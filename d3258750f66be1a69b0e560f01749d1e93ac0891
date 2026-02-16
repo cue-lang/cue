@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "168d7f96_89c067e9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-16T16:46:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0720ba96_9593933c",
+      "revId": "d3258750f66be1a69b0e560f01749d1e93ac0891",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e72b0c55_2ed06bd7",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-16T16:43:41Z",
       "side": 1,
       "message": "SGTM, but does it matter that fields in e.g. YAML can also be quoted?",
+      "revId": "d3258750f66be1a69b0e560f01749d1e93ac0891",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcf6490d_c4b1ecad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-16T16:46:32Z",
+      "side": 1,
+      "message": "Yes, but YAML is 100% broken atm because brace and bracket coordinates are wrong, so I\u0027ll revisit this once I\u0027ve fixed those.",
+      "parentUuid": "e72b0c55_2ed06bd7",
       "revId": "d3258750f66be1a69b0e560f01749d1e93ac0891",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

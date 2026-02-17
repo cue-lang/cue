@@ -114,7 +114,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 
 		for _, cfg = range []parser.Config{parseComments, importsOnly} {
 			syntax, err = parser.ParseFile(filename, content, cfg)
-			if syntax != nil {
+			if syntax != nil && syntax.Pos().HasAbsPos() {
 				break
 			}
 		}
@@ -136,11 +136,17 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 		return nil, parser.Config{}, nil
 	}
 
+	if syntax != nil && !syntax.Pos().HasAbsPos() {
+		// If we don't have an abs position, then we also don't have a
+		// [token.File], so something went terribly wrong when parsing.
+		// We should treat this as if there's no AST at all, to avoid
+		// downstream code attempting to work with this AST and finding
+		// the positions missing/invalid.
+		syntax = nil
+	}
+
 	if syntax != nil {
-		file := syntax.Pos().File()
-		if file != nil {
-			file.SetContent(content)
-		}
+		syntax.Pos().File().SetContent(content)
 		var pkg *ast.Package
 		decls := syntax.Decls
 		for _, decl := range decls {

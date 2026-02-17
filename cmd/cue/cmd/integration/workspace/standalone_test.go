@@ -105,7 +105,20 @@ y: x
 			env.CreateBuffer("z.cue", "@")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Reloaded", rootURI),
+				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: invalid attribute: expected '('", rootURI),
+				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Deleted", rootURI),
+			)
+		})
+	})
+
+	t.Run("open - bad experiment", func(t *testing.T) {
+		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.CreateBuffer("z.cue", "@experiment(unknown)")
+			env.Await(
+				env.DoneWithOpen(),
+				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: parsing experiments", rootURI),
+				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Deleted", rootURI),
 			)
 		})
 	})

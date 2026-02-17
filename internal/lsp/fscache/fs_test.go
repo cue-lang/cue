@@ -30,9 +30,9 @@ func TestCUECacheFSURI(t *testing.T) {
 		fh, err := fs.ReadFile(uri)
 		qt.Assert(t, qt.IsNil(err))
 		ast, cfg, err := fh.ReadCUE(parser.NewConfig())
-		qt.Assert(t, qt.IsNotNil(ast))
 
 		if strings.HasSuffix(f, "bad.cue") {
+			qt.Assert(t, qt.IsNil(ast))
 			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContentBad)))
 			qt.Assert(t, qt.IsNotNil(err))
 
@@ -42,6 +42,7 @@ func TestCUECacheFSURI(t *testing.T) {
 			qt.Assert(t, qt.ErrorMatches(errAgain, err.Error()))
 
 		} else {
+			qt.Assert(t, qt.IsNotNil(ast))
 			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContentGood)))
 			qt.Assert(t, qt.IsNil(err))
 			qt.Assert(t, qt.Equals(cfg.Mode, parser.ParseComments))

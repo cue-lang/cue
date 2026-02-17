@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/astsentinel"
 )
 
 // ----------------------------------------------------------------------------
@@ -457,22 +458,18 @@ type Ident struct {
 // created by NewPredeclared and the name is shadowed in scope, it renames the
 // identifier to avoid the shadow. It currently does so by writing the
 // "__"-prefixed form (e.g. "__self"), but this may change in the future.
-//
-// Use [Ident.IsPredeclared] to check if an identifier refers to a predeclared
-// name.
 func NewPredeclared(name string) *Ident {
 	return &Ident{Name: name, Node: predeclared}
 }
 
-// IsPredeclared reports whether id was created by [NewPredeclared],
-// i.e., whether it refers to a predeclared name.
-func (id *Ident) IsPredeclared() bool {
-	return id.Node == predeclared
-}
-
 // predeclared is a sentinel node used to mark identifiers that refer to
-// predeclared names.
+// predeclared names. It is also exported via astsentinel.Predeclared for
+// use by astutil.Sanitize.
 var predeclared Node = &predeclaredNode{}
+
+func init() {
+	astsentinel.Predeclared = predeclared
+}
 
 type predeclaredNode struct {
 	comments

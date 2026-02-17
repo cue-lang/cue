@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/astsentinel"
 )
 
 // TODO:
@@ -258,7 +259,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 
 	// A predeclared reference (e.g. "self") is shadowed by a local
 	// declaration. Use the "__"-prefixed form to avoid the shadow.
-	if n.IsPredeclared() {
+	if n.Node == astsentinel.Predeclared {
 		n.Name = "__" + n.Name
 		n.Node = nil
 		n.Scope = nil

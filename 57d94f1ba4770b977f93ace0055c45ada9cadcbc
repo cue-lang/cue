@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7194b8df_56dde6bf",
+        "filename": "tools/fix/fixall.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-17T15:39:00Z",
+      "side": 1,
+      "message": "from the user\u0027s point of view, it\u0027s odd to sanitize each of the instance files separately with an option pointing to all the files.\n\nwould it make more sense to have something like `sanitize.Instance` or `sanitize.Files`, deprecating the existing API as broken?\n\nI think such an API would be better as it\u0027s harder to misuse, i.e. by adding an option it\u0027s still possible to forget to use the option and get the broken behavior.\n\nThe only downside of a new API is that it\u0027s impossible to fix just one file out of many in an instance. But I don\u0027t really think that is going to be a common user workflow. We always run `cue fix` on either an entire package or on an entire module, not on a file-by-file basis.",
+      "revId": "57d94f1ba4770b977f93ace0055c45ada9cadcbc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

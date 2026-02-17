@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "78d431b3_fc1c15fe",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 2621,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T11:56:30Z",
+      "side": 1,
+      "message": "\u003e But it does.\n\nHmm, well, on further thought this demonstrates my own misunderstanding that once you reach the `{` you are specifying a comprehension value, and so definitely not adding to the existing clause sequence. So maybe there\u0027s nothing to change with the existing wording.",
+      "parentUuid": "d9aa931b_602ae965",
+      "revId": "14ec45f3bee9de17d2164d123a2bd0afadcc3c42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "46387b85_7e0bac93",
         "filename": "doc/ref/spec.md",
         "patchSetId": 5

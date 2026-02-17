@@ -25,6 +25,9 @@ import (
 	"cuelang.org/go/internal/core/convert"
 )
 
+// TODO: rename [Builtin] and [ToBuiltin] now that the spec separates predeclared (builtin)
+// functions from standard library functions consistently. Perhaps Func and ForADT?
+
 // A Builtin is a Builtin function or constant.
 //
 // A function may return and a constant may be any of the following types:

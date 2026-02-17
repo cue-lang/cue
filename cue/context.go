@@ -97,8 +97,12 @@ func ImportPath(path string) BuildOption {
 	return func(o *runtime.Config) { o.ImportPath = path }
 }
 
-// InferBuiltins allows unresolved references to bind to builtin packages with a
-// unique package name.
+// TODO: rename [InferBuiltins] now that the spec separates predeclared (builtin)
+// functions from standard library functions consistently. Perhaps InferStandardLibrary?
+// Also note that the "elide" parameter is entirely unused, which seems like a bug.
+
+// InferBuiltins allows unresolved references to bind to standard library packages
+// (formerly known as builtin packages) with a unique package name.
 //
 // This option is intended for evaluating expressions in a context where import
 // statements cannot be used. It is not recommended to use this for evaluating

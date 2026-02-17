@@ -958,8 +958,8 @@ a signed binary exponent of at least 16 bits.
 - Give an error if unable to represent a floating-point value due to overflow.
 - Round to the nearest representable value if unable to represent
 a floating-point value due to limits on precision.
-These requirements apply to the result of any expression except for builtin
-functions, for which an unusual loss of precision must be explicitly documented.
+These requirements apply to the result of any expression except for builtin functions,
+for which an unusual loss of precision must be explicitly documented.
 
 
 ### Strings
@@ -1824,7 +1824,7 @@ and to specify the default name for import declarations.
 
 ### Predeclared identifiers
 
-CUE predefines a set of types and builtin functions.
+CUE predefines a set of named types and functions, also known as builtins.
 For each of these there is a corresponding keyword which is the name
 of the predefined identifier, prefixed with `__`.
 
@@ -2565,18 +2565,16 @@ c3: T({ a: {b: 0} })  // _|_  // field a.b does not unify (0 & 1..10)
 
 ### Calls
 
-Calls can be made to core library functions, called builtins.
+Calls can be made to builtin or standard library functions.
 Given an expression `f` of function type F,
-```
-f(a1, a2, … an)
-```
+
+	f(a1, a2, … an)
+
 calls `f` with arguments `a1, a2, … an`. Arguments must be expressions
 of which the values are an instance of the parameter types of `F`
 and are evaluated before the function is called.
 
-```
-a: math.Atan2(x, y)
-```
+	a: math.Atan2(x, y)
 
 In a function call, the function value and arguments are evaluated in the usual
 order.
@@ -2717,11 +2715,12 @@ b: "Hello \( a )!" // Hello World!
 
 ## Builtin Functions
 
-Builtin functions are predeclared. They are called like any other function.
+These functions are available as [predeclared identifiers](#predeclared-identifiers).
+They are called like any other function.
 
 ### `error`
-The `error` builtin allows users to create custom error values with a specified
-message.
+
+The function `error` allows users to create custom error values with a specified message.
 User-generated errors can be included in disjunctions; if at least one disjunct
 is valid, any user errors are ignored.
 However, if all disjuncts fail, all user error messages are reported together.
@@ -2737,8 +2736,7 @@ a: 1/0 | error("infinity and beyond!: \(1/0)")
 
 ### `len`
 
-The builtin function `len` takes arguments of various types and returns
-a result of type int.
+The function `len` takes arguments of various types and returns a result of type int.
 
 ```
 Argument type    Result
@@ -2748,7 +2746,7 @@ list             list length, smallest length for an open list
 struct           number of distinct data fields, excluding field constraints
 ```
 <!-- TODO: consider not supporting len, but instead rely on more
-precisely named builtin functions:
+precisely named standard library functions:
   - strings.RuneLen(x)
   - bytes.Len(x)  // x may be a string
   - struct.NumFooFields(x)
@@ -2765,13 +2763,13 @@ len([1, 2, ...])     2
 
 ### `close`
 
-The builtin function `close` converts a partially defined, or open, struct
+The function `close` converts a partially defined, or open, struct
 to a fully defined, or closed, struct.
 
 
 ### `and`
 
-The builtin function `and` takes a list and returns the result of applying
+The function `and` takes a list and returns the result of applying
 the `&` operator to all elements in the list.
 It returns top for the empty list.
 
@@ -2784,7 +2782,7 @@ and([])              _
 
 ### `or`
 
-The builtin function `or` takes a list and returns the result of applying
+The function `or` takes a list and returns the result of applying
 the `|` operator to all elements in the list.
 It returns bottom for the empty list.
 
@@ -2837,13 +2835,13 @@ with `quo(x, y)` truncated towards zero.
 A zero divisor in either case results in bottom (an error).
 
 
-## Builtin Validators
+## Validators
 
 A validator validates the value at the position where it is defined.
 A successful validation yields the original value;
 a failed validation yields an error.
 
-Bounds (`<10`) are a type of validator.
+Bounds like `<10` are a type of validator.
 
 Functions that return a boolean value can be used as validators by omitting
 their first argument.
@@ -3202,8 +3200,9 @@ disambiguation in these cases.
 -->
 
 The interpretation of the ImportPath is implementation-dependent but it is
-typically either the path of a builtin package or a fully qualifying location
-of a package within a source code repository.
+typically either the path of a standard library package, like `math/bits`,
+or the location of a package within a [module](#modules-and-instances),
+like `github.com/org/repo/subpackage` or `cue.dev/x/githubactions`.
 
 An ImportLocation must be a non-empty string using only characters belonging to
 Unicode's L, M, N, P, and S general categories

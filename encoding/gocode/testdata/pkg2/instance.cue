@@ -3,8 +3,8 @@ package pkg2
 import "strings"
 
 ImportMe: {
-	A: <100
-	B: strings.ContainsAny("abc")
+	a: <100
+	b: strings.ContainsAny("abc")
 }
 
 PickMe: >5

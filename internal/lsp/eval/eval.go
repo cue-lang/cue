@@ -1906,12 +1906,14 @@ func (f *frame) eval() {
 			f.newFrame(node.Expr, f.navigable)
 
 		case *ast.PostfixExpr:
-			if node.Op == token.ELLIPSIS {
+			switch node.Op {
+			case token.ELLIPSIS:
 				unprocessed = append(unprocessed, node.X)
-			} else {
-				// Currently should never happen as Postfix is only used
-				// with ellipses. Just in case that changes, behave the
-				// same as Unary.
+			case token.OPTION:
+				embeddedResolvable = append(embeddedResolvable, node)
+			default:
+				// Currently should never happen. Just in case though,
+				// behave the same as Unary.
 				f.newFrame(node.X, nil)
 			}
 
@@ -2043,6 +2045,20 @@ func (f *frame) eval() {
 				// must be added to the current frame f because we need to
 				// be able to find it from the first element of a path.
 				f.newBinding(ident, node.Expr)
+			}
+
+		case *ast.TryClause:
+			comprehensionTail := comprehensionsStash[node]
+			if ident := node.Ident; ident != nil {
+				// Assignment form: try x = expr { ... }
+				f.newFrame(node.Expr, nil)
+
+				stack := frameStack{f.newFrame(nil, nil)}
+				stack.push(ident, stack.peek().newBinding(ident, nil))
+				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+			} else {
+				// Struct form: try { ... }
+				f.newFrame(comprehensionTail, f.navigable)
 			}
 
 		case *ast.Field:
@@ -2489,6 +2505,10 @@ func (f *frame) createPath(expr ast.Expr, receiver *navigable) {
 				start: start,
 				end:   end,
 			})
+
+		case *ast.PostfixExpr:
+			component = curExpr.X
+			nextEnd = curExpr.OpPos
 
 		default:
 			component = nil

@@ -16,6 +16,24 @@
       "message": "Technically `v2` _is_ a valid version, even though it\u0027s just the major version part of it. Also, the parenthesis wasn\u0027t terminated in quite the right place.\nHow about something like this instead?\n\n```suggestion\n\t\t\t\t\t\"package %s: %[2]s is not a valid version to use as an argument; use a fully qualified version (e.g. %[2]s.0.0, %[2]s.latest, or @latest)\",\n```",
       "revId": "21632ea7a5792e7a38ec09365bcb5c1db216bcc0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0e49ebd_d793976b",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-17T11:44:12Z",
+      "side": 1,
+      "message": "well spotted; done.",
+      "parentUuid": "9d839f30_c2fb6271",
+      "revId": "21632ea7a5792e7a38ec09365bcb5c1db216bcc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

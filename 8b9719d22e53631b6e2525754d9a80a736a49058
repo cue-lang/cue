@@ -71,6 +71,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e65b57a1_ffafeb5c",
+        "filename": "doc/specs/try-expressions/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:25:43Z",
+      "side": 1,
+      "message": "It might be nice to have another case where the nesting goes the other way:\n\n`a: string` and `try { x: y: a? } else { fallback: \"\" }`",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b16024b8_ab46c7e8",
+        "filename": "doc/specs/try-expressions/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:25:43Z",
+      "side": 1,
+      "message": "Looking at these made me realise there are no entries here for required fields. Which then made me run this:\n\n```\nexec cue eval try.cue\n-- try.cue --\n@experiment(try)\na!: _\ntry { x: a? } else { fallback: 23 }\n```\n\nUnfortunately, that panics:\n\n```\npanic: unreachable\n\ngoroutine 1 [running]:\ncuelang.org/go/internal/core/export.(*exporter).adt(0xc0001956b0, 0xc0003f6640, {0x1b0ae40, 0xc00034ce40})\n\t/home/matthew/cue/cue/internal/core/export/adt.go:295 +0x4245\ncuelang.org/go/internal/core/export.(*exporter).expr(0xc0001956b0, 0xc0003f6640, {0x1b0ae40, 0xc00034ce40})\n\t/home/matthew/cue/cue/internal/core/export/expr.go:100 +0x5fe\netc\n```",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbdc8a9e_bc777986",
+        "filename": "doc/specs/try-expressions/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:25:43Z",
+      "side": 1,
+      "message": "I think I mention this on the spec CL, but it would be nice to have an attempt to use ref? in *both* expression and struct, just to be super clear about whether there should be an error or not. Because currently this doesn\u0027t error, and I don\u0027t know whether it should or not:\n\n```\nexec cue eval try.cue\n-- try.cue --\n@experiment(try)\na: _\ntry y \u003d a? { x: a? } else { fallback: 23 }\n-- stdout --\na: _\nx: _\n```",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2e93e306_6d80f10f",
         "filename": "internal/core/adt/expr.go",
         "patchSetId": 5

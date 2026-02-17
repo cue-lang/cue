@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e1f4892_292f7f35",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-17T00:14:12Z",
+      "side": 1,
+      "message": "auto +2 please, as I already reviewed the patch in the PR, but my +2 doesn\u0027t count.",
+      "revId": "96f057efec0051427c2f75a1c0b4dad77606c4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

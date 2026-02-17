@@ -16,12 +16,13 @@ invalid: #Envs
 invalid: foo: {}
 -- out/evalalpha --
 Errors:
-invalid.foo: field not allowed:
+invalid.foo: Must specify a valid environment:
+    ./in.cue:1:39
     ./in.cue:10:10
 
 Result:
 (_|_){
-  // [eval]
+  // [user]
   #Environment: (string){ |((string){ "sbx" }, (string){ "stg" }, (string){ "pro" }) }
   #Envs: (#struct){
   }
@@ -30,9 +31,10 @@ Result:
     }
   }
   invalid: (_|_){
-    // [eval]
+    // [user]
     foo: (_|_){
-      // [eval] invalid.foo: field not allowed:
+      // [user] invalid.foo: Must specify a valid environment:
+      //     ./in.cue:1:39
       //     ./in.cue:10:10
     }
   }

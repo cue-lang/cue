@@ -211,6 +211,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd9ab2df_4dfe2172",
+        "filename": "doc/specs/try-expressions/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T17:21:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "803baddd_78701781",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbdc8a9e_bc777986",
@@ -242,6 +260,24 @@
       "side": 1,
       "message": "Good catch. That definitely should error.",
       "parentUuid": "cbdc8a9e_bc777986",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d1d47a4_b64be2f7",
+        "filename": "doc/specs/try-expressions/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T17:21:20Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "ecb1d96c_63bc1134",
       "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

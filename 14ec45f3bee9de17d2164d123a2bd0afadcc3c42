@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9aa931b_602ae965",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 2621,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T11:27:57Z",
+      "side": 1,
+      "message": "I think `it must be the last clause` is a bit confusing, because it suggests that any clause that follows is illegal. That would suggest that this wouldn\u0027t parse:\n\n```\n@experiment(try)\ntry {\n\tfor k in s {}\n}\n```\n\nBut it does. I think it\u0027s sufficient to say \"In the latter case the clause following the try comprehension is used as the try expression.\"\n\nI appreciate the need to keep the spec short, but it might be worth making clear that optional references are allowed within nested comprehensions. E.g.\n```\n@experiment(try)\ntry {\n\tfor k in s {\n\t\tx: a?\n\t}\n}\n```",
+      "revId": "14ec45f3bee9de17d2164d123a2bd0afadcc3c42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46387b85_7e0bac93",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 2632,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T11:27:57Z",
+      "side": 1,
+      "message": "It might be worth saying what happens if there are both `?`-optional expressions within the expression *and* the subsequent clause. E.g.\n\n```\ntry b \u003d a? {\n\tc: d?\n}\n```",
+      "revId": "14ec45f3bee9de17d2164d123a2bd0afadcc3c42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1938,6 +1938,9 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 // [Value.LookupPath](path) resolves to the same value, or no path if this value
 // is not a reference.
 func (v Value) ReferencePath() (root Value, p Path) {
+	if v.v == nil || v.v.IsData() {
+		return Value{}, Path{}
+	}
 	// TODO: don't include references to hidden fields.
 	c, count := v.v.SingleConjunct()
 	if count != 1 {

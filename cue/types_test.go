@@ -3422,6 +3422,7 @@ func TestReferencePath(t *testing.T) {
 		want           string
 		wantImportPath string
 		alt            string
+		eval           bool // call Eval before ReferencePath
 	}{{
 		input: "v: w: x: _|_",
 		want:  "",
@@ -3493,6 +3494,11 @@ func TestReferencePath(t *testing.T) {
 		want:           "Pi",
 		wantImportPath: "math",
 		alt:            "3.14159265358979323846264338327950288419716939937510582097494459",
+	}, {
+		// Issue #4096: ReferencePath should return empty after Eval.
+		input: "v: w: x: a, a: 1",
+		eval:  true,
+		want:  "",
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
@@ -3500,6 +3506,9 @@ func TestReferencePath(t *testing.T) {
 
 			val := ctx.CompileString(tc.input, cue.Filename("in"))
 			v := val.Lookup("v", "w", "x")
+			if tc.eval {
+				v = v.Eval()
+			}
 
 			root, path := v.ReferencePath()
 			if got := path.String(); got != tc.want {

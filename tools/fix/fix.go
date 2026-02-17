@@ -69,7 +69,7 @@ func UpgradeVersion(version string) Option {
 
 // File applies fixes to f and returns it. It alters the original f.
 func File(f *ast.File, o ...Option) *ast.File {
-	f, err := file(f, "", o...)
+	f, err := file(f, "", nil, o...)
 	// TODO: this File method is public, and its signature was fixed
 	// before we started calling Sanitize. Ideally, we want to return
 	// this error, but that would require deprecating this File method,
@@ -82,7 +82,7 @@ func File(f *ast.File, o ...Option) *ast.File {
 	return f
 }
 
-func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
+func file(f *ast.File, version string, so []astutil.SanitizeOption, o ...Option) (*ast.File, errors.Error) {
 	existingExps := f.Pos().Experiment()
 	if version == "" {
 		version = existingExps.LanguageVersion()
@@ -201,7 +201,7 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		f = simplify(f)
 	}
 
-	err = astutil.Sanitize(f)
+	err = astutil.Sanitize(f, so...)
 	if err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "fix: sanitize failed")
 	}

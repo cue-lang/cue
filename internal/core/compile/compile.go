@@ -456,11 +456,20 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			}
 		}
 
-		if p := predeclared(n); p != nil {
-			return c.verifyVersion(n, p)
+		p := predeclared(n)
+		if p == nil {
+			return c.errf(n, "reference %q not found", n.Name)
 		}
 
-		return c.errf(n, "reference %q not found", n.Name)
+		return c.verifyVersion(n, p)
+	}
+
+	if n.IsPredeclared() {
+		p := predeclared(n)
+		if p == nil {
+			return c.errf(n, "predeclared identifier %q not found", n.Name)
+		}
+		return c.verifyVersion(n, p)
 	}
 
 	//   X in [X=x]: y  Scope: Field  Node: Expr (x)

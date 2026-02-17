@@ -79,6 +79,9 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 //    Value               Field          Field
 // Pkg                    nil            ImportSpec
 
+// TODO: allow passing all files in a package and mark nodes as predeclared
+// identifiers.
+
 // Resolve resolves all identifiers in a file, populating [ast.Ident.Node] fields.
 // Unresolved identifiers are recorded in [ast.File.Unresolved].
 // It will not overwrite already resolved identifiers.

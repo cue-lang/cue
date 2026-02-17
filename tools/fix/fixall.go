@@ -18,6 +18,7 @@ import (
 	"os"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -66,12 +67,18 @@ func Instances(a []*build.Instance, o ...Option) errors.Error {
 			}
 		}
 
+		// Compute top-level names once per package for cross-file shadowing
+		// detection.
+		sanitizeOptions := []astutil.SanitizeOption{
+			astutil.WithPackageFiles(b.Files),
+		}
+
 		for _, f := range b.Files {
 			if done[f] {
 				continue
 			}
 			done[f] = true
-			_, err := file(f, version, o...)
+			_, err := file(f, version, sanitizeOptions, o...)
 			if err != nil {
 				return err
 			}

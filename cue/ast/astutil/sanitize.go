@@ -29,6 +29,47 @@ import (
 // - change field from foo to "foo" if it isn't referenced, rather than
 //   relying on introducing a unique alias.
 
+// SanitizeOption configures the behavior of Sanitize.
+type SanitizeOption func(*sanitizer)
+
+// WithPackageFiles specifies all files in the package. Sanitize will extract
+// top-level field and definition names from these files to detect cross-file
+// shadowing of predeclared identifiers.
+//
+// Reuse this option between calls with identical file sets for better
+// efficiency.
+func WithPackageFiles(files []*ast.File) SanitizeOption {
+	names := make(map[string]bool)
+	for _, f := range files {
+		for _, d := range f.Decls {
+			switch x := d.(type) {
+			case *ast.Field:
+				if name := labelName(x.Label); name != "" {
+					names[name] = true
+				}
+			}
+		}
+	}
+	return func(z *sanitizer) {
+		for name := range names {
+			z.names[name] = true
+		}
+	}
+}
+
+// labelName returns the name of a label, or "" if it cannot be determined.
+func labelName(label ast.Label) string {
+	switch x := label.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.Alias:
+		if id, ok := x.Expr.(*ast.Ident); ok {
+			return id.Name
+		}
+	}
+	return ""
+}
+
 // Sanitize rewrites File f in place to be well-formed after automated
 // construction of an AST.
 //
@@ -36,7 +77,7 @@ import (
 //   - auto inserts imports associated with Idents
 //   - unshadows imports associated with idents
 //   - unshadows references for identifiers that were already resolved.
-func Sanitize(f *ast.File) error {
+func Sanitize(f *ast.File, opts ...SanitizeOption) error {
 	z := &sanitizer{
 		file: f,
 		rand: rand.New(rand.NewPCG(123, 456)), // ensure determinism between runs
@@ -45,6 +86,11 @@ func Sanitize(f *ast.File) error {
 		importMap:  map[string]*ast.ImportSpec{},
 		referenced: map[ast.Node]bool{},
 		altMap:     map[ast.Node]string{},
+	}
+
+	// Apply options first, so cross-file names are registered before gathering.
+	for _, opt := range opts {
+		opt(z)
 	}
 
 	// Gather all names.
@@ -200,6 +246,15 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 
 	_, _, node := s.lookup(n.Name)
 	if node.node == nil {
+		if n.IsPredeclared() {
+			// Check if the predeclared name is shadowed by a top-level field
+			// in another file of the same package.
+			if z.names[n.Name] {
+				n.Name = "__" + n.Name
+			}
+			n.Scope = nil
+			return true
+		}
 		spec, ok := n.Node.(*ast.ImportSpec)
 		if !ok {
 			// Clear node. A reference may have been moved to a different
@@ -260,7 +315,6 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 	// declaration. Use the "__"-prefixed form to avoid the shadow.
 	if n.IsPredeclared() {
 		n.Name = "__" + n.Name
-		n.Node = nil
 		n.Scope = nil
 		return false
 	}

@@ -1,0 +1,55 @@
+# Test that error() in a disjunction used as a pattern constraint key
+# surfaces the custom error message instead of the generic "field not allowed".
+#
+# Issue #4208
+
+-- in.cue --
+#Environment: "sbx" | "stg" | "pro" | error("Must specify a valid environment")
+#Envs: [Env=#Environment]: {}
+
+// Valid key should work fine.
+valid: #Envs
+valid: sbx: {}
+
+// Invalid key should show the custom error message.
+invalid: #Envs
+invalid: foo: {}
+-- out/evalalpha --
+Errors:
+invalid.foo: field not allowed:
+    ./in.cue:10:10
+
+Result:
+(_|_){
+  // [eval]
+  #Environment: (string){ |((string){ "sbx" }, (string){ "stg" }, (string){ "pro" }) }
+  #Envs: (#struct){
+  }
+  valid: (#struct){
+    sbx: (#struct){
+    }
+  }
+  invalid: (_|_){
+    // [eval]
+    foo: (_|_){
+      // [eval] invalid.foo: field not allowed:
+      //     ./in.cue:10:10
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #Environment: ("sbx"|"stg"|"pro"|error("Must specify a valid environment"))
+  #Envs: {
+    [〈1;#Environment〉]: {}
+  }
+  valid: 〈0;#Envs〉
+  valid: {
+    sbx: {}
+  }
+  invalid: 〈0;#Envs〉
+  invalid: {
+    foo: {}
+  }
+}

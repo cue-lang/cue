@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f73619ff_d2fd750d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:05:53Z",
+      "side": 1,
+      "message": "Just getting this batch published; I still need to work through the main try.txtar, and the spec.md.",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d4a9be1_05336574",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 939,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:05:53Z",
+      "side": 1,
+      "message": "I\u0027m surprised these \\n were added.",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d05239a2_432b37c1",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:05:53Z",
+      "side": 1,
+      "message": "I can\u0027t claim to understand all the details here, but I\u0027m puzzled why the preceding case (LetClause) twiddles s.inField around the ast.Walk call. If it\u0027s correct to *not* do that here, I guess I\u0027m not understanding the difference between this form of try, and a let.",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d267477_cec7c950",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1217,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:05:53Z",
+      "side": 1,
+      "message": "I wonder whether we might get nicer error messages if that `p.peek()` was a `p.expect(token.Bind)`?\n\nAs this code stands,\n\n```\ntry x 3\n```\n\ngives the error `expected \u0027{\u0027, found \u0027IDENT\u0027 x` because it\u0027s falling back to to the struct form. By contrast,\n\n```\nlet x 3\n```\n\ngives the error `expected \u0027\u003d\u0027, found \u0027INT\u0027 3:`.\n\nIs there a reason why, if we see an ident to start with, that we should allow falling back to the struct form?",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e93e306_6d80f10f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 2260,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:05:53Z",
+      "side": 1,
+      "message": "nit: surprising name. Would `savedSkip` be clearer?",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecc7034a_6e79dcbd",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 982,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:05:53Z",
+      "side": 1,
+      "message": "You seem to be consistently checking `tc.Ident` to determine if it\u0027s assignment or struct form. But here you switch to `tc.Expr`. I understand it doesn\u0027t matter which one, but it seems unfortunate to not be consistent.",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7269d358_a4980a88",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T14:05:53Z",
+      "side": 1,
+      "message": "This code happens 4 times in this file. I think it makes sense to bring it out to a helper - it\u0027s the equiv of `parser.wrapOptional`",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

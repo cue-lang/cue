@@ -16,6 +16,23 @@
       "message": "auto +2 please, as I already reviewed the patch in the PR, but my +2 doesn\u0027t count.",
       "revId": "96f057efec0051427c2f75a1c0b4dad77606c4ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a772ec96_08c2ceab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2026-02-17T11:30:17Z",
+      "side": 1,
+      "message": "approving as chiefcueckoo to unblock myself (daniel)",
+      "revId": "96f057efec0051427c2f75a1c0b4dad77606c4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -993,6 +993,349 @@ func TestFiles(t *testing.T) {
 	}
 }
 
+func TestMappingBracePositions(t *testing.T) {
+	type structInfo struct {
+		LbraceOffset int
+		RbraceOffset int
+	}
+	collectStructs := func(node ast.Node) []structInfo {
+		var infos []structInfo
+		ast.Walk(node, func(n ast.Node) bool {
+			if s, ok := n.(*ast.StructLit); ok {
+				infos = append(infos, structInfo{
+					LbraceOffset: s.Lbrace.Offset(),
+					RbraceOffset: s.Rbrace.Offset(),
+				})
+			}
+			return true
+		}, nil)
+		return infos
+	}
+
+	tests := []struct {
+		name string
+		yaml string
+		want []structInfo
+	}{
+		{
+			name: "BlankLinesBetweenSiblings",
+			yaml: `
+x:
+  a: 1
+  b: 2
+
+
+y:
+  c: 3
+  d: 4
+`[1:],
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 35},  // top-level: last \n in file
+				{LbraceOffset: 5, RbraceOffset: 18},  // x's struct: \n of last blank line before y
+				{LbraceOffset: 24, RbraceOffset: 35}, // y's struct: last \n in file
+			},
+		},
+		{
+			name: "NoBlankLinesBetweenSiblings",
+			yaml: `
+x:
+  a: 1
+  b: 2
+y:
+  c: 3
+  d: 4
+`[1:],
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 33},  // top-level: last \n in file
+				{LbraceOffset: 5, RbraceOffset: 16},  // x's struct: \n ending "  b: 2"
+				{LbraceOffset: 22, RbraceOffset: 33}, // y's struct: last \n in file
+			},
+		},
+		{
+			name: "SequenceOfMappingsWithBlankLines",
+			yaml: `
+- a: 1
+  b: 2
+
+- c: 3
+  d: 4
+`[1:],
+			want: []structInfo{
+				{LbraceOffset: 2, RbraceOffset: 14},  // first mapping: \n of blank line before "- c: 3"
+				{LbraceOffset: 17, RbraceOffset: 28}, // second mapping: last \n in file
+			},
+		},
+		{
+			name: "DeeplyNested",
+			yaml: `
+x:
+  y:
+    a: 1
+    b: 2
+
+  z:
+    c: 3
+    d: 4
+`[1:],
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 49},  // top-level: last \n in file
+				{LbraceOffset: 5, RbraceOffset: 49},  // x's struct: last \n in file
+				{LbraceOffset: 12, RbraceOffset: 26}, // y's struct: \n of blank line before z
+				{LbraceOffset: 36, RbraceOffset: 49}, // z's struct: last \n in file
+			},
+		},
+		{
+			name: "FlowMapping",
+			yaml: `{a: 1, b: 2}`,
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 11},
+			},
+		},
+		{
+			name: "EmptyFlowMapping",
+			yaml: `{}`,
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 1},
+			},
+		},
+		{
+			name: "NestedFlowMapping",
+			yaml: `{a: {b: 1}}`,
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 10}, // outer
+				{LbraceOffset: 4, RbraceOffset: 9},  // inner
+			},
+		},
+		{
+			name: "BlockStyleWithComments",
+			yaml: `
+a:
+  b: 1
+
+
+# comment
+
+c: 2
+`[1:],
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 27}, // top-level: last \n in file
+				{LbraceOffset: 5, RbraceOffset: 11}, // a's struct: \n at end of line 4 (before # comment)
+			},
+		},
+		{
+			name: "SequenceWithComments",
+			yaml: `
+- a: 1
+  b: 2
+
+# comment
+- c: 3
+  d: 4
+`[1:],
+			want: []structInfo{
+				{LbraceOffset: 2, RbraceOffset: 14},  // first mapping: \n of blank line before comment
+				{LbraceOffset: 27, RbraceOffset: 38}, // second mapping: last \n in file
+			},
+		},
+		{
+			name: "FlowStyleWithComment",
+			// The Rbrace should be at the actual '}', not affected by the comment.
+			yaml: `
+{a: 1, b: 2} # comment
+`[1:],
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 11},
+			},
+		},
+		{
+			name: "FlowStyleMultilineWithComments",
+			yaml: `
+{a: 3, # comment
+b: {c: 4}, # comment
+
+d: 5
+}`[1:],
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 44},  // outer: } on line 5
+				{LbraceOffset: 20, RbraceOffset: 25}, // inner {c: 4}: } at offset 25
+			},
+		},
+		{
+			name: "FlowAliasMapping",
+			// Alias to a flow mapping: the anchor's Lbrace should be at '{'
+			// (skipping '&x '), and the alias's braces should reflect the
+			// *x reference site.
+			yaml: `{a: &x {b: 1}, c: *x, d: 2}`,
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 26},  // outer
+				{LbraceOffset: 7, RbraceOffset: 12},  // anchor {b: 1}: Lbrace at '{' past anchor
+				{LbraceOffset: 18, RbraceOffset: 19}, // alias *x: spans the alias reference
+			},
+		},
+		{
+			name: "BlockAliasMapping",
+			// Alias to a block mapping: the anchor's Lbrace should be at
+			// the first key 'b' (skipping '&x\n  '), and the alias's
+			// braces should reflect the *x reference site.
+			yaml: `
+a: &x
+  b: 1
+  c: 2
+d: *x
+e: 3
+`[1:],
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 30},  // top-level: last \n
+				{LbraceOffset: 6, RbraceOffset: 19},  // anchor: Lbrace at 'b', Rbrace at \n ending "  c: 2"
+				{LbraceOffset: 23, RbraceOffset: 24}, // alias *x: spans the alias reference
+			},
+		},
+		{
+			name: "FlowStyleLastValueContainsClosingBrace",
+			// The last value is a quoted string containing '}', which
+			// findClosing must skip over to find the real '}'.
+			yaml: `{a: {b: {c: "contains }"}}}`,
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 26}, // outer
+				{LbraceOffset: 4, RbraceOffset: 25}, // a's value
+				{LbraceOffset: 8, RbraceOffset: 24}, // b's value
+			},
+		},
+		{
+			name: "NoTrailingNewline",
+			yaml: `
+x:
+  a: 1
+  b: 2`[1:],
+			want: []structInfo{
+				{LbraceOffset: 0, RbraceOffset: 15}, // top-level: last char in file
+				{LbraceOffset: 5, RbraceOffset: 15}, // x's struct: last char in file
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expr, err := yaml.Unmarshal("test.yaml", []byte(tt.yaml))
+			qt.Assert(t, qt.IsNil(err))
+			got := collectStructs(expr)
+			qt.Assert(t, qt.DeepEquals(got, tt.want))
+		})
+	}
+}
+
+func TestSequenceBracketPositions(t *testing.T) {
+	type listInfo struct {
+		LbrackOffset int
+		RbrackOffset int
+	}
+	collectLists := func(node ast.Node) []listInfo {
+		var infos []listInfo
+		ast.Walk(node, func(n ast.Node) bool {
+			if l, ok := n.(*ast.ListLit); ok {
+				infos = append(infos, listInfo{
+					LbrackOffset: l.Lbrack.Offset(),
+					RbrackOffset: l.Rbrack.Offset(),
+				})
+			}
+			return true
+		}, nil)
+		return infos
+	}
+
+	tests := []struct {
+		name string
+		yaml string
+		want []listInfo
+	}{
+		{
+			name: "FlowSequence",
+			yaml: `[1, 2, 3]`,
+			want: []listInfo{
+				{LbrackOffset: 0, RbrackOffset: 8},
+			},
+		},
+		{
+			name: "EmptyFlowSequence",
+			yaml: `[]`,
+			want: []listInfo{
+				{LbrackOffset: 0, RbrackOffset: 1},
+			},
+		},
+		{
+			name: "NestedFlowSequence",
+			yaml: `[[1, 2], [3, 4]]`,
+			want: []listInfo{
+				{LbrackOffset: 0, RbrackOffset: 15}, // outer
+				{LbrackOffset: 1, RbrackOffset: 6},  // inner [1, 2]
+				{LbrackOffset: 9, RbrackOffset: 14}, // inner [3, 4]
+			},
+		},
+		{
+			name: "BlockSequence",
+			yaml: `
+- 1
+- 2
+- 3
+`[1:],
+			want: []listInfo{
+				{LbrackOffset: 0, RbrackOffset: 11}, // last \n in file
+			},
+		},
+		{
+			name: "BlockSequenceWithBlankLines",
+			yaml: `
+- 1
+
+- 2
+`[1:],
+			want: []listInfo{
+				{LbrackOffset: 0, RbrackOffset: 8}, // last \n in file
+			},
+		},
+		{
+			name: "BlockSequenceWithComments",
+			yaml: `
+- 1
+
+# comment
+- 2
+`[1:],
+			want: []listInfo{
+				{LbrackOffset: 0, RbrackOffset: 18}, // last \n in file
+			},
+		},
+		{
+			name: "FlowAliasSequence",
+			// Alias to a flow sequence: the anchor's Lbrack should be at '['
+			// (skipping '&y '), and the alias's brackets should reflect the
+			// *y reference site.
+			yaml: `[&y [1, 2], *y, 3]`,
+			want: []listInfo{
+				{LbrackOffset: 0, RbrackOffset: 17},  // outer
+				{LbrackOffset: 4, RbrackOffset: 9},   // anchor [1, 2]: Lbrack at '[' past anchor
+				{LbrackOffset: 12, RbrackOffset: 13}, // alias *y: spans the alias reference
+			},
+		},
+		{
+			name: "FlowSequenceWithComment",
+			yaml: `
+[1, 2] # comment
+`[1:],
+			want: []listInfo{
+				{LbrackOffset: 0, RbrackOffset: 5},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expr, err := yaml.Unmarshal("test.yaml", []byte(tt.yaml))
+			qt.Assert(t, qt.IsNil(err))
+			got := collectLists(expr)
+			qt.Assert(t, qt.DeepEquals(got, tt.want))
+		})
+	}
+}
+
 func TestTrailingInput(t *testing.T) {
 	for _, input := range []string{
 		"---\nfirst\n...\n}invalid yaml",

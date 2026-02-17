@@ -8,6 +8,7 @@ import (
 	"io"
 	"regexp"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -44,6 +45,7 @@ type decoder struct {
 	// decodeErr is returned by any further calls to Decode when not nil.
 	decodeErr error
 
+	src      []byte
 	tokFile  *token.File
 	tokLines []int
 
@@ -56,13 +58,21 @@ type decoder struct {
 	// extractingAliases ensures we don't loop forever when expanding YAML anchors.
 	extractingAliases map[*yaml.Node]bool
 
-	// lastPos is the last YAML node position that we decoded,
-	// used for working out relative positions such as token.NewSection.
-	// This position can only increase, moving forward in the file.
-	lastPos token.Position
+	// lastOffset is byte offset from the last yaml.Node position that
+	// we decoded, used for working out relative positions such as
+	// token.NewSection. This offset can only increase, moving forward
+	// in the file. A value of -1 means no position has been recorded
+	// yet.
+	lastOffset int
 
 	// forceNewline ensures that the next position will be on a new line.
 	forceNewline bool
+
+	// scopeEnd is the byte offset (exclusive) bounding the current
+	// node's extent in the source. Used to compute Rbrace positions
+	// for struct literals: the Rbrace is placed at offset scopeEnd-1
+	// (typically the \n ending the last line before the next content).
+	scopeEnd int
 }
 
 // TODO(mvdan): this can be io.Reader really, except that token.Pos is offset-based,
@@ -82,9 +92,14 @@ func NewDecoder(filename string, b []byte) *decoder {
 	tokFile := token.NewFile(filename, 0, len(b)+1)
 	tokFile.SetLinesForContent(b)
 	return &decoder{
+		src:         b,
 		tokFile:     tokFile,
 		tokLines:    append(tokFile.Lines(), len(b)),
 		yamlDecoder: *yaml.NewDecoder(bytes.NewReader(b)),
+		lastOffset:  -1,
+		// TODO: for a streaming decoder we'll need to remove this
+		// dependency on knowing the length of the input ahead of time.
+		scopeEnd: len(b),
 	}
 }
 
@@ -231,7 +246,7 @@ func (d *decoder) addHeadCommentsToPending(yn *yaml.Node) {
 	// This will be wrong in some cases, moving empty lines, but is better than nothing.
 	if len(d.pendingHeadComments) == 0 && len(comments) > 0 {
 		c := comments[0]
-		if d.lastPos.IsValid() && (yn.Line-len(comments))-d.lastPos.Line >= 2 {
+		if d.lastOffset >= 0 && (yn.Line-len(comments))-d.offsetLine(d.lastOffset) >= 2 {
 			c.Slash = c.Slash.WithRel(token.NewSection)
 		}
 	}
@@ -284,39 +299,184 @@ func (d *decoder) posErrorf(yn *yaml.Node, format string, args ...any) error {
 	return fmt.Errorf(d.tokFile.Name()+":"+strconv.Itoa(yn.Line)+": "+format, args...)
 }
 
-// pos converts a YAML node position to a cue/ast position.
-// Note that this method uses and updates the last position in lastPos,
-// so it should be called on YAML nodes in increasing position order.
-func (d *decoder) pos(yn *yaml.Node) token.Pos {
-	// Calculate the position's offset via the line and column numbers.
-	offset := d.tokLines[yn.Line-1] + (yn.Column - 1)
+// yamlOffset converts a YAML node's line and column to a byte offset.
+func (d *decoder) yamlOffset(yn *yaml.Node) int {
+	return d.tokLines[yn.Line-1] + (yn.Column - 1)
+}
+
+// offsetLine returns a 1-indexed line number for the given byte
+// offset.
+func (d *decoder) offsetLine(offset int) int {
+	return sort.Search(len(d.tokLines), func(i int) bool {
+		return d.tokLines[i] > offset
+	})
+}
+
+// contentOffset returns the byte offset where a node's content
+// starts, skipping past any YAML anchor prefix (&name). For
+// flow-style nodes, it finds the opening delimiter (open). For
+// block-style nodes, it skips past the anchor and newline. When the
+// node has no anchor, it returns the node's position as-is.
+func (d *decoder) contentOffset(yn *yaml.Node, open byte) int {
+	offset := d.yamlOffset(yn)
+	if yn.Anchor == "" {
+		return offset
+	}
+
+	if yn.Style&yaml.FlowStyle != 0 {
+		for offset < len(d.src) && d.src[offset] != open {
+			offset++
+		}
+		return offset
+	}
+
+	// For block style, we want to be as greedy as possible. So once
+	// we're past the anchor, we want to stop right after the first
+	// newline, or at the first non-whitespace, whichever is sooner.
+	offset += 1 + len(yn.Anchor) // skip '&' and anchor name
+	newlineSeen := false
+	for ; offset < len(d.src); offset++ {
+		if newlineSeen {
+			return offset
+		}
+		switch d.src[offset] {
+		case ' ', '\t':
+		case '\n', '\r':
+			newlineSeen = true
+		default:
+			return offset
+		}
+	}
+	return offset
+}
+
+// pos converts a byte offset to a cue/ast position.
+// Note that this method uses and updates the last offset in lastOffset,
+// so it should be called with increasing offsets.
+func (d *decoder) pos(offset int) token.Pos {
 	pos := d.tokFile.Pos(offset, token.NoRelPos)
 
 	if d.forceNewline {
 		d.forceNewline = false
 		pos = pos.WithRel(token.Newline)
-	} else if d.lastPos.IsValid() {
+	} else if d.lastOffset >= 0 {
+		lastLine := d.offsetLine(d.lastOffset)
+		curLine := d.offsetLine(offset)
 		switch {
-		case yn.Line-d.lastPos.Line >= 2:
+		case curLine-lastLine >= 2:
 			pos = pos.WithRel(token.NewSection)
-		case yn.Line-d.lastPos.Line == 1:
+		case curLine-lastLine == 1:
 			pos = pos.WithRel(token.Newline)
-		case yn.Column-d.lastPos.Column > 0:
+		case offset-d.lastOffset > 0:
 			pos = pos.WithRel(token.Blank)
 		default:
 			pos = pos.WithRel(token.NoSpace)
 		}
-		// If for any reason the node's position is before the last position,
-		// give up and return an empty position. Akin to: yn.Pos().Before(d.lastPos)
+		// If for any reason the offset is before the last offset, give
+		// up and return an empty position.
 		//
 		// TODO(mvdan): Brought over from the old decoder; when does this happen?
 		// Can we get rid of those edge cases and this bit of logic?
-		if yn.Line < d.lastPos.Line || (yn.Line == d.lastPos.Line && yn.Column < d.lastPos.Column) {
+		if offset < d.lastOffset {
 			return token.NoPos
 		}
 	}
-	d.lastPos = token.Position{Line: yn.Line, Column: yn.Column}
+	d.lastOffset = offset
 	return pos
+}
+
+// findClosing scans forward from start in the source bytes to find
+// the first occurrence of close (typically '}' or ']') that is not
+// inside a quoted string or comment. It returns the byte offset.
+func (d *decoder) findClosing(start int, close byte) int {
+	for i := start; i < len(d.src); i++ {
+		switch d.src[i] {
+		case close:
+			return i
+		case '"':
+			// Skip double-quoted string.
+			for i++; i < len(d.src); i++ {
+				if d.src[i] == '\\' {
+					i++ // skip escaped character
+				} else if d.src[i] == '"' {
+					break
+				}
+			}
+		case '\'':
+			// Skip single-quoted string.
+			for i++; i < len(d.src); i++ {
+				if d.src[i] == '\'' {
+					if i+1 < len(d.src) && d.src[i+1] == '\'' {
+						i++ // skip '' escape
+					} else {
+						break
+					}
+				}
+			}
+		case '#':
+			// Skip comment to end of line. In YAML flow context, #
+			// starts a comment when preceded by whitespace (or at the
+			// start of the scan region).
+			if i == start || d.src[i-1] == ' ' || d.src[i-1] == '\t' {
+				for i++; i < len(d.src) && d.src[i] != '\n'; i++ {
+				}
+			}
+		}
+	}
+	return len(d.src) // shouldn't happen with valid YAML
+}
+
+// isBlankLine returns true if the 0-indexed line contains only
+// whitespace.
+func (d *decoder) isBlankLine(lineIdx int) bool {
+	start := d.tokLines[lineIdx]
+	end := d.tokLines[lineIdx+1]
+	for i := start; i < end; i++ {
+		switch d.src[i] {
+		case ' ', '\t', '\n', '\r':
+		default:
+			return false
+		}
+	}
+	return true
+}
+
+// isCommentLine returns true if the 0-indexed line is a comment-only
+// line (optional leading whitespace followed by '#').
+func (d *decoder) isCommentLine(lineIdx int) bool {
+	start := d.tokLines[lineIdx]
+	end := d.tokLines[lineIdx+1]
+	for i := start; i < end; i++ {
+		switch c := d.src[i]; c {
+		case ' ', '\t':
+		default:
+			return c == '#'
+		}
+	}
+	return false
+}
+
+// scopeEndBefore computes the scope end before the given YAML node,
+// excluding any head comments and their surrounding blank lines from
+// the scope. This ensures that comments belonging to the next sibling
+// are not consumed by the current node's scope.
+func (d *decoder) scopeEndBefore(yn *yaml.Node) int {
+	end := d.tokLines[yn.Line-1]
+	if yn.HeadComment == "" {
+		return end
+	}
+	// Walk backwards from the line before yn, skipping blank lines and
+	// then comment lines that belong to yn's head comments.
+	lineIdx := yn.Line - 2 // 0-indexed line just before yn
+	// Skip blank lines between comment and node.
+	for lineIdx >= 0 && d.isBlankLine(lineIdx) {
+		lineIdx--
+	}
+	// Skip comment lines.
+	for lineIdx >= 0 && d.isCommentLine(lineIdx) {
+		lineIdx--
+	}
+	return d.tokLines[lineIdx+1]
 }
 
 func (d *decoder) document(yn *yaml.Node) (ast.Expr, error) {
@@ -327,9 +487,23 @@ func (d *decoder) document(yn *yaml.Node) (ast.Expr, error) {
 }
 
 func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
+	parentScopeEnd := d.scopeEnd // save before the loop modifies it
 	list := &ast.ListLit{
-		Lbrack: d.pos(yn).WithRel(token.Blank),
+		// Compute the bracket position directly without the side
+		// effects of d.pos. Like struct braces, brackets are a CUE
+		// concept with no YAML counterpart in block-style sequences.
+		// Use contentOffset to skip past any anchor prefix.
+		Lbrack: d.tokFile.Pos(d.contentOffset(yn, '['), token.Blank),
 	}
+
+	// Unlike mappings which use d.label for keys, sequences extract
+	// elements directly. Advance lastOffset so that element relative
+	// positions are computed against the sequence node, not whatever
+	// came before it.
+	if ynOffset := d.yamlOffset(yn); ynOffset >= d.lastOffset {
+		d.lastOffset = ynOffset
+	}
+
 	multiline := false
 	if len(yn.Content) > 0 {
 		multiline = yn.Line < yn.Content[len(yn.Content)-1].Line
@@ -337,8 +511,14 @@ func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
 
 	// If a list is empty, or ends with a struct, the closing `]` is on the same line.
 	closeSameLine := true
-	for _, c := range yn.Content {
+	for i, c := range yn.Content {
 		d.forceNewline = multiline
+		// Set the scope end for the element we're about to extract.
+		if i+1 < len(yn.Content) {
+			d.scopeEnd = d.scopeEndBefore(yn.Content[i+1])
+		} else {
+			d.scopeEnd = parentScopeEnd
+		}
 		elem, err := d.extract(c)
 		if err != nil {
 			return nil, err
@@ -347,14 +527,42 @@ func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
 		// A list of structs begins with `[{`, so let it end with `}]`.
 		_, closeSameLine = elem.(*ast.StructLit)
 	}
-	if multiline && !closeSameLine {
-		list.Rbrack = list.Rbrack.WithRel(token.Newline)
+
+	if yn.Style&yaml.FlowStyle != 0 {
+		// Flow-style sequence: find the actual ']' in the source.
+		start := d.lastOffset
+		if len(yn.Content) == 0 {
+			start = list.Lbrack.Offset() + 1
+		}
+		rbrackOff := d.findClosing(start, ']')
+		// Update lastOffset past the ']' so that any parent flow
+		// mapping's scan starts after this one's closing brace.
+		d.lastOffset = rbrackOff + 1
+		list.Rbrack = d.tokFile.Pos(rbrackOff, token.Blank)
+
+	} else if len(yn.Content) > 0 {
+		// In block-style, there are no explicit brackets, so we have to
+		// guess. We want to be as greedy as possible, so we go one byte
+		// before the end of our parent node. This intentionally
+		// includes whitespace after the end of this sequence but before
+		// the end of our parent.
+		rel := token.Blank
+		if multiline && !closeSameLine {
+			rel = token.Newline
+		}
+		list.Rbrack = d.tokFile.Pos(parentScopeEnd-1, rel)
+
+	} else {
+		list.Rbrack = list.Lbrack
 	}
 	return list, nil
 }
 
 func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
-	strct := &ast.StructLit{}
+	parentScopeEnd := d.scopeEnd // save before insertMap modifies it
+	strct := &ast.StructLit{
+		Lbrace: d.tokFile.Pos(d.contentOffset(yn, '{'), token.Blank),
+	}
 	multiline := false
 	if len(yn.Content) > 0 {
 		multiline = yn.Line < yn.Content[len(yn.Content)-1].Line
@@ -363,10 +571,31 @@ func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
 	if err := d.insertMap(yn, strct, multiline, false); err != nil {
 		return nil, err
 	}
-	// TODO(mvdan): moving these positions above insertMap breaks a few tests, why?
-	strct.Lbrace = d.pos(yn).WithRel(token.Blank)
-	if multiline {
-		strct.Rbrace = strct.Lbrace.WithRel(token.Newline)
+
+	if yn.Style&yaml.FlowStyle != 0 {
+		// Flow-style mapping: find the actual '}' in the source.
+		// Start scanning from the last decoded position (which is
+		// past all children due to chaining), or from the '{' if empty.
+		start := d.lastOffset
+		if len(yn.Content) == 0 {
+			start = strct.Lbrace.Offset() + 1
+		}
+		rbraceOff := d.findClosing(start, '}')
+		d.lastOffset = rbraceOff + 1
+		strct.Rbrace = d.tokFile.Pos(rbraceOff, token.Blank)
+
+	} else if len(yn.Content) > 0 {
+		// In block-style, there are no explicit braces, so we have to
+		// guess. We want to be as greedy as possible, so we go one byte
+		// before the end of our parent node. This intentionally
+		// includes whitespace after the end of this mapping but before
+		// the end of our parent.
+		rel := token.Blank
+		if multiline {
+			rel = token.Newline
+		}
+		strct.Rbrace = d.tokFile.Pos(parentScopeEnd-1, rel)
+
 	} else {
 		strct.Rbrace = strct.Lbrace
 	}
@@ -374,6 +603,7 @@ func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
 }
 
 func (d *decoder) insertMap(yn *yaml.Node, m *ast.StructLit, multiline, mergeValues bool) error {
+	parentScopeEnd := d.scopeEnd
 	l := len(yn.Content)
 outer:
 	for i := 0; i < l; i += 2 {
@@ -397,6 +627,13 @@ outer:
 		}
 		d.addCommentsToNode(field, yk, 2)
 		field.Label = label
+
+		// Set the scope end for the value we're about to extract.
+		if i+2 < l {
+			d.scopeEnd = d.scopeEndBefore(yn.Content[i+2])
+		} else {
+			d.scopeEnd = parentScopeEnd
+		}
 
 		if mergeValues {
 			key := labelStr(label)
@@ -444,7 +681,7 @@ func (d *decoder) merge(yn *yaml.Node, m *ast.StructLit, multiline bool) error {
 }
 
 func (d *decoder) label(yn *yaml.Node) (ast.Label, error) {
-	pos := d.pos(yn)
+	pos := d.pos(d.yamlOffset(yn))
 
 	var expr ast.Expr
 	var err error
@@ -509,17 +746,18 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 	if yn.Style&yaml.TaggedStyle == 0 && tag == floatTag && rxAnyOctalYaml11().MatchString(yn.Value) {
 		tag = strTag
 	}
+	pos := d.pos(d.yamlOffset(yn))
 	switch tag {
 	// TODO: use parse literal or parse expression instead.
 	case timestampTag:
 		return &ast.BasicLit{
-			ValuePos: d.pos(yn),
+			ValuePos: pos,
 			Kind:     token.STRING,
 			Value:    literal.String.Quote(yn.Value),
 		}, nil
 	case strTag:
 		return &ast.BasicLit{
-			ValuePos: d.pos(yn),
+			ValuePos: pos,
 			Kind:     token.STRING,
 			Value:    literal.String.WithOptionalTabIndent(1).Quote(yn.Value),
 		}, nil
@@ -530,7 +768,7 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 			return nil, d.posErrorf(yn, "!!binary value contains invalid base64 data")
 		}
 		return &ast.BasicLit{
-			ValuePos: d.pos(yn),
+			ValuePos: pos,
 			Kind:     token.STRING,
 			Value:    literal.Bytes.Quote(string(data)),
 		}, nil
@@ -543,7 +781,7 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 			t = true
 		}
 		lit := ast.NewBool(t)
-		lit.ValuePos = d.pos(yn)
+		lit.ValuePos = pos
 		return lit, nil
 
 	case intTag:
@@ -562,7 +800,7 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		} else if !info.IsInt() {
 			return nil, d.posErrorf(yn, "cannot decode %q as %s: not a literal number", value, tag)
 		}
-		return d.makeNum(yn, value, token.INT), nil
+		return d.makeNum(pos, value, token.INT), nil
 
 	case floatTag:
 		value := yn.Value
@@ -598,11 +836,11 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 				}
 			}
 		}
-		return d.makeNum(yn, value, token.FLOAT), nil
+		return d.makeNum(pos, value, token.FLOAT), nil
 
 	case nullTag:
 		return &ast.BasicLit{
-			ValuePos: d.pos(yn).WithRel(token.Blank),
+			ValuePos: pos.WithRel(token.Blank),
 			Kind:     token.NULL,
 			Value:    "null",
 		}, nil
@@ -611,16 +849,16 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 	}
 }
 
-func (d *decoder) makeNum(yn *yaml.Node, val string, kind token.Token) (expr ast.Expr) {
+func (d *decoder) makeNum(pos token.Pos, val string, kind token.Token) (expr ast.Expr) {
 	val, negative := strings.CutPrefix(val, "-")
 	expr = &ast.BasicLit{
-		ValuePos: d.pos(yn),
+		ValuePos: pos,
 		Kind:     kind,
 		Value:    val,
 	}
 	if negative {
 		expr = &ast.UnaryExpr{
-			OpPos: d.pos(yn),
+			OpPos: pos,
 			Op:    token.SUB,
 			X:     expr,
 		}
@@ -637,10 +875,42 @@ func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 		d.extractingAliases = make(map[*yaml.Node]bool)
 	}
 	d.extractingAliases[yn] = true
-	var node ast.Expr
+
+	// Save and reset decoder state so the alias extraction doesn't
+	// interfere with the outer position tracking. The aliased node
+	// may be earlier in the source (the common case: define then use),
+	// which would leave lastOffset pointing past the aliased content
+	// and cause findClosing to find the wrong closing delimiter.
+	savedLastOffset := d.lastOffset
+	savedForceNewline := d.forceNewline
+	savedScopeEnd := d.scopeEnd
+	d.lastOffset = -1 // no position yet, so pos() produces valid positions for the alias's children
+	d.forceNewline = false
+
 	node, err := d.extract(yn.Alias)
+
+	d.lastOffset = savedLastOffset
+	d.forceNewline = savedForceNewline
+	d.scopeEnd = savedScopeEnd
 	delete(d.extractingAliases, yn)
-	return node, err
+	if err != nil {
+		return nil, err
+	}
+
+	// For container types, override brace/bracket positions to reflect
+	// the alias reference site (*name), not the anchor definition site.
+	// The alias is where this value logically appears in the document.
+	aliasStart := d.yamlOffset(yn)
+	aliasEnd := aliasStart + len(yn.Value) // *<name>: 1 + len(name) - 1
+	switch n := node.(type) {
+	case *ast.StructLit:
+		n.Lbrace = d.tokFile.Pos(aliasStart, token.Blank)
+		n.Rbrace = d.tokFile.Pos(aliasEnd, token.Blank)
+	case *ast.ListLit:
+		n.Lbrack = d.tokFile.Pos(aliasStart, token.Blank)
+		n.Rbrack = d.tokFile.Pos(aliasEnd, token.Blank)
+	}
+	return node, nil
 }
 
 func labelStr(l ast.Label) string {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe6b142d_2c4dd63b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T16:48:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f73619ff_d2fd750d",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d4a9be1_05336574",
@@ -294,6 +312,24 @@
       "side": 1,
       "message": "That is because that was in the AST. The ADT does not have Ident, but Feature. I think it is a bit safer to test tc.Expr.",
       "parentUuid": "ecc7034a_6e79dcbd",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf4165e1_356821da",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 982,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T16:48:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a9a60df1_b1bd02fb",
       "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

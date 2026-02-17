@@ -81,11 +81,24 @@ O: conflicting values {A:"X",P:4} and null (mismatched types struct and null):
 O.P: invalid value 4 (out of bound >5):
     pkg2/instance.cue:x:x`,
 	}, {
+		name: "fail nested struct of transitively imported package",
+		value: &pkg1.MyStruct{
+			A: 5,
+			B: "dog",
+			I: &pkg2.ImportMe{A: 1000, B: "z"},
+		},
+		want: `4 errors in empty disjunction:
+conflicting values {A:5,B:"dog",T:"0001-01-01T00:00:00Z",I:{a:1000,b:"z"}} and null (mismatched types struct and null)
+I: 2 errors in empty disjunction:
+I: conflicting values {a:1000,b:"z"} and null (mismatched types struct and null):
+    pkg1/instance.cue:x:x
+I.a: invalid value 1000 (out of bound <100):
+    pkg2/instance.cue:x:x`}, {
 		name: "all good",
 		value: &pkg1.MyStruct{
 			A: 5,
 			B: "dog",
-			I: &pkg2.ImportMe{A: 1000, B: "a"},
+			I: &pkg2.ImportMe{A: 50, B: "a"},
 		},
 		want: `nil`,
 	}}

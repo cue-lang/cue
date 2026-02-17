@@ -450,13 +450,29 @@ type Ident struct {
 	expr
 }
 
-// Predeclared is a sentinel [Node] that can be used as [Ident.Node]
-// for an identifier referring to a predeclared name such as "self" or "int".
+// NewPredeclared creates an [Ident] for a predeclared name such as "self",
+// "int", or "matchN". name must not have the "__" prefix.
 //
 // When [cuelang.org/go/cue/ast/astutil.Sanitize] encounters an identifier
-// whose Node is this sentinel and the name is shadowed in scope, it renames
-// the identifier to its "__"-prefixed form (e.g. "__self") to avoid the shadow.
-var Predeclared Node = &predeclaredNode{}
+// created by NewPredeclared and the name is shadowed in scope, it renames the
+// identifier to avoid the shadow. It currently does so by writing the
+// "__"-prefixed form (e.g. "__self"), but this may change in the future.
+//
+// Use [Ident.IsPredeclared] to check if an identifier refers to a predeclared
+// name.
+func NewPredeclared(name string) *Ident {
+	return &Ident{Name: name, Node: predeclared}
+}
+
+// IsPredeclared reports whether id was created by [NewPredeclared],
+// i.e., whether it refers to a predeclared name.
+func (id *Ident) IsPredeclared() bool {
+	return id.Node == predeclared
+}
+
+// predeclared is a sentinel node used to mark identifiers that refer to
+// predeclared names.
+var predeclared Node = &predeclaredNode{}
 
 type predeclaredNode struct {
 	comments

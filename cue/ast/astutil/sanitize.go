@@ -258,7 +258,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 
 	// A predeclared reference (e.g. "self") is shadowed by a local
 	// declaration. Use the "__"-prefixed form to avoid the shadow.
-	if n.Node == ast.Predeclared {
+	if n.IsPredeclared() {
 		n.Name = "__" + n.Name
 		n.Node = nil
 		n.Scope = nil

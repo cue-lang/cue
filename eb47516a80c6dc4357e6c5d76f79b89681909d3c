@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d8437c7_7783da98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-17T09:18:41Z",
+      "side": 1,
+      "message": "-1 on this one from me because it feels like we\u0027re hiding API unnecessarily. IsPredeclared can be useful for anyone building on the AST for non-trivial stuff, like writing their own mini-evaluator, an LSP, a static analysis tool, etc.",
+      "revId": "eb47516a80c6dc4357e6c5d76f79b89681909d3c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e54b66d0_59ab1f2f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-17T09:18:41Z",
+      "side": 1,
+      "message": "-1 on this one from me because it feels like we\u0027re hiding API unnecessarily. IsPredeclared can be useful for anyone building on the AST for non-trivial stuff, like writing their own mini-evaluator, an LSP, a tool, etc.",
+      "revId": "eb47516a80c6dc4357e6c5d76f79b89681909d3c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

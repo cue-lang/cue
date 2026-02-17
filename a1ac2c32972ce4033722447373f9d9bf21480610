@@ -16,6 +16,24 @@
       "message": "Maybe add this test too:\n\n// for-else: nested body fields, non-empty source - no else\nforNestedNonEmpty: {\n\tfor x in [] { a: b: (x): x } else { a: b: none: true }\n}",
       "revId": "a1ac2c32972ce4033722447373f9d9bf21480610",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bf02929_6fc2f253",
+        "filename": "cue/testdata/comprehensions/else.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T15:23:01Z",
+      "side": 1,
+      "message": "I meant:\n\nforNestedEmpty: {\nfor x in [] { a: b: (x): x } else { a: b: none: true }\n}",
+      "parentUuid": "f340c9fb_f268ff07",
+      "revId": "a1ac2c32972ce4033722447373f9d9bf21480610",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

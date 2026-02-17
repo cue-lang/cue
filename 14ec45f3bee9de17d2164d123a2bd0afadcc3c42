@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "394ac9ee_0ece6cd5",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 2621,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T17:21:02Z",
+      "side": 1,
+      "message": "Indeed.",
+      "parentUuid": "78d431b3_fc1c15fe",
+      "revId": "14ec45f3bee9de17d2164d123a2bd0afadcc3c42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "46387b85_7e0bac93",
@@ -49,6 +67,24 @@
       "writtenOn": "2026-02-17T11:27:57Z",
       "side": 1,
       "message": "It might be worth saying what happens if there are both `?`-optional expressions within the expression *and* the subsequent clause. E.g.\n\n```\ntry b \u003d a? {\n\tc: d?\n}\n```",
+      "revId": "14ec45f3bee9de17d2164d123a2bd0afadcc3c42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f89650a8_1cb52880",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 2632,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T17:21:02Z",
+      "side": 1,
+      "message": "Not allowed. changed wording a little bit.",
+      "parentUuid": "46387b85_7e0bac93",
       "revId": "14ec45f3bee9de17d2164d123a2bd0afadcc3c42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

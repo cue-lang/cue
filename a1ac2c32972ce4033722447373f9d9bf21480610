@@ -34,6 +34,24 @@
       "parentUuid": "f340c9fb_f268ff07",
       "revId": "a1ac2c32972ce4033722447373f9d9bf21480610",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ddd58a9_7cf65ed0",
+        "filename": "cue/testdata/comprehensions/else.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-17T15:25:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f340c9fb_f268ff07",
+      "revId": "a1ac2c32972ce4033722447373f9d9bf21480610",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

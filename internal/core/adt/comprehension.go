@@ -176,7 +176,6 @@ func (n *nodeContext) insertComprehension(
 					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
-					Else:    c.Else,    // Propagate else clause to partial comprehension
 					arcType: f.ArcType, // TODO: can be derived, remove this field.
 
 					comp:   ec,
@@ -200,7 +199,6 @@ func (n *nodeContext) insertComprehension(
 					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
-					Else:    c.Else, // Propagate else clause to partial comprehension
 
 					comp:   ec,
 					parent: c,
@@ -383,12 +381,12 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 
 	if len(d.envs) == 0 {
 		// If there's an else clause, use it instead of marking arc as not present.
-		if d.comp.Else != nil {
+		if d.leaf.Else != nil {
 			// Evaluate the else clause in the outer environment.
 			// We use linkChildren to properly chain the environment, similar to
 			// normal comprehension yield processing.
 			env := linkChildren(d.env, d.leaf)
-			n.scheduleConjunct(Conjunct{env, d.comp.Else, d.id}, d.id)
+			n.scheduleConjunct(Conjunct{env, d.leaf.Else, d.id}, d.id)
 			return nil
 		}
 		n.node.updateArcType(ArcNotPresent)

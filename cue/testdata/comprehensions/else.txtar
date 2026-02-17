@@ -66,6 +66,36 @@ outerScope: {
 	for x in [] { x } else { fallback: threshold }
 }
 
+// if-else: nested body fields - else yields once
+ifNestedBody: {
+	if false { a: b: 1 } else { c: 2 }
+}
+
+// if-else: nested else fields
+ifNestedElse: {
+	if false { a: 1 } else { b: c: 2 }
+}
+
+// if-else: nested fields in both
+ifNestedBoth: {
+	if false { a: b: 1 } else { c: d: 2 }
+}
+
+// if-else: deeply nested fields
+ifDeeplyNested: {
+	if false { a: b: c: 1 } else { a: b: c: 2 }
+}
+
+// for-else: nested body fields, empty source
+forNestedEmpty: {
+	for x in [] { a: b: (x): x } else { a: b: none: true }
+}
+
+// for-else: nested body fields, non-empty source - no else
+forNestedNonEmpty: {
+	for x in [1] { a: b: "\(x)": x } else { a: b: none: true }
+}
+
 // nested comprehensions - outer else triggers
 nestedOuterElse: {
 	for x in [] { for y in [1] { y } else { inner: true } } else { outer: true }
@@ -87,7 +117,7 @@ Conjuncts:    90
 Disjuncts:    69
 
 NumCloseIDs: 2
--- out/eval --
+-- out/evalalpha --
 (struct){
   ifTrue: (struct){
     a: (int){ 1 }
@@ -133,6 +163,40 @@ NumCloseIDs: 2
   outerScope: (struct){
     let threshold#1 = (int){ 10 }
     fallback: (int){ 10 }
+  }
+  ifNestedBody: (struct){
+    c: (int){ 2 }
+  }
+  ifNestedElse: (struct){
+    b: (struct){
+      c: (int){ 2 }
+    }
+  }
+  ifNestedBoth: (struct){
+    c: (struct){
+      d: (int){ 2 }
+    }
+  }
+  ifDeeplyNested: (struct){
+    a: (struct){
+      b: (struct){
+        c: (int){ 2 }
+      }
+    }
+  }
+  forNestedEmpty: (struct){
+    a: (struct){
+      b: (struct){
+        none: (bool){ true }
+      }
+    }
+  }
+  forNestedNonEmpty: (struct){
+    a: (struct){
+      b: (struct){
+        "1": (int){ 1 }
+      }
+    }
   }
   nestedOuterElse: (struct){
     outer: (bool){ true }
@@ -250,6 +314,82 @@ NumCloseIDs: 2
       〈1;x〉
     } else {
       fallback: 〈1;let threshold#1〉
+    }
+  }
+  ifNestedBody: {
+    if false {
+      a: {
+        b: 1
+      }
+    } else {
+      c: 2
+    }
+  }
+  ifNestedElse: {
+    if false {
+      a: 1
+    } else {
+      b: {
+        c: 2
+      }
+    }
+  }
+  ifNestedBoth: {
+    if false {
+      a: {
+        b: 1
+      }
+    } else {
+      c: {
+        d: 2
+      }
+    }
+  }
+  ifDeeplyNested: {
+    if false {
+      a: {
+        b: {
+          c: 1
+        }
+      }
+    } else {
+      a: {
+        b: {
+          c: 2
+        }
+      }
+    }
+  }
+  forNestedEmpty: {
+    for _, x in [] {
+      a: {
+        b: {
+          〈3;x〉: 〈3;x〉
+        }
+      }
+    } else {
+      a: {
+        b: {
+          none: true
+        }
+      }
+    }
+  }
+  forNestedNonEmpty: {
+    for _, x in [
+      1,
+    ] {
+      a: {
+        b: {
+          "\(〈3;x〉)": 〈3;x〉
+        }
+      }
+    } else {
+      a: {
+        b: {
+          none: true
+        }
+      }
     }
   }
   nestedOuterElse: {

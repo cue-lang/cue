@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f353501d_001b2d06",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 939,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "Ah, it is because I first added code and then removed. I\u0027ll revert",
+      "parentUuid": "8d4a9be1_05336574",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d05239a2_432b37c1",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-02-17T14:05:53Z",
       "side": 1,
       "message": "I can\u0027t claim to understand all the details here, but I\u0027m puzzled why the preceding case (LetClause) twiddles s.inField around the ast.Walk call. If it\u0027s correct to *not* do that here, I guess I\u0027m not understanding the difference between this form of try, and a let.",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f50fc70f_71c0f8e2",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "Actually, this is not necessary. Unlike the let, a try by itself is still a comprehension. That is why this was not an issue.",
+      "parentUuid": "d05239a2_432b37c1",
       "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31808684_94028842",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1217,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d267477_cec7c950",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e65b57a1_ffafeb5c",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-02-17T14:25:43Z",
       "side": 1,
       "message": "It might be nice to have another case where the nesting goes the other way:\n\n`a: string` and `try { x: y: a? } else { fallback: \"\" }`",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4657187a_4bd53396",
+        "filename": "doc/specs/try-expressions/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e65b57a1_ffafeb5c",
       "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +177,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "803baddd_78701781",
+        "filename": "doc/specs/try-expressions/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "Nice. \n\nAdded test cases to confirm and catch this error. Updated doc/specs with cases with required fields, although as field constraints my expectation is they behave as such.",
+      "parentUuid": "b16024b8_ab46c7e8",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cbdc8a9e_bc777986",
         "filename": "doc/specs/try-expressions/spec.md",
         "patchSetId": 5
@@ -122,6 +212,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ecb1d96c_63bc1134",
+        "filename": "doc/specs/try-expressions/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "Good catch. That definitely should error.",
+      "parentUuid": "cbdc8a9e_bc777986",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2e93e306_6d80f10f",
         "filename": "internal/core/adt/expr.go",
         "patchSetId": 5
@@ -133,6 +241,24 @@
       "writtenOn": "2026-02-17T14:05:53Z",
       "side": 1,
       "message": "nit: surprising name. Would `savedSkip` be clearer?",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d913a7e_4f3dfc85",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 2260,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e93e306_6d80f10f",
       "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -156,6 +282,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a9a60df1_b1bd02fb",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 982,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "That is because that was in the AST. The ADT does not have Ident, but Feature. I think it is a bit safer to test tc.Expr.",
+      "parentUuid": "ecc7034a_6e79dcbd",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7269d358_a4980a88",
         "filename": "internal/core/export/adt.go",
         "patchSetId": 5
@@ -167,6 +311,24 @@
       "writtenOn": "2026-02-17T14:05:53Z",
       "side": 1,
       "message": "This code happens 4 times in this file. I think it makes sense to bring it out to a helper - it\u0027s the equiv of `parser.wrapOptional`",
+      "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9f723cb_707cb99c",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T16:47:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7269d358_a4980a88",
       "revId": "8b9719d22e53631b6e2525754d9a80a736a49058",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

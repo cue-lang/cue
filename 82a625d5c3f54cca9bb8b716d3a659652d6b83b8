@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "daf9305a_f4fb905d",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 962,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-17T10:45:00Z",
+      "side": 1,
+      "message": "@mpvl@gmail.com did we actually mean builtin (predeclared) functions like `len` here, or standard library functions like `strings.Split`?\n\nIt\u0027s not obvious to me from reading the original text, so I want to double check whether you meant just one of them, or both.\n\nIf you can clarify, I\u0027ll amend the text accordingly.",
+      "revId": "82a625d5c3f54cca9bb8b716d3a659652d6b83b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

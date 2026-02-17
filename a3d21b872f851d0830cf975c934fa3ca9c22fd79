@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67ab7a8b_79482dac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T10:57:03Z",
+      "side": 1,
+      "message": "My comments here are entirely based on the assumption that this code has been written by AI, and has not seen any detailed human thought before my own. If this assumption is incorrect then I apologise, everything that follows should be disregarded, and I will start again.\n\nI find this CL quite upsetting.\n\nThe code looks plausible. But even the most minor change to the tests would demonstrate that it\u0027s not correct. It feels to me like you have not run the LSP manually with your editor and tested the behaviour. As the code stands here, any component of a path *after* an optional component will not work. So in `a?.b?.c`, whilst `a` will work, neither `b` nor `c` will resolve correctly. Usages, completions, hover-docs etc will also all be correspondingly wrong.\n\nOut of respect for your time and abilities, I genuinely hope I would not ask you to review code that I didn\u0027t claim to understand. It is very unsettling to be asked to review code that is signed-off by you, and is significantly beneath your own abilities. It makes me worry about how my own time and effort is valued.\n\nAs Russ says at https://groups.google.com/g/golang-dev/c/4Li4Ovd_ehE/m/8L9s_jq4BAAJ\n\n\u003e we have always expected that when contributors send code for review, they are sending quality code that they’ve already self-reviewed, not the first thing that happened to work.\n\nI apologise both if this comes across too strongly, and if my assumptions around the authorship of this CL are incorrect. I have lost quite a lot of sleep over this.",
+      "revId": "a3d21b872f851d0830cf975c934fa3ca9c22fd79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fefec10_a1134857",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1913,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T10:57:03Z",
+      "side": 1,
+      "message": "This is not correct. Optional path components should not be processed like this.",
+      "revId": "a3d21b872f851d0830cf975c934fa3ca9c22fd79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6452e071_8abcea36",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T10:57:03Z",
+      "side": 1,
+      "message": "I believe this section to be correct.",
+      "revId": "a3d21b872f851d0830cf975c934fa3ca9c22fd79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5349762_824625ce",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 4385,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-17T10:57:03Z",
+      "side": 1,
+      "message": "It is highly predictable that AI has written tests that pass.\n\nA single character change from `a.b?` to `a?.b?` would show that the processing of optional path components is incorrect.",
+      "revId": "a3d21b872f851d0830cf975c934fa3ca9c22fd79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

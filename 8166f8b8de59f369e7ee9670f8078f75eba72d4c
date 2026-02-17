@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b579edee_0cdd983e",
+        "filename": "cue/testdata/comprehensions/nested.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T18:54:50Z",
+      "side": 1,
+      "message": "Feel free to update out/eval to eliminate this diff (we should fix this).",
+      "revId": "8166f8b8de59f369e7ee9670f8078f75eba72d4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b16488d_52508c9e",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-17T18:54:50Z",
+      "side": 1,
+      "message": "We probably have this function in various spots. But either way.",
+      "revId": "8166f8b8de59f369e7ee9670f8078f75eba72d4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "A bit brittle, but seems like it is harmless to add.",
       "revId": "c2d87cd284817fb31fcf408121eaae9f1c279675",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf2968f8_250a41c9",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-18T14:52:29Z",
+      "side": 1,
+      "message": "yeah, I\u0027m more than happy if this code ends up being entirely replaced later on. But at the very least this adds one useful test and fixes the hang.",
+      "parentUuid": "22d2791b_95cd0b4d",
+      "revId": "c2d87cd284817fb31fcf408121eaae9f1c279675",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

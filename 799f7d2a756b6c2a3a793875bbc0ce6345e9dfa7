@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "150a93b8_43fea225",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4516,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-18T08:56:26Z",
+      "side": 1,
+      "message": "can we include a test case with try and else? especially in the form `try x \u003d expr { ... } else { ... }` to sanity check that the LSP and evaluator agree on whether \"x\" is in scope in the else block.",
+      "revId": "799f7d2a756b6c2a3a793875bbc0ce6345e9dfa7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

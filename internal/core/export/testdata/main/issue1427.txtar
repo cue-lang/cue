@@ -1,17 +1,15 @@
 -- in.cue --
 p: [name=_]: "name": name
 -- out/definition-v3 --
-cannot have both alias and field with name "name" in same scope
 p: {
-	[name=_]: {
-		name: name
+	[name_1=_]: {
+		name: name_1
 	}
 }
 -- out/definition-v3-noshare --
-cannot have both alias and field with name "name" in same scope
 p: {
-	[name=_]: {
-		name: name
+	[name_1=_]: {
+		name: name_1
 	}
 }
 -- out/doc-v3 --

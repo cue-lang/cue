@@ -16,6 +16,24 @@
       "message": "This seems wrong.",
       "revId": "4be7ef59a0a049883b911ba2c5dfbed95802ef56",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d67bdf8_78a3e668",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-18T13:38:04Z",
+      "side": 1,
+      "message": "To be clear, this was done with an older AI model, and we had already agreed this fix was likely not correct. I only posted it in case it was helpful, but this was not intended as the actual fix.",
+      "parentUuid": "c7711732_9d9afe5d",
+      "revId": "4be7ef59a0a049883b911ba2c5dfbed95802ef56",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

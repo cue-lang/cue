@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22d2791b_95cd0b4d",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:51:06Z",
+      "side": 1,
+      "message": "A bit brittle, but seems like it is harmless to add.",
+      "revId": "c2d87cd284817fb31fcf408121eaae9f1c279675",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

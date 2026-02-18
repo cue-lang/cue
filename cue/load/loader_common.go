@@ -16,9 +16,10 @@ package load
 
 import (
 	"cmp"
+	"io/fs"
 	"maps"
+	"os"
 	pathpkg "path"
-	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -26,7 +27,16 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	pkgpath "cuelang.org/go/pkg/path"
 )
+
+// separator returns the path separator byte for the given OS.
+func separator(os pkgpath.OS) byte {
+	if os == pkgpath.Windows {
+		return '\\'
+	}
+	return '/'
+}
 
 // An importMode controls the behavior of the Import method.
 type importMode uint
@@ -45,25 +55,110 @@ type excludeError struct {
 
 func (e excludeError) Is(err error) bool { return err == errExclude }
 
-func rewriteFiles(p *build.Instance, root string, isLocal bool) {
+func rewriteFiles(p *build.Instance, root string, isLocal bool, os pkgpath.OS) {
 	p.Root = root
 
-	normalizeFiles(p.BuildFiles)
-	normalizeFiles(p.IgnoredFiles)
-	normalizeFiles(p.OrphanedFiles)
-	normalizeFiles(p.InvalidFiles)
-	normalizeFiles(p.UnknownFiles)
+	normalizeFiles(p.BuildFiles, os)
+	normalizeFiles(p.IgnoredFiles, os)
+	normalizeFiles(p.OrphanedFiles, os)
+	normalizeFiles(p.InvalidFiles, os)
+	normalizeFiles(p.UnknownFiles, os)
+}
+
+// setFSLoc records the FS location info in DirLoc/RootLoc
+// and, when loading from an [fs.FS] with [Config.FromFSPath],
+// maps Dir/Root to display paths.
+//
+// Dir/Root must hold loader-internal paths when this is called.
+// DirLoc is only set on the first call (Dir is set once and not
+// overwritten). RootLoc is always updated because rewriteFiles
+// may reset Root between calls.
+func setFSLoc(c *Config, p *build.Instance) {
+	if c.FS != nil {
+		if !p.DirLoc.IsSet() {
+			p.DirLoc = makeFSLoc(c.FS, p.Dir, c.FromFSPath)
+			if c.FromFSPath != nil {
+				p.Dir = c.FromFSPath(p.Dir)
+			}
+		}
+		p.RootLoc = makeFSLoc(c.FS, p.Root, c.FromFSPath)
+		if c.FromFSPath != nil {
+			p.Root = c.FromFSPath(p.Root)
+		}
+	} else {
+		if !p.DirLoc.IsSet() && p.Dir != "" {
+			p.DirLoc = makeOSFSLoc(p.Dir, c.pathOS)
+		}
+		if p.Root != "" {
+			p.RootLoc = makeOSFSLoc(p.Root, c.pathOS)
+		}
+	}
+}
+
+// makeFSLoc creates an FSLoc for a loader-internal path in FS mode.
+// The loader-internal path is absolute within the FS namespace (e.g. "/foo/bar");
+// it strips the leading "/" to produce a valid [fs.FS] path.
+func makeFSLoc(fsys fs.FS, loaderPath string, cfgFromFSPath func(string) string) token.FSLoc {
+	fsPath := strings.TrimPrefix(loaderPath, "/")
+	var fromFSPath func(string) string
+	if cfgFromFSPath != nil {
+		fromFSPath = func(p string) string { return cfgFromFSPath("/" + p) }
+	} else {
+		fromFSPath = func(p string) string { return "/" + p }
+	}
+	return token.FSLoc{
+		FS:         fsys,
+		Path:       fsPath,
+		FromFSPath: fromFSPath,
+	}
+}
+
+// makeOSFSLoc creates an FSLoc backed by [os.DirFS] for an absolute
+// OS path. The FS is rooted at the filesystem root ("/" on Unix,
+// the volume root on Windows). The returned FSLoc.Path is a valid
+// [fs.FS] path (forward-slash separated, no leading separator).
+func makeOSFSLoc(absPath string, pathOS pkgpath.OS) token.FSLoc {
+	root := "/"
+	if pathOS == pkgpath.Windows {
+		vol := pkgpath.VolumeName(absPath, pathOS)
+		root = vol + `\`
+	}
+	fsPath := absPath[len(root):]
+	fsPath = strings.ReplaceAll(fsPath, `\`, "/")
+	fromFSPath := func(p string) string { return root + p }
+	if pathOS == pkgpath.Windows {
+		fromFSPath = func(p string) string {
+			return root + strings.ReplaceAll(p, "/", `\`)
+		}
+	}
+	return token.FSLoc{
+		FS:         os.DirFS(root),
+		Path:       fsPath,
+		FromFSPath: fromFSPath,
+	}
+}
+
+// fsDir returns the loader-internal directory path for p.
+// When loading from a [Config.FS], Dir may have been mapped
+// to a display path, so this uses DirLoc to reconstruct
+// the loader-internal path. In the OS case, Dir is unchanged.
+func fsDir(c *Config, p *build.Instance) string {
+	if c.FS != nil && p.DirLoc.IsSet() {
+		return "/" + p.DirLoc.Path
+	}
+	return p.Dir
 }
 
 // normalizeFiles sorts the files so that files contained by a parent directory
 // always come before files contained in sub-directories, and that filenames in
 // the same directory are sorted lexically byte-wise, like Go's `<` operator.
-func normalizeFiles(files []*build.File) {
+func normalizeFiles(files []*build.File, os pkgpath.OS) {
+	sep := separator(os)
 	slices.SortFunc(files, func(a, b *build.File) int {
 		fa := a.Filename
 		fb := b.Filename
-		ca := strings.Count(fa, string(filepath.Separator))
-		cb := strings.Count(fb, string(filepath.Separator))
+		ca := strings.Count(fa, string(sep))
+		cb := strings.Count(fb, string(sep))
 		if c := cmp.Compare(ca, cb); c != 0 {
 			return c
 		}
@@ -143,7 +238,7 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 	if countCUEFiles(fp.c, p) == 0 &&
 		!fp.c.DataFiles &&
 		(p.PkgName != "_" || !fp.allPackages) {
-		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, ignored: len(p.IgnoredFiles) > 0})
+		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, pathOS: fp.c.pathOS, ignored: len(p.IgnoredFiles) > 0})
 		return fp.err
 	}
 
@@ -160,13 +255,13 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 func (fp *fileProcessor) add(root string, file *build.File, mode importMode) bool {
 	fullPath := file.Filename
 	if fullPath != "-" {
-		if !filepath.IsAbs(fullPath) {
-			fullPath = filepath.Join(root, fullPath)
+		if !pkgpath.IsAbs(fullPath, fp.c.pathOS) {
+			fullPath = pkgpath.Join([]string{root, fullPath}, fp.c.pathOS)
 		}
 		file.Filename = fullPath
 	}
 
-	base := filepath.Base(fullPath)
+	base := pkgpath.Base(fullPath, fp.c.pathOS)
 
 	// special * and _
 	p := fp.pkg // default package
@@ -177,7 +272,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 	// or when allowExcludedFiles is specified, signifying that the
 	// file is part of an explicit set of files provided on the
 	// command line.
-	sameDir := filepath.Dir(fullPath) == p.Dir || (mode&allowExcludedFiles) != 0
+	sameDir := pkgpath.Dir(fullPath, fp.c.pathOS) == fsDir(fp.c, p) || (mode&allowExcludedFiles) != 0
 
 	// badFile := func(p *build.Instance, err errors.Error) bool {
 	badFile := func(err errors.Error) {
@@ -188,6 +283,19 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 	if err := setFileSource(fp.c, file); err != nil {
 		badFile(errors.Promote(err, ""))
 		return false
+	}
+	// Set FilenameLoc before transforming the filename for display purposes.
+	// This preserves the FS path for later FS operations.
+	if fp.c.FS != nil {
+		file.FilenameLoc = makeFSLoc(fp.c.FS, file.Filename, fp.c.FromFSPath)
+	} else {
+		file.FilenameLoc = makeOSFSLoc(file.Filename, fp.c.pathOS)
+	}
+	// Apply FromFSPath to transform the filename for display/position purposes.
+	// This must be done after setFileSource (which uses the FS path to read
+	// the file) but before getCUESyntax (which uses bf.Filename for positions).
+	if fp.c.FromFSPath != nil {
+		file.Filename = fp.c.FromFSPath(file.Filename)
 	}
 
 	if file.Encoding != build.CUE {
@@ -225,6 +333,11 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 		badFile(errors.Promote(perr, "add failed"))
 		return false
 	}
+	if file.FilenameLoc.IsSet() {
+		if tokFile := pf.Pos().File(); tokFile != nil {
+			tokFile.SetFSLoc(file.FilenameLoc)
+		}
+	}
 
 	pkg := pf.PackageName()
 	if pkg == "" {
@@ -251,6 +364,8 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 			q.DisplayPath = p.DisplayPath
 			q.ImportPath = p.ImportPath + ":" + pkg
 			q.Root = p.Root
+			q.DirLoc = p.DirLoc
+			q.RootLoc = p.RootLoc
 			q.Module = p.Module
 			q.ModuleFile = p.ModuleFile
 			fp.pkgs[pkg] = q
@@ -370,7 +485,7 @@ func warnUnmatched(matches []*match) {
 // cleanPatterns returns the patterns to use for the given
 // command line. It canonicalizes the patterns but does not
 // evaluate any matches.
-func cleanPatterns(patterns []string) []string {
+func cleanPatterns(patterns []string, os pkgpath.OS) []string {
 	if len(patterns) == 0 {
 		return []string{"."}
 	}
@@ -379,7 +494,7 @@ func cleanPatterns(patterns []string) []string {
 		// Arguments are supposed to be import paths, but
 		// as a courtesy to Windows developers, rewrite \ to /
 		// in command-line arguments. Handles .\... and so on.
-		if filepath.Separator == '\\' {
+		if separator(os) == '\\' {
 			a = strings.Replace(a, `\`, `/`, -1)
 		}
 
@@ -406,16 +521,17 @@ func isMetaPackage(name string) bool {
 
 // hasFilepathPrefix reports whether the path s begins with the
 // elements in prefix.
-func hasFilepathPrefix(s, prefix string) bool {
+func hasFilepathPrefix(s, prefix string, os pkgpath.OS) bool {
+	sep := separator(os)
 	switch {
 	default:
 		return false
 	case len(s) == len(prefix):
 		return s == prefix
 	case len(s) > len(prefix):
-		if prefix != "" && prefix[len(prefix)-1] == filepath.Separator {
+		if prefix != "" && prefix[len(prefix)-1] == sep {
 			return strings.HasPrefix(s, prefix)
 		}
-		return s[len(prefix)] == filepath.Separator && s[:len(prefix)] == prefix
+		return s[len(prefix)] == sep && s[:len(prefix)] == prefix
 	}
 }

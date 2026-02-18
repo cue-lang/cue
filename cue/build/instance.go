@@ -97,9 +97,17 @@ type Instance struct {
 	// Root/pkg is the directory that holds third-party packages.
 	Root string
 
+	// RootLoc holds FS location information for [Instance.Root].
+	// It is set when loading from an [io/fs.FS].
+	RootLoc token.FSLoc
+
 	// Dir is the package directory. A package may also include files from
 	// ancestor directories, up to the module file.
 	Dir string
+
+	// DirLoc holds FS location information for [Instance.Dir].
+	// It is set when loading from an [io/fs.FS].
+	DirLoc token.FSLoc
 
 	// NOTICE: the below struct field tags may change in the future.
 

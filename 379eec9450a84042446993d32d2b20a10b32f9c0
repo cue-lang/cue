@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aea59dcb_b1771678",
+        "filename": "internal/core/export/self.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:22:06Z",
+      "side": 1,
+      "message": "Can this function be called recursively? If so, we should save p.exporting and restore it.",
+      "revId": "379eec9450a84042446993d32d2b20a10b32f9c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

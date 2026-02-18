@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "badc42ef_5be8a47f",
+        "filename": "cue/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:04:21Z",
+      "side": 1,
+      "message": "Oops indeed. If we are gonna rename it anyway, it is a nice opportunity to implement it correctly and and deprecate this one.",
+      "revId": "82a625d5c3f54cca9bb8b716d3a659652d6b83b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "daf9305a_f4fb905d",
         "filename": "doc/ref/spec.md",
         "patchSetId": 1
@@ -14,6 +31,75 @@
       "writtenOn": "2026-02-17T10:45:00Z",
       "side": 1,
       "message": "@mpvl@gmail.com did we actually mean builtin (predeclared) functions like `len` here, or standard library functions like `strings.Split`?\n\nIt\u0027s not obvious to me from reading the original text, so I want to double check whether you meant just one of them, or both.\n\nIf you can clarify, I\u0027ll amend the text accordingly.",
+      "revId": "82a625d5c3f54cca9bb8b716d3a659652d6b83b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77646465_64e89ad0",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 962,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:04:21Z",
+      "side": 1,
+      "message": "Any function, really. Since we are correcting things, then also call it built-in *.",
+      "parentUuid": "daf9305a_f4fb905d",
+      "revId": "82a625d5c3f54cca9bb8b716d3a659652d6b83b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c22a8722_ac309014",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 972,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:04:21Z",
+      "side": 1,
+      "message": "built-in",
+      "revId": "82a625d5c3f54cca9bb8b716d3a659652d6b83b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b21ff916_618c56e7",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1827,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:04:21Z",
+      "side": 1,
+      "message": "It still feels really odd to me but I guess language evolves.\n\n...\"also known as built-in types and functions.\"",
+      "revId": "82a625d5c3f54cca9bb8b716d3a659652d6b83b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e2fc80a_9e01c862",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2568,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:04:21Z",
+      "side": 1,
+      "message": "built-in",
       "revId": "82a625d5c3f54cca9bb8b716d3a659652d6b83b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

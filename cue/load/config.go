@@ -20,8 +20,10 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -284,6 +286,7 @@ type Config struct {
 
 	// Overlay provides a mapping of absolute file paths to file contents,
 	// which are overlaid on top of the host operating system when loading files.
+	// It is mutually exclusive with [Config.FS]; it is an error to set both.
 	//
 	// If an overlaid file already exists in the host filesystem,
 	// the overlaid file contents will be used in its place.
@@ -291,6 +294,33 @@ type Config struct {
 	// the loader behaves as if the overlaid file exists with its contents,
 	// and that that all of its parent directories exist too.
 	Overlay map[string]Source
+
+	// FS, if non-nil, provides the filesystem used by the loader
+	// for discovering packages, resolving modules, and reading
+	// files. It is mutually exclusive with [Config.Overlay]; it is
+	// an error to set both.
+	//
+	// When FS is nil, the loader uses the host operating system
+	// filesystem (os.Stat, os.ReadDir, os.Open), which is the
+	// default and preserves the existing behavior.
+	//
+	// When FS is set, all paths — including [Config.Dir],
+	// [Config.ModuleRoot], and the arguments to [Instances] — are
+	// interpreted as forward-slash-separated paths within FS.
+	// Absolute paths (those starting with "/") are permitted and
+	// are interpreted relative to the root of FS. Dir defaults
+	// to "/" when FS is set and Dir is empty.
+	//
+	// FS enables loading CUE packages and modules from virtual or
+	// embedded filesystems (for example, embed.FS or
+	// fstest.MapFS) without accessing the host filesystem.
+	FS fs.FS
+
+	// FromFSPath maps file names as they appear inside [Config.FS]
+	// to file names as they should appear in error messages and
+	// position information. It is ignored when FS is nil. When FS
+	// is set and FromFSPath is nil, paths are left unchanged.
+	FromFSPath func(path string) string
 
 	// Stdin defines an alternative for os.Stdin for the file "-". When used,
 	// the corresponding build.File will be associated with the full buffer.
@@ -313,7 +343,7 @@ type Config struct {
 	// will be used.
 	Env []string
 
-	fileSystem *fileSystem
+	fileSystem fileSystem
 }
 
 func (c *Config) stdin() io.Reader {
@@ -352,6 +382,14 @@ func addImportQualifier(pkg importPath, name string) (importPath, error) {
 // It does not initialize c.Context, because that requires the
 // loader in order to use for build.Loader.
 func (c Config) complete() (cfg *Config, err error) {
+	if c.FS != nil && c.Overlay != nil {
+		return nil, fmt.Errorf("cannot set both Config.FS and Config.Overlay")
+	}
+
+	if c.FS != nil {
+		return c.completeFS()
+	}
+
 	// Ensure [Config.Dir] is a clean and absolute path,
 	// necessary for matching directory prefixes later.
 	if c.Dir == "" {
@@ -368,7 +406,7 @@ func (c Config) complete() (cfg *Config, err error) {
 
 	// TODO: we could populate this already with absolute file paths,
 	// but relative paths cannot be added. Consider what is reasonable.
-	fsys, err := newFileSystem(&c)
+	fsys, err := newOverlayFS(&c)
 	if err != nil {
 		return nil, err
 	}
@@ -418,6 +456,113 @@ func (c Config) complete() (cfg *Config, err error) {
 	return &c, nil
 }
 
+// completeFS is the FS-mode variant of complete. It is called
+// when Config.FS is set.
+func (c Config) completeFS() (cfg *Config, err error) {
+	// In FS mode, default Dir to "/" (root of the virtual filesystem).
+	if c.Dir == "" {
+		c.Dir = "/"
+	}
+	// Ensure Dir is clean and starts with "/".
+	c.Dir = cleanFSPath(c.Dir)
+	if insideCueModFS(c.Dir) {
+		return nil, fmt.Errorf("cannot load packages inside the %s directory", modDir)
+	}
+
+	fsys, err := newFSFileSystem(&c)
+	if err != nil {
+		return nil, err
+	}
+	c.fileSystem = fsys
+
+	// Ensure ModuleRoot is a clean and absolute path within the FS.
+	if c.ModuleRoot == "" {
+		c.ModuleRoot = c.Dir
+		if root := c.findModRoot(c.Dir); root != "" {
+			c.ModuleRoot = root
+		}
+	} else if !strings.HasPrefix(c.ModuleRoot, "/") {
+		c.ModuleRoot = path.Join(c.Dir, c.ModuleRoot)
+	} else {
+		c.ModuleRoot = path.Clean(c.ModuleRoot)
+	}
+	if c.SkipImports {
+		c.Registry = errorRegistry{errors.New("unexpected use of registry in SkipImports mode")}
+	} else if c.Registry == nil {
+		registry, err := modconfig.NewRegistry(&modconfig.Config{
+			Env: c.Env,
+		})
+		if err != nil {
+			registry = errorRegistry{err}
+		}
+		c.Registry = registry
+	}
+	c.parserConfig = parser.NewConfig(parser.ParseComments)
+	if err := c.loadModule(); err != nil {
+		return nil, err
+	}
+	return &c, nil
+}
+
+// cleanFSPath cleans a path for use inside an io/fs.FS-based
+// filesystem and ensures it starts with "/".
+func cleanFSPath(p string) string {
+	p = path.Clean(p)
+	if !strings.HasPrefix(p, "/") {
+		p = "/" + p
+	}
+	return p
+}
+
+// insideCueModFS reports whether absDir is inside a cue.mod directory
+// using forward-slash paths. This is the FS-mode equivalent of
+// [modpkgload.InsideCueMod].
+func insideCueModFS(absDir string) bool {
+	lastPart := ""
+	for {
+		dir, base := path.Split(strings.TrimSuffix(absDir, "/"))
+		if base == "cue.mod" {
+			switch lastPart {
+			case "pkg", "usr", "gen":
+				return false
+			}
+			return true
+		}
+		if dir == "" || dir == absDir {
+			return false
+		}
+		absDir = strings.TrimSuffix(dir, "/")
+		lastPart = base
+	}
+}
+
+// joinPath joins path elements using the appropriate path separator
+// for the configured filesystem.
+func (c *Config) joinPath(elem ...string) string {
+	if c.FS != nil {
+		return path.Join(elem...)
+	}
+	return filepath.Join(elem...)
+}
+
+// dirPath returns the directory part of a path using the appropriate
+// path convention.
+func (c *Config) dirPath(p string) string {
+	if c.FS != nil {
+		return path.Dir(p)
+	}
+	return filepath.Dir(p)
+}
+
+// basePath returns the last element of a path using the appropriate
+// path convention.
+func (c *Config) basePath(p string) string {
+	if c.FS != nil {
+		return path.Base(p)
+	}
+	return filepath.Base(p)
+}
+
 func (c *Config) languageVersion() string {
 	if c.modFile == nil || c.modFile.Language == nil {
 		return ""
@@ -433,8 +578,8 @@ func (c *Config) languageVersion() string {
 // as it is still possible to load CUE without a module.
 func (c *Config) loadModule() error {
 	// TODO: also make this work if run from outside the module?
-	modDir := filepath.Join(c.ModuleRoot, modDir)
-	modFile := filepath.Join(modDir, moduleFile)
+	modDir := c.joinPath(c.ModuleRoot, modDir)
+	modFile := c.joinPath(modDir, moduleFile)
 	f, cerr := c.fileSystem.openFile(modFile)
 	if cerr != nil {
 		// If we could not load cue.mod/module.cue, check whether the reason was
@@ -445,7 +590,7 @@ func (c *Config) loadModule() error {
 		//
 		// TODO(mvdan): we can remove this in mid 2026, once we can safely assume that
 		// practically all cue.mod files have vanished.
-		if errors.Is(cerr, fs.ErrNotExist) && runtime.GOOS != "windows" {
+		if errors.Is(cerr, fs.ErrNotExist) && (c.FS != nil || runtime.GOOS != "windows") {
 			// The file definitely does not exist. On Windows unfortunately due
 			// to https://github.com/golang/go/issues/46734
 			// we can't tell the difference between "does not exist"
@@ -495,7 +640,7 @@ func (c *Config) loadModule() error {
 
 func (c Config) isModRoot(dir string) bool {
 	// Note: cue.mod used to be a file. We still allow both to match.
-	_, err := c.fileSystem.stat(filepath.Join(dir, modDir))
+	_, err := c.fileSystem.stat(c.joinPath(dir, modDir))
 	return err == nil
 }
 
@@ -507,8 +652,8 @@ func (c Config) findModRoot(absDir string) string {
 		if c.isModRoot(abs) {
 			return abs
 		}
-		d := filepath.Dir(abs)
-		if filepath.Base(filepath.Dir(abs)) == modDir {
+		d := c.dirPath(abs)
+		if c.basePath(c.dirPath(abs)) == modDir {
 			// The package was located within a "cue.mod" dir and there was
 			// not cue.mod found until now. So there is no root.
 			return ""

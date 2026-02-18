@@ -32,7 +32,7 @@ func TestIOFS(t *testing.T) {
 		overlay[filepath.Join(dir, f)] = FromString(f + " overlay")
 	}
 
-	fsys, err := newFileSystem(&Config{
+	fsys, err := newOverlayFS(&Config{
 		Dir:     filepath.Join(dir, "foo"),
 		Overlay: overlay,
 	})
@@ -55,6 +55,91 @@ func TestIOFS(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(string(data), f))
 	}
+}
+
+func TestLoadFromFS(t *testing.T) {
+	mapFS := fstest.MapFS{
+		"cue.mod/module.cue": &fstest.MapFile{
+			Data: []byte(`module: "example.com/test@v0"
+language: version: "v0.12.0"
+`),
+		},
+		"x.cue": &fstest.MapFile{
+			Data: []byte(`package test
+
+a: 1
+`),
+		},
+	}
+	cfg := &Config{
+		FS: mapFS,
+	}
+	insts := Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.HasLen(insts, 1))
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+	qt.Assert(t, qt.Equals(insts[0].PkgName, "test"))
+}
+
+func TestLoadFromFSSubdir(t *testing.T) {
+	mapFS := fstest.MapFS{
+		"mymod/cue.mod/module.cue": &fstest.MapFile{
+			Data: []byte(`module: "example.com/test@v0"
+language: version: "v0.12.0"
+`),
+		},
+		"mymod/x.cue": &fstest.MapFile{
+			Data: []byte(`package test
+
+a: 1
+`),
+		},
+	}
+	cfg := &Config{
+		FS:  mapFS,
+		Dir: "/mymod",
+	}
+	insts := Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.HasLen(insts, 1))
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+	qt.Assert(t, qt.Equals(insts[0].PkgName, "test"))
+}
+
+func TestLoadFromFSAndOverlayMutualExclusion(t *testing.T) {
+	cfg := &Config{
+		FS:      fstest.MapFS{},
+		Overlay: map[string]Source{"/foo": FromString("bar")},
+	}
+	insts := Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.HasLen(insts, 1))
+	qt.Assert(t, qt.ErrorMatches(insts[0].Err, `.*cannot set both Config.FS and Config.Overlay.*`))
+}
+
+func TestLoadFromFSFromFSPath(t *testing.T) {
+	mapFS := fstest.MapFS{
+		"cue.mod/module.cue": &fstest.MapFile{
+			Data: []byte(`module: "example.com/test@v0"
+language: version: "v0.12.0"
+`),
+		},
+		"x.cue": &fstest.MapFile{
+			Data: []byte(`package test
+
+a: 1
+`),
+		},
+	}
+	cfg := &Config{
+		FS: mapFS,
+		FromFSPath: func(p string) string {
+			return "/real/source" + p
+		},
+	}
+	insts := Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.HasLen(insts, 1))
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+	// Check that file positions use the mapped path.
+	qt.Assert(t, qt.HasLen(insts[0].BuildFiles, 1))
+	qt.Assert(t, qt.Equals(insts[0].BuildFiles[0].Filename, "/real/source/x.cue"))
 }
 
 func writeFile(t *testing.T, fpath string, content string) {

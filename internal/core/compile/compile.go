@@ -1297,7 +1297,14 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			case *adt.IndexExpr:
 				r.Optional = true
 				return r
+			case *adt.Bottom:
+				return r
 			default:
+				// NOTE: as the parser already enforces correct use of ?, this
+				// can only happen if a user builds an incorrect AST
+				// programmatically. We do not generate errors for invalid
+				// references as this just leads to distracting additional error
+				// messages.
 				return c.errf(n, "optional marker (?) can only be used on references")
 			}
 		default:

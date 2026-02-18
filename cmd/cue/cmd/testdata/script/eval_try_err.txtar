@@ -1,0 +1,18 @@
+! exec cue export --out cue in.cue
+cmp stderr expect/nonExist/stderr
+
+-- in.cue --
+@experiment(try)
+
+package p
+
+a?: int
+// c: non-existing
+
+try x = {value: c? + 1} if x.value > 5 {
+    a: x
+}
+
+-- expect/nonExist/stderr --
+value: reference "c" not found:
+    ./in.cue:8:17

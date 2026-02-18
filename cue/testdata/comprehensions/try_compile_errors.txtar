@@ -24,6 +24,12 @@ optionalInAssignmentBody: {
     b: 2
     try y = a? { x: b? } else { fallback: 23 }
 }
+
+// Struct-form try must be the last clause
+invalidUseOfOptional: {
+    try { x: c? }
+}
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  2
@@ -45,11 +51,13 @@ optionalInForSource: optional marker (?) is only valid within a try clause:
     ./in.cue:17:14
 optionalInAssignmentBody.try[].x: optional marker (?) is only valid within a try clause:
     ./in.cue:24:21
+invalidUseOfOptional.x: reference "c" not found:
+    ./in.cue:29:14
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -3,4 +3,6 @@
+@@ -3,4 +3,8 @@
  optionalOutsideTry.b: optional marker (?) is only valid within a try clause:
      ./in.cue:11:8
  optionalInForSource: optional marker (?) is only valid within a try clause:
@@ -57,6 +65,8 @@ diff old new
 +    ./in.cue:17:14
 +optionalInAssignmentBody.try[].x: optional marker (?) is only valid within a try clause:
 +    ./in.cue:24:21
++invalidUseOfOptional.x: reference "c" not found:
++    ./in.cue:29:14
 -- out/eval --
 structFormNotLast: struct-form try clause must be the last clause in a comprehension:
     ./in.cue:5:5
@@ -73,6 +83,8 @@ optionalInForSource: optional marker (?) is only valid within a try clause:
     ./in.cue:17:14
 optionalInAssignmentBody.try[].x: optional marker (?) is only valid within a try clause:
     ./in.cue:24:21
+invalidUseOfOptional.x: reference "c" not found:
+    ./in.cue:29:14
 --- in.cue
 {
   structFormNotLast: {
@@ -99,6 +111,11 @@ optionalInAssignmentBody.try[].x: optional marker (?) is only valid within a try
       x: 〈2;b〉?
     } else {
       fallback: 23
+    }
+  }
+  invalidUseOfOptional: {
+    try {
+      x: _|_(reference "c" not found)
     }
   }
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7711732_9d9afe5d",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:54:34Z",
+      "side": 1,
+      "message": "This seems wrong.",
+      "revId": "4be7ef59a0a049883b911ba2c5dfbed95802ef56",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

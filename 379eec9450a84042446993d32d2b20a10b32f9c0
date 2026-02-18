@@ -16,6 +16,24 @@
       "message": "Can this function be called recursively? If so, we should save p.exporting and restore it.",
       "revId": "379eec9450a84042446993d32d2b20a10b32f9c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee5129f1_1613b577",
+        "filename": "internal/core/export/self.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-18T22:25:12Z",
+      "side": 1,
+      "message": "Claude says it\u0027s not called recursively, but it\u0027s easy enough to be defensive and save this anyway, so it\u0027s now done.",
+      "parentUuid": "aea59dcb_b1771678",
+      "revId": "379eec9450a84042446993d32d2b20a10b32f9c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

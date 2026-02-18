@@ -313,6 +313,7 @@ type File struct {
 	experiments *cueexperiment.File
 	priority    layer.Priority
 	isData      bool
+	fsLoc       FSLoc
 }
 
 // NewFile returns a new file with the given OS file name. The size provides the
@@ -363,9 +364,19 @@ func (f *hiddenFile) SetLayer(priority int8, isData bool) {
 	f.isData = isData
 }
 
+// NOTE: this is an internal API and may change at any time without notice.
+func (f *hiddenFile) SetFSLoc(loc FSLoc) {
+	f.fsLoc = loc
+}
+
 // Name returns the file name of file f as registered with AddFile.
 func (f *File) Name() string {
 	return f.name
+}
+
+// FSLoc returns the FS location information for file f.
+func (f *File) FSLoc() FSLoc {
+	return f.fsLoc
 }
 
 // Base returns the base offset of file f as passed to NewFile.

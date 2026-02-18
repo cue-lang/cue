@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"io/fs"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -27,6 +26,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/mod/module"
+	pkgpath "cuelang.org/go/pkg/path"
 )
 
 // A match represents the result of matching a single package pattern.
@@ -155,14 +155,14 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 	// Find new module root from here or check there are no additional
 	// cue.mod files between here and the next module.
 
-	if !hasFilepathPrefix(root, c.ModuleRoot) {
+	if !hasFilepathPrefix(root, c.ModuleRoot, c.pathOS) {
 		m.Err = errors.Newf(token.NoPos,
 			"cue: pattern %s refers to dir %s, outside module root %s",
 			pattern, root, c.ModuleRoot)
 		return m
 	}
 
-	pkgDir := filepath.Join(root, modDir)
+	pkgDir := pkgpath.Join([]string{root, modDir}, c.pathOS)
 
 	_ = c.fileSystem.walk(root, func(path string, entry fs.DirEntry, err errors.Error) errors.Error {
 		if err != nil || !entry.IsDir() {
@@ -175,7 +175,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		top := path == root
 
 		// Avoid .foo, _foo, and testdata directory trees, but do not avoid "." or "..".
-		_, elem := filepath.Split(path)
+		elem := pkgpath.Base(path, c.pathOS)
 		dot := strings.HasPrefix(elem, ".") && elem != "." && elem != ".."
 		if dot || strings.HasPrefix(elem, "_") || (elem == "testdata" && !top) {
 			return skipDir
@@ -183,7 +183,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 
 		if !top {
 			// Ignore other modules found in subdirectories.
-			if _, err := c.fileSystem.stat(filepath.Join(path, modDir)); err == nil {
+			if _, err := c.fileSystem.stat(pkgpath.Join([]string{path, modDir}, c.pathOS)); err == nil {
 				return skipDir
 			}
 		}
@@ -199,11 +199,11 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		// silently skipped as not matching the pattern.
 		// Do not take root, as we want to stay relative
 		// to one dir only.
-		relPath, err2 := filepath.Rel(c.Dir, path)
+		relPath, err2 := pkgpath.Rel(c.Dir, path, c.pathOS)
 		if err2 != nil {
 			panic(err2) // Should never happen because c.Dir is absolute.
 		}
-		relPath = "./" + filepath.ToSlash(relPath)
+		relPath = "./" + pkgpath.ToSlash(relPath, c.pathOS)
 		// TODO: consider not doing these checks here.
 		inst := l.newRelInstance(token.NoPos, relPath, pkgName)
 		pkgs := l.importPkg(token.NoPos, inst)
@@ -238,7 +238,7 @@ func (l *loader) importPaths(patterns []string) []*match {
 // importPathsQuiet is like importPaths but does not warn about patterns with no matches.
 func (l *loader) importPathsQuiet(patterns []string) []*match {
 	var out []*match
-	for _, a := range cleanPatterns(patterns) {
+	for _, a := range cleanPatterns(patterns, l.cfg.pathOS) {
 		if isMetaPackage(a) {
 			out = append(out, l.matchPackages(a, l.cfg.Package))
 			continue
@@ -305,13 +305,13 @@ func expandPackageArgs(c *Config, pkgArgs []string, pkgQual string, tg *tagger) 
 // Its semantics follow those of [Config.Package].
 func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string, pkgQual string, tg *tagger) ([]resolvedPackageArg, error) {
 	origp := p
-	if filepath.IsAbs(p) {
+	if pkgpath.IsAbs(p, c.pathOS) {
 		return nil, fmt.Errorf("cannot use absolute directory %q as package path", p)
 	}
 	// Arguments are supposed to be import paths, but
 	// as a courtesy to Windows developers, rewrite \ to /
 	// in command-line arguments. Handles .\... and so on.
-	p = filepath.ToSlash(p)
+	p = pkgpath.ToSlash(p, c.pathOS)
 
 	ip := ast.ParseImportPath(p)
 	if ip.Qualifier == "_" {

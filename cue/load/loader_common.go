@@ -18,7 +18,6 @@ import (
 	"cmp"
 	"maps"
 	pathpkg "path"
-	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -26,7 +25,16 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	pkgpath "cuelang.org/go/pkg/path"
 )
+
+// separator returns the path separator byte for the given OS.
+func separator(os pkgpath.OS) byte {
+	if os == pkgpath.Windows {
+		return '\\'
+	}
+	return '/'
+}
 
 // An importMode controls the behavior of the Import method.
 type importMode uint
@@ -45,25 +53,26 @@ type excludeError struct {
 
 func (e excludeError) Is(err error) bool { return err == errExclude }
 
-func rewriteFiles(p *build.Instance, root string, isLocal bool) {
+func rewriteFiles(p *build.Instance, root string, isLocal bool, os pkgpath.OS) {
 	p.Root = root
 
-	normalizeFiles(p.BuildFiles)
-	normalizeFiles(p.IgnoredFiles)
-	normalizeFiles(p.OrphanedFiles)
-	normalizeFiles(p.InvalidFiles)
-	normalizeFiles(p.UnknownFiles)
+	normalizeFiles(p.BuildFiles, os)
+	normalizeFiles(p.IgnoredFiles, os)
+	normalizeFiles(p.OrphanedFiles, os)
+	normalizeFiles(p.InvalidFiles, os)
+	normalizeFiles(p.UnknownFiles, os)
 }
 
 // normalizeFiles sorts the files so that files contained by a parent directory
 // always come before files contained in sub-directories, and that filenames in
 // the same directory are sorted lexically byte-wise, like Go's `<` operator.
-func normalizeFiles(files []*build.File) {
+func normalizeFiles(files []*build.File, os pkgpath.OS) {
+	sep := separator(os)
 	slices.SortFunc(files, func(a, b *build.File) int {
 		fa := a.Filename
 		fb := b.Filename
-		ca := strings.Count(fa, string(filepath.Separator))
-		cb := strings.Count(fb, string(filepath.Separator))
+		ca := strings.Count(fa, string(sep))
+		cb := strings.Count(fb, string(sep))
 		if c := cmp.Compare(ca, cb); c != 0 {
 			return c
 		}
@@ -143,7 +152,7 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 	if countCUEFiles(fp.c, p) == 0 &&
 		!fp.c.DataFiles &&
 		(p.PkgName != "_" || !fp.allPackages) {
-		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, ignored: len(p.IgnoredFiles) > 0})
+		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, pathOS: fp.c.pathOS, ignored: len(p.IgnoredFiles) > 0})
 		return fp.err
 	}
 
@@ -160,13 +169,13 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 func (fp *fileProcessor) add(root string, file *build.File, mode importMode) bool {
 	fullPath := file.Filename
 	if fullPath != "-" {
-		if !filepath.IsAbs(fullPath) {
-			fullPath = filepath.Join(root, fullPath)
+		if !pkgpath.IsAbs(fullPath, fp.c.pathOS) {
+			fullPath = pkgpath.Join([]string{root, fullPath}, fp.c.pathOS)
 		}
 		file.Filename = fullPath
 	}
 
-	base := filepath.Base(fullPath)
+	base := pkgpath.Base(fullPath, fp.c.pathOS)
 
 	// special * and _
 	p := fp.pkg // default package
@@ -177,7 +186,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 	// or when allowExcludedFiles is specified, signifying that the
 	// file is part of an explicit set of files provided on the
 	// command line.
-	sameDir := filepath.Dir(fullPath) == p.Dir || (mode&allowExcludedFiles) != 0
+	sameDir := pkgpath.Dir(fullPath, fp.c.pathOS) == p.Dir || (mode&allowExcludedFiles) != 0
 
 	// badFile := func(p *build.Instance, err errors.Error) bool {
 	badFile := func(err errors.Error) {
@@ -188,6 +197,12 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 	if err := setFileSource(fp.c, file); err != nil {
 		badFile(errors.Promote(err, ""))
 		return false
+	}
+	// Apply FromFSPath to transform the filename for display/position purposes.
+	// This must be done after setFileSource (which uses the FS path to read
+	// the file) but before getCUESyntax (which uses bf.Filename for positions).
+	if fp.c.FromFSPath != nil {
+		file.Filename = fp.c.FromFSPath(file.Filename)
 	}
 
 	if file.Encoding != build.CUE {
@@ -370,7 +385,7 @@ func warnUnmatched(matches []*match) {
 // cleanPatterns returns the patterns to use for the given
 // command line. It canonicalizes the patterns but does not
 // evaluate any matches.
-func cleanPatterns(patterns []string) []string {
+func cleanPatterns(patterns []string, os pkgpath.OS) []string {
 	if len(patterns) == 0 {
 		return []string{"."}
 	}
@@ -379,7 +394,7 @@ func cleanPatterns(patterns []string) []string {
 		// Arguments are supposed to be import paths, but
 		// as a courtesy to Windows developers, rewrite \ to /
 		// in command-line arguments. Handles .\... and so on.
-		if filepath.Separator == '\\' {
+		if separator(os) == '\\' {
 			a = strings.Replace(a, `\`, `/`, -1)
 		}
 
@@ -406,16 +421,17 @@ func isMetaPackage(name string) bool {
 
 // hasFilepathPrefix reports whether the path s begins with the
 // elements in prefix.
-func hasFilepathPrefix(s, prefix string) bool {
+func hasFilepathPrefix(s, prefix string, os pkgpath.OS) bool {
+	sep := separator(os)
 	switch {
 	default:
 		return false
 	case len(s) == len(prefix):
 		return s == prefix
 	case len(s) > len(prefix):
-		if prefix != "" && prefix[len(prefix)-1] == filepath.Separator {
+		if prefix != "" && prefix[len(prefix)-1] == sep {
 			return strings.HasPrefix(s, prefix)
 		}
-		return s[len(prefix)] == filepath.Separator && s[:len(prefix)] == prefix
+		return s[len(prefix)] == sep && s[:len(prefix)] == prefix
 	}
 }

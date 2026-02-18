@@ -162,7 +162,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		return m
 	}
 
-	pkgDir := filepath.Join(root, modDir)
+	pkgDir := c.joinPath(root, modDir)
 
 	_ = c.fileSystem.walk(root, func(path string, entry fs.DirEntry, err errors.Error) errors.Error {
 		if err != nil || !entry.IsDir() {
@@ -175,7 +175,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		top := path == root
 
 		// Avoid .foo, _foo, and testdata directory trees, but do not avoid "." or "..".
-		_, elem := filepath.Split(path)
+		elem := c.basePath(path)
 		dot := strings.HasPrefix(elem, ".") && elem != "." && elem != ".."
 		if dot || strings.HasPrefix(elem, "_") || (elem == "testdata" && !top) {
 			return skipDir
@@ -183,7 +183,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 
 		if !top {
 			// Ignore other modules found in subdirectories.
-			if _, err := c.fileSystem.stat(filepath.Join(path, modDir)); err == nil {
+			if _, err := c.fileSystem.stat(c.joinPath(path, modDir)); err == nil {
 				return skipDir
 			}
 		}

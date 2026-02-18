@@ -20,8 +20,6 @@ package load
 //    - go/build
 
 import (
-	"path/filepath"
-
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
@@ -63,7 +61,7 @@ func (l *loader) abs(filename string) string {
 	if !isLocalImport(filename) {
 		return filename
 	}
-	return filepath.Join(l.cfg.Dir, filename)
+	return l.cfg.joinPath(l.cfg.Dir, filename)
 }
 
 func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {

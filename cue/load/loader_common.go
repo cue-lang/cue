@@ -189,6 +189,12 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 		badFile(errors.Promote(err, ""))
 		return false
 	}
+	// Apply FromFSPath to transform the filename for display/position purposes.
+	// This must be done after setFileSource (which uses the FS path to read
+	// the file) but before getCUESyntax (which uses bf.Filename for positions).
+	if fp.c.FromFSPath != nil {
+		file.Filename = fp.c.FromFSPath(file.Filename)
+	}
 
 	if file.Encoding != build.CUE {
 		// Not a CUE file.

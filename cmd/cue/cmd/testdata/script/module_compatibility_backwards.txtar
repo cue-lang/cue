@@ -49,7 +49,7 @@ exec cue mod tidy --check
 
 # Upstream publishing then works once a source.kind is chosen by the user.
 ! exec cue mod publish v0.0.2
-stderr '^no source field found in cue.mod/module.cue$'
+stderr '^publishing a module requires a source field'
 exec cue mod edit --source self
 exec cue mod publish v0.0.2
 

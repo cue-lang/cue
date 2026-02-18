@@ -158,7 +158,7 @@ func runModUpload(cmd *Command, args []string) error {
 			mf.Source = &modfile.Source{Kind: "self"}
 		} else {
 			// TODO print filename relative to current directory
-			return fmt.Errorf("no source field found in cue.mod/module.cue")
+			return fmt.Errorf("publishing a module requires a source field in cue.mod/module.cue; choose a source with 'cue mod edit --source'")
 		}
 	}
 	zf, err := os.CreateTemp("", "cue-publish-")

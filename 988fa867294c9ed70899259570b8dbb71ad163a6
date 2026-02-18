@@ -51,6 +51,125 @@
       "parentUuid": "c275e51d_e78f7d5e",
       "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "103c5273_c4d8c176",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:47:00Z",
+      "side": 1,
+      "message": "There is also a very old bug related to this.\n\nAlso, this is theoretically a breaking change (people _may_ hold packages as open, and in some cases that is actually correct), so we _may_ want to gate this change on the language version. not sure.\n\nOverall, this needs a lot more tests. Consider the following:\n\nimport \".../cli\"\n\na: cli\nb: a.MkDir // will this catch it? Should it.\n\nb: {try { cli.Mkdir? }} // should this fail (I think it will). Should it?\n\u003d\u003d\u003d\npackage cli\n\nx: y: z: {}\n\n---\nimport \"cli\"\n\na: cli.x.y.Z // will this be caught (I think not). Should it?\n\n---\na: {try { cli.x.y.Z? }} // should this fail? If so, why?",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "321e47f6_ef76cd73",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_non_local.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:47:00Z",
+      "side": 1,
+      "message": "Not sure how this test works and why this was changed. Please double check.",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9e3b31a_e670b11c",
+        "filename": "cue/testdata/export/issue854.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:47:00Z",
+      "side": 1,
+      "message": "Should be marked as eval, if it is reported here. Should be fixed with my comment later.",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d34591f_1381704e",
+        "filename": "cue/testdata/references/let.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:47:00Z",
+      "side": 1,
+      "message": "This error seems incorrect. Should be incomplete, still.",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04dbb7d5_12cb350d",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:47:00Z",
+      "side": 1,
+      "message": "I would say here instead \n\n c.Runtime.IsPackage(v) || !v.Accept(c, f)",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "810edc5f_40e66571",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:47:00Z",
+      "side": 1,
+      "message": "I think this is not correct. See above.\n\nThis is more used for when a state is \"in flux\" (and should probably be deprecated). It is just an EvalError.",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f697f461_7dc62066",
+        "filename": "internal/core/adt/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T12:47:00Z",
+      "side": 1,
+      "message": "Not needed if check is moved.",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

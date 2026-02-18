@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0e76cd1_8e3f3099",
+        "filename": "cue/testdata/comprehensions/nested.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-18T12:14:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b579edee_0cdd983e",
+      "revId": "8166f8b8de59f369e7ee9670f8078f75eba72d4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b16488d_52508c9e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-17T18:54:50Z",
       "side": 1,
       "message": "We probably have this function in various spots. But either way.",
+      "revId": "8166f8b8de59f369e7ee9670f8078f75eba72d4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51f5f729_4a95d8fc",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-18T12:14:43Z",
+      "side": 1,
+      "message": "yeah, the only place I found it was in one of the mod packages which we can\u0027t import from here. Can clean it up later when we find a good low level place for it to live.",
+      "parentUuid": "9b16488d_52508c9e",
       "revId": "8166f8b8de59f369e7ee9670f8078f75eba72d4c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

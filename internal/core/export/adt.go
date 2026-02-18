@@ -619,7 +619,12 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		frame.labelExpr = expr // see astutil.Resolve.
 
 		if x.Label != 0 {
-			expr = &ast.Alias{Ident: e.ident(x.Label), Expr: expr}
+			// Mark features used in the value expression so that
+			// uniqueAlias can avoid generating a conflicting name
+			// when the alias has the same name as a field in the value.
+			e.markUsedFeatures(x.Value)
+			name := e.uniqueAlias(e.identString(x.Label))
+			expr = &ast.Alias{Ident: ast.NewIdent(name), Expr: expr}
 		}
 		f := &ast.Field{
 			Label: ast.NewList(expr),

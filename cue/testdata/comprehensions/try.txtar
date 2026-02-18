@@ -461,13 +461,13 @@ recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}
 
 -- out/evalalpha/stats --
 Leaks:  53
-Freed:  376
-Reused: 329
+Freed:  355
+Reused: 308
 Allocs: 100
 Retain: 0
 
-Unifications: 422
-Conjuncts:    552
+Unifications: 401
+Conjuncts:    509
 Disjuncts:    0
 
 NumCloseIDs: 173
@@ -481,8 +481,8 @@ diff old new
 -Reused: 5
 -Allocs: 3
 +Leaks:  53
-+Freed:  376
-+Reused: 329
++Freed:  355
++Reused: 308
 +Allocs: 100
  Retain: 0
  
@@ -491,8 +491,8 @@ diff old new
 -Disjuncts:    8
 -
 -NumCloseIDs: 1
-+Unifications: 422
-+Conjuncts:    552
++Unifications: 401
++Conjuncts:    509
 +Disjuncts:    0
 +
 +NumCloseIDs: 173

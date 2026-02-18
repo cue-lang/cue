@@ -14,10 +14,19 @@ valid: sbx: {}
 // Invalid key should show the custom error message.
 invalid: #Envs
 invalid: foo: {}
+
+// Two pattern constraints with different error() messages.
+#Color: "red" | "blue" | error("invalid color")
+#Size: "s" | "m" | error("invalid size")
+#TwoPatterns: {[#Color]: _} & {[#Size]: _}
+twoPatterns: #TwoPatterns
+twoPatterns: bad: "x"
 -- out/evalalpha --
 Errors:
 invalid.foo: field not allowed:
     ./in.cue:10:10
+twoPatterns.bad: field not allowed:
+    ./in.cue:17:14
 
 Result:
 (_|_){
@@ -36,6 +45,17 @@ Result:
       //     ./in.cue:10:10
     }
   }
+  #Color: (string){ |((string){ "red" }, (string){ "blue" }) }
+  #Size: (string){ |((string){ "s" }, (string){ "m" }) }
+  #TwoPatterns: (#struct){
+  }
+  twoPatterns: (_|_){
+    // [eval]
+    bad: (_|_){
+      // [eval] twoPatterns.bad: field not allowed:
+      //     ./in.cue:17:14
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -51,5 +71,16 @@ Result:
   invalid: 〈0;#Envs〉
   invalid: {
     foo: {}
+  }
+  #Color: ("red"|"blue"|error("invalid color"))
+  #Size: ("s"|"m"|error("invalid size"))
+  #TwoPatterns: ({
+    [〈1;#Color〉]: _
+  } & {
+    [〈1;#Size〉]: _
+  })
+  twoPatterns: 〈0;#TwoPatterns〉
+  twoPatterns: {
+    bad: "x"
   }
 }

@@ -16,6 +16,24 @@
       "message": "We probably want to find _all_ user errors. So technically, this block should not break, but collect all matching errors, and then add them creating a new error.\n\nfor this purpose selectErrors may not be the best choice either. Maybe just CombineErrors iterating on usersErrors directly and then rewrapping with a new Bottom.\n\nAdd test with two pattern constraints each having a user error to test.",
       "revId": "ad326b607dc02d95956914abc36b7ba2ab92351c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1dab0296_2f0d9ff4",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-18T22:47:38Z",
+      "side": 1,
+      "message": "good points, I hadn\u0027t thought about multiple pattern constraints. done.\n\nAmazingly, Claude was able to read this review and properly update the patch accordingly. I just had to ask it to split the tests in a first commit again, for the sake of seeing the test diff.\n\nPTAL",
+      "parentUuid": "0e169740_81367040",
+      "revId": "ad326b607dc02d95956914abc36b7ba2ab92351c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -415,6 +415,31 @@ func (ctx *OpContext) notAllowedError(arc *Vertex) *Bottom {
 	// desirable or not, but it differs, at least from <=v0.6 behavior.
 	err := ctx.NewErrf("field not allowed")
 	err.CloseCheck = true
+
+	// When a pattern constraint key is a disjunction containing an error() call,
+	// surface all custom error messages instead of "field not allowed".
+	if pcs := arc.Parent.DerefValue().PatternConstraints; pcs != nil {
+		var combined *Bottom
+		for _, pc := range pcs.Pairs {
+			v, ok := pc.Pattern.(*Vertex)
+			if !ok || v.state == nil {
+				continue
+			}
+			for _, userErr := range v.state.userErrs {
+				// Create a new error with the disallowed field's path,
+				// but the user error's message and position.
+				format, args := userErr.Err.Msg()
+				b := ctx.NewErrf(format, args...)
+				b.Code = UserError
+				b.Err.(*ValueError).AddPos(userErr.Err.Position())
+				combined = CombineErrors(nil, combined, b)
+			}
+		}
+		if combined != nil {
+			err = combined
+		}
+	}
+
 	arc.SetValue(ctx, err)
 	if arc.state != nil {
 		arc.state.kind = 0

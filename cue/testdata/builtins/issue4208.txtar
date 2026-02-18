@@ -23,14 +23,19 @@ twoPatterns: #TwoPatterns
 twoPatterns: bad: "x"
 -- out/evalalpha --
 Errors:
-invalid.foo: field not allowed:
+invalid.foo: Must specify a valid environment:
+    ./in.cue:1:39
     ./in.cue:10:10
-twoPatterns.bad: field not allowed:
+twoPatterns.bad: invalid color:
+    ./in.cue:13:26
+    ./in.cue:17:14
+twoPatterns.bad: invalid size:
+    ./in.cue:14:20
     ./in.cue:17:14
 
 Result:
 (_|_){
-  // [eval]
+  // [user]
   #Environment: (string){ |((string){ "sbx" }, (string){ "stg" }, (string){ "pro" }) }
   #Envs: (#struct){
   }
@@ -39,9 +44,10 @@ Result:
     }
   }
   invalid: (_|_){
-    // [eval]
+    // [user]
     foo: (_|_){
-      // [eval] invalid.foo: field not allowed:
+      // [user] invalid.foo: Must specify a valid environment:
+      //     ./in.cue:1:39
       //     ./in.cue:10:10
     }
   }
@@ -50,9 +56,13 @@ Result:
   #TwoPatterns: (#struct){
   }
   twoPatterns: (_|_){
-    // [eval]
+    // [user]
     bad: (_|_){
-      // [eval] twoPatterns.bad: field not allowed:
+      // [user] twoPatterns.bad: invalid color:
+      //     ./in.cue:13:26
+      //     ./in.cue:17:14
+      // twoPatterns.bad: invalid size:
+      //     ./in.cue:14:20
       //     ./in.cue:17:14
     }
   }

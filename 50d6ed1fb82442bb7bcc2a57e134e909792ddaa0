@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67e9fb5e_4587a1ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-18T11:53:17Z",
+      "side": 1,
+      "message": "I\u0027m not sure if I buy the argumentation here. Whether it is just evaluated (regular) or converted to data, in both cases we could argue that conjuncts are no longer valid. So it would be inconsistent to do it differently in either case.\n\nEither way, I think this could be a breaking change. Looking at the OP issue, this \"fix\" is actually not what the OP expected either.",
+      "revId": "50d6ed1fb82442bb7bcc2a57e134e909792ddaa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

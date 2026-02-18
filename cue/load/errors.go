@@ -16,12 +16,12 @@ package load
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	pkgpath "cuelang.org/go/pkg/path"
 )
 
 // A PackageError describes an error loading information about a package.
@@ -65,6 +65,7 @@ func (p *PackageError) Error() string {
 // tool files, files hidden by build tags, and so on.)
 type NoFilesError struct {
 	Package *build.Instance
+	pathOS  pkgpath.OS
 
 	ignored bool // whether any CUE files were ignored due to build tags
 }
@@ -79,7 +80,7 @@ func (e *NoFilesError) Msg() (string, []interface{}) {
 	// Count files beginning with _, which we will pretend don't exist at all.
 	dummy := 0
 	for _, f := range e.Package.IgnoredFiles {
-		if strings.HasPrefix(filepath.Base(f.Filename), "_") {
+		if strings.HasPrefix(pkgpath.Base(f.Filename, e.pathOS), "_") {
 			dummy++
 		}
 	}

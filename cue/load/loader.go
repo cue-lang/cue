@@ -20,13 +20,12 @@ package load
 //    - go/build
 
 import (
-	"path/filepath"
-
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modpkgload"
+	pkgpath "cuelang.org/go/pkg/path"
 )
 
 type loader struct {
@@ -63,7 +62,7 @@ func (l *loader) abs(filename string) string {
 	if !isLocalImport(filename) {
 		return filename
 	}
-	return filepath.Join(l.cfg.Dir, filename)
+	return pkgpath.Join([]string{l.cfg.Dir, filename}, l.cfg.pathOS)
 }
 
 func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
@@ -92,7 +91,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 
 	// TODO: ModImportFromFiles(files)
 	pkg.Dir = l.cfg.Dir
-	rewriteFiles(pkg, pkg.Dir, true)
+	rewriteFiles(pkg, pkg.Dir, true, l.cfg.pathOS)
 	for _, err := range errors.Errors(fp.finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError
 		if len(pkg.OrphanedFiles) == 0 || !errors.As(err, &x) {

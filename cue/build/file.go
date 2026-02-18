@@ -14,7 +14,10 @@
 
 package build
 
-import "cuelang.org/go/cue/errors"
+import (
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
+)
 
 // Note: the json tags in File correspond directly to names
 // used in the encoding/filetypes package, which unmarshals
@@ -23,6 +26,10 @@ import "cuelang.org/go/cue/errors"
 // A File represents a file that is part of the build process.
 type File struct {
 	Filename string `json:"filename"`
+
+	// FilenameLoc holds FS location information for [File.Filename].
+	// It is set when loading from an [io/fs.FS].
+	FilenameLoc token.FSLoc `json:"-"`
 
 	Encoding       Encoding       `json:"encoding,omitempty"`
 	Interpretation Interpretation `json:"interpretation,omitempty"`

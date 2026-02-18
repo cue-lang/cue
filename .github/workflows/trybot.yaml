@@ -19,6 +19,7 @@ jobs:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
     permissions:
+      contents: read
       id-token: write
     strategy:
       fail-fast: false

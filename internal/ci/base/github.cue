@@ -22,6 +22,12 @@ bashWorkflow: githubactions.#Workflow & {
 		// https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#defaultsrunshell
 		defaults: run: shell: "bash --noprofile --norc -euo pipefail {0}"
 
+		// If any job sets a permission, this "blasts" the GitHub defaults that
+		// are "inherited" from the workflow level (contents: "read"). Now that
+		// we have a step that sets a job-level permission for "id-token" we have
+		// to ensure the GitHub defaults are explicitly set.
+		permissions: contents: *"read" | _
+
 		// We want to allow steps in a job to define constraints on the job that
 		// contains them. To allow this for steps that are re-used between jobs,
 		// we need a means of a step declaring constraints that should be applied

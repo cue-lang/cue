@@ -78,7 +78,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = IPv4(ip)
+				c.Ret, c.Err = IPv4(ip)
 			}
 		},
 	}, {
@@ -90,7 +90,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = IPv6(ip)
+				c.Ret, c.Err = IPv6(ip)
 			}
 		},
 	}, {
@@ -102,7 +102,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = IP(ip)
+				c.Ret, c.Err = IP(ip)
 			}
 		},
 	}, {
@@ -126,7 +126,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = LoopbackIP(ip)
+				c.Ret, c.Err = LoopbackIP(ip)
 			}
 		},
 	}, {
@@ -138,7 +138,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = MulticastIP(ip)
+				c.Ret, c.Err = MulticastIP(ip)
 			}
 		},
 	}, {
@@ -150,7 +150,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = InterfaceLocalMulticastIP(ip)
+				c.Ret, c.Err = InterfaceLocalMulticastIP(ip)
 			}
 		},
 	}, {
@@ -162,7 +162,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = LinkLocalMulticastIP(ip)
+				c.Ret, c.Err = LinkLocalMulticastIP(ip)
 			}
 		},
 	}, {
@@ -174,7 +174,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = LinkLocalUnicastIP(ip)
+				c.Ret, c.Err = LinkLocalUnicastIP(ip)
 			}
 		},
 	}, {
@@ -186,7 +186,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = GlobalUnicastIP(ip)
+				c.Ret, c.Err = GlobalUnicastIP(ip)
 			}
 		},
 	}, {
@@ -198,7 +198,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			ip := c.Value(0)
 			if c.Do() {
-				c.Ret = UnspecifiedIP(ip)
+				c.Ret, c.Err = UnspecifiedIP(ip)
 			}
 		},
 	}, {

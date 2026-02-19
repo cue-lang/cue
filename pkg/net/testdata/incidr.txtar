@@ -38,13 +38,13 @@ v3: [192, 168, 1, 50] & net.InCIDR("192.168.1.0/24")
 v4: "2001:db8::1" & net.InCIDR("2001:db8::/32")
 -- out/net-v3 --
 Errors:
-t15: error in call to net.InCIDR: invalid IP "invalid":
+t15: error in call to net.InCIDR: ParseAddr("invalid"): unable to parse IP:
     ./in.cue:28:6
 t16: error in call to net.InCIDR: netip.ParsePrefix("invalid"): no '/':
     ./in.cue:29:6
 t17: error in call to net.InCIDR: netip.ParsePrefix("192.168.1.0"): no '/':
     ./in.cue:30:6
-t18: error in call to net.InCIDR: invalid IP "192.168.1.0/24":
+t18: error in call to net.InCIDR: ParseAddr("192.168.1.0/24"): unexpected character (at "/24"):
     ./in.cue:31:6
 v2: invalid value "10.0.0.1" (does not satisfy net.InCIDR("192.168.1.0/24")):
     ./in.cue:35:18
@@ -77,10 +77,10 @@ t13: true
 t14: true
 
 // Error cases
-t15: _|_ // t15: error in call to net.InCIDR: invalid IP "invalid"
+t15: _|_ // t15: error in call to net.InCIDR: ParseAddr("invalid"): unable to parse IP
 t16: _|_ // t16: error in call to net.InCIDR: netip.ParsePrefix("invalid"): no '/'
 t17: _|_ // t17: error in call to net.InCIDR: netip.ParsePrefix("192.168.1.0"): no '/'
-t18: _|_ // t18: error in call to net.InCIDR: invalid IP "192.168.1.0/24"
+t18: _|_ // t18: error in call to net.InCIDR: ParseAddr("192.168.1.0/24"): unexpected character (at "/24")
 
 // Validator usage - IP is validated against a CIDR constraint
 v1: "192.168.1.50"

@@ -30,55 +30,54 @@ const (
 	IPv6len = 16
 )
 
-func netGetIP(ip cue.Value) (goip netip.Addr) {
+func netGetIP(ip cue.Value) (netip.Addr, error) {
 	switch ip.Kind() {
 	case cue.StringKind:
 		s, err := ip.String()
 		if err != nil {
-			return netip.Addr{}
+			return netip.Addr{}, err
 		}
 		goip, err := netip.ParseAddr(s)
 		if err != nil {
-			return netip.Addr{}
+			return netip.Addr{}, err
 		}
-		return goip
+		return goip, nil
 
 	case cue.BytesKind:
 		b, err := ip.Bytes()
 		if err != nil {
-			return netip.Addr{}
+			return netip.Addr{}, err
 		}
 		goip, err := netip.ParseAddr(string(b))
 		if err != nil {
-			return netip.Addr{}
+			return netip.Addr{}, err
 		}
-		return goip
+		return goip, nil
 
 	case cue.ListKind:
 		iter, err := ip.List()
 		if err != nil {
-			return netip.Addr{}
+			return netip.Addr{}, err
 		}
 		var bytes []byte
 		for iter.Next() {
 			v, err := iter.Value().Int64()
 			if err != nil {
-				return netip.Addr{}
+				return netip.Addr{}, err
 			}
 			if v < 0 || 255 < v {
-				return netip.Addr{}
+				return netip.Addr{}, fmt.Errorf("invalid IP byte value %d", v)
 			}
 			bytes = append(bytes, byte(v))
 		}
 		goip, ok := netip.AddrFromSlice(bytes)
 		if !ok {
-			return netip.Addr{}
+			return netip.Addr{}, fmt.Errorf("invalid IP length %d", len(bytes))
 		}
-		return goip
+		return goip, nil
 
 	default:
-		// TODO: return canonical invalid type.
-		return netip.Addr{}
+		return netip.Addr{}, fmt.Errorf("invalid type %v for IP address", ip.Kind())
 	}
 }
 
@@ -107,8 +106,7 @@ func netGetIPCIDR(ip cue.Value) (gonet *netip.Prefix, err error) {
 		return &cidr, nil
 
 	default:
-		// TODO: return canonical invalid type.
-		return nil, nil
+		return nil, fmt.Errorf("invalid type %v for IP CIDR", ip.Kind())
 	}
 }
 
@@ -136,24 +134,36 @@ func netToList(ip []byte) []uint {
 // IPv4 reports whether ip is a valid IPv4 address.
 //
 // The address may be a string or list of bytes.
-func IPv4(ip cue.Value) bool {
+func IPv4(ip cue.Value) (bool, error) {
 	// TODO: convert to native CUE.
-	return netGetIP(ip).Is4()
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.Is4(), nil
 }
 
 // IPv6 reports whether ip is a valid IPv6 address.
 //
 // The address may be a string or list of bytes.
-func IPv6(ip cue.Value) bool {
-	return netGetIP(ip).Is6()
+func IPv6(ip cue.Value) (bool, error) {
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.Is6(), nil
 }
 
 // IP reports whether ip is a valid IPv4 or IPv6 address.
 //
 // The address may be a string or list of bytes.
-func IP(ip cue.Value) bool {
+func IP(ip cue.Value) (bool, error) {
 	// TODO: convert to native CUE.
-	return netGetIP(ip).IsValid()
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.IsValid(), nil
 }
 
 // IPCIDR reports whether ip is a valid IPv4 or IPv6 address with CIDR subnet notation.
@@ -165,29 +175,49 @@ func IPCIDR(ip cue.Value) (bool, error) {
 }
 
 // LoopbackIP reports whether ip is a loopback address.
-func LoopbackIP(ip cue.Value) bool {
-	return netGetIP(ip).IsLoopback()
+func LoopbackIP(ip cue.Value) (bool, error) {
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.IsLoopback(), nil
 }
 
 // MulticastIP reports whether ip is a multicast address.
-func MulticastIP(ip cue.Value) bool {
-	return netGetIP(ip).IsMulticast()
+func MulticastIP(ip cue.Value) (bool, error) {
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.IsMulticast(), nil
 }
 
 // InterfaceLocalMulticastIP reports whether ip is an interface-local multicast
 // address.
-func InterfaceLocalMulticastIP(ip cue.Value) bool {
-	return netGetIP(ip).IsInterfaceLocalMulticast()
+func InterfaceLocalMulticastIP(ip cue.Value) (bool, error) {
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.IsInterfaceLocalMulticast(), nil
 }
 
 // LinkLocalMulticastIP reports whether ip is a link-local multicast address.
-func LinkLocalMulticastIP(ip cue.Value) bool {
-	return netGetIP(ip).IsLinkLocalMulticast()
+func LinkLocalMulticastIP(ip cue.Value) (bool, error) {
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.IsLinkLocalMulticast(), nil
 }
 
 // LinkLocalUnicastIP reports whether ip is a link-local unicast address.
-func LinkLocalUnicastIP(ip cue.Value) bool {
-	return netGetIP(ip).IsLinkLocalUnicast()
+func LinkLocalUnicastIP(ip cue.Value) (bool, error) {
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.IsLinkLocalUnicast(), nil
 }
 
 // GlobalUnicastIP reports whether ip is a global unicast address.
@@ -196,22 +226,30 @@ func LinkLocalUnicastIP(ip cue.Value) bool {
 // identification as defined in RFC 1122, RFC 4632 and RFC 4291 with the
 // exception of IPv4 directed broadcast addresses. It returns true even if ip is
 // in IPv4 private address space or local IPv6 unicast address space.
-func GlobalUnicastIP(ip cue.Value) bool {
-	return netGetIP(ip).IsGlobalUnicast()
+func GlobalUnicastIP(ip cue.Value) (bool, error) {
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.IsGlobalUnicast(), nil
 }
 
 // UnspecifiedIP reports whether ip is an unspecified address, either the IPv4
 // address "0.0.0.0" or the IPv6 address "::".
-func UnspecifiedIP(ip cue.Value) bool {
-	return netGetIP(ip).IsUnspecified()
+func UnspecifiedIP(ip cue.Value) (bool, error) {
+	goip, err := netGetIP(ip)
+	if err != nil {
+		return false, err
+	}
+	return goip.IsUnspecified(), nil
 }
 
 // ToIP4 converts a given IP address, which may be a string or a list, to its
 // 4-byte representation.
 func ToIP4(ip cue.Value) ([]uint, error) {
-	ipdata := netGetIP(ip)
-	if !ipdata.IsValid() {
-		return nil, fmt.Errorf("invalid IP %q", ip)
+	ipdata, err := netGetIP(ip)
+	if err != nil {
+		return nil, err
 	}
 	if !ipdata.Is4() {
 		return nil, fmt.Errorf("cannot convert %q to IPv4", ipdata)
@@ -223,9 +261,9 @@ func ToIP4(ip cue.Value) ([]uint, error) {
 // ToIP16 converts a given IP address, which may be a string or a list, to its
 // 16-byte representation.
 func ToIP16(ip cue.Value) ([]uint, error) {
-	ipdata := netGetIP(ip)
-	if !ipdata.IsValid() {
-		return nil, fmt.Errorf("invalid IP %q", ip)
+	ipdata, err := netGetIP(ip)
+	if err != nil {
+		return nil, err
 	}
 	as16 := ipdata.As16()
 	return netToList(as16[:]), nil
@@ -238,9 +276,9 @@ func ToIP16(ip cue.Value) ([]uint, error) {
 // - IPv6 ("2001:db8::1"), if ip is a valid IPv6 address
 // - the hexadecimal form of ip, without punctuation, if no other cases apply
 func IPString(ip cue.Value) (string, error) {
-	ipdata := netGetIP(ip)
-	if !ipdata.IsValid() {
-		return "", fmt.Errorf("invalid IP %q", ip)
+	ipdata, err := netGetIP(ip)
+	if err != nil {
+		return "", err
 	}
 	return ipdata.String(), nil
 }
@@ -279,9 +317,9 @@ func AddIP(ip cue.Value, offset *big.Int) (string, error) {
 		}
 		return netip.PrefixFrom(addr, prefix.Bits()).String(), nil
 	}
-	ipdata := netGetIP(ip)
-	if !ipdata.IsValid() {
-		return "", fmt.Errorf("invalid IP %q", ip)
+	ipdata, err := netGetIP(ip)
+	if err != nil {
+		return "", err
 	}
 	addr, err := netIPAdd(ipdata, offset)
 	if err != nil {
@@ -357,9 +395,9 @@ func ParseCIDR(s string) (*ParsedCIDR, error) {
 
 // InCIDR reports whether an IP address is contained a CIDR subnet string.
 func InCIDR(ip, cidr cue.Value) (bool, error) {
-	ipAddr := netGetIP(ip)
-	if !ipAddr.IsValid() {
-		return false, fmt.Errorf("invalid IP %q", ip)
+	ipAddr, err := netGetIP(ip)
+	if err != nil {
+		return false, err
 	}
 
 	prefix, err := netGetIPCIDR(cidr)
@@ -376,13 +414,13 @@ func InCIDR(ip, cidr cue.Value) (bool, error) {
 //
 // The addresses may be strings or lists of bytes.
 func CompareIP(ip1, ip2 cue.Value) (int, error) {
-	addr1 := netGetIP(ip1)
-	if !addr1.IsValid() {
-		return 0, fmt.Errorf("invalid IP %q", ip1)
+	addr1, err := netGetIP(ip1)
+	if err != nil {
+		return 0, err
 	}
-	addr2 := netGetIP(ip2)
-	if !addr2.IsValid() {
-		return 0, fmt.Errorf("invalid IP %q", ip2)
+	addr2, err := netGetIP(ip2)
+	if err != nil {
+		return 0, err
 	}
 	return addr1.Compare(addr2), nil
 }

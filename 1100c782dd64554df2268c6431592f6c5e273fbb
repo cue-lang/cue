@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddec3c94_be9c3fd1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-19T11:30:55Z",
+      "side": 1,
+      "message": "This code has mainly been written, in stages, by Claude. I have manually improved it, and I would claim to understand it, but I did not write it. I am neither an expert on YAML nor the existing Decoder, so apologies if I\u0027ve missed important details.",
+      "revId": "1100c782dd64554df2268c6431592f6c5e273fbb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -55,11 +55,12 @@ func JoinHostPort(host, port cue.Value) (string, error) {
 	hostStr := ""
 	switch host.Kind() {
 	case cue.ListKind:
-		ipdata := netGetIP(host)
-		if !ipdata.IsValid() {
+		ipdata, ipErr := netGetIP(host)
+		if ipErr != nil {
 			err = fmt.Errorf("invalid host %s", host)
+		} else {
+			hostStr = ipdata.String()
 		}
-		hostStr = ipdata.String()
 	case cue.BytesKind:
 		var b []byte
 		b, err = host.Bytes()

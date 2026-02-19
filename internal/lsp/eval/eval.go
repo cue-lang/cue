@@ -2004,6 +2004,9 @@ func (f *frame) eval() {
 			if comprehensionsStash == nil {
 				comprehensionsStash = make(map[ast.Node]ast.Node)
 			}
+			if elsie := node.Else; elsie != nil {
+				f.newFrame(elsie.Body, f.navigable)
+			}
 			if len(node.Clauses) == 1 {
 				// Base-case: we're dealing with the last clause. So that
 				// clause gets processed in this frame, and we make sure we
@@ -2017,6 +2020,7 @@ func (f *frame) eval() {
 				// appropriate child/descendant.
 				nodeCopy := *node
 				nodeCopy.Clauses = node.Clauses[1:]
+				nodeCopy.Else = nil
 				comprehensionsStash[clause] = &nodeCopy
 			}
 

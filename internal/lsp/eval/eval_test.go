@@ -4514,6 +4514,144 @@ c: {
 				or1(117):     {f: []string{"d"}, e: []string{"a", "c", "x"}},
 			},
 		},
+
+		{
+			name: "Comprehension_Else",
+			archive: `-- a.cue --
+let x = _
+if true {
+	z: _
+} else {
+	a: z
+	b: x
+}
+
+for k, v in s {
+	true
+} else {
+	a: k & v
+	b: x
+}
+
+try k = true
+let v = true {
+	true
+} else {
+	a: k & v
+	b: x
+}
+`,
+			expectDefinitions: map[position][]position{
+				ln(6, 1, "x"):  {ln(1, 1, "x")},
+				ln(13, 1, "x"): {ln(1, 1, "x")},
+				ln(21, 1, "x"): {ln(1, 1, "x")},
+
+				ln(1, 1, "x"): {self},
+				ln(3, 1, "z"): {self},
+				ln(5, 1, "a"): {self, ln(12, 1, "a"), ln(20, 1, "a")},
+				ln(6, 1, "b"): {self, ln(13, 1, "b"), ln(21, 1, "b")},
+
+				ln(9, 1, "k"):  {self},
+				ln(9, 1, "v"):  {self},
+				ln(12, 1, "a"): {self, ln(5, 1, "a"), ln(20, 1, "a")},
+				ln(13, 1, "b"): {self, ln(6, 1, "b"), ln(21, 1, "b")},
+
+				ln(16, 1, "k"): {self},
+				ln(17, 1, "v"): {self},
+				ln(20, 1, "a"): {self, ln(5, 1, "a"), ln(12, 1, "a")},
+				ln(21, 1, "b"): {self, ln(6, 1, "b"), ln(13, 1, "b")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 8):     {f: []string{"a", "b", "z"}},
+				or(8, 10):    {e: []string{"x"}},
+				or(10, 13):   {f: []string{"a", "b", "z"}},
+				or1(17):      {e: []string{"x"}},
+				or(18, 21):   {f: []string{"z"}, e: []string{"x"}},
+				or(21, 23):   {f: []string{"z"}},
+				or(23, 26):   {e: []string{"x", "z"}},
+				or1(26):      {f: []string{"z"}, e: []string{"x"}},
+				or(28, 33):   {f: []string{"a", "b", "z"}},
+				or(33, 36):   {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(36, 38):   {f: []string{"a", "b", "z"}},
+				or(38, 41):   {e: []string{"a", "b", "x"}},
+				or1(41):      {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(42, 44):   {f: []string{"a", "b", "z"}},
+				or(44, 47):   {e: []string{"a", "b", "x"}},
+				or1(47):      {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(49, 54):   {f: []string{"a", "b", "z"}},
+				or1(56):      {e: []string{"x"}},
+				or(59, 64):   {e: []string{"k", "x"}},
+				or(64, 67):   {e: []string{"k", "v", "x"}},
+				or(71, 73):   {e: []string{"k", "v", "x"}},
+				or(74, 79):   {f: []string{"a", "b", "z"}},
+				or(79, 82):   {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(82, 84):   {f: []string{"a", "b", "z"}},
+				or(84, 91):   {e: []string{"a", "b", "x"}},
+				or1(91):      {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(92, 94):   {f: []string{"a", "b", "z"}},
+				or(94, 97):   {e: []string{"a", "b", "x"}},
+				or1(97):      {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(99, 104):  {f: []string{"a", "b", "z"}},
+				or(106, 108): {e: []string{"x"}},
+				or1(112):     {e: []string{"x"}},
+				or(113, 117): {e: []string{"k", "x"}},
+				or(119, 121): {e: []string{"k", "x"}},
+				or1(125):     {e: []string{"k", "x"}},
+				or(126, 129): {e: []string{"k", "v", "x"}},
+				or(133, 135): {e: []string{"k", "v", "x"}},
+				or(136, 141): {f: []string{"a", "b", "z"}},
+				or(141, 144): {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(144, 146): {f: []string{"a", "b", "z"}},
+				or(146, 153): {e: []string{"a", "b", "x"}},
+				or1(153):     {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(154, 156): {f: []string{"a", "b", "z"}},
+				or(156, 159): {e: []string{"a", "b", "x"}},
+				or1(159):     {f: []string{"a", "b", "z"}, e: []string{"x"}},
+			},
+		},
+
+		{
+			name: "Comprehension_Else_Scopes",
+			archive: `-- a.cue --
+out: {
+	if true {
+		x: a
+		y: b
+		c: _
+		d: _
+	} else {
+		x: c
+		y: d
+		a: _
+		b: _
+	}
+	b: _
+	d: _
+}
+`,
+			expectDefinitions: map[position][]position{
+				ln(3, 1, "a"): {},
+				ln(4, 1, "b"): {ln(11, 1, "b"), ln(13, 1, "b")},
+
+				ln(8, 1, "c"): {},
+				ln(9, 1, "d"): {ln(6, 1, "d"), ln(14, 1, "d")},
+
+				ln(1, 1, "out"): {self},
+
+				ln(3, 1, "x"): {self, ln(8, 1, "x")},
+				ln(4, 1, "y"): {self, ln(9, 1, "y")},
+				ln(5, 1, "c"): {self},
+				ln(6, 1, "d"): {self, ln(14, 1, "d")},
+
+				ln(8, 1, "x"):  {self, ln(3, 1, "x")},
+				ln(9, 1, "y"):  {self, ln(4, 1, "y")},
+				ln(10, 1, "a"): {self},
+				ln(11, 1, "b"): {self, ln(13, 1, "b")},
+
+				ln(13, 1, "b"): {self, ln(11, 1, "b")},
+				ln(14, 1, "d"): {self, ln(6, 1, "d")},
+			},
+		},
 	}.run(t)
 }
 

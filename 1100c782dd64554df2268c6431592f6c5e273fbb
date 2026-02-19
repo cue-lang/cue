@@ -16,6 +16,23 @@
       "message": "This code has mainly been written, in stages, by Claude. I have manually improved it, and I would claim to understand it, but I did not write it. I am neither an expert on YAML nor the existing Decoder, so apologies if I\u0027ve missed important details.",
       "revId": "1100c782dd64554df2268c6431592f6c5e273fbb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a5ca93d_acf56e52",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-19T11:37:23Z",
+      "side": 1,
+      "message": "Absolutely, it\u0027s very unfortunate to have to, essentially, re-parse any part of the YAML source. Note that the call-sites go to efforts to try to ensure that we start from the lastPos where ever possible, which means we should be walking over at most one non-composite field value or list element.",
+      "revId": "1100c782dd64554df2268c6431592f6c5e273fbb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

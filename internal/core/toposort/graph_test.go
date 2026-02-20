@@ -24,7 +24,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/toposort"
 )
 
@@ -84,19 +83,17 @@ func TestSort(t *testing.T) {
 		},
 	}
 
-	index := runtime.New()
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			testAllPermutations(t, index, tc.inputs,
+			testAllPermutations(t, tc.inputs,
 				func(t *testing.T, perm [][]adt.Feature, graph *toposort.Graph) {
-					sortedNames := featuresNames(index, graph.Sort(index))
+					sortedNames := featuresNames(graph.Sort())
 					if !slices.Equal(sortedNames, tc.expected) {
 						t.Fatalf(`
 For permutation: %v
        Expected: %v
             Got: %v`,
-							permutationNames(index, perm), tc.expected, sortedNames)
+							permutationNames(perm), tc.expected, sortedNames)
 					}
 				})
 		})
@@ -125,10 +122,9 @@ func TestSortFullyConnected(t *testing.T) {
 		}
 	}
 
-	index := runtime.New()
-	features := makeFeatures(index, inputs)
+	features := makeFeatures(inputs)
 	graph := buildGraphFromPermutation(features)
-	sortedNames := featuresNames(index, graph.Sort(index))
+	sortedNames := featuresNames(graph.Sort())
 	if !slices.Equal(sortedNames, names) {
 		t.Fatalf(`
        Expected: %v
@@ -151,7 +147,6 @@ func TestSortRandom(t *testing.T) {
 	rng := rand.New(rand.NewPCG(seed, 123))
 
 	names := strings.Split("abcdefghijklm", "")
-	index := runtime.New()
 
 	for n := range 100 {
 		inputs := make([][]string, 2+rng.IntN(4))
@@ -166,9 +161,9 @@ func TestSortRandom(t *testing.T) {
 			t.Log("inputs:", inputs)
 
 			var expected []string
-			testAllPermutations(t, index, inputs,
+			testAllPermutations(t, inputs,
 				func(t *testing.T, perm [][]adt.Feature, graph *toposort.Graph) {
-					sortedNames := featuresNames(index, graph.Sort(index))
+					sortedNames := featuresNames(graph.Sort())
 					if expected == nil {
 						expected = sortedNames
 						t.Log("First result:", expected)
@@ -190,19 +185,19 @@ Input %v contains name %q, but that does not appear in the output: %v`,
 For permutation: %v
        Expected: %v
             Got: %v`,
-							permutationNames(index, perm), expected, sortedNames)
+							permutationNames(perm), expected, sortedNames)
 					}
 				})
 		})
 	}
 }
 
-func makeFeatures(index adt.StringIndexer, inputs [][]string) [][]adt.Feature {
+func makeFeatures(inputs [][]string) [][]adt.Feature {
 	result := make([][]adt.Feature, len(inputs))
 	for i, names := range inputs {
 		features := make([]adt.Feature, len(names))
 		for j, name := range names {
-			features[j] = adt.MakeStringLabel(index, name)
+			features[j] = adt.MakeStringLabel(name)
 		}
 		result[i] = features
 	}
@@ -229,18 +224,18 @@ func allPermutations(featureses [][]adt.Feature) [][][]adt.Feature {
 	return results
 }
 
-func permutationNames(index adt.StringIndexer, permutation [][]adt.Feature) [][]string {
+func permutationNames(permutation [][]adt.Feature) [][]string {
 	permNames := make([][]string, len(permutation))
 	for i, features := range permutation {
-		permNames[i] = featuresNames(index, features)
+		permNames[i] = featuresNames(features)
 	}
 	return permNames
 }
 
-func featuresNames(index adt.StringIndexer, features []adt.Feature) []string {
+func featuresNames(features []adt.Feature) []string {
 	names := make([]string, len(features))
 	for i, feature := range features {
-		names[i] = feature.StringValue(index)
+		names[i] = feature.StringValue()
 	}
 	return names
 }
@@ -263,8 +258,8 @@ func buildGraphFromPermutation(permutation [][]adt.Feature) *toposort.Graph {
 	return builder.Build()
 }
 
-func testAllPermutations(t *testing.T, index adt.StringIndexer, inputs [][]string, fun func(*testing.T, [][]adt.Feature, *toposort.Graph)) {
-	features := makeFeatures(index, inputs)
+func testAllPermutations(t *testing.T, inputs [][]string, fun func(*testing.T, [][]adt.Feature, *toposort.Graph)) {
+	features := makeFeatures(inputs)
 	for i, permutation := range allPermutations(features) {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			graph := buildGraphFromPermutation(permutation)
@@ -315,15 +310,13 @@ func TestAllPermutations(t *testing.T) {
 		},
 	}
 
-	index := runtime.New()
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			fs := makeFeatures(index, tc.inputs)
+			fs := makeFeatures(tc.inputs)
 			permutations := allPermutations(fs)
 			permutationsNames := make([][][]string, len(permutations))
 			for i, permutation := range permutations {
-				permutationsNames[i] = permutationNames(index, permutation)
+				permutationsNames[i] = permutationNames(permutation)
 			}
 
 			if !slices.EqualFunc(permutationsNames, tc.expected,

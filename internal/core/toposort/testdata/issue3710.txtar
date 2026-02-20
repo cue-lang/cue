@@ -39,6 +39,35 @@ _app2: {
 		}]
 	}
 }
+-- out/TestTopologicalSort/lexicographical=true-v3 --
+{
+	out: {
+		objects: [{
+			leafField: "leaf value"
+		}]
+	}
+	#Exporter: {
+		objects: []
+	}
+}
+-- diff/-out/TestTopologicalSort/lexicographical=true-v3<==>+out/TestTopologicalSort/lexicographical=true --
+diff old new
+--- old
++++ new
+@@ -1,10 +1,10 @@
+ {
+-	#Exporter: {
+-		objects: []
+-	}
+ 	out: {
+ 		objects: [{
+ 			leafField: "leaf value"
+ 		}]
+ 	}
++	#Exporter: {
++		objects: []
++	}
+ }
 -- out/TestTopologicalSort/lexicographical=true --
 {
 	#Exporter: {

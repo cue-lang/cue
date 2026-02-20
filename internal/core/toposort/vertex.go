@@ -387,7 +387,7 @@ func (vf *vertexFeatures) compareStructMeta(a, b structMeta) int {
 }
 
 func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
-	debug("\n*** V (%s %v %p) ***\n", v.Label.SelectorString(ctx), v.Label, v)
+	debug("\n*** V (%s %v %p) ***\n", v.Label.SelectorString(), v.Label, v)
 
 	builder := NewGraphBuilder(!ctx.Config.SortFields)
 	dynFieldsMap := dynamicFieldsFeatures(v)
@@ -437,7 +437,7 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	}
 
 	debug("edges: %v\n", builder.edgesSet)
-	return builder.Build().Sort(ctx)
+	return builder.Build().Sort()
 }
 
 func (vf *vertexFeatures) addEdges(previous []adt.Feature, sMeta *structMeta) []adt.Feature {

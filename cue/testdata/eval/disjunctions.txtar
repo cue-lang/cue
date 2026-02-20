@@ -1964,9 +1964,9 @@ Result:
         _ok: bool
         ({}|{
           _ok: true
-          let Ok#2 = 〈0;_ok〉
+          let Ok#1 = 〈0;_ok〉
           ({}|{
-            x: 〈1;let Ok#2〉
+            x: 〈1;let Ok#1〉
           })
         })
       }
@@ -1979,9 +1979,9 @@ Result:
     t2: {
       ok: true
       X: (_|{
-        let Ok#3 = 〈1;ok〉
+        let Ok#2 = 〈1;ok〉
         (_|{
-          x: 〈1;let Ok#3〉
+          x: 〈1;let Ok#2〉
         })
       })
       foo: (〈0;X〉 & {

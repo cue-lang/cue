@@ -260,7 +260,7 @@ NumCloseIDs: 14
   }
   t2: (struct){
     out: ~(t2.m.x.y)
-    let X#2 = ~(t2.m.x)
+    let X#1 = ~(t2.m.x)
     m: (struct){
       x: (struct){
         y: (struct){
@@ -278,7 +278,7 @@ NumCloseIDs: 14
       }
     }
   }
-  let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
+  let svc#2multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -389,10 +389,17 @@ diff old new
 -      }
 -    }
 +    out: ~(t2.m.x.y)
-+    let X#2 = ~(t2.m.x)
++    let X#1 = ~(t2.m.x)
      m: (struct){
        x: (struct){
          y: (struct){
+@@ -173,5 +119,5 @@
+       }
+     }
+   }
+-  let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
++  let svc#2multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
+ }
 -- diff/todo/p2 --
 Different, but okay, error message, but missing some positions
 -- out/eval --
@@ -672,8 +679,8 @@ Different, but okay, error message, but missing some positions
     }
   }
   t2: {
-    out: 〈0;let X#2〉.y
-    let X#2 = 〈0;m〉.x
+    out: 〈0;let X#1〉.y
+    let X#1 = 〈0;m〉.x
     m: {
       x: {
         y: {}

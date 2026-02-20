@@ -44,7 +44,7 @@ nested."#foo": cannot use _ as label:
     X: 1
   }
   disallowTopAsLet: {
-    let _ = 1
+    let  = 1
   }
   disallowTopAsLabel: {
     _|_(cannot use _ as label)

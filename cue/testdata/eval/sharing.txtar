@@ -1687,11 +1687,11 @@ Result:
       _input: (null|*{
         name: "foo"
       })
-      let _inputList#2 = 〈import;list〉.FlattenN([
+      let _inputList#1 = 〈import;list〉.FlattenN([
         〈1;_input〉,
       ], 0)
       _inputByName: {
-        for _, input in 〈1;let _inputList#2〉 {
+        for _, input in 〈1;let _inputList#1〉 {
           〈1;input〉.name: 〈1;input〉
         }
       }
@@ -1713,11 +1713,11 @@ Result:
       _input: (null|*{
         name: "foo"
       })
-      let _inputList#3 = 〈import;list〉.FlattenN([
+      let _inputList#2 = 〈import;list〉.FlattenN([
         〈1;_input〉,
       ], 0)
       _inputByName: {
-        for _, input in (〈1;let _inputList#3〉 & _|_(no sharing)) {
+        for _, input in (〈1;let _inputList#2〉 & _|_(no sharing)) {
           〈1;input〉.name: 〈1;input〉
         }
       }

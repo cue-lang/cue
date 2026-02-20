@@ -56,21 +56,19 @@ func MakeFeature(r *runtime.Runtime, s cue.Selector) adt.Feature {
 
 	switch labelType {
 	case cue.StringLabel:
-		return adt.MakeStringLabel(r, s.Unquoted())
+		return adt.MakeStringLabel(s.Unquoted())
 
 	case cue.IndexLabel:
 		return adt.MakeIntLabel(adt.IntLabel, int64(s.Index()))
 
 	case cue.DefinitionLabel:
-		return adt.MakeNamedLabel(r, adt.DefinitionLabel, s.String())
+		return adt.MakeIdentLabel(s.String(), "")
 
 	case cue.HiddenLabel:
-		str := adt.HiddenKey(s.String(), s.PkgPath())
-		return adt.MakeNamedLabel(r, adt.HiddenLabel, str)
+		return adt.MakeIdentLabel(s.String(), s.PkgPath())
 
 	case cue.HiddenDefinitionLabel:
-		str := adt.HiddenKey(s.String(), s.PkgPath())
-		return adt.MakeNamedLabel(r, adt.HiddenDefinitionLabel, str)
+		return adt.MakeIdentLabel(s.String(), s.PkgPath())
 
 	default:
 		return adt.InvalidLabel

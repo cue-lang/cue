@@ -382,12 +382,12 @@ Result:
       }
     }
     export: {
-      let data#2 = {
+      let data#1 = {
         f1: "foo"
       }
       (〈1;#PutOut1〉 & {
         in: (〈2;#GetF1〉 & {
-          in: 〈2;let data#2〉
+          in: 〈2;let data#1〉
         }).out
       }).out
     }

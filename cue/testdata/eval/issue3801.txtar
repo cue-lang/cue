@@ -148,10 +148,10 @@ Disjuncts:    373
   issue3801: (struct){
     let: (struct){
       reduced: (struct){
-        let F#1 = (struct){
+        let F#0 = (struct){
           base: (struct){
             in: (string){ string }
-            let X#2 = (_|_){
+            let X#1 = (_|_){
               // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
               //     ./nested.cue:5:16
               //     ./nested.cue:4:8
@@ -164,7 +164,7 @@ Disjuncts:    373
           }
           XXX: (struct){
             in: (string){ "foo" }
-            let X#2 = (string){ "foo" }
+            let X#1 = (string){ "foo" }
             out: (string){ "foo" }
           }
         }
@@ -177,7 +177,7 @@ Disjuncts:    373
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#4 = (#struct){
+          let pickMsg#2 = (#struct){
             msg: (_|_){
               // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./nested.cue:29:25
@@ -222,14 +222,14 @@ Disjuncts:    373
             //     ./nested.cue:43:24
             //     ./nested.cue:41:15
           }
-          let jsonPatch#5 = (#struct){
-            let base#8 = (#struct){
+          let jsonPatch#3 = (#struct){
+            let base#4 = (#struct){
               someMsg: (string){ string }
               obs: (#struct){ |(*(#struct){
                   missing: (bool){ true }
                 }, (#struct){
                 }) }
-              let pickMsg#4 = (#struct){
+              let pickMsg#2 = (#struct){
                 msg: (_|_){
                   // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
                   //     ./nested.cue:29:25
@@ -248,13 +248,13 @@ Disjuncts:    373
                 }
               }
             }
-            let withMsg#9 = (#struct){
+            let withMsg#5 = (#struct){
               someMsg: (string){ "foo" }
               obs: (#struct){ |(*(#struct){
                   missing: (bool){ true }
                 }, (#struct){
                 }) }
-              let pickMsg#4 = (#struct){
+              let pickMsg#2 = (#struct){
                 msg: (string){ "foo" }
               }
               patches: (#list){
@@ -342,7 +342,7 @@ Disjuncts:    373
         }
         #Base: (#struct){
           val0: (string){ string }
-          let msgObj#D = (string){ string }
+          let msgObj#6 = (string){ string }
           value: (string){ string }
         }
       }
@@ -353,6 +353,37 @@ Disjuncts:    373
 diff old new
 --- old
 +++ new
+@@ -2,10 +2,10 @@
+   issue3801: (struct){
+     let: (struct){
+       reduced: (struct){
+-        let F#1 = (struct){
++        let F#0 = (struct){
+           base: (struct){
+             in: (string){ string }
+-            let X#2 = (_|_){
++            let X#1 = (_|_){
+               // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
+               //     ./nested.cue:5:16
+               //     ./nested.cue:4:8
+@@ -18,7 +18,7 @@
+           }
+           XXX: (struct){
+             in: (string){ "foo" }
+-            let X#2 = (string){ "foo" }
++            let X#1 = (string){ "foo" }
+             out: (string){ "foo" }
+           }
+         }
+@@ -31,7 +31,7 @@
+               missing: (bool){ true }
+             }, (#struct){
+             }) }
+-          let pickMsg#4 = (#struct){
++          let pickMsg#2 = (#struct){
+             msg: (_|_){
+               // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+               //     ./nested.cue:29:25
 @@ -43,7 +43,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
@@ -362,7 +393,7 @@ diff old new
                  //     ./nested.cue:29:25
                  //     ./nested.cue:25:12
                }
-@@ -72,38 +72,11 @@
+@@ -72,45 +72,18 @@
          #Main: (#struct){
            namespace: (string){ string }
            output: (_|_){
@@ -378,8 +409,8 @@ diff old new
 -                value: (string){ "foo" }
 -              }
 -            }
-           }
-           let jsonPatch#5 = (#struct){
+-          }
+-          let jsonPatch#5 = (#struct){
 -            namespace: (string){ string }
 -            patch: (#list){
 -              0: (#struct){
@@ -400,9 +431,20 @@ diff old new
 -                }
 -              }
 -            }
-             let base#8 = (#struct){
+-            let base#8 = (#struct){
++          }
++          let jsonPatch#3 = (#struct){
++            let base#4 = (#struct){
                someMsg: (string){ string }
                obs: (#struct){ |(*(#struct){
+                   missing: (bool){ true }
+                 }, (#struct){
+                 }) }
+-              let pickMsg#4 = (#struct){
++              let pickMsg#2 = (#struct){
+                 msg: (_|_){
+                   // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+                   //     ./nested.cue:29:25
 @@ -122,7 +95,7 @@
                    op: (string){ "add" }
                    path: (string){ "/metadata" }
@@ -412,6 +454,22 @@ diff old new
                      //     ./nested.cue:29:25
                      //     ./nested.cue:25:12
                    }
+@@ -129,13 +102,13 @@
+                 }
+               }
+             }
+-            let withMsg#9 = (#struct){
++            let withMsg#5 = (#struct){
+               someMsg: (string){ "foo" }
+               obs: (#struct){ |(*(#struct){
+                   missing: (bool){ true }
+                 }, (#struct){
+                 }) }
+-              let pickMsg#4 = (#struct){
++              let pickMsg#2 = (#struct){
+                 msg: (string){ "foo" }
+               }
+               patches: (#list){
 @@ -146,6 +119,19 @@
                  }
                }
@@ -460,6 +518,15 @@ diff old new
            ns1: (string){ "foo" }
          }
          #SubOutput: (#struct){
+@@ -211,7 +196,7 @@
+         }
+         #Base: (#struct){
+           val0: (string){ string }
+-          let msgObj#D = (string){ string }
++          let msgObj#6 = (string){ string }
+           value: (string){ string }
+         }
+       }
 -- out/eval --
 (struct){
   issue3801: (struct){
@@ -687,19 +754,19 @@ diff old new
   issue3801: {
     let: {
       reduced: {
-        let F#1 = {
+        let F#0 = {
           base: {
             in: string
-            let X#2 = {
+            let X#1 = {
               a: "\(〈1;in〉)"
             }.a
-            out: 〈0;let X#2〉
+            out: 〈0;let X#1〉
           }
           XXX: (〈0;base〉 & {
             in: "foo"
           })
         }
-        z: 〈0;let F#1〉.XXX.out
+        z: 〈0;let F#0〉.XXX.out
       }
     }
   }
@@ -732,7 +799,7 @@ diff old new
           obs: ({}|*{
             missing: true
           })
-          let pickMsg#4 = [
+          let pickMsg#2 = [
             if 〈1;obs〉.missing {
               msg: "\(〈2;someMsg〉)"
             },
@@ -744,7 +811,7 @@ diff old new
             {
               op: "add"
               path: "/metadata"
-              value: 〈2;let pickMsg#4〉.msg
+              value: 〈2;let pickMsg#2〉.msg
             },
           ]
         }
@@ -770,14 +837,14 @@ diff old new
         })
         #Main: {
           namespace: string
-          output: 〈0;let jsonPatch#5〉.output
-          let jsonPatch#5 = (〈1;#JSONPatch〉 & {
-            let base#8 = (〈2;#Resource〉 & {})
-            let withMsg#9 = (〈0;let base#8〉 & {
+          output: 〈0;let jsonPatch#3〉.output
+          let jsonPatch#3 = (〈1;#JSONPatch〉 & {
+            let base#4 = (〈2;#Resource〉 & {})
+            let withMsg#5 = (〈0;let base#4〉 & {
               someMsg: "foo"
             })
             namespace: 〈1;namespace〉
-            patch: 〈0;let withMsg#9〉.patches
+            patch: 〈0;let withMsg#5〉.patches
           })
         }
         out: (〈0;#Main〉 & {
@@ -793,13 +860,13 @@ diff old new
           namespace: string
           output: (〈1;#SubOutput〉 & {
             namespace: 〈1;namespace〉
-            let base2#A = {
-              let base#B = (〈3;#Base〉 & {})
-              output: (〈0;let base#B〉 & {
+            let base2#6 = {
+              let base#7 = (〈3;#Base〉 & {})
+              output: (〈0;let base#7〉 & {
                 val0: "foo"
               })
             }
-            patch: 〈0;let base2#A〉.output.value
+            patch: 〈0;let base2#6〉.output.value
           }).output
         }
         out: (〈0;#Output〉 & {
@@ -814,10 +881,10 @@ diff old new
         }
         #Base: {
           val0: string
-          let msgObj#D = [
+          let msgObj#8 = [
             〈1;val0〉,
           ][0]
-          value: 〈0;let msgObj#D〉
+          value: 〈0;let msgObj#8〉
         }
       }
     }

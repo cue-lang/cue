@@ -477,7 +477,7 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		// TODO: instead of setting the reference, the proper thing to do is
 		// to record a path that still needs to be selected into the recorded
 		// dependency. See the Target Path definition at the top of the file.
-		if f := c.feature(x.env, x.ref); f != 0 {
+		if f := c.feature(x.env, x.ref); f.IsValid() {
 			w = v.Lookup(f)
 		}
 		if w == nil {

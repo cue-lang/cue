@@ -854,7 +854,7 @@ Result:
         #Schema: (#struct){
           in: ((string|list)){ |((string){ string }, (list){
             }) }
-          let _flat#1 = (#list){
+          let _flat#0 = (#list){
             0: ((string|list)){ |((string){ string }, (list){
               }) }
           }
@@ -865,7 +865,7 @@ Result:
         }
         out: (#struct){
           in: (string){ "foo" }
-          let _flat#1 = (#list){
+          let _flat#0 = (#list){
             0: (string){ "foo" }
           }
           out: (#list){
@@ -1375,7 +1375,7 @@ Result:
       _subject: (#struct){
         in: (_){ _ }
         out: (#struct){
-          let self#2 = (_|_){
+          let self#1 = (_|_){
             // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
             //     ./issue3832.cue:8:16
           }
@@ -1390,7 +1390,7 @@ Result:
           check!: (_){ _ }
         }, (#struct){
           pass: (#struct){
-            let self#2 = (_|_){
+            let self#1 = (_|_){
               // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
               //     ./issue3832.cue:8:19
             }
@@ -1402,7 +1402,7 @@ Result:
           invoke!: (_){ _ }
         }) }
       results: (_|_){
-        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#0=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
         //     ./issue3832.cue:22:12
       }
     }
@@ -1413,14 +1413,14 @@ Result:
         }
       }
       pass: (#struct){
-        let self#2 = ~(issue3832._assert.invoke.self)
+        let self#1 = ~(issue3832._assert.invoke.self)
         outFirstName: (string){ "Sam" }
       }
     }
     _subject: (#struct){
       in: (_){ _ }
       out: (#struct){
-        let self#2 = (_|_){
+        let self#1 = (_|_){
           // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
           //     ./issue3832.cue:8:16
         }
@@ -1837,7 +1837,7 @@ Result:
           missing: (bool){ true }
         }, (#struct){
         }) }
-      let pickMsg#3 = (#struct){
+      let pickMsg#2 = (#struct){
         msg: (_|_){
           // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
           //     ./large.cue:7:25
@@ -1882,14 +1882,14 @@ Result:
         //     ./large.cue:21:24
         //     ./large.cue:19:15
       }
-      let jsonPatch#4 = (#struct){
-        let base#7 = (#struct){
+      let jsonPatch#3 = (#struct){
+        let base#4 = (#struct){
           someMsg: (string){ string }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#3 = (#struct){
+          let pickMsg#2 = (#struct){
             msg: (_|_){
               // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./large.cue:7:25
@@ -1908,13 +1908,13 @@ Result:
             }
           }
         }
-        let withMsg#8 = (#struct){
+        let withMsg#5 = (#struct){
           someMsg: (string){ "foo" }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#3 = (#struct){
+          let pickMsg#2 = (#struct){
             msg: (string){ "foo" }
           }
           patches: (#list){
@@ -2145,6 +2145,37 @@ diff old new
          }
          b?: (string){ string }
        }
+@@ -226,18 +161,18 @@
+         #Schema: (#struct){
+           in: ((string|list)){ |((string){ string }, (list){
+             }) }
+-          let _flat#1 = (#list){
+-            0: ((string|list)){ |((string){ string }, (list){
+-              }) }
+-          }
+-          out: (#list){
+-            0: ((string|list)){ |((string){ string }, (list){
+-              }) }
+-          }
+-        }
+-        out: (#struct){
+-          in: (string){ "foo" }
+-          let _flat#1 = (#list){
++          let _flat#0 = (#list){
++            0: ((string|list)){ |((string){ string }, (list){
++              }) }
++          }
++          out: (#list){
++            0: ((string|list)){ |((string){ string }, (list){
++              }) }
++          }
++        }
++        out: (#struct){
++          in: (string){ "foo" }
++          let _flat#0 = (#list){
+             0: (string){ "foo" }
+           }
+           out: (#list){
 @@ -259,9 +194,6 @@
      }
      nestedWithPatterns: (struct){
@@ -2432,7 +2463,13 @@ diff old new
          }
        }
      }
-@@ -807,8 +687,8 @@
+@@ -802,13 +682,13 @@
+       _subject: (#struct){
+         in: (_){ _ }
+         out: (#struct){
+-          let self#2 = (_|_){
++          let self#1 = (_|_){
+             // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -2443,12 +2480,14 @@ diff old new
            }
          }
        }
-@@ -818,19 +698,30 @@
+@@ -817,56 +697,50 @@
+           check!: (_){ _ }
          }, (#struct){
            pass: (#struct){
-             let self#2 = (_|_){
+-            let self#2 = (_|_){
 -              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
 -              //     ./issue3832.cue:8:16
++            let self#1 = (_|_){
 +              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
 +              //     ./issue3832.cue:8:19
              }
@@ -2464,38 +2503,36 @@ diff old new
        results: (_|_){
 -        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
 -        //     ./issue3832.cue:20:12
-+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
+-      }
+-    }
+-    _subject: (#struct){
+-      in: (_){ _ }
+-      out: (#struct){
+-        let self#2 = (_|_){
+-          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
+-          //     ./issue3832.cue:8:16
+-        }
+-        outFirstName: (_|_){
+-          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
+-          //     ./issue3832.cue:8:16
+-        }
++        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#0=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
 +        //     ./issue3832.cue:22:12
-+      }
-+    }
-+    _assert: (#struct){
+       }
+     }
+     _assert: (#struct){
 +      invoke: (#struct){
 +        self: (#struct){
 +          firstName: (string){ "Sam" }
 +        }
 +      }
-+      pass: (#struct){
-+        let self#2 = ~(issue3832._assert.invoke.self)
-+        outFirstName: (string){ "Sam" }
-       }
-     }
-     _subject: (#struct){
-@@ -841,32 +732,15 @@
-           //     ./issue3832.cue:8:16
-         }
-         outFirstName: (_|_){
--          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
--          //     ./issue3832.cue:8:16
--        }
--      }
--    }
--    _assert: (#struct){
--      pass: (#struct){
+       pass: (#struct){
 -        let self#2 = (#struct){
 -          firstName: (string){ "Sam" }
 -        }
--        outFirstName: (string){ "Sam" }
--      }
++        let self#1 = ~(issue3832._assert.invoke.self)
+         outFirstName: (string){ "Sam" }
+       }
 -      invoke: (struct){
 -        self: (struct){
 -          firstName: (string){ "Sam" }
@@ -2510,6 +2547,15 @@ diff old new
 -    }
 -  }
 -  issue3833: (struct){
++    }
++    _subject: (#struct){
++      in: (_){ _ }
++      out: (#struct){
++        let self#1 = (_|_){
++          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
++          //     ./issue3832.cue:8:16
++        }
++        outFirstName: (_|_){
 +          // [incomplete] issue3832._subject.out.outFirstName: undefined field: firstName:
 +          //     ./issue3832.cue:9:24
 +        }
@@ -2713,6 +2759,15 @@ diff old new
      }
    }
    issue3934: (struct){
+@@ -1279,7 +1144,7 @@
+           missing: (bool){ true }
+         }, (#struct){
+         }) }
+-      let pickMsg#3 = (#struct){
++      let pickMsg#2 = (#struct){
+         msg: (_|_){
+           // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+           //     ./large.cue:7:25
 @@ -1291,7 +1156,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
@@ -2722,7 +2777,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1320,38 +1185,11 @@
+@@ -1320,45 +1185,18 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2738,8 +2793,8 @@ diff old new
 -            value: (string){ "foo" }
 -          }
 -        }
-       }
-       let jsonPatch#4 = (#struct){
+-      }
+-      let jsonPatch#4 = (#struct){
 -        namespace: (string){ string }
 -        patch: (#list){
 -          0: (#struct){
@@ -2760,9 +2815,20 @@ diff old new
 -            }
 -          }
 -        }
-         let base#7 = (#struct){
+-        let base#7 = (#struct){
++      }
++      let jsonPatch#3 = (#struct){
++        let base#4 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
+               missing: (bool){ true }
+             }, (#struct){
+             }) }
+-          let pickMsg#3 = (#struct){
++          let pickMsg#2 = (#struct){
+             msg: (_|_){
+               // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+               //     ./large.cue:7:25
 @@ -1370,7 +1208,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
@@ -2772,6 +2838,22 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
+@@ -1377,13 +1215,13 @@
+             }
+           }
+         }
+-        let withMsg#8 = (#struct){
++        let withMsg#5 = (#struct){
+           someMsg: (string){ "foo" }
+           obs: (#struct){ |(*(#struct){
+               missing: (bool){ true }
+             }, (#struct){
+             }) }
+-          let pickMsg#3 = (#struct){
++          let pickMsg#2 = (#struct){
+             msg: (string){ "foo" }
+           }
+           patches: (#list){
 @@ -1394,6 +1232,19 @@
              }
            }
@@ -4420,10 +4502,10 @@ Result:
           in: (string|[
             ...string,
           ])
-          let _flat#1 = 〈import;list〉.FlattenN([
+          let _flat#0 = 〈import;list〉.FlattenN([
             〈1;in〉,
           ], 1)
-          out: 〈0;let _flat#1〉
+          out: 〈0;let _flat#0〉
         }
         out: (〈0;#Schema〉 & {
           in: "foo"
@@ -4867,8 +4949,8 @@ Result:
       _subject: {
         in: _
         out: {
-          let self#2 = 〈1;in〉.self
-          outFirstName: 〈0;let self#2〉.firstName
+          let self#0 = 〈1;in〉.self
+          outFirstName: 〈0;let self#0〉.firstName
         }
       }
       _assert: {
@@ -5253,7 +5335,7 @@ Result:
       obs: ({}|*{
         missing: true
       })
-      let pickMsg#3 = [
+      let pickMsg#0 = [
         if 〈1;obs〉.missing {
           msg: "\(〈2;someMsg〉)"
         },
@@ -5265,7 +5347,7 @@ Result:
         {
           op: "add"
           path: "/metadata"
-          value: 〈2;let pickMsg#3〉.msg
+          value: 〈2;let pickMsg#0〉.msg
         },
       ]
     }
@@ -5291,14 +5373,14 @@ Result:
     })
     #Main: {
       namespace: string
-      output: 〈0;let jsonPatch#4〉.output
-      let jsonPatch#4 = (〈1;#JSONPatch〉 & {
-        let base#7 = (〈2;#Resource〉 & {})
-        let withMsg#8 = (〈0;let base#7〉 & {
+      output: 〈0;let jsonPatch#1〉.output
+      let jsonPatch#1 = (〈1;#JSONPatch〉 & {
+        let base#2 = (〈2;#Resource〉 & {})
+        let withMsg#3 = (〈0;let base#2〉 & {
           someMsg: "foo"
         })
         namespace: 〈1;namespace〉
-        patch: 〈0;let withMsg#8〉.patches
+        patch: 〈0;let withMsg#3〉.patches
       })
     }
     out: (〈0;#Main〉 & {

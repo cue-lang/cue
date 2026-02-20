@@ -417,7 +417,7 @@ Result:
     let: (struct){ |((struct){
       }, (struct){
         a: (int){ 1 }
-        let B#1 = (_|_){
+        let B#0 = (_|_){
           // [eval] issue3599.let.B: conflicting values 2 and 1:
           //     ./issue3599.cue:39:17
           //     ./issue3599.cue:40:2
@@ -570,6 +570,15 @@ diff old new
        }
        c: (_){ _ }
      }
+@@ -223,7 +207,7 @@
+     let: (struct){ |((struct){
+       }, (struct){
+         a: (int){ 1 }
+-        let B#1 = (_|_){
++        let B#0 = (_|_){
+           // [eval] issue3599.let.B: conflicting values 2 and 1:
+           //     ./issue3599.cue:39:17
+           //     ./issue3599.cue:40:2
 @@ -232,4 +216,62 @@
          }
        }) }
@@ -1057,8 +1066,8 @@ Result:
   issue3599: {
     let: {
       ({}|{
-        a: (〈0;let B#1〉|1)
-        let B#1 = (1 & 2)
+        a: (〈0;let B#0〉|1)
+        let B#0 = (1 & 2)
       })
       ({}|{})
     }

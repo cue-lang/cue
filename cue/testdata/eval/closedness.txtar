@@ -4322,7 +4322,7 @@ Result:
     let: (struct){
       ok: (struct){
         #struct: (#struct){
-          let empty#1 = (#struct){
+          let empty#0 = (#struct){
           }
           field: (#struct){
             n: (int){ 3 }
@@ -4373,7 +4373,7 @@ Result:
     original: (struct){
       ok: (#list){
         #A: (#struct){
-          let b#2 = (#struct){
+          let b#1 = (#struct){
           }
           c: (#struct){
             d: (int){ 1 }
@@ -4385,7 +4385,7 @@ Result:
     variant1: (struct){
       ok: (#list){
         #A: (#struct){
-          let b#3 = (#struct){
+          let b#2 = (#struct){
           }
           c: (#struct){
             d: (int){ 1 }
@@ -6218,6 +6218,15 @@ diff old new
      }
    }
    issue3330: (struct){
+@@ -1710,7 +1187,7 @@
+     let: (struct){
+       ok: (struct){
+         #struct: (#struct){
+-          let empty#1 = (#struct){
++          let empty#0 = (#struct){
+           }
+           field: (#struct){
+             n: (int){ 3 }
 @@ -1717,13 +1194,7 @@
            }
          }
@@ -6248,10 +6257,16 @@ diff old new
          out2: (#struct){
            field: (#struct){
              n: (int){ 3 }
-@@ -1779,13 +1244,7 @@
-             d: (int){ 1 }
-           }
-         }
+@@ -1773,25 +1238,19 @@
+     original: (struct){
+       ok: (#list){
+         #A: (#struct){
+-          let b#2 = (#struct){
+-          }
+-          c: (#struct){
+-            d: (int){ 1 }
+-          }
+-        }
 -        0: (#struct){
 -          let b#2 = (#struct){
 -          }
@@ -6259,10 +6274,23 @@ diff old new
 -            d: (int){ 1 }
 -          }
 -        }
++          let b#1 = (#struct){
++          }
++          c: (#struct){
++            d: (int){ 1 }
++          }
++        }
 +        0: ~(issue3331.original.ok.#A)
        }
      }
      variant1: (struct){
+       ok: (#list){
+         #A: (#struct){
+-          let b#3 = (#struct){
++          let b#2 = (#struct){
+           }
+           c: (#struct){
+             d: (int){ 1 }
 @@ -1798,13 +1257,7 @@
            }
          }
@@ -7517,11 +7545,11 @@ issue2241: now correctly fails for V3.
     let: {
       ok: {
         #struct: {
-          let empty#1 = {}
+          let empty#0 = {}
           field: (null|{
             n: int
           })
-          field: (〈0;let empty#1〉 & {
+          field: (〈0;let empty#0〉 & {
             n: 3
           })
         }
@@ -7560,8 +7588,8 @@ issue2241: now correctly fails for V3.
     original: {
       ok: {
         #A: {
-          let b#2 = {}
-          c: (〈0;let b#2〉 & {
+          let b#1 = {}
+          c: (〈0;let b#1〉 & {
             d: 1
           })
         }
@@ -7575,8 +7603,8 @@ issue2241: now correctly fails for V3.
     variant1: {
       ok: {
         #A: {
-          let b#3 = {}
-          c: (〈0;let b#3〉 & {
+          let b#2 = {}
+          c: (〈0;let b#2〉 & {
             d: 1
           })
         }

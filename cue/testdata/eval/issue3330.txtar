@@ -61,7 +61,7 @@ Result:
   // [eval]
   issue3330: (struct){
     #A: (#struct){
-      let empty#1 = (#struct){
+      let empty#0 = (#struct){
       }
       field: (#struct){
         n: (int){ 3 }
@@ -133,6 +133,15 @@ diff old new
      ./in.cue:23:16
  
  Result:
+@@ -14,7 +13,7 @@
+   // [eval]
+   issue3330: (struct){
+     #A: (#struct){
+-      let empty#1 = (#struct){
++      let empty#0 = (#struct){
+       }
+       field: (#struct){
+         n: (int){ 3 }
 @@ -21,13 +20,7 @@
        }
      }
@@ -285,11 +294,11 @@ Result:
 {
   issue3330: {
     #A: {
-      let empty#1 = {}
+      let empty#0 = {}
       field: (null|{
         n: int
       })
-      field: (〈0;let empty#1〉 & {
+      field: (〈0;let empty#0〉 & {
         n: 3
       })
     }

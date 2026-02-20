@@ -37,7 +37,7 @@ bad1: comprehension values not allowed in this position:
   dis1: ("dev"|"prd")
   dis2: (*"dev"|"prd")
   con1: string
-  let con2#1 = string
+  let con2#0 = string
   ok0: {
     [string]: string
   }
@@ -48,7 +48,7 @@ bad1: comprehension values not allowed in this position:
     [〈1;con1〉]: string
   }
   ok3: {
-    [〈1;let con2#1〉]: string
+    [〈1;let con2#0〉]: string
   }
   ok4: {
     ["foo"]: string

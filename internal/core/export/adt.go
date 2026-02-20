@@ -454,7 +454,7 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		return wrapIfOptional(ident, x.Optional)
 
 	case *adt.ValueReference:
-		name := x.Label.IdentString(e.ctx)
+		name := x.Label.IdentString()
 		if a, ok := x.Src.Node.(*ast.Alias); ok { // Should always pass
 			if b, ok := e.valueAlias[a]; ok {
 				name = b.Ident.Name
@@ -467,7 +467,7 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		// TODO(unshadow): ensure we correctly unshadow newly visible fields.
 		//   before uncommenting this.
 		// if v := x.EvaluateLabel(e.ctx, env); v != 0 {
-		// 	str := v.StringValue(e.ctx)
+		// 	str := v.StringValue()
 		// 	if ast.IsValidIdent(str) {
 		// 		label := e.ctx.StringLabel(str)
 		// 		ident, ok := e.newIdentForField(x.Src, label, x.UpCount)
@@ -500,13 +500,13 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		return ident
 
 	case *adt.ImportReference:
-		importPath := x.ImportPath.StringValue(e.index)
+		importPath := x.ImportPath.StringValue()
 		info := ast.ParseImportPath(importPath)
 		spec := ast.NewImport(nil, importPath)
 
 		name := info.Qualifier
-		if x.Label != 0 {
-			name = x.Label.IdentString(e.index)
+		if x.Label.IsValid() {
+			name = x.Label.IdentString()
 			if name != info.Qualifier {
 				spec.Name = ast.NewIdent(name)
 			}
@@ -618,7 +618,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		expr := e.innerExpr(env, x.Filter)
 		frame.labelExpr = expr // see astutil.Resolve.
 
-		if x.Label != 0 {
+		if x.Label.IsValid() {
 			expr = &ast.Alias{Ident: e.ident(x.Label), Expr: expr}
 		}
 		f := &ast.Field{
@@ -762,11 +762,15 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			_, saved := e.pushFrame(empty, nil)
 			defer e.popFrame(saved)
 
-			if x.Key != adt.InvalidLabel ||
+			if x.Key.IsValid() ||
 				(x.Syntax != nil && x.Syntax.Key != nil) {
-				key := e.ident(x.Key)
-				clause.Key = key
-				e.addField(x.Key, nil, clause)
+				if x.Key.IsValid() {
+					key := e.ident(x.Key)
+					clause.Key = key
+					e.addField(x.Key, nil, clause)
+				} else {
+					clause.Key = &ast.Ident{Name: "_"}
+				}
 			}
 			e.addField(x.Value, nil, clause)
 

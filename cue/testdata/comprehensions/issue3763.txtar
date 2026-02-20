@@ -81,7 +81,7 @@ NumCloseIDs: 2
         }
       }
     }
-    let nc#1 = (struct){
+    let nc#0 = (struct){
       _ports: (struct){
       }
     }
@@ -103,7 +103,7 @@ NumCloseIDs: 2
         }
       }
     }
-    let cps#2multi = [
+    let cps#1multi = [
       for _, c in 〈2;n〉._cs for _, cps in 〈0;c〉._ports {
         〈1;cps〉
       },
@@ -123,7 +123,7 @@ NumCloseIDs: 2
         y?: (int){ int }
       }
     }
-    let Z#3multi = [
+    let Z#2multi = [
       for _, x in 〈2;A〉 {
         〈1;x〉
       },
@@ -136,7 +136,7 @@ NumCloseIDs: 2
 diff old new
 --- old
 +++ new
-@@ -11,22 +11,7 @@
+@@ -11,27 +11,12 @@
          n1: (struct){
            _CL: (string){ "l" }
            _cs: (struct){
@@ -156,10 +156,29 @@ diff old new
 -                }
 -              }
 -            }
+-          }
+-        }
+-      }
+-    }
+-    let nc#1 = (struct){
 +            l: ~(full._cl.l)
-           }
++          }
++        }
++      }
++    }
++    let nc#0 = (struct){
+       _ports: (struct){
+       }
+     }
+@@ -53,7 +38,7 @@
          }
        }
+     }
+-    let cps#2multi = [
++    let cps#1multi = [
+       for _, c in 〈2;n〉._cs for _, cps in 〈0;c〉._ports {
+         〈1;cps〉
+       },
 @@ -73,17 +58,11 @@
          y?: (int){ int }
        }
@@ -175,7 +194,7 @@ diff old new
 -        y?: (int){ int }
 -      }
 -    }
-+    let Z#3multi = [
++    let Z#2multi = [
 +      for _, x in 〈2;A〉 {
 +        〈1;x〉
 +      },
@@ -291,13 +310,13 @@ diff old new
         }
       }
     }
-    let nc#1 = {
+    let nc#0 = {
       _ports: {
         [_]: 〈2;_core_v1〉.#cp
       }
     }
     _cl: {
-      [_]: (〈1;let nc#1〉 & {
+      [_]: (〈1;let nc#0〉 & {
         _ports: {
           "1": {}
           "2": {}
@@ -316,13 +335,13 @@ diff old new
       }
     }
     for _, n in 〈0;k〉.n {
-      let cps#2multi = [
+      let cps#1multi = [
         for _, c in 〈2;n〉._cs for _, cps in 〈0;c〉._ports {
           〈1;cps〉
         },
       ]
       ports: [
-        for _, cp in 〈1;let cps#2〉 if (〈0;cp〉.hostPort != _|_(explicit error (_|_ literal) in source)) {
+        for _, cp in 〈1;let cps#1〉 if (〈0;cp〉.hostPort != _|_(explicit error (_|_ literal) in source)) {
           port: "\(〈1;cp〉.hostPort)"
         },
       ]
@@ -351,13 +370,13 @@ diff old new
       }
     }
     if true {
-      let Z#3 = [
+      let Z#0 = [
         for _, x in 〈2;A〉 {
           〈1;x〉
         },
       ]
       B: [
-        for _, z in 〈1;let Z#3〉 if (〈0;z〉.y != _|_(explicit error (_|_ literal) in source)) {
+        for _, z in 〈1;let Z#0〉 if (〈0;z〉.y != _|_(explicit error (_|_ literal) in source)) {
           b: 1
         },
       ]

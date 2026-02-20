@@ -96,7 +96,7 @@ func (c *OpContext) RewriteArgs(args ...interface{}) {
 		case Node:
 			args[i] = c.Str(x)
 		case Feature:
-			args[i] = x.SelectorString(c)
+			args[i] = x.SelectorString()
 		}
 	}
 }
@@ -149,7 +149,7 @@ func (c *OpContext) PathToString(path []Feature) string {
 		if i > 0 {
 			b.WriteByte('.')
 		}
-		b.WriteString(f.SelectorString(c))
+		b.WriteString(f.SelectorString())
 	}
 	return b.String()
 }

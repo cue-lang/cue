@@ -1389,7 +1389,7 @@ Result:
         // [structural cycle] withLetFail.schema.next: structural cycle
       }
     }
-    let _schema_1#1 = (_|_){
+    let _schema_1#0 = (_|_){
       // [structural cycle] withLetFail.schema.next: structural cycle
     }
   }
@@ -2011,12 +2011,14 @@ diff old new
        }
      }
    }
-@@ -759,8 +756,7 @@
+@@ -758,9 +755,8 @@
+         // [structural cycle] withLetFail.schema.next: structural cycle
        }
      }
-     let _schema_1#1 = (_|_){
+-    let _schema_1#1 = (_|_){
 -      // [structural cycle] withLetFail._schema_1: structural cycle:
 -      //     ./in.cue:362:17
++    let _schema_1#0 = (_|_){
 +      // [structural cycle] withLetFail.schema.next: structural cycle
      }
    }
@@ -3979,9 +3981,9 @@ Result:
   }
   withLetFail: {
     schema: {
-      next: 〈1;let _schema_1#1〉
+      next: 〈1;let _schema_1#0〉
     }
-    let _schema_1#1 = 〈0;schema〉
+    let _schema_1#0 = 〈0;schema〉
   }
   fieldsSumInfinite: {
     issue3310: {

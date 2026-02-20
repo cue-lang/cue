@@ -192,10 +192,10 @@ func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
 }
 
 func (x *Builtin) name(ctx *adt.OpContext) string {
-	if x.Pkg == 0 {
+	if !x.Pkg.IsValid() {
 		return x.Name
 	}
-	return fmt.Sprintf("%s.%s", x.Pkg.StringValue(ctx), x.Name)
+	return fmt.Sprintf("%s.%s", x.Pkg.StringValue(), x.Name)
 }
 
 func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {

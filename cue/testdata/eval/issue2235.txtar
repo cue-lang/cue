@@ -142,20 +142,6 @@ diff old new
 +Notifications: 1
 +
 +NumCloseIDs: 28
--- out/eval/stats --
-Leaks:  3
-Freed:  101
-Reused: 84
-Allocs: 20
-Retain: 72
-
-Unifications: 104
-Conjuncts:    271
-Disjuncts:    161
-
-MisalignedConjunct: 119
-
-NumCloseIDs: 14
 -- out/evalalpha --
 (struct){
   shorewallParams: (#struct){
@@ -260,7 +246,7 @@ NumCloseIDs: 14
   }
   t2: (struct){
     out: ~(t2.m.x.y)
-    let X#2 = ~(t2.m.x)
+    let X#0 = ~(t2.m.x)
     m: (struct){
       x: (struct){
         y: (struct){
@@ -395,184 +381,6 @@ diff old new
          y: (struct){
 -- diff/todo/p2 --
 Different, but okay, error message, but missing some positions
--- out/eval --
-(struct){
-  shorewallParams: (#struct){
-    KUBERNETES_FOO_INGRESS_ADMIN: (#list){
-      0: (string){ "127.0.0.1" }
-    }
-  }
-  #Cluster: (#struct){
-    clusterName: (string){ string }
-    shorewallPrefix: (_|_){
-      // [incomplete] #Cluster.shorewallPrefix: invalid interpolation: error in call to strings.ToUpper: non-concrete value string:
-      //     ./issue2235.cue:14:19
-      //     ./issue2235.cue:13:19
-      //     ./issue2235.cue:14:33
-    }
-    globalIngressControllers: (#struct){
-      admin: (#struct){
-        class: (string){ "admin" }
-        objects: (#struct){
-          namespaced: (#struct){
-            ingress: (#struct){
-              Service: (#struct){
-                "admin-nginx-ingress-controller": (#struct){
-                  spec: (#struct){
-                    externalIPs: (#list){
-                      0: (string){ "127.0.0.1" }
-                    }
-                  }
-                  metadata: (#struct){
-                    labels: (#struct){
-                      "ingress-class": (string){ "admin" }
-                      stack: (string){ "ingress" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    objects: (#struct){
-      namespaced: (#struct){
-        ingress: (#struct){
-          Service: (#struct){
-            "admin-nginx-ingress-controller": (#struct){
-              spec: (#struct){
-                externalIPs: (#list){
-                  0: (string){ "127.0.0.1" }
-                }
-              }
-              metadata: (#struct){
-                labels: (#struct){
-                  "ingress-class": (string){ "admin" }
-                  stack: (string){ "ingress" }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  clusters: (struct){
-    foo: (#struct){
-      clusterName: (string){ "foo" }
-      shorewallPrefix: (string){ "KUBERNETES_FOO" }
-      globalIngressControllers: (#struct){
-        admin: (#struct){
-          class: (string){ "admin" }
-          objects: (#struct){
-            namespaced: (#struct){
-              ingress: (#struct){
-                Service: (#struct){
-                  "admin-nginx-ingress-controller": (#struct){
-                    spec: (#struct){
-                      externalIPs: (#list){
-                        0: (string){ "127.0.0.1" }
-                      }
-                    }
-                    metadata: (#struct){
-                      labels: (#struct){
-                        "ingress-class": (string){ "admin" }
-                        stack: (string){ "ingress" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      objects: (#struct){
-        namespaced: (#struct){
-          ingress: (#struct){
-            Service: (#struct){
-              "admin-nginx-ingress-controller": (#struct){
-                spec: (#struct){
-                  externalIPs: (#list){
-                    0: (string){ "127.0.0.1" }
-                  }
-                }
-                metadata: (#struct){
-                  labels: (#struct){
-                    "ingress-class": (string){ "admin" }
-                    stack: (string){ "ingress" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  #GlobalIngressController: (_|_){
-    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
-    //     ./issue2235.cue:43:12
-    //     ./issue2235.cue:40:9
-    class: (string){ string }
-    objects: (#struct){
-      namespaced: (#struct){
-        ingress: (_|_){
-          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
-          //     ./issue2235.cue:43:12
-          //     ./issue2235.cue:40:9
-          Service: (_|_){
-            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
-            //     ./issue2235.cue:43:12
-            //     ./issue2235.cue:40:9
-          }
-        }
-      }
-    }
-  }
-  t1: (struct){
-    params: (struct){
-      a: (struct){
-      }
-    }
-    x: (struct){
-      y: (struct){
-        a: (struct){
-        }
-      }
-    }
-  }
-  t2: (struct){
-    out: (struct){
-      z: (struct){
-      }
-    }
-    let X#2 = (struct){
-      y: (struct){
-        z: (struct){
-        }
-      }
-    }
-    m: (struct){
-      x: (struct){
-        y: (struct){
-          z: (struct){
-          }
-        }
-      }
-    }
-  }
-  t3: (struct){
-    out: (struct){
-    }
-    foo: (struct){
-      bar: (struct){
-      }
-    }
-  }
-  let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
-}
 -- out/compile --
 --- issue2235.cue
 {
@@ -599,15 +407,15 @@ Different, but okay, error message, but missing some positions
         class: "admin"
       })
     }
-    for _, c in 〈0;globalIngressControllers〉 {
+    for , c in 〈0;globalIngressControllers〉 {
       objects: 〈1;c〉.objects
     }
   }
   for clusterName, cluster in 〈0;clusters〉 {
     for class, controller in 〈1;cluster〉.globalIngressControllers {
-      let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
+      let svc#0multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
       shorewallParams: {
-        "\(〈4;cluster〉.shorewallPrefix)_INGRESS_\(〈import;strings〉.ToUpper(〈2;class〉))": 〈1;let svc#1〉.spec.externalIPs
+        "\(〈4;cluster〉.shorewallPrefix)_INGRESS_\(〈import;strings〉.ToUpper(〈2;class〉))": 〈1;let svc#0〉.spec.externalIPs
       }
     }
   }
@@ -661,7 +469,7 @@ Different, but okay, error message, but missing some positions
     x: {
       y: {}
     }
-    for _, _ in 〈0;x〉 {
+    for ,  in 〈0;x〉 {
       if true {
         x: {
           y: {
@@ -672,14 +480,14 @@ Different, but okay, error message, but missing some positions
     }
   }
   t2: {
-    out: 〈0;let X#2〉.y
-    let X#2 = 〈0;m〉.x
+    out: 〈0;let X#0〉.y
+    let X#0 = 〈0;m〉.x
     m: {
       x: {
         y: {}
       }
     }
-    for _, v in 〈0;m〉 {
+    for , v in 〈0;m〉 {
       if true {
         m: {
           x: {
@@ -696,8 +504,8 @@ Different, but okay, error message, but missing some positions
     foo: {
       bar: {}
     }
-    for _, _ in 〈0;foo〉 {
-      for name, _ in 〈2;foo〉 {
+    for ,  in 〈0;foo〉 {
+      for name,  in 〈2;foo〉 {
         foo: {
           〈2;name〉: _
         }

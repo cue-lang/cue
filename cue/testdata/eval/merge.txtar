@@ -19,57 +19,6 @@ results: _
 for _, manifest in manifests {
 	results: manifest
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  22
-Reused: 15
-Allocs: 7
-Retain: 0
-
-Unifications: 22
-Conjuncts:    38
-Disjuncts:    22
-
-MisalignedConjunct: 9
-
-NumCloseIDs: 1
--- out/eval --
-(struct){
-  key: (string){ "app01" }
-  manifests: (#list){
-    0: (struct){
-      deployment: (struct){
-        #map: (#struct){
-          app01: (#struct){
-            name: (string){ "app01" }
-            image: (string){ string }
-            desc: (string){ string }
-          }
-        }
-      }
-    }
-    1: (struct){
-      deployment: (struct){
-        #map: (#struct){
-          app01: (#struct){
-            image: (string){ "image01" }
-          }
-        }
-      }
-    }
-  }
-  results: (struct){
-    deployment: (struct){
-      #map: (#struct){
-        app01: (#struct){
-          image: (string){ "image01" }
-          name: (string){ "app01" }
-          desc: (string){ string }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -104,7 +53,44 @@ NumCloseIDs: 1
     },
   ]
   results: _
-  for _, manifest in 〈0;manifests〉 {
+  for , manifest in 〈0;manifests〉 {
     results: 〈1;manifest〉
+  }
+}
+-- out/evalalpha --
+(struct){
+  key: (string){ "app01" }
+  manifests: (#list){
+    0: (struct){
+      deployment: (struct){
+        #map: (#struct){
+          app01: (#struct){
+            name: (string){ "app01" }
+            image: (string){ string }
+            desc: (string){ string }
+          }
+        }
+      }
+    }
+    1: (struct){
+      deployment: (struct){
+        #map: (#struct){
+          app01: (#struct){
+            image: (string){ "image01" }
+          }
+        }
+      }
+    }
+  }
+  results: (struct){
+    deployment: (struct){
+      #map: (#struct){
+        app01: (#struct){
+          image: (string){ "image01" }
+          name: (string){ "app01" }
+          desc: (string){ string }
+        }
+      }
+    }
   }
 }

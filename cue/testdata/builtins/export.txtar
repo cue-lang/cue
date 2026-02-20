@@ -20,36 +20,6 @@ issue3972: {
 	output: out1: yaml.Marshal(_out1)
 
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  10
-Reused: 3
-Allocs: 7
-Retain: 2
-
-Unifications: 10
-Conjuncts:    12
-Disjuncts:    12
-
-NumCloseIDs: 2
--- out/eval --
-(struct){
-  issue3972: (struct){
-    output: (struct){
-      out0: (string){ "static" }
-      out1: (string){ "- derivedStatic\n" }
-    }
-    input: (struct){
-      inputStatic: (string){ "static" }
-    }
-    derived: (struct){
-      derivedStatic: (string){ "static" }
-    }
-    _out1: (#list){
-      0: (string){ "derivedStatic" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -74,12 +44,30 @@ NumCloseIDs: 2
       }
     }
     _out1: [
-      for svc, _ in 〈1;derived〉 {
+      for svc,  in 〈1;derived〉 {
         〈1;svc〉
       },
     ]
     output: {
       out1: 〈import;"encoding/yaml"〉.Marshal(〈1;_out1〉)
+    }
+  }
+}
+-- out/evalalpha --
+(struct){
+  issue3972: (struct){
+    output: (struct){
+      out0: (string){ "static" }
+      out1: (string){ "- derivedStatic\n" }
+    }
+    input: (struct){
+      inputStatic: (string){ "static" }
+    }
+    derived: (struct){
+      derivedStatic: (string){ "static" }
+    }
+    _out1: (#list){
+      0: (string){ "derivedStatic" }
     }
   }
 }

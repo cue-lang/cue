@@ -44,21 +44,21 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 4499
--- out/eval/stats --
-Leaks:  0
-Freed:  3001
-Reused: 2998
-Allocs: 3
-Retain: 0
-
-Unifications: 3001
-Conjuncts:    7498
-Disjuncts:    3001
-
-MisalignedConjunct: 1498
-
-NumCloseIDs: 1
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  _entries(:p): [
+    for , i in 〈import;list〉.Range(1, 1500, 1) {
+      〈1;i〉
+    },
+  ]
+  unified: {
+    for , entry in 〈1;_entries(:p)〉 {
+      "\(〈1;entry〉)": true
+    }
+  }
+}
+-- out/evalalpha --
 (struct){
   _entries(:p): (#list){
     0: (int){ 1 }
@@ -3061,19 +3061,5 @@ NumCloseIDs: 1
     "1497": (bool){ true }
     "1498": (bool){ true }
     "1499": (bool){ true }
-  }
-}
--- out/compile --
---- in.cue
-{
-  _entries(:p): [
-    for _, i in 〈import;list〉.Range(1, 1500, 1) {
-      〈1;i〉
-    },
-  ]
-  unified: {
-    for _, entry in 〈1;_entries(:p)〉 {
-      "\(〈1;entry〉)": true
-    }
   }
 }

@@ -9,19 +9,21 @@ issue595: {
 		files: cfg.nam
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  6
-Reused: 1
-Allocs: 5
-Retain: 0
-
-Unifications: 6
-Conjuncts:    6
-Disjuncts:    6
-
-NumCloseIDs: 1
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  issue595: {
+    #cfgs: [
+      {
+        name: "foo"
+      },
+    ]
+    for , cfg in 〈0;#cfgs〉 {
+      files: 〈1;cfg〉.nam
+    }
+  }
+}
+-- out/evalalpha --
 Errors:
 issue595.files: undefined field: nam:
     ./in.cue:8:14
@@ -39,20 +41,6 @@ Result:
     files: (_|_){
       // [eval] issue595.files: undefined field: nam:
       //     ./in.cue:8:14
-    }
-  }
-}
--- out/compile --
---- in.cue
-{
-  issue595: {
-    #cfgs: [
-      {
-        name: "foo"
-      },
-    ]
-    for _, cfg in 〈0;#cfgs〉 {
-      files: 〈1;cfg〉.nam
     }
   }
 }

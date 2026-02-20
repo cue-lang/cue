@@ -23,17 +23,37 @@ bar: [
 		"hello bar: \(e)"
 	},
 ]
--- out/eval/stats --
-Leaks:  0
-Freed:  15
-Reused: 10
-Allocs: 5
-Retain: 0
-
-Unifications: 11
-Conjuncts:    17
-Disjuncts:    15
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  somelist: ([
+    ...string,
+  ]|*[])
+  foo: [
+    for , e in 〈1;somelist〉 {
+      "hello foo: \(〈1;e〉)"
+    },
+  ]
+  otherlist: [
+    "something",
+  ]
+  z: [
+    for , e in 〈1;otherlist〉 {
+      "hello z: \(〈1;e〉)"
+    },
+  ]
+  extlist: ([
+    ...string,
+  ]|*[
+    "something",
+  ])
+  bar: [
+    for , e in 〈1;extlist〉 {
+      "hello bar: \(〈1;e〉)"
+    },
+  ]
+}
+-- out/evalalpha --
 (struct){
   somelist: (list){ |(*(#list){
     }, (list){
@@ -53,34 +73,4 @@ Disjuncts:    15
   bar: (#list){
     0: (string){ "hello bar: something" }
   }
-}
--- out/compile --
---- in.cue
-{
-  somelist: ([
-    ...string,
-  ]|*[])
-  foo: [
-    for _, e in 〈1;somelist〉 {
-      "hello foo: \(〈1;e〉)"
-    },
-  ]
-  otherlist: [
-    "something",
-  ]
-  z: [
-    for _, e in 〈1;otherlist〉 {
-      "hello z: \(〈1;e〉)"
-    },
-  ]
-  extlist: ([
-    ...string,
-  ]|*[
-    "something",
-  ])
-  bar: [
-    for _, e in 〈1;extlist〉 {
-      "hello bar: \(〈1;e〉)"
-    },
-  ]
 }

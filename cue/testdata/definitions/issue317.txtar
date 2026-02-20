@@ -35,17 +35,64 @@ Something: {
 	}
 }
 x: Something & #Deployment
--- out/eval/stats --
-Leaks:  0
-Freed:  52
-Reused: 45
-Allocs: 7
-Retain: 0
-
-Unifications: 46
-Conjuncts:    122
-Disjuncts:    52
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    #Schema: {
+      [_]: 〈2;#D〉
+    }
+    concrete: 〈0;#Schema〉
+  }
+  #D: {
+    fieldWithDefault: (*0|int)
+    ...
+  }
+  s: (〈0;#T〉 & {
+    #Schema: {
+      foo: {
+        otherField: string
+      }
+    }
+    concrete: {
+      foo: {
+        otherField: "hello"
+      }
+    }
+  })
+  #Container: {
+    Env: {
+      [string]: {
+        name: string
+        value: string
+      }
+    }
+  }
+  #Deployment: {
+    #Containers: {
+      [string]: 〈2;#Container〉
+    }
+    containers: [
+      for , c in 〈1;#Containers〉 {
+        〈1;c〉
+      },
+    ]
+  }
+  Something: {
+    〈1;#Deployment〉
+    #Containers: {
+      "a thing": {
+        Env: {
+          foobar: {
+            value: "foo"
+          }
+        }
+      }
+    }
+  }
+  x: (〈0;Something〉 & 〈0;#Deployment〉)
+}
+-- out/evalalpha --
 (struct){
   #T: (#struct){
     #Schema: (#struct){
@@ -124,61 +171,4 @@ Disjuncts:    52
       }
     }
   }
-}
--- out/compile --
---- in.cue
-{
-  #T: {
-    #Schema: {
-      [_]: 〈2;#D〉
-    }
-    concrete: 〈0;#Schema〉
-  }
-  #D: {
-    fieldWithDefault: (*0|int)
-    ...
-  }
-  s: (〈0;#T〉 & {
-    #Schema: {
-      foo: {
-        otherField: string
-      }
-    }
-    concrete: {
-      foo: {
-        otherField: "hello"
-      }
-    }
-  })
-  #Container: {
-    Env: {
-      [string]: {
-        name: string
-        value: string
-      }
-    }
-  }
-  #Deployment: {
-    #Containers: {
-      [string]: 〈2;#Container〉
-    }
-    containers: [
-      for _, c in 〈1;#Containers〉 {
-        〈1;c〉
-      },
-    ]
-  }
-  Something: {
-    〈1;#Deployment〉
-    #Containers: {
-      "a thing": {
-        Env: {
-          foobar: {
-            value: "foo"
-          }
-        }
-      }
-    }
-  }
-  x: (〈0;Something〉 & 〈0;#Deployment〉)
 }

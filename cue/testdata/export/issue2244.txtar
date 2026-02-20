@@ -31,16 +31,6 @@ _#isReleaseTag: _#matchPattern & {#pattern: "refs/tags/v*", _}
 m: #step & {
 	if: _#isReleaseTag
 }
--- out/eval/stats --
-Leaks:  16
-Freed:  17
-Reused: 13
-Allocs: 20
-Retain: 30
-
-Unifications: 24
-Conjuncts:    58
-Disjuncts:    40
 -- diff/explanation --
 New evaluator should ultimately disallow new definitions in closed structs
 and not allow #pattern in #step
@@ -55,7 +45,7 @@ and not allow #pattern in #step
   _#isReleaseTag(:x): (string){
     "refs/tags/v"
     #pattern: (string){ "refs/tags/v*" }
-    let prefix#1 = (string){ "refs/tags/v" }
+    let prefix#0 = (string){ "refs/tags/v" }
   }
   #step: (#struct){
     if: ((string|number)){ |((number){ number }, (string){ string }) }
@@ -64,7 +54,7 @@ and not allow #pattern in #step
     if: (string){
       "refs/tags/v"
       #pattern: (string){ "refs/tags/v*" }
-      let prefix#1 = (string){ "refs/tags/v" }
+      let prefix#0 = (string){ "refs/tags/v" }
     }
   }
 }
@@ -80,30 +70,6 @@ diff old new
      //     ./in.cue:11:6
      //     ./in.cue:8:12
      #pattern: (string){ string }
--- out/eval --
-(struct){
-  _#matchPattern(:x): (_|_){
-    // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:
-    //     ./in.cue:11:6
-    //     ./in.cue:8:12
-    #pattern: (string){ string }
-  }
-  _#isReleaseTag(:x): (string){
-    "refs/tags/v"
-    #pattern: (string){ "refs/tags/v*" }
-    let prefix#1 = (string){ "refs/tags/v" }
-  }
-  #step: (#struct){
-    if: ((string|number)){ |((number){ number }, (string){ string }) }
-  }
-  m: (#struct){
-    if: (string){
-      "refs/tags/v"
-      #pattern: (string){ "refs/tags/v*" }
-      let prefix#1 = (string){ "refs/tags/v" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -111,8 +77,8 @@ diff old new
     #pattern: string
     [
       if 〈import;strings〉.HasSuffix(〈1;#pattern〉, "*") {
-        let prefix#1 = 〈import;strings〉.TrimSuffix(〈2;#pattern〉, "*")
-        〈0;let prefix#1〉
+        let prefix#0 = 〈import;strings〉.TrimSuffix(〈2;#pattern〉, "*")
+        〈0;let prefix#0〉
       },
       "'\(〈1;#pattern〉)'",
     ][0]

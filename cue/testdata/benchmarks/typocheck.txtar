@@ -64,21 +64,35 @@ diff old new
 +ConjunctInfos:       905
 +MaxConjunctInfos:    103
 +MaxReqSets:          104
--- out/eval/stats --
-Leaks:  0
-Freed:  700
-Reused: 594
-Allocs: 106
-Retain: 108
-
-Unifications: 700
-Conjuncts:    1302
-Disjuncts:    807
-
-MisalignedConjunct: 696
-
-NumCloseIDs: 4
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  out: (〈0;#Output〉 & {
+    #input: 〈1;_input〉
+  })
+  _input: {
+    for , n in 〈import;list〉.Range(1, 100, 1) {
+      "A\(〈1;n〉)": {
+        "B\(〈2;n〉)": {
+          name: "name\(〈3;n〉)"
+        }
+      }
+    }
+  }
+  #Embed: {
+    [string]: string
+  }
+  #Output: {
+    〈1;#Embed〉
+    #input: _
+    for , lvlA in 〈0;#input〉 {
+      for nameB, lvlB in 〈1;lvlA〉 {
+        〈1;nameB〉: 〈1;lvlB〉.name
+      }
+    }
+  }
+}
+-- out/evalalpha --
 (struct){
   out: (#struct){
     #input: (#struct){
@@ -1181,33 +1195,5 @@ NumCloseIDs: 4
     // [incomplete] #Output: cannot range over #input (incomplete type _):
     //     ./in.cue:16:17
     #input: (_){ _ }
-  }
-}
--- out/compile --
---- in.cue
-{
-  out: (〈0;#Output〉 & {
-    #input: 〈1;_input〉
-  })
-  _input: {
-    for _, n in 〈import;list〉.Range(1, 100, 1) {
-      "A\(〈1;n〉)": {
-        "B\(〈2;n〉)": {
-          name: "name\(〈3;n〉)"
-        }
-      }
-    }
-  }
-  #Embed: {
-    [string]: string
-  }
-  #Output: {
-    〈1;#Embed〉
-    #input: _
-    for _, lvlA in 〈0;#input〉 {
-      for nameB, lvlB in 〈1;lvlA〉 {
-        〈1;nameB〉: 〈1;lvlB〉.name
-      }
-    }
   }
 }

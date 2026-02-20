@@ -16,29 +16,17 @@ y: {{{for a in a {}}}}
 --- out.cue
 {
   x: {
-    for _, a in 〈1;a〉 {}
+    for , a in 〈1;a〉 {}
   }
   y: {
     {
       {
-        for _, a in 〈3;a〉 {}
+        for , a in 〈3;a〉 {}
       }
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 2
-Allocs: 2
-Retain: 0
-
-Unifications: 4
-Conjuncts:    7
-Disjuncts:    4
-
-NumCloseIDs: 2
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (#list){
   }

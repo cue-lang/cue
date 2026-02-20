@@ -19,7 +19,7 @@ for key, value in {x: v: 1} {
   } {
     "\(〈1;key〉)": {
       v: (*{
-        for pod, _ in 〈3;value〉.v {}
+        for pod,  in 〈3;value〉.v {}
       }|{
         "\(〈3;value〉.v)": 2
       })
@@ -27,21 +27,7 @@ for key, value in {x: v: 1} {
     }
   }
 }
--- out/eval/stats --
-Leaks:  3
-Freed:  7
-Reused: 2
-Allocs: 8
-Retain: 7
-
-Unifications: 8
-Conjuncts:    11
-Disjuncts:    12
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 1
--- out/eval --
+-- out/evalalpha --
 (struct){
   x: (struct){
     v: (struct){

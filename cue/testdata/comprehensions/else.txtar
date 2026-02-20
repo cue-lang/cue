@@ -105,18 +105,6 @@ nestedOuterElse: {
 nestedInnerElse: {
 	for x in [1] { for y in [] { y } else { inner: true } } else { outer: true }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  69
-Reused: 60
-Allocs: 9
-Retain: 0
-
-Unifications: 69
-Conjuncts:    90
-Disjuncts:    69
-
-NumCloseIDs: 2
 -- out/evalalpha --
 (struct){
   ifTrue: (struct){
@@ -161,7 +149,7 @@ NumCloseIDs: 2
     fallback: (int){ 3 }
   }
   outerScope: (struct){
-    let threshold#1 = (int){ 10 }
+    let threshold#0 = (int){ 10 }
     fallback: (int){ 10 }
   }
   ifNestedBody: (struct){
@@ -223,7 +211,7 @@ NumCloseIDs: 2
     }
   }
   forNonEmpty: {
-    for _, x in [
+    for , x in [
       1,
       2,
     ] {
@@ -233,14 +221,14 @@ NumCloseIDs: 2
     }
   }
   forEmpty: {
-    for _, x in [] {
+    for , x in [] {
       "\(〈1;x〉)": 〈1;x〉
     } else {
       empty: true
     }
   }
   forFilteredAll: {
-    for _, x in [
+    for , x in [
       1,
       2,
       3,
@@ -251,7 +239,7 @@ NumCloseIDs: 2
     }
   }
   forFilteredSome: {
-    for _, x in [
+    for , x in [
       1,
       2,
       3,
@@ -276,14 +264,14 @@ NumCloseIDs: 2
     },
   ]
   listForEmpty: [
-    for _, x in [] {
+    for , x in [] {
       〈1;x〉
     } else {
       0
     },
   ]
   listForNonEmpty: [
-    for _, x in [
+    for , x in [
       1,
       2,
     ] {
@@ -309,11 +297,11 @@ NumCloseIDs: 2
     }
   }
   outerScope: {
-    let threshold#1 = 10
-    for _, x in [] {
+    let threshold#0 = 10
+    for , x in [] {
       〈1;x〉
     } else {
-      fallback: 〈1;let threshold#1〉
+      fallback: 〈1;let threshold#0〉
     }
   }
   ifNestedBody: {
@@ -361,7 +349,7 @@ NumCloseIDs: 2
     }
   }
   forNestedEmpty: {
-    for _, x in [] {
+    for , x in [] {
       a: {
         b: {
           〈3;x〉: 〈3;x〉
@@ -376,7 +364,7 @@ NumCloseIDs: 2
     }
   }
   forNestedNonEmpty: {
-    for _, x in [
+    for , x in [
       1,
     ] {
       a: {
@@ -393,8 +381,8 @@ NumCloseIDs: 2
     }
   }
   nestedOuterElse: {
-    for _, x in [] {
-      for _, y in [
+    for , x in [] {
+      for , y in [
         1,
       ] {
         〈1;y〉
@@ -406,10 +394,10 @@ NumCloseIDs: 2
     }
   }
   nestedInnerElse: {
-    for _, x in [
+    for , x in [
       1,
     ] {
-      for _, y in [] {
+      for , y in [] {
         〈1;y〉
       } else {
         inner: true

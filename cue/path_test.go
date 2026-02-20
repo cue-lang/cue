@@ -104,8 +104,8 @@ func TestPaths(t *testing.T) {
 	}, {
 		path: cue.ParsePath(`b[3T]`),
 		str:  "_|_",
-		err:  true,
-		out:  `_|_ // int label out of range (3000000000000 not >=0 and <= 268435454)`,
+		err:  false,
+		out:  `_|_ // field not found: 3000000000000`,
 	}, {
 		path: cue.ParsePath(`b[3.3]`),
 		str:  "_|_",

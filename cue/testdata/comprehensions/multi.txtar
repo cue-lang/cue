@@ -21,17 +21,53 @@ issue574: {
 		},
 	]
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  24
-Reused: 20
-Allocs: 4
-Retain: 0
-
-Unifications: 24
-Conjuncts:    37
-Disjuncts:    24
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  list: [
+    2,
+    3,
+  ]
+  a: [
+    3,
+    for , x in 〈1;list〉 {
+      〈1;x〉
+    },
+    for , x in 〈1;list〉 {
+      〈1;x〉
+    },
+  ]
+  b: [
+    3,
+    if true {
+      3
+    },
+    for , x in 〈1;list〉 if (〈0;x〉 > 2) {
+      〈1;x〉
+    },
+  ]
+  issue574: {
+    greet: true
+    bye: true
+    message1: [
+      if 〈1;greet〉 {
+        "hello"
+      },
+      "how are you doing?",
+      "bye",
+    ]
+    message2: [
+      if !〈1;greet〉 {
+        "hello"
+      },
+      "how are you doing?",
+      if 〈1;bye〉 {
+        "bye"
+      },
+    ]
+  }
+}
+-- out/evalalpha --
 (struct){
   list: (#list){
     0: (int){ 2 }
@@ -61,51 +97,5 @@ Disjuncts:    24
       0: (string){ "how are you doing?" }
       1: (string){ "bye" }
     }
-  }
-}
--- out/compile --
---- in.cue
-{
-  list: [
-    2,
-    3,
-  ]
-  a: [
-    3,
-    for _, x in 〈1;list〉 {
-      〈1;x〉
-    },
-    for _, x in 〈1;list〉 {
-      〈1;x〉
-    },
-  ]
-  b: [
-    3,
-    if true {
-      3
-    },
-    for _, x in 〈1;list〉 if (〈0;x〉 > 2) {
-      〈1;x〉
-    },
-  ]
-  issue574: {
-    greet: true
-    bye: true
-    message1: [
-      if 〈1;greet〉 {
-        "hello"
-      },
-      "how are you doing?",
-      "bye",
-    ]
-    message2: [
-      if !〈1;greet〉 {
-        "hello"
-      },
-      "how are you doing?",
-      if 〈1;bye〉 {
-        "bye"
-      },
-    ]
   }
 }

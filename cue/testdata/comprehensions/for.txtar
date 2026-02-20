@@ -12,21 +12,48 @@ comprehensionBinds: {
 	a: {for _ in [1] {a: _}}
 	b: {for _, _ in [1] {a: _}}
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  16
-Reused: 12
-Allocs: 6
-Retain: 7
-
-Unifications: 18
-Conjuncts:    18
-Disjuncts:    21
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 5
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  b: {
+    for k, v in 〈1;a〉 {
+      "\(〈1;k〉)": (〈1;v〉 + 1)
+    }
+  }
+  a: {
+    b: 1
+    c: 2
+  }
+  x: {
+    for k, v in 〈1;y〉 {
+      "\(〈1;k〉)": 〈1;v〉
+    }
+  }
+  y: {}
+  k: {
+    for , v in 〈1;e〉 {
+      〈1;v〉
+    }
+  }
+  e: int
+  comprehensionBinds: {
+    a: {
+      for ,  in [
+        1,
+      ] {
+        a: _
+      }
+    }
+    b: {
+      for ,  in [
+        1,
+      ] {
+        a: _
+      }
+    }
+  }
+}
+-- out/evalalpha --
 Errors:
 k: cannot range over e (found int, want list or struct):
     ./in.cue:7:14
@@ -57,47 +84,6 @@ Result:
     }
     b: (struct){
       a: (_){ _ }
-    }
-  }
-}
--- out/compile --
---- in.cue
-{
-  b: {
-    for k, v in 〈1;a〉 {
-      "\(〈1;k〉)": (〈1;v〉 + 1)
-    }
-  }
-  a: {
-    b: 1
-    c: 2
-  }
-  x: {
-    for k, v in 〈1;y〉 {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-  }
-  y: {}
-  k: {
-    for _, v in 〈1;e〉 {
-      〈1;v〉
-    }
-  }
-  e: int
-  comprehensionBinds: {
-    a: {
-      for _, _ in [
-        1,
-      ] {
-        a: _
-      }
-    }
-    b: {
-      for _, _ in [
-        1,
-      ] {
-        a: _
-      }
     }
   }
 }

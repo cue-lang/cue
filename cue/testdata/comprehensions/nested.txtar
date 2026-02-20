@@ -58,20 +58,6 @@ for k, v in deployment {
 		]
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  45
-Reused: 26
-Allocs: 19
-Retain: 33
-
-Unifications: 35
-Conjuncts:    95
-Disjuncts:    75
-
-MisalignedConjunct: 5
-
-NumCloseIDs: 1
 -- out/compile --
 --- in.cue
 {
@@ -166,10 +152,10 @@ NumCloseIDs: 1
         }
         spec: {
           ports: [
-            for _, c in 〈5;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export(:kube) {
-              let Port#1 = 〈1;p〉.containerPort
-              port: (*〈0;let Port#1〉|int)
-              targetPort: (*〈0;let Port#1〉|int)
+            for , c in 〈5;v〉.spec.template.spec.containers for , p in 〈0;c〉.ports if 〈0;p〉._export(:kube) {
+              let Port#0 = 〈1;p〉.containerPort
+              port: (*〈0;let Port#0〉|int)
+              targetPort: (*〈0;let Port#0〉|int)
             },
           ]
         }
@@ -187,7 +173,7 @@ NumCloseIDs: 1
             name: (string){ "metrics" }
             port: (int){ 9100 }
             protocol: (string){ "TCP" }
-            let Port#1 = (int){ 9100 }
+            let Port#0 = (int){ 9100 }
             targetPort: (int){ |(*(int){ 9100 }, (int){ int }) }
           }
         }

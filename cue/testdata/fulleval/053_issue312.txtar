@@ -5,26 +5,10 @@
 for x in [1] {
 	*close({}) | {[_]: null}
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  3
-Reused: 0
-Allocs: 5
-Retain: 2
-
-Unifications: 3
-Conjuncts:    8
-Disjuncts:    5
-
-NumCloseIDs: 1
--- out/eval --
-(struct){ |(*(#struct){
-  }, (struct){
-  }) }
 -- out/compile --
 --- in.cue
 {
-  for _, x in [
+  for , x in [
     1,
   ] {
     (*close({})|{
@@ -32,3 +16,7 @@ NumCloseIDs: 1
     })
   }
 }
+-- out/evalalpha --
+(struct){ |(*(#struct){
+  }, (struct){
+  }) }

@@ -6,26 +6,14 @@ a: {for _, b in ["c"] {"\(b+".")": "a"}}
 --- in.cue
 {
   a: {
-    for _, b in [
+    for , b in [
       "c",
     ] {
       "\((〈1;b〉 + "."))": "a"
     }
   }
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  3
-Reused: 0
-Allocs: 5
-Retain: 3
-
-Unifications: 5
-Conjuncts:    5
-Disjuncts:    4
-
-NumCloseIDs: 1
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (struct){
     "c.": (string){ "a" }

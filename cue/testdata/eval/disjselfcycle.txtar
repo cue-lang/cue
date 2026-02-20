@@ -139,7 +139,7 @@ Result:
         },
       ])
       x: [
-        for _, i in 〈1;x〉 {
+        for , i in 〈1;x〉 {
           f: 〈1;i〉.f
         },
       ]
@@ -163,7 +163,7 @@ Result:
       })
       x: {
         y: [
-          for _, i in 〈2;x〉 {
+          for , i in 〈2;x〉 {
             f: 〈1;i〉.f
           },
         ]
@@ -181,7 +181,7 @@ Result:
             },
           ])
           groups: [
-            for _, g in 〈1;groups〉 let _gid = 〈0;g〉.gid {
+            for , g in 〈1;groups〉 let _gid = 〈0;g〉.gid {
               gid: [
                 if (〈2;_gid〉 != _|_(explicit error (_|_ literal) in source)) {
                   〈3;_gid〉

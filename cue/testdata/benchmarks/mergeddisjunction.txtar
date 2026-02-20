@@ -40,21 +40,63 @@ b: {
 		"\(x.text)": {text: x.text}
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  283
-Reused: 275
-Allocs: 8
-Retain: 0
-
-Unifications: 99
-Conjuncts:    530
-Disjuncts:    283
-
-MisalignedConjunct: 33
-
-NumCloseIDs: 2
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  list: [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+  ]
+  a: {
+    [string]: {
+      text: (*"default"|string)
+    }
+  }
+  a: {
+    for , i in 〈1;list〉 {
+      "\(〈1;i〉)": {
+        text: string
+      }
+    }
+  }
+  b: {
+    for , x in 〈1;a〉 {
+      "\(〈1;x〉.text)": {
+        text: 〈2;x〉.text
+      }
+    }
+  }
+}
+-- out/evalalpha --
 (struct){
   list: (#list){
     0: (int){ 0 }
@@ -187,62 +229,6 @@ NumCloseIDs: 2
   b: (struct){
     default: (struct){
       text: (string){ |(*(string){ "default" }, (string){ string }) }
-    }
-  }
-}
--- out/compile --
---- in.cue
-{
-  list: [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-    20,
-    21,
-    22,
-    23,
-    24,
-    25,
-    26,
-    27,
-    28,
-    29,
-    30,
-  ]
-  a: {
-    [string]: {
-      text: (*"default"|string)
-    }
-  }
-  a: {
-    for _, i in 〈1;list〉 {
-      "\(〈1;i〉)": {
-        text: string
-      }
-    }
-  }
-  b: {
-    for _, x in 〈1;a〉 {
-      "\(〈1;x〉.text)": {
-        text: 〈2;x〉.text
-      }
     }
   }
 }

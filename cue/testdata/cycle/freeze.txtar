@@ -182,24 +182,298 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 54
--- out/eval/stats --
-Leaks:  0
-Freed:  72
-Reused: 64
-Allocs: 8
-Retain: 15
-
-Unifications: 72
-Conjuncts:    127
-Disjuncts:    83
-
-MisalignedConjunct: 27
-
-NumCloseIDs: 20
-- comprehension.t1 should be at most an incomplete error, as it is fixable.
-  Arguably they should pass, though, as there is a predictable path to its
-  resolution.
--- out/eval --
+-- out/compile --
+--- comprehension.cue
+{
+  comprehension: {
+    t1: _
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p0: {
+          x: {
+            y: {}
+          }
+          for ,  in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p1: {
+          for ,  in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          x: {
+            y: {}
+          }
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p2: {
+          for ,  in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          x: {
+            y: {}
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p3: {
+          x: {
+            y: {}
+          }
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          for ,  in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p4: {
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          x: {
+            y: {}
+          }
+          for ,  in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p5: {
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          for ,  in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          x: {
+            y: {}
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t2: {
+      err: {
+        a: {
+          x: 1
+          for k, v in 〈1;a〉 {
+            (〈1;k〉 + "q"): 〈1;v〉
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t3: {
+      err: {
+        a: {
+          x: 1
+        }
+        b: {
+          y: 1
+        }
+        a: {
+          for k, v in 〈1;b〉 {
+            (〈1;k〉 + "q"): 〈1;v〉
+          }
+        }
+        b: {
+          for k, v in 〈1;a〉 {
+            〈1;k〉: 〈1;v〉
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t4: {
+      ok: {
+        x: {
+          y: {}
+        }
+        for ,  in 〈0;x〉 {
+          if true {
+            x: {
+              y: {
+                a: {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    moreSpecific: {
+      ok: {
+        a: {
+          x: int
+          for k, v in 〈1;a〉 {
+            〈1;k〉: 1
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    moreSpecific: {
+      err: {
+        a: {
+          x: {
+            y: 1
+          }
+          for k, v in 〈1;a〉 if (len(〈0;v〉) > 0) {
+            〈1;k〉: {
+              z: 1
+            }
+          }
+        }
+      }
+    }
+  }
+}
+--- in.cue
+{
+  freezing: {
+    t1: {
+      ok: {
+        #a: {
+          x: "a"
+        }
+        len(〈0;#a〉)
+      }
+    }
+  }
+}
+--- issue3178.cue
+{
+  issue3178: {
+    input: [
+      "Value",
+    ]
+    output: {
+      ...
+    }
+    for , name in 〈0;input〉 {
+      output: {
+        "\(〈2;name〉)": true
+      }
+    }
+    for name, v in 〈0;output〉 {}
+  }
+}
+-- out/evalalpha --
 Errors:
 comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
     ./comprehension.cue:71:13
@@ -349,296 +623,5 @@ Result:
     output: (struct){
       Value: (bool){ true }
     }
-  }
-}
--- out/compile --
---- comprehension.cue
-{
-  comprehension: {
-    t1: _
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p0: {
-          x: {
-            y: {}
-          }
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p1: {
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          x: {
-            y: {}
-          }
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p2: {
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          x: {
-            y: {}
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p3: {
-          x: {
-            y: {}
-          }
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p4: {
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          x: {
-            y: {}
-          }
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p5: {
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          x: {
-            y: {}
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t2: {
-      err: {
-        a: {
-          x: 1
-          for k, v in 〈1;a〉 {
-            (〈1;k〉 + "q"): 〈1;v〉
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t3: {
-      err: {
-        a: {
-          x: 1
-        }
-        b: {
-          y: 1
-        }
-        a: {
-          for k, v in 〈1;b〉 {
-            (〈1;k〉 + "q"): 〈1;v〉
-          }
-        }
-        b: {
-          for k, v in 〈1;a〉 {
-            〈1;k〉: 〈1;v〉
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t4: {
-      ok: {
-        x: {
-          y: {}
-        }
-        for _, _ in 〈0;x〉 {
-          if true {
-            x: {
-              y: {
-                a: {}
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    moreSpecific: {
-      ok: {
-        a: {
-          x: int
-          for k, v in 〈1;a〉 {
-            〈1;k〉: 1
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    moreSpecific: {
-      err: {
-        a: {
-          x: {
-            y: 1
-          }
-          for k, v in 〈1;a〉 if (len(〈0;v〉) > 0) {
-            〈1;k〉: {
-              z: 1
-            }
-          }
-        }
-      }
-    }
-  }
-}
---- in.cue
-{
-  freezing: {
-    t1: {
-      ok: {
-        #a: {
-          x: "a"
-        }
-        len(〈0;#a〉)
-      }
-    }
-  }
-}
---- issue3178.cue
-{
-  issue3178: {
-    input: [
-      "Value",
-    ]
-    output: {
-      ...
-    }
-    for _, name in 〈0;input〉 {
-      output: {
-        "\(〈2;name〉)": true
-      }
-    }
-    for name, v in 〈0;output〉 {}
   }
 }

@@ -2,17 +2,24 @@
 a: [{a: 1}, {b: 2 & 3}]
 
 b: [for x in a {x}]
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 3
-Allocs: 4
-Retain: 0
-
-Unifications: 7
-Conjuncts:    8
-Disjuncts:    7
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  a: [
+    {
+      a: 1
+    },
+    {
+      b: (2 & 3)
+    },
+  ]
+  b: [
+    for , x in 〈1;a〉 {
+      〈1;x〉
+    },
+  ]
+}
+-- out/evalalpha --
 Errors:
 a.1.b: conflicting values 3 and 2:
     ./in.cue:1:17
@@ -40,21 +47,4 @@ Result:
     //     ./in.cue:1:17
     //     ./in.cue:1:21
   }
-}
--- out/compile --
---- in.cue
-{
-  a: [
-    {
-      a: 1
-    },
-    {
-      b: (2 & 3)
-    },
-  ]
-  b: [
-    for _, x in 〈1;a〉 {
-      〈1;x〉
-    },
-  ]
 }

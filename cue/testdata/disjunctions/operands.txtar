@@ -36,21 +36,48 @@ binOp: {
 unaryOp: {
 	a: -num
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  30
-Reused: 25
-Allocs: 5
-Retain: 0
-
-Unifications: 22
-Conjuncts:    33
-Disjuncts:    30
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 2
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  list: (*[
+    1,
+  ]|[
+    2,
+  ])
+  condition: (*true|false)
+  num: (*1|2)
+  object: (*{
+    a: 1
+  }|{
+    a: 2
+  })
+  forLoop: [
+    for , e in 〈1;list〉 {
+      "count: \(〈1;e〉)"
+    },
+  ]
+  conditional: {
+    if 〈1;condition〉 {
+      a: 3
+    }
+    if (〈1;num〉 < 5) {
+      b: 3
+    }
+  }
+  selector: {
+    a: 〈1;object〉.a
+  }
+  index: {
+    a: 〈1;list〉[0]
+  }
+  binOp: {
+    a: (〈1;num〉 + 4)
+  }
+  unaryOp: {
+    a: -〈1;num〉
+  }
+}
+-- out/evalalpha --
 (struct){
   list: (list){ |(*(#list){
       0: (int){ 1 }
@@ -82,46 +109,5 @@ NumCloseIDs: 2
   }
   unaryOp: (struct){
     a: (int){ -1 }
-  }
-}
--- out/compile --
---- in.cue
-{
-  list: (*[
-    1,
-  ]|[
-    2,
-  ])
-  condition: (*true|false)
-  num: (*1|2)
-  object: (*{
-    a: 1
-  }|{
-    a: 2
-  })
-  forLoop: [
-    for _, e in 〈1;list〉 {
-      "count: \(〈1;e〉)"
-    },
-  ]
-  conditional: {
-    if 〈1;condition〉 {
-      a: 3
-    }
-    if (〈1;num〉 < 5) {
-      b: 3
-    }
-  }
-  selector: {
-    a: 〈1;object〉.a
-  }
-  index: {
-    a: 〈1;list〉[0]
-  }
-  binOp: {
-    a: (〈1;num〉 + 4)
-  }
-  unaryOp: {
-    a: -〈1;num〉
   }
 }

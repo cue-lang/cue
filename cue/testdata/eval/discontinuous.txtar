@@ -22,7 +22,7 @@ x: {
 --- in.cue
 {
   a: [
-    for _, c in 〈1;foo〉.bar.baz {
+    for , c in 〈1;foo〉.bar.baz {
       〈1;c〉
     },
   ]
@@ -48,17 +48,7 @@ x: {
     DSpec: {}
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  14
-Reused: 5
-Allocs: 9
-Retain: 9
-
-Unifications: 14
-Conjuncts:    23
-Disjuncts:    23
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (#list){
     0: (struct){

@@ -36,7 +36,7 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 		return ast.NewIdent(s)
 
 	default:
-		return ast.NewStringLabel(e.ctx.IndexToString(int64(x)))
+		return ast.NewStringLabel(f.StringValue())
 	}
 }
 
@@ -68,13 +68,13 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 // For now, as this only can occur when the InlineImports feature is used,
 // we use this simpler approach.
 func (e *exporter) identString(f adt.Feature) string {
-	s := f.IdentString(e.ctx)
+	s := f.IdentString()
 
 	if !f.IsHidden() || !e.cfg.InlineImports {
 		return s
 	}
 
-	pkg := f.PkgID(e.ctx)
+	pkg := f.PkgID()
 	if pkg == "" || pkg == "_" || pkg == e.pkgID {
 		return s
 	}

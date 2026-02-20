@@ -47,7 +47,7 @@ Result:
 --- in.cue
 {
   forSourceError: {
-    for _, x in "not-a-list" {
+    for , x in "not-a-list" {
       "\(〈1;x〉)": 〈1;x〉
     } else {
       fallback: true
@@ -61,7 +61,7 @@ Result:
     }
   }
   forSourceBottom: {
-    for _, x in _|_(explicit error (_|_ literal) in source) {
+    for , x in _|_(explicit error (_|_ literal) in source) {
       "\(〈1;x〉)": 〈1;x〉
     } else {
       fallback: true

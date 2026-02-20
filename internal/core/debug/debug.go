@@ -47,33 +47,33 @@ type Config struct {
 }
 
 // AppendNode writes a string representation of the node to w.
-func AppendNode(dst []byte, i adt.StringIndexer, n adt.Node, config *Config) []byte {
+func AppendNode(dst []byte, n adt.Node, config *Config) []byte {
 	if config == nil {
 		config = &Config{}
 	}
-	p := printer{dst: dst, index: i, cfg: config, compact: config.Compact}
+	p := printer{dst: dst, cfg: config, compact: config.Compact, letIDs: map[int]int{}}
 	p.node(n)
 	return p.dst
 }
 
 // NodeString returns a string representation of the given node.
-// The StringIndexer value i is used to translate elements of n to strings.
-// Commonly available implementations of StringIndexer include *adt.OpContext
-// and *runtime.Runtime.
-func NodeString(i adt.StringIndexer, n adt.Node, config *Config) string {
+func NodeString(n adt.Node, config *Config) string {
 	var buf [128]byte
-	return string(AppendNode(buf[:0], i, n, config))
+	return string(AppendNode(buf[:0], n, config))
 }
 
 type printer struct {
 	dst     []byte
-	index   adt.StringIndexer
 	indent  string
 	cfg     *Config
 	compact bool // copied from config.Compact
 
 	// keep track of vertices to avoid cycles.
 	stack []*adt.Vertex
+
+	// letIDs maps let label unique IDs to deterministic sequential
+	// display numbers, assigned in order of first appearance during printing.
+	letIDs map[int]int
 
 	// modes:
 	// - show vertex
@@ -88,13 +88,11 @@ type printer struct {
 // detection.
 func (w *printer) ReplaceArg(arg any) (replacement any, replaced bool) {
 	var x adt.Node
-	var r adt.Runtime
 	switch v := arg.(type) {
 	case adt.Node:
 		x = v
 	case adt.Formatter:
 		x = v.X
-		r = v.R
 	case errors.Error:
 		// Wrap errors to ensure they are formatted with our printer,
 		// which enables cycle detection in nested error formatting.
@@ -107,23 +105,22 @@ func (w *printer) ReplaceArg(arg any) (replacement any, replaced bool) {
 	case *adt.Vertex:
 		// We replace the formatter (or node) with our own formatter that is
 		// capable of detecting cycles.
-		return formatter{p: w, x: x, r: r}, true
+		return formatter{p: w, x: x}, true
 	}
 }
 
 type formatter struct {
 	p *printer
 	x adt.Node
-	r adt.Runtime ``
 }
 
 func (f formatter) String() string {
 	p := printer{
 		dst:     make([]byte, 0, 128),
-		index:   f.r,
 		cfg:     f.p.cfg,
 		compact: true, // Always compact for error arguments.
 		stack:   f.p.stack,
+		letIDs:  f.p.letIDs,
 	}
 	p.node(f.x)
 	return string(p.dst)
@@ -155,28 +152,32 @@ func (w *printer) int(i int64) {
 func (w *printer) label(f adt.Feature) {
 	switch {
 	case f.IsHidden():
-		ident := f.IdentString(w.index)
-		if pkgName := f.PkgID(w.index); pkgName != "_" {
+		ident := f.IdentString()
+		if pkgName := f.PkgID(); pkgName != "_" {
 			ident = fmt.Sprintf("%s(%s)", ident, pkgName)
 		}
 		w.string(ident)
 
 	case f.IsLet():
-		ident := f.RawString(w.index)
-		ident = strings.Replace(ident, "\x00", "#", 1)
-		w.string(ident)
+		id := f.Index()
+		displayNum, ok := w.letIDs[id]
+		if !ok {
+			displayNum = len(w.letIDs)
+			w.letIDs[id] = displayNum
+		}
+		w.string(fmt.Sprintf("%s#%x", f.IdentString(), displayNum))
 
 	default:
-		w.string(f.SelectorString(w.index))
+		w.string(f.SelectorString())
 	}
 }
 
 func (w *printer) ident(f adt.Feature) {
-	w.string(f.IdentString(w.index))
+	w.string(f.IdentString())
 }
 
 func (w *printer) path(v *adt.Vertex) {
-	if p := v.Parent; p != nil && p.Label != 0 {
+	if p := v.Parent; p != nil && p.Label.IsValid() {
 		w.path(v.Parent)
 		w.string(".")
 	}
@@ -646,7 +647,7 @@ func (w *printer) node(n adt.Node) {
 		w.string(")")
 
 	case *adt.Builtin:
-		if x.Package != 0 {
+		if x.Package.IsValid() {
 			w.label(x.Package)
 			w.string(".")
 		}

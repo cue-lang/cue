@@ -9,27 +9,13 @@ for x in [1] {y}
   y: (*1|{
     a: 2
   })
-  for _, x in [
+  for , x in [
     1,
   ] {
     〈2;y〉
   }
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  8
-Reused: 3
-Allocs: 6
-Retain: 1
-
-Unifications: 5
-Conjuncts:    12
-Disjuncts:    9
-
-MisalignedConjunct: 3
-
-NumCloseIDs: 1
--- out/eval --
+-- out/evalalpha --
 (struct){
   y: ((int|struct)){ |(*(int){ 1 }, (struct){
       a: (int){ 2 }

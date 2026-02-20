@@ -96,7 +96,7 @@ issue1972: {
       2,
       3,
     ]
-    for _, x in 〈0;list〉 if 〈2;a〉.d {
+    for , x in 〈0;list〉 if 〈2;a〉.d {
       〈1;x〉
     }
   }
@@ -121,7 +121,7 @@ issue1972: {
         bar: _
       }
       foo: [
-        for _, a in 〈1;s〉 if (〈0;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+        for , a in 〈1;s〉 if (〈0;a〉.b != _|_(explicit error (_|_ literal) in source)) {
           〈1;a〉
         },
       ]
@@ -146,20 +146,6 @@ issue1972: {
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  43
-Reused: 35
-Allocs: 8
-Retain: 14
-
-Unifications: 33
-Conjuncts:    66
-Disjuncts:    57
-
-MisalignedConjunct: 2
-
-NumCloseIDs: 7
 -- out/evalalpha --
 Errors:
 issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
@@ -298,86 +284,3 @@ diff old new
 issue1972: "field not allowed" are somewhat correct (it is also a list), but
 are already covered by the other error message and should be elided.
 This may lead to a large number of errors otherwise.
--- out/eval --
-Errors:
-issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-    ./in.cue:54:12
-    ./in.cue:61:8
-wrongConcreteType: cannot use 2 (type int) as type bool:
-    ./in.cue:4:2
-    ./in.cue:1:8
-wrongType: cannot use int (type int) as type bool:
-    ./in.cue:10:2
-    ./in.cue:1:14
-issue1972.err1: invalid list index someCondition (type string):
-    ./in.cue:65:6
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    b: (int){ 2 }
-    c: (int){ int }
-  }
-  wrongConcreteType: (_|_){
-    // [eval] wrongConcreteType: cannot use 2 (type int) as type bool:
-    //     ./in.cue:4:2
-    //     ./in.cue:1:8
-  }
-  wrongType: (_|_){
-    // [eval] wrongType: cannot use int (type int) as type bool:
-    //     ./in.cue:10:2
-    //     ./in.cue:1:14
-  }
-  incomplete: (_|_){
-    // [incomplete] incomplete: undefined field: d:
-    //     ./in.cue:16:7
-    // incomplete: undefined field: d:
-    //     ./in.cue:23:21
-    list: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-    }
-  }
-  useDefault: (struct){
-    a: (struct){
-      x: (string){ |(*(string){ "foo" }, (string){ string }) }
-      y: (string){ |(*(string){ "foo" }, (string){ string }) }
-    }
-    issue809: (struct){
-      #A: (#struct){
-        a: (string){ string }
-        b: (string){ string }
-      }
-      s: (struct){
-        bar: (#struct){
-          a: (string){ "bar" }
-          b: (string){ |(*(string){ "bar" }, (string){ string }) }
-        }
-      }
-      foo: (#list){
-        0: (#struct){
-          a: (string){ "bar" }
-          b: (string){ |(*(string){ "bar" }, (string){ string }) }
-        }
-      }
-    }
-  }
-  issue1972: (_|_){
-    // [eval]
-    err1: (_|_){
-      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-      //     ./in.cue:54:12
-      //     ./in.cue:61:8
-      // issue1972.err1: invalid list index someCondition (type string):
-      //     ./in.cue:65:6
-      #patchs: (#list){
-      }
-      someCondition: (_){ _ }
-      patchs: (list){
-      }
-      #someCondition: (_){ _ }
-    }
-  }
-}

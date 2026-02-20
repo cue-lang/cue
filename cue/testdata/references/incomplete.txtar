@@ -29,19 +29,40 @@ incompleteIndex: {
 	top: _
 	a:   [1][top]
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  17
-Reused: 14
-Allocs: 4
-Retain: 1
-
-Unifications: 18
-Conjuncts:    26
-Disjuncts:    18
-
-NumCloseIDs: 2
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  comprehensions: {
+    a: {}
+    b: {
+      if 〈1;a〉.b {}
+    }
+    c: {
+      for , x in 〈1;a〉.b {
+        〈1;x〉
+      }
+    }
+  }
+  openStruct: {
+    a: {}
+    b: 〈0;a〉.c
+  }
+  selectFromTop: {
+    top: _
+    a: 〈0;top〉.foo
+  }
+  indexOnTop: {
+    top: _
+    a: 〈0;top〉[2]
+  }
+  incompleteIndex: {
+    top: _
+    a: [
+      1,
+    ][〈0;top〉]
+  }
+}
+-- out/evalalpha --
 Errors:
 incompleteIndex.a: invalid index top (invalid type _):
     ./in.cue:29:7
@@ -92,38 +113,5 @@ Result:
       //     ./in.cue:29:7
       //     ./in.cue:29:11
     }
-  }
-}
--- out/compile --
---- in.cue
-{
-  comprehensions: {
-    a: {}
-    b: {
-      if 〈1;a〉.b {}
-    }
-    c: {
-      for _, x in 〈1;a〉.b {
-        〈1;x〉
-      }
-    }
-  }
-  openStruct: {
-    a: {}
-    b: 〈0;a〉.c
-  }
-  selectFromTop: {
-    top: _
-    a: 〈0;top〉.foo
-  }
-  indexOnTop: {
-    top: _
-    a: 〈0;top〉[2]
-  }
-  incompleteIndex: {
-    top: _
-    a: [
-      1,
-    ][〈0;top〉]
   }
 }

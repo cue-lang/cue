@@ -58,21 +58,58 @@ issue560: {
 		tags_str: "b {c}"
 	}
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  29
-Reused: 24
-Allocs: 6
-Retain: 1
-
-Unifications: 30
-Conjuncts:    38
-Disjuncts:    30
-
-MisalignedConjunct: 3
-
-NumCloseIDs: 5
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  dynamic: {
+    for , s in [
+      "foo",
+    ] {
+      〈1;s〉: 1
+      "\(〈1;s〉)bar": 2
+    }
+  }
+  ignoreOptional: {
+    #x: {
+      a?: string
+      b?: string
+      c: string
+    }
+    y: {
+      for k, v in 〈1;#x〉 {
+        〈1;k〉: "exists"
+      }
+    }
+  }
+  missingRequiredError: {
+    #x: {
+      a!: string
+      b?: string
+      c: string
+    }
+    y: {
+      for k, v in 〈1;#x〉 {
+        〈1;k〉: "exists"
+      }
+    }
+  }
+  issue560: {
+    #User: {
+      tags_str: string
+      tags_map: {
+        for k, v in 〈import;strings〉.Split(〈1;tags_str〉, " ") {
+          "\(〈1;v〉)": string
+        }
+        "{a}": string
+      }
+    }
+    user: {
+      〈1;#User〉
+      tags_str: "b {c}"
+    }
+  }
+}
+-- out/evalalpha --
 (struct){
   dynamic: (struct){
     foo: (int){ 1 }
@@ -118,57 +155,6 @@ NumCloseIDs: 5
         b: (string){ string }
         "{c}": (string){ string }
       }
-    }
-  }
-}
--- out/compile --
---- in.cue
-{
-  dynamic: {
-    for _, s in [
-      "foo",
-    ] {
-      〈1;s〉: 1
-      "\(〈1;s〉)bar": 2
-    }
-  }
-  ignoreOptional: {
-    #x: {
-      a?: string
-      b?: string
-      c: string
-    }
-    y: {
-      for k, v in 〈1;#x〉 {
-        〈1;k〉: "exists"
-      }
-    }
-  }
-  missingRequiredError: {
-    #x: {
-      a!: string
-      b?: string
-      c: string
-    }
-    y: {
-      for k, v in 〈1;#x〉 {
-        〈1;k〉: "exists"
-      }
-    }
-  }
-  issue560: {
-    #User: {
-      tags_str: string
-      tags_map: {
-        for k, v in 〈import;strings〉.Split(〈1;tags_str〉, " ") {
-          "\(〈1;v〉)": string
-        }
-        "{a}": string
-      }
-    }
-    user: {
-      〈1;#User〉
-      tags_str: "b {c}"
     }
   }
 }

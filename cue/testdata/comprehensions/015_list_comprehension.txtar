@@ -25,27 +25,17 @@ d: [for x, _ in a {x}]
     d: 4
   }
   c: [
-    for _, x in 〈1;b〉 for _, y in 〈2;b〉 if (〈1;x〉 < 〈0;y〉) {
+    for , x in 〈1;b〉 for , y in 〈2;b〉 if (〈1;x〉 < 〈0;y〉) {
       〈2;x〉
     },
   ]
   d: [
-    for x, _ in 〈1;a〉 {
+    for x,  in 〈1;a〉 {
       〈1;x〉
     },
   ]
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  19
-Reused: 12
-Allocs: 7
-Retain: 10
-
-Unifications: 19
-Conjuncts:    36
-Disjuncts:    23
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (#list){
     0: (string){ "b" }

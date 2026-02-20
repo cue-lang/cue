@@ -130,16 +130,16 @@ NumCloseIDs: 12
         // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
         //     ./in.cue:13:21
         //     ./in.cue:8:11
-        let characters#1 = (_|_){
+        let characters#0 = (_|_){
           // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
           //     ./in.cue:13:21
           //     ./in.cue:8:11
         }
-        let unique_combinations#2 = (_|_){
+        let unique_combinations#1 = (_|_){
           // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
           //     ./in.cue:13:21
           //     ./in.cue:8:11
-          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+          let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         }
       }
     }
@@ -155,7 +155,7 @@ NumCloseIDs: 12
         // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
         //     ./in.cue:16:36
         //     ./in.cue:11:11
-        let characters#1 = (#list){
+        let characters#0 = (#list){
           0: (string){ "m" }
           1: (string){ "j" }
           2: (string){ "q" }
@@ -187,11 +187,11 @@ NumCloseIDs: 12
           28: (string){ "l" }
           29: (string){ "b" }
         }
-        let unique_combinations#2 = (_|_){
+        let unique_combinations#1 = (_|_){
           // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
           //     ./in.cue:16:36
           //     ./in.cue:11:11
-          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+          let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         }
       }
     }
@@ -199,7 +199,7 @@ NumCloseIDs: 12
   output: (struct){
     "1": (string){
       "7"
-      let characters#1 = (#list){
+      let characters#0 = (#list){
         0: (string){ "m" }
         1: (string){ "j" }
         2: (string){ "q" }
@@ -231,8 +231,8 @@ NumCloseIDs: 12
         28: (string){ "l" }
         29: (string){ "b" }
       }
-      let unique_combinations#2 = (#struct){
-        let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+      let unique_combinations#1 = (#struct){
+        let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         "7": (#list){
           0: (string){ "j" }
           1: (string){ "p" }
@@ -381,7 +381,7 @@ NumCloseIDs: 12
     }
     "2": (string){
       "19"
-      let characters#1 = (#list){
+      let characters#0 = (#list){
         0: (string){ "m" }
         1: (string){ "j" }
         2: (string){ "q" }
@@ -413,8 +413,8 @@ NumCloseIDs: 12
         28: (string){ "l" }
         29: (string){ "b" }
       }
-      let unique_combinations#2 = (#struct){
-        let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+      let unique_combinations#1 = (#struct){
+        let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         "19": (#list){
           0: (string){ "q" }
           1: (string){ "m" }
@@ -535,10 +535,15 @@ NumCloseIDs: 12
 diff old new
 --- old
 +++ new
-@@ -12,13 +12,11 @@
-           //     ./in.cue:13:21
-           //     ./in.cue:8:11
-         }
+@@ -7,18 +7,16 @@
+         // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
+         //     ./in.cue:13:21
+         //     ./in.cue:8:11
+-        let characters#1 = (_|_){
+-          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
+-          //     ./in.cue:13:21
+-          //     ./in.cue:8:11
+-        }
 -        let unique_combinations#2multi = {
 -          for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
 -            let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
@@ -546,14 +551,28 @@ diff old new
 -              "\((〈2;i〉 + 1))": 〈1;let combination#3〉
 -            }
 -          }
-+        let unique_combinations#2 = (_|_){
++        let characters#0 = (_|_){
 +          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
 +          //     ./in.cue:13:21
 +          //     ./in.cue:8:11
-+          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
++        }
++        let unique_combinations#1 = (_|_){
++          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
++          //     ./in.cue:13:21
++          //     ./in.cue:8:11
++          let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
          }
        }
      }
+@@ -34,7 +32,7 @@
+         // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
+         //     ./in.cue:16:36
+         //     ./in.cue:11:11
+-        let characters#1 = (#list){
++        let characters#0 = (#list){
+           0: (string){ "m" }
+           1: (string){ "j" }
+           2: (string){ "q" }
 @@ -66,13 +64,11 @@
            28: (string){ "l" }
            29: (string){ "b" }
@@ -565,26 +584,90 @@ diff old new
 -              "\((〈2;i〉 + 1))": 〈1;let combination#3〉
 -            }
 -          }
-+        let unique_combinations#2 = (_|_){
++        let unique_combinations#1 = (_|_){
 +          // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
 +          //     ./in.cue:16:36
 +          //     ./in.cue:11:11
-+          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
++          let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
          }
        }
      }
-@@ -112,12 +108,151 @@
-         28: (string){ "l" }
-         29: (string){ "b" }
-       }
+@@ -80,87 +76,333 @@
+   output: (struct){
+     "1": (string){
+       "7"
+-      let characters#1 = (#list){
+-        0: (string){ "m" }
+-        1: (string){ "j" }
+-        2: (string){ "q" }
+-        3: (string){ "j" }
+-        4: (string){ "p" }
+-        5: (string){ "q" }
+-        6: (string){ "m" }
+-        7: (string){ "g" }
+-        8: (string){ "b" }
+-        9: (string){ "l" }
+-        10: (string){ "j" }
+-        11: (string){ "s" }
+-        12: (string){ "p" }
+-        13: (string){ "h" }
+-        14: (string){ "d" }
+-        15: (string){ "z" }
+-        16: (string){ "t" }
+-        17: (string){ "n" }
+-        18: (string){ "v" }
+-        19: (string){ "j" }
+-        20: (string){ "f" }
+-        21: (string){ "q" }
+-        22: (string){ "w" }
+-        23: (string){ "r" }
+-        24: (string){ "c" }
+-        25: (string){ "g" }
+-        26: (string){ "s" }
+-        27: (string){ "m" }
+-        28: (string){ "l" }
+-        29: (string){ "b" }
+-      }
 -      let unique_combinations#2multi = {
 -        for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
 -          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
 -          if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
 -            "\((〈2;i〉 + 1))": 〈1;let combination#3〉
 -          }
-+      let unique_combinations#2 = (#struct){
-+        let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
++      let characters#0 = (#list){
++        0: (string){ "m" }
++        1: (string){ "j" }
++        2: (string){ "q" }
++        3: (string){ "j" }
++        4: (string){ "p" }
++        5: (string){ "q" }
++        6: (string){ "m" }
++        7: (string){ "g" }
++        8: (string){ "b" }
++        9: (string){ "l" }
++        10: (string){ "j" }
++        11: (string){ "s" }
++        12: (string){ "p" }
++        13: (string){ "h" }
++        14: (string){ "d" }
++        15: (string){ "z" }
++        16: (string){ "t" }
++        17: (string){ "n" }
++        18: (string){ "v" }
++        19: (string){ "j" }
++        20: (string){ "f" }
++        21: (string){ "q" }
++        22: (string){ "w" }
++        23: (string){ "r" }
++        24: (string){ "c" }
++        25: (string){ "g" }
++        26: (string){ "s" }
++        27: (string){ "m" }
++        28: (string){ "l" }
++        29: (string){ "b" }
++      }
++      let unique_combinations#1 = (#struct){
++        let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
 +        "7": (#list){
 +          0: (string){ "j" }
 +          1: (string){ "p" }
@@ -731,18 +814,80 @@ diff old new
          }
        }
      }
-@@ -155,12 +290,119 @@
-         28: (string){ "l" }
-         29: (string){ "b" }
-       }
+     "2": (string){
+       "19"
+-      let characters#1 = (#list){
+-        0: (string){ "m" }
+-        1: (string){ "j" }
+-        2: (string){ "q" }
+-        3: (string){ "j" }
+-        4: (string){ "p" }
+-        5: (string){ "q" }
+-        6: (string){ "m" }
+-        7: (string){ "g" }
+-        8: (string){ "b" }
+-        9: (string){ "l" }
+-        10: (string){ "j" }
+-        11: (string){ "s" }
+-        12: (string){ "p" }
+-        13: (string){ "h" }
+-        14: (string){ "d" }
+-        15: (string){ "z" }
+-        16: (string){ "t" }
+-        17: (string){ "n" }
+-        18: (string){ "v" }
+-        19: (string){ "j" }
+-        20: (string){ "f" }
+-        21: (string){ "q" }
+-        22: (string){ "w" }
+-        23: (string){ "r" }
+-        24: (string){ "c" }
+-        25: (string){ "g" }
+-        26: (string){ "s" }
+-        27: (string){ "m" }
+-        28: (string){ "l" }
+-        29: (string){ "b" }
+-      }
 -      let unique_combinations#2multi = {
 -        for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
 -          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
 -          if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
 -            "\((〈2;i〉 + 1))": 〈1;let combination#3〉
 -          }
-+      let unique_combinations#2 = (#struct){
-+        let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
++      let characters#0 = (#list){
++        0: (string){ "m" }
++        1: (string){ "j" }
++        2: (string){ "q" }
++        3: (string){ "j" }
++        4: (string){ "p" }
++        5: (string){ "q" }
++        6: (string){ "m" }
++        7: (string){ "g" }
++        8: (string){ "b" }
++        9: (string){ "l" }
++        10: (string){ "j" }
++        11: (string){ "s" }
++        12: (string){ "p" }
++        13: (string){ "h" }
++        14: (string){ "d" }
++        15: (string){ "z" }
++        16: (string){ "t" }
++        17: (string){ "n" }
++        18: (string){ "v" }
++        19: (string){ "j" }
++        20: (string){ "f" }
++        21: (string){ "q" }
++        22: (string){ "w" }
++        23: (string){ "r" }
++        24: (string){ "c" }
++        25: (string){ "g" }
++        26: (string){ "s" }
++        27: (string){ "m" }
++        28: (string){ "l" }
++        29: (string){ "b" }
++      }
++      let unique_combinations#1 = (#struct){
++        let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
 +        "19": (#list){
 +          0: (string){ "q" }
 +          1: (string){ "m" }
@@ -1037,17 +1182,17 @@ let unique_combinations: not marked as multi. Seems benign, but should be fixed.
     marker: {
       length: int
       position: {
-        let characters#1 = 〈import;strings〉.Split(〈2;message〉, "")
-        let unique_combinations#2multi = {
-          for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
-            let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
-            if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
-              "\((〈2;i〉 + 1))": 〈1;let combination#3〉
+        let characters#0 = 〈import;strings〉.Split(〈2;message〉, "")
+        let unique_combinations#1multi = {
+          for i, _ in 〈1;let characters#0〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
+            let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+            if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
+              "\((〈2;i〉 + 1))": 〈1;let combination#2〉
             }
           }
         }
         [
-          for i, _ in 〈1;let unique_combinations#2〉 {
+          for i, _ in 〈1;let unique_combinations#1〉 {
             〈1;i〉
           },
         ][0]

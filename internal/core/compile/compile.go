@@ -114,7 +114,7 @@ type compiler struct {
 
 	upCountOffset int32 // 1 for files; 0 for expressions
 
-	index adt.StringIndexer
+	index adt.Runtime
 
 	experiments cueexperiment.File
 
@@ -312,7 +312,7 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	// TODO: set doc.
 	res := &adt.Vertex{}
 
-	// env := &adt.Environment{Vertex: nil} // runtime: c.runtime
+	// env := &adt.Environment{Vertex: nil} // runtime: c.index
 
 	env := &adt.Environment{}
 	top := env
@@ -390,7 +390,7 @@ func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
 		if !c.experiments.AliasV2 {
 			return c.errf(src, "%s %q requires @experiment(aliasv2)", kind, name)
 		}
-		x.Label = adt.MakeStringLabel(c.index, name)
+		x.Label = adt.MakeStringLabel(name)
 		return n
 	}
 
@@ -421,7 +421,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 	// X in import X "path"
 	if imp, ok := n.Node.(*ast.ImportSpec); ok {
 		importPath := c.label(imp.Path)
-		importPathStr := importPath.StringValue(c.index)
+		importPathStr := importPath.StringValue()
 		inst := c.inst.LookupImport(importPathStr)
 		if inst == nil && !isStdlibPackage(importPathStr) {
 			// It's an external package, which should be mentioned in [build.Instance.Imports].
@@ -458,7 +458,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		for p := c.Scope; p != nil; p = p.Parent() {
 			for _, a := range p.Vertex().Arcs {
 				switch {
-				case a.Label.IsLet() && a.Label.IdentString(c.index) == n.Name:
+				case a.Label.IsLet() && a.Label.IdentString() == n.Name:
 					label = a.Label
 				case a.Label == label:
 					return &adt.FieldReference{
@@ -477,7 +477,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 				// imports, so we can leave the Instance field nil.
 				return &adt.ImportReference{
 					Src:        n,
-					ImportPath: adt.MakeStringLabel(c.index, pkgPath),
+					ImportPath: adt.MakeStringLabel(pkgPath),
 					Label:      c.label(n),
 				}
 			}
@@ -712,7 +712,7 @@ func (c *compiler) markAlias(d ast.Decl) {
 			label:   (*letScope)(x),
 			srcExpr: x.Expr,
 			source:  x,
-			feature: adt.MakeLetLabel(c.index, x.Ident.Name),
+			feature: adt.MakeLetLabel(x.Ident.Name),
 		}
 		c.insertAlias(x.Ident, a)
 

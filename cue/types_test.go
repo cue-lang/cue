@@ -4172,9 +4172,8 @@ func exprStr(v cue.Value) string {
 }
 
 func compactRawStr(v cue.Value) string {
-	ctx := cue.ValueCtx(v)
 	cfg := &debug.Config{Compact: true, Raw: true}
-	return debug.NodeString(ctx, cue.ValueVertex(v), cfg)
+	return debug.NodeString(cue.ValueVertex(v), cfg)
 }
 
 func TestIsClosed(t *testing.T) {

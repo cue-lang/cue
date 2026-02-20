@@ -127,7 +127,7 @@ Result:
     }
     inlineLet: (struct){
       #NetworkID: (int){ 1 }
-      let p#1 = (_|_){
+      let p#0 = (_|_){
         // [eval]
         x: (_|_){
           // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
@@ -200,13 +200,13 @@ Result:
   issue3977: {
     inlineLet: {
       #NetworkID: 1
-      let p#1 = ({
+      let p#0 = ({
         x: 〈1;#NetworkID〉
         out: (〈0;x〉 + 10)
       } & {
         x: 2
       })
-      err: 〈0;let p#1〉.out
+      err: 〈0;let p#0〉.out
     }
   }
 }

@@ -182,42 +182,42 @@ indirectReference.y: conflicting values 3 and 1:
 Result:
 (_|_){
   // [eval]
-  let A#1 = (int){ 9 }
-  let B#2 = (int){ 18 }
-  let C#3 = (int){ 36 }
-  let D#4 = (int){ 72 }
-  let E#5 = (int){ 144 }
-  let F#6 = (int){ 288 }
+  let A#0 = (int){ 9 }
+  let B#1 = (int){ 18 }
+  let C#2 = (int){ 36 }
+  let D#3 = (int){ 72 }
+  let E#4 = (int){ 144 }
+  let F#5 = (int){ 288 }
   b: (struct){
-    let G#7 = (int){ 576 }
-    let H#8 = (int){ 1152 }
-    let I#9 = (int){ 2304 }
-    let J#A = (int){ 4608 }
-    let K#B = (int){ 9216 }
-    let L#C = (int){ 18432 }
-    let M#D = (int){ 36864 }
-    let N#E = (int){ 73728 }
-    let O#F = (int){ 147456 }
-    let P#10 = (int){ 294912 }
-    let Q#11 = (int){ 589824 }
-    let R#12 = (int){ 1179648 }
-    let S#13 = (int){ 2359296 }
-    let T#14 = (int){ 4718592 }
+    let G#6 = (int){ 576 }
+    let H#7 = (int){ 1152 }
+    let I#8 = (int){ 2304 }
+    let J#9 = (int){ 4608 }
+    let K#a = (int){ 9216 }
+    let L#b = (int){ 18432 }
+    let M#c = (int){ 36864 }
+    let N#d = (int){ 73728 }
+    let O#e = (int){ 147456 }
+    let P#f = (int){ 294912 }
+    let Q#10 = (int){ 589824 }
+    let R#11 = (int){ 1179648 }
+    let S#12 = (int){ 2359296 }
+    let T#13 = (int){ 4718592 }
     a: (int){ 4718592 }
     b: (int){ 288 }
   }
   issue1828: (struct){
     volumes: (struct){
     }
-    let L3#15 = (struct){
+    let L3#14 = (struct){
     }
-    let L2#16 = (#list){
+    let L2#15 = (#list){
     }
-    let L1#17 = (#list){
+    let L1#16 = (#list){
     }
   }
   ignoreErrorInLet: (struct){
-    let X#18 = (_|_){
+    let X#17 = (_|_){
       // [eval] ignoreErrorInLet.X: conflicting values 2 and 1:
       //     ./in.cue:37:10
       //     ./in.cue:37:14
@@ -233,15 +233,15 @@ Result:
     c: (#list){
       0: (int){
         4
-        let X#19 = (int){ 4 }
+        let X#18 = (int){ 4 }
       }
       1: (int){
         8
-        let X#19 = (int){ 8 }
+        let X#18 = (int){ 8 }
       }
       2: (int){
         12
-        let X#19 = (int){ 12 }
+        let X#18 = (int){ 12 }
       }
     }
   }
@@ -251,7 +251,7 @@ Result:
       1: (int){ 2 }
       2: (int){ 3 }
     }
-    let Y#1Amulti = (〈1;v〉 * 4)
+    let Y#19multi = (〈1;v〉 * 4)
     "0": (int){ 4 }
     "1": (int){ 8 }
     "2": (int){ 12 }
@@ -262,7 +262,7 @@ Result:
       1: (int){ 2 }
       2: (int){ 3 }
     }
-    let Y#1Bmulti = 〈1;X〉
+    let Y#1amulti = 〈1;X〉
     "0": (int){ 4 }
     "1": (int){ 8 }
     "2": (int){ 12 }
@@ -274,7 +274,7 @@ Result:
       1: (int){ 2 }
       2: (int){ 3 }
     }
-    let Y#1Cmulti = 〈1;X〉
+    let Y#1bmulti = 〈1;X〉
     "0": (int){ 2 }
     "1": (int){ 2 }
     "2": (int){ 2 }
@@ -300,7 +300,7 @@ Result:
       //     ./incomprehension.cue:43:2
       //     ./incomprehension.cue:44:6
     }
-    let X#1Dmulti = (〈0;y〉 * 4)
+    let X#1cmulti = (〈0;y〉 * 4)
     "0": (_|_){
       // [eval] indirectReference.y: conflicting values 2 and 1:
       //     ./incomprehension.cue:41:20
@@ -345,22 +345,22 @@ Result:
     }
   }
   nestedFor: (struct){
-    let X#1Emulti = {
+    let X#1dmulti = {
       for _, x in [
         1,
         2,
       ] {
-        let X#1Fmulti = 〈1;x〉
-        "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+        let X#1emulti = 〈1;x〉
+        "\(〈0;let X#1e〉)": 〈0;let X#1e〉
       }
     }
     "0": (struct){
-      let X#1Fmulti = 〈1;x〉
+      let X#1emulti = 〈1;x〉
       "1": (int){ 1 }
       "2": (int){ 2 }
     }
     "1": (struct){
-      let X#1Fmulti = 〈1;x〉
+      let X#1emulti = 〈1;x〉
       "1": (int){ 1 }
       "2": (int){ 2 }
     }
@@ -380,7 +380,7 @@ Result:
       ec: (struct){
       }
       bs: (struct){
-        let m#21 = (_|_){
+        let m#1f = (_|_){
           // [incomplete] keepDescending.t1.bs.m: undefined field: b:
           //     ./issue2063.cue:10:14
         }
@@ -394,7 +394,7 @@ Result:
       ec: (struct){
       }
       bs: (struct){
-        let m#22 = (_|_){
+        let m#20 = (_|_){
           // [incomplete] keepDescending.t2.bs.m: undefined field: b:
           //     ./issue2063.cue:21:14
         }
@@ -409,7 +409,7 @@ Result:
       a: (string){ "d" }
       b: (string){ "e" }
     }
-    let T#23multi = 〈1;v〉
+    let T#21multi = 〈1;v〉
     e: (string){ "1" }
     d: (string){ "1" }
   }
@@ -426,7 +426,7 @@ Result:
     }
   }
   disabled_parent_test: (struct){
-    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+    let parent_config#22multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
     CHILD1: (struct){
       parent_config: (bool){ false }
     }
@@ -452,12 +452,119 @@ diff old new
      ./incomprehension.cue:42:7
      ./incomprehension.cue:42:13
      ./incomprehension.cue:43:2
+@@ -13,27 +15,27 @@
+ Result:
+ (_|_){
+   // [eval]
+-  let A#1 = (int){ 9 }
+-  let B#2 = (int){ 18 }
+-  let C#3 = (int){ 36 }
+-  let D#4 = (int){ 72 }
+-  let E#5 = (int){ 144 }
+-  let F#6 = (int){ 288 }
++  let A#0 = (int){ 9 }
++  let B#1 = (int){ 18 }
++  let C#2 = (int){ 36 }
++  let D#3 = (int){ 72 }
++  let E#4 = (int){ 144 }
++  let F#5 = (int){ 288 }
+   b: (struct){
+-    let G#7 = (int){ 576 }
+-    let H#8 = (int){ 1152 }
+-    let I#9 = (int){ 2304 }
+-    let J#A = (int){ 4608 }
+-    let K#B = (int){ 9216 }
+-    let L#C = (int){ 18432 }
+-    let M#D = (int){ 36864 }
+-    let N#E = (int){ 73728 }
+-    let O#F = (int){ 147456 }
+-    let P#10 = (int){ 294912 }
+-    let Q#11 = (int){ 589824 }
+-    let R#12 = (int){ 1179648 }
+-    let S#13 = (int){ 2359296 }
+-    let T#14 = (int){ 4718592 }
++    let G#6 = (int){ 576 }
++    let H#7 = (int){ 1152 }
++    let I#8 = (int){ 2304 }
++    let J#9 = (int){ 4608 }
++    let K#a = (int){ 9216 }
++    let L#b = (int){ 18432 }
++    let M#c = (int){ 36864 }
++    let N#d = (int){ 73728 }
++    let O#e = (int){ 147456 }
++    let P#f = (int){ 294912 }
++    let Q#10 = (int){ 589824 }
++    let R#11 = (int){ 1179648 }
++    let S#12 = (int){ 2359296 }
++    let T#13 = (int){ 4718592 }
+     a: (int){ 4718592 }
+     b: (int){ 288 }
+   }
+@@ -40,15 +42,15 @@
+   issue1828: (struct){
+     volumes: (struct){
+     }
+-    let L3#15 = (struct){
+-    }
+-    let L2#16 = (#list){
+-    }
+-    let L1#17 = (#list){
++    let L3#14 = (struct){
++    }
++    let L2#15 = (#list){
++    }
++    let L1#16 = (#list){
+     }
+   }
+   ignoreErrorInLet: (struct){
+-    let X#18 = (_|_){
++    let X#17 = (_|_){
+       // [eval] ignoreErrorInLet.X: conflicting values 2 and 1:
+       //     ./in.cue:37:10
+       //     ./in.cue:37:14
+@@ -64,15 +66,15 @@
+     c: (#list){
+       0: (int){
+         4
+-        let X#19 = (int){ 4 }
++        let X#18 = (int){ 4 }
+       }
+       1: (int){
+         8
+-        let X#19 = (int){ 8 }
++        let X#18 = (int){ 8 }
+       }
+       2: (int){
+         12
+-        let X#19 = (int){ 12 }
++        let X#18 = (int){ 12 }
+       }
+     }
+   }
+@@ -82,7 +84,7 @@
+       1: (int){ 2 }
+       2: (int){ 3 }
+     }
+-    let Y#1Amulti = (〈1;v〉 * 4)
++    let Y#19multi = (〈1;v〉 * 4)
+     "0": (int){ 4 }
+     "1": (int){ 8 }
+     "2": (int){ 12 }
+@@ -93,7 +95,7 @@
+       1: (int){ 2 }
+       2: (int){ 3 }
+     }
+-    let Y#1Bmulti = 〈1;X〉
++    let Y#1amulti = 〈1;X〉
+     "0": (int){ 4 }
+     "1": (int){ 8 }
+     "2": (int){ 12 }
 @@ -105,7 +107,7 @@
        1: (int){ 2 }
        2: (int){ 3 }
      }
 -    let Y#1C = (int){ 2 }
-+    let Y#1Cmulti = 〈1;X〉
++    let Y#1bmulti = 〈1;X〉
      "0": (int){ 2 }
      "1": (int){ 2 }
      "2": (int){ 2 }
@@ -499,7 +606,7 @@ diff old new
 +      //     ./incomprehension.cue:43:2
 +      //     ./incomprehension.cue:44:6
 +    }
-+    let X#1Dmulti = (〈0;y〉 * 4)
++    let X#1cmulti = (〈0;y〉 * 4)
      "0": (_|_){
        // [eval] indirectReference.y: conflicting values 2 and 1:
 -      //     ./incomprehension.cue:42:7
@@ -555,10 +662,37 @@ diff old new
        //     ./incomprehension.cue:42:7
        //     ./incomprehension.cue:42:13
        //     ./incomprehension.cue:43:2
-@@ -199,6 +198,16 @@
-       "2": (int){ 2 }
+@@ -179,24 +178,34 @@
      }
    }
+   nestedFor: (struct){
+-    let X#1Emulti = {
++    let X#1dmulti = {
+       for _, x in [
+         1,
+         2,
+       ] {
+-        let X#1Fmulti = 〈1;x〉
+-        "\(〈0;let X#1F〉)": 〈0;let X#1F〉
++        let X#1emulti = 〈1;x〉
++        "\(〈0;let X#1e〉)": 〈0;let X#1e〉
+       }
+     }
+     "0": (struct){
+-      let X#1Fmulti = 〈1;x〉
++      let X#1emulti = 〈1;x〉
+       "1": (int){ 1 }
+       "2": (int){ 2 }
+     }
+     "1": (struct){
+-      let X#1Fmulti = 〈1;x〉
+-      "1": (int){ 1 }
+-      "2": (int){ 2 }
++      let X#1emulti = 〈1;x〉
++      "1": (int){ 1 }
++      "2": (int){ 2 }
++    }
++  }
 +  issue4022: (struct){
 +    full: (struct){
 +      envScript: (#list){
@@ -567,21 +701,48 @@ diff old new
 +      _env: (struct){
 +        KEY: (_){ |(*(string){ "" }, (_){ _ }) }
 +      }
-+    }
-+  }
+     }
+   }
    keepDescending: (struct){
-     t1: (struct){
+@@ -204,7 +213,7 @@
        ec: (struct){
-@@ -234,8 +243,8 @@
+       }
+       bs: (struct){
+-        let m#21 = (_|_){
++        let m#1f = (_|_){
+           // [incomplete] keepDescending.t1.bs.m: undefined field: b:
+           //     ./issue2063.cue:10:14
+         }
+@@ -218,7 +227,7 @@
+       ec: (struct){
+       }
+       bs: (struct){
+-        let m#22 = (_|_){
++        let m#20 = (_|_){
+           // [incomplete] keepDescending.t2.bs.m: undefined field: b:
+           //     ./issue2063.cue:21:14
+         }
+@@ -233,9 +242,9 @@
+       a: (string){ "d" }
        b: (string){ "e" }
      }
-     let T#23multi = 〈1;v〉
+-    let T#23multi = 〈1;v〉
 -    d: (string){ "1" }
++    let T#21multi = 〈1;v〉
      e: (string){ "1" }
 +    d: (string){ "1" }
    }
    _parent_configs: (struct){
      PARENT: (bool){ true }
+@@ -250,7 +259,7 @@
+     }
+   }
+   disabled_parent_test: (struct){
+-    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
++    let parent_config#22multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+     CHILD1: (struct){
+       parent_config: (bool){ false }
+     }
 -- out/evalalpha/stats --
 Leaks:  52
 Freed:  163
@@ -903,43 +1064,43 @@ Result:
 -- out/compile --
 --- in.cue
 {
-  let A#1 = (3 * 3)
-  let B#2 = (〈0;let A#1〉 + 〈0;let A#1〉)
-  let C#3 = (〈0;let B#2〉 + 〈0;let B#2〉)
-  let D#4 = (〈0;let C#3〉 + 〈0;let C#3〉)
-  let E#5 = (〈0;let D#4〉 + 〈0;let D#4〉)
-  let F#6 = (〈0;let E#5〉 + 〈0;let E#5〉)
+  let A#0 = (3 * 3)
+  let B#1 = (〈0;let A#0〉 + 〈0;let A#0〉)
+  let C#2 = (〈0;let B#1〉 + 〈0;let B#1〉)
+  let D#3 = (〈0;let C#2〉 + 〈0;let C#2〉)
+  let E#4 = (〈0;let D#3〉 + 〈0;let D#3〉)
+  let F#5 = (〈0;let E#4〉 + 〈0;let E#4〉)
   b: {
-    let G#7 = (〈1;let F#6〉 + 〈1;let F#6〉)
-    let H#8 = (〈0;let G#7〉 + 〈0;let G#7〉)
-    let I#9 = (〈0;let H#8〉 + 〈0;let H#8〉)
-    let J#A = (〈0;let I#9〉 + 〈0;let I#9〉)
-    let K#B = (〈0;let J#A〉 + 〈0;let J#A〉)
-    let L#C = (〈0;let K#B〉 + 〈0;let K#B〉)
-    let M#D = (〈0;let L#C〉 + 〈0;let L#C〉)
-    let N#E = (〈0;let M#D〉 + 〈0;let M#D〉)
-    let O#F = (〈0;let N#E〉 + 〈0;let N#E〉)
-    let P#10 = (〈0;let O#F〉 + 〈0;let O#F〉)
-    let Q#11 = (〈0;let P#10〉 + 〈0;let P#10〉)
-    let R#12 = (〈0;let Q#11〉 + 〈0;let Q#11〉)
-    let S#13 = (〈0;let R#12〉 + 〈0;let R#12〉)
-    let T#14 = (〈0;let S#13〉 + 〈0;let S#13〉)
-    a: 〈0;let T#14〉
-    b: 〈1;let F#6〉
+    let G#6 = (〈1;let F#5〉 + 〈1;let F#5〉)
+    let H#7 = (〈0;let G#6〉 + 〈0;let G#6〉)
+    let I#8 = (〈0;let H#7〉 + 〈0;let H#7〉)
+    let J#9 = (〈0;let I#8〉 + 〈0;let I#8〉)
+    let K#a = (〈0;let J#9〉 + 〈0;let J#9〉)
+    let L#b = (〈0;let K#a〉 + 〈0;let K#a〉)
+    let M#c = (〈0;let L#b〉 + 〈0;let L#b〉)
+    let N#d = (〈0;let M#c〉 + 〈0;let M#c〉)
+    let O#e = (〈0;let N#d〉 + 〈0;let N#d〉)
+    let P#f = (〈0;let O#e〉 + 〈0;let O#e〉)
+    let Q#10 = (〈0;let P#f〉 + 〈0;let P#f〉)
+    let R#11 = (〈0;let Q#10〉 + 〈0;let Q#10〉)
+    let S#12 = (〈0;let R#11〉 + 〈0;let R#11〉)
+    let T#13 = (〈0;let S#12〉 + 〈0;let S#12〉)
+    a: 〈0;let T#13〉
+    b: 〈1;let F#5〉
   }
   issue1828: {
-    volumes: 〈0;let L3#15〉
-    let L3#15 = {
+    volumes: 〈0;let L3#14〉
+    let L3#14 = {
       for _, v2 in [
-        for _, v1 in 〈2;let L2#16〉 {},
+        for _, v1 in 〈2;let L2#15〉 {},
       ] {}
     }
-    let L2#16 = 〈0;let L1#17〉
-    let L1#17 = []
+    let L2#15 = 〈0;let L1#16〉
+    let L1#16 = []
   }
   ignoreErrorInLet: {
-    let X#18 = (1 & 2)
-    disjunction: (*〈0;let X#18〉|3)
+    let X#17 = (1 & 2)
+    disjunction: (*〈0;let X#17〉|3)
   }
 }
 --- incomprehension.cue
@@ -952,8 +1113,8 @@ Result:
     ]
     c: [
       for _, v in 〈1;l〉 {
-        let X#19 = (〈1;v〉 * 4)
-        〈0;let X#19〉
+        let X#0 = (〈1;v〉 * 4)
+        〈0;let X#0〉
       },
     ]
   }
@@ -964,8 +1125,8 @@ Result:
       3,
     ]
     for k, v in 〈0;l〉 {
-      let Y#1Amulti = (〈1;v〉 * 4)
-      "\(〈1;k〉)": 〈0;let Y#1A〉
+      let Y#1multi = (〈1;v〉 * 4)
+      "\(〈1;k〉)": 〈0;let Y#1〉
     }
   }
   referencesForViaLet: {
@@ -975,8 +1136,8 @@ Result:
       3,
     ]
     for k, v in 〈0;l〉 let X = (〈0;v〉 * 4) {
-      let Y#1Bmulti = 〈1;X〉
-      "\(〈2;k〉)": 〈0;let Y#1B〉
+      let Y#2multi = 〈1;X〉
+      "\(〈2;k〉)": 〈0;let Y#2〉
     }
   }
   letClauseReferencesInert: {
@@ -987,8 +1148,8 @@ Result:
       3,
     ]
     for k, v in 〈0;l〉 let X = 〈1;x〉 {
-      let Y#1C = 〈1;X〉
-      "\(〈2;k〉)": 〈0;let Y#1C〉
+      let Y#3 = 〈1;X〉
+      "\(〈2;k〉)": 〈0;let Y#3〉
     }
   }
   indirectReference: {
@@ -999,8 +1160,8 @@ Result:
     ]
     for k, v in 〈0;l〉 {
       y: 〈1;v〉
-      let X#1D = (〈0;y〉 * 4)
-      "\(〈1;k〉)": 〈0;let X#1D〉
+      let X#4 = (〈0;y〉 * 4)
+      "\(〈1;k〉)": 〈0;let X#4〉
     }
   }
   nestedFor: {
@@ -1008,16 +1169,16 @@ Result:
       4,
       5,
     ] {
-      let X#1Emulti = {
+      let X#5multi = {
         for _, x in [
           1,
           2,
         ] {
-          let X#1Fmulti = 〈1;x〉
-          "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+          let X#6multi = 〈1;x〉
+          "\(〈0;let X#6〉)": 〈0;let X#6〉
         }
       }
-      "\(〈1;k〉)": 〈0;let X#1E〉
+      "\(〈1;k〉)": 〈0;let X#5〉
     }
   }
 }
@@ -1042,8 +1203,8 @@ Result:
     t1: {
       ec: {}
       bs: {
-        let m#21 = 〈1;ec〉.b
-        if (〈0;let m#21〉 == _|_(explicit error (_|_ literal) in source)) {}
+        let m#0 = 〈1;ec〉.b
+        if (〈0;let m#0〉 == _|_(explicit error (_|_ literal) in source)) {}
         x: {
           y: ""
         }
@@ -1055,8 +1216,8 @@ Result:
       x: 〈import;"encoding/yaml"〉.Marshal(〈0;bs〉)
       ec: {}
       bs: {
-        let m#22 = 〈1;ec〉.b
-        if (〈0;let m#22〉.b == _|_(explicit error (_|_ literal) in source)) {}
+        let m#1 = 〈1;ec〉.b
+        if (〈0;let m#1〉.b == _|_(explicit error (_|_ literal) in source)) {}
         X: {
           Y: 〈import;strings〉.Join([], "")
         }
@@ -1072,8 +1233,8 @@ Result:
       b: "e"
     }
     for k, v in 〈0;_i〉 {
-      let T#23multi = 〈1;v〉
-      〈0;let T#23〉: "1"
+      let T#0multi = 〈1;v〉
+      〈0;let T#0〉: "1"
     }
   }
 }
@@ -1093,9 +1254,9 @@ Result:
   }
   disabled_parent_test: {
     for k, v in 〈1;_configs〉 {
-      let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+      let parent_config#0multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
       "\(〈1;k〉)": {
-        parent_config: 〈1;let parent_config#24〉
+        parent_config: 〈1;let parent_config#0〉
       }
     }
   }

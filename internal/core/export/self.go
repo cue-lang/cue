@@ -121,7 +121,7 @@ type depData struct {
 // outside main exported tree) that has no further parent nodes that are
 // referenced.
 func (d *depData) isExternalRoot() bool {
-	return d.ident != 0
+	return d.ident.IsValid()
 }
 
 func (d *depData) usageCount() int {
@@ -208,7 +208,7 @@ func (p *pivotter) markDeps(v *adt.Vertex, pkg *adt.ImportReference) {
 			// be done, for instance, by marking them as "core" in the runtime
 			// and using a Runtime method to determine whether something is
 			// a core package, rather than relying on the presence of a dot.
-			path := d.Import().ImportPath.StringValue(p.x.ctx)
+			path := d.Import().ImportPath.StringValue()
 			if !strings.ContainsRune(path, '.') {
 				return nil
 			}
@@ -292,7 +292,7 @@ func (p *pivotter) makeParentPath(d *depData) {
 	if f.IsInt() {
 		str = fmt.Sprintf("Index%d", f.Index())
 	} else {
-		str = f.IdentString(p.x.ctx)
+		str = f.IdentString()
 		str = strings.TrimLeft(str, "_#")
 		str = strings.ToUpper(str)
 	}
@@ -303,7 +303,7 @@ func (p *pivotter) makeParentPath(d *depData) {
 
 	// Make it a definition if we need it.
 	if d.dstNode.IsRecursivelyClosed() {
-		d.path = append(d.path, adt.MakeIdentLabel(p.x.ctx, "#x", ""))
+		d.path = append(d.path, adt.MakeIdentLabel("#x", ""))
 	}
 }
 
@@ -502,7 +502,7 @@ func (p *pivotter) addExternal(d *depData) {
 	if d.dstImport == nil {
 		msg = fmt.Sprintf("//cue:path: %s", path)
 	} else {
-		pkg := d.dstImport.ImportPath.SelectorString(p.x.ctx)
+		pkg := d.dstImport.ImportPath.SelectorString()
 		if path == "" {
 			msg = fmt.Sprintf("//cue:path: %s", pkg)
 		} else {

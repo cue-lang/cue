@@ -50,7 +50,7 @@ NumCloseIDs: 2
 (struct){
   issue4011: (struct){
     full: (struct){
-      let _hugoEnvironments#1 = (struct){
+      let _hugoEnvironments#0 = (struct){
         default: (string){ "_default" }
         production: (string){ "production" }
       }
@@ -87,7 +87,7 @@ NumCloseIDs: 2
 {
   issue4011: {
     full: {
-      let _hugoEnvironments#1 = {
+      let _hugoEnvironments#0 = {
         default: "_default"
         production: "production"
       }
@@ -98,7 +98,7 @@ NumCloseIDs: 2
         [_]: {
           fs: {
             Create: {
-              for envID, envName in 〈4;let _hugoEnvironments#1〉 let envConfig = 〈3;hugo〉[〈0;envID〉] if (〈0;envConfig〉 != _|_(explicit error (_|_ literal) in source)) {
+              for envID, envName in 〈4;let _hugoEnvironments#0〉 let envConfig = 〈3;hugo〉[〈0;envID〉] if (〈0;envConfig〉 != _|_(explicit error (_|_ literal) in source)) {
                 config: {
                   Contents: 〈2;envConfig〉
                 }

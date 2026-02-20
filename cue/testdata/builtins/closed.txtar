@@ -300,7 +300,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.socket.string.a)
+            let X#0 = ~(inDisjunctions.x.socket.string.a)
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -310,7 +310,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.socket.string.a)
+            let X#0 = ~(inDisjunctions.x.socket.string.a)
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -323,7 +323,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
+            let X#0 = ~(inDisjunctions.x.syslog.xxx.a)
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -333,7 +333,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
+            let X#0 = ~(inDisjunctions.x.syslog.xxx.a)
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -344,7 +344,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.syslog.string.a)
+            let X#0 = ~(inDisjunctions.x.syslog.string.a)
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -354,7 +354,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.syslog.string.a)
+            let X#0 = ~(inDisjunctions.x.syslog.string.a)
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -631,7 +631,7 @@ diff old new
 -            let X#1 = (#struct){
 -              b: (bool){ true }
 -            }
-+            let X#1 = ~(inDisjunctions.x.socket.string.a)
++            let X#0 = ~(inDisjunctions.x.socket.string.a)
 +            uint: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -641,7 +641,7 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1 = ~(inDisjunctions.x.socket.string.a)
++            let X#0 = ~(inDisjunctions.x.socket.string.a)
              string: (#struct){
                a: (#struct){
                  b: (bool){ true }
@@ -685,7 +685,7 @@ diff old new
 -              b: (bool){ true }
 -            }
 -            let X#1multi = 〈0;a〉
-+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
++            let X#0 = ~(inDisjunctions.x.syslog.xxx.a)
 +            uint: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -695,7 +695,7 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
++            let X#0 = ~(inDisjunctions.x.syslog.xxx.a)
 +            string: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -706,7 +706,7 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
++            let X#0 = ~(inDisjunctions.x.syslog.string.a)
 +            uint: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -716,7 +716,7 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
++            let X#0 = ~(inDisjunctions.x.syslog.string.a)
              string: (#struct){
                a: (#struct){
                  b: (bool){ true }
@@ -1176,11 +1176,11 @@ Result:
         a: {
           b: true
         }
-        let X#1 = 〈0;a〉
+        let X#0 = 〈0;a〉
         (close({
           uint: {
             a: {
-              b: 〈3;let X#1〉.b
+              b: 〈3;let X#0〉.b
             }
           }
         })|close({

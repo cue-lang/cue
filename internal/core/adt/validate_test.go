@@ -355,7 +355,7 @@ func TestValidate(t *testing.T) {
 		}
 		v.Finalize(ctx)
 		if tc.lookup != "" {
-			v = v.Lookup(adt.MakeIdentLabel(r, tc.lookup, "main"))
+			v = v.Lookup(adt.MakeIdentLabel(tc.lookup, "main"))
 		}
 
 		b := adt.Validate(ctx, v, tc.cfg)

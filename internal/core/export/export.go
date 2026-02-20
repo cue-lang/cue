@@ -319,8 +319,7 @@ type exporter struct {
 
 	ctx *adt.OpContext
 
-	index adt.StringIndexer
-	rand  *rand.Rand
+	rand *rand.Rand
 
 	// For resolving references.
 	stack []frame
@@ -403,7 +402,6 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 	e := &exporter{
 		cfg:   p,
 		ctx:   eval.NewContext(r, n),
-		index: r,
 		pkgID: pkgID,
 
 		references: map[*adt.Vertex]*referenceInfo{},
@@ -624,7 +622,7 @@ func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Exp
 			// point we will not get a valid configuration.
 
 			// TODO: get rid of the use of x.X.
-			// str := x.Label.IdentString(e.ctx)
+			// str := x.Label.IdentString()
 			// ident := ast.NewIdent(str)
 			// return ident
 
@@ -651,20 +649,20 @@ func (e *exporter) uniqueLetIdent(f adt.Feature, x adt.Expr) adt.Feature {
 		return f
 	}
 
-	f, _ = e.uniqueFeature(f.IdentString(e.ctx))
+	f, _ = e.uniqueFeature(f.IdentString())
 	e.usedFeature[f] = x
 	return f
 }
 
 func (e *exporter) uniqueAlias(name string) string {
-	f := adt.MakeIdentLabel(e.ctx, name, "")
+	f := adt.MakeIdentLabel(name, "")
 
 	if _, ok := e.usedFeature[f]; !ok {
 		e.usedFeature[f] = nil
 		return name
 	}
 
-	_, name = e.uniqueFeature(f.IdentString(e.ctx))
+	_, name = e.uniqueFeature(f.IdentString())
 	return name
 }
 
@@ -683,7 +681,7 @@ func (e *exporter) intn(n int) int {
 }
 
 func (e *exporter) makeFeature(s string) (f adt.Feature, ok bool) {
-	f = adt.MakeIdentLabel(e.ctx, s, "")
+	f = adt.MakeIdentLabel(s, "")
 	_, exists := e.usedFeature[f]
 	if !exists {
 		e.usedFeature[f] = nil

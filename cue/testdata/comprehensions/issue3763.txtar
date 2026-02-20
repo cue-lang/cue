@@ -351,13 +351,13 @@ diff old new
       }
     }
     if true {
-      let Z#3 = [
+      let Z#1 = [
         for _, x in 〈2;A〉 {
           〈1;x〉
         },
       ]
       B: [
-        for _, z in 〈1;let Z#3〉 if (〈0;z〉.y != _|_(explicit error (_|_ literal) in source)) {
+        for _, z in 〈1;let Z#1〉 if (〈0;z〉.y != _|_(explicit error (_|_ literal) in source)) {
           b: 1
         },
       ]

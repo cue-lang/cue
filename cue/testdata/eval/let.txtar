@@ -380,7 +380,7 @@ Result:
       ec: (struct){
       }
       bs: (struct){
-        let m#21 = (_|_){
+        let m#20 = (_|_){
           // [incomplete] keepDescending.t1.bs.m: undefined field: b:
           //     ./issue2063.cue:10:14
         }
@@ -394,7 +394,7 @@ Result:
       ec: (struct){
       }
       bs: (struct){
-        let m#22 = (_|_){
+        let m#21 = (_|_){
           // [incomplete] keepDescending.t2.bs.m: undefined field: b:
           //     ./issue2063.cue:21:14
         }
@@ -409,7 +409,7 @@ Result:
       a: (string){ "d" }
       b: (string){ "e" }
     }
-    let T#23multi = 〈1;v〉
+    let T#22multi = 〈1;v〉
     e: (string){ "1" }
     d: (string){ "1" }
   }
@@ -426,7 +426,7 @@ Result:
     }
   }
   disabled_parent_test: (struct){
-    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+    let parent_config#23multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
     CHILD1: (struct){
       parent_config: (bool){ false }
     }
@@ -555,7 +555,7 @@ diff old new
        //     ./incomprehension.cue:42:7
        //     ./incomprehension.cue:42:13
        //     ./incomprehension.cue:43:2
-@@ -199,6 +198,16 @@
+@@ -199,12 +198,22 @@
        "2": (int){ 2 }
      }
    }
@@ -572,16 +572,43 @@ diff old new
    keepDescending: (struct){
      t1: (struct){
        ec: (struct){
-@@ -234,8 +243,8 @@
+       }
+       bs: (struct){
+-        let m#21 = (_|_){
++        let m#20 = (_|_){
+           // [incomplete] keepDescending.t1.bs.m: undefined field: b:
+           //     ./issue2063.cue:10:14
+         }
+@@ -218,7 +227,7 @@
+       ec: (struct){
+       }
+       bs: (struct){
+-        let m#22 = (_|_){
++        let m#21 = (_|_){
+           // [incomplete] keepDescending.t2.bs.m: undefined field: b:
+           //     ./issue2063.cue:21:14
+         }
+@@ -233,9 +242,9 @@
+       a: (string){ "d" }
        b: (string){ "e" }
      }
-     let T#23multi = 〈1;v〉
+-    let T#23multi = 〈1;v〉
 -    d: (string){ "1" }
++    let T#22multi = 〈1;v〉
      e: (string){ "1" }
 +    d: (string){ "1" }
    }
    _parent_configs: (struct){
      PARENT: (bool){ true }
+@@ -250,7 +259,7 @@
+     }
+   }
+   disabled_parent_test: (struct){
+-    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
++    let parent_config#23multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+     CHILD1: (struct){
+       parent_config: (bool){ false }
+     }
 -- out/evalalpha/stats --
 Leaks:  52
 Freed:  163
@@ -952,8 +979,8 @@ Result:
     ]
     c: [
       for _, v in 〈1;l〉 {
-        let X#19 = (〈1;v〉 * 4)
-        〈0;let X#19〉
+        let X#1 = (〈1;v〉 * 4)
+        〈0;let X#1〉
       },
     ]
   }
@@ -964,8 +991,8 @@ Result:
       3,
     ]
     for k, v in 〈0;l〉 {
-      let Y#1Amulti = (〈1;v〉 * 4)
-      "\(〈1;k〉)": 〈0;let Y#1A〉
+      let Y#2multi = (〈1;v〉 * 4)
+      "\(〈1;k〉)": 〈0;let Y#2〉
     }
   }
   referencesForViaLet: {
@@ -975,8 +1002,8 @@ Result:
       3,
     ]
     for k, v in 〈0;l〉 let X = (〈0;v〉 * 4) {
-      let Y#1Bmulti = 〈1;X〉
-      "\(〈2;k〉)": 〈0;let Y#1B〉
+      let Y#3multi = 〈1;X〉
+      "\(〈2;k〉)": 〈0;let Y#3〉
     }
   }
   letClauseReferencesInert: {
@@ -987,8 +1014,8 @@ Result:
       3,
     ]
     for k, v in 〈0;l〉 let X = 〈1;x〉 {
-      let Y#1C = 〈1;X〉
-      "\(〈2;k〉)": 〈0;let Y#1C〉
+      let Y#4 = 〈1;X〉
+      "\(〈2;k〉)": 〈0;let Y#4〉
     }
   }
   indirectReference: {
@@ -999,8 +1026,8 @@ Result:
     ]
     for k, v in 〈0;l〉 {
       y: 〈1;v〉
-      let X#1D = (〈0;y〉 * 4)
-      "\(〈1;k〉)": 〈0;let X#1D〉
+      let X#5 = (〈0;y〉 * 4)
+      "\(〈1;k〉)": 〈0;let X#5〉
     }
   }
   nestedFor: {
@@ -1008,16 +1035,16 @@ Result:
       4,
       5,
     ] {
-      let X#1Emulti = {
+      let X#6multi = {
         for _, x in [
           1,
           2,
         ] {
-          let X#1Fmulti = 〈1;x〉
-          "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+          let X#7multi = 〈1;x〉
+          "\(〈0;let X#7〉)": 〈0;let X#7〉
         }
       }
-      "\(〈1;k〉)": 〈0;let X#1E〉
+      "\(〈1;k〉)": 〈0;let X#6〉
     }
   }
 }
@@ -1042,8 +1069,8 @@ Result:
     t1: {
       ec: {}
       bs: {
-        let m#21 = 〈1;ec〉.b
-        if (〈0;let m#21〉 == _|_(explicit error (_|_ literal) in source)) {}
+        let m#1 = 〈1;ec〉.b
+        if (〈0;let m#1〉 == _|_(explicit error (_|_ literal) in source)) {}
         x: {
           y: ""
         }
@@ -1055,8 +1082,8 @@ Result:
       x: 〈import;"encoding/yaml"〉.Marshal(〈0;bs〉)
       ec: {}
       bs: {
-        let m#22 = 〈1;ec〉.b
-        if (〈0;let m#22〉.b == _|_(explicit error (_|_ literal) in source)) {}
+        let m#2 = 〈1;ec〉.b
+        if (〈0;let m#2〉.b == _|_(explicit error (_|_ literal) in source)) {}
         X: {
           Y: 〈import;strings〉.Join([], "")
         }
@@ -1072,8 +1099,8 @@ Result:
       b: "e"
     }
     for k, v in 〈0;_i〉 {
-      let T#23multi = 〈1;v〉
-      〈0;let T#23〉: "1"
+      let T#1multi = 〈1;v〉
+      〈0;let T#1〉: "1"
     }
   }
 }
@@ -1093,9 +1120,9 @@ Result:
   }
   disabled_parent_test: {
     for k, v in 〈1;_configs〉 {
-      let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+      let parent_config#1multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
       "\(〈1;k〉)": {
-        parent_config: 〈1;let parent_config#24〉
+        parent_config: 〈1;let parent_config#1〉
       }
     }
   }

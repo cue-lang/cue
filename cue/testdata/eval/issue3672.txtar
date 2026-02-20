@@ -515,7 +515,7 @@ Disjuncts:    330375
         // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: invalid interpolation: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
         //     ./x.cue:116:5
         //     ./x.cue:114:18
-        let INL#9 = (list){
+        let INL#5 = (list){
           0: ((string|struct)){ |((string){ string }, (#struct){
               UseSectionName: (bool){ true }
             }, (#struct){
@@ -539,11 +539,11 @@ Disjuncts:    330375
                 }) }
             }) }
         }
-        let elems#A = (_|_){
+        let elems#6 = (_|_){
           // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
           //     ./x.cue:114:18
         }
-        let result#B = (_|_){
+        let result#7 = (_|_){
           // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
           //     ./x.cue:114:18
         }
@@ -571,8 +571,8 @@ Disjuncts:    330375
       }) }
     orgSyntax: (string){
       "UseSectionName"
-      let INS#5 = (string){ string }
-      let INO#6 = (#struct){
+      let INS#8 = (string){ string }
+      let INO#9 = (#struct){
         UseSectionName: (bool){ true }
       }
     }
@@ -591,12 +591,12 @@ Disjuncts:    330375
       }) }
     orgSyntax: (string){
       "Append UseSectionName"
-      let INA#7 = (#struct){
+      let INA#A = (#struct){
         Append: ((string|struct)){ |((string){ string }, (#struct){
             UseSectionName: (bool){ true }
           }) }
       }
-      let INP#8 = (#struct){
+      let INP#B = (#struct){
         Prepend: ((string|struct)){ |((string){ string }, (#struct){
             UseSectionName: (bool){ true }
           }) }
@@ -642,7 +642,7 @@ Disjuncts:    330375
       // [incomplete] #orgForConfigTextRules.orgSyntax.elems: invalid interpolation: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
       //     ./x.cue:116:5
       //     ./x.cue:114:18
-      let INL#9 = (list){
+      let INL#5 = (list){
         0: ((string|struct)){ |((string){ string }, (#struct){
             UseSectionName: (bool){ true }
           }, (#struct){
@@ -666,11 +666,11 @@ Disjuncts:    330375
               }) }
           }) }
       }
-      let elems#A = (_|_){
+      let elems#6 = (_|_){
         // [incomplete] #orgForConfigTextRules.orgSyntax.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
         //     ./x.cue:114:18
       }
-      let result#B = (_|_){
+      let result#7 = (_|_){
         // [incomplete] #orgForConfigTextRules.orgSyntax.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
         //     ./x.cue:114:18
       }
@@ -685,7 +685,7 @@ Disjuncts:    330375
     let xs#3 = (#list){
       0: (string){
         "UseSectionName"
-        let INL#9 = (_|_){
+        let INL#5 = (_|_){
           // [eval] value0.xs.0.INL: conflicting values [...] and {UseSectionName:true} (mismatched types list and struct):
           //     ./x.cue:22:51
           //     ./x.cue:22:52
@@ -702,7 +702,7 @@ Disjuncts:    330375
             // [cycle] cycle error
           }
         }
-        let INA#7 = (_|_){
+        let INA#A = (_|_){
           // [eval] value0.xs.0.INA: 3 errors in empty disjunction:
           // value0.xs.0.INA: conflicting values {Append:_} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
           //     ./x.cue:22:51
@@ -726,7 +726,7 @@ Disjuncts:    330375
           Append: (_){ _ }
           UseSectionName: (bool){ true }
         }
-        let INP#8 = (_|_){
+        let INP#B = (_|_){
           // [eval] value0.xs.0.INP: 2 errors in empty disjunction:
           // value0.xs.0.INP: conflicting values {Prepend:_} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
           //     ./x.cue:22:51
@@ -748,7 +748,7 @@ Disjuncts:    330375
           Prepend: (_){ _ }
           UseSectionName: (bool){ true }
         }
-        let INS#5 = (_|_){
+        let INS#8 = (_|_){
           // [eval] value0.xs.0.INS: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
           //     ./x.cue:22:51
           //     ./x.cue:22:52
@@ -771,7 +771,7 @@ Disjuncts:    330375
             // [cycle] cycle error
           }
         }
-        let INO#6 = (#struct){
+        let INO#9 = (#struct){
           UseSectionName: (bool){ true }
         }
       }
@@ -861,7 +861,7 @@ diff old new
 +        // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: invalid interpolation: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
          //     ./x.cue:116:5
 +        //     ./x.cue:114:18
-+        let INL#9 = (list){
++        let INL#5 = (list){
 +          0: ((string|struct)){ |((string){ string }, (#struct){
 +              UseSectionName: (bool){ true }
 +            }, (#struct){
@@ -885,17 +885,47 @@ diff old new
 +                }) }
 +            }) }
 +        }
-+        let elems#A = (_|_){
++        let elems#6 = (_|_){
 +          // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
 +          //     ./x.cue:114:18
 +        }
-+        let result#B = (_|_){
++        let result#7 = (_|_){
 +          // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
 +          //     ./x.cue:114:18
 +        }
        }
      }
    }
+@@ -222,8 +212,8 @@
+       }) }
+     orgSyntax: (string){
+       "UseSectionName"
+-      let INS#5 = (string){ string }
+-      let INO#6 = (#struct){
++      let INS#8 = (string){ string }
++      let INO#9 = (#struct){
+         UseSectionName: (bool){ true }
+       }
+     }
+@@ -242,12 +232,12 @@
+       }) }
+     orgSyntax: (string){
+       "Append UseSectionName"
+-      let INA#7 = (#struct){
+-        Append: ((string|struct)){ |((string){ string }, (#struct){
+-            UseSectionName: (bool){ true }
+-          }) }
+-      }
+-      let INP#8 = (#struct){
++      let INA#A = (#struct){
++        Append: ((string|struct)){ |((string){ string }, (#struct){
++            UseSectionName: (bool){ true }
++          }) }
++      }
++      let INP#B = (#struct){
+         Prepend: ((string|struct)){ |((string){ string }, (#struct){
+             UseSectionName: (bool){ true }
+           }) }
 @@ -290,8 +280,41 @@
            }) }
        }) }
@@ -904,7 +934,7 @@ diff old new
 +      // [incomplete] #orgForConfigTextRules.orgSyntax.elems: invalid interpolation: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
        //     ./x.cue:116:5
 +      //     ./x.cue:114:18
-+      let INL#9 = (list){
++      let INL#5 = (list){
 +        0: ((string|struct)){ |((string){ string }, (#struct){
 +            UseSectionName: (bool){ true }
 +          }, (#struct){
@@ -928,21 +958,22 @@ diff old new
 +              }) }
 +          }) }
 +      }
-+      let elems#A = (_|_){
++      let elems#6 = (_|_){
 +        // [incomplete] #orgForConfigTextRules.orgSyntax.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
 +        //     ./x.cue:114:18
 +      }
-+      let result#B = (_|_){
++      let result#7 = (_|_){
 +        // [incomplete] #orgForConfigTextRules.orgSyntax.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
 +        //     ./x.cue:114:18
 +      }
      }
    }
    value0: (#struct){
-@@ -304,1165 +327,71 @@
+@@ -303,1166 +326,72 @@
+     let xs#3 = (#list){
        0: (string){
          "UseSectionName"
-         let INL#9 = (_|_){
+-        let INL#9 = (_|_){
 -          // [eval] value0.xs.0.INL: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {UseSectionName:true} (mismatched types list and struct):
 -          //     ./x.cue:22:52
 -          //     ./x.cue:44:29
@@ -1077,23 +1108,8 @@ diff old new
 -                  UseSectionName: (bool){ true }
 -                }) }
 -            }) }
-+          // [eval] value0.xs.0.INL: conflicting values [...] and {UseSectionName:true} (mismatched types list and struct):
-+          //     ./x.cue:22:51
-+          //     ./x.cue:22:52
-+          //     ./x.cue:44:29
-+          //     ./x.cue:44:56
-+          //     ./x.cue:62:25
-+          //     ./x.cue:70:12
-+          //     ./x.cue:70:47
-+          //     ./x.cue:111:13
-+          //     ./x.cue:111:18
-+          //     ./x.cue:123:9
-+          //     ./x.cue:124:16
-+          UseSectionName: (_|_){
-+            // [cycle] cycle error
-+          }
-         }
-         let INA#7 = (_|_){
+-        }
+-        let INA#7 = (_|_){
 -          // [eval] value0.xs.0.INA: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Append:#ConfigText} (mismatched types list and struct):
 -          //     ./x.cue:22:52
 -          //     ./x.cue:44:29
@@ -1192,6 +1208,24 @@ diff old new
 -          //     ./x.cue:123:9
 -          // value0.xs.0.INA: 9 errors in empty disjunction::
 -          //     ./x.cue:97:7
++        let INL#5 = (_|_){
++          // [eval] value0.xs.0.INL: conflicting values [...] and {UseSectionName:true} (mismatched types list and struct):
++          //     ./x.cue:22:51
++          //     ./x.cue:22:52
++          //     ./x.cue:44:29
++          //     ./x.cue:44:56
++          //     ./x.cue:62:25
++          //     ./x.cue:70:12
++          //     ./x.cue:70:47
++          //     ./x.cue:111:13
++          //     ./x.cue:111:18
++          //     ./x.cue:123:9
++          //     ./x.cue:124:16
++          UseSectionName: (_|_){
++            // [cycle] cycle error
++          }
++        }
++        let INA#A = (_|_){
 +          // [eval] value0.xs.0.INA: 3 errors in empty disjunction:
 +          // value0.xs.0.INA: conflicting values {Append:_} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
 +          //     ./x.cue:22:51
@@ -1620,11 +1654,8 @@ diff old new
 -                  UseSectionName: (bool){ true }
 -                }) }
 -            }) }
-+          //     ./x.cue:124:17
-+          Append: (_){ _ }
-+          UseSectionName: (bool){ true }
-         }
-         let INP#8 = (_|_){
+-        }
+-        let INP#8 = (_|_){
 -          // [eval] value0.xs.0.INP: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Append:#ConfigText} (mismatched types list and struct):
 -          //     ./x.cue:22:52
 -          //     ./x.cue:44:29
@@ -1745,6 +1776,11 @@ diff old new
 -          //     ./x.cue:118:38
 -          //     ./x.cue:123:9
 -          //     ./x.cue:124:16
++          //     ./x.cue:124:17
++          Append: (_){ _ }
++          UseSectionName: (bool){ true }
++        }
++        let INP#B = (_|_){
 +          // [eval] value0.xs.0.INP: 2 errors in empty disjunction:
 +          // value0.xs.0.INP: conflicting values {Prepend:_} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
 +          //     ./x.cue:22:51
@@ -2149,27 +2185,33 @@ diff old new
 -                  UseSectionName: (bool){ true }
 -                }) }
 -            }) }
+-        }
+-        let INS#5 = (_|_){
 +          //     ./x.cue:124:17
 +          Prepend: (_){ _ }
 +          UseSectionName: (bool){ true }
-         }
-         let INS#5 = (_|_){
++        }
++        let INS#8 = (_|_){
            // [eval] value0.xs.0.INS: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
 +          //     ./x.cue:22:51
            //     ./x.cue:22:52
            //     ./x.cue:44:29
            //     ./x.cue:44:56
-@@ -1479,7 +408,9 @@
+@@ -1479,9 +408,11 @@
            //     ./x.cue:118:38
            //     ./x.cue:123:9
            //     ./x.cue:124:16
 -          UseSectionName: (bool){ true }
+-        }
+-        let INO#6 = (#struct){
 +          UseSectionName: (_|_){
 +            // [cycle] cycle error
 +          }
-         }
-         let INO#6 = (#struct){
++        }
++        let INO#9 = (#struct){
            UseSectionName: (bool){ true }
+         }
+       }
 -- out/eval --
 (struct){
   #FinDefSetElemType: (#struct){

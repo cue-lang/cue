@@ -1,0 +1,26 @@
+# Verify that tool files can reference fields defined in regular CUE files,
+# including when pattern constraints and comprehensions are involved.
+
+exec cue cmd main
+cmp stdout expect-stdout
+
+-- expect-stdout --
+{}
+-- data.cue --
+package p
+
+data: [_]: d2: foo: 0
+if true {
+	data: d1: d2: bar: 1
+}
+-- main_tool.cue --
+package p
+
+import (
+	"encoding/json"
+	"tool/cli"
+)
+
+command: main: cli.Print & {
+	text: json.Marshal(data)
+}

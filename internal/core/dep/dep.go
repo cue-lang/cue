@@ -695,8 +695,8 @@ func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) 
 	c.markExpr(env, adt.ToExpr(y.Value))
 
 	// Mark else clause in outer environment.
-	if y.Else != nil {
-		c.markExpr(outerEnv, y.Else)
+	if y.Fallback != nil {
+		c.markExpr(outerEnv, y.Fallback)
 	}
 }
 

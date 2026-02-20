@@ -1039,14 +1039,20 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 		Value:   st,
 	}
 
-	// Compile else clause in the outer scope (before comprehension variables).
-	// The else clause should NOT have access to for/let variables.
-	if x.Else != nil {
-		if err := c.requireVersion(x.Else, "v0.16.0", "else clause in comprehension"); err != nil {
-			return err
+	// Compile fallback clause in the outer scope (before comprehension variables).
+	// The fallback clause should NOT have access to for/let variables.
+	if x.Fallback != nil {
+		// Both 'else' (with if) and 'fallback' (with for) require the try experiment.
+		if !c.experiments.Try {
+			// Use appropriate keyword in error message based on clause type.
+			keyword := "else"
+			if _, isFor := x.Clauses[0].(*ast.ForClause); isFor {
+				keyword = "fallback"
+			}
+			return c.errf(x.Fallback, "%s clause requires the try experiment (language version v0.16.0 or later)", keyword)
 		}
-		// Pop all comprehension scopes temporarily to compile else in outer scope.
-		// We need to compile the else body outside the comprehension's scope chain.
+		// Pop all comprehension scopes temporarily to compile fallback in outer scope.
+		// We need to compile the fallback body outside the comprehension's scope chain.
 		savedStack := c.stack
 		// Find the scope depth before the comprehension clauses were pushed.
 		// Each for/let clause pushes one scope.
@@ -1059,10 +1065,10 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 		}
 		// Temporarily truncate to outer scope depth.
 		c.stack = savedStack[:outerDepth]
-		elseBody := c.expr(x.Else.Body)
+		fallbackBody := c.expr(x.Fallback.Body)
 		c.stack = savedStack // Restore full stack
-		if elseSt, ok := elseBody.(*adt.StructLit); ok {
-			comp.Else = elseSt
+		if fallbackSt, ok := fallbackBody.(*adt.StructLit); ok {
+			comp.Fallback = fallbackSt
 		}
 	}
 

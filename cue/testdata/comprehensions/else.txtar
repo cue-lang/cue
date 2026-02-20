@@ -1,4 +1,6 @@
 -- in.cue --
+@experiment(try)
+
 // if-else: condition true - no else
 ifTrue: {
 	if true { a: 1 } else { b: 2 }
@@ -11,22 +13,22 @@ ifFalse: {
 
 // for-else: non-empty source - no else
 forNonEmpty: {
-	for x in [1, 2] { "\(x)": x } else { empty: true }
+	for x in [1, 2] { "\(x)": x } fallback { empty: true }
 }
 
 // for-else: empty source - else yields
 forEmpty: {
-	for x in [] { "\(x)": x } else { empty: true }
+	for x in [] { "\(x)": x } fallback { empty: true }
 }
 
 // for-else with filter: filter removes all - else yields
 forFilteredAll: {
-	for x in [1, 2, 3] if x > 10 { "\(x)": x } else { empty: true }
+	for x in [1, 2, 3] if x > 10 { "\(x)": x } fallback { empty: true }
 }
 
 // for-else with filter: filter keeps some - no else
 forFilteredSome: {
-	for x in [1, 2, 3] if x > 1 { "\(x)": x } else { empty: true }
+	for x in [1, 2, 3] if x > 1 { "\(x)": x } fallback { empty: true }
 }
 
 // list if-else: true
@@ -41,12 +43,12 @@ listIfFalse: [
 
 // list for-else: empty
 listForEmpty: [
-	for x in [] { x } else { 0 }
+	for x in [] { x } fallback { 0 }
 ]
 
 // list for-else: non-empty
 listForNonEmpty: [
-	for x in [1, 2] { x * 2 } else { 0 }
+	for x in [1, 2] { x * 2 } fallback { 0 }
 ]
 
 // else with multiple fields
@@ -60,10 +62,10 @@ elseEmbeds: {
 	if false { added: 2 } else { fallback: 3 }
 }
 
-// else with outer scope access
+// fallback with outer scope access
 outerScope: {
 	let threshold = 10
-	for x in [] { x } else { fallback: threshold }
+	for x in [] { x } fallback { fallbackField: threshold }
 }
 
 // if-else: nested body fields - else yields once
@@ -86,24 +88,24 @@ ifDeeplyNested: {
 	if false { a: b: c: 1 } else { a: b: c: 2 }
 }
 
-// for-else: nested body fields, empty source
+// for-fallback: nested body fields, empty source
 forNestedEmpty: {
-	for x in [] { a: b: (x): x } else { a: b: none: true }
+	for x in [] { a: b: (x): x } fallback { a: b: none: true }
 }
 
-// for-else: nested body fields, non-empty source - no else
+// for-fallback: nested body fields, non-empty source - no fallback
 forNestedNonEmpty: {
-	for x in [1] { a: b: "\(x)": x } else { a: b: none: true }
+	for x in [1] { a: b: "\(x)": x } fallback { a: b: none: true }
 }
 
-// nested comprehensions - outer else triggers
-nestedOuterElse: {
-	for x in [] { for y in [1] { y } else { inner: true } } else { outer: true }
+// nested comprehensions - outer fallback triggers
+nestedOuterFallback: {
+	for x in [] { for y in [1] { y } fallback { inner: true } } fallback { outer: true }
 }
 
-// nested comprehensions - inner else triggers
-nestedInnerElse: {
-	for x in [1] { for y in [] { y } else { inner: true } } else { outer: true }
+// nested comprehensions - inner fallback triggers
+nestedInnerFallback: {
+	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
 }
 -- out/eval/stats --
 Leaks:  0
@@ -162,7 +164,7 @@ NumCloseIDs: 2
   }
   outerScope: (struct){
     let threshold#1 = (int){ 10 }
-    fallback: (int){ 10 }
+    fallbackField: (int){ 10 }
   }
   ifNestedBody: (struct){
     c: (int){ 2 }
@@ -198,10 +200,10 @@ NumCloseIDs: 2
       }
     }
   }
-  nestedOuterElse: (struct){
+  nestedOuterFallback: (struct){
     outer: (bool){ true }
   }
-  nestedInnerElse: (struct){
+  nestedInnerFallback: (struct){
     inner: (bool){ true }
   }
 }
@@ -313,7 +315,7 @@ NumCloseIDs: 2
     for _, x in [] {
       〈1;x〉
     } else {
-      fallback: 〈1;let threshold#1〉
+      fallbackField: 〈1;let threshold#1〉
     }
   }
   ifNestedBody: {
@@ -392,7 +394,7 @@ NumCloseIDs: 2
       }
     }
   }
-  nestedOuterElse: {
+  nestedOuterFallback: {
     for _, x in [] {
       for _, y in [
         1,
@@ -405,7 +407,7 @@ NumCloseIDs: 2
       outer: true
     }
   }
-  nestedInnerElse: {
+  nestedInnerFallback: {
     for _, x in [
       1,
     ] {

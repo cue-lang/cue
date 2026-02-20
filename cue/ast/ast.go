@@ -389,9 +389,9 @@ func (a *PostfixAlias) End() token.Pos {
 
 // A Comprehension node represents a comprehension declaration.
 type Comprehension struct {
-	Clauses []Clause    // There must be at least one clause.
-	Value   Expr        // Must be a struct TODO: change to Struct
-	Else    *ElseClause // Optional else clause
+	Clauses  []Clause        // There must be at least one clause.
+	Value    Expr            // Must be a struct TODO: change to Struct
+	Fallback *FallbackClause // Optional else/fallback clause
 
 	comments
 	decl
@@ -401,8 +401,8 @@ type Comprehension struct {
 func (x *Comprehension) Pos() token.Pos  { return getPos(x) }
 func (x *Comprehension) pos() *token.Pos { return x.Clauses[0].pos() }
 func (x *Comprehension) End() token.Pos {
-	if x.Else != nil {
-		return x.Else.Body.End()
+	if x.Fallback != nil {
+		return x.Fallback.Body.End()
 	}
 	return x.Value.End()
 }
@@ -723,10 +723,14 @@ type LetClause struct {
 	decl
 }
 
-// An ElseClause node represents an else clause in a comprehension.
-type ElseClause struct {
-	Else token.Pos
-	Body *StructLit
+// A FallbackClause node represents an else or fallback clause in a comprehension.
+// Used with `else` after if/try clauses, and `fallback` after for clauses.
+type FallbackClause struct {
+	// TODO: note that the support for "else" is likely temporary, as
+	// we will move that functionality to an "if" and "try" element with an
+	// optional "else" body.
+	Fallback token.Pos // Position of "else" or "fallback" keyword
+	Body     *StructLit
 
 	comments
 	clause
@@ -882,38 +886,38 @@ func (x *StructLit) pos() *token.Pos {
 	return &x.Lbrace
 }
 
-func (x *ListLit) Pos() token.Pos       { return x.Lbrack }
-func (x *ListLit) pos() *token.Pos      { return &x.Lbrack }
-func (x *Ellipsis) Pos() token.Pos      { return x.Ellipsis }
-func (x *Ellipsis) pos() *token.Pos     { return &x.Ellipsis }
-func (x *LetClause) Pos() token.Pos     { return x.Let }
-func (x *LetClause) pos() *token.Pos    { return &x.Let }
-func (x *TryClause) Pos() token.Pos     { return x.Try }
-func (x *TryClause) pos() *token.Pos    { return &x.Try }
-func (x *ForClause) Pos() token.Pos     { return x.For }
-func (x *ForClause) pos() *token.Pos    { return &x.For }
-func (x *IfClause) Pos() token.Pos      { return x.If }
-func (x *IfClause) pos() *token.Pos     { return &x.If }
-func (x *ElseClause) Pos() token.Pos    { return x.Else }
-func (x *ElseClause) pos() *token.Pos   { return &x.Else }
-func (x *ParenExpr) Pos() token.Pos     { return x.Lparen }
-func (x *ParenExpr) pos() *token.Pos    { return &x.Lparen }
-func (x *SelectorExpr) Pos() token.Pos  { return x.X.Pos() }
-func (x *SelectorExpr) pos() *token.Pos { return x.X.pos() }
-func (x *IndexExpr) Pos() token.Pos     { return x.X.Pos() }
-func (x *IndexExpr) pos() *token.Pos    { return x.X.pos() }
-func (x *SliceExpr) Pos() token.Pos     { return x.X.Pos() }
-func (x *SliceExpr) pos() *token.Pos    { return x.X.pos() }
-func (x *CallExpr) Pos() token.Pos      { return x.Fun.Pos() }
-func (x *CallExpr) pos() *token.Pos     { return x.Fun.pos() }
-func (x *UnaryExpr) Pos() token.Pos     { return x.OpPos }
-func (x *UnaryExpr) pos() *token.Pos    { return &x.OpPos }
-func (x *BinaryExpr) Pos() token.Pos    { return x.X.Pos() }
-func (x *BinaryExpr) pos() *token.Pos   { return x.X.pos() }
-func (x *PostfixExpr) Pos() token.Pos   { return x.X.Pos() }
-func (x *PostfixExpr) pos() *token.Pos  { return x.X.pos() }
-func (x *BottomLit) Pos() token.Pos     { return x.Bottom }
-func (x *BottomLit) pos() *token.Pos    { return &x.Bottom }
+func (x *ListLit) Pos() token.Pos         { return x.Lbrack }
+func (x *ListLit) pos() *token.Pos        { return &x.Lbrack }
+func (x *Ellipsis) Pos() token.Pos        { return x.Ellipsis }
+func (x *Ellipsis) pos() *token.Pos       { return &x.Ellipsis }
+func (x *LetClause) Pos() token.Pos       { return x.Let }
+func (x *LetClause) pos() *token.Pos      { return &x.Let }
+func (x *TryClause) Pos() token.Pos       { return x.Try }
+func (x *TryClause) pos() *token.Pos      { return &x.Try }
+func (x *ForClause) Pos() token.Pos       { return x.For }
+func (x *ForClause) pos() *token.Pos      { return &x.For }
+func (x *IfClause) Pos() token.Pos        { return x.If }
+func (x *IfClause) pos() *token.Pos       { return &x.If }
+func (x *FallbackClause) Pos() token.Pos  { return x.Fallback }
+func (x *FallbackClause) pos() *token.Pos { return &x.Fallback }
+func (x *ParenExpr) Pos() token.Pos       { return x.Lparen }
+func (x *ParenExpr) pos() *token.Pos      { return &x.Lparen }
+func (x *SelectorExpr) Pos() token.Pos    { return x.X.Pos() }
+func (x *SelectorExpr) pos() *token.Pos   { return x.X.pos() }
+func (x *IndexExpr) Pos() token.Pos       { return x.X.Pos() }
+func (x *IndexExpr) pos() *token.Pos      { return x.X.pos() }
+func (x *SliceExpr) Pos() token.Pos       { return x.X.Pos() }
+func (x *SliceExpr) pos() *token.Pos      { return x.X.pos() }
+func (x *CallExpr) Pos() token.Pos        { return x.Fun.Pos() }
+func (x *CallExpr) pos() *token.Pos       { return x.Fun.pos() }
+func (x *UnaryExpr) Pos() token.Pos       { return x.OpPos }
+func (x *UnaryExpr) pos() *token.Pos      { return &x.OpPos }
+func (x *BinaryExpr) Pos() token.Pos      { return x.X.Pos() }
+func (x *BinaryExpr) pos() *token.Pos     { return x.X.pos() }
+func (x *PostfixExpr) Pos() token.Pos     { return x.X.Pos() }
+func (x *PostfixExpr) pos() *token.Pos    { return x.X.pos() }
+func (x *BottomLit) Pos() token.Pos       { return x.Bottom }
+func (x *BottomLit) pos() *token.Pos      { return &x.Bottom }
 
 func (x *BadExpr) End() token.Pos { return x.To }
 func (x *Ident) End() token.Pos {
@@ -943,16 +947,16 @@ func (x *TryClause) End() token.Pos {
 	}
 	return x.Try.Add(3) // len("try")
 }
-func (x *ForClause) End() token.Pos    { return x.Source.End() }
-func (x *IfClause) End() token.Pos     { return x.Condition.End() }
-func (x *ElseClause) End() token.Pos   { return x.Body.End() }
-func (x *ParenExpr) End() token.Pos    { return x.Rparen.Add(1) }
-func (x *SelectorExpr) End() token.Pos { return x.Sel.End() }
-func (x *IndexExpr) End() token.Pos    { return x.Rbrack.Add(1) }
-func (x *SliceExpr) End() token.Pos    { return x.Rbrack.Add(1) }
-func (x *CallExpr) End() token.Pos     { return x.Rparen.Add(1) }
-func (x *UnaryExpr) End() token.Pos    { return x.X.End() }
-func (x *BinaryExpr) End() token.Pos   { return x.Y.End() }
+func (x *ForClause) End() token.Pos      { return x.Source.End() }
+func (x *IfClause) End() token.Pos       { return x.Condition.End() }
+func (x *FallbackClause) End() token.Pos { return x.Body.End() }
+func (x *ParenExpr) End() token.Pos      { return x.Rparen.Add(1) }
+func (x *SelectorExpr) End() token.Pos   { return x.Sel.End() }
+func (x *IndexExpr) End() token.Pos      { return x.Rbrack.Add(1) }
+func (x *SliceExpr) End() token.Pos      { return x.Rbrack.Add(1) }
+func (x *CallExpr) End() token.Pos       { return x.Rparen.Add(1) }
+func (x *UnaryExpr) End() token.Pos      { return x.X.End() }
+func (x *BinaryExpr) End() token.Pos     { return x.Y.End() }
 func (x *PostfixExpr) End() token.Pos {
 	switch x.Op {
 	case token.ELLIPSIS:

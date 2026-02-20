@@ -476,7 +476,7 @@ func applyCursor(v applyVisitor, c Cursor) {
 	case *ast.Comprehension:
 		applyList(v, c, n.Clauses)
 		apply(v, c, &n.Value)
-		applyIfNotNil(v, c, &n.Else)
+		applyIfNotNil(v, c, &n.Fallback)
 
 	// Files and packages
 	case *ast.File:
@@ -493,7 +493,7 @@ func applyCursor(v applyVisitor, c Cursor) {
 	case *ast.IfClause:
 		apply(v, c, &n.Condition)
 
-	case *ast.ElseClause:
+	case *ast.FallbackClause:
 		apply(v, c, &n.Body)
 
 	default:

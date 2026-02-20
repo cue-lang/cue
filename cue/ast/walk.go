@@ -156,7 +156,7 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 	case *Comprehension:
 		walkList(n.Clauses, before, after)
 		Walk(n.Value, before, after)
-		walkIfNotNil(n.Else, before, after)
+		walkIfNotNil(n.Fallback, before, after)
 
 	// Files and packages
 	case *File:
@@ -173,7 +173,7 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 	case *IfClause:
 		Walk(n.Condition, before, after)
 
-	case *ElseClause:
+	case *FallbackClause:
 		Walk(n.Body, before, after)
 
 	default:

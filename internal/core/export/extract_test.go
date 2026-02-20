@@ -60,6 +60,6 @@ func writeDocs(t *cuetxtar.Test, r adt.Runtime, v *adt.Vertex, path []string) {
 	// Simulate the dereference behavior that is implemented in the CUE api.
 	v = v.DerefValue()
 	for _, a := range v.Arcs {
-		writeDocs(t, r, a, append(path, a.Label.SelectorString(r)))
+		writeDocs(t, r, a, append(path, a.Label.SelectorString()))
 	}
 }

@@ -1,21 +1,171 @@
 -- a.cue --
-// Test export of else clause in comprehensions
+@experiment(try)
+
+// Test export of fallback clause in comprehensions
 
 // if-else
 ifElse: {
 	if false { a: 1 } else { b: 2 }
 }
 
-// for-else with empty list
-forElse: {
-	for x in [] { "\(x)": x } else { empty: true }
+// for-fallback with empty list
+forFallback: {
+	for x in [] { "\(x)": x } fallback { empty: true }
 }
 
-// for-else with outer scope reference
-forElseOuter: {
+// for-fallback with outer scope reference
+forFallbackOuter: {
 	let val = 10
-	for x in [] { x } else { fallback: val }
+	for x in [] { x } fallback { fallbackField: val }
 }
+-- out/definition-v3-noshare --
+@experiment(try)
+
+// Test export of fallback clause in comprehensions
+
+// if-else
+ifElse: {
+	if false {
+		a: 1
+	} else {
+		b: 2
+	}
+}
+
+// for-fallback with empty list
+forFallback: {
+	for x in [] {
+		"\(x)": x
+	} fallback {
+		empty: true
+	}
+}
+
+// for-fallback with outer scope reference
+forFallbackOuter: {
+	let val = 10
+	for x in [] {
+		x
+	} fallback {
+		fallbackField: val
+	}
+}
+-- diff/-out/definition-v3-noshare<==>+out/definition --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,7 @@
+-// Test export of else clause in comprehensions
++@experiment(try)
++
++// Test export of fallback clause in comprehensions
++
+ // if-else
+ ifElse: {
+ 	if false {
+@@ -8,21 +11,21 @@
+ 	}
+ }
+ 
+-// for-else with empty list
+-forElse: {
++// for-fallback with empty list
++forFallback: {
+ 	for x in [] {
+ 		"\(x)": x
+-	} else {
++	} fallback {
+ 		empty: true
+ 	}
+ }
+ 
+-// for-else with outer scope reference
+-forElseOuter: {
++// for-fallback with outer scope reference
++forFallbackOuter: {
+ 	let val = 10
+ 	for x in [] {
+ 		x
+-	} else {
+-		fallback: val
++	} fallback {
++		fallbackField: val
+ 	}
+ }
+-- out/definition-v3 --
+@experiment(try)
+
+// Test export of fallback clause in comprehensions
+
+// if-else
+ifElse: {
+	if false {
+		a: 1
+	} else {
+		b: 2
+	}
+}
+
+// for-fallback with empty list
+forFallback: {
+	for x in [] {
+		"\(x)": x
+	} fallback {
+		empty: true
+	}
+}
+
+// for-fallback with outer scope reference
+forFallbackOuter: {
+	let val = 10
+	for x in [] {
+		x
+	} fallback {
+		fallbackField: val
+	}
+}
+-- diff/-out/definition-v3<==>+out/definition --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,7 @@
+-// Test export of else clause in comprehensions
++@experiment(try)
++
++// Test export of fallback clause in comprehensions
++
+ // if-else
+ ifElse: {
+ 	if false {
+@@ -8,21 +11,21 @@
+ 	}
+ }
+ 
+-// for-else with empty list
+-forElse: {
++// for-fallback with empty list
++forFallback: {
+ 	for x in [] {
+ 		"\(x)": x
+-	} else {
++	} fallback {
+ 		empty: true
+ 	}
+ }
+ 
+-// for-else with outer scope reference
+-forElseOuter: {
++// for-fallback with outer scope reference
++forFallbackOuter: {
+ 	let val = 10
+ 	for x in [] {
+ 		x
+-	} else {
+-		fallback: val
++	} fallback {
++		fallbackField: val
+ 	}
+ }
 -- out/definition --
 // Test export of else clause in comprehensions
 // if-else
@@ -45,6 +195,51 @@ forElseOuter: {
 		fallback: val
 	}
 }
+-- out/doc-v3 --
+[]
+[ifElse]
+- if-else
+
+[ifElse b]
+[forFallback]
+- for-fallback with empty list
+
+[forFallback empty]
+[forFallbackOuter]
+- for-fallback with outer scope reference
+
+[forFallbackOuter val]
+[forFallbackOuter fallbackField]
+-- diff/-out/doc-v3<==>+out/doc --
+diff old new
+--- old
++++ new
+@@ -1,16 +1,14 @@
+ []
+-- Test export of else clause in comprehensions
+-
+ [ifElse]
+ - if-else
+ 
+ [ifElse b]
+-[forElse]
+-- for-else with empty list
+-
+-[forElse empty]
+-[forElseOuter]
+-- for-else with outer scope reference
+-
+-[forElseOuter val]
+-[forElseOuter fallback]
++[forFallback]
++- for-fallback with empty list
++
++[forFallback empty]
++[forFallbackOuter]
++- for-fallback with outer scope reference
++
++[forFallbackOuter val]
++[forFallbackOuter fallbackField]
 -- out/doc --
 []
 - Test export of else clause in comprehensions
@@ -62,7 +257,7 @@ forElseOuter: {
 
 [forElseOuter val]
 [forElseOuter fallback]
--- out/value --
+-- out/value-v3 --
 == Simplified
 {
 	// if-else
@@ -70,14 +265,14 @@ forElseOuter: {
 		b: 2
 	}
 
-	// for-else with empty list
-	forElse: {
+	// for-fallback with empty list
+	forFallback: {
 		empty: true
 	}
 
-	// for-else with outer scope reference
-	forElseOuter: {
-		fallback: 10
+	// for-fallback with outer scope reference
+	forFallbackOuter: {
+		fallbackField: 10
 	}
 }
 == Raw
@@ -87,14 +282,14 @@ forElseOuter: {
 		b: 2
 	}
 
-	// for-else with empty list
-	forElse: {
+	// for-fallback with empty list
+	forFallback: {
 		empty: true
 	}
 
-	// for-else with outer scope reference
-	forElseOuter: {
-		fallback: 10
+	// for-fallback with outer scope reference
+	forFallbackOuter: {
+		fallbackField: 10
 	}
 }
 == Final
@@ -102,39 +297,46 @@ forElseOuter: {
 	ifElse: {
 		b: 2
 	}
-	forElse: {
+	forFallback: {
 		empty: true
 	}
-	forElseOuter: {
-		fallback: 10
+	forFallbackOuter: {
+		fallbackField: 10
 	}
 }
 == All
 {
+	@experiment(try)
+
+	// Test export of fallback clause in comprehensions
+
 	// if-else
 	ifElse: {
 		b: 2
 	}
 
-	// for-else with empty list
-	forElse: {
+	// for-fallback with empty list
+	forFallback: {
 		empty: true
 	}
 
-	// for-else with outer scope reference
-	forElseOuter: {
-		fallback: 10
+	// for-fallback with outer scope reference
+	forFallbackOuter: {
+		fallbackField: 10
 	}
 }
 == Eval
 {
+	@experiment(try)
+
+	// Test export of fallback clause in comprehensions
 	ifElse: {
 		b: 2
 	}
-	forElse: {
+	forFallback: {
 		empty: true
 	}
-	forElseOuter: {
-		fallback: 10
+	forFallbackOuter: {
+		fallbackField: 10
 	}
 }

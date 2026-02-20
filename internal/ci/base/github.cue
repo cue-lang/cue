@@ -1,4 +1,5 @@
 @experiment(explicitopen)
+@experiment(try)
 
 package base
 

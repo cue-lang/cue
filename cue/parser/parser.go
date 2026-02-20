@@ -866,9 +866,12 @@ func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 	expr := p.parseStruct()
 	sc.closeExpr(p, expr)
 
-	var elseClause *ast.ElseClause
-	if p.tok == token.ELSE {
-		elseClause = p.parseElseClause()
+	// Determine if this comprehension starts with a for clause
+	hasForClause := tok == token.FOR
+
+	var fallbackClause *ast.FallbackClause
+	if p.tok == token.ELSE || p.tok == token.FALLBACK {
+		fallbackClause = p.parseFallbackClause(hasForClause)
 	}
 
 	if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
@@ -876,9 +879,9 @@ func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 	}
 
 	return &ast.Comprehension{
-		Clauses: clauses,
-		Value:   expr,
-		Else:    elseClause,
+		Clauses:  clauses,
+		Value:    expr,
+		Fallback: fallbackClause,
 	}, nil
 }
 
@@ -950,7 +953,8 @@ func (p *parser) parseField() (decl ast.Decl) {
 		case token.IDENT, token.LBRACK, token.LPAREN,
 			token.STRING, token.INTERPOLATION,
 			token.NULL, token.TRUE, token.FALSE,
-			token.FOR, token.IF, token.LET, token.IN:
+			token.FOR, token.IF, token.LET, token.IN,
+			token.TRY, token.ELSE, token.FALLBACK:
 			return &ast.EmbedDecl{Expr: expr}
 		}
 		fallthrough
@@ -1040,6 +1044,10 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.
 			return nil, nil, comp, false
 		}
 		expr = ident
+
+	case token.ELSE, token.FALLBACK:
+		// These keywords can be used as field labels
+		expr = p.parseExpr()
 
 	case token.LET:
 		let, ident := p.parseLetDecl()
@@ -1231,18 +1239,37 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentSt
 	}
 }
 
-// parseElseClause parses an else clause in a comprehension.
-func (p *parser) parseElseClause() *ast.ElseClause {
+// parseFallbackClause parses an else or fallback clause in a comprehension.
+// It accepts the appropriate keyword based on hasForClause:
+// - hasForClause=true: expects FALLBACK, errors on ELSE
+// - hasForClause=false: expects ELSE, errors on FALLBACK
+func (p *parser) parseFallbackClause(hasForClause bool) *ast.FallbackClause {
 	if p.trace {
-		defer un(trace(p, "ElseClause"))
+		defer un(trace(p, "FallbackClause"))
 	}
 	c := p.openComments()
-	elsePos := p.expect(token.ELSE)
+
+	if p.experiments == nil || !p.experiments.Try {
+		p.errf(p.pos, "%s requires @experiment(try)", p.tok)
+	}
+
+	var pos token.Pos
+	if hasForClause {
+		if p.tok == token.ELSE {
+			p.errf(p.pos, "use 'fallback' with 'for' clauses")
+		}
+		pos = p.expect(token.FALLBACK)
+	} else {
+		if p.tok == token.FALLBACK {
+			p.errf(p.pos, "use 'else' with 'if' clauses")
+		}
+		pos = p.expect(token.ELSE)
+	}
 	body := p.parseStruct()
-	return c.closeClause(p, &ast.ElseClause{
-		Else: elsePos,
-		Body: body.(*ast.StructLit),
-	}).(*ast.ElseClause)
+	return c.closeClause(p, &ast.FallbackClause{
+		Fallback: pos,
+		Body:     body.(*ast.StructLit),
+	}).(*ast.FallbackClause)
 }
 
 func (p *parser) parseFunc() (expr ast.Expr) {
@@ -1366,9 +1393,12 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 			expr := p.parseStruct()
 			sc.closeExpr(p, expr)
 
-			var elseClause *ast.ElseClause
-			if p.tok == token.ELSE {
-				elseClause = p.parseElseClause()
+			// Determine if this comprehension starts with a for clause
+			hasForClause := tok == token.FOR
+
+			var fallbackClause *ast.FallbackClause
+			if p.tok == token.ELSE || p.tok == token.FALLBACK {
+				fallbackClause = p.parseFallbackClause(hasForClause)
 			}
 
 			if p.atComma("list literal", token.RBRACK) { // TODO: may be EOF
@@ -1376,9 +1406,9 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 			}
 
 			return &ast.Comprehension{
-				Clauses: clauses,
-				Value:   expr,
-				Else:    elseClause,
+				Clauses:  clauses,
+				Value:    expr,
+				Fallback: fallbackClause,
 			}, true
 		}
 

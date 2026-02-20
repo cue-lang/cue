@@ -421,8 +421,15 @@ func DebugStr(x interface{}) (out string) {
 	case *ast.Comprehension:
 		out := DebugStr(v.Clauses)
 		out += DebugStr(v.Value)
-		if v.Else != nil {
-			out += " else " + DebugStr(v.Else.Body)
+		if v.Fallback != nil {
+			// Use "fallback" for 'for' comprehensions, "else" for 'if'/'try'
+			kw := "else"
+			if len(v.Clauses) > 0 {
+				if _, ok := v.Clauses[0].(*ast.ForClause); ok {
+					kw = "fallback"
+				}
+			}
+			out += " " + kw + " " + DebugStr(v.Fallback.Body)
 		}
 		return out
 

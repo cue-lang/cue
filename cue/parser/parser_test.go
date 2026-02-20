@@ -548,40 +548,44 @@ cannot import package as definition identifier`,
 		{
 			desc:    "if-else comprehension",
 			version: "v0.16.0",
-			in: `{
+			in: `@experiment(try)
+		{
 			a: {
 				if true { x: 1 } else { y: 2 }
 			}
 		}`,
-			out: `{a: {if true {x: 1} else {y: 2}}}`,
+			out: `@experiment(try), {a: {if true {x: 1} else {y: 2}}}`,
 		},
 		{
-			desc:    "for-else comprehension",
+			desc:    "for-fallback comprehension",
 			version: "v0.16.0",
-			in: `{
+			in: `@experiment(try)
+		{
 			a: {
-				for x in [] { "\(x)": x } else { empty: true }
+				for x in [] { "\(x)": x } fallback { empty: true }
 			}
 		}`,
-			out: `{a: {for x in [] {"\(x)": x} else {empty: true}}}`,
+			out: `@experiment(try), {a: {for x in [] {"\(x)": x} fallback {empty: true}}}`,
 		},
 		{
-			desc:    "multi-clause comprehension with else",
+			desc:    "multi-clause comprehension with fallback",
 			version: "v0.16.0",
-			in: `{
+			in: `@experiment(try)
+		{
 			a: {
-				for x in [1,2] if x > 10 { "\(x)": x } else { none: true }
+				for x in [1,2] if x > 10 { "\(x)": x } fallback { none: true }
 			}
 		}`,
-			out: `{a: {for x in [1, 2] if x>10 {"\(x)": x} else {none: true}}}`,
+			out: `@experiment(try), {a: {for x in [1, 2] if x>10 {"\(x)": x} fallback {none: true}}}`,
 		},
 		{
-			desc:    "list comprehension with else",
+			desc:    "list comprehension with fallback",
 			version: "v0.16.0",
-			in: `{
-			a: [for x in [] { x } else { 0 }]
+			in: `@experiment(try)
+		{
+			a: [for x in [] { x } fallback { 0 }]
 		}`,
-			out: `{a: [for x in [] {x} else {0}]}`,
+			out: `@experiment(try), {a: [for x in [] {x} fallback {0}]}`,
 		},
 		{
 			desc:    "try struct form",
@@ -658,13 +662,36 @@ cannot import package as definition identifier`,
 		{
 			desc:    "multiple else clauses error",
 			version: "v0.16.0",
-			in: `{
+			in: `@experiment(try)
+
 			a: {
 				if true { x: 1 } else { y: 2 } else { z: 3 }
 			}
 		}`,
-			out: `{a: {if true {x: 1} else {y: 2}, {z: 3}}}
-missing ',' in struct literal`,
+			out: `@experiment(try), a: {if true {x: 1} else {y: 2}, {z: 3}}
+missing ',' in struct literal (and 1 more errors)`,
+		},
+		{
+			desc:    "else requires experiment even with latest version",
+			version: "v1000.0.0", // Future version that should still require the experiment
+			in: `{
+			a: {
+				if true { x: 1 } else { y: 2 }
+			}
+		}`,
+			out: `{a: {if true {x: 1} else {y: 2}}}
+else requires @experiment(try)`,
+		},
+		{
+			desc:    "fallback requires experiment even with latest version",
+			version: "v1000.0.0", // Future version that should still require the experiment
+			in: `{
+			a: {
+				for x in [] { "\(x)": x } fallback { empty: true }
+			}
+		}`,
+			out: `{a: {for x in [] {"\(x)": x} fallback {empty: true}}}
+fallback requires @experiment(try)`,
 		},
 		{
 			desc: "let declaration",

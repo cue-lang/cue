@@ -167,8 +167,8 @@ func (w *Visitor) node(n adt.Node) {
 			w.node(c)
 		}
 		w.node(adt.ToExpr(x.Value))
-		if x.Else != nil {
-			w.node(x.Else)
+		if x.Fallback != nil {
+			w.node(x.Fallback)
 		}
 
 	case *adt.ForClause:

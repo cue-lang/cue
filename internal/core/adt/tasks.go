@@ -288,11 +288,11 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			}
 			// If comprehension yielded zero values and has an else clause,
 			// insert the else clause's struct contents as list elements.
-			if index == indexBefore && x.Else != nil {
+			if index == indexBefore && x.Fallback != nil {
 				label, err := MakeLabel(x.Source(), index, IntLabel)
 				n.addErr(err)
 				index++
-				conj := MakeConjunct(t.env, x.Else, id)
+				conj := MakeConjunct(t.env, x.Fallback, id)
 				n.insertArc(label, ArcMember, conj, id, true)
 			}
 

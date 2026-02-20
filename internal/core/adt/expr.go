@@ -1927,9 +1927,9 @@ type Comprehension struct {
 	// information as possible.
 	Value Node
 
-	// Else is the optional else clause that is yielded when the comprehension
+	// Fallback is the optional else clause that is yielded when the comprehension
 	// produces zero values.
-	Else *StructLit
+	Fallback *StructLit
 
 	// The type of field as which the comprehension is added.
 	arcType ArcType

@@ -100,12 +100,13 @@ const (
 
 	keywordBeg
 
-	IF   // if
-	ELSE // else
-	FOR  // for
-	IN   // in
-	LET  // let
-	TRY  // try
+	IF       // if
+	ELSE     // else
+	FOR      // for
+	IN       // in
+	LET      // let
+	TRY      // try
+	FALLBACK // fallback
 	// experimental
 	FUNC // func
 

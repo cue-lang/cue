@@ -5,7 +5,7 @@ exec cue cmd main
 cmp stdout expect-stdout
 
 -- expect-stdout --
-{}
+{"d1":{"d2":{"foo":0,"bar":1}}}
 -- data.cue --
 package p
 

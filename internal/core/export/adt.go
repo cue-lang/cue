@@ -831,11 +831,11 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 	}
 	c.Value = v
 
-	// Export else clause using outer environment.
-	if comp.Else != nil {
-		elseBody := e.expr(outerEnv, comp.Else)
-		if body, ok := elseBody.(*ast.StructLit); ok {
-			c.Else = &ast.ElseClause{Body: body}
+	// Export fallback clause using outer environment.
+	if comp.Fallback != nil {
+		fallbackBody := e.expr(outerEnv, comp.Fallback)
+		if body, ok := fallbackBody.(*ast.StructLit); ok {
+			c.Fallback = &ast.FallbackClause{Body: body}
 		}
 	}
 

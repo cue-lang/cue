@@ -1,19 +1,60 @@
 -- in.cue --
-// Test that dependencies in else clause are tracked
+@experiment(try)
 
-// else clause references outer field - else triggers because list is empty
+// Test that dependencies in fallback clause are tracked
+
+// fallback clause references outer field - fallback triggers because list is empty
 a: b: {
-	for x in c { "\(x)": x } else { fallback: d }
+	for x in c { "\(x)": x } fallback { fallbackField: d }
 }
 c: []
 d: 10
+-- out/dependencies-v3/field --
+line  reference    path of resulting vertex
+7:    c         => c
+-- diff/-out/dependencies-v3/field<==>+out/dependencies/field --
+diff old new
+--- old
++++ new
+@@ -1,2 +1,2 @@
+ line  reference    path of resulting vertex
+-5:    c         => c
++7:    c         => c
 -- out/dependencies/field --
 line  reference    path of resulting vertex
 5:    c         => c
+-- out/dependencies-v3/all --
+line  reference    path of resulting vertex
+7:    c         => c
+7:    d         => d
+-- diff/-out/dependencies-v3/all<==>+out/dependencies/all --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,3 @@
+ line  reference    path of resulting vertex
+-5:    c         => c
+-5:    d         => d
++7:    c         => c
++7:    d         => d
 -- out/dependencies/all --
 line  reference    path of resulting vertex
 5:    c         => c
 5:    d         => d
+-- out/dependencies-v3/dynamic --
+line  reference    path of resulting vertex
+7:    c         => c
+7:    d         => d
+-- diff/-out/dependencies-v3/dynamic<==>+out/dependencies/dynamic --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,3 @@
+ line  reference    path of resulting vertex
+-5:    c         => c
+-5:    d         => d
++7:    c         => c
++7:    d         => d
 -- out/dependencies/dynamic --
 line  reference    path of resulting vertex
 5:    c         => c

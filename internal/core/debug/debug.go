@@ -715,9 +715,9 @@ func (w *printer) node(n adt.Node) {
 			w.node(c)
 		}
 		w.node(adt.ToExpr(x.Value))
-		if x.Else != nil {
+		if x.Fallback != nil {
 			w.string(" else ")
-			w.node(x.Else)
+			w.node(x.Fallback)
 		}
 
 	case *adt.ForClause:

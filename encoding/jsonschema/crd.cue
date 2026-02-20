@@ -1,3 +1,5 @@
+@experiment(try)
+
 package jsonschema
 
 // input holds the parsed YAML document, which may contain multiple

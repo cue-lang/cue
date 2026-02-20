@@ -251,9 +251,16 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 			f.walkClauseList(n.Clauses, blank)
 			f.print(blank, nooverride)
 			f.expr(n.Value)
-			if n.Else != nil {
-				f.print(blank, n.Else.Else, token.ELSE, blank)
-				f.expr(n.Else.Body)
+			if n.Fallback != nil {
+				// Use FALLBACK keyword for 'for' comprehensions, ELSE for 'if'/'try'
+				kw := token.ELSE
+				if len(n.Clauses) > 0 {
+					if _, ok := n.Clauses[0].(*ast.ForClause); ok {
+						kw = token.FALLBACK
+					}
+				}
+				f.print(blank, n.Fallback.Fallback, kw, blank)
+				f.expr(n.Fallback.Body)
 			}
 
 		case *ast.Ellipsis:
@@ -497,9 +504,16 @@ func (f *formatter) embedding(decl ast.Expr) {
 		f.walkClauseList(n.Clauses, blank)
 		f.print(blank, nooverride)
 		f.expr(n.Value)
-		if n.Else != nil {
-			f.print(blank, n.Else.Else, token.ELSE, blank)
-			f.expr(n.Else.Body)
+		if n.Fallback != nil {
+			// Use FALLBACK keyword for 'for' comprehensions, ELSE for 'if'/'try'
+			kw := token.ELSE
+			if len(n.Clauses) > 0 {
+				if _, ok := n.Clauses[0].(*ast.ForClause); ok {
+					kw = token.FALLBACK
+				}
+			}
+			f.print(blank, n.Fallback.Fallback, kw, blank)
+			f.expr(n.Fallback.Body)
 		}
 
 	case *ast.Ellipsis:

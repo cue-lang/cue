@@ -16,23 +16,23 @@ package compile
 
 import (
 	"github.com/cockroachdb/apd/v3"
-	"golang.org/x/text/unicode/norm"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 // LabelFromNode converts an ADT node to a feature.
 func (c *compiler) label(n ast.Node) adt.Feature {
-	index := c.index
 	switch x := n.(type) {
 	case *ast.Ident:
 		if x.Name == "_" {
 			return adt.InvalidLabel
 		}
-		return adt.MakeIdentLabel(c.index, x.Name, c.pkgPath)
+		return adt.MakeIdentLabel(x.Name, c.pkgPath)
 
 	case *ast.BasicLit:
 		switch x.Kind {
@@ -44,12 +44,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 				return adt.InvalidLabel
 			}
 
-			i := index.StringToIndex(norm.NFC.String(s))
-			f, err := adt.MakeLabel(n, i, adt.StringLabel)
-			if err != nil {
-				c.errf(n, msg, err)
-			}
-			return f
+			return adt.MakeStringLabel(norm.NFC.String(s))
 
 		case token.INT:
 			const msg = "invalid int label: %v"
@@ -70,24 +65,14 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 				return adt.InvalidLabel
 			}
 
-			f, err := adt.MakeLabel(n, i, adt.IntLabel)
-			if err != nil {
-				c.errf(n, msg, err)
-				return adt.InvalidLabel
-			}
-			return f
+			return adt.MakeIntLabel(adt.IntLabel, i)
 
 		case token.FLOAT:
 			_ = c.errf(n, "float %s cannot be used as label", x.Value)
 			return adt.InvalidLabel
 
 		default: // keywords (null, true, false, for, in, if, let)
-			i := index.StringToIndex(x.Kind.String())
-			f, err := adt.MakeLabel(n, i, adt.StringLabel)
-			if err != nil {
-				c.errf(n, "invalid string label: %v", err)
-			}
-			return f
+			return adt.MakeStringLabel(x.Kind.String())
 		}
 
 	default:

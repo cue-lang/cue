@@ -5,19 +5,23 @@ top: _
 a: [ if cond {}]
 b: [for x in src.foo {}]
 c: {for x in top {}}
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 5
-Allocs: 2
-Retain: 0
-
-Unifications: 7
-Conjuncts:    7
-Disjuncts:    7
-
-NumCloseIDs: 1
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  cond: bool
+  src: {}
+  top: _
+  a: [
+    if 〈1;cond〉 {},
+  ]
+  b: [
+    for _, x in 〈1;src〉.foo {},
+  ]
+  c: {
+    for _, x in 〈1;top〉 {}
+  }
+}
+-- out/evalalpha --
 (struct){
   cond: (bool){ bool }
   src: (struct){
@@ -34,21 +38,5 @@ NumCloseIDs: 1
   c: (_|_){
     // [incomplete] c: cannot range over top (incomplete type _):
     //     ./in.cue:6:14
-  }
-}
--- out/compile --
---- in.cue
-{
-  cond: bool
-  src: {}
-  top: _
-  a: [
-    if 〈1;cond〉 {},
-  ]
-  b: [
-    for _, x in 〈1;src〉.foo {},
-  ]
-  c: {
-    for _, x in 〈1;top〉 {}
   }
 }

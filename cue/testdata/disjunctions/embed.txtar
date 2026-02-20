@@ -123,21 +123,123 @@ diff old new
 +Notifications: 6
 +
 +NumCloseIDs: 39
--- out/eval/stats --
-Leaks:  19
-Freed:  430
-Reused: 413
-Allocs: 36
-Retain: 5
-
-Unifications: 268
-Conjuncts:    502
-Disjuncts:    438
-
-MisalignedConjunct: 3
-
-NumCloseIDs: 1
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  default: {
+    y: (*1|{
+      a: 2
+    })
+    〈0;y〉
+  }
+  unambiguous: {
+    y: (1|{
+      a: 2
+    })
+    〈0;y〉
+  }
+  forDefault: {
+    y: (*1|{
+      a: 2
+    })
+    for _, x in [
+      1,
+    ] {
+      〈2;y〉
+    }
+  }
+  openDefault: {
+    #y: (*1|{
+      a: 2
+    })
+    〈0;#y〉
+  }
+  openAmbiguous: {
+    #y: (1|{
+      a: 2
+    })
+    〈0;#y〉
+  }
+  forceStruct: {
+    #y: (1|{
+      a: 2
+    })
+    〈0;#y〉
+    {}
+  }
+  defaultsMulti: {
+    a: {
+      #def: {
+        (*{}|{
+          a: string
+        }|{
+          b: string
+        })
+        (*{}|{
+          c: string
+        }|{
+          d: string
+        })
+      }
+      a: (〈0;#def〉 & {
+        a: "foo"
+      })
+    }
+    b: {
+      #def: {
+        (*{}|{
+          a: string
+        }|{
+          b: string
+        })
+        (*{}|{
+          c: string
+        }|{
+          d: string
+        })
+        (*{}|{
+          d: string
+        }|{
+          e: string
+        })
+      }
+      a: (〈0;#def〉 & {
+        a: "foo"
+        e: "bar"
+      })
+    }
+  }
+  nested: {
+    a: (1|2|*((3|4|*(5|6|*7)) & (3|4|(*7|8))))
+  }
+}
+--- issue3415.cue
+{
+  issue3415: {
+    full: {
+      A: (〈0;#A〉 & {
+        i: {
+          (〈0;_a〉 + 〈0;_b〉)
+          _a: 1
+          _b: 10
+        }
+      })
+      #A: {
+        i: (*0|number)
+      }
+    }
+  }
+  issue3415: {
+    reduced: {
+      a: {
+        (1 + 〈0;#b〉)
+        #b: 10
+      }
+      a: (*0|number)
+    }
+  }
+}
+-- out/evalalpha --
 (struct){
   default: (struct){
     y: ((int|struct)){ |(*(int){ 1 }, (struct){
@@ -318,122 +420,6 @@ NumCloseIDs: 1
         11
         #b: (int){ 10 }
       }
-    }
-  }
-}
--- out/compile --
---- in.cue
-{
-  default: {
-    y: (*1|{
-      a: 2
-    })
-    〈0;y〉
-  }
-  unambiguous: {
-    y: (1|{
-      a: 2
-    })
-    〈0;y〉
-  }
-  forDefault: {
-    y: (*1|{
-      a: 2
-    })
-    for _, x in [
-      1,
-    ] {
-      〈2;y〉
-    }
-  }
-  openDefault: {
-    #y: (*1|{
-      a: 2
-    })
-    〈0;#y〉
-  }
-  openAmbiguous: {
-    #y: (1|{
-      a: 2
-    })
-    〈0;#y〉
-  }
-  forceStruct: {
-    #y: (1|{
-      a: 2
-    })
-    〈0;#y〉
-    {}
-  }
-  defaultsMulti: {
-    a: {
-      #def: {
-        (*{}|{
-          a: string
-        }|{
-          b: string
-        })
-        (*{}|{
-          c: string
-        }|{
-          d: string
-        })
-      }
-      a: (〈0;#def〉 & {
-        a: "foo"
-      })
-    }
-    b: {
-      #def: {
-        (*{}|{
-          a: string
-        }|{
-          b: string
-        })
-        (*{}|{
-          c: string
-        }|{
-          d: string
-        })
-        (*{}|{
-          d: string
-        }|{
-          e: string
-        })
-      }
-      a: (〈0;#def〉 & {
-        a: "foo"
-        e: "bar"
-      })
-    }
-  }
-  nested: {
-    a: (1|2|*((3|4|*(5|6|*7)) & (3|4|(*7|8))))
-  }
-}
---- issue3415.cue
-{
-  issue3415: {
-    full: {
-      A: (〈0;#A〉 & {
-        i: {
-          (〈0;_a〉 + 〈0;_b〉)
-          _a: 1
-          _b: 10
-        }
-      })
-      #A: {
-        i: (*0|number)
-      }
-    }
-  }
-  issue3415: {
-    reduced: {
-      a: {
-        (1 + 〈0;#b〉)
-        #b: 10
-      }
-      a: (*0|number)
     }
   }
 }

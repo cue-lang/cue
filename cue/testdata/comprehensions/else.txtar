@@ -105,18 +105,6 @@ nestedOuterElse: {
 nestedInnerElse: {
 	for x in [1] { for y in [] { y } else { inner: true } } else { outer: true }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  69
-Reused: 60
-Allocs: 9
-Retain: 0
-
-Unifications: 69
-Conjuncts:    90
-Disjuncts:    69
-
-NumCloseIDs: 2
 -- out/evalalpha --
 (struct){
   ifTrue: (struct){
@@ -161,7 +149,7 @@ NumCloseIDs: 2
     fallback: (int){ 3 }
   }
   outerScope: (struct){
-    let threshold#1 = (int){ 10 }
+    let threshold#0 = (int){ 10 }
     fallback: (int){ 10 }
   }
   ifNestedBody: (struct){
@@ -309,11 +297,11 @@ NumCloseIDs: 2
     }
   }
   outerScope: {
-    let threshold#1 = 10
+    let threshold#0 = 10
     for _, x in [] {
       〈1;x〉
     } else {
-      fallback: 〈1;let threshold#1〉
+      fallback: 〈1;let threshold#0〉
     }
   }
   ifNestedBody: {

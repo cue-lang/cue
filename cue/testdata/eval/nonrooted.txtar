@@ -46,17 +46,71 @@ issue3977: inlineLet: {
 
 	err: p.out
 }
--- out/eval/stats --
-Leaks:  9
-Freed:  48
-Reused: 43
-Allocs: 14
-Retain: 27
-
-Unifications: 47
-Conjuncts:    87
-Disjuncts:    68
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  issue3977: {
+    inlineExpr: {
+      #NetworkID: 1
+      #fn: {
+        x: 〈1;#NetworkID〉
+        out: (〈0;x〉 + 1)
+      }
+      err: (〈0;#fn〉 & {
+        x: 2
+      }).out
+    }
+  }
+  issue3977: {
+    inlineDisj1: {
+      #NetworkID: ("2"|"3"|"4")
+      #fn: {
+        x: 〈1;#NetworkID〉
+        out: "value=\(〈0;x〉)"
+      }
+      err: (〈0;#fn〉 & {
+        x: "invalid"
+      }).out
+    }
+  }
+  issue3977: {
+    inlineDisj2: {
+      #NetworkID: 1
+      #fn: {
+        x: 〈1;#NetworkID〉
+        out: (〈0;x〉 + 10)
+      }
+      err: (〈0;#fn〉 & {
+        x: (*2|4)
+      }).out
+    }
+  }
+  issue3977: {
+    inlineDisj3: {
+      #NetworkID: 1
+      #fn: {
+        x: 〈1;#NetworkID〉
+        out: (〈0;x〉 + 10)
+      }
+      err: (〈0;#fn〉 & {
+        x: (*2|int)
+      }).out
+    }
+  }
+  issue3977: {
+    inlineLet: {
+      #NetworkID: 1
+      let p#0 = ({
+        x: 〈1;#NetworkID〉
+        out: (〈0;x〉 + 10)
+      } & {
+        x: 2
+      })
+      err: 〈0;let p#0〉.out
+    }
+  }
+}
+-- out/evalalpha --
 Errors:
 x: conflicting values 2 and 1:
     ./in.cue:20:14
@@ -127,7 +181,7 @@ Result:
     }
     inlineLet: (struct){
       #NetworkID: (int){ 1 }
-      let p#1 = (_|_){
+      let p#0 = (_|_){
         // [eval]
         x: (_|_){
           // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
@@ -143,70 +197,6 @@ Result:
         }
       }
       err: (int){ 12 }
-    }
-  }
-}
--- out/compile --
---- in.cue
-{
-  issue3977: {
-    inlineExpr: {
-      #NetworkID: 1
-      #fn: {
-        x: 〈1;#NetworkID〉
-        out: (〈0;x〉 + 1)
-      }
-      err: (〈0;#fn〉 & {
-        x: 2
-      }).out
-    }
-  }
-  issue3977: {
-    inlineDisj1: {
-      #NetworkID: ("2"|"3"|"4")
-      #fn: {
-        x: 〈1;#NetworkID〉
-        out: "value=\(〈0;x〉)"
-      }
-      err: (〈0;#fn〉 & {
-        x: "invalid"
-      }).out
-    }
-  }
-  issue3977: {
-    inlineDisj2: {
-      #NetworkID: 1
-      #fn: {
-        x: 〈1;#NetworkID〉
-        out: (〈0;x〉 + 10)
-      }
-      err: (〈0;#fn〉 & {
-        x: (*2|4)
-      }).out
-    }
-  }
-  issue3977: {
-    inlineDisj3: {
-      #NetworkID: 1
-      #fn: {
-        x: 〈1;#NetworkID〉
-        out: (〈0;x〉 + 10)
-      }
-      err: (〈0;#fn〉 & {
-        x: (*2|int)
-      }).out
-    }
-  }
-  issue3977: {
-    inlineLet: {
-      #NetworkID: 1
-      let p#1 = ({
-        x: 〈1;#NetworkID〉
-        out: (〈0;x〉 + 10)
-      } & {
-        x: 2
-      })
-      err: 〈0;let p#1〉.out
     }
   }
 }

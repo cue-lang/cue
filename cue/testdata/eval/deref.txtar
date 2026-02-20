@@ -32,62 +32,12 @@ issue4011: reduced: {
 	}
 	envs: foo: {}
 }
--- out/eval/stats --
-Leaks:  5
-Freed:  22
-Reused: 12
-Allocs: 15
-Retain: 17
-
-Unifications: 27
-Conjuncts:    33
-Disjuncts:    37
-
-MisalignedConjunct: 4
-
-NumCloseIDs: 2
--- out/eval --
-(struct){
-  issue4011: (struct){
-    full: (struct){
-      let _hugoEnvironments#1 = (struct){
-        default: (string){ "_default" }
-        production: (string){ "production" }
-      }
-      site: (struct){
-        cls: (struct){
-          fs: (struct){
-            Create: (struct){
-              config: (struct){
-                Contents: (struct){
-                }
-              }
-            }
-          }
-          hugo: (struct){
-            production: (struct){
-            }
-          }
-        }
-      }
-    }
-    reduced: (struct){
-      result: (struct){
-        foo: (bool){ true }
-      }
-      envs: (struct){
-        foo: (struct){
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
   issue4011: {
     full: {
-      let _hugoEnvironments#1 = {
+      let _hugoEnvironments#0 = {
         default: "_default"
         production: "production"
       }
@@ -98,7 +48,7 @@ NumCloseIDs: 2
         [_]: {
           fs: {
             Create: {
-              for envID, envName in 〈4;let _hugoEnvironments#1〉 let envConfig = 〈3;hugo〉[〈0;envID〉] if (〈0;envConfig〉 != _|_(explicit error (_|_ literal) in source)) {
+              for envID, envName in 〈4;let _hugoEnvironments#0〉 let envConfig = 〈3;hugo〉[〈0;envID〉] if (〈0;envConfig〉 != _|_(explicit error (_|_ literal) in source)) {
                 config: {
                   Contents: 〈2;envConfig〉
                 }
@@ -128,6 +78,42 @@ NumCloseIDs: 2
       }
       envs: {
         foo: {}
+      }
+    }
+  }
+}
+-- out/evalalpha --
+(struct){
+  issue4011: (struct){
+    full: (struct){
+      let _hugoEnvironments#0 = (struct){
+        default: (string){ "_default" }
+        production: (string){ "production" }
+      }
+      site: (struct){
+        cls: (struct){
+          fs: (struct){
+            Create: (struct){
+              config: (struct){
+                Contents: (struct){
+                }
+              }
+            }
+          }
+          hugo: (struct){
+            production: (struct){
+            }
+          }
+        }
+      }
+    }
+    reduced: (struct){
+      result: (struct){
+        foo: (bool){ true }
+      }
+      envs: (struct){
+        foo: (struct){
+        }
       }
     }
   }

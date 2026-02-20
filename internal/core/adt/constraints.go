@@ -176,18 +176,20 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature) (result bool) {
 	case *BoundValue:
 		switch x.Kind() {
 		case StringKind:
-			if !f.IsString() || int64(f.Index()) == MaxIndex {
+			if !f.IsString() || f.IsAny() {
 				return false
 			}
-			str := ctx.IndexToString(f.safeIndex())
-			return x.validateStr(ctx, str)
+			return x.validateStr(ctx, f.StringValue())
 
 		case NumberKind:
+			if f.IsAny() {
+				return true
+			}
 			return x.validateInt(ctx, int64(f.Index()))
 		}
 
 	case *Num:
-		if !f.IsInt() {
+		if !f.IsInt() || f.IsAny() {
 			return false
 		}
 		yi := int64(f.Index())
@@ -195,11 +197,10 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature) (result bool) {
 		return err == nil && xi == yi
 
 	case *String:
-		if !f.IsString() || int64(f.Index()) == MaxIndex {
+		if !f.IsString() || f.IsAny() {
 			return false
 		}
-		str := ctx.IndexToString(f.safeIndex())
-		return x.Str == str
+		return x.Str == f.StringValue()
 
 	case *Conjunction:
 		for _, a := range x.Values {

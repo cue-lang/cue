@@ -30,7 +30,7 @@ func TestMergeCloseInfo(t *testing.T) {
 		nv: &nodeContext{
 			node: &Vertex{
 				Arcs: []*Vertex{
-					{Label: 1, state: &nodeContext{}},
+					{Label: MakeIntLabel(IntLabel, 1), state: &nodeContext{}},
 				},
 			},
 			conjunctInfo: []conjunctInfo{
@@ -43,7 +43,7 @@ func TestMergeCloseInfo(t *testing.T) {
 		nw: &nodeContext{
 			node: &Vertex{
 				Arcs: []*Vertex{
-					{Label: 1, state: &nodeContext{}},
+					{Label: MakeIntLabel(IntLabel, 1), state: &nodeContext{}},
 				},
 			},
 			conjunctInfo: []conjunctInfo{
@@ -68,7 +68,7 @@ func TestMergeCloseInfo(t *testing.T) {
 		nv: &nodeContext{
 			node: &Vertex{
 				Arcs: []*Vertex{
-					{Label: 1, state: &nodeContext{}},
+					{Label: MakeIntLabel(IntLabel, 1), state: &nodeContext{}},
 				},
 			},
 			conjunctInfo: []conjunctInfo{
@@ -81,7 +81,7 @@ func TestMergeCloseInfo(t *testing.T) {
 		nw: &nodeContext{
 			node: &Vertex{
 				Arcs: []*Vertex{
-					{Label: 2, state: &nodeContext{}},
+					{Label: MakeIntLabel(IntLabel, 2), state: &nodeContext{}},
 				},
 			},
 			conjunctInfo: []conjunctInfo{

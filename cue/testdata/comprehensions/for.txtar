@@ -12,54 +12,6 @@ comprehensionBinds: {
 	a: {for _ in [1] {a: _}}
 	b: {for _, _ in [1] {a: _}}
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  16
-Reused: 12
-Allocs: 6
-Retain: 7
-
-Unifications: 18
-Conjuncts:    18
-Disjuncts:    21
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 5
--- out/eval --
-Errors:
-k: cannot range over e (found int, want list or struct):
-    ./in.cue:7:14
-
-Result:
-(_|_){
-  // [eval]
-  b: (struct){
-    b: (int){ 2 }
-    c: (int){ 3 }
-  }
-  a: (struct){
-    b: (int){ 1 }
-    c: (int){ 2 }
-  }
-  x: (struct){
-  }
-  y: (struct){
-  }
-  k: (_|_){
-    // [eval] k: cannot range over e (found int, want list or struct):
-    //     ./in.cue:7:14
-  }
-  e: (int){ int }
-  comprehensionBinds: (struct){
-    a: (struct){
-      a: (_){ _ }
-    }
-    b: (struct){
-      a: (_){ _ }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -98,6 +50,40 @@ Result:
       ] {
         a: _
       }
+    }
+  }
+}
+-- out/evalalpha --
+Errors:
+k: cannot range over e (found int, want list or struct):
+    ./in.cue:7:14
+
+Result:
+(_|_){
+  // [eval]
+  b: (struct){
+    b: (int){ 2 }
+    c: (int){ 3 }
+  }
+  a: (struct){
+    b: (int){ 1 }
+    c: (int){ 2 }
+  }
+  x: (struct){
+  }
+  y: (struct){
+  }
+  k: (_|_){
+    // [eval] k: cannot range over e (found int, want list or struct):
+    //     ./in.cue:7:14
+  }
+  e: (int){ int }
+  comprehensionBinds: (struct){
+    a: (struct){
+      a: (_){ _ }
+    }
+    b: (struct){
+      a: (_){ _ }
     }
   }
 }

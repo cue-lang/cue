@@ -67,9 +67,6 @@ t3: {
 		"hello": n: "blah"
 	}
 }
--- out/eval --
-t2.z.hello: unreferenced alias or let clause q:
-    ./issue1960.cue:15:3
 -- out/compile --
 t2.z.hello: unreferenced alias or let clause q:
     ./issue1960.cue:15:3
@@ -86,8 +83,8 @@ t2.z.hello: unreferenced alias or let clause q:
     z: {
       hello: {
         for _, x in 〈0;p〉 {}
-        let q#1 = 〈2;z〉.blah
-        p: 〈0;let q#1〉.r
+        let q#0 = 〈2;z〉.blah
+        p: 〈0;let q#0〉.r
         p: {
           t: 1
         }
@@ -105,7 +102,7 @@ t2.z.hello: unreferenced alias or let clause q:
     z: {
       hello: {
         for _, x in 〈0;p〉 {}
-        let q#2 = 〈2;z〉.blah
+        let q#1 = 〈2;z〉.blah
         p: {
           t: 1
         }
@@ -156,8 +153,8 @@ t2.z.hello: unreferenced alias or let clause q:
     z: {
       [=~"^h"]: (〈1;#c〉 & {
         n: string
-        let q#3 = 〈2;z〉[〈0;n〉]
-        p: 〈0;let q#3〉.r.e
+        let q#2 = 〈2;z〉[〈0;n〉]
+        p: 〈0;let q#2〉.r.e
       })
     }
     z: {
@@ -168,3 +165,6 @@ t2.z.hello: unreferenced alias or let clause q:
     }
   }
 }
+-- out/evalalpha --
+t2.z.hello: unreferenced alias or let clause q:
+    ./issue1960.cue:15:3

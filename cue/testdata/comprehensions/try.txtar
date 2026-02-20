@@ -496,18 +496,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 173
--- out/eval/stats --
-Leaks:  0
-Freed:  8
-Reused: 5
-Allocs: 3
-Retain: 0
-
-Unifications: 8
-Conjuncts:    13
-Disjuncts:    8
-
-NumCloseIDs: 1
 -- out/evalalpha --
 Errors:
 errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
@@ -1298,22 +1286,6 @@ diff old new
 +    }
 +  }
  }
--- out/eval --
-(struct){
-  a: (int){ 1 }
-  b: (int){ 2 }
-  success: (struct){
-    c: (int){ 3 }
-  }
-  single: (struct){
-    x: (int){ 5 }
-    y: (int){ 10 }
-  }
-  fallbackDef: (int){ 42 }
-  withFallbackDef: (struct){
-    v: (int){ 42 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

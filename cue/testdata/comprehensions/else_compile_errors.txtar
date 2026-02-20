@@ -8,23 +8,6 @@ forVarInElse: {
 letVarInElse: {
 	for x in [1,2,3] let y = x*2 { "\(x)": y } else { bad: y }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  2
-Reused: 2
-Allocs: 0
-Retain: 0
-
-Unifications: 2
-Conjuncts:    2
-Disjuncts:    2
-
-NumCloseIDs: 0
--- out/eval --
-forVarInElse.bad: reference "i" not found:
-    ./in.cue:3:45
-letVarInElse.bad: reference "y" not found:
-    ./in.cue:8:57
 -- out/compile --
 forVarInElse.bad: reference "i" not found:
     ./in.cue:3:45
@@ -55,3 +38,8 @@ letVarInElse.bad: reference "y" not found:
     }
   }
 }
+-- out/evalalpha --
+forVarInElse.bad: reference "i" not found:
+    ./in.cue:3:45
+letVarInElse.bad: reference "y" not found:
+    ./in.cue:8:57

@@ -182,175 +182,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 54
--- out/eval/stats --
-Leaks:  0
-Freed:  72
-Reused: 64
-Allocs: 8
-Retain: 15
-
-Unifications: 72
-Conjuncts:    127
-Disjuncts:    83
-
-MisalignedConjunct: 27
-
-NumCloseIDs: 20
-- comprehension.t1 should be at most an incomplete error, as it is fixable.
-  Arguably they should pass, though, as there is a predictable path to its
-  resolution.
--- out/eval --
-Errors:
-comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
-    ./comprehension.cue:71:13
-comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
-    ./comprehension.cue:82:13
-comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
-    ./comprehension.cue:114:9
-
-Result:
-(_|_){
-  // [eval]
-  comprehension: (_|_){
-    // [eval]
-    t1: (struct){
-      ok: (struct){
-        p0: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p1: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p2: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p3: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p4: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p5: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
-          //     ./comprehension.cue:71:13
-          x: (int){ 1 }
-        }
-      }
-    }
-    t3: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
-          //     ./comprehension.cue:82:13
-          x: (int){ 1 }
-        }
-        b: (struct){
-          y: (int){ 1 }
-          x: (int){ 1 }
-        }
-      }
-    }
-    t4: (struct){
-      ok: (struct){
-        x: (struct){
-          y: (struct){
-            a: (struct){
-            }
-          }
-        }
-      }
-    }
-    moreSpecific: (_|_){
-      // [eval]
-      ok: (struct){
-        a: (struct){
-          x: (int){ 1 }
-        }
-      }
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
-          //     ./comprehension.cue:114:9
-          x: (struct){
-            y: (int){ 1 }
-          }
-        }
-      }
-    }
-  }
-  freezing: (struct){
-    t1: (struct){
-      ok: (int){
-        1
-        #a: (#struct){
-          x: (string){ "a" }
-        }
-      }
-    }
-  }
-  issue3178: (struct){
-    input: (#list){
-      0: (string){ "Value" }
-    }
-    output: (struct){
-      Value: (bool){ true }
-    }
-  }
-}
 -- out/compile --
 --- comprehension.cue
 {
@@ -640,5 +471,157 @@ Result:
       }
     }
     for name, v in 〈0;output〉 {}
+  }
+}
+-- out/evalalpha --
+Errors:
+comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
+    ./comprehension.cue:71:13
+comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
+    ./comprehension.cue:82:13
+comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
+    ./comprehension.cue:114:9
+
+Result:
+(_|_){
+  // [eval]
+  comprehension: (_|_){
+    // [eval]
+    t1: (struct){
+      ok: (struct){
+        p0: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p1: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p2: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p3: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p4: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p5: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
+          //     ./comprehension.cue:71:13
+          x: (int){ 1 }
+        }
+      }
+    }
+    t3: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
+          //     ./comprehension.cue:82:13
+          x: (int){ 1 }
+        }
+        b: (struct){
+          y: (int){ 1 }
+          x: (int){ 1 }
+        }
+      }
+    }
+    t4: (struct){
+      ok: (struct){
+        x: (struct){
+          y: (struct){
+            a: (struct){
+            }
+          }
+        }
+      }
+    }
+    moreSpecific: (_|_){
+      // [eval]
+      ok: (struct){
+        a: (struct){
+          x: (int){ 1 }
+        }
+      }
+      err: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
+          //     ./comprehension.cue:114:9
+          x: (struct){
+            y: (int){ 1 }
+          }
+        }
+      }
+    }
+  }
+  freezing: (struct){
+    t1: (struct){
+      ok: (int){
+        1
+        #a: (#struct){
+          x: (string){ "a" }
+        }
+      }
+    }
+  }
+  issue3178: (struct){
+    input: (#list){
+      0: (string){ "Value" }
+    }
+    output: (struct){
+      Value: (bool){ true }
+    }
   }
 }

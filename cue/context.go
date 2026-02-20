@@ -455,7 +455,7 @@ func newContext(idx *runtime.Runtime) *adt.OpContext {
 }
 
 func debugStr(ctx *adt.OpContext, v adt.Node) string {
-	return debug.NodeString(ctx, v, nil)
+	return debug.NodeString(v, nil)
 }
 
 func str(c *adt.OpContext, v adt.Node) string {

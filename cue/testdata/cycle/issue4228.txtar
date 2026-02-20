@@ -139,16 +139,6 @@ diff old new
 +ConjunctInfos:       196
 +MaxConjunctInfos:    8
 +MaxReqSets:          9
--- out/eval/stats --
-Leaks:  3
-Freed:  181
-Reused: 172
-Allocs: 12
-Retain: 20
-
-Unifications: 181
-Conjuncts:    308
-Disjuncts:    201
 -- out/evalalpha --
 Errors:
 _namespacedResourceKinds.app.#template.k8s.apiVersion: field not allowed:
@@ -191,7 +181,7 @@ argocd.app.apps: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:
 Result:
 (_|_){
   // [eval]
-  let _globalScope#1 = (_|_){
+  let _globalScope#0 = (_|_){
     // [structural cycle] _globalScope: structural cycle
   }
   #export: (#struct){
@@ -375,11 +365,10 @@ Result:
     _base(:main): ~(_namespacedResource(:main))
   }
 }
--- out/eval --
 -- out/compile --
 --- export.cue
 {
-  let _globalScope#1 = 〈1〉
+  let _globalScope#0 = 〈1〉
   #export: {
     #entries: [
       ...,
@@ -394,7 +383,7 @@ Result:
   #manifests: {
     〈1;#export〉
     #entries: [
-      〈2;let _globalScope#1〉,
+      〈2;let _globalScope#0〉,
     ]
   }.yamlStream
 }

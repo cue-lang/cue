@@ -30,18 +30,6 @@ invalidUseOfOptional: {
     try { x: c? }
 }
 
--- out/eval/stats --
-Leaks:  0
-Freed:  2
-Reused: 2
-Allocs: 0
-Retain: 0
-
-Unifications: 2
-Conjuncts:    2
-Disjuncts:    2
-
-NumCloseIDs: 0
 -- out/evalalpha --
 structFormNotLast: struct-form try clause must be the last clause in a comprehension:
     ./in.cue:5:5
@@ -67,13 +55,6 @@ diff old new
 +    ./in.cue:24:21
 +invalidUseOfOptional.x: reference "c" not found:
 +    ./in.cue:29:14
--- out/eval --
-structFormNotLast: struct-form try clause must be the last clause in a comprehension:
-    ./in.cue:5:5
-optionalOutsideTry.b: optional marker (?) is only valid within a try clause:
-    ./in.cue:11:8
-optionalInForSource: optional marker (?) is only valid within a try clause:
-    ./in.cue:16:14
 -- out/compile --
 structFormNotLast: struct-form try clause must be the last clause in a comprehension:
     ./in.cue:5:5

@@ -220,10 +220,10 @@ issue1116: {
       max: 〈import;list〉.Max(〈1;input〉)
     }
     bar: {
-      let mn#A = 〈1;last〉.min
-      let mx#B = 〈import;list〉.max
-      min: 〈0;let mn#A〉
-      max: 〈0;let mx#B〉
+      let mn#a = 〈1;last〉.min
+      let mx#b = 〈import;list〉.max
+      min: 〈0;let mn#a〉
+      max: 〈0;let mx#b〉
     }
     x: {
       if (〈import;list〉.max < 0) {}
@@ -233,33 +233,33 @@ issue1116: {
     inScalar: {
       p0: {
         5
-        let x#C = 6
-        #b: 〈0;let x#C〉
+        let x#c = 6
+        #b: 〈0;let x#c〉
       }
     }
     inScalar: {
       p1: {
-        #b: 〈0;let x#D〉
-        let x#D = 6
+        #b: 〈0;let x#d〉
+        let x#d = 6
         5
       }
     }
     inList: {
       p0: {
-        let x#E = {
+        let x#e = {
           a: 1
         }
         [
-          〈1;let x#E〉,
+          〈1;let x#e〉,
         ]
       }
     }
     inList: {
       p1: {
         [
-          〈1;let x#F〉,
+          〈1;let x#f〉,
         ]
-        let x#F = {
+        let x#f = {
           a: 1
         }
       }
@@ -392,8 +392,8 @@ NumCloseIDs: 4
       max: (int){ 5 }
     }
     bar: (struct){
-      let mn#A = (int){ 1 }
-      let mx#B = (_|_){
+      let mn#a = (int){ 1 }
+      let mx#b = (_|_){
         // [incomplete] incompleteLet.bar.mx: undefined field: max:
         //     ./in.cue:54:17
       }
@@ -412,18 +412,18 @@ NumCloseIDs: 4
     inScalar: (struct){
       p0: (int){
         5
-        let x#C = (int){ 6 }
+        let x#c = (int){ 6 }
         #b: (int){ 6 }
       }
       p1: (int){
         5
         #b: (int){ 6 }
-        let x#D = (int){ 6 }
+        let x#d = (int){ 6 }
       }
     }
     inList: (struct){
       p0: (#list){
-        let x#E = (struct){
+        let x#e = (struct){
           a: (int){ 1 }
         }
         0: (struct){
@@ -431,7 +431,7 @@ NumCloseIDs: 4
         }
       }
       p1: (#list){
-        let x#F = (struct){
+        let x#f = (struct){
           a: (int){ 1 }
         }
         0: (struct){
@@ -559,6 +559,48 @@ diff old new
    a9: (struct){
      b: (struct){
        c: (struct){
+@@ -111,8 +93,8 @@
+       max: (int){ 5 }
+     }
+     bar: (struct){
+-      let mn#A = (int){ 1 }
+-      let mx#B = (_|_){
++      let mn#a = (int){ 1 }
++      let mx#b = (_|_){
+         // [incomplete] incompleteLet.bar.mx: undefined field: max:
+         //     ./in.cue:54:17
+       }
+@@ -131,18 +113,18 @@
+     inScalar: (struct){
+       p0: (int){
+         5
+-        let x#C = (int){ 6 }
++        let x#c = (int){ 6 }
+         #b: (int){ 6 }
+       }
+       p1: (int){
+         5
+         #b: (int){ 6 }
+-        let x#D = (int){ 6 }
++        let x#d = (int){ 6 }
+       }
+     }
+     inList: (struct){
+       p0: (#list){
+-        let x#E = (struct){
++        let x#e = (struct){
+           a: (int){ 1 }
+         }
+         0: (struct){
+@@ -150,7 +132,7 @@
+         }
+       }
+       p1: (#list){
+-        let x#F = (struct){
++        let x#f = (struct){
+           a: (int){ 1 }
+         }
+         0: (struct){
 @@ -166,17 +148,11 @@
          0: (string){ "a" }
          1: (string){ "b" }

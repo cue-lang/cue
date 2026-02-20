@@ -221,11 +221,11 @@ diff old new
   _taxPayer(:p): {
     self: {}
   }
-  let sam#1 = {
+  let sam#0 = {
     taxPayer: 〈1;_taxPayer(:p)〉
   }
   assert: {
-    invoke: 〈1;let sam#1〉
+    invoke: 〈1;let sam#0〉
     invoke: _
     res: (〈1;subject〉 & {
       in: 〈1;invoke〉

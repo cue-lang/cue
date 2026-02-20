@@ -717,16 +717,16 @@ Result:
   letCycleOK: {
     t1: {
       b: 〈0;c〉
-      let X#1 = 〈0;b〉
-      c: 〈0;let X#1〉
+      let X#0 = 〈0;b〉
+      c: 〈0;let X#0〉
     }
   }
   letCycleOK: {
     t2: {
       a: {
         b: 1
-        let X#2 = 〈1;a〉
-        c: 〈0;let X#2〉.b
+        let X#1 = 〈1;a〉
+        c: 〈0;let X#1〉.b
       }
     }
   }
@@ -734,16 +734,16 @@ Result:
     t1: {
       a: {
         b: 1
-        let X#3 = 〈1;a〉
-        c: 〈0;let X#3〉
+        let X#2 = 〈1;a〉
+        c: 〈0;let X#2〉
       }
     }
   }
   letCycleFail: {
     t2: {
       a: {
-        let X#4 = 〈1;a〉
-        if (〈0;let X#4〉 == _|_(explicit error (_|_ literal) in source)) {}
+        let X#3 = 〈1;a〉
+        if (〈0;let X#3〉 == _|_(explicit error (_|_ literal) in source)) {}
         x: {
           y: ""
         }

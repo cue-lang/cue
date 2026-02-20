@@ -2273,8 +2273,8 @@ diff old new
 {
   T: int
   for _, C in 〈0;Y〉 {
-    let X#1multi = 〈1;C〉.M
-    T: 〈0;let X#1〉.V
+    let X#0multi = 〈1;C〉.M
+    T: 〈0;let X#0〉.V
   }
   Y: {
     x: {

@@ -3950,8 +3950,8 @@ Result:
     }
     a: {
       for k, v in 〈1;_c〉 {
-        let x#1multi = 〈1;v〉
-        if (〈0;let x#1〉 != _|_(explicit error (_|_ literal) in source)) {}
+        let x#0multi = 〈1;v〉
+        if (〈0;let x#0〉 != _|_(explicit error (_|_ literal) in source)) {}
       }
     }
   }

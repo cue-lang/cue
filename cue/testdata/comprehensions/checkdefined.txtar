@@ -259,27 +259,27 @@ NumCloseIDs: 13
   }
   issue1969: {
     okc: {
-      let X#1 = 〈2;xc〉.undefined
-      let Y#2 = ({} & {
+      let X#0 = 〈2;xc〉.undefined
+      let Y#1 = ({} & {
         s: [
-          for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#0〉, 1) {},
         ]
       })
-      if (〈0;let Y#2〉 != _|_(explicit error (_|_ literal) in source)) {
-        〈1;let Y#2〉
+      if (〈0;let Y#1〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#1〉
       }
     }
   }
   issue1969: {
     oko: {
-      let X#3 = 〈2;xo〉.undefined
-      let Y#4 = ({} & {
+      let X#2 = 〈2;xo〉.undefined
+      let Y#3 = ({} & {
         s: [
-          for _, y in 〈import;list〉.Range(0, 〈2;let X#3〉, 1) {},
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#2〉, 1) {},
         ]
       })
-      if (〈0;let Y#4〉 != _|_(explicit error (_|_ literal) in source)) {
-        〈1;let Y#4〉
+      if (〈0;let Y#3〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#3〉
       }
     }
   }

@@ -1037,17 +1037,17 @@ let unique_combinations: not marked as multi. Seems benign, but should be fixed.
     marker: {
       length: int
       position: {
-        let characters#1 = 〈import;strings〉.Split(〈2;message〉, "")
-        let unique_combinations#2multi = {
-          for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
-            let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
-            if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
-              "\((〈2;i〉 + 1))": 〈1;let combination#3〉
+        let characters#0 = 〈import;strings〉.Split(〈2;message〉, "")
+        let unique_combinations#1multi = {
+          for i, _ in 〈1;let characters#0〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
+            let combination#2multi = 〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+            if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#0〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
+              "\((〈2;i〉 + 1))": 〈1;let combination#2〉
             }
           }
         }
         [
-          for i, _ in 〈1;let unique_combinations#2〉 {
+          for i, _ in 〈1;let unique_combinations#1〉 {
             〈1;i〉
           },
         ][0]

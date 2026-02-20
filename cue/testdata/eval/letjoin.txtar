@@ -355,10 +355,10 @@ NumCloseIDs: 3
         }
       }
       let Var1#9multi = 〈1;v〉.p
-      let Var2#Amulti = 〈0;let Var1#9〉
-      let Items#Bmulti = {
+      let Var2#amulti = 〈0;let Var1#9〉
+      let Items#bmulti = {
         item: {
-          key1: 〈2;let Var2#A〉
+          key1: 〈2;let Var2#a〉
         }
       }
     }
@@ -472,10 +472,11 @@ diff old new
        }
      }
    }
-@@ -188,18 +167,9 @@
+@@ -187,19 +166,10 @@
+         }
        }
        let Var1#9multi = 〈1;v〉.p
-       let Var2#Amulti = 〈0;let Var1#9〉
+-      let Var2#Amulti = 〈0;let Var1#9〉
 -      let Items#B = (_|_){
 -        // [eval]
 -        item: (_|_){
@@ -488,9 +489,10 @@ diff old new
 -            //     ./issue3590.cue:73:14
 -            //     ./issue3590.cue:77:11
 -          }
-+      let Items#Bmulti = {
++      let Var2#amulti = 〈0;let Var1#9〉
++      let Items#bmulti = {
 +        item: {
-+          key1: 〈2;let Var2#A〉
++          key1: 〈2;let Var2#a〉
          }
        }
      }
@@ -772,13 +774,13 @@ Reduce conjunct group size. Semantically correct, though.
         }
       }
       for _, v in 〈0;_input〉 {
-        let Var1#3multi = 〈1;v〉.p
-        let Var2#4multi = 〈0;let Var1#3〉
-        let Items#5 = {
-          item: 〈1;let Var2#4〉
+        let Var1#1multi = 〈1;v〉.p
+        let Var2#2multi = 〈0;let Var1#1〉
+        let Items#3 = {
+          item: 〈1;let Var2#2〉
         }
         result: {
-          "conflicting-\(〈2;v〉.p)": 〈1;let Items#5〉
+          "conflicting-\(〈2;v〉.p)": 〈1;let Items#3〉
         }
       }
     }
@@ -804,13 +806,13 @@ Reduce conjunct group size. Semantically correct, though.
         B: {}
       }
       for _, v in 〈0;_input〉 {
-        let Var1#6multi = 〈1;v〉.p
-        let Var2#7multi = 〈0;let Var1#6〉
-        let Items#8 = {
-          item: 〈1;let Var2#7〉
+        let Var1#4multi = 〈1;v〉.p
+        let Var2#5multi = 〈0;let Var1#4〉
+        let Items#6 = {
+          item: 〈1;let Var2#5〉
         }
         result: {
-          "conflicting-\(〈2;v〉.p)": 〈1;let Items#8〉
+          "conflicting-\(〈2;v〉.p)": 〈1;let Items#6〉
         }
       }
     }
@@ -836,16 +838,16 @@ Reduce conjunct group size. Semantically correct, though.
         B: {}
       }
       for _, v in 〈0;_input〉 {
-        let Var1#9multi = 〈1;v〉.p
-        let Var2#Amulti = 〈0;let Var1#9〉
-        let Items#B = {
+        let Var1#7multi = 〈1;v〉.p
+        let Var2#8multi = 〈0;let Var1#7〉
+        let Items#9 = {
           item: {
-            key1: 〈2;let Var2#A〉
+            key1: 〈2;let Var2#8〉
           }
         }
         result: {
           "missing-items-\(〈2;v〉.p)": {
-            for s, attr in 〈2;let Items#B〉 {
+            for s, attr in 〈2;let Items#9〉 {
               if (〈1;attr〉.key1 != _|_(explicit error (_|_ literal) in source)) {
                 〈2;s〉: 〈2;attr〉.key1
               }

@@ -2413,14 +2413,14 @@ NumCloseIDs: 130
               1
             }
             if ((〈1;#in〉 & 〈1;#basic〉) == _|_(explicit error (_|_ literal) in source)) {
-              let depths#1 = [
+              let depths#0 = [
                 for k, v in 〈3;#in〉 {
                   (〈6;#next〉 & {
                     #in: 〈2;v〉
                   }).out
                 },
               ]
-              (〈import;list〉.Max(〈0;let depths#1〉) + 1)
+              (〈import;list〉.Max(〈0;let depths#0〉) + 1)
             }
           }
         }

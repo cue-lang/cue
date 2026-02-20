@@ -110,62 +110,62 @@ b.let[]: cyclic references in let clause or alias:
 --- in.cue
 {
   a: {
-    let X#3 = 〈0;let Y#4〉=>〈0;c〉
-    let Y#4 = 〈0;c〉
-    b: 〈0;let X#3〉=>〈0;let Y#4〉=>〈0;c〉
+    let X#1 = 〈0;let Y#2〉=>〈0;c〉
+    let Y#2 = 〈0;c〉
+    b: 〈0;let X#1〉=>〈0;let Y#2〉=>〈0;c〉
     c: 5
   }
   b: {
-    let X#5 = 〈0;let Y#6〉=>〈0;let X#5〉=>〈0;let Y#6〉=>_|_(cyclic references in let clause or alias)
-    let Y#6 = 〈0;let X#5〉=>〈0;let Y#6〉=>_|_(cyclic references in let clause or alias)
-    b: 〈0;let X#5〉=>〈0;let Y#6〉=>_|_(cyclic references in let clause or alias)
+    let X#3 = 〈0;let Y#4〉=>〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
+    let Y#4 = 〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
+    b: 〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
     c: 5
   }
   fieldOffset: {
     a: {
       p1: {
-        let X#7 = {
-          value: 〈1;let Y#8〉=>2
+        let X#5 = {
+          value: 〈1;let Y#6〉=>2
         }
-        let Y#8 = 2
-        x: 〈0;let X#7〉=>{
-          value: 〈1;let Y#8〉=>2
+        let Y#6 = 2
+        x: 〈0;let X#5〉=>{
+          value: 〈1;let Y#6〉=>2
         }
       }
       p2: {
-        x: 〈0;let X#A〉=>{
-          value: 〈1;let Y#9〉=>2
+        x: 〈0;let X#7〉=>{
+          value: 〈1;let Y#8〉=>2
         }
-        let Y#9 = 2
-        let X#A = {
-          value: 〈1;let Y#9〉=>2
+        let Y#8 = 2
+        let X#7 = {
+          value: 〈1;let Y#8〉=>2
         }
       }
     }
     b: {
       p1: {
-        let X#B = {
+        let X#9 = {
           x: {
-            y: 〈2;let Y#C〉=>2
+            y: 〈2;let Y#a〉=>2
           }
         }
-        let Y#C = 2
-        x: 〈0;let X#B〉=>{
+        let Y#a = 2
+        x: 〈0;let X#9〉=>{
           x: {
-            y: 〈2;let Y#C〉=>2
+            y: 〈2;let Y#a〉=>2
           }
         }
       }
       p2: {
-        x: 〈0;let X#E〉=>{
+        x: 〈0;let X#b〉=>{
           x: {
-            y: 〈2;let Y#D〉=>2
+            y: 〈2;let Y#c〉=>2
           }
         }
-        let Y#D = 2
-        let X#E = {
+        let Y#c = 2
+        let X#b = {
           x: {
-            y: 〈2;let Y#D〉=>2
+            y: 〈2;let Y#c〉=>2
           }
         }
       }
@@ -173,24 +173,24 @@ b.let[]: cyclic references in let clause or alias:
   }
   issue767: {
     #Foo: {
-      let _#bar#F = {
+      let _#bar#d = {
         value: ""
       }
-      let _#volmnts#10 = {
-        x: 〈1;let _#baz#11〉=>{
-          〈1;let _#bar#F〉=>{
+      let _#volmnts#e = {
+        x: 〈1;let _#baz#f〉=>{
+          〈1;let _#bar#d〉=>{
             value: ""
           }
         }.value
       }
-      let _#baz#11 = {
-        〈1;let _#bar#F〉=>{
+      let _#baz#f = {
+        〈1;let _#bar#d〉=>{
           value: ""
         }
       }
-      out: 〈0;let _#volmnts#10〉=>{
-        x: 〈1;let _#baz#11〉=>{
-          〈1;let _#bar#F〉=>{
+      out: 〈0;let _#volmnts#e〉=>{
+        x: 〈1;let _#baz#f〉=>{
+          〈1;let _#bar#d〉=>{
             value: ""
           }
         }.value

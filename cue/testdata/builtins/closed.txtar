@@ -1176,11 +1176,11 @@ Result:
         a: {
           b: true
         }
-        let X#1 = 〈0;a〉
+        let X#0 = 〈0;a〉
         (close({
           uint: {
             a: {
-              b: 〈3;let X#1〉.b
+              b: 〈3;let X#0〉.b
             }
           }
         })|close({

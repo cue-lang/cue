@@ -2444,12 +2444,12 @@ Result:
   }
   root: {
     "0": {
-      data: 〈2;let root_0#1〉.x.empty
+      data: 〈2;let root_0#0〉.x.empty
     }
   }
   root: {
     "1": {
-      data: 〈2;let root_1#2〉.x.empty
+      data: 〈2;let root_1#1〉.x.empty
     }
   }
   root: {
@@ -2462,8 +2462,8 @@ Result:
       data: 〈2;root_3〉.x.empty
     }
   }
-  let root_0#1 = 〈0;root〉
-  let root_1#2 = 〈0;root〉
+  let root_0#0 = 〈0;root〉
+  let root_1#1 = 〈0;root〉
   root_2: 〈0;root〉
   root_3: 〈0;root〉
 }

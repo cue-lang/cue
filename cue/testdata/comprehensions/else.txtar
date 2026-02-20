@@ -309,11 +309,11 @@ NumCloseIDs: 2
     }
   }
   outerScope: {
-    let threshold#1 = 10
+    let threshold#0 = 10
     for _, x in [] {
       〈1;x〉
     } else {
-      fallback: 〈1;let threshold#1〉
+      fallback: 〈1;let threshold#0〉
     }
   }
   ifNestedBody: {

@@ -15,7 +15,6 @@
 package toposort
 
 import (
-	"cmp"
 	"maps"
 	"slices"
 
@@ -49,8 +48,8 @@ func (n *Node) IsSorted() bool {
 // etc; for identifiers, you may get back a string with quotes in it,
 // eg `"runs-on"`. So this is not useful for comparisons, but it is
 // useful (and safe) for debugging.
-func (n *Node) SafeName(index adt.StringIndexer) string {
-	return n.Feature.SelectorString(index)
+func (n *Node) SafeName() string {
+	return n.Feature.SelectorString()
 }
 
 type Nodes []*Node
@@ -127,26 +126,12 @@ func (builder *GraphBuilder) Build() *Graph {
 	return &Graph{nodes: nodes}
 }
 
-type indexComparison struct{ adt.StringIndexer }
-
-func (index *indexComparison) compareNodeByName(a, b *Node) int {
-	aFeature, bFeature := a.Feature, b.Feature
-	aIsInt, bIsInt := aFeature.Typ() == adt.IntLabel, bFeature.Typ() == adt.IntLabel
-
-	switch {
-	case aIsInt && bIsInt:
-		return cmp.Compare(aFeature.Index(), bFeature.Index())
-	case aIsInt:
-		return -1
-	case bIsInt:
-		return 1
-	default:
-		return cmp.Compare(aFeature.RawString(index), bFeature.RawString(index))
-	}
+func compareNodeByName(a, b *Node) int {
+	return a.Feature.Compare(b.Feature)
 }
 
-func (index *indexComparison) compareComponentsByNodes(a, b *StronglyConnectedComponent) int {
-	return slices.CompareFunc(a.Nodes, b.Nodes, index.compareNodeByName)
+func compareComponentsByNodes(a, b *StronglyConnectedComponent) int {
+	return slices.CompareFunc(a.Nodes, b.Nodes, compareNodeByName)
 }
 
 // Sort the features of the graph into a single slice.
@@ -164,21 +149,19 @@ func (index *indexComparison) compareComponentsByNodes(a, b *StronglyConnectedCo
 // expensive and complex analysis of cycles: the maximum possible
 // number of cycles rises with the factorial of the number of nodes in
 // a component.
-func (graph *Graph) Sort(index adt.StringIndexer) []adt.Feature {
-	indexCmp := &indexComparison{index}
-
+func (graph *Graph) Sort() []adt.Feature {
 	nodesSorted := make(Nodes, 0, len(graph.nodes))
 
 	scc := graph.StronglyConnectedComponents()
 	var sccReady []*StronglyConnectedComponent
 	for _, component := range scc {
 		component.visited = false
-		slices.SortFunc(component.Nodes, indexCmp.compareNodeByName)
+		slices.SortFunc(component.Nodes, compareNodeByName)
 		if len(component.Incoming) == 0 {
 			sccReady = append(sccReady, component)
 		}
 	}
-	slices.SortFunc(sccReady, indexCmp.compareComponentsByNodes)
+	slices.SortFunc(sccReady, compareComponentsByNodes)
 
 	sccVisitedCount := 0
 	for sccVisitedCount != len(scc) {
@@ -205,7 +188,7 @@ func (graph *Graph) Sort(index adt.StringIndexer) []adt.Feature {
 			sccReadyNeedsSorting = true
 		}
 		if sccReadyNeedsSorting {
-			slices.SortFunc(sccReady, indexCmp.compareComponentsByNodes)
+			slices.SortFunc(sccReady, compareComponentsByNodes)
 		}
 	}
 

@@ -1033,10 +1033,10 @@ NumCloseIDs: 4
       [string]: _
     }
     for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "complex") {
-      let subs#1multi = (〈3;#sub〉 & {
+      let subs#0multi = (〈3;#sub〉 & {
         #p: 〈2;rd〉.a
       })
-      for sn, sd in 〈0;let subs#1〉.dict {
+      for sn, sd in 〈0;let subs#0〉.dict {
         dict: {
           "\(〈4;rn〉)_\(〈2;sn〉)": 〈2;sd〉
         }

@@ -140,8 +140,8 @@ Result:
   multiLets: {
     for _, k in 〈1;keys〉 {
       if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
-        let val#1multi = 〈2;k〉
-        if (〈0;let val#1〉 != _|_(explicit error (_|_ literal) in source)) {
+        let val#0multi = 〈2;k〉
+        if (〈0;let val#0〉 != _|_(explicit error (_|_ literal) in source)) {
           〈3;k〉
         }
       }
@@ -159,9 +159,9 @@ Result:
     out: {
       for k, _ in 〈1;#github_team_membership〉 {
         if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
-          let val#2multi = 〈4;values〉[〈2;k〉]
-          if ((〈0;let val#2〉 != null) && ((〈0;let val#2〉 & string) != _|_(explicit error (_|_ literal) in source))) {
-            〈3;k〉: 〈1;let val#2〉
+          let val#1multi = 〈4;values〉[〈2;k〉]
+          if ((〈0;let val#1〉 != null) && ((〈0;let val#1〉 & string) != _|_(explicit error (_|_ literal) in source))) {
+            〈3;k〉: 〈1;let val#1〉
           }
         }
       }

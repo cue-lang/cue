@@ -27,8 +27,7 @@ func TestFeatureBool(t *testing.T) {
 	ctx := adt.NewContext(r, &adt.Vertex{})
 
 	makeInt := func(x int64) adt.Feature {
-		f, _ := adt.MakeLabel(nil, 2, adt.IntLabel)
-		return f
+		return adt.MakeIntLabel(adt.IntLabel, x)
 	}
 
 	testCases := []struct {
@@ -55,19 +54,19 @@ func TestFeatureBool(t *testing.T) {
 		isRegular: true,
 		isString:  true,
 	}, {
-		in:        adt.MakeStringLabel(r, "foo"),
+		in:        adt.MakeStringLabel("foo"),
 		isRegular: true,
 		isString:  true,
 	}, {
-		in:        adt.MakeStringLabel(r, "_"),
+		in:        adt.MakeStringLabel("_"),
 		isRegular: true,
 		isString:  true,
 	}, {
-		in:        adt.MakeStringLabel(r, "_#foo"),
+		in:        adt.MakeStringLabel("_#foo"),
 		isRegular: true,
 		isString:  true,
 	}, {
-		in:        adt.MakeStringLabel(r, "#foo"),
+		in:        adt.MakeStringLabel("#foo"),
 		isRegular: true,
 		isString:  true,
 	}, {
@@ -75,18 +74,18 @@ func TestFeatureBool(t *testing.T) {
 		isRegular: true,
 		isInt:     true,
 	}, {
-		in:        adt.MakeIdentLabel(r, "foo", "main"),
+		in:        adt.MakeIdentLabel("foo", "main"),
 		isRegular: true,
 		isString:  true,
 	}, {
-		in:           adt.MakeIdentLabel(r, "#foo", "main"),
+		in:           adt.MakeIdentLabel("#foo", "main"),
 		isDefinition: true,
 	}, {
-		in:           adt.MakeIdentLabel(r, "_#foo", "main"),
+		in:           adt.MakeIdentLabel("_#foo", "main"),
 		isDefinition: true,
 		isHidden:     true,
 	}, {
-		in:       adt.MakeIdentLabel(r, "_foo", "main"),
+		in:       adt.MakeIdentLabel("_foo", "main"),
 		isHidden: true,
 	}}
 	for i, tc := range testCases {

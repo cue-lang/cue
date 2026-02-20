@@ -634,10 +634,10 @@ to some extent is clearer.
     }
     deployment: {
       description: {
-        let dep#1 = 〈2;_params〉.manifest.description
+        let dep#0 = 〈2;_params〉.manifest.description
         service: (〈3;#Configure〉 & {
           _params: {
-            hsize: 〈2;let dep#1〉.hsize
+            hsize: 〈2;let dep#0〉.hsize
           }
         }).service
       }
@@ -651,13 +651,13 @@ to some extent is clearer.
     }
     service: {
       description: {
-        let configed#2 = (〈3;#RelabelService〉 & {
+        let configed#1 = (〈3;#RelabelService〉 & {
           _params: {
             hsize: 〈4;_params〉.hsize
           }
           role: "admin"
         }).out
-        role: 〈0;let configed#2〉.role
+        role: 〈0;let configed#1〉.role
       }
     }
   }

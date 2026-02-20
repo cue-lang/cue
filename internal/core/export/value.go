@@ -312,10 +312,10 @@ func (e *exporter) boundValue(n *adt.BoundValue) ast.Expr {
 }
 
 func (e *exporter) builtin(x *adt.Builtin) ast.Expr {
-	if x.Package == 0 {
+	if !x.Package.IsValid() {
 		return ast.NewIdent(x.Name)
 	}
-	spec := ast.NewImport(nil, x.Package.StringValue(e.index))
+	spec := ast.NewImport(nil, x.Package.StringValue())
 	info, _ := astutil.ParseImportSpec(spec)
 	ident := ast.NewIdent(info.Ident)
 	ident.Node = spec
@@ -426,7 +426,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 		case adt.DefinitionLabel:
 			show = p.ShowDefinitions
 		case adt.HiddenLabel, adt.HiddenDefinitionLabel:
-			show = p.ShowHidden && label.PkgID(e.ctx) == e.pkgID
+			show = p.ShowHidden && label.PkgID() == e.pkgID
 		}
 		if !show {
 			continue

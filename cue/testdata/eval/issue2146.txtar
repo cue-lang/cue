@@ -95,7 +95,7 @@ Disjuncts:    189
           //     ./in.cue:10:8
         }
         y: (int){ 1 }
-        let list#1 = (#list){
+        let list#0 = (#list){
           0: (_|_){
             // [incomplete] p1.#A.list.0: cannot reference optional field: x:
             //     ./in.cue:6:15
@@ -108,7 +108,7 @@ Disjuncts:    189
       }, (#struct){
         x?: (int){ int }
         y?: (int){ int }
-        let list#1 = (#list){
+        let list#0 = (#list){
           0: (_|_){
             // [incomplete] p1.#A.list.0: cannot reference optional field: x:
             //     ./in.cue:6:15
@@ -124,7 +124,7 @@ Disjuncts:    189
     a: (#struct){
       x: (int){ 3 }
       y?: (int){ int }
-      let list#1 = (#list){
+      let list#0 = (#list){
         0: (int){ 3 }
         1: (_|_){
           // [incomplete] p1.a.list.1: cannot reference optional field: y:
@@ -138,7 +138,7 @@ Disjuncts:    189
     b: (#struct){
       x: (int){ 3 }
       y?: (int){ int }
-      let list#1 = (#list){
+      let list#0 = (#list){
         0: (int){ 3 }
         1: (_|_){
           // [incomplete] p1.b.list.1: cannot reference optional field: y:
@@ -157,7 +157,7 @@ Disjuncts:    189
           //     ./in.cue:27:8
         }
         y: (int){ 1 }
-        let list#2 = (#list){
+        let list#1 = (#list){
           0: (_|_){
             // [incomplete] p2.#A.list.0: cannot reference optional field: x:
             //     ./in.cue:23:15
@@ -170,7 +170,7 @@ Disjuncts:    189
       }, (#struct){
         x?: (int){ int }
         y?: (int){ int }
-        let list#2 = (#list){
+        let list#1 = (#list){
           0: (_|_){
             // [incomplete] p2.#A.list.0: cannot reference optional field: x:
             //     ./in.cue:23:15
@@ -186,7 +186,7 @@ Disjuncts:    189
     a: (#struct){
       x: (int){ 3 }
       y: (int){ 2 }
-      let list#2 = (#list){
+      let list#1 = (#list){
         0: (int){ 3 }
         1: (int){ 2 }
       }
@@ -198,7 +198,7 @@ Disjuncts:    189
     b: (#struct){
       x: (int){ 3 }
       y: (int){ 2 }
-      let list#2 = (#list){
+      let list#1 = (#list){
         0: (int){ 3 }
         1: (int){ 2 }
       }
@@ -213,6 +213,50 @@ Disjuncts:    189
 diff old new
 --- old
 +++ new
+@@ -6,20 +6,20 @@
+           //     ./in.cue:10:8
+         }
+         y: (int){ 1 }
+-        let list#1 = (#list){
+-          0: (_|_){
+-            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
+-            //     ./in.cue:6:15
+-          }
+-          1: (int){ 1 }
+-        }
+-        all: (#list){
+-          0: (int){ 1 }
+-        }
+-      }, (#struct){
+-        x?: (int){ int }
+-        y?: (int){ int }
+-        let list#1 = (#list){
++        let list#0 = (#list){
++          0: (_|_){
++            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
++            //     ./in.cue:6:15
++          }
++          1: (int){ 1 }
++        }
++        all: (#list){
++          0: (int){ 1 }
++        }
++      }, (#struct){
++        x?: (int){ int }
++        y?: (int){ int }
++        let list#0 = (#list){
+           0: (_|_){
+             // [incomplete] p1.#A.list.0: cannot reference optional field: x:
+             //     ./in.cue:6:15
+@@ -35,7 +35,7 @@
+     a: (#struct){
+       x: (int){ 3 }
+       y?: (int){ int }
+-      let list#1 = (#list){
++      let list#0 = (#list){
+         0: (int){ 3 }
+         1: (_|_){
+           // [incomplete] p1.a.list.1: cannot reference optional field: y:
 @@ -49,10 +49,13 @@
      b: (#struct){
        x: (int){ 3 }
@@ -221,7 +265,7 @@ diff old new
 -        〈1;x〉,
 -        〈1;y〉,
 -      ]
-+      let list#1 = (#list){
++      let list#0 = (#list){
 +        0: (int){ 3 }
 +        1: (_|_){
 +          // [incomplete] p1.b.list.1: cannot reference optional field: y:
@@ -231,15 +275,74 @@ diff old new
        all: (#list){
          0: (int){ 3 }
        }
-@@ -106,10 +109,10 @@
-     b: (#struct){
+@@ -65,20 +68,20 @@
+           //     ./in.cue:27:8
+         }
+         y: (int){ 1 }
+-        let list#2 = (#list){
+-          0: (_|_){
+-            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
+-            //     ./in.cue:23:15
+-          }
+-          1: (int){ 1 }
+-        }
+-        all: (#list){
+-          0: (int){ 1 }
+-        }
+-      }, (#struct){
+-        x?: (int){ int }
+-        y?: (int){ int }
+-        let list#2 = (#list){
++        let list#1 = (#list){
++          0: (_|_){
++            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
++            //     ./in.cue:23:15
++          }
++          1: (int){ 1 }
++        }
++        all: (#list){
++          0: (int){ 1 }
++        }
++      }, (#struct){
++        x?: (int){ int }
++        y?: (int){ int }
++        let list#1 = (#list){
+           0: (_|_){
+             // [incomplete] p2.#A.list.0: cannot reference optional field: x:
+             //     ./in.cue:23:15
+@@ -94,22 +97,22 @@
+     a: (#struct){
        x: (int){ 3 }
        y: (int){ 2 }
+-      let list#2 = (#list){
+-        0: (int){ 3 }
+-        1: (int){ 2 }
+-      }
+-      all: (#list){
+-        0: (int){ 3 }
+-        1: (int){ 2 }
+-      }
+-    }
+-    b: (#struct){
+-      x: (int){ 3 }
+-      y: (int){ 2 }
 -      let list#2multi = [
 -        〈1;x〉,
 -        〈1;y〉,
 -      ]
-+      let list#2 = (#list){
++      let list#1 = (#list){
++        0: (int){ 3 }
++        1: (int){ 2 }
++      }
++      all: (#list){
++        0: (int){ 3 }
++        1: (int){ 2 }
++      }
++    }
++    b: (#struct){
++      x: (int){ 3 }
++      y: (int){ 2 }
++      let list#1 = (#list){
 +        0: (int){ 3 }
 +        1: (int){ 2 }
 +      }
@@ -373,12 +476,12 @@ diff old new
     #A: {
       x?: int
       y?: int
-      let list#1 = [
+      let list#0 = [
         〈1;x〉,
         〈1;y〉,
       ]
       all: [
-        for _, v in 〈1;let list#1〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
+        for , v in 〈1;let list#0〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
           〈1;v〉
         },
       ]
@@ -396,12 +499,12 @@ diff old new
     #A: {
       x?: int
       y?: int
-      let list#2 = [
+      let list#1 = [
         〈1;x〉,
         〈1;y〉,
       ]
       all: [
-        for _, v in 〈1;let list#2〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
+        for , v in 〈1;let list#1〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
           〈1;v〉
         },
       ]

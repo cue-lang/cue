@@ -584,7 +584,7 @@ Result:
     ])
     Top: [
       [
-        for _, F in 〈2;_Sub〉 {
+        for , F in 〈2;_Sub〉 {
           〈1;F〉
         },
       ],
@@ -601,7 +601,7 @@ Result:
       ...,
     ])
     _Top: [
-      for _, F in 〈1;#Sub〉 {
+      for , F in 〈1;#Sub〉 {
         〈1;F〉
       },
     ]

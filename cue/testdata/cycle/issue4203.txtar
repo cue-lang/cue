@@ -78,7 +78,7 @@ if true {
         ...,
       ]
       _out: 〈import;strings〉.Join([
-        for _, d in 〈1;_objs〉 {
+        for , d in 〈1;_objs〉 {
           〈1;d〉.kind
         },
       ], ",")

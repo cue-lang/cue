@@ -191,7 +191,7 @@ argocd.app.apps: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:
 Result:
 (_|_){
   // [eval]
-  let _globalScope#1 = (_|_){
+  let _globalScope#0 = (_|_){
     // [structural cycle] _globalScope: structural cycle
   }
   #export: (#struct){
@@ -379,13 +379,13 @@ Result:
 -- out/compile --
 --- export.cue
 {
-  let _globalScope#1 = 〈1〉
+  let _globalScope#0 = 〈1〉
   #export: {
     #entries: [
       ...,
     ]
     manifests: [
-      for _, _entry in 〈1;#entries〉 for _, _ns in 〈0;_entry(:main)〉 for _kind, _objs in 〈0;_ns(:main)〉 for _name, _obj in 〈0;_objs(:main)〉 {
+      for , _entry in 〈1;#entries〉 for , _ns in 〈0;_entry(:main)〉 for _kind, _objs in 〈0;_ns(:main)〉 for _name, _obj in 〈0;_objs(:main)〉 {
         〈1;_obj(:main)〉.k8s
       },
     ]
@@ -394,7 +394,7 @@ Result:
   #manifests: {
     〈1;#export〉
     #entries: [
-      〈2;let _globalScope#1〉,
+      〈2;let _globalScope#0〉,
     ]
   }.yamlStream
 }

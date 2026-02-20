@@ -46,9 +46,9 @@ NumCloseIDs: 1
     if 〈1;cond〉 {},
   ]
   b: [
-    for _, x in 〈1;src〉.foo {},
+    for , x in 〈1;src〉.foo {},
   ]
   c: {
-    for _, x in 〈1;top〉 {}
+    for , x in 〈1;top〉 {}
   }
 }

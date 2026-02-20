@@ -179,7 +179,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 		return
 	}
 
-	t.Write(debug.AppendNode(nil, r, v, &debug.Config{Cwd: t.Dir}))
+	t.Write(debug.AppendNode(nil, v, &debug.Config{Cwd: t.Dir}))
 	return
 }
 
@@ -237,7 +237,7 @@ language: version: "v0.15.0"
 	ctx.Config = flags
 	v.Finalize(ctx)
 
-	out := debug.NodeString(r, v, nil)
+	out := debug.NodeString(v, nil)
 	if adt.OpenGraphs {
 		for p, g := range ctx.ErrorGraphs {
 			path := filepath.Join(".debug/TestX", p)

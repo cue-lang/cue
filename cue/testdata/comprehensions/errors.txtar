@@ -223,7 +223,7 @@ Result:
   circularFor: {
     #list: {
       tail: (〈1;#list〉|*null)
-      for _, x in (〈0;tail〉 != null) {}
+      for , x in (〈0;tail〉 != null) {}
     }
   }
   userError: {
@@ -231,7 +231,7 @@ Result:
     if (〈0;a〉 != "") {}
   }
   intField: {
-    for i, _ in [
+    for i,  in [
       1,
       2,
     ] {
@@ -244,7 +244,7 @@ Result:
       age: int
     }
     x: {
-      for k, _ in 〈1;x〉 {
+      for k,  in 〈1;x〉 {
         〈1;k〉: 〈1;k〉
       }
     }

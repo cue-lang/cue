@@ -53,7 +53,7 @@ Disjuncts:    13
   b: 〈0;a〉[3]
   d: 5
   c: [
-    for _, x in [
+    for , x in [
       [
         1,
         2,

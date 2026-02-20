@@ -652,7 +652,7 @@ func (x *LabelReference) Source() ast.Node {
 
 func (x *LabelReference) evaluate(ctx *OpContext, state Flags) Value {
 	label := ctx.relLabel(x.UpCount)
-	if label == 0 {
+	if !label.IsValid() {
 		// There is no label. This may happen if a LabelReference is evaluated
 		// outside of the context of a parent node, for instance if an
 		// "additional" items or properties is evaluated in isolation.
@@ -744,11 +744,11 @@ func (x *ImportReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	if x.Instance != nil {
 		v = ctx.Runtime.LoadInstance(x.Instance)
 	} else {
-		v = ctx.Runtime.LoadBuiltin(x.ImportPath.StringValue(ctx))
+		v = ctx.Runtime.LoadBuiltin(x.ImportPath.StringValue())
 	}
 	if v == nil {
 		ctx.addErrf(EvalError, x.Src.Pos(), "cannot find package %q",
-			x.ImportPath.StringValue(ctx))
+			x.ImportPath.StringValue())
 	}
 	return v
 }
@@ -1041,15 +1041,7 @@ func (x *SliceExpr) evaluate(c *OpContext, state Flags) Value {
 
 		n := c.newList(c.src, v.Parent)
 		for i, a := range v.Arcs[lo:hi] {
-			label, err := MakeLabel(a.Source(), int64(i), IntLabel)
-			if err != nil {
-				c.AddBottom(&Bottom{
-					Src:  a.Source(),
-					Err:  err,
-					Node: v,
-				})
-				return nil
-			}
+			label := MakeIntLabel(IntLabel, int64(i))
 			if v.IsDynamic {
 				// If the list is dynamic, there is no need to recompute the
 				// arcs.
@@ -1619,7 +1611,7 @@ func (p Param) Default() Value {
 
 func (x *Builtin) qualifiedName(c *OpContext) string {
 	if x.Package != InvalidLabel {
-		return x.Package.StringValue(c) + "." + x.Name
+		return x.Package.StringValue() + "." + x.Name
 	}
 	return x.Name
 }
@@ -2150,7 +2142,7 @@ func (x *ForClause) yield(s *compState) {
 			}
 			var key Value
 			if a.Label.IsString() {
-				key = &String{Src: c.src, Str: c.IndexToString(a.Label.safeIndex())}
+				key = &String{Src: c.src, Str: a.Label.StringValue()}
 			} else {
 				num := &Num{Src: c.src, K: IntKind}
 				num.X.SetInt64(int64(a.Label.Index()))

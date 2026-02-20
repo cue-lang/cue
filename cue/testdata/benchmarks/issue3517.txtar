@@ -850,7 +850,7 @@ Result:
       [string]: 〈2;#Task〉
     }
     tasks: [
-      for _, v in 〈1;#tasks〉 {
+      for , v in 〈1;#tasks〉 {
         〈1;v〉
       },
     ]

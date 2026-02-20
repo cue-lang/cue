@@ -18,11 +18,11 @@ for[].a: reference "E" not found:
     ./in.cue:7:16
 --- in.cue
 {
-  let X#1 = {}
+  let X#0 = {}
   ["foo"]: 3
   a: _|_(reference "Y" not found)
   c: {}
-  for _, x in 〈0;c〉 {
+  for , x in 〈0;c〉 {
     a: _|_(reference "E" not found)
   }
   [string]: (〈0;(〈0;-〉)〉 + 〈0;-〉)

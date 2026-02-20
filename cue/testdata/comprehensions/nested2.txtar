@@ -883,7 +883,7 @@ NumCloseIDs: 61
     }
   }
   T: (int){ 1 }
-  let X#1multi = 〈1;C〉.M
+  let X#0multi = 〈1;C〉.M
   Y: (struct){
     x: (struct){
       M: (struct){
@@ -1246,7 +1246,7 @@ diff old new
        _names: (struct){
          data: (string){ "data" }
        }
-@@ -640,10 +553,11 @@
+@@ -640,15 +553,16 @@
        volumeNames: (#list){
          0: (string){ "data" }
        }
@@ -1262,6 +1262,12 @@ diff old new
        }
      }
    }
+   T: (int){ 1 }
+-  let X#1multi = 〈1;C〉.M
++  let X#0multi = 〈1;C〉.M
+   Y: (struct){
+     x: (struct){
+       M: (struct){
 -- out/eval --
 (struct){
   given: (struct){
@@ -2045,7 +2051,7 @@ diff old new
       X: {
         a: {}
         objects: {
-          for _, v in 〈1;a〉 for _, _ in ({} & 〈0;v〉).objects {}
+          for , v in 〈1;a〉 for ,  in ({} & 〈0;v〉).objects {}
         }
       }
     }
@@ -2068,7 +2074,7 @@ diff old new
       X: {
         a: {}
         objects: {
-          for _, v in 〈1;a〉 for _, _ in ({} & 〈0;v〉).objects {}
+          for , v in 〈1;a〉 for ,  in ({} & 〈0;v〉).objects {}
         }
       }
     }
@@ -2093,7 +2099,7 @@ diff old new
       E: {
         i: {}
         o: [
-          for _, m in 〈1;i〉 for _, v in ({} & 〈0;m〉).o {},
+          for , m in 〈1;i〉 for , v in ({} & 〈0;m〉).o {},
         ]
       }
     }
@@ -2121,7 +2127,7 @@ diff old new
           ...,
         ]
         objects: [
-          for _, v in 〈1;_imports〉 for _, obj in ({} & 〈0;v〉.#export).objects {
+          for , v in 〈1;_imports〉 for , obj in ({} & 〈0;v〉.#export).objects {
             〈1;obj〉
           },
         ]
@@ -2146,7 +2152,7 @@ diff old new
       X: {
         a: {}
         objects: {
-          for _, v in 〈1;a〉 let x = ({} & 〈0;v〉) for _, _ in 〈0;x〉.objects {}
+          for , v in 〈1;a〉 let x = ({} & 〈0;v〉) for ,  in 〈0;x〉.objects {}
         }
       }
     }
@@ -2211,7 +2217,7 @@ diff old new
           }) {
             〈1;name〉: 〈1;obj〉
           },
-          for _, import in 〈1;_imports〉 for _, obj in ({
+          for , import in 〈1;_imports〉 for , obj in ({
             #conf: 〈3;#conf〉
           } & 〈0;import〉.#export).objects {
             〈1;obj〉
@@ -2248,20 +2254,20 @@ diff old new
         })
       }
     }
-    for _, import in 〈0;_imports〉 for _, obj in ({
+    for , import in 〈0;_imports〉 for , obj in ({
       extra: "unused"
     } & 〈0;import〉).exportObjs {
       〈2;import〉.name: 〈1;obj〉
     }
     _Deployment: {
       _names: {
-        for _, v in 〈2〉.volumes {
+        for , v in 〈2〉.volumes {
           〈1;v〉.name: 〈1;v〉.name
         }
       }
       if (len(〈0;_names〉) > 0) {
         volumeNames: [
-          for _, v in 〈2;_names〉 {
+          for , v in 〈2;_names〉 {
             〈1;v〉
           },
         ]
@@ -2272,16 +2278,16 @@ diff old new
 --- pending.cue
 {
   T: int
-  for _, C in 〈0;Y〉 {
-    let X#1multi = 〈1;C〉.M
-    T: 〈0;let X#1〉.V
+  for , C in 〈0;Y〉 {
+    let X#0multi = 〈1;C〉.M
+    T: 〈0;let X#0〉.V
   }
   Y: {
     x: {
       M: {
         V: 1
       }
-      for _, _ in 〈0;M〉 {
+      for ,  in 〈0;M〉 {
         if true {
           M: {}
         }

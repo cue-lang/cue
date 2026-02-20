@@ -198,7 +198,7 @@ Result:
     }
   }
   withLet: (struct){
-    let X#1 = (_|_){
+    let X#0 = (_|_){
       // [structural cycle] withLet.X: structural cycle
     }
     foo: (int){ 1 }
@@ -309,10 +309,10 @@ a: {
 --- withlet.cue
 {
   withLet: {
-    let X#1 = 〈1〉
+    let X#0 = 〈1〉
     foo: 1
     bar: {
-      baz: 〈1;let X#1〉.foo
+      baz: 〈1;let X#0〉.foo
     }
   }
 }

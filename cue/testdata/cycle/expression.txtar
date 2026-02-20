@@ -266,7 +266,7 @@ NumCloseIDs: 2
     }
   }
   t1total: {
-    for _, v in 〈1;t1〉 {
+    for , v in 〈1;t1〉 {
       〈1;v〉
     }
   }
@@ -315,7 +315,7 @@ NumCloseIDs: 2
     }
   }
   t2total: {
-    for _, v in 〈1;t2〉 {
+    for , v in 〈1;t2〉 {
       〈1;v〉
     }
   }

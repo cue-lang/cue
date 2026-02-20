@@ -24,7 +24,7 @@ NumCloseIDs: 1
 -- out/compile --
 --- in.cue
 {
-  for _, x in [
+  for , x in [
     1,
   ] {
     (*close({})|{

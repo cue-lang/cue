@@ -20,7 +20,7 @@ for x in [
 -- out/compile --
 --- in.cue
 {
-  for _, x in [
+  for , x in [
     {
       a: "A"
       b: "B"
@@ -42,7 +42,7 @@ for x in [
       }
     }
   }
-  for _, x in [
+  for , x in [
     {
       a: "A"
       b: "B"

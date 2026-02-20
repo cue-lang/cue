@@ -203,7 +203,7 @@ issue3731: full: {
           ...
         }
         output: [
-          for _, v in 〈1;input〉 if (〈0;v〉.show != _|_(explicit error (_|_ literal) in source)) {
+          for , v in 〈1;input〉 if (〈0;v〉.show != _|_(explicit error (_|_ literal) in source)) {
             〈1;v〉
           },
         ]
@@ -225,7 +225,7 @@ issue3731: full: {
           ...
         }
         output: [
-          for _, v in 〈1;input〉 if (〈0;v〉.show != _|_(explicit error (_|_ literal) in source)) {
+          for , v in 〈1;input〉 if (〈0;v〉.show != _|_(explicit error (_|_ literal) in source)) {
             〈1;v〉
           },
         ]

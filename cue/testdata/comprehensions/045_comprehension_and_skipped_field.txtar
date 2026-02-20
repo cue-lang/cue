@@ -19,7 +19,7 @@ for key, value in {x: v: 1} {
   } {
     "\(〈1;key〉)": {
       v: (*{
-        for pod, _ in 〈3;value〉.v {}
+        for pod,  in 〈3;value〉.v {}
       }|{
         "\(〈3;value〉.v)": 2
       })

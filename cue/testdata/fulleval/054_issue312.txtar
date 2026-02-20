@@ -9,7 +9,7 @@ for x in [1] {y}
   y: (*1|{
     a: 2
   })
-  for _, x in [
+  for , x in [
     1,
   ] {
     〈2;y〉

@@ -53,7 +53,7 @@ Result:
     },
   ]
   b: [
-    for _, x in 〈1;a〉 {
+    for , x in 〈1;a〉 {
       〈1;x〉
     },
   ]

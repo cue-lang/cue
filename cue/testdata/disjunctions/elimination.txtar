@@ -3673,7 +3673,7 @@ diff old new
     t1: {
       p?: []
       a: ([
-        for _, k in 〈1;p〉 {
+        for , k in 〈1;p〉 {
           〈1;k〉
         },
       ]|null)
@@ -3683,7 +3683,7 @@ diff old new
     t2: {
       p?: []
       a: (null|[
-        for _, k in 〈1;p〉 {
+        for , k in 〈1;p〉 {
           〈1;k〉
         },
       ])
@@ -3972,7 +3972,7 @@ diff old new
       #summarizeReturn: {
         in: 〈1;#Input〉
         out: [
-          for _, k in 〈1;in〉.forms {
+          for , k in 〈1;in〉.forms {
             〈1;k〉.common
           },
         ]

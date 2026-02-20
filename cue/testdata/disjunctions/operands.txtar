@@ -100,7 +100,7 @@ NumCloseIDs: 2
     a: 2
   })
   forLoop: [
-    for _, e in 〈1;list〉 {
+    for , e in 〈1;list〉 {
       "count: \(〈1;e〉)"
     },
   ]

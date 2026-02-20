@@ -51,7 +51,7 @@ Result:
         name: "foo"
       },
     ]
-    for _, cfg in 〈0;#cfgs〉 {
+    for , cfg in 〈0;#cfgs〉 {
       files: 〈1;cfg〉.nam
     }
   }

@@ -678,13 +678,13 @@ Result:
   }
   issue4125: (struct){
     t1_self: (struct){
-      let Root#1 = (_|_){
+      let Root#0 = (_|_){
         // [structural cycle] issue4125.t1_self.Root: structural cycle
       }
       a: (_){ _ }
     }
     t2_alias: (struct){
-      let Y#2 = (_|_){
+      let Y#1 = (_|_){
         // [structural cycle] issue4125.t2_alias.Y: structural cycle
       }
       b: (_){ _ }
@@ -793,13 +793,13 @@ diff old new
    }
 +  issue4125: (struct){
 +    t1_self: (struct){
-+      let Root#1 = (_|_){
++      let Root#0 = (_|_){
 +        // [structural cycle] issue4125.t1_self.Root: structural cycle
 +      }
 +      a: (_){ _ }
 +    }
 +    t2_alias: (struct){
-+      let Y#2 = (_|_){
++      let Y#1 = (_|_){
 +        // [structural cycle] issue4125.t2_alias.Y: structural cycle
 +      }
 +      b: (_){ _ }
@@ -1636,8 +1636,8 @@ Result:
 {
   issue4125: {
     t1_self: {
-      let Root#1 = 〈1〉
-      a: 〈0;let Root#1〉.a
+      let Root#0 = 〈1〉
+      a: 〈0;let Root#0〉.a
     }
   }
 }
@@ -1645,8 +1645,8 @@ Result:
 {
   issue4125: {
     t2_alias: {
-      let Y#2 = 〈1〉
-      b: 〈0;let Y#2〉.b
+      let Y#0 = 〈1〉
+      b: 〈0;let Y#0〉.b
     }
   }
 }

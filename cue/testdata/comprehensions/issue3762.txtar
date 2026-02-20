@@ -390,7 +390,7 @@ diff old new
         }
       }
     }
-    for k, _ in (〈0;_a〉 & 〈0;_b〉) {
+    for k,  in (〈0;_a〉 & 〈0;_b〉) {
       x: 5
     }
     _a: {
@@ -433,14 +433,14 @@ diff old new
           vms: "again"
         }
       }
-      for k, _ in (〈0;_a〉 & 〈0;_b〉) {
+      for k,  in (〈0;_a〉 & 〈0;_b〉) {
         x: 5
       }
     }
   }
   reduced: {
     p2: {
-      for k, _ in (〈0;_a〉 & 〈0;_b〉) {
+      for k,  in (〈0;_a〉 & 〈0;_b〉) {
         x: 5
       }
       _cs: (〈0;_a〉.l & {
@@ -471,7 +471,7 @@ diff old new
     _y: {
       f: false
     }
-    for k, _ in (〈0;_x〉 & 〈0;_y〉) {
+    for k,  in (〈0;_x〉 & 〈0;_y〉) {
       ok: true
     }
   }

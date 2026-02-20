@@ -35,7 +35,7 @@ Disjuncts:    39
     self: (struct){
     }
   }
-  let sam#1 = (struct){
+  let sam#0 = (struct){
     taxPayer: ~(_taxPayer(:p))
   }
   assert: (struct){
@@ -79,14 +79,16 @@ Disjuncts:    39
 diff old new
 --- old
 +++ new
-@@ -4,22 +4,16 @@
+@@ -3,23 +3,17 @@
+     self: (struct){
      }
    }
-   let sam#1 = (struct){
+-  let sam#1 = (struct){
 -    taxPayer: (struct){
 -      self: (struct){
 -      }
 -    }
++  let sam#0 = (struct){
 +    taxPayer: ~(_taxPayer(:p))
    }
    assert: (struct){
@@ -221,11 +223,11 @@ diff old new
   _taxPayer(:p): {
     self: {}
   }
-  let sam#1 = {
+  let sam#0 = {
     taxPayer: 〈1;_taxPayer(:p)〉
   }
   assert: {
-    invoke: 〈1;let sam#1〉
+    invoke: 〈1;let sam#0〉
     invoke: _
     res: (〈1;subject〉 & {
       in: 〈1;invoke〉

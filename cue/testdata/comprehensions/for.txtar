@@ -79,21 +79,21 @@ Result:
   }
   y: {}
   k: {
-    for _, v in 〈1;e〉 {
+    for , v in 〈1;e〉 {
       〈1;v〉
     }
   }
   e: int
   comprehensionBinds: {
     a: {
-      for _, _ in [
+      for ,  in [
         1,
       ] {
         a: _
       }
     }
     b: {
-      for _, _ in [
+      for ,  in [
         1,
       ] {
         a: _

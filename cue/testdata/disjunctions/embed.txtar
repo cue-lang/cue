@@ -340,7 +340,7 @@ NumCloseIDs: 1
     y: (*1|{
       a: 2
     })
-    for _, x in [
+    for , x in [
       1,
     ] {
       〈2;y〉

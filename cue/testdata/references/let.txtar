@@ -107,26 +107,26 @@ issue1116: {
       1
     },
   ]
-  let A1#1 = 〈0;a1list〉
-  a1: ((100 * 〈0;let A1#1〉[0]) + 〈0;let A1#1〉[0])
+  let A1#0 = 〈0;a1list〉
+  a1: ((100 * 〈0;let A1#0〉[0]) + 〈0;let A1#0〉[0])
   a2list: [
     {
       2
     },
   ]
-  let A2#2 = 〈0;a2list〉
+  let A2#1 = 〈0;a2list〉
   a2: {
-    b: ((100 * 〈1;let A2#2〉[0]) + 〈1;let A2#2〉[0])
+    b: ((100 * 〈1;let A2#1〉[0]) + 〈1;let A2#1〉[0])
   }
   a3list: [
     {
       3
     },
   ]
-  let A3#3 = 〈0;a3list〉
+  let A3#2 = 〈0;a3list〉
   a3: {
     b: {
-      c: ((100 * 〈2;let A3#3〉[0]) + 〈2;let A3#3〉[0])
+      c: ((100 * 〈2;let A3#2〉[0]) + 〈2;let A3#2〉[0])
     }
   }
   a4list: [
@@ -134,9 +134,9 @@ issue1116: {
       4
     },
   ]
-  let A4#4 = 〈0;a4list〉
+  let A4#3 = 〈0;a4list〉
   a4: [
-    for _, x in 〈1;let A4#4〉 {
+    for , x in 〈1;let A4#3〉 {
       v: 404
     },
   ]
@@ -145,10 +145,10 @@ issue1116: {
       5
     },
   ]
-  let A5#5 = 〈0;a5list〉
+  let A5#4 = 〈0;a5list〉
   a5: {
     b: [
-      for _, x in 〈2;let A5#5〉 {
+      for , x in 〈2;let A5#4〉 {
         v: 505
       },
     ]
@@ -158,11 +158,11 @@ issue1116: {
       6
     },
   ]
-  let A6#6 = 〈0;a6list〉
+  let A6#5 = 〈0;a6list〉
   a6: {
     b: {
       c: [
-        for _, x in 〈3;let A6#6〉 {
+        for , x in 〈3;let A6#5〉 {
           v: 606
         },
       ]
@@ -173,9 +173,9 @@ issue1116: {
       7
     },
   ]
-  let A7#7 = 〈0;a7list〉
+  let A7#6 = 〈0;a7list〉
   a7: {
-    for _, x in 〈1;let A7#7〉 {
+    for , x in 〈1;let A7#6〉 {
       v: 707
     }
   }
@@ -184,10 +184,10 @@ issue1116: {
       8
     },
   ]
-  let A8#8 = 〈0;a8list〉
+  let A8#7 = 〈0;a8list〉
   a8: {
     b: {
-      for _, x in 〈2;let A8#8〉 {
+      for , x in 〈2;let A8#7〉 {
         v: 808
       }
     }
@@ -197,11 +197,11 @@ issue1116: {
       9
     },
   ]
-  let A9#9 = 〈0;a9list〉
+  let A9#8 = 〈0;a9list〉
   a9: {
     b: {
       c: {
-        for _, x in 〈3;let A9#9〉 {
+        for , x in 〈3;let A9#8〉 {
           v: 909
         }
       }
@@ -220,10 +220,10 @@ issue1116: {
       max: 〈import;list〉.Max(〈1;input〉)
     }
     bar: {
-      let mn#A = 〈1;last〉.min
-      let mx#B = 〈import;list〉.max
-      min: 〈0;let mn#A〉
-      max: 〈0;let mx#B〉
+      let mn#9 = 〈1;last〉.min
+      let mx#a = 〈import;list〉.max
+      min: 〈0;let mn#9〉
+      max: 〈0;let mx#a〉
     }
     x: {
       if (〈import;list〉.max < 0) {}
@@ -233,33 +233,33 @@ issue1116: {
     inScalar: {
       p0: {
         5
-        let x#C = 6
-        #b: 〈0;let x#C〉
+        let x#b = 6
+        #b: 〈0;let x#b〉
       }
     }
     inScalar: {
       p1: {
-        #b: 〈0;let x#D〉
-        let x#D = 6
+        #b: 〈0;let x#c〉
+        let x#c = 6
         5
       }
     }
     inList: {
       p0: {
-        let x#E = {
+        let x#d = {
           a: 1
         }
         [
-          〈1;let x#E〉,
+          〈1;let x#d〉,
         ]
       }
     }
     inList: {
       p1: {
         [
-          〈1;let x#F〉,
+          〈1;let x#e〉,
         ]
-        let x#F = {
+        let x#e = {
           a: 1
         }
       }
@@ -271,12 +271,12 @@ issue1116: {
         "a",
         "b",
       ]
-      let List#10 = 〈0;#a〉
-      〈0;let List#10〉[(len(〈0;let List#10〉) - 1)]
+      let List#f = 〈0;#a〉
+      〈0;let List#f〉[(len(〈0;let List#f〉) - 1)]
     }
     b: {
-      let List#11 = 〈0;#a〉
-      〈0;let List#11〉[(len(〈0;let List#11〉) - 1)]
+      let List#10 = 〈0;#a〉
+      〈0;let List#10〉[(len(〈0;let List#10〉) - 1)]
       #a: [
         "a",
         "b",
@@ -301,19 +301,19 @@ NumCloseIDs: 4
   a1list: (#list){
     0: (int){ 1 }
   }
-  let A1#1 = ~(a1list)
+  let A1#0 = ~(a1list)
   a1: (int){ 101 }
   a2list: (#list){
     0: (int){ 2 }
   }
-  let A2#2 = ~(a2list)
+  let A2#1 = ~(a2list)
   a2: (struct){
     b: (int){ 202 }
   }
   a3list: (#list){
     0: (int){ 3 }
   }
-  let A3#3 = ~(a3list)
+  let A3#2 = ~(a3list)
   a3: (struct){
     b: (struct){
       c: (int){ 303 }
@@ -322,7 +322,7 @@ NumCloseIDs: 4
   a4list: (#list){
     0: (int){ 4 }
   }
-  let A4#4 = ~(a4list)
+  let A4#3 = ~(a4list)
   a4: (#list){
     0: (struct){
       v: (int){ 404 }
@@ -331,7 +331,7 @@ NumCloseIDs: 4
   a5list: (#list){
     0: (int){ 5 }
   }
-  let A5#5 = ~(a5list)
+  let A5#4 = ~(a5list)
   a5: (struct){
     b: (#list){
       0: (struct){
@@ -342,7 +342,7 @@ NumCloseIDs: 4
   a6list: (#list){
     0: (int){ 6 }
   }
-  let A6#6 = ~(a6list)
+  let A6#5 = ~(a6list)
   a6: (struct){
     b: (struct){
       c: (#list){
@@ -355,14 +355,14 @@ NumCloseIDs: 4
   a7list: (#list){
     0: (int){ 7 }
   }
-  let A7#7 = ~(a7list)
+  let A7#6 = ~(a7list)
   a7: (struct){
     v: (int){ 707 }
   }
   a8list: (#list){
     0: (int){ 8 }
   }
-  let A8#8 = ~(a8list)
+  let A8#7 = ~(a8list)
   a8: (struct){
     b: (struct){
       v: (int){ 808 }
@@ -371,7 +371,7 @@ NumCloseIDs: 4
   a9list: (#list){
     0: (int){ 9 }
   }
-  let A9#9 = ~(a9list)
+  let A9#8 = ~(a9list)
   a9: (struct){
     b: (struct){
       c: (struct){
@@ -392,8 +392,8 @@ NumCloseIDs: 4
       max: (int){ 5 }
     }
     bar: (struct){
-      let mn#A = (int){ 1 }
-      let mx#B = (_|_){
+      let mn#9 = (int){ 1 }
+      let mx#a = (_|_){
         // [incomplete] incompleteLet.bar.mx: undefined field: max:
         //     ./in.cue:54:17
       }
@@ -412,18 +412,18 @@ NumCloseIDs: 4
     inScalar: (struct){
       p0: (int){
         5
-        let x#C = (int){ 6 }
+        let x#b = (int){ 6 }
         #b: (int){ 6 }
       }
       p1: (int){
         5
         #b: (int){ 6 }
-        let x#D = (int){ 6 }
+        let x#c = (int){ 6 }
       }
     }
     inList: (struct){
       p0: (#list){
-        let x#E = (struct){
+        let x#d = (struct){
           a: (int){ 1 }
         }
         0: (struct){
@@ -431,7 +431,7 @@ NumCloseIDs: 4
         }
       }
       p1: (#list){
-        let x#F = (struct){
+        let x#e = (struct){
           a: (int){ 1 }
         }
         0: (struct){
@@ -447,11 +447,11 @@ NumCloseIDs: 4
         0: (string){ "a" }
         1: (string){ "b" }
       }
-      let List#10 = ~(issue1116.a.#a)
+      let List#f = ~(issue1116.a.#a)
     }
     b: (string){
       "b"
-      let List#11 = ~(issue1116.b.#a)
+      let List#10 = ~(issue1116.b.#a)
       #a: (#list){
         0: (string){ "a" }
         1: (string){ "b" }
@@ -470,7 +470,7 @@ diff old new
 -  let A1#1 = (#list){
 -    0: (int){ 1 }
 -  }
-+  let A1#1 = ~(a1list)
++  let A1#0 = ~(a1list)
    a1: (int){ 101 }
    a2list: (#list){
      0: (int){ 2 }
@@ -478,7 +478,7 @@ diff old new
 -  let A2#2 = (#list){
 -    0: (int){ 2 }
 -  }
-+  let A2#2 = ~(a2list)
++  let A2#1 = ~(a2list)
    a2: (struct){
      b: (int){ 202 }
    }
@@ -489,7 +489,7 @@ diff old new
 -  let A3#3 = (#list){
 -    0: (int){ 3 }
 -  }
-+  let A3#3 = ~(a3list)
++  let A3#2 = ~(a3list)
    a3: (struct){
      b: (struct){
        c: (int){ 303 }
@@ -500,7 +500,7 @@ diff old new
 -  let A4#4 = (#list){
 -    0: (int){ 4 }
 -  }
-+  let A4#4 = ~(a4list)
++  let A4#3 = ~(a4list)
    a4: (#list){
      0: (struct){
        v: (int){ 404 }
@@ -511,7 +511,7 @@ diff old new
 -  let A5#5 = (#list){
 -    0: (int){ 5 }
 -  }
-+  let A5#5 = ~(a5list)
++  let A5#4 = ~(a5list)
    a5: (struct){
      b: (#list){
        0: (struct){
@@ -522,7 +522,7 @@ diff old new
 -  let A6#6 = (#list){
 -    0: (int){ 6 }
 -  }
-+  let A6#6 = ~(a6list)
++  let A6#5 = ~(a6list)
    a6: (struct){
      b: (struct){
        c: (#list){
@@ -533,7 +533,7 @@ diff old new
 -  let A7#7 = (#list){
 -    0: (int){ 7 }
 -  }
-+  let A7#7 = ~(a7list)
++  let A7#6 = ~(a7list)
    a7: (struct){
      v: (int){ 707 }
    }
@@ -544,7 +544,7 @@ diff old new
 -  let A8#8 = (#list){
 -    0: (int){ 8 }
 -  }
-+  let A8#8 = ~(a8list)
++  let A8#7 = ~(a8list)
    a8: (struct){
      b: (struct){
        v: (int){ 808 }
@@ -555,10 +555,52 @@ diff old new
 -  let A9#9 = (#list){
 -    0: (int){ 9 }
 -  }
-+  let A9#9 = ~(a9list)
++  let A9#8 = ~(a9list)
    a9: (struct){
      b: (struct){
        c: (struct){
+@@ -111,8 +93,8 @@
+       max: (int){ 5 }
+     }
+     bar: (struct){
+-      let mn#A = (int){ 1 }
+-      let mx#B = (_|_){
++      let mn#9 = (int){ 1 }
++      let mx#a = (_|_){
+         // [incomplete] incompleteLet.bar.mx: undefined field: max:
+         //     ./in.cue:54:17
+       }
+@@ -131,18 +113,18 @@
+     inScalar: (struct){
+       p0: (int){
+         5
+-        let x#C = (int){ 6 }
++        let x#b = (int){ 6 }
+         #b: (int){ 6 }
+       }
+       p1: (int){
+         5
+         #b: (int){ 6 }
+-        let x#D = (int){ 6 }
++        let x#c = (int){ 6 }
+       }
+     }
+     inList: (struct){
+       p0: (#list){
+-        let x#E = (struct){
++        let x#d = (struct){
+           a: (int){ 1 }
+         }
+         0: (struct){
+@@ -150,7 +132,7 @@
+         }
+       }
+       p1: (#list){
+-        let x#F = (struct){
++        let x#e = (struct){
+           a: (int){ 1 }
+         }
+         0: (struct){
 @@ -166,17 +148,11 @@
          0: (string){ "a" }
          1: (string){ "b" }
@@ -567,7 +609,7 @@ diff old new
 -        0: (string){ "a" }
 -        1: (string){ "b" }
 -      }
-+      let List#10 = ~(issue1116.a.#a)
++      let List#f = ~(issue1116.a.#a)
      }
      b: (string){
        "b"
@@ -575,7 +617,7 @@ diff old new
 -        // [incomplete] issue1116.b.List: cycle error referencing #a:
 -        //     ./in.cue:96:14
 -      }
-+      let List#11 = ~(issue1116.b.#a)
++      let List#10 = ~(issue1116.b.#a)
        #a: (#list){
          0: (string){ "a" }
          1: (string){ "b" }

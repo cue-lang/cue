@@ -787,7 +787,7 @@ diff old new
       }
     }
     _outputs(:config): {
-      for _, ns in [
+      for , ns in [
         "ns",
       ] {
         "\(〈1;ns〉)/network": (〈4;#NetworkPolicy〉 & {
@@ -822,7 +822,7 @@ diff old new
         })
       }
     }
-    for _, ns in [
+    for , ns in [
       "ns",
     ] {
       for k, v in 〈2;_outputs(:config)〉 {

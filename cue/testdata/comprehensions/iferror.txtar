@@ -96,7 +96,7 @@ issue1972: {
       2,
       3,
     ]
-    for _, x in 〈0;list〉 if 〈2;a〉.d {
+    for , x in 〈0;list〉 if 〈2;a〉.d {
       〈1;x〉
     }
   }
@@ -121,7 +121,7 @@ issue1972: {
         bar: _
       }
       foo: [
-        for _, a in 〈1;s〉 if (〈0;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+        for , a in 〈1;s〉 if (〈0;a〉.b != _|_(explicit error (_|_ literal) in source)) {
           〈1;a〉
         },
       ]

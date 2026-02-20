@@ -125,7 +125,7 @@ NumCloseIDs: 5
 --- in.cue
 {
   dynamic: {
-    for _, s in [
+    for , s in [
       "foo",
     ] {
       〈1;s〉: 1

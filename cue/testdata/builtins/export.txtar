@@ -74,7 +74,7 @@ NumCloseIDs: 2
       }
     }
     _out1: [
-      for svc, _ in 〈1;derived〉 {
+      for svc,  in 〈1;derived〉 {
         〈1;svc〉
       },
     ]

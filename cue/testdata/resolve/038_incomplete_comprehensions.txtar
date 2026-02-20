@@ -17,7 +17,7 @@ B: A & {
 --- in.cue
 {
   A: {
-    for _, v in 〈0;src〉 {
+    for , v in 〈0;src〉 {
       "\(〈1;v〉)": 〈1;v〉
     }
     src: _

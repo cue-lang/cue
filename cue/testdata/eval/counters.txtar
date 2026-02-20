@@ -114,7 +114,7 @@ issue3824: panic: {
           strs: [
             ...string,
           ]
-          for _, w in 〈import;list〉.FlattenN([
+          for , w in 〈import;list〉.FlattenN([
             〈1;strs〉,
           ], 1) {}
         }
@@ -142,7 +142,7 @@ issue3824: panic: {
         })
         a: {
           b: _
-          for _, w in 〈import;list〉.FlattenN([
+          for , w in 〈import;list〉.FlattenN([
             〈1;b〉,
           ], 1) {}
         }
@@ -155,10 +155,10 @@ issue3824: panic: {
   issue3770: {
     task: {
       m: {
-        let t#1 = [
+        let t#0 = [
           "x",
         ]
-        for _, m in 〈0;let t#1〉 {
+        for , m in 〈0;let t#0〉 {
           〈1;m〉: {
             a: 1
           }
@@ -421,7 +421,7 @@ NumCloseIDs: 16
   issue3770: (struct){
     task: (struct){
       m: (struct){
-        let t#1 = (#list){
+        let t#0 = (#list){
           0: (string){ "x" }
         }
         x: (struct){
@@ -586,6 +586,15 @@ diff old new
          a: (struct){
            b: (_){ _ }
          }
+@@ -90,7 +114,7 @@
+   issue3770: (struct){
+     task: (struct){
+       m: (struct){
+-        let t#1 = (#list){
++        let t#0 = (#list){
+           0: (string){ "x" }
+         }
+         x: (struct){
 @@ -103,8 +127,8 @@
    }
    issue3780: (struct){

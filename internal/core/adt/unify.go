@@ -900,7 +900,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 
 	switch arc.ArcType {
 	case ArcRequired:
-		label := f.SelectorString(c.Runtime)
+		label := f.SelectorString()
 		b := &Bottom{
 			Code: IncompleteError,
 			Err:  c.NewPosf(pos, "required field missing: %s", label),
@@ -922,7 +922,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 		// definition, but this is fine for the purpose it serves.
 		// TODO(refRequired): revisit whether referencing required fields should
 		// fail.
-		label := f.SelectorString(c.Runtime)
+		label := f.SelectorString()
 		b := &Bottom{
 			Code: IncompleteError,
 			Node: v,

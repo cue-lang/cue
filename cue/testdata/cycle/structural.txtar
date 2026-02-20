@@ -1389,7 +1389,7 @@ Result:
         // [structural cycle] withLetFail.schema.next: structural cycle
       }
     }
-    let _schema_1#1 = (_|_){
+    let _schema_1#0 = (_|_){
       // [structural cycle] withLetFail.schema.next: structural cycle
     }
   }
@@ -2011,12 +2011,14 @@ diff old new
        }
      }
    }
-@@ -759,8 +756,7 @@
+@@ -758,9 +755,8 @@
+         // [structural cycle] withLetFail.schema.next: structural cycle
        }
      }
-     let _schema_1#1 = (_|_){
+-    let _schema_1#1 = (_|_){
 -      // [structural cycle] withLetFail._schema_1: structural cycle:
 -      //     ./in.cue:362:17
++    let _schema_1#0 = (_|_){
 +      // [structural cycle] withLetFail.schema.next: structural cycle
      }
    }
@@ -3703,7 +3705,7 @@ Result:
   b13: {
     root: {
       a: [
-        for _, x in 〈2;root〉 {
+        for , x in 〈2;root〉 {
           〈1;x〉
         },
       ]
@@ -3714,11 +3716,11 @@ Result:
       a: [
         ...int,
       ]
-      for _, x in 〈0;a〉 {
+      for , x in 〈0;a〉 {
         "\(〈1;x〉)": {}
       }
       b: [
-        for _, x in 〈2;root〉 {
+        for , x in 〈2;root〉 {
           〈1;x〉
         },
       ]
@@ -3727,7 +3729,7 @@ Result:
   b15: {
     root: {
       a: {
-        for _, x in 〈2;root〉 {
+        for , x in 〈2;root〉 {
           〈1;x〉
         }
       }
@@ -3979,9 +3981,9 @@ Result:
   }
   withLetFail: {
     schema: {
-      next: 〈1;let _schema_1#1〉
+      next: 〈1;let _schema_1#0〉
     }
-    let _schema_1#1 = 〈0;schema〉
+    let _schema_1#0 = 〈0;schema〉
   }
   fieldsSumInfinite: {
     issue3310: {
@@ -3989,7 +3991,7 @@ Result:
       fries: 2.00
       sprite: 1.00
       total: 〈import;list〉.Sum([
-        for _, v in 〈2;issue3310〉 {
+        for , v in 〈2;issue3310〉 {
           〈1;v〉
         },
       ])

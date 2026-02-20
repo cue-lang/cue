@@ -418,7 +418,7 @@ Result:
           }
         }
       }
-      let config#1 = ~(issue3641.full.#Config)
+      let config#0 = ~(issue3641.full.#Config)
       out: (#struct){
         sch: (#struct){
           cfg: (#struct){
@@ -530,7 +530,7 @@ Result:
       _input: ((null|struct)){ |(*(struct){
           name: (string){ "foo" }
         }, (null){ null }) }
-      let _inputList#2 = (#list){
+      let _inputList#1 = (#list){
         0: (struct){
           name: (string){ "foo" }
         }
@@ -559,7 +559,7 @@ Result:
       _input: ((null|struct)){ |(*(struct){
           name: (string){ "foo" }
         }, (null){ null }) }
-      let _inputList#3 = (#list){
+      let _inputList#2 = (#list){
         0: (struct){
           name: (string){ "foo" }
         }
@@ -899,7 +899,7 @@ diff old new
 -          }
 -        }
 -      }
-+      let config#1 = ~(issue3641.full.#Config)
++      let config#0 = ~(issue3641.full.#Config)
        out: (#struct){
          sch: (#struct){
            cfg: (#struct){
@@ -914,10 +914,11 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -293,14 +248,12 @@
+@@ -292,15 +247,13 @@
+       _input: ((null|struct)){ |(*(struct){
            name: (string){ "foo" }
          }, (null){ null }) }
-       let _inputList#2 = (#list){
+-      let _inputList#2 = (#list){
 -        0: ((null|struct)){ |(*(struct){
 -            name: (string){ "foo" }
 -          }, (null){ null }) }
@@ -926,6 +927,7 @@ diff old new
 -        foo: ((null|struct)){ |(*(struct){
 -            name: (string){ "foo" }
 -          }, (null){ null }) }
++      let _inputList#1 = (#list){
 +        0: (struct){
 +          name: (string){ "foo" }
 +        }
@@ -935,10 +937,11 @@ diff old new
        }
        _template: (struct){
          input: (struct){
-@@ -324,14 +277,14 @@
+@@ -323,15 +276,15 @@
+       _input: ((null|struct)){ |(*(struct){
            name: (string){ "foo" }
          }, (null){ null }) }
-       let _inputList#3 = (#list){
+-      let _inputList#3 = (#list){
 -        0: ((null|struct)){ |(*(struct){
 -            name: (string){ "foo" }
 -          }, (null){ null }) }
@@ -947,6 +950,7 @@ diff old new
 -        foo: ((null|struct)){ |(*(struct){
 -            name: (string){ "foo" }
 -          }, (null){ null }) }
++      let _inputList#2 = (#list){
 +        0: (struct){
 +          name: (string){ "foo" }
 +        }
@@ -1579,9 +1583,9 @@ Result:
         sch: 〈1;#Config1〉
       }
       #Config: (〈0;#Config1〉 & 〈0;#Config2〉)
-      let config#1 = 〈0;#Config〉
+      let config#0 = 〈0;#Config〉
       out: (〈0;#Schema〉 & {
-        sch: 〈1;let config#1〉
+        sch: 〈1;let config#0〉
       })
     }
   }
@@ -1687,11 +1691,11 @@ Result:
       _input: (null|*{
         name: "foo"
       })
-      let _inputList#2 = 〈import;list〉.FlattenN([
+      let _inputList#0 = 〈import;list〉.FlattenN([
         〈1;_input〉,
       ], 0)
       _inputByName: {
-        for _, input in 〈1;let _inputList#2〉 {
+        for , input in 〈1;let _inputList#0〉 {
           〈1;input〉.name: 〈1;input〉
         }
       }
@@ -1713,11 +1717,11 @@ Result:
       _input: (null|*{
         name: "foo"
       })
-      let _inputList#3 = 〈import;list〉.FlattenN([
+      let _inputList#1 = 〈import;list〉.FlattenN([
         〈1;_input〉,
       ], 0)
       _inputByName: {
-        for _, input in (〈1;let _inputList#3〉 & _|_(no sharing)) {
+        for , input in (〈1;let _inputList#1〉 & _|_(no sharing)) {
           〈1;input〉.name: 〈1;input〉
         }
       }

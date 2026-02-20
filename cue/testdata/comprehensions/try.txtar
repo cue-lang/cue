@@ -1411,7 +1411,7 @@ diff old new
   }
   forWithDefinedSource: {
     try {
-      for _, x in [
+      for , x in [
         〈3;b〉?,
       ] {
         val: 〈1;x〉
@@ -1420,7 +1420,7 @@ diff old new
   }
   forWithUndefinedSource: {
     try {
-      for _, x in [
+      for , x in [
         〈3;c〉?,
       ] {
         val: 〈1;x〉
@@ -1834,7 +1834,7 @@ diff old new
   recursive: {
     t1: {
       try {
-        for _, x in [
+        for , x in [
           〈4;b〉?,
         ] {
           〈1;x〉

@@ -1823,7 +1823,7 @@ Result:
             }
           }
         }
-        for k, _ in 〈0;a〉 {
+        for k,  in 〈0;a〉 {
           a: {
             〈2;k〉: {
               c: {

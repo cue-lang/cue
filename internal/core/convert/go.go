@@ -442,7 +442,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 				v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, sub, f))
 			}
 			slices.SortFunc(v.Arcs, func(a, b *adt.Vertex) int {
-				return strings.Compare(a.Label.IdentString(ctx), b.Label.IdentString(ctx))
+				return strings.Compare(a.Label.IdentString(), b.Label.IdentString())
 			})
 			// Create all the adt/ast fields after sorting the arcs
 			for _, arc := range v.Arcs {

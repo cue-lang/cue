@@ -546,7 +546,7 @@ Result:
       botUser: "bot1"
       orgs: {
         [_]: {
-          for repo_name, _ in 〈1〉.repos let orgBotUser = 〈3;botUser〉 {
+          for repo_name,  in 〈1〉.repos let orgBotUser = 〈3;botUser〉 {
             collaborators: {
               〈3;repo_name〉: {
                 〈3;orgBotUser〉: true

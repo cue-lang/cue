@@ -104,7 +104,7 @@ NumCloseIDs: 1
     },
   ]
   results: _
-  for _, manifest in 〈0;manifests〉 {
+  for , manifest in 〈0;manifests〉 {
     results: 〈1;manifest〉
   }
 }

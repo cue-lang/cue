@@ -33,7 +33,7 @@ letVarInElse.bad: reference "y" not found:
 --- in.cue
 {
   forVarInElse: {
-    for _, i in [
+    for , i in [
       1,
       2,
       3,
@@ -44,7 +44,7 @@ letVarInElse.bad: reference "y" not found:
     }
   }
   letVarInElse: {
-    for _, x in [
+    for , x in [
       1,
       2,
       3,

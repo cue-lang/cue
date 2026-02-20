@@ -1256,7 +1256,7 @@ Reordering / positions.
   }
   issue3925: {
     full: {
-      for name, _ in 〈0;_inputs〉 {
+      for name,  in 〈0;_inputs〉 {
         out: {
           〈2;name〉: {
             early: "early value"
@@ -1296,7 +1296,7 @@ Reordering / positions.
         src: [
           "foo",
         ]
-        for _, v in 〈0;src〉 {
+        for , v in 〈0;src〉 {
           "\(〈1;v〉)": 〈1;v〉
         }
       }
@@ -1425,7 +1425,7 @@ Reordering / positions.
               C: 1
             }
           }
-          for _, _ in 〈0;a〉 {
+          for ,  in 〈0;a〉 {
             a: {
               "b": {
                 D: 2

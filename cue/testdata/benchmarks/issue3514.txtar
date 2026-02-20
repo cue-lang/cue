@@ -163,7 +163,7 @@ Disjuncts:    31139
       ...
     }
     #timezone: or([
-      for _, i in 〈import;list〉.Range(0, 571, 1) {
+      for , i in 〈import;list〉.Range(0, 571, 1) {
         "\(〈1;i〉)"
       },
     ])

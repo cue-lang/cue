@@ -1190,7 +1190,7 @@ NumCloseIDs: 4
     #input: 〈1;_input〉
   })
   _input: {
-    for _, n in 〈import;list〉.Range(1, 100, 1) {
+    for , n in 〈import;list〉.Range(1, 100, 1) {
       "A\(〈1;n〉)": {
         "B\(〈2;n〉)": {
           name: "name\(〈3;n〉)"
@@ -1204,7 +1204,7 @@ NumCloseIDs: 4
   #Output: {
     〈1;#Embed〉
     #input: _
-    for _, lvlA in 〈0;#input〉 {
+    for , lvlA in 〈0;#input〉 {
       for nameB, lvlB in 〈1;lvlA〉 {
         〈1;nameB〉: 〈1;lvlB〉.name
       }

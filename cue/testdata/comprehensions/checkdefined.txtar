@@ -94,6 +94,139 @@ Disjuncts:    105
 MisalignedConjunct: 2
 
 NumCloseIDs: 13
+-- out/evalalpha --
+(struct){
+  xc: (#struct){
+    field: (struct){
+    }
+  }
+  xo: (struct){
+    field: (struct){
+    }
+  }
+  okc0: (struct){
+    a: (int){ 1 }
+  }
+  oko0: (struct){
+    a: (int){ 1 }
+  }
+  okc1: (struct){
+  }
+  oko1: (struct){
+  }
+  okc2: (struct){
+  }
+  oko2: (struct){
+    a: (int){ 1 }
+  }
+  okc3: (struct){
+  }
+  oko3: (struct){
+    a: (int){ 1 }
+  }
+  issue1969: (struct){
+    okc: (struct){
+      let X#0 = (_|_){
+        // [eval] issue1969.okc.X: undefined field: undefined:
+        //     ./in.cue:35:13
+      }
+      let Y#1 = (_|_){
+        // [eval]
+        s: (_|_){
+          // [eval] issue1969.okc.X: undefined field: undefined:
+          //     ./in.cue:35:13
+        }
+      }
+    }
+    oko: (struct){
+      let X#2 = (_|_){
+        // [incomplete] issue1969.oko.X: undefined field: undefined:
+        //     ./in.cue:42:13
+      }
+      let Y#3 = (struct){
+        s: (_|_){
+          // [incomplete] issue1969.oko.X: undefined field: undefined:
+          //     ./in.cue:42:13
+        }
+      }
+      s: (_|_){
+        // [incomplete] issue1969.oko.X: undefined field: undefined:
+        //     ./in.cue:42:13
+      }
+    }
+  }
+  checkIncomplete: (struct){
+    t1: (struct){
+      f: (struct){
+        blah: (struct){
+          a: (string){ string }
+        }
+      }
+    }
+  }
+  yo: (struct){
+    f: (int){ int }
+    g: (_|_){
+      // [incomplete] yo.g: non-concrete value int in operand to <:
+      //     ./issue2245.cue:1:18
+      //     ./issue2245.cue:1:10
+    }
+  }
+  okyo: (struct){
+    a: (int){ 1 }
+  }
+  okyog: (struct){
+  }
+  structs: (struct){
+    bare: (struct){
+      t1: (bool){ true }
+      f2: (bool){ false }
+      f3: (bool){ false }
+      t4: (bool){ true }
+    }
+    select: (struct){
+      t1: (bool){ true }
+      f2: (bool){ false }
+      f3: (bool){ false }
+      t4: (bool){ true }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -29,11 +29,11 @@
+   }
+   issue1969: (struct){
+     okc: (struct){
+-      let X#1 = (_|_){
++      let X#0 = (_|_){
+         // [eval] issue1969.okc.X: undefined field: undefined:
+         //     ./in.cue:35:13
+       }
+-      let Y#2 = (_|_){
++      let Y#1 = (_|_){
+         // [eval]
+         s: (_|_){
+           // [eval] issue1969.okc.X: undefined field: undefined:
+@@ -42,11 +42,11 @@
+       }
+     }
+     oko: (struct){
+-      let X#3 = (_|_){
+-        // [incomplete] issue1969.oko.X: undefined field: undefined:
+-        //     ./in.cue:42:13
+-      }
+-      let Y#4 = (struct){
++      let X#2 = (_|_){
++        // [incomplete] issue1969.oko.X: undefined field: undefined:
++        //     ./in.cue:42:13
++      }
++      let Y#3 = (struct){
+         s: (_|_){
+           // [incomplete] issue1969.oko.X: undefined field: undefined:
+           //     ./in.cue:42:13
 -- out/eval --
 (struct){
   xc: (#struct){
@@ -224,7 +357,7 @@ NumCloseIDs: 13
   okc2: {
     if (({} & {
       s: [
-        for _, y in 〈3;xc〉.undefined {},
+        for , y in 〈3;xc〉.undefined {},
       ]
     }) != _|_(explicit error (_|_ literal) in source)) {
       a: 1
@@ -233,7 +366,7 @@ NumCloseIDs: 13
   oko2: {
     if (({} & {
       s: [
-        for _, y in 〈3;xo〉.undefined {},
+        for , y in 〈3;xo〉.undefined {},
       ]
     }) != _|_(explicit error (_|_ literal) in source)) {
       a: 1
@@ -242,7 +375,7 @@ NumCloseIDs: 13
   okc3: {
     if ({
       s: [
-        for _, y in 〈3;xc〉.undefined {},
+        for , y in 〈3;xc〉.undefined {},
       ]
     } != _|_(explicit error (_|_ literal) in source)) {
       a: 1
@@ -251,7 +384,7 @@ NumCloseIDs: 13
   oko3: {
     if ({
       s: [
-        for _, y in 〈3;xo〉.undefined {},
+        for , y in 〈3;xo〉.undefined {},
       ]
     } != _|_(explicit error (_|_ literal) in source)) {
       a: 1
@@ -259,27 +392,27 @@ NumCloseIDs: 13
   }
   issue1969: {
     okc: {
-      let X#1 = 〈2;xc〉.undefined
-      let Y#2 = ({} & {
+      let X#0 = 〈2;xc〉.undefined
+      let Y#1 = ({} & {
         s: [
-          for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+          for , y in 〈import;list〉.Range(0, 〈2;let X#0〉, 1) {},
         ]
       })
-      if (〈0;let Y#2〉 != _|_(explicit error (_|_ literal) in source)) {
-        〈1;let Y#2〉
+      if (〈0;let Y#1〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#1〉
       }
     }
   }
   issue1969: {
     oko: {
-      let X#3 = 〈2;xo〉.undefined
-      let Y#4 = ({} & {
+      let X#2 = 〈2;xo〉.undefined
+      let Y#3 = ({} & {
         s: [
-          for _, y in 〈import;list〉.Range(0, 〈2;let X#3〉, 1) {},
+          for , y in 〈import;list〉.Range(0, 〈2;let X#2〉, 1) {},
         ]
       })
-      if (〈0;let Y#4〉 != _|_(explicit error (_|_ literal) in source)) {
-        〈1;let Y#4〉
+      if (〈0;let Y#3〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#3〉
       }
     }
   }

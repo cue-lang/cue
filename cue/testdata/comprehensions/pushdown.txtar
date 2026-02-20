@@ -1573,7 +1573,7 @@ Result:
       y: (int){ 1 }
     }
     a: (struct){
-      let x#1multi = 〈1;v〉
+      let x#0multi = 〈1;v〉
     }
   }
   nestedWithEmbeddingOK: (struct){
@@ -2062,6 +2062,15 @@ diff old new
          }
        }
      }
+@@ -606,7 +578,7 @@
+       y: (int){ 1 }
+     }
+     a: (struct){
+-      let x#1multi = 〈1;v〉
++      let x#0multi = 〈1;v〉
+     }
+   }
+   nestedWithEmbeddingOK: (struct){
 @@ -871,10 +843,10 @@
    issue3935: (struct){
      reduced: (struct){
@@ -3236,7 +3245,7 @@ Result:
         y: string
       }
       x: {
-        for _, _ in [
+        for ,  in [
           "iter-once",
         ] {
           〈3;#X〉
@@ -3280,7 +3289,7 @@ Result:
   }
   mixedFieldsSuccess: {
     a: {
-      for _, s in [
+      for , s in [
         "foo",
       ] {
         "\(〈1;s〉)": 1
@@ -3289,7 +3298,7 @@ Result:
     }
     b: {
       #Def: {
-        for _, s in [
+        for , s in [
           "foo",
         ] {
           "\(〈1;s〉)": 1
@@ -3321,7 +3330,7 @@ Result:
     }
     c: {
       x: {
-        for _, s in [
+        for , s in [
           "foo",
         ] {
           "\(〈1;s〉)": 1
@@ -3819,7 +3828,7 @@ Result:
   allArcsSuccess: {
     p1: {
       x: {
-        for k, _ in 〈1;y〉 {
+        for k,  in 〈1;y〉 {
           〈1;k〉: null
         }
       }
@@ -3838,7 +3847,7 @@ Result:
         }
       }
       x: {
-        for k, _ in 〈1;y〉 {
+        for k,  in 〈1;y〉 {
           〈1;k〉: null
         }
       }
@@ -3950,8 +3959,8 @@ Result:
     }
     a: {
       for k, v in 〈1;_c〉 {
-        let x#1multi = 〈1;v〉
-        if (〈0;let x#1〉 != _|_(explicit error (_|_ literal) in source)) {}
+        let x#0multi = 〈1;v〉
+        if (〈0;let x#0〉 != _|_(explicit error (_|_ literal) in source)) {}
       }
     }
   }
@@ -3993,7 +4002,7 @@ Result:
         }
       }
     }
-    for _, id in [
+    for , id in [
       "elem",
     ] {
       deployment: {
@@ -4055,7 +4064,7 @@ Result:
       namespace?: string
     }
     out: {
-      for i, _ in [
+      for i,  in [
         "iter-once",
       ] {
         metadata: 〈3;#ObjectMeta〉
@@ -4454,7 +4463,7 @@ Result:
 --- reflect.cue
 {
   unifyDynamicReflectSuccess: {
-    for _, s in [
+    for , s in [
       "foo",
     ] {
       X: {

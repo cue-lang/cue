@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/toposort"
 )
 
@@ -100,11 +99,9 @@ func TestStronglyConnectedComponents(t *testing.T) {
 		},
 	}
 
-	index := runtime.New()
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			testAllPermutations(t, index, tc.inputs,
+			testAllPermutations(t, tc.inputs,
 				func(t *testing.T, perm [][]adt.Feature, graph *toposort.Graph) {
 					components := graph.StronglyConnectedComponents()
 
@@ -113,7 +110,7 @@ func TestStronglyConnectedComponents(t *testing.T) {
 						fs := component.Nodes.Features()
 						names := make([]string, len(fs))
 						for j, f := range fs {
-							names[j] = f.StringValue(index)
+							names[j] = f.StringValue()
 						}
 						slices.Sort(names)
 						componentsNames[i] = names
@@ -125,7 +122,7 @@ func TestStronglyConnectedComponents(t *testing.T) {
 For permutation: %v
        Expected: %v
             Got: %v`,
-							permutationNames(index, perm),
+							permutationNames(perm),
 							tc.expected, componentsNames)
 					}
 
@@ -138,7 +135,7 @@ For permutation: %v
 							t.Fatalf(`
 For permutation: %v
   List of components contains the same component twice: %v`,
-								permutationNames(index, perm), component)
+								permutationNames(perm), component)
 						}
 						seen[component] = struct{}{}
 						for _, next := range component.Outgoing {
@@ -148,7 +145,7 @@ For permutation: %v
   Either the list of components is not topologically sorted, or the condensation graph is not a DAG!
       Component: %v
        Outgoing: %v`,
-									permutationNames(index, perm),
+									permutationNames(perm),
 									component.Nodes, next.Nodes)
 							}
 						}

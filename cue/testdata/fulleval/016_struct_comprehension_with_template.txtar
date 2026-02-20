@@ -15,7 +15,7 @@ service: baz: {name: "foobar"}
 --- in.cue
 {
   result: [
-    for _, v in 〈1;service〉 {
+    for , v in 〈1;service〉 {
       〈1;v〉
     },
   ]

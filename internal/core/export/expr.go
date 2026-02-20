@@ -182,7 +182,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	// predictability. Also sort in reverse order, so that bugs
 	// are more likely exposed.
 	slices.SortFunc(fields, func(f1, f2 adt.Feature) int {
-		return -cmp.Compare(f1, f2)
+		return -f1.Compare(f2)
 	})
 
 	// TODO: should this not use the new toposort? it still uses the pre-toposort field sorting.

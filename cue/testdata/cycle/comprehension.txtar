@@ -447,7 +447,7 @@ MaxReqSets:          12
 MaxRedirect:         1
 -- out/evalalpha --
 Errors:
-conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
+conflicting values true and [for , v in X if (v & true) {_}] (mismatched types bool and list):
     ./issue2229.cue:10:5
     ./issue2229.cue:10:24
     ./issue2229.cue:10:28
@@ -1067,7 +1067,7 @@ Result:
       // [eval]
       x: (bool){ true }
       y: (_|_){
-        // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
+        // [eval] conflicting values true and [for , v in X if (v & true) {_}] (mismatched types bool and list):
         //     ./issue2229.cue:10:5
         //     ./issue2229.cue:10:24
         //     ./issue2229.cue:10:28
@@ -1164,7 +1164,7 @@ Result:
   }
   issue4100: (struct){
     a: (#list){
-      let l#1 = (#list){
+      let l#0 = (#list){
         0: (int){ 0 }
       }
       0: (int){ 0 }
@@ -1177,7 +1177,7 @@ diff old new
 +++ new
 @@ -1,6 +1,12 @@
  Errors:
-+conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
++conflicting values true and [for , v in X if (v & true) {_}] (mismatched types bool and list):
 +    ./issue2229.cue:10:5
 +    ./issue2229.cue:10:24
 +    ./issue2229.cue:10:28
@@ -1256,7 +1256,7 @@ diff old new
 +      // [eval]
 +      x: (bool){ true }
 +      y: (_|_){
-+        // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
++        // [eval] conflicting values true and [for , v in X if (v & true) {_}] (mismatched types bool and list):
 +        //     ./issue2229.cue:10:5
 +        //     ./issue2229.cue:10:24
 +        //     ./issue2229.cue:10:28
@@ -1286,7 +1286,7 @@ diff old new
    }
 +  issue4100: (struct){
 +    a: (#list){
-+      let l#1 = (#list){
++      let l#0 = (#list){
 +        0: (int){ 0 }
 +      }
 +      0: (int){ 0 }
@@ -2062,7 +2062,7 @@ Result:
     a: {
       parent: ""
       children: [
-        for k, v in 〈3;B〉 for _, w in 〈0;v〉.children {
+        for k, v in 〈3;B〉 for , w in 〈0;v〉.children {
           〈2;k〉
         },
       ]
@@ -2155,7 +2155,7 @@ Result:
           }
         }
       }
-      for s, v in 〈0;S〉 for t, _ in 〈1;T〉 {
+      for s, v in 〈0;S〉 for t,  in 〈1;T〉 {
         T: {
           〈2;t〉: {
             S: {
@@ -2169,7 +2169,7 @@ Result:
   selfReferential: {
     list: {
       panels: [
-        for i, _ in 〈1;panels〉 {
+        for i,  in 〈1;panels〉 {
           id: 〈1;i〉
         },
       ]
@@ -2184,7 +2184,7 @@ Result:
     insertionError: {
       A: {
         foo: 1
-        for _, x in 〈1;A〉 {
+        for , x in 〈1;A〉 {
           "foo3": 1
         }
       }
@@ -2522,7 +2522,7 @@ Result:
   }
   issue2367: {
     a: _
-    for _, x in [
+    for , x in [
       〈1;a〉,
     ] {
       a: 〈1;x〉
@@ -2540,7 +2540,7 @@ Result:
         #a: string
         _#X: [
           〈1;#a〉,
-          for _, i in 〈import;list〉.Range(0, len(〈2;#subs〉), 1) {
+          for , i in 〈import;list〉.Range(0, len(〈2;#subs〉), 1) {
             (〈4;#subs〉[〈1;i〉] & {
               #_1: 〈4;_#X〉[〈2;i〉]
               _
@@ -2578,7 +2578,7 @@ Result:
         〈0;#X〉[3]
         #X: [
           "X",
-          for i, _ in 〈2;#subs〉 {
+          for i,  in 〈2;#subs〉 {
             〈4;#s〉
             #str: 〈3;#X〉[〈1;i〉]
           },
@@ -2613,7 +2613,7 @@ Result:
     reduced_fail: {
       x: true
       y: [
-        for _, v in 〈2〉 if (〈0;v〉 & true) {
+        for , v in 〈2〉 if (〈0;v〉 & true) {
           _
         },
       ]
@@ -2635,7 +2635,7 @@ Result:
           ...,
         ]
         objs: [
-          for _, dep in 〈1;_deps〉 for _, obj in (〈0;dep〉 & {}).objs {
+          for , dep in 〈1;_deps〉 for , obj in (〈0;dep〉 & {}).objs {
             〈1;obj〉
           },
         ]
@@ -2665,10 +2665,10 @@ Result:
           ...,
         ]
         objs: [
-          for _, obj in 〈1;_local〉 {
+          for , obj in 〈1;_local〉 {
             〈1;obj〉
           },
-          for _, dep in 〈1;_deps〉 for _, obj in (〈0;dep〉 & {}).objs {
+          for , dep in 〈1;_deps〉 for , obj in (〈0;dep〉 & {}).objs {
             〈1;obj〉
           },
         ]
@@ -2698,7 +2698,7 @@ Result:
         _names: [
           〈1;_metadata〉.name,
         ]
-        for _, name in 〈0;_names〉 {
+        for , name in 〈0;_names〉 {
           resource: {
             level1: {
               〈3;name〉: {
@@ -2715,13 +2715,13 @@ Result:
 {
   issue4100: {
     a: {
-      let l#1 = [
+      let l#0 = [
         0,
       ]
-      if (〈0;let l#1〉 != _|_(explicit error (_|_ literal) in source)) {
-        〈1;let l#1〉[:]
+      if (〈0;let l#0〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let l#0〉[:]
       }
     }
-    for _, _ in 〈0;a〉 {}
+    for ,  in 〈0;a〉 {}
   }
 }

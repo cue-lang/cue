@@ -100,7 +100,7 @@ invalidUseOfOptional.x: reference "c" not found:
       2,
       3,
     ]
-    for _, x in 〈0;a〉? {
+    for , x in 〈0;a〉? {
       "\(〈1;x〉)": 〈1;x〉
     }
   }

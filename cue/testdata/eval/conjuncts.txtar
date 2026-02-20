@@ -128,7 +128,7 @@ Result:
       //     ./issue2351.cue:3:2
       //     ./issue2351.cue:4:10
       //     ./issue2351.cue:4:19
-      let _param#1 = (string){ "foo" }
+      let _param#0 = (string){ "foo" }
     }
     hidden: (#list){
       _in1: (#list){
@@ -155,7 +155,7 @@ Result:
       }
     }
     export: (#struct){
-      let data#2 = (struct){
+      let data#1 = (struct){
         f1: (string){ "foo" }
       }
       out1: (string){ "foo" }
@@ -205,6 +205,24 @@ diff old new
      ./issue2351.cue:4:19
  
  Result:
+@@ -42,7 +44,7 @@
+       //     ./issue2351.cue:3:2
+       //     ./issue2351.cue:4:10
+       //     ./issue2351.cue:4:19
+-      let _param#1 = (string){ "foo" }
++      let _param#0 = (string){ "foo" }
+     }
+     hidden: (#list){
+       _in1: (#list){
+@@ -69,7 +71,7 @@
+       }
+     }
+     export: (#struct){
+-      let data#2 = (struct){
++      let data#1 = (struct){
+         f1: (string){ "foo" }
+       }
+       out1: (string){ "foo" }
 -- out/eval/stats --
 Leaks:  9
 Freed:  68
@@ -339,13 +357,13 @@ Result:
 {
   issue2351: {
     let: {
-      let _param#1 = "foo"
+      let _param#0 = "foo"
       {
-        param: (〈1;let _param#1〉 & [
+        param: (〈1;let _param#0〉 & [
           {},
         ])
         gen: [
-          for _, p in 〈1;param〉 {
+          for , p in 〈1;param〉 {
             〈1;p〉
           },
         ]
@@ -360,7 +378,7 @@ Result:
       {
         in2: 〈1;_in1〉
         out: [
-          for _, x in 〈1;in2〉 {
+          for , x in 〈1;in2〉 {
             〈1;x〉
           },
         ]
@@ -382,12 +400,12 @@ Result:
       }
     }
     export: {
-      let data#2 = {
+      let data#0 = {
         f1: "foo"
       }
       (〈1;#PutOut1〉 & {
         in: (〈2;#GetF1〉 & {
-          in: 〈2;let data#2〉
+          in: 〈2;let data#0〉
         }).out
       }).out
     }

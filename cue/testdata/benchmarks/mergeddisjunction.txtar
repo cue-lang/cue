@@ -232,14 +232,14 @@ NumCloseIDs: 2
     }
   }
   a: {
-    for _, i in 〈1;list〉 {
+    for , i in 〈1;list〉 {
       "\(〈1;i〉)": {
         text: string
       }
     }
   }
   b: {
-    for _, x in 〈1;a〉 {
+    for , x in 〈1;a〉 {
       "\(〈1;x〉.text)": {
         text: 〈2;x〉.text
       }

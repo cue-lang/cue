@@ -16,12 +16,12 @@ y: {{{for a in a {}}}}
 --- out.cue
 {
   x: {
-    for _, a in 〈1;a〉 {}
+    for , a in 〈1;a〉 {}
   }
   y: {
     {
       {
-        for _, a in 〈3;a〉 {}
+        for , a in 〈3;a〉 {}
       }
     }
   }

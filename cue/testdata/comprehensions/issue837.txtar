@@ -115,10 +115,10 @@ Result:
     }
     deployment: (#struct){
       description: (#struct){
-        let dep#1 = ~(#KumoriKinds.deployment)
+        let dep#0 = ~(#KumoriKinds.deployment)
         service: (#struct){
           description: (#struct){
-            let configed#2 = (_|_){
+            let configed#1 = (_|_){
               // [eval]
               labstr: (_|_){
                 // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
@@ -141,7 +141,7 @@ Result:
     }
     service: (#struct){
       description: (#struct){
-        let configed#2 = (_|_){
+        let configed#1 = (_|_){
           // [eval]
           labstr: (_|_){
             // [eval] #Configure.service.description.configed.labstr: undefined field: label:
@@ -228,7 +228,7 @@ diff old new
      description: (_|_){
        // [incomplete] #Manifest.description: unresolved disjunction "service" | "deployment" (type string):
        //     ./in.cue:5:15
-@@ -42,62 +24,22 @@
+@@ -42,63 +24,23 @@
    #KindsNames: (string){ |((string){ "service" }, (string){ "deployment" }) }
    #KumoriKinds: (#struct){
      deployment: (#struct){
@@ -288,6 +288,7 @@ diff old new
 -          // [eval]
 -          description: (_|_){
 -            // [eval]
+-            let configed#2 = (_|_){
 +      service: ~(#ServiceManifest)
 +      hsize: (_|_){
 +        // [incomplete] #ServiceManifest.description: undefined field: service:
@@ -301,12 +302,13 @@ diff old new
 +    }
 +    deployment: (#struct){
 +      description: (#struct){
-+        let dep#1 = ~(#KumoriKinds.deployment)
++        let dep#0 = ~(#KumoriKinds.deployment)
 +        service: (#struct){
 +          description: (#struct){
-             let configed#2 = (_|_){
++            let configed#1 = (_|_){
                // [eval]
                labstr: (_|_){
+                 // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
 @@ -106,7 +48,7 @@
                }
              }
@@ -316,7 +318,7 @@ diff old new
                //     ./in.cue:40:19
              }
            }
-@@ -114,16 +56,13 @@
+@@ -114,17 +56,14 @@
        }
      }
    }
@@ -330,6 +332,7 @@ diff old new
 -      // [eval]
 -      description: (_|_){
 -        // [eval]
+-        let configed#2 = (_|_){
 +  #Configure: (#struct){
 +    _params: (#struct){
 +      hsize: (#struct){
@@ -337,9 +340,10 @@ diff old new
 +    }
 +    service: (#struct){
 +      description: (#struct){
-         let configed#2 = (_|_){
++        let configed#1 = (_|_){
            // [eval]
            labstr: (_|_){
+             // [eval] #Configure.service.description.configed.labstr: undefined field: label:
 @@ -132,7 +71,7 @@
            }
          }
@@ -634,10 +638,10 @@ to some extent is clearer.
     }
     deployment: {
       description: {
-        let dep#1 = 〈2;_params〉.manifest.description
+        let dep#0 = 〈2;_params〉.manifest.description
         service: (〈3;#Configure〉 & {
           _params: {
-            hsize: 〈2;let dep#1〉.hsize
+            hsize: 〈2;let dep#0〉.hsize
           }
         }).service
       }
@@ -651,13 +655,13 @@ to some extent is clearer.
     }
     service: {
       description: {
-        let configed#2 = (〈3;#RelabelService〉 & {
+        let configed#1 = (〈3;#RelabelService〉 & {
           _params: {
             hsize: 〈4;_params〉.hsize
           }
           role: "admin"
         }).out
-        role: 〈0;let configed#2〉.role
+        role: 〈0;let configed#1〉.role
       }
     }
   }

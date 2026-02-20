@@ -84,6 +84,68 @@ Disjuncts:    56
 MisalignedConjunct: 5
 
 NumCloseIDs: 3
+-- out/evalalpha --
+Errors:
+out: cannot combine regular field "val" with "b":
+    ./in.cue:33:2
+
+Result:
+(_|_){
+  // [eval]
+  out: (_|_){
+    // [eval] out: cannot combine regular field "val" with "b":
+    //     ./in.cue:33:2
+    val: (string){ "b" }
+  }
+  multiLets: (string){
+    "b"
+    let val#0multi = 〈2;k〉
+  }
+  keys: (#list){
+    0: (string){ "a" }
+    1: (string){ "b" }
+  }
+  values: (struct){
+    b: (string){ "member" }
+    c: (string){ "foo" }
+  }
+  full: (struct){
+    out: (struct){
+      let val#1multi = 〈4;values〉[〈2;k〉]
+      role: (string){ "member" }
+    }
+    #github_team_membership: (#struct){
+      team_id: (string){ string }
+      role: (string){ string }
+    }
+    values: (struct){
+      role: (string){ "member" }
+      username: (string){ "foo" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -12,7 +12,7 @@
+   }
+   multiLets: (string){
+     "b"
+-    let val#1multi = 〈2;k〉
++    let val#0multi = 〈2;k〉
+   }
+   keys: (#list){
+     0: (string){ "a" }
+@@ -24,7 +24,7 @@
+   }
+   full: (struct){
+     out: (struct){
+-      let val#2multi = 〈4;values〉[〈2;k〉]
++      let val#1multi = 〈4;values〉[〈2;k〉]
+       role: (string){ "member" }
+     }
+     #github_team_membership: (#struct){
 -- out/eval --
 Errors:
 out: cannot combine regular field "val" with "b":
@@ -128,7 +190,7 @@ Result:
 --- in.cue
 {
   out: {
-    for _, k in 〈1;keys〉 {
+    for , k in 〈1;keys〉 {
       if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
         val: 〈2;k〉
         if (〈0;val〉 != _|_(explicit error (_|_ literal) in source)) {
@@ -138,10 +200,10 @@ Result:
     }
   }
   multiLets: {
-    for _, k in 〈1;keys〉 {
+    for , k in 〈1;keys〉 {
       if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
-        let val#1multi = 〈2;k〉
-        if (〈0;let val#1〉 != _|_(explicit error (_|_ literal) in source)) {
+        let val#0multi = 〈2;k〉
+        if (〈0;let val#0〉 != _|_(explicit error (_|_ literal) in source)) {
           〈3;k〉
         }
       }
@@ -157,11 +219,11 @@ Result:
   }
   full: {
     out: {
-      for k, _ in 〈1;#github_team_membership〉 {
+      for k,  in 〈1;#github_team_membership〉 {
         if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
-          let val#2multi = 〈4;values〉[〈2;k〉]
-          if ((〈0;let val#2〉 != null) && ((〈0;let val#2〉 & string) != _|_(explicit error (_|_ literal) in source))) {
-            〈3;k〉: 〈1;let val#2〉
+          let val#1multi = 〈4;values〉[〈2;k〉]
+          if ((〈0;let val#1〉 != null) && ((〈0;let val#1〉 & string) != _|_(explicit error (_|_ literal) in source))) {
+            〈3;k〉: 〈1;let val#1〉
           }
         }
       }

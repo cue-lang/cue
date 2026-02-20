@@ -163,7 +163,7 @@ Disjuncts:    52
       [string]: 〈2;#Container〉
     }
     containers: [
-      for _, c in 〈1;#Containers〉 {
+      for , c in 〈1;#Containers〉 {
         〈1;c〉
       },
     ]

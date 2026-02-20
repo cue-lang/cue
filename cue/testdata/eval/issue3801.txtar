@@ -133,25 +133,15 @@ diff old new
 +Disjuncts:    14
 +
 +NumCloseIDs: 77
--- out/eval/stats --
-Leaks:  98
-Freed:  260
-Reused: 254
-Allocs: 104
-Retain: 121
-
-Unifications: 332
-Conjuncts:    783
-Disjuncts:    373
 -- out/evalalpha --
 (struct){
   issue3801: (struct){
     let: (struct){
       reduced: (struct){
-        let F#1 = (struct){
+        let F#0 = (struct){
           base: (struct){
             in: (string){ string }
-            let X#2 = (_|_){
+            let X#1 = (_|_){
               // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
               //     ./nested.cue:5:16
               //     ./nested.cue:4:8
@@ -164,7 +154,7 @@ Disjuncts:    373
           }
           XXX: (struct){
             in: (string){ "foo" }
-            let X#2 = (string){ "foo" }
+            let X#1 = (string){ "foo" }
             out: (string){ "foo" }
           }
         }
@@ -177,7 +167,7 @@ Disjuncts:    373
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#4 = (#struct){
+          let pickMsg#2 = (#struct){
             msg: (_|_){
               // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./nested.cue:29:25
@@ -222,14 +212,14 @@ Disjuncts:    373
             //     ./nested.cue:43:24
             //     ./nested.cue:41:15
           }
-          let jsonPatch#5 = (#struct){
-            let base#8 = (#struct){
+          let jsonPatch#3 = (#struct){
+            let base#4 = (#struct){
               someMsg: (string){ string }
               obs: (#struct){ |(*(#struct){
                   missing: (bool){ true }
                 }, (#struct){
                 }) }
-              let pickMsg#4 = (#struct){
+              let pickMsg#2 = (#struct){
                 msg: (_|_){
                   // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
                   //     ./nested.cue:29:25
@@ -248,13 +238,13 @@ Disjuncts:    373
                 }
               }
             }
-            let withMsg#9 = (#struct){
+            let withMsg#5 = (#struct){
               someMsg: (string){ "foo" }
               obs: (#struct){ |(*(#struct){
                   missing: (bool){ true }
                 }, (#struct){
                 }) }
-              let pickMsg#4 = (#struct){
+              let pickMsg#2 = (#struct){
                 msg: (string){ "foo" }
               }
               patches: (#list){
@@ -342,7 +332,7 @@ Disjuncts:    373
         }
         #Base: (#struct){
           val0: (string){ string }
-          let msgObj#D = (string){ string }
+          let msgObj#6 = (string){ string }
           value: (string){ string }
         }
       }
@@ -460,246 +450,25 @@ diff old new
            ns1: (string){ "foo" }
          }
          #SubOutput: (#struct){
--- out/eval --
-(struct){
-  issue3801: (struct){
-    let: (struct){
-      reduced: (struct){
-        let F#1 = (struct){
-          base: (struct){
-            in: (string){ string }
-            let X#2 = (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:5:16
-              //     ./nested.cue:4:8
-            }
-            out: (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.out: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:5:16
-              //     ./nested.cue:4:8
-            }
-          }
-          XXX: (struct){
-            in: (string){ "foo" }
-            let X#2 = (string){ "foo" }
-            out: (string){ "foo" }
-          }
-        }
-        z: (string){ "foo" }
-      }
-      full: (struct){
-        #Resource: (#struct){
-          someMsg: (string){ string }
-          obs: (#struct){ |(*(#struct){
-              missing: (bool){ true }
-            }, (#struct){
-            }) }
-          let pickMsg#4 = (#struct){
-            msg: (_|_){
-              // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:29:25
-              //     ./nested.cue:25:12
-            }
-          }
-          patches: (#list){
-            0: (#struct){
-              op: (string){ "add" }
-              path: (string){ "/metadata" }
-              value: (_|_){
-                // [incomplete] issue3801.let.full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
-                //     ./nested.cue:29:25
-                //     ./nested.cue:25:12
-              }
-            }
-          }
-        }
-        #Patches: (#struct){
-        }
-        #JSONPatch: (#struct){
-          namespace?: (string){ string }
-          patch: (list){
-          }
-          output: (_|_){
-            // [incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
-            //     ./nested.cue:43:24
-          }
-        }
-        #JSONOp: (#struct){ |((#struct){
-            op: (string){ "add" }
-            path: (string){ string }
-            value: (_){ _ }
-          }, (#struct){
-            op: (string){ "remove" }
-            path: (string){ string }
-          }) }
-        #Main: (#struct){
-          namespace: (string){ string }
-          output: (_|_){
-            // [incomplete] issue3801.let.full.#Main.output: invalid non-ground value string (must be concrete string):
-            //     ./nested.cue:41:15
-            //     ./nested.cue:63:15
-            _: (#list){
-              0: (#struct){
-                op: (string){ "add" }
-                path: (string){ "/metadata" }
-                value: (string){ "foo" }
-              }
-            }
-          }
-          let jsonPatch#5 = (#struct){
-            namespace: (string){ string }
-            patch: (#list){
-              0: (#struct){
-                op: (string){ "add" }
-                path: (string){ "/metadata" }
-                value: (string){ "foo" }
-              }
-            }
-            output: (_|_){
-              // [incomplete] issue3801.let.full.#Main.jsonPatch.output: invalid non-ground value string (must be concrete string):
-              //     ./nested.cue:41:15
-              //     ./nested.cue:63:15
-              _: (#list){
-                0: (#struct){
-                  op: (string){ "add" }
-                  path: (string){ "/metadata" }
-                  value: (string){ "foo" }
-                }
-              }
-            }
-            let base#8 = (#struct){
-              someMsg: (string){ string }
-              obs: (#struct){ |(*(#struct){
-                  missing: (bool){ true }
-                }, (#struct){
-                }) }
-              let pickMsg#4 = (#struct){
-                msg: (_|_){
-                  // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                  //     ./nested.cue:29:25
-                  //     ./nested.cue:25:12
-                }
-              }
-              patches: (#list){
-                0: (#struct){
-                  op: (string){ "add" }
-                  path: (string){ "/metadata" }
-                  value: (_|_){
-                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
-                    //     ./nested.cue:29:25
-                    //     ./nested.cue:25:12
-                  }
-                }
-              }
-            }
-            let withMsg#9 = (#struct){
-              someMsg: (string){ "foo" }
-              obs: (#struct){ |(*(#struct){
-                  missing: (bool){ true }
-                }, (#struct){
-                }) }
-              let pickMsg#4 = (#struct){
-                msg: (string){ "foo" }
-              }
-              patches: (#list){
-                0: (#struct){
-                  op: (string){ "add" }
-                  path: (string){ "/metadata" }
-                  value: (string){ "foo" }
-                }
-              }
-            }
-          }
-        }
-        out: (#struct){
-          ns1: (#list){
-            0: (#struct){
-              op: (string){ "add" }
-              path: (string){ "/metadata" }
-              value: (string){ "foo" }
-            }
-          }
-        }
-      }
-    }
-    nonRooted: (struct){
-      reduced: (struct){
-        #Output: (#struct){
-          output: (#struct){
-            #base: (#struct){
-              val0: (string){ string }
-              msgObj: (string){ string }
-              value: (string){ string }
-            }
-            out: (#struct){
-              val0: (string){ "foo" }
-              msgObj: (string){ "foo" }
-              value: (string){ "foo" }
-            }
-          }
-        }
-        out: (struct){
-          #base: (#struct){
-            val0: (string){ string }
-            msgObj: (string){ string }
-            value: (string){ string }
-          }
-          out: (#struct){
-            val0: (string){ "foo" }
-            msgObj: (string){ "foo" }
-            value: (string){ "foo" }
-          }
-        }
-      }
-      full: (struct){
-        #Output: (#struct){
-          namespace: (string){ string }
-          output: (_|_){
-            // [incomplete] issue3801.nonRooted.full.#Output.output: invalid non-ground value string (must be concrete string):
-            //     ./nested.cue:85:15
-            //     ./nested.cue:74:15
-            _: (string){ "foo" }
-          }
-        }
-        out: (struct){
-          ns1: (string){ "foo" }
-        }
-        #SubOutput: (#struct){
-          namespace?: (string){ string }
-          patch: (_){ _ }
-          output: (_|_){
-            // [incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
-            //     ./nested.cue:88:12
-          }
-        }
-        #Base: (#struct){
-          val0: (string){ string }
-          let msgObj#D = (string){ string }
-          value: (string){ string }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- nested.cue
 {
   issue3801: {
     let: {
       reduced: {
-        let F#1 = {
+        let F#0 = {
           base: {
             in: string
-            let X#2 = {
+            let X#1 = {
               a: "\(〈1;in〉)"
             }.a
-            out: 〈0;let X#2〉
+            out: 〈0;let X#1〉
           }
           XXX: (〈0;base〉 & {
             in: "foo"
           })
         }
-        z: 〈0;let F#1〉.XXX.out
+        z: 〈0;let F#0〉.XXX.out
       }
     }
   }
@@ -732,7 +501,7 @@ diff old new
           obs: ({}|*{
             missing: true
           })
-          let pickMsg#4 = [
+          let pickMsg#2 = [
             if 〈1;obs〉.missing {
               msg: "\(〈2;someMsg〉)"
             },
@@ -744,7 +513,7 @@ diff old new
             {
               op: "add"
               path: "/metadata"
-              value: 〈2;let pickMsg#4〉.msg
+              value: 〈2;let pickMsg#2〉.msg
             },
           ]
         }
@@ -770,14 +539,14 @@ diff old new
         })
         #Main: {
           namespace: string
-          output: 〈0;let jsonPatch#5〉.output
-          let jsonPatch#5 = (〈1;#JSONPatch〉 & {
-            let base#8 = (〈2;#Resource〉 & {})
-            let withMsg#9 = (〈0;let base#8〉 & {
+          output: 〈0;let jsonPatch#3〉.output
+          let jsonPatch#3 = (〈1;#JSONPatch〉 & {
+            let base#4 = (〈2;#Resource〉 & {})
+            let withMsg#5 = (〈0;let base#4〉 & {
               someMsg: "foo"
             })
             namespace: 〈1;namespace〉
-            patch: 〈0;let withMsg#9〉.patches
+            patch: 〈0;let withMsg#5〉.patches
           })
         }
         out: (〈0;#Main〉 & {
@@ -793,13 +562,13 @@ diff old new
           namespace: string
           output: (〈1;#SubOutput〉 & {
             namespace: 〈1;namespace〉
-            let base2#A = {
-              let base#B = (〈3;#Base〉 & {})
-              output: (〈0;let base#B〉 & {
+            let base2#6 = {
+              let base#7 = (〈3;#Base〉 & {})
+              output: (〈0;let base#7〉 & {
                 val0: "foo"
               })
             }
-            patch: 〈0;let base2#A〉.output.value
+            patch: 〈0;let base2#6〉.output.value
           }).output
         }
         out: (〈0;#Output〉 & {
@@ -814,10 +583,10 @@ diff old new
         }
         #Base: {
           val0: string
-          let msgObj#D = [
+          let msgObj#8 = [
             〈1;val0〉,
           ][0]
-          value: 〈0;let msgObj#D〉
+          value: 〈0;let msgObj#8〉
         }
       }
     }

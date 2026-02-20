@@ -1202,7 +1202,7 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		switch v.BaseValue.(type) {
 		case *ListMarker:
 			// TODO(perf): use precomputed length.
-			if f.Index() < iterutil.Count(v.Elems()) {
+			if !f.IsAny() && f.Index() < iterutil.Count(v.Elems()) {
 				return true
 			}
 			return !v.IsClosedList()
@@ -1246,7 +1246,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 			if matchPattern(ctx, pc.Pattern, arc.Label) {
 				for _, c := range pc.Constraint.Conjuncts {
 					env := *(c.Env)
-					if arc.Label.Index() < MaxIndex {
+					if !arc.Label.IsAny() {
 						env.DynamicLabel = arc.Label
 					}
 					c.Env = &env
@@ -1437,7 +1437,7 @@ func appendPath(a []Feature, v *Vertex) []Feature {
 	// Skip if the node is a structure-shared node that has been assingned to
 	// the parent as it's new location: in this case the parent node will
 	// have the desired label.
-	if v.Label != 0 && v.Parent.BaseValue != v {
+	if v.Label.IsValid() && v.Parent.BaseValue != v {
 		// A Label may be 0 for programmatically inserted nodes.
 		a = append(a, v.Label)
 	}

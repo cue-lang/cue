@@ -32,21 +32,7 @@ B: A & {
     ]
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 6
-Allocs: 5
-Retain: 9
-
-Unifications: 11
-Conjuncts:    16
-Disjuncts:    16
-
-MisalignedConjunct: 4
-
-NumCloseIDs: 4
--- out/eval --
+-- out/evalalpha --
 (struct){
   A: (_|_){
     // [incomplete] A: cannot range over src (incomplete type _):

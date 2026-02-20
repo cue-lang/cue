@@ -61,21 +61,7 @@ for x in [
     }
   }
 }
--- out/eval/stats --
-Leaks:  20
-Freed:  29
-Reused: 25
-Allocs: 24
-Retain: 56
-
-Unifications: 49
-Conjuncts:    48
-Disjuncts:    61
-
-MisalignedConjunct: 23
-
-NumCloseIDs: 2
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (struct){
     A: (struct){

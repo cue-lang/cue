@@ -13,34 +13,6 @@ foo: #Workflow & {
 	jobs: foo: {
 	}
 }
--- out/eval/stats --
-Leaks:  6
-Freed:  11
-Reused: 6
-Allocs: 11
-Retain: 6
-
-Unifications: 15
-Conjuncts:    32
-Disjuncts:    17
--- out/eval --
-(struct){
-  #Workflow: (#struct){
-    jobs: (#struct){
-    }
-    #JobID: (_|_){
-      // [incomplete] empty list in call to or:
-      //     ./in.cue:6:10
-    }
-  }
-  foo: (#struct){
-    jobs: (#struct){
-      foo: (#struct){
-      }
-    }
-    #JobID: (string){ "foo" }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -59,4 +31,22 @@ Disjuncts:    17
       foo: {}
     }
   })
+}
+-- out/evalalpha --
+(struct){
+  #Workflow: (#struct){
+    jobs: (#struct){
+    }
+    #JobID: (_|_){
+      // [incomplete] empty list in call to or:
+      //     ./in.cue:6:10
+    }
+  }
+  foo: (#struct){
+    jobs: (#struct){
+      foo: (#struct){
+      }
+    }
+    #JobID: (string){ "foo" }
+  }
 }

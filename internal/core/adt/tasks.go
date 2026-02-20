@@ -193,7 +193,7 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 	env := t.env
 	if x := field.Src; x != nil && x.Alias != nil && x.Alias.Label != nil {
 		e := *(t.env)
-		if f.Index() < MaxIndex {
+		if !f.IsAny() {
 			e.DynamicLabel = f
 		}
 		env = &e
@@ -274,8 +274,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 		case *Comprehension:
 			indexBefore := index
 			err := c.yield(nil, t.env, x, Flags{status: partial, mode: mode}, func(e *Environment) {
-				label, err := MakeLabel(x.Source(), index, IntLabel)
-				n.addErr(err)
+				label := MakeIntLabel(IntLabel, index)
 				index++
 				// id.setOptional(t.node)
 				c := MakeConjunct(e, x.Value, id)
@@ -289,8 +288,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			// If comprehension yielded zero values and has an else clause,
 			// insert the else clause's struct contents as list elements.
 			if index == indexBefore && x.Else != nil {
-				label, err := MakeLabel(x.Source(), index, IntLabel)
-				n.addErr(err)
+				label := MakeIntLabel(IntLabel, index)
 				index++
 				conj := MakeConjunct(t.env, x.Else, id)
 				n.insertArc(label, ArcMember, conj, id, true)
@@ -322,8 +320,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			ellipsis = x
 
 		default:
-			label, err := MakeLabel(x.Source(), index, IntLabel)
-			n.addErr(err)
+			label := MakeIntLabel(IntLabel, index)
 			index++
 			c := MakeConjunct(t.env, x, id)
 			n.insertArc(label, ArcMember, c, id, true)

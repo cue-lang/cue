@@ -270,7 +270,7 @@ func (i *Iterator) Value() Value {
 // Selector reports the field label of this iteration.
 func (i *Iterator) Selector() Selector {
 	if !i.isPattern {
-		sel := featureToSel(i.f, i.idx)
+		sel := featureToSel(i.f)
 		// Only call wrapConstraint if there is any constraint type to wrap with.
 		if ctype := fromArcType(i.arcType); ctype != 0 {
 			sel = wrapConstraint(sel, ctype)
@@ -306,7 +306,7 @@ func (i *Iterator) patternSelectorType() SelectorType {
 // you are only dealing with regular fields, whose labels are always [StringLabel].
 // Note that this will give more accurate string representations.
 func (i *hiddenIterator) Label() string {
-	if i.f == 0 {
+	if !i.f.IsValid() {
 		return ""
 	}
 	return i.idx.LabelStr(i.f)
@@ -789,7 +789,7 @@ func (v Value) Default() (Value, bool) {
 // TODO: get rid of this somehow. Probably by including a FieldInfo struct
 // or the like.
 func (v hiddenValue) Label() (string, bool) {
-	if v.v == nil || v.v.Label == 0 {
+	if v.v == nil || !v.v.Label.IsValid() {
 		return "", false
 	}
 	return v.idx.LabelStr(v.v.Label), true
@@ -1470,11 +1470,10 @@ func (s *hiddenStruct) Field(i int) FieldInfo {
 	a := s.at(i)
 	opt := a.ArcType == adt.ArcOptional
 	selType := featureToSelType(a.Label, a.ArcType)
-	ctx := s.v.ctx()
 
 	v := makeChildValue(s.v, a)
 	name := s.v.idx.LabelStr(a.Label)
-	str := a.Label.SelectorString(ctx)
+	str := a.Label.SelectorString()
 	return FieldInfo{str, name, i, v, selType, a.Label.IsDef(), opt, a.Label.IsHidden()}
 }
 
@@ -1564,13 +1563,13 @@ func appendPath(a []Selector, v Value) []Selector {
 		a = appendPath(a, p)
 	}
 
-	if v.v.Label == 0 {
-		// A Label may be 0 for programmatically inserted nodes.
+	if !v.v.Label.IsValid() {
+		// A Label may be invalid for programmatically inserted nodes.
 		return a
 	}
 
 	f := v.v.Label
-	if index := f.Index(); index == adt.MaxIndex {
+	if f.IsAny() {
 		return append(a, Selector{anySelector(f)})
 	}
 
@@ -1579,16 +1578,16 @@ func appendPath(a []Selector, v Value) []Selector {
 	case adt.IntLabel:
 		sel = indexSelector(f)
 	case adt.DefinitionLabel:
-		sel = definitionSelector(f.SelectorString(v.idx))
+		sel = definitionSelector(f.SelectorString())
 
 	case adt.HiddenDefinitionLabel, adt.HiddenLabel:
 		sel = scopedSelector{
-			name: f.IdentString(v.idx),
-			pkg:  f.PkgID(v.idx),
+			name: f.IdentString(),
+			pkg:  f.PkgID(),
 		}
 
 	case adt.StringLabel:
-		sel = stringSelector(f.StringValue(v.idx))
+		sel = stringSelector(f.StringValue())
 
 	default:
 		panic(fmt.Sprintf("unsupported label type %v", t))
@@ -1829,7 +1828,7 @@ func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 	for _, a := range n.Arcs {
 		if !parent.Accept(ctx, a.Label) {
 			defer ctx.PopArc(ctx.PushArc(parent))
-			label := a.Label.SelectorString(ctx)
+			label := a.Label.SelectorString()
 			parent.Accept(ctx, a.Label)
 			return ctx.NewErrf("field not allowed: %s", label)
 		}
@@ -1974,7 +1973,7 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 	case *adt.FieldReference:
 		env := ctx.Env(x.UpCount)
 		inst, path = mkPath(rt, nil, env.Vertex)
-		path = appendSelector(path, featureToSel(x.Label, rt))
+		path = appendSelector(path, featureToSel(x.Label))
 
 	case *adt.LabelReference:
 		env := ctx.Env(x.UpCount)
@@ -1990,12 +1989,12 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 		if x.Instance != nil {
 			inst = rt.LoadInstance(x.Instance)
 		} else {
-			inst = rt.LoadBuiltin(rt.LabelStr(x.ImportPath))
+			inst = rt.LoadBuiltin(x.ImportPath.StringValue())
 		}
 
 	case *adt.SelectorExpr:
 		inst, path = reference(rt, c, env, x.X)
-		path = appendSelector(path, featureToSel(x.Sel, rt))
+		path = appendSelector(path, featureToSel(x.Sel))
 
 	case *adt.IndexExpr:
 		inst, path = reference(rt, c, env, x.X)
@@ -2014,7 +2013,7 @@ func mkPath(r *runtime.Runtime, a []Selector, v *adt.Vertex) (root *adt.Vertex, 
 		return v, a
 	}
 	root, path = mkPath(r, a, v.Parent)
-	path = appendSelector(path, featureToSel(v.Label, r))
+	path = appendSelector(path, featureToSel(v.Label))
 	return root, path
 }
 
@@ -2405,7 +2404,7 @@ process:
 		f := ctx.PushState(env, x.Src)
 		env := ctx.Env(x.UpCount)
 		a = append(a, remakeValue(v, nil, &adt.NodeLink{Node: env.Vertex}))
-		a = append(a, remakeValue(v, nil, ctx.NewString(x.Label.SelectorString(ctx))))
+		a = append(a, remakeValue(v, nil, ctx.NewString(x.Label.SelectorString())))
 		_ = ctx.PopState(f)
 		op = SelectorOp
 
@@ -2413,7 +2412,7 @@ process:
 		a = append(a, remakeValue(v, env, x.X))
 		// A string selector is quoted.
 		a = append(a, remakeValue(v, env, &adt.String{
-			Str: x.Sel.SelectorString(v.idx),
+			Str: x.Sel.SelectorString(),
 		}))
 		op = SelectorOp
 

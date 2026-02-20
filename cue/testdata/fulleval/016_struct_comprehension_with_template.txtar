@@ -40,17 +40,7 @@ service: baz: {name: "foobar"}
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  51
-Reused: 43
-Allocs: 8
-Retain: 4
-
-Unifications: 27
-Conjuncts:    70
-Disjuncts:    55
--- out/eval --
+-- out/evalalpha --
 (struct){
   result: (#list){
     0: (struct){

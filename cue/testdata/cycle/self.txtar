@@ -1645,8 +1645,8 @@ Result:
 {
   issue4125: {
     t2_alias: {
-      let Y#2 = 〈1〉
-      b: 〈0;let Y#2〉.b
+      let Y#1 = 〈1〉
+      b: 〈0;let Y#1〉.b
     }
   }
 }

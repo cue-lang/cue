@@ -244,7 +244,7 @@ func TestConvert(t *testing.T) {
 			if !ok {
 				n = &adt.Vertex{BaseValue: v}
 			}
-			got := debug.NodeString(ctx, n, nil)
+			got := debug.NodeString(n, nil)
 			if got != tc.want {
 				t.Error(cmp.Diff(got, tc.want))
 			}
@@ -264,7 +264,7 @@ func TestX(t *testing.T) {
 	// if err != nil {
 	// 	t.Fatal(err)
 	// }
-	got := debug.NodeString(ctx, v, nil)
+	got := debug.NodeString(v, nil)
 	t.Error(got)
 }
 
@@ -403,7 +403,7 @@ func TestConvertType(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			ctx := adt.NewContext(r, &adt.Vertex{})
 			v, err := convert.FromGoType(ctx, tc.goTyp)
-			got := debug.NodeString(ctx, v, nil)
+			got := debug.NodeString(v, nil)
 			if got != tc.want {
 				t.Errorf("\n got %q;\nwant %q", got, tc.want)
 			}

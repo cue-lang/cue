@@ -37,10 +37,6 @@ import (
 // Runtime defines an interface for low-level representation conversion and
 // lookup.
 type Runtime interface {
-	// StringIndexer allows for converting string labels to and from a
-	// canonical numeric representation.
-	StringIndexer
-
 	// LoadBuiltin loads a unique Vertex associated with a given builtin
 	// (standard library) import path. It returns nil if no builtin for
 	// this import path could be found.
@@ -943,7 +939,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags Flags) *Ve
 }
 
 func (c *OpContext) undefinedFieldError(v *Vertex, code ErrorCode) {
-	label := v.Label.SelectorString(c)
+	label := v.Label.SelectorString()
 	c.addErrf(code, c.pos(), "undefined field: %s", label)
 }
 

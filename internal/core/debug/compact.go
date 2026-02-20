@@ -298,7 +298,7 @@ func (w *printer) compactNode(n adt.Node) {
 		w.string(")")
 
 	case *adt.Builtin:
-		if x.Package != 0 {
+		if x.Package.IsValid() {
 			w.label(x.Package)
 			w.string(".")
 		}

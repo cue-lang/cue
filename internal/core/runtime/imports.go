@@ -85,17 +85,7 @@ type index struct {
 	imports        map[*adt.Vertex]*build.Instance
 	importsByBuild map[*build.Instance]*adt.Vertex
 
-	nextUniqueID uint64
-	typeCache    sync.Map // map[reflect.Type]evaluated
-}
-
-func (i *index) getNextUniqueID() uint64 {
-	// TODO: use atomic increment instead.
-	i.lock.Lock()
-	i.nextUniqueID++
-	x := i.nextUniqueID
-	i.lock.Unlock()
-	return x
+	typeCache sync.Map // map[reflect.Type]evaluated
 }
 
 func newIndex() *index {

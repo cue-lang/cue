@@ -211,8 +211,8 @@ func TestBuild(t *testing.T) {
 				got = err.Error()
 			} else {
 				cfg := &debug.Config{Compact: true}
-				r, v := value.ToInternal(insts[0].Value())
-				got = debug.NodeString(r, v, cfg)
+				_, v := value.ToInternal(insts[0].Value())
+				got = debug.NodeString(v, cfg)
 			}
 			if got != tc.emit {
 				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)

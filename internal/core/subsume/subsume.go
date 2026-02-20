@@ -120,8 +120,8 @@ func (s *subsumer) getError() (err errors.Error) {
 	// src := binSrc(token.NoPos, opUnify, gt, lt)
 	if s.gt != nil && s.lt != nil {
 		// src := binSrc(token.NoPos, opUnify, s.gt, s.lt)
-		if s.missing != 0 {
-			s.errf("missing field %q", s.missing.SelectorString(c))
+		if s.missing.IsValid() {
+			s.errf("missing field %q", s.missing.SelectorString())
 		} else if b, ok := unifyValue(c, s.gt, s.lt).(*adt.Bottom); !ok {
 			s.errf("value not an instance")
 		} else {

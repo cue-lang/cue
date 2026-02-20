@@ -1032,6 +1032,7 @@ func usages(navsWorklist []*navigable) {
 		{
 			pkgNav := nav.evaluator.pkgFrame.navigable
 			var child *navigable
+		next_parent:
 			for parent := nav; parent != nil; child, parent = parent, parent.parent {
 				if parent == pkgNav {
 					isExported = true
@@ -1067,6 +1068,12 @@ func usages(navsWorklist []*navigable) {
 					// If the user is asking for usages of the first y, we
 					// must walk up until we find the x navigable binding
 					// and evaluate all its frames.
+					expanded := expandNavigables([]*navigable{parent})
+					for _, target := range targetNavs {
+						if _, found := expanded[target]; found {
+							continue next_parent
+						}
+					}
 					break
 				}
 			}
@@ -2012,12 +2019,15 @@ func (f *frame) eval() {
 			f.newFrame(node.Condition, nil)
 
 			comprehensionTail := comprehensionsStash[node]
-			f.newFrame(comprehensionTail, f.navigable)
+			childFr := f.newFrame(comprehensionTail, nil)
+			f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
 
 		case *ast.ForClause:
 			f.newFrame(node.Source, nil)
 
-			stack := frameStack{f.newFrame(nil, nil)}
+			childFr := f.newFrame(nil, nil)
+			f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+			stack := frameStack{childFr}
 
 			if key := node.Key; key != nil {
 				stack.push(key, stack.peek().newBinding(key, nil))
@@ -2027,7 +2037,7 @@ func (f *frame) eval() {
 			}
 
 			comprehensionTail := comprehensionsStash[node]
-			stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+			stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, nil))
 
 		case *ast.LetClause:
 			ident := node.Ident
@@ -2036,9 +2046,11 @@ func (f *frame) eval() {
 				// We're within a wider comprehension.
 				f.newFrame(node.Expr, nil)
 
-				stack := frameStack{f.newFrame(nil, nil)}
+				childFr := f.newFrame(nil, nil)
+				f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+				stack := frameStack{childFr}
 				stack.push(ident, stack.peek().newBinding(ident, nil))
-				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, nil))
 
 			} else {
 				// We're not within a wider comprehension: the binding
@@ -2053,12 +2065,15 @@ func (f *frame) eval() {
 				// Assignment form: try x = expr { ... }
 				f.newFrame(node.Expr, nil)
 
-				stack := frameStack{f.newFrame(nil, nil)}
+				childFr := f.newFrame(nil, nil)
+				f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+				stack := frameStack{childFr}
 				stack.push(ident, stack.peek().newBinding(ident, nil))
-				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, nil))
 			} else {
 				// Struct form: try { ... }
-				f.newFrame(comprehensionTail, f.navigable)
+				childFr := f.newFrame(comprehensionTail, nil)
+				f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
 			}
 
 		case *ast.Field:
@@ -2870,18 +2885,23 @@ func (p *path) definitionsForOffset(offset int) (int, []*navigable) {
 // stack (stacks grow upwards).
 type frameStack []*frame
 
-func (stack *frameStack) push(n ast.Node, node *frame) {
-	nodes := *stack
-	for _, node := range nodes {
-		node.addRange(n)
+func (stack *frameStack) push(n ast.Node, childFr *frame) {
+	frames := *stack
+	var lastFr *frame
+	for _, fr := range frames {
+		fr.addRange(n)
+		lastFr = fr
 	}
-	*stack = append(nodes, node)
+	if lastFr != nil {
+		lastFr.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+	}
+	*stack = append(frames, childFr)
 }
 
 func (stack *frameStack) peek() *frame {
-	nodes := *stack
-	if len(nodes) == 0 {
+	frames := *stack
+	if len(frames) == 0 {
 		return nil
 	}
-	return nodes[len(nodes)-1]
+	return frames[len(frames)-1]
 }

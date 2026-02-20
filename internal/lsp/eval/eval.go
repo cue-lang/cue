@@ -1644,6 +1644,8 @@ type frame struct {
 	// have explicit cases within [frame.eval]. A good example is
 	// BasicLit: within a BasicLit, no completions should be offered.
 	unknownRanges *rangeset.RangeSet
+
+	comprehensionTails []ast.Node
 }
 
 // isFileFrame reports whether f is the top level package frame or a
@@ -1985,6 +1987,10 @@ func (f *frame) eval() {
 		case *ast.Comprehension:
 			clause := node.Clauses[0]
 			unprocessed = append(unprocessed, clause)
+			value := node.Value.(ast.Node)
+			if parent := f.parent; parent == nil || !slices.Contains(parent.comprehensionTails, value) {
+				f.comprehensionTails = append(f.comprehensionTails, value)
+			}
 			// We don't know how many child frames we'll need to
 			// process clause. So we stash whatever remains of this
 			// comprehension and can later find it once we've finished
@@ -1997,7 +2003,7 @@ func (f *frame) eval() {
 				// clause gets processed in this frame, and we make sure we
 				// can later use that last clause to find the body (value)
 				// of this comprehension.
-				comprehensionsStash[clause] = node.Value
+				comprehensionsStash[clause] = value
 			} else {
 				// Non-base-case: we're processing the first clause in
 				// this frame, and all that remain go into a copy of the
@@ -2007,17 +2013,33 @@ func (f *frame) eval() {
 				nodeCopy.Clauses = node.Clauses[1:]
 				comprehensionsStash[clause] = &nodeCopy
 			}
+			if elsie := node.Else; elsie != nil {
+				f.newFrame(elsie.Body, f.navigable)
+			}
 
 		case *ast.IfClause:
 			f.newFrame(node.Condition, nil)
 
 			comprehensionTail := comprehensionsStash[node]
-			f.newFrame(comprehensionTail, f.navigable)
+			tailFr := f.newFrame(comprehensionTail, nil)
+			f.navigable.ensureResolvesTo([]*navigable{tailFr.navigable})
+
+			if _, isCompr := comprehensionTail.(*ast.Comprehension); !isCompr {
+				for fr := tailFr.parent; fr != nil; fr = fr.parent {
+					if !slices.Contains(fr.comprehensionTails, comprehensionTail) {
+						continue
+					}
+					tailFr.navigable.ensureResolvesTo([]*navigable{f.navigable})
+					break
+				}
+			}
 
 		case *ast.ForClause:
 			f.newFrame(node.Source, nil)
 
-			stack := frameStack{f.newFrame(nil, nil)}
+			childFr := f.newFrame(nil, nil)
+			f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+			stack := frameStack{childFr}
 
 			if key := node.Key; key != nil {
 				stack.push(key, stack.peek().newBinding(key, nil))
@@ -2027,7 +2049,18 @@ func (f *frame) eval() {
 			}
 
 			comprehensionTail := comprehensionsStash[node]
-			stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+			tailFr := stack.peek().newFrame(comprehensionTail, nil)
+			stack.push(comprehensionTail, tailFr)
+
+			if _, isCompr := comprehensionTail.(*ast.Comprehension); !isCompr {
+				for fr := tailFr.parent; fr != nil; fr = fr.parent {
+					if !slices.Contains(fr.comprehensionTails, comprehensionTail) {
+						continue
+					}
+					tailFr.navigable.ensureResolvesTo([]*navigable{f.navigable})
+					break
+				}
+			}
 
 		case *ast.LetClause:
 			ident := node.Ident
@@ -2036,9 +2069,22 @@ func (f *frame) eval() {
 				// We're within a wider comprehension.
 				f.newFrame(node.Expr, nil)
 
-				stack := frameStack{f.newFrame(nil, nil)}
+				childFr := f.newFrame(nil, nil)
+				f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+				stack := frameStack{childFr}
 				stack.push(ident, stack.peek().newBinding(ident, nil))
-				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+				tailFr := stack.peek().newFrame(comprehensionTail, nil)
+				stack.push(comprehensionTail, tailFr)
+
+				if _, isCompr := comprehensionTail.(*ast.Comprehension); !isCompr {
+					for fr := tailFr.parent; fr != nil; fr = fr.parent {
+						if !slices.Contains(fr.comprehensionTails, comprehensionTail) {
+							continue
+						}
+						tailFr.navigable.ensureResolvesTo([]*navigable{f.navigable})
+						break
+					}
+				}
 
 			} else {
 				// We're not within a wider comprehension: the binding
@@ -2049,16 +2095,31 @@ func (f *frame) eval() {
 
 		case *ast.TryClause:
 			comprehensionTail := comprehensionsStash[node]
+			var tailFr *frame
 			if ident := node.Ident; ident != nil {
 				// Assignment form: try x = expr { ... }
 				f.newFrame(node.Expr, nil)
 
-				stack := frameStack{f.newFrame(nil, nil)}
+				childFr := f.newFrame(nil, nil)
+				f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+				stack := frameStack{childFr}
 				stack.push(ident, stack.peek().newBinding(ident, nil))
-				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+				tailFr = stack.peek().newFrame(comprehensionTail, nil)
+				stack.push(comprehensionTail, tailFr)
 			} else {
 				// Struct form: try { ... }
-				f.newFrame(comprehensionTail, f.navigable)
+				tailFr = f.newFrame(comprehensionTail, nil)
+				f.navigable.ensureResolvesTo([]*navigable{tailFr.navigable})
+			}
+
+			if _, isCompr := comprehensionTail.(*ast.Comprehension); !isCompr {
+				for fr := tailFr.parent; fr != nil; fr = fr.parent {
+					if !slices.Contains(fr.comprehensionTails, comprehensionTail) {
+						continue
+					}
+					tailFr.navigable.ensureResolvesTo([]*navigable{f.navigable})
+					break
+				}
 			}
 
 		case *ast.Field:
@@ -2870,18 +2931,23 @@ func (p *path) definitionsForOffset(offset int) (int, []*navigable) {
 // stack (stacks grow upwards).
 type frameStack []*frame
 
-func (stack *frameStack) push(n ast.Node, node *frame) {
-	nodes := *stack
-	for _, node := range nodes {
-		node.addRange(n)
+func (stack *frameStack) push(n ast.Node, childFr *frame) {
+	frames := *stack
+	var lastFr *frame
+	for _, fr := range frames {
+		fr.addRange(n)
+		lastFr = fr
 	}
-	*stack = append(nodes, node)
+	if lastFr != nil {
+		lastFr.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+	}
+	*stack = append(frames, childFr)
 }
 
 func (stack *frameStack) peek() *frame {
-	nodes := *stack
-	if len(nodes) == 0 {
+	frames := *stack
+	if len(frames) == 0 {
 		return nil
 	}
-	return nodes[len(nodes)-1]
+	return frames[len(frames)-1]
 }

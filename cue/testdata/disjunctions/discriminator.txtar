@@ -90,14 +90,14 @@ byKind: {
 -- out/eval/stats --
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  179
-Reused: 157
+Freed:  160
+Reused: 138
 Allocs: 22
 Retain: 0
 
 Unifications: 83
 Conjuncts:    221
-Disjuncts:    85
+Disjuncts:    77
 
 NumCloseIDs: 33
 -- out/evalalpha --
@@ -296,21 +296,24 @@ Result:
       out: (_|_){
         // [eval]
         f1: (_|_){
-          // [eval] byKind.nullableStructRegular.out.f1.f2.f3: 2 errors in empty disjunction:
-          // byKind.nullableStructRegular.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
-          //     ./in.cue:37:22
-          //     ./in.cue:38:22
-          //     ./in.cue:39:22
-          //     ./in.cue:42:8
-          //     ./in.cue:42:29
-          // byKind.nullableStructRegular.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
-          //     ./in.cue:37:22
-          //     ./in.cue:38:22
-          //     ./in.cue:39:15
-          //     ./in.cue:42:8
-          //     ./in.cue:42:29
-          f2: (struct){
-            f3: (string){ "not an int" }
+          // [eval]
+          f2: (_|_){
+            // [eval]
+            f3: (_|_){
+              // [eval] byKind.nullableStructRegular.out.f1.f2.f3: 2 errors in empty disjunction:
+              // byKind.nullableStructRegular.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
+              //     ./in.cue:37:22
+              //     ./in.cue:38:22
+              //     ./in.cue:39:22
+              //     ./in.cue:42:8
+              //     ./in.cue:42:29
+              // byKind.nullableStructRegular.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
+              //     ./in.cue:37:22
+              //     ./in.cue:38:22
+              //     ./in.cue:39:15
+              //     ./in.cue:42:8
+              //     ./in.cue:42:29
+            }
           }
         }
       }
@@ -335,21 +338,24 @@ Result:
       out: (_|_){
         // [eval]
         f1: (_|_){
-          // [eval] byKind.nullableStructRequired.out.f1.f2.f3: 2 errors in empty disjunction:
-          // byKind.nullableStructRequired.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
-          //     ./in.cue:46:23
-          //     ./in.cue:47:23
-          //     ./in.cue:48:23
-          //     ./in.cue:51:8
-          //     ./in.cue:51:29
-          // byKind.nullableStructRequired.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
-          //     ./in.cue:46:23
-          //     ./in.cue:47:23
-          //     ./in.cue:48:16
-          //     ./in.cue:51:8
-          //     ./in.cue:51:29
-          f2: (struct){
-            f3: (string){ "not an int" }
+          // [eval]
+          f2: (_|_){
+            // [eval]
+            f3: (_|_){
+              // [eval] byKind.nullableStructRequired.out.f1.f2.f3: 2 errors in empty disjunction:
+              // byKind.nullableStructRequired.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
+              //     ./in.cue:46:23
+              //     ./in.cue:47:23
+              //     ./in.cue:48:23
+              //     ./in.cue:51:8
+              //     ./in.cue:51:29
+              // byKind.nullableStructRequired.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
+              //     ./in.cue:46:23
+              //     ./in.cue:47:23
+              //     ./in.cue:48:16
+              //     ./in.cue:51:8
+              //     ./in.cue:51:29
+            }
           }
         }
       }
@@ -374,21 +380,24 @@ Result:
       out: (_|_){
         // [eval]
         f1: (_|_){
-          // [eval] byKind.nullableStructOptional.out.f1.f2.f3: 2 errors in empty disjunction:
-          // byKind.nullableStructOptional.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
-          //     ./in.cue:55:23
-          //     ./in.cue:56:23
-          //     ./in.cue:57:23
-          //     ./in.cue:60:8
-          //     ./in.cue:60:29
-          // byKind.nullableStructOptional.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
-          //     ./in.cue:55:23
-          //     ./in.cue:56:23
-          //     ./in.cue:57:16
-          //     ./in.cue:60:8
-          //     ./in.cue:60:29
-          f2: (struct){
-            f3: (string){ "not an int" }
+          // [eval]
+          f2: (_|_){
+            // [eval]
+            f3: (_|_){
+              // [eval] byKind.nullableStructOptional.out.f1.f2.f3: 2 errors in empty disjunction:
+              // byKind.nullableStructOptional.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
+              //     ./in.cue:55:23
+              //     ./in.cue:56:23
+              //     ./in.cue:57:23
+              //     ./in.cue:60:8
+              //     ./in.cue:60:29
+              // byKind.nullableStructOptional.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
+              //     ./in.cue:55:23
+              //     ./in.cue:56:23
+              //     ./in.cue:57:16
+              //     ./in.cue:60:8
+              //     ./in.cue:60:29
+            }
           }
         }
       }
@@ -404,20 +413,25 @@ Result:
       out: (_|_){
         // [eval]
         0: (_|_){
-          // [eval] byKind.nullableList.out.0.0.0: 2 errors in empty disjunction:
-          // byKind.nullableList.out.0.0.0: conflicting values "not an int" and int (mismatched types string and int):
-          //     ./in.cue:64:21
-          //     ./in.cue:65:21
-          //     ./in.cue:66:21
-          //     ./in.cue:69:8
-          //     ./in.cue:69:19
-          // byKind.nullableList.out.0.0.0: conflicting values "not an int" and null (mismatched types string and null):
-          //     ./in.cue:64:21
-          //     ./in.cue:65:21
-          //     ./in.cue:66:14
-          //     ./in.cue:69:8
-          //     ./in.cue:69:19
-          0: (list){ list }
+          // [eval]
+          0: (_|_){
+            // [eval]
+            0: (_|_){
+              // [eval] byKind.nullableList.out.0.0.0: 2 errors in empty disjunction:
+              // byKind.nullableList.out.0.0.0: conflicting values "not an int" and int (mismatched types string and int):
+              //     ./in.cue:64:21
+              //     ./in.cue:65:21
+              //     ./in.cue:66:21
+              //     ./in.cue:69:8
+              //     ./in.cue:69:19
+              // byKind.nullableList.out.0.0.0: conflicting values "not an int" and null (mismatched types string and null):
+              //     ./in.cue:64:21
+              //     ./in.cue:65:21
+              //     ./in.cue:66:14
+              //     ./in.cue:69:8
+              //     ./in.cue:69:19
+            }
+          }
         }
       }
     }

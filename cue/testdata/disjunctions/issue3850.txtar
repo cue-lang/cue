@@ -56,15 +56,15 @@ issue3875: reduced: {
 	S: {}
 }
 -- out/evalalpha/stats --
-Leaks:  22
+Leaks:  14
 Freed:  112
-Reused: 89
+Reused: 81
 Allocs: 45
 Retain: 0
 
 Unifications: 66
 Conjuncts:    123
-Disjuncts:    20
+Disjuncts:    18
 
 NumCloseIDs: 18
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -81,15 +81,15 @@ diff old new
 -Unifications: 97
 -Conjuncts:    182
 -Disjuncts:    123
-+Leaks:  22
++Leaks:  14
 +Freed:  112
-+Reused: 89
++Reused: 81
 +Allocs: 45
 +Retain: 0
 +
 +Unifications: 66
 +Conjuncts:    123
-+Disjuncts:    20
++Disjuncts:    18
 +
 +NumCloseIDs: 18
 -- out/eval/stats --

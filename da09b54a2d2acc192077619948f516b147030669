@@ -16,6 +16,24 @@
       "message": "do we need to flatten these errors? these lists of lists of errors are weird.",
       "revId": "da09b54a2d2acc192077619948f516b147030669",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97051b7f_5bf95895",
+        "filename": "cue/testdata/disjunctions/discriminator.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-22T16:02:20Z",
+      "side": 1,
+      "message": "now resolved in the next patch in this stack, as it was an orthogonal issue",
+      "parentUuid": "3c5eb1c1_b6ebd2f5",
+      "revId": "da09b54a2d2acc192077619948f516b147030669",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

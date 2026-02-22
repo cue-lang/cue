@@ -406,8 +406,21 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 		// p.completeNodeConjuncts()
 		initArcs(n.ctx, p.node)
 
+		compatibleIdx := -1
+		numCompatible := 0
+		for j, d := range dn.disjuncts {
+			if kind, ok := disjunctKind(n.ctx, dn.env, d.expr); !ok || p.kind&kind != 0 {
+				numCompatible++
+				compatibleIdx = j
+			}
+		}
+
 		for j, d := range dn.disjuncts {
 			ID.node.nextDisjunct(j, len(dn.disjuncts), d.expr)
+
+			if numCompatible == 1 && j != compatibleIdx {
+				continue
+			}
 
 			c := MakeConjunct(dn.env, d.expr, dn.cloneID)
 			r, err := p.doDisjunct(c, d.mode, mode, n.node)
@@ -486,6 +499,23 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 	}
 
 	return dst
+}
+
+// disjunctKind reports the Kind of a disjunct expression, if it can be
+// determined cheaply without triggering evaluation. This extends the basic
+// Value type assertion to also handle references whose target vertex has
+// already been partially evaluated.
+func disjunctKind(ctx *OpContext, env *Environment, expr Expr) (Kind, bool) {
+	var k Kind
+	switch x := expr.(type) {
+	case *FieldReference:
+		if v := env.up(ctx, x.UpCount).DerefVertex(ctx).Lookup(x.Label); v != nil {
+			k = v.Kind()
+		}
+	case Value:
+		k = x.Kind()
+	}
+	return k, k != BottomKind
 }
 
 func combineDefault2(a, b defaultMode, dropsDefaultA, dropsDefaultB bool) defaultMode {

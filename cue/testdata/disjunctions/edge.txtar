@@ -132,14 +132,14 @@ panic1: {
 }
 -- out/evalalpha/stats --
 Leaks:  24
-Freed:  175
-Reused: 144
+Freed:  173
+Reused: 142
 Allocs: 55
 Retain: 0
 
 Unifications: 83
-Conjuncts:    228
-Disjuncts:    53
+Conjuncts:    227
+Disjuncts:    52
 Notifications: 9
 
 NumCloseIDs: 64
@@ -158,14 +158,14 @@ diff old new
 -Conjuncts:    237
 -Disjuncts:    154
 +Leaks:  24
-+Freed:  175
-+Reused: 144
++Freed:  173
++Reused: 142
 +Allocs: 55
 +Retain: 0
 +
 +Unifications: 83
-+Conjuncts:    228
-+Disjuncts:    53
++Conjuncts:    227
++Disjuncts:    52
 +Notifications: 9
 +
 +NumCloseIDs: 64

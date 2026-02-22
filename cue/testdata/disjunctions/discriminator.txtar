@@ -70,6 +70,16 @@ byKind: {
 		out: #Def1 & [[["not an int"]]]
 	}
 
+	fieldRefConstraints: {
+		#A: {x!: int}
+		#B: {y!: string}
+		// The references here need to be resolved to figure out the underlying kind.
+		#Def: #A | #B | >10
+
+		// The data is an int, so only the >10 disjunct should match by kind.
+		out: #Def & 5
+	}
+
 	scalarConstraints: {
 		#Def: >10 | "" | null | false
 

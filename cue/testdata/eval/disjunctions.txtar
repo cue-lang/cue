@@ -319,15 +319,15 @@ issue3891: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  101
-Freed:  519
-Reused: 476
-Allocs: 144
+Leaks:  94
+Freed:  520
+Reused: 477
+Allocs: 137
 Retain: 0
 
 Unifications: 294
 Conjuncts:    780
-Disjuncts:    211
+Disjuncts:    209
 Notifications: 1
 
 NumCloseIDs: 132
@@ -354,15 +354,15 @@ diff old new
 -MisalignedConjunct: 2
 -
 -NumCloseIDs: 2
-+Leaks:  101
-+Freed:  519
-+Reused: 476
-+Allocs: 144
++Leaks:  94
++Freed:  520
++Reused: 477
++Allocs: 137
 +Retain: 0
 +
 +Unifications: 294
 +Conjuncts:    780
-+Disjuncts:    211
++Disjuncts:    209
 +Notifications: 1
 +
 +NumCloseIDs: 132

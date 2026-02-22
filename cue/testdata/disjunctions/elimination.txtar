@@ -677,14 +677,14 @@ issue2685: {
 }
 -- out/evalalpha/stats --
 Leaks:  218
-Freed:  2563
-Reused: 2524
+Freed:  2359
+Reused: 2320
 Allocs: 257
 Retain: 0
 
 Unifications: 667
-Conjuncts:    2771
-Disjuncts:    1302
+Conjuncts:    2669
+Disjuncts:    1200
 Notifications: 4
 
 NumCloseIDs: 323
@@ -707,14 +707,14 @@ diff old new
 -
 -NumCloseIDs: 10
 +Leaks:  218
-+Freed:  2563
-+Reused: 2524
++Freed:  2359
++Reused: 2320
 +Allocs: 257
 +Retain: 0
 +
 +Unifications: 667
-+Conjuncts:    2771
-+Disjuncts:    1302
++Conjuncts:    2669
++Disjuncts:    1200
 +Notifications: 4
 +
 +NumCloseIDs: 323

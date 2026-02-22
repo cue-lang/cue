@@ -225,14 +225,14 @@ issue3903: noshare: {
 }
 -- out/evalalpha/stats --
 Leaks:  7
-Freed:  229
-Reused: 205
+Freed:  227
+Reused: 203
 Allocs: 31
 Retain: 0
 
 Unifications: 224
-Conjuncts:    413
-Disjuncts:    6
+Conjuncts:    412
+Disjuncts:    5
 Notifications: 1
 
 NumCloseIDs: 105
@@ -255,14 +255,14 @@ diff old new
 -
 -NumCloseIDs: 7
 +Leaks:  7
-+Freed:  229
-+Reused: 205
++Freed:  227
++Reused: 203
 +Allocs: 31
 +Retain: 0
 +
 +Unifications: 224
-+Conjuncts:    413
-+Disjuncts:    6
++Conjuncts:    412
++Disjuncts:    5
 +Notifications: 1
 +
 +NumCloseIDs: 105

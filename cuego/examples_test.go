@@ -44,8 +44,6 @@ func ExampleComplete_structTag() {
 	// Output:
 	// completed: cuego_test.Sum{A:1, B:5, C:6} (err: <nil>)
 	// completed: cuego_test.Sum{A:2, B:6, C:8} (err: <nil>)
-	// 2 errors in empty disjunction:
-	// conflicting values {A:2,B:3,C:8} and null (mismatched types struct and null)
 	// A: conflicting values 5 and 2
 }
 
@@ -97,12 +95,8 @@ func ExampleConstrain() {
 	// Output:
 	// error: nil
 	// validate: nil
-	// validate: 2 errors in empty disjunction:
-	// conflicting values {let jsonFile#1==~".json$",Filename:jsonFile,OptFile?:jsonFile,MinCount:(>0 & <=MaxCount),MaxCount:<=10000} and null (mismatched types struct and null)
-	// MinCount: invalid value 39 (out of bound <=12)
-	// validate: 2 errors in empty disjunction:
-	// conflicting values {let jsonFile#1==~".json$",Filename:jsonFile,OptFile?:jsonFile,MinCount:(>0 & <=MaxCount),MaxCount:<=10000} and null (mismatched types struct and null)
-	// Filename: invalid value "foo.jso" (out of bound =~".json$")
+	// validate: MinCount: invalid value 39 (out of bound <=12)
+	// validate: Filename: invalid value "foo.jso" (out of bound =~".json$")
 }
 
 func errMsg(err error) string {

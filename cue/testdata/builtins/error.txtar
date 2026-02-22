@@ -79,14 +79,14 @@ issue3984: {
 }
 -- out/evalalpha/stats --
 Leaks:  3
-Freed:  76
-Reused: 57
+Freed:  75
+Reused: 56
 Allocs: 22
 Retain: 0
 
 Unifications: 34
-Conjuncts:    91
-Disjuncts:    41
+Conjuncts:    90
+Disjuncts:    40
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -97,8 +97,8 @@ diff old new
 -Reused: 25
 -Allocs: 5
 +Leaks:  3
-+Freed:  76
-+Reused: 57
++Freed:  75
++Reused: 56
 +Allocs: 22
  Retain: 0
  
@@ -106,8 +106,8 @@ diff old new
 -Conjuncts:    38
 -Disjuncts:    30
 +Unifications: 34
-+Conjuncts:    91
-+Disjuncts:    41
++Conjuncts:    90
++Disjuncts:    40
 -- out/eval/stats --
 Leaks:  0
 Freed:  30
@@ -152,8 +152,6 @@ indirect.y: msg:
     ./in.cue:38:5
 issue4001.a: error: a='b':
     ./issues.cue:3:11
-    ./issues.cue:2:5
-    ./issues.cue:3:5
 issue3983.x: I wanted an integer:
     ./issues.cue:6:11
 issue3983.x: I wanted more than 10:
@@ -261,8 +259,6 @@ Result:
     a: (_|_){
       // [eval] issue4001.a: error: a='b':
       //     ./issues.cue:3:11
-      //     ./issues.cue:2:5
-      //     ./issues.cue:3:5
     }
   }
   issue3983: (_|_){
@@ -301,7 +297,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,79 +1,116 @@
+@@ -1,79 +1,114 @@
  Errors:
 -selection.twoCustomErrors: 3 errors in empty disjunction:
 -selection.twoCustomErrors: conflicting values 2 and 1:
@@ -346,8 +342,6 @@ diff old new
 +    ./in.cue:38:5
 +issue4001.a: error: a='b':
 +    ./issues.cue:3:11
-+    ./issues.cue:2:5
-+    ./issues.cue:3:5
 +issue3983.x: I wanted an integer:
 +    ./issues.cue:6:11
 +issue3983.x: I wanted more than 10:
@@ -460,7 +454,7 @@ diff old new
    }
    indirect: (_|_){
      // [user]
-@@ -80,14 +117,62 @@
+@@ -80,14 +115,60 @@
      x: (string){ error() }
      y: (_|_){
        // [user] indirect.y: msg:
@@ -492,8 +486,6 @@ diff old new
 -      //     ./issue4001.cue:3:11
 +      // [eval] issue4001.a: error: a='b':
 +      //     ./issues.cue:3:11
-+      //     ./issues.cue:2:5
-+      //     ./issues.cue:3:5
 +    }
 +  }
 +  issue3983: (_|_){

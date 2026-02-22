@@ -189,6 +189,16 @@ func (n *nodeContext) disjunctError() errors.Error {
 		return ctx.Newf("empty disjunction") // XXX: add space to sort first
 	}
 	disjuncts = errors.Sanitize(disjuncts)
+
+	// When there's exactly one disjunct error and no user errors, propagate
+	// the error directly. This avoids nested "N errors in empty disjunction"
+	// wrappers that add no information, as happens when kind discrimination
+	// eliminates all but one disjunct and that disjunct fails with a compound
+	// error from a child disjunction.
+	if len(n.disjunctErrs) == 1 && pos == nil {
+		return disjuncts
+	}
+
 	k := len(errors.Errors(disjuncts))
 	if k == 1 {
 		if pos != nil {

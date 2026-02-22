@@ -577,15 +577,15 @@ resolveToAncestor: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  96
-Freed:  646
-Reused: 576
-Allocs: 166
+Leaks:  41
+Freed:  650
+Reused: 580
+Allocs: 111
 Retain: 0
 
 Unifications: 541
 Conjuncts:    960
-Disjuncts:    126
+Disjuncts:    105
 
 NumCloseIDs: 165
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -606,15 +606,15 @@ diff old new
 -MisalignedConjunct: 8
 -
 -NumCloseIDs: 20
-+Leaks:  96
-+Freed:  646
-+Reused: 576
-+Allocs: 166
++Leaks:  41
++Freed:  650
++Reused: 580
++Allocs: 111
 +Retain: 0
 +
 +Unifications: 541
 +Conjuncts:    960
-+Disjuncts:    126
++Disjuncts:    105
 +
 +NumCloseIDs: 165
 -- out/eval/stats --
@@ -1516,9 +1516,13 @@ Result:
       y: (_|_){
         // [eval]
         0: (_|_){
-          // [eval] nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
-          //     ./in.cue:438:6
-          0: (list){ list }
+          // [eval]
+          0: (_|_){
+            // [eval] nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
+            //     ./in.cue:438:6
+            0: (int){ 2 }
+            1: (int){ 1 }
+          }
           1: (int){ 1 }
         }
         1: (int){ 1 }
@@ -1529,9 +1533,13 @@ Result:
       y: (_|_){
         // [eval]
         0: (_|_){
-          // [eval] nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
-          //     ./in.cue:444:6
-          0: (list){ list }
+          // [eval]
+          0: (_|_){
+            // [eval] nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
+            //     ./in.cue:444:6
+            0: (int){ 2 }
+            1: (int){ 1 }
+          }
           1: (int){ 1 }
         }
         1: (int){ 1 }
@@ -2047,7 +2055,7 @@ diff old new
          0: (struct){
            c: (int){ 1 }
          }
-@@ -922,18 +882,7 @@
+@@ -922,20 +882,13 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2063,11 +2071,19 @@ diff old new
 -          //     ./in.cue:439:6
 -          //     ./in.cue:439:12
 -          // nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
-+          // [eval] nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
-           //     ./in.cue:438:6
-           0: (list){ list }
+-          //     ./in.cue:438:6
+-          0: (list){ list }
++          // [eval]
++          0: (_|_){
++            // [eval] nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
++            //     ./in.cue:438:6
++            0: (int){ 2 }
++            1: (int){ 1 }
++          }
            1: (int){ 1 }
-@@ -946,21 +895,9 @@
+         }
+         1: (int){ 1 }
+@@ -946,20 +899,12 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2085,14 +2101,16 @@ diff old new
 -          // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
 -          0: (#list){
 -            0: (int){ 2 }
--          }
-+          // [eval] nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
-+          //     ./in.cue:444:6
-+          0: (list){ list }
++          // [eval]
++          0: (_|_){
++            // [eval] nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
++            //     ./in.cue:444:6
++            0: (int){ 2 }
++            1: (int){ 1 }
+           }
            1: (int){ 1 }
          }
-         1: (int){ 1 }
-@@ -1075,13 +1012,12 @@
+@@ -1075,13 +1020,12 @@
        // [structural cycle]
        f: (_|_){
          // [structural cycle]
@@ -2111,7 +2129,7 @@ diff old new
        }
      }
    }
-@@ -1092,11 +1028,8 @@
+@@ -1092,11 +1036,8 @@
          y: (_){ _ }
        }
        C: (struct){
@@ -2125,7 +2143,7 @@ diff old new
        }
      }
      t2: (struct){
-@@ -1105,11 +1038,8 @@
+@@ -1105,11 +1046,8 @@
          y: (_){ _ }
        }
        C: (struct){
@@ -2139,7 +2157,7 @@ diff old new
        }
      }
      t3: (struct){
-@@ -1119,13 +1049,9 @@
+@@ -1119,13 +1057,9 @@
          z: (_){ _ }
        }
        C: (struct){
@@ -2156,7 +2174,7 @@ diff old new
        }
      }
      t4: (struct){
-@@ -1136,13 +1062,9 @@
+@@ -1136,13 +1070,9 @@
        }
        C: (struct){
          x: (struct){
@@ -2173,7 +2191,7 @@ diff old new
          }
          y: ~(crossRefNoCycle.t4.C.x)
          z: ~(crossRefNoCycle.t4.C.x)
-@@ -1180,19 +1102,19 @@
+@@ -1180,19 +1110,19 @@
      }
    }
    n4: (struct){

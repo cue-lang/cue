@@ -259,6 +259,18 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		return n.getError()
 	}
 
+	// Fast path: if every disjunction resolves to a single disjunct via
+	// kind discrimination, inject them as regular conjuncts and skip
+	// the expensive cross product (clone + overlay + unify).
+	// We require all disjuncts to have determinable kinds so that the
+	// elimination is based on complete information.
+	if resolved := n.resolveAllByKind(a); len(resolved) > 0 {
+		for _, c := range resolved {
+			n.scheduleConjunct(c, c.CloseInfo)
+		}
+		return nil
+	}
+
 	// If the disjunct of an enclosing disjunction operation has an attemptOnly
 	// runMode, this disjunct should have this also and may not finalize.
 	// Finalization may cause incoming dependencies to be broken. If an outer
@@ -516,6 +528,36 @@ func disjunctKind(ctx *OpContext, env *Environment, expr Expr) (Kind, bool) {
 		k = x.Kind()
 	}
 	return k, k != BottomKind
+}
+
+// resolveAllByKind checks whether every disjunction in a resolves to exactly
+// one kind-compatible disjunct. If so, it returns the corresponding conjuncts;
+// otherwise it returns nil.
+func (n *nodeContext) resolveAllByKind(a []envDisjunct) []Conjunct {
+	if n.kind == TopKind {
+		return nil
+	}
+	resolved := make([]Conjunct, 0, len(a))
+	for _, d := range a {
+		var match *disjunct
+		for _, dj := range d.disjuncts {
+			kind, ok := disjunctKind(n.ctx, d.env, dj.expr)
+			if !ok {
+				return nil
+			}
+			if n.kind&kind != 0 {
+				if match != nil {
+					return nil // more than one compatible
+				}
+				match = &dj
+			}
+		}
+		if match == nil {
+			return nil // none compatible
+		}
+		resolved = append(resolved, MakeConjunct(d.env, match.expr, d.cloneID))
+	}
+	return resolved
 }
 
 func combineDefault2(a, b defaultMode, dropsDefaultA, dropsDefaultB bool) defaultMode {

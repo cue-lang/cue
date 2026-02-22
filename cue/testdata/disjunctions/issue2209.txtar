@@ -226,15 +226,15 @@ reduced: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  92
+Leaks:  44
 Freed:  850
-Reused: 781
-Allocs: 161
+Reused: 780
+Allocs: 114
 Retain: 0
 
 Unifications: 146
 Conjuncts:    929
-Disjuncts:    550
+Disjuncts:    502
 
 NumCloseIDs: 96
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -255,15 +255,15 @@ diff old new
 -MisalignedConjunct: 66
 -
 -NumCloseIDs: 14
-+Leaks:  92
++Leaks:  44
 +Freed:  850
-+Reused: 781
-+Allocs: 161
++Reused: 780
++Allocs: 114
 +Retain: 0
 +
 +Unifications: 146
 +Conjuncts:    929
-+Disjuncts:    550
++Disjuncts:    502
 +
 +NumCloseIDs: 96
 -- out/eval/stats --

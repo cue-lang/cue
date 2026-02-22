@@ -285,15 +285,15 @@ issue3743: {
 	out: yaml.MarshalStream(docs)
 }
 -- out/evalalpha/stats --
-Leaks:  48
-Freed:  460
-Reused: 429
-Allocs: 79
+Leaks:  43
+Freed:  463
+Reused: 432
+Allocs: 74
 Retain: 0
 
 Unifications: 430
 Conjuncts:    757
-Disjuncts:    28
+Disjuncts:    27
 Notifications: 2
 
 NumCloseIDs: 191
@@ -311,15 +311,15 @@ diff old new
 -Unifications: 441
 -Conjuncts:    821
 -Disjuncts:    537
-+Leaks:  48
-+Freed:  460
-+Reused: 429
-+Allocs: 79
++Leaks:  43
++Freed:  463
++Reused: 432
++Allocs: 74
 +Retain: 0
 +
 +Unifications: 430
 +Conjuncts:    757
-+Disjuncts:    28
++Disjuncts:    27
 +Notifications: 2
 +
 +NumCloseIDs: 191

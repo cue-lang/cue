@@ -70,6 +70,16 @@ byKind: {
 		out: #Def1 & [[["not an int"]]]
 	}
 
+	fieldRefConstraints: {
+		#A: {x!: int}
+		#B: {y!: string}
+		// The references here need to be resolved to figure out the underlying kind.
+		#Def: #A | #B | >10
+
+		// The data is an int, so only the >10 disjunct should match by kind.
+		out: #Def & 5
+	}
+
 	scalarConstraints: {
 		#Def: >10 | "" | null | false
 
@@ -80,18 +90,29 @@ byKind: {
 -- out/eval/stats --
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  188
-Reused: 167
-Allocs: 21
+Freed:  205
+Reused: 183
+Allocs: 22
 Retain: 0
 
-Unifications: 74
-Conjuncts:    215
-Disjuncts:    92
+Unifications: 83
+Conjuncts:    236
+Disjuncts:    98
 
-NumCloseIDs: 30
+NumCloseIDs: 35
 -- out/evalalpha --
 Errors:
+byKind.fieldRefConstraints.out: 3 errors in empty disjunction:
+byKind.fieldRefConstraints.out: conflicting values 5 and {x!:int} (mismatched types int and struct):
+    ./in.cue:73:7
+    ./in.cue:76:9
+    ./in.cue:79:8
+    ./in.cue:79:15
+byKind.fieldRefConstraints.out: conflicting values 5 and {y!:string} (mismatched types int and struct):
+    ./in.cue:74:7
+    ./in.cue:76:14
+    ./in.cue:79:8
+    ./in.cue:79:15
 byKind.nullableList.out.0: 6 errors in empty disjunction:
 byKind.nullableList.out.0: conflicting values [["not an int"]] and null (mismatched types list and null):
     ./in.cue:64:14
@@ -190,17 +211,17 @@ byKind.nullableStructRequired.out.f1.f2.f3: conflicting values "not an int" and 
     ./in.cue:51:29
 byKind.scalarConstraints.out: 4 errors in empty disjunction:
 byKind.scalarConstraints.out: conflicting values 5 and "" (mismatched types int and string):
-    ./in.cue:73:15
-    ./in.cue:76:8
-    ./in.cue:76:15
+    ./in.cue:83:15
+    ./in.cue:86:8
+    ./in.cue:86:15
 byKind.scalarConstraints.out: conflicting values 5 and false (mismatched types int and bool):
-    ./in.cue:73:27
-    ./in.cue:76:8
-    ./in.cue:76:15
+    ./in.cue:83:27
+    ./in.cue:86:8
+    ./in.cue:86:15
 byKind.scalarConstraints.out: conflicting values 5 and null (mismatched types int and null):
-    ./in.cue:73:20
-    ./in.cue:76:8
-    ./in.cue:76:15
+    ./in.cue:83:20
+    ./in.cue:86:8
+    ./in.cue:86:15
 noKind.manyScalars.out: 3 errors in empty disjunction:
 noKind.manyScalars.out: conflicting values 1 and 123:
     ./in.cue:20:9
@@ -238,9 +259,12 @@ noKind.manyWithStructEmbed.out: invalid value 123 (out of bound <10):
 noKind.manyWithStructEmbed.out: invalid value 123 (out of bound >200):
     ./in.cue:8:35
     ./in.cue:11:15
+byKind.fieldRefConstraints.out: invalid value 5 (out of bound >10):
+    ./in.cue:76:19
+    ./in.cue:79:15
 byKind.scalarConstraints.out: invalid value 5 (out of bound >10):
-    ./in.cue:73:9
-    ./in.cue:76:15
+    ./in.cue:83:9
+    ./in.cue:86:15
 
 Result:
 (_|_){
@@ -509,26 +533,56 @@ Result:
         }
       }
     }
+    fieldRefConstraints: (_|_){
+      // [eval]
+      #A: (#struct){
+        x!: (int){ int }
+      }
+      #B: (#struct){
+        y!: (string){ string }
+      }
+      #Def: ((struct|number)){ |((#struct){
+          x!: (int){ int }
+        }, (#struct){
+          y!: (string){ string }
+        }, (number){ >10 }) }
+      out: (_|_){
+        // [eval] byKind.fieldRefConstraints.out: 3 errors in empty disjunction:
+        // byKind.fieldRefConstraints.out: conflicting values 5 and {x!:int} (mismatched types int and struct):
+        //     ./in.cue:73:7
+        //     ./in.cue:76:9
+        //     ./in.cue:79:8
+        //     ./in.cue:79:15
+        // byKind.fieldRefConstraints.out: conflicting values 5 and {y!:string} (mismatched types int and struct):
+        //     ./in.cue:74:7
+        //     ./in.cue:76:14
+        //     ./in.cue:79:8
+        //     ./in.cue:79:15
+        // byKind.fieldRefConstraints.out: invalid value 5 (out of bound >10):
+        //     ./in.cue:76:19
+        //     ./in.cue:79:15
+      }
+    }
     scalarConstraints: (_|_){
       // [eval]
       #Def: ((null|bool|string|number)){ |((number){ >10 }, (string){ "" }, (null){ null }, (bool){ false }) }
       out: (_|_){
         // [eval] byKind.scalarConstraints.out: 4 errors in empty disjunction:
         // byKind.scalarConstraints.out: conflicting values 5 and "" (mismatched types int and string):
-        //     ./in.cue:73:15
-        //     ./in.cue:76:8
-        //     ./in.cue:76:15
+        //     ./in.cue:83:15
+        //     ./in.cue:86:8
+        //     ./in.cue:86:15
         // byKind.scalarConstraints.out: conflicting values 5 and false (mismatched types int and bool):
-        //     ./in.cue:73:27
-        //     ./in.cue:76:8
-        //     ./in.cue:76:15
+        //     ./in.cue:83:27
+        //     ./in.cue:86:8
+        //     ./in.cue:86:15
         // byKind.scalarConstraints.out: conflicting values 5 and null (mismatched types int and null):
-        //     ./in.cue:73:20
-        //     ./in.cue:76:8
-        //     ./in.cue:76:15
+        //     ./in.cue:83:20
+        //     ./in.cue:86:8
+        //     ./in.cue:86:15
         // byKind.scalarConstraints.out: invalid value 5 (out of bound >10):
-        //     ./in.cue:73:9
-        //     ./in.cue:76:15
+        //     ./in.cue:83:9
+        //     ./in.cue:86:15
       }
     }
   }

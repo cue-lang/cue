@@ -44,14 +44,14 @@ Schema: {
 }
 -- out/evalalpha/stats --
 Leaks:  715
-Freed:  69
-Reused: 44
+Freed:  57
+Reused: 32
 Allocs: 740
 Retain: 0
 
 Unifications: 452
-Conjuncts:    797
-Disjuncts:    310
+Conjuncts:    796
+Disjuncts:    309
 
 NumCloseIDs: 21
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -69,14 +69,14 @@ diff old new
 -Conjuncts:    425
 -Disjuncts:    402
 +Leaks:  715
-+Freed:  69
-+Reused: 44
++Freed:  57
++Reused: 32
 +Allocs: 740
 +Retain: 0
 +
 +Unifications: 452
-+Conjuncts:    797
-+Disjuncts:    310
++Conjuncts:    796
++Disjuncts:    309
 +
 +NumCloseIDs: 21
 -- out/eval/stats --

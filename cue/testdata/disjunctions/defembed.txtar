@@ -31,14 +31,14 @@ z: {
 }
 -- out/evalalpha/stats --
 Leaks:  40
-Freed:  120
-Reused: 108
+Freed:  119
+Reused: 107
 Allocs: 52
 Retain: 0
 
 Unifications: 28
-Conjuncts:    192
-Disjuncts:    130
+Conjuncts:    191
+Disjuncts:    129
 
 NumCloseIDs: 16
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -51,8 +51,8 @@ diff old new
 -Reused: 155
 -Allocs: 8
 +Leaks:  40
-+Freed:  120
-+Reused: 108
++Freed:  119
++Reused: 107
 +Allocs: 52
  Retain: 0
  
@@ -60,8 +60,8 @@ diff old new
 -Conjuncts:    198
 -Disjuncts:    163
 +Unifications: 28
-+Conjuncts:    192
-+Disjuncts:    130
++Conjuncts:    191
++Disjuncts:    129
 +
 +NumCloseIDs: 16
 -- out/eval/stats --

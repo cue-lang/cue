@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3c17bdc_30803542",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T10:40:09Z",
+      "side": 1,
+      "message": "beyond the added extra parsing, this is the only addition that requires reading the full input. could we refactor this away? for example, only do the \"scope end is EOF\" as a fallback when the underlying yaml decoder actually hits EOF, or perhaps initialize this as -1 to mean \"EOF position once it is known\".",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ffb055a_29b63b6c",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T10:40:09Z",
+      "side": 1,
+      "message": "I assuem this re-parsing will also be resolved once we have opening/closing token positions, as this relates to the opening token position.",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b40bdcd7_8bda714d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T10:40:09Z",
+      "side": 1,
+      "message": "just like the comment below, I\u0027d add a comment noting that this is an approximated position, and not present in the input syntax",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b9b66d1_10f005aa",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T10:40:09Z",
+      "side": 1,
+      "message": "I\u0027d add a brief comment to clarify that in the block style, there are no left and right braces present in the syntax, but that we still approximate positions in the decoded CUE for the sake of the LSP.",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

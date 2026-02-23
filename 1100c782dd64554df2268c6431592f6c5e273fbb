@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9968421b_dee8b1d8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T10:40:09Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ddec3c94_be9c3fd1",
+      "revId": "1100c782dd64554df2268c6431592f6c5e273fbb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a5ca93d_acf56e52",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-19T11:37:23Z",
       "side": 1,
       "message": "Absolutely, it\u0027s very unfortunate to have to, essentially, re-parse any part of the YAML source. Note that the call-sites go to efforts to try to ensure that we start from the lastPos where ever possible, which means we should be walking over at most one non-composite field value or list element.",
+      "revId": "1100c782dd64554df2268c6431592f6c5e273fbb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0fe0be3_51df912c",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T10:40:09Z",
+      "side": 1,
+      "message": "as we agreed, this is OK for now with a TODO to remove entirely once https://github.com/yaml/go-yaml/issues/302 is resolved and we can switch to go-yaml v4.",
+      "parentUuid": "4a5ca93d_acf56e52",
       "revId": "1100c782dd64554df2268c6431592f6c5e273fbb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

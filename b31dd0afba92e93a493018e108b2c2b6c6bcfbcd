@@ -16,6 +16,24 @@
       "message": "Would be good to fix this off-by-one change to minimize the diffs.",
       "revId": "b31dd0afba92e93a493018e108b2c2b6c6bcfbcd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43a1d97e_8dbaaba8",
+        "filename": "cue/testdata/basicrewrite/aliases/aliases.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-23T14:39:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98c03377_a6cf79bc",
+      "revId": "b31dd0afba92e93a493018e108b2c2b6c6bcfbcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

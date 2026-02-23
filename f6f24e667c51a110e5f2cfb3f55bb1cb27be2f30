@@ -124,6 +124,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "47018238_d3cc0356",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-23T11:21:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b40bdcd7_8bda714d",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b9b66d1_10f005aa",
@@ -137,6 +155,24 @@
       "writtenOn": "2026-02-23T10:40:09Z",
       "side": 1,
       "message": "I\u0027d add a brief comment to clarify that in the block style, there are no left and right braces present in the syntax, but that we still approximate positions in the decoded CUE for the sake of the LSP.",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cf527c8_ccdaa36d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-23T11:21:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b9b66d1_10f005aa",
       "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

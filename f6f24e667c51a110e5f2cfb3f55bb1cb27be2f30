@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "57eed863_6790519c",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T11:19:33Z",
+      "side": 1,
+      "message": "We\u0027re not removing the dependency on \"src\" anytime soon, so I\u0027m happy to leave this as a TODO if it\u0027s not easy to do now.",
+      "parentUuid": "a58ed456_0595893f",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3ffb055a_29b63b6c",
         "filename": "internal/encoding/yaml/decode.go",
         "patchSetId": 3
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Yes and no. This does relate to the opening token position. But in the case of block style and an anchor, it\u0027s again ambiguous:\n\n```\na: \u0026anc\n\n\n\n  b: true\nc: *anc\n```\nWhere does a\u0027s mapping start? We want it to be as greedy as possible, so we actually say the start of line 2. The yaml node gives the position of the anchor on line 1, we want to skip past that. You could claim that the mapping doesn\u0027t start until `b`. So I don\u0027 think upstream is going to take a position on this.\n\nBut for flow-style, yes, if upstream gives us the offset of the { or [ then we could simplify this code.",
       "parentUuid": "3ffb055a_29b63b6c",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "678d73a4_da20025c",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T11:19:33Z",
+      "side": 1,
+      "message": "ack. can you summarize this in a TODO? because ideally we remove this dependency on the input source too, even if we don\u0027t know how to yet.",
+      "parentUuid": "ac4b1d69_58062253",
       "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d41d9ca8_8f6bf706",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T11:37:41Z",
+      "side": 1,
+      "message": "Also note the CI failure; we started dogfooding \"else\" in the CI code, so you need to add the try experiment in those files.",
+      "revId": "19f5869d76f4c3c248738c2d7e5357ef22bc9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "159606f6_4283e9dd",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 728,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T11:37:41Z",
+      "side": 1,
+      "message": "was there a particular reasoning in renaming ElseClause to FallbackClause? neither is entirely correct, so I would have probably leaned towards keeping ElseClause.",
+      "revId": "19f5869d76f4c3c248738c2d7e5357ef22bc9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b58ad6e_8d1acd0a",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T11:37:41Z",
+      "side": 1,
+      "message": "I\u0027d name this TokenPos, to clarify that it\u0027s not just for a `fallback` token.",
+      "revId": "19f5869d76f4c3c248738c2d7e5357ef22bc9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58cef316_8fe75193",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1052,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T11:37:41Z",
+      "side": 1,
+      "message": "this needs two test cases to ensure that neither `else` nor `fallback` are allowed without the experiment, even when the language version is latest.",
+      "revId": "19f5869d76f4c3c248738c2d7e5357ef22bc9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e3bffc3_131bd340",
+        "filename": "internal/core/export/testdata/main/else.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-23T11:37:41Z",
+      "side": 1,
+      "message": "these diffs seem like noise. you should ensure that the evalv2 output in these testdata files is removed, as we only care about the evalv3 output.\n\nwe should move towards removing the stale evalv2 output from tests ASAP, AFAIK the only relevance they have at this point is a couple of P1 TODOs, and nxcc\u0027s bugs which are already tracked in issues. So the vast majority of those evalv2 outputs and v2-to-v3 diffs are just noise now.",
+      "revId": "19f5869d76f4c3c248738c2d7e5357ef22bc9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

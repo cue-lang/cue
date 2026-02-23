@@ -68,14 +68,14 @@ let _schema_1 = schema
       b: 〈1;-〉
     }
   }
-  let B#1 = {
+  let B#0 = {
     open: int
   }
-  f: 〈0;let B#1〉
+  f: 〈0;let B#0〉
   schema: {
-    next: 〈1;let _schema_1#2〉
+    next: 〈1;let _schema_1#1〉
   }
-  let _schema_1#2 = 〈0;schema〉
+  let _schema_1#1 = 〈0;schema〉
 }
 -- out/evalalpha/stats --
 Leaks:  1
@@ -149,7 +149,7 @@ Result:
   }
   e: (struct){
   }
-  let B#1 = (struct){
+  let B#0 = (struct){
     open: (int){ int }
   }
   f: (struct){
@@ -161,7 +161,7 @@ Result:
       // [structural cycle] schema.next: structural cycle
     }
   }
-  let _schema_1#2 = (_|_){
+  let _schema_1#1 = (_|_){
     // [structural cycle] schema.next: structural cycle
   }
 }
@@ -169,12 +169,23 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -33,7 +33,6 @@
+@@ -20,7 +20,7 @@
+   }
+   e: (struct){
+   }
+-  let B#1 = (struct){
++  let B#0 = (struct){
+     open: (int){ int }
+   }
+   f: (struct){
+@@ -32,8 +32,7 @@
+       // [structural cycle] schema.next: structural cycle
      }
    }
-   let _schema_1#2 = (_|_){
+-  let _schema_1#2 = (_|_){
 -    // [structural cycle] _schema_1: structural cycle:
 -    //     ./in.cue:32:8
++  let _schema_1#1 = (_|_){
 +    // [structural cycle] schema.next: structural cycle
    }
  }

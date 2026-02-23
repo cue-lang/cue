@@ -17,7 +17,7 @@ Conjuncts:    7
 Disjuncts:    7
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalalpha --
 (struct){
   cond: (bool){ bool }
   src: (struct){

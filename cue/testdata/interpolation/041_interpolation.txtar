@@ -29,7 +29,7 @@ Retain: 12
 Unifications: 9
 Conjuncts:    16
 Disjuncts:    19
--- out/eval --
+-- out/evalalpha --
 Errors:
 e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):
     ./in.cue:7:4

@@ -128,14 +128,14 @@ NumCloseIDs: 10
       foo: (struct){
         label: (string){ "foo" }
       }
-      let Spec#1 = (struct){
+      let Spec#0 = (struct){
         selector?: (struct){
           label?: (string){ string }
           expr?: (list){
           }
         }
       }
-      let Selector#2 = (struct){
+      let Selector#1 = (struct){
         label?: (string){ string }
         expr?: (list){
         }
@@ -181,6 +181,24 @@ NumCloseIDs: 10
 diff old new
 --- old
 +++ new
+@@ -43,7 +43,7 @@
+       foo: (struct){
+         label: (string){ "foo" }
+       }
+-      let Spec#1 = (struct){
++      let Spec#0 = (struct){
+         selector?: (struct){
+           label?: (string){ string }
+           expr?: (list){
+@@ -50,7 +50,7 @@
+           }
+         }
+       }
+-      let Selector#2 = (struct){
++      let Selector#1 = (struct){
+         label?: (string){ string }
+         expr?: (list){
+         }
 @@ -61,10 +61,7 @@
      foo: (struct){
        fooData: (struct){
@@ -367,7 +385,7 @@ diff old new
     full: {
       bar: {
         [string]: {
-          spec?: 〈2;let Spec#1〉
+          spec?: 〈2;let Spec#0〉
         }
       }
       if true {
@@ -382,10 +400,10 @@ diff old new
           }
         }
       }
-      let Spec#1 = {
-        selector?: 〈1;let Selector#2〉
+      let Spec#0 = {
+        selector?: 〈1;let Selector#1〉
       }
-      let Selector#2 = {
+      let Selector#1 = {
         label?: string
         expr?: [
           ...string,

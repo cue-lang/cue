@@ -20,7 +20,7 @@ Conjuncts:    2
 Disjuncts:    2
 
 NumCloseIDs: 0
--- out/eval --
+-- out/evalalpha --
 forVarInElse.bad: reference "i" not found:
     ./in.cue:3:45
 letVarInElse.bad: reference "y" not found:

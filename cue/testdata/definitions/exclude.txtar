@@ -90,20 +90,20 @@ Result:
   // [eval]
   excludeLet: (struct){
     #D: (#struct){
-      let X#1 = (#struct){
+      let X#0 = (#struct){
       }
       #foo: (#struct){
       }
       f: (_){ _ }
     }
     a: (#struct){
-      let X#2 = (struct){
+      let X#1 = (struct){
         a: (int){ 1 }
       }
       f: (#struct){
         a: (int){ 1 }
       }
-      let X#1 = (#struct){
+      let X#0 = (#struct){
       }
       #foo: (#struct){
       }
@@ -224,7 +224,16 @@ diff old new
      ./in.cue:29:14
  
  Result:
-@@ -20,16 +16,16 @@
+@@ -13,7 +9,7 @@
+   // [eval]
+   excludeLet: (struct){
+     #D: (#struct){
+-      let X#1 = (#struct){
++      let X#0 = (#struct){
+       }
+       #foo: (#struct){
+       }
+@@ -20,15 +16,15 @@
        f: (_){ _ }
      }
      a: (#struct){
@@ -235,19 +244,20 @@ diff old new
 -      f: (struct){
 -        a: (int){ 1 }
 -      }
-       let X#2 = (struct){
-         a: (int){ 1 }
-       }
+-      let X#2 = (struct){
+-        a: (int){ 1 }
++      let X#1 = (struct){
++        a: (int){ 1 }
++      }
 +      f: (#struct){
 +        a: (int){ 1 }
 +      }
-+      let X#1 = (#struct){
++      let X#0 = (#struct){
 +      }
 +      #foo: (#struct){
-+      }
+       }
      }
    }
-   definition: (_|_){
 @@ -45,13 +41,11 @@
          // [eval]
          #foo: (_|_){
@@ -469,16 +479,16 @@ Result:
 {
   excludeLet: {
     #D: {
-      let X#1 = {}
-      #foo: 〈0;let X#1〉
+      let X#0 = {}
+      #foo: 〈0;let X#0〉
       f: _
     }
     a: 〈0;#D〉
     a: {
-      let X#2 = {
+      let X#1 = {
         a: 1
       }
-      f: 〈0;let X#2〉
+      f: 〈0;let X#1〉
     }
   }
   definition: {

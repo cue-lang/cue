@@ -25,7 +25,7 @@ Conjuncts:    5
 Disjuncts:    4
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (struct){
     "c.": (string){ "a" }

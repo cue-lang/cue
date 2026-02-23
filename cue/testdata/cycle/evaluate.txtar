@@ -201,13 +201,13 @@ Result:
   letCycleOK: (struct){
     t1: (struct){
       b: (_){ _ }
-      let X#1 = (_){ _ }
+      let X#0 = (_){ _ }
       c: (_){ _ }
     }
     t2: (struct){
       a: (struct){
         b: (int){ 1 }
-        let X#2 = (_|_){
+        let X#1 = (_|_){
           // [structural cycle] letCycleOK.t2.a.X: structural cycle
         }
         c: (int){ 1 }
@@ -221,7 +221,7 @@ Result:
       a: (_|_){
         // [structural cycle]
         b: (int){ 1 }
-        let X#3 = (_|_){
+        let X#2 = (_|_){
           // [structural cycle] letCycleFail.t1.a.X: structural cycle
         }
         c: (_|_){
@@ -231,7 +231,7 @@ Result:
     }
     t2: (struct){
       a: (struct){
-        let X#4 = (_|_){
+        let X#3 = (_|_){
           // [structural cycle] letCycleFail.t2.a.X: structural cycle
         }
         x: (struct){
@@ -422,6 +422,31 @@ diff old new
  
  Result:
  (_|_){
+@@ -35,13 +21,13 @@
+   letCycleOK: (struct){
+     t1: (struct){
+       b: (_){ _ }
+-      let X#1 = (_){ _ }
++      let X#0 = (_){ _ }
+       c: (_){ _ }
+     }
+     t2: (struct){
+       a: (struct){
+         b: (int){ 1 }
+-        let X#2 = (_|_){
++        let X#1 = (_|_){
+           // [structural cycle] letCycleOK.t2.a.X: structural cycle
+         }
+         c: (int){ 1 }
+@@ -55,7 +41,7 @@
+       a: (_|_){
+         // [structural cycle]
+         b: (int){ 1 }
+-        let X#3 = (_|_){
++        let X#2 = (_|_){
+           // [structural cycle] letCycleFail.t1.a.X: structural cycle
+         }
+         c: (_|_){
 @@ -65,14 +51,8 @@
      }
      t2: (struct){
@@ -434,7 +459,7 @@ diff old new
 -          x: (struct){
 -            y: (string){ "" }
 -          }
-+        let X#4 = (_|_){
++        let X#3 = (_|_){
 +          // [structural cycle] letCycleFail.t2.a.X: structural cycle
          }
          x: (struct){
@@ -717,16 +742,16 @@ Result:
   letCycleOK: {
     t1: {
       b: 〈0;c〉
-      let X#1 = 〈0;b〉
-      c: 〈0;let X#1〉
+      let X#0 = 〈0;b〉
+      c: 〈0;let X#0〉
     }
   }
   letCycleOK: {
     t2: {
       a: {
         b: 1
-        let X#2 = 〈1;a〉
-        c: 〈0;let X#2〉.b
+        let X#1 = 〈1;a〉
+        c: 〈0;let X#1〉.b
       }
     }
   }
@@ -734,16 +759,16 @@ Result:
     t1: {
       a: {
         b: 1
-        let X#3 = 〈1;a〉
-        c: 〈0;let X#3〉
+        let X#2 = 〈1;a〉
+        c: 〈0;let X#2〉
       }
     }
   }
   letCycleFail: {
     t2: {
       a: {
-        let X#4 = 〈1;a〉
-        if (〈0;let X#4〉 == _|_(explicit error (_|_ literal) in source)) {}
+        let X#3 = 〈1;a〉
+        if (〈0;let X#3〉 == _|_(explicit error (_|_ literal) in source)) {}
         x: {
           y: ""
         }

@@ -124,7 +124,7 @@ Disjuncts:    81
 MisalignedConjunct: 15
 
 NumCloseIDs: 14
--- out/eval --
+-- out/evalalpha --
 Errors:
 disallowed.vErr.d: field not allowed:
     ./in.cue:28:4

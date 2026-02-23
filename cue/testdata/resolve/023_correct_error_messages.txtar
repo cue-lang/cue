@@ -17,7 +17,7 @@ Retain: 0
 Unifications: 2
 Conjuncts:    3
 Disjuncts:    2
--- out/eval --
+-- out/evalalpha --
 Errors:
 a: conflicting values "a" and 1 (mismatched types string and int):
     ./in.cue:1:4

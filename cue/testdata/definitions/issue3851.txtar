@@ -43,7 +43,7 @@ Disjuncts:    48
     sub1: (#struct){
       sub2: (#struct){
         sub3: (struct){
-          let _let#1 = (string){ "bar" }
+          let _let#0 = (string){ "bar" }
           foo: (string){ "bar" }
         }
       }
@@ -54,15 +54,18 @@ Disjuncts:    48
 diff old new
 --- old
 +++ new
-@@ -14,7 +14,7 @@
+@@ -14,9 +14,9 @@
    out: (#struct){
      name: (string){ "foo" }
      sub1: (#struct){
 -      sub2: (struct){
 +      sub2: (#struct){
          sub3: (struct){
-           let _let#1 = (string){ "bar" }
+-          let _let#1 = (string){ "bar" }
++          let _let#0 = (string){ "bar" }
            foo: (string){ "bar" }
+         }
+       }
 -- out/eval --
 (struct){
   #App: (#struct){
@@ -107,8 +110,8 @@ diff old new
     sub1: {
       sub2: {
         sub3: {
-          let _let#1 = "bar"
-          foo: 〈0;let _let#1〉
+          let _let#0 = "bar"
+          foo: 〈0;let _let#0〉
         }
       }
     }

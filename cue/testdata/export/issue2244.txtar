@@ -55,7 +55,7 @@ and not allow #pattern in #step
   _#isReleaseTag(:x): (string){
     "refs/tags/v"
     #pattern: (string){ "refs/tags/v*" }
-    let prefix#1 = (string){ "refs/tags/v" }
+    let prefix#0 = (string){ "refs/tags/v" }
   }
   #step: (#struct){
     if: ((string|number)){ |((number){ number }, (string){ string }) }
@@ -64,7 +64,7 @@ and not allow #pattern in #step
     if: (string){
       "refs/tags/v"
       #pattern: (string){ "refs/tags/v*" }
-      let prefix#1 = (string){ "refs/tags/v" }
+      let prefix#0 = (string){ "refs/tags/v" }
     }
   }
 }
@@ -80,6 +80,24 @@ diff old new
      //     ./in.cue:11:6
      //     ./in.cue:8:12
      #pattern: (string){ string }
+@@ -8,7 +8,7 @@
+   _#isReleaseTag(:x): (string){
+     "refs/tags/v"
+     #pattern: (string){ "refs/tags/v*" }
+-    let prefix#1 = (string){ "refs/tags/v" }
++    let prefix#0 = (string){ "refs/tags/v" }
+   }
+   #step: (#struct){
+     if: ((string|number)){ |((number){ number }, (string){ string }) }
+@@ -17,7 +17,7 @@
+     if: (string){
+       "refs/tags/v"
+       #pattern: (string){ "refs/tags/v*" }
+-      let prefix#1 = (string){ "refs/tags/v" }
++      let prefix#0 = (string){ "refs/tags/v" }
+     }
+   }
+ }
 -- out/eval --
 (struct){
   _#matchPattern(:x): (_|_){
@@ -111,8 +129,8 @@ diff old new
     #pattern: string
     [
       if 〈import;strings〉.HasSuffix(〈1;#pattern〉, "*") {
-        let prefix#1 = 〈import;strings〉.TrimSuffix(〈2;#pattern〉, "*")
-        〈0;let prefix#1〉
+        let prefix#0 = 〈import;strings〉.TrimSuffix(〈2;#pattern〉, "*")
+        〈0;let prefix#0〉
       },
       "'\(〈1;#pattern〉)'",
     ][0]

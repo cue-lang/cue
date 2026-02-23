@@ -283,7 +283,7 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 		code = EvalError
 	}
 
-	label := f.SelectorString(c.Runtime)
+	label := f.SelectorString()
 
 	var err errors.Error
 	if f.IsInt() {
@@ -342,7 +342,7 @@ func (e *baseError) Path() (a []string) {
 		return nil
 	}
 	for _, f := range appendPath(nil, e.v) {
-		a = append(a, f.SelectorString(e.r))
+		a = append(a, f.SelectorString())
 	}
 	return a
 }
@@ -431,7 +431,7 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 			}
 			args[i] = string(b)
 		case Feature:
-			args[i] = x.SelectorString(c.Runtime)
+			args[i] = x.SelectorString()
 		}
 	}
 
@@ -453,11 +453,11 @@ func (c *OpContext) makeAltPath() (a []string) {
 	}
 
 	for _, f := range appendPath(nil, c.altPath[0]) {
-		a = append(a, f.SelectorString(c))
+		a = append(a, f.SelectorString())
 	}
 	for _, v := range c.altPath[1:] {
-		if f := v.Label; f != 0 {
-			a = append(a, f.SelectorString(c))
+		if f := v.Label; f.IsValid() {
+			a = append(a, f.SelectorString())
 		}
 	}
 	return a

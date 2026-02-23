@@ -19,7 +19,7 @@ Retain: 0
 Unifications: 2
 Conjuncts:    5
 Disjuncts:    4
--- out/eval --
+-- out/evalalpha --
 Errors:
 a: 2 errors in empty disjunction:
 a: conflicting values 8000.9 and 7080 (mismatched types float and int):

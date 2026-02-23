@@ -39,7 +39,7 @@ Disjuncts:    8
 MisalignedConjunct: 2
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (struct){
     b: (struct){

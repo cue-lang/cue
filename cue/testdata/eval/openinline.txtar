@@ -183,7 +183,7 @@ Result:
   }
   refFromPkg: (int){ 1 }
   refFromLet: (struct){
-    let X#1 = (_|_){
+    let X#0 = (_|_){
       // [eval]
       #D: (#struct){
         a: (int){ 2 }
@@ -227,6 +227,15 @@ diff old new
            }
            minor: (int){ 2 }
          }
+@@ -99,7 +91,7 @@
+   }
+   refFromPkg: (int){ 1 }
+   refFromLet: (struct){
+-    let X#1 = (_|_){
++    let X#0 = (_|_){
+       // [eval]
+       #D: (#struct){
+         a: (int){ 2 }
 @@ -106,13 +98,11 @@
        }
        #E: (_|_){
@@ -445,7 +454,7 @@ Result:
   }
   refFromPkg: 〈import;"foo.com/example"〉.#E.b
   refFromLet: {
-    let X#1 = {
+    let X#0 = {
       #D: {
         a: 2
       }
@@ -453,6 +462,6 @@ Result:
         b: 1
       })
     }
-    x: 〈0;let X#1〉.#E.b
+    x: 〈0;let X#0〉.#E.b
   }
 }

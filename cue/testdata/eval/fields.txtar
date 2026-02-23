@@ -35,7 +35,7 @@ Retain: 0
 Unifications: 7
 Conjuncts:    9
 Disjuncts:    7
--- out/eval --
+-- out/evalalpha --
 Errors:
 bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
     ./in.cue:3:18

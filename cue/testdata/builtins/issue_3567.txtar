@@ -22,7 +22,7 @@ Retain: 2
 Unifications: 6
 Conjuncts:    6
 Disjuncts:    7
--- out/eval --
+-- out/evalalpha --
 Errors:
 0: not enough arguments in call to strings.Join (have 1, want 2):
     ./in.cue:2:20

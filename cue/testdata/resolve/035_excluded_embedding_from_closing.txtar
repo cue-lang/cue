@@ -25,10 +25,10 @@ V: #S & {
         d: int
       }
     }
-    let B#1 = {
+    let B#0 = {
       open: int
     }
-    b: 〈0;let B#1〉
+    b: 〈0;let B#0〉
   }
   V: (〈0;#S〉 & {
     c: {
@@ -66,7 +66,7 @@ Result:
     c: (#struct){
       d: (int){ int }
     }
-    let B#1 = (#struct){
+    let B#0 = (#struct){
       open: (int){ int }
     }
     b: (#struct){
@@ -94,7 +94,7 @@ Result:
     a: (#struct){
       c: (int){ int }
     }
-    let B#1 = (#struct){
+    let B#0 = (#struct){
       open: (int){ int }
     }
   }
@@ -117,6 +117,15 @@ diff old new
      ./in.cue:10:5
  
  Result:
+@@ -20,7 +14,7 @@
+     c: (#struct){
+       d: (int){ int }
+     }
+-    let B#1 = (#struct){
++    let B#0 = (#struct){
+       open: (int){ int }
+     }
+     b: (#struct){
 @@ -29,33 +23,27 @@
    }
    V: (_|_){
@@ -154,7 +163,7 @@ diff old new
 +    a: (#struct){
 +      c: (int){ int }
 +    }
-+    let B#1 = (#struct){
++    let B#0 = (#struct){
 +      open: (int){ int }
      }
    }

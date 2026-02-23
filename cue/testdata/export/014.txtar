@@ -20,7 +20,7 @@ Retain: 0
 Unifications: 2
 Conjuncts:    5
 Disjuncts:    2
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (number){ &(>=0, <=10, !=1) }
 }

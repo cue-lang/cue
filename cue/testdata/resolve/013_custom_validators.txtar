@@ -21,7 +21,7 @@ Retain: 0
 Unifications: 4
 Conjuncts:    8
 Disjuncts:    4
--- out/eval --
+-- out/evalalpha --
 Errors:
 b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
     ./in.cue:6:4

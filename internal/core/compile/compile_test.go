@@ -62,7 +62,7 @@ func TestCompile(t *testing.T) {
 				fmt.Fprintln(t)
 			}
 			fmt.Fprintln(t, "---", t.Rel(f.Filename))
-			t.Write(debug.AppendNode(nil, r, v.ConjunctAt(i).Elem(), &debug.Config{
+			t.Write(debug.AppendNode(nil, v.ConjunctAt(i).Elem(), &debug.Config{
 				Cwd: t.Dir,
 
 				ExpandLetExpr: t.Bool("expandLetExpr"),
@@ -90,5 +90,5 @@ func TestX(t *testing.T) {
 	if err != nil {
 		t.Error(errors.Details(err, nil))
 	}
-	t.Error(debug.NodeString(r, arc.ConjunctAt(0).Elem(), nil))
+	t.Error(debug.NodeString(arc.ConjunctAt(0).Elem(), nil))
 }

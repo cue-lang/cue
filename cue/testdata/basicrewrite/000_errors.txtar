@@ -29,7 +29,7 @@ Retain: 0
 Unifications: 10
 Conjuncts:    14
 Disjuncts:    10
--- out/eval --
+-- out/evalalpha --
 Errors:
 explicit error (_|_ literal) in source:
     ./in.cue:1:4

@@ -29,7 +29,7 @@ NumCloseIDs: 23
 ConjunctInfos:       99
 MaxConjunctInfos:    12
 MaxReqSets:          12
--- out/eval --
+-- out/evalalpha --
 (struct){
   #def: (#struct){ |((#struct){
     }, (#struct){

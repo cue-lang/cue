@@ -199,7 +199,7 @@ NumCloseIDs: 20
 - comprehension.t1 should be at most an incomplete error, as it is fixable.
   Arguably they should pass, though, as there is a predictable path to its
   resolution.
--- out/eval --
+-- out/evalalpha --
 Errors:
 comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
     ./comprehension.cue:71:13

@@ -527,7 +527,7 @@ func (s scopedSelector) labelType() SelectorType {
 func (s scopedSelector) constraintType() SelectorType { return 0 }
 
 func (s scopedSelector) feature(r adt.Runtime) adt.Feature {
-	return adt.MakeIdentLabel(r, s.name, s.pkg)
+	return adt.MakeIdentLabel(s.name, s.pkg)
 }
 
 // Def marks a string as a definition label. An # will be added if a string is
@@ -559,7 +559,7 @@ func (d definitionSelector) labelType() SelectorType {
 func (d definitionSelector) constraintType() SelectorType { return 0 }
 
 func (d definitionSelector) feature(r adt.Runtime) adt.Feature {
-	return adt.MakeIdentLabel(r, string(d), "")
+	return adt.MakeIdentLabel(string(d), "")
 }
 
 // Str creates a CUE string label. Definition selectors are defined with [Def].
@@ -582,13 +582,13 @@ func (s stringSelector) labelType() SelectorType      { return StringLabel }
 func (s stringSelector) constraintType() SelectorType { return 0 }
 
 func (s stringSelector) feature(r adt.Runtime) adt.Feature {
-	return adt.MakeStringLabel(r, string(s))
+	return adt.MakeStringLabel(string(s))
 }
 
 // Index selects a list element by index.
 // It returns an invalid selector if the index is out of range.
 func Index[T interface{ int | int64 }](x T) Selector {
-	f, err := adt.MakeLabel(nil, int64(x), adt.IntLabel)
+	f, err := adt.TryMakeIntLabel(nil, int64(x), adt.IntLabel)
 	if err != nil {
 		return Selector{pathError{err}}
 	}
@@ -737,17 +737,17 @@ func valueToSel(v adt.Value) Selector {
 	}
 }
 
-func featureToSel(f adt.Feature, r adt.Runtime) Selector {
+func featureToSel(f adt.Feature) Selector {
 	switch f.Typ() {
 	case adt.StringLabel:
-		return Str(f.StringValue(r))
+		return Str(f.StringValue())
 	case adt.IntLabel:
 		return Index(f.Index())
 	case adt.DefinitionLabel:
-		return Def(f.IdentString(r))
+		return Def(f.IdentString())
 	case adt.HiddenLabel, adt.HiddenDefinitionLabel:
-		ident := f.IdentString(r)
-		pkg := f.PkgID(r)
+		ident := f.IdentString()
+		pkg := f.PkgID()
 		return Hid(ident, pkg)
 	}
 	return Selector{pathError{

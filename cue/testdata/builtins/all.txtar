@@ -34,7 +34,7 @@ Retain: 3
 Unifications: 20
 Conjuncts:    27
 Disjuncts:    21
--- out/eval --
+-- out/evalalpha --
 Errors:
 fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
     ./in.cue:2:9

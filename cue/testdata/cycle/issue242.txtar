@@ -96,7 +96,7 @@ Retain: 18
 Unifications: 26
 Conjuncts:    181
 Disjuncts:    82
--- out/eval --
+-- out/evalalpha --
 (struct){
   #size: (int){ 2 }
   #CellValue: (int){ |((int){ 0 }, (int){ 1 }, (int){ 2 }, (int){ 3 }) }

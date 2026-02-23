@@ -29,7 +29,7 @@ Retain: 0
 Unifications: 6
 Conjuncts:    13
 Disjuncts:    8
--- out/eval --
+-- out/evalalpha --
 (struct){
   A: (#list){
     0: (int){ &(>=0, int) }

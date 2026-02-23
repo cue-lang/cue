@@ -355,7 +355,7 @@ Result:
           }
         }
       }
-      let HTTPROUTESPEC#1 = (struct){
+      let HTTPROUTESPEC#0 = (struct){
         #x: (#list){ |(*(#list){
             0: (#struct){
               other: (#list){
@@ -569,7 +569,7 @@ diff old new
        }
      }
    }
-@@ -166,20 +140,17 @@
+@@ -166,24 +140,21 @@
          }
        }
        #Kubernetes: (#struct){
@@ -587,6 +587,10 @@ diff old new
 -        }
 -        Routes: (#struct){
 -          route: (#struct){
+-          }
+-        }
+-      }
+-      let HTTPROUTESPEC#1 = (struct){
 +        Routes: (#struct){
 +          route: (#struct){
 +          }
@@ -598,9 +602,13 @@ diff old new
 +          0: (#struct){
 +            route: (#struct){
 +            }
-           }
-         }
-       }
++          }
++        }
++      }
++      let HTTPROUTESPEC#0 = (struct){
+         #x: (#list){ |(*(#list){
+             0: (#struct){
+               other: (#list){
 @@ -192,60 +163,8 @@
            }, (list){
            }) }
@@ -1222,7 +1230,7 @@ Result:
           Routes: {
             route: {
               [_]: {
-                spec!: 〈5;let HTTPROUTESPEC#1〉=>{
+                spec!: 〈5;let HTTPROUTESPEC#0〉=>{
                   #x: ([
                     ...{
                       refs: [
@@ -1247,7 +1255,7 @@ Result:
           res1: 〈1;Routes〉
         }
       }
-      let HTTPROUTESPEC#1 = {
+      let HTTPROUTESPEC#0 = {
         #x: ([
           ...{
             refs: [

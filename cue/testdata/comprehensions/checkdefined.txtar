@@ -94,7 +94,7 @@ Disjuncts:    105
 MisalignedConjunct: 2
 
 NumCloseIDs: 13
--- out/eval --
+-- out/evalalpha --
 (struct){
   xc: (#struct){
     field: (struct){
@@ -126,11 +126,11 @@ NumCloseIDs: 13
   }
   issue1969: (struct){
     okc: (struct){
-      let X#1 = (_|_){
+      let X#0 = (_|_){
         // [eval] issue1969.okc.X: undefined field: undefined:
         //     ./in.cue:35:13
       }
-      let Y#2 = (_|_){
+      let Y#1 = (_|_){
         // [eval]
         s: (_|_){
           // [eval] issue1969.okc.X: undefined field: undefined:
@@ -139,11 +139,11 @@ NumCloseIDs: 13
       }
     }
     oko: (struct){
-      let X#3 = (_|_){
+      let X#2 = (_|_){
         // [incomplete] issue1969.oko.X: undefined field: undefined:
         //     ./in.cue:42:13
       }
-      let Y#4 = (struct){
+      let Y#3 = (struct){
         s: (_|_){
           // [incomplete] issue1969.oko.X: undefined field: undefined:
           //     ./in.cue:42:13
@@ -259,27 +259,27 @@ NumCloseIDs: 13
   }
   issue1969: {
     okc: {
-      let X#1 = 〈2;xc〉.undefined
-      let Y#2 = ({} & {
+      let X#0 = 〈2;xc〉.undefined
+      let Y#1 = ({} & {
         s: [
-          for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#0〉, 1) {},
         ]
       })
-      if (〈0;let Y#2〉 != _|_(explicit error (_|_ literal) in source)) {
-        〈1;let Y#2〉
+      if (〈0;let Y#1〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#1〉
       }
     }
   }
   issue1969: {
     oko: {
-      let X#3 = 〈2;xo〉.undefined
-      let Y#4 = ({} & {
+      let X#2 = 〈2;xo〉.undefined
+      let Y#3 = ({} & {
         s: [
-          for _, y in 〈import;list〉.Range(0, 〈2;let X#3〉, 1) {},
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#2〉, 1) {},
         ]
       })
-      if (〈0;let Y#4〉 != _|_(explicit error (_|_ literal) in source)) {
-        〈1;let Y#4〉
+      if (〈0;let Y#3〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#3〉
       }
     }
   }

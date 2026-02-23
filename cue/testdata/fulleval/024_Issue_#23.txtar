@@ -25,7 +25,7 @@ Retain: 0
 Unifications: 7
 Conjuncts:    15
 Disjuncts:    11
--- out/eval --
+-- out/evalalpha --
 Errors:
 y: 2 errors in empty disjunction:
 y.a: conflicting values 1 and 3:

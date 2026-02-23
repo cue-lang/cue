@@ -34,7 +34,7 @@ Retain: 0
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    9
--- out/eval --
+-- out/evalalpha --
 Errors:
 e0: invalid operands "a" and '' to '+' (type string and bytes):
     ./in.cue:10:5

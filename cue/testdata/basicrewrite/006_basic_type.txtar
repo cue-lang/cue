@@ -31,7 +31,7 @@ Retain: 0
 Unifications: 7
 Conjuncts:    13
 Disjuncts:    7
--- out/eval --
+-- out/evalalpha --
 Errors:
 d: conflicting values int and float (mismatched types int and float):
     ./in.cue:5:4

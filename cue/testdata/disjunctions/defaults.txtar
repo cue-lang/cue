@@ -44,7 +44,7 @@ issue3779: {
     }
   }
 }
--- out/eval --
+-- out/evalalpha --
 (struct){
   passToSingleValue: (struct){
     p1: (_){ |(*(string){ "y" }, (_){ _ }) }

@@ -335,7 +335,7 @@ Conjuncts:    821
 Disjuncts:    537
 -- out/evalalpha --
 Errors:
-0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
+0: cannot use [_|_(0: cannot use value at path '' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
     ./cycle.cue:39:24
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:6:7
@@ -530,7 +530,7 @@ Result:
           }
         }) }
       f: (_|_){
-        // [eval] 0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
+        // [eval] 0: cannot use [_|_(0: cannot use value at path '' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
         //     ./cycle.cue:39:24
         // issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, expected 1:
         //     ./cycle.cue:39:14
@@ -940,7 +940,7 @@ diff old new
 +++ new
 @@ -1,26 +1,47 @@
  Errors:
-+0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
++0: cannot use [_|_(0: cannot use value at path '' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
 +    ./cycle.cue:39:24
  noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
 -    ./cycle.cue:4:7
@@ -1161,7 +1161,7 @@ diff old new
 +          }
 +        }) }
 +      f: (_|_){
-+        // [eval] 0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
++        // [eval] 0: cannot use [_|_(0: cannot use value at path '' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
 +        //     ./cycle.cue:39:24
 +        // issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, expected 1:
 +        //     ./cycle.cue:39:14

@@ -493,7 +493,7 @@ Result:
           }
           out: (string){ "foo" }
         }
-        let res#1 = (struct){
+        let res#0 = (struct){
           out: (string){ "foo" }
         }
         out: (string){ "foo" }
@@ -762,30 +762,30 @@ Result:
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#2 = (bool){ true }
+          let Ok#1 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#2 = (bool){ true }
+          let Ok#1 = (bool){ true }
           x: (bool){ true }
         }) }
       foo: (#struct){ |((#struct){
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#2 = (bool){ true }
+          let Ok#1 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#2 = (bool){ true }
+          let Ok#1 = (bool){ true }
           x: (bool){ true }
         }) }
       bar: (#struct){ |((#struct){
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#2 = (bool){ true }
+          let Ok#1 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#2 = (bool){ true }
+          let Ok#1 = (bool){ true }
           x: (bool){ true }
         }) }
     }
@@ -793,16 +793,16 @@ Result:
       ok: (bool){ true }
       X: (_){ |((_){ _ }, (_){
           _
-          let Ok#3 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (struct){
-          let Ok#3 = (bool){ true }
+          let Ok#2 = (bool){ true }
           x: (bool){ true }
         }) }
       foo: (_){ |((_){ _ }, (_){
           _
-          let Ok#3 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (struct){
-          let Ok#3 = (bool){ true }
+          let Ok#2 = (bool){ true }
           x: (bool){ true }
         }) }
     }
@@ -916,6 +916,15 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
+@@ -112,7 +105,7 @@
+           }
+           out: (string){ "foo" }
+         }
+-        let res#1 = (struct){
++        let res#0 = (struct){
+           out: (string){ "foo" }
+         }
+         out: (string){ "foo" }
 @@ -151,12 +144,7 @@
      //     ./in.cue:15:4
      //     ./in.cue:15:27
@@ -952,15 +961,74 @@ diff old new
      }
      inList2: (struct){
        x: (int){ 0 }
-@@ -402,7 +387,7 @@
-           let Ok#2 = (bool){ true }
+@@ -389,10 +374,10 @@
+           _ok: (bool){ bool }
          }, (#struct){
            _ok: (bool){ true }
+-          let Ok#2 = (bool){ true }
+-        }, (#struct){
+-          _ok: (bool){ true }
+-          let Ok#2 = (bool){ true }
++          let Ok#1 = (bool){ true }
++        }, (#struct){
++          _ok: (bool){ true }
++          let Ok#1 = (bool){ true }
+           x: (bool){ true }
+         }) }
+       foo: (#struct){ |((#struct){
+@@ -399,10 +384,10 @@
+           _ok: (bool){ bool }
+         }, (#struct){
+           _ok: (bool){ true }
+-          let Ok#2 = (bool){ true }
+-        }, (#struct){
+-          _ok: (bool){ true }
 -          let Ok#2multi = 〈0;_ok〉
-+          let Ok#2 = (bool){ true }
++          let Ok#1 = (bool){ true }
++        }, (#struct){
++          _ok: (bool){ true }
++          let Ok#1 = (bool){ true }
            x: (bool){ true }
          }) }
        bar: (#struct){ |((#struct){
+@@ -409,10 +394,10 @@
+           _ok: (bool){ bool }
+         }, (#struct){
+           _ok: (bool){ true }
+-          let Ok#2 = (bool){ true }
+-        }, (#struct){
+-          _ok: (bool){ true }
+-          let Ok#2 = (bool){ true }
++          let Ok#1 = (bool){ true }
++        }, (#struct){
++          _ok: (bool){ true }
++          let Ok#1 = (bool){ true }
+           x: (bool){ true }
+         }) }
+     }
+@@ -420,16 +405,16 @@
+       ok: (bool){ true }
+       X: (_){ |((_){ _ }, (_){
+           _
+-          let Ok#3 = (bool){ true }
+-        }, (struct){
+-          let Ok#3 = (bool){ true }
++          let Ok#2 = (bool){ true }
++        }, (struct){
++          let Ok#2 = (bool){ true }
+           x: (bool){ true }
+         }) }
+       foo: (_){ |((_){ _ }, (_){
+           _
+-          let Ok#3 = (bool){ true }
+-        }, (struct){
+-          let Ok#3 = (bool){ true }
++          let Ok#2 = (bool){ true }
++        }, (struct){
++          let Ok#2 = (bool){ true }
+           x: (bool){ true }
+         }) }
+     }
 @@ -437,9 +422,7 @@
    issue3891: (struct){
      reduced: (struct){
@@ -1591,10 +1659,10 @@ Result:
           ][0]
           out: 〈0;_msgSwitch〉.msg
         }
-        let res#1 = {
+        let res#0 = {
           out: (〈1;_res〉 & {}).out
         }
-        out: 〈0;let res#1〉.out
+        out: 〈0;let res#0〉.out
       }
     }
   }
@@ -1964,9 +2032,9 @@ Result:
         _ok: bool
         ({}|{
           _ok: true
-          let Ok#2 = 〈0;_ok〉
+          let Ok#0 = 〈0;_ok〉
           ({}|{
-            x: 〈1;let Ok#2〉
+            x: 〈1;let Ok#0〉
           })
         })
       }
@@ -1979,9 +2047,9 @@ Result:
     t2: {
       ok: true
       X: (_|{
-        let Ok#3 = 〈1;ok〉
+        let Ok#1 = 〈1;ok〉
         (_|{
-          x: 〈1;let Ok#3〉
+          x: 〈1;let Ok#1〉
         })
       })
       foo: (〈0;X〉 & {

@@ -98,10 +98,10 @@ func ExampleConstrain() {
 	// error: nil
 	// validate: nil
 	// validate: 2 errors in empty disjunction:
-	// conflicting values {let jsonFile#1==~".json$",Filename:jsonFile,OptFile?:jsonFile,MinCount:(>0 & <=MaxCount),MaxCount:<=10000} and null (mismatched types struct and null)
+	// conflicting values {let jsonFile#0==~".json$",Filename:jsonFile,OptFile?:jsonFile,MinCount:(>0 & <=MaxCount),MaxCount:<=10000} and null (mismatched types struct and null)
 	// MinCount: invalid value 39 (out of bound <=12)
 	// validate: 2 errors in empty disjunction:
-	// conflicting values {let jsonFile#1==~".json$",Filename:jsonFile,OptFile?:jsonFile,MinCount:(>0 & <=MaxCount),MaxCount:<=10000} and null (mismatched types struct and null)
+	// conflicting values {let jsonFile#0==~".json$",Filename:jsonFile,OptFile?:jsonFile,MinCount:(>0 & <=MaxCount),MaxCount:<=10000} and null (mismatched types struct and null)
 	// Filename: invalid value "foo.jso" (out of bound =~".json$")
 }
 

@@ -2025,7 +2025,7 @@ Retain: 0
 Unifications: 1001
 Conjuncts:    1001
 Disjuncts:    0
--- out/eval --
+-- out/evalalpha --
 (struct){
   f1: (string){ string }
   f2: (string){ string }

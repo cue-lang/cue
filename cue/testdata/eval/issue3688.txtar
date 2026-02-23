@@ -129,7 +129,7 @@ Retain: 37
 Unifications: 82
 Conjuncts:    246
 Disjuncts:    139
--- out/eval --
+-- out/evalalpha --
 (struct){
   #TypeA: ((string|struct)){ |((string){ string }, (#struct){
       foo: (int){ int }

@@ -117,7 +117,7 @@ func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, cf
 		str := value.Make(ctxt, d.Node).Path().String()
 
 		if i := d.Import(); i != nil {
-			path := i.ImportPath.StringValue(ctxt)
+			path := i.ImportPath.StringValue()
 			str = fmt.Sprintf("%q.%s", path, str)
 		} else if d.Node.IsDetached() {
 			str = "**non-rooted**"
@@ -161,13 +161,13 @@ func TestX(t *testing.T) {
 
 	r, n := value.ToInternal(aVal)
 
-	out := debug.NodeString(r, n, nil)
+	out := debug.NodeString(n, nil)
 	t.Error(out)
 
 	ctxt := eval.NewContext(r, n)
 
 	for c := range n.LeafConjuncts() {
-		str := debug.NodeString(ctxt, c.Elem(), nil)
+		str := debug.NodeString(c.Elem(), nil)
 		t.Log(str)
 	}
 

@@ -54,7 +54,7 @@ Retain: 24
 Unifications: 98
 Conjuncts:    154
 Disjuncts:    98
--- out/eval --
+-- out/evalalpha --
 Errors:
 regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
     ./in.cue:2:7

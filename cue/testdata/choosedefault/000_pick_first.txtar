@@ -30,7 +30,7 @@ Retain: 0
 Unifications: 6
 Conjuncts:    11
 Disjuncts:    11
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: ((bool|int|string)){ |(*(int){ 5 }, (string){ "a" }, (bool){ true }) }
   b: (struct){

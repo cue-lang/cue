@@ -74,7 +74,7 @@ Retain: 0
 Unifications: 56
 Conjuncts:    132
 Disjuncts:    98
--- out/eval --
+-- out/evalalpha --
 (struct){
   issue700: (struct){
     a: (struct){

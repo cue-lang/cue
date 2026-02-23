@@ -44,7 +44,7 @@ Retain: 0
 Unifications: 41
 Conjuncts:    134
 Disjuncts:    81
--- out/eval --
+-- out/evalalpha --
 (struct){
   #simple: (#struct){
     peso: (int){ |(*(int){ 1 }, (int){ int }) }

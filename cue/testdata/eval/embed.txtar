@@ -134,7 +134,7 @@ Disjuncts:    122
 MisalignedConjunct: 15
 
 NumCloseIDs: 4
--- out/eval --
+-- out/evalalpha --
 Errors:
 fieldNotAllowed.t1.addTwo.objs.extra: field not allowed:
     ./noclose.cue:26:5

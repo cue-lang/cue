@@ -26,7 +26,7 @@ Retain: 0
 Unifications: 6
 Conjuncts:    30
 Disjuncts:    24
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (int){ |(*(int){ 1 }, (int){ int }) }
   b: (int){ |(*(int){ 3 }, (int){ int }) }

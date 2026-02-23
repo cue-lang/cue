@@ -70,7 +70,7 @@ Retain: 0
 Unifications: 24
 Conjuncts:    26
 Disjuncts:    24
--- out/eval --
+-- out/evalalpha --
 Errors:
 divZero: failed arithmetic: division by zero:
     ./in.cue:8:10

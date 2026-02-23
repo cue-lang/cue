@@ -21,7 +21,7 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    5
--- out/eval --
+-- out/evalalpha --
 (struct){
   #dev: (int){ int }
   "#dev": (int){ int }

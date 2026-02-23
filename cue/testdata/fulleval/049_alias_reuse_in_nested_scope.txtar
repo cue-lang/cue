@@ -26,10 +26,10 @@ Retain: 10
 Unifications: 29
 Conjuncts:    40
 Disjuncts:    29
--- out/eval --
+-- out/evalalpha --
 (struct){
   #Foo: (#struct){
-    let X#1 = (_|_){
+    let X#0 = (_|_){
       // [incomplete] empty list in call to or:
       //     ./in.cue:2:10
     }
@@ -40,7 +40,7 @@ Disjuncts:    29
   }
   #A: (#struct){
     foo: (string){ "key" }
-    let X#2 = (string){ "key" }
+    let X#1 = (string){ "key" }
     a: (#struct){
       foo: (#struct){
       }
@@ -48,7 +48,7 @@ Disjuncts:    29
   }
   #B: (#struct){
     foo: (string){ string }
-    let X#3 = (string){ string }
+    let X#2 = (string){ string }
     a: (#struct){
       foo: (#struct){
       }
@@ -56,7 +56,7 @@ Disjuncts:    29
   }
   b: (#struct){
     foo: (string){ "key" }
-    let X#3 = (string){ "key" }
+    let X#2 = (string){ "key" }
     a: (#struct){
       foo: (#struct){
       }
@@ -67,30 +67,30 @@ Disjuncts:    29
 --- in.cue
 {
   #Foo: {
-    let X#1 = or([
+    let X#0 = or([
       for k, _ in {} {
         〈1;k〉
       },
     ])
     connection: {
-      [〈1;let X#1〉]: 〈1;let X#1〉
+      [〈1;let X#0〉]: 〈1;let X#0〉
     }
   }
   #A: {
     foo: "key"
-    let X#2 = 〈0;foo〉
+    let X#1 = 〈0;foo〉
     a: {
       foo: {
-        [〈2;let X#2〉]: 〈2;let X#2〉
+        [〈2;let X#1〉]: 〈2;let X#1〉
       }
     }
   }
   #B: {
     foo: string
-    let X#3 = 〈0;foo〉
+    let X#2 = 〈0;foo〉
     a: {
       foo: {
-        [〈2;let X#3〉]: 〈2;let X#3〉
+        [〈2;let X#2〉]: 〈2;let X#2〉
       }
     }
   }

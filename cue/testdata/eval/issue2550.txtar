@@ -12,8 +12,8 @@ if bar.missing == "x" {
   foo: string
   bar: close({})
   if (〈0;bar〉.missing == "x") {
-    let _bar#1 = 〈1;bar〉
-    foo: 〈0;let _bar#1〉
+    let _bar#0 = 〈1;bar〉
+    foo: 〈0;let _bar#0〉
   }
 }
 -- out/eval/stats --
@@ -54,7 +54,7 @@ Result:
   foo: (string){ string }
   bar: (#struct){
   }
-  let _bar#1multi = 〈1;bar〉
+  let _bar#0multi = 〈1;bar〉
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -65,5 +65,5 @@ diff old new
    bar: (#struct){
    }
 -  let _bar#1 = (_){ _ }
-+  let _bar#1multi = 〈1;bar〉
++  let _bar#0multi = 〈1;bar〉
  }

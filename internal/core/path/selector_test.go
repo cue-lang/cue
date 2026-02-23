@@ -91,7 +91,7 @@ func TestMakeFeature(t *testing.T) {
 	for _, tc := range testCases {
 		r := runtime.New()
 		t.Run(tc.sel.String(), func(t *testing.T) {
-			got := MakeFeature(r, tc.sel).SelectorString(r)
+			got := MakeFeature(r, tc.sel).SelectorString()
 			if got != tc.str {
 				t.Errorf("got %v, want %v", got, tc.str)
 			}

@@ -30,7 +30,7 @@ Retain: 2
 Unifications: 5
 Conjuncts:    6
 Disjuncts:    6
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (int){ 1 }
   incomplete: (struct){

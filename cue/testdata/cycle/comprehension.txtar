@@ -1164,7 +1164,7 @@ Result:
   }
   issue4100: (struct){
     a: (#list){
-      let l#1 = (#list){
+      let l#0 = (#list){
         0: (int){ 0 }
       }
       0: (int){ 0 }
@@ -1286,7 +1286,7 @@ diff old new
    }
 +  issue4100: (struct){
 +    a: (#list){
-+      let l#1 = (#list){
++      let l#0 = (#list){
 +        0: (int){ 0 }
 +      }
 +      0: (int){ 0 }
@@ -2715,11 +2715,11 @@ Result:
 {
   issue4100: {
     a: {
-      let l#1 = [
+      let l#0 = [
         0,
       ]
-      if (〈0;let l#1〉 != _|_(explicit error (_|_ literal) in source)) {
-        〈1;let l#1〉[:]
+      if (〈0;let l#0〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let l#0〉[:]
       }
     }
     for _, _ in 〈0;a〉 {}

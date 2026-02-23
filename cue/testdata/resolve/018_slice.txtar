@@ -47,7 +47,7 @@ Retain: 8
 Unifications: 18
 Conjuncts:    18
 Disjuncts:    18
--- out/eval --
+-- out/evalalpha --
 Errors:
 e1: index 1 out of range:
     ./in.cue:3:5

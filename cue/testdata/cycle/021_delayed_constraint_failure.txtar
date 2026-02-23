@@ -26,7 +26,7 @@ Retain: 1
 Unifications: 4
 Conjuncts:    5
 Disjuncts:    4
--- out/eval --
+-- out/evalalpha --
 Errors:
 b: conflicting values 210 and 200:
     ./in.cue:2:4

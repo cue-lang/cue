@@ -107,7 +107,7 @@ Retain: 4
 Unifications: 60
 Conjuncts:    109
 Disjuncts:    65
--- out/eval --
+-- out/evalalpha --
 Errors:
 invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
     ./in.cue:96:22

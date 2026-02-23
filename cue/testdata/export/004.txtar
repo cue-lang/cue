@@ -25,7 +25,7 @@ Retain: 0
 Unifications: 5
 Conjuncts:    6
 Disjuncts:    5
--- out/eval --
+-- out/evalalpha --
 (struct){
   $type: (int){ 3 }
   "_": (int){ int }

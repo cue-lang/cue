@@ -84,7 +84,7 @@ Retain: 0
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    9
--- out/eval --
+-- out/evalalpha --
 (struct){
   a1: (string){ "before\n4\nafter" }
   a2: (string){ "before\n4\n" }

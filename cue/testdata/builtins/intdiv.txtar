@@ -48,7 +48,7 @@ Retain: 0
 Unifications: 29
 Conjuncts:    29
 Disjuncts:    29
--- out/eval --
+-- out/evalalpha --
 Errors:
 quoDivByZero: division by zero:
     ./in.cue:6:15

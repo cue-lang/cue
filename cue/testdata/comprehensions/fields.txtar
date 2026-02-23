@@ -72,7 +72,7 @@ Disjuncts:    30
 MisalignedConjunct: 3
 
 NumCloseIDs: 5
--- out/eval --
+-- out/evalalpha --
 (struct){
   dynamic: (struct){
     foo: (int){ 1 }

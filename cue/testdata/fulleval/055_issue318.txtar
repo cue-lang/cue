@@ -31,7 +31,7 @@ Retain: 0
 Unifications: 8
 Conjuncts:    9
 Disjuncts:    8
--- out/eval --
+-- out/evalalpha --
 Errors:
 #T.out1: invalid interpolation: undefined field: y:
     ./in.cue:3:8

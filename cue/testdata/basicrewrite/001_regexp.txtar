@@ -56,7 +56,7 @@ Retain: 0
 Unifications: 16
 Conjuncts:    25
 Disjuncts:    16
--- out/eval --
+-- out/evalalpha --
 Errors:
 e3: conflicting values !="a" and <5 (mismatched types string and number):
     ./in.cue:22:5

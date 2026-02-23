@@ -28,7 +28,7 @@ Retain: 0
 Unifications: 3
 Conjuncts:    4
 Disjuncts:    3
--- out/eval --
+-- out/evalalpha --
 Errors:
 off: testing experiment disabled:
     ./off.cue:1:6

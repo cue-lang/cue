@@ -83,7 +83,7 @@ Retain: 26
 Unifications: 73
 Conjuncts:    152
 Disjuncts:    97
--- out/eval --
+-- out/evalalpha --
 Errors:
 o3.a: 2 errors in empty disjunction:
 o3.a: conflicting values "bar" and "foo":

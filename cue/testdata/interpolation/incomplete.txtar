@@ -25,7 +25,7 @@ Retain: 0
 Unifications: 7
 Conjuncts:    11
 Disjuncts:    7
--- out/eval --
+-- out/evalalpha --
 (struct){
   a: (string){ "foo" }
   b: (string){ "boo" }

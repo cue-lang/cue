@@ -85,7 +85,7 @@ diff old new
 +Unifications: 14
 +Conjuncts:    22
 +Disjuncts:    4
--- out/eval --
+-- out/evalalpha --
 (struct){
   #T: (list){
     0: (string){ "d" }

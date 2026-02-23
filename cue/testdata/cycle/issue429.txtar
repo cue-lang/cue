@@ -60,7 +60,7 @@ Conjuncts:    143
 Disjuncts:    58
 
 NumCloseIDs: 15
--- out/eval --
+-- out/evalalpha --
 Errors:
 er3.min: 2 errors in empty disjunction:
 er3.min: conflicting values 1 and 5:

@@ -41,7 +41,7 @@ Conjuncts:    26
 Disjuncts:    18
 
 NumCloseIDs: 2
--- out/eval --
+-- out/evalalpha --
 Errors:
 incompleteIndex.a: invalid index top (invalid type _):
     ./in.cue:29:7

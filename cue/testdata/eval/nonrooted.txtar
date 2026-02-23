@@ -56,7 +56,7 @@ Retain: 27
 Unifications: 47
 Conjuncts:    87
 Disjuncts:    68
--- out/eval --
+-- out/evalalpha --
 Errors:
 x: conflicting values 2 and 1:
     ./in.cue:20:14

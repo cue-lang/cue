@@ -13,7 +13,7 @@ Retain: 1
 Unifications: 5
 Conjuncts:    8
 Disjuncts:    6
--- out/eval --
+-- out/evalalpha --
 (#struct){
   root1: (int){ 1 }
   #Root1: (#struct){

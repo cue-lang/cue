@@ -198,6 +198,6 @@ b.let[]: cyclic references in let clause or alias:
     }
   }
 }
--- out/eval --
+-- out/evalalpha --
 b.let[]: cyclic references in let clause or alias:
     ./in.cue:10:10

@@ -40,7 +40,7 @@ Retain: 0
 Unifications: 8
 Conjuncts:    15
 Disjuncts:    10
--- out/eval --
+-- out/evalalpha --
 (struct){
   #def: (#struct){ |((#struct){
       Type: (string){ "B" }

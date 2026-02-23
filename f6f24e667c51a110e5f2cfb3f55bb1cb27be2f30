@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9abfa71a_f53701a3",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-23T11:23:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57eed863_6790519c",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ffb055a_29b63b6c",

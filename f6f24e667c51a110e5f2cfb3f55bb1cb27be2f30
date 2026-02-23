@@ -125,6 +125,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5c99d6d_df3cc18c",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-23T11:31:24Z",
+      "side": 1,
+      "message": "Done. Though I do think that for any sort of parser, the node should provide access to the raw bytes it has consumed.",
+      "parentUuid": "678d73a4_da20025c",
+      "revId": "f6f24e667c51a110e5f2cfb3f55bb1cb27be2f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b40bdcd7_8bda714d",

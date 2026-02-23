@@ -946,6 +946,7 @@ nextFrame:
 // to.
 func (fe *FileEvaluator) UsagesForOffset(offset int, includeDefinitions bool) []ast.Node {
 	navs := slices.Collect(fe.definitionsForOffset(offset))
+	fmt.Println("usages", offset, navs)
 
 	if len(navs) == 1 {
 		nav := navs[0]
@@ -1058,19 +1059,25 @@ func usages(navsWorklist []*navigable) {
 				// set once they've played both roles.
 				traversedNavs[child] = struct{}{}
 				targetNavs = append(targetNavs, child)
-				if parent.name != "" && child.name == "" {
-					// The transition from an unnamed child nav to a named
-					// parent nav is the place to stop.
-					//
-					//	x: (({y: 6} & {y: int}).y + 1)
-					//
-					// If the user is asking for usages of the first y, we
-					// must walk up until we find the x navigable binding
-					// and evaluate all its frames.
-					break
+				if child.name == "" {
+					if _, found := parent.resolvesTo[child]; found {
+					} else if parent.name != "" {
+						// The transition from an unnamed child nav to a named
+						// parent nav is the place to stop.
+						//
+						//	x: (({y: 6} & {y: int}).y + 1)
+						//
+						// If the user is asking for usages of the first y, we
+						// must walk up until we find the x navigable binding
+						// and evaluate all its frames.
+						fmt.Println("stopping with parent", parent.name, targetNavs)
+						fmt.Println(" ", child.frames[0].node)
+						break
+					}
 				}
 			}
 		}
+		fmt.Println("targetNavs", targetNavs)
 
 		for len(evalWorklist) > 0 {
 			nav := evalWorklist[0]
@@ -1960,6 +1967,7 @@ func (f *frame) eval() {
 			//
 			// b and c are not unified.
 			childFr.navigable.name = "__..."
+			f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
 			f.ellipses = append(f.ellipses, childFr.navigable)
 
 		case *ast.CallExpr:
@@ -2386,18 +2394,28 @@ func (f *frame) newPathFromAncestralNames(key ast.Node, keyName string) {
 		end:   key.End(),
 	}}
 	if name != "" {
-		for ; nav != nil && nav.name != ""; nav = nav.parent {
-			components = append(components, pathComponent{
-				name: nav.name,
-			})
+		for child, parent := nav, nav.parent; parent != nil; child, parent = parent, parent.parent {
+			if child.name == "" {
+				if _, found := parent.resolvesTo[child]; found {
+				} else if parent.name != "" {
+					break
+				}
+			} else {
+				nav = parent
+				components = append(components, pathComponent{
+					name: child.name,
+				})
+			}
 		}
-	}
-	if nav == nil {
-		return
 	}
 
 	slices.Reverse(components)
 	components[0].unexpanded = []*navigable{nav}
+	fmt.Println("components:")
+	for i, c := range components {
+		fmt.Println("  ", i, c.name)
+	}
+	fmt.Println(" nav", nav)
 
 	components = append(components, pathComponent{node: key})
 

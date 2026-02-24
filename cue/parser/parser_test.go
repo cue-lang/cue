@@ -694,6 +694,102 @@ else requires @experiment(try)`,
 fallback requires @experiment(try)`,
 		},
 		{
+			desc:    "else with multiple if clauses error",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				if true if false { x: 1 } else { y: 2 }
+			}`,
+			out: `@experiment(try), a: {if true if false {x: 1} else {y: 2}}
+else clause only allowed with single 'if' or 'try' clause`,
+		},
+		{
+			desc:    "else with chained try error",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				try x = val? try y = val2? { result: x } else { fallback: 0 }
+			}`,
+			out: `@experiment(try), a: {try x = val? try y = val2? {result: x} else {fallback: 0}}
+else clause only allowed with single 'if' or 'try' clause`,
+		},
+		{
+			desc:    "else with if and let error",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				if true let x = 5 { y: x } else { z: 0 }
+			}`,
+			out: `@experiment(try), a: {if true let x=5 {y: x} else {z: 0}}
+else clause only allowed with single 'if' or 'try' clause`,
+		},
+		{
+			desc:    "else with if and try error",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				if true try { x: val? } else { y: 0 }
+			}`,
+			out: `@experiment(try), a: {if true try {x: val?} else {y: 0}}
+else clause only allowed with single 'if' or 'try' clause`,
+		},
+		{
+			desc:    "else with for clause error",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				if true for x in [] { y: x } else { empty: true }
+			}`,
+			out: `@experiment(try), a: {if true for x in [] {y: x} else {empty: true}}
+expected 'fallback', found 'else'`,
+		},
+		{
+			desc:    "fallback without for clause error",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				if true { x: 1 } fallback { y: 2 }
+			}`,
+			out: `@experiment(try), a: {if true {x: 1} else {y: 2}}
+expected 'else', found 'fallback'`,
+		},
+		{
+			desc:    "single if with else allowed",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				if true { x: 1 } else { y: 2 }
+			}`,
+			out: `@experiment(try), a: {if true {x: 1} else {y: 2}}`,
+		},
+		{
+			desc:    "single try with else allowed",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				try { x: val? } else { y: 0 }
+			}`,
+			out: `@experiment(try), a: {try {x: val?} else {y: 0}}`,
+		},
+		{
+			desc:    "for with fallback allowed",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				for x in [] { y: x } fallback { empty: true }
+			}`,
+			out: `@experiment(try), a: {for x in [] {y: x} fallback {empty: true}}`,
+		},
+		{
+			desc:    "for with if and fallback allowed",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				for x in list if x > 0 { y: x } fallback { empty: true }
+			}`,
+			out: `@experiment(try), a: {for x in list if x>0 {y: x} fallback {empty: true}}`,
+		},
+		{
 			desc: "let declaration",
 			in: `{
 			let X = 42

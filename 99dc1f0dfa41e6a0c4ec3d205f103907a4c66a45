@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f1d2278_7bce4ed2",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2649,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-24T12:57:24Z",
+      "side": 1,
+      "message": "The distinction between \"fallback clause\" (that may be an `else` clause) and clause that uses the `fallback` keyword is pretty confusing to my mind. On first reading, I assumed that \"fallback clause\" meant exactly a clause with the `fallback` keyword, but that\u0027s not the case.\n\n```suggestion\nA comprehension may have an optional `fallback` or `else` clause.\n```",
+      "revId": "99dc1f0dfa41e6a0c4ec3d205f103907a4c66a45",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8155e254_2686af55",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2650,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-24T12:57:24Z",
+      "side": 1,
+      "message": "```suggestion\nwhich is evaluated and its contents yielded\n```",
+      "revId": "99dc1f0dfa41e6a0c4ec3d205f103907a4c66a45",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8058c06_073fa174",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2664,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-24T12:57:24Z",
+      "side": 1,
+      "message": "\"comprehension type\" does not seem to be well defined by this spec, and isn\u0027t obvious given that a comprehension can consist of multiple clauses of different types.\n\n\n```suggestion\nThe keyword used depends on the type of the first clause in the comprehension:\n```\n\n?",
+      "revId": "99dc1f0dfa41e6a0c4ec3d205f103907a4c66a45",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

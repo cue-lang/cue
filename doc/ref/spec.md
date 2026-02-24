@@ -2654,13 +2654,14 @@ Provides traditional if-else semantics where exactly one branch is taken.
 - With `if`: the else clause executes when the condition is false
 - With `try`: the else clause executes when the optional reference fails
 - Restriction: only allowed with a single `if` or single `try` clause
-  (no chaining, no multiple clauses)
+  (no chaining, no other clauses)
 
-**`fallback` clause**: Used with `for` iterations as a default value.
-Provides a fallback when iteration produces zero items.
-- Triggers when the source collection is empty, or when all iterations
-  are filtered out by subsequent `if` clauses
-- Restriction: requires at least one `for` clause in the comprehension
+**`fallback` clause**: Used for all other comprehension types as a default value.
+Provides a fallback when the comprehension yields zero items.
+- Triggers when the source collection is empty, when iterations are filtered out,
+  or when multiple clauses result in no values being yielded
+- Used with: `for` clauses, multiple clauses, or any combination other than
+  single `if` or single `try`
 
 The clause body is evaluated in the enclosing scope, not the comprehension's
 internal scope. Identifiers bound by `for` or `let` clauses are not accessible

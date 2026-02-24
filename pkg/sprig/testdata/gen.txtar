@@ -1,0 +1,129 @@
+-- in.cue --
+import "sprig"
+
+// Title
+t1: sprig.Title("hello world")
+
+// Untitle
+t2: sprig.Untitle("Hello World")
+
+// Substr
+t3: sprig.Substr(0, 5, "hello world")
+t4: sprig.Substr(6, -1, "hello world")
+
+// Nospace
+t5: sprig.Nospace("hello world")
+
+// Trunc
+t6: sprig.Trunc(5, "hello world")
+t7: sprig.Trunc(-5, "hello world")
+
+// Abbrev
+t8:  sprig.Abbrev(5, "hello world")
+t9:  sprig.Abbrev(3, "hello world")
+t10: sprig.Abbrev(20, "hello world")
+
+// Abbrevboth
+t11: sprig.Abbrevboth(5, 12, "1234 5678 abcdefg")
+
+// Initials
+t12: sprig.Initials("Hello World")
+
+// Wrap
+t13: sprig.Wrap(5, "this is a long string")
+
+// WrapWith
+t14: sprig.WrapWith(5, "\t", "this is a long string")
+
+// Indent
+t15: sprig.Indent(4, "hello\nworld")
+
+// Nindent
+t16: sprig.Nindent(4, "hello\nworld")
+
+// Snakecase
+t17: sprig.Snakecase("HelloWorld")
+
+// Camelcase
+t18: sprig.Camelcase("hello_world")
+
+// Kebabcase
+t19: sprig.Kebabcase("HelloWorld")
+
+// Swapcase
+t20: sprig.Swapcase("Hello World")
+
+// Plural
+t21: sprig.Plural("item", "items", 1)
+t22: sprig.Plural("item", "items", 2)
+t23: sprig.Plural("item", "items", 0)
+-- out/sprig-v3 --
+// Title
+t1: "Hello World"
+
+// Untitle
+t2: "hello world"
+
+// Substr
+t3: "hello"
+t4: "world"
+
+// Nospace
+t5: "helloworld"
+
+// Trunc
+t6: "hello"
+t7: "world"
+
+// Abbrev
+t8:  "he..."
+t9:  "hello world"
+t10: "hello world"
+
+// Abbrevboth
+t11: "...5678 a..."
+
+// Initials
+t12: "HW"
+
+// Wrap
+t13: """
+	this
+	is a
+	long
+	string
+	"""
+
+// WrapWith
+t14: "this\tis a\tlong\tstrin\tg"
+
+// Indent
+t15: """
+	    hello
+	    world
+	"""
+
+// Nindent
+t16: """
+
+	    hello
+	    world
+	"""
+
+// Snakecase
+t17: "hello_world"
+
+// Camelcase
+t18: "HelloWorld"
+
+// Kebabcase
+t19: "hello-world"
+
+// Swapcase
+t20: "hELLO wORLD"
+
+// Plural
+t21: "item"
+t22: "items"
+t23: "items"
+-- out/sprig --

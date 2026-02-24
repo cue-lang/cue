@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/goutils"
+	sv "github.com/Masterminds/semver/v3"
 	"github.com/huandu/xstrings"
 )
 
@@ -134,4 +135,43 @@ func Plural(one, many string, count int) string {
 		return one
 	}
 	return many
+}
+
+// SemverVersion holds the parsed components of a semantic version string.
+type SemverVersion struct {
+	Major      uint64 `json:"major"`
+	Minor      uint64 `json:"minor"`
+	Patch      uint64 `json:"patch"`
+	Prerelease string `json:"prerelease,omitempty"`
+	Metadata   string `json:"metadata,omitempty"`
+	Original   string `json:"original"`
+}
+
+// SemverCompare tests whether version satisfies the given constraint.
+func SemverCompare(constraint, version string) (bool, error) {
+	c, err := sv.NewConstraint(constraint)
+	if err != nil {
+		return false, err
+	}
+	v, err := sv.NewVersion(version)
+	if err != nil {
+		return false, err
+	}
+	return c.Check(v), nil
+}
+
+// Semver parses a semantic version string and returns its components.
+func Semver(version string) (*SemverVersion, error) {
+	v, err := sv.NewVersion(version)
+	if err != nil {
+		return nil, err
+	}
+	return &SemverVersion{
+		Major:      v.Major(),
+		Minor:      v.Minor(),
+		Patch:      v.Patch(),
+		Prerelease: v.Prerelease(),
+		Metadata:   v.Metadata(),
+		Original:   v.Original(),
+	}, nil
 }

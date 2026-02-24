@@ -5,6 +5,7 @@ go 1.25.0
 require (
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20251212221603-3adeb8663819
 	github.com/Masterminds/goutils v1.1.1
+	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/cockroachdb/apd/v3 v3.2.1
 	github.com/emicklei/proto v1.14.3
 	github.com/go-quicktest/qt v1.101.0

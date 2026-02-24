@@ -231,5 +231,30 @@ var p = &pkg.Package{
 				c.Ret = Plural(one, many, count)
 			}
 		},
+	}, {
+		Name: "SemverCompare",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
+		Result: adt.BoolKind,
+		Func: func(c *pkg.CallCtxt) {
+			constraint, version := c.String(0), c.String(1)
+			if c.Do() {
+				c.Ret, c.Err = SemverCompare(constraint, version)
+			}
+		},
+	}, {
+		Name: "Semver",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StructKind,
+		Func: func(c *pkg.CallCtxt) {
+			version := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = Semver(version)
+			}
+		},
 	}},
 }

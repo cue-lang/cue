@@ -476,6 +476,8 @@ func (g *generator) adtKind(typ types.Type) string {
 		return "adt.StructKind"
 	case "*cuelang.org/go/pkg/net.ParsedCIDR":
 		return "adt.StructKind"
+	case "*cuelang.org/go/pkg/sprig.SemverVersion":
+		return "adt.StructKind"
 	}
 	log.Fatal("adtKind: unhandled Go type ", typ.String())
 	return ""

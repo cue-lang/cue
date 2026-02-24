@@ -36,8 +36,8 @@ command: gen: exec.Run & {
 			"out/foo.yaml":         {contents: foo: "as yaml"}
 			"out/foo.json":         {contents: foo: "as json"}
 			"out/foo.toml":         {contents: foo: "as toml"}
-			"out/foo.txt":          {contents: "plain text\n"}
-			"out/foo-noext":        {contents: "plain text\n"}
+			"out/foo.txt":          {contents: "plain text"}
+			"out/foo-noext":        {contents: "plain text"}
 			"out/link.yaml":        {type: "symlink", contents: "foo.yaml"}
 			"out/sub/dir/foo.yaml": {type: "file", contents: foo: "in nested dir"}
 		}

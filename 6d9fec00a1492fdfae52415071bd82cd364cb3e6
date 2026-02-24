@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e18ceaed_eb0fa33e",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 2674,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-24T15:26:12Z",
+      "side": 1,
+      "message": "Given that most of the other clauses are named after a specific keyword, how about:\n\n\n\n```suggestion\nComprehension       \u003d Clauses StructLit [ ElseClause | FallbackClause ] .\n```\n\nand further down:\n\n```\nFallbackClause \u003d \"fallback\" StructLit .\nElseClause \u003d \"else\" StructLit .\n```\n\nThat might make it easier to do `else if` later, perhaps.",
+      "revId": "6d9fec00a1492fdfae52415071bd82cd364cb3e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+# Test the various features of "cue exp writefs" via "cue cmd".
+
+exists out/to-remove.json
+exists out/do-not-remove.md
+
+[!symlink] skip 'symlinks not supported'
+
+exec cue cmd gen
+cmp out/foo.yaml expect-yaml
+cmp out/foo.json expect-json
+cmp out/foo.toml expect-toml
+cmp out/foo.txt expect-txt
+cmp out/foo-noext expect-txt
+cmp out/link.yaml expect-yaml
+cmp out/sub/dir/foo.yaml expect-nested-yaml
+
+! exists out/to-remove.json
+exists out/do-not-remove.md
+
+-- out/to-remove.json --
+-- out/do-not-remove.md --
+-- gen_tool.cue --
+package p
+
+import (
+	"encoding/json"
+	"tool/exec"
+)
+
+command: gen: exec.Run & {
+	cmd: ["cue", "exp", "writefs"]
+	stdin: json.Marshal({
+		tool: "cue cmd gen"
+		remove: ["out/*.json"]
+		create: {
+			"out/foo.yaml":         {contents: foo: "as yaml"}
+			"out/foo.json":         {contents: foo: "as json"}
+			"out/foo.toml":         {contents: foo: "as toml"}
+			"out/foo.txt":          {contents: "plain text\n"}
+			"out/foo-noext":        {contents: "plain text\n"}
+			"out/link.yaml":        {type: "symlink", contents: "foo.yaml"}
+			"out/sub/dir/foo.yaml": {type: "file", contents: foo: "in nested dir"}
+		}
+	})
+}
+
+-- expect-yaml --
+# Code generated cue cmd gen; DO NOT EDIT.
+
+foo: as yaml
+-- expect-json --
+{
+    "foo": "as json"
+}
+-- expect-toml --
+# Code generated cue cmd gen; DO NOT EDIT.
+
+foo = 'as toml'
+-- expect-txt --
+plain text
+-- expect-nested-yaml --
+# Code generated cue cmd gen; DO NOT EDIT.
+
+foo: in nested dir

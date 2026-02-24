@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93bb839d_91c5628d",
+        "filename": "cmd/cue/cmd/testdata/script/issue3464.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-24T11:10:06Z",
+      "side": 1,
+      "message": "nit: if we\u0027re doing the vertical alignment of the flags and files, which does help with readability, then try to stick with it even when some of the commands use `!` at the start. or you could even try aligning the `exec` lines if you wish.",
+      "revId": "534d8e8faddceaa596ce0786daec502937dca1ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -10,6 +10,7 @@ cmp out/foo.yaml expect-yaml
 cmp out/foo.json expect-json
 cmp out/foo.toml expect-toml
 cmp out/foo.txt expect-txt
+cmp out/foo.custom expect-yaml
 cmp out/link.yaml expect-yaml
 cmp out/sub/dir/foo.yaml expect-nested-yaml
 
@@ -36,8 +37,9 @@ command: gen: exec.Run & {
 			"out/foo.json":         {contents: foo: "as json"}
 			"out/foo.toml":         {contents: foo: "as toml"}
 			"out/foo.txt":          {contents: "plain text"}
+			"out/foo.custom":       {encoding: "yaml", contents: foo: "as yaml"}
 			"out/link.yaml":        {type: "symlink", contents: "foo.yaml"}
-			"out/sub/dir/foo.yaml": {contents: foo: "in nested dir"}
+			"out/sub/dir/foo.yaml": {type: "file", contents: foo: "in nested dir"}
 		}
 	})
 }

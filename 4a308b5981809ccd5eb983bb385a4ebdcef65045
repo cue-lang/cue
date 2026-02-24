@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bc4cd39_4911ba78",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-24T11:11:49Z",
+      "side": 1,
+      "message": "please name this e.g. objsLoop, to be more consistent with Go\u0027s naming conventions",
+      "revId": "4a308b5981809ccd5eb983bb385a4ebdcef65045",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cdaf135_4bab1503",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-24T11:11:49Z",
+      "side": 1,
+      "message": "how about:\n\n```\nlit, _ :\u003d expr.(*ast.BasicLit)\nisNull :\u003d lit !\u003d nil \u0026\u0026 lit.Value \u003d\u003d \"null\"\n```",
+      "revId": "4a308b5981809ccd5eb983bb385a4ebdcef65045",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40b11ca0_fc648028",
+        "filename": "cmd/cue/cmd/testdata/script/issue289.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-24T11:11:49Z",
+      "side": 1,
+      "message": "we can probably remove this TODO now, as we no longer fail",
+      "revId": "4a308b5981809ccd5eb983bb385a4ebdcef65045",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

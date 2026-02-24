@@ -16,6 +16,24 @@
       "message": "I don\u0027t think this logic is right; we should require the first clause to be a \"for\".\n\nin other words, `for ... if ... fallback` should work, but `if ... for ... fallback` should not work.\n\nor if it should work, then that must be clear in the spec and we must add a test showing how it would behave. for example:\n\n* would the fallback trigger in `if false for x in [] {} fallback { ... }`? arguably not, because we never reach the \"for\" clause.\n* why should `if ... for ... fallback ...` be allowed when `if ... fallback ...` is not?",
       "revId": "492e761f1bee6340dab68276ea291995612c069e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d082a317_59f91a4c",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1260,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-24T14:58:06Z",
+      "side": 1,
+      "message": "Q1: it should as fallback is defined to trigger if a comprehension does not yield a result.\n\nQ2: The idea is that we disallow if ... fallback ... for now as we want users to use if ... else .. which then later can morph into if ... else ... Remember that to support if ... else ..., we need to introduce a new language construct that is not a comprehension.",
+      "parentUuid": "6bdf2a8f_c0f45dea",
+      "revId": "492e761f1bee6340dab68276ea291995612c069e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

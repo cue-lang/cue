@@ -68,6 +68,8 @@ tryTryBothSucceed: {
 	try x = a? try y = b? { result: x + y } fallback { default: 0 }
 }
 
+missing?: int
+
 // try-try-fallback: first fails - fallback yields
 tryTryFirstFails: {
 	b: 2
@@ -169,15 +171,127 @@ Disjuncts:    69
 
 NumCloseIDs: 2
 -- out/evalalpha --
-tryTryFirstFails: reference "missing" not found:
-    ./in.cue:73:10
-tryTrySecondFails.try[]: reference "missing" not found:
-    ./in.cue:79:21
+(struct){
+  ifTrue: (struct){
+    a: (int){ 1 }
+  }
+  ifFalse: (struct){
+    b: (int){ 2 }
+  }
+  forNonEmpty: (struct){
+    "1": (int){ 1 }
+    "2": (int){ 2 }
+  }
+  forEmpty: (struct){
+    empty: (bool){ true }
+  }
+  forFilteredAll: (struct){
+    empty: (bool){ true }
+  }
+  forFilteredSome: (struct){
+    "2": (int){ 2 }
+    "3": (int){ 3 }
+  }
+  ifTrueForEmpty: (struct){
+    empty: (bool){ true }
+  }
+  ifFalseForNonEmpty: (struct){
+    empty: (bool){ true }
+  }
+  ifTrueForNonEmpty: (struct){
+    "1": (int){ 1 }
+    "2": (int){ 2 }
+  }
+  ifIfBothTrue: (struct){
+    a: (int){ 1 }
+  }
+  ifIfFirstFalse: (struct){
+    b: (int){ 2 }
+  }
+  ifIfSecondFalse: (struct){
+    b: (int){ 2 }
+  }
+  tryTryBothSucceed: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+    result: (int){ 3 }
+  }
+  missing?: (int){ int }
+  tryTryFirstFails: (struct){
+    b: (int){ 2 }
+    default: (int){ -1 }
+  }
+  tryTrySecondFails: (struct){
+    a: (int){ 1 }
+    default: (int){ -2 }
+  }
+  listIfTrue: (#list){
+    0: (int){ 1 }
+  }
+  listIfFalse: (#list){
+    0: (int){ 2 }
+  }
+  listForEmpty: (#list){
+    0: (int){ 0 }
+  }
+  listForNonEmpty: (#list){
+    0: (int){ 2 }
+    1: (int){ 4 }
+  }
+  elseMultipleFields: (struct){
+    b: (int){ 2 }
+    c: (int){ 3 }
+  }
+  elseEmbeds: (struct){
+    existing: (int){ 1 }
+    fallback: (int){ 3 }
+  }
+  outerScope: (struct){
+    let threshold#1 = (int){ 10 }
+    fallbackField: (int){ 10 }
+  }
+  ifNestedBody: (struct){
+    c: (int){ 2 }
+  }
+  ifNestedElse: (struct){
+    b: (struct){
+      c: (int){ 2 }
+    }
+  }
+  ifNestedBoth: (struct){
+    c: (struct){
+      d: (int){ 2 }
+    }
+  }
+  ifDeeplyNested: (struct){
+    a: (struct){
+      b: (struct){
+        c: (int){ 2 }
+      }
+    }
+  }
+  forNestedEmpty: (struct){
+    a: (struct){
+      b: (struct){
+        none: (bool){ true }
+      }
+    }
+  }
+  forNestedNonEmpty: (struct){
+    a: (struct){
+      b: (struct){
+        "1": (int){ 1 }
+      }
+    }
+  }
+  nestedOuterFallback: (struct){
+    outer: (bool){ true }
+  }
+  nestedInnerFallback: (struct){
+    inner: (bool){ true }
+  }
+}
 -- out/compile --
-tryTryFirstFails: reference "missing" not found:
-    ./in.cue:73:10
-tryTrySecondFails.try[]: reference "missing" not found:
-    ./in.cue:79:21
 --- in.cue
 {
   ifTrue: {
@@ -290,9 +404,10 @@ tryTrySecondFails.try[]: reference "missing" not found:
       default: 0
     }
   }
+  missing?: int
   tryTryFirstFails: {
     b: 2
-    try x = _|_(reference "missing" not found) try y = 〈1;b〉? {
+    try x = 〈1;missing〉? try y = 〈1;b〉? {
       result: (〈2;x〉 + 〈1;y〉)
     } else {
       default: -1
@@ -300,7 +415,7 @@ tryTrySecondFails.try[]: reference "missing" not found:
   }
   tryTrySecondFails: {
     a: 1
-    try x = 〈0;a〉? try y = _|_(reference "missing" not found) {
+    try x = 〈0;a〉? try y = 〈2;missing〉? {
       result: (〈2;x〉 + 〈1;y〉)
     } else {
       default: -2

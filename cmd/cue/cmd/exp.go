@@ -158,9 +158,11 @@ writefs takes JSON via stdin in the form of
 	} | *{
 		type: "file"
 
-		// If filepath has a supported file extension, such as .yaml or .json,
-		// this is an arbitrary concrete value written in that encoding.
-		// Otherwise, this is a string written as-is.
+		// encoding can be set to a filetype like "text", "json", or "yaml"
+		// to control how the arbitrary concrete value in contents is encoded.
+		// When unset, the filepath extension is used to infer an encoding,
+		// with a fallback to "text" for filepaths with no extension.
+		encoding?: string
 		contents!: _
 	}
 
@@ -186,6 +188,7 @@ For example, this tool can be used via "cue cmd" as follows:
 
 type writefsFile struct {
 	Type     string          `json:"type"`
+	Encoding string          `json:"encoding"`
 	Contents json.RawMessage `json:"contents"`
 }
 
@@ -240,9 +243,9 @@ func runExpWritefs(cmd *Command, args []string) error {
 				return fmt.Errorf("failed to symlink %s -> %s: %v", fp, target, err)
 			}
 		case "file", "": // empty if omitted, as it's the default
-			fenc := ""
-			if filepath.Ext(fp) == "" {
-				// Fall back to text when there is no extension, which is a useful default
+			fenc := f.Encoding
+			if fenc == "" && filepath.Ext(fp) == "" {
+				// Fall back to text when there is no encoding nor extension, which is a useful default
 				// without causing issues when we add more encodings with extensions in the future.
 				fenc = "text"
 			}

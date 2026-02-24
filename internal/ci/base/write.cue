@@ -64,9 +64,11 @@ uniqueWorkflowNames: self={
 		// and this carries forward the semantics we've had in a few repos for a while.
 		type: "file"
 
-		// If filepath has a supported file extension, such as .yaml or .json,
-		// this is an arbitrary concrete value written in that encoding.
-		// Otherwise, this is a string written as-is.
+		// encoding can be set to a filetype like "text", "json", or "yaml"
+		// to control how the arbitrary concrete value in contents is encoded.
+		// When unset, the filepath extension is used to infer an encoding,
+		// with a fallback to "text" for filepaths with no extension.
+		encoding?: string
 		contents!: _
 	}
 }

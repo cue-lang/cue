@@ -43,37 +43,41 @@ FallbackClause      = "fallback" StructLit .
 
 ### Requirement: Keyword-clause validation
 
-The parser SHALL validate that the correct keyword is used based on the preceding clause type:
-- `else` is valid only after `if` or `try` clauses
-- `fallback` is valid only after `for` clauses
+The parser SHALL validate that the correct keyword is used based on the clause composition:
+- `else` is used with a single `if` or single `try` clause
+- `fallback` is used with everything else (multiple clauses, `for` clauses, or combinations)
 
-#### Scenario: else after if accepted
+#### Scenario: else with single if accepted
 - **WHEN** the input is `if enabled { a: 1 } else { b: 2 }`
 - **THEN** the parser SHALL accept this as valid
 
-#### Scenario: fallback after if rejected
-- **WHEN** the input is `if enabled { a: 1 } fallback { b: 2 }`
-- **THEN** the parser SHALL report an error: "use 'else' with 'if' clauses"
+#### Scenario: else with single try accepted
+- **WHEN** the input is `try { a: x? } else { b: 2 }`
+- **THEN** the parser SHALL accept this as valid
 
-#### Scenario: fallback after for accepted
+#### Scenario: fallback with single if rejected
+- **WHEN** the input is `if enabled { a: 1 } fallback { b: 2 }`
+- **THEN** the parser SHALL report an error: "use 'else' with single 'if' or 'try' clause"
+
+#### Scenario: fallback with single try rejected
+- **WHEN** the input is `try { a: x? } fallback { b: 2 }`
+- **THEN** the parser SHALL report an error: "use 'else' with single 'if' or 'try' clause"
+
+#### Scenario: fallback with for accepted
 - **WHEN** the input is `for x in list { (x): true } fallback { empty: true }`
 - **THEN** the parser SHALL accept this as valid
 
-#### Scenario: else after for rejected
+#### Scenario: else with for rejected
 - **WHEN** the input is `for x in list { (x): true } else { empty: true }`
-- **THEN** the parser SHALL report an error: "use 'fallback' with 'for' clauses"
-
-#### Scenario: fallback after try rejected
-- **WHEN** the input is `try { a: x? } fallback { b: 2 }`
-- **THEN** the parser SHALL report an error: "use 'else' with 'try' clauses"
+- **THEN** the parser SHALL report an error: "use 'fallback' for comprehensions with multiple clauses or 'for' clauses"
 
 ### Requirement: Else and fallback clause restrictions
 
 To avoid ambiguous semantics, the system SHALL enforce the following restrictions:
 - `else` is only allowed with a single `if` clause or single `try` clause
-- `fallback` requires at least one `for` clause to be present in the comprehension
+- `fallback` is used for all other cases (multiple clauses, `for` clauses, or combinations)
 
-**Rationale**: With multiple clauses, it becomes ambiguous which clause the else applies to. Restricting `else` to a single guard clause and requiring `for` for `fallback` keeps the semantics clear and predictable.
+**Rationale**: The `else` keyword implies a binary choice, which only makes sense with a single conditional clause. For all other cases, `fallback` provides clear semantics: execute when the comprehension yields zero values.
 
 #### Scenario: else with single if clause accepted
 - **WHEN** the input is `if enabled { a: 1 } else { b: 2 }`
@@ -85,27 +89,27 @@ To avoid ambiguous semantics, the system SHALL enforce the following restriction
 
 #### Scenario: else with two if clauses rejected
 - **WHEN** the input is `if cond1 if cond2 { a: 1 } else { b: 2 }`
-- **THEN** the parser SHALL report an error: "else clause only allowed with single 'if' or 'try' clause"
+- **THEN** the parser SHALL report an error: "use 'fallback' for comprehensions with multiple clauses or 'for' clauses"
 
 #### Scenario: else with chained try clauses rejected
 - **WHEN** the input is `try x = a? try y = b? { result: x + y } else { fallback: 0 }`
-- **THEN** the parser SHALL report an error: "else clause only allowed with single 'if' or 'try' clause"
+- **THEN** the parser SHALL report an error: "use 'fallback' for comprehensions with multiple clauses or 'for' clauses"
 
 #### Scenario: else with mixed if and try rejected
 - **WHEN** the input is `try x = a? if x > 0 { result: x } else { zero: true }`
-- **THEN** the parser SHALL report an error: "else clause only allowed with single 'if' or 'try' clause"
+- **THEN** the parser SHALL report an error: "use 'fallback' for comprehensions with multiple clauses or 'for' clauses"
 
 #### Scenario: else with if followed by for rejected
 - **WHEN** the input is `if true for x in {} { x } else { a: 1 }`
-- **THEN** the parser SHALL report an error indicating else not allowed with for clauses
+- **THEN** the parser SHALL report an error: "use 'fallback' for comprehensions with multiple clauses or 'for' clauses"
 
 #### Scenario: else with try followed by for rejected
 - **WHEN** the input is `try x = a? for y in [x] { y } else { empty: true }`
-- **THEN** the parser SHALL report an error indicating else not allowed with for clauses; use fallback instead
+- **THEN** the parser SHALL report an error: "use 'fallback' for comprehensions with multiple clauses or 'for' clauses"
 
 #### Scenario: else with if and let rejected
 - **WHEN** the input is `if enabled let x = value { a: x } else { b: 2 }`
-- **THEN** the parser SHALL report an error: "else clause not allowed with let clauses"
+- **THEN** the parser SHALL report an error: "use 'fallback' for comprehensions with multiple clauses or 'for' clauses"
 
 #### Scenario: fallback with for clause accepted
 - **WHEN** the input is `for x in list { x } fallback { empty: true }`
@@ -117,6 +121,14 @@ To avoid ambiguous semantics, the system SHALL enforce the following restriction
 
 #### Scenario: fallback with for and let clauses accepted
 - **WHEN** the input is `for x in list let y = x * 2 { y } fallback { empty: true }`
+- **THEN** the parser SHALL accept this as valid
+
+#### Scenario: fallback with two if clauses accepted
+- **WHEN** the input is `if cond1 if cond2 { a: 1 } fallback { b: 2 }`
+- **THEN** the parser SHALL accept this as valid
+
+#### Scenario: fallback with two try clauses accepted
+- **WHEN** the input is `try x = a? try y = b? { result: x + y } fallback { default: 0 }`
 - **THEN** the parser SHALL accept this as valid
 
 ### Requirement: Single else or fallback clause limit

@@ -700,8 +700,8 @@ fallback requires @experiment(try)`,
 			a: {
 				if true if false { x: 1 } else { y: 2 }
 			}`,
-			out: `@experiment(try), a: {if true if false {x: 1} else {y: 2}}
-else clause only allowed with single 'if' or 'try' clause`,
+			out: `@experiment(try), a: {if true if false {x: 1} fallback {y: 2}}
+use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "else with chained try error",
@@ -710,8 +710,8 @@ else clause only allowed with single 'if' or 'try' clause`,
 			a: {
 				try x = val? try y = val2? { result: x } else { fallback: 0 }
 			}`,
-			out: `@experiment(try), a: {try x = val? try y = val2? {result: x} else {fallback: 0}}
-else clause only allowed with single 'if' or 'try' clause`,
+			out: `@experiment(try), a: {try x = val? try y = val2? {result: x} fallback {fallback: 0}}
+use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "else with if and let error",
@@ -720,8 +720,8 @@ else clause only allowed with single 'if' or 'try' clause`,
 			a: {
 				if true let x = 5 { y: x } else { z: 0 }
 			}`,
-			out: `@experiment(try), a: {if true let x=5 {y: x} else {z: 0}}
-else clause only allowed with single 'if' or 'try' clause`,
+			out: `@experiment(try), a: {if true let x=5 {y: x} fallback {z: 0}}
+use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "else with if and try error",
@@ -730,8 +730,8 @@ else clause only allowed with single 'if' or 'try' clause`,
 			a: {
 				if true try { x: val? } else { y: 0 }
 			}`,
-			out: `@experiment(try), a: {if true try {x: val?} else {y: 0}}
-else clause only allowed with single 'if' or 'try' clause`,
+			out: `@experiment(try), a: {if true try {x: val?} fallback {y: 0}}
+use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "else with for clause error",
@@ -740,8 +740,8 @@ else clause only allowed with single 'if' or 'try' clause`,
 			a: {
 				if true for x in [] { y: x } else { empty: true }
 			}`,
-			out: `@experiment(try), a: {if true for x in [] {y: x} else {empty: true}}
-expected 'fallback', found 'else'`,
+			out: `@experiment(try), a: {if true for x in [] {y: x} fallback {empty: true}}
+use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "fallback without for clause error",
@@ -751,7 +751,7 @@ expected 'fallback', found 'else'`,
 				if true { x: 1 } fallback { y: 2 }
 			}`,
 			out: `@experiment(try), a: {if true {x: 1} else {y: 2}}
-expected 'else', found 'fallback'`,
+use 'else' with single 'if' or 'try' clause`,
 		},
 		{
 			desc:    "single if with else allowed",
@@ -788,6 +788,33 @@ expected 'else', found 'fallback'`,
 				for x in list if x > 0 { y: x } fallback { empty: true }
 			}`,
 			out: `@experiment(try), a: {for x in list if x>0 {y: x} fallback {empty: true}}`,
+		},
+		{
+			desc:    "if with for and fallback allowed",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				if true for x in list { y: x } fallback { empty: true }
+			}`,
+			out: `@experiment(try), a: {if true for x in list {y: x} fallback {empty: true}}`,
+		},
+		{
+			desc:    "two if clauses with fallback allowed",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				if cond1 if cond2 { a: 1 } fallback { b: 2 }
+			}`,
+			out: `@experiment(try), a: {if cond1 if cond2 {a: 1} fallback {b: 2}}`,
+		},
+		{
+			desc:    "two try clauses with fallback allowed",
+			version: "v0.16.0",
+			in: `@experiment(try)
+			a: {
+				try x = a? try y = b? { result: x + y } fallback { default: 0 }
+			}`,
+			out: `@experiment(try), a: {try x = a? try y = b? {result: x+y} fallback {default: 0}}`,
 		},
 		{
 			desc: "let declaration",

@@ -1042,29 +1042,17 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 	// Compile fallback clause in the outer scope (before comprehension variables).
 	// The fallback clause should NOT have access to for/let variables.
 	if x.Fallback != nil {
-		// Validate else/fallback restrictions for programmatically created ASTs.
-		// The parser enforces these rules, but users can bypass the parser by
-		// creating AST nodes programmatically, so we validate here as well.
-		hasFor := false
-		for _, clause := range x.Clauses {
-			if _, ok := clause.(*ast.ForClause); ok {
-				hasFor = true
-				break
-			}
-		}
 		// Both 'else' (with if) and 'fallback' (with for) require the try experiment.
 		if !c.experiments.Try {
 			// Use appropriate keyword in error message based on clause type.
-			keyword := "else"
-			if hasFor {
-				keyword = "fallback"
+			keyword := "fallback"
+			if len(x.Clauses) == 1 {
+				switch x.Clauses[0].(type) {
+				case *ast.IfClause, *ast.TryClause:
+					keyword = "else"
+				}
 			}
 			return c.errf(x.Fallback, "%s clause requires the try experiment (language version v0.16.0 or later)", keyword)
-		}
-		if !hasFor && len(x.Clauses) > 1 {
-			// Can only trigger for programmatically created ASTs, as the parser
-			// enforces this rule.
-			return c.errf(x.Fallback, "invalid use of else or fallback")
 		}
 
 		// Pop all comprehension scopes temporarily to compile fallback in outer scope.

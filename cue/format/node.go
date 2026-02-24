@@ -226,6 +226,15 @@ func (f *formatter) walkClauseList(list []ast.Clause, ws whiteSpace) {
 	f.after(nil)
 }
 
+func fallbackKeyword(n *ast.Comprehension) token.Token {
+	if len(n.Clauses) > 1 {
+		return token.FALLBACK
+	} else if _, ok := n.Clauses[0].(*ast.ForClause); ok {
+		return token.FALLBACK
+	}
+	return token.ELSE
+}
+
 func (f *formatter) walkListElems(list []ast.Expr) {
 	f.before(nil)
 	for _, x := range list {
@@ -253,12 +262,7 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 			f.expr(n.Value)
 			if n.Fallback != nil {
 				// Use FALLBACK keyword for 'for' comprehensions, ELSE for 'if'/'try'
-				kw := token.ELSE
-				if len(n.Clauses) > 0 {
-					if _, ok := n.Clauses[0].(*ast.ForClause); ok {
-						kw = token.FALLBACK
-					}
-				}
+				kw := fallbackKeyword(n)
 				f.print(blank, n.Fallback.Fallback, kw, blank)
 				f.expr(n.Fallback.Body)
 			}
@@ -506,12 +510,7 @@ func (f *formatter) embedding(decl ast.Expr) {
 		f.expr(n.Value)
 		if n.Fallback != nil {
 			// Use FALLBACK keyword for 'for' comprehensions, ELSE for 'if'/'try'
-			kw := token.ELSE
-			if len(n.Clauses) > 0 {
-				if _, ok := n.Clauses[0].(*ast.ForClause); ok {
-					kw = token.FALLBACK
-				}
-			}
+			kw := fallbackKeyword(n)
 			f.print(blank, n.Fallback.Fallback, kw, blank)
 			f.expr(n.Fallback.Body)
 		}

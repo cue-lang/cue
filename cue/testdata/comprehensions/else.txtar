@@ -46,6 +46,40 @@ ifTrueForNonEmpty: {
 	if true for x in [1, 2] { "\(x)": x } fallback { empty: true }
 }
 
+// if-if-fallback: both true - no fallback
+ifIfBothTrue: {
+	if true if true { a: 1 } fallback { b: 2 }
+}
+
+// if-if-fallback: first false - fallback yields
+ifIfFirstFalse: {
+	if false if true { a: 1 } fallback { b: 2 }
+}
+
+// if-if-fallback: second false - fallback yields
+ifIfSecondFalse: {
+	if true if false { a: 1 } fallback { b: 2 }
+}
+
+// try-try-fallback: both succeed - no fallback
+tryTryBothSucceed: {
+	a: 1
+	b: 2
+	try x = a? try y = b? { result: x + y } fallback { default: 0 }
+}
+
+// try-try-fallback: first fails - fallback yields
+tryTryFirstFails: {
+	b: 2
+	try x = missing? try y = b? { result: x + y } fallback { default: -1 }
+}
+
+// try-try-fallback: second fails - fallback yields
+tryTrySecondFails: {
+	a: 1
+	try x = a? try y = missing? { result: x + y } fallback { default: -2 }
+}
+
 // list if-else: true
 listIfTrue: [
 	if true { 1 } else { 2 }
@@ -135,104 +169,15 @@ Disjuncts:    69
 
 NumCloseIDs: 2
 -- out/evalalpha --
-(struct){
-  ifTrue: (struct){
-    a: (int){ 1 }
-  }
-  ifFalse: (struct){
-    b: (int){ 2 }
-  }
-  forNonEmpty: (struct){
-    "1": (int){ 1 }
-    "2": (int){ 2 }
-  }
-  forEmpty: (struct){
-    empty: (bool){ true }
-  }
-  forFilteredAll: (struct){
-    empty: (bool){ true }
-  }
-  forFilteredSome: (struct){
-    "2": (int){ 2 }
-    "3": (int){ 3 }
-  }
-  ifTrueForEmpty: (struct){
-    empty: (bool){ true }
-  }
-  ifFalseForNonEmpty: (struct){
-    empty: (bool){ true }
-  }
-  ifTrueForNonEmpty: (struct){
-    "1": (int){ 1 }
-    "2": (int){ 2 }
-  }
-  listIfTrue: (#list){
-    0: (int){ 1 }
-  }
-  listIfFalse: (#list){
-    0: (int){ 2 }
-  }
-  listForEmpty: (#list){
-    0: (int){ 0 }
-  }
-  listForNonEmpty: (#list){
-    0: (int){ 2 }
-    1: (int){ 4 }
-  }
-  elseMultipleFields: (struct){
-    b: (int){ 2 }
-    c: (int){ 3 }
-  }
-  elseEmbeds: (struct){
-    existing: (int){ 1 }
-    fallback: (int){ 3 }
-  }
-  outerScope: (struct){
-    let threshold#1 = (int){ 10 }
-    fallbackField: (int){ 10 }
-  }
-  ifNestedBody: (struct){
-    c: (int){ 2 }
-  }
-  ifNestedElse: (struct){
-    b: (struct){
-      c: (int){ 2 }
-    }
-  }
-  ifNestedBoth: (struct){
-    c: (struct){
-      d: (int){ 2 }
-    }
-  }
-  ifDeeplyNested: (struct){
-    a: (struct){
-      b: (struct){
-        c: (int){ 2 }
-      }
-    }
-  }
-  forNestedEmpty: (struct){
-    a: (struct){
-      b: (struct){
-        none: (bool){ true }
-      }
-    }
-  }
-  forNestedNonEmpty: (struct){
-    a: (struct){
-      b: (struct){
-        "1": (int){ 1 }
-      }
-    }
-  }
-  nestedOuterFallback: (struct){
-    outer: (bool){ true }
-  }
-  nestedInnerFallback: (struct){
-    inner: (bool){ true }
-  }
-}
+tryTryFirstFails: reference "missing" not found:
+    ./in.cue:73:10
+tryTrySecondFails.try[]: reference "missing" not found:
+    ./in.cue:79:21
 -- out/compile --
+tryTryFirstFails: reference "missing" not found:
+    ./in.cue:73:10
+tryTrySecondFails.try[]: reference "missing" not found:
+    ./in.cue:79:21
 --- in.cue
 {
   ifTrue: {
@@ -313,6 +258,52 @@ NumCloseIDs: 2
       "\(〈1;x〉)": 〈1;x〉
     } else {
       empty: true
+    }
+  }
+  ifIfBothTrue: {
+    if true if true {
+      a: 1
+    } else {
+      b: 2
+    }
+  }
+  ifIfFirstFalse: {
+    if false if true {
+      a: 1
+    } else {
+      b: 2
+    }
+  }
+  ifIfSecondFalse: {
+    if true if false {
+      a: 1
+    } else {
+      b: 2
+    }
+  }
+  tryTryBothSucceed: {
+    a: 1
+    b: 2
+    try x = 〈0;a〉? try y = 〈1;b〉? {
+      result: (〈2;x〉 + 〈1;y〉)
+    } else {
+      default: 0
+    }
+  }
+  tryTryFirstFails: {
+    b: 2
+    try x = _|_(reference "missing" not found) try y = 〈1;b〉? {
+      result: (〈2;x〉 + 〈1;y〉)
+    } else {
+      default: -1
+    }
+  }
+  tryTrySecondFails: {
+    a: 1
+    try x = 〈0;a〉? try y = _|_(reference "missing" not found) {
+      result: (〈2;x〉 + 〈1;y〉)
+    } else {
+      default: -2
     }
   }
   listIfTrue: [

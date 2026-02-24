@@ -1237,9 +1237,9 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentSt
 }
 
 // parseFallbackClause parses an else or fallback clause in a comprehension.
-// It determines the appropriate keyword based on whether clauses contains a ForClause:
-// - Contains ForClause: expects FALLBACK, errors on ELSE
-// - No ForClause: expects ELSE, errors on FALLBACK
+// It determines the appropriate keyword based on the clause composition:
+// - Single if or try clause: expects ELSE, errors on FALLBACK
+// - Everything else: expects FALLBACK, errors on ELSE
 func (p *parser) parseFallbackClause(clauses []ast.Clause) *ast.FallbackClause {
 	if p.trace {
 		defer un(trace(p, "FallbackClause"))
@@ -1250,34 +1250,36 @@ func (p *parser) parseFallbackClause(clauses []ast.Clause) *ast.FallbackClause {
 		p.errf(p.pos, "%s requires @experiment(try)", p.tok)
 	}
 
-	// Determine clause composition
-	hasForClause := false
-	for _, clause := range clauses {
-		switch clause.(type) {
-		case *ast.ForClause:
-			hasForClause = true
+	// Determine if this is a single if or try clause
+	isSingleGuard := len(clauses) == 1
+	if isSingleGuard {
+		switch clauses[0].(type) {
+		case *ast.IfClause, *ast.TryClause:
+			// Single if or try: use else
+		default:
+			isSingleGuard = false
 		}
 	}
 
 	var pos token.Pos
-	if hasForClause {
-		// Has for clause: must use fallback
-		if p.tok == token.ELSE {
-			p.errf(p.pos, "use 'fallback' with 'for' clauses")
-		}
-		pos = p.expect(token.FALLBACK)
-	} else if len(clauses) > 1 {
-		// Multiple guard clauses: disallow else (ambiguous)
-		if p.tok == token.ELSE {
-			p.errf(p.pos, "else clause only allowed with single 'if' or 'try' clause")
-		}
-		pos = p.expect(token.ELSE) // Will fail, but consume token
-	} else {
-		// Single guard clause: use else
+	if isSingleGuard {
+		// Single if/try clause: must use else
 		if p.tok == token.FALLBACK {
-			p.errf(p.pos, "use 'else' with 'if' clauses")
+			p.errf(p.pos, "use 'else' with single 'if' or 'try' clause")
+			pos = p.pos
+			p.next()
+		} else {
+			pos = p.expect(token.ELSE)
 		}
-		pos = p.expect(token.ELSE)
+	} else {
+		// Everything else: must use fallback
+		if p.tok == token.ELSE {
+			p.errf(p.pos, "use 'fallback' for comprehensions with multiple clauses or 'for' clauses")
+			pos = p.pos
+			p.next()
+		} else {
+			pos = p.expect(token.FALLBACK)
+		}
 	}
 	body := p.parseStruct()
 	return c.closeClause(p, &ast.FallbackClause{

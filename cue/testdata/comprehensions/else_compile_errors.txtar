@@ -10,6 +10,15 @@ forVarInElse: {
 letVarInElse: {
 	for x in [1,2,3] let y = x*2 { "\(x)": y } fallback { bad: y }
 }
+
+// Note: Multiple clause cases with else are caught at parse time, not compile time:
+// - if + let with else: if cond let x = val { ... } else { ... }
+// - Two if clauses with else: if cond1 if cond2 { x } else { y }
+// - Chained try with else: try x = a? try y = b? { ... } else { ... }
+// - Mixed if/try with else: if cond try { x } else { y }
+// - if + for with else: if cond for x in [] { x } else { y }
+// These all produce parser error: "else clause only allowed with single 'if' or 'try' clause"
+// or "use 'fallback' with 'for' clauses"
 -- out/eval/stats --
 Leaks:  0
 Freed:  2

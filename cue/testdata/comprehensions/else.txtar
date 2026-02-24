@@ -31,6 +31,21 @@ forFilteredSome: {
 	for x in [1, 2, 3] if x > 1 { "\(x)": x } fallback { empty: true }
 }
 
+// if-for-fallback: if true, for empty - fallback yields
+ifTrueForEmpty: {
+	if true for x in [] { "\(x)": x } fallback { empty: true }
+}
+
+// if-for-fallback: if false, for non-empty - fallback yields (if blocks iteration)
+ifFalseForNonEmpty: {
+	if false for x in [1, 2] { "\(x)": x } fallback { empty: true }
+}
+
+// if-for-fallback: if true, for non-empty - no fallback
+ifTrueForNonEmpty: {
+	if true for x in [1, 2] { "\(x)": x } fallback { empty: true }
+}
+
 // list if-else: true
 listIfTrue: [
 	if true { 1 } else { 2 }
@@ -140,6 +155,16 @@ NumCloseIDs: 2
   forFilteredSome: (struct){
     "2": (int){ 2 }
     "3": (int){ 3 }
+  }
+  ifTrueForEmpty: (struct){
+    empty: (bool){ true }
+  }
+  ifFalseForNonEmpty: (struct){
+    empty: (bool){ true }
+  }
+  ifTrueForNonEmpty: (struct){
+    "1": (int){ 1 }
+    "2": (int){ 2 }
   }
   listIfTrue: (#list){
     0: (int){ 1 }
@@ -258,6 +283,33 @@ NumCloseIDs: 2
       2,
       3,
     ] if (〈0;x〉 > 1) {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      empty: true
+    }
+  }
+  ifTrueForEmpty: {
+    if true for _, x in [] {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      empty: true
+    }
+  }
+  ifFalseForNonEmpty: {
+    if false for _, x in [
+      1,
+      2,
+    ] {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      empty: true
+    }
+  }
+  ifTrueForNonEmpty: {
+    if true for _, x in [
+      1,
+      2,
+    ] {
       "\(〈1;x〉)": 〈1;x〉
     } else {
       empty: true

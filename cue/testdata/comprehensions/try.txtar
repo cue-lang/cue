@@ -427,7 +427,7 @@ assignmentForm: {
 
     // Multiple chained try assignments with one failing
     chainedOneFails: {
-        try x = a? try y = c? { result: x + y } else { fallback: "failed" }
+        try x = a? try y = c? { result: x + y }
     }
 
     // Assignment with real error - should propagate
@@ -461,13 +461,13 @@ recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}
 
 -- out/evalalpha/stats --
 Leaks:  53
-Freed:  355
-Reused: 308
+Freed:  354
+Reused: 307
 Allocs: 100
 Retain: 0
 
-Unifications: 401
-Conjuncts:    509
+Unifications: 400
+Conjuncts:    507
 Disjuncts:    0
 
 NumCloseIDs: 173
@@ -481,8 +481,8 @@ diff old new
 -Reused: 5
 -Allocs: 3
 +Leaks:  53
-+Freed:  355
-+Reused: 308
++Freed:  354
++Reused: 307
 +Allocs: 100
  Retain: 0
  
@@ -491,8 +491,8 @@ diff old new
 -Disjuncts:    8
 -
 -NumCloseIDs: 1
-+Unifications: 401
-+Conjuncts:    509
++Unifications: 400
++Conjuncts:    507
 +Disjuncts:    0
 +
 +NumCloseIDs: 173
@@ -870,7 +870,6 @@ Result:
       }
     }
     chainedOneFails: (struct){
-      fallback: (string){ "failed" }
     }
     withRealError: (_|_){
       // [eval]
@@ -946,7 +945,7 @@ diff old new
    }
    single: (struct){
      x: (int){ 5 }
-@@ -9,7 +41,350 @@
+@@ -9,7 +41,349 @@
      y: (int){ 10 }
    }
    fallbackDef: (int){ 42 }
@@ -1269,7 +1268,6 @@ diff old new
 +      }
 +    }
 +    chainedOneFails: (struct){
-+      fallback: (string){ "failed" }
 +    }
 +    withRealError: (_|_){
 +      // [eval]
@@ -1801,8 +1799,6 @@ diff old new
     chainedOneFails: {
       try x = 〈2;a〉? try y = 〈3;c〉? {
         result: (〈2;x〉 + 〈1;y〉)
-      } else {
-        fallback: "failed"
       }
     }
     withRealError: {

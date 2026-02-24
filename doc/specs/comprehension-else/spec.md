@@ -67,6 +67,58 @@ The parser SHALL validate that the correct keyword is used based on the precedin
 - **WHEN** the input is `try { a: x? } fallback { b: 2 }`
 - **THEN** the parser SHALL report an error: "use 'else' with 'try' clauses"
 
+### Requirement: Else and fallback clause restrictions
+
+To avoid ambiguous semantics, the system SHALL enforce the following restrictions:
+- `else` is only allowed with a single `if` clause or single `try` clause
+- `fallback` requires at least one `for` clause to be present in the comprehension
+
+**Rationale**: With multiple clauses, it becomes ambiguous which clause the else applies to. Restricting `else` to a single guard clause and requiring `for` for `fallback` keeps the semantics clear and predictable.
+
+#### Scenario: else with single if clause accepted
+- **WHEN** the input is `if enabled { a: 1 } else { b: 2 }`
+- **THEN** the parser SHALL accept this as valid
+
+#### Scenario: else with single try clause accepted
+- **WHEN** the input is `try { a: x? } else { b: 2 }`
+- **THEN** the parser SHALL accept this as valid
+
+#### Scenario: else with two if clauses rejected
+- **WHEN** the input is `if cond1 if cond2 { a: 1 } else { b: 2 }`
+- **THEN** the parser SHALL report an error: "else clause only allowed with single 'if' or 'try' clause"
+
+#### Scenario: else with chained try clauses rejected
+- **WHEN** the input is `try x = a? try y = b? { result: x + y } else { fallback: 0 }`
+- **THEN** the parser SHALL report an error: "else clause only allowed with single 'if' or 'try' clause"
+
+#### Scenario: else with mixed if and try rejected
+- **WHEN** the input is `try x = a? if x > 0 { result: x } else { zero: true }`
+- **THEN** the parser SHALL report an error: "else clause only allowed with single 'if' or 'try' clause"
+
+#### Scenario: else with if followed by for rejected
+- **WHEN** the input is `if true for x in {} { x } else { a: 1 }`
+- **THEN** the parser SHALL report an error indicating else not allowed with for clauses
+
+#### Scenario: else with try followed by for rejected
+- **WHEN** the input is `try x = a? for y in [x] { y } else { empty: true }`
+- **THEN** the parser SHALL report an error indicating else not allowed with for clauses; use fallback instead
+
+#### Scenario: else with if and let rejected
+- **WHEN** the input is `if enabled let x = value { a: x } else { b: 2 }`
+- **THEN** the parser SHALL report an error: "else clause not allowed with let clauses"
+
+#### Scenario: fallback with for clause accepted
+- **WHEN** the input is `for x in list { x } fallback { empty: true }`
+- **THEN** the parser SHALL accept this as valid
+
+#### Scenario: fallback with for and if clauses accepted
+- **WHEN** the input is `for x in list if x > 0 { x } fallback { empty: true }`
+- **THEN** the parser SHALL accept this as valid (fallback applies to the for iteration result)
+
+#### Scenario: fallback with for and let clauses accepted
+- **WHEN** the input is `for x in list let y = x * 2 { y } fallback { empty: true }`
+- **THEN** the parser SHALL accept this as valid
+
 ### Requirement: Single else or fallback clause limit
 
 A comprehension SHALL have at most one else or fallback clause. If multiple such clauses are present, the parser SHALL report an error.

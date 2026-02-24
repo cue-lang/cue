@@ -57,6 +57,14 @@ t20: sprig.Swapcase("Hello World")
 t21: sprig.Plural("item", "items", 1)
 t22: sprig.Plural("item", "items", 2)
 t23: sprig.Plural("item", "items", 0)
+
+// SemverCompare
+t24: sprig.SemverCompare("^1.2.0", "1.2.3")
+t25: sprig.SemverCompare("^1.2.0", "2.0.0")
+
+// Semver
+t26: sprig.Semver("1.2.3")
+t27: sprig.Semver("1.2.3-beta.1+c0ff33")
 -- out/sprig-v3 --
 // Title
 t1: "Hello World"
@@ -126,4 +134,24 @@ t20: "hELLO wORLD"
 t21: "item"
 t22: "items"
 t23: "items"
+
+// SemverCompare
+t24: true
+t25: false
+
+// Semver
+t26: {
+	major:    1
+	minor:    2
+	patch:    3
+	original: "1.2.3"
+}
+t27: {
+	major:      1
+	minor:      2
+	patch:      3
+	prerelease: "beta.1"
+	metadata:   "c0ff33"
+	original:   "1.2.3-beta.1+c0ff33"
+}
 -- out/sprig --

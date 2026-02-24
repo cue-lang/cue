@@ -52,6 +52,24 @@
       "parentUuid": "d082a317_59f91a4c",
       "revId": "492e761f1bee6340dab68276ea291995612c069e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "521c3c16_158c3840",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1260,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-24T16:13:02Z",
+      "side": 1,
+      "message": "this is now done",
+      "parentUuid": "e2375c9e_352adce5",
+      "revId": "492e761f1bee6340dab68276ea291995612c069e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

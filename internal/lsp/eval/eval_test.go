@@ -4514,6 +4514,196 @@ c: {
 				or1(117):     {f: []string{"d"}, e: []string{"a", "c", "x"}},
 			},
 		},
+
+		{
+			// - `else` is used only with single `if` or single `try` clause
+			// - `fallback` is used for everything else (multiple clauses, for clauses, combinations)
+			name: "Comprehension_Else",
+			archive: `-- a.cue --
+@experiment(try)
+let x = _
+if true {
+	z: _
+} else {
+	a: z
+	b: x
+}
+
+for k, v in s {
+	z: _
+} fallback {
+	a: k & v
+	b: x
+}
+
+try k = true
+let v = true {
+	z: _
+} fallback {
+	a: k & v
+	b: x
+}
+`,
+			expectDefinitions: map[position][]position{
+				// TODO: It's highly doubtful that this is what's really wanted
+				ln(6, 1, "z"): {ln(4, 1, "z"), ln(11, 1, "z"), ln(19, 1, "z")},
+
+				ln(7, 1, "x"):  {ln(2, 1, "x")},
+				ln(14, 1, "x"): {ln(2, 1, "x")},
+				ln(22, 1, "x"): {ln(2, 1, "x")},
+
+				ln(2, 1, "x"): {self},
+				ln(4, 1, "z"): {self, ln(11, 1, "z"), ln(19, 1, "z")},
+				ln(6, 1, "a"): {self, ln(13, 1, "a"), ln(21, 1, "a")},
+				ln(7, 1, "b"): {self, ln(14, 1, "b"), ln(22, 1, "b")},
+
+				ln(10, 1, "k"): {self},
+				ln(10, 1, "v"): {self},
+				ln(11, 1, "z"): {self, ln(4, 1, "z"), ln(19, 1, "z")},
+				ln(13, 1, "a"): {self, ln(6, 1, "a"), ln(21, 1, "a")},
+				ln(14, 1, "b"): {self, ln(7, 1, "b"), ln(22, 1, "b")},
+
+				ln(17, 1, "k"): {self},
+				ln(18, 1, "v"): {self},
+				ln(19, 1, "z"): {self, ln(4, 1, "z"), ln(11, 1, "z")},
+				ln(21, 1, "a"): {self, ln(6, 1, "a"), ln(13, 1, "a")},
+				ln(22, 1, "b"): {self, ln(7, 1, "b"), ln(14, 1, "b")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(16, 25):   {f: []string{"a", "b", "z"}},
+				or(25, 27):   {e: []string{"x"}},
+				or(27, 30):   {f: []string{"a", "b", "z"}},
+				or1(34):      {e: []string{"x"}},
+				or(35, 38):   {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(38, 40):   {f: []string{"a", "b", "z"}},
+				or(40, 43):   {e: []string{"x", "z"}},
+				or1(43):      {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(45, 50):   {f: []string{"a", "b", "z"}},
+				or(50, 53):   {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(53, 55):   {f: []string{"a", "b", "z"}},
+				or(55, 58):   {e: []string{"a", "b", "x"}},
+				or1(58):      {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(59, 61):   {f: []string{"a", "b", "z"}},
+				or(61, 64):   {e: []string{"a", "b", "x"}},
+				or1(64):      {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(66, 71):   {f: []string{"a", "b", "z"}},
+				or1(73):      {e: []string{"x"}},
+				or(76, 81):   {e: []string{"k", "x"}},
+				or(81, 84):   {f: []string{"a", "b", "z"}, e: []string{"k", "v", "x"}},
+				or(84, 86):   {f: []string{"a", "b", "z"}},
+				or(86, 89):   {e: []string{"k", "v", "x", "z"}},
+				or1(89):      {f: []string{"a", "b", "z"}, e: []string{"k", "v", "x"}},
+				or(91, 100):  {f: []string{"a", "b", "z"}},
+				or(100, 103): {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(103, 105): {f: []string{"a", "b", "z"}},
+				or(105, 112): {e: []string{"a", "b", "x"}},
+				or1(112):     {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(113, 115): {f: []string{"a", "b", "z"}},
+				or(115, 118): {e: []string{"a", "b", "x"}},
+				or1(118):     {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(120, 125): {f: []string{"a", "b", "z"}},
+				or(127, 129): {e: []string{"x"}},
+				or1(133):     {e: []string{"x"}},
+				or(134, 138): {e: []string{"k", "x"}},
+				or(140, 142): {e: []string{"k", "x"}},
+				or1(146):     {e: []string{"k", "x"}},
+				or(147, 150): {f: []string{"a", "b", "z"}, e: []string{"k", "v", "x"}},
+				or(150, 152): {f: []string{"a", "b", "z"}},
+				or(152, 155): {e: []string{"k", "v", "x", "z"}},
+				or1(155):     {f: []string{"a", "b", "z"}, e: []string{"k", "v", "x"}},
+				or(157, 166): {f: []string{"a", "b", "z"}},
+				or(166, 169): {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(169, 171): {f: []string{"a", "b", "z"}},
+				or(171, 178): {e: []string{"a", "b", "x"}},
+				or1(178):     {f: []string{"a", "b", "z"}, e: []string{"x"}},
+				or(179, 181): {f: []string{"a", "b", "z"}},
+				or(181, 184): {e: []string{"a", "b", "x"}},
+				or1(184):     {f: []string{"a", "b", "z"}, e: []string{"x"}},
+			},
+		},
+
+		{
+			name: "Comprehension_Else_Scopes",
+			archive: `-- a.cue --
+@experiment(try)
+out: {
+	if true {
+		x: a
+		y: b
+		c: _
+		d: _
+	} else {
+		x: c
+		y: d
+		a: _
+		b: _
+	}
+	b: _
+	d: _
+}
+`,
+			expectDefinitions: map[position][]position{
+				ln(4, 1, "a"): {},
+				ln(5, 1, "b"): {ln(12, 1, "b"), ln(14, 1, "b")},
+
+				ln(9, 1, "c"):  {},
+				ln(10, 1, "d"): {ln(7, 1, "d"), ln(15, 1, "d")},
+
+				ln(2, 1, "out"): {self},
+
+				ln(4, 1, "x"): {self, ln(9, 1, "x")},
+				ln(5, 1, "y"): {self, ln(10, 1, "y")},
+				ln(6, 1, "c"): {self},
+				ln(7, 1, "d"): {self, ln(15, 1, "d")},
+
+				ln(9, 1, "x"):  {self, ln(4, 1, "x")},
+				ln(10, 1, "y"): {self, ln(5, 1, "y")},
+				ln(11, 1, "a"): {self},
+				ln(12, 1, "b"): {self, ln(14, 1, "b")},
+
+				ln(14, 1, "b"): {self, ln(12, 1, "b")},
+				ln(15, 1, "d"): {self, ln(7, 1, "d")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(16, 21):   {f: []string{"out"}},
+				or(21, 28):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"out"}},
+				or1(32):      {e: []string{"b", "d", "out"}},
+				or(33, 37):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(37, 39):   {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(39, 42):   {e: []string{"b", "c", "d", "out", "x", "y"}},
+				or(42, 44):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(44, 46):   {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(46, 49):   {e: []string{"b", "c", "d", "out", "x", "y"}},
+				or(49, 51):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(51, 53):   {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(53, 56):   {e: []string{"b", "c", "d", "out", "x", "y"}},
+				or(56, 58):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(58, 60):   {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(60, 63):   {e: []string{"b", "c", "d", "out", "x", "y"}},
+				or(63, 65):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(66, 71):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"out"}},
+				or(71, 75):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(75, 77):   {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(77, 80):   {e: []string{"a", "b", "d", "out", "x", "y"}},
+				or(80, 82):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(82, 84):   {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(84, 87):   {e: []string{"a", "b", "d", "out", "x", "y"}},
+				or(87, 89):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(89, 91):   {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(91, 94):   {e: []string{"a", "b", "d", "out", "x", "y"}},
+				or(94, 96):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or(96, 98):   {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(98, 101):  {e: []string{"a", "b", "d", "out", "x", "y"}},
+				or(101, 103): {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},
+				or1(104):     {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"out"}},
+				or(105, 107): {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(107, 110): {e: []string{"b", "d", "out"}},
+				or1(110):     {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"out"}},
+				or(111, 113): {f: []string{"a", "b", "c", "d", "x", "y"}},
+				or(113, 116): {e: []string{"b", "d", "out"}},
+				or1(116):     {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"out"}},
+			},
+		},
 	}.run(t)
 }
 

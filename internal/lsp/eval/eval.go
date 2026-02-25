@@ -1985,6 +1985,9 @@ func (f *frame) eval() {
 		case *ast.Comprehension:
 			clause := node.Clauses[0]
 			unprocessed = append(unprocessed, clause)
+			if fallback := node.Fallback; fallback != nil {
+				f.newFrame(fallback.Body, f.navigable)
+			}
 			// We don't know how many child frames we'll need to
 			// process clause. So we stash whatever remains of this
 			// comprehension and can later find it once we've finished
@@ -2005,6 +2008,7 @@ func (f *frame) eval() {
 				// appropriate child/descendant.
 				nodeCopy := *node
 				nodeCopy.Clauses = node.Clauses[1:]
+				nodeCopy.Fallback = nil
 				comprehensionsStash[clause] = &nodeCopy
 			}
 

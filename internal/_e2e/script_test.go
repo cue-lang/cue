@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"cuelang.org/go/internal/cueconfig"
 	"github.com/rogpeppe/go-internal/testscript"
 )
 
@@ -101,8 +102,28 @@ func TestScript(t *testing.T) {
 			env.Setenv("CUE_CONFIG_DIR", configDir)
 
 			// CUE_TEST_TOKEN is a secret used by the scripts publishing to registry.cue.works.
-			// When unset, those tests would fail with an auth error.
-			if token := os.Getenv("CUE_TEST_TOKEN"); token != "" {
+			switch token := os.Getenv("CUE_TEST_TOKEN"); token {
+			case "":
+				// When unset, those tests will fail with an auth error;
+				// refuse to continue and ask the user to make a choice.
+				return fmt.Errorf("Missing $CUE_TEST_TOKEN for porcuepine; set it to a valid app token or to 'inherit'")
+			case "inherit":
+				// TODO(mvdan): if/when we have a `cue login --get-access-token`, use that instead.
+				loginsPath, err := cueconfig.LoginConfigPath(os.Getenv)
+				if err != nil {
+					return fmt.Errorf("locating ${CUE_CONFIG_DIR}/logins.json: %v", err)
+				}
+				loginsJSON, err := os.ReadFile(loginsPath)
+				if err != nil {
+					return fmt.Errorf("reading ${CUE_CONFIG_DIR}/logins.json: %v", err)
+				}
+				if err := os.MkdirAll(configDir, 0o777); err != nil {
+					return fmt.Errorf("creating new ${CUE_CONFIG_DIR}: %v", err)
+				}
+				if err := os.WriteFile(filepath.Join(configDir, "logins.json"), loginsJSON, 0o666); err != nil {
+					return fmt.Errorf("writing new ${CUE_CONFIG_DIR}/logins.json: %v", err)
+				}
+			default:
 				cmd := exec.Command("cue", "login", "--token", token)
 				cmd.Env = env.Vars // store the token in the CUE_CONFIG_DIR we just set
 				if out, err := cmd.CombinedOutput(); err != nil {

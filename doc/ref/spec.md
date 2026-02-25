@@ -2870,13 +2870,13 @@ The validator succeeds if the chosen schema unifies successfully with the value.
 
 ```
 // If value is a string, it must have length > 3; otherwise it must be > 10
-value: "hello" & matchIf(string, len(value) > 3, value > 10)  // true
+value: "hello" & matchIf(string, len(value) > 3, value > 10) // OK; len("hello") is >3
 
 // If value matches {a: int}, it must have b field; otherwise a must be a string
-x: {a: 1} & matchIf(x, {a: int}, {a: int, b: int}, {a: string})  // false: missing b
+x: {a: 1} & matchIf({a: int}, {a: int, b!: int}, {a: string}) // error; missing field b
 
 // If value is >5, it must be <10; otherwise it must be <3
-y: 2 & matchIf(y, >5, <10, <3)  // true: 2 is <=5, so <3 is checked
+y: 2 & matchIf(>5, <10, <3) // OK; 2 is <3
 ```
 
 

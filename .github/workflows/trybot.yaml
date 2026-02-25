@@ -136,7 +136,7 @@ jobs:
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.26.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: End-to-end test
         env:
-          CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
+          CUE_TEST_TOKEN: inherit
         run: |-
           cd internal/_e2e
           go test -race

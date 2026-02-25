@@ -36,7 +36,7 @@ data in a straightforward manner.
 The grammar is compact and regular, allowing for easy analysis by automatic
 tools such as integrated development environments.
 
-This document is maintained by mpvl@golang.org.
+This document is maintained by mpvl@cue.dev and the rest of the CUE team.
 CUE has a lot of similarities with the Go language. This document draws heavily
 from the Go specification as a result.
 

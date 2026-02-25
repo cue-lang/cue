@@ -46,6 +46,11 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if len(args) == 0 {
 		args = []string{"."}
 	}
+	// Note that Config is used early on to return error instances; ensure it's not nil.
+	if c == nil {
+		c = &Config{}
+	}
+
 	// TODO: This requires packages to be placed before files. At some point this
 	// could be relaxed.
 	i := 0
@@ -65,9 +70,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
 	ctx := context.TODO()
-	if c == nil {
-		c = &Config{}
-	}
 	newC, err := c.complete()
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}

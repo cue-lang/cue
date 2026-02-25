@@ -122,9 +122,10 @@ workflows: trybot: _repo.bashWorkflow & {
 		{
 			name: "End-to-end test"
 			env: {
-				// E2E_PORCUEPINE_CUE_TOKEN is a token generated on registry.cue.works
-				// as the GitHub porcuepine user, with description "e2e cue repo".
-				CUE_TEST_TOKEN: "${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}"
+				// The Central Registry login via OIDC is set up to use the "porcuepine" bot account
+				// for pushes to the protected branches master and ci/test.
+				// Inherit those credentials from ${CUE_CONFIG_DIR} in the testscript environment.
+				CUE_TEST_TOKEN: "inherit"
 			}
 			// Our regular tests run with both `go test ./...` and `go test -race ./...`.
 			// The end-to-end tests should only be run once, given the slowness and API rate limits.

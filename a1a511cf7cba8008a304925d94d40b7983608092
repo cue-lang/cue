@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17ea4bc8_53a9c313",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-25T11:28:54Z",
+      "side": 1,
+      "message": "Nice. I started reviewing this when I saw it being mailed, so LGTM.\n\nIf you want to merge this now, I\u0027ll include it in the RC.\n\nAlso, is the other \"add support for else\" CL now worth abandoning?",
+      "revId": "a1a511cf7cba8008a304925d94d40b7983608092",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

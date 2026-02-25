@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29382687_f1c18c5f",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-02-25T05:31:26Z",
+      "side": 1,
+      "message": "I\u0027m not sure whether this quite makes sense any more does it? I can\u0027t actually wrap my brain around what we need/want here...\n\nPerhaps we want this to fallback (not default) to text? i.e. when unset, if we couldn\u0027t derive a filetype from the extension (e.g. no extension) then text is used? \n\nPerhaps have a test case to cover this?",
+      "revId": "db65b715732278fa0a95a30ec689c3255806f960",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

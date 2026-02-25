@@ -16,6 +16,24 @@
       "message": "I\u0027m not sure whether this quite makes sense any more does it? I can\u0027t actually wrap my brain around what we need/want here...\n\nPerhaps we want this to fallback (not default) to text? i.e. when unset, if we couldn\u0027t derive a filetype from the extension (e.g. no extension) then text is used? \n\nPerhaps have a test case to cover this?",
       "revId": "db65b715732278fa0a95a30ec689c3255806f960",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b26ed5df_208a175f",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-25T10:27:20Z",
+      "side": 1,
+      "message": "good catch. the previous logic always fell back to text when we could not derive anything from an extension. the filetypes logic from cmd/cue does not do this.\n\nfor now I\u0027ve added such a test in the first CL, fixed it up, and improved the docs, especially in the second commit message and in the cue doc here.\n\nin the second commit message I now explain why I think it was a pitfall for e.g. `foo.unknown` extensions to be encoded as text. I think those should use explicit encodings now for the sake of forwards compatibility with future encodings we will add.",
+      "parentUuid": "29382687_f1c18c5f",
+      "revId": "db65b715732278fa0a95a30ec689c3255806f960",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

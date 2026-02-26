@@ -16,6 +16,24 @@
       "message": "I also wonder if referencing the original label here should be encouraged; I imagine something like this is more idiomatic:\n\n```\nvalue~X: \"hello\" \u0026 matchIf(string, len(X) \u003e 3, X \u003e 10) // OK; len(\"hello\") is \u003e3\n```",
       "revId": "c000c4b5b4cb1d4bdb66452f0acebae2d2ce9b2a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cb803a7_0453a249",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2873,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-26T13:01:38Z",
+      "side": 1,
+      "message": "Marcel prefers the alias; but we\u0027re not sure what the best way to do it is yet, so we\u0027ll leave it until we fix this test case tomorrow.",
+      "parentUuid": "049feaa6_de2c3220",
+      "revId": "c000c4b5b4cb1d4bdb66452f0acebae2d2ce9b2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

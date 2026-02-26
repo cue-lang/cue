@@ -16,6 +16,24 @@
       "message": "Why one? There could be multiple evaluations triggered per single repo. So ideally they would trickle in as they become available.",
       "revId": "97a9745991d28674dce2e01a7917081a3e0ffac4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fb33a58_1afefa81",
+        "filename": "unstable/lspaux/protocol/protocol.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-26T16:25:33Z",
+      "side": 1,
+      "message": "Discussed elsewhere; spec and implementation adjusted - EvalFinishedMsg added.",
+      "parentUuid": "b0fdf870_81b1164b",
+      "revId": "97a9745991d28674dce2e01a7917081a3e0ffac4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

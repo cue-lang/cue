@@ -442,11 +442,11 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 		return i
 	}
 	mf, err1 := l.modFileCache.modFile(mv, modRoot)
-	if err != nil {
+	if err1 != nil {
 		i.Err = errors.Append(i.Err, errors.Promote(err1, ""))
 	}
 	root, err1 := absPathForSourceLoc(modRoot)
-	if err != nil {
+	if err1 != nil {
 		i.Err = errors.Append(i.Err, errors.Promote(err1, ""))
 	} else {
 		i.Root = root

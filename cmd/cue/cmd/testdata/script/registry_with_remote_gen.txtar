@@ -27,7 +27,7 @@ import "example.com/e"
 -- cue.mod/module.cue --
 module: "test.org"
 language: version: "v0.8.0"
-deps: "example.com/e": v: "v0.0.1"
+deps: "example.com/e@v0": v: "v0.0.1"
 
 -- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
 module: "example.com/e@v0"

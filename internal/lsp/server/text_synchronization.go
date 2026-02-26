@@ -83,6 +83,9 @@ var openRange = &protocol.Range{
 }
 
 func (s *server) DidOpen(ctx context.Context, params *protocol.DidOpenTextDocumentParams) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.didOpen", tag.URI.Of(params.TextDocument.URI))
 	defer done()
 
@@ -104,6 +107,9 @@ func (s *server) DidOpen(ctx context.Context, params *protocol.DidOpenTextDocume
 }
 
 func (s *server) DidChange(ctx context.Context, params *protocol.DidChangeTextDocumentParams) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.didChange", tag.URI.Of(params.TextDocument.URI))
 	defer done()
 
@@ -117,6 +123,9 @@ func (s *server) DidChange(ctx context.Context, params *protocol.DidChangeTextDo
 }
 
 func (s *server) DidChangeWatchedFiles(ctx context.Context, params *protocol.DidChangeWatchedFilesParams) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.didChangeWatchedFiles")
 	defer done()
 
@@ -132,6 +141,9 @@ func (s *server) DidChangeWatchedFiles(ctx context.Context, params *protocol.Did
 }
 
 func (s *server) DidClose(ctx context.Context, params *protocol.DidCloseTextDocumentParams) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.didClose", tag.URI.Of(params.TextDocument.URI))
 	defer done()
 
@@ -143,6 +155,9 @@ func (s *server) DidClose(ctx context.Context, params *protocol.DidCloseTextDocu
 }
 
 func (s *server) DidSave(ctx context.Context, params *protocol.DidSaveTextDocumentParams) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.didSave", tag.URI.Of(params.TextDocument.URI))
 	defer done()
 

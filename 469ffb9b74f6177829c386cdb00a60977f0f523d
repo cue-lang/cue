@@ -1,5 +1,23 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2eb4556_16581526",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-26T21:27:42Z",
+      "side": 1,
+      "message": "For anyone following along here, we have just created a proposal for `io/fs` support within `cue/load`: https://github.com/cue-lang/cue/discussions/4285",
+      "revId": "469ffb9b74f6177829c386cdb00a60977f0f523d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {
@@ -16,7 +34,7 @@
       },
       "applicabilityExpressionResult": {},
       "submittabilityExpressionResult": {
-        "value": {"expression":{"expressionString":"label:Code-Review=MAX,user=non_uploader OR label:Code-Review=MAX,user=mpvl@gmail.com"},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["label:Code-Review=MAX,user=non_uploader","label:Code-Review=MAX,user=mpvl@gmail.com"]}
+        "value": {"expression":{"expressionString":"label:Code-Review=MAX,user=non_uploader OR label:Code-Review=MAX,user=mpvl@gmail.com"},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["label:Code-Review=MAX,user=non_uploader","label:Code-Review=MAX,user=mpvl@gmail.com"],"atomExplanations":{"value":null}}
       },
       "overrideExpressionResult": {},
       "patchSetCommitId": "469ffb9b74f6177829c386cdb00a60977f0f523d",
@@ -44,10 +62,10 @@
         "allowOverrideInChildProjects": false
       },
       "applicabilityExpressionResult": {
-        "value": {"expression":{"expressionString":"message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (R|r)(E|e)(V|v)(I|i)(E|e)(W|w).*\""},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (R|r)(E|e)(V|v)(I|i)(E|e)(W|w).*\""]}
+        "value": {"expression":{"expressionString":"message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (R|r)(E|e)(V|v)(I|i)(E|e)(W|w).*\""},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (R|r)(E|e)(V|v)(I|i)(E|e)(W|w).*\""],"atomExplanations":{"value":null}}
       },
       "submittabilityExpressionResult": {
-        "value": {"expression":{"expressionString":"is:false"},"status":"NOT_EVALUATED","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":[]}
+        "value": {"expression":{"expressionString":"is:false"},"status":"NOT_EVALUATED","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":[],"atomExplanations":{"value":null}}
       },
       "overrideExpressionResult": {},
       "patchSetCommitId": "469ffb9b74f6177829c386cdb00a60977f0f523d",
@@ -75,10 +93,10 @@
         "allowOverrideInChildProjects": false
       },
       "applicabilityExpressionResult": {
-        "value": {"expression":{"expressionString":"message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (S|s)(U|u)(B|b)(M|m)(I|i)(T|t).*\""},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (S|s)(U|u)(B|b)(M|m)(I|i)(T|t).*\""]}
+        "value": {"expression":{"expressionString":"message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (S|s)(U|u)(B|b)(M|m)(I|i)(T|t).*\""},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (S|s)(U|u)(B|b)(M|m)(I|i)(T|t).*\""],"atomExplanations":{"value":null}}
       },
       "submittabilityExpressionResult": {
-        "value": {"expression":{"expressionString":"is:false"},"status":"NOT_EVALUATED","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":[]}
+        "value": {"expression":{"expressionString":"is:false"},"status":"NOT_EVALUATED","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":[],"atomExplanations":{"value":null}}
       },
       "overrideExpressionResult": {},
       "patchSetCommitId": "469ffb9b74f6177829c386cdb00a60977f0f523d",
@@ -103,7 +121,7 @@
       },
       "applicabilityExpressionResult": {},
       "submittabilityExpressionResult": {
-        "value": {"expression":{"expressionString":"NOT label:Hold=1"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["label:Hold=1"]}
+        "value": {"expression":{"expressionString":"NOT label:Hold=1"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["label:Hold=1"],"atomExplanations":{"value":null}}
       },
       "overrideExpressionResult": {},
       "patchSetCommitId": "469ffb9b74f6177829c386cdb00a60977f0f523d",
@@ -131,10 +149,10 @@
         "allowOverrideInChildProjects": true
       },
       "applicabilityExpressionResult": {
-        "value": {"expression":{"expressionString":"-branch:refs/meta/config"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["branch:refs/meta/config"]}
+        "value": {"expression":{"expressionString":"-branch:refs/meta/config"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["branch:refs/meta/config"],"atomExplanations":{"value":null}}
       },
       "submittabilityExpressionResult": {
-        "value": {"expression":{"expressionString":"label:TryBot-Result=MAX OR label:Code-Review=MAX,user=chief.cueckoo@gmail.com"},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["label:TryBot-Result=MAX","label:Code-Review=MAX,user=chief.cueckoo@gmail.com"]}
+        "value": {"expression":{"expressionString":"label:TryBot-Result=MAX OR label:Code-Review=MAX,user=chief.cueckoo@gmail.com"},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["label:TryBot-Result=MAX","label:Code-Review=MAX,user=chief.cueckoo@gmail.com"],"atomExplanations":{"value":null}}
       },
       "overrideExpressionResult": {},
       "patchSetCommitId": "469ffb9b74f6177829c386cdb00a60977f0f523d",

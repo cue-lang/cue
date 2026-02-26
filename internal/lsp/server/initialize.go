@@ -50,6 +50,9 @@ func validateWorkspaceFolders(folders []protocol.WorkspaceFolder) (map[protocol.
 //
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialize
 func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitialize) (*protocol.InitializeResult, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.initialize")
 	defer done()
 
@@ -147,6 +150,9 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 //
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialized
 func (s *server) Initialized(ctx context.Context, params *protocol.InitializedParams) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.initialized")
 	defer done()
 

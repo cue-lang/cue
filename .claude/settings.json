@@ -13,6 +13,9 @@
       "Bash(go test:*)",
       "Bash(go test -run:*)",
       "Bash(go test -race:*)",
+      "Bash(go generate:*)",
+      "Bash(go mod:*)",
+      "Bash(go get:*)",
       "Bash(CUE_UPDATE=1 go test:*)",
       "Bash(CUE_UPDATE=1 go test -run:*)",
       "Bash(testscript:*)",
@@ -62,7 +65,10 @@
       "Bash(gh workflow view:*)",
       "Bash(gh workflow list:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:gist.github.com)"
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:cue.gerrithub.io)",
+      "WebSearch"
     ],
     "deny": [
       "Bash(cat:*)",

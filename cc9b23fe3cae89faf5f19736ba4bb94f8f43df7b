@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "343b2bc9_fd634a2d",
+        "filename": "unstable/lspaux/protocol/protocol.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-26T14:36:46Z",
+      "side": 1,
+      "message": "Excellent that you added a top-level README, I was thinking the same.\n\nCan you repeat a brief warning as part of a package godoc here too? Otherwise a user navigating to the package directly on pkg.go.dev could easily miss it. I know it\u0027s repetitive, but better safe than sorry.\n\nFWIW with experimental packages we have been using ALL CAPS in the hopes that it\u0027s more obvious and visible in the web UI and source:\n\n```\n// WARNING: THIS PACKAGE IS EXPERIMENTAL.\n// ITS API MAY CHANGE AT ANY TIME.\n```\n\nSo I\u0027d personally go for something similar here.",
+      "revId": "cc9b23fe3cae89faf5f19736ba4bb94f8f43df7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

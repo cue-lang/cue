@@ -64,6 +64,9 @@ so we use that to annotate code blocks with intent:
 * `cue parse` for CUE files which we expect parse OK,
   but we do not expect to compile or evaluate correctly.
 
+* `cue ! parse` for CUE which we expect to fail parsing;
+  the error is recorded as an HTML comment after the code block.
+
 * `cue rows` for tables of input-output rows.
   Just like `cue`, we do not yet mark what to do with them,
   but the output column is generally the expected outcome.
@@ -493,7 +496,7 @@ multiline_bytes_lit  = "'''" newline
 Carriage return characters (`\r`) inside string literals are discarded from
 the string value.
 
-```cue untested
+```cue ! parse
 'a\000\xab'
 '\007'
 '\377'
@@ -512,6 +515,12 @@ the string value.
 #"This is an \#(interpolation)"#
 #"The sequence "\U0001F604" renders as \#U0001F604."#
 ```
+<!-- error:
+illegal character U+0027 ''' in escape sequence:
+    spec.md:503:5
+escape sequence is invalid Unicode code point:
+    spec.md:512:3
+-->
 
 These examples all represent the same string:
 
@@ -544,7 +553,7 @@ A closing triple quote may not appear in the string.
 To include it is suffices to escape one of the quotes.
 
 <!-- TODO: should the backslash here work? -->
-```cue untested
+```cue ! parse
 """
     lily:
     out of the water
@@ -557,6 +566,10 @@ To include it is suffices to escape one of the quotes.
         — Nick Virgilio, Selected Haiku, 1988
     """
 ```
+<!-- error:
+unknown escape sequence:
+    spec.md:563:14
+-->
 
 This represents the same string as:
 
@@ -1230,7 +1243,7 @@ The token `...` is a shorthand for `..._`.
 _Note_: default constraints of the form `..._` are not yet implemented.
 
 <!-- NOTE: default constraints not yet implemented -->
-```cue untested
+```cue ! parse
 a: {
     foo:      string  // foo is a string
     [=~"^i"]: int     // all other fields starting with i are integers
@@ -1246,6 +1259,12 @@ b: a & {
     other: "a string"
 }
 ```
+<!-- error:
+missing ',' in struct literal:
+    spec.md:1253:8
+expected '}', found 'EOF':
+    spec.md:1260:3
+-->
 
 <!--
 TODO: are these two equivalent? Rog says that maybe you'll be able to refer

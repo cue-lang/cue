@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "871d6c86_0c8bf279",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-26T16:24:36Z",
+      "side": 1,
+      "message": "link https://github.com/cue-lang/cue/discussions/4285 instead now?",
+      "revId": "bb8ac5200398d4e17f9f0ecea5d5260ec07c307d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 	"sync/atomic"
 
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
@@ -79,6 +80,10 @@ func (s serverState) String() string {
 type server struct {
 	id string
 
+	// lock must be held for every public API method, and protects all
+	// state within the server.
+	lock sync.Mutex
+
 	client    protocol.ClientCloser
 	cache     *cache.Cache
 	workspace *cache.Workspace
@@ -113,6 +118,9 @@ func (s *server) ID() string { return s.id }
 // sent, instead it should wait for an exit message, which is
 // asynchronous.
 func (s *server) Shutdown(ctx context.Context) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.shutdown")
 	defer done()
 
@@ -139,6 +147,9 @@ func (s *server) Shutdown(ctx context.Context) error {
 //
 // This is asynchronous - it does not get a response.
 func (s *server) Exit(ctx context.Context) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	_, done := event.Start(ctx, "lsp.Server.exit")
 	defer done()
 
@@ -156,6 +167,9 @@ func (s *server) Exit(ctx context.Context) error {
 // WorkDoneProgressCancel is a message from the editor/client
 // requesting the cancellation of a long-running process.
 func (s *server) WorkDoneProgressCancel(ctx context.Context, params *protocol.WorkDoneProgressCancelParams) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	ctx, done := event.Start(ctx, "lsp.Server.workDoneProgressCancel")
 	defer done()
 

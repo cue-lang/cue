@@ -22,6 +22,9 @@ import (
 )
 
 func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) ([]protocol.Location, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	uri := params.TextDocument.URI
 	w := s.workspace
 	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadNothing)
@@ -32,6 +35,9 @@ func (s *server) Definition(ctx context.Context, params *protocol.DefinitionPara
 }
 
 func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (*protocol.CompletionList, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	uri := params.TextDocument.URI
 	w := s.workspace
 	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAllIfNonCue)
@@ -42,6 +48,9 @@ func (s *server) Completion(ctx context.Context, params *protocol.CompletionPara
 }
 
 func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	uri := params.TextDocument.URI
 	w := s.workspace
 	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAllIfNonCue)
@@ -52,6 +61,9 @@ func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*prot
 }
 
 func (s *server) References(ctx context.Context, params *protocol.ReferenceParams) ([]protocol.Location, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	uri := params.TextDocument.URI
 	w := s.workspace
 	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAll)
@@ -62,6 +74,9 @@ func (s *server) References(ctx context.Context, params *protocol.ReferenceParam
 }
 
 func (s *server) Rename(ctx context.Context, params *protocol.RenameParams) (*protocol.WorkspaceEdit, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	uri := params.TextDocument.URI
 	w := s.workspace
 	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAll)
@@ -72,6 +87,9 @@ func (s *server) Rename(ctx context.Context, params *protocol.RenameParams) (*pr
 }
 
 func (s *server) PrepareRename(ctx context.Context, params *protocol.PrepareRenameParams) (*protocol.PrepareRenamePlaceholder, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	uri := params.TextDocument.URI
 	w := s.workspace
 	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAll)

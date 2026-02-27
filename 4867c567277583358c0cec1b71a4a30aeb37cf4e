@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "916b798b_52d63d2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-27T17:53:45Z",
+      "side": 1,
+      "message": "I assume you already agreed this plan with Marcel? I would hope that custom validator funcs is something that can work in the future, for example. OK if we don\u0027t support it day one, though.",
+      "revId": "4867c567277583358c0cec1b71a4a30aeb37cf4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

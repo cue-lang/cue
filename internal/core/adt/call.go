@@ -54,13 +54,6 @@ func (c CallContext) AddPositions(err *ValueError) {
 	}
 }
 
-// Args return the pre-evaluated arguments. This function is only used for
-// transitioning and will be removed at some point. Use [CallContext.Value]
-// instead.
-func (c CallContext) Args() []Value {
-	return c.args
-}
-
 // Arg returns the nth argument expression. The value is evaluated and any
 // cycle information is accumulated in the context. This allows cycles in
 // arguments to be detected.

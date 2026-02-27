@@ -31,20 +31,19 @@ var matchNBuiltin = &adt.Builtin{
 	NonConcrete: true,
 	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
-		args := call.Args()
 
 		if !c.IsValidator {
 			return c.NewErrf("matchN is a validator and should not be used as a function")
 		}
 
-		self := finalizeSelf(c, args[0])
+		self := finalizeSelf(c, call.Value(0))
 		if err := bottom(c, self); err != nil {
 			return adt.StaticBoolFalse
 		}
 
 		var errs []*adt.Bottom
 		var count, possibleCount int64
-		for check := range c.Elems(args[2]) {
+		for check := range c.Elems(call.Value(2)) {
 			v := adt.Unify(c, self, check)
 			if err := adt.Validate(c, v, finalCfg); err == nil {
 				// TODO: is it always true that the lack of an error signifies
@@ -58,7 +57,7 @@ var matchNBuiltin = &adt.Builtin{
 			}
 		}
 
-		bound := args[1]
+		bound := call.Value(1)
 		// TODO: consider a mode to require "all" to pass, for instance by
 		// supporting the value null or "all".
 
@@ -90,17 +89,16 @@ var matchIfBuiltin = &adt.Builtin{
 	NonConcrete: true,
 	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
-		args := call.Args()
 
 		if !c.IsValidator {
 			return c.NewErrf("matchIf is a validator and should not be used as a function")
 		}
 
-		self := finalizeSelf(c, args[0])
+		self := finalizeSelf(c, call.Value(0))
 		if err := bottom(c, self); err != nil {
 			return adt.StaticBoolFalse
 		}
-		ifSchema, thenSchema, elseSchema := args[1], args[2], args[3]
+		ifSchema, thenSchema, elseSchema := call.Value(1), call.Value(2), call.Value(3)
 		v := adt.Unify(c, self, ifSchema)
 		var chosenSchema adt.Value
 		if err := adt.Validate(c, v, finalCfg); err == nil {

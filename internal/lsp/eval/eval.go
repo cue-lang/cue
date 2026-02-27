@@ -1589,6 +1589,21 @@ type frame struct {
 	// evaluated tracks whether this frame has been evaluated, ensuring
 	// it is only evaluated once.
 	evaluated bool
+	// embedded tracks whether this frame is embedded within its parent
+	// frame. This is useful to tell apart frames which share the same
+	// navigable. For example:
+	//
+	//	x: y
+	//	{y: _}
+	//
+	// The embedded frame uses the same navigable as the surrounding
+	// frame, but must be treated separately so that the path `y` does
+	// not resolve to the `y` field within the embedded frame.
+	//
+	// Note this embedded field is set for more than just normal cue
+	// embeddings - it is also set for things the LSP treats like
+	// embeddings, such as disjunctions and comprehensions.
+	embedded bool
 	// parent is the parent frame.
 	parent *frame
 	// childFrames contains every frame that is a child of this
@@ -1708,8 +1723,9 @@ func (f *frame) addUnknownRange(start, end int) {
 // frame f. This is a light wrapper around
 // [fileEvaluator.newFrame]. See those docs for more details on the
 // arguments to this function.
-func (f *frame) newFrame(node ast.Node, nav *navigable) *frame {
+func (f *frame) newFrame(node ast.Node, nav *navigable, embedded bool) *frame {
 	child := f.fileEvaluator.newFrame(f, node, nav)
+	child.embedded = embedded
 	f.childFrames = append(f.childFrames, child)
 	return child
 }
@@ -1749,7 +1765,7 @@ func (f *frame) eval() {
 			// navigable, so that they can all be found when resolving
 			// imports of this package, in some other package.
 
-			childFr := f.newFrame(nil, f.fileEvaluator.evaluator.pkgDecls)
+			childFr := f.newFrame(nil, f.fileEvaluator.evaluator.pkgDecls, false)
 			if fscache.IsPhantomPackage(node) {
 				// For packages with invented names, be careful to avoid
 				// returning file coordinates that use the length of the
@@ -1810,7 +1826,7 @@ func (f *frame) eval() {
 					f.fileEvaluator.importSpecNavigables = importSpecNavigables
 				}
 				nav, found := importSpecNavigables[*ip]
-				childFr := f.newFrame(node, nav)
+				childFr := f.newFrame(node, nav, false)
 				if !found {
 					importSpecNavigables[*ip] = childFr.navigable
 				}
@@ -1903,7 +1919,7 @@ func (f *frame) eval() {
 			}
 
 		case *ast.EmbedDecl:
-			f.newFrame(node.Expr, f.navigable)
+			f.newFrame(node.Expr, f.navigable, true)
 
 		case *ast.PostfixExpr:
 			switch node.Op {
@@ -1914,29 +1930,29 @@ func (f *frame) eval() {
 			default:
 				// Currently should never happen. Just in case though,
 				// behave the same as Unary.
-				f.newFrame(node.X, nil)
+				f.newFrame(node.X, nil, false)
 			}
 
 		case *ast.ParenExpr:
 			unprocessed = append(unprocessed, node.X)
 
 		case *ast.UnaryExpr:
-			f.newFrame(node.X, nil)
+			f.newFrame(node.X, nil, false)
 
 		case *ast.BinaryExpr:
 			switch node.Op {
 			case token.AND:
-				f.newFrame(node.X, f.navigable).addRange(node)
-				f.newFrame(node.Y, f.navigable).addRange(node)
+				f.newFrame(node.X, f.navigable, true).addRange(node)
+				f.newFrame(node.Y, f.navigable, true).addRange(node)
 			case token.OR:
-				lhsNav := f.newFrame(node.X, nil).navigable
-				rhsNav := f.newFrame(node.Y, nil).navigable
+				lhsNav := f.newFrame(node.X, nil, false).navigable
+				rhsNav := f.newFrame(node.Y, nil, false).navigable
 				f.navigable.ensureResolvesTo([]*navigable{lhsNav, rhsNav})
 				lhsNav.recordUsage(node, f)
 				rhsNav.recordUsage(node, f)
 			default:
-				f.newFrame(node.X, nil)
-				f.newFrame(node.Y, nil)
+				f.newFrame(node.X, nil, false)
+				f.newFrame(node.Y, nil, false)
 			}
 
 		case *ast.Alias:
@@ -1946,7 +1962,7 @@ func (f *frame) eval() {
 			unprocessed = append(unprocessed, node.Expr)
 
 		case *ast.Ellipsis:
-			childFr := f.newFrame(node.Type, nil)
+			childFr := f.newFrame(node.Type, nil, false)
 			childFr.key = node
 			childFr.addRange(node)
 			// The navigable needs a name so that [UsagesForOffset] will
@@ -1965,7 +1981,7 @@ func (f *frame) eval() {
 		case *ast.CallExpr:
 			resolvable = append(resolvable, node.Fun)
 			for _, arg := range node.Args {
-				f.newFrame(arg, nil)
+				f.newFrame(arg, nil, false)
 			}
 
 		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr:
@@ -1986,7 +2002,7 @@ func (f *frame) eval() {
 			clause := node.Clauses[0]
 			unprocessed = append(unprocessed, clause)
 			if fallback := node.Fallback; fallback != nil {
-				f.newFrame(fallback.Body, f.navigable)
+				f.newFrame(fallback.Body, f.navigable, true)
 			}
 			// We don't know how many child frames we'll need to
 			// process clause. So we stash whatever remains of this
@@ -2013,15 +2029,15 @@ func (f *frame) eval() {
 			}
 
 		case *ast.IfClause:
-			f.newFrame(node.Condition, nil)
+			f.newFrame(node.Condition, nil, false)
 
 			comprehensionTail := comprehensionsStash[node]
-			f.newFrame(comprehensionTail, f.navigable)
+			f.newFrame(comprehensionTail, f.navigable, true)
 
 		case *ast.ForClause:
-			f.newFrame(node.Source, nil)
+			f.newFrame(node.Source, nil, false)
 
-			stack := frameStack{f.newFrame(nil, nil)}
+			stack := frameStack{f.newFrame(nil, nil, false)}
 
 			if key := node.Key; key != nil {
 				stack.push(key, stack.peek().newBinding(key, nil))
@@ -2031,18 +2047,20 @@ func (f *frame) eval() {
 			}
 
 			comprehensionTail := comprehensionsStash[node]
-			stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+			tailFr := stack.peek().newFrame(comprehensionTail, f.navigable, true)
+			stack.push(comprehensionTail, tailFr)
 
 		case *ast.LetClause:
 			ident := node.Ident
 			// A let clause might or might not be within a comprehension.
 			if comprehensionTail, found := comprehensionsStash[node]; found {
 				// We're within a wider comprehension.
-				f.newFrame(node.Expr, nil)
+				f.newFrame(node.Expr, nil, false)
 
-				stack := frameStack{f.newFrame(nil, nil)}
+				stack := frameStack{f.newFrame(nil, nil, false)}
 				stack.push(ident, stack.peek().newBinding(ident, nil))
-				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+				tailFr := stack.peek().newFrame(comprehensionTail, f.navigable, true)
+				stack.push(comprehensionTail, tailFr)
 
 			} else {
 				// We're not within a wider comprehension: the binding
@@ -2055,14 +2073,15 @@ func (f *frame) eval() {
 			comprehensionTail := comprehensionsStash[node]
 			if ident := node.Ident; ident != nil {
 				// Assignment form: try x = expr { ... }
-				f.newFrame(node.Expr, nil)
+				f.newFrame(node.Expr, nil, false)
 
-				stack := frameStack{f.newFrame(nil, nil)}
+				stack := frameStack{f.newFrame(nil, nil, false)}
 				stack.push(ident, stack.peek().newBinding(ident, nil))
-				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+				tailFr := stack.peek().newFrame(comprehensionTail, f.navigable, true)
+				stack.push(comprehensionTail, tailFr)
 			} else {
 				// Struct form: try { ... }
-				f.newFrame(comprehensionTail, f.navigable)
+				f.newFrame(comprehensionTail, f.navigable, true)
 			}
 
 		case *ast.Field:
@@ -2078,17 +2097,17 @@ func (f *frame) eval() {
 
 			aliasIdent := fieldDecl.aliasIdent
 			if aliasIdent == nil {
-				childFr = f.newFrame(node.Value, childNav)
+				childFr = f.newFrame(node.Value, childNav, false)
 
 			} else if fieldDecl.aliasInParentScope {
-				childFr = f.newFrame(node.Value, childNav)
+				childFr = f.newFrame(node.Value, childNav, false)
 				f.appendBinding(aliasIdent.Name, childFr)
 
 			} else {
-				wrapper := f.newFrame(nil, nil)
+				wrapper := f.newFrame(nil, nil, false)
 				wrapper.addRange(node)
 				wrapper.navigable.ensureResolvesTo([]*navigable{f.navigable})
-				childFr = wrapper.newFrame(node.Value, childNav)
+				childFr = wrapper.newFrame(node.Value, childNav, false)
 
 				if expr := fieldDecl.aliasValue; expr != nil {
 					wrapper.newBinding(aliasIdent, expr)
@@ -2127,7 +2146,7 @@ func (f *frame) eval() {
 				// field label is a simple ident with no aliases and no
 				// expressions in the field label. Therefore,
 				// len(fieldDecl.exprs) > 0 implies !strings.HasPrefix(keyName, "__")
-				childFr.parent.newFrame(fieldDecl, nil)
+				childFr.parent.newFrame(fieldDecl, nil, false)
 			}
 
 			for _, attr := range node.Attrs {
@@ -2154,7 +2173,7 @@ func (f *frame) eval() {
 							remoteFilename = filepath.ToSlash(remoteFilename)
 							fieldName := strings.TrimPrefix(remoteFilename, dir)
 							fieldNameIdent := ast.NewIdent(fieldName)
-							grandChildFr := childFr.newFrame(fieldNameIdent, childFr.navigable.ensureNavigable(fieldName))
+							grandChildFr := childFr.newFrame(fieldNameIdent, childFr.navigable.ensureNavigable(fieldName), false)
 							grandChildFr.addRange(attr)
 							childFr.appendBinding(fieldName, grandChildFr)
 							childFrs = append(childFrs, grandChildFr)
@@ -2320,7 +2339,7 @@ func fieldNames(field *ast.Field) *fieldDeclExpr {
 // newBinding creates and returns a new [frame], and stores it under
 // the given name in the current frame only.
 func (f *frame) newBinding(key *ast.Ident, unprocessed ast.Node) *frame {
-	childFr := f.newFrame(unprocessed, nil)
+	childFr := f.newFrame(unprocessed, nil, false)
 	name := key.Name
 	f.appendBinding(name, childFr)
 	if !strings.HasPrefix(name, "__") {
@@ -2332,7 +2351,7 @@ func (f *frame) newBinding(key *ast.Ident, unprocessed ast.Node) *frame {
 			end:        key.End(),
 			valueFrame: childFr,
 		}
-		f.newFrame(expr, nil)
+		f.newFrame(expr, nil, false)
 		childFr.key = key
 	}
 	return childFr
@@ -2516,7 +2535,7 @@ func (f *frame) createPath(expr ast.Expr, receiver *navigable) {
 
 		default:
 			component = nil
-			childFr := f.newFrame(curExpr, nil)
+			childFr := f.newFrame(curExpr, nil, false)
 			if nextEnd.IsValid() {
 				childFr.end = nextEnd
 			}
@@ -2560,6 +2579,7 @@ func (f *frame) createPath(expr ast.Expr, receiver *navigable) {
 func (f *frame) resolvePathRoot(name string, requireIdent bool) (*navigable, string) {
 	frameOrig := f
 	for ; f != nil; f = f.parent {
+		fNav := f.navigable
 		if childFrs, found := f.bindings[name]; found {
 			if len(childFrs) == 1 {
 				nav := childFrs[0].navigable
@@ -2575,12 +2595,12 @@ func (f *frame) resolvePathRoot(name string, requireIdent bool) (*navigable, str
 					// name has been resolved to an alias which had a
 					// normal ident or basiclit field name. Switch to that
 					// name.
-					return f.navigable, nav.name
+					return fNav, nav.name
 				}
 			}
 
 			if !requireIdent {
-				return f.navigable, name
+				return fNav, name
 			}
 			// If name lexically matches a non-alias, it must be matching
 			// an ident and not a basiclit. But that ident can come from
@@ -2595,15 +2615,28 @@ func (f *frame) resolvePathRoot(name string, requireIdent bool) (*navigable, str
 			if !identFound {
 				continue
 			}
-			return f.navigable, name
+			return fNav, name
 		}
 
 		if f.isFileFrame() {
 			// If we've got this far, we're allowed to inspect the
 			// (shared) navigable bindings directly without having to go
 			// via our bindings.
-			if _, found := f.navigable.bindings[name]; found {
-				return f.navigable, name
+			if nav, found := fNav.bindings[name]; found {
+				// We must only return fNav if the binding has been made
+				// by a frame which is *not* embedded.
+				for _, fr := range fNav.frames {
+					if fr.embedded {
+						continue
+					}
+					for _, childFr := range fr.bindings[name] {
+						// check that the childFr has the right navigable
+						// otherwise we could get tripped up by aliases etc.
+						if childFr.navigable == nav {
+							return fNav, name
+						}
+					}
+				}
 			}
 			// Support for the Self experiment:
 			parentNav := frameOrig.navigable.parent

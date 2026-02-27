@@ -3390,7 +3390,6 @@ g: _
 `,
 			expectDefinitions: map[position][]position{
 				ln(2, 2, "b"):  {ln(2, 1, "b"), ln(3, 1, "b")},
-				ln(10, 2, "d"): {ln(10, 1, "d")}, // this is WRONG. Should not resolve at all.
 				ln(12, 2, "g"): {ln(12, 1, "g"), ln(13, 1, "g")},
 
 				ln(1, 1, "x"): {self},
@@ -4624,9 +4623,6 @@ let v = true {
 }
 `,
 			expectDefinitions: map[position][]position{
-				// TODO: It's highly doubtful that this is what's really wanted
-				ln(6, 1, "z"): {ln(4, 1, "z"), ln(11, 1, "z"), ln(19, 1, "z")},
-
 				ln(7, 1, "x"):  {ln(2, 1, "x")},
 				ln(14, 1, "x"): {ln(2, 1, "x")},
 				ln(22, 1, "x"): {ln(2, 1, "x")},

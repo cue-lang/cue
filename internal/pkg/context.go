@@ -28,7 +28,7 @@ import (
 
 // CallCtxt is passed to builtin implementations that need to use a cue.Value. This is an internal type. Its interface may change.
 type CallCtxt struct {
-	adt.CallContext
+	adt.BuiltinCallContext
 	ctx     *adt.OpContext
 	builtin *Builtin
 	Err     any
@@ -46,7 +46,7 @@ func (c *CallCtxt) Do() bool {
 
 // Schema returns the ith argument as is, without converting it to a cue.Value.
 //
-// TODO: Schema should use CallContext.Expr to capture cycle information.
+// TODO: Schema should use [adt.BuiltinCallContext.Expr] to capture cycle information.
 // However, this only makes sense if functions also use the same OpContext for
 // further evaluation. We should enforce as we port the old calls.
 func (c *CallCtxt) Schema(i int) Schema {
@@ -56,7 +56,7 @@ func (c *CallCtxt) Schema(i int) Schema {
 
 // Value returns a finalized cue.Value for the ith argument.
 func (c *CallCtxt) Value(i int) cue.Value {
-	v := value.Make(c.ctx, c.CallContext.Value(i))
+	v := value.Make(c.ctx, c.BuiltinCallContext.Value(i))
 	if c.builtin.NonConcrete {
 		// In case NonConcrete is false, the concreteness is already checked
 		// at call time. We may want to use finalize semantics in both cases,
@@ -72,7 +72,7 @@ func (c *CallCtxt) Value(i int) cue.Value {
 }
 
 func (c *CallCtxt) Struct(i int) Struct {
-	x := c.CallContext.Value(i)
+	x := c.BuiltinCallContext.Value(i)
 	if c.builtin.NonConcrete {
 		x = adt.Default(x)
 	}
@@ -106,7 +106,7 @@ func (c *CallCtxt) Rune(i int) rune   { return rune(c.intValue(i, 32, "rune")) }
 func (c *CallCtxt) Int64(i int) int64 { return c.intValue(i, 64, "int64") }
 
 func (c *CallCtxt) intValue(i, bitLen int, typ string) int64 {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
 		if n, err := num.X.Int64(); err == nil && bits.Len64(uint64(n)) <= bitLen {
@@ -135,7 +135,7 @@ func (c *CallCtxt) Uint32(i int) uint32 { return uint32(c.uintValue(i, 32, "uint
 func (c *CallCtxt) Uint64(i int) uint64 { return c.uintValue(i, 64, "uint64") }
 
 func (c *CallCtxt) uintValue(i, bitLen int, typ string) uint64 {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
 		// Note that [apd.Decimal] has an Int64 method, but no Uint64 method,
@@ -159,7 +159,7 @@ func (c *CallCtxt) uintValue(i, bitLen int, typ string) uint64 {
 }
 
 func (c *CallCtxt) Decimal(i int) *apd.Decimal {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
 		return &num.X
@@ -174,7 +174,7 @@ func (c *CallCtxt) Decimal(i int) *apd.Decimal {
 }
 
 func (c *CallCtxt) Float64(i int) float64 {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
 		if f, err := num.X.Float64(); err == nil {
@@ -191,7 +191,7 @@ func (c *CallCtxt) Float64(i int) float64 {
 }
 
 func (c *CallCtxt) BigInt(i int) *big.Int {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
 		return num.BigInt(nil)
@@ -208,7 +208,7 @@ func (c *CallCtxt) BigInt(i int) *big.Int {
 var ten = big.NewInt(10)
 
 func (c *CallCtxt) BigFloat(i int) *big.Float {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	x := value.Make(c.ctx, arg)
 	var mant big.Int
 	exp, err := x.MantExp(&mant)
@@ -227,7 +227,7 @@ func (c *CallCtxt) BigFloat(i int) *big.Float {
 }
 
 func (c *CallCtxt) String(i int) string {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	if str, _ := c.ctx.EvaluateKeepState(arg).(*adt.String); str != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
 		return str.Str
@@ -242,7 +242,7 @@ func (c *CallCtxt) String(i int) string {
 }
 
 func (c *CallCtxt) Bytes(i int) []byte {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	if bs, _ := c.ctx.EvaluateKeepState(arg).(*adt.Bytes); bs != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
 		return bs.B
@@ -257,7 +257,7 @@ func (c *CallCtxt) Bytes(i int) []byte {
 }
 
 func (c *CallCtxt) Reader(i int) io.Reader {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	x := value.Make(c.ctx, arg)
 	// TODO: optimize for string and bytes cases
 	r, err := x.Reader()
@@ -269,7 +269,7 @@ func (c *CallCtxt) Reader(i int) io.Reader {
 }
 
 func (c *CallCtxt) Bool(i int) bool {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	if b, _ := c.ctx.EvaluateKeepState(arg).(*adt.Bool); b != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
 		return b.B
@@ -284,7 +284,7 @@ func (c *CallCtxt) Bool(i int) bool {
 }
 
 func (c *CallCtxt) List(i int) (a []cue.Value) {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	x := value.Make(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
@@ -306,7 +306,7 @@ func (c *CallCtxt) CueList(i int) List {
 }
 
 func (c *CallCtxt) Iter(i int) (a cue.Iterator) {
-	arg := c.CallContext.Value(i)
+	arg := c.BuiltinCallContext.Value(i)
 	x := value.Make(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
@@ -316,7 +316,7 @@ func (c *CallCtxt) Iter(i int) (a cue.Iterator) {
 }
 
 func (c *CallCtxt) getList(i int) *adt.Vertex {
-	x := c.CallContext.Value(i)
+	x := c.BuiltinCallContext.Value(i)
 	if c.builtin.NonConcrete {
 		x = adt.Default(x)
 	}

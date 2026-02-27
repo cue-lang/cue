@@ -29,7 +29,7 @@ import (
 //
 // If Validate is called in a broader context, like a validation or function
 // call, the cycle context of n should be accumulated in c before this call.
-// This can be done by using the Expr method on the CallContext.
+// This can be done by using the Expr method on the BuiltinCallContext.
 func Validate(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 	d := NewDecoder("yaml.Validate", b)
 	r := v.Context()

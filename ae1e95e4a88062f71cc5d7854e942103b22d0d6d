@@ -16,6 +16,24 @@
       "message": "Maybe mention we could generalize this to URIs in the future.",
       "revId": "ae1e95e4a88062f71cc5d7854e942103b22d0d6d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d629c7a_7c5aceb4",
+        "filename": "unstable/lspaux/protocol/protocol.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-27T10:37:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e583706_88ab922e",
+      "revId": "ae1e95e4a88062f71cc5d7854e942103b22d0d6d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

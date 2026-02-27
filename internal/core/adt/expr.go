@@ -1446,11 +1446,6 @@ func (x *CallExpr) Source() ast.Node {
 }
 
 func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
-	call := CallContext{
-		ctx:  c,
-		call: x,
-	}
-
 	fun := c.value(x.Fun, Flags{
 		status:    partial,
 		condition: concreteKnown,
@@ -1458,13 +1453,7 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 	})
 	switch f := fun.(type) {
 	case *Builtin:
-		call.builtin = f
-		if f.RawFunc != nil {
-			if !call.builtin.checkArgs(c, Pos(x), len(x.Args)) {
-				return nil
-			}
-			return f.RawFunc(call)
-		}
+		return f.rawCall(c, x, state)
 
 	case *BuiltinValidator:
 		// We allow a validator that takes no arguments except the validated
@@ -1472,6 +1461,7 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 		switch {
 		case f.Src != nil:
 			c.AddErrf("cannot call previously called validator %s", x.Fun)
+			return nil
 
 		case f.Builtin.IsValidator(len(x.Args)):
 			v := *f
@@ -1479,9 +1469,8 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 			return &v
 
 		default:
-			call.builtin = f.Builtin
+			return f.Builtin.rawCall(c, x, state)
 		}
-
 	default:
 		if !IsConcrete(fun) && fun.Kind()&FuncKind != 0 {
 			c.addErrf(IncompleteError, Pos(x.Fun), "cannot call non-concrete value %s (type %s)", x.Fun, kind(fun))
@@ -1490,7 +1479,20 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 		}
 		return nil
 	}
+}
 
+func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value {
+	callCtx := BuiltinCallContext{
+		ctx:     c,
+		call:    call,
+		builtin: builtin,
+	}
+	if builtin.RawFunc != nil {
+		if !builtin.checkArgs(c, Pos(call), len(call.Args)) {
+			return nil
+		}
+		return builtin.RawFunc(callCtx)
+	}
 	// Arguments to functions are open. This mostly matters for NonConcrete
 	// builtins.
 	saved := c.ci
@@ -1501,8 +1503,8 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 		c.ci.FromEmbed = saved.FromEmbed
 	}()
 
-	args := make([]Value, 0, len(x.Args))
-	for i, a := range x.Args {
+	args := make([]Value, 0, len(call.Args))
+	for i, a := range call.Args {
 		saved := c.errs
 		c.errs = nil
 		// XXX: XXX: clear id.closeContext per argument and remove from runTask?
@@ -1510,7 +1512,7 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 		runMode := state.mode
 		cond := state.condition
 		var expr Value
-		if call.builtin.NonConcrete {
+		if builtin.NonConcrete {
 			state = Flags{
 				status:    state.status,
 				condition: cond,
@@ -1540,8 +1542,8 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 			if c.errs == nil {
 				// There SHOULD be an error in the context. If not, we generate
 				// one.
-				c.Assertf(Pos(x.Fun), c.HasErr(),
-					"argument %d to function %s is incomplete", i, x.Fun)
+				c.Assertf(Pos(call.Fun), c.HasErr(),
+					"argument %d to function %s is incomplete", i, call.Fun)
 			}
 
 		case *Bottom:
@@ -1556,11 +1558,11 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 	if c.HasErr() {
 		return nil
 	}
-	if call.builtin.IsValidator(len(args)) {
-		return &BuiltinValidator{x, call.builtin, args}
+	if builtin.IsValidator(len(args)) {
+		return &BuiltinValidator{call, builtin, args}
 	}
-	call.args = args
-	result := call.builtin.call(call)
+	callCtx.args = args
+	result := builtin.call(callCtx)
 	if result == nil {
 		return nil
 	}
@@ -1579,7 +1581,7 @@ type Builtin struct {
 	// arguments. By default, all arguments are checked to be concrete.
 	NonConcrete bool
 
-	Func func(call CallContext) Expr
+	Func func(call BuiltinCallContext) Expr
 
 	// RawFunc gives low-level control to CUE's internals for builtins.
 	// It should be used when fine control over the evaluation process is
@@ -1589,7 +1591,7 @@ type Builtin struct {
 	// the Context.
 	//
 	// TODO: consider merging Func and RawFunc into a single field again.
-	RawFunc func(call CallContext) Value
+	RawFunc func(call BuiltinCallContext) Value
 
 	// Added indicates as of which language version this builtin can be used.
 	Added string
@@ -1599,8 +1601,7 @@ type Builtin struct {
 }
 
 type Param struct {
-	Name  Feature // name of the argument; mostly for documentation
-	Value Value   // Could become Value later, using disjunctions for defaults.
+	Value Value
 }
 
 // Kind returns the kind mask of this parameter.
@@ -1673,7 +1674,7 @@ func (x *Builtin) checkArgs(c *OpContext, p token.Pos, numArgs int) bool {
 	return true
 }
 
-func (x *Builtin) call(call CallContext) Expr {
+func (x *Builtin) call(call BuiltinCallContext) Expr {
 	c := call.ctx
 	p := call.Pos()
 
@@ -1685,9 +1686,6 @@ func (x *Builtin) call(call CallContext) Expr {
 		call.args = append(call.args, x.Params[i].Default())
 	}
 	for i, a := range call.args {
-		if x.Params[i].Kind() == BottomKind {
-			continue
-		}
 		if b := bottom(a); b != nil {
 			return b
 		}
@@ -1765,18 +1763,16 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 	args[0] = v
 	copy(args[1:], x.Args)
 
-	call := CallContext{
+	return validateWithBuiltin(BuiltinCallContext{
 		ctx:         c,
 		call:        x.Src,
 		builtin:     x.Builtin,
 		args:        args,
 		isValidator: true,
-	}
-
-	return validateWithBuiltin(call)
+	})
 }
 
-func validateWithBuiltin(call CallContext) *Bottom {
+func validateWithBuiltin(call BuiltinCallContext) *Bottom {
 	var severeness ErrorCode
 	var err errors.Error
 

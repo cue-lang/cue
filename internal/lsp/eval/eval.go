@@ -1644,6 +1644,8 @@ type frame struct {
 	// have explicit cases within [frame.eval]. A good example is
 	// BasicLit: within a BasicLit, no completions should be offered.
 	unknownRanges *rangeset.RangeSet
+
+	nested bool
 }
 
 // isFileFrame reports whether f is the top level package frame or a
@@ -1903,7 +1905,7 @@ func (f *frame) eval() {
 			}
 
 		case *ast.EmbedDecl:
-			f.newFrame(node.Expr, f.navigable)
+			f.newFrame(node.Expr, f.navigable).nested = true
 
 		case *ast.PostfixExpr:
 			switch node.Op {
@@ -1926,8 +1928,12 @@ func (f *frame) eval() {
 		case *ast.BinaryExpr:
 			switch node.Op {
 			case token.AND:
-				f.newFrame(node.X, f.navigable).addRange(node)
-				f.newFrame(node.Y, f.navigable).addRange(node)
+				lhs := f.newFrame(node.X, f.navigable)
+				lhs.nested = true
+				lhs.addRange(node)
+				rhs := f.newFrame(node.Y, f.navigable)
+				rhs.nested = true
+				rhs.addRange(node)
 			case token.OR:
 				lhsNav := f.newFrame(node.X, nil).navigable
 				rhsNav := f.newFrame(node.Y, nil).navigable
@@ -1986,7 +1992,7 @@ func (f *frame) eval() {
 			clause := node.Clauses[0]
 			unprocessed = append(unprocessed, clause)
 			if fallback := node.Fallback; fallback != nil {
-				f.newFrame(fallback.Body, f.navigable)
+				f.newFrame(fallback.Body, f.navigable).nested = true
 			}
 			// We don't know how many child frames we'll need to
 			// process clause. So we stash whatever remains of this
@@ -2016,7 +2022,7 @@ func (f *frame) eval() {
 			f.newFrame(node.Condition, nil)
 
 			comprehensionTail := comprehensionsStash[node]
-			f.newFrame(comprehensionTail, f.navigable)
+			f.newFrame(comprehensionTail, f.navigable).nested = true
 
 		case *ast.ForClause:
 			f.newFrame(node.Source, nil)
@@ -2031,7 +2037,9 @@ func (f *frame) eval() {
 			}
 
 			comprehensionTail := comprehensionsStash[node]
-			stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+			tailFr := stack.peek().newFrame(comprehensionTail, f.navigable)
+			tailFr.nested = true
+			stack.push(comprehensionTail, tailFr)
 
 		case *ast.LetClause:
 			ident := node.Ident
@@ -2042,7 +2050,9 @@ func (f *frame) eval() {
 
 				stack := frameStack{f.newFrame(nil, nil)}
 				stack.push(ident, stack.peek().newBinding(ident, nil))
-				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+				tailFr := stack.peek().newFrame(comprehensionTail, f.navigable)
+				tailFr.nested = true
+				stack.push(comprehensionTail, tailFr)
 
 			} else {
 				// We're not within a wider comprehension: the binding
@@ -2059,10 +2069,12 @@ func (f *frame) eval() {
 
 				stack := frameStack{f.newFrame(nil, nil)}
 				stack.push(ident, stack.peek().newBinding(ident, nil))
-				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
+				tailFr := stack.peek().newFrame(comprehensionTail, f.navigable)
+				tailFr.nested = true
+				stack.push(comprehensionTail, tailFr)
 			} else {
 				// Struct form: try { ... }
-				f.newFrame(comprehensionTail, f.navigable)
+				f.newFrame(comprehensionTail, f.navigable).nested = true
 			}
 
 		case *ast.Field:
@@ -2602,8 +2614,17 @@ func (f *frame) resolvePathRoot(name string, requireIdent bool) (*navigable, str
 			// If we've got this far, we're allowed to inspect the
 			// (shared) navigable bindings directly without having to go
 			// via our bindings.
-			if _, found := f.navigable.bindings[name]; found {
-				return f.navigable, name
+			if nav, found := f.navigable.bindings[name]; found {
+				nonNestedFound := false
+				for _, childFr := range nav.frames {
+					if !childFr.parent.nested {
+						nonNestedFound = true
+						break
+					}
+				}
+				if nonNestedFound {
+					return f.navigable, name
+				}
 			}
 			// Support for the Self experiment:
 			parentNav := frameOrig.navigable.parent

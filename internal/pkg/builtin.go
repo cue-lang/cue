@@ -130,14 +130,14 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 		Package:     b.Pkg,
 		Name:        b.Name,
 	}
-	x.Func = func(call adt.CallContext) (ret adt.Expr) {
+	x.Func = func(call adt.BuiltinCallContext) (ret adt.Expr) {
 		ctx := call.OpContext()
 
 		// call, _ := ctx.Source().(*ast.CallExpr)
 		c := &CallCtxt{
-			CallContext: call,
-			ctx:         ctx,
-			builtin:     b,
+			BuiltinCallContext: call,
+			ctx:                ctx,
+			builtin:            b,
 		}
 		defer func() {
 			var errVal interface{} = c.Err

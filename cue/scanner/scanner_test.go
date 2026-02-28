@@ -699,7 +699,6 @@ var errorTests = []struct {
 	{"\a", token.ILLEGAL, 0, "", "illegal character U+0007"},
 	{`^`, token.ILLEGAL, 0, "", "illegal character U+005E '^'"},
 	{`…`, token.ILLEGAL, 0, "", "illegal character U+2026 '…'"},
-	{`_|`, token.ILLEGAL, 0, "", "illegal token '_|'; expected '_'"},
 	{`__#foobar`, token.ILLEGAL, 0, "", `illegal token "__#foobar"`},
 
 	{`@`, token.ATTRIBUTE, 1, `@`, "invalid attribute: expected '('"},
@@ -822,9 +821,44 @@ func TestScanErrors(t *testing.T) {
 	}
 }
 
+// TestScanUnderscoreOr checks that _ followed by | (without an intervening
+// space) is scanned as the identifier _ followed by the | or || operator,
+// rather than being greedily consumed as the start of _|_. Regression test
+// for #4289.
+func TestScanUnderscoreOr(t *testing.T) {
+	tests := []struct {
+		src  string
+		want []token.Token
+	}{
+		{"_|_", []token.Token{token.BOTTOM}},
+		{"_|1", []token.Token{token.IDENT, token.OR, token.INT}},
+		{"_||true", []token.Token{token.IDENT, token.LOR, token.TRUE}},
+	}
+	for _, tc := range tests {
+		t.Run(tc.src, func(t *testing.T) {
+			eh := func(_ token.Pos, msg string, args []interface{}) {
+				t.Errorf("error handler called (msg = %s)", fmt.Sprintf(msg, args...))
+			}
+			var s Scanner
+			s.Init(token.NewFile("", -1, len(tc.src)), []byte(tc.src), eh, DontInsertCommas)
+			var got []token.Token
+			for {
+				_, tok, _ := s.Scan()
+				if tok == token.EOF {
+					break
+				}
+				got = append(got, tok)
+			}
+			if diff := cmp.Diff(got, tc.want); diff != "" {
+				t.Errorf("unexpected tokens (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
 // Verify that no comments show up as literal values when skipping comments.
 func TestNoLiteralComments(t *testing.T) {
-	var src = `
+	src := `
 		a: {
 			A: 1 // foo
 		}

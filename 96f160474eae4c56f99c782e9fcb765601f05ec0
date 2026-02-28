@@ -16,6 +16,23 @@
       "message": "Generally I agree with the change, with two caveats:\n\n* The scanner currently never peeks past one byte via `s.ch`; this is the first time we do so. If we want to start doing this, I think a \"peek\" method makes sense for full clarity.\n* The existing code and tests very explicitly want the existing behavior to avoid lookahead (peeking). So I wonder if @mpvl@gmail.com, the author of this code, had a good reason behind this.\n\nMy take is that peeking a small fixed number of bytes (one or two extra) is fine, so I\u0027d approve this change, but best if we double check with Marcel.",
       "revId": "96f160474eae4c56f99c782e9fcb765601f05ec0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b8c0a59_f674dd7b",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_issue4289.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-28T14:13:02Z",
+      "side": 1,
+      "message": "also, if we indeed want this, this should be a test case in either cue/parser or cue/scanner; I think a cmd/cue testscript is rather overkill",
+      "revId": "96f160474eae4c56f99c782e9fcb765601f05ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

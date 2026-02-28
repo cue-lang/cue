@@ -449,8 +449,10 @@ cannot import package as definition identifier`,
 			d: -1
 			e: !foo
 			f: _|_
+			g: _|1
+			h: _||true
 		`,
-			out: "a: (2+3)*5, b: (2+3)+4, c: 2+3+4, d: -1, e: !foo, f: _|_",
+			out: "a: (2+3)*5, b: (2+3)+4, c: 2+3+4, d: -1, e: !foo, f: _|_, g: _|1, h: _||true",
 		},
 		{
 			desc: "ranges",

@@ -742,19 +742,9 @@ scanAgain:
 			}
 			tok = token.EOF
 		case '_':
-			if s.ch == '|' {
-				// Unconditionally require this to be followed by another
-				// underscore to avoid needing an extra lookahead.
-				// Note that `_|x` is always equal to _.
-				s.next()
-				if s.ch != '_' {
-					s.errf(s.file.Offset(pos), "illegal token '_|'; expected '_'")
-					insertEOL = s.insertEOL // preserve insertComma info
-					tok = token.ILLEGAL
-					lit = "_|"
-					break
-				}
-				s.next()
+			if s.ch == '|' && s.rdOffset < len(s.src) && s.src[s.rdOffset] == '_' {
+				s.next() // consume '|'
+				s.next() // consume '_'
 				tok = token.BOTTOM
 				lit = "_|_"
 			} else {

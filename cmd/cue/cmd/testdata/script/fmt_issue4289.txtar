@@ -1,0 +1,17 @@
+# Issue 4289: the scanner should not fail when _ precedes | without whitespace.
+# Previously, the scanner greedy-matched _| as the start of _|_ (bottom),
+# erroring when the third character was not _.
+
+exec cue fmt disj.cue
+cmp disj.cue disj.cue.golden
+exec cue fmt or.cue
+cmp or.cue or.cue.golden
+
+-- disj.cue --
+a: _| 1
+-- disj.cue.golden --
+a: _ | 1
+-- or.cue --
+a: _|| true
+-- or.cue.golden --
+a: _ || true

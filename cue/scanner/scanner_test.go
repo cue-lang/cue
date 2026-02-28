@@ -681,7 +681,6 @@ var errorTests = []struct {
 	{"\a", token.ILLEGAL, 0, "", "illegal character U+0007"},
 	{`^`, token.ILLEGAL, 0, "", "illegal character U+005E '^'"},
 	{`…`, token.ILLEGAL, 0, "", "illegal character U+2026 '…'"},
-	{`_|`, token.ILLEGAL, 0, "", "illegal token '_|'; expected '_'"},
 
 	{`@`, token.ATTRIBUTE, 1, `@`, "invalid attribute: expected '('"},
 	{`@foo`, token.ATTRIBUTE, 4, `@foo`, "invalid attribute: expected '('"},

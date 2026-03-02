@@ -16,6 +16,24 @@
       "message": "I assume you already agreed this plan with Marcel? I would hope that custom validator funcs is something that can work in the future, for example. OK if we don\u0027t support it day one, though.",
       "revId": "4867c567277583358c0cec1b71a4a30aeb37cf4e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3aa296e2_4af63879",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-02T10:47:42Z",
+      "side": 1,
+      "message": "@rogpeppe@gmail.com did you see this?",
+      "parentUuid": "916b798b_52d63d2c",
+      "revId": "4867c567277583358c0cec1b71a4a30aeb37cf4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

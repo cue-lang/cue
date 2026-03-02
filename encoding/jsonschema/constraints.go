@@ -114,7 +114,7 @@ var constraints = []*constraint{
 	p3("oneOf", constraintOneOf, allVersions|openAPILike),
 	p2("pattern", constraintPattern, allVersions|openAPILike),
 	p3("patternProperties", constraintPatternProperties, allVersions),
-	p2("prefixItems", constraintPrefixItems, vfrom(VersionDraft2020_12)),
+	p1("prefixItems", constraintPrefixItems, vfrom(VersionDraft2020_12)),
 	p2("properties", constraintProperties, allVersions|openAPILike),
 	p2("propertyNames", constraintPropertyNames, vfrom(VersionDraft6)),
 	px("readOnly", constraintTODO, vfrom(VersionDraft7)|openAPI),

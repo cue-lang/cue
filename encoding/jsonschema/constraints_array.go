@@ -40,8 +40,16 @@ func constraintAdditionalItems(key string, n cue.Value, s *state) {
 		// If there's no "items" keyword or its value is not an array "additionalItems" doesn't apply.
 		return
 	}
+	setAdditionalItems(elem, s)
+}
+
+// setAdditionalItems modifies the ellipsis in s.list to constrain
+// additional items beyond the prefix. It handles the "additionalItems"
+// keyword (pre-2020-12) and the "items" keyword (2020-12+) when
+// prefixItems is present.
+func setAdditionalItems(elem ast.Expr, s *state) {
 	if len(s.list.Elts) == 0 {
-		// Should never happen because "items" always adds an ellipsis
+		// Should never happen because prefixItems always adds an ellipsis
 		panic("no elements in list")
 	}
 	last := s.list.Elts[len(s.list.Elts)-1].(*ast.Ellipsis)
@@ -105,7 +113,14 @@ func constraintItems(key string, n cue.Value, s *state) {
 	case cue.StructKind, cue.BoolKind:
 		elem := s.schema(n)
 		ast.SetRelPos(elem, token.NoRelPos)
-		s.add(n, arrayType, ast.NewList(&ast.Ellipsis{Type: elem}))
+		if s.list != nil {
+			// In draft2020-12, when prefixItems is present, "items" applies
+			// only to elements beyond the prefix, like "additionalItems"
+			// did in earlier versions.
+			setAdditionalItems(elem, s)
+		} else {
+			s.add(n, arrayType, ast.NewList(&ast.Ellipsis{Type: elem}))
+		}
 		s.hasItems = true
 
 	case cue.ListKind:

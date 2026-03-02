@@ -1517,20 +1517,11 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 				mode:      state.mode,
 			})
 		} else {
-			state := Flags{
+			expr = c.value(a, Flags{
 				status:    state.status,
-				condition: state.condition | fieldSetKnown | concreteKnown,
+				condition: state.condition | fieldSetKnown | concreteKnown | disjunctionTask,
 				mode:      state.mode,
-			}
-			// Be sure to process disjunctions at the very least when
-			// finalizing. Requiring disjunctions earlier may lead to too eager
-			// evaluation.
-			//
-			// TODO: Ideally we would always add this flag regardless of mode.
-			if state.mode == finalize {
-				state.condition |= disjunctionTask
-			}
-			expr = c.value(a, state)
+			})
 		}
 
 		switch v := expr.(type) {

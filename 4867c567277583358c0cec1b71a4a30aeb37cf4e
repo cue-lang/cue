@@ -34,6 +34,24 @@
       "parentUuid": "916b798b_52d63d2c",
       "revId": "4867c567277583358c0cec1b71a4a30aeb37cf4e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5e71832_6d937775",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-02T11:43:32Z",
+      "side": 1,
+      "message": "Yup, this follows the plan we\u0027ve discussed. Custom validator funcs are definitely part of the plan; what isn\u0027t part of the plan is having funcs that are also validators at the same time. For example, `time.Format` would be defined as:\n```\nFormat: func(string) -\u003e validator\n```\n(or similar) rather than a function that might or might not be used as a validator, depending on the number of args passed.",
+      "parentUuid": "916b798b_52d63d2c",
+      "revId": "4867c567277583358c0cec1b71a4a30aeb37cf4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

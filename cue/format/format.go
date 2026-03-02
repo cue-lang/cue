@@ -41,25 +41,32 @@ func Simplify() Option {
 	return func(c *config) { c.simplify = true }
 }
 
+// TODO: The interaction between UseSpaces and TabIndent is very subtle,
+// especially given how both are actually on by default.
+// Moreover, it's actually impossible to unset [config.useSpaces].
+// We should probably rethink this API.
+
 // UseSpaces specifies that tabs should be converted to spaces and sets the
 // default tab width.
+//
+// This option is set to 8 by default.
 func UseSpaces(tabwidth int) Option {
 	return func(c *config) {
-		c.UseSpaces = true
-		c.Tabwidth = tabwidth
+		c.useSpaces = true
+		c.tabWidth = tabwidth
 	}
 }
 
-// TabIndent specifies whether to use tabs for indentation independent of
-// UseSpaces.
+// TabIndent specifies whether to use tabs for indentation independent of [UseSpaces].
+//
+// This option is set to true by default.
 func TabIndent(indent bool) Option {
-	return func(c *config) { c.TabIndent = indent }
+	return func(c *config) { c.tabIndent = indent }
 }
 
-// IndentPrefix specifies the number of tabstops to use as a prefix for every
-// line.
+// IndentPrefix specifies the number of tabstops to use as a prefix for every line.
 func IndentPrefix(n int) Option {
-	return func(c *config) { c.Indent = n }
+	return func(c *config) { c.indent = n }
 }
 
 // TODO: make public
@@ -116,20 +123,20 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 }
 
 type config struct {
-	UseSpaces bool
-	TabIndent bool
-	Tabwidth  int // default: 4
-	Indent    int // default: 0 (all code is indented at least by this much)
+	useSpaces bool // default: true
+	tabIndent bool // default: true
+	tabWidth  int  // default: 8
+	indent    int  // default: 0 (all code is indented at least by this much)
 
-	simplify    bool
-	sortImports bool
+	simplify    bool // default: false
+	sortImports bool // default: false
 }
 
 func newConfig(opt []Option) *config {
 	cfg := &config{
-		Tabwidth:  8,
-		TabIndent: true,
-		UseSpaces: true,
+		tabWidth:  8,
+		tabIndent: true,
+		useSpaces: true,
 	}
 	for _, o := range opt {
 		o(cfg)
@@ -138,7 +145,7 @@ func newConfig(opt []Option) *config {
 }
 
 // Config defines the output of Fprint.
-func (cfg *config) fprint(node interface{}) (out []byte, err error) {
+func (cfg *config) fprint(node any) (out []byte, err error) {
 	var p printer
 	p.init(cfg)
 	if err = printNode(node, &p); err != nil {
@@ -146,17 +153,17 @@ func (cfg *config) fprint(node interface{}) (out []byte, err error) {
 	}
 
 	padchar := byte('\t')
-	if cfg.UseSpaces {
+	if cfg.useSpaces {
 		padchar = byte(' ')
 	}
 
 	twmode := tabwriter.StripEscape | tabwriter.TabIndent | tabwriter.DiscardEmptyColumns
-	if cfg.TabIndent {
+	if cfg.tabIndent {
 		twmode |= tabwriter.TabIndent
 	}
 
 	buf := &bytes.Buffer{}
-	tw := tabwriter.NewWriter(buf, 0, cfg.Tabwidth, 1, padchar, twmode)
+	tw := tabwriter.NewWriter(buf, 0, cfg.tabWidth, 1, padchar, twmode)
 
 	// write printer result via tabwriter/trimmer to output
 	if _, err = tw.Write(p.output); err != nil {
@@ -169,8 +176,8 @@ func (cfg *config) fprint(node interface{}) (out []byte, err error) {
 	}
 
 	b := buf.Bytes()
-	if !cfg.TabIndent {
-		b = bytes.ReplaceAll(b, []byte{'\t'}, bytes.Repeat([]byte{' '}, cfg.Tabwidth))
+	if !cfg.tabIndent {
+		b = bytes.ReplaceAll(b, []byte{'\t'}, bytes.Repeat([]byte{' '}, cfg.tabWidth))
 	}
 	return b, nil
 }
@@ -244,7 +251,7 @@ func init() {
 	_ = s.override
 }
 
-func (f *formatter) print(a ...interface{}) {
+func (f *formatter) print(a ...any) {
 	for _, x := range a {
 		f.Print(x)
 		switch x.(type) {

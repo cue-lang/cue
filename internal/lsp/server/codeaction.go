@@ -56,6 +56,11 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 			Title: "Remove surrounding struct braces",
 			Kind:  protocol.RefactorRewriteConvertFromStruct,
 			Edit:  convertFromStructEdit,
+			// Mark it preferred so that if both "Add..." and "Remove..."
+			// are available, then this "Remove..." action will be
+			// prioritised by editors. This most likely matches the
+			// user's needs.
+			IsPreferred: true,
 		})
 	}
 

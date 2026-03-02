@@ -131,7 +131,7 @@ func (p *printer) Print(v interface{}) {
 			// 2) simplified structs are explicitly referenced separately
 			//    in the AST.
 			if p.indent < 6 {
-				data = literal.IndentTabs(data, p.cfg.Indent+p.indent+1)
+				data = literal.IndentTabs(data, p.cfg.indent+p.indent+1)
 			}
 
 		case token.INT:
@@ -411,7 +411,7 @@ func (p *printer) writeByte(ch byte, n int) {
 		p.pos.Line += n
 		p.pos.Column = 1
 
-		n := p.cfg.Indent + p.indent // include base indentation
+		n := p.cfg.indent + p.indent // include base indentation
 		for range n {
 			p.output = append(p.output, '\t')
 		}

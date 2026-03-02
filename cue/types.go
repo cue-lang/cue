@@ -1947,6 +1947,15 @@ func (v Value) ReferencePath() (root Value, p Path) {
 
 	env, expr := c.EnvExpr()
 
+	if sl, ok := expr.(*adt.StructLit); ok && sl.IsFile() && len(sl.Decls) == 1 {
+		if e, ok := sl.Decls[0].(adt.Expr); ok {
+			// The values is at the top level and it has a single
+			// conjunct which is a StructLit representing the file
+			// holding a single embedding that may be a reference.
+			expr = e
+		}
+	}
+
 	x, path := reference(v.idx, ctx, env, expr)
 	if x == nil {
 		return Value{}, Path{}

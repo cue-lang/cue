@@ -3419,47 +3419,58 @@ func TestWalk(t *testing.T) {
 func TestReferencePath(t *testing.T) {
 	testCases := []struct {
 		input          string
+		path           string
 		want           string
 		wantImportPath string
 		alt            string
 	}{{
 		input: "v: w: x: _|_",
+		path:  "v.w.x",
 		want:  "",
 	}, {
 		input: "v: w: x: 2",
+		path:  "v.w.x",
 		want:  "",
 	}, {
 		input: "v: w: x: a, a: 1",
+		path:  "v.w.x",
 		want:  "a",
 	}, {
 		input: "v: w: x: a.b.c, a: b: c: 1",
+		path:  "v.w.x",
 		want:  "a.b.c",
 	}, {
 		input: "if true { v: w: x: a, a: 1 }",
+		path:  "v.w.x",
 		want:  "a",
 	}, {
 		input: "v: w: x: w.a.b.c, v: w: a: b: c: 1",
+		path:  "v.w.x",
 		want:  "v.w.a.b.c",
 	}, {
 		input: `v: w: x: w.a.b.c, v: w: a: b: c: 1, #D: 3, opt?: 3, "v\(#D)": 3, X: {a: 3}, X`,
+		path:  "v.w.x",
 		want:  "v.w.a.b.c",
 	}, {
 		input: `
 		v: w: x: w.a[bb]["c"]
 		v: w: a: b: c: 1
 		bb: "b"`,
+		path: "v.w.x",
 		want: "v.w.a.b.c",
 	}, {
 		input: `
 		X="\(y)": 1
 		v: w: x: X // TODO: Move up for crash
 		y: "foo"`,
+		path: "v.w.x",
 		want: "foo",
 	}, {
 		input: `
 		v: w: _
 		v: [X=string]: x: a[X]
 		a: w: 1`,
+		path: "v.w.x",
 		want: "a.w",
 	}, {
 		input: `v: {
@@ -3469,6 +3480,7 @@ func TestReferencePath(t *testing.T) {
 			}
 		},
 		src: ["x", "y"]`,
+		path: "v.w.x",
 		want: "v.w.tx",
 	}, {
 		input: `
@@ -3477,12 +3489,14 @@ func TestReferencePath(t *testing.T) {
 		for i in [] {
 		}
 		`,
+		path: "v.w.x",
 		want: "a",
 	}, {
 		input: `
 		v: w: close({x: a})
 		a: 1
 		`,
+		path: "v.w.x",
 		want: "a",
 	}, {
 		input: `
@@ -3492,14 +3506,28 @@ func TestReferencePath(t *testing.T) {
 		`,
 		want:           "Pi",
 		wantImportPath: "math",
+		path:           "v.w.x",
 		alt:            "3.14159265358979323846264338327950288419716939937510582097494459",
-	}}
+	}, {
+		input: `
+		import "time"
+
+		time.RFC3339
+		`,
+		path: "",
+		want: "",
+		// TODO this should work
+		//want:           "RFC3339",
+		//wantImportPath: "time",
+		alt: `"2006-01-02T15:04:05Z07:00"`,
+	},
+	}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			ctx := m.CueContext()
 
 			val := ctx.CompileString(tc.input, cue.Filename("in"))
-			v := val.Lookup("v", "w", "x")
+			v := val.LookupPath(cue.ParsePath(tc.path))
 
 			root, path := v.ReferencePath()
 			if got := path.String(); got != tc.want {

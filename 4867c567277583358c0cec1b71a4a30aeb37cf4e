@@ -52,6 +52,24 @@
       "parentUuid": "916b798b_52d63d2c",
       "revId": "4867c567277583358c0cec1b71a4a30aeb37cf4e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd0f8ea7_355d11d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-02T11:44:34Z",
+      "side": 1,
+      "message": "ah gotcha, that makes sense. I agree with making their signatures more explicit. I can never remember what the logic behind \"is validator\" actually is.",
+      "parentUuid": "f5e71832_6d937775",
+      "revId": "4867c567277583358c0cec1b71a4a30aeb37cf4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

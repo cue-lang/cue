@@ -3514,12 +3514,10 @@ func TestReferencePath(t *testing.T) {
 
 		time.RFC3339
 		`,
-		path: "",
-		want: "",
-		// TODO this should work
-		//want:           "RFC3339",
-		//wantImportPath: "time",
-		alt: `"2006-01-02T15:04:05Z07:00"`,
+		path:           "",
+		want:           "RFC3339",
+		wantImportPath: "time",
+		alt:            `"2006-01-02T15:04:05Z07:00"`,
 	},
 	}
 	for _, tc := range testCases {

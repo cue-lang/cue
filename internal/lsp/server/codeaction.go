@@ -53,9 +53,10 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 	}
 	if convertFromStructEdit != nil {
 		codeActions = append(codeActions, protocol.CodeAction{
-			Title: "Remove surrounding struct braces",
-			Kind:  protocol.RefactorRewriteConvertFromStruct,
-			Edit:  convertFromStructEdit,
+			Title:       "Remove surrounding struct braces",
+			Kind:        protocol.RefactorRewriteConvertFromStruct,
+			Edit:        convertFromStructEdit,
+			IsPreferred: true,
 		})
 	}
 

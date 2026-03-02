@@ -20,10 +20,7 @@
 					1,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "non-unique array of more than two integers is invalid",
@@ -32,10 +29,7 @@
 					2,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "numbers are unique if mathematically unequal",
@@ -44,10 +38,7 @@
 					1.00,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "false is not equal to zero",
@@ -81,10 +72,7 @@
 					"bar",
 					"foo"
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unique array of objects is valid",
@@ -108,10 +96,7 @@
 						"foo": "bar"
 					}
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "property order of array of objects is ignored",
@@ -125,10 +110,7 @@
 						"foo": "bar"
 					}
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unique array of nested objects is valid",
@@ -168,10 +150,7 @@
 						}
 					}
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unique array of arrays is valid",
@@ -195,10 +174,7 @@
 						"foo"
 					]
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "non-unique array of more than two arrays is invalid",
@@ -213,10 +189,7 @@
 						"foo"
 					]
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "1 and true are unique",
@@ -320,10 +293,7 @@
 					{},
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "different objects are unique",
@@ -351,10 +321,7 @@
 						"a": 1
 					}
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "{\"a\": false} and {\"a\": 0} are unique",
@@ -419,10 +386,7 @@
 					false,
 					false
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "[true, true] from items array is not valid",
@@ -430,10 +394,7 @@
 					true,
 					true
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unique array extended from [false, true] is valid",
@@ -463,10 +424,7 @@
 					"foo",
 					"foo"
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "non-unique array extended from [true, false] is not valid",
@@ -476,10 +434,7 @@
 					"foo",
 					"foo"
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

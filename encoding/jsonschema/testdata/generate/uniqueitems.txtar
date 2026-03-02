@@ -1,0 +1,58 @@
+-- test.cue --
+package test
+
+import "list"
+
+uniqueList?: list.UniqueItems()
+
+uniqueBools?: list.UniqueItems() & [bool, bool]
+
+-- datatest/tests.cue --
+package datatest
+
+ok: data: {
+	uniqueList: [1, 2, 3]
+	uniqueBools: [true, false]
+}
+
+badUnique: {
+	data: uniqueList: [1, 1, 2]
+	error: true
+}
+
+badUniqueBools: {
+	data: uniqueBools: [true, true]
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		uniqueBools: {
+			type: "array"
+			prefixItems: [{
+				type: "boolean"
+			}, {
+				type: "boolean"
+			}]
+			maxItems:    2
+			minItems:    2
+			uniqueItems: true
+		}
+		uniqueList: {
+			type:        "array"
+			uniqueItems: true
+		}
+	}
+}
+-- out/generate-v3/ok --
+-- out/generate-v3/badUnique --
+badUnique.data.uniqueList: invalid value [1,1,2] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
+    1:248
+    ./datatest/tests.cue:9:20
+-- out/generate-v3/badUniqueBools --
+badUniqueBools.data.uniqueBools: invalid value [true,true] (does not satisfy list.UniqueItems): equal value (true) at position 0 and 1:
+    1:199
+    ./datatest/tests.cue:14:21
+    1:173

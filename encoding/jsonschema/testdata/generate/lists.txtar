@@ -66,8 +66,8 @@ badTupleType: {
 			}, {
 				type: "boolean"
 			}]
-			maxLength: 3
-			minLength: 3
+			maxItems: 3
+			minItems: 3
 		}
 		numberList: {
 			type: "array"
@@ -88,8 +88,8 @@ badTupleType: {
 			}, {
 				type: "integer"
 			}]
-			maxLength: 2
-			minLength: 2
+			maxItems: 2
+			minItems: 2
 		}
 	}
 }
@@ -102,12 +102,11 @@ badStringList.data.stringList.2: conflicting values 3 and string (mismatched typ
     ./datatest/tests.cue:14:27
 -- out/generate-v3/badTupleLength --
 badTupleLength.data.tuple: incompatible list lengths (1 and 3):
-    1:406
+    1:404
+badTupleLength.data.tuple: incompatible list lengths (1 and 3):
+    1:470
 -- out/generate-v3/badTupleType --
 badTupleType.data.tuple.0: conflicting values 1 and string (mismatched types int and string):
     ./datatest/tests.cue:24:16
-badTupleType.data.tuple.1: conflicting values "bar" and int (mismatched types string and int):
-    ./datatest/tests.cue:24:19
-    1:440
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --

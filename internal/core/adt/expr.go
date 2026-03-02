@@ -1509,30 +1509,26 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 		c.errs = nil
 		// XXX: XXX: clear id.closeContext per argument and remove from runTask?
 
-		runMode := state.mode
-		cond := state.condition
 		var expr Value
 		if builtin.NonConcrete {
-			state = Flags{
+			expr = c.evalState(a, Flags{
 				status:    state.status,
-				condition: cond,
-				mode:      runMode,
-			}
-			expr = c.evalState(a, state)
+				condition: state.condition,
+				mode:      state.mode,
+			})
 		} else {
-			cond |= fieldSetKnown | concreteKnown
+			state := Flags{
+				status:    state.status,
+				condition: state.condition | fieldSetKnown | concreteKnown,
+				mode:      state.mode,
+			}
 			// Be sure to process disjunctions at the very least when
 			// finalizing. Requiring disjunctions earlier may lead to too eager
 			// evaluation.
 			//
 			// TODO: Ideally we would always add this flag regardless of mode.
-			if runMode == finalize {
-				cond |= disjunctionTask
-			}
-			state = Flags{
-				status:    state.status,
-				condition: cond,
-				mode:      runMode,
+			if state.mode == finalize {
+				state.condition |= disjunctionTask
 			}
 			expr = c.value(a, state)
 		}

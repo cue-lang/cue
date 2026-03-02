@@ -3372,6 +3372,85 @@ o: #x & #x.y.z
 		},
 
 		{
+			name: "Package_Level_Scopes",
+			archive: `-- a.cue --
+x: {
+	{b: _} & {c: b}
+	b: _
+}
+
+y: {
+	{b: _} & {c: b}
+}
+
+{d: _} & {e: d}
+
+{g: _} & {h: g}
+g: _
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 2, "b"):  {ln(2, 1, "b"), ln(3, 1, "b")},
+				ln(10, 2, "d"): {ln(10, 1, "d")}, // this is WRONG. Should not resolve at all.
+				ln(12, 2, "g"): {ln(12, 1, "g"), ln(13, 1, "g")},
+
+				ln(1, 1, "x"): {self},
+				ln(2, 1, "c"): {self},
+				ln(2, 1, "b"): {self, ln(3, 1, "b")},
+				ln(3, 1, "b"): {self, ln(2, 1, "b")},
+
+				ln(6, 1, "y"): {self},
+
+				ln(7, 1, "b"): {self},
+				ln(7, 1, "c"): {self},
+
+				ln(10, 1, "d"): {self},
+				ln(10, 1, "e"): {self},
+
+				ln(12, 1, "g"): {self, ln(13, 1, "g")},
+				ln(12, 1, "h"): {self},
+				ln(13, 1, "g"): {self, ln(12, 1, "g")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or(2, 6):   {f: []string{"b", "c"}, e: []string{"g", "x", "y"}},
+				or1(6):     {f: []string{"b", "c"}, e: []string{"b", "g", "x", "y"}},
+				or(7, 9):   {f: []string{"b", "c"}},
+				or(9, 12):  {e: []string{"b", "g", "x", "y"}},
+				or1(15):    {f: []string{"b", "c"}, e: []string{"b", "g", "x", "y"}},
+				or(16, 18): {f: []string{"b", "c"}},
+				or(18, 21): {e: []string{"b", "c", "g", "x", "y"}},
+				or1(22):    {f: []string{"b", "c"}, e: []string{"g", "x", "y"}},
+				or(23, 25): {f: []string{"b", "c"}},
+				or(25, 28): {e: []string{"b", "g", "x", "y"}},
+				or1(28):    {f: []string{"b", "c"}, e: []string{"g", "x", "y"}},
+				or(30, 33): {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or(33, 38): {f: []string{"b", "c"}, e: []string{"g", "x", "y"}},
+				or(38, 40): {f: []string{"b", "c"}},
+				or(40, 43): {e: []string{"b", "g", "x", "y"}},
+				or1(46):    {f: []string{"b", "c"}, e: []string{"g", "x", "y"}},
+				or(47, 49): {f: []string{"b", "c"}},
+				or(49, 52): {e: []string{"c", "g", "x", "y"}},
+				or1(53):    {f: []string{"b", "c"}, e: []string{"g", "x", "y"}},
+				or1(55):    {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or1(56):    {f: []string{"d", "e", "g", "h", "x", "y"}, e: []string{"g", "x", "y"}},
+				or(57, 59): {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or(59, 62): {e: []string{"d", "g", "x", "y"}},
+				or1(65):    {f: []string{"d", "e", "g", "h", "x", "y"}, e: []string{"g", "x", "y"}},
+				or(66, 68): {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or(68, 71): {e: []string{"e", "g", "x", "y"}},
+				or1(72):    {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or1(73):    {f: []string{"d", "e", "g", "h", "x", "y"}, e: []string{"g", "x", "y"}},
+				or(74, 76): {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or(76, 79): {e: []string{"g", "x", "y"}},
+				or1(82):    {f: []string{"d", "e", "g", "h", "x", "y"}, e: []string{"g", "x", "y"}},
+				or(83, 85): {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or(85, 88): {e: []string{"g", "h", "x", "y"}},
+				or(89, 91): {f: []string{"d", "e", "g", "h", "x", "y"}},
+				or(91, 94): {e: []string{"g", "x", "y"}},
+			},
+		},
+
+		{
 			name: "MultiFile_Package_Top_Single",
 			archive: `-- a.cue --
 package x

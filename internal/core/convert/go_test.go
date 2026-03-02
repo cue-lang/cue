@@ -292,7 +292,7 @@ func TestConvertType(t *testing.T) {
 	}, {
 		goTyp: &struct {
 			A int16 `cue:">=0&<100"`
-			B error `json:"b,"`
+			B error `json:"b"`
 			C string
 			D bool
 			F float64

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7488dc54_5ab8aedd",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-02T17:34:51Z",
+      "side": 1,
+      "message": "why do we need the version with parentheses as well? we don\u0027t have that anywhere else.",
+      "revId": "11846734b5264518a361a4555bcebdcfdfbe626f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

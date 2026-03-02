@@ -652,6 +652,13 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 				g.unique.intern(&itemFormat{format: format}),
 			},
 		}
+	case "list.UniqueItems", "list.UniqueItems()":
+		return &itemAllOf{
+			elems: []internItem{
+				g.unique.intern(&itemType{kinds: []string{"array"}}),
+				g.unique.intern(&itemUniqueItems{}),
+			},
+		}
 	case "list.MinItems", "list.MaxItems":
 		if len(args) != 2 {
 			g.addError(v, fmt.Errorf("%s expects 1 argument, got %d", funcName, len(args)-1))
@@ -1055,7 +1062,11 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 		var err error
 		n, err = lenv.Int64()
 		if err != nil {
-			g.addErrorf(v, "cannot extract concrete list length from %v: %v", v, err)
+			// This can happen legitimately when we know that the type is a list
+			// but we don't know anything about the number of items,
+			// for example, a list validator. We'll treat this as if it's [... _]
+			n = 0
+			ellipsis = v.Context().CompileString("_")
 		}
 	}
 	prefix := make([]internItem, n)
@@ -1072,7 +1083,7 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 	}
 	items := &itemItems{}
 	if len(prefix) > 0 {
-		a.elems = append(a.elems, g.unique.intern(&itemLengthBounds{
+		a.elems = append(a.elems, g.unique.intern(&itemItemsBounds{
 			constraint: cue.GreaterThanEqualOp,
 			n:          len(prefix),
 		}))
@@ -1081,7 +1092,7 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 	if ellipsis.Exists() {
 		items.rest = trueAsNil(g.makeItem(ellipsis, mode))
 	} else {
-		a.elems = append(a.elems, g.unique.intern(&itemLengthBounds{
+		a.elems = append(a.elems, g.unique.intern(&itemItemsBounds{
 			constraint: cue.LessThanEqualOp,
 			n:          len(prefix),
 		}))

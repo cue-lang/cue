@@ -566,6 +566,20 @@ func (i *itemItems) apply(f func(internItem, *uniqueItems) internItem, u *unique
 	return &itemItems{prefix: prefix, rest: rest}
 }
 
+// itemUniqueItems represents the uniqueItems constraint for arrays.
+type itemUniqueItems struct{}
+
+func (it *itemUniqueItems) hash(h *maphash.Hash, u *uniqueItems) {
+}
+
+func (i *itemUniqueItems) generate(g *generator) ast.Expr {
+	return singleKeyword("uniqueItems", ast.NewBool(true))
+}
+
+func (i *itemUniqueItems) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {
+	return i
+}
+
 // itemContains represents a contains constraint for arrays
 type itemContains struct {
 	elem internItem

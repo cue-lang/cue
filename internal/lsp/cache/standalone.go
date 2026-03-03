@@ -210,6 +210,13 @@ func (f *standaloneFile) reload() error {
 		f.delete()
 		return ErrBadFile
 	}
+	if extm := w.extValidatorMgr; extm != nil {
+		extv := extm.EnsureValidator(f.uri, w.extValidatorOnDirtyChanged)
+		file.extValidator = extv
+		if extv != nil {
+			extv.MarkDirty()
+		}
+	}
 
 	f.definitions = eval.New(eval.Config{}, syntax)
 	w.debugLogf("%v Reloaded", f)

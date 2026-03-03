@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/extvalidator"
 	"cuelang.org/go/internal/lsp/fscache"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
@@ -66,6 +67,8 @@ type Module struct {
 	// care that all the dirty files are loaded by _some_ package
 	// within the module.
 	dirtyFiles map[protocol.DocumentURI]struct{}
+
+	extValidator *extvalidator.Validator
 }
 
 // NewModule creates a new [Module] and adds it to the workspace. The
@@ -127,6 +130,10 @@ func (m *Module) ReloadModule() error {
 	}
 
 	w := m.workspace
+	if extm := w.extValidatorMgr; extm != nil {
+		m.extValidator = extm.EnsureValidator(m.rootURI, w.extValidatorOnDirtyChanged)
+	}
+
 	fh, err := w.overlayFS.ReadFile(m.modFileURI)
 	if err != nil {
 		w.debugLogf("%v Error when reloading: %v", m, err)

@@ -123,9 +123,12 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 			DefinitionProvider:         &protocol.Or_ServerCapabilities_definitionProvider{Value: true},
 			DocumentFormattingProvider: &protocol.Or_ServerCapabilities_documentFormattingProvider{Value: true},
 			DocumentSymbolProvider:     &protocol.Or_ServerCapabilities_documentSymbolProvider{Value: true},
-			HoverProvider:              &protocol.Or_ServerCapabilities_hoverProvider{Value: true},
-			ReferencesProvider:         &protocol.Or_ServerCapabilities_referencesProvider{Value: true},
-			RenameProvider:             renameOpts,
+			ExecuteCommandProvider: &protocol.ExecuteCommandOptions{
+				Commands: protocol.NonNilSlice(options.SupportedCommands),
+			},
+			HoverProvider:      &protocol.Or_ServerCapabilities_hoverProvider{Value: true},
+			ReferencesProvider: &protocol.Or_ServerCapabilities_referencesProvider{Value: true},
+			RenameProvider:     renameOpts,
 			TextDocumentSync: &protocol.TextDocumentSyncOptions{
 				Change:    protocol.Incremental,
 				OpenClose: true,

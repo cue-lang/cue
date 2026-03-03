@@ -45,6 +45,8 @@ type FileHandle interface {
 	// is a copy of the underlying file content, and thus safe to be
 	// mutated. This matches the behaviour of [iofs.ReadFileFS].
 	Content() []byte
+	// ModTime returns modification time of the file.
+	ModTime() time.Time
 }
 
 type diskFileEntry struct {
@@ -210,10 +212,13 @@ func RemovePhantomPackageDecl(file *ast.File) ast.Node {
 }
 
 // Version implements [FileHandle]
-func (entry *diskFileEntry) Version() int32 { panic("Should never be called") }
+func (entry *diskFileEntry) Version() int32 { return 0 }
 
 // Content implements [FileHandle]
 func (entry *diskFileEntry) Content() []byte { return slices.Clone(entry.content) }
+
+// ModTime implements [FileHandle]
+func (entry *diskFileEntry) ModTime() time.Time { return entry.modTime }
 
 // CUECacheFS exists to cache [ast.File] values and thus amortize the
 // cost of parsing cue files. It is not an overlay in any way. Its
@@ -389,6 +394,9 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 // IoFS implements [RootableFS]
 func (fs *CUECacheFS) IoFS(root string) CUEDirFS {
 	root = strings.TrimRight(root, string(os.PathSeparator))
+	if root == "" {
+		root = string(os.PathSeparator)
+	}
 	return &rootedCUECacheFS{
 		cuecachefs: fs,
 		delegatefs: os.DirFS(root).(DirFS),

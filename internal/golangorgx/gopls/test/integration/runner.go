@@ -346,9 +346,9 @@ func (r *Runner) forwardedServer(config runConfig, optsHook func(*settings.Optio
 
 func newCache(config runConfig) (*cache.Cache, error) {
 	if config.reg == nil {
-		return cache.New()
+		return cache.New(nil)
 	} else {
-		return cache.NewWithRegistry(config.reg), nil
+		return cache.NewWithRegistry(nil, config.reg), nil
 	}
 }
 

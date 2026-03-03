@@ -10,7 +10,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 )
 
 var (
@@ -18,15 +17,13 @@ var (
 	defaultOptions *Options
 )
 
+const ExternalValidateCommand = "cuelsp.externalvalidate"
+
 // DefaultOptions is the options that are used for Gopls execution independent
 // of any externally provided configuration (LSP initialization, command
 // invocation, etc.).
 func DefaultOptions(overrides ...func(*Options)) *Options {
 	optionsOnce.Do(func() {
-		var commands []string
-		for _, c := range command.Commands {
-			commands = append(commands, c.ID())
-		}
 		defaultOptions = &Options{
 			ClientOptions: ClientOptions{
 				InsertTextFormat:                           protocol.PlainTextTextFormat,
@@ -45,7 +42,7 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 						protocol.RefactorRewriteConvertFromStruct: true,
 					},
 				},
-				SupportedCommands: commands,
+				SupportedCommands: []string{ExternalValidateCommand},
 			},
 			UserOptions: UserOptions{
 				BuildOptions: BuildOptions{
@@ -84,12 +81,7 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 						CompleteFunctionCalls:          true,
 					},
 					Codelenses: map[string]bool{
-						string(command.Generate):          true,
-						string(command.RegenerateCgo):     true,
-						string(command.Tidy):              true,
-						string(command.GCDetails):         false,
-						string(command.UpgradeDependency): true,
-						string(command.Vendor):            true,
+						ExternalValidateCommand: false,
 					},
 				},
 			},

@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
+	"cuelang.org/go/internal/lsp/extvalidator"
 	"cuelang.org/go/internal/lsp/fscache"
 	"cuelang.org/go/internal/mod/modpkgload"
 )
@@ -71,7 +72,8 @@ type Workspace struct {
 	// enqueue allows for a function to be added to the incoming queue
 	// of messages from the client. The enqueue function itself is
 	// non-blocking.
-	enqueue func(func())
+	enqueue         func(func())
+	extValidatorMgr *extvalidator.Manager
 }
 
 func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string), enqueue func(func())) *Workspace {
@@ -91,6 +93,9 @@ func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string), e
 		enqueue:   enqueue,
 	}
 	w.standalone = NewStandalone(w)
+	if extProfile := cache.extProfile; extProfile != nil {
+		w.extValidatorMgr = extvalidator.NewManager(extProfile, overlayFS, debugLog)
+	}
 	return w
 }
 

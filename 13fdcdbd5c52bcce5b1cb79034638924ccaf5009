@@ -16,6 +16,24 @@
       "message": "These removals are just drive-by tidyings. Unused stuff we inherited from gopls.",
       "revId": "13fdcdbd5c52bcce5b1cb79034638924ccaf5009",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5efdc8d_5f20c75a",
+        "filename": "internal/golangorgx/gopls/lsprpc/lsprpc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-03T16:41:06Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "90c72b84_efc59941",
+      "revId": "13fdcdbd5c52bcce5b1cb79034638924ccaf5009",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -74,10 +74,6 @@ func (s *server) DocumentLink(ctx context.Context, params *protocol.DocumentLink
 	return nil, notImplemented("DocumentLink")
 }
 
-func (s *server) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCommandParams) (interface{}, error) {
-	return nil, notImplemented("ExecuteCommand")
-}
-
 func (s *server) FoldingRange(ctx context.Context, params *protocol.FoldingRangeParams) ([]protocol.FoldingRange, error) {
 	return nil, notImplemented("FoldingRange")
 }

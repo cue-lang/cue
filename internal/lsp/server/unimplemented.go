@@ -14,10 +14,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 )
 
-func (s *server) CodeLens(ctx context.Context, params *protocol.CodeLensParams) ([]protocol.CodeLens, error) {
-	return nil, notImplemented("CodeLens")
-}
-
 func (s *server) ColorPresentation(context.Context, *protocol.ColorPresentationParams) ([]protocol.ColorPresentation, error) {
 	return nil, notImplemented("ColorPresentation")
 }
@@ -72,10 +68,6 @@ func (s *server) DocumentHighlight(ctx context.Context, params *protocol.Documen
 
 func (s *server) DocumentLink(ctx context.Context, params *protocol.DocumentLinkParams) (links []protocol.DocumentLink, err error) {
 	return nil, notImplemented("DocumentLink")
-}
-
-func (s *server) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCommandParams) (interface{}, error) {
-	return nil, notImplemented("ExecuteCommand")
 }
 
 func (s *server) FoldingRange(ctx context.Context, params *protocol.FoldingRangeParams) ([]protocol.FoldingRange, error) {

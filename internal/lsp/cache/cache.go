@@ -9,10 +9,11 @@ import (
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/mod/modconfig"
+	"cuelang.org/go/unstable/lspaux/config"
 )
 
 // New creates a new Cache.
-func New() (*Cache, error) {
+func New(extProfile *config.Profile) (*Cache, error) {
 	modcfg := &modconfig.Config{
 		ClientType: "cuelsp",
 	}
@@ -20,25 +21,28 @@ func New() (*Cache, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewWithRegistry(reg), nil
+	return NewWithRegistry(extProfile, reg), nil
 }
 
 // NewWithRegistry creates a new cache, using the specified registry.
-func NewWithRegistry(reg Registry) *Cache {
+func NewWithRegistry(extProfile *config.Profile, reg Registry) *Cache {
 	if reg == nil {
 		panic("nil registry")
 	}
+
 	return &Cache{
-		fs:       fscache.NewCUECachedFS(),
-		registry: reg,
+		fs:         fscache.NewCUECachedFS(),
+		registry:   reg,
+		extProfile: extProfile,
 	}
 }
 
 // A Cache holds content that is shared across multiple cuelsp
 // client/editor connections.
 type Cache struct {
-	fs       *fscache.CUECacheFS
-	registry Registry
+	fs         *fscache.CUECacheFS
+	registry   Registry
+	extProfile *config.Profile
 }
 
 type Registry interface {

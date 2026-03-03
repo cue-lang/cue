@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab48fa3b_b2c0b739",
+        "filename": "doc/ref/spec_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-03-03T16:26:20Z",
+      "side": 1,
+      "message": "This seems unnecessarily verbose to me. I would just check for the first case only, or the second case and google the newline if there is one separately, like in the previous function. The newline skipping could be hoisted in a separate function as well.\n\nAlternatively, there could be a function that finds a string and returns the string after it with a newline gobbled if it exists.",
+      "revId": "bcccbcfb11d1d7a0846dc968bfc6f85eed4dd2df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

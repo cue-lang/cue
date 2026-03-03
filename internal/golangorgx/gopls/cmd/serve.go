@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
@@ -19,6 +20,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
 	"cuelang.org/go/internal/lsp/cache"
+	"cuelang.org/go/unstable/lspaux/config"
 )
 
 // Serve is a struct that exposes the configurable parts of the LSP server as
@@ -30,6 +32,9 @@ type Serve struct {
 	IdleTimeout time.Duration `flag:"listen.timeout" help:"when used with -listen, shut down the server when there are no connected clients for this duration"`
 
 	RemoteListenTimeout time.Duration `flag:"remote.listen.timeout" help:"when used with -remote=auto, the -listen.timeout value used to start the daemon"`
+
+	ExtConfigFile string `flag:"extconfig" help:"path to config file for external validators"`
+	ExtProfile    string `flag:"extprofile" help:"profile name for external validators"`
 
 	app *Application
 }
@@ -77,7 +82,11 @@ func (s *Serve) Run(ctx context.Context, args ...string) error {
 			return fmt.Errorf("creating forwarder: %w", err)
 		}
 	} else {
-		cache, err := cache.New()
+		profile, err := s.externalValidatorProfile()
+		if err != nil {
+			return err
+		}
+		cache, err := cache.New(profile)
 		if err != nil {
 			return err
 		}
@@ -121,4 +130,28 @@ func (s *Serve) Run(ctx context.Context, args ...string) error {
 		return nil
 	}
 	return err
+}
+
+func (s *Serve) externalValidatorProfile() (*config.Profile, error) {
+	if s.ExtConfigFile == "" {
+		if s.ExtProfile != "" {
+			return nil, fmt.Errorf("-extprofile can only be set in conjunction with -extconfig")
+		}
+		return nil, nil
+	}
+	cfg, err := config.Parse(s.ExtConfigFile)
+	if err != nil {
+		return nil, fmt.Errorf("reading external config file: %w", err)
+	}
+	profileName := cfg.ActiveProfile
+	if s.ExtProfile != "" {
+		profileName = s.ExtProfile
+	}
+	profile, found := cfg.Profiles[profileName]
+	if !found {
+		return nil, fmt.Errorf("profile %q not found in config file %s", profileName, s.ExtConfigFile)
+	}
+
+	profile.ServerURL = strings.TrimRight(profile.ServerURL, "/")
+	return profile, nil
 }

@@ -29,6 +29,7 @@ require (
 )
 
 require (
+	github.com/coder/websocket v1.8.14 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect

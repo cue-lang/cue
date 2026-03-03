@@ -210,6 +210,11 @@ func (f *standaloneFile) reload() error {
 		f.delete()
 		return ErrBadFile
 	}
+	cueHub := w.cueHubMgr.EnsureHub(f.uri)
+	file.cueHub = cueHub
+	if cueHub != nil {
+		cueHub.MarkDirty()
+	}
 
 	f.definitions = eval.New(eval.Config{}, syntax)
 	w.debugLogf("%v Reloaded", f)

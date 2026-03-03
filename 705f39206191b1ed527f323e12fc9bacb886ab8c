@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36631f07_4efd28be",
+        "filename": "internal/lsp/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-03T16:21:49Z",
+      "side": 1,
+      "message": "nit: typically in Go you put a mutex at the top of a group of fields to mark that the mutex guards those fields. is that the case here? if the mutex guards the whole struct, I\u0027d put it separate to any other group of fields.",
+      "revId": "705f39206191b1ed527f323e12fc9bacb886ab8c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

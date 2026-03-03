@@ -221,6 +221,12 @@ func (s *server) debugLog(msg string) {
 	s.client.LogMessage(ctx, &protocol.LogMessageParams{Type: protocol.Debug, Message: msg})
 }
 
+func (s *server) withServerLocked(f func()) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	f()
+}
+
 // eventuallyUseWorkspaceFolders records the folders that the server
 // has received as part of the initialize message. Those folders
 // aren't used until after initialization is complete.

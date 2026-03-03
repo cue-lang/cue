@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/cuehub"
 )
 
 // ensureFile returns an existing [File] associated with uri if it
@@ -98,6 +99,8 @@ type File struct {
 	mapper  *protocol.Mapper
 	symbols []protocol.DocumentSymbol
 
+	cueHub *cuehub.CueHub
+
 	// errors records both the current users of this File and any
 	// errors they have reported. Because most of the time there will
 	// be only a single user of a File, it is modelled using a slice
@@ -109,7 +112,7 @@ type File struct {
 }
 
 type userErrors struct {
-	user   packageOrModule
+	user   any
 	errors []error
 }
 
@@ -117,7 +120,7 @@ type userErrors struct {
 // which may be nil, contains any errors which this user has
 // encountered with this file and which should be reported to the
 // client via diagonstic notifications.
-func (f *File) ensureUser(user packageOrModule, errs ...error) {
+func (f *File) ensureUser(user any, errs ...error) {
 	for i := range f.errors {
 		existing := &f.errors[i]
 		if existing.user != user {
@@ -137,7 +140,7 @@ func (f *File) ensureUser(user packageOrModule, errs ...error) {
 }
 
 // removeUser records that user is no longer using this File.
-func (f *File) removeUser(user packageOrModule) {
+func (f *File) removeUser(user any) {
 	f.errors = slices.DeleteFunc(f.errors, func(existing userErrors) bool {
 		if existing.user != user {
 			return false
@@ -323,7 +326,8 @@ func (f *File) publishErrors() {
 		Version:     f.tokFile.Revision(),
 		Diagnostics: diags,
 	}
-	f.workspace.client.PublishDiagnostics(context.Background(), params)
+	err := f.workspace.client.PublishDiagnostics(context.Background(), params)
+	f.workspace.debugLogf("published %d diagnostics for %s, %v", len(diags), f.uri, err)
 }
 
 // errorToDiagnostics converts cue errors to [protocol.Diagnostic]

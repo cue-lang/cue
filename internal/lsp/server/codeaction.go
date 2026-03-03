@@ -33,9 +33,6 @@ func (s *server) getSupportedCodeActions() []protocol.CodeActionKind {
 }
 
 func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionParams) ([]protocol.CodeAction, error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
 	var codeActions []protocol.CodeAction
 
 	convertToStructEdit, err := s.workspace.CodeActionConvertToStruct(ctx, params)
@@ -65,6 +62,11 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 			// user's needs.
 			IsPreferred: true,
 		})
+	}
+
+	cueHubEval := s.workspace.CodeActionCueHubEval(ctx, params)
+	if cueHubEval != nil {
+		codeActions = append(codeActions, *cueHubEval)
 	}
 
 	return codeActions, nil

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 )
@@ -87,25 +88,38 @@ func (s *server) UpdateWatchedFiles(ctx context.Context) error {
 		})
 	}
 
-	err := s.client.RegisterCapability(ctx, &protocol.RegistrationParams{
-		Registrations: []protocol.Registration{{
-			ID:     WatchedFilesCapabilityID(curID),
-			Method: "workspace/didChangeWatchedFiles",
-			RegisterOptions: protocol.DidChangeWatchedFilesRegistrationOptions{
-				Watchers: watchers,
-			},
-		}},
+	s.enqueue(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		err := s.client.RegisterCapability(ctx,
+			&protocol.RegistrationParams{
+				Registrations: []protocol.Registration{{
+					ID:     WatchedFilesCapabilityID(curID),
+					Method: "workspace/didChangeWatchedFiles",
+					RegisterOptions: protocol.DidChangeWatchedFilesRegistrationOptions{
+						Watchers: watchers,
+					},
+				}},
+			})
+		if err != nil {
+			s.debugLog(err.Error())
+		}
 	})
-	if err != nil {
-		return err
-	}
 
 	if oldID > 0 {
-		return s.client.UnregisterCapability(ctx, &protocol.UnregistrationParams{
-			Unregisterations: []protocol.Unregistration{{
-				ID:     WatchedFilesCapabilityID(oldID),
-				Method: "workspace/didChangeWatchedFiles",
-			}},
+		s.enqueue(func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			defer cancel()
+			err := s.client.UnregisterCapability(ctx,
+				&protocol.UnregistrationParams{
+					Unregisterations: []protocol.Unregistration{{
+						ID:     WatchedFilesCapabilityID(oldID),
+						Method: "workspace/didChangeWatchedFiles",
+					}},
+				})
+			if err != nil {
+				s.debugLog(err.Error())
+			}
 		})
 	}
 

@@ -1,4 +1,4 @@
-// Copyright 2025 CUE Authors
+// Copyright 2026 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,18 +16,28 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/golangorgx/gopls/settings"
 )
 
-func (s *server) DocumentSymbol(ctx context.Context, params *protocol.DocumentSymbolParams) ([]any, error) {
-	root := s.workspace.DocumentSymbols(params.TextDocument.URI)
-	if len(root) == 0 {
-		return nil, nil
+func (s *server) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCommandParams) (any, error) {
+	switch params.Command {
+	case settings.CueHubEvaluateCommand:
+		args := params.Arguments
+		if len(args) != 1 {
+			break
+		}
+		var uri protocol.DocumentURI
+		err := json.Unmarshal(args[0], &uri)
+		if err != nil {
+			return nil, err
+		}
+
+		err = s.workspace.CommandCueHubEval(ctx, uri)
+		return nil, err
+
 	}
-	roots := make([]any, len(root))
-	for i, child := range root {
-		roots[i] = child
-	}
-	return roots, nil
+	return nil, notImplemented("ExecuteCommand")
 }

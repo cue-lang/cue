@@ -35,10 +35,7 @@ type overlayFileEntry struct {
 	cueFileParser
 }
 
-var _ interface {
-	FileHandle
-	dirEntry
-} = (*overlayFileEntry)(nil)
+var _ FileHandle = (*overlayFileEntry)(nil)
 
 // URI implements [FileHandle]
 func (entry *overlayFileEntry) URI() protocol.DocumentURI { return entry.uri }

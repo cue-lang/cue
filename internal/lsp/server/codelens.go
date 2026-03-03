@@ -1,4 +1,4 @@
-// Copyright 2025 CUE Authors
+// Copyright 2026 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,14 +20,11 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 )
 
-func (s *server) DocumentSymbol(ctx context.Context, params *protocol.DocumentSymbolParams) ([]any, error) {
-	root := s.workspace.DocumentSymbols(params.TextDocument.URI)
-	if len(root) == 0 {
-		return nil, nil
+func (s *server) CodeLens(ctx context.Context, params *protocol.CodeLensParams) ([]protocol.CodeLens, error) {
+	var codeLenses []protocol.CodeLens
+	cueHubEval := s.workspace.CodeLensCueHubEval(ctx, params)
+	if cueHubEval != nil {
+		codeLenses = append(codeLenses, *cueHubEval)
 	}
-	roots := make([]any, len(root))
-	for i, child := range root {
-		roots[i] = child
-	}
-	return roots, nil
+	return codeLenses, nil
 }

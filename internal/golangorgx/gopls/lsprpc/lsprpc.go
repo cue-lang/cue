@@ -68,11 +68,14 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 	// - that would provide the necessary memory barries. TBD.
 	//
 	// defer svr.Shutdown(ctx)
+	handlers, enqueue := protocol.HandlersWithEnqueue(
+		handshaker(svrID, s.daemon,
+			protocol.ServerHandler(svr, jsonrpc2.MethodNotFound)))
+	svr.SetEnqueuer(enqueue.Enqueue)
+	defer enqueue.Enqueue(func() { svr.Shutdown(ctx) })
+
 	ctx = protocol.WithClient(ctx, client)
-	conn.Go(ctx,
-		protocol.Handlers(
-			handshaker(svrID, s.daemon,
-				protocol.ServerHandler(svr, jsonrpc2.MethodNotFound))))
+	conn.Go(ctx, handlers)
 	if s.daemon {
 		log.Printf("Server %s: connected", svrID)
 		defer log.Printf("Server %s: exited", svrID)

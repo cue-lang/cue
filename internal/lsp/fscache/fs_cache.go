@@ -6,6 +6,7 @@ import (
 	"fmt"
 	iofs "io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -45,11 +46,13 @@ type FileHandle interface {
 	// is a copy of the underlying file content, and thus safe to be
 	// mutated. This matches the behaviour of [iofs.ReadFileFS].
 	Content() []byte
+
+	dirEntry
 }
 
 type diskFileEntry struct {
 	uri     protocol.DocumentURI
-	modTime time.Time
+	modtime time.Time
 
 	// cueFileParser is a pointer because it is shared between several
 	// file entries (e.g. when symlinks mean you have several uris that
@@ -210,10 +213,34 @@ func RemovePhantomPackageDecl(file *ast.File) ast.Node {
 }
 
 // Version implements [FileHandle]
-func (entry *diskFileEntry) Version() int32 { panic("Should never be called") }
+func (entry *diskFileEntry) Version() int32 { return 0 }
 
 // Content implements [FileHandle]
 func (entry *diskFileEntry) Content() []byte { return slices.Clone(entry.content) }
+
+// Name implements [iofs.FileInfo] and  [iofs.DirEntry]
+func (entry *diskFileEntry) Name() string { return path.Base(entry.uri.Path()) }
+
+// Size implements [iofs.FileInfo]
+func (entry *diskFileEntry) Size() int64 { return int64(len(entry.content)) }
+
+// Mode implements [iofs.FileInfo]
+func (entry *diskFileEntry) Mode() iofs.FileMode { return 0o444 }
+
+// ModTime implements [iofs.FileInfo]
+func (entry *diskFileEntry) ModTime() time.Time { return entry.modtime }
+
+// IsDir implements [iofs.FileInfo] and  [iofs.DirEntry]
+func (entry *diskFileEntry) IsDir() bool { return false }
+
+// Sys implements [iofs.FileInfo]
+func (entry *diskFileEntry) Sys() any { return nil }
+
+// Type implements [iofs.DirEntry]
+func (entry *diskFileEntry) Type() iofs.FileMode { return 0 }
+
+// Info implements [iofs.DirEntry]
+func (entry *diskFileEntry) Info() (iofs.FileInfo, error) { return entry, nil }
 
 // CUECacheFS exists to cache [ast.File] values and thus amortize the
 // cost of parsing cue files. It is not an overlay in any way. Its
@@ -293,7 +320,7 @@ func (fs *CUECacheFS) ReadFile(uri protocol.DocumentURI) (FileHandle, error) {
 
 	fs.mu.Lock()
 	files, ok := fs.cueFilesByID[id]
-	if ok && files[0].modTime.Equal(mtime) {
+	if ok && files[0].modtime.Equal(mtime) {
 		var entry *diskFileEntry
 		// We have already seen this file and it has not changed.
 		for _, fh := range files {
@@ -364,7 +391,7 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 		// so that we record that this uri can never be converted to a
 		// CUE AST.
 		return &diskFileEntry{
-			modTime:       mtime,
+			modtime:       mtime,
 			uri:           uri,
 			cueFileParser: &cueFileParser{},
 		}, nil
@@ -377,7 +404,7 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 	bf.Source = content
 
 	return &diskFileEntry{
-		modTime: mtime,
+		modtime: mtime,
 		uri:     uri,
 		cueFileParser: &cueFileParser{
 			content:   content,
@@ -389,6 +416,9 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 // IoFS implements [RootableFS]
 func (fs *CUECacheFS) IoFS(root string) CUEDirFS {
 	root = strings.TrimRight(root, string(os.PathSeparator))
+	if root == "" {
+		root = string(os.PathSeparator)
+	}
 	return &rootedCUECacheFS{
 		cuecachefs: fs,
 		delegatefs: os.DirFS(root).(DirFS),

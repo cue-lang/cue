@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"sync"
 	"sync/atomic"
 
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
@@ -29,6 +28,8 @@ type ServerWithID interface {
 	// ID returns a unique, human-readable string for this server, for
 	// the purpose of log messages and debugging.
 	ID() string
+
+	SetEnqueuer(func(func()))
 }
 
 // New creates an LSP server and binds it to handle incoming client
@@ -80,10 +81,6 @@ func (s serverState) String() string {
 type server struct {
 	id string
 
-	// lock must be held for every public API method, and protects all
-	// state within the server.
-	lock sync.Mutex
-
 	client    protocol.ClientCloser
 	cache     *cache.Cache
 	workspace *cache.Workspace
@@ -102,11 +99,17 @@ type server struct {
 	// The map field may be reassigned but the map itself is immutable.
 	watchedGlobPatterns map[protocol.RelativePattern]struct{}
 	watchingIDCounter   int
+
+	enqueue func(func())
 }
 
 var _ ServerWithID = (*server)(nil)
 
 func (s *server) ID() string { return s.id }
+
+func (s *server) SetEnqueuer(enqueue func(func())) {
+	s.enqueue = enqueue
+}
 
 // Shutdown implements the 'shutdown' LSP handler. It releases resources
 // associated with the server and waits for all ongoing work to complete.
@@ -118,9 +121,6 @@ func (s *server) ID() string { return s.id }
 // sent, instead it should wait for an exit message, which is
 // asynchronous.
 func (s *server) Shutdown(ctx context.Context) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
 	ctx, done := event.Start(ctx, "lsp.Server.shutdown")
 	defer done()
 
@@ -147,9 +147,6 @@ func (s *server) Shutdown(ctx context.Context) error {
 //
 // This is asynchronous - it does not get a response.
 func (s *server) Exit(ctx context.Context) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
 	_, done := event.Start(ctx, "lsp.Server.exit")
 	defer done()
 
@@ -167,9 +164,6 @@ func (s *server) Exit(ctx context.Context) error {
 // WorkDoneProgressCancel is a message from the editor/client
 // requesting the cancellation of a long-running process.
 func (s *server) WorkDoneProgressCancel(ctx context.Context, params *protocol.WorkDoneProgressCancelParams) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
 	ctx, done := event.Start(ctx, "lsp.Server.workDoneProgressCancel")
 	defer done()
 

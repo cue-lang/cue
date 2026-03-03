@@ -107,3 +107,55 @@ func AsyncHandler(handler Handler) Handler {
 		return nil
 	}
 }
+
+type EnqueueHandler struct {
+	lock        sync.Mutex
+	nextRequest chan struct{}
+	handler     Handler
+}
+
+func NewEnqueueHandler(handler Handler) *EnqueueHandler {
+	nextRequest := make(chan struct{})
+	close(nextRequest)
+	return &EnqueueHandler{
+		nextRequest: nextRequest,
+		handler:     handler,
+	}
+}
+
+func (h *EnqueueHandler) Handle(ctx context.Context, reply Replier, req Request) error {
+	h.lock.Lock()
+	waitForPrevious := h.nextRequest
+	h.nextRequest = make(chan struct{})
+	unlockNext := h.nextRequest
+	h.lock.Unlock()
+
+	innerReply := reply
+	reply = func(ctx context.Context, result any, err error) error {
+		close(unlockNext)
+		return innerReply(ctx, result, err)
+	}
+	_, queueDone := event.Start(ctx, "queued")
+	go func() {
+		<-waitForPrevious
+		queueDone()
+		if err := h.handler(ctx, reply, req); err != nil {
+			event.Error(ctx, "jsonrpc2 async message delivery failed", err)
+		}
+	}()
+	return nil
+}
+
+func (h *EnqueueHandler) Enqueue(fun func()) {
+	h.lock.Lock()
+	waitForPrevious := h.nextRequest
+	h.nextRequest = make(chan struct{})
+	unlockNext := h.nextRequest
+	h.lock.Unlock()
+
+	go func() {
+		<-waitForPrevious
+		fun()
+		close(unlockNext)
+	}()
+}

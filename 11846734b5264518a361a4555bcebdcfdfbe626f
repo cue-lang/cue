@@ -16,6 +16,24 @@
       "message": "why do we need the version with parentheses as well? we don\u0027t have that anywhere else.",
       "revId": "11846734b5264518a361a4555bcebdcfdfbe626f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b21b2e1_2333d7ad",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-03T09:05:06Z",
+      "side": 1,
+      "message": "That\u0027s because list.UniqueItems with no arguments is an *adt.BuiltinValidator not an *adt.Builtin, and as such it formats itself as a call (see https://github.com/cue-lang/cue/blob/14b457843a37ca5fe73602879eccaedbe21dbec7/internal/core/export/value.go#L325). The whole thing with validators also being functions is a bit weird and one of the things I\u0027m trying to do is move away from that ambiguity, but for now that\u0027s what we have.",
+      "parentUuid": "7488dc54_5ab8aedd",
+      "revId": "11846734b5264518a361a4555bcebdcfdfbe626f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -117,15 +117,19 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 
 		Capabilities: protocol.ServerCapabilities{
 			CodeActionProvider: codeActionProvider,
+			CodeLensProvider:   &protocol.CodeLensOptions{}, // must be non-nil to enable the code lens capability
 			CompletionProvider: &protocol.CompletionOptions{
 				TriggerCharacters: []string{"."},
 			},
 			DefinitionProvider:         &protocol.Or_ServerCapabilities_definitionProvider{Value: true},
 			DocumentFormattingProvider: &protocol.Or_ServerCapabilities_documentFormattingProvider{Value: true},
 			DocumentSymbolProvider:     &protocol.Or_ServerCapabilities_documentSymbolProvider{Value: true},
-			HoverProvider:              &protocol.Or_ServerCapabilities_hoverProvider{Value: true},
-			ReferencesProvider:         &protocol.Or_ServerCapabilities_referencesProvider{Value: true},
-			RenameProvider:             renameOpts,
+			ExecuteCommandProvider: &protocol.ExecuteCommandOptions{
+				Commands: protocol.NonNilSlice(options.SupportedCommands),
+			},
+			HoverProvider:      &protocol.Or_ServerCapabilities_hoverProvider{Value: true},
+			ReferencesProvider: &protocol.Or_ServerCapabilities_referencesProvider{Value: true},
+			RenameProvider:     renameOpts,
 			TextDocumentSync: &protocol.TextDocumentSyncOptions{
 				Change:    protocol.Incremental,
 				OpenClose: true,
@@ -179,7 +183,7 @@ func (s *server) Initialized(ctx context.Context, params *protocol.InitializedPa
 		}
 	}
 
-	s.workspace = cache.NewWorkspace(s.cache, s.client, s.debugLog)
+	s.workspace = cache.NewWorkspace(s.cache, s.client, s.debugLog, s.withServerLocked)
 
 	err = s.maybeUseWorkspaceFolders(ctx)
 	// Initialized is a notification, so if there's an error, we show

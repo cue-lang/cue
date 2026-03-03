@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
+	"cuelang.org/go/internal/lsp/cuehub"
 	"cuelang.org/go/internal/lsp/fscache"
 	"cuelang.org/go/internal/mod/modpkgload"
 )
@@ -67,24 +68,31 @@ type Workspace struct {
 	files map[protocol.DocumentURI]*File
 
 	standalone *Standalone
+
+	cueHubMgr        *cuehub.CueHubManager
+	withServerLocked func(func())
 }
 
-func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string)) *Workspace {
+func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string), withServerLocked func(func())) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
 	w := &Workspace{
 		registry: &registryWrapper{
 			Registry:  cache.registry,
 			overlayFS: overlayFS,
 		},
-		client:    client,
-		fs:        cache.fs,
-		overlayFS: overlayFS,
-		debugLog:  debugLog,
-		modules:   make(map[protocol.DocumentURI]*Module),
-		mappers:   make(map[*token.File]*protocol.Mapper),
-		files:     make(map[protocol.DocumentURI]*File),
+		client:           client,
+		fs:               cache.fs,
+		overlayFS:        overlayFS,
+		debugLog:         debugLog,
+		modules:          make(map[protocol.DocumentURI]*Module),
+		mappers:          make(map[*token.File]*protocol.Mapper),
+		files:            make(map[protocol.DocumentURI]*File),
+		withServerLocked: withServerLocked,
 	}
 	w.standalone = NewStandalone(w)
+	if cueHubServer := cache.cueHubServer; cueHubServer != "" {
+		w.cueHubMgr = cuehub.NewCueHubManager(cueHubServer, overlayFS, debugLog)
+	}
 	return w
 }
 

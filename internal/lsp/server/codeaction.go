@@ -67,5 +67,10 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 		})
 	}
 
+	cueHubEval := s.workspace.CodeActionCueHubEval(ctx, params)
+	if cueHubEval != nil {
+		codeActions = append(codeActions, *cueHubEval)
+	}
+
 	return codeActions, nil
 }

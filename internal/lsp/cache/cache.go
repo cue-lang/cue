@@ -5,6 +5,9 @@
 package cache
 
 import (
+	"net/url"
+	"os"
+
 	"cuelang.org/go/internal/lsp/fscache"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
@@ -28,17 +31,32 @@ func NewWithRegistry(reg Registry) *Cache {
 	if reg == nil {
 		panic("nil registry")
 	}
+
+	cueHubServer := os.Getenv("CUEHUB_SERVER")
+	if cueHubServer != "" {
+		serverUrl, err := url.Parse(cueHubServer)
+		if err != nil {
+			cueHubServer = ""
+		}
+		if serverUrl.Scheme == "" {
+			serverUrl.Scheme = "https"
+			cueHubServer = serverUrl.String()
+		}
+	}
+
 	return &Cache{
-		fs:       fscache.NewCUECachedFS(),
-		registry: reg,
+		fs:           fscache.NewCUECachedFS(),
+		registry:     reg,
+		cueHubServer: cueHubServer,
 	}
 }
 
 // A Cache holds content that is shared across multiple cuelsp
 // client/editor connections.
 type Cache struct {
-	fs       *fscache.CUECacheFS
-	registry Registry
+	fs           *fscache.CUECacheFS
+	registry     Registry
+	cueHubServer string
 }
 
 type Registry interface {

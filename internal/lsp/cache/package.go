@@ -327,6 +327,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	filesSet := make(map[protocol.DocumentURI]*File, len(modpkgFiles))
 	isCue := true
 	var embeddings map[token.Pos]*embedding
+	cueHub := m.cueHub
 
 	for i, modpkgFile := range modpkgFiles {
 		evalASTs[i] = modpkgFile.Syntax
@@ -395,6 +396,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 
 		file.ensureUser(pkg, errs...)
 		w.standalone.deleteFile(fileUri)
+		file.cueHub = cueHub
 	}
 	pkg.isCue = isCue
 	pkg.embeddings = embeddings
@@ -407,6 +409,9 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	pkg.files = filesSet
 
 	w.invalidateActiveFilesAndDirs()
+	if cueHub != nil {
+		cueHub.MarkDirty()
+	}
 
 	config := eval.Config{
 		IP:                     pkg.importPath,

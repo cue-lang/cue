@@ -389,6 +389,9 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 // IoFS implements [RootableFS]
 func (fs *CUECacheFS) IoFS(root string) CUEDirFS {
 	root = strings.TrimRight(root, string(os.PathSeparator))
+	if root == "" {
+		root = string(os.PathSeparator)
+	}
 	return &rootedCUECacheFS{
 		cuecachefs: fs,
 		delegatefs: os.DirFS(root).(DirFS),

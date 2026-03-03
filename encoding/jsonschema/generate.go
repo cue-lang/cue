@@ -291,6 +291,12 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		if !pkg.Exists() {
 			break
 		}
+		// Check if this is a reference to a known validator function.
+		// For example, list.UniqueItems (without parens) should be treated
+		// the same as list.UniqueItems().
+		if it := g.makeCallItem(v, []cue.Value{v}, mode); it != nil {
+			return it
+		}
 		// It's a reference: generate a definition for it.
 		// TODO Not all references need or should have a definition.
 		if name := g.cfg.NameFunc(pkg, path); name != "" {
@@ -422,7 +428,12 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 			return &itemFalse{}
 		}
 	case cue.CallOp:
-		return g.makeCallItem(v, args, mode)
+		if it := g.makeCallItem(v, args, mode); it != nil {
+			return it
+		}
+		// For unknown functions, accept anything rather than fail.
+		// This allows for gradual implementation of more function types.
+		return &itemTrue{}
 	}
 	if !v.IsNull() {
 		// We want to encode null as {type: "null"} not {const: null}
@@ -864,9 +875,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 		}
 
 	default:
-		// For unknown functions, accept anything rather than fail.
-		// This allows for gradual implementation of more function types
-		return &itemTrue{}
+		return nil
 	}
 }
 

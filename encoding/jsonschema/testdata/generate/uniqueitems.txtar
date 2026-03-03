@@ -7,8 +7,6 @@ uniqueList?: list.UniqueItems()
 
 uniqueListNoCall?: list.UniqueItems
 
-// TODO this doesn't work - the code currently just looks
-// for call expressions but this isn't a call expression.
 uniqueBools?: list.UniqueItems() & [bool, bool]
 
 -- datatest/tests.cue --
@@ -27,8 +25,7 @@ badUnique: {
 
 badUniqueNoCall: {
 	data: uniqueListNoCall: [1, 1, 2]
-	// TODO this should be an error.
-	//error: true
+	error: true
 }
 
 badUniqueBools: {
@@ -38,12 +35,7 @@ badUniqueBools: {
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
-	$defs: {
-		UniqueItems: {
-			type: "array"
-		}
-	}
-	type: "object"
+	type:    "object"
 	properties: {
 		uniqueBools: {
 			type: "array"
@@ -61,18 +53,22 @@ badUniqueBools: {
 			uniqueItems: true
 		}
 		uniqueListNoCall: {
-			$ref: "#/$defs/UniqueItems"
+			type:        "array"
+			uniqueItems: true
 		}
 	}
 }
 -- out/generate-v3/ok --
 -- out/generate-v3/badUnique --
 badUnique.data.uniqueList: invalid value [1,1,2] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
-    1:289
+    1:248
     ./datatest/tests.cue:10:20
 -- out/generate-v3/badUniqueBools --
 badUniqueBools.data.uniqueBools: invalid value [true,true] (does not satisfy list.UniqueItems): equal value (true) at position 0 and 1:
-    1:240
-    ./datatest/tests.cue:21:21
-    1:214
+    1:199
+    ./datatest/tests.cue:20:21
+    1:173
 -- out/generate-v3/badUniqueNoCall --
+badUniqueNoCall.data.uniqueListNoCall: invalid value [1,1,2] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
+    1:303
+    ./datatest/tests.cue:15:26

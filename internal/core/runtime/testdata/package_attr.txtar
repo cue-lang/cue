@@ -1,20 +1,20 @@
 -- cue.mod/modules.cue --
 -- file1.cue --
-@extern("test")
+@extern("testfn")
 
 package foo
 
 Fn1: {
-	@test("file1.xx")
+	@testfn("file1.xx")
 }
 
 -- file2.cue --
-@extern("test")
+@extern("testfn")
 
 package foo
 
 Fn2: {
-	@test("file2.xx")
+	@testfn("file2.xx")
 }
 
 -- out/extern --

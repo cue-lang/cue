@@ -2,13 +2,13 @@
 // faster. But maybe it is more user-friendly to report the error.
 -- cue.mod/modules.cue --
 -- in.cue --
-// Missing @extern("test")
+// Missing @extern("testfn")
 @dummy()
 
 package foo
 
 
-Foo: _ @test(file.xx, abi=c, sig="func(int)int")
+Foo: _ @testfn(file.xx, abi=c, sig="func(int)int")
 
 -- extern/out --
 -- out/extern --

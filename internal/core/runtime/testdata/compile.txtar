@@ -1,9 +1,9 @@
 -- compile.cue --
-@extern("test")
+@extern("testfn")
 
 package ok
 
-foo: _ @test("file.xx", fail)
+foo: _ @testfn("file.xx", fail)
 -- out/extern --
-@test: TEST: fail compilation:
+@testfn: TEST: fail compilation:
     ./compile.cue:5:8

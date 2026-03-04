@@ -13,9 +13,6 @@ import (
 
 func TestRename(t *testing.T) {
 	const files = `
-NB want/a/a.cue shows the current bad behaviour: the renaming is
-applying to the alias too.
-
 -- cue.mod/module.cue --
 module: "example.com/bar"
 language: version: "v0.14.0"
@@ -60,9 +57,9 @@ c3: p3.out
 package a
 
 _x: {
-  result="result": 3
+  outer="result": 3
   a1: a2: _x.result
-  a3: result
+  a3: outer
 }
 _x
 -- want/b/b1.cue --

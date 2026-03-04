@@ -2,7 +2,7 @@
 -- schema.json --
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://www.sourcemeta.com/schemas/vendor/json-eXXXX@1.json",
+  "$id": "https://www.sourcemeta.com/schemas/vendor/json-eNNNN@1.json",
   "$comment": "https://json-e.js.org",
   "$defs": {
     "jsone-value": {
@@ -68,7 +68,7 @@
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 _schema
 _schema: {
-	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-eXXXX@1.json")
+	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-eNNNN@1.json")
 	$else?: #."jsone-value"
 	$let?: [string]: null | bool | number | string | [...] | {
 		[string]: _schema

@@ -7,9 +7,9 @@ issue3801: let: reduced: {
 			let X = {a: "\(in)" }.a
 			out: X
 		}
-		XXX: base & {in: "foo"} // failure is here
+		filled: base & {in: "foo"} // failure is here
 	}
-	z: F.XXX.out
+	z: F.filled.out
 }
 issue3801: nonRooted: reduced: {
 	#Output: output: {
@@ -162,7 +162,7 @@ Disjuncts:    373
               //     ./nested.cue:4:8
             }
           }
-          XXX: (struct){
+          filled: (struct){
             in: (string){ "foo" }
             let X#2 = (string){ "foo" }
             out: (string){ "foo" }
@@ -479,7 +479,7 @@ diff old new
               //     ./nested.cue:4:8
             }
           }
-          XXX: (struct){
+          filled: (struct){
             in: (string){ "foo" }
             let X#2 = (string){ "foo" }
             out: (string){ "foo" }
@@ -695,11 +695,11 @@ diff old new
             }.a
             out: 〈0;let X#2〉
           }
-          XXX: (〈0;base〉 & {
+          filled: (〈0;base〉 & {
             in: "foo"
           })
         }
-        z: 〈0;let F#1〉.XXX.out
+        z: 〈0;let F#1〉.filled.out
       }
     }
   }

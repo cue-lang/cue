@@ -1,11 +1,11 @@
 // This file is ordered first and is added as a convenience debugging tool.
 // Do not remove.
 -- a_debug.cue --
-@extern("test")
+@extern("testfn")
 
 package foo
 
-Foo: _ @test(file1.xx, abi=c, sig="func(int)int")
+Foo: _ @testfn(file1.xx, abi=c, sig="func(int)int")
 
 -- out/extern --
 {

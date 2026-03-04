@@ -21,6 +21,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
@@ -165,6 +166,13 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 
 	case *adt.Builtin:
 		result = e.builtin(x)
+
+	case *adt.Func:
+		// TODO: we might be able to represent this as a reference or
+		// some other expression in the future.
+		result = e.bottom(&adt.Bottom{
+			Err: errors.Newf(token.NoPos, "cannot convert function %q to CUE", x.Name),
+		})
 
 	case *adt.BuiltinValidator:
 		result = e.builtinValidator(x)

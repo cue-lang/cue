@@ -402,6 +402,21 @@ a: x: "hello"
 		name: "all errors are equal",
 		x:    `1 & 3`,
 		y:    `1 & 4`,
+	}, {
+		// 'a' and 'b' reference 'g', so under the v3 evaluator they share g's
+		// *adt.Vertex. The differ must return Identity without false-positive
+		// Modified results caused by memoization.
+		name: "shared vertices identity",
+		x: `
+			g: {x: 1, y: 2}
+			a: g
+			b: g
+		`,
+		y: `
+			g: {x: 1, y: 2}
+			a: g
+			b: g
+		`,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.name, func(t *testing.T, m *cuetdtest.M) {
@@ -430,6 +445,62 @@ a: x: "hello"
 			}
 		})
 	}
+}
+
+// TestMemoization checks that the differ's vertex-pair memoization fires when
+// structure sharing is present. When 'a' and 'b' are both references to 'g',
+// comparing (x.a, y.a) populates the cache so that comparing (x.b, y.b) is a
+// cache hit rather than a redundant traversal of g's fields.
+func TestMemoization(t *testing.T) {
+	const src = `
+		g: {x: 1, y: 2}
+		a: g
+		b: g
+	`
+	const modSrc = `
+		g: {x: 99, y: 2}
+		a: g
+		b: g
+	`
+
+	cuetdtest.FullMatrix.Run(t, "identity", func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
+		x := ctx.CompileString(src)
+		y := ctx.CompileString(src)
+
+		d := &differ{cfg: *Schema}
+		kind, script := d.diffValue(x, y)
+		if kind != Identity {
+			t.Fatalf("got %v; want Identity", kind)
+		}
+		if script != nil {
+			t.Errorf("expected nil script for identical values")
+		}
+		// Under the v3 evaluator, 'a' and 'b' share g's vertex (IsShared==true),
+		// so the (x.g, y.g) pair is inserted once when processing 'a' and reused
+		// for 'b'. The cache must contain at most 1 entry.
+		// Under v2 (no IsShared), the cache remains empty — both are acceptable.
+		if n := len(d.seen); n > 1 {
+			t.Errorf("expected at most 1 memoized pair; got %d", n)
+		}
+	})
+
+	cuetdtest.FullMatrix.Run(t, "modified", func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
+		x := ctx.CompileString(src)
+		y := ctx.CompileString(modSrc)
+
+		d := &differ{cfg: *Schema}
+		kind, _ := d.diffValue(x, y)
+		if kind != Modified {
+			t.Fatalf("got %v; want Modified", kind)
+		}
+		// Same cache-size invariant: the (x.g, y.g) pair is inserted at most
+		// once, regardless of how many shared references point to g.
+		if n := len(d.seen); n > 1 {
+			t.Errorf("expected at most 1 memoized pair; got %d", n)
+		}
+	})
 }
 
 func TestX(t *testing.T) {

@@ -16,6 +16,7 @@ package diff
 
 import (
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/core/adt"
 )
 
 // Profile configures a diff operation.
@@ -92,11 +93,48 @@ type Edit struct {
 	Sub  *EditScript  // non-nil if Modified
 }
 
+// seenPair is a key for the memoization map: a pair of dereferenced ADT
+// vertices that have already been compared by the differ.
+type seenPair struct{ x, y *adt.Vertex }
+
 type differ struct {
-	cfg Profile
+	cfg  Profile
+	seen map[seenPair]Kind // nil until the first shared-vertex pair is memoized
 }
 
-func (d *differ) diffValue(x, y cue.Value) (Kind, *EditScript) {
+// vertexOf returns the original and fully-dereferenced ADT vertex underlying v.
+// Returns (nil, nil) when v has no underlying vertex.
+func vertexOf(v cue.Value) (orig, deref *adt.Vertex) {
+	c := v.Core()
+	if c.V == nil {
+		return nil, nil
+	}
+	return c.V, c.V.DerefValue()
+}
+
+func (d *differ) diffValue(x, y cue.Value) (kind Kind, script *EditScript) {
+	// Memoize shared-vertex pairs to avoid re-traversing the same structure
+	// multiple times when the same ADT vertex is reachable from several paths
+	// (structure sharing). Only vertices marked IsShared are eligible for
+	// memoization so the cache stays small for ordinary values.
+	//
+	// TODO(mpvl): this is a simple approach, but may cause each shared node to
+	// be evaluated twice. We might solve this by marking destination vertices as shared.
+	xOrig, xDeref := vertexOf(x)
+	yOrig, yDeref := vertexOf(y)
+	if xOrig != nil && yOrig != nil && (xOrig.IsShared || yOrig.IsShared) {
+		k := seenPair{xDeref, yDeref}
+		if cached, ok := d.seen[k]; ok {
+			return cached, nil
+		}
+		defer func() {
+			if d.seen == nil {
+				d.seen = make(map[seenPair]Kind)
+			}
+			d.seen[k] = kind
+		}()
+	}
+
 	if d.cfg.Concrete {
 		x, _ = x.Default()
 		y, _ = y.Default()

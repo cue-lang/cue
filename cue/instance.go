@@ -85,7 +85,6 @@ func lookupInstance(x *runtime.Runtime, p *build.Instance) *Instance {
 
 func getImportFromBuild(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *Instance {
 	inst := lookupInstance(x, p)
-
 	if inst != nil {
 		return inst
 	}
@@ -115,25 +114,6 @@ func getImportFromNode(x *runtime.Runtime, v *adt.Vertex) *Instance {
 	}
 
 	return getImportFromBuild(x, p, v)
-}
-
-func getImportFromPath(x *runtime.Runtime, id string) *Instance {
-	node := x.LoadBuiltin(id)
-	if node == nil {
-		return nil
-	}
-	b := x.GetInstanceFromNode(node)
-	inst := lookupInstance(x, b)
-	if inst == nil {
-		inst = &Instance{
-			ImportPath: b.ImportPath,
-			PkgName:    b.PkgName,
-			root:       node,
-			inst:       b,
-			index:      x,
-		}
-	}
-	return inst
 }
 
 // newInstance creates a new instance. Use Insert to populate the instance.

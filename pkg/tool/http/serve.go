@@ -40,10 +40,7 @@ func newServeCmd(v cue.Value) (task.Runner, error) {
 	return &listenCmd{}, nil
 }
 
-type listenCmd struct {
-	w    http.ResponseWriter
-	body cue.Path
-}
+type listenCmd struct{}
 
 // IsService indicates that http.Serve acts as a service.
 // Other tasks can reference request fields (which are filled
@@ -75,7 +72,7 @@ type httpRequest struct {
 	PathValues map[string]string   `json:"pathValues"`
 }
 
-func (c *listenCmd) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *listenCmd) Run(ctx *task.Context) (res any, err error) {
 	v := ctx.Obj
 	addr, err := v.LookupPath(listenPath).String()
 
@@ -199,8 +196,7 @@ func extractPathVariables(pattern string) []string {
 }
 
 type serveCmd struct {
-	w    http.ResponseWriter
-	body cue.Path
+	w http.ResponseWriter
 }
 
 // IsService indicates that http.Serve should not be reported as part
@@ -209,7 +205,7 @@ func (c *serveCmd) IsService() bool {
 	return true
 }
 
-func (c *serveCmd) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *serveCmd) Run(ctx *task.Context) (res any, err error) {
 	v := ctx.Obj
 
 	response := v.LookupPath(responsePath)

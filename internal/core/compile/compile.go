@@ -441,6 +441,15 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		return &adt.Top{Src: n}
 	}
 
+	// Predeclared name references created via [ast.NewPredeclared].
+	if n.IsPredeclared() {
+		p := predeclared(n)
+		if p == nil {
+			return c.errf(n, "predeclared name %q not found", n.Name)
+		}
+		return c.verifyVersion(n, p)
+	}
+
 	// Unresolved field.
 	if n.Node == nil {
 		upCount := int32(0)
@@ -483,6 +492,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			}
 		}
 
+		// Predeclared name references created without [ast.NewPredeclared].
 		if p := predeclared(n); p != nil {
 			return c.verifyVersion(n, p)
 		}

@@ -50,16 +50,14 @@ func TestFromExpr(t *testing.T) {
 		),
 		out: `true`,
 	}, {
-		// TODO: the compiler must understand predeclared node references.
 		expr: ast.NewPredeclared("int"),
-		err:  `reference "int" set to unknown node in AST`,
+		out:  `int`,
 	}, {
-		// TODO: the compiler must understand predeclared node references.
 		expr: ast.NewPredeclared("__matchN"),
-		err:  `reference "__matchN" set to unknown node in AST`,
+		out:  `matchN`,
 	}, {
 		expr: ast.NewPredeclared("nosuchbuiltin"),
-		err:  `reference "nosuchbuiltin" set to unknown node in AST`,
+		err:  `predeclared name "nosuchbuiltin" not found`,
 	}, {
 		expr: ast.NewIdent("int"),
 		out:  `int`,

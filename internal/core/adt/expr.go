@@ -1583,6 +1583,9 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 	case *Builtin:
 		return f.rawCall(c, x, state)
 
+	case *Func:
+		return f.rawCall(c, x, state)
+
 	case *BuiltinValidator:
 		// We allow a validator that takes no arguments except the validated
 		// value to be called with zero arguments.
@@ -1917,6 +1920,76 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 		args:        args,
 		isValidator: true,
 	})
+}
+
+// Func is like Builtin but specifically oriented towards user-provided
+// functions. Unlike Builtin, it does not support default arguments,
+// non-concrete argument handling, or implicit validators.
+type Func struct {
+	// Func is called with the evaluated concrete arguments.
+	Func func(ctx *OpContext, args []Value) Expr
+	Name string
+}
+
+func (f *Func) Source() ast.Node { return nil }
+func (f *Func) Kind() Kind       { return FuncKind }
+
+func (f *Func) rawCall(c *OpContext, call *CallExpr, state Flags) Value {
+	saved := c.ci
+	c.ci.FromDef = false
+	c.ci.FromEmbed = false
+	defer func() {
+		c.ci.FromDef = saved.FromDef
+		c.ci.FromEmbed = saved.FromEmbed
+	}()
+
+	args := make([]Value, 0, len(call.Args))
+	for i, a := range call.Args {
+		savedErrs := c.errs
+		c.errs = nil
+
+		expr := c.value(a, Flags{
+			status:    state.status,
+			condition: state.condition | fieldSetKnown | concreteKnown | disjunctionTask,
+			mode:      state.mode,
+		})
+
+		switch v := expr.(type) {
+		case nil:
+			if c.errs == nil {
+				c.Assertf(Pos(call.Fun), c.HasErr(),
+					"argument %d to function %s is incomplete", i, call.Fun)
+			}
+		case *Bottom:
+			c.errs = CombineErrors(a.Source(), c.errs, v)
+		default:
+			args = append(args, expr)
+		}
+		c.errs = CombineErrors(a.Source(), savedErrs, c.errs)
+	}
+	if c.HasErr() {
+		return nil
+	}
+
+	result := f.Func(c, args)
+	if result == nil {
+		return nil
+	}
+	if b, ok := result.(*Bottom); ok {
+		name := f.Name
+		if name == "" {
+			name = "function"
+		}
+		vErr := c.NewPosf(Pos(call.Fun), "error in call to %s", name)
+		return &Bottom{
+			Code: b.Code,
+			Err:  errors.Wrap(vErr, b.Err),
+			Node: c.vertex,
+		}
+	}
+	v, ci := c.evalStateCI(result, Flags{status: partial, condition: state.condition, mode: state.mode})
+	c.ci = ci
+	return v
 }
 
 func validateWithBuiltin(call BuiltinCallContext) *Bottom {

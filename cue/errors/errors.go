@@ -151,8 +151,7 @@ func Positions(err error) []token.Pos {
 	// TODO if the Error we found wraps another error that itself
 	// has positions, we won't return them here but perhaps we should?
 
-	// TODO(mvdan): we can use [token.Pos.Compare] here and no tests break.
-	slices.SortFunc(a[sortOffset:], comparePosWithNoPosFirst)
+	slices.SortFunc(a[sortOffset:], token.Pos.Compare)
 	return slices.Compact(a)
 }
 

@@ -15,6 +15,8 @@
 package cache
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
@@ -30,7 +32,27 @@ func (w *Workspace) Rename(file *File, fe *eval.FileEvaluator, srcMapper *protoc
 		return nil
 	}
 
+	var srcNames []string
 	targets := fe.UsagesForOffset(offset, true)
+	for _, target := range targets {
+		if token.WithinInclusive(offset, target.Pos(), target.End()) {
+			switch target := target.(type) {
+			case *ast.Ident:
+				srcNames = []string{target.Name, literal.Label.Quote(target.Name)}
+			case *ast.BasicLit:
+				if target.Kind != token.STRING {
+					return nil
+				}
+				unquoted, err := literal.Unquote(target.Value)
+				if err == nil && ast.IsValidIdent(unquoted) {
+					srcNames = []string{unquoted, target.Value}
+				} else {
+					srcNames = []string{target.Value}
+				}
+			}
+			break
+		}
+	}
 
 	type versionedEdits struct {
 		edits   []protocol.TextEdit
@@ -55,8 +77,25 @@ func (w *Workspace) Rename(file *File, fe *eval.FileEvaluator, srcMapper *protoc
 		}
 		uri := targetMapper.URI
 		name := params.NewName
-		if lit, ok := target.(*ast.BasicLit); (ok && lit.Kind == token.STRING) || !ast.IsValidIdent(name) {
-			name = literal.Label.Quote(name)
+		switch target := target.(type) {
+		case *ast.BasicLit:
+			if !slices.Contains(srcNames, target.Value) {
+				continue
+			}
+			if target.Kind == token.STRING {
+				name = literal.Label.Quote(name)
+			}
+
+		case *ast.Ident:
+			if !slices.Contains(srcNames, target.Name) {
+				continue
+			}
+			if !ast.IsValidIdent(name) {
+				name = literal.Label.Quote(name)
+			}
+
+		default:
+			continue
 		}
 		ve, found := changes[uri]
 		if !found {

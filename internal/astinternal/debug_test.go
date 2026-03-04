@@ -60,9 +60,9 @@ func TestDebugPrint(t *testing.T) {
 				AllPositions:    allPositions,
 			})
 			if includePointers {
-				// Pointer values change between runs. Replace with a constant
-				// string so that we can test stable output.
-				full = ptrPat.ReplaceAll(full, []byte("XXXX"))
+				// Pointer values change between runs.
+				// Replace with a constant string so that we can test stable output.
+				full = ptrPat.ReplaceAll(full, []byte("TESTPTR"))
 			}
 			t.Writer(file.Name).Write(full)
 

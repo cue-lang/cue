@@ -5,35 +5,35 @@ package p
 a: b
 b: 3
 -- out/debugprint/file.cue --
-*ast.File@XXXX{
+*ast.File@TESTPTR{
 	Filename: "file.cue"
 	Decls: []ast.Decl{
-		*ast.Package@XXXX{
+		*ast.Package@TESTPTR{
 			PackagePos: token.Pos("file.cue:1:1", nospace)
-			Name: *ast.Ident@XXXX{
+			Name: *ast.Ident@TESTPTR{
 				NamePos: token.Pos("file.cue:1:9", blank)
 				Name: "p"
 			}
 		}
-		*ast.Field@XXXX{
-			Label: *ast.Ident@XXXX{
+		*ast.Field@TESTPTR{
+			Label: *ast.Ident@TESTPTR{
 				NamePos: token.Pos("file.cue:3:1", section)
 				Name: "a"
 			}
 			TokenPos: token.Pos("file.cue:3:2", nospace)
-			Value: *ast.Ident@XXXX{
+			Value: *ast.Ident@TESTPTR{
 				NamePos: token.Pos("file.cue:3:4", blank)
 				Name: "b"
-				Node: @XXXX (ast.BasicLit)
+				Node: @TESTPTR (ast.BasicLit)
 			}
 		}
-		*ast.Field@XXXX{
-			Label: *ast.Ident@XXXX{
+		*ast.Field@TESTPTR{
+			Label: *ast.Ident@TESTPTR{
 				NamePos: token.Pos("file.cue:4:1", newline)
 				Name: "b"
 			}
 			TokenPos: token.Pos("file.cue:4:2", nospace)
-			Value: *ast.BasicLit@XXXX{
+			Value: *ast.BasicLit@TESTPTR{
 				ValuePos: token.Pos("file.cue:4:4", blank)
 				Kind: token.Token("INT")
 				Value: "3"

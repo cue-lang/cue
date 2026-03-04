@@ -581,8 +581,11 @@ func (v Value) Float64() (float64, error) {
 	return f, nil
 }
 
-// Value holds any value, which may be a Boolean, Error, List, Null, Number,
-// Struct, or String.
+// Value holds a CUE value. The [Value.Kind] method can be used to inspect the
+// kind of value if it's concrete; [Value.IncompleteKind] can be used to find out
+// its possible kinds when it is non-concrete.
+//
+// A Value is considered immutable: methods may be called concurrently.
 type Value struct {
 	idx *runtime.Runtime
 	v   *adt.Vertex
@@ -1697,9 +1700,6 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 	var expr adt.Expr
 	switch x := x.(type) {
 	case Value:
-		if v.idx != x.idx {
-			panic("values are not from the same runtime")
-		}
 		expr = x.v
 	case ast.Expr:
 		n := getScopePrefix(v, p)

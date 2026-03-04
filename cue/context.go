@@ -57,6 +57,12 @@ func (c *Context) ctx() *adt.OpContext {
 }
 
 // Context reports the Context with which this value was created.
+//
+// Deprecated: the returned context is undefined when values from
+// different contexts are combined. Note that it is now OK to combine
+// (for example with [Value.Unify] or [Value.FillPath]) values
+// that were created from different contexts, so it is OK
+// to create a new one-off context rather than using this method.
 func (v Value) Context() *Context {
 	return (*Context)(v.idx)
 }

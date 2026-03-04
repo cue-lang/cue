@@ -26,7 +26,7 @@ CUE makes it easy to validate data, write schemas,
 and ensure configurations align with policies.
 
 CUE works with a wide range of tools and formats that you're already using
-such as Go, JSON, YAML, TOML, OpenAPI, Protobuf, and JSON Schema.
+such as Go, JSON, YAML, TOML, XML, OpenAPI, Protobuf, and JSON Schema.
 
 For more information and documentation, including __tutorials and guides__, see [cuelang.org](https://cuelang.org).
 
@@ -35,7 +35,6 @@ For more information and documentation, including __tutorials and guides__, see 
 The full range of installation methods for the `cue` command are listed on
 [cuelang.org](https://cuelang.org/docs/introduction/installation/),
 including the official container image suitable for use with Docker.
-Here are two common ways to install the command:
 
 #### Release builds
 
@@ -47,7 +46,11 @@ You need [Go 1.25 or later](https://go.dev/doc/install) to install CUE from sour
 
 	go install cuelang.org/go/cmd/cue@latest
 
-You can also clone the repository and build it directly via `go install ./cmd/cue`.
+You can also `git clone` the repository and build it directly via `go install ./cmd/cue`.
+
+Built `cue` binaries include version information as reported by `cue version`,
+which `go build` derives from the VCS. We recommend that downstream packagers
+build releases from git tags rather than source archives to ensure this works.
 
 ### Learning CUE
 
@@ -76,10 +79,6 @@ matching Go's [security policy](https://go.dev/doc/security/policy).
 For example, if CUE v0.7.0 is released when Go's latest version is 1.21.5,
 v0.7.x including any following bugfix releases will require Go 1.20 or later.
 
-### Contributing
-
-To contribute, please read the [Contribution Guide](CONTRIBUTING.md).
-
 ## Code of Conduct
 
 Guidelines for participating in CUE community spaces and a reporting process for
@@ -90,8 +89,3 @@ handling issues can be found in the [Code of Conduct](https://cuelang.org/docs/r
 - Ask questions via [GitHub Discussions](https://github.com/cue-lang/cue/discussions)
 - Chat with us on [Slack](https://cuelang.org/s/slack) and [Discord](https://cuelang.org/s/discord)
 - Subscribe to our [Community Calendar](https://cuelang.org/s/community-calendar) for community updates, demos, office hours, etc
-
----
-
-Unless otherwise noted, the CUE source files are distributed
-under the Apache 2.0 license found in the LICENSE file.

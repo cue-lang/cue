@@ -1,6 +1,6 @@
 -- cue.mod/modules.cue --
 -- file1.cue --
-@extern("test")
+@extern("testfn")
 
 package scopetest
 

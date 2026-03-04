@@ -1,6 +1,6 @@
 -- cue.mod/modules.cue --
 -- no_package.cue --
-@extern("test")
+@extern("testfn")
 
 
 Foo: _ @extern(file1.xx, abi=c, sig="func(int)int")

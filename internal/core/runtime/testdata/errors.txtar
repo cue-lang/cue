@@ -1,26 +1,26 @@
 -- cue.mod/modules.cue --
 
 -- invalid_file_attr.cue --
-@extern("test" foo)
+@extern("testfn" foo)
 
 package foo
 
 -- invalid_field_attr.cue --
 
-@extern("test")
+@extern("testfn")
 
 // Foo
 
 package foo
 
-Fn1: _ @test("file1.xx" abi sig)
+Fn1: _ @testfn("file1.xx" abi sig)
 
 -- empty_extern.cue --
 @extern()
 
 package foo
 
-Fn2: _ @test("file1.xx" abi sig)
+Fn2: _ @testfn("file1.xx" abi sig)
 
 
 -- unknown_interpreter.cue --
@@ -31,73 +31,73 @@ package foo
 Fn3: _ @wazem("file1.xx" abi sig)
 
 -- double_extern_a.cue --
-@extern("test")
-@extern("test")
+@extern("testfn")
+@extern("testfn")
 
 package foo
 
-Fn4a: _ @test("file1.xx")
+Fn4a: _ @testfn("file1.xx")
 
 -- double_extern_b.cue --
-@extern("test")
-@extern("test")
-@extern("test")
+@extern("testfn")
+@extern("testfn")
+@extern("testfn")
 
 package foo
 
-Fn4b: _ @test("file1.xx")
+Fn4b: _ @testfn("file1.xx")
 
 -- package_attr.cue --
-@extern("test")
+@extern("testfn")
 
 package foo
 
-@test("file1.xx")
+@testfn("file1.xx")
 Fn5: _
 
 -- duplicate.cue --
-@extern("test")
+@extern("testfn")
 
 package foo
 
 
-Fn6: _ @test("file1.xx",sig=func(int)int) @test("file1.xx", sig=func(int)bool)
+Fn6: _ @testfn("file1.xx",sig=func(int)int) @testfn("file1.xx", sig=func(int)bool)
 
 Fn7: {
-	@test("file1.xx",sig=func(int)int)
+	@testfn("file1.xx",sig=func(int)int)
 	_
-} @test("file1.xx", sig=func(int)bool)
+} @testfn("file1.xx", sig=func(int)bool)
 
 -- non_ident.cue --
-@extern("test")
+@extern("testfn")
 
 package foo
 
 
-("something"): _ @test("file1.xx",sig=func(int)int)
+("something"): _ @testfn("file1.xx",sig=func(int)int)
 
-[string]: _ @test("file1.xx",sig=func(int)int)
+[string]: _ @testfn("file1.xx",sig=func(int)int)
 
 -- late_extern.cue --
 package foo
 
-@extern("test")
+@extern("testfn")
 
 
-Foo: _ @test(file1.xx, abi=c, sig="func(int)int")
+Foo: _ @testfn(file1.xx, abi=c, sig="func(int)int")
 
 -- out/extern --
 only one file-level extern attribute allowed per file:
     ./double_extern_a.cue:2:1
 only one file-level extern attribute allowed per file:
     ./double_extern_b.cue:2:1
-duplicate @test attributes:
-    ./duplicate.cue:6:43
-duplicate @test attributes:
+duplicate @testfn attributes:
+    ./duplicate.cue:6:45
+duplicate @testfn attributes:
     ./duplicate.cue:11:3
 interpreter name must be non-empty:
     ./empty_extern.cue:1:1
-no interpreter defined for "\"test\" foo":
+no interpreter defined for "\"testfn\" foo":
     ./invalid_file_attr.cue:1:1
 extern attribute must appear before package clause:
     ./late_extern.cue:3:1
@@ -105,7 +105,7 @@ external attribute has non-concrete label ("something"):
     ./non_ident.cue:6:18
 external attribute has non-concrete label [string]:
     ./non_ident.cue:8:13
-@test attribute not associated with field:
+@testfn attribute not associated with field:
     ./package_attr.cue:5:1
 no interpreter defined for "wazem":
     ./unknown_interpreter.cue:1:1

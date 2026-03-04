@@ -1,5 +1,5 @@
 -- init.cue --
-@extern("test")
+@extern("testfn")
 
 // Package name failinit is used as a marker in the test code to indicate
 // there is nothing to do.

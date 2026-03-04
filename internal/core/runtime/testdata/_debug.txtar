@@ -1,7 +1,7 @@
 // This file is ordered first and is added as a convenience debugging tool.
 // Do not remove.
 -- a_debug.cue --
-@extern("test")
+@extern("testfn")
 
 package foo
 

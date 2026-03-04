@@ -31,6 +31,7 @@ func TestFromExpr(t *testing.T) {
 	testCases := []struct {
 		expr ast.Expr
 		out  string
+		err  string
 	}{{
 		expr: ast.NewString("Hello"),
 		out:  `"Hello"`,
@@ -48,15 +49,34 @@ func TestFromExpr(t *testing.T) {
 			ast.NewBool(true),
 		),
 		out: `true`,
+	}, {
+		// TODO: the compiler must understand predeclared node references.
+		expr: ast.NewPredeclared("int"),
+		err:  `reference "int" set to unknown node in AST`,
+	}, {
+		// TODO: the compiler must understand predeclared node references.
+		expr: ast.NewPredeclared("__matchN"),
+		err:  `reference "__matchN" set to unknown node in AST`,
+	}, {
+		expr: ast.NewPredeclared("nosuchbuiltin"),
+		err:  `reference "nosuchbuiltin" set to unknown node in AST`,
+	}, {
+		expr: ast.NewIdent("int"),
+		out:  `int`,
+	}, {
+		expr: ast.NewIdent("__matchN"),
+		out:  `matchN`,
+	}, {
+		expr: ast.NewIdent("__nosuchbuiltin"),
+		err:  `reference "__nosuchbuiltin" not found`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			r := cuecontext.New()
 			v := r.BuildExpr(tc.expr)
-			if err := v.Err(); err != nil {
-				t.Fatal(err)
-			}
-			if got := fmt.Sprint(v); got != tc.out {
+			err := v.Err()
+			if !checkErr(t, err, tc.err, "init") {
+			} else if got := fmt.Sprint(v); got != tc.out {
 				t.Errorf("\n got: %v; want %v", got, tc.out)
 			}
 		})

@@ -101,6 +101,12 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 	case *adt.Builtin:
 		return x == b
 
+	case *adt.Func:
+		if y, ok := b.(*adt.Func); ok {
+			return x == y
+		}
+		return false
+
 	case *adt.BuiltinValidator:
 		state := s.ctx.PushState(s.ctx.Env(0), b.Source())
 		// TODO: is this always correct?

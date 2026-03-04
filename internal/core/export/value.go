@@ -166,6 +166,9 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 	case *adt.Builtin:
 		result = e.builtin(x)
 
+	case *adt.Func:
+		result = ast.NewIdent(x.Name)
+
 	case *adt.BuiltinValidator:
 		result = e.builtinValidator(x)
 

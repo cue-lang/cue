@@ -128,6 +128,25 @@ func TestVersion(t *testing.T) {
 	}
 }
 
+// TestVersionLdflag verifies that cue version reports a version injected via
+// ldflags when there is no VCS information, as is the case when building from
+// a source tarball rather than a git clone. For example, the community Homebrew
+// formula builds CUE from a source tarball and injects the version via ldflags:
+// https://github.com/Homebrew/homebrew-core/blob/main/Formula/c/cue.rb
+func TestVersionLdflag(t *testing.T) {
+	t.Parallel()
+
+	const want = "v0.0.42-test"
+	out, err := exec.Command("go", "run",
+		"-buildvcs=false",
+		"-ldflags", "-X cuelang.org/go/internal/cueversion.version="+want,
+		"..", "version",
+	).CombinedOutput()
+	qt.Assert(t, qt.IsNil(err), qt.Commentf("%s", out))
+	got := string(out)
+	qt.Assert(t, qt.Matches(got, `(?s).*cue version `+regexp.QuoteMeta(want)+`.*`))
+}
+
 // Test that we handle context cancellation via SIGINT correctly,
 // never letting the cue tool hang around until it gets SIGKILLed.
 func TestInterrupt(t *testing.T) {

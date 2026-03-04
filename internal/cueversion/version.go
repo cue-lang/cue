@@ -27,7 +27,20 @@ func ModuleVersion() string {
 
 const cueModule = "cuelang.org/go"
 
+// version can be overridden at build time via ldflags, e.g.:
+//
+//	go build -ldflags "-X cuelang.org/go/internal/cueversion.version=v0.16.0"
+//
+// This is needed when CUE is built from a source tarball rather than a git
+// clone, as there is no VCS information for Go to derive a version from.
+// For example, the Homebrew formula builds CUE this way:
+// https://github.com/Homebrew/homebrew-core/blob/main/Formula/c/cue.rb
+var version string
+
 var moduleVersionOnce = sync.OnceValue(func() string {
+	if version != "" {
+		return version
+	}
 	bi, ok := debug.ReadBuildInfo()
 	if !ok {
 		// This might happen if the binary was not built with module support

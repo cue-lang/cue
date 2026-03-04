@@ -56,7 +56,7 @@ type interpreterFake struct {
 	files map[string]int
 }
 
-func (i *interpreterFake) Kind() string { return "test" }
+func (i *interpreterFake) Kind() string { return "testfn" }
 
 func (i *interpreterFake) NewCompiler(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
 	switch b.PkgName {

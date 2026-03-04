@@ -92,7 +92,6 @@ func runCmd(dir string, exe string, args ...string) (string, error) {
 
 var (
 	rxExtractEmail = regexp.MustCompile(`.*<(.*)\>$`)
-	rxUserMention  = regexp.MustCompile(`(^|\s)(@[a-z0-9][a-z0-9-]*)`)
 )
 
 func extractEmails(list string) []string {

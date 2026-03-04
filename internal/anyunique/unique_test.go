@@ -75,12 +75,12 @@ func (nodeHasher) Hash(h *maphash.Hash, n *node) {
 }
 
 func TestNew(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 	qt.Assert(t, qt.Not(qt.IsNil(s)))
 }
 
 func TestStore_Make_BasicEquality(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	// First call creates a new unique value
 	u1 := s.Make("hello")
@@ -98,7 +98,7 @@ func TestStore_Make_BasicEquality(t *testing.T) {
 }
 
 func TestStore_Make_ZeroValue(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	// Zero value should be handled specially
 	u1 := s.Make("")
@@ -113,7 +113,7 @@ func TestStore_Make_ZeroValue(t *testing.T) {
 }
 
 func TestStore_Make_StructPointers(t *testing.T) {
-	s := anyunique.New[*node](nodeHasher{})
+	s := anyunique.New(nodeHasher{})
 
 	node1 := &node{values: []int{1, 2, 3}}
 	node2 := &node{values: []int{1, 2, 3}} // same content, different pointer
@@ -139,7 +139,7 @@ func TestStore_Make_StructPointers(t *testing.T) {
 }
 
 func TestStore_Make_IntValues(t *testing.T) {
-	s := anyunique.New[int](simpleIntHasher{})
+	s := anyunique.New(simpleIntHasher{})
 
 	u1 := s.Make(42)
 	u2 := s.Make(42)
@@ -152,7 +152,7 @@ func TestStore_Make_IntValues(t *testing.T) {
 }
 
 func TestStore_Make_MultipleValues(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	values := []string{"apple", "banana", "cherry", "date", "elderberry"}
 	uniqueValues := make(map[anyunique.Handle[string]]bool)
@@ -186,7 +186,7 @@ func (badHasher) Hash(*maphash.Hash, string) {
 }
 
 func TestStore_Make_HashCollisions(t *testing.T) {
-	s := anyunique.New[string](badHasher{})
+	s := anyunique.New(badHasher{})
 
 	// All these will hash to the same bucket
 	u1 := s.Make("key1")
@@ -209,7 +209,7 @@ func TestStore_Make_HashCollisions(t *testing.T) {
 }
 
 func TestStore_WriteHash(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	u1 := s.Make("hello")
 	u2 := s.Make("hello")
@@ -235,7 +235,7 @@ func TestStore_WriteHash(t *testing.T) {
 }
 
 func TestStore_WriteHash_ZeroValue(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	u1 := s.Make("")
 	u2 := s.Make("")
@@ -253,7 +253,7 @@ func TestStore_WriteHash_ZeroValue(t *testing.T) {
 }
 
 func TestU_Get(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	u := s.Make("test")
 	qt.Assert(t, qt.Equals(u.Value(), "test"))
@@ -264,7 +264,7 @@ func TestU_Get(t *testing.T) {
 }
 
 func TestStore_Make_NilPointers(t *testing.T) {
-	s := anyunique.New[*node](nodeHasher{})
+	s := anyunique.New(nodeHasher{})
 
 	u1 := s.Make(nil)
 	u2 := s.Make(nil)
@@ -280,7 +280,7 @@ func TestStore_Make_NilPointers(t *testing.T) {
 }
 
 func TestStore_Make_RepeatedCalls(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	// Make the same value many times
 	var values []anyunique.Handle[string]
@@ -296,8 +296,8 @@ func TestStore_Make_RepeatedCalls(t *testing.T) {
 }
 
 func TestStore_Make_DifferentStores(t *testing.T) {
-	s1 := anyunique.New[string](stringHasher{})
-	s2 := anyunique.New[string](stringHasher{})
+	s1 := anyunique.New(stringHasher{})
+	s2 := anyunique.New(stringHasher{})
 
 	u1 := s1.Make("hello")
 	u2 := s2.Make("hello")
@@ -321,7 +321,7 @@ func TestStore_Make_DifferentStores(t *testing.T) {
 }
 
 func TestStore_WriteHash_ConsistentWithMake(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	// Create several unique values
 	values := []string{"alpha", "beta", "gamma"}
@@ -346,7 +346,7 @@ func TestStore_WriteHash_ConsistentWithMake(t *testing.T) {
 }
 
 func TestStore_Make_StressTest(t *testing.T) {
-	s := anyunique.New[int](simpleIntHasher{})
+	s := anyunique.New(simpleIntHasher{})
 
 	// Create many unique values
 	n := 10000
@@ -373,7 +373,6 @@ type treeNode struct {
 
 // treeHasher implements deep equality for tree nodes
 type treeHasher struct {
-	childStore *anyunique.Store[*treeNode, treeHasher]
 }
 
 func (h treeHasher) Equal(a, b *treeNode) bool {
@@ -406,7 +405,7 @@ func (h treeHasher) Hash(hash *maphash.Hash, n *treeNode) {
 }
 
 func TestStore_Make_NestedStructures(t *testing.T) {
-	s := anyunique.New[*treeNode](treeHasher{})
+	s := anyunique.New(treeHasher{})
 
 	// Create identical tree structures with different pointers
 	tree1 := &treeNode{
@@ -446,7 +445,7 @@ func TestStore_Make_NestedStructures(t *testing.T) {
 }
 
 func TestStore_Make_ZeroValueInt(t *testing.T) {
-	s := anyunique.New[int](simpleIntHasher{})
+	s := anyunique.New(simpleIntHasher{})
 
 	u1 := s.Make(0)
 	u2 := s.Make(0)
@@ -457,7 +456,7 @@ func TestStore_Make_ZeroValueInt(t *testing.T) {
 }
 
 func TestStore_WriteHash_DifferentSeeds(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	u := s.Make("test")
 
@@ -474,7 +473,7 @@ func TestStore_WriteHash_DifferentSeeds(t *testing.T) {
 }
 
 func TestStore_Make_LargeStructPointers(t *testing.T) {
-	s := anyunique.New[*node](nodeHasher{})
+	s := anyunique.New(nodeHasher{})
 
 	// Create nodes with large slices
 	largeSlice := make([]int, 1000)
@@ -494,7 +493,7 @@ func TestStore_Make_LargeStructPointers(t *testing.T) {
 }
 
 func TestStore_Make_AlternatingPatterns(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	// Alternate between two values many times
 	for range 100 {
@@ -508,7 +507,7 @@ func TestStore_Make_AlternatingPatterns(t *testing.T) {
 }
 
 func TestStore_WriteHash_MultipleValues(t *testing.T) {
-	s := anyunique.New[string](stringHasher{})
+	s := anyunique.New(stringHasher{})
 
 	values := []string{"apple", "banana", "cherry", "date"}
 	uniques := make([]anyunique.Handle[string], len(values))

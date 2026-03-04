@@ -57,6 +57,9 @@ func (c *Context) ctx() *adt.OpContext {
 }
 
 // Context reports the Context with which this value was created.
+//
+// Deprecated: the returned context is undefined when values from
+// different contexts are combined.
 func (v Value) Context() *Context {
 	return (*Context)(v.idx)
 }

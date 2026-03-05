@@ -1922,6 +1922,39 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 	})
 }
 
+// FuncValidator is like BuiltinValidator but for user-provided validators.
+// When unified with a concrete value, its Validate function is called.
+type FuncValidator struct {
+	Validate func(ctx *OpContext, v Value) *Bottom
+	Name     string
+}
+
+func (f *FuncValidator) Source() ast.Node { return nil }
+
+// Kind returns TopKind because the validator accepts a value of any kind and
+// leaves kind checking to the Validate function, which decodes the value into
+// the Go type it expects. Mapping the Go type to a CUE kind here would let a
+// wrong-typed value be rejected as a clean kind conflict rather than an opaque
+// decode error, but it is not implemented yet.
+func (f *FuncValidator) Kind() Kind { return TopKind }
+
+func (f *FuncValidator) validate(c *OpContext, v Value) *Bottom {
+	b := f.Validate(c, v)
+	if b == nil {
+		return nil
+	}
+	name := f.Name
+	if name == "" {
+		name = "validator"
+	}
+	vErr := c.Newf("error in call to %s", name)
+	return &Bottom{
+		Code: b.Code,
+		Err:  errors.Wrap(vErr, b.Err),
+		Node: c.vertex,
+	}
+}
+
 // Func is like Builtin but specifically oriented towards user-provided
 // functions. Unlike Builtin, it does not support default arguments,
 // non-concrete argument handling, or implicit validators.

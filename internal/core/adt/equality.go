@@ -197,6 +197,11 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 		return true
 
 	case *BuiltinValidator:
+
+	case *FuncValidator:
+		if y, ok := w.(*FuncValidator); ok {
+			return x == y
+		}
 	}
 
 	return false

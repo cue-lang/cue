@@ -93,3 +93,63 @@ func TestPureFunc2WrongArgCount(t *testing.T) {
 	qt.Assert(t, qt.IsNotNil(got.Err()))
 	qt.Assert(t, qt.ErrorMatches(got.Err(), `.*expected 2 argument\(s\).*`))
 }
+
+func TestValidatorFunc(t *testing.T) {
+	ctx := cuecontext.New()
+	v := ctx.CompileString(`#v: _, x: #v & "hello"`)
+	v = v.FillPath(cue.ParsePath("#v"), cue.ValidatorFunc(func(s string) error {
+		if len(s) < 3 {
+			return fmt.Errorf("string too short")
+		}
+		return nil
+	}))
+	got := v.LookupPath(cue.ParsePath("x"))
+	qt.Assert(t, qt.IsNil(got.Err()))
+	qt.Assert(t, qt.Equals(fmt.Sprint(got), `"hello"`))
+}
+
+func TestValidatorFuncError(t *testing.T) {
+	ctx := cuecontext.New()
+	v := ctx.CompileString(`#v: _, x: #v & "hi"`)
+	v = v.FillPath(cue.ParsePath("#v"), cue.ValidatorFunc(func(s string) error {
+		if len(s) < 3 {
+			return fmt.Errorf("string too short")
+		}
+		return nil
+	}))
+	got := v.LookupPath(cue.ParsePath("x"))
+	qt.Assert(t, qt.IsNotNil(got.Err()))
+	qt.Assert(t, qt.ErrorMatches(got.Err(), `.*string too short.*`))
+}
+
+func TestValidatorFuncTypeMismatch(t *testing.T) {
+	ctx := cuecontext.New()
+	v := ctx.CompileString(`#v: _, x: #v & 42`)
+	v = v.FillPath(cue.ParsePath("#v"), cue.ValidatorFunc(func(s string) error {
+		return nil
+	}))
+	got := v.LookupPath(cue.ParsePath("x"))
+	qt.Assert(t, qt.IsNotNil(got.Err()))
+	qt.Assert(t, qt.ErrorMatches(got.Err(), `.*decoding value for validator.*`))
+}
+
+func TestValidatorFuncName(t *testing.T) {
+	ctx := cuecontext.New()
+	v := ctx.CompileString(`#v: _, x: #v & "hi"`)
+	v = v.FillPath(cue.ParsePath("#v"), cue.ValidatorFunc(func(s string) error {
+		return fmt.Errorf("bad value")
+	}, cue.Name("myValidator")))
+	got := v.LookupPath(cue.ParsePath("x"))
+	qt.Assert(t, qt.IsNotNil(got.Err()))
+	qt.Assert(t, qt.ErrorMatches(got.Err(), `.*bad value.*`))
+}
+
+func TestValidatorFuncExportError(t *testing.T) {
+	ctx := cuecontext.New()
+	v := ctx.CompileString("#v: _")
+	v = v.FillPath(cue.ParsePath("#v"), cue.ValidatorFunc(func(s string) error {
+		return nil
+	}, cue.Name("myValidator")))
+	got := v.LookupPath(cue.ParsePath("#v"))
+	qt.Assert(t, qt.Matches(fmt.Sprint(got), `.*cannot convert validator "myValidator" to CUE.*`))
+}

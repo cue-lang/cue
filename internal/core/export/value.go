@@ -174,6 +174,11 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 			Err: errors.Newf(token.NoPos, "cannot convert function %q to CUE", x.Name),
 		})
 
+	case *adt.FuncValidator:
+		result = e.bottom(&adt.Bottom{
+			Err: errors.Newf(token.NoPos, "cannot convert validator %q to CUE", x.Name),
+		})
+
 	case *adt.BuiltinValidator:
 		result = e.builtinValidator(x)
 

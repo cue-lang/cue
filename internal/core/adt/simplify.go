@@ -317,6 +317,10 @@ func SimplifyValidator(ctx *OpContext, v, w Conjunct) (c Conjunct, ok bool) {
 			}
 			return v, true
 		}
+	case *FuncValidator:
+		if y, ok := w.x.(*FuncValidator); ok && x == y {
+			return v, true
+		}
 	}
 	return c, false
 }

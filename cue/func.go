@@ -38,6 +38,32 @@ func Name(name string) FuncOption {
 	}
 }
 
+// ValidatorFunc returns a [Value] that acts as a CUE validator.
+// When unified with a concrete value, it decodes that value as type T
+// and calls f to validate it. If f returns a non-nil error, the
+// unification fails with that error.
+func ValidatorFunc[T any](f func(T) error, opts ...FuncOption) Value {
+	var cfg funcConfig
+	for _, o := range opts {
+		o(&cfg)
+	}
+	ctx := (*Context)(runtime.New())
+	return newValueRoot(ctx.runtime(), ctx.ctx(), &adt.FuncValidator{
+		Name: cfg.name,
+		Validate: func(opCtx *adt.OpContext, v adt.Value) *adt.Bottom {
+			var t T
+			cueVal := newValueRoot(ctx.runtime(), opCtx, v)
+			if err := cueVal.Decode(&t); err != nil {
+				return opCtx.NewErrf("decoding value for validator: %v", err)
+			}
+			if err := f(t); err != nil {
+				return opCtx.NewErrf("%v", err)
+			}
+			return nil
+		},
+	})
+}
+
 func pureFunc[Args, R any](f func(Args) (R, error), opts []FuncOption) Value {
 	var cfg funcConfig
 	for _, o := range opts {

@@ -1780,6 +1780,20 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 	})
 }
 
+// FuncValidator is like BuiltinValidator but for user-provided validators.
+// When unified with a concrete value, its Validate function is called.
+type FuncValidator struct {
+	Validate func(ctx *OpContext, v Value) *Bottom
+	Pos_     token.Pos
+	Name     string
+}
+
+func (f *FuncValidator) Source() ast.Node { return nil }
+func (f *FuncValidator) Kind() Kind       { return TopKind }
+func (f *FuncValidator) validate(c *OpContext, v Value) *Bottom {
+	return f.Validate(c, v)
+}
+
 // Func is like Builtin but specifically oriented towards user-provided
 // functions. Unlike Builtin, it does not support default arguments,
 // non-concrete argument handling, or implicit validators.

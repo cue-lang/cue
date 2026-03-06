@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24293e77_ba331610",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2026-03-06T14:35:38Z",
+      "side": 1,
+      "message": "Doing a cheeky \"approve as self\" via Chief Cueckoo to not interrupt flow elsewhere for this simple change.",
+      "revId": "ea25913cf3d3cc3a9b0649ba209cd0b2c4baedb2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -264,7 +264,7 @@ func (f *formatter) formfeed() whiteSpace {
 func (f *formatter) onOneLine(node ast.Node) bool {
 	a := node.Pos()
 	b := node.End()
-	if a.IsValid() && b.IsValid() {
+	if a.HasAbsPos() && b.HasAbsPos() {
 		return f.lineFor(a) == f.lineFor(b)
 	}
 	// TODO: walk and look at relative positions to determine the same?

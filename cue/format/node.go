@@ -257,6 +257,9 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 		}
 		switch n := x.(type) {
 		case *ast.Comprehension:
+			if !n.Pos().HasRelPos() || n.Pos().RelPos() >= token.Newline {
+				f.print(f.formfeed())
+			}
 			f.walkClauseList(n.Clauses, blank)
 			f.print(blank, nooverride)
 			f.expr(n.Value)

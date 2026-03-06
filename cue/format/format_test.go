@@ -119,6 +119,69 @@ func TestNodes(t *testing.T) {
 		version: "foo"
 	}
 }`,
+	}, {
+		// Issue #4296: programmatic AST with comprehension inside a list
+		// should format with proper alignment and line structure.
+		name: "issue4296",
+		in: func() ast.Node {
+			nlFile := token.NewFile("", -1, 1)
+			nlPos := nlFile.Pos(0, token.Newline)
+
+			field := func(label, val string) *ast.Field {
+				return &ast.Field{
+					Label: ast.NewIdent(label),
+					Value: ast.NewString(val),
+				}
+			}
+			nested := func(l1, l2, val string) *ast.Field {
+				return &ast.Field{
+					Label: ast.NewIdent(l1),
+					Value: &ast.StructLit{Elts: []ast.Decl{
+						&ast.Field{Label: ast.NewIdent(l2), Value: ast.NewString(val)},
+					}},
+				}
+			}
+
+			s := &ast.StructLit{
+				Lbrace: nlPos,
+				Elts: []ast.Decl{
+					field("apiVersion", "v1"),
+					field("kind", "ConfigMap"),
+					nested("metadata", "name", "test"),
+					nested("data", "key", "one"),
+				},
+			}
+			list := &ast.ListLit{Rbrack: nlPos, Elts: []ast.Expr{s}}
+
+			embed := &ast.EmbedDecl{Expr: list}
+			ast.SetRelPos(embed, token.NoSpace)
+
+			comp := &ast.Comprehension{
+				Clauses: []ast.Clause{&ast.ForClause{
+					Key: ast.NewIdent("_"), Value: ast.NewIdent("x"),
+					Source: ast.NewIdent("items"),
+				}},
+				Value: &ast.StructLit{
+					Rbrace: token.NoSpace.Pos(),
+					Elts:   []ast.Decl{embed},
+				},
+			}
+			outer := &ast.ListLit{Rbrack: nlPos, Elts: []ast.Expr{comp}}
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{Label: ast.NewIdent("output"), Value: outer},
+			}}
+		}(),
+		out: `output: [
+	for _, x in items {[
+		{
+			apiVersion: "v1"
+			kind:       "ConfigMap"
+			metadata: name: "test"
+			data: key:      "one"
+		},
+	]},
+]
+`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1710af6_0d67c321",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-03-06T14:22:26Z",
+      "side": 1,
+      "message": "We should add a bunch of tests that verify these claims.\n\nIt may also be there is still code that enforces that values are unified with the same context.",
+      "revId": "6b10ade538a942c11a9c4513d8417294080bc36a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d941c5f_bbc9cd78",
+        "filename": "cue/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-03-06T14:22:26Z",
+      "side": 1,
+      "message": "Maybe explain it is now okay to Unify values from different context so it is okay to create a new context?",
+      "revId": "6b10ade538a942c11a9c4513d8417294080bc36a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

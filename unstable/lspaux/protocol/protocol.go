@@ -190,8 +190,11 @@ type FileCoordinate struct {
 	// slash-separated path relative to the git repo root. In the
 	// future, this could become a URI, with the git repo name as the
 	// prefix
-	Path       string
-	ByteOffset uint32 // byte offset to the start of the token
+	Path string
+	// Line position in the given path (1-based).
+	Line uint32
+	// Column position in the given path (1-based, count of bytes).
+	Column uint32
 }
 
 // EvalError represents a single error produced during evaluation.
@@ -218,7 +221,8 @@ func (m *EvalResultMsg) MarshalBytes() []byte {
 		buf = appendUint32(buf, uint32(len(e.Coordinates)))
 		for _, c := range e.Coordinates {
 			buf = appendString(buf, c.Path)
-			buf = appendUint32(buf, c.ByteOffset)
+			buf = appendUint32(buf, c.Line)
+			buf = appendUint32(buf, c.Column)
 		}
 	}
 
@@ -263,8 +267,11 @@ func (m *EvalResultMsg) UnmarshalBytes(data []byte) error {
 			if coord.Path, err = r.readString(); err != nil {
 				return fmt.Errorf("eval result: error[%d] coordinate[%d] path: %w", i, j, err)
 			}
-			if coord.ByteOffset, err = r.readUint32(); err != nil {
-				return fmt.Errorf("eval result: error[%d] coordinate[%d] byte offset: %w", i, j, err)
+			if coord.Line, err = r.readUint32(); err != nil {
+				return fmt.Errorf("eval result: error[%d] coordinate[%d] line offset: %w", i, j, err)
+			}
+			if coord.Column, err = r.readUint32(); err != nil {
+				return fmt.Errorf("eval result: error[%d] coordinate[%d] column offset: %w", i, j, err)
 			}
 		}
 	}

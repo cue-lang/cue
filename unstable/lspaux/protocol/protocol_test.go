@@ -137,8 +137,8 @@ func TestEvalResultMsgRoundTrip(t *testing.T) {
 			{
 				Message: "field not allowed: foo",
 				Coordinates: []protocol.FileCoordinate{
-					{Path: "pkg/config.cue", ByteOffset: 123},
-					{Path: "pkg/other.cue", ByteOffset: 456},
+					{Path: "pkg/config.cue", Line: 1, Column: 2},
+					{Path: "pkg/other.cue", Line: 3, Column: 4},
 				},
 			},
 			{
@@ -174,8 +174,11 @@ func TestEvalResultMsgRoundTrip(t *testing.T) {
 			if dc.Path != oc.Path {
 				t.Errorf("Errors[%d].Coordinates[%d].Path: got %q, want %q", i, j, dc.Path, oc.Path)
 			}
-			if dc.ByteOffset != oc.ByteOffset {
-				t.Errorf("Errors[%d].Coordinates[%d].ByteOffset: got %d, want %d", i, j, dc.ByteOffset, oc.ByteOffset)
+			if dc.Line != oc.Line {
+				t.Errorf("Errors[%d].Coordinates[%d].Line: got %d, want %d", i, j, dc.Line, oc.Line)
+			}
+			if dc.Column != oc.Column {
+				t.Errorf("Errors[%d].Coordinates[%d].Column: got %d, want %d", i, j, dc.Column, oc.Column)
 			}
 		}
 	}
@@ -219,7 +222,7 @@ func TestEvalResultMsgRejectsTruncated(t *testing.T) {
 			{
 				Message: "err",
 				Coordinates: []protocol.FileCoordinate{
-					{Path: "a.cue", ByteOffset: 10},
+					{Path: "a.cue", Line: 10, Column: 11},
 				},
 			},
 		},

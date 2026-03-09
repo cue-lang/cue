@@ -1,0 +1,31 @@
+-- in.cue --
+_t: {
+	#arg?: _
+	out: [if #arg != _|_ {
+		[
+			if (#arg & bool) != _|_ {#arg},
+			false,
+		][0]
+	}, false][0]
+}
+
+_innerArg: !((_t & {#arg: false}).out)
+
+// As a field: evaluates correctly (true)
+asField: (_t & {#arg: (_t & {#arg: _innerArg}).out}).out
+
+// In a comprehension guard: should also produce ["yes"]
+inGuard: [
+	if (_t & {#arg: (_t & {#arg: _innerArg}).out}).out {"yes"},
+]
+-- out/evalalpha --
+(struct){
+  _t: (struct){
+    #arg?: (_){ _ }
+    out: (bool){ false }
+  }
+  _innerArg: (bool){ true }
+  asField: (bool){ true }
+  inGuard: (#list){
+  }
+}

@@ -30,18 +30,25 @@ import (
 // error. If src == nil, ReadAll returns the result of reading the file
 // specified by filename.
 func ReadAll(filename string, src any) ([]byte, error) {
-	if src != nil {
-		switch src := src.(type) {
-		case string:
-			return []byte(src), nil
-		case []byte:
-			return src, nil
-		case *bytes.Buffer:
-			// is io.Reader, but src is already available in []byte form
-			return src.Bytes(), nil
-		case io.Reader:
-			return io.ReadAll(src)
+	switch src := src.(type) {
+	case nil:
+		// src is nil; fall through to os.ReadFile below.
+	case string:
+		return []byte(src), nil
+	case []byte:
+		if src == nil {
+			break // typed nil []byte; treat as nil src.
 		}
+		return src, nil
+	case *bytes.Buffer:
+		if src == nil {
+			break // typed nil *bytes.Buffer; treat as nil src.
+		}
+		// is io.Reader, but src is already available in []byte form
+		return src.Bytes(), nil
+	case io.Reader:
+		return io.ReadAll(src)
+	default:
 		return nil, fmt.Errorf("invalid source type %T", src)
 	}
 	return os.ReadFile(filename)
@@ -73,17 +80,24 @@ func ReadAllSize(r io.Reader, size int) ([]byte, error) {
 // The caller must check if the result is an [io.Closer], and if so, close it when done.
 // The size of the opened reader is returned if possible, or -1 otherwise.
 func Open(filename string, src any) (_ io.Reader, size int, _ error) {
-	if src != nil {
-		switch src := src.(type) {
-		case string:
-			return strings.NewReader(src), len(src), nil
-		case []byte:
-			return bytes.NewReader(src), len(src), nil
-		case *os.File:
-			return fileWithSize(src)
-		case io.Reader:
-			return src, -1, nil
+	switch src := src.(type) {
+	case nil:
+		// src is nil; fall through to os.Open below.
+	case string:
+		return strings.NewReader(src), len(src), nil
+	case []byte:
+		if src == nil {
+			break // typed nil []byte; treat as nil src.
 		}
+		return bytes.NewReader(src), len(src), nil
+	case *os.File:
+		if src == nil {
+			break // typed nil *os.File; treat as nil src.
+		}
+		return fileWithSize(src)
+	case io.Reader:
+		return src, -1, nil
+	default:
 		return nil, -1, fmt.Errorf("invalid source type %T", src)
 	}
 	f, err := os.Open(filename)

@@ -401,7 +401,9 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 //
 // Extract assumes the proto file compiles with protoc and may not report an error
 // if it does not. Imports are resolved using the paths defined in Config.
-func Extract(filename string, src interface{}, c *Config) (f *ast.File, err error) {
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildFile].
+func Extract(filename string, src any, c *Config) (f *ast.File, err error) {
 	if c == nil {
 		c = &Config{}
 	}

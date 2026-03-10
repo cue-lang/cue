@@ -30,6 +30,8 @@ import (
 //
 // It currently only converts entries in #/components/schema and extracts some
 // meta data.
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildFile].
 func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 	// TODO: find a good OpenAPI validator. Both go-openapi and kin-openapi
 	// seem outdated. The k8s one might be good, but avoid pulling in massive

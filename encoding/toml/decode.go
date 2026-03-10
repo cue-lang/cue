@@ -116,6 +116,8 @@ type openTableArray struct {
 // Decode parses the input stream as TOML and converts it to a CUE [*ast.File].
 // Because TOML files only contain a single top-level expression,
 // subsequent calls to this method may return [io.EOF].
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildExpr].
 func (d *Decoder) Decode() (ast.Expr, error) {
 	if d.decoded {
 		return nil, io.EOF

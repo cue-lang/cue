@@ -85,7 +85,7 @@ func TestPaths(t *testing.T) {
 		path: cue.ParsePath("foo._foo"),
 		str:  "_|_",
 		err:  true,
-		out:  `_|_ // invalid path: hidden label _foo not allowed`,
+		out:  `_|_ // invalid path: hidden label _foo not allowed; use Hid to construct a selector for hidden fields`,
 	}, {
 		path: cue.ParsePath(`c."#Foo`),
 		str:  "_|_",

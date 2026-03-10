@@ -325,7 +325,7 @@ func ParsePath(s string) Path {
 	for _, sel := range p.path {
 		if sel.Type().IsHidden() {
 			return MakePath(Selector{pathError{errors.Newf(token.NoPos,
-				"invalid path: hidden fields not allowed in path %s", s)}})
+				"invalid path: hidden fields not allowed in path %s; use MakePath and Hid to construct a path with hidden fields", s)}})
 		}
 	}
 	return p
@@ -463,7 +463,7 @@ func Label(label ast.Label) Selector {
 		case strings.HasPrefix(s, "_"):
 			// TODO: extract package from a bound identifier.
 			return Selector{pathError{errors.Newf(token.NoPos,
-				"invalid path: hidden label %s not allowed", s),
+				"invalid path: hidden label %s not allowed; use Hid to construct a selector for hidden fields", s),
 			}}
 		case strings.HasPrefix(s, "#"):
 			return Selector{definitionSelector(x.Name)}

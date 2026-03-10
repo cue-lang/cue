@@ -45,6 +45,8 @@ import (
 //
 // The generated CUE schema is guaranteed to deem valid any value that is
 // a valid instance of the source JSON schema.
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildFile].
 func Extract(data cue.InstanceOrValue, cfg *Config) (*ast.File, error) {
 	cfg = ref(*cfg)
 	if cfg.MapURL == nil {

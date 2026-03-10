@@ -138,6 +138,30 @@ func TestExtract(t *testing.T) {
 	}
 }
 
+func TestExtractNilAndEmpty(t *testing.T) {
+	testCases := []struct {
+		name string
+		data []byte
+		out  string
+	}{{
+		name: "nil data",
+		data: nil,
+		out:  `invalid JSON for file "nil data": unexpected end of JSON input`,
+	}, {
+		name: "empty non-nil data",
+		data: make([]byte, 0),
+		out:  `invalid JSON for file "empty non-nil data": unexpected end of JSON input`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := &bytes.Buffer{}
+			e, err := Extract(tc.name, tc.data)
+			toString(out, e, err)
+			qt.Assert(t, qt.Equals(out.String(), tc.out))
+		})
+	}
+}
+
 func toString(w *bytes.Buffer, e ast.Expr, err error) {
 	if err != nil {
 		fmt.Fprint(w, err)

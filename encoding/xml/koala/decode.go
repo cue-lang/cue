@@ -91,6 +91,8 @@ func NewDecoder(fileName string, r io.Reader) *Decoder {
 
 // Decode parses the input stream as XML and converts it to a CUE [ast.Expr].
 // The input stream is taken from the [Decoder] and consumed.
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildExpr].
 func (dec *Decoder) Decode() (ast.Expr, error) {
 	if dec.decoderRan {
 		return nil, io.EOF

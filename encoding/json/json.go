@@ -56,6 +56,8 @@ func Validate(b []byte, v cue.Value) error {
 
 // Extract parses JSON-encoded data to a CUE expression, using path for
 // position information.
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildExpr].
 func Extract(path string, data []byte) (ast.Expr, error) {
 	expr, err := extract(path, data)
 	if err != nil {
@@ -114,8 +116,10 @@ type Decoder struct {
 	readAllErr  error
 }
 
-// Extract converts the current JSON value to a CUE ast. It returns io.EOF
+// Extract converts the current JSON value to a CUE ast. It returns [io.EOF]
 // if the input has been exhausted.
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildExpr].
 func (d *Decoder) Extract() (ast.Expr, error) {
 	if d.readAllErr != nil {
 		return nil, d.readAllErr

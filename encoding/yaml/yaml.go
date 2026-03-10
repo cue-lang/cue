@@ -32,7 +32,9 @@ import (
 // list. The src argument may be a nil, string, []byte, or io.Reader. If
 // src is nil, the result of reading the file specified by filename will
 // be used.
-func Extract(filename string, src interface{}) (*ast.File, error) {
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildFile].
+func Extract(filename string, src any) (*ast.File, error) {
 	data, err := source.ReadAll(filename, src)
 	if err != nil {
 		return nil, err
@@ -118,11 +120,13 @@ type Decoder struct {
 	readAllErr error
 }
 
-// Extract converts the current YAML value to a CUE ast. It returns io.EOF
+// Extract converts the current YAML value to a CUE ast. It returns [io.EOF]
 // if the input has been exhausted.
 //
 // For YAML streams with multiple documents separated by `---`, each call to
 // Extract will return the next document as a separate CUE expression.
+//
+// The result can be converted to a [cue.Value] via [cue.Context.BuildExpr].
 func (d *Decoder) Extract() (ast.Expr, error) {
 	if d.readAllErr != nil {
 		return nil, d.readAllErr

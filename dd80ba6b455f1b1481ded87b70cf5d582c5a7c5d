@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f65cedaf_8f802a5f",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2026-03-10T12:42:07Z",
+      "side": 1,
+      "message": "I really cannot read, because now I see that the documentation up at line 313 already tells me that hidden fields are forbidden. I should have noticed that before complaining about this surprise.\n\nStill, line 314 mentions using Ident, but here we mention Hid. Are both correct? Is the suggestion for using Ident now wrong?",
+      "revId": "dd80ba6b455f1b1481ded87b70cf5d582c5a7c5d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -55,7 +55,8 @@ func Validate(b []byte, v cue.Value) error {
 }
 
 // Extract parses JSON-encoded data to a CUE expression, using path for
-// position information.
+// position information. Note that, unlike other APIs which take a src
+// of type [any], a nil data parameter is treated as empty input, which fails.
 //
 // The result can be converted to a [cue.Value] via [cue.Context.BuildExpr].
 func Extract(path string, data []byte) (ast.Expr, error) {

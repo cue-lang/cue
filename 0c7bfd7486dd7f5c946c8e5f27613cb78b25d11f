@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f979293_3ba795cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-10T09:48:00Z",
+      "side": 1,
+      "message": "Unfortunately I think this fix is incorrect; it would result in e.g. `[]byte(nil)` being treated differently from `[]byte{}` or `make([]byte, 0)`, which is very confusing.\n\nTyped nils are a sharp edge of the Go language for sure, but we should not try to paper over them by treating them like untyped nils. I think the bug here is with the json.Extract API (or at least its unclear godoc), and I think the internal source logic is correct as-is.",
+      "revId": "0c7bfd7486dd7f5c946c8e5f27613cb78b25d11f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

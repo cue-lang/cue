@@ -107,8 +107,12 @@ func TestUnquote(t *testing.T) {
 		{`"""Hello"""`, "", errMissingOpeningNewline},
 		{`"""` + "Hello\n" + `"""`, "", errMissingOpeningNewline},
 		{`"""` + "\nHello" + `"""`, "", errMissingClosingNewline},
-		{"'''\n  Hello\n   '''", "", errInvalidWhitespace},
-		{"'''\n   a\n  b\n   '''", "", errInvalidWhitespace},
+		{"'''\n  Hello\n   '''", "", invalidWhitespaceError("   ", "  ")},
+		{"'''\n   a\n  b\n   '''", "", invalidWhitespaceError("   ", "  ")},
+		// Tabs expected, spaces found (issue #4278).
+		{`"""` + "\n\t\tHello World\n    " + `"""`, "", invalidWhitespaceError("    ", "\t\t")},
+		// Spaces expected, tabs found.
+		{"'''\n    Hello\n\t\t'''", "", invalidWhitespaceError("\t\t", "    ")},
 		{"'''Hello\n'''", "", errMissingOpeningNewline},
 		{"'''\nHello'''", "", errMissingClosingNewline},
 		{`"Hello""`, "", errSyntax},
@@ -119,7 +123,7 @@ func TestUnquote(t *testing.T) {
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%s", i, tc.in), func(t *testing.T) {
-			if got, err := Unquote(tc.in); err != tc.err {
+			if got, err := Unquote(tc.in); fmt.Sprint(err) != fmt.Sprint(tc.err) {
 				t.Errorf("error: got %#v; want %#v", err, tc.err)
 			} else if got != tc.out {
 				t.Errorf("value: got %q; want %q", got, tc.out)

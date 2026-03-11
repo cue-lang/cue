@@ -181,7 +181,7 @@ func IsSorted(list []cue.Value, cmp cue.Value) bool {
 	return sort.IsSorted(&s)
 }
 
-// IsSortedStrings tests whether a list is a sorted lists of strings.
+// IsSortedStrings tests whether a list is a sorted list of strings.
 func IsSortedStrings(a []string) bool {
 	return slices.IsSorted(a)
 }

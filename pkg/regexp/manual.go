@@ -62,7 +62,7 @@ import (
 
 var errNoMatch = errors.New("no match")
 
-// Find returns a list holding the text of the leftmost match in b of the regular expression.
+// Find returns a string holding the text of the leftmost match in s of the regular expression.
 // A return value of bottom indicates no match.
 func Find(pattern, s string) (string, error) {
 	re, err := regexp.Compile(pattern)
@@ -93,7 +93,7 @@ func FindAll(pattern, s string, n int) ([]string, error) {
 }
 
 // FindAllNamedSubmatch is like [FindAllSubmatch], but returns a list of maps
-// with the named used in capturing groups. See [FindNamedSubmatch] for an
+// with the names used in capturing groups. See [FindNamedSubmatch] for an
 // example on how to use named groups.
 func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error) {
 	re, err := regexp.Compile(pattern)
@@ -148,7 +148,7 @@ func FindAllSubmatch(pattern, s string, n int) ([][]string, error) {
 //
 // Output:
 //
-//	[{person: "World"}]
+//	{person: "World"}
 func FindNamedSubmatch(pattern, s string) (map[string]string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -171,8 +171,8 @@ func FindNamedSubmatch(pattern, s string) (map[string]string, error) {
 	return r, nil
 }
 
-// FindSubmatch returns a list of lists holding the text of the leftmost
-// match of the regular expression in b and the matches, if any, of its
+// FindSubmatch returns a list holding the text of the leftmost
+// match of the regular expression in s and the matches, if any, of its
 // subexpressions, as defined by the 'Submatch' descriptions in the package
 // comment.
 // A return value of bottom indicates no match.
@@ -197,7 +197,7 @@ func FindSubmatch(pattern, s string) ([]string, error) {
 // corresponding index; other names refer to capturing parentheses named with
 // the (?P<name>...) syntax. A reference to an out of range or unmatched index
 // or a name that is not present in the regular expression is replaced with an
-// empty slice.
+// empty string.
 //
 // In the $name form, name is taken to be as long as possible: $1x is
 // equivalent to ${1x}, not ${1}x, and, $10 is equivalent to ${10}, not ${1}0.

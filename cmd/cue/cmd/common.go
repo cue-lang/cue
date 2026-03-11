@@ -16,10 +16,12 @@ package cmd
 
 import (
 	"cmp"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -694,10 +696,44 @@ func (b *buildPlan) parseFlags() (err error) {
 	return nil
 }
 
+// processLayerAttributes scans files in each build instance for @layer
+// attributes in the preamble and applies the layer priority and mode
+// to the file's token information. The @layer attribute is then removed
+// from the file's declarations.
+func processLayerAttributes(binst []*build.Instance) error {
+	for _, inst := range binst {
+		for _, f := range inst.Files {
+			for i, d := range f.Decls {
+				attr, ok := d.(*ast.Attribute)
+				if !ok {
+					break // no more preamble attributes
+				}
+				key, body := attr.Split()
+				if key != "layer" {
+					continue
+				}
+				args := strings.Split(body, ",")
+				priority, err := strconv.ParseInt(args[0], 10, 8)
+				if err != nil {
+					return fmt.Errorf("invalid @layer priority %q: %v", args[0], err)
+				}
+				isData := slices.Contains(args, "defaultData")
+				f.Pos().File().SetLayer(int8(priority), isData)
+				f.Decls = slices.Delete(f.Decls, i, i+1)
+				break
+			}
+		}
+	}
+	return nil
+}
+
 func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) ([]*instance, error) {
 	// TODO:
 	// If there are no files and User is true, then use those?
 	// Always use all files in user mode?
+	if err := processLayerAttributes(binst); err != nil {
+		return nil, err
+	}
 	instances, err := cmd.ctx.BuildInstances(binst)
 	if err != nil {
 		return nil, err

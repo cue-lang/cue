@@ -36,8 +36,8 @@ func DecodedLen(x int) int {
 
 // Decode returns the bytes represented by the hexadecimal string s.
 //
-// Decode expects that src contains only hexadecimal
-// characters and that src has even length.
+// Decode expects that s contains only hexadecimal
+// characters and that s has even length.
 // If the input is malformed, Decode returns
 // the bytes decoded before the error.
 func Decode(s string) ([]byte, error) {

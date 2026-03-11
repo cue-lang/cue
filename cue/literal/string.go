@@ -16,6 +16,7 @@ package literal
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -23,7 +24,6 @@ import (
 
 var (
 	errSyntax                = errors.New("invalid syntax")
-	errInvalidWhitespace     = errors.New("invalid string: invalid whitespace")
 	errMissingOpeningNewline = errors.New(
 		"invalid string: opening quote of multiline string must be followed by newline")
 	errMissingClosingNewline = errors.New(
@@ -34,6 +34,11 @@ var (
 	errSurrogate          = errors.New("unmatched surrogate pair")
 	errEscapedLastNewline = errors.New("last newline of multiline string cannot be escaped")
 )
+
+func invalidWhitespaceError(expected, actual string) error {
+	return fmt.Errorf("invalid string: non-matching whitespace for multiline string (expected %q, got %q)",
+		expected, actual)
+}
 
 // Unquote interprets s as a single- or double-quoted, single- or multi-line
 // string, possibly with custom escape delimiters, returning the string value
@@ -134,7 +139,13 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 
 		if len(start) > nStart && start[nStart] != '\n' {
 			if !strings.HasPrefix(start[nStart:], q.whitespace) {
-				return q, 0, 0, errInvalidWhitespace
+				actual := start[nStart:]
+				if i := strings.IndexByte(actual, '\n'); i >= 0 {
+					actual = actual[:i]
+				}
+				// Trim to only the whitespace prefix.
+				actual = actual[:len(actual)-len(strings.TrimLeft(actual, " \t"))]
+				return q, 0, 0, invalidWhitespaceError(q.whitespace, actual)
 			}
 			nStart += len(q.whitespace)
 		}
@@ -243,7 +254,13 @@ func skipWhitespaceAfterNewline(s string, q QuoteInfo) (string, error) {
 		// in the non-multiline case, but be defensive.
 		fallthrough
 	default:
-		return "", errInvalidWhitespace
+		actual := s
+		if i := strings.IndexByte(actual, '\n'); i >= 0 {
+			actual = actual[:i]
+		}
+		// Trim to only the whitespace prefix.
+		actual = actual[:len(actual)-len(strings.TrimLeft(actual, " \t"))]
+		return "", invalidWhitespaceError(q.whitespace, actual)
 	case strings.HasPrefix(s, q.whitespace):
 		s = s[len(q.whitespace):]
 	case strings.HasPrefix(s, "\n"):

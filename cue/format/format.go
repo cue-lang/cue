@@ -269,12 +269,17 @@ func (f *formatter) formfeed() whiteSpace {
 }
 
 func (f *formatter) onOneLine(node ast.Node) bool {
-	a := node.Pos()
-	b := node.End()
-	if a.IsValid() && b.IsValid() {
-		return f.lineFor(a) == f.lineFor(b)
+	pos := node.Pos()
+	end := node.End()
+	// Note that if either position reports line number 0, it has no absolute position
+	// information, being either an invalid position or just a relative position.
+	// In such cases, we cannot rely on comparing line numbers at all.
+	if posLine, endLine := pos.Line(), end.Line(); posLine > 0 && endLine > 0 {
+		return posLine == endLine
 	}
 	// TODO: walk and look at relative positions to determine the same?
+
+	// Fall back to assuming that the node isn't on a single line.
 	return false
 }
 

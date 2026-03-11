@@ -135,7 +135,7 @@ func TestNodes(t *testing.T) {
 		out: `{{
 	veryLongLabel: "1"
 	x:             "2"
-	a: b:          "3"
+	a: b: "3"
 }}`,
 	}, {
 		name: "foo",

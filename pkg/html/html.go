@@ -24,16 +24,16 @@ import "html"
 
 // Escape escapes special characters like "<" to become "&lt;". It
 // escapes only five such characters: <, >, &, ' and ".
-// UnescapeString(Escape(s)) == s always holds, but the converse isn't
+// Unescape(Escape(s)) == s always holds, but the converse isn't
 // always true.
 func Escape(s string) string {
 	return html.EscapeString(s)
 }
 
 // Unescape unescapes entities like "&lt;" to become "<". It unescapes a
-// larger range of entities than EscapeString escapes. For example, "&aacute;"
+// larger range of entities than Escape escapes. For example, "&aacute;"
 // unescapes to "á", as does "&#225;" and "&#xE1;".
-// Unescape(EscapeString(s)) == s always holds, but the converse isn't
+// Unescape(Escape(s)) == s always holds, but the converse isn't
 // always true.
 func Unescape(s string) string {
 	return html.UnescapeString(s)

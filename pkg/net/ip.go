@@ -116,7 +116,7 @@ func netGetIPCIDR(ip cue.Value) (gonet *netip.Prefix, err error) {
 // The string s can be in dotted decimal ("192.0.2.1")
 // or IPv6 ("2001:db8::68") form.
 // If s is not a valid textual representation of an IP address,
-// ParseIP returns nil.
+// ParseIP returns an error.
 func ParseIP(s string) ([]uint, error) {
 	goip, err := netip.ParseAddr(s)
 	if err != nil {

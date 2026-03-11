@@ -1,0 +1,9 @@
+# Verify that --path expressions that don't resolve to plain labels
+# produce a helpful error rather than panicking.
+
+! exec cue export --path '(*x|"foo")' data.yaml
+cmp stderr expect-stderr
+-- expect-stderr --
+expression is not a valid label: (*x|"foo")
+-- data.yaml --
+x: foo

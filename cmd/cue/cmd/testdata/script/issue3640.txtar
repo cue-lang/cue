@@ -1,0 +1,63 @@
+# Test that using .:pkg in a subdirectory fails when the package
+# only exists in a parent directory.
+# See https://cuelang.org/issue/3640.
+
+# Selecting packages that exist in the root directory should work.
+exec cue export .:a
+cmp stdout stdout-a.golden
+exec cue export .:b
+cmp stdout stdout-b.golden
+
+cd subdir
+
+# Selecting the package which exists in the subdirectory should work.
+exec cue export .:c
+cmp stdout ../stdout-c.golden
+
+# Selecting packages from the parent directory should fail.
+! exec cue export .:a
+cmp stderr ../stderr-a.golden
+! exec cue export .:b
+cmp stderr ../stderr-b.golden
+
+# It should also fail in a subdirectory with no CUE files.
+mkdir ../emptydir
+cd ../emptydir
+! exec cue export .:a
+cmp stderr ../stderr-emptydir.golden
+
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"
+-- a.cue --
+package a
+
+a: "a"
+-- b.cue --
+package b
+
+b: "b"
+-- subdir/c.cue --
+package c
+
+c: "c"
+-- stdout-a.golden --
+{
+    "a": "a"
+}
+-- stdout-b.golden --
+{
+    "b": "b"
+}
+-- stdout-c.golden --
+{
+    "c": "c"
+}
+-- stderr-a.golden --
+build constraints exclude all CUE files in .:
+    ./c.cue: package is c, want a
+-- stderr-b.golden --
+build constraints exclude all CUE files in .:
+    ./c.cue: package is c, want b
+-- stderr-emptydir.golden --
+cue: "." matched no packages

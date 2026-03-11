@@ -240,7 +240,13 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 						cue.Scope(inst))
 					switch l.Kind() {
 					case cue.StringKind, cue.IntKind:
-						label = l.Syntax().(ast.Label)
+						syn, ok := l.Syntax().(ast.Label)
+						if !ok {
+							return nil, fmt.Errorf(
+								`expression is not a valid label: %v`,
+								astinternal.DebugStr(x))
+						}
+						label = syn
 
 					default:
 						var arg interface{} = l

@@ -397,11 +397,11 @@ func TestSourceOptions(t *testing.T) {
 			want:    "foo: {\n\ta:         1\n\tlongField: 2\n}\n",
 		},
 		// TabIndent(false) makes the indentation use a tabWidth number of spaces.
-		// Note that this exposes the default tabWidth value of 8.
+		// Note that this exposes the default tabWidth value of 4.
 		{
 			name:    "TabIndent=false",
 			options: []format.Option{format.TabIndent(false)},
-			want:    "\"foo\": {\n        a:         1\n        longField: 2\n}\n",
+			want:    "\"foo\": {\n    a:         1\n    longField: 2\n}\n",
 		},
 		// TabIndent(false) with a custom number of spaces.
 		{

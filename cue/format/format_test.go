@@ -387,8 +387,8 @@ foo: {
 		// Note that this exposes the default tabWidth value of 8.
 		{"TabIndent=false", []format.Option{format.TabIndent(false)}, `
 "foo": {
-        a:         1
-        longField: 2
+    a:         1
+    longField: 2
 }
 `[1:]},
 		// TabIndent(false) with a custom number of spaces.

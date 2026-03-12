@@ -15,6 +15,7 @@ import (
 	_ "cuelang.org/go/pkg/encoding/json"
 	_ "cuelang.org/go/pkg/encoding/openapi"
 	_ "cuelang.org/go/pkg/encoding/toml"
+	_ "cuelang.org/go/pkg/encoding/xml/koala"
 	_ "cuelang.org/go/pkg/encoding/yaml"
 	_ "cuelang.org/go/pkg/html"
 	_ "cuelang.org/go/pkg/list"

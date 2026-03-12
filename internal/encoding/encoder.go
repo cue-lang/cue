@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/encoding/toml"
+	"cuelang.org/go/encoding/xml/koala"
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
@@ -244,6 +245,16 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 			}
 			_, err = w.Write(b)
 			return err
+		}
+
+	case build.XML:
+		switch {
+		case f.BoolTags["koala"]:
+			e.concrete = true
+			enc := koala.NewEncoder(w)
+			e.encValue = enc.Encode
+		default:
+			return nil, fmt.Errorf("xml requires a variant, such as: xml+koala")
 		}
 
 	default:

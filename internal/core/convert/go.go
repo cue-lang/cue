@@ -269,18 +269,15 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return n
 	}
 
-	if _, ok := implements(typ, typesInterface); ok {
-		v, _ := reflect.TypeAssert[types.Interface](val)
+	if v, ok := typeAssert[types.Interface](val, typesInterface); ok {
 		t := v.Core()
 		// TODO: panic if not the same runtime.
 		return t.V
 	}
-	if _, ok := implements(typ, astExpr); ok {
-		v, _ := reflect.TypeAssert[ast.Expr](val)
+	if v, ok := typeAssert[ast.Expr](val, astExpr); ok {
 		return compileExpr(ctx, v)
 	}
-	if _, ok := implements(typ, jsonMarshaler); ok {
-		v, _ := reflect.TypeAssert[json.Marshaler](val)
+	if v, ok := typeAssert[json.Marshaler](val, jsonMarshaler); ok {
 		b, err := v.MarshalJSON()
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "json.Marshaler"))
@@ -291,8 +288,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 		return compileExpr(ctx, expr)
 	}
-	if _, ok := implements(typ, textMarshaler); ok {
-		v, _ := reflect.TypeAssert[encoding.TextMarshaler](val)
+	if v, ok := typeAssert[encoding.TextMarshaler](val, textMarshaler); ok {
 		b, err := v.MarshalText()
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "encoding.TextMarshaler"))
@@ -300,8 +296,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		str := strings.ToValidUTF8(string(b), string(utf8.RuneError))
 		return &adt.String{Src: src, Str: str}
 	}
-	if _, ok := implements(typ, goError); ok {
-		v, _ := reflect.TypeAssert[error](val)
+	if v, ok := typeAssert[error](val, goError); ok {
 		errs, ok := v.(errors.Error)
 		if !ok {
 			errs = ctx.Newf("%s", v.Error())
@@ -557,20 +552,27 @@ var (
 	topSentinel    = ast.NewIdent("_")
 )
 
-// implements is like t.Implements(ifaceType) but checks whether
-// either t or reflect.PointerTo(t) implements the interface.
-// It also returns false for the case where t is an interface type.
-func implements(t, ifaceType reflect.Type) (needAddr, ok bool) {
+// typeAssert is similar to [reflect.TypeAssert] except that
+// it will also convert v to a pointer if its pointer type implements
+// the given interface T, allocating a value if necessary.
+func typeAssert[T any](v reflect.Value, t reflect.Type) (T, bool) {
+	vt := v.Type()
 	switch {
-	case t.Kind() == reflect.Interface:
-		return false, false
-	case t.Implements(ifaceType):
-		return false, true
-	case reflect.PointerTo(t).Implements(ifaceType):
-		return true, true
-	default:
-		return false, false
+	case vt.Kind() == reflect.Interface:
+		return *new(T), false
+	case vt.Implements(t):
+		return reflect.TypeAssert[T](v)
+	case reflect.PointerTo(vt).Implements(t):
+		if v.CanAddr() {
+			v = v.Addr()
+		} else {
+			p := reflect.New(vt)
+			p.Elem().Set(v)
+			v = p
+		}
+		return reflect.TypeAssert[T](v)
 	}
+	return *new(T), false
 }
 
 func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e ast.Expr, expr adt.Expr) {

@@ -18,6 +18,7 @@ package convert_test
 
 import (
 	"encoding"
+	"encoding/json"
 	"math/big"
 	"testing"
 	"time"
@@ -45,6 +46,24 @@ func (t *textMarshaller) MarshalText() (b []byte, err error) {
 }
 
 var _ encoding.TextMarshaler = &textMarshaller{}
+
+type jsonMarshaller struct {
+	b string
+}
+
+func (j *jsonMarshaller) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + j.b + `"`), nil
+}
+
+var _ json.Marshaler = &jsonMarshaller{}
+
+type ptrError struct {
+	msg string
+}
+
+func (e *ptrError) Error() string { return e.msg }
+
+var _ error = &ptrError{}
 
 func TestConvert(t *testing.T) {
 	type key struct {
@@ -234,6 +253,10 @@ func TestConvert(t *testing.T) {
 		{[]encoding.TextMarshaler{&textMarshaller{b: "bar"}},
 			"(#list){\n  0: (string){ \"bar\" }\n}"},
 		{stringType("\x80"), `(string){ "�" }`},
+		{jsonMarshaller{b: "bar"}, `(string){ "bar" }`},
+		{&jsonMarshaller{b: "bar"}, `(string){ "bar" }`},
+		{textMarshaller{b: "bar"}, `(string){ "bar" }`},
+		{ptrError{msg: "bad"}, "(_|_){\n  // [eval] bad\n}"},
 	}
 	r := runtime.New()
 	for _, tc := range testCases {

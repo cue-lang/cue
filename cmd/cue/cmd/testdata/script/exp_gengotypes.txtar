@@ -988,9 +988,7 @@ type EmbeddedStruct struct {
 // A conditional that narrows a field of a referenced type should not
 // prevent the use of that type reference in the generated Go code.
 type ConditionalNarrow struct {
-	Nested struct {
-		F []string `json:"f,omitempty"`
-	} `json:"nested"`
+	Nested LocalNested `json:"nested"`
 
 	Flag bool `json:"flag,omitempty"`
 }

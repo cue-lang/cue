@@ -714,9 +714,17 @@ func goPkgNameForInstance(inst *build.Instance, instVal cue.Value, importAliases
 // either to a type in the same Go package, or to a type in an imported package.
 func (g *generator) emitTypeReference(val cue.Value) (bool, typeFacts, error) {
 	// References to existing names, either from the same package or an imported package.
-	root, path := val.ReferencePath()
-	// TODO: surely there is a better way to check whether ReferencePath returned "no path",
-	// such as a possible path.IsValid method?
+	var root cue.Value
+	var path cue.Path
+	for _, candidate := range refCandidates(val) {
+		root, path = candidate.ReferencePath()
+		// TODO: surely there is a better way to check whether ReferencePath returned "no path",
+		// such as a possible path.IsValid method?
+		if len(path.Selectors()) > 0 {
+			val = candidate
+			break
+		}
+	}
 	if len(path.Selectors()) == 0 {
 		return false, typeFacts{}, nil
 	}
@@ -778,6 +786,25 @@ func (g *generator) emitTypeReference(val cue.Value) (bool, typeFacts, error) {
 	}
 	g.def.printf("%s", name)
 	return true, facts, nil
+}
+
+// refCandidates returns the values to try when looking for a type reference.
+// For a conjunction like `#Def & {extra constraints}`, the unified value has no
+// ReferencePath, so we return the operands that subsume the full value,
+// meaning the operand's type fully covers the conjunction's fields
+// and the extra constraints only narrow without adding new fields.
+func refCandidates(val cue.Value) []cue.Value {
+	op, args := val.Expr()
+	if op != cue.AndOp {
+		return []cue.Value{val}
+	}
+	var candidates []cue.Value
+	for _, arg := range args {
+		if cue.Dereference(arg).Subsume(val) == nil {
+			candidates = append(candidates, arg)
+		}
+	}
+	return candidates
 }
 
 // emitDocs generates the documentation comments attached to the following declaration.

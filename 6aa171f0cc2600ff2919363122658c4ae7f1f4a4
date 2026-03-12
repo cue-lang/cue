@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24683aa4_7f206704",
+        "filename": "pkg/strings/manual.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-12T09:19:28Z",
+      "side": 1,
+      "message": "this is still ... weird. \"can be used as a field constraint\"?",
+      "range": {
+        "startLine": 58,
+        "startChar": 38,
+        "endLine": 58,
+        "endChar": 69
+      },
+      "revId": "6aa171f0cc2600ff2919363122658c4ae7f1f4a4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb38df8c_7e7f70ad",
+        "filename": "pkg/strings/manual.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-12T09:19:28Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 68,
+        "startChar": 37,
+        "endLine": 68,
+        "endChar": 65
+      },
+      "revId": "6aa171f0cc2600ff2919363122658c4ae7f1f4a4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

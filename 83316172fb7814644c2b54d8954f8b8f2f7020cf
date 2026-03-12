@@ -16,6 +16,24 @@
       "message": "huh, the only thing here that puzzles me is that we have 2 trims - I\u0027m surprised we need to limit to the first line (the \\n stuff above) only - do you have an example (ideally add a comment?) which explains why that\u0027s necessary?\n\nit\u0027s probably slightly more code, but I wonder whether a simple loop is simpler in this case.\n```\nloop:\nfor i, c :\u003d range actual {\n  switch c {\n    case \u0027\\n\u0027,\u0027 \u0027,\u0027\\t\u0027:\n    default:\n      actual \u003d actual[:i]\n      break loop\n  }\n}\n```\nto me it\u0027s more obvious what\u0027s going on there, but ymmv.",
       "revId": "83316172fb7814644c2b54d8954f8b8f2f7020cf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfe3ca48_0a14bc8f",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-12T18:22:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd4efb5b_3f657c9e",
+      "revId": "83316172fb7814644c2b54d8954f8b8f2f7020cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -269,18 +269,18 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return n
 	}
 
-	if _, ok := implements(typ, typesInterface); ok {
-		v, _ := reflect.TypeAssert[types.Interface](val)
+	if needAddr, ok := implements(typ, typesInterface); ok {
+		v, _ := reflect.TypeAssert[types.Interface](addrIfNeeded(val, needAddr))
 		t := v.Core()
 		// TODO: panic if not the same runtime.
 		return t.V
 	}
-	if _, ok := implements(typ, astExpr); ok {
-		v, _ := reflect.TypeAssert[ast.Expr](val)
+	if needAddr, ok := implements(typ, astExpr); ok {
+		v, _ := reflect.TypeAssert[ast.Expr](addrIfNeeded(val, needAddr))
 		return compileExpr(ctx, v)
 	}
-	if _, ok := implements(typ, jsonMarshaler); ok {
-		v, _ := reflect.TypeAssert[json.Marshaler](val)
+	if needAddr, ok := implements(typ, jsonMarshaler); ok {
+		v, _ := reflect.TypeAssert[json.Marshaler](addrIfNeeded(val, needAddr))
 		b, err := v.MarshalJSON()
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "json.Marshaler"))
@@ -291,8 +291,8 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 		return compileExpr(ctx, expr)
 	}
-	if _, ok := implements(typ, textMarshaler); ok {
-		v, _ := reflect.TypeAssert[encoding.TextMarshaler](val)
+	if needAddr, ok := implements(typ, textMarshaler); ok {
+		v, _ := reflect.TypeAssert[encoding.TextMarshaler](addrIfNeeded(val, needAddr))
 		b, err := v.MarshalText()
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "encoding.TextMarshaler"))
@@ -300,8 +300,8 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		str := strings.ToValidUTF8(string(b), string(utf8.RuneError))
 		return &adt.String{Src: src, Str: str}
 	}
-	if _, ok := implements(typ, goError); ok {
-		v, _ := reflect.TypeAssert[error](val)
+	if needAddr, ok := implements(typ, goError); ok {
+		v, _ := reflect.TypeAssert[error](addrIfNeeded(val, needAddr))
 		errs, ok := v.(errors.Error)
 		if !ok {
 			errs = ctx.Newf("%s", v.Error())
@@ -571,6 +571,20 @@ func implements(t, ifaceType reflect.Type) (needAddr, ok bool) {
 	default:
 		return false, false
 	}
+}
+
+// addrIfNeeded returns a pointer to val when needAddr is true,
+// using val.Addr if possible, or allocating a copy otherwise.
+func addrIfNeeded(val reflect.Value, needAddr bool) reflect.Value {
+	if !needAddr {
+		return val
+	}
+	if val.CanAddr() {
+		return val.Addr()
+	}
+	p := reflect.New(val.Type())
+	p.Elem().Set(val)
+	return p
 }
 
 func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e ast.Expr, expr adt.Expr) {

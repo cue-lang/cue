@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5071a74_a5efbf6d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-12T16:01:07Z",
+      "side": 1,
+      "message": "Seems reasonable but I have a suggestion for simplifying things a bit.",
+      "revId": "e96c3a3846e2abd25929f9bffdc2add8b08b218e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c1dc208_9a2d02c8",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-12T16:01:07Z",
+      "side": 1,
+      "message": "This all seems a bit needlessly repetitive.\nWhy not define a slightly different primitive instead, something like this perhaps:\n\n```\n\n// typeAssert is similar to [reflect.TypeAssert] except that\n// it will also convert v to a pointer if its pointer type implements\n// the given interface T, allocating a value if necessary.\nfunc typeAssert[T any](v reflect.Value) (T, bool) {\n\tt :\u003d reflect.TypeFor[T]()\n\tvt :\u003d v.Type()\n\tswitch {\n\tcase vt.Kind() \u003d\u003d reflect.Interface:\n\t\treturn *new(T), false\n\tcase vt.Implements(t):\n\t\treturn reflect.TypeAssert[T](v)\n\tcase reflect.PointerTo(vt).Implements(t):\n\t\tif v.CanAddr() {\n\t\t\tv \u003d v.Addr()\n\t\t} else {\n\t\t\tp :\u003d reflect.New(vt)\n\t\t\tp.Elem().Set(v)\n\t\t\tv \u003d p\n\t\t}\n\t\treturn reflect.TypeAssert[T](v)\n\t}\n\treturn *new(T), false\n}\n```\n\nyou can use it like this:\n\n```\n\tif v, ok :\u003d typeAssert[ast.Expr](val); ok {\n\t\treturn compileExpr(ctx, v)\n\t}\n```\n\nthen you don\u0027t need addrIfNeeded and can lose a few of the global reflect.Type variables too.",
+      "revId": "e96c3a3846e2abd25929f9bffdc2add8b08b218e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

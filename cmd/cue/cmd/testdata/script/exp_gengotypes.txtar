@@ -613,6 +613,17 @@ _#hiddenStruct: {
 #localMap: [string]: int
 #localNested: f?: [...string]
 
+// A conditional that narrows a field of a referenced type should not
+// prevent the use of that type reference in the generated Go code.
+#conditionalNarrow: {
+	nested: #localNested
+	flag?:  bool
+
+	if flag != _|_ {
+		nested: f: [_, ...] // require at least one element in a sub-field
+	}
+}
+
 // Hidden definitions are only generated if referenced; this one is not.
 _#unusedHiddenStruct: neverGenerate?: int
 
@@ -972,6 +983,16 @@ type EmbeddedStruct struct {
 	Embedded1 int64 `json:"embedded1,omitempty"`
 
 	Embedded2 int64 `json:"embedded2,omitempty"`
+}
+
+// A conditional that narrows a field of a referenced type should not
+// prevent the use of that type reference in the generated Go code.
+type ConditionalNarrow struct {
+	Nested struct {
+		F []string `json:"f,omitempty"`
+	} `json:"nested"`
+
+	Flag bool `json:"flag,omitempty"`
 }
 
 type AttrChangedName int64

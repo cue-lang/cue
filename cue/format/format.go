@@ -49,7 +49,7 @@ func Simplify() Option {
 // UseSpaces specifies that tabs should be converted to spaces and sets the
 // default tab width.
 //
-// This option is set to 8 by default.
+// This option is set to 4 by default.
 func UseSpaces(tabwidth int) Option {
 	return func(c *config) {
 		c.useSpaces = true
@@ -125,7 +125,7 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 type config struct {
 	useSpaces bool // default: true
 	tabIndent bool // default: true
-	tabWidth  int  // default: 8
+	tabWidth  int  // default: 4
 	indent    int  // default: 0 (all code is indented at least by this much)
 
 	simplify    bool // default: false
@@ -134,7 +134,7 @@ type config struct {
 
 func newConfig(opt []Option) *config {
 	cfg := &config{
-		tabWidth:  8,
+		tabWidth:  4,
 		tabIndent: true,
 		useSpaces: true,
 	}

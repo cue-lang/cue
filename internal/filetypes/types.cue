@@ -357,7 +357,8 @@ tagInfo: {
 			// as a top-level filetype, and can only be used via "xml+koala".
 			// These effectively behave like a "one of", but we enforce this via the Go code
 			// so that we can provide the users with good error messages.
-			koala: *false | bool
+			koala:     *false | bool
+			xmlschema: *false | bool
 		}
 	}
 	proto: encoding:     "proto"

@@ -56,6 +56,7 @@ func init() {
 		"textproto":            TagTopLevel,
 		"toml":                 TagTopLevel,
 		"xml":                  TagTopLevel,
+		"xmlschema":            TagSubsidiaryBool,
 		"yaml":                 TagTopLevel,
 	}
 }
@@ -274,6 +275,7 @@ type subsidiaryBoolTags struct {
 	strict               opt.Opt[bool]
 	strictFeatures       opt.Opt[bool]
 	strictKeywords       opt.Opt[bool]
+	xmlschema            opt.Opt[bool]
 }
 
 func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
@@ -291,6 +293,9 @@ func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
 	}
 	if x, ok := m["strictKeywords"]; ok {
 		t.strictKeywords = opt.Some(x)
+	}
+	if x, ok := m["xmlschema"]; ok {
+		t.xmlschema = opt.Some(x)
 	}
 	return nil
 }
@@ -310,6 +315,9 @@ func (t subsidiaryBoolTags) marshalToMap() map[string]bool {
 	}
 	if t.strictKeywords.IsPresent() {
 		m["strictKeywords"] = t.strictKeywords.Value()
+	}
+	if t.xmlschema.IsPresent() {
+		m["xmlschema"] = t.xmlschema.Value()
 	}
 	return m
 }
@@ -377,6 +385,7 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 //		strict:               *false | bool
 //		strictKeywords:       *strict | bool
 //		strictFeatures:       *strict | bool
+//		xmlschema:            *false | bool
 //		openOnlyWhenExplicit: *false | bool
 //	}
 func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
@@ -401,6 +410,10 @@ func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 	if t.strictKeywords.IsPresent() {
 		r.strictKeywords = t.strictKeywords
 	}
+	r.xmlschema = opt.Some(false)
+	if t.xmlschema.IsPresent() {
+		r.xmlschema = t.xmlschema
+	}
 	return r, nil
 }
 
@@ -413,6 +426,7 @@ func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		koala:          *false | bool
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
+//		xmlschema:      *false | bool
 //		strictFeatures: *strict | bool
 //	}
 func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
@@ -436,6 +450,10 @@ func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 	if t.strictKeywords.IsPresent() {
 		r.strictKeywords = t.strictKeywords
 	}
+	r.xmlschema = opt.Some(false)
+	if t.xmlschema.IsPresent() {
+		r.xmlschema = t.xmlschema
+	}
 	return r, nil
 }
 
@@ -445,7 +463,8 @@ func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		{
 //			[string]: bool
 //		}
-//		koala: *false | bool
+//		koala:     *false | bool
+//		xmlschema: *false | bool
 //	}
 func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
@@ -464,6 +483,10 @@ func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 	}
 	if t.strictKeywords.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictKeywords")
+	}
+	r.xmlschema = opt.Some(false)
+	if t.xmlschema.IsPresent() {
+		r.xmlschema = t.xmlschema
 	}
 	return r, nil
 }
@@ -500,6 +523,9 @@ func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 	if t.strictKeywords.IsPresent() {
 		r.strictKeywords = t.strictKeywords
 	}
+	if t.xmlschema.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "xmlschema")
+	}
 	return r, nil
 }
 
@@ -532,6 +558,9 @@ func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 	r.strictKeywords = r.strict
 	if t.strictKeywords.IsPresent() {
 		r.strictKeywords = t.strictKeywords
+	}
+	if t.xmlschema.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "xmlschema")
 	}
 	return r, nil
 }

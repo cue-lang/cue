@@ -1,0 +1,41 @@
+# Test that the XML schema-guided encoding is supported in cmd/cue.
+
+# Decoding: schema-guided XML to CUE.
+exec cue eval -d '#Schema' schema.cue xml+xmlschema: input.xml
+cmp stdout out/decode
+
+# Encoding: CUE to XML guided by schema.
+exec cue export --out xml+xmlschema -d '#Schema' schema.cue data.cue
+cmp stdout out/encode
+
+-- schema.cue --
+#Schema: {
+	to?:      string @xml(tag=to)
+	from?:    string @xml(tag=from)
+	heading?: string @xml(tag=heading)
+	body?:    string @xml(tag=body)
+}
+-- input.xml --
+<note>
+    <to>Tove</to>
+    <from>Jani</from>
+    <heading>Reminder</heading>
+    <body>Don't forget me this weekend!</body>
+</note>
+-- data.cue --
+to:      "Tove"
+from:    "Jani"
+heading: "Reminder"
+body:    "Don't forget me this weekend!"
+-- out/decode --
+to:      "Tove"
+from:    "Jani"
+heading: "Reminder"
+body:    "Don't forget me this weekend!"
+-- out/encode --
+<root>
+    <to>Tove</to>
+    <from>Jani</from>
+    <heading>Reminder</heading>
+    <body>Don&#39;t forget me this weekend!</body>
+</root>

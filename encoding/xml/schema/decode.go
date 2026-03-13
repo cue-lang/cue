@@ -123,13 +123,10 @@ func (d *decoder) decodeElement(m *mapping, start xml.StartElement, xdec *xml.De
 		if !ok {
 			continue
 		}
-		val := d.decodeLeaf(fi, attr.Value)
-		if val != nil {
-			st.Elts = append(st.Elts, &ast.Field{
-				Label: ast.NewStringLabel(fi.cueName),
-				Value: val,
-			})
-		}
+		st.Elts = append(st.Elts, &ast.Field{
+			Label: ast.NewStringLabel(fi.cueName),
+			Value: d.decodeLeaf(fi, attr.Value),
+		})
 	}
 
 	// Process child elements and text content.
@@ -199,13 +196,10 @@ func (d *decoder) decodeElement(m *mapping, start xml.StartElement, xdec *xml.De
 			if m.body != nil {
 				text := strings.TrimSpace(chardata.String())
 				if text != "" {
-					val := d.decodeLeaf(m.body, text)
-					if val != nil {
-						st.Elts = append(st.Elts, &ast.Field{
-							Label: ast.NewStringLabel(m.body.cueName),
-							Value: val,
-						})
-					}
+					st.Elts = append(st.Elts, &ast.Field{
+						Label: ast.NewStringLabel(m.body.cueName),
+						Value: d.decodeLeaf(m.body, text),
+					})
 				}
 			}
 			return st

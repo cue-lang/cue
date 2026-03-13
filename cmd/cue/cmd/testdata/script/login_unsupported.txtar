@@ -19,10 +19,16 @@ cmp stderr stderr-method-not-allowed
 ! exists cueconfig/logins.json
 
 -- stderr-not-found --
-cannot start the OAuth2 device flow: oauth2: cannot fetch token: 404 Not Found
-Response: 404 page not found
+cannot start the OAuth2 device flow: 404 Not Found
+
+To log into a standard OCI registry, use 'docker login' or 'podman login' instead:
+
+	https://cuelang.org/docs/reference/modules/#authorization
 
 -- stderr-method-not-allowed --
-cannot start the OAuth2 device flow: oauth2: cannot fetch token: 405 Method Not Allowed
-Response: 405 method not allowed
+cannot start the OAuth2 device flow: 405 Method Not Allowed
+
+To log into a standard OCI registry, use 'docker login' or 'podman login' instead:
+
+	https://cuelang.org/docs/reference/modules/#authorization
 

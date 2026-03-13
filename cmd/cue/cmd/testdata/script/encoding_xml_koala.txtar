@@ -37,7 +37,7 @@ unsupported encoding "xml"
 -- encode-xml-koala.stderr --
 unsupported encoding "xml"
 -- decode-xml.stderr --
-xml requires a variant, such as: xml+koala
+xml requires a variant, such as: xml+koala or xml+xmlschema
 -- export.xml --
 <root>
     <message>Hello World!</message>

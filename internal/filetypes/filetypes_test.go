@@ -479,7 +479,8 @@ func TestParseArgs(t *testing.T) {
 				Encoding:       "xml",
 				Interpretation: "auto",
 				BoolTags: map[string]bool{
-					"koala": true,
+					"koala":     true,
+					"xmlschema": false,
 				},
 			},
 		},

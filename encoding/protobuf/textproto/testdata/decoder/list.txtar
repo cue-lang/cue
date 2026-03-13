@@ -39,7 +39,7 @@ empty2: [// foo
 int1: [1, 2]
 int2: [1, 2] // omitting commas okay
 int3: [1, // omitting comma okay
-		2]
+	2]
 string1: ["a", // omitting comma NOT supported
-		"b"]
+	"b"]
 float1: [1e+2, 1.0, 0]

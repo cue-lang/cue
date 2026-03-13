@@ -575,6 +575,9 @@ func (f *formatter) importSpec(x *ast.ImportSpec) {
 }
 
 func (f *formatter) label(l ast.Label, constraint token.Token) {
+	saved := f.inLabel
+	f.inLabel = true
+	defer func() { f.inLabel = saved }()
 	f.before(l)
 	defer f.after(l)
 	switch n := l.(type) {
@@ -738,7 +741,13 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		}
 		wasIndented := f.possibleSelectorExpr(x.Fun, token.HighestPrec, depth)
 		f.print(x.Lparen, token.LPAREN)
+		if !f.inLabel {
+			f.breakTableStack[len(f.breakTableStack)-1] = true
+		}
 		f.walkArgsList(x.Args, depth)
+		if !f.inLabel {
+			f.breakTableStack[len(f.breakTableStack)-1] = true
+		}
 		f.print(trailcomma, noblank, x.Rparen, token.RPAREN)
 		if wasIndented {
 			f.print(unindent)
@@ -771,7 +780,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 		ws = noblank
 		if f.lineout != l {
-			ws |= newline
+			ws |= formfeed
 			if f.lastTok != token.RBRACE && f.lastTok != token.RBRACK {
 				ws |= nooverride
 			}
@@ -793,10 +802,16 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		}
 
 		f.print(x.Lbrack, token.LBRACK, ws)
+		if !f.inLabel {
+			f.breakTableStack[len(f.breakTableStack)-1] = true
+		}
 		f.walkListElems(x.Elts)
 		f.print(trailcomma, noblank)
 		f.visitComments(f.current.pos)
 		f.matchUnindent()
+		if !f.inLabel {
+			f.breakTableStack[len(f.breakTableStack)-1] = true
+		}
 		f.print(noblank, x.Rbrack, token.RBRACK)
 
 	case *ast.Ellipsis:

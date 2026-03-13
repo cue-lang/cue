@@ -91,9 +91,9 @@ b: [
 // floating end
 
 c: [2342134, // line elem 0
-		2342135, // line elem 1
-		// inbetween elems
-		2342136, // line elem 2
+	2342135, // line elem 1
+	// inbetween elems
+	2342136, // line elem 2
 ]
 
 // after list c

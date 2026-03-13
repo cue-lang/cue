@@ -108,11 +108,9 @@ func FromGoType(r *cue.Context, x interface{}) cue.Value {
 	rt := (*runtime.Runtime)(r)
 	rt.Init()
 	ctx := eval.NewContext(rt, nil)
-	expr, err := convert.FromGoType(ctx, x)
+	v, err := convert.FromGoType(ctx, x)
 	if err != nil {
-		expr = &adt.Bottom{Err: err}
+		return r.Encode(&adt.Bottom{Err: err})
 	}
-	n := &adt.Vertex{}
-	n.AddConjunct(adt.MakeRootConjunct(nil, expr))
-	return r.Encode(n)
+	return r.Encode(v)
 }

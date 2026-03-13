@@ -20,6 +20,7 @@ import (
 	"encoding"
 	"encoding/json"
 	"math/big"
+	"sync"
 	"testing"
 	"time"
 
@@ -34,6 +35,30 @@ import (
 
 	_ "cuelang.org/go/pkg"
 )
+
+type recursiveA struct {
+	Next *recursiveA
+	Val  int
+}
+
+type crossRefA struct {
+	Y string
+	B *crossRefB
+}
+
+type crossRefB struct {
+	X int
+	A *crossRefA
+}
+
+type sharedS struct {
+	Other string
+}
+
+type sharedT struct {
+	S  *sharedS
+	S2 *sharedS
+}
 
 func mkBigInt(a int64) (v apd.Decimal) { v.SetInt64(a); return }
 
@@ -305,12 +330,12 @@ func TestConvertType(t *testing.T) {
 			F *big.Float
 		}{},
 		// TODO: indicate that B is explicitly an int only.
-		want: `{
-  A: (((int & >=-9223372036854775808) & <=9223372036854775807) & (>=0 & <100))
-  B: (int & >=0)
-  C?: int
-  D: int
-  F?: number
+		want: `(struct){
+  A: (int){ &(>=0, <100, int) }
+  B: (int){ &(>=0, int) }
+  C?: (int){ int }
+  D: (int){ int }
+  F?: (number){ number }
 }`,
 	}, {
 		goTyp: &struct {
@@ -323,20 +348,20 @@ func TestConvertType(t *testing.T) {
 			T time.Time
 			G func()
 		}{},
-		want: `(*null|{
-  A: (((int & >=-32768) & <=32767) & (>=0 & <100))
-  b: null
-  C: string
-  D: bool
-  F: number
-  L?: (*null|bytes)
-  T: _
-})`,
+		want: `((null|struct)){ |(*(null){ null }, (struct){
+    A: (int){ &(>=0, <100, int) }
+    b: (null){ null }
+    C: (string){ string }
+    D: (bool){ bool }
+    F: (number){ number }
+    L?: ((null|bytes)){ |(*(null){ null }, (bytes){ bytes }) }
+    T: (_){ _ }
+  }) }`,
 	}, {
 		goTyp: struct {
 			A int `cue:"<"` // invalid
 		}{},
-		want:        "_|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF')",
+		want:        "(_|_){// _|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF')\n}",
 		expectError: true,
 	}, {
 		goTyp: struct {
@@ -347,11 +372,11 @@ func TestConvertType(t *testing.T) {
 			T string `cue:""` // allowed
 			h int
 		}{},
-		want: `{
-  D?: number
-  P?: (*null|number)
-  I?: _
-  T: (string & _)
+		want: `(struct){
+  D?: (number){ number }
+  P?: ((null|number)){ |(*(null){ null }, (number){ number }) }
+  I?: (_){ _ }
+  T: (string){ string }
 }`,
 	}, {
 		goTyp: struct {
@@ -360,63 +385,56 @@ func TestConvertType(t *testing.T) {
 			C int8 `cue:"A+B"`
 		}{},
 		// TODO: should B be marked as optional?
-		want: `{
-  A: (((int & >=-128) & <=127) & (〈0;C〉 - 〈0;B〉))
-  B?: (((int & >=-128) & <=127) & (〈0;C〉 - 〈0;A〉))
-  C: (((int & >=-128) & <=127) & (〈0;A〉 + 〈0;B〉))
-}`,
+		want: "(struct){\n  A: (_|_){\n    // [incomplete] A: non-concrete value >=-128 & <=127 & int in operand to -:\n    //     <field:>:1:1\n    // A: cannot reference optional field: B:\n    //     <field:>:1:3\n  }\n  B?: (_|_){\n    // [incomplete] B: non-concrete value >=-128 & <=127 & int in operand to -:\n    //     <field:>:1:1\n  }\n  C: (_|_){\n    // [incomplete] C: non-concrete value >=-128 & <=127 & int in operand to +:\n    //     <field:>:1:1\n    // C: cannot reference optional field: B:\n    //     <field:>:1:3\n  }\n}",
 	}, {
 		goTyp: []string{},
-		want: `(*null|[
-  ...string,
-])`,
+		want: `((null|list)){ |(*(null){ null }, (list){
+  }) }`,
 	}, {
 		goTyp: [4]string{},
-		want: `〈import;list〉.Repeat([
-  string,
-], 4)`,
+		want: `(#list){
+  0: (string){ string }
+  1: (string){ string }
+  2: (string){ string }
+  3: (string){ string }
+}`,
 	}, {
 		goTyp:       []func(){},
-		want:        "_|_(unsupported Go type (func()))",
+		want:        "(_|_){// _|_(unsupported Go type (func()))\n}",
 		expectError: true,
 	}, {
 		goTyp: map[string]struct{ A map[string]uint }{},
-		want: `(*null|{
-  [string]: {
-    A?: (*null|{
-      [string]: ((int & >=0) & <=18446744073709551615)
-    })
-  }
-})`,
+		want: `((null|struct)){ |(*(null){ null }, (struct){
+  }) }`,
 	}, {
 		goTyp:       map[float32]int{},
-		want:        `_|_(unsupported Go type for map key (float32))`,
+		want:        "(_|_){// _|_(unsupported Go type for map key (float32))\n}",
 		expectError: true,
 	}, {
 		goTyp:       map[int]map[float32]int{},
-		want:        `_|_(unsupported Go type for map key (float32))`,
+		want:        "(_|_){// _|_(unsupported Go type for map key (float32))\n}",
 		expectError: true,
 	}, {
 		goTyp:       map[int]func(){},
-		want:        `_|_(unsupported Go type (func()))`,
+		want:        "(_|_){// _|_(unsupported Go type (func()))\n}",
 		expectError: true,
 	}, {
 		goTyp:       time.Now, // a function
-		want:        "_|_(unsupported Go type (func() time.Time))",
+		want:        "(_|_){// _|_(unsupported Go type (func() time.Time))\n}",
 		expectError: true,
 	}, {
 		goTyp: struct {
 			Foobar string `cue:"\"foo,bar\",opt"`
 		}{},
-		want: `{
-  Foobar?: (string & "foo,bar")
+		want: `(struct){
+  Foobar?: (string){ "foo,bar" }
 }`,
 	}, {
 		goTyp: struct {
 			Foobar string `cue:"\"foo,opt,bar\""`
 		}{},
-		want: `{
-  Foobar: (string & "foo,opt,bar")
+		want: `(struct){
+  Foobar: (string){ "foo,opt,bar" }
 }`,
 	}}
 
@@ -443,4 +461,127 @@ func TestConvertType(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestFromGoTypeRecursive(t *testing.T) {
+	r := runtime.New()
+
+	testCases := []struct {
+		name  string
+		goTyp any
+		want  string
+	}{{
+		name:  "self-recursive",
+		goTyp: recursiveA{},
+		want: `(struct){
+  _recursiveA_0: (struct){
+    Next?: (null){ null }
+    Val: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+  }
+  Next?: ((null|struct)){ |(*(null){ null }, (struct){
+      Next?: ((null|struct)){ |(*(null){ null }, (struct){
+          Next?: (null){ null }
+          Val: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+        }) }
+      Val: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+    }) }
+  Val: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+}`,
+	}, {
+		name:  "mutually-recursive",
+		goTyp: crossRefA{},
+		want: `(struct){
+  _crossRefA_0: (struct){
+    Y: (string){ string }
+    B?: ((null|struct)){ |(*(null){ null }, (struct){
+        X: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+        A?: (null){ null }
+      }) }
+  }
+  _crossRefB_0: (struct){
+    X: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+    A?: ((null|struct)){ |(*(null){ null }, (struct){
+        Y: (string){ string }
+        B?: (null){ null }
+      }) }
+  }
+  Y: (string){ string }
+  B?: ((null|struct)){ |(*(null){ null }, (struct){
+      X: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+      A?: ((null|struct)){ |(*(null){ null }, (struct){
+          Y: (string){ string }
+          B?: ((null|struct)){ |(*(null){ null }, (struct){
+              X: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+              A?: ((null|struct)){ |(*(null){ null }, (struct){
+                  Y: (string){ string }
+                  B?: (null){ null }
+                }) }
+            }) }
+        }) }
+    }) }
+}`,
+	}, {
+		name:  "shared-type",
+		goTyp: sharedT{},
+		want: `(struct){
+  _sharedT_0: (struct){
+    S?: ((null|struct)){ |(*(null){ null }, (struct){
+        Other: (string){ string }
+      }) }
+    S2?: ((null|struct)){ |(*(null){ null }, (struct){
+        Other: (string){ string }
+      }) }
+  }
+  _sharedS_0: (struct){
+    Other: (string){ string }
+  }
+  S?: ((null|struct)){ |(*(null){ null }, (struct){
+      Other: (string){ string }
+    }) }
+  S2?: ((null|struct)){ |(*(null){ null }, (struct){
+      Other: (string){ string }
+    }) }
+}`,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := adt.NewContext(r, &adt.Vertex{})
+			v, err := convert.FromGoType(ctx, tc.goTyp)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := debug.NodeString(ctx, v, nil)
+			if got != tc.want {
+				t.Errorf("\n got %q;\nwant %q", got, tc.want)
+			}
+			val, _ := ctx.Evaluate(&adt.Environment{}, v)
+			if bot, ok := val.(*adt.Bottom); ok {
+				t.Errorf("unexpected error when evaluating: %v", bot)
+			}
+		})
+	}
+}
+
+func TestFromGoTypeConcurrent(t *testing.T) {
+	// Note: there is a pre-existing race in compile.Expr which mutates
+	// cached AST nodes. This test verifies that astFromGoType itself
+	// (the AST construction) does not race, by checking that concurrent
+	// calls complete without panicking or producing errors.
+	// The -race flag may still detect the compile.Expr race which is
+	// outside the scope of this fix.
+	var wg sync.WaitGroup
+	for range 10 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r := runtime.New()
+			ctx := adt.NewContext(r, &adt.Vertex{})
+			_, err := convert.FromGoType(ctx, recursiveA{})
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+		}()
+	}
+	wg.Wait()
 }

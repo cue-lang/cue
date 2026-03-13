@@ -65,24 +65,34 @@ func FromGoValue(ctx *adt.OpContext, x any, nilIsTop bool) adt.Value {
 	return v
 }
 
-// FromGoType converts a Go type to an internal CUE expression.
-func FromGoType(ctx *adt.OpContext, x any) (adt.Expr, errors.Error) {
+// FromGoType converts a Go type to a finalized CUE Vertex.
+func FromGoType(ctx *adt.OpContext, x any) (*adt.Vertex, errors.Error) {
 	// TODO: if this value will always be unified with a concrete type in Go,
 	// then many of the fields may be omitted.
 	// TODO: this can be much more efficient.
 	typ := reflect.TypeOf(x)
-	if t, ok := ctx.LoadType(typ); ok {
-		return t, nil
+	if v, ok := ctx.LoadType(typ); ok {
+		return v, nil
 	}
-	_, expr := fromGoType(ctx, true, typ)
+	expr := fromGoType(ctx, typ)
 	if expr == nil {
 		expr = ctx.AddErrf("unsupported Go type (%v)", typ)
 	}
 	if err := ctx.Err(); err != nil {
 		// TODO: return an error as the expr itself, like [FromGoValue]?
-		return expr, err.Err
+		return exprToVertex(ctx, expr), err.Err
 	}
-	return expr, nil
+	v := exprToVertex(ctx, expr)
+	v.Finalize(ctx)
+	ctx.StoreType(typ, v)
+	return v, nil
+}
+
+// exprToVertex returns a new Vertex with x as its sole conjunct.
+func exprToVertex(ctx *adt.OpContext, x adt.Expr) *adt.Vertex {
+	v := &adt.Vertex{}
+	v.AddConjunct(adt.MakeRootConjunct(nil, x))
+	return v
 }
 
 func compileExpr(ctx *adt.OpContext, expr ast.Expr) adt.Value {
@@ -580,28 +590,92 @@ func typeAssert[T any](v reflect.Value, t reflect.Type) (T, bool) {
 	return *new(T), false
 }
 
-// fromGoTypeAST converts a Go reflect.Type to an ast.Expr, caching results
-// in the global astTypeCache. It does not require an adt.OpContext.
-// Errors are accumulated into errs.
+// typeBuilder tracks named Go types encountered during AST construction
+// and generates unique CUE identifiers for them. This avoids creating
+// cyclic ASTs for recursive Go types and eliminates shared AST pointers
+// when the same type is referenced multiple times.
+type typeBuilder struct {
+	named     []*namedType                // ordered list of named type entries
+	byType    map[reflect.Type]*namedType // lookup by Go type
+	nameCount map[string]int              // disambiguate same-named types from different packages
+	errs      *[]errors.Error
+}
+
+type namedType struct {
+	ident string   // unique CUE identifier, e.g. "_A_0"
+	expr  ast.Expr // the full struct literal for this type
+}
+
+// astFromGoType converts a Go reflect.Type to an ast.Expr, caching results
+// in the global astTypeCache. Errors are accumulated into errs.
 func astFromGoType(t reflect.Type, allowNullDefault bool, errs *[]errors.Error) ast.Expr {
 	if v, ok := astTypeCache.Load(t); ok {
 		return v.(ast.Expr)
 	}
 
-	var e ast.Expr
+	b := &typeBuilder{
+		byType:    make(map[reflect.Type]*namedType),
+		nameCount: make(map[string]int),
+		errs:      errs,
+	}
+	e := b.build(t, allowNullDefault)
+	if e == nil {
+		return nil
+	}
+	e = b.finalize(e, errs)
+	// Avoid returning different AST nodes for the same type.
+	// TODO use singleflight to avoid duplicating the work?
+	e1, _ := astTypeCache.LoadOrStore(t, e)
+	return e1.(ast.Expr)
+}
 
+// finalize wraps the top-level expression with named type definitions
+// if needed, resolves identifiers, and returns the final AST.
+func (b *typeBuilder) finalize(topExpr ast.Expr, errs *[]errors.Error) ast.Expr {
+	if len(b.named) == 0 {
+		f := &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: topExpr}}}
+		astutil.Resolve(f, func(_ token.Pos, msg string, args ...interface{}) {
+			*errs = append(*errs, errors.Newf(token.NoPos, msg, args...))
+		})
+		return topExpr
+	}
+
+	// Build a struct with hidden fields for named type definitions
+	// and the top-level expression's content.
+	s := &ast.StructLit{}
+	for _, entry := range b.named {
+		s.Elts = append(s.Elts, &ast.Field{
+			Label: ast.NewIdent(entry.ident),
+			Value: entry.expr,
+		})
+	}
+	// If the top expression is itself a struct literal, merge its
+	// elements directly to avoid an unnecessary level of nesting.
+	if topStruct, ok := topExpr.(*ast.StructLit); ok {
+		s.Elts = append(s.Elts, topStruct.Elts...)
+	} else {
+		s.Elts = append(s.Elts, &ast.EmbedDecl{Expr: topExpr})
+	}
+
+	// Resolve using the struct as the top-level expression so that
+	// identifiers within it can reference the struct's own fields.
+	f := &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: s}}}
+	astutil.Resolve(f, func(_ token.Pos, msg string, args ...interface{}) {
+		*errs = append(*errs, errors.Newf(token.NoPos, msg, args...))
+	})
+	return s
+}
+
+// build recursively converts a Go type to a CUE AST expression.
+func (b *typeBuilder) build(t reflect.Type, allowNullDefault bool) ast.Expr {
+	// Check special types first — these short-circuit regardless of being named.
 	switch reflect.Zero(t).Interface().(type) {
 	case *big.Int, big.Int:
-		e = ast.NewIdent("int")
-		goto store
-
+		return ast.NewIdent("int")
 	case *big.Float, big.Float, *big.Rat, big.Rat:
-		e = ast.NewIdent("number")
-		goto store
-
+		return ast.NewIdent("number")
 	case *apd.Decimal, apd.Decimal:
-		e = ast.NewIdent("number")
-		goto store
+		return ast.NewIdent("number")
 	}
 
 	// Even if this is for types that we know cast to a certain type, it can't
@@ -609,8 +683,7 @@ func astFromGoType(t reflect.Type, allowNullDefault bool, errs *[]errors.Error) 
 	// strict instances and there cannot be any tags that further constrain
 	// the values.
 	if t.Implements(jsonMarshaler) || t.Implements(textMarshaler) {
-		e = topSentinel
-		goto store
+		return topSentinel
 	}
 
 	switch k := t.Kind(); k {
@@ -619,100 +692,50 @@ func astFromGoType(t reflect.Type, allowNullDefault bool, errs *[]errors.Error) 
 		for elem.Kind() == reflect.Pointer {
 			elem = elem.Elem()
 		}
-		e = astFromGoType(elem, false, errs)
+		e := b.build(elem, false)
 		if allowNullDefault {
 			e = wrapOrNull(e)
 		}
+		return e
 
 	case reflect.Interface:
 		switch t.Name() {
 		case "error":
-			// This is really null | _|_. There is no error if the error is null.
-			e = ast.NewNull()
+			return ast.NewNull()
 		default:
-			e = topSentinel // `_`
+			return topSentinel
 		}
 
 	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		e = compile.LookupRange(t.Kind().String()).Source().(ast.Expr)
+		return compile.LookupRange(t.Kind().String()).Source().(ast.Expr)
 
 	case reflect.Uint, reflect.Uintptr:
-		e = compile.LookupRange("uint64").Source().(ast.Expr)
+		return compile.LookupRange("uint64").Source().(ast.Expr)
 
 	case reflect.Int:
-		e = compile.LookupRange("int64").Source().(ast.Expr)
+		return compile.LookupRange("int64").Source().(ast.Expr)
 
 	case reflect.String:
-		e = ast.NewIdent("__string")
+		return ast.NewIdent("__string")
 
 	case reflect.Bool:
-		e = ast.NewIdent("__bool")
+		return ast.NewIdent("__bool")
 
 	case reflect.Float32, reflect.Float64:
-		e = ast.NewIdent("__number")
+		return ast.NewIdent("__number")
 
 	case reflect.Struct:
-		obj := &ast.StructLit{}
-
-		// TODO: dirty trick: set this to a value that's updated
-		// below.  This avoids an infinite loop on circular references
-		// when creating the AST, but does not actually work
-		// as intended because AST trees should never be actually
-		// cyclic. Also, this is racy when called concurrently.
-		// Instead, we should generate named identifiers for
-		// named Go types and emit references to them.
-		astTypeCache.Store(t, obj)
-
-		for i := range t.NumField() {
-			f := t.Field(i)
-			if f.PkgPath != "" {
-				continue
-			}
-			_, ok := f.Tag.Lookup("cue")
-			elem := astFromGoType(f.Type, !ok, errs)
-			if isBad(elem) {
-				continue // Ignore fields for unsupported types
-			}
-
-			// leave errors like we do during normal evaluation or do we
-			// want to return the error?
-			name := getName(&f)
-			if name == "-" {
-				continue
-			}
-
-			if tag, ok := f.Tag.Lookup("cue"); ok {
-				v, err := parseTag(name, tag)
-				if err != nil {
-					*errs = append(*errs, err)
-				}
-				if isBad(v) {
-					return v
-				}
-				elem = ast.NewBinExpr(token.AND, elem, v)
-			}
-			// TODO: if an identifier starts with __ (or otherwise is not a
-			// valid CUE name), make it a string and create a map to a new
-			// name for references.
-
-			// The Go JSON decoder always allows a value to be undefined.
-			d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
-			if isOptional(&f) {
-				d.Constraint = token.OPTION
-			}
-			obj.Elts = append(obj.Elts, d)
-		}
-
-		e = obj
+		return b.buildStruct(t)
 
 	case reflect.Array, reflect.Slice:
+		var e ast.Expr
 		if t.Elem().Kind() == reflect.Uint8 {
 			e = ast.NewIdent("__bytes")
 		} else {
-			elem := astFromGoType(t.Elem(), allowNullDefault, errs)
+			elem := b.build(t.Elem(), allowNullDefault)
 			if elem == nil {
-				*errs = append(*errs, errors.Newf(token.NoPos, "unsupported Go type (%v)", t.Elem()))
+				*b.errs = append(*b.errs, errors.Newf(token.NoPos, "unsupported Go type (%v)", t.Elem()))
 				return &ast.BadExpr{}
 			}
 
@@ -731,6 +754,7 @@ func astFromGoType(t reflect.Type, allowNullDefault bool, errs *[]errors.Error) 
 		if k == reflect.Slice {
 			e = wrapOrNull(e)
 		}
+		return e
 
 	case reflect.Map:
 		switch key := t.Key(); key.Kind() {
@@ -738,65 +762,118 @@ func astFromGoType(t reflect.Type, allowNullDefault bool, errs *[]errors.Error) 
 			reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8,
 			reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		default:
-			*errs = append(*errs, errors.Newf(token.NoPos, "unsupported Go type for map key (%v)", key))
+			*b.errs = append(*b.errs, errors.Newf(token.NoPos, "unsupported Go type for map key (%v)", key))
 			return &ast.BadExpr{}
 		}
 
-		v := astFromGoType(t.Elem(), allowNullDefault, errs)
+		v := b.build(t.Elem(), allowNullDefault)
 		if v == nil {
-			*errs = append(*errs, errors.Newf(token.NoPos, "unsupported Go type (%v)", t.Elem()))
+			*b.errs = append(*b.errs, errors.Newf(token.NoPos, "unsupported Go type (%v)", t.Elem()))
 			return &ast.BadExpr{}
 		}
 		if isBad(v) {
 			return v
 		}
 
-		e = ast.NewStruct(&ast.Field{
+		e := ast.NewStruct(&ast.Field{
 			Label: ast.NewList(ast.NewIdent("__string")),
 			Value: v,
 		})
 
-		e = wrapOrNull(e)
+		return wrapOrNull(e)
 	}
-
-store:
-	if e != nil {
-		f := &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: e}}}
-		astutil.Resolve(f, func(_ token.Pos, msg string, args ...interface{}) {
-			*errs = append(*errs, errors.Newf(token.NoPos, msg, args...))
-		})
-		astTypeCache.Store(t, e)
-	}
-	return e
+	return nil
 }
 
-func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (ast.Expr, adt.Expr) {
-	if expr, ok := ctx.LoadType(t); ok {
-		e, _ := astTypeCache.Load(t)
-		src, _ := e.(ast.Expr)
-		return src, expr
+// allocIdent generates a unique CUE identifier for the given Go type name.
+func (b *typeBuilder) allocIdent(name string) string {
+	idx := b.nameCount[name]
+	b.nameCount[name]++
+	return fmt.Sprintf("_%s_%d", name, idx)
+}
+
+// buildStruct converts a Go struct type to a CUE AST expression.
+// For named types, it allocates a unique identifier and returns
+// a reference to it. For anonymous structs, it returns the struct
+// literal directly.
+func (b *typeBuilder) buildStruct(t reflect.Type) ast.Expr {
+	if t.Name() != "" {
+		if entry, ok := b.byType[t]; ok {
+			return ast.NewIdent(entry.ident)
+		}
+		entry := &namedType{
+			ident: b.allocIdent(t.Name()),
+		}
+		b.named = append(b.named, entry)
+		b.byType[t] = entry
+		entry.expr = b.buildStructLit(t)
+		return ast.NewIdent(entry.ident)
 	}
+	return b.buildStructLit(t)
+}
+
+// buildStructLit builds the struct literal for a Go struct type.
+func (b *typeBuilder) buildStructLit(t reflect.Type) ast.Expr {
+	obj := &ast.StructLit{}
+	for i := range t.NumField() {
+		f := t.Field(i)
+		if f.PkgPath != "" {
+			continue
+		}
+		_, ok := f.Tag.Lookup("cue")
+		elem := b.build(f.Type, !ok)
+		if isBad(elem) {
+			continue // Ignore fields for unsupported types
+		}
+
+		name := getName(&f)
+		if name == "-" {
+			continue
+		}
+
+		if tag, ok := f.Tag.Lookup("cue"); ok {
+			v, err := parseTag(name, tag)
+			if err != nil {
+				*b.errs = append(*b.errs, err)
+			}
+			if isBad(v) {
+				return v
+			}
+			elem = ast.NewBinExpr(token.AND, elem, v)
+		}
+		// TODO: if an identifier starts with __ (or otherwise is not a
+		// valid CUE name), make it a string and create a map to a new
+		// name for references.
+
+		// The Go JSON decoder always allows a value to be undefined.
+		d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
+		if isOptional(&f) {
+			d.Constraint = token.OPTION
+		}
+		obj.Elts = append(obj.Elts, d)
+	}
+	return obj
+}
+
+func fromGoType(ctx *adt.OpContext, t reflect.Type) adt.Expr {
 	var errs []errors.Error
-	e := astFromGoType(t, allowNullDefault, &errs)
+	e := astFromGoType(t, true, &errs)
 	for _, err := range errs {
 		ctx.AddErr(err)
 	}
 	if isBad(e) || e == nil {
 		if len(errs) > 0 {
-			return e, &adt.Bottom{Err: errs[0]}
+			return &adt.Bottom{Err: errs[0]}
 		}
-		return e, nil
+		return nil
 	}
 	x, err := compile.Expr(nil, ctx, pkgID(), e)
 	if err != nil {
 		b := &adt.Bottom{Err: err}
 		ctx.AddBottom(b)
-		ctx.StoreType(t, b)
-		return e, b
+		return b
 	}
-	expr := x.Expr()
-	ctx.StoreType(t, expr)
-	return e, expr
+	return x.Expr()
 }
 
 func isBottom(x adt.Node) bool {

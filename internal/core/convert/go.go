@@ -274,15 +274,15 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return n
 	}
 
-	if v, ok := typeAssert[types.Interface](val, typesInterface); ok {
+	if v, ok := typeAssert[types.Interface](val); ok {
 		t := v.Core()
 		// TODO: panic if not the same runtime.
 		return t.V
 	}
-	if v, ok := typeAssert[ast.Expr](val, astExpr); ok {
+	if v, ok := typeAssert[ast.Expr](val); ok {
 		return compileExpr(ctx, v)
 	}
-	if v, ok := typeAssert[json.Marshaler](val, jsonMarshaler); ok {
+	if v, ok := typeAssert[json.Marshaler](val); ok {
 		b, err := v.MarshalJSON()
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "json.Marshaler"))
@@ -293,7 +293,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 		return compileExpr(ctx, expr)
 	}
-	if v, ok := typeAssert[encoding.TextMarshaler](val, textMarshaler); ok {
+	if v, ok := typeAssert[encoding.TextMarshaler](val); ok {
 		b, err := v.MarshalText()
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "encoding.TextMarshaler"))
@@ -301,7 +301,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		str := strings.ToValidUTF8(string(b), string(utf8.RuneError))
 		return &adt.String{Src: src, Str: str}
 	}
-	if v, ok := typeAssert[error](val, goError); ok {
+	if v, ok := typeAssert[error](val); ok {
 		errs, ok := v.(errors.Error)
 		if !ok {
 			errs = ctx.Newf("%s", v.Error())
@@ -544,23 +544,21 @@ func ensureArcVertex(ctx *adt.OpContext, env *adt.Environment, x adt.Value, l ad
 }
 
 var (
-	goError        = reflect.TypeFor[error]()
-	typesInterface = reflect.TypeFor[types.Interface]()
-	jsonMarshaler  = reflect.TypeFor[json.Marshaler]()
-	textMarshaler  = reflect.TypeFor[encoding.TextMarshaler]()
-	astExpr        = reflect.TypeFor[ast.Expr]()
-	astFile        = reflect.TypeFor[*ast.File]()
-	bigInt         = reflect.TypeFor[*big.Int]()
-	bigRat         = reflect.TypeFor[*big.Rat]()
-	bigFloat       = reflect.TypeFor[*big.Float]()
-	apdDecimal     = reflect.TypeFor[*apd.Decimal]()
-	topSentinel    = ast.NewIdent("_")
+	jsonMarshaler = reflect.TypeFor[json.Marshaler]()
+	textMarshaler = reflect.TypeFor[encoding.TextMarshaler]()
+	astFile       = reflect.TypeFor[*ast.File]()
+	bigInt        = reflect.TypeFor[*big.Int]()
+	bigRat        = reflect.TypeFor[*big.Rat]()
+	bigFloat      = reflect.TypeFor[*big.Float]()
+	apdDecimal    = reflect.TypeFor[*apd.Decimal]()
+	topSentinel   = ast.NewIdent("_")
 )
 
 // typeAssert is similar to [reflect.TypeAssert] except that
 // it will also convert v to a pointer if its pointer type implements
 // the given interface T, allocating a value if necessary.
-func typeAssert[T any](v reflect.Value, t reflect.Type) (T, bool) {
+func typeAssert[T any](v reflect.Value) (T, bool) {
+	t := reflect.TypeFor[T]()
 	vt := v.Type()
 	switch {
 	case vt.Kind() == reflect.Interface:

@@ -372,3 +372,46 @@ foo: string
 // Just a few comments
 // on a field.
 foo: string
+-- issue1006.input --
+// issue #1006: comments should not be aligned across the opening
+// or closing token of a multi-line struct, list, or func call.
+
+very_long_to_push_out_the_comment: { // comment
+	a: string // comment
+
+	b: string // comment
+} | "very_long_to_push_out_the_comment" // comment
+
+very_long_to_push_out_the_comment: [ // comment
+	a, // comment
+
+	b, // comment
+] | "very_long_to_push_out_the_comment" // comment
+
+very_long_to_push_out_the_comment: f( // comment
+	a, // comment
+
+	b, // comment
+) | "very_long_to_push_out_the_comment" // comment
+
+-- out/format/issue1006.golden --
+// issue #1006: comments should not be aligned across the opening
+// or closing token of a multi-line struct, list, or func call.
+
+very_long_to_push_out_the_comment: {// comment
+	a: string // comment
+
+					b: string // comment
+} | "very_long_to_push_out_the_comment" // comment
+
+very_long_to_push_out_the_comment: [// comment
+	a, // comment
+
+					b, // comment
+] | "very_long_to_push_out_the_comment" // comment
+
+very_long_to_push_out_the_comment: f( // comment
+					a, // comment
+
+	b,                                      // comment
+	) | "very_long_to_push_out_the_comment" // comment

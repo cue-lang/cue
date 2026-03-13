@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
+	xmlschema "cuelang.org/go/encoding/xml/schema"
 	"cuelang.org/go/encoding/toml"
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
@@ -244,6 +245,23 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 			}
 			_, err = w.Write(b)
 			return err
+		}
+
+	case build.XML:
+		switch {
+		case f.BoolTags["xmlschema"]:
+			e.concrete = true
+			e.encValue = func(v cue.Value) error {
+				v = v.Unify(cfg.Schema)
+				b, err := xmlschema.NewEncoder().Encode(v, "root")
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(b)
+				return err
+			}
+		default:
+			return nil, fmt.Errorf("unsupported encoding %q", f.Encoding)
 		}
 
 	default:

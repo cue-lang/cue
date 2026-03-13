@@ -290,7 +290,7 @@ list4: [
 ]
 
 funcArg1: foo(
-		// Comment1
+	// Comment1
 
 	// Comment2
 	3,
@@ -299,7 +299,7 @@ funcArg1: foo(
 	)
 
 funcArg2: foo(
-		// Comment1
+	// Comment1
 
 	// Comment2
 
@@ -308,7 +308,7 @@ funcArg2: foo(
 	)
 
 funcArg3: foo(
-		2,
+	2,
 
 	// Comment1
 
@@ -401,17 +401,17 @@ very_long_to_push_out_the_comment: f( // comment
 very_long_to_push_out_the_comment: {// comment
 	a: string // comment
 
-					b: string // comment
+	b: string // comment
 } | "very_long_to_push_out_the_comment" // comment
 
 very_long_to_push_out_the_comment: [// comment
 	a, // comment
 
-					b, // comment
+	b, // comment
 ] | "very_long_to_push_out_the_comment" // comment
 
 very_long_to_push_out_the_comment: f( // comment
-					a, // comment
+	a, // comment
 
-	b,                                      // comment
+	b, // comment
 	) | "very_long_to_push_out_the_comment" // comment

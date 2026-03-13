@@ -52,6 +52,16 @@ type printer struct {
 	// we don't break the syntax by omitting the newline after a comment.
 	printingComment bool
 
+	// breakTableStack has one entry per open bracket, tracking whether to
+	// convert the next '\n' to '\f' to break tabwriter column alignment.
+	// Entries start as false and are set to true for list/call brackets
+	// (not field label brackets like [string]: or (expr):).
+	breakTableStack []bool
+
+	// inLabel is set while formatting field labels, so that
+	// brackets in labels don't trigger tabwriter table breaks.
+	inLabel bool
+
 	errs errors.Error
 }
 
@@ -116,7 +126,11 @@ func (p *printer) Print(v interface{}) {
 			p.allowed = newline
 			p.allowed &^= newsection
 		case token.LPAREN, token.LBRACK, token.LBRACE:
+			p.breakTableStack = append(p.breakTableStack, false)
 		case token.RPAREN, token.RBRACK, token.RBRACE:
+			if n := len(p.breakTableStack); n > 0 {
+				p.breakTableStack = p.breakTableStack[:n-1]
+			}
 			impliedComma = true
 		}
 		p.lastTok = x
@@ -280,16 +294,22 @@ func (p *printer) writeWhitespace(ws whiteSpace) {
 	case ws&newsection != 0:
 		p.maybeIndentLine(ws)
 		p.writeByte('\f', 2)
+		p.breakTable()
 		p.incrementLine(2)
 		p.spaceBefore = true
 	case ws&formfeed != 0:
 		p.maybeIndentLine(ws)
 		p.writeByte('\f', 1)
+		p.breakTable()
 		p.incrementLine(1)
 		p.spaceBefore = true
 	case ws&newline != 0:
 		p.maybeIndentLine(ws)
-		p.writeByte('\n', 1)
+		if p.breakTable() {
+			p.writeByte('\f', 1)
+		} else {
+			p.writeByte('\n', 1)
+		}
 		p.incrementLine(1)
 		p.spaceBefore = true
 	case ws&declcomma != 0:
@@ -304,6 +324,16 @@ func (p *printer) writeWhitespace(ws whiteSpace) {
 		p.writeByte(' ', 1)
 		p.spaceBefore = true
 	}
+}
+
+// breakTable reports whether the next newline should be a formfeed to break
+// tabwriter alignment, and if so, clears the flag for the current bracket.
+func (p *printer) breakTable() bool {
+	if n := len(p.breakTableStack); n > 0 && p.breakTableStack[n-1] {
+		p.breakTableStack[n-1] = false
+		return true
+	}
+	return false
 }
 
 func (p *printer) incrementLine(n int) {

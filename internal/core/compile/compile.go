@@ -857,10 +857,6 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		return c.comprehension(x, false)
 
 	case *ast.EmbedDecl: // Deprecated
-		for _, c := range ast.Comments(x.Expr) {
-			ast.AddComment(x, c)
-		}
-		ast.SetComments(x.Expr, ast.Comments(x))
 		return c.expr(x.Expr)
 
 	case ast.Expr:

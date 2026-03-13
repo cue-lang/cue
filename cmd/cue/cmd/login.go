@@ -58,6 +58,11 @@ removing the need for a human to interact with the OAuth device flow.
 
 Once the authorization is successful, a token is stored in a logins.json file
 inside $CUE_CONFIG_DIR; see 'cue help environment'.
+
+To log into other OCI registries, use 'docker login' or 'podman login'.
+The cue tool supports credentials configured via these tools:
+
+	https://cuelang.org/docs/reference/modules/#authorization
 `[1:],
 		Args: cobra.MaximumNArgs(1),
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {

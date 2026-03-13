@@ -1,0 +1,20 @@
+-- schema.cue --
+notes?: [...{
+	id?:   string @xml(attr=id)
+	text?: string @xml(body)
+}] @xml(tag=note)
+-- value.cue --
+notes: [{
+	id:   "one"
+	text: "Hello"
+}, {
+	id:   "two"
+	text: "Goodbye"
+}]
+-- root.txt --
+notes
+-- out/encode --
+<notes>
+    <note id="one">Hello</note>
+    <note id="two">Goodbye</note>
+</notes>

@@ -1,0 +1,8 @@
+-- schema.cue --
+id?:   string @xml(attr=id)
+text?: string @xml(body)
+-- input.xml --
+<note id="one">Hello</note>
+-- out/decode --
+id:   "one"
+text: "Hello"

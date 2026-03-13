@@ -1,0 +1,10 @@
+-- schema.cue --
+id?:   string @xml(attr=id)
+text?: string @xml(body)
+-- value.cue --
+id:   "one"
+text: "Hello"
+-- root.txt --
+note
+-- out/encode --
+<note id="one">Hello</note>

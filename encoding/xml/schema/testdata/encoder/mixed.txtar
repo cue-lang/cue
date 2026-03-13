@@ -1,0 +1,31 @@
+-- schema.cue --
+version?: string @xml(attr=version)
+items?: [...{
+	id?:    int    @xml(attr=id)
+	name?:  string @xml(tag=name)
+	price?: string @xml(tag=price)
+}] @xml(tag=item)
+-- value.cue --
+version: "1.0"
+items: [{
+	id:    1
+	name:  "Widget"
+	price: "9.99"
+}, {
+	id:    2
+	name:  "Gadget"
+	price: "19.99"
+}]
+-- root.txt --
+catalog
+-- out/encode --
+<catalog version="1.0">
+    <item id="1">
+        <name>Widget</name>
+        <price>9.99</price>
+    </item>
+    <item id="2">
+        <name>Gadget</name>
+        <price>19.99</price>
+    </item>
+</catalog>

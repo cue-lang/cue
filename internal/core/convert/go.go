@@ -24,6 +24,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v3"
@@ -43,6 +44,11 @@ import (
 //
 // The code in this file is a prototype implementation and is far from
 // optimized.
+
+// astTypeCache is a global cache of Go type to AST expression mappings.
+// This is safe for concurrent use because it uses sync.Map and the
+// AST expressions are effectively immutable once stored.
+var astTypeCache sync.Map // map[reflect.Type]ast.Expr
 
 // TODO(mvdan): get rid of the uses of %T below; have the recursive methods return *Bottom
 // TODO(mvdan): swap order of parameters in the recursive methods to match the top-level API order
@@ -64,9 +70,8 @@ func FromGoType(ctx *adt.OpContext, x any) (adt.Expr, errors.Error) {
 	// TODO: if this value will always be unified with a concrete type in Go,
 	// then many of the fields may be omitted.
 	// TODO: this can be much more efficient.
-	// TODO: synchronize
 	typ := reflect.TypeOf(x)
-	if _, t, ok := ctx.LoadType(typ); ok {
+	if t, ok := ctx.LoadType(typ); ok {
 		return t, nil
 	}
 	_, expr := fromGoType(ctx, true, typ)
@@ -89,18 +94,18 @@ func compileExpr(ctx *adt.OpContext, expr ast.Expr) adt.Value {
 }
 
 // parseTag parses a CUE expression from a cue tag.
-func parseTag(ctx *adt.OpContext, field, tag string) ast.Expr {
+func parseTag(field, tag string) (ast.Expr, errors.Error) {
 	tag, _ = splitTag(tag)
 	if tag == "" {
-		return topSentinel
+		return topSentinel, nil
 	}
 	expr, err := parser.ParseExpr("<field:>", tag)
 	if err != nil {
-		err := errors.Promote(err, "parser")
-		ctx.AddErr(errors.Wrapf(err, ctx.Pos(), "invalid tag %q for field %q", tag, field))
-		return &ast.BadExpr{}
+		return &ast.BadExpr{}, errors.Wrapf(
+			errors.Promote(err, "parser"), token.NoPos,
+			"invalid tag %q for field %q", tag, field)
 	}
-	return expr
+	return expr, nil
 }
 
 // splitTag splits a cue tag into cue and options.
@@ -575,10 +580,15 @@ func typeAssert[T any](v reflect.Value, t reflect.Type) (T, bool) {
 	return *new(T), false
 }
 
-func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e ast.Expr, expr adt.Expr) {
-	if src, t, ok := ctx.LoadType(t); ok {
-		return src, t
+// fromGoTypeAST converts a Go reflect.Type to an ast.Expr, caching results
+// in the global astTypeCache. It does not require an adt.OpContext.
+// Errors are accumulated into errs.
+func astFromGoType(t reflect.Type, allowNullDefault bool, errs *[]errors.Error) ast.Expr {
+	if v, ok := astTypeCache.Load(t); ok {
+		return v.(ast.Expr)
 	}
+
+	var e ast.Expr
 
 	switch reflect.Zero(t).Interface().(type) {
 	case *big.Int, big.Int:
@@ -609,7 +619,7 @@ func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e as
 		for elem.Kind() == reflect.Pointer {
 			elem = elem.Elem()
 		}
-		e, _ = fromGoType(ctx, false, elem)
+		e = astFromGoType(elem, false, errs)
 		if allowNullDefault {
 			e = wrapOrNull(e)
 		}
@@ -645,10 +655,14 @@ func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e as
 	case reflect.Struct:
 		obj := &ast.StructLit{}
 
-		// TODO: dirty trick: set this to a temporary Vertex and then update the
-		// arcs and conjuncts of this vertex below. This will allow circular
-		// references. Maybe have a special kind of "hardlink" reference.
-		ctx.StoreType(t, obj, nil)
+		// TODO: dirty trick: set this to a value that's updated
+		// below.  This avoids an infinite loop on circular references
+		// when creating the AST, but does not actually work
+		// as intended because AST trees should never be actually
+		// cyclic. Also, this is racy when called concurrently.
+		// Instead, we should generate named identifiers for
+		// named Go types and emit references to them.
+		astTypeCache.Store(t, obj)
 
 		for i := range t.NumField() {
 			f := t.Field(i)
@@ -656,7 +670,7 @@ func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e as
 				continue
 			}
 			_, ok := f.Tag.Lookup("cue")
-			elem, _ := fromGoType(ctx, !ok, f.Type)
+			elem := astFromGoType(f.Type, !ok, errs)
 			if isBad(elem) {
 				continue // Ignore fields for unsupported types
 			}
@@ -669,9 +683,12 @@ func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e as
 			}
 
 			if tag, ok := f.Tag.Lookup("cue"); ok {
-				v := parseTag(ctx, name, tag)
+				v, err := parseTag(name, tag)
+				if err != nil {
+					*errs = append(*errs, err)
+				}
 				if isBad(v) {
-					return v, nil
+					return v
 				}
 				elem = ast.NewBinExpr(token.AND, elem, v)
 			}
@@ -687,18 +704,16 @@ func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e as
 			obj.Elts = append(obj.Elts, d)
 		}
 
-		// TODO: should we validate references here? Can be done using
-		// astutil.ToFile and astutil.Resolve.
-
 		e = obj
 
 	case reflect.Array, reflect.Slice:
 		if t.Elem().Kind() == reflect.Uint8 {
 			e = ast.NewIdent("__bytes")
 		} else {
-			elem, _ := fromGoType(ctx, allowNullDefault, t.Elem())
+			elem := astFromGoType(t.Elem(), allowNullDefault, errs)
 			if elem == nil {
-				return &ast.BadExpr{}, ctx.AddErrf("unsupported Go type (%v)", t.Elem())
+				*errs = append(*errs, errors.Newf(token.NoPos, "unsupported Go type (%v)", t.Elem()))
+				return &ast.BadExpr{}
 			}
 
 			if t.Kind() == reflect.Array {
@@ -723,15 +738,17 @@ func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e as
 			reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8,
 			reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		default:
-			return &ast.BadExpr{}, ctx.AddErrf("unsupported Go type for map key (%v)", key)
+			*errs = append(*errs, errors.Newf(token.NoPos, "unsupported Go type for map key (%v)", key))
+			return &ast.BadExpr{}
 		}
 
-		v, x := fromGoType(ctx, allowNullDefault, t.Elem())
+		v := astFromGoType(t.Elem(), allowNullDefault, errs)
 		if v == nil {
-			return &ast.BadExpr{}, ctx.AddErrf("unsupported Go type (%v)", t.Elem())
+			*errs = append(*errs, errors.Newf(token.NoPos, "unsupported Go type (%v)", t.Elem()))
+			return &ast.BadExpr{}
 		}
 		if isBad(v) {
-			return v, x
+			return v
 		}
 
 		e = ast.NewStruct(&ast.Field{
@@ -743,25 +760,43 @@ func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (e as
 	}
 
 store:
-	// TODO: store error if not nil?
 	if e != nil {
 		f := &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: e}}}
 		astutil.Resolve(f, func(_ token.Pos, msg string, args ...interface{}) {
-			ctx.AddErrf(msg, args...)
+			*errs = append(*errs, errors.Newf(token.NoPos, msg, args...))
 		})
-		var x adt.Expr
-		x2, err := compile.Expr(nil, ctx, pkgID(), e)
-		if err != nil {
-			b := &adt.Bottom{Err: err}
-			ctx.AddBottom(b)
-			x = b
-		} else {
-			x = x2.Expr()
-		}
-		ctx.StoreType(t, e, x)
-		return e, x
+		astTypeCache.Store(t, e)
 	}
-	return e, nil
+	return e
+}
+
+func fromGoType(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type) (ast.Expr, adt.Expr) {
+	if expr, ok := ctx.LoadType(t); ok {
+		e, _ := astTypeCache.Load(t)
+		src, _ := e.(ast.Expr)
+		return src, expr
+	}
+	var errs []errors.Error
+	e := astFromGoType(t, allowNullDefault, &errs)
+	for _, err := range errs {
+		ctx.AddErr(err)
+	}
+	if isBad(e) || e == nil {
+		if len(errs) > 0 {
+			return e, &adt.Bottom{Err: errs[0]}
+		}
+		return e, nil
+	}
+	x, err := compile.Expr(nil, ctx, pkgID(), e)
+	if err != nil {
+		b := &adt.Bottom{Err: err}
+		ctx.AddBottom(b)
+		ctx.StoreType(t, b)
+		return e, b
+	}
+	expr := x.Expr()
+	ctx.StoreType(t, expr)
+	return e, expr
 }
 
 func isBottom(x adt.Node) bool {

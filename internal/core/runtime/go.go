@@ -17,30 +17,19 @@ package runtime
 import (
 	"reflect"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/core/adt"
 )
 
-func (x *Runtime) StoreType(t reflect.Type, src ast.Expr, expr adt.Expr) {
-	if expr == nil {
-		x.index.StoreType(t, src)
-	} else {
-		x.index.StoreType(t, expr)
-	}
+func (x *Runtime) StoreType(t reflect.Type, expr adt.Expr) {
+	x.index.StoreType(t, expr)
 }
 
-func (x *Runtime) LoadType(t reflect.Type) (src ast.Expr, expr adt.Expr, ok bool) {
+func (x *Runtime) LoadType(t reflect.Type) (adt.Expr, bool) {
 	v, ok := x.index.LoadType(t)
-	if ok {
-		switch x := v.(type) {
-		case ast.Expr:
-			return x, nil, true
-		case adt.Expr:
-			src, _ = x.Source().(ast.Expr)
-			return src, x, true
-		}
+	if !ok {
+		return nil, false
 	}
-	return nil, nil, false
+	return v.(adt.Expr), true
 }
 
 func (x *index) StoreType(t reflect.Type, v interface{}) {

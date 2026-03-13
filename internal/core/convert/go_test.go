@@ -336,7 +336,7 @@ func TestConvertType(t *testing.T) {
 		goTyp: struct {
 			A int `cue:"<"` // invalid
 		}{},
-		want:        "_|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF' (and 1 more errors))",
+		want:        "_|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF')",
 		expectError: true,
 	}, {
 		goTyp: struct {

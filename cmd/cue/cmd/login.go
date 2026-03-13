@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -114,6 +115,17 @@ The cue tool supports credentials configured via these tools:
 				oauthCfg := cueconfig.RegistryOAuthConfig(host)
 				resp, err := oauthCfg.DeviceAuth(ctx)
 				if err != nil {
+					var re *oauth2.RetrieveError
+					// If the user attempted to use `cue login` with an OCI registry that isn't a CUE registry
+					// like registry.cue.works, try to give some useful guidance. We don't print the full body
+					// because some respond with rather lengthy HTML content. We observed the following status codes:
+					//
+					// * HTTP 404 Not Found: Docker Hub
+					// * HTTP 405 Method Not Allowed: GHCR, Google Cloud, Quay.io
+					if errors.As(err, &re) && (re.Response.StatusCode == http.StatusNotFound || re.Response.StatusCode == http.StatusMethodNotAllowed) {
+						code := re.Response.StatusCode
+						return fmt.Errorf("cannot start the OAuth2 device flow: %d %s\n\nTo log into a standard OCI registry, use 'docker login' or 'podman login' instead", code, http.StatusText(code))
+					}
 					return fmt.Errorf("cannot start the OAuth2 device flow: %v", err)
 				}
 				// TODO: we could try using $BROWSER or xdg-open here,

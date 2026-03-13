@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbb3447c_6df5a88d",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-13T15:23:25Z",
+      "side": 1,
+      "message": "FWIW I\u0027ve been tending to use `root.Exists()`, which I _think_ is legit.",
+      "range": {
+        "startLine": 721,
+        "startChar": 2,
+        "endLine": 721,
+        "endChar": 90
+      },
+      "revId": "1fcb2782278b38af5656335e22a8bbe59d87e1a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e976e2e_3f1b6d64",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 803,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-13T15:23:25Z",
+      "side": 1,
+      "message": "Why is the Dereference needed? Everything seems to work OK without it.",
+      "revId": "1fcb2782278b38af5656335e22a8bbe59d87e1a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+-- schema.cue --
+title?: string @xml(tag=title)
+author?: {
+	name?:  string @xml(tag=name)
+	email?: string @xml(tag=email)
+} @xml(tag=author)
+-- input.xml --
+<book>
+    <title>The Art of CUE</title>
+    <author>
+        <name>Jane Doe</name>
+        <email>jane@example.com</email>
+    </author>
+</book>
+-- out/decode --
+title: "The Art of CUE"
+author: {
+	name:  "Jane Doe"
+	email: "jane@example.com"
+}

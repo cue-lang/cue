@@ -51,11 +51,11 @@ type Runtime interface {
 	LoadInstance(inst *build.Instance) *Vertex
 
 	// StoreType associates a CUE expression with a Go type.
-	StoreType(t reflect.Type, src ast.Expr, expr Expr)
+	StoreType(t reflect.Type, expr Expr)
 
 	// LoadType retrieves a previously stored CUE expression for a given Go
 	// type if available.
-	LoadType(t reflect.Type) (src ast.Expr, expr Expr, ok bool)
+	LoadType(t reflect.Type) (Expr, bool)
 
 	// ConfigureOpCtx configures the [*OpContext] with details such as
 	// evaluator version, debug options etc.

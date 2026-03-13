@@ -19,6 +19,7 @@ package convert_test
 import (
 	"encoding"
 	"math/big"
+	"sync"
 	"testing"
 	"time"
 
@@ -33,6 +34,30 @@ import (
 
 	_ "cuelang.org/go/pkg"
 )
+
+type recursiveA struct {
+	Next *recursiveA
+	Val  int
+}
+
+type crossRefA struct {
+	Y string
+	B *crossRefB
+}
+
+type crossRefB struct {
+	X int
+	A *crossRefA
+}
+
+type sharedS struct {
+	Other string
+}
+
+type sharedT struct {
+	S  *sharedS
+	S2 *sharedS
+}
 
 func mkBigInt(a int64) (v apd.Decimal) { v.SetInt64(a); return }
 
@@ -420,4 +445,92 @@ func TestConvertType(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestFromGoTypeRecursive(t *testing.T) {
+	r := runtime.New()
+
+	testCases := []struct {
+		name  string
+		goTyp any
+		want  string
+	}{{
+		name:  "self-recursive",
+		goTyp: recursiveA{},
+		want: `{
+  _recursiveA_0: {
+    Next?: (*null|〈1;_recursiveA_0〉)
+    Val: ((int & >=-9223372036854775808) & <=9223372036854775807)
+  }
+  〈0;_recursiveA_0〉
+}`,
+	}, {
+		name:  "mutually-recursive",
+		goTyp: crossRefA{},
+		want: `{
+  _crossRefA_0: {
+    Y: string
+    B?: (*null|〈1;_crossRefB_0〉)
+  }
+  _crossRefB_0: {
+    X: ((int & >=-9223372036854775808) & <=9223372036854775807)
+    A?: (*null|〈1;_crossRefA_0〉)
+  }
+  〈0;_crossRefA_0〉
+}`,
+	}, {
+		name:  "shared-type",
+		goTyp: sharedT{},
+		want: `{
+  _sharedT_0: {
+    S?: (*null|〈1;_sharedS_0〉)
+    S2?: (*null|〈1;_sharedS_0〉)
+  }
+  _sharedS_0: {
+    Other: string
+  }
+  〈0;_sharedT_0〉
+}`,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := adt.NewContext(r, &adt.Vertex{})
+			v, err := convert.FromGoType(ctx, tc.goTyp)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := debug.NodeString(ctx, v, nil)
+			if got != tc.want {
+				t.Errorf("\n got %q;\nwant %q", got, tc.want)
+			}
+			val, _ := ctx.Evaluate(&adt.Environment{}, v)
+			if bot, ok := val.(*adt.Bottom); ok {
+				t.Errorf("unexpected error when evaluating: %v", bot)
+			}
+		})
+	}
+}
+
+func TestFromGoTypeConcurrent(t *testing.T) {
+	// Note: there is a pre-existing race in compile.Expr which mutates
+	// cached AST nodes. This test verifies that astFromGoType itself
+	// (the AST construction) does not race, by checking that concurrent
+	// calls complete without panicking or producing errors.
+	// The -race flag may still detect the compile.Expr race which is
+	// outside the scope of this fix.
+	var wg sync.WaitGroup
+	for range 10 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r := runtime.New()
+			ctx := adt.NewContext(r, &adt.Vertex{})
+			_, err := convert.FromGoType(ctx, recursiveA{})
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+		}()
+	}
+	wg.Wait()
 }

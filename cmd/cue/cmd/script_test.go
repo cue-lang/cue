@@ -209,9 +209,11 @@ func TestScript(t *testing.T) {
 				ts.Setenv(args[0], srv.Host())
 				ts.Defer(srv.Close)
 			},
-			// memregistry starts an HTTP server with enough endpoints to test `cue login`.
+			// oauthregistry starts an HTTP server with enough endpoints to test `cue login`.
 			// It takes a single argument to describe the oauth server's behavior:
 			//
+			// * device-code-not-found: /login/device/code responds with 404
+			// * device-code-method-not-allowed: /login/device/code responds with 405
 			// * device-code-expired: polling for a token with device_code
 			//   always responds with [tokenErrorCodeExpired]
 			// * pending-success: polling for a token with device_code
@@ -672,6 +674,14 @@ func newMockRegistryOauth(mode string) *httptest.Server {
 	)
 	// OAuth2 Device Authorization Request endpoint: https://datatracker.ietf.org/doc/html/rfc8628#section-3.1
 	mux.HandleFunc("/login/device/code", func(w http.ResponseWriter, r *http.Request) {
+		switch mode {
+		case "device-code-not-found":
+			http.Error(w, "404 page not found", http.StatusNotFound)
+			return
+		case "device-code-method-not-allowed":
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 		writeJSON(w, http.StatusOK, oauth2.DeviceAuthResponse{
 			DeviceCode: staticDeviceCode,
 			UserCode:   staticUserCode,

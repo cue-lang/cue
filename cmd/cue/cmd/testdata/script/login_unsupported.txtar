@@ -1,0 +1,28 @@
+# Test that `cue login` fails gracefully when the registry
+# does not support the OAuth2 device flow at all,
+# such as when /login/device/code returns HTTP 404 or 405.
+
+env CUE_CONFIG_DIR=$WORK/cueconfig
+
+# A registry returning 404 for the device code endpoint.
+oauthregistry device-code-not-found
+
+! exec cue login
+cmp stderr stderr-not-found
+! exists cueconfig/logins.json
+
+# A registry returning 405 for the device code endpoint.
+oauthregistry device-code-method-not-allowed
+
+! exec cue login
+cmp stderr stderr-method-not-allowed
+! exists cueconfig/logins.json
+
+-- stderr-not-found --
+cannot start the OAuth2 device flow: oauth2: cannot fetch token: 404 Not Found
+Response: 404 page not found
+
+-- stderr-method-not-allowed --
+cannot start the OAuth2 device flow: oauth2: cannot fetch token: 405 Method Not Allowed
+Response: 405 method not allowed
+

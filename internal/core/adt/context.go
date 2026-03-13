@@ -50,12 +50,12 @@ type Runtime interface {
 	// instance. It returns nil if no such instance has been compiled.
 	LoadInstance(inst *build.Instance) *Vertex
 
-	// StoreType associates a CUE expression with a Go type.
-	StoreType(t reflect.Type, expr Expr)
+	// StoreType associates a finalized CUE Vertex with a Go type.
+	StoreType(t reflect.Type, v *Vertex)
 
-	// LoadType retrieves a previously stored CUE expression for a given Go
+	// LoadType retrieves a previously stored CUE Vertex for a given Go
 	// type if available.
-	LoadType(t reflect.Type) (Expr, bool)
+	LoadType(t reflect.Type) (*Vertex, bool)
 
 	// ConfigureOpCtx configures the [*OpContext] with details such as
 	// evaluator version, debug options etc.

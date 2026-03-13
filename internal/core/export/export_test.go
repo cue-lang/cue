@@ -97,7 +97,7 @@ func TestGenerated(t *testing.T) {
 				}
 				return convert.FromGoType(ctx, in)
 			},
-			out: `*null|{Terminals?: *null|[...*null|{Name: string, Description: string}]}`,
+			out: `*null|_C_0, _C_0: {Terminals?: *null|[...*null|_A_0]}, _A_0: {Name: string, Description: string}`,
 		}, {
 			in: func(ctx *adt.OpContext) (adt.Expr, error) {
 				in := []*A{{Name: "Name", Description: "Desc"}}
@@ -109,7 +109,7 @@ func TestGenerated(t *testing.T) {
 				in := []*A{{Name: "Name", Description: "Desc"}}
 				return convert.FromGoType(ctx, in)
 			},
-			out: `*null|[...*null|{Name: string, Description: string}]`,
+			out: `*null|[...*null|_A_0], _A_0: {Name: string, Description: string}`,
 		}, {
 			in: func(ctx *adt.OpContext) (adt.Expr, error) {
 				in := &KeepGoFieldOrdering{}

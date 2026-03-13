@@ -389,13 +389,11 @@ func (c *Context) EncodeType(x any, option ...EncodeOption) Value {
 	}
 
 	ctx := c.ctx()
-	expr, err := convert.FromGoType(ctx, x)
+	v, err := convert.FromGoType(ctx, x)
 	if err != nil {
 		return c.makeError(err)
 	}
-	n := exprToVertex(expr)
-	n.Finalize(ctx)
-	return c.make(n)
+	return c.make(v)
 }
 
 // NewList creates a Value that is a list of the given values.

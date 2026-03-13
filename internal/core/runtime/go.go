@@ -20,19 +20,19 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-func (x *Runtime) StoreType(t reflect.Type, expr adt.Expr) {
-	x.index.StoreType(t, expr)
+func (x *Runtime) StoreType(t reflect.Type, v *adt.Vertex) {
+	x.index.StoreType(t, v)
 }
 
-func (x *Runtime) LoadType(t reflect.Type) (adt.Expr, bool) {
+func (x *Runtime) LoadType(t reflect.Type) (*adt.Vertex, bool) {
 	v, ok := x.index.LoadType(t)
 	if !ok {
 		return nil, false
 	}
-	return v.(adt.Expr), true
+	return v.(*adt.Vertex), true
 }
 
-func (x *index) StoreType(t reflect.Type, v interface{}) {
+func (x *index) StoreType(t reflect.Type, v *adt.Vertex) {
 	x.typeCache.Store(t, v)
 }
 

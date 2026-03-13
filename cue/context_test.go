@@ -148,6 +148,14 @@ func TestEncodeType(t *testing.T) {
 		wantErr string
 		out     string
 	}
+	type linkedList struct {
+		X    int         `json:"x"`
+		Next *linkedList `json:"next"`
+	}
+	type multiref struct {
+		L1 *linkedList `json:"l1"`
+		L2 *linkedList `json:"l2"`
+	}
 	testCases := []testCase{{
 		name: "Struct",
 		x: struct {
@@ -170,15 +178,23 @@ func TestEncodeType(t *testing.T) {
 		// TODO this looks like a shortcoming of EncodeType.
 		name: "map",
 		x:    map[string]int{},
-		out:  `*null|{}`,
+		out:  `*null|{[string]: int&>=-9223372036854775808&<=9223372036854775807}`,
 	}, {
 		name: "slice",
 		x:    []int{},
-		out:  `*null|[...int64]`,
+		out:  `*null|[...int&>=-9223372036854775808&<=9223372036854775807]`,
 	}, {
 		name:    "chan",
 		x:       chan int(nil),
 		wantErr: `unsupported Go type \(chan int\)`,
+	}, {
+		name: "recursiveType",
+		x:    new(linkedList),
+		out:  `{*null|_linkedList_0, _linkedList_0: {x: int64, next: *null|_linkedList_0}}`,
+	}, {
+		name: "multiref",
+		x:    new(multiref),
+		out:  `{*null|_multiref_0, _multiref_0: {l1: *null|_linkedList_0, l2: *null|_linkedList_0}, _linkedList_0: {x: int64, next: *null|_linkedList_0}}`,
 	}}
 	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 		v := cuecontext.New().EncodeType(tc.x)
@@ -187,7 +203,7 @@ func TestEncodeType(t *testing.T) {
 			return
 		}
 		qt.Assert(t, qt.IsNil(v.Err()))
-		got := fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
+		got := fmt.Sprint(astinternal.DebugStr(v.Syntax()))
 		t.Equal(got, tc.out)
 	})
 }

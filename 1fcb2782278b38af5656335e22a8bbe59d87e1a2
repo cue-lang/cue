@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90d83285_e295ea75",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-14T20:50:57Z",
+      "side": 1,
+      "message": "nice! done.",
+      "parentUuid": "cbb3447c_6df5a88d",
+      "range": {
+        "startLine": 721,
+        "startChar": 2,
+        "endLine": 721,
+        "endChar": 90
+      },
+      "revId": "1fcb2782278b38af5656335e22a8bbe59d87e1a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e976e2e_3f1b6d64",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-03-13T15:23:25Z",
       "side": 1,
       "message": "Why is the Dereference needed? Everything seems to work OK without it.",
+      "revId": "1fcb2782278b38af5656335e22a8bbe59d87e1a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d2bad1a_bdd42e2e",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 803,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-14T20:50:57Z",
+      "side": 1,
+      "message": "good point, the AI hallucinated this. done.",
+      "parentUuid": "8e976e2e_3f1b6d64",
       "revId": "1fcb2782278b38af5656335e22a8bbe59d87e1a2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

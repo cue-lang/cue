@@ -20,6 +20,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 
@@ -165,6 +166,28 @@ type Config struct {
 	//         in the _ package.
 	Package string
 
+	// FS, if non-nil, provides the filesystem used by the loader for discovering
+	// packages, resolving modules, and reading files.
+	//
+	// When FS is nil, the loader uses the host operating system filesystem
+	// (os.Stat, os.ReadDir, os.Open), which is the default and preserves the
+	// existing behavior.
+	//
+	// When FS is set, all filesystem operations performed by the loader are
+	// routed through FS. In this mode, paths are interpreted as slash-separated
+	// paths within FS, and Config.Dir is treated as a directory inside FS rather
+	// than a host filesystem path.
+	//
+	// The loader does not require FS to support symbolic links. When using FS,
+	// any operations that would rely on os.Lstat semantics on the host filesystem
+	// are performed using fs.Stat instead, consistent with the capabilities of
+	// io/fs.
+	//
+	// FS enables loading CUE packages and modules from virtual or embedded
+	// filesystems (for example, embed.FS or fstest.MapFS) without accessing
+	// the host filesystem.
+	FS fs.FS
+
 	// Dir is the base directory for import path resolution.
 	// For example, it is used to determine the main module,
 	// and rooted import paths starting with "./" are relative to it.
@@ -280,7 +303,7 @@ type Config struct {
 	// An application may supply a custom implementation of ParseFile to change
 	// the effective file contents or the behavior of the parser, or to modify
 	// the syntax tree.
-	ParseFile func(name string, src interface{}, cfg parser.Config) (*ast.File, error)
+	ParseFile func(name string, src any, cfg parser.Config) (*ast.File, error)
 
 	// Overlay provides a mapping of absolute file paths to file contents,
 	// which are overlaid on top of the host operating system when loading files.
@@ -290,6 +313,9 @@ type Config struct {
 	// If an overlaid file does not exist in the host filesystem,
 	// the loader behaves as if the overlaid file exists with its contents,
 	// and that that all of its parent directories exist too.
+	//
+	// When FS is set, overlay paths must be absolute loadFS paths
+	// (that is, rooted at loadFsRoot).
 	Overlay map[string]Source
 
 	// Stdin defines an alternative for os.Stdin for the file "-". When used,
@@ -354,13 +380,22 @@ func addImportQualifier(pkg importPath, name string) (importPath, error) {
 func (c Config) complete() (cfg *Config, err error) {
 	// Ensure [Config.Dir] is a clean and absolute path,
 	// necessary for matching directory prefixes later.
-	if c.Dir == "" {
-		c.Dir, err = os.Getwd()
-		if err != nil {
+	if c.FS == nil {
+		if c.Dir == "" {
+			c.Dir, err = os.Getwd()
+			if err != nil {
+				return nil, err
+			}
+		} else if c.Dir, err = filepath.Abs(c.Dir); err != nil {
 			return nil, err
 		}
-	} else if c.Dir, err = filepath.Abs(c.Dir); err != nil {
-		return nil, err
+	} else {
+		if c.Dir == "" {
+			c.Dir = "."
+		}
+		if !isLoaderAbs(c.Dir) {
+			c.Dir = path.Clean(path.Join(loadFSRoot, c.Dir))
+		}
 	}
 	if modpkgload.InsideCueMod(c.Dir) {
 		return nil, fmt.Errorf("cannot load packages inside the %s directory", modDir)

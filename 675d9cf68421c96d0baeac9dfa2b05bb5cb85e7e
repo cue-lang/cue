@@ -16,6 +16,24 @@
       "message": "Per https://cue.gerrithub.io/c/cue-lang/cuelang.org/+/1233625 the wording here of \"standard OCI registry\" is a bit awkward. The Central Registry is a \"standard OCI registry\"... Perhaps \"other OCI registries\"?",
       "revId": "675d9cf68421c96d0baeac9dfa2b05bb5cb85e7e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e407caa_34c11d0c",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T16:48:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31ba755e_af1c8076",
+      "revId": "675d9cf68421c96d0baeac9dfa2b05bb5cb85e7e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

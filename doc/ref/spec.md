@@ -1588,7 +1588,8 @@ name of the field when mapping to a different language.
 
 
 ```cue
-// Package attribute
+// Package attributes
+@experiment(try)
 @protobuf(proto3)
 
 myStruct1: {

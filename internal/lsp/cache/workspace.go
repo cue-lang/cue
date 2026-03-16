@@ -67,9 +67,14 @@ type Workspace struct {
 	files map[protocol.DocumentURI]*File
 
 	standalone *Standalone
+
+	// enqueue allows for a function to be added to the incoming queue
+	// of messages from the client. The enqueue function itself is
+	// non-blocking.
+	enqueue func(func())
 }
 
-func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string)) *Workspace {
+func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string), enqueue func(func())) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
 	w := &Workspace{
 		registry: &registryWrapper{
@@ -83,6 +88,7 @@ func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string)) *
 		modules:   make(map[protocol.DocumentURI]*Module),
 		mappers:   make(map[*token.File]*protocol.Mapper),
 		files:     make(map[protocol.DocumentURI]*File),
+		enqueue:   enqueue,
 	}
 	w.standalone = NewStandalone(w)
 	return w

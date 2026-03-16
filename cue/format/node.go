@@ -692,8 +692,20 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	case *ast.Interpolation:
 		f.before(nil)
-		for _, x := range x.Elts {
-			f.expr0(x, depth+1)
+		// Reindent multiline interpolation string fragments directly,
+		// like the indent < 6 check in the printer for token.STRING.
+		search, replace := f.interpReindent(x)
+		for _, el := range x.Elts {
+			if lit, ok := el.(*ast.BasicLit); ok && search != "" {
+				lit = &ast.BasicLit{
+					ValuePos: lit.ValuePos,
+					Kind:     lit.Kind,
+					Value:    strings.ReplaceAll(lit.Value, search, replace),
+				}
+				f.print(lit.ValuePos, lit)
+				continue
+			}
+			f.expr0(el, depth+1)
 		}
 		f.after(nil)
 
@@ -822,6 +834,31 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))
 	}
+}
+
+// interpReindent returns a search/replace pair to reindent multiline
+// interpolation string fragments, or empty strings if no reindentation is needed.
+func (f *formatter) interpReindent(x *ast.Interpolation) (search, replace string) {
+	if f.indent >= 6 || len(x.Elts) < 2 {
+		return "", ""
+	}
+	first, ok := x.Elts[0].(*ast.BasicLit)
+	if !ok {
+		return "", ""
+	}
+	last, ok := x.Elts[len(x.Elts)-1].(*ast.BasicLit)
+	if !ok {
+		return "", ""
+	}
+	qi, _, _, err := literal.ParseQuotes(first.Value, last.Value)
+	if err != nil || !qi.IsMulti() {
+		return "", ""
+	}
+	indent := strings.Repeat("\t", f.cfg.indent+f.indent+1)
+	if qi.Whitespace() == indent {
+		return "", ""
+	}
+	return "\n" + qi.Whitespace(), "\n" + indent
 }
 
 func (f *formatter) clause(clause ast.Clause) {

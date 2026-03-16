@@ -167,10 +167,10 @@ comp: {
 bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'
 c1:    mystrings.Contains("aa", "a")
 s1:    """
-		multi
-		\(bar)
-		line
-		"""
+	multi
+	\(bar)
+	line
+	"""
 l1: [3, ...int]
 l2: [...int]
 l3: []

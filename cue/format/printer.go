@@ -62,7 +62,16 @@ type printer struct {
 	// brackets in labels don't trigger tabwriter table breaks.
 	inLabel bool
 
+	// interpIndent is set by the formatter inside ast.Interpolation nodes
+	// to reindent multiline string fragments.
+	interpIndent *interpIndentReplace
+
 	errs errors.Error
+}
+
+type interpIndentReplace struct {
+	search  string
+	replace string
 }
 
 type line int
@@ -147,6 +156,8 @@ func (p *printer) Print(v interface{}) {
 			if p.indent < 6 {
 				data = literal.IndentTabs(data, p.cfg.indent+p.indent+1)
 			}
+		case token.INTERPOLATION:
+			// Interpolation fragments are handled via interpIndent below.
 
 		case token.INT:
 			if len(data) > 1 &&
@@ -178,6 +189,9 @@ func (p *printer) Print(v interface{}) {
 			if strings.IndexByte(data, 'E') != -1 {
 				data = strings.ToLower(data)
 			}
+		}
+		if r := p.interpIndent; r != nil {
+			data = strings.ReplaceAll(data, r.search, r.replace)
 		}
 
 		isLit = true

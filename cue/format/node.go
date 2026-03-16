@@ -692,9 +692,15 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	case *ast.Interpolation:
 		f.before(nil)
+		// TODO: only do this when simplifying, like the indent < 6
+		// check in the printer for token.STRING.
+		if f.indent < 6 {
+			f.setInterpIndent(x)
+		}
 		for _, x := range x.Elts {
 			f.expr0(x, depth+1)
 		}
+		f.interpIndent = nil
 		f.after(nil)
 
 	case *ast.ParenExpr:
@@ -821,6 +827,34 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))
+	}
+}
+
+// setInterpIndent sets interpIndent on the printer if x is a multiline string
+// that needs reindenting.
+func (f *formatter) setInterpIndent(x *ast.Interpolation) {
+	if len(x.Elts) < 2 {
+		return
+	}
+	first, ok := x.Elts[0].(*ast.BasicLit)
+	if !ok {
+		return
+	}
+	last, ok := x.Elts[len(x.Elts)-1].(*ast.BasicLit)
+	if !ok {
+		return
+	}
+	qi, _, _, err := literal.ParseQuotes(first.Value, last.Value)
+	if err != nil || !qi.IsMulti() {
+		return
+	}
+	indent := strings.Repeat("\t", f.cfg.indent+f.indent+1)
+	if qi.Whitespace() == indent {
+		return
+	}
+	f.interpIndent = &interpIndentReplace{
+		search:  "\n" + qi.Whitespace(),
+		replace: "\n" + indent,
 	}
 }
 

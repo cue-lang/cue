@@ -173,9 +173,7 @@ func (r *registryConfig) init() error {
 
 var (
 	configSchemaOnce sync.Once // guards the creation of _configSchema
-	// TODO remove this mutex when https://cuelang.org/issue/2733 is fixed.
-	configSchemaMutex sync.Mutex // guards any use of _configSchema
-	_configSchema     cue.Value
+	_configSchema    cue.Value
 )
 
 //go:embed schema.cue
@@ -208,9 +206,6 @@ func ParseConfig(configFile []byte, filename string, catchAllDefault string) (Lo
 		}
 		_configSchema = schemav
 	})
-	configSchemaMutex.Lock()
-	defer configSchemaMutex.Unlock()
-
 	v := _configSchema.Context().CompileBytes(configFile, cue.Filename(filename))
 	if err := v.Err(); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "invalid registry configuration file")

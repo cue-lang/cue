@@ -27,7 +27,9 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/tdtest"
 )
 
 const debug = false
@@ -352,6 +354,77 @@ func TestIncorrectIdent(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSourceOptions(t *testing.T) {
+	// Input with a nested struct, aligned fields,
+	// and a quoted label that could be simplified to a plain identifier.
+	src := `
+"foo": {
+	a:         1
+	longField: 2
+}
+`[1:]
+	type testCase struct {
+		name    string
+		options []format.Option
+		want    string
+	}
+	testCases := []testCase{
+		// No options: default behavior uses tabs for indentation and spaces for alignment.
+		// The input source remains as-is.
+		{
+			name: "Defaults",
+			want: src,
+		},
+		// Setting options to their default values is also a no-op.
+		{
+			name:    "DefaultValues",
+			options: []format.Option{format.TabIndent(true), format.UseSpaces(8)},
+			want:    src,
+		},
+		// UseSpaces setting a different tabWidth makes no difference unless we indent with spaces.
+		{
+			name:    "UseSpaces=2",
+			options: []format.Option{format.UseSpaces(2)},
+			want:    src,
+		},
+
+		// Simplify removes unnecessary quotes from "foo".
+		{
+			name:    "Simplify",
+			options: []format.Option{format.Simplify()},
+			want:    "foo: {\n\ta:         1\n\tlongField: 2\n}\n",
+		},
+		// TabIndent(false) makes the indentation use a tabWidth number of spaces.
+		// Note that this exposes the default tabWidth value of 8.
+		{
+			name:    "TabIndent=false",
+			options: []format.Option{format.TabIndent(false)},
+			want:    "\"foo\": {\n        a:         1\n        longField: 2\n}\n",
+		},
+		// TabIndent(false) with a custom number of spaces.
+		{
+			name:    "TabIndent=false,UseSpaces=2",
+			options: []format.Option{format.TabIndent(false), format.UseSpaces(2)},
+			want:    "\"foo\": {\n  a:         1\n  longField: 2\n}\n",
+		},
+		// IndentPrefix indents every line as a prefix.
+		//
+		// TODO(mvdan): this seems buggy? note the trailing tabs, and the lack of leading tabs.
+		// Or at the very least, the docs are misleading.
+		{
+			name:    "IndentPrefix(3)",
+			options: []format.Option{format.IndentPrefix(3)},
+			want:    "\"foo\": {\n\t\t\t\ta:         1\n\t\t\t\tlongField: 2\n\t\t\t}\n\t\t",
+		},
+	}
+	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+		t.Update(cuetest.UpdateGoldenFiles)
+		got, err := format.Source([]byte(src), tc.options...)
+		qt.Assert(t, qt.IsNil(err))
+		t.Equal(string(got), tc.want)
+	})
 }
 
 // TextX is a skeleton test that can be filled in for debugging one-off cases.

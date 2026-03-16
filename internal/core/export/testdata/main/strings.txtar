@@ -25,9 +25,9 @@ c: {
 }
 bin1: '\(a)'
 bin2: '''
-		multi
-		\(b)
-		'''
+	multi
+	\(b)
+	'''
 -- out/doc --
 []
 [a]

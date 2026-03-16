@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16e6ace0_9672174b",
+        "filename": "internal/golangorgx/tools/jsonrpc2/handler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-16T15:45:15Z",
+      "side": 1,
+      "message": "The AsyncHandler is here if you\u0027re looking for it. This is what the LSP has been using all the time. I just want a version of this where I can inject in other funcs as needed.",
+      "revId": "5bbc8b2fb5def6310fd185230aeed4c2aeec0dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

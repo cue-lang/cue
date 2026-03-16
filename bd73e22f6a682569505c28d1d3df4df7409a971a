@@ -16,6 +16,24 @@
       "message": "It seems a bit odd to me that this change doesn\u0027t affect _any_ of the tests. Perhaps we should have at least one place where we can see the effect of this default?",
       "revId": "bd73e22f6a682569505c28d1d3df4df7409a971a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "772cbaeb_6b56879c",
+        "filename": "cue/format/format.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T15:15:24Z",
+      "side": 1,
+      "message": "with Marcel we discussed this last week and we agree that it shouldn\u0027t actually affect any formatting when indenting with tabs. because tabs are only used to indent, text/tabwriter is only used to align fields and comments, and that alignment should be broken when going up or down an indentation level. we didn\u0027t do that very well up to this point, hence the parent commit with a fix.\n\nthis does affect when a Go API user specifies TabIndent(false) though. the new parent commit shows this, and then this commit adjusts that test case.",
+      "parentUuid": "9b40dfb5_40301253",
+      "revId": "bd73e22f6a682569505c28d1d3df4df7409a971a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

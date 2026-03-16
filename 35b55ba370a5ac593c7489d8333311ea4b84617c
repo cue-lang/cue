@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60e22fd7_f8cd8854",
+        "filename": "cmd/cue/cmd/integration/workspace/rename_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-16T15:43:05Z",
+      "side": 1,
+      "message": "Sorry, it\u0027s a bit difficult to see because I\u0027ve refactored at the same time, but this existing test applies a rename to the \"out\" on this line, changing it to \"result\".",
+      "revId": "35b55ba370a5ac593c7489d8333311ea4b84617c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -21,9 +21,6 @@ import (
 )
 
 func (s *server) DocumentSymbol(ctx context.Context, params *protocol.DocumentSymbolParams) ([]any, error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
 	root := s.workspace.DocumentSymbols(params.TextDocument.URI)
 	if len(root) == 0 {
 		return nil, nil

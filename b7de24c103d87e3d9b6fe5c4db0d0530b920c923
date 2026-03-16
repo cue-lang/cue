@@ -16,6 +16,24 @@
       "message": "sorry, tiny typeo. \"hcange\"",
       "revId": "b7de24c103d87e3d9b6fe5c4db0d0530b920c923",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0832370d_bcf82739",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T16:36:33Z",
+      "side": 1,
+      "message": "and the human shows their skill over the AI again! 🤦",
+      "parentUuid": "30f56190_4cab3ffe",
+      "revId": "b7de24c103d87e3d9b6fe5c4db0d0530b920c923",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

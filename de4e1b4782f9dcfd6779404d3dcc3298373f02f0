@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f702957e_05a4a54f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T10:22:22Z",
+      "side": 1,
+      "message": "I\u0027m sure this might not be perfect, but if we get this into master this week, and release with alpha.1 in a couple of weeks, it gives users plenty of time to report any design issues.",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce3df1e5_5feda93b",
+        "filename": "cue/load/config.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T10:22:22Z",
+      "side": 1,
+      "message": "nit: linkify these os func references",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71ec3eec_a94a0925",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T10:22:22Z",
+      "side": 1,
+      "message": "nit: these two types don\u0027t agree on the casing of FileSystem vs Filesystem",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a23d9bc_478f97d8",
+        "filename": "cue/load/fsfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T10:22:22Z",
+      "side": 1,
+      "message": "can we come up with a better filename than fsfs.go? :) e.g. move `fs.go` to `overlayfs.go` in a separate parent commit, and add `iofs.go` here.",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21b284e4_8624ee67",
+        "filename": "cue/load/fsfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T10:22:22Z",
+      "side": 1,
+      "message": "no need to use a defer?\n\nalso, did you consider holding the mutex for the entire func, rather than grabbing it twice separately? I guess it\u0027s a tradeoff between races (or rather duplicate work) versus lock contention.",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f6bbe07_5dd907f0",
+        "filename": "cue/token/fsloc.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T10:22:22Z",
+      "side": 1,
+      "message": "you seem to be documenting the fields on the struct godoc itself; why not document them in the field godocs instead?",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2aa54d66_6f8b8716",
+        "filename": "cue/token/fsloc.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T10:22:22Z",
+      "side": 1,
+      "message": "above, you say that FromFSPath is always set by the loader, but here you have a nil check. is there a reason for that? perhaps clarify the doc slightly.",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b808735_ceebd402",
+        "filename": "cue/token/fsloc.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T10:22:22Z",
+      "side": 1,
+      "message": "Go is converging on IsZero for e.g. encoding/json/v2, so I\u0027d encourage the same here, with the caveat that it\u0027s negated logic.",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

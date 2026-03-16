@@ -16,6 +16,24 @@
       "message": "so the length of srcNames is always 0 or 1? perhaps use a `*string` for clarity? the `slices.Contains` below was throwing me off a bit because I was worried the linear lookup could scale poorly.\n\nalternatively, if you can indeed have multiple srcNames, did you consider a map?",
       "revId": "9c71754e6fbed7a8b59049b7d969ed0fac2cb2db",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f11cb31_9aa23ea7",
+        "filename": "internal/lsp/cache/rename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-16T16:07:03Z",
+      "side": 1,
+      "message": "Discussed on discord. But erm, no, the list is 1 or 2 items, depending on whether the unquoted form is a valid identifier or not.",
+      "parentUuid": "fdd9110e_b9dae02b",
+      "revId": "9c71754e6fbed7a8b59049b7d969ed0fac2cb2db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

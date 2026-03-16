@@ -16,6 +16,23 @@
       "message": "The AsyncHandler is here if you\u0027re looking for it. This is what the LSP has been using all the time. I just want a version of this where I can inject in other funcs as needed.",
       "revId": "5bbc8b2fb5def6310fd185230aeed4c2aeec0dd9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a597a102_31b96d63",
+        "filename": "internal/golangorgx/tools/jsonrpc2/handler.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-16T18:18:25Z",
+      "side": 1,
+      "message": "```suggestion\n// Enqueue adds the function to the end of the queue. It is non-blocking. The fun will\n```",
+      "revId": "5bbc8b2fb5def6310fd185230aeed4c2aeec0dd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

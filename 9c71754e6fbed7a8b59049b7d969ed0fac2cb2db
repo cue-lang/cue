@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdd9110e_b9dae02b",
+        "filename": "internal/lsp/cache/rename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-16T15:52:41Z",
+      "side": 1,
+      "message": "so the length of srcNames is always 0 or 1? perhaps use a `*string` for clarity? the `slices.Contains` below was throwing me off a bit because I was worried the linear lookup could scale poorly.\n\nalternatively, if you can indeed have multiple srcNames, did you consider a map?",
+      "revId": "9c71754e6fbed7a8b59049b7d969ed0fac2cb2db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

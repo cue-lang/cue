@@ -113,10 +113,8 @@ type noDepsFile struct {
 }
 
 var (
-	moduleSchemaOnce sync.Once // guards the creation of _moduleSchema
-	// TODO remove this mutex when https://cuelang.org/issue/2733 is fixed.
-	moduleSchemaMutex sync.Mutex // guards any use of _moduleSchema
-	_schemas          schemaInfo
+	moduleSchemaOnce sync.Once // guards the creation of _modules
+	_schemas         schemaInfo
 )
 
 type schemaInfo struct {
@@ -127,29 +125,18 @@ type schemaInfo struct {
 // moduleSchemaDo runs f with information about all the schema versions
 // present in schema.cue. It does this within a mutex because it is
 // not currently allowed to use cue.Value concurrently.
-// TODO remove the mutex when https://cuelang.org/issue/2733 is fixed.
 func moduleSchemaDo[T any](f func(*schemaInfo) (T, error)) (T, error) {
 	moduleSchemaOnce.Do(func() {
 		// It is important that this cue.Context not be used for building any other cue.Value,
 		// such as in [Parse] or [ParseLegacy].
 		// A value holds memory as long as the context it was built with is kept alive for,
 		// and this context is alive forever via the _schemas global.
-		//
-		// TODO(mvdan): this violates the documented API rules in the cue package:
-		//
-		//    Only values created from the same Context can be involved in the same operation.
-		//
-		// However, this appears to work in practice, and all alternatives right now would be
-		// either too costly or awkward. We want to lift that API restriction, and this works OK,
-		// so leave it as-is for the time being.
 		ctx := cuecontext.New()
 		schemav := ctx.CompileString(moduleSchemaData, cue.Filename(schemaFile))
 		if err := schemav.Decode(&_schemas); err != nil {
 			panic(fmt.Errorf("internal error: invalid CUE module.cue schema: %v", errors.Details(err, nil)))
 		}
 	})
-	moduleSchemaMutex.Lock()
-	defer moduleSchemaMutex.Unlock()
 	return f(&_schemas)
 }
 

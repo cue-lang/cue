@@ -55,24 +55,18 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 	options := settings.DefaultOptions(s.optionsOverrides)
 	svr := server.New(s.cache, client, options)
 	svrID := svr.ID()
-	// Clients may or may not send a shutdown message. Make sure the server is
-	// shut down.
-	//
-	// TODO(ms): temporarily disabled because it introduces a
-	// data-race: this is a moment of genuine concurrency. It would be
-	// much better to inject the shutdown message onto the end of the
-	// jsonrpc2 stream somehow. For now, there's nothing important to
-	// do for shutdown, so disabling this is fine, and it solves the
-	// data-race. It's possible we could get away with moving the
-	// <-conn.Done() call within the defer, prior to the Shutdown call
-	// - that would provide the necessary memory barries. TBD.
-	//
-	// defer svr.Shutdown(ctx)
+
+	handlers, enqueue := protocol.HandlersWithEnqueue(
+		handshaker(svrID, s.daemon,
+			protocol.ServerHandler(svr, jsonrpc2.MethodNotFound)))
+	svr.SetEnqueuer(enqueue.Enqueue)
+
+	// Clients may or may not send a shutdown message. Make sure the
+	// server is shut down.
+	defer enqueue.Enqueue(func() { svr.Shutdown(ctx) })
+
 	ctx = protocol.WithClient(ctx, client)
-	conn.Go(ctx,
-		protocol.Handlers(
-			handshaker(svrID, s.daemon,
-				protocol.ServerHandler(svr, jsonrpc2.MethodNotFound))))
+	conn.Go(ctx, handlers)
 	if s.daemon {
 		log.Printf("Server %s: connected", svrID)
 		defer log.Printf("Server %s: exited", svrID)

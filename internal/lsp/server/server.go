@@ -28,6 +28,11 @@ type ServerWithID interface {
 	// ID returns a unique, human-readable string for this server, for
 	// the purpose of log messages and debugging.
 	ID() string
+
+	// SetEnqueuer allows the server's enqueue function to be set. This
+	// exists only because of awkwardness around the creation of the
+	// server and the JSONRPC handlers.
+	SetEnqueuer(func(func()))
 }
 
 // New creates an LSP server and binds it to handle incoming client
@@ -97,11 +102,20 @@ type server struct {
 	// The map field may be reassigned but the map itself is immutable.
 	watchedGlobPatterns map[protocol.RelativePattern]struct{}
 	watchingIDCounter   int
+
+	// enqueue allows for a function to be added to the incoming queue
+	// of messages from the client. The enqueue function itself is
+	// non-blocking.
+	enqueue func(func())
 }
 
 var _ ServerWithID = (*server)(nil)
 
 func (s *server) ID() string { return s.id }
+
+func (s *server) SetEnqueuer(enqueue func(func())) {
+	s.enqueue = enqueue
+}
 
 // Shutdown implements the 'shutdown' LSP handler. It releases resources
 // associated with the server and waits for all ongoing work to complete.

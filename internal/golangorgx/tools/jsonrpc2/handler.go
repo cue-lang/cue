@@ -107,3 +107,65 @@ func AsyncHandler(handler Handler) Handler {
 		return nil
 	}
 }
+
+// EnqueueHandler behaves exactly the same as [AsyncHandler]: each
+// request is processed in its own goroutine, and requests are
+// enqueued non-blocking.
+//
+// Unlike [AsyncHandler], it also allows arbitrary functions to be
+// added to the queue.
+type EnqueueHandler struct {
+	lock        sync.Mutex
+	nextRequest chan struct{}
+	handler     Handler
+}
+
+func NewEnqueueHandler(handler Handler) *EnqueueHandler {
+	nextRequest := make(chan struct{})
+	close(nextRequest)
+	return &EnqueueHandler{
+		nextRequest: nextRequest,
+		handler:     handler,
+	}
+}
+
+// Handle implements [Handler]
+func (h *EnqueueHandler) Handle(ctx context.Context, reply Replier, req Request) error {
+	h.lock.Lock()
+	waitForPrevious := h.nextRequest
+	h.nextRequest = make(chan struct{})
+	unlockNext := h.nextRequest
+	h.lock.Unlock()
+
+	innerReply := reply
+	reply = func(ctx context.Context, result any, err error) error {
+		close(unlockNext)
+		return innerReply(ctx, result, err)
+	}
+	_, queueDone := event.Start(ctx, "queued")
+	go func() {
+		<-waitForPrevious
+		queueDone()
+		if err := h.handler(ctx, reply, req); err != nil {
+			event.Error(ctx, "jsonrpc2 async message delivery failed", err)
+		}
+	}()
+	return nil
+}
+
+// Enqueue adds the fun to the queue. It is non-blocking. The fun will
+// be run in its own go-routine, and will not run until the previous
+// item in the queue has finished running.
+func (h *EnqueueHandler) Enqueue(fun func()) {
+	h.lock.Lock()
+	waitForPrevious := h.nextRequest
+	h.nextRequest = make(chan struct{})
+	unlockNext := h.nextRequest
+	h.lock.Unlock()
+
+	go func() {
+		<-waitForPrevious
+		fun()
+		close(unlockNext)
+	}()
+}

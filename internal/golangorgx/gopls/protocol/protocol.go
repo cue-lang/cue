@@ -110,6 +110,11 @@ func Handlers(handler jsonrpc2.Handler) jsonrpc2.Handler {
 			jsonrpc2.MustReplyHandler(handler)))
 }
 
+func HandlersWithEnqueue(handler jsonrpc2.Handler) (jsonrpc2.Handler, *jsonrpc2.EnqueueHandler) {
+	enqueueHandler := jsonrpc2.NewEnqueueHandler(jsonrpc2.MustReplyHandler(handler))
+	return CancelHandler(enqueueHandler.Handle), enqueueHandler
+}
+
 func CancelHandler(handler jsonrpc2.Handler) jsonrpc2.Handler {
 	handler, canceller := jsonrpc2.CancelHandler(handler)
 	return func(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {

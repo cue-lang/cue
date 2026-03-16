@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d07b2dd0_584edb0d",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-03-16T15:23:49Z",
+      "side": 1,
+      "message": "Do we want to use this opportunity to link to the docs on cuelang.org?",
+      "revId": "e1eb9db295c5267a59101ceccd9cedc0e4a37c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

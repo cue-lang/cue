@@ -54,9 +54,6 @@ func (s *server) AddFolders(ctx context.Context, folders map[protocol.WorkspaceF
 }
 
 func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *protocol.DidChangeWorkspaceFoldersParams) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
 	for _, folder := range params.Event.Removed {
 		dir, err := protocol.ParseDocumentURI(folder.URI)
 		if err != nil {
@@ -77,9 +74,6 @@ func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *protocol
 }
 
 func (s *server) DidChangeConfiguration(ctx context.Context, _ *protocol.DidChangeConfigurationParams) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
 	ctx, done := event.Start(ctx, "lsp.Server.didChangeConfiguration")
 	defer done()
 

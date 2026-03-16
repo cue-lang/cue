@@ -354,6 +354,69 @@ func TestIncorrectIdent(t *testing.T) {
 	}
 }
 
+func TestSourceOptions(t *testing.T) {
+	// Input with a nested struct, aligned fields,
+	// and a quoted label that could be simplified to a plain identifier.
+	src := `
+"foo": {
+	a:         1
+	longField: 2
+}
+`[1:]
+	for _, test := range []struct {
+		name    string
+		options []format.Option
+		want    string
+	}{
+		// No options: default behavior uses tabs for indentation and spaces for alignment.
+		// The input source remains as-is.
+		{"Defaults", nil, src},
+		// Setting options to their default values is also a no-op.
+		{"DefaultValues", []format.Option{format.TabIndent(true), format.UseSpaces(8)}, src},
+		// UseSpaces setting a different tabWidth makes no difference unless we indent with spaces.
+		{"UseSpaces=2", []format.Option{format.UseSpaces(2)}, src},
+
+		// Simplify removes unnecessary quotes from "foo".
+		{"Simplify", []format.Option{format.Simplify()}, `
+foo: {
+	a:         1
+	longField: 2
+}
+`[1:]},
+		// TabIndent(false) makes the indentation use a tabWidth number of spaces.
+		// Note that this exposes the default tabWidth value of 8.
+		{"TabIndent=false", []format.Option{format.TabIndent(false)}, `
+"foo": {
+        a:         1
+        longField: 2
+}
+`[1:]},
+		// TabIndent(false) with a custom number of spaces.
+		{"TabIndent=false,UseSpaces=2", []format.Option{format.TabIndent(false), format.UseSpaces(2)}, `
+"foo": {
+  a:         1
+  longField: 2
+}
+`[1:]},
+		// IndentPrefix indents every line as a prefix.
+		//
+		// TODO(mvdan): this seems buggy? note the trailing tabs, and the lack of leading tabs.
+		// Or at the very least, the docs are misleading.
+		{"IndentPrefix(3)", []format.Option{format.IndentPrefix(3)}, `
+"foo": {
+				a:         1
+				longField: 2
+			}
+		`[1:]},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := format.Source([]byte(src), test.options...)
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(string(got), test.want))
+		})
+	}
+}
+
 // TextX is a skeleton test that can be filled in for debugging one-off cases.
 // Do not remove.
 func TestX(t *testing.T) {

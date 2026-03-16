@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b40dfb5_40301253",
+        "filename": "cue/format/format.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-16T12:23:51Z",
+      "side": 1,
+      "message": "It seems a bit odd to me that this change doesn\u0027t affect _any_ of the tests. Perhaps we should have at least one place where we can see the effect of this default?",
+      "revId": "bd73e22f6a682569505c28d1d3df4df7409a971a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

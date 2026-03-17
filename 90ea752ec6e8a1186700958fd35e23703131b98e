@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "490bbb0e_1195793a",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-17T12:33:16Z",
+      "side": 1,
+      "message": "good point. I was using multiline raw strings for the sake of easy updating, but that point is moot if we use tdtest.",
+      "parentUuid": "9be99f96_ad682193",
+      "revId": "90ea752ec6e8a1186700958fd35e23703131b98e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbb7720c_baf27c2d",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-17T11:13:09Z",
       "side": 1,
       "message": "Could use tdtest.Equal here so that CUE_UPDATE will work.",
+      "revId": "90ea752ec6e8a1186700958fd35e23703131b98e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8bd28d9_df9206fa",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-17T12:33:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbb7720c_baf27c2d",
       "revId": "90ea752ec6e8a1186700958fd35e23703131b98e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

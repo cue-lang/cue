@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9be99f96_ad682193",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T11:13:09Z",
+      "side": 1,
+      "message": "It\u0027s a bit of a shame that the difference between this case and the one before it will be invisible in some editors. Could maybe consider doing a replace of tab with `\\t` to make it clearer?",
+      "revId": "90ea752ec6e8a1186700958fd35e23703131b98e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbb7720c_baf27c2d",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T11:13:09Z",
+      "side": 1,
+      "message": "Could use tdtest.Equal here so that CUE_UPDATE will work.",
+      "revId": "90ea752ec6e8a1186700958fd35e23703131b98e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

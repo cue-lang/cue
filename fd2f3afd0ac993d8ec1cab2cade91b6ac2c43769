@@ -766,6 +766,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c20795f_6a7faa7a",
+        "filename": "unstable/lspaux/config/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T15:30:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "664d092f_cf3d99a8",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84dfea83_b86e7128",

@@ -485,6 +485,11 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 		return failf("standard library import path %q cannot be imported as a CUE package", p)
 	}
 	if l.pkgs == nil {
+		// Validate import paths before reporting "no module" so that
+		// malformed paths get a clear error rather than a confusing one.
+		if err := module.CheckImportPath(string(p)); err != nil {
+			return failf("%s", err)
+		}
 		return failf("imports are unavailable because there is no cue.mod/module.cue file")
 	}
 	// Extract the package name.

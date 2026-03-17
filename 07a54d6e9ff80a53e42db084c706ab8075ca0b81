@@ -16,6 +16,24 @@
       "message": "```suggestion\n\t\t// Note that this exposes the default tabWidth value of 4.\n```\nor just \"exposes the default tabWidth value\".",
       "revId": "07a54d6e9ff80a53e42db084c706ab8075ca0b81",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05e04e8f_50b99620",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-17T12:33:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25ff15f3_402b4dd8",
+      "revId": "07a54d6e9ff80a53e42db084c706ab8075ca0b81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

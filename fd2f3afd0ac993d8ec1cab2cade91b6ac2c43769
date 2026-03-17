@@ -75,6 +75,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebf2d9e4_dc21b5c4",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd72154d_4c52560f",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 0
+      },
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45f6c7ab_dad99c9b",
@@ -88,6 +112,30 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "Similar suggestion about shorter names for narrowly-scoped variables.\nWith all those \"Validator\" names flying around, I struggled to match up decl to use.\n\n```suggestion\n\tif extm :\u003d w.extValidatorMgr; extm !\u003d nil {\n\t\tev :\u003d extm.EnsureExtValidator(f.uri, w.extValidatorOnDirtyChanged)\n\t\tfile.extValidator \u003d ev\n\t\tif ev !\u003d nil {\n\t\t\tev.MarkDirty()\n\t\t}\n\t}\n```",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 2
+      },
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43878604_cb223afe",
+        "filename": "internal/lsp/cache/standalone.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45f6c7ab_dad99c9b",
       "range": {
         "startLine": 213,
         "startChar": 0,
@@ -115,6 +163,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9e8339b_db08c489",
+        "filename": "internal/lsp/extvalidator/conn.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Discussed elsewhere. This package is nice, but for now let\u0027s avoid the added dep. Let\u0027s revisit as soon as we have multiple uses of backoff.",
+      "parentUuid": "dd55ad99_e3184591",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "28691c96_3d09c285",
@@ -132,6 +198,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23543344_eb0fddf1",
+        "filename": "internal/lsp/extvalidator/conn.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28691c96_3d09c285",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e20a51d_f1df52bd",
@@ -145,6 +229,24 @@
       "writtenOn": "2026-03-17T12:30:00Z",
       "side": 1,
       "message": "It\u0027s a bit of a shame that if we happen to request evaluation at an unlucky moment (for example when it\u0027s taking half a second to reconnect) that this won\u0027t wait for the connection to become available, just fail. Maybe add a TODO to improve that behaviour?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8423c20d_b56b000a",
+        "filename": "internal/lsp/extvalidator/conn.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "I had a simple queue implemented and removed on the basis that you can\u0027t make any guarantees about it getting to the server, being processed, and replies being received, even if it is sent.\n\nWhenever the connection is established (and was previously not established), the codelens will (re)appear, so the user shouldn\u0027t be at a loss.",
+      "parentUuid": "0e20a51d_f1df52bd",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -206,6 +308,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ec233c2_7ce8b6b1",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11fc2794_18a16ecb",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 12
+      },
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba657b26_b8fc1f20",
@@ -219,6 +345,24 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "`mu` is the conventional name here.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c57434a7_9c0b80b5",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba657b26_b8fc1f20",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -257,6 +401,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ced4196c_88cfeff1",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66fea4e6_46b7b09e",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d789b2e_e8256c75",
@@ -270,6 +432,24 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "Maybe add some TODO about the possibility of streaming or deltas rather than buffering the entire thing in memory each time?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebb1f247_4892d5ae",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d789b2e_e8256c75",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -291,6 +471,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27e8250b_09afa6e0",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3617b7d_000c3402",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1d3b0c1_16679d08",
@@ -304,6 +502,24 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "It seems a bit of a shame to be invoking the actual git command multiple times on each evaluation request. We could probably use a git Go library to avoid that.\n\nAlso, we could probably do with a TODO about this use of `origin`: it\u0027s by no means a universal convention that `origin` tracks the upstream repository, although I\u0027m guessing that\u0027s what is desired in this case... or is it? I\u0027m not totally sure. \u0027the url of the \"origin\" remote\u0027 doesn\u0027t really express intention in that respect and \"origin\" is just a vague convention, so it\u0027s not clear what the intention actually is here. We could potentially also look for an `upstream` remote (also a common convention).",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b798d13_982de479",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "As discussed this morning, yes, I agree. I was steered away from using go-git.\n\nTODO added.",
+      "parentUuid": "b1d3b0c1_16679d08",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -325,6 +541,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88963b97_49c21d56",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Removed. It was added because AI suggested it might be needed for compatibility reasons, and the stdlib zip.AddFS does create directories. In our case, We strictly need neither.",
+      "parentUuid": "234d2062_aa68ed03",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34c23974_3caa2f3c",
@@ -338,6 +572,30 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "```suggestion\n\tif v :\u003d s.workspace.CodeLensExternalValidate(ctx, params); v !\u003d nil {\n\t\treturn []protocol.CodeLens{*v}\n\t}\n\treturn nil\n```",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 0
+      },
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15ba3e94_5ce9cbb6",
+        "filename": "internal/lsp/server/codelens.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34c23974_3caa2f3c",
       "range": {
         "startLine": 24,
         "startChar": 0,
@@ -399,6 +657,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b1ecf39_46ed0cf3",
+        "filename": "unstable/lspaux/config/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84dfea83_b86e7128",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7c16975_9a3cfed5",
@@ -412,6 +688,24 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "Maybe we should validate against a closed schema for the profile to catch spelling errors? Even better, generate the Go type from the CUE.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8b5da13_0b51df5f",
+        "filename": "unstable/lspaux/config/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T14:24:37Z",
+      "side": 1,
+      "message": "I\u0027ve added a TODO.",
+      "parentUuid": "c7c16975_9a3cfed5",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

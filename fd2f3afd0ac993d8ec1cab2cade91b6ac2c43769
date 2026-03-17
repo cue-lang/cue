@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b8cff82_4f2eed77",
+        "filename": "internal/lsp/cache/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T15:25:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "019db8dd_aeec71ed",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "58e08489_5738eb66",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "This is less helpful with the less specific `any` type for `user`. Maybe a hint as to what kinds of things user might be?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d2f77d0_1d4189fb",
+        "filename": "internal/lsp/cache/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T15:25:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58e08489_5738eb66",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -268,6 +304,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1bb7341_a21538b8",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T15:25:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "75e8b468_ded98b86",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "60fcfe0a_bd2b2e0b",
@@ -281,6 +335,24 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "doc comments for exported entities please.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db681173_d1d74a8d",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T15:25:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60fcfe0a_bd2b2e0b",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -380,6 +452,24 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "doc comment please.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abc3e990_bd08d9cb",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T15:25:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1122f60d_4327fe6c",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -619,6 +709,24 @@
       "writtenOn": "2026-03-17T12:27:19Z",
       "side": 1,
       "message": "return an \"unexpected argument count\" error?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12c19b17_2ec8afce",
+        "filename": "internal/lsp/server/command.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-17T15:25:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0da839a0_aacdab39",
       "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

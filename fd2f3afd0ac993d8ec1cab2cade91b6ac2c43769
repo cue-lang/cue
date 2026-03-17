@@ -1,0 +1,402 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfc67f57_e9819fb6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "LGTM modulo a bunch of minor nits, thanks!",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "019db8dd_aeec71ed",
+        "filename": "internal/lsp/cache/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "doc comments on these exported methods?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58e08489_5738eb66",
+        "filename": "internal/lsp/cache/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "This is less helpful with the less specific `any` type for `user`. Maybe a hint as to what kinds of things user might be?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd72154d_4c52560f",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "Personally I think for such a narrowly scoped variable, a shorter name\nmakes it easier to see wood for trees:\n\n```suggestion\n\tif extm :\u003d w.extValidatorMgr; extm !\u003d nil {\n\t\tm.extValidator \u003d extm.EnsureExtValidator(m.rootURI, w.extValidatorOnDirtyChanged)\n\t}\n\n```",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 0
+      },
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45f6c7ab_dad99c9b",
+        "filename": "internal/lsp/cache/standalone.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "Similar suggestion about shorter names for narrowly-scoped variables.\nWith all those \"Validator\" names flying around, I struggled to match up decl to use.\n\n```suggestion\n\tif extm :\u003d w.extValidatorMgr; extm !\u003d nil {\n\t\tev :\u003d extm.EnsureExtValidator(f.uri, w.extValidatorOnDirtyChanged)\n\t\tfile.extValidator \u003d ev\n\t\tif ev !\u003d nil {\n\t\t\tev.MarkDirty()\n\t\t}\n\t}\n```",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 2
+      },
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd55ad99_e3184591",
+        "filename": "internal/lsp/extvalidator/conn.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "I\u0027m biased of course, but I quite like github.com/rogpeppe/retry as an API for retries, which not only keeps the retry strategy nicely separate from the actual code logic (and uses well tested logic for that), but also makes it trivial to stop immediately when the context is cancelled.\n\nIt might look something like this (untested):\n\n```\n\nvar connectStrategy \u003d retry.Strategy{\n\tDelay:    250 * time.Millisecond,\n\tMaxDelay: 15 * time.Second,\n}\n\n// connect repeatedly attempts to connect to the external\n// validator. Whenever the connection closes, or fails to connect, the\n// go-routine sleeps, following a randomised binary exponential\n// backoff schedule. The go-routine will only exit if the context\n// supplied to [connect] errors.\nfunc (c *conn) connect() {\n\tprofile :\u003d c.profile\n\tserverUrl :\u003d profile.ServerURL\n\tctx :\u003d c.ctx\n\n\titer :\u003d connectStrategy.Start()\n\tfor {\n\t\tvar dialOpts *websocket.DialOptions\n\n\t\tif profile.Token !\u003d \"\" {\n\t\t\tdialOpts \u003d \u0026websocket.DialOptions{\n\t\t\t\tHTTPHeader: http.Header{\n\t\t\t\t\t\"Authorization\": {\"Bearer \" + profile.Token},\n\t\t\t\t},\n\t\t\t}\n\t\t}\n\n\t\tconn, resp, err :\u003d websocket.Dial(ctx, serverUrl+wsPath, dialOpts)\n\t\tif err !\u003d nil {\n\t\t\tif resp \u003d\u003d nil {\n\t\t\t\tc.debugLogf(\"extValidator: error when dialing %s: %v\", serverUrl, err)\n\t\t\t} else {\n\t\t\t\tc.debugLogf(\"extValidator: error when dialing %s: %v, http status: %v\", serverUrl, err, resp.StatusCode)\n\t\t\t}\n\t\t\tif !iter.Next(ctx.Done()) {\n\t\t\t\t// This can only happen if the context is cancelled.\n\t\t\t\treturn\n\t\t\t}\n\t\t\tcontinue\n\t\t}\n\t\tc.debugLogf(\"extValidator: connected to %s\", serverUrl)\n\t\tc.lock.Lock()\n\t\tc.conn \u003d conn\n\t\tc.lock.Unlock()\n\n\t\tc.receive(conn)\n\n\t\tc.lock.Lock()\n\t\tc.conn \u003d nil\n\t\tc.lock.Unlock()\n\t\titer.Reset(\u0026connectStrategy, nil)\n\t}\n}\n```",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28691c96_3d09c285",
+        "filename": "internal/lsp/extvalidator/conn.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "It\u0027s a bit of a shame this makes yet another full copy of the entire zipped fs, especially as the websocket API does give us a writer for an individual message and the representation for `[]byte` is just those literal bytes.\nMaybe add a TODO?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75e8b468_ded98b86",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "It would be nice to have a package-level doc comment explaining a bit about the package.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60fcfe0a_bd2b2e0b",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "doc comments for exported entities please.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11fc2794_18a16ecb",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "return early if found?\n\n```suggestion\n\tif found {\n\t\treturn v\n\t}\n```",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 12
+      },
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba657b26_b8fc1f20",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "`mu` is the conventional name here.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1122f60d_4327fe6c",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "doc comment please.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66fea4e6_46b7b09e",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "nit: full sentences for doc comments. (I reckon it\u0027s actually worth being stricter about this these days, as our code ends up being an exemplar for Claude).\n\n\n```suggestion\n\t// EvalResult is called for each evaluation result received from the server. NB\n```",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d789b2e_e8256c75",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "Maybe add some TODO about the possibility of streaming or deltas rather than buffering the entire thing in memory each time?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3617b7d_000c3402",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "```suggestion\n\tv.evalRequestId++\n```",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1d3b0c1_16679d08",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "It seems a bit of a shame to be invoking the actual git command multiple times on each evaluation request. We could probably use a git Go library to avoid that.\n\nAlso, we could probably do with a TODO about this use of `origin`: it\u0027s by no means a universal convention that `origin` tracks the upstream repository, although I\u0027m guessing that\u0027s what is desired in this case... or is it? I\u0027m not totally sure. \u0027the url of the \"origin\" remote\u0027 doesn\u0027t really express intention in that respect and \"origin\" is just a vague convention, so it\u0027s not clear what the intention actually is here. We could potentially also look for an `upstream` remote (also a common convention).",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "234d2062_aa68ed03",
+        "filename": "internal/lsp/extvalidator/extvalidator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "Is this actually needed? I\u0027m fairly sure zips work fine without explicit directory entries.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34c23974_3caa2f3c",
+        "filename": "internal/lsp/server/codelens.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "```suggestion\n\tif v :\u003d s.workspace.CodeLensExternalValidate(ctx, params); v !\u003d nil {\n\t\treturn []protocol.CodeLens{*v}\n\t}\n\treturn nil\n```",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 0
+      },
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0da839a0_aacdab39",
+        "filename": "internal/lsp/server/command.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "return an \"unexpected argument count\" error?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "664d092f_cf3d99a8",
+        "filename": "unstable/lspaux/config/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "Be that as it may, it would still be nice to have some doc comments on this de-facto public API. I don\u0027t even know what a \"profile\" means in this context, for example.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84dfea83_b86e7128",
+        "filename": "unstable/lspaux/config/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "\"config\" is a very general name. Assuming this is about external validator config, maybe `validatorconfig` might be more explicit?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7c16975_9a3cfed5",
+        "filename": "unstable/lspaux/config/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:27:19Z",
+      "side": 1,
+      "message": "Maybe we should validate against a closed schema for the profile to catch spelling errors? Even better, generate the Go type from the CUE.",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

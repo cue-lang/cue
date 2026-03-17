@@ -100,15 +100,27 @@ multipleErrors: {
 		out: template.Execute("{{.x}} {{.y}}", params)
 	}
 }
+
+-- issue962.cue --
+import "encoding/yaml"
+
+issue962: {
+	foo: bar: "something"
+
+	text:  yaml.Marshal(_obj)
+
+	_what: string
+	_obj:  foo[_what]
+}
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  79
-Reused: 60
-Allocs: 19
+Freed:  85
+Reused: 65
+Allocs: 20
 Retain: 0
 
-Unifications: 75
-Conjuncts:    95
+Unifications: 81
+Conjuncts:    102
 Disjuncts:    4
 
 NumCloseIDs: 7
@@ -127,13 +139,13 @@ diff old new
 -Conjuncts:    255
 -Disjuncts:    150
 +Leaks:  0
-+Freed:  79
-+Reused: 60
-+Allocs: 19
++Freed:  85
++Reused: 65
++Allocs: 20
 +Retain: 0
 +
-+Unifications: 75
-+Conjuncts:    95
++Unifications: 81
++Conjuncts:    102
 +Disjuncts:    4
 +
 +NumCloseIDs: 7
@@ -337,6 +349,20 @@ Result:
       }
     }
   }
+  issue962: (struct){
+    foo: (struct){
+      bar: (string){ "something" }
+    }
+    text: (_|_){
+      // [incomplete] issue962._obj: invalid non-ground value string (must be concrete string):
+      //     ./issue962.cue:8:9
+    }
+    _what: (string){ string }
+    _obj: (_|_){
+      // [incomplete] issue962._obj: invalid non-ground value string (must be concrete string):
+      //     ./issue962.cue:8:9
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -383,6 +409,25 @@ diff old new
      }
    }
    badListType: (_|_){
+@@ -184,4 +187,18 @@
+       }
+     }
+   }
++  issue962: (struct){
++    foo: (struct){
++      bar: (string){ "something" }
++    }
++    text: (_|_){
++      // [incomplete] issue962._obj: invalid non-ground value string (must be concrete string):
++      //     ./issue962.cue:8:9
++    }
++    _what: (string){ string }
++    _obj: (_|_){
++      // [incomplete] issue962._obj: invalid non-ground value string (must be concrete string):
++      //     ./issue962.cue:8:9
++    }
++  }
+ }
 -- out/eval --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
@@ -668,5 +713,16 @@ Result:
       }
       out: 〈import;"text/template"〉.Execute("{{.x}} {{.y}}", 〈0;params〉)
     }
+  }
+}
+--- issue962.cue
+{
+  issue962: {
+    foo: {
+      bar: "something"
+    }
+    text: 〈import;"encoding/yaml"〉.Marshal(〈0;_obj〉)
+    _what: string
+    _obj: 〈0;foo〉[〈0;_what〉]
   }
 }

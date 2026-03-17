@@ -1,0 +1,47 @@
+# Regression test for https://cuelang.org/issue/1834.
+
+# output template file contents
+exec cue cmd templateInput
+cmp stdout stdout1.golden
+
+# output result of executing template
+exec cue cmd executedOutput
+cmp stdout stdout2.golden
+
+-- test_tool.cue --
+package main
+
+import (
+	"tool/cli"
+	"text/template"
+	"tool/file"
+)
+
+file_template: file.Read & {
+	filename: "go.tmpl"
+	contents: string
+}
+
+v: x: "FOO"
+
+cli_commands: template.Execute(file_template.contents, v)
+
+command: templateInput: {
+	print: cli.Print & {
+		text: file_template.contents
+	}
+}
+
+command: executedOutput: {
+	print: cli.Print & {
+		text: cli_commands
+	}
+}
+-- go.tmpl --
+VALUE: {{ .x }}
+-- stdout1.golden --
+VALUE: {{ .x }}
+
+-- stdout2.golden --
+VALUE: FOO
+

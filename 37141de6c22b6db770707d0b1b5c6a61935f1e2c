@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6236ab4f_f08cabe8",
+        "filename": "cue/format/node.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-17T18:07:41Z",
+      "side": 1,
+      "message": "hmm, I couldn\u0027t come up with a test case that broke without i%2\u003d\u003d0 and neither could claude. but I added it back just in case. FWIW that\u0027s why I removed it initially; claude had added it, I asked if it\u0027s necessary, and we couldn\u0027t come up with a counter-example.",
+      "parentUuid": "bd4a23f9_fa7fd431",
+      "revId": "37141de6c22b6db770707d0b1b5c6a61935f1e2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c0dc2594_a376a5bc",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9de50675_8d4c6004",
+        "filename": "cue/format/node.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 841,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-17T18:07:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0dc2594_a376a5bc",
+      "revId": "37141de6c22b6db770707d0b1b5c6a61935f1e2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05d03b0e_72335a76",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-03-17T17:00:07Z",
       "side": 1,
       "message": "Add a TODO for that 6 magic number?",
+      "revId": "37141de6c22b6db770707d0b1b5c6a61935f1e2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80ad21e4_597fd022",
+        "filename": "cue/format/node.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 842,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-17T18:07:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05d03b0e_72335a76",
       "revId": "37141de6c22b6db770707d0b1b5c6a61935f1e2c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

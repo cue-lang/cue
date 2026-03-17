@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25ff15f3_402b4dd8",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T11:15:05Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t// Note that this exposes the default tabWidth value of 4.\n```\nor just \"exposes the default tabWidth value\".",
+      "revId": "07a54d6e9ff80a53e42db084c706ab8075ca0b81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

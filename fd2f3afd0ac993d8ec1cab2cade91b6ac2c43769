@@ -134,6 +134,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0e20a51d_f1df52bd",
+        "filename": "internal/lsp/extvalidator/conn.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T12:30:00Z",
+      "side": 1,
+      "message": "It\u0027s a bit of a shame that if we happen to request evaluation at an unlucky moment (for example when it\u0027s taking half a second to reconnect) that this won\u0027t wait for the connection to become available, just fail. Maybe add a TODO to improve that behaviour?",
+      "revId": "fd2f3afd0ac993d8ec1cab2cade91b6ac2c43769",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "75e8b468_ded98b86",
         "filename": "internal/lsp/extvalidator/extvalidator.go",
         "patchSetId": 1

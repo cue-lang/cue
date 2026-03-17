@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44c30151_1f21f5d1",
+        "filename": "cue/format/printer.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T11:07:55Z",
+      "side": 1,
+      "message": "Fixing things up post-hoc seems a bit of a strange approach to me. ISTM that this is driven by the inadequate interface to literal.IndentTabs.\n\nIf I were to guess at a better approach, it would be to avoid invoking IndentTabs on the string literal parts of an interpolation, instead adding a bit more logic to the `ast.Interpolation` case inside `exprRaw`, doing the ParseQuotes there, and explicitly doing the string replace in each alternate basic lit (we know even-numbered elements must be string basic lits).\n\nThen we don\u0027t need to further clutter the state we maintain, which is hard to keep track of at the best of times.",
+      "revId": "ec70b309301c4a06f96e25ad9e788d6773f9f620",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

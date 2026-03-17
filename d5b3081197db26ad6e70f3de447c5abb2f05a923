@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3abd811d_35d68c4d",
+        "filename": "cue/format/node.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T18:10:08Z",
+      "side": 1,
+      "message": "or just inline, which is arguably clearer.",
+      "revId": "d5b3081197db26ad6e70f3de447c5abb2f05a923",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

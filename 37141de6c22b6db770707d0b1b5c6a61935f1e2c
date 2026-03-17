@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f223976_5cd2807d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T17:00:07Z",
+      "side": 1,
+      "message": "Not _quite_ there yet!",
+      "revId": "37141de6c22b6db770707d0b1b5c6a61935f1e2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd4a23f9_fa7fd431",
+        "filename": "cue/format/node.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T17:00:07Z",
+      "side": 1,
+      "message": "I don\u0027t think this is quite right. It can be a BasicLit without needing the search/replace treatment. (try running `cue-ast` on this, for example:\n\n```\n\"\"\"\nfoo\\(\"bar\")bar\n\"\"\"\n```\n)\n\nThe even indexes of x.Elts are the ones to work on.\nSomething like this, perhaps:\n```\nfor i, el :\u003d range x.Elts {\n    if search !\u003d \"\" \u0026\u0026 i%2 \u003d\u003d 0  {\n       // It\u0027s one of the literal parts of the interpolation.\n       f.print(lit.ValuePos, \u0026ast.BasicLit{ etc })\n    } else {\n       f.expr0(el, depth+1)\n    }\n}\n```\n\nIt would be nice to have a test case for something that fails with the\ncode as it is currently.",
+      "revId": "37141de6c22b6db770707d0b1b5c6a61935f1e2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0dc2594_a376a5bc",
+        "filename": "cue/format/node.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 841,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T17:00:07Z",
+      "side": 1,
+      "message": "I initially read this as \"interpreterReindent\" 😉\n\n\n```suggestion\nfunc (f *formatter) interpolationReindent(x *ast.Interpolation) (search, replace string) {\n```",
+      "revId": "37141de6c22b6db770707d0b1b5c6a61935f1e2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05d03b0e_72335a76",
+        "filename": "cue/format/node.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 842,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-17T17:00:07Z",
+      "side": 1,
+      "message": "Add a TODO for that 6 magic number?",
+      "revId": "37141de6c22b6db770707d0b1b5c6a61935f1e2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

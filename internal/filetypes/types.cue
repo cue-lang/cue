@@ -100,6 +100,7 @@ modes: input: {
 	extensions: ".yaml": interpretation: *"auto" | _
 	extensions: ".yml": interpretation:  *"auto" | _
 	extensions: ".toml": interpretation: *"auto" | _
+	extensions: ".ini": interpretation:  *"auto" | _
 	extensions: ".xml": interpretation:  *"auto" | _
 }
 
@@ -172,6 +173,7 @@ modes: [string]: {
 		".yaml":      tagInfo.yaml
 		".yml":       tagInfo.yaml
 		".toml":      tagInfo.toml
+		".ini":       tagInfo.ini
 		".xml":       tagInfo.xml
 		".txt":       tagInfo.text
 		".go":        tagInfo.go
@@ -218,6 +220,11 @@ modes: [string]: {
 	}
 
 	encodings: toml: {
+		forms.data
+		stream: false
+	}
+
+	encodings: ini: {
 		forms.data
 		stream: false
 	}
@@ -350,6 +357,7 @@ tagInfo: {
 	jsonl: encoding: "jsonl"
 	yaml: encoding:  "yaml"
 	toml: encoding:  "toml"
+	ini: encoding:   "ini"
 	xml: {
 		encoding: "xml"
 		boolTags: {

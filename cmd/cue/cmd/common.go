@@ -418,7 +418,7 @@ func (p *buildPlan) getDecoders(b *build.Instance) (schemas, values []*decoderIn
 		}
 		switch f.Encoding {
 		case build.Protobuf, build.YAML, build.TOML, build.XML, build.JSON, build.JSONL,
-			build.Text, build.Binary:
+			build.Text, build.Binary, build.INI:
 			if f.Interpretation == build.ProtobufJSON {
 				// Need a schema.
 				values = append(values, &decoderInfo{f, nil})

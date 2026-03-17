@@ -32,14 +32,18 @@ func IsPackage(s string) bool {
 
 	ip := ast.ParseImportPath(s)
 	if ip.ExplicitQualifier {
-		if !ast.IsValidIdent(ip.Qualifier) || strings.Contains(ip.Path, ":") || ip.Path == "-" {
-			// TODO potentially widen the scope of "file-like"
-			// paths here to include more invalid package paths?
+		if strings.Contains(ip.Path, ":") || ip.Path == "-" {
 			return false
 		}
-		// If it's got an explicit qualifier, the path has a colon in
-		// which isn't generally allowed in CUE file names.
-		return true
+		if ast.IsValidIdent(ip.Qualifier) {
+			// If it's got an explicit qualifier, the path has a colon
+			// which isn't generally allowed in CUE file names.
+			return true
+		}
+		// Even with an invalid qualifier (e.g. "pkg@v1" where the
+		// version was placed after the qualifier), a path with a slash
+		// indicates a package path, not a filetype scope like "json:".
+		return strings.Contains(ip.Path, "/")
 	}
 	if ip.Version != "" {
 		if strings.Contains(ip.Version, "/") {

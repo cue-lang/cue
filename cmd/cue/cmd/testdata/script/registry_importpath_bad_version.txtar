@@ -4,7 +4,6 @@ cd full-version
 cmp stderr ../expect-stderr-full-version
 
 # Test that the version must come before the package qualifier, not after.
-# TODO: this should give a clear error.
 cd ../qualifier-before
 ! exec cue export .
 cmp stderr ../expect-stderr-qualifier-before
@@ -15,7 +14,6 @@ cd ../full-version-qualifier
 cmp stderr ../expect-stderr-full-version-qualifier
 
 # Test that a version in the qualifier is not treated as a path version.
-# TODO: this should give a clear error.
 cd ../version-in-qualifier
 ! exec cue export .
 cmp stderr ../expect-stderr-version-in-qualifier
@@ -29,13 +27,13 @@ cmp stdout ../expect-stdout-qualifier-after
 test.org/full-version@v0: import failed: cannot find package "example.com/main@v0.0.2": malformed import path "example.com/main@v0.0.2": import paths can only contain a major version specifier:
     ./main.cue:2:8
 -- expect-stderr-qualifier-before --
-test.org/qualifier-before@v0: import failed: cannot find package "example.com/main": no files in package directory with package name "other@v0":
+test.org/qualifier-before@v0: import failed: cannot find package "example.com/main": malformed import path "example.com/main:other@v0": package qualifier must not contain a version; use path@version:qualifier syntax:
     ./main.cue:2:8
 -- expect-stderr-full-version-qualifier --
 test.org/full-version-qualifier@v0: import failed: cannot find package "example.com/main@v0.0.2": malformed import path "example.com/main@v0.0.2:other": import paths can only contain a major version specifier:
     ./main.cue:2:8
 -- expect-stderr-version-in-qualifier --
-test.org/version-in-qualifier@v0: import failed: cannot find package "example.com/main@v0": no files in package directory with package name "other@v1":
+test.org/version-in-qualifier@v0: import failed: cannot find package "example.com/main@v0": malformed import path "example.com/main@v0:other@v1": package qualifier must not contain a version; use path@version:qualifier syntax:
     ./main.cue:2:8
 -- expect-stdout-qualifier-after --
 {

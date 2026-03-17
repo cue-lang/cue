@@ -195,6 +195,13 @@ func CheckPath(mpath string) (err error) {
 // on Windows, regardless of case (CON, com1, NuL, and so on).
 func CheckImportPath(path string) error {
 	parts := ast.ParseImportPath(path)
+	if strings.Contains(parts.Qualifier, "@") {
+		return &InvalidPathError{
+			Kind: "import",
+			Path: path,
+			Err:  fmt.Errorf("package qualifier must not contain a version; use path@version:qualifier syntax"),
+		}
+	}
 	if semver.Major(parts.Version) != parts.Version {
 		return &InvalidPathError{
 			Kind: "import",

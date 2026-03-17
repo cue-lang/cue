@@ -29,9 +29,8 @@ stderr 'package foo.com/bar@v0: v0 is not a valid version to use as an argument;
 cmp stderr stderr4-golden
 
 # Check that the package qualifier must come after the version, not before.
-# TODO: this should give a clear error.
 ! exec cue export foo.com/bar:baz@v1.5.0
-stderr 'cannot combine scope with file'
+stderr 'package qualifier must not contain a version; use path@version:qualifier syntax'
 
 -- stdout1-golden --
 {

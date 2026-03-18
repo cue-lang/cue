@@ -1,0 +1,108 @@
+# Various edge cases for `cue def` where references across files
+# must still work in the self-contained result.
+# We also include cases where joining the file values without
+# lexical scopes can introduce duplicate names, such as aliases and lets.
+
+exec cue export .
+cmp stdout export.stdout
+
+exec cue def .
+cmp stdout def.stdout
+stdin stdout
+! exec cue export -
+cmp stderr stderr-bug.golden
+
+-- def.stdout --
+package p
+
+let L = true
+let L_1 = false
+{
+	crossfile_alias: "referenced from sibling file"
+	A="non ident":   true
+	if A {
+		alias1_used: true
+	}
+}
+{
+	A="another non ident": false
+	crossfile_alias_ref:   crossfile_alias
+	alias2_mark_used:      A
+}
+{
+	crossfile_let: "referenced from sibling file"
+	if L {
+		let1_used: true
+	}
+}
+{
+	crossfile_simple: true
+	if crossfile_simple {
+		simple1_used: true
+	}
+}
+crossfile_let_ref:    crossfile_let
+crossfile_simple_ref: crossfile_simple
+let2_mark_used:       L_1
+-- export.stdout --
+{
+    "another non ident": false,
+    "crossfile_alias": "referenced from sibling file",
+    "crossfile_alias_ref": "referenced from sibling file",
+    "alias2_mark_used": false,
+    "crossfile_let": "referenced from sibling file",
+    "crossfile_let_ref": "referenced from sibling file",
+    "crossfile_simple": true,
+    "crossfile_simple_ref": true,
+    "let1_used": true,
+    "let2_mark_used": false,
+    "non ident": true,
+    "alias1_used": true,
+    "simple1_used": true
+}
+-- stderr-bug.golden --
+crossfile_alias_ref: reference "crossfile_alias" not found:
+    -:14:25
+crossfile_let_ref: reference "crossfile_let" not found:
+    -:29:23
+crossfile_simple_ref: reference "crossfile_simple" not found:
+    -:30:23
+-- simple_1.cue --
+package p
+
+crossfile_simple: true
+if crossfile_simple {
+    simple1_used: true
+}
+-- simple_2.cue --
+package p
+
+crossfile_simple_ref: crossfile_simple
+-- alias_1.cue --
+package p
+
+crossfile_alias: "referenced from sibling file"
+A="non ident": true
+if A {
+    alias1_used: true
+}
+-- alias_2.cue --
+package p
+
+A="another non ident": false
+crossfile_alias_ref: crossfile_alias
+alias2_mark_used: A
+-- let_1.cue --
+package p
+
+crossfile_let: "referenced from sibling file"
+let L = true
+if L {
+    let1_used: true
+}
+-- let_2.cue --
+package p
+
+crossfile_let_ref: crossfile_let
+let L = false
+let2_mark_used: L

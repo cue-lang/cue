@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23aac792_623345b7",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-18T22:05:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8bc4cd39_4911ba78",
+      "revId": "4a308b5981809ccd5eb983bb385a4ebdcef65045",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2cdaf135_4bab1503",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "26a5bd05_06067c84",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-18T22:05:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2cdaf135_4bab1503",
+      "revId": "4a308b5981809ccd5eb983bb385a4ebdcef65045",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40b11ca0_fc648028",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-02-24T11:11:49Z",
       "side": 1,
       "message": "we can probably remove this TODO now, as we no longer fail",
+      "revId": "4a308b5981809ccd5eb983bb385a4ebdcef65045",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29850e39_86eab45b",
+        "filename": "cmd/cue/cmd/testdata/script/issue289.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-18T22:05:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40b11ca0_fc648028",
       "revId": "4a308b5981809ccd5eb983bb385a4ebdcef65045",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

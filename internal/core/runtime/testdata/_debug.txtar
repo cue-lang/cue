@@ -5,7 +5,7 @@
 
 package foo
 
-Foo: _ @extern(file1.xx, abi=c, sig="func(int)int")
+Foo: _ @test(file1.xx, abi=c, sig="func(int)int")
 
 -- out/extern --
 {

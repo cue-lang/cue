@@ -1,0 +1,24 @@
+-- cue.mod/modules.cue --
+-- file1.cue --
+@extern("test")
+
+package foo
+
+Fn1: {
+	@test("file1.xx")
+}
+
+-- file2.cue --
+@extern("test")
+
+package foo
+
+Fn2: {
+	@test("file2.xx")
+}
+
+-- out/extern --
+{
+	Fn1: impl1
+	Fn2: impl2
+}

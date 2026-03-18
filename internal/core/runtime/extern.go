@@ -83,54 +83,56 @@ func (r *Runtime) InjectImplementations(b *build.Instance, v *adt.Vertex) (errs 
 
 // externDecorator locates extern attributes and calls the relevant interpreters
 // to inject builtins.
-//
-// This is a two-pass algorithm: in the first pass, all ast.Files are processed
-// to build an index from *ast.Fields to attributes. In the second phase, the
-// corresponding adt.Fields are located in the ADT and decorated with the
-// builtins.
 type externDecorator struct {
 	runtime *Runtime
 	pkg     *build.Instance
 
 	compilers map[string]Compiler
-	fields    map[*ast.Field]fieldInfo
+
+	// fileKinds maps each AST file to the set of extern kinds declared in it.
+	fileKinds map[*token.File]map[string]bool
 
 	errs errors.Error
-}
-
-type fieldInfo struct {
-	extern   string
-	funcName string
-	attrBody string
-	attr     *ast.Attribute
 }
 
 // addFile finds injection points in the given ast.File for external
 // implementations of Builtins.
 func (d *externDecorator) addFile(f *ast.File) (errs errors.Error) {
-	kind, pos, decls, err := findExternFileAttr(f)
-	if len(decls) == 0 {
+	kinds, _, err := findExternFileAttrs(f)
+	if err != nil {
 		return err
 	}
-
-	ok, err := d.initCompiler(kind, pos)
-	if !ok {
-		return err
+	if len(kinds) == 0 {
+		return nil
 	}
 
-	return d.markExternFieldAttr(kind, decls)
+	if d.fileKinds == nil {
+		d.fileKinds = map[*token.File]map[string]bool{}
+	}
+	km := make(map[string]bool)
+	for kind := range kinds {
+		km[kind] = true
+	}
+	d.fileKinds[f.Pos().File()] = km
+
+	for kind, pos := range kinds {
+		if err := d.initCompiler(kind, pos); err != nil {
+			errs = errors.Append(errs, err)
+		}
+	}
+	return errs
 }
 
-// findExternFileAttr reports the extern kind of a file-level @extern(kind)
-// attribute in f, the position of the corresponding attribute, and f's
-// declarations from the package directive onwards. It's an error if more than
-// one @extern attribute is found. decls == nil signals that this file should be
-// skipped.
-func findExternFileAttr(f *ast.File) (kind string, pos token.Pos, decls []ast.Decl, err errors.Error) {
+// findExternFileAttrs reports all extern kinds from file-level @extern(kind)
+// attributes in f, the position of each corresponding attribute, and f's
+// declarations from the package directive onwards. It's an error if duplicate
+// @extern attributes for the same kind are found. decls == nil signals that
+// this file should be skipped.
+func findExternFileAttrs(f *ast.File) (kinds map[string]token.Pos, decls []ast.Decl, err errors.Error) {
 	var (
-		hasPkg   bool
-		p        int
-		fileAttr *ast.Attribute
+		hasPkg    bool
+		p         int
+		fileAttrs []*ast.Attribute
 	)
 
 loop:
@@ -141,47 +143,55 @@ loop:
 			break loop
 
 		case *ast.Attribute:
-			pos = a.Pos()
+			pos := a.Pos()
 			key, body := a.Split()
 			if key != "extern" {
 				continue
 			}
-			fileAttr = a
+			fileAttrs = append(fileAttrs, a)
 
 			attr := internal.ParseAttrBody(pos, body)
 			if attr.Err != nil {
-				return "", pos, nil, attr.Err
+				err = errors.Append(err, attr.Err)
+				continue
 			}
-			k, err := attr.String(0)
-			if err != nil {
+			k, e := attr.String(0)
+			if e != nil {
 				// Unreachable.
-				return "", pos, nil, errors.Newf(pos, "%s", err)
+				err = errors.Append(err, errors.Newf(pos, "%s", e))
+				continue
 			}
 
 			if k == "" {
-				return "", pos, nil, errors.Newf(pos,
-					"interpreter name must be non-empty")
+				err = errors.Append(err, errors.Newf(pos,
+					"interpreter name must be non-empty"))
+				continue
 			}
 
-			if kind != "" {
-				return "", pos, nil, errors.Newf(pos,
-					"only one file-level extern attribute allowed per file")
-
+			if kinds == nil {
+				kinds = map[string]token.Pos{}
 			}
-			kind = k
+			if _, ok := kinds[k]; ok {
+				err = errors.Append(err, errors.Newf(pos,
+					"duplicate @extern attribute for kind %q", k))
+				continue
+			}
+			kinds[k] = pos
 		}
 	}
 
 	switch {
-	case fileAttr == nil && !hasPkg:
-		// Nothing to see here.
-		return "", pos, nil, nil
+	case len(fileAttrs) == 0 && !hasPkg:
+		return nil, nil, err
 
-	case fileAttr != nil && !hasPkg:
-		return "", pos, nil, errors.Newf(fileAttr.Pos(),
-			"extern attribute without package clause")
+	case len(fileAttrs) > 0 && !hasPkg:
+		for _, a := range fileAttrs {
+			err = errors.Append(err, errors.Newf(a.Pos(),
+				"extern attribute without package clause"))
+		}
+		return nil, nil, err
 
-	case fileAttr == nil && hasPkg:
+	case len(fileAttrs) == 0 && hasPkg:
 		// Check that there are no top-level extern attributes.
 		for p++; p < len(f.Decls); p++ {
 			x, ok := f.Decls[p].(*ast.Attribute)
@@ -193,115 +203,51 @@ loop:
 					"extern attribute must appear before package clause"))
 			}
 		}
-		return "", pos, nil, err
+		return nil, nil, err
 	}
 
-	return kind, pos, f.Decls[p:], nil
+	return kinds, f.Decls[p:], err
 }
 
 // initCompiler initializes the runtime for kind, if applicable. The pos
 // argument represents the position of the file-level @extern attribute.
-func (d *externDecorator) initCompiler(kind string, pos token.Pos) (ok bool, err errors.Error) {
-	if c, ok := d.compilers[kind]; ok {
-		return c != nil, nil
+func (d *externDecorator) initCompiler(kind string, pos token.Pos) errors.Error {
+	if _, ok := d.compilers[kind]; ok {
+		return nil
 	}
-
 	// initialize the compiler.
 	if d.compilers == nil {
 		d.compilers = map[string]Compiler{}
-		d.fields = map[*ast.Field]fieldInfo{}
 	}
-
 	x := d.runtime.interpreters[kind]
 	if x == nil {
-		return false, errors.Newf(pos, "no interpreter defined for %q", kind)
+		return errors.Newf(pos, "no interpreter defined for %q", kind)
 	}
-
 	c, err := x.NewCompiler(d.pkg, d.runtime)
 	if err != nil {
-		return false, err
+		return err
 	}
-
 	d.compilers[kind] = c
-
-	return c != nil, nil
-}
-
-// markExternFieldAttr collects all *ast.Fields with extern attributes into
-// d.fields. Both of the following forms are allowed:
-//
-//	a: _ @extern(...)
-//	a: { _, @extern(...) }
-//
-// consistent with attribute implementation recommendations.
-func (d *externDecorator) markExternFieldAttr(kind string, decls []ast.Decl) (errs errors.Error) {
-	var fieldStack []*ast.Field
-
-	ast.Walk(&ast.File{Decls: decls}, func(n ast.Node) bool {
-		switch x := n.(type) {
-		case *ast.Field:
-			fieldStack = append(fieldStack, x)
-
-		case *ast.Attribute:
-			key, body := x.Split()
-			// Support old-style and new-style extern attributes.
-			if key != "extern" && key != kind {
-				break
-			}
-
-			lastField := len(fieldStack) - 1
-			if lastField < 0 {
-				errs = errors.Append(errs, errors.Newf(x.Pos(),
-					"@%s attribute not associated with field", kind))
-				return true
-			}
-
-			f := fieldStack[lastField]
-
-			if _, ok := d.fields[f]; ok {
-				errs = errors.Append(errs, errors.Newf(x.Pos(),
-					"duplicate @%s attributes", kind))
-				return true
-			}
-
-			name, _, err := ast.LabelName(f.Label)
-			if err != nil {
-				b, _ := format.Node(f.Label)
-				errs = errors.Append(errs, errors.Newf(x.Pos(), "external attribute has non-concrete label %s", b))
-				return true
-			}
-
-			d.fields[f] = fieldInfo{
-				extern:   kind,
-				funcName: name,
-				attrBody: body,
-				attr:     x,
-			}
-		}
-
-		return true
-
-	}, func(n ast.Node) {
-		switch n.(type) {
-		case *ast.Field:
-			fieldStack = fieldStack[:len(fieldStack)-1]
-		}
-	})
-
-	return errs
+	return nil
 }
 
 // ExtractFieldAttrsByKind finds all the attributes of the given kind
 // in the given AST, parsing their bodies into [internal.Attr].
+// TODO this API does not fit the way that extern attributes can now
+// be used; in particular, there is no longer necessarily a field associated
+// with every extern attribute.
 func ExtractFieldAttrsByKind(file *ast.File, kind string) (attrsByField map[*ast.Field]*internal.Attr, errs errors.Error) {
-	k, _, decs, err := findExternFileAttr(file)
-	if err != nil || len(decs) == 0 || k != kind {
+	kinds, decls, err := findExternFileAttrs(file)
+	if err != nil || len(decls) == 0 {
 		return nil, err
+	}
+	if _, ok := kinds[kind]; !ok {
+		return nil, nil
 	}
 
 	var fieldStack []*ast.Field
 
-	ast.Walk(&ast.File{Decls: decs}, func(n ast.Node) bool {
+	ast.Walk(&ast.File{Decls: decls}, func(n ast.Node) bool {
 		switch n := n.(type) {
 		case *ast.Field:
 			fieldStack = append(fieldStack, n)
@@ -357,54 +303,96 @@ func ExtractFieldAttrsByKind(file *ast.File, kind string) (attrsByField map[*ast
 }
 
 func (d *externDecorator) decorateConjunct(e adt.Elem, scope *adt.Vertex) {
-	w := walk.Visitor{Before: func(n adt.Node) bool {
-		return d.processADTNode(n, scope)
-	}}
+	w := walk.Visitor{
+		Before: func(n adt.Node) bool {
+			if s, ok := n.(*adt.StructLit); ok {
+				// Only walk the tree for struct literals that
+				// are from a file with some extern declarations.
+				return s.Src != nil && len(d.fileKinds[s.Src.Pos().File()]) > 0
+			}
+			return true
+		},
+		After: func(n adt.Node) {
+			d.processNode(n, scope)
+		},
+	}
 	w.Elem(e)
 }
 
-// processADTNode injects a builtin conjunct into n if n is an adt.Field and
-// has a marked ast.Field associated with it.
-func (d *externDecorator) processADTNode(n adt.Node, scope *adt.Vertex) bool {
-	f, ok := n.(*adt.Field)
+// processNode processes a single adt Node; if it's a struct literal,
+// it decorates both embedded and field-level attributes.
+func (d *externDecorator) processNode(n adt.Node, scope *adt.Vertex) {
+	s, ok := n.(*adt.StructLit)
 	if !ok {
-		return true
+		return
+	}
+	kinds := d.fileKinds[s.Src.Pos().File()]
+	// Process attributes on fields.
+	for _, decl := range s.Decls {
+		var valuePtr *adt.Expr
+		switch decl := decl.(type) {
+		case *adt.Field:
+			valuePtr = &decl.Value
+		case *adt.BulkOptionalField:
+			valuePtr = &decl.Value
+		case *adt.DynamicField:
+			valuePtr = &decl.Value
+		default:
+			continue
+		}
+		srcField := decl.Source().(*ast.Field) // We know all the above types come from ast.Field.
+		name, _, _ := ast.LabelName(srcField.Label)
+		for _, attr := range srcField.Attrs {
+			if expr := d.externValue(attr, name, kinds, scope); expr != nil {
+				*valuePtr = &adt.BinaryExpr{
+					Op: adt.AndOp,
+					X:  *valuePtr,
+					Y:  expr,
+				}
+			}
+		}
 	}
 
-	info, ok := d.fields[f.Src]
-	if !ok {
-		return true
+	// Process embedded attributes.
+	var srcDecls []ast.Decl
+	switch src := s.Src.(type) {
+	case *ast.File:
+		srcDecls = src.Decls
+	case *ast.StructLit:
+		srcDecls = src.Elts
+	default:
+		panic("unexpected type in adt.StructLit.Src")
 	}
+	for _, decl := range srcDecls {
+		if attr, ok := decl.(*ast.Attribute); ok {
+			if expr := d.externValue(attr, "", kinds, scope); expr != nil {
+				s.Decls = append(s.Decls, expr)
+			}
+		}
+	}
+}
 
-	c, ok := d.compilers[info.extern]
-	if !ok {
-		// An error for a missing runtime was already reported earlier,
-		// if applicable.
-		return true
+func (d *externDecorator) externValue(attr *ast.Attribute, name string, kinds map[string]bool, scope *adt.Vertex) adt.Expr {
+	kind, body := attr.Split()
+	if !kinds[kind] {
+		return nil
 	}
-
-	attr := internal.ParseAttrBody(info.attr.Pos(), info.attrBody)
-	if attr.Err != nil {
-		d.errs = errors.Append(d.errs, attr.Err)
-		return true
+	parsed := internal.ParseAttrBody(attr.Pos(), body)
+	if parsed.Err != nil {
+		d.errs = errors.Append(d.errs, parsed.Err)
+		return nil
 	}
-	name := info.funcName
-	if str, ok, _ := attr.Lookup(1, "name"); ok {
-		name = str
+	c := d.compilers[kind]
+	if c == nil {
+		return nil
 	}
-
-	b, err := c.Compile(name, scope, &attr)
+	if a, ok, _ := parsed.Lookup(1, "name"); ok {
+		name = a
+	}
+	b, err := c.Compile(name, scope, &parsed)
 	if err != nil {
-		err = errors.Wrap(errors.Newf(info.attr.Pos(), "@%s", info.extern), err)
-		d.errs = errors.Append(d.errs, err)
-		return true
+		d.errs = errors.Append(d.errs, errors.Wrap(errors.Newf(attr.Pos(), "@%s", kind), err))
+		return nil
 	}
-
-	f.Value = &adt.BinaryExpr{
-		Op: adt.AndOp,
-		X:  f.Value,
-		Y:  b,
-	}
-
-	return true
+	return b
 }

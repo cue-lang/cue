@@ -87,25 +87,17 @@ package foo
 Foo: _ @test(file1.xx, abi=c, sig="func(int)int")
 
 -- out/extern --
-only one file-level extern attribute allowed per file:
+duplicate @extern attribute for kind "test":
     ./double_extern_a.cue:2:1
-only one file-level extern attribute allowed per file:
+duplicate @extern attribute for kind "test":
     ./double_extern_b.cue:2:1
-duplicate @test attributes:
-    ./duplicate.cue:6:43
-duplicate @test attributes:
-    ./duplicate.cue:11:3
+duplicate @extern attribute for kind "test":
+    ./double_extern_b.cue:3:1
 interpreter name must be non-empty:
     ./empty_extern.cue:1:1
 no interpreter defined for "\"test\" foo":
     ./invalid_file_attr.cue:1:1
 extern attribute must appear before package clause:
     ./late_extern.cue:3:1
-external attribute has non-concrete label ("something"):
-    ./non_ident.cue:6:18
-external attribute has non-concrete label [string]:
-    ./non_ident.cue:8:13
-@test attribute not associated with field:
-    ./package_attr.cue:5:1
 no interpreter defined for "wazem":
     ./unknown_interpreter.cue:1:1

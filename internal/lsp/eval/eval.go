@@ -763,8 +763,8 @@ nextFrame:
 		fieldDecl, ok := fr.node.(*fieldDeclExpr)
 		inFieldDecl := ok && token.WithinInclusive(offset, fieldDecl.start, fieldDecl.end)
 		if inFieldDecl {
-			// Only make suggestions if we're really within the field key ident.
-			if keyIdent := fieldDecl.keyIdent; keyIdent != nil {
+			// Only make suggestions if we're really within the field keyIdent ident.
+			if keyIdent, ok := fieldDecl.key.(*ast.Ident); ok {
 				start := keyIdent.Pos()
 				end := keyIdent.End()
 				if token.WithinInclusive(offset, start, end) {
@@ -1988,13 +1988,11 @@ func (f *frame) eval() {
 			embeddedResolvable = append(embeddedResolvable, node.(ast.Expr))
 
 		case *fieldDeclExpr:
-			aliasIdent := node.aliasIdent
-			key := node.key
-			if key != nil && !strings.HasPrefix(node.keyName, "__") && aliasIdent != key {
+			if key := node.key; key != nil && !strings.HasPrefix(node.keyName, "__") {
 				f.newPathFromAncestralNames(key, node.keyName)
 			}
-			if aliasIdent != nil {
-				f.newPathFromAncestralNames(aliasIdent, aliasIdent.Name)
+			if valueAlias := node.valueAliasIdent; valueAlias != nil {
+				f.newPathFromAncestralNames(valueAlias, valueAlias.Name)
 			}
 			unprocessed = append(unprocessed, node.exprs...)
 
@@ -2093,59 +2091,51 @@ func (f *frame) eval() {
 				childNav = f.navigable.ensureNavigable(keyName)
 			}
 
-			var childFr *frame
+			valueAlias := fieldDecl.valueAliasIdent
+			keyAlias := fieldDecl.keyAliasIdent
 
-			aliasIdent := fieldDecl.aliasIdent
-			if aliasIdent == nil {
-				childFr = f.newFrame(node.Value, childNav, false)
-
-			} else if fieldDecl.aliasInParentScope {
-				childFr = f.newFrame(node.Value, childNav, false)
-				f.appendBinding(aliasIdent.Name, childFr)
-
-			} else {
-				wrapper := f.newFrame(nil, nil, false)
-				wrapper.addRange(node)
-				wrapper.navigable.ensureResolvesTo([]*navigable{f.navigable})
-				childFr = wrapper.newFrame(node.Value, childNav, false)
-
-				if expr := fieldDecl.aliasValue; expr != nil {
-					wrapper.newBinding(aliasIdent, expr)
-					// newBinding will have made a frame with a fresh
-					// fieldDeclExpr in it for aliasIdent, so we should
-					// nil it out in fieldDecl so that our frame for
-					// fieldDecl (below) doesn't also find the alias.
-					fieldDecl.aliasIdent = nil
-				} else {
-					wrapper.appendBinding(aliasIdent.Name, childFr)
-				}
+			parentFr := f
+			if fieldDecl.patternField && (valueAlias != nil || keyAlias != nil) {
+				parentFr = f.newFrame(nil, nil, false)
+				parentFr.addRange(node)
+				parentFr.navigable.ensureResolvesTo([]*navigable{f.navigable})
 			}
 
-			childFr.key = fieldDecl.key
+			childFr := parentFr.newFrame(node.Value, childNav, false)
+			if valueAlias != nil {
+				childFr.key = valueAlias
+				childFr.parent.appendBinding(valueAlias.Name, childFr)
+			}
+
 			childFr.docsNode = node
 			fieldDecl.valueFrame = childFr
 
+			if keyAlias != nil {
+				parentFr.newBinding(keyAlias, fieldDecl.keyExpr)
+			}
+			if fieldDecl.key != nil {
+				childFr.key = fieldDecl.key
+			}
 			if keyName != "" {
 				f.appendBinding(keyName, childFr)
 			}
-
 			if node.TokenPos.IsValid() {
 				childFr.start = node.TokenPos.Add(1)
 			}
 
-			if (fieldDecl.key != nil && !strings.HasPrefix(keyName, "__")) || len(fieldDecl.exprs) > 0 {
-				// The reason for guarding against __ here (which is
-				// possibly surprising given we also detect it in the
-				// fieldDeclExpr case above) is because the new frame will
-				// become authoritative for the offsets in fieldDecl,
-				// which would clobber the real value given that __ tends
-				// to mean no real key exists.
-				//
-				// We rely on the invariant that if the key *does* start
-				// with __ then we've created it and in these cases the
-				// field label is a simple ident with no aliases and no
-				// expressions in the field label. Therefore,
-				// len(fieldDecl.exprs) > 0 implies !strings.HasPrefix(keyName, "__")
+			// The reason for guarding against __ here (which is possibly
+			// surprising given we also detect it in the fieldDeclExpr
+			// case above) is because the new frame will become
+			// authoritative for the offsets in fieldDecl, which would
+			// clobber the real value given that __ tends to mean no real
+			// key exists.
+			//
+			// We rely on the invariant that if the key *does* start with
+			// __ then we've created it and in these cases the field
+			// label is a simple ident with no aliases and no expressions
+			// in the field label. Therefore, len(fieldDecl.exprs) > 0
+			// implies !strings.HasPrefix(keyName, "__")
+			if !strings.HasPrefix(keyName, "__") {
 				childFr.parent.newFrame(fieldDecl, nil, false)
 			}
 
@@ -2231,109 +2221,73 @@ func (f *frame) eval() {
 // fieldNames analysis the field's label, returning a populated
 // [fieldDeclExpr].
 func fieldNames(field *ast.Field) *fieldDeclExpr {
-	// NB it is known that this doesn't cope well yet with fields which
-	// contain multiple aliases. Apparently this is legal:
-	//
-	//	s: x=[y=string]: {name: y, nextage: x.age+1}
-	//	out: s
-	//	out: john: {age: 13}
-	//
-	// TODO: rework this code to cope with multiple aliases per field
+	var result fieldDeclExpr
 
 	label := field.Label
 
-	var unprocessed []ast.Node
-	var aliasIdent *ast.Ident
-	aliasInParentScope := false
 	alias, isAlias := label.(*ast.Alias)
 	if isAlias {
-		aliasIdent = alias.Ident
-		aliasInParentScope = true
-		unprocessed = append(unprocessed, alias.Expr)
-
-		switch expr := alias.Expr.(type) {
-		case *ast.ListLit:
-			// X=[e]: field
-			// X is only visible within field
-			aliasInParentScope = false
-
-		case ast.Label:
+		result.valueAliasIdent = alias.Ident
+		if expr, ok := alias.Expr.(ast.Label); ok {
 			// X=ident: field
 			// X="basic": field
 			// X="\(e)": field
 			// X=(e): field
-			// X is visible within s
+			// X=[e]: field
 			label = expr
-			unprocessed = nil
+		} else {
+			result.exprs = append(result.exprs, alias.Expr)
 		}
 	}
 
-	var key ast.Node
-	var keyIdent *ast.Ident
-	keyName := ""
-	var aliasValue ast.Expr
 	switch label := label.(type) {
 	case *ast.Ident:
-		key = label
-		keyName = label.Name
-		keyIdent = label
+		result.key = label
+		result.keyName = label.Name
 
 	case *ast.BasicLit:
 		name, _, err := ast.LabelName(label)
 		if err == nil {
-			key = label
-			keyName = name
+			result.key = label
+			result.keyName = name
 		}
 
 	case *ast.Interpolation:
-		unprocessed = append(unprocessed, label)
+		result.exprs = append(result.exprs, label)
 
 	case *ast.ParenExpr:
 		if alias, ok := label.X.(*ast.Alias); ok {
 			// (X=e): field
-			// X is only visible within field.
 			// Although the spec supports this, the parser doesn't seem to.
-			aliasIdent = alias.Ident
-			aliasValue = alias.Expr
+			result.keyAliasIdent = alias.Ident
+			result.keyExpr = alias.Expr
 		} else {
-			unprocessed = append(unprocessed, label.X)
+			result.exprs = append(result.exprs, label.X)
 		}
 
 	case *ast.ListLit:
-		for _, elt := range label.Elts {
-			if alias, ok := elt.(*ast.Alias); ok {
-				// [X=e]: field
-				// X is only visible within field.
-				aliasIdent = alias.Ident
-				aliasValue = alias.Expr
-			} else {
-				unprocessed = append(unprocessed, elt)
-			}
+		result.patternField = true
+		elt := label.Elts[0]
+		if alias, ok := elt.(*ast.Alias); ok {
+			// [X=e]: field
+			// X is only visible within field.
+			result.keyAliasIdent = alias.Ident
+			result.keyExpr = alias.Expr
+		} else {
+			result.exprs = append(result.exprs, elt)
 		}
 	}
 
-	if key == nil && aliasIdent != nil {
-		key = aliasIdent
-	}
-
 	start, end := field.Label.Pos(), field.Label.End()
-	if strings.HasPrefix(keyName, "__") {
+	if strings.HasPrefix(result.keyName, "__") {
 		end = start
 	} else if field.TokenPos.IsValid() {
 		end = field.TokenPos
 	}
+	result.start = start
+	result.end = end
 
-	return &fieldDeclExpr{
-		keyName:            keyName,
-		key:                key,
-		keyIdent:           keyIdent,
-		aliasIdent:         aliasIdent,
-		aliasInParentScope: aliasInParentScope,
-		aliasValue:         aliasValue,
-		exprs:              unprocessed,
-		start:              start,
-		end:                end,
-	}
+	return &result
 }
 
 // newBinding creates and returns a new [frame], and stores it under
@@ -2345,7 +2299,6 @@ func (f *frame) newBinding(key *ast.Ident, unprocessed ast.Node) *frame {
 	if !strings.HasPrefix(name, "__") {
 		expr := &fieldDeclExpr{
 			key:        key,
-			keyIdent:   key,
 			keyName:    name,
 			start:      key.Pos(),
 			end:        key.End(),
@@ -2669,35 +2622,34 @@ func (n *frame) docComments() []*ast.CommentGroup {
 type fieldDeclExpr struct {
 	// Always nil: make the struct implement [ast.Node]
 	ast.Node
+
 	// keyName is the main name of the field, whether that's from an
 	// Ident or a BasicLit. It is not the name of any alias: if there
 	// is an alias but no main name, then keyName will be blank
 	// (e.g. X="\(y)")
 	keyName string
-	// keyIdent is the main Ident of the field if it exists.
-	keyIdent *ast.Ident
-	// key is either the main key of the field (whether it's an Ident
-	// or a BasicLit), or if neither of those exists, then it's the
-	// alias Ident.
-	key ast.Node
-	// aliasIdent is the alias Ident of the field if it exists.
-	aliasIdent *ast.Ident
-	// aliasInParentScope tracks whether the alias is visible to the
-	// rest of the parent scope or just the field value's scope. Most
-	// aliases are visible in the parent scope, but some are not,
-	// e.g. [x=e]: y
-	aliasInParentScope bool
-	// aliasValue contains the expression associated with the
-	// alias. For (x=e]: y and [x=e]: y aliases, the alias x should
+	// key is the main key of the field if it's an Ident or a BasicLit
+	key ast.Label
+	// keyAliasIdent is the alias that refers to the field's key's name
+	keyAliasIdent *ast.Ident
+	// valueAliasIdent is the alias that refers to the field's value
+	valueAliasIdent *ast.Ident
+	// patternField indicates that we have a field definition which is
+	// a pattern. This limits visibility of all aliases to the field's
+	// value scope.
+	patternField bool
+	// keyExpr contains the expression associated with the
+	// key. For (x=e]: y and [x=e]: y aliases, the alias x should
 	// resolve to the expression e, and not the field value y.
-	aliasValue ast.Expr
+	keyExpr ast.Expr
+	// exprs contains expressions from within the field declaration
+	// that need to be evaluated. E.g. "\(w)-\(x.y)": _
+	// Note this is always disjoint from keyExpr.
+	exprs []ast.Node
+
 	// start and end track the bounds of the fieldDeclExpr.
 	start token.Pos
 	end   token.Pos
-	// exprs contains expressions from within the field declaration
-	// that need to be evaluated. E.g. "\(w)-\(x.y)": _
-	// Note this is always disjoint from aliasValue.
-	exprs []ast.Node
 	// valueFrame links the fieldDeclExpr to the frame in which the
 	// value of this field is evaluated.
 	valueFrame *frame

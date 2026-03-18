@@ -2016,7 +2016,7 @@ c: l.b`,
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
 				or(3, 5):   {e: []string{"l"}},
-				or(6, 8):   {f: []string{"b", "c", "d"}, e: []string{"l"}},
+				or1(7):     {f: []string{"b", "c", "d"}, e: []string{"l"}},
 				or(8, 10):  {f: []string{"b", "c", "d"}},
 				or1(10):    {e: []string{"b", "c", "d", "l"}},
 				or1(12):    {e: []string{"b", "c", "d", "l"}},
@@ -2080,6 +2080,39 @@ c: l`,
 				or1(11):    {e: []string{"b", "c", "l"}},
 				or(12, 14): {f: []string{"c"}},
 				or(14, 17): {e: []string{"c"}},
+			},
+		},
+
+		{
+			name: "Alias_Pattern_Key_Value",
+			archive: `-- a.cue --
+v=[k=string]: {a: _, b: v.a, c: k.a}
+`,
+			expectDefinitions: map[position][]position{
+				ln(1, 2, "v"): {ln(1, 1, "v")},
+				ln(1, 2, "a"): {ln(1, 1, "a")},
+				ln(1, 2, "k"): {ln(1, 1, "k")},
+				ln(1, 3, "a"): {}, // Explicitly assert the k.a doesn't resolve to anything
+
+				ln(1, 1, "v"): {self},
+				ln(1, 1, "k"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(1):     {e: []string{"k", "v"}},
+				or(5, 12):  {e: []string{"k", "v"}},
+				or(13, 15): {f: []string{"a", "b", "c"}, e: []string{"k", "v"}},
+				or(15, 17): {f: []string{"a", "b", "c"}},
+				or(17, 20): {e: []string{"a", "b", "c", "k", "v"}},
+				or1(20):    {f: []string{"a", "b", "c"}, e: []string{"k", "v"}},
+				or(21, 23): {f: []string{"a", "b", "c"}},
+				or(23, 26): {e: []string{"a", "b", "c", "k", "v"}},
+				or(26, 28): {e: []string{"a", "b", "c"}},
+				or1(28):    {f: []string{"a", "b", "c"}, e: []string{"k", "v"}},
+				or(29, 31): {f: []string{"a", "b", "c"}},
+				or(31, 34): {e: []string{"a", "b", "c", "k", "v"}},
 			},
 		},
 

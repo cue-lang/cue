@@ -13,6 +13,13 @@ t7: strconv.FormatInt(64, 16)
 t8: strconv.FormatUint(170_141_183_460_469_231_731_687_303_715_884_105_728, 10)
 t9: strconv.FormatUint(61, 62)
 t10: strconv.FormatFloat(0.0, 102, -1, 64)
+// FormatFloat with string format argument
+t54: strconv.FormatFloat(3.14159, "g", -1, 64)
+t55: strconv.FormatFloat(3.14159, "f", 2, 64)
+t56: strconv.FormatFloat(3.14159, "e", 4, 64)
+t57: strconv.FormatFloat(3.14159, "E", 4, 64)
+// FormatFloat with integer format argument (103 == 'g')
+t58: strconv.FormatFloat(3.14159, 103, -1, 64)
 // Test Atoi with large integers
 t11: strconv.Atoi("2000000000000")
 t12: strconv.Atoi("40000000000000000000")
@@ -62,65 +69,71 @@ t52: strconv.ParseNumber("1_")
 t53: strconv.ParseNumber("0xG")
 -- out/strconv-v3 --
 Errors:
-t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
+t2: error in call to strconv.FormatFloat: format value 300 out of range [0, 255]:
     ./in.cue:4:5
-t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat:
+t3: error in call to strconv.FormatFloat: format value -1 out of range [0, 255]:
     ./in.cue:5:5
-    ./in.cue:5:31
-t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
-    ./in.cue:6:31
+t4: error in call to strconv.FormatFloat: unexpected kind float:
+    ./in.cue:6:5
 t16: error in call to strconv.Atoi: strconv.Atoi: parsing "invalid": invalid syntax:
-    ./in.cue:19:6
-t18: error in call to strconv.ParseInt: strconv.ParseInt: parsing "128": value out of range:
-    ./in.cue:22:6
-t20: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-129": value out of range:
-    ./in.cue:24:6
-t22: error in call to strconv.ParseInt: strconv.ParseInt: parsing "256": value out of range:
     ./in.cue:26:6
-t25: error in call to strconv.ParseInt: strconv.ParseInt: parsing "7": value out of range:
+t18: error in call to strconv.ParseInt: strconv.ParseInt: parsing "128": value out of range:
     ./in.cue:29:6
-t26: error in call to strconv.ParseInt: strconv.ParseInt: parsing "4": value out of range:
-    ./in.cue:30:6
-t28: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-5": value out of range:
-    ./in.cue:32:6
-t30: error in call to strconv.ParseInt: strconv.ParseInt: parsing "FF": value out of range:
-    ./in.cue:34:6
-t31: error in call to strconv.ParseInt: strconv.ParseInt: parsing "100": value out of range:
-    ./in.cue:35:6
-t32: error in call to strconv.ParseInt: strconv.ParseInt: parsing "invalid": invalid syntax:
+t20: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-129": value out of range:
+    ./in.cue:31:6
+t22: error in call to strconv.ParseInt: strconv.ParseInt: parsing "256": value out of range:
+    ./in.cue:33:6
+t25: error in call to strconv.ParseInt: strconv.ParseInt: parsing "7": value out of range:
     ./in.cue:36:6
-t33: error in call to strconv.ParseInt: strconv.ParseInt: parsing "123": value out of range:
+t26: error in call to strconv.ParseInt: strconv.ParseInt: parsing "4": value out of range:
     ./in.cue:37:6
-t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range:
-    ./in.cue:40:6
-t38: error in call to strconv.ParseUint: strconv.ParseUint: parsing "512": value out of range:
+t28: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-5": value out of range:
+    ./in.cue:39:6
+t30: error in call to strconv.ParseInt: strconv.ParseInt: parsing "FF": value out of range:
+    ./in.cue:41:6
+t31: error in call to strconv.ParseInt: strconv.ParseInt: parsing "100": value out of range:
+    ./in.cue:42:6
+t32: error in call to strconv.ParseInt: strconv.ParseInt: parsing "invalid": invalid syntax:
     ./in.cue:43:6
-t42: error in call to strconv.ParseUint: strconv.ParseUint: parsing "8": value out of range:
+t33: error in call to strconv.ParseInt: strconv.ParseInt: parsing "123": value out of range:
+    ./in.cue:44:6
+t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range:
     ./in.cue:47:6
-t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing "100": value out of range:
-    ./in.cue:49:6
-t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax:
+t38: error in call to strconv.ParseUint: strconv.ParseUint: parsing "512": value out of range:
     ./in.cue:50:6
+t42: error in call to strconv.ParseUint: strconv.ParseUint: parsing "8": value out of range:
+    ./in.cue:54:6
+t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing "100": value out of range:
+    ./in.cue:56:6
+t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax:
+    ./in.cue:57:6
 t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range:
-    ./in.cue:51:6
-t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range:
-    ./in.cue:52:6
-t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": illegal '_' in number:
     ./in.cue:58:6
-t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG":
+t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range:
     ./in.cue:59:6
+t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": illegal '_' in number:
+    ./in.cue:65:6
+t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG":
+    ./in.cue:66:6
 
 Result:
 t1:  "40"
-t2:  _|_ // t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat
-t3:  _|_ // t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat
-t4:  _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
+t2:  _|_ // t2: error in call to strconv.FormatFloat: format value 300 out of range [0, 255]
+t3:  _|_ // t3: error in call to strconv.FormatFloat: format value -1 out of range [0, 255]
+t4:  _|_ // t4: error in call to strconv.FormatFloat: unexpected kind float
 t5:  "true"
 t6:  "170141183460469231731687303715884105728"
 t7:  "40"
 t8:  "170141183460469231731687303715884105728"
 t9:  "Z"
 t10: "0"
+// FormatFloat with string format argument
+t54: "3.14159"
+t55: "3.14"
+t56: "3.1416e+00"
+t57: "3.1416E+00"
+// FormatFloat with integer format argument (103 == 'g')
+t58: "3.14159"
 // Test Atoi with large integers
 t11: 2000000000000
 t12: 40000000000000000000
@@ -172,59 +185,84 @@ t53: _|_ // t53: error in call to strconv.ParseNumber: strconv.ParseNumber: pars
 diff old new
 --- old
 +++ new
-@@ -6,8 +6,46 @@
-     ./in.cue:5:31
- t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
-     ./in.cue:6:31
+@@ -1,19 +1,56 @@
+ Errors:
+-t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
++t2: error in call to strconv.FormatFloat: format value 300 out of range [0, 255]:
+     ./in.cue:4:5
+-t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat:
++t3: error in call to strconv.FormatFloat: format value -1 out of range [0, 255]:
+     ./in.cue:5:5
+-    ./in.cue:5:31
+-t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
+-    ./in.cue:6:31
 -t16: strconv.Atoi: parsing "invalid": invalid syntax:
 -    ./in.cue:22:5
++t4: error in call to strconv.FormatFloat: unexpected kind float:
++    ./in.cue:6:5
 +t16: error in call to strconv.Atoi: strconv.Atoi: parsing "invalid": invalid syntax:
-+    ./in.cue:19:6
-+t18: error in call to strconv.ParseInt: strconv.ParseInt: parsing "128": value out of range:
-+    ./in.cue:22:6
-+t20: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-129": value out of range:
-+    ./in.cue:24:6
-+t22: error in call to strconv.ParseInt: strconv.ParseInt: parsing "256": value out of range:
 +    ./in.cue:26:6
-+t25: error in call to strconv.ParseInt: strconv.ParseInt: parsing "7": value out of range:
++t18: error in call to strconv.ParseInt: strconv.ParseInt: parsing "128": value out of range:
 +    ./in.cue:29:6
-+t26: error in call to strconv.ParseInt: strconv.ParseInt: parsing "4": value out of range:
-+    ./in.cue:30:6
-+t28: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-5": value out of range:
-+    ./in.cue:32:6
-+t30: error in call to strconv.ParseInt: strconv.ParseInt: parsing "FF": value out of range:
-+    ./in.cue:34:6
-+t31: error in call to strconv.ParseInt: strconv.ParseInt: parsing "100": value out of range:
-+    ./in.cue:35:6
-+t32: error in call to strconv.ParseInt: strconv.ParseInt: parsing "invalid": invalid syntax:
++t20: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-129": value out of range:
++    ./in.cue:31:6
++t22: error in call to strconv.ParseInt: strconv.ParseInt: parsing "256": value out of range:
++    ./in.cue:33:6
++t25: error in call to strconv.ParseInt: strconv.ParseInt: parsing "7": value out of range:
 +    ./in.cue:36:6
-+t33: error in call to strconv.ParseInt: strconv.ParseInt: parsing "123": value out of range:
++t26: error in call to strconv.ParseInt: strconv.ParseInt: parsing "4": value out of range:
 +    ./in.cue:37:6
-+t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range:
-+    ./in.cue:40:6
-+t38: error in call to strconv.ParseUint: strconv.ParseUint: parsing "512": value out of range:
++t28: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-5": value out of range:
++    ./in.cue:39:6
++t30: error in call to strconv.ParseInt: strconv.ParseInt: parsing "FF": value out of range:
++    ./in.cue:41:6
++t31: error in call to strconv.ParseInt: strconv.ParseInt: parsing "100": value out of range:
++    ./in.cue:42:6
++t32: error in call to strconv.ParseInt: strconv.ParseInt: parsing "invalid": invalid syntax:
 +    ./in.cue:43:6
-+t42: error in call to strconv.ParseUint: strconv.ParseUint: parsing "8": value out of range:
++t33: error in call to strconv.ParseInt: strconv.ParseInt: parsing "123": value out of range:
++    ./in.cue:44:6
++t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range:
 +    ./in.cue:47:6
-+t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing "100": value out of range:
-+    ./in.cue:49:6
-+t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax:
++t38: error in call to strconv.ParseUint: strconv.ParseUint: parsing "512": value out of range:
 +    ./in.cue:50:6
++t42: error in call to strconv.ParseUint: strconv.ParseUint: parsing "8": value out of range:
++    ./in.cue:54:6
++t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing "100": value out of range:
++    ./in.cue:56:6
++t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax:
++    ./in.cue:57:6
 +t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range:
-+    ./in.cue:51:6
-+t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range:
-+    ./in.cue:52:6
-+t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": illegal '_' in number:
 +    ./in.cue:58:6
-+t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG":
++t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range:
 +    ./in.cue:59:6
++t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": illegal '_' in number:
++    ./in.cue:65:6
++t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG":
++    ./in.cue:66:6
  
  Result:
  t1:  "40"
-@@ -20,12 +58,31 @@
+-t2:  _|_ // t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat
+-t3:  _|_ // t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat
+-t4:  _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
++t2:  _|_ // t2: error in call to strconv.FormatFloat: format value 300 out of range [0, 255]
++t3:  _|_ // t3: error in call to strconv.FormatFloat: format value -1 out of range [0, 255]
++t4:  _|_ // t4: error in call to strconv.FormatFloat: unexpected kind float
+ t5:  "true"
+ t6:  "170141183460469231731687303715884105728"
+ t7:  "40"
+@@ -20,12 +57,38 @@
  t8:  "170141183460469231731687303715884105728"
  t9:  "Z"
  t10: "0"
++// FormatFloat with string format argument
++t54: "3.14159"
++t55: "3.14"
++t56: "3.1416e+00"
++t57: "3.1416E+00"
++// FormatFloat with integer format argument (103 == 'g')
++t58: "3.14159"
 +// Test Atoi with large integers
  t11: 2000000000000
  t12: 40000000000000000000
@@ -254,7 +292,7 @@ diff old new
  // Test ParseUint with various bit widths
  t34: 255
  t35: _|_ // t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range
-@@ -41,3 +98,10 @@
+@@ -41,3 +104,10 @@
  t45: _|_ // t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax
  t46: _|_ // t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range
  t47: _|_ // t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range

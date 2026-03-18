@@ -21,10 +21,13 @@
 package strconv
 
 import (
-	"cuelang.org/go/cue/literal"
-	"cuelang.org/go/internal"
+	"fmt"
 	"math/big"
 	"strconv"
+
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/literal"
+	"cuelang.org/go/internal"
 )
 
 // ParseBool returns the boolean value represented by the string.
@@ -222,25 +225,51 @@ func Atoi(s string) (*big.Int, error) {
 // result assuming that the original was obtained from a floating-point
 // value of bitSize bits (32 for float32, 64 for float64).
 //
-// The format fmt is one of
-// 'b' (-ddddp±ddd, a binary exponent),
-// 'e' (-d.dddde±dd, a decimal exponent),
-// 'E' (-d.ddddE±dd, a decimal exponent),
-// 'f' (-ddd.dddd, no exponent),
-// 'g' ('e' for large exponents, 'f' otherwise),
-// 'G' ('E' for large exponents, 'f' otherwise),
-// 'x' (-0xd.ddddp±ddd, a hexadecimal fraction and binary exponent), or
-// 'X' (-0Xd.ddddP±ddd, a hexadecimal fraction and binary exponent).
+// The format fmt is a string or integer: one of
+// "b" (-ddddp±ddd, a binary exponent),
+// "e" (-d.dddde±dd, a decimal exponent),
+// "E" (-d.ddddE±dd, a decimal exponent),
+// "f" (-ddd.dddd, no exponent),
+// "g" ("e" for large exponents, "f" otherwise),
+// "G" ("E" for large exponents, "f" otherwise),
+// "x" (-0xd.ddddp±ddd, a hexadecimal fraction and binary exponent), or
+// "X" (-0Xd.ddddP±ddd, a hexadecimal fraction and binary exponent).
+//
+// For historical reasons, an integer (the ASCII code point of a
+// format character) is also accepted for the format.
 //
 // The precision prec controls the number of digits (excluding the exponent)
-// printed by the 'e', 'E', 'f', 'g', 'G', 'x', and 'X' formats.
-// For 'e', 'E', 'f', 'x', and 'X', it is the number of digits after the decimal point.
-// For 'g' and 'G' it is the maximum number of significant digits (trailing
+// printed by the "e", "E", "f", "g", "G", "x", and "X" formats.
+// For "e", "E", "f", "x", and "X", it is the number of digits after the decimal point.
+// For "g" and "G" it is the maximum number of significant digits (trailing
 // zeros are removed).
 // The special precision -1 uses the smallest number of digits
 // necessary such that ParseFloat will return f exactly.
-func FormatFloat(f float64, fmt byte, prec, bitSize int) string {
-	return strconv.FormatFloat(f, fmt, prec, bitSize)
+func FormatFloat(f float64, fmtVal cue.Value, prec, bitSize int) (string, error) {
+	var fmtByte byte
+	switch k := fmtVal.Kind(); k {
+	case cue.StringKind:
+		s, err := fmtVal.String()
+		if err != nil {
+			return "", err
+		}
+		if len(s) != 1 {
+			return "", fmt.Errorf("expected single character string")
+		}
+		fmtByte = s[0]
+	case cue.IntKind:
+		n, err := fmtVal.Int64()
+		if err != nil {
+			return "", err
+		}
+		if n < 0 || n > 255 {
+			return "", fmt.Errorf("format value %d out of range [0, 255]", n)
+		}
+		fmtByte = byte(n)
+	default:
+		return "", fmt.Errorf("unexpected kind %v", k)
+	}
+	return strconv.FormatFloat(f, fmtByte, prec, bitSize), nil
 }
 
 // FormatUint returns the string representation of i in the given base,

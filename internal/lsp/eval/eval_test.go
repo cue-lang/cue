@@ -2117,6 +2117,90 @@ v=[k=string]: {a: _, b: v.a, c: k.a}
 		},
 
 		{
+			name: "AliasV2_Value_External",
+			archive: `-- a.cue --
+@experiment(aliasv2)
+"-foo"~a: b: 42
+x: a.b + 1
+`,
+			expectDefinitions: map[position][]position{
+				ln(3, 1, "a"): {ln(2, 1, `"-foo"`)},
+				ln(3, 1, "b"): {ln(2, 1, "b")},
+
+				ln(2, 1, `"-foo"`): {self},
+				ln(2, 1, "a"):      {ln(2, 1, `"-foo"`)},
+				ln(2, 1, "b"):      {self},
+				ln(3, 1, "x"):      {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(20, 22): {f: []string{"-foo", "x"}},
+				or(22, 30): {e: []string{"-foo", "a", "x"}},
+				or1(30):    {f: []string{"b"}, e: []string{"-foo", "a", "x"}},
+				or(31, 33): {f: []string{"b"}},
+				or1(33):    {e: []string{"-foo", "a", "b", "x"}},
+				or1(36):    {e: []string{"-foo", "a", "b", "x"}},
+				or(37, 39): {f: []string{"-foo", "x"}},
+				or(39, 42): {e: []string{"-foo", "a", "x"}},
+				or(42, 44): {e: []string{"b"}},
+				or(44, 46): {e: []string{"-foo", "a", "x"}},
+				or1(47):    {e: []string{"-foo", "a", "x"}},
+			},
+		},
+
+		{
+			name: "AliasV2_Key_Value_External",
+			archive: `-- a.cue --
+@experiment(aliasv2)
+a: [string]~(L,V): {
+	name: L
+	x:  V.y
+	y:  5
+}
+a: b: _
+`,
+			expectDefinitions: map[position][]position{
+				ln(3, 1, "L"): {ln(2, 1, "L")},
+				ln(4, 1, "V"): {ln(2, 1, "V")},
+				ln(4, 1, "y"): {ln(5, 1, "y")},
+
+				ln(2, 1, "a"): {self, ln(7, 1, "a")},
+				ln(2, 1, "L"): {self},
+				ln(2, 1, "V"): {self},
+
+				ln(3, 1, "name"): {self},
+				ln(4, 1, "x"):    {self},
+				ln(5, 1, "y"):    {self},
+
+				ln(7, 1, "a"): {self, ln(2, 1, "a")},
+				ln(7, 1, "b"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(20, 23): {f: []string{"a"}},
+				or1(23):    {f: []string{"b"}, e: []string{"a"}},
+				or1(24):    {f: []string{"b"}},
+				or(25, 32): {e: []string{"L", "V", "a"}},
+				or(34, 36): {f: []string{"b"}},
+				or(36, 38): {e: []string{"L", "V", "a"}},
+				or(39, 43): {f: []string{"name", "x", "y"}, e: []string{"L", "V", "a"}},
+				or(43, 48): {f: []string{"name", "x", "y"}},
+				or(48, 51): {e: []string{"L", "V", "a", "name", "x", "y"}},
+				or1(51):    {f: []string{"name", "x", "y"}, e: []string{"L", "V", "a"}},
+				or(52, 54): {f: []string{"name", "x", "y"}},
+				or(54, 58): {e: []string{"L", "V", "a", "name", "x", "y"}},
+				or(58, 60): {e: []string{"name", "x", "y"}},
+				or1(60):    {f: []string{"name", "x", "y"}, e: []string{"L", "V", "a"}},
+				or(61, 63): {f: []string{"name", "x", "y"}},
+				or(63, 65): {e: []string{"L", "V", "a", "name", "x", "y"}},
+				or1(66):    {e: []string{"L", "V", "a", "name", "x", "y"}},
+				or1(67):    {f: []string{"name", "x", "y"}, e: []string{"L", "V", "a"}},
+				or(69, 71): {f: []string{"a"}},
+				or1(71):    {f: []string{"b"}, e: []string{"a"}},
+				or(72, 74): {f: []string{"b"}},
+				or(74, 77): {e: []string{"a", "b"}},
+			},
+		},
+
+		{
 			name: "Alias_Expr_Internal",
 			archive: `-- a.cue --
 a: l={b: 3, c: l.b}`,

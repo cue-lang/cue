@@ -10,11 +10,11 @@ package scopetest
 	spam: eggs: bool
 }
 
-foo: _ @extern(int)
-bar: _ @extern(#Bar)
+foo: _ @test(int)
+bar: _ @test(#Bar)
 baz: {
-	quux: _ @extern(#Baz.#Quux)
-	eggs: _ @extern(#Baz.spam.eggs)
+	quux: _ @test(#Baz.#Quux)
+	eggs: _ @test(#Baz.spam.eggs)
 }
 -- out/extern --
 {

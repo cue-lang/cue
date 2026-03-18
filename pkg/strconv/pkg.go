@@ -122,15 +122,15 @@ var p = &pkg.Package{
 		Name: "FormatFloat",
 		Params: []pkg.Param{
 			{Kind: adt.NumberKind},
-			{Kind: adt.IntKind},
+			{Kind: adt.TopKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
 		Func: func(c *pkg.CallCtxt) {
-			f, fmt, prec, bitSize := c.Float64(0), c.Byte(1), c.Int(2), c.Int(3)
+			f, fmtVal, prec, bitSize := c.Float64(0), c.Value(1), c.Int(2), c.Int(3)
 			if c.Do() {
-				c.Ret = FormatFloat(f, fmt, prec, bitSize)
+				c.Ret, c.Err = FormatFloat(f, fmtVal, prec, bitSize)
 			}
 		},
 	}, {

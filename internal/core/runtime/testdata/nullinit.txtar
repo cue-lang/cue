@@ -6,7 +6,7 @@
 package nullinit
 
 
-foo: _ @extern("file.xx")
+foo: _ @test("file.xx")
 
 -- out/extern --
 {

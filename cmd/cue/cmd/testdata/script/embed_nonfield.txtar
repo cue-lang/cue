@@ -1,32 +1,35 @@
 cd $WORK/toplevel
-! exec cue export
-cmp stdout want-stderr
+exec cue export
+cmp stdout want-stdout
 
 cd $WORK/toplevel_multi
-! exec cue export
-cmp stderr want-stderr
+exec cue export
+cmp stdout want-stdout
 
 cd $WORK/inside_expr
-! exec cue export
-cmp stderr want-stderr
+exec cue export
+cmp stdout want-stdout
 
 cd $WORK/field_multi
-! exec cue export
-cmp stderr want-stderr
+exec cue export
+cmp stdout want-stdout
 
 cd $WORK/dynamic_field
-! exec cue export
-cmp stdout want-stderr
+exec cue export
+cmp stdout want-stdout
 
 cd $WORK/pattern_field
-! exec cue export
-cmp stdout want-stderr
+exec cue export
+cmp stdout want-stdout
 
 -- cue.mod/module.cue --
 module: "cue.example"
 language: version: "v0.11.0"
 
--- toplevel/want-stderr --
+-- toplevel/want-stdout --
+{
+    "x": true
+}
 -- toplevel/x.cue --
 @extern(embed)
 
@@ -35,11 +38,11 @@ package toplevel
 -- toplevel/x.json --
 {"x": true}
 
--- toplevel_multi/want-stderr --
-@embed attribute not associated with field:
-    ./x.cue:3:1
-@embed attribute not associated with field:
-    ./x.cue:4:1
+-- toplevel_multi/want-stdout --
+{
+    "x": true,
+    "y": true
+}
 -- toplevel_multi/x.cue --
 @extern(embed)
 package toplevel_multi
@@ -50,16 +53,10 @@ package toplevel_multi
 -- toplevel_multi/y.json --
 {"y": true}
 
--- inside_expr/want-stderr --
-a: 2 errors in empty disjunction:
-a: conflicting values {x:true} and bool (mismatched types struct and bool):
-    ./x.cue:3:4
-    ./x.cue:4:17
-    x.json:1:3
-a: conflicting values {x:true} and false (mismatched types struct and bool):
-    ./x.cue:3:4
-    ./x.cue:4:9
-    x.json:1:3
+-- inside_expr/want-stdout --
+{
+    "a": true
+}
 -- inside_expr/x.cue --
 @extern(embed)
 package inside_expr
@@ -70,9 +67,13 @@ a: {
 -- inside_expr/x.json --
 {"x": true}
 
--- field_multi/want-stderr --
-duplicate @embed attributes:
-    ./x.cue:3:26
+-- field_multi/want-stdout --
+{
+    "a": {
+        "x": true,
+        "y": true
+    }
+}
 -- field_multi/x.cue --
 @extern(embed)
 package field_multi
@@ -82,7 +83,13 @@ a: _ @embed(file=x.json) @embed(file=y.json)
 -- field_multi/y.json --
 {"y": true}
 
--- dynamic_field/want-stderr --
+-- dynamic_field/want-stdout --
+{
+    "a": "foo",
+    "foo": {
+        "a": true
+    }
+}
 -- dynamic_field/x.cue --
 @extern(embed)
 package dynamic_field
@@ -92,7 +99,12 @@ a: "foo"
 -- dynamic_field/x.json --
 {"a": true}
 
--- pattern_field/want-stderr --
+-- pattern_field/want-stdout --
+{
+    "x": {
+        "a": true
+    }
+}
 -- pattern_field/x.cue --
 @extern(embed)
 package dynamic_field

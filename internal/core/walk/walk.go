@@ -35,10 +35,13 @@ type Visitor struct {
 	// Feature is invoked for all field names.
 	Feature func(f adt.Feature, src adt.Node)
 
-	// Before is invoked for all nodes in pre-order traversal.
+	// Before, if non-nil, is invoked for all nodes in pre-order traversal.
 	// Returning false prevents the visitor from visiting the node's
 	// children.
 	Before func(adt.Node) bool
+
+	// After, if non-nil, is invoked for all nodes in post-order traversal.
+	After func(adt.Node)
 }
 
 func (w *Visitor) Elem(x adt.Elem) {
@@ -194,5 +197,8 @@ func (w *Visitor) node(n adt.Node) {
 
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
+	}
+	if n != nil && w.After != nil {
+		w.After(n)
 	}
 }

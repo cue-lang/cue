@@ -214,13 +214,7 @@ objsLoop:
 					"recordCount", ast.NewLit(token.INT, strconv.Itoa(len(objs))),
 				)
 			}
-			var f *ast.File
-			if s, ok := expr.(*ast.StructLit); ok {
-				f = &ast.File{Decls: s.Elts}
-			} else {
-				f = &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}}}
-			}
-			err := astutil.Sanitize(f)
+			f, err := astutil.ToFile(expr)
 			if err != nil {
 				return nil, errors.Wrapf(err, token.NoPos,
 					"invalid combination of input files")

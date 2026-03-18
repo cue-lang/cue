@@ -249,6 +249,7 @@ func ToFile(n ast.Node, preserveStructLit bool) *ast.File {
 	if n == nil {
 		return nil
 	}
+	// TODO(mvdan): SetRelPos modifies the input argument; if it's really needed, make a copy
 	switch n := n.(type) {
 	case *ast.StructLit:
 		if preserveStructLit {

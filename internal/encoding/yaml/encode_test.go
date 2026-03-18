@@ -155,6 +155,14 @@ f4: {} # line 4
 # trail
 `,
 	}, {
+		name: "embed_binary",
+		in: `
+		{'\x80'}
+		`,
+		out: `
+!!binary gA==
+`,
+	}, {
 		// TODO: support this at some point
 		name: "anchors",
 		in: `
@@ -306,6 +314,19 @@ custom: !%3Ctag:example.com,2000:app/foo%3E value
 		`,
 		out: `
 item: !%3Chttps://example.com/schema/v1%3E value
+		`,
+	}, {
+		name: "yaml_tag_embed",
+		in: `
+		items: [
+			"first",
+			{"second", @yaml(,tag="!Env")},
+		] @yaml(,tag="!Format")
+		`,
+		out: `
+items: !Format
+  - first
+  - !Env second
 		`,
 	}, {
 		name: "yaml_attribute_without_tag",

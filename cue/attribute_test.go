@@ -33,6 +33,14 @@ func TestAttributes(t *testing.T) {
 		@embed(foo)
 		3
 	} @field(foo)
+	d: {
+		@foo(decl=1)
+		4
+	} @foo(field=1)
+	items: [
+		"first",
+		{"second", @yaml(,tag="!Env")},
+	]
 
 	c1: {} @step(1)
 	if true {
@@ -94,6 +102,22 @@ func TestAttributes(t *testing.T) {
 		flags: cue.ValueAttr | cue.FieldAttr,
 		path:  "c4",
 		out:   "[]",
+	}, {
+		flags: cue.DeclAttr,
+		path:  "items[1]",
+		out:   `[@yaml(,tag="!Env")]`,
+	}, {
+		flags: cue.FieldAttr,
+		path:  "items[1]",
+		out:   "[]",
+	}, {
+		flags: cue.ValueAttr,
+		path:  "items[1]",
+		out:   `[@yaml(,tag="!Env")]`,
+	}, {
+		flags: cue.ValueAttr,
+		path:  "d",
+		out:   `[@foo(field=1) @foo(decl=1)]`,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.path, func(t *testing.T, m *cuetdtest.M) {
@@ -105,6 +129,71 @@ func TestAttributes(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAttributeListElementDeclAttr(t *testing.T) {
+	const config = `
+	items: [
+		"first",
+		{"second", @yaml(,tag="!Env")},
+	]
+	`
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		v := getValue(m, config).LookupPath(cue.ParsePath("items[1]"))
+		a := v.Attribute("yaml")
+		if err := a.Err(); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got, want := a.Kind(), cue.DeclAttr; got != want {
+			t.Errorf("got %v; want %v", got, want)
+		}
+		val, found, err := a.Lookup(1, "tag")
+		if err != nil {
+			t.Fatalf("lookup failed: %v", err)
+		}
+		if !found {
+			t.Fatal("tag not found")
+		}
+		if got, want := val, "!Env"; got != want {
+			t.Errorf("got %q; want %q", got, want)
+		}
+	})
+}
+
+func TestAttributePrefersFieldAttr(t *testing.T) {
+	const config = `
+	v: {
+		@foo(decl=1)
+		3
+	} @foo(field=1)
+	`
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		v := getValue(m, config).Lookup("v")
+		a := v.Attribute("foo")
+		if err := a.Err(); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got, want := a.Kind(), cue.FieldAttr; got != want {
+			t.Errorf("got %v; want %v", got, want)
+		}
+		val, found, err := a.Lookup(0, "field")
+		if err != nil {
+			t.Fatalf("lookup failed: %v", err)
+		}
+		if !found {
+			t.Fatal("field argument not found")
+		}
+		if got, want := val, "1"; got != want {
+			t.Errorf("got %q; want %q", got, want)
+		}
+		_, found, err = a.Lookup(0, "decl")
+		if err != nil {
+			t.Fatalf("lookup failed: %v", err)
+		}
+		if found {
+			t.Fatal("unexpected decl argument")
+		}
+	})
 }
 
 func TestAttributeErr(t *testing.T) {

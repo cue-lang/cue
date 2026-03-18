@@ -26,7 +26,7 @@ Bar: {
 -- extern/out --
 -- out/extern --
 {
-	Bar:            implBar2
+	Bar:            impl2
 	Foo:            implFoo1
 	Rename:         implEmaner1
 	"Quoted-Field": implEmaner1

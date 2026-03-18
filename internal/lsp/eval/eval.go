@@ -2278,6 +2278,11 @@ func fieldNames(field *ast.Field) *fieldDeclExpr {
 		}
 	}
 
+	if alias := field.Alias; alias != nil {
+		result.valueAliasIdent = alias.Field
+		result.keyAliasIdent = alias.Label
+	}
+
 	start, end := field.Label.Pos(), field.Label.End()
 	if strings.HasPrefix(result.keyName, "__") {
 		end = start

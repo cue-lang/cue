@@ -24,6 +24,7 @@ import (
 // references as appropriate.
 func ToFile(x ast.Expr) (*ast.File, error) {
 	var f *ast.File
+	// TODO(mvdan): SetRelPos modifies the input argument; if it's really needed, make a copy
 	if st, ok := x.(*ast.StructLit); ok {
 		f = &ast.File{Decls: st.Elts}
 	} else {

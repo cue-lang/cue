@@ -1,0 +1,103 @@
+cd $WORK/toplevel
+! exec cue export
+cmp stdout want-stderr
+
+cd $WORK/toplevel_multi
+! exec cue export
+cmp stderr want-stderr
+
+cd $WORK/inside_expr
+! exec cue export
+cmp stderr want-stderr
+
+cd $WORK/field_multi
+! exec cue export
+cmp stderr want-stderr
+
+cd $WORK/dynamic_field
+! exec cue export
+cmp stdout want-stderr
+
+cd $WORK/pattern_field
+! exec cue export
+cmp stdout want-stderr
+
+-- cue.mod/module.cue --
+module: "cue.example"
+language: version: "v0.11.0"
+
+-- toplevel/want-stderr --
+-- toplevel/x.cue --
+@extern(embed)
+
+package toplevel
+@embed(file="x.json")
+-- toplevel/x.json --
+{"x": true}
+
+-- toplevel_multi/want-stderr --
+@embed attribute not associated with field:
+    ./x.cue:3:1
+@embed attribute not associated with field:
+    ./x.cue:4:1
+-- toplevel_multi/x.cue --
+@extern(embed)
+package toplevel_multi
+@embed(file="x.json")
+@embed(file="y.json")
+-- toplevel_multi/x.json --
+{"x": true}
+-- toplevel_multi/y.json --
+{"y": true}
+
+-- inside_expr/want-stderr --
+a: 2 errors in empty disjunction:
+a: conflicting values {x:true} and bool (mismatched types struct and bool):
+    ./x.cue:3:4
+    ./x.cue:4:17
+    x.json:1:3
+a: conflicting values {x:true} and false (mismatched types struct and bool):
+    ./x.cue:3:4
+    ./x.cue:4:9
+    x.json:1:3
+-- inside_expr/x.cue --
+@extern(embed)
+package inside_expr
+a: {
+    x: *false | bool
+    @embed(file=x.json)
+}.x
+-- inside_expr/x.json --
+{"x": true}
+
+-- field_multi/want-stderr --
+duplicate @embed attributes:
+    ./x.cue:3:26
+-- field_multi/x.cue --
+@extern(embed)
+package field_multi
+a: _ @embed(file=x.json) @embed(file=y.json)
+-- field_multi/x.json --
+{"x": true}
+-- field_multi/y.json --
+{"y": true}
+
+-- dynamic_field/want-stderr --
+-- dynamic_field/x.cue --
+@extern(embed)
+package dynamic_field
+
+a: "foo"
+(a): _ @embed(file=x.json)
+-- dynamic_field/x.json --
+{"a": true}
+
+-- pattern_field/want-stderr --
+-- pattern_field/x.cue --
+@extern(embed)
+package dynamic_field
+
+[_]: _ @embed(file=x.json)
+x: _
+-- pattern_field/x.json --
+{"a": true}

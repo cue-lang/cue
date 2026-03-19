@@ -236,7 +236,11 @@ func (v *Validator) repoName() (string, error) {
 	if withoutGitHub, wasCut := strings.CutPrefix(url, "git@github.com:"); wasCut {
 		// transform "git@github.com:foo/bar.git" into "github:foo/bar"
 		url = "github:" + strings.TrimSuffix(withoutGitHub, ".git")
+	} else if withoutGitHub, wasCut := strings.CutPrefix(url, "https://github.com/"); wasCut {
+		// transform "https://github.com/foo/bar.git" into "github:foo/bar"
+		url = "github:" + strings.TrimSuffix(withoutGitHub, ".git")
 	}
+
 	return url, nil
 }
 

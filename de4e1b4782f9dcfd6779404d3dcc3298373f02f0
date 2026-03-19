@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30f2d822_b4adab01",
+        "filename": "cue/load/config.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-19T17:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce3df1e5_5feda93b",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71ec3eec_a94a0925",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-03-16T10:22:22Z",
       "side": 1,
       "message": "nit: these two types don\u0027t agree on the casing of FileSystem vs Filesystem",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5161a587_3aecd0a9",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-19T17:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71ec3eec_a94a0925",
       "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e57f6590_a144522e",
+        "filename": "cue/load/fsfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-19T17:19:08Z",
+      "side": 1,
+      "message": "I just renamed to iofs.go and renamed the types.",
+      "parentUuid": "2a23d9bc_478f97d8",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21b284e4_8624ee67",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-03-16T10:22:22Z",
       "side": 1,
       "message": "no need to use a defer?\n\nalso, did you consider holding the mutex for the entire func, rather than grabbing it twice separately? I guess it\u0027s a tradeoff between races (or rather duplicate work) versus lock contention.",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "376642b1_094e2b0d",
+        "filename": "cue/load/fsfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-19T17:19:08Z",
+      "side": 1,
+      "message": "In general I prefer to avoid holding mutexes when calling out to arbitrary third party code, and also it precludes concurrency when reading files. I think I\u0027ll leave it as is for now.",
+      "parentUuid": "21b284e4_8624ee67",
       "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11f12b42_ad687464",
+        "filename": "cue/token/fsloc.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-19T17:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f6bbe07_5dd907f0",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2aa54d66_6f8b8716",
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92b8e323_4a2dca43",
+        "filename": "cue/token/fsloc.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-19T17:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2aa54d66_6f8b8716",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b808735_ceebd402",
@@ -133,6 +241,24 @@
       "writtenOn": "2026-03-16T10:22:22Z",
       "side": 1,
       "message": "Go is converging on IsZero for e.g. encoding/json/v2, so I\u0027d encourage the same here, with the caveat that it\u0027s negated logic.",
+      "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63c69327_2c981a22",
+        "filename": "cue/token/fsloc.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-19T17:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b808735_ceebd402",
       "revId": "de4e1b4782f9dcfd6779404d3dcc3298373f02f0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

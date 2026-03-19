@@ -81,6 +81,18 @@ func TestFromExpr(t *testing.T) {
 	}
 }
 
+func TestBuildExprClose(t *testing.T) {
+	// Issue #2680: BuildExpr should preserve the close constraint,
+	// just like CompileString and BuildFile do.
+	ctx := cuecontext.New()
+	expr := ast.NewCall(ast.NewIdent("close"), ast.NewStruct())
+	v := ctx.BuildExpr(expr)
+	w := ctx.CompileString("a: 1")
+	if err := v.Unify(w).Err(); err == nil {
+		t.Error("close({}) unified with a:1 should fail, but succeeded")
+	}
+}
+
 func TestBuild(t *testing.T) {
 	files := func(s ...string) []string { return s }
 	insts := func(i ...*bimport) []*bimport { return i }

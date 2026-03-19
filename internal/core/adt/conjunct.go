@@ -74,6 +74,10 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			n.unshare()
 			n.insertValueConjunct(env, x, id)
 		} else {
+			if x.ClosedNonRecursive {
+				n.node.ClosedNonRecursive = true
+				id = n.addResolver(x, x, id, false)
+			}
 			n.scheduleVertexConjuncts(c, x, id)
 		}
 

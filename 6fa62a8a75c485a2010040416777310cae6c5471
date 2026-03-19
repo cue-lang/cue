@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "998d927c_9f17496f",
+        "filename": "internal/core/export/testdata/selfcontained/issue3714.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-19T11:36:04Z",
+      "side": 1,
+      "message": "```suggestion\n(Def \u0026 {...}).field patterns that include conditionals that used to\n```",
+      "revId": "6fa62a8a75c485a2010040416777310cae6c5471",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -356,12 +356,17 @@ Unifications: 971
 Conjuncts:    1551
 Disjuncts:    16
 
-NumCloseIDs: 483
+NumCloseIDs: 486
+
+ConjunctInfos:       1211
+MaxConjunctInfos:    3
+MaxReqSets:          4
+MaxRedirect:         2
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,11 @@
+@@ -1,9 +1,16 @@
 -Leaks:  52
 -Freed:  951
 -Reused: 944
@@ -381,7 +386,12 @@ diff old new
 +Conjuncts:    1551
 +Disjuncts:    16
 +
-+NumCloseIDs: 483
++NumCloseIDs: 486
++
++ConjunctInfos:       1211
++MaxConjunctInfos:    3
++MaxReqSets:          4
++MaxRedirect:         2
 -- out/eval/stats --
 Leaks:  52
 Freed:  951

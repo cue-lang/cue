@@ -149,14 +149,8 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 
 	if syntax != nil {
 		syntax.Pos().File().SetContent(content)
-		var pkg *ast.Package
+		pkg, _ := internal.Package(syntax)
 		decls := syntax.Decls
-		for _, decl := range decls {
-			if p, ok := decl.(*ast.Package); ok {
-				pkg = p
-				break
-			}
-		}
 		if pkg == nil {
 			pkg = &ast.Package{PackagePos: syntax.Pos()}
 			if len(decls) == 0 {

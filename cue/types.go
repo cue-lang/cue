@@ -949,15 +949,8 @@ You could file a bug with the above information at:
 		}
 	}
 
-outer:
-	for _, d := range f.Decls {
-		switch d.(type) {
-		case *ast.Package, *ast.ImportDecl:
-			return f
-		case *ast.CommentGroup, *ast.Attribute:
-		default:
-			break outer
-		}
+	if len(f.Preamble()) > 0 {
+		return f
 	}
 
 	if len(f.Decls) == 1 {

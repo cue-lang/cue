@@ -772,7 +772,7 @@ func (v *Vertex) toDataAllRec(ctx *OpContext, processed map[*Vertex]*Vertex) *Ve
 	w.ClosedRecursive = false
 	w.ClosedNonRecursive = false
 
-	w.Conjuncts = slices.Clone(v.Conjuncts)
+	w.Conjuncts = slices.Clip(v.Conjuncts)
 
 	for i, c := range w.Conjuncts {
 		if v, _ := c.x.(Value); v != nil {

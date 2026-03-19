@@ -250,7 +250,7 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 	ctx.vertexMap[x] = v
 	x.overlay = v
 
-	v.Conjuncts = slices.Clone(v.Conjuncts)
+	v.Conjuncts = slices.Clip(v.Conjuncts)
 
 	if a := x.Arcs; len(a) > 0 {
 		// TODO(perf): reuse buffer.

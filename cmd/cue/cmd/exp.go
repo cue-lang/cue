@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
@@ -85,6 +86,8 @@ To ensure that the resulting Go code works, any imported CUE packages or
 referenced CUE definitions are transitively generated as well.
 Code is generated in each CUE package directory at cue_types_${pkgname}_gen.go,
 where the package name is omitted from the filename if it is implied by the import path.
+The --outfile flag can be used to write the output for a single CUE package to a specific file,
+or to stdout when set to "-".
 
 Generated Go type and field names may differ from the original CUE names by default.
 For instance, an exported definition "#foo" becomes "Foo",
@@ -124,13 +127,47 @@ The default is "zero", representing a missing field as the zero value.
 `[1:],
 		RunE: mkRunE(c, runExpGenGoTypes),
 	}
+	cmd.Flags().StringP(string(flagOutFile), "o", "", "generate one Go file for a single CUE package")
 
 	return cmd
 }
 
 func runExpGenGoTypes(cmd *Command, args []string) error {
+	outFile := flagOutFile.String(cmd)
 	insts := load.Instances(args, &load.Config{})
-	return gotypes.Generate(cmd.ctx, insts...)
+	writeFile := defaultGenGoTypesWrite
+	if outFile != "" {
+		if len(insts) != 1 {
+			return fmt.Errorf("--outfile only allows for one package to be specified")
+		}
+		writeFile = func(_ *build.Instance, data []byte) error {
+			if outFile == "-" {
+				_, err := os.Stdout.Write(data)
+				return err
+			}
+			return os.WriteFile(outFile, data, 0o666)
+		}
+	}
+	return gotypes.Generate(cmd.ctx, writeFile, insts...)
+}
+
+// defaultGenGoTypesWrite writes each instance's generated Go source to its default filename.
+//
+// The generated file is named after the CUE package, not the generated Go package,
+// as we can have multiple CUE packages in one directory all generating to one Go package.
+// To keep the filename short for common cases, if we are generating a CUE package
+// whose package name is implied from its import path, omit the package name element.
+func defaultGenGoTypesWrite(inst *build.Instance, data []byte) error {
+	basename := "cue_types_gen.go"
+	ip := ast.ParseImportPath(inst.ImportPath)
+	ip1 := ip
+	ip1.Qualifier = ""
+	ip1.ExplicitQualifier = false
+	ip1 = ast.ParseImportPath(ip1.String())
+	if ip.Qualifier != ip1.Qualifier {
+		basename = fmt.Sprintf("cue_types_%s_gen.go", inst.PkgName)
+	}
+	return os.WriteFile(filepath.Join(inst.Dir, basename), data, 0o666)
 }
 
 func newExpWritefsCmd(c *Command) *cobra.Command {

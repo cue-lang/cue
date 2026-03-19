@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7774aae_19058ed3",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-19T16:33:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6c181d1_ea74b8cb",
+      "revId": "c01ed3651e0eafc09724418d406808fcadd59d52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f5177a0_e0157850",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-03-19T16:22:23Z",
       "side": 1,
       "message": "This feels like quite an awkward API.\nHow about passing in an (optional) function that determines the output filename for a given instance? That\u0027s more general and doesn\u0027t have the awkward edge case of applying to only a single instance in the slice.\n\n\n```\n// When filenameForInstance is non-nil, it\u0027s used to generate the\n// Go filename to be written for an instance. If nil, [DefaultFilenameForInstance]\n// will be used. If filenameForInstance returns \"-\" the content will\n// be written to [os.Stdout].\nfunc Generate(ctx *cue.Context, filenameForInstance func(*build.Instance) string, insts ...*build.Instance) error\n```\n\nAlternatively, pass in a function that\u0027s responsible for actually writing the file:\n\n```\nwriteFileForInstance(inst *build.Instance, data []byte) error\n```\n\nThat way we don\u0027t need this code to know about the \"-\" convention.",
+      "revId": "c01ed3651e0eafc09724418d406808fcadd59d52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "661e5391_df5d0ef6",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-19T16:33:13Z",
+      "side": 1,
+      "message": "good point :) done with the write callback func",
+      "parentUuid": "2f5177a0_e0157850",
       "revId": "c01ed3651e0eafc09724418d406808fcadd59d52",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

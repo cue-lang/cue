@@ -214,7 +214,7 @@ func (sm *structMeta) hasDynamic(dynFieldsMap map[*adt.DynamicField][]adt.Featur
 // we look at the vertex's conjuncts. If a conjunct is a binary
 // expression &, then we look up the structMeta for the arguments to
 // the binary expression, and mark them as explicit unification.
-func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
+func analyseStructs(ctx *adt.OpContext, v *adt.Vertex, builder *GraphBuilder) []structMeta {
 	structInfos := v.Structs
 	// Note that it's important that nodeToStructMetas avoids duplicate entries,
 	// which cause significant slowness for some large configs.
@@ -268,20 +268,13 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 					sMeta.pos = pos
 				}
 			}
-			refs := c.CloseInfo.CycleInfo.Refs
-			if refs == nil {
+			ref := ctx.LastCycleRef(c.CloseInfo.CycleInfo)
+			if ref == nil {
 				continue
 			}
-			debug(" ref %p :: %T (%v)\n",
-				refs.Ref, refs.Ref, refs.Ref.Source().Pos())
-			for refs.Next != nil {
-				refs = refs.Next
-				debug(" ref %p :: %T (%v)\n",
-					refs.Ref, refs.Ref, refs.Ref.Source().Pos())
-			}
-			maps.Insert(structMetaMap(refs.Ref), maps.All(sMetas))
-			if pos := refs.Ref.Source().Pos(); pos.IsValid() {
-				for sMeta := range nodeToStructMetas[refs.Ref] {
+			maps.Insert(structMetaMap(ref), maps.All(sMetas))
+			if pos := ref.Source().Pos(); pos.IsValid() {
+				for sMeta := range nodeToStructMetas[ref] {
 					sMeta.pos = pos
 				}
 			}
@@ -391,7 +384,7 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 
 	builder := NewGraphBuilder(!ctx.Config.SortFields)
 	dynFieldsMap := dynamicFieldsFeatures(v)
-	roots := analyseStructs(v, builder)
+	roots := analyseStructs(ctx, v, builder)
 
 	vf := &vertexFeatures{
 		builder:      builder,

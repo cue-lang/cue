@@ -1230,7 +1230,7 @@ func (x *BinaryExpr) Source() ast.Node {
 func (x *BinaryExpr) evaluate(c *OpContext, state Flags) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
-		v := c.newInlineVertex(nil, nil, makeAnonymousConjunct(env, x, c.ci.Refs))
+		v := c.newInlineVertex(nil, nil, makeAnonymousConjunct(env, x, c.ci.refs))
 
 		// Do not fully evaluate the Vertex: if it is embedded within a
 		// struct with arcs that are referenced from within this expression,

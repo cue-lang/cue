@@ -35,6 +35,10 @@ type Runtime struct {
 	version internal.EvaluatorVersion
 
 	flags cuedebug.Config
+
+	// refArena is a shared arena for cycle detection refNodes,
+	// shared across all OpContext instances created from this Runtime.
+	refArena adt.RefArena
 }
 
 func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
@@ -44,6 +48,7 @@ func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
 func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
 	ctx.Version = r.version
 	ctx.Config = r.flags
+	ctx.RefArena = &r.refArena
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {

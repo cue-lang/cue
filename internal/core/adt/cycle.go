@@ -382,10 +382,14 @@ type CycleInfo struct {
 	// a cycle is detected and of which type.
 	CycleType CyclicType
 
-	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
-	// a buffer maintained in OpContext, using a mark-release mechanism.
-	Refs *RefNode
+	// refs is an index+1 into RefArena.nodes, forming a linked list of
+	// references for cycle detection. A value of 0 (the zero value) means
+	// no refs, so that CloseInfo's zero value is valid.
+	refs int32
 }
+
+// noRefs is the sentinel value for CycleInfo.refs indicating no references.
+const noRefs int32 = 0
 
 // IsCyclic indicates whether this conjunct, or any of its ancestors,
 // had a violating cycle.
@@ -393,33 +397,76 @@ func (ci CycleInfo) IsCyclic() bool {
 	return ci.CycleType == IsCyclic
 }
 
-// A RefNode is a linked list of associated references.
-type RefNode struct {
-	Ref Resolver
-	Arc *Vertex // Ref points to this Vertex
+// A refNode records a reference for cycle detection purposes.
+// Nodes are stored in a flat arena (refArena) and linked via
+// next indices, forming a LIFO chain per conjunct.
+type refNode struct {
+	Ref  Resolver
+	Arc  *Vertex // Ref points to this Vertex
+	Node *Vertex // Vertex of which Ref is evaluated as a conjunct
 
-	// Node is the Vertex of which Ref is evaluated as a conjunct.
-	// If there is a cyclic reference (not structural cycle), then
-	// the reference will have the same node. This allows detecting reference
-	// cycles for nodes referring to nodes with an evaluation cycle
-	// (mode tracked to Evaluating status). Examples:
-	//
-	//      a: x
-	//      Y: x
-	//      x: {Y}
-	//
-	// and
-	//
-	//      Y: x.b
-	//      a: x
-	//      x: b: {Y} | null
-	//
-	// In both cases there are not structural cycles and thus need to be
-	// distinguished from regular structural cycles.
-	Node *Vertex
-
-	Next  *RefNode
+	next  int32 // index+1 of next [refNode] in a [RefArena], or [noRefs]
 	Depth int32
+}
+
+// A RefArena is a shared, append-only arena for cycle detection refNodes.
+// It is shared across OpContext instances via the Runtime, so that refs
+// stored in CycleInfo remain valid when accessed from a different OpContext.
+//
+// Fixed-size chunks avoid the memory overhead of repeated slice growth.
+//
+// TODO(perf): the arena currently grows monotonically. Consider a
+// mark-release or epoch-based scheme to reclaim refNodes whose
+// CycleInfo values are no longer reachable.
+type RefArena struct {
+	chunks [][]refNode
+	len    int32 // total number of refNodes across all chunks
+}
+
+const refArenaChunkSize = 512
+
+func (a *RefArena) at(idx int32) *refNode {
+	i := idx - 1
+	return &a.chunks[i/refArenaChunkSize][i%refArenaChunkSize]
+}
+
+func (a *RefArena) push(n refNode) int32 {
+	i := a.len
+	ci := i / refArenaChunkSize
+	si := i % refArenaChunkSize
+	if int(ci) == len(a.chunks) {
+		a.chunks = append(a.chunks, make([]refNode, refArenaChunkSize))
+	}
+	a.chunks[ci][si] = n
+	a.len++
+	return a.len // index+1
+}
+
+// LastCycleRef returns the Resolver at the tail of the ref chain in ci,
+// or nil if there are no refs.
+func (c *OpContext) LastCycleRef(ci CycleInfo) Resolver {
+	a := c.RefArena
+	for idx := ci.refs; idx != noRefs; {
+		r := a.at(idx)
+		if r.next == noRefs {
+			return r.Ref
+		}
+		idx = r.next
+	}
+	return nil
+}
+
+// pushRefNode appends a refNode to the arena and returns the updated CycleInfo
+// with refs pointing to the new head of the chain.
+func (c *OpContext) pushRefNode(ci CycleInfo, arc *Vertex, ref Resolver, node *Vertex, depth int32) CycleInfo {
+	ci.refs = c.RefArena.push(refNode{
+		Ref:   ref,
+		Arc:   arc,
+		Node:  node,
+		next:  ci.refs,
+		Depth: depth,
+	})
+	return ci
 }
 
 // cyclicConjunct is used in nodeContext to postpone the computation of
@@ -466,7 +513,8 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 		return ci, false
 	}
 
-	for r := ci.Refs; r != nil; r = r.Next {
+	for idx := ci.refs; idx != noRefs; {
+		r := n.ctx.RefArena.at(idx)
 		if equalDeref(r.Arc, arc) {
 			if equalDeref(r.Node, n.node) {
 				// reference cycle
@@ -489,7 +537,7 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 				if r.Depth == n.depth {
 					return ci, true
 				}
-				ci.Refs = nil
+				ci.refs = noRefs
 				return ci, false
 			}
 
@@ -514,15 +562,10 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 				return n.markCyclic(arc, env, x, ci)
 			}
 		}
+		idx = r.next
 	}
 
-	ci.Refs = &RefNode{
-		Arc:   deref(arc),
-		Ref:   x,
-		Node:  deref(n.node),
-		Next:  ci.Refs,
-		Depth: n.depth,
-	}
+	ci.CycleInfo = n.ctx.pushRefNode(ci.CycleInfo, deref(arc), x, deref(n.node), n.depth)
 
 	return ci, false
 }
@@ -679,10 +722,10 @@ func (n *nodeContext) reportCycleError() {
 //
 // Example:
 // TODO:
-func makeAnonymousConjunct(env *Environment, x Expr, refs *RefNode) Conjunct {
+func makeAnonymousConjunct(env *Environment, x Expr, refs int32) Conjunct {
 	return Conjunct{
 		env, x, CloseInfo{CycleInfo: CycleInfo{
-			Refs: refs,
+			refs: refs,
 		}},
 	}
 }

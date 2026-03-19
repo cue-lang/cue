@@ -523,7 +523,7 @@ const (
 func (c *OpContext) Wrap(v *Vertex, id CloseInfo) *Vertex {
 	w := c.newInlineVertex(nil, nil, v.Conjuncts...)
 	n := w.getState(c)
-	n.share(makeAnonymousConjunct(nil, v, nil), v, id)
+	n.share(makeAnonymousConjunct(nil, v, noRefs), v, id)
 	return w
 }
 

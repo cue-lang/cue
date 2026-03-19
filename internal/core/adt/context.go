@@ -150,6 +150,10 @@ type OpContext struct {
 	positionTable []token.Pos          // unique positions
 	positionIndex map[token.Pos]uint32 // reverse lookup for interning
 
+	// RefArena is a shared arena for cycle detection refNodes,
+	// shared across OpContext instances via the Runtime.
+	RefArena *RefArena
+
 	// disjunctBuffer is reused when constructing [envDisjunct.disjuncts].
 	disjunctBuffer []disjunct
 

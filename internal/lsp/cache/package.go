@@ -364,11 +364,11 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 			// files are added and removed from the file system. This is
 			// not possible with imported packages: an import spec always
 			// refers to exactly one package.
-			attrsByField, err := runtime.ExtractFieldAttrsByKind(syntax, embed.EmbedKind)
+			attrsByNode, err := runtime.ExtractAttrsByKind(syntax, embed.EmbedKind)
 			if err != nil {
 				errs = append(errs, err)
 			}
-			embeddedPaths, err := embed.EmbeddedPaths(modpkgFile.FilePath, attrsByField)
+			embeddedPaths, err := embed.EmbeddedPaths(modpkgFile.FilePath, attrsByNode)
 			if err != nil {
 				errs = append(errs, err)
 			}

@@ -16,6 +16,24 @@
       "message": "```suggestion\n(Def \u0026 {...}).field patterns that include conditionals that used to\n```",
       "revId": "6fa62a8a75c485a2010040416777310cae6c5471",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0f2d706_391a7b54",
+        "filename": "internal/core/export/testdata/selfcontained/issue3714.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-19T11:37:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "998d927c_9f17496f",
+      "revId": "6fa62a8a75c485a2010040416777310cae6c5471",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

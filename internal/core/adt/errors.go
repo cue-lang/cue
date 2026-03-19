@@ -308,6 +308,10 @@ type baseError struct {
 	pos     token.Pos
 	auxpos  []token.Pos
 	altPath []string
+
+	// auxposBootstrap lets auxpos avoid extra allocations for few positions,
+	// which is a very common scenario.
+	auxposBootstrap [4]token.Pos
 }
 
 func (e *baseError) AddPos(p token.Pos) {
@@ -394,17 +398,25 @@ func appendNodePositions(a []token.Pos, n Node) []token.Pos {
 }
 
 func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *ValueError {
-	var a []token.Pos
+	err := &ValueError{
+		baseError: baseError{
+			r:       c.Runtime,
+			v:       c.errNode(),
+			pos:     p,
+			altPath: c.makeAltPath(),
+		},
+	}
+	err.auxpos = err.auxposBootstrap[:0]
+
 	if len(c.positions) > 0 {
-		a = make([]token.Pos, 0, len(c.positions))
 		for _, n := range c.positions {
-			a = appendNodePositions(a, n)
+			err.auxpos = appendNodePositions(err.auxpos, n)
 		}
 	}
 	for i, arg := range args {
 		switch x := arg.(type) {
 		case Node:
-			a = appendNodePositions(a, x)
+			err.auxpos = appendNodePositions(err.auxpos, x)
 			// Wrap nodes in a [fmt.Stringer] which delays the call to
 			// [OpContext.Str] until the error needs to be rendered.
 			// This helps avoid work, as in many cases,
@@ -427,7 +439,7 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 			// more widely.
 			b, _ := cueformat.Node(x)
 			if p := x.Pos(); p.IsValid() {
-				a = append(a, p)
+				err.auxpos = append(err.auxpos, p)
 			}
 			args[i] = string(b)
 		case Feature:
@@ -435,16 +447,8 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 		}
 	}
 
-	return &ValueError{
-		baseError: baseError{
-			r:       c.Runtime,
-			v:       c.errNode(),
-			pos:     p,
-			auxpos:  a,
-			altPath: c.makeAltPath(),
-		},
-		Message: errors.NewMessagef(format, args...),
-	}
+	err.Message = errors.NewMessagef(format, args...)
+	return err
 }
 
 func (c *OpContext) makeAltPath() (a []string) {

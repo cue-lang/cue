@@ -24,7 +24,6 @@ import (
 	gotoken "go/token"
 	"maps"
 	"os"
-	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -38,9 +37,14 @@ import (
 	"cuelang.org/go/cue/build"
 )
 
+// WriteFunc is a function that writes the generated Go source for an instance.
+type WriteFunc func(inst *build.Instance, data []byte) error
+
 // Generate produces Go type definitions from exported CUE definitions.
 // See the help text for `cue help exp gengotypes`.
-func Generate(ctx *cue.Context, insts ...*build.Instance) error {
+//
+// writeFile is called to write the formatted Go source for each instance.
+func Generate(ctx *cue.Context, writeFile WriteFunc, insts ...*build.Instance) error {
 	// record which package instances have already been generated
 	instDone := make(map[*build.Instance]bool)
 
@@ -163,21 +167,6 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 			printf("\n\n")
 		}
 
-		// The generated file is named after the CUE package, not the generated Go package,
-		// as we can have multiple CUE packages in one directory all generating to one Go package.
-		// To keep the filename short for common cases, if we are generating a CUE package
-		// whose package name is implied from its import path, omit the package name element.
-		basename := "cue_types_gen.go"
-		ip := ast.ParseImportPath(inst.ImportPath)
-		ip1 := ip
-		ip1.Qualifier = ""
-		ip1.ExplicitQualifier = false
-		ip1 = ast.ParseImportPath(ip1.String())
-		if ip.Qualifier != ip1.Qualifier {
-			basename = fmt.Sprintf("cue_types_%s_gen.go", inst.PkgName)
-		}
-		outpath := filepath.Join(inst.Dir, basename)
-
 		formatted, err := goformat.Source(buf)
 		if err != nil {
 			// Showing the generated Go code helps debug where the syntax error is.
@@ -187,10 +176,10 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 			for i, line := range lines {
 				withLineNums = fmt.Appendf(withLineNums, "% 4d: %s\n", i+1, line)
 			}
-			fmt.Fprintf(os.Stderr, "-- %s --\n%s\n--\n", filepath.ToSlash(outpath), withLineNums)
+			fmt.Fprintf(os.Stderr, "-- %s --\n%s\n--\n", inst.ImportPath, withLineNums)
 			return err
 		}
-		if err := os.WriteFile(outpath, formatted, 0o666); err != nil {
+		if err := writeFile(inst, formatted); err != nil {
 			return err
 		}
 	}

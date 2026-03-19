@@ -1104,7 +1104,8 @@ type File struct {
 	comments
 }
 
-// Preamble returns the declarations of the preamble.
+// Preamble returns the declarations of the preamble at the top of the file,
+// including any package clause or import declaration found in it.
 func (f *File) Preamble() []Decl {
 	p := 0
 outer:

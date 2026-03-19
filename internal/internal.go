@@ -213,18 +213,7 @@ func ToExpr(n ast.Node) ast.Expr {
 		return x
 
 	case *ast.File:
-		start := 0
-	outer:
-		for i, d := range x.Decls {
-			switch d.(type) {
-			case *ast.Package, *ast.ImportDecl:
-				start = i + 1
-			case *ast.CommentGroup, *ast.Attribute:
-			default:
-				break outer
-			}
-		}
-		decls := x.Decls[start:]
+		decls := x.Decls[len(x.Preamble()):]
 		if len(decls) == 1 {
 			if e, ok := decls[0].(*ast.EmbedDecl); ok {
 				return e.Expr

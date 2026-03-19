@@ -571,10 +571,21 @@ func (c *OpContext) freeNodeContext(n *nodeContext) {
 func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...posInfo) {
 	ctx := n.ctx
 
-	// Collect all positions from the nodes, including their leaf conjuncts
-	var auxpos []token.Pos
-	auxpos = appendNodePositions(auxpos, v1)
-	auxpos = appendNodePositions(auxpos, v2)
+	// Create a ConflictError that defers formatting until needed.
+	err := &ConflictError{
+		baseError: baseError{
+			r:       ctx.Runtime,
+			v:       ctx.errNode(),
+			pos:     token.NoPos,
+			altPath: ctx.makeAltPath(),
+		},
+		format: ctx.Format,
+	}
+	err.auxpos = err.auxposBootstrap[:0]
+
+	// Collect all positions from the nodes, including their leaf conjuncts.
+	err.auxpos = appendNodePositions(err.auxpos, v1)
+	err.auxpos = appendNodePositions(err.auxpos, v2)
 
 	// Make shallow copies of Vertex nodes to avoid endless recursion when
 	// the error is set as the BaseValue. This matches the behavior in [OpContext.NewPosf].
@@ -586,22 +597,10 @@ func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...posInfo) {
 		vcopy := *v
 		v2 = &vcopy
 	}
-
-	// Create a ConflictError that defers formatting until needed
-	err := &ConflictError{
-		baseError: baseError{
-			r:       ctx.Runtime,
-			v:       ctx.errNode(),
-			pos:     token.NoPos,
-			auxpos:  auxpos,
-			altPath: ctx.makeAltPath(),
-		},
-		format: ctx.Format,
-		v1:     v1,
-		v2:     v2,
-		k1:     k1,
-		k2:     k2,
-	}
+	err.v1 = v1
+	err.v2 = v2
+	err.k1 = k1
+	err.k2 = k2
 
 	for _, id := range ids {
 		err.AddClosedPositions(ctx, id)

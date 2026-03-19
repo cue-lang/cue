@@ -248,7 +248,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 		d := &ast.Field{Label: label}
 
-		top := e.frame(0)
+		top := e.frame(0, false)
 		if fr, ok := top.fields[f]; ok && fr.alias != "" {
 			setFieldAlias(d, fr.alias)
 			fr.node = d

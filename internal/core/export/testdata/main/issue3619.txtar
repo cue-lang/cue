@@ -1,0 +1,102 @@
+-- in.cue --
+outputs: [Name=string]: metadata: {
+	name: "\(Name)"
+	labels: string
+}
+outputs: "test": metadata: labels: "test-label"
+-- out/definition-v3 --
+outputs: {
+	{
+		[Name=string]: {
+			metadata: {
+				name:   "\(Name)"
+				labels: string
+			}
+		}
+	}
+	test: {
+		metadata: {
+			labels: "test-label"
+		}
+	}
+}
+-- out/definition-v3-noshare --
+outputs: {
+	{
+		[Name=string]: {
+			metadata: {
+				name:   "\(Name)"
+				labels: string
+			}
+		}
+	}
+	test: {
+		metadata: {
+			labels: "test-label"
+		}
+	}
+}
+-- out/definition --
+-- out/doc-v3 --
+[]
+[outputs]
+[outputs test]
+[outputs test metadata]
+[outputs test metadata labels]
+[outputs test metadata name]
+-- out/value-v3 --
+== Simplified
+{
+	outputs: {
+		test: {
+			metadata: {
+				name:   "test"
+				labels: "test-label"
+			}
+		}
+	}
+}
+== Raw
+{
+	outputs: {
+		test: {
+			metadata: {
+				name:   "test"
+				labels: "test-label"
+			}
+		}
+	}
+}
+== Final
+{
+	outputs: {
+		test: {
+			metadata: {
+				name:   "test"
+				labels: "test-label"
+			}
+		}
+	}
+}
+== All
+{
+	outputs: {
+		test: {
+			metadata: {
+				name:   "test"
+				labels: "test-label"
+			}
+		}
+	}
+}
+== Eval
+{
+	outputs: {
+		test: {
+			metadata: {
+				name:   "test"
+				labels: "test-label"
+			}
+		}
+	}
+}

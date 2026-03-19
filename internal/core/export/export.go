@@ -821,10 +821,13 @@ func (e *exporter) node() *adt.Vertex {
 	return n
 }
 
-func (e *exporter) frame(upCount int32) *frame {
+// frame returns the frame at the given upCount. If needField is true,
+// it skips frames that don't have field set, to resolve LabelReferences
+// past intermediate frames created by nested field processing.
+func (e *exporter) frame(upCount int32, needField bool) *frame {
 	for i := len(e.stack) - 1; i >= 0; i-- {
 		f := &(e.stack[i])
-		if upCount <= (f.upCount - 1) {
+		if upCount <= (f.upCount-1) && (!needField || f.field != nil) {
 			return f
 		}
 		upCount -= f.upCount

@@ -18,7 +18,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -231,12 +230,9 @@ func (d *externDecorator) initCompiler(kind string, pos token.Pos) errors.Error 
 	return nil
 }
 
-// ExtractFieldAttrsByKind finds all the attributes of the given kind
-// in the given AST, parsing their bodies into [internal.Attr].
-// TODO this API does not fit the way that extern attributes can now
-// be used; in particular, there is no longer necessarily a field associated
-// with every extern attribute.
-func ExtractFieldAttrsByKind(file *ast.File, kind string) (attrsByField map[*ast.Field]*internal.Attr, errs errors.Error) {
+// ExtractAttrsByKind finds all the attributes of the given kind in
+// the given AST, parsing their bodies into [internal.Attr].
+func ExtractAttrsByKind(file *ast.File, kind string) (attrsByNode map[ast.Node][]*internal.Attr, errs errors.Error) {
 	kinds, decls, err := findExternFileAttrs(file)
 	if err != nil || len(decls) == 0 {
 		return nil, err
@@ -245,48 +241,28 @@ func ExtractFieldAttrsByKind(file *ast.File, kind string) (attrsByField map[*ast
 		return nil, nil
 	}
 
-	var fieldStack []*ast.Field
+	nodeStack := []ast.Node{file}
 
 	ast.Walk(&ast.File{Decls: decls}, func(n ast.Node) bool {
 		switch n := n.(type) {
+		case *ast.StructLit:
+			nodeStack = append(nodeStack, n)
+
 		case *ast.Field:
-			fieldStack = append(fieldStack, n)
+			nodeStack = append(nodeStack, n.Value)
 
 		case *ast.Attribute:
-			pos := n.Pos()
 			k, body := n.Split()
-
-			// Support old-style and new-style extern attributes.
-			if k != "extern" && k != kind {
+			if k != kind {
 				break
 			}
 
-			lastFieldIdx := len(fieldStack) - 1
-			if lastFieldIdx < 0 {
-				errs = errors.Append(errs, errors.Newf(pos, "@%s attribute not associated with field", kind))
-				return true
+			attrParsed := internal.ParseAttrBody(n.Pos(), body)
+			parent := nodeStack[len(nodeStack)-1]
+			if attrsByNode == nil {
+				attrsByNode = make(map[ast.Node][]*internal.Attr)
 			}
-
-			f := fieldStack[lastFieldIdx]
-
-			_, _, err := ast.LabelName(f.Label)
-			if err != nil {
-				b, _ := format.Node(f.Label)
-				errs = errors.Append(errs, errors.Newf(pos, "external attribute has non-concrete label %s", b))
-				break
-			}
-
-			if attrsByField == nil {
-				attrsByField = make(map[*ast.Field]*internal.Attr)
-			}
-			if _, found := attrsByField[f]; found {
-				errs = errors.Append(errs, errors.Newf(pos, "duplicate @%s attributes", k))
-				break
-			}
-
-			attrParsed := internal.ParseAttrBody(pos, body)
-			attrsByField[f] = &attrParsed
-
+			attrsByNode[parent] = append(attrsByNode[parent], &attrParsed)
 			return false
 		}
 
@@ -294,12 +270,12 @@ func ExtractFieldAttrsByKind(file *ast.File, kind string) (attrsByField map[*ast
 
 	}, func(n ast.Node) {
 		switch n.(type) {
-		case *ast.Field:
-			fieldStack = fieldStack[:len(fieldStack)-1]
+		case *ast.StructLit, *ast.Field:
+			nodeStack = nodeStack[:len(nodeStack)-1]
 		}
 	})
 
-	return attrsByField, errs
+	return attrsByNode, errs
 }
 
 func (d *externDecorator) decorateConjunct(e adt.Elem, scope *adt.Vertex) {

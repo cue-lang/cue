@@ -619,7 +619,7 @@ func (e *Evaluator) embedders() map[*navigable]struct{} {
 	for remotePkg, embeds := range e.config.PkgEmbedders() {
 		remotePkg.bootFiles()
 		for _, embed := range embeds {
-			remotePos := embed.Field.Value.Pos()
+			remotePos := embed.Node.Pos()
 			remoteFilename := remotePos.Filename()
 			remoteFe := remotePkg.byFilename[remoteFilename]
 			if remoteFe == nil {
@@ -1621,7 +1621,8 @@ type frame struct {
 	key ast.Node
 	// node is the initial node that this frame is solely responsible
 	// for evaluating.
-	node ast.Node
+	node  ast.Node
+	attrs []*ast.Attribute
 	// docsNode is set to node if this frame is considered to be a
 	// source of documentation comments. These are used for the "hover"
 	// LSP functionality.
@@ -2138,69 +2139,13 @@ func (f *frame) eval() {
 			if !strings.HasPrefix(keyName, "__") {
 				childFr.parent.newFrame(fieldDecl, nil, false)
 			}
-
+			childFr.attrs = append(childFr.attrs, node.Attrs...)
 			for _, attr := range node.Attrs {
 				childFr.addRange(attr)
-				embed, remoteEvals := f.fileEvaluator.evaluator.config.ForEmbedAttribute(attr.Pos())
-				if len(remoteEvals) == 0 {
-					continue
-				}
-				isGlob := embed.IsGlob()
-				for _, remotePkgEvaluator := range remoteEvals {
-					// The attribute is an embed of 1 or more files, which
-					// we have converted to pkgs with evaluators. Booting
-					// them means their pkgDecls have frames.
-					//
-					// The behaviour here is very similar to processing an
-					// ImportSpec.
-					remotePkgEvaluator.bootFiles()
-
-					childFrs := []*frame{childFr}
-					if isGlob {
-						childFrs = childFrs[:0]
-						dir := stdpath.Dir(filepath.ToSlash(f.fileEvaluator.File.Filename)) + "/"
-						for remoteFilename := range remotePkgEvaluator.byFilename {
-							remoteFilename = filepath.ToSlash(remoteFilename)
-							fieldName := strings.TrimPrefix(remoteFilename, dir)
-							fieldNameIdent := ast.NewIdent(fieldName)
-							grandChildFr := childFr.newFrame(fieldNameIdent, childFr.navigable.ensureNavigable(fieldName), false)
-							grandChildFr.addRange(attr)
-							childFr.appendBinding(fieldName, grandChildFr)
-							childFrs = append(childFrs, grandChildFr)
-						}
-					}
-
-					for _, childFr := range childFrs {
-						// We add a path that records that this field resolves
-						// to the remote package. DefinitionsForOffset always
-						// passes through a path, so this path ensures
-						// DefinitionsForOffset on the attr itself will take
-						// you to the embedded files.
-						p := &path{
-							frame: childFr,
-							components: []pathComponent{{
-								unexpanded: []*navigable{remotePkgEvaluator.pkgDecls},
-								node:       attr,
-							}},
-						}
-						childFr.childPaths = append(childFr.childPaths, p)
-
-						// Ensure that the child frame resolves to the file
-						// navs from the remote package. This allows paths that
-						// travels through the embed and into the remote pkg to
-						// resolve correctly.
-						remotePkgFileFrames := remotePkgEvaluator.pkgFrame.childFrames
-						remotePkgNavs := make([]*navigable, len(remotePkgFileFrames))
-						for i, remoteFileFr := range remotePkgFileFrames {
-							remotePkgNavs[i] = remoteFileFr.navigable
-						}
-						childFr.navigable.ensureResolvesTo(remotePkgNavs)
-
-						// We also record that the attr uses the remote package.
-						remotePkgEvaluator.pkgDecls.recordUsage(attr, childFr)
-					}
-				}
 			}
+
+		case *ast.Attribute:
+			f.attrs = append(f.attrs, node)
 
 		default:
 			f.addUnknownRange(node.Pos().Offset(), node.End().Offset())
@@ -2215,6 +2160,68 @@ func (f *frame) eval() {
 	}
 	for _, p := range f.childPaths {
 		p.resolvesToChanged(0)
+	}
+
+	for _, attr := range f.attrs {
+		embed, remoteEvals := f.fileEvaluator.evaluator.config.ForEmbedAttribute(attr.Pos())
+		if len(remoteEvals) == 0 {
+			continue
+		}
+		isGlob := embed.IsGlob()
+		for _, remotePkgEvaluator := range remoteEvals {
+			// The attribute is an embed of 1 or more files, which
+			// we have converted to pkgs with evaluators. Booting
+			// them means their pkgDecls have frames.
+			//
+			// The behaviour here is very similar to processing an
+			// ImportSpec.
+			remotePkgEvaluator.bootFiles()
+
+			frs := []*frame{f}
+			if isGlob {
+				frs = frs[:0]
+				dir := stdpath.Dir(filepath.ToSlash(f.fileEvaluator.File.Filename)) + "/"
+				for remoteFilename := range remotePkgEvaluator.byFilename {
+					remoteFilename = filepath.ToSlash(remoteFilename)
+					fieldName := strings.TrimPrefix(remoteFilename, dir)
+					fieldNameIdent := ast.NewIdent(fieldName)
+					grandChildFr := f.newFrame(fieldNameIdent, f.navigable.ensureNavigable(fieldName), false)
+					grandChildFr.addRange(attr)
+					f.appendBinding(fieldName, grandChildFr)
+					frs = append(frs, grandChildFr)
+				}
+			}
+
+			for _, fr := range frs {
+				// We add a path that records that this frame resolves to
+				// the remote package. DefinitionsForOffset always passes
+				// through a path, so this path ensures
+				// DefinitionsForOffset on the attr itself will take you
+				// to the embedded files.
+				p := &path{
+					frame: fr,
+					components: []pathComponent{{
+						unexpanded: []*navigable{remotePkgEvaluator.pkgDecls},
+						node:       attr,
+					}},
+				}
+				fr.childPaths = append(fr.childPaths, p)
+
+				// Ensure that the frame resolves to the file navs from
+				// the remote package. This allows paths that travels
+				// through the embed and into the remote pkg to resolve
+				// correctly.
+				remotePkgFileFrames := remotePkgEvaluator.pkgFrame.childFrames
+				remotePkgNavs := make([]*navigable, len(remotePkgFileFrames))
+				for i, remoteFileFr := range remotePkgFileFrames {
+					remotePkgNavs[i] = remoteFileFr.navigable
+				}
+				fr.navigable.ensureResolvesTo(remotePkgNavs)
+
+				// We also record that the attr uses the remote package.
+				remotePkgEvaluator.pkgDecls.recordUsage(attr, fr)
+			}
+		}
 	}
 }
 

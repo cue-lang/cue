@@ -470,7 +470,7 @@ q: o.z
 				ln(4, 1, "q"): {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(25, 28): {f: []string{"o", "q", "x"}},
+				or(0, 28):  {f: []string{"o", "q", "x"}},
 				or1(28):    {f: []string{"y"}, e: []string{"o", "q", "x"}},
 				or(29, 31): {f: []string{"y"}},
 				or1(31):    {f: []string{"z"}, e: []string{"o", "q", "x", "y"}},
@@ -2133,7 +2133,7 @@ x: a.b + 1
 				ln(3, 1, "x"):      {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(20, 22): {f: []string{"-foo", "x"}},
+				or(0, 22):  {f: []string{"-foo", "x"}},
 				or(22, 30): {e: []string{"-foo", "a", "x"}},
 				or1(30):    {f: []string{"b"}, e: []string{"-foo", "a", "x"}},
 				or(31, 33): {f: []string{"b"}},
@@ -2175,7 +2175,7 @@ a: b: _
 				ln(7, 1, "b"): {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(20, 23): {f: []string{"a"}},
+				or(0, 23):  {f: []string{"a"}},
 				or1(23):    {f: []string{"b"}, e: []string{"a"}},
 				or1(24):    {f: []string{"b"}},
 				or(25, 32): {e: []string{"L", "V", "a"}},
@@ -4418,7 +4418,7 @@ e: self
 				ln(12, 1, "e"): {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(20, 23):   {f: []string{"a", "e", "x"}},
+				or(0, 23):    {f: []string{"a", "e", "x"}},
 				or1(23):      {f: []string{"y", "z"}, e: []string{"a", "e", "x"}},
 				or(24, 26):   {f: []string{"y", "z"}},
 				or1(26):      {e: []string{"a", "e", "x", "y"}},
@@ -4470,7 +4470,7 @@ g: h: X.f[0]
 				ln(4, 1, "h"): {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(20, 23): {f: []string{"f", "g"}},
+				or(0, 23):  {f: []string{"f", "g"}},
 				or(23, 26): {e: []string{"X", "f", "g"}},
 				or(27, 29): {e: []string{"X", "f", "g"}},
 				or(30, 37): {e: []string{"X", "f", "g"}},
@@ -4501,7 +4501,7 @@ i: self: x: y: z: self
 				ln(2, 1, "z"):    {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(20, 23): {f: []string{"i"}},
+				or(0, 23):  {f: []string{"i"}},
 				or1(23):    {f: []string{"self"}, e: []string{"i"}},
 				or(24, 29): {f: []string{"self"}},
 				or1(29):    {f: []string{"x"}, e: []string{"i", "self"}},
@@ -4607,7 +4607,7 @@ c: {
 				ln(9, 1, "h"): {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(16, 19): {f: []string{"a", "c"}},
+				or(0, 19):  {f: []string{"a", "c"}},
 				or1(19):    {f: []string{"b"}, e: []string{"a", "c"}},
 				or(20, 22): {f: []string{"b"}},
 				or1(22):    {e: []string{"a", "b", "c"}},
@@ -4679,7 +4679,7 @@ c: {
 				ln(9, 1, "d"): {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(16, 19):   {f: []string{"a", "c"}},
+				or(0, 19):    {f: []string{"a", "c"}},
 				or1(19):      {f: []string{"b"}, e: []string{"a", "c"}},
 				or(20, 22):   {f: []string{"b"}},
 				or1(22):      {e: []string{"a", "b", "c"}},
@@ -4762,7 +4762,7 @@ let v = true {
 				ln(22, 1, "b"): {self, ln(7, 1, "b"), ln(14, 1, "b")},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(16, 25):   {f: []string{"a", "b", "z"}},
+				or(0, 25):    {f: []string{"a", "b", "z"}},
 				or(25, 27):   {e: []string{"x"}},
 				or(27, 30):   {f: []string{"a", "b", "z"}},
 				or1(34):      {e: []string{"x"}},
@@ -4857,7 +4857,7 @@ out: {
 				ln(15, 1, "d"): {self, ln(7, 1, "d")},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(16, 21):   {f: []string{"out"}},
+				or(0, 21):    {f: []string{"out"}},
 				or(21, 28):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"out"}},
 				or1(32):      {e: []string{"b", "d", "out"}},
 				or(33, 37):   {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"b", "d", "out"}},

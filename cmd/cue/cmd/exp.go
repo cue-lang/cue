@@ -85,6 +85,8 @@ To ensure that the resulting Go code works, any imported CUE packages or
 referenced CUE definitions are transitively generated as well.
 Code is generated in each CUE package directory at cue_types_${pkgname}_gen.go,
 where the package name is omitted from the filename if it is implied by the import path.
+The --outfile flag can be used to write the output for a single CUE package to a specific file,
+or to stdout when set to "-".
 
 Generated Go type and field names may differ from the original CUE names by default.
 For instance, an exported definition "#foo" becomes "Foo",
@@ -124,13 +126,18 @@ The default is "zero", representing a missing field as the zero value.
 `[1:],
 		RunE: mkRunE(c, runExpGenGoTypes),
 	}
+	cmd.Flags().String(string(flagOutFile), "", "generate one Go file for a single CUE package")
 
 	return cmd
 }
 
 func runExpGenGoTypes(cmd *Command, args []string) error {
+	outFile := flagOutFile.String(cmd)
 	insts := load.Instances(args, &load.Config{})
-	return gotypes.Generate(cmd.ctx, insts...)
+	if outFile != "" && len(insts) != 1 {
+		return fmt.Errorf("--outfile only allows for one package to be specified")
+	}
+	return gotypes.Generate(cmd.ctx, outFile, insts...)
 }
 
 func newExpWritefsCmd(c *Command) *cobra.Command {

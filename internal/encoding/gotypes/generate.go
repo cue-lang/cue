@@ -40,7 +40,10 @@ import (
 
 // Generate produces Go type definitions from exported CUE definitions.
 // See the help text for `cue help exp gengotypes`.
-func Generate(ctx *cue.Context, insts ...*build.Instance) error {
+//
+// When outFile is non-empty, output for the first package is written to that path,
+// or to stdout when outFile is "-".
+func Generate(ctx *cue.Context, outFile string, insts ...*build.Instance) error {
 	// record which package instances have already been generated
 	instDone := make(map[*build.Instance]bool)
 
@@ -167,16 +170,19 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 		// as we can have multiple CUE packages in one directory all generating to one Go package.
 		// To keep the filename short for common cases, if we are generating a CUE package
 		// whose package name is implied from its import path, omit the package name element.
-		basename := "cue_types_gen.go"
-		ip := ast.ParseImportPath(inst.ImportPath)
-		ip1 := ip
-		ip1.Qualifier = ""
-		ip1.ExplicitQualifier = false
-		ip1 = ast.ParseImportPath(ip1.String())
-		if ip.Qualifier != ip1.Qualifier {
-			basename = fmt.Sprintf("cue_types_%s_gen.go", inst.PkgName)
+		outpath := outFile
+		if outpath == "" || len(instDone) > 1 {
+			basename := "cue_types_gen.go"
+			ip := ast.ParseImportPath(inst.ImportPath)
+			ip1 := ip
+			ip1.Qualifier = ""
+			ip1.ExplicitQualifier = false
+			ip1 = ast.ParseImportPath(ip1.String())
+			if ip.Qualifier != ip1.Qualifier {
+				basename = fmt.Sprintf("cue_types_%s_gen.go", inst.PkgName)
+			}
+			outpath = filepath.Join(inst.Dir, basename)
 		}
-		outpath := filepath.Join(inst.Dir, basename)
 
 		formatted, err := goformat.Source(buf)
 		if err != nil {
@@ -190,7 +196,11 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 			fmt.Fprintf(os.Stderr, "-- %s --\n%s\n--\n", filepath.ToSlash(outpath), withLineNums)
 			return err
 		}
-		if err := os.WriteFile(outpath, formatted, 0o666); err != nil {
+		if outpath == "-" {
+			if _, err := os.Stdout.Write(formatted); err != nil {
+				return err
+			}
+		} else if err := os.WriteFile(outpath, formatted, 0o666); err != nil {
 			return err
 		}
 	}

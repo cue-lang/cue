@@ -214,13 +214,8 @@ objsLoop:
 					"recordCount", ast.NewLit(token.INT, strconv.Itoa(len(objs))),
 				)
 			}
-			f, err := astutil.ToFile(expr)
-			if err != nil {
-				return nil, errors.Wrapf(err, token.NoPos,
-					"invalid combination of input files")
-			}
 			ctx := b.cmd.ctx
-			inst := ctx.BuildFile(f)
+			inst := ctx.BuildExpr(expr)
 			if err := inst.Err(); err != nil {
 				return nil, err
 			}

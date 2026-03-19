@@ -440,46 +440,48 @@ func (c *compiler) decodeFile(file, scope string) (adt.Expr, errors.Error) {
 // not. The filepath should be the filepath of the file from which
 // these attributes were extracted, and relative to whatever root is
 // going to be used in calls to [Embed.Matches] and [Embed.FindAll].
-func EmbeddedPaths(filepath string, attrsByField map[*ast.Field]*internal.Attr) ([]*Embed, errors.Error) {
-	if len(attrsByField) == 0 {
+func EmbeddedPaths(filepath string, attrsByNode map[ast.Node][]*internal.Attr) ([]*Embed, errors.Error) {
+	if len(attrsByNode) == 0 {
 		return nil, nil
 	}
 	var errs errors.Error
-	embeds := make([]*Embed, 0, len(attrsByField))
-	for field, attr := range attrsByField {
-		if attr.Err != nil {
-			errs = errors.Append(errs, attr.Err)
-			continue
-		}
-		file, glob, typ, allowEmptyGlob, err := validateAttr(attr)
-		if err != nil {
-			errs = errors.Append(errs, err)
-			continue
-		}
-		embed := &Embed{
-			Field:     field,
-			Attribute: attr,
-			FilePath:  filepath,
-			Type:      typ,
-		}
-		if file != "" {
-			embed.interpreter = &embeddedFile{
-				filepath: file,
+	embeds := make([]*Embed, 0, len(attrsByNode))
+	for node, attrs := range attrsByNode {
+		for _, attr := range attrs {
+			if attr.Err != nil {
+				errs = errors.Append(errs, attr.Err)
+				continue
 			}
-			embeds = append(embeds, embed)
-		} else if glob != "" {
-			embed.interpreter = &embeddedGlob{
-				glob:           glob,
-				allowEmptyGlob: allowEmptyGlob,
+			file, glob, typ, allowEmptyGlob, err := validateAttr(attr)
+			if err != nil {
+				errs = errors.Append(errs, err)
+				continue
 			}
-			embeds = append(embeds, embed)
+			embed := &Embed{
+				Node:      node,
+				Attribute: attr,
+				FilePath:  filepath,
+				Type:      typ,
+			}
+			if file != "" {
+				embed.interpreter = &embeddedFile{
+					filepath: file,
+				}
+				embeds = append(embeds, embed)
+			} else if glob != "" {
+				embed.interpreter = &embeddedGlob{
+					glob:           glob,
+					allowEmptyGlob: allowEmptyGlob,
+				}
+				embeds = append(embeds, embed)
+			}
 		}
 	}
 	return embeds, errs
 }
 
 type Embed struct {
-	Field       *ast.Field
+	Node        ast.Node
 	Attribute   *internal.Attr
 	FilePath    string
 	Type        string

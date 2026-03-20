@@ -691,7 +691,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 				Node: n.node,
 				Err: ctx.NewPosf(Pos(c.expr),
 					"circular dependency in evaluation of conditionals: %v changed after evaluation",
-					ctx.Str(c.expr)),
+					c.expr),
 			})
 		}
 

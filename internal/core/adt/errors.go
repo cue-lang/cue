@@ -303,10 +303,12 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 
 // baseError contains common fields and methods for error types.
 type baseError struct {
-	r       Runtime
-	v       *Vertex
-	pos     token.Pos
-	auxpos  []token.Pos
+	r      Runtime
+	format func(Runtime, Node) string
+	v      *Vertex
+	pos    token.Pos
+	auxpos []token.Pos
+
 	altPath []string
 
 	// auxposBootstrap lets auxpos avoid extra allocations for few positions,
@@ -401,6 +403,7 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 	err := &ValueError{
 		baseError: baseError{
 			r:       c.Runtime,
+			format:  c.Format,
 			v:       c.errNode(),
 			pos:     p,
 			altPath: c.makeAltPath(),
@@ -417,22 +420,18 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 		switch x := arg.(type) {
 		case Node:
 			err.auxpos = appendNodePositions(err.auxpos, x)
-			// Wrap nodes in a [fmt.Stringer] which delays the call to
-			// [OpContext.Str] until the error needs to be rendered.
-			// This helps avoid work, as in many cases,
-			// errors are created but never shown to the user.
-			//
 			// A Vertex will set an error as its BaseValue via a Bottom node,
 			// which might be this error we are creating.
 			// Using the Vertex directly could then lead to endless recursion.
 			// Make a shallow copy to avoid that.
 			if v, ok := x.(*Vertex); ok {
-				// TODO(perf): we could join this allocation with the creation
-				// of the stringer below.
 				vcopy := *v
 				x = &vcopy
 			}
-			args[i] = c.Str(x)
+			// Keep the Node in args; ValueError.Msg wraps it in a
+			// Formatter lazily, avoiding an interface-boxing allocation
+			// for the common case where the error is never rendered.
+			args[i] = x
 		case ast.Node:
 			// TODO: ideally the core evaluator should not depend on higher
 			// level packages. This will allow the debug packages to be used
@@ -467,6 +466,18 @@ func (c *OpContext) makeAltPath() (a []string) {
 	return a
 }
 
+// Msg wraps any Node args with [Formatter] lazily, so the boxing allocation
+// only happens when the error is actually rendered (the minority case).
+func (e *ValueError) Msg() (format string, args []interface{}) {
+	format, args = e.Message.Msg()
+	for i, a := range args {
+		if x, ok := a.(Node); ok {
+			args[i] = Formatter{X: x, F: e.format, R: e.r}
+		}
+	}
+	return format, args
+}
+
 func (e *ValueError) Error() string {
 	return errors.String(e)
 }
@@ -475,7 +486,6 @@ func (e *ValueError) Error() string {
 // actually needed, avoiding expensive string conversions and allocations.
 type ConflictError struct {
 	baseError
-	format func(Runtime, Node) string
 	v1, v2 Node
 	k1, k2 Kind
 }

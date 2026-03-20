@@ -326,12 +326,33 @@ func TestDecode(t *testing.T) {
 		dst:   new(StructWithFloat),
 		want:  StructWithFloat{bigFloat("1.99769313499e+508")},
 	}, {
-		value: "{name: \"John Doe\"}",
+		value: `{name: "John Doe"}`,
 		dst:   new(Custom),
 		want: Custom{
 			UnmarshalCalled: true,
 			Name:            "John Doe",
 		},
+	}, {
+		// `5*time.Minute` via encoding/json and `cue export`,
+		// or via encoding/json/v2 with `,format:nano`
+		value: `300000000000`,
+		dst:   new(time.Duration),
+		want:  5 * time.Minute,
+	}, {
+		// `time.Duration & "5m"` via `cue export`,
+		// and `5*time.Minute` via encoding/json/v2 with `,format:units`
+		// TODO: we should make this work.
+		value: `"5m"`,
+		dst:   new(time.Duration),
+		err:   "cannot use value \"5m\" (type string) as int",
+		// TODO: cover more encoding/json/v2 time.Duration formats
+	}, {
+		// `time.Time & "1970-01-01T03:25:45Z"` via `cue export`,
+		// and `time.Unix(12345, 0).UTC()` via encoding/json and encoding/json/v2
+		value: `"1970-01-01T03:25:45Z"`,
+		dst:   new(time.Time),
+		want:  time.Unix(12345, 0).UTC(),
+		// TODO: cover more encoding/json/v2 time.Time formats
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {

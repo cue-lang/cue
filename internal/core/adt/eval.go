@@ -575,11 +575,11 @@ func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...posInfo) {
 	err := &ConflictError{
 		baseError: baseError{
 			r:       ctx.Runtime,
+			format:  ctx.Format,
 			v:       ctx.errNode(),
 			pos:     token.NoPos,
 			altPath: ctx.makeAltPath(),
 		},
-		format: ctx.Format,
 	}
 	err.auxpos = err.auxposBootstrap[:0]
 

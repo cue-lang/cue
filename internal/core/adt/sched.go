@@ -112,6 +112,10 @@ func (p *taskContext) popTask() {
 	p.stack = p.stack[:len(p.stack)-1]
 }
 
+// taskChunkSize is the number of tasks allocated at once when the pool is empty.
+// sizeof(task) is 128 bytes, so 32 tasks is 4KiB per chunk.
+const taskChunkSize = 32
+
 func (p *taskContext) newTask() *task {
 	if n := len(p.taskPool); n > 0 {
 		t := p.taskPool[n-1]
@@ -122,7 +126,13 @@ func (p *taskContext) newTask() *task {
 		*t = task{}
 		return t
 	}
-	return &task{}
+	// Allocate a chunk of tasks at once to reduce GC overhead
+	// from many small heap allocations.
+	chunk := make([]task, taskChunkSize)
+	for i := 1; i < taskChunkSize; i++ {
+		p.taskPool = append(p.taskPool, &chunk[i])
+	}
+	return &chunk[0]
 }
 
 func (p *taskContext) freeTask(t *task) {

@@ -33,8 +33,7 @@ import (
 // A Context is used for creating CUE [Value] objects.
 //
 // A Context keeps track of loaded instances, indices of internal
-// representations of values, and defines the set of supported builtins. Any
-// operation that involves two Values should originate from the same Context.
+// representations of values, and defines the set of supported builtins.
 //
 // Use [cuelang.org/go/cue/cuecontext.New] to create a new context.
 //
@@ -408,9 +407,6 @@ func (c *Context) EncodeType(x any, option ...EncodeOption) Value {
 func (c *Context) NewList(v ...Value) Value {
 	a := make([]adt.Value, len(v))
 	for i, x := range v {
-		if x.idx != (*runtime.Runtime)(c) {
-			panic("values must be from same Context")
-		}
 		a[i] = x.v
 	}
 	return c.make(c.ctx().NewList(a...))

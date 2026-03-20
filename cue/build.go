@@ -23,9 +23,6 @@ import (
 
 // A Runtime is used for creating CUE Values.
 //
-// Any operation that involves two Values or Instances should originate from
-// the same Runtime.
-//
 // The zero value of Runtime works for legacy reasons, but
 // should not be used. It may panic at some point.
 //

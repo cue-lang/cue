@@ -108,9 +108,8 @@ func (c *OpContext) isDevVersion() bool {
 // An OpContext is not goroutine safe and only one goroutine may use an
 // OpContext at a time.
 //
-// An OpContext is typically used for an entire operation involving CUE
-// values that are derived from the same [cue.Context], such as any call
-// to exported Go APIs like methods on [cue.Value].
+// An OpContext is typically used for an entire operation with CUE values,
+// such as any call to exported Go APIs like methods on [cue.Value].
 //
 // An OpContext stores:
 // - errors encountered during the evaluation

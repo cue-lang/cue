@@ -1673,11 +1673,8 @@ func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 // given path: identifiers that are not resolved within the expression are
 // resolved as if they were defined at the path position.
 //
-// If x is a Value, it will be used as is. It panics if x is not created
-// from the same [Context] as v.
-//
-// Otherwise, the given Go value will be converted to CUE using the same rules
-// as [Context.Encode].
+// If x is a Value, it will be used as is. Otherwise, the given Go value
+// will be converted to CUE using the same rules as [Context.Encode].
 //
 // Any reference in v referring to the value at the given path will resolve to x
 // in the newly created value. The resulting value is not validated.

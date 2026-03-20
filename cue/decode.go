@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 	"unicode"
 	"unicode/utf8"
 
@@ -87,8 +88,6 @@ func (d *decoder) clear(x reflect.Value) {
 	}
 }
 
-var valueType = reflect.TypeFor[Value]()
-
 type valueUnmarshaler interface {
 	unmarshalValue(v Value) error
 }
@@ -145,9 +144,25 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 		d.addErr(err)
 		return
 	}
-	if x.Type() == valueType {
+	switch x.Type() {
+	// When decoding into [Value], we use the value directly.
+	case reflect.TypeFor[Value]():
 		x.Set(reflect.ValueOf(v))
 		return
+	// When decoding into [time.Duration], whose underlying type is int64,
+	// check if the incoming data is a string and parse it in the [time.Duration.String] form.
+	// This matches what CUE's own `time.Duration` validator uses,
+	// as well as encoding/json/v2 with `,format:units`.
+	// Otherwise, continue below to expect a nanosecond integer count.
+	case reflect.TypeFor[time.Duration]():
+		if v.Kind() == StringKind {
+			s, err := v.String()
+			d.addErr(err)
+			dur, err := time.ParseDuration(s)
+			d.addErr(err)
+			x.SetInt(int64(dur))
+			return
+		}
 	}
 
 	unmarshaler, x := indirect(x, v.IsNull())

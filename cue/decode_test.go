@@ -341,10 +341,9 @@ func TestDecode(t *testing.T) {
 	}, {
 		// `time.Duration & "5m"` via `cue export`,
 		// and `5*time.Minute` via encoding/json/v2 with `,format:units`
-		// TODO: we should make this work.
 		value: `"5m"`,
 		dst:   new(time.Duration),
-		err:   "cannot use value \"5m\" (type string) as int",
+		want:  5 * time.Minute,
 		// TODO: cover more encoding/json/v2 time.Duration formats
 	}, {
 		// `time.Time & "1970-01-01T03:25:45Z"` via `cue export`,

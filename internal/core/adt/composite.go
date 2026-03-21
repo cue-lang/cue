@@ -1245,11 +1245,13 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 		for _, pc := range pcs.Pairs {
 			if matchPattern(ctx, pc.Pattern, arc.Label) {
 				for _, c := range pc.Constraint.Conjuncts {
-					env := *(c.Env)
-					if arc.Label.Index() < MaxIndex {
-						env.DynamicLabel = arc.Label
+					if bof, ok := c.x.(*BulkOptionalField); ok && bof.UsesLabel {
+						env := *(c.Env)
+						if arc.Label.Index() < MaxIndex {
+							env.DynamicLabel = arc.Label
+						}
+						c.Env = &env
 					}
-					c.Env = &env
 
 					arc.insertConjunct(ctx, c, c.CloseInfo, ArcMember, true, false)
 				}

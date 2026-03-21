@@ -440,8 +440,8 @@ Resolve: {
 			"d:\\": "c:/a/d:\\"
 		}
 		"//home/user/foo": {
-			"//other/abs/foo": "/other/abs/foo"
 			bar:               "/home/user/foo/bar"
+			"//other/abs/foo": "/other/abs/foo"
 		}
 	}
 }

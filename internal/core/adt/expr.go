@@ -1121,7 +1121,46 @@ func (x *Interpolation) Source() ast.Node {
 	return x.Src
 }
 
+// simpleExpr reports whether the interpolation is of the form "\(expr)",
+// i.e. a single expression with no surrounding text. If so, it returns
+// the inner expression.
+func (x *Interpolation) simpleExpr() (Expr, bool) {
+	if x.K != StringKind || len(x.Parts) != 3 {
+		return nil, false
+	}
+	s, ok := x.Parts[0].(*String)
+	if !ok || s.Str != "" {
+		return nil, false
+	}
+	s, ok = x.Parts[2].(*String)
+	if !ok || s.Str != "" {
+		return nil, false
+	}
+	return x.Parts[1], true
+}
+
 func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
+	// Fast path for "\(expr)", which is fairly common.
+	if expr, ok := x.simpleExpr(); ok {
+		v := c.value(expr, Flags{
+			status:    partial,
+			condition: scalarKnown,
+			mode:      yield,
+		})
+		str := c.ToString(v)
+		if err := c.Err(); err != nil {
+			return &Bottom{
+				Code: err.Code,
+				Node: c.vertex,
+				Err:  errors.Wrapf(err.Err, Pos(x), "invalid interpolation"),
+			}
+		}
+		if s, ok := v.(*String); ok {
+			return s
+		}
+		return &String{x.Src, str}
+	}
+
 	var sb strings.Builder
 	for _, e := range x.Parts {
 		v := c.value(e, Flags{

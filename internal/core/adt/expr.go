@@ -156,6 +156,11 @@ type BulkOptionalField struct {
 	Filter Expr
 	Value  Expr
 	Label  Feature // for reference and formatting
+
+	// HasLabel indicates that the Value expression contains a LabelReference,
+	// meaning it refers to the label of the matched field. When false,
+	// addConstraint can skip copying the Environment to set DynamicLabel.
+	HasLabel bool
 }
 
 func (x *BulkOptionalField) Source() ast.Node {

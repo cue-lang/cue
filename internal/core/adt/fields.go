@@ -317,14 +317,14 @@ func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check
 	n.assertInitialized()
 
 	// TODO(perf): avoid cloning the Environment, if:
-	// - the pattern constraint has no LabelReference
-	//   (require compile-time support)
 	// - there are no references in the conjunct pointing to this node.
 	// - consider adding this value to the Conjunct struct
-	f := arc.Label
-	bulkEnv := *c.Env
-	bulkEnv.DynamicLabel = f
-	c.Env = &bulkEnv
+	if bof, ok := c.x.(*BulkOptionalField); ok && bof.HasLabel {
+		f := arc.Label
+		bulkEnv := *c.Env
+		bulkEnv.DynamicLabel = f
+		c.Env = &bulkEnv
+	}
 
 	arc.insertConjunct(n.ctx, c, c.CloseInfo, mode, check, false)
 }

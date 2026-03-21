@@ -124,14 +124,14 @@ issue3978: {
 }
 -- out/evalalpha/stats --
 Leaks:  10
-Freed:  116
-Reused: 93
+Freed:  114
+Reused: 91
 Allocs: 33
 Retain: 0
 
-Unifications: 105
-Conjuncts:    152
-Disjuncts:    5
+Unifications: 104
+Conjuncts:    150
+Disjuncts:    4
 
 NumCloseIDs: 47
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -153,14 +153,14 @@ diff old new
 -
 -NumCloseIDs: 6
 +Leaks:  10
-+Freed:  116
-+Reused: 93
++Freed:  114
++Reused: 91
 +Allocs: 33
 +Retain: 0
 +
-+Unifications: 105
-+Conjuncts:    152
-+Disjuncts:    5
++Unifications: 104
++Conjuncts:    150
++Disjuncts:    4
 +
 +NumCloseIDs: 47
 -- out/eval/stats --
@@ -183,13 +183,12 @@ closeCycle.c: structural cycle
 closeFail.x.b: field not allowed:
     ./in.cue:104:6
     ./in.cue:107:5
+forCycle.#B.b: structural cycle
 letCycleFail.t1.a.c: structural cycle
 printCycle.a.X: structural cycle
 structCycle.c: structural cycle
 disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:56:9
-b: structural cycle:
-    ./in.cue:62:6
 listAddCycle.c: structural cycle:
     ./in.cue:91:5
 listMulCycle.c: structural cycle:
@@ -264,14 +263,13 @@ Result:
     // [structural cycle]
     #A: (_|_){
       // [structural cycle]
-      a: (_|_){
-        // [structural cycle] b: structural cycle:
-        //     ./in.cue:62:6
-      }
+      a: ~(forCycle.#B)
     }
     #B: (_|_){
-      // [structural cycle] b: structural cycle:
-      //     ./in.cue:62:6
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle] forCycle.#B.b: structural cycle
+      }
     }
   }
   letCycleWithAnd: (struct){
@@ -380,7 +378,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,33 +1,19 @@
+@@ -1,33 +1,18 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
@@ -390,6 +388,7 @@ diff old new
 -    ./in.cue:105:12
 -    ./in.cue:106:6
      ./in.cue:107:5
++forCycle.#B.b: structural cycle
  letCycleFail.t1.a.c: structural cycle
 -structCycle.a: structural cycle
 -structCycle.b.d: structural cycle
@@ -401,12 +400,9 @@ diff old new
 -    ./in.cue:56:9
 -disjunctionCycle.c: cannot use 1 (type int) as type list:
 -    ./in.cue:56:5
-+printCycle.a.X: structural cycle
-+structCycle.c: structural cycle
-+disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
-     ./in.cue:56:9
- b: structural cycle:
-     ./in.cue:62:6
+-    ./in.cue:56:9
+-b: structural cycle:
+-    ./in.cue:62:6
 -closeCycle.c: structural cycle:
 -    ./in.cue:73:15
 -structCycle.c: structural cycle:
@@ -415,6 +411,10 @@ diff old new
 -    ./in.cue:85:11
 -printCycle.a.X.X: structural cycle:
 -    ./in.cue:113:6
++printCycle.a.X: structural cycle
++structCycle.c: structural cycle
++disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
++    ./in.cue:56:9
 +listAddCycle.c: structural cycle:
 +    ./in.cue:91:5
 +listMulCycle.c: structural cycle:
@@ -422,7 +422,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -65,14 +51,8 @@
+@@ -65,14 +50,8 @@
      }
      t2: (struct){
        a: (struct){
@@ -439,7 +439,7 @@ diff old new
          }
          x: (struct){
            y: (string){ "" }
-@@ -88,18 +68,15 @@
+@@ -88,18 +67,15 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -467,7 +467,27 @@ diff old new
        //     ./in.cue:56:9
      }
    }
-@@ -145,12 +122,11 @@
+@@ -107,14 +83,13 @@
+     // [structural cycle]
+     #A: (_|_){
+       // [structural cycle]
+-      a: (_|_){
+-        // [structural cycle] b: structural cycle:
+-        //     ./in.cue:62:6
+-      }
++      a: ~(forCycle.#B)
+     }
+     #B: (_|_){
+-      // [structural cycle] b: structural cycle:
+-      //     ./in.cue:62:6
++      // [structural cycle]
++      b: (_|_){
++        // [structural cycle] forCycle.#B.b: structural cycle
++      }
+     }
+   }
+   letCycleWithAnd: (struct){
+@@ -145,12 +120,11 @@
      b: (_|_){
        // [structural cycle]
        d: (_|_){

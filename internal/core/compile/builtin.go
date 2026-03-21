@@ -241,11 +241,11 @@ var orBuiltin = &adt.Builtin{
 	Func: func(call adt.BuiltinCallContext) adt.Expr {
 		c := call.OpContext()
 
-		d := []adt.Disjunct{}
-		for c := range c.RawElems(call.Value(0)) {
-			d = append(d, adt.Disjunct{Val: c, Default: false})
+		var values []adt.Value
+		for v := range c.RawElems(call.Value(0)) {
+			values = append(values, v)
 		}
-		if len(d) == 0 {
+		if len(values) == 0 {
 			// TODO(manifest): This should not be unconditionally incomplete,
 			// but it requires results from comprehensions and all to have
 			// some special status. Maybe this can be solved by having results
@@ -259,15 +259,10 @@ var orBuiltin = &adt.Builtin{
 				Err: errors.Newf(c.Pos(), "empty list in call to or"),
 			}
 		}
-		v := &adt.Vertex{}
-		// TODO: make a Disjunction.
-		closeInfo := c.CloseInfo()
-		v.AddConjunct(adt.MakeConjunct(nil,
-			&adt.DisjunctionExpr{Values: d, HasDefaults: false},
-			closeInfo,
-		))
-		v.CompleteArcs(c)
-		return v
+		if len(values) == 1 {
+			return values[0]
+		}
+		return &adt.Disjunction{Values: values}
 	},
 }
 

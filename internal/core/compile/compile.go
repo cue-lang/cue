@@ -131,6 +131,12 @@ type compiler struct {
 	// across different iterations of the same field.
 	refersToForVariable bool
 
+	// refersToLabelReference tracks whether an expression refers to a label
+	// via a LabelReference. This is used to set UsesLabel on BulkOptionalField,
+	// allowing the evaluator to skip Environment copies when no label
+	// reference is present in a pattern constraint's value.
+	refersToLabelReference bool
+
 	// inTryContext tracks the nesting depth of try clauses. The ? marker on
 	// references is only valid when inTryContext > 0. In the future, this may
 	// also be set by other contexts like exists() builtins or query contexts.
@@ -518,6 +524,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			Src:     n,
 			UpCount: upCount,
 		}
+		c.refersToLabelReference = true
 
 		switch x := n.Node.(type) {
 		case *ast.Ident:
@@ -747,6 +754,9 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		v := x.Value
 		var value adt.Expr
 
+		savedLabelRef := c.refersToLabelReference
+		c.refersToLabelReference = false
+
 		// Handle value aliases. Deprecated in new aliases.
 		if a, ok := v.(*ast.Alias); ok {
 			c.pushScope(nil, 0, a)
@@ -756,6 +766,9 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		} else {
 			value = c.labeledExpr(x, (*fieldLabel)(x), v)
 		}
+
+		usesLabel := c.refersToLabelReference
+		c.refersToLabelReference = savedLabelRef || usesLabel
 
 		switch l := lab.(type) {
 		case *ast.Ident, *ast.BasicLit:
@@ -793,10 +806,11 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			}
 
 			return &adt.BulkOptionalField{
-				Src:    x,
-				Filter: c.expr(elem),
-				Value:  value,
-				Label:  label,
+				Src:       x,
+				Filter:    c.expr(elem),
+				Value:     value,
+				Label:     label,
+				UsesLabel: usesLabel,
 			}
 
 		case *ast.ParenExpr:

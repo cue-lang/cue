@@ -111,20 +111,6 @@ type envYield struct {
 	expr Node         // The adjusted expression.
 }
 
-// ValueClause represents a wrapper Environment in a chained clause list
-// to account for the unwrapped struct. It is never created by the compiler
-// and serves as a dynamic element only.
-type ValueClause struct {
-	Node
-
-	// The node in which to resolve lookups in the comprehension's value struct.
-	arc *Vertex
-}
-
-func (v *ValueClause) yield(s *compState) {
-	s.yield(s.ctx.spawn(v.arc))
-}
-
 // insertComprehension registers a comprehension with a node, possibly pushing
 // down its evaluation to the node's children. It will only evaluate one level
 // of fields at a time.
@@ -133,12 +119,6 @@ func (n *nodeContext) insertComprehension(
 	c *Comprehension,
 	ci CloseInfo,
 ) {
-	// TODO(perf): this implementation causes the parent's clauses
-	// to be evaluated for each nested comprehension. It would be
-	// possible to simply store the envComprehension of the parent's
-	// result and have each subcomprehension reuse those. This would
-	// also avoid the below allocation and would probably allow us
-	// to get rid of the ValueClause type.
 
 	ec := c.comp
 	if ec == nil {

@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"strings"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -1116,7 +1117,7 @@ func (x *Interpolation) Source() ast.Node {
 }
 
 func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
-	buf := bytes.Buffer{}
+	var sb strings.Builder
 	for _, e := range x.Parts {
 		v := c.value(e, Flags{
 			status:    partial,
@@ -1124,9 +1125,9 @@ func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
 			mode:      yield,
 		})
 		if x.K == BytesKind {
-			buf.Write(c.ToBytes(v))
+			sb.Write(c.ToBytes(v))
 		} else {
-			buf.WriteString(c.ToString(v))
+			sb.WriteString(c.ToString(v))
 		}
 	}
 	if err := c.Err(); err != nil {
@@ -1140,9 +1141,11 @@ func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
 		return err
 	}
 	if x.K == BytesKind {
-		return &Bytes{x.Src, buf.Bytes()}
+		// Interpolations in bytes literals are not very common;
+		// it's okay that we allocate twice in this case.
+		return &Bytes{x.Src, []byte(sb.String())}
 	}
-	return &String{x.Src, buf.String()}
+	return &String{x.Src, sb.String()}
 }
 
 // UnaryExpr is a unary expression.

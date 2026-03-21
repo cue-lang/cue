@@ -398,8 +398,6 @@ func (w *printer) compactNode(n adt.Node) {
 		}
 		// Struct form has no Ident/Expr - body is in Comprehension.Value
 
-	case *adt.ValueClause:
-
 	default:
 		panic(fmt.Sprintf("unknown type %T", x))
 	}

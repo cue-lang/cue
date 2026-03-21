@@ -294,9 +294,6 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 					env = &adt.Environment{Up: env, Vertex: empty}
 				}
 				// Struct form: no new environment needed (like IfClause)
-			case *adt.ValueClause:
-				// Can occur in nested comprehenions.
-				env = &adt.Environment{Up: env, Vertex: empty}
 			default:
 				panic("unreachable")
 			}
@@ -812,10 +809,6 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			// Struct form has no Ident/Expr - body is in Comprehension.Value
 			e.copyMeta(clause, x.Src)
 			c.Clauses = append(c.Clauses, clause)
-
-		case *adt.ValueClause:
-			// Can occur in nested comprehenions.
-			env = &adt.Environment{Up: env, Vertex: empty}
 
 		default:
 			panic(fmt.Sprintf("unknown field %T", x))

@@ -193,8 +193,6 @@ func (w *Visitor) node(n adt.Node) {
 		}
 		// Struct form: body is in Comprehension.Value, walked separately
 
-	case *adt.ValueClause:
-
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
 	}

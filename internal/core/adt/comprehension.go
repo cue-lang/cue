@@ -93,24 +93,6 @@ func (e *envComprehension) addEnv(env *Environment) {
 	e.envs = append(e.envs, env)
 }
 
-// envYield defines a comprehension for a specific field within a comprehension
-// value. Multiple envYields can be associated with a single envComprehension.
-// An envComprehension only needs to be evaluated once for multiple envYields.
-type envYield struct {
-	*envComprehension                // The original comprehension.
-	leaf              *Comprehension // The leaf Comprehension
-
-	// Values specific to the field corresponding to this envYield
-
-	// This envYield was successfully executed and the resulting conjuncts were
-	// added.
-	inserted bool
-
-	env  *Environment // The adjusted Environment.
-	id   CloseInfo    // CloseInfo for the field.
-	expr Node         // The adjusted expression.
-}
-
 // insertComprehension registers a comprehension with a node, possibly pushing
 // down its evaluation to the node's children. It will only evaluate one level
 // of fields at a time.
@@ -327,49 +309,48 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // processComprehension processes a single Comprehension conjunct.
 // It returns an incomplete error if there was one. Fatal errors are
 // processed as a "successfully" completed computation.
-func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bottom {
+func (n *nodeContext) processComprehension(t *task, state vertexStatus) *Bottom {
 	ctx := n.ctx
 
+	ec := t.comp
+
 	// Compute environments, if needed.
-	if !d.done {
-		if err := ctx.yield(d.vertex, d.env, d.comp, Flags{
+	if !ec.done {
+		if err := ctx.yield(ec.vertex, t.env, ec.comp, Flags{
 			status:    state,
 			condition: allKnown,
 			mode:      ignore,
-		}, d.addEnv); err != nil {
+		}, ec.addEnv); err != nil {
 			if err.IsIncomplete() {
 				return err
 			}
 
 			// continue to collect other errors.
-			d.done = true
-			d.inserted = true
-			if d.vertex != nil {
-				d.vertex.state.addBottom(err)
-				ctx.PopArc(d.vertex)
+			ec.done = true
+			if ec.vertex != nil {
+				ec.vertex.state.addBottom(err)
+				ctx.PopArc(ec.vertex)
 			}
 			return nil
 		}
 
-		if len(d.envs) > 0 {
-			for _, s := range d.structs {
+		if len(ec.envs) > 0 {
+			for _, s := range ec.structs {
 				s.Init(n.ctx)
 			}
 		}
-		d.structs = nil
-		d.done = true
+		ec.structs = nil
+		ec.done = true
 	}
 
-	d.inserted = true
-
-	if len(d.envs) == 0 {
+	if len(ec.envs) == 0 {
 		// If there's an else clause, use it instead of marking arc as not present.
-		if d.leaf.Fallback != nil {
+		if t.leaf.Fallback != nil {
 			// Evaluate the else clause in the outer environment.
 			// We use linkChildren to properly chain the environment, similar to
 			// normal comprehension yield processing.
-			env := linkChildren(d.env, d.leaf)
-			n.scheduleConjunct(Conjunct{env, d.leaf.Fallback, d.id}, d.id)
+			env := linkChildren(t.env, t.leaf)
+			n.scheduleConjunct(Conjunct{env, t.leaf.Fallback, t.id}, t.id)
 			return nil
 		}
 		n.node.updateArcType(ArcNotPresent)
@@ -377,13 +358,13 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	}
 
 	v := n.node
-	for c := d.leaf; c.parent != nil; c = c.parent {
+	for c := t.leaf; c.parent != nil; c = c.parent {
 		v = n.ctx.deref(v)
 		v.updateArcType(c.arcType)
 		if v.ArcType == ArcNotPresent {
 			parent := v.Parent
-			b := parent.reportFieldCycleError(ctx, d.comp.Syntax.Pos(), v.Label)
-			d.envComprehension.vertex.state.addBottom(b)
+			b := parent.reportFieldCycleError(ctx, ec.comp.Syntax.Pos(), v.Label)
+			ec.vertex.state.addBottom(b)
 			ctx.current().err = b
 			ctx.current().state = taskFAILED
 			return nil
@@ -391,28 +372,28 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 		if k := c.kind; k == StructKind || k == ListKind {
 			v := v.DerefDisjunct()
 			if s := v.getBareState(n.ctx); s != nil {
-				s.updateNodeType(k, ToExpr(c.Value), d.id)
+				s.updateNodeType(k, ToExpr(c.Value), t.id)
 			}
 		}
 		v = c.arc
 	}
 
-	id := d.id
+	id := t.id
 	// TODO: should we treat comprehension values as optional?
 	// It seems so, but it causes some hangs.
 	// id.setOptional(nil)
 
-	for _, env := range d.envs {
+	for _, env := range ec.envs {
 		if n.node.ArcType == ArcNotPresent {
-			b := n.node.reportFieldCycleError(ctx, d.comp.Syntax.Pos(), n.node.Label)
+			b := n.node.reportFieldCycleError(ctx, ec.comp.Syntax.Pos(), n.node.Label)
 			ctx.current().err = b
 			n.yield()
 			return nil
 		}
 
-		env = linkChildren(env, d.leaf)
+		env = linkChildren(env, t.leaf)
 
-		n.scheduleConjunct(Conjunct{env, d.expr, id}, id)
+		n.scheduleConjunct(Conjunct{env, t.x, id}, id)
 	}
 
 	return nil

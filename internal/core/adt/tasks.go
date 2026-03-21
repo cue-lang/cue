@@ -228,15 +228,7 @@ func processPatternConstraint(ctx *OpContext, t *task, mode runMode) {
 func processComprehension(ctx *OpContext, t *task, mode runMode) {
 	n := t.node
 
-	y := &envYield{
-		envComprehension: t.comp,
-		leaf:             t.leaf,
-		env:              t.env,
-		id:               t.id,
-		expr:             t.x,
-	}
-
-	err := n.processComprehension(y, 0)
+	err := n.processComprehension(t, 0)
 	t.err = CombineErrors(nil, t.err, err)
 	if t.comp.vertex.state != nil {
 		t.comp.vertex.state.addBottom(err)

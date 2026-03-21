@@ -132,14 +132,12 @@ func (n *nodeContext) insertComprehension(
 
 	node := n.node.DerefDisjunct()
 
-	var decls []Decl
 	switch v := ToExpr(x).(type) {
 	case *StructLit:
 		ci = n.splitStruct(v, ci)
 
 		kind := TopKind
 		numFixed := 0
-		var fields []Decl
 		for _, d := range v.Decls {
 			switch f := d.(type) {
 			case *Field:
@@ -167,8 +165,6 @@ func (n *nodeContext) insertComprehension(
 				n.assertInitialized()
 				n.insertArc(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
 
-				fields = append(fields, f)
-
 			case *LetField:
 				// TODO: consider merging this case with the LetField case.
 
@@ -189,15 +185,10 @@ func (n *nodeContext) insertComprehension(
 				n.assertInitialized()
 				arc := n.insertFieldUnchecked(f.Label, ArcMember, conjunct)
 				arc.MultiLet = true // NOTE: v2 was f.IsMulti
-
-				fields = append(fields, f)
-
-			default:
-				decls = append(decls, d)
 			}
 		}
 
-		if len(fields) > 0 {
+		if numFixed > 0 {
 			// Create a stripped struct that only includes fixed fields.
 			// TODO(perf): this StructLit may be inserted more than once in
 			// the same vertex: once taking the StructLit of the referred node
@@ -205,10 +196,27 @@ func (n *nodeContext) insertComprehension(
 			// Is this necessary (given closedness rules), and is this posing
 			// a performance problem?
 			st := v
-			if len(fields) < len(v.Decls) {
+			if numFixed < len(v.Decls) {
+				// Mixed case: second pass to split field decls
+				// from non-field decls. This only runs when
+				// 0 < numFixed < len(v.Decls).
+				fields := make([]Decl, 0, numFixed)
+				decls := make([]Decl, 0, len(v.Decls)-numFixed)
+				for _, d := range v.Decls {
+					switch d.(type) {
+					case *Field, *LetField:
+						fields = append(fields, d)
+					default:
+						decls = append(decls, d)
+					}
+				}
 				st = &StructLit{
 					Src:             v.Src,
 					Decls:           fields,
+					isComprehension: true,
+				}
+				x = &StructLit{
+					Decls:           decls,
 					isComprehension: true,
 				}
 			}
@@ -250,12 +258,7 @@ func (n *nodeContext) insertComprehension(
 			}
 
 		default:
-			// Create a new StructLit with only the fields that need to be
-			// added at this level.
-			x = &StructLit{
-				Decls:           decls,
-				isComprehension: true,
-			}
+			// x was already set in the mixed-case block above.
 		}
 	}
 

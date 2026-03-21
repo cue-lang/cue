@@ -845,12 +845,19 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		if e.cache == nil {
 			e.cache = map[cacheKey]Value{}
 		}
-		n := &Vertex{
+		// Allocate a vertex with space for one conjunct.
+		var alloc struct {
+			v Vertex
+			c [1]Conjunct
+		}
+		alloc.c[0] = c
+		alloc.v = Vertex{
 			Parent:    arc.Parent,
 			Label:     x.Label,
 			IsDynamic: b != nil && b.Code == StructuralCycleError,
-			Conjuncts: []Conjunct{c},
+			Conjuncts: alloc.c[:],
 		}
+		n := &alloc.v
 		v = n
 		e.cache[key] = n
 		// TODO(mem): enable again once we implement memory management.

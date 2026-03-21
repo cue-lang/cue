@@ -121,7 +121,7 @@ type ValueClause struct {
 	arc *Vertex
 }
 
-func (v *ValueClause) yield(s *compState) {
+func (v *ValueClause) yield(s compState) {
 	s.yield(s.ctx.spawn(v.arc))
 }
 
@@ -301,7 +301,7 @@ func (c *OpContext) yield(
 	state Flags,
 	f YieldFunc, // called for every result
 ) *Bottom {
-	s := &compState{
+	s := compState{
 		ctx:   c,
 		comp:  comp,
 		f:     f,
@@ -316,12 +316,11 @@ func (c *OpContext) yield(
 
 	s.i++
 	y.yield(s)
-	s.i--
 
 	return c.PopState(saved)
 }
 
-func (s *compState) yield(env *Environment) (ok bool) {
+func (s compState) yield(env *Environment) (ok bool) {
 	c := s.ctx
 	if s.i >= len(s.comp.Clauses) {
 		s.f(env)
@@ -332,7 +331,6 @@ func (s *compState) yield(env *Environment) (ok bool) {
 
 	s.i++
 	dst.yield(s)
-	s.i--
 
 	if b := c.PopState(saved); b != nil {
 		c.AddBottom(b)

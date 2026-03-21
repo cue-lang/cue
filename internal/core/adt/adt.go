@@ -127,7 +127,7 @@ type YieldFunc func(env *Environment)
 // A Yielder represents 0 or more labeled values of structs or lists.
 type Yielder interface {
 	Node
-	yield(s *compState)
+	yield(s compState)
 }
 
 // A Validator validates a Value. All Validators are Values.

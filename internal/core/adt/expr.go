@@ -2068,7 +2068,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 	return node
 }
 
-func (x *ForClause) yield(s *compState) {
+func (x *ForClause) yield(s compState) {
 	c := s.ctx
 	env := c.Env(0)
 	n := c.forSource(x.Src)
@@ -2179,7 +2179,7 @@ func (x *IfClause) Source() ast.Node {
 	return x.Src
 }
 
-func (x *IfClause) yield(s *compState) {
+func (x *IfClause) yield(s compState) {
 	ctx := s.ctx
 	if ctx.BoolValue(ctx.value(x.Condition, Flags{
 		status:    s.state,
@@ -2206,7 +2206,7 @@ func (x *LetClause) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LetClause) yield(s *compState) {
+func (x *LetClause) yield(s compState) {
 	c := s.ctx
 	n := &Vertex{Arcs: []*Vertex{
 		{
@@ -2245,7 +2245,7 @@ func (x *TryClause) Source() ast.Node {
 	return x.Src
 }
 
-func (x *TryClause) yield(s *compState) {
+func (x *TryClause) yield(s compState) {
 	c := s.ctx
 	env := c.e
 

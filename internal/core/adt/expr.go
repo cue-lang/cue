@@ -1128,36 +1128,78 @@ func (x *Interpolation) Source() ast.Node {
 	return x.Src
 }
 
+// isEmptyLiteral reports whether e is an empty string or bytes literal.
+func isEmptyLiteral(e Expr) bool {
+	switch e := e.(type) {
+	case *String:
+		return e.Str == ""
+	case *Bytes:
+		return len(e.B) == 0
+	}
+	return false
+}
+
 func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
-	var sb strings.Builder
-	for _, e := range x.Parts {
-		v := c.value(e, Flags{
+	var err *Bottom
+
+	// Fast path for "\(expr)" or '\(expr)', which is fairly common.
+	if len(x.Parts) == 3 && isEmptyLiteral(x.Parts[0]) && isEmptyLiteral(x.Parts[2]) {
+		v := c.value(x.Parts[1], Flags{
 			status:    partial,
 			condition: scalarKnown,
 			mode:      yield,
 		})
 		if x.K == BytesKind {
-			sb.Write(c.ToBytes(v))
-		} else {
-			sb.WriteString(c.ToString(v))
+			b := c.ToBytes(v)
+			if err = c.Err(); err != nil {
+				goto invalid
+			}
+			if v, ok := v.(*Bytes); ok {
+				return v
+			}
+			return &Bytes{x.Src, b}
 		}
-	}
-	if err := c.Err(); err != nil {
-		err = &Bottom{
-			Code: err.Code,
-			Node: c.vertex,
-			Err:  errors.Wrapf(err.Err, Pos(x), "invalid interpolation"),
+		str := c.ToString(v)
+		if err = c.Err(); err != nil {
+			goto invalid
 		}
-		// c.AddBottom(err)
-		// return nil
-		return err
+		if v, ok := v.(*String); ok {
+			return v
+		}
+		return &String{x.Src, str}
 	}
-	if x.K == BytesKind {
-		// Interpolations in bytes literals are not very common;
-		// it's okay that we allocate twice in this case.
-		return &Bytes{x.Src, []byte(sb.String())}
+
+	{
+		var sb strings.Builder
+		for _, e := range x.Parts {
+			v := c.value(e, Flags{
+				status:    partial,
+				condition: scalarKnown,
+				mode:      yield,
+			})
+			if x.K == BytesKind {
+				sb.Write(c.ToBytes(v))
+			} else {
+				sb.WriteString(c.ToString(v))
+			}
+		}
+		if err = c.Err(); err != nil {
+			goto invalid
+		}
+		if x.K == BytesKind {
+			// Interpolations in bytes literals are not very common;
+			// it's okay that we allocate twice in this case.
+			return &Bytes{x.Src, []byte(sb.String())}
+		}
+		return &String{x.Src, sb.String()}
 	}
-	return &String{x.Src, sb.String()}
+
+invalid:
+	return &Bottom{
+		Code: err.Code,
+		Node: c.vertex,
+		Err:  errors.Wrapf(err.Err, Pos(x), "invalid interpolation"),
+	}
 }
 
 // UnaryExpr is a unary expression.

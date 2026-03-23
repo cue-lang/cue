@@ -125,7 +125,7 @@ func runEval(cmd *Command, args []string) error {
 
 		errHeader := func() {
 			if id != "" {
-				fmt.Fprintf(cmd.OutOrStderr(), "// %s\n", id)
+				fmt.Fprintf(cmd.ErrOrStderr(), "// %s\n", id)
 			}
 		}
 		if b.outFile.Encoding != build.CUE {

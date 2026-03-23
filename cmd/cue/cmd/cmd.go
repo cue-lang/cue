@@ -135,7 +135,7 @@ Run "cue help commands" for more details on tasks and workflow commands.
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			if len(args) == 0 {
-				w := cmd.OutOrStderr()
+				w := cmd.ErrOrStderr()
 				fmt.Fprintln(w, "cmd must be run as one of its subcommands")
 				fmt.Fprintln(w, "Run 'cue help cmd' for known subcommands.")
 				return ErrPrintedError
@@ -146,7 +146,7 @@ Run "cue help commands" for more details on tasks and workflow commands.
 			}
 			sub, err := customCommand(cmd, commandSection, args[0], tools)
 			if err != nil {
-				w := cmd.OutOrStderr()
+				w := cmd.ErrOrStderr()
 				fmt.Fprint(w, errors.Details(err, &errors.Config{Cwd: rootWorkingDir()}))
 				fmt.Fprintln(w, `Ensure custom commands are defined in a "_tool.cue" file.`)
 				fmt.Fprintln(w, "Run 'cue help cmd' to list available custom commands.")

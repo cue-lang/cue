@@ -442,7 +442,7 @@ func getFilename(b *buildPlan, f *ast.File, root string, force bool) (filename s
 			if !force {
 				// TODO: mimic old behavior: write to stderr, but do not exit
 				// with error code. Consider what is best to do here.
-				stderr := b.cmd.OutOrStderr()
+				stderr := b.cmd.ErrOrStderr()
 				if root != "" {
 					cueFile, _ = filepath.Rel(root, cueFile)
 				}
@@ -483,7 +483,7 @@ func writeFile(p *buildPlan, f *ast.File, cueFile string) error {
 		if err != nil {
 			return err
 		}
-		stderr := p.cmd.OutOrStderr()
+		stderr := p.cmd.ErrOrStderr()
 		fmt.Fprintf(stderr, "importing into %s\n", cueFile)
 		return nil
 	}

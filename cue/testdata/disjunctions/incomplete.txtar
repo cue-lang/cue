@@ -125,9 +125,9 @@ Disjuncts:    98
     s: (string){ string }
     ok1: (_|_){
       // [incomplete] func.ok1: 2 errors in empty disjunction:
-      // func.ok1: non-concrete argument 0:
+      // func.ok1: error in call to encoding/yaml.MarshalStream: non-concrete argument 0:
       //     ./in.cue:26:7
-      // func.ok1: non-concrete argument 0:
+      // func.ok1: error in call to encoding/yaml.Marshal: non-concrete argument 0:
       //     ./in.cue:26:31
     }
   }

@@ -131,11 +131,11 @@ badScore2: {
 	}
 }
 -- out/generate-v3/badDate --
-badDate.data.date: invalid value "2025-10-40" (does not satisfy time.Format("2006-01-02")): error in call to time.Format: invalid time "2025-10-40":
+badDate.data.date: invalid value "2025-10-40" (does not satisfy time.Format("2006-01-02")): invalid time "2025-10-40":
     1:170
     ./datatest/tests.cue:30:14
 -- out/generate-v3/badDateTime --
-badDateTime.data.dateTime: invalid value "2025-10-02T13" (does not satisfy time.Time): error in call to time.Time: invalid time "2025-10-02T13":
+badDateTime.data.dateTime: invalid value "2025-10-02T13" (does not satisfy time.Time): invalid time "2025-10-02T13":
     ./datatest/tests.cue:26:18
     1:215
 -- out/generate-v3/badScore2 --
@@ -144,7 +144,7 @@ badScore2.data.score: invalid value 5 (does not satisfy math.MultipleOf(10)):
     ./datatest/tests.cue:42:15
     1:376
 -- out/generate-v3/badTime --
-badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-01-02")): error in call to time.Format: invalid time "25:00:10":
+badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-01-02")): invalid time "25:00:10":
     1:170
     ./datatest/tests.cue:34:14
 -- out/generate-v3/badUserName --

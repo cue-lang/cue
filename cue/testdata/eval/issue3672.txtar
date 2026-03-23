@@ -389,7 +389,8 @@ Disjuncts:    330375
   #mkFinDefSet: (#struct){
     #Definition!: ~(#FinDefSetDefinition)
     #Type: (_|_){
-      // [incomplete] required field missing: #Definition:
+      // [incomplete] #mkFinDefSet.#Type: error in call to or: required field missing: #Definition:
+      //     ./x.cue:22:9
       //     ./x.cue:22:25
     }
   }
@@ -799,7 +800,7 @@ diff old new
      #Alternatives: (#struct){
        allBut: (#struct){
          AllBut: (list){
-@@ -34,48 +28,11 @@
+@@ -34,48 +28,12 @@
      }
    }
    #mkFinDefSet: (#struct){
@@ -847,13 +848,14 @@ diff old new
 -      }) }
 +    #Definition!: ~(#FinDefSetDefinition)
 +    #Type: (_|_){
-+      // [incomplete] required field missing: #Definition:
++      // [incomplete] #mkFinDefSet.#Type: error in call to or: required field missing: #Definition:
++      //     ./x.cue:22:9
 +      //     ./x.cue:22:25
 +    }
    }
    #ConfigText: ((string|struct)){ |((string){ string }, (#struct){
        UseSectionName: (bool){ true }
-@@ -196,8 +153,41 @@
+@@ -196,8 +154,41 @@
              }) }
          }) }
        _output: (_|_){
@@ -896,7 +898,7 @@ diff old new
        }
      }
    }
-@@ -290,8 +280,41 @@
+@@ -290,8 +281,41 @@
            }) }
        }) }
      orgSyntax: (_|_){
@@ -939,7 +941,7 @@ diff old new
      }
    }
    value0: (#struct){
-@@ -304,1165 +327,71 @@
+@@ -304,1165 +328,71 @@
        0: (string){
          "UseSectionName"
          let INL#9 = (_|_){
@@ -2159,7 +2161,7 @@ diff old new
            //     ./x.cue:22:52
            //     ./x.cue:44:29
            //     ./x.cue:44:56
-@@ -1479,7 +408,9 @@
+@@ -1479,7 +409,9 @@
            //     ./x.cue:118:38
            //     ./x.cue:123:9
            //     ./x.cue:124:16

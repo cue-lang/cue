@@ -1560,8 +1560,16 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 	}
 	callCtx.args = args
 	result := builtin.call(callCtx)
-	if result == nil {
+	switch result := result.(type) {
+	case nil:
 		return nil
+	case *Bottom:
+		vErr := c.NewPosf(Pos(call), "error in call to %s", builtin.qualifiedName(c))
+		return &Bottom{
+			Code: result.Code,
+			Err:  errors.Wrap(vErr, result.Err),
+			Node: c.vertex,
+		}
 	}
 	v, ci := c.evalStateCI(result, Flags{status: partial, condition: state.condition, mode: state.mode})
 	c.ci = ci

@@ -239,7 +239,8 @@ Result:
         //     ./in.cue:50:17
       }
       max: (_|_){
-        // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
+        // [incomplete] incompleteArgDecimalList.#a.max: error in call to list.Max: operand param of '+' not concrete (was int):
+        //     ./in.cue:51:16
         //     ./in.cue:50:17
       }
     }
@@ -258,20 +259,21 @@ Result:
         //     ./in.cue:58:16
       }
       joined: (_|_){
-        // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
-        //     ./in.cue:59:16
+        // [incomplete] incompleteArgStringList.#a.joined: error in call to strings.Join: non-concrete value string in operand to +:
+        //     ./in.cue:60:16
         //     ./in.cue:58:16
+        //     ./in.cue:59:16
       }
     }
   }
   incompleteList: (struct){
     x: (_){ _ }
     decimal: (_|_){
-      // [incomplete] incompleteList.decimal: non-concrete list for argument 0:
+      // [incomplete] incompleteList.decimal: error in call to list.Max: non-concrete list for argument 0:
       //     ./in.cue:66:11
     }
     str: (_|_){
-      // [incomplete] incompleteList.str: non-concrete list for argument 0:
+      // [incomplete] incompleteList.str: error in call to strings.Join: non-concrete list for argument 0:
       //     ./in.cue:67:11
     }
   }
@@ -342,25 +344,45 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -89,7 +89,7 @@
+@@ -89,7 +89,8 @@
          //     ./in.cue:50:17
        }
        max: (_|_){
 -        // [incomplete] incompleteArgDecimalList.#a.0: operand param of '+' not concrete (was int):
-+        // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
++        // [incomplete] incompleteArgDecimalList.#a.max: error in call to list.Max: operand param of '+' not concrete (was int):
++        //     ./in.cue:51:16
          //     ./in.cue:50:17
        }
      }
-@@ -108,7 +108,7 @@
+@@ -108,9 +109,10 @@
          //     ./in.cue:58:16
        }
        joined: (_|_){
 -        // [incomplete] incompleteArgStringList.#a.0: non-concrete value string in operand to +:
-+        // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
-         //     ./in.cue:59:16
-         //     ./in.cue:58:16
+-        //     ./in.cue:59:16
+-        //     ./in.cue:58:16
++        // [incomplete] incompleteArgStringList.#a.joined: error in call to strings.Join: non-concrete value string in operand to +:
++        //     ./in.cue:60:16
++        //     ./in.cue:58:16
++        //     ./in.cue:59:16
        }
-@@ -129,15 +129,18 @@
+     }
+   }
+@@ -117,11 +119,11 @@
+   incompleteList: (struct){
+     x: (_){ _ }
+     decimal: (_|_){
+-      // [incomplete] incompleteList.decimal: non-concrete list for argument 0:
++      // [incomplete] incompleteList.decimal: error in call to list.Max: non-concrete list for argument 0:
+       //     ./in.cue:66:11
+     }
+     str: (_|_){
+-      // [incomplete] incompleteList.str: non-concrete list for argument 0:
++      // [incomplete] incompleteList.str: error in call to strings.Join: non-concrete list for argument 0:
+       //     ./in.cue:67:11
+     }
+   }
+@@ -129,15 +131,18 @@
      x: (_|_){
        // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
        //     ./in.cue:72:11

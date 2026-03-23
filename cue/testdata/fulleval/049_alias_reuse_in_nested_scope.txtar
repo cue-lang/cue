@@ -30,11 +30,11 @@ Disjuncts:    29
 (struct){
   #Foo: (#struct){
     let X#1 = (_|_){
-      // [incomplete] empty list in call to or:
+      // [incomplete] #Foo.X: error in call to or: empty list in call to or:
       //     ./in.cue:2:10
     }
     connection: (_|_){
-      // [incomplete] empty list in call to or:
+      // [incomplete] #Foo.X: error in call to or: empty list in call to or:
       //     ./in.cue:2:10
     }
   }

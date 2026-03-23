@@ -189,8 +189,12 @@ printCycle.a.X: structural cycle
 structCycle.c: structural cycle
 disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:56:9
+listAddCycle.b: error in call to list.Concat: structural cycle:
+    ./in.cue:91:5
 listAddCycle.c: structural cycle:
     ./in.cue:91:5
+listMulCycle.b: error in call to list.Repeat: structural cycle:
+    ./in.cue:97:5
 listMulCycle.c: structural cycle:
     ./in.cue:97:5
 
@@ -318,11 +322,11 @@ Result:
   listAddCycle: (_|_){
     // [structural cycle]
     a: (_|_){
-      // [structural cycle] listAddCycle.c: structural cycle:
+      // [structural cycle] listAddCycle.b: error in call to list.Concat: structural cycle:
       //     ./in.cue:91:5
     }
     b: (_|_){
-      // [structural cycle] listAddCycle.c: structural cycle:
+      // [structural cycle] listAddCycle.b: error in call to list.Concat: structural cycle:
       //     ./in.cue:91:5
     }
     c: (_|_){
@@ -333,11 +337,11 @@ Result:
   listMulCycle: (_|_){
     // [structural cycle]
     a: (_|_){
-      // [structural cycle] listMulCycle.c: structural cycle:
+      // [structural cycle] listMulCycle.b: error in call to list.Repeat: structural cycle:
       //     ./in.cue:97:5
     }
     b: (_|_){
-      // [structural cycle] listMulCycle.c: structural cycle:
+      // [structural cycle] listMulCycle.b: error in call to list.Repeat: structural cycle:
       //     ./in.cue:97:5
     }
     c: (_|_){
@@ -378,7 +382,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,33 +1,18 @@
+@@ -1,33 +1,22 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
@@ -415,14 +419,18 @@ diff old new
 +structCycle.c: structural cycle
 +disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
 +    ./in.cue:56:9
++listAddCycle.b: error in call to list.Concat: structural cycle:
++    ./in.cue:91:5
 +listAddCycle.c: structural cycle:
 +    ./in.cue:91:5
++listMulCycle.b: error in call to list.Repeat: structural cycle:
++    ./in.cue:97:5
 +listMulCycle.c: structural cycle:
 +    ./in.cue:97:5
  
  Result:
  (_|_){
-@@ -65,14 +50,8 @@
+@@ -65,14 +54,8 @@
      }
      t2: (struct){
        a: (struct){
@@ -439,7 +447,7 @@ diff old new
          }
          x: (struct){
            y: (string){ "" }
-@@ -88,18 +67,15 @@
+@@ -88,18 +71,15 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -467,7 +475,7 @@ diff old new
        //     ./in.cue:56:9
      }
    }
-@@ -107,14 +83,13 @@
+@@ -107,14 +87,13 @@
      // [structural cycle]
      #A: (_|_){
        // [structural cycle]
@@ -487,7 +495,7 @@ diff old new
      }
    }
    letCycleWithAnd: (struct){
-@@ -145,12 +120,11 @@
+@@ -145,12 +124,11 @@
      b: (_|_){
        // [structural cycle]
        d: (_|_){
@@ -505,6 +513,40 @@ diff old new
      }
    }
    embedCycle: (struct){
+@@ -164,11 +142,11 @@
+   listAddCycle: (_|_){
+     // [structural cycle]
+     a: (_|_){
+-      // [structural cycle] listAddCycle.c: structural cycle:
+-      //     ./in.cue:91:5
+-    }
+-    b: (_|_){
+-      // [structural cycle] listAddCycle.c: structural cycle:
++      // [structural cycle] listAddCycle.b: error in call to list.Concat: structural cycle:
++      //     ./in.cue:91:5
++    }
++    b: (_|_){
++      // [structural cycle] listAddCycle.b: error in call to list.Concat: structural cycle:
+       //     ./in.cue:91:5
+     }
+     c: (_|_){
+@@ -179,11 +157,11 @@
+   listMulCycle: (_|_){
+     // [structural cycle]
+     a: (_|_){
+-      // [structural cycle] listMulCycle.c: structural cycle:
+-      //     ./in.cue:97:5
+-    }
+-    b: (_|_){
+-      // [structural cycle] listMulCycle.c: structural cycle:
++      // [structural cycle] listMulCycle.b: error in call to list.Repeat: structural cycle:
++      //     ./in.cue:97:5
++    }
++    b: (_|_){
++      // [structural cycle] listMulCycle.b: error in call to list.Repeat: structural cycle:
+       //     ./in.cue:97:5
+     }
+     c: (_|_){
 -- diff/explanation --
 embedCycle: technically not a structural cycle, so V3 result
 is okay or even an improvement.

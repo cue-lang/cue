@@ -88,11 +88,11 @@ c.err.nested.extra: field not allowed:
     ./in.cue:19:3
 f.err.extra: field not allowed:
     ./in.cue:28:14
-d.err: argument must be a struct or list literal:
+d.err: error in call to __closeAll: argument must be a struct or list literal:
     ./in.cue:24:9
-g.err: argument must be a struct or list literal:
+g.err: error in call to __closeAll: argument must be a struct or list literal:
     ./in.cue:32:9
-h.err: __closeAll may only be used when explicitopen is enabled:
+h.err: error in call to __closeAll: __closeAll may only be used when explicitopen is enabled:
     ./old.cue:2:9
 
 Result:
@@ -136,7 +136,7 @@ Result:
   d: (_|_){
     // [eval]
     err: (_|_){
-      // [eval] d.err: argument must be a struct or list literal:
+      // [eval] d.err: error in call to __closeAll: argument must be a struct or list literal:
       //     ./in.cue:24:9
     }
   }
@@ -158,14 +158,14 @@ Result:
   g: (_|_){
     // [eval]
     err: (_|_){
-      // [eval] g.err: argument must be a struct or list literal:
+      // [eval] g.err: error in call to __closeAll: argument must be a struct or list literal:
       //     ./in.cue:32:9
     }
   }
   h: (_|_){
     // [eval]
     err: (_|_){
-      // [eval] h.err: __closeAll may only be used when explicitopen is enabled:
+      // [eval] h.err: error in call to __closeAll: __closeAll may only be used when explicitopen is enabled:
       //     ./old.cue:2:9
     }
   }

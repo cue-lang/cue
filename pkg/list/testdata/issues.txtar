@@ -100,10 +100,11 @@ issue3416: sumSecond: {
 }
 -- out/list-v3 --
 Errors:
-0: invalid operands 2 and {num:6} to '+' (type int and struct):
-    ./in.cue:53:3
+issue3541: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (type int and struct):
+    ./in.cue:52:2
     ./in.cue:35:9
     ./in.cue:36:10
+    ./in.cue:53:3
 
 Result:
 issue563: {
@@ -128,7 +129,7 @@ issue1404: {
 	a:   *1 | 2
 	sum: 1
 }
-issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
+issue3541: _|_ // issue3541: error in call to list.Sum: 0: invalid operands 2 and {num:6} to '+' (type int and struct)
 issue2594: {
 	sumFirst: {
 		#Def: {
@@ -171,7 +172,7 @@ issue3416: {
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,8 @@
+@@ -1,11 +1,9 @@
  Errors:
 -issue2594.sumSecond.x: conflicting values 0 and 6:
 -    ./in.cue:71:3
@@ -180,23 +181,24 @@ diff old new
 -    ./in.cue:75:6
 -issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle
 -issue3416.sumFirst.a.b: field z not allowed by earlier comprehension or reference cycle
-+0: invalid operands 2 and {num:6} to '+' (type int and struct):
-+    ./in.cue:53:3
++issue3541: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (type int and struct):
++    ./in.cue:52:2
 +    ./in.cue:35:9
 +    ./in.cue:36:10
++    ./in.cue:53:3
  
  Result:
  issue563: {
-@@ -30,7 +27,7 @@
+@@ -30,7 +28,7 @@
  	a:   *1 | 2
  	sum: 1
  }
 -issue3541: {}
-+issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
++issue3541: _|_ // issue3541: error in call to list.Sum: 0: invalid operands 2 and {num:6} to '+' (type int and struct)
  issue2594: {
  	sumFirst: {
  		#Def: {
-@@ -47,13 +44,18 @@
+@@ -47,13 +45,18 @@
  			0
  			#In: [...number]
  		}

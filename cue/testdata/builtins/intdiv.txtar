@@ -50,25 +50,25 @@ Conjuncts:    29
 Disjuncts:    29
 -- out/evalalpha --
 Errors:
-quoDivByZero: division by zero:
+quoDivByZero: error in call to quo: division by zero:
     ./in.cue:6:15
 quoTypeError1: cannot use 2.0 (type float) as int in argument 1 to quo:
     ./in.cue:8:20
 quoTypeError2: cannot use 1.0 (type float) as int in argument 2 to quo:
     ./in.cue:9:23
-remDivByZero: division by zero:
+remDivByZero: error in call to rem: division by zero:
     ./in.cue:16:15
 remTypeError1: cannot use 2.0 (type float) as int in argument 1 to rem:
     ./in.cue:18:20
 remTypeError2: cannot use 1.0 (type float) as int in argument 2 to rem:
     ./in.cue:19:23
-divDivByZero: division by zero:
+divDivByZero: error in call to div: division by zero:
     ./in.cue:26:15
 divTypeError1: cannot use 2.0 (type float) as int in argument 1 to div:
     ./in.cue:28:20
 divTypeError2: cannot use 1.0 (type float) as int in argument 2 to div:
     ./in.cue:29:23
-modDivByZero: division by zero:
+modDivByZero: error in call to mod: division by zero:
     ./in.cue:36:15
 modTypeError1: cannot use 2.0 (type float) as int in argument 1 to mod:
     ./in.cue:38:20
@@ -83,7 +83,7 @@ Result:
   quo3: (int){ -2 }
   quo4: (int){ 2 }
   quoDivByZero: (_|_){
-    // [eval] quoDivByZero: division by zero:
+    // [eval] quoDivByZero: error in call to quo: division by zero:
     //     ./in.cue:6:15
   }
   quoTypeError1: (_|_){
@@ -99,7 +99,7 @@ Result:
   rem3: (int){ -1 }
   rem4: (int){ -1 }
   remDivByZero: (_|_){
-    // [eval] remDivByZero: division by zero:
+    // [eval] remDivByZero: error in call to rem: division by zero:
     //     ./in.cue:16:15
   }
   remTypeError1: (_|_){
@@ -115,7 +115,7 @@ Result:
   div3: (int){ -3 }
   div4: (int){ 3 }
   divDivByZero: (_|_){
-    // [eval] divDivByZero: division by zero:
+    // [eval] divDivByZero: error in call to div: division by zero:
     //     ./in.cue:26:15
   }
   divTypeError1: (_|_){
@@ -131,7 +131,7 @@ Result:
   mod3: (int){ 1 }
   mod4: (int){ 1 }
   modDivByZero: (_|_){
-    // [eval] modDivByZero: division by zero:
+    // [eval] modDivByZero: error in call to mod: division by zero:
     //     ./in.cue:36:15
   }
   modTypeError1: (_|_){

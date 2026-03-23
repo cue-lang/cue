@@ -91,7 +91,8 @@ Disjuncts:    62
   #V: (#struct){
     s: (string){ string }
     out: (_|_){
-      // [incomplete] cannot convert incomplete value "string" to JSON:
+      // [incomplete] #V.out: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
+      //     ./in.cue:21:7
       //     ./in.cue:20:7
     }
   }
@@ -109,7 +110,7 @@ Disjuncts:    62
 diff old new
 --- old
 +++ new
-@@ -8,7 +8,7 @@
+@@ -8,13 +8,14 @@
      out: (_|_){
        // [incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
        //     ./in.cue:14:7
@@ -118,7 +119,15 @@ diff old new
      }
    }
    #V: (#struct){
-@@ -24,6 +24,7 @@
+     s: (string){ string }
+     out: (_|_){
+-      // [incomplete] cannot convert incomplete value "string" to JSON:
++      // [incomplete] #V.out: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
++      //     ./in.cue:21:7
+       //     ./in.cue:20:7
+     }
+   }
+@@ -24,6 +25,7 @@
        // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
        //     ./in.cue:26:7
        //     ./in.cue:25:7

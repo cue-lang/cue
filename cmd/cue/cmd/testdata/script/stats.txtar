@@ -22,9 +22,8 @@ stdout -count=1 '\d+\s+B/op'
 stdout -count=1 '\d+\s+max-RSS-B/op'
 
 ! exec cue vet -c fail.cue
-# TODO(mvdan): we should print both
-! stdout '\d+\s+B/op'
-! stderr 'a: conflicting values'
+stdout -count=1 '\d+\s+B/op'
+stderr 'a: conflicting values'
 
 env CUE_BENCH=
 

@@ -69,7 +69,7 @@ func statsEncoder(cmd *Command) (*encoding.Encoder, error) {
 	}
 
 	return encoding.NewEncoder(cmd.ctx, stats, &encoding.Config{
-		Stdout: cmd.OutOrStderr(),
+		Stdout: cmd.ErrOrStderr(),
 		Force:  true,
 	})
 }
@@ -150,7 +150,7 @@ func commandGroup(cmd *cobra.Command) *cobra.Command {
 
 	name := cmd.Name()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		stderr := cmd.OutOrStderr()
+		stderr := cmd.ErrOrStderr()
 		if len(args) == 0 {
 			fmt.Fprintf(stderr, "%s must be run as one of its subcommands\n", name)
 		} else {
@@ -323,13 +323,14 @@ func Main() int {
 	benchName := os.Getenv("CUE_BENCH")
 	if benchName != "" {
 		// Don't let anything else be printed to stdout; we're only benchmarking.
-		cmd.SetOutput(io.Discard)
+		cmd.SetOut(io.Discard)
 	}
 	// TODO(mvdan): consider using [os/signal.NotifyContext]
 	ctx := httplog.ContextWithAllowedURLQueryParams(
 		context.Background(),
 		allowURLQueryParam,
 	)
+	exitCode := 0
 	if err := cmd.Run(ctx); err != nil {
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{
@@ -337,7 +338,7 @@ func Main() int {
 				ToSlash: testing.Testing(),
 			})
 		}
-		return 1
+		exitCode = 1
 	}
 	if benchName != "" {
 		fmt.Printf("Benchmark%s\t", benchName)
@@ -356,7 +357,7 @@ func Main() int {
 		fmt.Printf("\t%d sys-ns/op", stats.Proc.SysNano)
 		fmt.Printf("\n")
 	}
-	return 0
+	return exitCode
 }
 
 type Command struct {
@@ -378,10 +379,10 @@ type errWriter Command
 func (w *errWriter) Write(b []byte) (int, error) {
 	c := (*Command)(w)
 	c.hasErr = len(b) > 0
-	return c.Command.OutOrStderr().Write(b)
+	return c.ErrOrStderr().Write(b)
 }
 
-// Hint: search for uses of OutOrStderr other than the one here to see
+// Hint: search for uses of ErrOrStderr other than the one here to see
 // which output does not trigger a non-zero exit code. os.Stderr may never
 // be used directly.
 
@@ -396,14 +397,19 @@ func (c *Command) Stderr() io.Writer {
 // TODO: add something similar for Stdout. The output model of Cobra isn't
 // entirely clear, and such a change seems non-trivial.
 
-// Consider overriding these methods from Cobra using OutOrStdErr.
+// Consider overriding these methods from Cobra using ErrOrStdErr.
 // We don't use them currently, but may be safer to block. Having them
 // will encourage their usage, and the naming is inconsistent with other CUE APIs.
 // PrintErrf(format string, args ...interface{})
 // PrintErrln(args ...interface{})
 // PrintErr(args ...interface{})
 
-func (c *Command) SetOutput(w io.Writer) {
+// OutOrStderr from Cobra is a footgun; it mixes the configurable SetOut writer,
+// which is only meant for Stdout, with Stderr.
+// Hide it to force using OutOrStdout or ErrOrStderr instead.
+func (c *Command) OutOrStderr() {}
+
+func (c *Command) SetOut(w io.Writer) {
 	c.root.SetOut(w)
 }
 

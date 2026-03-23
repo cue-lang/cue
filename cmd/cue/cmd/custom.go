@@ -205,7 +205,7 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 		Root:    root.Value(),
 		Stdin:   cmd.InOrStdin(),
 		Stdout:  cmd.OutOrStdout(),
-		Stderr:  cmd.OutOrStderr(),
+		Stderr:  cmd.ErrOrStderr(),
 	}
 
 	var didWork atomic.Bool

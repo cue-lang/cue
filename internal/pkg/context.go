@@ -79,7 +79,7 @@ func (c *CallCtxt) Struct(i int) Struct {
 	switch v, ok := x.(*adt.Vertex); {
 	case ok && !v.IsList():
 		v.CompleteArcs(c.ctx)
-		return Struct{c.ctx, v}
+		return Struct{v}
 
 	case v != nil:
 		x = v.Value()
@@ -302,7 +302,7 @@ func (c *CallCtxt) CueList(i int) List {
 	if v == nil {
 		return List{}
 	}
-	return List{c.ctx, v, v.BaseValue.(*adt.ListMarker).IsOpen}
+	return List{v, v.BaseValue.(*adt.ListMarker).IsOpen}
 }
 
 func (c *CallCtxt) Iter(i int) (a cue.Iterator) {

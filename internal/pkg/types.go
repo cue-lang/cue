@@ -27,9 +27,8 @@ type Schema = cue.Value
 
 // List represents a CUE list, which can be open or closed.
 type List struct {
-	runtime adt.Runtime
-	node    *adt.Vertex
-	isOpen  bool
+	node   *adt.Vertex
+	isOpen bool
 }
 
 // Elems returns the elements of a list.
@@ -44,8 +43,7 @@ func (l *List) IsOpen() bool {
 
 // Struct represents a CUE struct, which can be open or closed.
 type Struct struct {
-	runtime adt.Runtime
-	node    *adt.Vertex
+	node *adt.Vertex
 }
 
 // Arcs returns all arcs of s.

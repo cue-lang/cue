@@ -182,7 +182,7 @@ func isOptional(f *reflect.StructField) bool {
 }
 
 // isOmitEmpty means that the zero value is interpreted as undefined.
-func isOmitEmpty(f *reflect.StructField) bool {
+func isOmitEmpty(f reflect.StructField) bool {
 	isOmitEmpty := false
 	switch f.Type.Kind() {
 	case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
@@ -197,8 +197,12 @@ func isOmitEmpty(f *reflect.StructField) bool {
 	tag, ok := f.Tag.Lookup("json")
 	if ok {
 		isOmitEmpty = false
-		if slices.Contains(strings.Split(tag, ",")[1:], "omitempty") {
-			return true
+		i := 0
+		for s := range strings.SplitSeq(tag, ",") {
+			if i > 0 && s == "omitempty" {
+				return true
+			}
+			i++
 		}
 	}
 	return isOmitEmpty
@@ -384,7 +388,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			if tag, _ := sf.Tag.Lookup("json"); tag == "-" {
 				continue
 			}
-			if isOmitEmpty(&sf) && val.IsZero() {
+			if isOmitEmpty(sf) && val.IsZero() {
 				continue
 			}
 			sub := fromGoValue(ctx, nilIsTop, val)

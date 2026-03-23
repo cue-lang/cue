@@ -473,12 +473,21 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		// avoiding repeated slice growth in append calls below.
 		numElems := val.Len()
 		src, _ := src.(*ast.ListLit)
-		list := &adt.ListLit{
+		// Allocate all the objects needed for the list itself together, to reduce overhead.
+		var alloc struct {
+			list  adt.ListLit
+			v     adt.Vertex
+			conjs [1]adt.Conjunct
+		}
+		list := &alloc.list
+		*list = adt.ListLit{
 			Src:   src,
 			Elems: make([]adt.Elem, 0, numElems),
 		}
-		v := &adt.Vertex{
-			Arcs: make([]*adt.Vertex, 0, numElems),
+		v := &alloc.v
+		*v = adt.Vertex{
+			Arcs:      make([]*adt.Vertex, 0, numElems),
+			Conjuncts: alloc.conjs[:1],
 		}
 
 		// Note that we don't use [reflect.Value.Seq2],
@@ -499,7 +508,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, x, f))
 		}
 
-		v.AddConjunct(adt.MakeRootConjunct(env, list))
+		v.Conjuncts[0] = adt.MakeRootConjunct(env, list)
 		v.SetValue(ctx, listMarker)
 		return v
 	}
@@ -541,10 +550,10 @@ func ensureArcVertex(ctx *adt.OpContext, env *adt.Environment, x adt.Value, l ad
 		conjs [1]adt.Conjunct
 	}
 	arc := &alloc.arc
-	arc.Conjuncts = alloc.conjs[:0]
+	arc.Conjuncts = alloc.conjs[:1]
 
 	arc.Label = l
-	arc.AddConjunct(adt.MakeRootConjunct(env, x))
+	arc.Conjuncts[0] = adt.MakeRootConjunct(env, x)
 	arc.SetValue(ctx, x)
 	return arc
 }

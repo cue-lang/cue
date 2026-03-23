@@ -115,7 +115,7 @@ func TestBuiltins(t *testing.T) {
 		`"1937-01-01T12:00:27.87+00:20"`,
 	}, {
 		test("time", `time.Time & "no time"`),
-		`_|_ // invalid value "no time" (does not satisfy time.Time): error in call to time.Time: invalid time "no time"`,
+		`_|_ // invalid value "no time" (does not satisfy time.Time): invalid time "no time"`,
 	}, {
 		test("time", `time.Unix(1500000000, 123456)`),
 		`"2017-07-14T02:40:00.000123456Z"`,

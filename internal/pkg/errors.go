@@ -59,6 +59,14 @@ func (c *CallCtxt) errcf(code adt.ErrorCode, format string, args ...interface{})
 }
 
 func wrapCallErr(c *CallCtxt, b *adt.Bottom) *adt.Bottom {
+	if c.ctx.IsValidator {
+		// Erroring validators already get wrapped by the adt package like:
+		//
+		//    invalid value "foo" (does not satisfy pkg.Bar): ...
+		//
+		// Hence, avoid wrapping them again here, causing stutter.
+		return b
+	}
 	ne := c.ctx.Newf("error in call to %s", c.builtin.name(c.ctx))
 	b.Err = errors.Wrap(ne, b.Err)
 	return b

@@ -191,13 +191,6 @@ func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
 
 }
 
-func (x *Builtin) name(ctx *adt.OpContext) string {
-	if x.Pkg == 0 {
-		return x.Name
-	}
-	return fmt.Sprintf("%s.%s", x.Pkg.StringValue(ctx), x.Name)
-}
-
 func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	switch err := errVal.(type) {
 	case nil:
@@ -216,7 +209,7 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 			}
 		}
 	case Bottomer:
-		ret = wrapCallErr(call, err.Bottom())
+		ret = err.Bottom()
 
 	case errors.Error:
 		// Convert lists of errors to a combined Bottom error.
@@ -232,20 +225,20 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 			}
 		}
 
-		ret = wrapCallErr(call, &adt.Bottom{Err: err})
+		ret = &adt.Bottom{Err: err}
 	case error:
 		// TODO: store the underlying error explicitly
-		ret = wrapCallErr(call, &adt.Bottom{Err: errors.Promote(err, "")})
+		ret = &adt.Bottom{Err: errors.Promote(err, "")}
 	case string, fmt.Stringer:
 		// A string or a stringer likely used as a panic value.
-		ret = wrapCallErr(call, &adt.Bottom{
+		ret = &adt.Bottom{
 			Err: errors.Newf(call.ctx.Pos(), "%s", err),
-		})
+		}
 	default:
 		// Some other value used when panicking; likely a bug.
-		ret = wrapCallErr(call, &adt.Bottom{
+		ret = &adt.Bottom{
 			Err: errors.Newf(call.ctx.Pos(), "BUG: non-stringifiable %T", err),
-		})
+		}
 	}
 	return ret
 }

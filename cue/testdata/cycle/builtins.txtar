@@ -357,7 +357,7 @@ issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, ex
     ./cycle.cue:39:14
     ./cycle.cue:39:21
     ./cycle.cue:40:5
-jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
+jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
     ./jsoncycle.cue:4:8
     ./jsoncycle.cue:5:8
 listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy 1:
@@ -410,10 +410,10 @@ selfCycle.t1.c.d.d: invalid value {d:{}} (does not satisfy matchN): 0 matched, e
     ./yamlcycle.cue:15:8
 selfCycle.t1.c.d.d.d: structural cycle:
     ./yamlcycle.cue:14:5
-selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
+selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
     ./yamlcycle.cue:24:8
     ./yamlcycle.cue:25:8
-selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
+selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
     ./yamlcycle.cue:30:8
     ./yamlcycle.cue:31:8
     ./yamlcycle.cue:32:8
@@ -422,7 +422,7 @@ selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cy
     ./yamlcycle.cue:41:8
 selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:41:8
-selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
+selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
     ./yamlcycle.cue:44:8
     ./yamlcycle.cue:45:8
 
@@ -634,7 +634,7 @@ Result:
       x: (_|_){
         // [structural cycle]
         y: (_|_){
-          // [structural cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
+          // [structural cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
           //     ./jsoncycle.cue:4:8
           //     ./jsoncycle.cue:5:8
         }
@@ -876,7 +876,7 @@ Result:
         x: (_|_){
           // [structural cycle]
           y: (_|_){
-            // [structural cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
+            // [structural cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
             //     ./yamlcycle.cue:24:8
             //     ./yamlcycle.cue:25:8
           }
@@ -887,7 +887,7 @@ Result:
         x: (_|_){
           // [structural cycle]
           y: (_|_){
-            // [structural cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
+            // [structural cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
             //     ./yamlcycle.cue:30:8
             //     ./yamlcycle.cue:31:8
             //     ./yamlcycle.cue:32:8
@@ -926,7 +926,7 @@ Result:
       x: (_|_){
         // [structural cycle]
         y: (_|_){
-          // [structural cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
+          // [structural cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
           //     ./yamlcycle.cue:44:8
           //     ./yamlcycle.cue:45:8
         }
@@ -980,7 +980,7 @@ diff old new
 +    ./cycle.cue:39:14
 +    ./cycle.cue:39:21
 +    ./cycle.cue:40:5
-+jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
++jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
 +    ./jsoncycle.cue:4:8
 +    ./jsoncycle.cue:5:8
 +listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy 1:
@@ -1028,10 +1028,10 @@ diff old new
 -    ./yamlcycle.cue:41:28
 -selfCycle.yamlValidatePartial.x.y.y: structural cycle:
 -    ./yamlcycle.cue:44:29
-+selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
++selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
 +    ./yamlcycle.cue:24:8
 +    ./yamlcycle.cue:25:8
-+selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
++selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
 +    ./yamlcycle.cue:30:8
 +    ./yamlcycle.cue:31:8
 +    ./yamlcycle.cue:32:8
@@ -1040,7 +1040,7 @@ diff old new
 +    ./yamlcycle.cue:41:8
 +selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
 +    ./yamlcycle.cue:41:8
-+selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
++selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
 +    ./yamlcycle.cue:44:8
 +    ./yamlcycle.cue:45:8
  
@@ -1200,7 +1200,7 @@ diff old new
 -        //     ./jsoncycle.cue:4:22
 +        // [structural cycle]
 +        y: (_|_){
-+          // [structural cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
++          // [structural cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
 +          //     ./jsoncycle.cue:4:8
 +          //     ./jsoncycle.cue:5:8
 +        }
@@ -1345,7 +1345,7 @@ diff old new
 -          //     ./yamlcycle.cue:32:22
 +          // [structural cycle]
 +          y: (_|_){
-+            // [structural cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
++            // [structural cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
 +            //     ./yamlcycle.cue:24:8
 +            //     ./yamlcycle.cue:25:8
 +          }
@@ -1356,7 +1356,7 @@ diff old new
 +        x: (_|_){
 +          // [structural cycle]
 +          y: (_|_){
-+            // [structural cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
++            // [structural cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
 +            //     ./yamlcycle.cue:30:8
 +            //     ./yamlcycle.cue:31:8
 +            //     ./yamlcycle.cue:32:8
@@ -1410,7 +1410,7 @@ diff old new
 -        //     ./yamlcycle.cue:44:29
 +        // [structural cycle]
 +        y: (_|_){
-+          // [structural cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
++          // [structural cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
 +          //     ./yamlcycle.cue:44:8
 +          //     ./yamlcycle.cue:45:8
 +        }

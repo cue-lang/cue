@@ -76,13 +76,13 @@ divZero: failed arithmetic: division by zero:
     ./in.cue:8:10
 div00: failed arithmetic: division undefined:
     ./in.cue:9:10
-idiv00: division by zero:
+idiv00: error in call to div: division by zero:
     ./in.cue:13:9
-imod00: division by zero:
+imod00: error in call to mod: division by zero:
     ./in.cue:14:9
-iquo00: division by zero:
+iquo00: error in call to quo: division by zero:
     ./in.cue:15:9
-irem00: division by zero:
+irem00: error in call to rem: division by zero:
     ./in.cue:16:9
 e0: invalid operands 2 and "a" to '+' (type int and string):
     ./in.cue:23:5
@@ -116,19 +116,19 @@ Result:
   b: (bool){ true }
   add: (float){ 5.000000000000000000000000000000000 }
   idiv00: (_|_){
-    // [eval] idiv00: division by zero:
+    // [eval] idiv00: error in call to div: division by zero:
     //     ./in.cue:13:9
   }
   imod00: (_|_){
-    // [eval] imod00: division by zero:
+    // [eval] imod00: error in call to mod: division by zero:
     //     ./in.cue:14:9
   }
   iquo00: (_|_){
-    // [eval] iquo00: division by zero:
+    // [eval] iquo00: error in call to quo: division by zero:
     //     ./in.cue:15:9
   }
   irem00: (_|_){
-    // [eval] irem00: division by zero:
+    // [eval] irem00: error in call to rem: division by zero:
     //     ./in.cue:16:9
   }
   v1: (float){ 5.0E+11 }

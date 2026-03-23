@@ -24,14 +24,16 @@ Conjuncts:    6
 Disjuncts:    7
 -- out/evalalpha --
 Errors:
-0: not enough arguments in call to strings.Join (have 1, want 2):
+a: error in call to strings.Join: not enough arguments in call to strings.Join (have 1, want 2):
+    ./in.cue:2:4
     ./in.cue:2:20
 
 Result:
 (_|_){
   // [eval]
   a: (_|_){
-    // [eval] 0: not enough arguments in call to strings.Join (have 1, want 2):
+    // [eval] a: error in call to strings.Join: not enough arguments in call to strings.Join (have 1, want 2):
+    //     ./in.cue:2:4
     //     ./in.cue:2:20
   }
 }

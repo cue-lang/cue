@@ -207,11 +207,11 @@ recursive.t4.err.nested.field2: conflicting values "hello" and int (mismatched t
     ./in.cue:17:19
     ./in.cue:28:11
     ./in.cue:31:12
-nonStructLiterals.t1.err: argument must be a struct or list literal:
+nonStructLiterals.t1.err: error in call to __reclose: argument must be a struct or list literal:
     ./in.cue:54:11
-nonStructLiterals.t4.err: argument must be a struct or list literal:
+nonStructLiterals.t4.err: error in call to __reclose: argument must be a struct or list literal:
     ./in.cue:58:11
-retro.t1.err: __reclose may only be used when explicitopen is enabled:
+retro.t1.err: error in call to __reclose: __reclose may only be used when explicitopen is enabled:
     ./old.cue:3:11
 
 Result:
@@ -338,7 +338,7 @@ Result:
     t1: (_|_){
       // [eval]
       err: (_|_){
-        // [eval] nonStructLiterals.t1.err: argument must be a struct or list literal:
+        // [eval] nonStructLiterals.t1.err: error in call to __reclose: argument must be a struct or list literal:
         //     ./in.cue:54:11
       }
     }
@@ -348,7 +348,7 @@ Result:
     t4: (_|_){
       // [eval]
       err: (_|_){
-        // [eval] nonStructLiterals.t4.err: argument must be a struct or list literal:
+        // [eval] nonStructLiterals.t4.err: error in call to __reclose: argument must be a struct or list literal:
         //     ./in.cue:58:11
       }
     }
@@ -377,7 +377,7 @@ Result:
     t1: (_|_){
       // [eval]
       err: (_|_){
-        // [eval] retro.t1.err: __reclose may only be used when explicitopen is enabled:
+        // [eval] retro.t1.err: error in call to __reclose: __reclose may only be used when explicitopen is enabled:
         //     ./old.cue:3:11
       }
     }

@@ -35,10 +35,6 @@ type CallCtxt struct {
 	Ret     any
 }
 
-func (c *CallCtxt) Name() string {
-	return c.builtin.name(c.ctx)
-}
-
 // Do returns whether the call should be done.
 func (c *CallCtxt) Do() bool {
 	return c.Err == nil
@@ -120,8 +116,8 @@ func (c *CallCtxt) intValue(i, bitLen int, typ string) int64 {
 		return 0
 	}
 	if n.BitLen() > bitLen {
-		c.errf(err, "int %s overflows %s in argument %d in call to %s",
-			n, typ, i, c.Name())
+		c.errf(err, "int %s overflows %s in argument %d",
+			n, typ, i)
 	}
 	res, _ := x.Int64()
 	return res
@@ -151,8 +147,8 @@ func (c *CallCtxt) uintValue(i, bitLen int, typ string) uint64 {
 		return 0
 	}
 	if n.BitLen() > bitLen {
-		c.errf(err, "int %s overflows %s in argument %d in call to %s",
-			n, typ, i, c.Name())
+		c.errf(err, "int %s overflows %s in argument %d",
+			n, typ, i)
 	}
 	res, _ := x.Uint64()
 	return res

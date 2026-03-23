@@ -721,7 +721,7 @@ resolveToAncestor.t2.X.b: structural cycle
 shortPathFail.elipsis.t2.Foo.ref: structural cycle
 withLetFail.schema.next: structural cycle
 z1.z.g: structural cycle
-3: structural cycle:
+fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
     ./in.cue:371:9
 nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
     ./in.cue:438:6
@@ -1401,7 +1401,7 @@ Result:
       fries: (float){ 2.00 }
       sprite: (float){ 1.00 }
       total: (_|_){
-        // [structural cycle] 3: structural cycle:
+        // [structural cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
         //     ./in.cue:371:9
       }
     }
@@ -1925,7 +1925,7 @@ diff old new
 -d3.x.indirect: structural cycle:
 -    ./in.cue:316:12
 +z1.z.g: structural cycle
-+3: structural cycle:
++fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
 +    ./in.cue:371:9
 +nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
 +    ./in.cue:438:6
@@ -2021,6 +2021,15 @@ diff old new
      }
    }
    fieldsSumInfinite: (_|_){
+@@ -771,7 +767,7 @@
+       fries: (float){ 2.00 }
+       sprite: (float){ 1.00 }
+       total: (_|_){
+-        // [structural cycle] 3: structural cycle:
++        // [structural cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
+         //     ./in.cue:371:9
+       }
+     }
 @@ -839,11 +835,9 @@
        // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
        //     ./in.cue:412:5

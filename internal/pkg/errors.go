@@ -58,20 +58,6 @@ func (c *CallCtxt) errcf(code adt.ErrorCode, format string, args ...interface{})
 	c.Err = &callError{err}
 }
 
-func wrapCallErr(c *CallCtxt, b *adt.Bottom) *adt.Bottom {
-	if c.ctx.IsValidator {
-		// Erroring validators already get wrapped by the adt package like:
-		//
-		//    invalid value "foo" (does not satisfy pkg.Bar): ...
-		//
-		// Hence, avoid wrapping them again here, causing stutter.
-		return b
-	}
-	ne := c.ctx.Newf("error in call to %s", c.builtin.name(c.ctx))
-	b.Err = errors.Wrap(ne, b.Err)
-	return b
-}
-
 func (c *CallCtxt) invalidArgType(arg adt.Value, i int, typ string, err error) {
 	if ve, ok := err.(Bottomer); ok && ve.Bottom().IsIncomplete() {
 		c.Err = ve
@@ -85,11 +71,11 @@ func (c *CallCtxt) invalidArgType(arg adt.Value, i int, typ string, err error) {
 	// a reference.
 	if err != nil {
 		c.errf(err,
-			"cannot use %s (type %s) as %s in argument %d to %s",
-			arg, arg.Kind(), typ, i, c.Name())
+			"cannot use %s (type %s) as %s in argument %d",
+			arg, arg.Kind(), typ, i)
 	} else {
 		c.errf(err,
-			"cannot use %s (type %s) as %s in argument %d to %s",
-			arg, arg.Kind(), typ, i, c.Name())
+			"cannot use %s (type %s) as %s in argument %d",
+			arg, arg.Kind(), typ, i)
 	}
 }

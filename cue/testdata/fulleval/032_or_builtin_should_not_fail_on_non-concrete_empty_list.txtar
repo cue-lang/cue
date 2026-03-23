@@ -29,7 +29,7 @@ Disjuncts:    17
     jobs: (#struct){
     }
     #JobID: (_|_){
-      // [incomplete] empty list in call to or:
+      // [incomplete] #Workflow.#JobID: error in call to or: empty list in call to or:
       //     ./in.cue:6:10
     }
   }

@@ -39,11 +39,12 @@ Disjuncts:    17
         use: (string){ string }
       }
       baz: (_|_){
-        // [incomplete] #Spec.data.baz: non-concrete argument 0:
+        // [incomplete] #Spec.data.baz: error in call to encoding/json.Marshal: non-concrete argument 0:
         //     ./in.cue:11:11
       }
       foobar: (_|_){
-        // [incomplete] cannot convert incomplete value "string" to JSON:
+        // [incomplete] #Spec.data.foobar: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
+        //     ./in.cue:12:11
         //     ./in.cue:6:21
       }
     }

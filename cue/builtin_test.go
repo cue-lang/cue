@@ -92,7 +92,7 @@ func TestBuiltins(t *testing.T) {
 		}`),
 		`{
 	x: int
-	y: _|_ // cannot convert incomplete value "int" to JSON
+	y: _|_ // y: error in call to encoding/json.Marshal: cannot convert incomplete value "int" to JSON
 }`,
 	}, {
 		test("encoding/yaml", `yaml.MarshalStream([{a: 1}, {b: 2}])`),

@@ -30,14 +30,14 @@ Conjuncts:    4
 Disjuncts:    3
 -- out/evalalpha --
 Errors:
-off: testing experiment disabled:
+off: error in call to testExperiment: testing experiment disabled:
     ./off.cue:1:6
 
 Result:
 (_|_){
   // [eval]
   off: (_|_){
-    // [eval] off: testing experiment disabled:
+    // [eval] off: error in call to testExperiment: testing experiment disabled:
     //     ./off.cue:1:6
   }
   on: (string){ "on" }

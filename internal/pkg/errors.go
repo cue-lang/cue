@@ -59,12 +59,9 @@ func (c *CallCtxt) errcf(code adt.ErrorCode, format string, args ...interface{})
 }
 
 func wrapCallErr(c *CallCtxt, b *adt.Bottom) *adt.Bottom {
-	var err errors.Error
-	for _, e := range errors.Errors(b.Err) {
-		ne := c.ctx.Newf("error in call to %s", c.builtin.name(c.ctx))
-		err = errors.Append(err, errors.Wrap(ne, e))
-	}
-	return &adt.Bottom{Code: b.Code, Err: err}
+	ne := c.ctx.Newf("error in call to %s", c.builtin.name(c.ctx))
+	b.Err = errors.Wrap(ne, b.Err)
+	return b
 }
 
 func (c *CallCtxt) invalidArgType(arg adt.Value, i int, typ string, err error) {

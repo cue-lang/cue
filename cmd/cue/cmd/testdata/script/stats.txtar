@@ -7,14 +7,25 @@ stderr -count=1 '"AllocBytes": [1-9]\d*,'
 [unix] stderr -count=1 '"MaxRssBytes": [1-9]\d*$'
 [windows] stderr -count=1 '"MaxRssBytes": 0$'
 
-# Smoke test that CUE_BENCH also works.
+! exec cue vet -c fail.cue
+stderr -count=1 '"EvalVersion": 3,'
+stderr 'a: conflicting values'
+
 env CUE_STATS_FILE=
+
+# Smoke test that CUE_BENCH also works.
 env CUE_BENCH=FooBar
 exec cue export x.cue
 ! stderr .
 [unix] stdout -count=1 '^BenchmarkFooBar\s+1\s+[1-9]\d* ns/op'
 stdout -count=1 '\d+\s+B/op'
 stdout -count=1 '\d+\s+max-RSS-B/op'
+
+! exec cue vet -c fail.cue
+# TODO(mvdan): we should print both
+! stdout '\d+\s+B/op'
+! stderr 'a: conflicting values'
+
 env CUE_BENCH=
 
 # Mock the Go runtime and OS stats, to verify the rest of the logic.
@@ -47,6 +58,8 @@ cmp stderr out/stderr
 a: 1
 b: 2
 c: a | *b
+-- fail.cue --
+a: 1 & 2
 -- memstats.json --
 {
     "TotalAlloc": 300456,

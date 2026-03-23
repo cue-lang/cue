@@ -2352,6 +2352,16 @@ func TestUnify(t *testing.T) {
 		pathA: "#site",
 		pathB: b,
 		want:  `{"bar":{"kind":"bar1","bar1field":"expr"}}`,
+	}, {
+		// Issue #4058: unifying a value obtained via LookupPath from
+		// inside a comprehension should preserve the comprehension's fields.
+		value: `
+			a: a: 1
+			b: { if true { sub: b: 2 } }
+			`,
+		pathA: a,
+		pathB: "b.sub",
+		want:  `{"a":1,"b":2}`,
 	}}
 
 	matrix := cuetdtest.FullMatrix

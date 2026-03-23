@@ -163,6 +163,10 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 		}
 	}
 
+	// Adding a new arc invalidates any existing structure sharing,
+	// as the shared target does not have this arc.
+	n.unshare()
+
 	// getArc is immediately followed by inserting one conjunct,
 	// and vertices with one conjunct are rather common.
 	// When allocating the vertex, also allocate a bootstrap conjuncts array.

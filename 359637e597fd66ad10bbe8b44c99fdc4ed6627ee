@@ -16,6 +16,24 @@
       "message": "very nit - line length here seems surprisingly inconsistent.",
       "revId": "359637e597fd66ad10bbe8b44c99fdc4ed6627ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "758aec09_867466af",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-26T10:20:29Z",
+      "side": 1,
+      "message": "ah that\u0027s just me following https://sembr.org/ :) so it is intentional up to a point. I think in this case it\u0027s OK",
+      "parentUuid": "bd8b1cf7_98ee6269",
+      "revId": "359637e597fd66ad10bbe8b44c99fdc4ed6627ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd8b1cf7_98ee6269",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-26T09:18:09Z",
+      "side": 1,
+      "message": "very nit - line length here seems surprisingly inconsistent.",
+      "revId": "359637e597fd66ad10bbe8b44c99fdc4ed6627ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

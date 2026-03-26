@@ -328,9 +328,10 @@ func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error)
 
 // matchN is the actual implementation of MatchN.
 func matchN(c *adt.OpContext, list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
+	matchVertex := value.Vertex(matchValue)
 	var nmatch int64
 	for _, w := range list {
-		vx := adt.Unify(c, value.Vertex(matchValue), value.Vertex(w))
+		vx := adt.Unify(c, matchVertex, value.Vertex(w))
 		x := value.Make(c, vx)
 		if x.Validate(cue.Final()) == nil {
 			nmatch++
@@ -342,9 +343,10 @@ func matchN(c *adt.OpContext, list []cue.Value, n pkg.Schema, matchValue pkg.Sch
 	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: adt.EvalError,
-			Err: errors.Newf(
+			Err: c.NewPosf(
 				token.NoPos,
-				"number of matched elements is %d: does not satisfy %v",
+				"%v matches %d times, want %d",
+				matchVertex,
 				nmatch,
 				n,
 			),

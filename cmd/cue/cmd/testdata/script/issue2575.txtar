@@ -1,0 +1,20 @@
+# Due to a bug, default selection would differ based on the encoding,
+# given that each encoding uses different code paths out of cue.Value.
+
+exec cue export --out json in.cue
+stdout -count=1 'must-print'
+exec cue export --out cue in.cue
+stdout -count=1 'must-print'
+exec cue export --out yaml in.cue
+stdout -count=1 'must-print'
+exec cue export --out toml in.cue
+stdout -count=1 'must-print'
+
+-- in.cue --
+#Def: {
+	_in: string
+	result: string | *null
+	result: string | *_in
+}
+
+out: #Def & {_in: "must-print"}

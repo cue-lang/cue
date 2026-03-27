@@ -1,0 +1,24 @@
+exec cue cmd print
+stdout 'Hello value'
+
+-- test_tool.cue --
+package main
+
+import (
+	"tool/cli"
+	"text/template"
+	"tool/file"
+)
+
+readTmpl: file.Read & {
+	filename: "go.tmpl"
+	contents: string
+}
+
+execTmpl: template.Execute(readTmpl.contents, {x: "value"})
+
+command: print: cli.Print & {
+	text: execTmpl
+}
+-- go.tmpl --
+Hello {{ .x }}

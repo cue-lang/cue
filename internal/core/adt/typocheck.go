@@ -712,7 +712,18 @@ outer:
 			continue outer
 		}
 
-		if !ok || a.parent == 0 {
+		if a.parent == 0 {
+			// If the embedding's parent is not in the local
+			// reqSets, it originated from a different context
+			// (e.g. cross-package) and cannot provide evidence.
+			if embedScope.parent != 0 {
+				if _, ok2 := all.lookupSet(embedScope.parent); !ok2 {
+					continue outer
+				}
+			}
+			return true
+		}
+		if !ok {
 			return true
 		}
 		if outerScope.removed {

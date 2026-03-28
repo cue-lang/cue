@@ -1,0 +1,59 @@
+# Cross-package embedded disjunction of definitions should correctly
+# eliminate branches when unified with a concrete field.
+# From issue #4197.
+
+-- cue.mod/module.cue --
+module: "foo.test/main"
+language: version: "v0.14.0"
+-- in.cue --
+package main
+
+import "foo.test/main/imported"
+
+out: imported
+out: either: foo: "world"
+-- imported/imported.cue --
+package imported
+
+#Foo: foo: _
+#Bar: bar: _
+
+{either: #Foo | #Bar}
+-- out/evalalpha/stats --
+Leaks:  3
+Freed:  11
+Reused: 2
+Allocs: 12
+Retain: 0
+
+Unifications: 9
+Conjuncts:    18
+Disjuncts:    2
+
+NumCloseIDs: 4
+-- out/eval/stats --
+-- out/evalalpha --
+(struct){
+  out: (struct){
+    either: (#struct){
+      foo: (string){ "world" }
+    }
+    #Foo: (#struct){
+      foo: (_){ _ }
+    }
+    #Bar: (#struct){
+      bar: (_){ _ }
+    }
+  }
+}
+-- out/eval --
+-- out/compile --
+--- in.cue
+{
+  out: 〈import;"foo.test/main/imported"〉
+  out: {
+    either: {
+      foo: "world"
+    }
+  }
+}

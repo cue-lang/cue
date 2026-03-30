@@ -1,0 +1,8 @@
+-- in.cue --
+// File-level @test(eq, ...) coexists with field-level @test attributes.
+// Both assertions run. The file-level @test covers all fields, so per-field
+// coverage is not required, but individual fields may still carry @test.
+
+x: 1 @test(eq, 1)
+y: x + 1
+@test(eq, {x: 1, y: 2})

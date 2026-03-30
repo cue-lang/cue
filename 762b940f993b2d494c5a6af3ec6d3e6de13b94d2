@@ -67,6 +67,24 @@
       "message": "The `k.a` reference doesn\u0027t really make sense here, as the key must be a string, and it\u0027s always nice when examples are actually potentially working, so maybe something like this?\n\n\n```suggestion\nv\u003d[k\u003dstring]: {a: _, b: v.a, c: \"foo\" + k}\n```",
       "revId": "762b940f993b2d494c5a6af3ec6d3e6de13b94d2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b590846a_0b1c6c3d",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2089,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-30T16:07:03Z",
+      "side": 1,
+      "message": "The LSP has to cope with \"bad\" code from the user. I think showing that `k.a` does not resolve to anything (essentially, demonstrating that it is treated as an alias of the key and not the value) (line 2095 makes this explicit, though the test framework actually ensures that every offset within the file that is *not* mentioned in the expectations resolves to nothing), is important, and actually more meaningful than doing `\"foo\" + k` given that the LSP will certainly not produce any error if you tried to add a struct to a string.",
+      "parentUuid": "83e90252_5dae5dad",
+      "revId": "762b940f993b2d494c5a6af3ec6d3e6de13b94d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

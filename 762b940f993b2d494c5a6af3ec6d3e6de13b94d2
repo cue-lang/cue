@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f2650d8_6ef1a1c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-30T15:49:50Z",
+      "side": 1,
+      "message": "I can\u0027t say I fully understand all the details, but the general gist seems good.",
+      "revId": "762b940f993b2d494c5a6af3ec6d3e6de13b94d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc47e357_35ebd900",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 766,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-30T15:49:50Z",
+      "side": 1,
+      "message": "The original phrasing seemed to make more sense here as the `fieldDeclExpr` struct doesn\u0027t have a `keyIdent` field.",
+      "revId": "762b940f993b2d494c5a6af3ec6d3e6de13b94d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4962fb12_3a303671",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2087,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-30T15:49:50Z",
+      "side": 1,
+      "message": "FWIW for new tests, it\u0027s always nice to add them first before changing the logic, so we can see how the new logic changes behaviour.",
+      "revId": "762b940f993b2d494c5a6af3ec6d3e6de13b94d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83e90252_5dae5dad",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2089,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-30T15:49:50Z",
+      "side": 1,
+      "message": "The `k.a` reference doesn\u0027t really make sense here, as the key must be a string, and it\u0027s always nice when examples are actually potentially working, so maybe something like this?\n\n\n```suggestion\nv\u003d[k\u003dstring]: {a: _, b: v.a, c: \"foo\" + k}\n```",
+      "revId": "762b940f993b2d494c5a6af3ec6d3e6de13b94d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

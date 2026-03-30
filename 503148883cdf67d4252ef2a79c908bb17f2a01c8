@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "966c239c_7ebe52c3",
+        "filename": "internal/diff/diff.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-30T12:11:51Z",
+      "side": 1,
+      "message": "should we do anything for the opposite order, i.e. `y, x`?\n\nat least in cases where the cached difference is \"they are exactly equal\", or other simple cases like \"x is missing, y is present\", we could easily use the cached knowledge as well.\n\nor do we expect the reverse order to basically never happen?",
+      "revId": "503148883cdf67d4252ef2a79c908bb17f2a01c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

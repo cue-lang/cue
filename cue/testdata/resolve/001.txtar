@@ -1,8 +1,7 @@
-#evalPartial
 -- in.cue --
-a: b.c.d
-b: c: {d: 3}
-c: {c: d.d}
+a: b.c.d        @test(eq, 3)
+b: {c: {d: 3}}
+c: {c: d.d}     @test(eq, {c: 2})
 d: {d: 2}
 -- out/compile --
 --- in.cue
@@ -30,18 +29,3 @@ Retain: 5
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    12
--- out/evalalpha --
-(struct){
-  a: (int){ 3 }
-  b: (struct){
-    c: (struct){
-      d: (int){ 3 }
-    }
-  }
-  c: (struct){
-    c: (int){ 2 }
-  }
-  d: (struct){
-    d: (int){ 2 }
-  }
-}

@@ -172,6 +172,24 @@ func Instances(args []string, c *Config) []*build.Instance {
 		tg.tags = append(tg.tags, tags...)
 	}
 
+	// Collect module-scoped tags (scope=mod) from transitive imports within
+	// the same module. These tags are injected even when their package is
+	// not a root package but is merely imported.
+	if c.Module != "" {
+		visited := map[string]bool{}
+		// Seed visited with root package paths to avoid double-processing.
+		for _, p := range a {
+			visited[p.ImportPath] = true
+		}
+		for _, p := range a {
+			tags, err := findModuleScopedTags(p, c.Module, visited)
+			if err != nil {
+				p.ReportError(err)
+			}
+			tg.tags = append(tg.tags, tags...)
+		}
+	}
+
 	// TODO(api): have API call that returns an error which is the aggregate
 	// of all build errors. Certain errors, like these, hold across builds.
 	if err := tg.injectTags(c.Tags); err != nil {

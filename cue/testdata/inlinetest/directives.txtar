@@ -1,0 +1,205 @@
+-- in.cue --
+// Comprehensive directive coverage for inline assertion mode.
+
+// ── eq ───────────────────────────────────
+
+eqInt:    42              @test(eq, 42)
+eqStr:    "hello"         @test(eq, "hello")
+eqBool:   true            @test(eq, true)
+eqStruct: {a: 1, b: "x"}  @test(eq, {a: 1, b: "x"})
+eqList:   [1, 2, 3]       @test(eq, [1, 2, 3])
+
+// ── err ──────────────────────────────────
+
+// Conflict at the annotated field.
+errConflict: 1 & 2 @test(err)
+
+// Direct self-cycle at the annotated field.
+errCycle: errCycle + 1 @test(err, code=cycle)
+
+// Type conflict error.
+errEval: string & 1 @test(err, code=eval)
+
+// Error message substring match.
+errContains: 1 & 2 @test(err, contains="conflicting")
+
+// Decl-level err: struct whose evaluation produces an error.
+errDecl: {
+	@test(err, code=eval)
+	a: string & 1
+}
+
+// ── kind ─────────────────────────────────
+
+kindInt:    int    @test(kind=int)
+kindString: string @test(kind=string)
+kindBool:   bool   @test(kind=bool)
+kindFloat:  float  @test(kind=float)
+kindStruct: {a: 1} @test(kind=struct)
+kindList:   [1, 2] @test(kind=list)
+kindBytes:  bytes  @test(kind=bytes)
+kindNull:   null   @test(kind=null)
+
+// Pipe-separated list of acceptable kinds.
+kindIntOrString: int | string @test(kind=int|string)
+
+// ── closed ───────────────────────────────
+
+closedTrue:  close({x: 1}) @test(closed)
+closedFalse: {x: 1}        @test(closed=false)
+
+// Decl-level closed=false: check non-closedness of the containing struct.
+closedDeclFalse: {
+	@test(closed=false)
+	x: 1
+}
+
+// ── leq ──────────────────────────────────
+
+leqInt:    42              @test(leq, number)
+leqString: "hi"            @test(leq, string)
+leqStruct: {a: 1, b: 2}    @test(leq, {a: int, b: int})
+
+// Decl-level leq: subsumption check on the containing struct.
+leqDecl: {
+	@test(leq, {a: int, b: int})
+	a: 1
+	b: 2
+}
+
+// ── kind (decl form) ────────────────────────
+
+// Decl-level kind: check kind of the containing struct.
+kindDecl: {
+	@test(kind=struct)
+	a: 1
+}
+
+// ── permute (field attribute form) ────────
+
+// Two mutually-referencing fields: any permutation must yield the same result.
+permutePair: {
+	x: y + 1 @test(permute)
+	y: 2     @test(permute)
+} @test(eq, {x: 3, y: 2}) @test(permuteCount, 2)
+
+// Three fields, all permuted.
+permuteTriple: {
+	@test(eq, {a: 3, b: 1, c: 2})
+	@test(permuteCount, 6)
+	a: b + c @test(permute)
+	b: 1     @test(permute)
+	c: 2     @test(permute)
+}
+
+// Only two of three fields are permuted; c stays fixed.
+permuteTwoOfThree: {
+	a: b + 1 @test(permute)
+	b: 10    @test(permute)
+	c: 99
+	@test(eq, {
+		a: 11
+		b: 10
+		c: 99
+	})
+	@test(permuteCount, 2)
+}
+
+// ── skip ──────────────────────────────
+
+// Bare skip: test is registered but skipped.
+skipBare: 1 + "2" @test(skip)
+
+// Skip with reason: reason appears in test output.
+skipReason: 1 + "2" @test(skip, why="not yet implemented")
+
+// ── debugCheck ────────────────────────
+
+// debugCheck as field attribute: compare debug printer output.
+debugCheckScalar: 42 @test(debugCheck, "(int){ 42 }")
+debugCheckStruct: {a: 1} @test(debugCheck, "(struct){\n  a: (int){ 1 }\n}")
+
+// ── version-specific ─────────────────
+
+// Version-suffixed eq: override expected value for a specific evaluator version.
+versionedEq: 42 @test(eq, 42) @test(eq:v3, 42)
+-- out/compile --
+--- in.cue
+{
+  eqInt: 42
+  eqStr: "hello"
+  eqBool: true
+  eqStruct: {
+    a: 1
+    b: "x"
+  }
+  eqList: [
+    1,
+    2,
+    3,
+  ]
+  errConflict: (1 & 2)
+  errCycle: (〈0;errCycle〉 + 1)
+  errEval: (string & 1)
+  errContains: (1 & 2)
+  errDecl: {
+    a: (string & 1)
+  }
+  kindInt: int
+  kindString: string
+  kindBool: bool
+  kindFloat: float
+  kindStruct: {
+    a: 1
+  }
+  kindList: [
+    1,
+    2,
+  ]
+  kindBytes: bytes
+  kindNull: null
+  kindIntOrString: (int|string)
+  closedTrue: close({
+    x: 1
+  })
+  closedFalse: {
+    x: 1
+  }
+  closedDeclFalse: {
+    x: 1
+  }
+  leqInt: 42
+  leqString: "hi"
+  leqStruct: {
+    a: 1
+    b: 2
+  }
+  leqDecl: {
+    a: 1
+    b: 2
+  }
+  kindDecl: {
+    a: 1
+  }
+  permutePair: {
+    x: (〈0;y〉 + 1)
+    y: 2
+  }
+  permuteTriple: {
+    a: (〈0;b〉 + 〈0;c〉)
+    b: 1
+    c: 2
+  }
+  permuteTwoOfThree: {
+    a: (〈0;b〉 + 1)
+    b: 10
+    c: 99
+  }
+  skipBare: (1 + "2")
+  skipReason: (1 + "2")
+  debugCheckScalar: 42
+  debugCheckStruct: {
+    a: 1
+  }
+  versionedEq: 42
+}

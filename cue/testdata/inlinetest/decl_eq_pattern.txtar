@@ -1,0 +1,17 @@
+-- in.cue --
+// File-level @test(eq, VALUE) where a pattern constraint contributes
+// to the output — the eq check applies to the whole file.
+
+{[X=string]: baz: X}
+bar: {}
+@test(eq, {bar: baz: "bar"})
+-- out/compile --
+--- in.cue
+{
+  {
+    [string]: {
+      baz: 〈1;-〉
+    }
+  }
+  bar: {}
+}

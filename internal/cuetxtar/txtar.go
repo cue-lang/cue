@@ -89,6 +89,12 @@ type TxTarTest struct {
 	// DebugArchive, if set, is loaded instead of the on-disk archive. This allows
 	// a test to be used for debugging.
 	DebugArchive string
+
+	// Inline, if true, enables inline-assertion mode: archives containing
+	// @test(...) attributes are dispatched to the inline runner instead of
+	// golden-file comparison. Tests that should not be affected by @test
+	// attributes (e.g. TestCompile) must leave this false.
+	Inline bool
 }
 
 // A Test represents a single test based on a .txtar file.
@@ -443,6 +449,27 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			a, err := txtar.ParseFile(fullpath)
 			if err != nil {
 				t.Fatalf("error parsing txtar file: %v", err)
+			}
+
+			// Archives with @test attributes use inline assertions instead of
+			// golden-file comparison.  The inline runner is self-contained and
+			// does not write to the Test output files, so we return immediately
+			// after it finishes.
+			//
+			// TODO: support a `#inline` header directive for archives that
+			// should always use inline mode (e.g. for future full-file tests
+			// that express golden-file expectations in CUE form rather than as
+			// raw text sections).
+			if x.Inline && isInlineMode(a) {
+				runner := &inlineRunner{
+					t:        t,
+					m:        m,
+					archive:  a,
+					dir:      filepath.Dir(filepath.Join(dir, fullpath)),
+					filePath: filepath.Join(dir, fullpath),
+				}
+				runner.runArchive()
+				return
 			}
 
 			tc := &Test{

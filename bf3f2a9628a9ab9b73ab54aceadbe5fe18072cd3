@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c7bc870_13b31d6c",
+        "filename": "internal/diff/diff.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-30T12:40:37Z",
+      "side": 1,
+      "message": "use `slices.Reverse`",
+      "revId": "bf3f2a9628a9ab9b73ab54aceadbe5fe18072cd3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "619d22a3_5b72de8f",
+        "filename": "internal/diff/diff.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-30T12:40:37Z",
+      "side": 1,
+      "message": "can these be `result \u003d append(result, edits[xi:xEnd]...)` and so on?",
+      "revId": "bf3f2a9628a9ab9b73ab54aceadbe5fe18072cd3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

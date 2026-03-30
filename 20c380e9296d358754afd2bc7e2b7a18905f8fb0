@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8eaeb2f9_1339019f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-03-30T14:10:42Z",
+      "side": 1,
+      "message": "Seems reasonable and is a fairly well-contained change that is unlikely to trigger for \"non-API\" evaluation.",
+      "revId": "20c380e9296d358754afd2bc7e2b7a18905f8fb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -417,6 +417,193 @@ a: x: "hello"
 			a: g
 			b: g
 		`,
+
+		// --- Myers list diff tests ---
+
+	}, {
+		// Pure insertion at the beginning: only the new element should be marked UniqueY.
+		// The printer shows 2 context elements after the change; the 4th (last) is elided.
+		name: "list insert at beginning",
+		x:    `[2, 3, 4]`,
+		y:    `[1, 2, 3, 4]`,
+		kind: Modified,
+		diff: `  [
++     1,
+      2,
+      3,
+      ... // 1 identical elements
+  ]
+`,
+	}, {
+		// Pure insertion in the middle: only the new element should be marked UniqueY.
+		name: "list insert in middle",
+		x:    `[1, 3, 4]`,
+		y:    `[1, 2, 3, 4]`,
+		kind: Modified,
+		diff: `  [
+      1,
++     2,
+      3,
+      4,
+  ]
+`,
+	}, {
+		// Pure insertion at the end: 2 context elements before the change are shown;
+		// the first element (1) is elided.
+		name: "list insert at end",
+		x:    `[1, 2, 3]`,
+		y:    `[1, 2, 3, 4]`,
+		kind: Modified,
+		diff: `  [
+      ... // 1 identical elements
+      2,
+      3,
++     4,
+  ]
+`,
+	}, {
+		// Pure deletion from the beginning.
+		name: "list delete at beginning",
+		x:    `[1, 2, 3, 4]`,
+		y:    `[2, 3, 4]`,
+		kind: Modified,
+		diff: `  [
+-     1,
+      2,
+      3,
+      ... // 1 identical elements
+  ]
+`,
+	}, {
+		// Pure deletion from the middle.
+		name: "list delete in middle",
+		x:    `[1, 2, 3, 4]`,
+		y:    `[1, 3, 4]`,
+		kind: Modified,
+		diff: `  [
+      1,
+-     2,
+      3,
+      4,
+  ]
+`,
+	}, {
+		// Pure deletion from the end.
+		name: "list delete at end",
+		x:    `[1, 2, 3, 4]`,
+		y:    `[1, 2, 3]`,
+		kind: Modified,
+		diff: `  [
+      ... // 1 identical elements
+      2,
+      3,
+-     4,
+  ]
+`,
+	}, {
+		// Mixed: deletion and insertion at different positions.
+		name: "list mixed insert and delete",
+		x:    `[1, 2, 3, 4, 5]`,
+		y:    `[1, 3, 99, 5]`,
+		kind: Modified,
+		diff: `  [
+      1,
+-     2,
+      3,
+-     4,
++     99,
+      5,
+  ]
+`,
+	}, {
+		// Completely different lists: mergeAdjacentEdits pairs each UniqueX with
+		// the corresponding UniqueY, producing interleaved -/+ output.
+		name: "list completely different",
+		x:    `[1, 2, 3]`,
+		y:    `[4, 5, 6]`,
+		kind: Modified,
+		diff: `  [
+-     1,
++     4,
+-     2,
++     5,
+-     3,
++     6,
+  ]
+`,
+	}, {
+		// After an insertion, the XSel/YSel of Identity edits reflect independent
+		// positions in their respective lists.  The 4th identical element is elided
+		// by the 2-element context window.
+		name: "list index independence after insertion",
+		x:    `[10, 20, 30]`,
+		y:    `[5, 10, 20, 30]`,
+		kind: Modified,
+		diff: `  [
++     5,
+      10,
+      20,
+      ... // 1 identical elements
+  ]
+`,
+	}, {
+		// Struct element with one changed field: expect Modified with sub-diff
+		// showing all fields (identity + modified) within the context window.
+		name: "list struct element single field diff",
+		x:    `[{a: 1, b: 2}]`,
+		y:    `[{a: 1, b: 3}]`,
+		kind: Modified,
+		diff: `  [
+      {
+          a: 1
+-         b: 2
++         b: 3
+      }
+  ]
+`,
+	}, {
+		// Nested list element that differs in one item.
+		name: "list nested list single element diff",
+		x:    `[[1, 2, 3]]`,
+		y:    `[[1, 99, 3]]`,
+		kind: Modified,
+		diff: `  [
+      [
+          1,
+-         2,
++         99,
+          3,
+      ]
+  ]
+`,
+	}, {
+		// Two UniqueX, one UniqueY: the first UniqueX pairs with the UniqueY into
+		// a Modified edit; the second UniqueX remains unpaired.
+		name: "list merge run length limiting",
+		x:    `[1, 2, 10]`,
+		y:    `[99, 10]`,
+		kind: Modified,
+		diff: `  [
+-     1,
++     99,
+-     2,
+      10,
+  ]
+`,
+	}, {
+		// Adjacent UniqueX (number) and UniqueY (struct): incompatible kinds,
+		// must remain as separate edits and not be merged into Modified.
+		name: "list incompatible kinds not merged",
+		x:    `[1]`,
+		y:    `[{a: 1}]`,
+		kind: Modified,
+		diff: `  [
+-     1,
++     {
++     	a: 1
++     },
+  ]
+`,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.name, func(t *testing.T, m *cuetdtest.M) {

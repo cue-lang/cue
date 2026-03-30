@@ -1,0 +1,65 @@
+-- in.cue --
+// debugCheck: sub-field comparison in structural containers.
+// The debugCheck: field stores the expected output of the internal/core/debug
+// printer applied to evaluate(in), as a CUE string.
+
+// ── scalar value ─────────────────────────
+
+debugCheckScalar: {
+	@test()
+	in:          42
+	debugCheck: "(int){ 42 }"
+}
+
+// ── struct value ─────────────────────────
+
+debugCheckStruct: {
+	@test()
+	in: {
+		a: 1
+		b: 2
+	}
+	debugCheck: """
+		(struct){
+		  a: (int){ 1 }
+		  b: (int){ 2 }
+		}
+		"""
+}
+
+// ── computed struct ───────────────────────
+
+debugCheckComputed: {
+	@test()
+	in: {
+		x: 10
+		y: x * 2
+	}
+	debugCheck: """
+		(struct){
+		  x: (int){ 10 }
+		  y: (int){ 20 }
+		}
+		"""
+}
+
+// ── version sub-struct override: v3 debugCheck takes precedence ──
+// The top-level debugCheck: is the baseline; the v3 sub-struct can override it.
+// Since the in value is the same, both top-level and v3 debugCheck should match.
+
+debugCheckVersioned: {
+	@test()
+	in: {z: 99}
+	debugCheck: """
+		(struct){
+		  z: (int){ 99 }
+		}
+		"""
+	v3: {
+		debugCheck: """
+			(struct){
+			  z: (int){ 99 }
+			}
+			"""
+	}
+}

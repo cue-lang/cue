@@ -71,6 +71,12 @@ func TestEvalV2(t *testing.T) {
 func TestEvalV3(t *testing.T) {
 	adt.DebugDeps = true // check unmatched dependencies.
 
+	// TxTarTest.run dispatches inline archives (those with @test attributes)
+	// to the inline runner automatically; non-inline archives use golden-file
+	// comparison as before.  No separate RunInlineTests call is needed.
+	//
+	// Fallback lets existing out/eval golden-file sections pass until
+	// out/evalalpha sections are generated with CUE_UPDATE=1.
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
 		Name:     "evalalpha",
@@ -254,6 +260,28 @@ language: version: "v0.15.0"
 	t.Error(out)
 
 	t.Log(ctx.Stats())
+}
+
+// TestY is for debugging inline tests. Do not delete.
+func TestY(t *testing.T) {
+	in := `
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- in.cue --
+s1: !="b" & =~"c"     @test(eq, =~"c")
+s2: !=null @test(eq, !=null)
+	`
+
+	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
+		t.Skip()
+	}
+
+	archive := txtar.Parse([]byte(in))
+	runner := cuetxtar.NewInlineRunner(t, nil, archive, t.TempDir())
+	runner.Run()
 }
 
 func BenchmarkUnifyAPI(b *testing.B) {

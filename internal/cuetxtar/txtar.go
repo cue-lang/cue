@@ -445,6 +445,27 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				t.Fatalf("error parsing txtar file: %v", err)
 			}
 
+			// Archives with @test attributes use inline assertions instead of
+			// golden-file comparison.  The inline runner is self-contained and
+			// does not write to the Test output files, so we return immediately
+			// after it finishes.
+			//
+			// TODO: support a `#inline` header directive for archives that
+			// should always use inline mode (e.g. for future full-file tests
+			// that express golden-file expectations in CUE form rather than as
+			// raw text sections).
+			if isInlineMode(a) {
+				runner := &inlineRunner{
+					t:        t,
+					m:        m,
+					archive:  a,
+					dir:      filepath.Dir(filepath.Join(dir, fullpath)),
+					filePath: filepath.Join(dir, fullpath),
+				}
+				runner.runArchive()
+				return
+			}
+
 			tc := &Test{
 				T:       t,
 				M:       m,

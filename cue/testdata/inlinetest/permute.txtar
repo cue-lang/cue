@@ -1,0 +1,75 @@
+-- in.cue --
+// Structural permute tests: @test(permute) placed on the struct whose fields
+// should be permuted — either as a decl attr on the container, or as a decl
+// attr directly on the 'in' struct.
+
+// ── Container-level @test(permute): permutes all fields of `in` ──
+
+threeFieldPermute: {
+	@test(permute)
+	a: b + c
+	b: 1
+	c: 2
+	@test(eq, {
+		a: 3
+		b: 1
+		c: 2
+	})
+	@test(permuteCount, 6) // 3 fields = 3! = 6 permutations
+}
+
+twoFieldPermute: {
+	@test(permute)
+	x: y + 1
+	y: 5
+	@test(eq, {
+		x: 6
+		y: 5
+	})
+	@test(permuteCount, 2) // 2 fields = 2! = 2 permutations
+}
+
+// ── Decl attr on `in` directly: equivalent syntax ──
+
+inDeclPermute: {
+	@test(permute)
+	p: q + r
+	q: 3
+	r: 7
+	@test(eq, {
+		p: 10
+		q: 3
+		r: 7
+	})
+	@test(permuteCount, 6) // 3 fields = 3! = 6 permutations
+}
+
+// ── Self-contained concrete struct: trivially order-invariant ──
+
+concretePermute: {
+	x: {
+		@test(permute)
+		alpha: 1
+		beta:  2
+		gamma: 3
+	}
+	y: {
+		@test(permute)
+		alpha: 1
+		beta:  2
+		gamma: 3
+	}
+	@test(eq, {
+		x: {
+			alpha: 1
+			beta:  2
+			gamma: 3
+		}
+		y: {
+			alpha: 1
+			beta:  2
+			gamma: 3
+		}
+	})
+	@test(permuteCount, 12) // 2 structs * 3! = 12 permutations
+}

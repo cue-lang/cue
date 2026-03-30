@@ -19,6 +19,12 @@ stderr 'unknown shorthand flag'
 ! exec cue -t name=bar fmt tags.cue
 stderr 'unknown shorthand flag'
 
+# Duplicate tags.
+exec cue cmd -t who=foo -t who=foo hello ./hello
+stdout 'Hello foo!'
+! exec cue cmd -t who=foo -t who=bar hello ./hello
+stderr 'who: invalid interpolation: conflicting values'
+
 # Invalid tag injections.
 ! exec cue cmd -t nosuchshort tag
 stderr 'tag "nosuchshort" not used in any file'
@@ -66,4 +72,14 @@ command: tag: cli.Print & {
         data.json: \(json.Marshal(data))
         tooldata.json: \(json.Marshal(tooldata))
         """
+}
+-- hello/hello_tool.cue --
+package hello
+
+import "tool/cli"
+
+who: string @tag(who)
+
+command: hello: cli.Print & {
+  text: "Hello \(who)!"
 }

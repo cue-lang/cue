@@ -1,0 +1,48 @@
+-- in.cue --
+// shareId assertions on eq sub-fields in structural form.
+// @test(shareId=name) on a field within an eq struct asserts that the
+// corresponding path in evaluate(in) shares the same canonical adt.Vertex as
+// every other field carrying the same name in this test case.
+
+// ── basic: field reference creates vertex sharing ──
+// In CUE, b: a makes b an alias of a at the ADT level.  After evaluation,
+// in.b.DerefValue() == in.a.DerefValue(), so the shareId assertion passes.
+
+basicSharing: {
+	@test(skip, why="sharing checks not implemented yet")
+	a: {x: 1, y: 2}
+	b: a
+	@test(eq, {
+		a: { x: 1, y: 2 } @test(shareId=A)
+		b: a @test(shareId=A)
+	})
+}
+
+// ── three-way sharing ─────────────────────
+// g is the canonical node; p and q are both references to g.
+
+threeWaySharing: {
+	@test(skip, why="sharing checks not implemented yet")
+	g: {n: 42}
+	p: g
+	q: g
+	@test(eq, {
+		g: { n: 42 } @test(shareId=G)
+		p: g @test(shareId=G)
+		q: g @test(shareId=G)
+	})
+}
+
+// ── versioned shareId: @test(shareId:v3=name) applies only under v3 ──
+// The unversioned group "common" covers all evaluator versions; the versioned
+// group "v3group" is only checked when running under v3.
+
+versionedSharing: {
+	@test(skip, why="sharing checks not implemented yet")
+	a: {z: 1}
+	b: a
+	@test(eq, {
+		a: { z: 1 } @test(shareId=common)
+		b: a @test(shareId=common)
+	})
+}

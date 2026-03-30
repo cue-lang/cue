@@ -1,10 +1,11 @@
-#name: disjunctions of lists
-#evalFull
 -- in.cue --
-l: *[ int, int] | [ string, string]
-
+l: *[int, int] | [string, string]
 l1: ["a", "b"]
-l2: l & ["c", "d"]
+
+t1: {
+	l & ["c", "d"]
+	@test(eq, ["c", "d"])
+}
 -- out/compile --
 --- in.cue
 {
@@ -34,21 +35,3 @@ Retain: 0
 Unifications: 14
 Conjuncts:    24
 Disjuncts:    18
--- out/evalalpha --
-(struct){
-  l: (list){ |(*(#list){
-      0: (int){ int }
-      1: (int){ int }
-    }, (#list){
-      0: (string){ string }
-      1: (string){ string }
-    }) }
-  l1: (#list){
-    0: (string){ "a" }
-    1: (string){ "b" }
-  }
-  l2: (#list){
-    0: (string){ "c" }
-    1: (string){ "d" }
-  }
-}

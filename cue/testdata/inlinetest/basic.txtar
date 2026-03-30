@@ -1,0 +1,64 @@
+-- in.cue --
+// Basic inline assertion examples.
+// Each top-level field with @test(...) is a separate test case.
+
+// Inline eq: compare evaluated value to expected literal.
+simpleInt: 42 @test(eq, 42)
+
+// Inline eq: string comparison.
+simpleStr: "hello" @test(eq, "hello")
+
+// Inline err: field should produce an error (bottom value).
+// Using a forced error via unification conflict.
+errField: 1 & 2 @test(err)
+
+// Inline err with code: cycle error.
+a: a + 1 @test(err, code=cycle)
+
+// Inline kind: check the incomplete kind using key=value syntax.
+kindInt: int @test(kind=int)
+
+// Inline closed check for a concrete struct.
+closedStruct: close({x: 1}) @test(closed)
+
+// Inline permute: verify field order does not affect evaluation result.
+// Only fields marked @test(permute) at this struct level are permuted.
+permuteStruct: {
+	x: y + 1 @test(permute)
+	y: 2 @test(permute)
+} @test(eq, {x: 3, y: 2})
+
+// A plain field with no @test is a fixture field — not a sub-test,
+// but still accessible to other test fields in the same file.
+sharedValue: 10
+
+// A test case that references the plain fixture field above.
+usesShared: sharedValue + 5 @test(eq, 15)
+
+// Struct-level @test(eq, VALUE): checks the whole struct.
+eqComputed: {
+	@test(eq, {x: 10, y: 20})
+	x: 10
+	y: x * 2
+}
+
+// @test(desc="...") is a human-readable description — no assertion.
+descField: {v: "ok"} @test(desc="description") @test(eq, {v: "ok"})
+
+// debugCheck as field attribute with escaped newlines.
+debugScalar: 42 @test(debugCheck, "(int){ 42 }")
+
+// debugCheck as decl attribute inside a struct, using multi-line string.
+debugComputed: {
+	@test(debugCheck, """
+		(struct){
+		  x: (int){ 10 }
+		  y: (int){ 20 }
+		}
+		""")
+	x: 10
+	y: x * 2
+}
+
+// Fixture fields without @test are allowed (no coverage requirement).
+helperValue: 99

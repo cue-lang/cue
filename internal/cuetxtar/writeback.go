@@ -1,0 +1,102 @@
+// Copyright 2026 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// This file implements CUE_UPDATE write-backs for the inline test runner.
+//
+// The inline fill write-back rewrites @test attributes in-place using byte
+// offsets, handling fill, force-overwrite, regression-guard, and stale-skip
+// cleanup operations.
+package cuetxtar
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/tools/txtar"
+
+	"cuelang.org/go/cue"
+)
+
+// ── inline fill / diff-annotate write-back ─────────────────────────────────────
+
+// inlineFillWrite records a byte-level replacement of a @test attribute in a
+// .cue archive file.  Used for three operations:
+//   - fill: @test() → @test(eq, <value>) or @test(err, ...)
+//   - force: @test(eq, old) → @test(eq, <actual>)
+//   - diff-annotate: @test(eq, old) → @test(eq, old, skip:<ver>, diff="...")
+//   - stale-skip: @test(eq, old, skip:<ver>, diff="...") → @test(eq, old)
+type inlineFillWrite struct {
+	fileName    string // archive .cue file name, e.g. "in.cue"
+	attrOffset  int    // byte offset of the @ in the original file data
+	attrLen     int    // byte length of the original @test(...) text
+	newAttrText string // replacement text
+}
+
+// applyInlineFillWritebacks applies pending inline @test attribute rewrites to
+// the archive.  Replacements are applied by byte offset in descending order so
+// earlier offsets remain valid after each substitution.
+func (r *inlineRunner) applyInlineFillWritebacks() {
+	if len(r.pendingInlineFillWrites) == 0 {
+		return
+	}
+	// Group writes by file name.
+	byFile := make(map[string][]inlineFillWrite, 2)
+	for _, ifw := range r.pendingInlineFillWrites {
+		byFile[ifw.fileName] = append(byFile[ifw.fileName], ifw)
+	}
+
+	changed := false
+	for i, f := range r.archive.Files {
+		writes, ok := byFile[f.Name]
+		if !ok {
+			continue
+		}
+		// Apply descending by offset so earlier positions remain valid.
+		sortDesc := func(a, b inlineFillWrite) bool { return a.attrOffset > b.attrOffset }
+		_ = sortDesc // sort inline below
+		// Sort descending.
+		for j := 1; j < len(writes); j++ {
+			for k := j; k > 0 && writes[k].attrOffset > writes[k-1].attrOffset; k-- {
+				writes[k], writes[k-1] = writes[k-1], writes[k]
+			}
+		}
+		data := append([]byte(nil), f.Data...)
+		for _, w := range writes {
+			end := w.attrOffset + w.attrLen
+			if end > len(data) {
+				continue
+			}
+			data = append(data[:w.attrOffset:w.attrOffset],
+				append([]byte(w.newAttrText), data[end:]...)...)
+		}
+		r.archive.Files[i].Data = data
+		changed = true
+	}
+	if changed && r.filePath != "" {
+		out := txtar.Format(r.archive)
+		if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
+			r.t.Errorf("inline: fill write-back to %s: %v", r.filePath, err)
+		}
+	}
+}
+
+// formatCoverAttr returns the @test attribute text to insert for a field whose
+// evaluated value is v.  For non-error values this is @test(eq, <value>).
+// For error values it falls back to a bare @test(err) placeholder.
+func (r *inlineRunner) formatCoverAttr(v cue.Value) string {
+	if r.isError(v) {
+		return "@test(err)"
+	}
+	return fmt.Sprintf("@test(eq, %s)", r.formatValue(v))
+}

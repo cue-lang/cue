@@ -1,0 +1,59 @@
+-- in.cue --
+// Tests converted from structural form to inline form.
+
+// ── error-only ─────────────────────────
+
+errOnly: 1 & 2 @test(err) @test(debugCheck, """
+	(_|_){
+	  // [eval] errOnly: conflicting values 2 and 1:
+	  //     in.cue:5:10
+	  //     in.cue:5:14
+	}
+	""")
+
+errWithCode: string & 1 @test(err, code=eval) @test(debugOutput, """
+	(_|_){
+	  // [eval] errWithCode: conflicting values string and 1 (mismatched types string and int):
+	  //     in.cue:7:14
+	  //     in.cue:7:23
+	}
+	""")
+
+// ── eq: computed struct ────────────────
+
+eqBasic: {a: 1, b: 2} @test(eq, {a: 1, b: 2})
+
+eqComputed: {
+	@test(eq, {x: 10, y: 20})
+	x: 10
+	y: x * 2
+}
+
+// ── leq: subsumption ──────────────────
+
+leqBasic: {x: 42} @test(leq, {x: int}) @test(eq, {x: 42})
+
+// ── skip ──────────────────────────────
+
+skippedTest: {a: 1} @test(skip, why="demonstrating skip")
+
+// ── desc ──────────────────────────────
+
+descTest: {v: "ok"} @test(desc="description") @test(eq, {v: "ok"})
+
+// ── version-specific ──────────────────
+
+versionOverride: {x: 1} @test(eq, {x: 1}) @test(eq:unknown, {x: 3})
+
+// ── plain fixture field + references ──────────────────
+
+// A plain field with no @test is accessible but not a sub-test.
+plainFixture: {
+	x: 42
+}
+
+refsFixture: plainFixture.x @test(eq, 42)
+
+// ── mixed inline ──────────────────────
+
+mixedInline: 42 @test(eq, 42)

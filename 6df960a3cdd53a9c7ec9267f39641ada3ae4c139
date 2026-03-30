@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65c01648_962af08d",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2120,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-30T15:56:58Z",
+      "side": 1,
+      "message": "Again, it\u0027s always nice to add tests before changing the logic.",
+      "revId": "6df960a3cdd53a9c7ec9267f39641ada3ae4c139",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

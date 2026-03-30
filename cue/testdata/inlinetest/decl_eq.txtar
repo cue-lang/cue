@@ -1,0 +1,19 @@
+-- in.cue --
+// File-level @test(eq, VALUE) as a decl attribute: checks the entire
+// file's evaluated value against VALUE.  All fields are covered
+// implicitly — no per-field @test is required.
+
+a: 1
+b: a + 1
+c: {
+	x: "hello"
+	y: b
+}
+@test(eq, {
+	a: 1
+	b: 2
+	c: {
+		x: "hello"
+		y: 2
+	}
+})

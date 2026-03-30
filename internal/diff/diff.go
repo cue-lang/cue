@@ -15,6 +15,8 @@
 package diff
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -270,50 +272,192 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 	return Modified, &EditScript{X: x, Y: y, Edits: edits}
 }
 
-// TODO: right now we do a simple element-by-element comparison. Instead,
-// use an algorithm that approximates a minimal Levenshtein distance, like the
-// one in github.com/google/go-cmp/internal/diff.
 func (d *differ) diffList(x, y cue.Value) (Kind, *EditScript) {
-	ix, _ := x.List()
-	iy, _ := y.List()
+	xs := collectList(x)
+	ys := collectList(y)
 
-	edits := []Edit{}
-	differs := false
+	edits := myersEdits(xs, ys)
+	edits = d.mergeAdjacentEdits(edits, xs, ys)
+
+	for _, e := range edits {
+		if e.Kind != Identity {
+			return Modified, &EditScript{X: x, Y: y, Edits: edits}
+		}
+	}
+	return Identity, nil
+}
+
+// collectList collects all elements of a CUE list into a slice.
+func collectList(v cue.Value) []cue.Value {
+	var elems []cue.Value
+	for it, _ := v.List(); it.Next(); {
+		elems = append(elems, it.Value())
+	}
+	return elems
+}
+
+// myersEdits computes a minimal edit script between xs and ys using Myers'
+// diff algorithm. The returned edits contain only Identity, UniqueX, and
+// UniqueY kinds. Modified edits with sub-scripts are produced separately by
+// mergeAdjacentEdits.
+//
+// Based on "An O(ND) Difference Algorithm and Its Variations" by Eugene W.
+// Myers (1986).
+func myersEdits(xs, ys []cue.Value) []Edit {
+	nx, ny := len(xs), len(ys)
+	if nx == 0 && ny == 0 {
+		return nil
+	}
+
+	// maxD is the maximum possible edit distance.
+	maxD := nx + ny
+	offset := maxD // maps diagonal k to index k+offset in v
+
+	// v[k+offset] is the furthest x-coordinate reachable on diagonal k.
+	// Diagonal k is defined as x - y = k.
+	v := make([]int, 2*maxD+1)
+	v[1+offset] = 0 // starting sentinel: diagonal 1, x=0
+
+	// trace[d] stores a copy of v captured before computing step d.
+	// It is used during backtracking to recover the edit path.
+	trace := make([][]int, 0, maxD+1)
+
+	finalD := -1
+
+loop:
+	for d := 0; d <= maxD; d++ {
+		vcopy := make([]int, len(v))
+		copy(vcopy, v)
+		trace = append(trace, vcopy)
+
+		for k := -d; k <= d; k += 2 {
+			var x int
+			if k == -d || (k != d && v[k-1+offset] < v[k+1+offset]) {
+				x = v[k+1+offset] // move down (UniqueY: advance y, x stays)
+			} else {
+				x = v[k-1+offset] + 1 // move right (UniqueX: advance x)
+			}
+			y := x - k
+			// Follow diagonal: matching elements are free moves.
+			for x < nx && y < ny && xs[x].Equals(ys[y]) {
+				x++
+				y++
+			}
+			v[k+offset] = x
+			if x == nx && y == ny {
+				finalD = d
+				break loop
+			}
+		}
+	}
+
+	if finalD < 0 {
+		// Should not happen: maxD == nx+ny guarantees termination.
+		// Defensive fallback: mark all of X as removed, all of Y as added.
+		edits := make([]Edit, 0, nx+ny)
+		for i := range xs {
+			edits = append(edits, Edit{UniqueX, cue.Index(i), cue.Selector{}, nil})
+		}
+		for j := range ys {
+			edits = append(edits, Edit{UniqueY, cue.Selector{}, cue.Index(j), nil})
+		}
+		return edits
+	}
+
+	// Backtrack from (nx, ny) to (0, 0) to recover the edit path.
+	// Edits are appended in reverse order and flipped at the end.
+	edits := make([]Edit, 0, nx+ny)
+	x, y := nx, ny
+	for d := finalD; d > 0; d-- {
+		v := trace[d]
+		k := x - y
+		var prevK int
+		if k == -d || (k != d && v[k-1+offset] < v[k+1+offset]) {
+			prevK = k + 1 // came from a down move (UniqueY)
+		} else {
+			prevK = k - 1 // came from a right move (UniqueX)
+		}
+		prevX := v[prevK+offset]
+		prevY := prevX - prevK
+
+		// Walk back along the diagonal (Identity edits).
+		for x > prevX && y > prevY {
+			x--
+			y--
+			edits = append(edits, Edit{Identity, cue.Index(x), cue.Index(y), nil})
+		}
+
+		// The non-diagonal move that started this diagonal.
+		if prevK == k+1 {
+			// Down move: UniqueY (y was advanced, x stayed).
+			y--
+			edits = append(edits, Edit{UniqueY, cue.Selector{}, cue.Index(y), nil})
+		} else {
+			// Right move: UniqueX (x was advanced).
+			x--
+			edits = append(edits, Edit{UniqueX, cue.Index(x), cue.Selector{}, nil})
+		}
+	}
+	// Remaining diagonal at d=0 (all Identity).
+	for x > 0 && y > 0 {
+		x--
+		y--
+		edits = append(edits, Edit{Identity, cue.Index(x), cue.Index(y), nil})
+	}
+
+	// Edits were accumulated in reverse; flip to restore forward order.
+	slices.Reverse(edits)
+	return edits
+}
+
+// mergeAdjacentEdits post-processes the raw edit script from myersEdits to
+// produce Modified edits for adjacent UniqueX/UniqueY pairs that have the
+// same structural kind. This preserves recursive sub-diff output: two list
+// elements that differ by only one field are shown as Modified with a
+// sub-script rather than as a bare deletion + insertion.
+func (d *differ) mergeAdjacentEdits(edits []Edit, xs, ys []cue.Value) []Edit {
+	result := make([]Edit, 0, len(edits))
 	i := 0
+	for i < len(edits) {
+		if edits[i].Kind != UniqueX {
+			result = append(result, edits[i])
+			i++
+			continue
+		}
+		// Collect a contiguous run of UniqueX edits.
+		xStart := i
+		for i < len(edits) && edits[i].Kind == UniqueX {
+			i++
+		}
+		xEnd := i
 
-	for {
-		// TODO: This would be much easier with a Next/Done API.
-		hasX := ix.Next()
-		hasY := iy.Next()
-		if !hasX {
-			for hasY {
-				differs = true
-				edits = append(edits, Edit{UniqueY, cue.Selector{}, cue.Index(i), nil})
-				hasY = iy.Next()
-				i++
-			}
-			break
+		// Collect the immediately following run of UniqueY edits.
+		yStart := i
+		for i < len(edits) && edits[i].Kind == UniqueY {
+			i++
 		}
-		if !hasY {
-			for hasX {
-				differs = true
-				edits = append(edits, Edit{UniqueX, cue.Index(i), cue.Selector{}, nil})
-				hasX = ix.Next()
-				i++
-			}
-			break
-		}
+		yEnd := i
 
-		// Both x and y have a value.
-		kind, script := d.diffValue(ix.Value(), iy.Value())
-		if kind != Identity {
-			differs = true
+		// Pair them up (the shorter run limits the pairing count).
+		xi, yi := xStart, yStart
+		for xi < xEnd && yi < yEnd {
+			xe := edits[xi]
+			ye := edits[yi]
+			xv := xs[xe.XSel.Index()]
+			yv := ys[ye.YSel.Index()]
+			if xv.IncompleteKind() == yv.IncompleteKind() {
+				kind, script := d.diffValue(xv, yv)
+				result = append(result, Edit{kind, xe.XSel, ye.YSel, script})
+			} else {
+				result = append(result, xe)
+				result = append(result, ye)
+			}
+			xi++
+			yi++
 		}
-		edits = append(edits, Edit{kind, cue.Index(i), cue.Index(i), script})
-		i++
+		// Append any unpaired edits from the longer run.
+		result = append(result, edits[xi:xEnd]...)
+		result = append(result, edits[yi:yEnd]...)
 	}
-	if !differs {
-		return Identity, nil
-	}
-	return Modified, &EditScript{X: x, Y: y, Edits: edits}
+	return result
 }

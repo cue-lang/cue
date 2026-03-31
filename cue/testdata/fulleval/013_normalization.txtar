@@ -2,12 +2,10 @@ TODO: the new evaluator currently does not normalize disjuncts.
 It needs to be determined under which circumstances is desirable.
 The redundancy that remains from not normalizing can be useful.
 
-#name: normalization
-#evalFull
 -- in.cue --
-a: string | string
-b: *1 | *int
-c: *1.0 | *float
+a: string | string @test(eq, string)
+b: *1 | *int       @test(eq, *1 | *int)
+c: *1.0 | *float   @test(eq, *1.0 | *float)
 -- out/compile --
 --- in.cue
 {
@@ -25,9 +23,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    10
 Disjuncts:    10
--- out/evalalpha --
-(struct){
-  a: (string){ string }
-  b: (int){ |(*(int){ 1 }, *(int){ int }) }
-  c: (float){ |(*(float){ 1.0 }, *(float){ float }) }
-}

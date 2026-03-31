@@ -1,20 +1,25 @@
-#name: default disambiguation and elimination
-#evalFull
 -- in.cue --
-a: *1 | int
-b: *3 | int
-c: a & b
-d: b & a
+a: *1 | int @test(eq, *1 | int)
+b: *3 | int @test(eq, *3 | int)
+e: *1 | *1  @test(eq, 1)
 
-e: *1 | *1
+c: a & b @test(eq, 1 | 3 | int)
+
+d: {
+  b & a
+  @test(eq, 1 | 3 | int)
+}
+
 -- out/compile --
 --- in.cue
 {
   a: (*1|int)
   b: (*3|int)
-  c: (〈0;a〉 & 〈0;b〉)
-  d: (〈0;b〉 & 〈0;a〉)
   e: (*1|*1)
+  c: (〈0;a〉 & 〈0;b〉)
+  d: {
+    (〈1;b〉 & 〈1;a〉)
+  }
 }
 -- out/eval/stats --
 Leaks:  0
@@ -26,11 +31,3 @@ Retain: 0
 Unifications: 6
 Conjuncts:    30
 Disjuncts:    24
--- out/evalalpha --
-(struct){
-  a: (int){ |(*(int){ 1 }, (int){ int }) }
-  b: (int){ |(*(int){ 3 }, (int){ int }) }
-  c: (int){ |((int){ 1 }, (int){ 3 }, (int){ int }) }
-  d: (int){ |((int){ 3 }, (int){ 1 }, (int){ int }) }
-  e: (int){ 1 }
-}

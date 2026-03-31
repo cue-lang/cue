@@ -1,9 +1,7 @@
-#name: null coalescing
-#evalPartial
 -- in.cue --
-a: null
-b: a.x | "b"
-c: a["x"] | "c"
+a: null         @test(eq, null)
+b: a.x | "b"    @test(eq, "b")
+c: a["x"] | "c" @test(eq, "c")
 -- out/compile --
 --- in.cue
 {
@@ -21,9 +19,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    8
 Disjuncts:    8
--- out/evalalpha --
-(struct){
-  a: (null){ null }
-  b: (string){ "b" }
-  c: (string){ "c" }
-}

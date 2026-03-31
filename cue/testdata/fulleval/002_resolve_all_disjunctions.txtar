@@ -1,13 +1,20 @@
-#name: resolve all disjunctions
-#evalFull
 -- in.cue --
 service: [Name=string]: {
 	name: string | *Name
 	port: int | *7080
 }
-service: foo: _
-service: bar: {port: 8000}
-service: baz: {name: "foobar"}
+service: foo: _    @test(eq, {
+    name: *"foo" | string
+    port: *7080 | int
+})
+service: bar: {port: 8000} @test(eq, {
+    port: 8000
+    name: *"bar" | string
+})
+service: baz: {name: "foobar"} @test(eq, {
+    name: "foobar"
+    port: *7080 | int
+})
 -- out/compile --
 --- in.cue
 {
@@ -31,6 +38,7 @@ service: baz: {name: "foobar"}
     }
   }
 }
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  23
@@ -41,20 +49,3 @@ Retain: 0
 Unifications: 11
 Conjuncts:    31
 Disjuncts:    23
--- out/evalalpha --
-(struct){
-  service: (struct){
-    foo: (struct){
-      name: (string){ |(*(string){ "foo" }, (string){ string }) }
-      port: (int){ |(*(int){ 7080 }, (int){ int }) }
-    }
-    bar: (struct){
-      port: (int){ 8000 }
-      name: (string){ |(*(string){ "bar" }, (string){ string }) }
-    }
-    baz: (struct){
-      name: (string){ "foobar" }
-      port: (int){ |(*(int){ 7080 }, (int){ int }) }
-    }
-  }
-}

@@ -1,0 +1,107 @@
+-- in.cue --
+cycle: {
+	x: 200
+	x: y + 100
+	y: x - 100
+
+	a: b + 100
+	b: a - 100	
+}
+
+incompleteOne: {
+	_t: {
+		#p: string
+		"""
+			hello \(#p)
+			"""
+	}
+
+	r: """
+		\(_t)
+		"""	
+}
+
+incompleteTwo: {
+	r: """
+		\(_t)
+		"""
+
+	_t: {
+		#p: string
+		"""
+			hello \(#p)
+			"""
+	}
+}
+-- out/evalalpha --
+(struct){
+  cycle: (struct){
+    x: (int){ 200 }
+    y: (int){ 100 }
+    a: (_|_){
+      // [cycle] cycle.a: cycle with field: b:
+      //     ./in.cue:6:5
+      // cycle.b: cycle with field: a:
+      //     ./in.cue:7:5
+    }
+    b: (_|_){
+      // [cycle] cycle.a: cycle with field: b:
+      //     ./in.cue:6:5
+      // cycle.b: cycle with field: a:
+      //     ./in.cue:7:5
+    }
+  }
+  incompleteOne: (struct){
+    _t: (_|_){
+      // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
+      //     ./in.cue:13:3
+      //     ./in.cue:12:7
+      #p: (string){ string }
+    }
+    r: (_|_){
+      // [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
+      //     ./in.cue:18:5
+      //     ./in.cue:12:7
+      //     ./in.cue:13:3
+    }
+  }
+  incompleteTwo: (struct){
+    r: (_|_){
+      // [incomplete] incompleteTwo._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
+      //     ./in.cue:24:5
+      //     ./in.cue:29:7
+      //     ./in.cue:30:3
+    }
+    _t: (_|_){
+      // [incomplete] incompleteTwo._t: invalid interpolation: non-concrete value string (type string):
+      //     ./in.cue:30:3
+      //     ./in.cue:29:7
+      #p: (string){ string }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  cycle: {
+    x: 200
+    x: (〈0;y〉 + 100)
+    y: (〈0;x〉 - 100)
+    a: (〈0;b〉 + 100)
+    b: (〈0;a〉 - 100)
+  }
+  incompleteOne: {
+    _t: {
+      #p: string
+      "hello \(〈0;#p〉)"
+    }
+    r: "\(〈0;_t〉)"
+  }
+  incompleteTwo: {
+    r: "\(〈0;_t〉)"
+    _t: {
+      #p: string
+      "hello \(〈0;#p〉)"
+    }
+  }
+}

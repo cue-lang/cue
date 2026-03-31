@@ -1,0 +1,45 @@
+exec cue export x.cue
+cmp stdout want-stdout
+
+-- x.cue --
+#Copy: {
+	param: {...}
+	result: {
+		for k, v in param {
+			(k): (#Copy & {param: v}).result
+		}
+	}
+} | {
+	param: [...]
+	result: [
+		for v in param {
+			(#Copy & {param: v}).result
+		},
+	]
+} | {
+	param:  number
+	result: param
+}
+
+foo: #Copy
+foo: param: a: [{b: 134}]
+
+-- want-stdout --
+{
+    "foo": {
+        "param": {
+            "a": [
+                {
+                    "b": 134
+                }
+            ]
+        },
+        "result": {
+            "a": [
+                {
+                    "b": 134
+                }
+            ]
+        }
+    }
+}

@@ -1,12 +1,10 @@
-#name: inequality
-#evalPartial
 -- in.cue --
-a: 1 != 2
-b: 1 != null
-c: true == null
-d: null != {}
-e: null == []
-f: 0 == 0.0 // types are unified first TODO: make this consistent
+a: 1 != 2       @test(eq, true)
+b: 1 != null    @test(eq, true)
+c: true == null @test(eq, false)
+d: null != {}   @test(eq, true)
+e: null == []   @test(eq, false)
+f: 0 == 0.0     @test(eq, true) // types are unified first TODO: make this consistent
 -- out/compile --
 --- in.cue
 {
@@ -27,12 +25,3 @@ Retain: 2
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    11
--- out/evalalpha --
-(struct){
-  a: (bool){ true }
-  b: (bool){ true }
-  c: (bool){ false }
-  d: (bool){ true }
-  e: (bool){ false }
-  f: (bool){ true }
-}

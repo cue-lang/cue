@@ -1,8 +1,12 @@
-#name: reference across tuples and back
-#evalPartial
 -- in.cue --
-a: {c: b.e, d: b.f}
-b: {e: 3, f: a.c}
+t1: {
+    a: {c: b.e, d: b.f}
+    b: {e: 3, f: a.c}
+    @test(eq, {
+      a: {c: 3, d: 3}
+      b: {e: 3, f: 3}
+    })
+}
 -- out/compile --
 --- in.cue
 {
@@ -25,14 +29,3 @@ Retain: 8
 Unifications: 7
 Conjuncts:    12
 Disjuncts:    12
--- out/evalalpha --
-(struct){
-  a: (struct){
-    c: (int){ 3 }
-    d: (int){ 3 }
-  }
-  b: (struct){
-    e: (int){ 3 }
-    f: (int){ 3 }
-  }
-}

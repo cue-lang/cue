@@ -1,15 +1,17 @@
-#name: list comprehension
-#evalFull
 -- in.cue --
-a: [for k, v in b if k < "d" if v > b.a {k}]
 b: {
 	a: 1
 	b: 2
 	c: 3
 	d: 4
+} @test(ignore)
+
+a: [for k, v in b if k < "d" if v > b.a {k}] @test(eq, ["b", "c"])
+c: {
+	[for _, x in b for _, y in b if x < y {x}]
+	@test(eq, [1, 1, 1, 2, 2, 3])
 }
-c: [for _, x in b for _, y in b if x < y {x}]
-d: [for x, _ in a {x}]
+d: [for x, _ in a {x}] @test(eq, [0, 1])
 -- out/compile --
 --- in.cue
 {
@@ -45,28 +47,3 @@ Retain: 10
 Unifications: 19
 Conjuncts:    36
 Disjuncts:    23
--- out/evalalpha --
-(struct){
-  a: (#list){
-    0: (string){ "b" }
-    1: (string){ "c" }
-  }
-  b: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-    c: (int){ 3 }
-    d: (int){ 4 }
-  }
-  c: (#list){
-    0: (int){ 1 }
-    1: (int){ 1 }
-    2: (int){ 1 }
-    3: (int){ 2 }
-    4: (int){ 2 }
-    5: (int){ 3 }
-  }
-  d: (#list){
-    0: (int){ 0 }
-    1: (int){ 1 }
-  }
-}

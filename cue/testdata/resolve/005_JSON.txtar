@@ -1,10 +1,8 @@
-#name: JSON
-#evalPartial
 -- in.cue --
-a="a": 3
-b:     a
-o: {"a\nb": 2} // TODO: use $ for root?
-c: o["a\nb"]
+a="a": 3        @test(eq, 3)
+b:     a        @test(eq, 3)
+o: {"a\nb": 2}  @test(eq, {"a\nb": 2})
+c: o["a\nb"]    @test(eq, 2)
 -- out/compile --
 --- in.cue
 {
@@ -15,6 +13,7 @@ c: o["a\nb"]
   }
   c: 〈0;o〉["a\nb"]
 }
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  6
@@ -25,12 +24,3 @@ Retain: 0
 Unifications: 6
 Conjuncts:    8
 Disjuncts:    6
--- out/evalalpha --
-(struct){
-  a: (int){ 3 }
-  b: (int){ 3 }
-  o: (struct){
-    "a\nb": (int){ 2 }
-  }
-  c: (int){ 2 }
-}

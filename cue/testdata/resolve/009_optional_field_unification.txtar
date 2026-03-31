@@ -1,14 +1,15 @@
-#name: optional field unification
-#evalPartial
 -- in.cue --
-a: {foo?: string}
-b: {foo: "foo"}
-c: a & b
-d: a & {"foo"?: "bar"}
+a: {foo?: string}      @test(eq, {foo?: string})
+b: {foo: "foo"}        @test(eq, {foo: "foo"})
+c: a & b               @test(eq, {foo: "foo"})
+d: a & {"foo"?: "bar"} @test(eq, {foo?: "bar"})
 
-g1:       1
-"g\(1)"?: 1
-"g\(2)"?: 2
+e: {
+	g1: 1
+	"g\(1)"?: 1
+	"g\(2)"?: 2
+	@test(eq, {g1: 1, g2?: 2})
+}
 -- out/compile --
 --- in.cue
 {
@@ -26,6 +27,7 @@ g1:       1
   "g\(1)"?: 1
   "g\(2)"?: 2
 }
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
@@ -36,20 +38,3 @@ Retain: 0
 Unifications: 11
 Conjuncts:    19
 Disjuncts:    11
--- out/evalalpha --
-(struct){
-  a: (struct){
-    foo?: (string){ string }
-  }
-  b: (struct){
-    foo: (string){ "foo" }
-  }
-  c: (struct){
-    foo: (string){ "foo" }
-  }
-  d: (struct){
-    foo?: (string){ "bar" }
-  }
-  g1: (int){ 1 }
-  g2?: (int){ 2 }
-}

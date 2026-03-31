@@ -1,5 +1,3 @@
-#name: field comprehensions with multiple keys
-#evalFull
 -- in.cue --
 
 for x in [
@@ -17,6 +15,17 @@ for x in [
 ] {
 	"\(x.a)": "\(x.b)": x
 }
+
+@test(eq, {
+	a: {
+		A: b: B: {a: "A", b: "B"}
+		C: b: D: {a: "C", b: "D"}
+		E: b: F: {a: "E", b: "F"}
+	}
+	A: B: {a: "A", b: "B"}
+	C: D: {a: "C", b: "D"}
+	E: F: {a: "E", b: "F"}
+})
 -- out/compile --
 --- in.cue
 {
@@ -61,6 +70,7 @@ for x in [
     }
   }
 }
+
 -- out/eval/stats --
 Leaks:  20
 Freed:  29
@@ -75,50 +85,3 @@ Disjuncts:    61
 MisalignedConjunct: 23
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  a: (struct){
-    A: (struct){
-      b: (struct){
-        B: (struct){
-          a: (string){ "A" }
-          b: (string){ "B" }
-        }
-      }
-    }
-    C: (struct){
-      b: (struct){
-        D: (struct){
-          a: (string){ "C" }
-          b: (string){ "D" }
-        }
-      }
-    }
-    E: (struct){
-      b: (struct){
-        F: (struct){
-          a: (string){ "E" }
-          b: (string){ "F" }
-        }
-      }
-    }
-  }
-  A: (struct){
-    B: (struct){
-      a: (string){ "A" }
-      b: (string){ "B" }
-    }
-  }
-  C: (struct){
-    D: (struct){
-      a: (string){ "C" }
-      b: (string){ "D" }
-    }
-  }
-  E: (struct){
-    F: (struct){
-      a: (string){ "E" }
-      b: (string){ "F" }
-    }
-  }
-}

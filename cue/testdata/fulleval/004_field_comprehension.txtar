@@ -1,5 +1,3 @@
-#name: field comprehension
-#evalFull
 -- in.cue --
 a: {
 	for k, v in b
@@ -7,6 +5,7 @@ a: {
 	if v > b.a {
 		"\(k)": v
 	}
+	@test(eq, {b: 2, c: 3})
 }
 b: {
 	a: 1
@@ -20,6 +19,7 @@ c: {
 	if v > b.a {
 		"\(k)": v
 	}
+	@test(eq, {b: 2, c: 3})
 }
 -- out/compile --
 --- in.cue
@@ -41,6 +41,7 @@ c: {
     }
   }
 }
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  12
@@ -55,20 +56,3 @@ Disjuncts:    16
 MisalignedConjunct: 2
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  a: (struct){
-    b: (int){ 2 }
-    c: (int){ 3 }
-  }
-  b: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-    c: (int){ 3 }
-    d: (int){ 4 }
-  }
-  c: (struct){
-    b: (int){ 2 }
-    c: (int){ 3 }
-  }
-}

@@ -1,11 +1,16 @@
-#name: complex interaction of groundness
-#evalFull
 -- in.cue --
 res: [for x in a for y in x {y & {d: "b"}}]
 res: [ a.b.c & {d: "b"}]
 
 a: b: [C=string]: {d: string, s: "a" + d}
 a: b: c: d: string
+@test(eq, {
+	res: [ {d: "b", s: "ab"} ]
+	a: b: c: {
+		d: string
+		s: _|_ @test(err, code=incomplete, pos=[4:23 4:34  5:13])
+	}
+})
 -- out/compile --
 --- in.cue
 {
@@ -37,6 +42,7 @@ a: b: c: d: string
     }
   }
 }
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  10
@@ -47,25 +53,3 @@ Retain: 5
 Unifications: 10
 Conjuncts:    33
 Disjuncts:    15
--- out/evalalpha --
-(struct){
-  res: (#list){
-    0: (struct){
-      d: (string){ "b" }
-      s: (string){ "ab" }
-    }
-  }
-  a: (struct){
-    b: (struct){
-      c: (struct){
-        d: (string){ string }
-        s: (_|_){
-          // [incomplete] a.b.c.s: non-concrete value string in operand to +:
-          //     ./in.cue:4:34
-          //     ./in.cue:4:23
-          //     ./in.cue:5:13
-        }
-      }
-    }
-  }
-}

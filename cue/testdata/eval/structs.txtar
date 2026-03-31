@@ -1,7 +1,8 @@
 -- in.cue --
 import "struct"
 
-v: {a: struct.MaxFields(2) & {}}.a
+// TODO: test that it returns struct.MaxFields(2) as validator.
+v: {a: struct.MaxFields(2) & {}}.a @test(eq, {})
 -- out/eval/stats --
 Leaks:  2
 Freed:  2
@@ -12,11 +13,6 @@ Retain: 2
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
--- out/evalalpha --
-(struct){
-  v: (struct){
-  }
-}
 -- out/compile --
 --- in.cue
 {

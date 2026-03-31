@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "872016d1_3fb383e4",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-03-31T10:23:50Z",
+      "side": 0,
+      "message": "Why was this comment deleted?",
+      "revId": "be652b6e7de80afbe19f83927c3901f9a527cb8c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

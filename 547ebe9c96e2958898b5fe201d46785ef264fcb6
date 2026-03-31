@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdae3ceb_5ef4f6de",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-03-31T10:23:50Z",
+      "side": 1,
+      "message": "Doesn\u0027t this make it always growing? This seems a bit treacherous. I would only do this if we also can implement a mark-release mechanism or use an arena per OpContext so that it can be reclaimed after the operation completes (although we then have to be careful with partial evaluation).",
+      "revId": "547ebe9c96e2958898b5fe201d46785ef264fcb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb98baf9_900e516a",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-03-31T10:23:50Z",
+      "side": 1,
+      "message": "analyze",
+      "revId": "547ebe9c96e2958898b5fe201d46785ef264fcb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e560a41_e62bd03b",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-03-31T10:23:50Z",
+      "side": 1,
+      "message": "Isn\u0027t this dropping debug output?",
+      "revId": "547ebe9c96e2958898b5fe201d46785ef264fcb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

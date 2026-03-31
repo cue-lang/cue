@@ -1,13 +1,15 @@
-#name: nested templates in one field
-#evalFull
 -- in.cue --
 a: [A=string]: b: [B=string]: {
 	name: A
 	kind: B
 }
-a: "A": b: "B": _
-a: "C": b: "D": _
-a: "EE": b: "FF": {c: "bar"}
+a: "A": b: "B": _    @test(eq, {name: "A", kind: "B"})
+a: "C": b: "D": _    @test(eq, {name: "C", kind: "D"})
+a: "EE": b: "FF": {c: "bar"} @test(eq, {
+	c:    "bar"
+	name: "EE"
+	kind: "FF"
+})
 -- out/compile --
 --- in.cue
 {
@@ -55,33 +57,3 @@ Retain: 0
 Unifications: 18
 Conjuncts:    30
 Disjuncts:    18
--- out/evalalpha --
-(struct){
-  a: (struct){
-    A: (struct){
-      b: (struct){
-        B: (struct){
-          name: (string){ "A" }
-          kind: (string){ "B" }
-        }
-      }
-    }
-    C: (struct){
-      b: (struct){
-        D: (struct){
-          name: (string){ "C" }
-          kind: (string){ "D" }
-        }
-      }
-    }
-    EE: (struct){
-      b: (struct){
-        FF: (struct){
-          c: (string){ "bar" }
-          name: (string){ "EE" }
-          kind: (string){ "FF" }
-        }
-      }
-    }
-  }
-}

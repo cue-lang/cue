@@ -1,20 +1,19 @@
-#name: field templates
-#evalFull
 -- in.cue --
 a: {
 	{[name=_]: int}
 	k: 1
+  @test(eq, {k: 1})
 }
 b: {
 	{[X=_]: {x: 0, y: *1 | int}}
-	v: {}
-	w: {y: 0}
+	v: {}         @test(eq, {x: 0, y: *1 | int})
+	w: {y: 0}     @test(eq, {y: 0, x: 0})
 }
 b: {[y=_]: {}} // TODO: allow different name
 c: {
 	{[Name=_]: {name: Name, y: 1}}
-	foo: {}
-	bar: _
+	foo: {}        @test(eq, {name: "foo", y: 1})
+	bar: _         @test(eq, {name: "bar", y: 1})
 }
 -- out/compile --
 --- in.cue
@@ -51,6 +50,7 @@ c: {
     bar: _
   }
 }
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  21
@@ -61,29 +61,3 @@ Retain: 0
 Unifications: 17
 Conjuncts:    33
 Disjuncts:    21
--- out/evalalpha --
-(struct){
-  a: (struct){
-    k: (int){ 1 }
-  }
-  b: (struct){
-    v: (struct){
-      x: (int){ 0 }
-      y: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-    w: (struct){
-      y: (int){ 0 }
-      x: (int){ 0 }
-    }
-  }
-  c: (struct){
-    foo: (struct){
-      name: (string){ "foo" }
-      y: (int){ 1 }
-    }
-    bar: (struct){
-      name: (string){ "bar" }
-      y: (int){ 1 }
-    }
-  }
-}

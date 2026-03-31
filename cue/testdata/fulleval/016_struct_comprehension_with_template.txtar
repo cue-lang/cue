@@ -1,16 +1,38 @@
-#name: struct comprehension with template
-#evalFull
 -- in.cue --
-result: [for _, v in service {v}]
+result: [for _, v in service {v}] @test(eq, [{
+	name: *"foo" | string
+	type: "service"
+	port: *7080 | int
+}, {
+	port: 8000
+	name: *"bar" | string
+	type: "service"
+}, {
+	name: "foobar"
+	type: "service"
+	port: *7080 | int
+}])
 
 service: [Name=string]: {
 	name: *Name | string
 	type: "service"
 	port: *7080 | int
 }
-service: foo: {}
-service: bar: {port: 8000}
-service: baz: {name: "foobar"}
+service: foo: {} @test(eq, {
+	name: *"foo" | string
+	type: "service"
+	port: *7080 | int
+})
+service: bar: {port: 8000} @test(eq, {
+	port: 8000
+	name: *"bar" | string
+	type: "service"
+})
+service: baz: {name: "foobar"} @test(eq, {
+	name: "foobar"
+	type: "service"
+	port: *7080 | int
+})
 -- out/compile --
 --- in.cue
 {
@@ -40,6 +62,7 @@ service: baz: {name: "foobar"}
     }
   }
 }
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  51
@@ -50,40 +73,3 @@ Retain: 4
 Unifications: 27
 Conjuncts:    70
 Disjuncts:    55
--- out/evalalpha --
-(struct){
-  result: (#list){
-    0: (struct){
-      name: (string){ |(*(string){ "foo" }, (string){ string }) }
-      type: (string){ "service" }
-      port: (int){ |(*(int){ 7080 }, (int){ int }) }
-    }
-    1: (struct){
-      port: (int){ 8000 }
-      name: (string){ |(*(string){ "bar" }, (string){ string }) }
-      type: (string){ "service" }
-    }
-    2: (struct){
-      name: (string){ "foobar" }
-      type: (string){ "service" }
-      port: (int){ |(*(int){ 7080 }, (int){ int }) }
-    }
-  }
-  service: (struct){
-    foo: (struct){
-      name: (string){ |(*(string){ "foo" }, (string){ string }) }
-      type: (string){ "service" }
-      port: (int){ |(*(int){ 7080 }, (int){ int }) }
-    }
-    bar: (struct){
-      port: (int){ 8000 }
-      name: (string){ |(*(string){ "bar" }, (string){ string }) }
-      type: (string){ "service" }
-    }
-    baz: (struct){
-      name: (string){ "foobar" }
-      type: (string){ "service" }
-      port: (int){ |(*(int){ 7080 }, (int){ int }) }
-    }
-  }
-}

@@ -629,6 +629,14 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		case EqualOp, NotEqualOp:
 			// We treat equality as an open validator.
 			n.updateConjunctInfo(TopKind, id, cHasOpenValidator|cHasTop)
+			// Mark as top-like when the bound's kind overlaps with
+			// composite types (e.g. !=null has kind TopKind &^ NullKind,
+			// which includes StructKind). Without this, validateValue
+			// prematurely marks the node as a concrete struct, causing
+			// the constraint to be consumed and lost.
+			if x.Kind()&CompositeKind != 0 {
+				n.hasTop = true
+			}
 			fallthrough
 
 		case MatchOp, NotMatchOp:

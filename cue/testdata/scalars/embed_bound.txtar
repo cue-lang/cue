@@ -16,8 +16,7 @@ c: {
 }
 -- out/evalalpha --
 (struct){
-  a: (struct){
-  }
+  a: ((bool|string|bytes|func|list|struct|number)){ !=null }
   b: ((bool|string|bytes|func|list|struct|number)){ !=null }
   c: (struct){
     x: (int){ 1 }

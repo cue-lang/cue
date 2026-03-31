@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "feb9036a_ceb24433",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-31T08:28:31Z",
+      "side": 1,
+      "message": "Not that it matters much because this is an internal API, but I had been toying with the idea of a slightly more general (and potentially public) API that doesn\u0027t select a specific kind and returns an iterator rather than gathering everything.\n\nBut this is fine for now.",
+      "revId": "3bccd1b28ceb0bdac702e79b474d04e8dd20f65a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9153abea_0dce7009",
         "filename": "internal/lsp/eval/eval_test.go",
         "patchSetId": 2
@@ -14,6 +31,24 @@
       "writtenOn": "2026-03-19T16:10:37Z",
       "side": 1,
       "message": "The reason for these changes is:\n- In the LSP eval, for all AST nodes we encounter that we don\u0027t understand, we deliberately do not make completion suggestions for their range. A good example of this is BasicLit - we choose not to make any suggestions when the cursor is within a BasicLic.\n- Previously, we were not processing embedded ast.Attribute nodes, and so we were excluding them. But now we are processing them, and so we no longer exclude them, and so you get completions. The completions aren\u0027t particularly meaningful in this case, but they\u0027re not harmful either.",
+      "revId": "3bccd1b28ceb0bdac702e79b474d04e8dd20f65a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bbb7de7_cdb03846",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-03-31T08:28:31Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9153abea_0dce7009",
       "revId": "3bccd1b28ceb0bdac702e79b474d04e8dd20f65a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -386,6 +386,30 @@ issue3903: full: {
 		]
 	}
 }
+-- issue2405.cue --
+issue2405: {
+	#Copy: {
+		param: {...}
+		result: {
+			for k, v in param {
+				(k): (#Copy & {param: v}).result
+			}
+		}
+	} | {
+		param: [...]
+		result: [
+			for v in param {
+				(#Copy & {param: v}).result
+			},
+		]
+	} | {
+		param:  number
+		result: param
+	}
+
+	foo: #Copy
+	foo: param: a: [{b: 134}]
+}
 -- issue3941.cue --
 issue3941: full: {
 	#Metadata: name: string
@@ -428,20 +452,20 @@ issue4100: {
 	for _ in a {}
 }
 -- out/evalalpha/stats --
-Leaks:  53
-Freed:  920
-Reused: 884
-Allocs: 89
+Leaks:  91
+Freed:  1007
+Reused: 975
+Allocs: 123
 Retain: 0
 
-Unifications: 588
-Conjuncts:    1718
-Disjuncts:    210
+Unifications: 650
+Conjuncts:    1925
+Disjuncts:    237
 Notifications: 14
 
-NumCloseIDs: 732
+NumCloseIDs: 813
 
-ConjunctInfos:       1131
+ConjunctInfos:       1258
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1
@@ -1077,6 +1101,38 @@ Result:
       }
     }
   }
+  issue2405: (struct){
+    #Copy: (#struct){ |((#struct){
+        param: (#struct){
+        }
+        result: (#struct){
+        }
+      }, (#struct){
+        param: (list){
+        }
+        result: (#list){
+        }
+      }, (#struct){
+        param: (number){ number }
+        result: (number){ number }
+      }) }
+    foo: (#struct){
+      param: (#struct){
+        a: (#list){
+          0: (struct){
+            b: (int){ 134 }
+          }
+        }
+      }
+      result: (#struct){
+        a: (#list){
+          0: (#struct){
+            b: (int){ 134 }
+          }
+        }
+      }
+    }
+  }
   issue3903: (struct){
     reduced: (struct){
       s1: (#struct){
@@ -1238,7 +1294,7 @@ diff old new
          }
        }
      }
-@@ -599,16 +605,35 @@
+@@ -599,16 +605,67 @@
        }
      }
    }
@@ -1266,6 +1322,38 @@ diff old new
 +      }
 +    }
 +  }
++  issue2405: (struct){
++    #Copy: (#struct){ |((#struct){
++        param: (#struct){
++        }
++        result: (#struct){
++        }
++      }, (#struct){
++        param: (list){
++        }
++        result: (#list){
++        }
++      }, (#struct){
++        param: (number){ number }
++        result: (number){ number }
++      }) }
++    foo: (#struct){
++      param: (#struct){
++        a: (#list){
++          0: (struct){
++            b: (int){ 134 }
++          }
++        }
++      }
++      result: (#struct){
++        a: (#list){
++          0: (#struct){
++            b: (int){ 134 }
++          }
++        }
++      }
++    }
++  }
    issue3903: (struct){
      reduced: (struct){
        s1: (#struct){
@@ -1280,7 +1368,7 @@ diff old new
          }
          objs: (#list){
          }
-@@ -689,4 +714,12 @@
+@@ -689,4 +746,12 @@
        }
      }
    }
@@ -1311,20 +1399,20 @@ diff old new
 -MisalignedConjunct: 268
 -
 -NumCloseIDs: 16
-+Leaks:  53
-+Freed:  920
-+Reused: 884
-+Allocs: 89
++Leaks:  91
++Freed:  1007
++Reused: 975
++Allocs: 123
 +Retain: 0
 +
-+Unifications: 588
-+Conjuncts:    1718
-+Disjuncts:    210
++Unifications: 650
++Conjuncts:    1925
++Disjuncts:    237
 +Notifications: 14
 +
-+NumCloseIDs: 732
++NumCloseIDs: 813
 +
-+ConjunctInfos:       1131
++ConjunctInfos:       1258
 +MaxConjunctInfos:    10
 +MaxReqSets:          12
 +MaxRedirect:         1
@@ -2617,6 +2705,47 @@ Result:
           _
         },
       ]
+    }
+  }
+}
+--- issue2405.cue
+{
+  issue2405: {
+    #Copy: ({
+      param: {
+        ...
+      }
+      result: {
+        for k, v in 〈1;param〉 {
+          〈1;k〉: (〈4;#Copy〉 & {
+            param: 〈2;v〉
+          }).result
+        }
+      }
+    }|{
+      param: [
+        ...,
+      ]
+      result: [
+        for _, v in 〈1;param〉 {
+          (〈4;#Copy〉 & {
+            param: 〈2;v〉
+          }).result
+        },
+      ]
+    }|{
+      param: number
+      result: 〈0;param〉
+    })
+    foo: 〈0;#Copy〉
+    foo: {
+      param: {
+        a: [
+          {
+            b: 134
+          },
+        ]
+      }
     }
   }
 }

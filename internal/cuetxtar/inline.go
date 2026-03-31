@@ -198,8 +198,10 @@ type posSpec struct {
 
 // errArgs holds parsed sub-options from an @test(err, ...) directive.
 type errArgs struct {
-	// code is the expected error code, e.g. "cycle", "structural cycle".
-	code string
+	// codes holds the acceptable error codes, e.g. ["cycle"] or ["cycle", "incomplete"].
+	// A single code= value is stored as a one-element slice; code=(a|b) as two.
+	// An empty slice means any error code is accepted.
+	codes []string
 	// contains is a substring the error message must contain.
 	contains string
 	// any requires any descendant of the annotated field to have the error.
@@ -213,6 +215,15 @@ type errArgs struct {
 	// posSet is true when pos= was
 	// explicitly provided (including pos=[] to assert no positions).
 	posSet bool
+}
+
+// matchesCode reports whether the given error code satisfies the codes
+// constraint. An empty codes slice means any code is accepted.
+func (ea *errArgs) matchesCode(got string) bool {
+	if len(ea.codes) == 0 {
+		return true
+	}
+	return slices.Contains(ea.codes, got)
 }
 
 // parseTestAttr parses the body of a @test(...) attribute node.
@@ -286,7 +297,11 @@ func parseErrArgs(a internal.Attr) (errArgs, error) {
 	for _, kv := range a.Fields[1:] {
 		switch {
 		case kv.Key() == "code":
-			ea.code = kv.Value()
+			codes, err := parseParenList(kv.Value())
+			if err != nil {
+				return ea, fmt.Errorf("@test(err, code=...): %w", err)
+			}
+			ea.codes = codes
 		case kv.Key() == "contains":
 			ea.contains = kv.Value()
 		case kv.Key() == "" && kv.Value() == "any":
@@ -1286,7 +1301,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		// @test(err, any, ...) — check that any descendant has the error.
 		found := r.findDescendantError(val, ea)
 		if !found {
-			t.Errorf("path %s: expected a descendant error with code=%q, none found", path, ea.code)
+			t.Errorf("path %s: expected a descendant error with code=%v, none found", path, ea.codes)
 		}
 		return
 	}
@@ -1297,10 +1312,10 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 	}
 
 	// Validate error code.
-	if ea.code != "" {
+	if len(ea.codes) > 0 {
 		gotCode := r.errorCode(val)
-		if gotCode != ea.code {
-			t.Errorf("path %s: expected error code %q, got %q", path, ea.code, gotCode)
+		if !ea.matchesCode(gotCode) {
+			t.Errorf("path %s: expected error code %v, got %q", path, ea.codes, gotCode)
 		}
 	}
 	// Validate error message contains.
@@ -1507,10 +1522,7 @@ func (r *inlineRunner) errorMessage(val cue.Value) string {
 // matching ea. Returns true if found.
 func (r *inlineRunner) findDescendantError(val cue.Value, ea *errArgs) bool {
 	if r.isError(val) {
-		if ea.code == "" {
-			return true
-		}
-		if r.errorCode(val) == ea.code {
+		if ea.matchesCode(r.errorCode(val)) {
 			return true
 		}
 	}

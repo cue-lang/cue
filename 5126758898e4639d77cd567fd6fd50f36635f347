@@ -16,6 +16,24 @@
       "message": "presumably these trailing tabs are not important for the test and could be removed?",
       "revId": "5126758898e4639d77cd567fd6fd50f36635f347",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce4dd1a1_159a8e76",
+        "filename": "cue/testdata/eval/issue1886.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-31T15:25:13Z",
+      "side": 1,
+      "message": "oops, well spotted. done.",
+      "parentUuid": "fbcaa5ea_14ffb619",
+      "revId": "5126758898e4639d77cd567fd6fd50f36635f347",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

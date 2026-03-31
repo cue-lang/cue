@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b937f55_a2482a17",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-31T09:13:59Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "feb9036a_ceb24433",
+      "revId": "3bccd1b28ceb0bdac702e79b474d04e8dd20f65a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9153abea_0dce7009",

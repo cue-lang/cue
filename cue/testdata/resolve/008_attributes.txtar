@@ -1,11 +1,9 @@
-#name: attributes
-#evalPartial
 -- in.cue --
-a: {foo: 1 @foo() @baz(1)}
-b: {foo: 1 @bar() @foo()}
-c: a & b
+a: {foo: 1 @foo() @baz(1)} @test(eq, {foo: 1 @foo() @baz(1)})
+b: {foo: 1 @bar() @foo()}  @test(eq, {foo: 1 @foo() @bar()})
+c: a & b                   @test(eq, {foo: 1 @foo() @baz(1) @bar()})
 
-e: a & {foo: 1 @foo(other)}
+e: a & {foo: 1 @foo(other)} @test(eq, {foo: 1 @foo(other) @foo() @baz(1)})
 -- out/compile --
 --- in.cue
 {
@@ -30,18 +28,3 @@ Retain: 0
 Unifications: 9
 Conjuncts:    16
 Disjuncts:    9
--- out/evalalpha --
-(struct){
-  a: (struct){
-    foo: (int){ 1 }
-  }
-  b: (struct){
-    foo: (int){ 1 }
-  }
-  c: (struct){
-    foo: (int){ 1 }
-  }
-  e: (struct){
-    foo: (int){ 1 }
-  }
-}

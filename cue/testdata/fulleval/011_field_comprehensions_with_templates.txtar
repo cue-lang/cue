@@ -1,5 +1,3 @@
-#name: field comprehensions with templates
-#evalFull
 -- in.cue --
 num: 1
 a: {
@@ -9,7 +7,13 @@ a: {
 			kind: B
 		}
 	}
-}
+} @test(eq, {
+	b: c: {
+		d:    "bar"
+		name: "b"
+		kind: "c"
+	}
+})
 a: b: c: d: "bar"
 -- out/compile --
 --- in.cue
@@ -47,16 +51,3 @@ Disjuncts:    8
 MisalignedConjunct: 2
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  num: (int){ 1 }
-  a: (struct){
-    b: (struct){
-      c: (struct){
-        d: (string){ "bar" }
-        name: (string){ "b" }
-        kind: (string){ "c" }
-      }
-    }
-  }
-}

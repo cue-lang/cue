@@ -1,5 +1,3 @@
-#name: template unification within one struct
-#evalFull
 -- in.cue --
 a: {
 	{[A=string]: {name: A}}
@@ -7,9 +5,13 @@ a: {
 	// TODO: allow duplicate alias here
 	{[X=string]: {kind: X}}
 }
-a: "A": _
-a: "C": _
-a: "E": {c: "bar"}
+a: "A": _  @test(eq, {name: "A", kind: "A"})
+a: "C": _  @test(eq, {name: "C", kind: "C"})
+a: "E": {c: "bar"} @test(eq, {
+	c: "bar"
+	name: "E"
+	kind: "E"
+})
 -- out/compile --
 --- in.cue
 {
@@ -47,21 +49,3 @@ Retain: 0
 Unifications: 12
 Conjuncts:    23
 Disjuncts:    12
--- out/evalalpha --
-(struct){
-  a: (struct){
-    A: (struct){
-      name: (string){ "A" }
-      kind: (string){ "A" }
-    }
-    C: (struct){
-      name: (string){ "C" }
-      kind: (string){ "C" }
-    }
-    E: (struct){
-      c: (string){ "bar" }
-      name: (string){ "E" }
-      kind: (string){ "E" }
-    }
-  }
-}

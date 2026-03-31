@@ -1,27 +1,39 @@
-#name: slice rewrite bug
-#evalFull
 -- in.cue --
-fn: {
-	arg: [...int] & [1]
-	out: arg[1:]
+t1: {
+	fn: {
+		arg: [...int] & [1]
+		out: arg[1:]
+	}
+	fn1: fn & {arg: [1]}
+	@test(eq, {
+		fn: {
+			arg: [1]
+			out: []
+		}
+		fn1: {
+			arg: [1]
+			out: []
+		}
+	})
 }
-fn1: fn & {arg: [1]}
 -- out/compile --
 --- in.cue
 {
-  fn: {
-    arg: ([
-      ...int,
-    ] & [
-      1,
-    ])
-    out: 〈0;arg〉[1:]
+  t1: {
+    fn: {
+      arg: ([
+        ...int,
+      ] & [
+        1,
+      ])
+      out: 〈0;arg〉[1:]
+    }
+    fn1: (〈0;fn〉 & {
+      arg: [
+        1,
+      ]
+    })
   }
-  fn1: (〈0;fn〉 & {
-    arg: [
-      1,
-    ]
-  })
 }
 -- out/eval/stats --
 Leaks:  0
@@ -33,20 +45,3 @@ Retain: 0
 Unifications: 9
 Conjuncts:    17
 Disjuncts:    9
--- out/evalalpha --
-(struct){
-  fn: (struct){
-    arg: (#list){
-      0: (int){ 1 }
-    }
-    out: (#list){
-    }
-  }
-  fn1: (struct){
-    arg: (#list){
-      0: (int){ 1 }
-    }
-    out: (#list){
-    }
-  }
-}

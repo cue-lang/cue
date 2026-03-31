@@ -16,6 +16,24 @@
       "message": "Again, it\u0027s always nice to add tests before changing the logic.",
       "revId": "6df960a3cdd53a9c7ec9267f39641ada3ae4c139",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65ca86e7_059179be",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2120,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-03-31T09:13:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "65c01648_962af08d",
+      "revId": "6df960a3cdd53a9c7ec9267f39641ada3ae4c139",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

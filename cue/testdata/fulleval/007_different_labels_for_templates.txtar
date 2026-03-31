@@ -1,9 +1,7 @@
-#name: different labels for templates
-#evalFull
 -- in.cue --
 a: [X=string]: {name: X}
 a: [Name=string]: {name: Name}
-a: foo: {}
+a: foo: {} @test(eq, {name: "foo"})
 -- out/compile --
 --- in.cue
 {
@@ -31,11 +29,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    9
 Disjuncts:    4
--- out/evalalpha --
-(struct){
-  a: (struct){
-    foo: (struct){
-      name: (string){ "foo" }
-    }
-  }
-}

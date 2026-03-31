@@ -383,14 +383,14 @@ func (tg *tagger) injectTags(tags []string) errors.Error {
 // findModuleScopedTags collects tags with scope=mod from the transitive imports
 // of inst that belong to modPath. visited is mutated to track seen import paths
 // and must be pre-seeded with the root package paths to avoid double-processing.
-func findModuleScopedTags(inst *build.Instance, modPath string, visited map[string]bool) ([]*tag, errors.Error) {
+func findModuleScopedTags(inst *build.Instance, modPath string, visited map[string]struct{}) ([]*tag, errors.Error) {
 	var tags []*tag
 	var errs errors.Error
 	for _, imp := range inst.Imports {
-		if visited[imp.ImportPath] {
+		if _, ok := visited[imp.ImportPath]; ok {
 			continue
 		}
-		visited[imp.ImportPath] = true
+		visited[imp.ImportPath] = struct{}{}
 		if imp.Module != modPath {
 			continue
 		}

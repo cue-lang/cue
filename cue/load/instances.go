@@ -176,10 +176,16 @@ func Instances(args []string, c *Config) []*build.Instance {
 	// the same module. These tags are injected even when their package is
 	// not a root package but is merely imported.
 	if c.Module != "" {
-		visited := map[string]bool{}
+		// `capacity` is over-estimated because it counts shared and out-of-module
+		// deps, but it avoids rehashing as findModuleScopedTags adds entries.
+		capacity := len(a)
+		for _, p := range a {
+			capacity += len(p.Deps)
+		}
+		visited := make(map[string]struct{}, capacity)
 		// Seed visited with root package paths to avoid double-processing.
 		for _, p := range a {
-			visited[p.ImportPath] = true
+			visited[p.ImportPath] = struct{}{}
 		}
 		for _, p := range a {
 			tags, err := findModuleScopedTags(p, c.Module, visited)

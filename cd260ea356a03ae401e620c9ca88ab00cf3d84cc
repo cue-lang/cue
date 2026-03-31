@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a17ab89b_3598df1c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-31T15:20:29Z",
+      "side": 1,
+      "message": "do not escape the negation operator in the commit message; I suppose this is a shell gotcha with the AI",
+      "revId": "cd260ea356a03ae401e620c9ca88ab00cf3d84cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3ec2883_b638b123",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-03-31T15:20:29Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "cd260ea356a03ae401e620c9ca88ab00cf3d84cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

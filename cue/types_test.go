@@ -4052,17 +4052,17 @@ func TestExpr(t *testing.T) {
 		input: "v: 2 / 5",
 		want:  "/(2 5)",
 	}, {
-		input: "v: 2 quo 5",
-		want:  "quo(2 5)",
+		input: "v: quo(2, 5)",
+		want:  "()(quo 2 5)",
 	}, {
-		input: "v: 2 rem 5",
-		want:  "rem(2 5)",
+		input: "v: rem(2, 5)",
+		want:  "()(rem 2 5)",
 	}, {
-		input: "v: 2 div 5",
-		want:  "div(2 5)",
+		input: "v: div(2, 5)",
+		want:  "()(div 2 5)",
 	}, {
-		input: "v: 2 mod 5",
-		want:  "mod(2 5)",
+		input: "v: mod(2, 5)",
+		want:  "()(mod 2 5)",
 	}, {
 		input: "@experiment(explicitopen)\n v: #Y..., #Y: {b: 2}",
 		want:  `...(.(〈〉 "#Y"))`,

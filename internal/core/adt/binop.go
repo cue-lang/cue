@@ -232,26 +232,6 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 		if leftKind&NumberKind != 0 && rightKind&NumberKind != 0 {
 			return c.Quo(c.Num(left, op), c.Num(right, op))
 		}
-
-	case IntDivideOp:
-		if leftKind&IntKind != 0 && rightKind&IntKind != 0 {
-			return c.IntDiv(c.Num(left, op), c.Num(right, op))
-		}
-
-	case IntModuloOp:
-		if leftKind&IntKind != 0 && rightKind&IntKind != 0 {
-			return c.IntMod(c.Num(left, op), c.Num(right, op))
-		}
-
-	case IntQuotientOp:
-		if leftKind&IntKind != 0 && rightKind&IntKind != 0 {
-			return c.IntQuo(c.Num(left, op), c.Num(right, op))
-		}
-
-	case IntRemainderOp:
-		if leftKind&IntKind != 0 && rightKind&IntKind != 0 {
-			return c.IntRem(c.Num(left, op), c.Num(right, op))
-		}
 	}
 
 	return c.NewErrf("invalid operands %s and %s to '%s' (type %s and %s)",

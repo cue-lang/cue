@@ -52,10 +52,6 @@ const (
 	SubtractOp      // -
 	MultiplyOp      // *
 	FloatQuotientOp // /
-	IntQuotientOp   // quo
-	IntRemainderOp  // rem
-	IntDivideOp     // div
-	IntModuloOp     // mod
 
 	InterpolationOp // \()
 
@@ -80,11 +76,6 @@ var tokenMap = map[token.Token]Op{
 	token.SUB: SubtractOp,      // -
 	token.MUL: MultiplyOp,      // *
 	token.QUO: FloatQuotientOp, // /
-
-	token.IDIV: IntDivideOp,    // div
-	token.IMOD: IntModuloOp,    // mod
-	token.IQUO: IntQuotientOp,  // quo
-	token.IREM: IntRemainderOp, // rem
 
 	token.LAND: BoolAndOp, // &&
 	token.LOR:  BoolOrOp,  // ||

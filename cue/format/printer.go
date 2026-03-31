@@ -470,8 +470,6 @@ func mayCombine(prev, next token.Token) (before, after bool) {
 		return true, true
 	}
 	switch prev {
-	case token.IQUO, token.IREM, token.IDIV, token.IMOD:
-		return false, false
 	case token.INT:
 		before = next == token.PERIOD // 1.
 	case token.ADD:

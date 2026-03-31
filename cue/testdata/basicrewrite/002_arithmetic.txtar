@@ -13,15 +13,15 @@ div00:   0 / 0
 b:       1 != 4
 add:     div1 + 1.0
 
-idiv00: 0 div 0
-imod00: 0 mod 0
-iquo00: 0 quo 0
-irem00: 0 rem 0
+idiv00: div(0, 0)
+imod00: mod(0, 0)
+iquo00: quo(0, 0)
+irem00: rem(0, 0)
 
 v1: 1.0T / 2.0
 v2: 2.0 == 2
 v3: 2.0 / 3.0
-v5: i1 div i2
+v5: div(i1, i2)
 
 e0: 2 + "a"
 // these are now all alloweed
@@ -29,10 +29,10 @@ e0: 2 + "a"
 // e2: i1 / 2.0
 // e3: 3.0 % i2
 // e4: i1 % 2.0
-e5: 1.0 div 2
-e6: 2 rem 2.0
-e7: 2 quo 2.0
-e8: 1.0 mod 1
+e5: div(1.0, 2)
+e6: rem(2, 2.0)
+e7: quo(2, 2.0)
+e8: mod(1.0, 1)
 -- out/compile --
 --- in.cue
 {
@@ -46,19 +46,19 @@ e8: 1.0 mod 1
   div00: (0 / 0)
   b: (1 != 4)
   add: (〈0;div1〉 + 1.0)
-  idiv00: (0 div 0)
-  imod00: (0 mod 0)
-  iquo00: (0 quo 0)
-  irem00: (0 rem 0)
+  idiv00: div(0, 0)
+  imod00: mod(0, 0)
+  iquo00: quo(0, 0)
+  irem00: rem(0, 0)
   v1: (1000000000000 / 2.0)
   v2: (2.0 == 2)
   v3: (2.0 / 3.0)
-  v5: (〈0;i1〉 div 〈0;i2〉)
+  v5: div(〈0;i1〉, 〈0;i2〉)
   e0: (2 + "a")
-  e5: (1.0 div 2)
-  e6: (2 rem 2.0)
-  e7: (2 quo 2.0)
-  e8: (1.0 mod 1)
+  e5: div(1.0, 2)
+  e6: rem(2, 2.0)
+  e7: quo(2, 2.0)
+  e8: mod(1.0, 1)
 }
 -- out/eval/stats --
 Leaks:  0
@@ -87,18 +87,14 @@ irem00: division by zero:
 e0: invalid operands 2 and "a" to '+' (type int and string):
     ./in.cue:23:5
     ./in.cue:23:9
-e5: invalid operands 1.0 and 2 to 'div' (type float and int):
-    ./in.cue:29:5
-    ./in.cue:29:13
-e6: invalid operands 2 and 2.0 to 'rem' (type int and float):
-    ./in.cue:30:5
-    ./in.cue:30:11
-e7: invalid operands 2 and 2.0 to 'quo' (type int and float):
-    ./in.cue:31:5
-    ./in.cue:31:11
-e8: invalid operands 1.0 and 1 to 'mod' (type float and int):
-    ./in.cue:32:5
-    ./in.cue:32:13
+e5: cannot use 1.0 (type float) as int in argument 1 to div:
+    ./in.cue:29:9
+e6: cannot use 2.0 (type float) as int in argument 2 to rem:
+    ./in.cue:30:12
+e7: cannot use 2.0 (type float) as int in argument 2 to quo:
+    ./in.cue:31:12
+e8: cannot use 1.0 (type float) as int in argument 1 to mod:
+    ./in.cue:32:9
 
 Result:
 (_|_){
@@ -145,23 +141,19 @@ Result:
     //     ./in.cue:23:9
   }
   e5: (_|_){
-    // [eval] e5: invalid operands 1.0 and 2 to 'div' (type float and int):
-    //     ./in.cue:29:5
-    //     ./in.cue:29:13
+    // [eval] e5: cannot use 1.0 (type float) as int in argument 1 to div:
+    //     ./in.cue:29:9
   }
   e6: (_|_){
-    // [eval] e6: invalid operands 2 and 2.0 to 'rem' (type int and float):
-    //     ./in.cue:30:5
-    //     ./in.cue:30:11
+    // [eval] e6: cannot use 2.0 (type float) as int in argument 2 to rem:
+    //     ./in.cue:30:12
   }
   e7: (_|_){
-    // [eval] e7: invalid operands 2 and 2.0 to 'quo' (type int and float):
-    //     ./in.cue:31:5
-    //     ./in.cue:31:11
+    // [eval] e7: cannot use 2.0 (type float) as int in argument 2 to quo:
+    //     ./in.cue:31:12
   }
   e8: (_|_){
-    // [eval] e8: invalid operands 1.0 and 1 to 'mod' (type float and int):
-    //     ./in.cue:32:5
-    //     ./in.cue:32:13
+    // [eval] e8: cannot use 1.0 (type float) as int in argument 1 to mod:
+    //     ./in.cue:32:9
   }
 }

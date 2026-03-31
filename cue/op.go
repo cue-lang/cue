@@ -52,10 +52,6 @@ const (
 	SubtractOp      Op = adt.SubtractOp
 	MultiplyOp      Op = adt.MultiplyOp
 	FloatQuotientOp Op = adt.FloatQuotientOp
-	IntQuotientOp   Op = adt.IntQuotientOp
-	IntRemainderOp  Op = adt.IntRemainderOp
-	IntDivideOp     Op = adt.IntDivideOp
-	IntModuloOp     Op = adt.IntModuloOp
 
 	InterpolationOp Op = adt.InterpolationOp
 

@@ -93,7 +93,7 @@ import "list"
     e: f(3*4*5)
     e: f(3+4*5)
 
-    e: f(3 + 4 div 5)
+    e: f(3 + div(4, 5))
 
     e: 3<4&&5>4
     e: a || b && c || d
@@ -109,14 +109,14 @@ import "list"
     e: a - b*c
     e: a - (b * c)
     e: a * b / c
-    e: a div b + 5
+    e: div(a, b) + 5
     e: a / b
     e: x[a|b]
     e: x[a /b]
     e: a & b
     e: a + +b
     e: a - -b
-    e: a div - b
+    e: div(a, - b)
     e: x[a*-b]
     e: x[a + +b]
     e: len(longVariableName) * 2
@@ -377,7 +377,7 @@ import "list"
 	e: f(3 * 4 * 5)
 	e: f(3 + 4*5)
 
-	e: f(3 + 4 div 5)
+	e: f(3 + div(4, 5))
 
 	e: 3 < 4 && 5 > 4
 	e: a || b && c || d
@@ -393,14 +393,14 @@ import "list"
 	e: a - b*c
 	e: a - (b * c)
 	e: a * b / c
-	e: a div b + 5
+	e: div(a, b) + 5
 	e: a / b
 	e: x[a | b]
 	e: x[a/b]
 	e: a & b
 	e: a + +b
 	e: a - -b
-	e: a div -b
+	e: div(a, -b)
 	e: x[a*-b]
 	e: x[a + +b]
 	e: len(longVariableName) * 2

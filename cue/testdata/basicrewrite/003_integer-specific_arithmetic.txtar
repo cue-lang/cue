@@ -1,60 +1,60 @@
 #name: integer-specific arithmetic
 #evalPartial
 -- in.cue --
-q1:  5 quo 2   // 2
-q2:  5 quo -2  // -2
-q3:  -5 quo 2  // -2
-q4:  -5 quo -2 // 2
-qe1: 2.0 quo 1
-qe2: 2 quo 1.0
+q1:  quo(5, 2)   // 2
+q2:  quo(5, -2)  // -2
+q3:  quo(-5, 2)  // -2
+q4:  quo(-5, -2) // 2
+qe1: quo(2.0, 1)
+qe2: quo(2, 1.0)
 
-r1:  5 rem 2   // 1
-r2:  5 rem -2  // 1
-r3:  -5 rem 2  // -1
-r4:  -5 rem -2 // -1
-re1: 2.0 rem 1
-re2: 2 rem 1.0
+r1:  rem(5, 2)   // 1
+r2:  rem(5, -2)  // 1
+r3:  rem(-5, 2)  // -1
+r4:  rem(-5, -2) // -1
+re1: rem(2.0, 1)
+re2: rem(2, 1.0)
 
-d1:  5 div 2   // 2
-d2:  5 div -2  // -2
-d3:  -5 div 2  // -3
-d4:  -5 div -2 // 3
-de1: 2.0 div 1
-de2: 2 div 1.0
+d1:  div(5, 2)   // 2
+d2:  div(5, -2)  // -2
+d3:  div(-5, 2)  // -3
+d4:  div(-5, -2) // 3
+de1: div(2.0, 1)
+de2: div(2, 1.0)
 
-m1:  5 mod 2   // 1
-m2:  5 mod -2  // 1
-m3:  -5 mod 2  // 1
-m4:  -5 mod -2 // 1
-me1: 2.0 mod 1
-me2: 2 mod 1.0
+m1:  mod(5, 2)   // 1
+m2:  mod(5, -2)  // 1
+m3:  mod(-5, 2)  // 1
+m4:  mod(-5, -2) // 1
+me1: mod(2.0, 1)
+me2: mod(2, 1.0)
 -- out/compile --
 --- in.cue
 {
-  q1: (5 quo 2)
-  q2: (5 quo -2)
-  q3: (-5 quo 2)
-  q4: (-5 quo -2)
-  qe1: (2.0 quo 1)
-  qe2: (2 quo 1.0)
-  r1: (5 rem 2)
-  r2: (5 rem -2)
-  r3: (-5 rem 2)
-  r4: (-5 rem -2)
-  re1: (2.0 rem 1)
-  re2: (2 rem 1.0)
-  d1: (5 div 2)
-  d2: (5 div -2)
-  d3: (-5 div 2)
-  d4: (-5 div -2)
-  de1: (2.0 div 1)
-  de2: (2 div 1.0)
-  m1: (5 mod 2)
-  m2: (5 mod -2)
-  m3: (-5 mod 2)
-  m4: (-5 mod -2)
-  me1: (2.0 mod 1)
-  me2: (2 mod 1.0)
+  q1: quo(5, 2)
+  q2: quo(5, -2)
+  q3: quo(-5, 2)
+  q4: quo(-5, -2)
+  qe1: quo(2.0, 1)
+  qe2: quo(2, 1.0)
+  r1: rem(5, 2)
+  r2: rem(5, -2)
+  r3: rem(-5, 2)
+  r4: rem(-5, -2)
+  re1: rem(2.0, 1)
+  re2: rem(2, 1.0)
+  d1: div(5, 2)
+  d2: div(5, -2)
+  d3: div(-5, 2)
+  d4: div(-5, -2)
+  de1: div(2.0, 1)
+  de2: div(2, 1.0)
+  m1: mod(5, 2)
+  m2: mod(5, -2)
+  m3: mod(-5, 2)
+  m4: mod(-5, -2)
+  me1: mod(2.0, 1)
+  me2: mod(2, 1.0)
 }
 -- out/eval/stats --
 Leaks:  0
@@ -68,30 +68,22 @@ Conjuncts:    25
 Disjuncts:    25
 -- out/evalalpha --
 Errors:
-qe1: invalid operands 2.0 and 1 to 'quo' (type float and int):
-    ./in.cue:5:6
-    ./in.cue:5:14
-qe2: invalid operands 2 and 1.0 to 'quo' (type int and float):
-    ./in.cue:6:6
-    ./in.cue:6:12
-re1: invalid operands 2.0 and 1 to 'rem' (type float and int):
-    ./in.cue:12:6
-    ./in.cue:12:14
-re2: invalid operands 2 and 1.0 to 'rem' (type int and float):
-    ./in.cue:13:6
-    ./in.cue:13:12
-de1: invalid operands 2.0 and 1 to 'div' (type float and int):
-    ./in.cue:19:6
-    ./in.cue:19:14
-de2: invalid operands 2 and 1.0 to 'div' (type int and float):
-    ./in.cue:20:6
-    ./in.cue:20:12
-me1: invalid operands 2.0 and 1 to 'mod' (type float and int):
-    ./in.cue:26:6
-    ./in.cue:26:14
-me2: invalid operands 2 and 1.0 to 'mod' (type int and float):
-    ./in.cue:27:6
-    ./in.cue:27:12
+qe1: cannot use 2.0 (type float) as int in argument 1 to quo:
+    ./in.cue:5:10
+qe2: cannot use 1.0 (type float) as int in argument 2 to quo:
+    ./in.cue:6:13
+re1: cannot use 2.0 (type float) as int in argument 1 to rem:
+    ./in.cue:12:10
+re2: cannot use 1.0 (type float) as int in argument 2 to rem:
+    ./in.cue:13:13
+de1: cannot use 2.0 (type float) as int in argument 1 to div:
+    ./in.cue:19:10
+de2: cannot use 1.0 (type float) as int in argument 2 to div:
+    ./in.cue:20:13
+me1: cannot use 2.0 (type float) as int in argument 1 to mod:
+    ./in.cue:26:10
+me2: cannot use 1.0 (type float) as int in argument 2 to mod:
+    ./in.cue:27:13
 
 Result:
 (_|_){
@@ -101,55 +93,47 @@ Result:
   q3: (int){ -2 }
   q4: (int){ 2 }
   qe1: (_|_){
-    // [eval] qe1: invalid operands 2.0 and 1 to 'quo' (type float and int):
-    //     ./in.cue:5:6
-    //     ./in.cue:5:14
+    // [eval] qe1: cannot use 2.0 (type float) as int in argument 1 to quo:
+    //     ./in.cue:5:10
   }
   qe2: (_|_){
-    // [eval] qe2: invalid operands 2 and 1.0 to 'quo' (type int and float):
-    //     ./in.cue:6:6
-    //     ./in.cue:6:12
+    // [eval] qe2: cannot use 1.0 (type float) as int in argument 2 to quo:
+    //     ./in.cue:6:13
   }
   r1: (int){ 1 }
   r2: (int){ 1 }
   r3: (int){ -1 }
   r4: (int){ -1 }
   re1: (_|_){
-    // [eval] re1: invalid operands 2.0 and 1 to 'rem' (type float and int):
-    //     ./in.cue:12:6
-    //     ./in.cue:12:14
+    // [eval] re1: cannot use 2.0 (type float) as int in argument 1 to rem:
+    //     ./in.cue:12:10
   }
   re2: (_|_){
-    // [eval] re2: invalid operands 2 and 1.0 to 'rem' (type int and float):
-    //     ./in.cue:13:6
-    //     ./in.cue:13:12
+    // [eval] re2: cannot use 1.0 (type float) as int in argument 2 to rem:
+    //     ./in.cue:13:13
   }
   d1: (int){ 2 }
   d2: (int){ -2 }
   d3: (int){ -3 }
   d4: (int){ 3 }
   de1: (_|_){
-    // [eval] de1: invalid operands 2.0 and 1 to 'div' (type float and int):
-    //     ./in.cue:19:6
-    //     ./in.cue:19:14
+    // [eval] de1: cannot use 2.0 (type float) as int in argument 1 to div:
+    //     ./in.cue:19:10
   }
   de2: (_|_){
-    // [eval] de2: invalid operands 2 and 1.0 to 'div' (type int and float):
-    //     ./in.cue:20:6
-    //     ./in.cue:20:12
+    // [eval] de2: cannot use 1.0 (type float) as int in argument 2 to div:
+    //     ./in.cue:20:13
   }
   m1: (int){ 1 }
   m2: (int){ 1 }
   m3: (int){ 1 }
   m4: (int){ 1 }
   me1: (_|_){
-    // [eval] me1: invalid operands 2.0 and 1 to 'mod' (type float and int):
-    //     ./in.cue:26:6
-    //     ./in.cue:26:14
+    // [eval] me1: cannot use 2.0 (type float) as int in argument 1 to mod:
+    //     ./in.cue:26:10
   }
   me2: (_|_){
-    // [eval] me2: invalid operands 2 and 1.0 to 'mod' (type int and float):
-    //     ./in.cue:27:6
-    //     ./in.cue:27:12
+    // [eval] me2: cannot use 1.0 (type float) as int in argument 2 to mod:
+    //     ./in.cue:27:13
   }
 }

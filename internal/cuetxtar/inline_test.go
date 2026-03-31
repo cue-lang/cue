@@ -105,7 +105,7 @@ func TestParseTestAttr_ErrSubOptions(t *testing.T) {
 		name        string
 		src         string
 		wantAny     bool
-		wantCode    string
+		wantCodes   []string
 		wantContain string
 		wantPaths   []string
 	}{
@@ -115,14 +115,14 @@ func TestParseTestAttr_ErrSubOptions(t *testing.T) {
 			wantAny: false,
 		},
 		{
-			name:     "err with code",
-			src:      `x: 1 @test(err, code=cycle)`,
-			wantCode: "cycle",
+			name:      "err with code",
+			src:       `x: 1 @test(err, code=cycle)`,
+			wantCodes: []string{"cycle"},
 		},
 		{
-			name:     "err structural cycle",
-			src:      `x: 1 @test(err, code="structural cycle")`,
-			wantCode: "structural cycle",
+			name:      "err structural cycle",
+			src:       `x: 1 @test(err, code="structural cycle")`,
+			wantCodes: []string{"structural cycle"},
 		},
 		{
 			name:    "err any",
@@ -130,10 +130,15 @@ func TestParseTestAttr_ErrSubOptions(t *testing.T) {
 			wantAny: true,
 		},
 		{
-			name:     "err any with code",
-			src:      `x: 1 @test(err, any, code=cycle)`,
-			wantAny:  true,
-			wantCode: "cycle",
+			name:      "err any with code",
+			src:       `x: 1 @test(err, any, code=cycle)`,
+			wantAny:   true,
+			wantCodes: []string{"cycle"},
+		},
+		{
+			name:      "err multi-code",
+			src:       `x: 1 @test(err, code=(cycle|incomplete))`,
+			wantCodes: []string{"cycle", "incomplete"},
 		},
 		{
 			name:        "err contains",
@@ -160,8 +165,8 @@ func TestParseTestAttr_ErrSubOptions(t *testing.T) {
 			if ea.any != tt.wantAny {
 				t.Errorf("any: got %v, want %v", ea.any, tt.wantAny)
 			}
-			if ea.code != tt.wantCode {
-				t.Errorf("code: got %q, want %q", ea.code, tt.wantCode)
+			if !slices.Equal(ea.codes, tt.wantCodes) {
+				t.Errorf("codes: got %v, want %v", ea.codes, tt.wantCodes)
 			}
 			if ea.contains != tt.wantContain {
 				t.Errorf("contains: got %q, want %q", ea.contains, tt.wantContain)

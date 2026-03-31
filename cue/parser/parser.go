@@ -1723,25 +1723,6 @@ func (p *parser) parseUnaryExpr() ast.Expr {
 	return p.parsePrimaryExpr()
 }
 
-func (p *parser) tokPrec() (token.Token, int) {
-	tok := p.tok
-	if tok == token.IDENT {
-		switch p.lit {
-		case "quo":
-			return token.IQUO, 7
-		case "rem":
-			return token.IREM, 7
-		case "div":
-			return token.IDIV, 7
-		case "mod":
-			return token.IMOD, 7
-		default:
-			return tok, 0
-		}
-	}
-	return tok, tok.Precedence()
-}
-
 // If lhs is set and the result is an identifier, it is not resolved.
 func (p *parser) parseBinaryExpr(prec1 int) ast.Expr {
 	if p.trace {
@@ -1755,7 +1736,7 @@ func (p *parser) parseBinaryExpr(prec1 int) ast.Expr {
 
 func (p *parser) parseBinaryExprTail(prec1 int, x ast.Expr) ast.Expr {
 	for {
-		op, prec := p.tokPrec()
+		op, prec := p.tok, p.tok.Precedence()
 		if prec < prec1 {
 			return x
 		}

@@ -453,14 +453,6 @@ cannot import package as definition identifier`,
 			out: "a: (2+3)*5, b: (2+3)+4, c: 2+3+4, d: -1, e: !foo, f: _|_",
 		},
 		{
-			desc: "pseudo keyword expressions",
-			in: `	a: (2 div 3) mod 5
-			b: (2 quo 3) rem 4
-			c: 2 div 3 div 4
-		`,
-			out: "a: (2 div 3) mod 5, b: (2 quo 3) rem 4, c: 2 div 3 div 4",
-		},
-		{
 			desc: "ranges",
 			in: `	a: >=1 & <=2
 			b: >2.0  & <= 40.0

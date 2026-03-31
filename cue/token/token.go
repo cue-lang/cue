@@ -57,11 +57,6 @@ const (
 	POW // ^
 	QUO // /
 
-	IQUO // quo
-	IREM // rem
-	IDIV // div
-	IMOD // mod
-
 	AND // &
 	OR  // |
 
@@ -151,7 +146,7 @@ func (tok Token) Precedence() int {
 		return 5
 	case ADD, SUB:
 		return 6
-	case MUL, QUO, IDIV, IMOD, IQUO, IREM:
+	case MUL, QUO:
 		return 7
 	}
 	return lowestPrec

@@ -142,15 +142,6 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		switch n := n.(type) {
 		case *ast.BinaryExpr:
 			switch n.Op {
-			case token.IDIV, token.IMOD, token.IQUO, token.IREM:
-				// Rewrite integer division operations to use builtins.
-				ast.SetRelPos(n.X, token.NoSpace)
-				c.Replace(&ast.CallExpr{
-					// Use the __foo version to prevent accidental shadowing.
-					Fun:  ast.NewIdent("__" + n.Op.String()),
-					Args: []ast.Expr{n.X, n.Y},
-				})
-
 			case token.ADD, token.MUL:
 				// The fix here only works when at least one argument is a
 				// literal list. It would be better to be able to use CUE

@@ -520,10 +520,10 @@ func (c *cmpCtx) cmpErr(path []string, val cue.Value, ea *errArgs) error {
 	if b == nil {
 		return pathErr(path, "@test(err): expected error, got non-error value")
 	}
-	if ea.code != "" {
+	if len(ea.codes) > 0 {
 		gotCode := b.Code.String()
-		if gotCode != ea.code {
-			return pathErr(path, "@test(err): expected error code %q, got %q", ea.code, gotCode)
+		if !ea.matchesCode(gotCode) {
+			return pathErr(path, "@test(err): expected error code %v, got %q", ea.codes, gotCode)
 		}
 	}
 	// TODO: support CUE_UPDATE=1 and CUE_UPDATE=force for nested pos= specs.

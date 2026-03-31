@@ -1,22 +1,20 @@
-#name: conditional field
-#evalFull
 -- in.cue --
-
-if b {
-	a: "foo"
-}
-b: true
-c: {
-	a: 3
-	if a > 1 {
-		a: 3
+x: {
+	@test(eq, {
+		b: true
+		a: "foo"
+	})
+	if b {
+		a: "foo"
 	}
+	b: true
 }
 d: {
 	a: int
 	if a > 1 {
 		a: 3
 	}
+	@test(err, code=(cycle|incomplete), pos=[2:5 1:5 2:2])
 }
 -- out/compile --
 --- in.cue
@@ -38,6 +36,7 @@ d: {
     }
   }
 }
+
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
@@ -50,56 +49,3 @@ Conjuncts:    7
 Disjuncts:    7
 
 NumCloseIDs: 3
--- out/evalalpha --
-(struct){
-  a: (string){ "foo" }
-  b: (bool){ true }
-  c: (struct){
-    a: (int){ 3 }
-  }
-  d: (_|_){
-    // [incomplete] d: non-concrete value int in operand to >:
-    //     ./in.cue:14:5
-    //     ./in.cue:13:5
-    //     ./in.cue:14:2
-    a: (_|_){
-      // [incomplete] d: non-concrete value int in operand to >:
-      //     ./in.cue:14:5
-      //     ./in.cue:13:5
-      //     ./in.cue:14:2
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,7 +5,15 @@
-     a: (int){ 3 }
-   }
-   d: (_|_){
--    // [cycle] cycle error:
-+    // [incomplete] d: non-concrete value int in operand to >:
-     //     ./in.cue:14:5
-+    //     ./in.cue:13:5
-+    //     ./in.cue:14:2
-+    a: (_|_){
-+      // [incomplete] d: non-concrete value int in operand to >:
-+      //     ./in.cue:14:5
-+      //     ./in.cue:13:5
-+      //     ./in.cue:14:2
-+    }
-   }
- }
--- out/eval --
-(struct){
-  a: (string){ "foo" }
-  b: (bool){ true }
-  c: (struct){
-    a: (int){ 3 }
-  }
-  d: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:14:5
-  }
-}

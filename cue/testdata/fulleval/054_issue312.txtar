@@ -1,18 +1,23 @@
-#name: issue312
-#evalFull
 -- in.cue --
-y: *1 | {a: 2}
-for x in [1] {y}
+x: {
+    y: *1 | {a: 2}
+    for x in [1] {y}
+} @test(eq, {
+    a: 2
+    y: *1 | { a: 2 }
+})
 -- out/compile --
 --- in.cue
 {
-  y: (*1|{
-    a: 2
-  })
-  for _, x in [
-    1,
-  ] {
-    〈2;y〉
+  x: {
+    y: (*1|{
+      a: 2
+    })
+    for _, x in [
+      1,
+    ] {
+      〈2;y〉
+    }
   }
 }
 -- out/eval/stats --
@@ -29,10 +34,3 @@ Disjuncts:    9
 MisalignedConjunct: 3
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  y: ((int|struct)){ |(*(int){ 1 }, (struct){
-      a: (int){ 2 }
-    }) }
-  a: (int){ 2 }
-}

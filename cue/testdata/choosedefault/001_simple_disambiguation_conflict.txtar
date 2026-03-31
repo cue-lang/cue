@@ -1,9 +1,7 @@
-#name: simple disambiguation conflict
-#evalFull
 -- in.cue --
-a: *"a" | "b"
-b: *"b" | "a"
-c: a & b
+a: *"a" | "b" @test(eq, *"a" | "b")
+b: *"b" | "a" @test(eq, *"b" | "a")
+c: a & b      @test(eq, "a" | "b")
 -- out/compile --
 --- in.cue
 {
@@ -21,9 +19,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    17
 Disjuncts:    14
--- out/evalalpha --
-(struct){
-  a: (string){ |(*(string){ "a" }, (string){ "b" }) }
-  b: (string){ |(*(string){ "b" }, (string){ "a" }) }
-  c: (string){ |((string){ "a" }, (string){ "b" }) }
-}

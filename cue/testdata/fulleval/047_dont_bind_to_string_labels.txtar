@@ -1,10 +1,9 @@
-#name: dont bind to string labels
-#evalFull
 -- in.cue --
+
 x: 1
 y: {
 	"x": 2
-	z:   x
+	z:   x @test(eq, 1)
 }
 -- out/compile --
 --- in.cue
@@ -25,11 +24,3 @@ Retain: 0
 Unifications: 5
 Conjuncts:    6
 Disjuncts:    5
--- out/evalalpha --
-(struct){
-  x: (int){ 1 }
-  y: (struct){
-    x: (int){ 2 }
-    z: (int){ 1 }
-  }
-}

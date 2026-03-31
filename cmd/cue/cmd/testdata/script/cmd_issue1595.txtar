@@ -1,0 +1,22 @@
+# Issue 1595: the use of an intermediary "resp" value
+# would cause a "non-concrete value string" error on evalv2.
+# Note that this only happened with tool/http, as its result value
+# has multiple levels of fields. To avoid requiring an HTTP server,
+# try to HTTP GET an invalid URL and expect a good failure.
+
+! exec cue cmd main ./main_tool.cue
+stderr 'unsupported protocol scheme'
+
+-- main_tool.cue --
+import (
+	"tool/cli"
+	"tool/http"
+)
+
+command: main: {
+	get: http.Get & {
+		url: "badproto://neverexists.localhost"
+	}
+	resp: get.response
+	final: cli.Print & { text: resp.body }
+}

@@ -1,7 +1,14 @@
 -- in.cue --
-a: [{a: 1}, {b: 2 & 3}]
+a: [{a: 1}, {b: 2 & 3}] @test(err, code=eval, pos=[0:17 0:21], contains="conflicting values")
 
-b: [for x in a {x}]
+b: [for x in a {x}] @test(err, code=eval, pos=[-2:17 -2:21], contains="conflicting values")
+-- out/errors.txt --
+[eval] a.1.b: conflicting values 3 and 2:
+    in.cue:1:17
+    in.cue:1:21
+[eval] a.1.b: conflicting values 3 and 2:
+    in.cue:1:17
+    in.cue:1:21
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
@@ -12,35 +19,6 @@ Retain: 0
 Unifications: 7
 Conjuncts:    8
 Disjuncts:    7
--- out/evalalpha --
-Errors:
-a.1.b: conflicting values 3 and 2:
-    ./in.cue:1:17
-    ./in.cue:1:21
-
-Result:
-(_|_){
-  // [eval]
-  a: (_|_){
-    // [eval]
-    0: (struct){
-      a: (int){ 1 }
-    }
-    1: (_|_){
-      // [eval]
-      b: (_|_){
-        // [eval] a.1.b: conflicting values 3 and 2:
-        //     ./in.cue:1:17
-        //     ./in.cue:1:21
-      }
-    }
-  }
-  b: (_|_){
-    // [eval] a.1.b: conflicting values 3 and 2:
-    //     ./in.cue:1:17
-    //     ./in.cue:1:21
-  }
-}
 -- out/compile --
 --- in.cue
 {

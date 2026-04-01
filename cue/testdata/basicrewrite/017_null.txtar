@@ -1,15 +1,16 @@
-#name: null
-#evalPartial
 -- in.cue --
-eql: null == null
-neq: null != null
-unf: null & null
+eql: null == null @test(eq, true)
+neq: null != null @test(eq, false)
+unf: null & null  @test(eq, null)
 
 // errors
-eq1:  null == 1
-eq2:  1 == null
-ne1:  "s" != null
-call: null()
+eq1:  null == 1   @test(eq, false)
+eq2:  1 == null   @test(eq, false)
+ne1:  "s" != null @test(eq, true)
+call: null()      @test(err, code=eval, pos=[0:7], contains="cannot call non-function")
+-- out/errors.txt --
+[eval] call: cannot call non-function null (type null):
+    in.cue:9:7
 -- out/compile --
 --- in.cue
 {
@@ -31,22 +32,3 @@ Retain: 0
 Unifications: 8
 Conjuncts:    9
 Disjuncts:    8
--- out/evalalpha --
-Errors:
-call: cannot call non-function null (type null):
-    ./in.cue:9:7
-
-Result:
-(_|_){
-  // [eval]
-  eql: (bool){ true }
-  neq: (bool){ false }
-  unf: (null){ null }
-  eq1: (bool){ false }
-  eq2: (bool){ false }
-  ne1: (bool){ true }
-  call: (_|_){
-    // [eval] call: cannot call non-function null (type null):
-    //     ./in.cue:9:7
-  }
-}

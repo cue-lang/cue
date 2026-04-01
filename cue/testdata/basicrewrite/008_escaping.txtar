@@ -1,8 +1,6 @@
-#name: escaping
-#evalPartial
 -- in.cue --
-a: "foo\nbar"
-b: a
+a: "foo\nbar" @test(eq, "foo\nbar")
+b: a          @test(eq, "foo\nbar")
 
 // TODO: mimic http://exploringjs.com/es6/ch_template-literals.html#sec_introduction-template-literals
 -- out/compile --
@@ -21,8 +19,3 @@ Retain: 0
 Unifications: 3
 Conjuncts:    4
 Disjuncts:    3
--- out/evalalpha --
-(struct){
-  a: (string){ "foo\nbar" }
-  b: (string){ "foo\nbar" }
-}

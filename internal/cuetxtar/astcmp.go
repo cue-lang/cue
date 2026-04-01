@@ -192,7 +192,7 @@ func checkStructuralMatch(path []string, expr ast.Expr, val cue.Value) error {
 // ── structs ─────────────────────────────────────────────────────────────────
 
 func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error {
-	// Collect expected fields and pattern constraints from the AST.
+	// Collect expected fields, let bindings, and pattern constraints from the AST.
 	// Also detect @test(checkOrder), @test(final), and non-@test attributes.
 	type expectedField struct {
 		name       string
@@ -200,9 +200,14 @@ func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error
 		isHidden   bool
 		constraint token.Token // token.ILLEGAL (regular), token.OPTION (?), token.NOT (!)
 		final      bool        // @test(final): resolve default before comparing
+		ignore     bool        // @test(ignore): skip eq descent; field need not exist
 		errCheck   *errArgs    // @test(err, ...): check value is error instead of comparing
 		value      ast.Expr
 		attrs      []*ast.Attribute // non-@test attributes
+	}
+	type expectedLet struct {
+		name string
+		expr ast.Expr
 	}
 	type expectedPattern struct {
 		label ast.Expr // the expression inside [...]
@@ -210,6 +215,7 @@ func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error
 	}
 
 	var fields []expectedField
+	var lets []expectedLet
 	var patterns []expectedPattern
 	checkOrder := false
 	allFinal := false
@@ -229,11 +235,14 @@ func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error
 					}
 				}
 			}
+		case *ast.LetClause:
+			lets = append(lets, expectedLet{name: d.Ident.Name, expr: d.Expr})
 		case *ast.Field:
 			// Separate non-@test attributes from @test attributes.
-			// Detect @test(final) and @test(err) on individual fields.
+			// Detect @test(final), @test(ignore), and @test(err) on individual fields.
 			var nonTestAttrs []*ast.Attribute
 			isFinal := false
+			isIgnore := false
 			var errCk *errArgs
 			for _, a := range d.Attrs {
 				if k, _ := a.Split(); k == "test" {
@@ -242,6 +251,8 @@ func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error
 						switch pa.directive {
 						case "final":
 							isFinal = true
+						case "ignore":
+							isIgnore = true
 						case "err":
 							errCk = pa.errArgs
 							if errCk == nil {
@@ -265,6 +276,7 @@ func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error
 					isHidden:   isHidden,
 					constraint: constraint,
 					final:      isFinal,
+					ignore:     isIgnore,
 					errCheck:   errCk,
 					value:      d.Value,
 					attrs:      nonTestAttrs,
@@ -279,6 +291,7 @@ func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error
 					name:       s,
 					constraint: constraint,
 					final:      isFinal,
+					ignore:     isIgnore,
 					errCheck:   errCk,
 					value:      d.Value,
 					attrs:      nonTestAttrs,
@@ -334,6 +347,18 @@ func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error
 		seen[seenKey{ef.name, ef.constraint}] = true
 		sel := fieldSelector(ef.name, ef.isDef, ef.isHidden, ef.constraint)
 		child := val.LookupPath(cue.MakePath(sel))
+
+		// @test(ignore): skip eq descent; field need not be present.
+		// Other directives (e.g. @test(err)) still run if the field exists.
+		if ef.ignore {
+			if ef.errCheck != nil && child.Exists() {
+				if err := c.cmpErr(append(path, ef.name), child, ef.errCheck); err != nil {
+					return err
+				}
+			}
+			continue
+		}
+
 		if !child.Exists() {
 			return pathErr(path, "field %q not found in value", ef.name)
 		}
@@ -446,6 +471,34 @@ func (c *cmpCtx) cmpStruct(path []string, s *ast.StructLit, val cue.Value) error
 			vp := valPatterns[i]
 			patPath := append(path, fmt.Sprintf("[%d]pattern", i))
 			if err := c.astCmp(patPath, ep.value, vp.value); err != nil {
+				return err
+			}
+		}
+	}
+
+	// Compare let bindings listed in the expected struct.
+	// Each expected let must be present in the evaluated vertex with a matching value.
+	if len(lets) > 0 {
+		opCtx := value.OpContext(val)
+		v := value.Vertex(val)
+
+		// Build a map from let base-name to arc.
+		valLets := make(map[string]*adt.Vertex, len(v.Arcs))
+		for _, arc := range v.Arcs {
+			if arc.Label.IsLet() {
+				name := arc.Label.IdentString(opCtx)
+				valLets[name] = arc
+			}
+		}
+
+		for _, el := range lets {
+			arc, ok := valLets[el.name]
+			if !ok {
+				return pathErr(path, "let binding %q not found in value", el.name)
+			}
+			letPath := append(path, "let "+el.name)
+			letVal := value.Make(opCtx, arc)
+			if err := c.astCmp(letPath, el.expr, letVal); err != nil {
 				return err
 			}
 		}

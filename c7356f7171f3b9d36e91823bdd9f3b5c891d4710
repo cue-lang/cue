@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e0b7e53_133e4927",
+        "filename": "cue/testdata/eval/structs.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T16:34:01Z",
+      "side": 1,
+      "message": "Note: in a later CL we encode the TODO as a specialized TODO that can be picked up by automated processing.",
+      "revId": "c7356f7171f3b9d36e91823bdd9f3b5c891d4710",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

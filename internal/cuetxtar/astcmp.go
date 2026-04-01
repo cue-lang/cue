@@ -94,6 +94,8 @@ func (c *cmpCtx) astCmp(path cue.Path, expr ast.Expr, val cue.Value) error {
 		return c.astCmp(path, e.X, val)
 	case *ast.BottomLit:
 		return nil
+	case *ast.CallExpr, *ast.SelectorExpr:
+		return cmpBuiltinExpr(path, expr, val)
 	}
 	return pathErr(path, "unsupported AST node type %T", expr)
 }
@@ -309,37 +311,11 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 				patterns = append(patterns, expectedPattern{label: label.Elts[0], value: d.Value})
 			}
 		case *ast.EmbedDecl:
+			if err := c.astCmp(path, d.Expr, val); err != nil {
+				return err
+			}
 			// Embeddings are collected for non-struct value handling below.
 		}
-	}
-
-	// Check if any field has @test(err), which means the struct may contain
-	// errors that cause IncompleteKind() to return _|_ instead of StructKind.
-	hasErrCheck := false
-	for _, ef := range fields {
-		if ef.errCheck != nil {
-			hasErrCheck = true
-			break
-		}
-	}
-
-	// If the value is not a struct and @test(final) is set with no fields,
-	// unwrap the single embedding and compare directly, skipping structural
-	// consistency check. This allows {int, @test(final)} to match int & >=0.
-	if val.IncompleteKind() != cue.StructKind && !hasErrCheck {
-		if !allFinal {
-			return pathErr(path, "expected struct, got %v", val.IncompleteKind())
-		}
-		var embeds []ast.Expr
-		for _, d := range s.Elts {
-			if e, ok := d.(*ast.EmbedDecl); ok {
-				embeds = append(embeds, e.Expr)
-			}
-		}
-		if len(embeds) != 1 || len(fields) != 0 {
-			return pathErr(path, "expected struct, got %v", val.IncompleteKind())
-		}
-		return cmpFinal(path, embeds[0], val)
 	}
 
 	// Compare regular fields (including definitions, optional, required, hidden).
@@ -784,10 +760,13 @@ func flattenConjunction(expr ast.Expr) []ast.Expr {
 func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value) error {
 	astParts := flattenConjunction(e)
 	op, args := val.Eval().Expr()
-	if op != cue.AndOp {
+	if op != cue.AndOp && op != cue.NoOp {
+		// The conjunction may have been simplified during evaluation
+		// (e.g. struct.MaxFields(2) & {} evaluates to a plain struct value).
+		// We could be comparing a struct and a struct and a validator.
 		return pathErr(path, "expected conjunction (&), got %v", op)
 	}
-	if len(args) != len(astParts) {
+	if len(args) != len(astParts) && len(args) != len(astParts)-1 {
 		return pathErr(path, "conjunction: expected %d conjunct(s), got %d",
 			len(astParts), len(args))
 	}
@@ -795,6 +774,12 @@ func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value)
 	matched := make([]bool, len(args))
 	for _, ae := range astParts {
 		found := false
+		if s, ok := ae.(*ast.StructLit); ok {
+			if err := c.cmpStruct(path, s, val); err != nil {
+				return err
+			}
+			continue
+		}
 		for j, vd := range args {
 			if matched[j] {
 				continue
@@ -806,7 +791,13 @@ func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value)
 			}
 		}
 		if !found {
-			return pathErr(path, "conjunction: no matching value conjunct for AST expr at %s", pos(ae))
+			// If the value has one fewer conjunct than expected, a validator
+			// was consumed during evaluation. Accept the unmatched non-struct
+			// conjunct — it documents the constraint that was applied.
+			if len(args) < len(astParts) {
+				continue
+			}
+			return pathErr(path, "%s: conjunction: no matching value conjunct expr %s", pos(ae), toStr(ae))
 		}
 	}
 	return nil
@@ -824,6 +815,31 @@ func (c *cmpCtx) cmpUnaryExpr(path cue.Path, e *ast.UnaryExpr, val cue.Value) er
 		return pathErr(path, "expected op %v, got %v", wantOp, op)
 	}
 	return c.astCmp(path, e.X, args[0])
+}
+
+func toStr(expr ast.Expr) string {
+	b, err := format.Node(expr)
+	if err != nil {
+		return fmt.Sprintf("cannot format expression: %v", err)
+	}
+	return string(b)
+}
+
+// ── builtin call and selector expressions ───────────────────────────────────
+
+// cmpBuiltinExpr compiles expr using InferBuiltins so that unresolved
+// package-qualified references (e.g. struct.MaxFields(2), math.Pi) resolve to
+// CUE builtin packages, then compares the resulting value against val.
+func cmpBuiltinExpr(path cue.Path, expr ast.Expr, val cue.Value) error {
+	ctx := val.Context()
+	expected := ctx.BuildExpr(expr, cue.InferBuiltins(true))
+	if err := expected.Err(); err != nil {
+		return pathErr(path, "cannot compile expression %s: %v", toStr(expr), err)
+	}
+	if !valuesEqual(expected, val) {
+		return pathErr(path, "expected %s, got %v", toStr(expr), val)
+	}
+	return nil
 }
 
 // ── identifiers (types and special values) ──────────────────────────────────

@@ -150,7 +150,7 @@ var _ testing.TB = (*Test)(nil)
 func (t *Test) Write(b []byte) (n int, err error) {
 	if t.buf == nil {
 		t.buf = &bytes.Buffer{}
-		t.outFiles = append(t.outFiles, file{t.prefix, t.fallback, t.buf, false})
+		t.outFiles = append(t.outFiles, file{t.prefix, t.fallback, t.buf, false, false})
 	}
 	return t.buf.Write(b)
 }
@@ -160,6 +160,7 @@ type file struct {
 	fallback string
 	buf      *bytes.Buffer
 	diff     bool // true if this contains a diff between fallback and main
+	doc      bool // true if this is a documentary section (never fails, only updated if already present)
 }
 
 // bytes returns the bytes in the file's buffer, and ensures that the
@@ -275,12 +276,31 @@ func (t *Test) Writer(name string) io.Writer {
 	}
 
 	w := &bytes.Buffer{}
-	t.outFiles = append(t.outFiles, file{name, fallback, w, false})
+	t.outFiles = append(t.outFiles, file{name, fallback, w, false, false})
 
 	if name == t.prefix {
 		t.buf = w
 	}
 
+	return w
+}
+
+// WriterDoc returns a Writer with the given name that is marked as a
+// documentary section. Documentary sections are never automatically created
+// and never cause test failures. They are updated by CUE_UPDATE=1 only if
+// the section already exists in the txtar archive. With CUE_UPDATE=diff,
+// they are treated like normal golden sections and will fail if stale.
+func (t *Test) WriterDoc(name string) io.Writer {
+	name = path.Join(t.prefix, name)
+
+	for _, f := range t.outFiles {
+		if f.name == name {
+			return f.buf
+		}
+	}
+
+	w := &bytes.Buffer{}
+	t.outFiles = append(t.outFiles, file{name, "", w, false, true})
 	return w
 }
 
@@ -596,6 +616,13 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			for _, sub := range tc.outFiles {
 				result := sub.bytes()
 
+				// Documentary sections are only included if they already exist
+				// in the archive; they are never auto-created.
+				_, inArchive := index[sub.name]
+				if sub.doc && !inArchive {
+					continue
+				}
+
 				files = append(files, txtar.File{Name: sub.name})
 				gold := &files[len(files)-1]
 
@@ -628,6 +655,11 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				// Skip the test if just the diff differs.
 				// TODO: also fail once diffs are fully in use.
 				if sub.diff {
+					continue
+				}
+
+				// Doc sections never fail unless CUE_UPDATE=diff.
+				if sub.doc && !cuetest.DiffGoldenFiles {
 					continue
 				}
 

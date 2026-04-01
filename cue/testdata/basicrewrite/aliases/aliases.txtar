@@ -3,12 +3,21 @@ t0: {
 	a=_a: _
 	let _b = a
 	_out: _b
+	@test(eq, {
+		_a: _
+		let _b = _
+		_out: _
+	})
 }
 t1: {
 	_a: b
 	let b = c
 	c=d: 3
-}
+} @test(eq, {
+	_a: 3
+	let b = 3
+	d: 3
+})
 -- out/compile --
 --- in.cue
 {
@@ -33,16 +42,3 @@ Retain: 3
 Unifications: 9
 Conjuncts:    14
 Disjuncts:    10
--- out/evalalpha --
-(struct){
-  t0: (struct){
-    _a: (_){ _ }
-    let _b#1 = (_){ _ }
-    _out: (_){ _ }
-  }
-  t1: (struct){
-    _a: (int){ 3 }
-    let b#2 = (int){ 3 }
-    d: (int){ 3 }
-  }
-}

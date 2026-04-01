@@ -706,10 +706,8 @@ func (r *inlineRunner) runArchive() {
 		}
 	}
 
-	// Determine which top-level fields are test-case roots and which are
-	// intentionally ignored (@test(ignore)).
-	//
-	// rootNames: fields that are active test roots (will run as sub-tests).
+	// Determine which top-level fields are test-case roots.
+	// A field is a root if it has any @test attribute (other than file-level).
 	// Fields with no @test attributes are silently skipped (fixture fields).
 	rootNames := make(map[string]bool)
 	for _, rec := range allRecords {

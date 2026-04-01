@@ -496,6 +496,12 @@ func applyCursor(v applyVisitor, c Cursor) {
 	case *ast.FallbackClause:
 		apply(v, c, &n.Body)
 
+	case *ast.TryClause:
+		if n.Ident != nil {
+			apply(v, c, &n.Ident)
+			apply(v, c, &n.Expr)
+		}
+
 	default:
 		panic(fmt.Sprintf("Walk: unexpected node type %T", n))
 	}

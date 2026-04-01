@@ -16,6 +16,23 @@
       "message": "I\u0027m surprised this works, actually. Would be good to have a test (create or locate) to really prove that it does.",
       "revId": "2cc3f7ee27f2a195ebc60b42ae625fc382b7a63a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5383118e_24de3508",
+        "filename": "internal/pkg/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T10:17:24Z",
+      "side": 1,
+      "message": "It seems that this function will be deleted a few CLS down the line anyway. So might as well abandon.",
+      "revId": "2cc3f7ee27f2a195ebc60b42ae625fc382b7a63a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

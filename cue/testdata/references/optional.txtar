@@ -1,15 +1,19 @@
-#todo:inline: easy — reference resolution; most fields have concrete values
 -- in.cue --
 t1: a: {
 	foo?: int
 
-	b: foo
+	b: foo @test(err, code=incomplete)
 }
 t2: a: {
-	b: foo
+	b: foo @test(err, code=incomplete)
 
 	foo?: int
 }
+-- out/errors.txt --
+[incomplete] t1.a.b: cannot reference optional field: foo:
+    in.cue:4:5
+[incomplete] t2.a.b: cannot reference optional field: foo:
+    in.cue:7:5
 -- out/eval/stats --
 Leaks:  0
 Freed:  9
@@ -20,27 +24,6 @@ Retain: 1
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    10
--- out/evalalpha --
-(struct){
-  t1: (struct){
-    a: (struct){
-      foo?: (int){ int }
-      b: (_|_){
-        // [incomplete] t1.a.b: cannot reference optional field: foo:
-        //     ./in.cue:4:5
-      }
-    }
-  }
-  t2: (struct){
-    a: (struct){
-      b: (_|_){
-        // [incomplete] t2.a.b: cannot reference optional field: foo:
-        //     ./in.cue:7:5
-      }
-      foo?: (int){ int }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

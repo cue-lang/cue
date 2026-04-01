@@ -1,28 +1,19 @@
-#todo:inline: easy — simple scalar/string values, straightforward @test(eq, ...) conversion
 -- in.cue --
 // Embedding !=null at file scope should preserve the constraint,
 // not collapse to (struct){}.
 
 a: {
 	!=null
-}
+} @test(eq, !=null)
 
 // As a field value, !=null is preserved. Verify parity.
-b: !=null
+b: !=null @test(eq, !=null)
 
 // !=null as embedding combined with a regular field.
 c: {
 	!=null
 	x: 1
-}
--- out/evalalpha --
-(struct){
-  a: ((bool|string|bytes|func|list|struct|number)){ !=null }
-  b: ((bool|string|bytes|func|list|struct|number)){ !=null }
-  c: (struct){
-    x: (int){ 1 }
-  }
-}
+} @test(eq, {x: 1})
 -- out/compile --
 --- in.cue
 {

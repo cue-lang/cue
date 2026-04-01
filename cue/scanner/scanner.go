@@ -333,6 +333,9 @@ exponent:
 		if s.ch == '-' || s.ch == '+' {
 			s.next()
 		}
+		if digitVal(s.ch) >= 10 {
+			s.errf(s.offset, "illegal exponent in number")
+		}
 		s.scanMantissa(10)
 	}
 

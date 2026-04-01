@@ -1,4 +1,5 @@
 // This code caused a hang on evalv2.
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 x
 x: {

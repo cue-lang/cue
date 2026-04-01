@@ -1,5 +1,5 @@
 TODO: l4 should be allowed
-
+#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #def1: l1: ["l2"]: {l3: int, l4: 26}
 #special1: #def1 & {l1: l2: l3:     <100}

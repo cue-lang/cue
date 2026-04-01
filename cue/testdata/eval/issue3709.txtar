@@ -1,6 +1,6 @@
 # Issue #3709
 # Prevent hang.
-
+#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- cue.mod/module.cue --
 module: "foo.test/bar"
 language: version: "v0.11.0"

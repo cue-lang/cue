@@ -1,5 +1,6 @@
 #name: bound conversions
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 r0: int & >0.1 & <=1.9
 r1: int & >0.1 & <1.9

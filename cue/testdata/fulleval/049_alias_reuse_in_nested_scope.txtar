@@ -1,5 +1,6 @@
 #name: alias reuse in nested scope
 #evalFull
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #Foo: {
 	let X = or([for k, _ in {} {k}])

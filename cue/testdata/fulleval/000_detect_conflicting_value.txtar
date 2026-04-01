@@ -1,5 +1,6 @@
 #name: detect conflicting value
 #evalFull
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 a: 8000.9
 a: 7080 | int

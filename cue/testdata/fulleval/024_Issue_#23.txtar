@@ -1,5 +1,6 @@
 #name: Issue #23
 #evalFull
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 x: {a:     1} | {a: 2}
 y: x & {a: 3}

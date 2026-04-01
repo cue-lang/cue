@@ -1,5 +1,5 @@
 #expandLetExpr: true
-
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 a: {
 	foo: a: 1

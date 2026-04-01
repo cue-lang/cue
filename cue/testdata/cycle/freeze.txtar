@@ -2,6 +2,7 @@
 // references. Non-structural cyclic references are okay, as long a property
 // that is dependended upon in the cycle is not changed after the fact,
 // that is, a value may not become more specific after it is used.
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 freezing: t1: ok: {
 	#a: x: "a"

@@ -1,5 +1,6 @@
 #name: interpolation
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 a: "\(4)"
 b: "one \(a) two \( a+c )"

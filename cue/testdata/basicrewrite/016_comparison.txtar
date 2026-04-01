@@ -1,5 +1,6 @@
 #name: comparison
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- cue.mod/module.cue --
 module: "x.test"
 language: version: "v0.14.0"

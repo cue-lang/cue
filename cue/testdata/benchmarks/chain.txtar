@@ -1,4 +1,5 @@
 // TODO(perf): reduce number of Conjunctions
+#todo:inline: skip — performance benchmark, not a functional test
 -- stats.txt --
 Leaks:  0
 Freed:  1001

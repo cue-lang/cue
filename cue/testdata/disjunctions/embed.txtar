@@ -1,3 +1,4 @@
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 // Given the existence of this field, embedDefault is a struct. This
 // means that embedding this conjunction into `embedDefault` itself should

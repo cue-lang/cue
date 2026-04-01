@@ -1,4 +1,5 @@
 # This issue addresses evaluation in nested lets.
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- nested.cue --
 issue3801: let: reduced: {
 	let F = {

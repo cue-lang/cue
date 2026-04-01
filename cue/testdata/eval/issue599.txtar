@@ -1,3 +1,4 @@
+#todo:inline: medium — large complex test with many interdependent fields
 -- in.cue --
 package deps
 

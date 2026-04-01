@@ -1,3 +1,4 @@
+#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 quo1: quo(5, 2)   // 2
 quo2: quo(5, -2)  // -2

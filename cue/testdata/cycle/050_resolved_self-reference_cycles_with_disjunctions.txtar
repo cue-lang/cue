@@ -1,5 +1,6 @@
 #name: resolved self-reference cycles with disjunctions
 #evalPartial
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 a: b & {x: 1} | {y:     1} // {x:1,y:3,z:2} | {y:1}
 b: {x:     2} | c & {z: 2} // {x:2} | {x:1,y:3,z:2}

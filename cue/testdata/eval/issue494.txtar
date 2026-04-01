@@ -1,3 +1,4 @@
+#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 _Q: [{pos: 0}, {pos: 1}]
 

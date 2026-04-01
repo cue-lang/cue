@@ -1,5 +1,6 @@
 #name: disjunctions
 #evalPartial
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 o1:  1 | 2 | 3
 o2:  (1 | 2 | 3) & 1

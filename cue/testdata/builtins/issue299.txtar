@@ -1,3 +1,4 @@
+#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 import "list"
 

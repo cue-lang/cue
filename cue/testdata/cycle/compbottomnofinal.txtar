@@ -1,4 +1,5 @@
 // Issues: #667, #695, #622
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import (
 	"strconv"

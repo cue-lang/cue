@@ -1,5 +1,6 @@
 #name: slice
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 a:  [2][0:0]
 b:  [0][1:1]

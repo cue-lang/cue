@@ -1,5 +1,6 @@
 #name: definitions with disjunctions
 #evalPartial
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #Foo: {
 	field: int

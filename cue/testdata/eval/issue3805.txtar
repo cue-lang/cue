@@ -1,3 +1,4 @@
+#todo:inline: medium — large real-world schema test with 1000+ lines
 -- x.cue --
 #PatientViewSections: {
 	[string]: #PatientViewSection

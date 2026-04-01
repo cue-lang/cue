@@ -14,7 +14,7 @@
 // xb1: xb2
 // xb2: xb3
 // xb3: xb2 + 0
-
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // The second disjunct in xa1 is not resolvable and can be
 // eliminated:

@@ -1,5 +1,6 @@
 #name: bounds
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 i1: >1 & 5
 i2: (>=0 & <=10) & 5

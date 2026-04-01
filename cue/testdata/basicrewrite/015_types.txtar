@@ -1,15 +1,26 @@
-#name: types
-#evalPartial
 -- in.cue --
-i:  int
-j:  int & 3
-s:  string
-t:  "s" & string
-e:  int & string
-e2: 1 & string
-b:  !int
-p:  +true
-m:  -false
+i:  int          @test(eq, int)
+j:  int & 3      @test(eq, 3)
+s:  string       @test(eq, string)
+t:  "s" & string @test(eq, "s")
+e:  int & string @test(err, code=eval, contains="conflicting values")
+e2: 1 & string   @test(err, code=eval, contains="conflicting values")
+b:  !int         @test(err, code=eval, pos=[0:6], contains="invalid operand")
+p:  +true        @test(err, code=eval, pos=[0:5], contains="invalid operation")
+m:  -false       @test(err, code=eval, pos=[0:5], contains="invalid operation")
+-- out/errors.txt --
+[eval] e: conflicting values int and string (mismatched types int and string):
+    in.cue:5:5
+    in.cue:5:11
+[eval] e2: conflicting values 1 and string (mismatched types int and string):
+    in.cue:6:5
+    in.cue:6:9
+[eval] b: invalid operand int ('!' requires concrete value):
+    in.cue:7:6
+[eval] p: invalid operation +true (+ bool):
+    in.cue:8:5
+[eval] m: invalid operation -false (- bool):
+    in.cue:9:5
 -- out/compile --
 --- in.cue
 {
@@ -33,48 +44,3 @@ Retain: 0
 Unifications: 10
 Conjuncts:    14
 Disjuncts:    10
--- out/evalalpha --
-Errors:
-b: invalid operand int ('!' requires concrete value):
-    ./in.cue:7:6
-e: conflicting values int and string (mismatched types int and string):
-    ./in.cue:5:5
-    ./in.cue:5:11
-e2: conflicting values 1 and string (mismatched types int and string):
-    ./in.cue:6:5
-    ./in.cue:6:9
-p: invalid operation +true (+ bool):
-    ./in.cue:8:5
-m: invalid operation -false (- bool):
-    ./in.cue:9:5
-
-Result:
-(_|_){
-  // [eval]
-  i: (int){ int }
-  j: (int){ 3 }
-  s: (string){ string }
-  t: (string){ "s" }
-  e: (_|_){
-    // [eval] e: conflicting values int and string (mismatched types int and string):
-    //     ./in.cue:5:5
-    //     ./in.cue:5:11
-  }
-  e2: (_|_){
-    // [eval] e2: conflicting values 1 and string (mismatched types int and string):
-    //     ./in.cue:6:5
-    //     ./in.cue:6:9
-  }
-  b: (_|_){
-    // [eval] b: invalid operand int ('!' requires concrete value):
-    //     ./in.cue:7:6
-  }
-  p: (_|_){
-    // [eval] p: invalid operation +true (+ bool):
-    //     ./in.cue:8:5
-  }
-  m: (_|_){
-    // [eval] m: invalid operation -false (- bool):
-    //     ./in.cue:9:5
-  }
-}

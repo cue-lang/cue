@@ -1,14 +1,17 @@
-#name: obj unify
-#evalPartial
 -- in.cue --
-o1: {a: 1} & {b: 2}       // {a:1,b:2}
-o2: {a: 1, b:    2} & {b: 2} // {a:1,b:2}
-o3: {a: 1} & {a: 1, b:    2} // {a:1,b:2}
-o4: {a: 1} & {b: 2}       // {a:1,b:2}
-o4: {a: 1, b:    2} & {b: 2}
-o4: {a: 1} & {a: 1, b:    2}
-e:  1   // 1 & {a:3}
+o1: {a: 1} & {b: 2}          @test(eq, {a: 1, b: 2})
+o2: {a: 1, b: 2} & {b: 2}    @test(eq, {a: 1, b: 2})
+o3: {a: 1} & {a: 1, b: 2}    @test(eq, {a: 1, b: 2})
+o4: {a: 1} & {b: 2}
+o4: {a: 1, b: 2} & {b: 2}
+o4: {a: 1} & {a: 1, b: 2}    @test(eq, {a: 1, b: 2})
+
+e: 1      @test(err, code=eval, pos=[0:4 1:4], contains="conflicting values")
 e: {a: 3}
+-- out/errors.txt --
+[eval] e: conflicting values 1 and {a:3} (mismatched types int and struct):
+    in.cue:8:4
+    in.cue:9:4
 -- out/compile --
 --- in.cue
 {
@@ -61,36 +64,3 @@ Retain: 0
 Unifications: 15
 Conjuncts:    32
 Disjuncts:    15
--- out/evalalpha --
-Errors:
-e: conflicting values 1 and {a:3} (mismatched types int and struct):
-    ./in.cue:7:5
-    ./in.cue:8:4
-
-Result:
-(_|_){
-  // [eval]
-  o1: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  o2: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  o3: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  o4: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  e: (_|_){
-    // [eval] e: conflicting values 1 and {a:3} (mismatched types int and struct):
-    //     ./in.cue:7:5
-    //     ./in.cue:8:4
-    a: (_|_){// 3
-    }
-  }
-}

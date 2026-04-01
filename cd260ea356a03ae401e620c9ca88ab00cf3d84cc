@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4704b4b1_223b0e63",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T08:33:26Z",
+      "side": 1,
+      "message": "We should have clear rules somewhere what should be escaped and what not. I\u0027m getting invalid commit message warnings quite a bit for some seemingly random rules. Ideally we should have a pre-commit check that fails on invalid messages.",
+      "parentUuid": "a17ab89b_3598df1c",
+      "revId": "cd260ea356a03ae401e620c9ca88ab00cf3d84cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3ec2883_b638b123",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-31T15:20:29Z",
       "side": 1,
       "message": "ditto",
+      "revId": "cd260ea356a03ae401e620c9ca88ab00cf3d84cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1798d380_07703c06",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T08:33:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3ec2883_b638b123",
       "revId": "cd260ea356a03ae401e620c9ca88ab00cf3d84cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

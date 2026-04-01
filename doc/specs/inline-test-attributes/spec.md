@@ -89,6 +89,27 @@ Comparison behavior:
 - Structs: by default, field order is ignored. `@test(checkOrder)` as a decl attribute inside the expected struct additionally asserts that fields appear in the listed order.
 - `@test(final)` as a decl attribute inside the expected struct opts into compile-and-compare for all fields in that struct (resolving disjunction defaults before comparison).
 - `@test(final)` on a specific field inside the expected struct opts into compile-and-compare for that field only.
+- Let bindings (`let x = expr`) in the expected struct SHALL be compared: the runner checks that the corresponding let binding in the evaluated vertex has the same value as `expr`.
+
+Skipping sub-comparisons — `@test(ignore)` inside an expected value:
+- A field inside the expected struct MAY carry `@test(ignore)` as a field attribute. When present, `eq`'s recursive descent into that element is halted: the element need not be present in the evaluated value and its value is not compared.
+- `@test(ignore)` does NOT suppress other directives on the same element. For example, `b: _ @test(ignore) @test(err, any)` will still run the `@test(err, any)` check on `b`'s subtree; only the `eq` value comparison is skipped.
+- To skip a let binding's value comparison, omit the let clause from the expected struct entirely — the runner only checks lets that are explicitly listed.
+
+```cue
+// Skip a subfield but still assert it contains an error somewhere:
+result @test(eq, {
+    a: 1
+    b: _ @test(ignore) @test(err, any, code=cycle)  // skip eq check; still check for cycle error in b
+})
+
+// To skip checking a let binding, simply omit it from the expected struct:
+result @test(eq, {
+    a: 1
+    // let b is not listed, so its value is not checked
+    c: 3
+})
+```
 
 Error handling within the expected struct:
 - A field inside the expected struct may carry `@test(err, ...)` to assert that the corresponding field in the evaluated value is an error instead of performing a normal value comparison.
@@ -141,6 +162,22 @@ obj: {a: 1, b: 2} @test(eq, {a: 1, b: 2})
 #### Scenario: checkOrder asserts field ordering
 - **WHEN** `@test(eq, {a: 1, b: 2, @test(checkOrder)})` is declared and the evaluated struct has fields in order `b`, `a`
 - **THEN** the test fails reporting the field order mismatch
+
+#### Scenario: Let binding is compared
+- **WHEN** `@test(eq, {a: 1, let b = 3})` is declared and the evaluated vertex has `let b = 3`
+- **THEN** the test passes
+
+#### Scenario: Let binding value mismatch fails
+- **WHEN** `@test(eq, {let b = 3})` is declared but the evaluated vertex has `let b = 4`
+- **THEN** the test fails reporting the let value mismatch
+
+#### Scenario: @test(ignore) skips subfield eq check
+- **WHEN** `@test(eq, {a: 1, b: _ @test(ignore)})` is declared and the evaluated struct has `a: 1` with any value for `b` (or no `b` at all)
+- **THEN** the `eq` comparison of `b` is skipped; the test passes
+
+#### Scenario: @test(ignore) does not suppress other directives
+- **WHEN** `@test(eq, {b: _ @test(ignore) @test(err, any, code=cycle)})` is declared and `b` in the evaluated value contains a cycle error somewhere in its subtree
+- **THEN** the `eq` check on `b` is skipped, but the `@test(err, any, code=cycle)` assertion still runs and passes
 
 ---
 

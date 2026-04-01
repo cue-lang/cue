@@ -639,6 +639,133 @@ func TestAstCompare_Parens(t *testing.T) {
 	}
 }
 
+func TestAstCompare_LetBindings(t *testing.T) {
+	// Note: CUE requires let bindings to be referenced, so test values use a
+	// concrete field that references each let (e.g. "a: b" where "let b = 3").
+	// Expected structs use the evaluated concrete value (e.g. "a: 3"), not the
+	// let identifier, since expected expressions are compared structurally.
+	tests := []struct {
+		name    string
+		expr    string
+		val     string
+		wantErr string
+	}{
+		// Let binding present and value matches.
+		{
+			name: "let match",
+			expr: "{\na: 3\nlet b = 3\n}",
+			val:  "{\na: b\nlet b = 3\n}", // b referenced by a
+		},
+		// Let binding present but value mismatches.
+		{
+			name:    "let value mismatch",
+			expr:    "{\na: 3\nlet b = 4\n}", // expected: let b = 4 (wrong)
+			val:     "{\na: b\nlet b = 3\n}", // actual: let b = 3
+			wantErr: `let b: expected 4, got 3`,
+		},
+		// Expected has a let but value has no let with that name.
+		{
+			name:    "let missing from value",
+			expr:    "{\na: 1\nlet x = 2\n}",
+			val:     "{\na: 1\n}",
+			wantErr: `let binding "x" not found`,
+		},
+		// Let with top (_) matches a top value.
+		{
+			name: "let top matches top",
+			expr: "{\na: _\nlet b = _\n}",
+			val:  "{\na: b\nlet b = _\n}", // b=top, a=b=top
+		},
+		// Value has an extra let not listed in expected — not an error.
+		{
+			name: "extra let in value is allowed",
+			expr: "{\na: 3\n}",
+			val:  "{\na: b\nlet b = 3\n}",
+		},
+		// Multiple lets.
+		{
+			name: "multiple lets match",
+			expr: "{\na: 1\nb: 2\nlet x = 1\nlet y = 2\n}",
+			val:  "{\na: x\nb: y\nlet x = 1\nlet y = 2\n}",
+		},
+		{
+			name:    "multiple lets one mismatch",
+			expr:    "{\na: 1\nb: 2\nlet x = 1\nlet y = 99\n}",
+			val:     "{\na: x\nb: y\nlet x = 1\nlet y = 2\n}",
+			wantErr: `let y: expected 99, got 2`,
+		},
+		// Hidden let (underscore prefix).
+		{
+			name: "hidden let match",
+			expr: "{\na: 3\nlet _b = 3\n}",
+			val:  "{\na: _b\nlet _b = 3\n}",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expr := parseExpr(t, tt.expr)
+			val := compileVal(t, tt.val)
+			err := astCompare(expr, val)
+			checkErr(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestAstCompare_Ignore(t *testing.T) {
+	tests := []struct {
+		name    string
+		expr    string
+		val     string
+		wantErr string
+	}{
+		// @test(ignore) on a field skips eq check; field need not be present.
+		{
+			name: "ignore skips missing field",
+			expr: "{\na: 1\nb: _ @test(ignore)\n}",
+			val:  "{\na: 1\n}",
+		},
+		// @test(ignore) on a field skips eq check; field can be present with any value.
+		{
+			name: "ignore skips field with any value",
+			expr: "{\na: 1\nb: _ @test(ignore)\n}",
+			val:  "{\na: 1\nb: 99\n}",
+		},
+		// @test(ignore) does not suppress @test(err) — the err check still runs
+		// and fails when the field has no error.
+		{
+			name:    "ignore does not suppress err check - fails non-error field",
+			expr:    "{\nb: _ @test(ignore) @test(err)\n}",
+			val:     "{\nb: 3\n}",
+			wantErr: "@test(err): expected error",
+		},
+		// @test(ignore) on a field that would otherwise fail value comparison.
+		{
+			name: "ignore skips value mismatch",
+			expr: "{\na: 1 @test(ignore)\n}",
+			val:  "{\na: 999\n}",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expr := parseExpr(t, tt.expr)
+			val := compileVal(t, tt.val)
+			err := astCompare(expr, val)
+			checkErr(t, err, tt.wantErr)
+		})
+	}
+
+	// @test(ignore) does not suppress @test(err) — the err check still passes
+	// when the field IS an error. Use a value with an error field (skip top-level error check).
+	t.Run("ignore does not suppress err check - passes error field", func(t *testing.T) {
+		ctx := cuecontext.New()
+		errVal := ctx.CompileString("{\nb: 1 & 2\n}") // b has a conflict error
+		expr := parseExpr(t, "{\nb: _|_ @test(ignore) @test(err)\n}")
+		checkErr(t, astCompare(expr, errVal), "")
+	})
+}
+
 // checkErr is a test helper that verifies error expectations.
 func checkErr(t *testing.T, err error, wantErr string) {
 	t.Helper()

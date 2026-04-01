@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88132d74_46a8e637",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T10:29:35Z",
+      "side": 1,
+      "message": "Conflicts with comprehension rework. Good chance this code will be removed. But please keep around in case it is not.",
+      "revId": "282fd32bbd6c02cfa0dbd5515f3e3b86ee9dbc74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

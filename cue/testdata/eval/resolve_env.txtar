@@ -1,18 +1,21 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 a: {
 	d: int
 	b: {
 		c: d
 	}
+	@test(eq, {
+		d: int
+		b: c: int
+	})
 }
 x: {
 	d: 2
-	b: a.b.c // should be int, not 2
+	b: a.b.c @test(eq, int)
 }
 a1: y: 5
 a1: a2: a3: a4: a5: a1.y
-b: a1.a2.a3.a4.a5
+b: a1.a2.a3.a4.a5 @test(eq, 5)
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
@@ -23,30 +26,6 @@ Retain: 0
 Unifications: 15
 Conjuncts:    22
 Disjuncts:    15
--- out/evalalpha --
-(struct){
-  a: (struct){
-    d: (int){ int }
-    b: (struct){
-      c: (int){ int }
-    }
-  }
-  x: (struct){
-    d: (int){ 2 }
-    b: (int){ int }
-  }
-  a1: (struct){
-    y: (int){ 5 }
-    a2: (struct){
-      a3: (struct){
-        a4: (struct){
-          a5: (int){ 5 }
-        }
-      }
-    }
-  }
-  b: (int){ 5 }
-}
 -- out/compile --
 --- in.cue
 {

@@ -1,8 +1,7 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 p: close({
 	"\("f")": _
-})
+}) @test(eq, {f: 9}) @test(closed)
 p: f: 9
 -- out/compile --
 --- in.cue
@@ -24,9 +23,3 @@ Retain: 1
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
--- out/evalalpha --
-(struct){
-  p: (#struct){
-    f: (int){ 9 }
-  }
-}

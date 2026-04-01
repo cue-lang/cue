@@ -20,7 +20,9 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 )
 
 func FuzzStandaloneCUE(f *testing.F) {
@@ -79,7 +81,35 @@ list.Concat(["foo"], [])
 			func(ast.Node) {},
 		)
 		astutil.Apply(f,
-			func(astutil.Cursor) bool { return true },
+			func(c astutil.Cursor) bool {
+				node := c.Node()
+				_ = node.Pos().Position()
+				_ = node.End().Position()
+				switch node := node.(type) {
+				case *ast.Ident:
+					if !ast.IsValidIdent(node.Name) {
+						t.Fatalf("cue/parser and cue/ast should agree on what is a valid identifier: %s", node.Name)
+					}
+				case *ast.BasicLit:
+					switch node.Kind {
+					case token.INT, token.FLOAT:
+						var info literal.NumInfo
+						if err := literal.ParseNum(node.Value, &info); err != nil {
+							t.Fatalf("cue/parser and cue/literal should agree on what is a valid number: %s", node.Value)
+						}
+					case token.STRING:
+						if _, ok := c.Parent().Node().(*ast.Interpolation); ok {
+							// An interpolation consists of incomplete basic literals like: "\(
+							break
+						}
+						if _, err := literal.Unquote(node.Value); err != nil {
+							t.Fatalf("cue/parser and cue/literal should agree on what is a valid string: %s", node.Value)
+						}
+					}
+				}
+
+				return true
+			},
 			func(astutil.Cursor) bool { return true },
 		)
 

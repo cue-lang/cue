@@ -618,7 +618,7 @@ func fileHasTestAttrs(f *ast.File) bool {
 }
 
 // declsHaveTestAttrs recursively searches decls for any @test(...) attribute,
-// descending into struct-valued fields at any depth.
+// descending into struct-valued fields and comprehension bodies at any depth.
 func declsHaveTestAttrs(decls []ast.Decl) bool {
 	for _, decl := range decls {
 		switch d := decl.(type) {
@@ -632,6 +632,12 @@ func declsHaveTestAttrs(decls []ast.Decl) bool {
 					return true
 				}
 			}
+			if sl, ok := d.Value.(*ast.StructLit); ok {
+				if declsHaveTestAttrs(sl.Elts) {
+					return true
+				}
+			}
+		case *ast.Comprehension:
 			if sl, ok := d.Value.(*ast.StructLit); ok {
 				if declsHaveTestAttrs(sl.Elts) {
 					return true

@@ -1,17 +1,15 @@
-#name: strings and bytes
-#evalPartial
 -- in.cue --
-s0: "foo" + "bar"
-s1: 3 * "abc"
-s2: "abc" * 2
+s0: "foo" + "bar" @test(eq, "foobar")
+s1: 3 * "abc"     @test(eq, "abcabcabc")
+s2: "abc" * 2     @test(eq, "abcabc")
 
-b0: 'foo' + 'bar'
-b1: 3 * 'abc'
-b2: 'abc' * 2
+b0: 'foo' + 'bar' @test(eq, 'foobar')
+b1: 3 * 'abc'     @test(eq, 'abcabcabc')
+b2: 'abc' * 2     @test(eq, 'abcabc')
 
 // TODO: consider the semantics of this and perhaps allow this.
-e0: "a" + ''
-e1: 'b' + "c"
+e0: "a" + ''  @test(err, code=eval)
+e1: 'b' + "c" @test(err, code=eval)
 -- out/compile --
 --- in.cue
 {
@@ -34,32 +32,3 @@ Retain: 0
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    9
--- out/evalalpha --
-Errors:
-e0: invalid operands "a" and '' to '+' (type string and bytes):
-    ./in.cue:10:5
-    ./in.cue:10:11
-e1: invalid operands 'b' and "c" to '+' (type bytes and string):
-    ./in.cue:11:5
-    ./in.cue:11:11
-
-Result:
-(_|_){
-  // [eval]
-  s0: (string){ "foobar" }
-  s1: (string){ "abcabcabc" }
-  s2: (string){ "abcabc" }
-  b0: (bytes){ 'foobar' }
-  b1: (bytes){ 'abcabcabc' }
-  b2: (bytes){ 'abcabc' }
-  e0: (_|_){
-    // [eval] e0: invalid operands "a" and '' to '+' (type string and bytes):
-    //     ./in.cue:10:5
-    //     ./in.cue:10:11
-  }
-  e1: (_|_){
-    // [eval] e1: invalid operands 'b' and "c" to '+' (type bytes and string):
-    //     ./in.cue:11:5
-    //     ./in.cue:11:11
-  }
-}

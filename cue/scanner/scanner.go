@@ -190,9 +190,6 @@ func isDigit(ch rune) bool {
 
 func (s *Scanner) scanFieldIdentifier() string {
 	offs := s.offset
-	if s.ch == '_' {
-		s.next()
-	}
 	if s.ch == '#' {
 		s.next()
 		// TODO: remove this block to allow #<num>
@@ -760,6 +757,12 @@ scanAgain:
 			} else {
 				tok = token.IDENT
 				lit = "_" + s.scanFieldIdentifier()
+				if lit == "__" && s.ch == '#' {
+					s.next() // consume '#'
+					lit += "#" + s.scanIdentifier()
+					s.errf(s.file.Offset(pos), "illegal token %q", lit)
+					tok = token.ILLEGAL
+				}
 			}
 			insertEOL = true
 

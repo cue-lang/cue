@@ -1,7 +1,7 @@
 // Treat fields of different files as belonging to the same struct.
 // This means that a closed embedding in one file should not restrict the
 // fields of another.
-
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 package foo
 

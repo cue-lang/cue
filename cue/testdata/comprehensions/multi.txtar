@@ -1,3 +1,4 @@
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 list: [2, 3]
 a: [ 3, for x in list {x}, for x in list {x}]

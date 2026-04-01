@@ -1,5 +1,6 @@
 #name: associativity of defaults
 #evalFull
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 a: *"a" | ("b" | "c")
 b: (*"a" | "b") | "c"

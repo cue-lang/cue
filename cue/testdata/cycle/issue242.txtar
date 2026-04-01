@@ -1,3 +1,4 @@
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #size:     2
 #CellValue: 0 | 1 | 2 | 3

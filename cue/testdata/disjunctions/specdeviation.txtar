@@ -14,7 +14,7 @@ Proof:
     p: *(*_|_ | 2)  | int         // U1: distribute conjuncts
     p: *_|_ | 2  | int            // M2: remove mark
     p: 2  | int                   // value after removing default.
-
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 Q: *1 | int
 q: *Q | int // 1 as expected

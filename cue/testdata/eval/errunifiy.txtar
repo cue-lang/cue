@@ -1,5 +1,5 @@
 Incomplete errors should not unify with values.
-
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 a: or([])
 a: "t"

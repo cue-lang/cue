@@ -1,5 +1,6 @@
 #name: excluded embedding from closing
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 #S: {
 	a: {c: int}

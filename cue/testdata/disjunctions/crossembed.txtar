@@ -1,7 +1,7 @@
 # Cross-package embedded disjunction of definitions should correctly
 # eliminate branches when unified with a concrete field.
 # From issue #4197.
-
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- cue.mod/module.cue --
 module: "foo.test/main"
 language: version: "v0.14.0"

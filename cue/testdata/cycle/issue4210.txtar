@@ -3,6 +3,7 @@
 // CUE hangs when evaluating expressions like `a: b: c: {a}.b` — a structural
 // cycle where a cyclic reference is embedded within braces and followed by a
 // selector. Without braces (`a: b: c: a.b`), the cycle is correctly detected.
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 t1: {
 	a: b: c: {a}.b

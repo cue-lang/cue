@@ -1,14 +1,12 @@
-#name: resolved self-reference cycles: Issue 19
-#evalPartial
 -- in.cue --
 // CUE knows how to resolve the following:
-x: y + 100
-y: x - 100
+x: y + 100 @test(eq, 200)
+y: x - 100 @test(eq, 100)
 x: 200
 
-z1: z2 + 1
-z2: z3 + 2
-z3: z1 - 3
+z1: z2 + 1 @test(eq, 11)
+z2: z3 + 2 @test(eq, 10)
+z3: z1 - 3 @test(eq, 8)
 z3: 8
 
 // TODO: extensive tests with disjunctions.
@@ -33,11 +31,3 @@ Retain: 3
 Unifications: 6
 Conjuncts:    6
 Disjuncts:    8
--- out/evalalpha --
-(struct){
-  x: (int){ 200 }
-  y: (int){ 100 }
-  z1: (int){ 11 }
-  z2: (int){ 10 }
-  z3: (int){ 8 }
-}

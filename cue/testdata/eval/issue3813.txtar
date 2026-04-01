@@ -1,10 +1,16 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- x.cue --
-x: {[string]: _}
+x: {[string]: _} @test(closed) @test(eq, {
+	f: _
+	[_]: _
+})
 x: #d
 #d: f: _
 
-y: { x }
+y: {
+	@test(eq, {f: true})
+	@test(closed)
+	x
+}
 y: f: true
 -- out/compile --
 --- x.cue
@@ -33,15 +39,3 @@ Retain: 1
 Unifications: 7
 Conjuncts:    17
 Disjuncts:    8
--- out/evalalpha --
-(struct){
-  x: (#struct){
-    f: (_){ _ }
-  }
-  #d: (#struct){
-    f: (_){ _ }
-  }
-  y: (#struct){
-    f: (bool){ true }
-  }
-}

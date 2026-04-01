@@ -152,6 +152,11 @@ type parsedTestAttr struct {
 	// For "err" directives, parsed sub-options are stored here.
 	errArgs *errArgs
 
+	// isTodo marks directives produced by the "todo" version qualifier
+	// (e.g. @test(eq:todo, X)). These run as expected-to-fail: failures
+	// are logged rather than reported as errors; a pass emits a warning.
+	isTodo bool
+
 	// srcAttr is the original AST attribute node (needed for CUE_UPDATE write-back).
 	srcAttr *ast.Attribute
 
@@ -636,6 +641,29 @@ type inlineRunner struct {
 	pendingInlineFillWrites []inlineFillWrite
 }
 
+// todoCapture wraps *testing.T and captures failures without propagating them.
+// It is used for @test(todo) XFAIL mode: all directives run, but failures are
+// logged rather than reported as test errors.
+//
+// todoCapture embeds *testing.T to satisfy the testing.TB interface (via the
+// promoted unexported private() method). Only Errorf and Error are overridden;
+// all other methods delegate to the embedded T.
+type todoCapture struct {
+	*testing.T
+	failed bool
+	msgs   strings.Builder
+}
+
+func (c *todoCapture) Error(args ...any) {
+	c.failed = true
+	fmt.Fprintln(&c.msgs, args...)
+}
+
+func (c *todoCapture) Errorf(format string, args ...any) {
+	c.failed = true
+	fmt.Fprintf(&c.msgs, format+"\n", args...)
+}
+
 // runArchive runs all test cases in the archive.
 func (r *inlineRunner) runArchive() {
 	r.t.Helper()
@@ -687,7 +715,12 @@ func (r *inlineRunner) runArchive() {
 	// Run file-level @test assertions against the entire file value.
 	if len(fileLevelRecords) > 0 {
 		version := r.versionName()
+		seenFilePaths := make(map[string]bool)
 		for _, rec := range fileLevelRecords {
+			if seenFilePaths[rec.path.String()] {
+				continue
+			}
+			seenFilePaths[rec.path.String()] = true
 			directives := selectActiveDirectives(allRecords, rec.path, version)
 			// Process skip directives first.
 			for _, pa := range directives {
@@ -695,11 +728,49 @@ func (r *inlineRunner) runArchive() {
 					r.runDirective(r.t, cue.Path{}, val, pa)
 				}
 			}
+			hasTodo := false
+			var todoWhy, todoPriority string
 			for _, pa := range directives {
-				if pa.directive == "skip" {
-					continue
+				if pa.directive == "todo" {
+					hasTodo = true
+					for _, kv := range pa.raw.Fields[1:] {
+						switch kv.Key() {
+						case "why":
+							todoWhy = kv.Value()
+						case "p":
+							todoPriority = kv.Value()
+						}
+					}
+					break
 				}
-				r.runDirective(r.t, cue.Path{}, val, pa)
+			}
+			if hasTodo {
+				cap := &todoCapture{T: r.t}
+				for _, pa := range directives {
+					if pa.directive == "skip" || pa.directive == "todo" {
+						continue
+					}
+					r.runDirective(cap, cue.Path{}, val, pa)
+				}
+				suffix := ""
+				if todoPriority != "" {
+					suffix += fmt.Sprintf(" p=%s", todoPriority)
+				}
+				if todoWhy != "" {
+					suffix += fmt.Sprintf(" why=%q", todoWhy)
+				}
+				if cap.failed {
+					r.t.Logf("TODO (still failing): (file level)%s\n%s", suffix, cap.msgs.String())
+				} else {
+					r.t.Logf("WARNING: TODO now passes for file level — consider removing @test(todo)")
+				}
+			} else {
+				for _, pa := range directives {
+					if pa.directive == "skip" {
+						continue
+					}
+					r.runDirective(r.t, cue.Path{}, val, pa)
+				}
 			}
 		}
 	}
@@ -886,15 +957,25 @@ func selectActiveDirectives(records []attrRecord, path cue.Path, version string)
 		versioned bool
 	}
 	var candidates []entry
+	// todoDirectives are @test(directive:todo, ...) forms — always active and
+	// additive (they do not replace unversioned directives of the same name).
+	var todoDirectives []parsedTestAttr
 	for _, rec := range records {
 		if rec.path.String() != path.String() {
 			continue
 		}
-		versioned := rec.parsed.version != ""
-		if rec.parsed.version != "" && rec.parsed.version != version {
+		pa := rec.parsed
+		if pa.version == "todo" {
+			// "todo" is not a real version; treat as expected-to-fail annotation.
+			pa.isTodo = true
+			todoDirectives = append(todoDirectives, pa)
+			continue
+		}
+		versioned := pa.version != ""
+		if versioned && pa.version != version {
 			continue // wrong version
 		}
-		candidates = append(candidates, entry{pa: rec.parsed, versioned: versioned})
+		candidates = append(candidates, entry{pa: pa, versioned: versioned})
 	}
 
 	// For each directive name, prefer the versioned form.
@@ -911,6 +992,8 @@ func selectActiveDirectives(records []attrRecord, path cue.Path, version string)
 	}
 
 	result := slices.Collect(maps.Values(byDirective))
+	// Append todo-form directives last; they are additive and not deduplicated.
+	result = append(result, todoDirectives...)
 	return result
 }
 
@@ -924,25 +1007,74 @@ func (r *inlineRunner) runInline(t *testing.T, root testCaseRoot, fileVal cue.Va
 	version := r.versionName()
 
 	// Gather all records for this root and its descendants.
+	// A field may have multiple attrRecords (one per @test attribute), so
+	// deduplicate by path to avoid running all directives once per attribute.
 	rootPath := cue.MakePath(root.sel)
+	seenPaths := make(map[string]bool)
 	for _, rec := range records {
 		if !pathHasPrefix(rec.path, rootPath) {
 			continue
 		}
+		if seenPaths[rec.path.String()] {
+			continue
+		}
+		seenPaths[rec.path.String()] = true
 		directives := selectActiveDirectives(records, rec.path, version)
+		fieldVal := fileVal.LookupPath(rec.path)
+
 		// Process skip directives first so t.Skip() fires before other assertions.
 		for _, pa := range directives {
 			if pa.directive == "skip" {
-				fieldVal := fileVal.LookupPath(rec.path)
 				r.runDirective(t, rec.path, fieldVal, pa)
 			}
 		}
+
+		// Check for @test(todo) modifier: run all other directives but suppress failures.
+		hasTodo := false
+		var todoWhy string
+		var todoPriority string
 		for _, pa := range directives {
-			if pa.directive == "skip" {
-				continue // already handled above
+			if pa.directive == "todo" {
+				hasTodo = true
+				for _, kv := range pa.raw.Fields[1:] {
+					switch kv.Key() {
+					case "why":
+						todoWhy = kv.Value()
+					case "p":
+						todoPriority = kv.Value()
+					}
+				}
+				break
 			}
-			fieldVal := fileVal.LookupPath(rec.path)
-			r.runDirective(t, rec.path, fieldVal, pa)
+		}
+
+		if hasTodo {
+			cap := &todoCapture{T: t}
+			for _, pa := range directives {
+				if pa.directive == "skip" || pa.directive == "todo" {
+					continue
+				}
+				r.runDirective(cap, rec.path, fieldVal, pa)
+			}
+			suffix := ""
+			if todoPriority != "" {
+				suffix += fmt.Sprintf(" p=%s", todoPriority)
+			}
+			if todoWhy != "" {
+				suffix += fmt.Sprintf(" why=%q", todoWhy)
+			}
+			if cap.failed {
+				t.Logf("TODO (still failing): %s%s\n%s", rec.path, suffix, cap.msgs.String())
+			} else {
+				t.Logf("WARNING: TODO now passes for %s — consider removing @test(todo)", rec.path)
+			}
+		} else {
+			for _, pa := range directives {
+				if pa.directive == "skip" {
+					continue // already handled above
+				}
+				r.runDirective(t, rec.path, fieldVal, pa)
+			}
 		}
 	}
 
@@ -967,7 +1099,7 @@ func pathHasPrefix(path, prefix cue.Path) bool {
 }
 
 // runDirective dispatches a single parsed directive against a cue.Value.
-func (r *inlineRunner) runDirective(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	switch pa.directive {
 	case "eq":
@@ -995,6 +1127,8 @@ func (r *inlineRunner) runDirective(t *testing.T, path cue.Path, val cue.Value, 
 		r.runDebugCheckInline(t, path, val, pa)
 	case "debugOutput":
 		r.runDebugOutputInline(t, path, val, pa)
+	case "todo":
+		// @test(todo) is handled at the loop level in runInline; no-op here.
 	case "permute":
 		// Handled by permute-group collection in runInline; no-op here.
 	case "permuteCount":
@@ -1018,8 +1152,28 @@ func (r *inlineRunner) runDirective(t *testing.T, path cue.Path, val cue.Value, 
 //   - passing assertion with skip+diff: remove stale skip (UpdateGoldenFiles)
 //   - failing assertion: force-overwrite (ForceUpdateGoldenFiles) or
 //     regression-guard with skip:<ver>+diff annotation (UpdateGoldenFiles)
-func (r *inlineRunner) runEqInline(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
+	// @test(eq:todo, X) — expected-to-fail form.
+	// Failures are logged but not reported as test errors; a match emits a warning.
+	if pa.isTodo {
+		if len(pa.raw.Fields) < 2 {
+			return
+		}
+		exprStr := pa.raw.Fields[1].Text()
+		expr, err := parser.ParseExpr("@test(eq:todo)", exprStr)
+		if err != nil {
+			t.Logf("path %s: @test(eq:todo, ...): cannot parse expected expression: %v", path, err)
+			return
+		}
+		cmpErr := (&cmpCtx{baseLine: pa.baseLine}).astCmp(cue.Path{}, expr, val)
+		if cmpErr == nil {
+			t.Logf("WARNING: path %s: TODO eq:todo now passes — consider upgrading to @test(eq, %s)", path, exprStr)
+		} else {
+			t.Logf("path %s: TODO eq:todo still failing: %v", path, cmpErr)
+		}
+		return
+	}
 	if len(pa.raw.Fields) < 2 {
 		// Empty @test(eq) — fill placeholder.
 		if cuetest.UpdateGoldenFiles {
@@ -1088,7 +1242,7 @@ func (r *inlineRunner) formatValue(v cue.Value) string {
 }
 
 // runErrAssertion checks that an error is present at val, applying sub-options.
-func (r *inlineRunner) runErrAssertion(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	ea := pa.errArgs
 	if ea == nil {
@@ -1137,7 +1291,7 @@ func (r *inlineRunner) runErrAssertion(t *testing.T, path cue.Path, val cue.Valu
 // spec in pa.  When positions don't match:
 //   - pos=[] (placeholder): update on CUE_UPDATE=1.
 //   - pos=[non-empty]: update on CUE_UPDATE=force only.
-func (r *inlineRunner) checkErrPositions(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	err := val.Err()
 	if err == nil {
@@ -1345,7 +1499,7 @@ func (r *inlineRunner) findDescendantError(val cue.Value, ea *errArgs) bool {
 }
 
 // runLeqInline checks that val is subsumed by the constraint in pa.
-func (r *inlineRunner) runLeqInline(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) runLeqInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	if len(pa.raw.Fields) < 2 {
 		t.Errorf("path %s: @test(leq) requires a constraint argument", path)
@@ -1362,7 +1516,7 @@ func (r *inlineRunner) runLeqInline(t *testing.T, path cue.Path, val cue.Value, 
 }
 
 // runLeqAssertion asserts that val is subsumed by constraint (constraint ⊑ val, i.e. val is at least as specific).
-func (r *inlineRunner) runLeqAssertion(t *testing.T, path cue.Path, val, constraint cue.Value) {
+func (r *inlineRunner) runLeqAssertion(t testing.TB, path cue.Path, val, constraint cue.Value) {
 	t.Helper()
 	if err := constraint.Subsume(val); err != nil {
 		t.Errorf("path %s: @test(leq): value %v is not subsumed by constraint %v: %v", path, val, constraint, err)
@@ -1371,7 +1525,7 @@ func (r *inlineRunner) runLeqAssertion(t *testing.T, path cue.Path, val, constra
 
 // runKindAssertion checks val.IncompleteKind() against the expected kind list.
 // Syntax: @test(kind=int) or @test(kind=int|string).
-func (r *inlineRunner) runKindAssertion(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) runKindAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	// The directive is the key ("kind") and the expected kind(s) are the value.
 	if len(pa.raw.Fields) == 0 || pa.raw.Fields[0].Value() == "" {
@@ -1425,7 +1579,7 @@ func parseKindStr(s string) cue.Kind {
 
 // runClosedAssertion checks val.IsClosed() matches expected.
 // Syntax: @test(closed) for closed=true, @test(closed=false) for closed=false.
-func (r *inlineRunner) runClosedAssertion(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	expected := true // bare @test(closed) means closed=true
 	if len(pa.raw.Fields) >= 1 && pa.raw.Fields[0].Key() == "closed" {
@@ -1442,7 +1596,7 @@ func (r *inlineRunner) runClosedAssertion(t *testing.T, path cue.Path, val cue.V
 // runDebugCheckInline checks the debug printer output of val against the
 // expected string in the @test(debugCheck, "...") attribute.
 // When CUE_UPDATE modes are active, enqueues a write-back.
-func (r *inlineRunner) runDebugCheckInline(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	if len(pa.raw.Fields) < 2 {
 		// Empty @test(debugCheck) — fill placeholder.
@@ -1472,7 +1626,7 @@ func (r *inlineRunner) runDebugCheckInline(t *testing.T, path cue.Path, val cue.
 // runDebugOutputInline captures the debug printer output of val as an
 // informational annotation.  Unlike debugCheck, a mismatch does not fail the
 // test — it only logs and auto-updates when CUE_UPDATE is active.
-func (r *inlineRunner) runDebugOutputInline(t *testing.T, path cue.Path, val cue.Value, pa parsedTestAttr) {
+func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	actual := r.debugPrinterOutput(val)
 	if len(pa.raw.Fields) < 2 {

@@ -1,19 +1,24 @@
-#todo:inline: easy — simple scalar/string values, straightforward @test(eq, ...) conversion
 -- in.cue --
 t1: {
 	#R: {
 		pos:  uint
-		name: "hello_\(pos)"
+		name: "hello_\(pos)" @test(err, code=incomplete)
 	}
-	a: #R & {pos: 67}
+	a: #R & {pos: 67} @test(eq, {pos: 67, name: "hello_67"}) @test(closed)
 }
 t2: {
 	#R: {
 		pos:  string
-		name: "hello_\(pos)"
+		name: "hello_\(pos)" @test(err, code=incomplete)
 	}
-	a: #R & {pos: "a"}
+	a: #R & {pos: "a"} @test(eq, {pos: "a", name: "hello_a"}) @test(closed)
 }
+-- out/errors.txt --
+[incomplete] t1.#R.name: invalid interpolation: non-concrete value >=0 & int (type int):
+    in.cue:4:9
+[incomplete] t2.#R.name: invalid interpolation: non-concrete value string (type string):
+    in.cue:11:9
+    in.cue:10:9
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
@@ -24,36 +29,6 @@ Retain: 0
 Unifications: 15
 Conjuncts:    29
 Disjuncts:    15
--- out/evalalpha --
-(struct){
-  t1: (struct){
-    #R: (#struct){
-      pos: (int){ &(>=0, int) }
-      name: (_|_){
-        // [incomplete] t1.#R.name: invalid interpolation: non-concrete value >=0 & int (type int):
-        //     ./in.cue:4:9
-      }
-    }
-    a: (#struct){
-      pos: (int){ 67 }
-      name: (string){ "hello_67" }
-    }
-  }
-  t2: (struct){
-    #R: (#struct){
-      pos: (string){ string }
-      name: (_|_){
-        // [incomplete] t2.#R.name: invalid interpolation: non-concrete value string (type string):
-        //     ./in.cue:11:9
-        //     ./in.cue:10:9
-      }
-    }
-    a: (#struct){
-      pos: (string){ "a" }
-      name: (string){ "hello_a" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

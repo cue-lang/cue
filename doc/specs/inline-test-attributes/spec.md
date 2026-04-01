@@ -318,13 +318,60 @@ The `skip` directive SHALL cause the test case or individual assertion to be ski
 ---
 
 ### Requirement: `todo` directive
-The `todo` directive is like `skip`, but acts as a signal that the skipped test case is expected to be fixed in the near future rather than being permanently skipped. An optional `p=N` priority key-value arg classifies urgency: `p=0` is critical (must fix immediately), `p=1` is important (fix soon), `p=2` is good to have (fix when convenient). An optional `why="reason"` key-value arg provides a human-readable explanation.
+The `todo` directive marks a test case as *expected to fail*. Unlike `skip`, the directives on the annotated field **still run** — but failures are suppressed (logged, not reported as errors). If all directives on the field pass, the runner emits a warning indicating that the `@test(todo)` may no longer be needed.
 
-`@test(todo)` skips only the field or struct in which it is defined, not the entire file.
+This is useful when a test case is known to be broken but the fix is expected soon, and the author wants to be alerted automatically when it starts passing.
 
-#### Scenario: Todo skips with priority signal
+An optional `p=N` priority key-value arg classifies urgency: `p=0` is critical (must fix immediately), `p=1` is important (fix soon), `p=2` is good to have (fix when convenient). An optional `why="reason"` key-value arg provides a human-readable explanation.
+
+`@test(todo)` applies only to the field or struct in which it is defined, not the entire file.
+
+```cue
+// Directive still runs; failures suppressed; warns when it passes.
+result: somethingBroken @test(eq, 42) @test(todo, p=1, why="evaluator bug #123")
+```
+
+#### Scenario: Todo suppresses failure, logs diagnostic
+- **WHEN** a test case carries `@test(todo)` and the other directives on the field fail
+- **THEN** the test does NOT fail; instead the runner logs a message indicating the test is still failing
+
+#### Scenario: Todo warns when passing
+- **WHEN** a test case carries `@test(todo, why="...")` and all other directives on the field pass
+- **THEN** the runner logs a WARNING that the TODO is no longer needed, prompting the author to remove `@test(todo)`
+
+#### Scenario: Todo with priority signal
 - **WHEN** a test case carries `@test(todo, p=0, why="broken by recent evaluator change")`
-- **THEN** the test is reported as skipped with the priority and reason shown in the test output
+- **THEN** the diagnostic log includes the priority and reason
+
+---
+
+### Requirement: `@test(eq:todo, X)` — expected-future-value
+The version-qualifier slot of the `eq` directive MAY carry the token `todo` instead of a real version identifier. `@test(eq:todo, X)` marks `X` as the *expected future value* — what the field is expected to produce once a known issue is resolved. It differs from `@test(eq, X)` as follows:
+
+- `@test(eq:todo, X)` runs regardless of the current evaluator version.
+- A mismatch is **not** a test failure — it is logged as "still failing".
+- A **match** emits a WARNING that the `eq:todo` may be upgraded to a plain `@test(eq, X)`.
+
+`@test(eq:todo, X)` is additive: it does NOT replace any `@test(eq, Y)` on the same field. Both run independently.
+
+```cue
+// Current broken value; expected future value annotated.
+v: {a: struct.MaxFields(2) & {}}.a
+    @test(eq, {})          // current passing assertion
+    @test(eq:todo, struct.MaxFields(2) & {})  // future expected value, no failure today
+```
+
+#### Scenario: eq:todo still failing — not an error
+- **WHEN** a field carries `@test(eq:todo, X)` and the value does not match `X`
+- **THEN** the test does NOT fail; the runner logs "TODO eq:todo still failing" with details
+
+#### Scenario: eq:todo now passes — warning emitted
+- **WHEN** a field carries `@test(eq:todo, X)` and the value now matches `X`
+- **THEN** the runner logs a WARNING that the annotation may be upgraded to `@test(eq, X)`
+
+#### Scenario: eq:todo and eq coexist
+- **WHEN** a field carries both `@test(eq, Y)` and `@test(eq:todo, X)` where `Y ≠ X`
+- **THEN** `@test(eq, Y)` runs normally; `@test(eq:todo, X)` runs as an expected-to-fail check; both are independent
 
 ---
 

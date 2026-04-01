@@ -3,6 +3,7 @@
 // Ensure that let expressions are uniqued not only per Environment, but also
 // per arc. This is relevant for disjunctions. Without it, an incorrect
 // result may be cached for an arbitrary Environment.
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 p1: {
 	#A: {

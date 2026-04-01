@@ -1,5 +1,6 @@
 #name: structs
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 a: t & {c:  5} // {c:5,d:15}
 b: ti & {c: 7} // {c:7,d:21}

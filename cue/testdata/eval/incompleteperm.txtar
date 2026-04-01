@@ -1,6 +1,6 @@
 // Issue #742
 // Issue #405
-
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 // Issue #129
 permanentlyIncompleteOperands: {

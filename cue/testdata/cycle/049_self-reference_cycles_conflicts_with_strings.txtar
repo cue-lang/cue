@@ -1,5 +1,6 @@
 #name: self-reference cycles conflicts with strings
 #evalPartial
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 a: {
 	x: y + "?"

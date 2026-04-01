@@ -1,5 +1,5 @@
 See https://en.wikipedia.org/wiki/Billion_laughs_attack.
-
+#todo:inline: skip — performance benchmark, not a functional test
 -- in.cue --
 f: [g, g, g, g, g, g, g]
 g: [h, h, h, h, h, h, h]

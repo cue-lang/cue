@@ -26,7 +26,7 @@
 //
 // These are not automatically tested using CUE to avoid interfering with the
 // evaluation.
-
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import "regexp"
 

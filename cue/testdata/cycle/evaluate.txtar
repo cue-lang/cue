@@ -1,3 +1,4 @@
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // All these cases whose name end with cycle should fail with a structural
 // error. These are all uncommon code paths, triggered when container types

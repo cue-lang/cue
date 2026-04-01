@@ -1,6 +1,6 @@
 // TODO: make special benchmark test that tests repeated lines more accurately
 // and and automatically.
-
+#todo:inline: skip — performance benchmark, not a functional test
 -- in.cue --
 // Should linearly increase with each repeated line.
 // automatically.

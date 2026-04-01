@@ -1,3 +1,4 @@
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // Not a cycle: the structure in x (c) only triggers one further
 // instantiation of y, but not enough to trigger another round.

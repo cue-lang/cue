@@ -1,5 +1,5 @@
 # This file tests disjunctions used as operands.
-
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 list:      *[1] | [2]
 condition: *true | false

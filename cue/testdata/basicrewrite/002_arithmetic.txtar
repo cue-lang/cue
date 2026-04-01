@@ -1,5 +1,6 @@
 #name: arithmetic
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 i1: 1 & int
 i2: 2 & int

@@ -1,5 +1,6 @@
 // Triggering recomputation of disjunctions on each branch results
 // in exponential run time. Ensure this does not happen.
+#todo:inline: skip — performance benchmark, not a functional test
 -- stats.txt --
 Leaks:  0
 Freed:  82

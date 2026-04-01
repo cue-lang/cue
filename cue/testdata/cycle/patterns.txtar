@@ -1,5 +1,5 @@
 // Lots of cycle-reference goodness.
-
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 [!~"^[.]"]: c
 a:          b

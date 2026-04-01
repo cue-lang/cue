@@ -1,5 +1,5 @@
 Issue #553
-
+#todo:inline: easy — simple scalar/string values, straightforward @test(eq, ...) conversion
 -- in.cue --
 a: "foo"
 b: "boo"

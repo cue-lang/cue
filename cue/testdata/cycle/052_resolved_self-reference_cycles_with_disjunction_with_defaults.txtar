@@ -1,5 +1,6 @@
 #name: resolved self-reference cycles with disjunction with defaults
 #evalPartial
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // The disjunction in xa could be resolved, but as disjunctions
 // are not resolved for expression, it remains unresolved.

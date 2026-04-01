@@ -1,5 +1,6 @@
 #name: diamond-shaped constraints
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 S: {
 	A: {

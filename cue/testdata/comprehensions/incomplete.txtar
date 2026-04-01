@@ -2,9 +2,9 @@
 cond: bool
 src: {}
 top: _
-a: [ if cond {}]
-b: [for x in src.foo {}]
-c: {for x in top {}}
+a: [ if cond {}]         @test(err, code=incomplete, pos=[-3:7], contains="incomplete bool")
+b: [for x in src.foo {}] @test(err, code=incomplete, pos=[0:18], contains="undefined field")
+c: {for x in top {}}     @test(err, code=incomplete, pos=[0:14], contains="cannot range")
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
@@ -17,25 +17,6 @@ Conjuncts:    7
 Disjuncts:    7
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  cond: (bool){ bool }
-  src: (struct){
-  }
-  top: (_){ _ }
-  a: (_|_){
-    // [incomplete] a: incomplete bool: bool:
-    //     ./in.cue:1:7
-  }
-  b: (_|_){
-    // [incomplete] b: undefined field: foo:
-    //     ./in.cue:5:18
-  }
-  c: (_|_){
-    // [incomplete] c: cannot range over top (incomplete type _):
-    //     ./in.cue:6:14
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -73,6 +73,12 @@ var ForceUpdateGoldenFiles = os.Getenv(envUpdate) == "force"
 // It is controlled by setting CUE_FORMAT_TXTAR to a non-empty string like "true".
 var FormatTxtar = os.Getenv(envFormatTxtar) != ""
 
+// Check enables strict verification of documentary sections (e.g. out/errors.txt).
+// When true, doc sections are treated like normal golden sections and will fail
+// if stale. It is controlled by setting CUE_CHECK to a non-empty string like "1".
+// This can be extended to other check modes (e.g. stats validation) in the future.
+var Check = os.Getenv("CUE_CHECK") != ""
+
 // Condition adds support for CUE-specific testscript conditions within
 // testscript scripts. Supported conditions include:
 //

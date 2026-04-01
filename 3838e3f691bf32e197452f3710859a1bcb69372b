@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f46b68af_7e546a8b",
+        "filename": "cue/testdata/fulleval/006_referencing_field_in_field_comprehension.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T12:42:08Z",
+      "side": 1,
+      "message": "indentation. Using single tab.",
+      "revId": "3838e3f691bf32e197452f3710859a1bcb69372b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

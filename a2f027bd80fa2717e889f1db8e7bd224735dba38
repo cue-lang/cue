@@ -16,6 +16,24 @@
       "message": "Might be worth having the ParseComments option in here as it\u0027s so widely used. Also might want a comment or two in the corpus?",
       "revId": "a2f027bd80fa2717e889f1db8e7bd224735dba38",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "040414e2_2e05503b",
+        "filename": "cue/fuzz_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-01T15:58:34Z",
+      "side": 1,
+      "message": "also definitely worth adding some with `package` and `import` lines I feel.",
+      "parentUuid": "0557739b_c94bf2bb",
+      "revId": "a2f027bd80fa2717e889f1db8e7bd224735dba38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

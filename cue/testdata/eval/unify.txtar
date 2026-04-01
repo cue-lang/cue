@@ -1,18 +1,17 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 a: d: {
 	#base
 	#info: {...}
-	Y: #info.X
-}
+	Y: #info.X @test(eq, "foo") @test(closed)
+}  @test(closed)
 
 #base: {
 	#info: {...}
-}
+} @test(closed)
 
 a: [Name=string]: {#info: {
 	X: "foo"
-}}
+}} @test(closed=false)
 -- out/eval/stats --
 Leaks:  0
 Freed:  8
@@ -23,21 +22,6 @@ Retain: 1
 Unifications: 8
 Conjuncts:    19
 Disjuncts:    9
--- out/evalalpha --
-(struct){
-  a: (struct){
-    d: (#struct){
-      #info: (#struct){
-        X: (string){ "foo" }
-      }
-      Y: (string){ "foo" }
-    }
-  }
-  #base: (#struct){
-    #info: (#struct){
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

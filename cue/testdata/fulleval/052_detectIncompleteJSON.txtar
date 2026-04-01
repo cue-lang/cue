@@ -1,6 +1,5 @@
 #name: detectIncompleteJSON
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 package foobar
 

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "efb22e26_9f07b953",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-01T18:56:18Z",
+      "side": 1,
+      "message": "DFS is already using aliasv2 across their entire codebase, so yes, these measurements were taken with aliasv2 :)",
+      "parentUuid": "53e1f645_207adcf8",
+      "revId": "bb1d6a76a75d849c41900ec39866e4384c033572",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d2a5c052_51f5d13c",

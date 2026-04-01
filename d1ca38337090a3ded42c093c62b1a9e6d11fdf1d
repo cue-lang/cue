@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dced7605_566c5cc1",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "It is now also allowed inside any struct that is on a concrete path.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e26a8458_7b0662b3",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "Note, this is a guideline, not a requirement.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d85e00fe_669bd72d",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "Should not just be field attributes, but also decl attributes.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da9673ad_24d88a32",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "Also, if the evaluated data has an attribute that is not reported in the test result, that is an error too.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf216076_711192f8",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "Since this is now not enforced, consider removing support for ignore altogether.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61c20eb3_772cd88b",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "Suggestion, also add a todo directive  that is like skip, but acts as a signal that it should be fixed soon, whereas skip may be permanently skipped. This could also have a priority field, were p\u003dN, where 0 is critical, and 2 good to have soon, etc.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abf48adf_5486ef13",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "Need to test/ clarify:\n\nA skip directive skips the field or struct in which the test is defined, not the entire file.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba94f768_67724fad",
+        "filename": "doc/specs/inline-test-runner/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "I think it is fine to delete this file now it is implemented.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8001929_b1a50cb8",
+        "filename": "doc/specs/test-migration-tool/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:43:30Z",
+      "side": 1,
+      "message": "Not sure we want a tool. Use it as guidelines, though.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

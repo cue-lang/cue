@@ -1,14 +1,15 @@
 -- in.cue --
-b: {for k, v in a {"\(k)": v + 1}}
-a: {b: 1, c: 2}
+b: {for k, v in a {"\(k)": v + 1}} @test(eq, {b: 2, c: 3})
+a: {b: 1, c: 2}                    @test(eq, {b: 1, c: 2})
 
-x: {for k, v in y {"\(k)": v}}
+x: {for k, v in y {"\(k)": v}} @test(eq, {})
 y: {} // check that empty struct after reference works.
 
-k: {for v in e {v}}
-e: int
+k: {for v in e {v}} @test(err, code=eval, pos=[0:14], contains="cannot range")
+e: int @test(eq, int)
 
 comprehensionBinds: {
+	@test(eq, {a: a: _, b: a: _})
 	a: {for _ in [1] {a: _}}
 	b: {for _, _ in [1] {a: _}}
 }
@@ -26,40 +27,6 @@ Disjuncts:    21
 MisalignedConjunct: 1
 
 NumCloseIDs: 5
--- out/evalalpha --
-Errors:
-k: cannot range over e (found int, want list or struct):
-    ./in.cue:7:14
-
-Result:
-(_|_){
-  // [eval]
-  b: (struct){
-    b: (int){ 2 }
-    c: (int){ 3 }
-  }
-  a: (struct){
-    b: (int){ 1 }
-    c: (int){ 2 }
-  }
-  x: (struct){
-  }
-  y: (struct){
-  }
-  k: (_|_){
-    // [eval] k: cannot range over e (found int, want list or struct):
-    //     ./in.cue:7:14
-  }
-  e: (int){ int }
-  comprehensionBinds: (struct){
-    a: (struct){
-      a: (_){ _ }
-    }
-    b: (struct){
-      a: (_){ _ }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

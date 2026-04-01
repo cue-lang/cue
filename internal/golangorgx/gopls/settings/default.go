@@ -58,7 +58,11 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 							Inline: true,
 							Nil:    true,
 						},
-						DiagnosticsDelay:          1 * time.Second,
+						// 601ms is long enough to not distract the user
+						// while typing incomplete syntax, but short enough
+						// that we'll show diagnostics reasonably quickly
+						// when they stop.
+						DiagnosticsDelay:          601 * time.Millisecond,
 						DiagnosticsTrigger:        DiagnosticsOnEdit,
 						AnalysisProgressReporting: true,
 					},

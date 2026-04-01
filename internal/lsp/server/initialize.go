@@ -177,7 +177,7 @@ func (s *server) Initialized(ctx context.Context, params *protocol.InitializedPa
 		}
 	}
 
-	s.workspace = cache.NewWorkspace(s.cache, s.client, s.debugLog, s.enqueue)
+	s.workspace = cache.NewWorkspace(s.cache, s.client, s.debugLog, s.enqueue, s.options.DiagnosticsDelay)
 
 	err = s.maybeUseWorkspaceFolders(ctx)
 	// Initialized is a notification, so if there's an error, we show

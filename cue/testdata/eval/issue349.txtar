@@ -1,6 +1,20 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+# Tests that field names overlapping with built-in identifiers (e.g. "html",
+# "list") are not reordered to the front of the struct during evaluation.
+# Issue: `cue eval` placed such fields before others, violating declaration
+# order.
+# https://cuelang.org/issue/349
 -- in.cue --
 ex: {
+	@test(eq, {
+		aaa:  "aaa"
+		list: "list"
+		zzz:  "zzz"
+		AAA:  "AAA"
+		html: "html"
+		HTML: "html"
+		ZZZ:  "ZZZ"
+		Html: "html"
+	})
 	"aaa":  "aaa"
 	"list": "list"
 	"zzz":  "zzz"
@@ -20,19 +34,6 @@ Retain: 0
 Unifications: 10
 Conjuncts:    10
 Disjuncts:    10
--- out/evalalpha --
-(struct){
-  ex: (struct){
-    aaa: (string){ "aaa" }
-    list: (string){ "list" }
-    zzz: (string){ "zzz" }
-    AAA: (string){ "AAA" }
-    html: (string){ "html" }
-    HTML: (string){ "html" }
-    ZZZ: (string){ "ZZZ" }
-    Html: (string){ "html" }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -1,10 +1,22 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+# Tests that a struct with an open pattern constraint unifies correctly with a
+# definition and an embed, producing the expected closed result. Issue: evalv3
+# incorrectly reported "field not allowed" for `y.f` when the struct was opened
+# via a pattern constraint `[string]: _` and then closed through unification
+# with a definition.
+# https://cuelang.org/issue/3813
 -- x.cue --
-x: {[string]: _}
+x: {[string]: _} @test(closed) @test(eq, {
+	f: _
+	[_]: _
+})
 x: #d
 #d: f: _
 
-y: { x }
+y: {
+	@test(eq, {f: true})
+	@test(closed)
+	x
+}
 y: f: true
 -- out/compile --
 --- x.cue
@@ -33,15 +45,3 @@ Retain: 1
 Unifications: 7
 Conjuncts:    17
 Disjuncts:    8
--- out/evalalpha --
-(struct){
-  x: (#struct){
-    f: (_){ _ }
-  }
-  #d: (#struct){
-    f: (_){ _ }
-  }
-  y: (#struct){
-    f: (bool){ true }
-  }
-}

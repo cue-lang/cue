@@ -53,6 +53,14 @@ func TestInlineRunner_Basic(t *testing.T) {
 			name:    "leq passes",
 			archive: "-- test.cue --\nx: 42 @test(leq, number)\n",
 		},
+		{
+			name:    "eq passes for builtin validator call",
+			archive: "-- test.cue --\nimport \"struct\"\nx: struct.MaxFields(2) & {} @test(eq, struct.MaxFields(2) & {})\n",
+		},
+		{
+			name:    "eq passes for selector (math.Pi)",
+			archive: "-- test.cue --\nimport \"math\"\nx: math.Pi @test(eq, math.Pi)\n",
+		},
 	}
 
 	for _, tt := range tests {
@@ -105,6 +113,62 @@ func TestInlineRunner_Permute(t *testing.T) {
 			runner.Run()
 		})
 	}
+}
+
+// TestInlineRunner_Todo verifies @test(todo) and @test(eq:todo) semantics.
+func TestInlineRunner_Todo(t *testing.T) {
+	// runExpectPass runs the archive and asserts it does NOT fail.
+	runExpectPass := func(t *testing.T, archiveStr string) {
+		t.Helper()
+		archive := txtar.Parse([]byte(archiveStr))
+		var failed bool
+		t.Run("inner", func(inner *testing.T) {
+			runner := cuetxtar.NewInlineRunner(inner, nil, archive, t.TempDir())
+			runner.Run()
+			failed = inner.Failed()
+		})
+		if failed {
+			t.Errorf("expected test to pass, but it failed")
+		}
+	}
+
+	t.Run("todo suppresses failing eq", func(t *testing.T) {
+		// @test(todo) wraps @test(eq): the eq would normally fail (42 != 99)
+		// but the failure is suppressed.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(eq, 99) @test(todo)\n")
+	})
+
+	t.Run("todo does not fail when eq passes", func(t *testing.T) {
+		// @test(todo) with a passing eq: the test passes (with a logged warning).
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(eq, 42) @test(todo)\n")
+	})
+
+	t.Run("todo with priority and why", func(t *testing.T) {
+		runExpectPass(t, `-- test.cue --
+x: 42 @test(eq, 99) @test(todo, p=1, why="known issue")
+`)
+	})
+
+	t.Run("todo suppresses failing err", func(t *testing.T) {
+		// @test(todo) wraps @test(err): x=42 is not an error, so @test(err) would fail.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(err) @test(todo)\n")
+	})
+
+	t.Run("eq:todo still failing does not fail test", func(t *testing.T) {
+		// @test(eq:todo, X) where value doesn't match X: no test failure.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(eq, 42) @test(eq:todo, 99)\n")
+	})
+
+	t.Run("eq:todo passing does not fail test", func(t *testing.T) {
+		// @test(eq:todo, X) where value matches X: logs a warning but no failure.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(eq, 42) @test(eq:todo, 42)\n")
+	})
+
+	t.Run("eq and eq:todo coexist independently", func(t *testing.T) {
+		// @test(eq, 42) passes; @test(eq:todo, 99) fails silently.
+		// Both run; test passes overall.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(eq, 42) @test(eq:todo, 99)\n")
+	})
 }
 
 // TestInlineRunner_SubPath verifies #subpath restricts execution.

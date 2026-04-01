@@ -1,13 +1,15 @@
-#name: reference
-#evalPartial
 -- in.cue --
-a: b
+a: b @test(eq, 2)
 b: 2
 d: {
 	d: 3
-	e: d
-}
+	e: d @test(eq, 3)
+} @test(eq, {d: 3, e: 3})
 e: {
+	@test(eq, {
+		e: {v: 1}
+		f: {v: 1}
+	})
 	e: {
 		v: 1
 	}
@@ -43,20 +45,3 @@ Retain: 1
 Unifications: 11
 Conjuncts:    13
 Disjuncts:    11
--- out/evalalpha --
-(struct){
-  a: (int){ 2 }
-  b: (int){ 2 }
-  d: (struct){
-    d: (int){ 3 }
-    e: (int){ 3 }
-  }
-  e: (struct){
-    e: (struct){
-      v: (int){ 1 }
-    }
-    f: (struct){
-      v: (int){ 1 }
-    }
-  }
-}

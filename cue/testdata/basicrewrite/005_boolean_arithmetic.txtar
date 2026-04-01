@@ -1,12 +1,10 @@
-#name: boolean arithmetic
-#evalPartial
 -- in.cue --
-a: true && true
-b: true || false
-c: false == true
-d: false != true
-e: true & true
-f: true & false
+a: true && true   @test(eq, true)
+b: true || false  @test(eq, true)
+c: false == true  @test(eq, false)
+d: false != true  @test(eq, true)
+e: true & true    @test(eq, true)
+f: true & false   @test(err, code=eval, pos=[0:4 0:11])
 -- out/compile --
 --- in.cue
 {
@@ -27,23 +25,3 @@ Retain: 0
 Unifications: 7
 Conjuncts:    9
 Disjuncts:    7
--- out/evalalpha --
-Errors:
-f: conflicting values false and true:
-    ./in.cue:6:4
-    ./in.cue:6:11
-
-Result:
-(_|_){
-  // [eval]
-  a: (bool){ true }
-  b: (bool){ true }
-  c: (bool){ false }
-  d: (bool){ true }
-  e: (bool){ true }
-  f: (_|_){
-    // [eval] f: conflicting values false and true:
-    //     ./in.cue:6:4
-    //     ./in.cue:6:11
-  }
-}

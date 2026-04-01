@@ -1,45 +1,27 @@
+# Tests that encoding built-in functions called with non-concrete arguments
+# correctly return an "incomplete" error rather than panicking. Issue: calling
+# csv.Decode or hex.EncodedLen with abstract (non-concrete) values caused a
+# nil pointer dereference panic instead of a proper incomplete error.
+# https://cuelang.org/issue/178
 #name: Issue #178
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 import "encoding/csv"
 
 import "encoding/hex"
 
-foo:  csv.Decode(data)
-data: bytes
+foo:  csv.Decode(data) @test(err, code=incomplete)
+data: bytes            @test(kind=bytes)
 
-len: int
-bar: hex.EncodedLen(len)
--- out/evalalpha/stats --
-Leaks:  0
-Freed:  5
-Reused: 0
-Allocs: 5
-Retain: 0
-
-Unifications: 5
-Conjuncts:    5
-Disjuncts:    0
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- Leaks:  0
- Freed:  5
--Reused: 2
--Allocs: 3
--Retain: 5
-+Reused: 0
-+Allocs: 5
-+Retain: 0
- 
- Unifications: 5
--Conjuncts:    13
--Disjuncts:    10
-+Conjuncts:    5
-+Disjuncts:    0
+len: int                 @test(kind=int)
+bar: hex.EncodedLen(len) @test(err, code=incomplete)
+-- out/errors.txt --
+[incomplete] foo: error in call to encoding/csv.Decode: non-concrete value bytes:
+    in.cue:5:7
+    in.cue:6:7
+[incomplete] bar: error in call to encoding/hex.EncodedLen: non-concrete value int:
+    in.cue:9:6
+    in.cue:8:6
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
@@ -50,21 +32,6 @@ Retain: 5
 Unifications: 5
 Conjuncts:    13
 Disjuncts:    10
--- out/evalalpha --
-(struct){
-  foo: (_|_){
-    // [incomplete] foo: error in call to encoding/csv.Decode: non-concrete value bytes:
-    //     ./in.cue:5:7
-    //     ./in.cue:6:7
-  }
-  data: (bytes){ bytes }
-  len: (int){ int }
-  bar: (_|_){
-    // [incomplete] bar: error in call to encoding/hex.EncodedLen: non-concrete value int:
-    //     ./in.cue:9:6
-    //     ./in.cue:8:6
-  }
-}
 -- out/compile --
 --- in.cue
 {

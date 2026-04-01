@@ -1,8 +1,13 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+# Tests that a closed struct with an interpolated dynamic field key correctly
+# unifies with a regular field of the same name. Issue: `cue vet -c` reported
+# "field not allowed in closed struct" when the key was written as `"\("f")":`
+# even though the resulting field name is identical to a subsequently declared
+# regular field.
+# https://cuelang.org/issue/295
 -- in.cue --
 p: close({
 	"\("f")": _
-})
+}) @test(eq, {f: 9}) @test(closed)
 p: f: 9
 -- out/compile --
 --- in.cue
@@ -24,9 +29,3 @@ Retain: 1
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
--- out/evalalpha --
-(struct){
-  p: (#struct){
-    f: (int){ 9 }
-  }
-}

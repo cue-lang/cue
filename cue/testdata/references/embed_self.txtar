@@ -1,7 +1,5 @@
-#todo:inline: easy — reference resolution; most fields have concrete values
 -- in.cue --
-Foo: {
-}
+Foo: {} @test(eq, {})
 
 Foo
 -- out/eval/stats --
@@ -14,11 +12,6 @@ Retain: 1
 Unifications: 2
 Conjuncts:    4
 Disjuncts:    3
--- out/evalalpha --
-(struct){
-  Foo: (struct){
-  }
-}
 -- out/compile --
 --- in.cue
 {

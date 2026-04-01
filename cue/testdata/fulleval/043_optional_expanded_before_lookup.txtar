@@ -1,6 +1,5 @@
 #name: optional expanded before lookup
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 test: [ID=_]: {
 	name: ID
@@ -11,7 +10,11 @@ test: A: {
 	field2: "2"
 }
 
-B: test.A & {}
+B: test.A & {} @test(eq, {
+	field1: "1"
+	field2: "2"
+	name: "A"
+})
 -- out/compile --
 --- in.cue
 {
@@ -38,18 +41,3 @@ Retain: 0
 Unifications: 10
 Conjuncts:    15
 Disjuncts:    10
--- out/evalalpha --
-(struct){
-  test: (struct){
-    A: (struct){
-      field1: (string){ "1" }
-      field2: (string){ "2" }
-      name: (string){ "A" }
-    }
-  }
-  B: (struct){
-    field1: (string){ "1" }
-    field2: (string){ "2" }
-    name: (string){ "A" }
-  }
-}

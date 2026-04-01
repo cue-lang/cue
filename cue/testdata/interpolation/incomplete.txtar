@@ -1,8 +1,7 @@
 Issue #553
-#todo:inline: easy — simple scalar/string values, straightforward @test(eq, ...) conversion
 -- in.cue --
-a: "foo"
-b: "boo"
+a: "foo" @test(eq, "foo")
+b: "boo" @test(eq, "boo")
 commands: {
 	#c: {
 		help: "help!"
@@ -14,7 +13,11 @@ out: """
 
     c is \(commands.#c.help)
     d is \(commands.#d.help)
-    """
+    """ @test(err, code=incomplete)
+-- out/errors.txt --
+[incomplete] out: invalid interpolation: undefined field: #d:
+    in.cue:8:6
+    in.cue:13:18
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
@@ -25,21 +28,6 @@ Retain: 0
 Unifications: 7
 Conjuncts:    11
 Disjuncts:    7
--- out/evalalpha --
-(struct){
-  a: (string){ "foo" }
-  b: (string){ "boo" }
-  commands: (struct){
-    #c: (#struct){
-      help: (string){ "help!" }
-    }
-  }
-  out: (_|_){
-    // [incomplete] out: invalid interpolation: undefined field: #d:
-    //     ./in.cue:8:6
-    //     ./in.cue:13:21
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -1,22 +1,25 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
-a: 1
-b: a + 1
+a: 1     @test(eq, 1)
+b: a + 1 @test(eq, 2)
 d: {
 	x: _
-	y: b + x
+	y: b + x @test(err, code=incomplete, pos=[0:5 -1:5], contains="non-concrete value")
 }
 e: d & {
 	x: 5
-}
+} @test(eq, {x: 5, y: 7})
 f: {
 	a: "foo-bar": 3
 	b: a."foo-bar"
-}
+} @test(eq, {a: {"foo-bar": 3}, b: 3})
 g: {
 	a: "foo-bar": c: 3
 	b: a."foo-bar".c
-}
+} @test(eq, {a: {"foo-bar": {c: 3}}, b: 3})
+-- out/errors.txt --
+[incomplete] d.y: non-concrete value _ in operand to +:
+    in.cue:5:5
+    in.cue:4:5
 -- out/eval/stats --
 Leaks:  0
 Freed:  18
@@ -27,37 +30,6 @@ Retain: 0
 Unifications: 18
 Conjuncts:    27
 Disjuncts:    18
--- out/evalalpha --
-(struct){
-  a: (int){ 1 }
-  b: (int){ 2 }
-  d: (struct){
-    x: (_){ _ }
-    y: (_|_){
-      // [incomplete] d.y: non-concrete value _ in operand to +:
-      //     ./in.cue:5:5
-      //     ./in.cue:4:5
-    }
-  }
-  e: (struct){
-    x: (int){ 5 }
-    y: (int){ 7 }
-  }
-  f: (struct){
-    a: (struct){
-      "foo-bar": (int){ 3 }
-    }
-    b: (int){ 3 }
-  }
-  g: (struct){
-    a: (struct){
-      "foo-bar": (struct){
-        c: (int){ 3 }
-      }
-    }
-    b: (int){ 3 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

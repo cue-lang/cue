@@ -61,17 +61,27 @@ var (
 //
 // In some cases, tests might refuse to perform some updates by default.
 // The special value "force" can be used to force updates in that situation.
-var UpdateGoldenFiles = os.Getenv(envUpdate) != ""
+//
+// The special value "diff" does not update files but shows a diff of the
+// changes that would be applied; see [DiffGoldenFiles].
+var UpdateGoldenFiles = os.Getenv(envUpdate) != "" && os.Getenv(envUpdate) != "diff"
 
 // ForceUpdateGoldenFiles determines whether tests should update
 // expected output in test files even when they would not be updated
 // usually (for example when there are test regressions).
 var ForceUpdateGoldenFiles = os.Getenv(envUpdate) == "force"
 
+// DiffGoldenFiles determines whether tests should display a diff of changes
+// that would be applied by CUE_UPDATE=1, without actually writing any files.
+// It is controlled by setting CUE_UPDATE=diff.
+// Documentary sections (e.g. out/errors.txt) are also checked in this mode.
+var DiffGoldenFiles = os.Getenv(envUpdate) == "diff"
+
 // FormatTxtar ensures that .cue files in txtar test archives are well
 // formatted, updating the archive as required prior to running a test.
 // It is controlled by setting CUE_FORMAT_TXTAR to a non-empty string like "true".
 var FormatTxtar = os.Getenv(envFormatTxtar) != ""
+
 
 // Condition adds support for CUE-specific testscript conditions within
 // testscript scripts. Supported conditions include:

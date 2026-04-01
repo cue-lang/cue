@@ -30,6 +30,7 @@
 package cuetxtar
 
 import (
+	"bytes"
 	"fmt"
 	"io/fs"
 	"maps"
@@ -40,6 +41,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
@@ -824,6 +826,73 @@ func (r *inlineRunner) runArchive() {
 	// AST-based write-backs re-parse the updated bytes.
 	r.applyPosWritebacks()
 	r.applyInlineFillWritebacks()
+
+	// Update the optional out/errors.txt documentary section.
+	r.handleErrorsTxtSection(val)
+}
+
+// handleErrorsTxtSection manages the out/errors.txt documentary section.
+// The section is only processed if it already exists in the archive:
+//   - CUE_UPDATE=1:    updates the section with current error output
+//   - CUE_UPDATE=diff: fails if the section is stale, showing a diff
+//   - otherwise:       silently skips any difference
+func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
+	const sectionName = "out/errors.txt"
+
+	// Find the section in the archive.
+	sectionIdx := -1
+	for i, f := range r.archive.Files {
+		if f.Name == sectionName {
+			sectionIdx = i
+			break
+		}
+	}
+	// Never auto-create the section.
+	if sectionIdx < 0 {
+		return
+	}
+
+	// Collect all errors (including incomplete) from the evaluated value.
+	// Do not pass Cwd: cueerrors.Print prepends "./" to relative paths for
+	// IDE compatibility, which we don't want in the golden section. Strip the
+	// directory prefix manually instead, consistent with how the rest of the
+	// inline runner normalizes paths.
+	var buf strings.Builder
+	core := val.Core()
+	if core.V != nil {
+		PrintErrors(&buf, core.V, &cueerrors.Config{
+			Cwd:     r.dir,
+			ToSlash: true,
+		})
+	}
+	result := buf.String()
+	if result != "" && result[len(result)-1] != '\n' {
+		result += "\n"
+	}
+	resultBytes := []byte(result)
+
+	existing := r.archive.Files[sectionIdx].Data
+	if bytes.Equal(existing, resultBytes) {
+		return
+	}
+
+	if cuetest.UpdateGoldenFiles {
+		r.archive.Files[sectionIdx].Data = resultBytes
+		if r.filePath != "" {
+			out := txtar.Format(r.archive)
+			if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
+				r.t.Errorf("inline: errors.txt write-back to %s: %v", r.filePath, err)
+			}
+		}
+		return
+	}
+
+	if cuetest.DiffGoldenFiles {
+		r.t.Errorf("result for %s differs: (-want +got)\n%s",
+			sectionName,
+			cmp.Diff(string(existing), result),
+		)
+	}
 }
 
 // subTestName returns the sub-test name for a root.

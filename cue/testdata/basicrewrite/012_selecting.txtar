@@ -1,13 +1,23 @@
-#name: selecting
-#evalPartial
 -- in.cue --
-obj: {a: 1, b: 2}
-index:  {a: 1, b:     2}["b"]
-mulidx: {a: 1, b: {a: 1, b: 3}}["b"]["b"]
-e:      {a: 1}[4]
-f:      {a: 1}.b
-g:      {a: 1}["b"]
-h:      [3].b
+obj:    {a: 1, b: 2}              @test(eq, {a: 1, b: 2})
+index:  {a: 1, b:     2}["b"]     @test(eq, 2)
+mulidx: {a: 1, b: {a: 1, b: 3}}["b"]["b"] @test(eq, 3)
+e:      {a: 1}[4]                 @test(err, code=eval, pos=[0:11])
+f:      {a: 1}.b                  @test(err, code=incomplete, pos=[0:11])
+g:      {a: 1}["b"]               @test(err, code=incomplete, pos=[0:11])
+h:      [3].b                     @test(err, code=eval, pos=[0:8])
+-- out/errors.txt --
+[eval] e: index out of range [4] with length 0:
+    in.cue:4:11
+[incomplete] f: undefined field: b:
+    in.cue:5:11
+[incomplete] g: undefined field: b:
+    in.cue:6:11
+[eval] h: undefined field: b:
+    in.cue:7:8
+-- todo.txt --
+Some error messages could use improvement. Address after query
+extension is implemented.
 -- out/compile --
 --- in.cue
 {
@@ -49,104 +59,3 @@ Retain: 9
 Unifications: 19
 Conjuncts:    19
 Disjuncts:    17
--- out/eval --
-Errors:
-e: invalid struct selector 4 (type int):
-    ./in.cue:4:16
-h: invalid list index b (type string):
-    ./in.cue:7:13
-
-Result:
-(_|_){
-  // [eval]
-  obj: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  index: (int){ 2 }
-  mulidx: (int){ 3 }
-  e: (_|_){
-    // [eval] e: invalid struct selector 4 (type int):
-    //     ./in.cue:4:16
-  }
-  f: (_|_){
-    // [incomplete] f: undefined field: b:
-    //     ./in.cue:5:16
-  }
-  g: (_|_){
-    // [incomplete] g: undefined field: b:
-    //     ./in.cue:6:16
-  }
-  h: (_|_){
-    // [eval] h: invalid list index b (type string):
-    //     ./in.cue:7:13
-  }
-}
--- out/evalalpha --
-Errors:
-e: index out of range [4] with length 0:
-    ./in.cue:4:16
-h: undefined field: b:
-    ./in.cue:7:13
-
-Result:
-(_|_){
-  // [eval]
-  obj: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  index: (int){ 2 }
-  mulidx: (int){ 3 }
-  e: (_|_){
-    // [eval] e: index out of range [4] with length 0:
-    //     ./in.cue:4:16
-  }
-  f: (_|_){
-    // [incomplete] f: undefined field: b:
-    //     ./in.cue:5:16
-  }
-  g: (_|_){
-    // [incomplete] g: undefined field: b:
-    //     ./in.cue:6:16
-  }
-  h: (_|_){
-    // [eval] h: undefined field: b:
-    //     ./in.cue:7:13
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,7 +1,7 @@
- Errors:
--e: invalid struct selector 4 (type int):
-+e: index out of range [4] with length 0:
-     ./in.cue:4:16
--h: invalid list index b (type string):
-+h: undefined field: b:
-     ./in.cue:7:13
- 
- Result:
-@@ -14,7 +14,7 @@
-   index: (int){ 2 }
-   mulidx: (int){ 3 }
-   e: (_|_){
--    // [eval] e: invalid struct selector 4 (type int):
-+    // [eval] e: index out of range [4] with length 0:
-     //     ./in.cue:4:16
-   }
-   f: (_|_){
-@@ -26,7 +26,7 @@
-     //     ./in.cue:6:16
-   }
-   h: (_|_){
--    // [eval] h: invalid list index b (type string):
-+    // [eval] h: undefined field: b:
-     //     ./in.cue:7:13
-   }
- }
--- diff/explanation --
-Better error message for undefined field in new.
-Other error got worse, but this is covered elsewhere.

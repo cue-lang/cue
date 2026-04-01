@@ -104,7 +104,7 @@ func (v *externalValidation) Result(resultMsg *extproto.EvalResultMsg) {
 			f.ensureUser(v, errs...)
 		}
 
-		w.publishDiagnostics()
+		w.publishDiagnostics(false)
 	})
 }
 

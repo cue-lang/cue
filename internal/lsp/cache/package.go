@@ -239,7 +239,9 @@ func (pkg *Package) delete() {
 
 	w := m.workspace
 	for fileUri := range pkg.files {
-		w.standalone.reloadFile(fileUri)
+		sfile := w.standalone.ensureFile(fileUri)
+		sfile.markFileDirty(fileUri)
+		sfile.reload()
 		w.GetFile(fileUri).removeUser(pkg)
 	}
 

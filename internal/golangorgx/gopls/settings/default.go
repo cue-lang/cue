@@ -58,7 +58,7 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 							Inline: true,
 							Nil:    true,
 						},
-						DiagnosticsDelay:          1 * time.Second,
+						DiagnosticsDelay:          601 * time.Millisecond,
 						DiagnosticsTrigger:        DiagnosticsOnEdit,
 						AnalysisProgressReporting: true,
 					},

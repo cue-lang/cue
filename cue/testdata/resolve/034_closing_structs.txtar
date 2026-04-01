@@ -1,5 +1,6 @@
 #name: closing structs
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 op: {x: int} // {x: int}
 ot: {x: int, ...} // {x: int, ...}

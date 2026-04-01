@@ -1,6 +1,6 @@
 // Issue 4055: crash variant
 // Issue 4056
-
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- issue4056.cue --
 import "strings"
 

@@ -1,3 +1,4 @@
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 structShorthand: X={b: 3, c: X.b}
 

@@ -1,5 +1,6 @@
 #name: range unification
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 // with concrete values
 a1: >=1 & <=5 & 3

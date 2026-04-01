@@ -1,5 +1,6 @@
 #name: Issue #178
 #evalFull
+#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 import "encoding/csv"
 

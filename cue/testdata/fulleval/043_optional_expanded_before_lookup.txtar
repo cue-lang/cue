@@ -1,5 +1,6 @@
 #name: optional expanded before lookup
 #evalFull
+#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 test: [ID=_]: {
 	name: ID

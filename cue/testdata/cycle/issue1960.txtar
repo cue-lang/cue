@@ -1,4 +1,5 @@
 // Issue-specific tests. Essence tested in evaluate.txtar (LetCycle*).
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- issue1960.cue --
 t1: {
 	z: blah: s: [for z in z {}]

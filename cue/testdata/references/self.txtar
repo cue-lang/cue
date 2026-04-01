@@ -1,5 +1,5 @@
 Test various self reference cases.
-
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 @experiment(aliasv2)
 

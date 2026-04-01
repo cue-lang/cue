@@ -1,5 +1,5 @@
 // These tests are related to issue 2351.
-
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 
 conjunct: t1: {

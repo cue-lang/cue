@@ -1,5 +1,6 @@
 // Issue #3527
 // This code caused a panic before.
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 package p
 

@@ -1,5 +1,6 @@
 #name: references from template to concrete
 #evalFull
+#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 res: [t]
 t: [X=string]: {

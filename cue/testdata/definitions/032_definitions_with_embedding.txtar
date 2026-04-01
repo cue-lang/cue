@@ -1,5 +1,6 @@
 #name: definitions with embedding
 #evalPartial
+#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #E: {
 	a: {b: int}

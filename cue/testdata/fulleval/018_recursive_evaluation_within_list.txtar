@@ -1,5 +1,6 @@
 #name: recursive evaluation within list
 #evalFull
+#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 l: [a]
 a: b & {c: "t"}

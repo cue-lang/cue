@@ -2,7 +2,7 @@
 # of evalv2, where inline structs cause some closedness errors
 # to be ignored. evalv3 mimics this behavior for the sake of
 # backwards compatibility and not breaking existing users.
-
+#todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"

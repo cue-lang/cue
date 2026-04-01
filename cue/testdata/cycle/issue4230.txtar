@@ -3,6 +3,7 @@
 // Calls with only literal arguments like `or(["west", "east"])` were
 // incorrectly deferred when evaluated from within a cyclic context,
 // resulting in empty results.
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #transform: {
 	_input: {...}

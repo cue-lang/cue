@@ -34,6 +34,24 @@
       "parentUuid": "affdc239_94e80f90",
       "revId": "d594b4f63ed6a52aa59e9a54b9863b3b7f728ccf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f31b4ed3_d668eea1",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-01T16:38:06Z",
+      "side": 1,
+      "message": "\u003e The string is closed by a matching triple quote, which must be by itself on a new line, preceded by optional whitespace.\n\nIt was this line that I was missing, along with the fact the EBNF doesn\u0027t seem to mention whitespace.",
+      "parentUuid": "0c69e965_d35486f8",
+      "revId": "d594b4f63ed6a52aa59e9a54b9863b3b7f728ccf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

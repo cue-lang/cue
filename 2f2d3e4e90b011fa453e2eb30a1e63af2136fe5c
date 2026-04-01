@@ -16,6 +16,23 @@
       "message": "Note that although I did some tidying and hand-holding, this logic error was found, and the test and fix created, entirely by claude.",
       "revId": "2f2d3e4e90b011fa453e2eb30a1e63af2136fe5c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22f4c24e_556b83fe",
+        "filename": "encoding/protobuf/jsonpb/testdata/decoder/bytes_nonstring.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-01T11:04:33Z",
+      "side": 1,
+      "message": "Because this triggers a panic on master, I couldn\u0027t add this test-case in a separate CL first.",
+      "revId": "2f2d3e4e90b011fa453e2eb30a1e63af2136fe5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

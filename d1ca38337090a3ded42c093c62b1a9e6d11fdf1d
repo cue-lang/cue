@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90b2a933_c885f4ac",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Updated to \"inside a struct body at any nesting depth (provided the struct is on a concrete path)\".",
+      "parentUuid": "dced7605_566c5cc1",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e26a8458_7b0662b3",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-01T11:43:30Z",
       "side": 1,
       "message": "Note, this is a guideline, not a requirement.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "162f8b38_530b07e0",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Reworded to \"Pattern constraints (`[T]: V`) are compared as a guideline where possible; the runner checks for existence and value match on a best-effort basis.\"",
+      "parentUuid": "e26a8458_7b0662b3",
       "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a647845b_0317865d",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Changed to \"Non-test attributes — both field attributes (e.g. `@json(...)`, `@protobuf(...)`) and decl attributes — inside the expected struct ARE compared\".",
+      "parentUuid": "d85e00fe_669bd72d",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da9673ad_24d88a32",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-01T11:43:30Z",
       "side": 1,
       "message": "Also, if the evaluated data has an attribute that is not reported in the test result, that is an error too.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "023e6298_25ed45a7",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Updated the paragraph and added an \"Extra attribute in evaluated value fails\" scenario to cover this case.",
+      "parentUuid": "da9673ad_24d88a32",
       "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce6c2e61_c68b7575",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Removed the `ignore` directive section from the spec entirely.",
+      "parentUuid": "cf216076_711192f8",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61c20eb3_772cd88b",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-04-01T11:43:30Z",
       "side": 1,
       "message": "Suggestion, also add a todo directive  that is like skip, but acts as a signal that it should be fixed soon, whereas skip may be permanently skipped. This could also have a priority field, were p\u003dN, where 0 is critical, and 2 good to have soon, etc.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c501ba2_0f9eee10",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Added a `todo` directive section: like `skip` but signals the test should be fixed soon, with an optional `p\u003dN` priority (0\u003dcritical, 1\u003dimportant, 2\u003dgood to have).",
+      "parentUuid": "61c20eb3_772cd88b",
       "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6358e2e0_a18f4d45",
+        "filename": "doc/specs/inline-test-attributes/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Added explicit clarification: \"`@test(skip)` skips only the field or struct in which it is defined, not the entire file.\" with a corresponding scenario.",
+      "parentUuid": "abf48adf_5486ef13",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba94f768_67724fad",
@@ -137,6 +263,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2639a5b1_ee213839",
+        "filename": "doc/specs/inline-test-runner/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Deleted the file.",
+      "parentUuid": "ba94f768_67724fad",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8001929_b1a50cb8",
@@ -150,6 +294,24 @@
       "writtenOn": "2026-04-01T11:43:30Z",
       "side": 1,
       "message": "Not sure we want a tool. Use it as guidelines, though.",
+      "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bb445e8_f5e3ab52",
+        "filename": "doc/specs/test-migration-tool/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T11:52:41Z",
+      "side": 1,
+      "message": "Done. Rewrote as \"Test Migration Guidelines\" — dropped the tool framing and all formal requirements, keeping only the practical guidance as prose guidelines.",
+      "parentUuid": "e8001929_b1a50cb8",
       "revId": "d1ca38337090a3ded42c093c62b1a9e6d11fdf1d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

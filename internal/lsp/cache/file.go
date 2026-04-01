@@ -74,10 +74,12 @@ func (w *Workspace) DocumentSymbols(fileUri protocol.DocumentURI) []protocol.Doc
 
 // publishDiagnostics sends to the client / editor all new diagnostic
 // messages.
-func (w *Workspace) publishDiagnostics() {
+func (w *Workspace) publishDiagnostics(clearOnly bool) bool {
+	errorsFound := false
 	for _, f := range w.files {
-		f.publishErrors()
+		errorsFound = f.publishErrors(clearOnly) || errorsFound
 	}
+	return errorsFound
 }
 
 // File models a single CUE file. This file might be loaded by one or
@@ -312,11 +314,17 @@ func (f *File) tokenRangeOffsets(offset int) (start, end int) {
 // publishErrors sends PublishDiagnostics notifications to the client
 // if this File is open and has changed its errors since last
 // publication.
-func (f *File) publishErrors() {
+//
+// If clearOnly is true, diagnostics will only be sent if there are no
+// errors - i.e. we're clearing old errors only and have no new errors
+// to send. If clearOnly is true and the file does contain errors then
+// true is returned, to indicate errors were found. In all other
+// cases, false is returned.
+func (f *File) publishErrors(clearOnly bool) bool {
 	if !f.isOpen || !f.dirtyErrors || f.tokFile == nil || f.mapper == nil {
-		return
+		return false
 	}
-	f.dirtyErrors = false
+
 	// must not be nil!
 	diags := []protocol.Diagnostic{}
 	for _, errs := range f.errors {
@@ -324,7 +332,12 @@ func (f *File) publishErrors() {
 			diags = f.errorToDiagnostics(err, diags)
 		}
 	}
+	if len(diags) > 0 && clearOnly {
+		// we have real errors to send, and we're not allowed to send them
+		return true
+	}
 
+	f.dirtyErrors = false
 	params := &protocol.PublishDiagnosticsParams{
 		URI:         f.uri,
 		Version:     f.tokFile.Revision(),
@@ -334,6 +347,7 @@ func (f *File) publishErrors() {
 	w.enqueue(func() {
 		w.client.PublishDiagnostics(context.Background(), params)
 	})
+	return false
 }
 
 // errorToDiagnostics converts cue errors to [protocol.Diagnostic]

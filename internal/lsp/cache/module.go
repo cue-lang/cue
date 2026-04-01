@@ -168,7 +168,9 @@ func (m *Module) delete() {
 	}
 	w := m.workspace
 	delete(w.modules, m.rootURI)
-	w.standalone.reloadFile(m.modFileURI)
+	sfile := w.standalone.ensureFile(m.modFileURI)
+	sfile.markFileDirty(m.modFileURI)
+	sfile.reload()
 	w.debugLogf("%v Deleted", m)
 	w.invalidateActiveFilesAndDirs()
 }

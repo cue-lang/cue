@@ -45,25 +45,24 @@ func NewStandalone(workspace *Workspace) *Standalone {
 	}
 }
 
-// reloadFile ensures that a standalone file exists for uri and
-// reloads it.
-//
-// If the file cannot be loaded then it is deleted.
-func (s *Standalone) reloadFile(uri protocol.DocumentURI) error {
+// ensureFile ensures that a standalone file exists for uri.
+func (s *Standalone) ensureFile(uri protocol.DocumentURI) *standaloneFile {
 	sfile, found := s.files[uri]
-	if !found {
-		sfile = &standaloneFile{
-			standalone: s,
-			uri:        uri,
-			file:       s.workspace.ensureFile(uri),
-		}
-		sfile.file.ensureUser(sfile)
-		s.files[uri] = sfile
-		s.workspace.invalidateActiveFilesAndDirs()
-		s.workspace.debugLogf("%v Created", sfile)
+	if found {
+		return sfile
 	}
-	sfile.isDirty = true
-	return sfile.reload()
+
+	sfile = &standaloneFile{
+		standalone: s,
+		uri:        uri,
+		file:       s.workspace.ensureFile(uri),
+		isDirty:    true,
+	}
+	sfile.file.ensureUser(sfile)
+	s.files[uri] = sfile
+	s.workspace.invalidateActiveFilesAndDirs()
+	s.workspace.debugLogf("%v Created", sfile)
+	return sfile
 }
 
 func (s *Standalone) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{}) {

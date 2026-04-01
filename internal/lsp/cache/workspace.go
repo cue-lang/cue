@@ -69,6 +69,15 @@ type Workspace struct {
 
 	standalone *Standalone
 
+	// diagnosticsCounter is incremented by
+	// [Workspace.reloadPackages]. It is used to ensure we only send
+	// diagnostics to the client after a period of inactivity.
+	diagnosticsCounter int
+
+	// diagnosticsDelay is the amount of time to wait after a file
+	// modification before publishing diagnostics.
+	diagnosticsDelay time.Duration
+
 	// enqueue allows for a function to be added to the incoming queue
 	// of messages from the client. The enqueue function itself is
 	// non-blocking.
@@ -76,21 +85,22 @@ type Workspace struct {
 	extValidatorMgr *extvalidator.Manager
 }
 
-func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string), enqueue func(func())) *Workspace {
+func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string), enqueue func(func()), diagnosticsDelay time.Duration) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
 	w := &Workspace{
 		registry: &registryWrapper{
 			Registry:  cache.registry,
 			overlayFS: overlayFS,
 		},
-		client:    client,
-		fs:        cache.fs,
-		overlayFS: overlayFS,
-		debugLog:  debugLog,
-		modules:   make(map[protocol.DocumentURI]*Module),
-		mappers:   make(map[*token.File]*protocol.Mapper),
-		files:     make(map[protocol.DocumentURI]*File),
-		enqueue:   enqueue,
+		client:           client,
+		fs:               cache.fs,
+		overlayFS:        overlayFS,
+		debugLog:         debugLog,
+		modules:          make(map[protocol.DocumentURI]*Module),
+		mappers:          make(map[*token.File]*protocol.Mapper),
+		files:            make(map[protocol.DocumentURI]*File),
+		enqueue:          enqueue,
+		diagnosticsDelay: diagnosticsDelay,
 	}
 	w.standalone = NewStandalone(w)
 	if extProfile := cache.extProfile; extProfile != nil {
@@ -413,7 +423,7 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		m, err := w.FindModuleForFile(fileUri)
 		if err == errModuleNotFound {
 			w.debugLogf("No module found for %v; treating as standalone", fileUri)
-			_ = w.standalone.reloadFile(fileUri)
+			_ = w.standalone.ensureFile(fileUri)
 			continue
 		}
 		if err != nil {
@@ -427,7 +437,7 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		if err != nil {
 			if err == ErrBadModule {
 				w.debugLogf("Module for %v is bad; treating as standalone", fileUri)
-				_ = w.standalone.reloadFile(fileUri)
+				_ = w.standalone.ensureFile(fileUri)
 				continue
 			}
 			if _, ok := err.(cueerrors.Error); ok {
@@ -443,7 +453,7 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 			// must be sure to mark the pkg dirty.
 			m.EnsurePackage(*ip, dirUris).markFileDirty(fileUri)
 		} else {
-			w.standalone.reloadFile(fileUri)
+			w.standalone.ensureFile(fileUri)
 		}
 	}
 
@@ -452,7 +462,26 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		return err
 	}
 	w.reloadPackages()
-	w.publishDiagnostics()
+
+	// Update the client with diagnostics that clear old errors
+	// immediately. But if there are errors to send, don't send them
+	// until after a period of quiet has occurred. This debounces rapid
+	// edits so that diagnostics are not published while the user is
+	// actively typing.
+	if errorsFound := w.publishDiagnostics(true); errorsFound {
+		w.diagnosticsCounter++
+		reloadCounter := w.diagnosticsCounter
+		go func() {
+			time.Sleep(w.diagnosticsDelay)
+			w.enqueue(func() {
+				if reloadCounter != w.diagnosticsCounter {
+					return
+				}
+				w.publishDiagnostics(false)
+			})
+		}()
+	}
+
 	return nil
 }
 
@@ -921,7 +950,7 @@ func (w *Workspace) reloadPackages() {
 				}
 				if ip == nil || len(dirUris) == 0 {
 					// Probably the file had no package declaration.
-					w.standalone.reloadFile(fileUri)
+					w.standalone.ensureFile(fileUri)
 					continue
 				}
 				key := importPathModRootPair{

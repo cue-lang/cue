@@ -34,6 +34,24 @@
       "parentUuid": "0557739b_c94bf2bb",
       "revId": "a2f027bd80fa2717e889f1db8e7bd224735dba38",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3908d78e_41bb66f0",
+        "filename": "cue/fuzz_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-01T16:01:17Z",
+      "side": 1,
+      "message": "\u003e also definitely worth adding some with package and import lines I feel.\n\njust like you have!",
+      "parentUuid": "040414e2_2e05503b",
+      "revId": "a2f027bd80fa2717e889f1db8e7bd224735dba38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -8,6 +8,7 @@ do: {
 }
 
 for k, v in do {do: (k): v}
+@test(eq, {do: hello: {}})
 -- out/compile --
 --- in.cue
 {
@@ -32,10 +33,3 @@ Conjuncts:    5
 Disjuncts:    3
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  do: (struct){
-    hello: (struct){
-    }
-  }
-}

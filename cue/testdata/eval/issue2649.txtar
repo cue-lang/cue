@@ -1,4 +1,4 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+#todo:inline: skip — bare top-level expression, not a named field; cannot attach @test
 -- in.cue --
 (4 + 8 + 12) / 3
 -- out/compile --

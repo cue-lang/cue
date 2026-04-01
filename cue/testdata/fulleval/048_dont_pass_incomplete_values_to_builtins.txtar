@@ -1,11 +1,10 @@
 #name: dont pass incomplete values to builtins
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 import "encoding/json"
 
-input: string
-foo:   json.Marshal(input)
+input: string @test(kind=string)
+foo:   json.Marshal(input) @test(err)
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  3

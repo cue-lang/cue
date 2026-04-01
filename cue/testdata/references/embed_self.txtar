@@ -1,7 +1,5 @@
-#todo:inline: easy — reference resolution; most fields have concrete values
 -- in.cue --
-Foo: {
-}
+Foo: {} @test(eq, {})
 
 Foo
 -- out/eval/stats --

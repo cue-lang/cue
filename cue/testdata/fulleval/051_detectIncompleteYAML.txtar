@@ -1,6 +1,5 @@
 #name: detectIncompleteYAML
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 package foobar
 
@@ -12,8 +11,8 @@ import yaml "encoding/yaml"
 		#foo: {
 			use: _vars.something
 		}
-		baz:    yaml.Marshal(_vars.something)
-		foobar: yaml.Marshal(#foo)
+		baz:    yaml.Marshal(_vars.something) @test(err)
+		foobar: yaml.Marshal(#foo)            @test(err)
 	}
 }
 Val: #Spec & {

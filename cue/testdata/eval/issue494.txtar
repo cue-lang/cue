@@ -1,4 +1,4 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+#todo:inline: medium — slice/len on template patterns; complex to annotate concisely
 -- in.cue --
 _Q: [{pos: 0}, {pos: 1}]
 

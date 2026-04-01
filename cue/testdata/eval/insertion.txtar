@@ -1,6 +1,6 @@
 # Tests various patterns of insertion of conjuncts.
 # See https://cuelang.org/issues/2169
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+#todo:inline: medium — multi-file, complex embedding patterns with definition insertions
 -- a.cue --
 embeddingDirect: t1: {
 	#a: _

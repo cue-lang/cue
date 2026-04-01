@@ -1,6 +1,15 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 ex: {
+	@test(eq, {
+		aaa:  "aaa"
+		list: "list"
+		zzz:  "zzz"
+		AAA:  "AAA"
+		html: "html"
+		HTML: "html"
+		ZZZ:  "ZZZ"
+		Html: "html"
+	})
 	"aaa":  "aaa"
 	"list": "list"
 	"zzz":  "zzz"

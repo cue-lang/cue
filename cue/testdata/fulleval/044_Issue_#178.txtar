@@ -1,16 +1,15 @@
 #name: Issue #178
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 import "encoding/csv"
 
 import "encoding/hex"
 
-foo:  csv.Decode(data)
-data: bytes
+foo:  csv.Decode(data) @test(err)
+data: bytes @test(kind=bytes)
 
-len: int
-bar: hex.EncodedLen(len)
+len: int @test(kind=int)
+bar: hex.EncodedLen(len) @test(err)
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  5

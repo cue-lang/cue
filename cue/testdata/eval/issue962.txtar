@@ -1,13 +1,12 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 import "encoding/yaml"
 
-foo: bar: "something"
+foo: bar: "something" @test(eq, "something")
 
-text:  yaml.Marshal(_obj)
+text:  yaml.Marshal(_obj) @test(err)
 
 _what: string
-_obj:  foo[_what]
+_obj:  foo[_what] @test(err)
 -- out/evalalpha --
 (struct){
   foo: (struct){

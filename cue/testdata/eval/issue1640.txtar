@@ -1,4 +1,4 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+#todo:inline: skip — multi-file package; fixture files with cross-file refs contaminate combined value
 -- a1.cue --
 package bug
 

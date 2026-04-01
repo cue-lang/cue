@@ -1,17 +1,16 @@
 #name: recursive evaluation within list
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
-l: [a]
-a: b & {c: "t"}
+l: [a]   @test(eq, [{c: "t", d: "t"}])
+a: b & {c: "t"} @test(eq, {c: "t", d: "t"})
 b: {
 	d: c
 	c: string
 }
-l1: [a1]
-a1: b1 & {c: "t"}
+l1: [a1] @test(eq, [{c: "t", d: "st"}])
+a1: b1 & {c: "t"} @test(eq, {c: "t", d: "st"})
 b1: {
-	d: "s" + c
+	d: "s" + c @test(err)
 	c: string
 }
 -- out/compile --

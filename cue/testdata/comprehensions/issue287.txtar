@@ -1,9 +1,9 @@
 -- in.cue --
  if #E["x"] != _|_ {
-	#E: y: true
+	#E: {y: true} @test(eq, {y: true, x: true})
 }
 if #E["y"] != _|_ {
-	z: true
+	z: true @test(eq, true)
 }
 #E: [_]: bool
 #E: x:   true
@@ -21,14 +21,6 @@ Disjuncts:    5
 MisalignedConjunct: 1
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  #E: (#struct){
-    y: (bool){ true }
-    x: (bool){ true }
-  }
-  z: (bool){ true }
-}
 -- out/compile --
 --- in.cue
 {

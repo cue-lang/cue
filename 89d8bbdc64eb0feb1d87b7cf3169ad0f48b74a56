@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac61f5fe_6d2a6ad5",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1145,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T09:38:09Z",
+      "side": 1,
+      "message": "In theory we could just have two paths for strings and bytes, of course, and avoid this issue. But this is fine.",
+      "revId": "89d8bbdc64eb0feb1d87b7cf3169ad0f48b74a56",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

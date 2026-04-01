@@ -1,0 +1,6 @@
+-- schema.cue --
+b: [string]: bytes
+-- int.cue --
+b: field: 42
+-- out/jsonpb/int.cue --
+b: field: 42

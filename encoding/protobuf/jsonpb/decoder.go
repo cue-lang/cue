@@ -209,7 +209,7 @@ func (r *rewriter) rewrite(schema cue.Value, expr ast.Expr) (x ast.Expr) {
 
 	case cue.BytesKind:
 		x, q, str := stringValue(expr)
-		if x == nil && q.IsDouble() {
+		if x == nil {
 			break
 		}
 

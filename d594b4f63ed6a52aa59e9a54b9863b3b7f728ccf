@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "affdc239_94e80f90",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-01T16:07:56Z",
+      "side": 1,
+      "message": "I don\u0027t follow this - this seems to allow for the close to occur after spaces or tabs.",
+      "revId": "d594b4f63ed6a52aa59e9a54b9863b3b7f728ccf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

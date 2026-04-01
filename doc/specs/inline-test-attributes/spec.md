@@ -18,7 +18,7 @@ CUE evaluator test files SHALL support `@test(...)` attributes on fields and ins
 ### Requirement: Field attribute
 When `@test(...)` appears as a *field attribute* (`field: value @test(...)`), the field value is the thing under test and the directive is an assertion applied directly to it. The test case name is the field name.
 
-A txtar file is in inline-assertion mode when any of its CUE files contains at least one `@test(...)` attribute — as a field attribute, a decl attribute inside a struct, or a file-level decl attribute. All other txtar files use the existing golden-file mechanism.
+A txtar file is in inline-assertion mode when any of its CUE files contains at least one `@test(...)` attribute — as a field attribute, a decl attribute inside a struct at any nesting depth, or a file-scope decl attribute. All other txtar files use the existing golden-file mechanism.
 
 #### Scenario: Field attribute triggers inline mode
 - **WHEN** a txtar `.cue` file contains `result: 42 @test(eq, 42)` at the top level
@@ -30,17 +30,30 @@ A txtar file is in inline-assertion mode when any of its CUE files contains at l
 
 ---
 
-### Requirement: File-level decl attribute
-A `@test(...)` decl attribute appearing at the top level of a `.cue` file (not inside a struct field) SHALL check the **entire file's** evaluated value against `VALUE`. Field-level `@test` attributes MAY still coexist with a file-level `@test`; both SHALL be checked independently.
+### Requirement: Decl attribute
+A `@test(...)` attribute may appear as a *decl attribute* — a bare attribute declaration inside a struct body or at the top level of a `.cue` file (not as a field attribute). The value it is associated with depends on where it appears:
 
-This form is particularly useful when pattern constraints (e.g. `{[X=string]: baz: X}`) contribute to the output.
+- **Inside a struct body** (`field: { @test(...) ... }`): the attribute is associated with the containing field's value. This form is used by directives like `permute` (marks all sibling fields for permutation), `ignore` (suppresses the containing field as a test root), and `eq`/`err` (asserts the containing field's value).
+- **At file scope** (top-level `@test(...)` in a `.cue` file, outside any struct): the attribute is associated with the **entire file's** evaluated value. This is useful when pattern constraints (e.g. `{[X=string]: baz: X}`) contribute to the output and there is no single field to annotate.
+
+Field-level `@test` attributes MAY coexist with decl attributes; all are checked independently.
 
 ```cue
-// File-level @test checks the whole file
+// Struct-level decl: checks the value of "result"
+result: {
+    @test(eq, {a: 1})
+    a: 1
+}
+
+// File-level decl: checks the entire file value
 {[X=string]: baz: X}
 bar: {}
 @test(eq, {bar: baz: "bar"})
 ```
+
+#### Scenario: Struct-level decl @test(eq) checks containing field value
+- **WHEN** a field `result` has `@test(eq, {a: 1})` as a decl attribute inside its struct body
+- **THEN** the runner compares the value of `result` against `{a: 1}`
 
 #### Scenario: File-level @test(eq) checks entire file value
 - **WHEN** a `.cue` file has `a: 1`, `b: a + 1`, and `@test(eq, {a: 1, b: 2})` at file scope

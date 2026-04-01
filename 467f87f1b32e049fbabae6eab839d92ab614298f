@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8de75d1_9e3a5fea",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1144,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T10:04:43Z",
+      "side": 1,
+      "message": "I would inline this logic and make the checking of whether it is an empty string a function by itself. This way you can also check the bytes case, without making too much more code (probably less even). The core code will also look more like the code below. This is cleaner and does more optimization.\n\nThe error code could also be reused. Easiest is probably a goto in this case, but a function would work too.",
+      "revId": "467f87f1b32e049fbabae6eab839d92ab614298f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

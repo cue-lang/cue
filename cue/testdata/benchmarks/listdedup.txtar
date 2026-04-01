@@ -2,6 +2,7 @@
 #Issue: 1044
 
 // TODO(perf): reduce number of conjunctions and disjunctions.
+#todo:inline: skip — performance benchmark, not a functional test
 -- stats.txt --
 Leaks:  0
 Freed:  24096

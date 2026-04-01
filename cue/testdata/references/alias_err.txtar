@@ -1,3 +1,4 @@
+#todo:inline: easy — reference resolution; most fields have concrete values
 -- old.cue --
 issue2527: {
 	x=(x): 3

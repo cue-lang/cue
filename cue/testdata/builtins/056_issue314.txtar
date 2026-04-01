@@ -1,5 +1,6 @@
 #name: issue314
 #evalFull
+#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 import (
 	"text/template"

@@ -1,3 +1,4 @@
+#todo:inline: skip — performance benchmark, not a functional test
 -- in.cue --
 // Test that cyclic references do not break structure sharing. This was the
 // underlying problem of Issue #3587. Note that this is not a problem related

@@ -1,5 +1,5 @@
 // Tests fields.go
-
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 // TODO: reorganize ordered on what is tested by name. E.g.
 // insertion: longPath: ok: p1: {

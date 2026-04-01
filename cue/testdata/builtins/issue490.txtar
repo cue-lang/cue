@@ -1,3 +1,4 @@
+#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- test.cue --
 A: close({
 	a: 1

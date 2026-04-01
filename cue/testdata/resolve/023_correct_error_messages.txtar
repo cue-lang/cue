@@ -1,5 +1,6 @@
 #name: correct error messages
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 a: "a" & 1
 -- out/compile --

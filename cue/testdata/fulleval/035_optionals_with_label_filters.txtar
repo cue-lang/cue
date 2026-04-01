@@ -1,5 +1,6 @@
 #name: optionals with label filters
 #evalFull
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 #JobID: =~"^[a-zA-Z]*$"
 #Job: {

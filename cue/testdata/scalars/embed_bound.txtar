@@ -1,3 +1,4 @@
+#todo:inline: easy — simple scalar/string values, straightforward @test(eq, ...) conversion
 -- in.cue --
 // Embedding !=null at file scope should preserve the constraint,
 // not collapse to (struct){}.

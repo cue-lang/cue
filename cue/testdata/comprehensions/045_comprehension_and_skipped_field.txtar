@@ -1,6 +1,7 @@
 #name: comprehension and skipped field
 #bug: true
 #evalFull
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 
 for key, value in {x: v: 1} {

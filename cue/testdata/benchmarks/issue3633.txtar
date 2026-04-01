@@ -1,4 +1,5 @@
 #Issue: 3633
+#todo:inline: skip — performance benchmark, not a functional test
 -- out/evalalpha/stats --
 Leaks:  145
 Freed:  1886

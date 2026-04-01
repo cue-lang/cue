@@ -1,3 +1,4 @@
+#todo:inline: skip — performance benchmark, not a functional test
 -- in.cue --
 if _request.enabled {
     r1: {

@@ -182,6 +182,13 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 		fmt.Fprintln(t, "Result:")
 	}
 
+	// Write all errors (including incomplete) with [code] prefixes to the
+	// documentary errors.txt section (only updated if the section exists).
+	cuetxtar.PrintErrors(t.WriterDoc("errors.txt"), v, &errors.Config{
+		Cwd:     t.Dir,
+		ToSlash: true,
+	})
+
 	if v == nil {
 		return
 	}

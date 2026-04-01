@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd22be98_687fd10d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-01T11:01:33Z",
+      "side": 1,
+      "message": "Note that although I did some tidying and hand-holding, this logic error was found, and the test and fix created, entirely by claude.",
+      "revId": "2f2d3e4e90b011fa453e2eb30a1e63af2136fe5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -417,6 +417,9 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 
 	hasCR := false
 	extra := 0
+	// For multiline strings, the closing quotes must follow a newline
+	// (with optional whitespace indentation). The opening newline was already consumed.
+	atLineStart := quote.numChar == 3
 	for {
 		ch := s.ch
 		if (quote.numChar != 3 && ch == '\n') || ch < 0 {
@@ -429,9 +432,18 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 		}
 
 		s.next()
-		ch, ok := s.consumeStringClose(ch, quote)
-		if ok {
-			break
+		if quote.numChar != 3 || atLineStart {
+			if _, ok := s.consumeStringClose(ch, quote); ok {
+				break
+			}
+		}
+		switch {
+		case ch == '\n':
+			atLineStart = true
+		case quote.numChar == 3 && atLineStart && (ch == ' ' || ch == '\t'):
+			// preserve atLineStart
+		default:
+			atLineStart = false
 		}
 		if ch == '\r' && quote.numChar == 3 {
 			hasCR = true

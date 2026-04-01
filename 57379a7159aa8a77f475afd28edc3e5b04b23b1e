@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dc6f4fa_350e649a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T12:36:36Z",
+      "side": 1,
+      "message": "Update spec (docs/specs inline tests spec.md) to reflect this functionality.",
+      "revId": "57379a7159aa8a77f475afd28edc3e5b04b23b1e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

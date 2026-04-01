@@ -1,11 +1,9 @@
-#name: booleans
-#evalPartial
 -- in.cue --
-t: true
+t: true @test(eq, true)
 t: !false
-f: false
+f: false @test(eq, false)
 f: !t
-e: true
+e: true @test(err, code=eval, pos=[0:4 1:4], contains="conflicting values")
 e: !true
 -- out/compile --
 --- in.cue
@@ -27,20 +25,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
--- out/evalalpha --
-Errors:
-e: conflicting values false and true:
-    ./in.cue:5:4
-    ./in.cue:6:4
-
-Result:
-(_|_){
-  // [eval]
-  t: (bool){ true }
-  f: (bool){ false }
-  e: (_|_){
-    // [eval] e: conflicting values false and true:
-    //     ./in.cue:5:4
-    //     ./in.cue:6:4
-  }
-}

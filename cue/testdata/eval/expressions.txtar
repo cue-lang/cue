@@ -1,24 +1,23 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- cue.mod/module.cue --
 module: "test.com"
 language: version: "v0.15.0"
 -- in.cue --
-a: 1
-b: 1 + 2
-c: 3 - 1
-d: rem(5, 3)
+a: 1         @test(eq, 1)
+b: 1 + 2     @test(eq, 3)
+c: 3 - 1     @test(eq, 2)
+d: rem(5, 3) @test(eq, 2)
 
 // StructCmp examples - now that the experiment is accepted
 structComparison: {
-    equalStructs: t: {a: 1, b: 2} == {a: 1, b: 2}
-    differentStructs: f: {a: 1} == {a: 2}
-    emptyStructs: t: {} == {}
+    equalStructs:     {a: 1, b: 2} == {a: 1, b: 2} @test(eq, true)
+    differentStructs: {a: 1} == {a: 2}             @test(eq, false)
+    emptyStructs:     {} == {}                     @test(eq, true)
 }
 
 mixedComparison: {
-    structVsNumber: f: {a: 1} == 1
-    listVsStruct: f: [1, 2] == {a: 1}
-    stringVsNumber: f: "hello" == 42
+    structVsNumber: {a: 1} == 1      @test(eq, false)
+    listVsStruct:   [1, 2] == {a: 1} @test(eq, false)
+    stringVsNumber: "hello" == 42    @test(eq, false)
 }
 -- out/eval/stats --
 Leaks:  0
@@ -30,73 +29,6 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    5
--- out/evalalpha --
-(struct){
-  a: (int){ 1 }
-  b: (int){ 3 }
-  c: (int){ 2 }
-  d: (int){ 2 }
-  structComparison: (struct){
-    equalStructs: (struct){
-      t: (bool){ true }
-    }
-    differentStructs: (struct){
-      f: (bool){ false }
-    }
-    emptyStructs: (struct){
-      t: (bool){ true }
-    }
-  }
-  mixedComparison: (struct){
-    structVsNumber: (struct){
-      f: (bool){ false }
-    }
-    listVsStruct: (struct){
-      f: (bool){ false }
-    }
-    stringVsNumber: (struct){
-      f: (bool){ false }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -3,4 +3,26 @@
-   b: (int){ 3 }
-   c: (int){ 2 }
-   d: (int){ 2 }
-+  structComparison: (struct){
-+    equalStructs: (struct){
-+      t: (bool){ true }
-+    }
-+    differentStructs: (struct){
-+      f: (bool){ false }
-+    }
-+    emptyStructs: (struct){
-+      t: (bool){ true }
-+    }
-+  }
-+  mixedComparison: (struct){
-+    structVsNumber: (struct){
-+      f: (bool){ false }
-+    }
-+    listVsStruct: (struct){
-+      f: (bool){ false }
-+    }
-+    stringVsNumber: (struct){
-+      f: (bool){ false }
-+    }
-+  }
- }
--- out/eval --
-(struct){
-  a: (int){ 1 }
-  b: (int){ 3 }
-  c: (int){ 2 }
-  d: (int){ 2 }
-}
 -- out/compile --
 --- in.cue
 {
@@ -105,42 +37,30 @@ diff old new
   c: (3 - 1)
   d: rem(5, 3)
   structComparison: {
-    equalStructs: {
-      t: ({
-        a: 1
-        b: 2
-      } == {
-        a: 1
-        b: 2
-      })
-    }
-    differentStructs: {
-      f: ({
-        a: 1
-      } == {
-        a: 2
-      })
-    }
-    emptyStructs: {
-      t: ({} == {})
-    }
+    equalStructs: ({
+      a: 1
+      b: 2
+    } == {
+      a: 1
+      b: 2
+    })
+    differentStructs: ({
+      a: 1
+    } == {
+      a: 2
+    })
+    emptyStructs: ({} == {})
   }
   mixedComparison: {
-    structVsNumber: {
-      f: ({
-        a: 1
-      } == 1)
-    }
-    listVsStruct: {
-      f: ([
-        1,
-        2,
-      ] == {
-        a: 1
-      })
-    }
-    stringVsNumber: {
-      f: ("hello" == 42)
-    }
+    structVsNumber: ({
+      a: 1
+    } == 1)
+    listVsStruct: ([
+      1,
+      2,
+    ] == {
+      a: 1
+    })
+    stringVsNumber: ("hello" == 42)
   }
 }

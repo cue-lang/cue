@@ -1,16 +1,20 @@
 #name: retain references with interleaved embedding
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 a: d: {
 	#base
 	#info: {...}
 	Y: #info.X
-}
+} @test(eq, {
+	#info: {X: "foo"}
+	Y: "foo"
+}) @test(closed)
 
 #base: {
 	#info: {...}
-}
+} @test(eq, {
+	#info: {} @test(closed)
+})
 
 a: [Name=string]: {#info: {
 	X: "foo"
@@ -50,18 +54,3 @@ Retain: 1
 Unifications: 8
 Conjuncts:    19
 Disjuncts:    9
--- out/evalalpha --
-(struct){
-  a: (struct){
-    d: (#struct){
-      #info: (#struct){
-        X: (string){ "foo" }
-      }
-      Y: (string){ "foo" }
-    }
-  }
-  #base: (#struct){
-    #info: (#struct){
-    }
-  }
-}

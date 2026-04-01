@@ -1,4 +1,4 @@
-#todo:inline: easy — reference resolution; most fields have concrete values
+#todo:inline: compile-time alias errors prevent CUE source compilation; @test(err) requires successful compile
 -- old.cue --
 issue2527: {
 	x=(x): 3

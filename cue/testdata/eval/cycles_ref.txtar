@@ -1,12 +1,11 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
-a: b + 100
-b: a - 100
+a: b + 100 @test(eq, 200)
+b: a - 100 @test(eq, 100)
 a: 200
 
-c: d & {b: 2}
-d: e
-e: {a: 1}
+c: d & {b: 2} @test(eq, {a: 1, b: 2})
+d: e          @test(eq, {a: 1, b: 2})
+e: {a: 1}     @test(eq, {a: 1, b: 2})
 e: c
 -- out/eval/stats --
 Leaks:  0
@@ -18,53 +17,6 @@ Retain: 3
 Unifications: 12
 Conjuncts:    24
 Disjuncts:    15
--- out/evalalpha --
-(struct){
-  a: (int){ 200 }
-  b: (int){ 100 }
-  c: (struct){
-    b: (int){ 2 }
-    a: (int){ 1 }
-  }
-  d: ~(e)
-  e: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,10 +5,7 @@
-     b: (int){ 2 }
-     a: (int){ 1 }
-   }
--  d: (struct){
--    a: (int){ 1 }
--    b: (int){ 2 }
--  }
-+  d: ~(e)
-   e: (struct){
-     a: (int){ 1 }
-     b: (int){ 2 }
--- out/eval --
-(struct){
-  a: (int){ 200 }
-  b: (int){ 100 }
-  c: (struct){
-    b: (int){ 2 }
-    a: (int){ 1 }
-  }
-  d: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  e: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -1,44 +1,24 @@
 #name: json Marshaling detects incomplete
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 import "encoding/json"
 
-a: json.Marshal({a: string})
+a: json.Marshal({a: string}) @test(err, code=incomplete)
 
-foo: {a: 3, b: foo.c}
-b: json.Marshal(foo)
--- out/evalalpha/stats --
-Leaks:  0
-Freed:  8
-Reused: 2
-Allocs: 6
-Retain: 0
-
-Unifications: 8
-Conjuncts:    8
-Disjuncts:    0
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- Leaks:  0
--Freed:  16
--Reused: 12
--Allocs: 4
--Retain: 5
-+Freed:  8
-+Reused: 2
-+Allocs: 6
-+Retain: 0
- 
--Unifications: 16
--Conjuncts:    24
--Disjuncts:    21
-+Unifications: 8
-+Conjuncts:    8
-+Disjuncts:    0
+foo: {
+	a: 3     @test(eq, 3)
+	b: foo.c @test(err, code=incomplete)
+}
+b: json.Marshal(foo) @test(err, code=incomplete)
+-- out/errors.txt --
+[incomplete] a: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
+    in.cue:3:4
+    in.cue:3:21
+[incomplete] foo.b: undefined field: c:
+    in.cue:7:9
+[incomplete] b: error in call to encoding/json.Marshal: undefined field: c:
+    in.cue:9:4
+    in.cue:7:9
 -- out/eval/stats --
 Leaks:  0
 Freed:  16
@@ -49,26 +29,6 @@ Retain: 5
 Unifications: 16
 Conjuncts:    24
 Disjuncts:    21
--- out/evalalpha --
-(struct){
-  a: (_|_){
-    // [incomplete] a: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
-    //     ./in.cue:3:4
-    //     ./in.cue:3:21
-  }
-  foo: (struct){
-    a: (int){ 3 }
-    b: (_|_){
-      // [incomplete] foo.b: undefined field: c:
-      //     ./in.cue:5:20
-    }
-  }
-  b: (_|_){
-    // [incomplete] b: error in call to encoding/json.Marshal: undefined field: c:
-    //     ./in.cue:6:4
-    //     ./in.cue:5:20
-  }
-}
 -- out/compile --
 --- in.cue
 {

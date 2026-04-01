@@ -1,13 +1,11 @@
-#name: errors
-#evalPartial
 -- in.cue --
-a: _|_ & _|_
-b: null & _|_
-c: b.a == _|_
-d: _|_ != b.a
-e: _|_ == _|_
-f: ({} & false) == _|_
-g: _|_ != ({} & false)
+a: _|_ & _|_            @test(err, code=user)
+b: null & _|_           @test(err, code=user)
+c: b.a == _|_           @test(eq, true)
+d: _|_ != b.a           @test(eq, false)
+e: _|_ == _|_           @test(eq, true)
+f: ({} & false) == _|_  @test(eq, true)
+g: _|_ != ({} & false)  @test(eq, false)
 -- out/compile --
 --- in.cue
 {
@@ -29,31 +27,3 @@ Retain: 0
 Unifications: 10
 Conjuncts:    14
 Disjuncts:    10
--- out/evalalpha --
-Errors:
-explicit error (_|_ literal) in source:
-    ./in.cue:1:4
-explicit error (_|_ literal) in source:
-    ./in.cue:1:10
-explicit error (_|_ literal) in source:
-    ./in.cue:2:11
-
-Result:
-(_|_){
-  // [user]
-  a: (_|_){
-    // [user] explicit error (_|_ literal) in source:
-    //     ./in.cue:1:4
-    // explicit error (_|_ literal) in source:
-    //     ./in.cue:1:10
-  }
-  b: (_|_){
-    // [user] explicit error (_|_ literal) in source:
-    //     ./in.cue:2:11
-  }
-  c: (bool){ true }
-  d: (bool){ false }
-  e: (bool){ true }
-  f: (bool){ true }
-  g: (bool){ false }
-}

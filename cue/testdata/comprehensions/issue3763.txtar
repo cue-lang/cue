@@ -1,3 +1,4 @@
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- reduced.cue --
 reduced: {
 	A: x1: y?: int // needs to be optional

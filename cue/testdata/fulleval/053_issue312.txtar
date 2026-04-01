@@ -1,5 +1,6 @@
 #name: issue312
 #evalFull
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 
 for x in [1] {

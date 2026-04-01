@@ -1,5 +1,6 @@
 #name: recursive closing starting at non-definition
 #evalPartial
+#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 z: a: {
 	#B: {

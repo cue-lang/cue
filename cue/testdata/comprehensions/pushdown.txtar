@@ -1,6 +1,6 @@
 # Working set of tests that unit test specifics of the aspect of the
 # comprehension algorithm that pushes down evaluation to the arcs.
-
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 linkChildren: {
 	w: 1

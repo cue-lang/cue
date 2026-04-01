@@ -1,5 +1,6 @@
 #name: top-level definition with struct and disjunction
 #evalPartial
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #def: {
 	Type: string

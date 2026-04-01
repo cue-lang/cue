@@ -1,5 +1,6 @@
 #name: predefined ranges
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 k1: int8
 k1: 44

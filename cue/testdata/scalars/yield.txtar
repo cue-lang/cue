@@ -1,4 +1,5 @@
 // Issue #729
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 ifScalar: {
 	_#cond: true

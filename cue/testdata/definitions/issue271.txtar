@@ -1,3 +1,4 @@
+#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #T: [_]: _
 #T: close({"a": string})

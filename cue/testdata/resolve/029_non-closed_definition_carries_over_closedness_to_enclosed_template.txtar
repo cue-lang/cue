@@ -1,5 +1,6 @@
 #name: non-closed definition carries over closedness to enclosed template
 #evalPartial
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #S: {
 	[string]: {a: int}

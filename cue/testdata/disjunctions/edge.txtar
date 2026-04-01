@@ -3,6 +3,7 @@
 #
 # Many of these cases were discovered as part of the development of the new
 # evaluator that started at v0.7 and do not pass for that version.
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 cyclicalInsertInDisjunction: {
 	// We do not allow lookups across unresolved disjunctions. As such, the

@@ -1,5 +1,6 @@
 #name: references from template to concrete
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 res: [t]
 t: [X=string]: {

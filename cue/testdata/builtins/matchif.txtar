@@ -1,3 +1,4 @@
+#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 regularFields: {
 	[_]: matchIf({x!: >2}, {y!: 5}, {y!: 1})

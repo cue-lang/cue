@@ -1,3 +1,4 @@
+#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #schema: a!: bool
 _hidden & #schema // must fail here, but not elsewhere

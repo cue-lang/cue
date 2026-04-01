@@ -1,3 +1,4 @@
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 intIndex:    [2][0]
 stringIndex: {foo: "bar"}["foo"]

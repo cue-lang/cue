@@ -197,6 +197,17 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 		return true
 
 	case *BuiltinValidator:
+		if y, ok := w.(*BuiltinValidator); ok {
+			if x.Builtin != y.Builtin || len(x.Args) != len(y.Args) {
+				return false
+			}
+			for i, xa := range x.Args {
+				if !Equal(ctx, xa, y.Args[i], flags) {
+					return false
+				}
+			}
+			return true
+		}
 	}
 
 	return false

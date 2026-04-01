@@ -1,4 +1,5 @@
 // Caused a stack overflow on evalv2.
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
  let X = {}
 

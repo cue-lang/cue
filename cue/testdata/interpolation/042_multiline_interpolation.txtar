@@ -1,5 +1,6 @@
 #name: multiline interpolation
 #evalPartial
+#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 a1: """
 			before

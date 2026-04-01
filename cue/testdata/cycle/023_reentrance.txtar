@@ -1,5 +1,6 @@
 #name: reentrance
 #evalFull
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // This indirection is needed to avoid binding references to fib
 // within fib to the instantiated version.

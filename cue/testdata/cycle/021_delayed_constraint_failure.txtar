@@ -1,5 +1,6 @@
 #name: delayed constraint failure
 #evalPartial
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 a: b - 100 // Okay to have no error here, as long as there is an error with b.
 b: a + 110

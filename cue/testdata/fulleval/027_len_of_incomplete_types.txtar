@@ -1,5 +1,6 @@
 #name: len of incomplete types
 #evalFull
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 args: *[] | [...string]
 v1:   len(args)

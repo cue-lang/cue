@@ -1,5 +1,6 @@
 #name: ips
 #evalFull
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 import "list"
 

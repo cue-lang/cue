@@ -1,5 +1,6 @@
 #name: complex groundness  2
 #evalFull
+#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 r1: f1 & {y: "c"}
 

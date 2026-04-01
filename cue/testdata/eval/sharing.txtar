@@ -1,5 +1,5 @@
 
-
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 issue3062: ok1: {
 	#S: "a"

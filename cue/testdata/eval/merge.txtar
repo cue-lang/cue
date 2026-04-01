@@ -1,6 +1,6 @@
 TODO: image field is not pre-evaluated (not a huge deal)
 TODO: allow dynamic fields
-
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 key: "app01"
 manifests: [

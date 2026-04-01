@@ -1,5 +1,6 @@
 #name: closing with failed optional
 #evalPartial
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #k1: {a: int, b?: int} & #A // closed({a: int})
 

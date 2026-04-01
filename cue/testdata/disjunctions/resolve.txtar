@@ -1,4 +1,5 @@
 // Ensure that references are resolved on the boundaries of disjunctions.
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 resolveAcrossDisjunct: t1: {
 	{} | { #B: 1} // d resolves to 1 in the second case.

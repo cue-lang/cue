@@ -1,3 +1,4 @@
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 // Test that an error in a let that is merged with itself from two different
 // origins does not result in an error as long as the error is not referenced

@@ -1,5 +1,6 @@
 #name: continue recursive closing for optionals
 #evalFull
+#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #S: {
 	[string]: {a: int}

@@ -1,6 +1,6 @@
 // Test various orders
 // https://cuelang.org/issues/2235
-
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- reductions.cue --
 // Each of these tests triggers a slightly different path.
 

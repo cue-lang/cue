@@ -1,6 +1,7 @@
 Interaction between defaults, embedding and disjunctions.
 
 // TODO: at the moment, using a default will select it.
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 x: {
 	// All of these resolve to *2 | 3

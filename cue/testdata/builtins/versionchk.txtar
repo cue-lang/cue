@@ -1,3 +1,4 @@
+#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- cue.mod/module.cue --
 module: "cuelang.org/go/internal/core/adt/eval_test"
 language: version: "v0.8.0"

@@ -1,5 +1,6 @@
 #name: index
 #evalPartial
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 a: [2][0]
 b: {foo:       "bar"}["foo"]

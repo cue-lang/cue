@@ -1,4 +1,5 @@
 // Issue #946
+#todo:inline: medium — compile-time checks; verify output in out/compile section
 -- in.cue --
 package repro
 

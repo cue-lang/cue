@@ -1,3 +1,4 @@
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- cue.mod/module.cue --
 module: "mod.test"
 

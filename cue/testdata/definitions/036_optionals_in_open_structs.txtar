@@ -1,5 +1,6 @@
 #name: optionals in open structs
 #evalFull
+#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 A: {
 	[=~"^[a-s]*$"]: int

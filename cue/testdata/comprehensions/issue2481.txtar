@@ -1,4 +1,4 @@
-
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // Mixing struct fields and embedded scalars should error. Using comprehensions
 // this follows a different path which may miss the error.

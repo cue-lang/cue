@@ -1,5 +1,5 @@
 title: Simplification of validators.
-
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 package main
 

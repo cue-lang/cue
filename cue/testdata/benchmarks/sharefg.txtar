@@ -1,5 +1,5 @@
 # This file has fine-grained sharing tests.
-
+#todo:inline: skip — performance benchmark, not a functional test
 -- in.cue --
 // In each case, the number of output nodes should be linear in the input size.
 //

@@ -1,6 +1,7 @@
 #name: pick first
 #bug: true
 #evalFull
+#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 a: *5 | "a" | true
 b: c: *{

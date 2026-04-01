@@ -1,6 +1,6 @@
 # This test is important in locking in the behaviour of evalv3,
 # which fixed some closedness bugs present in the older evalv2.
-
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- x.cue --
 package x
 

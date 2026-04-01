@@ -1,5 +1,6 @@
 #name: or builtin should not fail on non-concrete empty list
 #evalFull
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #Workflow: {
 	jobs: {

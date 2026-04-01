@@ -1,5 +1,6 @@
 #name: cannot resolve references that would be ambiguous
 #evalFull
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 a1: *0 | 1
 a1: a3 - a2

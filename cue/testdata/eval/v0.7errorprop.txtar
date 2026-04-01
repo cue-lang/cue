@@ -1,5 +1,5 @@
 // NOTE: do not add more tests to this file, as it may obfuscate the test case.
-
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 a: #A
 a: c: 1

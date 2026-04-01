@@ -1,5 +1,6 @@
 #name: resolved self-reference cycles
 #evalPartial
+#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 math: p1: {
 	a: b - 100

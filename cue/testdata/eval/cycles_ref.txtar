@@ -1,3 +1,4 @@
+#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 a: b + 100
 b: a - 100

@@ -1,5 +1,6 @@
 #name: combined definitions
 #evalPartial
+#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 // Allow combining of structs within a definition
 #D1: {

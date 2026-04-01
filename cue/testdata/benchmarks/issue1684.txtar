@@ -1,6 +1,7 @@
 #Issue: 1684
 
 // TODO: significantly reduce the number of counts in this evaluation.
+#todo:inline: skip — performance benchmark, not a functional test
 -- stats.txt --
 Leaks:  0
 Freed:  995025

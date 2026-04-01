@@ -1,5 +1,6 @@
 #name: comparison against bottom
 #evalFull
+#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 a: _|_ == _|_
 b: err == 1 & 2 // not a literal error, so not allowed

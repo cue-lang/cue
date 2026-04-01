@@ -1,3 +1,4 @@
+#todo:inline: medium — multi-package test; check subpath handling
 -- x.cue --
 import "x/y"
 

@@ -1,5 +1,5 @@
 // Issue #852
-
+#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #E: {
 	c: int

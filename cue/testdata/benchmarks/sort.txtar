@@ -1,6 +1,7 @@
 // NOTE: the performance of Sort is not measured by counters. The issues
 // of https://cuelang.org/issues/745 were mostly related to poor memory
 // management.
+#todo:inline: skip — performance benchmark, not a functional test
 -- stats.txt --
 Leaks:  0
 Freed:  7529

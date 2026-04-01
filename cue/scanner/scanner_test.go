@@ -81,7 +81,6 @@ var testTokens = [...]elt{
 	{token.IDENT, "__foobar", literal},
 	{token.IDENT, "#_foobar", literal},
 	{token.IDENT, "_#foobar", literal},
-	{token.IDENT, "__#foobar", literal},
 	{token.IDENT, "a۰۱۸", literal},
 	{token.IDENT, "foo६४", literal},
 	{token.IDENT, "bar９８７６", literal},
@@ -682,6 +681,7 @@ var errorTests = []struct {
 	{`^`, token.ILLEGAL, 0, "", "illegal character U+005E '^'"},
 	{`…`, token.ILLEGAL, 0, "", "illegal character U+2026 '…'"},
 	{`_|`, token.ILLEGAL, 0, "", "illegal token '_|'; expected '_'"},
+	{`__#foobar`, token.ILLEGAL, 0, "", `illegal token "__#foobar"`},
 
 	{`@`, token.ATTRIBUTE, 1, `@`, "invalid attribute: expected '('"},
 	{`@foo`, token.ATTRIBUTE, 4, `@foo`, "invalid attribute: expected '('"},

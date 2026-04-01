@@ -52,6 +52,24 @@
       "parentUuid": "040414e2_2e05503b",
       "revId": "a2f027bd80fa2717e889f1db8e7bd224735dba38",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b47174e3_a47bac70",
+        "filename": "cue/fuzz_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-01T16:03:36Z",
+      "side": 1,
+      "message": "added ParseComments; and the corpus entries are already there.",
+      "parentUuid": "040414e2_2e05503b",
+      "revId": "a2f027bd80fa2717e889f1db8e7bd224735dba38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

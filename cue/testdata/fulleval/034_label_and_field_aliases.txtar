@@ -1,15 +1,14 @@
 #name: label and field aliases
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 p: [ID=string]: {name: ID}
-A="foo=bar": "str"
-a:           A
-B=bb:        4
-b1:          B
+A="foo=bar": "str"   @test(eq, "str")
+a:           A       @test(eq, "str")
+B=bb:        4       @test(eq, 4)
+b1:          B       @test(eq, 4)
 b1:          bb
 C="\(a)":    5
-c:           C
+c:           C       @test(eq, 5)
 -- out/compile --
 --- in.cue
 {

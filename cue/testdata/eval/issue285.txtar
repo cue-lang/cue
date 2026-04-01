@@ -1,4 +1,3 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 #TopLevel: [name=string]: {
 	path:    string
@@ -9,7 +8,7 @@
 	myoutput: path: "/output"
 }
 
-val: #Mid & {} & {myoutput: {content: "foo"}} // Should work.
+val: #Mid & {} & {myoutput: {content: "foo"}} @test(eq, {myoutput: {content: "foo", path: "/output"}}) @test(closed) // Should work.
 -- out/eval/stats --
 Leaks:  0
 Freed:  10

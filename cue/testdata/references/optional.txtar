@@ -1,12 +1,11 @@
-#todo:inline: easy — reference resolution; most fields have concrete values
 -- in.cue --
 t1: a: {
 	foo?: int
 
-	b: foo
+	b: foo @test(err)
 }
 t2: a: {
-	b: foo
+	b: foo @test(err)
 
 	foo?: int
 }

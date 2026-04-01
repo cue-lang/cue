@@ -1,8 +1,7 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 p: close({
 	"\("f")": _
-})
+}) @test(eq, {f: 9}) @test(closed)
 p: f: 9
 -- out/compile --
 --- in.cue

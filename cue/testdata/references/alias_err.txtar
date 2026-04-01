@@ -1,4 +1,4 @@
-#todo:inline: easy — reference resolution; most fields have concrete values
+#todo:inline: skip — compile-time cyclic alias errors; file does not evaluate to a CUE struct
 -- old.cue --
 issue2527: {
 	x=(x): 3

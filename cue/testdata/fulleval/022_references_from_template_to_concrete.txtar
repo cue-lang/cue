@@ -1,14 +1,15 @@
 #name: references from template to concrete
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
-res: [t]
+res: [t] @test(eq, [{x: {a: "XDDDD", b: {str: "DDDD"}, c: "X"}}])
 t: [X=string]: {
 	a: c + b.str
 	b: str: string
 	c: "X"
 }
-t: x: {b: str: "DDDD"}
+t: x: {
+	b: str: "DDDD"
+} @test(eq, {a: "XDDDD", b: {str: "DDDD"}, c: "X"})
 -- out/compile --
 --- in.cue
 {

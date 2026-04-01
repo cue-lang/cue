@@ -1,22 +1,21 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
-a: 1
-b: a + 1
+a: 1   @test(eq, 1)
+b: a + 1 @test(eq, 2)
 d: {
 	x: _
-	y: b + x
+	y: b + x @test(err)
 }
 e: d & {
 	x: 5
-}
+} @test(eq, {x: 5, y: 7})
 f: {
 	a: "foo-bar": 3
 	b: a."foo-bar"
-}
+} @test(eq, {a: {"foo-bar": 3}, b: 3})
 g: {
 	a: "foo-bar": c: 3
 	b: a."foo-bar".c
-}
+} @test(eq, {a: {"foo-bar": {c: 3}}, b: 3})
 -- out/eval/stats --
 Leaks:  0
 Freed:  18

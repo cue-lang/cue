@@ -1,4 +1,4 @@
-#todo:inline: easy — simple scalar/string values, straightforward @test(eq, ...) conversion
+#todo:inline: medium — bytes interpolation produces unicode replacement chars; eval/evalalpha differ
 -- in.cue --
 bool1: "1+1=2:  \(true)"
 bool1: "1+1=2:  \(true)"

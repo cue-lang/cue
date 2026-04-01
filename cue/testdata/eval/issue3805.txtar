@@ -1,4 +1,4 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+#todo:inline: medium — large real-world schema test with 1000+ lines
 -- x.cue --
 #PatientViewSections: {
 	[string]: #PatientViewSection

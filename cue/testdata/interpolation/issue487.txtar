@@ -1,18 +1,17 @@
-#todo:inline: easy — simple scalar/string values, straightforward @test(eq, ...) conversion
 -- in.cue --
 t1: {
 	#R: {
 		pos:  uint
-		name: "hello_\(pos)"
+		name: "hello_\(pos)" @test(err)
 	}
-	a: #R & {pos: 67}
+	a: #R & {pos: 67} @test(eq, {pos: 67, name: "hello_67"}) @test(closed)
 }
 t2: {
 	#R: {
 		pos:  string
-		name: "hello_\(pos)"
+		name: "hello_\(pos)" @test(err)
 	}
-	a: #R & {pos: "a"}
+	a: #R & {pos: "a"} @test(eq, {pos: "a", name: "hello_a"}) @test(closed)
 }
 -- out/eval/stats --
 Leaks:  0

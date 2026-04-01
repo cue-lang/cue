@@ -1,13 +1,15 @@
 #name: json Marshaling detects incomplete
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 import "encoding/json"
 
-a: json.Marshal({a: string})
+a: json.Marshal({a: string}) @test(err)
 
-foo: {a: 3, b: foo.c}
-b: json.Marshal(foo)
+foo: {
+	a: 3     @test(eq, 3)
+	b: foo.c @test(err)
+}
+b: json.Marshal(foo) @test(err)
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  8

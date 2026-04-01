@@ -51,6 +51,24 @@
       "message": "The name confused me at first. It should probably be LabelUsed, or something like that. Whether it is has a label can just be derived from Label !\u003d 0. But the point here is whether the label is used.",
       "revId": "bb1d6a76a75d849c41900ec39866e4384c033572",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96d40001_a8d08bbd",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-01T19:13:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2a5c052_51f5d13c",
+      "revId": "bb1d6a76a75d849c41900ec39866e4384c033572",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

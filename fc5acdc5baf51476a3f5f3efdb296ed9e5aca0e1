@@ -16,6 +16,24 @@
       "message": "same as before, drop the backslash in these",
       "revId": "fc5acdc5baf51476a3f5f3efdb296ed9e5aca0e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b90490d_695b0b63",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-01T08:33:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77271a5c_54044d10",
+      "revId": "fc5acdc5baf51476a3f5f3efdb296ed9e5aca0e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

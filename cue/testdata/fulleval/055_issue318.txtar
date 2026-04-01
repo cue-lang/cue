@@ -1,13 +1,12 @@
 #name: issue318
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 #T: {
 	arg: x: string
-	out1: "\(arg.x) \(arg.y)"
-	out2: "\(arg.y)"
-	vx:   arg.x
-	vy:   arg.y
+	out1: "\(arg.x) \(arg.y)" @test(err)
+	out2: "\(arg.y)"           @test(err)
+	vx:   arg.x                @test(kind=string)
+	vy:   arg.y                @test(err)
 }
 -- out/compile --
 --- in.cue

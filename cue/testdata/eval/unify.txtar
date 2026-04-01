@@ -1,9 +1,8 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 a: d: {
 	#base
 	#info: {...}
-	Y: #info.X
+	Y: #info.X @test(eq, "foo")
 }
 
 #base: {

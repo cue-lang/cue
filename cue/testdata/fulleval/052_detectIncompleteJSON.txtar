@@ -1,6 +1,5 @@
 #name: detectIncompleteJSON
 #evalFull
-#todo:inline: easy — full evaluation; use @test(eq, ...) for concrete results
 -- in.cue --
 package foobar
 
@@ -12,8 +11,8 @@ import "encoding/json"
 		#foo: {
 			use: _vars.something
 		}
-		baz:    json.Marshal(_vars.something)
-		foobar: json.Marshal(#foo)
+		baz:    json.Marshal(_vars.something) @test(err)
+		foobar: json.Marshal(#foo)            @test(err)
 	}
 }
 Val: #Spec & {

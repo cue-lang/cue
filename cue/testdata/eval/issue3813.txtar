@@ -1,10 +1,13 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- x.cue --
 x: {[string]: _}
 x: #d
 #d: f: _
 
-y: { x }
+y: {
+	@test(eq, {f: true})
+	@test(closed)
+	x
+}
 y: f: true
 -- out/compile --
 --- x.cue

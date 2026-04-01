@@ -17,6 +17,9 @@ package cue_test
 import (
 	"testing"
 
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 )
 
@@ -62,10 +65,23 @@ list.Concat(["foo"], [])
 		if len(s) > 100 {
 			t.Skip() // keep inputs reasonably small for now
 		}
-		_, err := parser.ParseFile("fuzz.cue", s)
+		f, err := parser.ParseFile("fuzz.cue", s)
 		if err != nil {
 			t.Skip() // skip inputs which aren't valid syntax
 		}
+
+		// Common operations with the syntax tree.
+		if _, err := format.Node(f); err != nil {
+			t.Fatalf("cue/format should not fail on parsed input: %v", err)
+		}
+		ast.Walk(f,
+			func(ast.Node) bool { return true },
+			func(ast.Node) {},
+		)
+		astutil.Apply(f,
+			func(astutil.Cursor) bool { return true },
+			func(astutil.Cursor) bool { return true },
+		)
 
 		// TODO: cover the compiler and evaluator, and various common operations like export
 		// ctx := cuecontext.New()

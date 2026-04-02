@@ -16,6 +16,24 @@
       "message": "is there a reason why you self-approved this change? I would avoid doing that in general, but also because you\u0027re an \"admin\" so your +2 counts even if it\u0027s on your own patch.",
       "revId": "6e96e6218ad41846920c2027983577291ef6309c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d912dd04_ae01574e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T10:12:35Z",
+      "side": 1,
+      "message": "I think this was by accident. I don\u0027t recall doing it.",
+      "parentUuid": "ee5af91c_a2b685dd",
+      "revId": "6e96e6218ad41846920c2027983577291ef6309c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

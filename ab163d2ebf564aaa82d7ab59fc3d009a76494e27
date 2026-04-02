@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df35bf9d_f0dd4718",
+        "filename": "internal/golangorgx/gopls/settings/default.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-02T10:48:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "159a5e5d_8026e012",
+      "revId": "ab163d2ebf564aaa82d7ab59fc3d009a76494e27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32584e4d_27992e80",
@@ -49,6 +67,24 @@
       "writtenOn": "2026-04-02T10:33:03Z",
       "side": 1,
       "message": "do we need both the `go func` and enqueue? i.e. could we not do the sleep inside the enqueue?\n\nI\u0027m also curious how gopls implements this, to see if it\u0027s a different or better approach.",
+      "revId": "ab163d2ebf564aaa82d7ab59fc3d009a76494e27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7b5b29d_232621c5",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-02T10:48:10Z",
+      "side": 1,
+      "message": "\u003e  i.e. could we not do the sleep inside the enqueue?\n\nNo - if we did that we would be blocking the server: conceptually, the server is single threaded (which is why there\u0027s no horrifying locking going on here). Any function passed to `enqueue` is run with exclusive access to the server - it is enqueuing the fun into the queue of messages received from the editor.\n\nSo, we want to do the sleep in its own go-routine, and then only when that\u0027s complete do we inject a func into the work-queue.\n\n\u003e I\u0027m also curious how gopls implements this, to see if it\u0027s a different or better approach.\n\nThey have a much more complicated locking system around \"snapshots\" of editor state. They perform the analysis of code in a separate thread and so can then just get that thread to sleep for the delay before sending the diagnostics back, but the handling of server state is much more complex because they really do have concurrent access going on.",
+      "parentUuid": "32584e4d_27992e80",
       "revId": "ab163d2ebf564aaa82d7ab59fc3d009a76494e27",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

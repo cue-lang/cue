@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "369302cf_235919a6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T09:52:25Z",
+      "side": 1,
+      "message": "was this meant to be part of the commit message title?",
+      "revId": "1c359ae02adbcdf17847f64e207d36f671a0d2ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b365d879_eecbe5ec",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T09:52:25Z",
+      "side": 1,
+      "message": "`return slices.Contains(ea.codes, got)`",
+      "range": {
+        "startLine": 217,
+        "startChar": 1,
+        "endLine": 222,
+        "endChar": 13
+      },
+      "revId": "1c359ae02adbcdf17847f64e207d36f671a0d2ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

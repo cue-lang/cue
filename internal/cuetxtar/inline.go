@@ -672,7 +672,7 @@ func (r *inlineRunner) runArchive() {
 	// Determine which top-level fields are test-case roots.
 	// A field is a root if it has any @test attribute (other than file-level).
 	// Fields with no @test attributes are silently skipped (fixture fields).
-	rootNames := make(map[string]bool)
+	rootNames := make(map[cue.Selector]bool)
 	for _, rec := range allRecords {
 		if rec.fileLevel {
 			continue // file-level records are handled separately
@@ -681,7 +681,7 @@ func (r *inlineRunner) runArchive() {
 		if len(sels) == 0 {
 			continue
 		}
-		rootNames[sels[0].String()] = true
+		rootNames[sels[0]] = true
 	}
 
 	// Run file-level @test assertions against the entire file value.
@@ -712,17 +712,17 @@ func (r *inlineRunner) runArchive() {
 			if !ok {
 				continue
 			}
-			name := identStr(field.Label)
-			if !rootNames[name] {
+			sel := cue.Label(field.Label)
+			if !rootNames[sel] {
 				continue
 			}
-			if subpath != "" && name != subpath {
+			if subpath != "" && sel.String() != subpath {
 				continue
 			}
 			roots = append(roots, testCaseRoot{
-				name: name,
+				sel: sel,
 			})
-			delete(rootNames, name) // avoid duplicates across files
+			delete(rootNames, sel) // avoid duplicates across files
 		}
 	}
 
@@ -746,12 +746,12 @@ func (r *inlineRunner) runArchive() {
 // description annotation and does not affect the sub-test name.
 // TODO: use a name directive to allow an explicit name separate from desc, and support
 func (r *inlineRunner) subTestName(root testCaseRoot, _ []attrRecord) string {
-	return root.name
+	return root.sel.String()
 }
 
 // testCaseRoot represents a top-level test case.
 type testCaseRoot struct {
-	name string
+	sel cue.Selector
 }
 
 // cueFileResult holds the parsed and stripped AST for one CUE file.
@@ -924,7 +924,7 @@ func (r *inlineRunner) runInline(t *testing.T, root testCaseRoot, fileVal cue.Va
 	version := r.versionName()
 
 	// Gather all records for this root and its descendants.
-	rootPath := cue.MakePath(cue.Str(root.name))
+	rootPath := cue.MakePath(root.sel)
 	for _, rec := range records {
 		if !pathHasPrefix(rec.path, rootPath) {
 			continue

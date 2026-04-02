@@ -11,8 +11,8 @@ import yaml "encoding/yaml"
 		#foo: {
 			use: _vars.something
 		}
-		baz:    yaml.Marshal(_vars.something) @test(err, code=incomplete, pos=[11:11])
-		foobar: yaml.Marshal(#foo)            @test(err, code=incomplete, pos=[12:11 6:21 9:9])
+		baz:    yaml.Marshal(_vars.something) @test(err, code=incomplete, pos=[0:11])
+		foobar: yaml.Marshal(#foo)            @test(err, code=incomplete, pos=[0:11 -6:21 -3:9])
 	}
 }
 Val: #Spec & {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "da5c1256_eeaaef45",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2378,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-02T16:03:42Z",
+      "side": 1,
+      "message": "Yes, but that is not a function call (from the AST pov) so I\u0027ll do that in a separate CL; and it should already work too.",
+      "parentUuid": "d1222f47_fcfc4e4d",
+      "revId": "8ad159a2c9a7d8ac0e2f856d4c1735fc8fbab04a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e32a8d0a_cf40a278",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-02T15:57:53Z",
       "side": 1,
       "message": "wow, I didn\u0027t realise this worked. I\u0027m not entirely sure it should 😉",
+      "revId": "8ad159a2c9a7d8ac0e2f856d4c1735fc8fbab04a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea3e5ccb_b66efe6c",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2439,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-02T16:03:42Z",
+      "side": 1,
+      "message": "We\u0027ve definitely discussed this one in the past!",
+      "parentUuid": "e32a8d0a_cf40a278",
       "revId": "8ad159a2c9a7d8ac0e2f856d4c1735fc8fbab04a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

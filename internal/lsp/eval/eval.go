@@ -483,6 +483,12 @@ func (e *Evaluator) Reset() {
 	pkgFrame.navigable = &navigable{
 		evaluator: e,
 		frames:    []*frame{pkgFrame},
+		bindings: map[string]*navigable{
+			"close": {
+				evaluator: e,
+				name:      "__close",
+			},
+		},
 	}
 	e.pkgFrame = pkgFrame
 
@@ -1974,9 +1980,24 @@ func (f *frame) eval() {
 			f.ellipses = append(f.ellipses, childFr.navigable)
 
 		case *ast.CallExpr:
-			resolvable = append(resolvable, node.Fun)
+			var childFr *frame
 			for _, arg := range node.Args {
-				f.newFrame(arg, nil, false)
+				childFr = f.newFrame(arg, nil, false)
+			}
+
+			if len(node.Args) == 1 {
+				f.createPath(node.Fun, func(navs []*navigable) {
+					for nav := range expandNavigables(navs) {
+						if nav.name == "__close" {
+							f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+							childFr.navigable.recordUsage(node, f)
+							return
+						}
+					}
+				})
+
+			} else {
+				resolvable = append(resolvable, node.Fun)
 			}
 
 		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr:
@@ -2147,7 +2168,7 @@ func (f *frame) eval() {
 	}
 
 	for _, expr := range embeddedResolvable {
-		f.createPath(expr, f.navigable)
+		f.createPath(expr, f.navigable.ensureResolvesTo)
 	}
 	for _, expr := range resolvable {
 		f.createPath(expr, nil)
@@ -2395,7 +2416,7 @@ func (f *frame) newPathFromAncestralNames(key ast.Node, keyName string) {
 // expression is considered to be embeddded, then receiver should be
 // the navigable of the frame into which the expression is embedded.
 // The new path is added to the frame's childPaths.
-func (f *frame) createPath(expr ast.Expr, receiver *navigable) {
+func (f *frame) createPath(expr ast.Expr, receiver func([]*navigable)) {
 	var components []pathComponent
 	var rootNav *navigable
 	nextEnd := token.NoPos
@@ -2602,7 +2623,8 @@ func (f *frame) resolvePathRoot(name string, requireIdent bool) (*navigable, str
 			if name == "self" && frameOrig.fileEvaluator.File.Pos().Experiment().AliasV2 {
 				return parentNav, ""
 			}
-			return nil, ""
+			// Finally, inspect the globals
+			return fNav.parent.bindings[name], ""
 		}
 	}
 	return nil, ""
@@ -2681,11 +2703,9 @@ type path struct {
 	// this frame and the component's node are added to the usedBy
 	// field of each of those navs.
 	frame *frame
-	// receiver is only used when a path is embedded. When the final
-	// component of a path is resolved, if receiver is non-nil, then
-	// its ensureResolvesTo method is called with the final set of
-	// navigables.
-	receiver *navigable
+	// When the final component of a path is resolved, if receiver is
+	// non-nil, then it is called with the final set of navigables.
+	receiver func([]*navigable)
 	// components is the list of components of this path.
 	//
 	// For simple paths which start with an ident, components is always
@@ -2816,7 +2836,7 @@ func (p *path) resolvesToChanged(i int) {
 	if p.receiver == nil {
 		return
 	}
-	p.receiver.ensureResolvesTo(components[i].unexpanded)
+	p.receiver(components[i].unexpanded)
 }
 
 // definitionsForOffset searches the components of this path for a

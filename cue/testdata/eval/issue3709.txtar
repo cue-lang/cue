@@ -1,6 +1,5 @@
 # Issue #3709
 # Prevent hang.
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- cue.mod/module.cue --
 module: "foo.test/bar"
 language: version: "v0.11.0"
@@ -10,6 +9,7 @@ package p
 import "foo.test/bar/imported"
 
 out: [string]: imported.#Foo
+@test(eq, { out: [_]: {bar?: foo?: _ @test(ignore)} })
 -- imported/imported.cue --
 package imported
 
@@ -32,8 +32,3 @@ Retain: 0
 Unifications: 2
 Conjuncts:    2
 Disjuncts:    2
--- out/evalalpha --
-(struct){
-  out: (struct){
-  }
-}

@@ -960,7 +960,7 @@ func (r *inlineRunner) parseAndExtract() ([]*cueFileResult, []attrRecord, error)
 // scope value; test files are compiled with that scope so that references from
 // test files to fixture-file fields resolve correctly.
 func (r *inlineRunner) buildValue(ctx *cue.Context, cueFiles []*cueFileResult) (cue.Value, error) {
-	combined := ctx.CompileString("{}")
+	combined := ctx.CompileString("_")
 
 	// First pass: compile fixture files (no @test attrs).
 	// Their fields form the scope for test files.

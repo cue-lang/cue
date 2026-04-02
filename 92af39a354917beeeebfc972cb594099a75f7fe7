@@ -1,0 +1,350 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adda35b5_1afe7e3c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "this is not implemented, so I think it\u0027s misleading.",
+      "range": {
+        "startLine": 22,
+        "startChar": 43,
+        "endLine": 22,
+        "endChar": 50
+      },
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ca12474_36167319",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "can we reuse some of our internal/diff code, for example in astcmp.go? I see a lot of very similar logic when it comes to comparing lists and structs, for example. I get that here you\u0027re comparing AST with ADT, but perhaps we can compile or convert first, and then use internal/diff on that?",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "191b830f_b1c54142",
+        "filename": "cue/testdata/inlinetest/directives.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "these testdata files are rather repetitive. e.g. `eq` is extensively tested in this file, but also `basic.txtar` and `decl_eq*`.\n\nmy 2c would be to delete `basic.txtar`, because the basics are already covered in `cue/testdata/readme.md`. and I would delete this file too, because each directive has its own testdata files covering all relevant edge cases.\n\nduplication is not a huge issue, but it\u0027s also unnecessary and it makes future changes harder, so I would only add more files if they really serve a purpose or add coverage.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5d1e719_550119af",
+        "filename": "cue/testdata/inlinetest/sharing.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "nit: I would call this `shareID` to be consistent with how we spell \"ID\" elsewhere.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5e2c1c1_29ce5599",
+        "filename": "cue/testdata/readme.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "ask the AI to double check that these docs are in sync with the actually implemented directives, e.g. I see that `sharing` is missing here.\n\nactually, for that one it\u0027s a little worse than I thought - we have a test but no implementation. was the test added too soon? or does it need a TODO as it\u0027s resolved later in the stack?",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6442dac_9ea64603",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "document this - otherwise it\u0027s odd to omit just this one",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9493aa9_88512500",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "document this - otherwise it\u0027s odd to omit just this one",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "069570cd_2d245512",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "no need to make a new slice; you can trim in-place in the `parts` slice.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecc27043_b9e9f86c",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "manually unquoting literals like this is odd. why not use `cue/literal.Unquote`?",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6ac3967_e95183af",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "I think this helper is entirely unnecessary; I\u0027d just inline it.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d127774_13e77aa7",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "just make this `len(fileLevelRecords) \u003e 0`?",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d86cfcb_36953d00",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "this helper seems to be unnecessary at this point, so I\u0027d inline it. if it exists because you plan to expand this in the future, I would add a TODO to clarify that",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98176dcd_2f7edb12",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "this can be `slices.Collect(maps.Keys(byDirective))`",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b76662b6_44be2906",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1239,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "this can be just `p.String()`, no?",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b929508_eb5eec85",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1284,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "please remind the AI to use `slices.SortFunc` rather than `sort.Slice`",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63a472c9_0f4b6dd2",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1437,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "should we fall back to bottom? ISTM like `kind\u003dwhatever` or typos like `kind\u003dnul` should be a hard failure rather than silently acting like `kind\u003dbottom`",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a42108af_ca3af7fa",
+        "filename": "internal/cuetxtar/inline_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 818,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "this package is adding a lot of unit tests, are all of them really that useful? I would hope that we just need \u003c500 lines of unit tests covering various edge cases and expected failures, but letting the happy path be tested by the corpus of txtar files elsewhere. having nearly 2k lines of added unit tests in this package feels like a lot.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c08ea716_bae76a88",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "what about having this automatically on if the CUE source has at least one `@test(...)` attribute? wouldn\u0027t that automatically do the right thing for pretty much all of our tests?\n\nor alternatively, I\u0027d base this on an `#inline` directive at the top of the txtar as you suggest below, so that we can force it on or off on a per-file basis rather than globally in the Go test code.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a35fb773_8550763d",
+        "filename": "internal/cuetxtar/writeback.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "the AI is using per-file godocs, which is not right. they will all be joined together into one massive package godoc explaining \"this file\" over and over again.\n\neither drop these and use a single package godoc covering the whole package, or separate the \"this file\" docs so that they go after the `package` line.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d369b473_3cb0dcef",
+        "filename": "internal/cuetxtar/writeback.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:52:55Z",
+      "side": 1,
+      "message": "use `slices.SortFunc`",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

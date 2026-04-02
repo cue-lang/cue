@@ -162,7 +162,7 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 // are replaced with the corresponding non-surrogate code points.
 func (q QuoteInfo) Unquote(s string) (string, error) {
 	if len(s) > 0 && !q.multiline {
-		if strings.ContainsAny(s, "\n\r") {
+		if strings.ContainsRune(s, '\n') {
 			return "", errSyntax
 		}
 

@@ -25,6 +25,7 @@ func TestUnquote(t *testing.T) {
 		err     error
 	}{
 		{`"Hello"`, "Hello", nil},
+		{"\"\r\"", "\r", nil},
 		{`'Hello'`, "Hello", nil},
 		{`'Hellø'`, "Hellø", nil},
 		{`"""` + "\n\t\tHello\n\t\t" + `"""`, "Hello", nil},

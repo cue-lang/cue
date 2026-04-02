@@ -18,6 +18,7 @@
 package scanner
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
 	"unicode"
@@ -413,7 +414,7 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 	return true, false
 }
 
-func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
+func (s *Scanner) scanString(offs int, quote quoteInfo, continuation bool) (token.Token, string) {
 	// ", """, ', or ''' opening already consumed
 
 	tok := token.STRING
@@ -422,7 +423,12 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 	extra := 0
 	// For multiline strings, the closing quotes must follow a newline
 	// (with optional whitespace indentation). The opening newline was already consumed.
-	atLineStart := quote.numChar == 3
+	// For a new multiline string, the opening newline was already consumed,
+	// so we start at a line boundary. For continuations after interpolation,
+	// we resume mid-line.
+	atLineStart := quote.numChar == 3 && !continuation
+	lineStart := s.offset
+	var minLineWS []byte // shortest whitespace prefix of any non-empty content line
 	for {
 		ch := s.ch
 		if (quote.numChar != 3 && ch == '\n') || ch < 0 {
@@ -443,9 +449,15 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 		switch {
 		case ch == '\n':
 			atLineStart = true
+			lineStart = s.offset
 		case quote.numChar == 3 && atLineStart && (ch == ' ' || ch == '\t'):
 			// preserve atLineStart
 		default:
+			if atLineStart {
+				if ws := s.src[lineStart : s.offset-1]; minLineWS == nil || len(ws) < len(minLineWS) {
+					minLineWS = ws
+				}
+			}
 			atLineStart = false
 		}
 		if ch == '\r' && quote.numChar == 3 {
@@ -463,6 +475,12 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 	lit := s.src[offs : s.offset+extra]
 	if hasCR {
 		lit = stripCR(lit)
+	}
+	if tok == token.STRING && minLineWS != nil {
+		closingWS := s.src[lineStart : s.offset-int(quote.numChar)-quote.numHash]
+		if !bytes.HasPrefix(minLineWS, closingWS) {
+			s.errf(offs, "non-matching whitespace for multiline strings")
+		}
 	}
 	return tok, string(lit)
 }
@@ -624,7 +642,7 @@ func (s *Scanner) popInterpolation() quoteInfo {
 // of the next interpolation expression if there is one.
 func (s *Scanner) ResumeInterpolation() string {
 	quote := s.popInterpolation()
-	_, str := s.scanString(s.offset-1, quote)
+	_, str := s.scanString(s.offset-1, quote, true)
 	return str
 }
 
@@ -813,7 +831,7 @@ scanAgain:
 			switch _, n := s.consumeQuotes(ch, 2); n {
 			case 0:
 				quote.numChar = 1
-				tok, lit = s.scanString(offs, quote)
+				tok, lit = s.scanString(offs, quote, false)
 			case 1:
 				// When the string is surrounded by hashes,
 				// a single leading quote is OK (and part of the string)
@@ -825,19 +843,19 @@ scanAgain:
 					// It's the empty string.
 					tok, lit = token.STRING, string(s.src[offs:s.offset])
 				} else {
-					tok, lit = s.scanString(offs, quote)
+					tok, lit = s.scanString(offs, quote, false)
 				}
 			case 2:
 				quote.numChar = 3
 				switch s.ch {
 				case '\n':
 					s.next()
-					tok, lit = s.scanString(offs, quote)
+					tok, lit = s.scanString(offs, quote, false)
 				case '\r':
 					s.next()
 					if s.ch == '\n' {
 						s.next()
-						tok, lit = s.scanString(offs, quote)
+						tok, lit = s.scanString(offs, quote, false)
 						break
 					}
 					fallthrough

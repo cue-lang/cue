@@ -311,6 +311,12 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 				patterns = append(patterns, expectedPattern{label: label.Elts[0], value: d.Value})
 			}
 		case *ast.EmbedDecl:
+			val := val
+			if v, ok := val.Core().V.BaseValue.(adt.Value); ok {
+				ctx := value.OpContext(val)
+				val = value.Make(ctx, v)
+			}
+
 			if err := c.astCmp(path, d.Expr, val); err != nil {
 				return err
 			}
@@ -758,6 +764,14 @@ func flattenConjunction(expr ast.Expr) []ast.Expr {
 }
 
 func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value) error {
+	// Check that this is a valid conjunction. If it is, we can investigate
+	// the conjuncts in isolation as per how lattices work.
+	ctx := val.Context()
+	v := ctx.BuildExpr(e, cue.InferBuiltins(true))
+	if err := v.Err(); err != nil {
+		return pathErr(path, "cannot compile conjunction expression: %v", err)
+	}
+
 	astParts := flattenConjunction(e)
 	op, args := val.Eval().Expr()
 	if op != cue.AndOp && op != cue.NoOp {

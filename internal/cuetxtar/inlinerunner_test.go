@@ -198,10 +198,13 @@ func TestInlineRunner_FixtureField(t *testing.T) {
 		},
 		{
 			// Pure fixture file: no @test attrs anywhere in fixture.cue.
+			// Package declarations required for cross-file identifier resolution.
 			name: "pure fixture file no annotation needed",
 			archive: "-- fixture.cue --\n" +
+				"package p\n" +
 				"fixture: foo: 1\n" +
 				"-- test.cue --\n" +
+				"package p\n" +
 				"a: fixture.foo & int @test(eq, 1)\n",
 		},
 	}

@@ -48,6 +48,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -753,14 +754,6 @@ func (r *inlineRunner) runDirectivesForPath(t *testing.T, path cue.Path, val cue
 func (r *inlineRunner) runArchive() {
 	r.t.Helper()
 
-	// Parse and extract @test attrs from all CUE files.
-	cueFiles, allRecords, err := r.parseAndExtract()
-	if err != nil {
-		r.t.Fatalf("inline: failed to parse CUE files: %v", err)
-		return
-	}
-	r.cueFiles = cueFiles
-
 	// Check for #subpath restriction.
 	subpath := r.subpath()
 
@@ -768,7 +761,7 @@ func (r *inlineRunner) runArchive() {
 	// Note: val.Err() may be non-nil if sub-fields are erroneous; this is
 	// intentional for tests that assert errors. We only fatal on compile errors.
 	ctx := r.cueContext()
-	val, compileErr := r.buildValue(ctx, cueFiles)
+	val, allRecords, compileErr := r.buildValue(ctx, nil)
 	if compileErr != nil {
 		r.t.Fatalf("inline: CUE compile error: %v", compileErr)
 		return
@@ -813,7 +806,7 @@ func (r *inlineRunner) runArchive() {
 
 	// Build ordered roots preserving declaration order.
 	var roots []testCaseRoot
-	for _, f := range cueFiles {
+	for _, f := range r.cueFiles {
 		for _, decl := range f.strippedAST.Decls {
 			field, ok := decl.(*ast.Field)
 			if !ok {
@@ -938,83 +931,104 @@ type cueFileResult struct {
 	hasTestAttrs bool
 }
 
-// parseAndExtract parses all .cue files, extracts @test attrs, and returns:
-// - the stripped AST files
-// - all attrRecords
-func (r *inlineRunner) parseAndExtract() ([]*cueFileResult, []attrRecord, error) {
-	var results []*cueFileResult
+// buildValue compiles and evaluates CUE files.
+//
+// When cueFiles is nil, loads fresh from r.archive. If the archive contains a
+// cue.mod/module.cue, module-aware loading (loadWithConfig) is used, which
+// handles external package imports and cross-file references. Otherwise the
+// files are compiled independently and unified (CompileBytes). After loading,
+// @test attributes are extracted and stripped from the main-package files, and
+// r.cueFiles is populated.
+//
+// When cueFiles is non-nil (permutation rebuild), the caller has already
+// modified the AST elements in place (field reordering). buildValue reformats
+// those ASTs, creates a fresh stripped archive, and reloads to produce a new
+// cue.Value that reflects the permuted field ordering.
+func (r *inlineRunner) buildValue(ctx *cue.Context, cueFiles []*cueFileResult) (cue.Value, []attrRecord, error) {
+	if cueFiles != nil {
+		// Permutation rebuild: format modified ASTs and reload.
+		return r.buildFromFilesViaLoad(ctx, cueFiles)
+	}
+	// Initial load.
+	return r.buildFromArchive(ctx)
+}
+
+// relFilename converts an absolute filename to a relative one by stripping the
+// runner's directory prefix. Falls back to the basename if stripping fails.
+func (r *inlineRunner) relFilename(absPath string) string {
+	if rel, err := filepath.Rel(r.dir, absPath); err == nil {
+		return filepath.ToSlash(rel)
+	}
+	return filepath.Base(absPath)
+}
+
+// buildFromArchive loads the archive via loadWithConfig, extracts @test attrs
+// from the parsed AST files, then reloads from formatted stripped ASTs so that
+// error positions in the evaluated value match the baseLine values computed
+// during attribute extraction (which are in stripped-source coordinates).
+func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, []attrRecord, error) {
+	// First load: get parsed AST files for attr extraction.
+	insts := loadWithConfig(r.archive, r.dir, load.Config{Env: []string{}})
+	if len(insts) == 0 {
+		return cue.Value{}, nil, fmt.Errorf("no instances found")
+	}
+	inst := insts[0]
+	if inst.Err != nil {
+		return cue.Value{}, nil, inst.Err
+	}
+
 	var allRecords []attrRecord
-
-	for _, f := range r.archive.Files {
-		if !strings.HasSuffix(f.Name, ".cue") {
-			continue
-		}
-		af, err := parser.ParseFile(f.Name, f.Data, parser.ParseComments)
-		if err != nil {
-			return nil, nil, fmt.Errorf("parse %s: %w", f.Name, err)
-		}
-		records := extractTestAttrs(af, f.Name)
+	for _, f := range inst.Files {
+		relName := r.relFilename(f.Filename)
+		records := extractTestAttrs(f, relName)
 		allRecords = append(allRecords, records...)
-
-		results = append(results, &cueFileResult{
-			name:         f.Name,
-			strippedAST:  af,
+		r.cueFiles = append(r.cueFiles, &cueFileResult{
+			name:         relName,
+			strippedAST:  f,
 			hasTestAttrs: len(records) > 0,
 		})
 	}
-	return results, allRecords, nil
+
+	// Second load: format stripped ASTs and reload so error positions reflect
+	// stripped source coordinates, matching baseLine from attr extraction.
+	val, _, err := r.buildFromFilesViaLoad(ctx, r.cueFiles)
+	return val, allRecords, err
 }
 
-// buildValue compiles and evaluates the stripped CUE files using the test context.
-// Returns a compile-level error (parse/compile failure), not evaluation errors.
-// Evaluation errors in sub-fields are returned as bottom values within the
-// returned cue.Value and are intentional for tests asserting errors.
-//
-// Fixture files (hasTestAttrs==false) are compiled first and collected into a
-// scope value; test files are compiled with that scope so that references from
-// test files to fixture-file fields resolve correctly.
-func (r *inlineRunner) buildValue(ctx *cue.Context, cueFiles []*cueFileResult) (cue.Value, error) {
-	combined := ctx.CompileString("_")
-
-	// First pass: compile fixture files (no @test attrs).
-	// Their fields form the scope for test files.
-	fixtureScope := ctx.CompileString("{}")
+// buildFromFilesViaLoad formats ASTs, creates a stripped archive, and reloads
+// via loadWithConfig. Used for permutation rebuilds in module-aware archives.
+func (r *inlineRunner) buildFromFilesViaLoad(ctx *cue.Context, cueFiles []*cueFileResult) (cue.Value, []attrRecord, error) {
+	strippedByName := make(map[string][]byte, len(cueFiles))
 	for _, cf := range cueFiles {
-		if cf.hasTestAttrs {
-			continue
-		}
-		fmtBytes, err := format.Node(cf.strippedAST)
+		b, err := format.Node(cf.strippedAST)
 		if err != nil {
-			return cue.Value{}, fmt.Errorf("format %s: %w", cf.name, err)
+			return cue.Value{}, nil, fmt.Errorf("format %s: %w", cf.name, err)
 		}
-		v := ctx.CompileBytes(fmtBytes, cue.Filename(cf.name))
-		if v.BuildInstance() == nil && v.Err() != nil {
-			return cue.Value{}, v.Err()
-		}
-		fixtureScope = fixtureScope.Unify(v)
-		combined = combined.Unify(v)
+		strippedByName[cf.name] = b
 	}
 
-	// Second pass: compile test files with fixture scope so that
-	// cross-file references to fixture fields resolve correctly.
-	for _, cf := range cueFiles {
-		if !cf.hasTestAttrs {
-			continue // already compiled above
+	stripped := *r.archive
+	stripped.Files = make([]txtar.File, len(r.archive.Files))
+	copy(stripped.Files, r.archive.Files)
+	for i, f := range stripped.Files {
+		if b, ok := strippedByName[f.Name]; ok {
+			stripped.Files[i].Data = b
 		}
-		fmtBytes, err := format.Node(cf.strippedAST)
-		if err != nil {
-			return cue.Value{}, fmt.Errorf("format %s: %w", cf.name, err)
-		}
-		v := ctx.CompileBytes(fmtBytes, cue.Filename(cf.name), cue.Scope(fixtureScope))
-		// Distinguish syntax/compile errors from evaluation errors.
-		// BuildInstance() returns nil only when there is a syntax error;
-		// evaluation errors produce a non-nil instance with a bottom value.
-		if v.BuildInstance() == nil && v.Err() != nil {
-			return cue.Value{}, v.Err()
-		}
-		combined = combined.Unify(v)
 	}
-	return combined, nil
+
+	insts := loadWithConfig(&stripped, r.dir, load.Config{Env: []string{}})
+	if len(insts) == 0 {
+		return cue.Value{}, nil, fmt.Errorf("no instances found")
+	}
+	inst := insts[0]
+	if inst.Err != nil {
+		return cue.Value{}, nil, inst.Err
+	}
+	val := ctx.BuildInstance(inst)
+	if val.BuildInstance() == nil && val.Err() != nil {
+		return cue.Value{}, nil, val.Err()
+	}
+	return val, nil, nil
 }
 
 // cueContext returns the appropriate cue.Context for the current matrix entry.
@@ -1355,7 +1369,9 @@ func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Va
 			got := positions[i]
 			if exp.fileName != "" {
 				// Absolute form: match filename + absolute line + column.
-				if got.Filename() != exp.fileName || got.Line() != exp.absLine || got.Column() != exp.col {
+				// Normalize the position filename for archives loaded via
+				// loadWithConfig, which stores absolute paths in positions.
+				if r.relFilename(got.Filename()) != exp.fileName || got.Line() != exp.absLine || got.Column() != exp.col {
 					match = false
 					break
 				}
@@ -1390,9 +1406,10 @@ func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Va
 	for i, exp := range expected {
 		got := positions[i]
 		if exp.fileName != "" {
-			if got.Filename() != exp.fileName || got.Line() != exp.absLine || got.Column() != exp.col {
+			gotFile := r.relFilename(got.Filename())
+			if gotFile != exp.fileName || got.Line() != exp.absLine || got.Column() != exp.col {
 				t.Errorf("path %s: @test(err, pos=...): position[%d]: got %s:%d:%d, want %s:%d:%d",
-					path, i, got.Filename(), got.Line(), got.Column(), exp.fileName, exp.absLine, exp.col)
+					path, i, gotFile, got.Line(), got.Column(), exp.fileName, exp.absLine, exp.col)
 			}
 		} else {
 			wantLine := pa.baseLine + exp.deltaLine
@@ -1700,12 +1717,17 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 
 // debugPrinterOutput returns the standard debug-printer representation of val,
 // equivalent to what appears in out/eval golden sections.
+// Absolute file paths from module-aware loading are normalized to relative.
 func (r *inlineRunner) debugPrinterOutput(val cue.Value) string {
 	c := val.Core()
 	if c.V == nil {
 		return ""
 	}
-	return debug.NodeString(c.R, c.V, nil)
+	out := debug.NodeString(c.R, c.V, nil)
+	if r.dir != "" {
+		out = strings.ReplaceAll(out, filepath.ToSlash(r.dir)+"/", "")
+	}
+	return out
 }
 
 // normalizeLines trims trailing whitespace from each line and strips any

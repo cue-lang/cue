@@ -100,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01379504_ca954cab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "More info: The core issue is that `internal/diff` operates on two evaluated CUE values. What then happens is that it would basically compare against two evaluated values, possibly papering over bugs. For instance if I compare `*1 | int` against `*1 | 1 | int` to see if the second normalized to the first, I would end up checking `1` against `1`.",
+      "parentUuid": "8ca12474_36167319",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "191b830f_b1c54142",
@@ -117,6 +135,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6555978c_f6f463b4",
+        "filename": "cue/testdata/inlinetest/directives.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Fair point. Will remove `basic.txtar` and `directives.txtar` — the per-directive txtar files cover the same ground and the basics are in `cue/testdata/readme.md`.",
+      "parentUuid": "191b830f_b1c54142",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5d1e719_550119af",
@@ -130,6 +166,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "nit: I would call this `shareID` to be consistent with how we spell \"ID\" elsewhere.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d11f8d5b_cb66c558",
+        "filename": "cue/testdata/inlinetest/sharing.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "shareID is specced but not yet implemented (the sharing.txtar test is skipped). Will rename when the implementation lands.",
+      "parentUuid": "e5d1e719_550119af",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -169,6 +223,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac6d6e36_f4aa0d3f",
+        "filename": "cue/testdata/readme.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Updated readme.md to document all currently implemented directives and added a note that `sharing` (`shareId`) is specced but not yet implemented.",
+      "parentUuid": "d5e2c1c1_29ce5599",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6442dac_9ea64603",
@@ -182,6 +254,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "document this - otherwise it\u0027s odd to omit just this one",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b1148ed_cb92ebf5",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e6442dac_9ea64603",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -203,6 +293,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a79aeb6_06080ed2",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e9493aa9_88512500",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "069570cd_2d245512",
@@ -220,6 +328,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df8dbf02_59ae73cc",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Now trims in-place in the `parts` slice.",
+      "parentUuid": "069570cd_2d245512",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ecc27043_b9e9f86c",
@@ -233,6 +359,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "manually unquoting literals like this is odd. why not use `cue/literal.Unquote`?",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e712ff38_08067e74",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Now using `cue.Label(label)` which handles both string and ident labels correctly without manual unquoting.",
+      "parentUuid": "ecc27043_b9e9f86c",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -289,6 +433,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdd29d5c_236a01cd",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Replaced the separate `hasFileLevel` bool with `len(fileLevelRecords) \u003e 0`.",
+      "parentUuid": "2d127774_13e77aa7",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d86cfcb_36953d00",
@@ -302,6 +464,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "this helper seems to be unnecessary at this point, so I\u0027d inline it. if it exists because you plan to expand this in the future, I would add a TODO to clarify that",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10e287b9_1caa4509",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d86cfcb_36953d00",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -323,6 +503,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "542c0f44_bcf5aa77",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Using `slices.Collect(maps.Values(byDirective))` (Values, not Keys — the map values are `parsedTestAttr`).",
+      "parentUuid": "98176dcd_2f7edb12",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b76662b6_44be2906",
@@ -336,6 +534,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "this can be just `p.String()`, no?",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "698a0e74_596ac883",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1239,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Now using `cue.Path` throughout; path errors use `path.String()` directly.",
+      "parentUuid": "b76662b6_44be2906",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -357,6 +573,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa2be2be_18de277e",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1284,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Replaced `sort.Slice` with `slices.SortFunc`.",
+      "parentUuid": "7b929508_eb5eec85",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "63a472c9_0f4b6dd2",
@@ -370,6 +604,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "should we fall back to bottom? ISTM like `kind\u003dwhatever` or typos like `kind\u003dnul` should be a hard failure rather than silently acting like `kind\u003dbottom`",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e10ad47_88dd2f9e",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1437,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Already a hard failure: `parseKindStr` returns `cue.BottomKind` for unknown names, and the caller immediately calls `t.Errorf` and returns on that case.",
+      "parentUuid": "63a472c9_0f4b6dd2",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -391,6 +643,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7613fb26_52d90bc9",
+        "filename": "internal/cuetxtar/inline_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 818,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Agreed. Will trim the unit tests to focus on error/edge cases that aren\u0027t covered by the txtar corpus, targeting well under 500 lines.",
+      "parentUuid": "a42108af_ca3af7fa",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c08ea716_bae76a88",
@@ -404,6 +674,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "what about having this automatically on if the CUE source has at least one `@test(...)` attribute? wouldn\u0027t that automatically do the right thing for pretty much all of our tests?\n\nor alternatively, I\u0027d base this on an `#inline` directive at the top of the txtar as you suggest below, so that we can force it on or off on a per-file basis rather than globally in the Go test code.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e31ec0ab_2e73fcae",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Not all tests should go to inline mode if @test exists. For instance TestCompile. Basically, only TestEvalV3 should enable this. All other archive-based tests should not use this! This is especially relevant as these tests share the same txtar files.",
+      "parentUuid": "c08ea716_bae76a88",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -425,6 +713,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "43037389_0b409d32",
+        "filename": "internal/cuetxtar/writeback.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Moved the \"this file\" comments to after the `package` line so they are file-level comments rather than package-doc.",
+      "parentUuid": "a35fb773_8550763d",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d369b473_3cb0dcef",
@@ -438,6 +744,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "use `slices.SortFunc`",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91ab1a00_64b3bbf8",
+        "filename": "internal/cuetxtar/writeback.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T13:11:47Z",
+      "side": 1,
+      "message": "Done. Replaced the manual insertion sort with `slices.SortFunc`.",
+      "parentUuid": "d369b473_3cb0dcef",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

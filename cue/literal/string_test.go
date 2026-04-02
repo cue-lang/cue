@@ -91,6 +91,8 @@ func TestUnquote(t *testing.T) {
 		{`#"This is a "dog""#`, `This is a "dog"`, nil},
 		{"#\"\"\"\n\"\n\"\"\"#", `"`, nil},
 		{"#\"\"\"\n\"\"\"\n\"\"\"#", `"""`, nil},
+		{"\"\"\"\n0\"\"\"\n\"\"\"", `0"""`, nil},
+		{"'''\n0'''\n'''", `0'''`, nil},
 		{"#\"\"\"\n\na\n\n\"\"\"#", "\na\n", nil},
 		// Gobble extra \r
 		{"#\"\"\"\n\ra\n\r\"\"\"#", `a`, nil},

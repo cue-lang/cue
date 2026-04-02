@@ -16,6 +16,24 @@
       "message": "indentation. Using single tab.",
       "revId": "3838e3f691bf32e197452f3710859a1bcb69372b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3ced2dc_bb8e8797",
+        "filename": "cue/testdata/fulleval/006_referencing_field_in_field_comprehension.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T09:45:59Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f46b68af_7e546a8b",
+      "revId": "3838e3f691bf32e197452f3710859a1bcb69372b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

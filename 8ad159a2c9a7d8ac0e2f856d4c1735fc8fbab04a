@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1222f47_fcfc4e4d",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2378,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-02T15:57:53Z",
+      "side": 1,
+      "message": "Maybe should have a test for the reasonably common scenario of embedding a `close` expression too?",
+      "revId": "8ad159a2c9a7d8ac0e2f856d4c1735fc8fbab04a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e32a8d0a_cf40a278",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2439,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-02T15:57:53Z",
+      "side": 1,
+      "message": "wow, I didn\u0027t realise this worked. I\u0027m not entirely sure it should 😉",
+      "revId": "8ad159a2c9a7d8ac0e2f856d4c1735fc8fbab04a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

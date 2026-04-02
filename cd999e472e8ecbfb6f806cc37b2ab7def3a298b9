@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9baa0678_18fe7150",
+        "filename": "cue/testdata/eval/structs.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T15:42:48Z",
+      "side": 1,
+      "message": "why not do this TODO here, given that we now support validators with this patch?",
+      "revId": "cd999e472e8ecbfb6f806cc37b2ab7def3a298b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a52d3d4_5cedd118",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 774,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T15:42:48Z",
+      "side": 1,
+      "message": "this is an almost exact copy of the changes below in runInline. reuse via a helper or some other way?",
+      "revId": "cd999e472e8ecbfb6f806cc37b2ab7def3a298b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

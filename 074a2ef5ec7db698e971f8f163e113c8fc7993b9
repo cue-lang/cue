@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2533239b_47401ee6",
+        "filename": "internal/cuetest/cuetest.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T09:49:15Z",
+      "side": 1,
+      "message": "why not do this by default? I worry that having this opt-in will mean that we basically never use it, meaning that it\u0027s effectively pointless to have.\n\nput another way, should CI enforce this?\n\nanother thought that comes to mind is to instead augment CUE_UPDATE, so that it gains a new \"diff\" mode that would show the changes it would make and fail the tests rather than update files. that feels way more natural to me.",
+      "revId": "074a2ef5ec7db698e971f8f163e113c8fc7993b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

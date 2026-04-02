@@ -398,7 +398,7 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 	var x uint32
 	for n > 0 {
 		d := uint32(digitVal(s.ch))
-		if d >= base {
+		if s.ch == '_' || d >= base {
 			if s.ch < 0 {
 				s.errf(s.offset, "escape sequence not terminated")
 			} else {

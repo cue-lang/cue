@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "25982fe2_86f32b5b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T10:11:30Z",
+      "side": 1,
+      "message": "Yes, in the tests I mark it as todo. I can mark it as todo here too.",
+      "parentUuid": "adda35b5_1afe7e3c",
+      "range": {
+        "startLine": 22,
+        "startChar": 43,
+        "endLine": 22,
+        "endChar": 50
+      },
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8ca12474_36167319",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 6
@@ -54,6 +78,24 @@
       "writtenOn": "2026-04-02T08:53:18Z",
       "side": 1,
       "message": "I reviewed as best as can be expected given how huge and AI-assisted this change is.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00d0b245_3f8116ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T10:11:30Z",
+      "side": 1,
+      "message": "I did that initially, but we really need to compare AST with an ADT, which we don\u0027t have yet. Also, there is some very specific diffing logic that only makes sense for this framework. For instance, we won\u0027t be able to use this for a `cue test` implementation.",
+      "parentUuid": "8ca12474_36167319",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +147,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "ask the AI to double check that these docs are in sync with the actually implemented directives, e.g. I see that `sharing` is missing here.\n\nactually, for that one it\u0027s a little worse than I thought - we have a test but no implementation. was the test added too soon? or does it need a TODO as it\u0027s resolved later in the stack?",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e6a3d07_5aa12b9d",
+        "filename": "cue/testdata/readme.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T10:11:30Z",
+      "side": 1,
+      "message": "I think what happened is that it was first implemented, but then I completely rewrote how diffing works and had to remove support for now. So I added \"skip\" to the test. \n\nSo it is spec-ed out, but the implementation is separate.",
+      "parentUuid": "d5e2c1c1_29ce5599",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -190,6 +250,24 @@
       "writtenOn": "2026-04-02T08:52:55Z",
       "side": 1,
       "message": "I think this helper is entirely unnecessary; I\u0027d just inline it.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dba1b488_5d247528",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T10:11:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6ac3967_e95183af",
       "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

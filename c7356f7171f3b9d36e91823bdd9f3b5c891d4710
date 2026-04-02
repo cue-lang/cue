@@ -16,6 +16,24 @@
       "message": "Note: in a later CL we encode the TODO as a specialized TODO that can be picked up by automated processing.",
       "revId": "c7356f7171f3b9d36e91823bdd9f3b5c891d4710",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46f7a314_5bd28925",
+        "filename": "cue/testdata/eval/structs.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T09:44:38Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4e0b7e53_133e4927",
+      "revId": "c7356f7171f3b9d36e91823bdd9f3b5c891d4710",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

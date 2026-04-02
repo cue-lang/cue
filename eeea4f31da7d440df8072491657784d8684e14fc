@@ -34,6 +34,40 @@
       "parentUuid": "ba31b6cf_181f2a3e",
       "revId": "eeea4f31da7d440df8072491657784d8684e14fc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f10b0c4_008c9f1f",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-02T13:54:06Z",
+      "side": 1,
+      "message": "this seems to start by duplicating the previous sentence?",
+      "revId": "eeea4f31da7d440df8072491657784d8684e14fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c133e05_2daba49f",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-02T13:54:06Z",
+      "side": 1,
+      "message": "but if this is a continuation, this will be wrong. I think you\u0027re going to have to stash lineStart in the scanner somehow so that it can be correctly resumed, otherwise I suspect you could make something odd pass with an interpolation ending right before the closing \"\"\" - maybe something that finishes with `\\\"\"\"` perhaps - it\u0027s just the use of lineStart at line 480 which is not guarded by atLineStart that is worrying me.\n\nThis is actually confusing me because I think atLineStart is misnamed - as it is currently, it suggests that you could drop it and just use \"lineStart \u003d\u003d s.offset\" where you need it. But actually you can\u0027t because of the fact you maintain lineStart if there are leading whitespace only.\n\nWhich suggests to me that lineStart should be renamed to \"closeAllowed\" or similar.",
+      "revId": "eeea4f31da7d440df8072491657784d8684e14fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

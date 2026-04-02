@@ -41,6 +41,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0b38608_fd5933a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T08:53:18Z",
+      "side": 1,
+      "message": "I reviewed as best as can be expected given how huge and AI-assisted this change is.",
+      "revId": "92af39a354917beeeebfc972cb594099a75f7fe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "191b830f_b1c54142",

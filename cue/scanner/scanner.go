@@ -368,8 +368,16 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 		s.next()
 		return true, false
 	case '0', '1', '2', '3', '4', '5', '6', '7':
+		if quote.char == '"' {
+			s.errf(offs, "octal escape not allowed in string literal")
+			return false, false
+		}
 		n, base, max = 3, 8, 255
 	case 'x':
+		if quote.char == '"' {
+			s.errf(offs, "hexadecimal escape not allowed in string literal")
+			return false, false
+		}
 		s.next()
 		n, base, max = 2, 16, 255
 	case 'u':

@@ -332,7 +332,12 @@ func unquoteChar(s string, info QuoteInfo) (value rune, multibyte bool, tail str
 			}
 		}
 		if ln := int(info.numChar) + info.numHash; len(s) != ln {
-			// TODO: terminating quote in middle of string
+			// For multiline strings, three quotes in the middle of a line
+			// are literal quote characters, not a closing delimiter.
+			// The closing delimiter must be on its own line per the spec.
+			if info.numChar == 3 {
+				return rune(info.char), false, s[1:], nil
+			}
 			return 0, false, s[ln:], errSyntax
 		}
 		return terminatedByQuote, false, "", nil

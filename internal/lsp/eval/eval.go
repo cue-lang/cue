@@ -1942,15 +1942,9 @@ func (f *frame) eval() {
 
 		case *ast.BinaryExpr:
 			switch node.Op {
-			case token.AND:
+			case token.AND, token.OR:
 				f.newFrame(node.X, f.navigable, true).addRange(node)
 				f.newFrame(node.Y, f.navigable, true).addRange(node)
-			case token.OR:
-				lhsNav := f.newFrame(node.X, nil, false).navigable
-				rhsNav := f.newFrame(node.Y, nil, false).navigable
-				f.navigable.ensureResolvesTo([]*navigable{lhsNav, rhsNav})
-				lhsNav.recordUsage(node, f)
-				rhsNav.recordUsage(node, f)
 			default:
 				f.newFrame(node.X, nil, false)
 				f.newFrame(node.Y, nil, false)

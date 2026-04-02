@@ -1,5 +1,11 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+# Tests that list.Avg returns a float value (not an integer) when the result
+# is mathematically a whole number. Issue: in v0.6.0 the integer representation
+# of the float result caused incorrect Int64() reads and panics in Int().
+# https://cuelang.org/issue/2649
 -- in.cue --
+@test(eq, 8.0)
+@test(eq:todo, 8)
+@test(kind=float) // TODO: should this be a float, or can it also be an int?
 (4 + 8 + 12) / 3
 -- out/compile --
 --- in.cue
@@ -16,5 +22,3 @@ Retain: 0
 Unifications: 1
 Conjuncts:    2
 Disjuncts:    1
--- out/evalalpha --
-(float){ 8.0 }

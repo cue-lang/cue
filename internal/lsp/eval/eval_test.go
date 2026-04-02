@@ -2382,7 +2382,7 @@ c: a.b
 `,
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "a"): {ln(1, 1, "a")},
-				ln(2, 1, "b"): {}, // FIXME!
+				ln(2, 1, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
@@ -2390,13 +2390,13 @@ c: a.b
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
 				or(0, 2):   {f: []string{"a", "c"}},
-				or(2, 9):   {e: []string{"a", "c"}},
-				or1(9):     {f: []string{"b"}, e: []string{"a", "c"}},
+				or(2, 10):  {f: []string{"b"}, e: []string{"a", "c"}},
 				or(10, 12): {f: []string{"b"}},
 				or(12, 15): {e: []string{"a", "b", "c"}},
 				or1(16):    {e: []string{"a", "c"}},
 				or(17, 19): {f: []string{"a", "c"}},
 				or(19, 22): {e: []string{"a", "c"}},
+				or(22, 24): {e: []string{"b"}},
 			},
 		},
 
@@ -2410,7 +2410,7 @@ klose: close
 			expectDefinitions: map[position][]position{
 				ln(1, 1, "klose"): {ln(3, 1, "klose")},
 				ln(2, 1, "a"):     {ln(1, 1, "a")},
-				ln(2, 1, "b"):     {}, // FIXME!
+				ln(2, 1, "b"):     {ln(1, 1, "b")},
 
 				ln(1, 1, "a"):     {self},
 				ln(1, 1, "b"):     {self},
@@ -2419,13 +2419,13 @@ klose: close
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
 				or(0, 2):   {f: []string{"a", "c", "klose"}},
-				or(2, 9):   {e: []string{"a", "c", "klose"}},
-				or1(9):     {f: []string{"b"}, e: []string{"a", "c", "klose"}},
+				or(2, 10):  {f: []string{"b"}, e: []string{"a", "c", "klose"}},
 				or(10, 12): {f: []string{"b"}},
 				or(12, 15): {e: []string{"a", "b", "c", "klose"}},
 				or1(16):    {e: []string{"a", "c", "klose"}},
 				or(17, 19): {f: []string{"a", "c", "klose"}},
 				or(19, 22): {e: []string{"a", "c", "klose"}},
+				or(22, 24): {e: []string{"b"}},
 				or(24, 30): {f: []string{"a", "c", "klose"}},
 				or(30, 37): {e: []string{"a", "c", "klose"}},
 			},
@@ -2443,7 +2443,7 @@ d: b: _
 				ln(1, 1, "klose"): {ln(3, 1, "klose")},
 				ln(1, 1, "d"):     {ln(4, 1, "d")},
 				ln(2, 1, "a"):     {ln(1, 1, "a")},
-				ln(2, 1, "b"):     {}, // FIXME!
+				ln(2, 1, "b"):     {ln(4, 1, "b")},
 
 				ln(1, 1, "a"):     {self},
 				ln(2, 1, "c"):     {self},
@@ -2453,11 +2453,11 @@ d: b: _
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
 				or(0, 2):   {f: []string{"a", "c", "d", "klose"}},
-				or(2, 9):   {e: []string{"a", "c", "d", "klose"}},
-				or(9, 11):  {f: []string{"b"}, e: []string{"a", "c", "d", "klose"}},
+				or(2, 11):  {f: []string{"b"}, e: []string{"a", "c", "d", "klose"}},
 				or1(11):    {e: []string{"a", "c", "d", "klose"}},
 				or(12, 14): {f: []string{"a", "c", "d", "klose"}},
 				or(14, 17): {e: []string{"a", "c", "d", "klose"}},
+				or(17, 19): {e: []string{"b"}},
 				or(19, 25): {f: []string{"a", "c", "d", "klose"}},
 				or(25, 32): {e: []string{"a", "c", "d", "klose"}},
 				or(32, 34): {f: []string{"a", "c", "d", "klose"}},

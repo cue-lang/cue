@@ -1,5 +1,7 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
+@test(eq, 8.0)
+@test(eq:todo, 8)
+@test(kind=float) // TODO: should this be a float, or can it also be an int?
 (4 + 8 + 12) / 3
 -- out/compile --
 --- in.cue
@@ -16,5 +18,3 @@ Retain: 0
 Unifications: 1
 Conjuncts:    2
 Disjuncts:    1
--- out/evalalpha --
-(float){ 8.0 }

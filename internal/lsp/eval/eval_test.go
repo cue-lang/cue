@@ -2375,6 +2375,99 @@ c: (f({a: b, b: 3})).g
 		},
 
 		{
+			name: "Call_Close",
+			archive: `-- a.cue --
+a: close({b: _})
+c: a.b
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "a"): {ln(1, 1, "a")},
+				ln(2, 1, "b"): {}, // FIXME!
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "c"}},
+				or(2, 9):   {e: []string{"a", "c"}},
+				or1(9):     {f: []string{"b"}, e: []string{"a", "c"}},
+				or(10, 12): {f: []string{"b"}},
+				or(12, 15): {e: []string{"a", "b", "c"}},
+				or1(16):    {e: []string{"a", "c"}},
+				or(17, 19): {f: []string{"a", "c"}},
+				or(19, 22): {e: []string{"a", "c"}},
+			},
+		},
+
+		{
+			name: "Call_Close_Indirect",
+			archive: `-- a.cue --
+a: klose({b: _})
+c: a.b
+klose: close
+`,
+			expectDefinitions: map[position][]position{
+				ln(1, 1, "klose"): {ln(3, 1, "klose")},
+				ln(2, 1, "a"):     {ln(1, 1, "a")},
+				ln(2, 1, "b"):     {}, // FIXME!
+
+				ln(1, 1, "a"):     {self},
+				ln(1, 1, "b"):     {self},
+				ln(2, 1, "c"):     {self},
+				ln(3, 1, "klose"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "c", "klose"}},
+				or(2, 9):   {e: []string{"a", "c", "klose"}},
+				or1(9):     {f: []string{"b"}, e: []string{"a", "c", "klose"}},
+				or(10, 12): {f: []string{"b"}},
+				or(12, 15): {e: []string{"a", "b", "c", "klose"}},
+				or1(16):    {e: []string{"a", "c", "klose"}},
+				or(17, 19): {f: []string{"a", "c", "klose"}},
+				or(19, 22): {e: []string{"a", "c", "klose"}},
+				or(24, 30): {f: []string{"a", "c", "klose"}},
+				or(30, 37): {e: []string{"a", "c", "klose"}},
+			},
+		},
+
+		{
+			name: "Call_Close_Double_Indirect",
+			archive: `-- a.cue --
+a: klose(d)
+c: a.b
+klose: close
+d: b: _
+`,
+			expectDefinitions: map[position][]position{
+				ln(1, 1, "klose"): {ln(3, 1, "klose")},
+				ln(1, 1, "d"):     {ln(4, 1, "d")},
+				ln(2, 1, "a"):     {ln(1, 1, "a")},
+				ln(2, 1, "b"):     {}, // FIXME!
+
+				ln(1, 1, "a"):     {self},
+				ln(2, 1, "c"):     {self},
+				ln(3, 1, "klose"): {self},
+				ln(4, 1, "d"):     {self},
+				ln(4, 1, "b"):     {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "c", "d", "klose"}},
+				or(2, 9):   {e: []string{"a", "c", "d", "klose"}},
+				or(9, 11):  {f: []string{"b"}, e: []string{"a", "c", "d", "klose"}},
+				or1(11):    {e: []string{"a", "c", "d", "klose"}},
+				or(12, 14): {f: []string{"a", "c", "d", "klose"}},
+				or(14, 17): {e: []string{"a", "c", "d", "klose"}},
+				or(19, 25): {f: []string{"a", "c", "d", "klose"}},
+				or(25, 32): {e: []string{"a", "c", "d", "klose"}},
+				or(32, 34): {f: []string{"a", "c", "d", "klose"}},
+				or1(34):    {f: []string{"b"}, e: []string{"a", "c", "d", "klose"}},
+				or(35, 37): {f: []string{"b"}},
+				or(37, 40): {e: []string{"a", "b", "c", "d", "klose"}},
+			},
+		},
+
+		{
 			name: "Disjunction_Simple",
 			archive: `-- a.cue --
 d: {a: b: 3} | {a: b: 4, c: 5}

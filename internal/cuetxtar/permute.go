@@ -161,7 +161,7 @@ func (r *inlineRunner) runPermuteAssertion(t *testing.T, structPath cue.Path, fi
 
 	// Evaluate the baseline (identity permutation / original source order).
 	ctx := r.cueContext()
-	baselineAll, err := r.buildValue(ctx, r.cueFiles)
+	baselineAll, _, err := r.buildValue(ctx, r.cueFiles)
 	if err != nil {
 		t.Errorf("path %s: @test(permute): baseline evaluation error: %v", structPath, err)
 		return 0
@@ -191,7 +191,7 @@ func (r *inlineRunner) runPermuteAssertion(t *testing.T, structPath cue.Path, fi
 				targetLit.Elts[permIndices[i]] = origElts[p]
 			}
 			// Re-evaluate the modified archive.
-			permAll, evalErr := r.buildValue(ctx, r.cueFiles)
+			permAll, _, evalErr := r.buildValue(ctx, r.cueFiles)
 			// Restore immediately so subsequent permutations start from original.
 			for i, idx := range permIndices {
 				targetLit.Elts[idx] = origElts[i]

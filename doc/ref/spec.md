@@ -546,7 +546,7 @@ immediately followed by a newline, which is discarded from the string contents.
 The string is closed by a matching triple quote, which must be by itself
 on a new line, preceded by optional whitespace.
 The newline preceding the closing quote is discarded from the string contents.
-The whitespace before a closing triple quote must appear before any non-empty
+The whitespace before a closing triple quote must appear before every non-empty
 line after the opening quote and will be removed from each of these
 lines in the string literal.
 A closing triple quote may not appear in the string.

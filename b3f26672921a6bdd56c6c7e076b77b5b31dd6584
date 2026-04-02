@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d21f3d60_05c205e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-02T10:35:29Z",
+      "side": 1,
+      "message": "makes sense. I don\u0027t have strong feelings either way but I can buy your reasoning, and consistency is nice",
+      "revId": "b3f26672921a6bdd56c6c7e076b77b5b31dd6584",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

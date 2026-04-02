@@ -766,6 +766,47 @@ func TestAstCompare_Ignore(t *testing.T) {
 	})
 }
 
+// TestCatchInvalidConjuncts verifies @test(eq, ...) that conjunctions are
+// valid.
+//
+// The astCompare implementation mostly assumes that literal values are
+// provided that can be checked verbatim. One exception is conjunctions, as
+// it is needed for testing validators. We can check each conjunct separately,
+// as long as their unification is valid. We do so to avoid having improper
+// CUE in the AST, which will be workable, but confusing.
+func TestCatchInvalidConjuncts(t *testing.T) {
+	// CUE source that produces (string){"s", #a: "s"}: a struct with an
+	// embedded #a field whose value is also the struct's scalar.
+	const srcField = `x: {
+	#a: _
+	_
+} & {
+	#a: "s"
+	#a
+}`
+	t.Run("conjunction form is invalid", func(t *testing.T) {
+		// "s" & {#a: "s"} is invalid CUE: {#a: "s"} has no embedded _ so a
+		// string literal cannot unify with it. astCompare must return an error
+		// for such a conjunction. This cannot be tested via a txtar test file
+		// because a failing @test would also fail the outer test run.
+		ctx := cuecontext.New()
+		val := ctx.CompileString(`{
+			#a: _
+			_
+		} & {
+			#a: "s"
+			#a
+		}`)
+		expr, err := parser.ParseExpr("test.cue", `"s" & {#a: "s"}`)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
+		if err := astCompare(expr, val); err == nil {
+			t.Error("expected error for invalid conjunction expression, got nil")
+		}
+	})
+}
+
 // checkErr is a test helper that verifies error expectations.
 func checkErr(t *testing.T, err error, wantErr string) {
 	t.Helper()

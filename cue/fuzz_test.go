@@ -38,10 +38,10 @@ list.Concat(["foo"], [])
 // group // here
 `)
 	f.Add(`"some string"`)
-	f.Add(`[1, 2.3, 4M, 5Gi]`)
+	f.Add(`[1, 2.3, 4M, 5Gi, 1E6, 1.e+0, .23E-10]`)
 	f.Add(`if foo { if bar if baz { x } }`)
 	f.Add(`[x for x in [a, b, c]]`)
-	f.Add(`foo: "bar": (baz): "\(x)": y`)
+	f.Add(`foo: "bar ": (baz): "\(x)": y`)
 	f.Add(`{x: _, y: _|_}`)
 	f.Add(`3 & int32`)
 	f.Add(`string | *"foo"`)
@@ -50,12 +50,22 @@ list.Concat(["foo"], [])
 	f.Add(`[1>1, 2>=2, 3==3, 4!=4]`)
 	f.Add(`[=~"^a"]: bool`)
 	f.Add(`[X=string]: Y={}`)
-	f.Add(`[len(x), close(y), and([]), or([]), div(5, 2)]`)
+	f.Add(`[len(x), close({y}), and([]), or([]), div(5, 2)]`)
+	f.Add(`value: "foo" & matchN(2, [string, !="bar", <4])`)
+	f.Add(`a: b: a`)
 	f.Add(`[null, bool, float, bytes, int16, uint128]`)
 	f.Add(`[ [...string], {x: string, ...}]]`)
 	f.Add(`{regular: x, required!: x, optional?: x}`)
 	f.Add(`{_hidden: x, #Definition: x, αβ: x}`)
-	f.Add(`["\u65e5本\U00008a9e", '\xff\u00FF']`)
+	f.Add(`["\u65e5本\U00008a9e", '\xff\003']`)
+	f.Add(`"""
+	here is a multiline
+	string literal
+	"""`)
+	f.Add(`'''
+	here is a multiline
+	bytes literal
+	'''`)
 	f.Add(`["\(expr)", #"\#(expr) \(notexpr)"#]`)
 	f.Add(`{@jsonschema(id="foo"), field: string @go(Field,type=Other)}`)
 	f.Add(`@experiment(explicitopen), out: #Schema... & data`)
@@ -63,6 +73,7 @@ list.Concat(["foo"], [])
 	f.Add(`@experiment(try), a?: int, try { b: a? + 1 }`)
 	f.Add(`@experiment(try), if false { "yes" } else { "no" }`)
 	f.Add(`@experiment(try), for x in [] { x } fallback { "zero" }`)
+	f.Add(`a[0], b["foo"], #c.#bar, _d._baz`)
 	f.Fuzz(func(t *testing.T, s string) {
 		if len(s) > 100 {
 			t.Skip() // keep inputs reasonably small for now

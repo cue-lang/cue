@@ -33,6 +33,24 @@
       "message": "why not do this by default? I worry that having this opt-in will mean that we basically never use it, meaning that it\u0027s effectively pointless to have.\n\nput another way, should CI enforce this?\n\nanother thought that comes to mind is to instead augment CUE_UPDATE, so that it gains a new \"diff\" mode that would show the changes it would make and fail the tests rather than update files. that feels way more natural to me.",
       "revId": "074a2ef5ec7db698e971f8f163e113c8fc7993b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbff5459_65e96de4",
+        "filename": "internal/cuetest/cuetest.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-02T10:11:21Z",
+      "side": 1,
+      "message": "I actually did that before, but then realized that it is a bit weird to do a check when requesting an update. But holding it the way you explain it makes sense.",
+      "parentUuid": "2533239b_47401ee6",
+      "revId": "074a2ef5ec7db698e971f8f163e113c8fc7993b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -18,6 +18,7 @@
 package scanner
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
 	"unicode"
@@ -60,6 +61,10 @@ type quoteInfo struct {
 	char    rune
 	numChar int
 	numHash int
+
+	// For multiline strings, persisted across interpolation boundaries.
+	startOffs int    // offset of the opening quotes
+	minLineWS []byte // shortest whitespace prefix of any non-empty content line; nil if none
 }
 
 const bom = 0xFEFF // byte order mark, only permitted as very first character
@@ -421,7 +426,7 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 	return true, false
 }
 
-func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
+func (s *Scanner) scanString(offs int, quote quoteInfo, continuation bool) (token.Token, string) {
 	// ", """, ', or ''' opening already consumed
 
 	tok := token.STRING
@@ -429,8 +434,15 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 	hasCR := false
 	extra := 0
 	// For multiline strings, the closing quotes must follow a newline
-	// (with optional whitespace indentation). The opening newline was already consumed.
-	atLineStart := quote.numChar == 3
+	// (with optional whitespace indentation).
+	// For a new multiline string, the opening newline was already consumed,
+	// so we start at a line boundary. For continuations after interpolation,
+	// we resume mid-line.
+	closeAllowed := quote.numChar == 3 && !continuation
+	if !continuation {
+		quote.startOffs = offs
+	}
+	lineStart := s.offset
 	for {
 		ch := s.ch
 		if (quote.numChar != 3 && ch == '\n') || ch < 0 {
@@ -443,18 +455,24 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 		}
 
 		s.next()
-		if quote.numChar != 3 || atLineStart {
+		if quote.numChar != 3 || closeAllowed {
 			if _, ok := s.consumeStringClose(ch, quote); ok {
 				break
 			}
 		}
 		switch {
 		case ch == '\n':
-			atLineStart = true
-		case quote.numChar == 3 && atLineStart && (ch == ' ' || ch == '\t'):
-			// preserve atLineStart
+			closeAllowed = true
+			lineStart = s.offset
+		case quote.numChar == 3 && closeAllowed && (ch == ' ' || ch == '\t'):
+			// preserve closeAllowed
 		default:
-			atLineStart = false
+			if closeAllowed {
+				if ws := s.src[lineStart : s.offset-1]; quote.minLineWS == nil || len(ws) < len(quote.minLineWS) {
+					quote.minLineWS = ws
+				}
+			}
+			closeAllowed = false
 		}
 		if ch == '\r' && quote.numChar == 3 {
 			hasCR = true
@@ -471,6 +489,12 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 	lit := s.src[offs : s.offset+extra]
 	if hasCR {
 		lit = stripCR(lit)
+	}
+	if tok == token.STRING && quote.minLineWS != nil {
+		closingWS := s.src[lineStart : s.offset-int(quote.numChar)-quote.numHash]
+		if !bytes.HasPrefix(quote.minLineWS, closingWS) {
+			s.errf(quote.startOffs, "non-matching whitespace for multiline strings")
+		}
 	}
 	return tok, string(lit)
 }
@@ -632,7 +656,7 @@ func (s *Scanner) popInterpolation() quoteInfo {
 // of the next interpolation expression if there is one.
 func (s *Scanner) ResumeInterpolation() string {
 	quote := s.popInterpolation()
-	_, str := s.scanString(s.offset-1, quote)
+	_, str := s.scanString(s.offset-1, quote, true)
 	return str
 }
 
@@ -821,7 +845,7 @@ scanAgain:
 			switch _, n := s.consumeQuotes(ch, 2); n {
 			case 0:
 				quote.numChar = 1
-				tok, lit = s.scanString(offs, quote)
+				tok, lit = s.scanString(offs, quote, false)
 			case 1:
 				// When the string is surrounded by hashes,
 				// a single leading quote is OK (and part of the string)
@@ -833,19 +857,19 @@ scanAgain:
 					// It's the empty string.
 					tok, lit = token.STRING, string(s.src[offs:s.offset])
 				} else {
-					tok, lit = s.scanString(offs, quote)
+					tok, lit = s.scanString(offs, quote, false)
 				}
 			case 2:
 				quote.numChar = 3
 				switch s.ch {
 				case '\n':
 					s.next()
-					tok, lit = s.scanString(offs, quote)
+					tok, lit = s.scanString(offs, quote, false)
 				case '\r':
 					s.next()
 					if s.ch == '\n' {
 						s.next()
-						tok, lit = s.scanString(offs, quote)
+						tok, lit = s.scanString(offs, quote, false)
 						break
 					}
 					fallthrough

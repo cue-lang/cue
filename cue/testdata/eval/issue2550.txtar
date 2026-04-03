@@ -1,12 +1,20 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that accessing an undefined field (bar.missing) on a closed empty struct
+# (bar: close({})) inside a comprehension guard correctly reports "undefined
+# field" rather than panicking or producing a wrong result. The let binding
+# (let _bar = bar) inside the comprehension body verifies that let bindings in
+# comprehensions interacting with closed structs do not affect the error behavior.
 -- in.cue --
-foo: string
-bar: close({})
+foo: string    @test(eq, string)
+bar: close({}) @test(eq, {}) @test(closed)
 
 if bar.missing == "x" {
 	let _bar = bar
 	foo: _bar
 }
+@test(err, code=eval, contains="undefined field", args=[missing], pos=[in.cue:4:8])
+-- out/errors.txt --
+[eval] undefined field: missing:
+    ./in.cue:4:8
 -- out/compile --
 --- in.cue
 {
@@ -29,42 +37,4 @@ Conjuncts:    5
 Disjuncts:    6
 
 NumCloseIDs: 1
--- out/eval --
-Errors:
-undefined field: missing:
-    ./in.cue:4:8
 
-Result:
-(_|_){
-  // [eval] undefined field: missing:
-  //     ./in.cue:4:8
-  foo: (string){ string }
-  bar: (#struct){
-  }
-  let _bar#1 = (_){ _ }
-}
--- out/evalalpha --
-Errors:
-undefined field: missing:
-    ./in.cue:4:8
-
-Result:
-(_|_){
-  // [eval] undefined field: missing:
-  //     ./in.cue:4:8
-  foo: (string){ string }
-  bar: (#struct){
-  }
-  let _bar#1multi = 〈1;bar〉
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -9,5 +9,5 @@
-   foo: (string){ string }
-   bar: (#struct){
-   }
--  let _bar#1 = (_){ _ }
-+  let _bar#1multi = 〈1;bar〉
- }

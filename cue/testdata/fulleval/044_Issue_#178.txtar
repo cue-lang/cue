@@ -12,11 +12,11 @@ len: int                 @test(kind=int)
 bar: hex.EncodedLen(len) @test(err, code=incomplete)
 -- out/errors.txt --
 [incomplete] foo: error in call to encoding/csv.Decode: non-concrete value bytes:
-    in.cue:5:7
-    in.cue:6:7
+    ./in.cue:5:7
+    ./in.cue:6:7
 [incomplete] bar: error in call to encoding/hex.EncodedLen: non-concrete value int:
-    in.cue:9:6
-    in.cue:8:6
+    ./in.cue:9:6
+    ./in.cue:8:6
 -- out/eval/stats --
 Leaks:  0
 Freed:  5

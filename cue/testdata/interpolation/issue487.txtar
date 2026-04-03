@@ -15,10 +15,10 @@ t2: {
 }
 -- out/errors.txt --
 [incomplete] t1.#R.name: invalid interpolation: non-concrete value >=0 & int (type int):
-    in.cue:4:9
+    ./in.cue:4:9
 [incomplete] t2.#R.name: invalid interpolation: non-concrete value string (type string):
-    in.cue:11:9
-    in.cue:10:9
+    ./in.cue:11:9
+    ./in.cue:10:9
 -- out/eval/stats --
 Leaks:  0
 Freed:  15

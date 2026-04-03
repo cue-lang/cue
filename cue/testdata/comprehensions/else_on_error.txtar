@@ -23,12 +23,12 @@ forSourceBottom: {
 }
 -- out/errors.txt --
 [eval] forSourceError: cannot range over "not-a-list" (found string, want list or struct):
-    in.cue:8:11
+    ./in.cue:8:11
 [eval] ifConditionError: invalid operands "not" and 1 to '+' (type string and int):
-    in.cue:13:6
-    in.cue:13:14
+    ./in.cue:13:6
+    ./in.cue:13:14
 [user] explicit error (_|_ literal) in source:
-    in.cue:18:11
+    ./in.cue:18:11
 -- out/compile --
 --- in.cue
 {

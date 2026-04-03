@@ -8,13 +8,13 @@ g:      {a: 1}["b"]               @test(err, code=incomplete, pos=[0:11])
 h:      [3].b                     @test(err, code=eval, pos=[0:8])
 -- out/errors.txt --
 [eval] e: index out of range [4] with length 0:
-    in.cue:4:11
+    ./in.cue:4:11
 [incomplete] f: undefined field: b:
-    in.cue:5:11
+    ./in.cue:5:11
 [incomplete] g: undefined field: b:
-    in.cue:6:11
+    ./in.cue:6:11
 [eval] h: undefined field: b:
-    in.cue:7:8
+    ./in.cue:7:8
 -- todo.txt --
 Some error messages could use improvement. Address after query
 extension is implemented.

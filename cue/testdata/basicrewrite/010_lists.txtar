@@ -11,19 +11,19 @@ e4:    [1, 2, ...>=4 & <=5] & [1, 2, 4, 8] @test(err, code=eval, pos=[0:21 0:38]
 e5:    [1, 2, 4, 8] & [1, 2, ...>=4 & <=5] @test(err, code=eval, pos=[0:36 0:15], contains="invalid value")
 -- out/errors.txt --
 [eval] e: conflicting values [] and 4 (mismatched types list and int):
-    in.cue:4:4
-    in.cue:4:9
+    ./in.cue:4:4
+    ./in.cue:4:9
 [eval] e2: undefined field: d:
-    in.cue:7:9
+    ./in.cue:7:9
 [eval] e3: invalid index -1 (index must be non-negative):
-    in.cue:8:5
-    in.cue:8:9
+    ./in.cue:8:5
+    ./in.cue:8:9
 [eval] e4.3: invalid value 8 (out of bound <=5):
-    in.cue:9:21
-    in.cue:9:38
+    ./in.cue:9:21
+    ./in.cue:9:38
 [eval] e5.3: invalid value 8 (out of bound <=5):
-    in.cue:10:36
-    in.cue:10:15
+    ./in.cue:10:36
+    ./in.cue:10:15
 -- out/compile --
 --- in.cue
 {

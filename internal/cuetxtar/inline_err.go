@@ -68,9 +68,10 @@ type errArgs struct {
 	contains string
 	// any requires any descendant of the annotated field to have the error.
 	any bool
-	// paths lists specific paths (relative to test-case root) where the error
-	// must occur. Populated when path=(...) is present.
-	paths []string
+	// at is a relative CUE path string (e.g. "a.b") to navigate to from the
+	// annotated field before checking the error. Allows asserting errors in
+	// sub-fields that cannot be directly annotated.
+	at string
 	// pos lists expected error positions as (deltaLine:col) pairs relative to
 	// the line containing the @test attribute.
 	pos []posSpec
@@ -125,12 +126,8 @@ func parseErrArgs(a internal.Attr) (errArgs, error) {
 			ea.contains = kv.Value()
 		case kv.Key() == "" && kv.Value() == "any":
 			ea.any = true
-		case kv.Key() == "path":
-			paths, err := parseParenList(kv.Value())
-			if err != nil {
-				return ea, fmt.Errorf("@test(err, path=...): %w", err)
-			}
-			ea.paths = paths
+		case kv.Key() == "at":
+			ea.at = kv.Value()
 		case kv.Key() == "pos":
 			specs, err := parsePosSpecs(kv.Value())
 			if err != nil {
@@ -196,6 +193,11 @@ func parsePosSpecs(s string) ([]posSpec, error) {
 	s = s[1 : len(s)-1]
 	var specs []posSpec
 	for _, p := range strings.Fields(s) {
+		// TODO: make these required.
+		p = strings.TrimRight(p, ",") // commas are optional separators
+		if p == "" {
+			continue
+		}
 		parts := strings.SplitN(p, ":", 3)
 		switch len(parts) {
 		case 2:
@@ -281,8 +283,39 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		return
 	}
 
+	if ea.at != "" {
+		// @test(err, at=<path>, ...) — navigate to sub-path then check error.
+		subPath := cue.ParsePath(ea.at)
+		if err := subPath.Err(); err != nil {
+			t.Errorf("path %s: @test(err, at=%s): invalid path: %v", path, ea.at, err)
+			return
+		}
+		subVal := val.LookupPath(subPath)
+		if !subVal.Exists() {
+			t.Errorf("path %s: @test(err, at=%s): sub-path not found", path, ea.at)
+			return
+		}
+		subFullPath := cue.MakePath(append(path.Selectors(), subPath.Selectors()...)...)
+		subPA := pa
+		subPA.errArgs = &errArgs{
+			codes:    ea.codes,
+			contains: ea.contains,
+			any:      false,
+			posSet:   ea.posSet,
+			pos:      ea.pos,
+			suberrs:  ea.suberrs,
+			msgArgs:  ea.msgArgs,
+		}
+		r.runErrAssertion(t, subFullPath, subVal, subPA)
+		return
+	}
+
 	if ea.any {
 		// @test(err, any, ...) — check that any descendant has the error.
+		if ea.posSet {
+			t.Errorf("path %s: @test(err, any, pos=...): pos= is not supported with any", path)
+			return
+		}
 		found := r.findDescendantError(val, ea)
 		if !found {
 			t.Errorf("path %s: expected a descendant error with code=%v, none found", path, ea.codes)
@@ -596,54 +629,75 @@ func positionsFromSingleError(e cueerrors.Error) []token.Pos {
 	return slices.Compact(a)
 }
 
-// posSpecsMatch reports whether positions match specs exactly.
+// posSpecsMatch reports whether positions match specs in any order.
 // baseLine is the line number of the @test attribute; used to resolve relative specs.
 // The runner's relFilename method is needed for absolute specs — pass it as a func.
 func posSpecsMatch(positions []token.Pos, specs []posSpec, baseLine int, relFilename func(string) string) bool {
 	if len(positions) != len(specs) {
 		return false
 	}
-	for i, exp := range specs {
-		got := positions[i]
-		if exp.fileName != "" {
-			if relFilename(got.Filename()) != exp.fileName || got.Line() != exp.absLine || got.Column() != exp.col {
-				return false
+	used := make([]bool, len(positions))
+	for _, exp := range specs {
+		matched := false
+		for i, got := range positions {
+			if used[i] {
+				continue
 			}
-		} else {
-			if got.Line() != baseLine+exp.deltaLine || got.Column() != exp.col {
-				return false
+			if posMatchesSpec(got, exp, baseLine, relFilename) {
+				used[i] = true
+				matched = true
+				break
 			}
+		}
+		if !matched {
+			return false
 		}
 	}
 	return true
 }
 
+// posMatchesSpec reports whether a single token.Pos satisfies a posSpec.
+func posMatchesSpec(got token.Pos, exp posSpec, baseLine int, relFilename func(string) string) bool {
+	if exp.fileName != "" {
+		return relFilename(got.Filename()) == exp.fileName && got.Line() == exp.absLine && got.Column() == exp.col
+	}
+	return got.Line() == baseLine+exp.deltaLine && got.Column() == exp.col
+}
+
 // reportPosMismatch reports a position mismatch between actual positions and
 // expected specs. directive is included verbatim in each error message.
 // If counts differ, only the count error is reported. Otherwise each
-// mismatched position is reported individually.
+// unmatched expected spec is reported individually (order-independent).
 func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive string, positions []token.Pos, specs []posSpec, baseLine int) {
 	t.Helper()
 	if len(positions) != len(specs) {
 		t.Errorf("path %s: %s: got %d position(s), want %d", path, directive, len(positions), len(specs))
-		for i, p := range positions {
-			t.Logf("  actual[%d]: %d:%d", i, p.Line(), p.Column())
+		for _, p := range positions {
+			t.Logf("  actual: %d:%d", p.Line(), p.Column())
 		}
 		return
 	}
-	for i, exp := range specs {
-		got := positions[i]
-		if exp.fileName != "" {
-			gotFile := r.relFilename(got.Filename())
-			if gotFile != exp.fileName || got.Line() != exp.absLine || got.Column() != exp.col {
-				t.Errorf("path %s: %s: position[%d]: got %s:%d:%d, want %s:%d:%d",
-					path, directive, i, gotFile, got.Line(), got.Column(), exp.fileName, exp.absLine, exp.col)
+	used := make([]bool, len(positions))
+	for _, exp := range specs {
+		matched := false
+		for i, got := range positions {
+			if used[i] {
+				continue
 			}
-		} else {
-			wantLine := baseLine + exp.deltaLine
-			if got.Line() != wantLine || got.Column() != exp.col {
-				t.Errorf("path %s: %s: position[%d]: got %d:%d, want %d:%d",
-					path, directive, i, got.Line()-baseLine, got.Column(), exp.deltaLine, exp.col)
+			if posMatchesSpec(got, exp, baseLine, r.relFilename) {
+				used[i] = true
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			if exp.fileName != "" {
+				t.Errorf("path %s: %s: unmatched position %s:%d:%d; actual positions:", path, directive, exp.fileName, exp.absLine, exp.col)
+			} else {
+				t.Errorf("path %s: %s: unmatched position %d:%d; actual positions:", path, directive, exp.deltaLine, exp.col)
+			}
+			for _, p := range positions {
+				t.Logf("  actual: %d:%d", p.Line(), p.Column())
 			}
 		}
 	}
@@ -785,6 +839,25 @@ func (r *inlineRunner) errorMessage(val cue.Value) string {
 	return ""
 }
 
+// msgArgsMatch reports whether err's Msg() args include all strings in expected
+// (matched via fmt.Sprint, order-independent). Returns true when expected is empty.
+func msgArgsMatch(err error, expected []string) bool {
+	if len(expected) == 0 {
+		return true
+	}
+	var e cueerrors.Error
+	if !errors.As(err, &e) {
+		return false
+	}
+	_, actualArgs := e.Msg()
+	for _, exp := range expected {
+		if !slices.ContainsFunc(actualArgs, func(a any) bool { return fmt.Sprint(a) == exp }) {
+			return false
+		}
+	}
+	return true
+}
+
 // checkMsgArgs checks that the Msg() args of e include all strings in expected
 // (matched via fmt.Sprint, order-independent). directive is used in error messages.
 func checkMsgArgs(t testing.TB, path cue.Path, e cueerrors.Error, expected []string, directive string) {
@@ -802,10 +875,12 @@ func checkMsgArgs(t testing.TB, path cue.Path, e cueerrors.Error, expected []str
 }
 
 // findDescendantError walks val looking for any descendant with an error
-// matching ea. Returns true if found.
+// matching ea (code=, contains=, args=). Returns true if found.
 func (r *inlineRunner) findDescendantError(val cue.Value, ea *errArgs) bool {
 	if r.isError(val) {
-		if ea.matchesCode(r.errorCode(val)) {
+		if ea.matchesCode(r.errorCode(val)) &&
+			(ea.contains == "" || strings.Contains(r.errorMessage(val), ea.contains)) &&
+			msgArgsMatch(val.Err(), ea.msgArgs) {
 			return true
 		}
 	}

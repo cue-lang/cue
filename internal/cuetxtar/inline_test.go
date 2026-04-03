@@ -134,13 +134,18 @@ func TestParsePosSpecs(t *testing.T) {
 			want:  []posSpec{{deltaLine: 0, col: 5}},
 		},
 		{
-			name:  "multiple relative with whitespace",
-			input: "[0:5 1:13 -2:3]",
+			name:  "multiple relative comma-separated",
+			input: "[0:5, 1:13, -2:3]",
 			want: []posSpec{
 				{deltaLine: 0, col: 5},
 				{deltaLine: 1, col: 13},
 				{deltaLine: -2, col: 3},
 			},
+		},
+		{
+			name:    "multiple relative whitespace-only is rejected",
+			input:   "[0:5 1:13 -2:3]",
+			wantErr: true,
 		},
 		{
 			name:  "absolute form",
@@ -149,7 +154,7 @@ func TestParsePosSpecs(t *testing.T) {
 		},
 		{
 			name:  "mixed relative and absolute",
-			input: "[0:5 fixture.cue:1:13]",
+			input: "[0:5, fixture.cue:1:13]",
 			want: []posSpec{
 				{deltaLine: 0, col: 5},
 				{fileName: "fixture.cue", absLine: 1, col: 13},
@@ -174,15 +179,6 @@ func TestParsePosSpecs(t *testing.T) {
 			name:    "non-integer col",
 			input:   "[0:x]",
 			wantErr: true,
-		},
-		{
-			name:  "comma-separated (commas ignored)",
-			input: "[0:5, 1:13, -2:3]",
-			want: []posSpec{
-				{deltaLine: 0, col: 5},
-				{deltaLine: 1, col: 13},
-				{deltaLine: -2, col: 3},
-			},
 		},
 		{
 			name:  "trailing comma only",

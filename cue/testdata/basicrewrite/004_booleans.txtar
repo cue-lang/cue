@@ -3,7 +3,7 @@ t: true @test(eq, true)
 t: !false
 f: false @test(eq, false)
 f: !t
-e: true @test(err, code=eval, pos=[0:4 1:4], contains="conflicting values")
+e: true @test(err, code=eval, pos=[0:4, 1:4], contains="conflicting values")
 e: !true
 -- out/errors.txt --
 [eval] e: conflicting values false and true:

@@ -8,7 +8,7 @@ b1: =~"a" @test(eq, "a")
 b1: "a"
 b2: =~"[a-z]{3}" @test(eq, "foo")
 b2: "foo"
-b3: =~"[a-z]{4}" @test(err, code=eval, contains="out of bound", pos=[0:5 1:5])
+b3: =~"[a-z]{4}" @test(err, code=eval, contains="out of bound", pos=[0:5, 1:5])
 b3: "foo"
 b4: !~"[a-z]{4}" @test(eq, "foo")
 b4: "foo"
@@ -19,17 +19,11 @@ s3: !="b" & =~"[a-z]" @test(eq, !="b" & =~"[a-z]")
 s4: =~"[a-z]" & !="b" @test(eq, =~"[a-z]" & !="b") // TODO: allow different order
 
 e1: "foo" =~ 1     @test(err, code=eval,
-        contains="cannot use 1", pos=[
-            0:5
-            0:14
-        ])
+        contains="cannot use 1", pos=[0:5, 0:14])
 e2: "foo" !~ true  @test(err, code=eval,
-        contains="cannot use true", pos=[
-            0:5
-            0:14
-        ])
+        contains="cannot use true", pos=[0:5, 0:14])
 e3: !="a" & <5     @test(err, code=eval,
-        contains="conflicting values", pos=[0:5 0:13])
+        contains="conflicting values", pos=[0:5, 0:13])
 -- out/compile --
 --- in.cue
 {

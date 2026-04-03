@@ -11,14 +11,14 @@ f1: {y: string, res: a.b.c & {d: y}} @test(eq, {
 	res: {
 		d: string
 		s: _|_ @test(err, code=incomplete,
-			pos=[5:25 3:34 5:14 6:23 7:13])
+			pos=[5:25, 3:34, 5:14, 6:23, 7:13])
 	}
 })
 
 a: b: c: {d: string, s: "a" + d} @test(eq, {
 	d: string
 	s: _|_ @test(err, code=incomplete,
-		pos=[5:25 5:14 6:23 7:13])
+		pos=[5:25, 5:14, 6:23, 7:13])
 })
 a: b: [C=string]: {d: string, s: "a" + d}
 a: b: c: d: string

@@ -707,7 +707,6 @@ func (r *inlineRunner) runArchive() {
 // handleErrorsTxtSection manages the out/errors.txt documentary section.
 // The section is only processed if it already exists in the archive:
 //   - CUE_UPDATE=1:    updates the section with current error output
-//   - CUE_UPDATE=diff: fails if the section is stale, showing a diff
 //   - otherwise:       silently skips any difference
 func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 	const sectionName = "out/errors.txt"
@@ -1119,16 +1118,16 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		return
 	}
 
-	// Detect stale-skip: a prior regression guard annotated this attr with
-	// skip:<ver> and diff="...".
+	// Detect stale-skip: a prior CUE_UPDATE=force annotated this attr with
+	// skip:<ver> to mark a known discrepancy.
 	_, hasSkip := attrHasSkip(pa.raw)
 
 	cmpErr := (&cmpCtx{baseLine: 0}).astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {
 		// Assertion passes via AST comparison.
 		if hasSkip && cuetest.UpdateGoldenFiles {
-			// Stale-skip cleanup (task 11.7): the assertion now passes; strip
-			// the skip and diff args, restoring the plain @test(eq, <expr>).
+			// Stale-skip cleanup: the assertion now passes; strip skip,
+			// restoring the plain @test(eq, <expr>).
 			r.enqueueInlineFill(pa, "@test(eq, "+exprStr+")")
 		}
 		return
@@ -1136,21 +1135,13 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 
 	// Comparison failed — genuine mismatch.
 	if cuetest.ForceUpdateGoldenFiles {
-		// Force overwrite (task 11.4): replace expected with actual.
-		r.enqueueInlineFill(pa, "@test(eq, "+r.formatValue(val)+")")
-		return
-	}
-	if cuetest.UpdateGoldenFiles && !hasSkip {
-		// Regression guard (tasks 11.2-11.3): annotate with skip:<ver>+diff
-		// so the test keeps passing under CUE_UPDATE without silent overwrite.
-		got := r.formatValue(val)
-		diffStr := fmt.Sprintf("got %s; want %s", got, exprStr)
-		escaped := strings.ReplaceAll(diffStr, `"`, `\"`)
+		// CUE_UPDATE=force: annotate with skip:<ver> so the test keeps passing
+		// while the discrepancy is tracked, without silently overwriting.
 		ver := r.versionName()
 		if ver == "" {
 			ver = "unknown"
 		}
-		r.enqueueInlineFill(pa, fmt.Sprintf(`@test(eq, %s, skip:%s, diff="%s")`, exprStr, ver, escaped))
+		r.enqueueInlineFill(pa, fmt.Sprintf(`@test(eq, %s, skip:%s)`, exprStr, ver))
 		return
 	}
 	// Report the failure (unless already annotated with a skip).

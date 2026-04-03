@@ -224,6 +224,8 @@ The `err` directive SHALL assert that an error exists at the annotated location.
 - `code=<code>` — the error code must match. Valid codes include `cycle`, `eval`, `incomplete`, `structural`, `reference`, and any other code defined in `cuelang.org/go/cue/errors`.
 - `contains="substring"` — the error message must contain the given substring.
 - `any` (bare flag) — at least one **descendant** of the annotated field must have an error. The annotated field itself is not required to be an error. `code` MUST be specified when `any` is used.
+- `args=[v1, v2, ...]` — the values returned by the error's `Msg()` method must include all listed strings (matched via `fmt.Sprint`, order-independent, subset check). See `Requirement: err directive — args= sub-option` for details.
+- `suberr=(...)` — matches one sub-error of a multi-error value (e.g. a failed disjunction). Multiple `suberr=` entries match sub-errors order-independently. The body accepts the same sub-options as `@test(err, ...)`. See `Requirement: err directive — suberr=(...)` for details.
 - `pos=[spec ...]` — asserts the exact set of source positions reported by the error (as returned by `cuelang.org/go/cue/errors.Positions`). Each whitespace-delimited spec takes one of two forms:
   - `deltaLine:col` — position in the **same file** as the `@test` attribute, expressed as a signed line offset from an *anchor line* and a 1-indexed column. The anchor depends on where the `@test` attribute appears:
     - **Field attribute** (`field: value @test(...)`): anchor is the field's line in the stripped output (`deltaLine=0` = same line as the field).
@@ -267,6 +269,104 @@ The `err` directive SHALL assert that an error exists at the annotated location.
 #### Scenario: pos= mismatch fails test
 - **WHEN** `@test(err, pos=[0:5])` is declared but the error has two positions
 - **THEN** the test fails reporting the count mismatch
+
+---
+
+### Requirement: `err` directive — `args=` sub-option
+The `args=[v1, v2, ...]` sub-option of `@test(err, ...)` asserts that the error's `Msg()` method returns arguments that include all listed strings. The check is **order-independent** and a **subset check**: every expected string must appear in the actual `Msg()` args (matched by stringifying each actual arg with `fmt.Sprint`), but extra actual args not listed in `args=` are allowed.
+
+Design rationale: `args=` targets the structured arguments of an error message (e.g. type names, field names), not the rendered text. Internationalized error messages may change wording while keeping the same structured args. `contains=` checks rendered text; `args=` checks structured data. The subset-check design lets authors list only the args they care about (e.g. the two type names in a type-conflict error) without repeating args already covered by `contains=`, and allows checking args whose order may vary across evaluator implementations.
+
+```cue
+e: [] & 4   @test(err, code=eval, contains="conflicting values", args=[list, int])
+e3: [3][-1] @test(err, code=eval, args=[-1])
+```
+
+#### Scenario: args= subset matches
+- **WHEN** `@test(err, args=[list, int])` is declared and `Msg()` returns args `["conflicting values []", "list", "int"]` (or any order)
+- **THEN** the test passes because both `"list"` and `"int"` are found in the actual args
+
+#### Scenario: args= missing arg fails
+- **WHEN** `@test(err, args=[list, int])` is declared but `Msg()` returns only `["list"]`
+- **THEN** the test fails reporting that `"int"` was not found
+
+#### Scenario: args= extra actual args are allowed
+- **WHEN** `@test(err, args=[int])` is declared and `Msg()` returns `["list", "int"]`
+- **THEN** the test passes; the extra `"list"` arg is allowed under the subset-check design
+
+#### Scenario: args= is order-independent
+- **WHEN** `@test(err, args=[int, list])` is declared and `Msg()` returns args in order `["list", "int"]`
+- **THEN** the test passes regardless of argument order
+
+---
+
+### Requirement: `err` directive — `suberr=(...)` sub-option
+The `suberr=(...)` sub-option of `@test(err, ...)` asserts properties of individual sub-errors within a multi-error value (e.g., a failed disjunction). Each `suberr=(...)` entry matches one sub-error; multiple entries match sub-errors order-independently. The body of `suberr=(...)` accepts the same sub-options as `@test(err, ...)`: `code=`, `contains=`, `pos=`, `args=`.
+
+Matching is two-pass:
+1. Specs with non-empty `pos=` are matched first against sub-errors with matching positions (position is a stronger discriminator than text content).
+2. Remaining specs are matched by `contains=` against unmatched actual sub-errors.
+
+`pos=[]` placeholders inside `suberr=(...)` trigger write-back on `CUE_UPDATE=1`. All position updates for the same `@test` attribute are applied atomically.
+
+```cue
+x: null | {n: 3}
+x: #empty & {n: 3} @test(err, code=eval,
+    suberr=(contains="conflicting values", args=[struct, null]),
+    suberr=(contains="not allowed"))
+```
+
+#### Scenario: suberr= matches all sub-errors
+- **WHEN** `@test(err, suberr=(contains="A"), suberr=(contains="B"))` is declared and the error has exactly two sub-errors whose messages contain `"A"` and `"B"` respectively
+- **THEN** the test passes
+
+#### Scenario: suberr= order-independent matching
+- **WHEN** two `suberr=` specs are declared and the actual sub-errors appear in reverse order relative to the specs
+- **THEN** the test passes; matching is order-independent
+
+#### Scenario: suberr= unmatched spec fails
+- **WHEN** `@test(err, suberr=(contains="A"), suberr=(contains="B"))` is declared but only one sub-error exists (containing "A")
+- **THEN** the test fails reporting that the `suberr=(contains="B")` spec was unmatched
+
+#### Scenario: suberr= pos= placeholder fills on CUE_UPDATE
+- **WHEN** `suberr=(pos=[])` appears inside a `@test(err, ...)` and `CUE_UPDATE=1` is set
+- **THEN** the runner fills in the actual positions within the `suberr=(...)` body
+
+---
+
+### Requirement: `shareID` directive
+The `shareID=name` argument, used inside the expected struct of a `@test(eq, {...})` body, asserts that all fields annotated with the same `name` share the same underlying `*adt.Vertex` (pointer identity after following indirections). This verifies that the evaluator's vertex-sharing optimization is working correctly.
+
+Rules:
+- The **first** field carrying a given `shareID` name has its `eq` check run normally — so every value-expression pair is validated at least once.
+- **Subsequent** fields with the same `shareID` name skip the `eq` check — their expression is treated as documentation only.
+- The pointer-identity assertion runs after all `eq` checks complete.
+- `@test(shareID=name)` may only appear inside a `@test(eq, {...})` body; it is not valid as a standalone field attribute.
+
+```cue
+a: {x: 1}
+b: a
+@test(eq, {
+    a: {x: 1} @test(shareID=A)   // first occurrence: eq check runs normally
+    b: a       @test(shareID=A)   // subsequent occurrence: eq check skipped
+})
+```
+
+#### Scenario: shareID first occurrence runs eq check
+- **WHEN** `a: {x: 1} @test(shareID=A)` is the first field with `shareID=A` and `a` does not equal `{x: 1}`
+- **THEN** the test fails on the eq check
+
+#### Scenario: shareID subsequent occurrence skips eq check
+- **WHEN** `b: a @test(shareID=A)` is the second field with `shareID=A` and the expression `a` would not be valid in this scope
+- **THEN** the eq check is skipped; only the pointer-identity assertion runs
+
+#### Scenario: shareID pointer identity fails
+- **WHEN** `a` and `b` are annotated with the same `shareID=A` but point to different `*adt.Vertex` objects
+- **THEN** the test fails reporting that the vertices are not shared
+
+#### Scenario: shareID pointer identity passes
+- **WHEN** `b: a` (a reference) and `a` are annotated with `shareID=A` and the evaluator has shared the vertex
+- **THEN** the test passes
 
 ---
 
@@ -530,15 +630,15 @@ The error format prefixes each error with its error code in square brackets, fol
 
 Behavior matrix:
 
-| Section present? | `CUE_UPDATE=1` | Normal run | `CUE_CHECK=1` |
-|-----------------|---------------|------------|---------------|
+| Section present? | `CUE_UPDATE=1` | Normal run | `CUE_UPDATE=diff` |
+|-----------------|---------------|------------|-------------------|
 | No              | skip (don't create) | skip | skip |
-| Yes             | update silently | skip (no fail) | fail if stale |
+| Yes             | update silently | skip (no fail) | show diff (no fail) |
 
 Key points:
 - The section is **never auto-created** by `CUE_UPDATE=1`. It must be added manually.
 - A normal test run silently ignores differences in this section.
-- `CUE_CHECK=1` enables strict mode: the section fails if its content is stale.
+- `CUE_UPDATE=diff` shows a unified diff of what `CUE_UPDATE=1` would write, without modifying files.
 - `CUE_UPDATE=1` updates the section's content when it already exists.
 
 Both child errors (incomplete, eval, cycle, etc.) and propagated-from-child error markers are included. Child-only marker errors (which don't carry their own message) are excluded.
@@ -555,6 +655,6 @@ Both child errors (incomplete, eval, cycle, etc.) and propagated-from-child erro
 - **WHEN** the archive has an `-- out/errors.txt --` section and `CUE_UPDATE=1` is set
 - **THEN** the section is updated with the current error output
 
-#### Scenario: Section present — CUE_CHECK=1 fails on stale content
-- **WHEN** the archive has an `-- out/errors.txt --` section with stale content and `CUE_CHECK=1` is set
-- **THEN** the test fails with a message showing the expected and actual error output
+#### Scenario: Section present — CUE_UPDATE=diff shows diff on stale content
+- **WHEN** the archive has an `-- out/errors.txt --` section with stale content and `CUE_UPDATE=diff` is set
+- **THEN** the runner shows a unified diff of the expected and actual error output but does not fail the test

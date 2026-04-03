@@ -362,7 +362,9 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 
 			case *ast.Field:
 				subPath := appendPath(path, e.Label)
-				walkField(e, subPath)
+				if subPath.Err() == nil {
+					walkField(e, subPath)
+				}
 				newElts = append(newElts, elt)
 
 			default:
@@ -405,7 +407,9 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 			continue
 		}
 		fieldPath := cue.MakePath(cue.Label(field.Label))
-		walkField(field, fieldPath)
+		if fieldPath.Err() == nil {
+			walkField(field, fieldPath)
+		}
 	}
 
 	return records

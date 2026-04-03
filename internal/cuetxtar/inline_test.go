@@ -15,6 +15,7 @@
 package cuetxtar
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 	"testing"
@@ -23,8 +24,24 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/parser"
 )
+
+// failRecorder implements testing.TB and records whether Errorf was called.
+// Used to test that runShareIDChecks correctly detects non-sharing.
+type failRecorder struct {
+	testing.TB
+	failed bool
+	msgs   strings.Builder
+}
+
+func (f *failRecorder) Helper() {}
+
+func (f *failRecorder) Errorf(format string, args ...any) {
+	f.failed = true
+	fmt.Fprintf(&f.msgs, format+"\n", args...)
+}
 
 // testMakePath creates a CUE path from a dot-separated string for test use.
 func testMakePath(s string) cue.Path {
@@ -377,4 +394,68 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 			runner.Run()
 		})
 	}
+}
+
+// TestRunShareIDChecks_Negative verifies that runShareIDChecks correctly
+// reports an error when two paths do NOT share the same vertex.
+// This cannot be expressed as a txtar inline test (we can't annotate "should
+// fail"), so it is tested here by calling runShareIDChecks directly with a
+// failRecorder that captures errors without propagating to the parent test.
+func TestRunShareIDChecks_Negative(t *testing.T) {
+	ctx := cuecontext.New()
+	r := &inlineRunner{}
+
+	t.Run("shared vertices pass", func(t *testing.T) {
+		// b: a creates vertex sharing; both paths should deref to the same node.
+		v := ctx.CompileString("a: {x: 1}\nb: a")
+		rec := &failRecorder{TB: t}
+		r.runShareIDChecks(rec, v, map[string][]cue.Path{
+			"AB": {cue.MakePath(cue.Str("a")), cue.MakePath(cue.Str("b"))},
+		})
+		if rec.failed {
+			t.Errorf("expected shared vertices to pass, got errors:\n%s", rec.msgs.String())
+		}
+	})
+
+	t.Run("independent structs fail", func(t *testing.T) {
+		// a and b are independently defined; they must not share a vertex.
+		v := ctx.CompileString("a: {x: 1}\nb: {x: 1}")
+		rec := &failRecorder{TB: t}
+		r.runShareIDChecks(rec, v, map[string][]cue.Path{
+			"AB": {cue.MakePath(cue.Str("a")), cue.MakePath(cue.Str("b"))},
+		})
+		if !rec.failed {
+			t.Errorf("expected independent structs to fail shareID check, but it passed")
+		}
+	})
+
+	t.Run("list element via at=0 shared passes", func(t *testing.T) {
+		// l: [a] makes l[0] the same vertex as a.
+		v := ctx.CompileString("a: {x: 1}\nl: [a]")
+		rec := &failRecorder{TB: t}
+		r.runShareIDChecks(rec, v, map[string][]cue.Path{
+			"EL": {
+				cue.MakePath(cue.Str("l"), cue.Index(0)),
+				cue.MakePath(cue.Str("a")),
+			},
+		})
+		if rec.failed {
+			t.Errorf("expected l[0] and a to be shared, got errors:\n%s", rec.msgs.String())
+		}
+	})
+
+	t.Run("list element literal not shared fails", func(t *testing.T) {
+		// l: [{x: 1}] is a literal; no sharing with a.
+		v := ctx.CompileString("a: {x: 1}\nl: [{x: 1}]")
+		rec := &failRecorder{TB: t}
+		r.runShareIDChecks(rec, v, map[string][]cue.Path{
+			"EL": {
+				cue.MakePath(cue.Str("l"), cue.Index(0)),
+				cue.MakePath(cue.Str("a")),
+			},
+		})
+		if !rec.failed {
+			t.Errorf("expected list literal element to fail shareID check, but it passed")
+		}
+	})
 }

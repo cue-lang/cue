@@ -141,19 +141,37 @@ Optional arguments:
 | `code=<c>` | error code must match (`cycle`, `eval`, `incomplete`, …) |
 | `contains="s"` | error message must contain substring `s` |
 | `any` | at least one *descendant* has the error (requires `code=`) |
-| `path=(p\|q)` | error exists at one of the listed paths |
+| `at=<path>` | navigate to sub-path before checking error (e.g. `at=a.b`) |
 | `pos=[...]` | error positions must match (see below) |
 | `args=[...]` | Msg() args must contain the listed values (see below) |
 | `suberr=(...)` | sub-error spec for multi-error values (see below) |
+
+#### `at=<path>` — assert error at sub-path
+
+Navigates to the given CUE path (relative to the annotated field) before
+checking for the error. Useful when the error occurs in a nested field that
+cannot be directly annotated:
+
+```cue
+outer: {
+    inner: bad: string & int
+} @test(err, at=inner.bad, code=eval, contains="conflicting values")
+```
+
+The path must not include hidden fields (identifiers beginning with `_`); hidden
+fields cannot be accessed via `cue.ParsePath` and are silently skipped by the
+annotation infrastructure.
 
 #### `pos=[...]` — error positions
 
 Specifies expected error positions. Each position is written as `deltaLine:col`
 relative to the `@test` attribute line, or `file:line:col` for positions in
-other files:
+other files. Positions are matched **order-independently** — the order of specs
+does not need to match the order of actual positions. Commas between specs are
+optional:
 
 ```cue
-bad: x & y @test(err, code=eval, pos=[0:5 0:9])
+bad: x & y @test(err, code=eval, pos=[0:5, 0:9])
 ```
 
 `pos=[]` is a fill-in placeholder. Running with `CUE_UPDATE=1` writes the

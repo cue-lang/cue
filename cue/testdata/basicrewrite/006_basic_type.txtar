@@ -9,8 +9,8 @@ f: true         @test(eq, true)
 f: bool
 -- out/errors.txt --
 [eval] d: conflicting values int and float (mismatched types int and float):
-    in.cue:5:4
-    in.cue:5:10
+    ./in.cue:5:4
+    ./in.cue:5:10
 -- out/compile --
 --- in.cue
 {

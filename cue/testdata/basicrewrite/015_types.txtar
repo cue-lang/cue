@@ -10,17 +10,17 @@ p:  +true        @test(err, code=eval, pos=[0:5], contains="invalid operation")
 m:  -false       @test(err, code=eval, pos=[0:5], contains="invalid operation")
 -- out/errors.txt --
 [eval] e: conflicting values int and string (mismatched types int and string):
-    in.cue:5:5
-    in.cue:5:11
+    ./in.cue:5:5
+    ./in.cue:5:11
 [eval] e2: conflicting values 1 and string (mismatched types int and string):
-    in.cue:6:5
-    in.cue:6:9
+    ./in.cue:6:5
+    ./in.cue:6:9
 [eval] b: invalid operand int ('!' requires concrete value):
-    in.cue:7:6
+    ./in.cue:7:6
 [eval] p: invalid operation +true (+ bool):
-    in.cue:8:5
+    ./in.cue:8:5
 [eval] m: invalid operation -false (- bool):
-    in.cue:9:5
+    ./in.cue:9:5
 -- out/compile --
 --- in.cue
 {

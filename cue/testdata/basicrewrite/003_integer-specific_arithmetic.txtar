@@ -28,21 +28,21 @@ me1: mod(2.0, 1) @test(err, code=eval, pos=[0:10], contains="cannot use")
 me2: mod(2, 1.0) @test(err, code=eval, pos=[0:13], contains="cannot use")
 -- out/errors.txt --
 [eval] qe1: cannot use 2.0 (type float) as int in argument 1 to quo:
-    in.cue:5:10
+    ./in.cue:5:10
 [eval] qe2: cannot use 1.0 (type float) as int in argument 2 to quo:
-    in.cue:6:13
+    ./in.cue:6:13
 [eval] re1: cannot use 2.0 (type float) as int in argument 1 to rem:
-    in.cue:12:10
+    ./in.cue:12:10
 [eval] re2: cannot use 1.0 (type float) as int in argument 2 to rem:
-    in.cue:13:13
+    ./in.cue:13:13
 [eval] de1: cannot use 2.0 (type float) as int in argument 1 to div:
-    in.cue:19:10
+    ./in.cue:19:10
 [eval] de2: cannot use 1.0 (type float) as int in argument 2 to div:
-    in.cue:20:13
+    ./in.cue:20:13
 [eval] me1: cannot use 2.0 (type float) as int in argument 1 to mod:
-    in.cue:26:10
+    ./in.cue:26:10
 [eval] me2: cannot use 1.0 (type float) as int in argument 2 to mod:
-    in.cue:27:13
+    ./in.cue:27:13
 -- out/compile --
 --- in.cue
 {

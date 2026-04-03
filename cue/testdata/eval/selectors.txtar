@@ -18,8 +18,8 @@ g: {
 } @test(eq, {a: {"foo-bar": {c: 3}}, b: 3})
 -- out/errors.txt --
 [incomplete] d.y: non-concrete value _ in operand to +:
-    in.cue:5:5
-    in.cue:4:5
+    ./in.cue:5:5
+    ./in.cue:4:5
 -- out/eval/stats --
 Leaks:  0
 Freed:  18

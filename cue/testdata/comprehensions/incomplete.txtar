@@ -7,11 +7,11 @@ b: [for x in src.foo {}] @test(err, code=incomplete, pos=[0:18], contains="undef
 c: {for x in top {}}     @test(err, code=incomplete, pos=[0:14], contains="cannot range")
 -- out/errors.txt --
 [incomplete] a: incomplete bool: bool:
-    in.cue:1:7
+    ./in.cue:1:7
 [incomplete] b: undefined field: foo:
-    in.cue:5:18
+    ./in.cue:5:18
 [incomplete] c: cannot range over top (incomplete type _):
-    in.cue:6:14
+    ./in.cue:6:14
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

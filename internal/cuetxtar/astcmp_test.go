@@ -236,10 +236,18 @@ func TestAstCompare_Structs(t *testing.T) {
 			wantErr: "_foo: expected 1, got 2",
 		},
 		{
-			name:    "hidden missing",
+			name:    "hidden missing from value",
 			expr:    `{_foo: 1}`,
 			val:     `{}`,
 			wantErr: `field "_foo" not found`,
+		},
+		{
+			// Hidden field present in value but absent from expected must be reported.
+			// This ensures hidden fields are not silently ignored by the comparison.
+			name:    "hidden unexpected in value",
+			expr:    `{a: 1}`,
+			val:     `{_foo: 42, a: 1}`,
+			wantErr: `unexpected field "_foo" in value`,
 		},
 	}
 

@@ -6,7 +6,7 @@ o4: {a: 1} & {b: 2}
 o4: {a: 1, b: 2} & {b: 2}
 o4: {a: 1} & {a: 1, b: 2}    @test(eq, {a: 1, b: 2})
 
-e: 1      @test(err, code=eval, pos=[0:4 1:4], contains="conflicting values")
+e: 1      @test(err, code=eval, pos=[0:4, 1:4], contains="conflicting values")
 e: {a: 3}
 -- out/errors.txt --
 [eval] e: conflicting values 1 and {a:3} (mismatched types int and struct):

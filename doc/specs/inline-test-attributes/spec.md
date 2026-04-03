@@ -227,7 +227,7 @@ The `err` directive SHALL assert that an error exists at the annotated location.
 - `at=<path>` — navigate to the given CUE path (relative to the annotated field) before checking the error. Useful when the erroneous sub-field cannot be directly annotated (e.g. it is inside a comprehension or a pattern constraint). `pos=` is not compatible with `any`; `at=` and `any` may not be combined.
 - `args=[v1, v2, ...]` — the values returned by the error's `Msg()` method must include all listed strings (matched via `fmt.Sprint`, order-independent, subset check). See `Requirement: err directive — args= sub-option` for details.
 - `suberr=(...)` — matches one sub-error of a multi-error value (e.g. a failed disjunction). Multiple `suberr=` entries match sub-errors order-independently. The body accepts the same sub-options as `@test(err, ...)`. See `Requirement: err directive — suberr=(...)` for details.
-- `pos=[spec ...]` — asserts the exact set of source positions reported by the error (as returned by `cuelang.org/go/cue/errors.Positions`). Matching is **order-independent**: the order of specs need not match the order of actual positions. Commas between specs are optional. Each spec takes one of two forms:
+- `pos=[spec, ...]` — asserts the set of source positions reported by the error (as returned by `cuelang.org/go/cue/errors.Positions`). Matching is **order-independent**: the order of specs need not match the order of actual positions. **Commas between specs are required.** Each spec takes one of two forms:
   - `deltaLine:col` — position in the **same file** as the `@test` attribute, expressed as a signed line offset from an *anchor line* and a 1-indexed column. The anchor depends on where the `@test` attribute appears:
     - **Field attribute** (`field: value @test(...)`): anchor is the field's line in the stripped output (`deltaLine=0` = same line as the field).
     - **Struct-level decl attribute** (inside `{ @test(...) ... }`): anchor is the line of the opening `{` of the enclosing struct (`deltaLine=1` = first line inside the struct body). This keeps the assertion stable when the `@test` line itself is stripped, and gives the natural reading "N lines into the struct".
@@ -261,7 +261,7 @@ The `err` directive SHALL assert that an error exists at the annotated location.
 
 #### Scenario: pos= matches error positions on field attribute
 - **WHEN** `@test(err, pos=[0:5, 0:14])` is a **field attribute** and the error reports exactly two positions on the same line as the field (column 5 and column 14)
-- **THEN** the test passes (commas between specs are optional; order of specs need not match order of actual positions)
+- **THEN** the test passes (order of specs need not match order of actual positions)
 
 #### Scenario: pos= matches error positions on struct decl attribute
 - **WHEN** `d: { @test(err, pos=[1:5, 2:2]) ... }` is declared and the error reports positions at the 1st and 2nd lines inside `d`'s `{` at the given columns
@@ -273,7 +273,7 @@ The `err` directive SHALL assert that an error exists at the annotated location.
 
 #### Scenario: pos= empty placeholder fills on CUE_UPDATE
 - **WHEN** `@test(err, pos=[])` is declared and `CUE_UPDATE=1` is set
-- **THEN** the runner fills in the actual positions, writing e.g. `pos=[0:5 0:14]` to the source file
+- **THEN** the runner fills in the actual positions, writing e.g. `pos=[0:5, 0:14]` to the source file
 
 #### Scenario: pos= cross-file absolute position
 - **WHEN** `@test(err, pos=[fixture.cue:3:5])` is declared and the error position is at absolute line 3, column 5 in `fixture.cue`

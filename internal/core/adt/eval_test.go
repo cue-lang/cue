@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
@@ -279,16 +280,25 @@ module: "mod.test"
 language: version: "v0.15.0"
 
 -- in.cue --
-s1: !="b" & =~"c"     @test(eq, =~"c")
-s2: !=null @test(eq, !=null)
+// s1: !="b" & =~"c"     @test(eq, =~"c")
+// s2: !=null @test(eq, !=null)
+a: 1 @test(shareID=A)
+b: c: a @test(shareID=A)
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
 		t.Skip()
 	}
 
+	m := &cuetdtest.M{
+		Flags: cuedebug.Config{
+			Sharing: true, // Comment out to test without sharing.
+			// LogEval: 1, // Uncomment to enable evaluator logging.
+		},
+	}
+
 	archive := txtar.Parse([]byte(in))
-	runner := cuetxtar.NewInlineRunner(t, nil, archive, t.TempDir())
+	runner := cuetxtar.NewInlineRunner(t, m, archive, t.TempDir())
 	runner.Run()
 }
 

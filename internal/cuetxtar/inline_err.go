@@ -178,7 +178,7 @@ func parseParenList(s string) ([]string, error) {
 }
 
 // parsePosSpecs parses a pos= value into a slice of posSpec.
-// The value must be enclosed in square brackets; elements are whitespace-separated.
+// The value must be enclosed in square brackets; elements are comma-separated.
 // Two element forms are supported:
 //
 //   - deltaLine:col — relative position on the same file (one colon).
@@ -192,9 +192,8 @@ func parsePosSpecs(s string) ([]posSpec, error) {
 	}
 	s = s[1 : len(s)-1]
 	var specs []posSpec
-	for _, p := range strings.Fields(s) {
-		// TODO: make these required.
-		p = strings.TrimRight(p, ",") // commas are optional separators
+	for _, p := range strings.Split(s, ",") {
+		p = strings.TrimSpace(p)
 		if p == "" {
 			continue
 		}
@@ -541,7 +540,7 @@ func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUp
 		for i, p := range u.positions {
 			parts[i] = r.formatPosSpec(p, pa)
 		}
-		newPosStr := strings.Join(parts, " ")
+		newPosStr := strings.Join(parts, ", ")
 		newAttrText = replaceSuberrPos(newAttrText, u.expIdx, newPosStr)
 	}
 	r.pendingPosWrites = append(r.pendingPosWrites, posWrite{

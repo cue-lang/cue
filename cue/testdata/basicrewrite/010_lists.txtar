@@ -2,13 +2,13 @@
 list:  [1, 2, 3]              @test(eq, [1, 2, 3])
 index: [1, 2, 3][1]           @test(eq, 2)
 unify: [1, 2, 3] & [_, 2, 3]  @test(eq, [1, 2, 3])
-e:     [] & 4                  @test(err, code=eval, pos=[0:4 0:9], contains="conflicting values", args=[list, int])
+e:     [] & 4                  @test(err, code=eval, pos=[0:4, 0:9], contains="conflicting values", args=[list, int])
 
 // No "contains" as message may vary by implementation.
 e2:    [3]["d"]                @test(err, code=eval, pos=[0:9])
-e3:    [3][-1]                 @test(err, code=eval, pos=[0:5 0:9], contains="invalid index", args=[-1])
-e4:    [1, 2, ...>=4 & <=5] & [1, 2, 4, 8] @test(err, code=eval, pos=[0:21 0:38], contains="invalid value", args=[8, <=5])
-e5:    [1, 2, 4, 8] & [1, 2, ...>=4 & <=5] @test(err, code=eval, pos=[0:36 0:15], contains="invalid value", args=[8, <=5])
+e3:    [3][-1]                 @test(err, code=eval, pos=[0:5, 0:9], contains="invalid index", args=[-1])
+e4:    [1, 2, ...>=4 & <=5] & [1, 2, 4, 8] @test(err, code=eval, pos=[0:21, 0:38], contains="invalid value", args=[8, <=5])
+e5:    [1, 2, 4, 8] & [1, 2, ...>=4 & <=5] @test(err, code=eval, pos=[0:36, 0:15], contains="invalid value", args=[8, <=5])
 -- out/errors.txt --
 [eval] e: conflicting values [] and 4 (mismatched types list and int):
     ./in.cue:4:4

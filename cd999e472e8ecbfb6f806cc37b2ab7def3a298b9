@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9285cc81_b9572811",
+        "filename": "cue/testdata/eval/structs.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-03T11:44:56Z",
+      "side": 1,
+      "message": "Good point. got lost in the rebase. I noticed it also, but then forgot about it.",
+      "parentUuid": "9baa0678_18fe7150",
+      "revId": "cd999e472e8ecbfb6f806cc37b2ab7def3a298b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a52d3d4_5cedd118",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-02T15:42:48Z",
       "side": 1,
       "message": "this is an almost exact copy of the changes below in runInline. reuse via a helper or some other way?",
+      "revId": "cd999e472e8ecbfb6f806cc37b2ab7def3a298b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a157c51_92a3604c",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 774,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-03T11:44:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a52d3d4_5cedd118",
       "revId": "cd999e472e8ecbfb6f806cc37b2ab7def3a298b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

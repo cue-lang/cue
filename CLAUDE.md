@@ -90,6 +90,67 @@ go fmt ./...
 - The `CUE_UPDATE=1` environment variable updates golden files with actual output
 - Prefer adding test cases to an existing txtar file that is appropriate for the type of reproducer
 
+### Converting txtar tests to inline `@test(...)` format
+
+When converting a txtar test from golden-file format to inline annotations:
+
+1. **Section ordering**: The `-- out/errors.txt --` section must directly follow the
+   last input section (e.g., `-- in.cue --`), before `-- out/compile --` and
+   `-- out/eval/stats --`.
+
+2. **Error annotations**: Always include position information using a `pos=[]`
+   placeholder; `CUE_UPDATE=1` fills it in automatically. Positions are matched
+   order-independently; commas between specs are optional. Example:
+   ```
+   x: bad @test(err, code=eval, contains="...", pos=[])
+   ```
+
+3. **Multiple sub-errors**: When an error has multiple sub-errors (e.g., from a
+   failed disjunction), use `suberr=(...)` to match individual sub-errors instead
+   of a single flat `contains=`:
+   ```
+   x: a | b @test(err, suberr=(code=eval, contains="..."), suberr=(code=eval, contains="..."))
+   ```
+
+4. **Files with compile-time errors**: CUE source files that themselves produce
+   compile errors (e.g., arithmetic on abstract types like `string + ":" + string`,
+   or comparisons like `string == number`) **cannot** be converted to inline test
+   format. The inline runner must be able to compile the source. Leave these files
+   in their original golden-file format.
+
+5. **Definition references in `@test(leq, ...)`**: Definition names (e.g.,
+   `#MyDef`) are not in scope when the expected constraint expression is compiled.
+   Use the structural equivalent (e.g., `{field: string}`) with `@test(closed)`.
+
+6. **Remove `out/eval` and `out/evalalpha` sections** after conversion, but keep
+   the `out/eval/stats` section (promote v3 stats from `out/evalalpha/stats` if
+   needed).
+
+7. **Add `out/errors.txt`** if any errors e  xist in the test (leave empty initially;
+   `CUE_UPDATE=1` fills it in automatically).
+
+8. **Add `out/todo.txt`** if there are noteworthy differences
+   between the v2 and v3 evaluator results.
+
+9. **File header comment**: For files that reference a GitHub issue (e.g.,
+   `issue1886.txtar`), add a `#`-prefixed comment block at the very top of the
+   txtar file (before the first `-- section --`) explaining what the original
+   issue was about and how the test covers its essence. Example:
+   ```
+   # Tests that string interpolation with an abstract type reports "incomplete"
+   # errors correctly regardless of declaration order. Issue: evalv2 gave wrong
+   # "was already used" errors when a field was referenced before being defined.
+   ```
+
+10. **DO NOT** introduce any flags in new @test(err) directives. Only maintainers
+of the CUE project should do so.
+
+11. **@test(eq, ...) placement**: Prefer placing the eq directive attribute
+    either directly after a field for single field test, or as a field decl
+    at the end of a struct of a test that is struct based. Do NOT place `@test`
+    as a field attribute after a closing `}` — e.g., `} @test(eq, ...)` is
+    wrong; move it inside the struct as a trailing decl attribute instead.
+
 ### Contribution Model
 - Single commit per PR/CL model
 - Uses `git codereview` workflow for managing changes

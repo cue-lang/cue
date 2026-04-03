@@ -51,6 +51,24 @@
       "parentUuid": "2533239b_47401ee6",
       "revId": "074a2ef5ec7db698e971f8f163e113c8fc7993b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cad6903d_4471bbbe",
+        "filename": "internal/cuetest/cuetest.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-03T14:19:23Z",
+      "side": 1,
+      "message": "Good point. The opt-in model means it will likely never be used in practice. Your suggestion to augment `CUE_UPDATE` with a \"diff\" mode that shows what would change and fails rather than updating makes more sense as the UX. I\u0027ll rethink the design along those lines.",
+      "parentUuid": "2533239b_47401ee6",
+      "revId": "074a2ef5ec7db698e971f8f163e113c8fc7993b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

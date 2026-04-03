@@ -1311,7 +1311,7 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 	// Always auto-update on mismatch (informational, not an assertion).
 	if cuetest.ForceUpdateGoldenFiles || cuetest.UpdateGoldenFiles {
 		escaped := strings.ReplaceAll(actual, `"`, `\"`)
-		r.enqueueInlineFill(pa, fmt.Sprintf(`@test(debugOutput, """%s""")`, escaped))
+		r.enqueueInlineFill(pa, fmt.Sprintf("@test(debugOutput, \"\"\"\n%s\"\"\")", escaped))
 		return
 	}
 	if !match {

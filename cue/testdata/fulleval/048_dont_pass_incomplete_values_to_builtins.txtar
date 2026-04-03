@@ -7,7 +7,7 @@ input: string              @test(kind=string)
 foo:   json.Marshal(input) @test(err, code=incomplete)
 -- out/errors.txt --
 [incomplete] foo: error in call to encoding/json.Marshal: non-concrete argument 0:
-    in.cue:4:8
+    ./in.cue:4:8
 -- out/eval/stats --
 Leaks:  0
 Freed:  3

@@ -880,9 +880,6 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 		})
 	}
 	result := buf.String()
-	// TODO: consider removing this line to have standard errors. But keep now
-	// to minimize diffs in this CL.
-	result = strings.ReplaceAll(result, "./", "")
 	if result != "" && result[len(result)-1] != '\n' {
 		result += "\n"
 	}

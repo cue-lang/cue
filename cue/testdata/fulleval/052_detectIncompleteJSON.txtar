@@ -27,10 +27,10 @@ Val: #Spec & {
 })
 -- out/errors.txt --
 [incomplete] #Spec.data.baz: error in call to encoding/json.Marshal: non-concrete argument 0:
-    in.cue:11:11
+    ./in.cue:11:11
 [incomplete] #Spec.data.foobar: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
-    in.cue:12:11
-    in.cue:6:21
+    ./in.cue:12:11
+    ./in.cue:6:21
 -- out/eval/stats --
 Leaks:  0
 Freed:  17

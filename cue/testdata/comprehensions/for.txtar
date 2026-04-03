@@ -15,7 +15,7 @@ comprehensionBinds: {
 }
 -- out/errors.txt --
 [eval] k: cannot range over e (found int, want list or struct):
-    in.cue:7:14
+    ./in.cue:7:14
 -- out/eval/stats --
 Leaks:  2
 Freed:  16

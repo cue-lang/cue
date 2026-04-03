@@ -10,7 +10,7 @@ ne1:  "s" != null @test(eq, true)
 call: null()      @test(err, code=eval, pos=[0:7], contains="cannot call non-function")
 -- out/errors.txt --
 [eval] call: cannot call non-function null (type null):
-    in.cue:9:7
+    ./in.cue:9:7
 -- out/compile --
 --- in.cue
 {

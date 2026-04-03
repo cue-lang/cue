@@ -832,3 +832,47 @@ func checkErr(t *testing.T, err error, wantErr string) {
 		t.Errorf("error %q does not contain %q", err.Error(), wantErr)
 	}
 }
+
+// TestShareIDInEqBody verifies the first-occurrence eq-check rule for
+// @test(shareID=name) fields in an eq struct body.
+func TestShareIDInEqBody(t *testing.T) {
+	t.Run("first occurrence runs eq check, mismatch fails", func(t *testing.T) {
+		// The first field with shareID=A has value {x: 99} but the actual
+		// value of "a" is {x: 1}.  The eq check must run and fail.
+		expr := parseExpr(t, `{
+			a: {x: 99} @test(shareID=A)
+			b: {x: 1}  @test(shareID=A)
+		}`)
+		val := compileVal(t, `{a: {x: 1}, b: {x: 1}}`)
+		err := astCompare(expr, val.LookupPath(cue.MakePath()))
+		if err == nil {
+			t.Error("expected eq check to fail for first shareID occurrence, but it passed")
+		}
+	})
+
+	t.Run("second occurrence skips eq check, mismatch ok", func(t *testing.T) {
+		// First field matches; second has wrong value but is skipped.
+		expr := parseExpr(t, `{
+			a: {x: 1}  @test(shareID=A)
+			b: {x: 99} @test(shareID=A)
+		}`)
+		val := compileVal(t, `{a: {x: 1}, b: {x: 1}}`)
+		err := astCompare(expr, val.LookupPath(cue.MakePath()))
+		if err != nil {
+			t.Errorf("expected second shareID occurrence to skip eq check, but got: %v", err)
+		}
+	})
+
+	t.Run("identifier value in second occurrence is skipped", func(t *testing.T) {
+		// Second occurrence uses 'a' as a documentation reference; it is skipped.
+		expr := parseExpr(t, `{
+			a: {x: 1} @test(shareID=A)
+			b: a       @test(shareID=A)
+		}`)
+		val := compileVal(t, `{a: {x: 1}, b: {x: 1}}`)
+		err := astCompare(expr, val.LookupPath(cue.MakePath()))
+		if err != nil {
+			t.Errorf("identifier as second shareID value should be skipped, but got: %v", err)
+		}
+	})
+}

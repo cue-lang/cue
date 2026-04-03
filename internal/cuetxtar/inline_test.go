@@ -4,14 +4,13 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 package cuetxtar
 
 import (
@@ -19,11 +18,11 @@ import (
 	"strings"
 	"testing"
 
-	"golang.org/x/tools/txtar"
-
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/parser"
+	"golang.org/x/tools/txtar"
 )
 
 // testMakePath creates a CUE path from a dot-separated string for test use.
@@ -38,7 +37,6 @@ func testMakePath(s string) cue.Path {
 	}
 	return cue.MakePath(sels...)
 }
-
 func TestParsePosSpecs(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -99,7 +97,6 @@ func TestParsePosSpecs(t *testing.T) {
 			wantErr: true,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := parsePosSpecs(tt.input)
@@ -124,7 +121,6 @@ func TestParsePosSpecs(t *testing.T) {
 		})
 	}
 }
-
 func TestFindPermFieldsAtPath(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -169,16 +165,13 @@ func TestFindPermFieldsAtPath(t *testing.T) {
 			wantCount: 0,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f, err := parser.ParseFile("test.cue", tt.src)
 			if err != nil {
 				t.Fatalf("parse: %v", err)
 			}
-
 			structLit, indices := findPermFieldsAtPath(f, testMakePath(tt.path), tt.fieldNames)
-
 			if tt.wantCount == 0 {
 				if len(indices) != 0 {
 					t.Errorf("want 0 indices, got %d", len(indices))
@@ -211,7 +204,6 @@ func TestFindPermFieldsAtPath(t *testing.T) {
 		})
 	}
 }
-
 func makeRec(path string, directive, version string) attrRecord {
 	return attrRecord{
 		path: testMakePath(path),
@@ -221,7 +213,6 @@ func makeRec(path string, directive, version string) attrRecord {
 		},
 	}
 }
-
 func TestSelectActiveDirectives(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -275,7 +266,6 @@ func TestSelectActiveDirectives(t *testing.T) {
 			wantDirs: []string{"eq", "err"},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := selectActiveDirectives(tt.records, testMakePath(tt.path), tt.version)
@@ -369,7 +359,6 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 			archive: "-- test.cue --\nx: 1 & 2 @test(err, pos=[test.cue:1:4 test.cue:1:8])\n",
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			archive := txtar.Parse([]byte(tt.archive))
@@ -377,4 +366,64 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 			runner.Run()
 		})
 	}
+}
+
+// TestRunShareIDChecks_Negative verifies that runShareIDChecks correctly
+// reports an error when two paths do NOT share the same vertex.
+// This cannot be expressed as a txtar inline test (we can't annotate "should
+// fail"), so it is tested here by calling runShareIDChecks directly with a
+// todoCapture that captures errors without propagating to the parent test.
+func TestRunShareIDChecks_Negative(t *testing.T) {
+	ctx := cuecontext.New()
+	r := &inlineRunner{}
+	t.Run("shared vertices pass", func(t *testing.T) {
+		// b: a creates vertex sharing; both paths should deref to the same node.
+		v := ctx.CompileString("a: {x: 1}\nb: a")
+		rec := &failCapture{TB: t}
+		r.runShareIDChecks(rec, v, map[string][]cue.Path{
+			"AB": {cue.MakePath(cue.Str("a")), cue.MakePath(cue.Str("b"))},
+		})
+		if rec.failed {
+			t.Errorf("expected shared vertices to pass, got errors:\n%s", rec.msgs.String())
+		}
+	})
+	t.Run("independent structs fail", func(t *testing.T) {
+		// a and b are independently defined; they must not share a vertex.
+		v := ctx.CompileString("a: {x: 1}\nb: {x: 1}")
+		rec := &failCapture{TB: t}
+		r.runShareIDChecks(rec, v, map[string][]cue.Path{
+			"AB": {cue.MakePath(cue.Str("a")), cue.MakePath(cue.Str("b"))},
+		})
+		if !rec.failed {
+			t.Errorf("expected independent structs to fail shareID check, but it passed")
+		}
+	})
+	t.Run("list element via at=0 shared passes", func(t *testing.T) {
+		// l: [a] makes l[0] the same vertex as a.
+		v := ctx.CompileString("a: {x: 1}\nl: [a]")
+		rec := &failCapture{TB: t}
+		r.runShareIDChecks(rec, v, map[string][]cue.Path{
+			"EL": {
+				cue.MakePath(cue.Str("l"), cue.Index(0)),
+				cue.MakePath(cue.Str("a")),
+			},
+		})
+		if rec.failed {
+			t.Errorf("expected l[0] and a to be shared, got errors:\n%s", rec.msgs.String())
+		}
+	})
+	t.Run("list element literal not shared fails", func(t *testing.T) {
+		// l: [{x: 1}] is a literal; no sharing with a.
+		v := ctx.CompileString("a: {x: 1}\nl: [{x: 1}]")
+		rec := &failCapture{TB: t}
+		r.runShareIDChecks(rec, v, map[string][]cue.Path{
+			"EL": {
+				cue.MakePath(cue.Str("l"), cue.Index(0)),
+				cue.MakePath(cue.Str("a")),
+			},
+		})
+		if !rec.failed {
+			t.Errorf("expected list literal element to fail shareID check, but it passed")
+		}
+	})
 }

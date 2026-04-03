@@ -1,20 +1,19 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
 -- in.cue --
 _Q: [{pos: 0}, {pos: 1}]
 
 a: [rn=string]: _Q[0:len(a[rn])]
-a: ben: [{}]
+a: ben: [{}] @test(eq, [{pos: 0}])
 
 b: [rn=string]: _Q[0:1]
-b: ben: [{}]
+b: ben: [{}] @test(eq, [{pos: 0}])
 
 c: [rn=string]: [...{l: len(a[rn])}]
-c: ben: [{}]
+c: ben: [{}] @test(eq, [{l: 1}])
 
-#d: [rn=string]: [...{pos: uint}] & _Q[0:len(#d[rn])]
-#d: ben: [{}]
+#d: {[rn=string]: [...{pos: uint}] & _Q[0:len(#d[rn])]} @test(shareID=D)
+#d: ben: [{}] @test(eq, [{pos: 0}])
 
-d: #d
+d: #d @test(shareID=D)
 -- out/eval/stats --
 Leaks:  0
 Freed:  26
@@ -25,109 +24,6 @@ Retain: 0
 Unifications: 26
 Conjuncts:    56
 Disjuncts:    28
--- out/evalalpha --
-(struct){
-  _Q: (#list){
-    0: (struct){
-      pos: (int){ 0 }
-    }
-    1: (struct){
-      pos: (int){ 1 }
-    }
-  }
-  a: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  b: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  c: (struct){
-    ben: (#list){
-      0: (struct){
-        l: (int){ 1 }
-      }
-    }
-  }
-  #d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  d: ~(#d)
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -35,11 +35,5 @@
-       }
-     }
-   }
--  d: (#struct){
--    ben: (#list){
--      0: (#struct){
--        pos: (int){ 0 }
--      }
--    }
--  }
-+  d: ~(#d)
- }
--- out/eval --
-(struct){
-  _Q: (#list){
-    0: (struct){
-      pos: (int){ 0 }
-    }
-    1: (struct){
-      pos: (int){ 1 }
-    }
-  }
-  a: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  b: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  c: (struct){
-    ben: (#list){
-      0: (struct){
-        l: (int){ 1 }
-      }
-    }
-  }
-  #d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

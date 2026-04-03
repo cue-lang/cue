@@ -142,6 +142,69 @@ Optional arguments:
 | `contains="s"` | error message must contain substring `s` |
 | `any` | at least one *descendant* has the error (requires `code=`) |
 | `path=(p\|q)` | error exists at one of the listed paths |
+| `pos=[...]` | error positions must match (see below) |
+| `args=[...]` | Msg() args must contain the listed values (see below) |
+| `suberr=(...)` | sub-error spec for multi-error values (see below) |
+
+#### `pos=[...]` — error positions
+
+Specifies expected error positions. Each position is written as `deltaLine:col`
+relative to the `@test` attribute line, or `file:line:col` for positions in
+other files:
+
+```cue
+bad: x & y @test(err, code=eval, pos=[0:5 0:9])
+```
+
+`pos=[]` is a fill-in placeholder. Running with `CUE_UPDATE=1` writes the
+actual positions. Running with `CUE_UPDATE=force` overwrites existing
+non-empty `pos=` specs too.
+
+#### `args=[v1, v2, ...]` — Msg() argument check
+
+Checks that the values returned by the error's `Msg()` method include
+all listed strings (matched via `fmt.Sprint`, **order-independent**,
+**subset check**):
+
+```cue
+e: [] & 4 @test(err, code=eval, contains="conflicting values", args=[list, int])
+```
+
+Design note: `args=` is a **subset check** — extra actual arguments not
+listed in `args=` are allowed. This is intentional: `args=` is for
+verifying the arguments that matter (e.g. type names) without having to
+enumerate every argument. Arguments that happen to vary in order across
+implementations can be checked without also repeating arguments already
+covered by `contains=`.
+
+If you need to verify the exact set of arguments, list all of them:
+
+```cue
+e: [3][-1] @test(err, code=eval, args=[-1])   // only one arg — effectively exact
+```
+
+#### `suberr=(...)` — sub-error specs
+
+For errors composed of multiple sub-errors (typically failed disjunctions),
+each `suberr=(...)` spec matches one sub-error **order-independently**.
+The body accepts the same options as `@test(err, ...)`:
+
+```cue
+x: null | {n: 3}
+x: #empty & {n: 3} @test(err, code=eval,
+    suberr=(contains="conflicting values", args=[struct, null]),
+    suberr=(contains="not allowed"))
+```
+
+Matching is two-pass:
+1. Specs with non-empty `pos=` are matched first (position is a stronger
+   discriminator than `contains=`).
+2. Remaining specs are matched by `contains=` against unmatched actual
+   sub-errors.
+
+`pos=[]` placeholders inside `suberr=(...)` trigger write-back on
+`CUE_UPDATE=1`. All position updates for the same `@test` attribute are
+applied atomically.
 
 ### `kind` — value kind
 
@@ -213,6 +276,32 @@ produce any assertion.
 
 ---
 
+## `shareID` — vertex sharing assertion
+
+`@test(shareID=name)` asserts that all fields annotated with the same
+`name` share the same underlying `*adt.Vertex` (pointer identity after
+following indirections):
+
+```cue
+a: {x: 1}
+b: a
+@test(eq, {
+    a: {x: 1} @test(shareID=A)   // first occurrence: eq check runs normally
+    b: a       @test(shareID=A)   // subsequent occurrences: eq check skipped
+})
+```
+
+Rules:
+- The **first** field with a given `shareID` name has its eq check run
+  normally (so every value-expr pair is validated at least once).
+- **Subsequent** fields with the same name skip the eq check — their
+  expression is treated as documentation only.
+- The sharing assertion itself runs after all eq checks.
+
+`@test(shareID=name)` may only appear inside a `@test(eq, {...})` body.
+
+---
+
 ## Empty placeholder and `CUE_UPDATE`
 
 `@test()` (empty body) is a fill-in placeholder.  Running with `CUE_UPDATE=1`
@@ -223,9 +312,10 @@ evaluates the field and rewrites the attribute in the source file:
 | Value            | `@test(eq, <value>)` |
 | Error            | `@test(err, code=<code>, contains="<msg>")` |
 
-`CUE_UPDATE=diff` records a failing assertion as
-`@test(..., skip:v3, diff="got …; want …")` rather than overwriting the
-expected value.  `CUE_UPDATE=force` overwrites unconditionally.
+`CUE_UPDATE=diff` shows a unified diff of what `CUE_UPDATE=1` *would* write,
+without modifying any files.  Documentary sections (e.g. `out/errors.txt`)
+are also validated in this mode.  `CUE_UPDATE=force` overwrites unconditionally,
+including non-empty `pos=` specs that would normally require manual review.
 
 ---
 

@@ -898,7 +898,7 @@ func (r *inlineRunner) cueContext() *cue.Context {
 // subpath returns the #subpath value from the archive comment, or empty string.
 func (r *inlineRunner) subpath() string {
 	prefix := []byte("#subpath:")
-	for _, line := range strings.Split(string(r.archive.Comment), "\n") {
+	for line := range strings.SplitSeq(string(r.archive.Comment), "\n") {
 		b := []byte(strings.TrimSpace(line))
 		if strings.HasPrefix(string(b), string(prefix)) {
 			return strings.TrimSpace(string(b[len(prefix):]))
@@ -1207,7 +1207,7 @@ func (r *inlineRunner) runKindAssertion(t testing.TB, path cue.Path, val cue.Val
 
 	// Parse expected kind(s) — may be pipe-separated like "int|string".
 	var expectedKind cue.Kind
-	for _, ks := range strings.Split(expectedStr, "|") {
+	for ks := range strings.SplitSeq(expectedStr, "|") {
 		k := parseKindStr(strings.TrimSpace(ks))
 		if k == cue.BottomKind {
 			t.Errorf("path %s: @test(kind=%q): unknown kind %q", path, expectedStr, ks)

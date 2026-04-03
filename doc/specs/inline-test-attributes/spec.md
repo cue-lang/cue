@@ -609,23 +609,23 @@ A field carrying `@test()` (empty attribute body) SHALL be treated as an unfille
 ---
 
 ### Requirement: Regression guard for failing `eq` assertions
-When `CUE_UPDATE=1` is set and an `eq` assertion **fails** (genuine mismatch), the runner SHALL NOT silently overwrite the expected value. Instead it SHALL annotate the attribute with `skip:<version>` and `diff="..."` arguments that record the discrepancy without changing the nominal expected value. The test is then effectively skipped for that version.
+When `CUE_UPDATE=1` is set and an `eq` assertion **fails** (genuine mismatch), the runner SHALL fail the test. It SHALL NOT silently overwrite or skip the expected value.
 
-`CUE_UPDATE=force` (`CUE_UPDATE=force` env value) SHALL overwrite the expected value unconditionally, regardless of whether it was passing before.
+`CUE_UPDATE=force` SHALL annotate the attribute with `skip:<version>` to mark the discrepancy and let the test pass while the difference is tracked. The nominal expected value is preserved; only the skip marker is added.
 
-When a previously-failing (skip-annotated) assertion now passes again under `CUE_UPDATE=1`, the runner SHALL remove the stale `skip:` and `diff=` arguments, restoring the plain `@test(eq, <expr>)` form.
+When a `skip`-annotated assertion now passes again under `CUE_UPDATE=1`, the runner SHALL remove the stale `skip:` argument, restoring the plain `@test(eq, <expr>)` form.
 
-#### Scenario: Record failing assertion as regression guard
+#### Scenario: Failing assertion is an error under CUE_UPDATE=1
 - **WHEN** `@test(eq, 42)` fails because the value is `43` and `CUE_UPDATE=1` is set
-- **THEN** the attribute is rewritten to `@test(eq, 42, skip:v3, diff="got 43; want 42")` in the source file
+- **THEN** the test fails; the source file is NOT modified
+
+#### Scenario: Mark failing assertion with CUE_UPDATE=force
+- **WHEN** `@test(eq, 42)` fails because the value is `43` and `CUE_UPDATE=force` is set
+- **THEN** the attribute is rewritten to `@test(eq, 42, skip:v3)` so the test is skipped for that version
 
 #### Scenario: Remove stale skip on recovery
-- **WHEN** `@test(eq, 42, skip:v3, diff="got 43; want 42")` now passes and `CUE_UPDATE=1` is set
-- **THEN** the `skip:v3` and `diff=` arguments are removed, leaving `@test(eq, 42)`
-
-#### Scenario: Force overwrite with CUE_UPDATE=force
-- **WHEN** `@test(eq, 42)` fails because the value is `43` and `CUE_UPDATE=force` is set
-- **THEN** the attribute is rewritten to `@test(eq, 43)` unconditionally
+- **WHEN** `@test(eq, 42, skip:v3)` now passes and `CUE_UPDATE=1` is set
+- **THEN** the `skip:v3` argument is removed, leaving `@test(eq, 42)`
 
 ---
 

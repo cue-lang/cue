@@ -196,6 +196,20 @@ func TestParsePosSpecs(t *testing.T) {
 			input:   "[0:x]",
 			wantErr: true,
 		},
+		{
+			name:  "comma-separated (commas ignored)",
+			input: "[0:5, 1:13, -2:3]",
+			want: []posSpec{
+				{deltaLine: 0, col: 5},
+				{deltaLine: 1, col: 13},
+				{deltaLine: -2, col: 3},
+			},
+		},
+		{
+			name:  "trailing comma only",
+			input: "[0:5,]",
+			want:  []posSpec{{deltaLine: 0, col: 5}},
+		},
 	}
 
 	for _, tt := range tests {
@@ -537,6 +551,101 @@ func TestRunShareIDChecks_Negative(t *testing.T) {
 		})
 		if !rec.failed {
 			t.Errorf("expected list literal element to fail shareID check, but it passed")
+		}
+	})
+}
+
+// TestAtDirective verifies that @test(err, at=<path>, ...) navigates to a
+// sub-path before checking the error.
+func TestAtDirective(t *testing.T) {
+	t.Run("at= navigates to sub-field error", func(t *testing.T) {
+		ctx := cuecontext.New()
+		parent := ctx.CompileString("a: {b: int & string}")
+		if parent.LookupPath(cue.MakePath(cue.Str("a"), cue.Str("b"))).Err() == nil {
+			t.Fatal("expected a.b to be an error")
+		}
+		r := &inlineRunner{}
+		rec := &failRecorder{TB: t}
+		pa := parsedTestAttr{directive: "err", errArgs: &errArgs{at: "a.b"}}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), parent, pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: %s", rec.msgs.String())
+		}
+	})
+
+	t.Run("at= missing sub-path fails", func(t *testing.T) {
+		ctx := cuecontext.New()
+		val := ctx.CompileString("a: 1")
+		r := &inlineRunner{}
+		rec := &failRecorder{TB: t}
+		pa := parsedTestAttr{directive: "err", errArgs: &errArgs{at: "a.nonexistent"}}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), val, pa)
+		if !rec.failed {
+			t.Errorf("expected failure for missing sub-path")
+		}
+	})
+
+	t.Run("at= sub-path not an error fails", func(t *testing.T) {
+		ctx := cuecontext.New()
+		val := ctx.CompileString("a: {b: 42}")
+		r := &inlineRunner{}
+		rec := &failRecorder{TB: t}
+		pa := parsedTestAttr{directive: "err", errArgs: &errArgs{at: "a.b"}}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), val, pa)
+		if !rec.failed {
+			t.Errorf("expected failure when sub-path is not an error")
+		}
+	})
+}
+
+// makeTestPos creates a token.Pos at the given 1-indexed line and column in
+// a fresh file with the given name. Each line is allocated lineWidth bytes.
+func makeTestPos(filename string, line, col int) token.Pos {
+	const lineWidth = 100
+	size := line*lineWidth + col
+	f := token.NewFile(filename, 0, size)
+	for i := 1; i < line; i++ {
+		f.AddLine(i * lineWidth)
+	}
+	return f.Pos((line-1)*lineWidth+(col-1), token.Blank)
+}
+
+// TestPosSpecsMatch verifies that posSpecsMatch is order-independent.
+func TestPosSpecsMatch(t *testing.T) {
+	identity := func(s string) string { return s }
+
+	// Two positions in "in.cue": line 5 col 3 and line 7 col 1.
+	pos5_3 := makeTestPos("in.cue", 5, 3)
+	pos7_1 := makeTestPos("in.cue", 7, 1)
+
+	// Absolute specs for the same positions (baseLine is irrelevant for absolute).
+	spec5_3 := posSpec{fileName: "in.cue", absLine: 5, col: 3}
+	spec7_1 := posSpec{fileName: "in.cue", absLine: 7, col: 1}
+
+	t.Run("same order matches", func(t *testing.T) {
+		if !posSpecsMatch([]token.Pos{pos5_3, pos7_1}, []posSpec{spec5_3, spec7_1}, 0, identity) {
+			t.Error("expected match in same order")
+		}
+	})
+	t.Run("reversed order matches", func(t *testing.T) {
+		if !posSpecsMatch([]token.Pos{pos5_3, pos7_1}, []posSpec{spec7_1, spec5_3}, 0, identity) {
+			t.Error("expected match with reversed spec order")
+		}
+	})
+	t.Run("wrong position does not match", func(t *testing.T) {
+		pos9_2 := makeTestPos("in.cue", 9, 2)
+		if posSpecsMatch([]token.Pos{pos5_3, pos9_2}, []posSpec{spec5_3, spec7_1}, 0, identity) {
+			t.Error("expected no match for wrong position")
+		}
+	})
+	t.Run("count mismatch does not match", func(t *testing.T) {
+		if posSpecsMatch([]token.Pos{pos5_3}, []posSpec{spec5_3, spec7_1}, 0, identity) {
+			t.Error("expected no match for count mismatch")
+		}
+	})
+	t.Run("empty positions and specs match", func(t *testing.T) {
+		if !posSpecsMatch(nil, nil, 0, identity) {
+			t.Error("expected empty slices to match")
 		}
 	})
 }

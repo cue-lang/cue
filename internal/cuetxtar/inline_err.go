@@ -14,7 +14,7 @@
 
 // This file contains all error-assertion logic for the inline test runner:
 // types, parsing, matching, position checking, and write-back for
-// @test(err, ...) directives.
+// @test(err, ...) and @test(err, suberr=(...)) directives.
 
 package cuetxtar
 
@@ -76,6 +76,9 @@ type errArgs struct {
 	// posSet is true when pos= was
 	// explicitly provided (including pos=[] to assert no positions).
 	posSet bool
+	// suberrs holds expected sub-error specs for multi-error (list) values.
+	// Each entry is matched order-independently against errors.Errors(val.Err()).
+	suberrs []*errArgs
 }
 
 // matchesCode reports whether the given error code satisfies the codes
@@ -85,6 +88,20 @@ func (ea *errArgs) matchesCode(got string) bool {
 		return true
 	}
 	return slices.Contains(ea.codes, got)
+}
+
+// posUpdate records a pending pos=[...] replacement within a suberr=(...) group.
+type posUpdate struct {
+	expIdx    int         // 0-based index of the suberr=(...) group in the attribute
+	positions []token.Pos // actual positions to write
+}
+
+// posWrite records a pending pos= attribute update for CUE_UPDATE write-back.
+type posWrite struct {
+	fileName    string // archive .cue file name, e.g. "in.cue"
+	attrOffset  int    // byte offset of the @test attr in the original file data
+	attrLen     int    // byte length of the original @test attr text
+	newAttrText string // replacement attribute text with updated pos=[...]
 }
 
 // parseErrArgs extracts err sub-options from an already-parsed Attr.
@@ -117,6 +134,19 @@ func parseErrArgs(a internal.Attr) (errArgs, error) {
 			}
 			ea.pos = specs
 			ea.posSet = true
+		case kv.Key() == "suberr":
+			inner := strings.TrimSpace(kv.Value())
+			if !strings.HasPrefix(inner, "(") || !strings.HasSuffix(inner, ")") {
+				return ea, fmt.Errorf("@test(err, suberr=...): value must be wrapped in (...), got %q", inner)
+			}
+			inner = inner[1 : len(inner)-1]
+			// Reuse parseErrArgs by building a synthetic "err, <inner>" attr body.
+			syntheticAttr := internal.ParseAttrBody(token.NoPos, "err, "+inner)
+			subEA, err := parseErrArgs(syntheticAttr)
+			if err != nil {
+				return ea, fmt.Errorf("@test(err, suberr=...): %w", err)
+			}
+			ea.suberrs = append(ea.suberrs, &subEA)
 		}
 	}
 	return ea, nil
@@ -188,6 +218,30 @@ func parsePosSpecs(s string) ([]posSpec, error) {
 	return specs, nil
 }
 
+// matchesErrSpec reports whether act satisfies all discriminating constraints
+// in ea. It is a pure predicate — it never calls t.Errorf.
+//
+// Position specs are used for discrimination only when len(ea.pos) > 0.
+// An empty pos=[] placeholder does not influence matching; use
+// checkSubErrPositions to validate positions after a match is found.
+//
+// code= is not checked here because cueerrors.Error does not expose adt.Code
+// directly; code checking is done at the cue.Value level in runErrAssertion.
+func (r *inlineRunner) matchesErrSpec(act cueerrors.Error, ea *errArgs, baseLine int) bool {
+	if ea.contains != "" && !strings.Contains(act.Error(), ea.contains) {
+		return false
+	}
+	// Only use pos for discrimination when it is non-empty. An empty pos=[]
+	// is a placeholder; positions are validated separately by checkSubErrPositions.
+	if ea.posSet && len(ea.pos) > 0 {
+		positions := positionsFromSingleError(act)
+		if !posSpecsMatch(positions, ea.pos, baseLine, r.relFilename) {
+			return false
+		}
+	}
+	return true
+}
+
 // runErrAssertion checks that an error is present at val, applying sub-options.
 func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
@@ -214,7 +268,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		return
 	}
 
-	// Validate error code.
+	// Validate error code (uses adt.Bottom.Code, only available at cue.Value level).
 	if len(ea.codes) > 0 {
 		gotCode := r.errorCode(val)
 		if !ea.matchesCode(gotCode) {
@@ -232,6 +286,315 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 	if ea.posSet {
 		r.checkErrPositions(t, path, val, pa)
 	}
+	// Validate sub-errors.
+	if len(ea.suberrs) > 0 {
+		r.checkSubErrors(t, path, val, ea, pa)
+	}
+}
+
+// checkSubErrors verifies that the sub-errors of a multi-error value at val
+// match the suberr=(...) specs in ea.
+//
+// Matching is two-pass and order-independent:
+//   - Pass 1 (exact): specs with non-empty pos= are matched first — they
+//     uniquely identify a sub-error even when multiple errors share a contains
+//     substring.
+//   - Pass 2 (contains): remaining specs (pos=[] or no pos=) are matched by
+//     contains= against the still-unmatched actual errors.
+//
+// After matching, positions are validated for each pair. pos=[] is a
+// placeholder that triggers writeback when CUE_UPDATE=1.
+//
+// When the error is a failed disjunction, CUE prepends a summary entry of
+// the form "N errors in empty disjunction:" to the list; checkSubErrors
+// detects and skips this header.
+func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value, ea *errArgs, pa parsedTestAttr) {
+	t.Helper()
+	all := cueerrors.Errors(val.Err())
+	// Skip the disjunction header entry if present.
+	actual := all
+	if len(all) > 1 && isDisjunctionHeader(all[0]) {
+		actual = all[1:]
+	}
+	expected := ea.suberrs
+
+	if len(actual) != len(expected) {
+		t.Errorf("path %s: @test(err, suberr=...): got %d sub-error(s), want %d",
+			path, len(actual), len(expected))
+		for i, a := range actual {
+			t.Logf("  actual[%d]: %s", i, a.Error())
+		}
+		return
+	}
+
+	// matchedPair records an (actual, expected) pairing together with expIdx —
+	// the 0-based index of the expected spec within ea.suberrs, which is the
+	// same as its ordinal position among suberr=(...) groups in the source
+	// attribute text (needed for pos= writeback).
+	type matchedPair struct {
+		act    cueerrors.Error
+		exp    *errArgs
+		expIdx int
+	}
+
+	usedAct := make([]bool, len(actual))
+	expMatched := make([]bool, len(expected))
+	var pairs []matchedPair
+
+	// Pass 1 — exact: specs with non-empty pos= matched first.
+	// These specs uniquely identify an error even when contains substrings overlap.
+	for i, exp := range expected {
+		if !exp.posSet || len(exp.pos) == 0 {
+			continue
+		}
+		for j, act := range actual {
+			if !usedAct[j] && r.matchesErrSpec(act, exp, pa.baseLine) {
+				usedAct[j] = true
+				expMatched[i] = true
+				pairs = append(pairs, matchedPair{act, exp, i})
+				break
+			}
+		}
+	}
+
+	// Pass 2 — contains: specs not yet matched (pos=[] or no pos=) matched
+	// against remaining actual errors by contains= only.
+	// Specs with non-empty pos= are handled by pass 1 and the reporting
+	// section below; skip them here to avoid duplicate error messages.
+	for i, exp := range expected {
+		if expMatched[i] {
+			continue
+		}
+		if exp.posSet && len(exp.pos) > 0 {
+			continue
+		}
+		matched := false
+		for j, act := range actual {
+			if !usedAct[j] && r.matchesErrSpec(act, exp, pa.baseLine) {
+				usedAct[j] = true
+				expMatched[i] = true
+				matched = true
+				pairs = append(pairs, matchedPair{act, exp, i})
+				break
+			}
+		}
+		if !matched {
+			desc := exp.contains
+			if desc == "" {
+				desc = fmt.Sprintf("code=%v", exp.codes)
+			}
+			t.Errorf("path %s: @test(err, suberr=...): no sub-error matched %q", path, desc)
+		}
+	}
+	// Report pass-1 specs that also failed to match.
+	// When contains= is set, scan all actual errors for a contains-only match
+	// and report a position diff; this is more informative than "no match".
+	for i, exp := range expected {
+		if !expMatched[i] && exp.posSet && len(exp.pos) > 0 {
+			if exp.contains != "" {
+				found := false
+				for _, act := range actual {
+					if !strings.Contains(act.Error(), exp.contains) {
+						continue
+					}
+					found = true
+					positions := positionsFromSingleError(act)
+					if len(positions) != len(exp.pos) {
+						t.Errorf("path %s: @test(err, suberr=...): pos: got %d position(s), want %d",
+							path, len(positions), len(exp.pos))
+					} else {
+						for k, spec := range exp.pos {
+							got := positions[k]
+							wantLine := pa.baseLine + spec.deltaLine
+							if got.Line() != wantLine || got.Column() != spec.col {
+								t.Errorf("path %s: @test(err, suberr=...): pos[%d]: got %d:%d, want %d:%d",
+									path, k, got.Line()-pa.baseLine, got.Column(), spec.deltaLine, spec.col)
+							}
+						}
+					}
+					break
+				}
+				if !found {
+					t.Errorf("path %s: @test(err, suberr=...): no sub-error matched pos=%v contains=%q",
+						path, exp.pos, exp.contains)
+				}
+			} else {
+				t.Errorf("path %s: @test(err, suberr=...): no sub-error matched pos=%v contains=%q",
+					path, exp.pos, exp.contains)
+			}
+		}
+	}
+
+	// Validate / writeback positions for matched pairs.
+	// Collect all placeholder updates and apply them atomically to avoid
+	// multiple posWrite entries clobbering each other on the same attribute.
+	var posUpdates []posUpdate
+	needWriteback := false
+	for _, p := range pairs {
+		if !p.exp.posSet {
+			continue
+		}
+		positions := positionsFromSingleError(p.act)
+		isPlaceholder := len(p.exp.pos) == 0
+		if posSpecsMatch(positions, p.exp.pos, pa.baseLine, r.relFilename) {
+			continue
+		}
+		if isPlaceholder && (cuetest.UpdateGoldenFiles || cuetest.ForceUpdateGoldenFiles) {
+			posUpdates = append(posUpdates, posUpdate{p.expIdx, positions})
+			needWriteback = true
+			continue
+		}
+		if !isPlaceholder && cuetest.ForceUpdateGoldenFiles {
+			posUpdates = append(posUpdates, posUpdate{p.expIdx, positions})
+			needWriteback = true
+			continue
+		}
+		// Report mismatch.
+		if len(positions) != len(p.exp.pos) {
+			t.Errorf("path %s: @test(err, suberr=...): pos: got %d position(s), want %d",
+				path, len(positions), len(p.exp.pos))
+		} else {
+			for i, spec := range p.exp.pos {
+				got := positions[i]
+				wantLine := pa.baseLine + spec.deltaLine
+				if got.Line() != wantLine || got.Column() != spec.col {
+					t.Errorf("path %s: @test(err, suberr=...): pos[%d]: got %d:%d, want %d:%d",
+						path, i, got.Line()-pa.baseLine, got.Column(), spec.deltaLine, spec.col)
+				}
+			}
+		}
+	}
+	if needWriteback {
+		r.enqueueSubErrPosWrites(pa, posUpdates)
+	}
+}
+
+// enqueueSubErrPosWrites applies all sub-error position updates atomically to
+// the source attribute, producing a single posWrite entry. Each update replaces
+// pos=[...] in the expIdx-th suberr=(...) group.
+func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUpdate) {
+	newAttrText := pa.srcAttr.Text
+	// Apply updates from highest expIdx to lowest so earlier indices stay valid.
+	slices.SortFunc(updates, func(a, b posUpdate) int {
+		return b.expIdx - a.expIdx
+	})
+	for _, u := range updates {
+		parts := make([]string, len(u.positions))
+		for i, p := range u.positions {
+			if p.Filename() == "" || p.Filename() == pa.srcFileName {
+				parts[i] = fmt.Sprintf("%d:%d", p.Line()-pa.baseLine, p.Column())
+			} else {
+				parts[i] = fmt.Sprintf("%s:%d:%d", r.relFilename(p.Filename()), p.Line(), p.Column())
+			}
+		}
+		newPosStr := strings.Join(parts, " ")
+		newAttrText = replaceSuberrPos(newAttrText, u.expIdx, newPosStr)
+	}
+	r.pendingPosWrites = append(r.pendingPosWrites, posWrite{
+		fileName:    pa.srcFileName,
+		attrOffset:  pa.srcAttr.Pos().Offset(),
+		attrLen:     len(pa.srcAttr.Text),
+		newAttrText: newAttrText,
+	})
+}
+
+// replaceSuberrPos replaces the pos=[...] content in the n-th suberr=(...)
+// group within attrText with newPosContent.
+func replaceSuberrPos(attrText string, n int, newPosContent string) string {
+	// Find the start of the n-th "suberr=(" occurrence.
+	pos := 0
+	for i := 0; i <= n; i++ {
+		idx := strings.Index(attrText[pos:], "suberr=(")
+		if idx < 0 {
+			return attrText
+		}
+		if i < n {
+			pos += idx + len("suberr=(")
+		} else {
+			pos += idx
+		}
+	}
+	// Scan past "suberr=(" to find the content end (matching closing paren).
+	innerStart := pos + len("suberr=(")
+	depth := 1
+	end := innerStart
+	for end < len(attrText) && depth > 0 {
+		switch attrText[end] {
+		case '(':
+			depth++
+		case ')':
+			depth--
+		}
+		if depth > 0 {
+			end++
+		}
+	}
+	// attrText[innerStart:end] is the content inside suberr=(...).
+	inner := attrText[innerStart:end]
+	posIdx := strings.Index(inner, "pos=[")
+	if posIdx < 0 {
+		return attrText // no pos= in this suberr group
+	}
+	bracket := posIdx + len("pos=[")
+	closeIdx := strings.Index(inner[bracket:], "]")
+	if closeIdx < 0 {
+		return attrText
+	}
+	closeIdx += bracket + 1 // include "]"
+	newInner := inner[:posIdx] + "pos=[" + newPosContent + "]" + inner[closeIdx:]
+	return attrText[:innerStart] + newInner + attrText[end:]
+}
+
+// isDisjunctionHeader reports whether e is the synthetic summary error that
+// CUE prepends to a failed-disjunction error list, e.g. "2 errors in empty
+// disjunction:". These entries are structural scaffolding and not individual
+// disjunct errors.
+func isDisjunctionHeader(e cueerrors.Error) bool {
+	msg := e.Error()
+	// The header always has the form "N errors in empty disjunction:" where N >= 2.
+	// Use a simple heuristic: ends with "errors in empty disjunction:".
+	return strings.Contains(msg, "errors in empty disjunction:")
+}
+
+// positionsFromSingleError extracts the token positions from a single
+// cueerrors.Error (primary position first, then input positions sorted).
+// Unlike cueerrors.Positions, this works on an individual error rather than
+// potentially a list (where cueerrors.Positions only sees the first element).
+func positionsFromSingleError(e cueerrors.Error) []token.Pos {
+	var a []token.Pos
+	if p := e.Position(); p.File() != nil {
+		a = append(a, p)
+	}
+	sortOffset := len(a)
+	for _, p := range e.InputPositions() {
+		if p.File() != nil && p != e.Position() {
+			a = append(a, p)
+		}
+	}
+	slices.SortFunc(a[sortOffset:], token.Pos.Compare)
+	return slices.Compact(a)
+}
+
+// posSpecsMatch reports whether positions match specs exactly.
+// baseLine is the line number of the @test attribute; used to resolve relative specs.
+// The runner's relFilename method is needed for absolute specs — pass it as a func.
+func posSpecsMatch(positions []token.Pos, specs []posSpec, baseLine int, relFilename func(string) string) bool {
+	if len(positions) != len(specs) {
+		return false
+	}
+	for i, exp := range specs {
+		got := positions[i]
+		if exp.fileName != "" {
+			if relFilename(got.Filename()) != exp.fileName || got.Line() != exp.absLine || got.Column() != exp.col {
+				return false
+			}
+		} else {
+			if got.Line() != baseLine+exp.deltaLine || got.Column() != exp.col {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // checkErrPositions verifies that the error positions on val match the pos=
@@ -248,28 +611,7 @@ func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Va
 	positions := cueerrors.Positions(err)
 	expected := pa.errArgs.pos
 
-	match := len(positions) == len(expected)
-	if match {
-		for i, exp := range expected {
-			got := positions[i]
-			if exp.fileName != "" {
-				// Absolute form: match filename + absolute line + column.
-				// Normalize the position filename for archives loaded via
-				// loadWithConfig, which stores absolute paths in positions.
-				if r.relFilename(got.Filename()) != exp.fileName || got.Line() != exp.absLine || got.Column() != exp.col {
-					match = false
-					break
-				}
-			} else {
-				// Relative form: match line delta from @test + column.
-				if got.Line() != pa.baseLine+exp.deltaLine || got.Column() != exp.col {
-					match = false
-					break
-				}
-			}
-		}
-	}
-	if match {
+	if posSpecsMatch(positions, expected, pa.baseLine, r.relFilename) {
 		return
 	}
 
@@ -304,14 +646,6 @@ func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Va
 			}
 		}
 	}
-}
-
-// posWrite records a pending pos= attribute update for CUE_UPDATE write-back.
-type posWrite struct {
-	fileName    string // archive .cue file name, e.g. "in.cue"
-	attrOffset  int    // byte offset of the @test attr in the original file data
-	attrLen     int    // byte length of the original @test attr text
-	newAttrText string // replacement attribute text with updated pos=[...]
 }
 
 // enqueuePosWrite formats positions as pos specs and enqueues a write-back

@@ -301,3 +301,35 @@ outer: {q: g    @test(shareID=V)}
 `)
 	})
 }
+
+// TestInlineRunner_SubErrors verifies @test(err, suberr=(...)) sub-error matching.
+func TestInlineRunner_SubErrors(t *testing.T) {
+	run := func(t *testing.T, archiveStr string) {
+		t.Helper()
+		archive := txtar.Parse([]byte(archiveStr))
+		runner := cuetxtar.NewInlineRunner(t, nil, archive, t.TempDir())
+		runner.Run()
+	}
+
+	t.Run("two sub-errors both matched passes", func(t *testing.T) {
+		// null | {n: 3} unified with #empty (closed {}) & {n: 3} produces two sub-errors.
+		run(t, `-- test.cue --
+#empty: {}
+x: null | {n: 3}
+x: #empty & {n: 3} @test(err, code=eval,
+	suberr=(contains="conflicting values"),
+	suberr=(contains="not allowed"))
+`)
+	})
+
+	t.Run("order-independent matching passes", func(t *testing.T) {
+		// Specs in reversed order relative to actual sub-errors — should still pass.
+		run(t, `-- test.cue --
+#empty: {}
+x: null | {n: 3}
+x: #empty & {n: 3} @test(err, code=eval,
+	suberr=(contains="not allowed"),
+	suberr=(contains="conflicting values"))
+`)
+	})
+}

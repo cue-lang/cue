@@ -38,6 +38,13 @@ func (v Value) Attribute(key string) Attribute {
 		}
 		return newAttr(internal.FieldAttr, a)
 	}
+	for _, a := range export.ExtractDeclAttrs(v.v) {
+		k, _ := a.Split()
+		if key != k {
+			continue
+		}
+		return newAttr(internal.DeclAttr, a)
+	}
 
 	return nonExistAttr(key)
 }

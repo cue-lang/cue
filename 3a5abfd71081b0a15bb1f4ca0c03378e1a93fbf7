@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "489df301_fbf50b11",
+        "filename": "internal/cuetest/cuetest.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-03T14:39:14Z",
+      "side": 1,
+      "message": "This gets cleaned up later.",
+      "revId": "3a5abfd71081b0a15bb1f4ca0c03378e1a93fbf7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

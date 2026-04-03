@@ -178,7 +178,7 @@ func parseParenList(s string) ([]string, error) {
 }
 
 // parsePosSpecs parses a pos= value into a slice of posSpec.
-// The value must be enclosed in square brackets; elements are whitespace-separated.
+// The value must be enclosed in square brackets; elements are comma-separated.
 // Two element forms are supported:
 //
 //   - deltaLine:col — relative position on the same file (one colon).
@@ -192,9 +192,8 @@ func parsePosSpecs(s string) ([]posSpec, error) {
 	}
 	s = s[1 : len(s)-1]
 	var specs []posSpec
-	for _, p := range strings.Fields(s) {
-		// TODO: make these required.
-		p = strings.TrimRight(p, ",") // commas are optional separators
+	for _, p := range strings.Split(s, ",") {
+		p = strings.TrimSpace(p)
 		if p == "" {
 			continue
 		}
@@ -541,7 +540,7 @@ func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUp
 		for i, p := range u.positions {
 			parts[i] = r.formatPosSpec(p, pa)
 		}
-		newPosStr := strings.Join(parts, " ")
+		newPosStr := strings.Join(parts, ", ")
 		newAttrText = replaceSuberrPos(newAttrText, u.expIdx, newPosStr)
 	}
 	r.pendingPosWrites = append(r.pendingPosWrites, posWrite{
@@ -664,6 +663,16 @@ func posMatchesSpec(got token.Pos, exp posSpec, baseLine int, relFilename func(s
 	return got.Line() == baseLine+exp.deltaLine && got.Column() == exp.col
 }
 
+// formatPosCountMismatch returns a consistent mismatch message for @test(err,
+// pos=...) assertions. When got has extra positions, it explains that this can
+// be acceptable after validating relevance.
+func formatPosCountMismatch(directive string, got, want int) string {
+	if got > want {
+		return fmt.Sprintf("%s: got %d position(s), want %d; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...]", directive, got, want)
+	}
+	return fmt.Sprintf("%s: got %d position(s), want %d", directive, got, want)
+}
+
 // reportPosMismatch reports a position mismatch between actual positions and
 // expected specs. directive is included verbatim in each error message.
 // If counts differ, only the count error is reported. Otherwise each
@@ -671,7 +680,7 @@ func posMatchesSpec(got token.Pos, exp posSpec, baseLine int, relFilename func(s
 func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive string, positions []token.Pos, specs []posSpec, baseLine int) {
 	t.Helper()
 	if len(positions) != len(specs) {
-		t.Errorf("path %s: %s: got %d position(s), want %d", path, directive, len(positions), len(specs))
+		t.Errorf("path %s: %s", path, formatPosCountMismatch(directive, len(positions), len(specs)))
 		for _, p := range positions {
 			t.Logf("  actual: %d:%d", p.Line(), p.Column())
 		}

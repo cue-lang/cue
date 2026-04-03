@@ -1,8 +1,7 @@
-TODO: image field is not pre-evaluated (not a huge deal)
-TODO: allow dynamic fields
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# TODO: image field is not pre-evaluated (not a huge deal)
+# TODO: allow dynamic fields
 -- in.cue --
-key: "app01"
+key: "app01" @test(eq, "app01")
 manifests: [
 	{
 		deployment: #map: [string]: {name: string, image: string, desc: string}
@@ -15,7 +14,9 @@ manifests: [
 	},
 ]
 // unify
-results: _
+results: _ @test(eq, {deployment: #map: {
+	app01: {image: "image01", name: "app01", desc: string}
+}})
 for _, manifest in manifests {
 	results: manifest
 }
@@ -33,43 +34,6 @@ Disjuncts:    22
 MisalignedConjunct: 9
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  key: (string){ "app01" }
-  manifests: (#list){
-    0: (struct){
-      deployment: (struct){
-        #map: (#struct){
-          app01: (#struct){
-            name: (string){ "app01" }
-            image: (string){ string }
-            desc: (string){ string }
-          }
-        }
-      }
-    }
-    1: (struct){
-      deployment: (struct){
-        #map: (#struct){
-          app01: (#struct){
-            image: (string){ "image01" }
-          }
-        }
-      }
-    }
-  }
-  results: (struct){
-    deployment: (struct){
-      #map: (#struct){
-        app01: (#struct){
-          image: (string){ "image01" }
-          name: (string){ "app01" }
-          desc: (string){ string }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

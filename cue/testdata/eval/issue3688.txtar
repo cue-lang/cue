@@ -1,6 +1,8 @@
-# This test is important in locking in the behaviour of evalv3,
-# which fixed some closedness bugs present in the older evalv2.
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
+# Tests that #fun1 with a hidden field _in: #TypeA (where #TypeA: string |
+# {foo: int}) correctly computes out using comprehensions that select based on
+# whether _in is a string or has field foo. evalv2 had closedness bugs where eg2
+# (input {foo: 5}) failed to select "foo" and eg3 (input {foo: 5, bar: "test"})
+# failed to fall through to "impossible". evalv3 fixed these bugs.
 -- x.cue --
 package x
 
@@ -26,14 +28,38 @@ examples: [string]: {
 	res: (#fun1 & {_in: in, _}).out
 }
 
-examples: eg1: in: "test"
-examples: eg2: in: {
-	foo: 5
+examples: eg1: {
+	in: "test"
+	@test(eq, {in: "test", res: "test"})
 }
-examples: eg3: in: {
-	foo: 5
-	bar: "test"
+examples: eg2: {
+	in: {
+		foo: 5
+	}
+	@test(eq, {in: {foo: 5}, res: "foo"})
 }
+examples: eg3: {
+	in: {
+		foo: 5
+		bar: "test"
+	}
+	@test(eq, {
+		in: {foo: 5, bar: "test"}
+		res: "impossible"
+	})
+}
+-- out/eval/stats --
+Leaks:  8
+Freed:  82
+Reused: 63
+Allocs: 27
+Retain: 0
+
+Unifications: 41
+Conjuncts:    139
+Disjuncts:    22
+
+NumCloseIDs: 43
 -- out/compile --
 --- x.cue
 {
@@ -79,84 +105,6 @@ examples: eg3: in: {
         foo: 5
         bar: "test"
       }
-    }
-  }
-}
--- out/evalalpha/stats --
-Leaks:  8
-Freed:  82
-Reused: 63
-Allocs: 27
-Retain: 0
-
-Unifications: 41
-Conjuncts:    139
-Disjuncts:    22
-
-NumCloseIDs: 43
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  15
--Freed:  105
--Reused: 99
--Allocs: 21
--Retain: 37
--
--Unifications: 82
--Conjuncts:    246
--Disjuncts:    139
-+Leaks:  8
-+Freed:  82
-+Reused: 63
-+Allocs: 27
-+Retain: 0
-+
-+Unifications: 41
-+Conjuncts:    139
-+Disjuncts:    22
-+
-+NumCloseIDs: 43
--- out/eval/stats --
-Leaks:  15
-Freed:  105
-Reused: 99
-Allocs: 21
-Retain: 37
-
-Unifications: 82
-Conjuncts:    246
-Disjuncts:    139
--- out/evalalpha --
-(struct){
-  #TypeA: ((string|struct)){ |((string){ string }, (#struct){
-      foo: (int){ int }
-    }) }
-  #fun1: (#struct){
-    _in(:x): ((string|struct)){ |((string){ string }, (#struct){
-        foo: (int){ int }
-      }) }
-    out: (string){ "impossible" }
-  }
-  examples: (struct){
-    eg1: (struct){
-      in: (string){ "test" }
-      res: (string){ "test" }
-    }
-    eg2: (struct){
-      in: (struct){
-        foo: (int){ 5 }
-      }
-      res: (string){ "foo" }
-    }
-    eg3: (struct){
-      in: (struct){
-        foo: (int){ 5 }
-        bar: (string){ "test" }
-      }
-      res: (string){ "impossible" }
     }
   }
 }

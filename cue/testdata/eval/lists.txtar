@@ -1,13 +1,12 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 a: [...int]
 a: [1, 2, 3, 5]
-a: [1, 2, 3, d]
+a: [1, 2, 3, d] @test(eq, [1, 2, 3, 5])
 
-b: a[3]
-d: 5
+b: a[3] @test(eq, 5)
+d: 5    @test(eq, 5)
 
-c: [for x in [[1, 2]][0] {x + d}]
+c: [for x in [[1, 2]][0] {x + d}] @test(eq, [6, 7])
 -- out/eval/stats --
 Leaks:  4
 Freed:  11
@@ -18,21 +17,6 @@ Retain: 6
 Unifications: 15
 Conjuncts:    29
 Disjuncts:    13
--- out/evalalpha --
-(struct){
-  a: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 3 }
-    3: (int){ 5 }
-  }
-  b: (int){ 5 }
-  d: (int){ 5 }
-  c: (#list){
-    0: (int){ 6 }
-    1: (int){ 7 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

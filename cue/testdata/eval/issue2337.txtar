@@ -1,12 +1,19 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# evalv2 reported "x: was already used" instead of "conflicting values" for the
+# simple.x case. The issue2473 cases test that comprehension guards do not prevent
+# fields referenced in the guard from being further constrained in the outer scope
+# — env2 should remain "prod" even after being used as a comprehension condition.
+# The "one" variant broke on v0.6.0; the "two" variant also failed on v0.5.0.
 -- in.cue --
 // evalv2 failed with the confusing error "x: was already used"
 // rather than a friendlier "conflicting values" error.
 simple: {
-	x:   "x"
+	x:   "x" @test(err, code=eval,
+			contains="conflicting values",
+			args=["foo", "x"],
+			pos=[in.cue:4:5, in.cue:6:7])
+
 	(x): "foo"
 }
-
 // Worked on CUE v0.5.0, broke on v0.6.0 with "was already used".
 // Should succeed, as the comprehension does not change env2.
 issue2473: one: {
@@ -22,6 +29,10 @@ issue2473: one: {
 			example: c.env2
 		}
 	}
+	@test(eq, {
+		c: {env: "prod", env2: "prod"},
+		example: "prod"}
+	)
 }
 // A variant of the above which failed on v0.5.0 as well.
 issue2473: two: {
@@ -35,7 +46,16 @@ issue2473: two: {
 			example: env2
 		}
 	}
+	@test(eq, {
+		env:     "prod"
+		env2:    "prod"
+		example: "prod"
+	})
 }
+-- out/errors.txt --
+[eval] simple.x: conflicting values "foo" and "x":
+    ./in.cue:4:5
+    ./in.cue:6:7
 -- out/compile --
 --- in.cue
 {
@@ -88,112 +108,5 @@ Disjuncts:    21
 MisalignedConjunct: 5
 
 NumCloseIDs: 2
--- out/evalalpha --
-Errors:
-simple.x: conflicting values "foo" and "x":
-    ./in.cue:4:7
-    ./in.cue:5:7
 
-Result:
-(_|_){
-  // [eval]
-  simple: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval] simple.x: conflicting values "foo" and "x":
-      //     ./in.cue:4:7
-      //     ./in.cue:5:7
-    }
-  }
-  issue2473: (struct){
-    one: (struct){
-      c: (struct){
-        env: (string){ "prod" }
-        env2: (string){ "prod" }
-      }
-      example: (string){ "prod" }
-    }
-    two: (struct){
-      env: (string){ "prod" }
-      env2: (string){ "prod" }
-      example: (string){ "prod" }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,25 +1,28 @@
--(struct){
-+Errors:
-+simple.x: conflicting values "foo" and "x":
-+    ./in.cue:4:7
-+    ./in.cue:5:7
-+
-+Result:
-+(_|_){
-+  // [eval]
-   simple: (_|_){
--    // [incomplete] simple: cannot add field x: was already used:
--    //     ./in.cue:5:2
--    x: (string){ "x" }
-+    // [eval]
-+    x: (_|_){
-+      // [eval] simple.x: conflicting values "foo" and "x":
-+      //     ./in.cue:4:7
-+      //     ./in.cue:5:7
-+    }
-   }
-   issue2473: (struct){
-     one: (struct){
--      c: (_|_){
--        // [incomplete] issue2473.one: cannot add field env2: was already used:
--        //     ./in.cue:19:7
-+      c: (struct){
-         env: (string){ "prod" }
-         env2: (string){ "prod" }
-       }
--      example: (_|_){
--        // [incomplete] issue2473.one: cannot add field env2: was already used:
--        //     ./in.cue:19:7
--      }
--    }
--    two: (_|_){
--      // [incomplete] issue2473.two: cannot add field env2: was already used:
--      //     ./in.cue:32:4
-+      example: (string){ "prod" }
-+    }
-+    two: (struct){
-       env: (string){ "prod" }
-       env2: (string){ "prod" }
-       example: (string){ "prod" }
--- out/eval --
-(struct){
-  simple: (_|_){
-    // [incomplete] simple: cannot add field x: was already used:
-    //     ./in.cue:5:2
-    x: (string){ "x" }
-  }
-  issue2473: (struct){
-    one: (struct){
-      c: (_|_){
-        // [incomplete] issue2473.one: cannot add field env2: was already used:
-        //     ./in.cue:19:7
-        env: (string){ "prod" }
-        env2: (string){ "prod" }
-      }
-      example: (_|_){
-        // [incomplete] issue2473.one: cannot add field env2: was already used:
-        //     ./in.cue:19:7
-      }
-    }
-    two: (_|_){
-      // [incomplete] issue2473.two: cannot add field env2: was already used:
-      //     ./in.cue:32:4
-      env: (string){ "prod" }
-      env2: (string){ "prod" }
-      example: (string){ "prod" }
-    }
-  }
-}
+

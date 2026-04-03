@@ -1,22 +1,23 @@
 This test tests a case where a child node needs to be evaluated
 before evaluating a parent has completed.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 a: [for c in foo.bar.baz {
 	c
 }]
 
-a: [{name: "http"}]
+a: [{name: "http"}] @test(eq, [{name: "http", port: 8080}])
 
 foo: {
 	x.D
 
 	bar: baz: [{port: 8080}]
+	@test(eq, {bar: {baz: [{port: 8080}]}})
 }
 
 x: {
 	D: bar: DSpec
 	DSpec: {}
+	@test(eq, {D: bar: {}, DSpec: {}})
 }
 -- out/compile --
 --- in.cue
@@ -58,29 +59,3 @@ Retain: 9
 Unifications: 14
 Conjuncts:    23
 Disjuncts:    23
--- out/evalalpha --
-(struct){
-  a: (#list){
-    0: (struct){
-      name: (string){ "http" }
-      port: (int){ 8080 }
-    }
-  }
-  foo: (struct){
-    bar: (struct){
-      baz: (#list){
-        0: (struct){
-          port: (int){ 8080 }
-        }
-      }
-    }
-  }
-  x: (struct){
-    D: (struct){
-      bar: (struct){
-      }
-    }
-    DSpec: (struct){
-    }
-  }
-}

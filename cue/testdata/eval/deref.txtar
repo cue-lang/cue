@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 issue4011: full: {
 	let _hugoEnvironments = {
@@ -22,8 +21,13 @@ issue4011: full: {
 	}
 
 	site: [_]: hugo: production: {}
+	@test(eq, {site: cls: {
+		fs: Create: config: Contents: {}
+		hugo: production: {}
+	}})
 }
 issue4011: reduced: {
+	@test(eq, {result: foo: true, envs: foo: {}})
 	result: {
 		for envName in ["foo"]
 		let env = envs[envName]
@@ -47,42 +51,6 @@ Disjuncts:    37
 MisalignedConjunct: 4
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  issue4011: (struct){
-    full: (struct){
-      let _hugoEnvironments#1 = (struct){
-        default: (string){ "_default" }
-        production: (string){ "production" }
-      }
-      site: (struct){
-        cls: (struct){
-          fs: (struct){
-            Create: (struct){
-              config: (struct){
-                Contents: (struct){
-                }
-              }
-            }
-          }
-          hugo: (struct){
-            production: (struct){
-            }
-          }
-        }
-      }
-    }
-    reduced: (struct){
-      result: (struct){
-        foo: (bool){ true }
-      }
-      envs: (struct){
-        foo: (struct){
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

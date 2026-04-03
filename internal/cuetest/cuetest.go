@@ -82,7 +82,6 @@ var DiffGoldenFiles = os.Getenv(envUpdate) == "diff"
 // It is controlled by setting CUE_FORMAT_TXTAR to a non-empty string like "true".
 var FormatTxtar = os.Getenv(envFormatTxtar) != ""
 
-
 // Condition adds support for CUE-specific testscript conditions within
 // testscript scripts. Supported conditions include:
 //

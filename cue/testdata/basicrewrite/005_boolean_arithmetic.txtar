@@ -4,7 +4,7 @@ b: true || false  @test(eq, true)
 c: false == true  @test(eq, false)
 d: false != true  @test(eq, true)
 e: true & true    @test(eq, true)
-f: true & false   @test(err, code=eval, pos=[0:4 0:11])
+f: true & false   @test(err, code=eval, pos=[0:4, 0:11])
 -- out/errors.txt --
 [eval] f: conflicting values false and true:
     ./in.cue:6:4

@@ -217,3 +217,87 @@ func TestInlineRunner_FixtureField(t *testing.T) {
 		})
 	}
 }
+
+// TestInlineRunner_ShareID verifies @test(shareID=name) vertex-sharing
+// assertions for the passing (positive) cases. Negative cases (asserting that
+// the check correctly rejects non-shared vertices) are in inline_test.go as
+// TestRunShareIDChecks_Negative, which calls runShareIDChecks directly with a
+// non-propagating failRecorder.
+func TestInlineRunner_ShareID(t *testing.T) {
+	run := func(t *testing.T, archiveStr string) {
+		t.Helper()
+		archive := txtar.Parse([]byte(archiveStr))
+		runner := cuetxtar.NewInlineRunner(t, nil, archive, t.TempDir())
+		runner.Run()
+	}
+
+	t.Run("sharing passes when p and q reference g", func(t *testing.T) {
+		run(t, `-- test.cue --
+g: {x: 1, y: 2}
+p: g @test(shareID=V)
+q: g @test(shareID=V)
+`)
+	})
+
+	t.Run("sharing passes inside eq body", func(t *testing.T) {
+		run(t, `-- test.cue --
+root: {
+	a: {x: 1}
+	b: a
+	@test(eq, {
+		a: {x: 1} @test(shareID=AB)
+		b: a       @test(shareID=AB)
+	})
+}
+`)
+	})
+
+	t.Run("single annotated path is silently skipped", func(t *testing.T) {
+		// A group with a single path needs no second vertex to compare against.
+		run(t, `-- test.cue --
+a: {x: 1} @test(shareID=SOLO)
+`)
+	})
+
+	t.Run("sharing passes with at=0 for list element", func(t *testing.T) {
+		// l[0] is the same vertex as a because l: [a].
+		run(t, `-- test.cue --
+a: {x: 1}
+l: [a] @test(shareID=EL, at=0)
+m: a   @test(shareID=EL)
+`)
+	})
+
+	t.Run("sharing passes inside eq body with at=0", func(t *testing.T) {
+		run(t, `-- test.cue --
+root: {
+	a: {x: 1}
+	l: [a]
+	@test(eq, {
+		a: {x: 1} @test(shareID=AB)
+		l: [a]    @test(shareID=AB, at=0)
+	})
+}
+`)
+	})
+
+	t.Run("sharing passes for nested fields across roots", func(t *testing.T) {
+		// @test(shareID=...) at depth > 1 participates in cross-root groups.
+		// outer1.inner and outer2.inner both reference g, so they share a vertex.
+		run(t, `-- test.cue --
+g: {x: 1}
+outer1: {inner: g @test(shareID=V)}
+outer2: {inner: g @test(shareID=V)}
+`)
+	})
+
+	t.Run("sharing passes across different depths", func(t *testing.T) {
+		// A top-level field and a nested field may share the same vertex and
+		// participate in the same shareID group despite being at different depths.
+		run(t, `-- test.cue --
+g: {x: 1} @test(shareID=V)
+p: g            @test(shareID=V)
+outer: {q: g    @test(shareID=V)}
+`)
+	})
+}

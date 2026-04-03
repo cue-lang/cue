@@ -219,6 +219,7 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 	var patterns []expectedPattern
 	checkOrder := false
 	allFinal := false
+	seenShareIDs := make(map[string]bool)
 
 	for _, d := range s.Elts {
 		switch d := d.(type) {
@@ -239,7 +240,8 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 			lets = append(lets, expectedLet{name: d.Ident.Name, expr: d.Expr})
 		case *ast.Field:
 			// Separate non-@test attributes from @test attributes.
-			// Detect @test(final), @test(ignore), and @test(err) on individual fields.
+			// Detect @test(final), @test(ignore), @test(err), and @test(shareID=name)
+			// on individual fields.
 			var nonTestAttrs []*ast.Attribute
 			isFinal := false
 			isIgnore := false
@@ -257,6 +259,19 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 							errCk = pa.errArgs
 							if errCk == nil {
 								errCk = &errArgs{} // bare @test(err)
+							}
+						case "shareID":
+							// The first field with a given shareID name runs the eq check
+							// normally so every value-expr pair is checked at least once.
+							// Subsequent fields with the same shareID name skip the eq
+							// check; sharing is verified separately by runShareIDChecks.
+							if len(pa.raw.Fields) > 0 {
+								name := pa.raw.Fields[0].Value()
+								if seenShareIDs[name] {
+									isIgnore = true
+								} else {
+									seenShareIDs[name] = true
+								}
 							}
 						}
 					}

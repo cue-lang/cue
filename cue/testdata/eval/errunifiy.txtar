@@ -1,12 +1,16 @@
 Incomplete errors should not unify with values.
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
-a: or([])
+a: or([]) @test(err, code=incomplete, contains="empty list", pos=[0:4])
 a: "t"
 
-b: _|_
+b: _|_ @test(err, code=user, contains="explicit error", pos=[0:4])
 b: "t"
--- out/evalalpha/stats --
+-- out/errors.txt --
+[incomplete] a: error in call to or: empty list in call to or:
+    ./in.cue:1:4
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:4:4
+-- out/eval/stats --
 Leaks:  0
 Freed:  4
 Reused: 0
@@ -16,55 +20,6 @@ Retain: 0
 Unifications: 4
 Conjuncts:    6
 Disjuncts:    0
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
--Leaks:  5
--Freed:  3
--Reused: 1
--Allocs: 7
--Retain: 5
-+Leaks:  0
-+Freed:  4
-+Reused: 0
-+Allocs: 4
-+Retain: 0
- 
--Unifications: 8
--Conjuncts:    14
--Disjuncts:    8
-+Unifications: 4
-+Conjuncts:    6
-+Disjuncts:    0
--- out/eval/stats --
-Leaks:  5
-Freed:  3
-Reused: 1
-Allocs: 7
-Retain: 5
-
-Unifications: 8
-Conjuncts:    14
-Disjuncts:    8
--- out/evalalpha --
-Errors:
-explicit error (_|_ literal) in source:
-    ./in.cue:4:4
-
-Result:
-(_|_){
-  // [user]
-  a: (_|_){
-    // [incomplete] a: error in call to or: empty list in call to or:
-    //     ./in.cue:1:4
-  }
-  b: (_|_){
-    // [user] explicit error (_|_ literal) in source:
-    //     ./in.cue:4:4
-  }
-}
 -- out/compile --
 --- in.cue
 {

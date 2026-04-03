@@ -1,13 +1,21 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that closedness is correctly propagated through multiple levels of
+# embedded definitions with optional fields and conditional comprehensions.
+# #Leaf embeds #Mid (which embeds #Base), all with optional fields. The nested
+# if comprehensions inside #Leaf reference optional fields without triggering
+# spurious closedness errors.
 -- in.cue --
-object: #Leaf & {}
+object: #Leaf & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
 
 #Base: {
 	extra?: {...}
+	@test(eq, {extra?: {}})
+	@test(closed)
 }
 
 #Mid: {
 	#Base
+	@test(eq, {extra?: {}})
+	@test(closed)
 }
 
 #Leaf: {
@@ -19,27 +27,8 @@ object: #Leaf & {}
 			foo: "bar"
 		}
 	}
-}
--- out/evalalpha --
-(struct){
-  object: (#struct){
-    extra?: (#struct){
-    }
-    more?: (int){ int }
-  }
-  #Base: (#struct){
-    extra?: (#struct){
-    }
-  }
-  #Mid: (#struct){
-    extra?: (#struct){
-    }
-  }
-  #Leaf: (#struct){
-    extra?: (#struct){
-    }
-    more?: (int){ int }
-  }
+	@test(eq, {extra?: {}, more?: int})
+	@test(closed)
 }
 -- out/eval/stats --
 Leaks:  0

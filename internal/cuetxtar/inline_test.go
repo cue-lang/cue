@@ -14,6 +14,7 @@
 package cuetxtar
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 	"testing"
@@ -22,8 +23,86 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"golang.org/x/tools/txtar"
 )
+
+// stubError implements cueerrors.Error with a fixed Msg() return.
+type stubError struct {
+	format string
+	args   []any
+}
+
+func (s stubError) Position() token.Pos         { return token.NoPos }
+func (s stubError) InputPositions() []token.Pos { return nil }
+func (s stubError) Error() string               { return fmt.Sprintf(s.format, s.args...) }
+func (s stubError) Path() []string              { return nil }
+func (s stubError) Msg() (string, []any)        { return s.format, s.args }
+func TestCheckMsgArgs(t *testing.T) {
+	path := testMakePath("field")
+	tests := []struct {
+		name     string
+		args     []any    // actual Msg() args
+		expected []string // expected strings passed to checkMsgArgs
+		wantFail bool
+	}{
+		{
+			name:     "exact match passes",
+			args:     []any{"list", "int"},
+			expected: []string{"list", "int"},
+		},
+		{
+			name:     "subset passes — one of two args",
+			args:     []any{"list", "int"},
+			expected: []string{"list"},
+		},
+		{
+			name:     "subset passes — other arg",
+			args:     []any{"list", "int"},
+			expected: []string{"int"},
+		},
+		{
+			name:     "order-independent — reversed",
+			args:     []any{"list", "int"},
+			expected: []string{"int", "list"},
+		},
+		{
+			name:     "extra actual args are allowed",
+			args:     []any{"list", "int", "extra"},
+			expected: []string{"list", "int"},
+		},
+		{
+			name:     "missing expected arg fails",
+			args:     []any{"list"},
+			expected: []string{"list", "int"},
+			wantFail: true,
+		},
+		{
+			name:     "empty expected always passes",
+			args:     []any{"list", "int"},
+			expected: nil,
+		},
+		{
+			name:     "no actual args with non-empty expected fails",
+			args:     nil,
+			expected: []string{"list"},
+			wantFail: true,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			rec := &failCapture{TB: t}
+			checkMsgArgs(rec, path, stubError{args: tc.args}, tc.expected, "@test(err, args=...)")
+			if rec.failed != tc.wantFail {
+				if tc.wantFail {
+					t.Errorf("expected failure but checkMsgArgs passed")
+				} else {
+					t.Errorf("unexpected failure:\n%s", rec.msgs.String())
+				}
+			}
+		})
+	}
+}
 
 // testMakePath creates a CUE path from a dot-separated string for test use.
 func testMakePath(s string) cue.Path {
@@ -372,7 +451,7 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 // reports an error when two paths do NOT share the same vertex.
 // This cannot be expressed as a txtar inline test (we can't annotate "should
 // fail"), so it is tested here by calling runShareIDChecks directly with a
-// todoCapture that captures errors without propagating to the parent test.
+// failCapture that captures errors without propagating to the parent test.
 func TestRunShareIDChecks_Negative(t *testing.T) {
 	ctx := cuecontext.New()
 	r := &inlineRunner{}

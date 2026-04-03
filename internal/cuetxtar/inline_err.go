@@ -19,6 +19,7 @@
 package cuetxtar
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"slices"
@@ -79,6 +80,9 @@ type errArgs struct {
 	// suberrs holds expected sub-error specs for multi-error (list) values.
 	// Each entry is matched order-independently against errors.Errors(val.Err()).
 	suberrs []*errArgs
+	// msgArgs holds expected fmt.Sprint representations of Msg() args to check
+	// order-independently against the error's Msg() arguments.
+	msgArgs []string
 }
 
 // matchesCode reports whether the given error code satisfies the codes
@@ -147,6 +151,12 @@ func parseErrArgs(a internal.Attr) (errArgs, error) {
 				return ea, fmt.Errorf("@test(err, suberr=...): %w", err)
 			}
 			ea.suberrs = append(ea.suberrs, &subEA)
+		case kv.Key() == "args":
+			args, err := parseArgsList(kv.Value())
+			if err != nil {
+				return ea, fmt.Errorf("@test(err, args=...): %w", err)
+			}
+			ea.msgArgs = args
 		}
 	}
 	return ea, nil
@@ -218,6 +228,23 @@ func parsePosSpecs(s string) ([]posSpec, error) {
 	return specs, nil
 }
 
+// parseArgsList parses a bracket-enclosed, comma-separated list of arg strings,
+// e.g. "[list, int]" → ["list", "int"].
+func parseArgsList(s string) ([]string, error) {
+	if !strings.HasPrefix(s, "[") || !strings.HasSuffix(s, "]") {
+		return nil, fmt.Errorf("expected [...], got %q", s)
+	}
+	inner := s[1 : len(s)-1]
+	var result []string
+	for tok := range strings.SplitSeq(inner, ",") {
+		tok = strings.TrimSpace(tok)
+		if tok != "" {
+			result = append(result, tok)
+		}
+	}
+	return result, nil
+}
+
 // matchesErrSpec reports whether act satisfies all discriminating constraints
 // in ea. It is a pure predicate — it never calls t.Errorf.
 //
@@ -280,6 +307,13 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		msg := r.errorMessage(val)
 		if !strings.Contains(msg, ea.contains) {
 			t.Errorf("path %s: expected error message to contain %q, got %q", path, ea.contains, msg)
+		}
+	}
+	// Validate Msg() args (order-independent).
+	if len(ea.msgArgs) > 0 {
+		var e cueerrors.Error
+		if errors.As(val.Err(), &e) {
+			checkMsgArgs(t, path, e, ea.msgArgs, "@test(err, args=...)")
 		}
 	}
 	// Validate error positions.
@@ -441,6 +475,12 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 	if needWriteback {
 		r.enqueueSubErrPosWrites(pa, posUpdates)
 	}
+	// Validate Msg() args for matched pairs (order-independent).
+	for _, p := range pairs {
+		if len(p.exp.msgArgs) > 0 {
+			checkMsgArgs(t, path, p.act, p.exp.msgArgs, "@test(err, suberr=...)")
+		}
+	}
 }
 
 // enqueueSubErrPosWrites applies all sub-error position updates atomically to
@@ -454,7 +494,7 @@ func (r *inlineRunner) formatPosSpec(p token.Pos, pa parsedTestAttr) string {
 	if p.Filename() == "" || p.Filename() == pa.srcFileName {
 		return fmt.Sprintf("%d:%d", p.Line()-pa.baseLine, p.Column())
 	}
-	return fmt.Sprintf("%s:%d:%d", r.relFilename(p.Filename()), p.Line(), p.Column())
+	return p.String()
 }
 
 func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUpdate) {
@@ -541,6 +581,8 @@ func isDisjunctionHeader(e cueerrors.Error) bool {
 // cueerrors.Error (primary position first, then input positions sorted).
 // Unlike cueerrors.Positions, this works on an individual error rather than
 // potentially a list (where cueerrors.Positions only sees the first element).
+//
+// TODO: is this a bug in cueerrors.Positions()?
 func positionsFromSingleError(e cueerrors.Error) []token.Pos {
 	var a []token.Pos
 	if p := e.Position(); p.File() != nil {
@@ -743,6 +785,22 @@ func (r *inlineRunner) errorMessage(val cue.Value) string {
 		return err.Error()
 	}
 	return ""
+}
+
+// checkMsgArgs checks that the Msg() args of e include all strings in expected
+// (matched via fmt.Sprint, order-independent). directive is used in error messages.
+func checkMsgArgs(t testing.TB, path cue.Path, e cueerrors.Error, expected []string, directive string) {
+	t.Helper()
+	_, actualArgs := e.Msg()
+	for _, exp := range expected {
+		if !slices.ContainsFunc(actualArgs, func(a any) bool { return fmt.Sprint(a) == exp }) {
+			var actual []string
+			for _, a := range actualArgs {
+				actual = append(actual, fmt.Sprint(a))
+			}
+			t.Errorf("path %s: %s: args: expected %q in Msg() args, got %v", path, directive, exp, actual)
+		}
+	}
 }
 
 // findDescendantError walks val looking for any descendant with an error

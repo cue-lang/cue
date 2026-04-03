@@ -1,26 +1,25 @@
-#todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- in.cue --
 package x
 
 import "strings"
 import "list"
 
-a: strings.Join(strings.Split("test", "")[1:], "")
+a: strings.Join(strings.Split("test", "")[1:], "") @test(eq, "est")
 
-b: strings.Join(["t", "e", "s", "t"][1:], "")
+b: strings.Join(["t", "e", "s", "t"][1:], "") @test(eq, "est")
 
-c: ["t", "e", "s", "t"][1:]
-d: strings.Join(c, "")
+c: ["t", "e", "s", "t"][1:] @test(eq, ["e", "s", "t"])
+d: strings.Join(c, "")      @test(eq, "est")
 
-e: strings.Join(list.Concat([["a"], ["b"]]), "")
+e: strings.Join(list.Concat([["a"], ["b"]]), "") @test(eq, "ab")
 
-f: list.Concat([["a"], ["b"]])
-g: strings.Join(f, "")
+f: list.Concat([["a"], ["b"]]) @test(eq, ["a", "b"])
+g: strings.Join(f, "")         @test(eq, "ab")
 
-h: strings.Join(list.Repeat(["a"], 3), "")
+h: strings.Join(list.Repeat(["a"], 3), "") @test(eq, "aaa")
 
-i: list.Repeat(["b"], 3)
-j: strings.Join(i, "")
+i: list.Repeat(["b"], 3) @test(eq, ["b", "b", "b"])
+j: strings.Join(i, "")   @test(eq, "bbb")
 -- out/eval/stats --
 Leaks:  2
 Freed:  36
@@ -31,30 +30,6 @@ Retain: 6
 Unifications: 38
 Conjuncts:    45
 Disjuncts:    42
--- out/evalalpha --
-(struct){
-  a: (string){ "est" }
-  b: (string){ "est" }
-  c: (#list){
-    0: (string){ "e" }
-    1: (string){ "s" }
-    2: (string){ "t" }
-  }
-  d: (string){ "est" }
-  e: (string){ "ab" }
-  f: (#list){
-    0: (string){ "a" }
-    1: (string){ "b" }
-  }
-  g: (string){ "ab" }
-  h: (string){ "aaa" }
-  i: (#list){
-    0: (string){ "b" }
-    1: (string){ "b" }
-    2: (string){ "b" }
-  }
-  j: (string){ "bbb" }
-}
 -- out/compile --
 --- in.cue
 {

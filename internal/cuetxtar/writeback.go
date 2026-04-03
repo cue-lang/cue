@@ -30,14 +30,14 @@ import (
 	"cuelang.org/go/cue"
 )
 
-// ── inline fill / diff-annotate write-back ─────────────────────────────────────
+// ── inline fill write-back ─────────────────────────────────────────────────────
 
 // inlineFillWrite records a byte-level replacement of a @test attribute in a
 // .cue archive file.  Used for three operations:
 //   - fill: @test() → @test(eq, <value>) or @test(err, ...)
 //   - force: @test(eq, old) → @test(eq, <actual>)
-//   - diff-annotate: @test(eq, old) → @test(eq, old, skip:<ver>, diff="...")
-//   - stale-skip: @test(eq, old, skip:<ver>, diff="...") → @test(eq, old)
+//   - force-skip: @test(eq, old) → @test(eq, old, skip:<ver>)  [CUE_UPDATE=force only]
+//   - stale-skip: @test(eq, old, skip:<ver>) → @test(eq, old)  [CUE_UPDATE=1]
 type inlineFillWrite struct {
 	fileName    string // archive .cue file name, e.g. "in.cue"
 	attrOffset  int    // byte offset of the @ in the original file data

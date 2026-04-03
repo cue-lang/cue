@@ -4,11 +4,11 @@ a: [{a: 1}, {b: 2 & 3}] @test(err, code=eval, pos=[0:17 0:21], contains="conflic
 b: [for x in a {x}] @test(err, code=eval, pos=[-2:17 -2:21], contains="conflicting values")
 -- out/errors.txt --
 [eval] a.1.b: conflicting values 3 and 2:
-    in.cue:1:17
-    in.cue:1:21
+    ./in.cue:1:17
+    ./in.cue:1:21
 [eval] a.1.b: conflicting values 3 and 2:
-    in.cue:1:17
-    in.cue:1:21
+    ./in.cue:1:17
+    ./in.cue:1:21
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

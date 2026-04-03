@@ -11,9 +11,9 @@ t2: a: {
 }
 -- out/errors.txt --
 [incomplete] t1.a.b: cannot reference optional field: foo:
-    in.cue:4:5
+    ./in.cue:4:5
 [incomplete] t2.a.b: cannot reference optional field: foo:
-    in.cue:7:5
+    ./in.cue:7:5
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

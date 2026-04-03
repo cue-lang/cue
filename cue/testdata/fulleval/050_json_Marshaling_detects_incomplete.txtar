@@ -12,13 +12,13 @@ foo: {
 b: json.Marshal(foo) @test(err, code=incomplete)
 -- out/errors.txt --
 [incomplete] a: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
-    in.cue:3:4
-    in.cue:3:21
+    ./in.cue:3:4
+    ./in.cue:3:21
 [incomplete] foo.b: undefined field: c:
-    in.cue:7:9
+    ./in.cue:7:9
 [incomplete] b: error in call to encoding/json.Marshal: undefined field: c:
-    in.cue:9:4
-    in.cue:7:9
+    ./in.cue:9:4
+    ./in.cue:7:9
 -- out/eval/stats --
 Leaks:  0
 Freed:  16

@@ -10,8 +10,8 @@ e: d & {
 } @test(eq, {x: 5, y: 7})
 -- out/errors.txt --
 [incomplete] d.y: non-concrete value _ in operand to +:
-    in.cue:5:5
-    in.cue:4:5
+    ./in.cue:5:5
+    ./in.cue:4:5
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

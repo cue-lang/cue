@@ -26,7 +26,88 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 )
+
+// stubError implements cueerrors.Error with a fixed Msg() return.
+type stubError struct {
+	format string
+	args   []any
+}
+
+func (s stubError) Position() token.Pos         { return token.NoPos }
+func (s stubError) InputPositions() []token.Pos { return nil }
+func (s stubError) Error() string               { return fmt.Sprintf(s.format, s.args...) }
+func (s stubError) Path() []string              { return nil }
+func (s stubError) Msg() (string, []any)        { return s.format, s.args }
+
+func TestCheckMsgArgs(t *testing.T) {
+	path := testMakePath("field")
+
+	tests := []struct {
+		name     string
+		args     []any    // actual Msg() args
+		expected []string // expected strings passed to checkMsgArgs
+		wantFail bool
+	}{
+		{
+			name:     "exact match passes",
+			args:     []any{"list", "int"},
+			expected: []string{"list", "int"},
+		},
+		{
+			name:     "subset passes — one of two args",
+			args:     []any{"list", "int"},
+			expected: []string{"list"},
+		},
+		{
+			name:     "subset passes — other arg",
+			args:     []any{"list", "int"},
+			expected: []string{"int"},
+		},
+		{
+			name:     "order-independent — reversed",
+			args:     []any{"list", "int"},
+			expected: []string{"int", "list"},
+		},
+		{
+			name:     "extra actual args are allowed",
+			args:     []any{"list", "int", "extra"},
+			expected: []string{"list", "int"},
+		},
+		{
+			name:     "missing expected arg fails",
+			args:     []any{"list"},
+			expected: []string{"list", "int"},
+			wantFail: true,
+		},
+		{
+			name:     "empty expected always passes",
+			args:     []any{"list", "int"},
+			expected: nil,
+		},
+		{
+			name:     "no actual args with non-empty expected fails",
+			args:     nil,
+			expected: []string{"list"},
+			wantFail: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			rec := &failRecorder{TB: t}
+			checkMsgArgs(rec, path, stubError{args: tc.args}, tc.expected, "@test(err, args=...)")
+			if rec.failed != tc.wantFail {
+				if tc.wantFail {
+					t.Errorf("expected failure but checkMsgArgs passed")
+				} else {
+					t.Errorf("unexpected failure:\n%s", rec.msgs.String())
+				}
+			}
+		})
+	}
+}
 
 // failRecorder implements testing.TB and records whether Errorf was called.
 // Used to test that runShareIDChecks correctly detects non-sharing.

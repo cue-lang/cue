@@ -1,15 +1,27 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
+# Tests cycles and incomplete errors. The cycle struct covers resolvable cycles
+# (x=200, x=y+100, y=x-100 resolves because x is grounded at 200) and
+# unresolvable ones (a=b+100, b=a-100 — cycle error). The incompleteOne and
+# incompleteTwo cases verify that string interpolation with an abstract type
+# parameter reports "incomplete" errors correctly regardless of whether the
+# hidden template field _t appears before or after its usage site.
 -- in.cue --
 cycle: {
-	x: 200
+	x: 200             @test(eq, 200)
 	x: y + 100
-	y: x - 100
+	y: x - 100         @test(eq, 100)
 
-	a: b + 100
-	b: a - 100
+	a: b + 100  @test(err, code=cycle,
+		suberr=(pos=[0:5], args=[b]),
+		suberr=(pos=[1:5], args=[a]),
+	)
+	b: a - 100  @test(err, code=cycle,
+		suberr=(pos=[-1:5], args=[b]),
+		suberr=(pos=[0:5], args=[a]),
+	)
 }
 
 incompleteOne: {
+	@test(err, code=incomplete, pos=[2:7, 3:3, 8:5], at=r)
 	_t: {
 		#p: string
 		"""
@@ -20,12 +32,29 @@ incompleteOne: {
 	r: """
 		\(_t)
 		"""
+	// TODO: we current cannot check for errors on hidden fields.
+	@test(debugOutput, """
+(struct){
+  _t: (_|_){
+    // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
+    //     in.cue:13:3
+    //     in.cue:12:7
+    #p: (string){ string }
+  }
+  r: (_|_){
+    // [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
+    //     in.cue:18:5
+    //     in.cue:12:7
+    //     in.cue:13:3
+  }
+}
+""")
 }
 
 incompleteTwo: {
 	r: """
 		\(_t)
-		"""
+		""" @test(err, code=incomplete)
 
 	_t: {
 		#p: string
@@ -34,53 +63,29 @@ incompleteTwo: {
 			"""
 	}
 }
--- out/evalalpha --
-(struct){
-  cycle: (struct){
-    x: (int){ 200 }
-    y: (int){ 100 }
-    a: (_|_){
-      // [cycle] cycle.a: cycle with field: b:
-      //     ./in.cue:6:5
-      // cycle.b: cycle with field: a:
-      //     ./in.cue:7:5
-    }
-    b: (_|_){
-      // [cycle] cycle.a: cycle with field: b:
-      //     ./in.cue:6:5
-      // cycle.b: cycle with field: a:
-      //     ./in.cue:7:5
-    }
-  }
-  incompleteOne: (struct){
-    _t: (_|_){
-      // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
-      //     ./in.cue:13:3
-      //     ./in.cue:12:7
-      #p: (string){ string }
-    }
-    r: (_|_){
-      // [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-      //     ./in.cue:18:5
-      //     ./in.cue:12:7
-      //     ./in.cue:13:3
-    }
-  }
-  incompleteTwo: (struct){
-    r: (_|_){
-      // [incomplete] incompleteTwo._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-      //     ./in.cue:24:5
-      //     ./in.cue:29:7
-      //     ./in.cue:30:3
-    }
-    _t: (_|_){
-      // [incomplete] incompleteTwo._t: invalid interpolation: non-concrete value string (type string):
-      //     ./in.cue:30:3
-      //     ./in.cue:29:7
-      #p: (string){ string }
-    }
-  }
-}
+-- out/errors.txt --
+[cycle] cycle.a: cycle with field: b:
+    ./in.cue:6:5
+cycle.b: cycle with field: a:
+    ./in.cue:7:5
+[cycle] cycle.a: cycle with field: b:
+    ./in.cue:6:5
+cycle.b: cycle with field: a:
+    ./in.cue:7:5
+[incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:13:3
+    ./in.cue:12:7
+[incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:18:5
+    ./in.cue:12:7
+    ./in.cue:13:3
+[incomplete] incompleteTwo._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:24:5
+    ./in.cue:29:7
+    ./in.cue:30:3
+[incomplete] incompleteTwo._t: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:30:3
+    ./in.cue:29:7
 -- out/compile --
 --- in.cue
 {

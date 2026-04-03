@@ -1,4 +1,8 @@
-#todo:inline: easy — general eval; straightforward @test(eq, ...) for concrete fields
+# Tests that evaluation of multi-file packages is deterministic regardless of
+# field declaration order across files. The two input files a1.cue and a2.cue
+# define the same fields x and y but in opposite orders; both must yield the same
+# result. Also tests that #MCS (MultiCaseString, with uc: lc) correctly propagates
+# concrete values when fact1 and fact2 cross-reference each other.
 -- a1.cue --
 package bug
 
@@ -13,14 +17,21 @@ y: fact2.uc
 package bug
 
 fact1: #MCS & {
+	@test(eq, {lc: "foo", uc: "foo"})
+	@test(closed)
 	lc: fact2.lc
 }
 fact2: #MCS & {
+	@test(eq, {lc: "foo", uc: "foo"})
+	@test(closed)
 	lc: "foo"
 }
 
-#MCS: #MultiCaseString
+#MCS: #MultiCaseString @test(eq, {lc: string, uc: string}) @test(closed) @test(shareID=MCS)
 #MultiCaseString: {
+	@test(shareID=MCS)
+	@test(eq, {lc: string, uc: string})
+	@test(closed)
 	lc: string
 	uc: lc
 }
@@ -59,58 +70,3 @@ Retain: 21
 Unifications: 15
 Conjuncts:    45
 Disjuncts:    31
--- out/evalalpha --
-(struct){
-  y: (string){ "foo" }
-  x: (string){ "foo" }
-  fact1: (#struct){
-    lc: (string){ "foo" }
-    uc: (string){ "foo" }
-  }
-  fact2: (#struct){
-    lc: (string){ "foo" }
-    uc: (string){ "foo" }
-  }
-  #MCS: ~(#MultiCaseString)
-  #MultiCaseString: (#struct){
-    lc: (string){ string }
-    uc: (string){ string }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -9,10 +9,7 @@
-     lc: (string){ "foo" }
-     uc: (string){ "foo" }
-   }
--  #MCS: (#struct){
--    lc: (string){ string }
--    uc: (string){ string }
--  }
-+  #MCS: ~(#MultiCaseString)
-   #MultiCaseString: (#struct){
-     lc: (string){ string }
-     uc: (string){ string }
--- out/eval --
-(struct){
-  y: (string){ "foo" }
-  x: (string){ "foo" }
-  fact1: (#struct){
-    lc: (string){ "foo" }
-    uc: (string){ "foo" }
-  }
-  fact2: (#struct){
-    lc: (string){ "foo" }
-    uc: (string){ "foo" }
-  }
-  #MCS: (#struct){
-    lc: (string){ string }
-    uc: (string){ string }
-  }
-  #MultiCaseString: (#struct){
-    lc: (string){ string }
-    uc: (string){ string }
-  }
-}

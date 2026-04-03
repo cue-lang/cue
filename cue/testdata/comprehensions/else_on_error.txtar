@@ -12,7 +12,7 @@ forSourceError: {
 
 // Error in if condition - else should NOT trigger
 ifConditionError: {
-	@test(err, code=eval, pos=[1:6 1:14], contains="invalid operands")
+	@test(err, code=eval, pos=[1:6, 1:14], contains="invalid operands")
 	if ("not" + 1) { a: 1 } else { b: 2 }
 }
 

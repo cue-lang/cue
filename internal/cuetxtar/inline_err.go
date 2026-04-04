@@ -75,8 +75,8 @@ type errArgs struct {
 	// pos lists expected error positions as (deltaLine:col) pairs relative to
 	// the line containing the @test attribute.
 	pos []posSpec
-	// posSet is true when pos= was
-	// explicitly provided (including pos=[] to assert no positions).
+	// posSet is true when pos= was explicitly provided (including pos=[] to
+	// assert no positions).
 	posSet bool
 	// suberrs holds expected sub-error specs for multi-error (list) values.
 	// Each entry is matched order-independently against errors.Errors(val.Err()).
@@ -154,6 +154,12 @@ func parseErrArgs(a internal.Attr) (errArgs, error) {
 				return ea, fmt.Errorf("@test(err, args=...): %w", err)
 			}
 			ea.msgArgs = args
+		case kv.Key() == "hint":
+			// hint= is a universal flag handled at the parsedTestAttr level; skip here.
+		case kv.Key() == "":
+			// Positional arg (e.g. "any"); already handled above.
+		default:
+			return ea, fmt.Errorf("@test(err): unknown flag %q", kv.Key())
 		}
 	}
 	return ea, nil
@@ -192,7 +198,7 @@ func parsePosSpecs(s string) ([]posSpec, error) {
 	}
 	s = s[1 : len(s)-1]
 	var specs []posSpec
-	for _, p := range strings.Split(s, ",") {
+	for p := range strings.SplitSeq(s, ",") {
 		p = strings.TrimSpace(p)
 		if p == "" {
 			continue
@@ -278,6 +284,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		// Bare @test(err) — just check that the value is an error.
 		if !r.isError(val) {
 			t.Errorf("path %s: expected error, got non-error value", path)
+			logHint(t, pa.hint)
 		}
 		return
 	}
@@ -299,11 +306,12 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		subPA.errArgs = &errArgs{
 			codes:    ea.codes,
 			contains: ea.contains,
-			any:      false,
+			any:      false, // don't cascade any= to the sub-check
 			posSet:   ea.posSet,
 			pos:      ea.pos,
 			suberrs:  ea.suberrs,
 			msgArgs:  ea.msgArgs,
+			// at is intentionally omitted: we already navigated to the sub-path.
 		}
 		r.runErrAssertion(t, subFullPath, subVal, subPA)
 		return
@@ -318,12 +326,14 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		found := r.findDescendantError(val, ea)
 		if !found {
 			t.Errorf("path %s: expected a descendant error with code=%v, none found", path, ea.codes)
+			logHint(t, pa.hint)
 		}
 		return
 	}
 
 	if !r.isError(val) {
 		t.Errorf("path %s: expected error, got non-error value", path)
+		logHint(t, pa.hint)
 		return
 	}
 
@@ -332,6 +342,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		gotCode := r.errorCode(val)
 		if !ea.matchesCode(gotCode) {
 			t.Errorf("path %s: expected error code %v, got %q", path, ea.codes, gotCode)
+			logHint(t, pa.hint)
 		}
 	}
 	// Validate error message contains.
@@ -339,13 +350,14 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		msg := r.errorMessage(val)
 		if !strings.Contains(msg, ea.contains) {
 			t.Errorf("path %s: expected error message to contain %q, got %q", path, ea.contains, msg)
+			logHint(t, pa.hint)
 		}
 	}
 	// Validate Msg() args (order-independent).
 	if len(ea.msgArgs) > 0 {
 		var e cueerrors.Error
 		if errors.As(val.Err(), &e) {
-			checkMsgArgs(t, path, e, ea.msgArgs, "@test(err, args=...)")
+			checkMsgArgs(t, path, e, ea.msgArgs, "@test(err, args=...)", pa.hint)
 		}
 	}
 	// Validate error positions.
@@ -390,6 +402,7 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 		for i, a := range actual {
 			t.Logf("  actual[%d]: %s", i, a.Error())
 		}
+		logHint(t, pa.hint)
 		return
 	}
 
@@ -450,6 +463,7 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 				desc = fmt.Sprintf("code=%v", exp.codes)
 			}
 			t.Errorf("path %s: @test(err, suberr=...): no sub-error matched %q", path, desc)
+			logHint(t, pa.hint)
 		}
 	}
 	// Report pass-1 specs that also failed to match.
@@ -459,6 +473,7 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 		if !expMatched[i] && exp.posSet && len(exp.pos) > 0 {
 			if exp.contains == "" {
 				t.Errorf("path %s: @test(err, suberr=...): no sub-error matched pos=%v", path, exp.pos)
+				logHint(t, pa.hint)
 				continue
 			}
 			found := false
@@ -467,12 +482,13 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 					continue
 				}
 				found = true
-				r.reportPosMismatch(t, path, "@test(err, suberr=...)", positionsFromSingleError(act), exp.pos, pa.baseLine)
+				r.reportPosMismatch(t, path, "@test(err, suberr=...)", positionsFromSingleError(act), exp.pos, pa.baseLine, pa.hint)
 				break
 			}
 			if !found {
 				t.Errorf("path %s: @test(err, suberr=...): no sub-error matched pos=%v contains=%q",
 					path, exp.pos, exp.contains)
+				logHint(t, pa.hint)
 			}
 		}
 	}
@@ -502,7 +518,7 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 			continue
 		}
 		// Report mismatch.
-		r.reportPosMismatch(t, path, "@test(err, suberr=...)", positions, p.exp.pos, pa.baseLine)
+		r.reportPosMismatch(t, path, "@test(err, suberr=...)", positions, p.exp.pos, pa.baseLine, pa.hint)
 	}
 	if needWriteback {
 		r.enqueueSubErrPosWrites(pa, posUpdates)
@@ -510,7 +526,7 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 	// Validate Msg() args for matched pairs (order-independent).
 	for _, p := range pairs {
 		if len(p.exp.msgArgs) > 0 {
-			checkMsgArgs(t, path, p.act, p.exp.msgArgs, "@test(err, suberr=...)")
+			checkMsgArgs(t, path, p.act, p.exp.msgArgs, "@test(err, suberr=...)", pa.hint)
 		}
 	}
 }
@@ -677,13 +693,14 @@ func formatPosCountMismatch(directive string, got, want int) string {
 // expected specs. directive is included verbatim in each error message.
 // If counts differ, only the count error is reported. Otherwise each
 // unmatched expected spec is reported individually (order-independent).
-func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive string, positions []token.Pos, specs []posSpec, baseLine int) {
+func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive string, positions []token.Pos, specs []posSpec, baseLine int, hint string) {
 	t.Helper()
 	if len(positions) != len(specs) {
 		t.Errorf("path %s: %s", path, formatPosCountMismatch(directive, len(positions), len(specs)))
 		for _, p := range positions {
 			t.Logf("  actual: %d:%d", p.Line(), p.Column())
 		}
+		logHint(t, hint)
 		return
 	}
 	used := make([]bool, len(positions))
@@ -708,6 +725,7 @@ func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive 
 			for _, p := range positions {
 				t.Logf("  actual: %d:%d", p.Line(), p.Column())
 			}
+			logHint(t, hint)
 		}
 	}
 }
@@ -739,7 +757,7 @@ func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Va
 		return
 	}
 
-	r.reportPosMismatch(t, path, "@test(err, pos=...)", positions, expected, pa.baseLine)
+	r.reportPosMismatch(t, path, "@test(err, pos=...)", positions, expected, pa.baseLine, pa.hint)
 }
 
 // enqueuePosWrite formats positions as pos specs and enqueues a write-back
@@ -753,7 +771,7 @@ func (r *inlineRunner) enqueuePosWrite(pa parsedTestAttr, positions []token.Pos)
 	for i, p := range positions {
 		parts[i] = r.formatPosSpec(p, pa)
 	}
-	newPosStr := strings.Join(parts, " ")
+	newPosStr := strings.Join(parts, ", ")
 
 	old := pa.srcAttr.Text
 	start := strings.Index(old, "pos=[")
@@ -869,7 +887,7 @@ func msgArgsMatch(err error, expected []string) bool {
 
 // checkMsgArgs checks that the Msg() args of e include all strings in expected
 // (matched via fmt.Sprint, order-independent). directive is used in error messages.
-func checkMsgArgs(t testing.TB, path cue.Path, e cueerrors.Error, expected []string, directive string) {
+func checkMsgArgs(t testing.TB, path cue.Path, e cueerrors.Error, expected []string, directive string, hint string) {
 	t.Helper()
 	_, actualArgs := e.Msg()
 	for _, exp := range expected {
@@ -879,6 +897,7 @@ func checkMsgArgs(t testing.TB, path cue.Path, e cueerrors.Error, expected []str
 				actual = append(actual, fmt.Sprint(a))
 			}
 			t.Errorf("path %s: %s: args: expected %q in Msg() args, got %v", path, directive, exp, actual)
+			logHint(t, hint)
 		}
 	}
 }

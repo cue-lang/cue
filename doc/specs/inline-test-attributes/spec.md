@@ -78,6 +78,29 @@ The first positional argument of a `@test(...)` attribute SHALL be the *directiv
 
 ---
 
+### Requirement: `guidance=` universal flag
+Any `@test(...)` directive that can produce a test failure MAY carry a `guidance="..."` key-value flag. When an assertion fails, the runner logs the guidance string as an additional note after the failure message. This is intended to provide context for automated tools (such as AI assistants) that inspect test failures, and for human readers who need background on why the expected value was chosen.
+
+`guidance=` is purely informational — it has no effect on whether a test passes or fails. It does not modify any comparison or matching logic. It is silently accepted by all directives that report failures (`eq`, `leq`, `err`, `kind`, `closed`, `debugCheck`).
+
+```cue
+a: c: 1 @test(err, code=eval,
+    contains="field not allowed",
+    guidance="v3 only reports the direct definition position; see out/todo.txt")
+```
+
+When an AI tool encounters a test failure on a field that carries `guidance="..."`, it SHOULD read the guidance text before attempting to diagnose or fix the failure. The guidance may explain known evaluator differences, link to a tracking issue, or describe why the expected value is correct despite appearances.
+
+#### Scenario: guidance= is logged on failure
+- **WHEN** `@test(eq, 42, guidance="check the evaluator cycle")` is declared and the field evaluates to `43`
+- **THEN** the test fails AND the runner logs `hint: check the evaluator cycle` immediately after the failure message
+
+#### Scenario: guidance= has no effect on passing test
+- **WHEN** `@test(eq, 42, guidance="...")` is declared and the field evaluates to `42`
+- **THEN** the test passes; the guidance string is not logged
+
+---
+
 ### Requirement: `eq` directive
 The `eq` directive SHALL assert equality between the evaluated value at the annotated field and an expected CUE expression. The comparison is performed by walking the expected expression as a parsed AST and comparing it structurally against the evaluated value — the expected expression is never compiled, which prevents evaluator bugs from masking mismatches.
 

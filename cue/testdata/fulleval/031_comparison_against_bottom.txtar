@@ -1,19 +1,39 @@
-#name: comparison against bottom
-#evalFull
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
-a: _|_ == _|_
-b: err == 1 & 2 // not a literal error, so not allowed
-c: err == _|_   // allowed
-d: err != _|_   // allowed
-e: err != 1 & 3
+a: _|_ == _|_                       @test(eq, true)
+b: err == 1 & 2 @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[in.cue:12:6, in.cue:12:10]) // not a literal error, so not allowed
+c: err == _|_   @test(eq, true)  // allowed
+d: err != _|_   @test(eq, false) // allowed
+e: err != 1 & 3 @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[in.cue:12:6, in.cue:12:10])
 // z: err == err // TODO: should infer to be true?
-f: ({a:        1} & {a: 2}) == _|_
-g: ({a:        1} & {b: 2}) == _|_
-h: _|_ == ({a: 1} & {a: 2})
-i: _|_ == ({a: 1} & {b: 2})
+f: ({a:        1} & {a: 2}) == _|_ @test(eq, true)
+g: ({a:        1} & {b: 2}) == _|_ @test(eq, false)
+h: _|_ == ({a: 1} & {a: 2})        @test(eq, true)
+i: _|_ == ({a: 1} & {b: 2})        @test(eq, false)
 
-err: 1 & 2
+err: 1 & 2 @test(err, code=eval, contains="conflicting values 2 and 1", pos=[in.cue:12:6, in.cue:12:10])
+-- out/errors.txt --
+[eval] err: conflicting values 2 and 1:
+    ./in.cue:12:6
+    ./in.cue:12:10
+[eval] err: conflicting values 2 and 1:
+    ./in.cue:12:6
+    ./in.cue:12:10
+[eval] err: conflicting values 2 and 1:
+    ./in.cue:12:6
+    ./in.cue:12:10
+-- out/todo.txt --
+Our aim is to disallow comparisons against errors and replace them with more
+precise functions.
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 16
+Allocs: 5
+Retain: 4
+
+Unifications: 21
+Conjuncts:    28
+Disjuncts:    21
 -- out/compile --
 --- in.cue
 {
@@ -43,46 +63,4 @@ err: 1 & 2
     b: 2
   }))
   err: (1 & 2)
-}
--- out/eval/stats --
-Leaks:  0
-Freed:  21
-Reused: 16
-Allocs: 5
-Retain: 4
-
-Unifications: 21
-Conjuncts:    28
-Disjuncts:    21
--- out/evalalpha --
-Errors:
-err: conflicting values 2 and 1:
-    ./in.cue:12:6
-    ./in.cue:12:10
-
-Result:
-(_|_){
-  // [eval]
-  a: (bool){ true }
-  b: (_|_){
-    // [eval] err: conflicting values 2 and 1:
-    //     ./in.cue:12:6
-    //     ./in.cue:12:10
-  }
-  c: (bool){ true }
-  d: (bool){ false }
-  e: (_|_){
-    // [eval] err: conflicting values 2 and 1:
-    //     ./in.cue:12:6
-    //     ./in.cue:12:10
-  }
-  f: (bool){ true }
-  g: (bool){ false }
-  h: (bool){ true }
-  i: (bool){ false }
-  err: (_|_){
-    // [eval] err: conflicting values 2 and 1:
-    //     ./in.cue:12:6
-    //     ./in.cue:12:10
-  }
 }

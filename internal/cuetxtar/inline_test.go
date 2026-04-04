@@ -92,7 +92,7 @@ func TestCheckMsgArgs(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			rec := &failCapture{TB: t}
-			checkMsgArgs(rec, path, stubError{args: tc.args}, tc.expected, "@test(err, args=...)")
+			checkMsgArgs(rec, path, stubError{args: tc.args}, tc.expected, "@test(err, args=...)", "")
 			if rec.failed != tc.wantFail {
 				if tc.wantFail {
 					t.Errorf("expected failure but checkMsgArgs passed")
@@ -159,6 +159,11 @@ func TestParsePosSpecs(t *testing.T) {
 				{deltaLine: 0, col: 5},
 				{fileName: "fixture.cue", absLine: 1, col: 13},
 			},
+		},
+		{
+			name:    "mixed relative and absolute whitespace-only is rejected",
+			input:   "[0:5 fixture.cue:1:13]",
+			wantErr: true,
 		},
 		{
 			name:    "missing brackets",
@@ -384,7 +389,7 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 			// Positions: 1:4 (the 1) and 1:8 (the 2).
 			// baseLine=1, deltaLine=0 → expected line 1.
 			name:    "field attr pos relative same line",
-			archive: "-- test.cue --\nx: 1 & 2 @test(err, pos=[0:4 0:8])\n",
+			archive: "-- test.cue --\nx: 1 & 2 @test(err, pos=[0:4, 0:8])\n",
 		},
 		{
 			// Field-attribute on a struct with conflict below.
@@ -395,13 +400,13 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 			//   line 4: }
 			// baseLine=1 (field x on line 1), deltas: 1→line 2, 2→line 3.
 			name:    "field attr pos relative below",
-			archive: "-- test.cue --\nx: {\n\ta: 1\n\ta: 2\n} @test(err, pos=[1:5 2:5])\n",
+			archive: "-- test.cue --\nx: {\n\ta: 1\n\ta: 2\n} @test(err, pos=[1:5, 2:5])\n",
 		},
 		{
 			// Decl-attribute form inside a struct.
 			// Original source:
 			//   line 1: x: {
-			//   line 2: 	@test(err, pos=[1:5 2:5])
+			//   line 2: 	@test(err, pos=[1:5, 2:5])
 			//   line 3: 	a: 1
 			//   line 4: 	a: 2
 			//   line 5: }
@@ -413,12 +418,12 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 			// baseLine = sl.Lbrace.Line() - 0 = 1 (the "{" on line 1).
 			// deltaLine=1 → line 2 (a: 1), deltaLine=2 → line 3 (a: 2).
 			name:    "decl attr pos relative",
-			archive: "-- test.cue --\nx: {\n\t@test(err, pos=[1:5 2:5])\n\ta: 1\n\ta: 2\n}\n",
+			archive: "-- test.cue --\nx: {\n\t@test(err, pos=[1:5, 2:5])\n\ta: 1\n\ta: 2\n}\n",
 		},
 		{
 			// Decl-attribute at file-level with a conflict.
 			// Original source:
-			//   line 1: @test(err, pos=[0:4 0:8])
+			//   line 1: @test(err, pos=[0:4, 0:8])
 			//   line 2: x: 1 & 2
 			// After stripping the @test (line 1 removed):
 			//   line 1: x: 1 & 2
@@ -426,26 +431,26 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 			// deltaLine=0 → line 1 (x: 1 & 2).
 			// Positions: 1:4 and 1:8.
 			name:    "file-level decl attr pos relative",
-			archive: "-- test.cue --\n@test(err, pos=[0:4 0:8])\nx: 1 & 2\n",
+			archive: "-- test.cue --\n@test(err, pos=[0:4, 0:8])\nx: 1 & 2\n",
 		},
 		{
 			// Multiple fields: second field's baseLine accounts for
 			// the stripped @test on the first field.
 			// Original:
 			//   line 1: x: 1 @test(eq, 1)
-			//   line 2: y: 1 & 2 @test(err, pos=[0:4 0:8])
+			//   line 2: y: 1 & 2 @test(err, pos=[0:4, 0:8])
 			// After stripping (both on same line, no extra newlines):
 			//   line 1: x: 1
 			//   line 2: y: 1 & 2
 			// baseLine for y = 2, deltaLine=0 → line 2.
 			name:    "field attr after prior field attr",
-			archive: "-- test.cue --\nx: 1 @test(eq, 1)\ny: 1 & 2 @test(err, pos=[0:4 0:8])\n",
+			archive: "-- test.cue --\nx: 1 @test(eq, 1)\ny: 1 & 2 @test(err, pos=[0:4, 0:8])\n",
 		},
 		{
 			// Absolute position form: filename:absLine:col.
 			// After stripping, "test.cue" has "x: 1 & 2" on line 1.
 			name:    "absolute pos form",
-			archive: "-- test.cue --\nx: 1 & 2 @test(err, pos=[test.cue:1:4 test.cue:1:8])\n",
+			archive: "-- test.cue --\nx: 1 & 2 @test(err, pos=[test.cue:1:4, test.cue:1:8])\n",
 		},
 	}
 	for _, tt := range tests {
@@ -603,6 +608,61 @@ func TestPosSpecsMatch(t *testing.T) {
 	t.Run("empty positions and specs match", func(t *testing.T) {
 		if !posSpecsMatch(nil, nil, 0, identity) {
 			t.Error("expected empty slices to match")
+		}
+	})
+}
+
+func TestHintFlag(t *testing.T) {
+	parseAttr := func(src string) (parsedTestAttr, error) {
+		f, err := parser.ParseFile("test.cue", src)
+		if err != nil {
+			return parsedTestAttr{}, err
+		}
+		field := f.Decls[0].(*ast.Field)
+		return parseTestAttr(field.Attrs[0])
+	}
+
+	t.Run("hint= is parsed into pa.hint", func(t *testing.T) {
+		pa, err := parseAttr(`x: 1 @test(eq, 42, hint="fix the evaluator")`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if pa.hint != "fix the evaluator" {
+			t.Errorf("got hint=%q, want %q", pa.hint, "fix the evaluator")
+		}
+	})
+
+	t.Run("hint= works on err directive", func(t *testing.T) {
+		pa, err := parseAttr(`x: 1 @test(err, code=eval, hint="check the cycle")`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if pa.hint != "check the cycle" {
+			t.Errorf("got hint=%q, want %q", pa.hint, "check the cycle")
+		}
+	})
+
+	t.Run("unknown flag rejected for eq", func(t *testing.T) {
+		_, err := parseAttr(`x: 1 @test(eq, 42, foo="bar")`)
+		if err == nil || !strings.Contains(err.Error(), "unknown flag") {
+			t.Errorf("expected unknown flag error, got: %v", err)
+		}
+	})
+
+	t.Run("unknown flag rejected for err", func(t *testing.T) {
+		_, err := parseAttr(`x: 1 @test(err, unknownKey=x)`)
+		if err == nil || !strings.Contains(err.Error(), "unknown flag") {
+			t.Errorf("expected unknown flag error, got: %v", err)
+		}
+	})
+
+	t.Run("no hint= gives empty hint", func(t *testing.T) {
+		pa, err := parseAttr(`x: 1 @test(eq, 42)`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if pa.hint != "" {
+			t.Errorf("expected empty hint, got %q", pa.hint)
 		}
 	})
 }

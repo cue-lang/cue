@@ -1,39 +1,66 @@
-#name: arithmetic
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-i1: 1 & int
-i2: 2 & int
+i1: 1 & int  @test(eq, 1)
+i2: 2 & int  @test(eq, 2)
 
-sum:     -1 + +2     // 1
-div1:    2.0 / 3 * 6 // 4
-div2:    2 / 3 * 6   // 4
-div3:    1.00 / 1.00
-divZero: 1.0 / 0
-div00:   0 / 0
-b:       1 != 4
-add:     div1 + 1.0
+sum:     -1 + +2     @test(eq, 1)
+div1:    2.0 / 3 * 6 @test(eq, 4.0) @test(kind=float)
+div2:    2 / 3 * 6   @test(eq, 4.0) @test(kind=float,
+		guidance="we may consider this to be int in the future")
+div3:    1.00 / 1.00 @test(eq, 1.0) @test(kind=float)
+divZero: 1.0 / 0     @test(err, code=eval, contains="division by zero", pos=[0:10])
+div00:   0 / 0       @test(err, code=eval, contains="division undefined", pos=[0:10])
+b:       1 != 4      @test(eq, true)
+add:     div1 + 1.0  @test(eq, 5.0)
 
-idiv00: div(0, 0)
-imod00: mod(0, 0)
-iquo00: quo(0, 0)
-irem00: rem(0, 0)
+idiv00: div(0, 0) @test(err, code=eval, contains="division by zero", pos=[0:9])
+imod00: mod(0, 0) @test(err, code=eval, contains="division by zero", pos=[0:9])
+iquo00: quo(0, 0) @test(err, code=eval, contains="division by zero", pos=[0:9])
+irem00: rem(0, 0) @test(err, code=eval, contains="division by zero", pos=[0:9])
 
-v1: 1.0T / 2.0
-v2: 2.0 == 2
-v3: 2.0 / 3.0
-v5: div(i1, i2)
+v1: 1.0T / 2.0  @test(eq, 5.0E+11)
+v2: 2.0 == 2    @test(eq, true)
+v3: 2.0 / 3.0   @test(eq, 0.6666666666666666666666666666666667)
+v5: div(i1, i2) @test(eq, 0)
 
-e0: 2 + "a"
-// these are now all alloweed
-// e1: 2.0 / i1
-// e2: i1 / 2.0
-// e3: 3.0 % i2
-// e4: i1 % 2.0
-e5: div(1.0, 2)
-e6: rem(2, 2.0)
-e7: quo(2, 2.0)
-e8: mod(1.0, 1)
+e0: 2 + "a"     @test(err, code=eval, contains="invalid operands", pos=[0:5, 0:9])
+e5: div(1.0, 2) @test(err, code=eval, contains="cannot use", pos=[0:9])
+e6: rem(2, 2.0) @test(err, code=eval, contains="cannot use", pos=[0:12])
+e7: quo(2, 2.0) @test(err, code=eval, contains="cannot use", pos=[0:12])
+e8: mod(1.0, 1) @test(err, code=eval, contains="cannot use", pos=[0:9])
+-- out/errors.txt --
+[eval] divZero: failed arithmetic: division by zero:
+    ./in.cue:8:10
+[eval] div00: failed arithmetic: division undefined:
+    ./in.cue:9:10
+[eval] idiv00: error in call to div: division by zero:
+    ./in.cue:13:9
+[eval] imod00: error in call to mod: division by zero:
+    ./in.cue:14:9
+[eval] iquo00: error in call to quo: division by zero:
+    ./in.cue:15:9
+[eval] irem00: error in call to rem: division by zero:
+    ./in.cue:16:9
+[eval] e0: invalid operands 2 and "a" to '+' (type int and string):
+    ./in.cue:23:5
+    ./in.cue:23:9
+[eval] e5: cannot use 1.0 (type float) as int in argument 1 to div:
+    ./in.cue:29:9
+[eval] e6: cannot use 2.0 (type float) as int in argument 2 to rem:
+    ./in.cue:30:12
+[eval] e7: cannot use 2.0 (type float) as int in argument 2 to quo:
+    ./in.cue:31:12
+[eval] e8: cannot use 1.0 (type float) as int in argument 1 to mod:
+    ./in.cue:32:9
+-- out/eval/stats --
+Leaks:  0
+Freed:  24
+Reused: 22
+Allocs: 2
+Retain: 0
+
+Unifications: 24
+Conjuncts:    26
+Disjuncts:    24
 -- out/compile --
 --- in.cue
 {
@@ -60,101 +87,4 @@ e8: mod(1.0, 1)
   e6: rem(2, 2.0)
   e7: quo(2, 2.0)
   e8: mod(1.0, 1)
-}
--- out/eval/stats --
-Leaks:  0
-Freed:  24
-Reused: 22
-Allocs: 2
-Retain: 0
-
-Unifications: 24
-Conjuncts:    26
-Disjuncts:    24
--- out/evalalpha --
-Errors:
-divZero: failed arithmetic: division by zero:
-    ./in.cue:8:10
-div00: failed arithmetic: division undefined:
-    ./in.cue:9:10
-idiv00: error in call to div: division by zero:
-    ./in.cue:13:9
-imod00: error in call to mod: division by zero:
-    ./in.cue:14:9
-iquo00: error in call to quo: division by zero:
-    ./in.cue:15:9
-irem00: error in call to rem: division by zero:
-    ./in.cue:16:9
-e0: invalid operands 2 and "a" to '+' (type int and string):
-    ./in.cue:23:5
-    ./in.cue:23:9
-e5: cannot use 1.0 (type float) as int in argument 1 to div:
-    ./in.cue:29:9
-e6: cannot use 2.0 (type float) as int in argument 2 to rem:
-    ./in.cue:30:12
-e7: cannot use 2.0 (type float) as int in argument 2 to quo:
-    ./in.cue:31:12
-e8: cannot use 1.0 (type float) as int in argument 1 to mod:
-    ./in.cue:32:9
-
-Result:
-(_|_){
-  // [eval]
-  i1: (int){ 1 }
-  i2: (int){ 2 }
-  sum: (int){ 1 }
-  div1: (float){ 4.000000000000000000000000000000000 }
-  div2: (float){ 4.000000000000000000000000000000000 }
-  div3: (float){ 1.0 }
-  divZero: (_|_){
-    // [eval] divZero: failed arithmetic: division by zero:
-    //     ./in.cue:8:10
-  }
-  div00: (_|_){
-    // [eval] div00: failed arithmetic: division undefined:
-    //     ./in.cue:9:10
-  }
-  b: (bool){ true }
-  add: (float){ 5.000000000000000000000000000000000 }
-  idiv00: (_|_){
-    // [eval] idiv00: error in call to div: division by zero:
-    //     ./in.cue:13:9
-  }
-  imod00: (_|_){
-    // [eval] imod00: error in call to mod: division by zero:
-    //     ./in.cue:14:9
-  }
-  iquo00: (_|_){
-    // [eval] iquo00: error in call to quo: division by zero:
-    //     ./in.cue:15:9
-  }
-  irem00: (_|_){
-    // [eval] irem00: error in call to rem: division by zero:
-    //     ./in.cue:16:9
-  }
-  v1: (float){ 5.0E+11 }
-  v2: (bool){ true }
-  v3: (float){ 0.6666666666666666666666666666666667 }
-  v5: (int){ 0 }
-  e0: (_|_){
-    // [eval] e0: invalid operands 2 and "a" to '+' (type int and string):
-    //     ./in.cue:23:5
-    //     ./in.cue:23:9
-  }
-  e5: (_|_){
-    // [eval] e5: cannot use 1.0 (type float) as int in argument 1 to div:
-    //     ./in.cue:29:9
-  }
-  e6: (_|_){
-    // [eval] e6: cannot use 2.0 (type float) as int in argument 2 to rem:
-    //     ./in.cue:30:12
-  }
-  e7: (_|_){
-    // [eval] e7: cannot use 2.0 (type float) as int in argument 2 to quo:
-    //     ./in.cue:31:12
-  }
-  e8: (_|_){
-    // [eval] e8: cannot use 1.0 (type float) as int in argument 1 to mod:
-    //     ./in.cue:32:9
-  }
 }

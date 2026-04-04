@@ -1,15 +1,31 @@
-#name: cross-dependent comprehension
-#evalFull
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that comprehension conditions referencing fields resolve correctly when the
+# condition is cross-dependent. x unifies #a with b:true and c:4, resolving the
+# comprehension. y is an alias of x with the same value.
 -- in.cue --
 #a: {
 	if b {
 		c: 4
 	}
 	b: bool
+	@test(err, code=incomplete, args=[bool], pos=[in.cue:5:5])
 }
-x: (#a & {b: true}) & {c: 4}
-y: x
+x: (#a & {b: true}) & {c: 4} @test(eq, {b: true, c: 4}) @test(shareID=xy)
+y: x                         @test(eq, {b: true, c: 4}) @test(shareID=xy)
+-- out/errors.txt --
+[incomplete] #a: incomplete bool: bool:
+    ./in.cue:5:5
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 6
+Allocs: 4
+Retain: 4
+
+Unifications: 10
+Conjuncts:    18
+Disjuncts:    12
+
+NumCloseIDs: 3
 -- out/compile --
 --- in.cue
 {
@@ -25,67 +41,4 @@ y: x
     c: 4
   })
   y: 〈0;x〉
-}
--- out/eval/stats --
-Leaks:  0
-Freed:  10
-Reused: 6
-Allocs: 4
-Retain: 4
-
-Unifications: 10
-Conjuncts:    18
-Disjuncts:    12
-
-NumCloseIDs: 3
--- out/evalalpha --
-(struct){
-  #a: (_|_){
-    // [incomplete] #a: incomplete bool: bool:
-    //     ./in.cue:5:5
-    b: (bool){ bool }
-  }
-  x: (#struct){
-    b: (bool){ true }
-    c: (int){ 4 }
-  }
-  y: ~(x)
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,11 +5,8 @@
-     b: (bool){ bool }
-   }
-   x: (#struct){
--    c: (int){ 4 }
--    b: (bool){ true }
--  }
--  y: (#struct){
--    c: (int){ 4 }
--    b: (bool){ true }
--  }
-+    b: (bool){ true }
-+    c: (int){ 4 }
-+  }
-+  y: ~(x)
- }
--- diff/todo/p3 --
-Reordering
--- out/eval --
-(struct){
-  #a: (_|_){
-    // [incomplete] #a: incomplete bool: bool:
-    //     ./in.cue:5:5
-    b: (bool){ bool }
-  }
-  x: (#struct){
-    c: (int){ 4 }
-    b: (bool){ true }
-  }
-  y: (#struct){
-    c: (int){ 4 }
-    b: (bool){ true }
-  }
 }

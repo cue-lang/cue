@@ -1,9 +1,30 @@
-#name: Issue #23
-#evalFull
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that unifying a struct with a disjunction where neither branch matches reports
+# an empty disjunction error. Issue #23.
 -- in.cue --
-x: {a:     1} | {a: 2}
-y: x & {a: 3}
+x: {a: 1} | {a: 2}
+y: x & {a: 3} @test(err, code=eval,
+	suberr=(code=eval, contains="conflicting values", args=[1, 3], pos=[in.cue:1:8, in.cue:2:4, in.cue:2:12]),
+	suberr=(code=eval, contains="conflicting values", args=[2, 3], pos=[in.cue:1:17, in.cue:2:4, in.cue:2:12]))
+-- out/errors.txt --
+[eval] y: 2 errors in empty disjunction:
+y.a: conflicting values 1 and 3:
+    ./in.cue:1:8
+    ./in.cue:2:4
+    ./in.cue:2:12
+y.a: conflicting values 2 and 3:
+    ./in.cue:1:17
+    ./in.cue:2:4
+    ./in.cue:2:12
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 6
+Allocs: 5
+Retain: 0
+
+Unifications: 7
+Conjuncts:    15
+Disjuncts:    11
 -- out/compile --
 --- in.cue
 {
@@ -15,47 +36,4 @@ y: x & {a: 3}
   y: (〈0;x〉 & {
     a: 3
   })
-}
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 6
-Allocs: 5
-Retain: 0
-
-Unifications: 7
-Conjuncts:    15
-Disjuncts:    11
--- out/evalalpha --
-Errors:
-y: 2 errors in empty disjunction:
-y.a: conflicting values 1 and 3:
-    ./in.cue:1:12
-    ./in.cue:2:4
-    ./in.cue:2:12
-y.a: conflicting values 2 and 3:
-    ./in.cue:1:21
-    ./in.cue:2:4
-    ./in.cue:2:12
-
-Result:
-(_|_){
-  // [eval]
-  x: (struct){ |((struct){
-      a: (int){ 1 }
-    }, (struct){
-      a: (int){ 2 }
-    }) }
-  y: (_|_){
-    // [eval] y: 2 errors in empty disjunction:
-    // y.a: conflicting values 1 and 3:
-    //     ./in.cue:1:12
-    //     ./in.cue:2:4
-    //     ./in.cue:2:12
-    // y.a: conflicting values 2 and 3:
-    //     ./in.cue:1:21
-    //     ./in.cue:2:4
-    //     ./in.cue:2:12
-    a: (int){ 3 }
-  }
 }

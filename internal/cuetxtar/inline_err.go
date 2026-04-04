@@ -679,6 +679,16 @@ func posMatchesSpec(got token.Pos, exp posSpec, baseLine int, relFilename func(s
 	return got.Line() == baseLine+exp.deltaLine && got.Column() == exp.col
 }
 
+// formatPosCountMismatch returns a consistent mismatch message for @test(err,
+// pos=...) assertions. When got has extra positions, it explains that this can
+// be acceptable after validating relevance.
+func formatPosCountMismatch(directive string, got, want int) string {
+	if got > want {
+		return fmt.Sprintf("%s: got %d position(s), want %d; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...]", directive, got, want)
+	}
+	return fmt.Sprintf("%s: got %d position(s), want %d", directive, got, want)
+}
+
 // reportPosMismatch reports a position mismatch between actual positions and
 // expected specs. directive is included verbatim in each error message.
 // If counts differ, only the count error is reported. Otherwise each
@@ -686,7 +696,7 @@ func posMatchesSpec(got token.Pos, exp posSpec, baseLine int, relFilename func(s
 func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive string, positions []token.Pos, specs []posSpec, baseLine int, hint string) {
 	t.Helper()
 	if len(positions) != len(specs) {
-		t.Errorf("path %s: %s: got %d position(s), want %d", path, directive, len(positions), len(specs))
+		t.Errorf("path %s: %s", path, formatPosCountMismatch(directive, len(positions), len(specs)))
 		for _, p := range positions {
 			t.Logf("  actual: %d:%d", p.Line(), p.Column())
 		}

@@ -591,8 +591,8 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 			for _, p := range positions {
 				got = append(got, fmt.Sprintf("%d:%d", p.Line(), p.Column()))
 			}
-			return pathErr(path, "@test(err, pos=...): got %d position(s) %v, want %d",
-				len(positions), got, len(ea.pos))
+			msg := formatPosCountMismatch("@test(err, pos=...)", len(positions), len(ea.pos))
+			return pathErr(path, "%s %v", msg, got)
 		}
 		// Order-independent matching: each expected position must match
 		// exactly one actual position.

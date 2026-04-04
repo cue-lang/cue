@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0e08ab4_af4c63b8",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1017,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-04T11:18:21Z",
+      "side": 1,
+      "message": "use `slices.Clone` for Files",
+      "revId": "24302f8c4cc0cac84ceea751493c1a61a0e6c50b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

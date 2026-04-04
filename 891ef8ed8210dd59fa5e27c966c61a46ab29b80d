@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f93df29_bd908cb1",
+        "filename": "cue/testdata/eval/issue2649.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-04T11:16:09Z",
+      "side": 1,
+      "message": "should this use the test TODO feature?",
+      "revId": "891ef8ed8210dd59fa5e27c966c61a46ab29b80d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

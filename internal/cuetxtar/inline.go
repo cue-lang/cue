@@ -159,6 +159,11 @@ type parsedTestAttr struct {
 	// are logged rather than reported as errors; a pass emits a warning.
 	isTodo bool
 
+	// guidance is an optional hint printed when the assertion fails
+	// (from guidance="..."). Intended as guidance for automated tools
+	// such as AI assistants reviewing test failures.
+	guidance string
+
 	// srcAttr is the original AST attribute node (needed for CUE_UPDATE write-back).
 	srcAttr *ast.Attribute
 
@@ -234,7 +239,36 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 		result.errArgs = &ea
 	}
 
+	// Extract the universal guidance= flag and reject unknown key= flags.
+	// Positional args (kv.Key() == "") are accepted by directives as needed.
+	// Directives with their own flag parsers (err, todo, skip, shareID) are
+	// responsible for validating their own flags.
+	for _, kv := range parsed.Fields[1:] {
+		switch kv.Key() {
+		case "guidance":
+			result.guidance = kv.Value()
+		case "":
+			// Positional arg — accepted.
+		default:
+			switch result.directive {
+			case "err", "todo", "skip", "shareID":
+				// These directives parse their own flags elsewhere.
+			default:
+				return result, fmt.Errorf("@test(%s): unknown flag %q", result.directive, kv.Key())
+			}
+		}
+	}
+
 	return result, nil
+}
+
+// logHint logs hint as an additional note following a test failure.
+// Call immediately after t.Errorf when pa.guidance is set.
+func logHint(t testing.TB, hint string) {
+	if hint != "" {
+		t.Helper()
+		t.Log("hint:", hint)
+	}
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1148,6 +1182,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	// Report the failure (unless already annotated with a skip).
 	if !hasSkip {
 		t.Errorf("path %s: %v", path, cmpErr)
+		logHint(t, pa.guidance)
 	}
 }
 
@@ -1178,14 +1213,15 @@ func (r *inlineRunner) runLeqInline(t testing.TB, path cue.Path, val cue.Value, 
 		t.Errorf("path %s: @test(leq, ...): cannot compile constraint: %v", path, constraint.Err())
 		return
 	}
-	r.runLeqAssertion(t, path, val, constraint)
+	r.runLeqAssertion(t, path, val, constraint, pa.guidance)
 }
 
 // runLeqAssertion asserts that val is subsumed by constraint (constraint ⊑ val, i.e. val is at least as specific).
-func (r *inlineRunner) runLeqAssertion(t testing.TB, path cue.Path, val, constraint cue.Value) {
+func (r *inlineRunner) runLeqAssertion(t testing.TB, path cue.Path, val, constraint cue.Value, hint string) {
 	t.Helper()
 	if err := constraint.Subsume(val); err != nil {
 		t.Errorf("path %s: @test(leq): value %v is not subsumed by constraint %v: %v", path, val, constraint, err)
+		logHint(t, hint)
 	}
 }
 
@@ -1213,6 +1249,7 @@ func (r *inlineRunner) runKindAssertion(t testing.TB, path cue.Path, val cue.Val
 	}
 	if gotKind != expectedKind {
 		t.Errorf("path %s: @test(kind=%s): got kind %v, want %v", path, expectedStr, gotKind, expectedKind)
+		logHint(t, pa.guidance)
 	}
 }
 
@@ -1256,6 +1293,7 @@ func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.V
 	got := val.IsClosed()
 	if got != expected {
 		t.Errorf("path %s: @test(closed): got closed=%v, want %v", path, got, expected)
+		logHint(t, pa.guidance)
 	}
 }
 
@@ -1286,6 +1324,7 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 	}
 	if !match {
 		t.Errorf("path %s: @test(debugCheck) mismatch:\ngot:  %q\nwant: %q", path, actual, expected)
+		logHint(t, pa.guidance)
 	}
 }
 

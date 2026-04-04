@@ -1,6 +1,6 @@
-#name: Issue #94
-#evalFull
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests field visibility and comprehension iteration: comprehensions only iterate
+# regular (non-optional, non-hidden, non-definition) fields; select and index access
+# have different rules for optional, hidden, and definition fields. Issue #94.
 -- in.cue --
 foo: {
 	opt?:    1
@@ -8,22 +8,46 @@ foo: {
 	#def:    3
 	regular: 4
 	_hidden: 5
+	@test(eq, {opt?: 1, txt: 2, #def: 3, regular: 4, _hidden: 5})
 }
 comp: {for k, v in foo {"\(k)": v}}
 select: {
-	opt:     foo.opt
-	"txt":   foo.txt
-	#def:    foo.#def
-	regular: foo.regular
-	_hidden: foo._hidden
+	opt:     foo.opt     @test(err, code=incomplete, contains="cannot reference optional field", pos=[0:15])
+	"txt":   foo.txt     @test(eq, 2)
+	#def:    foo.#def    @test(eq, 3)
+	regular: foo.regular @test(eq, 4)
+	_hidden: foo._hidden @test(eq, 5)
 }
 index: {
-	opt:     foo["opt"]
-	"txt":   foo["txt"]
-	#def:    foo["#def"]
-	regular: foo["regular"]
-	_hidden: foo["_hidden"]
+	opt:     foo["opt"]     @test(err, code=incomplete, contains="cannot reference optional field", pos=[0:15])
+	"txt":   foo["txt"]     @test(eq, 2)
+	#def:    foo["#def"]    @test(err, code=incomplete, contains="undefined field", pos=[0:15])
+	regular: foo["regular"] @test(eq, 4)
+	_hidden: foo["_hidden"] @test(err, code=incomplete, contains="undefined field", pos=[0:15])
 }
+-- out/errors.txt --
+[incomplete] select.opt: cannot reference optional field: opt:
+    ./in.cue:10:15
+[incomplete] index.opt: cannot reference optional field: opt:
+    ./in.cue:17:15
+[incomplete] index.#def: undefined field: "#def":
+    ./in.cue:19:15
+[incomplete] index._hidden: undefined field: "_hidden":
+    ./in.cue:21:15
+-- out/eval/stats --
+Leaks:  0
+Freed:  22
+Reused: 19
+Allocs: 3
+Retain: 0
+
+Unifications: 22
+Conjuncts:    32
+Disjuncts:    22
+
+MisalignedConjunct: 1
+
+NumCloseIDs: 1
 -- out/compile --
 --- in.cue
 {
@@ -52,59 +76,5 @@ index: {
     #def: 〈1;foo〉["#def"]
     regular: 〈1;foo〉["regular"]
     _hidden: 〈1;foo〉["_hidden"]
-  }
-}
--- out/eval/stats --
-Leaks:  0
-Freed:  22
-Reused: 19
-Allocs: 3
-Retain: 0
-
-Unifications: 22
-Conjuncts:    32
-Disjuncts:    22
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  foo: (struct){
-    opt?: (int){ 1 }
-    txt: (int){ 2 }
-    #def: (int){ 3 }
-    regular: (int){ 4 }
-    _hidden: (int){ 5 }
-  }
-  comp: (struct){
-    txt: (int){ 2 }
-    regular: (int){ 4 }
-  }
-  select: (struct){
-    opt: (_|_){
-      // [incomplete] select.opt: cannot reference optional field: opt:
-      //     ./in.cue:10:15
-    }
-    txt: (int){ 2 }
-    #def: (int){ 3 }
-    regular: (int){ 4 }
-    _hidden: (int){ 5 }
-  }
-  index: (struct){
-    opt: (_|_){
-      // [incomplete] index.opt: cannot reference optional field: opt:
-      //     ./in.cue:17:15
-    }
-    txt: (int){ 2 }
-    #def: (_|_){
-      // [incomplete] index.#def: undefined field: "#def":
-      //     ./in.cue:19:15
-    }
-    regular: (int){ 4 }
-    _hidden: (_|_){
-      // [incomplete] index._hidden: undefined field: "_hidden":
-      //     ./in.cue:21:15
-    }
   }
 }

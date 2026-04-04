@@ -126,7 +126,7 @@ When converting a txtar test from golden-file format to inline annotations:
    the `out/eval/stats` section (promote v3 stats from `out/evalalpha/stats` if
    needed).
 
-7. **Add `out/errors.txt`** if any errors e  xist in the test (leave empty initially;
+7. **Add `out/errors.txt`** if any errors exist in the test (leave empty initially;
    `CUE_UPDATE=1` fills it in automatically).
 
 8. **Add `out/todo.txt`** if there are noteworthy differences
@@ -145,7 +145,18 @@ When converting a txtar test from golden-file format to inline annotations:
 10. **DO NOT** introduce any flags in new @test(err) directives. Only maintainers
 of the CUE project should do so.
 
-11. **@test(eq, ...) placement**: Prefer placing the eq directive attribute
+11. **`guidance=` flag**: Any `@test(...)` directive may carry a `guidance="..."` flag.
+    When a test fails, the runner logs the guidance text as an additional note.
+    **If you (as an AI) encounter a test failure on a field carrying `guidance="..."`,
+    read that text before diagnosing or fixing the failure.** The guidance may explain
+    known evaluator differences, version-specific behavior, or why the expected value is
+    correct despite appearances. Example:
+    ```
+    a: c: 1 @test(err, code=eval, contains="field not allowed",
+        guidance="v3 only reports the direct definition position; see out/todo.txt")
+    ```
+
+12. **@test(eq, ...) placement**: Prefer placing the eq directive attribute
     either directly after a field for single field test, or as a field decl
     at the end of a struct of a test that is struct based. Do NOT place `@test`
     as a field attribute after a closing `}` — e.g., `} @test(eq, ...)` is

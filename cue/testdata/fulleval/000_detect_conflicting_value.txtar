@@ -1,15 +1,18 @@
-#name: detect conflicting value
-#evalFull
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that a float value conflicting with a disjunction of an int value and int type
+# reports an empty disjunction error. Issue: regression test for early evaluator behavior.
 -- in.cue --
 a: 8000.9
-a: 7080 | int
--- out/compile --
---- in.cue
-{
-  a: 8000.9
-  a: (7080|int)
-}
+a: 7080 | int @test(err, code=eval,
+	suberr=(code=eval, contains="conflicting values", args=[8000.9, 7080], pos=[in.cue:1:4, in.cue:2:4]),
+	suberr=(code=eval, contains="conflicting values", args=[8000.9, int], pos=[in.cue:1:4, in.cue:2:11]))
+-- out/errors.txt --
+[eval] a: 2 errors in empty disjunction:
+a: conflicting values 8000.9 and 7080 (mismatched types float and int):
+    ./in.cue:1:4
+    ./in.cue:2:4
+a: conflicting values 8000.9 and int (mismatched types float and int):
+    ./in.cue:1:4
+    ./in.cue:2:11
 -- out/eval/stats --
 Leaks:  0
 Freed:  4
@@ -20,26 +23,9 @@ Retain: 0
 Unifications: 2
 Conjuncts:    5
 Disjuncts:    4
--- out/evalalpha --
-Errors:
-a: 2 errors in empty disjunction:
-a: conflicting values 8000.9 and 7080 (mismatched types float and int):
-    ./in.cue:1:4
-    ./in.cue:2:4
-a: conflicting values 8000.9 and int (mismatched types float and int):
-    ./in.cue:1:4
-    ./in.cue:2:11
-
-Result:
-(_|_){
-  // [eval]
-  a: (_|_){
-    // [eval] a: 2 errors in empty disjunction:
-    // a: conflicting values 8000.9 and 7080 (mismatched types float and int):
-    //     ./in.cue:1:4
-    //     ./in.cue:2:4
-    // a: conflicting values 8000.9 and int (mismatched types float and int):
-    //     ./in.cue:1:4
-    //     ./in.cue:2:11
-  }
+-- out/compile --
+--- in.cue
+{
+  a: 8000.9
+  a: (7080|int)
 }

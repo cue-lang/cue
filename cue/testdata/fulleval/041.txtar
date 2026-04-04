@@ -1,28 +1,15 @@
-#evalFull
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 t: {
 	#ok: *true | bool
 	if #ok {
 		x: int
 	}
+	@test(eq, {
+		#ok: *true | bool
+		x:   int
+	})
 }
-s: t & {
-	#ok: false
-}
--- out/compile --
---- in.cue
-{
-  t: {
-    #ok: (*true|bool)
-    if 〈0;#ok〉 {
-      x: int
-    }
-  }
-  s: (〈0;t〉 & {
-    #ok: false
-  })
-}
+s: t & {#ok: false} @test(eq, {#ok: false})
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
@@ -37,13 +24,16 @@ Disjuncts:    11
 MisalignedConjunct: 1
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  t: (struct){
-    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
-    x: (int){ int }
+-- out/compile --
+--- in.cue
+{
+  t: {
+    #ok: (*true|bool)
+    if 〈0;#ok〉 {
+      x: int
+    }
   }
-  s: (struct){
-    #ok: (bool){ false }
-  }
+  s: (〈0;t〉 & {
+    #ok: false
+  })
 }

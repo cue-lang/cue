@@ -259,40 +259,52 @@ func (p *protoConverter) resolve(pos scanner.Position, name string, options []*p
 		return expr
 	}
 	if strings.HasPrefix(name, ".") {
-		return p.resolveTopScope(pos, name[1:], options)
+		// A leading dot indicates the path should be resolved in the top-level scope.
+		return p.resolveUsingScopes(pos, name[1:], p.scope[:1])
 	}
-	for _, scope := range slices.Backward(p.scope) {
-		if m, ok := scope[name]; ok {
-			return m.cue()
-		}
-	}
-	expr := p.resolveTopScope(pos, name, options)
+	// Non-absolute names need to be resolved using the nearest lexical scopes.
+	expr := p.resolveUsingScopes(pos, name, p.scope)
 	return expr
 }
 
-func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, options []*proto.Option) ast.Expr {
+// resolveUsingScopes resolves a name using the nearest lexical scopes.
+// If the name is package-qualified, for this package, we trim the package prefix before searching.
+// If the name is dotted, we split the name and look for the first segment in the nearest lexical scope.
+// If the name is not found, we fail (panic with error).
+// scopes is a list of scopes to search, starting from the nearest scope;
+// to limit the search to a specific scope, pass that scope alone.
+func (p *protoConverter) resolveUsingScopes(pos scanner.Position, name string, scopes []map[string]mapping) ast.Expr {
 	for i := 0; i < len(name); i++ {
+		// Get the first segment of the name, advancing the index to the next dot.
 		k := strings.IndexByte(name[i:], '.')
 		i += k
 		if k == -1 {
 			i = len(name)
 		}
 		curName := name[:i]
+		// If the name is package-qualified, for this package, we can use the local name.
 		if local, ok := strings.CutPrefix(curName, p.protoPkg+"."); ok {
 			curName = local
 		}
-		if m, ok := p.scope[0][curName]; ok {
+		// Look for the name in the nearest scope.
+		for _, scope := range slices.Backward(scopes) {
+			m, ok := scope[curName]
+			if !ok {
+				continue
+			}
 			if m.pkg != nil {
 				p.imported[m.pkg.qualifiedImportPath()] = true
 			}
 			expr := m.cue()
 			for i < len(name) {
+				// The actual expression is pointing to a nested message, so we need to namespace it:
 				name = name[i+1:]
 				if i = strings.IndexByte(name, '.'); i == -1 {
 					i = len(name)
 				}
 				expr = ast.NewSel(expr, "#"+name[:i])
 			}
+
 			ast.SetPos(expr, p.toCUEPos(pos))
 			return expr
 		}

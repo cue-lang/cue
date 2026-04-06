@@ -67,7 +67,7 @@ func TestExtractDefinitions(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if diff := cmp.Diff(out.String(), string(b)); diff != "" {
+			if diff := cmp.Diff(string(b), out.String()); diff != "" {
 				t.Error(diff)
 			}
 		})

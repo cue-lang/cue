@@ -3,12 +3,13 @@
 # field reference (e.g. "\(arg.x) \(arg.y)") silently swallowed the error for
 # the invalid field, while a single invalid reference was correctly reported.
 # https://cuelang.org/issue/318
-#name: issue318
-#evalFull
+#
 -- in.cue --
 #T: {
 	arg: x: string
 	out1: "\(arg.x) \(arg.y)" @test(err, code=eval)
+	// TODO: is this really an eval error if it is referred to within a
+	// definitions?
 	out2: "\(arg.y)"           @test(err, code=eval)
 	vx:   arg.x                @test(kind=string)
 	vy:   arg.y                @test(err, code=eval)

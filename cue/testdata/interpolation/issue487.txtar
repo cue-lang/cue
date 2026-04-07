@@ -1,3 +1,10 @@
+# Tests that string interpolation correctly reports "incomplete" errors when
+# the interpolated field is abstract (non-concrete), while still allowing the
+# parent struct to be unified with a concrete value. Issue: interpolation inside
+# a definition produced an "incomplete" error on the definition field itself,
+# but the unified concrete result (e.g. `a: #R & {pos: 67}`) should evaluate
+# to a concrete string.
+# https://cuelang.org/issue/487
 -- in.cue --
 t1: {
 	#R: {

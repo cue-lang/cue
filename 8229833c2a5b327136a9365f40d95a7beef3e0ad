@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f550822b_f8320f4c",
+        "filename": "cue/testdata/eval/issue2337.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T13:17:46Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2b253cc5_fad54a7c",
+      "revId": "8229833c2a5b327136a9365f40d95a7beef3e0ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d44b4d1a_a0165b1d",

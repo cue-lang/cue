@@ -1,4 +1,8 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests non-rooted inline expressions and let bindings where the inline
+# expression conflicts with a definition constraint. The evaluation should
+# use the local context (overriding the definition's value), even when
+# that creates a conflict detectable from the root.
+# https://cuelang.org/issue/3977
 -- in.cue --
 issue3977: inlineExpr: {
 	#NetworkID: 1
@@ -7,7 +11,8 @@ issue3977: inlineExpr: {
 		out: x + 1
 	}
 
-	err: (#fn & {x: 2}).out
+	err: (#fn & {x: 2}).out @test(eq, 3, incorrect) @test(err:todo, p=1, code=eval,
+		contains="conflicting values", args=[1, 2])
 }
 issue3977: inlineDisj1: {
 	#NetworkID: "2" | "3" | "4"
@@ -16,7 +21,7 @@ issue3977: inlineDisj1: {
 		out: "value=\(x)"
 	}
 
-	err: (#fn & {x: "invalid"}).out
+	err: (#fn & {x: "invalid"}).out @test(eq, "value=invalid", incorrect) @test(err:todo, p=1, code=eval, contains="conflicting values")
 }
 issue3977: inlineDisj2: {
 	#NetworkID: 1
@@ -25,7 +30,9 @@ issue3977: inlineDisj2: {
 		out: x + 10
 	}
 
-	err: (#fn & {x: *2 | 4}).out
+	err: (#fn & {x: *2 | 4}).out @test(err, code=eval,
+		suberr=(contains="conflicting values", args=[1, 2]),
+		suberr=(contains="conflicting values", args=[4, 1]))
 }
 issue3977: inlineDisj3: {
 	#NetworkID: 1
@@ -34,7 +41,7 @@ issue3977: inlineDisj3: {
 		out: x + 10
 	}
 
-	err: (#fn & {x: *2 | int}).out
+	ok: (#fn & {x: *2 | int}).out @test(eq, 11)
 }
 issue3977: inlineLet: {
 	#NetworkID: 1
@@ -45,7 +52,8 @@ issue3977: inlineLet: {
 		x: 2
 	}
 
-	err: p.out
+	err: p.out @test(eq, 12, incorrect) @test(err:todo, p=1, code=eval,
+		contains="conflicting values", args=[1, 2])
 }
 -- out/eval/stats --
 Leaks:  9
@@ -57,96 +65,21 @@ Retain: 27
 Unifications: 47
 Conjuncts:    87
 Disjuncts:    68
--- out/evalalpha --
-Errors:
-x: conflicting values 2 and 1:
-    ./in.cue:20:14
-    ./in.cue:22:8
-    ./in.cue:26:8
-    ./in.cue:26:19
+-- out/errors.txt --
+[incomplete] issue3977.inlineDisj1.#fn.out: invalid interpolation: unresolved disjunction "2" | "3" | "4" (type string):
+    ./in.cue:14:8
+[eval] x: conflicting values 2 and 1:
+    ./in.cue:22:14
+    ./in.cue:24:8
+    ./in.cue:30:8
+    ./in.cue:30:19
 x: conflicting values 4 and 1:
-    ./in.cue:20:14
-    ./in.cue:22:8
-    ./in.cue:26:8
-    ./in.cue:26:23
+    ./in.cue:22:14
+    ./in.cue:24:8
+    ./in.cue:30:8
+    ./in.cue:30:23
 x: 2 errors in empty disjunction::
-    ./in.cue:23:8
-
-Result:
-(_|_){
-  // [eval]
-  issue3977: (_|_){
-    // [eval]
-    inlineExpr: (struct){
-      #NetworkID: (int){ 1 }
-      #fn: (#struct){
-        x: (int){ 1 }
-        out: (int){ 2 }
-      }
-      err: (int){ 3 }
-    }
-    inlineDisj1: (struct){
-      #NetworkID: (string){ |((string){ "2" }, (string){ "3" }, (string){ "4" }) }
-      #fn: (#struct){
-        x: (string){ |((string){ "2" }, (string){ "3" }, (string){ "4" }) }
-        out: (_|_){
-          // [incomplete] issue3977.inlineDisj1.#fn.out: invalid interpolation: unresolved disjunction "2" | "3" | "4" (type string):
-          //     ./in.cue:14:8
-        }
-      }
-      err: (string){ "value=invalid" }
-    }
-    inlineDisj2: (_|_){
-      // [eval]
-      #NetworkID: (int){ 1 }
-      #fn: (#struct){
-        x: (int){ 1 }
-        out: (int){ 11 }
-      }
-      err: (_|_){
-        // [eval] x: conflicting values 2 and 1:
-        //     ./in.cue:20:14
-        //     ./in.cue:22:8
-        //     ./in.cue:26:8
-        //     ./in.cue:26:19
-        // x: conflicting values 4 and 1:
-        //     ./in.cue:20:14
-        //     ./in.cue:22:8
-        //     ./in.cue:26:8
-        //     ./in.cue:26:23
-        // x: 2 errors in empty disjunction::
-        //     ./in.cue:23:8
-      }
-    }
-    inlineDisj3: (struct){
-      #NetworkID: (int){ 1 }
-      #fn: (#struct){
-        x: (int){ 1 }
-        out: (int){ 11 }
-      }
-      err: (int){ 11 }
-    }
-    inlineLet: (struct){
-      #NetworkID: (int){ 1 }
-      let p#1 = (_|_){
-        // [eval]
-        x: (_|_){
-          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
-          //     ./in.cue:38:14
-          //     ./in.cue:40:8
-          //     ./in.cue:43:6
-        }
-        out: (_|_){
-          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
-          //     ./in.cue:38:14
-          //     ./in.cue:40:8
-          //     ./in.cue:43:6
-        }
-      }
-      err: (int){ 12 }
-    }
-  }
-}
+    ./in.cue:25:8
 -- out/compile --
 --- in.cue
 {
@@ -193,7 +126,7 @@ Result:
         x: 〈1;#NetworkID〉
         out: (〈0;x〉 + 10)
       }
-      err: (〈0;#fn〉 & {
+      ok: (〈0;#fn〉 & {
         x: (*2|int)
       }).out
     }

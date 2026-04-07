@@ -145,15 +145,15 @@ When converting a txtar test from golden-file format to inline annotations:
 10. **DO NOT** introduce any flags in new @test(err) directives. Only maintainers
 of the CUE project should do so.
 
-11. **`guidance=` flag**: Any `@test(...)` directive may carry a `guidance="..."` flag.
-    When a test fails, the runner logs the guidance text as an additional note.
-    **If you (as an AI) encounter a test failure on a field carrying `guidance="..."`,
-    read that text before diagnosing or fixing the failure.** The guidance may explain
+11. **`hint=` flag**: Any `@test(...)` directive may carry a `hint="..."` flag.
+    When a test fails, the runner logs the hint text as an additional note.
+    **If you (as an AI) encounter a test failure on a field carrying `hint="..."`,
+    read that text before diagnosing or fixing the failure.** The hint may explain
     known evaluator differences, version-specific behavior, or why the expected value is
     correct despite appearances. Example:
     ```
     a: c: 1 @test(err, code=eval, contains="field not allowed",
-        guidance="v3 only reports the direct definition position; see out/todo.txt")
+        hint="v3 only reports the direct definition position; see out/todo.txt")
     ```
 
 12. **@test(eq, ...) placement**: Prefer placing the eq directive attribute

@@ -5,7 +5,7 @@ i2: 2 & int  @test(eq, 2)
 sum:     -1 + +2     @test(eq, 1)
 div1:    2.0 / 3 * 6 @test(eq, 4.0) @test(kind=float)
 div2:    2 / 3 * 6   @test(eq, 4.0) @test(kind=float,
-		guidance="we may consider this to be int in the future")
+		hint="we may consider this to be int in the future")
 div3:    1.00 / 1.00 @test(eq, 1.0) @test(kind=float)
 divZero: 1.0 / 0     @test(err, code=eval, contains="division by zero", pos=[0:10])
 div00:   0 / 0       @test(err, code=eval, contains="division undefined", pos=[0:10])

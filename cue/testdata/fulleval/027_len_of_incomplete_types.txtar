@@ -9,9 +9,9 @@ v6:   len('sf' | 'dd')     @test(err, code=incomplete, contains="unresolved disj
 v7:   len([2] | *[1, 2])   @test(eq, 2)
 v8:   len([2] | [1, 2])    @test(err, code=incomplete, contains="unresolved disjunction", pos=[in.cue:9:5])
 v9:   len("😂")            @test(eq, 4,
-	guidance="len of strings should be deprecated and this should be an error in the future")
+	hint="len of strings should be deprecated and this should be an error in the future")
 v10:  len("")              @test(eq, 0,
-	guidance="len of strings should be deprecated and this should be an error in the future")
+	hint="len of strings should be deprecated and this should be an error in the future")
 -- out/errors.txt --
 [incomplete] v5: unresolved disjunction {a:3} | {a:4} (type struct):
     ./in.cue:6:5

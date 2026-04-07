@@ -159,10 +159,10 @@ type parsedTestAttr struct {
 	// are logged rather than reported as errors; a pass emits a warning.
 	isTodo bool
 
-	// guidance is an optional hint printed when the assertion fails
-	// (from guidance="..."). Intended as guidance for automated tools
+	// hint is an optional message printed when the assertion fails
+	// (from hint="..."). Intended as guidance for automated tools
 	// such as AI assistants reviewing test failures.
-	guidance string
+	hint string
 
 	// srcAttr is the original AST attribute node (needed for CUE_UPDATE write-back).
 	srcAttr *ast.Attribute
@@ -245,8 +245,8 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 	// responsible for validating their own flags.
 	for _, kv := range parsed.Fields[1:] {
 		switch kv.Key() {
-		case "guidance":
-			result.guidance = kv.Value()
+		case "hint":
+			result.hint = kv.Value()
 		case "":
 			// Positional arg — accepted.
 		default:
@@ -263,7 +263,7 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 }
 
 // logHint logs hint as an additional note following a test failure.
-// Call immediately after t.Errorf when pa.guidance is set.
+// Call immediately after t.Errorf when pa.hint is set.
 func logHint(t testing.TB, hint string) {
 	if hint != "" {
 		t.Helper()
@@ -902,8 +902,7 @@ func (r *inlineRunner) buildFromFilesViaLoad(ctx *cue.Context, cueFiles []*cueFi
 	}
 
 	stripped := *r.archive
-	stripped.Files = make([]txtar.File, len(r.archive.Files))
-	copy(stripped.Files, r.archive.Files)
+	stripped.Files = slices.Clone(r.archive.Files)
 	for i, f := range stripped.Files {
 		if b, ok := strippedByName[f.Name]; ok {
 			stripped.Files[i].Data = b
@@ -1182,7 +1181,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	// Report the failure (unless already annotated with a skip).
 	if !hasSkip {
 		t.Errorf("path %s: %v", path, cmpErr)
-		logHint(t, pa.guidance)
+		logHint(t, pa.hint)
 	}
 }
 
@@ -1213,7 +1212,7 @@ func (r *inlineRunner) runLeqInline(t testing.TB, path cue.Path, val cue.Value, 
 		t.Errorf("path %s: @test(leq, ...): cannot compile constraint: %v", path, constraint.Err())
 		return
 	}
-	r.runLeqAssertion(t, path, val, constraint, pa.guidance)
+	r.runLeqAssertion(t, path, val, constraint, pa.hint)
 }
 
 // runLeqAssertion asserts that val is subsumed by constraint (constraint ⊑ val, i.e. val is at least as specific).
@@ -1249,7 +1248,7 @@ func (r *inlineRunner) runKindAssertion(t testing.TB, path cue.Path, val cue.Val
 	}
 	if gotKind != expectedKind {
 		t.Errorf("path %s: @test(kind=%s): got kind %v, want %v", path, expectedStr, gotKind, expectedKind)
-		logHint(t, pa.guidance)
+		logHint(t, pa.hint)
 	}
 }
 
@@ -1293,7 +1292,7 @@ func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.V
 	got := val.IsClosed()
 	if got != expected {
 		t.Errorf("path %s: @test(closed): got closed=%v, want %v", path, got, expected)
-		logHint(t, pa.guidance)
+		logHint(t, pa.hint)
 	}
 }
 
@@ -1324,7 +1323,7 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 	}
 	if !match {
 		t.Errorf("path %s: @test(debugCheck) mismatch:\ngot:  %q\nwant: %q", path, actual, expected)
-		logHint(t, pa.guidance)
+		logHint(t, pa.hint)
 	}
 }
 

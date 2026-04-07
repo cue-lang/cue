@@ -4,7 +4,7 @@ a: #A
 a: c: 1 @test(err, code=eval,
 		contains="field not allowed",
 		pos=[in.cue:2:4],
-		guidance="more positions may be allowed, see out/todo.txt for details")
+		hint="more positions may be allowed, see out/todo.txt for details")
 #A: {} @test(eq, {})
 -- out/errors.txt --
 [eval] a.c: field not allowed:

@@ -669,23 +669,23 @@ func TestGuidanceFlag(t *testing.T) {
 		return parseTestAttr(field.Attrs[0])
 	}
 
-	t.Run("guidance= is parsed into pa.guidance", func(t *testing.T) {
-		pa, err := parseAttr(`x: 1 @test(eq, 42, guidance="fix the evaluator")`)
+	t.Run("hint= is parsed into pa.hint", func(t *testing.T) {
+		pa, err := parseAttr(`x: 1 @test(eq, 42, hint="fix the evaluator")`)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if pa.guidance != "fix the evaluator" {
-			t.Errorf("got guidance=%q, want %q", pa.guidance, "fix the evaluator")
+		if pa.hint != "fix the evaluator" {
+			t.Errorf("got hint=%q, want %q", pa.hint, "fix the evaluator")
 		}
 	})
 
-	t.Run("guidance= works on err directive", func(t *testing.T) {
-		pa, err := parseAttr(`x: 1 @test(err, code=eval, guidance="check the cycle")`)
+	t.Run("hint= works on err directive", func(t *testing.T) {
+		pa, err := parseAttr(`x: 1 @test(err, code=eval, hint="check the cycle")`)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if pa.guidance != "check the cycle" {
-			t.Errorf("got guidance=%q, want %q", pa.guidance, "check the cycle")
+		if pa.hint != "check the cycle" {
+			t.Errorf("got hint=%q, want %q", pa.hint, "check the cycle")
 		}
 	})
 
@@ -703,13 +703,13 @@ func TestGuidanceFlag(t *testing.T) {
 		}
 	})
 
-	t.Run("no guidance= gives empty guidance", func(t *testing.T) {
+	t.Run("no hint= gives empty hint", func(t *testing.T) {
 		pa, err := parseAttr(`x: 1 @test(eq, 42)`)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if pa.guidance != "" {
-			t.Errorf("expected empty guidance, got %q", pa.guidance)
+		if pa.hint != "" {
+			t.Errorf("expected empty hint, got %q", pa.hint)
 		}
 	})
 }

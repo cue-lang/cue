@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0a3d9a90_0b1bca6c",
+        "filename": "cue/testdata/eval/issue2649.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:16:40Z",
+      "side": 1,
+      "message": "Describe GH issue 2649 and verify that this tests correctly captures the issue.",
+      "revId": "891ef8ed8210dd59fa5e27c966c61a46ab29b80d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8f93df29_bd908cb1",
         "filename": "cue/testdata/eval/issue2649.txtar",
         "patchSetId": 5

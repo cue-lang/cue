@@ -16,6 +16,24 @@
       "message": "should this use the test TODO feature?",
       "revId": "891ef8ed8210dd59fa5e27c966c61a46ab29b80d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19995b63_d740c6b6",
+        "filename": "cue/testdata/eval/issue2649.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:07:30Z",
+      "side": 1,
+      "message": "I deliberately left it a comment, as I\u0027m honestly not sure what the answer should be. a @test(todo) signals that we _know_ it is wrong and should be the indicated alternative.",
+      "parentUuid": "8f93df29_bd908cb1",
+      "revId": "891ef8ed8210dd59fa5e27c966c61a46ab29b80d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

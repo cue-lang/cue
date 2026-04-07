@@ -2726,6 +2726,8 @@ OtherwiseClause     = ( "else" | "otherwise" ) StructLit .
 ```
 
 ```cue
+@experiment(try)
+
 a: [1, 2, 3, 4]
 b: [for x in a if x > 1 { x+1 }]  // [3, 4, 5]
 
@@ -2756,8 +2758,7 @@ i: {
 }
 j: { otherwiseField: 10 }
 
-// try clause examples (requires @experiment(try))
-@experiment(try)
+// try clause examples
 
 // struct form: include fields only if optional references resolve
 k: {

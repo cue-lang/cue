@@ -16,6 +16,24 @@
       "message": "another title that got split in two? what part of the AI workflow is causing this?",
       "revId": "ed6251a847280e99c0dc5e755f7320e64b68ee07",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "869b9d77_7bfc41c7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:08:00Z",
+      "side": 1,
+      "message": "Bad guidance on my part, I think. It would wrap long sentences, then I said the second line should be blank. Sigh.",
+      "parentUuid": "8f662997_70656008",
+      "revId": "ed6251a847280e99c0dc5e755f7320e64b68ee07",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

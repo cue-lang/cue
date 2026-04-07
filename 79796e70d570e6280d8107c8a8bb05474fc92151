@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13e808d2_5974fc48",
+        "filename": "CLAUDE.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-07T13:56:46Z",
+      "side": 1,
+      "message": "the body should actually wrap at 72 characters. this is the default for Gerrit, and also what Go encourages: https://go.dev/wiki/CommitMessage",
+      "revId": "79796e70d570e6280d8107c8a8bb05474fc92151",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ee39a2d_7c87ef71",
+        "filename": "CLAUDE.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-07T13:56:46Z",
+      "side": 1,
+      "message": "I\u0027d caveat that the package prefix can be dropped when the change isn\u0027t centered around one or few related packages.",
+      "revId": "79796e70d570e6280d8107c8a8bb05474fc92151",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

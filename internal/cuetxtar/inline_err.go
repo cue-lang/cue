@@ -156,6 +156,8 @@ func parseErrArgs(a internal.Attr) (errArgs, error) {
 			ea.msgArgs = args
 		case kv.Key() == "hint":
 			// hint= is a universal flag handled at the parsedTestAttr level; skip here.
+		case kv.Key() == "p":
+			// p= is a universal priority flag handled at the parsedTestAttr level; skip here.
 		case kv.Key() == "":
 			// Positional arg (e.g. "any"); already handled above.
 		default:
@@ -290,6 +292,24 @@ func (r *inlineRunner) matchesErrSpec(act cueerrors.Error, ea *errArgs, baseLine
 // runErrAssertion checks that an error is present at val, applying sub-options.
 func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
+	// @test(err:todo, ...) — expected-to-fail form.
+	// Failures are logged but not reported as test errors; a pass emits a warning.
+	if pa.isTodo {
+		suffix := ""
+		if pa.todoPriority != "" {
+			suffix = fmt.Sprintf(" p=%s", pa.todoPriority)
+		}
+		cap := &failCapture{TB: t}
+		pa2 := pa
+		pa2.isTodo = false
+		r.runErrAssertion(cap, path, val, pa2)
+		if cap.failed {
+			t.Logf("TODO err:todo (still failing)%s: %s\n%s", suffix, path, cap.msgs.String())
+		} else {
+			t.Logf("WARNING: TODO err:todo now passes for %s — consider upgrading to @test(err, ...)", path)
+		}
+		return
+	}
 	ea := pa.errArgs
 	if ea == nil {
 		// Bare @test(err) — just check that the value is an error.

@@ -511,6 +511,93 @@ v: {a: struct.MaxFields(2) & {}}.a
 
 ---
 
+### Requirement: `err:todo` — expected-future-error
+The version-qualifier slot of the `err` directive MAY carry the token `todo` instead of a real version identifier. `@test(err:todo, ...)` marks an error assertion as expected-to-fail — useful when a field is *known not to produce an error yet*, but is expected to once a bug is fixed. It differs from `@test(err, ...)` as follows:
+
+- `@test(err:todo, ...)` runs regardless of the current evaluator version.
+- A mismatch (field does not produce the expected error) is **not** a test failure — it is logged as "still failing".
+- A **match** (field now produces the expected error) emits a WARNING that the `:todo` may be upgraded to a plain `@test(err, ...)`.
+
+`@test(err:todo, ...)` is additive: it does NOT replace any `@test(err, ...)` on the same field. Both run independently.
+
+```cue
+// Field currently evaluates to 42 (no error), but is expected to fail
+// once the evaluator enforces the constraint.
+x: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)
+```
+
+#### Scenario: err:todo still failing — not an error
+- **WHEN** a field carries `@test(err:todo, code=eval)` and the field does not currently produce an eval error
+- **THEN** the test does NOT fail; the runner logs "TODO err:todo still failing" with details
+
+#### Scenario: err:todo now passes — warning emitted
+- **WHEN** a field carries `@test(err:todo, code=eval)` and the field now produces the expected eval error
+- **THEN** the runner logs a WARNING that the annotation may be upgraded to `@test(err, code=eval)`
+
+#### Scenario: err:todo and err coexist
+- **WHEN** a field carries both `@test(err, code=incomplete)` (passing) and `@test(err:todo, code=eval)`
+- **THEN** `@test(err, code=incomplete)` runs normally; `@test(err:todo, code=eval)` runs as expected-to-fail; both are independent
+
+---
+
+### Requirement: `incorrect` universal modifier
+Any assertion directive (`eq`, `err`, `leq`, `kind`, `closed`, etc.) MAY carry `incorrect` as a positional flag. This marks the assertion as documenting the current *known-incorrect* behavior of the field — that is, the value or property the evaluator currently produces even though it is wrong.
+
+Behavior when the assertion runs:
+- **If the assertion passes** (the documented incorrect value still matches): the test does NOT fail; the runner logs `NOTE: ... matches (documented as known incorrect behavior)`.
+- **If the assertion fails** (the behavior has changed): the test **DOES FAIL**. Any change to the incorrect value needs attention — it may be a welcome fix or a new regression.
+
+The typical usage is to pair `incorrect` with a `:todo` counterpart that documents the expected correct behavior:
+
+```cue
+// Documents that the field currently produces 42 (wrong), and that it
+// should eventually produce an error.
+x: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)
+```
+
+#### Scenario: incorrect passes — note logged
+- **WHEN** a field carries `@test(eq, 42, incorrect)` and evaluates to `42`
+- **THEN** the test does NOT fail; the runner logs a NOTE that the known-incorrect behavior is still present
+
+#### Scenario: incorrect fails — test fails
+- **WHEN** a field carries `@test(eq, 42, incorrect)` and evaluates to `43`
+- **THEN** the test **FAILS** — a change to the incorrect value needs attention (may be a fix or a new regression)
+
+#### Scenario: incorrect applies to err directive — passes
+- **WHEN** a field carries `@test(err, code=eval, incorrect)` and the field is an eval error
+- **THEN** the test does NOT fail; the runner logs a NOTE that the documented incorrect error behavior is still present
+
+#### Scenario: incorrect applies to err directive — fails
+- **WHEN** a field carries `@test(err, code=eval, incorrect)` and the field does NOT produce an eval error
+- **THEN** the test **FAILS** — the behavior changed and needs attention
+
+#### Scenario: incorrect does not affect isTodo
+- **WHEN** a field carries `@test(eq:todo, 99)` (no `incorrect`): normal `:todo` logging applies
+- **THEN** the `:todo` semantics are unaffected by `incorrect` (which is only checked on the outer directive)
+
+---
+
+### Requirement: `p=N` universal priority modifier
+Any `:todo` directive (`eq:todo`, `err:todo`, `@test(todo)`, etc.) MAY carry a `p=N` key-value argument that indicates fix priority. `p=0` is critical (must fix immediately), `p=1` is important (fix soon), `p=2` is good to have (fix when convenient). Higher integers indicate lower urgency.
+
+The priority is **purely informational** — it is shown in log output but has no effect on pass/fail behavior.
+
+```cue
+x: 42 @test(eq:todo, 99, p=1)
+x: 1/0 @test(err:todo, p=0, code=eval)
+result: bad @test(eq, bad) @test(todo, p=2, why="low-priority cleanup")
+```
+
+#### Scenario: p=N appears in log output
+- **WHEN** a field carries `@test(err:todo, p=1, code=eval)` and the assertion is still failing
+- **THEN** the runner logs the failure with `p=1` included in the message
+
+#### Scenario: p=N has no effect on pass/fail
+- **WHEN** a field carries `@test(eq:todo, 99, p=0)` and the assertion is still failing
+- **THEN** the test does NOT fail regardless of the priority value; `p=0` only affects log formatting
+
+---
+
 ### Requirement: `desc` directive
 The `desc` directive is a human-readable description annotation with no assertion semantics. It SHALL be silently accepted and ignored during test evaluation. Its only purpose is to document the intent of a test case in the source file.
 

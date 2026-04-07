@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba0a0aa4_e9b7153d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-07T13:58:00Z",
+      "side": 1,
+      "message": "this is again badly wrapped",
+      "revId": "7987708980bdc5b35de04a07c2423f544769ef82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c893ab84_c48d6059",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-07T13:58:00Z",
+      "side": 1,
+      "message": "per my earlier review, wrapping at 50 just makes the whole text hard to read, as you can barely fit four or five words per line. 72 is a lot more readable.",
+      "revId": "7987708980bdc5b35de04a07c2423f544769ef82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

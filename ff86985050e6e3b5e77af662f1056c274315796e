@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d62f6e7_dd102366",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-07T15:25:37Z",
+      "side": 1,
+      "message": "I\u0027m a little concerned that this could result in very wordy error messages when we\u0027re matching against large struct definitions, but let\u0027s try it for now and see how things go.",
+      "revId": "ff86985050e6e3b5e77af662f1056c274315796e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "650a5e7b_e204b002",
+        "filename": "cue/testdata/eval/cycles_ref.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T10:34:39Z",
+      "side": 1,
+      "message": "Done. Added a `#todo:inline:` header comment noting that `@test(shareID)` assertions should be added once the evaluator correctly shares structure for the cyclic reference fields.",
+      "parentUuid": "76d203f1_7c517902",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1020f9d1_7e834f18",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-07T09:26:05Z",
       "side": 1,
       "message": "Describe GH issue the filename refers to and verify that this tests correctly captures the issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f514cce3_74d04360",
+        "filename": "cue/testdata/eval/issue285.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T10:34:39Z",
+      "side": 1,
+      "message": "Done. Added a header comment describing the issue (Fill() failing with \"field not allowed\" for inherited nested pattern constraints) with a link to https://cuelang.org/issue/285.",
+      "parentUuid": "1020f9d1_7e834f18",
       "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb1f9928_c5ba222c",
+        "filename": "cue/testdata/eval/issue295.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T10:34:39Z",
+      "side": 1,
+      "message": "Done. Added a header comment describing the issue (closed struct with interpolated dynamic key `\"\\(\"f\")\"` rejected a matching regular field) with a link to https://cuelang.org/issue/295.",
+      "parentUuid": "ada45e55_0fc57010",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf1b7037_44e983fd",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-07T09:26:05Z",
       "side": 1,
       "message": "Describe GH issue the filename refers to and verify that this tests correctly captures the issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2daaf706_c32e1c92",
+        "filename": "cue/testdata/eval/issue349.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T10:34:39Z",
+      "side": 1,
+      "message": "Done. Added a header comment describing the issue (fields whose names overlap with built-in identifiers were reordered to the front during eval) with a link to https://cuelang.org/issue/349.",
+      "parentUuid": "cf1b7037_44e983fd",
       "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "55dbe71c_0d9e0aaf",
+        "filename": "cue/testdata/eval/issue3813.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T10:34:39Z",
+      "side": 1,
+      "message": "Done. Added a header comment describing the issue (evalv3 incorrectly reported \"field not allowed\" for a struct opened via `[string]: _` then unified with a definition) with a link to https://cuelang.org/issue/3813.",
+      "parentUuid": "ec7eef6a_e55e0a43",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "693eb421_fd93cbdb",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-04-07T09:26:05Z",
       "side": 1,
       "message": "Describe GH issue the filename refers to and verify that this tests correctly captures the issue. Here and for other files.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95818e78_6d744c51",
+        "filename": "cue/testdata/eval/issue962.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T10:34:39Z",
+      "side": 1,
+      "message": "Done. Added a header comment describing the issue (indirect reference through a hidden field to a dynamic index caused \"cycle error\" instead of \"invalid non-ground value\") with a link to https://cuelang.org/issue/962.",
+      "parentUuid": "693eb421_fd93cbdb",
       "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f60199e5_4e7db839",
+        "filename": "cue/testdata/references/alias_err.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T10:34:39Z",
+      "side": 1,
+      "message": "Done. Added a CUE comment above the issue2527 block in both old.cue and new.cue describing the essence (self-referential alias in key caused a panic).",
+      "parentUuid": "aef1f1c9_a20e9fa3",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a27f5840_58ed930d",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-04-07T09:26:05Z",
       "side": 1,
       "message": "Add comment describing essence of issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d073609_57cd7153",
+        "filename": "cue/testdata/references/alias_err.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T10:34:39Z",
+      "side": 1,
+      "message": "Done. Added a CUE comment above the issue2094 block in both old.cue and new.cue describing the essence (alias to a dynamic-key field declared later caused a panic due to ordering).",
+      "parentUuid": "a27f5840_58ed930d",
       "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

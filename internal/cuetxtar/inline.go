@@ -1177,9 +1177,8 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 // When CUE_UPDATE modes are active it enqueues the appropriate write-back
 // instead of (or in addition to) running the comparison:
 //   - empty placeholder @test(eq): fill with actual value (UpdateGoldenFiles)
-//   - passing assertion with skip+diff: remove stale skip (UpdateGoldenFiles)
-//   - failing assertion: force-overwrite (ForceUpdateGoldenFiles) or
-//     regression-guard with skip:<ver>+diff annotation (UpdateGoldenFiles)
+//   - passing assertion with stale skip: remove the skip (UpdateGoldenFiles)
+//   - failing assertion: overwrite with actual value (ForceUpdateGoldenFiles)
 func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	// @test(eq:todo, X) — expected-to-fail form.
@@ -1216,15 +1215,15 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		return
 	}
 
-	// Detect stale-skip: a prior CUE_UPDATE=force annotated this attr with
-	// skip:<ver> to mark a known discrepancy.
+	// Detect stale-skip: an existing skip:<ver> positional arg on this attr
+	// marks a known discrepancy recorded by a prior manual annotation.
 	_, hasSkip := attrHasSkip(pa.raw)
 
 	cmpErr := (&cmpCtx{baseLine: 0}).astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {
 		// Assertion passes via AST comparison.
 		if hasSkip && cuetest.UpdateGoldenFiles {
-			// Stale-skip cleanup: the assertion now passes; strip skip,
+			// Stale-skip cleanup: the assertion now passes; strip the skip,
 			// restoring the plain @test(eq, <expr>).
 			r.enqueueInlineFill(pa, "@test(eq, "+exprStr+")")
 		}
@@ -1233,13 +1232,8 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 
 	// Comparison failed — genuine mismatch.
 	if cuetest.ForceUpdateGoldenFiles {
-		// CUE_UPDATE=force: annotate with skip:<ver> so the test keeps passing
-		// while the discrepancy is tracked, without silently overwriting.
-		ver := r.versionName()
-		if ver == "" {
-			ver = "unknown"
-		}
-		r.enqueueInlineFill(pa, fmt.Sprintf(`@test(eq, %s, skip:%s)`, exprStr, ver))
+		// CUE_UPDATE=force: overwrite the assertion with the actual value.
+		r.enqueueInlineFill(pa, r.formatCoverAttr(val))
 		return
 	}
 	// Report the failure (unless already annotated with a skip).
@@ -1250,8 +1244,14 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 }
 
 // formatValue returns a human-readable CUE string for a value.
+// Routes through the Vertex export path (via cue.Final()) to avoid internal
+// _#def wrapping, then re-enables optional fields (value?: T) so the
+// formatted expression round-trips through astCmp.
 func (r *inlineRunner) formatValue(v cue.Value) string {
-	syn := v.Syntax(cue.All(), cue.Docs(true), cue.Final())
+	// cue.Final() routes to Vertex() export (no _#def wrapping) and sets
+	// omitOptional=true.  cue.Optional(true) applied afterwards re-enables
+	// optional fields, giving us the complete value without internals.
+	syn := v.Syntax(cue.Docs(true), cue.Final(), cue.Optional(true))
 	if syn == nil {
 		return fmt.Sprintf("%v", v)
 	}

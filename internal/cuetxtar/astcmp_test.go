@@ -454,20 +454,144 @@ func TestAstCompare_Bounds(t *testing.T) {
 }
 
 func TestAstCompare_PatternConstraints(t *testing.T) {
-	ctx := cuecontext.New()
+	tests := []struct {
+		name    string
+		expr    string
+		val     string
+		wantErr string
+	}{
+		// ── positive: type patterns ───────────────────────────────────────────
+		{
+			name: "string pattern matches string pattern",
+			expr: `{[string]: int}`,
+			val:  `{[string]: int}`,
+		},
+		{
+			name: "regex pattern matches regex pattern",
+			expr: `{[=~"foo"]: string}`,
+			val:  `{[=~"foo"]: string}`,
+		},
+		{
+			name: "pattern with regular field",
+			expr: `{[string]: int, a: 1}`,
+			val:  `{[string]: int, a: 1}`,
+		},
+		{
+			// Concrete key pattern [\"key\"]: value — the pattern label is the
+			// specific string "key". This is the case that the label-comparison
+			// fix targets: the value must be keyed on "key", not any other string.
+			name: "concrete key pattern matches same key",
+			expr: `{["key"]: "key"}`,
+			val:  `{["key"]: "key"}`,
+		},
 
-	t.Run("simple pattern", func(t *testing.T) {
-		// {[string]: int} with a concrete field.
-		val := ctx.CompileString(`{[string]: int, a: 1}`)
-		if err := val.Err(); err != nil {
-			t.Fatal(err)
-		}
-		expr := parseExpr(t, `{[string]: int, a: 1}`)
-		err := astCompare(expr, val)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-	})
+		// ── negative: wrong pattern label ─────────────────────────────────────
+
+		// This is the primary regression test for the pattern-label fix: before
+		// the fix, the label was not checked, so ["foo"]: "key" would silently
+		// pass against a value that had ["key"]: "key" because the VALUE "key"
+		// happened to match. The fix ensures the LABEL is also compared.
+		{
+			name:    "concrete key wrong: foo vs key",
+			expr:    `{["foo"]: "key"}`,
+			val:     `{["key"]: "key"}`,
+			wantErr: `pattern constraint "foo" not found in value`,
+		},
+		{
+			name:    "concrete key wrong: key vs other",
+			expr:    `{["key"]: "key"}`,
+			val:     `{["other"]: "key"}`,
+			wantErr: `pattern constraint "key" not found in value`,
+		},
+		{
+			// string type expected but value has a regex pattern.
+			name:    "string vs regex label mismatch",
+			expr:    `{[string]: int}`,
+			val:     `{[=~"foo"]: int}`,
+			wantErr: `pattern constraint string not found in value`,
+		},
+		{
+			// regex expected but value has a different regex.
+			name:    "wrong regex label",
+			expr:    `{[=~"bar"]: int}`,
+			val:     `{[=~"foo"]: int}`,
+			wantErr: `pattern constraint =~"bar" not found in value`,
+		},
+
+		// ── negative: wrong pattern value ─────────────────────────────────────
+		{
+			name:    "pattern label matches but value type differs",
+			expr:    `{[string]: int}`,
+			val:     `{[string]: string}`,
+			wantErr: `incompatible pattern value`,
+		},
+		{
+			name:    "concrete key label matches but value differs",
+			expr:    `{["key"]: "expected"}`,
+			val:     `{["key"]: "actual"}`,
+			wantErr: `incompatible pattern value`,
+		},
+
+		// ── positive: multiple distinct patterns, order-independent ──────────
+		{
+			// Two distinct pattern labels: order in expected must not matter.
+			name: "two patterns same order",
+			expr: `{[string]: int, [=~"foo"]: string}`,
+			val:  `{[string]: int, [=~"foo"]: string}`,
+		},
+		{
+			// Expected lists patterns in reverse order relative to value:
+			// matching must still succeed.
+			name: "two patterns reversed order",
+			expr: `{[=~"foo"]: string, [string]: int}`,
+			val:  `{[string]: int, [=~"foo"]: string}`,
+		},
+
+		// ── positive: duplicate pattern labels unify in the evaluated value ──
+		//
+		// In CUE, two pattern constraints with the same label (e.g. [string]:
+		// int and [string]: >=0) are unified during evaluation into a single
+		// pattern ([string]: int & >=0). The @test(eq) expected expression
+		// must reflect the unified result — one pattern, not two.
+		{
+			name: "duplicate pattern labels unify: test has one pattern",
+			expr: `{[string]: int & >=0}`,
+			// CUE unifies both [string] patterns into one.
+			val: `{[string]: int, [string]: >=0}`,
+		},
+		{
+			// When the expected expr lists two patterns with the same label
+			// but the value has only one (unified), the count check fails.
+			name:    "duplicate pattern labels: test with two fails count check",
+			expr:    `{[string]: int, [string]: >=0}`,
+			val:     `{[string]: int, [string]: >=0}`,
+			wantErr: `expected 2 pattern constraint(s), got 1`,
+		},
+
+		// ── negative: pattern count mismatch ─────────────────────────────────
+		{
+			name:    "pattern expected but value has none",
+			expr:    `{[string]: int}`,
+			val:     `{}`,
+			wantErr: `expected 1 pattern constraint(s), got 0`,
+		},
+		{
+			// When the expected struct lists no patterns, any patterns present
+			// in the value are ignored (the expected is a partial spec).
+			name: "no pattern expected: value patterns silently ignored",
+			expr: `{}`,
+			val:  `{[string]: int}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expr := parseExpr(t, tt.expr)
+			val := compileVal(t, tt.val)
+			err := astCompare(expr, val)
+			checkErr(t, err, tt.wantErr)
+		})
+	}
 }
 
 func TestAstCompare_Complex(t *testing.T) {

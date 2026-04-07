@@ -9,7 +9,7 @@ package p
 import "foo.test/bar/imported"
 
 out: [string]: imported.#Foo
-@test(eq, { out: [_]: {bar?: foo?: _ @test(ignore)} })
+@test(eq, { out: [string]: {bar?: foo?: _ @test(ignore)} })
 -- imported/imported.cue --
 package imported
 

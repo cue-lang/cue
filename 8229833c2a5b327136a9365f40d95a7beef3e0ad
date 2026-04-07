@@ -18,6 +18,41 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4cebd05_b390c9a6",
+        "filename": "cue/testdata/eval/issue1640.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:39:07Z",
+      "side": 1,
+      "message": "Done. Removed trailing whitespace.",
+      "parentUuid": "782fdbc3_51e33c11",
+      "revId": "8229833c2a5b327136a9365f40d95a7beef3e0ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b253cc5_fad54a7c",
+        "filename": "cue/testdata/eval/issue2337.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:39:07Z",
+      "side": 1,
+      "message": "Add back newline and describe issue 2473",
+      "revId": "8229833c2a5b327136a9365f40d95a7beef3e0ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d44b4d1a_a0165b1d",
@@ -31,6 +66,24 @@
       "writtenOn": "2026-04-07T07:29:11Z",
       "side": 1,
       "message": "should we convert existing TODOs, be it from headers or from `-- todo/... --` txtar entries, to the new test todo annotations?",
+      "revId": "8229833c2a5b327136a9365f40d95a7beef3e0ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19b082f8_460901c3",
+        "filename": "cue/testdata/eval/merge.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:39:07Z",
+      "side": 1,
+      "message": "Done. Converted the bare `TODO:` header lines to `#`-prefixed comments (the standard txtar header format). The in-source `// TODO: allow` comment remains since it annotates commented-out code that cannot be directly expressed as a `@test` assertion.",
+      "parentUuid": "d44b4d1a_a0165b1d",
       "revId": "8229833c2a5b327136a9365f40d95a7beef3e0ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

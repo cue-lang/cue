@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fd0e91a_52dbce3d",
+        "filename": "internal/cuetxtar/inline_err.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-07T07:22:09Z",
+      "side": 1,
+      "message": "this hardening seems fine, but it should be explained in the commit message",
+      "revId": "5feb8dac3f086de3bf3725767fb17cf897433b08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

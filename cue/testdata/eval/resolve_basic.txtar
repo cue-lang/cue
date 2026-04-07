@@ -3,7 +3,7 @@ a: 1     @test(eq, 1)
 b: a + 1 @test(eq, 2)
 d: {
 	x: _
-	y: b + x @test(err, code=incomplete, constains="non-concrete value", pos=[0:5, -1:5])
+	y: b + x @test(err, code=incomplete, contains="non-concrete value", pos=[0:5, -1:5])
 }
 e: d & {
 	x: 5

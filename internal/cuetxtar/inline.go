@@ -304,6 +304,10 @@ type attrRecord struct {
 	// parsed is the parsed directive from this attribute.
 	parsed parsedTestAttr
 
+	// parseErr is non-nil when parseTestAttr failed. The runner reports the
+	// error as a test failure and skips running the directive.
+	parseErr error
+
 	// fileLevel is true when this record comes from a file-level (top-level)
 	// decl attribute rather than a field attribute or struct-level decl attribute.
 	// A file-level @test(eq, VALUE) checks the entire file's evaluated value.
@@ -338,6 +342,19 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 	// output.
 	extraNewlines := 0
 
+	// appendErrRecord records a @test attribute whose parseTestAttr call failed.
+	// The runner reports all parseErr records as test failures before running
+	// any assertions.
+	appendErrRecord := func(attr *ast.Attribute, path cue.Path, isDeclAttr, fileLevel bool, err error) {
+		records = append(records, attrRecord{
+			path:       path,
+			parsed:     parsedTestAttr{srcAttr: attr, srcFileName: fileName},
+			parseErr:   err,
+			isDeclAttr: isDeclAttr,
+			fileLevel:  fileLevel,
+		})
+	}
+
 	// walkField strips @test field attrs from field, records them, then recurses
 	// into the field's struct value (if any).
 	var walkField func(field *ast.Field, path cue.Path)
@@ -360,8 +377,7 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 			}
 			pa, err := parseTestAttr(a)
 			if err != nil {
-				// Keep on parse error; runner will report it.
-				keep = append(keep, a)
+				appendErrRecord(a, path, false, false, err)
 				continue
 			}
 			pa.baseLine = fieldBaseLine
@@ -399,7 +415,7 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 				}
 				pa, err := parseTestAttr(e)
 				if err != nil {
-					newElts = append(newElts, elt)
+					appendErrRecord(e, path, true, false, err)
 					continue
 				}
 				pa.baseLine = structBaseLine
@@ -436,7 +452,9 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 			if k == "test" {
 				pa, err := parseTestAttr(a)
 				if err != nil {
-					newDecls = append(newDecls, decl)
+					// Record the error so the runner can report it; strip
+					// the attribute from the file (do not add to newDecls).
+					appendErrRecord(a, cue.Path{}, false, true, err)
 					continue
 				}
 				pa.baseLine = a.Pos().Line() - extraNewlines
@@ -672,10 +690,18 @@ func (r *inlineRunner) runArchive() {
 		return
 	}
 
+	// Report any parse errors collected during attribute extraction.
+	// An invalid @test attribute is always a test failure.
+	for _, rec := range allRecords {
+		if rec.parseErr != nil {
+			r.t.Errorf("@test parse error at %s: %v", rec.parsed.srcAttr.Pos(), rec.parseErr)
+		}
+	}
+
 	// Collect file-level records (decl @test attrs at file scope).
 	var fileLevelRecords []attrRecord
 	for _, rec := range allRecords {
-		if rec.fileLevel {
+		if rec.fileLevel && rec.parseErr == nil {
 			fileLevelRecords = append(fileLevelRecords, rec)
 		}
 	}
@@ -685,8 +711,8 @@ func (r *inlineRunner) runArchive() {
 	// Fields with no @test attributes are silently skipped (fixture fields).
 	rootNames := make(map[cue.Selector]bool)
 	for _, rec := range allRecords {
-		if rec.fileLevel {
-			continue // file-level records are handled separately
+		if rec.fileLevel || rec.parseErr != nil {
+			continue // file-level and error records are handled separately
 		}
 		sels := rec.path.Selectors()
 		if len(sels) == 0 {
@@ -990,7 +1016,7 @@ func selectActiveDirectives(records []attrRecord, path cue.Path, version string)
 	// additive (they do not replace unversioned directives of the same name).
 	var todoDirectives []parsedTestAttr
 	for _, rec := range records {
-		if rec.path.String() != path.String() {
+		if rec.parseErr != nil || rec.path.String() != path.String() {
 			continue
 		}
 		pa := rec.parsed

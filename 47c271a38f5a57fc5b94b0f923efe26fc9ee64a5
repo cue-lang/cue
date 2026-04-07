@@ -52,6 +52,24 @@
       "parentUuid": "e8a4f4ea_b4538605",
       "revId": "47c271a38f5a57fc5b94b0f923efe26fc9ee64a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35eea462_fc4d184f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T13:39:57Z",
+      "side": 1,
+      "message": "with the obvious corrections. (s/BytesKind/StringKind/ for instance)",
+      "parentUuid": "c3f1fe02_53599dac",
+      "revId": "47c271a38f5a57fc5b94b0f923efe26fc9ee64a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

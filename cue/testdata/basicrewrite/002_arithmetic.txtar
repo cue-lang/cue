@@ -44,13 +44,13 @@ e8: mod(1.0, 1) @test(err, code=eval, contains="cannot use", pos=[0:9])
     ./in.cue:23:5
     ./in.cue:23:9
 [eval] e5: cannot use 1.0 (type float) as int in argument 1 to div:
-    ./in.cue:29:9
+    ./in.cue:24:9
 [eval] e6: cannot use 2.0 (type float) as int in argument 2 to rem:
-    ./in.cue:30:12
+    ./in.cue:25:12
 [eval] e7: cannot use 2.0 (type float) as int in argument 2 to quo:
-    ./in.cue:31:12
+    ./in.cue:26:12
 [eval] e8: cannot use 1.0 (type float) as int in argument 1 to mod:
-    ./in.cue:32:9
+    ./in.cue:27:9
 -- out/eval/stats --
 Leaks:  0
 Freed:  24

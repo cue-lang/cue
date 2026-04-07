@@ -81,19 +81,18 @@ structs: {
 }
 
 -- out/eval/stats --
-Leaks:  11
-Freed:  89
-Reused: 85
-Allocs: 15
-Retain: 26
+Leaks:  14
+Freed:  95
+Reused: 72
+Allocs: 37
+Retain: 0
 
-Unifications: 100
-Conjuncts:    134
-Disjuncts:    105
+Unifications: 105
+Conjuncts:    149
+Disjuncts:    0
+Notifications: 1
 
-MisalignedConjunct: 2
-
-NumCloseIDs: 13
+NumCloseIDs: 29
 -- out/evalalpha --
 (struct){
   xc: (#struct){

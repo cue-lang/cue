@@ -31,7 +31,7 @@ noOpt: true
     })
   }
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  0
 Freed:  12
 Reused: 2
@@ -43,35 +43,6 @@ Conjuncts:    19
 Disjuncts:    2
 
 NumCloseIDs: 3
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
- Leaks:  0
- Freed:  12
--Reused: 3
--Allocs: 9
-+Reused: 2
-+Allocs: 10
- Retain: 0
- 
- Unifications: 10
- Conjuncts:    19
--Disjuncts:    12
-+Disjuncts:    2
-+
-+NumCloseIDs: 3
--- out/eval/stats --
-Leaks:  0
-Freed:  12
-Reused: 3
-Allocs: 9
-Retain: 0
-
-Unifications: 10
-Conjuncts:    19
-Disjuncts:    12
 -- out/evalalpha --
 (struct){
   #And: (#struct){

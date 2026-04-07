@@ -25,14 +25,16 @@ package x
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  20
-Reused: 14
-Allocs: 6
-Retain: 2
+Freed:  21
+Reused: 8
+Allocs: 13
+Retain: 0
 
-Unifications: 18
-Conjuncts:    31
-Disjuncts:    22
+Unifications: 17
+Conjuncts:    30
+Disjuncts:    2
+
+NumCloseIDs: 4
 -- out/evalalpha --
 (struct){
   #a: (#struct){ |((#struct){

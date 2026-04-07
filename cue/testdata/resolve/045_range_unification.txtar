@@ -89,13 +89,13 @@ n5: >=1 & <=5 & 2.5
 -- out/eval/stats --
 Leaks:  0
 Freed:  36
-Reused: 34
-Allocs: 2
+Reused: 0
+Allocs: 36
 Retain: 0
 
 Unifications: 36
 Conjuncts:    120
-Disjuncts:    36
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 c3: conflicting values string and >=1 (mismatched types string and number):

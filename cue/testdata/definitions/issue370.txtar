@@ -22,13 +22,15 @@ c2: #C2 & {
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
-Reused: 8
-Allocs: 3
+Reused: 4
+Allocs: 7
 Retain: 0
 
 Unifications: 11
-Conjuncts:    27
-Disjuncts:    11
+Conjuncts:    25
+Disjuncts:    0
+
+NumCloseIDs: 12
 -- out/evalalpha --
 (struct){
   #C1: (#struct){

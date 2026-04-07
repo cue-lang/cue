@@ -54,7 +54,7 @@ ts: this={
 	}
 	timeSpan: start: this.#tasks.t1.timeSpan.start
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  0
 Freed:  45
 Reused: 22
@@ -66,41 +66,6 @@ Conjuncts:    119
 Disjuncts:    0
 
 NumCloseIDs: 13
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  2
--Freed:  49
--Reused: 39
--Allocs: 12
--Retain: 608
--
--Unifications: 51
--Conjuncts:    801
--Disjuncts:    73
-+Leaks:  0
-+Freed:  45
-+Reused: 22
-+Allocs: 23
-+Retain: 0
-+
-+Unifications: 45
-+Conjuncts:    119
-+Disjuncts:    0
-+
-+NumCloseIDs: 13
--- out/eval/stats --
-Leaks:  2
-Freed:  49
-Reused: 39
-Allocs: 12
-Retain: 608
-
-Unifications: 51
-Conjuncts:    801
-Disjuncts:    73
 -- out/evalalpha --
 Errors:
 ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):

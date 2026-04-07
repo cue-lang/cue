@@ -59,19 +59,17 @@ issue560: {
 	}
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  29
-Reused: 24
-Allocs: 6
-Retain: 1
+Leaks:  0
+Freed:  30
+Reused: 18
+Allocs: 12
+Retain: 0
 
 Unifications: 30
-Conjuncts:    38
-Disjuncts:    30
+Conjuncts:    37
+Disjuncts:    0
 
-MisalignedConjunct: 3
-
-NumCloseIDs: 5
+NumCloseIDs: 12
 -- out/evalalpha --
 (struct){
   dynamic: (struct){

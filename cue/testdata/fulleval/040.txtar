@@ -33,15 +33,17 @@ foo: #Task & {"op": "pull"}
   })
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  27
-Reused: 21
-Allocs: 6
+Leaks:  8
+Freed:  16
+Reused: 10
+Allocs: 14
 Retain: 0
 
-Unifications: 15
-Conjuncts:    35
-Disjuncts:    27
+Unifications: 14
+Conjuncts:    28
+Disjuncts:    8
+
+NumCloseIDs: 5
 -- out/evalalpha --
 (struct){
   #Task: (#struct){ |((#struct){

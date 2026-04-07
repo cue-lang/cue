@@ -42,15 +42,18 @@ issue3905: full: {
 	}
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  57
-Reused: 47
-Allocs: 13
-Retain: 26
+Leaks:  0
+Freed:  54
+Reused: 28
+Allocs: 26
+Retain: 0
 
-Unifications: 48
-Conjuncts:    93
-Disjuncts:    81
+Unifications: 42
+Conjuncts:    77
+Disjuncts:    10
+Notifications: 2
+
+NumCloseIDs: 13
 -- out/evalalpha --
 (struct){
   issue3905: (struct){

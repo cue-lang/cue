@@ -11,13 +11,16 @@ root: input: foo: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  13
-Reused: 4
-Allocs: 9
-Retain: 4
+Reused: 2
+Allocs: 11
+Retain: 0
 
 Unifications: 11
-Conjuncts:    20
-Disjuncts:    17
+Conjuncts:    21
+Disjuncts:    2
+Notifications: 1
+
+NumCloseIDs: 3
 -- out/evalalpha --
 (#struct){
   root: (#struct){

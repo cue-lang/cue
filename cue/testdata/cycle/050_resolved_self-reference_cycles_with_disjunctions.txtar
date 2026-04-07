@@ -25,15 +25,17 @@ c: a & {y: 3} | {z:     3} // {x:1,y:3,z:2} | {z:3}
   })
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  43
+Leaks:  6
+Freed:  46
 Reused: 32
-Allocs: 11
+Allocs: 20
 Retain: 0
 
-Unifications: 25
-Conjuncts:    64
-Disjuncts:    43
+Unifications: 16
+Conjuncts:    55
+Disjuncts:    18
+
+NumCloseIDs: 6
 -- out/evalalpha --
 (struct){
   a: (struct){ |((struct){

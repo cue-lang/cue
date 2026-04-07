@@ -44,15 +44,17 @@ import "list"
 	from: #c1
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  73
-Reused: 58
-Allocs: 15
-Retain: 7
+Leaks:  9
+Freed:  57
+Reused: 33
+Allocs: 33
+Retain: 0
 
-Unifications: 57
-Conjuncts:    138
-Disjuncts:    80
+Unifications: 50
+Conjuncts:    103
+Disjuncts:    12
+
+NumCloseIDs: 24
 -- out/evalalpha --
 (struct){
   #d1: (#struct){

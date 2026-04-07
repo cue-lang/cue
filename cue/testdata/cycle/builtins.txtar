@@ -285,7 +285,7 @@ issue3743: {
 	docs: [ (#transform & {in: "x"}).out ]
 	out: yaml.MarshalStream(docs)
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  48
 Freed:  464
 Reused: 433
@@ -298,42 +298,6 @@ Disjuncts:    30
 Notifications: 2
 
 NumCloseIDs: 191
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,12 @@
--Leaks:  25
--Freed:  446
--Reused: 434
--Allocs: 37
--Retain: 99
--
--Unifications: 441
--Conjuncts:    821
--Disjuncts:    537
-+Leaks:  48
-+Freed:  464
-+Reused: 433
-+Allocs: 79
-+Retain: 0
-+
-+Unifications: 430
-+Conjuncts:    759
-+Disjuncts:    30
-+Notifications: 2
-+
-+NumCloseIDs: 191
--- out/eval/stats --
-Leaks:  25
-Freed:  446
-Reused: 434
-Allocs: 37
-Retain: 99
-
-Unifications: 441
-Conjuncts:    821
-Disjuncts:    537
 -- out/evalalpha --
 Errors:
 0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:

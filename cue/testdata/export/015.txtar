@@ -19,13 +19,15 @@ eval: true
 -- out/eval/stats --
 Leaks:  0
 Freed:  16
-Reused: 9
-Allocs: 7
+Reused: 8
+Allocs: 8
 Retain: 0
 
 Unifications: 4
 Conjuncts:    19
-Disjuncts:    16
+Disjuncts:    12
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   a: (int){ |((int){ 1 }, (int){ 2 }) }

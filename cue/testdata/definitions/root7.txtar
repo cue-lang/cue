@@ -7,11 +7,14 @@ Leaks:  0
 Freed:  5
 Reused: 0
 Allocs: 5
-Retain: 3
+Retain: 0
 
 Unifications: 5
 Conjuncts:    9
-Disjuncts:    8
+Disjuncts:    0
+Notifications: 1
+
+NumCloseIDs: 3
 -- out/evalalpha --
 (#struct){
   root: (#struct){

@@ -23,14 +23,16 @@ chained: x: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  23
+Freed:  28
 Reused: 16
-Allocs: 7
-Retain: 1
+Allocs: 12
+Retain: 0
 
-Unifications: 19
-Conjuncts:    29
-Disjuncts:    23
+Unifications: 24
+Conjuncts:    36
+Disjuncts:    4
+
+NumCloseIDs: 2
 -- out/evalalpha --
 (struct){
   chained: (struct){

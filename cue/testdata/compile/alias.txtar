@@ -32,13 +32,13 @@ dynamic: t2: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  10
-Reused: 5
-Allocs: 5
-Retain: 2
+Reused: 3
+Allocs: 7
+Retain: 0
 
 Unifications: 10
 Conjuncts:    11
-Disjuncts:    10
+Disjuncts:    0
 -- out/evalalpha --
 (struct){
   dynamic: (struct){

@@ -63,13 +63,20 @@ b: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  47
-Reused: 39
-Allocs: 8
+Reused: 28
+Allocs: 19
 Retain: 0
 
 Unifications: 47
-Conjuncts:    122
-Disjuncts:    47
+Conjuncts:    105
+Disjuncts:    0
+
+NumCloseIDs: 31
+
+ConjunctInfos:       87
+MaxConjunctInfos:    6
+MaxReqSets:          11
+MaxRedirect:         2
 -- out/evalalpha --
 (struct){
   a: (struct){

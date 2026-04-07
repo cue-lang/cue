@@ -26,14 +26,17 @@ package baz
 x: 1
 -- out/eval/stats --
 Leaks:  2
-Freed:  9
-Reused: 6
-Allocs: 5
-Retain: 4
+Freed:  7
+Reused: 0
+Allocs: 9
+Retain: 0
 
-Unifications: 11
-Conjuncts:    25
-Disjuncts:    13
+Unifications: 7
+Conjuncts:    15
+Disjuncts:    0
+Notifications: 1
+
+NumCloseIDs: 9
 -- out/evalalpha --
 (struct){
   z: (int){ 3 }

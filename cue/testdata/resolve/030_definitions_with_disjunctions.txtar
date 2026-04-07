@@ -42,15 +42,17 @@ baz: {b: 2}
   }
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  33
-Reused: 28
-Allocs: 5
+Leaks:  6
+Freed:  34
+Reused: 26
+Allocs: 14
 Retain: 0
 
-Unifications: 25
-Conjuncts:    45
-Disjuncts:    33
+Unifications: 18
+Conjuncts:    38
+Disjuncts:    8
+
+NumCloseIDs: 11
 -- out/evalalpha --
 Errors:
 bar.c: field not allowed:

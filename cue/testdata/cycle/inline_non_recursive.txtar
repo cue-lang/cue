@@ -94,19 +94,6 @@ select: indirect: {
 	req!: int
 	opt?: run?: string
 }
--- out/evalalpha/stats --
-Leaks:  1
-Freed:  226
-Reused: 198
-Allocs: 29
-Retain: 0
-
-Unifications: 142
-Conjuncts:    376
-Disjuncts:    0
-Notifications: 1
-
-NumCloseIDs: 169
 -- out/evalalpha --
 Errors:
 issue3182.first.t2.x.b: structural cycle
@@ -240,32 +227,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,12 @@
--Leaks:  309
--Freed:  437
--Reused: 429
--Allocs: 317
--Retain: 1074
--
--Unifications: 746
--Conjuncts:    2813
--Disjuncts:    1485
-+Leaks:  1
-+Freed:  226
-+Reused: 198
-+Allocs: 29
-+Retain: 0
-+
-+Unifications: 142
-+Conjuncts:    376
-+Disjuncts:    0
-+Notifications: 1
-+
-+NumCloseIDs: 169
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -302,15 +263,18 @@ issue1708.k30: no longer evaluates. Not the worst, but would ideally be fixed.
 Error positions.
 Incorrect path due to structure sharing.
 -- out/eval/stats --
-Leaks:  309
-Freed:  437
-Reused: 429
-Allocs: 317
-Retain: 1074
+Leaks:  1
+Freed:  226
+Reused: 198
+Allocs: 29
+Retain: 0
 
-Unifications: 746
-Conjuncts:    2813
-Disjuncts:    1485
+Unifications: 142
+Conjuncts:    376
+Disjuncts:    0
+Notifications: 1
+
+NumCloseIDs: 169
 -- out/eval --
 Errors:
 issue3182.first.t2.x.b: structural cycle

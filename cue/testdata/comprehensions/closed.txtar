@@ -112,19 +112,17 @@ issue3486: {
 	}
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  80
-Reused: 74
-Allocs: 8
-Retain: 3
+Leaks:  4
+Freed:  77
+Reused: 61
+Allocs: 20
+Retain: 0
 
-Unifications: 68
-Conjuncts:    118
-Disjuncts:    81
+Unifications: 67
+Conjuncts:    125
+Disjuncts:    14
 
-MisalignedConjunct: 15
-
-NumCloseIDs: 14
+NumCloseIDs: 46
 -- out/evalalpha --
 Errors:
 disallowed.vErr.d: field not allowed:

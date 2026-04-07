@@ -14,15 +14,15 @@ a: strings.Join( [ strings.Join(["1"]), "2" ], "\n")
   ], "\n")
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  5
-Reused: 1
-Allocs: 5
-Retain: 2
+Leaks:  0
+Freed:  7
+Reused: 0
+Allocs: 7
+Retain: 0
 
 Unifications: 6
 Conjuncts:    6
-Disjuncts:    7
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 a: error in call to strings.Join: not enough arguments in call to strings.Join (have 1, want 2):

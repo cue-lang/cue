@@ -39,17 +39,15 @@ unaryOp: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  30
-Reused: 25
-Allocs: 5
+Reused: 15
+Allocs: 15
 Retain: 0
 
 Unifications: 22
 Conjuncts:    33
-Disjuncts:    30
+Disjuncts:    8
 
-MisalignedConjunct: 1
-
-NumCloseIDs: 2
+NumCloseIDs: 5
 -- out/evalalpha --
 (struct){
   list: (list){ |(*(#list){

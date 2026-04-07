@@ -29,15 +29,17 @@ X: {
 
 Z: X.test_3_bar.ref
 -- out/eval/stats --
-Leaks:  0
-Freed:  24
-Reused: 17
-Allocs: 7
-Retain: 2
+Leaks:  2
+Freed:  18
+Reused: 5
+Allocs: 15
+Retain: 0
 
-Unifications: 18
-Conjuncts:    33
-Disjuncts:    24
+Unifications: 14
+Conjuncts:    23
+Disjuncts:    4
+
+NumCloseIDs: 5
 -- out/evalalpha --
 (struct){
   X: (struct){

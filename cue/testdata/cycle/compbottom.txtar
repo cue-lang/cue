@@ -257,17 +257,15 @@ medium: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  85
-Reused: 73
-Allocs: 12
-Retain: 200
+Reused: 67
+Allocs: 18
+Retain: 0
 
 Unifications: 85
-Conjuncts:    152
-Disjuncts:    194
+Conjuncts:    177
+Disjuncts:    0
 
-MisalignedConjunct: 3
-
-NumCloseIDs: 24
+NumCloseIDs: 72
 -- out/evalalpha --
 (struct){
   simple: (struct){

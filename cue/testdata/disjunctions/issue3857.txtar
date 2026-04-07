@@ -52,19 +52,17 @@ issue3851: t2: {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  96
-Reused: 83
-Allocs: 13
-Retain: 2
+Leaks:  7
+Freed:  67
+Reused: 45
+Allocs: 29
+Retain: 0
 
-Unifications: 60
-Conjuncts:    151
-Disjuncts:    98
+Unifications: 48
+Conjuncts:    119
+Disjuncts:    26
 
-MisalignedConjunct: 4
-
-NumCloseIDs: 6
+NumCloseIDs: 25
 -- out/evalalpha --
 (struct){
   reduced: (struct){

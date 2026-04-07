@@ -784,15 +784,17 @@ diffTypes: {
   }
 }
 -- out/eval/stats --
-Leaks:  54
-Freed:  659
-Reused: 654
-Allocs: 59
-Retain: 287
+Leaks:  0
+Freed:  547
+Reused: 507
+Allocs: 40
+Retain: 0
 
-Unifications: 690
-Conjuncts:    857
-Disjuncts:    946
+Unifications: 518
+Conjuncts:    577
+Disjuncts:    17
+
+NumCloseIDs: 35
 -- out/evalalpha --
 Errors:
 lists.eErrPassthrough: invalid left-hand value to '==' (type list): 0: failed arithmetic: division by zero:

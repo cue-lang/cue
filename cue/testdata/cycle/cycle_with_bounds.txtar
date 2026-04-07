@@ -23,13 +23,15 @@ foo: 1
 -- out/eval/stats --
 Leaks:  0
 Freed:  4
-Reused: 1
-Allocs: 3
-Retain: 1
+Reused: 0
+Allocs: 4
+Retain: 0
 
 Unifications: 4
-Conjuncts:    9
-Disjuncts:    4
+Conjuncts:    10
+Disjuncts:    0
+
+NumCloseIDs: 2
 -- out/evalalpha --
 (struct){
   #Value: (int){ int }

@@ -160,17 +160,17 @@ nestedInnerFallback: {
 	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  69
-Reused: 60
-Allocs: 9
+Leaks:  16
+Freed:  114
+Reused: 77
+Allocs: 53
 Retain: 0
 
-Unifications: 69
-Conjuncts:    90
-Disjuncts:    69
+Unifications: 130
+Conjuncts:    180
+Disjuncts:    0
 
-NumCloseIDs: 2
+NumCloseIDs: 69
 -- out/evalalpha --
 (struct){
   ifTrue: (struct){

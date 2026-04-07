@@ -37,13 +37,15 @@ d: #D & {aaa: 3}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9
-Reused: 6
-Allocs: 3
+Reused: 1
+Allocs: 8
 Retain: 0
 
 Unifications: 9
 Conjuncts:    29
-Disjuncts:    9
+Disjuncts:    0
+
+NumCloseIDs: 14
 -- out/evalalpha --
 Errors:
 c.aaa: field not allowed:

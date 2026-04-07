@@ -19,13 +19,13 @@ r: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
-Reused: 2
-Allocs: 3
+Reused: 0
+Allocs: 5
 Retain: 0
 
 Unifications: 5
 Conjuncts:    5
-Disjuncts:    5
+Disjuncts:    0
 -- out/evalalpha --
 (struct){
   r: (struct){

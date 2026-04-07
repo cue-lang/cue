@@ -39,13 +39,15 @@ import "list"
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
-Reused: 11
-Allocs: 4
-Retain: 1
+Reused: 6
+Allocs: 9
+Retain: 0
 
 Unifications: 15
 Conjuncts:    31
-Disjuncts:    16
+Disjuncts:    0
+
+NumCloseIDs: 7
 -- out/evalalpha --
 (struct){
   a: (#list){

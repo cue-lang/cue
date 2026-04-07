@@ -22,13 +22,13 @@ on: __test_experiment("on")
 -- out/eval/stats --
 Leaks:  0
 Freed:  3
-Reused: 1
-Allocs: 2
+Reused: 0
+Allocs: 3
 Retain: 0
 
 Unifications: 3
 Conjuncts:    4
-Disjuncts:    3
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 off: error in call to testExperiment: testing experiment disabled:

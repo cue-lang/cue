@@ -26,13 +26,15 @@ ti: t & {c: int}
 -- out/eval/stats --
 Leaks:  0
 Freed:  13
-Reused: 9
-Allocs: 4
-Retain: 2
+Reused: 6
+Allocs: 7
+Retain: 0
 
 Unifications: 13
-Conjuncts:    33
-Disjuncts:    15
+Conjuncts:    25
+Disjuncts:    0
+
+NumCloseIDs: 4
 -- out/evalalpha --
 (struct){
   a: (struct){

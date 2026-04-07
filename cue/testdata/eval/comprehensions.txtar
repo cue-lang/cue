@@ -120,19 +120,17 @@ issue3691: structuralCycle: {
 	}
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  77
-Reused: 69
-Allocs: 12
-Retain: 19
+Leaks:  6
+Freed:  74
+Reused: 56
+Allocs: 24
+Retain: 0
 
-Unifications: 81
-Conjuncts:    121
-Disjuncts:    94
+Unifications: 79
+Conjuncts:    136
+Disjuncts:    0
 
-MisalignedConjunct: 19
-
-NumCloseIDs: 19
+NumCloseIDs: 48
 -- out/evalalpha --
 Errors:
 issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):

@@ -34,13 +34,15 @@ bulk: {[string]: string} & {
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
-Reused: 8
-Allocs: 3
+Reused: 4
+Allocs: 7
 Retain: 0
 
 Unifications: 11
 Conjuncts:    16
-Disjuncts:    11
+Disjuncts:    0
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   #Foo: (#struct){

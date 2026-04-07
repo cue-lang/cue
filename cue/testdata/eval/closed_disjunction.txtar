@@ -15,15 +15,17 @@ b: #A & {
 	d: 4
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  46
-Reused: 39
-Allocs: 7
+Leaks:  3
+Freed:  49
+Reused: 36
+Allocs: 16
 Retain: 0
 
-Unifications: 34
-Conjuncts:    60
-Disjuncts:    46
+Unifications: 16
+Conjuncts:    39
+Disjuncts:    12
+
+NumCloseIDs: 8
 -- out/evalalpha --
 Errors:
 b: 2 errors in empty disjunction:

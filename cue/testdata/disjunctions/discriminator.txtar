@@ -79,7 +79,6 @@ byKind: {
 	}
 }
 -- out/eval/stats --
--- out/evalalpha/stats --
 Leaks:  0
 Freed:  188
 Reused: 167

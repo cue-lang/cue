@@ -34,13 +34,15 @@ c4: 1.2 & (>=1 & <2 & int)
 -- out/eval/stats --
 Leaks:  0
 Freed:  12
-Reused: 10
-Allocs: 2
+Reused: 0
+Allocs: 12
 Retain: 0
 
 Unifications: 12
 Conjuncts:    35
-Disjuncts:    12
+Disjuncts:    0
+
+NumCloseIDs: 1
 -- out/evalalpha --
 Errors:
 c4: conflicting values 1.2 and int (mismatched types float and int):

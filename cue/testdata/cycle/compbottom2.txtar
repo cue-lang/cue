@@ -330,7 +330,7 @@ issue3838: {
 		_test: assert: invoke: "foo"
 	}).results
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  28
 Freed:  204
 Reused: 189
@@ -343,50 +343,6 @@ Disjuncts:    16
 Notifications: 2
 
 NumCloseIDs: 112
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,13 +1,12 @@
--Leaks:  13
--Freed:  223
--Reused: 214
--Allocs: 22
--Retain: 104
--
--Unifications: 220
--Conjuncts:    279
--Disjuncts:    302
--
--MisalignedConjunct: 20
--
--NumCloseIDs: 57
-+Leaks:  28
-+Freed:  204
-+Reused: 189
-+Allocs: 43
-+Retain: 0
-+
-+Unifications: 206
-+Conjuncts:    343
-+Disjuncts:    16
-+Notifications: 2
-+
-+NumCloseIDs: 112
--- out/eval/stats --
-Leaks:  13
-Freed:  223
-Reused: 214
-Allocs: 22
-Retain: 104
-
-Unifications: 220
-Conjuncts:    279
-Disjuncts:    302
-
-MisalignedConjunct: 20
-
-NumCloseIDs: 57
 -- out/evalalpha --
 (struct){
   self: (struct){

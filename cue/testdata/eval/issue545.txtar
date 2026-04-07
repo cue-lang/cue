@@ -35,7 +35,7 @@ t2: {
 	e: time.Time()
 	f: d & e & d & e
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  7
 Freed:  62
 Reused: 41
@@ -48,40 +48,6 @@ Disjuncts:    16
 Notifications: 3
 
 NumCloseIDs: 22
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,12 @@
--Leaks:  0
--Freed:  121
--Reused: 107
--Allocs: 14
-+Leaks:  7
-+Freed:  62
-+Reused: 41
-+Allocs: 28
- Retain: 0
- 
--Unifications: 65
--Conjuncts:    205
--Disjuncts:    121
-+Unifications: 29
-+Conjuncts:    79
-+Disjuncts:    16
-+Notifications: 3
-+
-+NumCloseIDs: 22
--- out/eval/stats --
-Leaks:  0
-Freed:  121
-Reused: 107
-Allocs: 14
-Retain: 0
-
-Unifications: 65
-Conjuncts:    205
-Disjuncts:    121
 -- out/evalalpha --
 (struct){
   t1: (struct){

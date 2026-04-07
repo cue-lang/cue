@@ -16,6 +16,24 @@
       "message": "the code and logged message say \"hint\", so I would call the attribute key \"hint\" rather than \"guidance\" too.",
       "revId": "fcae6549c5c2db1cc2c6e75aa2697ed2058f0ade",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55034bbb_a25303df",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T13:18:24Z",
+      "side": 1,
+      "message": "Done. Renamed the attribute key from `guidance\u003d` to `hint\u003d` throughout (inline.go, inline_err.go, inline_test.go, CLAUDE.md, and all three txtar files that used it).",
+      "parentUuid": "cf359d8c_bb58627b",
+      "revId": "fcae6549c5c2db1cc2c6e75aa2697ed2058f0ade",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

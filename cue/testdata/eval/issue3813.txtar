@@ -7,7 +7,7 @@
 -- x.cue --
 x: {[string]: _} @test(closed) @test(eq, {
 	f: _
-	[_]: _
+	[string]: _
 })
 x: #d
 #d: f: _

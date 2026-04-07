@@ -173,6 +173,12 @@ of the CUE project should do so.
     y: x            @test(eq, {a: 1, b: 1}) @test(shareID:v3=xy)
     ```
 
+### Commit Message Format
+- The commit title must fit on a single line, under 70 characters.
+  Do not let the title overflow onto a second or third line.
+- Wrap the body at 50 characters per line.
+- Format: `<package>: <short description>` (e.g. `internal/cuetxtar: fix pattern label`)
+
 ### Contribution Model
 - Single commit per PR/CL model
 - Uses `git codereview` workflow for managing changes

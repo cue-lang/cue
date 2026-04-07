@@ -1,0 +1,8 @@
+Code-Review+2: Daniel Martí <mvdan@mvdan.cc>
+TryBot-Result+1: CUEcueckoo <cueckoo@cuelang.org>
+Submitted-by: Daniel Martí <mvdan@mvdan.cc>
+Submitted-at: Tue, 07 Apr 2026 11:30:48 +0000
+Reviewed-on: https://review.gerrithub.io/c/cue-lang/cue/+/1235075
+Comments-Total: 1
+Project: cue-lang/cue
+Branch: refs/heads/master

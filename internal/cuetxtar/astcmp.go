@@ -210,8 +210,8 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 		expr ast.Expr
 	}
 	type expectedPattern struct {
-		label ast.Expr // the expression inside [...]
-		value ast.Expr
+		pattern ast.Expr // the expression inside [...]
+		value   ast.Expr
 	}
 
 	var fields []expectedField
@@ -323,7 +323,7 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 				if len(label.Elts) != 1 {
 					return pathErr(path, "pattern constraint label must have exactly one element")
 				}
-				patterns = append(patterns, expectedPattern{label: label.Elts[0], value: d.Value})
+				patterns = append(patterns, expectedPattern{pattern: label.Elts[0], value: d.Value})
 			}
 		case *ast.EmbedDecl:
 			val := val
@@ -445,31 +445,42 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 		if err != nil {
 			return pathErr(path, "cannot iterate value patterns: %v", err)
 		}
-		var valPatterns []struct {
+		type valPat struct {
 			sel   cue.Selector
 			value cue.Value
 		}
+		var valPatterns []valPat
 		for patIter.Next() {
 			sel := patIter.Selector()
 			if !sel.IsConstraint() {
 				continue
 			}
-			valPatterns = append(valPatterns, struct {
-				sel   cue.Selector
-				value cue.Value
-			}{sel, patIter.Value()})
+			valPatterns = append(valPatterns, valPat{sel, patIter.Value()})
 		}
 
 		if len(valPatterns) != len(patterns) {
 			return pathErr(path, "expected %d pattern constraint(s), got %d",
 				len(patterns), len(valPatterns))
 		}
-		// Match patterns positionally for now (both ordered by source).
-		for i, ep := range patterns {
-			vp := valPatterns[i]
-			patPath := path.Append(cue.Str(fmt.Sprintf("[%d]pattern", i)))
+
+		// Match patterns positionally (both ordered by source).
+		for _, ep := range patterns {
+			patPath := path.Append(cue.Str(fmt.Sprintf("[%s]", toStr(ep.pattern))))
+			found := false
+			var vp valPat
+			for _, p := range valPatterns {
+				if err := c.astCmp(patPath, ep.pattern, p.sel.Pattern()); err == nil {
+					found = true
+					vp = p
+					break
+				}
+			}
+			if !found {
+				return pathErr(patPath, "pattern constraint %v not found in value", toStr(ep.pattern))
+			}
+
 			if err := c.astCmp(patPath, ep.value, vp.value); err != nil {
-				return err
+				return pathErr(patPath, "incompatible pattern value: %w", err)
 			}
 		}
 	}

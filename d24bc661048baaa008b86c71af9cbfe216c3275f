@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "769b9f4f_3ef002f6",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T12:51:55Z",
+      "side": 1,
+      "message": "I\u0027m not sure if this is entirely correct. For instance, is this handled correctly?\n```\n[A\u003dstring]: {\n    [B\u003dstring]: x: A + B\n}\n```\nAFAICT, A would not be marked as used here.\n\nI would think that we would need to actually track per alias whether it is used, and that we cannot use this shorthand.",
+      "revId": "d24bc661048baaa008b86c71af9cbfe216c3275f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

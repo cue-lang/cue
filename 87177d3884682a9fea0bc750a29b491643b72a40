@@ -16,6 +16,24 @@
       "message": "perhaps add a helper for trimming surrounding characters, be it `[ ]` or `( )`, because I\u0027ve seen this a bunch of times now. it could be something like `func trimSurrounding(left, right byte) (string, error)`",
       "revId": "87177d3884682a9fea0bc750a29b491643b72a40",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02e091f2_e6064edf",
+        "filename": "internal/cuetxtar/inline_err.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T13:15:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c37d376_4c288b88",
+      "revId": "87177d3884682a9fea0bc750a29b491643b72a40",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

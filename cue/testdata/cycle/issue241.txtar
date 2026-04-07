@@ -25,15 +25,17 @@ cell: b: _
 a: cell.a
 b: cell.b
 -- out/eval/stats --
-Leaks:  0
-Freed:  47
-Reused: 39
-Allocs: 8
-Retain: 7
+Leaks:  6
+Freed:  37
+Reused: 25
+Allocs: 18
+Retain: 0
 
 Unifications: 11
-Conjuncts:    101
-Disjuncts:    47
+Conjuncts:    66
+Disjuncts:    32
+
+NumCloseIDs: 4
 -- out/evalalpha --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }

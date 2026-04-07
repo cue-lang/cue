@@ -75,15 +75,17 @@ issue3648: full: {
 	foo: {}
 }
 -- out/eval/stats --
-Leaks:  6
-Freed:  79
-Reused: 70
-Allocs: 15
-Retain: 26
+Leaks:  1
+Freed:  86
+Reused: 68
+Allocs: 19
+Retain: 0
 
-Unifications: 73
-Conjuncts:    152
-Disjuncts:    97
+Unifications: 69
+Conjuncts:    119
+Disjuncts:    6
+
+NumCloseIDs: 30
 -- out/evalalpha --
 Errors:
 o3.a: 2 errors in empty disjunction:

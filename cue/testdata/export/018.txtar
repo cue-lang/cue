@@ -20,13 +20,15 @@ raw: true
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
-Reused: 4
-Allocs: 3
+Reused: 2
+Allocs: 5
 Retain: 0
 
 Unifications: 7
 Conjuncts:    12
-Disjuncts:    7
+Disjuncts:    0
+
+NumCloseIDs: 7
 -- out/evalalpha --
 (struct){
   a: (#list){

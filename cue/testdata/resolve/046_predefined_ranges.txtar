@@ -23,13 +23,13 @@ e1: 100_000
 -- out/eval/stats --
 Leaks:  0
 Freed:  4
-Reused: 2
-Allocs: 2
+Reused: 0
+Allocs: 4
 Retain: 0
 
 Unifications: 4
 Conjuncts:    7
-Disjuncts:    4
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 e1: invalid value 100000 (out of bound <=32767):

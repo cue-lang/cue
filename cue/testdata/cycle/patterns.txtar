@@ -24,14 +24,17 @@ issue3326: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  7
-Reused: 2
-Allocs: 5
-Retain: 2
+Freed:  13
+Reused: 4
+Allocs: 9
+Retain: 0
 
-Unifications: 7
-Conjuncts:    59
-Disjuncts:    9
+Unifications: 13
+Conjuncts:    53
+Disjuncts:    0
+Notifications: 1
+
+NumCloseIDs: 7
 -- out/evalalpha --
 (struct){
   a: (struct){

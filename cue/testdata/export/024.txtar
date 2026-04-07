@@ -41,14 +41,16 @@ noOpt: true
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  23
-Reused: 18
-Allocs: 5
+Freed:  16
+Reused: 5
+Allocs: 11
 Retain: 0
 
-Unifications: 23
-Conjuncts:    28
-Disjuncts:    23
+Unifications: 16
+Conjuncts:    18
+Disjuncts:    0
+
+NumCloseIDs: 2
 -- out/evalalpha --
 (struct){
   reg: (struct){

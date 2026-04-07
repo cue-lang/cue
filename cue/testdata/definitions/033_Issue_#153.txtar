@@ -48,17 +48,16 @@ Foo & {
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
-Reused: 9
-Allocs: 6
-Retain: 1
+Reused: 5
+Allocs: 10
+Retain: 0
 
 Unifications: 11
-Conjuncts:    23
-Disjuncts:    16
+Conjuncts:    22
+Disjuncts:    4
+Notifications: 1
 
-MisalignedConjunct: 1
-
-NumCloseIDs: 1
+NumCloseIDs: 5
 -- out/evalalpha --
 Errors:
 listOfCloseds.0.b: field not allowed:

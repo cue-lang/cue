@@ -247,18 +247,6 @@ issue4251: ok: {
 issue4251: fail: {
 	b: =="b" & !="b" & "b"
 }
--- out/evalalpha/stats --
-Leaks:  0
-Freed:  205
-Reused: 148
-Allocs: 57
-Retain: 0
-
-Unifications: 197
-Conjuncts:    357
-Disjuncts:    0
-
-NumCloseIDs: 4
 -- out/evalalpha --
 Errors:
 nonConcrete.eErr5: conflicting values =="foo" and int (mismatched types string and int):
@@ -1374,3 +1362,15 @@ Result:
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  254
+Reused: 195
+Allocs: 59
+Retain: 0
+
+Unifications: 238
+Conjuncts:    422
+Disjuncts:    0
+
+NumCloseIDs: 8

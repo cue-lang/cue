@@ -285,6 +285,23 @@ func (t *Test) Writer(name string) io.Writer {
 	return w
 }
 
+// WriterFallback returns a Writer that writes to the fallback section name
+// for the given sub-section (e.g., "out/eval/stats" rather than
+// "out/evalalpha/stats"). Because name equals fallback, no diff section is
+// generated. This is useful when the test output has been promoted and should
+// replace the fallback directly.
+func (t *Test) WriterFallback(name string) io.Writer {
+	name = path.Join(t.fallback, name)
+	for _, f := range t.outFiles {
+		if f.name == name {
+			return f.buf
+		}
+	}
+	w := &bytes.Buffer{}
+	t.outFiles = append(t.outFiles, file{name, name, w, false, false})
+	return w
+}
+
 // WriterDoc returns a Writer with the given name that is marked as a
 // documentary section. Documentary sections are never automatically created
 // and never cause test failures. They are updated by CUE_UPDATE=1 only if

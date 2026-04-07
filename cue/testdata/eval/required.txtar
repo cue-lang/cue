@@ -280,14 +280,16 @@ doNotEscalateError: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  66
-Reused: 58
-Allocs: 8
-Retain: 10
+Freed:  93
+Reused: 75
+Allocs: 18
+Retain: 0
 
-Unifications: 66
-Conjuncts:    90
-Disjuncts:    76
+Unifications: 91
+Conjuncts:    131
+Disjuncts:    0
+
+NumCloseIDs: 15
 -- out/evalalpha --
 (_|_){
   // [eval]

@@ -55,13 +55,15 @@ raw: true
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
-Reused: 11
-Allocs: 4
+Reused: 6
+Allocs: 9
 Retain: 0
 
 Unifications: 15
 Conjuncts:    26
-Disjuncts:    15
+Disjuncts:    0
+
+NumCloseIDs: 9
 -- out/evalalpha --
 (struct){
   #emb: (#struct){

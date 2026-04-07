@@ -7,14 +7,16 @@ x: [string, ...string]
 x: ["x", "x"]
 -- out/eval/stats --
 Leaks:  0
-Freed:  2
+Freed:  4
 Reused: 0
-Allocs: 2
+Allocs: 4
 Retain: 0
 
-Unifications: 2
-Conjuncts:    5
-Disjuncts:    3
+Unifications: 4
+Conjuncts:    9
+Disjuncts:    0
+
+NumCloseIDs: 1
 -- out/evalalpha --
 Errors:
 x: invalid value ["x","x"] (does not satisfy list.UniqueItems): equal value ("x") at position 0 and 1:

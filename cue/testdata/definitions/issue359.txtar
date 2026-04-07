@@ -36,15 +36,17 @@ notbad: many & {
 	things: hola: peso: 2
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  81
-Reused: 74
-Allocs: 7
+Leaks:  9
+Freed:  72
+Reused: 57
+Allocs: 24
 Retain: 0
 
 Unifications: 41
 Conjuncts:    134
-Disjuncts:    81
+Disjuncts:    40
+
+NumCloseIDs: 15
 -- out/evalalpha --
 (struct){
   #simple: (#struct){

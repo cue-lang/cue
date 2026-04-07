@@ -32,15 +32,17 @@ foo: #Value
 foo: #Value
 foo: #Value
 -- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 6
-Allocs: 5
+Leaks:  2
+Freed:  10
+Reused: 5
+Allocs: 7
 Retain: 0
 
-Unifications: 7
-Conjuncts:    29
-Disjuncts:    11
+Unifications: 6
+Conjuncts:    28
+Disjuncts:    4
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   #Value: (#struct){ |((#struct){

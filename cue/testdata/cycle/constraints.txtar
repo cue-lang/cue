@@ -578,15 +578,17 @@ issue3509: {
   }
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  193
-Reused: 182
-Allocs: 13
-Retain: 20
+Leaks:  4
+Freed:  190
+Reused: 164
+Allocs: 30
+Retain: 0
 
-Unifications: 193
-Conjuncts:    399
-Disjuncts:    213
+Unifications: 183
+Conjuncts:    359
+Disjuncts:    2
+
+NumCloseIDs: 60
 -- out/evalalpha --
 Errors:
 brokenRing.t1.p1.T.b: structural cycle

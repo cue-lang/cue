@@ -31,15 +31,17 @@ varNegativeIndex: {
 	a: [1, 2, 3][n]
 }
 -- out/eval/stats --
-Leaks:  12
-Freed:  36
-Reused: 33
-Allocs: 15
-Retain: 12
+Leaks:  0
+Freed:  61
+Reused: 40
+Allocs: 21
+Retain: 0
 
-Unifications: 40
+Unifications: 37
 Conjuncts:    50
-Disjuncts:    45
+Disjuncts:    8
+
+NumCloseIDs: 5
 -- out/evalalpha --
 Errors:
 outOfBoundsDisjunction: index out of range [1] with length 0:

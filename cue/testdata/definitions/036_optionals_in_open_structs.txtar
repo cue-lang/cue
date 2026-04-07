@@ -29,13 +29,15 @@ c: #C & {aaa: 3}
 -- out/eval/stats --
 Leaks:  0
 Freed:  6
-Reused: 3
-Allocs: 3
+Reused: 0
+Allocs: 6
 Retain: 0
 
 Unifications: 6
 Conjuncts:    17
-Disjuncts:    6
+Disjuncts:    0
+
+NumCloseIDs: 9
 -- out/evalalpha --
 (struct){
   A: (struct){

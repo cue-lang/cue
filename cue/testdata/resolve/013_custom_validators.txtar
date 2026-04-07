@@ -15,13 +15,13 @@ c: "dog"
 -- out/eval/stats --
 Leaks:  0
 Freed:  4
-Reused: 2
-Allocs: 2
+Reused: 0
+Allocs: 4
 Retain: 0
 
 Unifications: 4
 Conjuncts:    8
-Disjuncts:    4
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):

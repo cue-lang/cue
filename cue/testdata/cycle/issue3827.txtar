@@ -24,15 +24,18 @@ full: {
 	}
 }
 -- out/eval/stats --
-Leaks:  6
-Freed:  29
-Reused: 22
-Allocs: 13
-Retain: 10
+Leaks:  9
+Freed:  22
+Reused: 10
+Allocs: 21
+Retain: 0
 
-Unifications: 31
-Conjuncts:    57
-Disjuncts:    38
+Unifications: 20
+Conjuncts:    43
+Disjuncts:    4
+Notifications: 2
+
+NumCloseIDs: 7
 -- out/evalalpha --
 (struct){
   reduced: (struct){

@@ -15,15 +15,17 @@ foo: #Workflow & {
 	}
 }
 -- out/eval/stats --
-Leaks:  6
+Leaks:  0
 Freed:  11
-Reused: 6
-Allocs: 11
-Retain: 6
+Reused: 4
+Allocs: 7
+Retain: 0
 
-Unifications: 15
-Conjuncts:    32
-Disjuncts:    17
+Unifications: 10
+Conjuncts:    17
+Disjuncts:    0
+
+NumCloseIDs: 5
 -- out/evalalpha --
 (struct){
   #Workflow: (#struct){

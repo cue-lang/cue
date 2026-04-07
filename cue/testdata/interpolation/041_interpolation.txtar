@@ -21,15 +21,15 @@ e: "\([])"
   e: "\([])"
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  8
-Reused: 6
-Allocs: 3
-Retain: 12
+Leaks:  0
+Freed:  9
+Reused: 0
+Allocs: 9
+Retain: 0
 
 Unifications: 9
-Conjuncts:    16
-Disjuncts:    19
+Conjuncts:    9
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):

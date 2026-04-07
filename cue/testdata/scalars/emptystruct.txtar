@@ -73,15 +73,17 @@ issue783: {
 	check2b: test2 & #Def2
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  54
-Reused: 48
-Allocs: 6
+Leaks:  5
+Freed:  52
+Reused: 34
+Allocs: 23
 Retain: 0
 
-Unifications: 48
-Conjuncts:    107
-Disjuncts:    54
+Unifications: 45
+Conjuncts:    102
+Disjuncts:    6
+
+NumCloseIDs: 56
 -- out/evalalpha --
 (struct){
   elipsis: (struct){

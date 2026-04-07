@@ -11,14 +11,16 @@
 l: #N
 -- out/eval/stats --
 Leaks:  0
-Freed:  8
-Reused: 4
-Allocs: 4
+Freed:  6
+Reused: 0
+Allocs: 6
 Retain: 0
 
-Unifications: 8
-Conjuncts:    13
-Disjuncts:    8
+Unifications: 6
+Conjuncts:    8
+Disjuncts:    0
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   #A: (_){ _ }

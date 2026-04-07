@@ -36,15 +36,17 @@ z: #PrestepNewUser & {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  45
-Reused: 36
-Allocs: 9
-Retain: 1
+Leaks:  9
+Freed:  33
+Reused: 23
+Allocs: 19
+Retain: 0
 
-Unifications: 29
-Conjuncts:    71
-Disjuncts:    46
+Unifications: 24
+Conjuncts:    60
+Disjuncts:    14
+
+NumCloseIDs: 8
 -- out/evalalpha --
 (struct){
   #Prestep: (#struct){

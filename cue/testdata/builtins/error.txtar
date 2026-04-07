@@ -78,7 +78,7 @@ issue3984: {
 	v: "a" | error("must be a")
 	v: "b"
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  3
 Freed:  76
 Reused: 57
@@ -88,37 +88,6 @@ Retain: 0
 Unifications: 34
 Conjuncts:    91
 Disjuncts:    41
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
--Leaks:  0
--Freed:  30
--Reused: 25
--Allocs: 5
-+Leaks:  3
-+Freed:  76
-+Reused: 57
-+Allocs: 22
- Retain: 0
- 
--Unifications: 16
--Conjuncts:    38
--Disjuncts:    30
-+Unifications: 34
-+Conjuncts:    91
-+Disjuncts:    41
--- out/eval/stats --
-Leaks:  0
-Freed:  30
-Reused: 25
-Allocs: 5
-Retain: 0
-
-Unifications: 16
-Conjuncts:    38
-Disjuncts:    30
 -- out/evalalpha --
 Errors:
 issue3983.x: 2 errors in empty disjunction::

@@ -79,19 +79,17 @@ for k, v in {f3: int} {
   })
 }
 -- out/eval/stats --
-Leaks:  10
-Freed:  18
-Reused: 15
-Allocs: 13
-Retain: 10
+Leaks:  0
+Freed:  28
+Reused: 16
+Allocs: 12
+Retain: 0
 
 Unifications: 28
 Conjuncts:    43
-Disjuncts:    28
+Disjuncts:    0
 
-MisalignedConjunct: 5
-
-NumCloseIDs: 5
+NumCloseIDs: 16
 -- out/evalalpha --
 Errors:
 #E.f3: field not allowed:

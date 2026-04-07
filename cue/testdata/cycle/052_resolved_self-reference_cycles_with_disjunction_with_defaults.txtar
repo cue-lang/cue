@@ -78,15 +78,17 @@ z3: 8
   z3: 8
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  44
-Reused: 36
-Allocs: 8
-Retain: 25
+Leaks:  2
+Freed:  42
+Reused: 13
+Allocs: 31
+Retain: 0
 
 Unifications: 27
-Conjuncts:    82
-Disjuncts:    58
+Conjuncts:    79
+Disjuncts:    17
+
+NumCloseIDs: 14
 -- out/evalalpha --
 Errors:
 xe3: conflicting values 7 and 6:

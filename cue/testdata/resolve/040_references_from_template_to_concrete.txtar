@@ -34,14 +34,14 @@ t: x: {b: str: "DDDD"}
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  14
-Reused: 7
-Allocs: 7
-Retain: 3
+Freed:  9
+Reused: 0
+Allocs: 9
+Retain: 0
 
-Unifications: 14
-Conjuncts:    21
-Disjuncts:    15
+Unifications: 9
+Conjuncts:    13
+Disjuncts:    0
 -- out/evalalpha --
 (struct){
   res: (#list){

@@ -11,7 +11,7 @@ resolveAcrossDisjunct: nested: {
 	{d: a.b.#B} | {}
 	a: b: #B: int
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  0
 Freed:  48
 Reused: 15
@@ -23,38 +23,6 @@ Conjuncts:    33
 Disjuncts:    12
 
 NumCloseIDs: 6
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
- Leaks:  0
--Freed:  44
--Reused: 32
--Allocs: 12
-+Freed:  48
-+Reused: 15
-+Allocs: 33
- Retain: 0
- 
--Unifications: 32
--Conjuncts:    67
--Disjuncts:    44
-+Unifications: 12
-+Conjuncts:    33
-+Disjuncts:    12
-+
-+NumCloseIDs: 6
--- out/eval/stats --
-Leaks:  0
-Freed:  44
-Reused: 32
-Allocs: 12
-Retain: 0
-
-Unifications: 32
-Conjuncts:    67
-Disjuncts:    44
 -- out/evalalpha --
 (struct){
   resolveAcrossDisjunct: (struct){

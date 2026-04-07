@@ -42,15 +42,17 @@ noOpt: true
   }
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  14
-Reused: 8
-Allocs: 6
+Leaks:  1
+Freed:  13
+Reused: 5
+Allocs: 9
 Retain: 0
 
 Unifications: 10
 Conjuncts:    22
-Disjuncts:    14
+Disjuncts:    4
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   job: (struct){

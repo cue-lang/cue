@@ -31,15 +31,17 @@ eval: true
   }
 }
 -- out/eval/stats --
-Leaks:  5
-Freed:  6
+Leaks:  0
+Freed:  8
 Reused: 2
-Allocs: 9
-Retain: 10
+Allocs: 6
+Retain: 0
 
-Unifications: 9
-Conjuncts:    16
-Disjuncts:    16
+Unifications: 5
+Conjuncts:    8
+Disjuncts:    2
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   b: (_|_){

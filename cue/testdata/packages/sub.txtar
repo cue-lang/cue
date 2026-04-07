@@ -20,11 +20,13 @@ Leaks:  2
 Freed:  2
 Reused: 0
 Allocs: 4
-Retain: 3
+Retain: 0
 
-Unifications: 4
+Unifications: 3
 Conjuncts:    5
-Disjuncts:    4
+Disjuncts:    0
+
+NumCloseIDs: 2
 -- out/evalalpha --
 (string){
   "Hello World!"

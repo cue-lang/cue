@@ -22,17 +22,17 @@ issue3972: {
 
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  10
-Reused: 3
-Allocs: 7
-Retain: 2
+Leaks:  2
+Freed:  11
+Reused: 2
+Allocs: 11
+Retain: 0
 
-Unifications: 10
-Conjuncts:    12
-Disjuncts:    12
+Unifications: 13
+Conjuncts:    18
+Disjuncts:    0
 
-NumCloseIDs: 2
+NumCloseIDs: 5
 -- out/evalalpha --
 (struct){
   issue3972: (struct){

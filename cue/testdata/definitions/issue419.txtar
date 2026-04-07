@@ -16,15 +16,17 @@ l: [
 	{b: "bar"},
 ]
 -- out/eval/stats --
-Leaks:  0
-Freed:  17
-Reused: 12
-Allocs: 5
+Leaks:  2
+Freed:  16
+Reused: 8
+Allocs: 10
 Retain: 0
 
-Unifications: 13
-Conjuncts:    25
-Disjuncts:    17
+Unifications: 12
+Conjuncts:    24
+Disjuncts:    4
+
+NumCloseIDs: 5
 -- out/evalalpha --
 (struct){
   #A: (#struct){

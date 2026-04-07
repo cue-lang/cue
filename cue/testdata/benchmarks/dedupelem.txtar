@@ -27,14 +27,16 @@ foo: [{type: "float"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
 -- out/eval/stats --
 Leaks:  0
-Freed:  16
-Reused: 10
-Allocs: 6
+Freed:  11
+Reused: 2
+Allocs: 9
 Retain: 0
 
-Unifications: 10
-Conjuncts:    94
-Disjuncts:    16
+Unifications: 8
+Conjuncts:    59
+Disjuncts:    3
+
+NumCloseIDs: 1
 -- out/evalalpha --
 Errors:
 foo.0.type: conflicting values "string" and "float":

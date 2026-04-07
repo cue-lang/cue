@@ -72,13 +72,15 @@ hidden: ok1: {
 -- out/eval/stats --
 Leaks:  1
 Freed:  78
-Reused: 70
-Allocs: 9
-Retain: 7
+Reused: 64
+Allocs: 15
+Retain: 0
 
-Unifications: 79
-Conjuncts:    120
-Disjuncts:    85
+Unifications: 77
+Conjuncts:    115
+Disjuncts:    0
+
+NumCloseIDs: 18
 -- out/evalalpha --
 Errors:
 definition.err1.a.#foo.b: field not allowed:

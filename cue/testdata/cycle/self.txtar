@@ -281,7 +281,7 @@ issue4125: t2_alias: X={
 	b: Y.b
 }
 
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  42
 Freed:  297
 Reused: 275
@@ -293,41 +293,6 @@ Conjuncts:    435
 Disjuncts:    100
 
 NumCloseIDs: 86
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  0
--Freed:  432
--Reused: 423
--Allocs: 9
--Retain: 15
--
--Unifications: 240
--Conjuncts:    663
--Disjuncts:    447
-+Leaks:  42
-+Freed:  297
-+Reused: 275
-+Allocs: 64
-+Retain: 0
-+
-+Unifications: 219
-+Conjuncts:    435
-+Disjuncts:    100
-+
-+NumCloseIDs: 86
--- out/eval/stats --
-Leaks:  0
-Freed:  432
-Reused: 423
-Allocs: 9
-Retain: 15
-
-Unifications: 240
-Conjuncts:    663
-Disjuncts:    447
 -- out/evalalpha --
 Errors:
 expr.error1.a: conflicting values 4 and 3:

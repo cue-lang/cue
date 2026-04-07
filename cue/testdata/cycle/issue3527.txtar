@@ -22,14 +22,16 @@ subject: {
 #TaxPayer: self?:       _
 -- out/eval/stats --
 Leaks:  0
-Freed:  35
-Reused: 26
-Allocs: 9
-Retain: 4
+Freed:  26
+Reused: 11
+Allocs: 15
+Retain: 0
 
-Unifications: 35
-Conjuncts:    82
-Disjuncts:    39
+Unifications: 26
+Conjuncts:    55
+Disjuncts:    0
+
+NumCloseIDs: 15
 -- out/evalalpha --
 (struct){
   _taxPayer(:p): (struct){

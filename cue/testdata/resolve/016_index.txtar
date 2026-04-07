@@ -72,15 +72,17 @@ e7: def["b"]
   e7: 〈0;def〉["b"]
 }
 -- out/eval/stats --
-Leaks:  10
-Freed:  32
-Reused: 26
-Allocs: 16
-Retain: 12
+Leaks:  0
+Freed:  55
+Reused: 33
+Allocs: 22
+Retain: 0
 
-Unifications: 34
+Unifications: 32
 Conjuncts:    44
-Disjuncts:    42
+Disjuncts:    8
+
+NumCloseIDs: 3
 -- out/evalalpha --
 Errors:
 c: undefined field: "3":

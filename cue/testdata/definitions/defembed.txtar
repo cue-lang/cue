@@ -17,13 +17,15 @@ b: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
-Reused: 7
-Allocs: 4
-Retain: 2
+Reused: 3
+Allocs: 8
+Retain: 0
 
 Unifications: 11
-Conjuncts:    17
-Disjuncts:    13
+Conjuncts:    16
+Disjuncts:    0
+
+NumCloseIDs: 6
 -- out/evalalpha --
 Errors:
 a.c: field not allowed:

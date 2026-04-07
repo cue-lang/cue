@@ -8,15 +8,17 @@ x: {
 	b: "foo"
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  6
-Reused: 3
-Allocs: 5
-Retain: 2
+Leaks:  0
+Freed:  14
+Reused: 5
+Allocs: 9
+Retain: 0
 
-Unifications: 8
-Conjuncts:    18
-Disjuncts:    8
+Unifications: 10
+Conjuncts:    20
+Disjuncts:    0
+
+NumCloseIDs: 3
 -- out/evalalpha --
 Errors:
 x.b: field not allowed:

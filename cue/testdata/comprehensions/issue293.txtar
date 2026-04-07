@@ -31,19 +31,17 @@ t: p: "foo"
 	x: f2: 2
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  16
-Reused: 12
-Allocs: 7
-Retain: 4
+Leaks:  0
+Freed:  28
+Reused: 15
+Allocs: 13
+Retain: 0
 
-Unifications: 19
-Conjuncts:    33
-Disjuncts:    20
+Unifications: 22
+Conjuncts:    40
+Disjuncts:    0
 
-MisalignedConjunct: 1
-
-NumCloseIDs: 4
+NumCloseIDs: 15
 -- out/evalalpha --
 Errors:
 #V1.x.f2: field not allowed:

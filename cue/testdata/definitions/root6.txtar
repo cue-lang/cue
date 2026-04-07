@@ -12,15 +12,23 @@ x: {
 	#Schema: close({ a: b: int})
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  14
-Reused: 9
-Allocs: 9
-Retain: 6
+Leaks:  0
+Freed:  30
+Reused: 8
+Allocs: 22
+Retain: 0
 
-Unifications: 18
-Conjuncts:    32
-Disjuncts:    20
+Unifications: 22
+Conjuncts:    34
+Disjuncts:    0
+Notifications: 2
+
+NumCloseIDs: 11
+
+ConjunctInfos:       29
+MaxConjunctInfos:    3
+MaxReqSets:          7
+MaxRedirect:         2
 -- out/evalalpha --
 (#struct){
   c: (string){ "foo" }

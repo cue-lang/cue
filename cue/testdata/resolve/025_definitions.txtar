@@ -84,13 +84,15 @@ mixedRec: {Mixed: string}
 -- out/eval/stats --
 Leaks:  0
 Freed:  28
-Reused: 24
-Allocs: 4
+Reused: 14
+Allocs: 14
 Retain: 0
 
 Unifications: 28
 Conjuncts:    43
-Disjuncts:    28
+Disjuncts:    0
+
+NumCloseIDs: 7
 -- out/evalalpha --
 Errors:
 foo.feild: field not allowed:

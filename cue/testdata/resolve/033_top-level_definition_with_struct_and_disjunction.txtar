@@ -33,14 +33,14 @@
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  10
-Reused: 5
-Allocs: 5
+Freed:  13
+Reused: 0
+Allocs: 13
 Retain: 0
 
-Unifications: 8
-Conjuncts:    15
-Disjuncts:    10
+Unifications: 5
+Conjuncts:    12
+Disjuncts:    2
 -- out/evalalpha --
 (struct){
   #def: (#struct){ |((#struct){

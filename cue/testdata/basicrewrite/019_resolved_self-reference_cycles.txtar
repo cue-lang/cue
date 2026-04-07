@@ -170,13 +170,15 @@ nodes: t3: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  62
-Reused: 55
-Allocs: 7
-Retain: 10
+Reused: 48
+Allocs: 14
+Retain: 0
 
 Unifications: 62
-Conjuncts:    105
-Disjuncts:    70
+Conjuncts:    103
+Disjuncts:    0
+
+NumCloseIDs: 8
 -- out/evalalpha --
 (struct){
   math: (struct){

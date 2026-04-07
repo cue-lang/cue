@@ -70,19 +70,17 @@ issue3946: reduced:{
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  61
-Reused: 51
-Allocs: 10
-Retain: 6
+Leaks:  2
+Freed:  58
+Reused: 38
+Allocs: 22
+Retain: 0
 
-Unifications: 57
-Conjuncts:    86
-Disjuncts:    67
+Unifications: 54
+Conjuncts:    100
+Disjuncts:    4
 
-MisalignedConjunct: 19
-
-NumCloseIDs: 10
+NumCloseIDs: 27
 -- out/evalalpha --
 (struct){
   full: (struct){

@@ -7,13 +7,16 @@ root1: 1
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
-Reused: 2
-Allocs: 3
-Retain: 1
+Reused: 0
+Allocs: 5
+Retain: 0
 
 Unifications: 5
 Conjuncts:    8
-Disjuncts:    6
+Disjuncts:    0
+Notifications: 1
+
+NumCloseIDs: 2
 -- out/evalalpha --
 (#struct){
   root1: (int){ 1 }

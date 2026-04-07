@@ -13,13 +13,15 @@ instance: #Type & {
 -- out/eval/stats --
 Leaks:  0
 Freed:  14
-Reused: 7
-Allocs: 7
-Retain: 3
+Reused: 6
+Allocs: 8
+Retain: 0
 
 Unifications: 14
-Conjuncts:    35
-Disjuncts:    17
+Conjuncts:    32
+Disjuncts:    0
+
+NumCloseIDs: 8
 -- out/evalalpha --
 (struct){
   out: (#struct){

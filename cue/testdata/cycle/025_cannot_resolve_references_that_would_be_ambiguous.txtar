@@ -37,13 +37,15 @@ c2: (*{a: 2} | {b: 2}) & c1
 -- out/eval/stats --
 Leaks:  0
 Freed:  52
-Reused: 43
-Allocs: 9
-Retain: 19
+Reused: 32
+Allocs: 20
+Retain: 0
 
-Unifications: 24
-Conjuncts:    80
-Disjuncts:    52
+Unifications: 16
+Conjuncts:    62
+Disjuncts:    28
+
+NumCloseIDs: 4
 -- out/evalalpha --
 (struct){
   a1: (_|_){

@@ -19,7 +19,7 @@ Retain: 0
 
 Unifications: 2
 Conjuncts:    2
-Disjuncts:    2
+Disjuncts:    0
 -- out/evalalpha --
 (struct){
   a: (struct){

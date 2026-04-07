@@ -675,7 +675,7 @@ issue2685: {
 		foo: #Foo
 	}
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  218
 Freed:  2563
 Reused: 2524
@@ -688,50 +688,6 @@ Disjuncts:    1302
 Notifications: 4
 
 NumCloseIDs: 323
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,13 +1,12 @@
--Leaks:  9
--Freed:  2856
--Reused: 2841
--Allocs: 24
--Retain: 123
--
--Unifications: 1435
--Conjuncts:    4154
--Disjuncts:    2979
--
--MisalignedConjunct: 44
--
--NumCloseIDs: 10
-+Leaks:  218
-+Freed:  2563
-+Reused: 2524
-+Allocs: 257
-+Retain: 0
-+
-+Unifications: 667
-+Conjuncts:    2771
-+Disjuncts:    1302
-+Notifications: 4
-+
-+NumCloseIDs: 323
--- out/eval/stats --
-Leaks:  9
-Freed:  2856
-Reused: 2841
-Allocs: 24
-Retain: 123
-
-Unifications: 1435
-Conjuncts:    4154
-Disjuncts:    2979
-
-MisalignedConjunct: 44
-
-NumCloseIDs: 10
 -- diff/explanation --
 issue2209.simplified.t2.BAZ: now fixed
 issue2209.simplified.t3.BAZ: missing error.

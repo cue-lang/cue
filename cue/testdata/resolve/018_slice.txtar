@@ -39,15 +39,15 @@ e7: [2][:"9"]
   ][:"9"]
 }
 -- out/eval/stats --
-Leaks:  8
-Freed:  10
-Reused: 8
-Allocs: 10
-Retain: 8
+Leaks:  0
+Freed:  25
+Reused: 13
+Allocs: 12
+Retain: 0
 
 Unifications: 18
 Conjuncts:    18
-Disjuncts:    18
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 e1: index 1 out of range:

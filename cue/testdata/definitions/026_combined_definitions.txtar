@@ -83,13 +83,15 @@ d1: #D1 & {env: c: "C"}
 -- out/eval/stats --
 Leaks:  0
 Freed:  29
-Reused: 24
-Allocs: 5
-Retain: 1
+Reused: 17
+Allocs: 12
+Retain: 0
 
 Unifications: 29
 Conjuncts:    41
-Disjuncts:    30
+Disjuncts:    0
+
+NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 #D4.env.b: field not allowed:

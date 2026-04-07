@@ -460,7 +460,7 @@ recursive: t1: { try { for x in [b?] { x } } }
 recursive: t2: { try { {x: b?, y: c?} } }
 recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}
 
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  53
 Freed:  354
 Reused: 307
@@ -472,43 +472,6 @@ Conjuncts:    507
 Disjuncts:    0
 
 NumCloseIDs: 173
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,11 @@
--Leaks:  0
--Freed:  8
--Reused: 5
--Allocs: 3
-+Leaks:  53
-+Freed:  354
-+Reused: 307
-+Allocs: 100
- Retain: 0
- 
--Unifications: 8
--Conjuncts:    13
--Disjuncts:    8
--
--NumCloseIDs: 1
-+Unifications: 400
-+Conjuncts:    507
-+Disjuncts:    0
-+
-+NumCloseIDs: 173
--- out/eval/stats --
-Leaks:  0
-Freed:  8
-Reused: 5
-Allocs: 3
-Retain: 0
-
-Unifications: 8
-Conjuncts:    13
-Disjuncts:    8
-
-NumCloseIDs: 1
 -- out/evalalpha --
 Errors:
 errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):

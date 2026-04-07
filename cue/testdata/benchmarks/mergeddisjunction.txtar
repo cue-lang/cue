@@ -44,17 +44,19 @@ b: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  283
-Reused: 275
-Allocs: 8
+Reused: 245
+Allocs: 38
 Retain: 0
 
 Unifications: 99
 Conjuncts:    530
-Disjuncts:    283
+Disjuncts:    184
 
-MisalignedConjunct: 33
+NumCloseIDs: 35
 
-NumCloseIDs: 2
+ConjunctInfos:       194
+MaxConjunctInfos:    32
+MaxReqSets:          2
 -- out/evalalpha --
 (struct){
   list: (#list){

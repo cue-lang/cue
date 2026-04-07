@@ -37,13 +37,13 @@ a
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
-Reused: 8
-Allocs: 3
+Reused: 2
+Allocs: 9
 Retain: 0
 
 Unifications: 11
 Conjuncts:    11
-Disjuncts:    11
+Disjuncts:    0
 -- out/evalalpha --
 (struct){
   a: (struct){

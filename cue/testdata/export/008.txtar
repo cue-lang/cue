@@ -19,7 +19,9 @@ Retain: 0
 
 Unifications: 3
 Conjuncts:    5
-Disjuncts:    3
+Disjuncts:    0
+
+NumCloseIDs: 1
 -- out/evalalpha --
 Errors:
 a.0: conflicting values 4 and 3:

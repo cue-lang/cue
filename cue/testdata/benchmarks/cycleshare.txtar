@@ -26,7 +26,7 @@ let root_0 = root
 let root_1 = root
 root_2: root
 root_3: root
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  3
 Freed:  63
 Reused: 40
@@ -38,41 +38,6 @@ Conjuncts:    72
 Disjuncts:    21
 
 NumCloseIDs: 1
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  8
--Freed:  965
--Reused: 951
--Allocs: 22
--Retain: 17
--
--Unifications: 559
--Conjuncts:    1046
--Disjuncts:    976
-+Leaks:  3
-+Freed:  63
-+Reused: 40
-+Allocs: 26
-+Retain: 0
-+
-+Unifications: 45
-+Conjuncts:    72
-+Disjuncts:    21
-+
-+NumCloseIDs: 1
--- out/eval/stats --
-Leaks:  8
-Freed:  965
-Reused: 951
-Allocs: 22
-Retain: 17
-
-Unifications: 559
-Conjuncts:    1046
-Disjuncts:    976
 -- out/evalalpha --
 (struct){
   #D1: (#struct){ |((#struct){

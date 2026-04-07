@@ -99,7 +99,7 @@ for clusterName, cluster in clusters {
 }
 
 clusters: foo: {}
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  2
 Freed:  68
 Reused: 29
@@ -112,50 +112,6 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 28
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,13 +1,12 @@
--Leaks:  3
--Freed:  101
--Reused: 84
--Allocs: 20
--Retain: 72
--
--Unifications: 104
--Conjuncts:    271
--Disjuncts:    161
--
--MisalignedConjunct: 119
--
--NumCloseIDs: 14
-+Leaks:  2
-+Freed:  68
-+Reused: 29
-+Allocs: 41
-+Retain: 0
-+
-+Unifications: 70
-+Conjuncts:    130
-+Disjuncts:    0
-+Notifications: 1
-+
-+NumCloseIDs: 28
--- out/eval/stats --
-Leaks:  3
-Freed:  101
-Reused: 84
-Allocs: 20
-Retain: 72
-
-Unifications: 104
-Conjuncts:    271
-Disjuncts:    161
-
-MisalignedConjunct: 119
-
-NumCloseIDs: 14
 -- out/evalalpha --
 (struct){
   shorewallParams: (#struct){

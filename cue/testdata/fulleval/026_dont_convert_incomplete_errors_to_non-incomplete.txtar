@@ -21,7 +21,7 @@ s3: strings.ContainsAny(str, "dd")
 str: string
 num: <4
 is:  bool
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  0
 Freed:  17
 Reused: 0
@@ -31,35 +31,6 @@ Retain: 0
 Unifications: 17
 Conjuncts:    17
 Disjuncts:    0
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- Leaks:  0
- Freed:  17
--Reused: 12
--Allocs: 5
--Retain: 75
-+Reused: 0
-+Allocs: 17
-+Retain: 0
- 
- Unifications: 17
--Conjuncts:    71
--Disjuncts:    82
-+Conjuncts:    17
-+Disjuncts:    0
--- out/eval/stats --
-Leaks:  0
-Freed:  17
-Reused: 12
-Allocs: 5
-Retain: 75
-
-Unifications: 17
-Conjuncts:    71
-Disjuncts:    82
 -- out/evalalpha --
 (struct){
   n1: (struct){

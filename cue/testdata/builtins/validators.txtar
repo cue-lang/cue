@@ -222,19 +222,18 @@ issue3981: matchWithClose: {
 	out: f1: foo: ["bar"]
 }
 -- out/eval/stats --
-Leaks:  5
-Freed:  190
-Reused: 182
-Allocs: 13
-Retain: 26
+Leaks:  13
+Freed:  193
+Reused: 161
+Allocs: 45
+Retain: 0
 
-Unifications: 195
-Conjuncts:    351
-Disjuncts:    218
+Unifications: 188
+Conjuncts:    327
+Disjuncts:    0
+Notifications: 1
 
-MisalignedConjunct: 1
-
-NumCloseIDs: 8
+NumCloseIDs: 76
 -- out/evalalpha --
 Errors:
 issue3474.topValidator.failType.A: conflicting values {C:1} and >10 (mismatched types struct and number):

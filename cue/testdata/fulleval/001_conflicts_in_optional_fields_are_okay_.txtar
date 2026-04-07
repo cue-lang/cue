@@ -21,14 +21,16 @@ c: d & {b?: 4}
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  14
-Reused: 9
-Allocs: 5
+Freed:  15
+Reused: 5
+Allocs: 10
 Retain: 0
 
-Unifications: 10
-Conjuncts:    17
-Disjuncts:    14
+Unifications: 9
+Conjuncts:    16
+Disjuncts:    4
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   d: (struct){ |((struct){

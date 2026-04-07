@@ -97,15 +97,17 @@ e1: [...float]
   ]
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  33
-Reused: 29
-Allocs: 7
-Retain: 7
+Leaks:  0
+Freed:  41
+Reused: 25
+Allocs: 16
+Retain: 0
 
-Unifications: 36
+Unifications: 35
 Conjuncts:    59
-Disjuncts:    39
+Disjuncts:    0
+
+NumCloseIDs: 9
 -- out/evalalpha --
 Errors:
 e0: incompatible list lengths (1 and 2)

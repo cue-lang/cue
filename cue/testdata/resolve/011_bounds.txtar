@@ -124,13 +124,13 @@ e9: >"a" & <1
 -- out/eval/stats --
 Leaks:  0
 Freed:  50
-Reused: 47
-Allocs: 3
+Reused: 0
+Allocs: 50
 Retain: 0
 
 Unifications: 50
 Conjuncts:    126
-Disjuncts:    51
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):

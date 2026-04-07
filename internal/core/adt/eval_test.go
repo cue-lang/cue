@@ -18,6 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -26,7 +27,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -35,7 +35,6 @@ import (
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetdtest"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
 )
@@ -117,52 +116,20 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 
 	switch counts := ctx.Stats(); {
 	case version == internal.DevVersion:
-		hasDiff := false
-		for _, f := range t.Archive.Files {
-			if f.Name == "out/evalalpha/stats" {
-				hasDiff = true
-			}
-		}
-		for _, f := range t.Archive.Files {
-			if f.Name != "out/eval/stats" {
-				// TODO perhaps we should also look for out/evalalpha/stats too?
-				continue
-			}
-			c := cuecontext.New()
-			v := c.CompileBytes(f.Data)
-			var orig stats.Counts
-			v.Decode(&orig)
-
-			// TODO: do something more principled.
-			switch {
-			case hasDiff || cuetest.ForceUpdateGoldenFiles:
-				// With CUE_UPDATE=force, we update the stats file
-				// unconditionally.
-				// NOTE: if the reuse of force clashes too much with other uses,
-				// we could also introduce a different enum value for this.
-				fallthrough
-			case orig.Disjuncts < counts.Disjuncts,
-				orig.Disjuncts > counts.Disjuncts*5 &&
-					counts.Disjuncts > 20,
-				orig.Conjuncts > counts.Conjuncts*2,
-				counts.Notifications > 10,
-				counts.NumCloseIDs > 100,
-				counts.MaxReqSets > 15,
-				counts.Leaks()-orig.Leaks() > 17,
-				counts.Allocs-orig.Allocs > 50:
-				// For now, we only care about disjuncts.
-				// TODO: add triggers once the disjunction issues have bene
-				// solved.
-				w := t.Writer("stats")
-				fmt.Fprintln(w, counts)
-			default:
-				// This is technically a no-op but still worthwhile to
-				// inform the cuetxtar garbage collector we still care
-				// about the file.
-				w := t.Writer("stats")
-				w.Write(f.Data)
-			}
-			break
+		// V2 is no longer supported. Write stats to out/eval/stats (the
+		// fallback name) directly — no evalalpha diff section is generated.
+		// If out/evalalpha/stats or its diff section exist in the archive,
+		// remove them so that CUE_UPDATE=1 cleans them up.
+		hasStats := slices.ContainsFunc(t.Archive.Files, func(f txtar.File) bool {
+			return f.Name == "out/eval/stats" || f.Name == "out/evalalpha/stats"
+		})
+		if hasStats {
+			t.Archive.Files = slices.DeleteFunc(t.Archive.Files, func(f txtar.File) bool {
+				return f.Name == "out/evalalpha/stats" ||
+					f.Name == "diff/-out/evalalpha/stats<==>+out/eval/stats"
+			})
+			w := t.WriterFallback("stats")
+			fmt.Fprintln(w, counts)
 		}
 
 	default:

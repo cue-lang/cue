@@ -628,7 +628,7 @@ issue4006: {
 	#C: #A & {}
 	out: #C & #B
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  77
 Freed:  863
 Reused: 815
@@ -646,51 +646,6 @@ ConjunctInfos:       1118
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,17 @@
--Leaks:  47
--Freed:  1002
--Reused: 988
--Allocs: 61
--Retain: 227
--
--Unifications: 929
--Conjuncts:    2032
--Disjuncts:    1209
--
--NumCloseIDs: 3
-+Leaks:  77
-+Freed:  863
-+Reused: 815
-+Allocs: 125
-+Retain: 0
-+
-+Unifications: 767
-+Conjuncts:    1532
-+Disjuncts:    84
-+Notifications: 7
-+
-+NumCloseIDs: 441
-+
-+ConjunctInfos:       1118
-+MaxConjunctInfos:    5
-+MaxReqSets:          9
-+MaxRedirect:         2
--- out/eval/stats --
-Leaks:  47
-Freed:  1002
-Reused: 988
-Allocs: 61
-Retain: 227
-
-Unifications: 929
-Conjuncts:    2032
-Disjuncts:    1209
-
-NumCloseIDs: 3
 -- out/evalalpha --
 Errors:
 and.transitive.err.out.err: field not allowed:

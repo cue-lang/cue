@@ -27,13 +27,15 @@ bar: [
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
-Reused: 10
-Allocs: 5
+Reused: 5
+Allocs: 10
 Retain: 0
 
 Unifications: 11
 Conjuncts:    17
-Disjuncts:    15
+Disjuncts:    4
+
+NumCloseIDs: 4
 -- out/evalalpha --
 (struct){
   somelist: (list){ |(*(#list){

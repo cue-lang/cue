@@ -103,7 +103,7 @@ issue3967: error: local: {
 		}}
 	}
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  16
 Freed:  278
 Reused: 259
@@ -115,44 +115,6 @@ Conjuncts:    394
 Disjuncts:    80
 
 NumCloseIDs: 94
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,11 @@
- Leaks:  16
--Freed:  292
--Reused: 281
--Allocs: 27
--Retain: 28
--
--Unifications: 220
--Conjuncts:    388
--Disjuncts:    299
--
--NumCloseIDs: 8
-+Freed:  278
-+Reused: 259
-+Allocs: 35
-+Retain: 0
-+
-+Unifications: 162
-+Conjuncts:    394
-+Disjuncts:    80
-+
-+NumCloseIDs: 94
--- out/eval/stats --
-Leaks:  16
-Freed:  292
-Reused: 281
-Allocs: 27
-Retain: 28
-
-Unifications: 220
-Conjuncts:    388
-Disjuncts:    299
-
-NumCloseIDs: 8
 -- out/evalalpha --
 (struct){
   #OneOrTwo: (#struct){ |((#struct){

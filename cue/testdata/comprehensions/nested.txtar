@@ -60,19 +60,17 @@ for k, v in deployment {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  45
-Reused: 26
-Allocs: 19
-Retain: 33
+Leaks:  6
+Freed:  40
+Reused: 12
+Allocs: 34
+Retain: 0
 
 Unifications: 35
-Conjuncts:    95
-Disjuncts:    75
+Conjuncts:    89
+Disjuncts:    10
 
-MisalignedConjunct: 5
-
-NumCloseIDs: 1
+NumCloseIDs: 5
 -- out/compile --
 --- in.cue
 {

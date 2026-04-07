@@ -21,14 +21,16 @@ cycleErr: X={
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  13
-Reused: 9
-Allocs: 4
+Freed:  15
+Reused: 6
+Allocs: 9
 Retain: 0
 
-Unifications: 13
-Conjuncts:    20
-Disjuncts:    13
+Unifications: 15
+Conjuncts:    18
+Disjuncts:    0
+
+NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):

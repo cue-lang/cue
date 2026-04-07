@@ -169,6 +169,35 @@ x: 42 @test(eq, 99) @test(todo, p=1, why="known issue")
 		// Both run; test passes overall.
 		runExpectPass(t, "-- test.cue --\nx: 42 @test(eq, 42) @test(eq:todo, 99)\n")
 	})
+
+	t.Run("err:todo still failing does not fail test", func(t *testing.T) {
+		// @test(err:todo, ...) where value is not an error: no test failure.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(err:todo, code=eval)\n")
+	})
+
+	t.Run("err:todo passing does not fail test", func(t *testing.T) {
+		// @test(err:todo) where value IS an error: logs a warning but no failure.
+		runExpectPass(t, "-- test.cue --\nx: 1/0 @test(err:todo, code=eval)\n")
+	})
+
+	t.Run("err:todo with priority does not fail test", func(t *testing.T) {
+		// p= is included in the log but does not affect pass/fail.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(err:todo, p=1, code=eval)\n")
+	})
+
+	t.Run("eq incorrect passing logs note", func(t *testing.T) {
+		// @test(eq, X, incorrect) where value matches X: suppresses "this is wrong"
+		// feeling by logging a NOTE, but does not fail.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(eq, 42, incorrect)\n")
+	})
+
+	// Note: a mismatch on an incorrect-flagged assertion fails normally (same as
+	// without the flag). The incorrect flag only suppresses the pass case.
+
+	t.Run("eq incorrect and err:todo coexist", func(t *testing.T) {
+		// Both document different aspects of the same incorrect-behavior field.
+		runExpectPass(t, "-- test.cue --\nx: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)\n")
+	})
 }
 
 // TestInlineRunner_SubPath verifies #subpath restricts execution.

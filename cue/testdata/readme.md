@@ -283,6 +283,68 @@ Placed on the struct containing `@test(permute)` fields.  Asserts that the
 total number of evaluated permutations equals `N`.  Auto-updated by
 `CUE_UPDATE=1`.
 
+### `todo` — expected-to-fail wrapper
+
+```cue
+result: broken @test(eq, 42) @test(todo, p=1, why="evaluator bug #123")
+```
+
+Marks the annotated field as expected-to-fail: all directives still run, but
+failures are suppressed (logged, not reported as errors).  If all directives
+pass, the runner emits a WARNING that `@test(todo)` may no longer be needed.
+
+### `eq:todo` — expected future value
+
+```cue
+v: gotWrong @test(eq, gotWrong) @test(eq:todo, expectedRight)
+```
+
+Documents what the field *should* evaluate to once a known issue is fixed.  A
+mismatch is not a test failure (logged as "still failing"); a match emits a
+WARNING suggesting the annotation be promoted to `@test(eq, ...)`.
+
+### `err:todo` — expected future error
+
+```cue
+x: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)
+```
+
+Like `eq:todo` but for error assertions.  A mismatch (field does not yet
+produce the expected error) is logged as "still failing", not a failure.  A
+match emits a WARNING to upgrade the annotation.
+
+### `incorrect` — document known-incorrect behavior
+
+```cue
+x: 42 @test(eq, 42, incorrect)
+x: 1/0 @test(err, code=eval, incorrect)
+```
+
+Applicable to any assertion directive.  Marks the assertion as documenting the
+evaluator's *current* output even though that output is known to be wrong.
+
+- Passes (documented wrong value still present): logs `NOTE: ... matches (documented as known incorrect behavior)`. No test failure.
+- Fails (behavior has changed): **test fails** — any change needs attention (may be a fix or a new regression).
+
+Typical pattern: pair with `err:todo` to record both the current wrong value
+and the expected correct behavior:
+
+```cue
+x: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)
+```
+
+### `p=N` — fix priority
+
+```cue
+x: 42 @test(eq:todo, 99, p=1)
+x: 1/0 @test(err:todo, p=0, code=eval)
+result: bad @test(eq, bad) @test(todo, p=2, why="cleanup")
+```
+
+Attaches a numeric priority to any `:todo` directive.  `p=0` is critical,
+`p=1` important, `p=2` good-to-have.  Purely informational — shown in log
+output; does not affect pass/fail behavior.
+
 ### `desc` — human-readable description
 
 ```cue

@@ -16,7 +16,9 @@
 // This file implements inline-assertion mode where @test(...) attributes on CUE
 // fields replace golden-file comparison.
 //
-// @test(eq, VALUE) may appear in two positions:
+// # Placement
+//
+// A @test attribute may appear in two positions:
 //
 //  1. As a field attribute:  field: expr @test(eq, VALUE)
 //     Checks the evaluated field value against VALUE.
@@ -159,6 +161,18 @@ type parsedTestAttr struct {
 	// are logged rather than reported as errors; a pass emits a warning.
 	isTodo bool
 
+	// todoPriority is the p= value from a :todo directive, e.g. "1" for p=1.
+	// 0 is the highest priority; empty means no priority specified.
+	todoPriority string
+
+	// isIncorrect marks a directive carrying the "incorrect" positional flag
+	// (e.g. @test(eq, 3, incorrect) or @test(err, code=eval, incorrect)).
+	// Applicable to any assertion directive. The assertion documents current
+	// known-incorrect behavior: a pass is suppressed (logs a NOTE), but a
+	// failure still propagates as a real test failure so that changes to the
+	// incorrect value are always detected.
+	isIncorrect bool
+
 	// hint is an optional message printed when the assertion fails
 	// (from hint="..."). Intended as guidance for automated tools
 	// such as AI assistants reviewing test failures.
@@ -239,7 +253,7 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 		result.errArgs = &ea
 	}
 
-	// Extract the universal guidance= flag and reject unknown key= flags.
+	// Extract universal flags and reject unknown key= flags.
 	// Positional args (kv.Key() == "") are accepted by directives as needed.
 	// Directives with their own flag parsers (err, todo, skip, shareID) are
 	// responsible for validating their own flags.
@@ -247,8 +261,14 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 		switch kv.Key() {
 		case "hint":
 			result.hint = kv.Value()
+		case "p":
+			// p= is a universal priority flag (e.g. p=1 on err:todo).
+			result.todoPriority = kv.Value()
 		case "":
-			// Positional arg — accepted.
+			// Positional arg — check for universal flags.
+			if kv.Value() == "incorrect" {
+				result.isIncorrect = true
+			}
 		default:
 			switch result.directive {
 			case "err", "todo", "skip", "shareID":
@@ -1062,6 +1082,24 @@ func pathHasPrefix(path, prefix cue.Path) bool {
 // runDirective dispatches a single parsed directive against a cue.Value.
 func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
+	// @test(..., incorrect) — run the directive normally (failures are still
+	// reported), but log a NOTE when it passes so readers know this is
+	// documenting known-incorrect behavior and that a change here might be
+	// intentional (a fix) rather than a regression.
+	if pa.isIncorrect {
+		cap := &failCapture{TB: t}
+		pa2 := pa
+		pa2.isIncorrect = false
+		r.runDirective(cap, path, val, pa2)
+		if !cap.failed {
+			t.Logf("NOTE: path %s: %s: matches (documented as known incorrect behavior)", path, pa.directive)
+		} else {
+			// Propagate as a real test failure — the incorrect behavior changed
+			// and needs attention (may be a fix or a new regression).
+			t.Errorf("%s", strings.TrimRight(cap.msgs.String(), "\n"))
+		}
+		return
+	}
 	switch pa.directive {
 	case "eq":
 		r.runEqInline(t, path, val, pa)

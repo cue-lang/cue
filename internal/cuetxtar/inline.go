@@ -51,6 +51,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
@@ -1361,12 +1362,12 @@ func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.V
 // When CUE_UPDATE modes are active, enqueues a write-back.
 func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
+	name := pa.raw.Fields[0].Value() // preserves any :vN version suffix
 	if len(pa.raw.Fields) < 2 {
 		// Empty @test(debugCheck) — fill placeholder.
 		if cuetest.UpdateGoldenFiles {
 			actual := r.debugPrinterOutput(val)
-			escaped := strings.ReplaceAll(actual, `"`, `\"`)
-			r.enqueueInlineFill(pa, fmt.Sprintf(`@test(debugCheck, """%s""")`, escaped))
+			r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		}
 		return
 	}
@@ -1377,8 +1378,7 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 		return
 	}
 	if cuetest.ForceUpdateGoldenFiles || cuetest.UpdateGoldenFiles {
-		escaped := strings.ReplaceAll(actual, `"`, `\"`)
-		r.enqueueInlineFill(pa, fmt.Sprintf(`@test(debugCheck, """%s""")`, escaped))
+		r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		return
 	}
 	if !match {
@@ -1392,12 +1392,12 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 // test — it only logs and auto-updates when CUE_UPDATE is active.
 func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
+	name := pa.raw.Fields[0].Value() // preserves any :vN version suffix
 	actual := r.debugPrinterOutput(val)
 	if len(pa.raw.Fields) < 2 {
 		// Empty @test(debugOutput) — fill placeholder.
 		if cuetest.UpdateGoldenFiles {
-			escaped := strings.ReplaceAll(actual, `"`, `\"`)
-			r.enqueueInlineFill(pa, fmt.Sprintf(`@test(debugOutput, """%s""")`, escaped))
+			r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		}
 		return
 	}
@@ -1408,13 +1408,43 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 	}
 	// Always auto-update on mismatch (informational, not an assertion).
 	if cuetest.ForceUpdateGoldenFiles || cuetest.UpdateGoldenFiles {
-		escaped := strings.ReplaceAll(actual, `"`, `\"`)
-		r.enqueueInlineFill(pa, fmt.Sprintf("@test(debugOutput, \"\"\"\n%s\"\"\")", escaped))
+		r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		return
 	}
 	if !match {
 		t.Logf("path %s: @test(debugOutput) changed:\ngot:  %q\nwant: %q", path, actual, expected)
 	}
+}
+
+// formatDebugAttr returns the @test(name, ...) attribute text for a debug value.
+func (r *inlineRunner) formatDebugAttr(name, actual string, pa parsedTestAttr) string {
+	actual = strings.TrimRight(actual, "\n")
+	n := strings.Count(r.attrLineIndent(pa), "\t")
+	actual = literal.String.WithOptionalTabIndent(n + 1).Quote(actual)
+	return fmt.Sprintf("@test(%s, %s)", name, actual)
+}
+
+// attrLineIndent returns the leading whitespace on the source line that
+// contains pa's @test attribute. Used to compute the indentation level
+// for multi-line debug attribute values.
+func (r *inlineRunner) attrLineIndent(pa parsedTestAttr) string {
+	offset := pa.srcAttr.Pos().Offset()
+	for _, f := range r.archive.Files {
+		if f.Name != pa.srcFileName {
+			continue
+		}
+		data := f.Data
+		start := offset
+		for start > 0 && data[start-1] != '\n' {
+			start--
+		}
+		end := start
+		for end < offset && data[end] == '\t' {
+			end++
+		}
+		return string(data[start:end])
+	}
+	return ""
 }
 
 // debugPrinterOutput returns the standard debug-printer representation of val,

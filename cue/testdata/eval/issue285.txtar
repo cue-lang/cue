@@ -1,3 +1,9 @@
+# Tests that a definition referencing another definition with a nested pattern
+# constraint correctly propagates field constraints through Instance.Fill and
+# unification. Issue: filling a field in a closed nested struct failed with
+# "field not allowed" when the constraint was inherited via a parent definition
+# rather than explicitly re-stated.
+# https://cuelang.org/issue/285
 -- in.cue --
 #TopLevel: [name=string]: {
 	path:    string

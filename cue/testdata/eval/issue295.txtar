@@ -1,3 +1,9 @@
+# Tests that a closed struct with an interpolated dynamic field key correctly
+# unifies with a regular field of the same name. Issue: `cue vet -c` reported
+# "field not allowed in closed struct" when the key was written as `"\("f")":`
+# even though the resulting field name is identical to a subsequently declared
+# regular field.
+# https://cuelang.org/issue/295
 -- in.cue --
 p: close({
 	"\("f")": _

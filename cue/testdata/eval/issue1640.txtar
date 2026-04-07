@@ -34,7 +34,7 @@ fact2: #MCS & {
 	@test(closed)
 	lc: string
 	uc: lc
-} 
+}
 -- out/compile --
 --- a1.cue
 {

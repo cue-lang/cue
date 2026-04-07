@@ -1,3 +1,8 @@
+# Tests that an indirect reference through a hidden field to a dynamic index
+# correctly propagates an "incomplete" error rather than a misleading "cycle"
+# error. Issue: indexing foo[_what] via a hidden variable _obj caused a "cycle
+# error" instead of "invalid non-ground value" when _what was abstract.
+# https://cuelang.org/issue/962
 -- in.cue --
 import "encoding/yaml"
 

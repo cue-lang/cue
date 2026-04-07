@@ -1,3 +1,8 @@
+# Tests that field names overlapping with built-in identifiers (e.g. "html",
+# "list") are not reordered to the front of the struct during evaluation.
+# Issue: `cue eval` placed such fields before others, violating declaration
+# order.
+# https://cuelang.org/issue/349
 -- in.cue --
 ex: {
 	@test(eq, {

@@ -1,5 +1,5 @@
-TODO: image field is not pre-evaluated (not a huge deal)
-TODO: allow dynamic fields
+# TODO: image field is not pre-evaluated (not a huge deal)
+# TODO: allow dynamic fields
 -- in.cue --
 key: "app01" @test(eq, "app01")
 manifests: [

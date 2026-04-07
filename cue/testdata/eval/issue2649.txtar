@@ -1,3 +1,7 @@
+# Tests that list.Avg returns a float value (not an integer) when the result
+# is mathematically a whole number. Issue: in v0.6.0 the integer representation
+# of the float result caused incorrect Int64() reads and panics in Int().
+# https://cuelang.org/issue/2649
 -- in.cue --
 @test(eq, 8.0)
 @test(eq:todo, 8)

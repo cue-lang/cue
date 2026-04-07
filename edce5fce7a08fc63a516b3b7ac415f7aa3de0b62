@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76d203f1_7c517902",
+        "filename": "cue/testdata/eval/cycles_ref.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:26:05Z",
+      "side": 1,
+      "message": "Add #todo:inline: comment in txtar header that we should test for structure sharing. It looks like the current implementation does not do this properly, so we should add the sharing part as a todo.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1020f9d1_7e834f18",
+        "filename": "cue/testdata/eval/issue285.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:26:05Z",
+      "side": 1,
+      "message": "Describe GH issue the filename refers to and verify that this tests correctly captures the issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ada45e55_0fc57010",
+        "filename": "cue/testdata/eval/issue295.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:26:05Z",
+      "side": 1,
+      "message": "Describe GH issue the filename refers to and verify that this tests correctly captures the issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf1b7037_44e983fd",
+        "filename": "cue/testdata/eval/issue349.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:26:05Z",
+      "side": 1,
+      "message": "Describe GH issue the filename refers to and verify that this tests correctly captures the issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec7eef6a_e55e0a43",
+        "filename": "cue/testdata/eval/issue3813.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:26:05Z",
+      "side": 1,
+      "message": "Describe GH issue the filename refers to and verify that this tests correctly captures the issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "693eb421_fd93cbdb",
+        "filename": "cue/testdata/eval/issue962.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:26:05Z",
+      "side": 1,
+      "message": "Describe GH issue the filename refers to and verify that this tests correctly captures the issue. Here and for other files.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aef1f1c9_a20e9fa3",
+        "filename": "cue/testdata/references/alias_err.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:26:05Z",
+      "side": 1,
+      "message": "Add comment describing essence of issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a27f5840_58ed930d",
+        "filename": "cue/testdata/references/alias_err.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T09:26:05Z",
+      "side": 1,
+      "message": "Add comment describing essence of issue.",
+      "revId": "edce5fce7a08fc63a516b3b7ac415f7aa3de0b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

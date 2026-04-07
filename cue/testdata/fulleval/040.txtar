@@ -1,5 +1,8 @@
+# Tests that a disjunction inside a definition resolves correctly when a
+# discriminant field is set. After unifying #Task with {op: "pull"}, the
+# "pull" branch is selected and expressions using the defaulted tag
+# field (tag: *"latest" | string) evaluate concretely.
 #evalFull
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #Task: {
 	{
@@ -13,7 +16,25 @@
 	}
 }
 
-foo: #Task & {"op": "pull"}
+foo: #Task & {"op": "pull"} @test(eq, {
+	@test(final)
+
+	op:           "pull"
+	tag:          "latest"
+	refToTag:     "latest"
+	tagExpr:     "latestdd"
+	tagInString: "latest"
+})
+-- out/eval/stats --
+Leaks:  0
+Freed:  27
+Reused: 21
+Allocs: 6
+Retain: 0
+
+Unifications: 15
+Conjuncts:    35
+Disjuncts:    27
 -- out/compile --
 --- in.cue
 {
@@ -31,35 +52,9 @@ foo: #Task & {"op": "pull"}
   foo: (〈0;#Task〉 & {
     op: "pull"
   })
-}
--- out/eval/stats --
-Leaks:  8
-Freed:  16
-Reused: 10
-Allocs: 14
-Retain: 0
-
-Unifications: 14
-Conjuncts:    28
-Disjuncts:    8
-
-NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  #Task: (#struct){ |((#struct){
-      op: (string){ "pull" }
-      tag: (string){ |(*(string){ "latest" }, (string){ string }) }
-      refToTag: (string){ |(*(string){ "latest" }, (string){ string }) }
-      tagExpr: (string){ "latestdd" }
-      tagInString: (string){ "latest" }
-    }, (#struct){
-      op: (string){ "scratch" }
-    }) }
-  foo: (#struct){
-    op: (string){ "pull" }
-    tag: (string){ |(*(string){ "latest" }, (string){ string }) }
-    refToTag: (string){ |(*(string){ "latest" }, (string){ string }) }
-    tagExpr: (string){ "latestdd" }
-    tagInString: (string){ "latest" }
+  foo: {
+    op: _
+    tagExpr: _
+    tagInString: _
   }
 }

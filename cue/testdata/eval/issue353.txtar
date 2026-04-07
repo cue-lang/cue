@@ -1,6 +1,16 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that unifying a value with a definition that embeds a disjunction
+# correctly retains both disjunction branches after concretizing some fields.
+# Issue: after setting e.a = "hello" the two-branch disjunction (one with
+# value?, one with externalValue?) should survive intact.
+# https://cuelang.org/issue/353
 -- in.cue --
-e: #Example
+e: #Example @test(closed) @test(eq, {
+	a:      "hello"
+	value?: string
+} | {
+	a:              "hello"
+	externalValue?: string
+})
 
 e: a: "hello"
 
@@ -11,7 +21,13 @@ e: a: "hello"
 	} | {
 		externalValue?: string
 	}
-}
+} @test(eq,   {
+	a:      string
+	value?: string
+} | {
+	a:              string
+	externalValue?: string
+})
 -- out/eval/stats --
 Leaks:  0
 Freed:  17
@@ -19,28 +35,9 @@ Reused: 7
 Allocs: 10
 Retain: 0
 
-Unifications: 9
-Conjuncts:    18
-Disjuncts:    4
-
-NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  e: (#struct){ |((#struct){
-      a: (string){ "hello" }
-      value?: (string){ string }
-    }, (#struct){
-      a: (string){ "hello" }
-      externalValue?: (string){ string }
-    }) }
-  #Example: (#struct){ |((#struct){
-      a: (string){ string }
-      value?: (string){ string }
-    }, (#struct){
-      a: (string){ string }
-      externalValue?: (string){ string }
-    }) }
-}
+Unifications: 11
+Conjuncts:    21
+Disjuncts:    15
 -- out/compile --
 --- in.cue
 {

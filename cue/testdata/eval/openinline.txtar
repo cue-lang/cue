@@ -80,15 +80,17 @@ package example
 #E: #D & {b: 1}
 
 -- out/eval/stats --
-Leaks:  18
-Freed:  73
-Reused: 69
+Leaks:  10
+Freed:  75
+Reused: 63
 Allocs: 22
-Retain: 37
+Retain: 0
 
-Unifications: 91
-Conjuncts:    141
-Disjuncts:    107
+Unifications: 72
+Conjuncts:    108
+Disjuncts:    0
+
+NumCloseIDs: 19
 -- out/evalalpha --
 Errors:
 outerErr.usingClose.t1.version.major: field not allowed:

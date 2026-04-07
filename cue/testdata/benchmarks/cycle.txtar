@@ -45,15 +45,17 @@ sameValues: CmustBeA: {
   }
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  25
-Reused: 15
-Allocs: 10
-Retain: 1
+Leaks:  2
+Freed:  15
+Reused: 6
+Allocs: 11
+Retain: 0
 
-Unifications: 15
-Conjuncts:    30
-Disjuncts:    26
+Unifications: 13
+Conjuncts:    19
+Disjuncts:    4
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   sameValues: (struct){

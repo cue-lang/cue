@@ -24,15 +24,15 @@ ifScalarNested: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
-Reused: 4
-Allocs: 3
-Retain: 3
+Reused: 2
+Allocs: 5
+Retain: 0
 
 Unifications: 7
-Conjuncts:    13
-Disjuncts:    7
+Conjuncts:    16
+Disjuncts:    0
 
-NumCloseIDs: 3
+NumCloseIDs: 12
 -- out/evalalpha --
 Errors:
 ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):

@@ -18,14 +18,14 @@ b: _
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  5
-Reused: 2
-Allocs: 3
+Freed:  4
+Reused: 0
+Allocs: 4
 Retain: 0
 
-Unifications: 5
-Conjuncts:    11
-Disjuncts:    5
+Unifications: 4
+Conjuncts:    7
+Disjuncts:    0
 -- out/evalalpha --
 (struct){
   a: (struct){

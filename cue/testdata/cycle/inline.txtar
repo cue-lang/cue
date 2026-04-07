@@ -395,7 +395,7 @@ issue3731: full: {
     }
   }
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  5
 Freed:  311
 Reused: 273
@@ -407,41 +407,6 @@ Conjuncts:    623
 Disjuncts:    0
 
 NumCloseIDs: 202
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  286
--Freed:  253
--Reused: 248
--Allocs: 291
--Retain: 994
--
--Unifications: 539
--Conjuncts:    1663
--Disjuncts:    943
-+Leaks:  5
-+Freed:  311
-+Reused: 273
-+Allocs: 43
-+Retain: 0
-+
-+Unifications: 247
-+Conjuncts:    623
-+Disjuncts:    0
-+
-+NumCloseIDs: 202
--- out/eval/stats --
-Leaks:  286
-Freed:  253
-Reused: 248
-Allocs: 291
-Retain: 994
-
-Unifications: 539
-Conjuncts:    1663
-Disjuncts:    943
 -- out/eval --
 Errors:
 expanded1.hasCycle.root._a.input._a.input: structural cycle:

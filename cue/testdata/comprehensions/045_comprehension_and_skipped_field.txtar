@@ -29,19 +29,17 @@ for key, value in {x: v: 1} {
   }
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  7
-Reused: 2
-Allocs: 8
-Retain: 7
+Leaks:  2
+Freed:  8
+Reused: 1
+Allocs: 9
+Retain: 0
 
 Unifications: 8
 Conjuncts:    11
-Disjuncts:    12
+Disjuncts:    2
 
-MisalignedConjunct: 1
-
-NumCloseIDs: 1
+NumCloseIDs: 3
 -- out/evalalpha --
 (struct){
   x: (struct){

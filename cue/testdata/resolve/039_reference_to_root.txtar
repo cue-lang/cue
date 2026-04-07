@@ -52,13 +52,15 @@ wp: v & {b: 100}
 -- out/eval/stats --
 Leaks:  0
 Freed:  21
-Reused: 18
-Allocs: 3
+Reused: 11
+Allocs: 10
 Retain: 0
 
 Unifications: 21
-Conjuncts:    53
-Disjuncts:    21
+Conjuncts:    33
+Disjuncts:    0
+
+NumCloseIDs: 4
 -- out/evalalpha --
 (struct){
   a: (struct){

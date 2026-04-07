@@ -78,13 +78,13 @@ m4: """
 -- out/eval/stats --
 Leaks:  0
 Freed:  9
-Reused: 7
-Allocs: 2
+Reused: 0
+Allocs: 9
 Retain: 0
 
 Unifications: 9
 Conjuncts:    9
-Disjuncts:    9
+Disjuncts:    0
 -- out/evalalpha --
 (struct){
   a1: (string){ "before\n4\nafter" }

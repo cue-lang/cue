@@ -14,15 +14,17 @@ r: #foo & {
 	#x: "hello"
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  19
-Reused: 13
-Allocs: 8
-Retain: 10
+Leaks:  0
+Freed:  21
+Reused: 11
+Allocs: 10
+Retain: 0
 
-Unifications: 21
-Conjuncts:    52
-Disjuncts:    29
+Unifications: 19
+Conjuncts:    44
+Disjuncts:    0
+
+NumCloseIDs: 15
 -- out/evalalpha --
 (struct){
   #d: (#struct){

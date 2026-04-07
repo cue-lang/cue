@@ -34,13 +34,13 @@ missingFieldNestedInInterpolation: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  17
-Reused: 14
-Allocs: 3
+Reused: 8
+Allocs: 9
 Retain: 0
 
 Unifications: 17
-Conjuncts:    29
-Disjuncts:    17
+Conjuncts:    17
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 missingFieldClosed.r: undefined field: b:

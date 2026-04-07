@@ -64,18 +64,6 @@
 }
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
--- out/evalalpha/stats --
-Leaks:  14
-Freed:  67
-Reused: 49
-Allocs: 32
-Retain: 0
-
-Unifications: 57
-Conjuncts:    97
-Disjuncts:    8
-
-NumCloseIDs: 17
 -- out/evalalpha --
 Errors:
 #RelabelService.out.labstr: undefined field: label:
@@ -382,41 +370,18 @@ diff old new
      }
    }
    #ServiceManifest: (#struct){
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  16
--Freed:  117
--Reused: 108
--Allocs: 25
--Retain: 53
--
--Unifications: 107
--Conjuncts:    243
--Disjuncts:    170
-+Leaks:  14
-+Freed:  67
-+Reused: 49
-+Allocs: 32
-+Retain: 0
-+
-+Unifications: 57
-+Conjuncts:    97
-+Disjuncts:    8
-+
-+NumCloseIDs: 17
 -- out/eval/stats --
-Leaks:  16
-Freed:  117
-Reused: 108
-Allocs: 25
-Retain: 53
+Leaks:  14
+Freed:  67
+Reused: 49
+Allocs: 32
+Retain: 0
 
-Unifications: 107
-Conjuncts:    243
-Disjuncts:    170
+Unifications: 57
+Conjuncts:    97
+Disjuncts:    8
+
+NumCloseIDs: 17
 -- out/eval --
 Errors:
 #Configure.service.description.role: undefined field: role:

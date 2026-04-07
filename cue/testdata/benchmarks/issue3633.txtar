@@ -1,6 +1,6 @@
 #Issue: 3633
 #todo:inline: skip — performance benchmark, not a functional test
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  145
 Freed:  1886
 Reused: 1798
@@ -12,39 +12,6 @@ Conjuncts:    2081
 Disjuncts:    1625
 
 NumCloseIDs: 50
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  0
--Freed:  3595
--Reused: 3575
--Allocs: 20
-+Leaks:  145
-+Freed:  1886
-+Reused: 1798
-+Allocs: 233
- Retain: 0
- 
--Unifications: 885
--Conjuncts:    3846
--Disjuncts:    3595
-+Unifications: 401
-+Conjuncts:    2081
-+Disjuncts:    1625
-+
-+NumCloseIDs: 50
--- out/eval/stats --
-Leaks:  0
-Freed:  3595
-Reused: 3575
-Allocs: 20
-Retain: 0
-
-Unifications: 885
-Conjuncts:    3846
-Disjuncts:    3595
 -- in.cue --
 reduced: {
 	#Schema: {

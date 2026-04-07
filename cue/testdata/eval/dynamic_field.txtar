@@ -94,18 +94,16 @@ issue3828: full: {
 }
 -- out/eval/stats --
 Leaks:  4
-Freed:  76
-Reused: 67
-Allocs: 13
-Retain: 17
+Freed:  74
+Reused: 51
+Allocs: 27
+Retain: 0
 
-Unifications: 80
-Conjuncts:    101
-Disjuncts:    87
+Unifications: 78
+Conjuncts:    91
+Disjuncts:    0
 
-MisalignedConjunct: 3
-
-NumCloseIDs: 2
+NumCloseIDs: 4
 -- out/evalalpha --
 Errors:
 invalid interpolation: conflicting values 2 and 1:

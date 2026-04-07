@@ -19,18 +19,16 @@ New_infra: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  18
-Reused: 14
-Allocs: 4
+Freed:  16
+Reused: 7
+Allocs: 9
 Retain: 0
 
-Unifications: 18
-Conjuncts:    26
-Disjuncts:    18
+Unifications: 16
+Conjuncts:    22
+Disjuncts:    0
 
-MisalignedConjunct: 2
-
-NumCloseIDs: 1
+NumCloseIDs: 6
 -- out/evalalpha --
 (struct){
   DeleteThis: (#list){

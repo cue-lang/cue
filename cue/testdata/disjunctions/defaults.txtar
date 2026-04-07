@@ -69,12 +69,14 @@ issue3779: {
   }
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  46
-Reused: 37
-Allocs: 9
-Retain: 2
+Leaks:  7
+Freed:  39
+Reused: 28
+Allocs: 18
+Retain: 0
 
 Unifications: 16
 Conjuncts:    68
-Disjuncts:    48
+Disjuncts:    30
+
+NumCloseIDs: 6

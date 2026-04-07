@@ -49,15 +49,17 @@ MyIP: Inst & [_, _, 10, 10]
   ])
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  56
-Reused: 50
-Allocs: 6
-Retain: 1
+Leaks:  10
+Freed:  52
+Reused: 38
+Allocs: 24
+Retain: 0
 
-Unifications: 47
-Conjuncts:    106
-Disjuncts:    57
+Unifications: 35
+Conjuncts:    86
+Disjuncts:    9
+
+NumCloseIDs: 8
 -- out/evalalpha --
 (struct){
   IP: (#list){

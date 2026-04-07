@@ -100,14 +100,16 @@ invalidPattern: {
 }
 -- out/eval/stats --
 Leaks:  1
-Freed:  61
-Reused: 56
-Allocs: 6
-Retain: 4
+Freed:  60
+Reused: 40
+Allocs: 21
+Retain: 0
 
-Unifications: 60
-Conjuncts:    109
-Disjuncts:    65
+Unifications: 59
+Conjuncts:    101
+Disjuncts:    2
+
+NumCloseIDs: 9
 -- out/evalalpha --
 Errors:
 invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:

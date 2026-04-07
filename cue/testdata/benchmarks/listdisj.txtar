@@ -54,37 +54,6 @@ v: #T
   #X: 〈0;v〉
   #X: 〈0;#T〉
 }
--- out/evalalpha/stats --
-Leaks:  2
-Freed:  16
-Reused: 8
-Allocs: 10
-Retain: 0
-
-Unifications: 14
-Conjuncts:    22
-Disjuncts:    4
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
--Leaks:  0
--Freed:  447
--Reused: 439
--Allocs: 8
-+Leaks:  2
-+Freed:  16
-+Reused: 8
-+Allocs: 10
- Retain: 0
- 
--Unifications: 287
--Conjuncts:    894
--Disjuncts:    447
-+Unifications: 14
-+Conjuncts:    22
-+Disjuncts:    4
 -- out/evalalpha --
 (struct){
   #T: (list){
@@ -99,12 +68,12 @@ diff old new
 -- diff/explanation --
 Differences fully due to rendered structure sharing.
 -- out/eval/stats --
-Leaks:  0
-Freed:  447
-Reused: 439
-Allocs: 8
+Leaks:  2
+Freed:  16
+Reused: 8
+Allocs: 10
 Retain: 0
 
-Unifications: 287
-Conjuncts:    894
-Disjuncts:    447
+Unifications: 14
+Conjuncts:    22
+Disjuncts:    4

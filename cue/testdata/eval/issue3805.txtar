@@ -169,7 +169,7 @@ tabcatsExample: {
     }
   }
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  77
 Freed:  162
 Reused: 129
@@ -186,46 +186,6 @@ ConjunctInfos:       243
 MaxConjunctInfos:    5
 MaxReqSets:          14
 MaxRedirect:         3
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,16 @@
--Leaks:  9
--Freed:  1508
--Reused: 1482
--Allocs: 35
--Retain: 51
--
--Unifications: 1373
--Conjuncts:    3626
--Disjuncts:    1548
-+Leaks:  77
-+Freed:  162
-+Reused: 129
-+Allocs: 110
-+Retain: 0
-+
-+Unifications: 171
-+Conjuncts:    284
-+Disjuncts:    16
-+
-+NumCloseIDs: 57
-+
-+ConjunctInfos:       243
-+MaxConjunctInfos:    5
-+MaxReqSets:          14
-+MaxRedirect:         3
--- out/eval/stats --
-Leaks:  9
-Freed:  1508
-Reused: 1482
-Allocs: 35
-Retain: 51
-
-Unifications: 1373
-Conjuncts:    3626
-Disjuncts:    1548
 -- out/evalalpha --
 (struct){
   #PatientViewSections: (#struct){

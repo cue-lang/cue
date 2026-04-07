@@ -47,13 +47,15 @@ d: #D & {aaa: 4}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9
-Reused: 6
-Allocs: 3
+Reused: 1
+Allocs: 8
 Retain: 0
 
 Unifications: 9
 Conjuncts:    35
-Disjuncts:    9
+Disjuncts:    0
+
+NumCloseIDs: 22
 -- out/evalalpha --
 (struct){
   #A: (#struct){

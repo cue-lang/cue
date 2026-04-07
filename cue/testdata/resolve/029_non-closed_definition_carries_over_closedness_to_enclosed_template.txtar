@@ -66,14 +66,16 @@ c: #R & {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  23
-Reused: 18
-Allocs: 5
+Freed:  24
+Reused: 12
+Allocs: 12
 Retain: 0
 
-Unifications: 21
-Conjuncts:    34
-Disjuncts:    23
+Unifications: 20
+Conjuncts:    33
+Disjuncts:    2
+
+NumCloseIDs: 3
 -- out/evalalpha --
 Errors:
 a.v.b: field not allowed:

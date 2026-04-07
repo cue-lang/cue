@@ -151,7 +151,7 @@ selfRefInEmbed: t1: {
 	}
 }
 
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  4
 Freed:  132
 Reused: 111
@@ -164,50 +164,6 @@ Disjuncts:    4
 Notifications: 12
 
 NumCloseIDs: 124
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,13 +1,12 @@
--Leaks:  10
--Freed:  130
--Reused: 123
--Allocs: 17
--Retain: 57
--
--Unifications: 136
--Conjuncts:    304
--Disjuncts:    173
--
--MisalignedConjunct: 1
--
--NumCloseIDs: 2
-+Leaks:  4
-+Freed:  132
-+Reused: 111
-+Allocs: 25
-+Retain: 0
-+
-+Unifications: 126
-+Conjuncts:    284
-+Disjuncts:    4
-+Notifications: 12
-+
-+NumCloseIDs: 124
--- out/eval/stats --
-Leaks:  10
-Freed:  130
-Reused: 123
-Allocs: 17
-Retain: 57
-
-Unifications: 136
-Conjuncts:    304
-Disjuncts:    173
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 listEmbed.b6: index out of range [5] with length 2:

@@ -286,17 +286,18 @@ issue1116: {
   }
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  112
-Reused: 107
-Allocs: 8
-Retain: 10
+Leaks:  4
+Freed:  101
+Reused: 73
+Allocs: 32
+Retain: 0
 
-Unifications: 115
-Conjuncts:    169
-Disjuncts:    117
+Unifications: 103
+Conjuncts:    130
+Disjuncts:    0
+Notifications: 2
 
-NumCloseIDs: 4
+NumCloseIDs: 45
 -- out/evalalpha --
 (struct){
   a1list: (#list){

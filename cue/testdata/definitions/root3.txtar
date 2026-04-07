@@ -6,13 +6,16 @@ x: _
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
-Reused: 2
-Allocs: 3
-Retain: 1
+Reused: 0
+Allocs: 5
+Retain: 0
 
 Unifications: 5
 Conjuncts:    11
-Disjuncts:    6
+Disjuncts:    0
+Notifications: 1
+
+NumCloseIDs: 4
 -- out/evalalpha --
 (#struct){
   x: (_){ _ }

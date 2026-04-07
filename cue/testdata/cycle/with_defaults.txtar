@@ -14,15 +14,17 @@ rg: range2 & {
 	max: 8
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  16
-Reused: 11
-Allocs: 5
+Leaks:  2
+Freed:  14
+Reused: 8
+Allocs: 8
 Retain: 0
 
 Unifications: 10
 Conjuncts:    22
-Disjuncts:    16
+Disjuncts:    6
+
+NumCloseIDs: 1
 -- out/evalalpha --
 (struct){
   range1: (struct){

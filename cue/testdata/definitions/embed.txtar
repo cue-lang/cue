@@ -75,15 +75,22 @@ reclose3: {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  63
-Reused: 56
-Allocs: 7
-Retain: 6
+Leaks:  3
+Freed:  62
+Reused: 42
+Allocs: 23
+Retain: 0
 
-Unifications: 59
-Conjuncts:    124
-Disjuncts:    69
+Unifications: 55
+Conjuncts:    103
+Disjuncts:    4
+
+NumCloseIDs: 48
+
+ConjunctInfos:       85
+MaxConjunctInfos:    7
+MaxReqSets:          12
+MaxRedirect:         2
 -- out/evalalpha --
 Errors:
 reclose1.z.d: field not allowed:

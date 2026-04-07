@@ -38,13 +38,15 @@ x: Something & #Deployment
 -- out/eval/stats --
 Leaks:  0
 Freed:  52
-Reused: 45
-Allocs: 7
+Reused: 37
+Allocs: 15
 Retain: 0
 
 Unifications: 46
-Conjuncts:    122
-Disjuncts:    52
+Conjuncts:    96
+Disjuncts:    6
+
+NumCloseIDs: 21
 -- out/evalalpha --
 (struct){
   #T: (#struct){

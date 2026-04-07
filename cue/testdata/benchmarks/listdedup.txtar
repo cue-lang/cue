@@ -33,23 +33,6 @@ C: #steps: #Script & {mount: [B]}
 }
 
 #ref: {a: 1} | {b: 2}
--- out/evalalpha/stats --
-Leaks:  0
-Freed:  89
-Reused: 51
-Allocs: 38
-Retain: 0
-
-Unifications: 33
-Conjuncts:    91
-Disjuncts:    24
-
-NumCloseIDs: 22
-
-ConjunctInfos:       70
-MaxConjunctInfos:    6
-MaxReqSets:          9
-MaxRedirect:         2
 -- out/evalalpha --
 (struct){
   A: (#struct){ |((#struct){
@@ -467,45 +450,23 @@ diff old new
       b: (int){ 2 }
     }) }
 }
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,16 @@
- Leaks:  0
--Freed:  24096
--Reused: 24051
--Allocs: 45
--Retain: 1
--
--Unifications: 18724
--Conjuncts:    100730
--Disjuncts:    24097
-+Freed:  89
-+Reused: 51
-+Allocs: 38
-+Retain: 0
-+
-+Unifications: 33
-+Conjuncts:    91
-+Disjuncts:    24
-+
-+NumCloseIDs: 22
-+
-+ConjunctInfos:       70
-+MaxConjunctInfos:    6
-+MaxReqSets:          9
-+MaxRedirect:         2
 -- out/eval/stats --
 Leaks:  0
-Freed:  24096
-Reused: 24051
-Allocs: 45
-Retain: 1
+Freed:  89
+Reused: 51
+Allocs: 38
+Retain: 0
 
-Unifications: 18724
-Conjuncts:    100730
-Disjuncts:    24097
+Unifications: 33
+Conjuncts:    91
+Disjuncts:    24
+
+NumCloseIDs: 22
+
+ConjunctInfos:       70
+MaxConjunctInfos:    6
+MaxReqSets:          9
+MaxRedirect:         2
 -- out/compile --
 --- in.cue
 {

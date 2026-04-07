@@ -7,13 +7,13 @@ a: 12
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
-Reused: 1
-Allocs: 4
+Reused: 0
+Allocs: 5
 Retain: 0
 
 Unifications: 5
 Conjuncts:    5
-Disjuncts:    5
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 #Controller.settings.controller: structural cycle

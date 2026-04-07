@@ -14,13 +14,15 @@ foo: #Foo & {
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
-Reused: 4
-Allocs: 3
-Retain: 1
+Reused: 1
+Allocs: 6
+Retain: 0
 
 Unifications: 7
 Conjuncts:    14
-Disjuncts:    8
+Disjuncts:    0
+
+NumCloseIDs: 7
 -- out/evalalpha --
 Errors:
 foo.y: field not allowed:

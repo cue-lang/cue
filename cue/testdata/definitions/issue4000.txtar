@@ -146,7 +146,7 @@ _items: [#VMRuleList]
     kind: (string|*"default")
   }
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  18
 Freed:  36
 Reused: 20
@@ -158,41 +158,6 @@ Conjuncts:    77
 Disjuncts:    12
 
 NumCloseIDs: 17
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  0
--Freed:  152
--Reused: 137
--Allocs: 15
--Retain: 9
--
--Unifications: 116
--Conjuncts:    257
--Disjuncts:    161
-+Leaks:  18
-+Freed:  36
-+Reused: 20
-+Allocs: 34
-+Retain: 0
-+
-+Unifications: 38
-+Conjuncts:    77
-+Disjuncts:    12
-+
-+NumCloseIDs: 17
--- out/eval/stats --
-Leaks:  0
-Freed:  152
-Reused: 137
-Allocs: 15
-Retain: 9
-
-Unifications: 116
-Conjuncts:    257
-Disjuncts:    161
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

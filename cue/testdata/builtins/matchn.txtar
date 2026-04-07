@@ -346,7 +346,7 @@ issue3694: simple: {
 		uses?: string
 	})
 }
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  130
 Freed:  1058
 Reused: 1028
@@ -363,46 +363,6 @@ ConjunctInfos:       1211
 MaxConjunctInfos:    3
 MaxReqSets:          4
 MaxRedirect:         2
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,16 @@
--Leaks:  52
--Freed:  951
--Reused: 944
--Allocs: 59
--Retain: 129
--
--Unifications: 987
--Conjuncts:    1635
--Disjuncts:    1081
-+Leaks:  130
-+Freed:  1058
-+Reused: 1028
-+Allocs: 160
-+Retain: 0
-+
-+Unifications: 971
-+Conjuncts:    1551
-+Disjuncts:    16
-+
-+NumCloseIDs: 486
-+
-+ConjunctInfos:       1211
-+MaxConjunctInfos:    3
-+MaxReqSets:          4
-+MaxRedirect:         2
--- out/eval/stats --
-Leaks:  52
-Freed:  951
-Reused: 944
-Allocs: 59
-Retain: 129
-
-Unifications: 987
-Conjuncts:    1635
-Disjuncts:    1081
 -- out/eval --
 Errors:
 closedByDefinition.err5.out.exports: conflicting values null and {exp1:"./main-module.js"} (mismatched types null and struct):

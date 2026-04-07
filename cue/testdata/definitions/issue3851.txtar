@@ -16,15 +16,18 @@ out: #Output & {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  48
-Reused: 39
-Allocs: 9
+Leaks:  8
+Freed:  52
+Reused: 27
+Allocs: 33
 Retain: 0
 
-Unifications: 34
-Conjuncts:    65
-Disjuncts:    48
+Unifications: 16
+Conjuncts:    41
+Disjuncts:    14
+Notifications: 2
+
+NumCloseIDs: 5
 -- out/evalalpha --
 (struct){
   #App: (#struct){

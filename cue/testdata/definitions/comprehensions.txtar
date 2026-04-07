@@ -13,15 +13,15 @@ issue595: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  6
-Reused: 1
-Allocs: 5
+Reused: 0
+Allocs: 6
 Retain: 0
 
 Unifications: 6
-Conjuncts:    6
-Disjuncts:    6
+Conjuncts:    7
+Disjuncts:    0
 
-NumCloseIDs: 1
+NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 issue595.files: undefined field: nam:

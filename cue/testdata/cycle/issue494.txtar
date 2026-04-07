@@ -26,14 +26,14 @@ g: [rn=string]: _Q[0:len(a[rn])]
 g: ben: [{}, {}]
 -- out/eval/stats --
 Leaks:  0
-Freed:  43
-Reused: 38
-Allocs: 5
+Freed:  36
+Reused: 22
+Allocs: 14
 Retain: 0
 
-Unifications: 43
-Conjuncts:    83
-Disjuncts:    45
+Unifications: 36
+Conjuncts:    59
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 f.ben: incompatible list lengths (1 and 2)

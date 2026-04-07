@@ -6,14 +6,16 @@ TODO: l4 should be allowed
 instance:  #special1 & {l1: l2: l3: 34}
 -- out/eval/stats --
 Leaks:  0
-Freed:  17
-Reused: 12
-Allocs: 5
+Freed:  13
+Reused: 5
+Allocs: 8
 Retain: 0
 
-Unifications: 17
-Conjuncts:    36
-Disjuncts:    17
+Unifications: 13
+Conjuncts:    28
+Disjuncts:    0
+
+NumCloseIDs: 3
 -- out/evalalpha --
 (struct){
   #def1: (#struct){

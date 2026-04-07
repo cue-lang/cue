@@ -22,14 +22,16 @@ eval: true
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  8
-Reused: 3
-Allocs: 5
+Freed:  9
+Reused: 1
+Allocs: 8
 Retain: 0
 
-Unifications: 6
-Conjuncts:    13
-Disjuncts:    8
+Unifications: 5
+Conjuncts:    12
+Disjuncts:    2
+
+NumCloseIDs: 2
 -- out/evalalpha --
 (struct){
   A: (#list){

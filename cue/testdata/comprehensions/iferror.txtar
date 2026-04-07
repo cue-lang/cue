@@ -148,19 +148,18 @@ issue1972: {
   }
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  43
-Reused: 35
-Allocs: 8
-Retain: 14
+Leaks:  1
+Freed:  40
+Reused: 23
+Allocs: 18
+Retain: 0
 
-Unifications: 33
-Conjuncts:    66
-Disjuncts:    57
+Unifications: 31
+Conjuncts:    63
+Disjuncts:    8
+Notifications: 2
 
-MisalignedConjunct: 2
-
-NumCloseIDs: 7
+NumCloseIDs: 26
 -- out/evalalpha --
 Errors:
 issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):

@@ -10,13 +10,16 @@ allowed: true
 -- out/eval/stats --
 Leaks:  0
 Freed:  9
-Reused: 5
-Allocs: 4
-Retain: 2
+Reused: 1
+Allocs: 8
+Retain: 0
 
 Unifications: 9
-Conjuncts:    15
-Disjuncts:    11
+Conjuncts:    14
+Disjuncts:    0
+Notifications: 2
+
+NumCloseIDs: 3
 -- out/evalalpha --
 Errors:
 notAllowed: field not allowed:

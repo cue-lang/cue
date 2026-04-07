@@ -50,19 +50,17 @@ full: {
 	_cl: l: {}
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  66
-Reused: 58
-Allocs: 12
-Retain: 10
+Leaks:  19
+Freed:  53
+Reused: 48
+Allocs: 24
+Retain: 0
 
-Unifications: 70
-Conjuncts:    129
-Disjuncts:    76
+Unifications: 68
+Conjuncts:    126
+Disjuncts:    0
 
-MisalignedConjunct: 56
-
-NumCloseIDs: 2
+NumCloseIDs: 38
 -- out/evalalpha --
 (struct){
   full: (struct){

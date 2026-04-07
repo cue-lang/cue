@@ -19,7 +19,7 @@ package imported
 #Bar: bar: _
 
 {either: #Foo | #Bar}
--- out/evalalpha/stats --
+-- out/eval/stats --
 Leaks:  3
 Freed:  11
 Reused: 2
@@ -31,7 +31,6 @@ Conjuncts:    18
 Disjuncts:    2
 
 NumCloseIDs: 4
--- out/eval/stats --
 -- out/evalalpha --
 (struct){
   out: (struct){

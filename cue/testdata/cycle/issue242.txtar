@@ -88,15 +88,17 @@ b: 1
 c: 2
 d: 3
 -- out/eval/stats --
-Leaks:  0
-Freed:  78
-Reused: 68
-Allocs: 10
-Retain: 18
+Leaks:  16
+Freed:  62
+Reused: 50
+Allocs: 28
+Retain: 0
 
 Unifications: 26
-Conjuncts:    181
-Disjuncts:    82
+Conjuncts:    191
+Disjuncts:    52
+
+NumCloseIDs: 8
 -- out/evalalpha --
 (struct){
   #size: (int){ 2 }

@@ -34,21 +34,21 @@ incompleteOne: {
 		"""
 	// TODO: we current cannot check for errors on hidden fields.
 	@test(debugOutput, """
-(struct){
-  _t: (_|_){
-    // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
-    //     in.cue:13:3
-    //     in.cue:12:7
-    #p: (string){ string }
-  }
-  r: (_|_){
-    // [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-    //     in.cue:18:5
-    //     in.cue:12:7
-    //     in.cue:13:3
-  }
-}
-""")
+		(struct){
+		  _t: (_|_){
+		    // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
+		    //     in.cue:13:3
+		    //     in.cue:12:7
+		    #p: (string){ string }
+		  }
+		  r: (_|_){
+		    // [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
+		    //     in.cue:18:5
+		    //     in.cue:12:7
+		    //     in.cue:13:3
+		  }
+		}
+		""")
 }
 
 incompleteTwo: {

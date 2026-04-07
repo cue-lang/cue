@@ -16,6 +16,24 @@
       "message": "var v Value\n\t\tif len(x.Parts) \u003d\u003d 3 \u0026\u0026 isEmptyLiteral(x.Parts[0]) \u0026\u0026 isEmptyLiteral(x.Parts[2]) {\n\t\t\tv :\u003d c.value(x.Parts[1], Flags{\n\t\t\t\tstatus:    partial,\n\t\t\t\tcondition: scalarKnown,\n\t\t\t\tmode:      yield,\n\t\t\t})\n\t\t\tswitch x.K {\n\t\t\tcase BytesKind:\n\t\t\t\tv \u003d \u0026Bytes{x.Src, c.ToBytes(v)}\n\t\t\tcase StringKind:\n\t\t\t\tv \u003d \u0026String{x.Src, c.ToString(v)}\n\t\t\t}\n\t\t} else {\n\t\t\tvar sb strings.Builder\n\t\t\tfor _, e :\u003d range x.Parts {\n\t\t\t\tv :\u003d c.value(e, Flags{\n\t\t\t\t\tstatus:    partial,\n\t\t\t\t\tcondition: scalarKnown,\n\t\t\t\t\tmode:      yield,\n\t\t\t\t})\n\t\t\t\tif x.K \u003d\u003d BytesKind {\n\t\t\t\t\tsb.Write(c.ToBytes(v))\n\t\t\t\t} else {\n\t\t\t\t\tsb.WriteString(c.ToString(v))\n\t\t\t\t}\n\t\t\t}\n\t\t\tswitch x.K {\n\t\t\tcase BytesKind:\n\t\t\t\tv \u003d \u0026Bytes{x.Src, []byte(sb.String())}\n\t\t\tcase StringKind:\n\t\t\t\tv \u003d \u0026String{x.Src, sb.String()}\n\t\t\t}\n\t\t}\n\t\tif err :\u003d c.Err(); err !\u003d nil {\n\t\t\treturn \u0026Bottom{\n\t\t\t\tCode: err.Code,\n\t\t\t\tNode: c.vertex,\n\t\t\t\tErr:  errors.Wrapf(err.Err, Pos(x), \"invalid interpolation\"),\n\t\t\t}\n\t\t}\n\t\treturn v",
       "revId": "47c271a38f5a57fc5b94b0f923efe26fc9ee64a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8a4f4ea_b4538605",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-07T13:34:09Z",
+      "side": 1,
+      "message": "Or, even better:\n```\n\tvar v Value\n\t\tif len(x.Parts) \u003d\u003d 3 \u0026\u0026 isEmptyLiteral(x.Parts[0]) \u0026\u0026 isEmptyLiteral(x.Parts[2]) {\n\t\t\t// Fast path for \"\\(expr)\" or \u0027\\(expr)\u0027, which is fairly common.\n\t\t\tv :\u003d c.value(x.Parts[1], Flags{\n\t\t\t\tstatus:    partial,\n\t\t\t\tcondition: scalarKnown,\n\t\t\t\tmode:      yield,\n\t\t\t})\n\t\t\tswitch x.K {\n\t\t\tcase BytesKind:\n\t\t\t\tv \u003d \u0026Bytes{x.Src, c.ToBytes(v)}\n\t\t\tcase StringKind:\n\t\t\t\tv \u003d \u0026String{x.Src, c.ToString(v)}\n\t\t\t}\n\t\t} else if x.K \u003d\u003d BytesKind {\n\t\t\tvar sb strings.Builder\n\t\t\tfor _, e :\u003d range x.Parts {\n\t\t\t\tv :\u003d c.value(e, Flags{\n\t\t\t\t\tstatus:    partial,\n\t\t\t\t\tcondition: scalarKnown,\n\t\t\t\t\tmode:      yield,\n\t\t\t\t})\n\t\t\t\tsb.WriteString(c.ToString(v))\n\t\t\t}\n\t\t\tv \u003d \u0026String{x.Src, sb.String()}\n\t\t} else {\n\t\t\tvar b bytes.Buffer\n\t\t\tfor _, e :\u003d range x.Parts {\n\t\t\t\tv :\u003d c.value(e, Flags{\n\t\t\t\t\tstatus:    partial,\n\t\t\t\t\tcondition: scalarKnown,\n\t\t\t\t\tmode:      yield,\n\t\t\t\t})\n\t\t\t\tsb.Write(c.ToBytes(v))\n\t\t\t}\n\t\t\tv \u003d \u0026Bytes{x.Src, b.Bytes()}\n\t\t}\n\t\tif err :\u003d c.Err(); err !\u003d nil {\n\t\t\treturn \u0026Bottom{\n\t\t\t\tCode: err.Code,\n\t\t\t\tNode: c.vertex,\n\t\t\t\tErr:  errors.Wrapf(err.Err, Pos(x), \"invalid interpolation\"),\n\t\t\t}\n\t\t}\n\t\treturn v\n```",
+      "parentUuid": "dc62442d_cb333055",
+      "revId": "47c271a38f5a57fc5b94b0f923efe26fc9ee64a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

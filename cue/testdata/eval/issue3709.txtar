@@ -1,5 +1,8 @@
-# Issue #3709
-# Prevent hang.
+# Tests that mutually recursive optional definitions across packages do not cause
+# the evaluator to hang. Issue: a pattern constraint referencing a type from an
+# imported package, where that type and its transitive references form a cycle
+# (e.g. #Foo -> #Bar -> #Foo), caused an infinite loop during evaluation.
+# https://cuelang.org/issue/3709
 -- cue.mod/module.cue --
 module: "foo.test/bar"
 language: version: "v0.11.0"

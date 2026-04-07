@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c37d376_4c288b88",
+        "filename": "internal/cuetxtar/inline_err.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-07T07:19:26Z",
+      "side": 1,
+      "message": "perhaps add a helper for trimming surrounding characters, be it `[ ]` or `( )`, because I\u0027ve seen this a bunch of times now. it could be something like `func trimSurrounding(left, right byte) (string, error)`",
+      "revId": "87177d3884682a9fea0bc750a29b491643b72a40",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

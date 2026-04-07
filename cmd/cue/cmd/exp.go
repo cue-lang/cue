@@ -178,7 +178,7 @@ func newExpWritefsCmd(c *Command) *cobra.Command {
 		Long: `
 WARNING: THIS COMMAND IS EXPERIMENTAL.
 In the future, it will be entirely replaced by native @export(...)
-as described in https://cuelang.org/cl/issue/2031.
+as described in https://cuelang.org/issue/2031.
 
 writefs takes JSON via stdin in the form of
 

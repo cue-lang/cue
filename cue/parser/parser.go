@@ -867,7 +867,7 @@ func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 	sc.closeExpr(p, expr)
 
 	var fallbackClause *ast.FallbackClause
-	if p.tok == token.ELSE || p.tok == token.FALLBACK {
+	if p.tok == token.ELSE || p.tok == token.FALLBACK || p.tok == token.OTHERWISE {
 		fallbackClause = p.parseFallbackClause(clauses)
 	}
 
@@ -951,7 +951,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 			token.STRING, token.INTERPOLATION,
 			token.NULL, token.TRUE, token.FALSE,
 			token.FOR, token.IF, token.LET, token.IN,
-			token.TRY, token.ELSE, token.FALLBACK:
+			token.TRY, token.ELSE, token.FALLBACK, token.OTHERWISE:
 			return &ast.EmbedDecl{Expr: expr}
 		}
 		fallthrough
@@ -1042,7 +1042,7 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.
 		}
 		expr = ident
 
-	case token.ELSE, token.FALLBACK:
+	case token.ELSE, token.FALLBACK, token.OTHERWISE:
 		// These keywords can be used as field labels
 		expr = p.parseExpr()
 
@@ -1264,7 +1264,7 @@ func (p *parser) parseFallbackClause(clauses []ast.Clause) *ast.FallbackClause {
 	var pos token.Pos
 	if isSingleGuard {
 		// Single if/try clause: must use else
-		if p.tok == token.FALLBACK {
+		if p.tok == token.FALLBACK || p.tok == token.OTHERWISE {
 			p.errf(p.pos, "use 'else' with single 'if' or 'try' clause")
 			pos = p.pos
 			p.next()
@@ -1272,13 +1272,17 @@ func (p *parser) parseFallbackClause(clauses []ast.Clause) *ast.FallbackClause {
 			pos = p.expect(token.ELSE)
 		}
 	} else {
-		// Everything else: must use fallback
+		// Everything else: must use otherwise (or legacy fallback)
 		if p.tok == token.ELSE {
-			p.errf(p.pos, "use 'fallback' for comprehensions with multiple clauses or 'for' clauses")
+			p.errf(p.pos, "use 'otherwise' for comprehensions with multiple clauses or 'for' clauses")
 			pos = p.pos
 			p.next()
 		} else {
-			pos = p.expect(token.FALLBACK)
+			// Accept both 'otherwise' (primary) and 'fallback' (legacy alias)
+			// TODO: once support for fallback token is removed, use
+			// p.expect(token.OTHERWISE) here instead.
+			pos = p.pos
+			p.next()
 		}
 	}
 	body := p.parseStruct()
@@ -1410,7 +1414,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 			sc.closeExpr(p, expr)
 
 			var fallbackClause *ast.FallbackClause
-			if p.tok == token.ELSE || p.tok == token.FALLBACK {
+			if p.tok == token.ELSE || p.tok == token.FALLBACK || p.tok == token.OTHERWISE {
 				fallbackClause = p.parseFallbackClause(clauses)
 			}
 

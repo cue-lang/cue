@@ -1,33 +1,32 @@
-#name: list types
-#evalPartial
-#todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- in.cue --
 import "list"
 
 l0: list.Repeat([int], 3)
-l0: [1, 2, 3]
+l0: [1, 2, 3] @test(eq, [1, 2, 3])
 l2: [...{a: int}]
-l2: [{a: 1}, {a: 2, b: 3}]
+l2: [{a: 1}, {a: 2, b: 3}] @test(eq, [{a: 1}, {a: 2, b: 3}])
 
 // TODO: work out a decent way to specify length ranges of lists.
 // l3: <=10*[int]
 // l3: [1, 2, 3, ...]
 
-s1: (list.Repeat([int], 6))[2:3]
-s2: [0, 2, 3][1:2]
+s1: (list.Repeat([int], 6))[2:3] @test(eq, [int])
+s2: [0, 2, 3][1:2]               @test(eq, [2])
 
-i1: (list.Repeat([int], 6))[2]
-i2: [0, 2, 3][2]
+i1: (list.Repeat([int], 6))[2]   @test(eq, int)
+i2: [0, 2, 3][2]                 @test(eq, 3)
 
 t0: [...{a: 8}]
-t0: [{}]
+t0: [{}] @test(eq, [{a: 8}])
 t1: [...]
-t1: [...int]
+t1: [...int] @test(leq, [...int])
 
 e0: list.Repeat([{}], 2)
-e0: [{}]
+e0: [{}] @test(err, code=eval, contains="incompatible list lengths", args=[1, 2], pos=[], hint="missing positions")
 e1: [...int]
-e1: [...float]
+e1: [...float] @test(leq, [...int])
+-- out/errors.txt --
+[eval] e0: incompatible list lengths (1 and 2)
 -- out/compile --
 --- in.cue
 {
@@ -108,49 +107,3 @@ Conjuncts:    59
 Disjuncts:    0
 
 NumCloseIDs: 9
--- out/evalalpha --
-Errors:
-e0: incompatible list lengths (1 and 2)
-
-Result:
-(_|_){
-  // [eval]
-  l0: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 3 }
-  }
-  l2: (#list){
-    0: (struct){
-      a: (int){ 1 }
-    }
-    1: (struct){
-      a: (int){ 2 }
-      b: (int){ 3 }
-    }
-  }
-  s1: (#list){
-    0: (int){ int }
-  }
-  s2: (#list){
-    0: (int){ 2 }
-  }
-  i1: (int){ int }
-  i2: (int){ 3 }
-  t0: (#list){
-    0: (struct){
-      a: (int){ 8 }
-    }
-  }
-  t1: (list){
-  }
-  e0: (_|_){
-    // [eval] e0: incompatible list lengths (1 and 2)
-    0: (struct){
-    }
-    1: (struct){
-    }
-  }
-  e1: (list){
-  }
-}

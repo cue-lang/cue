@@ -654,13 +654,24 @@ The runner SHALL generate all N! permutations of the marked fields, evaluate eac
 ---
 
 ### Requirement: `permuteCount` directive
-The `permuteCount` directive asserts the total number of permutations that were executed for the test case root. It is placed as a field attribute on the test root. When `CUE_UPDATE=1` is set, the count is auto-filled if empty or replaced if it differs.
+The `permuteCount` directive asserts the total number of permutations that were executed for the test case root. It is placed alongside `@test(permute)` (either in the same struct as a decl attr, or on the parent struct). When `CUE_UPDATE=1` is set, the count is auto-filled if empty or replaced if it differs.
 
 ```cue
 in: {
-    a: 1  @test(permute)
-    b: a+1 @test(permute)
-} @test(permuteCount, 2)
+    @test(permute)
+    a: 1, b: a+1
+    @test(permuteCount, 2)
+}
+```
+
+For multiple permutation groups within one test root, `@test(permuteCount, N)` at the root asserts the total across all groups:
+
+```cue
+multiPermute: {
+    x: { @test(permute); alpha: 1, beta: 2, gamma: 3 }
+    y: { @test(permute); alpha: 1, beta: 2, gamma: 3 }
+    @test(permuteCount, 12) // 2 groups × 3! = 12 total
+}
 ```
 
 #### Scenario: Permutation count matches

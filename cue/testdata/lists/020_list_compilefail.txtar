@@ -1,6 +1,7 @@
+# The CUE source contains compile-time errors (invalid operands to *),
+# so inline @test() annotations are not possible. Keep golden sections.
 #name: list arithmetic
 #evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 l3: <=2 * []
 l4: <=2 * [int]

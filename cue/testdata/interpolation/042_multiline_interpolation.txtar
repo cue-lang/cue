@@ -1,52 +1,49 @@
-#name: multiline interpolation
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 a1: """
-			before
-			\(4)
-			after
-			"""
+		before
+		\(4)
+		after
+		""" @test(eq, "before\n4\nafter")
 a2: """
-			before
-			\(4)
+		before
+		\(4)
 
-			"""
+		""" @test(eq, "before\n4\n")
 a3: """
 
-			\(4)
-			after
-			"""
+		\(4)
+		after
+		""" @test(eq, "\n4\nafter")
 a4: """
 
-			\(4)
+		\(4)
 
-			"""
+		""" @test(eq, "\n4\n")
 m1: """
-			before
-			\(
+		before
+		\(
 	4)
-			after
-			"""
+		after
+		""" @test(eq, "before\n4\nafter")
 m2: """
-			before
-			\(
+		before
+		\(
 	4)
 
-			"""
+		""" @test(eq, "before\n4\n")
 m3: """
 
-			\(
+		\(
 
 	4)
-			after
-			"""
+		after
+		""" @test(eq, "\n4\nafter")
 m4: """
 
-			\(
+		\(
 	4)
 
-			"""
+		""" @test(eq, "\n4\n")
 -- out/compile --
 --- in.cue
 {
@@ -85,14 +82,3 @@ Retain: 0
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  a1: (string){ "before\n4\nafter" }
-  a2: (string){ "before\n4\n" }
-  a3: (string){ "\n4\nafter" }
-  a4: (string){ "\n4\n" }
-  m1: (string){ "before\n4\nafter" }
-  m2: (string){ "before\n4\n" }
-  m3: (string){ "\n4\nafter" }
-  m4: (string){ "\n4\n" }
-}

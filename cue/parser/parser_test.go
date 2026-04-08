@@ -557,7 +557,7 @@ cannot import package as definition identifier`,
 				for x in [] { "\(x)": x } fallback { empty: true }
 			}
 		}`,
-			out: `@experiment(try), {a: {for x in [] {"\(x)": x} fallback {empty: true}}}`,
+			out: `@experiment(try), {a: {for x in [] {"\(x)": x} otherwise {empty: true}}}`,
 		},
 		{
 			desc:    "multi-clause comprehension with fallback",
@@ -568,7 +568,7 @@ cannot import package as definition identifier`,
 				for x in [1,2] if x > 10 { "\(x)": x } fallback { none: true }
 			}
 		}`,
-			out: `@experiment(try), {a: {for x in [1, 2] if x>10 {"\(x)": x} fallback {none: true}}}`,
+			out: `@experiment(try), {a: {for x in [1, 2] if x>10 {"\(x)": x} otherwise {none: true}}}`,
 		},
 		{
 			desc:    "list comprehension with fallback",
@@ -577,7 +577,7 @@ cannot import package as definition identifier`,
 		{
 			a: [for x in [] { x } fallback { 0 }]
 		}`,
-			out: `@experiment(try), {a: [for x in [] {x} fallback {0}]}`,
+			out: `@experiment(try), {a: [for x in [] {x} otherwise {0}]}`,
 		},
 		{
 			desc:    "try struct form",
@@ -682,7 +682,7 @@ else requires @experiment(try)`,
 				for x in [] { "\(x)": x } fallback { empty: true }
 			}
 		}`,
-			out: `{a: {for x in [] {"\(x)": x} fallback {empty: true}}}
+			out: `{a: {for x in [] {"\(x)": x} otherwise {empty: true}}}
 fallback requires @experiment(try)`,
 		},
 		{
@@ -692,8 +692,8 @@ fallback requires @experiment(try)`,
 			a: {
 				if true if false { x: 1 } else { y: 2 }
 			}`,
-			out: `@experiment(try), a: {if true if false {x: 1} fallback {y: 2}}
-use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
+			out: `@experiment(try), a: {if true if false {x: 1} otherwise {y: 2}}
+use 'otherwise' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "else with chained try error",
@@ -702,8 +702,8 @@ use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 			a: {
 				try x = val? try y = val2? { result: x } else { fallback: 0 }
 			}`,
-			out: `@experiment(try), a: {try x = val? try y = val2? {result: x} fallback {fallback: 0}}
-use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
+			out: `@experiment(try), a: {try x = val? try y = val2? {result: x} otherwise {fallback: 0}}
+use 'otherwise' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "else with if and let error",
@@ -712,8 +712,8 @@ use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 			a: {
 				if true let x = 5 { y: x } else { z: 0 }
 			}`,
-			out: `@experiment(try), a: {if true let x=5 {y: x} fallback {z: 0}}
-use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
+			out: `@experiment(try), a: {if true let x=5 {y: x} otherwise {z: 0}}
+use 'otherwise' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "else with if and try error",
@@ -722,8 +722,8 @@ use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 			a: {
 				if true try { x: val? } else { y: 0 }
 			}`,
-			out: `@experiment(try), a: {if true try {x: val?} fallback {y: 0}}
-use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
+			out: `@experiment(try), a: {if true try {x: val?} otherwise {y: 0}}
+use 'otherwise' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "else with for clause error",
@@ -732,8 +732,8 @@ use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
 			a: {
 				if true for x in [] { y: x } else { empty: true }
 			}`,
-			out: `@experiment(try), a: {if true for x in [] {y: x} fallback {empty: true}}
-use 'fallback' for comprehensions with multiple clauses or 'for' clauses`,
+			out: `@experiment(try), a: {if true for x in [] {y: x} otherwise {empty: true}}
+use 'otherwise' for comprehensions with multiple clauses or 'for' clauses`,
 		},
 		{
 			desc:    "fallback without for clause error",
@@ -770,7 +770,7 @@ use 'else' with single 'if' or 'try' clause`,
 			a: {
 				for x in [] { y: x } fallback { empty: true }
 			}`,
-			out: `@experiment(try), a: {for x in [] {y: x} fallback {empty: true}}`,
+			out: `@experiment(try), a: {for x in [] {y: x} otherwise {empty: true}}`,
 		},
 		{
 			desc:    "for with if and fallback allowed",
@@ -779,7 +779,7 @@ use 'else' with single 'if' or 'try' clause`,
 			a: {
 				for x in list if x > 0 { y: x } fallback { empty: true }
 			}`,
-			out: `@experiment(try), a: {for x in list if x>0 {y: x} fallback {empty: true}}`,
+			out: `@experiment(try), a: {for x in list if x>0 {y: x} otherwise {empty: true}}`,
 		},
 		{
 			desc:    "if with for and fallback allowed",
@@ -788,7 +788,7 @@ use 'else' with single 'if' or 'try' clause`,
 			a: {
 				if true for x in list { y: x } fallback { empty: true }
 			}`,
-			out: `@experiment(try), a: {if true for x in list {y: x} fallback {empty: true}}`,
+			out: `@experiment(try), a: {if true for x in list {y: x} otherwise {empty: true}}`,
 		},
 		{
 			desc:    "two if clauses with fallback allowed",
@@ -797,7 +797,7 @@ use 'else' with single 'if' or 'try' clause`,
 			a: {
 				if cond1 if cond2 { a: 1 } fallback { b: 2 }
 			}`,
-			out: `@experiment(try), a: {if cond1 if cond2 {a: 1} fallback {b: 2}}`,
+			out: `@experiment(try), a: {if cond1 if cond2 {a: 1} otherwise {b: 2}}`,
 		},
 		{
 			desc:    "two try clauses with fallback allowed",
@@ -806,7 +806,7 @@ use 'else' with single 'if' or 'try' clause`,
 			a: {
 				try x = a? try y = b? { result: x + y } fallback { default: 0 }
 			}`,
-			out: `@experiment(try), a: {try x = a? try y = b? {result: x+y} fallback {default: 0}}`,
+			out: `@experiment(try), a: {try x = a? try y = b? {result: x+y} otherwise {default: 0}}`,
 		},
 		{
 			desc: "let declaration",

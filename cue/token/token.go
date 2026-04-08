@@ -95,13 +95,15 @@ const (
 
 	keywordBeg
 
-	IF       // if
-	ELSE     // else
-	FOR      // for
-	IN       // in
-	LET      // let
-	TRY      // try
-	FALLBACK // fallback
+	IF   // if
+	ELSE // else
+	FOR  // for
+	IN   // in
+	LET  // let
+	TRY  // try
+	// TODO: remove in favor of OTHERWISE
+	FALLBACK  // fallback
+	OTHERWISE // otherwise
 	// experimental
 	FUNC // func
 

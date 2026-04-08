@@ -422,12 +422,12 @@ func DebugStr(x interface{}) (out string) {
 		out := DebugStr(v.Clauses)
 		out += DebugStr(v.Value)
 		if v.Fallback != nil {
-			// Use "fallback" for 'for' comprehensions, "else" for 'if'/'try'
+			// Use "otherwise" for 'for' comprehensions, "else" for 'if'/'try'
 			kw := "else"
 			if len(v.Clauses) > 1 {
-				kw = "fallback"
+				kw = "otherwise"
 			} else if _, ok := v.Clauses[0].(*ast.ForClause); ok {
-				kw = "fallback"
+				kw = "otherwise"
 			}
 			out += " " + kw + " " + DebugStr(v.Fallback.Body)
 		}

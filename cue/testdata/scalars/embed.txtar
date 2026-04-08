@@ -1,12 +1,18 @@
-// Issue ##739
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
+// Issue #739: Tests that scalar values (integers, lists, strings) embedded in
+// structs participate correctly in arithmetic, indexing, and built-in function
+// calls (list.Concat, strings.Join). Also covers definitions and optional fields
+// used alongside embedded scalars, and comprehensions gated on optional presence.
+//
+// Issue #794: Tests that a hidden field used as a list element inside an embedded
+// struct resolves to its concrete value (hidden.issue794: _foo embedded as [_foo]).
 import "strings"
 import "list"
 
 intEmbed: {
 	a1: {
 		2
+		@test(eq, 2)
 	}
 	a2: {
 		v: {
@@ -15,31 +21,42 @@ intEmbed: {
 		}
 		w: v
 		x: v.#foo
+		@test(eq, {
+			v: {3, #foo: 4} @test(shareID=a2vw)
+			w: {3, #foo: 4} @test(shareID=a2vw)
+			x: 4
+		})
 	}
-	a3: a1 + a2.v
+	a3: a1 + a2.v @test(eq, 5)
 }
 
 listEmbed: {
 	a1: {
 		2
+		@test(eq, 2)
 	}
 	b3: {
 		[1, 2]
 		#foo: 1
+		@test(eq, {[1, 2], #foo: 1})
 	}
-	b4: list.Concat([b3, b3])
-	b5: b3[1]
-	b6: b3[5]
-	b7: b4[a1] // 1
+	b4: list.Concat([b3, b3]) @test(eq, [1, 2, 1, 2])
+	b5: b3[1]  @test(eq, 2)
+	b6: b3[5]  @test(err, code=eval, contains="index out of range [5] with length 2", pos=[1:9])
+	b7: b4[a1] @test(eq, 1)
 }
 
 stringEmbed: {
 	s1: {
 		"foo"
 		#bar: "bar"
+		@test(eq, {"foo", #bar: "bar"})
 	}
-	s2: [ s1, {s1.#bar, #baz: 4}]
-	s3: strings.Join(s2, "--")
+	s2: [ s1, {s1.#bar, #baz: 4}] @test(eq, [
+		{"foo", #bar: "bar"},
+		{"bar", #baz: 4},
+	])
+	s3: strings.Join(s2, "--") @test(eq, "foo--bar")
 }
 
 outPattern: {
@@ -48,7 +65,14 @@ outPattern: {
 		#a:  int
 		#b:  int
 	}
-	used: sum & {#a: 1, #b: 3}
+	used: {
+		sum & {#a: 1, #b: 3}
+		@test(eq, {
+			out: 4
+			#a: 1
+			#b: 3
+		})
+	}
 }
 
 arithmetic: {
@@ -57,16 +81,17 @@ arithmetic: {
 		#a: int
 		#b: int
 	}
-	a1: (sum & {_, #a:          1, #b: 3}) + 2
-	a2: 2 + (sum & {_, #a:      1, #b: 3})
-	a3: 2 + (2 + (sum & {_, #a: 1, #b: 3}))
+	a1: (sum & {_, #a:          1, #b: 3}) + 2 @test(eq, 6)
+	a2: 2 + (sum & {_, #a:      1, #b: 3})     @test(eq, 6)
+	a3: 2 + (2 + (sum & {_, #a: 1, #b: 3}))    @test(eq, 8)
 }
 
 defCheck: {
 	a: {
 		#def: 1
+		@test(eq, {#def: 1})
 	}
-	b: a.#def
+	b: a.#def @test(eq, 1)
 }
 
 optionalExists: {
@@ -91,50 +116,48 @@ optionalCheck: {
 	thing: {
 		value: "some string"
 		other: 3
-	}
+	} @test(eq, {
+		value: "some string"
+		other: 3
+	})
 }
 
 hidden: {
 	issue794: {
 		_foo: "foo"
 		[_foo]
+		@test(eq, {
+			_foo: "foo"
+			["foo"]
+		})
 	}
 }
 
 -- issue2113.cue --
-// In all these tests, embedded scalars should resolve without error.
-merged: t1: p1: {
+// Issue #2113: Tests that embedded scalars inside a definition function (#fn with
+// an embedded bare value) resolve correctly when the definition is specialized,
+// regardless of which field is declared first. The @test(permute) exercises all
+// declaration orders to confirm order-independence.
+merged: t1: {
+	@test(permute)
+	@test(permuteCount, 6)
+
 	#fn: { #in2: _, _ }
 	#fn: { #in2: c1: string, #in2.c1 }
 	x: #fn & {#in2: {c1: "V 1"}, _}
-}
-merged: t1: p2: {
-	#fn: { #in2: c1: string, #in2.c1 }
-	#fn: { #in2: _, _ }
-	x: #fn & {#in2: {c1: "V 1"}, _}
-}
-merged: t1: p3: {
-	x: #fn & {#in2: {c1: "V 1"}, _}
-	#fn: { #in2: c1: string, #in2.c1 }
-	#fn: { #in2: _, _ }
-}
-merged: t2: p1: {
-	#fn: { #in2: {}, _ }
-	#fn: { #in2: c1: string, #in2.c1 }
-	x: #fn & {#in2: {c1: "V 1"}, _}
-}
-merged: t2: p2: {
-	#fn: { #in2: c1: string, #in2.c1 }
-	#fn: { #in2: {}, _ }
-	x: #fn & {#in2: {c1: "V 1"}, _}
-}
-merged: t2: p3: {
-	x: #fn & {#in2: {c1: "V 1"}, _}
-	#fn: { #in2: c1: string, #in2.c1 }
-	#fn: { #in2: {}, _ }
+	@test(eq, {
+		#fn: { string, #in2: c1: string }
+		x: {
+			"V 1"
+			#in2: {c1: "V 1"}
+		}
+	})
 }
 
 -- issue2163.cue --
+// Issue #2163: Tests that a self-referencing embedded expression — a definition
+// that embeds (#Func & {_foo: #in, "buzz"}) + "fiz", where the embedded result
+// depends on an inner field — does not panic or produce a spurious error.
 selfRefInEmbed: t1: {
 	#Func: {
 		#in: _
@@ -143,234 +166,34 @@ selfRefInEmbed: t1: {
 	#fn: #Func
 	#fn: {
 		#in: _
-	
+
 		(#Func & {
 			_foo: #in
 			"buzz"
 		}) + "fiz"
 	}
+
+	@test(eq, {
+		#Func: {
+			_
+			#in: _
+		}
+		#fn: {
+			"buzzfiz"
+			#in: _
+		}
+	})
 }
 
--- out/eval/stats --
-Leaks:  4
-Freed:  132
-Reused: 111
-Allocs: 25
-Retain: 0
-
-Unifications: 126
-Conjuncts:    284
-Disjuncts:    4
-Notifications: 12
-
-NumCloseIDs: 124
--- out/evalalpha --
-Errors:
-listEmbed.b6: index out of range [5] with length 2:
-    ./in.cue:29:9
-
-Result:
-(_|_){
-  // [eval]
-  intEmbed: (struct){
-    a1: (int){ 2 }
-    a2: (struct){
-      v: (int){
-        3
-        #foo: (int){ 4 }
-      }
-      w: ~(intEmbed.a2.v)
-      x: (int){ 4 }
-    }
-    a3: (int){ 5 }
-  }
-  listEmbed: (_|_){
-    // [eval]
-    a1: (int){ 2 }
-    b3: (#list){
-      #foo: (int){ 1 }
-      0: (int){ 1 }
-      1: (int){ 2 }
-    }
-    b4: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 1 }
-      3: (int){ 2 }
-    }
-    b5: (int){ 2 }
-    b6: (_|_){
-      // [eval] listEmbed.b6: index out of range [5] with length 2:
-      //     ./in.cue:29:9
-    }
-    b7: (int){ 1 }
-  }
-  stringEmbed: (struct){
-    s1: (string){
-      "foo"
-      #bar: (string){ "bar" }
-    }
-    s2: (#list){
-      0: ~(stringEmbed.s1)
-      1: (string){
-        "bar"
-        #baz: (int){ 4 }
-      }
-    }
-    s3: (string){ "foo--bar" }
-  }
-  outPattern: (struct){
-    sum: (struct){
-      out: (_|_){
-        // [incomplete] outPattern.sum.out: non-concrete value int in operand to +:
-        //     ./in.cue:44:8
-        //     ./in.cue:45:8
-      }
-      #a: (int){ int }
-      #b: (int){ int }
-    }
-    used: (struct){
-      #a: (int){ 1 }
-      #b: (int){ 3 }
-      out: (int){ 4 }
-    }
-  }
-  arithmetic: (struct){
-    sum: (_|_){
-      // [incomplete] arithmetic.sum: non-concrete value int in operand to +:
-      //     ./in.cue:53:3
-      //     ./in.cue:54:7
-      #a: (int){ int }
-      #b: (int){ int }
-    }
-    a1: (int){ 6 }
-    a2: (int){ 6 }
-    a3: (int){ 8 }
-  }
-  defCheck: (struct){
-    a: (struct){
-      #def: (int){ 1 }
-    }
-    b: (int){ 1 }
-  }
-  optionalExists: ((string|struct)){ |((string){ string }, (struct){
-      value?: (string){ string }
-    }) }
-  optionalCheck: (struct){
-    thing: (struct){
-      value: (string){ "some string" }
-      other: (int){ 3 }
-    }
-  }
-  hidden: (struct){
-    issue794: (#list){
-      _foo: (string){ "foo" }
-      0: (string){ "foo" }
-    }
-  }
-  merged: (struct){
-    t1: (struct){
-      p1: (struct){
-        #fn: (string){
-          string
-          #in2: (#struct){
-            c1: (string){ string }
-          }
-        }
-        x: (string){
-          "V 1"
-          #in2: (#struct){
-            c1: (string){ "V 1" }
-          }
-        }
-      }
-      p2: (struct){
-        #fn: (string){
-          string
-          #in2: (#struct){
-            c1: (string){ string }
-          }
-        }
-        x: (string){
-          "V 1"
-          #in2: (#struct){
-            c1: (string){ "V 1" }
-          }
-        }
-      }
-      p3: (struct){
-        x: (string){
-          "V 1"
-          #in2: (#struct){
-            c1: (string){ "V 1" }
-          }
-        }
-        #fn: (string){
-          string
-          #in2: (#struct){
-            c1: (string){ string }
-          }
-        }
-      }
-    }
-    t2: (struct){
-      p1: (struct){
-        #fn: (string){
-          string
-          #in2: (#struct){
-            c1: (string){ string }
-          }
-        }
-        x: (string){
-          "V 1"
-          #in2: (#struct){
-            c1: (string){ "V 1" }
-          }
-        }
-      }
-      p2: (struct){
-        #fn: (string){
-          string
-          #in2: (#struct){
-            c1: (string){ string }
-          }
-        }
-        x: (string){
-          "V 1"
-          #in2: (#struct){
-            c1: (string){ "V 1" }
-          }
-        }
-      }
-      p3: (struct){
-        x: (string){
-          "V 1"
-          #in2: (#struct){
-            c1: (string){ "V 1" }
-          }
-        }
-        #fn: (string){
-          string
-          #in2: (#struct){
-            c1: (string){ string }
-          }
-        }
-      }
-    }
-  }
-  selfRefInEmbed: (struct){
-    t1: (struct){
-      #Func: (_){
-        _
-        #in: (_){ _ }
-      }
-      #fn: (string){
-        "buzzfiz"
-        #in: (_){ _ }
-      }
-    }
-  }
-}
+-- out/errors.txt --
+[eval] listEmbed.b6: index out of range [5] with length 2:
+    ./in.cue:37:9
+[incomplete] outPattern.sum.out: non-concrete value int in operand to +:
+    ./in.cue:52:8
+    ./in.cue:53:8
+[incomplete] arithmetic.sum: non-concrete value int in operand to +:
+    ./in.cue:63:3
+    ./in.cue:64:7
 -- out/compile --
 --- in.cue
 {
@@ -427,10 +250,12 @@ Result:
       #a: int
       #b: int
     }
-    used: (〈0;sum〉 & {
-      #a: 1
-      #b: 3
-    })
+    used: {
+      (〈1;sum〉 & {
+        #a: 1
+        #b: 3
+      })
+    }
   }
   arithmetic: {
     sum: {
@@ -493,134 +318,22 @@ Result:
 {
   merged: {
     t1: {
-      p1: {
-        #fn: {
-          #in2: _
-          _
-        }
-        #fn: {
-          #in2: {
-            c1: string
-          }
-          〈0;#in2〉.c1
-        }
-        x: (〈0;#fn〉 & {
-          #in2: {
-            c1: "V 1"
-          }
-          _
-        })
+      #fn: {
+        #in2: _
+        _
       }
-    }
-  }
-  merged: {
-    t1: {
-      p2: {
-        #fn: {
-          #in2: {
-            c1: string
-          }
-          〈0;#in2〉.c1
+      #fn: {
+        #in2: {
+          c1: string
         }
-        #fn: {
-          #in2: _
-          _
-        }
-        x: (〈0;#fn〉 & {
-          #in2: {
-            c1: "V 1"
-          }
-          _
-        })
+        〈0;#in2〉.c1
       }
-    }
-  }
-  merged: {
-    t1: {
-      p3: {
-        x: (〈0;#fn〉 & {
-          #in2: {
-            c1: "V 1"
-          }
-          _
-        })
-        #fn: {
-          #in2: {
-            c1: string
-          }
-          〈0;#in2〉.c1
+      x: (〈0;#fn〉 & {
+        #in2: {
+          c1: "V 1"
         }
-        #fn: {
-          #in2: _
-          _
-        }
-      }
-    }
-  }
-  merged: {
-    t2: {
-      p1: {
-        #fn: {
-          #in2: {}
-          _
-        }
-        #fn: {
-          #in2: {
-            c1: string
-          }
-          〈0;#in2〉.c1
-        }
-        x: (〈0;#fn〉 & {
-          #in2: {
-            c1: "V 1"
-          }
-          _
-        })
-      }
-    }
-  }
-  merged: {
-    t2: {
-      p2: {
-        #fn: {
-          #in2: {
-            c1: string
-          }
-          〈0;#in2〉.c1
-        }
-        #fn: {
-          #in2: {}
-          _
-        }
-        x: (〈0;#fn〉 & {
-          #in2: {
-            c1: "V 1"
-          }
-          _
-        })
-      }
-    }
-  }
-  merged: {
-    t2: {
-      p3: {
-        x: (〈0;#fn〉 & {
-          #in2: {
-            c1: "V 1"
-          }
-          _
-        })
-        #fn: {
-          #in2: {
-            c1: string
-          }
-          〈0;#in2〉.c1
-        }
-        #fn: {
-          #in2: {}
-          _
-        }
-      }
+        _
+      })
     }
   }
 }
@@ -643,3 +356,19 @@ Result:
     }
   }
 }
+-- out/eval/stats --
+Leaks:  4
+Freed:  132
+Reused: 111
+Allocs: 25
+Retain: 0
+
+Unifications: 126
+Conjuncts:    284
+Disjuncts:    4
+Notifications: 12
+
+NumCloseIDs: 124
+-- out/diff-v2-v3.txt --
+v3 uses structure sharing for intEmbed.a2.w: ~(intEmbed.a2.v) and stringEmbed.s2[0]: ~(stringEmbed.s1).
+v2 expands these fields independently.

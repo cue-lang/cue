@@ -95,7 +95,7 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 		// Using CodeActionOptions is only valid if codeActionLiteralSupport is set.
 		codeActionProvider = &protocol.CodeActionOptions{
 			CodeActionKinds: s.getSupportedCodeActions(),
-			ResolveProvider: false,
+			ResolveProvider: true,
 		}
 	}
 

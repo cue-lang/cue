@@ -16,6 +16,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"slices"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -33,36 +34,97 @@ func (s *server) getSupportedCodeActions() []protocol.CodeActionKind {
 }
 
 func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionParams) ([]protocol.CodeAction, error) {
+	// delayEdit means the client supports a subsequent round-trip to
+	// the server in order to resolve the `edit` property of a chosen
+	// code action. This allows us to avoid potentially expensive
+	// calculations of edits (diffs) before the user has chosen any
+	// code action.
+	delayEdit := slices.Contains(s.options.ClientOptions.CodeActionResolveOptions, "edit")
+	var raw json.RawMessage
+	if delayEdit {
+		// The client will send this raw data back to us in any
+		// subsequent call to ResolveCodeAction. For simplicity, we
+		// reuse the params we've received.
+		data, err := json.Marshal(params)
+		if err != nil {
+			return nil, err
+		}
+		raw = json.RawMessage(data)
+	}
+
 	var codeActions []protocol.CodeAction
 
-	convertToStructEdit, err := s.workspace.CodeActionConvertToStruct(ctx, params)
+	convertToStructEdit, err := s.workspace.CodeActionConvertToStruct(ctx, params, delayEdit)
 	if err != nil {
 		return nil, err
 	}
 	if convertToStructEdit != nil {
-		codeActions = append(codeActions, protocol.CodeAction{
+		action := protocol.CodeAction{
 			Title: "Add surrounding struct braces",
 			Kind:  protocol.RefactorRewriteConvertToStruct,
-			Edit:  convertToStructEdit,
-		})
+		}
+		if delayEdit {
+			action.Data = &raw
+		} else {
+			action.Edit = convertToStructEdit
+
+		}
+		codeActions = append(codeActions, action)
 	}
 
-	convertFromStructEdit, err := s.workspace.CodeActionConvertFromStruct(ctx, params)
+	convertFromStructEdit, err := s.workspace.CodeActionConvertFromStruct(ctx, params, delayEdit)
 	if err != nil {
 		return nil, err
 	}
 	if convertFromStructEdit != nil {
-		codeActions = append(codeActions, protocol.CodeAction{
+		action := protocol.CodeAction{
 			Title: "Remove surrounding struct braces",
 			Kind:  protocol.RefactorRewriteConvertFromStruct,
-			Edit:  convertFromStructEdit,
 			// Mark it preferred so that if both "Add..." and "Remove..."
 			// are available, then this "Remove..." action will be
 			// prioritised by editors. This most likely matches the
 			// user's needs.
 			IsPreferred: true,
-		})
+		}
+		if delayEdit {
+			action.Data = &raw
+		} else {
+			action.Edit = convertFromStructEdit
+		}
+		codeActions = append(codeActions, action)
 	}
 
 	return codeActions, nil
+}
+
+func (s *server) ResolveCodeAction(ctx context.Context, action *protocol.CodeAction) (*protocol.CodeAction, error) {
+	if action.Data == nil {
+		return nil, nil
+	}
+	var params protocol.CodeActionParams
+	err := json.Unmarshal(*action.Data, &params)
+	if err != nil {
+		return nil, err
+	}
+
+	switch action.Kind {
+	case protocol.RefactorRewriteConvertToStruct:
+		convertToStructEdit, err := s.workspace.CodeActionConvertToStruct(ctx, &params, false)
+		if err != nil {
+			return nil, err
+		}
+		action.Edit = convertToStructEdit
+		return action, nil
+
+	case protocol.RefactorRewriteConvertFromStruct:
+		convertFromStructEdit, err := s.workspace.CodeActionConvertFromStruct(ctx, &params, false)
+		if err != nil {
+			return nil, err
+		}
+		action.Edit = convertFromStructEdit
+		return action, nil
+
+	default:
+		return nil, nil
+	}
 }

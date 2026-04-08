@@ -26,7 +26,22 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/diff"
 )
 
-func (w *Workspace) CodeActionConvertToStruct(ctx context.Context, params *protocol.CodeActionParams) (*protocol.WorkspaceEdit, error) {
+// CodeActionConvertToStruct calculates the edits needed to convert from
+//
+//	a: b: c
+//
+// to
+//
+//	a: {
+//		b: c
+//	}
+//
+// assuming the cursor is somewhere around `b`. The cursor position
+// and file uri are provided by params. A nil [protocol.WorkspaceEdit]
+// is returned if the conversion is not possible. If delayEdit is
+// true, an empty but non-nil [protocol.WorkspaceEdit] will be
+// returned as soon as the params have been successfully validated.
+func (w *Workspace) CodeActionConvertToStruct(ctx context.Context, params *protocol.CodeActionParams, delayEdit bool) (*protocol.WorkspaceEdit, error) {
 	f := w.GetFile(params.TextDocument.URI)
 	if f == nil || f.syntax == nil || f.mapper == nil || f.tokFile == nil {
 		return nil, nil
@@ -52,6 +67,10 @@ func (w *Workspace) CodeActionConvertToStruct(ctx context.Context, params *proto
 	lineNo := labelStart.Line() - 1 // Line is 1-based, hence the -1
 	if lineNo < 0 || lineNo >= len(lineStartOffsets) {
 		return nil, nil
+	}
+
+	if delayEdit {
+		return &protocol.WorkspaceEdit{}, nil
 	}
 
 	lineEnding := extractLineEnding(content, lineStartOffsets)
@@ -104,7 +123,22 @@ func (w *Workspace) CodeActionConvertToStruct(ctx context.Context, params *proto
 	return &protocol.WorkspaceEdit{DocumentChanges: docChanges}, nil
 }
 
-func (w *Workspace) CodeActionConvertFromStruct(ctx context.Context, params *protocol.CodeActionParams) (*protocol.WorkspaceEdit, error) {
+// CodeActionConvertFromStruct calculates the edits needed to convert from
+//
+//	a: {
+//		b: c
+//	}
+//
+// to
+//
+//	a: b: c
+//
+// assuming the cursor is somewhere around `b`. The cursor position
+// and file uri are provided by params. A nil [protocol.WorkspaceEdit]
+// is returned if the conversion is not possible. If delayEdit is
+// true, an empty but non-nil [protocol.WorkspaceEdit] will be
+// returned as soon as the params have been successfully validated.
+func (w *Workspace) CodeActionConvertFromStruct(ctx context.Context, params *protocol.CodeActionParams, delayEdit bool) (*protocol.WorkspaceEdit, error) {
 	f := w.GetFile(params.TextDocument.URI)
 	if f == nil || f.syntax == nil || f.mapper == nil || f.tokFile == nil {
 		return nil, nil
@@ -129,6 +163,10 @@ func (w *Workspace) CodeActionConvertFromStruct(ctx context.Context, params *pro
 	lineNo := structLit.Pos().Line() - 1  // Line is 1-based, hence the -1
 	if lineNo < 0 || lineNo >= len(lineStartOffsets) {
 		return nil, nil
+	}
+
+	if delayEdit {
+		return &protocol.WorkspaceEdit{}, nil
 	}
 
 	lineEnding := extractLineEnding(content, lineStartOffsets)

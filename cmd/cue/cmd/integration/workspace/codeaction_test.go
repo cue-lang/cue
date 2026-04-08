@@ -91,40 +91,64 @@ a:
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			WithOptions(RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, func(t *testing.T, env *Env) {
-				env.OpenFile("input.cue")
-				env.Await(env.DoneWithOpen())
-				rootURI := env.Sandbox.Workdir.RootURI()
+		fun := func(t *testing.T, env *Env) {
+			resolveSupport, err := env.Editor.EditResolveSupport()
+			if err != nil {
+				t.Fatal(err)
+			}
 
-				cursor := protocol.Location{
-					URI: rootURI + "/input.cue",
-					Range: protocol.Range{
-						Start: tc.position,
-					},
+			env.OpenFile("input.cue")
+			env.Await(env.DoneWithOpen())
+			rootURI := env.Sandbox.Workdir.RootURI()
+
+			cursor := protocol.Location{
+				URI: rootURI + "/input.cue",
+				Range: protocol.Range{
+					Start: tc.position,
+				},
+			}
+
+			actions, err := env.Editor.CodeAction(env.Ctx, cursor, nil)
+			if err != nil {
+				qt.Assert(t, qt.IsNil(err))
+			}
+
+			var action protocol.CodeAction
+			found := slices.ContainsFunc(actions, func(a protocol.CodeAction) bool {
+				if a.Title == "Add surrounding struct braces" {
+					action = a
+					return true
 				}
-
-				actions, err := env.Editor.CodeAction(env.Ctx, cursor, nil)
-				if err != nil {
-					qt.Assert(t, qt.IsNil(err))
-				}
-
-				var action protocol.CodeAction
-				found := slices.ContainsFunc(actions, func(a protocol.CodeAction) bool {
-					if a.Title == "Add surrounding struct braces" {
-						action = a
-						return true
-					}
-					return false
-				})
-				if !found {
-					t.Fatal("Failed to find ConvertToStruct code action")
-				}
-
-				env.ApplyCodeAction(action)
-				after := env.BufferText("input.cue")
-				qt.Check(t, qt.Equals(after, tc.expected))
+				return false
 			})
+			if !found {
+				t.Fatal("Failed to find ConvertToStruct code action")
+			}
+			// If we advertised to the LSP that we support lazy
+			// resolution for codeactions, we should have been sent back
+			// a nil-Edit property.
+			qt.Assert(t, qt.Equals(action.Edit == nil, resolveSupport))
+			// Calling ApplyCodeAction will make the additional call to
+			// resolve the Edit property if necessary.
+			env.ApplyCodeAction(action)
+			after := env.BufferText("input.cue")
+			qt.Check(t, qt.Equals(after, tc.expected))
+		}
+
+		t.Run(tc.name+"/eager", func(t *testing.T) {
+			WithOptions(RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, fun)
+		})
+
+		t.Run(tc.name+"/lazy", func(t *testing.T) {
+			WithOptions(
+				RootURIAsDefaultFolder(),
+				CapabilitiesJSON([]byte(`{
+  "textDocument": {"codeAction": {
+    "dataSupport": true,
+    "resolveSupport": {"properties": ["edit"]}
+  }}
+}`)),
+			).Run(t, "-- input.cue --\n"+tc.input, fun)
 		})
 	}
 }

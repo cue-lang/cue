@@ -36,6 +36,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3aca3be3_0e69a279",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-08T21:22:41Z",
+      "side": 1,
+      "message": "@matthew@cue.works you were right that this didn\u0027t quite work with interpolations. the updated patchset adds a test, which failed, and adds state so that we now support it.",
+      "revId": "eeea4f31da7d440df8072491657784d8684e14fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7f10b0c4_008c9f1f",
@@ -53,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b75f9153_f7000f57",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-08T21:22:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f10b0c4_008c9f1f",
+      "revId": "eeea4f31da7d440df8072491657784d8684e14fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c133e05_2daba49f",
@@ -66,6 +101,24 @@
       "writtenOn": "2026-04-02T13:54:06Z",
       "side": 1,
       "message": "but if this is a continuation, this will be wrong. I think you\u0027re going to have to stash lineStart in the scanner somehow so that it can be correctly resumed, otherwise I suspect you could make something odd pass with an interpolation ending right before the closing \"\"\" - maybe something that finishes with `\\\"\"\"` perhaps - it\u0027s just the use of lineStart at line 480 which is not guarded by atLineStart that is worrying me.\n\nThis is actually confusing me because I think atLineStart is misnamed - as it is currently, it suggests that you could drop it and just use \"lineStart \u003d\u003d s.offset\" where you need it. But actually you can\u0027t because of the fact you maintain lineStart if there are leading whitespace only.\n\nWhich suggests to me that lineStart should be renamed to \"closeAllowed\" or similar.",
+      "revId": "eeea4f31da7d440df8072491657784d8684e14fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "214f870d_f920e36a",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-08T21:22:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c133e05_2daba49f",
       "revId": "eeea4f31da7d440df8072491657784d8684e14fc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

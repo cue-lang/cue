@@ -71,6 +71,9 @@ func (c *cmpCtx) astCmp(path cue.Path, expr ast.Expr, val cue.Value) error {
 	case *ast.StructLit:
 		return c.cmpStruct(path, e, val)
 	case *ast.ListLit:
+		if err := checkNoExtraFields(path, val); err != nil {
+			return err
+		}
 		return c.cmpList(path, e, val)
 	case *ast.BinaryExpr:
 		switch e.Op {
@@ -87,8 +90,14 @@ func (c *cmpCtx) astCmp(path cue.Path, expr ast.Expr, val cue.Value) error {
 		}
 		return c.cmpUnaryExpr(path, e, val)
 	case *ast.BasicLit:
+		if err := checkNoExtraFields(path, val); err != nil {
+			return err
+		}
 		return cmpFinal(path, e, val)
 	case *ast.Ident:
+		if err := checkNoExtraFields(path, val); err != nil {
+			return err
+		}
 		return cmpIdent(path, e, val)
 	case *ast.ParenExpr:
 		return c.astCmp(path, e.X, val)
@@ -98,6 +107,33 @@ func (c *cmpCtx) astCmp(path cue.Path, expr ast.Expr, val cue.Value) error {
 		return cmpBuiltinExpr(path, expr, val)
 	}
 	return pathErr(path, "unsupported AST node type %T", expr)
+}
+
+// checkNoExtraFields reports an error if val has any hidden or definition
+// fields that would be silently ignored when the expected expression is a
+// non-struct (e.g. a list literal or scalar). In those cases the caller
+// must use a struct-form expected value to make hidden fields explicit:
+//
+//	@test(eq, {_foo: "foo", ["bar"]})
+func checkNoExtraFields(path cue.Path, val cue.Value) error {
+	iter, err := val.Fields(cue.Definitions(true), cue.Hidden(true))
+	if err != nil {
+		// Not a struct — no extra fields possible.
+		return nil
+	}
+	for iter.Next() {
+		name := iter.Selector().String()
+		// Skip list-element index selectors (e.g. "0", "1") that arise when
+		// val is a struct with an embedded list — those are part of the list
+		// value itself, not extra struct fields.
+		if !internal.IsDefOrHidden(name) {
+			continue
+		}
+		return pathErr(path, "value has field %q not present in the non-struct"+
+			" expected expression; use a struct form, e.g. @test(eq, {%s: ..., ...})",
+			name, name)
+	}
+	return nil
 }
 
 // cmpFinal compiles the AST expression and checks that the compiled value
@@ -328,14 +364,7 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 			}
 		case *ast.EmbedDecl:
 			hasEmbed = true
-			// Compare the embedded expression against the actual value's
-			// embedded scalar (if any). Falls back to the full value when
-			// the base type is a StructMarker or ListMarker.
-			innerVal := val
-			if scalar, ok := embeddedScalar(val); ok {
-				innerVal = scalar
-			}
-			if err := c.astCmp(path, d.Expr, innerVal); err != nil {
+			if err := c.cmpEmbedExpr(path, d.Expr, val); err != nil {
 				return err
 			}
 			// Embeddings are collected for non-struct value handling below.
@@ -432,8 +461,7 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 		// Fields() may also return list-element index selectors (e.g. "0", "1").
 		// These are part of the embedded base value and should not be flagged
 		// as unexpected — skip them when there was an EmbedDecl in the expected.
-		if hasEmbed && !sel.IsString() &&
-			!strings.HasPrefix(name, "#") && !strings.HasPrefix(name, "_") {
+		if hasEmbed && !sel.IsString() && !internal.IsDefOrHidden(name) {
 			continue
 		}
 		// For hidden fields the expected struct may use bare _foo (pkg="_")
@@ -935,6 +963,24 @@ func applyConstraint(sel cue.Selector, constraint token.Token) cue.Selector {
 }
 
 // ── helpers ─────────────────────────────────────────────────────────────────
+
+// cmpEmbedExpr compares an embedded expression from an expected struct against
+// the actual value. It bypasses checkNoExtraFields because the outer cmpStruct
+// already validates all struct-level fields via its seen-set check.
+//
+// Lists are compared directly via cmpList. Scalars are extracted first via
+// embeddedScalar so that astCmp sees a pure scalar rather than the surrounding
+// struct arcs.
+func (c *cmpCtx) cmpEmbedExpr(path cue.Path, expr ast.Expr, val cue.Value) error {
+	if listExpr, ok := expr.(*ast.ListLit); ok {
+		return c.cmpList(path, listExpr, val)
+	}
+	innerVal := val
+	if scalar, ok := embeddedScalar(val); ok {
+		innerVal = scalar
+	}
+	return c.astCmp(path, expr, innerVal)
+}
 
 // embeddedScalar extracts the embedded non-struct, non-list BaseValue from a
 // vertex value, following vertex indirections that arise with structure sharing.

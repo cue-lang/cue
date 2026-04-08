@@ -1,101 +1,66 @@
-#name: resolved self-reference cycles
-#evalPartial
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
+# Tests that the evaluator resolves various forms of self-referential cycles
+# without errors or hangs. Covers arithmetic cycles (math), tautological list
+# cycles (list.t0), list cycles through external bindings (list.t1), and
+# mutual struct cycles with two (nodes.t2) and three (nodes.t3) participants.
 -- in.cue --
-math: p1: {
+math: {
+	@test(permute)
 	a: b - 100
 	b: a + 100
 	b: 200
-}
-math: p2: {
-	a: b - 100
-	b: 200
-	b: a + 100
-}
-math: p3: {
-	b: a + 100
-	a: b - 100
-	b: 200
-}
-math: p4: {
-	b: a + 100
-	b: 200
-	a: b - 100
-}
-math: p5: {
-	b: 200
-	b: a + 100
-	a: b - 100
-}
-math: p6: {
-	b: 200
-	a: b - 100
-	b: a + 100
+	@test(eq, {a: 100, b: 200})
+	@test(permuteCount, 6)
 }
 
-a: 100
+a: 100 @test(eq, 100)
 
-list: t0: c: [c[0]]
+// list.t0: tautological cycle — c[0] = c[0] adds no constraint,
+// so c resolves to a list with one unconstrained element.
+list: t0: c: [c[0]] @test(eq, [_])
 
-list: t1: p1: c: [c[1], a]
-list: t1: p2: c: [a, c[0]]
+// list.t1: cycles where an external binding (a=100) breaks the cycle.
+// p1 and p2 test different element orderings; both resolve to [100, 100].
+list: t1: p1: c: [c[1], a] @test(eq, [100, 100])
+list: t1: p2: c: [a, c[0]] @test(eq, [100, 100])
 
-nodes: t1: p1: s1: s1 & {a: 1}
-nodes: t1: p2: s1: {a: 1} & s1
+// nodes.t1: self-referential struct; tests commutativity of &.
+nodes: t1: p1: s1: s1 & {a: 1} @test(eq, {a: 1})
+nodes: t1: p2: s1: {a: 1} & s1 @test(eq, {a: 1})
+// nodes.t2: two-node mutual cycle; field order must not affect the result.
 nodes: t2: {
+	@test(permute)
 	s1: s2 & {a: 1}
 	s2: s1 & {b: 2}
+	@test(eq, {s1: {a: 1, b: 2}, s2: {b: 2, a: 1}})
+	@test(permuteCount, 2)
 }
+// nodes.t3: three-node mutual cycle; all 6 orderings must yield equal results.
 nodes: t3: {
+	@test(permute)
 	s1: s2 & {a: 1}
 	s2: s3 & {b: 2}
 	s3: s1 & {c: 3}
+	@test(eq, {s1: {a: 1, b: 2, c: 3}, s2: {b: 2, c: 3, a: 1}, s3: {c: 3, a: 1, b: 2}})
+	@test(permuteCount, 6)
 }
 
+-- out/eval/stats --
+Leaks:  0
+Freed:  62
+Reused: 55
+Allocs: 7
+Retain: 10
+
+Unifications: 62
+Conjuncts:    105
+Disjuncts:    70
 -- out/compile --
 --- in.cue
 {
   math: {
-    p1: {
-      a: (〈0;b〉 - 100)
-      b: (〈0;a〉 + 100)
-      b: 200
-    }
-  }
-  math: {
-    p2: {
-      a: (〈0;b〉 - 100)
-      b: 200
-      b: (〈0;a〉 + 100)
-    }
-  }
-  math: {
-    p3: {
-      b: (〈0;a〉 + 100)
-      a: (〈0;b〉 - 100)
-      b: 200
-    }
-  }
-  math: {
-    p4: {
-      b: (〈0;a〉 + 100)
-      b: 200
-      a: (〈0;b〉 - 100)
-    }
-  }
-  math: {
-    p5: {
-      b: 200
-      b: (〈0;a〉 + 100)
-      a: (〈0;b〉 - 100)
-    }
-  }
-  math: {
-    p6: {
-      b: 200
-      a: (〈0;b〉 - 100)
-      b: (〈0;a〉 + 100)
-    }
+    a: (〈0;b〉 - 100)
+    b: (〈0;a〉 + 100)
+    b: 200
   }
   a: 100
   list: {
@@ -164,110 +129,6 @@ nodes: t3: {
       s3: (〈0;s1〉 & {
         c: 3
       })
-    }
-  }
-}
--- out/eval/stats --
-Leaks:  0
-Freed:  62
-Reused: 48
-Allocs: 14
-Retain: 0
-
-Unifications: 62
-Conjuncts:    103
-Disjuncts:    0
-
-NumCloseIDs: 8
--- out/evalalpha --
-(struct){
-  math: (struct){
-    p1: (struct){
-      a: (int){ 100 }
-      b: (int){ 200 }
-    }
-    p2: (struct){
-      a: (int){ 100 }
-      b: (int){ 200 }
-    }
-    p3: (struct){
-      b: (int){ 200 }
-      a: (int){ 100 }
-    }
-    p4: (struct){
-      b: (int){ 200 }
-      a: (int){ 100 }
-    }
-    p5: (struct){
-      b: (int){ 200 }
-      a: (int){ 100 }
-    }
-    p6: (struct){
-      b: (int){ 200 }
-      a: (int){ 100 }
-    }
-  }
-  a: (int){ 100 }
-  list: (struct){
-    t0: (struct){
-      c: (#list){
-        0: (_){ _ }
-      }
-    }
-    t1: (struct){
-      p1: (struct){
-        c: (#list){
-          0: (int){ 100 }
-          1: (int){ 100 }
-        }
-      }
-      p2: (struct){
-        c: (#list){
-          0: (int){ 100 }
-          1: (int){ 100 }
-        }
-      }
-    }
-  }
-  nodes: (struct){
-    t1: (struct){
-      p1: (struct){
-        s1: (struct){
-          a: (int){ 1 }
-        }
-      }
-      p2: (struct){
-        s1: (struct){
-          a: (int){ 1 }
-        }
-      }
-    }
-    t2: (struct){
-      s1: (struct){
-        a: (int){ 1 }
-        b: (int){ 2 }
-      }
-      s2: (struct){
-        b: (int){ 2 }
-        a: (int){ 1 }
-      }
-    }
-    t3: (struct){
-      s1: (struct){
-        a: (int){ 1 }
-        b: (int){ 2 }
-        c: (int){ 3 }
-      }
-      s2: (struct){
-        b: (int){ 2 }
-        c: (int){ 3 }
-        a: (int){ 1 }
-      }
-      s3: (struct){
-        c: (int){ 3 }
-        a: (int){ 1 }
-        b: (int){ 2 }
-      }
     }
   }
 }

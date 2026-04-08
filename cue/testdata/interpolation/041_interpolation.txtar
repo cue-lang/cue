@@ -1,14 +1,20 @@
-#name: interpolation
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-a: "\(4)"
-b: "one \(a) two \( a+c )"
-c: "one"
-d: "\(r)"
-u: "\(_)"
+a: "\(4)"    @test(eq, "4")
+b: "one \(a) two \( a+c )" @test(eq, "one 4 two 4one")
+c: "one"     @test(eq, "one")
+d: "\(r)"    @test(err, code=incomplete, contains="invalid interpolation: non-concrete value _", pos=[0:4], hint="position of r itself would be nice")
+u: "\(_)"    @test(err, code=incomplete|eval, contains="invalid interpolation: non-concrete value _", pos=[0:4, 0:7]) @test(err:todo, code=eval) // literal _ can never resolve.
 r: _
-e: "\([])"
+e: "\([])"   @test(err, code=eval, contains="invalid interpolation: cannot use [] (type list)", pos=[0:4, 0:7])
+-- out/errors.txt --
+[incomplete] d: invalid interpolation: non-concrete value _ (type _):
+    ./in.cue:4:4
+[incomplete] u: invalid interpolation: non-concrete value _ (type _):
+    ./in.cue:5:4
+    ./in.cue:5:7
+[eval] e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):
+    ./in.cue:7:4
+    ./in.cue:7:7
 -- out/compile --
 --- in.cue
 {
@@ -30,31 +36,3 @@ Retain: 0
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):
-    ./in.cue:7:4
-    ./in.cue:7:7
-
-Result:
-(_|_){
-  // [eval]
-  a: (string){ "4" }
-  b: (string){ "one 4 two 4one" }
-  c: (string){ "one" }
-  d: (_|_){
-    // [incomplete] d: invalid interpolation: non-concrete value _ (type _):
-    //     ./in.cue:4:4
-  }
-  u: (_|_){
-    // [incomplete] u: invalid interpolation: non-concrete value _ (type _):
-    //     ./in.cue:5:4
-    //     ./in.cue:5:7
-  }
-  r: (_){ _ }
-  e: (_|_){
-    // [eval] e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):
-    //     ./in.cue:7:4
-    //     ./in.cue:7:7
-  }
-}

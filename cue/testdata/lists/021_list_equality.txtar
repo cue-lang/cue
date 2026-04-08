@@ -1,70 +1,72 @@
-#name: list equality
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-eq0: [] == []
-eq1: [...] == []
-eq2: [] == [...]
-eq3: [...] == [...]
+eq0: [] == []           @test(eq, true)
+eq1: [...] == []        @test(eq, true)
+eq2: [] == [...]        @test(eq, true)
+eq3: [...] == [...]     @test(eq, true)
 
-eq4: [1] == [1]
-eq5: [1, ...] == [1]
-eq6: [1] == [1, ...]
-eq7: [1, ...] == [1, ...]
+eq4: [1] == [1]           @test(eq, true)
+eq5: [1, ...] == [1]      @test(eq, true)
+eq6: [1] == [1, ...]      @test(eq, true)
+eq7: [1, ...] == [1, ...] @test(eq, true)
 
-eq8:  [1, 2] == [1, 2]
-eq9:  [1, 2, ...] == [1, 2]
-eq10: [1, 2] == [1, 2, ...]
-eq11: [1, 2, ...] == [1, 2, ...]
+eq8:  [1, 2] == [1, 2]           @test(eq, true)
+eq9:  [1, 2, ...] == [1, 2]      @test(eq, true)
+eq10: [1, 2] == [1, 2, ...]      @test(eq, true)
+eq11: [1, 2, ...] == [1, 2, ...] @test(eq, true)
 
-ne0: [] != []
-ne1: [...] != []
-ne2: [] != [...]
-ne3: [...] != [...]
+ne0: [] != []           @test(eq, false)
+ne1: [...] != []        @test(eq, false)
+ne2: [] != [...]        @test(eq, false)
+ne3: [...] != [...]     @test(eq, false)
 
-ne4: [1] != [1]
-ne5: [1, ...] != [1]
-ne6: [1] != [1, ...]
-ne7: [1, ...] != [1, ...]
+ne4: [1] != [1]           @test(eq, false)
+ne5: [1, ...] != [1]      @test(eq, false)
+ne6: [1] != [1, ...]      @test(eq, false)
+ne7: [1, ...] != [1, ...] @test(eq, false)
 
-ne8:  [1, 2] != [1, 2]
-ne9:  [1, 2, ...] != [1, 2]
-ne10: [1, 2] != [1, 2, ...]
-ne11: [1, 2, ...] != [1, 2, ...]
+ne8:  [1, 2] != [1, 2]           @test(eq, false)
+ne9:  [1, 2, ...] != [1, 2]      @test(eq, false)
+ne10: [1, 2] != [1, 2, ...]      @test(eq, false)
+ne11: [1, 2, ...] != [1, 2, ...] @test(eq, false)
 
-feq0: [] == [1]
-feq1: [...] == [1]
-feq2: [] == [1, ...]
-feq3: [...] == [1, ...]
+feq0: [] == [1]          @test(eq, false)
+feq1: [...] == [1]       @test(eq, false)
+feq2: [] == [1, ...]     @test(eq, false)
+feq3: [...] == [1, ...]  @test(eq, false)
 
-feq4: [1] == []
-feq5: [1, ...] == []
-feq6: [1] == [...]
-feq7: [1, ...] == [...]
+feq4: [1] == []         @test(eq, false)
+feq5: [1, ...] == []    @test(eq, false)
+feq6: [1] == [...]      @test(eq, false)
+feq7: [1, ...] == [...] @test(eq, false)
 
-feq8:  [1, 2] == [1]
-feq9:  [1, ...] == [1, 2]
-feq10: [1, 2] == [1, ...]
-feq11: [1, ...] == [1, 2, ...]
+feq8:  [1, 2] == [1]           @test(eq, false)
+feq9:  [1, ...] == [1, 2]      @test(eq, false)
+feq10: [1, 2] == [1, ...]      @test(eq, false)
+feq11: [1, ...] == [1, 2, ...] @test(eq, false)
 
-fne0: [] != [1]
-fne1: [...] != [1]
-fne2: [] != [1, ...]
-fne3: [1, ...] != [1, ...]
+fne0: [] != [1]            @test(eq, true)
+fne1: [...] != [1]         @test(eq, true)
+fne2: [] != [1, ...]       @test(eq, true)
+fne3: [1, ...] != [1, ...] @test(eq, false)
 
-fne4: [1] != []
-fne5: [1, ...] != []
-fne6: [1] != [...]
-fne7: [1, ...] != [...]
+fne4: [1] != []         @test(eq, true)
+fne5: [1, ...] != []    @test(eq, true)
+fne6: [1] != [...]      @test(eq, true)
+fne7: [1, ...] != [...] @test(eq, true)
 
-fne8:  [1, 2] != [1]
-fne9:  [1, ...] != [1, 2]
-fne10: [1, 2] != [1, ...]
-fne11: [1, ...] != [1, 2, ...]
+fne8:  [1, 2] != [1]           @test(eq, true)
+fne9:  [1, ...] != [1, 2]      @test(eq, true)
+fne10: [1, 2] != [1, ...]      @test(eq, true)
+fne11: [1, ...] != [1, 2, ...] @test(eq, true)
 
-eqIncomplete1: [1] == [string]
+eqIncomplete1: [1] == [string]  @test(err, code=incomplete, contains="invalid right-hand value to '=='", pos=[0:16])
 
-neIncomplete1: [1] != [string]
+neIncomplete1: [1] != [string]  @test(err, code=incomplete, contains="invalid right-hand value to '!='", pos=[0:16])
+-- out/errors.txt --
+[incomplete] eqIncomplete1: invalid right-hand value to '==' (type list): 0: incomplete value string:
+    ./in.cue:61:16
+[incomplete] neIncomplete1: invalid right-hand value to '!=' (type list): 0: incomplete value string:
+    ./in.cue:63:16
 -- out/compile --
 --- in.cue
 {
@@ -354,62 +356,3 @@ Retain: 0
 Unifications: 244
 Conjuncts:    244
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  eq0: (bool){ true }
-  eq1: (bool){ true }
-  eq2: (bool){ true }
-  eq3: (bool){ true }
-  eq4: (bool){ true }
-  eq5: (bool){ true }
-  eq6: (bool){ true }
-  eq7: (bool){ true }
-  eq8: (bool){ true }
-  eq9: (bool){ true }
-  eq10: (bool){ true }
-  eq11: (bool){ true }
-  ne0: (bool){ false }
-  ne1: (bool){ false }
-  ne2: (bool){ false }
-  ne3: (bool){ false }
-  ne4: (bool){ false }
-  ne5: (bool){ false }
-  ne6: (bool){ false }
-  ne7: (bool){ false }
-  ne8: (bool){ false }
-  ne9: (bool){ false }
-  ne10: (bool){ false }
-  ne11: (bool){ false }
-  feq0: (bool){ false }
-  feq1: (bool){ false }
-  feq2: (bool){ false }
-  feq3: (bool){ false }
-  feq4: (bool){ false }
-  feq5: (bool){ false }
-  feq6: (bool){ false }
-  feq7: (bool){ false }
-  feq8: (bool){ false }
-  feq9: (bool){ false }
-  feq10: (bool){ false }
-  feq11: (bool){ false }
-  fne0: (bool){ true }
-  fne1: (bool){ true }
-  fne2: (bool){ true }
-  fne3: (bool){ false }
-  fne4: (bool){ true }
-  fne5: (bool){ true }
-  fne6: (bool){ true }
-  fne7: (bool){ true }
-  fne8: (bool){ true }
-  fne9: (bool){ true }
-  fne10: (bool){ true }
-  fne11: (bool){ true }
-  eqIncomplete1: (_|_){
-    // [incomplete] eqIncomplete1: invalid right-hand value to '==' (type list): 0: incomplete value string:
-    //     ./in.cue:61:16
-  }
-  neIncomplete1: (_|_){
-    // [incomplete] neIncomplete1: invalid right-hand value to '!=' (type list): 0: incomplete value string:
-    //     ./in.cue:63:16
-  }
-}

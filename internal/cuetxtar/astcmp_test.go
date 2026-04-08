@@ -382,6 +382,99 @@ func TestAstCompare_ErrDirective(t *testing.T) {
 	})
 }
 
+// TestAstCompare_HiddenFieldsInNonStruct verifies that hidden and definition
+// fields present in a value are not silently ignored when the expected
+// expression is a non-struct (list, scalar, or ident). The caller must use a
+// struct-form expected value to make those fields explicit.
+func TestAstCompare_HiddenFieldsInNonStruct(t *testing.T) {
+	ctx := cuecontext.New()
+
+	// Build test values once. Each is a struct with an embedded list or scalar
+	// plus a hidden or definition field alongside it.
+	listWithHidden := ctx.CompileString(`x: {
+		_foo: "foo"
+		["a", "b"]
+	}`).LookupPath(cue.MakePath(cue.Str("x")))
+
+	listWithDef := ctx.CompileString(`x: {
+		#D: 1
+		["a", "b"]
+	}`).LookupPath(cue.MakePath(cue.Str("x")))
+
+	scalarWithHidden := ctx.CompileString(`x: {
+		_bar: "secret"
+		42
+	}`).LookupPath(cue.MakePath(cue.Str("x")))
+
+	plainList := ctx.CompileString(`x: ["a", "b"]`).LookupPath(cue.MakePath(cue.Str("x")))
+	plainScalar := ctx.CompileString(`x: 42`).LookupPath(cue.MakePath(cue.Str("x")))
+
+	tests := []struct {
+		name    string
+		expr    string
+		val     cue.Value
+		wantErr string
+	}{
+		// ── list + hidden: negative — hidden field absent from expected list ──
+		{
+			name:    "list expr misses hidden field",
+			expr:    `["a", "b"]`,
+			val:     listWithHidden,
+			wantErr: `value has field "_foo" not present in the non-struct expected expression`,
+		},
+		// ── list + hidden: positive — struct form includes _foo ──────────────
+		{
+			name: "struct form with list embed includes hidden field",
+			expr: `{_foo: "foo", ["a", "b"]}`,
+			val:  listWithHidden,
+		},
+		// ── list + definition: negative ───────────────────────────────────────
+		{
+			name:    "list expr misses definition field",
+			expr:    `["a", "b"]`,
+			val:     listWithDef,
+			wantErr: `value has field "#D" not present in the non-struct expected expression`,
+		},
+		// ── list + definition: positive ───────────────────────────────────────
+		{
+			name: "struct form with list embed includes definition field",
+			expr: `{#D: 1, ["a", "b"]}`,
+			val:  listWithDef,
+		},
+		// ── scalar + hidden: negative ─────────────────────────────────────────
+		{
+			name:    "scalar expr misses hidden field",
+			expr:    `42`,
+			val:     scalarWithHidden,
+			wantErr: `value has field "_bar" not present in the non-struct expected expression`,
+		},
+		// ── scalar + hidden: positive ─────────────────────────────────────────
+		{
+			name: "struct form with scalar embed includes hidden field",
+			expr: `{_bar: "secret", 42}`,
+			val:  scalarWithHidden,
+		},
+		// ── no false positives for plain values ───────────────────────────────
+		{
+			name: "plain list has no extra fields",
+			expr: `["a", "b"]`,
+			val:  plainList,
+		},
+		{
+			name: "plain scalar has no extra fields",
+			expr: `42`,
+			val:  plainScalar,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expr := parseExpr(t, tt.expr)
+			checkErr(t, astCompare(expr, tt.val), tt.wantErr)
+		})
+	}
+}
+
 func TestAstCompare_Lists(t *testing.T) {
 	tests := []struct {
 		name    string

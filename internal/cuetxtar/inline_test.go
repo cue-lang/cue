@@ -656,6 +656,13 @@ func TestHintFlag(t *testing.T) {
 		}
 	})
 
+	t.Run("suberr without = is rejected", func(t *testing.T) {
+		_, err := parseAttr(`x: 1 @test(err, suberr(code=eval, contains="foo"))`)
+		if err == nil || !strings.Contains(err.Error(), "missing '='") {
+			t.Errorf("expected missing '=' error, got: %v", err)
+		}
+	})
+
 	t.Run("no hint= gives empty hint", func(t *testing.T) {
 		pa, err := parseAttr(`x: 1 @test(eq, 42)`)
 		if err != nil {

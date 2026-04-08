@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2cfd51e_e34d637b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-08T10:33:27Z",
+      "side": 1,
+      "message": "this is again badly wrapped",
+      "revId": "bc7fde443bfb4a5a87b3480bcc241651ad62950c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

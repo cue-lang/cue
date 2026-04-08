@@ -15,6 +15,7 @@
 package export
 
 import (
+	"cmp"
 	"fmt"
 	"slices"
 	"strings"
@@ -426,7 +427,9 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 		case adt.DefinitionLabel:
 			show = p.ShowDefinitions
 		case adt.HiddenLabel, adt.HiddenDefinitionLabel:
-			show = p.ShowHidden && label.PkgID(e.ctx) == e.pkgID
+			lpkg := label.PkgID(e.ctx)
+			pkgID := cmp.Or(e.pkgID, "_")
+			show = p.ShowHidden && lpkg == pkgID
 		}
 		if !show {
 			continue

@@ -230,6 +230,33 @@ if true {
 		path:    "#person.children",
 		options: o(cue.Raw()),
 		out:     `[...#person]`,
+	}, {
+		// Hidden fields in sub-values must appear when ShowHidden is true and
+		// cue.Final() is used. GetInstanceFromNode only tracks root vertices; a
+		// sub-value from LookupPath has instance()=nil → ID()="". The Vertex
+		// export path (taken when o.final=true) calls structComposite, which
+		// checks label.PkgID(e.ctx)==e.pkgID. With e.pkgID=="" but
+		// label.PkgID="_" (anonymous package marker), the comparison failed and
+		// hidden fields were dropped. Fix: map e.pkgID=="" to "_".
+		name:    "hidden field in sub-value",
+		in:      `outer: {a: 1, _hidden: "secret"}`,
+		path:    "outer",
+		options: o(cue.Final(), cue.Hidden(true)),
+		out: `{
+	a:       1
+	_hidden: "secret"
+}`,
+	}, {
+		// Hidden-definition fields (_#name) have pkgID "_" in anonymous contexts
+		// and were affected by the same bug when accessed as a sub-value with Final.
+		name:    "hidden-def field in sub-value",
+		in:      `outer: {_#cond: true, a: 1}`,
+		path:    "outer",
+		options: o(cue.Final(), cue.Hidden(true)),
+		out: `{
+	_#cond: true
+	a:      1
+}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

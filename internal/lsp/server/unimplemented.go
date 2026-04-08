@@ -138,10 +138,6 @@ func (s *server) ResolveCodeLens(context.Context, *protocol.CodeLens) (*protocol
 	return nil, notImplemented("ResolveCodeLens")
 }
 
-func (s *server) ResolveCodeAction(context.Context, *protocol.CodeAction) (*protocol.CodeAction, error) {
-	return nil, notImplemented("ResolveCodeAction")
-}
-
 func (s *server) ResolveCompletionItem(context.Context, *protocol.CompletionItem) (*protocol.CompletionItem, error) {
 	return nil, notImplemented("ResolveCompletionItem")
 }

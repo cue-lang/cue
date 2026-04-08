@@ -16,6 +16,24 @@
       "message": "I\u0027m a little concerned that this could result in very wordy error messages when we\u0027re matching against large struct definitions, but let\u0027s try it for now and see how things go.",
       "revId": "ff86985050e6e3b5e77af662f1056c274315796e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83b347ca_4de95884",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038219
+      },
+      "writtenOn": "2026-04-08T08:18:02Z",
+      "side": 1,
+      "message": "I agree but TBH that\u0027s consistent with other CUE error messages that involve big structs ;)",
+      "parentUuid": "1d62f6e7_dd102366",
+      "revId": "ff86985050e6e3b5e77af662f1056c274315796e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,24 +1,24 @@
-#todo:inline: medium — bytes interpolation produces unicode replacement chars; eval/evalalpha differ
 -- in.cue --
+bool1: "1+1=2:  \(true)" @test(eq, "1+1=2:  true")
 bool1: "1+1=2:  \(true)"
-bool1: "1+1=2:  \(true)"
-bool2: "1+1=1:  \(false)"
+bool2: "1+1=1:  \(false)" @test(eq, "1+1=1:  false")
 
 // one replacement character
-b1:      'a\xED\x95a'
-bytes1s: "\(b1)"
-bytes1b: '\(b1)'
+b1:      'a\xED\x95a'   @test(eq, 'a\xed\x95a')
+bytes1s: "\(b1)"        @test(eq, "a\uFFFDa")
+bytes1b: '\(b1)'        @test(eq, 'a\xed\x95a')
 
 // two replacement characters
-b2:      'a\x80\x95a'
+b2:      'a\x80\x95a'   @test(eq, 'a\x80\x95a')
 bytes2s: "\(b2)"
-bytes2b: '\(b2)'
+bytes2b: '\(b2)'        @test(eq, 'a\x80\x95a')
 
 // preserve precision
-n1: "\(1) \(2.00)"
+n1: "\(1) \(2.00)"      @test(eq, "1 2.00")
 
 // but normalize representation
-n2: "\(1e2)"
+n2: "\(1e2)"            @test(eq, "1E+2")
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
@@ -29,45 +29,6 @@ Retain: 0
 Unifications: 11
 Conjuncts:    12
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  bool1: (string){ "1+1=2:  true" }
-  bool2: (string){ "1+1=1:  false" }
-  b1: (bytes){ 'a\xed\x95a' }
-  bytes1s: (string){ "a�a" }
-  bytes1b: (bytes){ 'a\xed\x95a' }
-  b2: (bytes){ 'a\x80\x95a' }
-  bytes2s: (string){ "a�a" }
-  bytes2b: (bytes){ 'a\x80\x95a' }
-  n1: (string){ "1 2.00" }
-  n2: (string){ "1E+2" }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,7 +5,7 @@
-   bytes1s: (string){ "a�a" }
-   bytes1b: (bytes){ 'a\xed\x95a' }
-   b2: (bytes){ 'a\x80\x95a' }
--  bytes2s: (string){ "a��a" }
-+  bytes2s: (string){ "a�a" }
-   bytes2b: (bytes){ 'a\x80\x95a' }
-   n1: (string){ "1 2.00" }
-   n2: (string){ "1E+2" }
--- out/eval --
-(struct){
-  bool1: (string){ "1+1=2:  true" }
-  bool2: (string){ "1+1=1:  false" }
-  b1: (bytes){ 'a\xed\x95a' }
-  bytes1s: (string){ "a�a" }
-  bytes1b: (bytes){ 'a\xed\x95a' }
-  b2: (bytes){ 'a\x80\x95a' }
-  bytes2s: (string){ "a��a" }
-  bytes2b: (bytes){ 'a\x80\x95a' }
-  n1: (string){ "1 2.00" }
-  n2: (string){ "1E+2" }
-}
 -- out/compile --
 --- in.cue
 {
@@ -83,3 +44,8 @@ diff old new
   n1: "\(1) \(2.00)"
   n2: "\(1E+2)"
 }
+-- out/diff-v2-v3.txt --
+v2 produces two replacement characters for bytes2s ("a\uFFFD\uFFFDa"); v3
+produces one ("a\uFFFDa"). Reason: V2 implements Go conversions standard, which
+deviates from the Unicode standard. V3 implements the Unicode standard in this
+regard.

@@ -460,6 +460,16 @@ func (s *Scanner) scanString(offs int, quote quoteInfo, continuation bool) (toke
 				break
 			}
 		}
+		// Track the whitespace prefix of non-empty content lines,
+		// including lines consisting entirely of whitespace.
+		// For newlines, len(ws) > 0 skips truly empty lines.
+		if closeAllowed && ch != ' ' && ch != '\t' {
+			if ws := s.src[lineStart : s.offset-1]; ch != '\n' || len(ws) > 0 {
+				if quote.minLineWS == nil || len(ws) < len(quote.minLineWS) {
+					quote.minLineWS = ws
+				}
+			}
+		}
 		switch {
 		case ch == '\n':
 			closeAllowed = true
@@ -467,11 +477,6 @@ func (s *Scanner) scanString(offs int, quote quoteInfo, continuation bool) (toke
 		case quote.numChar == 3 && closeAllowed && (ch == ' ' || ch == '\t'):
 			// preserve closeAllowed
 		default:
-			if closeAllowed {
-				if ws := s.src[lineStart : s.offset-1]; quote.minLineWS == nil || len(ws) < len(quote.minLineWS) {
-					quote.minLineWS = ws
-				}
-			}
 			closeAllowed = false
 		}
 		if ch == '\r' && quote.numChar == 3 {

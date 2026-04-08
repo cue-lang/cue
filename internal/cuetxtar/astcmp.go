@@ -772,7 +772,7 @@ func (c *cmpCtx) matchDisjuncts(path cue.Path, opCtx *adt.OpContext, kind string
 			}
 		}
 		if !found {
-			return pathErr(path, "disjunction: no matching %s disjunct for AST expr at %s", kind, pos(ae))
+			return pathErr(path, "%s: no matching %s disjunct %s", pos(ae), kind, toStr(ae))
 		}
 	}
 	return nil
@@ -837,7 +837,7 @@ func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value)
 			if len(args) < len(astParts) {
 				continue
 			}
-			return pathErr(path, "%s: conjunction: no matching value conjunct expr %s", pos(ae), toStr(ae))
+			return pathErr(path, "%s: no matching conjunct expr %s", pos(ae), toStr(ae))
 		}
 	}
 	return nil

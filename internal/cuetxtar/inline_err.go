@@ -573,10 +573,10 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 // deltaLine:col (relative to pa.baseLine); positions in other files are
 // written as filename:absLine:col (absolute).
 func (r *inlineRunner) formatPosSpec(p token.Pos, pa parsedTestAttr) string {
-	if p.Filename() == "" || p.Filename() == pa.srcFileName {
+	if p.Filename() == "" || r.relFilename(p.Filename()) == pa.srcFileName {
 		return fmt.Sprintf("%d:%d", p.Line()-pa.baseLine, p.Column())
 	}
-	return p.String()
+	return fmt.Sprintf("%s:%d:%d", r.relFilename(p.Filename()), p.Line(), p.Column())
 }
 
 func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUpdate) {

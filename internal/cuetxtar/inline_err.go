@@ -160,6 +160,9 @@ func parseErrArgs(a internal.Attr) (errArgs, error) {
 			// p= is a universal priority flag handled at the parsedTestAttr level; skip here.
 		case kv.Key() == "":
 			// Positional arg (e.g. "any"); already handled above.
+			if v := strings.TrimSpace(kv.Value()); strings.HasPrefix(v, "suberr(") {
+				return ea, fmt.Errorf("@test(err): %q looks like suberr=(...) with missing '='; use suberr=(...)", v)
+			}
 		default:
 			return ea, fmt.Errorf("@test(err): unknown flag %q", kv.Key())
 		}

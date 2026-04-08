@@ -647,6 +647,20 @@ func checkError(t *testing.T, src string, tok token.Token, pos int, lit, err str
 	}
 	s.Init(token.NewFile("", -1, len(src)), []byte(src), eh, ScanComments|DontInsertCommas)
 	_, tok0, lit0 := s.Scan()
+	// Scan the full input so that errors produced during string
+	// continuation after interpolation are collected too.
+	count := 0
+	for scanTok := tok0; scanTok != token.EOF; {
+		_, scanTok, _ = s.Scan()
+		switch scanTok {
+		case token.LPAREN:
+			count++
+		case token.RPAREN:
+			if count--; count == 0 {
+				s.ResumeInterpolation()
+			}
+		}
+	}
 	if tok0 != tok {
 		t.Errorf("%q: got %s, expected %s", src, tok0, tok)
 	}
@@ -746,9 +760,9 @@ var errorTests = []struct {
 	{"#'", token.STRING, 0, "#'", "string literal not terminated"},
 	{"''", token.STRING, 0, "''", ""},
 	{"'", token.STRING, 0, "'", "string literal not terminated"},
-	{`"\("`, token.INTERPOLATION, 0, `"\(`, ""},
+	{`"\(0)"`, token.INTERPOLATION, 0, `"\(`, ""},
 	{`#"\("#`, token.STRING, 0, `#"\("#`, ""},
-	{`#"\#("#`, token.INTERPOLATION, 0, `#"\#(`, ""},
+	{`#"\#(0)"#`, token.INTERPOLATION, 0, `#"\#(`, ""},
 	{`"\q"`, token.STRING, 2, `"\q"`, "unknown escape sequence"},
 	{`#"\q"#`, token.STRING, 0, `#"\q"#`, ""},
 	{`#"\#q"#`, token.STRING, 4, `#"\#q"#`, "unknown escape sequence"},

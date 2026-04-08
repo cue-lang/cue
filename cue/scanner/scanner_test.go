@@ -757,6 +757,11 @@ var errorTests = []struct {
 	{"'''\n \n\t'''", token.STRING, 0, "'''\n \n\t'''", "non-matching whitespace for multiline strings"},
 	{"\"\"\"\n \n\t\"\"\"", token.STRING, 0, "\"\"\"\n \n\t\"\"\"", "non-matching whitespace for multiline strings"},
 	{"'''\n\t\n '''", token.STRING, 0, "'''\n\t\n '''", "non-matching whitespace for multiline strings"},
+	// Content lines with same-length but incompatible whitespace prefixes.
+	{"'''\n\t\n 0\n\t'''", token.STRING, 0, "'''\n\t\n 0\n\t'''", "non-matching whitespace for multiline strings"},
+	{"'''\n \n\t0\n '''", token.STRING, 0, "'''\n \n\t0\n '''", "non-matching whitespace for multiline strings"},
+	// Longer shared prefix that diverges (tab vs space after common prefix).
+	{"'''\n\t\t 0\n\t\t\t0\n\t\t\t'''", token.STRING, 0, "'''\n\t\t 0\n\t\t\t0\n\t\t\t'''", "non-matching whitespace for multiline strings"},
 	{"\"abc\n", token.STRING, 0, `"abc`, "string literal not terminated"},
 	{"\"abc\n   ", token.STRING, 0, `"abc`, "string literal not terminated"},
 	{"\"abc\r\n   ", token.STRING, 0, "\"abc\r", "string literal not terminated"},

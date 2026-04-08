@@ -460,13 +460,24 @@ func (s *Scanner) scanString(offs int, quote quoteInfo, continuation bool) (toke
 				break
 			}
 		}
-		// Track the whitespace prefix of non-empty content lines,
+		// Track the common whitespace prefix of non-empty content lines,
 		// including lines consisting entirely of whitespace.
 		// For newlines, len(ws) > 0 skips truly empty lines.
 		if closeAllowed && ch != ' ' && ch != '\t' {
 			if ws := s.src[lineStart : s.offset-1]; ch != '\n' || len(ws) > 0 {
-				if quote.minLineWS == nil || len(ws) < len(quote.minLineWS) {
+				if quote.minLineWS == nil {
 					quote.minLineWS = ws
+				} else {
+					// Compute the common prefix between the current line's
+					// whitespace and the running minimum.
+					n := min(len(quote.minLineWS), len(ws))
+					for i := range n {
+						if ws[i] != quote.minLineWS[i] {
+							n = i
+							break
+						}
+					}
+					quote.minLineWS = quote.minLineWS[:n]
 				}
 			}
 		}

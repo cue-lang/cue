@@ -19,10 +19,10 @@
     ./in.cue:3:8
     ./in.cue:3:24
 [eval] #T.out2: invalid interpolation: undefined field: y:
-    ./in.cue:4:8
-    ./in.cue:4:15
+    ./in.cue:6:8
+    ./in.cue:6:15
 [eval] #T.vy: undefined field: y:
-    ./in.cue:6:12
+    ./in.cue:8:12
 -- out/compile --
 --- in.cue
 {

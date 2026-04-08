@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfdfc782_3f6bb57e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-08T12:17:36Z",
+      "side": 1,
+      "message": "please be clear in the code with TODOs about this, including when we want to remove support for this legacy form - or if we want to do a \"cue fix\" for it. I assume not necessary given how this was just an experiment.",
+      "range": {
+        "startLine": 10,
+        "startChar": 38,
+        "endLine": 12,
+        "endChar": 27
+      },
+      "revId": "b18ba760a5ad87052becaf7e4187624a271cdc08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

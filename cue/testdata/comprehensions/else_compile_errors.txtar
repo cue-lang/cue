@@ -19,7 +19,7 @@ letVarInElse: {
 // - Mixed if/try with else: if cond try { x } else { y }
 // - if + for with else: if cond for x in [] { x } else { y }
 // These all produce parser error: "else clause only allowed with single 'if' or 'try' clause"
-// or "use 'fallback' with 'for' clauses"
+// or "use 'otherwise' with 'for' clauses"
 -- out/eval/stats --
 Leaks:  0
 Freed:  2

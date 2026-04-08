@@ -261,6 +261,100 @@ func TestAstCompare_Structs(t *testing.T) {
 	}
 }
 
+// TestAstCompare_EmbedExpr covers struct comparisons involving embedded
+// expressions: embedded scalars (e.g. {5, foo: "bar"}), embedded type
+// constraints (e.g. {string, foo: "bar"}), and the new check that reports
+// an error when the actual value carries an embedded scalar but the expected
+// struct has no corresponding EmbedDecl.
+func TestAstCompare_EmbedExpr(t *testing.T) {
+	tests := []struct {
+		name    string
+		expr    string
+		val     string
+		wantErr string
+	}{
+		// Expected struct has an embedded expression — actual matches.
+		// Note: CUE only allows scalar embeds alongside definition fields (#foo)
+		// or hidden-def fields (_#foo), not regular exported fields.
+		{name: "int embed match", expr: `{42}`, val: `{42}`},
+		{name: "type embed with def field", expr: `{string, #foo: "bar"}`, val: `{string, #foo: "bar"}`},
+
+		// Expected struct has an embedded expression — actual embed differs.
+		{name: "int embed mismatch", expr: `{6}`, val: `{5}`, wantErr: "expected 6, got 5"},
+
+		// Neither side has an embedded expression — plain struct comparison.
+		{name: "neither has embed", expr: `{#foo: "bar"}`, val: `{#foo: "bar"}`},
+
+		// Actual value has an embedded scalar but expected struct omits it.
+		// These cases test the new "value has embedded … but no embed in expected" check.
+		{
+			name:    "actual has type embed expected has none",
+			expr:    `{#foo: "bar"}`,
+			val:     `{string, #foo: "bar"}`,
+			wantErr: "value has embedded string but expected struct has no embedded expression",
+		},
+		{
+			name:    "actual has only embed expected is empty struct",
+			expr:    `{}`,
+			val:     `{42}`,
+			wantErr: "value has embedded 42 but expected struct has no embedded expression",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			expr := parseExpr(t, tt.expr)
+			val := compileVal(t, tt.val)
+			checkErr(t, astCompare(expr, val), tt.wantErr)
+		})
+	}
+
+	// The motivating case from yield.txtar: a struct with a hidden-def field
+	// and a scalar embedded via an if comprehension. Both the correct assertion
+	// ({5, _#cond: true}) and the incorrect one ({_#cond: true}) are checked.
+	t.Run("hidden def with conditional scalar embed", func(t *testing.T) {
+		ctx := cuecontext.New()
+		v := ctx.CompileString(`x: {
+			_#cond: true
+			if _#cond { 5 }
+		}`)
+		if err := v.Err(); err != nil {
+			t.Fatalf("compile: %v", err)
+		}
+		val := v.LookupPath(cue.MakePath(cue.Str("x")))
+
+		t.Run("correct assertion passes", func(t *testing.T) {
+			checkErr(t, astCompare(parseExpr(t, `{5, _#cond: true}`), val), "")
+		})
+		t.Run("missing embed fails", func(t *testing.T) {
+			checkErr(t, astCompare(parseExpr(t, `{_#cond: true}`), val),
+				"value has embedded 5 but expected struct has no embedded expression")
+		})
+	})
+
+	// Structure sharing: when a field is shared via vertex indirection the
+	// embedded scalar traversal must follow the indirection chain.
+	t.Run("vertex indirection from structure sharing", func(t *testing.T) {
+		ctx := cuecontext.New()
+		v := ctx.CompileString(`
+			base: {5, #foo: "bar"}
+			x: base
+		`)
+		if err := v.Err(); err != nil {
+			t.Fatalf("compile: %v", err)
+		}
+		val := v.LookupPath(cue.MakePath(cue.Str("x")))
+
+		t.Run("correct assertion passes", func(t *testing.T) {
+			checkErr(t, astCompare(parseExpr(t, `{5, #foo: "bar"}`), val), "")
+		})
+		t.Run("missing embed fails", func(t *testing.T) {
+			checkErr(t, astCompare(parseExpr(t, `{#foo: "bar"}`), val),
+				"value has embedded")
+		})
+	})
+}
+
 func TestAstCompare_ErrDirective(t *testing.T) {
 	ctx := cuecontext.New()
 

@@ -115,7 +115,7 @@ func cmpFinal(path cue.Path, expr ast.Expr, val cue.Value) error {
 		return pathErr(path, "cannot compile expression %q: %v", b, err)
 	}
 	if !valuesEqual(expected, val) {
-		return pathErr(path, "expected %s, got %v", b, val)
+		return pathErr(path, "expected %s, got %#v", b, val)
 	}
 	return nil
 }
@@ -219,6 +219,7 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 	var patterns []expectedPattern
 	checkOrder := false
 	allFinal := false
+	hasEmbed := false
 	seenShareIDs := make(map[string]bool)
 
 	for _, d := range s.Elts {
@@ -326,16 +327,29 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 				patterns = append(patterns, expectedPattern{pattern: label.Elts[0], value: d.Value})
 			}
 		case *ast.EmbedDecl:
-			val := val
-			if v, ok := val.Core().V.BaseValue.(adt.Value); ok {
-				ctx := value.OpContext(val)
-				val = value.Make(ctx, v)
+			hasEmbed = true
+			// Compare the embedded expression against the actual value's
+			// embedded scalar (if any). Falls back to the full value when
+			// the base type is a StructMarker or ListMarker.
+			innerVal := val
+			if scalar, ok := embeddedScalar(val); ok {
+				innerVal = scalar
 			}
-
-			if err := c.astCmp(path, d.Expr, val); err != nil {
+			if err := c.astCmp(path, d.Expr, innerVal); err != nil {
 				return err
 			}
 			// Embeddings are collected for non-struct value handling below.
+		}
+	}
+
+	// When the expected struct has no embedded expression, verify that the actual
+	// value also carries no embedded scalar or type constraint. Without this check,
+	// omitting an embed from the expected value silently passes (e.g. writing
+	// {_#cond: true} when the actual value is {5, _#cond: true}).
+	if !hasEmbed {
+		if scalar, ok := embeddedScalar(val); ok {
+			return pathErr(path, "value has embedded %v but expected struct has no embedded expression",
+				scalar)
 		}
 	}
 
@@ -414,6 +428,14 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 			name = sel.String()
 		}
 		valFieldOrder = append(valFieldOrder, name)
+		// When the expected struct embeds a non-struct value (list or scalar),
+		// Fields() may also return list-element index selectors (e.g. "0", "1").
+		// These are part of the embedded base value and should not be flagged
+		// as unexpected — skip them when there was an EmbedDecl in the expected.
+		if hasEmbed && !sel.IsString() &&
+			!strings.HasPrefix(name, "#") && !strings.HasPrefix(name, "_") {
+			continue
+		}
 		// For hidden fields the expected struct may use bare _foo (pkg="_")
 		// while the value stores _foo scoped to a package. Accept either.
 		if !seen[sel] {
@@ -913,6 +935,29 @@ func applyConstraint(sel cue.Selector, constraint token.Token) cue.Selector {
 }
 
 // ── helpers ─────────────────────────────────────────────────────────────────
+
+// embeddedScalar extracts the embedded non-struct, non-list BaseValue from a
+// vertex value, following vertex indirections that arise with structure sharing.
+// Returns (scalar, true) when the base value is an adt.Value that is not a
+// further Vertex (e.g. a concrete int, a type constraint like string, a bound).
+// Returns (zero, false) when the base value is a StructMarker, ListMarker, or nil.
+func embeddedScalar(val cue.Value) (cue.Value, bool) {
+	for v := val.Core().V; v != nil; {
+		bv, ok := v.BaseValue.(adt.Value)
+		if !ok {
+			return cue.Value{}, false // *StructMarker or *ListMarker
+		}
+		if _, isBottom := bv.(*adt.Bottom); isBottom {
+			return cue.Value{}, false // error base value — not an embedded scalar
+		}
+		if vertex, ok2 := bv.(*adt.Vertex); ok2 {
+			v = vertex // follow structure-sharing indirection
+			continue
+		}
+		return value.Make(value.OpContext(val), bv), true
+	}
+	return cue.Value{}, false
+}
 
 func pathErr(path cue.Path, format string, args ...any) error {
 	prefix := path.String()

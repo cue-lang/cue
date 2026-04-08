@@ -83,20 +83,39 @@ func (r *inlineRunner) runInlinePermutes(t *testing.T, rootPath cue.Path, record
 
 	totalPerms := 0
 	for _, group := range permuteGroups {
-		totalPerms += r.runPermuteAssertion(t, group.parentPath, group.fields)
+		groupPerms := r.runPermuteAssertion(t, group.parentPath, group.fields)
+		// @test(permuteCount, N) placed alongside @test(permute) in the same
+		// struct is checked here with the per-group count.
+		if groupPerms > 0 {
+			r.checkPermuteCount(t, group.parentPath, records, version, groupPerms)
+		}
+		totalPerms += groupPerms
 	}
-
-	// Check @test(permuteCount, N) on the root if any permutations ran.
+	// Also check @test(permuteCount, N) at the root with the total across all
+	// groups — but only when the root path is not itself one of the group paths
+	// (to avoid double-checking single-group cases where the permuted struct IS
+	// the root).
 	if totalPerms > 0 {
-		r.checkPermuteCount(t, rootPath, records, version, totalPerms)
+		rootStr := rootPath.String()
+		rootIsGroup := false
+		for _, group := range permuteGroups {
+			if group.parentPath.String() == rootStr {
+				rootIsGroup = true
+				break
+			}
+		}
+		if !rootIsGroup {
+			r.checkPermuteCount(t, rootPath, records, version, totalPerms)
+		}
 	}
 }
 
 // checkPermuteCount verifies or auto-updates a @test(permuteCount, N) directive
-// on the test root after all permutations have run.
-func (r *inlineRunner) checkPermuteCount(t *testing.T, rootPath cue.Path, records []attrRecord, version string, actualCount int) {
+// at path after all permutations for a group have run. When CUE_UPDATE=1, the
+// count is filled or replaced with the actual value.
+func (r *inlineRunner) checkPermuteCount(t *testing.T, path cue.Path, records []attrRecord, version string, actualCount int) {
 	t.Helper()
-	directives := selectActiveDirectives(records, rootPath, version)
+	directives := selectActiveDirectives(records, path, version)
 	for _, pa := range directives {
 		if pa.directive != "permuteCount" {
 			continue
@@ -111,7 +130,7 @@ func (r *inlineRunner) checkPermuteCount(t *testing.T, rootPath cue.Path, record
 		expectedStr := pa.raw.Fields[1].Value()
 		expected, err := strconv.Atoi(expectedStr)
 		if err != nil {
-			t.Errorf("path %s: @test(permuteCount, %q): cannot parse as integer", rootPath, expectedStr)
+			t.Errorf("path %s: @test(permuteCount, %q): cannot parse as integer", path, expectedStr)
 			return
 		}
 		if expected == actualCount {
@@ -121,7 +140,7 @@ func (r *inlineRunner) checkPermuteCount(t *testing.T, rootPath cue.Path, record
 			r.enqueueInlineFill(pa, fmt.Sprintf("@test(permuteCount, %d)", actualCount))
 			return
 		}
-		t.Errorf("path %s: @test(permuteCount): got %d permutations, want %d", rootPath, actualCount, expected)
+		t.Errorf("path %s: @test(permuteCount): got %d permutations, want %d", path, actualCount, expected)
 		return
 	}
 }
@@ -228,6 +247,7 @@ func (r *inlineRunner) runPermuteAssertion(t *testing.T, structPath cue.Path, fi
 		}
 	}
 	generate(n)
+	t.Logf("path %s: @test(permute): evaluated %d permutations of %d fields", structPath, permNum, n)
 	return permNum
 }
 

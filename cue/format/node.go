@@ -228,9 +228,9 @@ func (f *formatter) walkClauseList(list []ast.Clause, ws whiteSpace) {
 
 func fallbackKeyword(n *ast.Comprehension) token.Token {
 	if len(n.Clauses) > 1 {
-		return token.FALLBACK
+		return token.OTHERWISE
 	} else if _, ok := n.Clauses[0].(*ast.ForClause); ok {
-		return token.FALLBACK
+		return token.OTHERWISE
 	}
 	return token.ELSE
 }

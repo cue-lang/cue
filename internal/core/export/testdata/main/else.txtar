@@ -36,7 +36,7 @@ ifElse: {
 forFallback: {
 	for x in [] {
 		"\(x)": x
-	} fallback {
+	} otherwise {
 		empty: true
 	}
 }
@@ -46,7 +46,7 @@ forFallbackOuter: {
 	let val = 10
 	for x in [] {
 		x
-	} fallback {
+	} otherwise {
 		fallbackField: val
 	}
 }
@@ -74,7 +74,7 @@ diff old new
  	for x in [] {
  		"\(x)": x
 -	} else {
-+	} fallback {
++	} otherwise {
  		empty: true
  	}
  }
@@ -88,7 +88,7 @@ diff old new
  		x
 -	} else {
 -		fallback: val
-+	} fallback {
++	} otherwise {
 +		fallbackField: val
  	}
  }
@@ -110,7 +110,7 @@ ifElse: {
 forFallback: {
 	for x in [] {
 		"\(x)": x
-	} fallback {
+	} otherwise {
 		empty: true
 	}
 }
@@ -120,7 +120,7 @@ forFallbackOuter: {
 	let val = 10
 	for x in [] {
 		x
-	} fallback {
+	} otherwise {
 		fallbackField: val
 	}
 }
@@ -148,7 +148,7 @@ diff old new
  	for x in [] {
  		"\(x)": x
 -	} else {
-+	} fallback {
++	} otherwise {
  		empty: true
  	}
  }
@@ -162,7 +162,7 @@ diff old new
  		x
 -	} else {
 -		fallback: val
-+	} fallback {
++	} otherwise {
 +		fallbackField: val
  	}
  }

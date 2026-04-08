@@ -72,7 +72,7 @@ unmarshal: {
 Errors:
 unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: =:
     ./in.cue:66:19
-    1:1
+    1:15
 unmarshal.output.failDuplicate: error in call to encoding/toml.Unmarshal: duplicate key: foo:
     ./in.cue:66:19
     2:1

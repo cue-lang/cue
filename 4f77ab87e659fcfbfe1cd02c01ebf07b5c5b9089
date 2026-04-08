@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a46d03f7_348c1231",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-08T21:23:17Z",
+      "side": 1,
+      "message": "@matthew@cue.works you were right that this didn\u0027t quite work with interpolations. the updated patchset adds a test, which failed, and adds state so that we now support it.",
+      "revId": "4f77ab87e659fcfbfe1cd02c01ebf07b5c5b9089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3576f26c_cf4463d5",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1442,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-08T10:48:23Z",
+      "side": 1,
+      "message": "why not use cue/literal here? it knows how to quote multi-line strings correctly, including tab indentation. it seems odd to reimplement this by hand here.",
+      "revId": "4a24873be1aa87c2c843d8d508a8eb3f70191e39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94dc2d69_6aee8804",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1466,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-08T10:48:23Z",
+      "side": 1,
+      "message": "personally I\u0027d write this around tabs only, because we shouldn\u0027t be using spaces to indent CUE. and this will align with cue/literal as well, which only supports tab indenting when quoting multiline strings.",
+      "revId": "4a24873be1aa87c2c843d8d508a8eb3f70191e39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

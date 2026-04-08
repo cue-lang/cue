@@ -1251,13 +1251,10 @@ func (r *inlineRunner) formatValue(v cue.Value) string {
 	// cue.Final() routes to Vertex() export (no _#def wrapping) and sets
 	// omitOptional=true.  cue.Optional(true) applied afterwards re-enables
 	// optional fields, giving us the complete value without internals.
-	syn := v.Syntax(cue.Docs(true), cue.Final(), cue.Optional(true))
-	if syn == nil {
-		return fmt.Sprintf("%v", v)
-	}
+	syn := v.Syntax(cue.Docs(true), cue.Final(), cue.Optional(true), cue.Definitions(true), cue.Hidden(true))
 	b, err := format.Node(syn)
 	if err != nil {
-		return fmt.Sprintf("%v", v)
+		return fmt.Sprintf("%#v", v)
 	}
 	return string(b)
 }

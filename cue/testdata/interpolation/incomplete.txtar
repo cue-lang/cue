@@ -17,7 +17,7 @@ out: """
 -- out/errors.txt --
 [incomplete] out: invalid interpolation: undefined field: #d:
     ./in.cue:8:6
-    ./in.cue:13:18
+    ./in.cue:13:21
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

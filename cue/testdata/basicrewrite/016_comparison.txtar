@@ -43,7 +43,7 @@ lists: {
 
 	// TODO: types can never match. This could be a permanent error.
 	//       This was V2 behavior.
-	eIncompat: [int] == [string]   @test(err, code=incomplete|eval, pos=[-1:13]) @test(err:todo, code=eval, pos=[-1:13])
+	eIncompat: [int] == [string]   @test(err, code=incomplete|eval, pos=[0:13]) @test(err:todo, code=eval, pos=[0:13])
 
 	// Error cases
 	eErrPassthrough: [1/0] == [1]  @test(err, code=eval, contains="invalid", pos=[0:19])
@@ -51,8 +51,8 @@ lists: {
 	// incomplete passtrhough
 	_e3l: {}
 	eErrPassthrough: [_e3l.b] == [1]  @test(err, code=eval,
-		suberr=(code=eval, contains="division by zero", pos=[-5:19]),
-		suberr=(code=eval, contains="conflicting values", pos=[2:19]),
+		suberr=(code=eval, contains="division by zero", pos=[-4:19]),
+		suberr=(code=eval, contains="conflicting values", pos=[6:19]),
 	)
 
 	// error reported as part of combined eErrPassthrough error
@@ -196,11 +196,11 @@ diffTypes: {
 }
 -- out/errors.txt --
 [incomplete] lists.eIncompat: invalid left-hand value to '==' (type list): 0: incomplete value int:
-    ./lists.cue:23:13
+    ./lists.cue:24:13
 [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type list): 0: failed arithmetic: division by zero:
-    ./lists.cue:26:19
+    ./lists.cue:27:19
 lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
-    ./lists.cue:33:19
+    ./lists.cue:37:19
 [incomplete] incomplete.iErr1: invalid left-hand value to '==' (type struct): a: field is required but not present:
     ./structs.cue:73:9
 [incomplete] incomplete.iErr2: invalid left-hand value to '==' (type struct): a: field is required but not present:

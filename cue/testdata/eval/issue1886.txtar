@@ -12,16 +12,16 @@ cycle: {
 
 	a: b + 100  @test(err, code=cycle,
 		suberr=(pos=[0:5], args=[b]),
-		suberr=(pos=[1:5], args=[a]),
+		suberr=(pos=[4:5], args=[a]),
 	)
 	b: a - 100  @test(err, code=cycle,
-		suberr=(pos=[-1:5], args=[b]),
+		suberr=(pos=[-4:5], args=[b]),
 		suberr=(pos=[0:5], args=[a]),
 	)
 }
 
 incompleteOne: {
-	@test(err, code=incomplete, pos=[2:7, 3:3, 8:5], at=r)
+	@test(err, code=incomplete, pos=[9:5, 3:7, 4:3], at=r)
 	_t: {
 		#p: string
 		"""
@@ -37,15 +37,15 @@ incompleteOne: {
 		(struct){
 		  _t: (_|_){
 		    // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
-		    //     in.cue:13:3
-		    //     in.cue:12:7
+		    //     in.cue:20:3
+		    //     in.cue:19:7
 		    #p: (string){ string }
 		  }
 		  r: (_|_){
 		    // [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-		    //     in.cue:18:5
-		    //     in.cue:12:7
-		    //     in.cue:13:3
+		    //     in.cue:25:5
+		    //     in.cue:19:7
+		    //     in.cue:20:3
 		  }
 		}
 		""")
@@ -67,25 +67,25 @@ incompleteTwo: {
 [cycle] cycle.a: cycle with field: b:
     ./in.cue:6:5
 cycle.b: cycle with field: a:
-    ./in.cue:7:5
+    ./in.cue:10:5
 [cycle] cycle.a: cycle with field: b:
     ./in.cue:6:5
 cycle.b: cycle with field: a:
-    ./in.cue:7:5
+    ./in.cue:10:5
 [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:13:3
-    ./in.cue:12:7
+    ./in.cue:20:3
+    ./in.cue:19:7
 [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:18:5
-    ./in.cue:12:7
-    ./in.cue:13:3
+    ./in.cue:25:5
+    ./in.cue:19:7
+    ./in.cue:20:3
 [incomplete] incompleteTwo._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:24:5
-    ./in.cue:29:7
-    ./in.cue:30:3
+    ./in.cue:48:5
+    ./in.cue:53:7
+    ./in.cue:54:3
 [incomplete] incompleteTwo._t: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:30:3
-    ./in.cue:29:7
+    ./in.cue:54:3
+    ./in.cue:53:7
 -- out/compile --
 --- in.cue
 {

@@ -628,7 +628,11 @@ func (e *Evaluator) embedders() map[*navigable]struct{} {
 	for remotePkg, embeds := range e.config.PkgEmbedders() {
 		remotePkg.bootFiles()
 		for _, embed := range embeds {
-			remotePos := embed.Node.Pos()
+			node := embed.Node
+			if f, ok := node.(*ast.Field); ok {
+				node = f.Value
+			}
+			remotePos := node.Pos()
 			remoteFilename := remotePos.Filename()
 			remoteFe := remotePkg.byFilename[remoteFilename]
 			if remoteFe == nil {

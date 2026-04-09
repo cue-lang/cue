@@ -1,4 +1,4 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+#todo:inline: skip: compile errors.
 -- in.cue --
 package compile
 

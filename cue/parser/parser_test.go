@@ -1367,6 +1367,12 @@ func TestParseExpr(t *testing.T) {
 		t.Errorf("ParseExpr(%q): got no error", src)
 	}
 
+	// a bare operator must not crash (issue found via fuzzing)
+	src = "=="
+	if _, err := parseExprString(src); err == nil {
+		t.Errorf("ParseExpr(%q): got no error", src)
+	}
+
 	// a comma is not permitted unless automatically inserted
 	src = "a + b\n"
 	if _, err := parseExprString(src); err != nil {

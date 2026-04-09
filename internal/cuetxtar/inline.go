@@ -1219,11 +1219,56 @@ func (r *inlineRunner) formatValue(v cue.Value) string {
 	// omitOptional=true.  cue.Optional(true) applied afterwards re-enables
 	// optional fields, giving us the complete value without internals.
 	syn := v.Syntax(cue.Docs(true), cue.Final(), cue.Optional(true), cue.Definitions(true), cue.Hidden(true))
-	b, err := format.Node(syn)
+	// Strip @test decl attributes from any struct literals in the exported
+	// syntax tree.  v.Syntax() may carry over source-level attributes, which
+	// must not appear in the formatted expected-value expression.
+	stripTestAttrs(syn)
+	// Strip all comments from the AST.  Error nodes (e.g. _|_) carry line
+	// comments like "// path: error message" from v.Syntax(); if these appear
+	// inside an @test(eq, ...) attribute body, the // sequence is parsed as a
+	// CUE comment, which would consume the closing ) and corrupt the attribute.
+	stripComments(syn)
+	b, err := format.Node(syn, format.Simplify())
 	if err != nil {
 		return fmt.Sprintf("%#v", v)
 	}
 	return string(b)
+}
+
+// stripComments removes all comment groups from every node in the AST.
+// Error nodes produced by v.Syntax() carry line comments like
+// "// path: error message"; if left in, the // sequence inside an
+// @test(eq, ...) attribute body would be parsed as a CUE comment and
+// consume the closing ), corrupting the attribute syntax.
+func stripComments(node ast.Node) {
+	ast.Walk(node, func(n ast.Node) bool {
+		ast.SetComments(n, nil)
+		return true
+	}, nil)
+}
+
+// stripTestAttrs removes @test(...) decl-level attributes from all struct
+// literals in the AST node.  This prevents source-level test annotations from
+// leaking into @test(eq, ...) expected-value expressions written by CUE_UPDATE.
+func stripTestAttrs(node ast.Node) {
+	ast.Walk(node, func(n ast.Node) bool {
+		sl, ok := n.(*ast.StructLit)
+		if !ok {
+			return true
+		}
+		elts := sl.Elts[:0]
+		for _, e := range sl.Elts {
+			if a, ok := e.(*ast.Attribute); ok {
+				k, _ := a.Split()
+				if k == "test" {
+					continue
+				}
+			}
+			elts = append(elts, e)
+		}
+		sl.Elts = elts
+		return true
+	}, nil)
 }
 
 // runLeqInline checks that val is subsumed by the constraint in pa.

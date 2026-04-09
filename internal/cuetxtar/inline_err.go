@@ -21,13 +21,10 @@ package cuetxtar
 import (
 	"errors"
 	"fmt"
-	"os"
 	"slices"
 	"strconv"
 	"strings"
 	"testing"
-
-	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
 	cueerrors "cuelang.org/go/cue/errors"
@@ -101,13 +98,8 @@ type posUpdate struct {
 	positions []token.Pos // actual positions to write
 }
 
-// posWrite records a pending pos= attribute update for CUE_UPDATE write-back.
-type posWrite struct {
-	fileName    string // archive .cue file name, e.g. "in.cue"
-	attrOffset  int    // byte offset of the @test attr in the original file data
-	attrLen     int    // byte length of the original @test attr text
-	newAttrText string // replacement attribute text with updated pos=[...]
-}
+// posWrite is an alias for inlineFillWrite, used for pos= attribute updates.
+type posWrite = inlineFillWrite
 
 // parseErrArgs extracts err sub-options from an already-parsed Attr.
 // The attribute body is expected to start with "err" as the first positional arg.
@@ -830,47 +822,11 @@ func (r *inlineRunner) enqueuePosWrite(pa parsedTestAttr, positions []token.Pos)
 	})
 }
 
-// applyPosWritebacks writes pending pos= attribute updates to the archive file.
-// Replacements are applied by byte offset from end to start so that earlier
-// offsets remain valid after each substitution.
-func (r *inlineRunner) applyPosWritebacks() {
-	if len(r.pendingPosWrites) == 0 || r.filePath == "" {
-		return
-	}
-	changed := false
-	for i, f := range r.archive.Files {
-		var writes []posWrite
-		for _, pw := range r.pendingPosWrites {
-			if pw.fileName == f.Name {
-				writes = append(writes, pw)
-			}
-		}
-		if len(writes) == 0 {
-			continue
-		}
-		// Sort descending by offset so earlier offsets stay valid.
-		slices.SortFunc(writes, func(a, b posWrite) int {
-			return b.attrOffset - a.attrOffset
-		})
-		data := append([]byte(nil), f.Data...)
-		for _, pw := range writes {
-			end := pw.attrOffset + pw.attrLen
-			if end > len(data) {
-				continue
-			}
-			data = append(data[:pw.attrOffset:pw.attrOffset],
-				append([]byte(pw.newAttrText), data[end:]...)...)
-			changed = true
-		}
-		r.archive.Files[i].Data = data
-	}
-	if changed {
-		out := txtar.Format(r.archive)
-		if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
-			r.t.Errorf("inline: pos write-back to %s: %v", r.filePath, err)
-		}
-	}
-}
+// applyPosWritebacks is a no-op: pos= writes are folded into the combined
+// write-back pass in applyInlineFillWritebacks to ensure all byte-level
+// replacements are applied in a single descending-offset pass, avoiding
+// stale-offset corruption when multiple writes share the same file.
+func (r *inlineRunner) applyPosWritebacks() {}
 
 // isError reports whether val is an error value (bottom).
 func (r *inlineRunner) isError(val cue.Value) bool {

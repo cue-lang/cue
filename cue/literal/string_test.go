@@ -24,6 +24,7 @@ func TestUnquote(t *testing.T) {
 		in, out string
 		err     error
 	}{
+		{``, "", errSyntax},
 		{`"Hello"`, "Hello", nil},
 		{"\"\r\"", "\r", nil},
 		{`'Hello'`, "Hello", nil},

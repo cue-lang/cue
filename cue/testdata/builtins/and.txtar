@@ -1,16 +1,15 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
-merge: and([1, 1])
+merge: and([1, 1]) @test(eq, 1)
 
 // ensure definitions along embedded scalars are preserved.
-embed: and([{2, #x: 1}, {2, #x: 2}])
+embed: and([{2, #x: 1}, {2, #x: 2}]) @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[0:13, 0:21, 0:25, 0:33])
 
 // issue3719: and() with a comprehension over an incomplete field failed in
 // evalv3 while the equivalent expression without and() worked correctly.
 // https://cuelang.org/issue/3719
 issue3719: {
     #openStruct: {...}
-	_filledLater: #openStruct.foo
+	_filledLater: #openStruct.foo @test(err, code=incomplete, contains="undefined field: foo", pos=[0:10])
 
 	// The comprehension below should work regardless of whether it's wrapped in "and".
 
@@ -18,12 +17,12 @@ issue3719: {
 		for k, v in _filledLater.bar {
 			(k): v
 		}
-	}
+	} @test(err, code=incomplete, contains="undefined field: foo", pos=[in.cue:11:28])
 	withAnd: and([
 		for k, v in _filledLater.bar {
 			(k): v
 		}
-	])
+	]) @test(err, code=incomplete, contains="undefined field: foo", pos=[in.cue:11:28])
 }
 -- out/eval/stats --
 Leaks:  0
@@ -37,104 +36,18 @@ Conjuncts:    19
 Disjuncts:    0
 
 NumCloseIDs: 10
--- out/evalalpha --
-Errors:
-embed.#x: conflicting values 2 and 1:
+-- out/errors.txt --
+[eval] embed.#x: conflicting values 2 and 1:
     ./in.cue:4:13
     ./in.cue:4:21
     ./in.cue:4:25
     ./in.cue:4:33
-
-Result:
-(_|_){
-  // [eval]
-  merge: (int){ 1 }
-  embed: (_|_){
-    // [eval]
-    #x: (_|_){
-      // [eval] embed.#x: conflicting values 2 and 1:
-      //     ./in.cue:4:13
-      //     ./in.cue:4:21
-      //     ./in.cue:4:25
-      //     ./in.cue:4:33
-    }
-  }
-  issue3719: (struct){
-    #openStruct: (#struct){
-    }
-    _filledLater: (_|_){
-      // [incomplete] issue3719._filledLater: undefined field: foo:
-      //     ./in.cue:11:28
-    }
-    withoutAnd: (_|_){
-      // [incomplete] issue3719._filledLater: undefined field: foo:
-      //     ./in.cue:11:28
-    }
-    withAnd: (_|_){
-      // [incomplete] issue3719._filledLater: undefined field: foo:
-      //     ./in.cue:11:28
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,8 @@
- Errors:
- embed.#x: conflicting values 2 and 1:
-+    ./in.cue:4:13
-     ./in.cue:4:21
-+    ./in.cue:4:25
-     ./in.cue:4:33
- 
- Result:
-@@ -11,8 +13,26 @@
-     // [eval]
-     #x: (_|_){
-       // [eval] embed.#x: conflicting values 2 and 1:
-+      //     ./in.cue:4:13
-       //     ./in.cue:4:21
-+      //     ./in.cue:4:25
-       //     ./in.cue:4:33
-     }
-   }
-+  issue3719: (struct){
-+    #openStruct: (#struct){
-+    }
-+    _filledLater: (_|_){
-+      // [incomplete] issue3719._filledLater: undefined field: foo:
-+      //     ./in.cue:11:28
-+    }
-+    withoutAnd: (_|_){
-+      // [incomplete] issue3719._filledLater: undefined field: foo:
-+      //     ./in.cue:11:28
-+    }
-+    withAnd: (_|_){
-+      // [incomplete] issue3719._filledLater: undefined field: foo:
-+      //     ./in.cue:11:28
-+    }
-+  }
- }
--- out/eval --
-Errors:
-embed.#x: conflicting values 2 and 1:
-    ./in.cue:4:21
-    ./in.cue:4:33
-
-Result:
-(_|_){
-  // [eval]
-  merge: (int){ 1 }
-  embed: (_|_){
-    // [eval]
-    #x: (_|_){
-      // [eval] embed.#x: conflicting values 2 and 1:
-      //     ./in.cue:4:21
-      //     ./in.cue:4:33
-    }
-  }
-}
+[incomplete] issue3719._filledLater: undefined field: foo:
+    ./in.cue:11:28
+[incomplete] issue3719._filledLater: undefined field: foo:
+    ./in.cue:11:28
+[incomplete] issue3719._filledLater: undefined field: foo:
+    ./in.cue:11:28
 -- out/compile --
 --- in.cue
 {

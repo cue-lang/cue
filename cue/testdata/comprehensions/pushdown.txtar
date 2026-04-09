@@ -833,6 +833,9 @@ unifyDynamicReflectSuccess: {
 	}
 }
 -- issue3621.cue --
+// issue3621: evalv3 regression producing false "cyclic reference" errors for
+// comprehensions with nested field definitions and references that evalv2 handles correctly.
+// https://cuelang.org/issue/3621
 issue3621: reduced: t1: {
 	// This test ensures that when a reference is made within a comprehension,
 	// with vertices marked as "pending", that these are not completed the
@@ -865,6 +868,9 @@ issue3621: full: {
 	}
 }
 -- issue3708.cue --
+// issue3708: evalv3 regression reporting a cyclic reference error when fields are
+// accessed inside a comprehension using optional field patterns with if conditionals.
+// https://cuelang.org/issue/3708
 issue3708: {
 	out: people.bob.kind
 
@@ -880,6 +886,9 @@ issue3708: {
 	}
 }
 -- issue3729.cue --
+// issue3729: evalv3 incorrectly reports "incomplete value null" for fields typed
+// as a disjunction containing null (e.g. null | #T) inside if comprehensions.
+// https://cuelang.org/issue/3729
 issue3729: withDisjunction: {
 	#Root: sub1?: #sub2?: bool
 	root?: null | #Root
@@ -943,6 +952,9 @@ arcTypeAcrossTwo: {
 		a: b: c: d: true
 	}
 }
+// issue3894: evalv3 regression where an if comprehension affecting an optional
+// field with a disjunction returns an incorrect result instead of the properly
+// constrained value. https://cuelang.org/issue/3894
 issue3894: reduced: p1: {
 	{a: string} | {b: value: string}
 	if true { b: value: "true" }
@@ -961,6 +973,9 @@ issue3894: full: {
 	}
 }
 -- issue3935.cue --
+// issue3935: evalv3 incorrectly reports "field not allowed" when a schema defined
+// with a disjunction is intersected with additional constraints.
+// https://cuelang.org/issue/3935
 issue3935: reduced: {
 	out: #A | #B
 	out: #B & {

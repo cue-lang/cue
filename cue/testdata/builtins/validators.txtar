@@ -118,10 +118,11 @@ issue2098: incomplete1: {
 }
 
 -- issue3418.cue --
+// issue3418: Tests that matchN correctly reports validation failures when
+// combined with conflicting constraints, regardless of operand order.
+// https://cuelang.org/issue/3418
 issue3418: t1: "foo" & matchN(1, [1&2]) & matchN(1, [_])
 issue3418: t2: "foo" & matchN(1, [_]) & matchN(1, [1&2])
-// issue3418: Tests that matchN correctly reports validation failures when
-// combined with conflicting constraints, regardless of operand order. https://cuelang.org/issue/3418
 issue3418: t3: {
 	x: "foo"
 	x: matchN(1, [_])

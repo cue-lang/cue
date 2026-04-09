@@ -1,4 +1,7 @@
-#todo:inline: medium — large real-world schema test with 1000+ lines
+# Tests that complex schema definitions with multiple type aliases, comprehensions,
+# and nested struct unification evaluate correctly in the v3 evaluator. The issue
+# reported that evalv3 produced validation errors for code accepted by evalv2.
+# https://cuelang.org/issue/3805
 -- x.cue --
 #PatientViewSections: {
 	[string]: #PatientViewSection

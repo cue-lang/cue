@@ -51,6 +51,9 @@ useDefault: {
 	}
 }
 
+// issue1972: Tests that mixing a list value with struct fields in a
+// comprehension correctly produces a conflict error rather than a panic.
+// https://cuelang.org/issue/1972
 issue1972: {
 	err1: {
 		#patchs: []
@@ -163,9 +166,9 @@ NumCloseIDs: 26
 -- out/evalalpha --
 Errors:
 issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-    ./in.cue:61:8
-    ./in.cue:63:11
-    ./in.cue:64:3
+    ./in.cue:64:8
+    ./in.cue:66:11
+    ./in.cue:67:3
 wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:4:2
     ./in.cue:1:8
@@ -229,9 +232,9 @@ Result:
     // [eval]
     err1: (_|_){
       // [eval] issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-      //     ./in.cue:61:8
-      //     ./in.cue:63:11
-      //     ./in.cue:64:3
+      //     ./in.cue:64:8
+      //     ./in.cue:66:11
+      //     ./in.cue:67:3
       #patchs: (_|_){// []
       }
       #someCondition: (_){ _ }
@@ -251,10 +254,11 @@ diff old new
  Errors:
 -issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
 -    ./in.cue:54:12
+-    ./in.cue:61:8
 +issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-     ./in.cue:61:8
-+    ./in.cue:63:11
-+    ./in.cue:64:3
++    ./in.cue:64:8
++    ./in.cue:66:11
++    ./in.cue:67:3
  wrongConcreteType: cannot use 2 (type int) as type bool:
      ./in.cue:4:2
      ./in.cue:1:8
@@ -273,16 +277,17 @@ diff old new
      err1: (_|_){
 -      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
 -      //     ./in.cue:54:12
-+      // [eval] issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-       //     ./in.cue:61:8
+-      //     ./in.cue:61:8
 -      // issue1972.err1: invalid list index someCondition (type string):
 -      //     ./in.cue:65:6
 -      #patchs: (#list){
 -      }
 -      someCondition: (_){ _ }
 -      patchs: (list){
-+      //     ./in.cue:63:11
-+      //     ./in.cue:64:3
++      // [eval] issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
++      //     ./in.cue:64:8
++      //     ./in.cue:66:11
++      //     ./in.cue:67:3
 +      #patchs: (_|_){// []
        }
        #someCondition: (_){ _ }

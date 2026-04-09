@@ -148,6 +148,8 @@ required: {
 	}
 }
 
+// issue3575: Tests that matchN correctly validates structs with extra fields
+// whether inside or outside a list argument. https://cuelang.org/issue/3575
 // A struct with extra fields should match whether or not inside a list.
 // evalv2 would get this wrong but evalv3 got it right.
 issue3575: {
@@ -226,6 +228,8 @@ incomplete: {
 		x: bar: 2
 	}
 }
+// issue3389: Tests that matchN only reports schema errors of lesser severity,
+// not all constraint failures. https://cuelang.org/issue/3389
 issue3389: {
 	// only report schema errors that are of a lesser severity.
 	x: bar: 2
@@ -321,6 +325,8 @@ closedByDefinition: err5: {
 	}
 }
 -- issue3694.cue --
+// issue3694: Tests that matchN combined with close() correctly validates schemas
+// requiring one of several required fields. https://cuelang.org/issue/3694
 issue3694: full: {
 	#step: matchN(1, [{
 		uses!: _
@@ -2307,12 +2313,12 @@ Result:
   issue3389: (struct){
     x: (_|_){
       // [incomplete] issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
-      //     ./incomplete.cue:62:5
-      //     ./incomplete.cue:61:5
-      //     ./incomplete.cue:62:12
+      //     ./incomplete.cue:64:5
+      //     ./incomplete.cue:63:5
+      //     ./incomplete.cue:64:12
       // issue3389.x.foo: field is required but not present:
-      //     ./incomplete.cue:62:5
-      //     ./incomplete.cue:62:35
+      //     ./incomplete.cue:64:5
+      //     ./incomplete.cue:64:35
       bar: (int){ 2 }
     }
   }
@@ -2320,15 +2326,15 @@ Result:
     full: (struct){
       #step: (_|_){
         // [incomplete] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
-        //     ./issue3694.cue:2:9
-        //     ./issue3694.cue:2:16
-        //     ./issue3694.cue:9:9
+        //     ./issue3694.cue:4:9
+        //     ./issue3694.cue:4:16
+        //     ./issue3694.cue:11:9
         // issue3694.full.#step.run: field is required but not present:
-        //     ./issue3694.cue:2:9
-        //     ./issue3694.cue:6:3
+        //     ./issue3694.cue:4:9
+        //     ./issue3694.cue:8:3
         // issue3694.full.#step.uses: field is required but not present:
-        //     ./issue3694.cue:2:9
-        //     ./issue3694.cue:3:3
+        //     ./issue3694.cue:4:9
+        //     ./issue3694.cue:5:3
         uses?: (string){ string }
         run?: (string){ string }
       }
@@ -2340,12 +2346,12 @@ Result:
     simple: (struct){
       #step: (_|_){
         // [incomplete] issue3694.simple.#step: invalid value {uses?:string} (does not satisfy matchN): 0 matched, expected 1:
-        //     ./issue3694.cue:19:9
-        //     ./issue3694.cue:19:16
-        //     ./issue3694.cue:22:9
+        //     ./issue3694.cue:21:9
+        //     ./issue3694.cue:21:16
+        //     ./issue3694.cue:24:9
         // issue3694.simple.#step.uses: field is required but not present:
-        //     ./issue3694.cue:19:9
-        //     ./issue3694.cue:20:3
+        //     ./issue3694.cue:21:9
+        //     ./issue3694.cue:22:3
         uses?: (string){ string }
       }
     }
@@ -2418,7 +2424,45 @@ diff old new
            //     ./closedness.cue:80:13
            //     ./closedness.cue:80:24
            //     ./closedness.cue:85:7
-@@ -975,8 +971,8 @@
+@@ -949,12 +945,12 @@
+   issue3389: (struct){
+     x: (_|_){
+       // [incomplete] issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+-      //     ./incomplete.cue:62:5
+-      //     ./incomplete.cue:61:5
+-      //     ./incomplete.cue:62:12
++      //     ./incomplete.cue:64:5
++      //     ./incomplete.cue:63:5
++      //     ./incomplete.cue:64:12
+       // issue3389.x.foo: field is required but not present:
+-      //     ./incomplete.cue:62:5
+-      //     ./incomplete.cue:62:35
++      //     ./incomplete.cue:64:5
++      //     ./incomplete.cue:64:35
+       bar: (int){ 2 }
+     }
+   }
+@@ -962,32 +958,32 @@
+     full: (struct){
+       #step: (_|_){
+         // [incomplete] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
+-        //     ./issue3694.cue:2:9
+-        //     ./issue3694.cue:2:16
+-        //     ./issue3694.cue:9:9
++        //     ./issue3694.cue:4:9
++        //     ./issue3694.cue:4:16
++        //     ./issue3694.cue:11:9
+         // issue3694.full.#step.run: field is required but not present:
+-        //     ./issue3694.cue:2:9
+-        //     ./issue3694.cue:6:3
++        //     ./issue3694.cue:4:9
++        //     ./issue3694.cue:8:3
+         // issue3694.full.#step.uses: field is required but not present:
+-        //     ./issue3694.cue:2:9
+-        //     ./issue3694.cue:3:3
++        //     ./issue3694.cue:4:9
++        //     ./issue3694.cue:5:3
+         uses?: (string){ string }
          run?: (string){ string }
        }
        s: (#struct){
@@ -2428,6 +2472,22 @@ diff old new
        }
      }
      simple: (struct){
+       #step: (_|_){
+         // [incomplete] issue3694.simple.#step: invalid value {uses?:string} (does not satisfy matchN): 0 matched, expected 1:
+-        //     ./issue3694.cue:19:9
+-        //     ./issue3694.cue:19:16
+-        //     ./issue3694.cue:22:9
++        //     ./issue3694.cue:21:9
++        //     ./issue3694.cue:21:16
++        //     ./issue3694.cue:24:9
+         // issue3694.simple.#step.uses: field is required but not present:
+-        //     ./issue3694.cue:19:9
+-        //     ./issue3694.cue:20:3
++        //     ./issue3694.cue:21:9
++        //     ./issue3694.cue:22:3
+         uses?: (string){ string }
+       }
+     }
 -- diff/explanation --
 The old evaluator does not correctly handle ToDataAll if a node is
 mid-evaluation. The new evaluator does.

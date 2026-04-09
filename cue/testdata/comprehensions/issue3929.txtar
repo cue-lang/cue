@@ -1,4 +1,5 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that comprehensions over pattern-constrained structs work correctly
+# with nested definitions and if-comprehensions. Issue #3929.
 -- in.cue --
 package main
 

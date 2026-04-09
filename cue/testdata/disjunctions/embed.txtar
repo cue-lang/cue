@@ -62,6 +62,9 @@ nested: {
 		(3 | 4 | *( 5 | 6 | *7)) & ( 3 | 4 | ( *7 | 8 )))
 }
 -- issue3415.cue --
+// evalv3: calculated embedded scalars with a default value disagree with v2
+// when co-located with a hidden field; embedded scalar addition should work.
+// https://cuelang.org/issue/3415
 issue3415: full: {
 	A: #A & {
 		i: {

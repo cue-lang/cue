@@ -45,6 +45,9 @@ t2: {
 	xy: x1 & x2
 }
 -- issue3590.cue --
+// Conflicting values in for loop with let expressions: two chained let bindings
+// inside a for comprehension incorrectly caused a conflict error.
+// https://cuelang.org/issue/3590
 issue3590: reduced: {
 	result: [_]: [string]: string
 
@@ -97,6 +100,9 @@ issue3590: full: {
 	}
 }
 // Issue #3591 is related
+// Missing items in for loop with let expressions: items produced inside a
+// for comprehension via let were dropped from the output.
+// https://cuelang.org/issue/3591
 issue3591: missing: {
 	#Result: [_]: {[string]: string}
 

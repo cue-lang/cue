@@ -5,6 +5,9 @@ merge: and([1, 1])
 // ensure definitions along embedded scalars are preserved.
 embed: and([{2, #x: 1}, {2, #x: 2}])
 
+// issue3719: and() with a comprehension over an incomplete field failed in
+// evalv3 while the equivalent expression without and() worked correctly.
+// https://cuelang.org/issue/3719
 issue3719: {
     #openStruct: {...}
 	_filledLater: #openStruct.foo
@@ -61,15 +64,15 @@ Result:
     }
     _filledLater: (_|_){
       // [incomplete] issue3719._filledLater: undefined field: foo:
-      //     ./in.cue:8:28
+      //     ./in.cue:11:28
     }
     withoutAnd: (_|_){
       // [incomplete] issue3719._filledLater: undefined field: foo:
-      //     ./in.cue:8:28
+      //     ./in.cue:11:28
     }
     withAnd: (_|_){
       // [incomplete] issue3719._filledLater: undefined field: foo:
-      //     ./in.cue:8:28
+      //     ./in.cue:11:28
     }
   }
 }
@@ -101,15 +104,15 @@ diff old new
 +    }
 +    _filledLater: (_|_){
 +      // [incomplete] issue3719._filledLater: undefined field: foo:
-+      //     ./in.cue:8:28
++      //     ./in.cue:11:28
 +    }
 +    withoutAnd: (_|_){
 +      // [incomplete] issue3719._filledLater: undefined field: foo:
-+      //     ./in.cue:8:28
++      //     ./in.cue:11:28
 +    }
 +    withAnd: (_|_){
 +      // [incomplete] issue3719._filledLater: undefined field: foo:
-+      //     ./in.cue:8:28
++      //     ./in.cue:11:28
 +    }
 +  }
  }

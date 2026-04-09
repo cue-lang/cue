@@ -1,4 +1,6 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that Fill() followed by Validate(concrete) succeeds for complex disjunction
+# definitions under dynamic (interpolated) keys, as it does for static keys.
+# https://cuelang.org/issue/342
 -- in.cue --
 X: {
 	#Simple: {

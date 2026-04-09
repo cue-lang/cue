@@ -2,6 +2,8 @@
 -- in.cue --
 import "encoding/yaml"
 
+// issue3972: Tests that yaml.Marshal with list comprehensions over conditionally
+// defined fields works correctly in evalv3. https://cuelang.org/issue/3972
 issue3972: {
 	// yaml uses Syntax to convert CUE to YAML. Ensure that unresolved values
 	// are properly handled.

@@ -1,3 +1,5 @@
+# Tests that list.Sort with complex type definitions involving defaults works.
+# Issue: https://cuelang.org/issue/4000
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 import "list"

@@ -52,9 +52,53 @@ decimalListErrors: {
 		result: list.Avg(x)
 	}
 }
+	  // [eval]
+	    // [eval]
+	      // [eval] a3.a: invalid value \"bar\" (out of bound =~\"oo\"):
+	      //     in.cue:8:5
+	      //     in.cue:7:5
+	      //     in.cue:12:14
+	      // a3.a: invalid value \"bar\" (out of bound =~\"fo\"):
+	      //     in.cue:9:5
+	      //     in.cue:7:5
+	      //     in.cue:12:14
+	    // [eval]
+	      // [eval] o3.a: 2 errors in empty disjunction:
+	      // o3.a: conflicting values \"bar\" and \"foo\":
+	      //     in.cue:15:12
+	      //     in.cue:17:5
+	      //     in.cue:20:5
+	      //     in.cue:20:14
+	      // o3.a: conflicting values \"baz\" and \"foo\":
+	      //     in.cue:15:9
+	      //     in.cue:20:5
+	      //     in.cue:20:14
+	      //     in.cue:20:24
+	    // [eval]
+	        // [incomplete] stringListErrors.a.result: error in call to strings.Join: non-concrete value string for element 0 of string list argument 0:
+	        //     in.cue:26:11
+	        //     in.cue:25:7
+	      // [eval]
+	        // [eval] stringListErrors.b.result: error in call to strings.Join: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
+	        //     in.cue:31:11
+	        //     in.cue:30:7
+	      // [eval]
+	        // [eval] stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
+	        //     in.cue:36:27
+	    // [eval]
+	      // [eval]
+	        // [eval] decimalListErrors.a.result: error in call to list.Avg: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
+	        //     in.cue:43:11
+	        //     in.cue:42:7
+	        // [incomplete] decimalListErrors.b.result: error in call to list.Avg: non-concrete value int for element 0 of number list argument 0:
+	        //     in.cue:48:11
+	        //     in.cue:47:7
 -- issue3648.cue --
 // Fully finalize values before passing them to builtins.
 
+// "not properly initialized" error regression in evalv3 involving builtins:
+// list.Concat received an unfinalized value when called from a pattern constraint.
+// https://cuelang.org/issue/3648
 import "list"
 
 issue3648: reduced: {

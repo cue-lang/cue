@@ -1,5 +1,8 @@
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
+// cmd/cue: misleading "field not allowed" error when a type clash occurs inside
+// a disjunction; the actual conflict should be reported instead.
+// https://cuelang.org/issue/570
 issue570: {
 	results: #DecodeOutput
 	results: result: "hello"
@@ -16,6 +19,9 @@ issue570: {
 	}
 }
 
+// Clarify when an error resulted from a failed disjunction; error messages
+// should indicate which disjunct failed rather than showing a generic error.
+// https://cuelang.org/issue/516
 issue516: {
 	#Def: {
 		match: metrics: string: {}
@@ -33,22 +39,34 @@ explicitDefaultError: {
 	}
 }
 
+// evaluator: export as YAML vs JSON emits different templated data when
+// pattern constraints with defaults produce different disjunction results.
+// https://cuelang.org/issue/2916
 issue2916: {
 	b: _
 	[_]: c:      uint | *1
 	[string]: c: >=3 | *3
 }
+// evaluator: inconsistent export output for different formats based on which
+// default is selected when multiple defaults are unified.
+// https://cuelang.org/issue/3157
 issue3157: {
 	foo: *42 | _
 	foo: *43 | bool
 }
 -- issue3581.cue --
+// evalv3: tools/flow unexpected error when a flow task result field is used as
+// a list item; string interpolation in a list element caused a spurious error.
+// https://cuelang.org/issue/3581
 issue3581: reduced: {
 	list: [...] | *[]
 	list: ["\(c)" ]
 	c: _
 }
 -- issue3576.cue --
+// evalv3: disjunct of definitions with identical optional fields results in
+// incomplete evaluation; the resolved disjunct should be fully evaluated.
+// https://cuelang.org/issue/3576
 issue3576: reduced: {
 	#A: a!: string
 	#B: {
@@ -82,6 +100,9 @@ issue3576: full: {
 	foo: run: "make"
 }
 -- issue3599.cue --
+// evalv3: "explicit error in source" regression when using bottom (_|_) in
+// repeating disjunctions; errors in optional/let fields should be ignored.
+// https://cuelang.org/issue/3599
 // Ignore errors for irrelevant fields like let and optional fields.
 issue3599: full: {
 	#Action: {
@@ -125,6 +146,9 @@ issue3599: let: {
 	{  } | {  }
 }
 -- optionalerror.cue --
+// evalv3 closedness regression with disjunctions and ellipses; a definition
+// using _|_ in an optional field inside a disjunction caused spurious errors.
+// https://cuelang.org/issue/4022
 issue4022: reduced: {
 	#NonNamespaced: metadata: namespace?: _|_
 	#NullOrNonNamespaced: int | #NonNamespaced
@@ -168,13 +192,13 @@ NumCloseIDs: 51
 Errors:
 issue516.x: 2 errors in empty disjunction:
 issue516.x.match: field not allowed:
-    ./in.cue:23:5
+    ./in.cue:29:5
 issue516.x.match.metrics.foo: field not allowed:
-    ./in.cue:23:21
+    ./in.cue:29:21
 issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
-    ./in.cue:2:11
-    ./in.cue:3:19
-    ./in.cue:12:12
+    ./in.cue:5:11
+    ./in.cue:6:19
+    ./in.cue:15:12
 
 Result:
 (_|_){
@@ -185,9 +209,9 @@ Result:
       // [eval]
       result: (_|_){
         // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
-        //     ./in.cue:2:11
-        //     ./in.cue:3:19
-        //     ./in.cue:12:12
+        //     ./in.cue:5:11
+        //     ./in.cue:6:19
+        //     ./in.cue:15:12
       }
     }
     #Output: (#struct){ |((#struct){
@@ -201,7 +225,7 @@ Result:
       }, (#struct){
         result?: (_|_){
           // [eval] issue570.#DecodeOutput.result: field not allowed:
-          //     ./in.cue:12:3
+          //     ./in.cue:15:3
         }
         error: (string){ string }
       }) }
@@ -220,9 +244,9 @@ Result:
     x: (_|_){
       // [eval] issue516.x: 2 errors in empty disjunction:
       // issue516.x.match: field not allowed:
-      //     ./in.cue:23:5
+      //     ./in.cue:29:5
       // issue516.x.match.metrics.foo: field not allowed:
-      //     ./in.cue:23:21
+      //     ./in.cue:29:21
       match: (struct){
         metrics: (struct){
           foo: (struct){
@@ -233,8 +257,8 @@ Result:
   }
   explicitDefaultError: (_|_){
     // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    //     ./in.cue:30:5
-    //     ./in.cue:28:5
+    //     ./in.cue:36:5
+    //     ./in.cue:34:5
     a: (string){ string }
   }
   issue2916: (struct){
@@ -290,9 +314,9 @@ Result:
       list: (_|_){
         // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
         // issue3581.reduced.list: incompatible list lengths (0 and 1):
-        //     ./issue3581.cue:2:17
+        //     ./issue3581.cue:5:17
         // issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
-        //     ./issue3581.cue:3:9
+        //     ./issue3581.cue:6:9
         0: (_){ _ }
       }
       c: (_){ _ }
@@ -305,13 +329,13 @@ Result:
             read!: (string){ string }
             write?: (_|_){
               // [user] explicit error (_|_ literal) in source:
-              //     ./issue3599.cue:6:12
+              //     ./issue3599.cue:9:12
             }
           }, (#struct){
             write!: (string){ string }
             read?: (_|_){
               // [user] explicit error (_|_ literal) in source:
-              //     ./issue3599.cue:9:12
+              //     ./issue3599.cue:12:12
             }
           }) }
       }
@@ -321,9 +345,9 @@ Result:
             write: (string){ "somefile.txt" }
             read?: (_|_){
               // [user] explicit error (_|_ literal) in source:
-              //     ./issue3599.cue:9:12
+              //     ./issue3599.cue:12:12
               // explicit error (_|_ literal) in source:
-              //     ./issue3599.cue:20:13
+              //     ./issue3599.cue:23:13
             }
           }
         }
@@ -337,37 +361,37 @@ Result:
       p1: (struct){ |((struct){
           a?: (_|_){
             // [eval] issue3599.reduced.p1.a: conflicting values 2 and 1:
-            //     ./issue3599.cue:31:25
-            //     ./issue3599.cue:32:2
-            //     ./issue3599.cue:32:9
-            //     ./issue3599.cue:32:11
+            //     ./issue3599.cue:34:25
+            //     ./issue3599.cue:35:2
+            //     ./issue3599.cue:35:9
+            //     ./issue3599.cue:35:11
           }
         }, (struct){
           a: (string){ string }
           b?: (_|_){
             // [eval] issue3599.reduced.p1.b: conflicting values 2 and 1:
-            //     ./issue3599.cue:31:25
-            //     ./issue3599.cue:32:2
-            //     ./issue3599.cue:32:35
-            //     ./issue3599.cue:32:37
+            //     ./issue3599.cue:34:25
+            //     ./issue3599.cue:35:2
+            //     ./issue3599.cue:35:35
+            //     ./issue3599.cue:35:37
           }
         }) }
       p2: (struct){ |((struct){
           a?: (_|_){
             // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
-            //     ./issue3599.cue:35:25
-            //     ./issue3599.cue:37:2
-            //     ./issue3599.cue:37:9
-            //     ./issue3599.cue:37:11
+            //     ./issue3599.cue:38:25
+            //     ./issue3599.cue:40:2
+            //     ./issue3599.cue:40:9
+            //     ./issue3599.cue:40:11
           }
         }, (struct){
           a: (string){ string }
           b?: (_|_){
             // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
-            //     ./issue3599.cue:35:25
-            //     ./issue3599.cue:37:2
-            //     ./issue3599.cue:37:35
-            //     ./issue3599.cue:37:37
+            //     ./issue3599.cue:38:25
+            //     ./issue3599.cue:40:2
+            //     ./issue3599.cue:40:35
+            //     ./issue3599.cue:40:37
           }
         }) }
     }
@@ -376,10 +400,10 @@ Result:
         a: (int){ 1 }
         let B#1 = (_|_){
           // [eval] issue3599.let.B: conflicting values 2 and 1:
-          //     ./issue3599.cue:39:17
-          //     ./issue3599.cue:40:2
-          //     ./issue3599.cue:40:29
-          //     ./issue3599.cue:40:31
+          //     ./issue3599.cue:42:17
+          //     ./issue3599.cue:43:2
+          //     ./issue3599.cue:43:29
+          //     ./issue3599.cue:43:31
         }
       }) }
   }
@@ -389,7 +413,7 @@ Result:
         metadata: (#struct){
           namespace?: (_|_){
             // [user] explicit error (_|_ literal) in source:
-            //     ./optionalerror.cue:2:40
+            //     ./optionalerror.cue:5:40
           }
         }
       }
@@ -397,7 +421,7 @@ Result:
           metadata: (#struct){
             namespace?: (_|_){
               // [user] explicit error (_|_ literal) in source:
-              //     ./optionalerror.cue:2:40
+              //     ./optionalerror.cue:5:40
             }
           }
         }) }
@@ -405,7 +429,7 @@ Result:
         metadata: (#struct){
           namespace?: (_|_){
             // [user] explicit error (_|_ literal) in source:
-            //     ./optionalerror.cue:2:40
+            //     ./optionalerror.cue:5:40
           }
         }
       }
@@ -416,7 +440,7 @@ Result:
           name!: (string){ string }
           namespace?: (_|_){
             // [user] explicit error (_|_ literal) in source:
-            //     ./optionalerror.cue:12:16
+            //     ./optionalerror.cue:15:16
           }
         }
       }
@@ -425,7 +449,7 @@ Result:
             name!: (string){ string }
             namespace?: (_|_){
               // [user] explicit error (_|_ literal) in source:
-              //     ./optionalerror.cue:12:16
+              //     ./optionalerror.cue:15:16
             }
           }
         }) }
@@ -434,7 +458,7 @@ Result:
           name: (string){ "foo" }
           namespace?: (_|_){
             // [user] explicit error (_|_ literal) in source:
-            //     ./optionalerror.cue:12:16
+            //     ./optionalerror.cue:15:16
           }
         }
         apiVersion: (string){ "v1" }
@@ -446,20 +470,30 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,8 @@
+@@ -1,17 +1,13 @@
  Errors:
  issue516.x: 2 errors in empty disjunction:
  issue516.x.match: field not allowed:
 -    ./in.cue:20:6
 -    ./in.cue:22:5
-     ./in.cue:23:5
+-    ./in.cue:23:5
++    ./in.cue:29:5
  issue516.x.match.metrics.foo: field not allowed:
 -    ./in.cue:19:19
 -    ./in.cue:22:5
-     ./in.cue:23:21
+-    ./in.cue:23:21
++    ./in.cue:29:21
  issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
-     ./in.cue:2:11
-@@ -19,10 +15,7 @@
+-    ./in.cue:2:11
+-    ./in.cue:3:19
+-    ./in.cue:12:12
++    ./in.cue:5:11
++    ./in.cue:6:19
++    ./in.cue:15:12
+ 
+ Result:
+ (_|_){
+@@ -19,17 +15,13 @@
    issue570: (_|_){
      // [eval]
      results: (_|_){
@@ -470,12 +504,15 @@ diff old new
 +      // [eval]
        result: (_|_){
          // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
-         //     ./in.cue:2:11
-@@ -29,7 +22,6 @@
-         //     ./in.cue:3:19
-         //     ./in.cue:12:12
-       }
+-        //     ./in.cue:2:11
+-        //     ./in.cue:3:19
+-        //     ./in.cue:12:12
+-      }
 -      error: (string){ string }
++        //     ./in.cue:5:11
++        //     ./in.cue:6:19
++        //     ./in.cue:15:12
++      }
      }
      #Output: (#struct){ |((#struct){
          result: (_){ _ }
@@ -486,7 +523,7 @@ diff old new
 -        result?: (list){
 +        result?: (_|_){
 +          // [eval] issue570.#DecodeOutput.result: field not allowed:
-+          //     ./in.cue:12:3
++          //     ./in.cue:15:3
          }
          error: (string){ string }
        }) }
@@ -496,48 +533,157 @@ diff old new
        // issue516.x.match: field not allowed:
 -      //     ./in.cue:20:6
 -      //     ./in.cue:22:5
-       //     ./in.cue:23:5
+-      //     ./in.cue:23:5
++      //     ./in.cue:29:5
        // issue516.x.match.metrics.foo: field not allowed:
 -      //     ./in.cue:19:19
 -      //     ./in.cue:22:5
-       //     ./in.cue:23:21
+-      //     ./in.cue:23:21
 -      match: (_|_){
 -        // [eval] issue516.x.match: field not allowed:
 -        //     ./in.cue:20:6
 -        //     ./in.cue:22:5
 -        //     ./in.cue:23:5
++      //     ./in.cue:29:21
 +      match: (struct){
          metrics: (struct){
            foo: (struct){
            }
+@@ -80,8 +66,8 @@
+   }
+   explicitDefaultError: (_|_){
+     // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
+-    //     ./in.cue:30:5
+-    //     ./in.cue:28:5
++    //     ./in.cue:36:5
++    //     ./in.cue:34:5
+     a: (string){ string }
+   }
+   issue2916: (struct){
 @@ -136,13 +122,11 @@
      reduced: (struct){
        list: (_|_){
          // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
 -        // issue3581.reduced.list: incompatible list lengths (0 and 1)
 +        // issue3581.reduced.list: incompatible list lengths (0 and 1):
-+        //     ./issue3581.cue:2:17
++        //     ./issue3581.cue:5:17
          // issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
-         //     ./issue3581.cue:3:9
+-        //     ./issue3581.cue:3:9
 -        0: (_|_){
 -          // [incomplete] issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
 -          //     ./issue3581.cue:3:9
 -        }
++        //     ./issue3581.cue:6:9
 +        0: (_){ _ }
        }
        c: (_){ _ }
      }
-@@ -232,4 +216,62 @@
+@@ -154,13 +138,13 @@
+             read!: (string){ string }
+             write?: (_|_){
+               // [user] explicit error (_|_ literal) in source:
+-              //     ./issue3599.cue:6:12
++              //     ./issue3599.cue:9:12
+             }
+           }, (#struct){
+             write!: (string){ string }
+             read?: (_|_){
+               // [user] explicit error (_|_ literal) in source:
+-              //     ./issue3599.cue:9:12
++              //     ./issue3599.cue:12:12
+             }
+           }) }
+       }
+@@ -170,9 +154,9 @@
+             write: (string){ "somefile.txt" }
+             read?: (_|_){
+               // [user] explicit error (_|_ literal) in source:
+-              //     ./issue3599.cue:9:12
++              //     ./issue3599.cue:12:12
+               // explicit error (_|_ literal) in source:
+-              //     ./issue3599.cue:20:13
++              //     ./issue3599.cue:23:13
+             }
+           }
          }
-       }) }
-   }
+@@ -186,37 +170,37 @@
+       p1: (struct){ |((struct){
+           a?: (_|_){
+             // [eval] issue3599.reduced.p1.a: conflicting values 2 and 1:
+-            //     ./issue3599.cue:31:25
+-            //     ./issue3599.cue:32:2
+-            //     ./issue3599.cue:32:9
+-            //     ./issue3599.cue:32:11
++            //     ./issue3599.cue:34:25
++            //     ./issue3599.cue:35:2
++            //     ./issue3599.cue:35:9
++            //     ./issue3599.cue:35:11
+           }
+         }, (struct){
+           a: (string){ string }
+           b?: (_|_){
+             // [eval] issue3599.reduced.p1.b: conflicting values 2 and 1:
+-            //     ./issue3599.cue:31:25
+-            //     ./issue3599.cue:32:2
+-            //     ./issue3599.cue:32:35
+-            //     ./issue3599.cue:32:37
++            //     ./issue3599.cue:34:25
++            //     ./issue3599.cue:35:2
++            //     ./issue3599.cue:35:35
++            //     ./issue3599.cue:35:37
+           }
+         }) }
+       p2: (struct){ |((struct){
+           a?: (_|_){
+             // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
+-            //     ./issue3599.cue:35:25
+-            //     ./issue3599.cue:37:2
+-            //     ./issue3599.cue:37:9
+-            //     ./issue3599.cue:37:11
++            //     ./issue3599.cue:38:25
++            //     ./issue3599.cue:40:2
++            //     ./issue3599.cue:40:9
++            //     ./issue3599.cue:40:11
+           }
+         }, (struct){
+           a: (string){ string }
+           b?: (_|_){
+             // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
+-            //     ./issue3599.cue:35:25
+-            //     ./issue3599.cue:37:2
+-            //     ./issue3599.cue:37:35
+-            //     ./issue3599.cue:37:37
++            //     ./issue3599.cue:38:25
++            //     ./issue3599.cue:40:2
++            //     ./issue3599.cue:40:35
++            //     ./issue3599.cue:40:37
+           }
+         }) }
+     }
+@@ -225,11 +209,69 @@
+         a: (int){ 1 }
+         let B#1 = (_|_){
+           // [eval] issue3599.let.B: conflicting values 2 and 1:
+-          //     ./issue3599.cue:39:17
+-          //     ./issue3599.cue:40:2
+-          //     ./issue3599.cue:40:29
+-          //     ./issue3599.cue:40:31
+-        }
+-      }) }
++          //     ./issue3599.cue:42:17
++          //     ./issue3599.cue:43:2
++          //     ./issue3599.cue:43:29
++          //     ./issue3599.cue:43:31
++        }
++      }) }
++  }
 +  issue4022: (struct){
 +    reduced: (struct){
 +      #NonNamespaced: (#struct){
 +        metadata: (#struct){
 +          namespace?: (_|_){
 +            // [user] explicit error (_|_ literal) in source:
-+            //     ./optionalerror.cue:2:40
++            //     ./optionalerror.cue:5:40
 +          }
 +        }
 +      }
@@ -545,7 +691,7 @@ diff old new
 +          metadata: (#struct){
 +            namespace?: (_|_){
 +              // [user] explicit error (_|_ literal) in source:
-+              //     ./optionalerror.cue:2:40
++              //     ./optionalerror.cue:5:40
 +            }
 +          }
 +        }) }
@@ -553,7 +699,7 @@ diff old new
 +        metadata: (#struct){
 +          namespace?: (_|_){
 +            // [user] explicit error (_|_ literal) in source:
-+            //     ./optionalerror.cue:2:40
++            //     ./optionalerror.cue:5:40
 +          }
 +        }
 +      }
@@ -564,7 +710,7 @@ diff old new
 +          name!: (string){ string }
 +          namespace?: (_|_){
 +            // [user] explicit error (_|_ literal) in source:
-+            //     ./optionalerror.cue:12:16
++            //     ./optionalerror.cue:15:16
 +          }
 +        }
 +      }
@@ -573,7 +719,7 @@ diff old new
 +            name!: (string){ string }
 +            namespace?: (_|_){
 +              // [user] explicit error (_|_ literal) in source:
-+              //     ./optionalerror.cue:12:16
++              //     ./optionalerror.cue:15:16
 +            }
 +          }
 +        }) }
@@ -582,13 +728,13 @@ diff old new
 +          name: (string){ "foo" }
 +          namespace?: (_|_){
 +            // [user] explicit error (_|_ literal) in source:
-+            //     ./optionalerror.cue:12:16
++            //     ./optionalerror.cue:15:16
 +          }
 +        }
 +        apiVersion: (string){ "v1" }
 +      }
 +    }
-+  }
+   }
  }
 -- diff/explanation --
 The additional "field not allowed" error is correct and a message corresponding

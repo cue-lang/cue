@@ -225,6 +225,9 @@ validator: keepClosed: {
 	x: c: 1
 }
 -- issue1830.cue --
+// Closedness was not applied when accessing optional fields through a selector;
+// extra fields should still be rejected by the definition.
+// https://cuelang.org/issue/1830
 issue1830: {
 	#x: {
 		y: {
@@ -246,6 +249,9 @@ issue1830: {
 	}
 }
 -- issue3491.cue --
+// evalv3 regression: "field not allowed" when unifying a definition with an
+// optional field against a value that adds a regular field of the same name.
+// https://cuelang.org/issue/3491
 issue3491: {
 	#Schema: field?: {}
   

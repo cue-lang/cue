@@ -1,3 +1,7 @@
+# Tests that list.FlattenN does not spuriously report an "incomplete value"
+# error when its input list is derived from a definition field passed through
+# a conjunction. Previously FlattenN failed when the list element was abstract.
+# https://cuelang.org/issue/332
 #todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- in.cue --
 import "list"

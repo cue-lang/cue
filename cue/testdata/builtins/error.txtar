@@ -63,10 +63,14 @@ errorSelf: {
 	v: "z"
 }
 -- issues.cue --
+// issue4001: Tests that error() text is shown correctly when the message uses
+// string concatenation with interpolation. https://cuelang.org/issue/4001
 issue4001: {
 	a: "b"
 	a: int | error("error: "+"a='\(a)'")
 }
+// issue3983: Tests that multiple error() disjunctions aggregate all user-defined
+// error messages correctly. https://cuelang.org/issue/3983
 issue3983: {
 	x: int | error("I wanted an integer")
 	x: >10 | error("I wanted more than 10")
@@ -74,6 +78,8 @@ issue3983: {
 
 	x: 3
 }
+// issue3984: Tests that error() shows all relevant source locations when the
+// error builtin is used in a disjunction. https://cuelang.org/issue/3984
 issue3984: {
 	v: "a" | error("must be a")
 	v: "b"
@@ -91,8 +97,8 @@ Disjuncts:    41
 -- out/evalalpha --
 Errors:
 issue3983.x: 2 errors in empty disjunction::
-    ./issues.cue:7:5
-    ./issues.cue:10:5
+    ./issues.cue:11:5
+    ./issues.cue:14:5
 selection.twoCustomErrors: 2 errors in empty disjunction::
     ./in.cue:6:19
     ./in.cue:6:21
@@ -121,17 +127,17 @@ interpolation.errorBottomInterpolation: custom: (1 & 2):
 indirect.y: msg:
     ./in.cue:38:5
 issue4001.a: error: a='b':
-    ./issues.cue:3:11
-    ./issues.cue:2:5
-    ./issues.cue:3:5
+    ./issues.cue:5:11
+    ./issues.cue:4:5
+    ./issues.cue:5:5
 issue3983.x: I wanted an integer:
-    ./issues.cue:6:11
+    ./issues.cue:10:11
 issue3983.x: I wanted more than 10:
-    ./issues.cue:7:11
+    ./issues.cue:11:11
 issue3984.v: must be a:
-    ./issues.cue:13:11
-    ./issues.cue:13:5
-    ./issues.cue:14:5
+    ./issues.cue:19:11
+    ./issues.cue:19:5
+    ./issues.cue:20:5
 errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
     ./self.cue:7:17
     ./self.cue:6:12
@@ -230,30 +236,30 @@ Result:
     // [eval]
     a: (_|_){
       // [eval] issue4001.a: error: a='b':
-      //     ./issues.cue:3:11
-      //     ./issues.cue:2:5
-      //     ./issues.cue:3:5
+      //     ./issues.cue:5:11
+      //     ./issues.cue:4:5
+      //     ./issues.cue:5:5
     }
   }
   issue3983: (_|_){
     // [eval]
     x: (_|_){
       // [eval] issue3983.x: 2 errors in empty disjunction::
-      //     ./issues.cue:7:5
-      //     ./issues.cue:10:5
+      //     ./issues.cue:11:5
+      //     ./issues.cue:14:5
       // issue3983.x: I wanted an integer:
-      //     ./issues.cue:6:11
+      //     ./issues.cue:10:11
       // issue3983.x: I wanted more than 10:
-      //     ./issues.cue:7:11
+      //     ./issues.cue:11:11
     }
   }
   issue3984: (_|_){
     // [eval]
     v: (_|_){
       // [eval] issue3984.v: must be a:
-      //     ./issues.cue:13:11
-      //     ./issues.cue:13:5
-      //     ./issues.cue:14:5
+      //     ./issues.cue:19:11
+      //     ./issues.cue:19:5
+      //     ./issues.cue:20:5
     }
   }
   errorSelf: (_|_){
@@ -277,8 +283,8 @@ diff old new
 -selection.twoCustomErrors: conflicting values 2 and 1:
 -    ./in.cue:6:17
 +issue3983.x: 2 errors in empty disjunction::
-+    ./issues.cue:7:5
-+    ./issues.cue:10:5
++    ./issues.cue:11:5
++    ./issues.cue:14:5
 +selection.twoCustomErrors: 2 errors in empty disjunction::
      ./in.cue:6:19
 -selection.useCustomError: 2 errors in empty disjunction:
@@ -315,17 +321,17 @@ diff old new
 -    ./in.cue:22:5
 +    ./in.cue:38:5
 +issue4001.a: error: a='b':
-+    ./issues.cue:3:11
-+    ./issues.cue:2:5
-+    ./issues.cue:3:5
++    ./issues.cue:5:11
++    ./issues.cue:4:5
++    ./issues.cue:5:5
 +issue3983.x: I wanted an integer:
-+    ./issues.cue:6:11
++    ./issues.cue:10:11
 +issue3983.x: I wanted more than 10:
-+    ./issues.cue:7:11
++    ./issues.cue:11:11
 +issue3984.v: must be a:
-+    ./issues.cue:13:11
-+    ./issues.cue:13:5
-+    ./issues.cue:14:5
++    ./issues.cue:19:11
++    ./issues.cue:19:5
++    ./issues.cue:20:5
 +errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
 +    ./self.cue:7:17
 +    ./self.cue:6:12
@@ -461,30 +467,30 @@ diff old new
 -      // [user] issue4001.a: error: a='b':
 -      //     ./issue4001.cue:3:11
 +      // [eval] issue4001.a: error: a='b':
-+      //     ./issues.cue:3:11
-+      //     ./issues.cue:2:5
-+      //     ./issues.cue:3:5
++      //     ./issues.cue:5:11
++      //     ./issues.cue:4:5
++      //     ./issues.cue:5:5
 +    }
 +  }
 +  issue3983: (_|_){
 +    // [eval]
 +    x: (_|_){
 +      // [eval] issue3983.x: 2 errors in empty disjunction::
-+      //     ./issues.cue:7:5
-+      //     ./issues.cue:10:5
++      //     ./issues.cue:11:5
++      //     ./issues.cue:14:5
 +      // issue3983.x: I wanted an integer:
-+      //     ./issues.cue:6:11
++      //     ./issues.cue:10:11
 +      // issue3983.x: I wanted more than 10:
-+      //     ./issues.cue:7:11
++      //     ./issues.cue:11:11
 +    }
 +  }
 +  issue3984: (_|_){
 +    // [eval]
 +    v: (_|_){
 +      // [eval] issue3984.v: must be a:
-+      //     ./issues.cue:13:11
-+      //     ./issues.cue:13:5
-+      //     ./issues.cue:14:5
++      //     ./issues.cue:19:11
++      //     ./issues.cue:19:5
++      //     ./issues.cue:20:5
 +    }
 +  }
 +  errorSelf: (_|_){

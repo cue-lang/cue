@@ -1,3 +1,7 @@
+# Tests that inline unification patterns like `(#mkDef & {}).#Type` evaluate
+# correctly in the v3 evaluator. The issue caused evalv3 to include unwanted
+# disjunction alternatives, making orgSyntax compute the wrong branch result.
+# https://cuelang.org/issue/3672
 #todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- x.cue --
 import "strings"

@@ -1,3 +1,7 @@
+# Tests that recursive definitions using disjunctions of validators and self-references
+# do not produce duplicate constraints. A regression caused nested applications to
+# accumulate redundant conjunctions instead of preserving the recursive structure.
+# https://cuelang.org/issue/545
 title: Simplification of validators.
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --

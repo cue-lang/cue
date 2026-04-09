@@ -1,3 +1,6 @@
+# Tests that optional nested fields within a definition unified with an open struct
+# (#Root: {...}) correctly accept concrete values without "field not allowed" errors.
+# https://cuelang.org/issue/483
 #todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 out: {

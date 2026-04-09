@@ -1,3 +1,7 @@
+# Tests that disjunctions combined with comprehensions and pattern constraints
+# do not cause panics in the v3 evaluator. The issue reported crashes in
+# Vertex.DerefValue and Environment.up for code that worked correctly in evalv2.
+# https://cuelang.org/issue/3857
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 reduced: t1: {

@@ -1,3 +1,5 @@
+# Tests that nested for comprehensions within field patterns work correctly.
+# The test uses a kubernetes-like structure with services and deployments.
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 package kube

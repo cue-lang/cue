@@ -1,8 +1,8 @@
-#todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- in.cue --
 import "list"
 
-a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y})
+a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y}) @test(eq, [1, 2, 3, 4])
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
@@ -15,15 +15,6 @@ Conjuncts:    20
 Disjuncts:    0
 
 NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  a: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 3 }
-    3: (int){ 4 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

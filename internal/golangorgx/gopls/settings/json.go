@@ -12,11 +12,10 @@ import (
 )
 
 type APIJSON struct {
-	Options   map[string][]*OptionJSON
-	Commands  []*CommandJSON
-	Lenses    []*LensJSON
-	Analyzers []*AnalyzerJSON
-	Hints     []*HintJSON
+	Options  map[string][]*OptionJSON
+	Commands []*CommandJSON
+	Lenses   []*LensJSON
+	Hints    []*HintJSON
 }
 
 type OptionJSON struct {
@@ -136,21 +135,6 @@ func (l *LensJSON) String() string {
 
 func (l *LensJSON) Write(w io.Writer) {
 	fmt.Fprintf(w, "%s (%s): %s", l.Title, l.Lens, l.Doc)
-}
-
-type AnalyzerJSON struct {
-	Name    string
-	Doc     string
-	URL     string
-	Default bool
-}
-
-func (a *AnalyzerJSON) String() string {
-	return a.Name
-}
-
-func (a *AnalyzerJSON) Write(w io.Writer) {
-	fmt.Fprintf(w, "%s (%s): %v", a.Name, a.Doc, a.Default)
 }
 
 type HintJSON struct {

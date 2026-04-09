@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bf944d5_44fcaef5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-04-09T17:01:17Z",
+      "side": 1,
+      "message": "This guidance belongs in `cmd/cueckoo`",
+      "revId": "3ba2f0f56d503e8c316945ffa7ea5f5322ce9b8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

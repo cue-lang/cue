@@ -4087,6 +4087,29 @@ package a
 		},
 
 		{
+			name: "Resolve_Import_Unused",
+			archive: `-- a.cue --
+package a
+-- b.cue --
+package b
+
+import "a"
+`,
+			expectDefinitions: map[position][]position{
+				fln("b.cue", 3, 1, `"a"`): {fln("a.cue", 1, 3, "a")},
+
+				fln("a.cue", 1, 3, "a"): {self},
+				fln("b.cue", 1, 1, "b"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("b.cue", 18, 22): {e: []string{"a"}},
+			},
+			importedBy: map[string][]string{
+				"a": {"b"},
+			},
+		},
+
+		{
 			name: "Resolve_Import_Embed",
 			archive: `-- a.cue --
 package a

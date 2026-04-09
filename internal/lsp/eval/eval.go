@@ -507,7 +507,7 @@ func (e *Evaluator) Reset() {
 	}
 
 	for _, fe := range e.byFilename {
-		clear(fe.likelyReferenceOffsets)
+		clear(fe.likelyUseOffsets)
 		clear(fe.importSpecNavigables)
 		fileFr := fe.newFrame(pkgFrame, fe.File, fileFramesNavigable)
 		pkgFrame.childFrames = append(pkgFrame.childFrames, fileFr)
@@ -564,18 +564,18 @@ func (e *Evaluator) parseImportSpec(spec *ast.ImportSpec) *ast.ImportPath {
 	return &ip
 }
 
-// initialNavsForImport locates navigable that are likely to
+// initialNavsForImport locates navigables that are likely to
 // contain uses of the import path.
 func (e *Evaluator) initialNavsForImport(ip ast.ImportPath) []*navigable {
 	// When calculating usages of a field, we can discover that the
 	// field is exported by the package. We then look for all the
 	// packages that import us. To try to avoid brute force evaluation
 	// of the whole of these "downstream" packages, we use
-	// [FileEvaluator.findIdentUsageOffsets] to quickly search for
-	// file offsets that appear to be of idents that match the imported
-	// package's name (i.e. our original now-"upstream" package). We
-	// evaluate up to those offsets only, and return the
-	// navigable now associated with those offsets.
+	// [FileEvaluator.findLikelyUseOffsets] to quickly search for file
+	// offsets that appear to be of idents (or imports) that match the
+	// imported package's name (i.e. our original now-"upstream"
+	// package). We evaluate up to those offsets only, and return the
+	// navigables that contain those offsets.
 	e.bootFiles()
 	var result []*navigable
 	for _, fe := range e.byFilename {
@@ -590,9 +590,12 @@ func (e *Evaluator) initialNavsForImport(ip ast.ImportPath) []*navigable {
 				continue
 			}
 
-			for _, offsets := range fe.findIdentUsageOffsets(name) {
-				for _, fr := range fe.evalForOffset(offsets) {
-					result = append(result, fr.navigable)
+			offsets := fe.findLikelyUseOffsets(name)
+			for _, offsets := range [][]int{offsets.imports, offsets.idents} {
+				for _, offset := range offsets {
+					for _, fr := range fe.evalForOffset(offset) {
+						result = append(result, fr.navigable)
+					}
 				}
 			}
 		}
@@ -663,16 +666,25 @@ type FileEvaluator struct {
 	evaluator *Evaluator
 	// File is the original [ast.File] that was passed to [New].
 	File *ast.File
-	// likelyReferenceOffsets contains file offsets for idents that are
-	// likely to be references (as opposed to declarations) and likely
-	// to reference imported packages. It is lazily populated by
-	// [FileEvaluator.findIdentUsageOffsets].
-	likelyReferenceOffsets map[string][]int
+	// likelyUseOffsets contains file offsets for imports and idents
+	// that are likely to be uses (as opposed to declarations) and
+	// likely to reference imported packages. It is lazily populated by
+	// [FileEvaluator.findLikelyUseOffsets].
+	likelyUseOffsets map[string]useOffsets
 	// importSpecNavigables contains entries for every import within this
 	// file. Within this file, all import specs that are of the
 	// same (canonical) import path, share the same
 	// navigable. This is made possible by this map.
 	importSpecNavigables map[ast.ImportPath]*navigable
+}
+
+// useOffsets models likely file offsets for a given name. It
+// separates out offsets of import specs which use the name from other
+// idents because import specs can be considered either usages or
+// definitions of a name, depending on context.
+type useOffsets struct {
+	imports []int
+	idents  []int
 }
 
 // DefinitionsForOffset reports the definitions that the file offset
@@ -962,6 +974,7 @@ func (fe *FileEvaluator) UsagesForOffset(offset int, includeDefinitions bool) []
 			// is actually asking for usages of an import, so we hunt
 			// through the usedBy looking for a import spec that's from
 			// this file.
+			navs = navs[:0]
 			for n, fr := range nav.usedBy {
 				if fr.fileEvaluator != fe {
 					continue
@@ -978,12 +991,10 @@ func (fe *FileEvaluator) UsagesForOffset(offset int, includeDefinitions bool) []
 				if name == "" {
 					continue
 				}
-				offsets := fe.findIdentUsageOffsets(name)
-				result := slices.Collect(fe.definitionsForOffset(offsets...))
-				if len(result) > 0 {
-					navs = result
-					break
-				}
+				offsets := fe.findLikelyUseOffsets(name)
+				// In this case, the import spec is a definition not a
+				// use, so we ignore offsets.imports.
+				navs = slices.AppendSeq(navs, fe.definitionsForOffset(offsets.idents...))
 			}
 		}
 	}
@@ -1182,8 +1193,8 @@ func (fe *FileEvaluator) definitionsForOffset(offsets ...int) iter.Seq[*navigabl
 	}
 }
 
-// findIdentUsageOffsets does a rough-and-ready walk through the ast,
-// searching for idents with the given name. It returns their offsets.
+// findLikelyUseOffsets does a rough-and-ready walk through the ast,
+// searching for uses of the given name. It returns their offsets.
 //
 // It cuts out some subtrees: where a field definition label matches
 // the given name, or where a let- or for-clause creates a binding for
@@ -1191,22 +1202,23 @@ func (fe *FileEvaluator) definitionsForOffset(offsets ...int) iter.Seq[*navigabl
 // for idents which match the given name, and are unlikely to resolve
 // to other fields. This is approximate and false positives will
 // definitely be returned, but it's a single fast pass over the AST.
-func (fe *FileEvaluator) findIdentUsageOffsets(name string) []int {
-	likelyReferenceOffsets := fe.likelyReferenceOffsets
-	if likelyReferenceOffsets == nil {
-		likelyReferenceOffsets = make(map[string][]int)
-		fe.likelyReferenceOffsets = likelyReferenceOffsets
+func (fe *FileEvaluator) findLikelyUseOffsets(name string) useOffsets {
+	likelyUseOffsets := fe.likelyUseOffsets
+	if likelyUseOffsets == nil {
+		likelyUseOffsets = make(map[string]useOffsets)
+		fe.likelyUseOffsets = likelyUseOffsets
 	}
 
-	offsets, found := likelyReferenceOffsets[name]
+	offsets, found := likelyUseOffsets[name]
 	if !found {
 		ast.Walk(fe.File, func(n ast.Node) bool {
 			switch n := n.(type) {
-			case *ast.ImportDecl:
-				// We want to find potential uses of name. If name exists
-				// within an import decl, it can only be as the import's
-				// local package name, which we definitely want to exclude
-				// - that's a definition of name, not a use.
+			case *ast.ImportSpec:
+				if nameIdent := n.Name; nameIdent != nil && nameIdent.Name == name {
+					offsets.imports = append(offsets.imports, nameIdent.Pos().Offset())
+				} else if ip := fe.evaluator.parseImportSpec(n); ip != nil && ip.Qualifier == name {
+					offsets.imports = append(offsets.imports, n.Path.Pos().Offset())
+				}
 				return false
 			case *ast.Field:
 				if label, ok := n.Label.(*ast.Ident); ok && label.Name == name {
@@ -1229,12 +1241,12 @@ func (fe *FileEvaluator) findIdentUsageOffsets(name string) []int {
 				}
 			case *ast.Ident:
 				if n.Name == name {
-					offsets = append(offsets, n.Pos().Offset())
+					offsets.idents = append(offsets.idents, n.Pos().Offset())
 				}
 			}
 			return true
 		}, nil)
-		likelyReferenceOffsets[name] = offsets
+		likelyUseOffsets[name] = offsets
 	}
 
 	return offsets

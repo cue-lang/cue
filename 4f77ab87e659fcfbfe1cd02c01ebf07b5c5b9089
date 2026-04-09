@@ -16,6 +16,57 @@
       "message": "@matthew@cue.works you were right that this didn\u0027t quite work with interpolations. the updated patchset adds a test, which failed, and adds state so that we now support it.",
       "revId": "4f77ab87e659fcfbfe1cd02c01ebf07b5c5b9089",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6ff1ab0_28d73e56",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-09T08:18:31Z",
+      "side": 1,
+      "message": "nit, personally I\u0027d have spent the two extra chars and made this be called `startOffset`",
+      "revId": "4f77ab87e659fcfbfe1cd02c01ebf07b5c5b9089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c8d107c_755de5ff",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-09T08:18:31Z",
+      "side": 1,
+      "message": "also nit, personally I\u0027d have done\n```\ncloseAllowed :\u003d false\nif !continuation {\n  quote.startOffs \u003d offs\n  closeAllowed \u003d quote.numChar \u003d\u003d 3\n}\n```",
+      "revId": "4f77ab87e659fcfbfe1cd02c01ebf07b5c5b9089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5b730b3_1ba1387e",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-09T08:18:31Z",
+      "side": 1,
+      "message": "oooo, eek, this is tricksy. So, earlier on, (line 470ish) you\u0027re just looking at length. That means you\u0027re treating \\t as having width 1, which is fine, except it\u0027s not documented and the editor is probably not showing it that way. Which means, that if you have `  ` (2 spaces) as the prefix on a line, and \\t as the prefix on the next line, you would choose \\t as the minLineWS, which the editor may \"disagree\" with and may be surprising for the user.\n\nBut then down here you\u0027re not looking at length, you\u0027re looking at prefix. I don\u0027t think this inconsistency is a good thing.\n\nI think (line 470ish):\n```\nws :\u003d s.src[lineStart : s.offset-1]\nif quote.minLineWS \u003d\u003d nil {\n  quote.minLineWS \u003d ws\n} else if strings.HasPrefix(ws, quote.minLineWS) {\n  // noop - minLineWS is already the shorter prefix\n} else if strings.HasPrefix(quote.minLineWS, ws) {\n  quote.minLineWS \u003d ws\n} else {\n  s.errf(something something something)\n}\n```",
+      "revId": "4f77ab87e659fcfbfe1cd02c01ebf07b5c5b9089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

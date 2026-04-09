@@ -19,6 +19,9 @@ E: {
 a:    int
 okay: (>10 & <a) + 3
 
+// No output or "cycle error" when checking existence of non-existing fields;
+// an incomplete error should be reported instead of a cycle error.
+// https://cuelang.org/issue/1837
 issue1837: {
 	// x is properly recognized as erroneous and the "message" field is added
 	// with the value "a", instead of as a cycle error.
@@ -109,6 +112,7 @@ NumCloseIDs: 9
       x: (_|_){
         // [incomplete] issue1837.p1.x: undefined field: b:
         //     ./in.cue:25:14
+        //     ./in.cue:28:14
       }
       message: (string){ "a" }
     }
@@ -117,6 +121,7 @@ NumCloseIDs: 9
       x: (_|_){
         // [incomplete] issue1837.p2.x: undefined field: b:
         //     ./in.cue:34:14
+        //     ./in.cue:37:14
       }
       context: (struct){
       }
@@ -193,7 +198,7 @@ NumCloseIDs: 9
       }
       x: (_|_){
         // [incomplete] issue1837.p1.x: undefined field: b:
-        //     ./in.cue:25:14
+        //     ./in.cue:28:14
       }
       message: (string){ "a" }
     }
@@ -201,7 +206,7 @@ NumCloseIDs: 9
       message: (string){ "a" }
       x: (_|_){
         // [incomplete] issue1837.p2.x: undefined field: b:
-        //     ./in.cue:34:14
+        //     ./in.cue:37:14
       }
       context: (struct){
       }
@@ -212,7 +217,7 @@ NumCloseIDs: 9
       }
       x: (_|_){
         // [incomplete] issue1837.p3.x: undefined field: b:
-        //     ./in.cue:42:14
+        //     ./in.cue:45:14
       }
     }
   }
@@ -262,6 +267,31 @@ diff old new
      }
    }
    a: (int){ int }
+@@ -49,7 +58,6 @@
+       }
+       x: (_|_){
+         // [incomplete] issue1837.p1.x: undefined field: b:
+-        //     ./in.cue:25:14
+         //     ./in.cue:28:14
+       }
+       message: (string){ "a" }
+@@ -58,7 +66,6 @@
+       message: (string){ "a" }
+       x: (_|_){
+         // [incomplete] issue1837.p2.x: undefined field: b:
+-        //     ./in.cue:34:14
+         //     ./in.cue:37:14
+       }
+       context: (struct){
+@@ -70,7 +77,7 @@
+       }
+       x: (_|_){
+         // [incomplete] issue1837.p3.x: undefined field: b:
+-        //     ./in.cue:42:14
++        //     ./in.cue:45:14
+       }
+     }
+   }
 -- out/compile --
 --- in.cue
 {

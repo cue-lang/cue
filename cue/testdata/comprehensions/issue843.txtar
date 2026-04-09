@@ -1,3 +1,5 @@
+# Tests that list comprehensions with definitions and nested constraints work.
+# Issue #843: complex nested definition with list comprehensions and imports.
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 package main

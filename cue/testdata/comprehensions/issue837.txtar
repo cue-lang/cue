@@ -1,3 +1,5 @@
+# Tests that errors in definitions with complex reference chains are reported
+# correctly, specifically undefined field errors via let bindings. Issue #837.
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #DeploymentManifest: #Manifest & {ref: kind: "deployment"}

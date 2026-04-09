@@ -1,6 +1,9 @@
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- issue3635.cue --
 import "list"
+// evalv3: `incDependent: already closed` panic with a builtin and a disjunction;
+// using list.Concat to satisfy a disjunction of map or list should not crash.
+// https://cuelang.org/issue/3635
 issue3635: case1: {
 	Run: {
 		env: *{[string]: string} | [...string]

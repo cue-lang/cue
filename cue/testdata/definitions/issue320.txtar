@@ -1,3 +1,6 @@
+# Tests that "field not allowed" errors in closed structs include sufficient
+# diagnostic information about the source of the restriction.
+# https://cuelang.org/issue/320
 #todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #Foo: {

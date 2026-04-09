@@ -5,6 +5,9 @@ passToSingleValue: p2: _ | *((*"x" | _) & "y")
 passToSingleValue: p3: *((_ | *"x") & "y") | _
 passToSingleValue: p4: *((*"x" | _) & "y") | _
 
+// eval: "incomplete value" regression with defaults involving multiple
+// definitions; default values that depend on other fields should resolve.
+// https://cuelang.org/issue/3779
 issue3779: {
 	out: #Foo & {
 		fieldFoo: "foo"

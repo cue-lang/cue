@@ -384,6 +384,7 @@ how many fields do we have?
 					URI:   p.mapper.URI,
 					Range: protocol.Range{Start: pos},
 				})
+				qt.Assert(t, qt.IsNotNil(got), qt.Commentf("%v(+%d)", p, i))
 				qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v(+%d)", p, i))
 			}
 		}

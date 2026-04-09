@@ -4,21 +4,21 @@ v1:   len(args)         @test(eq, 0)
 v2:   len([])           @test(eq, 0)
 v3:   len({})           @test(eq, 0)
 v4:   len({a: 3})       @test(eq, 1)
-v5:   len({a: 3} | {a: 4}) @test(err, code=incomplete, contains="unresolved disjunction", pos=[in.cue:6:5])
-v6:   len('sf' | 'dd')     @test(err, code=incomplete, contains="unresolved disjunction", pos=[in.cue:7:5])
+v5:   len({a: 3} | {a: 4}) @test(err, code=incomplete, contains="unresolved disjunction", pos=[0:7])
+v6:   len('sf' | 'dd')     @test(err, code=incomplete, contains="unresolved disjunction", pos=[0:7])
 v7:   len([2] | *[1, 2])   @test(eq, 2)
-v8:   len([2] | [1, 2])    @test(err, code=incomplete, contains="unresolved disjunction", pos=[in.cue:9:5])
+v8:   len([2] | [1, 2])    @test(err, code=incomplete, contains="unresolved disjunction", pos=[0:7])
 v9:   len("😂")            @test(eq, 4,
 	hint="len of strings should be deprecated and this should be an error in the future")
 v10:  len("")              @test(eq, 0,
 	hint="len of strings should be deprecated and this should be an error in the future")
 -- out/errors.txt --
 [incomplete] v5: unresolved disjunction {a:3} | {a:4} (type struct):
-    ./in.cue:6:5
+    ./in.cue:6:7
 [incomplete] v6: unresolved disjunction 'sf' | 'dd' (type bytes):
-    ./in.cue:7:5
+    ./in.cue:7:7
 [incomplete] v8: unresolved disjunction [2] | [1,2] (type list):
-    ./in.cue:9:5
+    ./in.cue:9:7
 -- out/eval/stats --
 Leaks:  0
 Freed:  38

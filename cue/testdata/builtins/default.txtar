@@ -1,13 +1,12 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
-Len: len(*[1, 2, 3] | 0)
-Close: close(*{} | 0)
-And: and(*[1, 1] | int)
-Or: or(*[1, 1] | int)
-Div: div(*5 | string, 2)
-Mod: mod(*5 | string, 2)
-Quo: quo(*5 | string, 2)
-Rem: rem(*5 | string, 2)
+Len: len(*[1, 2, 3] | 0) @test(eq, 3)
+Close: close(*{} | 0)    @test(eq, {}) @test(closed)
+And: and(*[1, 1] | int)  @test(eq, 1)
+Or: or(*[1, 1] | int)    @test(eq, 1)
+Div: div(*5 | string, 2) @test(eq, 2)
+Mod: mod(*5 | string, 2) @test(eq, 1)
+Quo: quo(*5 | string, 2) @test(eq, 2)
+Rem: rem(*5 | string, 2) @test(eq, 1)
 -- out/compile --
 --- in.cue
 {
@@ -42,39 +41,3 @@ Conjuncts:    46
 Disjuncts:    18
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  Len: (int){ 3 }
-  Close: (#struct){
-  }
-  And: (int){ 1 }
-  Or: (int){ 1 }
-  Div: (int){ 2 }
-  Mod: (int){ 1 }
-  Quo: (int){ 2 }
-  Rem: (int){ 1 }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,6 @@
- (struct){
-   Len: (int){ 3 }
--  Close: (struct){
-+  Close: (#struct){
-   }
-   And: (int){ 1 }
-   Or: (int){ 1 }
--- out/eval --
-(struct){
-  Len: (int){ 3 }
-  Close: (struct){
-  }
-  And: (int){ 1 }
-  Or: (int){ 1 }
-  Div: (int){ 2 }
-  Mod: (int){ 1 }
-  Quo: (int){ 2 }
-  Rem: (int){ 1 }
-}

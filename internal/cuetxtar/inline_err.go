@@ -765,7 +765,7 @@ func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive 
 //   - pos=[non-empty]: update on CUE_UPDATE=force only.
 func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
-	err := val.Err()
+	err := valErr(val)
 	if err == nil {
 		t.Errorf("path %s: @test(err, pos=...): value has no error", path)
 		return
@@ -850,9 +850,29 @@ func (r *inlineRunner) errorCode(val cue.Value) string {
 	return b.Code.String()
 }
 
+// valErr returns the error for val.  It prefers val.Err() but falls back
+// to Core().V.Bottom().Err for values whose incomplete error is stored in
+// the raw vertex without being surfaced by the CUE evaluator (e.g. list
+// elements produced by list.FlattenN from a list containing an incomplete
+// value).
+//
+// TODO: fix this at the cue.Value API level so that val.Err() surfaces
+// incomplete errors from all vertex types, making this fallback unnecessary.
+func valErr(val cue.Value) error {
+	if err := val.Err(); err != nil {
+		return err
+	}
+	if core := val.Core(); core.V != nil {
+		if b := core.V.Bottom(); b != nil {
+			return b.Err
+		}
+	}
+	return nil
+}
+
 // errorMessage returns the human-readable error message for val.
 func (r *inlineRunner) errorMessage(val cue.Value) string {
-	if err := val.Err(); err != nil {
+	if err := valErr(val); err != nil {
 		return err.Error()
 	}
 	return ""

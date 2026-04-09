@@ -1,43 +1,43 @@
 # Test that error() in a disjunction used as a pattern constraint key
 # surfaces the custom error message instead of the generic "field not allowed".
 #
-# Issue #4208
 # Issue: https://cuelang.org/issue/4208
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #Environment: "sbx" | "stg" | "pro" | error("Must specify a valid environment")
 #Envs: [Env=#Environment]: {}
 
 // Valid key should work fine.
-valid: #Envs
+valid: #Envs   @test(eq, {["sbx"|"stg"|"pro"]: {}, sbx: {}}, hint="user error should be preserved in pattern")
 valid: sbx: {}
 
 // Invalid key should show the custom error message.
 invalid: #Envs
-invalid: foo: {}
--- out/evalalpha --
-Errors:
-invalid.foo: field not allowed:
-    ./in.cue:10:10
+invalid: foo: {} @test(err, code=eval, contains="field not allowed", incorrect) @test(err:todo, code=eval, contains="Must specify a valid environment")
 
-Result:
-(_|_){
-  // [eval]
-  #Environment: (string){ |((string){ "sbx" }, (string){ "stg" }, (string){ "pro" }) }
-  #Envs: (#struct){
-  }
-  valid: (#struct){
-    sbx: (#struct){
-    }
-  }
-  invalid: (_|_){
-    // [eval]
-    foo: (_|_){
-      // [eval] invalid.foo: field not allowed:
-      //     ./in.cue:10:10
-    }
-  }
-}
+
+@test(debug, #"""
+	(_|_){
+	  // [eval]
+	  #Environment: (string){ |((string){ "sbx" }, (string){ "stg" }, (string){ "pro" }) }
+	  #Envs: (#struct){
+	  }
+	  valid: (#struct){
+	    sbx: (#struct){
+	    }
+	  }
+	  invalid: (_|_){
+	    // [eval]
+	    foo: (_|_){
+	      // [eval] invalid.foo: field not allowed:
+	      //     in.cue:10:10
+	    }
+	  }
+	}
+	"""#)
+
+-- out/errors.txt --
+[eval] invalid.foo: field not allowed:
+    ./in.cue:10:10
 -- out/compile --
 --- in.cue
 {

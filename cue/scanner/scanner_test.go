@@ -773,7 +773,7 @@ var errorTests = []struct {
 	{`#""`, token.STRING, 0, `#""`, "string literal not terminated"},
 	{`#"""`, token.STRING, 0, `#"""`, `expected newline after multiline quote #"""`},
 	{`#""#`, token.STRING, 0, `#""#`, ""},
-	// {"$", IDENT, 0, "$", ""}, // TODO: for root of file?
+	{"$", token.IDENT, 0, "$", ""},
 	{"#'", token.STRING, 0, "#'", "string literal not terminated"},
 	{"''", token.STRING, 0, "''", ""},
 	{"'", token.STRING, 0, "'", "string literal not terminated"},

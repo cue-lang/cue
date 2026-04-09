@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/mod/semver"
 )
 
 // The parser structure holds the parser's internal state.
@@ -92,6 +93,16 @@ func (p *parser) init(filename string, src []byte, opts []Option) {
 	p.comments = &commentState{pos: -1}
 
 	p.next()
+}
+
+// versionAtLeast reports whether the file's language version is at least v.
+// An absent version (empty string) is treated as the latest version.
+func (p *parser) versionAtLeast(v string) bool {
+	fv := ""
+	if p.experiments != nil {
+		fv = p.experiments.LanguageVersion()
+	}
+	return fv == "" || semver.Compare(fv, v) >= 0
 }
 
 type commentState struct {
@@ -1440,20 +1451,22 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 	expr = p.parseBinaryExprTail(token.LowestPrec+1, expr)
 	expr = p.parseAlias(expr)
 
-	// Enforce there is an explicit comma. We could also allow the
-	// omission of commas in lists, but this gives rise to some ambiguities
-	// with list comprehensions.
-	if p.tok == token.COMMA && p.lit != "," {
+	// Before v0.17.0 the parser required explicit commas between list
+	// elements; automatic (newline-inserted) commas were not accepted.
+	if !p.versionAtLeast("v0.17.0") && p.tok == token.COMMA && p.lit != "," {
 		p.next()
-		// Allow missing comma for last element, though, to be compliant
-		// with JSON.
+		// Allow missing comma for last element to be compliant with JSON.
 		if p.tok == token.RBRACK || p.tok == token.FOR || p.tok == token.IF {
 			return expr, false
 		}
 		p.errf(p.pos, "missing ',' before newline in list literal")
-	} else if !p.atComma("list literal", token.RBRACK, token.FOR, token.IF) {
+		goto exit
+	}
+
+	if !p.atComma("list literal", token.RBRACK, token.FOR, token.IF) {
 		return expr, false
 	}
+exit:
 	p.next()
 
 	return expr, true

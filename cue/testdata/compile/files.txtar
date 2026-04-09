@@ -1,17 +1,15 @@
-// Issue #946
 # Issue #946: Tests that a for comprehension variable that shadows the source
 # name (for a in a) compiles correctly and resolves scoping at the right depth.
 # https://cuelang.org/issue/946
-#todo:inline: medium — compile-time checks; verify output in out/compile section
 -- in.cue --
 package repro
 
-a: []
+a: [] @test(eq, [])
 -- out.cue --
 package repro
 
-x: {for a in a {}}
-y: {{{for a in a {}}}}
+x: {for a in a {}}   @test(eq, {})
+y: {{{for a in a {}}}} @test(eq, {})
 -- out/compile --
 --- in.cue
 {
@@ -42,12 +40,3 @@ Conjuncts:    7
 Disjuncts:    0
 
 NumCloseIDs: 6
--- out/evalalpha --
-(struct){
-  a: (#list){
-  }
-  x: (struct){
-  }
-  y: (struct){
-  }
-}

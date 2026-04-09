@@ -1,9 +1,8 @@
-#todo:inline: medium — compile-time checks; verify output in out/compile section
 -- in.cue --
-#dev:   int
-"#dev": int
-_dev:   int
-_#dev:  int
+#dev:   int   @test(eq, int)
+"#dev": int   @test(eq, int)
+_dev:   int   @test(eq, int)
+_#dev:  int   @test(eq, int)
 -- out/compile --
 --- in.cue
 {
@@ -22,10 +21,3 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  #dev: (int){ int }
-  "#dev": (int){ int }
-  _dev: (int){ int }
-  _#dev: (int){ int }
-}

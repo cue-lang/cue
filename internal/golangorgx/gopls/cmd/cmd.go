@@ -213,7 +213,5 @@ func (app *Application) mainCommands() []tool.Application {
 }
 
 func (app *Application) featureCommands() []tool.Application {
-	return []tool.Application{
-		newRemote(app),
-	}
+	return nil
 }

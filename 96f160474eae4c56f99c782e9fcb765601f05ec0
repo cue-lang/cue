@@ -36,6 +36,41 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7026593e_94f01a44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-09T07:58:14Z",
+      "side": 1,
+      "message": "per my comment on the issue, I just spoke to Marcel, so consider this resolved :)",
+      "parentUuid": "4e7d219c_3a3d69b4",
+      "revId": "96f160474eae4c56f99c782e9fcb765601f05ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b66d0f2_87fb1888",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-09T07:58:14Z",
+      "side": 1,
+      "message": "SGTM, I\u0027d just still move the test out of cmd/cue as my other comment says.",
+      "revId": "96f160474eae4c56f99c782e9fcb765601f05ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b8c0a59_f674dd7b",

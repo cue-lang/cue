@@ -30,6 +30,9 @@ handleComprehensions: {
 }
 
 -- issue2351.cue --
+// Regression between v0.4.3 and v0.5.0: "undefined field" error when embedding
+// a for comprehension, caused by incorrect error reporting for let/hidden fields.
+// https://cuelang.org/issue/2351
 issue2351: let: {
 	let _param = "foo"
 	({
@@ -47,6 +50,9 @@ issue2351: hidden: {
 }
 
 -- issue2355.cue --
+// Regression v0.4.3→v0.5.0: cycle error when using let fields within nested
+// struct embeddings, breaking previously working code.
+// https://cuelang.org/issue/2355
 issue2355: {
 	#GetF1: {
 		in:  _
@@ -71,11 +77,11 @@ issue2355: {
 -- out/evalalpha --
 Errors:
 param: conflicting values [{}] and "foo" (mismatched types list and string):
-    ./issue2351.cue:1:17
-    ./issue2351.cue:2:15
-    ./issue2351.cue:3:2
-    ./issue2351.cue:4:10
-    ./issue2351.cue:4:19
+    ./issue2351.cue:4:17
+    ./issue2351.cue:5:15
+    ./issue2351.cue:6:2
+    ./issue2351.cue:7:10
+    ./issue2351.cue:7:19
 
 Result:
 (_|_){
@@ -110,11 +116,11 @@ Result:
     // [eval]
     let: (_|_){
       // [eval] param: conflicting values [{}] and "foo" (mismatched types list and string):
-      //     ./issue2351.cue:1:17
-      //     ./issue2351.cue:2:15
-      //     ./issue2351.cue:3:2
-      //     ./issue2351.cue:4:10
-      //     ./issue2351.cue:4:19
+      //     ./issue2351.cue:4:17
+      //     ./issue2351.cue:5:15
+      //     ./issue2351.cue:6:2
+      //     ./issue2351.cue:7:10
+      //     ./issue2351.cue:7:19
       let _param#1 = (string){ "foo" }
     }
     hidden: (#list){
@@ -129,7 +135,7 @@ Result:
       in: (_){ _ }
       out: (_|_){
         // [incomplete] issue2355.#GetF1.out: in.f1 undefined as in is incomplete (type _):
-        //     ./issue2355.cue:4:8
+        //     ./issue2355.cue:7:8
       }
     }
     #PutOut1: (#struct){
@@ -137,7 +143,7 @@ Result:
       out: (#struct){
         out1: (_|_){
           // [incomplete] issue2355.#PutOut1.out.out1: invalid interpolation: non-concrete value _ (type _):
-          //     ./issue2355.cue:9:14
+          //     ./issue2355.cue:12:14
         }
       }
     }
@@ -153,17 +159,56 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,9 @@
+@@ -1,8 +1,10 @@
  Errors:
 -issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
+-    ./issue2351.cue:2:15
+-    ./issue2351.cue:3:2
+-    ./issue2351.cue:4:19
 +param: conflicting values [{}] and "foo" (mismatched types list and string):
-+    ./issue2351.cue:1:17
-     ./issue2351.cue:2:15
-     ./issue2351.cue:3:2
-+    ./issue2351.cue:4:10
-     ./issue2351.cue:4:19
++    ./issue2351.cue:4:17
++    ./issue2351.cue:5:15
++    ./issue2351.cue:6:2
++    ./issue2351.cue:7:10
++    ./issue2351.cue:7:19
  
  Result:
+ (_|_){
+@@ -37,11 +39,11 @@
+     // [eval]
+     let: (_|_){
+       // [eval] param: conflicting values [{}] and "foo" (mismatched types list and string):
+-      //     ./issue2351.cue:1:17
+-      //     ./issue2351.cue:2:15
+-      //     ./issue2351.cue:3:2
+-      //     ./issue2351.cue:4:10
+-      //     ./issue2351.cue:4:19
++      //     ./issue2351.cue:4:17
++      //     ./issue2351.cue:5:15
++      //     ./issue2351.cue:6:2
++      //     ./issue2351.cue:7:10
++      //     ./issue2351.cue:7:19
+       let _param#1 = (string){ "foo" }
+     }
+     hidden: (#list){
+@@ -56,7 +58,7 @@
+       in: (_){ _ }
+       out: (_|_){
+         // [incomplete] issue2355.#GetF1.out: in.f1 undefined as in is incomplete (type _):
+-        //     ./issue2355.cue:4:8
++        //     ./issue2355.cue:7:8
+       }
+     }
+     #PutOut1: (#struct){
+@@ -64,7 +66,7 @@
+       out: (#struct){
+         out1: (_|_){
+           // [incomplete] issue2355.#PutOut1.out.out1: invalid interpolation: non-concrete value _ (type _):
+-          //     ./issue2355.cue:9:14
++          //     ./issue2355.cue:12:14
+         }
+       }
+     }
 -- out/eval/stats --
 Leaks:  5
 Freed:  240

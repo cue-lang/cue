@@ -82,6 +82,8 @@ indirectlyDoublyNested: {
 }
 
 // This case used to trigger an over-aggressive deduplication.
+// issue1974: Tests that two-level nested for comprehensions do not lose keys
+// due to over-aggressive deduplication. https://cuelang.org/issue/1974
 issue1974: {
 	X: {
 		foo: {
@@ -109,6 +111,8 @@ Y: x: {
 	}
 }
 -- issue3940.cue --
+// issue3940: Tests that chained comprehension clauses do not trigger spurious
+// structural cycle errors in evalv3. https://cuelang.org/issue/3940
 // Test chained comprehension clauses (without braces)
 issue3940: reduced1: {
 	X
@@ -232,6 +236,9 @@ issue3940: full: {
 	}
 }
 -- issue3990.cue --
+// issue3990: Tests that nested comprehensions within struct definitions do not
+// trigger "field set was already referenced" errors in evalv3.
+// https://cuelang.org/issue/3990
 issue3990: {
 	_imports: [_noVolumes, _someVolumes]
 	_noVolumes: {
@@ -348,7 +355,7 @@ NumCloseIDs: 217
           }
           objects: (_|_){
             // [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:12:22
+            //     ./issue3940.cue:14:22
           }
         }
       }
@@ -360,7 +367,7 @@ NumCloseIDs: 217
       }
       objects: (_|_){
         // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:12:22
+        //     ./issue3940.cue:14:22
       }
     }
     reduced2: (struct){
@@ -373,7 +380,7 @@ NumCloseIDs: 217
           }
           objects: (_|_){
             // [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:29:22
+            //     ./issue3940.cue:31:22
           }
         }
       }
@@ -385,7 +392,7 @@ NumCloseIDs: 217
       }
       objects: (_|_){
         // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:29:22
+        //     ./issue3940.cue:31:22
       }
     }
     reduced3: (struct){
@@ -451,7 +458,7 @@ NumCloseIDs: 217
           }
           objects: (_|_){
             // [incomplete] issue3940.let.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:73:15
+            //     ./issue3940.cue:75:15
           }
         }
       }
@@ -463,7 +470,7 @@ NumCloseIDs: 217
       }
       objects: (_|_){
         // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:73:15
+        //     ./issue3940.cue:75:15
       }
     }
     full: (struct){
@@ -476,7 +483,7 @@ NumCloseIDs: 217
                 }
                 region: (_|_){
                   // [incomplete] issue3940.full.out._imports.0.objects.branch.region: undefined field: global:
-                  //     ./issue3940.cue:87:18
+                  //     ./issue3940.cue:89:18
                 }
               }
             }
@@ -488,7 +495,7 @@ NumCloseIDs: 217
                     }
                     region: (_|_){
                       // [incomplete] issue3940.full.out._imports.0.imports.0.objects.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:98:18
+                      //     ./issue3940.cue:100:18
                     }
                   }
                 }
@@ -499,7 +506,7 @@ NumCloseIDs: 217
                       }
                       region: (_|_){
                         // [incomplete] issue3940.full.out._imports.0.imports.0.#export._objects.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:98:18
+                        //     ./issue3940.cue:100:18
                       }
                     }
                   }
@@ -514,7 +521,7 @@ NumCloseIDs: 217
                         }
                         region: (_|_){
                           // [incomplete] issue3940.full.out._imports.0.imports.0.#export.objects.0.leaf.region: undefined field: global:
-                          //     ./issue3940.cue:98:18
+                          //     ./issue3940.cue:100:18
                         }
                       }
                     }
@@ -529,7 +536,7 @@ NumCloseIDs: 217
                   }
                   region: (_|_){
                     // [incomplete] issue3940.full.out._imports.0.#export._objects.branch.region: undefined field: global:
-                    //     ./issue3940.cue:87:18
+                    //     ./issue3940.cue:89:18
                   }
                 }
               }
@@ -541,7 +548,7 @@ NumCloseIDs: 217
                       }
                       region: (_|_){
                         // [incomplete] issue3940.full.out._imports.0.#export._imports.0.objects.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:98:18
+                        //     ./issue3940.cue:100:18
                       }
                     }
                   }
@@ -552,7 +559,7 @@ NumCloseIDs: 217
                         }
                         region: (_|_){
                           // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export._objects.leaf.region: undefined field: global:
-                          //     ./issue3940.cue:98:18
+                          //     ./issue3940.cue:100:18
                         }
                       }
                     }
@@ -567,7 +574,7 @@ NumCloseIDs: 217
                           }
                           region: (_|_){
                             // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
-                            //     ./issue3940.cue:98:18
+                            //     ./issue3940.cue:100:18
                           }
                         }
                       }
@@ -584,7 +591,7 @@ NumCloseIDs: 217
                     }
                     region: (_|_){
                       // [incomplete] issue3940.full.out._imports.0.#export.objects.0.branch.region: undefined field: global:
-                      //     ./issue3940.cue:87:18
+                      //     ./issue3940.cue:89:18
                     }
                   }
                 }
@@ -594,7 +601,7 @@ NumCloseIDs: 217
                     }
                     region: (_|_){
                       // [incomplete] issue3940.full.out._imports.0.#export.objects.1.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:98:18
+                      //     ./issue3940.cue:100:18
                     }
                   }
                 }
@@ -639,7 +646,7 @@ NumCloseIDs: 217
             }
             region: (_|_){
               // [incomplete] issue3940.full._branch.objects.branch.region: undefined field: global:
-              //     ./issue3940.cue:87:18
+              //     ./issue3940.cue:89:18
             }
           }
         }
@@ -653,7 +660,7 @@ NumCloseIDs: 217
               }
               region: (_|_){
                 // [incomplete] issue3940.full._branch.#export._objects.branch.region: undefined field: global:
-                //     ./issue3940.cue:87:18
+                //     ./issue3940.cue:89:18
               }
             }
           }
@@ -665,7 +672,7 @@ NumCloseIDs: 217
                   }
                   region: (_|_){
                     // [incomplete] issue3940.full._branch.#export._imports.0.objects.leaf.region: undefined field: global:
-                    //     ./issue3940.cue:98:18
+                    //     ./issue3940.cue:100:18
                   }
                 }
               }
@@ -676,7 +683,7 @@ NumCloseIDs: 217
                     }
                     region: (_|_){
                       // [incomplete] issue3940.full._branch.#export._imports.0.#export._objects.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:98:18
+                      //     ./issue3940.cue:100:18
                     }
                   }
                 }
@@ -691,7 +698,7 @@ NumCloseIDs: 217
                       }
                       region: (_|_){
                         // [incomplete] issue3940.full._branch.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:98:18
+                        //     ./issue3940.cue:100:18
                       }
                     }
                   }
@@ -708,7 +715,7 @@ NumCloseIDs: 217
                 }
                 region: (_|_){
                   // [incomplete] issue3940.full._branch.#export.objects.0.branch.region: undefined field: global:
-                  //     ./issue3940.cue:87:18
+                  //     ./issue3940.cue:89:18
                 }
               }
             }
@@ -718,7 +725,7 @@ NumCloseIDs: 217
                 }
                 region: (_|_){
                   // [incomplete] issue3940.full._branch.#export.objects.1.leaf.region: undefined field: global:
-                  //     ./issue3940.cue:98:18
+                  //     ./issue3940.cue:100:18
                 }
               }
             }
@@ -732,7 +739,7 @@ NumCloseIDs: 217
             }
             region: (_|_){
               // [incomplete] issue3940.full._leaf.objects.leaf.region: undefined field: global:
-              //     ./issue3940.cue:98:18
+              //     ./issue3940.cue:100:18
             }
           }
         }
@@ -743,7 +750,7 @@ NumCloseIDs: 217
               }
               region: (_|_){
                 // [incomplete] issue3940.full._leaf.#export._objects.leaf.region: undefined field: global:
-                //     ./issue3940.cue:98:18
+                //     ./issue3940.cue:100:18
               }
             }
           }
@@ -758,7 +765,7 @@ NumCloseIDs: 217
                 }
                 region: (_|_){
                   // [incomplete] issue3940.full._leaf.#export.objects.0.leaf.region: undefined field: global:
-                  //     ./issue3940.cue:98:18
+                  //     ./issue3940.cue:100:18
                 }
               }
             }
@@ -813,10 +820,10 @@ NumCloseIDs: 217
     }
     _Deployment: (_|_){
       // [incomplete] issue3990._Deployment._names: undefined field: volumes:
-      //     ./issue3990.cue:21:21
+      //     ./issue3990.cue:24:21
       _names: (_|_){
         // [incomplete] issue3990._Deployment._names: undefined field: volumes:
-        //     ./issue3990.cue:21:21
+        //     ./issue3990.cue:24:21
       }
     }
     someVolumes: (struct){
@@ -853,7 +860,7 @@ NumCloseIDs: 217
 diff old new
 --- old
 +++ new
-@@ -65,12 +65,7 @@
+@@ -65,29 +65,24 @@
          b: (struct){
            a: (struct){
              b: (struct){
@@ -867,7 +874,37 @@ diff old new
              }
            }
            objects: (_|_){
-@@ -95,12 +90,7 @@
+             // [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
+-            //     ./issue3940.cue:12:22
+-          }
+-        }
+-      }
+-      X: (struct){
+-        a: (struct){
+-        }
+-        objects: (struct){
+-        }
+-      }
+-      objects: (_|_){
+-        // [incomplete] objects: undefined field: objects:
+-        //     ./issue3940.cue:12:22
++            //     ./issue3940.cue:14:22
++          }
++        }
++      }
++      X: (struct){
++        a: (struct){
++        }
++        objects: (struct){
++        }
++      }
++      objects: (_|_){
++        // [incomplete] objects: undefined field: objects:
++        //     ./issue3940.cue:14:22
+       }
+     }
+     reduced2: (struct){
+@@ -95,29 +90,24 @@
          b: (struct){
            a: (struct){
              b: (struct){
@@ -881,6 +918,36 @@ diff old new
              }
            }
            objects: (_|_){
+             // [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
+-            //     ./issue3940.cue:29:22
+-          }
+-        }
+-      }
+-      X: (struct){
+-        a: (struct){
+-        }
+-        objects: (struct){
+-        }
+-      }
+-      objects: (_|_){
+-        // [incomplete] objects: undefined field: objects:
+-        //     ./issue3940.cue:29:22
++            //     ./issue3940.cue:31:22
++          }
++        }
++      }
++      X: (struct){
++        a: (struct){
++        }
++        objects: (struct){
++        }
++      }
++      objects: (_|_){
++        // [incomplete] objects: undefined field: objects:
++        //     ./issue3940.cue:31:22
+       }
+     }
+     reduced3: (struct){
 @@ -125,12 +115,7 @@
          i: (struct){
            x: (struct){
@@ -895,7 +962,7 @@ diff old new
              }
              o: (#list){
              }
-@@ -183,12 +168,7 @@
+@@ -183,67 +168,53 @@
          b: (struct){
            a: (struct){
              b: (struct){
@@ -909,7 +976,34 @@ diff old new
              }
            }
            objects: (_|_){
-@@ -210,17 +190,10 @@
+             // [incomplete] issue3940.let.a.b.objects: undefined field: objects:
+-            //     ./issue3940.cue:73:15
+-          }
+-        }
+-      }
+-      X: (struct){
+-        a: (struct){
+-        }
+-        objects: (struct){
+-        }
+-      }
+-      objects: (_|_){
+-        // [incomplete] objects: undefined field: objects:
+-        //     ./issue3940.cue:73:15
++            //     ./issue3940.cue:75:15
++          }
++        }
++      }
++      X: (struct){
++        a: (struct){
++        }
++        objects: (struct){
++        }
++      }
++      objects: (_|_){
++        // [incomplete] objects: undefined field: objects:
++        //     ./issue3940.cue:75:15
+       }
      }
      full: (struct){
        out: (#struct){
@@ -931,7 +1025,10 @@ diff old new
                  #conf: (#struct){
                  }
                  region: (_|_){
-@@ -230,9 +203,9 @@
+                   // [incomplete] issue3940.full.out._imports.0.objects.branch.region: undefined field: global:
+-                  //     ./issue3940.cue:87:18
++                  //     ./issue3940.cue:89:18
+                 }
                }
              }
              imports: (#list){
@@ -944,7 +1041,10 @@ diff old new
                      #conf: (#struct){
                      }
                      region: (_|_){
-@@ -242,8 +215,6 @@
+                       // [incomplete] issue3940.full.out._imports.0.imports.0.objects.leaf.region: undefined field: global:
+-                      //     ./issue3940.cue:98:18
++                      //     ./issue3940.cue:100:18
+                     }
                    }
                  }
                  #export: (#struct){
@@ -953,66 +1053,158 @@ diff old new
                    _objects: (#struct){
                      leaf: (#struct){
                        #conf: (#struct){
-@@ -254,6 +225,8 @@
+@@ -250,9 +221,11 @@
                        }
-                     }
-                   }
-+                  #conf: (#struct){
+                       region: (_|_){
+                         // [incomplete] issue3940.full.out._imports.0.imports.0.#export._objects.leaf.region: undefined field: global:
+-                        //     ./issue3940.cue:98:18
+-                      }
+-                    }
++                        //     ./issue3940.cue:100:18
++                      }
++                    }
 +                  }
++                  #conf: (#struct){
+                   }
                    _imports: (list){
                    }
-                   objects: (#list){
-@@ -272,8 +245,6 @@
-               }
-             }
-             #export: (#struct){
+@@ -263,17 +236,15 @@
+                         }
+                         region: (_|_){
+                           // [incomplete] issue3940.full.out._imports.0.imports.0.#export.objects.0.leaf.region: undefined field: global:
+-                          //     ./issue3940.cue:98:18
+-                        }
+-                      }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-            #export: (#struct){
 -              #conf: (#struct){
 -              }
++                          //     ./issue3940.cue:100:18
++                        }
++                      }
++                    }
++                  }
++                }
++              }
++            }
++            #export: (#struct){
                _objects: (#struct){
                  branch: (#struct){
                    #conf: (#struct){
-@@ -297,8 +268,6 @@
-                     }
+@@ -280,7 +251,7 @@
                    }
-                   #export: (#struct){
--                    #conf: (#struct){
--                    }
-                     _objects: (#struct){
-                       leaf: (#struct){
-                         #conf: (#struct){
-@@ -309,6 +278,8 @@
-                         }
-                       }
-                     }
-+                    #conf: (#struct){
-+                    }
-                     _imports: (list){
-                     }
-                     objects: (#list){
-@@ -326,6 +297,8 @@
+                   region: (_|_){
+                     // [incomplete] issue3940.full.out._imports.0.#export._objects.branch.region: undefined field: global:
+-                    //     ./issue3940.cue:87:18
++                    //     ./issue3940.cue:89:18
                    }
                  }
                }
-+              #conf: (#struct){
+@@ -292,13 +263,11 @@
+                       }
+                       region: (_|_){
+                         // [incomplete] issue3940.full.out._imports.0.#export._imports.0.objects.leaf.region: undefined field: global:
+-                        //     ./issue3940.cue:98:18
+-                      }
+-                    }
+-                  }
+-                  #export: (#struct){
+-                    #conf: (#struct){
+-                    }
++                        //     ./issue3940.cue:100:18
++                      }
++                    }
++                  }
++                  #export: (#struct){
+                     _objects: (#struct){
+                       leaf: (#struct){
+                         #conf: (#struct){
+@@ -305,9 +274,11 @@
+                         }
+                         region: (_|_){
+                           // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export._objects.leaf.region: undefined field: global:
+-                          //     ./issue3940.cue:98:18
+-                        }
+-                      }
++                          //     ./issue3940.cue:100:18
++                        }
++                      }
++                    }
++                    #conf: (#struct){
+                     }
+                     _imports: (list){
+                     }
+@@ -318,13 +289,15 @@
+                           }
+                           region: (_|_){
+                             // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
+-                            //     ./issue3940.cue:98:18
+-                          }
+-                        }
+-                      }
+-                    }
+-                  }
+-                }
++                            //     ./issue3940.cue:100:18
++                          }
++                        }
++                      }
++                    }
++                  }
++                }
 +              }
++              #conf: (#struct){
+               }
                objects: (#list){
                  0: (#struct){
-                   branch: (#struct){
-@@ -351,6 +324,13 @@
-             }
-           }
-         }
+@@ -333,7 +306,7 @@
+                     }
+                     region: (_|_){
+                       // [incomplete] issue3940.full.out._imports.0.#export.objects.0.branch.region: undefined field: global:
+-                      //     ./issue3940.cue:87:18
++                      //     ./issue3940.cue:89:18
+                     }
+                   }
+                 }
+@@ -343,13 +316,20 @@
+                     }
+                     region: (_|_){
+                       // [incomplete] issue3940.full.out._imports.0.#export.objects.1.leaf.region: undefined field: global:
+-                      //     ./issue3940.cue:98:18
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
++                      //     ./issue3940.cue:100:18
++                    }
++                  }
++                }
++              }
++            }
++          }
++        }
 +        #conf: (#struct){
 +          global: (#struct){
 +            region: (string){ "Europe" }
 +          }
 +        }
 +        _objects: (#struct){
-+        }
+         }
          objects: (#list){
            0: (#struct){
-             branch: (#struct){
-@@ -386,50 +366,9 @@
+@@ -381,55 +361,14 @@
+             }
+             region: (_|_){
+               // [incomplete] issue3940.full._branch.objects.branch.region: undefined field: global:
+-              //     ./issue3940.cue:87:18
++              //     ./issue3940.cue:89:18
+             }
            }
          }
          imports: (#list){
@@ -1066,7 +1258,22 @@ diff old new
            _objects: (#struct){
              branch: (#struct){
                #conf: (#struct){
-@@ -453,8 +392,6 @@
+@@ -436,7 +375,7 @@
+               }
+               region: (_|_){
+                 // [incomplete] issue3940.full._branch.#export._objects.branch.region: undefined field: global:
+-                //     ./issue3940.cue:87:18
++                //     ./issue3940.cue:89:18
+               }
+             }
+           }
+@@ -448,13 +387,11 @@
+                   }
+                   region: (_|_){
+                     // [incomplete] issue3940.full._branch.#export._imports.0.objects.leaf.region: undefined field: global:
+-                    //     ./issue3940.cue:98:18
++                    //     ./issue3940.cue:100:18
+                   }
                  }
                }
                #export: (#struct){
@@ -1075,42 +1282,105 @@ diff old new
                  _objects: (#struct){
                    leaf: (#struct){
                      #conf: (#struct){
-@@ -465,6 +402,8 @@
+@@ -461,9 +398,11 @@
                      }
-                   }
-                 }
-+                #conf: (#struct){
+                     region: (_|_){
+                       // [incomplete] issue3940.full._branch.#export._imports.0.#export._objects.leaf.region: undefined field: global:
+-                      //     ./issue3940.cue:98:18
+-                    }
+-                  }
++                      //     ./issue3940.cue:100:18
++                    }
++                  }
 +                }
++                #conf: (#struct){
+                 }
                  _imports: (list){
                  }
-                 objects: (#list){
-@@ -482,6 +421,8 @@
-               }
-             }
-           }
-+          #conf: (#struct){
+@@ -474,13 +413,15 @@
+                       }
+                       region: (_|_){
+                         // [incomplete] issue3940.full._branch.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
+-                        //     ./issue3940.cue:98:18
+-                      }
+-                    }
+-                  }
+-                }
+-              }
+-            }
++                        //     ./issue3940.cue:100:18
++                      }
++                    }
++                  }
++                }
++              }
++            }
 +          }
++          #conf: (#struct){
+           }
            objects: (#list){
              0: (#struct){
-               branch: (#struct){
-@@ -518,8 +459,6 @@
-           }
-         }
-         #export: (#struct){
+@@ -489,7 +430,7 @@
+                 }
+                 region: (_|_){
+                   // [incomplete] issue3940.full._branch.#export.objects.0.branch.region: undefined field: global:
+-                  //     ./issue3940.cue:87:18
++                  //     ./issue3940.cue:89:18
+                 }
+               }
+             }
+@@ -499,7 +440,7 @@
+                 }
+                 region: (_|_){
+                   // [incomplete] issue3940.full._branch.#export.objects.1.leaf.region: undefined field: global:
+-                  //     ./issue3940.cue:98:18
++                  //     ./issue3940.cue:100:18
+                 }
+               }
+             }
+@@ -513,13 +454,11 @@
+             }
+             region: (_|_){
+               // [incomplete] issue3940.full._leaf.objects.leaf.region: undefined field: global:
+-              //     ./issue3940.cue:98:18
+-            }
+-          }
+-        }
+-        #export: (#struct){
 -          #conf: (#struct){
 -          }
++              //     ./issue3940.cue:100:18
++            }
++          }
++        }
++        #export: (#struct){
            _objects: (#struct){
              leaf: (#struct){
                #conf: (#struct){
-@@ -530,6 +469,8 @@
+@@ -526,9 +465,11 @@
                }
-             }
-           }
-+          #conf: (#struct){
+               region: (_|_){
+                 // [incomplete] issue3940.full._leaf.#export._objects.leaf.region: undefined field: global:
+-                //     ./issue3940.cue:98:18
+-              }
+-            }
++                //     ./issue3940.cue:100:18
++              }
++            }
 +          }
++          #conf: (#struct){
+           }
            _imports: (list){
            }
-           objects: (#list){
+@@ -539,7 +480,7 @@
+                 }
+                 region: (_|_){
+                   // [incomplete] issue3940.full._leaf.#export.objects.0.leaf.region: undefined field: global:
+-                  //     ./issue3940.cue:98:18
++                  //     ./issue3940.cue:100:18
+                 }
+               }
+             }
 @@ -560,43 +501,16 @@
    }
    issue3990: (struct){
@@ -1172,7 +1442,7 @@ diff old new
            _names: (struct){
              data: (string){ "data" }
            }
-@@ -611,11 +530,6 @@
+@@ -611,29 +530,23 @@
            volumeNames: (#list){
              0: (string){ "data" }
            }
@@ -1184,16 +1454,22 @@ diff old new
          }
        }
      }
-@@ -627,13 +541,12 @@
-         //     ./issue3990.cue:21:21
-       }
-     }
+     _Deployment: (_|_){
+       // [incomplete] issue3990._Deployment._names: undefined field: volumes:
+-      //     ./issue3990.cue:21:21
++      //     ./issue3990.cue:24:21
+       _names: (_|_){
+         // [incomplete] issue3990._Deployment._names: undefined field: volumes:
+-        //     ./issue3990.cue:21:21
+-      }
+-    }
 -    noVolumes: (struct){
 -      _names: (struct){
 -      }
 -      volumes: (#list){
--      }
--    }
++        //     ./issue3990.cue:24:21
+       }
+     }
      someVolumes: (struct){
 +      volumes: (#list){
 +        0: (struct){

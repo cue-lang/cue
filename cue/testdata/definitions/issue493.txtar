@@ -1,3 +1,6 @@
+# Tests that a disjunction of identical definitions (#Both: #App | #Atom where
+# both alias the same type) correctly unifies with an additional constraint.
+# https://cuelang.org/issue/493
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #Artifact: {

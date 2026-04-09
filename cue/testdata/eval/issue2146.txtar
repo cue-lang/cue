@@ -1,3 +1,7 @@
+# Tests that let expressions within disjunctions are uniqued per arc, not just
+# per Environment. Without the fix, incorrect results were cached and shared
+# across arcs, causing the `all` list to evaluate incorrectly under unification.
+# https://cuelang.org/issue/2146
 // Issue #2146
 //
 // Ensure that let expressions are uniqued not only per Environment, but also

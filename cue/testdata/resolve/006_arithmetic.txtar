@@ -1,5 +1,7 @@
 #name: arithmetic
 #evalPartial
+# Tests arithmetic operations including division producing floats and
+# conflicting types (int & float).
 #todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 v1: 1.0T / 2.0

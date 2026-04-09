@@ -72,6 +72,9 @@ patternCycle: t1: p3: {
 }
 
 -- intpattern.cue --
+// evalv3 regression: a pattern constraint definition with int key incorrectly
+// allowed a non-matching (non-int) field.
+// https://cuelang.org/issue/3670
 issue3670: {
 	#X: [int]: string
 	a: #X
@@ -87,6 +90,9 @@ dual: {
 	[int]: _
 }
 -- multi.cue --
+// evalv3 regression: closedness values and default markers were incorrectly
+// erased, causing order-dependent "incomplete value" errors.
+// https://cuelang.org/issue/3638
 // Ensure that if the same pattern is added multiple times in different
 // contexts, it is added to all contexts to preserve closedness information.
 issue3638: full: {
@@ -157,7 +163,7 @@ NumCloseIDs: 80
 -- out/evalalpha --
 Errors:
 issue3670.a.not_int: field not allowed:
-    ./intpattern.cue:4:5
+    ./intpattern.cue:7:5
 t1.c.z: field not allowed:
     ./in.cue:19:11
 t2.c.z: field not allowed:
@@ -223,7 +229,7 @@ Result:
       // [eval]
       not_int: (_|_){
         // [eval] issue3670.a.not_int: field not allowed:
-        //     ./intpattern.cue:4:5
+        //     ./intpattern.cue:7:5
       }
     }
   }
@@ -293,7 +299,7 @@ Result:
         input: (_){ _ }
         output: (_|_){
           // [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
-          //     ./multi.cue:10:21
+          //     ./multi.cue:13:21
         }
       }
       #Kubernetes: (#struct){
@@ -416,7 +422,8 @@ diff old new
  issue3670.a.not_int: field not allowed:
 -    ./intpattern.cue:2:6
 -    ./intpattern.cue:3:5
-     ./intpattern.cue:4:5
+-    ./intpattern.cue:4:5
++    ./intpattern.cue:7:5
  t1.c.z: field not allowed:
 -    ./in.cue:15:6
 -    ./in.cue:19:5
@@ -463,15 +470,17 @@ diff old new
          //     ./in.cue:27:11
        }
      }
-@@ -74,8 +66,6 @@
+@@ -74,9 +66,7 @@
        // [eval]
        not_int: (_|_){
          // [eval] issue3670.a.not_int: field not allowed:
 -        //     ./intpattern.cue:2:6
 -        //     ./intpattern.cue:3:5
-         //     ./intpattern.cue:4:5
+-        //     ./intpattern.cue:4:5
++        //     ./intpattern.cue:7:5
        }
      }
+   }
 @@ -111,37 +101,21 @@
          }
        }
@@ -525,7 +534,12 @@ diff old new
        }
      }
    }
-@@ -166,20 +140,17 @@
+@@ -162,24 +136,21 @@
+         input: (_){ _ }
+         output: (_|_){
+           // [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
+-          //     ./multi.cue:10:21
++          //     ./multi.cue:13:21
          }
        }
        #Kubernetes: (#struct){

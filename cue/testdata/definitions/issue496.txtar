@@ -1,3 +1,6 @@
+# Tests that hidden fields within a definition unified with #A: _ are correctly
+# handled and do not cause spurious "field not allowed" errors.
+# https://cuelang.org/issue/496
 #todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #A: _

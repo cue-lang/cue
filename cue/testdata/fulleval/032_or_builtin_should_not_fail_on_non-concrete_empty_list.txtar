@@ -1,3 +1,7 @@
+# Tests that the or() builtin does not panic when called with a non-concrete
+# (empty) list, such as when no comprehension entries are produced.
+# The #JobID field should be an incomplete error in the base definition, but
+# successfully resolve to a concrete string once jobs has at least one entry.
 #name: or builtin should not fail on non-concrete empty list
 #evalFull
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
@@ -8,6 +12,7 @@
 		}
 	}
 	#JobID: or([for k, _ in jobs {k}])
+	// #JobID is incomplete when jobs has no entries — or([]) is not allowed.
 }
 
 foo: #Workflow & {

@@ -6,6 +6,10 @@ d: {a: 1, b?: 3} | {a: 2}
 
 // the following conjunction should not eliminate any disjuncts
 c: d & {b?: 4}
+        // [eval] c.b: conflicting values 3 and 4:
+        //     ./in.cue:1:15
+        //     ./in.cue:4:4
+        //     ./in.cue:4:13
 -- out/compile --
 --- in.cue
 {

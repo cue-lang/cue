@@ -1,3 +1,7 @@
+# Tests that if-comprehensions inside a definition correctly match default
+# values when the condition is satisfied. Issue #436: conditional in a definition
+# unified with a concrete value was not evaluating the condition correctly.
+# https://cuelang.org/issue/436
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #a: {

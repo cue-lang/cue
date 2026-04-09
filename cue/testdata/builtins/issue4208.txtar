@@ -2,6 +2,7 @@
 # surfaces the custom error message instead of the generic "field not allowed".
 #
 # Issue #4208
+# Issue: https://cuelang.org/issue/4208
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #Environment: "sbx" | "stg" | "pro" | error("Must specify a valid environment")

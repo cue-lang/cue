@@ -1,3 +1,7 @@
+# Tests that complex configurations with disjunctions and comprehensions evaluate
+# correctly. A regression in v0.5.0 caused "empty disjunction" errors for code
+# involving nested definitions with spec disjunctions and if-guard comprehensions.
+# https://cuelang.org/issue/2209
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- input.cue --
 full: {

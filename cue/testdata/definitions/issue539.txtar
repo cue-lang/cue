@@ -1,3 +1,6 @@
+# Tests that combining a definition with open spread (`...`) and a non-definition
+# struct preserves the expected fields including hidden definitions and defaults.
+# Issue: https://cuelang.org/issue/539
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #Schema: {

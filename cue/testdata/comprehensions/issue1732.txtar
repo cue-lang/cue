@@ -1,3 +1,7 @@
+# Tests comprehensions with definitions that use incomplete boolean conditions,
+# including nested definition references and cross-struct comprehensions.
+# Issue #1732: comprehension with abstract bool condition in definitions causes
+# "incomplete bool" error propagation through nested structs.
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 package config

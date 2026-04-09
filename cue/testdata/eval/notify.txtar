@@ -27,6 +27,9 @@ t3: p2: {
 	b: a
 }
 -- issue3437.cue --
+// Panic with a structurally recursive disjunction where a field aliases to
+// itself via a self-referential disjunction path.
+// https://cuelang.org/issue/3437
 issue3437: {
 	r: L=L.a
 	d: a: a: a: {b: 4}|d
@@ -155,7 +158,7 @@ Result:
   issue3437: (struct){
     r: (_|_){
       // [incomplete] issue3437.r: undefined field: a:
-      //     ./issue3437.cue:2:9
+      //     ./issue3437.cue:5:9
     }
     d: (struct){
       a: (struct){
@@ -1256,15 +1259,17 @@ diff old new
          }
        }
      }
-@@ -119,7 +119,7 @@
+@@ -119,8 +119,8 @@
    }
    issue3437: (struct){
      r: (_|_){
 -      // [incomplete] issue3437.r: cycle error referencing a:
+-      //     ./issue3437.cue:2:9
 +      // [incomplete] issue3437.r: undefined field: a:
-       //     ./issue3437.cue:2:9
++      //     ./issue3437.cue:5:9
      }
      d: (struct){
+       a: (struct){
 @@ -131,33 +131,853 @@
          }
        }

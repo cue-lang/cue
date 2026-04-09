@@ -1,3 +1,5 @@
+# Tests that comprehensions over intersections of hidden fields work correctly.
+# Issue #3762: for comprehensions over _a & _b where both have patterns.
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 full: {

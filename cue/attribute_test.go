@@ -16,6 +16,7 @@ package cue_test
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -388,6 +389,16 @@ something structured "}"
 			qt.Assert(t, qt.HasLen(attrs, 1))
 			attr := attrs[0]
 			qt.Check(t, qt.Equals(attr.Name(), tc.name))
+			gotAttrs := slices.Collect(attr.Args(0))
+			qt.Assert(t, qt.HasLen(gotAttrs, attr.NumArgs()))
+			wantAttrs := make([]cue.AttributeArg, len(tc.args))
+			for i, arg := range tc.args {
+				wantAttrs[i] = cue.AttributeArg{
+					Key:   arg.key,
+					Value: arg.value,
+				}
+			}
+			qt.Assert(t, qt.DeepEquals(gotAttrs, wantAttrs))
 
 			qt.Assert(t, qt.Equals(attr.NumArgs(), len(tc.args)))
 			for i, want := range tc.args {

@@ -16,6 +16,7 @@ package cue
 
 import (
 	"fmt"
+	"iter"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal"
@@ -156,17 +157,51 @@ func (a *Attribute) NumArgs() int {
 //
 // If the argument contains an unescaped equals sign, it returns a key-value
 // pair. Otherwise it returns the contents in key.
+//
+// It also unquotes the value argument if it's a string.
 func (a *Attribute) Arg(i int) (key, value string) {
-	// TODO: Returning the contents in key for a non-key-value argument
-	// is counter to the original documentation for this method and
-	// counter-intuitive too, but it remains that way to avoid breaking
-	// backward compatibility. In the future it would be nice to
-	// change it to return ("", value) in this case.
 	f := a.attr.Fields[i]
 	if f.Key() == "" {
 		return f.Value(), ""
 	}
 	return f.Key(), f.Value()
+}
+
+// AttributeArg represents an argument in an attribute.
+type AttributeArg struct {
+	// Key holds the key part of the argument. This will
+	// be empty if there is no key part. Note that if the key
+	// is quoted, Key will also be quoted.
+	Key string
+
+	// Value holds the value part of the of the argument.
+	// Other than having surrounding white space trimmed,
+	// this will hold the verbatim text of the argument's value:
+	// it will not be unquoted if it's a literal string.
+	Value string
+}
+
+// AsString returns the value part of the argument as a string,
+// unquoting it if it's a valid CUE string literal.
+func (a AttributeArg) AsString() string {
+	return internal.MaybeUnquote(a.Value)
+}
+
+// Args returns an iterator over all the arguments from
+// position pos onwards.
+func (a *Attribute) Args(pos int) iter.Seq[AttributeArg] {
+	return func(yield func(AttributeArg) bool) {
+		n := a.NumArgs()
+		for i := pos; i < n; i++ {
+			f := &a.attr.Fields[i]
+			if !yield(AttributeArg{
+				Key:   f.Key(),
+				Value: f.RawValue(),
+			}) {
+				return
+			}
+		}
+	}
 }
 
 // RawArg reports the raw contents of the ith comma-separated argument of a,

@@ -1,4 +1,3 @@
-#todo:inline: medium — compile-time checks; verify output in out/compile section
 -- cue.mod/module.cue --
 module: "test.example"
 language: version: "v0.15.0"
@@ -8,29 +7,34 @@ language: version: "v0.15.0"
 
 #Base: {
 	x: int
-}
+} @test(shareID=Base)
 
 // Test postfix ... operator with struct
-a: #Base...
+a: #Base... @test(shareID=Base)
 
 // Test with selector
-b: foo.bar...
+b: foo.bar... @test(err, code=incomplete, contains="undefined field: bar", pos=[0:8])
 
 // Test with parentheses
-c: (x & y)...
+c: (x & y)... @test(eq, _)
 
 // Test with function call
-d: fn()...
+d: fn()... @test(err, code=incomplete, contains="cannot call non-concrete value fn", pos=[0:4])
 
 // As an expression
 e: #Base... & {y: int}
 
-foo: {}
+foo: {} @test(eq, {})
 
-x:  _
-y:  _
-fn: _
+x:  _ @test(eq, _)
+y:  _ @test(eq, _)
+fn: _ @test(eq, _)
 
+-- out/errors.txt --
+[incomplete] b: undefined field: bar:
+    ./with_experiment.cue:11:8
+[incomplete] d: cannot call non-concrete value fn (type _):
+    ./with_experiment.cue:17:4
 -- out/compile --
 --- with_experiment.cue
 {
@@ -48,29 +52,4 @@ fn: _
   x: _
   y: _
   fn: _
-}
--- out/evalalpha --
-(struct){
-  #Base: (#struct){
-    x: (int){ int }
-  }
-  a: ~(#Base)
-  b: (_|_){
-    // [incomplete] b: undefined field: bar:
-    //     ./with_experiment.cue:11:8
-  }
-  c: (_){ _ }
-  d: (_|_){
-    // [incomplete] d: cannot call non-concrete value fn (type _):
-    //     ./with_experiment.cue:17:4
-  }
-  e: (#struct){
-    y: (int){ int }
-    x: (int){ int }
-  }
-  foo: (struct){
-  }
-  x: (_){ _ }
-  y: (_){ _ }
-  fn: (_){ _ }
 }

@@ -6,7 +6,7 @@ t0: {
 	@test(err, code=eval, at=v,
 		contains="conflicting values",
 		args=[int, string],
-		pos=[-3:4, -2:4, 1:5, 1:9])
+		pos=[-3:4, -2:4, 5:5, 5:9])
 	v: i & s
 }
 
@@ -14,7 +14,7 @@ t1: {
 	@test(err, code=eval, at=x.a.b,
 		contains="conflicting values",
 		args=[3, 4],
-		pos=[2:9, 6:9, 9:5, 9:11])
+		pos=[6:9, 10:9, 13:5, 13:11])
 	#d1: {
 		a: b: 3
 	}
@@ -34,13 +34,13 @@ t1: {
 [eval] t0.v: conflicting values string and int (mismatched types string and int):
     ./in.cue:1:4
     ./in.cue:2:4
-    ./in.cue:5:5
-    ./in.cue:5:9
+    ./in.cue:9:5
+    ./in.cue:9:9
 [eval] t1.x.a.b: conflicting values 4 and 3:
-    ./in.cue:10:9
-    ./in.cue:14:9
-    ./in.cue:17:5
-    ./in.cue:17:11
+    ./in.cue:18:9
+    ./in.cue:22:9
+    ./in.cue:25:5
+    ./in.cue:25:11
 -- out/eval/stats --
 Leaks:  0
 Freed:  15

@@ -260,14 +260,8 @@ func (p *NumInfo) scanNumber(seenDecimalPoint bool) error {
 				return p.errorf("illegal octal number %q", p.src)
 			}
 		default:
-			// int (base 8 or 10) or float
-			p.scanMantissa(8)
-			if p.ch == '8' || p.ch == '9' {
-				p.scanMantissa(10)
-				if p.ch != '.' && p.ch != 'e' && p.ch != 'E' {
-					return p.errorf("illegal integer number %q", p.src)
-				}
-			}
+			// 0 or float
+			seenDigits := p.scanMantissa(10)
 			switch p.ch {
 			case 'e', 'E':
 				if len(p.buf) == 0 {
@@ -277,8 +271,9 @@ func (p *NumInfo) scanNumber(seenDecimalPoint bool) error {
 			case '.':
 				goto fraction
 			}
-			if len(p.buf) > 0 {
-				p.base = 8
+			if seenDigits {
+				// integer other than 0 may not start with 0
+				return p.errorf("illegal integer number %q", p.src)
 			}
 		}
 		goto exit

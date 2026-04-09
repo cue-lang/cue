@@ -157,9 +157,8 @@ var unmarshalTests = []struct {
 		"not_octal_yaml12: 0o123456789",
 		`not_octal_yaml12: "0o123456789"`,
 	}, {
-		// TODO(mvdan): 01234 is not a valid numeric literal in CUE.
 		"float_octal_yaml11: !!float 01234",
-		"float_octal_yaml11: number & 01234",
+		"float_octal_yaml11: number & 0o1234",
 	}, {
 		"float_octal_yaml12: !!float 0o1234",
 		"float_octal_yaml12: number & 0o1234",

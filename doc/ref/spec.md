@@ -193,15 +193,14 @@ the token stream immediately after a line's final token if that token is
 - an ellipsis `...`
 
 
-Although commas are automatically inserted, the parser will require
-explicit commas between two list elements.
-
-<!--
-TODO: remove the above exception
--->
-
 To reflect idiomatic use, examples in this document elide commas using
 these rules.
+
+<!--
+Note: prior to v0.17.0, the parser required explicit commas between two
+list elements, even when automatic comma insertion would otherwise apply.
+That restriction has been lifted as of v0.17.0.
+-->
 
 
 ### Identifiers

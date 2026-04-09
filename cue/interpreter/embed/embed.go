@@ -166,6 +166,10 @@ type compiler struct {
 // validateAttr performs logical validation of the attr. It does not
 // perform any checks against a filesystem.
 func validateAttr(a *internal.Attr) (file, glob, typ string, allowEmptyGlob bool, errs errors.Error) {
+	if a.Err != nil {
+		return "", "", "", false, a.Err
+	}
+
 	pos := a.Pos
 
 	file, _, err := a.Lookup(0, "file")
@@ -434,47 +438,52 @@ func (c *compiler) decodeFile(file, scope string) (adt.Expr, errors.Error) {
 	return v, nil
 }
 
-// EmbeddedPaths validates the provided attributes as embed
-// attributes, returning a slice of [Embed] structs for attributes
+// EmbeddedPaths walks all the embed attributes in the given file,
+// returning a slice of [Embed] structs for attributes
 // that were successfully validated, and errors for those which were
 // not. The filepath should be the filepath of the file from which
 // these attributes were extracted, and relative to whatever root is
 // going to be used in calls to [Embed.Matches] and [Embed.FindAll].
-func EmbeddedPaths(filepath string, attrsByNode map[ast.Node][]*internal.Attr) ([]*Embed, errors.Error) {
-	if len(attrsByNode) == 0 {
+func EmbeddedPaths(filepath string, syntax *ast.File) ([]*Embed, errors.Error) {
+	extAttrs, err := runtime.ExternAttrsForFile(syntax)
+	if err != nil {
+		return nil, err
+	}
+	if extAttrs.TopLevel[EmbedKind] == nil {
 		return nil, nil
 	}
 	var errs errors.Error
-	embeds := make([]*Embed, 0, len(attrsByNode))
-	for node, attrs := range attrsByNode {
-		for _, attr := range attrs {
-			if attr.Err != nil {
-				errs = errors.Append(errs, attr.Err)
-				continue
+	var embeds []*Embed
+	for attr := range extAttrs.Body {
+		if attr.Attr.Name != EmbedKind {
+			continue
+		}
+		if err := attr.Attr.Err; err != nil {
+			errs = errors.Append(errs, err)
+			continue
+		}
+		file, glob, typ, allowEmptyGlob, err := validateAttr(attr.Attr)
+		if err != nil {
+			errs = errors.Append(errs, err)
+			continue
+		}
+		embed := &Embed{
+			Node:      attr.Parent,
+			Attribute: attr.Attr,
+			FilePath:  filepath,
+			Type:      typ,
+		}
+		if file != "" {
+			embed.interpreter = &embeddedFile{
+				filepath: file,
 			}
-			file, glob, typ, allowEmptyGlob, err := validateAttr(attr)
-			if err != nil {
-				errs = errors.Append(errs, err)
-				continue
+			embeds = append(embeds, embed)
+		} else if glob != "" {
+			embed.interpreter = &embeddedGlob{
+				glob:           glob,
+				allowEmptyGlob: allowEmptyGlob,
 			}
-			embed := &Embed{
-				Node:      node,
-				Attribute: attr,
-				FilePath:  filepath,
-				Type:      typ,
-			}
-			if file != "" {
-				embed.interpreter = &embeddedFile{
-					filepath: file,
-				}
-				embeds = append(embeds, embed)
-			} else if glob != "" {
-				embed.interpreter = &embeddedGlob{
-					glob:           glob,
-					allowEmptyGlob: allowEmptyGlob,
-				}
-				embeds = append(embeds, embed)
-			}
+			embeds = append(embeds, embed)
 		}
 	}
 	return embeds, errs

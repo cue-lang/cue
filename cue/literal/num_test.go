@@ -90,7 +90,6 @@ func TestNumbers(t *testing.T) {
 		{"0b11001000", "200", mkMul("11001000", 0, 2)},
 		{"0b1", "1", mkMul("1", 0, 2)},
 		{"0o755", "493", mkMul("755", 0, 8)},
-		{"0755", "493", mkMul("755", 0, 8)},
 	}
 	n := NumInfo{}
 	for i, tc := range testCases {
@@ -134,6 +133,8 @@ func TestNumErrors(t *testing.T) {
 		`0o`,
 		`0b`,
 		`0_`,
+		"0000",
+		"00",
 		"0128",
 		"e+100",
 		".p",

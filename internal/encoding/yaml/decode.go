@@ -813,9 +813,13 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		case ".nan", ".NaN", ".NAN":
 			value = "NaN"
 		default:
+			// Convert YAML 1.1 octal to CUE octal, like with !!int above.
+			if len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9' {
+				value = "0o" + value[1:]
+			}
 			var info literal.NumInfo
 			// We make the assumption that any valid YAML float literal will be a valid
-			// CUE float literal as well, with the only exception of Inf/NaN above.
+			// CUE float literal as well, with the only exception of Inf/NaN and octal above.
 			// Note that `!!float 123` is allowed.
 			if err := literal.ParseNum(value, &info); err != nil {
 				return nil, d.posErrorf(yn, "cannot decode %q as %s: %v", value, tag, err)

@@ -312,7 +312,8 @@ outer:
 }
 
 // Contains reports whether v is contained in a. The value must be a
-// comparable value.
+// comparable and concrete value.
+// For non-concrete values, you can use [MatchN] with >0.
 func Contains(a []cue.Value, v cue.Value) bool {
 	return slices.ContainsFunc(a, v.Equals)
 }

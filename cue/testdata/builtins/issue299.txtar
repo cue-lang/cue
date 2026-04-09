@@ -6,7 +6,7 @@ import "list"
 
 x: list.UniqueItems
 x: [string, ...string]
-x: ["x", "x"]
+x: ["x", "x"] @test(err, code=eval, contains="does not satisfy list.UniqueItems", pos=[-2:4, -1:4, 0:4])
 -- out/eval/stats --
 Leaks:  0
 Freed:  4
@@ -19,25 +19,11 @@ Conjuncts:    9
 Disjuncts:    0
 
 NumCloseIDs: 1
--- out/evalalpha --
-Errors:
-x: invalid value ["x","x"] (does not satisfy list.UniqueItems): equal value ("x") at position 0 and 1:
+-- out/errors.txt --
+[eval] x: invalid value ["x","x"] (does not satisfy list.UniqueItems): equal value ("x") at position 0 and 1:
     ./in.cue:3:4
     ./in.cue:4:4
     ./in.cue:5:4
-
-Result:
-(_|_){
-  // [eval]
-  x: (_|_){
-    // [eval] x: invalid value ["x","x"] (does not satisfy list.UniqueItems): equal value ("x") at position 0 and 1:
-    //     ./in.cue:3:4
-    //     ./in.cue:4:4
-    //     ./in.cue:5:4
-    0: (string){ "x" }
-    1: (string){ "x" }
-  }
-}
 -- out/compile --
 --- in.cue
 {

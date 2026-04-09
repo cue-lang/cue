@@ -1,55 +1,60 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- cue.mod/module.cue --
 module: "cuelang.org/error"
 language: version: "v0.15.0"
 -- in.cue --
 selection: {
-	dropError: 1 | error("drop me")
+	dropError: 1 | error("drop me") @test(eq, 1)
 
-	useCustomError: 1&2 | error("use me")
+	useCustomError: 1&2 | error("use me") @test(err, code=eval, contains="use me", pos=[0:24, 0:18, 0:20])
 
-	twoCustomErrors: 1&2 | error("error one") | error("error two")
+	twoCustomErrors: 1&2 | error("error one") | error("error two") @test(err, code=eval, contains="empty disjunction",
+		suberr=(code=eval, contains="error one", pos=[0:25]),
+		suberr=(code=eval, contains="error two", pos=[0:46]),
+	)
 
 	x: int
-	dropIncomplete: x + 1 | error("user msg: x + 1 failed")
+	dropIncomplete: x + 1 | error("user msg: x + 1 failed") @test(err, code=incomplete, contains="user msg: x + 1 failed", pos=[0:26, -1:5])
 }
 
 interpolation: {
 	a: {b: int}
-	world: "world"
+	world: "world" @test(eq, "world")
 
-	substituteAll: a.notExist | error("hello \(world)")
+	substituteAll: a.notExist | error("hello \(world)") @test(err, code=incomplete, contains="hello world", pos=[0:30])
 
-	substituteFail: a.b + 1 | a.notExist | error("reference failed: \(a.b) | \(a.notExist)")
+	substituteFail: a.b + 1 | a.notExist | error("reference failed: \(a.b) | \(a.notExist)") @test(err, code=incomplete, contains="reference failed:", pos=[0:41, -5:9, 0:77])
 
 	// When the error() message itself contains an error,
 	// the custom error should not be thrown away.
 	// For comparison, without interpolation:
 	errorNoInterpolation: "a" | "b" | error("custom")
-	errorNoInterpolation: "c"
+	errorNoInterpolation: "c" @test(err, code=eval, contains="custom", pos=[-1:36, -1:24, 0:24])
 
 	// When the struct interpolation fails, the custom error should
 	// still be shown rather than being replaced by the interpolation error.
 	errorStructInterpolation: "a" | "b" | error("custom: \({x: 1})")
-	errorStructInterpolation: "c"
+	errorStructInterpolation: "c" @test(err, code=eval, contains="custom: {x:1}", pos=[-1:40, -1:28, -1:57, 0:28])
 
 	// When the interpolation always results in an error, the custom
 	// error should still be shown.
 	errorBottomInterpolation: "a" | "b" | error("custom: \(1 & 2)")
-	errorBottomInterpolation: "c"
+	errorBottomInterpolation: "c" @test(err, code=eval, contains="custom: (1 & 2)", pos=[-1:40, -1:28, -1:57, 0:28])
 }
 indirect: {
-	x: error
-	y: x("msg")
+	x: error    @test(eq, error)
+	y: x("msg") @test(err, code=user, contains="msg", pos=[0:5])
 }
 -- incomplete.cue --
 import "struct"
 
 // The custom error should not alter the type of error.
-minFields: struct.MinFields(2) | error("should remain incomplete")
-maxFields: a: 1
+minFields: struct.MinFields(2) | error("should remain incomplete") @test(eq, struct.MinFields(2))
+maxFields: a: 1 @test(eq, 1)
 
-multi: struct.MinFields(2) | error("should remain incomplete") | error("second")
+multi: struct.MinFields(2) | error("should remain incomplete") | error("second") @test(err, code=incomplete,
+	pos=[0:8, 0:25, 4:8],
+	suberr=(code=eval, contains="should remain incomplete", pos=[0:30]),
+	suberr=(code=eval, contains="second", pos=[0:66]))
 multi: a: 1
 
 -- self.cue --
@@ -61,13 +66,14 @@ multi: a: 1
 errorSelf: {
 	v: "x" | "y" | error("bad: \(self)")
 	v: "z"
+	@test(err, code=eval, contains="bad:", pos=[1:17, 0:12, 1:5, 2:5])
 }
 -- issues.cue --
 // issue4001: Tests that error() text is shown correctly when the message uses
 // string concatenation with interpolation. https://cuelang.org/issue/4001
 issue4001: {
 	a: "b"
-	a: int | error("error: "+"a='\(a)'")
+	a: int | error("error: "+"a='\(a)'") @test(err, code=eval, contains="error: a='b'", pos=[0:11, -1:5, 0:5])
 }
 // issue3983: Tests that multiple error() disjunctions aggregate all user-defined
 // error messages correctly. https://cuelang.org/issue/3983
@@ -77,12 +83,17 @@ issue3983: {
 	x: <20 | error("I wanted less than 20")
 
 	x: 3
+	@test(err, code=eval, contains="2 errors in empty disjunction", pos=[2:5, 5:5],
+		suberr=(code=eval, contains="I wanted an integer", hint="this could be dropped"),
+		suberr=(code=eval, contains="I wanted more than 10"),
+		hint="we could also include the third condition, if we want to be consistent.",
+	)
 }
 // issue3984: Tests that error() shows all relevant source locations when the
 // error builtin is used in a disjunction. https://cuelang.org/issue/3984
 issue3984: {
 	v: "a" | error("must be a")
-	v: "b"
+	v: "b" @test(err, code=eval, contains="must be a", pos=[-1:11, -1:5, 0:5])
 }
 -- out/eval/stats --
 Leaks:  3
@@ -94,510 +105,71 @@ Retain: 0
 Unifications: 34
 Conjuncts:    91
 Disjuncts:    41
--- out/evalalpha --
-Errors:
-issue3983.x: 2 errors in empty disjunction::
-    ./issues.cue:11:5
-    ./issues.cue:14:5
-selection.twoCustomErrors: 2 errors in empty disjunction::
-    ./in.cue:6:19
-    ./in.cue:6:21
-selection.useCustomError: use me:
+-- out/errors.txt --
+[eval] selection.useCustomError: use me:
     ./in.cue:4:24
     ./in.cue:4:18
     ./in.cue:4:20
+[eval] selection.twoCustomErrors: 2 errors in empty disjunction::
+    ./in.cue:6:19
+    ./in.cue:6:21
 selection.twoCustomErrors: error one:
     ./in.cue:6:25
 selection.twoCustomErrors: error two:
     ./in.cue:6:46
-interpolation.errorNoInterpolation: custom:
-    ./in.cue:23:36
-    ./in.cue:23:24
-    ./in.cue:24:24
-interpolation.errorStructInterpolation: custom: {x:1}:
-    ./in.cue:28:40
-    ./in.cue:28:28
-    ./in.cue:28:57
-    ./in.cue:29:28
-interpolation.errorBottomInterpolation: custom: (1 & 2):
-    ./in.cue:33:40
-    ./in.cue:33:28
-    ./in.cue:33:57
-    ./in.cue:34:28
-indirect.y: msg:
-    ./in.cue:38:5
-issue4001.a: error: a='b':
+[incomplete] selection.dropIncomplete: user msg: x + 1 failed:
+    ./in.cue:12:26
+    ./in.cue:11:5
+[incomplete] interpolation.substituteAll: hello world:
+    ./in.cue:19:30
+[incomplete] interpolation.substituteFail: reference failed: int | a.notExist:
+    ./in.cue:21:41
+    ./in.cue:16:9
+    ./in.cue:21:77
+[eval] interpolation.errorNoInterpolation: custom:
+    ./in.cue:26:36
+    ./in.cue:26:24
+    ./in.cue:27:24
+[eval] interpolation.errorStructInterpolation: custom: {x:1}:
+    ./in.cue:31:40
+    ./in.cue:31:28
+    ./in.cue:31:57
+    ./in.cue:32:28
+[eval] interpolation.errorBottomInterpolation: custom: (1 & 2):
+    ./in.cue:36:40
+    ./in.cue:36:28
+    ./in.cue:36:57
+    ./in.cue:37:28
+[user] indirect.y: msg:
+    ./in.cue:41:5
+[incomplete] multi: 2 errors in empty disjunction::
+    ./incomplete.cue:7:8
+    ./incomplete.cue:7:25
+    ./incomplete.cue:11:8
+multi: should remain incomplete:
+    ./incomplete.cue:7:30
+multi: second:
+    ./incomplete.cue:7:66
+[eval] issue4001.a: error: a='b':
     ./issues.cue:5:11
     ./issues.cue:4:5
     ./issues.cue:5:5
+[eval] issue3983.x: 2 errors in empty disjunction::
+    ./issues.cue:11:5
+    ./issues.cue:14:5
 issue3983.x: I wanted an integer:
     ./issues.cue:10:11
 issue3983.x: I wanted more than 10:
     ./issues.cue:11:11
-issue3984.v: must be a:
-    ./issues.cue:19:11
-    ./issues.cue:19:5
-    ./issues.cue:20:5
-errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
+[eval] issue3984.v: must be a:
+    ./issues.cue:24:11
+    ./issues.cue:24:5
+    ./issues.cue:25:5
+[eval] errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
     ./self.cue:7:17
     ./self.cue:6:12
     ./self.cue:7:5
     ./self.cue:8:5
-
-Result:
-(_|_){
-  // [eval]
-  selection: (_|_){
-    // [eval]
-    dropError: (int){ 1 }
-    useCustomError: (_|_){
-      // [eval] selection.useCustomError: use me:
-      //     ./in.cue:4:24
-      //     ./in.cue:4:18
-      //     ./in.cue:4:20
-    }
-    twoCustomErrors: (_|_){
-      // [eval] selection.twoCustomErrors: 2 errors in empty disjunction::
-      //     ./in.cue:6:19
-      //     ./in.cue:6:21
-      // selection.twoCustomErrors: error one:
-      //     ./in.cue:6:25
-      // selection.twoCustomErrors: error two:
-      //     ./in.cue:6:46
-    }
-    x: (int){ int }
-    dropIncomplete: (_|_){
-      // [incomplete] selection.dropIncomplete: user msg: x + 1 failed:
-      //     ./in.cue:9:26
-      //     ./in.cue:8:5
-    }
-  }
-  interpolation: (_|_){
-    // [eval]
-    a: (struct){
-      b: (int){ int }
-    }
-    world: (string){ "world" }
-    substituteAll: (_|_){
-      // [incomplete] interpolation.substituteAll: hello world:
-      //     ./in.cue:16:30
-    }
-    substituteFail: (_|_){
-      // [incomplete] interpolation.substituteFail: reference failed: int | a.notExist:
-      //     ./in.cue:18:41
-      //     ./in.cue:13:9
-      //     ./in.cue:18:77
-    }
-    errorNoInterpolation: (_|_){
-      // [eval] interpolation.errorNoInterpolation: custom:
-      //     ./in.cue:23:36
-      //     ./in.cue:23:24
-      //     ./in.cue:24:24
-    }
-    errorStructInterpolation: (_|_){
-      // [eval] interpolation.errorStructInterpolation: custom: {x:1}:
-      //     ./in.cue:28:40
-      //     ./in.cue:28:28
-      //     ./in.cue:28:57
-      //     ./in.cue:29:28
-    }
-    errorBottomInterpolation: (_|_){
-      // [eval] interpolation.errorBottomInterpolation: custom: (1 & 2):
-      //     ./in.cue:33:40
-      //     ./in.cue:33:28
-      //     ./in.cue:33:57
-      //     ./in.cue:34:28
-    }
-  }
-  indirect: (_|_){
-    // [user]
-    x: (string){ error() }
-    y: (_|_){
-      // [user] indirect.y: msg:
-      //     ./in.cue:38:5
-    }
-  }
-  minFields: (struct){ struct.MinFields(2) }
-  maxFields: (struct){
-    a: (int){ 1 }
-  }
-  multi: (_|_){
-    // [incomplete] multi: 2 errors in empty disjunction::
-    //     ./incomplete.cue:7:8
-    //     ./incomplete.cue:7:25
-    //     ./incomplete.cue:8:8
-    // multi: should remain incomplete:
-    //     ./incomplete.cue:7:30
-    // multi: second:
-    //     ./incomplete.cue:7:66
-    a: (int){ 1 }
-  }
-  issue4001: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval] issue4001.a: error: a='b':
-      //     ./issues.cue:5:11
-      //     ./issues.cue:4:5
-      //     ./issues.cue:5:5
-    }
-  }
-  issue3983: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval] issue3983.x: 2 errors in empty disjunction::
-      //     ./issues.cue:11:5
-      //     ./issues.cue:14:5
-      // issue3983.x: I wanted an integer:
-      //     ./issues.cue:10:11
-      // issue3983.x: I wanted more than 10:
-      //     ./issues.cue:11:11
-    }
-  }
-  issue3984: (_|_){
-    // [eval]
-    v: (_|_){
-      // [eval] issue3984.v: must be a:
-      //     ./issues.cue:19:11
-      //     ./issues.cue:19:5
-      //     ./issues.cue:20:5
-    }
-  }
-  errorSelf: (_|_){
-    // [eval]
-    v: (_|_){
-      // [eval] errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
-      //     ./self.cue:7:17
-      //     ./self.cue:6:12
-      //     ./self.cue:7:5
-      //     ./self.cue:8:5
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,79 +1,116 @@
- Errors:
--selection.twoCustomErrors: 3 errors in empty disjunction:
--selection.twoCustomErrors: conflicting values 2 and 1:
--    ./in.cue:6:17
-+issue3983.x: 2 errors in empty disjunction::
-+    ./issues.cue:11:5
-+    ./issues.cue:14:5
-+selection.twoCustomErrors: 2 errors in empty disjunction::
-     ./in.cue:6:19
--selection.useCustomError: 2 errors in empty disjunction:
--selection.useCustomError: conflicting values 2 and 1:
--    ./in.cue:4:16
--    ./in.cue:4:18
-+    ./in.cue:6:21
- selection.useCustomError: use me:
--    ./in.cue:4:22
-+    ./in.cue:4:24
-+    ./in.cue:4:18
-+    ./in.cue:4:20
- selection.twoCustomErrors: error one:
--    ./in.cue:6:23
-+    ./in.cue:6:25
- selection.twoCustomErrors: error two:
--    ./in.cue:6:44
-+    ./in.cue:6:46
-+interpolation.errorNoInterpolation: custom:
-+    ./in.cue:23:36
-+    ./in.cue:23:24
-+    ./in.cue:24:24
-+interpolation.errorStructInterpolation: custom: {x:1}:
-+    ./in.cue:28:40
-+    ./in.cue:28:28
-+    ./in.cue:28:57
-+    ./in.cue:29:28
-+interpolation.errorBottomInterpolation: custom: (1 & 2):
-+    ./in.cue:33:40
-+    ./in.cue:33:28
-+    ./in.cue:33:57
-+    ./in.cue:34:28
- indirect.y: msg:
--    ./in.cue:22:5
-+    ./in.cue:38:5
-+issue4001.a: error: a='b':
-+    ./issues.cue:5:11
-+    ./issues.cue:4:5
-+    ./issues.cue:5:5
-+issue3983.x: I wanted an integer:
-+    ./issues.cue:10:11
-+issue3983.x: I wanted more than 10:
-+    ./issues.cue:11:11
-+issue3984.v: must be a:
-+    ./issues.cue:19:11
-+    ./issues.cue:19:5
-+    ./issues.cue:20:5
-+errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
-+    ./self.cue:7:17
-+    ./self.cue:6:12
-+    ./self.cue:7:5
-+    ./self.cue:8:5
- 
- Result:
- (_|_){
--  // [user]
-+  // [eval]
-   selection: (_|_){
--    // [user]
-+    // [eval]
-     dropError: (int){ 1 }
-     useCustomError: (_|_){
--      // [user] selection.useCustomError: 2 errors in empty disjunction:
--      // selection.useCustomError: conflicting values 2 and 1:
--      //     ./in.cue:4:16
-+      // [eval] selection.useCustomError: use me:
-+      //     ./in.cue:4:24
-       //     ./in.cue:4:18
--      // selection.useCustomError: use me:
--      //     ./in.cue:4:22
-+      //     ./in.cue:4:20
-     }
-     twoCustomErrors: (_|_){
--      // [user] selection.twoCustomErrors: 3 errors in empty disjunction:
--      // selection.twoCustomErrors: conflicting values 2 and 1:
--      //     ./in.cue:6:17
-+      // [eval] selection.twoCustomErrors: 2 errors in empty disjunction::
-       //     ./in.cue:6:19
-+      //     ./in.cue:6:21
-       // selection.twoCustomErrors: error one:
--      //     ./in.cue:6:23
-+      //     ./in.cue:6:25
-       // selection.twoCustomErrors: error two:
--      //     ./in.cue:6:44
-+      //     ./in.cue:6:46
-     }
-     x: (int){ int }
-     dropIncomplete: (_|_){
--      // [incomplete] selection.dropIncomplete: 2 errors in empty disjunction:
--      // selection.dropIncomplete: non-concrete value int in operand to +:
--      //     ./in.cue:9:18
--      //     ./in.cue:8:5
--      // selection.dropIncomplete: user msg: x + 1 failed:
-+      // [incomplete] selection.dropIncomplete: user msg: x + 1 failed:
-       //     ./in.cue:9:26
--    }
--  }
--  interpolation: (struct){
-+      //     ./in.cue:8:5
-+    }
-+  }
-+  interpolation: (_|_){
-+    // [eval]
-     a: (struct){
-       b: (int){ int }
-     }
-     world: (string){ "world" }
-     substituteAll: (_|_){
--      // [incomplete] interpolation.substituteAll: 2 errors in empty disjunction:
--      // interpolation.substituteAll: undefined field: notExist:
--      //     ./in.cue:16:19
--      // interpolation.substituteAll: hello world:
-+      // [incomplete] interpolation.substituteAll: hello world:
-       //     ./in.cue:16:30
-     }
-     substituteFail: (_|_){
--      // [incomplete] interpolation.substituteFail: 3 errors in empty disjunction:
--      // interpolation.substituteFail: non-concrete value int in operand to +:
--      //     ./in.cue:18:18
--      //     ./in.cue:13:9
--      // interpolation.substituteFail: undefined field: notExist:
--      //     ./in.cue:18:30
--      // interpolation.substituteFail: reference failed: int | a.notExist:
-+      // [incomplete] interpolation.substituteFail: reference failed: int | a.notExist:
-       //     ./in.cue:18:41
-       //     ./in.cue:13:9
-       //     ./in.cue:18:77
-     }
-+    errorNoInterpolation: (_|_){
-+      // [eval] interpolation.errorNoInterpolation: custom:
-+      //     ./in.cue:23:36
-+      //     ./in.cue:23:24
-+      //     ./in.cue:24:24
-+    }
-+    errorStructInterpolation: (_|_){
-+      // [eval] interpolation.errorStructInterpolation: custom: {x:1}:
-+      //     ./in.cue:28:40
-+      //     ./in.cue:28:28
-+      //     ./in.cue:28:57
-+      //     ./in.cue:29:28
-+    }
-+    errorBottomInterpolation: (_|_){
-+      // [eval] interpolation.errorBottomInterpolation: custom: (1 & 2):
-+      //     ./in.cue:33:40
-+      //     ./in.cue:33:28
-+      //     ./in.cue:33:57
-+      //     ./in.cue:34:28
-+    }
-   }
-   indirect: (_|_){
-     // [user]
-@@ -80,14 +117,62 @@
-     x: (string){ error() }
-     y: (_|_){
-       // [user] indirect.y: msg:
--      //     ./in.cue:22:5
--    }
-+      //     ./in.cue:38:5
-+    }
-+  }
-+  minFields: (struct){ struct.MinFields(2) }
-+  maxFields: (struct){
-+    a: (int){ 1 }
-+  }
-+  multi: (_|_){
-+    // [incomplete] multi: 2 errors in empty disjunction::
-+    //     ./incomplete.cue:7:8
-+    //     ./incomplete.cue:7:25
-+    //     ./incomplete.cue:8:8
-+    // multi: should remain incomplete:
-+    //     ./incomplete.cue:7:30
-+    // multi: second:
-+    //     ./incomplete.cue:7:66
-+    a: (int){ 1 }
-   }
-   issue4001: (_|_){
--    // [user]
-+    // [eval]
-     a: (_|_){
--      // [user] issue4001.a: error: a='b':
--      //     ./issue4001.cue:3:11
-+      // [eval] issue4001.a: error: a='b':
-+      //     ./issues.cue:5:11
-+      //     ./issues.cue:4:5
-+      //     ./issues.cue:5:5
-+    }
-+  }
-+  issue3983: (_|_){
-+    // [eval]
-+    x: (_|_){
-+      // [eval] issue3983.x: 2 errors in empty disjunction::
-+      //     ./issues.cue:11:5
-+      //     ./issues.cue:14:5
-+      // issue3983.x: I wanted an integer:
-+      //     ./issues.cue:10:11
-+      // issue3983.x: I wanted more than 10:
-+      //     ./issues.cue:11:11
-+    }
-+  }
-+  issue3984: (_|_){
-+    // [eval]
-+    v: (_|_){
-+      // [eval] issue3984.v: must be a:
-+      //     ./issues.cue:19:11
-+      //     ./issues.cue:19:5
-+      //     ./issues.cue:20:5
-+    }
-+  }
-+  errorSelf: (_|_){
-+    // [eval]
-+    v: (_|_){
-+      // [eval] errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
-+      //     ./self.cue:7:17
-+      //     ./self.cue:6:12
-+      //     ./self.cue:7:5
-+      //     ./self.cue:8:5
-     }
-   }
- }
--- out/eval --
-Errors:
-selection.twoCustomErrors: 3 errors in empty disjunction:
-selection.twoCustomErrors: conflicting values 2 and 1:
-    ./in.cue:6:17
-    ./in.cue:6:19
-selection.useCustomError: 2 errors in empty disjunction:
-selection.useCustomError: conflicting values 2 and 1:
-    ./in.cue:4:16
-    ./in.cue:4:18
-selection.useCustomError: use me:
-    ./in.cue:4:22
-selection.twoCustomErrors: error one:
-    ./in.cue:6:23
-selection.twoCustomErrors: error two:
-    ./in.cue:6:44
-indirect.y: msg:
-    ./in.cue:22:5
-
-Result:
-(_|_){
-  // [user]
-  selection: (_|_){
-    // [user]
-    dropError: (int){ 1 }
-    useCustomError: (_|_){
-      // [user] selection.useCustomError: 2 errors in empty disjunction:
-      // selection.useCustomError: conflicting values 2 and 1:
-      //     ./in.cue:4:16
-      //     ./in.cue:4:18
-      // selection.useCustomError: use me:
-      //     ./in.cue:4:22
-    }
-    twoCustomErrors: (_|_){
-      // [user] selection.twoCustomErrors: 3 errors in empty disjunction:
-      // selection.twoCustomErrors: conflicting values 2 and 1:
-      //     ./in.cue:6:17
-      //     ./in.cue:6:19
-      // selection.twoCustomErrors: error one:
-      //     ./in.cue:6:23
-      // selection.twoCustomErrors: error two:
-      //     ./in.cue:6:44
-    }
-    x: (int){ int }
-    dropIncomplete: (_|_){
-      // [incomplete] selection.dropIncomplete: 2 errors in empty disjunction:
-      // selection.dropIncomplete: non-concrete value int in operand to +:
-      //     ./in.cue:9:18
-      //     ./in.cue:8:5
-      // selection.dropIncomplete: user msg: x + 1 failed:
-      //     ./in.cue:9:26
-    }
-  }
-  interpolation: (struct){
-    a: (struct){
-      b: (int){ int }
-    }
-    world: (string){ "world" }
-    substituteAll: (_|_){
-      // [incomplete] interpolation.substituteAll: 2 errors in empty disjunction:
-      // interpolation.substituteAll: undefined field: notExist:
-      //     ./in.cue:16:19
-      // interpolation.substituteAll: hello world:
-      //     ./in.cue:16:30
-    }
-    substituteFail: (_|_){
-      // [incomplete] interpolation.substituteFail: 3 errors in empty disjunction:
-      // interpolation.substituteFail: non-concrete value int in operand to +:
-      //     ./in.cue:18:18
-      //     ./in.cue:13:9
-      // interpolation.substituteFail: undefined field: notExist:
-      //     ./in.cue:18:30
-      // interpolation.substituteFail: reference failed: int | a.notExist:
-      //     ./in.cue:18:41
-      //     ./in.cue:13:9
-      //     ./in.cue:18:77
-    }
-  }
-  indirect: (_|_){
-    // [user]
-    x: (string){ error() }
-    y: (_|_){
-      // [user] indirect.y: msg:
-      //     ./in.cue:22:5
-    }
-  }
-  issue4001: (_|_){
-    // [user]
-    a: (_|_){
-      // [user] issue4001.a: error: a='b':
-      //     ./issue4001.cue:3:11
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

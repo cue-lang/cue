@@ -88,6 +88,9 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 		q.numHash = i + 1
 	}
 	s := start[q.numHash:]
+	if len(s) == 0 {
+		return QuoteInfo{}, 0, 0, errSyntax
+	}
 	switch s[0] {
 	case '"', '\'':
 		q.char = s[0]

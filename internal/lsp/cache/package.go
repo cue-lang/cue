@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/interpreter/embed"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/eval"
 	"cuelang.org/go/internal/mod/modpkgload"
@@ -366,11 +365,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 			// files are added and removed from the file system. This is
 			// not possible with imported packages: an import spec always
 			// refers to exactly one package.
-			attrsByNode, err := runtime.ExtractAttrsByKind(syntax, embed.EmbedKind)
-			if err != nil {
-				errs = append(errs, err)
-			}
-			embeddedPaths, err := embed.EmbeddedPaths(modpkgFile.FilePath, attrsByNode)
+			embeddedPaths, err := embed.EmbeddedPaths(modpkgFile.FilePath, syntax)
 			if err != nil {
 				errs = append(errs, err)
 			}

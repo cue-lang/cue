@@ -1,13 +1,14 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 fatalArg: {
-	x: len("eee" + 'eee')
+	x: len("eee" + 'eee') @test(err, code=eval,
+		contains="invalid operands",
+		args= ["eee", 'eee', string, bytes], pos=[0:9, 0:17])
 }
 
 // don't call builtin for a permanent error of a child node
 fatalChild: {
 	#b: {}
-	x: and([{a: #b.c}])
+	x: and([{a: #b.c}]) @test(err, at=a, code=eval, contains="undefined field: c", pos=[0:17])
 }
 
 // allow incomplete child values. The error will persist after `and` is
@@ -15,7 +16,10 @@ fatalChild: {
 // complete later.
 okIncompleteChild: {
 	b: {}
-	x: and([{a: b.c}, {b: 1}])
+	x: and([{a: b.c}, {b: 1}]) @test(eq, {
+		a: _|_ @test(err, code=incomplete, contains="undefined field: c")
+		b: 1
+	})
 }
 -- issue3412.cue --
 // Tests that using and() in a pattern constraint with a definition
@@ -26,8 +30,11 @@ andInPattern: {
 	out: {
 		[and(#constraints)]: _
 		someKey: {}
-	}
-	#constraints: [=~"^.*$"]
+	} @test(eq, {
+		[=~"^.*$"]: _
+		someKey: {}
+	})
+	#constraints: [=~"^.*$"] @test(eq, [=~"^.*$"])
 }
 -- out/eval/stats --
 Leaks:  0
@@ -41,58 +48,14 @@ Conjuncts:    24
 Disjuncts:    0
 
 NumCloseIDs: 3
--- out/evalalpha --
-Errors:
-fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
+-- out/errors.txt --
+[eval] fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
     ./in.cue:2:9
     ./in.cue:2:17
-fatalChild.x.a: undefined field: c:
-    ./in.cue:8:17
-
-Result:
-(_|_){
-  // [eval]
-  fatalArg: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval] fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
-      //     ./in.cue:2:9
-      //     ./in.cue:2:17
-    }
-  }
-  fatalChild: (_|_){
-    // [eval]
-    #b: (#struct){
-    }
-    x: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval] fatalChild.x.a: undefined field: c:
-        //     ./in.cue:8:17
-      }
-    }
-  }
-  okIncompleteChild: (struct){
-    b: (struct){
-    }
-    x: (struct){
-      a: (_|_){
-        // [incomplete] okIncompleteChild.x.a: undefined field: c:
-        //     ./in.cue:16:16
-      }
-      b: (int){ 1 }
-    }
-  }
-  andInPattern: (struct){
-    out: (struct){
-      someKey: (struct){
-      }
-    }
-    #constraints: (#list){
-      0: (string){ =~"^.*$" }
-    }
-  }
-}
+[eval] fatalChild.x.a: undefined field: c:
+    ./in.cue:10:17
+[incomplete] okIncompleteChild.x.a: undefined field: c:
+    ./in.cue:18:16
 -- out/compile --
 --- in.cue
 {

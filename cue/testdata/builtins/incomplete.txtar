@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 import (
 	"list"
@@ -9,85 +8,92 @@ import (
 list1: {
 	// Note that Top is not incomplete, only its first element is.
 	// We allow FlattenN to proceed and pass on the incomplete values.
-	Out1: list.FlattenN(Top, 1)
-	Out2: [...] & list.FlattenN(Top, 1)
-	Out3: list.FlattenN(Top, 1) & [...]
+	Out1: list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	Out2: [...] & list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	Out3: list.FlattenN(Top, 1) & [...] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
 
 	// This evaluates to a list with an incomplete element.
 	Top: [
 		[for _, F in _Sub {F}],
-	]
+	] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
 
-	_Sub: a.b
+	_Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
 	a: {} // b does not
 }
 
 list2: {
-	Out1: list.FlattenN(_Top, 1)
-	Out2: [...] & list.FlattenN(_Top, 1)
-	Out3: list.FlattenN(_Top, 1) & [...]
+	Out1: list.FlattenN(_Top, 1)         @test(err, code=incomplete, contains="undefined field: b", pos=[9:10])
+	Out2: [...] & list.FlattenN(_Top, 1) @test(err, code=incomplete, contains="undefined field: b", pos=[8:10])
+	Out3: list.FlattenN(_Top, 1) & [...] @test(err, code=incomplete, contains="undefined field: b", pos=[7:10])
 
 	// This evaluates to a list with an incomplete element.
 	_Top: [
 		for _, F in #Sub {F},
-	]
+	] @test(err, code=incomplete, contains="undefined field: b", pos=[])
 
-	#Sub: a.b
+	#Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:10])
 
 	a: {} // b does not
 }
 
 value1: {
-	a: len('sf' | 'dd')
+	a: len('sf' | 'dd') @test(err, code=incomplete|eval,
+		hint="this can never be resolve so could be a permanent error"
+		contains="unresolved disjunction", pos=[0:5]) @test(err:todo, code=eval)
 }
 
 value2: {
 	len('sf' | 'dd')
+
+	@test(err, code=incomplete|eval,
+		hint="this can never be resolve so could be a permanent error"
+		contains="unresolved disjunction")
+	@test(err:todo, code=eval)
 }
 
 incompleteArgDecimalList: {
-	a: #a & {param: 123}
+	a: #a & {param: 123} @test(eq, {param: 123, transformed: 123, max: 123})
 	#a: {
 		param:       int
-		transformed: +param
-		max:         list.Max([transformed])
+		transformed: +param @test(err, code=incomplete, contains="operand param of '+' not concrete", pos=[0:17])
+		max:         list.Max([transformed]) @test(err, code=incomplete, contains="operand param of '+' not concrete", pos=[0:16, -1:17])
 	}
 }
 
 incompleteArgStringList: {
-	a: #a & {param: "123"}
+	a: #a & {param: "123"} @test(eq, {param: "123", transformed: "123", joined: "123"})
 	#a: {
 		param:       string
-		transformed: param + ""
-		joined:      strings.Join([transformed], "-")
+		transformed: param + "" @test(err, code=incomplete, contains="non-concrete value string in operand to +", pos=[0:16, -1:16])
+		joined:      strings.Join([transformed], "-") @test(err, code=incomplete, contains="non-concrete value string in operand to +", pos=[0:16, -2:16, -1:16])
 	}
 }
 
 incompleteList: {
 	x:       _
-	decimal: list.Max(x)
-	str:     strings.Join(x, "")
+	decimal: list.Max(x) @test(err, code=incomplete, contains="non-concrete list for argument 0", pos=[0:11])
+	str:     strings.Join(x, "") @test(err, code=incomplete, contains="non-concrete list for argument 0", pos=[0:11])
 }
 
 // TODO: add better error positions.
 incompleteListError: {
-	x:       y + []
+	x:       y + [] @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[0:11, 1:11])
 	y:       _
-	decimal: list.Max(x)
-	str:     strings.Join(x, "")
+	decimal: list.Max(x) @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[-2:11, -1:11])
+	str:     strings.Join(x, "") @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[-3:11, -2:11])
 }
 
 badListType: {
 	x:       2
-	decimal: list.Max(x)
-	str:     strings.Join(x, "")
+	decimal: list.Max(x) @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-1:11])
+	str:     strings.Join(x, "") @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-2:11])
 }
 
 badListError: {
-	x:       2 + y
+	x:       2 + y @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[0:11, 1:11])
 	y:       "foo"
-	decimal: list.Max(x)
-	str:     strings.Join(x, "")
+	decimal: list.Max(x) @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[-2:11, -1:11])
+	str:     strings.Join(x, "") @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[-3:11, -2:11])
 }
 
 // Issue #1095
@@ -98,7 +104,7 @@ multipleErrors: {
 			x: string
 			y: string
 		}
-		out: template.Execute("{{.x}} {{.y}}", params)
+		out: template.Execute("{{.x}} {{.y}}", params) @test(err, code=incomplete, contains="cannot convert non-concrete value string", pos=[0:8, -3:4])
 	}
 }
 -- out/eval/stats --
@@ -113,452 +119,72 @@ Conjuncts:    95
 Disjuncts:    4
 
 NumCloseIDs: 7
--- out/evalalpha --
-Errors:
-badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
+-- out/errors.txt --
+[incomplete] list1._Sub: undefined field: b:
+    ./in.cue:19:10
+[incomplete] list1._Sub: undefined field: b:
+    ./in.cue:19:10
+[incomplete] list1._Sub: undefined field: b:
+    ./in.cue:19:10
+[incomplete] list1._Sub: undefined field: b:
+    ./in.cue:19:10
+[incomplete] list1._Sub: undefined field: b:
+    ./in.cue:19:10
+[incomplete] list2.#Sub: undefined field: b:
+    ./in.cue:33:10
+[incomplete] list2.#Sub: undefined field: b:
+    ./in.cue:33:10
+[incomplete] list2.#Sub: undefined field: b:
+    ./in.cue:33:10
+[incomplete] list2.#Sub: undefined field: b:
+    ./in.cue:33:10
+[incomplete] list2.#Sub: undefined field: b:
+    ./in.cue:33:10
+[incomplete] value1.a: unresolved disjunction 'sf' | 'dd' (type bytes):
+    ./in.cue:39:5
+[incomplete] value2: unresolved disjunction 'sf' | 'dd' (type bytes):
+    ./in.cue:45:2
+[incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
+    ./in.cue:57:17
+[incomplete] incompleteArgDecimalList.#a.max: error in call to list.Max: operand param of '+' not concrete (was int):
+    ./in.cue:58:16
+    ./in.cue:57:17
+[incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
+    ./in.cue:66:16
+    ./in.cue:65:16
+[incomplete] incompleteArgStringList.#a.joined: error in call to strings.Join: non-concrete value string in operand to +:
+    ./in.cue:67:16
+    ./in.cue:65:16
+    ./in.cue:66:16
+[incomplete] incompleteList.decimal: error in call to list.Max: non-concrete list for argument 0:
+    ./in.cue:73:11
+[incomplete] incompleteList.str: error in call to strings.Join: non-concrete list for argument 0:
+    ./in.cue:74:11
+[incomplete] incompleteListError.x: non-concrete value _ in operand to +:
     ./in.cue:79:11
-badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
+    ./in.cue:80:11
+[incomplete] incompleteListError.x: non-concrete value _ in operand to +:
     ./in.cue:79:11
-badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-    ./in.cue:85:11
+    ./in.cue:80:11
+[incomplete] incompleteListError.x: non-concrete value _ in operand to +:
+    ./in.cue:79:11
+    ./in.cue:80:11
+[eval] badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
     ./in.cue:86:11
-
-Result:
-(_|_){
-  // [eval]
-  list1: (struct){
-    Out1: (#list){
-      0: (_|_){
-        // [incomplete] list1._Sub: undefined field: b:
-        //     ./in.cue:19:10
-      }
-    }
-    Out2: (#list){
-      0: (_|_){
-        // [incomplete] list1._Sub: undefined field: b:
-        //     ./in.cue:19:10
-      }
-    }
-    Out3: (#list){
-      0: (_|_){
-        // [incomplete] list1._Sub: undefined field: b:
-        //     ./in.cue:19:10
-      }
-    }
-    Top: (#list){
-      0: (_|_){
-        // [incomplete] list1._Sub: undefined field: b:
-        //     ./in.cue:19:10
-      }
-    }
-    _Sub: (_|_){
-      // [incomplete] list1._Sub: undefined field: b:
-      //     ./in.cue:19:10
-    }
-    a: (struct){
-    }
-  }
-  list2: (struct){
-    Out1: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    Out2: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    Out3: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    _Top: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    #Sub: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    a: (struct){
-    }
-  }
-  value1: (struct){
-    a: (_|_){
-      // [incomplete] value1.a: unresolved disjunction 'sf' | 'dd' (type bytes):
-      //     ./in.cue:39:5
-    }
-  }
-  value2: (_|_){
-    // [incomplete] value2: unresolved disjunction 'sf' | 'dd' (type bytes):
-    //     ./in.cue:43:2
-  }
-  incompleteArgDecimalList: (struct){
-    a: (#struct){
-      param: (int){ 123 }
-      transformed: (int){ 123 }
-      max: (int){ 123 }
-    }
-    #a: (#struct){
-      param: (int){ int }
-      transformed: (_|_){
-        // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
-        //     ./in.cue:50:17
-      }
-      max: (_|_){
-        // [incomplete] incompleteArgDecimalList.#a.max: error in call to list.Max: operand param of '+' not concrete (was int):
-        //     ./in.cue:51:16
-        //     ./in.cue:50:17
-      }
-    }
-  }
-  incompleteArgStringList: (struct){
-    a: (#struct){
-      param: (string){ "123" }
-      transformed: (string){ "123" }
-      joined: (string){ "123" }
-    }
-    #a: (#struct){
-      param: (string){ string }
-      transformed: (_|_){
-        // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
-        //     ./in.cue:59:16
-        //     ./in.cue:58:16
-      }
-      joined: (_|_){
-        // [incomplete] incompleteArgStringList.#a.joined: error in call to strings.Join: non-concrete value string in operand to +:
-        //     ./in.cue:60:16
-        //     ./in.cue:58:16
-        //     ./in.cue:59:16
-      }
-    }
-  }
-  incompleteList: (struct){
-    x: (_){ _ }
-    decimal: (_|_){
-      // [incomplete] incompleteList.decimal: error in call to list.Max: non-concrete list for argument 0:
-      //     ./in.cue:66:11
-    }
-    str: (_|_){
-      // [incomplete] incompleteList.str: error in call to strings.Join: non-concrete list for argument 0:
-      //     ./in.cue:67:11
-    }
-  }
-  incompleteListError: (struct){
-    x: (_|_){
-      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:72:11
-      //     ./in.cue:73:11
-    }
-    y: (_){ _ }
-    decimal: (_|_){
-      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:72:11
-      //     ./in.cue:73:11
-    }
-    str: (_|_){
-      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:72:11
-      //     ./in.cue:73:11
-    }
-  }
-  badListType: (_|_){
-    // [eval]
-    x: (int){ 2 }
-    decimal: (_|_){
-      // [eval] badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
-      //     ./in.cue:79:11
-    }
-    str: (_|_){
-      // [eval] badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
-      //     ./in.cue:79:11
-    }
-  }
-  badListError: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:85:11
-      //     ./in.cue:86:11
-    }
-    y: (string){ "foo" }
-    decimal: (_|_){
-      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:85:11
-      //     ./in.cue:86:11
-    }
-    str: (_|_){
-      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:85:11
-      //     ./in.cue:86:11
-    }
-  }
-  multipleErrors: (struct){
-    #T: (#struct){
-      params: (#struct){
-        x: (string){ string }
-        y: (string){ string }
-      }
-      out: (_|_){
-        // [incomplete] multipleErrors.#T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
-        //     ./in.cue:99:8
-        //     ./in.cue:96:4
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -89,7 +89,8 @@
-         //     ./in.cue:50:17
-       }
-       max: (_|_){
--        // [incomplete] incompleteArgDecimalList.#a.0: operand param of '+' not concrete (was int):
-+        // [incomplete] incompleteArgDecimalList.#a.max: error in call to list.Max: operand param of '+' not concrete (was int):
-+        //     ./in.cue:51:16
-         //     ./in.cue:50:17
-       }
-     }
-@@ -108,9 +109,10 @@
-         //     ./in.cue:58:16
-       }
-       joined: (_|_){
--        // [incomplete] incompleteArgStringList.#a.0: non-concrete value string in operand to +:
--        //     ./in.cue:59:16
--        //     ./in.cue:58:16
-+        // [incomplete] incompleteArgStringList.#a.joined: error in call to strings.Join: non-concrete value string in operand to +:
-+        //     ./in.cue:60:16
-+        //     ./in.cue:58:16
-+        //     ./in.cue:59:16
-       }
-     }
-   }
-@@ -117,11 +119,11 @@
-   incompleteList: (struct){
-     x: (_){ _ }
-     decimal: (_|_){
--      // [incomplete] incompleteList.decimal: non-concrete list for argument 0:
-+      // [incomplete] incompleteList.decimal: error in call to list.Max: non-concrete list for argument 0:
-       //     ./in.cue:66:11
-     }
-     str: (_|_){
--      // [incomplete] incompleteList.str: non-concrete list for argument 0:
-+      // [incomplete] incompleteList.str: error in call to strings.Join: non-concrete list for argument 0:
-       //     ./in.cue:67:11
-     }
-   }
-@@ -129,15 +131,18 @@
-     x: (_|_){
-       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-       //     ./in.cue:72:11
-+      //     ./in.cue:73:11
-     }
-     y: (_){ _ }
-     decimal: (_|_){
-       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-       //     ./in.cue:72:11
--    }
--    str: (_|_){
--      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
--      //     ./in.cue:72:11
-+      //     ./in.cue:73:11
-+    }
-+    str: (_|_){
-+      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-+      //     ./in.cue:72:11
-+      //     ./in.cue:73:11
-     }
-   }
-   badListType: (_|_){
--- out/eval --
-Errors:
-badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
-    ./in.cue:79:11
-badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
-    ./in.cue:79:11
-badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-    ./in.cue:85:11
+[eval] badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
     ./in.cue:86:11
-
-Result:
-(_|_){
-  // [eval]
-  list1: (struct){
-    Out1: (#list){
-      0: (_|_){
-        // [incomplete] list1._Sub: undefined field: b:
-        //     ./in.cue:19:10
-      }
-    }
-    Out2: (#list){
-      0: (_|_){
-        // [incomplete] list1._Sub: undefined field: b:
-        //     ./in.cue:19:10
-      }
-    }
-    Out3: (#list){
-      0: (_|_){
-        // [incomplete] list1._Sub: undefined field: b:
-        //     ./in.cue:19:10
-      }
-    }
-    Top: (#list){
-      0: (_|_){
-        // [incomplete] list1._Sub: undefined field: b:
-        //     ./in.cue:19:10
-      }
-    }
-    _Sub: (_|_){
-      // [incomplete] list1._Sub: undefined field: b:
-      //     ./in.cue:19:10
-    }
-    a: (struct){
-    }
-  }
-  list2: (struct){
-    Out1: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    Out2: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    Out3: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    _Top: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    #Sub: (_|_){
-      // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:10
-    }
-    a: (struct){
-    }
-  }
-  value1: (struct){
-    a: (_|_){
-      // [incomplete] value1.a: unresolved disjunction 'sf' | 'dd' (type bytes):
-      //     ./in.cue:39:5
-    }
-  }
-  value2: (_|_){
-    // [incomplete] value2: unresolved disjunction 'sf' | 'dd' (type bytes):
-    //     ./in.cue:43:2
-  }
-  incompleteArgDecimalList: (struct){
-    a: (#struct){
-      param: (int){ 123 }
-      transformed: (int){ 123 }
-      max: (int){ 123 }
-    }
-    #a: (#struct){
-      param: (int){ int }
-      transformed: (_|_){
-        // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
-        //     ./in.cue:50:17
-      }
-      max: (_|_){
-        // [incomplete] incompleteArgDecimalList.#a.0: operand param of '+' not concrete (was int):
-        //     ./in.cue:50:17
-      }
-    }
-  }
-  incompleteArgStringList: (struct){
-    a: (#struct){
-      param: (string){ "123" }
-      transformed: (string){ "123" }
-      joined: (string){ "123" }
-    }
-    #a: (#struct){
-      param: (string){ string }
-      transformed: (_|_){
-        // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
-        //     ./in.cue:59:16
-        //     ./in.cue:58:16
-      }
-      joined: (_|_){
-        // [incomplete] incompleteArgStringList.#a.0: non-concrete value string in operand to +:
-        //     ./in.cue:59:16
-        //     ./in.cue:58:16
-      }
-    }
-  }
-  incompleteList: (struct){
-    x: (_){ _ }
-    decimal: (_|_){
-      // [incomplete] incompleteList.decimal: non-concrete list for argument 0:
-      //     ./in.cue:66:11
-    }
-    str: (_|_){
-      // [incomplete] incompleteList.str: non-concrete list for argument 0:
-      //     ./in.cue:67:11
-    }
-  }
-  incompleteListError: (struct){
-    x: (_|_){
-      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:72:11
-    }
-    y: (_){ _ }
-    decimal: (_|_){
-      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:72:11
-    }
-    str: (_|_){
-      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:72:11
-    }
-  }
-  badListType: (_|_){
-    // [eval]
-    x: (int){ 2 }
-    decimal: (_|_){
-      // [eval] badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
-      //     ./in.cue:79:11
-    }
-    str: (_|_){
-      // [eval] badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
-      //     ./in.cue:79:11
-    }
-  }
-  badListError: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:85:11
-      //     ./in.cue:86:11
-    }
-    y: (string){ "foo" }
-    decimal: (_|_){
-      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:85:11
-      //     ./in.cue:86:11
-    }
-    str: (_|_){
-      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:85:11
-      //     ./in.cue:86:11
-    }
-  }
-  multipleErrors: (struct){
-    #T: (#struct){
-      params: (#struct){
-        x: (string){ string }
-        y: (string){ string }
-      }
-      out: (_|_){
-        // [incomplete] multipleErrors.#T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
-        //     ./in.cue:99:8
-        //     ./in.cue:96:4
-      }
-    }
-  }
-}
+[eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
+    ./in.cue:92:11
+    ./in.cue:93:11
+[eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
+    ./in.cue:92:11
+    ./in.cue:93:11
+[eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
+    ./in.cue:92:11
+    ./in.cue:93:11
+[incomplete] multipleErrors.#T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
+    ./in.cue:106:8
+    ./in.cue:103:4
 -- out/compile --
 --- in.cue
 {

@@ -1,10 +1,9 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 a: close({
 	a: b: int
 })
 
-b: a & {x:    int} // err
+b: a & {x:    int @test(err, code=eval, contains="field not allowed", pos=[])} // err
 c: a & {a: c: int} // okay (non-recursive close)
 
 inDisjunctions: {
@@ -17,6 +16,35 @@ inDisjunctions: {
 	x: socket: string: {}
 	x: syslog: x.socket
 	x: syslog: xxx: {}
+
+	@test(eq, {
+		x: {
+			socket: string: {
+				a: b: true
+				uint: a: b: true
+			} | {
+				a: b: true
+				string: a: b: true
+			}
+			syslog: {
+				string: {
+					a: b: true
+					uint: a: b: true
+				} | {
+					a: b: true
+					string: a: b: true
+				}
+				xxx: {
+					a: b: true
+					uint: a: b: true
+				} | {
+					a: b: true
+					string: a: b: true
+				}
+			}
+		}
+		#Def: {}
+	})
 }
 
 // issue642: Tests that close() with merged struct patterns (concrete fields and
@@ -27,10 +55,24 @@ issue642: {
 		b: x: _
 	} & {
 		[string]: y: _
-	})
+	}) @test(closed)
 
 	test: a: x: _
 	test: b: x: _
+
+	@test(eq, {
+		test: {
+			[string]: y: _
+			a: {
+				y: _
+				x: _
+			}
+			b: {
+				x: _
+				y: _
+			}
+		}
+	})
 }
 
 // Issue 642
@@ -43,16 +85,30 @@ withSubfields: {
 
 	test: a: x: _
 	test: b: x: _
+
+	@test(eq, {
+		test: {
+			[string]: y: _
+			a: {
+				y: _
+				x: _
+			}
+			b: {
+				x: _
+				y: _
+			}
+		}
+	})
 }
 
 // issue3572: Tests that close({...}) allows additional fields when unified
 // with an open struct. https://cuelang.org/issue/3572
 issue3572: {
-  t1: close({...}) & {a: 5}
+  t1: close({...}) & {a: 5} @test(eq, {a: 5}) @test(closed)
 
-  e: close({...})
+  e: close({...}) @test(closed) // TODO: @test(allows=expr)
 
-  t2: e & {a: 5}
+  t2: e & {a: 5} @test(eq, {a: 5}) @test(closed)
 }
 
 // issue3580: Tests that close() does not panic when a field inside the closed
@@ -61,42 +117,52 @@ issue3580: {
 	x: close({
 		a: _
 		b: x.a
-	})
+	}) @test(closed)
 }
 -- embed.cue --
 nestedEmbedded: base: {
 	close({ foo?: close({ foo?: _ }) })
 	foo: allowed: 5
+
+	@test(eq, { foo: { allowed: 5, foo?: _ } })
 }
 nestedEmbedded: t1: {
 	{ close({ foo?: close({ foo?: _ }) }) }
 	foo: allowed: 5
+
+	@test(eq, { foo: { allowed: 5, foo?: _ } })
 }
 nestedEmbedded: t2: {
 	{{ close({ foo?: close({ foo?: _ }) }) }}
 	foo: allowed: 5
+
+	@test(eq, { foo: { allowed: 5, foo?: _ } })
 }
 unified: base: {
 	x: close({ foo?: close({ foo?: _ }) })
-	x: foo: disallowed: 5
+	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
 unified: t1: {
 	x: { close({ foo?: close({ foo?: _ }) }) }
-	x: foo: disallowed: 5
+	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
 unified: t2: {
 	x: {{ close({ foo?: close({ foo?: _ }) }) }}
-	x: foo: disallowed: 5
+	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
 nestedWithSelfReference: t1: {
-	_schema: close({ foo?: _schema })
+	_schema: close({
+		foo?: _schema @test(err, code="structural cycle") @test(shareID=S)
+	})
 	x: {_schema}
-	x: foo: disallowed: 5
+	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
 nestedWithSelfReference: t2: {
-	_schema: close({ foo?: _schema })
+	_schema: close({
+		foo?: _schema @test(err, code="structural cycle")
+	})
 	x: {{_schema}}
-	x: foo: disallowed: 5
+	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
 -- out/eval/stats --
 Leaks:  0
@@ -115,884 +181,25 @@ ConjunctInfos:       239
 MaxConjunctInfos:    5
 MaxReqSets:          6
 MaxRedirect:         2
--- out/evalalpha --
-Errors:
-b.x: field not allowed:
+-- out/errors.txt --
+[eval] unified.base.x.foo.disallowed: field not allowed:
+    ./embed.cue:21:10
+[eval] unified.t1.x.foo.disallowed: field not allowed:
+    ./embed.cue:25:10
+[eval] unified.t2.x.foo.disallowed: field not allowed:
+    ./embed.cue:29:10
+[structural cycle] nestedWithSelfReference.t1._schema.foo: structural cycle
+[eval] nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
+    ./embed.cue:36:10
+[structural cycle] nestedWithSelfReference.t2._schema.foo: structural cycle
+[eval] nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
+    ./embed.cue:43:10
+[eval] b.x: field not allowed:
     ./in.cue:5:9
-nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
-    ./embed.cue:28:10
-nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
-    ./embed.cue:33:10
-unified.base.x.foo.disallowed: field not allowed:
-    ./embed.cue:15:10
-unified.t1.x.foo.disallowed: field not allowed:
-    ./embed.cue:19:10
-unified.t2.x.foo.disallowed: field not allowed:
-    ./embed.cue:23:10
-
-Result:
-(_|_){
-  // [eval]
-  nestedEmbedded: (struct){
-    base: (#struct){
-      foo: (#struct){
-        allowed: (int){ 5 }
-        foo?: (_){ _ }
-      }
-    }
-    t1: (#struct){
-      foo: (#struct){
-        allowed: (int){ 5 }
-        foo?: (_){ _ }
-      }
-    }
-    t2: (#struct){
-      foo: (#struct){
-        allowed: (int){ 5 }
-        foo?: (_){ _ }
-      }
-    }
-  }
-  unified: (_|_){
-    // [eval]
-    base: (_|_){
-      // [eval]
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          disallowed: (_|_){
-            // [eval] unified.base.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:15:10
-          }
-          foo?: (_){ _ }
-        }
-      }
-    }
-    t1: (_|_){
-      // [eval]
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          disallowed: (_|_){
-            // [eval] unified.t1.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:19:10
-          }
-          foo?: (_){ _ }
-        }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          disallowed: (_|_){
-            // [eval] unified.t2.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:23:10
-          }
-          foo?: (_){ _ }
-        }
-      }
-    }
-  }
-  nestedWithSelfReference: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      _schema: (#struct){
-        foo?: (_|_){
-          // [structural cycle] nestedWithSelfReference.t1._schema.foo: structural cycle
-        }
-      }
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          disallowed: (_|_){
-            // [eval] nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:28:10
-          }
-          foo?: ~(nestedWithSelfReference.t1._schema)
-        }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      _schema: (#struct){
-        foo?: (_|_){
-          // [structural cycle] nestedWithSelfReference.t2._schema.foo: structural cycle
-        }
-      }
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          disallowed: (_|_){
-            // [eval] nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:33:10
-          }
-          foo?: ~(nestedWithSelfReference.t2._schema)
-        }
-      }
-    }
-  }
-  a: (#struct){
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  b: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval] b.x: field not allowed:
-      //     ./in.cue:5:9
-    }
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  c: (#struct){
-    a: (struct){
-      c: (int){ int }
-      b: (int){ int }
-    }
-  }
-  inDisjunctions: (struct){
-    x: (struct){
-      socket: (#struct){
-        string: (#struct){ |((#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1 = ~(inDisjunctions.x.socket.string.a)
-            uint: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }, (#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1 = ~(inDisjunctions.x.socket.string.a)
-            string: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }) }
-      }
-      syslog: (#struct){
-        xxx: (#struct){ |((#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
-            uint: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }, (#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
-            string: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }) }
-        string: (#struct){ |((#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1 = ~(inDisjunctions.x.syslog.string.a)
-            uint: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }, (#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1 = ~(inDisjunctions.x.syslog.string.a)
-            string: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }) }
-      }
-    }
-    #Def: (#struct){
-    }
-  }
-  issue642: (struct){
-    test: (#struct){
-      a: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-      b: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-    }
-  }
-  withSubfields: (struct){
-    test: (#struct){
-      a: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-      b: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-    }
-  }
-  issue3572: (struct){
-    t1: (#struct){
-      a: (int){ 5 }
-    }
-    e: (#struct){
-    }
-    t2: (#struct){
-      a: (int){ 5 }
-    }
-  }
-  issue3580: (struct){
-    x: (#struct){
-      a: (_){ _ }
-      b: (_){ _ }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,33 +1,15 @@
- Errors:
- b.x: field not allowed:
--    ./in.cue:1:10
--    ./in.cue:5:4
-     ./in.cue:5:9
- nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
--    ./embed.cue:26:17
--    ./embed.cue:26:25
--    ./embed.cue:27:6
-     ./embed.cue:28:10
- nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
--    ./embed.cue:31:17
--    ./embed.cue:31:25
--    ./embed.cue:32:6
--    ./embed.cue:32:7
-     ./embed.cue:33:10
- unified.base.x.foo.disallowed: field not allowed:
--    ./embed.cue:14:11
--    ./embed.cue:14:25
-     ./embed.cue:15:10
- unified.t1.x.foo.disallowed: field not allowed:
--    ./embed.cue:18:7
--    ./embed.cue:18:13
--    ./embed.cue:18:27
-     ./embed.cue:19:10
- unified.t2.x.foo.disallowed: field not allowed:
--    ./embed.cue:22:6
--    ./embed.cue:22:8
--    ./embed.cue:22:14
--    ./embed.cue:22:28
-     ./embed.cue:23:10
- 
- Result:
-@@ -36,20 +18,20 @@
-   nestedEmbedded: (struct){
-     base: (#struct){
-       foo: (#struct){
--        foo?: (_){ _ }
--        allowed: (int){ 5 }
--      }
--    }
--    t1: (#struct){
--      foo: (#struct){
--        foo?: (_){ _ }
--        allowed: (int){ 5 }
--      }
--    }
--    t2: (#struct){
--      foo: (#struct){
--        foo?: (_){ _ }
--        allowed: (int){ 5 }
-+        allowed: (int){ 5 }
-+        foo?: (_){ _ }
-+      }
-+    }
-+    t1: (#struct){
-+      foo: (#struct){
-+        allowed: (int){ 5 }
-+        foo?: (_){ _ }
-+      }
-+    }
-+    t2: (#struct){
-+      foo: (#struct){
-+        allowed: (int){ 5 }
-+        foo?: (_){ _ }
-       }
-     }
-   }
-@@ -61,48 +43,39 @@
-         // [eval]
-         foo: (_|_){
-           // [eval]
--          foo?: (_){ _ }
-           disallowed: (_|_){
-             // [eval] unified.base.x.foo.disallowed: field not allowed:
--            //     ./embed.cue:14:11
--            //     ./embed.cue:14:25
-             //     ./embed.cue:15:10
-           }
--        }
--      }
--    }
--    t1: (_|_){
--      // [eval]
--      x: (_|_){
--        // [eval]
--        foo: (_|_){
--          // [eval]
--          foo?: (_){ _ }
-+          foo?: (_){ _ }
-+        }
-+      }
-+    }
-+    t1: (_|_){
-+      // [eval]
-+      x: (_|_){
-+        // [eval]
-+        foo: (_|_){
-+          // [eval]
-           disallowed: (_|_){
-             // [eval] unified.t1.x.foo.disallowed: field not allowed:
--            //     ./embed.cue:18:7
--            //     ./embed.cue:18:13
--            //     ./embed.cue:18:27
-             //     ./embed.cue:19:10
-           }
--        }
--      }
--    }
--    t2: (_|_){
--      // [eval]
--      x: (_|_){
--        // [eval]
--        foo: (_|_){
--          // [eval]
--          foo?: (_){ _ }
-+          foo?: (_){ _ }
-+        }
-+      }
-+    }
-+    t2: (_|_){
-+      // [eval]
-+      x: (_|_){
-+        // [eval]
-+        foo: (_|_){
-+          // [eval]
-           disallowed: (_|_){
-             // [eval] unified.t2.x.foo.disallowed: field not allowed:
--            //     ./embed.cue:22:6
--            //     ./embed.cue:22:8
--            //     ./embed.cue:22:14
--            //     ./embed.cue:22:28
-             //     ./embed.cue:23:10
-           }
-+          foo?: (_){ _ }
-         }
-       }
-     }
-@@ -120,16 +93,11 @@
-         // [eval]
-         foo: (_|_){
-           // [eval]
--          foo?: (_|_){
--            // [structural cycle] nestedWithSelfReference.t1.x.foo.foo: structural cycle
--          }
-           disallowed: (_|_){
-             // [eval] nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
--            //     ./embed.cue:26:17
--            //     ./embed.cue:26:25
--            //     ./embed.cue:27:6
-             //     ./embed.cue:28:10
-           }
-+          foo?: ~(nestedWithSelfReference.t1._schema)
-         }
-       }
-     }
-@@ -144,17 +112,11 @@
-         // [eval]
-         foo: (_|_){
-           // [eval]
--          foo?: (_|_){
--            // [structural cycle] nestedWithSelfReference.t2.x.foo.foo: structural cycle
--          }
-           disallowed: (_|_){
-             // [eval] nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
--            //     ./embed.cue:31:17
--            //     ./embed.cue:31:25
--            //     ./embed.cue:32:6
--            //     ./embed.cue:32:7
-             //     ./embed.cue:33:10
-           }
-+          foo?: ~(nestedWithSelfReference.t2._schema)
-         }
-       }
-     }
-@@ -166,20 +128,18 @@
-   }
-   b: (_|_){
-     // [eval]
--    a: (struct){
--      b: (int){ int }
--    }
-     x: (_|_){
-       // [eval] b.x: field not allowed:
--      //     ./in.cue:1:10
--      //     ./in.cue:5:4
-       //     ./in.cue:5:9
-     }
-+    a: (struct){
-+      b: (int){ int }
-+    }
-   }
-   c: (#struct){
-     a: (struct){
--      b: (int){ int }
-       c: (int){ int }
-+      b: (int){ int }
-     }
-   }
-   inDisjunctions: (struct){
-@@ -189,21 +149,17 @@
-             a: (#struct){
-               b: (bool){ true }
-             }
--            let X#1 = (#struct){
--              b: (bool){ true }
--            }
--            uint: (#struct){
--              a: (#struct){
--                b: (bool){ true }
--              }
--            }
--          }, (#struct){
--            a: (#struct){
--              b: (bool){ true }
--            }
--            let X#1 = (#struct){
--              b: (bool){ true }
--            }
-+            let X#1 = ~(inDisjunctions.x.socket.string.a)
-+            uint: (#struct){
-+              a: (#struct){
-+                b: (bool){ true }
-+              }
-+            }
-+          }, (#struct){
-+            a: (#struct){
-+              b: (bool){ true }
-+            }
-+            let X#1 = ~(inDisjunctions.x.socket.string.a)
-             string: (#struct){
-               a: (#struct){
-                 b: (bool){ true }
-@@ -212,42 +168,42 @@
-           }) }
-       }
-       syslog: (#struct){
--        string: (#struct){ |((#struct){
--            a: (#struct){
--              b: (bool){ true }
--            }
--            let X#1multi = 〈0;a〉
--            uint: (#struct){
--              a: (#struct){
--                b: (bool){ true }
--              }
--            }
--          }, (#struct){
--            a: (#struct){
--              b: (bool){ true }
--            }
--            let X#1multi = 〈0;a〉
--            string: (#struct){
--              a: (#struct){
--                b: (bool){ true }
--              }
--            }
--          }) }
-         xxx: (#struct){ |((#struct){
-             a: (#struct){
-               b: (bool){ true }
-             }
--            let X#1multi = 〈0;a〉
--            uint: (#struct){
--              a: (#struct){
--                b: (bool){ true }
--              }
--            }
--          }, (#struct){
--            a: (#struct){
--              b: (bool){ true }
--            }
--            let X#1multi = 〈0;a〉
-+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
-+            uint: (#struct){
-+              a: (#struct){
-+                b: (bool){ true }
-+              }
-+            }
-+          }, (#struct){
-+            a: (#struct){
-+              b: (bool){ true }
-+            }
-+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
-+            string: (#struct){
-+              a: (#struct){
-+                b: (bool){ true }
-+              }
-+            }
-+          }) }
-+        string: (#struct){ |((#struct){
-+            a: (#struct){
-+              b: (bool){ true }
-+            }
-+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
-+            uint: (#struct){
-+              a: (#struct){
-+                b: (bool){ true }
-+              }
-+            }
-+          }, (#struct){
-+            a: (#struct){
-+              b: (bool){ true }
-+            }
-+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
-             string: (#struct){
-               a: (#struct){
-                 b: (bool){ true }
--- diff/todo/p3 --
+-- out/diff-v2-v3.txt --
 Reordering
 Let differs.
--- out/eval --
-Errors:
-b.x: field not allowed:
-    ./in.cue:1:10
-    ./in.cue:5:4
-    ./in.cue:5:9
-nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
-    ./embed.cue:26:17
-    ./embed.cue:26:25
-    ./embed.cue:27:6
-    ./embed.cue:28:10
-nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
-    ./embed.cue:31:17
-    ./embed.cue:31:25
-    ./embed.cue:32:6
-    ./embed.cue:32:7
-    ./embed.cue:33:10
-unified.base.x.foo.disallowed: field not allowed:
-    ./embed.cue:14:11
-    ./embed.cue:14:25
-    ./embed.cue:15:10
-unified.t1.x.foo.disallowed: field not allowed:
-    ./embed.cue:18:7
-    ./embed.cue:18:13
-    ./embed.cue:18:27
-    ./embed.cue:19:10
-unified.t2.x.foo.disallowed: field not allowed:
-    ./embed.cue:22:6
-    ./embed.cue:22:8
-    ./embed.cue:22:14
-    ./embed.cue:22:28
-    ./embed.cue:23:10
-
-Result:
-(_|_){
-  // [eval]
-  nestedEmbedded: (struct){
-    base: (#struct){
-      foo: (#struct){
-        foo?: (_){ _ }
-        allowed: (int){ 5 }
-      }
-    }
-    t1: (#struct){
-      foo: (#struct){
-        foo?: (_){ _ }
-        allowed: (int){ 5 }
-      }
-    }
-    t2: (#struct){
-      foo: (#struct){
-        foo?: (_){ _ }
-        allowed: (int){ 5 }
-      }
-    }
-  }
-  unified: (_|_){
-    // [eval]
-    base: (_|_){
-      // [eval]
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          foo?: (_){ _ }
-          disallowed: (_|_){
-            // [eval] unified.base.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:14:11
-            //     ./embed.cue:14:25
-            //     ./embed.cue:15:10
-          }
-        }
-      }
-    }
-    t1: (_|_){
-      // [eval]
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          foo?: (_){ _ }
-          disallowed: (_|_){
-            // [eval] unified.t1.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:18:7
-            //     ./embed.cue:18:13
-            //     ./embed.cue:18:27
-            //     ./embed.cue:19:10
-          }
-        }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          foo?: (_){ _ }
-          disallowed: (_|_){
-            // [eval] unified.t2.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:22:6
-            //     ./embed.cue:22:8
-            //     ./embed.cue:22:14
-            //     ./embed.cue:22:28
-            //     ./embed.cue:23:10
-          }
-        }
-      }
-    }
-  }
-  nestedWithSelfReference: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      _schema: (#struct){
-        foo?: (_|_){
-          // [structural cycle] nestedWithSelfReference.t1._schema.foo: structural cycle
-        }
-      }
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          foo?: (_|_){
-            // [structural cycle] nestedWithSelfReference.t1.x.foo.foo: structural cycle
-          }
-          disallowed: (_|_){
-            // [eval] nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:26:17
-            //     ./embed.cue:26:25
-            //     ./embed.cue:27:6
-            //     ./embed.cue:28:10
-          }
-        }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      _schema: (#struct){
-        foo?: (_|_){
-          // [structural cycle] nestedWithSelfReference.t2._schema.foo: structural cycle
-        }
-      }
-      x: (_|_){
-        // [eval]
-        foo: (_|_){
-          // [eval]
-          foo?: (_|_){
-            // [structural cycle] nestedWithSelfReference.t2.x.foo.foo: structural cycle
-          }
-          disallowed: (_|_){
-            // [eval] nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
-            //     ./embed.cue:31:17
-            //     ./embed.cue:31:25
-            //     ./embed.cue:32:6
-            //     ./embed.cue:32:7
-            //     ./embed.cue:33:10
-          }
-        }
-      }
-    }
-  }
-  a: (#struct){
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  b: (_|_){
-    // [eval]
-    a: (struct){
-      b: (int){ int }
-    }
-    x: (_|_){
-      // [eval] b.x: field not allowed:
-      //     ./in.cue:1:10
-      //     ./in.cue:5:4
-      //     ./in.cue:5:9
-    }
-  }
-  c: (#struct){
-    a: (struct){
-      b: (int){ int }
-      c: (int){ int }
-    }
-  }
-  inDisjunctions: (struct){
-    x: (struct){
-      socket: (#struct){
-        string: (#struct){ |((#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1 = (#struct){
-              b: (bool){ true }
-            }
-            uint: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }, (#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1 = (#struct){
-              b: (bool){ true }
-            }
-            string: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }) }
-      }
-      syslog: (#struct){
-        string: (#struct){ |((#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1multi = 〈0;a〉
-            uint: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }, (#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1multi = 〈0;a〉
-            string: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }) }
-        xxx: (#struct){ |((#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1multi = 〈0;a〉
-            uint: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }, (#struct){
-            a: (#struct){
-              b: (bool){ true }
-            }
-            let X#1multi = 〈0;a〉
-            string: (#struct){
-              a: (#struct){
-                b: (bool){ true }
-              }
-            }
-          }) }
-      }
-    }
-    #Def: (#struct){
-    }
-  }
-  issue642: (struct){
-    test: (#struct){
-      a: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-      b: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-    }
-  }
-  withSubfields: (struct){
-    test: (#struct){
-      a: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-      b: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-    }
-  }
-  issue3572: (struct){
-    t1: (#struct){
-      a: (int){ 5 }
-    }
-    e: (#struct){
-    }
-    t2: (#struct){
-      a: (int){ 5 }
-    }
-  }
-  issue3580: (struct){
-    x: (#struct){
-      a: (_){ _ }
-      b: (_){ _ }
-    }
-  }
-}
+Verdict: cosmetic -- Field reordering; let binding differences. No semantic change.
 -- out/compile --
 --- embed.cue
 {

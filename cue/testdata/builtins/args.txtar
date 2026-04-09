@@ -1,4 +1,3 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 import (
 	"math"
@@ -12,11 +11,17 @@ issue3584: reduced: t1: {
 	ref: out
 	trigger: *1 | 2
 	out: strings.SliceRunes("ABC", 0, trigger)
+	@test(eq, {
+		ref:     "A"
+		trigger: *1 | 2
+		out:     "A"
+	})
 }
 
 issue3584: reduced: t2: {
 	x: math.Abs(y)
 	y: *6 | 5
+	@test(eq, {x: 6, y: *6 | 5})
 }
 -- out/eval/stats --
 Leaks:  0
@@ -28,22 +33,6 @@ Retain: 0
 Unifications: 10
 Conjuncts:    16
 Disjuncts:    4
--- out/evalalpha --
-(struct){
-  issue3584: (struct){
-    reduced: (struct){
-      t1: (struct){
-        ref: (string){ "A" }
-        trigger: (int){ |(*(int){ 1 }, (int){ 2 }) }
-        out: (string){ "A" }
-      }
-      t2: (struct){
-        x: (int){ 6 }
-        y: (int){ |(*(int){ 6 }, (int){ 5 }) }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

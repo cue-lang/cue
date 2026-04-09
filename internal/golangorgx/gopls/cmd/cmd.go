@@ -15,7 +15,6 @@ import (
 	"sort"
 	"strings"
 	"text/tabwriter"
-	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
@@ -37,9 +36,6 @@ type Application struct {
 	// the options configuring function to invoke when building a server
 	options func(*settings.Options)
 
-	// Support for remote LSP server.
-	Remote string `flag:"remote" help:"forward all commands to a remote lsp specified by this flag. With no special prefix, this is assumed to be a TCP address. If prefixed by 'unix;', the subsequent address is assumed to be a unix domain socket. If 'auto', or prefixed by 'auto;', the remote address is automatically resolved based on the executing environment."`
-
 	// Verbose enables verbose logging.
 	Verbose bool `flag:"v,verbose" help:"verbose output"`
 
@@ -55,10 +51,6 @@ type Application struct {
 func New(options func(*settings.Options)) *Application {
 	app := &Application{
 		options: options,
-
-		Serve: Serve{
-			RemoteListenTimeout: 1 * time.Minute,
-		},
 	}
 	app.Serve.app = app
 	return app
@@ -95,10 +87,6 @@ Command:
 `)
 	fmt.Fprint(w, "\nMain\t\n")
 	for _, c := range app.mainCommands() {
-		fmt.Fprintf(w, "  %s\t%s\n", c.Name(), c.ShortHelp())
-	}
-	fmt.Fprint(w, "\t\nFeatures\t\n")
-	for _, c := range app.featureCommands() {
 		fmt.Fprintf(w, "  %s\t%s\n", c.Name(), c.ShortHelp())
 	}
 	fmt.Fprint(w, "\nflags:\n")
@@ -197,10 +185,7 @@ func (app *Application) Run(ctx context.Context, args ...string) error {
 // command line.
 // The command is specified by the first non flag argument.
 func (app *Application) Commands() []tool.Application {
-	var commands []tool.Application
-	commands = append(commands, app.mainCommands()...)
-	commands = append(commands, app.featureCommands()...)
-	return commands
+	return app.mainCommands()
 }
 
 func (app *Application) mainCommands() []tool.Application {
@@ -210,8 +195,4 @@ func (app *Application) mainCommands() []tool.Application {
 		&apiJSON{app: app},
 		&licenses{app: app},
 	}
-}
-
-func (app *Application) featureCommands() []tool.Application {
-	return nil
 }

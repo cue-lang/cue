@@ -5,7 +5,6 @@
 package integration
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -13,15 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cmd"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/tool"
 	"cuelang.org/go/internal/lsp/cache"
 )
 
 var (
-	runSubprocessTests       = flag.Bool("enable_gopls_subprocess_tests", false, "run integration tests against a gopls subprocess (default: in-process)")
-	goplsBinaryPath          = flag.String("gopls_test_binary", "", "path to the gopls binary for use as a remote, for use with the -enable_gopls_subprocess_tests flag")
 	timeout                  = flag.Duration("timeout", defaultTimeout(), "if nonzero, default timeout for each integration test; defaults to GOPLS_INTEGRATION_TEST_TIMEOUT")
 	skipCleanup              = flag.Bool("skip_cleanup", false, "whether to skip cleaning up temp directories")
 	printGoroutinesOnFailure = flag.Bool("print_goroutines", false, "whether to print goroutines info on failure")
@@ -95,23 +90,13 @@ func (r RunMultiple) Run(t *testing.T, files string, f TestFunc) {
 func DefaultModes() Mode {
 	modes := Default
 	if !testing.Short() {
-		modes |= Experimental | Forwarded
-	}
-	if *runSubprocessTests {
-		modes |= SeparateProcess
+		modes |= Experimental
 	}
 	return modes
 }
 
 // Main sets up and tears down the shared integration test state.
 func Main(m *testing.M, hook func(*settings.Options)) {
-	// If this magic environment variable is set, run gopls instead of the test
-	// suite. See the documentation for runTestAsGoplsEnvvar for more details.
-	if os.Getenv(runTestAsGoplsEnvvar) == "true" {
-		tool.Main(context.Background(), cmd.New(hook), os.Args[1:])
-		os.Exit(0)
-	}
-
 	flag.Parse()
 
 	runner = &Runner{
@@ -120,15 +105,6 @@ func Main(m *testing.M, hook func(*settings.Options)) {
 		PrintGoroutinesOnFailure: *printGoroutinesOnFailure,
 		SkipCleanup:              *skipCleanup,
 		OptionsHook:              hook,
-	}
-
-	runner.goplsPath = *goplsBinaryPath
-	if runner.goplsPath == "" {
-		var err error
-		runner.goplsPath, err = os.Executable()
-		if err != nil {
-			panic(fmt.Sprintf("finding test binary path: %v", err))
-		}
 	}
 
 	dir, err := os.MkdirTemp("", "cue-lsp-test-")

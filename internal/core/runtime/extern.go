@@ -15,6 +15,8 @@
 package runtime
 
 import (
+	"iter"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -114,8 +116,8 @@ func (d *externDecorator) addFile(f *ast.File) (errs errors.Error) {
 	}
 	d.fileKinds[f.Pos().File()] = km
 
-	for kind, pos := range kinds {
-		if err := d.initCompiler(kind, pos); err != nil {
+	for kind, attr := range kinds {
+		if err := d.initCompiler(kind, attr.Pos); err != nil {
 			errs = errors.Append(errs, err)
 		}
 	}
@@ -127,7 +129,7 @@ func (d *externDecorator) addFile(f *ast.File) (errs errors.Error) {
 // declarations from the package directive onwards. It's an error if duplicate
 // @extern attributes for the same kind are found. decls == nil signals that
 // this file should be skipped.
-func findExternFileAttrs(f *ast.File) (kinds map[string]token.Pos, decls []ast.Decl, err errors.Error) {
+func findExternFileAttrs(f *ast.File) (kinds map[string]*internal.Attr, decls []ast.Decl, err errors.Error) {
 	var (
 		hasPkg    bool
 		p         int
@@ -166,14 +168,14 @@ loop:
 			}
 
 			if kinds == nil {
-				kinds = map[string]token.Pos{}
+				kinds = map[string]*internal.Attr{}
 			}
 			if _, ok := kinds[k]; ok {
 				err = errors.Append(err, errors.Newf(attr.Pos,
 					"duplicate @extern attribute for kind %q", k))
 				continue
 			}
-			kinds[k] = attr.Pos
+			kinds[k] = attr
 		}
 	}
 
@@ -228,51 +230,86 @@ func (d *externDecorator) initCompiler(kind string, pos token.Pos) errors.Error 
 	return nil
 }
 
-// ExtractAttrsByKind finds all the attributes of the given kind in
-// the given AST, parsing their bodies into [internal.Attr].
-func ExtractAttrsByKind(file *ast.File, kind string) (attrsByNode map[ast.Node][]*internal.Attr, errs errors.Error) {
+type ExternAttrs struct {
+	// TopLevel holds all the extern attributes declared
+	// before the package directive, e.g. @extern(embed)
+	TopLevel map[string]*internal.Attr
+
+	// Body holds a sequence of (node, attribute) pairs
+	// corresponding to all the extern attributes in the body
+	// of the file.
+	Body iter.Seq[ExternAttr]
+}
+
+type ExternAttr struct {
+	// TopLevel holds the top level @extern attribute for the attribute, for example @extern(embed).
+	// This is the same as ExternAttrs.TopLevel[TopLevel.Name].
+	TopLevel *internal.Attr
+
+	// Parent holds the parent AST node that contains the attribute.
+	// It's either a *ast.Field, *ast.StructLit, or *ast.File.
+	Parent ast.Node
+
+	// Attr holds the extern attribute itself.
+	Attr *internal.Attr
+}
+
+func ExternAttrsForFile(file *ast.File) (*ExternAttrs, errors.Error) {
 	kinds, decls, err := findExternFileAttrs(file)
-	if err != nil || len(decls) == 0 {
+	if err != nil {
 		return nil, err
 	}
-	if _, ok := kinds[kind]; !ok {
-		return nil, nil
-	}
+	return &ExternAttrs{
+		TopLevel: kinds,
+		Body: func(yield func(ExternAttr) bool) {
+			if len(kinds) > 0 {
+				walkExternFileAttrs(file, decls, kinds, yield)
+			}
+		},
+	}, nil
+}
 
-	nodeStack := []ast.Node{file}
-
+func walkExternFileAttrs(file *ast.File, decls []ast.Decl, kinds map[string]*internal.Attr, yield func(ExternAttr) bool) {
 	ast.Walk(&ast.File{Decls: decls}, func(n ast.Node) bool {
+		var elts []ast.Decl
+		parent := n
 		switch n := n.(type) {
 		case *ast.StructLit:
-			nodeStack = append(nodeStack, n)
-
-		case *ast.Field:
-			nodeStack = append(nodeStack, n.Value)
-
-		case *ast.Attribute:
-			if n.Name() != kind {
-				break
-			}
-
-			attrParsed := internal.ParseAttr(n)
-			parent := nodeStack[len(nodeStack)-1]
-			if attrsByNode == nil {
-				attrsByNode = make(map[ast.Node][]*internal.Attr)
-			}
-			attrsByNode[parent] = append(attrsByNode[parent], attrParsed)
-			return false
+			elts = n.Elts
+		case *ast.File:
+			parent = file
+			elts = n.Decls
+		default:
+			return true
 		}
-
+		for _, elt := range elts {
+			switch elt := elt.(type) {
+			case *ast.Attribute:
+				if !yieldAttr(elt, parent, kinds, yield) {
+					return false
+				}
+			case *ast.Field:
+				for _, attr := range elt.Attrs {
+					if !yieldAttr(attr, elt, kinds, yield) {
+						return false
+					}
+				}
+			}
+		}
 		return true
+	}, nil)
+}
 
-	}, func(n ast.Node) {
-		switch n.(type) {
-		case *ast.StructLit, *ast.Field:
-			nodeStack = nodeStack[:len(nodeStack)-1]
-		}
+func yieldAttr(attr *ast.Attribute, parent ast.Node, kinds map[string]*internal.Attr, yield func(ExternAttr) bool) bool {
+	toplevel := kinds[attr.Name()]
+	if toplevel == nil {
+		return true
+	}
+	return yield(ExternAttr{
+		TopLevel: toplevel,
+		Parent:   parent,
+		Attr:     internal.ParseAttr(attr),
 	})
-
-	return attrsByNode, errs
 }
 
 func (d *externDecorator) decorateConjunct(e adt.Elem, scope *adt.Vertex) {
@@ -367,4 +404,8 @@ func (d *externDecorator) externValue(astAttr *ast.Attribute, name string, kinds
 		return nil
 	}
 	return b
+}
+
+func ref[T any](x T) *T {
+	return &x
 }

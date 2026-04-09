@@ -1,0 +1,7 @@
+Code-Review+2: Matthew Sackman <matthew@cue.works>
+TryBot-Result+1: CUEcueckoo <cueckoo@cuelang.org>
+Submitted-by: Daniel Martí <mvdan@mvdan.cc>
+Submitted-at: Thu, 09 Apr 2026 15:50:16 +0000
+Reviewed-on: https://review.gerrithub.io/c/cue-lang/cue/+/1235220
+Project: cue-lang/cue
+Branch: refs/heads/master

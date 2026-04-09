@@ -404,34 +404,27 @@ func TestInlineRunner_ErrPos(t *testing.T) {
 		},
 		{
 			// Decl-attribute form inside a struct.
-			// Original source:
+			// Source (no stripping — @test attr is kept):
 			//   line 1: x: {
-			//   line 2: 	@test(err, pos=[1:5, 2:5])
+			//   line 2: 	@test(err, pos=[2:5, 3:5])
 			//   line 3: 	a: 1
 			//   line 4: 	a: 2
 			//   line 5: }
-			// After stripping the @test (line 2 removed):
-			//   line 1: x: {
-			//   line 2: 	a: 1
-			//   line 3: 	a: 2
-			//   line 4: }
-			// baseLine = sl.Lbrace.Line() - 0 = 1 (the "{" on line 1).
-			// deltaLine=1 → line 2 (a: 1), deltaLine=2 → line 3 (a: 2).
+			// baseLine = sl.Lbrace.Line() = 1 (the "{" on line 1).
+			// deltaLine=2 → line 3 (a: 1), deltaLine=3 → line 4 (a: 2).
 			name:    "decl attr pos relative",
-			archive: "-- test.cue --\nx: {\n\t@test(err, pos=[1:5, 2:5])\n\ta: 1\n\ta: 2\n}\n",
+			archive: "-- test.cue --\nx: {\n\t@test(err, pos=[2:5, 3:5])\n\ta: 1\n\ta: 2\n}\n",
 		},
 		{
 			// Decl-attribute at file-level with a conflict.
-			// Original source:
-			//   line 1: @test(err, pos=[0:4, 0:8])
+			// Source (no stripping — @test attr is kept):
+			//   line 1: @test(err, pos=[1:4, 1:8])
 			//   line 2: x: 1 & 2
-			// After stripping the @test (line 1 removed):
-			//   line 1: x: 1 & 2
-			// baseLine = 1 (original line of @test) - 0 = 1.
-			// deltaLine=0 → line 1 (x: 1 & 2).
-			// Positions: 1:4 and 1:8.
+			// baseLine = a.Pos().Line() = 1 (original line of @test).
+			// deltaLine=1 → line 2 (x: 1 & 2).
+			// Positions: 2:4 and 2:8.
 			name:    "file-level decl attr pos relative",
-			archive: "-- test.cue --\n@test(err, pos=[0:4, 0:8])\nx: 1 & 2\n",
+			archive: "-- test.cue --\n@test(err, pos=[1:4, 1:8])\nx: 1 & 2\n",
 		},
 		{
 			// Multiple fields: second field's baseLine accounts for

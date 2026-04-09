@@ -25,9 +25,9 @@ d: {
 }
 -- out/errors.txt --
 [incomplete] d: non-concrete value int in operand to >:
-    ./in.cue:15:5
-    ./in.cue:14:5
-    ./in.cue:15:2
+    ./in.cue:20:5
+    ./in.cue:19:5
+    ./in.cue:20:2
 -- out/compile --
 --- in.cue
 {

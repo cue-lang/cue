@@ -20,7 +20,9 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/internal/cuetdtest"
+	"github.com/go-quicktest/qt"
 )
 
 func TestAttributes(t *testing.T) {
@@ -225,64 +227,181 @@ func TestAttributeString(t *testing.T) {
 }
 
 func TestAttributeArg(t *testing.T) {
-	const config = `
-	a: 1 @foo(a,,d=1,e="x y","f g", with spaces ,  s=  spaces in value  )
-	`
+	type testArg struct {
+		key   string
+		value string
+		raw   string
+	}
+
 	testCases := []struct {
-		pos int
-		key string
-		val string
-		raw string
+		testName string
+		config   string
+		name     string
+		args     []testArg
 	}{{
-		pos: 0,
-		key: "a",
-		val: "",
-		raw: "a",
+		testName: "SimplePositional",
+		config:   `@foo(a)`,
+		name:     "foo",
+		args: []testArg{{
+			raw:   "a",
+			value: "a",
+		}},
 	}, {
-		pos: 1,
-		key: "",
-		val: "",
-		raw: "",
+		testName: "QuotedSimple",
+		config:   `@foo("a")`,
+		name:     "foo",
+		args: []testArg{{
+			raw:   `"a"`,
+			value: `"a"`,
+		}},
 	}, {
-		pos: 2,
-		key: "d",
-		val: "1",
-		raw: "d=1",
+		testName: "EmptyArg",
+		config:   `@foo()`,
+		name:     "foo",
+		args: []testArg{{
+			raw:   "",
+			value: "",
+		}},
 	}, {
-		pos: 3,
-		key: "e",
-		val: "x y",
-		raw: `e="x y"`,
+		testName: "EmptyMiddleArg",
+		config:   `@foo(a,,b)`,
+		name:     "foo",
+		args: []testArg{{
+			raw:   "a",
+			value: "a",
+		}, {
+			raw:   "",
+			value: "",
+		}, {
+			raw:   "b",
+			value: "b",
+		}},
 	}, {
-		pos: 4,
-		key: "f g",
-		val: "",
-		raw: `"f g"`,
+		testName: "KeyValue",
+		config:   `@foo(d=1)`,
+		name:     "foo",
+		args: []testArg{{
+			key:   "d",
+			value: "1",
+			raw:   "d=1",
+		}},
 	}, {
-		pos: 5,
-		key: "with spaces",
-		val: "",
-		raw: " with spaces ",
+		testName: "KeyWithQuotedValue",
+		config:   `@foo(d="1")`,
+		name:     "foo",
+		args: []testArg{{
+			key:   "d",
+			value: `"1"`,
+			raw:   `d="1"`,
+		}},
 	}, {
-		pos: 6,
-		key: "s",
-		val: "spaces in value",
-		raw: "  s=  spaces in value  ",
+		testName: "QuotedKey",
+		config:   `@foo("d"=1)`,
+		name:     "foo",
+		args: []testArg{{
+			key:   `"d"`,
+			value: `1`,
+			raw:   `"d"=1`,
+		}},
+	}, {
+		testName: "KeyQuotedValue",
+		config:   `@foo(e="x y")`,
+		name:     "foo",
+		args: []testArg{{
+			key:   "e",
+			value: `"x y"`,
+			raw:   `e="x y"`,
+		}},
+	}, {
+		testName: "KeyWithStructuredValue",
+		config: `@foo(   a = {
+something structured "}"
+})`,
+		name: "foo",
+		args: []testArg{{
+			key: "a",
+			value: `{
+something structured "}"
+}`,
+			raw: `   a = {
+something structured "}"
+}`,
+		}},
+	}, {
+		testName: "QuotedWithSpaces",
+		config:   `@foo("f g")`,
+		name:     "foo",
+		args: []testArg{{
+			raw:   `"f g"`,
+			value: `"f g"`,
+		}},
+	}, {
+		testName: "SpacesAroundValue",
+		config:   `@foo( with spaces )`,
+		name:     "foo",
+		args: []testArg{{
+			raw:   " with spaces ",
+			value: "with spaces",
+		}},
+	}, {
+		testName: "SpacesAroundKeyValue",
+		config:   `@foo(  s=  spaces in value  )`,
+		name:     "foo",
+		args: []testArg{{
+			key:   "s",
+			value: "spaces in value",
+			raw:   "  s=  spaces in value  ",
+		}},
+	}, {
+		testName: "MultipleArgs",
+		config:   `@foo(a,,d=1,e="x y","f g", with spaces ,  s=  spaces in value  )`,
+		name:     "foo",
+		args: []testArg{{
+			value: "a",
+			raw:   "a",
+		}, {
+			value: "",
+			raw:   "",
+		}, {
+			key:   "d",
+			value: "1",
+			raw:   "d=1",
+		}, {
+			key:   "e",
+			value: `"x y"`,
+			raw:   `e="x y"`,
+		}, {
+			value: `"f g"`,
+			raw:   `"f g"`,
+		}, {
+			value: "with spaces",
+			raw:   " with spaces ",
+		}, {
+			key:   "s",
+			value: "spaces in value",
+			raw:   "  s=  spaces in value  ",
+		}},
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d", tc.pos), func(t *testing.T, m *cuetdtest.M) {
-			v := getValue(m, config).Lookup("a")
-			a := v.Attribute("foo")
-			key, val := a.Arg(tc.pos)
-			raw := a.RawArg(tc.pos)
-			if got, want := key, tc.key; got != want {
-				t.Errorf("unexpected key; got %q want %q", got, want)
-			}
-			if got, want := val, tc.val; got != want {
-				t.Errorf("unexpected value; got %q want %q", got, want)
-			}
-			if got, want := raw, tc.raw; got != want {
-				t.Errorf("unexpected raw value; got %q want %q", got, want)
+		cuetdtest.FullMatrix.Run(t, tc.testName, func(t *testing.T, m *cuetdtest.M) {
+			attrs := getValue(m, tc.config).Attributes(cue.ValueAttr)
+			qt.Assert(t, qt.HasLen(attrs, 1))
+			attr := attrs[0]
+			qt.Check(t, qt.Equals(attr.Name(), tc.name))
+
+			qt.Assert(t, qt.Equals(attr.NumArgs(), len(tc.args)))
+			for i, want := range tc.args {
+				gotKey, gotValue := attr.Arg(i)
+				wantKey, wantValue := want.key, want.value
+				if v, err := literal.Unquote(want.value); err == nil {
+					wantValue = v
+				}
+				if want.key == "" {
+					wantKey, wantValue = wantValue, ""
+				}
+				qt.Check(t, qt.Equals(gotKey, wantKey))
+				qt.Check(t, qt.Equals(gotValue, wantValue))
+				qt.Check(t, qt.Equals(attr.RawArg(i), want.raw))
 			}
 		})
 	}

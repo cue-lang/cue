@@ -101,9 +101,7 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 				ZeroConfig:                  true,
 			},
 			Hooks: Hooks{
-				URLRegexp:            urlRegexp(),
-				DefaultAnalyzers:     analyzers(),
-				StaticcheckAnalyzers: map[string]*Analyzer{},
+				URLRegexp: urlRegexp(),
 			},
 		}
 	})

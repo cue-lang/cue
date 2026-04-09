@@ -16,7 +16,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"golang.org/x/tools/go/analysis"
 )
 
 type Annotation string
@@ -43,22 +42,6 @@ type Options struct {
 	UserOptions
 	InternalOptions
 	Hooks
-}
-
-// IsAnalyzerEnabled reports whether an analyzer with the given name is
-// enabled.
-//
-// TODO(rfindley): refactor to simplify this function. We no longer need the
-// different categories of analyzer.
-func (opts *Options) IsAnalyzerEnabled(name string) bool {
-	for _, amap := range []map[string]*Analyzer{opts.DefaultAnalyzers, opts.StaticcheckAnalyzers} {
-		for _, analyzer := range amap {
-			if analyzer.Analyzer.Name == name && analyzer.IsEnabled(opts) {
-				return true
-			}
-		}
-	}
-	return false
 }
 
 // ClientOptions holds LSP-specific configuration that is provided by the
@@ -380,9 +363,6 @@ type Hooks struct {
 	// LicensesText holds third party licenses for software used by gopls.
 	LicensesText string
 
-	// Whether staticcheck is supported.
-	StaticcheckSupported bool
-
 	// URLRegexp is used to find potential URLs in comments/strings.
 	//
 	// Not all matches are shown to the user: if the matched URL is not detected
@@ -393,9 +373,6 @@ type Hooks struct {
 	// gofumpt/format.Source. langVersion and modulePath are used for some
 	// Gofumpt formatting rules -- see the Gofumpt documentation for details.
 	GofumptFormat func(ctx context.Context, langVersion, modulePath string, src []byte) ([]byte, error)
-
-	DefaultAnalyzers     map[string]*Analyzer
-	StaticcheckAnalyzers map[string]*Analyzer
 }
 
 // InternalOptions contains settings that are not intended for use by the
@@ -699,9 +676,8 @@ func (o *Options) Clone() *Options {
 		ClientOptions:   o.ClientOptions,
 		InternalOptions: o.InternalOptions,
 		Hooks: Hooks{
-			StaticcheckSupported: o.StaticcheckSupported,
-			GofumptFormat:        o.GofumptFormat,
-			URLRegexp:            o.URLRegexp,
+			GofumptFormat: o.GofumptFormat,
+			URLRegexp:     o.URLRegexp,
 		},
 		ServerOptions: o.ServerOptions,
 		UserOptions:   o.UserOptions,
@@ -725,23 +701,7 @@ func (o *Options) Clone() *Options {
 	result.BuildFlags = copySlice(o.BuildFlags)
 	result.DirectoryFilters = copySlice(o.DirectoryFilters)
 	result.StandaloneTags = copySlice(o.StandaloneTags)
-
-	copyAnalyzerMap := func(src map[string]*Analyzer) map[string]*Analyzer {
-		dst := make(map[string]*Analyzer)
-		maps.Copy(dst, src)
-		return dst
-	}
-	result.DefaultAnalyzers = copyAnalyzerMap(o.DefaultAnalyzers)
-	result.StaticcheckAnalyzers = copyAnalyzerMap(o.StaticcheckAnalyzers)
 	return result
-}
-
-func (o *Options) AddStaticcheckAnalyzer(a *analysis.Analyzer, enabled bool, severity protocol.DiagnosticSeverity) {
-	o.StaticcheckAnalyzers[a.Name] = &Analyzer{
-		Analyzer: a,
-		Enabled:  enabled,
-		Severity: severity,
-	}
 }
 
 // EnableAllExperiments turns on all of the experimental "off-by-default"
@@ -919,15 +879,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 				o.Codelenses = make(map[string]bool)
 			}
 			maps.Copy(o.Codelenses, lensOverrides)
-		}
-
-	case "staticcheck":
-		if v, ok := result.asBool(); ok {
-			o.Staticcheck = v
-			if v && !o.StaticcheckSupported {
-				result.Error = fmt.Errorf("applying setting %q: staticcheck is not supported at %s;"+
-					" rebuild gopls with a more recent version of Go", result.Name, runtime.Version())
-			}
 		}
 
 	case "local":
@@ -1205,10 +1156,6 @@ func (r *OptionResult) setStringSlice(s *[]string) {
 	if v, ok := r.asStringSlice(); ok {
 		*s = v
 	}
-}
-
-func analyzers() map[string]*Analyzer {
-	return map[string]*Analyzer{}
 }
 
 func urlRegexp() *regexp.Regexp {

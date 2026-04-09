@@ -22,7 +22,7 @@ eliminated: {
 	x: null | { n: 3 }
 	x: #empty & { n: 3 } @test(err, code=eval, contains="empty disjunction",
 		suberr=(pos=[-1:5, 0:5, 0:14], contains="conflicting values", args=[struct, null]),
-		suberr=(pos=[-1:13, 0:15], contains="not allowed"))
+		suberr=(pos=[-1:14, 0:16], contains="not allowed"))
 	out: len(x) @test(err, code=eval)
 }
 
@@ -43,16 +43,16 @@ eliminated.x: conflicting values {n:3} and null (mismatched types struct and nul
     ./in.cue:22:5
     ./in.cue:22:14
 eliminated.x.n: field not allowed:
-    ./in.cue:21:13
-    ./in.cue:22:15
+    ./in.cue:21:14
+    ./in.cue:22:16
 [eval] eliminated.x: 2 errors in empty disjunction:
 eliminated.x: conflicting values {n:3} and null (mismatched types struct and null):
     ./in.cue:21:5
     ./in.cue:22:5
     ./in.cue:22:14
 eliminated.x.n: field not allowed:
-    ./in.cue:21:13
-    ./in.cue:22:15
+    ./in.cue:21:14
+    ./in.cue:22:16
 -- out/eval/stats --
 Leaks:  0
 Freed:  43

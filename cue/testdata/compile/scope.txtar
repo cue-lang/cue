@@ -1,4 +1,3 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 a: {
 	{{
@@ -8,33 +7,45 @@ a: {
 		e: c
 	}}
 	c: {}
-}
-b: {
-
-}
-s: "foo"
-c: s
+} @test(eq, {d: {}, e: {}, c: {}})
+b: {}    @test(eq, {})
+s: "foo" @test(eq, "foo")
+c: s     @test(eq, "foo")
 
 // s is technically in a new struct here so it will have a one higher count than
 // the one before.
-d: [s]: 3
+d: [s]: 3 @test(eq, {["foo"]: 3})
 
-e: {}
-e & {// Is this allowed? Probably not as per comprehension rule (ref fixes.)
+e: {} @test(eq, {}, hint="not the worst if this is not allowed")
+
+e & {
 	e: {}
 }
 
-{X=["foo"]: b: X | null}
-{[Y="bar"]: b: Y}
+p: {
+	{X=["foo"]: b: X | null}
+	{[Y="bar"]: b: Y}
+
+	@test(eq, {
+		["foo"]: b: null @test(final)
+		["bar"]: b: string
+	}, incorrect)
+	@test(eq:todo, {
+		["foo"]: b: null @test(final)
+		["bar"]: b: "bar"
+	})
+}
 
 let B = {open: int}
-f: B
+f: B @test(eq, {open: int})
 
 schema: {
-	next: _schema_1
+	next: _schema_1 @test(err, code=structural cycle)
 }
 
 let _schema_1 = schema
+-- out/errors.txt --
+[structural cycle] schema.next: structural cycle
 -- out/compile --
 --- in.cue
 {
@@ -59,14 +70,16 @@ let _schema_1 = schema
   (〈0;e〉 & {
     e: {}
   })
-  {
-    ["foo"]: {
-      b: (〈1;(〈0;-〉)〉|null)
+  p: {
+    {
+      ["foo"]: {
+        b: (〈1;(〈0;-〉)〉|null)
+      }
     }
-  }
-  {
-    ["bar"]: {
-      b: 〈1;-〉
+    {
+      ["bar"]: {
+        b: 〈1;-〉
+      }
     }
   }
   let B#1 = {
@@ -91,99 +104,9 @@ Disjuncts:    0
 Notifications: 2
 
 NumCloseIDs: 13
--- out/evalalpha --
-Errors:
-schema.next: structural cycle
-
-Result:
-(_|_){
-  // [structural cycle]
-  a: (struct){
-    d: (struct){
-    }
-    e: (struct){
-    }
-    c: (struct){
-    }
-  }
-  b: (struct){
-  }
-  s: (string){ "foo" }
-  c: (string){ "foo" }
-  d: (struct){
-  }
-  e: (struct){
-  }
-  let B#1 = (struct){
-    open: (int){ int }
-  }
-  f: (struct){
-    open: (int){ int }
-  }
-  schema: (_|_){
-    // [structural cycle]
-    next: (_|_){
-      // [structural cycle] schema.next: structural cycle
-    }
-  }
-  let _schema_1#2 = (_|_){
-    // [structural cycle] schema.next: structural cycle
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -33,7 +33,6 @@
-     }
-   }
-   let _schema_1#2 = (_|_){
--    // [structural cycle] _schema_1: structural cycle:
--    //     ./in.cue:32:8
-+    // [structural cycle] schema.next: structural cycle
-   }
- }
--- diff/todo/p3 --
-Structural cycle reported in different location. Seems fine, as
-ultimately we need to print the paths of the cycle anyway.
-Now also reports a position.
--- out/eval --
-Errors:
-schema.next: structural cycle
-
-Result:
-(_|_){
-  // [structural cycle]
-  a: (struct){
-    d: (struct){
-    }
-    e: (struct){
-    }
-    c: (struct){
-    }
-  }
-  b: (struct){
-  }
-  s: (string){ "foo" }
-  c: (string){ "foo" }
-  d: (struct){
-  }
-  e: (struct){
-  }
-  let B#1 = (struct){
-    open: (int){ int }
-  }
-  f: (struct){
-    open: (int){ int }
-  }
-  schema: (_|_){
-    // [structural cycle]
-    next: (_|_){
-      // [structural cycle] schema.next: structural cycle
-    }
-  }
-  let _schema_1#2 = (_|_){
-    // [structural cycle] _schema_1: structural cycle:
-    //     ./in.cue:32:8
-  }
-}
+-- out/diff-v2-v3.txt --
+Structural cycle reported in different location between v2 and v3.
+v2: _schema_1: structural cycle (with position ./in.cue:32:8)
+v3: schema.next: structural cycle
+Seems fine, as ultimately we need to print the paths of the cycle anyway.
+v3 also reports a position.

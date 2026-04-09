@@ -1,5 +1,5 @@
 #expandLetExpr: true
-#todo:inline: medium — compile-time checks; verify output in out/compile section
+#todo:inline: skip: compile errors.
 -- in.cue --
 a: {
 	let X = Y

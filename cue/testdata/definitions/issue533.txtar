@@ -1,4 +1,6 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
+# Tests that hidden definitions (_#x) enforce closedness the same way regular
+# definitions (#x) do, rejecting extra fields not declared in the definition.
+# https://cuelang.org/issue/533
 -- in.cue --
 package x
 

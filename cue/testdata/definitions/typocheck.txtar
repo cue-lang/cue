@@ -148,6 +148,9 @@ embedInline: {
 	}
 	out: #Schema & __no_sharing
 }
+// evalv3 "field not allowed" regression involving embeddings and selectors;
+// accessing a field via selector on an embedded definition should stay open.
+// https://cuelang.org/issue/3853
 issue3853: {
 	#Schema: {
 		a: "hello"
@@ -163,11 +166,17 @@ issue3853: {
 -- disjunction.cue --
 import "list"
 
+// evalv3 regression: closedness errors no longer reported when default values
+// are present; disallowed fields in a default disjunct should still be caught.
+// https://cuelang.org/issue/3947
 issue3947: full: {
 	#Schema: allowed?: string
 	_defaults: disallowed: _ | *"default value"
 	out: #Schema & _defaults
 }
+// evalv3 regression: #oneOf pattern disjunction; unifying a closed definition
+// disjunction with a default string field caused incorrect field-not-allowed errors.
+// https://cuelang.org/issue/3957
 issue3957: reduced: {
 	c: a: "bar"
 	c: #B & {a: string | *"foo"}
@@ -194,6 +203,9 @@ issue3957: derived: t2: {
 	out: #Schema & {in: "foo"}
 }
 -- issue3833.cue --
+// evalv3 "field not allowed" regression with embeddings; combining a definition
+// that has an open field with another definition via embedding should be allowed.
+// https://cuelang.org/issue/3833
 issue3833: ok: {
 	out: { #A & { a: #B } }
 	#A: {
@@ -219,6 +231,9 @@ issue3833: evalv2Issue:{
 	}
 }
 -- issue3837.cue --
+// evalv3 regression with embeddings, disjunctions, and extra fields; a struct
+// that embeds a definition and adds extra fields should not cause spurious errors.
+// https://cuelang.org/issue/3837
 issue3837: reduced: {
 	A: {
 		#Embed
@@ -243,6 +258,9 @@ issue3837: full: {
 	}
 }
 -- issue3832.cue --
+// evalv3 "field not allowed" regression with a disjunction and a let field;
+// a let binding inside a disjunct should not cause closedness errors.
+// https://cuelang.org/issue/3832
 issue3832: {
 	_person: self: firstName: "Sam"
 
@@ -271,6 +289,9 @@ issue3832: {
 	}
 }
 -- issue3839.cue --
+// evalv3 closedness regression with embeddings and definitions; embedding a
+// definition with an ellipsis inside a non-definition should remain open.
+// https://cuelang.org/issue/3839
 issue3839: reduced: {
 	x: { A & __no_sharing }
 	x: y: 1
@@ -308,6 +329,9 @@ issue3839: full: {
 	}
 }
 -- chaineddef.cue --
+// evalv3 "field not allowed" regression when embedding a chain of definitions;
+// chained optional-field definitions embedded in a struct should not be enforced.
+// https://cuelang.org/issue/3920
 // chained definitions should be handled correctly within embeddings.
 issue3920: {
 	out: {
@@ -327,6 +351,9 @@ closeInEmbed: {
 	x: d: e: 1
 }
 -- embedelim.cue --
+// evalv3 "field not allowed" regression with nested definitions; eliminating
+// an embedded top value from a definition should not incorrectly close the struct.
+// https://cuelang.org/issue/3921
 issue3921: top: {
 	#A: #B
 	#A: b: string
@@ -455,6 +482,9 @@ reduced: t2: {
 	#Z & { _in: Y }
 }
 -- issue3934.cue --
+// evalv3 "field not allowed" regression with disjunctions and a comprehension;
+// a false-branch comprehension inside a disjunct should not trigger closedness errors.
+// https://cuelang.org/issue/3934
 issue3934: {
 	out: #Foo & {
 		foo: {
@@ -539,6 +569,9 @@ nestedEllipsis: nestedWithPatterns: {
 		objs?: _
 	}
 }
+// evalv3 "field not allowed" regression with ellipses since v0.13.0; embedding
+// a schema with `...` alongside additional fields should not close the struct.
+// https://cuelang.org/issue/4015
 issue4015: reduced: {
 	#X: { ... }
 	out: {
@@ -596,6 +629,9 @@ issue4015: full: {
 	}
 }
 -- issue3964.cue --
+// evalv3 closedness regression since v0.13.1; a definition that embeds another
+// definition containing a disjunction should correctly allow matching fields.
+// https://cuelang.org/issue/3964
 issue3964: reduced: {
 	#Output: { #Embedded }
 	#Embedded: {
@@ -619,6 +655,9 @@ issue3964: full: {
 	#Used: used: string
 }
 -- cycle.cue --
+// evalv3 stack overflow due to latest closedness changes; mutually recursive
+// definitions that embed each other caused infinite recursion during evaluation.
+// https://cuelang.org/issue/4006
 issue4006: {
 	#A: {
 		#B
@@ -675,13 +714,13 @@ embed.simple.a.err: field not allowed:
 embed.withIndirect.err: field not allowed:
     ./in.cue:87:8
 issue3833.evalv2Issue.out.a.c: field not allowed:
-    ./issue3833.cue:19:6
-    ./issue3833.cue:21:9
+    ./issue3833.cue:22:6
+    ./issue3833.cue:24:9
 issue3947.full.out.disallowed: field not allowed:
-    ./disjunction.cue:5:13
+    ./disjunction.cue:8:13
 issue3957.reduced.c.a: field not allowed:
-    ./disjunction.cue:9:5
-    ./disjunction.cue:10:11
+    ./disjunction.cue:15:5
+    ./disjunction.cue:16:11
 embed.normalValidator.x.err: field not allowed:
     ./validators.cue:8:3
     ./validators.cue:13:5
@@ -756,7 +795,7 @@ Result:
         allowed?: (string){ string }
         disallowed: (_|_){
           // [eval] issue3947.full.out.disallowed: field not allowed:
-          //     ./disjunction.cue:5:13
+          //     ./disjunction.cue:8:13
         }
       }
     }
@@ -769,8 +808,8 @@ Result:
         // [eval]
         a: (_|_){
           // [eval] issue3957.reduced.c.a: field not allowed:
-          //     ./disjunction.cue:9:5
-          //     ./disjunction.cue:10:11
+          //     ./disjunction.cue:15:5
+          //     ./disjunction.cue:16:11
         }
         b?: (string){ string }
       }
@@ -1333,11 +1372,11 @@ Result:
         out: (#struct){
           let self#2 = (_|_){
             // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
-            //     ./issue3832.cue:8:16
+            //     ./issue3832.cue:11:16
           }
           outFirstName: (_|_){
             // [incomplete] issue3832.#T._subject.out.outFirstName: undefined field: firstName:
-            //     ./issue3832.cue:9:24
+            //     ./issue3832.cue:12:24
           }
         }
       }
@@ -1348,18 +1387,18 @@ Result:
           pass: (#struct){
             let self#2 = (_|_){
               // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
-              //     ./issue3832.cue:8:19
+              //     ./issue3832.cue:11:19
             }
             outFirstName: (_|_){
               // [incomplete] issue3832.#T._assert.pass.outFirstName: undefined field: firstName:
-              //     ./issue3832.cue:9:24
+              //     ./issue3832.cue:12:24
             }
           }
           invoke!: (_){ _ }
         }) }
       results: (_|_){
         // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
-        //     ./issue3832.cue:22:12
+        //     ./issue3832.cue:25:12
       }
     }
     _assert: (#struct){
@@ -1378,11 +1417,11 @@ Result:
       out: (#struct){
         let self#2 = (_|_){
           // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
-          //     ./issue3832.cue:8:16
+          //     ./issue3832.cue:11:16
         }
         outFirstName: (_|_){
           // [incomplete] issue3832._subject.out.outFirstName: undefined field: firstName:
-          //     ./issue3832.cue:9:24
+          //     ./issue3832.cue:12:24
         }
       }
     }
@@ -1419,8 +1458,8 @@ Result:
           b: (string){ "foo" }
           c: (_|_){
             // [eval] issue3833.evalv2Issue.out.a.c: field not allowed:
-            //     ./issue3833.cue:19:6
-            //     ./issue3833.cue:21:9
+            //     ./issue3833.cue:22:6
+            //     ./issue3833.cue:24:9
           }
         }
       }
@@ -2026,27 +2065,30 @@ diff old new
 -    ./in.cue:87:2
      ./in.cue:87:8
 +issue3833.evalv2Issue.out.a.c: field not allowed:
-+    ./issue3833.cue:19:6
-+    ./issue3833.cue:21:9
++    ./issue3833.cue:22:6
++    ./issue3833.cue:24:9
  issue3947.full.out.disallowed: field not allowed:
 -    ./disjunction.cue:4:11
-     ./disjunction.cue:5:13
+-    ./disjunction.cue:5:13
 -    ./disjunction.cue:6:7
 -    ./disjunction.cue:6:17
 -issue3957.reduced.c.a: 2 errors in empty disjunction:
 -issue3957.reduced.c.a: conflicting values "foo" and "bar":
 -    ./disjunction.cue:9:8
 -    ./disjunction.cue:10:24
++    ./disjunction.cue:8:13
  issue3957.reduced.c.a: field not allowed:
-     ./disjunction.cue:9:5
+-    ./disjunction.cue:9:5
 -    ./disjunction.cue:10:5
-     ./disjunction.cue:10:11
+-    ./disjunction.cue:10:11
 -    ./disjunction.cue:11:6
 -embed.openValidator.t1.x.err: field not allowed:
 -    ./validators.cue:17:3
 -    ./validators.cue:16:6
 -    ./validators.cue:21:5
 -    ./validators.cue:22:5
++    ./disjunction.cue:15:5
++    ./disjunction.cue:16:11
 +embed.normalValidator.x.err: field not allowed:
 +    ./validators.cue:8:3
 +    ./validators.cue:13:5
@@ -2078,9 +2120,10 @@ diff old new
          disallowed: (_|_){
            // [eval] issue3947.full.out.disallowed: field not allowed:
 -          //     ./disjunction.cue:4:11
-           //     ./disjunction.cue:5:13
+-          //     ./disjunction.cue:5:13
 -          //     ./disjunction.cue:6:7
 -          //     ./disjunction.cue:6:17
++          //     ./disjunction.cue:8:13
          }
        }
      }
@@ -2093,11 +2136,13 @@ diff old new
 -          //     ./disjunction.cue:9:8
 -          //     ./disjunction.cue:10:24
 -          // issue3957.reduced.c.a: field not allowed:
-+          // [eval] issue3957.reduced.c.a: field not allowed:
-           //     ./disjunction.cue:9:5
+-          //     ./disjunction.cue:9:5
 -          //     ./disjunction.cue:10:5
-           //     ./disjunction.cue:10:11
+-          //     ./disjunction.cue:10:11
 -          //     ./disjunction.cue:11:6
++          // [eval] issue3957.reduced.c.a: field not allowed:
++          //     ./disjunction.cue:15:5
++          //     ./disjunction.cue:16:11
          }
          b?: (string){ string }
        }
@@ -2388,14 +2433,18 @@ diff old new
          }
        }
      }
-@@ -807,8 +687,8 @@
-             //     ./issue3832.cue:8:16
+@@ -804,11 +684,11 @@
+         out: (#struct){
+           let self#2 = (_|_){
+             // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
+-            //     ./issue3832.cue:8:16
++            //     ./issue3832.cue:11:16
            }
            outFirstName: (_|_){
 -            // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
 -            //     ./issue3832.cue:8:16
 +            // [incomplete] issue3832.#T._subject.out.outFirstName: undefined field: firstName:
-+            //     ./issue3832.cue:9:24
++            //     ./issue3832.cue:12:24
            }
          }
        }
@@ -2406,13 +2455,13 @@ diff old new
 -              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
 -              //     ./issue3832.cue:8:16
 +              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
-+              //     ./issue3832.cue:8:19
++              //     ./issue3832.cue:11:19
              }
              outFirstName: (_|_){
 -              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
 -              //     ./issue3832.cue:8:16
 +              // [incomplete] issue3832.#T._assert.pass.outFirstName: undefined field: firstName:
-+              //     ./issue3832.cue:9:24
++              //     ./issue3832.cue:12:24
              }
            }
            invoke!: (_){ _ }
@@ -2421,7 +2470,7 @@ diff old new
 -        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
 -        //     ./issue3832.cue:20:12
 +        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
-+        //     ./issue3832.cue:22:12
++        //     ./issue3832.cue:25:12
 +      }
 +    }
 +    _assert: (#struct){
@@ -2436,8 +2485,12 @@ diff old new
        }
      }
      _subject: (#struct){
-@@ -841,32 +732,15 @@
-           //     ./issue3832.cue:8:16
+@@ -838,35 +729,18 @@
+       out: (#struct){
+         let self#2 = (_|_){
+           // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
+-          //     ./issue3832.cue:8:16
++          //     ./issue3832.cue:11:16
          }
          outFirstName: (_|_){
 -          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
@@ -2467,7 +2520,7 @@ diff old new
 -  }
 -  issue3833: (struct){
 +          // [incomplete] issue3832._subject.out.outFirstName: undefined field: firstName:
-+          //     ./issue3832.cue:9:24
++          //     ./issue3832.cue:12:24
 +        }
 +      }
 +    }
@@ -2496,8 +2549,8 @@ diff old new
 +          b: (string){ "foo" }
 +          c: (_|_){
 +            // [eval] issue3833.evalv2Issue.out.a.c: field not allowed:
-+            //     ./issue3833.cue:19:6
-+            //     ./issue3833.cue:21:9
++            //     ./issue3833.cue:22:6
++            //     ./issue3833.cue:24:9
 +          }
          }
        }

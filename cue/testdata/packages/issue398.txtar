@@ -1,4 +1,7 @@
-#todo:inline: medium — multi-package test; check subpath handling
+# Tests that transitive package imports are correctly propagated. When foo imports
+# bar which imports baz, evaluating foo should include values from all three
+# packages rather than omitting the transitively imported baz contents.
+# https://cuelang.org/issue/398
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"

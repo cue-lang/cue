@@ -1,4 +1,6 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Issue #1969: Tests that comparing fields to _|_ (checking if defined) works
+# correctly for both closed and open structs, including edge cases with
+# comprehensions and let clauses.
 -- in.cue --
 #T: {
 	if true {
@@ -9,6 +11,11 @@
 		})
 	}
 	x: _
+// All tests here should pass and the result of the okcN tests should be
+// identical to those of the okoN tests.
+// Should Field s exist in okc or not? Depends on whether comparison to bottom
+// is recursive or not. It probably should not.
+// TODO: fix for new evaluator. But possibly address this with new builtins.
 }
 z: #T & {
 	x: {
@@ -21,6 +28,9 @@ t: #C
 #C: {
 	if true {
 		p: _
+// Comparing to string is not an error. But for legacy reasons we want to still
+// support this. We intend to have more clean and precise behavior with the
+// builtins isdefined, isvalid, and isconcrete.
 	}
 }
 t: p: "foo"
@@ -47,7 +57,7 @@ Errors:
 #V1.x.f2: field not allowed:
     ./variant1.cue:3:5
 z.x.f2: field not allowed:
-    ./in.cue:14:3
+    ./in.cue:19:3
 
 Result:
 (_|_){
@@ -64,7 +74,7 @@ Result:
       f1: (int){ 99 }
       f2: (_|_){
         // [eval] z.x.f2: field not allowed:
-        //     ./in.cue:14:3
+        //     ./in.cue:19:3
       }
     }
   }
@@ -90,7 +100,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,7 @@
+@@ -1,12 +1,8 @@
  Errors:
  #V1.x.f2: field not allowed:
 -    ./variant1.cue:2:11
@@ -99,19 +109,23 @@ diff old new
 -    ./in.cue:2:2
 -    ./in.cue:5:12
 -    ./in.cue:11:4
-     ./in.cue:14:3
+-    ./in.cue:14:3
++    ./in.cue:19:3
  
  Result:
-@@ -23,9 +19,6 @@
+ (_|_){
+@@ -23,10 +19,7 @@
        f1: (int){ 99 }
        f2: (_|_){
          // [eval] z.x.f2: field not allowed:
 -        //     ./in.cue:2:2
 -        //     ./in.cue:5:12
 -        //     ./in.cue:11:4
-         //     ./in.cue:14:3
+-        //     ./in.cue:14:3
++        //     ./in.cue:19:3
        }
      }
+   }
 @@ -40,12 +33,11 @@
      // [eval]
      x: (_|_){

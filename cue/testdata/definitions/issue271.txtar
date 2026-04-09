@@ -1,4 +1,6 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
+# Tests that a struct combining an open pattern constraint with close() correctly
+# rejects fields not allowed by the close() constraint when unified with a value.
+# https://cuelang.org/issue/271
 -- in.cue --
 #T: [_]: _
 #T: close({"a": string})

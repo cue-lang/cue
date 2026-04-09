@@ -1,4 +1,3 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 _schema // embed schema through indirections
 _schema: #Schema

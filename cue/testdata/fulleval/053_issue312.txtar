@@ -1,6 +1,9 @@
+# Tests a comprehension with a disjunction of close({}) and a pattern
+# constraint. Issue: https://cuelang.org/issue/312 — the default selection
+# and closing behavior of a disjunction inside a comprehension should work
+# correctly.
 #name: issue312
 #evalFull
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 
 for x in [1] {

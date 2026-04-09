@@ -1,9 +1,12 @@
+# Tests that let expressions within disjunctions are uniqued per arc, not just
+# per Environment. Without the fix, incorrect results were cached and shared
+# across arcs, causing the `all` list to evaluate incorrectly under unification.
+# https://cuelang.org/issue/2146
 // Issue #2146
 //
 // Ensure that let expressions are uniqued not only per Environment, but also
 // per arc. This is relevant for disjunctions. Without it, an incorrect
 // result may be cached for an arbitrary Environment.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 p1: {
 	#A: {

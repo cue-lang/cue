@@ -1,4 +1,5 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that errors in definitions with complex reference chains are reported
+# correctly, specifically undefined field errors via let bindings. Issue #837.
 -- in.cue --
 #DeploymentManifest: #Manifest & {ref: kind: "deployment"}
 

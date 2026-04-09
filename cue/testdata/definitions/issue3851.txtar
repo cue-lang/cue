@@ -1,4 +1,6 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that a nested optional field structure combined with let bindings and
+# disjunctions (#Output: null | #App) evaluates correctly without false errors.
+# https://cuelang.org/issue/3851
 -- in.cue --
 #App: {
 	name?: string

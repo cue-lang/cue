@@ -1,4 +1,7 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that builtin function calls with arguments depending on later-defined
+# default values evaluate correctly in evalv3. The issue caused math.Abs to fail
+# with "non-concrete value" when the port field had a default defined after the call.
+# https://cuelang.org/issue/3919
 -- in.cue --
 import "math"
 

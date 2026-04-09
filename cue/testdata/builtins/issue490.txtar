@@ -1,4 +1,6 @@
-#todo:inline: medium — builtin function calls; use InferBuiltins for validators
+# Tests that close() correctly rejects fields not present in the closed struct
+# when the closed value is later unified with an open struct adding new fields.
+# https://cuelang.org/issue/490
 -- test.cue --
 A: close({
 	a: 1
@@ -8,6 +10,10 @@ A: close({
 B: A & {
 	c: 3
 }
+	  // [eval]
+	    // [eval]
+	      // [eval] B.c: field not allowed:
+	      //     test.cue:7:2
 -- out/eval/stats --
 Leaks:  0
 Freed:  20

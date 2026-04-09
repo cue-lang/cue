@@ -1,6 +1,8 @@
 #name: optionals with label filters
 #evalFull
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
+# Tests that optional fields with label filters enforce their constraints:
+# fields not matching the pattern or constraint fail with "field not allowed"
+# or bound violations. jobs is the happy path; jobs1, jobs2, jobs3 are faulty.
 -- in.cue --
 #JobID: =~"^[a-zA-Z]*$"
 #Job: {

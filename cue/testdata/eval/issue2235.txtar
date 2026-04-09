@@ -1,6 +1,9 @@
+# Tests that nested for-loop comprehensions with dynamic field assignments do
+# not trigger a nil pointer dereference panic. The issue occurred in the
+# evaluator's conjunct handling when processing nested iterations over structs.
+# https://cuelang.org/issue/2235
 // Test various orders
 // https://cuelang.org/issues/2235
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- reductions.cue --
 // Each of these tests triggers a slightly different path.
 

@@ -16,6 +16,24 @@
       "message": "try nested multiline literals too with the #, ##, ### etc wrapping?",
       "revId": "6001f4d78669b450ebc83e610c5ed39a40bc1afb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7415f031_2773fadf",
+        "filename": "cue/fuzz_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-09T13:54:41Z",
+      "side": 1,
+      "message": "Done; added one. a bit of a balance in terms of not letting this seed corpus be too long, as it can grow from this as a starting point.",
+      "parentUuid": "0cb5eeeb_d8e0e031",
+      "revId": "6001f4d78669b450ebc83e610c5ed39a40bc1afb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01cd2d5a_6684790a",
+        "filename": "internal/golangorgx/gopls/cmd/info.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-09T16:14:28Z",
+      "side": 0,
+      "message": "erm, sure, add `serve`, and delete `remote sessions`, but keep `remote` I think (though they should all become `cue lsp help ...` but arguably that\u0027s a different CL",
+      "revId": "34ed292d8f3b97a816aab153ee56b2f530076262",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

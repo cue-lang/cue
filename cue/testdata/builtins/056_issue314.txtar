@@ -2,9 +2,6 @@
 # encoding/json.Marshal, encoding/yaml.Marshal) correctly produce [incomplete]
 # errors rather than panicking when called with abstract (non-concrete) values.
 # https://cuelang.org/issue/314
-#name: issue314
-#evalFull
-#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 import (
 	"text/template"
@@ -15,23 +12,27 @@ import (
 x: {
 	s: "myname"
 	#T
+	@test(eq, {s: "myname", out: "myname"})
 }
 
 #T: {
 	s:   string
 	out: template.Execute("{{.s}}", {
 		"s": s
-	})
+	}) @test(err, code=incomplete,
+		contains="error in call to text/template.Execute: cannot convert non-concrete value string", pos=[0:7, -1:2])
 }
 
 #V: {
 	s:   string
-	out: json.Marshal({"s": s})
+	out: json.Marshal({"s": s}) @test(err, code=incomplete,
+		contains="cannot convert incomplete value", pos=[0:7, -1:7])
 }
 
 #U: {
 	s:   string
-	out: yaml.Marshal({"s": s})
+	out: yaml.Marshal({"s": s}) @test(err, code=incomplete,
+		contains="incomplete value string", pos=[0:7, -1:7, 0:26])
 }
 -- out/eval/stats --
 Leaks:  0
@@ -45,97 +46,20 @@ Conjuncts:    24
 Disjuncts:    0
 
 NumCloseIDs: 3
--- out/evalalpha --
-(struct){
-  x: (#struct){
-    s: (string){ "myname" }
-    out: (string){ "myname" }
-  }
-  #T: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
-      //     ./in.cue:14:7
-      //     ./in.cue:13:2
-    }
-  }
-  #V: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] #V.out: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
-      //     ./in.cue:21:7
-      //     ./in.cue:20:7
-    }
-  }
-  #U: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
-      //     ./in.cue:26:7
-      //     ./in.cue:25:7
-      //     ./in.cue:26:26
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -8,13 +8,14 @@
-     out: (_|_){
-       // [incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
-       //     ./in.cue:14:7
--      //     ./in.cue:15:3
-+      //     ./in.cue:13:2
-     }
-   }
-   #V: (#struct){
-     s: (string){ string }
-     out: (_|_){
--      // [incomplete] cannot convert incomplete value "string" to JSON:
-+      // [incomplete] #V.out: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
-+      //     ./in.cue:21:7
-       //     ./in.cue:20:7
-     }
-   }
-@@ -24,6 +25,7 @@
-       // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
-       //     ./in.cue:26:7
-       //     ./in.cue:25:7
-+      //     ./in.cue:26:26
-     }
-   }
- }
--- out/eval --
-(struct){
-  x: (#struct){
-    s: (string){ "myname" }
-    out: (string){ "myname" }
-  }
-  #T: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
-      //     ./in.cue:14:7
-      //     ./in.cue:15:3
-    }
-  }
-  #V: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] cannot convert incomplete value "string" to JSON:
-      //     ./in.cue:20:7
-    }
-  }
-  #U: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
-      //     ./in.cue:26:7
-      //     ./in.cue:25:7
-    }
-  }
-}
+-- out/errors.txt --
+[incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
+    ./in.cue:15:7
+    ./in.cue:14:2
+[incomplete] #V.out: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
+    ./in.cue:23:7
+    ./in.cue:22:7
+[incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
+    ./in.cue:29:7
+    ./in.cue:28:7
+    ./in.cue:29:26
+-- out/diff-v2-v3.txt --
+positions: v3 reports different position for some errors
+Verdict: worsening -- v3 reports different error positions.
 -- out/compile --
 --- in.cue
 {

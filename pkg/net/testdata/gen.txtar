@@ -5,6 +5,13 @@ import "net"
 
 t1:  net.FQDN & "foo.bar."
 t2:  net.FQDN("foo.bararararararararararararararararararararararararararararararararara")
+
+// Regression test for https://cuelang.org/issue/2431.
+// StrictDomainName was not being applied due to an upstream bug.
+t48: net.FQDN("hello world")
+t49: net.FQDN("foo bar.")
+t50: net.FQDN("valid.example.com.")
+t51: net.FQDN("under_score.example.com.")
 t3:  net.SplitHostPort("[::%lo0]:80")
 t4:  net.JoinHostPort("mod.test", "80")
 t5:  net.JoinHostPort("2001:db8::1", 80)
@@ -57,54 +64,61 @@ t47: net.AddIPCIDR("255.0.0.0/8", 1)
 -- out/net-v3 --
 Errors:
 t20b: invalid value 123 (does not satisfy net.IPCIDR): invalid type int for IP CIDR:
-    ./in.cue:23:7
+    ./in.cue:30:7
 t20c: invalid value 123 (does not satisfy net.IP): invalid type int for IP address:
-    ./in.cue:24:7
+    ./in.cue:31:7
 t20d: invalid value 123 (does not satisfy net.IPv4): invalid type int for IP address:
-    ./in.cue:25:7
+    ./in.cue:32:7
 t20e: invalid value 123 (does not satisfy net.IPv6): invalid type int for IP address:
-    ./in.cue:26:7
+    ./in.cue:33:7
 t25: invalid value "2001:db8::1234567" (does not satisfy net.IPv6): ParseAddr("2001:db8::1234567"): each group must have 4 or less digits (at "1234567"):
-    ./in.cue:31:6
-    ./in.cue:31:17
-t30: invalid value "%" (does not satisfy net.URL): parse "%": invalid URL escape "%":
-    ./in.cue:36:6
-    ./in.cue:36:16
-t32: invalid value "/foo/bar" (does not satisfy net.AbsURL): URL is not absolute:
     ./in.cue:38:6
-    ./in.cue:38:19
+    ./in.cue:38:17
+t30: invalid value "%" (does not satisfy net.URL): parse "%": invalid URL escape "%":
+    ./in.cue:43:6
+    ./in.cue:43:16
+t32: invalid value "/foo/bar" (does not satisfy net.AbsURL): URL is not absolute:
+    ./in.cue:45:6
+    ./in.cue:45:19
 t34: invalid value "%" (does not satisfy net.AbsURL): parse "%": invalid URL escape "%":
+    ./in.cue:47:6
+    ./in.cue:47:19
+t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4): ParseAddr("23.23.23.2333"): IPv4 field has value >255:
+    ./in.cue:18:6
+    ./in.cue:18:17
+t7: error in call to net.JoinHostPort: invalid host [192, 30, 4]:
+    ./in.cue:16:6
+t13: invalid value "ff02::1:3" (does not satisfy net.IPv4):
+    ./in.cue:22:6
+    ./in.cue:22:19
+t20: error in call to net.IPCIDR: netip.ParsePrefix("172.16.12.3"): no '/':
+    ./in.cue:29:6
+t27: invalid value "23.23.23.23" (does not satisfy net.IPv6):
     ./in.cue:40:6
     ./in.cue:40:19
-t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4): ParseAddr("23.23.23.2333"): IPv4 field has value >255:
-    ./in.cue:11:6
-    ./in.cue:11:17
-t7: error in call to net.JoinHostPort: invalid host [192, 30, 4]:
-    ./in.cue:9:6
-t13: invalid value "ff02::1:3" (does not satisfy net.IPv4):
-    ./in.cue:15:6
-    ./in.cue:15:19
-t20: error in call to net.IPCIDR: netip.ParsePrefix("172.16.12.3"): no '/':
-    ./in.cue:22:6
-t27: invalid value "23.23.23.23" (does not satisfy net.IPv6):
-    ./in.cue:33:6
-    ./in.cue:33:19
 t39: error in call to net.AddIP: ParseAddr("invalid ip"): unable to parse IP:
-    ./in.cue:45:6
-t40: error in call to net.AddIP: IP address arithmetic resulted in out-of-range address (underflow):
-    ./in.cue:46:6
-t41: error in call to net.AddIP: IP address arithmetic resulted in out-of-range address (overflow):
-    ./in.cue:47:6
-t45: error in call to net.AddIPCIDR: netip.ParsePrefix("192.168.0.0"): no '/':
-    ./in.cue:51:6
-t46: error in call to net.AddIPCIDR: IP address arithmetic resulted in out-of-range address (underflow):
     ./in.cue:52:6
-t47: error in call to net.AddIPCIDR: IP address arithmetic resulted in out-of-range address (overflow):
+t40: error in call to net.AddIP: IP address arithmetic resulted in out-of-range address (underflow):
     ./in.cue:53:6
+t41: error in call to net.AddIP: IP address arithmetic resulted in out-of-range address (overflow):
+    ./in.cue:54:6
+t45: error in call to net.AddIPCIDR: netip.ParsePrefix("192.168.0.0"): no '/':
+    ./in.cue:58:6
+t46: error in call to net.AddIPCIDR: IP address arithmetic resulted in out-of-range address (underflow):
+    ./in.cue:59:6
+t47: error in call to net.AddIPCIDR: IP address arithmetic resulted in out-of-range address (overflow):
+    ./in.cue:60:6
 
 Result:
 t1: "foo.bar."
 t2: false
+
+// Regression test for https://cuelang.org/issue/2431.
+// StrictDomainName was not being applied due to an upstream bug.
+t48: true
+t49: true
+t50: true
+t51: true
 t3: ["::%lo0", "80"]
 t4:  "mod.test:80"
 t5:  "[2001:db8::1]:80"

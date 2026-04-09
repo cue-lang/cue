@@ -278,6 +278,16 @@ func (p *NumInfo) scanNumber(seenDecimalPoint bool) error {
 				// integer other than 0 may not start with 0
 				return p.errorf("illegal integer number %q", p.src)
 			}
+			// After a bare "0", only valid continuations are
+			// end-of-input or a multiplier suffix.
+			if p.ch != 0 {
+				switch p.ch {
+				case 'K', 'M', 'G', 'T', 'P':
+					goto exponent
+				default:
+					return p.errorf("illegal number %q", p.src)
+				}
+			}
 		}
 		goto exit
 	}
@@ -323,6 +333,13 @@ exponent:
 	}
 
 exit:
+	// p.next eagerly advances p.p past each character it reads,
+	// so a trailing invalid character (e.g. "1A", "0xFG") will have
+	// p.p == len(src) even though p.ch holds an unconsumed rune.
+	// Catch any such leftover character here.
+	if p.ch != 0 {
+		return p.errorf("illegal number %q", p.src)
+	}
 	return nil
 }
 

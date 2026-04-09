@@ -25,10 +25,11 @@ import (
 	"cuelang.org/go/cue"
 )
 
+// TODO: revert to using ValidateLabels and StrictDomainName once
+// https://go.dev/issue/74848 is fixed.
 var idnaProfile = idna.New(
-	idna.ValidateLabels(true),
+	idna.MapForLookup(),
 	idna.VerifyDNSLength(true),
-	idna.StrictDomainName(true),
 )
 
 // SplitHostPort splits a network address of the form "host:port",

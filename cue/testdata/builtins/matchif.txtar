@@ -1,16 +1,39 @@
-#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 regularFields: {
 	[_]: matchIf({x!: >2}, {y!: 5}, {y!: 1})
-	ok1: {x: 10, y: 5}
-	ok2: {x: 11, y: 5}
-	ok3: {x: 2, y: 1}
-	ok4: {x: 1, y: 1}
-	err1: {x: 10, y: 6}
-	err2: {x: 11, y: 6}
-	err3: {x: 2, y: 5}
-	err4: {x: 1, y: 2}
+	ok1: {x: 10, y: 5} @test(eq, {x: 10, y: 5})
+	ok2: {x: 11, y: 5} @test(eq, {x: 11, y: 5})
+	ok3: {x: 2,  y: 1} @test(eq, {x: 2,  y: 1})
+	ok4: {x: 1,  y: 1} @test(eq, {x: 1,  y: 1})
+
+	// TODO: allow unwrapping errors so that we can test args in wrapped errors,
+	// without having to match the other arguments.
+	err1: {x: 10, y: 6} @test(err, code=eval, contains="conflicting values 5 and 6", pos=[in.cue:2:7, in.cue:2:30, 0:8, 0:19])
+	err2: {x: 11, y: 6} @test(err, code=eval, contains="conflicting values 5 and 6", pos=[in.cue:2:7, in.cue:2:30, 0:8, 0:19])
+	err3: {x: 2, y: 5}  @test(err, code=eval, contains="conflicting values 1 and 5", pos=[in.cue:2:7, in.cue:2:39, 0:8, 0:18])
+	err4: {x: 1, y: 2}  @test(err, code=eval, contains="conflicting values 1 and 2", pos=[in.cue:2:7, in.cue:2:39, 0:8, 0:18])
 }
+-- out/errors.txt --
+[eval] regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
+    ./in.cue:2:7
+    ./in.cue:2:30
+    ./in.cue:10:8
+    ./in.cue:10:19
+[eval] regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
+    ./in.cue:2:7
+    ./in.cue:2:30
+    ./in.cue:11:8
+    ./in.cue:11:19
+[eval] regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf): conflicting values 1 and 5:
+    ./in.cue:2:7
+    ./in.cue:2:39
+    ./in.cue:12:8
+    ./in.cue:12:18
+[eval] regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf): conflicting values 1 and 2:
+    ./in.cue:2:7
+    ./in.cue:2:39
+    ./in.cue:13:8
+    ./in.cue:13:18
 -- out/eval/stats --
 Leaks:  32
 Freed:  106
@@ -23,88 +46,6 @@ Conjuncts:    154
 Disjuncts:    0
 
 NumCloseIDs: 48
--- out/evalalpha --
-Errors:
-regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
-    ./in.cue:2:7
-    ./in.cue:2:30
-    ./in.cue:7:8
-    ./in.cue:7:19
-regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
-    ./in.cue:2:7
-    ./in.cue:2:30
-    ./in.cue:8:8
-    ./in.cue:8:19
-regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf): conflicting values 1 and 5:
-    ./in.cue:2:7
-    ./in.cue:2:39
-    ./in.cue:9:8
-    ./in.cue:9:18
-regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf): conflicting values 1 and 2:
-    ./in.cue:2:7
-    ./in.cue:2:39
-    ./in.cue:10:8
-    ./in.cue:10:18
-
-Result:
-(_|_){
-  // [eval]
-  regularFields: (_|_){
-    // [eval]
-    ok1: (struct){
-      x: (int){ 10 }
-      y: (int){ 5 }
-    }
-    ok2: (struct){
-      x: (int){ 11 }
-      y: (int){ 5 }
-    }
-    ok3: (struct){
-      x: (int){ 2 }
-      y: (int){ 1 }
-    }
-    ok4: (struct){
-      x: (int){ 1 }
-      y: (int){ 1 }
-    }
-    err1: (_|_){
-      // [eval] regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
-      //     ./in.cue:2:7
-      //     ./in.cue:2:30
-      //     ./in.cue:7:8
-      //     ./in.cue:7:19
-      x: (int){ 10 }
-      y: (int){ 6 }
-    }
-    err2: (_|_){
-      // [eval] regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
-      //     ./in.cue:2:7
-      //     ./in.cue:2:30
-      //     ./in.cue:8:8
-      //     ./in.cue:8:19
-      x: (int){ 11 }
-      y: (int){ 6 }
-    }
-    err3: (_|_){
-      // [eval] regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf): conflicting values 1 and 5:
-      //     ./in.cue:2:7
-      //     ./in.cue:2:39
-      //     ./in.cue:9:8
-      //     ./in.cue:9:18
-      x: (int){ 2 }
-      y: (int){ 5 }
-    }
-    err4: (_|_){
-      // [eval] regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf): conflicting values 1 and 2:
-      //     ./in.cue:2:7
-      //     ./in.cue:2:39
-      //     ./in.cue:10:8
-      //     ./in.cue:10:18
-      x: (int){ 1 }
-      y: (int){ 2 }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

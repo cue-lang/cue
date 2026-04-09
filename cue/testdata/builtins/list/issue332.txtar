@@ -2,7 +2,6 @@
 # error when its input list is derived from a definition field passed through
 # a conjunction. Previously FlattenN failed when the list element was abstract.
 # https://cuelang.org/issue/332
-#todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- in.cue --
 import "list"
 
@@ -16,7 +15,7 @@ import "list"
 }
 r: #foo & {
 	#x: "hello"
-}
+} @test(eq, {#x: "hello", y: ["hello"]})
 -- out/eval/stats --
 Leaks:  0
 Freed:  21
@@ -29,27 +28,6 @@ Conjuncts:    44
 Disjuncts:    0
 
 NumCloseIDs: 15
--- out/evalalpha --
-(struct){
-  #d: (#struct){
-    #x: (string){ string }
-    result: (#list){
-      0: (string){ string }
-    }
-  }
-  #foo: (#struct){
-    #x: (_){ _ }
-    y: (#list){
-      0: (string){ string }
-    }
-  }
-  r: (#struct){
-    #x: (string){ "hello" }
-    y: (#list){
-      0: (string){ "hello" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -10,7 +10,7 @@ simple: {
 	x:   "x" @test(err, code=eval,
 			contains="conflicting values",
 			args=["foo", "x"],
-			pos=[in.cue:4:5, in.cue:6:7])
+			pos=[0:7, 5:7])
 
 	(x): "foo"
 }
@@ -54,8 +54,8 @@ issue2473: two: {
 }
 -- out/errors.txt --
 [eval] simple.x: conflicting values "foo" and "x":
-    ./in.cue:4:5
-    ./in.cue:6:7
+    ./in.cue:4:7
+    ./in.cue:9:7
 -- out/compile --
 --- in.cue
 {

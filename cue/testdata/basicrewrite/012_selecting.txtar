@@ -2,19 +2,19 @@
 obj:    {a: 1, b: 2}              @test(eq, {a: 1, b: 2})
 index:  {a: 1, b:     2}["b"]     @test(eq, 2)
 mulidx: {a: 1, b: {a: 1, b: 3}}["b"]["b"] @test(eq, 3)
-e:      {a: 1}[4]                 @test(err, code=eval, pos=[0:11])
-f:      {a: 1}.b                  @test(err, code=incomplete, pos=[0:11])
-g:      {a: 1}["b"]               @test(err, code=incomplete, pos=[0:11])
-h:      [3].b                     @test(err, code=eval, pos=[0:8])
+e:      {a: 1}[4]                 @test(err, code=eval, pos=[0:16])
+f:      {a: 1}.b                  @test(err, code=incomplete, pos=[0:16])
+g:      {a: 1}["b"]               @test(err, code=incomplete, pos=[0:16])
+h:      [3].b                     @test(err, code=eval, pos=[0:13])
 -- out/errors.txt --
 [eval] e: index out of range [4] with length 0:
-    ./in.cue:4:11
+    ./in.cue:4:16
 [incomplete] f: undefined field: b:
-    ./in.cue:5:11
+    ./in.cue:5:16
 [incomplete] g: undefined field: b:
-    ./in.cue:6:11
+    ./in.cue:6:16
 [eval] h: undefined field: b:
-    ./in.cue:7:8
+    ./in.cue:7:13
 -- todo.txt --
 Some error messages could use improvement. Address after query
 extension is implemented.

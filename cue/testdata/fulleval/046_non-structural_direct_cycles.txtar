@@ -6,12 +6,12 @@ c1: {bar: baz: 2} & c1.bar @test(eq, {bar: {baz: 2}, baz: 2})
 c2: {bar:      1} & c2.bar @test(err, code=eval,
 	contains="conflicting values",
 	args=[{bar:1}, 1, struct, int],
-	pos=[in.cue:2:5, in.cue:2:11, in.cue:2:16])
+	pos=[0:5, 0:16, 0:21])
 -- out/errors.txt --
 [eval] c2: conflicting values {bar:1} and 1 (mismatched types struct and int):
     ./in.cue:2:5
-    ./in.cue:2:11
     ./in.cue:2:16
+    ./in.cue:2:21
 -- out/todo.txt --
 v3 error message for c2 says "conflicting values {bar:1} and 1 (mismatched types struct and int)"
 while v2 says "conflicting values 1 and {bar:1} (mismatched types int and struct)" (operand order swapped).

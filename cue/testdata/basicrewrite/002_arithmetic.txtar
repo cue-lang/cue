@@ -29,28 +29,28 @@ e7: quo(2, 2.0) @test(err, code=eval, contains="cannot use", pos=[0:12])
 e8: mod(1.0, 1) @test(err, code=eval, contains="cannot use", pos=[0:9])
 -- out/errors.txt --
 [eval] divZero: failed arithmetic: division by zero:
-    ./in.cue:8:10
-[eval] div00: failed arithmetic: division undefined:
     ./in.cue:9:10
+[eval] div00: failed arithmetic: division undefined:
+    ./in.cue:10:10
 [eval] idiv00: error in call to div: division by zero:
-    ./in.cue:13:9
-[eval] imod00: error in call to mod: division by zero:
     ./in.cue:14:9
-[eval] iquo00: error in call to quo: division by zero:
+[eval] imod00: error in call to mod: division by zero:
     ./in.cue:15:9
-[eval] irem00: error in call to rem: division by zero:
+[eval] iquo00: error in call to quo: division by zero:
     ./in.cue:16:9
+[eval] irem00: error in call to rem: division by zero:
+    ./in.cue:17:9
 [eval] e0: invalid operands 2 and "a" to '+' (type int and string):
-    ./in.cue:23:5
-    ./in.cue:23:9
-[eval] e5: cannot use 1.0 (type float) as int in argument 1 to div:
+    ./in.cue:24:5
     ./in.cue:24:9
+[eval] e5: cannot use 1.0 (type float) as int in argument 1 to div:
+    ./in.cue:25:9
 [eval] e6: cannot use 2.0 (type float) as int in argument 2 to rem:
-    ./in.cue:25:12
-[eval] e7: cannot use 2.0 (type float) as int in argument 2 to quo:
     ./in.cue:26:12
+[eval] e7: cannot use 2.0 (type float) as int in argument 2 to quo:
+    ./in.cue:27:12
 [eval] e8: cannot use 1.0 (type float) as int in argument 1 to mod:
-    ./in.cue:27:9
+    ./in.cue:28:9
 -- out/eval/stats --
 Leaks:  0
 Freed:  24

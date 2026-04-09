@@ -334,15 +334,6 @@ type attrRecord struct {
 func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 	var records []attrRecord
 
-	// extraNewlines tracks the cumulative count of newlines embedded inside
-	// @test attribute bodies that have been stripped from preceding fields.
-	// When the CUE scanner reads a multiline attribute body (e.g. pos=[0:5\n1:5])
-	// it advances its line counter, shifting subsequent AST node positions upward.
-	// After stripping and reformatting, those embedded newlines are gone, so we
-	// subtract the running total to recover the effective line in the formatted
-	// output.
-	extraNewlines := 0
-
 	// appendErrRecord records a @test attribute whose parseTestAttr call failed.
 	// The runner reports all parseErr records as test failures before running
 	// any assertions.
@@ -356,24 +347,21 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 		})
 	}
 
-	// walkField strips @test field attrs from field, records them, then recurses
-	// into the field's struct value (if any).
+	// walkField records @test field attrs, then recurses into the field's
+	// struct value (if any). Attributes are NOT stripped from the AST so that
+	// the evaluated value is built from the original source; CUE ignores
+	// attributes during evaluation, so positions reference original source lines.
 	var walkField func(field *ast.Field, path cue.Path)
 
-	// walkStruct strips @test decl attrs from sl, records them, and recurses
-	// into all sub-fields.
+	// walkStruct records @test decl attrs and recurses into all sub-fields.
 	var walkStruct func(sl *ast.StructLit, path cue.Path)
 
 	walkField = func(field *ast.Field, path cue.Path) {
-		// Effective line of this field in the stripped-and-formatted output.
-		fieldBaseLine := field.Pos().Line() - extraNewlines
+		fieldBaseLine := field.Pos().Line()
 
-		// Strip @test field attrs and record them.
-		var keep []*ast.Attribute
 		for _, a := range field.Attrs {
-			k, body := a.Split()
+			k, _ := a.Split()
 			if k != "test" {
-				keep = append(keep, a)
 				continue
 			}
 			pa, err := parseTestAttr(a)
@@ -387,10 +375,7 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 				path:   path,
 				parsed: pa,
 			})
-			// Newlines inside a stripped attr body shift subsequent line numbers.
-			extraNewlines += strings.Count(body, "\n")
 		}
-		field.Attrs = keep
 
 		if sl, ok := field.Value.(*ast.StructLit); ok {
 			walkStruct(sl, path)
@@ -398,20 +383,15 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 	}
 
 	walkStruct = func(sl *ast.StructLit, path cue.Path) {
-		// Capture the struct's {-relative base line for decl @test pos= specs.
-		// Captured before processing elements so it stays stable even if earlier
-		// elements in this struct strip lines. File-level @test attrs (no braces)
-		// use their own line as baseLine instead (see below).
-		structBaseLine := sl.Lbrace.Line() - extraNewlines
+		// Use the opening brace line as the base for decl-level @test pos= specs.
+		// File-level @test attrs (no braces) use their own line as baseLine (see below).
+		structBaseLine := sl.Lbrace.Line()
 
-		// Strip decl attrs, recurse into sub-fields.
-		var newElts []ast.Decl
 		for _, elt := range sl.Elts {
 			switch e := elt.(type) {
 			case *ast.Attribute:
-				k, body := e.Split()
+				k, _ := e.Split()
 				if k != "test" {
-					newElts = append(newElts, elt)
 					continue
 				}
 				pa, err := parseTestAttr(e)
@@ -426,53 +406,36 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 					parsed:     pa,
 					isDeclAttr: true,
 				})
-				// The entire decl attr line is stripped (+1), plus any
-				// embedded newlines in the body shift subsequent lines.
-				extraNewlines += 1 + strings.Count(body, "\n")
-				// Stripped — not added to newElts.
 
 			case *ast.Field:
 				subPath := appendPath(path, e.Label)
 				if subPath.Err() == nil {
 					walkField(e, subPath)
 				}
-				newElts = append(newElts, elt)
-
-			default:
-				newElts = append(newElts, elt)
 			}
 		}
-		sl.Elts = newElts
 	}
 
 	// Handle file-level decl attributes (@test as a top-level declaration).
-	var newDecls []ast.Decl
 	for _, decl := range f.Decls {
 		if a, ok := decl.(*ast.Attribute); ok {
-			k, body := a.Split()
+			k, _ := a.Split()
 			if k == "test" {
 				pa, err := parseTestAttr(a)
 				if err != nil {
-					// Record the error so the runner can report it; strip
-					// the attribute from the file (do not add to newDecls).
 					appendErrRecord(a, cue.Path{}, false, true, err)
 					continue
 				}
-				pa.baseLine = a.Pos().Line() - extraNewlines
+				pa.baseLine = a.Pos().Line()
 				pa.srcFileName = fileName
 				records = append(records, attrRecord{
 					path:      cue.Path{},
 					parsed:    pa,
 					fileLevel: true,
 				})
-				extraNewlines += 1 + strings.Count(body, "\n")
-				// Stripped — not added to newDecls.
-				continue
 			}
 		}
-		newDecls = append(newDecls, decl)
 	}
-	f.Decls = newDecls
 
 	for _, decl := range f.Decls {
 		field, ok := decl.(*ast.Field)
@@ -861,10 +824,11 @@ type testCaseRoot struct {
 	sel cue.Selector
 }
 
-// cueFileResult holds the parsed and stripped AST for one CUE file.
+// cueFileResult holds the parsed AST for one CUE file.
+// @test attributes are recorded but not stripped; CUE ignores them during evaluation.
 type cueFileResult struct {
 	name        string
-	strippedAST *ast.File
+	strippedAST *ast.File // original parsed AST (attrs retained)
 	// hasTestAttrs is true when the file contained at least one @test attribute.
 	// Files where this is false are treated as fixture files: they are still
 	// compiled into the evaluated value (so references from other files work)
@@ -874,17 +838,15 @@ type cueFileResult struct {
 
 // buildValue compiles and evaluates CUE files.
 //
-// When cueFiles is nil, loads fresh from r.archive. If the archive contains a
-// cue.mod/module.cue, module-aware loading (loadWithConfig) is used, which
-// handles external package imports and cross-file references. Otherwise the
-// files are compiled independently and unified (CompileBytes). After loading,
-// @test attributes are extracted and stripped from the main-package files, and
-// r.cueFiles is populated.
+// When cueFiles is nil, loads fresh from r.archive using loadWithConfig (which
+// handles external package imports and cross-file references). @test attributes
+// are recorded from the parsed AST files (but not stripped — CUE ignores them),
+// and r.cueFiles is populated.
 //
 // When cueFiles is non-nil (permutation rebuild), the caller has already
 // modified the AST elements in place (field reordering). buildValue reformats
-// those ASTs, creates a fresh stripped archive, and reloads to produce a new
-// cue.Value that reflects the permuted field ordering.
+// those ASTs, creates a fresh archive, and reloads to produce a new cue.Value
+// that reflects the permuted field ordering.
 func (r *inlineRunner) buildValue(ctx *cue.Context, cueFiles []*cueFileResult) (cue.Value, []attrRecord, error) {
 	if cueFiles != nil {
 		// Permutation rebuild: format modified ASTs and reload.
@@ -904,11 +866,12 @@ func (r *inlineRunner) relFilename(absPath string) string {
 }
 
 // buildFromArchive loads the archive via loadWithConfig, extracts @test attrs
-// from the parsed AST files, then reloads from formatted stripped ASTs so that
-// error positions in the evaluated value match the baseLine values computed
-// during attribute extraction (which are in stripped-source coordinates).
+// from the parsed AST files, then builds the value directly from the original
+// loaded instance (with @test attrs still present). CUE ignores attributes
+// during evaluation, so the result is identical to stripping them, but error
+// positions reference the original source lines — what the user sees in their
+// editor — rather than a reformatted stripped copy.
 func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, []attrRecord, error) {
-	// First load: get parsed AST files for attr extraction.
 	insts := loadWithConfig(r.archive, r.dir, load.Config{Env: []string{}})
 	if len(insts) == 0 {
 		return cue.Value{}, nil, fmt.Errorf("no instances found")
@@ -930,10 +893,13 @@ func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, []attrReco
 		})
 	}
 
-	// Second load: format stripped ASTs and reload so error positions reflect
-	// stripped source coordinates, matching baseLine from attr extraction.
-	val, _, err := r.buildFromFilesViaLoad(ctx, r.cueFiles)
-	return val, allRecords, err
+	// Build from the original instance so that error positions match the
+	// original source, not a reformatted stripped copy.
+	val := ctx.BuildInstance(inst)
+	if val.BuildInstance() == nil && val.Err() != nil {
+		return cue.Value{}, nil, val.Err()
+	}
+	return val, allRecords, nil
 }
 
 // buildFromFilesViaLoad formats ASTs, creates a stripped archive, and reloads

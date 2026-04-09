@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "833ac331_b3c17115",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-09T08:33:08Z",
+      "side": 1,
+      "message": "Nice - and more efficient than using strings.HasPrefix twice. Any chance of squashing the three CLs that deal with this logic into one? Would be nice to avoid two slightly-bad CLs landing on master?",
+      "revId": "d25d94cd0045485f43c3db2c564ff86129986f2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

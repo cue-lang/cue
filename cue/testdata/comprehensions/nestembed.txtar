@@ -1,4 +1,6 @@
 Issue #556
+# Issue #556: Tests that nested comprehensions with list.Contains filtering
+# correctly produces only the non-deleted entries.
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 import "list"

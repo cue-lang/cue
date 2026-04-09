@@ -2,6 +2,9 @@
 -- in.cue --
 import "encoding/yaml"
 
+// Defaults don't resolve struct values; a default that selects a missing
+// field in a struct should fall back to the other disjunct.
+// https://cuelang.org/issue/700
 issue700: {
 	a: y: "y"
 	test1: *a.x | 1
@@ -28,6 +31,9 @@ func: {
 	ok1: yaml.MarshalStream(s) | yaml.Marshal(s)
 }
 
+// Default mark on interpolated string; a concrete override should suppress
+// a default interpolation regardless of whether it is left or right in the disjunction.
+// https://cuelang.org/issue/782
 issue782: {
 	a: {
 		inner:         string
@@ -51,6 +57,9 @@ issue782: {
 	}
 }
 -- issue3680.cue --
+// evalv3: "unexpected uninitialized node" regression with bottom optional fields;
+// optional fields set to _|_ in a disjunct should not cause a crash.
+// https://cuelang.org/issue/3680
 issue3680: t1: {
 	{} | {
 		a?: _|_
@@ -92,7 +101,7 @@ NumCloseIDs: 9
     }
     y: (_|_){
       // [incomplete] lookup.y: undefined field: a:
-      //     ./in.cue:13:14
+      //     ./in.cue:16:14
     }
     ok1: (struct){
       name: (string){ "Hello" }
@@ -112,16 +121,16 @@ NumCloseIDs: 9
     allFail1: (_|_){
       // [incomplete] lookup.allFail1: 2 errors in empty disjunction:
       // lookup.allFail1: undefined field: a:
-      //     ./in.cue:20:14
+      //     ./in.cue:23:14
       // lookup.allFail1: undefined field: b:
-      //     ./in.cue:20:20
+      //     ./in.cue:23:20
     }
     allFail2: (_|_){
       // [incomplete] lookup.allFail2: 2 errors in empty disjunction:
       // lookup.allFail2: undefined field: a:
-      //     ./in.cue:21:14
+      //     ./in.cue:24:14
       // lookup.allFail2: undefined field: b:
-      //     ./in.cue:21:20
+      //     ./in.cue:24:20
     }
   }
   func: (struct){
@@ -129,9 +138,9 @@ NumCloseIDs: 9
     ok1: (_|_){
       // [incomplete] func.ok1: 2 errors in empty disjunction:
       // func.ok1: error in call to encoding/yaml.MarshalStream: non-concrete argument 0:
-      //     ./in.cue:26:7
+      //     ./in.cue:29:7
       // func.ok1: error in call to encoding/yaml.Marshal: non-concrete argument 0:
-      //     ./in.cue:26:31
+      //     ./in.cue:29:31
     }
   }
   issue782: (struct){
@@ -157,11 +166,11 @@ NumCloseIDs: 9
       }, (struct){
         a?: (_|_){
           // [user] explicit error (_|_ literal) in source:
-          //     ./issue3680.cue:3:7
+          //     ./issue3680.cue:6:7
         }
         b?: (_|_){
           // [user] explicit error (_|_ literal) in source:
-          //     ./issue3680.cue:4:7
+          //     ./issue3680.cue:7:7
         }
       }) }
     t2: (struct){
@@ -169,11 +178,11 @@ NumCloseIDs: 9
         }, (struct){
           a?: (_|_){
             // [user] explicit error (_|_ literal) in source:
-            //     ./issue3680.cue:10:7
+            //     ./issue3680.cue:13:7
           }
           b?: (_|_){
             // [user] explicit error (_|_ literal) in source:
-            //     ./issue3680.cue:11:7
+            //     ./issue3680.cue:14:7
           }
         }) }
     }

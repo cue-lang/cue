@@ -1,3 +1,7 @@
+# Tests that a disjunction inside a definition resolves correctly when a
+# discriminant field is set. After unifying #Task with {op: "pull"}, the
+# "pull" branch is selected and expressions using the defaulted tag
+# field (tag: *"latest" | string) evaluate concretely.
 #evalFull
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --

@@ -1,3 +1,6 @@
+# Tests that list.UniqueItems correctly rejects lists with duplicate
+# values, which were silently passed through instead of producing an error.
+# https://cuelang.org/issue/299
 #todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 import "list"

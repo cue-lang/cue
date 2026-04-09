@@ -88,6 +88,9 @@ scalarReference: {
 	}
 }
 
+// Strange let declaration behavior: accessing the last element of a list via
+// a let-bound variable failed when the let appeared before the list definition.
+// https://cuelang.org/issue/1116
 issue1116: {
 	a: {
 		#a: ["a", "b"]
@@ -100,6 +103,12 @@ issue1116: {
 		#a: ["a", "b"]
 	}
 }
+	        // [incomplete] incompleteLet.bar.mx: undefined field: max:
+	        //     in.cue:54:17
+	        // [incomplete] incompleteLet.bar.max: undefined field: max:
+	        //     in.cue:54:17
+	      // [incomplete] incompleteLet.x: undefined field: max:
+	      //     in.cue:61:11
 -- out/compile --
 --- in.cue
 {

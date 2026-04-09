@@ -1,3 +1,6 @@
+# Tests that inner structs within a definition template constraint are not
+# incorrectly treated as closed when unified via a non-definition value.
+# https://cuelang.org/issue/359
 #todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #simple: {

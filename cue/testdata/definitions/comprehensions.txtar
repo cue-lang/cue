@@ -1,5 +1,8 @@
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
+// Closedness should not be silently swallowed when propagated through
+// comprehensions; fields added via comprehensions should still be checked.
+// https://cuelang.org/issue/595
 issue595: {
 	// NOTE: this should eval with an EVAL error, not
 	// an incomplete error. See Issue #595.
@@ -25,7 +28,7 @@ NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 issue595.files: undefined field: nam:
-    ./in.cue:8:14
+    ./in.cue:11:14
 
 Result:
 (_|_){
@@ -39,7 +42,7 @@ Result:
     }
     files: (_|_){
       // [eval] issue595.files: undefined field: nam:
-      //     ./in.cue:8:14
+      //     ./in.cue:11:14
     }
   }
 }

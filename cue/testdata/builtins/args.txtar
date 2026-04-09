@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+// issue3584: builtin functions with default-valued disjunction arguments
+// (e.g. *1 | 2) caused an "error in call" panic in evalv3.
+// https://cuelang.org/issue/3584
 issue3584: reduced: t1: {
 	ref: out
 	trigger: *1 | 2

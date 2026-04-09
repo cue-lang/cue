@@ -238,6 +238,8 @@ inDefinitions: err2: {
 // SimplifyBounds should handle EqualOp bounds
 // without panicking, including in combination
 // with other bound types.
+// Regression: SimplifyBounds panicked on == bounds combined with other bound types.
+// https://cuelang.org/issue/4251
 issue4251: ok: {
 	a: !="c" & =="a" & "a"
 	b: =="b" & !="c" & "b"
@@ -376,9 +378,9 @@ inDefinitions.err2.x: invalid value {name:"X"} (out of bound !={name:"X"}):
     ./issue4142.cue:16:6
     ./issue4142.cue:17:5
 issue4251.fail.b: invalid value "b" (out of bound !="b"):
-    ./issue4251-panic.cue:13:13
-    ./issue4251-panic.cue:13:5
-    ./issue4251-panic.cue:13:21
+    ./issue4251-panic.cue:15:13
+    ./issue4251-panic.cue:15:5
+    ./issue4251-panic.cue:15:21
 
 Result:
 (_|_){
@@ -958,9 +960,9 @@ Result:
       // [eval]
       b: (_|_){
         // [eval] issue4251.fail.b: invalid value "b" (out of bound !="b"):
-        //     ./issue4251-panic.cue:13:13
-        //     ./issue4251-panic.cue:13:5
-        //     ./issue4251-panic.cue:13:21
+        //     ./issue4251-panic.cue:15:13
+        //     ./issue4251-panic.cue:15:5
+        //     ./issue4251-panic.cue:15:21
       }
     }
   }

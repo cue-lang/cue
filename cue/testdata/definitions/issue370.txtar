@@ -1,3 +1,6 @@
+# Tests that embedding a definition (#C1) inside another definition (#C2) and
+# then unifying with a concrete struct correctly validates all fields.
+# https://cuelang.org/issue/370
 #todo:inline: medium — general test; audit in.cue for appropriate @test annotations
 -- x.cue --
 package x

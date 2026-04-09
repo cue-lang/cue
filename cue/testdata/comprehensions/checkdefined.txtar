@@ -1,5 +1,8 @@
 
 Issue #1969
+# Tests that undefined field comparisons with _|_ work correctly in
+# comprehension conditions, including with close(), for loops, and let bindings.
+# Issue #1969 and #2245.
 #todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 import "list"
@@ -35,11 +38,19 @@ oko3: {
 // Should Field s exist in okc or not? Depends on whether comparison to bottom
 // is recursive or not. It probably should not.
 // TODO: fix for new evaluator. But possibly address this with new builtins.
+// issue1969: Tests that comparing let-bound expressions involving undefined
+// fields to _|_ works correctly with list comprehensions.
+// https://cuelang.org/issue/1969
 issue1969: okc: {
 	let X = xc.undefined
 	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
 
 	if Y != _|_ {Y}
+		    // [eval] issue1969.okc.X: undefined field: undefined:
+		    //     in.cue:47:13
+		    // [eval]
+		      // [eval] issue1969.okc.X: undefined field: undefined:
+		      //     in.cue:47:13
 }
 
 issue1969: oko: {
@@ -127,30 +138,30 @@ NumCloseIDs: 29
     okc: (struct){
       let X#1 = (_|_){
         // [eval] issue1969.okc.X: undefined field: undefined:
-        //     ./in.cue:35:13
+        //     ./in.cue:38:13
       }
       let Y#2 = (_|_){
         // [eval]
         s: (_|_){
           // [eval] issue1969.okc.X: undefined field: undefined:
-          //     ./in.cue:35:13
+          //     ./in.cue:38:13
         }
       }
     }
     oko: (struct){
       let X#3 = (_|_){
         // [incomplete] issue1969.oko.X: undefined field: undefined:
-        //     ./in.cue:42:13
+        //     ./in.cue:50:13
       }
       let Y#4 = (struct){
         s: (_|_){
           // [incomplete] issue1969.oko.X: undefined field: undefined:
-          //     ./in.cue:42:13
+          //     ./in.cue:50:13
         }
       }
       s: (_|_){
         // [incomplete] issue1969.oko.X: undefined field: undefined:
-        //     ./in.cue:42:13
+        //     ./in.cue:50:13
       }
     }
   }

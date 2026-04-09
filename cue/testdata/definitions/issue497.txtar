@@ -1,3 +1,6 @@
+# Tests that nested fields within a definition unified with #A: _ are accepted
+# and do not produce spurious "field not allowed" errors on the nested structure.
+# https://cuelang.org/issue/497
 #todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #A: _

@@ -4,6 +4,9 @@
 -- issue4056.cue --
 import "strings"
 
+// cmd/cue: "unresolved disjunction" when error() disjuncts are added inside
+// a conditional that depends on the same field; the concrete value should win.
+// https://cuelang.org/issue/4056
 issue4056: full: {
 	a: "foo-bar"
 	a: _ | error("error message 1")

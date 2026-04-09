@@ -16,6 +16,24 @@
       "message": "erm, sure, add `serve`, and delete `remote sessions`, but keep `remote` I think (though they should all become `cue lsp help ...` but arguably that\u0027s a different CL",
       "revId": "34ed292d8f3b97a816aab153ee56b2f530076262",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "480cd7c9_d8637f65",
+        "filename": "internal/golangorgx/gopls/cmd/info.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-09T16:27:04Z",
+      "side": 0,
+      "message": "reverted this; it\u0027s really unrelated to the other changes.",
+      "parentUuid": "01cd2d5a_6684790a",
+      "revId": "34ed292d8f3b97a816aab153ee56b2f530076262",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "now *not* already-deleted ;)",
       "revId": "534be9d98188ffcdd453322acdc278f730baa872",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "175c1dd2_12bc7d54",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-09T16:27:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4a45567_49a04bd6",
+      "revId": "534be9d98188ffcdd453322acdc278f730baa872",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

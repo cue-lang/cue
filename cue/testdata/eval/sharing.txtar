@@ -1,6 +1,9 @@
 
 #todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
+// evalv3 "incDependent: already closed" panic on valid CUE involving
+// structure sharing between definitions and regular fields.
+// https://cuelang.org/issue/3062
 issue3062: ok1: {
 	#S: "a"
 	#o: x: #S
@@ -10,6 +13,9 @@ issue3062: ok1: {
 	A: "a"
 }
 
+// evalv3 "field not allowed" regression from v2 involving structure sharing
+// when a field is unified with a shared vertex that has a self-referential path.
+// https://cuelang.org/issue/3601
 issue3601: ok1: {
 	Y: (X & __no_sharing).a
 	X: a: b: a.b
@@ -42,6 +48,9 @@ debug: {
 // a field with different "closedness" history should compute closedness
 // correctly.
 
+// "field not allowed" regression in evalv3 when the same definition is
+// unified into a field multiple times with different closedness histories.
+// https://cuelang.org/issue/3641
 issue3641: simplified: t1: {
 	#Context1: ctx: {}
 	Context2: ctx: {}
@@ -108,6 +117,9 @@ issue3641: full: {
 		sch: config
 	}
 }
+// "field not allowed" evalv3 regression with lists: a list value shared from
+// a definition constraint was incorrectly rejected in a regular field.
+// https://cuelang.org/issue/3546
 issue3546: reduced: {
 	all: ["a"]
 	#all: all
@@ -143,6 +155,9 @@ shareCycle: t3: {
 -- acrossdisjunction.cue --
 import "list"
 
+// evalv3 incomplete value regression involving builtin calls: list.Repeat
+// result shared across a disjunction boundary was not properly unshared.
+// https://cuelang.org/issue/3679
 issue3679: {
 	// The result of list.Repeat is structure shared in env. This needs to be
 	// "unshared" within the disjunction. Ensure that unsharing a shared Vertex
@@ -151,6 +166,9 @@ issue3679: {
 	b: list.Repeat([for k, v in [0] { "bar" }], 1)
 }
 -- issue3835.cue --
+// evalv3 regression with "cycle with field" error involving a comprehension
+// with a let that references a top-level field via a pattern constraint.
+// https://cuelang.org/issue/3835
 issue3835: {
 	foo: {}
 
@@ -171,6 +189,9 @@ pending: t1: {
 	X: b: Y
 	Y: c: d: int
 }
+// evalv3 "field not allowed" regression with a comprehension that conditionally
+// sets a field inside a definition with an optional nested definition.
+// https://cuelang.org/issue/3849
 issue3849: {
 	dep: #Deployment & {}
 	if true {
@@ -182,6 +203,9 @@ issue3849: {
 -- let.cue --
 import "list"
 
+// evalv3 structural cycle regression vs evalv2 when a let binding holds a
+// flattened list that is iterated and used to populate a dynamic field.
+// https://cuelang.org/issue/3903
 issue3903: full: {
 	_input: null | *{name: "foo"}
 
@@ -500,8 +524,8 @@ Result:
         }
         result: (_|_){
           // [incomplete] issue3903.full._template.result: invalid interpolation: non-concrete value string (type string):
-          //     ./let.cue:21:11
-          //     ./let.cue:20:16
+          //     ./let.cue:24:11
+          //     ./let.cue:23:16
         }
       }
       foo: (struct){
@@ -531,8 +555,8 @@ Result:
         }
         result: (_|_){
           // [incomplete] issue3903.noshare._template.result: invalid interpolation: non-concrete value string (type string):
-          //     ./let.cue:41:11
-          //     ./let.cue:40:17
+          //     ./let.cue:44:11
+          //     ./let.cue:43:17
         }
       }
       foo: (struct){
@@ -541,8 +565,8 @@ Result:
         }
         result: (_|_){
           // [incomplete] issue3903.noshare.foo.result: invalid interpolation: non-concrete value string (type string):
-          //     ./let.cue:41:11
-          //     ./let.cue:40:17
+          //     ./let.cue:44:11
+          //     ./let.cue:43:17
         }
       }
     }
@@ -891,6 +915,17 @@ diff old new
        }
        _template: (struct){
          input: (struct){
+@@ -308,8 +261,8 @@
+         }
+         result: (_|_){
+           // [incomplete] issue3903.full._template.result: invalid interpolation: non-concrete value string (type string):
+-          //     ./let.cue:21:11
+-          //     ./let.cue:20:16
++          //     ./let.cue:24:11
++          //     ./let.cue:23:16
+         }
+       }
+       foo: (struct){
 @@ -324,14 +277,14 @@
            name: (string){ "foo" }
          }, (null){ null }) }
@@ -914,19 +949,31 @@ diff old new
        }
        _template: (struct){
          input: (struct){
-@@ -345,9 +298,13 @@
-       }
-       foo: (struct){
-         input: (struct){
+@@ -339,15 +292,19 @@
+         }
+         result: (_|_){
+           // [incomplete] issue3903.noshare._template.result: invalid interpolation: non-concrete value string (type string):
+-          //     ./let.cue:41:11
+-          //     ./let.cue:40:17
+-        }
+-      }
+-      foo: (struct){
+-        input: (struct){
 -          name: (string){ "foo" }
 -        }
 -        result: (string){ "result-foo" }
++          //     ./let.cue:44:11
++          //     ./let.cue:43:17
++        }
++      }
++      foo: (struct){
++        input: (struct){
 +          name: (string){ string }
 +        }
 +        result: (_|_){
 +          // [incomplete] issue3903.noshare.foo.result: invalid interpolation: non-concrete value string (type string):
-+          //     ./let.cue:41:11
-+          //     ./let.cue:40:17
++          //     ./let.cue:44:11
++          //     ./let.cue:43:17
 +        }
        }
      }

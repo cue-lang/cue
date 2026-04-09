@@ -1,4 +1,7 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that list comprehensions work correctly when iterating over lists with
+# default values (disjunctions using *). Issue #507: comprehensions over
+# [...T] | *[elem] lists failed with "invalid operand" errors.
+# https://cuelang.org/issue/507
 -- in.cue --
 package x
 

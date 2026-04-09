@@ -1,6 +1,9 @@
 #todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 -- comprehensions.cue --
+// Panic "vertex not initialized" in v0.14.0+ with recursive comprehensions
+// referencing a field being defined, particularly across subdirectories.
+// https://cuelang.org/issue/4119
 issue4119: reduced: {
 	x: [...]
 	x: _ | *[{f: 123}]
@@ -61,7 +64,7 @@ issue4119: full: {
 -- out/evalalpha --
 Errors:
 issue4119.reducedNested.x.y.0.f: undefined field: f:
-    ./comprehensions.cue:19:9
+    ./comprehensions.cue:22:9
 
 Result:
 (_|_){
@@ -80,7 +83,7 @@ Result:
       // [eval]
       x: (_|_){
         // [eval] issue4119.reducedNested.x.y.0.f: undefined field: f:
-        //     ./comprehensions.cue:19:9
+        //     ./comprehensions.cue:22:9
         y: (list){ list }
       }
     }

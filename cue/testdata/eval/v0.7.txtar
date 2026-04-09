@@ -205,6 +205,9 @@ mutual: t4: ok: {
 }
 
 -- equality.cue --
+// evalv3 nil pointer dereference panic in equalTerminal with repeated
+// unifications of the same default disjunction inside a close() call.
+// https://cuelang.org/issue/3194
 issue3194: reduced: {
 	A: *0 | >10
 	A: *0 | >10
@@ -217,6 +220,9 @@ issue3194: reduced: {
 -- chained.cue --
 import "encoding/yaml"
 
+// evalv3 "field set was already referenced" regression when a chained field
+// lookup resolves through a dynamic field to a yaml.Marshal call.
+// https://cuelang.org/issue/3925
 issue3925: reduced: {
 	out: yaml.Marshal(in.b.actual)
 	in: {

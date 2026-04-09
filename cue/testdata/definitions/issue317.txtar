@@ -1,5 +1,7 @@
 # Allow otherField
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that comprehension-based schemas and deployment configurations correctly
+# allow fields defined through pattern constraints and let comprehensions.
+# Issue: https://cuelang.org/issue/317
 -- in.cue --
 #T: {
 	#Schema: [_]: #D

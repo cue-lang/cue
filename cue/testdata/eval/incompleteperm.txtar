@@ -16,8 +16,14 @@ permanentlyIncompleteOperandsDisjunct: {
 	a: (int + 1) | (int + 1)
 }
 
+// Wrong result for `meet`: multiplying a bound by a concrete value should
+// yield an error when the result contradicts the bound.
+// https://cuelang.org/issue/680
 issue680: (>10 * 2) & 0
 
+// In a definition, 'size: >=100 <=200' should be a compile error since
+// applying <= to a bound (>=100) is not valid arithmetic.
+// https://cuelang.org/issue/405
 issue405: >=100 <= 200
 -- out/evalalpha --
 permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
@@ -33,9 +39,9 @@ permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concr
 permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
     ./in.cue:12:18
 issue680: invalid operand >10 ('*' requires concrete value):
-    ./in.cue:15:12
+    ./in.cue:18:12
 issue405: invalid operand >=100 ('<=' requires concrete value):
-    ./in.cue:17:11
+    ./in.cue:23:11
 -- out/compile --
 permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
     ./in.cue:3:5
@@ -50,9 +56,9 @@ permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concr
 permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
     ./in.cue:12:18
 issue680: invalid operand >10 ('*' requires concrete value):
-    ./in.cue:15:12
+    ./in.cue:18:12
 issue405: invalid operand >=100 ('<=' requires concrete value):
-    ./in.cue:17:11
+    ./in.cue:23:11
 --- in.cue
 {
   permanentlyIncompleteOperands: {

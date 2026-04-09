@@ -67,6 +67,9 @@ fieldDiscriminator: local:{
 // inside the disjunction. The failure to do this lookup is not the underlying
 // cause, though: the inner failure is. For this reason, we should report all
 // errors.
+// evalv3 regression: misleading "undefined field" error instead of the expected
+// circular dependency error when processing disjunctions with cyclic conditionals.
+// https://cuelang.org/issue/3967
 issue3967: error: nested: {
 	out: #Application & {
 		oneOrTwo: two: {}
@@ -288,16 +291,16 @@ NumCloseIDs: 94
       nested: (struct){
         out: (_|_){
           // [incomplete] issue3967.error.nested.out: undefined field: kind:
-          //     ./in.cue:82:17
+          //     ./in.cue:85:17
           oneOrTwo: (_|_){
             // [cycle] issue3967.error.nested.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.oneOrTwo.two.optional changed after evaluation:
-            //     ./in.cue:76:9
+            //     ./in.cue:79:9
             // issue3967.error.nested.out.oneOrTwo: 2 errors in empty disjunction::
-            //     ./in.cue:82:6
+            //     ./in.cue:85:6
             // issue3967.error.nested.out.oneOrTwo.two: field not allowed:
-            //     ./in.cue:82:6
-            //     ./in.cue:70:13
-            //     ./in.cue:75:5
+            //     ./in.cue:85:6
+            //     ./in.cue:73:13
+            //     ./in.cue:78:5
           }
         }
         #Application: (#struct){
@@ -313,13 +316,13 @@ NumCloseIDs: 94
         out: (#struct){
           oneOrTwo: (_|_){
             // [cycle] issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
-            //     ./in.cue:94:9
+            //     ./in.cue:97:9
             // issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
-            //     ./in.cue:99:7
+            //     ./in.cue:102:7
             // issue3967.error.local.out.oneOrTwo.two: field not allowed:
-            //     ./in.cue:99:7
-            //     ./in.cue:88:13
-            //     ./in.cue:93:5
+            //     ./in.cue:102:7
+            //     ./in.cue:91:13
+            //     ./in.cue:96:5
           }
         }
         #Application: (#struct){
@@ -366,16 +369,16 @@ diff old new
 -            }) }
 +        out: (_|_){
 +          // [incomplete] issue3967.error.nested.out: undefined field: kind:
-+          //     ./in.cue:82:17
++          //     ./in.cue:85:17
 +          oneOrTwo: (_|_){
 +            // [cycle] issue3967.error.nested.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.oneOrTwo.two.optional changed after evaluation:
-+            //     ./in.cue:76:9
++            //     ./in.cue:79:9
 +            // issue3967.error.nested.out.oneOrTwo: 2 errors in empty disjunction::
-+            //     ./in.cue:82:6
++            //     ./in.cue:85:6
 +            // issue3967.error.nested.out.oneOrTwo.two: field not allowed:
-+            //     ./in.cue:82:6
-+            //     ./in.cue:70:13
-+            //     ./in.cue:75:5
++            //     ./in.cue:85:6
++            //     ./in.cue:73:13
++            //     ./in.cue:78:5
 +          }
 +        }
 +        #Application: (#struct){
@@ -403,13 +406,13 @@ diff old new
 -            // [incomplete] issue3967.error.local.#Application.oneOrTwo: cycle error referencing kind:
 -            //     ./in.cue:99:9
 +            // [cycle] issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
-+            //     ./in.cue:94:9
++            //     ./in.cue:97:9
 +            // issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
-+            //     ./in.cue:99:7
++            //     ./in.cue:102:7
 +            // issue3967.error.local.out.oneOrTwo.two: field not allowed:
-+            //     ./in.cue:99:7
-+            //     ./in.cue:88:13
-+            //     ./in.cue:93:5
++            //     ./in.cue:102:7
++            //     ./in.cue:91:13
++            //     ./in.cue:96:5
 +          }
 +        }
 +        #Application: (#struct){

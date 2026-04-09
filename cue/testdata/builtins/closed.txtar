@@ -19,6 +19,8 @@ inDisjunctions: {
 	x: syslog: xxx: {}
 }
 
+// issue642: Tests that close() with merged struct patterns (concrete fields and
+// bulk optional) correctly allows subfields. https://cuelang.org/issue/642
 issue642: {
 	test: close({
 		a: _
@@ -43,6 +45,8 @@ withSubfields: {
 	test: b: x: _
 }
 
+// issue3572: Tests that close({...}) allows additional fields when unified
+// with an open struct. https://cuelang.org/issue/3572
 issue3572: {
   t1: close({...}) & {a: 5}
 
@@ -51,6 +55,8 @@ issue3572: {
   t2: e & {a: 5}
 }
 
+// issue3580: Tests that close() does not panic when a field inside the closed
+// struct references another field of the same struct. https://cuelang.org/issue/3580
 issue3580: {
 	x: close({
 		a: _

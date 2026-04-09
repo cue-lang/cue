@@ -45,17 +45,22 @@ type inlineFillWrite struct {
 	newAttrText string // replacement text
 }
 
-// applyInlineFillWritebacks applies pending inline @test attribute rewrites to
-// the archive.  Replacements are applied by byte offset in descending order so
-// earlier offsets remain valid after each substitution.
+// applyInlineFillWritebacks applies all pending byte-level @test attribute
+// rewrites to the archive, including both inline-fill writes (eq/cover/debug)
+// and pos= writes.  All writes are combined and applied in a single
+// descending-offset pass per file so that no write shifts the byte positions
+// used by another write in the same pass.
 func (r *inlineRunner) applyInlineFillWritebacks() {
-	if len(r.pendingInlineFillWrites) == 0 {
+	if len(r.pendingInlineFillWrites) == 0 && len(r.pendingPosWrites) == 0 {
 		return
 	}
-	// Group writes by file name.
+	// Group writes by file name, combining both sets.
 	byFile := make(map[string][]inlineFillWrite, 2)
 	for _, ifw := range r.pendingInlineFillWrites {
 		byFile[ifw.fileName] = append(byFile[ifw.fileName], ifw)
+	}
+	for _, pw := range r.pendingPosWrites {
+		byFile[pw.fileName] = append(byFile[pw.fileName], pw)
 	}
 
 	changed := false

@@ -495,6 +495,47 @@ cannot import package as definition identifier`,
 			out: `{a: [1, 2, 3, b, c, ...], b: [1, 2, 3], c: [1, 2, 3], d: [1+2, 2, 4]}`,
 		},
 		{
+			desc:    "lists with optional commas",
+			version: "v0.17.0",
+			in: `{
+			a: [
+				1
+				2
+				3
+			]
+			b: [
+				"foo"
+				"bar"
+			]
+			c: [1
+			2]
+		}`,
+			out: `{a: [1, 2, 3], b: ["foo", "bar"], c: [1, 2]}`,
+		},
+		{
+			desc:    "list element followed by comprehension on next line",
+			version: "v0.17.0",
+			in: `{
+			a: [1, 2, 3]
+			b: [
+				0
+				for x in a { x }
+			]
+		}`,
+			out: `{a: [1, 2, 3], b: [0, for x in a {x}]}`,
+		},
+		{
+			desc:    "lists with optional commas not allowed before v0.17.0",
+			version: "v0.16.0",
+			in: `{
+			a: [
+				1
+				2
+			]
+		}`,
+			out: "{a: [1, <*ast.BadExpr>]}\nmissing ',' before newline in list literal (and 2 more errors)",
+		},
+		{
 			desc: "list types",
 			in: `{
 			a: 4*[int]

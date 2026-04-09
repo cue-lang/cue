@@ -2,28 +2,28 @@
 list:  [1, 2, 3]              @test(eq, [1, 2, 3])
 index: [1, 2, 3][1]           @test(eq, 2)
 unify: [1, 2, 3] & [_, 2, 3]  @test(eq, [1, 2, 3])
-e:     [] & 4                  @test(err, code=eval, pos=[0:4, 0:9], contains="conflicting values", args=[list, int])
+e:     [] & 4                  @test(err, code=eval, pos=[0:8, 0:13], contains="conflicting values", args=[list, int])
 
 // No "contains" as message may vary by implementation.
-e2:    [3]["d"]                @test(err, code=eval, pos=[0:9])
-e3:    [3][-1]                 @test(err, code=eval, pos=[0:5, 0:9], contains="invalid index", args=[-1])
-e4:    [1, 2, ...>=4 & <=5] & [1, 2, 4, 8] @test(err, code=eval, pos=[0:21, 0:38], contains="invalid value", args=[8, <=5])
-e5:    [1, 2, 4, 8] & [1, 2, ...>=4 & <=5] @test(err, code=eval, pos=[0:36, 0:15], contains="invalid value", args=[8, <=5])
+e2:    [3]["d"]                @test(err, code=eval, pos=[0:12])
+e3:    [3][-1]                 @test(err, code=eval, pos=[0:8, 0:12], contains="invalid index", args=[-1])
+e4:    [1, 2, ...>=4 & <=5] & [1, 2, 4, 8] @test(err, code=eval, pos=[0:24, 0:41], contains="invalid value", args=[8, <=5])
+e5:    [1, 2, 4, 8] & [1, 2, ...>=4 & <=5] @test(err, code=eval, pos=[0:39, 0:18], contains="invalid value", args=[8, <=5])
 -- out/errors.txt --
 [eval] e: conflicting values [] and 4 (mismatched types list and int):
-    ./in.cue:4:4
-    ./in.cue:4:9
+    ./in.cue:4:8
+    ./in.cue:4:13
 [eval] e2: undefined field: d:
-    ./in.cue:7:9
+    ./in.cue:7:12
 [eval] e3: invalid index -1 (index must be non-negative):
-    ./in.cue:8:5
-    ./in.cue:8:9
+    ./in.cue:8:8
+    ./in.cue:8:12
 [eval] e4.3: invalid value 8 (out of bound <=5):
-    ./in.cue:9:21
-    ./in.cue:9:38
+    ./in.cue:9:24
+    ./in.cue:9:41
 [eval] e5.3: invalid value 8 (out of bound <=5):
-    ./in.cue:10:36
-    ./in.cue:10:15
+    ./in.cue:10:39
+    ./in.cue:10:18
 -- out/compile --
 --- in.cue
 {

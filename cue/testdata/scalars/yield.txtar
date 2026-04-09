@@ -28,10 +28,10 @@ ifScalarNested: {
 }
 -- out/errors.txt --
 [eval] ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
-    ./in.cue:7:19
-    ./in.cue:10:2
-    ./in.cue:10:13
-    ./in.cue:12:2
+    ./in.cue:11:19
+    ./in.cue:14:2
+    ./in.cue:14:13
+    ./in.cue:16:2
 -- out/compile --
 --- in.cue
 {

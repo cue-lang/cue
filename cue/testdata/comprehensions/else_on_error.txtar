@@ -6,29 +6,29 @@
 
 // Error in for source - else should NOT trigger
 forSourceError: {
-	@test(err, code=eval, pos=[1:11], contains="cannot range")
+	@test(err, code=eval, pos=[2:11], contains="cannot range")
 	for x in "not-a-list" { "\(x)": x } fallback { fallbackField: true }
 }
 
 // Error in if condition - else should NOT trigger
 ifConditionError: {
-	@test(err, code=eval, pos=[1:6, 1:14], contains="invalid operands")
+	@test(err, code=eval, pos=[2:6, 2:14], contains="invalid operands")
 	if ("not" + 1) { a: 1 } else { b: 2 }
 }
 
 // Bottom value in for source - else should NOT trigger
 forSourceBottom: {
-	@test(err, code=user, pos=[1:11], contains="explicit error")
+	@test(err, code=user, pos=[2:11], contains="explicit error")
 	for x in _|_ { "\(x)": x } fallback { fallbackField: true }
 }
 -- out/errors.txt --
 [eval] forSourceError: cannot range over "not-a-list" (found string, want list or struct):
-    ./in.cue:8:11
+    ./in.cue:9:11
 [eval] ifConditionError: invalid operands "not" and 1 to '+' (type string and int):
-    ./in.cue:13:6
-    ./in.cue:13:14
+    ./in.cue:15:6
+    ./in.cue:15:14
 [user] explicit error (_|_ literal) in source:
-    ./in.cue:18:11
+    ./in.cue:21:11
 -- out/compile --
 --- in.cue
 {

@@ -1,3 +1,7 @@
+# Tests that builtin encoding/template functions (text/template.Execute,
+# encoding/json.Marshal, encoding/yaml.Marshal) correctly produce [incomplete]
+# errors rather than panicking when called with abstract (non-concrete) values.
+# https://cuelang.org/issue/314
 #name: issue314
 #evalFull
 #todo:inline: medium — builtin function calls; use InferBuiltins for validators

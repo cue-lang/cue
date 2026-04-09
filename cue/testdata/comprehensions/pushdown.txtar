@@ -833,6 +833,9 @@ unifyDynamicReflectSuccess: {
 	}
 }
 -- issue3621.cue --
+// issue3621: evalv3 regression producing false "cyclic reference" errors for
+// comprehensions with nested field definitions and references that evalv2 handles correctly.
+// https://cuelang.org/issue/3621
 issue3621: reduced: t1: {
 	// This test ensures that when a reference is made within a comprehension,
 	// with vertices marked as "pending", that these are not completed the
@@ -865,6 +868,9 @@ issue3621: full: {
 	}
 }
 -- issue3708.cue --
+// issue3708: evalv3 regression reporting a cyclic reference error when fields are
+// accessed inside a comprehension using optional field patterns with if conditionals.
+// https://cuelang.org/issue/3708
 issue3708: {
 	out: people.bob.kind
 
@@ -880,6 +886,9 @@ issue3708: {
 	}
 }
 -- issue3729.cue --
+// issue3729: evalv3 incorrectly reports "incomplete value null" for fields typed
+// as a disjunction containing null (e.g. null | #T) inside if comprehensions.
+// https://cuelang.org/issue/3729
 issue3729: withDisjunction: {
 	#Root: sub1?: #sub2?: bool
 	root?: null | #Root
@@ -943,6 +952,9 @@ arcTypeAcrossTwo: {
 		a: b: c: d: true
 	}
 }
+// issue3894: evalv3 regression where an if comprehension affecting an optional
+// field with a disjunction returns an incorrect result instead of the properly
+// constrained value. https://cuelang.org/issue/3894
 issue3894: reduced: p1: {
 	{a: string} | {b: value: string}
 	if true { b: value: "true" }
@@ -961,6 +973,9 @@ issue3894: full: {
 	}
 }
 -- issue3935.cue --
+// issue3935: evalv3 incorrectly reports "field not allowed" when a schema defined
+// with a disjunction is intersected with additional constraints.
+// https://cuelang.org/issue/3935
 issue3935: reduced: {
 	out: #A | #B
 	out: #B & {
@@ -1012,10 +1027,10 @@ embed.fail4.p: field not allowed:
 issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:25:4
 issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
-    ./issue3729.cue:8:32
-    ./issue3729.cue:9:9
-    ./issue3729.cue:10:2
-    ./issue3729.cue:11:9
+    ./issue3729.cue:11:32
+    ./issue3729.cue:12:9
+    ./issue3729.cue:13:2
+    ./issue3729.cue:14:9
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1762,10 +1777,10 @@ Result:
       // [eval]
       root: (_|_){
         // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
-        //     ./issue3729.cue:8:32
-        //     ./issue3729.cue:9:9
-        //     ./issue3729.cue:10:2
-        //     ./issue3729.cue:11:9
+        //     ./issue3729.cue:11:32
+        //     ./issue3729.cue:12:9
+        //     ./issue3729.cue:13:2
+        //     ./issue3729.cue:14:9
         #sub1?: (#struct){
           #sub2: (bool){ true }
         }
@@ -1861,7 +1876,7 @@ Result:
       #B: (#struct){
         x: (_|_){
           // [incomplete] issue3935.reduced.#B.x: required field missing: y:
-          //     ./issue3935.cue:9:7
+          //     ./issue3935.cue:12:7
         }
         y!: (#struct){
           x!: (_){ _ }
@@ -1893,11 +1908,11 @@ Result:
         }
         namespace: (_|_){
           // [incomplete] issue3935.full.#SchemaSelected.namespace: undefined field: namespace:
-          //     ./issue3935.cue:36:27
+          //     ./issue3935.cue:39:27
         }
         _specConfig: (_|_){
           // [incomplete] issue3935.full.#SchemaSelected._specConfig: required field missing: spec:
-          //     ./issue3935.cue:39:16
+          //     ./issue3935.cue:42:16
         }
       }
     }
@@ -1973,7 +1988,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,23 +1,11 @@
+@@ -1,39 +1,21 @@
  Errors:
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
@@ -1996,9 +2011,14 @@ diff old new
 -    ./issue3535.cue:22:4
 +    ./issue3535.cue:25:4
  issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
-     ./issue3729.cue:8:32
-     ./issue3729.cue:9:9
-@@ -26,14 +14,8 @@
+-    ./issue3729.cue:8:32
+-    ./issue3729.cue:9:9
+-    ./issue3729.cue:10:2
+-    ./issue3729.cue:11:9
++    ./issue3729.cue:11:32
++    ./issue3729.cue:12:9
++    ./issue3729.cue:13:2
++    ./issue3729.cue:14:9
  noStackOverflowStructCycle.#list.tail: structural cycle
  noStackOverflowStructCycle.list.tail: structural cycle
  provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -2083,6 +2103,21 @@ diff old new
          }
          output: (#struct){
          }
+@@ -785,10 +757,10 @@
+       // [eval]
+       root: (_|_){
+         // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+-        //     ./issue3729.cue:8:32
+-        //     ./issue3729.cue:9:9
+-        //     ./issue3729.cue:10:2
+-        //     ./issue3729.cue:11:9
++        //     ./issue3729.cue:11:32
++        //     ./issue3729.cue:12:9
++        //     ./issue3729.cue:13:2
++        //     ./issue3729.cue:14:9
+         #sub1?: (#struct){
+           #sub2: (bool){ true }
+         }
 @@ -871,10 +843,10 @@
    issue3935: (struct){
      reduced: (struct){
@@ -2102,7 +2137,7 @@ diff old new
 -        x: (_){ _ }
 +        x: (_|_){
 +          // [incomplete] issue3935.reduced.#B.x: required field missing: y:
-+          //     ./issue3935.cue:9:7
++          //     ./issue3935.cue:12:7
 +        }
          y!: (#struct){
            x!: (_){ _ }
@@ -2116,11 +2151,11 @@ diff old new
 -        }
 -        _specConfig: (_){ _ }
 +          // [incomplete] issue3935.full.#SchemaSelected.namespace: undefined field: namespace:
-+          //     ./issue3935.cue:36:27
++          //     ./issue3935.cue:39:27
 +        }
 +        _specConfig: (_|_){
 +          // [incomplete] issue3935.full.#SchemaSelected._specConfig: required field missing: spec:
-+          //     ./issue3935.cue:39:16
++          //     ./issue3935.cue:42:16
 +        }
        }
      }

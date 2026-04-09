@@ -192,7 +192,6 @@ func (app *Application) mainCommands() []tool.Application {
 	return []tool.Application{
 		&app.Serve,
 		&help{app: app},
-		&apiJSON{app: app},
 		&licenses{app: app},
 	}
 }

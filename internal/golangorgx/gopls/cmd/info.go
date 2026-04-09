@@ -4,11 +4,10 @@
 
 package cmd
 
-// This file defines the help, bug, version, api-json, licenses commands.
+// This file defines the help and licenses commands.
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -32,8 +31,7 @@ func (h *help) DetailedHelp(f *flag.FlagSet) {
 
 Examples:
 $ cuelsp help                         # main cuelsp help message
-$ cuelsp help remote                  # help on 'remote' command
-$ cuelsp help remote sessions         # help on 'remote sessions' subcommand
+$ cuelsp help serve                   # help on 'serve' command
 `)
 	printFlagDefaults(f)
 }
@@ -64,28 +62,6 @@ func (h *help) Run(ctx context.Context, args ...string) error {
 	// when it sees the -h flag.
 	fs := flag.NewFlagSet(cmd.Name(), flag.ExitOnError)
 	return tool.Run(ctx, fs, h.app, append(args[:len(args):len(args)], "-h"))
-}
-
-type apiJSON struct {
-	app *Application
-}
-
-func (j *apiJSON) Name() string      { return "api-json" }
-func (j *apiJSON) Parent() string    { return j.app.Name() }
-func (j *apiJSON) Usage() string     { return "" }
-func (j *apiJSON) ShortHelp() string { return "print JSON describing cuelsp API" }
-func (j *apiJSON) DetailedHelp(f *flag.FlagSet) {
-	fmt.Fprint(f.Output(), ``)
-	printFlagDefaults(f)
-}
-
-func (j *apiJSON) Run(ctx context.Context, args ...string) error {
-	js, err := json.MarshalIndent(settings.GeneratedAPIJSON, "", "\t")
-	if err != nil {
-		return err
-	}
-	fmt.Fprint(os.Stdout, string(js))
-	return nil
 }
 
 type licenses struct {

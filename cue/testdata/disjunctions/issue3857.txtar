@@ -13,6 +13,9 @@ reduced: t1: {
 	T: 1
 	U: b: 1 | 1
 }
+// issue3851: evalv3 incorrectly rejects a let field nested under multiple
+// disjunctions with "field not allowed", a regression not present in evalv2.
+// https://cuelang.org/issue/3851
 issue3851: t1: {
 	#Top: _
 	#Config: {

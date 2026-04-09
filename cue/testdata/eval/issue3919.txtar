@@ -43,6 +43,9 @@ related: {
 	}
 }
 -- let.cue --
+// issue3931: evalv3 raises "field set was already referenced" when processing
+// optional field specs with let bindings that evalv2 accepts without error.
+// https://cuelang.org/issue/3931
 issue3931: full: {
 	bar: [string]: spec?: Spec
 	if true {
@@ -58,6 +61,9 @@ issue3931: full: {
 	}
 }
 -- issue3946.cue --
+// issue3946: evalv3 regression reporting a cyclic reference error when a field
+// is inserted and then referenced within a comprehension expression.
+// https://cuelang.org/issue/3946
 issue3946: reduced:{
 	out: [for _, v in _inputs { v }]
 	_inputs: [_]: {

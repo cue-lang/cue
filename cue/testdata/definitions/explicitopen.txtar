@@ -1,4 +1,6 @@
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
+# Tests the explicitopen experiment: allows using the spread operator (...) to
+# explicitly open closed structs. NewClosed1: {#A} is closed; NewOpen1: {#A...}
+# is open. The test covers interactions between old and new style closedness.
 -- cue.mod/module.cue --
 module: "mod.test"
 
@@ -193,6 +195,9 @@ combinenew: {
 }
 -- issues.cue --
 @experiment(explicitopen)
+// explicitopen experiment: postfix `...` spread cannot directly combine with
+// `&`; tests open-struct spread behavior and non-struct operand tolerance.
+// https://cuelang.org/issue/4150
 issue4150: {
 	#Def: a: int
 

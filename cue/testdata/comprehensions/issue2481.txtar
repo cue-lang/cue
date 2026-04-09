@@ -1,4 +1,10 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
+# Tests that mixing struct fields and embedded scalars in a comprehension body
+# correctly reports an error. Issue #2481: nested for/if/let comprehensions
+# triggered a spurious "circular dependency" error in the evaluator.
+# https://cuelang.org/issue/2481
+// Mixing struct fields and embedded scalars should error. Using comprehensions
+// this follows a different path which may miss the error.
+// TODO: fix
 -- in.cue --
 // Mixing struct fields and embedded scalars should error. Using comprehensions
 // this follows a different path which may miss the error.

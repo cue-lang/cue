@@ -1,4 +1,7 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that hidden fields with disjunctions (close({y!: z?: _}) | _) work
+# correctly when exposed through embedding. The key behavior is that _a unifies
+# with close({y!: ...}) correctly even when exposed via {X} or X.
+# Issue: https://cuelang.org/issue/3834
 -- in.cue --
 // expose at top level
 X: {

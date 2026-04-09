@@ -4,6 +4,9 @@ import (
 	"net"
 	"strings"
 )
+// evalv3 regression: disjunctions with conditionals depending on the
+// disjunction's own value were left unresolved.
+// https://cuelang.org/issue/3993
 issue3993: reduced: {
 	x: net.IPv4 | =~"fail"
 	x: { if net.IPv4(x) {=~"^10\\." } }

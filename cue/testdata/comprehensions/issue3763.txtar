@@ -1,4 +1,5 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that nested comprehensions with let bindings across multiple files work.
+# Issue #3763: for comprehension with multi-level let bindings and pattern constraints.
 -- reduced.cue --
 reduced: {
 	A: x1: y?: int // needs to be optional

@@ -25,6 +25,9 @@ b: {
 	a: T
 	b: F
 }
+// Nil pointer in *core/adt.Environment.evalCached caused by a let binding
+// that references a list comprehension over another let-bound list.
+// https://cuelang.org/issue/1828
 issue1828: {
 	volumes: L3
 
@@ -102,6 +105,9 @@ nestedFor: {
 }
 
 -- issue2166.cue --
+// Using a let clause inside a field comprehension to create a dynamic key
+// caused an "invalid interpolation: conflicting values" error.
+// https://cuelang.org/issue/2166
 letWithDynamicInComprehension: {
 	_i: {
 		a: "d"
@@ -114,6 +120,9 @@ letWithDynamicInComprehension: {
 	}
 }
 -- issue2218.cue --
+// Earlier let evaluation results in the wrong value: a let inside a for
+// comprehension picked up an outer binding instead of the loop variable.
+// https://cuelang.org/issue/2218
 _parent_configs: {
 	PARENT: true
 }
@@ -139,6 +148,9 @@ import (
 )
 
 // Issue #2063
+// tools/flow: unsupported node import "list" in yaml.Marshal; let bindings
+// inside a struct referencing an undefined field must not block descending.
+// https://cuelang.org/issue/2063
 keepDescending: t1: {
 	ec: {}
 	bs: {
@@ -159,6 +171,9 @@ keepDescending: t2: {
 	}
 }
 -- interpolation.cue --
+// evalv3 closedness regression with disjunctions and ellipses where a let
+// binding shadowed a loop variable inside a for comprehension.
+// https://cuelang.org/issue/4022
 issue4022: full: {
 	envScript: [ for v in _env let v = _env["KEY"] {"\(v)"} ]
 	_env: {
@@ -220,8 +235,8 @@ Result:
   ignoreErrorInLet: (struct){
     let X#18 = (_|_){
       // [eval] ignoreErrorInLet.X: conflicting values 2 and 1:
-      //     ./in.cue:37:10
-      //     ./in.cue:37:14
+      //     ./in.cue:40:10
+      //     ./in.cue:40:14
     }
     disjunction: (int){ 3 }
   }
@@ -383,7 +398,7 @@ Result:
       bs: (struct){
         let m#21 = (_|_){
           // [incomplete] keepDescending.t1.bs.m: undefined field: b:
-          //     ./issue2063.cue:10:14
+          //     ./issue2063.cue:13:14
         }
         x: (struct){
           y: (string){ "" }
@@ -397,7 +412,7 @@ Result:
       bs: (struct){
         let m#22 = (_|_){
           // [incomplete] keepDescending.t2.bs.m: undefined field: b:
-          //     ./issue2063.cue:21:14
+          //     ./issue2063.cue:24:14
         }
         X: (struct){
           Y: (string){ "" }
@@ -453,6 +468,17 @@ diff old new
      ./incomprehension.cue:42:7
      ./incomprehension.cue:42:13
      ./incomprehension.cue:43:2
+@@ -50,8 +52,8 @@
+   ignoreErrorInLet: (struct){
+     let X#18 = (_|_){
+       // [eval] ignoreErrorInLet.X: conflicting values 2 and 1:
+-      //     ./in.cue:37:10
+-      //     ./in.cue:37:14
++      //     ./in.cue:40:10
++      //     ./in.cue:40:14
+     }
+     disjunction: (int){ 3 }
+   }
 @@ -105,7 +107,7 @@
        1: (int){ 2 }
        2: (int){ 3 }
@@ -573,6 +599,24 @@ diff old new
    keepDescending: (struct){
      t1: (struct){
        ec: (struct){
+@@ -206,7 +215,7 @@
+       bs: (struct){
+         let m#21 = (_|_){
+           // [incomplete] keepDescending.t1.bs.m: undefined field: b:
+-          //     ./issue2063.cue:10:14
++          //     ./issue2063.cue:13:14
+         }
+         x: (struct){
+           y: (string){ "" }
+@@ -220,7 +229,7 @@
+       bs: (struct){
+         let m#22 = (_|_){
+           // [incomplete] keepDescending.t2.bs.m: undefined field: b:
+-          //     ./issue2063.cue:21:14
++          //     ./issue2063.cue:24:14
+         }
+         X: (struct){
+           Y: (string){ "" }
 @@ -234,8 +243,8 @@
        b: (string){ "e" }
      }

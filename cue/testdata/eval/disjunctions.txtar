@@ -108,6 +108,9 @@ d100: {
 	j: i.bar
 }
 
+// Regression test for empty disjunction with combined definitions and
+// template constraints where valid unification was incorrectly rejected.
+// https://cuelang.org/issue/641
 issue641: {
 	#A: {
 		type: "a"
@@ -134,17 +137,24 @@ issue641: {
 	}
 }
 -- issue3406.cue --
+// evalv3 panic with inconsistent state when unifying a struct with itself
+// embedded via a disjunction field.
+// https://cuelang.org/issue/3406
 issue3406: {
 	out: d & { d }
 	d: kind: "foo" | "bar"
 	d: { kind: "foo" } | { kind: "bar" }
 }
 -- issue3411.cue --
+// evalv3 nil pointer dereference when unifying optional fields with defaults.
+// https://cuelang.org/issue/3411
 issue3411: {
 	x: y?: [...string]
 	x: {y: ["foo"]} | *{y: ["bar"]}
 }
 -- issue3490.cue --
+// evalv3 "incDependent: already closed" panic regression involving disjunctions.
+// https://cuelang.org/issue/3490
 issue3490: nested: p1: {
 	("a"|"b") | "b"
 	"a"|"b"
@@ -163,6 +173,8 @@ issue3490: full: {
 	}
 }
 -- issue3434.cue --
+// evalv3 panic "unexpected overlay in next" with disjunctions inside definitions.
+// https://cuelang.org/issue/3434
 issue3434: t1: {
 	({} | {})
 	{["x"]: 1}
@@ -182,6 +194,9 @@ issue3434: full: {
 	}
 }
 -- issue3597.cue --
+// evalv3 index out of range panic in overlayContext.allocCC with let inside
+// a disjunction within a definition applied via a pattern constraint.
+// https://cuelang.org/issue/3597
 issue3597: t1: {
 	#Schema: {
 		_ok: bool
@@ -206,6 +221,9 @@ issue3597: t2: {
 	foo: X & {X}
 }
 -- dependencies.cue --
+// evalv3 incorrectly allowed a field inside a struct disjunction that should
+// have been rejected as "field not allowed".
+// https://cuelang.org/issue/3606
 issue3606: {
 	data: {
 		notAllowed: true
@@ -213,6 +231,9 @@ issue3606: {
 	
 	#S: string | {}
 }
+// evalv3 gives a different result vs evalv2 when openinline is enabled; list
+// element count is wrong after unifying nested disjunctions through definitions.
+// https://cuelang.org/issue/3672
 issue3672: {
 	#A: string | {y: true}
 	#B: #A | {a: "append"} | {b: "prepend"}
@@ -228,6 +249,9 @@ issue3672: {
 	v: #def
 	v: x: [{y: true}] // Should be one element
 }
+// Regression giving "non-concrete value _ (type _)" error when interpolating
+// a string default from a disjunction via a definition alias.
+// https://cuelang.org/issue/3681
 issue3681: {
 	// Order dependent! These two fields need to go first.
 	out: one: #strDefaultDef
@@ -236,6 +260,9 @@ issue3681: {
 	strDefault: *"fallback" | string
 	#strDefaultDef: strDefault
 }
+// evalv3 "undefined field" regression when a comprehension condition references
+// a field whose default is provided by a disjunction.
+// https://cuelang.org/issue/3699
 issue3699: {
 	reduced: p1: {
 		y: { if x.z { 1 } }
@@ -267,6 +294,9 @@ indexElimination: {
 	inStruct: x: { a: *x[0] | 0 }.a
 	inList1: x: [x[0]][0]
 	inList2: x: [*x[0] | 0][0]
+	// evalv3 strange behavior with chaining of list comprehensions,
+	// incorrect results when indexing the output of a for loop.
+	// https://cuelang.org/issue/3124
 	issue3124: full: {
 		x: [...bool]
 		x: [true, false, true, true]
@@ -275,6 +305,9 @@ indexElimination: {
 	}
 }
 -- issue3899.cue --
+// evalv3 "invalid type _" regression that is order-dependent, triggered when
+// a string interpolation references an optional field inside a disjunction.
+// https://cuelang.org/issue/3899
 issue3899: reduced: p1: {
 	b: c + "" | string
 	c?: string
@@ -296,6 +329,9 @@ issue3899: full: {
    }
 }
 -- issue3891.cue --
+// evalv3 "incomplete value" regression with repeated disjunctions where a
+// field referencing a default via another field yields an incomplete error.
+// https://cuelang.org/issue/3891
 issue3891: reduced: {
 	{x: _} | null
 	{x: _} | null
@@ -350,11 +386,11 @@ f.val: conflicting values 3 and string (mismatched types int and string):
     ./in.cue:15:27
 issue3606.data: 2 errors in empty disjunction:
 issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
-    ./dependencies.cue:2:8
-    ./dependencies.cue:4:6
-    ./dependencies.cue:6:6
+    ./dependencies.cue:5:8
+    ./dependencies.cue:7:6
+    ./dependencies.cue:9:6
 issue3606.data.notAllowed: field not allowed:
-    ./dependencies.cue:3:3
+    ./dependencies.cue:6:3
 
 Result:
 (_|_){
@@ -364,11 +400,11 @@ Result:
     data: (_|_){
       // [eval] issue3606.data: 2 errors in empty disjunction:
       // issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
-      //     ./dependencies.cue:2:8
-      //     ./dependencies.cue:4:6
-      //     ./dependencies.cue:6:6
+      //     ./dependencies.cue:5:8
+      //     ./dependencies.cue:7:6
+      //     ./dependencies.cue:9:6
       // issue3606.data.notAllowed: field not allowed:
-      //     ./dependencies.cue:3:3
+      //     ./dependencies.cue:6:3
       notAllowed: (bool){ true }
     }
     #S: ((string|struct)){ |((string){ string }, (#struct){
@@ -819,7 +855,7 @@ Result:
         name!: (string){ string }
         deployImage: (_|_){
           // [incomplete] issue3899.full.#Schema.deployImage: invalid non-ground value string (must be concrete string):
-          //     ./issue3899.cue:17:18
+          //     ./issue3899.cue:20:18
         }
       }
     }
@@ -834,14 +870,17 @@ diff old new
      ./in.cue:15:27
  issue3606.data: 2 errors in empty disjunction:
 -issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+-    ./dependencies.cue:2:8
+-    ./dependencies.cue:6:6
 +issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
-     ./dependencies.cue:2:8
-+    ./dependencies.cue:4:6
-     ./dependencies.cue:6:6
++    ./dependencies.cue:5:8
++    ./dependencies.cue:7:6
++    ./dependencies.cue:9:6
  issue3606.data.notAllowed: field not allowed:
-     ./dependencies.cue:3:3
+-    ./dependencies.cue:3:3
 -    ./dependencies.cue:4:6
 -    ./dependencies.cue:6:15
++    ./dependencies.cue:6:3
  
  Result:
  (_|_){
@@ -850,12 +889,14 @@ diff old new
      data: (_|_){
        // [eval] issue3606.data: 2 errors in empty disjunction:
 -      // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+-      //     ./dependencies.cue:2:8
+-      //     ./dependencies.cue:6:6
 +      // issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
-       //     ./dependencies.cue:2:8
-+      //     ./dependencies.cue:4:6
-       //     ./dependencies.cue:6:6
++      //     ./dependencies.cue:5:8
++      //     ./dependencies.cue:7:6
++      //     ./dependencies.cue:9:6
        // issue3606.data.notAllowed: field not allowed:
-       //     ./dependencies.cue:3:3
+-      //     ./dependencies.cue:3:3
 -      //     ./dependencies.cue:4:6
 -      //     ./dependencies.cue:6:15
 -      notAllowed: (_|_){
@@ -864,6 +905,7 @@ diff old new
 -        //     ./dependencies.cue:4:6
 -        //     ./dependencies.cue:6:15
 -      }
++      //     ./dependencies.cue:6:3
 +      notAllowed: (bool){ true }
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
@@ -946,6 +988,14 @@ diff old new
          deployImage: (string){ "123" }
        }
        #Schema: (#struct){
+@@ -496,7 +479,6 @@
+         name!: (string){ string }
+         deployImage: (_|_){
+           // [incomplete] issue3899.full.#Schema.deployImage: invalid non-ground value string (must be concrete string):
+-          //     ./issue3899.cue:17:18
+           //     ./issue3899.cue:20:18
+         }
+       }
 -- diff/todo/p3 --
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long
@@ -1451,6 +1501,7 @@ Result:
         deployImage: (_|_){
           // [incomplete] issue3899.full.#Schema.deployImage: invalid non-ground value string (must be concrete string):
           //     ./issue3899.cue:17:18
+          //     ./issue3899.cue:20:18
         }
       }
     }

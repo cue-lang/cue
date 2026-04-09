@@ -1,4 +1,7 @@
-#todo:inline: medium — large complex test with many interdependent fields
+# Tests that closedness is correctly tracked when combining schemas through
+# inheritance and embedding using the & operator. The issue caused CUE to reject
+# fields that should be permitted under the merged schema definitions.
+# https://cuelang.org/issue/599
 -- in.cue --
 package deps
 

@@ -1,5 +1,6 @@
 Issue #560
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Issue #560: Tests that for comprehensions correctly iterate over struct fields,
+# skipping optionals, and that missing required fields produce errors.
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"
@@ -42,6 +43,9 @@ missingRequiredError:  {
 	}
 }
 
+// issue560: Tests that for comprehensions over definitions with interpolated
+// field names correctly produce all expected output fields.
+// https://cuelang.org/issue/560
 issue560: {
 	#User: {
 		tags_str: string
@@ -104,8 +108,8 @@ NumCloseIDs: 12
       tags_str: (string){ string }
       tags_map: (_|_){
         // [incomplete] issue560.#User.tags_map: error in call to strings.Split: non-concrete value string:
-        //     ./in.cue:43:16
-        //     ./in.cue:41:13
+        //     ./in.cue:46:16
+        //     ./in.cue:44:13
         "{a}": (string){ string }
       }
     }

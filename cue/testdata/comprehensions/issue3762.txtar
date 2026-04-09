@@ -1,4 +1,5 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that comprehensions over intersections of hidden fields work correctly.
+# Issue #3762: for comprehensions over _a & _b where both have patterns.
 -- in.cue --
 full: {
 	kube: node: n1: {

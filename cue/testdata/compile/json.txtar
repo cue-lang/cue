@@ -1,6 +1,5 @@
 # Issue #721: Tests that front-style (leading) commas are allowed in CUE source.
 #noformat
-Issue #721
 -- in.cue --
 // allow front-style commas
 a
@@ -18,6 +17,14 @@ a
 
     , 5
 ]
+
+@test(eq, {
+	a: {
+		key:  "value"
+		key2: "value2"
+	}
+	b: [0, 1, 2, 3, 4, 5]
+})
 -- out/compile --
 --- in.cue
 {

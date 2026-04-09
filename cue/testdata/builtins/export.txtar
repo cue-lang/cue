@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 import "encoding/yaml"
 
@@ -20,8 +19,7 @@ issue3972: {
 	}
 
 	_out1: [for svc, _ in derived {svc}]
-	output: out1: yaml.Marshal(_out1)
-
+	output: out1: yaml.Marshal(_out1) @test(eq, "- derivedStatic\n")
 }
 -- out/eval/stats --
 Leaks:  2
@@ -35,24 +33,6 @@ Conjuncts:    18
 Disjuncts:    0
 
 NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  issue3972: (struct){
-    output: (struct){
-      out0: (string){ "static" }
-      out1: (string){ "- derivedStatic\n" }
-    }
-    input: (struct){
-      inputStatic: (string){ "static" }
-    }
-    derived: (struct){
-      derivedStatic: (string){ "static" }
-    }
-    _out1: (#list){
-      0: (string){ "derivedStatic" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

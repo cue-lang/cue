@@ -1,44 +1,43 @@
-#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
-quo1: quo(5, 2)   // 2
-quo2: quo(5, -2)  // -2
-quo3: quo(-5, 2)  // -2
-quo4: quo(-5, -2) // 2
+quo1: quo(5, 2)   @test(eq, 2)
+quo2: quo(5, -2)  @test(eq, -2)
+quo3: quo(-5, 2)  @test(eq, -2)
+quo4: quo(-5, -2) @test(eq, 2)
 
-quoDivByZero: quo(2, 0)
+quoDivByZero: quo(2, 0) @test(err, code=eval, contains="division by zero", pos=[0:15])
 
-quoTypeError1: quo(2.0, 1)
-quoTypeError2: quo(2, 1.0)
+quoTypeError1: quo(2.0, 1) @test(err, code=eval, contains="cannot use 2.0 (type float) as int in argument 1 to quo", pos=[0:20])
+quoTypeError2: quo(2, 1.0) @test(err, code=eval, contains="cannot use 1.0 (type float) as int in argument 2 to quo", pos=[0:23])
 
-rem1: rem(5, 2)   // 1
-rem2: rem(5, -2)  // 1
-rem3: rem(-5, 2)  // -1
-rem4: rem(-5, -2) // -1
+rem1: rem(5, 2)   @test(eq, 1)
+rem2: rem(5, -2)  @test(eq, 1)
+rem3: rem(-5, 2)  @test(eq, -1)
+rem4: rem(-5, -2) @test(eq, -1)
 
-remDivByZero: rem(2, 0)
+remDivByZero: rem(2, 0) @test(err, code=eval, contains="division by zero", pos=[0:15])
 
-remTypeError1: rem(2.0, 1)
-remTypeError2: rem(2, 1.0)
+remTypeError1: rem(2.0, 1) @test(err, code=eval, contains="cannot use 2.0 (type float) as int in argument 1 to rem", pos=[0:20])
+remTypeError2: rem(2, 1.0) @test(err, code=eval, contains="cannot use 1.0 (type float) as int in argument 2 to rem", pos=[0:23])
 
-div1: div(5, 2)   // 2
-div2: div(5, -2)  // -2
-div3: div(-5, 2)  // -3
-div4: div(-5, -2) // 3
+div1: div(5, 2)   @test(eq, 2)
+div2: div(5, -2)  @test(eq, -2)
+div3: div(-5, 2)  @test(eq, -3)
+div4: div(-5, -2) @test(eq, 3)
 
-divDivByZero: div(2, 0)
+divDivByZero: div(2, 0) @test(err, code=eval, contains="division by zero", pos=[0:15])
 
-divTypeError1: div(2.0, 1)
-divTypeError2: div(2, 1.0)
+divTypeError1: div(2.0, 1) @test(err, code=eval, contains="cannot use 2.0 (type float) as int in argument 1 to div", pos=[0:20])
+divTypeError2: div(2, 1.0) @test(err, code=eval, contains="cannot use 1.0 (type float) as int in argument 2 to div", pos=[0:23])
 
-mod1: mod(5, 2)   // 1
-mod2: mod(5, -2)  // 1
-mod3: mod(-5, 2)  // 1
-mod4: mod(-5, -2) // 1
+mod1: mod(5, 2)   @test(eq, 1)
+mod2: mod(5, -2)  @test(eq, 1)
+mod3: mod(-5, 2)  @test(eq, 1)
+mod4: mod(-5, -2) @test(eq, 1)
 
-modDivByZero: mod(2, 0)
+modDivByZero: mod(2, 0) @test(err, code=eval, contains="division by zero", pos=[0:15])
 
-modTypeError1: mod(2.0, 1)
-modTypeError2: mod(2, 1.0)
+modTypeError1: mod(2.0, 1) @test(err, code=eval, contains="cannot use 2.0 (type float) as int in argument 1 to mod", pos=[0:20])
+modTypeError2: mod(2, 1.0) @test(err, code=eval, contains="cannot use 1.0 (type float) as int in argument 2 to mod", pos=[0:23])
 -- out/eval/stats --
 Leaks:  0
 Freed:  29
@@ -49,101 +48,31 @@ Retain: 0
 Unifications: 29
 Conjuncts:    29
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-quoDivByZero: error in call to quo: division by zero:
+-- out/errors.txt --
+[eval] quoDivByZero: error in call to quo: division by zero:
     ./in.cue:6:15
-quoTypeError1: cannot use 2.0 (type float) as int in argument 1 to quo:
+[eval] quoTypeError1: cannot use 2.0 (type float) as int in argument 1 to quo:
     ./in.cue:8:20
-quoTypeError2: cannot use 1.0 (type float) as int in argument 2 to quo:
+[eval] quoTypeError2: cannot use 1.0 (type float) as int in argument 2 to quo:
     ./in.cue:9:23
-remDivByZero: error in call to rem: division by zero:
+[eval] remDivByZero: error in call to rem: division by zero:
     ./in.cue:16:15
-remTypeError1: cannot use 2.0 (type float) as int in argument 1 to rem:
+[eval] remTypeError1: cannot use 2.0 (type float) as int in argument 1 to rem:
     ./in.cue:18:20
-remTypeError2: cannot use 1.0 (type float) as int in argument 2 to rem:
+[eval] remTypeError2: cannot use 1.0 (type float) as int in argument 2 to rem:
     ./in.cue:19:23
-divDivByZero: error in call to div: division by zero:
+[eval] divDivByZero: error in call to div: division by zero:
     ./in.cue:26:15
-divTypeError1: cannot use 2.0 (type float) as int in argument 1 to div:
+[eval] divTypeError1: cannot use 2.0 (type float) as int in argument 1 to div:
     ./in.cue:28:20
-divTypeError2: cannot use 1.0 (type float) as int in argument 2 to div:
+[eval] divTypeError2: cannot use 1.0 (type float) as int in argument 2 to div:
     ./in.cue:29:23
-modDivByZero: error in call to mod: division by zero:
+[eval] modDivByZero: error in call to mod: division by zero:
     ./in.cue:36:15
-modTypeError1: cannot use 2.0 (type float) as int in argument 1 to mod:
+[eval] modTypeError1: cannot use 2.0 (type float) as int in argument 1 to mod:
     ./in.cue:38:20
-modTypeError2: cannot use 1.0 (type float) as int in argument 2 to mod:
+[eval] modTypeError2: cannot use 1.0 (type float) as int in argument 2 to mod:
     ./in.cue:39:23
-
-Result:
-(_|_){
-  // [eval]
-  quo1: (int){ 2 }
-  quo2: (int){ -2 }
-  quo3: (int){ -2 }
-  quo4: (int){ 2 }
-  quoDivByZero: (_|_){
-    // [eval] quoDivByZero: error in call to quo: division by zero:
-    //     ./in.cue:6:15
-  }
-  quoTypeError1: (_|_){
-    // [eval] quoTypeError1: cannot use 2.0 (type float) as int in argument 1 to quo:
-    //     ./in.cue:8:20
-  }
-  quoTypeError2: (_|_){
-    // [eval] quoTypeError2: cannot use 1.0 (type float) as int in argument 2 to quo:
-    //     ./in.cue:9:23
-  }
-  rem1: (int){ 1 }
-  rem2: (int){ 1 }
-  rem3: (int){ -1 }
-  rem4: (int){ -1 }
-  remDivByZero: (_|_){
-    // [eval] remDivByZero: error in call to rem: division by zero:
-    //     ./in.cue:16:15
-  }
-  remTypeError1: (_|_){
-    // [eval] remTypeError1: cannot use 2.0 (type float) as int in argument 1 to rem:
-    //     ./in.cue:18:20
-  }
-  remTypeError2: (_|_){
-    // [eval] remTypeError2: cannot use 1.0 (type float) as int in argument 2 to rem:
-    //     ./in.cue:19:23
-  }
-  div1: (int){ 2 }
-  div2: (int){ -2 }
-  div3: (int){ -3 }
-  div4: (int){ 3 }
-  divDivByZero: (_|_){
-    // [eval] divDivByZero: error in call to div: division by zero:
-    //     ./in.cue:26:15
-  }
-  divTypeError1: (_|_){
-    // [eval] divTypeError1: cannot use 2.0 (type float) as int in argument 1 to div:
-    //     ./in.cue:28:20
-  }
-  divTypeError2: (_|_){
-    // [eval] divTypeError2: cannot use 1.0 (type float) as int in argument 2 to div:
-    //     ./in.cue:29:23
-  }
-  mod1: (int){ 1 }
-  mod2: (int){ 1 }
-  mod3: (int){ 1 }
-  mod4: (int){ 1 }
-  modDivByZero: (_|_){
-    // [eval] modDivByZero: error in call to mod: division by zero:
-    //     ./in.cue:36:15
-  }
-  modTypeError1: (_|_){
-    // [eval] modTypeError1: cannot use 2.0 (type float) as int in argument 1 to mod:
-    //     ./in.cue:38:20
-  }
-  modTypeError2: (_|_){
-    // [eval] modTypeError2: cannot use 1.0 (type float) as int in argument 2 to mod:
-    //     ./in.cue:39:23
-  }
-}
 -- out/compile --
 --- in.cue
 {

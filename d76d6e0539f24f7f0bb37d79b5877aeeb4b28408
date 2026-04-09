@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92d7f3c5_5ff71311",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-09T08:29:10Z",
+      "side": 1,
+      "message": "yes, fine, but I think my earlier comments about looking at the common prefix, not the length, is still relevant and should be reflected here.",
+      "revId": "d76d6e0539f24f7f0bb37d79b5877aeeb4b28408",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

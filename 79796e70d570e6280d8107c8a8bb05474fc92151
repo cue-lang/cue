@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d02ea0b3_a34fc236",
+        "filename": "CLAUDE.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-09T16:43:01Z",
+      "side": 1,
+      "message": "Okay, I was shooting from the hip. But corrected to 72.\n\nAlso reflowed messages of following.",
+      "parentUuid": "13e808d2_5974fc48",
+      "revId": "79796e70d570e6280d8107c8a8bb05474fc92151",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ee39a2d_7c87ef71",
         "filename": "CLAUDE.md",
         "patchSetId": 4

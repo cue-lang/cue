@@ -49,146 +49,147 @@ type elt struct {
 	tok   token.Token
 	lit   string
 	class int
+	want  string // expected scanned literal, if different from lit (e.g. after \r stripping)
 }
 
 var testTokens = [...]elt{
 	// Special tokens
-	{token.COMMENT, "// a comment \n", special},
-	{token.COMMENT, "//\r\n", special},
+	{tok: token.COMMENT, lit: "// a comment \n", class: special},
+	{tok: token.COMMENT, lit: "//\r\n", class: special, want: "//"},
 
 	// Attributes
-	{token.ATTRIBUTE, "@foo()", special},
-	{token.ATTRIBUTE, "@foo(,,)", special},
-	{token.ATTRIBUTE, "@foo(a)", special},
-	{token.ATTRIBUTE, "@foo(aa=b)", special},
-	{token.ATTRIBUTE, "@foo(,a=b)", special},
-	{token.ATTRIBUTE, `@foo(",a=b")`, special},
-	{token.ATTRIBUTE, `@foo(##"\(),a=b"##)`, special},
-	{token.ATTRIBUTE, `@foo("",a="")`, special},
-	{token.ATTRIBUTE, `@foo(2,bytes,a.b=c)`, special},
-	{token.ATTRIBUTE, `@foo([{()}]())`, special},
-	{token.ATTRIBUTE, `@foo("{")`, special},
+	{tok: token.ATTRIBUTE, lit: "@foo()", class: special},
+	{tok: token.ATTRIBUTE, lit: "@foo(,,)", class: special},
+	{tok: token.ATTRIBUTE, lit: "@foo(a)", class: special},
+	{tok: token.ATTRIBUTE, lit: "@foo(aa=b)", class: special},
+	{tok: token.ATTRIBUTE, lit: "@foo(,a=b)", class: special},
+	{tok: token.ATTRIBUTE, lit: `@foo(",a=b")`, class: special},
+	{tok: token.ATTRIBUTE, lit: `@foo(##"\(),a=b"##)`, class: special},
+	{tok: token.ATTRIBUTE, lit: `@foo("",a="")`, class: special},
+	{tok: token.ATTRIBUTE, lit: `@foo(2,bytes,a.b=c)`, class: special},
+	{tok: token.ATTRIBUTE, lit: `@foo([{()}]())`, class: special},
+	{tok: token.ATTRIBUTE, lit: `@foo("{")`, class: special},
 
 	// Identifiers and basic type literals
-	{token.BOTTOM, "_|_", literal},
+	{tok: token.BOTTOM, lit: "_|_", class: literal},
 
-	{token.IDENT, "foobar", literal},
-	{token.IDENT, "$foobar", literal},
-	{token.IDENT, "#foobar", literal},
-	// {token.IDENT, "#0", literal},
-	{token.IDENT, "#", literal},
-	{token.IDENT, "_foobar", literal},
-	{token.IDENT, "__foobar", literal},
-	{token.IDENT, "#_foobar", literal},
-	{token.IDENT, "_#foobar", literal},
-	{token.IDENT, "a۰۱۸", literal},
-	{token.IDENT, "foo६४", literal},
-	{token.IDENT, "bar９８７６", literal},
-	{token.IDENT, "ŝ", literal},
-	{token.IDENT, "ŝfoo", literal},
-	{token.INT, "0", literal},
-	{token.INT, "1", literal},
-	{token.INT, "123456789012345678890", literal},
-	{token.INT, "12345_67890_12345_6788_90", literal},
-	{token.INT, "1234567M", literal},
-	{token.INT, "1234567Mi", literal},
-	{token.INT, "1234567", literal},
-	{token.INT, ".3Mi", literal},
-	{token.INT, "3.3Mi", literal},
-	{token.INT, "0xcafebabe", literal},
-	{token.INT, "0b1100_1001", literal},
-	{token.INT, "0o1234567", literal},
-	{token.FLOAT, "0.", literal},
-	{token.FLOAT, ".0", literal},
-	{token.FLOAT, "3.14159265", literal},
-	{token.FLOAT, "1e0", literal},
-	{token.FLOAT, "1e+100", literal},
-	{token.FLOAT, "1e-100", literal},
-	{token.FLOAT, "1E+100", literal},
-	{token.FLOAT, "1E-100", literal},
-	{token.FLOAT, "0e-5", literal},
-	{token.FLOAT, "0e+100", literal},
-	{token.FLOAT, "0e-100", literal},
-	{token.FLOAT, "0E+100", literal},
-	{token.FLOAT, "0E-100", literal},
-	{token.FLOAT, "2.71828e-1000", literal},
-	{token.STRING, "'a'", literal},
-	{token.STRING, "'\\000'", literal},
-	{token.STRING, "'\\xFF'", literal},
-	{token.STRING, "'\\uff16'", literal},
-	{token.STRING, "'\\uD801'", literal},
-	{token.STRING, "'\\U0000ff16'", literal},
-	{token.STRING, "'foobar'", literal},
-	{token.STRING, `'foo\/bar'`, literal},
-	{token.STRING, `#" ""#`, literal},
-	{token.STRING, `#"" "#`, literal},
-	{token.STRING, `#""hello""#`, literal},
-	{token.STRING, `##""# "##`, literal},
-	{token.STRING, `####""###"####`, literal},
-	{token.STRING, "##\"\"\"\n\"\"\"#\n\"\"\"##", literal},
-	{token.STRING, `##"####"##`, literal},
-	{token.STRING, `#"foobar"#`, literal},
-	{token.STRING, `#" """#`, literal},
-	{token.STRING, `#"\r"#`, literal},
-	{token.STRING, `#"\("#`, literal},
-	{token.STRING, `#"\q"#`, literal},
-	{token.STRING, `###"\##q"###`, literal},
-	{token.STRING, "'" + `\r` + "'", literal},
-	{token.STRING, "'foo" + `\r\n` + "bar'", literal},
-	{token.STRING, `"foobar"`, literal},
-	{token.STRING, "\"\"\"\n  foobar\n  \"\"\"", literal},
-	{token.STRING, "#\"\"\"\n  \\(foobar\n  \"\"\"#", literal},
+	{tok: token.IDENT, lit: "foobar", class: literal},
+	{tok: token.IDENT, lit: "$foobar", class: literal},
+	{tok: token.IDENT, lit: "#foobar", class: literal},
+	// {tok: token.IDENT, lit: "#0", class: literal},
+	{tok: token.IDENT, lit: "#", class: literal},
+	{tok: token.IDENT, lit: "_foobar", class: literal},
+	{tok: token.IDENT, lit: "__foobar", class: literal},
+	{tok: token.IDENT, lit: "#_foobar", class: literal},
+	{tok: token.IDENT, lit: "_#foobar", class: literal},
+	{tok: token.IDENT, lit: "a۰۱۸", class: literal},
+	{tok: token.IDENT, lit: "foo६४", class: literal},
+	{tok: token.IDENT, lit: "bar９８７６", class: literal},
+	{tok: token.IDENT, lit: "ŝ", class: literal},
+	{tok: token.IDENT, lit: "ŝfoo", class: literal},
+	{tok: token.INT, lit: "0", class: literal},
+	{tok: token.INT, lit: "1", class: literal},
+	{tok: token.INT, lit: "123456789012345678890", class: literal},
+	{tok: token.INT, lit: "12345_67890_12345_6788_90", class: literal},
+	{tok: token.INT, lit: "1234567M", class: literal},
+	{tok: token.INT, lit: "1234567Mi", class: literal},
+	{tok: token.INT, lit: "1234567", class: literal},
+	{tok: token.INT, lit: ".3Mi", class: literal},
+	{tok: token.INT, lit: "3.3Mi", class: literal},
+	{tok: token.INT, lit: "0xcafebabe", class: literal},
+	{tok: token.INT, lit: "0b1100_1001", class: literal},
+	{tok: token.INT, lit: "0o1234567", class: literal},
+	{tok: token.FLOAT, lit: "0.", class: literal},
+	{tok: token.FLOAT, lit: ".0", class: literal},
+	{tok: token.FLOAT, lit: "3.14159265", class: literal},
+	{tok: token.FLOAT, lit: "1e0", class: literal},
+	{tok: token.FLOAT, lit: "1e+100", class: literal},
+	{tok: token.FLOAT, lit: "1e-100", class: literal},
+	{tok: token.FLOAT, lit: "1E+100", class: literal},
+	{tok: token.FLOAT, lit: "1E-100", class: literal},
+	{tok: token.FLOAT, lit: "0e-5", class: literal},
+	{tok: token.FLOAT, lit: "0e+100", class: literal},
+	{tok: token.FLOAT, lit: "0e-100", class: literal},
+	{tok: token.FLOAT, lit: "0E+100", class: literal},
+	{tok: token.FLOAT, lit: "0E-100", class: literal},
+	{tok: token.FLOAT, lit: "2.71828e-1000", class: literal},
+	{tok: token.STRING, lit: "'a'", class: literal},
+	{tok: token.STRING, lit: "'\\000'", class: literal},
+	{tok: token.STRING, lit: "'\\xFF'", class: literal},
+	{tok: token.STRING, lit: "'\\uff16'", class: literal},
+	{tok: token.STRING, lit: "'\\uD801'", class: literal},
+	{tok: token.STRING, lit: "'\\U0000ff16'", class: literal},
+	{tok: token.STRING, lit: "'foobar'", class: literal},
+	{tok: token.STRING, lit: `'foo\/bar'`, class: literal},
+	{tok: token.STRING, lit: `#" ""#`, class: literal},
+	{tok: token.STRING, lit: `#"" "#`, class: literal},
+	{tok: token.STRING, lit: `#""hello""#`, class: literal},
+	{tok: token.STRING, lit: `##""# "##`, class: literal},
+	{tok: token.STRING, lit: `####""###"####`, class: literal},
+	{tok: token.STRING, lit: "##\"\"\"\n\"\"\"#\n\"\"\"##", class: literal},
+	{tok: token.STRING, lit: `##"####"##`, class: literal},
+	{tok: token.STRING, lit: `#"foobar"#`, class: literal},
+	{tok: token.STRING, lit: `#" """#`, class: literal},
+	{tok: token.STRING, lit: `#"\r"#`, class: literal},
+	{tok: token.STRING, lit: `#"\("#`, class: literal},
+	{tok: token.STRING, lit: `#"\q"#`, class: literal},
+	{tok: token.STRING, lit: `###"\##q"###`, class: literal},
+	{tok: token.STRING, lit: "'" + `\r` + "'", class: literal},
+	{tok: token.STRING, lit: "'foo" + `\r\n` + "bar'", class: literal},
+	{tok: token.STRING, lit: `"foobar"`, class: literal},
+	{tok: token.STRING, lit: "\"\"\"\n  foobar\n  \"\"\"", class: literal},
+	{tok: token.STRING, lit: "#\"\"\"\n  \\(foobar\n  \"\"\"#", class: literal},
 	// TODO: should we preserve the \r instead and have it removed by the
 	// literal parser? This would allow preserving \r for formatting without
 	// changing the semantics of evaluation.
-	{token.STRING, "#\"\"\"\r\n  \\(foobar\n  \"\"\"#", literal},
+	{tok: token.STRING, lit: "#\"\"\"\r\n  \\(foobar\n  \"\"\"#", class: literal},
 
 	// Operators and delimiters
-	{token.ADD, "+", operator},
-	{token.SUB, "-", operator},
-	{token.MUL, "*", operator},
-	{token.QUO, "/", operator},
+	{tok: token.ADD, lit: "+", class: operator},
+	{tok: token.SUB, lit: "-", class: operator},
+	{tok: token.MUL, lit: "*", class: operator},
+	{tok: token.QUO, lit: "/", class: operator},
 
-	{token.AND, "&", operator},
-	{token.OR, "|", operator},
+	{tok: token.AND, lit: "&", class: operator},
+	{tok: token.OR, lit: "|", class: operator},
 
-	{token.LAND, "&&", operator},
-	{token.LOR, "||", operator},
+	{tok: token.LAND, lit: "&&", class: operator},
+	{tok: token.LOR, lit: "||", class: operator},
 
-	{token.EQL, "==", operator},
-	{token.LSS, "<", operator},
-	{token.GTR, ">", operator},
-	{token.BIND, "=", operator},
-	{token.NOT, "!", operator},
+	{tok: token.EQL, lit: "==", class: operator},
+	{tok: token.LSS, lit: "<", class: operator},
+	{tok: token.GTR, lit: ">", class: operator},
+	{tok: token.BIND, lit: "=", class: operator},
+	{tok: token.NOT, lit: "!", class: operator},
 
-	{token.NEQ, "!=", operator},
-	{token.LEQ, "<=", operator},
-	{token.GEQ, ">=", operator},
-	{token.ELLIPSIS, "...", operator},
+	{tok: token.NEQ, lit: "!=", class: operator},
+	{tok: token.LEQ, lit: "<=", class: operator},
+	{tok: token.GEQ, lit: ">=", class: operator},
+	{tok: token.ELLIPSIS, lit: "...", class: operator},
 
-	{token.MAT, "=~", operator},
-	{token.NMAT, "!~", operator},
+	{tok: token.MAT, lit: "=~", class: operator},
+	{tok: token.NMAT, lit: "!~", class: operator},
 
-	{token.LPAREN, "(", operator},
-	{token.LBRACK, "[", operator},
-	{token.LBRACE, "{", operator},
-	{token.COMMA, ",", operator},
-	{token.PERIOD, ".", operator},
-	{token.OPTION, "?", operator},
+	{tok: token.LPAREN, lit: "(", class: operator},
+	{tok: token.LBRACK, lit: "[", class: operator},
+	{tok: token.LBRACE, lit: "{", class: operator},
+	{tok: token.COMMA, lit: ",", class: operator},
+	{tok: token.PERIOD, lit: ".", class: operator},
+	{tok: token.OPTION, lit: "?", class: operator},
 
-	{token.RPAREN, ")", operator},
-	{token.RBRACK, "]", operator},
-	{token.RBRACE, "}", operator},
-	{token.COLON, ":", operator},
+	{tok: token.RPAREN, lit: ")", class: operator},
+	{tok: token.RBRACK, lit: "]", class: operator},
+	{tok: token.RBRACE, lit: "}", class: operator},
+	{tok: token.COLON, lit: ":", class: operator},
 
 	// Keywords
-	{token.TRUE, "true", keyword},
-	{token.FALSE, "false", keyword},
-	{token.NULL, "null", keyword},
+	{tok: token.TRUE, lit: "true", class: keyword},
+	{tok: token.FALSE, lit: "false", class: keyword},
+	{tok: token.NULL, lit: "null", class: keyword},
 
-	{token.FOR, "for", keyword},
-	{token.IF, "if", keyword},
-	{token.IN, "in", keyword},
+	{tok: token.FOR, lit: "for", class: keyword},
+	{tok: token.IF, lit: "if", class: keyword},
+	{tok: token.IN, lit: "in", class: keyword},
 }
 
 const whitespace = "  \t  \n\n\n" // to separate tokens
@@ -262,7 +263,7 @@ func TestScan(t *testing.T) {
 		checkPosScan(t, lit, pos, epos)
 
 		// check token
-		e := elt{token.EOF, "", special}
+		e := elt{tok: token.EOF, class: special}
 		if index < len(testTokens) {
 			e = testTokens[index]
 			index++
@@ -278,29 +279,28 @@ func TestScan(t *testing.T) {
 
 		// check literal
 		elit := ""
-		switch e.tok {
-		case token.COMMENT:
-			// no CRs in comments
-			elit = string(stripCR([]byte(e.lit)))
-			//-style comment literal doesn't contain newline
-			if elit[1] == '/' {
-				elit = elit[0 : len(elit)-1]
-			}
-		case token.ATTRIBUTE:
-			elit = e.lit
-		case token.IDENT:
-			elit = e.lit
-		case token.COMMA:
-			elit = ","
-		default:
-			if e.tok.IsLiteral() {
-				// no CRs in raw string literals
+		if e.want != "" {
+			elit = e.want
+		} else {
+			switch e.tok {
+			case token.COMMENT:
 				elit = e.lit
-				if elit[0] == '`' {
-					elit = string(stripCR([]byte(elit)))
+				//-style comment literal doesn't contain newline
+				if elit[1] == '/' {
+					elit = elit[0 : len(elit)-1]
 				}
-			} else if e.tok.IsKeyword() {
+			case token.ATTRIBUTE:
 				elit = e.lit
+			case token.IDENT:
+				elit = e.lit
+			case token.COMMA:
+				elit = ","
+			default:
+				if e.tok.IsLiteral() {
+					elit = e.lit
+				} else if e.tok.IsKeyword() {
+					elit = e.lit
+				}
 			}
 		}
 		if lit != elit {

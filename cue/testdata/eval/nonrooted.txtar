@@ -67,19 +67,19 @@ Conjuncts:    87
 Disjuncts:    68
 -- out/errors.txt --
 [incomplete] issue3977.inlineDisj1.#fn.out: invalid interpolation: unresolved disjunction "2" | "3" | "4" (type string):
-    ./in.cue:14:8
+    ./in.cue:15:8
 [eval] x: conflicting values 2 and 1:
-    ./in.cue:20:14
-    ./in.cue:22:8
-    ./in.cue:26:8
-    ./in.cue:26:19
-x: conflicting values 4 and 1:
-    ./in.cue:20:14
-    ./in.cue:22:8
-    ./in.cue:26:8
-    ./in.cue:26:23
-x: 2 errors in empty disjunction::
+    ./in.cue:21:14
     ./in.cue:23:8
+    ./in.cue:27:8
+    ./in.cue:27:19
+x: conflicting values 4 and 1:
+    ./in.cue:21:14
+    ./in.cue:23:8
+    ./in.cue:27:8
+    ./in.cue:27:23
+x: 2 errors in empty disjunction::
+    ./in.cue:24:8
 -- out/compile --
 --- in.cue
 {

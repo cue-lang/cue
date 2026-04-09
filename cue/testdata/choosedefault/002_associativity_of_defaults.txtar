@@ -22,10 +22,16 @@ e2: (*"x" | string) | *(1&2)
 // 1. ValK = (ValA & ValB_ND) & ValC_D \neq _|_ (the element we track must exist).
 // 2. ValC_D & (ValA & ValB_D) = _|_ (for Path 1 Cond(ValC_D, Disj_AB) to be true).
 // 3. ValC_D & ValB_D \neq _|_ (for Path 2 Cond(ValC_D, Disj_B) to be false).
+// 1. ValK = (ValA & ValB_ND) & ValC_D \neq _|_ (the element we track must exist).
+// 2. ValC_D & (ValA & ValB_D) = _|_ (for Path 1 Cond(ValC_D, Disj_AB) to be true).
+// 3. ValC_D & ValB_D \neq _|_ (for Path 2 Cond(ValC_D, Disj_B) to be false).
 
 // Let's define these CUE values. The trick is that ValA must introduce a
 // component that causes ValC_D to conflict with (ValA & ValB_D),
 // but ValC_D must *not* conflict with ValB_D on its own.
+// Let's define these CUE values. The trick is that ValA must introduce a
+// component that causes ValC_D to conflict with (ValA & ValB_D),
+// but ValC_D must *not* conflict with ValB_D on its own.
 t1: {
 	va:  {a: 1, b: 2}
 	vb1: {c: 3}
@@ -55,6 +61,8 @@ t2: {
 	p2: A & (B & C)
 }
 -- issue3908.cue --
+// issue3908: Tests that nested defaults (e.g. null default overridden by a
+// string default) are handled correctly in evalv3. https://cuelang.org/issue/3908
 issue3908: reduced: p1: {
 	string | *null
 	string | *"str"

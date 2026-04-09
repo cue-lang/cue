@@ -32,6 +32,9 @@ unify: t2: p2: {
 	a!: int
 }
 
+// Required fields do not cause vet to fail with definitions: a required field
+// in one definition should block a disallowed field from another definition.
+// https://cuelang.org/issue/2306
 allowed: issue2306: {
 	#A: a!: int
 	#A: #B
@@ -78,6 +81,9 @@ reference: {
 -- issue3918.cue --
 import "strings"
 
+// Required fields do not work on the function pattern: a required field used
+// as an input to a definition-based function was not satisfied at the call site.
+// https://cuelang.org/issue/3918
 issue3918: reduced: {
 	#disjuncts: {
 		in!: [...string]
@@ -87,6 +93,8 @@ issue3918: reduced: {
 	x: (#disjuncts & {
 		in: ["foo", "bar"]
 	}).out
+		      // [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
+		      //     issue3918.cue:9:21
 }
 issue3918: noFunction: {
 	#disjuncts: {
@@ -332,7 +340,7 @@ NumCloseIDs: 15
         // [eval]
         a!: (_|_){
           // [eval] allowed.issue2306.#A.a: field not allowed:
-          //     ./in.cue:34:6
+          //     ./in.cue:37:6
         }
         b!: (int){ int }
       }
@@ -349,13 +357,13 @@ NumCloseIDs: 15
         }
         b: (_|_){
           // [incomplete] reference.toWithinDefinition.p1.b: required field missing: a:
-          //     ./in.cue:43:11
+          //     ./in.cue:46:11
         }
       }
       p2: (struct){
         b: (_|_){
           // [incomplete] reference.toWithinDefinition.p2.b: required field missing: a:
-          //     ./in.cue:46:11
+          //     ./in.cue:49:11
         }
         #Foo: (#struct){
           a!: (int){ int }
@@ -370,13 +378,13 @@ NumCloseIDs: 15
         b: ~(reference.toFieldFromDefinition.p1.#Foo)
         c: (_|_){
           // [incomplete] reference.toFieldFromDefinition.p1.c: required field missing: a:
-          //     ./in.cue:52:8
+          //     ./in.cue:55:8
         }
       }
       p2: (struct){
         c: (_|_){
           // [incomplete] reference.toFieldFromDefinition.p2.c: required field missing: a:
-          //     ./in.cue:55:8
+          //     ./in.cue:58:8
         }
         b: ~(reference.toFieldFromDefinition.p2.#Foo)
         #Foo: (#struct){
@@ -391,13 +399,13 @@ NumCloseIDs: 15
         }
         b: (_|_){
           // [incomplete] reference.toNonDefinition.p1.b: required field missing: y:
-          //     ./in.cue:61:8
+          //     ./in.cue:64:8
         }
       }
       p2: (struct){
         b: (_|_){
           // [incomplete] reference.toNonDefinition.p2.b: required field missing: y:
-          //     ./in.cue:64:8
+          //     ./in.cue:67:8
         }
         x: (struct){
           y!: (_){ _ }
@@ -409,13 +417,13 @@ NumCloseIDs: 15
         a!: (int){ 1 }
         b: (_|_){
           // [incomplete] reference.toConcrete.p1.b: required field missing: a:
-          //     ./in.cue:69:6
+          //     ./in.cue:72:6
         }
       }
       p2: (struct){
         b: (_|_){
           // [incomplete] reference.toConcrete.p2.b: required field missing: a:
-          //     ./in.cue:72:6
+          //     ./in.cue:75:6
         }
         a!: (int){ 1 }
       }
@@ -428,7 +436,7 @@ NumCloseIDs: 15
         }
         out: (_|_){
           // [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
-          //     ./issue3918.cue:6:21
+          //     ./issue3918.cue:9:21
         }
       }
       x: (string){ "foo|bar" }
@@ -439,7 +447,7 @@ NumCloseIDs: 15
         }
         out: (_|_){
           // [incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:
-          //     ./issue3918.cue:16:8
+          //     ./issue3918.cue:21:8
         }
       }
       _foo: (#struct){
@@ -447,12 +455,12 @@ NumCloseIDs: 15
         }
         out: (_|_){
           // [incomplete] issue3918.noFunction._foo.out: required field missing: in:
-          //     ./issue3918.cue:16:8
+          //     ./issue3918.cue:21:8
         }
       }
       x: (_|_){
         // [incomplete] issue3918.noFunction._foo.out: required field missing: in:
-        //     ./issue3918.cue:16:8
+        //     ./issue3918.cue:21:8
       }
     }
   }
@@ -461,14 +469,14 @@ NumCloseIDs: 15
       in: (_){ _ }
       out: (_|_){
         // [incomplete] doNotEscalateError.a.out: in.self undefined as in is incomplete (type _):
-        //     ./issue3918.cue:26:8
+        //     ./issue3918.cue:31:8
       }
     }
     b: (struct){
       required!: (_){ _ }
       pass: (_|_){
         // [incomplete] doNotEscalateError.b.pass: undefined field: self:
-        //     ./issue3918.cue:26:11
+        //     ./issue3918.cue:31:11
       }
     }
   }
@@ -477,15 +485,15 @@ NumCloseIDs: 15
 diff old new
 --- old
 +++ new
-@@ -40,8 +40,6 @@
+@@ -39,8 +39,6 @@
+         // [eval]
          a!: (_|_){
            // [eval] allowed.issue2306.#A.a: field not allowed:
-           //     ./in.cue:34:6
+-          //     ./in.cue:34:6
 -          //     ./in.cue:35:6
--          //     ./in.cue:37:6
+           //     ./in.cue:37:6
          }
          b!: (int){ int }
-       }
 @@ -56,10 +54,16 @@
          #Foo: (#struct){
            a!: (int){ int }
@@ -496,13 +504,13 @@ diff old new
 -        b: (int){ int }
 +        b: (_|_){
 +          // [incomplete] reference.toWithinDefinition.p1.b: required field missing: a:
-+          //     ./in.cue:43:11
++          //     ./in.cue:46:11
 +        }
 +      }
 +      p2: (struct){
 +        b: (_|_){
 +          // [incomplete] reference.toWithinDefinition.p2.b: required field missing: a:
-+          //     ./in.cue:46:11
++          //     ./in.cue:49:11
 +        }
          #Foo: (#struct){
            a!: (int){ int }
@@ -524,13 +532,13 @@ diff old new
 +        b: ~(reference.toFieldFromDefinition.p1.#Foo)
 +        c: (_|_){
 +          // [incomplete] reference.toFieldFromDefinition.p1.c: required field missing: a:
-+          //     ./in.cue:52:8
++          //     ./in.cue:55:8
 +        }
 +      }
 +      p2: (struct){
 +        c: (_|_){
 +          // [incomplete] reference.toFieldFromDefinition.p2.c: required field missing: a:
-+          //     ./in.cue:55:8
++          //     ./in.cue:58:8
 +        }
 +        b: ~(reference.toFieldFromDefinition.p2.#Foo)
          #Foo: (#struct){
@@ -546,13 +554,13 @@ diff old new
 -        b: (_){ _ }
 +        b: (_|_){
 +          // [incomplete] reference.toNonDefinition.p1.b: required field missing: y:
-+          //     ./in.cue:61:8
++          //     ./in.cue:64:8
 +        }
 +      }
 +      p2: (struct){
 +        b: (_|_){
 +          // [incomplete] reference.toNonDefinition.p2.b: required field missing: y:
-+          //     ./in.cue:64:8
++          //     ./in.cue:67:8
 +        }
          x: (struct){
            y!: (_){ _ }
@@ -568,13 +576,13 @@ diff old new
 -        a!: (int){ 1 }
 +        b: (_|_){
 +          // [incomplete] reference.toConcrete.p1.b: required field missing: a:
-+          //     ./in.cue:69:6
++          //     ./in.cue:72:6
 +        }
 +      }
 +      p2: (struct){
 +        b: (_|_){
 +          // [incomplete] reference.toConcrete.p2.b: required field missing: a:
-+          //     ./in.cue:72:6
++          //     ./in.cue:75:6
 +        }
 +        a!: (int){ 1 }
 +      }
@@ -587,7 +595,7 @@ diff old new
 +        }
 +        out: (_|_){
 +          // [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
-+          //     ./issue3918.cue:6:21
++          //     ./issue3918.cue:9:21
 +        }
 +      }
 +      x: (string){ "foo|bar" }
@@ -598,7 +606,7 @@ diff old new
 +        }
 +        out: (_|_){
 +          // [incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:
-+          //     ./issue3918.cue:16:8
++          //     ./issue3918.cue:21:8
 +        }
 +      }
 +      _foo: (#struct){
@@ -606,12 +614,12 @@ diff old new
 +        }
 +        out: (_|_){
 +          // [incomplete] issue3918.noFunction._foo.out: required field missing: in:
-+          //     ./issue3918.cue:16:8
++          //     ./issue3918.cue:21:8
 +        }
 +      }
 +      x: (_|_){
 +        // [incomplete] issue3918.noFunction._foo.out: required field missing: in:
-+        //     ./issue3918.cue:16:8
++        //     ./issue3918.cue:21:8
 +      }
 +    }
 +  }
@@ -620,14 +628,14 @@ diff old new
 +      in: (_){ _ }
 +      out: (_|_){
 +        // [incomplete] doNotEscalateError.a.out: in.self undefined as in is incomplete (type _):
-+        //     ./issue3918.cue:26:8
++        //     ./issue3918.cue:31:8
 +      }
 +    }
 +    b: (struct){
 +      required!: (_){ _ }
 +      pass: (_|_){
 +        // [incomplete] doNotEscalateError.b.pass: undefined field: self:
-+        //     ./issue3918.cue:26:11
++        //     ./issue3918.cue:31:11
        }
      }
    }

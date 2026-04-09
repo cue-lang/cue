@@ -1,4 +1,7 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that dynamic field keys with disjunctive default values evaluate correctly.
+# The v3 evaluator incorrectly reported a cycle error for `(parameters.gatewayNamespace)`
+# when the value was a disjunction like `string | *"foo"`, working fine in evalv2.
+# https://cuelang.org/issue/3905
 -- in.cue --
 issue3905: reduced: {
 	#Schema: {

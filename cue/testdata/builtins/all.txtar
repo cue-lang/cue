@@ -18,6 +18,10 @@ okIncompleteChild: {
 	x: and([{a: b.c}, {b: 1}])
 }
 -- issue3412.cue --
+// Tests that using and() in a pattern constraint with a definition
+// reference defined after its use does not crash (nil pointer
+// dereference in matchPatternValue). Issue: evalv3 panicked when
+// #constraints appeared after its usage in the pattern key.
 andInPattern: {
 	out: {
 		[and(#constraints)]: _

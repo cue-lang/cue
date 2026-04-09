@@ -259,6 +259,7 @@ edgeCases: {
 
         direct: {
             try { v: a? } else { skipped: true }
+            // v shares the error from a
         }
         dontSkipError1: {
             try { a._b? } else { skipped: true }
@@ -476,10 +477,10 @@ NumCloseIDs: 173
 Errors:
 errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
     ./in.cue:7:4
-    ./in.cue:340:20
-    ./in.cue:341:9
-    ./in.cue:341:18
-    ./in.cue:341:23
+    ./in.cue:341:20
+    ./in.cue:342:9
+    ./in.cue:342:18
+    ./in.cue:342:23
 closedness.notExistsDef.v: undefined field: g:
     ./in.cue:177:23
 closedness.notExistsValue.v: undefined field: g:
@@ -491,15 +492,15 @@ indexTests.outOfRangeClosedNoElse.v: index out of range [100] with length 3:
 edgeCases.referenceError.a: failed arithmetic: division by zero:
     ./in.cue:255:12
 errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-    ./in.cue:325:18
+    ./in.cue:326:18
     ./in.cue:7:4
-    ./in.cue:325:23
+    ./in.cue:326:23
 errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-    ./in.cue:336:18
+    ./in.cue:337:18
 assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-    ./in.cue:413:22
+    ./in.cue:414:22
 assignmentForm.withRealError.result: failed arithmetic: division by zero:
-    ./in.cue:434:17
+    ./in.cue:435:17
 
 Result:
 (_|_){
@@ -723,13 +724,13 @@ Result:
     failedRef1: (struct){
       v: (_|_){
         // [incomplete] refIntoTry.failedRef1.v: undefined field: foo:
-        //     ./in.cue:308:30
+        //     ./in.cue:309:30
       }
     }
     failedRef2: (struct){
       v: (_|_){
         // [incomplete] refIntoTry.failedRef2.v: undefined field: foo:
-        //     ./in.cue:311:30
+        //     ./in.cue:312:30
       }
     }
     successRef: (struct){
@@ -742,9 +743,9 @@ Result:
       // [eval]
       v: (_|_){
         // [eval] errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-        //     ./in.cue:325:18
+        //     ./in.cue:326:18
         //     ./in.cue:7:4
-        //     ./in.cue:325:23
+        //     ./in.cue:326:23
       }
     }
     typeErrorUndefined: (struct){
@@ -754,7 +755,7 @@ Result:
       // [eval]
       v: (_|_){
         // [eval] errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-        //     ./in.cue:336:18
+        //     ./in.cue:337:18
       }
     }
     conflictError: (_|_){
@@ -762,10 +763,10 @@ Result:
       v: (_|_){
         // [eval] errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
         //     ./in.cue:7:4
-        //     ./in.cue:340:20
-        //     ./in.cue:341:9
-        //     ./in.cue:341:18
-        //     ./in.cue:341:23
+        //     ./in.cue:341:20
+        //     ./in.cue:342:9
+        //     ./in.cue:342:18
+        //     ./in.cue:342:23
       }
     }
     mixedError: (struct){
@@ -817,7 +818,7 @@ Result:
       }
       result: (_|_){
         // [eval] assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-        //     ./in.cue:413:22
+        //     ./in.cue:414:22
       }
     }
     withOutOfRangeIndexOpen: (struct){
@@ -839,7 +840,7 @@ Result:
       // [eval]
       result: (_|_){
         // [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
-        //     ./in.cue:434:17
+        //     ./in.cue:435:17
       }
     }
     withFor: (struct){
@@ -871,10 +872,10 @@ diff old new
 +Errors:
 +errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
 +    ./in.cue:7:4
-+    ./in.cue:340:20
-+    ./in.cue:341:9
-+    ./in.cue:341:18
-+    ./in.cue:341:23
++    ./in.cue:341:20
++    ./in.cue:342:9
++    ./in.cue:342:18
++    ./in.cue:342:23
 +closedness.notExistsDef.v: undefined field: g:
 +    ./in.cue:177:23
 +closedness.notExistsValue.v: undefined field: g:
@@ -886,15 +887,15 @@ diff old new
 +edgeCases.referenceError.a: failed arithmetic: division by zero:
 +    ./in.cue:255:12
 +errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-+    ./in.cue:325:18
++    ./in.cue:326:18
 +    ./in.cue:7:4
-+    ./in.cue:325:23
++    ./in.cue:326:23
 +errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-+    ./in.cue:336:18
++    ./in.cue:337:18
 +assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-+    ./in.cue:413:22
++    ./in.cue:414:22
 +assignmentForm.withRealError.result: failed arithmetic: division by zero:
-+    ./in.cue:434:17
++    ./in.cue:435:17
 +
 +Result:
 +(_|_){
@@ -1121,13 +1122,13 @@ diff old new
 +    failedRef1: (struct){
 +      v: (_|_){
 +        // [incomplete] refIntoTry.failedRef1.v: undefined field: foo:
-+        //     ./in.cue:308:30
++        //     ./in.cue:309:30
 +      }
 +    }
 +    failedRef2: (struct){
 +      v: (_|_){
 +        // [incomplete] refIntoTry.failedRef2.v: undefined field: foo:
-+        //     ./in.cue:311:30
++        //     ./in.cue:312:30
 +      }
 +    }
 +    successRef: (struct){
@@ -1140,9 +1141,9 @@ diff old new
 +      // [eval]
 +      v: (_|_){
 +        // [eval] errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-+        //     ./in.cue:325:18
++        //     ./in.cue:326:18
 +        //     ./in.cue:7:4
-+        //     ./in.cue:325:23
++        //     ./in.cue:326:23
 +      }
 +    }
 +    typeErrorUndefined: (struct){
@@ -1152,7 +1153,7 @@ diff old new
 +      // [eval]
 +      v: (_|_){
 +        // [eval] errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-+        //     ./in.cue:336:18
++        //     ./in.cue:337:18
 +      }
 +    }
 +    conflictError: (_|_){
@@ -1160,10 +1161,10 @@ diff old new
 +      v: (_|_){
 +        // [eval] errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
 +        //     ./in.cue:7:4
-+        //     ./in.cue:340:20
-+        //     ./in.cue:341:9
-+        //     ./in.cue:341:18
-+        //     ./in.cue:341:23
++        //     ./in.cue:341:20
++        //     ./in.cue:342:9
++        //     ./in.cue:342:18
++        //     ./in.cue:342:23
 +      }
 +    }
 +    mixedError: (struct){
@@ -1215,7 +1216,7 @@ diff old new
 +      }
 +      result: (_|_){
 +        // [eval] assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-+        //     ./in.cue:413:22
++        //     ./in.cue:414:22
 +      }
 +    }
 +    withOutOfRangeIndexOpen: (struct){
@@ -1237,7 +1238,7 @@ diff old new
 +      // [eval]
 +      result: (_|_){
 +        // [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
-+        //     ./in.cue:434:17
++        //     ./in.cue:435:17
 +      }
 +    }
 +    withFor: (struct){

@@ -4,6 +4,9 @@ list: [2, 3]
 a: [ 3, for x in list {x}, for x in list {x}]
 b: [ 3, if true {3}, for x in list if x > 2 {x}]
 
+// issue574: Tests that if and for comprehensions inside list literals
+// correctly include or exclude elements based on conditions.
+// https://cuelang.org/issue/574
 issue574: {
 	greet: true
 	bye:   true

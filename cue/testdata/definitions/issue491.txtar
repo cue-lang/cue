@@ -1,4 +1,6 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that a definition used as a list element type correctly propagates default
+# values and does not incorrectly reject fields like Pattern when unified.
+# https://cuelang.org/issue/491
 -- in.cue --
 package x
 

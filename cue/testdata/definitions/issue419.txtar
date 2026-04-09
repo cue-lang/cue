@@ -1,4 +1,6 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that a list constrained with [...#X] where #X is a disjunction of
+# definitions correctly accepts values matching either branch of the disjunction.
+# https://cuelang.org/issue/419
 -- in.cue --
 #A: {
 	a: string

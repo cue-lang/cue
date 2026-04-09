@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cb5eeeb_d8e0e031",
+        "filename": "cue/fuzz_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-09T08:21:48Z",
+      "side": 1,
+      "message": "try nested multiline literals too with the #, ##, ### etc wrapping?",
+      "revId": "6001f4d78669b450ebc83e610c5ed39a40bc1afb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

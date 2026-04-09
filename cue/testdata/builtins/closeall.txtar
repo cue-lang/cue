@@ -1,4 +1,3 @@
-#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 @experiment(explicitopen)
 
@@ -8,34 +7,62 @@ a: __closeAll({
 	nested: {
 		field2: "hello"
 	}
-})
+}) @test(eq, {field1: 1, nested: {field2: "hello"}})
 
 // Test that extra fields are not allowed (should error)
-b: err: a & {extra: "not allowed"}
+b: {
+	err: a & {extra: "not allowed"}
+	@test(err, at=err.extra, code=eval, contains="field not allowed", pos=[1:12])
+}
 
 // Test that nested extra fields are not allowed (should error)
-c: err: a & {
-	field1: 1
-	nested: {
-		field2: "hello"
-		extra: "not allowed"
+c: {
+	err: a & {
+		field1: 1
+		nested: {
+			field2: "hello"
+			extra: "not allowed"
+		}
 	}
+	@test(err, at=err.nested.extra, code=eval, contains="field not allowed", pos=[5:4])
 }
 
 // Test with non-struct should error
-d: err: __closeAll("not a struct")
+d: {
+	err: __closeAll("not a struct") @test(err, code=eval, contains="argument must be a struct or list literal", pos=[0:7])
+}
 
 // Test with empty struct
-e: __closeAll({})
-f: err: e & {extra: "not allowed"}  // should error
+e: __closeAll({}) @test(eq, {})
+f: {
+	err: e & {extra: "not allowed"}  // should error
+	@test(err, at=err.extra, code=eval, contains="field not allowed", pos=[1:12])
+}
 
 
 #A: a: int
-g: err: __closeAll(#A)
+g: {
+	err: __closeAll(#A) @test(err, code=eval, contains="argument must be a struct or list literal", pos=[0:7])
+}
 -- old.cue --
 // May not be used if explicitopen is not set.
-h: err: __closeAll({})
+h: {
+	err: __closeAll({}) @test(err, code=eval, contains="__closeAll may only be used when explicitopen is enabled", pos=[0:7])
+}
 
+-- out/errors.txt --
+[eval] b.err.extra: field not allowed:
+    ./in.cue:13:12
+[eval] c.err.nested.extra: field not allowed:
+    ./in.cue:23:4
+[eval] d.err: error in call to __closeAll: argument must be a struct or list literal:
+    ./in.cue:31:7
+[eval] f.err.extra: field not allowed:
+    ./in.cue:37:12
+[eval] g.err: error in call to __closeAll: argument must be a struct or list literal:
+    ./in.cue:44:7
+[eval] h.err: error in call to __closeAll: __closeAll may only be used when explicitopen is enabled:
+    ./old.cue:3:7
 -- out/compile --
 --- in.cue
 {
@@ -79,95 +106,5 @@ h: err: __closeAll({})
 {
   h: {
     err: __closeAll({})
-  }
-}
--- out/evalalpha --
-Errors:
-b.err.extra: field not allowed:
-    ./in.cue:12:14
-c.err.nested.extra: field not allowed:
-    ./in.cue:19:3
-f.err.extra: field not allowed:
-    ./in.cue:28:14
-d.err: error in call to __closeAll: argument must be a struct or list literal:
-    ./in.cue:24:9
-g.err: error in call to __closeAll: argument must be a struct or list literal:
-    ./in.cue:32:9
-h.err: error in call to __closeAll: __closeAll may only be used when explicitopen is enabled:
-    ./old.cue:2:9
-
-Result:
-(_|_){
-  // [eval]
-  a: (#struct){
-    field1: (int){ 1 }
-    nested: (#struct){
-      field2: (string){ "hello" }
-    }
-  }
-  b: (_|_){
-    // [eval]
-    err: (_|_){
-      // [eval]
-      extra: (_|_){
-        // [eval] b.err.extra: field not allowed:
-        //     ./in.cue:12:14
-      }
-      field1: (int){ 1 }
-      nested: (#struct){
-        field2: (string){ "hello" }
-      }
-    }
-  }
-  c: (_|_){
-    // [eval]
-    err: (_|_){
-      // [eval]
-      field1: (int){ 1 }
-      nested: (_|_){
-        // [eval]
-        field2: (string){ "hello" }
-        extra: (_|_){
-          // [eval] c.err.nested.extra: field not allowed:
-          //     ./in.cue:19:3
-        }
-      }
-    }
-  }
-  d: (_|_){
-    // [eval]
-    err: (_|_){
-      // [eval] d.err: error in call to __closeAll: argument must be a struct or list literal:
-      //     ./in.cue:24:9
-    }
-  }
-  e: (#struct){
-  }
-  f: (_|_){
-    // [eval]
-    err: (_|_){
-      // [eval]
-      extra: (_|_){
-        // [eval] f.err.extra: field not allowed:
-        //     ./in.cue:28:14
-      }
-    }
-  }
-  #A: (#struct){
-    a: (int){ int }
-  }
-  g: (_|_){
-    // [eval]
-    err: (_|_){
-      // [eval] g.err: error in call to __closeAll: argument must be a struct or list literal:
-      //     ./in.cue:32:9
-    }
-  }
-  h: (_|_){
-    // [eval]
-    err: (_|_){
-      // [eval] h.err: error in call to __closeAll: __closeAll may only be used when explicitopen is enabled:
-      //     ./old.cue:2:9
-    }
   }
 }

@@ -5,15 +5,30 @@
 A: close({
 	a: 1
 	b: 2
-})
+}) @test(eq, {a: 1, b: 2})
 
 B: A & {
 	c: 3
-}
+} @test(err, code=eval, at=c, contains="field not allowed", pos=[1:2])
+
+@test(debugCheck, """
+	(_|_){
 	  // [eval]
+	  A: (#struct){
+	    a: (int){ 1 }
+	    b: (int){ 2 }
+	  }
+	  B: (_|_){
 	    // [eval]
+	    c: (_|_){
 	      // [eval] B.c: field not allowed:
 	      //     test.cue:7:2
+	    }
+	    a: (int){ 1 }
+	    b: (int){ 2 }
+	  }
+	}
+	""")
 -- out/eval/stats --
 Leaks:  0
 Freed:  20
@@ -26,86 +41,13 @@ Conjuncts:    16
 Disjuncts:    0
 
 NumCloseIDs: 3
--- out/evalalpha --
-Errors:
-B.c: field not allowed:
+-- out/errors.txt --
+[eval] B.c: field not allowed:
     ./test.cue:7:2
-
-Result:
-(_|_){
-  // [eval]
-  A: (#struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  B: (_|_){
-    // [eval]
-    c: (_|_){
-      // [eval] B.c: field not allowed:
-      //     ./test.cue:7:2
-    }
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,7 +1,5 @@
- Errors:
- B.c: field not allowed:
--    ./test.cue:1:10
--    ./test.cue:6:4
-     ./test.cue:7:2
- 
- Result:
-@@ -13,13 +11,11 @@
-   }
-   B: (_|_){
-     // [eval]
--    a: (int){ 1 }
--    b: (int){ 2 }
-     c: (_|_){
-       // [eval] B.c: field not allowed:
--      //     ./test.cue:1:10
--      //     ./test.cue:6:4
-       //     ./test.cue:7:2
-     }
-+    a: (int){ 1 }
-+    b: (int){ 2 }
-   }
- }
--- diff/todo/p2 --
+-- out/diff-v2-v3.txt --
 positions
--- diff/todo/p3 --
 Reordering
--- out/eval --
-Errors:
-B.c: field not allowed:
-    ./test.cue:1:10
-    ./test.cue:6:4
-    ./test.cue:7:2
-
-Result:
-(_|_){
-  // [eval]
-  A: (#struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  B: (_|_){
-    // [eval]
-    a: (int){ 1 }
-    b: (int){ 2 }
-    c: (_|_){
-      // [eval] B.c: field not allowed:
-      //     ./test.cue:1:10
-      //     ./test.cue:6:4
-      //     ./test.cue:7:2
-    }
-  }
-}
+Verdict: worsening -- v3 reports different error positions; field reordering.
 -- out/compile --
 --- test.cue
 {

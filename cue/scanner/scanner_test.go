@@ -143,6 +143,11 @@ var testTokens = [...]elt{
 	// literal parser? This would allow preserving \r for formatting without
 	// changing the semantics of evaluation.
 	{tok: token.STRING, lit: "#\"\"\"\r\n  \\(foobar\n  \"\"\"#", class: literal},
+	// Bare \r in multiline strings should be stripped and not prevent
+	// the closing quotes from being recognized.
+	{tok: token.STRING, lit: "\"\"\"\n\r\"\"\"", class: literal, want: "\"\"\"\n\"\"\""},
+	{tok: token.STRING, lit: "\"\"\"\n\r\n\r\"\"\"", class: literal, want: "\"\"\"\n\n\"\"\""},
+	{tok: token.STRING, lit: "\"\"\"\n\rfoo\n\r\"\"\"", class: literal, want: "\"\"\"\nfoo\n\"\"\""},
 
 	// Operators and delimiters
 	{tok: token.ADD, lit: "+", class: operator},

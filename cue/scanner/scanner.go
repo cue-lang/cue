@@ -461,6 +461,12 @@ func (s *Scanner) scanString(offs int, quote quoteInfo, continuation bool) (toke
 				break
 			}
 		}
+		// Carriage returns are stripped from multiline strings per the spec,
+		// so they should not affect closeAllowed or whitespace tracking.
+		if ch == '\r' && quote.numChar == 3 {
+			hasCR = true
+			continue
+		}
 		// Track the common whitespace prefix of non-empty content lines,
 		// including lines consisting entirely of whitespace.
 		// For newlines, len(ws) > 0 skips truly empty lines.
@@ -486,9 +492,6 @@ func (s *Scanner) scanString(offs int, quote quoteInfo, continuation bool) (toke
 			// preserve closeAllowed
 		default:
 			closeAllowed = false
-		}
-		if ch == '\r' && quote.numChar == 3 {
-			hasCR = true
 		}
 		if ch == '\\' {
 			if _, interpolation := s.scanEscape(quote); interpolation {

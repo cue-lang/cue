@@ -207,6 +207,9 @@ func (p *NumInfo) scanMantissa(base int) bool {
 	hasDigit := false
 	var last byte
 	for p.digitVal(p.ch) < base {
+		if last == '_' && p.ch == '_' {
+			p.err = p.errorf("illegal '_' in number")
+		}
 		if p.ch != '_' {
 			p.buf = append(p.buf, p.ch)
 			hasDigit = true

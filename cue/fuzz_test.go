@@ -83,13 +83,29 @@ list.Concat(["foo"], [])
 			t.Skip() // keep inputs reasonably small for now
 		}
 		f, err := parser.ParseFile("fuzz.cue", s, parser.ParseComments)
+
 		if err != nil {
-			t.Skip() // skip inputs which aren't valid syntax
+			if _, err := parser.ParseExpr("fuzz.cue", s, parser.ParseComments); err == nil {
+				t.Errorf("ParseFile rejects this input but ParseExpr does not: %s", s)
+			}
+			if ast.IsValidIdent(s) {
+				t.Errorf("cue/parser rejects this identifier but cue/ast accepts it as valid: %s", s)
+			}
+			var info literal.NumInfo
+			if err := literal.ParseNum(s, &info); err == nil {
+				t.Errorf("cue/parser rejects this number but cue/literal accepts it as valid: %s", s)
+			}
+			if _, err := literal.Unquote(s); err == nil {
+				t.Errorf("cue/parser rejects this string but cue/literal accepts it as valid: %s", s)
+			}
+
+			// Nothing else to do for invalid syntax; stop here.
+			return
 		}
 
 		// Common operations with the syntax tree.
 		if _, err := format.Node(f); err != nil {
-			t.Fatalf("cue/format should not fail on parsed input: %v", err)
+			t.Errorf("cue/format should not fail on parsed input: %v", err)
 		}
 		ast.Walk(f,
 			func(ast.Node) bool { return true },
@@ -103,14 +119,14 @@ list.Concat(["foo"], [])
 				switch node := node.(type) {
 				case *ast.Ident:
 					if !ast.IsValidIdent(node.Name) {
-						t.Fatalf("cue/parser and cue/ast should agree on what is a valid identifier: %s", node.Name)
+						t.Errorf("cue/parser accepts this identifier as valid but cue/ast does not: %s", node.Name)
 					}
 				case *ast.BasicLit:
 					switch node.Kind {
 					case token.INT, token.FLOAT:
 						var info literal.NumInfo
 						if err := literal.ParseNum(node.Value, &info); err != nil {
-							t.Fatalf("cue/parser and cue/literal should agree on what is a valid number: %s", node.Value)
+							t.Errorf("cue/parser accepts this number as valid but cue/literal does not: %s", node.Value)
 						}
 					case token.STRING:
 						if _, ok := c.Parent().Node().(*ast.Interpolation); ok {
@@ -118,7 +134,7 @@ list.Concat(["foo"], [])
 							break
 						}
 						if _, err := literal.Unquote(node.Value); err != nil {
-							t.Fatalf("cue/parser and cue/literal should agree on what is a valid string: %s", node.Value)
+							t.Errorf("cue/parser accepts this string as valid but cue/literal does not: %s", node.Value)
 						}
 					}
 				}

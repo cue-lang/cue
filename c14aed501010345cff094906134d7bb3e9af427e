@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c2a07e3_8f6d9802",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 596,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-09T15:41:14Z",
+      "side": 1,
+      "message": "five levels of nested for loops here; are we certain this can\u0027t easily spiral to CPU burning?",
+      "revId": "c14aed501010345cff094906134d7bb3e9af427e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a2d12a47_7036c78d",
         "filename": "internal/lsp/eval/eval_test.go",
         "patchSetId": 1
@@ -14,6 +31,24 @@
       "writtenOn": "2026-04-09T14:56:19Z",
       "side": 1,
       "message": "Unfortunately it\u0027s not possible to add a version of this test in a preceding CL because:\n\n1. the broken behaviour results in the /usages test failing\n2. the test framework automatically calculates expected usages by inverting expected definitions\n3. there is no way to express the definitions in such a way that we could have the test \"pass\" with a FIXME without significant alterations to the test framework",
+      "revId": "c14aed501010345cff094906134d7bb3e9af427e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97263368_dd9f500d",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4090,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-09T15:41:14Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a2d12a47_7036c78d",
       "revId": "c14aed501010345cff094906134d7bb3e9af427e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

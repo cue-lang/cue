@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 )
 
@@ -257,21 +256,6 @@ func (e *Env) DocumentHighlight(loc protocol.Location) []protocol.DocumentHighli
 	return highlights
 }
 
-// RunGenerate runs "go generate" in the given dir, calling t.Fatal on any error.
-// It waits for the generate command to complete and checks for file changes
-// before returning.
-func (e *Env) RunGenerate(dir string) {
-	e.T.Helper()
-	if err := e.Editor.RunGenerate(e.Ctx, dir); err != nil {
-		e.T.Fatal(err)
-	}
-	e.Await(NoOutstandingWork(nil))
-	// Ideally the editor.Workspace would handle all synthetic file watching, but
-	// we help it out here as we need to wait for the generate command to
-	// complete before checking the filesystem.
-	e.CheckForFileChanges()
-}
-
 // CheckForFileChanges triggers a manual poll of the workspace for any file
 // changes since creation, or since last polling. It is a workaround for the
 // lack of true file watching support in the fake workspace.
@@ -291,28 +275,6 @@ func (e *Env) CodeLens(path string) []protocol.CodeLens {
 		e.T.Fatal(err)
 	}
 	return lens
-}
-
-// ExecuteCodeLensCommand executes the command for the code lens matching the
-// given command name.
-func (e *Env) ExecuteCodeLensCommand(path string, cmd command.Command, result interface{}) {
-	e.T.Helper()
-	lenses := e.CodeLens(path)
-	var lens protocol.CodeLens
-	var found bool
-	for _, l := range lenses {
-		if l.Command.Command == cmd.ID() {
-			lens = l
-			found = true
-		}
-	}
-	if !found {
-		e.T.Fatalf("found no command with the ID %s", cmd.ID())
-	}
-	e.ExecuteCommand(&protocol.ExecuteCommandParams{
-		Command:   lens.Command.Command,
-		Arguments: lens.Command.Arguments,
-	}, result)
 }
 
 func (e *Env) ExecuteCommand(params *protocol.ExecuteCommandParams, result interface{}) {
@@ -336,55 +298,6 @@ func (e *Env) ExecuteCommand(params *protocol.ExecuteCommandParams, result inter
 	}
 	if err := json.Unmarshal(data, result); err != nil {
 		e.T.Fatal(err)
-	}
-}
-
-// Views returns the server's views.
-func (e *Env) Views() []command.View {
-	var summaries []command.View
-	cmd, err := command.NewViewsCommand("")
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	e.ExecuteCommand(&protocol.ExecuteCommandParams{
-		Command:   cmd.Command,
-		Arguments: cmd.Arguments,
-	}, &summaries)
-	return summaries
-}
-
-// StartProfile starts a CPU profile with the given name, using the
-// gopls.start_profile custom command. It calls t.Fatal on any error.
-//
-// The resulting stop function must be called to stop profiling (using the
-// gopls.stop_profile custom command).
-func (e *Env) StartProfile() (stop func() string) {
-	// TODO(golang/go#61217): revisit the ergonomics of these command APIs.
-	//
-	// This would be a lot simpler if we generated params constructors.
-	args, err := command.MarshalArgs(command.StartProfileArgs{})
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	params := &protocol.ExecuteCommandParams{
-		Command:   command.StartProfile.ID(),
-		Arguments: args,
-	}
-	var result command.StartProfileResult
-	e.ExecuteCommand(params, &result)
-
-	return func() string {
-		stopArgs, err := command.MarshalArgs(command.StopProfileArgs{})
-		if err != nil {
-			e.T.Fatal(err)
-		}
-		stopParams := &protocol.ExecuteCommandParams{
-			Command:   command.StopProfile.ID(),
-			Arguments: stopArgs,
-		}
-		var result command.StopProfileResult
-		e.ExecuteCommand(stopParams, &result)
-		return result.File
 	}
 }
 

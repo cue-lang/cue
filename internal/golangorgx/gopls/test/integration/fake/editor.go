@@ -20,7 +20,6 @@ import (
 	"sync"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake/glob"
 	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
@@ -1080,37 +1079,6 @@ func (e *Editor) checkBufferLocation(loc protocol.Location) error {
 
 	_, _, err := buf.mapper.RangeOffsets(loc.Range)
 	return err
-}
-
-// RunGenerate runs `go generate` non-recursively in the workdir-relative dir
-// path. It does not report any resulting file changes as a watched file
-// change, so must be followed by a call to Workdir.CheckForFileChanges once
-// the generate command has completed.
-// TODO(rFindley): this shouldn't be necessary anymore. Delete it.
-func (e *Editor) RunGenerate(ctx context.Context, dir string) error {
-	if e.Server == nil {
-		return nil
-	}
-	absDir := e.sandbox.Workdir.AbsPath(dir)
-	cmd, err := command.NewGenerateCommand("", command.GenerateArgs{
-		Dir:       protocol.URIFromPath(absDir),
-		Recursive: false,
-	})
-	if err != nil {
-		return err
-	}
-	params := &protocol.ExecuteCommandParams{
-		Command:   cmd.Command,
-		Arguments: cmd.Arguments,
-	}
-	if _, err := e.ExecuteCommand(ctx, params); err != nil {
-		return fmt.Errorf("running generate: %v", err)
-	}
-	// Unfortunately we can't simply poll the workdir for file changes here,
-	// because server-side command may not have completed. In integration tests, we can
-	// Await this state change, but here we must delegate that responsibility to
-	// the caller.
-	return nil
 }
 
 // CodeLens executes a codelens request on the server.

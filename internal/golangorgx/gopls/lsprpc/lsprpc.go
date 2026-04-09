@@ -11,16 +11,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
@@ -107,59 +103,6 @@ func NewForwarder(rawAddr string, argFunc func(network, address string) []string
 	return fwd, nil
 }
 
-// QueryServerState returns a JSON-encodable struct describing the state of the named server.
-func QueryServerState(ctx context.Context, addr string) (any, error) {
-	serverConn, err := dialRemote(ctx, addr)
-	if err != nil {
-		return nil, err
-	}
-	var state serverState
-	if err := protocol.Call(ctx, serverConn, serversMethod, nil, &state); err != nil {
-		return nil, fmt.Errorf("querying server state: %w", err)
-	}
-	return &state, nil
-}
-
-// dialRemote is used for making calls into the cuelsp daemon. addr should be a
-// URL, possibly on the synthetic 'auto' network (e.g. tcp://..., unix://...,
-// or auto://...).
-func dialRemote(ctx context.Context, addr string) (jsonrpc2.Conn, error) {
-	network, address := ParseAddr(addr)
-	if network == autoNetwork {
-		cuePath, err := os.Executable()
-		if err != nil {
-			return nil, fmt.Errorf("getting cue path: %w", err)
-		}
-		network, address = autoNetworkAddress(cuePath, address)
-	}
-	netConn, err := net.DialTimeout(network, address, 5*time.Second)
-	if err != nil {
-		return nil, fmt.Errorf("dialing remote: %w", err)
-	}
-	serverConn := jsonrpc2.NewConn(jsonrpc2.NewHeaderStream(netConn))
-	serverConn.Go(ctx, jsonrpc2.MethodNotFound)
-	return serverConn, nil
-}
-
-// ExecuteCommand connects to the named server, sends it a
-// workspace/executeCommand request (with command 'id' and arguments
-// JSON encoded in 'request'), and populates the result variable.
-func ExecuteCommand(ctx context.Context, addr string, id string, request, result any) error {
-	serverConn, err := dialRemote(ctx, addr)
-	if err != nil {
-		return err
-	}
-	args, err := command.MarshalArgs(request)
-	if err != nil {
-		return err
-	}
-	params := protocol.ExecuteCommandParams{
-		Command:   id,
-		Arguments: args,
-	}
-	return protocol.Call(ctx, serverConn, "workspace/executeCommand", params, result)
-}
-
 // ServeStream dials the forwarder remote and binds the remote to serve the LSP
 // on the incoming stream.
 func (f *forwarder) ServeStream(ctx context.Context, clientConn jsonrpc2.Conn) error {
@@ -224,14 +167,6 @@ func (f *forwarder) handshake(ctx context.Context) {
 		tag.NewServer.Of(f.serverID),
 		tag.ServerID.Of(hresp.ServerID),
 	)
-}
-
-func ConnectToRemote(ctx context.Context, addr string) (net.Conn, error) {
-	dialer, err := newAutoDialer(addr, nil)
-	if err != nil {
-		return nil, err
-	}
-	return dialer.dialNet(ctx)
 }
 
 // A handshakeRequest identifies a client to the LSP server.

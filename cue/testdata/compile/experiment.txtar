@@ -1,15 +1,17 @@
-#todo:inline: medium — compile-time checks; verify output in out/compile section
 -- cue.mod/module.cue --
 module: "x.test"
 language: version: "v0.13.0"
 -- off.cue --
-off: __test_experiment("off")
+off: __test_experiment("off") @test(err, code=eval, contains="testing experiment disabled", pos=[0:6])
 
 -- on.cue --
 @experiment(testing)
 
-on: __test_experiment("on")
+on: __test_experiment("on") @test(eq, "on")
 
+-- out/errors.txt --
+[eval] off: error in call to testExperiment: testing experiment disabled:
+    ./off.cue:1:6
 -- out/compile --
 --- off.cue
 {
@@ -29,17 +31,3 @@ Retain: 0
 Unifications: 3
 Conjuncts:    4
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-off: error in call to testExperiment: testing experiment disabled:
-    ./off.cue:1:6
-
-Result:
-(_|_){
-  // [eval]
-  off: (_|_){
-    // [eval] off: error in call to testExperiment: testing experiment disabled:
-    //     ./off.cue:1:6
-  }
-  on: (string){ "on" }
-}

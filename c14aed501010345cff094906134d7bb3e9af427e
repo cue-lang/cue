@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "949cbf70_5d951c03",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 596,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-09T15:52:10Z",
+      "side": 1,
+      "message": "It\u0027s the same as before really given that the new one has constant length of 2. It\u0027s all safe - the pathological case is every node in the AST - there\u0027s no place where we\u0027re creating \u003e 1 object per AST node, and no list here will contain duplicates. So it should all be safe.",
+      "parentUuid": "5c2a07e3_8f6d9802",
+      "revId": "c14aed501010345cff094906134d7bb3e9af427e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2d12a47_7036c78d",

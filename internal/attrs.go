@@ -76,6 +76,10 @@ func (kv *KeyValue) Key() string {
 }
 
 func (kv *KeyValue) Value() string {
+	return MaybeUnquote(kv.value)
+}
+
+func (kv *KeyValue) RawValue() string {
 	return kv.value
 }
 
@@ -207,12 +211,13 @@ func ParseAttrBody(pos token.Pos, s string) (a Attr) {
 func (a *Attr) appendField(k, v, text string) {
 	a.Fields = append(a.Fields, KeyValue{
 		key:   strings.TrimSpace(k),
-		value: maybeUnquote(strings.TrimSpace(v)),
+		value: strings.TrimSpace(v),
 		text:  text,
 	})
 }
 
-func maybeUnquote(s string) string {
+// MaybeUnquote returns s unquoted if it's a quoted string literal.
+func MaybeUnquote(s string) string {
 	if !possiblyQuoted(s) {
 		return s
 	}

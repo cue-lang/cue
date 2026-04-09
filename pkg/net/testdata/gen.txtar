@@ -115,10 +115,10 @@ t2: false
 
 // Regression test for https://cuelang.org/issue/2431.
 // StrictDomainName was not being applied due to an upstream bug.
-t48: true
-t49: true
+t48: false
+t49: false
 t50: true
-t51: true
+t51: false
 t3: ["::%lo0", "80"]
 t4:  "mod.test:80"
 t5:  "[2001:db8::1]:80"

@@ -32,8 +32,8 @@ incompleteOne: {
 	r: """
 		\(_t)
 		"""
-	// TODO: we current cannot check for errors on hidden fields.
-	@test(debugOutput, """
+	// TODO: we cannot check for errors on hidden fields yet.
+	@test(debugCheck, """
 		(struct){
 		  _t: (_|_){
 		    // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):

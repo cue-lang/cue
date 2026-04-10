@@ -169,15 +169,15 @@ type tag struct {
 	field *ast.Field
 }
 
-func parseTag(pos token.Pos, body string) (t *tag, err errors.Error) {
+func parseTag(astAttr *ast.Attribute) (t *tag, err errors.Error) {
 	t = &tag{}
 	t.kind = cue.StringKind
 
-	a := internal.ParseAttrBody(pos, body)
+	a := internal.ParseAttr(astAttr)
 
 	t.key, _ = a.String(0)
 	if !ast.IsValidIdent(t.key) {
-		return t, errors.Newf(pos, "invalid identifier %q", t.key)
+		return t, errors.Newf(a.Pos, "invalid identifier %q", t.key)
 	}
 
 	if s, ok, _ := a.Lookup(1, "type"); ok {
@@ -190,14 +190,14 @@ func parseTag(pos token.Pos, body string) (t *tag, err errors.Error) {
 		case "bool":
 			t.kind = cue.BoolKind
 		default:
-			return t, errors.Newf(pos, "invalid type %q", s)
+			return t, errors.Newf(a.Pos, "invalid type %q", s)
 		}
 	}
 
 	if s, ok, _ := a.Lookup(1, "short"); ok {
 		for s := range strings.SplitSeq(s, "|") {
 			if !ast.IsValidIdent(t.key) {
-				return t, errors.Newf(pos, "invalid identifier %q", s)
+				return t, errors.Newf(a.Pos, "invalid identifier %q", s)
 			}
 			t.shorthands = append(t.shorthands, s)
 		}
@@ -265,11 +265,10 @@ func findTags(b *build.Instance) (tags []*tag, errs errors.Error) {
 				}
 
 				for _, a := range x.Attrs {
-					key, body := a.Split()
-					if key != "tag" {
+					if a.Name() != "tag" {
 						continue
 					}
-					t, err := parseTag(a.Pos(), body)
+					t, err := parseTag(a)
 					if err != nil {
 						errs = errors.Append(errs, err)
 						continue

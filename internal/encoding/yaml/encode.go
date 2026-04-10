@@ -239,11 +239,10 @@ func encodeExprs(exprs []ast.Expr) (n *yaml.Node, err error) {
 // Returns an error if the attribute is malformed.
 func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
 	for _, attr := range attrs {
-		key, body := attr.Split()
-		if key != "yaml" {
+		if attr.Name() != "yaml" {
 			continue
 		}
-		parsed := internal.ParseAttrBody(attr.Pos(), body)
+		parsed := internal.ParseAttr(attr)
 		if parsed.Err != nil {
 			return "", parsed.Err
 		}

@@ -44,14 +44,7 @@ func (v Value) Attribute(key string) Attribute {
 }
 
 func newAttr(k internal.AttrKind, a *ast.Attribute) Attribute {
-	key, body := a.Split()
-	// Note: the body is always positioned just after
-	// the opening ( after the key.
-	x := internal.ParseAttrBody(a.Pos().Add(len(key)+1), body)
-	x.Name = key
-	x.Kind = k
-	x.Pos = a.Pos()
-	return Attribute{x}
+	return Attribute{*internal.ParseAttr(a)}
 }
 
 func nonExistAttr(key string) Attribute {

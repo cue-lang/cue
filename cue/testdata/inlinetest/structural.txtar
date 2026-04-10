@@ -11,7 +11,7 @@ errOnly: 1 & 2 @test(err) @test(debugCheck, """
 	}
 	""")
 
-errWithCode: string & 1 @test(err, code=eval) @test(debugOutput, """
+errWithCode: string & 1 @test(err, code=eval) @test(debug, """
 	(_|_){
 	  // [eval] errWithCode: conflicting values string and 1 (mismatched types string and int):
 	  //     in.cue:7:14

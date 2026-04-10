@@ -34,6 +34,24 @@
       "parentUuid": "9bf944d5_44fcaef5",
       "revId": "3ba2f0f56d503e8c316945ffa7ea5f5322ce9b8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a226fd9e_4464d18b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-04-10T11:17:40Z",
+      "side": 1,
+      "message": "The reason it doesn\u0027t belong in this CLAUDE.md file (or any other for that matter) is that otherwise we would have to replicate this change in all CLAUDE.md files. Instead we have opted for the following:\n\nhttps://github.com/cue-lang/contrib-tools/blob/a542bd31e97ff37615d20c8c7332d607f3b479ca/CLAUDE.md#L3-L8\n\nThat way, we make the change in one place and it updates all common CUE projects.",
+      "parentUuid": "e6048357_159cdc95",
+      "revId": "3ba2f0f56d503e8c316945ffa7ea5f5322ce9b8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

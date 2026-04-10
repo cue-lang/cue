@@ -54,8 +54,8 @@ import (
 
 type runFunction func(cmd *Command, args []string) error
 
-// wasmInterp is set when the cuewasm build tag is enbabled.
-var wasmInterp cuecontext.ExternInterpreter
+// wasmInterp is set when the cuewasm build tag is enabled.
+var wasmInterp cuecontext.Injection
 
 func statsEncoder(cmd *Command) (*encoding.Encoder, error) {
 	file := os.Getenv("CUE_STATS_FILE")
@@ -181,7 +181,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		}
 		var opts []cuecontext.Option
 		if wasmInterp != nil {
-			opts = append(opts, cuecontext.Interpreter(wasmInterp))
+			opts = append(opts, cuecontext.WithInjection(wasmInterp))
 		}
 		c.ctx = cuecontext.New(opts...)
 		// Some init work, such as in internal/filetypes, evaluates CUE by design.

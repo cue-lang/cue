@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/interpreter/wasm"
+	"cuelang.org/go/cue/inject/wasm"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetxtar"
 )

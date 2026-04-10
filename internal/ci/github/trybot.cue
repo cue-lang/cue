@@ -215,6 +215,6 @@ workflows: trybot: _repo.bashWorkflow & {
 		name: "Test with -tags=cuewasm"
 		// The wasm interpreter is only bundled into cmd/cue with the cuewasm build tag.
 		// Test the related packages with the build tag enabled as well.
-		run: "go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm"
+		run: "go test -tags cuewasm ./cmd/cue/cmd ./cue/inject/wasm"
 	}
 }

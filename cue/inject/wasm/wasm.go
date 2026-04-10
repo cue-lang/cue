@@ -19,6 +19,7 @@ import (
 	"strings"
 	"sync"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -28,23 +29,23 @@ import (
 	coreruntime "cuelang.org/go/internal/core/runtime"
 )
 
-// interpreter is a [cuecontext.ExternInterpreter] for Wasm files.
-type interpreter struct{}
+// injection is a [cuecontext.Injection] for Wasm files.
+type injection struct{}
 
-// New returns a new Wasm interpreter as a [cuecontext.ExternInterpreter]
-// suitable for passing to [cuecontext.New].
+// New returns a new Wasm injection as a [cuecontext.Injection]
+// suitable for passing to [cuecontext.WithInjection].
 func New() cuecontext.ExternInterpreter {
-	return &interpreter{}
+	return &injection{}
 }
 
-func (i *interpreter) Kind() string {
+func (i *injection) Kind() string {
 	return "wasm"
 }
 
-// NewCompiler returns a Wasm compiler that services the specified
+// InjectorForInstance returns a Wasm injector that services the specified
 // build.Instance.
-func (i *interpreter) NewCompiler(b *build.Instance, r *coreruntime.Runtime) (coreruntime.Compiler, errors.Error) {
-	return &compiler{
+func (i *injection) InjectorForInstance(b *build.Instance, r *coreruntime.Runtime) (coreruntime.Injector, errors.Error) {
+	return &wasmInjector{
 		b:           b,
 		runtime:     r,
 		wasmRuntime: newRuntime(),
@@ -52,9 +53,9 @@ func (i *interpreter) NewCompiler(b *build.Instance, r *coreruntime.Runtime) (co
 	}, nil
 }
 
-// A compiler is a [coreruntime.Compiler]
+// A wasmInjector is a [coreruntime.Injector]
 // that provides Wasm functionality to the runtime.
-type compiler struct {
+type wasmInjector struct {
 	b           *build.Instance
 	runtime     *coreruntime.Runtime
 	wasmRuntime runtime
@@ -67,10 +68,21 @@ type compiler struct {
 	instances map[string]*instance
 }
 
-// Compile searches for a Wasm function described by the given `@extern`
-// attribute and returns it as an [adt.Builtin] with the given function
-// name.
-func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
+// InjectedValue searches for a Wasm function described by the given
+// extern attribute and returns it as an [adt.Builtin].
+func (c *wasmInjector) InjectedValue(attr *coreruntime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
+	a := attr.Attr
+
+	// Determine the function name from the parent field label,
+	// with an explicit name= attribute taking precedence.
+	var funcName string
+	if f, ok := attr.Parent.(*ast.Field); ok {
+		funcName, _, _ = ast.LabelName(f.Label)
+	}
+	if name, ok, _ := a.Lookup(1, "name"); ok {
+		funcName = name
+	}
+
 	baseFile, err := fileName(a)
 	if err != nil {
 		return nil, errors.Promote(err, "invalid attribute")
@@ -104,7 +116,7 @@ func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (
 
 // instance returns the instance corresponding to filename, compiling
 // and loading it if necessary.
-func (c *compiler) instance(filename string) (inst *instance, err error) {
+func (c *wasmInjector) instance(filename string) (inst *instance, err error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	inst, ok := c.instances[filename]

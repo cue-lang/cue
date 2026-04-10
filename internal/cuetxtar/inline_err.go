@@ -317,8 +317,8 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 
 	if ea.at != "" {
 		// @test(err, at=<path>, ...) — navigate to sub-path then check error.
-		subPath := cue.ParsePath(ea.at)
-		if err := subPath.Err(); err != nil {
+		subPath, err := parseAtPath(ea.at)
+		if err != nil {
 			t.Errorf("path %s: @test(err, at=%s): invalid path: %v", path, ea.at, err)
 			return
 		}

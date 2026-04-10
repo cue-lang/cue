@@ -5,7 +5,7 @@
 X: {
 	#Simple: {
 		ref: string
-	}
+	} @test(shareID=SIMPLE)
 
 	#Complex: {
 		{
@@ -13,100 +13,31 @@ X: {
 		} | {
 			local: string
 		}
-	}
+	} @test(eq, {ref: string} | {local: string}) @test(shareID=COMPLEX)
+
 
 	var: "bar"
 
 	// Validate(concrete) after Fill() on Complex.ref from a "static" key will succeed
-	"test_1": #Complex
+	"test_1": #Complex @test(shareID=COMPLEX) @test(eq, {
+			ref: string
+		} | {
+			local: string
+		})
 
 	// Validate(concrete) after Fill() on "#Simple.ref" from a "dynamic" key will succeed
 	"test_2_\(var)": #Simple
+	@test(shareID=SIMPLE, at=test_2_bar)
+	@test(eq, at=test_2_bar, { ref: string })
 
 	// Validate(concrete) after Fill() on Complex.ref from a "dynamic" key will fail
 	"test_3_\(var)": #Complex
 
 	test_3_bar: ref: "FOO"
+	@test(eq, at=test_3_bar, { ref: "FOO" })
 }
 
-Z: X.test_3_bar.ref
--- out/eval/stats --
-Leaks:  2
-Freed:  18
-Reused: 5
-Allocs: 15
-Retain: 0
-
-Unifications: 14
-Conjuncts:    23
-Disjuncts:    4
-
-NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  X: (struct){
-    #Simple: (#struct){
-      ref: (string){ string }
-    }
-    #Complex: (#struct){ |((#struct){
-        ref: (string){ string }
-      }, (#struct){
-        local: (string){ string }
-      }) }
-    var: (string){ "bar" }
-    test_1: (#struct){ |((#struct){
-        ref: (string){ string }
-      }, (#struct){
-        local: (string){ string }
-      }) }
-    test_3_bar: (#struct){
-      ref: (string){ "FOO" }
-    }
-    test_2_bar: ~(X.#Simple)
-  }
-  Z: (string){ "FOO" }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -17,9 +17,7 @@
-     test_3_bar: (#struct){
-       ref: (string){ "FOO" }
-     }
--    test_2_bar: (#struct){
--      ref: (string){ string }
--    }
-+    test_2_bar: ~(X.#Simple)
-   }
-   Z: (string){ "FOO" }
- }
--- out/eval --
-(struct){
-  X: (struct){
-    #Simple: (#struct){
-      ref: (string){ string }
-    }
-    #Complex: (#struct){ |((#struct){
-        ref: (string){ string }
-      }, (#struct){
-        local: (string){ string }
-      }) }
-    var: (string){ "bar" }
-    test_1: (#struct){ |((#struct){
-        ref: (string){ string }
-      }, (#struct){
-        local: (string){ string }
-      }) }
-    test_3_bar: (#struct){
-      ref: (string){ "FOO" }
-    }
-    test_2_bar: (#struct){
-      ref: (string){ string }
-    }
-  }
-  Z: (string){ "FOO" }
-}
+Z: X.test_3_bar.ref @test(eq, "FOO")
 -- out/compile --
 --- in.cue
 {
@@ -131,3 +62,17 @@ diff old new
   }
   Z: 〈0;X〉.test_3_bar.ref
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  18
+Reused: 5
+Allocs: 15
+Retain: 0
+
+Unifications: 14
+Conjuncts:    23
+Disjuncts:    4
+
+NumCloseIDs: 5
+-- out/diff-v2-v3.txt --
+Reordering

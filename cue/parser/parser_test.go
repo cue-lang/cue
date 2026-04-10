@@ -1409,6 +1409,13 @@ func TestParseExpr(t *testing.T) {
 		}
 	}
 
+	// invalid UTF-8 must be rejected even when there are many errors,
+	// triggering the "too many errors" bail-out in the parser.
+	src = "(\xfa\x00\x00\xfa%%\"\n0"
+	if _, err := parseExprString(src); err == nil {
+		t.Errorf("ParseExpr(%q): got no error for invalid UTF-8", src)
+	}
+
 	// ParseExpr must not crash
 	for _, src := range valids {
 		_, _ = parseExprString(src)

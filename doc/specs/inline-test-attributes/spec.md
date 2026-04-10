@@ -705,17 +705,17 @@ An empty `@test(debugCheck)` with no argument behaves as a fill placeholder unde
 
 ---
 
-### Requirement: `debugOutput` directive
-The `debugOutput` directive is an informational annotation that records the debug-printer output of the evaluated value. Unlike `debugCheck`, a mismatch does NOT fail the test — it only logs a difference and auto-updates when `CUE_UPDATE=1` is set.
+### Requirement: `debug` directive
+The `debug` directive is an informational annotation that records the debug-printer output of the evaluated value. Unlike `debugCheck`, a mismatch does NOT fail the test — it only logs a difference and auto-updates when `CUE_UPDATE=1` is set.
 
 This is useful for documenting what internal representation a value produces without locking the test to that exact representation.
 
 ```cue
-result: {a: 1} @test(debugOutput, """<debug output here>""")
+result: {a: 1} @test(debug, """<debug output here>""")
 ```
 
 #### Scenario: Debug output annotation — no test failure on mismatch
-- **WHEN** a field carries `@test(debugOutput, "...")` and the actual debug output differs
+- **WHEN** a field carries `@test(debug, "...")` and the actual debug output differs
 - **THEN** the difference is logged but the test does not fail
 
 ---

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5928d82_e0f2b926",
+        "filename": "internal/cuetxtar/astcmp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 960,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-10T09:35:38Z",
+      "side": 1,
+      "message": "it would be nice to not use this much internal `adt` code in the test helpers, but we can transition away from these over time.",
+      "revId": "600ce25c505cc76dd9fff6ca11cdf825c3f01a23",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

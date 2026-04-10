@@ -1150,7 +1150,7 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 		t.Skip(reason) // t.Skip calls runtime.Goexit, stopping the goroutine.
 	case "debugCheck":
 		r.runDebugCheckInline(t, path, val, pa)
-	case "debugOutput":
+	case "debug":
 		r.runDebugOutputInline(t, path, val, pa)
 	case "todo":
 		// @test(todo) is handled at the loop level in runInline; no-op here.
@@ -1388,14 +1388,15 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 }
 
 // runDebugOutputInline captures the debug printer output of val as an
-// informational annotation.  Unlike debugCheck, a mismatch does not fail the
-// test — it only logs and auto-updates when CUE_UPDATE is active.
+// informational annotation (@test(debug, ...)).  Unlike debugCheck, a
+// mismatch does not fail the test — it only logs and auto-updates when
+// CUE_UPDATE is active.
 func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	name := pa.raw.Fields[0].Value() // preserves any :vN version suffix
 	actual := r.debugPrinterOutput(val)
 	if len(pa.raw.Fields) < 2 {
-		// Empty @test(debugOutput) — fill placeholder.
+		// Empty @test(debug) — fill placeholder.
 		if cuetest.UpdateGoldenFiles {
 			r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		}
@@ -1412,7 +1413,7 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 		return
 	}
 	if !match {
-		t.Logf("path %s: @test(debugOutput) changed:\ngot:  %q\nwant: %q", path, actual, expected)
+		t.Logf("path %s: @test(debug) changed:\ngot:  %q\nwant: %q", path, actual, expected)
 	}
 }
 

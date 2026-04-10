@@ -1,44 +1,12 @@
-TODO: l4 should be allowed
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #def1: l1: ["l2"]: {l3: int, l4: 26}
-#special1: #def1 & {l1: l2: l3:     <100}
-instance:  #special1 & {l1: l2: l3: 34}
--- out/eval/stats --
-Leaks:  0
-Freed:  13
-Reused: 5
-Allocs: 8
-Retain: 0
-
-Unifications: 13
-Conjuncts:    28
-Disjuncts:    0
-
-NumCloseIDs: 3
--- out/evalalpha --
-(struct){
-  #def1: (#struct){
-    l1: (#struct){
-    }
-  }
-  #special1: (#struct){
-    l1: (#struct){
-      l2: (#struct){
-        l3: (int){ &(<100, int) }
-        l4: (int){ 26 }
-      }
-    }
-  }
-  instance: (#struct){
-    l1: (#struct){
-      l2: (#struct){
-        l3: (int){ 34 }
-        l4: (int){ 26 }
-      }
-    }
-  }
-}
+#special1: #def1 & {l1: l2: l3:     <100} @test(eq, {
+	l1: l2: {
+		l3: int & <100
+		l4: 26
+	}
+})
+instance:  #special1 & {l1: l2: l3: 34} @test(eq, {l1: {l2: {l3: 34, l4: 26}}})
 -- out/compile --
 --- in.cue
 {
@@ -65,3 +33,15 @@ NumCloseIDs: 3
     }
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  13
+Reused: 5
+Allocs: 8
+Retain: 0
+
+Unifications: 13
+Conjuncts:    28
+Disjuncts:    0
+
+NumCloseIDs: 3

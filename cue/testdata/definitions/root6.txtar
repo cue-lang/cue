@@ -1,16 +1,26 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 c: "foo"
 a: b: int
 #Schema
-#Schema: close({ a: b: int})
+#Schema: close({ a: b: int}) @test(closed)
 
 x: {
 	c: "foo"
 	a: b: int
 	#Schema
 	#Schema: close({ a: b: int})
-}
+} @test(closed)
+
+@test(eq, {
+	a: b: int
+	c: "foo"
+	#Schema: { a: b: int }
+	x: {
+		a: b: int
+		c: "foo"
+		#Schema: a: b: int
+	}
+})
 -- out/eval/stats --
 Leaks:  0
 Freed:  30
@@ -29,29 +39,6 @@ ConjunctInfos:       29
 MaxConjunctInfos:    3
 MaxReqSets:          7
 MaxRedirect:         2
--- out/evalalpha --
-(#struct){
-  c: (string){ "foo" }
-  a: (#struct){
-    b: (int){ int }
-  }
-  #Schema: (#struct){
-    a: (#struct){
-      b: (int){ int }
-    }
-  }
-  x: (#struct){
-    c: (string){ "foo" }
-    a: (#struct){
-      b: (int){ int }
-    }
-    #Schema: (#struct){
-      a: (#struct){
-        b: (int){ int }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

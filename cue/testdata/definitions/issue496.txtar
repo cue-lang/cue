@@ -1,7 +1,6 @@
 # Tests that hidden fields within a definition unified with #A: _ are correctly
 # handled and do not cause spurious "field not allowed" errors.
 # https://cuelang.org/issue/496
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #A: _
 
@@ -9,9 +8,20 @@
 	_E: {
 		name: "hello"
 	}
-}
+} @test(shareID=lN)
 
-l: #N
+l: #N @test(shareID=lN)
+-- out/compile --
+--- in.cue
+{
+  #A: _
+  #N: (〈0;#A〉 & {
+    _E: {
+      name: "hello"
+    }
+  })
+  l: 〈0;#N〉
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  6
@@ -24,53 +34,5 @@ Conjuncts:    8
 Disjuncts:    0
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  #A: (_){ _ }
-  #N: (#struct){
-    _E: (#struct){
-      name: (string){ "hello" }
-    }
-  }
-  l: ~(#N)
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,9 +5,5 @@
-       name: (string){ "hello" }
-     }
-   }
--  l: (#struct){
--    _E: (#struct){
--      name: (string){ "hello" }
--    }
--  }
-+  l: ~(#N)
- }
--- out/eval --
-(struct){
-  #A: (_){ _ }
-  #N: (#struct){
-    _E: (#struct){
-      name: (string){ "hello" }
-    }
-  }
-  l: (#struct){
-    _E: (#struct){
-      name: (string){ "hello" }
-    }
-  }
-}
--- out/compile --
---- in.cue
-{
-  #A: _
-  #N: (〈0;#A〉 & {
-    _E: {
-      name: "hello"
-    }
-  })
-  l: 〈0;#N〉
-}
+-- out/diff-v2-v3.txt --
+Reordering

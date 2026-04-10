@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 // Closedness should not be silently swallowed when propagated through
 // comprehensions; fields added via comprehensions should still be checked.
@@ -9,10 +8,15 @@ issue595: {
 	#cfgs: [{
 		name: "foo"
 	}]
+	_name: #cfgs[0].name
 	for cfg in #cfgs {
 		files: cfg.nam
 	}
+	@test(err, code=eval, at=files, contains="undefined field: nam", pos=[8:14])
 }
+-- out/errors.txt --
+[eval] issue595.files: undefined field: nam:
+    ./in.cue:12:14
 -- out/eval/stats --
 Leaks:  0
 Freed:  6
@@ -25,27 +29,6 @@ Conjuncts:    7
 Disjuncts:    0
 
 NumCloseIDs: 2
--- out/evalalpha --
-Errors:
-issue595.files: undefined field: nam:
-    ./in.cue:11:14
-
-Result:
-(_|_){
-  // [eval]
-  issue595: (_|_){
-    // [eval]
-    #cfgs: (#list){
-      0: (#struct){
-        name: (string){ "foo" }
-      }
-    }
-    files: (_|_){
-      // [eval] issue595.files: undefined field: nam:
-      //     ./in.cue:11:14
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -55,6 +38,7 @@ Result:
         name: "foo"
       },
     ]
+    _name: 〈0;#cfgs〉[0].name
     for _, cfg in 〈0;#cfgs〉 {
       files: 〈1;cfg〉.nam
     }

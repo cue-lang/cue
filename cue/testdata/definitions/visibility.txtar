@@ -1,4 +1,3 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #foo: {
 	name: string
@@ -9,7 +8,13 @@ foo: #foo & {
 	_#name: "bar"
 
 	#name: "baz"
-}
+} @test(closed) @test(eq, {
+	_name: "foo"
+	_#name: "bar"
+	#name: "baz"
+	name: string
+})
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  8
@@ -22,49 +27,6 @@ Conjuncts:    10
 Disjuncts:    0
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  #foo: (#struct){
-    name: (string){ string }
-  }
-  foo: (#struct){
-    _name: (string){ "foo" }
-    _#name: (string){ "bar" }
-    #name: (string){ "baz" }
-    name: (string){ string }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -3,9 +3,9 @@
-     name: (string){ string }
-   }
-   foo: (#struct){
--    name: (string){ string }
-     _name: (string){ "foo" }
-     _#name: (string){ "bar" }
-     #name: (string){ "baz" }
-+    name: (string){ string }
-   }
- }
--- diff/todo/p3 --
-Reordering.
--- diff/explanation --
-New evaluator should ultimately disallow new definitions in closed structs.
--- out/eval --
-(struct){
-  #foo: (#struct){
-    name: (string){ string }
-  }
-  foo: (#struct){
-    name: (string){ string }
-    _name: (string){ "foo" }
-    _#name: (string){ "bar" }
-    #name: (string){ "baz" }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -77,3 +39,5 @@ New evaluator should ultimately disallow new definitions in closed structs.
     #name: "baz"
   })
 }
+-- out/diff-v2-v3.txt --
+Reordering: v3 outputs fields in different order than v2 (name appears after hidden fields in v3).

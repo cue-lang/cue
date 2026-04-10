@@ -1,5 +1,4 @@
 exec cue eval ./pkg:foo
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"
@@ -23,14 +22,27 @@ e: pkg.#D & #def & {
 
 	// This should not fail, as this is a different _val
 	_val: g: int
-}
+}  @test(err, code=eval, at=_name$foo.c, contains="field not allowed", pos=[3:9])
 
-f: pkg.#D & {_val: f: 4}
-g: f._val
+f: pkg.#D & {_val: f: 4} @test(debugCheck, """
+	(#struct){
+	  _val(:foo): (struct){
+	    f: (int){ 4 }
+	  }
+	  _val(mod.test/pkg): (#struct){
+	    f: (int){ 3 }
+	  }
+	}
+	""")
+
+g: f._val @test(eq, {f: 4})
 -- pkg/bar.cue --
 package pkg
 
 #D: {_val: f: 3}
+-- out/errors.txt --
+[eval] e._name.c: field not allowed:
+    ./in.cue:16:9
 -- out/eval/stats --
 Leaks:  2
 Freed:  25
@@ -43,189 +55,9 @@ Conjuncts:    35
 Disjuncts:    0
 
 NumCloseIDs: 4
--- out/evalalpha --
-Errors:
-e._name.c: field not allowed:
-    ./in.cue:16:9
-
-Result:
-(_|_){
-  // [eval]
-  #def: (#struct){
-    _name(:foo): (#struct){
-      d: (int){ int }
-    }
-  }
-  d: (#struct){
-    _name(:foo): (struct){
-      d: (int){ int }
-    }
-    _val(:foo): (struct){
-      f: (int){ 4 }
-    }
-    _val(mod.test/pkg): (#struct){
-      f: (int){ 3 }
-    }
-  }
-  e: (_|_){
-    // [eval]
-    _name(:foo): (_|_){
-      // [eval]
-      c: (_|_){
-        // [eval] e._name.c: field not allowed:
-        //     ./in.cue:16:9
-      }
-      d: (int){ int }
-    }
-    _val(:foo): (struct){
-      g: (int){ int }
-    }
-    _val(mod.test/pkg): (#struct){
-      f: (int){ 3 }
-    }
-  }
-  f: (#struct){
-    _val(:foo): (struct){
-      f: (int){ 4 }
-    }
-    _val(mod.test/pkg): (#struct){
-      f: (int){ 3 }
-    }
-  }
-  g: ~(f._val(:foo))
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,7 +1,5 @@
- Errors:
- e._name.c: field not allowed:
--    ./in.cue:6:9
--    ./in.cue:13:13
-     ./in.cue:16:9
- 
- Result:
-@@ -13,9 +11,6 @@
-     }
-   }
-   d: (#struct){
--    _val(mod.test/pkg): (#struct){
--      f: (int){ 3 }
--    }
-     _name(:foo): (struct){
-       d: (int){ int }
-     }
-@@ -22,35 +17,34 @@
-     _val(:foo): (struct){
-       f: (int){ 4 }
-     }
-+    _val(mod.test/pkg): (#struct){
-+      f: (int){ 3 }
-+    }
-   }
-   e: (_|_){
-     // [eval]
--    _val(mod.test/pkg): (#struct){
--      f: (int){ 3 }
--    }
-     _name(:foo): (_|_){
-       // [eval]
--      d: (int){ int }
-       c: (_|_){
-         // [eval] e._name.c: field not allowed:
--        //     ./in.cue:6:9
--        //     ./in.cue:13:13
-         //     ./in.cue:16:9
-       }
-+      d: (int){ int }
-     }
-     _val(:foo): (struct){
-       g: (int){ int }
-     }
-+    _val(mod.test/pkg): (#struct){
-+      f: (int){ 3 }
-+    }
-   }
-   f: (#struct){
--    _val(mod.test/pkg): (#struct){
--      f: (int){ 3 }
--    }
--    _val(:foo): (struct){
--      f: (int){ 4 }
--    }
--  }
--  g: (struct){
--    f: (int){ 4 }
--  }
-+    _val(:foo): (struct){
-+      f: (int){ 4 }
-+    }
-+    _val(mod.test/pkg): (#struct){
-+      f: (int){ 3 }
-+    }
-+  }
-+  g: ~(f._val(:foo))
- }
--- diff/todo/p2 --
-Reordering / missing positions.
--- out/eval --
-Errors:
-e._name.c: field not allowed:
-    ./in.cue:6:9
-    ./in.cue:13:13
-    ./in.cue:16:9
-
-Result:
-(_|_){
-  // [eval]
-  #def: (#struct){
-    _name(:foo): (#struct){
-      d: (int){ int }
-    }
-  }
-  d: (#struct){
-    _val(mod.test/pkg): (#struct){
-      f: (int){ 3 }
-    }
-    _name(:foo): (struct){
-      d: (int){ int }
-    }
-    _val(:foo): (struct){
-      f: (int){ 4 }
-    }
-  }
-  e: (_|_){
-    // [eval]
-    _val(mod.test/pkg): (#struct){
-      f: (int){ 3 }
-    }
-    _name(:foo): (_|_){
-      // [eval]
-      d: (int){ int }
-      c: (_|_){
-        // [eval] e._name.c: field not allowed:
-        //     ./in.cue:6:9
-        //     ./in.cue:13:13
-        //     ./in.cue:16:9
-      }
-    }
-    _val(:foo): (struct){
-      g: (int){ int }
-    }
-  }
-  f: (#struct){
-    _val(mod.test/pkg): (#struct){
-      f: (int){ 3 }
-    }
-    _val(:foo): (struct){
-      f: (int){ 4 }
-    }
-  }
-  g: (struct){
-    f: (int){ 4 }
-  }
-}
+-- out/diff-v2-v3.txt --
+g: v2 evaluator expands g to {f: 4}; v3 uses structure sharing (~(f._val(:foo))).
+Verdict: improvement -- v3 uses structure sharing for g; more efficient.
 -- out/compile --
 --- in.cue
 {

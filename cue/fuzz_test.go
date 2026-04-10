@@ -87,11 +87,15 @@ list.Concat(["foo"], [])
 		// but we still want to check that ParseExpr doesn't panic.
 		_, exprErr := parser.ParseExpr("fuzz.cue", s, parser.ParseComments)
 		if err != nil {
-			if exprErr == nil {
-				t.Errorf("ParseFile rejects this input but ParseExpr does not: %s", s)
-			}
-			if ast.IsValidIdent(s) {
-				t.Errorf("cue/parser rejects this identifier but cue/ast accepts it as valid: %s", s)
+			// Per the spec, "package" and "import" are valid identifiers after the preamble,
+			// so ParseExpr and IsValidIdent correctly accept them.
+			if s != "package" && s != "import" {
+				if exprErr == nil {
+					t.Errorf("ParseFile rejects this input but ParseExpr does not: %s", s)
+				}
+				if ast.IsValidIdent(s) {
+					t.Errorf("cue/parser rejects this identifier but cue/ast accepts it as valid: %s", s)
+				}
 			}
 			var info literal.NumInfo
 			if err := literal.ParseNum(s, &info); err == nil {

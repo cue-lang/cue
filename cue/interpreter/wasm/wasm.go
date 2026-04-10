@@ -19,6 +19,7 @@ import (
 	"strings"
 	"sync"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -41,9 +42,9 @@ func (i *interpreter) Kind() string {
 	return "wasm"
 }
 
-// NewCompiler returns a Wasm compiler that services the specified
+// InjectorForInstance returns a Wasm injector that services the specified
 // build.Instance.
-func (i *interpreter) NewCompiler(b *build.Instance, r *coreruntime.Runtime) (coreruntime.Compiler, errors.Error) {
+func (i *interpreter) InjectorForInstance(b *build.Instance, r *coreruntime.Runtime) (coreruntime.Injector, errors.Error) {
 	return &compiler{
 		b:           b,
 		runtime:     r,
@@ -52,7 +53,7 @@ func (i *interpreter) NewCompiler(b *build.Instance, r *coreruntime.Runtime) (co
 	}, nil
 }
 
-// A compiler is a [coreruntime.Compiler]
+// A compiler is a [coreruntime.Injector]
 // that provides Wasm functionality to the runtime.
 type compiler struct {
 	b           *build.Instance
@@ -67,10 +68,21 @@ type compiler struct {
 	instances map[string]*instance
 }
 
-// Compile searches for a Wasm function described by the given `@extern`
-// attribute and returns it as an [adt.Builtin] with the given function
-// name.
-func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
+// InjectedValue searches for a Wasm function described by the given
+// extern attribute and returns it as an [adt.Builtin].
+func (c *compiler) InjectedValue(attr *coreruntime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
+	a := attr.Attr
+
+	// Determine the function name from the parent field label,
+	// with an explicit name= attribute taking precedence.
+	var funcName string
+	if f, ok := attr.Parent.(*ast.Field); ok {
+		funcName, _, _ = ast.LabelName(f.Label)
+	}
+	if name, ok, _ := a.Lookup(1, "name"); ok {
+		funcName = name
+	}
+
 	baseFile, err := fileName(a)
 	if err != nil {
 		return nil, errors.Promote(err, "invalid attribute")

@@ -115,17 +115,13 @@ import (
 
 // TODO: record files in build.Instance
 
-// interpreter is a [cuecontext.ExternInterpreter] for embedded files.
+// interpreter is a [runtime.Injection] for embedded files.
 type interpreter struct{}
 
-// Note that [cuecontext.ExternInterpreter] is just an alias for [runtime.Interpreter]
-// but because the [cuelang.org/go/cue/cuecontext] package depends on embedding
-// we cannot refer to that type directly.
-
-// New returns a new interpreter for embedded files as a
-// [cuelang.org/go/cue/cuecontext.ExternInterpreter] suitable for
-// passing to [cuelang.org/go/cue/cuecontext.New].
-func New() runtime.Interpreter {
+// New returns a new injection for embedded files as a
+// [runtime.Injection] suitable for passing to
+// [cuelang.org/go/cue/cuecontext.WithInjection].
+func New() runtime.Injection {
 	return interpreter{}
 }
 
@@ -135,9 +131,9 @@ func (i interpreter) Kind() string {
 
 const EmbedKind = "embed"
 
-// NewCompiler returns a compiler that can decode and embed files that exist
-// within a CUE module.
-func (i interpreter) NewCompiler(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
+// InjectorForInstance returns an injector that can decode and embed files
+// that exist within a CUE module.
+func (i interpreter) InjectorForInstance(b *build.Instance, r *runtime.Runtime) (runtime.Injector, errors.Error) {
 	if b.Module == "" {
 		return nil, errors.Newf(token.Pos{}, "cannot embed files when not in a module")
 	}
@@ -150,7 +146,7 @@ func (i interpreter) NewCompiler(b *build.Instance, r *runtime.Runtime) (runtime
 	}, nil
 }
 
-// A compiler is a [runtime.Compiler] that allows embedding files into CUE
+// A compiler is a [runtime.Injector] that allows embedding files into CUE
 // values.
 type compiler struct {
 	b       *build.Instance
@@ -233,10 +229,11 @@ func validateAttr(a *internal.Attr) (file, glob, typ string, allowEmptyGlob bool
 	}
 }
 
-// Compile interprets an embed attribute to either load a file
-// (@embed(file=...)) or a glob of files (@embed(glob=...)).
+// InjectedValue interprets an embed attribute to either load a file
+// (@embed(file=...)) or a glob of files (@embed(glob=...))
 // and decodes the given files.
-func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
+func (c *compiler) InjectedValue(attr *runtime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
+	a := attr.Attr
 	c.opCtx = adt.NewContext((*runtime.Runtime)(c.runtime), nil)
 
 	pos := a.Pos

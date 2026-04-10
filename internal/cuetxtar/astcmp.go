@@ -780,8 +780,8 @@ func (c *cmpCtx) cmpDisjunction(path cue.Path, expr ast.Expr, val cue.Value) err
 	tv := val.Core()
 	dj, ok := tv.V.DerefValue().BaseValue.(*adt.Disjunction)
 	if !ok {
-		return pathErr(path, "value is a disjunction but expected expression is not; "+
-			"use a disjunction in the expected value or @test(final) on the field")
+		return pathErr(path, "expected expression is a disjunction but value is not; "+
+			"wrap the expected value in a struct or use at= to target a sub-field")
 	}
 
 	// Match value disjuncts to AST disjuncts order-independently.

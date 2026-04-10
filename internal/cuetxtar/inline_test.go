@@ -594,6 +594,26 @@ func TestRunAllowsAssertion(t *testing.T) {
 		}
 	})
 
+	t.Run("allows errors on scalar value", func(t *testing.T) {
+		val := ctx.CompileString("x: 42")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, foo)"})}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if !rec.failed {
+			t.Errorf("expected failure: @test(allows) should error on scalar value")
+		}
+	})
+
+	t.Run("allows passes for AnyIndex on open list", func(t *testing.T) {
+		val := ctx.CompileString("x: [...]")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, int)"})}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: open list should allow int indices\n%s", rec.msgs.String())
+		}
+	})
+
 	t.Run("allows passes for open struct", func(t *testing.T) {
 		val := ctx.CompileString("x: {a: 1}")
 		rec := &failCapture{TB: t}

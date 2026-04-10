@@ -223,7 +223,7 @@ func ParseFile(filename string, src any, mode ...Option) (f *ast.File, err error
 // The arguments have the same meaning as for Parse, but the source must
 // be a valid CUE (type or value) expression. Specifically, fset must not
 // be nil.
-func ParseExpr(filename string, src any, mode ...Option) (ast.Expr, error) {
+func ParseExpr(filename string, src any, mode ...Option) (_ ast.Expr, err error) {
 	// get source
 	text, err := source.ReadAll(filename, src)
 	if err != nil {

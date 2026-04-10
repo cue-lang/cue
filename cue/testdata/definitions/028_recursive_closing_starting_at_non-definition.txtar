@@ -1,6 +1,6 @@
+
 #name: recursive closing starting at non-definition
 #evalPartial
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 z: a: {
 	#B: {
@@ -8,7 +8,8 @@ z: a: {
 		c: f: 1
 	}
 }
-A: z & {a: {#B: {c: e: 2}}}
+A: z & {a: {#B: {c: e: 2}}} @test(eq, {a: #B: c: {e: 2, d: 1, f: 1}})
+-- out/errors.txt --
 -- out/compile --
 --- in.cue
 {
@@ -40,33 +41,7 @@ Freed:  14
 Reused: 5
 Allocs: 9
 Retain: 0
-
 Unifications: 14
 Conjuncts:    21
 Disjuncts:    0
-
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  z: (struct){
-    a: (struct){
-      #B: (#struct){
-        c: (#struct){
-          d: (int){ 1 }
-          f: (int){ 1 }
-        }
-      }
-    }
-  }
-  A: (struct){
-    a: (struct){
-      #B: (#struct){
-        c: (#struct){
-          e: (int){ 2 }
-          d: (int){ 1 }
-          f: (int){ 1 }
-        }
-      }
-    }
-  }
-}

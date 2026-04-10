@@ -1,6 +1,8 @@
-#name: Issue #153
-#evalFull
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Tests that a comprehension-generated struct merged into a list element
+# constrained by a closed definition correctly rejects fields not declared
+# in the definition. Fields introduced via comprehension inside a list
+# literal should still be subject to closedness checks.
+# Issue: https://cuelang.org/issue/153
 -- in.cue --
 Foo: {
 	listOfCloseds: [...#Closed]
@@ -11,7 +13,7 @@ Foo: {
 }
 
 Junk: {
-	b: 2
+	b: 2 @test(eq, 2)
 }
 
 Foo & {
@@ -21,6 +23,28 @@ Foo & {
 		}
 	}]
 }
+@test(eq, {
+	Foo: listOfCloseds: []
+	#Closed: a: int | *0
+	Junk: b: 2
+	listOfCloseds: _|_ @test(err, at=0.b, code=eval,
+		hint="considerably more positions could be useful",
+		contains="field not allowed", pos=[16:4])
+})
+-- out/errors.txt --
+[eval] listOfCloseds.0.b: field not allowed:
+    ./in.cue:16:4
+-- out/eval/stats --
+Leaks:  0
+Freed:  15
+Reused: 5
+Allocs: 10
+Retain: 0
+Unifications: 11
+Conjuncts:    22
+Disjuncts:    4
+Notifications: 1
+NumCloseIDs: 5
 -- out/compile --
 --- in.cue
 {
@@ -45,56 +69,9 @@ Foo & {
     ]
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  15
-Reused: 5
-Allocs: 10
-Retain: 0
-
-Unifications: 11
-Conjuncts:    22
-Disjuncts:    4
-Notifications: 1
-
-NumCloseIDs: 5
--- out/evalalpha --
-Errors:
+-- out/diff-v2-v3.txt --
+missing error positions: v3 reports fewer positions than v2.
 listOfCloseds.0.b: field not allowed:
-    ./in.cue:16:4
-
-Result:
-(_|_){
-  // [eval]
-  Foo: (struct){
-    listOfCloseds: (list){
-    }
-  }
-  #Closed: (#struct){
-    a: (int){ |(*(int){ 0 }, (int){ int }) }
-  }
-  Junk: (struct){
-    b: (int){ 2 }
-  }
-  listOfCloseds: (_|_){
-    // [eval]
-    0: (_|_){
-      // [eval]
-      a: (int){ |(*(int){ 0 }, (int){ int }) }
-      b: (_|_){
-        // [eval] listOfCloseds.0.b: field not allowed:
-        //     ./in.cue:16:4
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,5 @@
- Errors:
- listOfCloseds.0.b: field not allowed:
 -    ./in.cue:2:18
 -    ./in.cue:2:21
 -    ./in.cue:5:10
@@ -102,62 +79,3 @@ diff old new
 -    ./in.cue:14:18
 -    ./in.cue:15:3
      ./in.cue:16:4
- 
- Result:
-@@ -28,12 +22,6 @@
-       a: (int){ |(*(int){ 0 }, (int){ int }) }
-       b: (_|_){
-         // [eval] listOfCloseds.0.b: field not allowed:
--        //     ./in.cue:2:18
--        //     ./in.cue:2:21
--        //     ./in.cue:5:10
--        //     ./in.cue:13:1
--        //     ./in.cue:14:18
--        //     ./in.cue:15:3
-         //     ./in.cue:16:4
-       }
-     }
--- diff/todo/p3 --
-missing error positions
--- out/eval --
-Errors:
-listOfCloseds.0.b: field not allowed:
-    ./in.cue:2:18
-    ./in.cue:2:21
-    ./in.cue:5:10
-    ./in.cue:13:1
-    ./in.cue:14:18
-    ./in.cue:15:3
-    ./in.cue:16:4
-
-Result:
-(_|_){
-  // [eval]
-  Foo: (struct){
-    listOfCloseds: (list){
-    }
-  }
-  #Closed: (#struct){
-    a: (int){ |(*(int){ 0 }, (int){ int }) }
-  }
-  Junk: (struct){
-    b: (int){ 2 }
-  }
-  listOfCloseds: (_|_){
-    // [eval]
-    0: (_|_){
-      // [eval]
-      a: (int){ |(*(int){ 0 }, (int){ int }) }
-      b: (_|_){
-        // [eval] listOfCloseds.0.b: field not allowed:
-        //     ./in.cue:2:18
-        //     ./in.cue:2:21
-        //     ./in.cue:5:10
-        //     ./in.cue:13:1
-        //     ./in.cue:14:18
-        //     ./in.cue:15:3
-        //     ./in.cue:16:4
-      }
-    }
-  }
-}

@@ -13,7 +13,7 @@ a: d: {
 #base: {
 	#info: {...}
 } @test(eq, {
-	#info: {} @test(closed)
+	#info: {}
 })
 
 a: [Name=string]: {#info: {

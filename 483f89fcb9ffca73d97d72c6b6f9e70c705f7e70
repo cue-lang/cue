@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b15477d_3f08331e",
+        "filename": "cue/fuzz_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-10T12:48:01Z",
+      "side": 1,
+      "message": "Hmm. I feel like we should have the exact same error in both cases. So I would be tempted by a qt.DeepEquals(err, exprErr)",
+      "revId": "483f89fcb9ffca73d97d72c6b6f9e70c705f7e70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

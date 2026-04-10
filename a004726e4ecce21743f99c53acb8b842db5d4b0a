@@ -33,6 +33,40 @@
       "message": "I think a much nicer fix is the same that we do for CUE_REGISTRY in cue/load/loader_test.go via a `func init`. i.e. you can do `os.Setenv(\"DOCKER_CONFIG\", ...)` to set it to some dummy value for all tests to ensure the host system doesn\u0027t influence in any way.",
       "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dc840a8_a3f8aeff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-10T11:23:39Z",
+      "side": 1,
+      "message": "LGTM with one small suggestion.",
+      "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3809daa_06ae5035",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-10T11:23:39Z",
+      "side": 1,
+      "message": "Rather than duplicating this logic in two places, how about factoring it into a helper function?\n\n```\nfunc setupEmptyDockerConfig(t *testing.T) {\n    mk temp dir\n    set DOCKER CONFIG\n    write config.json with {} contents\n}\n```",
+      "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

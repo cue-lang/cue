@@ -594,6 +594,26 @@ func TestRunAllowsAssertion(t *testing.T) {
 		}
 	})
 
+	t.Run("allows errors on scalar value", func(t *testing.T) {
+		val := ctx.CompileString("x: 42")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttrBody(token.NoPos, "allows, foo")}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if !rec.failed {
+			t.Errorf("expected failure: @test(allows) should error on scalar value")
+		}
+	})
+
+	t.Run("allows passes for AnyIndex on open list", func(t *testing.T) {
+		val := ctx.CompileString("x: [...]")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttrBody(token.NoPos, "allows, [int]")}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: open list should allow int indices\n%s", rec.msgs.String())
+		}
+	})
+
 	t.Run("allows passes for open struct", func(t *testing.T) {
 		val := ctx.CompileString("x: {a: 1}")
 		rec := &failCapture{TB: t}
@@ -611,6 +631,33 @@ func TestRunAllowsAssertion(t *testing.T) {
 		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
 		if rec.failed {
 			t.Errorf("unexpected failure: closed struct should deny unknown field b\n%s", rec.msgs.String())
+		}
+	})
+}
+
+// TestRunPassAssertion verifies that @test(pass) passes for non-error values
+// and fails for error values.
+func TestRunPassAssertion(t *testing.T) {
+	ctx := cuecontext.New()
+	r := &inlineRunner{}
+	path := cue.MakePath(cue.Str("x"))
+	pa := parsedTestAttr{directive: "pass", raw: internal.ParseAttrBody(token.NoPos, "pass")}
+
+	t.Run("passes for non-error value", func(t *testing.T) {
+		val := ctx.CompileString("x: 42")
+		rec := &failCapture{TB: t}
+		r.runPassAssertion(rec, path, val.LookupPath(path), pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: non-error value should pass\n%s", rec.msgs.String())
+		}
+	})
+
+	t.Run("fails for error value", func(t *testing.T) {
+		val := ctx.CompileString("x: 1 & 2")
+		rec := &failCapture{TB: t}
+		r.runPassAssertion(rec, path, val.LookupPath(path), pa)
+		if !rec.failed {
+			t.Errorf("expected failure: error value should not pass")
 		}
 	})
 }

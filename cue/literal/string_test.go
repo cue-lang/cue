@@ -68,6 +68,10 @@ func TestUnquote(t *testing.T) {
 		{`"\uDD1E\uD834"`, "", errSurrogate},
 		{`"\uD834\uD834"`, "", errSurrogate},
 
+		// Literal NUL bytes in the source are rejected, matching the scanner.
+		{"\"\x00\"", "", errSyntax},
+		{"'\x00'", "", errSyntax},
+
 		{`"\\"`, "\\", nil},
 		{`"\'"`, "", errSyntax},
 		{`"\q"`, "", errSyntax},

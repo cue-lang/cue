@@ -11,10 +11,8 @@ a: d: {
 }) @test(closed)
 
 #base: {
-	#info: {...}
-} @test(eq, {
-	#info: {} @test(closed)
-})
+	#info: {...} @test(closed)
+} @test(eq, { #info: {} })
 
 a: [Name=string]: {#info: {
 	X: "foo"

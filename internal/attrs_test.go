@@ -16,16 +16,17 @@ package internal
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 )
 
 type keyVals [][3]string
 
-func TestAttributeBody(t *testing.T) {
+func TestParseAttr(t *testing.T) {
 	testdata := []struct {
 		in  string
 		out keyVals
@@ -103,22 +104,16 @@ func TestAttributeBody(t *testing.T) {
 	for i, tc := range testdata {
 		t.Run(fmt.Sprintf("%d-%s", i, tc.in), func(t *testing.T) {
 			f := token.NewFile("test", -1, len(tc.in))
-			pos := f.Pos(0, token.NoRelPos)
-			pa := ParseAttrBody(pos, tc.in)
-			err := pa.Err
-
+			pa := ParseAttr(&ast.Attribute{
+				At:   f.Pos(0, token.NoRelPos),
+				Text: "@attr(" + tc.in + ")",
+			})
+			qt.Assert(t, qt.Equals(pa.Name, "attr"))
 			if tc.err != "" {
-				if err == nil {
-					t.Fatalf("unexpected success when error was expected (%#v)", pa.Fields)
-				}
-				if !strings.Contains(err.Error(), tc.err) {
-					t.Errorf("error was %v; want %v", err, tc.err)
-				}
+				qt.Assert(t, qt.ErrorMatches(pa.Err, tc.err))
 				return
 			}
-			if err != nil {
-				t.Fatal(err)
-			}
+			qt.Assert(t, qt.IsNil(pa.Err))
 			var kvs keyVals
 			for _, kv := range pa.Fields {
 				kvs = append(kvs, [3]string{kv.Key(), kv.Value(), kv.Text()})

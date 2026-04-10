@@ -30,6 +30,7 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -111,7 +112,7 @@ type posWrite struct {
 
 // parseErrArgs extracts err sub-options from an already-parsed Attr.
 // The attribute body is expected to start with "err" as the first positional arg.
-func parseErrArgs(a internal.Attr) (errArgs, error) {
+func parseErrArgs(a *internal.Attr) (errArgs, error) {
 	var ea errArgs
 	// Start from index 1 (index 0 is "err").
 	for _, kv := range a.Fields[1:] {
@@ -142,7 +143,9 @@ func parseErrArgs(a internal.Attr) (errArgs, error) {
 				return ea, fmt.Errorf("@test(err, suberr=...): %w", err)
 			}
 			// Reuse parseErrArgs by building a synthetic "err, <inner>" attr body.
-			syntheticAttr := internal.ParseAttrBody(token.NoPos, "err, "+inner)
+			syntheticAttr := internal.ParseAttr(&ast.Attribute{
+				Text: fmt.Sprintf("@test(err, %s)", inner),
+			})
 			subEA, err := parseErrArgs(syntheticAttr)
 			if err != nil {
 				return ea, fmt.Errorf("@test(err, suberr=...): %w", err)

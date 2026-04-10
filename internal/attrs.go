@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strings"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/scanner"
@@ -155,18 +156,29 @@ func (a *Attr) Lookup(pos int, key string) (val string, found bool, err error) {
 	return "", false, nil
 }
 
-func ParseAttrBody(pos token.Pos, s string) (a Attr) {
+// ParseAttr parses the given attribute. It always returns a non-nil
+// [Attr], which will have a non-nil Err field if there's an error.
+func ParseAttr(astAttr *ast.Attribute) *Attr {
+	key, body := astAttr.Split()
+
+	// Note: the body is always positioned just after the opening (
+	// after the key
+	pos := astAttr.Pos().Add(len(key) + 1)
+
 	// Create temporary token.File so that scanner has something
 	// to work with.
 	// TODO it's probably possible to do this without allocations.
-	tmpFile := token.NewFile("", -1, len(s))
-	if len(s) > 0 {
-		tmpFile.AddLine(len(s) - 1)
+	tmpFile := token.NewFile("", -1, len(body))
+	if len(body) > 0 {
+		tmpFile.AddLine(len(body) - 1)
 	}
-	a.Body = s
-	a.Pos = pos
+	a := &Attr{
+		Pos:  astAttr.Pos(),
+		Name: key,
+		Body: body,
+	}
 	var scan scanner.Scanner
-	scan.Init(tmpFile, []byte(s), nil, scanner.DontInsertCommas)
+	scan.Init(tmpFile, []byte(body), nil, scanner.DontInsertCommas)
 	for {
 		start := scan.Offset()
 		tok, err := scanAttributeTokens(&scan, pos, 1<<token.COMMA|1<<token.BIND|1<<token.EOF)
@@ -179,15 +191,15 @@ func ParseAttrBody(pos token.Pos, s string) (a Attr) {
 		switch tok {
 		case token.EOF:
 			// Empty field.
-			a.appendField("", s[start:], s[start:])
+			a.appendField("", body[start:], body[start:])
 			return a
 		case token.COMMA:
-			val := s[start : scan.Offset()-1]
+			val := body[start : scan.Offset()-1]
 			a.appendField("", val, val) // All but final comma.
 			continue
 		}
 		valStart := scan.Offset()
-		key := s[start : valStart-1] // All but =.
+		key := body[start : valStart-1] // All but =.
 		tok, err = scanAttributeTokens(&scan, pos, 1<<token.COMMA|1<<token.EOF)
 		if err != nil {
 			// Shouldn't happen because bracket nesting should have been checked previously by
@@ -195,12 +207,12 @@ func ParseAttrBody(pos token.Pos, s string) (a Attr) {
 			a.Err = err
 			return a
 		}
-		valEnd := len(s)
+		valEnd := len(body)
 		if tok != token.EOF {
 			valEnd = scan.Offset() - 1 // All but final comma
 		}
-		value := s[valStart:valEnd]
-		text := s[start:valEnd]
+		value := body[valStart:valEnd]
+		text := body[start:valEnd]
 		a.appendField(key, value, text)
 		if tok == token.EOF {
 			return a

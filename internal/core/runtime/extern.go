@@ -131,7 +131,7 @@ func findExternFileAttrs(f *ast.File) (kinds map[string]token.Pos, decls []ast.D
 	var (
 		hasPkg    bool
 		p         int
-		fileAttrs []*ast.Attribute
+		fileAttrs []token.Pos
 	)
 
 loop:
@@ -142,27 +142,25 @@ loop:
 			break loop
 
 		case *ast.Attribute:
-			pos := a.Pos()
-			key, body := a.Split()
-			if key != "extern" {
+			if a.Name() != "extern" {
 				continue
 			}
-			fileAttrs = append(fileAttrs, a)
-
-			attr := internal.ParseAttrBody(pos, body)
+			attr := internal.ParseAttr(a)
+			fileAttrs = append(fileAttrs, attr.Pos)
 			if attr.Err != nil {
 				err = errors.Append(err, attr.Err)
 				continue
 			}
+
 			k, e := attr.String(0)
 			if e != nil {
 				// Unreachable.
-				err = errors.Append(err, errors.Newf(pos, "%s", e))
+				err = errors.Append(err, errors.Newf(attr.Pos, "%s", e))
 				continue
 			}
 
 			if k == "" {
-				err = errors.Append(err, errors.Newf(pos,
+				err = errors.Append(err, errors.Newf(attr.Pos,
 					"interpreter name must be non-empty"))
 				continue
 			}
@@ -171,11 +169,11 @@ loop:
 				kinds = map[string]token.Pos{}
 			}
 			if _, ok := kinds[k]; ok {
-				err = errors.Append(err, errors.Newf(pos,
+				err = errors.Append(err, errors.Newf(attr.Pos,
 					"duplicate @extern attribute for kind %q", k))
 				continue
 			}
-			kinds[k] = pos
+			kinds[k] = attr.Pos
 		}
 	}
 
@@ -185,7 +183,7 @@ loop:
 
 	case len(fileAttrs) > 0 && !hasPkg:
 		for _, a := range fileAttrs {
-			err = errors.Append(err, errors.Newf(a.Pos(),
+			err = errors.Append(err, errors.Newf(a,
 				"extern attribute without package clause"))
 		}
 		return nil, nil, err
@@ -252,17 +250,16 @@ func ExtractAttrsByKind(file *ast.File, kind string) (attrsByNode map[ast.Node][
 			nodeStack = append(nodeStack, n.Value)
 
 		case *ast.Attribute:
-			k, body := n.Split()
-			if k != kind {
+			if n.Name() != kind {
 				break
 			}
 
-			attrParsed := internal.ParseAttrBody(n.Pos(), body)
+			attrParsed := internal.ParseAttr(n)
 			parent := nodeStack[len(nodeStack)-1]
 			if attrsByNode == nil {
 				attrsByNode = make(map[ast.Node][]*internal.Attr)
 			}
-			attrsByNode[parent] = append(attrsByNode[parent], &attrParsed)
+			attrsByNode[parent] = append(attrsByNode[parent], attrParsed)
 			return false
 		}
 
@@ -348,26 +345,25 @@ func (d *externDecorator) processNode(n adt.Node, scope *adt.Vertex) {
 	}
 }
 
-func (d *externDecorator) externValue(attr *ast.Attribute, name string, kinds map[string]bool, scope *adt.Vertex) adt.Expr {
-	kind, body := attr.Split()
-	if !kinds[kind] {
+func (d *externDecorator) externValue(astAttr *ast.Attribute, name string, kinds map[string]bool, scope *adt.Vertex) adt.Expr {
+	if !kinds[astAttr.Name()] {
 		return nil
 	}
-	parsed := internal.ParseAttrBody(attr.Pos(), body)
-	if parsed.Err != nil {
-		d.errs = errors.Append(d.errs, parsed.Err)
+	attr := internal.ParseAttr(astAttr)
+	if attr.Err != nil {
+		d.errs = errors.Append(d.errs, attr.Err)
 		return nil
 	}
-	c := d.compilers[kind]
+	c := d.compilers[attr.Name]
 	if c == nil {
 		return nil
 	}
-	if a, ok, _ := parsed.Lookup(1, "name"); ok {
+	if a, ok, _ := attr.Lookup(1, "name"); ok {
 		name = a
 	}
-	b, err := c.Compile(name, scope, &parsed)
+	b, err := c.Compile(name, scope, attr)
 	if err != nil {
-		d.errs = errors.Append(d.errs, errors.Wrap(errors.Newf(attr.Pos(), "@%s", kind), err))
+		d.errs = errors.Append(d.errs, errors.Wrap(errors.Newf(attr.Pos, "@%s", attr.Name), err))
 		return nil
 	}
 	return b

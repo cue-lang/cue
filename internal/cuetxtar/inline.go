@@ -151,7 +151,7 @@ type parsedTestAttr struct {
 	version string
 
 	// raw is the parsed internal.Attr for accessing remaining arguments.
-	raw internal.Attr
+	raw *internal.Attr
 
 	// For "err" directives, parsed sub-options are stored here.
 	errArgs *errArgs
@@ -197,23 +197,22 @@ type parsedTestAttr struct {
 // It returns a parsedTestAttr for each logical directive in the attribute.
 // A single @test(...) contains exactly one directive (the first positional
 // argument or the key of the first key=value pair).
-func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
-	key, body := a.Split()
-	if key != "test" {
-		return parsedTestAttr{}, fmt.Errorf("not a @test attribute: @%s", key)
+func parseTestAttr(astAttr *ast.Attribute) (parsedTestAttr, error) {
+	if name := astAttr.Name(); name != "test" {
+		return parsedTestAttr{}, fmt.Errorf("not a @test attribute: @%s", name)
 	}
 
-	parsed := internal.ParseAttrBody(a.Pos(), body)
-	if parsed.Err != nil {
-		return parsedTestAttr{}, parsed.Err
+	attr := internal.ParseAttr(astAttr)
+	if attr.Err != nil {
+		return parsedTestAttr{}, attr.Err
 	}
 
 	result := parsedTestAttr{
-		raw:     parsed,
-		srcAttr: a,
+		raw:     attr,
+		srcAttr: astAttr,
 	}
 
-	if len(parsed.Fields) == 0 || (len(parsed.Fields) == 1 && parsed.Fields[0] == internal.KeyValue{}) {
+	if len(attr.Fields) == 0 || (len(attr.Fields) == 1 && attr.Fields[0] == internal.KeyValue{}) {
 		// @test() — empty placeholder or bare marker.
 		result.directive = ""
 		return result, nil
@@ -222,7 +221,7 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 	// The first field determines the directive.
 	// Case 1: key=value form like desc="hello", shareID=name — directive is the key.
 	// Case 2: positional form like eq, err, kind — directive (with optional :vN suffix) is the value.
-	f0 := parsed.Fields[0]
+	f0 := attr.Fields[0]
 	if f0.Key() != "" {
 		dir := f0.Key()
 		// Key-based directives may carry a version suffix: "shareID:v3" → directive="shareID", version="v3".
@@ -246,7 +245,7 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 	// Parse directive-specific sub-options.
 	switch result.directive {
 	case "err":
-		ea, err := parseErrArgs(parsed)
+		ea, err := parseErrArgs(attr)
 		if err != nil {
 			return result, err
 		}
@@ -257,7 +256,7 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 	// Positional args (kv.Key() == "") are accepted by directives as needed.
 	// Directives with their own flag parsers (err, todo, skip, shareID) are
 	// responsible for validating their own flags.
-	for _, kv := range parsed.Fields[1:] {
+	for _, kv := range attr.Fields[1:] {
 		switch kv.Key() {
 		case "hint":
 			result.hint = kv.Value()
@@ -1449,7 +1448,7 @@ func normalizeLines(s string) string {
 // attrHasSkip reports whether the raw attribute body contains a skip:<ver> arg
 // at position 2 or later.  Returns the version string (e.g. "v3") and true
 // when a skip arg is found; returns "", false otherwise.
-func attrHasSkip(raw internal.Attr) (ver string, ok bool) {
+func attrHasSkip(raw *internal.Attr) (ver string, ok bool) {
 	for i := 2; i < len(raw.Fields); i++ {
 		text := raw.Fields[i].Text()
 		if text == "skip" {

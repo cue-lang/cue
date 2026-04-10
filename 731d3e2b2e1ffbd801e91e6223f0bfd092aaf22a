@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "324479d5_c254be84",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-10T09:37:24Z",
+      "side": 1,
+      "message": "nit: `pkgID :\u003d cmp.Or(e.pkgID, \"_\")`",
+      "revId": "731d3e2b2e1ffbd801e91e6223f0bfd092aaf22a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

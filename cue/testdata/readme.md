@@ -238,6 +238,25 @@ closedTrue:  close({x: 1}) @test(closed)
 closedFalse: {x: 1}        @test(closed=false)
 ```
 
+### `allows` — field allowance
+
+Checks whether `val.Allows(sel)` returns the expected result for the given
+selector expression.
+
+```cue
+openStruct:   {a: 1}        @test(allows, b)          // open: any field allowed
+knownField:   close({a: 1}) @test(allows, a)           // closed: known field allowed
+unknownField: close({a: 1}) @test(allows=false, b)     // closed: unknown field denied
+anyPattern:   {[string]: 1} @test(allows, [string])    // any-string pattern allowed
+```
+
+| Selector form | Meaning |
+|---------------|---------|
+| `foo` or `"foo"` | Regular string field |
+| `#Def` | Definition field |
+| `[string]` | Any-string pattern (`cue.AnyString`) |
+| `[int]` | Any-index pattern (`cue.AnyIndex`) |
+
 ### `debugCheck` — debug-printer output
 
 ```cue

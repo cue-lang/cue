@@ -269,6 +269,15 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 			if kv.Value() == "incorrect" {
 				result.isIncorrect = true
 			}
+		case "at":
+			// at= is accepted by eq, err, and shareID; each validates it
+			// in its own handler.
+			switch result.directive {
+			case "eq", "err", "shareID":
+				// Validated in their respective handlers.
+			default:
+				return result, fmt.Errorf("@test(%s): unknown flag %q", result.directive, kv.Key())
+			}
 		default:
 			switch result.directive {
 			case "err", "todo", "skip", "shareID":
@@ -410,6 +419,40 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 				subPath := appendPath(path, e.Label)
 				if subPath.Err() == nil {
 					walkField(e, subPath)
+				} else {
+					// Non-static label (e.g. string interpolation): cannot
+					// register a path from the AST. Still process
+					// @test(shareID=name, at=sel) where at= is a non-integer
+					// field name giving the resolved key, so the shareID check
+					// can look it up in the evaluated value.
+					for _, a := range e.Attrs {
+						k, _ := a.Split()
+						if k != "test" {
+							continue
+						}
+						pa, err := parseTestAttr(a)
+						if err != nil {
+							appendErrRecord(a, path, false, false, err)
+							continue
+						}
+						if pa.directive != "shareID" || len(pa.raw.Fields) == 0 {
+							continue
+						}
+						// Require a non-integer at= giving the resolved field name.
+						// applyShareIDAt (called in collectDirectShareIDs) will
+						// append it to the parent path stored here.
+						if !hasShareIDAtSel(pa) {
+							continue // no usable at=sel for dynamic key
+						}
+						pa.baseLine = a.Pos().Line()
+						pa.srcFileName = fileName
+						// Store the parent path; applyShareIDAt in
+						// collectDirectShareIDs appends the at= selector.
+						records = append(records, attrRecord{
+							path:   path,
+							parsed: pa,
+						})
+					}
 				}
 			}
 		}
@@ -470,6 +513,44 @@ func identStr(label ast.Label) string {
 // appendPath appends a selector for label to an existing path.
 func appendPath(base cue.Path, label ast.Label) cue.Path {
 	return base.Append(cue.Label(label))
+}
+
+// applyShareIDAt applies the at= field from a @test(shareID=...) attribute
+// to base. For integer at=N it appends a list index; for a non-integer at=sel
+// it parses sel as a CUE path and appends its selectors. Returns base
+// unchanged if no at= is present or if the at= value cannot be parsed.
+func applyShareIDAt(base cue.Path, pa parsedTestAttr) cue.Path {
+	for _, kv := range pa.raw.Fields[1:] {
+		if kv.Key() != "at" {
+			continue
+		}
+		val := kv.Value()
+		if n, err := strconv.Atoi(val); err == nil {
+			return base.Append(cue.Index(n))
+		}
+		if p := cue.ParsePath(val); p.Err() == nil {
+			return base.Append(p.Selectors()...)
+		}
+		break
+	}
+	return base
+}
+
+// hasShareIDAtSel reports whether pa contains at= with a non-integer value,
+// i.e. a field-name selector for use with dynamic-key fields.
+func hasShareIDAtSel(pa parsedTestAttr) bool {
+	for _, kv := range pa.raw.Fields[1:] {
+		if kv.Key() != "at" {
+			continue
+		}
+		val := kv.Value()
+		if val == "" {
+			return false
+		}
+		_, err := strconv.Atoi(val)
+		return err != nil
+	}
+	return false
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1147,13 +1228,41 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 //   - failing assertion: overwrite with actual value (ForceUpdateGoldenFiles)
 func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
+
+	// Extract at= and the expected-value expression from extra fields.
+	// Both may appear in any order; at= is named, expression is unnamed.
+	var atStr, exprStr string
+	for _, kv := range pa.raw.Fields[1:] {
+		switch {
+		case kv.Key() == "at" && atStr == "":
+			atStr = kv.Value()
+		case kv.Key() == "" && exprStr == "":
+			exprStr = kv.Text()
+		}
+	}
+
+	// Navigate val to the at= sub-path if specified.
+	if atStr != "" {
+		atPath := cue.ParsePath(atStr)
+		if err := atPath.Err(); err != nil {
+			t.Errorf("path %s: @test(eq, at=%s): invalid path: %v", path, atStr, err)
+			return
+		}
+		sub := val.LookupPath(atPath)
+		if !sub.Exists() {
+			t.Errorf("path %s: @test(eq, at=%s): sub-path not found", path, atStr)
+			return
+		}
+		path = cue.MakePath(append(path.Selectors(), atPath.Selectors()...)...)
+		val = sub
+	}
+
 	// @test(eq:todo, X) — expected-to-fail form.
 	// Failures are logged but not reported as test errors; a match emits a warning.
 	if pa.isTodo {
-		if len(pa.raw.Fields) < 2 {
+		if exprStr == "" {
 			return
 		}
-		exprStr := pa.raw.Fields[1].Text()
 		expr, err := parser.ParseExpr("@test(eq:todo)", exprStr)
 		if err != nil {
 			t.Logf("path %s: @test(eq:todo, ...): cannot parse expected expression: %v", path, err)
@@ -1167,14 +1276,13 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		}
 		return
 	}
-	if len(pa.raw.Fields) < 2 {
-		// Empty @test(eq) — fill placeholder.
+	if exprStr == "" {
+		// Empty @test(eq) or @test(eq, at=N) — fill placeholder.
 		if cuetest.UpdateGoldenFiles {
-			r.enqueueInlineFill(pa, "@test(eq, "+r.formatValue(val)+")")
+			r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr))
 		}
 		return
 	}
-	exprStr := pa.raw.Fields[1].Text()
 	expr, err := parser.ParseExpr("@test(eq)", exprStr)
 	if err != nil {
 		t.Errorf("path %s: @test(eq, ...): cannot parse expected expression: %v", path, err)
@@ -1190,8 +1298,8 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		// Assertion passes via AST comparison.
 		if hasSkip && cuetest.UpdateGoldenFiles {
 			// Stale-skip cleanup: the assertion now passes; strip the skip,
-			// restoring the plain @test(eq, <expr>).
-			r.enqueueInlineFill(pa, "@test(eq, "+exprStr+")")
+			// restoring @test(eq, <expr>[, at=<sel>]).
+			r.enqueueInlineFill(pa, r.eqFillAttrStr(exprStr, atStr))
 		}
 		return
 	}
@@ -1199,7 +1307,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	// Comparison failed — genuine mismatch.
 	if cuetest.ForceUpdateGoldenFiles {
 		// CUE_UPDATE=force: overwrite the assertion with the actual value.
-		r.enqueueInlineFill(pa, r.formatCoverAttr(val))
+		r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr))
 		return
 	}
 	// Report the failure (unless already annotated with a skip).
@@ -1207,6 +1315,22 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		t.Errorf("path %s: %v", path, cmpErr)
 		logHint(t, pa.hint)
 	}
+}
+
+// eqFillAttr builds an @test(eq, <value>[, at=<atStr>]) attribute for fill/force-update.
+func (r *inlineRunner) eqFillAttr(v cue.Value, atStr string) string {
+	if r.isError(v) {
+		return "@test(err)"
+	}
+	return r.eqFillAttrStr(r.formatValue(v), atStr)
+}
+
+// eqFillAttrStr builds @test(eq, <exprStr>[, at=<atStr>]).
+func (r *inlineRunner) eqFillAttrStr(exprStr, atStr string) string {
+	if atStr != "" {
+		return fmt.Sprintf("@test(eq, %s, at=%s)", exprStr, atStr)
+	}
+	return fmt.Sprintf("@test(eq, %s)", exprStr)
 }
 
 // formatValue returns a human-readable CUE string for a value.
@@ -1569,15 +1693,7 @@ func extractShareIDsFromEqExpr(expr ast.Expr, basePath cue.Path, version string)
 			if shareIDName == "" {
 				continue
 			}
-			fieldPath := basePath.Append(cue.Label(f.Label))
-			for _, kv := range pa.raw.Fields[1:] {
-				if kv.Key() == "at" {
-					if n, err := strconv.Atoi(kv.Value()); err == nil {
-						fieldPath = fieldPath.Append(cue.Index(n))
-					}
-					break
-				}
-			}
+			fieldPath := applyShareIDAt(basePath.Append(cue.Label(f.Label)), pa)
 			if result == nil {
 				result = make(map[string][]cue.Path)
 			}
@@ -1633,17 +1749,7 @@ func (r *inlineRunner) collectShareIDsForRoot(records []attrRecord, rootPath cue
 			if shareIDName == "" {
 				continue
 			}
-			p := rec.path
-			for _, kv := range pa.raw.Fields[1:] {
-				if kv.Key() == "at" {
-					n, err := strconv.Atoi(kv.Value())
-					if err == nil {
-						p = p.Append(cue.Index(n))
-					}
-					break
-				}
-			}
-			add(shareIDName, p)
+			add(shareIDName, applyShareIDAt(rec.path, pa))
 
 		case "eq":
 			// Eq body: extract @test(shareID=name) from fields in the struct literal.
@@ -1695,20 +1801,10 @@ func (r *inlineRunner) collectDirectShareIDs(records []attrRecord, version strin
 		if shareIDName == "" {
 			continue
 		}
-		p := rec.path
-		for _, kv := range pa.raw.Fields[1:] {
-			if kv.Key() == "at" {
-				n, err := strconv.Atoi(kv.Value())
-				if err == nil {
-					p = p.Append(cue.Index(n))
-				}
-				break
-			}
-		}
 		if shareGroups == nil {
 			shareGroups = make(map[string][]cue.Path)
 		}
-		shareGroups[shareIDName] = append(shareGroups[shareIDName], p)
+		shareGroups[shareIDName] = append(shareGroups[shareIDName], applyShareIDAt(rec.path, pa))
 	}
 	return shareGroups
 }

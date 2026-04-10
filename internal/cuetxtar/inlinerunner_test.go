@@ -320,6 +320,19 @@ outer2: {inner: g @test(shareID=V)}
 `)
 	})
 
+	t.Run("sharing passes with at=selector for dynamic key field", func(t *testing.T) {
+		// "dyn_\(k)": def uses an interpolated key so appendPath fails.
+		// at=dyn_a gives the resolved field name so the shareID check can
+		// look up X.dyn_a in the evaluated value.
+		run(t, `-- test.cue --
+k: "a"
+X: {
+	def: {x: 1} @test(shareID=D)
+	"dyn_\(k)": def @test(shareID=D, at=dyn_a)
+}
+`)
+	})
+
 	t.Run("sharing passes across different depths", func(t *testing.T) {
 		// A top-level field and a nested field may share the same vertex and
 		// participate in the same shareID group despite being at different depths.
@@ -327,6 +340,35 @@ outer2: {inner: g @test(shareID=V)}
 g: {x: 1} @test(shareID=V)
 p: g            @test(shareID=V)
 outer: {q: g    @test(shareID=V)}
+`)
+	})
+}
+
+// TestInlineRunner_EqAt verifies @test(eq, at=<sel>) sub-path navigation and
+// disjunction comparison through shared/forwarding vertices.
+func TestInlineRunner_EqAt(t *testing.T) {
+	run := func(t *testing.T, archiveStr string) {
+		t.Helper()
+		archive := txtar.Parse([]byte(archiveStr))
+		runner := cuetxtar.NewInlineRunner(t, nil, archive, t.TempDir())
+		runner.Run()
+	}
+
+	t.Run("eq with at= navigates to sub-field", func(t *testing.T) {
+		// @test(eq, at=b) on a struct checks the b sub-field's value.
+		run(t, `-- test.cue --
+s: {a: 1, b: 2} @test(eq, 2, at=b)
+`)
+	})
+
+	t.Run("eq on shared disjunction value", func(t *testing.T) {
+		// test_1 is assigned #Dis, which is shared. The value at test_1 is
+		// a forwarding vertex pointing to #Dis (a disjunction). DerefValue()
+		// is required to reach the *adt.Disjunction base value.
+		run(t, `-- test.cue --
+#Dis: {x: 1} | {y: 2}
+test_1: #Dis @test(shareID=D) @test(eq, {x: 1} | {y: 2})
+#Dis: _       @test(shareID=D)
 `)
 	})
 }

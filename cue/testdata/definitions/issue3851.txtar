@@ -6,7 +6,7 @@
 	name?: string
 	sub1?: sub2?: null | _
 }
-#Output: null | #App
+#Output: null | #App @test(pass)
 out: #Output & {
 	name: "foo"
 	sub1: sub2: {} | _
@@ -16,7 +16,7 @@ out: #Output & {
 			foo: _let
 		}
 	}
-}
+} @test(eq, {name: "foo", sub1: {sub2: {sub3: {foo: "bar"}}}})
 -- out/eval/stats --
 Leaks:  8
 Freed:  52
@@ -30,71 +30,6 @@ Disjuncts:    14
 Notifications: 2
 
 NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  #App: (#struct){
-    name?: (string){ string }
-    sub1?: (#struct){
-      sub2?: (_){ |((null){ null }, (_){ _ }) }
-    }
-  }
-  #Output: ((null|struct)){ |((null){ null }, (#struct){
-      name?: (string){ string }
-      sub1?: (#struct){
-        sub2?: (_){ |((null){ null }, (_){ _ }) }
-      }
-    }) }
-  out: (#struct){
-    name: (string){ "foo" }
-    sub1: (#struct){
-      sub2: (#struct){
-        sub3: (struct){
-          let _let#1 = (string){ "bar" }
-          foo: (string){ "bar" }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -14,7 +14,7 @@
-   out: (#struct){
-     name: (string){ "foo" }
-     sub1: (#struct){
--      sub2: (struct){
-+      sub2: (#struct){
-         sub3: (struct){
-           let _let#1 = (string){ "bar" }
-           foo: (string){ "bar" }
--- out/eval --
-(struct){
-  #App: (#struct){
-    name?: (string){ string }
-    sub1?: (#struct){
-      sub2?: (_){ |((null){ null }, (_){ _ }) }
-    }
-  }
-  #Output: ((null|struct)){ |((null){ null }, (#struct){
-      name?: (string){ string }
-      sub1?: (#struct){
-        sub2?: (_){ |((null){ null }, (_){ _ }) }
-      }
-    }) }
-  out: (#struct){
-    name: (string){ "foo" }
-    sub1: (#struct){
-      sub2: (struct){
-        sub3: (struct){
-          let _let#1 = (string){ "bar" }
-          foo: (string){ "bar" }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -120,3 +55,6 @@ diff old new
     }
   })
 }
+-- out/diff-v2-v3.txt --
+Disjunctions with defaults: needs @test(final) for default field selection
+v3: sub2 is (#struct); v2: sub2 is (struct)

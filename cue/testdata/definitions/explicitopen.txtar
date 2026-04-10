@@ -25,61 +25,61 @@ Old1: {
 }
 
 useNewClosed1: {
-	t1: err: NewClosed1 & {c: 3}
-	t2: ok:  {NewClosed1, c: 3}
+	t1: err: NewClosed1 & {c: 3} @test(err, code=eval, contains="field not allowed", pos=[0:25])
+	t2: ok:  {NewClosed1, c: 3} @test(eq, { a: 1, c: 3 })
 }
 
 useNewClosed2: {
-	t1: err: #NewClosed2 & {c: 3}
-	t2: ok:  {#NewClosed2, c: 3}
+	t1: err: #NewClosed2 & {c: 3} @test(err, code=eval, contains="field not allowed", pos=[0:26])
+	t2: ok:  {#NewClosed2, c: 3} @test(eq, { a: 1, b: 1, c: 3 })
 }
 
 useNewOpen1: {
-	t1: ok: NewOpen1 & {c: 3}
-	t2: ok: {NewOpen1, c: 3}
+	t1: ok: NewOpen1 & {c: 3} @test(eq, { a: 1, b: 1, c: 3 })
+	t2: ok: {NewOpen1, c: 3} @test(eq, { a: 1, b: 1, c: 3 })
 }
 
 useNewOpen2: {
-	t1: ok: NewOpen2 & {c: 3}
-	t2: ok: {NewOpen2, c: 3}
+	t1: ok: NewOpen2 & {c: 3} @test(eq, { a: 1, c: 3 })
+	t2: ok: {NewOpen2, c: 3} @test(eq, { a: 1, c: 3 })
 }
 
 combineold: {
 	// all {a: 1}
-	a0: ok: #A & NewClosed1
-	a1: ok: {#A, NewClosed1}
+	a0: ok: #A & NewClosed1 @test(eq, { a: 1 })
+	a1: ok: {#A, NewClosed1} @test(eq, { a: 1 })
 
-	a2: ok: NewClosed1 & NewOpen2
-	a3: ok: {NewClosed1, NewOpen2}
+	a2: ok: NewClosed1 & NewOpen2 @test(eq, { a: 1 })
+	a3: ok: {NewClosed1, NewOpen2} @test(eq, { a: 1 })
 
 	// all {a: 1, b: 2}
-	b0: ok: Old1 & #NewClosed2
-	b1: ok: #Old2 & #NewClosed2
+	b0: ok: Old1 & #NewClosed2 @test(eq, { a: 1, b: 1 })
+	b1: ok: #Old2 & #NewClosed2 @test(eq, { a: 1, b: 1 })
 
-	c1: ok: {#NewClosed2,  Old1}
-	c2: ok: {#NewClosed2,  #Old2}
+	c1: ok: {#NewClosed2,  Old1} @test(eq, { a: 1, b: 1 })
+	c2: ok: {#NewClosed2,  #Old2} @test(eq, { a: 1, b: 1 })
 
 	// {a: 1} and {a: 1, b: 2}
-	e0: err: #A & Old1
-	e1: err: #A & #Old2
-	e2: err: #A & #NewClosed2
-	e3: err: #A & NewOpen1
+	e0: err: #A & Old1 @test(err, code=eval, contains="field not allowed", pos=[-47:3])
+	e1: err: #A & #Old2 @test(err, code=eval, contains="field not allowed", pos=[-41:3])
+	e2: err: #A & #NewClosed2 @test(err, code=eval, contains="field not allowed", pos=[new.cue:11:2])
+	e3: err: #A & NewOpen1 @test(err, code=eval, contains="field not allowed", pos=[new.cue:16:2])
 
-	e4: ok: {#A, Old1}
-	e5: ok: {#A, #Old2}
-	e6: ok: {#A, #NewClosed2}
-	e7: ok: {#A, NewOpen1}
+	e4: ok: {#A, Old1} @test(eq, { a: 1, b: 1 })
+	e5: ok: {#A, #Old2} @test(eq, { a: 1, b: 1 })
+	e6: ok: {#A, #NewClosed2} @test(eq, { a: 1, b: 1 })
+	e7: ok: {#A, NewOpen1} @test(eq, { a: 1, b: 1 })
 
-	f0: err: NewClosed1 & Old1
-	f1: err: NewClosed1 & #Old2
-	f2: err: NewClosed1 & #NewClosed2
-	f3: err: NewClosed1 & NewOpen1
+	f0: err: NewClosed1 & Old1 @test(err, code=eval, contains="field not allowed", pos=[-57:3])
+	f1: err: NewClosed1 & #Old2 @test(err, code=eval, contains="field not allowed", pos=[-51:3])
+	f2: err: NewClosed1 & #NewClosed2 @test(err, code=eval, contains="field not allowed", pos=[new.cue:11:2])
+	f3: err: NewClosed1 & NewOpen1 @test(err, code=eval, contains="field not allowed", pos=[new.cue:16:2])
 
-	f4: ok: {NewClosed1, Old1}
-	f5: ok: {NewClosed1, #Old2}
-	f6: ok: {NewClosed1, NewClosed1}
-	f7: ok: {NewClosed1, #NewClosed2}
-	f8: ok: {NewClosed1, NewOpen1}
+	f4: ok: {NewClosed1, Old1} @test(eq, { a: 1, b: 1 })
+	f5: ok: {NewClosed1, #Old2} @test(eq, { a: 1, b: 1 })
+	f6: ok: {NewClosed1, NewClosed1} @test(eq, { a: 1 })
+	f7: ok: {NewClosed1, #NewClosed2} @test(eq, { a: 1, b: 1 })
+	f8: ok: {NewClosed1, NewOpen1} @test(eq, { a: 1, b: 1 })
 }
 
 -- new.cue --
@@ -104,94 +104,94 @@ NewOpen1: {
 NewOpen2: #A...
 
 useOld1: {
-	t1: err: Old1 & {c: 3}
-	t2: err: {Old1, c: 3} // TODO
-	t3: ok:  {Old1..., c: 3}
+	t1: err: Old1 & {c: 3} @test(err, code=eval, contains="field not allowed", pos=[0:19])
+	t2: err: {Old1, c: 3} @test(err, code=eval, contains="field not allowed", pos=[0:18]) // TODO
+	t3: ok:  {Old1..., c: 3} @test(eq, {a: 1, b: 1, c: 3})
 }
 
 useOld2: {
-	t1: err: #Old2 & {c: 3}
-	t2: err: {#Old2, c: 3}
-	t3: ok:  {#Old2..., c: 3}
+	t1: err: #Old2 & {c: 3} @test(err, code=eval, contains="field not allowed", pos=[0:20])
+	t2: err: {#Old2, c: 3} @test(err, code=eval, contains="field not allowed", pos=[0:19])
+	t3: ok:  {#Old2..., c: 3} @test(eq, {a: 1, b: 1, c: 3})
 }
 
 combinenew: {
 	// all {a: 1}
-	a0: ok: #A & NewClosed1
-	a1: ok: {#A, NewClosed1}
+	a0: ok: #A & NewClosed1 @test(eq, {a: 1})
+	a1: ok: {#A, NewClosed1} @test(eq, {a: 1})
 
-	a2: ok: NewClosed1 & NewOpen2
-	a3: ok: {NewClosed1, NewOpen2}
-	a4: ok: {NewClosed1..., NewOpen2}
+	a2: ok: NewClosed1 & NewOpen2 @test(eq, {a: 1})
+	a3: ok: {NewClosed1, NewOpen2} @test(eq, {a: 1})
+	a4: ok: {NewClosed1..., NewOpen2} @test(eq, {a: 1})
 
-	a5: ok: NewOpen2 & NewClosed1
-	a6: ok: {NewOpen2, NewClosed1}
-	a7: ok: {NewOpen2..., NewClosed1}
+	a5: ok: NewOpen2 & NewClosed1 @test(eq, {a: 1})
+	a6: ok: {NewOpen2, NewClosed1} @test(eq, {a: 1})
+	a7: ok: {NewOpen2..., NewClosed1} @test(eq, {a: 1})
 
 	// all {a: 1, b: 2}
-	b0: ok: Old1 & #NewClosed2
-	b1: ok: #Old2 & #NewClosed2
-	b2: ok: #NewClosed2 & Old1
-	b3: ok: #NewClosed2 & #Old2
+	b0: ok: Old1 & #NewClosed2 @test(eq, {a: 1, b: 1})
+	b1: ok: #Old2 & #NewClosed2 @test(eq, {a: 1, b: 1})
+	b2: ok: #NewClosed2 & Old1 @test(eq, {a: 1, b: 1})
+	b3: ok: #NewClosed2 & #Old2 @test(eq, {a: 1, b: 1})
 
-	c1: ok: {#NewClosed2,  Old1}
-	c2: ok: {#NewClosed2,  #Old2}
-	c3: ok: {Old1, #NewClosed2}
-	c4: ok: {#Old2, #NewClosed2}
+	c1: ok: {#NewClosed2,  Old1} @test(eq, {a: 1, b: 1})
+	c2: ok: {#NewClosed2,  #Old2} @test(eq, {a: 1, b: 1})
+	c3: ok: {Old1, #NewClosed2} @test(eq, {a: 1, b: 1})
+	c4: ok: {#Old2, #NewClosed2} @test(eq, {a: 1, b: 1})
 
-	d0: ok: {#NewClosed2,  Old1...}
-	d1: ok: {#NewClosed2,  #Old2...}
-	d2: ok: {#NewClosed2...,  Old1}
-	d3: ok: {#NewClosed2...,  #Old2}
-	d4: ok: {#NewClosed2...,  Old1...}
-	d5: ok: {#NewClosed2...,  #Old2...}
+	d0: ok: {#NewClosed2,  Old1...} @test(eq, {a: 1, b: 1})
+	d1: ok: {#NewClosed2,  #Old2...} @test(eq, {a: 1, b: 1})
+	d2: ok: {#NewClosed2...,  Old1} @test(eq, {a: 1, b: 1})
+	d3: ok: {#NewClosed2...,  #Old2} @test(eq, {a: 1, b: 1})
+	d4: ok: {#NewClosed2...,  Old1...} @test(eq, {a: 1, b: 1})
+	d5: ok: {#NewClosed2...,  #Old2...} @test(eq, {a: 1, b: 1})
 
-	d6: ok: {Old1..., #NewClosed2}
-	d7: ok: {#Old2..., #NewClosed2}
-	d8: ok: {Old1, #NewClosed2...,}
-	d9: ok: {#Old2, #NewClosed2...,}
-	d10: ok: {Old1..., #NewClosed2...,}
-	d11: ok: {#Old2..., #NewClosed2...,}
+	d6: ok: {Old1..., #NewClosed2} @test(eq, {a: 1, b: 1})
+	d7: ok: {#Old2..., #NewClosed2} @test(eq, {a: 1, b: 1})
+	d8: ok: {Old1, #NewClosed2...,} @test(eq, {a: 1, b: 1})
+	d9: ok: {#Old2, #NewClosed2...,} @test(eq, {a: 1, b: 1})
+	d10: ok: {Old1..., #NewClosed2...,} @test(eq, {a: 1, b: 1})
+	d11: ok: {#Old2..., #NewClosed2...,} @test(eq, {a: 1, b: 1})
 
 	// {a: 1} and {a: 1, b: 2}
-	e0: err: #A & Old1
-	e1: err: #A & #Old2
-	e2: err: #A & #NewClosed2
-	e3: err: #A & NewOpen1
+	e0: err: #A & Old1 @test(err, code=eval, contains="field not allowed", pos=[old.cue:7:3])
+	e1: err: #A & #Old2 @test(err, code=eval, contains="field not allowed", pos=[old.cue:14:3])
+	e2: err: #A & #NewClosed2 @test(err, code=eval, contains="field not allowed", pos=[-63:2])
+	e3: err: #A & NewOpen1 @test(err, code=eval, contains="field not allowed", pos=[-59:2])
 
-	e4: err: {#A, Old1}
-	e5: err: {#A, #Old2}
-	e6: err: {#A, #NewClosed2}
-	e7: err: {#A, NewOpen1}
+	e4: err: {#A, Old1} @test(err, code=eval, contains="field not allowed", pos=[old.cue:7:3])
+	e5: err: {#A, #Old2} @test(err, code=eval, contains="field not allowed", pos=[old.cue:14:3])
+	e6: err: {#A, #NewClosed2} @test(err, code=eval, contains="field not allowed", pos=[-68:2])
+	e7: err: {#A, NewOpen1} @test(err, code=eval, contains="field not allowed", pos=[-64:2])
 
-	e8: ok: {#A..., Old1}
-	e9: ok: {#A..., #Old2}
-	e10: ok: {#A..., #NewClosed2}
-	e11: ok: {#A..., NewOpen1}
+	e8: ok: {#A..., Old1} @test(eq, {a: 1, b: 1})
+	e9: ok: {#A..., #Old2} @test(eq, {a: 1, b: 1})
+	e10: ok: {#A..., #NewClosed2} @test(eq, {a: 1, b: 1})
+	e11: ok: {#A..., NewOpen1} @test(eq, {a: 1, b: 1})
 
-	f0: err: NewClosed1 & Old1
-	f1: err: NewClosed1 & #Old2
-	f2: err: NewClosed1 & #NewClosed2
-	f3: err: NewClosed1 & NewOpen1
-	f4: ok: NewClosed1 & NewClosed1
+	f0: err: NewClosed1 & Old1 @test(err, code=eval, contains="field not allowed", pos=[old.cue:7:3])
+	f1: err: NewClosed1 & #Old2 @test(err, code=eval, contains="field not allowed", pos=[old.cue:14:3])
+	f2: err: NewClosed1 & #NewClosed2 @test(err, code=eval, contains="field not allowed", pos=[-78:2])
+	f3: err: NewClosed1 & NewOpen1 @test(err, code=eval, contains="field not allowed", pos=[-74:2])
+	f4: ok: NewClosed1 & NewClosed1 @test(eq, {a: 1})
 
-	f5: err: {NewClosed1, Old1}
-	f6: err: {NewClosed1, #Old2}
-	f7: err: {NewClosed1, #NewClosed2}
-	f8: err: {NewClosed1, NewOpen1}
-	f9: ok: {NewClosed1, NewClosed1}
+	f5: err: {NewClosed1, Old1} @test(err, code=eval, contains="field not allowed", pos=[old.cue:7:3])
+	f6: err: {NewClosed1, #Old2} @test(err, code=eval, contains="field not allowed", pos=[old.cue:14:3])
+	f7: err: {NewClosed1, #NewClosed2} @test(err, code=eval, contains="field not allowed", pos=[-84:2])
+	f8: err: {NewClosed1, NewOpen1} @test(err, code=eval, contains="field not allowed", pos=[-80:2])
+	f9: ok: {NewClosed1, NewClosed1} @test(err)
 
-	f9: ok:  {NewClosed1..., Old1}
-	f10: ok: {NewClosed1..., #Old2}
-	f11: ok: {NewClosed1..., NewClosed1}
-	f12: ok: {NewClosed1..., #NewClosed2}
-	f13: ok: {NewClosed1..., NewOpen1}
+	f9: ok:  {NewClosed1..., Old1} @test(err, code=eval, contains="field not allowed", pos=[old.cue:7:3], hint="see todo")
+	f10: ok: {NewClosed1..., #Old2} @test(eq, {a: 1, b: 1})
+	f11: ok: {NewClosed1..., NewClosed1} @test(eq, {a: 1})
+	f12: ok: {NewClosed1..., #NewClosed2} @test(eq, {a: 1, b: 1})
+	f13: ok: {NewClosed1..., NewOpen1} @test(eq, {a: 1, b: 1})
 
-	f14: err: Old1 & NewClosed1
-	f15: err: #Old2 & NewClosed1
-	f16: err: #NewClosed2 & NewClosed1
-	f17: err: NewOpen1 & NewClosed1
-	f18: ok: NewClosed1 & NewClosed1
+	f14: err: Old1 & NewClosed1 @test(eq, {a: 1, b: 1}, hint="see todo")
+	f15: err: #Old2 & NewClosed1 @test(eq, {a: 1, b: 1}, hint="see todo")
+	f16: err: #NewClosed2 & NewClosed1 @test(err, code=eval, contains="field not allowed", pos=[-96:2])
+	f17: err: NewOpen1 & NewClosed1 @test(err, code=eval, contains="field not allowed", pos=[-92:2])
+	f18: ok: NewClosed1 & NewClosed1 @test(eq, {a: 1})
 }
 -- issues.cue --
 @experiment(explicitopen)
@@ -204,10 +204,11 @@ issue4150: {
 	x: #Def... & {
 			a: 42
 			b: 42
-	}
+	} @test(eq, {a: 42, b: 42}) @test(closed)
+
 	foo: {a: int}
 	bar: {b: int}
-	y: foo... & bar...
+	y: foo... & bar... @test(eq, {a: int, b: int})
 
 	// NOTE: we allow this, even though it doesn't mean anything. The benefit
 	// of this is that code doesn't become brittle using the spread operator
@@ -219,889 +220,79 @@ issue4150: {
 	//
 	// Not allowing ... on any expression would mean #foo... may or may not be
 	// erroneous, depending on the value foo is set to.
-	z: 1...
+	z: 1... @test(eq, 1)
 }
--- out/evalalpha --
-Errors:
-combinenew.e0.err.b: field not allowed:
-    ./old.cue:7:3
-combinenew.e1.err.b: field not allowed:
-    ./old.cue:14:3
-combinenew.e2.err.b: field not allowed:
-    ./new.cue:11:2
-combinenew.e3.err.b: field not allowed:
-    ./new.cue:16:2
-combinenew.e4.err.b: field not allowed:
-    ./old.cue:7:3
-combinenew.e5.err.b: field not allowed:
-    ./old.cue:14:3
-combinenew.e6.err.b: field not allowed:
-    ./new.cue:11:2
-combinenew.e7.err.b: field not allowed:
-    ./new.cue:16:2
-combinenew.f0.err.b: field not allowed:
-    ./old.cue:7:3
-combinenew.f1.err.b: field not allowed:
-    ./old.cue:14:3
-combinenew.f16.err.b: field not allowed:
-    ./new.cue:11:2
-combinenew.f17.err.b: field not allowed:
-    ./new.cue:16:2
-combinenew.f2.err.b: field not allowed:
-    ./new.cue:11:2
-combinenew.f3.err.b: field not allowed:
-    ./new.cue:16:2
-combinenew.f5.err.b: field not allowed:
-    ./old.cue:7:3
-combinenew.f6.err.b: field not allowed:
-    ./old.cue:14:3
-combinenew.f7.err.b: field not allowed:
-    ./new.cue:11:2
-combinenew.f8.err.b: field not allowed:
-    ./new.cue:16:2
-combinenew.f9.ok.b: field not allowed:
-    ./old.cue:7:3
-combineold.e0.err.b: field not allowed:
-    ./old.cue:7:3
-combineold.e1.err.b: field not allowed:
-    ./old.cue:14:3
-combineold.e2.err.b: field not allowed:
-    ./new.cue:11:2
-combineold.e3.err.b: field not allowed:
-    ./new.cue:16:2
-combineold.f0.err.b: field not allowed:
-    ./old.cue:7:3
-combineold.f1.err.b: field not allowed:
-    ./old.cue:14:3
-combineold.f2.err.b: field not allowed:
-    ./new.cue:11:2
-combineold.f3.err.b: field not allowed:
-    ./new.cue:16:2
-useNewClosed1.t1.err.c: field not allowed:
-    ./old.cue:19:25
-useNewClosed2.t1.err.c: field not allowed:
-    ./old.cue:24:26
-useOld1.t1.err.c: field not allowed:
+-- out/errors.txt --
+[eval] useOld1.t1.err.c: field not allowed:
     ./new.cue:22:19
-useOld1.t2.err.c: field not allowed:
+[eval] useOld1.t2.err.c: field not allowed:
     ./new.cue:23:18
-useOld2.t1.err.c: field not allowed:
+[eval] useOld2.t1.err.c: field not allowed:
     ./new.cue:28:20
-useOld2.t2.err.c: field not allowed:
+[eval] useOld2.t2.err.c: field not allowed:
     ./new.cue:29:19
-
-Result:
-(_|_){
-  // [eval]
-  issue4150: (struct){
-    #Def: (#struct){
-      a: (int){ int }
-    }
-    x: (#struct){
-      a: (int){ 42 }
-      b: (int){ 42 }
-    }
-    foo: (struct){
-      a: (int){ int }
-    }
-    bar: (struct){
-      b: (int){ int }
-    }
-    y: (struct){
-      a: (int){ int }
-      b: (int){ int }
-    }
-    z: (int){ 1 }
-  }
-  NewClosed1: (#struct){
-    a: (int){ 1 }
-  }
-  #NewClosed2: (#struct){
-    b: (int){ 1 }
-    a: (int){ 1 }
-  }
-  NewOpen1: (#struct){
-    b: (int){ 1 }
-    a: (int){ 1 }
-  }
-  NewOpen2: ~(#A)
-  useOld1: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] useOld1.t1.err.c: field not allowed:
-          //     ./new.cue:22:19
-        }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] useOld1.t2.err.c: field not allowed:
-          //     ./new.cue:23:18
-        }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    t3: (struct){
-      ok: (#struct){
-        c: (int){ 3 }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-  }
-  useOld2: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] useOld2.t1.err.c: field not allowed:
-          //     ./new.cue:28:20
-        }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] useOld2.t2.err.c: field not allowed:
-          //     ./new.cue:29:19
-        }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    t3: (struct){
-      ok: (#struct){
-        c: (int){ 3 }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-  }
-  combinenew: (_|_){
-    // [eval]
-    a0: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a1: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a2: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a3: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a4: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a5: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a6: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a7: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    b0: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    b1: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    b2: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    b3: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    c1: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    c2: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    c3: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    c4: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d0: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d1: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d2: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d3: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d4: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d5: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d6: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d7: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d8: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d9: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d10: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    d11: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    e0: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combinenew.e0.err.b: field not allowed:
-          //     ./old.cue:7:3
-        }
-      }
-    }
-    e1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combinenew.e1.err.b: field not allowed:
-          //     ./old.cue:14:3
-        }
-      }
-    }
-    e2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combinenew.e2.err.b: field not allowed:
-          //     ./new.cue:11:2
-        }
-      }
-    }
-    e3: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combinenew.e3.err.b: field not allowed:
-          //     ./new.cue:16:2
-        }
-      }
-    }
-    e4: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combinenew.e4.err.b: field not allowed:
-          //     ./old.cue:7:3
-        }
-      }
-    }
-    e5: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combinenew.e5.err.b: field not allowed:
-          //     ./old.cue:14:3
-        }
-      }
-    }
-    e6: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combinenew.e6.err.b: field not allowed:
-          //     ./new.cue:11:2
-        }
-      }
-    }
-    e7: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combinenew.e7.err.b: field not allowed:
-          //     ./new.cue:16:2
-        }
-      }
-    }
-    e8: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-    e9: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-    e10: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-    e11: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-    f0: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f0.err.b: field not allowed:
-          //     ./old.cue:7:3
-        }
-        a: (int){ 1 }
-      }
-    }
-    f1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f1.err.b: field not allowed:
-          //     ./old.cue:14:3
-        }
-        a: (int){ 1 }
-      }
-    }
-    f2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f2.err.b: field not allowed:
-          //     ./new.cue:11:2
-        }
-        a: (int){ 1 }
-      }
-    }
-    f3: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f3.err.b: field not allowed:
-          //     ./new.cue:16:2
-        }
-        a: (int){ 1 }
-      }
-    }
-    f4: (struct){
-      ok: ~(NewClosed1)
-    }
-    f5: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f5.err.b: field not allowed:
-          //     ./old.cue:7:3
-        }
-        a: (int){ 1 }
-      }
-    }
-    f6: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f6.err.b: field not allowed:
-          //     ./old.cue:14:3
-        }
-        a: (int){ 1 }
-      }
-    }
-    f7: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f7.err.b: field not allowed:
-          //     ./new.cue:11:2
-        }
-        a: (int){ 1 }
-      }
-    }
-    f8: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f8.err.b: field not allowed:
-          //     ./new.cue:16:2
-        }
-        a: (int){ 1 }
-      }
-    }
-    f9: (_|_){
-      // [eval]
-      ok: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f9.ok.b: field not allowed:
-          //     ./old.cue:7:3
-        }
-        a: (int){ 1 }
-      }
-    }
-    f10: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    f11: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    f12: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    f13: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    f14: (struct){
-      err: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    f15: (struct){
-      err: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    f16: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f16.err.b: field not allowed:
-          //     ./new.cue:11:2
-        }
-        a: (int){ 1 }
-      }
-    }
-    f17: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combinenew.f17.err.b: field not allowed:
-          //     ./new.cue:16:2
-        }
-        a: (int){ 1 }
-      }
-    }
-    f18: (struct){
-      ok: ~(NewClosed1)
-    }
-  }
-  #A: (#struct){
-    a: (int){ 1 }
-  }
-  Old1: (#struct){
-    b: (int){ 1 }
-    a: (int){ 1 }
-  }
-  #Old2: (#struct){
-    b: (int){ 1 }
-    a: (int){ 1 }
-  }
-  useNewClosed1: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] useNewClosed1.t1.err.c: field not allowed:
-          //     ./old.cue:19:25
-        }
-        a: (int){ 1 }
-      }
-    }
-    t2: (struct){
-      ok: (#struct){
-        c: (int){ 3 }
-        a: (int){ 1 }
-      }
-    }
-  }
-  useNewClosed2: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] useNewClosed2.t1.err.c: field not allowed:
-          //     ./old.cue:24:26
-        }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    t2: (struct){
-      ok: (#struct){
-        c: (int){ 3 }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-  }
-  useNewOpen1: (struct){
-    t1: (struct){
-      ok: (#struct){
-        c: (int){ 3 }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    t2: (struct){
-      ok: (#struct){
-        c: (int){ 3 }
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-  }
-  useNewOpen2: (struct){
-    t1: (struct){
-      ok: (#struct){
-        c: (int){ 3 }
-        a: (int){ 1 }
-      }
-    }
-    t2: (struct){
-      ok: (#struct){
-        c: (int){ 3 }
-        a: (int){ 1 }
-      }
-    }
-  }
-  combineold: (_|_){
-    // [eval]
-    a0: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a1: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a2: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    a3: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    b0: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    b1: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    c1: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    c2: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    e0: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combineold.e0.err.b: field not allowed:
-          //     ./old.cue:7:3
-        }
-      }
-    }
-    e1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combineold.e1.err.b: field not allowed:
-          //     ./old.cue:14:3
-        }
-      }
-    }
-    e2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combineold.e2.err.b: field not allowed:
-          //     ./new.cue:11:2
-        }
-      }
-    }
-    e3: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (int){ 1 }
-        b: (_|_){
-          // [eval] combineold.e3.err.b: field not allowed:
-          //     ./new.cue:16:2
-        }
-      }
-    }
-    e4: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-    e5: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-    e6: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-    e7: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-    f0: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combineold.f0.err.b: field not allowed:
-          //     ./old.cue:7:3
-        }
-        a: (int){ 1 }
-      }
-    }
-    f1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combineold.f1.err.b: field not allowed:
-          //     ./old.cue:14:3
-        }
-        a: (int){ 1 }
-      }
-    }
-    f2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combineold.f2.err.b: field not allowed:
-          //     ./new.cue:11:2
-        }
-        a: (int){ 1 }
-      }
-    }
-    f3: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] combineold.f3.err.b: field not allowed:
-          //     ./new.cue:16:2
-        }
-        a: (int){ 1 }
-      }
-    }
-    f4: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    f5: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    f6: (struct){
-      ok: (#struct){
-        a: (int){ 1 }
-      }
-    }
-    f7: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-    f8: (struct){
-      ok: (#struct){
-        b: (int){ 1 }
-        a: (int){ 1 }
-      }
-    }
-  }
-}
+[eval] combinenew.e0.err.b: field not allowed:
+    ./old.cue:7:3
+[eval] combinenew.e1.err.b: field not allowed:
+    ./old.cue:14:3
+[eval] combinenew.e2.err.b: field not allowed:
+    ./new.cue:11:2
+[eval] combinenew.e3.err.b: field not allowed:
+    ./new.cue:16:2
+[eval] combinenew.e4.err.b: field not allowed:
+    ./old.cue:7:3
+[eval] combinenew.e5.err.b: field not allowed:
+    ./old.cue:14:3
+[eval] combinenew.e6.err.b: field not allowed:
+    ./new.cue:11:2
+[eval] combinenew.e7.err.b: field not allowed:
+    ./new.cue:16:2
+[eval] combinenew.f0.err.b: field not allowed:
+    ./old.cue:7:3
+[eval] combinenew.f1.err.b: field not allowed:
+    ./old.cue:14:3
+[eval] combinenew.f2.err.b: field not allowed:
+    ./new.cue:11:2
+[eval] combinenew.f3.err.b: field not allowed:
+    ./new.cue:16:2
+[eval] combinenew.f5.err.b: field not allowed:
+    ./old.cue:7:3
+[eval] combinenew.f6.err.b: field not allowed:
+    ./old.cue:14:3
+[eval] combinenew.f7.err.b: field not allowed:
+    ./new.cue:11:2
+[eval] combinenew.f8.err.b: field not allowed:
+    ./new.cue:16:2
+[eval] combinenew.f9.ok.b: field not allowed:
+    ./old.cue:7:3
+[eval] combinenew.f16.err.b: field not allowed:
+    ./new.cue:11:2
+[eval] combinenew.f17.err.b: field not allowed:
+    ./new.cue:16:2
+[eval] useNewClosed1.t1.err.c: field not allowed:
+    ./old.cue:19:25
+[eval] useNewClosed2.t1.err.c: field not allowed:
+    ./old.cue:24:26
+[eval] combineold.e0.err.b: field not allowed:
+    ./old.cue:7:3
+[eval] combineold.e1.err.b: field not allowed:
+    ./old.cue:14:3
+[eval] combineold.e2.err.b: field not allowed:
+    ./new.cue:11:2
+[eval] combineold.e3.err.b: field not allowed:
+    ./new.cue:16:2
+[eval] combineold.f0.err.b: field not allowed:
+    ./old.cue:7:3
+[eval] combineold.f1.err.b: field not allowed:
+    ./old.cue:14:3
+[eval] combineold.f2.err.b: field not allowed:
+    ./new.cue:11:2
+[eval] combineold.f3.err.b: field not allowed:
+    ./new.cue:16:2
+-- out/diff-v2-v3.txt --
+f9: combinenew.f9.ok is in error because two f9 declarations conflict.
+f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
+Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/compile --
 --- issues.cue
 {

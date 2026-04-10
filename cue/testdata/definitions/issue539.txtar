@@ -14,7 +14,11 @@ Component: {
 	}
 }
 
-hello: #Schema & Component
+hello: #Schema & Component @test(closed) @test(eq, {
+	hostname: *"localhost" | string
+	_#foo: {hello: "world"}
+})
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  14
@@ -27,23 +31,6 @@ Conjuncts:    17
 Disjuncts:    4
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  #Schema: (#struct){
-  }
-  Component: (struct){
-    hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
-    _#foo: (#struct){
-      hello: (string){ "world" }
-    }
-  }
-  hello: (#struct){
-    hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
-    _#foo: (#struct){
-      hello: (string){ "world" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

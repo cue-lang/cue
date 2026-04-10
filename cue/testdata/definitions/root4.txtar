@@ -1,4 +1,3 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #schema: a!: bool
 _hidden & #schema // must fail here, but not elsewhere
@@ -7,6 +6,21 @@ _hidden: {
 	notAllowed: true
 }
 allowed: true
+
+@test(eq, {
+	a: true
+	#schema: a!: bool
+	_hidden: {
+		a: true
+		notAllowed: true
+	}
+	allowed: true
+	notAllowed: _|_
+})
+@test(err, code=eval, contains="field not allowed", pos=[in.cue:5:2])
+-- out/errors.txt --
+[eval] notAllowed: field not allowed:
+    ./in.cue:5:2
 -- out/eval/stats --
 Leaks:  0
 Freed:  9
@@ -20,92 +34,6 @@ Disjuncts:    0
 Notifications: 2
 
 NumCloseIDs: 3
--- out/evalalpha --
-Errors:
-notAllowed: field not allowed:
-    ./in.cue:5:2
-
-Result:
-(_|_){
-  // [eval]
-  #schema: (#struct){
-    a!: (bool){ bool }
-  }
-  _hidden: (struct){
-    a: (bool){ true }
-    notAllowed: (bool){ true }
-  }
-  allowed: (bool){ true }
-  a: (bool){ true }
-  notAllowed: (_|_){
-    // [eval] notAllowed: field not allowed:
-    //     ./in.cue:5:2
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,5 @@
- Errors:
- notAllowed: field not allowed:
--    ./in.cue:1:1
--    ./in.cue:1:10
--    ./in.cue:2:1
--    ./in.cue:2:11
-     ./in.cue:5:2
- 
- Result:
-@@ -12,18 +8,14 @@
-   #schema: (#struct){
-     a!: (bool){ bool }
-   }
--  a: (bool){ true }
-   _hidden: (struct){
-     a: (bool){ true }
-     notAllowed: (bool){ true }
-   }
-   allowed: (bool){ true }
-+  a: (bool){ true }
-   notAllowed: (_|_){
-     // [eval] notAllowed: field not allowed:
--    //     ./in.cue:1:1
--    //     ./in.cue:1:10
--    //     ./in.cue:2:1
--    //     ./in.cue:2:11
-     //     ./in.cue:5:2
-   }
- }
--- out/eval --
-Errors:
-notAllowed: field not allowed:
-    ./in.cue:1:1
-    ./in.cue:1:10
-    ./in.cue:2:1
-    ./in.cue:2:11
-    ./in.cue:5:2
-
-Result:
-(_|_){
-  // [eval]
-  #schema: (#struct){
-    a!: (bool){ bool }
-  }
-  a: (bool){ true }
-  _hidden: (struct){
-    a: (bool){ true }
-    notAllowed: (bool){ true }
-  }
-  allowed: (bool){ true }
-  notAllowed: (_|_){
-    // [eval] notAllowed: field not allowed:
-    //     ./in.cue:1:1
-    //     ./in.cue:1:10
-    //     ./in.cue:2:1
-    //     ./in.cue:2:11
-    //     ./in.cue:5:2
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -119,3 +47,7 @@ Result:
   }
   allowed: true
 }
+-- out/diff-v2-v3.txt --
+Positions: v3 reports fewer positions than v2 for the "field not allowed" error.
+Reordering.
+notAllowed error: cannot add @test(err) to field created by embedding.

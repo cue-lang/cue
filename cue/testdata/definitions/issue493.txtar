@@ -5,97 +5,14 @@
 #Artifact: {
 	body: _
 	other: [string]: int
-}
+} @test(shareID=appAtom)
 
-#App:  #Artifact
-#Atom: #Artifact
+#App:  #Artifact @test(shareID=appAtom)
+#Atom: #Artifact @test(shareID=appAtom)
 
 #Both: #App | #Atom
 
-t1: #Both & {body: 3}
--- out/eval/stats --
-Leaks:  6
-Freed:  15
-Reused: 5
-Allocs: 16
-Retain: 0
-
-Unifications: 15
-Conjuncts:    27
-Disjuncts:    4
-
-NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  #Artifact: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  #App: ~(#Artifact)
-  #Atom: ~(#Artifact)
-  #Both: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  t1: (#struct){
-    body: (int){ 3 }
-    other: (#struct){
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -4,16 +4,8 @@
-     other: (#struct){
-     }
-   }
--  #App: (#struct){
--    body: (_){ _ }
--    other: (#struct){
--    }
--  }
--  #Atom: (#struct){
--    body: (_){ _ }
--    other: (#struct){
--    }
--  }
-+  #App: ~(#Artifact)
-+  #Atom: ~(#Artifact)
-   #Both: (#struct){
-     body: (_){ _ }
-     other: (#struct){
--- out/eval --
-(struct){
-  #Artifact: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  #App: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  #Atom: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  #Both: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  t1: (#struct){
-    body: (int){ 3 }
-    other: (#struct){
-    }
-  }
-}
+t1: #Both & {body: 3} @test(eq, {body: 3, other: {}})
 -- out/compile --
 --- in.cue
 {
@@ -112,3 +29,17 @@ diff old new
     body: 3
   })
 }
+-- out/eval/stats --
+Leaks:  6
+Freed:  15
+Reused: 5
+Allocs: 16
+Retain: 0
+
+Unifications: 15
+Conjuncts:    27
+Disjuncts:    4
+
+NumCloseIDs: 5
+-- out/diff-v2-v3.txt --
+Reordering

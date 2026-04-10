@@ -1,37 +1,43 @@
 #name: closing with comprehensions
 #evalPartial
 -- in.cue --
-#A: {f1: int, f2: int}
+#A: {f1: int, f2: int} @test(eq, {f1: int, f2: int}) @test(closed)
 
 for k, v in {f3: int} {
 	a: #A & {"\(k)": v}
 }
+@test(err, at=a.f3, code=eval, contains="field not allowed", pos=[-2:11])
 
 #B: {
 	for k, v in {f1: int} {
 		"\(k)": v
 	}
-}
+} @test(eq, { f1: int })
 
 #C: {
 	f1: _
 	for k, v in {f1: int} {
 		"\(k)": v
 	}
-}
+} @test(eq, { f1: int }) @test(closed) @test(allows=false, [string])
 
 #D: {
 	for k, v in {f1: int} {
 		"\(k)": v
 	}
 	...
-}
+} @test(eq, { f1: int }) @test(closed) @test(allows, [string])
 
 #E: #A & {
 	for k, v in {f3: int} {
 		"\(k)": v
 	}
-}
+} @test(err, at=f3, code=eval, contains="field not allowed", pos=[2:3])
+-- out/errors.txt --
+[eval] a.f3: field not allowed:
+    ./in.cue:4:11
+[eval] #E.f3: field not allowed:
+    ./in.cue:30:3
 -- out/compile --
 --- in.cue
 {
@@ -89,143 +95,5 @@ Conjuncts:    43
 Disjuncts:    0
 
 NumCloseIDs: 16
--- out/evalalpha --
-Errors:
-#E.f3: field not allowed:
-    ./in.cue:29:3
-a.f3: field not allowed:
-    ./in.cue:4:11
-
-Result:
-(_|_){
-  // [eval]
-  #A: (#struct){
-    f1: (int){ int }
-    f2: (int){ int }
-  }
-  a: (_|_){
-    // [eval]
-    f1: (int){ int }
-    f2: (int){ int }
-    f3: (_|_){
-      // [eval] a.f3: field not allowed:
-      //     ./in.cue:4:11
-    }
-  }
-  #B: (#struct){
-    f1: (int){ int }
-  }
-  #C: (#struct){
-    f1: (int){ int }
-  }
-  #D: (#struct){
-    f1: (int){ int }
-  }
-  #E: (_|_){
-    // [eval]
-    f1: (int){ int }
-    f2: (int){ int }
-    f3: (_|_){
-      // [eval] #E.f3: field not allowed:
-      //     ./in.cue:29:3
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,14 +1,7 @@
- Errors:
- #E.f3: field not allowed:
--    ./in.cue:1:5
--    ./in.cue:27:5
--    ./in.cue:27:10
--    ./in.cue:28:2
-     ./in.cue:29:3
- a.f3: field not allowed:
--    ./in.cue:1:5
--    ./in.cue:3:1
--    ./in.cue:4:5
-     ./in.cue:4:11
- 
- Result:
-@@ -24,9 +17,6 @@
-     f2: (int){ int }
-     f3: (_|_){
-       // [eval] a.f3: field not allowed:
--      //     ./in.cue:1:5
--      //     ./in.cue:3:1
--      //     ./in.cue:4:5
-       //     ./in.cue:4:11
-     }
-   }
-@@ -45,10 +35,6 @@
-     f2: (int){ int }
-     f3: (_|_){
-       // [eval] #E.f3: field not allowed:
--      //     ./in.cue:1:5
--      //     ./in.cue:27:5
--      //     ./in.cue:27:10
--      //     ./in.cue:28:2
-       //     ./in.cue:29:3
-     }
-   }
--- diff/todo/p2 --
-error positions
--- out/eval --
-Errors:
-#E.f3: field not allowed:
-    ./in.cue:1:5
-    ./in.cue:27:5
-    ./in.cue:27:10
-    ./in.cue:28:2
-    ./in.cue:29:3
-a.f3: field not allowed:
-    ./in.cue:1:5
-    ./in.cue:3:1
-    ./in.cue:4:5
-    ./in.cue:4:11
-
-Result:
-(_|_){
-  // [eval]
-  #A: (#struct){
-    f1: (int){ int }
-    f2: (int){ int }
-  }
-  a: (_|_){
-    // [eval]
-    f1: (int){ int }
-    f2: (int){ int }
-    f3: (_|_){
-      // [eval] a.f3: field not allowed:
-      //     ./in.cue:1:5
-      //     ./in.cue:3:1
-      //     ./in.cue:4:5
-      //     ./in.cue:4:11
-    }
-  }
-  #B: (#struct){
-    f1: (int){ int }
-  }
-  #C: (#struct){
-    f1: (int){ int }
-  }
-  #D: (#struct){
-    f1: (int){ int }
-  }
-  #E: (_|_){
-    // [eval]
-    f1: (int){ int }
-    f2: (int){ int }
-    f3: (_|_){
-      // [eval] #E.f3: field not allowed:
-      //     ./in.cue:1:5
-      //     ./in.cue:27:5
-      //     ./in.cue:27:10
-      //     ./in.cue:28:2
-      //     ./in.cue:29:3
-    }
-  }
-}
+-- out/diff-v2-v3.txt --
+Error positions: v3 reports fewer positions than v2 for the "field not allowed" errors (v2 includes definition site positions, v3 only reports the immediate error site).

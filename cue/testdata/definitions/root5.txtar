@@ -1,18 +1,64 @@
 -- in.cue --
 _schema // embed schema through indirections
-_schema: #Schema
-#Schema: a?: b?: string
+_schema: #Schema @test(shareID=topSchema)
+#Schema: {
+	@test(shareID=topSchema)
+	a?: b?: string
+}
 a: b: "foo"
 c: "foo"
 
 
 x: {
 	_schema // embed schema through indirections
-	_schema: #Schema
-	#Schema: a?: b?: string
+	_schema: #Schema @test(shareID=xSchema)
+	#Schema: {
+		@test(shareID=xSchema)
+		a?: b?: string
+	}
 	a: b: "foo"
 	c: "foo"
 }
+
+@test(eq, {
+	a: b: "foo"
+	_schema: a?: b?: string
+	#Schema: a?: b?: string
+	c: "foo"
+	x: {
+		a: b: "foo"
+		_schema: a?: b?: string
+		#Schema: a?: b?: string
+		c: "foo"
+	}
+})
+// TODO(inline): fix sharing detection across hidden fields.
+@test(debug, #"""
+	(#struct){
+	  _schema: ~(#Schema)
+	  #Schema: (#struct){
+	    a?: (#struct){
+	      b?: (string){ string }
+	    }
+	  }
+	  a: (#struct){
+	    b: (string){ "foo" }
+	  }
+	  c: (string){ "foo" }
+	  x: (#struct){
+	    _schema: ~(x.#Schema)
+	    #Schema: (#struct){
+	      a?: (#struct){
+	        b?: (string){ string }
+	      }
+	    }
+	    a: (#struct){
+	      b: (string){ "foo" }
+	    }
+	    c: (string){ "foo" }
+	  }
+	}
+	"""#)
 -- out/eval/stats --
 Leaks:  0
 Freed:  16
@@ -26,92 +72,6 @@ Disjuncts:    0
 Notifications: 4
 
 NumCloseIDs: 7
--- out/evalalpha --
-(#struct){
-  _schema: ~(#Schema)
-  #Schema: (#struct){
-    a?: (#struct){
-      b?: (string){ string }
-    }
-  }
-  a: (#struct){
-    b: (string){ "foo" }
-  }
-  c: (string){ "foo" }
-  x: (#struct){
-    _schema: ~(x.#Schema)
-    #Schema: (#struct){
-      a?: (#struct){
-        b?: (string){ string }
-      }
-    }
-    a: (#struct){
-      b: (string){ "foo" }
-    }
-    c: (string){ "foo" }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,5 @@
- (#struct){
--  _schema: (#struct){
--    a?: (#struct){
--      b?: (string){ string }
--    }
--  }
-+  _schema: ~(#Schema)
-   #Schema: (#struct){
-     a?: (#struct){
-       b?: (string){ string }
-@@ -14,11 +10,7 @@
-   }
-   c: (string){ "foo" }
-   x: (#struct){
--    _schema: (#struct){
--      a?: (#struct){
--        b?: (string){ string }
--      }
--    }
-+    _schema: ~(x.#Schema)
-     #Schema: (#struct){
-       a?: (#struct){
-         b?: (string){ string }
--- out/eval --
-(#struct){
-  _schema: (#struct){
-    a?: (#struct){
-      b?: (string){ string }
-    }
-  }
-  #Schema: (#struct){
-    a?: (#struct){
-      b?: (string){ string }
-    }
-  }
-  a: (#struct){
-    b: (string){ "foo" }
-  }
-  c: (string){ "foo" }
-  x: (#struct){
-    _schema: (#struct){
-      a?: (#struct){
-        b?: (string){ string }
-      }
-    }
-    #Schema: (#struct){
-      a?: (#struct){
-        b?: (string){ string }
-      }
-    }
-    a: (#struct){
-      b: (string){ "foo" }
-    }
-    c: (string){ "foo" }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -138,5 +98,33 @@ diff old new
       b: "foo"
     }
     c: "foo"
+  }
+}
+-- out/diff-v2-v3.txt --
+Reordering
+Verdict: cosmetic -- Field reordering only. No semantic change.
+-- out/evalalpha --
+(#struct){
+  _schema: ~(#Schema)
+  #Schema: (#struct){
+    a?: (#struct){
+      b?: (string){ string }
+    }
+  }
+  a: (#struct){
+    b: (string){ "foo" }
+  }
+  c: (string){ "foo" }
+  x: (#struct){
+    _schema: ~(x.#Schema)
+    #Schema: (#struct){
+      a?: (#struct){
+        b?: (string){ string }
+      }
+    }
+    a: (#struct){
+      b: (string){ "foo" }
+    }
+    c: (string){ "foo" }
   }
 }

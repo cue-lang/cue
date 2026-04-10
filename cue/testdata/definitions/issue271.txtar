@@ -1,3 +1,4 @@
+
 # Tests that a struct combining an open pattern constraint with close() correctly
 # rejects fields not allowed by the close() constraint when unified with a value.
 # https://cuelang.org/issue/271
@@ -6,93 +7,23 @@
 #T: close({"a": string})
 x:  #T
 x: {
-	a: "hello"
-	b: "foo"
+	a: "hello" @test(eq, "hello")
+	b: "foo"   @test(err, code=eval, contains="field not allowed", pos=[-5:5, 0:2])
 }
+-- out/errors.txt --
+[eval] x.b: field not allowed:
+    ./in.cue:1:5
+    ./in.cue:6:2
 -- out/eval/stats --
 Leaks:  0
 Freed:  14
 Reused: 5
 Allocs: 9
 Retain: 0
-
 Unifications: 10
 Conjuncts:    20
 Disjuncts:    0
-
 NumCloseIDs: 3
--- out/evalalpha --
-Errors:
-x.b: field not allowed:
-    ./in.cue:1:5
-    ./in.cue:6:2
-
-Result:
-(_|_){
-  // [eval]
-  #T: (#struct){
-    a: (string){ string }
-  }
-  x: (_|_){
-    // [eval]
-    a: (string){ "hello" }
-    b: (_|_){
-      // [eval] x.b: field not allowed:
-      //     ./in.cue:1:5
-      //     ./in.cue:6:2
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,6 @@
- Errors:
- x.b: field not allowed:
-     ./in.cue:1:5
--    ./in.cue:2:11
--    ./in.cue:3:5
-     ./in.cue:6:2
- 
- Result:
-@@ -17,8 +15,6 @@
-     b: (_|_){
-       // [eval] x.b: field not allowed:
-       //     ./in.cue:1:5
--      //     ./in.cue:2:11
--      //     ./in.cue:3:5
-       //     ./in.cue:6:2
-     }
-   }
--- diff/todo/p2 --
-Positions.
--- out/eval --
-Errors:
-x.b: field not allowed:
-    ./in.cue:1:5
-    ./in.cue:2:11
-    ./in.cue:3:5
-    ./in.cue:6:2
-
-Result:
-(_|_){
-  // [eval]
-  #T: (#struct){
-    a: (string){ string }
-  }
-  x: (_|_){
-    // [eval]
-    a: (string){ "hello" }
-    b: (_|_){
-      // [eval] x.b: field not allowed:
-      //     ./in.cue:1:5
-      //     ./in.cue:2:11
-      //     ./in.cue:3:5
-      //     ./in.cue:6:2
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -108,3 +39,12 @@ Result:
     b: "foo"
   }
 }
+-- out/diff-v2-v3.txt --
+Positions: v3 reports fewer positions than v2 for the "field not allowed" error.
+x.b: field not allowed:
+     ./in.cue:1:5
+-    ./in.cue:2:11
+-    ./in.cue:3:5
+     ./in.cue:6:2
+ 
+No newline at end of right file.

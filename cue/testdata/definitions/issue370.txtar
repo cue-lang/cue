@@ -15,81 +15,12 @@ package x
 
 c1: #C1 & {
 	name: "cueckoo"
-}
+} @test(eq, {name: "cueckoo"})
 
 c2: #C2 & {
 	c1
 	age: 5
-}
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 4
-Allocs: 7
-Retain: 0
-
-Unifications: 11
-Conjuncts:    25
-Disjuncts:    0
-
-NumCloseIDs: 12
--- out/evalalpha --
-(struct){
-  #C1: (#struct){
-    name: (string){ string }
-  }
-  #C2: (#struct){
-    age: (int){ int }
-    name: (string){ string }
-  }
-  c1: (#struct){
-    name: (string){ "cueckoo" }
-  }
-  c2: (#struct){
-    age: (int){ 5 }
-    name: (string){ "cueckoo" }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -3,14 +3,14 @@
-     name: (string){ string }
-   }
-   #C2: (#struct){
--    name: (string){ string }
-     age: (int){ int }
-+    name: (string){ string }
-   }
-   c1: (#struct){
-     name: (string){ "cueckoo" }
-   }
-   c2: (#struct){
--    name: (string){ "cueckoo" }
-     age: (int){ 5 }
-+    name: (string){ "cueckoo" }
-   }
- }
--- diff/explanation --
-Reordering
--- out/eval --
-(struct){
-  #C1: (#struct){
-    name: (string){ string }
-  }
-  #C2: (#struct){
-    name: (string){ string }
-    age: (int){ int }
-  }
-  c1: (#struct){
-    name: (string){ "cueckoo" }
-  }
-  c2: (#struct){
-    name: (string){ "cueckoo" }
-    age: (int){ 5 }
-  }
-}
+} @test(eq, {age: 5, name: "cueckoo"})
 -- out/compile --
 --- x.cue
 {
@@ -108,3 +39,17 @@ Reordering
     age: 5
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 4
+Allocs: 7
+Retain: 0
+
+Unifications: 11
+Conjuncts:    25
+Disjuncts:    0
+
+NumCloseIDs: 12
+-- out/diff-v2-v3.txt --
+Reordering

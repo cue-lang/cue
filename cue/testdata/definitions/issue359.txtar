@@ -10,7 +10,7 @@
 // Second struct is not considered closed, as expected
 good: #simple & {
 	peso: 4
-}
+} @test(eq, {peso: 4, edad: *2 | int})
 
 #complex: {
 	things: [string]: #simple
@@ -20,98 +20,67 @@ good: #simple & {
 #many: #complex & {
 	things: hola: peso: 2
 	things: sol: peso:  3
-}
+} @test(eq, {
+	things: {
+		hola: {
+			peso: 2
+			edad: *2 | int
+		}
+		sol: {
+			peso: 3
+			edad: *2 | int
+		}
+	}
+})
 
 // Inner struct in second struct IS considered closed: why?
 bad: #many & {
 	things: hola: peso: 2
-}
+} @test(eq, {
+	things: {
+		hola: {
+			peso: 2
+			edad: *2 | int
+		}
+		sol: {
+			peso: 3
+			edad: *2 | int
+		}
+	}
+})
 
 // non-definition equivalent
 many: #complex & {
 	things: hola: peso: 2
 	things: sol: peso:  3
-}
+} @test(eq, {
+	things: {
+		hola: {
+			peso: 2
+			edad: *2 | int
+		}
+		sol: {
+			peso: 3
+			edad: *2 | int
+		}
+	}
+})
 
 // Now inner struct on second struct is NOT considered closed
 notbad: many & {
 	things: hola: peso: 2
-}
--- out/eval/stats --
-Leaks:  9
-Freed:  72
-Reused: 57
-Allocs: 24
-Retain: 0
-
-Unifications: 41
-Conjuncts:    134
-Disjuncts:    40
-
-NumCloseIDs: 15
--- out/evalalpha --
-(struct){
-  #simple: (#struct){
-    peso: (int){ |(*(int){ 1 }, (int){ int }) }
-    edad: (int){ |(*(int){ 2 }, (int){ int }) }
-  }
-  good: (#struct){
-    peso: (int){ 4 }
-    edad: (int){ |(*(int){ 2 }, (int){ int }) }
-  }
-  #complex: (#struct){
-    things: (#struct){
-    }
-  }
-  #many: (#struct){
-    things: (#struct){
-      hola: (#struct){
-        peso: (int){ 2 }
-        edad: (int){ |(*(int){ 2 }, (int){ int }) }
-      }
-      sol: (#struct){
-        peso: (int){ 3 }
-        edad: (int){ |(*(int){ 2 }, (int){ int }) }
-      }
-    }
-  }
-  bad: (#struct){
-    things: (#struct){
-      hola: (#struct){
-        peso: (int){ 2 }
-        edad: (int){ |(*(int){ 2 }, (int){ int }) }
-      }
-      sol: (#struct){
-        peso: (int){ 3 }
-        edad: (int){ |(*(int){ 2 }, (int){ int }) }
-      }
-    }
-  }
-  many: (#struct){
-    things: (#struct){
-      hola: (#struct){
-        peso: (int){ 2 }
-        edad: (int){ |(*(int){ 2 }, (int){ int }) }
-      }
-      sol: (#struct){
-        peso: (int){ 3 }
-        edad: (int){ |(*(int){ 2 }, (int){ int }) }
-      }
-    }
-  }
-  notbad: (#struct){
-    things: (#struct){
-      hola: (#struct){
-        peso: (int){ 2 }
-        edad: (int){ |(*(int){ 2 }, (int){ int }) }
-      }
-      sol: (#struct){
-        peso: (int){ 3 }
-        edad: (int){ |(*(int){ 2 }, (int){ int }) }
-      }
-    }
-  }
-}
+} @test(eq, {
+	things: {
+		hola: {
+			peso: 2
+			edad: *2 | int
+		}
+		sol: {
+			peso: 3
+			edad: *2 | int
+		}
+	}
+})
 -- out/compile --
 --- in.cue
 {
@@ -166,3 +135,15 @@ NumCloseIDs: 15
     }
   })
 }
+-- out/eval/stats --
+Leaks:  9
+Freed:  72
+Reused: 57
+Allocs: 24
+Retain: 0
+
+Unifications: 41
+Conjuncts:    134
+Disjuncts:    40
+
+NumCloseIDs: 15

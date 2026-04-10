@@ -9,9 +9,25 @@ X: {
 	_a: _ | close({y!: z?: _})
 	_b: _a & {y: {}}
 	concrete: _b.y
-	isTrue: concrete != _|_
+	isTrue: concrete != _|_ @test(eq, true)
 }
 {X}
+
+@test(eq, {
+	X: {
+		_a: {foo: true}
+		_b: {y: {}, foo: true}
+		concrete: {}
+		isTrue: true
+	}
+	_a: {foo: true}
+	_b: {y: {}, foo: true}
+	concrete: {}
+	isTrue: true
+
+	sub: _ @test(ignore)
+	full: _ @test(ignore)
+})
 
 sub: t1: {
 	X: {
@@ -21,33 +37,91 @@ sub: t1: {
 		concrete: _b.y
 	}
 	{X}
+
+	@test(eq, {
+		X: {
+			_a: {foo: true}
+			_b: {y: {}, foo: true}
+			concrete: {}
+		}
+		_a: {foo: true}
+		_b: {y: {}, foo: true}
+		concrete: {}
+	})
 }
 sub: t2: {
 	X: {
 		_a: foo: true
 		_a: _ | close({y!: z?: _})
 		_b: _a & {y: {}}
-		concrete: _b.y
+		concrete: _b.y @test(eq, {})
 	}
 	X
+
+	@test(eq, {
+		X: {
+			_a: {foo: true}
+			_b: {y: {}, foo: true}
+			concrete: {}
+		}
+		_a: {foo: true}
+		_b: {y: {}, foo: true}
+		concrete: {}
+	})
 }
 sub: t3: {
 	#X: {
 		_a: foo: true
 		_a: _ | close({y!: z?: _})
 		_b: _a & {y: {}}
-		concrete: _b.y
+		concrete: _b.y @test(eq, {})
 	}
 	{#X}
+
+	@test(eq, {
+		#X: {
+			_a: {foo: true}
+			_b: {y: {}, foo: true}
+			concrete: {}
+		}
+		_a: {foo: true}
+		_b: {y: {}, foo: true}
+		concrete: {}
+	})
 }
 sub: t4: {
 	#X: {
 		_a: foo: true
 		_a: _ | close({y!: z?: _})
 		_b: _a & {y: {}}
-		concrete: _b.y
+		concrete: _b.y @test(eq, {})
+		@test(debug, #"""
+			(#struct){
+			  _a: (#struct){
+			    foo: (bool){ true }
+			  }
+			  _b: (#struct){
+			    y: (#struct){
+			    }
+			    foo: (bool){ true }
+			  }
+			  concrete: (#struct){
+			  }
+			}
+			"""#)
 	}
 	#X
+
+	@test(eq, {
+		#X: {
+			_a: {foo: true}
+			_b: {y: {}, foo: true}
+			concrete: {}
+		}
+		_a: {foo: true}
+		_b: {y: {}, foo: true}
+		concrete: {}
+	})
 }
 
 full: {
@@ -57,11 +131,23 @@ full: {
 
 		_dataWithExtra: _data & {Extra: {}}
 
-		out: _dataWithExtra.Extra != _|_
+		out: _dataWithExtra.Extra != _|_ @test(eq, true)
 	}
 
 	{#Foo}
+
+	@test(eq, {
+		#Foo: {
+			_data: {Foo: true}
+			_dataWithExtra: {Extra: {}, Foo: true}
+			out: true
+		}
+		_data: {Foo: true}
+		_dataWithExtra: {Extra: {}, Foo: true}
+		out: true
+	})
 }
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  60
 Freed:  279
@@ -75,505 +161,9 @@ Disjuncts:    48
 Notifications: 6
 
 NumCloseIDs: 69
--- out/evalalpha --
-(struct){
-  X: (struct){
-    _a: (struct){
-      foo: (bool){ true }
-    }
-    _b: (struct){
-      y: (struct){
-      }
-      foo: (bool){ true }
-    }
-    concrete: (struct){
-    }
-    isTrue: (bool){ true }
-  }
-  sub: (struct){
-    t1: (struct){
-      X: (struct){
-        _a: (struct){
-          foo: (bool){ true }
-        }
-        _b: (struct){
-          y: (struct){
-          }
-          foo: (bool){ true }
-        }
-        concrete: (struct){
-        }
-      }
-      _a: (struct){
-        foo: (bool){ true }
-      }
-      _b: (struct){
-        y: (struct){
-        }
-        foo: (bool){ true }
-      }
-      concrete: (struct){
-      }
-    }
-    t2: (struct){
-      X: (struct){
-        _a: (struct){
-          foo: (bool){ true }
-        }
-        _b: (struct){
-          y: (struct){
-          }
-          foo: (bool){ true }
-        }
-        concrete: (struct){
-        }
-      }
-      _a: (struct){
-        foo: (bool){ true }
-      }
-      _b: (struct){
-        y: (struct){
-        }
-        foo: (bool){ true }
-      }
-      concrete: (struct){
-      }
-    }
-    t3: (#struct){
-      #X: (#struct){
-        _a: (#struct){
-          foo: (bool){ true }
-        }
-        _b: (#struct){
-          y: (#struct){
-          }
-          foo: (bool){ true }
-        }
-        concrete: (#struct){
-        }
-      }
-      _a: (#struct){
-        foo: (bool){ true }
-      }
-      _b: (#struct){
-        y: (#struct){
-        }
-        foo: (bool){ true }
-      }
-      concrete: (#struct){
-      }
-    }
-    t4: (#struct){
-      #X: (#struct){
-        _a: (#struct){
-          foo: (bool){ true }
-        }
-        _b: (#struct){
-          y: (#struct){
-          }
-          foo: (bool){ true }
-        }
-        concrete: (#struct){
-        }
-      }
-      _a: (#struct){
-        foo: (bool){ true }
-      }
-      _b: (#struct){
-        y: (#struct){
-        }
-        foo: (bool){ true }
-      }
-      concrete: (#struct){
-      }
-    }
-  }
-  full: (#struct){
-    #Foo: (#struct){
-      _data: (#struct){
-        Foo: (bool){ true }
-      }
-      _dataWithExtra: (#struct){
-        Extra: (#struct){
-        }
-        Foo: (bool){ true }
-      }
-      out: (bool){ true }
-    }
-    _data: (#struct){
-      Foo: (bool){ true }
-    }
-    _dataWithExtra: (#struct){
-      Extra: (#struct){
-      }
-      Foo: (bool){ true }
-    }
-    out: (bool){ true }
-  }
-  _a: (struct){
-    foo: (bool){ true }
-  }
-  _b: (struct){
-    y: (struct){
-    }
-    foo: (bool){ true }
-  }
-  concrete: (struct){
-  }
-  isTrue: (bool){ true }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -4,25 +4,14 @@
-       foo: (bool){ true }
-     }
-     _b: (struct){
--      foo: (bool){ true }
-       y: (struct){
-       }
-+      foo: (bool){ true }
-     }
-     concrete: (struct){
-     }
-     isTrue: (bool){ true }
-   }
--  _a: (struct){
--    foo: (bool){ true }
--  }
--  _b: (struct){
--    foo: (bool){ true }
--    y: (struct){
--    }
--  }
--  concrete: (struct){
--  }
--  isTrue: (bool){ true }
-   sub: (struct){
-     t1: (struct){
-       X: (struct){
-@@ -30,20 +19,20 @@
-           foo: (bool){ true }
-         }
-         _b: (struct){
--          foo: (bool){ true }
--          y: (struct){
--          }
--        }
--        concrete: (struct){
--        }
--      }
--      _a: (struct){
--        foo: (bool){ true }
--      }
--      _b: (struct){
--        foo: (bool){ true }
--        y: (struct){
--        }
-+          y: (struct){
-+          }
-+          foo: (bool){ true }
-+        }
-+        concrete: (struct){
-+        }
-+      }
-+      _a: (struct){
-+        foo: (bool){ true }
-+      }
-+      _b: (struct){
-+        y: (struct){
-+        }
-+        foo: (bool){ true }
-       }
-       concrete: (struct){
-       }
-@@ -54,20 +43,20 @@
-           foo: (bool){ true }
-         }
-         _b: (struct){
--          foo: (bool){ true }
--          y: (struct){
--          }
--        }
--        concrete: (struct){
--        }
--      }
--      _a: (struct){
--        foo: (bool){ true }
--      }
--      _b: (struct){
--        foo: (bool){ true }
--        y: (struct){
--        }
-+          y: (struct){
-+          }
-+          foo: (bool){ true }
-+        }
-+        concrete: (struct){
-+        }
-+      }
-+      _a: (struct){
-+        foo: (bool){ true }
-+      }
-+      _b: (struct){
-+        y: (struct){
-+        }
-+        foo: (bool){ true }
-       }
-       concrete: (struct){
-       }
-@@ -78,20 +67,20 @@
-           foo: (bool){ true }
-         }
-         _b: (#struct){
--          foo: (bool){ true }
--          y: (#struct){
--          }
--        }
--        concrete: (#struct){
--        }
--      }
--      _a: (#struct){
--        foo: (bool){ true }
--      }
--      _b: (#struct){
--        foo: (bool){ true }
--        y: (#struct){
--        }
-+          y: (#struct){
-+          }
-+          foo: (bool){ true }
-+        }
-+        concrete: (#struct){
-+        }
-+      }
-+      _a: (#struct){
-+        foo: (bool){ true }
-+      }
-+      _b: (#struct){
-+        y: (#struct){
-+        }
-+        foo: (bool){ true }
-       }
-       concrete: (#struct){
-       }
-@@ -102,20 +91,20 @@
-           foo: (bool){ true }
-         }
-         _b: (#struct){
--          foo: (bool){ true }
--          y: (#struct){
--          }
--        }
--        concrete: (#struct){
--        }
--      }
--      _a: (#struct){
--        foo: (bool){ true }
--      }
--      _b: (#struct){
--        foo: (bool){ true }
--        y: (#struct){
--        }
-+          y: (#struct){
-+          }
-+          foo: (bool){ true }
-+        }
-+        concrete: (#struct){
-+        }
-+      }
-+      _a: (#struct){
-+        foo: (bool){ true }
-+      }
-+      _b: (#struct){
-+        y: (#struct){
-+        }
-+        foo: (bool){ true }
-       }
-       concrete: (#struct){
-       }
-@@ -127,9 +116,9 @@
-         Foo: (bool){ true }
-       }
-       _dataWithExtra: (#struct){
--        Foo: (bool){ true }
-         Extra: (#struct){
-         }
-+        Foo: (bool){ true }
-       }
-       out: (bool){ true }
-     }
-@@ -137,10 +126,21 @@
-       Foo: (bool){ true }
-     }
-     _dataWithExtra: (#struct){
--      Foo: (bool){ true }
-       Extra: (#struct){
-       }
-+      Foo: (bool){ true }
-     }
-     out: (bool){ true }
-   }
-+  _a: (struct){
-+    foo: (bool){ true }
-+  }
-+  _b: (struct){
-+    y: (struct){
-+    }
-+    foo: (bool){ true }
-+  }
-+  concrete: (struct){
-+  }
-+  isTrue: (bool){ true }
- }
--- out/eval --
-(struct){
-  X: (struct){
-    _a: (struct){
-      foo: (bool){ true }
-    }
-    _b: (struct){
-      foo: (bool){ true }
-      y: (struct){
-      }
-    }
-    concrete: (struct){
-    }
-    isTrue: (bool){ true }
-  }
-  _a: (struct){
-    foo: (bool){ true }
-  }
-  _b: (struct){
-    foo: (bool){ true }
-    y: (struct){
-    }
-  }
-  concrete: (struct){
-  }
-  isTrue: (bool){ true }
-  sub: (struct){
-    t1: (struct){
-      X: (struct){
-        _a: (struct){
-          foo: (bool){ true }
-        }
-        _b: (struct){
-          foo: (bool){ true }
-          y: (struct){
-          }
-        }
-        concrete: (struct){
-        }
-      }
-      _a: (struct){
-        foo: (bool){ true }
-      }
-      _b: (struct){
-        foo: (bool){ true }
-        y: (struct){
-        }
-      }
-      concrete: (struct){
-      }
-    }
-    t2: (struct){
-      X: (struct){
-        _a: (struct){
-          foo: (bool){ true }
-        }
-        _b: (struct){
-          foo: (bool){ true }
-          y: (struct){
-          }
-        }
-        concrete: (struct){
-        }
-      }
-      _a: (struct){
-        foo: (bool){ true }
-      }
-      _b: (struct){
-        foo: (bool){ true }
-        y: (struct){
-        }
-      }
-      concrete: (struct){
-      }
-    }
-    t3: (#struct){
-      #X: (#struct){
-        _a: (#struct){
-          foo: (bool){ true }
-        }
-        _b: (#struct){
-          foo: (bool){ true }
-          y: (#struct){
-          }
-        }
-        concrete: (#struct){
-        }
-      }
-      _a: (#struct){
-        foo: (bool){ true }
-      }
-      _b: (#struct){
-        foo: (bool){ true }
-        y: (#struct){
-        }
-      }
-      concrete: (#struct){
-      }
-    }
-    t4: (#struct){
-      #X: (#struct){
-        _a: (#struct){
-          foo: (bool){ true }
-        }
-        _b: (#struct){
-          foo: (bool){ true }
-          y: (#struct){
-          }
-        }
-        concrete: (#struct){
-        }
-      }
-      _a: (#struct){
-        foo: (bool){ true }
-      }
-      _b: (#struct){
-        foo: (bool){ true }
-        y: (#struct){
-        }
-      }
-      concrete: (#struct){
-      }
-    }
-  }
-  full: (#struct){
-    #Foo: (#struct){
-      _data: (#struct){
-        Foo: (bool){ true }
-      }
-      _dataWithExtra: (#struct){
-        Foo: (bool){ true }
-        Extra: (#struct){
-        }
-      }
-      out: (bool){ true }
-    }
-    _data: (#struct){
-      Foo: (bool){ true }
-    }
-    _dataWithExtra: (#struct){
-      Foo: (bool){ true }
-      Extra: (#struct){
-      }
-    }
-    out: (bool){ true }
-  }
-}
+-- out/diff-v2-v3.txt --
+Disjunction handling: _a: _ | close({y!: z?: _}) uses disjunction; needs @test(final) for precise testing.
+Verdict: cosmetic -- Disjunction with @test(final) annotation artifact. No semantic change.
 -- out/compile --
 --- in.cue
 {

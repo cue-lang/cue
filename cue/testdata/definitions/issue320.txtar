@@ -1,3 +1,4 @@
+
 # Tests that "field not allowed" errors in closed structs include sufficient
 # diagnostic information about the source of the restriction.
 # https://cuelang.org/issue/320
@@ -12,98 +13,23 @@
 foo: #Foo & {
 	x: "hello"
 	y: "goodbye"
-}
+} @test(err, at=y, code=eval,
+	hint="could use more positions, like in v2",
+	contains="field not allowed",
+	pos=[in.cue:10:2])
+-- out/errors.txt --
+[eval] foo.y: field not allowed:
+    ./in.cue:10:2
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
 Reused: 1
 Allocs: 6
 Retain: 0
-
 Unifications: 7
 Conjuncts:    14
 Disjuncts:    0
-
 NumCloseIDs: 7
--- out/evalalpha --
-Errors:
-foo.y: field not allowed:
-    ./in.cue:10:2
-
-Result:
-(_|_){
-  // [eval]
-  #Foo: (#struct){
-    x: (string){ string }
-  }
-  #More: (#struct){
-  }
-  foo: (_|_){
-    // [eval]
-    x: (string){ "hello" }
-    y: (_|_){
-      // [eval] foo.y: field not allowed:
-      //     ./in.cue:10:2
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,5 @@
- Errors:
- foo.y: field not allowed:
--    ./in.cue:1:7
--    ./in.cue:3:2
--    ./in.cue:6:8
--    ./in.cue:8:6
-     ./in.cue:10:2
- 
- Result:
-@@ -19,10 +15,6 @@
-     x: (string){ "hello" }
-     y: (_|_){
-       // [eval] foo.y: field not allowed:
--      //     ./in.cue:1:7
--      //     ./in.cue:3:2
--      //     ./in.cue:6:8
--      //     ./in.cue:8:6
-       //     ./in.cue:10:2
-     }
-   }
--- diff/todo/p2 --
-Positions.
--- out/eval --
-Errors:
-foo.y: field not allowed:
-    ./in.cue:1:7
-    ./in.cue:3:2
-    ./in.cue:6:8
-    ./in.cue:8:6
-    ./in.cue:10:2
-
-Result:
-(_|_){
-  // [eval]
-  #Foo: (#struct){
-    x: (string){ string }
-  }
-  #More: (#struct){
-  }
-  foo: (_|_){
-    // [eval]
-    x: (string){ "hello" }
-    y: (_|_){
-      // [eval] foo.y: field not allowed:
-      //     ./in.cue:1:7
-      //     ./in.cue:3:2
-      //     ./in.cue:6:8
-      //     ./in.cue:8:6
-      //     ./in.cue:10:2
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -119,3 +45,12 @@ Result:
     y: "goodbye"
   })
 }
+-- out/diff-v2-v3.txt --
+Positions: v3 reports fewer positions than v2 for the "field not allowed" error.
+Verdict: worsening -- v3 reports fewer error positions than v2.
+foo.y: field not allowed:
+-    ./in.cue:1:7
+-    ./in.cue:3:2
+-    ./in.cue:6:8
+-    ./in.cue:8:6
+     ./in.cue:10:2

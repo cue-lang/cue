@@ -8,68 +8,9 @@
 	f: j: {
 		n: "hi"
 	}
-}
+} @test(shareID=lN) @test(eq, {f: {j: {n: "hi"}}})
 
-l: #N
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 0
-Allocs: 7
-Retain: 0
-
-Unifications: 7
-Conjuncts:    9
-Disjuncts:    0
-
-NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  #A: (_){ _ }
-  #N: (#struct){
-    f: (#struct){
-      j: (#struct){
-        n: (string){ "hi" }
-      }
-    }
-  }
-  l: ~(#N)
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -7,11 +7,5 @@
-       }
-     }
-   }
--  l: (#struct){
--    f: (#struct){
--      j: (#struct){
--        n: (string){ "hi" }
--      }
--    }
--  }
-+  l: ~(#N)
- }
--- out/eval --
-(struct){
-  #A: (_){ _ }
-  #N: (#struct){
-    f: (#struct){
-      j: (#struct){
-        n: (string){ "hi" }
-      }
-    }
-  }
-  l: (#struct){
-    f: (#struct){
-      j: (#struct){
-        n: (string){ "hi" }
-      }
-    }
-  }
-}
+l: #N @test(shareID=lN)
 -- out/compile --
 --- in.cue
 {
@@ -83,3 +24,17 @@ diff old new
   })
   l: 〈0;#N〉
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  7
+Reused: 0
+Allocs: 7
+Retain: 0
+
+Unifications: 7
+Conjuncts:    9
+Disjuncts:    0
+
+NumCloseIDs: 1
+-- out/diff-v2-v3.txt --
+Reordering

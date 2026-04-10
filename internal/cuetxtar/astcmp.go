@@ -218,7 +218,7 @@ func checkStructuralMatch(path cue.Path, expr ast.Expr, val cue.Value) error {
 		return nil
 	}
 	tv := val.Core()
-	switch tv.V.BaseValue.(type) {
+	switch tv.V.DerefValue().BaseValue.(type) {
 	case *adt.Disjunction:
 		if !isASTDisjunction(expr) {
 			return pathErr(path, "value is a disjunction but expected expression is not; "+
@@ -765,8 +765,9 @@ func (c *cmpCtx) cmpDisjunction(path cue.Path, expr ast.Expr, val cue.Value) err
 	astDs := flattenDisjunction(expr)
 
 	// Get disjuncts from the value via Expr().
+	// Use DerefValue() to follow sharing/forwarding pointers to the actual vertex.
 	tv := val.Core()
-	dj, ok := tv.V.BaseValue.(*adt.Disjunction)
+	dj, ok := tv.V.DerefValue().BaseValue.(*adt.Disjunction)
 	if !ok {
 		return pathErr(path, "value is a disjunction but expected expression is not; "+
 			"use a disjunction in the expected value or @test(final) on the field")

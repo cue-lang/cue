@@ -1,7 +1,6 @@
 # Tests that a definition used as a list element type correctly propagates default
 # values and does not incorrectly reject fields like Pattern when unified.
 # https://cuelang.org/issue/491
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 package x
 
@@ -25,11 +24,11 @@ package x
 x: [...#Repo]
 x: [{
 	Var: "REPO1"
-}]
+}]  @test(eq, [{Var: "REPO1", Pattern: *"*" | string}])
 
 y: #Repo & {
 	Var: "REPO1"
-}
+} @test(eq, {Var: "REPO1", Pattern: *"*" | string})
 
 z: #PrestepNewUser & {
 	Args: {
@@ -37,59 +36,7 @@ z: #PrestepNewUser & {
 			Var: "REPO1"
 		}]
 	}
-}
--- out/eval/stats --
-Leaks:  9
-Freed:  33
-Reused: 23
-Allocs: 19
-Retain: 0
-
-Unifications: 24
-Conjuncts:    60
-Disjuncts:    14
-
-NumCloseIDs: 8
--- out/evalalpha --
-(struct){
-  #Prestep: (#struct){
-    Args: (_){ |(*(null){ null }, (_){ _ }) }
-  }
-  #PrestepNewUser: (#struct){
-    Args: (#struct){
-      Repos: (list){
-      }
-    }
-  }
-  #NewUser: (#struct){
-    Repos: (list){
-    }
-  }
-  #Repo: (#struct){
-    Var: (string){ string }
-    Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
-  }
-  x: (#list){
-    0: (#struct){
-      Var: (string){ "REPO1" }
-      Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
-    }
-  }
-  y: (#struct){
-    Var: (string){ "REPO1" }
-    Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
-  }
-  z: (#struct){
-    Args: (#struct){
-      Repos: (#list){
-        0: (#struct){
-          Var: (string){ "REPO1" }
-          Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
-        }
-      }
-    }
-  }
-}
+} @test(eq, {Args: {Repos: [{Var: "REPO1", Pattern: *"*" | string}]}})
 -- out/compile --
 --- in.cue
 {
@@ -129,3 +76,15 @@ NumCloseIDs: 8
     }
   })
 }
+-- out/eval/stats --
+Leaks:  9
+Freed:  33
+Reused: 23
+Allocs: 19
+Retain: 0
+
+Unifications: 24
+Conjuncts:    60
+Disjuncts:    14
+
+NumCloseIDs: 8

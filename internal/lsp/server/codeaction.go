@@ -94,6 +94,23 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 		codeActions = append(codeActions, action)
 	}
 
+	organizeImportsEdit, err := s.workspace.CodeActionOrganizeImports(ctx, params, delayEdit)
+	if err != nil {
+		return nil, err
+	}
+	if organizeImportsEdit != nil {
+		action := protocol.CodeAction{
+			Title: "Organize Imports",
+			Kind:  protocol.SourceOrganizeImports,
+		}
+		if delayEdit {
+			action.Data = &raw
+		} else {
+			action.Edit = organizeImportsEdit
+		}
+		codeActions = append(codeActions, action)
+	}
+
 	return codeActions, nil
 }
 
@@ -122,6 +139,14 @@ func (s *server) ResolveCodeAction(ctx context.Context, action *protocol.CodeAct
 			return nil, err
 		}
 		action.Edit = convertFromStructEdit
+		return action, nil
+
+	case protocol.SourceOrganizeImports:
+		organizeImportsEdit, err := s.workspace.CodeActionOrganizeImports(ctx, &params, false)
+		if err != nil {
+			return nil, err
+		}
+		action.Edit = organizeImportsEdit
 		return action, nil
 
 	default:

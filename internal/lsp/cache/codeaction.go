@@ -16,6 +16,7 @@ package cache
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"slices"
 	"strings"
@@ -290,4 +291,80 @@ func extractLineEnding(content []byte, lineStartOffsets []int) string {
 		}
 	}
 	return "\n"
+}
+
+// CodeActionOrganizeImports calculates the edits needed to organise
+// imports.
+//
+// Currently that only goes as far as:
+// 1. Removing unused imports;
+// 2. Sorting imports lexicographically.
+func (w *Workspace) CodeActionOrganizeImports(ctx context.Context, params *protocol.CodeActionParams, delayEdit bool) (*protocol.WorkspaceEdit, error) {
+	fileUri := params.TextDocument.URI
+	f, fe, mapper, err := w.FileEvaluatorForURI(fileUri, LoadAll)
+	if f == nil || fe == nil || mapper == nil || err != nil {
+		return nil, err
+	}
+
+	if delayEdit {
+		return &protocol.WorkspaceEdit{}, nil
+	}
+
+	content := f.tokFile.Content()
+	start := 0
+	var organisedContent strings.Builder
+
+	for decl := range f.syntax.ImportDecls() {
+		organisedContent.Write(content[start:decl.Pos().Offset()])
+		start = decl.End().Offset()
+
+		var survivors []*ast.ImportSpec
+		for _, spec := range decl.Specs {
+			pos := spec.Path.Pos()
+			if spec.Name != nil {
+				pos = spec.Name.Pos()
+			}
+			usages := fe.UsagesForOffset(pos.Offset(), false)
+			if len(usages) > 0 {
+				survivors = append(survivors, spec)
+			}
+		}
+
+		if l := len(survivors); l > 0 {
+			plural := l > 1
+			if plural {
+				slices.SortFunc(survivors, func(a, b *ast.ImportSpec) int {
+					return cmp.Compare(a.Path.Value, b.Path.Value)
+				})
+			}
+
+			organisedContent.WriteString("import ")
+			if plural {
+				organisedContent.WriteString("(\n")
+			}
+			for _, spec := range survivors {
+				if plural {
+					organisedContent.WriteString("\t")
+				}
+				organisedContent.Write(content[spec.Pos().Offset():spec.End().Offset()])
+				if plural {
+					organisedContent.WriteString("\n")
+				}
+			}
+			if plural {
+				organisedContent.WriteString(")")
+			}
+		}
+	}
+
+	organisedContent.Write(content[start:])
+
+	diffEdits := diff.Strings(string(content), organisedContent.String())
+	edits, err := protocol.EditsFromDiffEdits(f.mapper, diffEdits)
+	if err != nil {
+		return nil, nil
+	}
+
+	docChanges := protocol.TextEditsToDocumentChanges(params.TextDocument.URI, f.tokFile.Revision(), edits)
+	return &protocol.WorkspaceEdit{DocumentChanges: docChanges}, nil
 }

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "87d14ace_2b573416",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1442,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T09:57:19Z",
+      "side": 1,
+      "message": "It doesn\u0027t do so within attributes. I don\u0027t really have a better idea that is not more complicated.\n\nI simplified the escaping logic a bit at least.",
+      "parentUuid": "3576f26c_cf4463d5",
+      "revId": "4a24873be1aa87c2c843d8d508a8eb3f70191e39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94dc2d69_6aee8804",
         "filename": "internal/cuetxtar/inline.go",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-08T10:48:23Z",
       "side": 1,
       "message": "personally I\u0027d write this around tabs only, because we shouldn\u0027t be using spaces to indent CUE. and this will align with cue/literal as well, which only supports tab indenting when quoting multiline strings.",
+      "revId": "4a24873be1aa87c2c843d8d508a8eb3f70191e39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05b7a3d9_67280dd0",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1466,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T09:57:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94dc2d69_6aee8804",
       "revId": "4a24873be1aa87c2c843d8d508a8eb3f70191e39",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

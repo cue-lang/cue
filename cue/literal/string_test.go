@@ -72,6 +72,11 @@ func TestUnquote(t *testing.T) {
 		{"\"\x00\"", "", errSyntax},
 		{"'\x00'", "", errSyntax},
 
+		// Invalid UTF-8 bytes in the source are rejected, matching the scanner.
+		{"\"\xb0\"", "", errInvalidUTF8},
+		{"'\xb0'", "", errInvalidUTF8},
+		{"\"\xff\"", "", errInvalidUTF8},
+
 		{`"\\"`, "\\", nil},
 		{`"\'"`, "", errSyntax},
 		{`"\q"`, "", errSyntax},

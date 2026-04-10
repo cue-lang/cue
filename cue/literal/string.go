@@ -32,6 +32,7 @@ var (
 	// TODO: making this an error is optional according to RFC 4627. But we
 	// could make it not an error if this ever results in an issue.
 	errSurrogate          = errors.New("unmatched surrogate pair")
+	errInvalidUTF8        = errors.New("invalid UTF-8 encoding")
 	errEscapedLastNewline = errors.New("last newline of multiline string cannot be escaped")
 )
 
@@ -285,7 +286,7 @@ func isSimple(s string, quote rune) bool {
 	// faster than converting to code points. At the very least there should
 	// be an ASCII fast path.
 	for _, r := range s {
-		if r == quote || r == '\\' || r == 0 {
+		if r == quote || r == '\\' || r == 0 || r == utf8.RuneError {
 			return false
 		}
 		if surHigh <= r && r < surEnd {
@@ -345,10 +346,10 @@ func unquoteChar(s string, info QuoteInfo) (value rune, multibyte bool, tail str
 		}
 		return terminatedByQuote, false, "", nil
 	case c >= utf8.RuneSelf:
-		// TODO: consider handling surrogate values. These are discarded by
-		// DecodeRuneInString. It is technically correct to disallow it, but
-		// some JSON parsers allow this anyway.
 		r, size := utf8.DecodeRuneInString(s)
+		if r == utf8.RuneError && size == 1 {
+			return 0, false, s, errInvalidUTF8
+		}
 		return r, true, s[size:], nil
 	case c != '\\':
 		if c == 0 {

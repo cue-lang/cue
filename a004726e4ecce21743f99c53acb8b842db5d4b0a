@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "213996cc_f12bbc52",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-10T11:21:20Z",
+      "side": 1,
+      "message": "re-run this commit message by the AI, as it\u0027s wrapped incorrectly",
+      "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e43956a1_11e236f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-10T11:21:20Z",
+      "side": 1,
+      "message": "I think a much nicer fix is the same that we do for CUE_REGISTRY in cue/load/loader_test.go via a `func init`. i.e. you can do `os.Setenv(\"DOCKER_CONFIG\", ...)` to set it to some dummy value for all tests to ensure the host system doesn\u0027t influence in any way.",
+      "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

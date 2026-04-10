@@ -29,7 +29,7 @@ list2: {
 	// This evaluates to a list with an incomplete element.
 	_Top: [
 		for _, F in #Sub {F},
-	] @test(err, code=incomplete, contains="undefined field: b", pos=[])
+	] @test(err, code=incomplete, contains="undefined field: b", pos=[4:10])
 
 	#Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:10])
 

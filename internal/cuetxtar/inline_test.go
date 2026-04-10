@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"golang.org/x/tools/txtar"
 )
 
@@ -552,6 +553,64 @@ func TestAtDirective(t *testing.T) {
 		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), val, pa)
 		if !rec.failed {
 			t.Errorf("expected failure when sub-path is not an error")
+		}
+	})
+}
+
+// TestRunAllowsAssertion verifies that @test(allows, sel) and @test(allows=false, sel)
+// correctly report failures when the assertion is wrong.
+func TestRunAllowsAssertion(t *testing.T) {
+	ctx := cuecontext.New()
+	r := &inlineRunner{}
+	path := cue.MakePath(cue.Str("x"))
+
+	t.Run("allows fails when field is not allowed in closed struct", func(t *testing.T) {
+		val := ctx.CompileString("x: close({a: 1})")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttrBody(token.NoPos, "allows, b")}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if !rec.failed {
+			t.Errorf("expected failure: closed struct should not allow field b")
+		}
+	})
+
+	t.Run("allows=false fails when field is actually allowed", func(t *testing.T) {
+		val := ctx.CompileString("x: close({a: 1})")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttrBody(token.NoPos, "allows=false, a")}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if !rec.failed {
+			t.Errorf("expected failure: closed struct should allow known field a")
+		}
+	})
+
+	t.Run("allows fails for int pattern in closed string-keyed struct", func(t *testing.T) {
+		val := ctx.CompileString("x: close({[string]: 1})")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttrBody(token.NoPos, "allows, [int]")}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if !rec.failed {
+			t.Errorf("expected failure: string-keyed struct should not allow int pattern")
+		}
+	})
+
+	t.Run("allows passes for open struct", func(t *testing.T) {
+		val := ctx.CompileString("x: {a: 1}")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttrBody(token.NoPos, "allows, b")}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: open struct should allow any field\n%s", rec.msgs.String())
+		}
+	})
+
+	t.Run("allows=false passes for unknown field in closed struct", func(t *testing.T) {
+		val := ctx.CompileString("x: close({a: 1})")
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttrBody(token.NoPos, "allows=false, b")}
+		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: closed struct should deny unknown field b\n%s", rec.msgs.String())
 		}
 	})
 }

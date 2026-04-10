@@ -45,22 +45,29 @@ type Option struct {
 func New(options ...Option) *cue.Context {
 	r := runtime.New()
 	// Embedding is always available.
-	r.SetInterpreter(embed.New())
+	r.SetInjection(embed.New())
 	for _, o := range options {
 		o.apply(r)
 	}
 	return (*cue.Context)(r)
 }
 
-// An ExternInterpreter creates a compiler that can produce implementations of
-// functions written in a language other than CUE. It is currently for internal
-// use only.
-type ExternInterpreter = runtime.Interpreter
+// Deprecated: use [Injection] instead.
+type ExternInterpreter = runtime.Injection
 
-// Interpreter associates an interpreter for external code with this context.
+// An Injection provides a way to inject runtime values
+// into imported CUE code.
+type Injection = runtime.Injection
+
+// Deprecated: use [WithInjection] instead.
 func Interpreter(i ExternInterpreter) Option {
+	return WithInjection(i)
+}
+
+// WithInjection associates an injection for external code with this context.
+func WithInjection(i Injection) Option {
 	return Option{func(r *runtime.Runtime) {
-		r.SetInterpreter(i)
+		r.SetInjection(i)
 	}}
 }
 

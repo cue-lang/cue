@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4fd97905_bd438f50",
+        "filename": "cue/attribute.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-10T12:06:29Z",
+      "side": 1,
+      "message": "I\u0027ve removed the deprecation notice as requested, but I will note that for key-value-pair arguments, in general we don\u0027t want them to be position-sensitive, so we\u0027d probably want to discourage use in that case. For non-key-value-pair arguments, we already have String, Int, and RawArg, none of which are deprecated.\n\nWhat\u0027s the use case you\u0027re thinking of when it might be useful?",
+      "parentUuid": "d93ba074_1e4ffaba",
+      "revId": "4ed229b1a8279fc63e9615896f3179fc3b44e667",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dce009d8_425349de",
         "filename": "internal/attrs.go",
         "patchSetId": 3

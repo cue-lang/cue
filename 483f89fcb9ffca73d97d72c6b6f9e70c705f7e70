@@ -16,6 +16,24 @@
       "message": "Hmm. I feel like we should have the exact same error in both cases. So I would be tempted by a qt.DeepEquals(err, exprErr)",
       "revId": "483f89fcb9ffca73d97d72c6b6f9e70c705f7e70",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0f1746e_43bc961e",
+        "filename": "cue/fuzz_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-10T12:57:43Z",
+      "side": 1,
+      "message": "typically yes, but not always. think about \"expected token X, found token Y\"; when parsing a single expression, what you can expect or allow as a next token is narrower than when you parse a whole file.\n\nsimilarly, think about inputs like `package`; ParseFile knows about package directives so it will fail saying \"you missed the package name\", but ParseExpr can fail in a different way as it doesn\u0027t accept package declarations.\n\nI tried this and indeed some corpus entries already produce different errors, and on a quick skim they seem fine.",
+      "parentUuid": "8b15477d_3f08331e",
+      "revId": "483f89fcb9ffca73d97d72c6b6f9e70c705f7e70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

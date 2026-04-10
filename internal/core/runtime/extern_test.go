@@ -20,11 +20,11 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetxtar"
@@ -38,8 +38,8 @@ func Test(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		interpreter := &interpreterFake{files: map[string]int{}}
-		ctx := cuecontext.New(cuecontext.Interpreter(interpreter))
+		inj := &injectionFake{files: map[string]int{}}
+		ctx := cuecontext.New(cuecontext.WithInjection(inj))
 
 		b := t.Instance()
 		v := ctx.BuildInstance(b)
@@ -52,25 +52,26 @@ func Test(t *testing.T) {
 	})
 }
 
-type interpreterFake struct {
+type injectionFake struct {
 	files map[string]int
 }
 
-func (i *interpreterFake) Kind() string { return "testfn" }
+func (i *injectionFake) Kind() string { return "testfn" }
 
-func (i *interpreterFake) NewCompiler(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
+func (i *injectionFake) InjectorForInstance(b *build.Instance, r *runtime.Runtime) (runtime.Injector, errors.Error) {
 	switch b.PkgName {
 	case "failinit":
 		return nil, errors.Newf(token.NoPos, "TEST: fail initialization")
 	case "nullinit":
 		return nil, nil
 	case "scopetest":
-		return newCompilerFake(b, r)
+		return newInjectorFake(b, r)
 	}
 	return i, nil
 }
 
-func (i *interpreterFake) Compile(funcName string, _ adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
+func (i *injectionFake) InjectedValue(attr *runtime.ExternAttr, _ *adt.Vertex) (adt.Expr, errors.Error) {
+	a := attr.Attr
 	if ok, _ := a.Flag(1, "fail"); ok {
 		return nil, errors.Newf(token.NoPos, "TEST: fail compilation")
 	}
@@ -92,6 +93,16 @@ func (i *interpreterFake) Compile(funcName string, _ adt.Value, a *internal.Attr
 		i.files[str] = len(i.files) + 1
 	}
 
+	// Derive the function name from the parent field label,
+	// with an explicit name= attribute taking precedence.
+	var funcName string
+	if f, ok := attr.Parent.(*ast.Field); ok {
+		funcName, _, _ = ast.LabelName(f.Label)
+	}
+	if name, ok, _ := a.Lookup(1, "name"); ok {
+		funcName = name
+	}
+
 	return &adt.Builtin{
 		Name:   "impl" + funcName + strconv.Itoa(i.files[str]),
 		Params: []adt.Param{{Value: &adt.BasicType{K: adt.IntKind}}},
@@ -99,19 +110,20 @@ func (i *interpreterFake) Compile(funcName string, _ adt.Value, a *internal.Attr
 	}, nil
 }
 
-type compilerFake struct {
+type injectorFake struct {
 	runtime *runtime.Runtime
 	b       *build.Instance
 }
 
-func newCompilerFake(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
-	return &compilerFake{
+func newInjectorFake(b *build.Instance, r *runtime.Runtime) (runtime.Injector, errors.Error) {
+	return &injectorFake{
 		runtime: r,
 		b:       b,
 	}, nil
 }
 
-func (c *compilerFake) Compile(name string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
+func (c *injectorFake) InjectedValue(attr *runtime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
+	a := attr.Attr
 	typStr, err := a.String(0)
 	if err != nil {
 		return nil, errors.Promote(err, "test")

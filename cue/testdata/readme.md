@@ -249,6 +249,17 @@ Compares the string output of `internal/core/debug`'s printer applied to the
 evaluated value.  Useful for verifying internal representation details that `eq`
 does not capture.
 
+### `debug` — informational debug-printer annotation
+
+```cue
+result: {a: 1} @test(debug, "(struct){\n  a: (int){ 1 }\n}")
+```
+
+Records the debug-printer output as an informational annotation.  Unlike
+`debugCheck`, a mismatch does **not** fail the test — it only logs and
+auto-updates when `CUE_UPDATE=1` is set.  Useful for documenting what
+internal representation a value produces without locking the test to it.
+
 ### `skip` — skip a test case
 
 ```cue

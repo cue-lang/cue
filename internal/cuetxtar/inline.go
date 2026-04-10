@@ -226,7 +226,7 @@ func parseTestAttr(a *ast.Attribute) (parsedTestAttr, error) {
 	f0 := parsed.Fields[0]
 	if f0.Key() != "" {
 		dir := f0.Key()
-		// Key-based directives may carry a version suffix: "shareID:v3" → directive="shareID", version="v3".
+		// Key-based directives may carry a version suffix: "shareID" → directive="shareID", version="v3".
 		if idx := strings.LastIndex(dir, ":"); idx >= 0 {
 			result.directive = dir[:idx]
 			result.version = dir[idx+1:]
@@ -1282,7 +1282,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	if exprStr == "" {
 		// Empty @test(eq) or @test(eq, at=N) — fill placeholder.
 		if cuetest.UpdateGoldenFiles {
-			r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr))
+			r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr, pa))
 		}
 		return
 	}
@@ -1291,6 +1291,10 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		t.Errorf("path %s: @test(eq, ...): cannot parse expected expression: %v", path, err)
 		return
 	}
+
+	// Detect any @test(...) field attributes inside the eq body — they have no
+	// effect there and are almost certainly misplaced.
+	reportEqBodyTestAttrs(t, path, expr)
 
 	// Detect stale-skip: an existing skip:<ver> positional arg on this attr
 	// marks a known discrepancy recorded by a prior manual annotation.
@@ -1302,7 +1306,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		if hasSkip && cuetest.UpdateGoldenFiles {
 			// Stale-skip cleanup: the assertion now passes; strip the skip,
 			// restoring @test(eq, <expr>[, at=<sel>]).
-			r.enqueueInlineFill(pa, r.eqFillAttrStr(exprStr, atStr))
+			r.enqueueInlineFill(pa, r.eqFillAttrStr(exprStr, atStr, pa))
 		}
 		return
 	}
@@ -1310,7 +1314,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	// Comparison failed — genuine mismatch.
 	if cuetest.ForceUpdateGoldenFiles {
 		// CUE_UPDATE=force: overwrite the assertion with the actual value.
-		r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr))
+		r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr, pa))
 		return
 	}
 	// Report the failure (unless already annotated with a skip).
@@ -1321,19 +1325,57 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 }
 
 // eqFillAttr builds an @test(eq, <value>[, at=<atStr>]) attribute for fill/force-update.
-func (r *inlineRunner) eqFillAttr(v cue.Value, atStr string) string {
+func (r *inlineRunner) eqFillAttr(v cue.Value, atStr string, pa parsedTestAttr) string {
 	if r.isError(v) {
 		return "@test(err)"
 	}
-	return r.eqFillAttrStr(r.formatValue(v), atStr)
+	return r.eqFillAttrStr(r.formatValue(v), atStr, pa)
 }
 
 // eqFillAttrStr builds @test(eq, <exprStr>[, at=<atStr>]).
-func (r *inlineRunner) eqFillAttrStr(exprStr, atStr string) string {
+// For multi-line expressions, if the compact single-line form is < 20 chars it
+// is used directly; otherwise lines after the first are re-indented using the
+// leading whitespace of the source line containing the @test attribute (the
+// same offset trick as formatDebugAttr, but without an extra tab because
+// format.Node already carries one tab of relative indentation).
+func (r *inlineRunner) eqFillAttrStr(exprStr, atStr string, pa parsedTestAttr) string {
+	if strings.Contains(exprStr, "\n") {
+		if compact := compactCUEExpr(exprStr); len(compact) < 20 {
+			exprStr = compact
+		} else {
+			indent := r.attrLineIndent(pa)
+			exprStr = strings.ReplaceAll(exprStr, "\n", "\n"+indent)
+		}
+	}
 	if atStr != "" {
 		return fmt.Sprintf("@test(eq, %s, at=%s)", exprStr, atStr)
 	}
 	return fmt.Sprintf("@test(eq, %s)", exprStr)
+}
+
+// compactCUEExpr collapses a multi-line CUE expression produced by format.Node
+// into a single line. It handles struct and list literals by joining their
+// tab-indented field lines with ", ". Only safe for shallow (non-nested)
+// structures; deeply-nested values will exceed the 20-char threshold and use
+// the indented form instead.
+func compactCUEExpr(s string) string {
+	lines := strings.Split(s, "\n")
+	parts := make([]string, 0, len(lines))
+	for _, line := range lines {
+		trimmed := strings.TrimLeft(line, "\t")
+		if trimmed != "" {
+			parts = append(parts, trimmed)
+		}
+	}
+	if len(parts) < 2 {
+		return strings.Join(parts, "")
+	}
+	open, close_ := parts[0], parts[len(parts)-1]
+	middle := parts[1 : len(parts)-1]
+	if (open == "{" || open == "[") && len(middle) > 0 {
+		return open + strings.Join(middle, ", ") + close_
+	}
+	return strings.Join(parts, " ")
 }
 
 // formatValue returns a human-readable CUE string for a value.
@@ -1393,6 +1435,47 @@ func stripTestAttrs(node ast.Node) {
 			elts = append(elts, e)
 		}
 		sl.Elts = elts
+		return true
+	}, nil)
+}
+
+// eqBodySupportedDirectives lists the @test directive names that are
+// intentionally processed by astCmp when they appear inside an @test(eq, ...)
+// body (as field-level attributes or struct-level decl attributes).
+// Any other directive has no effect there.
+var eqBodySupportedDirectives = map[string]bool{
+	"final":      true, // field-level and struct-level: resolve default before comparing
+	"ignore":     true, // field-level: skip eq descent; field need not exist
+	"err":        true, // field-level: check that value is an error
+	"shareID":    true, // field-level: sharing assertion (handled by extractShareIDsFromEqExpr)
+	"checkOrder": true, // struct-level decl: require fields in declaration order
+}
+
+// reportEqBodyTestAttrs walks the expected expression of an @test(eq, ...)
+// body and reports any @test field attributes that have no effect there.
+// Directives listed in eqBodySupportedDirectives are intentionally processed
+// by astCmp and are excluded from the error.
+func reportEqBodyTestAttrs(t testing.TB, path cue.Path, expr ast.Node) {
+	t.Helper()
+	ast.Walk(expr, func(n ast.Node) bool {
+		f, ok := n.(*ast.Field)
+		if !ok {
+			return true
+		}
+		for _, a := range f.Attrs {
+			k, _ := a.Split()
+			if k != "test" {
+				continue
+			}
+			pa, err := parseTestAttr(a)
+			if err != nil {
+				continue
+			}
+			if eqBodySupportedDirectives[pa.directive] {
+				continue
+			}
+			t.Errorf("path %s: @test(%s) in @test(eq, ...) body has no effect; place it as a field attribute on the actual value", path, pa.directive)
+		}
 		return true
 	}, nil)
 }
@@ -1693,7 +1776,7 @@ func (r *inlineRunner) enqueueInlineFill(pa parsedTestAttr, newAttrText string) 
 // body and collects all @test(shareID=name) annotations on fields.
 // basePath is the CUE path of the @test(eq) attribute; field paths in the
 // struct are appended to it.  version is the active evaluator version name
-// used for version-specific share groups (@test(shareID:v3=name)).
+// used for version-specific share groups (@test(shareID=name)).
 // Returns a map from shareID name to the absolute paths of fields in that group.
 func extractShareIDsFromEqExpr(expr ast.Expr, basePath cue.Path, version string) map[string][]cue.Path {
 	s, ok := expr.(*ast.StructLit)

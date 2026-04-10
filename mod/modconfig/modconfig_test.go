@@ -163,6 +163,11 @@ package x
 
 	dir := t.TempDir()
 	t.Setenv("DOCKER_CONFIG", dir)
+	// Write an empty docker config so that ociauth does not fall back to
+	// the platform credential helper (e.g. docker-credential-desktop on
+	// macOS), which can hang when Docker Desktop is not running.
+	err = os.WriteFile(filepath.Join(dir, "config.json"), []byte("{}"), 0o666)
+	qt.Assert(t, qt.IsNil(err))
 	t.Setenv("CUE_REGISTRY", u.Host+"+insecure")
 	cacheDir := filepath.Join(dir, "cache")
 	t.Setenv("CUE_CACHE_DIR", cacheDir)
@@ -250,9 +255,18 @@ package bar
 	}
 
 	dir := t.TempDir()
+	// Write an empty docker config so that ociauth does not fall back to
+	// the platform credential helper (e.g. docker-credential-desktop on
+	// macOS), which can hang when Docker Desktop is not running.
+	dockerDir := filepath.Join(dir, "docker")
+	err := os.MkdirAll(dockerDir, 0o777)
+	qt.Assert(t, qt.IsNil(err))
+	err = os.WriteFile(filepath.Join(dockerDir, "config.json"), []byte("{}"), 0o666)
+	qt.Assert(t, qt.IsNil(err))
+	t.Setenv("DOCKER_CONFIG", dockerDir)
 	configDir := filepath.Join(dir, "config")
 	t.Setenv("CUE_CONFIG_DIR", configDir)
-	err := os.MkdirAll(configDir, 0o777)
+	err = os.MkdirAll(configDir, 0o777)
 	qt.Assert(t, qt.IsNil(err))
 
 	// Check logins.json validation.

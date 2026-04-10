@@ -33,6 +33,24 @@
       "message": "doesn\u0027t this change behavior for existing users?",
       "revId": "4ed229b1a8279fc63e9615896f3179fc3b44e667",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "529a5533_d672b608",
+        "filename": "internal/attrs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T11:47:38Z",
+      "side": 1,
+      "message": "Ah, i see, never mind.",
+      "parentUuid": "dce009d8_425349de",
+      "revId": "4ed229b1a8279fc63e9615896f3179fc3b44e667",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

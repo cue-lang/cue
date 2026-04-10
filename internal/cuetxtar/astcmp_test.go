@@ -222,7 +222,7 @@ func TestAstCompare_Structs(t *testing.T) {
 			name:    "required vs optional mismatch",
 			expr:    `{foo!: string}`,
 			val:     `{foo?: string}`,
-			wantErr: `unexpected field "foo"`,
+			wantErr: `unexpected field "foo?"`,
 		},
 
 		// Nested @test(err) — tested separately below in TestAstCompare_ErrDirective.

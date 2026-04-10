@@ -464,10 +464,21 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 		if hasEmbed && !sel.IsString() && !internal.IsDefOrHidden(name) {
 			continue
 		}
+		// In a closed struct, optional fields with an error value (e.g.
+		// b?: _|_ from a disallowed field) are a structural consequence of
+		// closing, not a value mismatch. Skip them so that the expected
+		// expression need not enumerate every disallowed optional field.
+		if val.IsClosed() && iter.IsOptional() && iter.Value().Err() != nil {
+			continue
+		}
 		// For hidden fields the expected struct may use bare _foo (pkg="_")
 		// while the value stores _foo scoped to a package. Accept either.
 		if !seen[sel] {
-			return pathErr(path, "unexpected field %q in value", name)
+			displayName := name
+			if iter.IsOptional() {
+				displayName += "?"
+			}
+			return pathErr(path, "unexpected field %q in value", displayName)
 		}
 	}
 

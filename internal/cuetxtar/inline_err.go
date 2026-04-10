@@ -751,7 +751,7 @@ func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive 
 			if exp.fileName != "" {
 				t.Errorf("path %s: %s: unmatched position %s:%d:%d; actual positions:", path, directive, exp.fileName, exp.absLine, exp.col)
 			} else {
-				t.Errorf("path %s: %s: unmatched position %d:%d; actual positions:", path, directive, exp.deltaLine, exp.col)
+				t.Errorf("path %s: %s: unmatched position %d:%d (spec %d:%d); actual positions:", path, directive, baseLine+exp.deltaLine, exp.col, exp.deltaLine, exp.col)
 			}
 			for _, p := range positions {
 				t.Logf("  actual: %d:%d", p.Line(), p.Column())

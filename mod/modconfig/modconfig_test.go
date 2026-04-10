@@ -31,6 +31,22 @@ import (
 	"cuelang.org/go/mod/module"
 )
 
+func init() {
+	// Tests that use ociauth must not fall back to the platform credential
+	// helper (e.g. docker-credential-desktop on macOS), which can hang when
+	// Docker Desktop is not running. Set DOCKER_CONFIG to an empty config
+	// so that no credential helper is invoked. Tests that need their own
+	// docker credentials override this via t.Setenv.
+	dir, err := os.MkdirTemp("", "cue-modconfig-test-*")
+	if err != nil {
+		panic(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "config.json"), []byte("{}"), 0o666); err != nil {
+		panic(err)
+	}
+	os.Setenv("DOCKER_CONFIG", dir)
+}
+
 // TODO: the test below acts as a smoke test for the functionality here,
 // but more of the behavior is tested in the cmd/cue script tests.
 // We should do more of it here too.
@@ -162,7 +178,6 @@ package x
 	qt.Assert(t, qt.IsNil(err))
 
 	dir := t.TempDir()
-	t.Setenv("DOCKER_CONFIG", dir)
 	t.Setenv("CUE_REGISTRY", u.Host+"+insecure")
 	cacheDir := filepath.Join(dir, "cache")
 	t.Setenv("CUE_CACHE_DIR", cacheDir)
@@ -251,9 +266,9 @@ package bar
 
 	dir := t.TempDir()
 	configDir := filepath.Join(dir, "config")
-	t.Setenv("CUE_CONFIG_DIR", configDir)
 	err := os.MkdirAll(configDir, 0o777)
 	qt.Assert(t, qt.IsNil(err))
+	t.Setenv("CUE_CONFIG_DIR", configDir)
 
 	// Check logins.json validation.
 	logins.Registries["blank"] = cueconfig.RegistryLogin{TokenType: "Bearer"}

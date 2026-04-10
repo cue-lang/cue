@@ -16,6 +16,24 @@
       "message": "nit: `pkgID :\u003d cmp.Or(e.pkgID, \"_\")`",
       "revId": "731d3e2b2e1ffbd801e91e6223f0bfd092aaf22a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de4d390f_06377751",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T10:47:08Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "324479d5_c254be84",
+      "revId": "731d3e2b2e1ffbd801e91e6223f0bfd092aaf22a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

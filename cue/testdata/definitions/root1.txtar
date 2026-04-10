@@ -1,9 +1,14 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 // Test embedding at root of file
 root1: 1
 #Root1: x: {}
 #Root1 & { }
+
+@test(eq, {
+	root1: 1
+	#Root1: x: {}
+	x: {}
+})
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
@@ -17,16 +22,6 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 2
--- out/evalalpha --
-(#struct){
-  root1: (int){ 1 }
-  #Root1: (#struct){
-    x: (#struct){
-    }
-  }
-  x: (#struct){
-  }
-}
 -- out/compile --
 --- in.cue
 {

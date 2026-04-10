@@ -1,8 +1,12 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 root2: 1
 #Root2: {}
 #Root2
+
+@test(eq, {
+	root2: 1
+	#Root2: {}
+})
 -- out/eval/stats --
 Leaks:  0
 Freed:  3
@@ -16,12 +20,6 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 2
--- out/evalalpha --
-(#struct){
-  root2: (int){ 1 }
-  #Root2: (#struct){
-  }
-}
 -- out/compile --
 --- in.cue
 {

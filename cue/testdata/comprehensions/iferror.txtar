@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 a: {b: 2, c: int}
 
@@ -6,28 +5,35 @@ wrongConcreteType: {
 	if a.b {
 		2
 	}
+	@test(err, code=eval, contains="cannot use 2 (type int) as type bool", pos=[1:2, -2:8])
 }
 
 wrongType: {
 	if a.c {
 		2
 	}
+	@test(err, code=eval, contains="cannot use int (type int) as type bool", pos=[1:2, -9:14])
 }
 
-incomplete: {
+incomplete: err1: {
 	if a.d {
 		2
 	}
+	@test(err, code=incomplete, contains="undefined field: d", pos=[1:7])
 }
-
-incomplete: {
+incomplete: err2: {
 	list: [1, 2, 3]
 	for x in list if a.d {
 		x
 	}
+	@test(err, code=incomplete, contains="undefined field: d", pos=[2:21])
 }
 
-// Issue #809
+// issue809: Tests that comprehension guards using `!= _|_` work correctly
+// when the guarded field has a default value. In both cases below the field
+// being tested is non-bottom (it carries a default), so the guard should
+// pass and the comprehension should yield the entry.
+// https://cuelang.org/issue/809
 useDefault: {
 	a: {
 		x: *"foo" | string
@@ -48,6 +54,21 @@ useDefault: {
 		foo: [
 			for _, a in s if a.b != _|_ {a},
 		]
+
+		@test(eq, {
+			#A: {
+				a: string
+				b: string
+			}
+			s: bar: {
+				a: "bar"
+				b: *"bar" | string
+			}
+			foo: [{
+				a: "bar"
+				b: *"bar" | string
+			}]
+		})
 	}
 }
 
@@ -71,7 +92,23 @@ issue1972: {
 			patchs: _
 		}
 	}
+	@test(err, code=eval, contains="conflicting values", pos=[9:8, 11:11, 12:3])
 }
+-- out/errors.txt --
+[eval] wrongConcreteType: cannot use 2 (type int) as type bool:
+    ./in.cue:4:2
+    ./in.cue:1:8
+[eval] wrongType: cannot use int (type int) as type bool:
+    ./in.cue:11:2
+    ./in.cue:1:14
+[incomplete] incomplete.err1: undefined field: d:
+    ./in.cue:18:7
+[incomplete] incomplete.err2: undefined field: d:
+    ./in.cue:25:21
+[eval] issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
+    ./in.cue:86:8
+    ./in.cue:88:11
+    ./in.cue:89:3
 -- out/compile --
 --- in.cue
 {
@@ -90,18 +127,22 @@ issue1972: {
     }
   }
   incomplete: {
-    if 〈1;a〉.d {
-      2
+    err1: {
+      if 〈2;a〉.d {
+        2
+      }
     }
   }
   incomplete: {
-    list: [
-      1,
-      2,
-      3,
-    ]
-    for _, x in 〈0;list〉 if 〈2;a〉.d {
-      〈1;x〉
+    err2: {
+      list: [
+        1,
+        2,
+        3,
+      ]
+      for _, x in 〈0;list〉 if 〈3;a〉.d {
+        〈1;x〉
+      }
     }
   }
   useDefault: {
@@ -163,226 +204,7 @@ Disjuncts:    8
 Notifications: 2
 
 NumCloseIDs: 26
--- out/evalalpha --
-Errors:
-issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-    ./in.cue:64:8
-    ./in.cue:66:11
-    ./in.cue:67:3
-wrongConcreteType: cannot use 2 (type int) as type bool:
-    ./in.cue:4:2
-    ./in.cue:1:8
-wrongType: cannot use int (type int) as type bool:
-    ./in.cue:10:2
-    ./in.cue:1:14
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    b: (int){ 2 }
-    c: (int){ int }
-  }
-  wrongConcreteType: (_|_){
-    // [eval] wrongConcreteType: cannot use 2 (type int) as type bool:
-    //     ./in.cue:4:2
-    //     ./in.cue:1:8
-  }
-  wrongType: (_|_){
-    // [eval] wrongType: cannot use int (type int) as type bool:
-    //     ./in.cue:10:2
-    //     ./in.cue:1:14
-  }
-  incomplete: (_|_){
-    // [incomplete] incomplete: undefined field: d:
-    //     ./in.cue:16:7
-    // incomplete: undefined field: d:
-    //     ./in.cue:23:21
-    list: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-    }
-  }
-  useDefault: (struct){
-    a: (struct){
-      x: (string){ |(*(string){ "foo" }, (string){ string }) }
-      y: (string){ |(*(string){ "foo" }, (string){ string }) }
-    }
-    issue809: (struct){
-      #A: (#struct){
-        a: (string){ string }
-        b: (string){ string }
-      }
-      s: (struct){
-        bar: (#struct){
-          a: (string){ "bar" }
-          b: (string){ |(*(string){ "bar" }, (string){ string }) }
-        }
-      }
-      foo: (#list){
-        0: (#struct){
-          a: (string){ "bar" }
-          b: (string){ |(*(string){ "bar" }, (string){ string }) }
-        }
-      }
-    }
-  }
-  issue1972: (_|_){
-    // [eval]
-    err1: (_|_){
-      // [eval] issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-      //     ./in.cue:64:8
-      //     ./in.cue:66:11
-      //     ./in.cue:67:3
-      #patchs: (_|_){// []
-      }
-      #someCondition: (_){ _ }
-      someCondition: (_){ _ }
-      patchs: (_|_){// [
-        //   ...{},
-        // ][e] & if 〈0;someCondition〉 _
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,7 +1,8 @@
- Errors:
--issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
--    ./in.cue:54:12
--    ./in.cue:61:8
-+issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-+    ./in.cue:64:8
-+    ./in.cue:66:11
-+    ./in.cue:67:3
- wrongConcreteType: cannot use 2 (type int) as type bool:
-     ./in.cue:4:2
-     ./in.cue:1:8
-@@ -8,8 +9,6 @@
- wrongType: cannot use int (type int) as type bool:
-     ./in.cue:10:2
-     ./in.cue:1:14
--issue1972.err1: invalid list index someCondition (type string):
--    ./in.cue:65:6
- 
- Result:
- (_|_){
-@@ -66,17 +65,18 @@
-   issue1972: (_|_){
-     // [eval]
-     err1: (_|_){
--      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
--      //     ./in.cue:54:12
--      //     ./in.cue:61:8
--      // issue1972.err1: invalid list index someCondition (type string):
--      //     ./in.cue:65:6
--      #patchs: (#list){
--      }
--      someCondition: (_){ _ }
--      patchs: (list){
-+      // [eval] issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-+      //     ./in.cue:64:8
-+      //     ./in.cue:66:11
-+      //     ./in.cue:67:3
-+      #patchs: (_|_){// []
-       }
-       #someCondition: (_){ _ }
-+      someCondition: (_){ _ }
-+      patchs: (_|_){// [
-+        //   ...{},
-+        // ][e] & if 〈0;someCondition〉 _
-+      }
-     }
-   }
- }
--- diff/todo/p2 --
+-- out/diff-v2-v3.txt --
 issue1972: "field not allowed" are somewhat correct (it is also a list), but
 are already covered by the other error message and should be elided.
 This may lead to a large number of errors otherwise.
--- out/eval --
-Errors:
-issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-    ./in.cue:54:12
-    ./in.cue:61:8
-wrongConcreteType: cannot use 2 (type int) as type bool:
-    ./in.cue:4:2
-    ./in.cue:1:8
-wrongType: cannot use int (type int) as type bool:
-    ./in.cue:10:2
-    ./in.cue:1:14
-issue1972.err1: invalid list index someCondition (type string):
-    ./in.cue:65:6
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    b: (int){ 2 }
-    c: (int){ int }
-  }
-  wrongConcreteType: (_|_){
-    // [eval] wrongConcreteType: cannot use 2 (type int) as type bool:
-    //     ./in.cue:4:2
-    //     ./in.cue:1:8
-  }
-  wrongType: (_|_){
-    // [eval] wrongType: cannot use int (type int) as type bool:
-    //     ./in.cue:10:2
-    //     ./in.cue:1:14
-  }
-  incomplete: (_|_){
-    // [incomplete] incomplete: undefined field: d:
-    //     ./in.cue:16:7
-    // incomplete: undefined field: d:
-    //     ./in.cue:23:21
-    list: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-    }
-  }
-  useDefault: (struct){
-    a: (struct){
-      x: (string){ |(*(string){ "foo" }, (string){ string }) }
-      y: (string){ |(*(string){ "foo" }, (string){ string }) }
-    }
-    issue809: (struct){
-      #A: (#struct){
-        a: (string){ string }
-        b: (string){ string }
-      }
-      s: (struct){
-        bar: (#struct){
-          a: (string){ "bar" }
-          b: (string){ |(*(string){ "bar" }, (string){ string }) }
-        }
-      }
-      foo: (#list){
-        0: (#struct){
-          a: (string){ "bar" }
-          b: (string){ |(*(string){ "bar" }, (string){ string }) }
-        }
-      }
-    }
-  }
-  issue1972: (_|_){
-    // [eval]
-    err1: (_|_){
-      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-      //     ./in.cue:54:12
-      //     ./in.cue:61:8
-      // issue1972.err1: invalid list index someCondition (type string):
-      //     ./in.cue:65:6
-      #patchs: (#list){
-      }
-      someCondition: (_){ _ }
-      patchs: (list){
-      }
-      #someCondition: (_){ _ }
-    }
-  }
-}

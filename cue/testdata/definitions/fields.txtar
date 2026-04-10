@@ -1,5 +1,4 @@
 // Tests fields.go
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 // TODO: reorganize ordered on what is tested by name. E.g.
 // insertion: longPath: ok: p1: {
@@ -8,14 +7,24 @@
 
 ok: t1: {
 	c: #R
-	c: [{b: int}]
-	#R: [...]
+	c: [{b: int}] @test(allows=false, int)
+	#R: [...]     @test(allows, int)
+
+	@test(eq, {
+		c: [{b: int}]
+		#R: []
+	})
 }
 
 ok: t2: {
 	#A: _
 	l: #A
 	l: f: "hi"
+
+	@test(eq, {
+		#A: _
+		l: f: "hi"
+	})
 }
 
 ok: t3: {
@@ -23,6 +32,12 @@ ok: t3: {
 	#A1: { #A }
 	s: [string]: #A1
 	s: foo: f: d: foo: 1
+
+	@test(eq, {
+		#A: f: {}
+		#A1: f: {}
+		s: foo: f: d: foo: 1
+	})
 }
 
 ok: t4: {
@@ -31,6 +46,14 @@ ok: t4: {
 		{#T}
 		b: c: 2
 	}
+
+	@test(eq, {
+		#T: a: b: 1
+		W: {
+			a: b: 1
+			b: c: 2
+		}
+	})
 }
 
 ok: t5: {
@@ -41,7 +64,9 @@ ok: t5: {
 	}
 	Common: { }
 	x: #A
-	x: c: int
+	x: c: int @test(err, code=eval,
+		hint="not sure if this is actually correct",
+		contains="field not allowed", pos=[0:5])
 }
 
 ok: t6: {
@@ -50,20 +75,37 @@ ok: t6: {
 		...
 	}
 	Common: { }
-	x: #A
+	x: #A  @test(allows, string)
 	x: c: int
+
+	@test(eq, {
+		#A: {}
+		Common: {}
+		x: c: int
+	})
 }
 
 ok: t7: {
 	a: {#A, #B}
 	#A: b: f: 1
 	#B: b: g: 1
+
+	@test(eq, {
+		a: b: {
+			f: 1
+			g: 1
+		}
+		#A: b: f: 1
+		#B: b: g: 1
+	})
 }
 
 ok: t8: {
 	// TODO: this should pass
-	foo: #X
+	foo: #X @test(shareID=ok_t8_foox)
 	#X: {
+		@test(shareID=ok_t8_foox)
+
 		a: b: c: C: 1
 		for k, _ in a {
 			// dynamic field causes insertion one level higher. This causes
@@ -71,18 +113,41 @@ ok: t8: {
 			a: (k): c: D: 2
 		}
 	}
+
+	@test(eq, {
+		foo: a: b: c: {
+			C: 1
+			D: 2
+		}
+		#X: a: b: c: {
+			C: 1
+			D: 2
+		}
+	})
 }
 
 ok: t9: {
 	c: #R
 	c: [{b: int}]
 	#R: [...]
+
+	@test(eq, {
+		c: [{
+			b: int
+		}]
+		#R: []
+	})
 }
 
 ok: t10: {
 	#A: _ // top should allow everything
 	l: #A
 	l: f: "hi"
+
+	@test(eq, {
+		#A: _
+		l: f: "hi"
+	})
 }
 
 ok: t11: {
@@ -91,6 +156,12 @@ ok: t11: {
 	#A1: { #A }
 	s: [string]: #A1
 	s: foo: f: d: foo: "bar" // should pass
+
+	@test(eq, {
+		#A: f: {}
+		#A1: f: {}
+		s: foo: f: d: foo: "bar"
+	})
 }
 
 ok: t12: {
@@ -100,6 +171,14 @@ ok: t12: {
 		{#T}
 		b: c: 2
 	}
+
+	@test(eq, {
+		#T: { a: b: 1 }
+		W: {
+			a: b: 1
+			b: c: 2
+		}
+	})
 }
 
 ok: t13: {
@@ -112,7 +191,13 @@ ok: t13: {
 	}
 	Common: { }
 	x: #A
-	x: c: int
+	x: c: int @test(err, code=eval, contains="field not allowed", pos=[0:5])
+
+	@test(eq, {
+		#A: {}
+		Common: {}
+		x: c: _|_
+	})
 }
 
 ok: t14: {
@@ -124,6 +209,12 @@ ok: t14: {
 	Common: { }
 	x: #A
 	x: c: int
+
+	@test(eq, {
+		#A: {}
+		Common: {}
+		x: c: int
+	})
 }
 
 // TODO: move this test to "ok": _ means any and implicitly defines all fields
@@ -133,51 +224,51 @@ ok: t14: {
 // either allow for an error variant that only "allows" all fields but does not
 // define them as optional top, or rethink the closedness model altogether.
 err: t1: {
+	@test(permute)
 	#D: _ & {a: 2}
 	a: #D
-	a: disallowed: 1
+	a: disallowed: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
 }
 
 err: t2: {
+	@test(permute)
 	#S: { { c: d: 1 } }
 	V: #S
-	V: { c: e:  1 }
+	V: { c: e: 1 @test(err, code=eval, contains="field not allowed", pos=[0:10]) }
 }
 
-err: t3: p1: {
+err: t3: {
+	@test(permute)
 	#D: {}
 	a: #D
-	a: c: "C"
-}
-
-err: t3: p2: {
-	#D: b: {}
-	a: #D
-	a: b: c: "C"
+	a: c: "C" @test(err, code=eval, contains="field not allowed", pos=[0:5])
 }
 
 err: t4: {
+	@test(permute)
 	a: #A
 	#A: b: f: 1
-	a: b: h: 1
+	a: b: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:8])
 }
 
 err: t5: {
+	@test(permute)
 	// TODO: this should fail
 	a: {#A, #B}
 	#A: b: f: 1
 	#B: b: g: 1
 	b: a
-	b: b: h: 1 // only an error here
+	b: b: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:8])
 }
 
 err: t6: {
+	@test(permute)
 	// TODO: this should fail
 	a: {#A, #B}
 	#A: b: c: d: e: f: 1
 	#B: b: c: d: e: g: 1
 	b: a
-	b: b: c: d: e: h: 1 // only an error here
+	b: b: c: d: e: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:17])
 }
 
 // TODO: move this test to "ok": _ means any and implicitly defines all fields
@@ -187,16 +278,18 @@ err: t6: {
 // either allow for an error variant that only "allows" all fields but does not
 // define them as optional top, or rethink the closedness model altogether.
 err: t7: {
+	@test(permute)
 	#D: _ & {a: 2}
 	a: #D
-	a: b: 1
+	a: b: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
 }
 
 err: t8: {
+	@test(permute)
 	// nested embedding
 	#S: { { c: d: 1 } }
 	V: #S
-	V: { c: e:  1 } // Should fail
+	V: { c: e: 1 @test(err, code=eval, contains="field not allowed", pos=[0:10]) }
 }
 -- validators.cue --
 import "struct"
@@ -213,6 +306,18 @@ validator: open: {
 	}
 	data: trailingComma: "all"
 	data: #Schema
+
+	@test(eq, {
+		#Schema: {
+			matchN(1, [{trailingComma: "all"}])
+			#x: trailingComma?: "all"
+		}
+		data: {
+			// TODO: why is the matchN dropped here?
+			trailingComma: "all"
+			#x: trailingComma?: "all"
+		}
+	})
 }
 
 validator: keepClosed: {
@@ -222,7 +327,7 @@ validator: keepClosed: {
 		b?: int
 	}
 	x: #X
-	x: c: 1
+	x: c: 1 @test(err, code=eval, contains="field not allowed", pos=[-5:3, 0:5])
 }
 -- issue1830.cue --
 // Closedness was not applied when accessing optional fields through a selector;
@@ -241,11 +346,14 @@ issue1830: {
 		x1: (#x & {y: z: _}).y.z & {
 			name: "blah"
 			age1: 5
-		}
+		} @test(closed) @test(eq, { name: "blah", age1: 5 }, incorrect)
 		x2: (#x.y & {z: _}).z & {
 			name: "blah"
 			age2: 5
-		}
+		} @test(closed) @test(eq, { name: "blah", age2: 5 }, incorrect)
+
+		@test(err:todo, at=x1.age1, code=eval, contains="field not allowed")
+		@test(err:todo, at=x2.age2, code=eval, contains="field not allowed")
 	}
 }
 -- issue3491.cue --
@@ -254,13 +362,22 @@ issue1830: {
 // https://cuelang.org/issue/3491
 issue3491: {
 	#Schema: field?: {}
-  
+
 	a: #Schema & {
 	  field: {}
 	}
-  
+
 	a: b
 	b: #Extra: {}
+
+	@test(eq, {
+		#Schema: field?: {}
+		a: {
+			field: {}
+			#Extra: {}
+		}
+		b: #Extra: {}
+	})
 }
 -- out/eval/stats --
 Leaks:  1
@@ -274,1398 +391,34 @@ Conjuncts:    423
 Disjuncts:    0
 
 NumCloseIDs: 122
--- out/evalalpha --
-Errors:
-err.t1.a.disallowed: field not allowed:
-    ./in.cue:135:5
-err.t2.V.c.e: field not allowed:
-    ./in.cue:141:10
-err.t3.p1.a.c: field not allowed:
-    ./in.cue:147:5
-err.t3.p2.a.b.c: field not allowed:
-    ./in.cue:153:8
-err.t4.a.b.h: field not allowed:
-    ./in.cue:159:8
-err.t5.b.b.h: field not allowed:
-    ./in.cue:168:8
-err.t6.b.b.c.d.e.h: field not allowed:
-    ./in.cue:177:17
-err.t7.a.b: field not allowed:
-    ./in.cue:189:5
-err.t8.V.c.e: field not allowed:
-    ./in.cue:196:10
-ok.t13.x.c: field not allowed:
-    ./in.cue:112:5
-ok.t5.x.c: field not allowed:
-    ./in.cue:41:5
-validator.keepClosed.x.c: field not allowed:
-    ./validators.cue:19:3
-    ./validators.cue:24:5
-
-Result:
-(_|_){
-  // [eval]
-  ok: (_|_){
-    // [eval]
-    t1: (struct){
-      c: (#list){
-        0: (#struct){
-          b: (int){ int }
-        }
-      }
-      #R: (list){
-      }
-    }
-    t2: (struct){
-      #A: (_){ _ }
-      l: (#struct){
-        f: (string){ "hi" }
-      }
-    }
-    t3: (struct){
-      #A: (#struct){
-        f: (#struct){
-        }
-      }
-      #A1: (#struct){
-        f: (#struct){
-        }
-      }
-      s: (struct){
-        foo: (#struct){
-          f: (#struct){
-            d: (struct){
-              foo: (int){ 1 }
-            }
-          }
-        }
-      }
-    }
-    t4: (struct){
-      #T: (#struct){
-        a: (#struct){
-          b: (int){ 1 }
-        }
-      }
-      W: (#struct){
-        b: (struct){
-          c: (int){ 2 }
-        }
-        a: (#struct){
-          b: (int){ 1 }
-        }
-      }
-    }
-    t5: (_|_){
-      // [eval]
-      #A: (#struct){
-      }
-      Common: (struct){
-      }
-      x: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] ok.t5.x.c: field not allowed:
-          //     ./in.cue:41:5
-        }
-      }
-    }
-    t6: (struct){
-      #A: (#struct){
-      }
-      Common: (struct){
-      }
-      x: (#struct){
-        c: (int){ int }
-      }
-    }
-    t7: (struct){
-      a: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-          g: (int){ 1 }
-        }
-      }
-      #A: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-        }
-      }
-      #B: (#struct){
-        b: (#struct){
-          g: (int){ 1 }
-        }
-      }
-    }
-    t8: (struct){
-      foo: ~(ok.t8.#X)
-      #X: (#struct){
-        a: (#struct){
-          b: (#struct){
-            c: (#struct){
-              C: (int){ 1 }
-              D: (int){ 2 }
-            }
-          }
-        }
-      }
-    }
-    t9: (struct){
-      c: (#list){
-        0: (#struct){
-          b: (int){ int }
-        }
-      }
-      #R: (list){
-      }
-    }
-    t10: (struct){
-      #A: (_){ _ }
-      l: (#struct){
-        f: (string){ "hi" }
-      }
-    }
-    t11: (struct){
-      #A: (#struct){
-        f: (#struct){
-        }
-      }
-      #A1: (#struct){
-        f: (#struct){
-        }
-      }
-      s: (struct){
-        foo: (#struct){
-          f: (#struct){
-            d: (struct){
-              foo: (string){ "bar" }
-            }
-          }
-        }
-      }
-    }
-    t12: (struct){
-      #T: (#struct){
-        a: (#struct){
-          b: (int){ 1 }
-        }
-      }
-      W: (#struct){
-        b: (struct){
-          c: (int){ 2 }
-        }
-        a: (#struct){
-          b: (int){ 1 }
-        }
-      }
-    }
-    t13: (_|_){
-      // [eval]
-      #A: (#struct){
-      }
-      Common: (struct){
-      }
-      x: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] ok.t13.x.c: field not allowed:
-          //     ./in.cue:112:5
-        }
-      }
-    }
-    t14: (struct){
-      #A: (#struct){
-      }
-      Common: (struct){
-      }
-      x: (#struct){
-        c: (int){ int }
-      }
-    }
-  }
-  err: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      #D: (#struct){
-        a: (int){ 2 }
-      }
-      a: (_|_){
-        // [eval]
-        disallowed: (_|_){
-          // [eval] err.t1.a.disallowed: field not allowed:
-          //     ./in.cue:135:5
-        }
-        a: (int){ 2 }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      #S: (#struct){
-        c: (#struct){
-          d: (int){ 1 }
-        }
-      }
-      V: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval]
-          e: (_|_){
-            // [eval] err.t2.V.c.e: field not allowed:
-            //     ./in.cue:141:10
-          }
-          d: (int){ 1 }
-        }
-      }
-    }
-    t3: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
-        #D: (#struct){
-        }
-        a: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval] err.t3.p1.a.c: field not allowed:
-            //     ./in.cue:147:5
-          }
-        }
-      }
-      p2: (_|_){
-        // [eval]
-        #D: (#struct){
-          b: (#struct){
-          }
-        }
-        a: (_|_){
-          // [eval]
-          b: (_|_){
-            // [eval]
-            c: (_|_){
-              // [eval] err.t3.p2.a.b.c: field not allowed:
-              //     ./in.cue:153:8
-            }
-          }
-        }
-      }
-    }
-    t4: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          h: (_|_){
-            // [eval] err.t4.a.b.h: field not allowed:
-            //     ./in.cue:159:8
-          }
-          f: (int){ 1 }
-        }
-      }
-      #A: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-        }
-      }
-    }
-    t5: (_|_){
-      // [eval]
-      a: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-          g: (int){ 1 }
-        }
-      }
-      #A: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-        }
-      }
-      #B: (#struct){
-        b: (#struct){
-          g: (int){ 1 }
-        }
-      }
-      b: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          h: (_|_){
-            // [eval] err.t5.b.b.h: field not allowed:
-            //     ./in.cue:168:8
-          }
-          f: (int){ 1 }
-          g: (int){ 1 }
-        }
-      }
-    }
-    t6: (_|_){
-      // [eval]
-      a: (#struct){
-        b: (#struct){
-          c: (#struct){
-            d: (#struct){
-              e: (#struct){
-                f: (int){ 1 }
-                g: (int){ 1 }
-              }
-            }
-          }
-        }
-      }
-      #A: (#struct){
-        b: (#struct){
-          c: (#struct){
-            d: (#struct){
-              e: (#struct){
-                f: (int){ 1 }
-              }
-            }
-          }
-        }
-      }
-      #B: (#struct){
-        b: (#struct){
-          c: (#struct){
-            d: (#struct){
-              e: (#struct){
-                g: (int){ 1 }
-              }
-            }
-          }
-        }
-      }
-      b: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval]
-            d: (_|_){
-              // [eval]
-              e: (_|_){
-                // [eval]
-                h: (_|_){
-                  // [eval] err.t6.b.b.c.d.e.h: field not allowed:
-                  //     ./in.cue:177:17
-                }
-                f: (int){ 1 }
-                g: (int){ 1 }
-              }
-            }
-          }
-        }
-      }
-    }
-    t7: (_|_){
-      // [eval]
-      #D: (#struct){
-        a: (int){ 2 }
-      }
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] err.t7.a.b: field not allowed:
-          //     ./in.cue:189:5
-        }
-        a: (int){ 2 }
-      }
-    }
-    t8: (_|_){
-      // [eval]
-      #S: (#struct){
-        c: (#struct){
-          d: (int){ 1 }
-        }
-      }
-      V: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval]
-          e: (_|_){
-            // [eval] err.t8.V.c.e: field not allowed:
-            //     ./in.cue:196:10
-          }
-          d: (int){ 1 }
-        }
-      }
-    }
-  }
-  issue1830: (struct){
-    #x: (#struct){
-      y: (#struct){
-        z?: (#struct){
-          name: (string){ string }
-        }
-      }
-    }
-    egs: (struct){
-      x1: (#struct){
-        name: (string){ "blah" }
-        age1: (int){ 5 }
-      }
-      x2: (#struct){
-        name: (string){ "blah" }
-        age2: (int){ 5 }
-      }
-    }
-  }
-  issue3491: (struct){
-    #Schema: (#struct){
-      field?: (#struct){
-      }
-    }
-    a: (#struct){
-      field: (#struct){
-      }
-      #Extra: (#struct){
-      }
-    }
-    b: (struct){
-      #Extra: (#struct){
-      }
-    }
-  }
-  validator: (_|_){
-    // [eval]
-    open: (struct){
-      #Schema: (_){
-        matchN(1, (#list){
-          0: (_|_){// 〈1;#x〉
-          }
-        })
-        #x: (#struct){
-          trailingComma?: (string){ "all" }
-        }
-      }
-      data: (#struct){
-        trailingComma: (string){ "all" }
-        #x: (#struct){
-          trailingComma?: (string){ "all" }
-        }
-      }
-    }
-    keepClosed: (_|_){
-      // [eval]
-      #X: (#struct){
-        a?: (int){ int }
-        b?: (int){ int }
-      }
-      x: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] validator.keepClosed.x.c: field not allowed:
-          //     ./validators.cue:19:3
-          //     ./validators.cue:24:5
-        }
-        a?: (int){ int }
-        b?: (int){ int }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,74 +1,29 @@
- Errors:
- err.t1.a.disallowed: field not allowed:
--    ./in.cue:133:10
--    ./in.cue:134:5
-     ./in.cue:135:5
- err.t2.V.c.e: field not allowed:
--    ./in.cue:139:8
--    ./in.cue:139:13
--    ./in.cue:140:5
-     ./in.cue:141:10
- err.t3.p1.a.c: field not allowed:
--    ./in.cue:145:6
--    ./in.cue:146:5
-     ./in.cue:147:5
- err.t3.p2.a.b.c: field not allowed:
--    ./in.cue:151:9
--    ./in.cue:152:5
-     ./in.cue:153:8
- err.t4.a.b.h: field not allowed:
--    ./in.cue:157:5
--    ./in.cue:158:9
-     ./in.cue:159:8
- err.t5.b.b.h: field not allowed:
--    ./in.cue:164:6
--    ./in.cue:164:10
--    ./in.cue:165:9
--    ./in.cue:166:9
--    ./in.cue:167:5
-     ./in.cue:168:8
- err.t6.b.b.c.d.e.h: field not allowed:
--    ./in.cue:173:6
--    ./in.cue:173:10
--    ./in.cue:174:18
--    ./in.cue:175:18
--    ./in.cue:176:5
-     ./in.cue:177:17
- err.t7.a.b: field not allowed:
--    ./in.cue:187:10
--    ./in.cue:188:5
-     ./in.cue:189:5
- err.t8.V.c.e: field not allowed:
--    ./in.cue:194:8
--    ./in.cue:194:13
--    ./in.cue:195:5
-     ./in.cue:196:10
- ok.t13.x.c: field not allowed:
--    ./in.cue:106:6
--    ./in.cue:107:3
--    ./in.cue:110:10
--    ./in.cue:111:5
-     ./in.cue:112:5
- ok.t5.x.c: field not allowed:
--    ./in.cue:35:6
--    ./in.cue:36:3
--    ./in.cue:39:10
--    ./in.cue:40:5
-     ./in.cue:41:5
- validator.keepClosed.x.c: field not allowed:
--    ./validators.cue:18:6
--    ./validators.cue:23:5
-+    ./validators.cue:19:3
-     ./validators.cue:24:5
--validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:_|_(validator.open.data.trailingComma: field not allowed)} (does not satisfy matchN): 0 matched, expected 1:
--    ./validators.cue:10:3
--    ./validators.cue:10:10
--    ./validators.cue:13:8
--    ./validators.cue:14:8
--validator.open.data.trailingComma: field not allowed:
--    ./validators.cue:10:3
--    ./validators.cue:9:11
--    ./validators.cue:13:8
--    ./validators.cue:14:8
- 
- Result:
- (_|_){
-@@ -116,11 +71,11 @@
-         }
-       }
-       W: (#struct){
--        a: (#struct){
--          b: (int){ 1 }
--        }
--        b: (struct){
--          c: (int){ 2 }
-+        b: (struct){
-+          c: (int){ 2 }
-+        }
-+        a: (#struct){
-+          b: (int){ 1 }
-         }
-       }
-     }
-@@ -134,10 +89,6 @@
-         // [eval]
-         c: (_|_){
-           // [eval] ok.t5.x.c: field not allowed:
--          //     ./in.cue:35:6
--          //     ./in.cue:36:3
--          //     ./in.cue:39:10
--          //     ./in.cue:40:5
-           //     ./in.cue:41:5
-         }
-       }
-@@ -223,11 +174,11 @@
-         }
-       }
-       W: (#struct){
--        a: (#struct){
--          b: (int){ 1 }
--        }
--        b: (struct){
--          c: (int){ 2 }
-+        b: (struct){
-+          c: (int){ 2 }
-+        }
-+        a: (#struct){
-+          b: (int){ 1 }
-         }
-       }
-     }
-@@ -241,10 +192,6 @@
-         // [eval]
-         c: (_|_){
-           // [eval] ok.t13.x.c: field not allowed:
--          //     ./in.cue:106:6
--          //     ./in.cue:107:3
--          //     ./in.cue:110:10
--          //     ./in.cue:111:5
-           //     ./in.cue:112:5
-         }
-       }
-@@ -286,14 +233,11 @@
-         // [eval]
-         c: (_|_){
-           // [eval]
--          d: (int){ 1 }
-           e: (_|_){
-             // [eval] err.t2.V.c.e: field not allowed:
--            //     ./in.cue:139:8
--            //     ./in.cue:139:13
--            //     ./in.cue:140:5
-             //     ./in.cue:141:10
-           }
-+          d: (int){ 1 }
-         }
-       }
-     }
-@@ -307,8 +251,6 @@
-           // [eval]
-           c: (_|_){
-             // [eval] err.t3.p1.a.c: field not allowed:
--            //     ./in.cue:145:6
--            //     ./in.cue:146:5
-             //     ./in.cue:147:5
-           }
-         }
-@@ -325,8 +267,6 @@
-             // [eval]
-             c: (_|_){
-               // [eval] err.t3.p2.a.b.c: field not allowed:
--              //     ./in.cue:151:9
--              //     ./in.cue:152:5
-               //     ./in.cue:153:8
-             }
-           }
-@@ -339,54 +279,47 @@
-         // [eval]
-         b: (_|_){
-           // [eval]
--          f: (int){ 1 }
-           h: (_|_){
-             // [eval] err.t4.a.b.h: field not allowed:
--            //     ./in.cue:157:5
--            //     ./in.cue:158:9
-             //     ./in.cue:159:8
-           }
--        }
--      }
--      #A: (#struct){
--        b: (#struct){
--          f: (int){ 1 }
--        }
--      }
--    }
--    t5: (_|_){
--      // [eval]
--      a: (#struct){
--        b: (#struct){
--          f: (int){ 1 }
--          g: (int){ 1 }
--        }
--      }
--      #A: (#struct){
--        b: (#struct){
--          f: (int){ 1 }
--        }
--      }
--      #B: (#struct){
--        b: (#struct){
--          g: (int){ 1 }
--        }
--      }
--      b: (_|_){
--        // [eval]
--        b: (_|_){
--          // [eval]
--          f: (int){ 1 }
--          g: (int){ 1 }
-+          f: (int){ 1 }
-+        }
-+      }
-+      #A: (#struct){
-+        b: (#struct){
-+          f: (int){ 1 }
-+        }
-+      }
-+    }
-+    t5: (_|_){
-+      // [eval]
-+      a: (#struct){
-+        b: (#struct){
-+          f: (int){ 1 }
-+          g: (int){ 1 }
-+        }
-+      }
-+      #A: (#struct){
-+        b: (#struct){
-+          f: (int){ 1 }
-+        }
-+      }
-+      #B: (#struct){
-+        b: (#struct){
-+          g: (int){ 1 }
-+        }
-+      }
-+      b: (_|_){
-+        // [eval]
-+        b: (_|_){
-+          // [eval]
-           h: (_|_){
-             // [eval] err.t5.b.b.h: field not allowed:
--            //     ./in.cue:164:6
--            //     ./in.cue:164:10
--            //     ./in.cue:165:9
--            //     ./in.cue:166:9
--            //     ./in.cue:167:5
-             //     ./in.cue:168:8
-           }
-+          f: (int){ 1 }
-+          g: (int){ 1 }
-         }
-       }
-     }
-@@ -436,17 +369,12 @@
-               // [eval]
-               e: (_|_){
-                 // [eval]
--                f: (int){ 1 }
--                g: (int){ 1 }
-                 h: (_|_){
-                   // [eval] err.t6.b.b.c.d.e.h: field not allowed:
--                  //     ./in.cue:173:6
--                  //     ./in.cue:173:10
--                  //     ./in.cue:174:18
--                  //     ./in.cue:175:18
--                  //     ./in.cue:176:5
-                   //     ./in.cue:177:17
-                 }
-+                f: (int){ 1 }
-+                g: (int){ 1 }
-               }
-             }
-           }
-@@ -460,13 +388,11 @@
-       }
-       a: (_|_){
-         // [eval]
--        a: (int){ 2 }
-         b: (_|_){
-           // [eval] err.t7.a.b: field not allowed:
--          //     ./in.cue:187:10
--          //     ./in.cue:188:5
-           //     ./in.cue:189:5
-         }
-+        a: (int){ 2 }
-       }
-     }
-     t8: (_|_){
-@@ -480,14 +406,11 @@
-         // [eval]
-         c: (_|_){
-           // [eval]
--          d: (int){ 1 }
-           e: (_|_){
-             // [eval] err.t8.V.c.e: field not allowed:
--            //     ./in.cue:194:8
--            //     ./in.cue:194:13
--            //     ./in.cue:195:5
-             //     ./in.cue:196:10
-           }
-+          d: (int){ 1 }
-         }
-       }
-     }
-@@ -554,14 +477,13 @@
-       }
-       x: (_|_){
-         // [eval]
--        a?: (int){ int }
--        b?: (int){ int }
-         c: (_|_){
-           // [eval] validator.keepClosed.x.c: field not allowed:
--          //     ./validators.cue:18:6
--          //     ./validators.cue:23:5
-+          //     ./validators.cue:19:3
-           //     ./validators.cue:24:5
-         }
-+        a?: (int){ int }
-+        b?: (int){ int }
-       }
-     }
-   }
--- diff/todo/p2 --
-all: error positions and reordering.
--- diff/explanation --
-issue1830: the new evaluator correctly rejects inserting new fields in a closed struct
-err.t(1|2): bug fixes.
--- out/eval --
-Errors:
-err.t1.a.disallowed: field not allowed:
-    ./in.cue:133:10
-    ./in.cue:134:5
-    ./in.cue:135:5
-err.t2.V.c.e: field not allowed:
-    ./in.cue:139:8
-    ./in.cue:139:13
-    ./in.cue:140:5
-    ./in.cue:141:10
-err.t3.p1.a.c: field not allowed:
-    ./in.cue:145:6
-    ./in.cue:146:5
-    ./in.cue:147:5
-err.t3.p2.a.b.c: field not allowed:
-    ./in.cue:151:9
-    ./in.cue:152:5
-    ./in.cue:153:8
-err.t4.a.b.h: field not allowed:
-    ./in.cue:157:5
-    ./in.cue:158:9
-    ./in.cue:159:8
-err.t5.b.b.h: field not allowed:
-    ./in.cue:164:6
-    ./in.cue:164:10
-    ./in.cue:165:9
-    ./in.cue:166:9
-    ./in.cue:167:5
-    ./in.cue:168:8
-err.t6.b.b.c.d.e.h: field not allowed:
-    ./in.cue:173:6
-    ./in.cue:173:10
-    ./in.cue:174:18
-    ./in.cue:175:18
-    ./in.cue:176:5
-    ./in.cue:177:17
-err.t7.a.b: field not allowed:
-    ./in.cue:187:10
-    ./in.cue:188:5
-    ./in.cue:189:5
-err.t8.V.c.e: field not allowed:
-    ./in.cue:194:8
-    ./in.cue:194:13
-    ./in.cue:195:5
-    ./in.cue:196:10
-ok.t13.x.c: field not allowed:
-    ./in.cue:106:6
-    ./in.cue:107:3
-    ./in.cue:110:10
-    ./in.cue:111:5
-    ./in.cue:112:5
-ok.t5.x.c: field not allowed:
-    ./in.cue:35:6
-    ./in.cue:36:3
-    ./in.cue:39:10
-    ./in.cue:40:5
-    ./in.cue:41:5
-validator.keepClosed.x.c: field not allowed:
-    ./validators.cue:18:6
-    ./validators.cue:23:5
-    ./validators.cue:24:5
-validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:_|_(validator.open.data.trailingComma: field not allowed)} (does not satisfy matchN): 0 matched, expected 1:
-    ./validators.cue:10:3
-    ./validators.cue:10:10
-    ./validators.cue:13:8
-    ./validators.cue:14:8
-validator.open.data.trailingComma: field not allowed:
-    ./validators.cue:10:3
-    ./validators.cue:9:11
-    ./validators.cue:13:8
-    ./validators.cue:14:8
-
-Result:
-(_|_){
-  // [eval]
-  ok: (_|_){
-    // [eval]
-    t1: (struct){
-      c: (#list){
-        0: (#struct){
-          b: (int){ int }
-        }
-      }
-      #R: (list){
-      }
-    }
-    t2: (struct){
-      #A: (_){ _ }
-      l: (#struct){
-        f: (string){ "hi" }
-      }
-    }
-    t3: (struct){
-      #A: (#struct){
-        f: (#struct){
-        }
-      }
-      #A1: (#struct){
-        f: (#struct){
-        }
-      }
-      s: (struct){
-        foo: (#struct){
-          f: (#struct){
-            d: (struct){
-              foo: (int){ 1 }
-            }
-          }
-        }
-      }
-    }
-    t4: (struct){
-      #T: (#struct){
-        a: (#struct){
-          b: (int){ 1 }
-        }
-      }
-      W: (#struct){
-        a: (#struct){
-          b: (int){ 1 }
-        }
-        b: (struct){
-          c: (int){ 2 }
-        }
-      }
-    }
-    t5: (_|_){
-      // [eval]
-      #A: (#struct){
-      }
-      Common: (struct){
-      }
-      x: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] ok.t5.x.c: field not allowed:
-          //     ./in.cue:35:6
-          //     ./in.cue:36:3
-          //     ./in.cue:39:10
-          //     ./in.cue:40:5
-          //     ./in.cue:41:5
-        }
-      }
-    }
-    t6: (struct){
-      #A: (#struct){
-      }
-      Common: (struct){
-      }
-      x: (#struct){
-        c: (int){ int }
-      }
-    }
-    t7: (struct){
-      a: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-          g: (int){ 1 }
-        }
-      }
-      #A: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-        }
-      }
-      #B: (#struct){
-        b: (#struct){
-          g: (int){ 1 }
-        }
-      }
-    }
-    t8: (struct){
-      foo: ~(ok.t8.#X)
-      #X: (#struct){
-        a: (#struct){
-          b: (#struct){
-            c: (#struct){
-              C: (int){ 1 }
-              D: (int){ 2 }
-            }
-          }
-        }
-      }
-    }
-    t9: (struct){
-      c: (#list){
-        0: (#struct){
-          b: (int){ int }
-        }
-      }
-      #R: (list){
-      }
-    }
-    t10: (struct){
-      #A: (_){ _ }
-      l: (#struct){
-        f: (string){ "hi" }
-      }
-    }
-    t11: (struct){
-      #A: (#struct){
-        f: (#struct){
-        }
-      }
-      #A1: (#struct){
-        f: (#struct){
-        }
-      }
-      s: (struct){
-        foo: (#struct){
-          f: (#struct){
-            d: (struct){
-              foo: (string){ "bar" }
-            }
-          }
-        }
-      }
-    }
-    t12: (struct){
-      #T: (#struct){
-        a: (#struct){
-          b: (int){ 1 }
-        }
-      }
-      W: (#struct){
-        a: (#struct){
-          b: (int){ 1 }
-        }
-        b: (struct){
-          c: (int){ 2 }
-        }
-      }
-    }
-    t13: (_|_){
-      // [eval]
-      #A: (#struct){
-      }
-      Common: (struct){
-      }
-      x: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] ok.t13.x.c: field not allowed:
-          //     ./in.cue:106:6
-          //     ./in.cue:107:3
-          //     ./in.cue:110:10
-          //     ./in.cue:111:5
-          //     ./in.cue:112:5
-        }
-      }
-    }
-    t14: (struct){
-      #A: (#struct){
-      }
-      Common: (struct){
-      }
-      x: (#struct){
-        c: (int){ int }
-      }
-    }
-  }
-  err: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      #D: (#struct){
-        a: (int){ 2 }
-      }
-      a: (_|_){
-        // [eval]
-        disallowed: (_|_){
-          // [eval] err.t1.a.disallowed: field not allowed:
-          //     ./in.cue:135:5
-        }
-        a: (int){ 2 }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      #S: (#struct){
-        c: (#struct){
-          d: (int){ 1 }
-        }
-      }
-      V: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval]
-          d: (int){ 1 }
-          e: (_|_){
-            // [eval] err.t2.V.c.e: field not allowed:
-            //     ./in.cue:139:8
-            //     ./in.cue:139:13
-            //     ./in.cue:140:5
-            //     ./in.cue:141:10
-          }
-        }
-      }
-    }
-    t3: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
-        #D: (#struct){
-        }
-        a: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval] err.t3.p1.a.c: field not allowed:
-            //     ./in.cue:145:6
-            //     ./in.cue:146:5
-            //     ./in.cue:147:5
-          }
-        }
-      }
-      p2: (_|_){
-        // [eval]
-        #D: (#struct){
-          b: (#struct){
-          }
-        }
-        a: (_|_){
-          // [eval]
-          b: (_|_){
-            // [eval]
-            c: (_|_){
-              // [eval] err.t3.p2.a.b.c: field not allowed:
-              //     ./in.cue:151:9
-              //     ./in.cue:152:5
-              //     ./in.cue:153:8
-            }
-          }
-        }
-      }
-    }
-    t4: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          f: (int){ 1 }
-          h: (_|_){
-            // [eval] err.t4.a.b.h: field not allowed:
-            //     ./in.cue:157:5
-            //     ./in.cue:158:9
-            //     ./in.cue:159:8
-          }
-        }
-      }
-      #A: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-        }
-      }
-    }
-    t5: (_|_){
-      // [eval]
-      a: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-          g: (int){ 1 }
-        }
-      }
-      #A: (#struct){
-        b: (#struct){
-          f: (int){ 1 }
-        }
-      }
-      #B: (#struct){
-        b: (#struct){
-          g: (int){ 1 }
-        }
-      }
-      b: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          f: (int){ 1 }
-          g: (int){ 1 }
-          h: (_|_){
-            // [eval] err.t5.b.b.h: field not allowed:
-            //     ./in.cue:164:6
-            //     ./in.cue:164:10
-            //     ./in.cue:165:9
-            //     ./in.cue:166:9
-            //     ./in.cue:167:5
-            //     ./in.cue:168:8
-          }
-        }
-      }
-    }
-    t6: (_|_){
-      // [eval]
-      a: (#struct){
-        b: (#struct){
-          c: (#struct){
-            d: (#struct){
-              e: (#struct){
-                f: (int){ 1 }
-                g: (int){ 1 }
-              }
-            }
-          }
-        }
-      }
-      #A: (#struct){
-        b: (#struct){
-          c: (#struct){
-            d: (#struct){
-              e: (#struct){
-                f: (int){ 1 }
-              }
-            }
-          }
-        }
-      }
-      #B: (#struct){
-        b: (#struct){
-          c: (#struct){
-            d: (#struct){
-              e: (#struct){
-                g: (int){ 1 }
-              }
-            }
-          }
-        }
-      }
-      b: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval]
-            d: (_|_){
-              // [eval]
-              e: (_|_){
-                // [eval]
-                f: (int){ 1 }
-                g: (int){ 1 }
-                h: (_|_){
-                  // [eval] err.t6.b.b.c.d.e.h: field not allowed:
-                  //     ./in.cue:173:6
-                  //     ./in.cue:173:10
-                  //     ./in.cue:174:18
-                  //     ./in.cue:175:18
-                  //     ./in.cue:176:5
-                  //     ./in.cue:177:17
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    t7: (_|_){
-      // [eval]
-      #D: (#struct){
-        a: (int){ 2 }
-      }
-      a: (_|_){
-        // [eval]
-        a: (int){ 2 }
-        b: (_|_){
-          // [eval] err.t7.a.b: field not allowed:
-          //     ./in.cue:187:10
-          //     ./in.cue:188:5
-          //     ./in.cue:189:5
-        }
-      }
-    }
-    t8: (_|_){
-      // [eval]
-      #S: (#struct){
-        c: (#struct){
-          d: (int){ 1 }
-        }
-      }
-      V: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval]
-          d: (int){ 1 }
-          e: (_|_){
-            // [eval] err.t8.V.c.e: field not allowed:
-            //     ./in.cue:194:8
-            //     ./in.cue:194:13
-            //     ./in.cue:195:5
-            //     ./in.cue:196:10
-          }
-        }
-      }
-    }
-  }
-  issue1830: (struct){
-    #x: (#struct){
-      y: (#struct){
-        z?: (#struct){
-          name: (string){ string }
-        }
-      }
-    }
-    egs: (struct){
-      x1: (#struct){
-        name: (string){ "blah" }
-        age1: (int){ 5 }
-      }
-      x2: (#struct){
-        name: (string){ "blah" }
-        age2: (int){ 5 }
-      }
-    }
-  }
-  issue3491: (struct){
-    #Schema: (#struct){
-      field?: (#struct){
-      }
-    }
-    a: (#struct){
-      field: (#struct){
-      }
-      #Extra: (#struct){
-      }
-    }
-    b: (struct){
-      #Extra: (#struct){
-      }
-    }
-  }
-  validator: (_|_){
-    // [eval]
-    open: (struct){
-      #Schema: (_){
-        matchN(1, (#list){
-          0: (_|_){// 〈1;#x〉
-          }
-        })
-        #x: (#struct){
-          trailingComma?: (string){ "all" }
-        }
-      }
-      data: (#struct){
-        trailingComma: (string){ "all" }
-        #x: (#struct){
-          trailingComma?: (string){ "all" }
-        }
-      }
-    }
-    keepClosed: (_|_){
-      // [eval]
-      #X: (#struct){
-        a?: (int){ int }
-        b?: (int){ int }
-      }
-      x: (_|_){
-        // [eval]
-        a?: (int){ int }
-        b?: (int){ int }
-        c: (_|_){
-          // [eval] validator.keepClosed.x.c: field not allowed:
-          //     ./validators.cue:18:6
-          //     ./validators.cue:23:5
-          //     ./validators.cue:24:5
-        }
-      }
-    }
-  }
-}
+-- out/errors.txt --
+[eval] ok.t5.x.c: field not allowed:
+    ./in.cue:65:5
+[eval] ok.t13.x.c: field not allowed:
+    ./in.cue:192:5
+[eval] err.t1.a.disallowed: field not allowed:
+    ./in.cue:228:5
+[eval] err.t2.V.c.e: field not allowed:
+    ./in.cue:235:10
+[eval] err.t3.a.c: field not allowed:
+    ./in.cue:242:5
+[eval] err.t4.a.b.h: field not allowed:
+    ./in.cue:249:8
+[eval] err.t5.b.b.h: field not allowed:
+    ./in.cue:259:8
+[eval] err.t6.b.b.c.d.e.h: field not allowed:
+    ./in.cue:269:17
+[eval] err.t7.a.b: field not allowed:
+    ./in.cue:282:5
+[eval] err.t8.V.c.e: field not allowed:
+    ./in.cue:290:10
+[eval] validator.keepClosed.x.c: field not allowed:
+    ./validators.cue:31:3
+    ./validators.cue:36:5
+-- out/diff-v2-v3.txt --
+Error positions: v3 reports fewer positions than v2.
+Field reordering differences between v2 and v3.
+Verdict: worsening -- v3 reports fewer error positions than v2; field reordering.
 -- out/compile --
 --- in.cue
 {
@@ -1918,27 +671,10 @@ Result:
   }
   err: {
     t3: {
-      p1: {
-        #D: {}
-        a: 〈0;#D〉
-        a: {
-          c: "C"
-        }
-      }
-    }
-  }
-  err: {
-    t3: {
-      p2: {
-        #D: {
-          b: {}
-        }
-        a: 〈0;#D〉
-        a: {
-          b: {
-            c: "C"
-          }
-        }
+      #D: {}
+      a: 〈0;#D〉
+      a: {
+        c: "C"
       }
     }
   }

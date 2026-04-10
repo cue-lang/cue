@@ -55,9 +55,11 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/value"
 )
 
 // RunInlineTests iterates over txtar archives in dir, detects inline-assertion
@@ -1450,24 +1452,122 @@ func compactCUEExpr(s string) string {
 // _#def wrapping, then re-enables optional fields (value?: T) so the
 // formatted expression round-trips through astCmp.
 func (r *inlineRunner) formatValue(v cue.Value) string {
-	// cue.Final() routes to Vertex() export (no _#def wrapping) and sets
-	// omitOptional=true.  cue.Optional(true) applied afterwards re-enables
-	// optional fields, giving us the complete value without internals.
-	syn := v.Syntax(cue.Docs(true), cue.Final(), cue.Optional(true), cue.Definitions(true), cue.Hidden(true))
-	// Strip @test decl attributes from any struct literals in the exported
-	// syntax tree.  v.Syntax() may carry over source-level attributes, which
-	// must not appear in the formatted expected-value expression.
-	stripTestAttrs(syn)
-	// Strip all comments from the AST.  Error nodes (e.g. _|_) carry line
-	// comments like "// path: error message" from v.Syntax(); if these appear
-	// inside an @test(eq, ...) attribute body, the // sequence is parsed as a
-	// CUE comment, which would consume the closing ) and corrupt the attribute.
-	stripComments(syn)
-	b, err := format.Node(syn, format.Simplify())
-	if err != nil {
-		return fmt.Sprintf("%#v", v)
+	var b strings.Builder
+	eqWriteValue(value.OpContext(v), &b, v)
+	return b.String()
+}
+
+// eqWriteValue writes a CUE value to b in @test(eq, ...) body notation.
+//
+// Compared with v.Syntax() + cue.Final() + format.Node:
+//   - Hidden fields use _foo$pkg notation (matching astcmp.go conventions).
+//   - adt.Disjunction values are emitted as *d1 | d2 (with * for defaults)
+//     instead of being collapsed to the default by cue.Final().
+//   - adt.Conjunction values are emitted as c1 & c2.
+func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value) {
+	tv := v.Core()
+	vx := tv.V.DerefValue()
+
+	switch bv := vx.BaseValue.(type) {
+	case *adt.Disjunction:
+		eqWriteDisjunction(opCtx, b, bv)
+		return
+	case *adt.Conjunction:
+		eqWriteConjunction(opCtx, b, bv)
+		return
 	}
-	return string(b)
+
+	// Use struct emission if the kind is struct OR if there are arcs — the
+	// latter handles error vertices that still carry child fields (e.g. a
+	// struct with one bad field: the parent vertex is _|_ but its arcs hold
+	// the successfully-evaluated sibling fields).
+	if v.IncompleteKind() == cue.StructKind || len(vx.Arcs) > 0 {
+		eqWriteStruct(opCtx, b, vx)
+		return
+	}
+
+	// Scalar values and lists: fall back to the standard syntax formatter.
+	// cue.Final() resolves defaults and avoids _#def wrapping.
+	syn := v.Syntax(cue.Docs(false), cue.Final(), cue.Optional(true))
+	stripComments(syn)
+	bs, err := format.Node(syn, format.Simplify())
+	if err != nil {
+		fmt.Fprintf(b, "%#v", v)
+	} else {
+		b.Write(bs)
+	}
+}
+
+// eqWriteDisjunction emits disjuncts as *d1 | d2 | d3 (defaults first with *).
+func eqWriteDisjunction(opCtx *adt.OpContext, b *strings.Builder, dj *adt.Disjunction) {
+	for i, v := range dj.Values {
+		if i > 0 {
+			b.WriteString(" | ")
+		}
+		if i < dj.NumDefaults {
+			b.WriteByte('*')
+		}
+		eqWriteValue(opCtx, b, value.Make(opCtx, v))
+	}
+}
+
+// eqWriteConjunction emits conjuncts as c1 & c2 & c3.
+func eqWriteConjunction(opCtx *adt.OpContext, b *strings.Builder, conj *adt.Conjunction) {
+	for i, v := range conj.Values {
+		if i > 0 {
+			b.WriteString(" & ")
+		}
+		eqWriteValue(opCtx, b, value.Make(opCtx, v))
+	}
+}
+
+// eqWriteStruct emits a struct, using _foo$pkg notation for hidden-field labels.
+func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex) {
+	b.WriteByte('{')
+	first := true
+	for _, arc := range vx.Arcs {
+		if arc.ArcType == adt.ArcNotPresent || arc.Label.IsLet() {
+			continue
+		}
+		// Skip hidden fields from external packages: their PkgID is a full
+		// module path (e.g. "mod.test/pkg") which cannot be encoded as a
+		// valid CUE identifier in the $pkg suffix notation.
+		if arc.Label.IsHidden() {
+			pkg := arc.Label.PkgID(opCtx)
+			if pkg != "_" && !strings.HasPrefix(pkg, ":") {
+				continue
+			}
+		}
+		if !first {
+			b.WriteString(", ")
+		}
+		first = false
+		eqWriteLabel(opCtx, b, arc.Label, arc.ArcType)
+		b.WriteString(": ")
+		eqWriteValue(opCtx, b, value.Make(opCtx, arc))
+	}
+	b.WriteByte('}')
+}
+
+// eqWriteLabel writes a field label.
+// For hidden labels the $pkg qualifier is included when the field is
+// package-scoped (pkg != "_"). Callers must ensure the label's PkgID is
+// either "_" or colon-prefixed (inline package) before calling — see
+// the skip guard in eqWriteStruct.
+func eqWriteLabel(opCtx *adt.OpContext, b *strings.Builder, f adt.Feature, arcType adt.ArcType) {
+	if f.IsHidden() {
+		name := f.IdentString(opCtx)
+		pkg := f.PkgID(opCtx)
+		if pkg != "_" {
+			// PkgID returns ":pkgname" for inline sources; convert to "$pkgname".
+			b.WriteString(name + "$" + strings.TrimPrefix(pkg, ":"))
+		} else {
+			b.WriteString(name)
+		}
+	} else {
+		b.WriteString(f.SelectorString(opCtx))
+	}
+	b.WriteString(arcType.Suffix())
 }
 
 // stripComments removes all comment groups from every node in the AST.
@@ -1478,30 +1578,6 @@ func (r *inlineRunner) formatValue(v cue.Value) string {
 func stripComments(node ast.Node) {
 	ast.Walk(node, func(n ast.Node) bool {
 		ast.SetComments(n, nil)
-		return true
-	}, nil)
-}
-
-// stripTestAttrs removes @test(...) decl-level attributes from all struct
-// literals in the AST node.  This prevents source-level test annotations from
-// leaking into @test(eq, ...) expected-value expressions written by CUE_UPDATE.
-func stripTestAttrs(node ast.Node) {
-	ast.Walk(node, func(n ast.Node) bool {
-		sl, ok := n.(*ast.StructLit)
-		if !ok {
-			return true
-		}
-		elts := sl.Elts[:0]
-		for _, e := range sl.Elts {
-			if a, ok := e.(*ast.Attribute); ok {
-				k, _ := a.Split()
-				if k == "test" {
-					continue
-				}
-			}
-			elts = append(elts, e)
-		}
-		sl.Elts = elts
 		return true
 	}, nil)
 }

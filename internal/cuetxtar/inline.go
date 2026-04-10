@@ -1183,6 +1183,8 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 		r.runKindAssertion(t, path, val, pa)
 	case "closed":
 		r.runClosedAssertion(t, path, val, pa)
+	case "allows":
+		r.runAllowsAssertion(t, path, val, pa)
 	case "skip":
 		// @test(skip) or @test(skip, why="reason") — skip this test.
 		reason := "skipped"
@@ -1487,6 +1489,52 @@ func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.V
 	got := val.IsClosed()
 	if got != expected {
 		t.Errorf("path %s: @test(closed): got closed=%v, want %v", path, got, expected)
+		logHint(t, pa.hint)
+	}
+}
+
+// runAllowsAssertion checks val.Allows(sel) against the expected result.
+// Syntax: @test(allows, sel) for expected=true, @test(allows=false, sel) for false.
+// sel is the raw attribute value (before quote-unescaping):
+//   - Unquoted string or int: the CUE pattern constraints cue.AnyString or cue.AnyIndex.
+//   - Anything else (e.g. foo, "foo", #Def): passed to cue.ParsePath as a single-selector
+//     path. Quoted values like "foo" or "string" select the literal string field.
+func (r *inlineRunner) runAllowsAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
+	t.Helper()
+	expected := true
+	if len(pa.raw.Fields) >= 1 && pa.raw.Fields[0].Key() == "allows" {
+		if pa.raw.Fields[0].Value() == "false" {
+			expected = false
+		}
+	}
+	var rawSel string
+	for _, kv := range pa.raw.Fields[1:] {
+		if kv.Key() == "" {
+			rawSel = kv.RawValue()
+			break
+		}
+	}
+	if rawSel == "" {
+		t.Errorf("path %s: @test(allows): missing selector argument", path)
+		return
+	}
+	var sel cue.Selector
+	switch rawSel {
+	case "string":
+		sel = cue.AnyString
+	case "int":
+		sel = cue.AnyIndex
+	default:
+		p := cue.ParsePath(rawSel)
+		if err := p.Err(); err != nil || len(p.Selectors()) != 1 {
+			t.Errorf("path %s: @test(allows): invalid selector %s: %v", path, rawSel, err)
+			return
+		}
+		sel = p.Selectors()[0]
+	}
+	got := val.Allows(sel)
+	if got != expected {
+		t.Errorf("path %s: @test(allows, %s): got Allows=%v, want %v", path, rawSel, got, expected)
 		logHint(t, pa.hint)
 	}
 }

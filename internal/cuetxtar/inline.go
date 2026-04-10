@@ -1184,6 +1184,8 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 		r.runKindAssertion(t, path, val, pa)
 	case "closed":
 		r.runClosedAssertion(t, path, val, pa)
+	case "pass":
+		r.runPassAssertion(t, path, val, pa)
 	case "allows":
 		r.runAllowsAssertion(t, path, val, pa)
 	case "skip":
@@ -1560,6 +1562,16 @@ func parseKindStr(s string) cue.Kind {
 	return cue.BottomKind // sentinel for unknown
 }
 
+// runPassAssertion checks that val has no error.
+// Syntax: @test(pass)
+func (r *inlineRunner) runPassAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
+	t.Helper()
+	if err := val.Err(); err != nil {
+		t.Errorf("path %s: @test(pass): value has error: %v", path, err)
+		logHint(t, pa.hint)
+	}
+}
+
 // runClosedAssertion checks val.IsClosed() matches expected.
 // Syntax: @test(closed) for closed=true, @test(closed=false) for closed=false.
 func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
@@ -1598,6 +1610,11 @@ func (r *inlineRunner) runAllowsAssertion(t testing.TB, path cue.Path, val cue.V
 	}
 	if selStr == "" {
 		t.Errorf("path %s: @test(allows): missing selector argument", path)
+		return
+	}
+	k := val.IncompleteKind()
+	if k != cue.StructKind && k != cue.ListKind {
+		t.Errorf("path %s: @test(allows): directive only valid on struct or list values, got %v", path, k)
 		return
 	}
 	var sel cue.Selector

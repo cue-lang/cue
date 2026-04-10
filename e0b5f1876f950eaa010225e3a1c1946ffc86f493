@@ -16,6 +16,24 @@
       "message": "It\u0027s interesting that apparently this is not an expression\n\n```\n@experiment(try)\ntry { true }\n```\n\nThis is an expression, but it doesn\u0027t work:\n\n```\n{x: {try { true }} @experiment(try)}.x\n```\n\nEssentially, I\u0027m trying to convince myself that it\u0027s ok for you to assume there are no experiments. I think it\u0027s ok.",
       "revId": "e0b5f1876f950eaa010225e3a1c1946ffc86f493",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0cbf29f_56a4fb34",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-10T10:05:17Z",
+      "side": 1,
+      "message": "```\n{x: {\n\t@experiment(try)\n\ttry {true}\n}}.x\n```\nThat\u0027s a better example, but it still doesn\u0027t work. I guess the only legal places for `@experiment` to appear means it can never be part of an expression.",
+      "parentUuid": "86879684_e0407256",
+      "revId": "e0b5f1876f950eaa010225e3a1c1946ffc86f493",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

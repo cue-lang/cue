@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bb3fef7_6ace5507",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T11:58:56Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "213996cc_f12bbc52",
+      "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e43956a1_11e236f2",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e1bb8e5_bfc69a90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T11:58:56Z",
+      "side": 1,
+      "message": "Done. Used TestMain instead of func init so the temp dir gets cleaned up properly.",
+      "parentUuid": "e43956a1_11e236f2",
+      "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3809daa_06ae5035",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-04-10T11:23:39Z",
       "side": 1,
       "message": "Rather than duplicating this logic in two places, how about factoring it into a helper function?\n\n```\nfunc setupEmptyDockerConfig(t *testing.T) {\n    mk temp dir\n    set DOCKER CONFIG\n    write config.json with {} contents\n}\n```",
+      "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "857d5914_e23d2863",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T11:58:56Z",
+      "side": 1,
+      "message": "Done, though the int approach, as per mvdan, made the per-test helper unnecessary.",
+      "parentUuid": "d3809daa_06ae5035",
       "revId": "a004726e4ecce21743f99c53acb8b842db5d4b0a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

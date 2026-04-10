@@ -28,9 +28,9 @@ type Runtime struct {
 
 	loaded map[*build.Instance]interface{}
 
-	// interpreters implement extern functionality. The map key corresponds to
+	// injections implement extern functionality. The map key corresponds to
 	// the kind in a file-level @extern(kind) attribute.
-	interpreters map[string]Interpreter
+	injections map[string]Injection
 
 	version internal.EvaluatorVersion
 

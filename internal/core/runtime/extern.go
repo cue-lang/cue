@@ -26,37 +26,35 @@ import (
 	"cuelang.org/go/internal/core/walk"
 )
 
-// SetInterpreter sets the interpreter for interpretation of files marked with
-// @extern(kind).
-func (r *Runtime) SetInterpreter(i Interpreter) {
-	if r.interpreters == nil {
-		r.interpreters = map[string]Interpreter{}
+// SetInjection sets the injection value to be used for injection
+// of values with an @extern(kind) attribute where kind is i.Kind().
+func (r *Runtime) SetInjection(i Injection) {
+	if r.injections == nil {
+		r.injections = map[string]Injection{}
 	}
-	r.interpreters[i.Kind()] = i
+	r.injections[i.Kind()] = i
 }
 
-// TODO: consider also passing the top-level attribute to NewCompiler to allow
-// passing default values.
+// Injection defines an entrypoint for creating per-instance injectors.
+type Injection interface {
+	// InjectorForInstance returns a new injector for the
+	// given build instance.
+	InjectorForInstance(b *build.Instance, r *Runtime) (Injector, errors.Error)
 
-// Interpreter defines an entrypoint for creating per-package interpreters.
-type Interpreter interface {
-	// NewCompiler creates a compiler for b and reports any errors.
-	NewCompiler(b *build.Instance, r *Runtime) (Compiler, errors.Error)
-
-	// Kind returns the string to be used in the file-level @extern attribute.
+	// Kind returns the @extern kind for this injection,
+	// for example "embed" for @extern(embed).
+	// A given Injection instance should always return
+	// the same value.
 	Kind() string
 }
 
-// A Compiler fills in an adt.Expr for fields marked with `@extern(kind)`.
-type Compiler interface {
-	// Compile creates an adt.Expr (usually a builtin) for the
-	// given external named resource (usually a function). name
-	// is the name of the resource to compile, taken from altName
-	// in `@extern(name=altName)`, or from the field name if that's
-	// not defined. Scope is the struct that contains the field.
-	// Other than "name", the fields in a are implementation
-	// specific.
-	Compile(name string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error)
+// An Injector fills in an adt.Expr for fields marked with `@extern(kind)`.
+type Injector interface {
+	// InjectedValue returns a value to be unified at the position of
+	// the given external attribute. The scope argument
+	// holds the value of the instance before any injections
+	// have been unified into it.
+	InjectedValue(attr *ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error)
 }
 
 // InjectImplementations modifies v to include implementations of functions
@@ -82,22 +80,23 @@ func (r *Runtime) InjectImplementations(b *build.Instance, v *adt.Vertex) (errs 
 	return d.errs
 }
 
-// externDecorator locates extern attributes and calls the relevant interpreters
-// to inject builtins.
+// externDecorator locates extern attributes and calls the relevant injectors
+// to inject values.
 type externDecorator struct {
 	runtime *Runtime
 	pkg     *build.Instance
 
-	compilers map[string]Compiler
+	injectors map[string]Injector
 
-	// fileKinds maps each AST file to the set of extern kinds declared in it.
-	fileKinds map[*token.File]map[string]bool
+	// fileKinds maps each AST file to the extern kinds declared in it,
+	// along with their file-level @extern attribute.
+	fileKinds map[*token.File]map[string]*internal.Attr
 
 	errs errors.Error
 }
 
 // addFile finds injection points in the given ast.File for external
-// implementations of Builtins.
+// implementations.
 func (d *externDecorator) addFile(f *ast.File) (errs errors.Error) {
 	kinds, _, err := findExternFileAttrs(f)
 	if err != nil {
@@ -108,16 +107,12 @@ func (d *externDecorator) addFile(f *ast.File) (errs errors.Error) {
 	}
 
 	if d.fileKinds == nil {
-		d.fileKinds = map[*token.File]map[string]bool{}
+		d.fileKinds = map[*token.File]map[string]*internal.Attr{}
 	}
-	km := make(map[string]bool)
-	for kind := range kinds {
-		km[kind] = true
-	}
-	d.fileKinds[f.Pos().File()] = km
+	d.fileKinds[f.Pos().File()] = kinds
 
 	for kind, attr := range kinds {
-		if err := d.initCompiler(kind, attr.Pos); err != nil {
+		if err := d.initInjector(kind, attr.Pos); err != nil {
 			errs = errors.Append(errs, err)
 		}
 	}
@@ -163,7 +158,7 @@ loop:
 
 			if k == "" {
 				err = errors.Append(err, errors.Newf(attr.Pos,
-					"interpreter name must be non-empty"))
+					"injection name must be non-empty"))
 				continue
 			}
 
@@ -208,25 +203,24 @@ loop:
 	return kinds, f.Decls[p:], err
 }
 
-// initCompiler initializes the runtime for kind, if applicable. The pos
+// initInjector initializes the injector for kind, if applicable. The pos
 // argument represents the position of the file-level @extern attribute.
-func (d *externDecorator) initCompiler(kind string, pos token.Pos) errors.Error {
-	if _, ok := d.compilers[kind]; ok {
+func (d *externDecorator) initInjector(kind string, pos token.Pos) errors.Error {
+	if _, ok := d.injectors[kind]; ok {
 		return nil
 	}
-	// initialize the compiler.
-	if d.compilers == nil {
-		d.compilers = map[string]Compiler{}
+	if d.injectors == nil {
+		d.injectors = map[string]Injector{}
 	}
-	x := d.runtime.interpreters[kind]
+	x := d.runtime.injections[kind]
 	if x == nil {
-		return errors.Newf(pos, "no interpreter defined for %q", kind)
+		return errors.Newf(pos, "no injection defined for %q", kind)
 	}
-	c, err := x.NewCompiler(d.pkg, d.runtime)
+	inj, err := x.InjectorForInstance(d.pkg, d.runtime)
 	if err != nil {
 		return err
 	}
-	d.compilers[kind] = c
+	d.injectors[kind] = inj
 	return nil
 }
 
@@ -351,9 +345,8 @@ func (d *externDecorator) processNode(n adt.Node, scope *adt.Vertex) {
 			continue
 		}
 		srcField := decl.Source().(*ast.Field) // We know all the above types come from ast.Field.
-		name, _, _ := ast.LabelName(srcField.Label)
 		for _, attr := range srcField.Attrs {
-			if expr := d.externValue(attr, name, kinds, scope); expr != nil {
+			if expr := d.injectedValue(attr, srcField, kinds, scope); expr != nil {
 				*valuePtr = &adt.BinaryExpr{
 					Op: adt.AndOp,
 					X:  *valuePtr,
@@ -364,26 +357,30 @@ func (d *externDecorator) processNode(n adt.Node, scope *adt.Vertex) {
 	}
 
 	// Process embedded attributes.
+	var srcParent ast.Node
 	var srcDecls []ast.Decl
 	switch src := s.Src.(type) {
 	case *ast.File:
+		srcParent = src
 		srcDecls = src.Decls
 	case *ast.StructLit:
+		srcParent = src
 		srcDecls = src.Elts
 	default:
 		panic("unexpected type in adt.StructLit.Src")
 	}
 	for _, decl := range srcDecls {
 		if attr, ok := decl.(*ast.Attribute); ok {
-			if expr := d.externValue(attr, "", kinds, scope); expr != nil {
+			if expr := d.injectedValue(attr, srcParent, kinds, scope); expr != nil {
 				s.Decls = append(s.Decls, expr)
 			}
 		}
 	}
 }
 
-func (d *externDecorator) externValue(astAttr *ast.Attribute, name string, kinds map[string]bool, scope *adt.Vertex) adt.Expr {
-	if !kinds[astAttr.Name()] {
+func (d *externDecorator) injectedValue(astAttr *ast.Attribute, parent ast.Node, kinds map[string]*internal.Attr, scope *adt.Vertex) adt.Expr {
+	topLevel := kinds[astAttr.Name()]
+	if topLevel == nil {
 		return nil
 	}
 	attr := internal.ParseAttr(astAttr)
@@ -391,14 +388,16 @@ func (d *externDecorator) externValue(astAttr *ast.Attribute, name string, kinds
 		d.errs = errors.Append(d.errs, attr.Err)
 		return nil
 	}
-	c := d.compilers[attr.Name]
-	if c == nil {
+	inj := d.injectors[attr.Name]
+	if inj == nil {
 		return nil
 	}
-	if a, ok, _ := attr.Lookup(1, "name"); ok {
-		name = a
+	ea := &ExternAttr{
+		TopLevel: topLevel,
+		Parent:   parent,
+		Attr:     attr,
 	}
-	b, err := c.Compile(name, scope, attr)
+	b, err := inj.InjectedValue(ea, scope)
 	if err != nil {
 		d.errs = errors.Append(d.errs, errors.Wrap(errors.Newf(attr.Pos, "@%s", attr.Name), err))
 		return nil

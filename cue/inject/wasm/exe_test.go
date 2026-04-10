@@ -32,7 +32,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
-	"cuelang.org/go/cue/interpreter/wasm"
+	"cuelang.org/go/cue/inject/wasm"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/runtime"

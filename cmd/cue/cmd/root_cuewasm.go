@@ -17,11 +17,11 @@
 package cmd
 
 import (
-	"cuelang.org/go/cue/interpreter/wasm"
+	"cuelang.org/go/cue/inject/wasm"
 )
 
 func init() {
-	// The wasm interpreter can be enabled by default once we are ready to ship the feature.
+	// The wasm injection can be enabled by default once we are ready to ship the feature.
 	// For now, it's not ready, and makes cue binaries heavier by over 2MiB.
 	wasmInterp = wasm.New()
 }

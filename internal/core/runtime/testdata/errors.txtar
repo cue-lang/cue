@@ -93,11 +93,11 @@ duplicate @extern attribute for kind "testfn":
     ./double_extern_b.cue:2:1
 duplicate @extern attribute for kind "testfn":
     ./double_extern_b.cue:3:1
-interpreter name must be non-empty:
+injection name must be non-empty:
     ./empty_extern.cue:1:1
-no interpreter defined for "\"testfn\" foo":
+no injection defined for "\"testfn\" foo":
     ./invalid_file_attr.cue:1:1
 extern attribute must appear before package clause:
     ./late_extern.cue:3:1
-no interpreter defined for "wazem":
+no injection defined for "wazem":
     ./unknown_interpreter.cue:1:1

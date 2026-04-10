@@ -179,6 +179,10 @@ func (q QuoteInfo) Unquote(s string) (string, error) {
 	}
 
 	buf := make([]byte, 0, 3*len(s)/2) // Try to avoid more allocations.
+	// Reject a closing delimiter at line start followed by more content.
+	if q.multiline && startsWithClosingDelim(s, q) && len(s) > int(q.numChar)+q.numHash {
+		return "", errSyntax
+	}
 	stripNL := false
 	wasEscapedNewline := false
 	for len(s) > 0 {
@@ -192,6 +196,10 @@ func (q QuoteInfo) Unquote(s string) (string, error) {
 			s, err = skipWhitespaceAfterNewline(s[1:], q)
 			if err != nil {
 				return "", err
+			}
+			// Reject a closing delimiter at line start followed by more content.
+			if q.multiline && startsWithClosingDelim(s, q) && len(s) > int(q.numChar)+q.numHash {
+				return "", errSyntax
 			}
 			stripNL = true
 			wasEscapedNewline = false
@@ -251,6 +259,25 @@ func (q QuoteInfo) Unquote(s string) (string, error) {
 	}
 	// allow unmatched quotes if already checked.
 	return "", errUnmatchedQuote
+}
+
+// startsWithClosingDelim reports whether s begins with the closing delimiter
+// for the given quote info (e.g. “”” or “””## for a ##”””-quoted string).
+func startsWithClosingDelim(s string, q QuoteInfo) bool {
+	if len(s) < int(q.numChar)+q.numHash {
+		return false
+	}
+	for i := range int(q.numChar) {
+		if s[i] != q.char {
+			return false
+		}
+	}
+	for i := range q.numHash {
+		if s[int(q.numChar)+i] != '#' {
+			return false
+		}
+	}
+	return true
 }
 
 func skipWhitespaceAfterNewline(s string, q QuoteInfo) (string, error) {

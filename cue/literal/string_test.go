@@ -103,6 +103,9 @@ func TestUnquote(t *testing.T) {
 		{"#\"\"\"\n\"\"\"\n\"\"\"#", `"""`, nil},
 		{"\"\"\"\n0\"\"\"\n\"\"\"", `0"""`, nil},
 		{"'''\n0'''\n'''", `0'''`, nil},
+		// Closing delimiter at line start followed by more content.
+		{"\"\"\"\n\t\"\"\"0\n\t\"\"\"", ``, errSyntax},
+		{"'''\n\t'''0\n\t'''", ``, errSyntax},
 		{"#\"\"\"\n\na\n\n\"\"\"#", "\na\n", nil},
 		// Gobble extra \r
 		{"#\"\"\"\n\ra\n\r\"\"\"#", `a`, nil},

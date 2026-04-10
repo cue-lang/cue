@@ -1197,7 +1197,7 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 		t.Skip(reason) // t.Skip calls runtime.Goexit, stopping the goroutine.
 	case "debugCheck":
 		r.runDebugCheckInline(t, path, val, pa)
-	case "debugOutput":
+	case "debug":
 		r.runDebugOutputInline(t, path, val, pa)
 	case "todo":
 		// @test(todo) is handled at the loop level in runInline; no-op here.
@@ -1523,14 +1523,15 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 }
 
 // runDebugOutputInline captures the debug printer output of val as an
-// informational annotation.  Unlike debugCheck, a mismatch does not fail the
-// test — it only logs and auto-updates when CUE_UPDATE is active.
+// informational annotation (@test(debug, ...)).  Unlike debugCheck, a
+// mismatch does not fail the test — it only logs and auto-updates when
+// CUE_UPDATE is active.
 func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
 	name := pa.raw.Fields[0].Value() // preserves any :vN version suffix
 	actual := r.debugPrinterOutput(val)
 	if len(pa.raw.Fields) < 2 {
-		// Empty @test(debugOutput) — fill placeholder.
+		// Empty @test(debug) — fill placeholder.
 		if cuetest.UpdateGoldenFiles {
 			r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		}
@@ -1547,31 +1548,31 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 		return
 	}
 	if !match {
-		t.Logf("path %s: @test(debugOutput) changed:\ngot:  %q\nwant: %q", path, actual, expected)
+		t.Logf("path %s: @test(debug) changed:\ngot:  %q\nwant: %q", path, actual, expected)
 	}
 }
 
 // formatDebugAttr returns the @test(name, ...) attribute text for a debug value.
-// Single-line values use the compact inline form: @test(name, """value""").
+// Raw strings (#"..."# and #"""..."""#) are used so that double quotes in
+// debug output do not need escaping.
+// Single-line values use: @test(name, #"value"#)
 // Multi-line values use an indented block with the content indented one tab
-// level beyond the attribute's source line, and the closing """ on its own line:
+// level beyond the attribute's source line, and the closing """# on its own line:
 //
-//	@test(name, """
+//	@test(name, #"""
 //		line1
 //		line2
-//		""")
+//		"""#)
 func (r *inlineRunner) formatDebugAttr(name, actual string, pa parsedTestAttr) string {
 	actual = strings.TrimRight(actual, "\n")
 	if !strings.Contains(actual, "\n") {
-		// Single-line: use a regular quoted string. Escape \ and ".
-		escaped := strings.NewReplacer(`\`, `\\`, `"`, `\"`).Replace(actual)
-		return fmt.Sprintf(`@test(%s, "%s")`, name, escaped)
+		// Single-line: use a raw quoted string #"..."#. No escaping needed.
+		return fmt.Sprintf(`@test(%s, #"%s"#)`, name, actual)
 	}
-	// Multi-line: indented block form; closing """ on its own line.
-	escaped := strings.ReplaceAll(actual, `"`, `\"`)
+	// Multi-line: indented raw block form #"""..."""#; no escaping needed.
 	inner := r.attrLineIndent(pa) + "\t"
-	indented := inner + strings.ReplaceAll(escaped, "\n", "\n"+inner)
-	return fmt.Sprintf("@test(%s, \"\"\"\n%s\n%s\"\"\")", name, indented, inner)
+	indented := inner + strings.ReplaceAll(actual, "\n", "\n"+inner)
+	return fmt.Sprintf("@test(%s, #\"\"\"\n%s\n%s\"\"\"#)", name, indented, inner)
 }
 
 // attrLineIndent returns the leading whitespace on the source line that

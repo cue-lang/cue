@@ -11,7 +11,7 @@ errOnly: 1 & 2 @test(err) @test(debugCheck, """
 	}
 	""")
 
-errWithCode: string & 1 @test(err, code=eval) @test(debugOutput, """
+errWithCode: string & 1 @test(err, code=eval) @test(debug, """
 	(_|_){
 	  // [eval] errWithCode: conflicting values string and 1 (mismatched types string and int):
 	  //     in.cue:13:14
@@ -25,13 +25,19 @@ eqBasic: {a: 1, b: 2} @test(eq, {a: 1, b: 2})
 
 eqComputed: {
 	@test(eq, {x: 10, y: 20})
+	@test(debug, """
+		(struct){
+		  x: (int){ 10 }
+		  y: (int){ 20 }
+		}
+		""")
 	x: 10
 	y: x * 2
 }
 
 // ── leq: subsumption ──────────────────
 
-leqBasic: {x: 42} @test(leq, {x: int}) @test(eq, {x: 42})
+leqBasic: {x: 42} @test(eq, {x: int}) @test(eq, {x: 42})
 
 // ── skip ──────────────────────────────
 

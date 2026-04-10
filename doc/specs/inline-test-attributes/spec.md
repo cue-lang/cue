@@ -438,6 +438,35 @@ The `closed` directive (bare flag) SHALL assert that the evaluated struct is clo
 
 ---
 
+### Requirement: `allows` directive
+The `allows` directive SHALL assert that `val.Allows(sel)` returns the expected
+boolean for the given selector expression. `@test(allows, sel)` asserts allowed=true;
+`@test(allows=false, sel)` asserts allowed=false.
+
+Selector expressions:
+- A plain identifier or quoted string (`foo`, `"foo"`) — a regular string field
+- A definition name (`#Def`) — a definition field
+- `[string]` — any-string pattern (`cue.AnyString`)
+- `[int]` — any-index pattern (`cue.AnyIndex`)
+
+#### Scenario: Open struct allows any field
+- **WHEN** a field carries `@test(allows, "b")` and the struct is open
+- **THEN** the test passes (open structs allow any field)
+
+#### Scenario: Closed struct allows known field
+- **WHEN** a field carries `@test(allows, "a")` and the closed struct allows `a`
+- **THEN** the test passes
+
+#### Scenario: Closed struct denies unknown field
+- **WHEN** a field carries `@test(allows=false, "b")` and the closed struct does not allow `b`
+- **THEN** the test passes
+
+#### Scenario: Missing selector argument
+- **WHEN** a field carries `@test(allows)` with no selector argument
+- **THEN** the test fails with a descriptive error
+
+---
+
 ### Requirement: `skip` directive
 The `skip` directive SHALL cause the test case or individual assertion to be skipped. An optional `why="reason"` key-value arg provides a human-readable explanation. A versioned form `skip:v3` skips only when running under evaluator version `v3`.
 

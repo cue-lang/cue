@@ -343,6 +343,13 @@ type attrRecord struct {
 func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 	var records []attrRecord
 
+	// hidPkg is the package scope for hidden fields in this file.
+	// Inline-compiled sources use ":" + pkgname; anonymous files use "_".
+	hidPkg := ":" + f.PackageName()
+	if hidPkg == ":" {
+		hidPkg = "_"
+	}
+
 	// appendErrRecord records a @test attribute whose parseTestAttr call failed.
 	// The runner reports all parseErr records as test failures before running
 	// any assertions.
@@ -417,7 +424,7 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 				})
 
 			case *ast.Field:
-				subPath := appendPath(path, e.Label)
+				subPath := appendPath(path, e.Label, hidPkg)
 				if subPath.Err() == nil {
 					walkField(e, subPath)
 				} else {
@@ -485,7 +492,7 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 		if !ok {
 			continue
 		}
-		fieldPath := cue.MakePath(cue.Label(field.Label))
+		fieldPath := appendPath(cue.Path{}, field.Label, hidPkg)
 		if fieldPath.Err() == nil {
 			walkField(field, fieldPath)
 		}
@@ -511,9 +518,67 @@ func identStr(label ast.Label) string {
 	return ""
 }
 
-// appendPath appends a selector for label to an existing path.
-func appendPath(base cue.Path, label ast.Label) cue.Path {
-	return base.Append(cue.Label(label))
+// labelSelector returns the cue.Selector for an AST label, correctly handling
+// hidden fields (_foo) in two contexts:
+//
+//   - Source-file context: pass hidPkg = ":" + f.PackageName() (or "_" for
+//     anonymous packages). The package scope is applied to all hidden idents.
+//   - Eq-body context: pass hidPkg = "". The caller signals that the name may
+//     carry a $pkg suffix (e.g. "_foo$mypkg"), which is stripped and converted
+//     to ":" + pkgname. Without a suffix, "_" is used (anonymous hidden field).
+func labelSelector(label ast.Label, hidPkg string) cue.Selector {
+	if ident, ok := label.(*ast.Ident); ok && internal.IsHidden(ident.Name) {
+		name := ident.Name
+		pkg := hidPkg
+		if pkg == "" {
+			if i := strings.IndexByte(name, '$'); i >= 0 {
+				pkg = ":" + name[i+1:]
+				name = name[:i]
+			} else {
+				pkg = "_"
+			}
+		}
+		return cue.Hid(name, pkg)
+	}
+	return cue.Label(label)
+}
+
+// appendPath appends a selector for label to path.
+// hidPkg is forwarded to labelSelector; see its documentation.
+func appendPath(base cue.Path, label ast.Label, hidPkg string) cue.Path {
+	return base.Append(labelSelector(label, hidPkg))
+}
+
+// parseAtPath parses an at= selector string into a cue.Path.
+// Unlike cue.ParsePath, it handles hidden field names with a $pkg qualifier
+// (e.g. "_foo$pkg" → cue.Hid("_foo", ":pkg"), matching the same syntax
+// accepted inside @test(eq, {...}) bodies). Dotted paths are split on "." and
+// each segment is processed independently, so "a._foo$pkg.b" works correctly.
+func parseAtPath(at string) (cue.Path, error) {
+	// Fast path: if there are no hidden-field indicators, delegate directly.
+	if !strings.Contains(at, "_") {
+		p := cue.ParsePath(at)
+		return p, p.Err()
+	}
+	var sels []cue.Selector
+	for _, seg := range strings.Split(at, ".") {
+		if internal.IsHidden(seg) {
+			name := seg
+			pkg := "_"
+			if i := strings.IndexByte(name, '$'); i >= 0 {
+				pkg = ":" + name[i+1:]
+				name = name[:i]
+			}
+			sels = append(sels, cue.Hid(name, pkg))
+		} else {
+			p := cue.ParsePath(seg)
+			if err := p.Err(); err != nil {
+				return cue.Path{}, err
+			}
+			sels = append(sels, p.Selectors()...)
+		}
+	}
+	return cue.MakePath(sels...), nil
 }
 
 // applyShareIDAt applies the at= field from a @test(shareID=...) attribute
@@ -529,7 +594,7 @@ func applyShareIDAt(base cue.Path, pa parsedTestAttr) cue.Path {
 		if n, err := strconv.Atoi(val); err == nil {
 			return base.Append(cue.Index(n))
 		}
-		if p := cue.ParsePath(val); p.Err() == nil {
+		if p, err := parseAtPath(val); err == nil {
 			return base.Append(p.Selectors()...)
 		}
 		break
@@ -1248,8 +1313,8 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 
 	// Navigate val to the at= sub-path if specified.
 	if atStr != "" {
-		atPath := cue.ParsePath(atStr)
-		if err := atPath.Err(); err != nil {
+		atPath, err := parseAtPath(atStr)
+		if err != nil {
 			t.Errorf("path %s: @test(eq, at=%s): invalid path: %v", path, atStr, err)
 			return
 		}
@@ -1825,7 +1890,7 @@ func extractShareIDsFromEqExpr(expr ast.Expr, basePath cue.Path, version string)
 			if shareIDName == "" {
 				continue
 			}
-			fieldPath := applyShareIDAt(basePath.Append(cue.Label(f.Label)), pa)
+			fieldPath := applyShareIDAt(basePath.Append(labelSelector(f.Label, "")), pa)
 			if result == nil {
 				result = make(map[string][]cue.Path)
 			}

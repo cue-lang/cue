@@ -9,7 +9,7 @@ embed: and([{2, #x: 1}, {2, #x: 2}]) @test(err, code=eval, contains="conflicting
 // https://cuelang.org/issue/3719
 issue3719: {
     #openStruct: {...}
-	_filledLater: #openStruct.foo @test(err, code=incomplete, contains="undefined field: foo", pos=[0:10])
+	_filledLater: #openStruct.foo @test(err, code=incomplete, contains="undefined field: foo", pos=[0:28])
 
 	// The comprehension below should work regardless of whether it's wrapped in "and".
 

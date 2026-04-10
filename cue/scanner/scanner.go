@@ -291,6 +291,13 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 				seenDigits = true
 				s.scanMantissa(10)
 			}
+			if p := s.offset + 1; s.ch == '.' && p < len(s.src) && s.src[p] == '.' {
+				// The dot is part of a range (..), so this is an integer.
+				if seenDigits {
+					s.errf(offs, "illegal integer number")
+				}
+				goto exit
+			}
 			if s.ch == '.' || s.ch == 'e' || s.ch == 'E' {
 				goto fraction
 			}

@@ -1,6 +1,3 @@
-#name: conjunction of optional sets
-#evalFull
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 #A: {
 	[=~"^[a-s]*$"]: int
@@ -9,31 +6,27 @@
 	[=~"^[m-z]*$"]: int
 }
 
-#C: #A & #B
-c:  #C & {aaa: 3}
+#C: #A & #B  @test(allows, moo) @test(allows=false, QQQ) @test(eq, {
+	[=~"^[a-s]*$"]: int
+	[=~"^[m-z]*$"]: int
+})
+c: #C
+c: {aaa: 3 } @test(err, code=eval, at=aaa,
+	hint="positions missing",
+	contains="field not allowed", pos=[in.cue:2:2, 0:5])
 
 #D: {#A & #B}
-d: #D & {aaa: 3}
--- out/compile --
---- in.cue
-{
-  #A: {
-    [=~"^[a-s]*$"]: int
-  }
-  #B: {
-    [=~"^[m-z]*$"]: int
-  }
-  #C: (〈0;#A〉 & 〈0;#B〉)
-  c: (〈0;#C〉 & {
-    aaa: 3
-  })
-  #D: {
-    (〈1;#A〉 & 〈1;#B〉)
-  }
-  d: (〈0;#D〉 & {
-    aaa: 3
-  })
-}
+d: #D
+d: {aaa: 3 } @test(err, code=eval, at=aaa,
+	hint="positions missing",
+	contains="field not allowed", pos=[in.cue:2:2, 0:5])
+-- out/errors.txt --
+[eval] c.aaa: field not allowed:
+    ./in.cue:2:2
+    ./in.cue:13:5
+[eval] d.aaa: field not allowed:
+    ./in.cue:2:2
+    ./in.cue:19:5
 -- out/eval/stats --
 Leaks:  0
 Freed:  9
@@ -46,143 +39,27 @@ Conjuncts:    29
 Disjuncts:    0
 
 NumCloseIDs: 14
--- out/evalalpha --
-Errors:
-c.aaa: field not allowed:
-    ./in.cue:2:2
-    ./in.cue:9:11
-d.aaa: field not allowed:
-    ./in.cue:2:2
-    ./in.cue:12:10
-
-Result:
-(_|_){
-  // [eval]
-  #A: (#struct){
+-- out/compile --
+--- in.cue
+{
+  #A: {
+    [=~"^[a-s]*$"]: int
   }
-  #B: (#struct){
+  #B: {
+    [=~"^[m-z]*$"]: int
   }
-  #C: (#struct){
+  #C: (〈0;#A〉 & 〈0;#B〉)
+  c: 〈0;#C〉
+  c: {
+    aaa: 3
   }
-  c: (_|_){
-    // [eval]
-    aaa: (_|_){
-      // [eval] c.aaa: field not allowed:
-      //     ./in.cue:2:2
-      //     ./in.cue:9:11
-    }
+  #D: {
+    (〈1;#A〉 & 〈1;#B〉)
   }
-  #D: (#struct){
-  }
-  d: (_|_){
-    // [eval]
-    aaa: (_|_){
-      // [eval] d.aaa: field not allowed:
-      //     ./in.cue:2:2
-      //     ./in.cue:12:10
-    }
+  d: 〈0;#D〉
+  d: {
+    aaa: 3
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,18 +1,9 @@
- Errors:
- c.aaa: field not allowed:
-     ./in.cue:2:2
--    ./in.cue:4:5
--    ./in.cue:8:5
--    ./in.cue:8:10
--    ./in.cue:9:5
-     ./in.cue:9:11
- d.aaa: field not allowed:
-     ./in.cue:2:2
--    ./in.cue:4:5
--    ./in.cue:11:5
--    ./in.cue:11:6
--    ./in.cue:11:11
--    ./in.cue:12:4
-     ./in.cue:12:10
- 
- Result:
-@@ -29,10 +20,6 @@
-     aaa: (_|_){
-       // [eval] c.aaa: field not allowed:
-       //     ./in.cue:2:2
--      //     ./in.cue:4:5
--      //     ./in.cue:8:5
--      //     ./in.cue:8:10
--      //     ./in.cue:9:5
-       //     ./in.cue:9:11
-     }
-   }
-@@ -43,11 +30,6 @@
-     aaa: (_|_){
-       // [eval] d.aaa: field not allowed:
-       //     ./in.cue:2:2
--      //     ./in.cue:4:5
--      //     ./in.cue:11:5
--      //     ./in.cue:11:6
--      //     ./in.cue:11:11
--      //     ./in.cue:12:4
-       //     ./in.cue:12:10
-     }
-   }
--- diff/todo/p2 --
-Missing positions.
--- out/eval --
-Errors:
-c.aaa: field not allowed:
-    ./in.cue:2:2
-    ./in.cue:4:5
-    ./in.cue:8:5
-    ./in.cue:8:10
-    ./in.cue:9:5
-    ./in.cue:9:11
-d.aaa: field not allowed:
-    ./in.cue:2:2
-    ./in.cue:4:5
-    ./in.cue:11:5
-    ./in.cue:11:6
-    ./in.cue:11:11
-    ./in.cue:12:4
-    ./in.cue:12:10
-
-Result:
-(_|_){
-  // [eval]
-  #A: (#struct){
-  }
-  #B: (#struct){
-  }
-  #C: (#struct){
-  }
-  c: (_|_){
-    // [eval]
-    aaa: (_|_){
-      // [eval] c.aaa: field not allowed:
-      //     ./in.cue:2:2
-      //     ./in.cue:4:5
-      //     ./in.cue:8:5
-      //     ./in.cue:8:10
-      //     ./in.cue:9:5
-      //     ./in.cue:9:11
-    }
-  }
-  #D: (#struct){
-  }
-  d: (_|_){
-    // [eval]
-    aaa: (_|_){
-      // [eval] d.aaa: field not allowed:
-      //     ./in.cue:2:2
-      //     ./in.cue:4:5
-      //     ./in.cue:11:5
-      //     ./in.cue:11:6
-      //     ./in.cue:11:11
-      //     ./in.cue:12:4
-      //     ./in.cue:12:10
-    }
-  }
-}
+-- out/diff-v2-v3.txt --
+Missing positions: v3 reports fewer positions than v2 for the "field not allowed" errors.

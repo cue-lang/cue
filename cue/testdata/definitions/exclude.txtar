@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 package p
 
@@ -6,7 +5,31 @@ excludeLet: {
 	// Two lets with the same name should not unify and checked by definition.
 	#D: { let X = {}, #foo: X, f: _ }
 	a: #D
-	a: { let X = { a: 1 }, f: X }
+	a: { let X = { a: 1 }, f: X } @test(debugCheck, #"""
+		(#struct){
+		  let X#2 = (struct){
+		    a: (int){ 1 }
+		  }
+		  f: (#struct){
+		    a: (int){ 1 }
+		  }
+		  let X#1 = (#struct){
+		  }
+		  #foo: (#struct){
+		  }
+		}
+		"""#)
+
+	@test(eq, {
+		#D: {
+			#foo: {}
+			f: _
+		}
+		a: {
+			#foo: {}
+			f: a: 1
+		}
+	})
 }
 
 definition: {
@@ -14,12 +37,16 @@ definition: {
 	err1: {
 		#D: { #foo: a: int }
 		a: #D
-		a: { #foo: b: int }
+		a: { #foo: b: int @test(err, code=eval, contains="field not allowed", pos=[0:14]) }
 	}
 	ok1: {
 		#D: {}
 		a: #D
 		a: { #foo: b: int }
+		@test(eq, {
+			#D: {}
+			a: #foo: b: int
+		})
 	}
 }
 
@@ -28,25 +55,18 @@ hidden: {
 	err1: {
 		#D: { _foo: a: int }
 		a: #D
-		a: { _foo: b: int }
+		a: { _foo: b: int } @test(err, code=eval, at=_foo$p, contains="field not allowed", pos=[0:14])
 	}
 	ok1: {
 		#D: {}
 		a: #D
 		a: { _foo: b: int }
-	}
+	} @test(pass)
 }
 -- regress.cue --
 package p
 
 import "encoding/json"
-
-definition: ok1: {
-	org: #Org & {
-		#Employee: username: string
-	}
-	#Org: employees?: [string]: username!: string
-}
 
 definition: ok2: {
 	#Tree: {
@@ -54,10 +74,10 @@ definition: ok2: {
 		#Branch: branch?: #Leaf
 		root: #Branch
 	}
-	out: json.Marshal(#Tree & {root: {}})
+	out: json.Marshal(#Tree & {root: {}}) @test(eq, #"{"root":{}}"#)
 }
 
-hidden: ok1: {
+hidden: ok2: {
 	out: #Workflow & {
 		_hidden: #step & {
 			run: "foo bar"
@@ -68,7 +88,21 @@ hidden: ok1: {
 	#step: matchN(1, [{
 		"run"!: _
 	}])
+
+	@test(eq, {
+		out: _hidden$p: run: "foo bar"
+		#Workflow: {}
+		#step: matchN(1, [{ run!: _ }])
+	})
 }
+-- out/errors.txt --
+[eval] definition.err1.a.#foo.b: field not allowed:
+    ./in.cue:39:14
+[eval] hidden.err1.a._foo.b: field not allowed:
+    ./in.cue:57:14
+-- out/diff-v2-v3.txt --
+Reordering.
+Missing error positions: v3 reports fewer positions than v2.
 -- out/eval/stats --
 Leaks:  1
 Freed:  78
@@ -81,392 +115,6 @@ Conjuncts:    115
 Disjuncts:    0
 
 NumCloseIDs: 18
--- out/evalalpha --
-Errors:
-definition.err1.a.#foo.b: field not allowed:
-    ./in.cue:15:14
-hidden.err1.a._foo.b: field not allowed:
-    ./in.cue:29:14
-
-Result:
-(_|_){
-  // [eval]
-  excludeLet: (struct){
-    #D: (#struct){
-      let X#1 = (#struct){
-      }
-      #foo: (#struct){
-      }
-      f: (_){ _ }
-    }
-    a: (#struct){
-      let X#2 = (struct){
-        a: (int){ 1 }
-      }
-      f: (#struct){
-        a: (int){ 1 }
-      }
-      let X#1 = (#struct){
-      }
-      #foo: (#struct){
-      }
-    }
-  }
-  definition: (_|_){
-    // [eval]
-    err1: (_|_){
-      // [eval]
-      #D: (#struct){
-        #foo: (#struct){
-          a: (int){ int }
-        }
-      }
-      a: (_|_){
-        // [eval]
-        #foo: (_|_){
-          // [eval]
-          b: (_|_){
-            // [eval] definition.err1.a.#foo.b: field not allowed:
-            //     ./in.cue:15:14
-          }
-          a: (int){ int }
-        }
-      }
-    }
-    ok1: (struct){
-      #D: (#struct){
-      }
-      a: (#struct){
-        #foo: (#struct){
-          b: (int){ int }
-        }
-      }
-      org: (#struct){
-        #Employee: (#struct){
-          username: (string){ string }
-        }
-        employees?: (#struct){
-        }
-      }
-      #Org: (#struct){
-        employees?: (#struct){
-        }
-      }
-    }
-    ok2: (struct){
-      #Tree: (#struct){
-        #Leaf: (#struct){
-          leaf: (string){ string }
-        }
-        #Branch: (#struct){
-          branch?: ~(definition.ok2.#Tree.#Leaf)
-        }
-        root: ~(definition.ok2.#Tree.#Branch)
-      }
-      out: (string){ "{\"root\":{}}" }
-    }
-  }
-  hidden: (_|_){
-    // [eval]
-    err1: (_|_){
-      // [eval]
-      #D: (#struct){
-        _foo(:p): (#struct){
-          a: (int){ int }
-        }
-      }
-      a: (_|_){
-        // [eval]
-        _foo(:p): (_|_){
-          // [eval]
-          b: (_|_){
-            // [eval] hidden.err1.a._foo.b: field not allowed:
-            //     ./in.cue:29:14
-          }
-          a: (int){ int }
-        }
-      }
-    }
-    ok1: (struct){
-      #D: (#struct){
-      }
-      a: (#struct){
-        _foo(:p): (struct){
-          b: (int){ int }
-        }
-      }
-      out: (#struct){
-        _hidden(:p): (#struct){
-          run: (string){ "foo bar" }
-        }
-      }
-      #Workflow: (#struct){
-      }
-      #step: (_){ matchN(1, (#list){
-          0: (_|_){// {
-            //   run!: _
-            // }
-          }
-        }) }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,7 @@
- Errors:
- definition.err1.a.#foo.b: field not allowed:
--    ./in.cue:13:15
--    ./in.cue:14:6
-     ./in.cue:15:14
- hidden.err1.a._foo.b: field not allowed:
--    ./in.cue:27:15
--    ./in.cue:28:6
-     ./in.cue:29:14
- 
- Result:
-@@ -20,16 +16,16 @@
-       f: (_){ _ }
-     }
-     a: (#struct){
--      let X#1 = (#struct){
--      }
--      #foo: (#struct){
--      }
--      f: (struct){
--        a: (int){ 1 }
--      }
-       let X#2 = (struct){
-         a: (int){ 1 }
-       }
-+      f: (#struct){
-+        a: (int){ 1 }
-+      }
-+      let X#1 = (#struct){
-+      }
-+      #foo: (#struct){
-+      }
-     }
-   }
-   definition: (_|_){
-@@ -45,13 +41,11 @@
-         // [eval]
-         #foo: (_|_){
-           // [eval]
--          a: (int){ int }
-           b: (_|_){
-             // [eval] definition.err1.a.#foo.b: field not allowed:
--            //     ./in.cue:13:15
--            //     ./in.cue:14:6
-             //     ./in.cue:15:14
-           }
-+          a: (int){ int }
-         }
-       }
-     }
-@@ -64,11 +58,11 @@
-         }
-       }
-       org: (#struct){
--        employees?: (#struct){
--        }
-         #Employee: (#struct){
-           username: (string){ string }
-         }
-+        employees?: (#struct){
-+        }
-       }
-       #Org: (#struct){
-         employees?: (#struct){
-@@ -81,15 +75,9 @@
-           leaf: (string){ string }
-         }
-         #Branch: (#struct){
--          branch?: (#struct){
--            leaf: (string){ string }
--          }
--        }
--        root: (#struct){
--          branch?: (#struct){
--            leaf: (string){ string }
--          }
--        }
-+          branch?: ~(definition.ok2.#Tree.#Leaf)
-+        }
-+        root: ~(definition.ok2.#Tree.#Branch)
-       }
-       out: (string){ "{\"root\":{}}" }
-     }
-@@ -107,13 +95,11 @@
-         // [eval]
-         _foo(:p): (_|_){
-           // [eval]
--          a: (int){ int }
-           b: (_|_){
-             // [eval] hidden.err1.a._foo.b: field not allowed:
--            //     ./in.cue:27:15
--            //     ./in.cue:28:6
-             //     ./in.cue:29:14
-           }
-+          a: (int){ int }
-         }
-       }
-     }
-@@ -126,7 +112,7 @@
-         }
-       }
-       out: (#struct){
--        _hidden(:p): (struct){
-+        _hidden(:p): (#struct){
-           run: (string){ "foo bar" }
-         }
-       }
--- out/eval --
-Errors:
-definition.err1.a.#foo.b: field not allowed:
-    ./in.cue:13:15
-    ./in.cue:14:6
-    ./in.cue:15:14
-hidden.err1.a._foo.b: field not allowed:
-    ./in.cue:27:15
-    ./in.cue:28:6
-    ./in.cue:29:14
-
-Result:
-(_|_){
-  // [eval]
-  excludeLet: (struct){
-    #D: (#struct){
-      let X#1 = (#struct){
-      }
-      #foo: (#struct){
-      }
-      f: (_){ _ }
-    }
-    a: (#struct){
-      let X#1 = (#struct){
-      }
-      #foo: (#struct){
-      }
-      f: (struct){
-        a: (int){ 1 }
-      }
-      let X#2 = (struct){
-        a: (int){ 1 }
-      }
-    }
-  }
-  definition: (_|_){
-    // [eval]
-    err1: (_|_){
-      // [eval]
-      #D: (#struct){
-        #foo: (#struct){
-          a: (int){ int }
-        }
-      }
-      a: (_|_){
-        // [eval]
-        #foo: (_|_){
-          // [eval]
-          a: (int){ int }
-          b: (_|_){
-            // [eval] definition.err1.a.#foo.b: field not allowed:
-            //     ./in.cue:13:15
-            //     ./in.cue:14:6
-            //     ./in.cue:15:14
-          }
-        }
-      }
-    }
-    ok1: (struct){
-      #D: (#struct){
-      }
-      a: (#struct){
-        #foo: (#struct){
-          b: (int){ int }
-        }
-      }
-      org: (#struct){
-        employees?: (#struct){
-        }
-        #Employee: (#struct){
-          username: (string){ string }
-        }
-      }
-      #Org: (#struct){
-        employees?: (#struct){
-        }
-      }
-    }
-    ok2: (struct){
-      #Tree: (#struct){
-        #Leaf: (#struct){
-          leaf: (string){ string }
-        }
-        #Branch: (#struct){
-          branch?: (#struct){
-            leaf: (string){ string }
-          }
-        }
-        root: (#struct){
-          branch?: (#struct){
-            leaf: (string){ string }
-          }
-        }
-      }
-      out: (string){ "{\"root\":{}}" }
-    }
-  }
-  hidden: (_|_){
-    // [eval]
-    err1: (_|_){
-      // [eval]
-      #D: (#struct){
-        _foo(:p): (#struct){
-          a: (int){ int }
-        }
-      }
-      a: (_|_){
-        // [eval]
-        _foo(:p): (_|_){
-          // [eval]
-          a: (int){ int }
-          b: (_|_){
-            // [eval] hidden.err1.a._foo.b: field not allowed:
-            //     ./in.cue:27:15
-            //     ./in.cue:28:6
-            //     ./in.cue:29:14
-          }
-        }
-      }
-    }
-    ok1: (struct){
-      #D: (#struct){
-      }
-      a: (#struct){
-        _foo(:p): (struct){
-          b: (int){ int }
-        }
-      }
-      out: (#struct){
-        _hidden(:p): (struct){
-          run: (string){ "foo bar" }
-        }
-      }
-      #Workflow: (#struct){
-      }
-      #step: (_){ matchN(1, (#list){
-          0: (_|_){// {
-            //   run!: _
-            // }
-          }
-        }) }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -536,22 +184,6 @@ Result:
 --- regress.cue
 {
   definition: {
-    ok1: {
-      org: (〈0;#Org〉 & {
-        #Employee: {
-          username: string
-        }
-      })
-      #Org: {
-        employees?: {
-          [string]: {
-            username!: string
-          }
-        }
-      }
-    }
-  }
-  definition: {
     ok2: {
       #Tree: {
         #Leaf: {
@@ -568,7 +200,7 @@ Result:
     }
   }
   hidden: {
-    ok1: {
+    ok2: {
       out: (〈0;#Workflow〉 & {
         _hidden(:p): (〈1;#step〉 & {
           run: "foo bar"

@@ -1,8 +1,14 @@
-#todo:inline: medium — definitions with closedness; check @test(closed) support
 -- in.cue --
 x: _
 #D: b: x
 #D & { b: _ }
+
+@test(eq, {
+	x: _
+	#D: b: _
+	b: _
+})
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
@@ -16,14 +22,6 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 4
--- out/evalalpha --
-(#struct){
-  x: (_){ _ }
-  #D: (#struct){
-    b: (_){ _ }
-  }
-  b: (_){ _ }
-}
 -- out/compile --
 --- in.cue
 {

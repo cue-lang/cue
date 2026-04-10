@@ -1360,7 +1360,8 @@ type navigable struct {
 	// set to this navigable. It is also an invariant that every frame
 	// that has a particular navigable value in its navigable field
 	// will appear in that navigable's frames field.
-	frames []*frame
+	frames   []*frame
+	patterns []*navigable
 	// bindings contains all bindings for this navigable node. These
 	// bindings are "merged"; for example:
 	//
@@ -1438,6 +1439,7 @@ func (n *navigable) eval() {
 	navs := expandNavigables([]*navigable{n})
 	for name, nav := range n.bindings {
 		nav.ensureResolvesTo(navigateByName(navs, name))
+		nav.ensureResolvesTo(n.patterns)
 	}
 }
 
@@ -2149,6 +2151,9 @@ func (f *frame) eval() {
 			}
 			if node.TokenPos.IsValid() {
 				childFr.start = node.TokenPos.Add(1)
+			}
+			if fieldDecl.patternField {
+				f.navigable.patterns = append(f.navigable.patterns, childFr.navigable)
 			}
 
 			// The reason for guarding against __ here (which is possibly

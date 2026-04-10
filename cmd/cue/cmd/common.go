@@ -734,7 +734,7 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) ([
 }
 
 func buildToolInstances(ctx *cue.Context, binst []*build.Instance) ([]*cue.Instance, error) {
-	// Reuse the same context, if there is one, so that the @embed interpreter can be used.
+	// Reuse the same context, if there is one, so that the @embed injection can be used.
 	// Note that ctx may be nil when we do `cue help cmd`.
 	r := new(cue.Runtime)
 	if ctx != nil {

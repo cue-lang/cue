@@ -160,7 +160,7 @@ loop:
 
 			if k == "" {
 				err = errors.Append(err, errors.Newf(pos,
-					"interpreter name must be non-empty"))
+					"injection name must be non-empty"))
 				continue
 			}
 
@@ -216,7 +216,7 @@ func (d *externDecorator) initInjector(kind string, pos token.Pos) errors.Error 
 	}
 	x := d.runtime.injections[kind]
 	if x == nil {
-		return errors.Newf(pos, "no interpreter defined for %q", kind)
+		return errors.Newf(pos, "no injection defined for %q", kind)
 	}
 	inj, err := x.InjectorForInstance(d.pkg, d.runtime)
 	if err != nil {

@@ -38,8 +38,8 @@ func Test(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		interpreter := &interpreterFake{files: map[string]int{}}
-		ctx := cuecontext.New(cuecontext.Interpreter(interpreter))
+		inj := &injectionFake{files: map[string]int{}}
+		ctx := cuecontext.New(cuecontext.WithInjection(inj))
 
 		b := t.Instance()
 		v := ctx.BuildInstance(b)
@@ -52,13 +52,13 @@ func Test(t *testing.T) {
 	})
 }
 
-type interpreterFake struct {
+type injectionFake struct {
 	files map[string]int
 }
 
-func (i *interpreterFake) Kind() string { return "testfn" }
+func (i *injectionFake) Kind() string { return "testfn" }
 
-func (i *interpreterFake) InjectorForInstance(b *build.Instance, r *runtime.Runtime) (runtime.Injector, errors.Error) {
+func (i *injectionFake) InjectorForInstance(b *build.Instance, r *runtime.Runtime) (runtime.Injector, errors.Error) {
 	switch b.PkgName {
 	case "failinit":
 		return nil, errors.Newf(token.NoPos, "TEST: fail initialization")
@@ -70,7 +70,7 @@ func (i *interpreterFake) InjectorForInstance(b *build.Instance, r *runtime.Runt
 	return i, nil
 }
 
-func (i *interpreterFake) InjectedValue(attr *runtime.ExternAttr, _ *adt.Vertex) (adt.Expr, errors.Error) {
+func (i *injectionFake) InjectedValue(attr *runtime.ExternAttr, _ *adt.Vertex) (adt.Expr, errors.Error) {
 	a := attr.Attr
 	if ok, _ := a.Flag(1, "fail"); ok {
 		return nil, errors.Newf(token.NoPos, "TEST: fail compilation")

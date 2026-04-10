@@ -29,23 +29,23 @@ import (
 	coreruntime "cuelang.org/go/internal/core/runtime"
 )
 
-// interpreter is a [cuecontext.ExternInterpreter] for Wasm files.
-type interpreter struct{}
+// injection is a [cuecontext.Injection] for Wasm files.
+type injection struct{}
 
-// New returns a new Wasm interpreter as a [cuecontext.ExternInterpreter]
-// suitable for passing to [cuecontext.New].
+// New returns a new Wasm injection as a [cuecontext.Injection]
+// suitable for passing to [cuecontext.WithInjection].
 func New() cuecontext.ExternInterpreter {
-	return &interpreter{}
+	return &injection{}
 }
 
-func (i *interpreter) Kind() string {
+func (i *injection) Kind() string {
 	return "wasm"
 }
 
 // InjectorForInstance returns a Wasm injector that services the specified
 // build.Instance.
-func (i *interpreter) InjectorForInstance(b *build.Instance, r *coreruntime.Runtime) (coreruntime.Injector, errors.Error) {
-	return &compiler{
+func (i *injection) InjectorForInstance(b *build.Instance, r *coreruntime.Runtime) (coreruntime.Injector, errors.Error) {
+	return &wasmInjector{
 		b:           b,
 		runtime:     r,
 		wasmRuntime: newRuntime(),
@@ -53,9 +53,9 @@ func (i *interpreter) InjectorForInstance(b *build.Instance, r *coreruntime.Runt
 	}, nil
 }
 
-// A compiler is a [coreruntime.Injector]
+// A wasmInjector is a [coreruntime.Injector]
 // that provides Wasm functionality to the runtime.
-type compiler struct {
+type wasmInjector struct {
 	b           *build.Instance
 	runtime     *coreruntime.Runtime
 	wasmRuntime runtime
@@ -70,7 +70,7 @@ type compiler struct {
 
 // InjectedValue searches for a Wasm function described by the given
 // extern attribute and returns it as an [adt.Builtin].
-func (c *compiler) InjectedValue(attr *coreruntime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
+func (c *wasmInjector) InjectedValue(attr *coreruntime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
 	a := attr.Attr
 
 	// Determine the function name from the parent field label,
@@ -116,7 +116,7 @@ func (c *compiler) InjectedValue(attr *coreruntime.ExternAttr, scope *adt.Vertex
 
 // instance returns the instance corresponding to filename, compiling
 // and loading it if necessary.
-func (c *compiler) instance(filename string) (inst *instance, err error) {
+func (c *wasmInjector) instance(filename string) (inst *instance, err error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	inst, ok := c.instances[filename]

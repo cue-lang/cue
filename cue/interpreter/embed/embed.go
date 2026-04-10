@@ -60,7 +60,7 @@
 //
 // # Limitations
 //
-// The embed interpreter currently does not support:
+// The embed injection currently does not support:
 // - stream values, such as .ndjson or YAML streams.
 // - schema-based decoding, such as needed for textproto
 //
@@ -115,17 +115,17 @@ import (
 
 // TODO: record files in build.Instance
 
-// interpreter is a [runtime.Injection] for embedded files.
-type interpreter struct{}
+// injection is a [runtime.Injection] for embedded files.
+type injection struct{}
 
 // New returns a new injection for embedded files as a
 // [runtime.Injection] suitable for passing to
 // [cuelang.org/go/cue/cuecontext.WithInjection].
 func New() runtime.Injection {
-	return interpreter{}
+	return injection{}
 }
 
-func (i interpreter) Kind() string {
+func (i injection) Kind() string {
 	return EmbedKind
 }
 
@@ -133,22 +133,22 @@ const EmbedKind = "embed"
 
 // InjectorForInstance returns an injector that can decode and embed files
 // that exist within a CUE module.
-func (i interpreter) InjectorForInstance(b *build.Instance, r *runtime.Runtime) (runtime.Injector, errors.Error) {
+func (i injection) InjectorForInstance(b *build.Instance, r *runtime.Runtime) (runtime.Injector, errors.Error) {
 	if b.Module == "" {
 		return nil, errors.Newf(token.Pos{}, "cannot embed files when not in a module")
 	}
 	if b.Root == "" {
 		return nil, errors.Newf(token.Pos{}, "cannot embed files: no module root found")
 	}
-	return &compiler{
+	return &injector{
 		b:       b,
 		runtime: (*cue.Context)(r),
 	}, nil
 }
 
-// A compiler is a [runtime.Injector] that allows embedding files into CUE
+// An injector is a [runtime.Injector] that allows embedding files into CUE
 // values.
-type compiler struct {
+type injector struct {
 	b       *build.Instance
 	runtime *cue.Context
 	opCtx   *adt.OpContext
@@ -232,7 +232,7 @@ func validateAttr(a *internal.Attr) (file, glob, typ string, allowEmptyGlob bool
 // InjectedValue interprets an embed attribute to either load a file
 // (@embed(file=...)) or a glob of files (@embed(glob=...))
 // and decodes the given files.
-func (c *compiler) InjectedValue(attr *runtime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
+func (c *injector) InjectedValue(attr *runtime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
 	a := attr.Attr
 	c.opCtx = adt.NewContext((*runtime.Runtime)(c.runtime), nil)
 
@@ -264,7 +264,7 @@ func (c *compiler) InjectedValue(attr *runtime.ExternAttr, scope *adt.Vertex) (a
 	return c.processGlob(glob, typ, allowEmptyGlob)
 }
 
-func (c *compiler) processGlob(glob, scope string, allowEmptyGlob bool) (adt.Expr, errors.Error) {
+func (c *injector) processGlob(glob, scope string, allowEmptyGlob bool) (adt.Expr, errors.Error) {
 	m := &adt.StructLit{}
 
 	matches, err := fsGlob(c.fs, glob)
@@ -365,7 +365,7 @@ func filterFsGlobResults(pattern string, matches ...string) []string {
 	return matches[:i]
 }
 
-func (c *compiler) decodeFile(file, scope string) (adt.Expr, errors.Error) {
+func (c *injector) decodeFile(file, scope string) (adt.Expr, errors.Error) {
 	// Do not use the most obvious filetypes.Input in order to disable "auto"
 	// mode.
 	f, err := filetypes.ParseFileAndType(file, scope, filetypes.Def)

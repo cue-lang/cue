@@ -52,6 +52,24 @@
       "parentUuid": "e6048357_159cdc95",
       "revId": "3ba2f0f56d503e8c316945ffa7ea5f5322ce9b8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8136696e_7082dd0a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T11:30:48Z",
+      "side": 1,
+      "message": "The md file in CUE could be the canonical one that cueckoo uses. Now you have to learn how to modify a new tool, install a new repo, etc.",
+      "parentUuid": "a226fd9e_4464d18b",
+      "revId": "3ba2f0f56d503e8c316945ffa7ea5f5322ce9b8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

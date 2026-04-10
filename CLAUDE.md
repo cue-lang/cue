@@ -163,14 +163,14 @@ of the CUE project should do so.
     wrong; move it inside the struct as a trailing decl attribute instead.
 
 13. **Structure sharing (`~(field)`)**: When the `out/evalalpha` section shows a
-    field as a shared reference (e.g., `y: ~(x)`), add `@test(shareID:v3=name)` to
+    field as a shared reference (e.g., `y: ~(x)`), add `@test(shareID=name)` to
     both the referencing field (`y`) and the referenced field (`x`), using the same
     name to assert they share the same underlying vertex. Use the `:v3` version suffix
     when the sharing is v3-specific (i.e., v2 expanded the field into an independent
     struct). Example:
     ```
-    x: a & {b: 1}  @test(eq, {a: 1, b: 1}) @test(shareID:v3=xy)
-    y: x            @test(eq, {a: 1, b: 1}) @test(shareID:v3=xy)
+    x: a & {b: 1}  @test(eq, {a: 1, b: 1}) @test(shareID=xy)
+    y: x            @test(eq, {a: 1, b: 1}) @test(shareID=xy)
     ```
 
 ### Contribution Model

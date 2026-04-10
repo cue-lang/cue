@@ -1601,11 +1601,16 @@ func (r *inlineRunner) runAllowsAssertion(t testing.TB, path cue.Path, val cue.V
 		t.Errorf("path %s: @test(allows): missing selector argument", path)
 		return
 	}
+	k := val.IncompleteKind()
+	if k != cue.StructKind && k != cue.ListKind {
+		t.Errorf("path %s: @test(allows): directive only valid on struct or list values, got %v", path, k)
+		return
+	}
 	var sel cue.Selector
 	switch rawSel {
 	case "string":
 		sel = cue.AnyString
-	case "int":
+	case "int", "[int]":
 		sel = cue.AnyIndex
 	default:
 		p := cue.ParsePath(rawSel)

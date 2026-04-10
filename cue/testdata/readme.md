@@ -241,13 +241,14 @@ closedFalse: {x: 1}        @test(closed=false)
 ### `allows` — field allowance
 
 Checks whether `val.Allows(sel)` returns the expected result for the given
-selector expression.
+selector expression. Valid on struct and list values.
 
 ```cue
-openStruct:   {a: 1}        @test(allows, b)          // open: any field allowed
+openStruct:   {a: 1}        @test(allows, b)           // open: any field allowed
 knownField:   close({a: 1}) @test(allows, a)           // closed: known field allowed
 unknownField: close({a: 1}) @test(allows=false, b)     // closed: unknown field denied
 anyPattern:   {[string]: 1} @test(allows, string)      // any-string pattern allowed
+openList:     [...]         @test(allows, int)         // open list: int index allowed
 ```
 
 | Selector form | Meaning |

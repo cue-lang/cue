@@ -16,6 +16,24 @@
       "message": "This guidance belongs in `cmd/cueckoo`",
       "revId": "3ba2f0f56d503e8c316945ffa7ea5f5322ce9b8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6048357_159cdc95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T09:21:08Z",
+      "side": 1,
+      "message": "I think it is both.",
+      "parentUuid": "9bf944d5_44fcaef5",
+      "revId": "3ba2f0f56d503e8c316945ffa7ea5f5322ce9b8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

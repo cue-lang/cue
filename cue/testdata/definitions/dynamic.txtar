@@ -1,25 +1,46 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #A: {
 	a:      "foo"
 	"\(a)": 3
+
+	@test(eq, {
+		a:   "foo"
+		foo: 3
+	})
 }
 #B: a: b: {
 	c: string
 	d: 2
-}
+} @test(eq, {
+	c: string
+	d: 2
+})
+
 #C: a: b: {
 	c: *"d" | string
 	(c): 2
-}
+} @test(eq, {
+	c: *"d" | string
+	d: 2
+})
 
-x: #B & #C
+x: #B & #C @test(eq, {
+	a: b: {
+		c: *"d" | string
+		d: 2
+	}
+})
 
 -- evalv3regress.cue --
 chained: x: {
+	// TODO: add this once the todo is fixed.
+	// @test(permute)
 	(a.b): "foo"
 	(x.hello): "true"
 	a: b: "hello"
+
+	@test(eq, {a: b: "hello", hello: "foo"}, incorrect, hint="shouldn't foo be in here?")
+	@test(eq:todo, {a: b: "hello", hello: "foo", foo: "true"})
 }
 -- out/eval/stats --
 Leaks:  0
@@ -33,45 +54,8 @@ Conjuncts:    36
 Disjuncts:    4
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  chained: (struct){
-    x: (struct){
-      a: (struct){
-        b: (string){ "hello" }
-      }
-      hello: (string){ "foo" }
-    }
-  }
-  #A: (#struct){
-    a: (string){ "foo" }
-    foo: (int){ 3 }
-  }
-  #B: (#struct){
-    a: (#struct){
-      b: (#struct){
-        c: (string){ string }
-        d: (int){ 2 }
-      }
-    }
-  }
-  #C: (#struct){
-    a: (#struct){
-      b: (#struct){
-        c: (string){ |(*(string){ "d" }, (string){ string }) }
-        d: (int){ 2 }
-      }
-    }
-  }
-  x: (#struct){
-    a: (#struct){
-      b: (#struct){
-        c: (string){ |(*(string){ "d" }, (string){ string }) }
-        d: (int){ 2 }
-      }
-    }
-  }
-}
+-- out/diff-v2-v3.txt --
+Disjunctions with defaults: needs @test(final) for x.a.b.c field.
 -- out/compile --
 --- evalv3regress.cue
 {

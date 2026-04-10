@@ -1,7 +1,6 @@
 // Treat fields of different files as belonging to the same struct.
 // This means that a closed embedding in one file should not restrict the
 // fields of another.
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 package foo
 
@@ -12,20 +11,27 @@ package foo
 dark: #theme & {
 	color:   "dark"
 	ctermbg: "239"
-}
+} @test(eq, {color: "dark", ctermbg: "239"})
+
 light: #theme & {
 	color:   "light"
 	ctermbg: "254"
-}
+} @test(eq, {color: "light", ctermbg: "254"})
+
 #Config: {
 	console: dark | *light
-}
+} @test(eq, {
+	console: *{color: "light", ctermbg: "254"} | {color: "dark", ctermbg: "239"}
+})
 -- box.cue --
 package foo
 
 #Config & {
 	console: dark
 }
+
+@test(eq, {color: "dark", ctermbg: "239"}, at=console)
+
 -- out/eval/stats --
 Leaks:  3
 Freed:  24
@@ -39,6 +45,34 @@ Disjuncts:    4
 Notifications: 1
 
 NumCloseIDs: 13
+-- out/compile --
+--- box.cue
+{
+  (〈0;#Config〉 & {
+    console: 〈1;dark〉
+  })
+}
+--- in.cue
+{
+  #theme: {
+    color: string
+    ctermbg: string
+  }
+  dark: (〈0;#theme〉 & {
+    color: "dark"
+    ctermbg: "239"
+  })
+  light: (〈0;#theme〉 & {
+    color: "light"
+    ctermbg: "254"
+  })
+  #Config: {
+    console: (〈1;dark〉|*〈1;light〉)
+  }
+}
+-- out/diff-v2-v3.txt --
+Reordering.
+Disjunctions with defaults: needs @test(final) for console field.
 -- out/evalalpha --
 (#struct){
   console: (#struct){
@@ -65,82 +99,5 @@ NumCloseIDs: 13
         color: (string){ "dark" }
         ctermbg: (string){ "239" }
       }) }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,8 @@
- (#struct){
-+  console: (#struct){
-+    color: (string){ "dark" }
-+    ctermbg: (string){ "239" }
-+  }
-   #theme: (#struct){
-     color: (string){ string }
-     ctermbg: (string){ string }
-@@ -20,8 +24,4 @@
-         ctermbg: (string){ "239" }
-       }) }
-   }
--  console: (#struct){
--    color: (string){ "dark" }
--    ctermbg: (string){ "239" }
--  }
- }
--- diff/todo/p3 --
-Reordering.
--- out/eval --
-(#struct){
-  #theme: (#struct){
-    color: (string){ string }
-    ctermbg: (string){ string }
-  }
-  dark: (#struct){
-    color: (string){ "dark" }
-    ctermbg: (string){ "239" }
-  }
-  light: (#struct){
-    color: (string){ "light" }
-    ctermbg: (string){ "254" }
-  }
-  #Config: (#struct){
-    console: (#struct){ |(*(#struct){
-        color: (string){ "light" }
-        ctermbg: (string){ "254" }
-      }, (#struct){
-        color: (string){ "dark" }
-        ctermbg: (string){ "239" }
-      }) }
-  }
-  console: (#struct){
-    color: (string){ "dark" }
-    ctermbg: (string){ "239" }
-  }
-}
--- out/compile --
---- box.cue
-{
-  (〈0;#Config〉 & {
-    console: 〈1;dark〉
-  })
-}
---- in.cue
-{
-  #theme: {
-    color: string
-    ctermbg: string
-  }
-  dark: (〈0;#theme〉 & {
-    color: "dark"
-    ctermbg: "239"
-  })
-  light: (〈0;#theme〉 & {
-    color: "light"
-    ctermbg: "254"
-  })
-  #Config: {
-    console: (〈1;dark〉|*〈1;light〉)
   }
 }

@@ -83,9 +83,11 @@ list.Concat(["foo"], [])
 			t.Skip() // keep inputs reasonably small for now
 		}
 		f, err := parser.ParseFile("fuzz.cue", s, parser.ParseComments)
-
+		// Check ParseExpr too. Note that a valid file is not always a valid expression,
+		// but we still want to check that ParseExpr doesn't panic.
+		_, exprErr := parser.ParseExpr("fuzz.cue", s, parser.ParseComments)
 		if err != nil {
-			if _, err := parser.ParseExpr("fuzz.cue", s, parser.ParseComments); err == nil {
+			if exprErr == nil {
 				t.Errorf("ParseFile rejects this input but ParseExpr does not: %s", s)
 			}
 			if ast.IsValidIdent(s) {

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d93ba074_1e4ffaba",
+        "filename": "cue/attribute.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T11:45:37Z",
+      "side": 1,
+      "message": "I wouldn\u0027t deprecate it quite yet. It is quite useful to be able to get an by position. SO until we have an alternative, I would keep it.",
+      "revId": "4ed229b1a8279fc63e9615896f3179fc3b44e667",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dce009d8_425349de",
+        "filename": "internal/attrs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-10T11:45:37Z",
+      "side": 1,
+      "message": "doesn\u0027t this change behavior for existing users?",
+      "revId": "4ed229b1a8279fc63e9615896f3179fc3b44e667",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

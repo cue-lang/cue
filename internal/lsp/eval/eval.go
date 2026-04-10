@@ -2640,7 +2640,11 @@ func (f *frame) resolvePathRoot(name string, requireIdent bool) (*navigable, str
 				return parentNav, ""
 			}
 			// Finally, inspect the globals
-			return fNav.parent.bindings[name], ""
+			if fNav.parent == nil {
+				return nil, ""
+			} else {
+				return fNav.parent.bindings[name], ""
+			}
 		}
 	}
 	return nil, ""

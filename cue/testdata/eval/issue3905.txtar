@@ -2,16 +2,22 @@
 # The v3 evaluator incorrectly reported a cycle error for `(parameters.gatewayNamespace)`
 # when the value was a disjunction like `string | *"foo"`, working fine in evalv2.
 # https://cuelang.org/issue/3905
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 issue3905: reduced: {
 	#Schema: {
 		params: name: string | *"foo"
-	
+
 		result: (params.name): "bar"
 	}
-	
+
 	(#Schema).result
+	@test(eq, {
+		#Schema: {
+			params: {name: *"foo" | string}
+			result: {foo: "bar"}
+		}
+		foo: "bar"
+	})
 }
 issue3905: full: {
 	#ReferenceGrantBuilder: {
@@ -19,17 +25,17 @@ issue3905: full: {
 			namespace:        string
 			gatewayNamespace: string | *"foo"
 		}
-	
+
 		referenceGrant: (parameters.gatewayNamespace): #ReferenceGrant & {
 			metadata: name:      parameters.gatewayNamespace
 			metadata: namespace: parameters.namespace
 		}
 	}
-	
+
 	(#ReferenceGrantBuilder & {
 		parameters: namespace: "foo"
 	}).referenceGrant
-	
+
 	#ReferenceGrant: {
 		apiVersion: "gateway.networking.k8s.io/v1beta1"
 		kind: "ReferenceGrant"
@@ -44,6 +50,46 @@ issue3905: full: {
 			}
 		}
 	}
+	@test(eq, {
+		#ReferenceGrantBuilder: {
+			parameters: {
+				namespace: string
+				gatewayNamespace: *"foo" | string
+			}
+			referenceGrant: {
+				foo: {
+					metadata: {
+						name: *"foo" | string
+						namespace: string
+						labels?: {}
+						annotations?: {}
+					}
+					apiVersion: "gateway.networking.k8s.io/v1beta1"
+					kind: "ReferenceGrant"
+				}
+			}
+		}
+		#ReferenceGrant: {
+			apiVersion: "gateway.networking.k8s.io/v1beta1"
+			kind: "ReferenceGrant"
+			metadata!: {
+				name!: string
+				namespace!: string
+				labels?: {}
+				annotations?: {}
+			}
+		}
+		foo: {
+			metadata: {
+				name: *"foo" | string
+				namespace: "foo"
+				labels?: {}
+				annotations?: {}
+			}
+			apiVersion: "gateway.networking.k8s.io/v1beta1"
+			kind: "ReferenceGrant"
+		}
+	})
 }
 -- out/eval/stats --
 Leaks:  0
@@ -58,179 +104,6 @@ Disjuncts:    10
 Notifications: 2
 
 NumCloseIDs: 13
--- out/evalalpha --
-(struct){
-  issue3905: (struct){
-    reduced: (#struct){
-      #Schema: (#struct){
-        params: (#struct){
-          name: (string){ |(*(string){ "foo" }, (string){ string }) }
-        }
-        result: (#struct){
-          foo: (string){ "bar" }
-        }
-      }
-      foo: (string){ "bar" }
-    }
-    full: (#struct){
-      #ReferenceGrantBuilder: (#struct){
-        parameters: (#struct){
-          namespace: (string){ string }
-          gatewayNamespace: (string){ |(*(string){ "foo" }, (string){ string }) }
-        }
-        referenceGrant: (#struct){
-          foo: (#struct){
-            metadata: (#struct){
-              name: (string){ |(*(string){ "foo" }, (string){ string }) }
-              namespace: (string){ string }
-              labels?: (#struct){
-              }
-              annotations?: (#struct){
-              }
-            }
-            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-            kind: (string){ "ReferenceGrant" }
-          }
-        }
-      }
-      #ReferenceGrant: (#struct){
-        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-        kind: (string){ "ReferenceGrant" }
-        metadata!: (#struct){
-          name!: (string){ string }
-          namespace!: (string){ string }
-          labels?: (#struct){
-          }
-          annotations?: (#struct){
-          }
-        }
-      }
-      foo: (#struct){
-        metadata: (#struct){
-          name: (string){ |(*(string){ "foo" }, (string){ string }) }
-          namespace: (string){ "foo" }
-          labels?: (#struct){
-          }
-          annotations?: (#struct){
-          }
-        }
-        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-        kind: (string){ "ReferenceGrant" }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -11,7 +11,7 @@
-       }
-       foo: (string){ "bar" }
-     }
--    full: (struct){
-+    full: (#struct){
-       #ReferenceGrantBuilder: (#struct){
-         parameters: (#struct){
-           namespace: (string){ string }
-@@ -19,8 +19,6 @@
-         }
-         referenceGrant: (#struct){
-           foo: (#struct){
--            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
--            kind: (string){ "ReferenceGrant" }
-             metadata: (#struct){
-               name: (string){ |(*(string){ "foo" }, (string){ string }) }
-               namespace: (string){ string }
-@@ -29,6 +27,8 @@
-               annotations?: (#struct){
-               }
-             }
-+            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-+            kind: (string){ "ReferenceGrant" }
-           }
-         }
-       }
-@@ -45,8 +45,6 @@
-         }
-       }
-       foo: (#struct){
--        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
--        kind: (string){ "ReferenceGrant" }
-         metadata: (#struct){
-           name: (string){ |(*(string){ "foo" }, (string){ string }) }
-           namespace: (string){ "foo" }
-@@ -55,6 +53,8 @@
-           annotations?: (#struct){
-           }
-         }
-+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-+        kind: (string){ "ReferenceGrant" }
-       }
-     }
-   }
--- out/eval --
-(struct){
-  issue3905: (struct){
-    reduced: (#struct){
-      #Schema: (#struct){
-        params: (#struct){
-          name: (string){ |(*(string){ "foo" }, (string){ string }) }
-        }
-        result: (#struct){
-          foo: (string){ "bar" }
-        }
-      }
-      foo: (string){ "bar" }
-    }
-    full: (struct){
-      #ReferenceGrantBuilder: (#struct){
-        parameters: (#struct){
-          namespace: (string){ string }
-          gatewayNamespace: (string){ |(*(string){ "foo" }, (string){ string }) }
-        }
-        referenceGrant: (#struct){
-          foo: (#struct){
-            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-            kind: (string){ "ReferenceGrant" }
-            metadata: (#struct){
-              name: (string){ |(*(string){ "foo" }, (string){ string }) }
-              namespace: (string){ string }
-              labels?: (#struct){
-              }
-              annotations?: (#struct){
-              }
-            }
-          }
-        }
-      }
-      #ReferenceGrant: (#struct){
-        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-        kind: (string){ "ReferenceGrant" }
-        metadata!: (#struct){
-          name!: (string){ string }
-          namespace!: (string){ string }
-          labels?: (#struct){
-          }
-          annotations?: (#struct){
-          }
-        }
-      }
-      foo: (#struct){
-        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-        kind: (string){ "ReferenceGrant" }
-        metadata: (#struct){
-          name: (string){ |(*(string){ "foo" }, (string){ string }) }
-          namespace: (string){ "foo" }
-          labels?: (#struct){
-          }
-          annotations?: (#struct){
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -287,3 +160,5 @@ diff old new
     }
   }
 }
+-- out/todo.txt --
+issue3905.full: v2 evaluates as non-closed struct, v3 as closed (#struct).

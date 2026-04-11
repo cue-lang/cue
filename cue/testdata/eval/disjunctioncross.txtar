@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #OneOrTwo: #One | #Two
 #One: {
@@ -22,6 +21,19 @@ valueDiscriminator: crossing: {
 		// processed.
 		oneOrTwo: *_appDefaults[oneOrTwo.kind] | _
 	}
+	@test(eq, {
+		out: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "two", two: {optional?: string}}
+		}
+		#Application: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "one", one: {oneField: "value"}} |
+				 {kind: "two", two: {optional?: string}}
+		}
+	})
 }
 
 valueDiscriminator: local: {
@@ -35,6 +47,19 @@ valueDiscriminator: local: {
 		// try { oneOrTwo: _appDefaults.(self.kind)? }
 		oneOrTwo: X={ *_appDefaults[X.kind] | _ }
 	}
+	@test(eq, {
+		out: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "two", two: {optional?: string}}
+		}
+		#Application: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "one", one: {oneField: "value"}} |
+				  {kind: "two", two: {optional?: string}}
+		}
+	})
 }
 
 // Use a value that is available AFTER a disjunction is resolved to augment
@@ -51,6 +76,19 @@ fieldDiscriminator: crossing:{
 		// selected.
 		oneOrTwo: *_appDefaults[oneOrTwo.kind] | _
 	}
+	@test(eq, {
+		out: {
+			oneOrTwo:
+				*{two: {optional: *"optional set" | string}, kind: "two"} |
+				 {two: {optional?: string}, kind: "two"}
+		}
+		#Application: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "one", one: {oneField: "value"}} |
+				 {kind: "two", two: {optional?: string}}
+		}
+	})
 }
 
 fieldDiscriminator: local:{
@@ -60,6 +98,19 @@ fieldDiscriminator: local:{
 		// oneOrTwo.kind always resolves to the value of the disjunct.
 		oneOrTwo: X={ *_appDefaults[X.kind] | _ }
 	}
+	@test(eq, {
+		out: {
+			oneOrTwo:
+				*{two: {optional: *"optional set" | string}, kind: "two"} |
+				 {two: {optional?: string}, kind: "two"}
+		}
+		#Application: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "one", one: {oneField: "value"}} |
+				 {kind: "two", two: {optional?: string}}
+		}
+	})
 }
 
 // Do not hide error messages. Here, the inner failure of both disjuncts means
@@ -83,29 +134,66 @@ issue3967: error: nested: {
 					}
 				}
 			}
+			if X.oneOrTwo.kind == "never" {
+			}
 		}
 		if X.oneOrTwo.kind == "never" {
 		}
 	}
+	@test(eq, {
+		out: {oneOrTwo: {two: {}}}
+		#Application: {
+			oneOrTwo: {kind: "one", one: {oneField: "value"}}
+		}
+	})
 }
-issue3967: error: local: {
-	out: #Application & {
-		oneOrTwo: two: {}
-	}
-	#Application: {
-		oneOrTwo: X= { #OneOrTwo & {
-			if X.kind == "two" {
-				two: {
-					if X.two.optional == _|_ {
-						optional: "optional set"
+issue3967: {
+	error: local: {
+		out: #Application & {
+			oneOrTwo: two: {}
+		}
+		#Application: {
+			oneOrTwo: X= { #OneOrTwo & {
+				if X.kind == "two" {
+					two: {
+						if X.two.optional == _|_ {
+							optional: "optional set"
+						}
 					}
 				}
-			}
-			if X.kind == "never" {
-			}
-		}}
+				if X.kind == "never" {
+				}
+			}}
+		}
 	}
+	@test(eq, {
+		error: {
+			nested: {
+				out: {oneOrTwo: {two: {}}}
+				#Application: {
+					oneOrTwo: {kind: "one", one: {oneField: "value"}}
+				}
+			}
+			local: {
+				out: {oneOrTwo: {two: {}}}
+				#Application: {
+					oneOrTwo: {kind: "one", one: {oneField: "value"}}
+				}
+			}
+		}
+	})
 }
+-- out/errors.txt --
+[incomplete] issue3967.error.nested.out: undefined field: kind:
+    ./in.cue:139:17
+[cycle] issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
+    ./in.cue:158:10
+issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
+    ./in.cue:163:8
+issue3967.error.local.out.oneOrTwo.two: field not allowed:
+    ./in.cue:163:8
+    ./in.cue:152:14
+    ./in.cue:157:6
 -- out/eval/stats --
 Leaks:  16
 Freed:  278
@@ -117,529 +205,7 @@ Unifications: 162
 Conjuncts:    394
 Disjuncts:    80
 
-NumCloseIDs: 94
--- out/evalalpha --
-(struct){
-  #OneOrTwo: (#struct){ |((#struct){
-      kind: (string){ "one" }
-      one: (#struct){
-        oneField: (string){ "value" }
-      }
-    }, (#struct){
-      kind: (string){ "two" }
-      two: (#struct){
-        optional?: (string){ string }
-      }
-    }) }
-  #One: (#struct){
-    kind: (string){ "one" }
-    one: (#struct){
-      oneField: (string){ "value" }
-    }
-  }
-  #Two: (#struct){
-    kind: (string){ "two" }
-    two: (#struct){
-      optional?: (string){ string }
-    }
-  }
-  _appDefaults: (struct){
-    two: (struct){
-      two: (struct){
-        optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-      }
-    }
-  }
-  valueDiscriminator: (struct){
-    crossing: (struct){
-      out: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-      #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-    }
-    local: (struct){
-      out: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-      #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-    }
-  }
-  fieldDiscriminator: (struct){
-    crossing: (struct){
-      out: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-            kind: (string){ "two" }
-          }, (#struct){
-            two: (#struct){
-              optional?: (string){ string }
-            }
-            kind: (string){ "two" }
-          }) }
-      }
-      #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-    }
-    local: (struct){
-      out: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-            kind: (string){ "two" }
-          }, (#struct){
-            two: (#struct){
-              optional?: (string){ string }
-            }
-            kind: (string){ "two" }
-          }) }
-      }
-      #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-    }
-  }
-  issue3967: (struct){
-    error: (struct){
-      nested: (struct){
-        out: (_|_){
-          // [incomplete] issue3967.error.nested.out: undefined field: kind:
-          //     ./in.cue:85:17
-          oneOrTwo: (_|_){
-            // [cycle] issue3967.error.nested.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.oneOrTwo.two.optional changed after evaluation:
-            //     ./in.cue:79:9
-            // issue3967.error.nested.out.oneOrTwo: 2 errors in empty disjunction::
-            //     ./in.cue:85:6
-            // issue3967.error.nested.out.oneOrTwo.two: field not allowed:
-            //     ./in.cue:85:6
-            //     ./in.cue:73:13
-            //     ./in.cue:78:5
-          }
-        }
-        #Application: (#struct){
-          oneOrTwo: (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }
-        }
-      }
-      local: (struct){
-        out: (#struct){
-          oneOrTwo: (_|_){
-            // [cycle] issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
-            //     ./in.cue:97:9
-            // issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
-            //     ./in.cue:102:7
-            // issue3967.error.local.out.oneOrTwo.two: field not allowed:
-            //     ./in.cue:102:7
-            //     ./in.cue:91:13
-            //     ./in.cue:96:5
-          }
-        }
-        #Application: (#struct){
-          oneOrTwo: (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -168,45 +168,48 @@
-   issue3967: (struct){
-     error: (struct){
-       nested: (struct){
--        out: (#struct){
--          oneOrTwo: (#struct){
--            two: (#struct){
--              optional?: (string){ string }
--            }
--            kind: (string){ "two" }
--          }
--        }
--        #Application: (_|_){
--          // [incomplete] issue3967.error.nested.#Application: unresolved disjunction {kind:"one",one:{oneField:"value"}} | {two:{optional?:string},kind:"two"} (type struct):
--          //     ./in.cue:82:6
--          oneOrTwo: (#struct){ |((#struct){
--              kind: (string){ "one" }
--              one: (#struct){
--                oneField: (string){ "value" }
--              }
--            }, (#struct){
--              two: (#struct){
--                optional?: (string){ string }
--              }
--              kind: (string){ "two" }
--            }) }
-+        out: (_|_){
-+          // [incomplete] issue3967.error.nested.out: undefined field: kind:
-+          //     ./in.cue:85:17
-+          oneOrTwo: (_|_){
-+            // [cycle] issue3967.error.nested.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.oneOrTwo.two.optional changed after evaluation:
-+            //     ./in.cue:79:9
-+            // issue3967.error.nested.out.oneOrTwo: 2 errors in empty disjunction::
-+            //     ./in.cue:85:6
-+            // issue3967.error.nested.out.oneOrTwo.two: field not allowed:
-+            //     ./in.cue:85:6
-+            //     ./in.cue:73:13
-+            //     ./in.cue:78:5
-+          }
-+        }
-+        #Application: (#struct){
-+          oneOrTwo: (#struct){
-+            kind: (string){ "one" }
-+            one: (#struct){
-+              oneField: (string){ "value" }
-+            }
-+          }
-         }
-       }
-       local: (struct){
-         out: (#struct){
-           oneOrTwo: (_|_){
--            // [incomplete] issue3967.error.local.out.oneOrTwo: cycle error referencing kind:
--            //     ./in.cue:99:9
--            two: (#struct){
--              optional?: (string){ string }
--            }
--            kind: (string){ "two" }
--          }
--        }
--        #Application: (#struct){
--          oneOrTwo: (_|_){
--            // [incomplete] issue3967.error.local.#Application.oneOrTwo: cycle error referencing kind:
--            //     ./in.cue:99:9
-+            // [cycle] issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
-+            //     ./in.cue:97:9
-+            // issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
-+            //     ./in.cue:102:7
-+            // issue3967.error.local.out.oneOrTwo.two: field not allowed:
-+            //     ./in.cue:102:7
-+            //     ./in.cue:91:13
-+            //     ./in.cue:96:5
-+          }
-+        }
-+        #Application: (#struct){
-+          oneOrTwo: (#struct){
-+            kind: (string){ "one" }
-+            one: (#struct){
-+              oneField: (string){ "value" }
-+            }
-           }
-         }
-       }
--- out/eval --
-(struct){
-  #OneOrTwo: (#struct){ |((#struct){
-      kind: (string){ "one" }
-      one: (#struct){
-        oneField: (string){ "value" }
-      }
-    }, (#struct){
-      kind: (string){ "two" }
-      two: (#struct){
-        optional?: (string){ string }
-      }
-    }) }
-  #One: (#struct){
-    kind: (string){ "one" }
-    one: (#struct){
-      oneField: (string){ "value" }
-    }
-  }
-  #Two: (#struct){
-    kind: (string){ "two" }
-    two: (#struct){
-      optional?: (string){ string }
-    }
-  }
-  _appDefaults: (struct){
-    two: (struct){
-      two: (struct){
-        optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-      }
-    }
-  }
-  valueDiscriminator: (struct){
-    crossing: (struct){
-      out: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-      #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-    }
-    local: (struct){
-      out: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-      #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-    }
-  }
-  fieldDiscriminator: (struct){
-    crossing: (struct){
-      out: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-            kind: (string){ "two" }
-          }, (#struct){
-            two: (#struct){
-              optional?: (string){ string }
-            }
-            kind: (string){ "two" }
-          }) }
-      }
-      #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-    }
-    local: (struct){
-      out: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-            kind: (string){ "two" }
-          }, (#struct){
-            two: (#struct){
-              optional?: (string){ string }
-            }
-            kind: (string){ "two" }
-          }) }
-      }
-      #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-            }
-          }, (#struct){
-            kind: (string){ "one" }
-            one: (#struct){
-              oneField: (string){ "value" }
-            }
-          }, (#struct){
-            kind: (string){ "two" }
-            two: (#struct){
-              optional?: (string){ string }
-            }
-          }) }
-      }
-    }
-  }
-  issue3967: (struct){
-    error: (struct){
-      nested: (struct){
-        out: (#struct){
-          oneOrTwo: (#struct){
-            two: (#struct){
-              optional?: (string){ string }
-            }
-            kind: (string){ "two" }
-          }
-        }
-        #Application: (_|_){
-          // [incomplete] issue3967.error.nested.#Application: unresolved disjunction {kind:"one",one:{oneField:"value"}} | {two:{optional?:string},kind:"two"} (type struct):
-          //     ./in.cue:82:6
-          oneOrTwo: (#struct){ |((#struct){
-              kind: (string){ "one" }
-              one: (#struct){
-                oneField: (string){ "value" }
-              }
-            }, (#struct){
-              two: (#struct){
-                optional?: (string){ string }
-              }
-              kind: (string){ "two" }
-            }) }
-        }
-      }
-      local: (struct){
-        out: (#struct){
-          oneOrTwo: (_|_){
-            // [incomplete] issue3967.error.local.out.oneOrTwo: cycle error referencing kind:
-            //     ./in.cue:99:9
-            two: (#struct){
-              optional?: (string){ string }
-            }
-            kind: (string){ "two" }
-          }
-        }
-        #Application: (#struct){
-          oneOrTwo: (_|_){
-            // [incomplete] issue3967.error.local.#Application.oneOrTwo: cycle error referencing kind:
-            //     ./in.cue:99:9
-          }
-        }
-      }
-    }
-  }
-}
+NumCloseIDs: 96
 -- out/compile --
 --- in.cue
 {
@@ -736,6 +302,7 @@ diff old new
                 }
               }
             }
+            if (〈2〉.oneOrTwo.kind == "never") {}
           })
           if (〈1〉.oneOrTwo.kind == "never") {}
         }
@@ -768,3 +335,5 @@ diff old new
     }
   }
 }
+-- out/todo.txt --
+v3 reports a cycle error for issue3967.error.nested.out (undefined field: kind) and issue3967.error.local.out.oneOrTwo (circular dependency), whereas v2 reported incomplete/cycle errors differently and resolved some fields that v3 does not.

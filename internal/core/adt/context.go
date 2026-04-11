@@ -344,6 +344,217 @@ func (c *OpContext) Err() *Bottom {
 	return b
 }
 
+// ResolveExists reports whether the field reference, selector, or index
+// expression x refers to a regular member that is present. It returns an error
+// for a non-reference argument, a missing intermediate component, or when the
+// answer would be order-dependent (a cycle). name labels the builtin in error
+// messages.
+func (c *OpContext) ResolveExists(x Expr, name string) (bool, *Bottom) {
+	env := c.Env(0)
+	var value Expr
+	var sel Feature
+	var pos token.Pos
+
+	switch r := x.(type) {
+	case *FieldReference:
+		x := c.MakeConjunct(r)
+		arc, _ := c.Resolve(x, r)
+		if arc == nil {
+			return false, nil
+		}
+		return arc.ArcType == ArcMember, nil
+
+	case *SelectorExpr:
+		value = r.X
+		sel = r.Sel
+		if r.Src != nil {
+			pos = r.Src.Sel.Pos()
+		}
+
+	case *IndexExpr:
+		idx, idxOK := c.Evaluate(c.Env(0), r.Index)
+		if _, isErr := idx.(*Bottom); isErr || !idxOK {
+			return false, nil
+		}
+		sel = c.Label(r.Index, idx)
+		if c.HasErr() {
+			return false, nil
+		}
+		value = r.X
+		if r.Src != nil {
+			pos = r.Src.Index.Pos()
+		}
+
+	default:
+		return false, c.NewErrf("%s: argument must be a field reference, selector, or index expression", name)
+	}
+
+	// Resolve the peer cooperatively, the way regular selector resolution
+	// does (see [SelectorExpr.resolve] and [OpContext.node]): only the peer's
+	// field set is needed to answer an existence question, and mode yield
+	// lets the scheduler suspend the current task while the peer is still
+	// being computed, re-running it when the peer's field set is known.
+	// Forcing the peer with [OpContext.Evaluate] instead would make tasks of
+	// the peer, such as a builtin call awaiting one of its arguments, fail
+	// with a spurious cycle error whenever evaluation merely entered the
+	// graph through a not-yet-computed node.
+	s := c.PushState(env, x.Source())
+	peerV := c.unifyNode(value, Flags{
+		status:    partial,
+		condition: needFieldSetKnown,
+		mode:      yield,
+	})
+	peerV, defOK := c.getDefault(peerV)
+	if b := c.PopState(s); b != nil {
+		return false, b
+	}
+	if !defOK {
+		return false, nil
+	}
+	if w := Unwrap(peerV); !isCyclePlaceholder(w) {
+		peerV = w
+	}
+	if vtx, ok := peerV.(*Vertex); !ok || vtx.state == nil || vtx.state.scheduler.state != schedRUNNING {
+		// The peer is not actively being computed: forcing it cannot
+		// produce a spurious cycle and acts as the driver for values that
+		// are not driven by the regular evaluation order, such as let
+		// values and comprehension bindings.
+		peerV, _ = c.Evaluate(env, value)
+	}
+	if b, isErr := peerV.(*Bottom); isErr {
+		return false, b
+	}
+	parent, ok := peerV.(*Vertex)
+	if !ok {
+		return false, c.NewErrf("%s: cannot index non-struct/list value", name)
+	}
+
+	// Follow defaults: a selection on a disjunction with a default picks the
+	// default disjunct, as the old `!= _|_` validator did via
+	// [OpContext.getDefault]. Only descend when the value is actually a
+	// disjunction; otherwise Default() can produce a stale copy.
+	if _, isDisjunction := parent.BaseValue.(*Disjunction); isDisjunction {
+		parent = parent.Default()
+	}
+	parent = parent.DerefValue()
+
+	s = c.PushState(env, x.Source())
+
+	c.inValidator++
+	defer func() { c.inValidator-- }()
+
+	flags := Flags{
+		status:    conjuncts,
+		condition: needTasksDone,
+		mode:      finalize,
+	}
+	var v Value
+	arc := c.lookup(parent, pos, sel, flags)
+	if arc != nil {
+		// A regular member exists regardless of its value: presence is
+		// monotone, as conjuncts can only be added. Answer before completing
+		// the arc: completion computes the arc's value, which may force
+		// nodes that are still legitimately waiting on other tasks and
+		// thereby trigger premature cycle breaking.
+		if arc.ArcType == ArcMember {
+			c.PopState(s)
+			return true, nil
+		}
+		arc.CompleteArcsOnly(c)
+		v = arc.DerefNonShared()
+		if arc.ArcType == ArcMember {
+			c.PopState(s)
+			return true, nil
+		}
+
+	}
+	if c.HasErr() {
+		v = c.errs
+	}
+
+	u, _ := c.getDefault(v)
+	c.PopState(s)
+
+	if v, ok := Unwrap(u).(*Bottom); ok {
+		switch v.Code {
+		case CycleError:
+			return false, v
+		case IncompleteError:
+			// The responsible node is actively being computed and still has
+			// value-producing tasks pending; suspend until its value is known
+			// and re-run, as [OpContext.validate] does for comparisons against
+			// bottom. Unlike the propagation below, which relies on the
+			// current task being retried by its own node, suspension also
+			// reschedules the current task when it waits on a *different*
+			// node, whose completion would otherwise not retrigger it.
+			if sched := pendingValueScheduler(v.Node); sched != nil {
+				if t := c.current(); t != nil {
+					t.waitFor(sched, valueKnown)
+					sched.yield()
+					panic("unreachable")
+				}
+			}
+
+			c.verifyNonMonotonicResult(env, x, true)
+
+			// For a SelectorExpr or IndexExpr `peer.field`, identify the peer
+			// vertex (distinct from the caller). If the peer is
+			// mid-evaluation with a pending comp that could yet
+			// add this field, propagate so we don't commit to a
+			// stale "field absent" answer.
+			caller := env.DerefVertex(c)
+			if parent != caller {
+				if hasPendingComp(parent) {
+					return false, v
+				}
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// pendingValueScheduler returns the scheduler of n if n is actively being
+// computed and still has value-producing tasks pending, meaning a task may
+// wait on it for valueKnown. It returns nil otherwise. schedRUNNING (not
+// schedREADY) avoids deadlocking on a node that nobody else will trigger — a
+// genuine cycle.
+func pendingValueScheduler(n *Vertex) *scheduler {
+	if n == nil {
+		return nil
+	}
+	ns := n.state
+	if ns != nil && ns.state == schedRUNNING &&
+		!ns.meets(valueKnown) && ns.provided&valueKnown != 0 {
+		return &ns.scheduler
+	}
+	return nil
+}
+
+// hasPendingComp reports whether the given vertex has a comprehension
+// dependency that has not yet been definitively settled, OR is itself in
+// mid-evaluation (any non-success task remaining, including a builtin call
+// awaiting an input). A still-running task could yet insert arcs or
+// otherwise change what exists() observes; a registered postCheck means a
+// previous comp evaluated its condition under IncompleteError and may flip
+// later. In either case a "doesn't exist" answer right now would be
+// order-dependent.
+func hasPendingComp(v *Vertex) bool {
+	if v == nil || v.state == nil {
+		return false
+	}
+	if len(v.state.postChecks) > 0 {
+		return true
+	}
+	for _, t := range v.state.tasks {
+		if t.state == taskSUCCESS {
+			continue
+		}
+		return true
+	}
+	return false
+}
+
 func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...interface{}) {
 	err := c.NewPosf(pos, msg, args...)
 	c.addErr(code, err)
@@ -657,6 +868,48 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 	}
 
 	return val, true
+}
+
+// IsValidExpr evaluates expression x and reports whether it does not result in
+// a permanent error, using full finalization (as the != _|_ comparison did) so
+// that sub-field errors are detected. Any errors produced during evaluation are
+// discarded after checking. Incomplete errors, including those from
+// comprehensions over undefined fields and unresolved disjunctions, do not make
+// it return false.
+func (c *OpContext) IsValidExpr(env *Environment, x Expr) bool {
+	s := c.PushState(env, x.Source())
+	v := c.evalState(x, Flags{
+		status:    finalized,
+		condition: needTasksDone,
+		mode:      finalize,
+	})
+	// Save errors accumulated during evaluation (e.g. ChildErrors from
+	// sub-evaluations propagated via c.AddBottom in BinaryExpr/StructLit.evaluate).
+	errsFromEval := c.errs
+	// getDefault may add an IncompleteError for unresolved disjunctions.
+	// That should not make isValid return false: an unresolved disjunction
+	// is a valid (abstract) value, not an error. Restore after the call.
+	u, _ := c.getDefault(v)
+	c.errs = errsFromEval
+
+	var valid bool
+	switch val := u.(type) {
+	case *Bottom:
+	case *Vertex:
+		val.Finalize(c)
+
+		// isFinalError covers non-incomplete errors in BaseValue.
+		// c.errs covers ChildErrors propagated by BinaryExpr/StructLit.evaluate
+		// (inline struct/binary expressions are re-evaluated with c.inValidator>0).
+		valid = !isFinalError(val) && c.errs == nil
+
+	default:
+		// nil means the value is abstract/incomplete but not an error.
+		// Non-nil non-vertex/bottom values (scalars) are valid.
+		valid = c.errs == nil
+	}
+	_ = c.PopState(s)
+	return valid
 }
 
 // EvaluateKeepState does an evaluate, but leaves any errors and cycle info

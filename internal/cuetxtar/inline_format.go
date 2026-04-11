@@ -89,24 +89,37 @@ func compactCUEExpr(s string) string {
 	return strings.Join(parts, " ")
 }
 
+// eqCompactThreshold is the maximum byte length of a compact struct expression
+// before eqWriteValue switches to multi-line (one field per line) form.
+const eqCompactThreshold = 40
+
 // formatValue returns a human-readable CUE string for a value.
-// Routes through the Vertex export path (via cue.Final()) to avoid internal
-// _#def wrapping, then re-enables optional fields (value?: T) so the
-// formatted expression round-trips through astCmp.
+// Short values are returned compact (single line). Struct values whose compact
+// form exceeds eqCompactThreshold are returned in multi-line form with
+// recursive indentation; eqFillAttrStr handles re-indentation relative to the
+// source attribute line.
 func (r *inlineRunner) formatValue(v cue.Value) string {
 	var b strings.Builder
-	eqWriteValue(value.OpContext(v), &b, v)
+	eqWriteValue(value.OpContext(v), &b, v, "\t")
 	return b.String()
 }
 
 // eqWriteValue writes a CUE value to b in @test(eq, ...) body notation.
+//
+// nestedIndent controls multi-line formatting for struct values: when non-empty,
+// a struct whose compact form exceeds eqCompactThreshold is written in
+// multi-line form — each field prefixed by "\n"+nestedIndent, the closing "}"
+// by "\n"+nestedIndent[:-1]. Nested struct values receive nestedIndent+"\t" so
+// every level of nesting gains one extra tab. When nestedIndent is empty the
+// value is always written compact (used internally for disjuncts, conjuncts,
+// and nested field values that already fit in the threshold).
 //
 // Compared with v.Syntax() + cue.Final() + format.Node:
 //   - Hidden fields use _foo$pkg notation (matching astcmp.go conventions).
 //   - adt.Disjunction values are emitted as *d1 | d2 (with * for defaults)
 //     instead of being collapsed to the default by cue.Final().
 //   - adt.Conjunction values are emitted as c1 & c2.
-func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value) {
+func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value, nestedIndent string) {
 	tv := v.Core()
 	vx := tv.V.DerefValue()
 
@@ -123,8 +136,20 @@ func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value) {
 	// latter handles error vertices that still carry child fields (e.g. a
 	// struct with one bad field: the parent vertex is _|_ but its arcs hold
 	// the successfully-evaluated sibling fields).
-	if v.IncompleteKind() == cue.StructKind || len(vx.Arcs) > 0 {
-		eqWriteStruct(opCtx, b, vx)
+	// Lists also have arcs (integer-indexed elements) but must fall through
+	// to the standard syntax formatter so they render as [v1, v2] not {0: v1}.
+	k := v.IncompleteKind()
+	if (k == cue.StructKind || len(vx.Arcs) > 0) && k != cue.ListKind {
+		if nestedIndent != "" {
+			// Multi-line mode: use compact if it fits, else recurse one level deeper.
+			var compact strings.Builder
+			eqWriteStruct(opCtx, &compact, vx, "")
+			if compact.Len() <= eqCompactThreshold {
+				b.WriteString(compact.String())
+				return
+			}
+		}
+		eqWriteStruct(opCtx, b, vx, nestedIndent)
 		return
 	}
 
@@ -149,7 +174,7 @@ func eqWriteDisjunction(opCtx *adt.OpContext, b *strings.Builder, dj *adt.Disjun
 		if i < dj.NumDefaults {
 			b.WriteByte('*')
 		}
-		eqWriteValue(opCtx, b, value.Make(opCtx, v))
+		eqWriteValue(opCtx, b, value.Make(opCtx, v), "")
 	}
 }
 
@@ -159,12 +184,18 @@ func eqWriteConjunction(opCtx *adt.OpContext, b *strings.Builder, conj *adt.Conj
 		if i > 0 {
 			b.WriteString(" & ")
 		}
-		eqWriteValue(opCtx, b, value.Make(opCtx, v))
+		eqWriteValue(opCtx, b, value.Make(opCtx, v), "")
 	}
 }
 
-// eqWriteStruct emits a struct, using _foo$pkg notation for hidden-field labels.
-func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex) {
+// eqWriteStruct emits a struct using _foo$pkg notation for hidden-field labels.
+//
+// nestedIndent controls layout:
+//   - ""  (compact): fields are separated by ", ".
+//   - non-empty: each field is preceded by "\n"+nestedIndent; the closing "}"
+//     is preceded by "\n"+nestedIndent[:-1] (one tab less). Field values
+//     receive nestedIndent+"\t" so they can recurse one level deeper.
+func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex, nestedIndent string) {
 	b.WriteByte('{')
 	first := true
 	for _, arc := range vx.Arcs {
@@ -180,13 +211,18 @@ func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex) {
 				continue
 			}
 		}
-		if !first {
+		if nestedIndent != "" {
+			b.WriteString("\n" + nestedIndent)
+		} else if !first {
 			b.WriteString(", ")
 		}
 		first = false
 		eqWriteLabel(opCtx, b, arc.Label, arc.ArcType)
 		b.WriteString(": ")
-		eqWriteValue(opCtx, b, value.Make(opCtx, arc))
+		eqWriteValue(opCtx, b, value.Make(opCtx, arc), nestedIndent+"\t")
+	}
+	if nestedIndent != "" && !first {
+		b.WriteString("\n" + nestedIndent[:len(nestedIndent)-1])
 	}
 	b.WriteByte('}')
 }

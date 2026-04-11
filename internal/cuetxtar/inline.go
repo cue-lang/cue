@@ -1097,7 +1097,12 @@ func attrHasSkip(raw *internal.Attr) (ver string, ok bool) {
 
 // enqueueInlineFill appends a byte-level replacement for pa's @test attribute.
 // newAttrText is the full replacement text including the leading @.
+// It is a no-op when pa.srcAttr is nil (e.g. in unit tests that construct
+// parsedTestAttr directly without a source attribute).
 func (r *inlineRunner) enqueueInlineFill(pa parsedTestAttr, newAttrText string) {
+	if pa.srcAttr == nil {
+		return
+	}
 	r.pendingInlineFillWrites = append(r.pendingInlineFillWrites, inlineFillWrite{
 		fileName:    pa.srcFileName,
 		attrOffset:  pa.srcAttr.Pos().Offset(),

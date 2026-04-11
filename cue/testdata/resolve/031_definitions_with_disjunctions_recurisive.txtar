@@ -1,6 +1,3 @@
-#name: definitions with disjunctions recurisive
-#evalPartial
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #Foo: {
 	x: {
@@ -10,7 +7,9 @@
 		{b: 2}
 	}
 	x: c: 3
-}
+} @test(eq, {
+	x: {field: int, c: 3, a: 1} | {field: int, c: 3, b: 2}
+})
 -- out/compile --
 --- in.cue
 {
@@ -40,17 +39,3 @@ Conjuncts:    11
 Disjuncts:    2
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  #Foo: (#struct){
-    x: (#struct){ |((#struct){
-        field: (int){ int }
-        c: (int){ 3 }
-        a: (int){ 1 }
-      }, (#struct){
-        field: (int){ int }
-        c: (int){ 3 }
-        b: (int){ 2 }
-      }) }
-  }
-}

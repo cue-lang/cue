@@ -1,156 +1,22 @@
-#name: closing structs
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-op: {x: int} // {x: int}
-ot: {x: int, ...} // {x: int, ...}
-cp: close({x: int})      // closed({x: int})
-ct: close({x: int, ...}) // {x: int, ...}
+op: {x: int} @test(eq, {x: int}) // {x: int}
+ot: {x: int, ...} @test(eq, {x: int}) // {x: int, ...}
+cp: close({x: int})      @test(eq, {x: int}) @test(closed) // closed({x: int})
+ct: close({x: int, ...}) @test(eq, {x: int}) @test(closed) @test(shareID=ctct) // {x: int, ...}
 
-opot: op & ot // {x: int, ...}
-otop: ot & op // {x: int, ...}
-opcp: op & cp // closed({x: int})
-cpop: cp & op // closed({x: int})
-opct: op & ct // {x: int, ...}
-ctop: ct & op // {x: int, ...}
-otcp: ot & cp // closed({x: int})
-cpot: cp & ot // closed({x: int})
-otct: ot & ct // {x: int, ...}
-ctot: ct & ot // {x: int, ...}
-cpct: cp & ct // closed({x: int})
-ctcp: ct & cp // closed({x: int})
-ctct: ct & ct // {x: int, ...}
--- out/eval/stats --
-Leaks:  0
-Freed:  90
-Reused: 63
-Allocs: 27
-Retain: 0
-
-Unifications: 62
-Conjuncts:    125
-Disjuncts:    0
-
-NumCloseIDs: 38
--- out/evalalpha --
-(struct){
-  op: (struct){
-    x: (int){ int }
-  }
-  ot: (struct){
-    x: (int){ int }
-  }
-  cp: (#struct){
-    x: (int){ int }
-  }
-  ct: (#struct){
-    x: (int){ int }
-  }
-  opot: (struct){
-    x: (int){ int }
-  }
-  otop: (struct){
-    x: (int){ int }
-  }
-  opcp: (#struct){
-    x: (int){ int }
-  }
-  cpop: (#struct){
-    x: (int){ int }
-  }
-  opct: (#struct){
-    x: (int){ int }
-  }
-  ctop: (#struct){
-    x: (int){ int }
-  }
-  otcp: (#struct){
-    x: (int){ int }
-  }
-  cpot: (#struct){
-    x: (int){ int }
-  }
-  otct: (#struct){
-    x: (int){ int }
-  }
-  ctot: (#struct){
-    x: (int){ int }
-  }
-  cpct: (#struct){
-    x: (int){ int }
-  }
-  ctcp: (#struct){
-    x: (int){ int }
-  }
-  ctct: ~(ct)
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -47,7 +47,5 @@
-   ctcp: (#struct){
-     x: (int){ int }
-   }
--  ctct: (#struct){
--    x: (int){ int }
--  }
-+  ctct: ~(ct)
- }
--- out/eval --
-(struct){
-  op: (struct){
-    x: (int){ int }
-  }
-  ot: (struct){
-    x: (int){ int }
-  }
-  cp: (#struct){
-    x: (int){ int }
-  }
-  ct: (#struct){
-    x: (int){ int }
-  }
-  opot: (struct){
-    x: (int){ int }
-  }
-  otop: (struct){
-    x: (int){ int }
-  }
-  opcp: (#struct){
-    x: (int){ int }
-  }
-  cpop: (#struct){
-    x: (int){ int }
-  }
-  opct: (#struct){
-    x: (int){ int }
-  }
-  ctop: (#struct){
-    x: (int){ int }
-  }
-  otcp: (#struct){
-    x: (int){ int }
-  }
-  cpot: (#struct){
-    x: (int){ int }
-  }
-  otct: (#struct){
-    x: (int){ int }
-  }
-  ctot: (#struct){
-    x: (int){ int }
-  }
-  cpct: (#struct){
-    x: (int){ int }
-  }
-  ctcp: (#struct){
-    x: (int){ int }
-  }
-  ctct: (#struct){
-    x: (int){ int }
-  }
-}
+opot: op & ot @test(eq, {x: int}) // {x: int, ...}
+otop: ot & op @test(eq, {x: int}) // {x: int, ...}
+opcp: op & cp @test(eq, {x: int}) @test(closed) // closed({x: int})
+cpop: cp & op @test(eq, {x: int}) @test(closed) // closed({x: int})
+opct: op & ct @test(eq, {x: int}) @test(closed) // {x: int, ...}
+ctop: ct & op @test(eq, {x: int}) @test(closed) // {x: int, ...}
+otcp: ot & cp @test(eq, {x: int}) @test(closed) // closed({x: int})
+cpot: cp & ot @test(eq, {x: int}) @test(closed) // closed({x: int})
+otct: ot & ct @test(eq, {x: int}) @test(closed) // {x: int, ...}
+ctot: ct & ot @test(eq, {x: int}) @test(closed) // {x: int, ...}
+cpct: cp & ct @test(eq, {x: int}) @test(closed) // closed({x: int})
+ctcp: ct & cp @test(eq, {x: int}) @test(closed) // closed({x: int})
+ctct: ct & ct @test(eq, {x: int}) @test(closed) @test(shareID=ctct) // {x: int, ...}
 -- out/compile --
 --- in.cue
 {
@@ -182,3 +48,17 @@ diff old new
   ctcp: (〈0;ct〉 & 〈0;cp〉)
   ctct: (〈0;ct〉 & 〈0;ct〉)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  90
+Reused: 63
+Allocs: 27
+Retain: 0
+
+Unifications: 62
+Conjuncts:    125
+Disjuncts:    0
+
+NumCloseIDs: 38
+-- out/todo.txt --
+ctct: v2 evaluator expands ctct to a full struct; v3 shares the vertex with ct.

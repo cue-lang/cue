@@ -69,8 +69,7 @@ var matchNBuiltin = &adt.Builtin{
 		bound := call.Value(1)
 		// TODO: consider a mode to require "all" to pass, for instance by
 		// supporting the value null or "all".
-
-		b := checkNum(c, bound, count, count+possibleCount)
+		b := checkNum(c, "", bound, count, count+possibleCount)
 		if b != nil {
 			// Only show errors related to incomplete schema if there is still
 			// a possibility that we can resolve it.
@@ -170,12 +169,17 @@ func unifyScalar(c *adt.OpContext, self, check adt.Value) *adt.Vertex {
 	return v
 }
 
-func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.Bottom {
+func checkNum(ctx *adt.OpContext, fn string, bound adt.Value, count, maxCount int64) *adt.Bottom {
 	cnt := ctx.NewInt64(count)
 	n := unifyScalar(ctx, bound, cnt)
 	b, _ := n.BaseValue.(*adt.Bottom)
 	if b != nil {
-		b := ctx.NewErrf("%d matched, expected %v", count, bound)
+		var b *adt.Bottom
+		if fn == "" {
+			b = ctx.NewErrf("%d matched, expected %v", count, bound)
+		} else {
+			b = ctx.NewErrf("%s: %d matched, expected %v", fn, count, bound)
+		}
 		// This error is wrapped by the validator's context error, which locates
 		// it at the validated value; a path here would duplicate that location.
 		if ve, ok := b.Err.(*adt.ValueError); ok {

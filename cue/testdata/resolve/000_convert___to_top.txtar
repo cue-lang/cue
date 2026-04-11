@@ -1,10 +1,7 @@
-#name: convert _ to top
-#evalPartial
 # Tests that a pattern constraint [_]: _ over an open struct results in
 # an open struct without any concrete fields.
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-a: {[_]: _}
+a: {[_]: _}   @test(eq, {})
 -- out/compile --
 --- in.cue
 {
@@ -22,8 +19,3 @@ Retain: 0
 Unifications: 2
 Conjuncts:    2
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  a: (struct){
-  }
-}

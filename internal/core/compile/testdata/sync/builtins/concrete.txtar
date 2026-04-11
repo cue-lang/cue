@@ -1,0 +1,305 @@
+# Tests for isConcrete and concreteN builtins
+
+-- in.cue --
+// isConcrete with concrete scalar values
+concreteScalars: {
+	a:      42
+	b:      "hello"
+	c:      true
+	d:      3.14
+	checkA: isConcrete(a)
+	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+	checkD: isConcrete(d)
+}
+
+// isConcrete with types (not concrete)
+concreteTypes: {
+	a:      int
+	b:      string
+	c:      bool
+	checkA: isConcrete(a)
+	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+}
+
+// isConcrete with constraints (not concrete)
+concreteConstraints: {
+	a:      >10
+	b:      =~"pattern"
+	c:      int & >0
+	checkA: isConcrete(a)
+	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+}
+
+// isConcrete with disjunctions
+concreteDisjunctions: {
+	a:      1 | 2        // no default: not concrete
+	b:      *1 | 2       // single default: concrete (finalization selects it)
+	c:      string | int // no default: not concrete
+	checkA: isConcrete(a)
+	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+}
+
+// isConcrete with structs
+concreteStructs: {
+	// fully concrete struct
+	full: {x: 1, y: "hello"}
+	checkFull: isConcrete(full)
+
+	// struct with non-concrete field
+	partial: {x: 1, y: string}
+	checkPartial: isConcrete(partial)
+
+	// XXX: add tests with structs with disjunctions with a default concrete value and without.
+	deep: {
+		a: x: y: a: 1
+		b: x: y: b: *1 | 2
+		c: x: y: c: int
+	}
+	checkDeep1: isConcrete(deep)
+	checkDeep2: isConcrete(deep.a)
+	checkDeep3: isConcrete(deep.b)
+	checkDeep4: isConcrete(deep.c)
+	checkDeep5: isConcrete({deep.a, deep.b})
+	checkDeep6: isConcrete({deep.b, deep.c})
+	checkDeep7: isConcrete({deep.a, deep.c})
+
+	// open struct: closed to its concrete fields at evaluation time
+	open: {x: 1, ...}
+	checkOpen: isConcrete(open)
+}
+
+// isConcrete with literal values
+concreteLiterals: {
+	checkInt:    isConcrete(42)
+	checkString: isConcrete("hello")
+	checkBool:   isConcrete(true)
+}
+
+// concreteN: exactly 2 required, 2 currently concrete - passes
+concreteNExact2: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(2, a, b, c)
+}
+
+// concreteN: at least 1 required, 2 currently concrete - passes
+concreteNAtLeast1: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(>=1, a, b, c)
+}
+
+// concreteN: at most 3 required, max possible is 3 - always passes
+concreteNAtMost3: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(<=3, a, b, c)
+}
+
+// concreteN: at most 2 required, 2 currently concrete - passes
+concreteNAtMost2: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(<=2, a, b, c)
+}
+
+// concreteN: exactly 3 required but only 2 concrete - incomplete (b could become concrete)
+concreteNIncomplete: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(3, a, b, c)
+}
+
+// concreteN: requires 4 but only 3 args, impossible - eval error
+concreteNImpossible4: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(4, a, b, c)
+}
+
+// concreteN: requires exactly 1 but already 2 concrete, impossible - eval error
+concreteNImpossible1: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(1, a, b, c)
+}
+
+// concreteN: requires <2 but already 2 concrete, impossible - eval error
+concreteNImpossibleLt2: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(<2, a, b, c)
+}
+
+// concreteN embedded (protobuf-style: exactly one must be concrete)
+concreteNOneOf: {
+	a?: int
+	b?: string
+	a:  42
+	concreteN(1, a, b)
+}
+-- out/compile --
+--- in.cue
+{
+  concreteScalars: {
+    a: 42
+    b: "hello"
+    c: true
+    d: 3.14
+    checkA: isConcrete(〈0;a〉)
+    checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+    checkD: isConcrete(〈0;d〉)
+  }
+  concreteTypes: {
+    a: int
+    b: string
+    c: bool
+    checkA: isConcrete(〈0;a〉)
+    checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+  }
+  concreteConstraints: {
+    a: >10
+    b: =~"pattern"
+    c: (int & >0)
+    checkA: isConcrete(〈0;a〉)
+    checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+  }
+  concreteDisjunctions: {
+    a: (1|2)
+    b: (*1|2)
+    c: (string|int)
+    checkA: isConcrete(〈0;a〉)
+    checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+  }
+  concreteStructs: {
+    full: {
+      x: 1
+      y: "hello"
+    }
+    checkFull: isConcrete(〈0;full〉)
+    partial: {
+      x: 1
+      y: string
+    }
+    checkPartial: isConcrete(〈0;partial〉)
+    deep: {
+      a: {
+        x: {
+          y: {
+            a: 1
+          }
+        }
+      }
+      b: {
+        x: {
+          y: {
+            b: (*1|2)
+          }
+        }
+      }
+      c: {
+        x: {
+          y: {
+            c: int
+          }
+        }
+      }
+    }
+    checkDeep1: isConcrete(〈0;deep〉)
+    checkDeep2: isConcrete(〈0;deep〉.a)
+    checkDeep3: isConcrete(〈0;deep〉.b)
+    checkDeep4: isConcrete(〈0;deep〉.c)
+    checkDeep5: isConcrete({
+      〈1;deep〉.a
+      〈1;deep〉.b
+    })
+    checkDeep6: isConcrete({
+      〈1;deep〉.b
+      〈1;deep〉.c
+    })
+    checkDeep7: isConcrete({
+      〈1;deep〉.a
+      〈1;deep〉.c
+    })
+    open: {
+      x: 1
+      ...
+    }
+    checkOpen: isConcrete(〈0;open〉)
+  }
+  concreteLiterals: {
+    checkInt: isConcrete(42)
+    checkString: isConcrete("hello")
+    checkBool: isConcrete(true)
+  }
+  concreteNExact2: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNAtLeast1: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNAtMost3: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(<=3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNAtMost2: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(<=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNIncomplete: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNImpossible4: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(4, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNImpossible1: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNImpossibleLt2: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(<2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNOneOf: {
+    a?: int
+    b?: string
+    a: 42
+    concreteN(1, 〈0;a〉, 〈0;b〉)
+  }
+}

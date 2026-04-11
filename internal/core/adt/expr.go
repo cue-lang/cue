@@ -1571,6 +1571,22 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 	})
 	switch f := fun.(type) {
 	case *Builtin:
+		// For validators that don't take "self", return a BuiltinValidator
+		// so the result is used for validation rather than being embedded.
+		if f.RawFunc != nil && f.ValidatorNoSelf {
+			if !f.checkArgs(c, Pos(x), len(x.Args)) {
+				return nil
+			}
+			// Eagerly evaluate to detect permanent (non-incomplete) errors.
+			// If the validator can never succeed, return the error immediately.
+			callCtx := BuiltinCallContext{ctx: c, call: x, builtin: f}
+			if result := f.RawFunc(callCtx); result != nil {
+				if b, ok := result.(*Bottom); ok && !b.IsIncomplete() {
+					return b
+				}
+			}
+			return &BuiltinValidator{Src: x, Builtin: f, Args: nil}
+		}
 		return f.rawCall(c, x, state)
 
 	case *BuiltinValidator:
@@ -1711,6 +1727,12 @@ type Builtin struct {
 	// arguments. By default, all arguments are checked to be concrete.
 	NonConcrete bool
 
+	// ValidatorNoSelf indicates that this is a validator that does not take
+	// "self" as an argument. When embedded in a struct, these validators
+	// constrain the struct without using the struct value itself.
+	// This is used for builtins like existsN that validate field presence.
+	ValidatorNoSelf bool
+
 	Func func(call BuiltinCallContext) Expr
 
 	// RawFunc gives low-level control to CUE's internals for builtins.
@@ -1722,6 +1744,8 @@ type Builtin struct {
 	//
 	// TODO: consider merging Func and RawFunc into a single field again.
 	RawFunc func(call BuiltinCallContext) Value
+
+	VarArgs bool // allows an unlimited number of arguments
 
 	// Added indicates as of which language version this builtin can be used.
 	Added string
@@ -1785,7 +1809,7 @@ func bottom(v Value) *Bottom {
 }
 
 func (x *Builtin) checkArgs(c *OpContext, p token.Pos, numArgs int) bool {
-	if numArgs > len(x.Params) {
+	if numArgs > len(x.Params) && !x.VarArgs {
 		c.addErrf(0, p,
 			"too many arguments in call to %v (have %d, want %d)",
 			x, numArgs, len(x.Params))
@@ -1809,6 +1833,13 @@ func (x *Builtin) call(call BuiltinCallContext) Expr {
 	p := call.Pos()
 
 	fun := x // right now always x.
+
+	// For ValidatorNoSelf builtins using RawFunc, args were already checked
+	// in CallExpr.evaluate, and call.args is nil. Skip the args-based checks.
+	if x.ValidatorNoSelf && x.RawFunc != nil {
+		return x.RawFunc(call)
+	}
+
 	if !x.checkArgs(c, p, len(call.args)) {
 		return nil
 	}
@@ -1885,21 +1916,42 @@ func (x *BuiltinValidator) Source() ast.Node {
 }
 
 func (x *BuiltinValidator) Kind() Kind {
+	// For validators that don't take "self", return TopKind to allow
+	// unification with any struct they're embedded in.
+	if x.Builtin.ValidatorNoSelf {
+		return TopKind
+	}
 	return x.Builtin.Params[0].Kind()
 }
 
 func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
-	args := make([]Value, len(x.Args)+1)
-	args[0] = v
-	copy(args[1:], x.Args)
+	var call BuiltinCallContext
 
-	return validateWithBuiltin(BuiltinCallContext{
-		ctx:         c,
-		call:        x.Src,
-		builtin:     x.Builtin,
-		args:        args,
-		isValidator: true,
-	})
+	if x.Builtin.ValidatorNoSelf {
+		// For validators that don't take "self", we don't prepend v to args.
+		// The RawFunc will access expressions directly via call.Src.
+		call = BuiltinCallContext{
+			ctx:         c,
+			call:        x.Src,
+			builtin:     x.Builtin,
+			args:        nil, // RawFunc accesses expressions directly
+			isValidator: false,
+		}
+	} else {
+		args := make([]Value, len(x.Args)+1)
+		args[0] = v
+		copy(args[1:], x.Args)
+
+		call = BuiltinCallContext{
+			ctx:         c,
+			call:        x.Src,
+			builtin:     x.Builtin,
+			args:        args,
+			isValidator: true,
+		}
+	}
+
+	return validateWithBuiltin(call)
 }
 
 func validateWithBuiltin(call BuiltinCallContext) *Bottom {
@@ -1909,7 +1961,12 @@ func validateWithBuiltin(call BuiltinCallContext) *Bottom {
 	c := call.ctx
 	b := call.builtin
 	src := call.Pos()
-	arg0 := call.Value(0)
+
+	// For ValidatorNoSelf, there's no "self" argument
+	var arg0 Value
+	if !b.ValidatorNoSelf {
+		arg0 = call.Value(0)
+	}
 
 	res := call.builtin.call(call)
 	switch v := res.(type) {
@@ -1933,9 +1990,11 @@ func validateWithBuiltin(call BuiltinCallContext) *Bottom {
 	}
 
 	// If the validator returns an error and we already had an error, just
-	// return the original error.
-	if b, ok := Unwrap(call.Value(0)).(*Bottom); ok {
-		return b
+	// return the original error. Skip this for ValidatorNoSelf since there's no arg0.
+	if !b.ValidatorNoSelf {
+		if b, ok := Unwrap(call.Value(0)).(*Bottom); ok {
+			return b
+		}
 	}
 	// failed:
 	// TODO(mvdan): building this buffer should be part of the error format and arguments,
@@ -1957,7 +2016,12 @@ func validateWithBuiltin(call BuiltinCallContext) *Bottom {
 		buf.WriteString(")")
 	}
 
-	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", arg0, buf.String())
+	var vErr *ValueError
+	if b.ValidatorNoSelf {
+		vErr = c.NewPosf(src, "%s", buf.String())
+	} else {
+		vErr = c.NewPosf(src, "invalid value %s (does not satisfy %s)", arg0, buf.String())
+	}
 
 	call.AddPositions(vErr)
 

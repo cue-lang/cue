@@ -111,7 +111,7 @@ func (c *cmpCtx) astCmp(path cue.Path, expr ast.Expr, val cue.Value) error {
 	case *ast.ParenExpr:
 		return c.astCmp(path, e.X, val)
 	case *ast.BottomLit:
-		if val.Err() == nil {
+		if val.Err() == nil && val.Kind() != cue.BottomKind {
 			return pathErr(path, "_|_: expected error, got %v", val)
 		}
 		return nil
@@ -861,13 +861,13 @@ func flattenConjunction(expr ast.Expr) []ast.Expr {
 }
 
 func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value) error {
-	// Check that this is a valid conjunction. If it is, we can investigate
-	// the conjuncts in isolation as per how lattices work.
+	// Try to build the conjunction expression to validate it.  This fails for
+	// experimental operators such as == (structcmp).  In that case proceed with
+	// per-conjunct comparison; if the expression is genuinely wrong the
+	// individual c.astCmp calls below will still catch the mismatch.
+	// TODO(inline): allow setting the experiments in the cue.Context?
 	ctx := val.Context()
-	v := ctx.BuildExpr(e, cue.InferBuiltins(true))
-	if err := v.Err(); err != nil {
-		return pathErr(path, "cannot compile conjunction expression: %v", err)
-	}
+	ctx.BuildExpr(e, cue.InferBuiltins(true)) //nolint:errcheck
 
 	astParts := flattenConjunction(e)
 	op, args := val.Eval().Expr()
@@ -1059,6 +1059,8 @@ func tokenToOp(t token.Token) cue.Op {
 		return cue.GreaterThanEqualOp
 	case token.NEQ:
 		return cue.NotEqualOp
+	case token.EQL:
+		return cue.EqualOp
 	case token.MAT:
 		return cue.RegexMatchOp
 	case token.NMAT:

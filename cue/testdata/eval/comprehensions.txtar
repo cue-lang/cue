@@ -1,8 +1,11 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+// Tests comprehension evaluation including for-loop filters, let bindings in
+// comprehensions, if-conditioned field insertions, and field-match ordering
+// in structs. Also covers panic fixes for nested comprehensions with pattern
+// constraints (issue 3691).
 -- in.cue --
 import "strings"
 
-a: {x: 10, y: 100, z: 50}
+a: {x: 10, y: 100, z: 50} @test(eq, {x: 10, y: 100, z: 50})
 b: {
 	for k, v in a if v <= 50 {
 		"\(k)": v
@@ -15,15 +18,20 @@ b: {
 	if k > 0 {
 		l: 40
 	}
+	@test(eq, {x: 10, k: 20, l: 40, z: 50})
 }
 
 c: {
 	for k, v in a let y = v + 10 if y > 50 {
 		"\(k)": y
 	}
+	@test(eq, {y: 110, z: 60})
 }
 
-A: X: run: "dfoo"
+A: {
+	X: run: "dfoo"
+	@test(eq, {X: {run: "dfoo", files: "dfoo"}})
+}
 
 if true {
 	A: X: {
@@ -42,6 +50,7 @@ matchOrder: {
         b: {}
       }
     }
+    @test(eq, {out: {b: {Val: 1}}, in: {a: {b: {}}}})
   }
   a2: {
     out: [string]: Val: 1
@@ -53,6 +62,7 @@ matchOrder: {
     }
 
     out: in.a
+    @test(eq, {out: {b: {Val: 1}}, in: {a: {b: {}}}})
   }
   a3: {
 
@@ -64,6 +74,7 @@ matchOrder: {
 
     out: [string]: Val: 1
     out: in.a
+    @test(eq, {in: {a: {b: {}}}, out: {b: {Val: 1}}})
   }
   a4: {
     out: in.a
@@ -74,6 +85,7 @@ matchOrder: {
         b: {}
       }
     }
+    @test(eq, {out: {b: {Val: 1}}, in: {a: {b: {}}}})
   }
   a5: {
     out: in.a
@@ -85,6 +97,7 @@ matchOrder: {
     }
 
     out: [string]: Val: 1
+    @test(eq, {out: {b: {Val: 1}}, in: {a: {b: {}}}})
   }
   a6: {
     in: a: {
@@ -95,6 +108,7 @@ matchOrder: {
 
     out: in.a
     out: [string]: Val: 1
+    @test(eq, {in: {a: {b: {}}}, out: {b: {Val: 1}}})
   }
 }
 -- issue3691.cue --
@@ -111,6 +125,7 @@ issue3691: original: {
 			b: c: 1
 		}
 	}
+	@test(err, code=eval, at=a.b.c, contains="conflicting values string and 1", pos=[1:15, 2:15, 3:5, 4:3, 5:10])
 }
 // Structural cycles follow a different code path.
 issue3691: structuralCycle: {
@@ -121,7 +136,22 @@ issue3691: structuralCycle: {
 			b: c: a
 		}
 	}
+	@test(err, code=eval, at=a.b.c, contains="conflicting values string and", pos=[1:15, 2:5, 2:15, 3:5, 4:3, 5:10])
 }
+-- out/errors.txt --
+[eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
+    ./issue3691.cue:7:15
+    ./issue3691.cue:8:15
+    ./issue3691.cue:9:5
+    ./issue3691.cue:10:3
+    ./issue3691.cue:11:10
+[eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+    ./issue3691.cue:18:15
+    ./issue3691.cue:19:5
+    ./issue3691.cue:19:15
+    ./issue3691.cue:20:5
+    ./issue3691.cue:21:3
+    ./issue3691.cue:22:10
 -- out/eval/stats --
 Leaks:  6
 Freed:  74
@@ -134,407 +164,6 @@ Conjuncts:    136
 Disjuncts:    0
 
 NumCloseIDs: 48
--- out/evalalpha --
-Errors:
-issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
-    ./issue3691.cue:7:15
-    ./issue3691.cue:8:15
-    ./issue3691.cue:9:5
-    ./issue3691.cue:10:3
-    ./issue3691.cue:11:10
-issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
-    ./issue3691.cue:17:15
-    ./issue3691.cue:18:5
-    ./issue3691.cue:18:15
-    ./issue3691.cue:19:5
-    ./issue3691.cue:20:3
-    ./issue3691.cue:21:10
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    x: (int){ 10 }
-    y: (int){ 100 }
-    z: (int){ 50 }
-  }
-  b: (struct){
-    x: (int){ 10 }
-    k: (int){ 20 }
-    l: (int){ 40 }
-    z: (int){ 50 }
-  }
-  c: (struct){
-    y: (int){ 110 }
-    z: (int){ 60 }
-  }
-  A: (struct){
-    X: (struct){
-      run: (string){ "dfoo" }
-      files: (string){ "dfoo" }
-    }
-  }
-  matchOrder: (struct){
-    a1: (struct){
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-    }
-    a2: (struct){
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-    }
-    a3: (struct){
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-    }
-    a4: (struct){
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-    }
-    a5: (struct){
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-    }
-    a6: (struct){
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-    }
-  }
-  issue3691: (_|_){
-    // [eval]
-    original: (_|_){
-      // [eval]
-      X: (struct){
-      }
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
-            //     ./issue3691.cue:7:15
-            //     ./issue3691.cue:8:15
-            //     ./issue3691.cue:9:5
-            //     ./issue3691.cue:10:3
-            //     ./issue3691.cue:11:10
-          }
-        }
-      }
-    }
-    structuralCycle: (_|_){
-      // [eval]
-      X: (struct){
-      }
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
-            //     ./issue3691.cue:17:15
-            //     ./issue3691.cue:18:5
-            //     ./issue3691.cue:18:15
-            //     ./issue3691.cue:19:5
-            //     ./issue3691.cue:20:3
-            //     ./issue3691.cue:21:10
-            b*: (_|_){// [e]if true {
-              //   c: 〈3;a〉
-              // } & 〈1;X〉
-            }
-          }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,14 +1,17 @@
- Errors:
- issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
--    ./issue3691.cue:4:15
--    ./issue3691.cue:7:3
--    ./issue3691.cue:8:10
-+    ./issue3691.cue:7:15
-+    ./issue3691.cue:8:15
-+    ./issue3691.cue:9:5
-+    ./issue3691.cue:10:3
-+    ./issue3691.cue:11:10
- issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
--    ./issue3691.cue:14:15
--    ./issue3691.cue:15:5
--    ./issue3691.cue:17:3
--    ./issue3691.cue:18:10
--issue3691.structuralCycle.a.b.c.b.c: structural cycle
-+    ./issue3691.cue:17:15
-+    ./issue3691.cue:18:5
-+    ./issue3691.cue:18:15
-+    ./issue3691.cue:19:5
-+    ./issue3691.cue:20:3
-+    ./issue3691.cue:21:10
- 
- Result:
- (_|_){
-@@ -126,9 +129,11 @@
-           // [eval]
-           c: (_|_){
-             // [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
--            //     ./issue3691.cue:4:15
--            //     ./issue3691.cue:7:3
--            //     ./issue3691.cue:8:10
-+            //     ./issue3691.cue:7:15
-+            //     ./issue3691.cue:8:15
-+            //     ./issue3691.cue:9:5
-+            //     ./issue3691.cue:10:3
-+            //     ./issue3691.cue:11:10
-           }
-         }
-       }
-@@ -143,15 +148,15 @@
-           // [eval]
-           c: (_|_){
-             // [eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
--            //     ./issue3691.cue:14:15
--            //     ./issue3691.cue:15:5
--            //     ./issue3691.cue:17:3
--            //     ./issue3691.cue:18:10
--            b: (_|_){
--              // [structural cycle]
--              c: (_|_){
--                // [structural cycle] issue3691.structuralCycle.a.b.c.b.c: structural cycle
--              }
-+            //     ./issue3691.cue:17:15
-+            //     ./issue3691.cue:18:5
-+            //     ./issue3691.cue:18:15
-+            //     ./issue3691.cue:19:5
-+            //     ./issue3691.cue:20:3
-+            //     ./issue3691.cue:21:10
-+            b*: (_|_){// [e]if true {
-+              //   c: 〈3;a〉
-+              // } & 〈1;X〉
-             }
-           }
-         }
--- diff/todo/p2 --
-Missing error positions.
--- out/eval --
-Errors:
-issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
-    ./issue3691.cue:4:15
-    ./issue3691.cue:7:3
-    ./issue3691.cue:8:10
-issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
-    ./issue3691.cue:14:15
-    ./issue3691.cue:15:5
-    ./issue3691.cue:17:3
-    ./issue3691.cue:18:10
-issue3691.structuralCycle.a.b.c.b.c: structural cycle
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    x: (int){ 10 }
-    y: (int){ 100 }
-    z: (int){ 50 }
-  }
-  b: (struct){
-    x: (int){ 10 }
-    k: (int){ 20 }
-    l: (int){ 40 }
-    z: (int){ 50 }
-  }
-  c: (struct){
-    y: (int){ 110 }
-    z: (int){ 60 }
-  }
-  A: (struct){
-    X: (struct){
-      run: (string){ "dfoo" }
-      files: (string){ "dfoo" }
-    }
-  }
-  matchOrder: (struct){
-    a1: (struct){
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-    }
-    a2: (struct){
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-    }
-    a3: (struct){
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-    }
-    a4: (struct){
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-    }
-    a5: (struct){
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-    }
-    a6: (struct){
-      in: (struct){
-        a: (struct){
-          b: (struct){
-          }
-        }
-      }
-      out: (struct){
-        b: (struct){
-          Val: (int){ 1 }
-        }
-      }
-    }
-  }
-  issue3691: (_|_){
-    // [eval]
-    original: (_|_){
-      // [eval]
-      X: (struct){
-      }
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
-            //     ./issue3691.cue:4:15
-            //     ./issue3691.cue:7:3
-            //     ./issue3691.cue:8:10
-          }
-        }
-      }
-    }
-    structuralCycle: (_|_){
-      // [eval]
-      X: (struct){
-      }
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
-            //     ./issue3691.cue:14:15
-            //     ./issue3691.cue:15:5
-            //     ./issue3691.cue:17:3
-            //     ./issue3691.cue:18:10
-            b: (_|_){
-              // [structural cycle]
-              c: (_|_){
-                // [structural cycle] issue3691.structuralCycle.a.b.c.b.c: structural cycle
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -706,3 +335,6 @@ Result:
     }
   }
 }
+-- out/todo.txt --
+A.X.files: v3 correctly resolves to "dfoo" (strings.Join(["dfoo"], "\n")); annotated at top level.
+issue3691.structuralCycle: v3 has different structural cycle representation in error output.

@@ -1,17 +1,16 @@
 # Some new cases specific to v0.7
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- builtins.cue --
 import "strings"
 
 mutualBuiltin: t1: ok: {
 	// Results in incomplete error in v0.6
-	s3: strings.ContainsAny(s4)
+	s3: strings.ContainsAny(s4)  @test(eq, strings.ContainsAny("dd"))
 	s4: strings.ContainsAny(s3)
-	s4: "dd"
+	s4: "dd" @test(eq, "dd")
 }
 
 mutualBuiltin: t2: ok: {
-	s3: strings.ContainsAny(s5, "dd")
+	s3: strings.ContainsAny(s5, "dd")  @test(eq, true)
 	s5: s6
 	s6: "dd"
 }
@@ -20,6 +19,7 @@ mutualBuiltin: t2: ok: {
 comprehensions: t1: ok: {
 	src: ["foo"]
 	for v in src { "\(v)": v }
+	@test(eq, {src: ["foo"], foo: "foo"})
 }
 
 -- dynamic.cue --
@@ -27,6 +27,10 @@ dynamic: t1: ok: {
 	[X=string]: {name: X}
 	(x.y): {}
 	x: y: "foo"
+	@test(eq, {
+		x: {y: "foo", name: "x"}
+		foo: {name: "foo"}
+	})
 }
 
 dynamic: t2: ok: {
@@ -37,18 +41,22 @@ dynamic: t2: ok: {
 			a: ("b"): D: 2
 		}
 	}
+	@test(eq, {
+		foo: {a: {b: {C: 1, D: 2}}}
+		#X: {a: {b: {C: 1, D: 2}}}
+	})
 }
 
 -- definition.cue --
 definition: t0: err: {
 	#D1: env: {}
-	d1: env: c: "C"
+	d1: env: c: "C" @test(err, code=eval, contains="field not allowed", pos=[0:11])
 	d1: #D1
 }
 
 definition: t1: err: {
 	a: #A
-	a: c: 1
+	a: c: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
 	// defining after first reference triggers notification mechanism to kick in.
 	#A: {}
 }
@@ -59,6 +67,7 @@ definition: t2: ok: p1: {
 		{a: int}
 	}
 	x: #A & { c: int }
+	@test(eq, {#A: {a: int}, x: {c: int, a: int}})
 }
 
 definition: t2: ok: p2: {
@@ -67,6 +76,7 @@ definition: t2: ok: p2: {
 		...
 	}
 	x: #A & { c: int }
+	@test(eq, {#A: {a: int}, x: {c: int, a: int}})
 }
 
 definition: t2: ok: p3: {
@@ -75,6 +85,7 @@ definition: t2: ok: p3: {
 		...
 		{a: int}
 	}
+	@test(eq, {x: {c: int, a: int}, #A: {a: int}})
 }
 
 definition: t2: ok: p4: {
@@ -83,6 +94,7 @@ definition: t2: ok: p4: {
 		{a: int}
 		...
 	}
+	@test(eq, {x: {c: int, a: int}, #A: {a: int}})
 }
 
 -- expr.cue --
@@ -91,35 +103,39 @@ expr: t1: ok: {
 	X: 5.0
 	X: Y / 2
 	Y: a * 2
+	@test(eq, {a: 5.0, X: 5.0, Y: 10.0})
 }
 
 expr: t2: ok: {
 	A: X + 2
-	X: 5
-	X: A - 2
+	X: 5      
+	X: A - 2  
+	@test(eq, {A: 7, X: 5})
 }
 
 expr: t3: ok: p1: {
 	a0: X
 	X:  5.0
 	X:  a0 * 1
+	@test(eq, {a0: 5.0, X: 5.0})
 }
 
 expr: t3: ok: p2: {
 	b: Y * 1
 	Y: b * 1
 	Y: 5.0
+	@test(eq, {b: 5.0, Y: 5.0})
 }
 
 expr: t4: ok: {
 	// -> a0 -> X -> b1 -> b0 -> a1 -> a0
-	a0: X // Need all conjuncts known from X
-	b0: a1
-	a1: a0 + 2
-	b1: b0 - 2
-	a0: X
+	a0: X        @test(eq, 5.0) // Need all conjuncts known from X
+	b0: a1       @test(eq, 7.0)
+	a1: a0 + 2   @test(eq, 7.0)
+	b1: b0 - 2   @test(eq, 5.0)
+	a0: X        // defined earlier
 	X:  b1
-	X:  5.0
+	X:  5.0      @test(eq, 5.0)
 }
 
 -- in.cue --
@@ -127,6 +143,7 @@ mutual: t0: ok: {
 	c: e & {b: 2}
 	e: {a: 1}
 	e: c
+	@test(eq, {c: {b: 2, a: 1}, e: {a: 1, b: 2}})
 }
 
 mutual: t1: ok: {
@@ -136,6 +153,7 @@ mutual: t1: ok: {
 	}
 	a: a.b
 	a: b: {b: f: 1}
+	@test(eq, {a: {b: {b: {f: 1}, f: 1}, f: 1}})
 }
 
 mutual: t2: ok: {
@@ -143,12 +161,20 @@ mutual: t2: ok: {
 	x: y.a
 	y: a: a: e: 1
 	y: x.a
+	@test(eq, {
+		x: {a: {a: {f: 1}, e: 1}, f: 1}
+		y: {a: {a: {e: 1}, f: 1}, e: 1}
+	})
 }
 
 mutual: t3: ok: {
 	d: e: f: 1
 	d
 	d: d: e: g: 1
+	@test(eq, {
+		d: {e: {f: 1, g: 1}, d: {e: {g: 1}}}
+		e: {f: 1, g: 1}
+	})
 }
 
 // This test fails for some permutations in v0.6.
@@ -159,6 +185,11 @@ mutual: t4: ok: {
 		x: b: {d: b: 2}
 		y: c: z.d
 		z: d: {a: 1}
+		@test(eq, {
+			z: {d: {a: 1, b: 2}, a: 1, b: 2}
+			x: {b: {d: {b: 2}, a: 1, b: 2}}
+			y: {c: {a: 1, b: 2}}
+		})
 	}
 
 	p1: {
@@ -167,6 +198,11 @@ mutual: t4: ok: {
 		x: b: {d: b: 2}
 		y: c: z.d
 		z: d: {a: 1}
+		@test(eq, {
+			x: {b: {d: {b: 2}, a: 1, b: 2}}
+			z: {d: {a: 1, b: 2}, a: 1, b: 2}
+			y: {c: {a: 1, b: 2}}
+		})
 	}
 
 	p2: {
@@ -175,6 +211,11 @@ mutual: t4: ok: {
 		y: c: z.d
 		z: x.b
 		z: d: {a: 1}
+		@test(eq, {
+			x: {b: {d: {b: 2}, a: 1, b: 2}}
+			y: {c: {a: 1, b: 2}}
+			z: {d: {a: 1, b: 2}, a: 1, b: 2}
+		})
 	}
 
 	p3: {
@@ -183,6 +224,11 @@ mutual: t4: ok: {
 		z: x.b
 		x: b: y.c
 		z: d: {a: 1}
+		@test(eq, {
+			x: {b: {d: {b: 2}, a: 1, b: 2}}
+			y: {c: {a: 1, b: 2}}
+			z: {d: {a: 1, b: 2}, a: 1, b: 2}
+		})
 	}
 
 	p4: {
@@ -191,6 +237,11 @@ mutual: t4: ok: {
 		y: c: z.d
 		x: b: y.c
 		z: d: {a: 1}
+		@test(eq, {
+			z: {d: {a: 1, b: 2}, a: 1, b: 2}
+			x: {b: {d: {b: 2}, a: 1, b: 2}}
+			y: {c: {a: 1, b: 2}}
+		})
 	}
 
 	p5: {
@@ -199,9 +250,18 @@ mutual: t4: ok: {
 		x: b: y.c
 		z: x.b
 		z: d: {a: 1}
+		@test(eq, {
+			x: {b: {d: {b: 2}, a: 1, b: 2}}
+			y: {c: {a: 1, b: 2}}
+			z: {d: {a: 1, b: 2}, a: 1, b: 2}
+		})
 	}
 
-	check: p1 & p2 & p3 & p4 & p5
+	check: p1 & p2 & p3 & p4 & p5 @test(eq, {
+		x: {b: {d: {b: 2}, a: 1, b: 2}}
+		z: {d: {a: 1, b: 2}, a: 1, b: 2}
+		y: {c: {a: 1, b: 2}}
+	})
 }
 
 -- equality.cue --
@@ -246,6 +306,11 @@ issue3925: full: {
 		out: (name): lateYAML: yaml.Marshal(input.config[input.name])
 	}
 }
+-- out/errors.txt --
+[eval] definition.t0.err.d1.env.c: field not allowed:
+    ./definition.cue:3:11
+[eval] definition.t1.err.a.c: field not allowed:
+    ./definition.cue:9:5
 -- out/eval/stats --
 Leaks:  2
 Freed:  284
@@ -259,925 +324,8 @@ Disjuncts:    10
 Notifications: 10
 
 NumCloseIDs: 86
--- out/eval --
-Errors:
-definition.t0.err.d1.env.c: field not allowed:
-    ./definition.cue:2:12
-    ./definition.cue:3:11
-    ./definition.cue:4:6
-definition.t1.err.a.c: field not allowed:
-    ./definition.cue:9:5
-
-Result:
-(_|_){
-  // [eval]
-  mutualBuiltin: (struct){
-    t1: (struct){
-      ok: (struct){
-        s3: (string){ strings.ContainsAny("dd") }
-        s4: (string){ "dd" }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        s3: (bool){ true }
-        s5: (string){ "dd" }
-        s6: (string){ "dd" }
-      }
-    }
-  }
-  issue3925: (struct){
-    reduced: (struct){
-      out: (string){ "c: str\n" }
-      in: (struct){
-        a: (string){ "actual" }
-        b: (struct){
-          actual: (struct){
-            c: (string){ "str" }
-          }
-        }
-      }
-    }
-    full: (struct){
-      out: (struct){
-        input1: (struct){
-          early: (string){ "early value" }
-          lateYAML: (string){ "one: one value\n" }
-        }
-      }
-      _inputs: (struct){
-        input1: (struct){
-          name: (string){ "actual" }
-          config: (struct){
-            actual: (struct){
-              one: (string){ "one value" }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehensions: (struct){
-    t1: (struct){
-      ok: (struct){
-        src: (#list){
-          0: (string){ "foo" }
-        }
-        foo: (string){ "foo" }
-      }
-    }
-  }
-  definition: (_|_){
-    // [eval]
-    t0: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        #D1: (#struct){
-          env: (#struct){
-          }
-        }
-        d1: (_|_){
-          // [eval]
-          env: (_|_){
-            // [eval]
-            c: (_|_){
-              // [eval] definition.t0.err.d1.env.c: field not allowed:
-              //     ./definition.cue:2:12
-              //     ./definition.cue:3:11
-              //     ./definition.cue:4:6
-            }
-          }
-        }
-      }
-    }
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval] definition.t1.err.a.c: field not allowed:
-            //     ./definition.cue:8:5
-            //     ./definition.cue:9:5
-            //     ./definition.cue:11:6
-          }
-        }
-        #A: (#struct){
-        }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        p1: (struct){
-          #A: (#struct){
-            a: (int){ int }
-          }
-          x: (#struct){
-            c: (int){ int }
-            a: (int){ int }
-          }
-        }
-        p2: (struct){
-          #A: (#struct){
-            a: (int){ int }
-          }
-          x: (#struct){
-            c: (int){ int }
-            a: (int){ int }
-          }
-        }
-        p3: (struct){
-          x: (#struct){
-            c: (int){ int }
-            a: (int){ int }
-          }
-          #A: (#struct){
-            a: (int){ int }
-          }
-        }
-        p4: (struct){
-          x: (#struct){
-            c: (int){ int }
-            a: (int){ int }
-          }
-          #A: (#struct){
-            a: (int){ int }
-          }
-        }
-      }
-    }
-  }
-  dynamic: (struct){
-    t1: (struct){
-      ok: (struct){
-        x: (struct){
-          y: (string){ "foo" }
-          name: (string){ "x" }
-        }
-        foo: (struct){
-          name: (string){ "foo" }
-        }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        foo: ~(dynamic.t2.ok.#X)
-        #X: (#struct){
-          a: (#struct){
-            b: (#struct){
-              C: (int){ 1 }
-              D: (int){ 2 }
-            }
-          }
-        }
-      }
-    }
-  }
-  issue3194: (struct){
-    reduced: (#struct){
-      A: (number){ |(*(int){ 0 }, (number){ >10 }) }
-      b: (number){ |(*(int){ 0 }, (number){ >10 }) }
-    }
-  }
-  expr: (struct){
-    t1: (struct){
-      ok: (struct){
-        a: (float){ 5.0 }
-        X: (float){ 5.0 }
-        Y: (float){ 10.0 }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        A: (int){ 7 }
-        X: (int){ 5 }
-      }
-    }
-    t3: (struct){
-      ok: (struct){
-        p1: (struct){
-          a0: (float){ 5.0 }
-          X: (float){ 5.0 }
-        }
-        p2: (struct){
-          b: (float){ 5.0 }
-          Y: (float){ 5.0 }
-        }
-      }
-    }
-    t4: (struct){
-      ok: (struct){
-        a0: (float){ 5.0 }
-        b0: (float){ 7.0 }
-        a1: (float){ 7.0 }
-        b1: (float){ 5.0 }
-        X: (float){ 5.0 }
-      }
-    }
-  }
-  mutual: (struct){
-    t0: (struct){
-      ok: (struct){
-        c: (struct){
-          b: (int){ 2 }
-          a: (int){ 1 }
-        }
-        e: (struct){
-          a: (int){ 1 }
-          b: (int){ 2 }
-        }
-      }
-    }
-    t1: (struct){
-      ok: (struct){
-        a: (struct){
-          b: (struct){
-            b: (struct){
-              f: (int){ 1 }
-            }
-            f: (int){ 1 }
-          }
-          f: (int){ 1 }
-        }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        x: (struct){
-          a: (struct){
-            a: (struct){
-              f: (int){ 1 }
-            }
-            e: (int){ 1 }
-          }
-          f: (int){ 1 }
-        }
-        y: (struct){
-          a: (struct){
-            a: (struct){
-              e: (int){ 1 }
-            }
-            f: (int){ 1 }
-          }
-          e: (int){ 1 }
-        }
-      }
-    }
-    t3: (struct){
-      ok: (struct){
-        d: (struct){
-          e: (struct){
-            f: (int){ 1 }
-            g: (int){ 1 }
-          }
-          d: (struct){
-            e: (struct){
-              g: (int){ 1 }
-            }
-          }
-        }
-        e: (struct){
-          f: (int){ 1 }
-          g: (int){ 1 }
-        }
-      }
-    }
-    t4: (struct){
-      ok: (struct){
-        p0: (struct){
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p0.z.d)
-          }
-        }
-        p1: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p1.z.d)
-          }
-        }
-        p2: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p2.z.d)
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-        }
-        p3: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p3.z.d)
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-        }
-        p4: (struct){
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p4.z.d)
-          }
-        }
-        p5: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p5.z.d)
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-        }
-        check: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.check.z.d)
-          }
-        }
-      }
-    }
-  }
-}
--- out/evalalpha --
-Errors:
-definition.t0.err.d1.env.c: field not allowed:
-    ./definition.cue:3:11
-definition.t1.err.a.c: field not allowed:
-    ./definition.cue:9:5
-
-Result:
-(_|_){
-  // [eval]
-  mutualBuiltin: (struct){
-    t1: (struct){
-      ok: (struct){
-        s3: (string){ strings.ContainsAny("dd") }
-        s4: (string){ "dd" }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        s3: (bool){ true }
-        s5: (string){ "dd" }
-        s6: (string){ "dd" }
-      }
-    }
-  }
-  issue3925: (struct){
-    reduced: (struct){
-      out: (string){ "c: str\n" }
-      in: (struct){
-        a: (string){ "actual" }
-        b: (struct){
-          actual: (struct){
-            c: (string){ "str" }
-          }
-        }
-      }
-    }
-    full: (struct){
-      out: (struct){
-        input1: (struct){
-          early: (string){ "early value" }
-          lateYAML: (string){ "one: one value\n" }
-        }
-      }
-      _inputs: (struct){
-        input1: (struct){
-          name: (string){ "actual" }
-          config: (struct){
-            actual: (struct){
-              one: (string){ "one value" }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehensions: (struct){
-    t1: (struct){
-      ok: (struct){
-        src: (#list){
-          0: (string){ "foo" }
-        }
-        foo: (string){ "foo" }
-      }
-    }
-  }
-  definition: (_|_){
-    // [eval]
-    t0: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        #D1: (#struct){
-          env: (#struct){
-          }
-        }
-        d1: (_|_){
-          // [eval]
-          env: (_|_){
-            // [eval]
-            c: (_|_){
-              // [eval] definition.t0.err.d1.env.c: field not allowed:
-              //     ./definition.cue:3:11
-            }
-          }
-        }
-      }
-    }
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval] definition.t1.err.a.c: field not allowed:
-            //     ./definition.cue:9:5
-          }
-        }
-        #A: (#struct){
-        }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        p1: (struct){
-          #A: (#struct){
-            a: (int){ int }
-          }
-          x: (#struct){
-            c: (int){ int }
-            a: (int){ int }
-          }
-        }
-        p2: (struct){
-          #A: (#struct){
-            a: (int){ int }
-          }
-          x: (#struct){
-            c: (int){ int }
-            a: (int){ int }
-          }
-        }
-        p3: (struct){
-          x: (#struct){
-            c: (int){ int }
-            a: (int){ int }
-          }
-          #A: (#struct){
-            a: (int){ int }
-          }
-        }
-        p4: (struct){
-          x: (#struct){
-            c: (int){ int }
-            a: (int){ int }
-          }
-          #A: (#struct){
-            a: (int){ int }
-          }
-        }
-      }
-    }
-  }
-  dynamic: (struct){
-    t1: (struct){
-      ok: (struct){
-        x: (struct){
-          y: (string){ "foo" }
-          name: (string){ "x" }
-        }
-        foo: (struct){
-          name: (string){ "foo" }
-        }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        foo: ~(dynamic.t2.ok.#X)
-        #X: (#struct){
-          a: (#struct){
-            b: (#struct){
-              C: (int){ 1 }
-              D: (int){ 2 }
-            }
-          }
-        }
-      }
-    }
-  }
-  issue3194: (struct){
-    reduced: (#struct){
-      A: (number){ |(*(int){ 0 }, (number){ >10 }) }
-      b: (number){ |(*(int){ 0 }, (number){ >10 }) }
-    }
-  }
-  expr: (struct){
-    t1: (struct){
-      ok: (struct){
-        a: (float){ 5.0 }
-        X: (float){ 5.0 }
-        Y: (float){ 10.0 }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        A: (int){ 7 }
-        X: (int){ 5 }
-      }
-    }
-    t3: (struct){
-      ok: (struct){
-        p1: (struct){
-          a0: (float){ 5.0 }
-          X: (float){ 5.0 }
-        }
-        p2: (struct){
-          b: (float){ 5.0 }
-          Y: (float){ 5.0 }
-        }
-      }
-    }
-    t4: (struct){
-      ok: (struct){
-        a0: (float){ 5.0 }
-        b0: (float){ 7.0 }
-        a1: (float){ 7.0 }
-        b1: (float){ 5.0 }
-        X: (float){ 5.0 }
-      }
-    }
-  }
-  mutual: (struct){
-    t0: (struct){
-      ok: (struct){
-        c: (struct){
-          b: (int){ 2 }
-          a: (int){ 1 }
-        }
-        e: (struct){
-          a: (int){ 1 }
-          b: (int){ 2 }
-        }
-      }
-    }
-    t1: (struct){
-      ok: (struct){
-        a: (struct){
-          b: (struct){
-            b: (struct){
-              f: (int){ 1 }
-            }
-            f: (int){ 1 }
-          }
-          f: (int){ 1 }
-        }
-      }
-    }
-    t2: (struct){
-      ok: (struct){
-        x: (struct){
-          a: (struct){
-            a: (struct){
-              f: (int){ 1 }
-            }
-            e: (int){ 1 }
-          }
-          f: (int){ 1 }
-        }
-        y: (struct){
-          a: (struct){
-            a: (struct){
-              e: (int){ 1 }
-            }
-            f: (int){ 1 }
-          }
-          e: (int){ 1 }
-        }
-      }
-    }
-    t3: (struct){
-      ok: (struct){
-        d: (struct){
-          e: (struct){
-            f: (int){ 1 }
-            g: (int){ 1 }
-          }
-          d: (struct){
-            e: (struct){
-              g: (int){ 1 }
-            }
-          }
-        }
-        e: (struct){
-          f: (int){ 1 }
-          g: (int){ 1 }
-        }
-      }
-    }
-    t4: (struct){
-      ok: (struct){
-        p0: (struct){
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p0.z.d)
-          }
-        }
-        p1: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p1.z.d)
-          }
-        }
-        p2: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p2.z.d)
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-        }
-        p3: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p3.z.d)
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-        }
-        p4: (struct){
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p4.z.d)
-          }
-        }
-        p5: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.p5.z.d)
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-        }
-        check: (struct){
-          x: (struct){
-            b: (struct){
-              d: (struct){
-                b: (int){ 2 }
-              }
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-          }
-          z: (struct){
-            d: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }
-          y: (struct){
-            c: ~(mutual.t4.ok.check.z.d)
-          }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,6 @@
- Errors:
- definition.t0.err.d1.env.c: field not allowed:
--    ./definition.cue:2:12
-     ./definition.cue:3:11
--    ./definition.cue:4:6
- definition.t1.err.a.c: field not allowed:
-     ./definition.cue:9:5
- 
-@@ -81,9 +79,7 @@
-             // [eval]
-             c: (_|_){
-               // [eval] definition.t0.err.d1.env.c: field not allowed:
--              //     ./definition.cue:2:12
-               //     ./definition.cue:3:11
--              //     ./definition.cue:4:6
-             }
-           }
-         }
-@@ -97,9 +93,7 @@
-           // [eval]
-           c: (_|_){
-             // [eval] definition.t1.err.a.c: field not allowed:
--            //     ./definition.cue:8:5
-             //     ./definition.cue:9:5
--            //     ./definition.cue:11:6
-           }
-         }
-         #A: (#struct){
--- diff/todo/p2 --
-Reordering / positions.
+-- out/todo.txt --
+v3 uses structure sharing (~) for dynamic.t2.ok.foo/\#X and mutual.t4.ok's y.c fields. v3 reports fewer error positions for definition.t0.err and definition.t1.err (missing some context positions).
 -- out/compile --
 --- builtins.cue
 {

@@ -3,11 +3,12 @@
 # Issue: after setting e.a = "hello" the two-branch disjunction (one with
 # value?, one with externalValue?) should survive intact.
 # https://cuelang.org/issue/353
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 e: #Example
-
-e: a: "hello"
+e: {
+	a: "hello"
+	@test(eq, {a: "hello", value?: string} | {a: "hello", externalValue?: string})
+}
 
 #Example: {
 	a: string
@@ -29,23 +30,6 @@ Conjuncts:    18
 Disjuncts:    4
 
 NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  e: (#struct){ |((#struct){
-      a: (string){ "hello" }
-      value?: (string){ string }
-    }, (#struct){
-      a: (string){ "hello" }
-      externalValue?: (string){ string }
-    }) }
-  #Example: (#struct){ |((#struct){
-      a: (string){ string }
-      value?: (string){ string }
-    }, (#struct){
-      a: (string){ string }
-      externalValue?: (string){ string }
-    }) }
-}
 -- out/compile --
 --- in.cue
 {

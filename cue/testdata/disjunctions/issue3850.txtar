@@ -1,4 +1,7 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+# Tests that struct fields referencing hidden variables inside disjunctions
+# evaluate correctly. A regression in evalv3 caused incomplete fields and
+# panics when combining disjunctions with hidden-field lookups and definitions.
+# https://cuelang.org/issue/3850
 -- issue3850.cue --
 issue3850: full: {
 	global: glb1: glb2: "123"
@@ -10,6 +13,17 @@ issue3850: full: {
 		_global: global
 		foo: _global.glb1.glb2
 	}
+	@test(eq, {
+		global: {glb1: {glb2: "123"}}
+		out: {
+			_global: {glb1: {glb2: "123"}}
+			foo: "123"
+		}
+		#WithFoo: {
+			_global: {glb1: {glb2: "123"}}
+			foo: "123"
+		}
+	})
 }
 issue3850: incomplete: {
 	global: glb1: glb2: "123"
@@ -22,6 +36,17 @@ issue3850: incomplete: {
 		foo: _global.glb1.glb2
 		...
 	}
+	@test(eq, {
+		global: {glb1: {glb2: "123"}}
+		out: {
+			_global: {glb1: {glb2: "123"}}
+			foo: "123"
+		}
+		#WithFoo: {
+			_global: {glb1: {glb2: "123"}}
+			foo: "123"
+		}
+	})
 }
 issue3850: p2p: {
 	out: *{} | _
@@ -29,6 +54,10 @@ issue3850: p2p: {
 	out: {
 		reg: #def
 		#def: foo: _global
+		@test(eq, {
+			reg: {foo: "global value"}
+			#def: {foo: "global value"}
+		})
 	}
 
 	_global: "global value"
@@ -44,6 +73,11 @@ issue3875: full: {
 	out: #Schema | "never"
 
 	#Schema: desc: {...}
+	@test(eq, {
+		_global: {name: "foo"}
+		out: {desc: {_hidden: "foo", name: "foo"}}
+		#Schema: {desc: {}}
+	})
 }
 issue3875: reduced: {
 	global: a: "foo"
@@ -55,7 +89,15 @@ issue3875: reduced: {
 	out: S | null
 
 	S: {}
+	@test(eq, {
+		global: {a: "foo"}
+		out: {desc: {a: "foo", b: "foo"}}
+		S: {}
+	})
 }
+-- out/todo.txt --
+issue3850.p2p.out.reg: evalv3 uses structure sharing (~) for reg=>#def,
+while evalv2 expands it to a concrete struct.
 -- out/eval/stats --
 Leaks:  22
 Freed:  120
@@ -68,203 +110,6 @@ Conjuncts:    125
 Disjuncts:    22
 
 NumCloseIDs: 18
--- out/evalalpha --
-(struct){
-  issue3850: (struct){
-    full: (struct){
-      global: (struct){
-        glb1: (struct){
-          glb2: (string){ "123" }
-        }
-      }
-      out: (#struct){
-        _global: (#struct){
-          glb1: (#struct){
-            glb2: (string){ "123" }
-          }
-        }
-        foo: (string){ "123" }
-      }
-      #WithFoo: (#struct){
-        _global: (#struct){
-          glb1: (#struct){
-            glb2: (string){ "123" }
-          }
-        }
-        foo: (string){ "123" }
-      }
-    }
-    incomplete: (struct){
-      global: (struct){
-        glb1: (struct){
-          glb2: (string){ "123" }
-        }
-      }
-      out: (#struct){
-        _global: (#struct){
-          glb1: (#struct){
-            glb2: (string){ "123" }
-          }
-        }
-        foo: (string){ "123" }
-      }
-      #WithFoo: (#struct){
-        _global: (#struct){
-          glb1: (#struct){
-            glb2: (string){ "123" }
-          }
-        }
-        foo: (string){ "123" }
-      }
-    }
-    p2p: (struct){
-      out: (struct){
-        reg: ~(issue3850.p2p.out.#def)
-        #def: (#struct){
-          foo: (string){ "global value" }
-        }
-      }
-      _global: (string){ "global value" }
-    }
-  }
-  issue3875: (struct){
-    full: (struct){
-      _global: (struct){
-        name: (string){ "foo" }
-      }
-      out: (#struct){
-        desc: (#struct){
-          _hidden: (string){ "foo" }
-          name: (string){ "foo" }
-        }
-      }
-      #Schema: (#struct){
-        desc: (#struct){
-        }
-      }
-    }
-    reduced: (struct){
-      global: (struct){
-        a: (string){ "foo" }
-      }
-      out: (struct){
-        desc: (struct){
-          a: (string){ "foo" }
-          b: (string){ "foo" }
-        }
-      }
-      S: (struct){
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -48,9 +48,7 @@
-     }
-     p2p: (struct){
-       out: (struct){
--        reg: (#struct){
--          foo: (string){ "global value" }
--        }
-+        reg: ~(issue3850.p2p.out.#def)
-         #def: (#struct){
-           foo: (string){ "global value" }
-         }
--- out/eval --
-(struct){
-  issue3850: (struct){
-    full: (struct){
-      global: (struct){
-        glb1: (struct){
-          glb2: (string){ "123" }
-        }
-      }
-      out: (#struct){
-        _global: (#struct){
-          glb1: (#struct){
-            glb2: (string){ "123" }
-          }
-        }
-        foo: (string){ "123" }
-      }
-      #WithFoo: (#struct){
-        _global: (#struct){
-          glb1: (#struct){
-            glb2: (string){ "123" }
-          }
-        }
-        foo: (string){ "123" }
-      }
-    }
-    incomplete: (struct){
-      global: (struct){
-        glb1: (struct){
-          glb2: (string){ "123" }
-        }
-      }
-      out: (#struct){
-        _global: (#struct){
-          glb1: (#struct){
-            glb2: (string){ "123" }
-          }
-        }
-        foo: (string){ "123" }
-      }
-      #WithFoo: (#struct){
-        _global: (#struct){
-          glb1: (#struct){
-            glb2: (string){ "123" }
-          }
-        }
-        foo: (string){ "123" }
-      }
-    }
-    p2p: (struct){
-      out: (struct){
-        reg: (#struct){
-          foo: (string){ "global value" }
-        }
-        #def: (#struct){
-          foo: (string){ "global value" }
-        }
-      }
-      _global: (string){ "global value" }
-    }
-  }
-  issue3875: (struct){
-    full: (struct){
-      _global: (struct){
-        name: (string){ "foo" }
-      }
-      out: (#struct){
-        desc: (#struct){
-          _hidden: (string){ "foo" }
-          name: (string){ "foo" }
-        }
-      }
-      #Schema: (#struct){
-        desc: (#struct){
-        }
-      }
-    }
-    reduced: (struct){
-      global: (struct){
-        a: (string){ "foo" }
-      }
-      out: (struct){
-        desc: (struct){
-          a: (string){ "foo" }
-          b: (string){ "foo" }
-        }
-      }
-      S: (struct){
-      }
-    }
-  }
-}
 -- out/compile --
 --- issue3850.cue
 {

@@ -2,7 +2,6 @@
 # do not cause panics in the v3 evaluator. The issue reported crashes in
 # Vertex.DerefValue and Environment.up for code that worked correctly in evalv2.
 # https://cuelang.org/issue/3857
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 reduced: t1: {
 	S: { if true { a: U } }
@@ -13,6 +12,12 @@ reduced: t1: {
 	}
 	T: 1
 	U: b: 1 | 1
+	@test(eq, {
+		S: {a: {b: 1}}
+		x: {d: {b: {b: 1}}, a: {b: 1}}
+		T: 1
+		U: {b: 1}
+	})
 }
 // issue3851: evalv3 incorrectly rejects a let field nested under multiple
 // disjunctions with "field not allowed", a regression not present in evalv2.
@@ -36,6 +41,17 @@ issue3851: t1: {
 	["one"]: disj: _ | #Top
 	two: shared: out.one.shared
 	}
+	@test(eq, {
+		#Top: _
+		#Config: {disj: *"default" | _, shared: _}
+		#Schema: {
+			one: {shared: "foo", disj: *"default" | _}
+		}
+		out: {
+			two: {shared: "foo", disj: *"default" | _}
+			one: {shared: "foo", disj: _}
+		}
+	})
 }
 issue3851: t2: {
 	#Top: _
@@ -57,7 +73,27 @@ issue3851: t2: {
 	conf: ["one"]: disj: {} | #Top
 	conf: two: shared: conf.one.shared
 	}
+	@test(eq, {
+		#Top: _
+		#Config: {disj: *{} | _, shared: _}
+		#Env: {
+			conf: {one: {shared: "foo", disj: *{} | _}}
+		}
+		env1: {
+			conf: {
+				two: {shared: "foo", disj: *{} | _}
+				one: {shared: "foo", disj: *{} | _ | {} | _}
+			}
+		}
+	})
 }
+-- out/todo.txt --
+issue3851.t1.out.one.disj: evalv3 gives _ (top) while evalv2 gives
+*(string){ "default" } | (_){ _ } because in v3 the pattern constraint
+[string]: #Config applies to "one" but the additional disj: _ | #Top
+(where #Top = _) unifies the default away.
+issue3851.t2.env1.conf.one.disj: similar difference; v3 gives more disjuncts
+than v2 due to structural sharing differences.
 -- out/eval/stats --
 Leaks:  7
 Freed:  67
@@ -70,239 +106,6 @@ Conjuncts:    119
 Disjuncts:    26
 
 NumCloseIDs: 25
--- out/evalalpha --
-(struct){
-  reduced: (struct){
-    t1: (struct){
-      S: (struct){
-        a: ~(reduced.t1.U)
-      }
-      x: (struct){
-        d: (struct){
-          b: ~(reduced.t1.x.a)
-        }
-        a: (struct){
-          b: (int){ 1 }
-        }
-      }
-      T: (int){ 1 }
-      U: (struct){
-        b: (int){ 1 }
-      }
-    }
-  }
-  issue3851: (struct){
-    t1: (struct){
-      #Top: (_){ _ }
-      #Config: (#struct){
-        disj: (_){ |(*(string){ "default" }, (_){ _ }) }
-        shared: (_){ _ }
-      }
-      #Schema: (#struct){
-        one: (#struct){
-          shared: (string){ "foo" }
-          disj: (_){ |(*(string){ "default" }, (_){ _ }) }
-        }
-      }
-      out: (#struct){
-        two: (#struct){
-          shared: (string){ "foo" }
-          disj: (_){ |(*(string){ "default" }, (_){ _ }) }
-        }
-        one: (#struct){
-          shared: (string){ "foo" }
-          disj: (_){ _ }
-        }
-      }
-    }
-    t2: (struct){
-      #Top: (_){ _ }
-      #Config: (#struct){
-        disj: (_){ |(*(#struct){
-          }, (_){ _ }) }
-        shared: (_){ _ }
-      }
-      #Env: (#struct){
-        conf: (#struct){
-          one: (#struct){
-            shared: (string){ "foo" }
-            disj: (_){ |(*(#struct){
-              }, (_){ _ }) }
-          }
-        }
-      }
-      env1: (#struct){
-        conf: (#struct){
-          two: (#struct){
-            shared: (string){ "foo" }
-            disj: (_){ |(*(#struct){
-              }, (_){ _ }) }
-          }
-          one: (#struct){
-            shared: (string){ "foo" }
-            disj: (_){ |(*(#struct){
-              }, (_){ _ }, (#struct){
-              }, (_){ _ }) }
-          }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -2,18 +2,14 @@
-   reduced: (struct){
-     t1: (struct){
-       S: (struct){
--        a: (struct){
--          b: (int){ 1 }
--        }
-+        a: ~(reduced.t1.U)
-       }
-       x: (struct){
--        a: (struct){
--          b: (int){ 1 }
--        }
-         d: (struct){
--          b: (struct){
--            b: (int){ 1 }
--          }
-+          b: ~(reduced.t1.x.a)
-+        }
-+        a: (struct){
-+          b: (int){ 1 }
-         }
-       }
-       T: (int){ 1 }
-@@ -36,14 +32,14 @@
-         }
-       }
-       out: (#struct){
--        one: (#struct){
--          shared: (string){ "foo" }
--          disj: (_){ |(*(string){ "default" }, (_){ _ }) }
--        }
-         two: (#struct){
-           shared: (string){ "foo" }
-           disj: (_){ |(*(string){ "default" }, (_){ _ }) }
-         }
-+        one: (#struct){
-+          shared: (string){ "foo" }
-+          disj: (_){ _ }
-+        }
-       }
-     }
-     t2: (struct){
-@@ -64,17 +60,17 @@
-       }
-       env1: (#struct){
-         conf: (#struct){
--          one: (#struct){
--            shared: (string){ "foo" }
--            disj: (_){ |(*(#struct){
--              }, (_){ _ }, (struct){
--              }) }
--          }
-           two: (#struct){
-             shared: (string){ "foo" }
-             disj: (_){ |(*(#struct){
-               }, (_){ _ }) }
-           }
-+          one: (#struct){
-+            shared: (string){ "foo" }
-+            disj: (_){ |(*(#struct){
-+              }, (_){ _ }, (#struct){
-+              }, (_){ _ }) }
-+          }
-         }
-       }
-     }
--- out/eval --
-(struct){
-  reduced: (struct){
-    t1: (struct){
-      S: (struct){
-        a: (struct){
-          b: (int){ 1 }
-        }
-      }
-      x: (struct){
-        a: (struct){
-          b: (int){ 1 }
-        }
-        d: (struct){
-          b: (struct){
-            b: (int){ 1 }
-          }
-        }
-      }
-      T: (int){ 1 }
-      U: (struct){
-        b: (int){ 1 }
-      }
-    }
-  }
-  issue3851: (struct){
-    t1: (struct){
-      #Top: (_){ _ }
-      #Config: (#struct){
-        disj: (_){ |(*(string){ "default" }, (_){ _ }) }
-        shared: (_){ _ }
-      }
-      #Schema: (#struct){
-        one: (#struct){
-          shared: (string){ "foo" }
-          disj: (_){ |(*(string){ "default" }, (_){ _ }) }
-        }
-      }
-      out: (#struct){
-        one: (#struct){
-          shared: (string){ "foo" }
-          disj: (_){ |(*(string){ "default" }, (_){ _ }) }
-        }
-        two: (#struct){
-          shared: (string){ "foo" }
-          disj: (_){ |(*(string){ "default" }, (_){ _ }) }
-        }
-      }
-    }
-    t2: (struct){
-      #Top: (_){ _ }
-      #Config: (#struct){
-        disj: (_){ |(*(#struct){
-          }, (_){ _ }) }
-        shared: (_){ _ }
-      }
-      #Env: (#struct){
-        conf: (#struct){
-          one: (#struct){
-            shared: (string){ "foo" }
-            disj: (_){ |(*(#struct){
-              }, (_){ _ }) }
-          }
-        }
-      }
-      env1: (#struct){
-        conf: (#struct){
-          one: (#struct){
-            shared: (string){ "foo" }
-            disj: (_){ |(*(#struct){
-              }, (_){ _ }, (struct){
-              }) }
-          }
-          two: (#struct){
-            shared: (string){ "foo" }
-            disj: (_){ |(*(#struct){
-              }, (_){ _ }) }
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

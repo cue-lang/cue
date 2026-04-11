@@ -1,0 +1,36 @@
+# Tests that @test(eq) correctly matches structure-shared scalar fields.
+# In v3, constraining a definition disjunction with a concrete scalar value
+# yields a vertex that is a thin wrapper (BaseValue = *adt.Vertex) around the
+# actual scalar. valuesEqual must call DerefValue() to follow the sharing
+# pointer before comparing BaseValues; otherwise the extra hidden arcs on the
+# shared vertex cause adt.Equal to return false even though the scalars agree.
+#
+# Regression: without DerefValue, valuesEqual failed on required scalar fields
+# inside structure-shared disjunct vertices because adt.Equal saw extra arcs.
+-- in/test.cue --
+// The required field build_type! is structure-shared in v3 when the
+// definition disjunction is resolved by additional optional constraints.
+// @test(eq) must match the deref'd scalar "legacy" on build_type!.
+a: {
+	#Schema: {
+		build_type!: "legacy"
+		source!:     {branch!: _}
+	} | close({
+		build_type!: "workflow"
+	})
+	v: #Schema
+	v: {
+		build_type?: "legacy" | "workflow"
+		source: {branch?: string}
+	}
+	@test(eq, {
+		#Schema: {build_type!: "legacy", source!: {branch!: _}} | {build_type!: "workflow"}
+		v: {
+			build_type!: "legacy"
+			source: {branch!: string}
+		}
+	})
+}
+-- out/status.txt --
+update: identical to input
+force:  identical to update

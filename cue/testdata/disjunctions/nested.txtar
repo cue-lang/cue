@@ -1,4 +1,3 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- issue3635.cue --
 import "list"
 // evalv3: `incDependent: already closed` panic with a builtin and a disjunction;
@@ -12,6 +11,10 @@ issue3635: case1: {
 	command: Run & {
 		env: list.Concat([["foo"], ["bar"]])
 	}
+	@test(eq, {
+		Run: {env: *{} | []}
+		command: {env: ["foo", "bar"]}
+	})
 }
 
 issue3635: case2: {
@@ -30,6 +33,21 @@ issue3635: case2: {
 
 		#env: [string]: bool | string
 	}
+	@test(eq, {
+		out: [{
+			name: "x"
+			container?: {}
+			#container: string | {env?: {}}
+			#env: [string]: bool | string
+		}]
+		#Schema: {
+			name?: string
+			container?: {}
+			#container: string | {env?: {}}
+			#env: [string]: bool | string
+
+		}
+	})
 }
 
 issue3635: reduced: {
@@ -39,6 +57,11 @@ issue3635: reduced: {
 		c: int | { e: d }
 	}
 	d: 1
+	@test(eq, {
+		out: {b: int | {e: 1}, c: int | {e: 1}}
+		X: {b: int | {e: 1}, c: int | {e: 1}}
+		d: 1
+	})
 }
 
 issue3635: reduced_noshare: {
@@ -48,6 +71,11 @@ issue3635: reduced_noshare: {
 		c: int | { e: d & __no_sharing }
 	}
 	d: 1
+	@test(eq, {
+		out: {b: int | {e: 1}, c: int | {e: 1}}
+		X: {b: int | {e: 1}, c: int | {e: 1}}
+		d: 1
+	})
 }
 -- out/eval/stats --
 Leaks:  7
@@ -61,88 +89,6 @@ Conjuncts:    118
 Disjuncts:    32
 
 NumCloseIDs: 19
--- out/evalalpha --
-(struct){
-  issue3635: (struct){
-    case1: (struct){
-      Run: (struct){
-        env: ((list|struct)){ |(*(struct){
-          }, (list){
-          }) }
-      }
-      command: (struct){
-        env: (#list){
-          0: (string){ "foo" }
-          1: (string){ "bar" }
-        }
-      }
-    }
-    case2: (struct){
-      out: (#list){
-        0: (#struct){
-          name: (string){ "x" }
-          container?: (#struct){
-          }
-          #container: ((string|struct)){ |((string){ string }, (#struct){
-              env?: (#struct){
-              }
-            }) }
-          #env: (#struct){
-          }
-        }
-      }
-      #Schema: (#struct){
-        name?: (string){ string }
-        container?: (#struct){
-        }
-        #container: ((string|struct)){ |((string){ string }, (#struct){
-            env?: (#struct){
-            }
-          }) }
-        #env: (#struct){
-        }
-      }
-    }
-    reduced: (struct){
-      out: (struct){
-        b: ((int|struct)){ |((int){ int }, (struct){
-            e: (int){ 1 }
-          }) }
-        c: ((int|struct)){ |((int){ int }, (struct){
-            e: (int){ 1 }
-          }) }
-      }
-      X: (struct){
-        b: ((int|struct)){ |((int){ int }, (struct){
-            e: (int){ 1 }
-          }) }
-        c: ((int|struct)){ |((int){ int }, (struct){
-            e: (int){ 1 }
-          }) }
-      }
-      d: (int){ 1 }
-    }
-    reduced_noshare: (struct){
-      out: (struct){
-        b: ((int|struct)){ |((int){ int }, (struct){
-            e: (int){ 1 }
-          }) }
-        c: ((int|struct)){ |((int){ int }, (struct){
-            e: (int){ 1 }
-          }) }
-      }
-      X: (struct){
-        b: ((int|struct)){ |((int){ int }, (struct){
-            e: (int){ 1 }
-          }) }
-        c: ((int|struct)){ |((int){ int }, (struct){
-            e: (int){ 1 }
-          }) }
-      }
-      d: (int){ 1 }
-    }
-  }
-}
 -- out/compile --
 --- issue3635.cue
 {

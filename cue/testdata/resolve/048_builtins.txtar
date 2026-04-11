@@ -1,6 +1,3 @@
-#name: builtins
-#evalPartial
-#todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- in.cue --
 import (
 	"list"
@@ -11,88 +8,62 @@ a1: {
 	a: and([b, c])
 	b: =~"oo"
 	c: =~"fo"
-}
-a2: a1 & {a: "foo"}
-a3: a1 & {a: "bar"}
+} @test(eq, {
+	a: =~"oo" & =~"fo"
+	b: =~"oo"
+	c: =~"fo"
+})
+a2: a1 & {a: "foo"} @test(eq, {a: "foo", b: =~"oo", c: =~"fo"})
+a3: a1 & {a: "bar"} @test(err, code=eval,
+	suberr=(code=eval, contains="invalid value", args=["bar", =~"oo"], pos=[-8:5, -9:5, 0:14]),
+	suberr=(code=eval, contains="invalid value", args=["bar", =~"fo"], pos=[-7:5, -9:5, 0:14]))
 
 o1: {
 	a: or([b, c])
 	b: string
 	c: "bar"
-}
-o2: o1 & {a: "foo"}
-o3: o1 & {a: "foo", b: "baz"}
+} @test(eq, {a: string | "bar", b: string, c: "bar"})
+o2: o1 & {a: "foo"}           @test(eq, {a: "foo", b: string, c: "bar"})
+o3: o1 & {a: "foo", b: "baz"} @test(err, code=eval,
+	suberr=(code=eval, contains="conflicting values", args=["bar", "foo"], pos=[-5:12, -3:5, 0:5, 0:14]),
+	suberr=(code=eval, contains="conflicting values", args=["baz", "foo"], pos=[-5:9, 0:5, 0:14, 0:24]))
 
 // Issue #585
 stringListErrors: {
 	a: {
 		x: [string, ...string]
-		result: strings.Join(x, " ")
+		result: strings.Join(x, " ") @test(err, code=incomplete,
+			contains="non-concrete value string for element", pos=[0:11, -1:7])
 	}
 
 	b: {
 		x: [int, ...string]
-		result: strings.Join(x, " ")
+		result: strings.Join(x, " ") @test(err, code=eval,
+			contains="cannot use value int (int) as string", pos=[0:11, -1:7])
 	}
 
 	c: {
 		x: []
-		result: strings.Join(x, int)
+		result: strings.Join(x, int) @test(err, code=eval,
+			contains="cannot use int (type int) as string in argument 2 to strings.Join",
+			pos=[0:27])
 	}
 }
 
 decimalListErrors: {
 	a: {
 		x: [string]
-		result: list.Avg(x)
+		result: list.Avg(x) @test(err, code=eval,
+			contains="invalid list element", pos=[0:11, -1:7])
+			// TODO: allow checking wrapped errors: args=[string, number],
 	}
 
 	b: {
 		x: [int, ...string]
-		result: list.Avg(x)
+		result: list.Avg(x) @test(err, code=incomplete,
+			contains="non-concrete value int for element 0 of number list argument 0", pos=[0:11, -1:7])
 	}
 }
-	  // [eval]
-	    // [eval]
-	      // [eval] a3.a: invalid value \"bar\" (out of bound =~\"oo\"):
-	      //     in.cue:8:5
-	      //     in.cue:7:5
-	      //     in.cue:12:14
-	      // a3.a: invalid value \"bar\" (out of bound =~\"fo\"):
-	      //     in.cue:9:5
-	      //     in.cue:7:5
-	      //     in.cue:12:14
-	    // [eval]
-	      // [eval] o3.a: 2 errors in empty disjunction:
-	      // o3.a: conflicting values \"bar\" and \"foo\":
-	      //     in.cue:15:12
-	      //     in.cue:17:5
-	      //     in.cue:20:5
-	      //     in.cue:20:14
-	      // o3.a: conflicting values \"baz\" and \"foo\":
-	      //     in.cue:15:9
-	      //     in.cue:20:5
-	      //     in.cue:20:14
-	      //     in.cue:20:24
-	    // [eval]
-	        // [incomplete] stringListErrors.a.result: error in call to strings.Join: non-concrete value string for element 0 of string list argument 0:
-	        //     in.cue:26:11
-	        //     in.cue:25:7
-	      // [eval]
-	        // [eval] stringListErrors.b.result: error in call to strings.Join: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
-	        //     in.cue:31:11
-	        //     in.cue:30:7
-	      // [eval]
-	        // [eval] stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
-	        //     in.cue:36:27
-	    // [eval]
-	      // [eval]
-	        // [eval] decimalListErrors.a.result: error in call to list.Avg: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
-	        //     in.cue:43:11
-	        //     in.cue:42:7
-	        // [incomplete] decimalListErrors.b.result: error in call to list.Avg: non-concrete value int for element 0 of number list argument 0:
-	        //     in.cue:48:11
-	        //     in.cue:47:7
 -- issue3648.cue --
 // Fully finalize values before passing them to builtins.
 
@@ -107,6 +78,8 @@ issue3648: reduced: {
 		b: [{}]
 	}
 	foo: {}
+
+	@test(eq, {foo: {a: [{}], b: [{}]}})
 }
 issue3648: full: {
 	#Redirect: path?: string
@@ -117,188 +90,50 @@ issue3648: full: {
 		redirects:    [...#Redirect]
 	}
 	foo: {}
+
+	@test(eq, {
+		#Redirect: {path?: string}
+		[string]: {
+			allRedirects: list.Concat([[]])
+			redirects:    []
+		}
+		foo: {allRedirects: [], redirects: []}
+	})
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  86
-Reused: 68
-Allocs: 19
-Retain: 0
-
-Unifications: 69
-Conjuncts:    119
-Disjuncts:    6
-
-NumCloseIDs: 30
--- out/evalalpha --
-Errors:
-o3.a: 2 errors in empty disjunction:
-o3.a: conflicting values "bar" and "foo":
-    ./in.cue:15:12
-    ./in.cue:17:5
-    ./in.cue:20:5
-    ./in.cue:20:14
-o3.a: conflicting values "baz" and "foo":
-    ./in.cue:15:9
-    ./in.cue:20:5
-    ./in.cue:20:14
-    ./in.cue:20:24
-a3.a: invalid value "bar" (out of bound =~"oo"):
+-- out/errors.txt --
+[eval] a3.a: invalid value "bar" (out of bound =~"oo"):
     ./in.cue:8:5
     ./in.cue:7:5
-    ./in.cue:12:14
+    ./in.cue:16:14
 a3.a: invalid value "bar" (out of bound =~"fo"):
     ./in.cue:9:5
     ./in.cue:7:5
-    ./in.cue:12:14
-stringListErrors.b.result: error in call to strings.Join: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
-    ./in.cue:31:11
-    ./in.cue:30:7
-stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
-    ./in.cue:36:27
-decimalListErrors.a.result: error in call to list.Avg: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
-    ./in.cue:43:11
-    ./in.cue:42:7
-
-Result:
-(_|_){
-  // [eval]
-  a1: (struct){
-    a: (string){ &(=~"oo", =~"fo") }
-    b: (string){ =~"oo" }
-    c: (string){ =~"fo" }
-  }
-  a2: (struct){
-    a: (string){ "foo" }
-    b: (string){ =~"oo" }
-    c: (string){ =~"fo" }
-  }
-  a3: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval] a3.a: invalid value "bar" (out of bound =~"oo"):
-      //     ./in.cue:8:5
-      //     ./in.cue:7:5
-      //     ./in.cue:12:14
-      // a3.a: invalid value "bar" (out of bound =~"fo"):
-      //     ./in.cue:9:5
-      //     ./in.cue:7:5
-      //     ./in.cue:12:14
-    }
-    b: (string){ =~"oo" }
-    c: (string){ =~"fo" }
-  }
-  o1: (struct){
-    a: (string){ |((string){ string }, (string){ "bar" }) }
-    b: (string){ string }
-    c: (string){ "bar" }
-  }
-  o2: (struct){
-    a: (string){ "foo" }
-    b: (string){ string }
-    c: (string){ "bar" }
-  }
-  o3: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval] o3.a: 2 errors in empty disjunction:
-      // o3.a: conflicting values "bar" and "foo":
-      //     ./in.cue:15:12
-      //     ./in.cue:17:5
-      //     ./in.cue:20:5
-      //     ./in.cue:20:14
-      // o3.a: conflicting values "baz" and "foo":
-      //     ./in.cue:15:9
-      //     ./in.cue:20:5
-      //     ./in.cue:20:14
-      //     ./in.cue:20:24
-    }
-    b: (string){ "baz" }
-    c: (string){ "bar" }
-  }
-  stringListErrors: (_|_){
-    // [eval]
-    a: (struct){
-      x: (list){
-        0: (string){ string }
-      }
-      result: (_|_){
-        // [incomplete] stringListErrors.a.result: error in call to strings.Join: non-concrete value string for element 0 of string list argument 0:
-        //     ./in.cue:26:11
-        //     ./in.cue:25:7
-      }
-    }
-    b: (_|_){
-      // [eval]
-      x: (list){
-        0: (int){ int }
-      }
-      result: (_|_){
-        // [eval] stringListErrors.b.result: error in call to strings.Join: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
-        //     ./in.cue:31:11
-        //     ./in.cue:30:7
-      }
-    }
-    c: (_|_){
-      // [eval]
-      x: (#list){
-      }
-      result: (_|_){
-        // [eval] stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
-        //     ./in.cue:36:27
-      }
-    }
-  }
-  decimalListErrors: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval]
-      x: (#list){
-        0: (string){ string }
-      }
-      result: (_|_){
-        // [eval] decimalListErrors.a.result: error in call to list.Avg: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
-        //     ./in.cue:43:11
-        //     ./in.cue:42:7
-      }
-    }
-    b: (struct){
-      x: (list){
-        0: (int){ int }
-      }
-      result: (_|_){
-        // [incomplete] decimalListErrors.b.result: error in call to list.Avg: non-concrete value int for element 0 of number list argument 0:
-        //     ./in.cue:48:11
-        //     ./in.cue:47:7
-      }
-    }
-  }
-  issue3648: (struct){
-    reduced: (struct){
-      foo: (struct){
-        a: (#list){
-          0: (struct){
-          }
-        }
-        b: (#list){
-          0: (struct){
-          }
-        }
-      }
-    }
-    full: (struct){
-      #Redirect: (#struct){
-        path?: (string){ string }
-      }
-      foo: (struct){
-        allRedirects: (#list){
-        }
-        redirects: (list){
-        }
-      }
-    }
-  }
-}
+    ./in.cue:16:14
+[eval] o3.a: 2 errors in empty disjunction:
+o3.a: conflicting values "bar" and "foo":
+    ./in.cue:21:12
+    ./in.cue:23:5
+    ./in.cue:26:5
+    ./in.cue:26:14
+o3.a: conflicting values "baz" and "foo":
+    ./in.cue:21:9
+    ./in.cue:26:5
+    ./in.cue:26:14
+    ./in.cue:26:24
+[incomplete] stringListErrors.a.result: error in call to strings.Join: non-concrete value string for element 0 of string list argument 0:
+    ./in.cue:34:11
+    ./in.cue:33:7
+[eval] stringListErrors.b.result: error in call to strings.Join: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
+    ./in.cue:40:11
+    ./in.cue:39:7
+[eval] stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
+    ./in.cue:46:27
+[eval] decimalListErrors.a.result: error in call to list.Avg: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
+    ./in.cue:55:11
+    ./in.cue:54:7
+[incomplete] decimalListErrors.b.result: error in call to list.Avg: non-concrete value int for element 0 of number list argument 0:
+    ./in.cue:62:11
+    ./in.cue:61:7
 -- out/compile --
 --- in.cue
 {
@@ -399,3 +234,15 @@ Result:
     }
   }
 }
+-- out/eval/stats --
+Leaks:  1
+Freed:  86
+Reused: 68
+Allocs: 19
+Retain: 0
+
+Unifications: 69
+Conjuncts:    119
+Disjuncts:    6
+
+NumCloseIDs: 30

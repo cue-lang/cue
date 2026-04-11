@@ -1,15 +1,16 @@
-#name: arithmetic
-#evalPartial
 # Tests arithmetic operations including division producing floats and
 # conflicting types (int & float).
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-v1: 1.0T / 2.0
-v2: 2.0 == 2
-n1: 1
-v5: 2.0 / n1
-v6: 1.0 / 1.0
-e2: int & 4.0/2.0
+v1: 1.0T / 2.0   @test(eq, 5.0e+11)
+v2: 2.0 == 2     @test(eq, true)
+n1: 1            @test(eq, 1) @test(kind=int)
+v5: 2.0 / n1     @test(eq, 2.0)
+v6: 1.0 / 1.0   @test(eq, 1.0) @test(kind:todo=int, hint="may consider this")
+e2: int & 4.0/2.0   @test(err, code=eval, contains="conflicting values int and 2.0", pos=[0:5, 0:11])
+-- out/errors.txt --
+[eval] e2: conflicting values int and 2.0 (mismatched types int and float):
+    ./in.cue:6:5
+    ./in.cue:6:11
 -- out/compile --
 --- in.cue
 {
@@ -30,23 +31,3 @@ Retain: 0
 Unifications: 7
 Conjuncts:    8
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-e2: conflicting values int and 2.0 (mismatched types int and float):
-    ./in.cue:6:5
-    ./in.cue:6:11
-
-Result:
-(_|_){
-  // [eval]
-  v1: (float){ 5.0E+11 }
-  v2: (bool){ true }
-  n1: (int){ 1 }
-  v5: (float){ 2.0 }
-  v6: (float){ 1.0 }
-  e2: (_|_){
-    // [eval] e2: conflicting values int and 2.0 (mismatched types int and float):
-    //     ./in.cue:6:5
-    //     ./in.cue:6:11
-  }
-}

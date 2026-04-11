@@ -1,4 +1,3 @@
-#todo:inline: add @test(shareID) assertions once the evaluator correctly shares structure for cyclic references (c, d, e fields currently expand independently instead of sharing)
 -- in.cue --
 a: b + 100 @test(eq, 200)
 b: a - 100 @test(eq, 100)

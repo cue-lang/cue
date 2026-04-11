@@ -31,24 +31,27 @@ import (
 // Section 8: shareID — vertex sharing assertions
 // ─────────────────────────────────────────────────────────────────────────────
 
-// extractShareIDsFromEqExpr walks the struct literal of an @test(eq, STRUCT)
-// body and collects all @test(shareID=name) annotations on fields.
-// basePath is the CUE path of the @test(eq) attribute; field paths in the
-// struct are appended to it.  version is the active evaluator version name
-// used for version-specific share groups (@test(shareID=name)).
+// extractShareIDsFromEqExpr walks the expression of an @test(eq, EXPR) body
+// and collects all @test(shareID=name) annotations.
+// basePath is the CUE path of the @test(eq) attribute.
+// version is the active evaluator version for version-specific share groups.
+//
+// Supported expression forms:
+//   - *ast.StructLit: @test(shareID=name) on fields → path = basePath.fieldLabel
+//   - *ast.ListLit:   @test(shareID=name) as decl attrs inside struct elements
+//     → path = basePath.Index(i)
+//
 // Returns a map from shareID name to the absolute paths of fields in that group.
 func extractShareIDsFromEqExpr(expr ast.Expr, basePath cue.Path, version string) map[string][]cue.Path {
-	s, ok := expr.(*ast.StructLit)
-	if !ok {
-		return nil
-	}
 	var result map[string][]cue.Path
-	for _, d := range s.Elts {
-		f, ok := d.(*ast.Field)
-		if !ok {
-			continue
+	addResult := func(name string, p cue.Path) {
+		if result == nil {
+			result = make(map[string][]cue.Path)
 		}
-		for _, a := range f.Attrs {
+		result[name] = append(result[name], p)
+	}
+	collectShareIDAttrs := func(attrs []*ast.Attribute, path cue.Path) {
+		for _, a := range attrs {
 			if k, _ := a.Split(); k != "test" {
 				continue
 			}
@@ -56,22 +59,47 @@ func extractShareIDsFromEqExpr(expr ast.Expr, basePath cue.Path, version string)
 			if err != nil || pa.directive != "shareID" {
 				continue
 			}
-			// Version filter: skip if a non-matching version is specified.
 			if pa.version != "" && pa.version != version {
 				continue
 			}
 			if len(pa.raw.Fields) == 0 {
 				continue
 			}
-			shareIDName := pa.raw.Fields[0].Value()
-			if shareIDName == "" {
+			name := pa.raw.Fields[0].Value()
+			if name == "" {
 				continue
 			}
-			fieldPath := applyShareIDAt(basePath.Append(labelSelector(f.Label, "")), pa)
-			if result == nil {
-				result = make(map[string][]cue.Path)
+			addResult(name, applyShareIDAt(path, pa))
+		}
+	}
+
+	switch x := expr.(type) {
+	case *ast.StructLit:
+		// Struct body: look for @test(shareID=name) on fields.
+		for _, d := range x.Elts {
+			f, ok := d.(*ast.Field)
+			if !ok {
+				continue
 			}
-			result[shareIDName] = append(result[shareIDName], fieldPath)
+			collectShareIDAttrs(f.Attrs, basePath.Append(labelSelector(f.Label, "")))
+		}
+
+	case *ast.ListLit:
+		// List body: look for @test(shareID=name) as decl attrs inside
+		// struct elements. The path for element i is basePath.Index(i).
+		for i, elt := range x.Elts {
+			s, ok := elt.(*ast.StructLit)
+			if !ok {
+				continue
+			}
+			elemPath := basePath.Append(cue.Index(i))
+			for _, d := range s.Elts {
+				a, ok := d.(*ast.Attribute)
+				if !ok {
+					continue
+				}
+				collectShareIDAttrs([]*ast.Attribute{a}, elemPath)
+			}
 		}
 	}
 	return result
@@ -150,35 +178,59 @@ func (r *inlineRunner) collectShareIDsForRoot(records []attrRecord, rootPath cue
 }
 
 // collectDirectShareIDs builds a shareID group map from direct @test(shareID=name)
-// field attributes across ALL records at any nesting depth (no root filtering).
+// field attributes and in-place @test(shareID=name) inside @test(eq, ...) bodies,
+// across ALL records at any nesting depth (no root filtering).
 // This is used for cross-root sharing assertions where fields from different
-// roots share a vertex. Eq-body sharing is handled per-root by
-// collectShareIDsForRoot.
+// roots share a vertex.
 func (r *inlineRunner) collectDirectShareIDs(records []attrRecord, version string) map[string][]cue.Path {
+	type attrKey struct {
+		file   string
+		offset int
+	}
 	var shareGroups map[string][]cue.Path
-	for _, rec := range records {
-		if rec.fileLevel {
-			continue
+	seenEq := make(map[attrKey]bool)
+	add := func(id string, p cue.Path) {
+		if shareGroups == nil {
+			shareGroups = make(map[string][]cue.Path)
 		}
-
+		shareGroups[id] = append(shareGroups[id], p)
+	}
+	for _, rec := range records {
 		pa := rec.parsed
 		if pa.version != "" && pa.version != version {
 			continue
 		}
-		if pa.directive != "shareID" {
-			continue
+		switch pa.directive {
+		case "shareID":
+			if len(pa.raw.Fields) == 0 {
+				continue
+			}
+			shareIDName := pa.raw.Fields[0].Value()
+			if shareIDName == "" {
+				continue
+			}
+			add(shareIDName, applyShareIDAt(rec.path, pa))
+
+		case "eq":
+			// Extract in-place @test(shareID=name) from fields in the eq body.
+			if len(pa.raw.Fields) < 2 {
+				continue
+			}
+			key := attrKey{file: pa.srcFileName, offset: pa.srcAttr.Pos().Offset()}
+			if seenEq[key] {
+				continue
+			}
+			seenEq[key] = true
+			eqExpr, err := parser.ParseExpr("shareID", pa.raw.Fields[1].Text())
+			if err != nil {
+				continue
+			}
+			for id, paths := range extractShareIDsFromEqExpr(eqExpr, rec.path, version) {
+				for _, p := range paths {
+					add(id, p)
+				}
+			}
 		}
-		if len(pa.raw.Fields) == 0 {
-			continue
-		}
-		shareIDName := pa.raw.Fields[0].Value()
-		if shareIDName == "" {
-			continue
-		}
-		if shareGroups == nil {
-			shareGroups = make(map[string][]cue.Path)
-		}
-		shareGroups[shareIDName] = append(shareGroups[shareIDName], applyShareIDAt(rec.path, pa))
 	}
 	return shareGroups
 }

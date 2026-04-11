@@ -3,7 +3,6 @@
 #
 # Many of these cases were discovered as part of the development of the new
 # evaluator that started at v0.7 and do not pass for that version.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 cyclicalInsertInDisjunction: {
 	// We do not allow lookups across unresolved disjunctions. As such, the
@@ -21,6 +20,7 @@ cyclicalInsertInDisjunction: {
 		// boundaries.
 		c: {d: e, e: _}
 		c: {d: 1, e: 2} | {d : 2, e: 2}
+		@test(eq, {c: {d: 2, e: 2}})
 	}
 	maybe1: {
 		// In this case, the reference c.e crosses a disjunction boundary.
@@ -28,6 +28,7 @@ cyclicalInsertInDisjunction: {
 		// could be allowed, if we define it to be.
 		c: d: c.e
 		c: {d: 1, e: 2} | {d : 2, e: 2}
+		@test(eq, {c: {d: 2, e: 2}})
 	}
 	err1: {
 		// This should be an error: to resolve x in c.d, we need to first
@@ -37,6 +38,7 @@ cyclicalInsertInDisjunction: {
 		x: c.e
 		c: d: x
 		c: {d: 1, e: 2} | {d : 2, e: 2}
+		@test(eq, {x: 2, c: {d: 2, e: 2}})
 	}
 	err2: {
 		// This is a more obviously erroneous variant of err1. The div in x
@@ -46,6 +48,7 @@ cyclicalInsertInDisjunction: {
 		x: div(c.e, 2)
 		c: d: x
 		c: {d: 1, e: 2} | {d : 2, e: 3}
+		@test(eq, {x: 1, c: {d: 1, e: 2}})
 	}
 	err3: {
 		// Here it is clear that d will not disambiguate the disjunction at c.
@@ -53,7 +56,21 @@ cyclicalInsertInDisjunction: {
 		x: c.e
 		c: d: 1 | 2 | x
 		c: {d: 1, e: 2} | {d : 2, e: 3}
+		@test(eq, {
+			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction", pos=[50:6])
+			c: {d: 1, e: 2} | {d: 2, e: 3}
+		})
 	}
+	@test(eq, {
+		ok1: {c: {d: 2, e: 2}}
+		maybe1: {c: {d: 2, e: 2}}
+		err1: {x: 2, c: {d: 2, e: 2}}
+		err2: {x: 1, c: {d: 1, e: 2}}
+		err3: {
+			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct)", pos=[50:6])
+			c: {d: 1, e: 2} | {d: 2, e: 3}
+		}
+	})
 }
 
 preseveBottomSemantics: ok: {
@@ -63,6 +80,7 @@ preseveBottomSemantics: ok: {
 	// However, we could consider simplifying in this case to `a: _` if we can
 	// come up with a good general mechanism for subsumption.
 	#x: { #x | {} }
+	@test(eq, {#x: {}})
 }
 
 eliminateOpenVariant: ok: {
@@ -70,12 +88,14 @@ eliminateOpenVariant: ok: {
 	// except openness. TODO: should we disambiguate those?
 	c: {a: 1} | #b
 	#b: {a: 1}
+	@test(eq, {c: {a: 1} | {a: 1}, #b: {a: 1}})
 }
 
 cyclicSelfElimination: ok: {
 	// This should resolve to {y: 1} (works for new evaluator)
 	y: 1 | {y: 1}
 	y
+	@test(eq, {y: 1})
 }
 
 // Value aliases must resolve to the specific disjunct arm's value,
@@ -83,30 +103,33 @@ cyclicSelfElimination: ok: {
 issue4251_notC: {
 	#NotC: x={
 		string
-		_must: true & x != "c"
+		_must: true & x != "c" @test(err, code=incomplete, contains="non-concrete value string in operand to !=", pos=[0:17, -2:11, -1:3])
 	}
+	@test(err, at=#NotC._must, =incomplete, contains="non-concrete value string in operand to !=", pos=[3:17, 1:11, 2:3])
 
 	a: #NotC
 	a: "a" | "b"
-	a: "a"
+	a: "a" @test(eq, {"a", _must: true})
 }
 issue4251_notB: {
 	#NotB: x={
 		string
-		_must: true & x != "b"
+		_must: true & x != "b" @test(err, code=incomplete, contains="non-concrete value string in operand to !=", pos=[0:17, -2:11, -1:3])
 	}
+	@test(err, at=#NotB._must, code=incomplete, contains="non-concrete value string in operand to !=", pos=[3:17, 1:11, 2:3])
 	a: #NotB
 	a: "a" | "b"
-	a: "a"
+	a: "a" @test(eq, {"a", _must: true})
 }
 issue4251_notB_reversed: {
 	#NotB: x={
 		string
-		_must: true & x != "b"
+		_must: true & x != "b" @test(err, code=incomplete, contains="non-concrete value string in operand to !=", pos=[0:17, -2:11, -1:3])
 	}
+	@test(err, at=#NotB._must, code=incomplete, contains="non-concrete value string in operand to !=", pos=[3:17, 1:11, 2:3])
 	a: #NotB
 	a: "b" | "a"
-	a: "a"
+	a: "a" @test(eq, {"a", _must: true})
 }
 -- panic.cue --
 // This used to cause a panic with evalv3.
@@ -126,11 +149,39 @@ panic1: {
 	objs: obj1: {
 		type: #TypeFoo | #TypeBar
 		type: *objs["missing"] | #TypeFoo | #TypeBar
-	}
+	} 	@test(eq, {
+		type: {name: "foo", foo_field: string} | {bar_field?: string, name: "bar"}
+	})
 
 	out: #TypeFoo | #TypeBar
 	out: objs["obj1"].type
+	@test(eq, {
+		#TypeFoo: {name: "foo", foo_field: string}
+		#TypeBar: {bar_field?: string, name: "bar"}
+		#TypeBar2: {name: "bar"}
+		objs: {
+			obj1: {
+				type: {name: "foo", foo_field: string} | {bar_field?: string, name: "bar"}
+			}
+		}
+		out: {name: "foo", foo_field: string} | {bar_field?: string, name: "bar"}
+	})
 }
+-- out/errors.txt --
+[incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
+    ./in.cue:50:6
+[incomplete] issue4251_notC.#NotC._must: non-concrete value string in operand to !=:
+    ./in.cue:100:17
+    ./in.cue:98:11
+    ./in.cue:99:3
+[incomplete] issue4251_notB.#NotB._must: non-concrete value string in operand to !=:
+    ./in.cue:111:17
+    ./in.cue:109:11
+    ./in.cue:110:3
+[incomplete] issue4251_notB_reversed.#NotB._must: non-concrete value string in operand to !=:
+    ./in.cue:121:17
+    ./in.cue:119:11
+    ./in.cue:120:3
 -- out/eval/stats --
 Leaks:  24
 Freed:  175
@@ -144,350 +195,10 @@ Disjuncts:    53
 Notifications: 9
 
 NumCloseIDs: 64
--- out/eval --
-(struct){
-  cyclicalInsertInDisjunction: (struct){
-    ok1: (struct){
-      c: (struct){
-        d: (int){ 2 }
-        e: (int){ 2 }
-      }
-    }
-    maybe1: (struct){
-      c: (struct){
-        d: (int){ 2 }
-        e: (int){ 2 }
-      }
-    }
-    err1: (struct){
-      x: (int){ 2 }
-      c: (struct){
-        d: (int){ 2 }
-        e: (int){ 2 }
-      }
-    }
-    err2: (struct){
-      x: (int){ 1 }
-      c: (struct){
-        d: (int){ 1 }
-        e: (int){ 2 }
-      }
-    }
-    err3: (struct){
-      x: (_|_){
-        // [incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
-        //     ./in.cue:46:6
-      }
-      c: (struct){ |((struct){
-          d: (int){ 1 }
-          e: (int){ 2 }
-        }, (struct){
-          d: (int){ 2 }
-          e: (int){ 3 }
-        }) }
-    }
-  }
-  preseveBottomSemantics: (struct){
-    ok: (struct){
-      #x: (#struct){
-      }
-    }
-  }
-  eliminateOpenVariant: (struct){
-    ok: (struct){
-      c: (struct){ |((struct){
-          a: (int){ 1 }
-        }, (#struct){
-          a: (int){ 1 }
-        }) }
-      #b: (#struct){
-        a: (int){ 1 }
-      }
-    }
-  }
-  cyclicSelfElimination: (struct){
-    ok: (struct){
-      y: (int){ 1 }
-    }
-  }
-  panic1: (struct){
-    #TypeFoo: (#struct){
-      name: (string){ "foo" }
-      foo_field: (string){ string }
-    }
-    #TypeBar: (#struct){
-      name: (string){ "bar" }
-      bar_field?: (string){ string }
-    }
-    #TypeBar2: (#struct){
-      name: (string){ "bar" }
-    }
-    objs: (struct){
-      obj1: (struct){
-        type: (#struct){ |((#struct){
-            name: (string){ "foo" }
-            foo_field: (string){ string }
-          }, (#struct){
-            name: (string){ "bar" }
-            bar_field?: (string){ string }
-          }) }
-      }
-    }
-    out: (#struct){ |((#struct){
-        name: (string){ "foo" }
-        foo_field: (string){ string }
-      }, (#struct){
-        name: (string){ "bar" }
-        bar_field?: (string){ string }
-      }) }
-  }
-}
--- out/evalalpha --
-(struct){
-  cyclicalInsertInDisjunction: (struct){
-    ok1: (struct){
-      c: (struct){
-        d: (int){ 2 }
-        e: (int){ 2 }
-      }
-    }
-    maybe1: (struct){
-      c: (struct){
-        d: (int){ 2 }
-        e: (int){ 2 }
-      }
-    }
-    err1: (struct){
-      x: (int){ 2 }
-      c: (struct){
-        d: (int){ 2 }
-        e: (int){ 2 }
-      }
-    }
-    err2: (struct){
-      x: (int){ 1 }
-      c: (struct){
-        d: (int){ 1 }
-        e: (int){ 2 }
-      }
-    }
-    err3: (struct){
-      x: (_|_){
-        // [incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
-        //     ./in.cue:46:6
-      }
-      c: (struct){ |((struct){
-          d: (int){ 1 }
-          e: (int){ 2 }
-        }, (struct){
-          d: (int){ 2 }
-          e: (int){ 3 }
-        }) }
-    }
-  }
-  preseveBottomSemantics: (struct){
-    ok: (struct){
-      #x: (#struct){
-      }
-    }
-  }
-  eliminateOpenVariant: (struct){
-    ok: (struct){
-      c: (struct){ |((struct){
-          a: (int){ 1 }
-        }, (#struct){
-          a: (int){ 1 }
-        }) }
-      #b: (#struct){
-        a: (int){ 1 }
-      }
-    }
-  }
-  cyclicSelfElimination: (struct){
-    ok: (struct){
-      y: (int){ 1 }
-    }
-  }
-  issue4251_notC: (struct){
-    #NotC: (string){
-      string
-      _must: (_|_){
-        // [incomplete] issue4251_notC.#NotC._must: non-concrete value string in operand to !=:
-        //     ./in.cue:79:17
-        //     ./in.cue:77:11
-        //     ./in.cue:78:3
-      }
-    }
-    a: (string){
-      "a"
-      _must: (bool){ true }
-    }
-  }
-  issue4251_notB: (struct){
-    #NotB: (string){
-      string
-      _must: (_|_){
-        // [incomplete] issue4251_notB.#NotB._must: non-concrete value string in operand to !=:
-        //     ./in.cue:89:17
-        //     ./in.cue:87:11
-        //     ./in.cue:88:3
-      }
-    }
-    a: (string){
-      "a"
-      _must: (bool){ true }
-    }
-  }
-  issue4251_notB_reversed: (struct){
-    #NotB: (string){
-      string
-      _must: (_|_){
-        // [incomplete] issue4251_notB_reversed.#NotB._must: non-concrete value string in operand to !=:
-        //     ./in.cue:98:17
-        //     ./in.cue:96:11
-        //     ./in.cue:97:3
-      }
-    }
-    a: (string){
-      "a"
-      _must: (bool){ true }
-    }
-  }
-  panic1: (struct){
-    #TypeFoo: (#struct){
-      name: (string){ "foo" }
-      foo_field: (string){ string }
-    }
-    #TypeBar: (#struct){
-      bar_field?: (string){ string }
-      name: (string){ "bar" }
-    }
-    #TypeBar2: (#struct){
-      name: (string){ "bar" }
-    }
-    objs: (struct){
-      obj1: (struct){
-        type: (struct){ |((#struct){
-            name: (string){ "foo" }
-            foo_field: (string){ string }
-          }, (#struct){
-            bar_field?: (string){ string }
-            name: (string){ "bar" }
-          }) }
-      }
-    }
-    out: (struct){ |((#struct){
-        name: (string){ "foo" }
-        foo_field: (string){ string }
-      }, (#struct){
-        bar_field?: (string){ string }
-        name: (string){ "bar" }
-      }) }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -63,6 +63,51 @@
-       y: (int){ 1 }
-     }
-   }
-+  issue4251_notC: (struct){
-+    #NotC: (string){
-+      string
-+      _must: (_|_){
-+        // [incomplete] issue4251_notC.#NotC._must: non-concrete value string in operand to !=:
-+        //     ./in.cue:79:17
-+        //     ./in.cue:77:11
-+        //     ./in.cue:78:3
-+      }
-+    }
-+    a: (string){
-+      "a"
-+      _must: (bool){ true }
-+    }
-+  }
-+  issue4251_notB: (struct){
-+    #NotB: (string){
-+      string
-+      _must: (_|_){
-+        // [incomplete] issue4251_notB.#NotB._must: non-concrete value string in operand to !=:
-+        //     ./in.cue:89:17
-+        //     ./in.cue:87:11
-+        //     ./in.cue:88:3
-+      }
-+    }
-+    a: (string){
-+      "a"
-+      _must: (bool){ true }
-+    }
-+  }
-+  issue4251_notB_reversed: (struct){
-+    #NotB: (string){
-+      string
-+      _must: (_|_){
-+        // [incomplete] issue4251_notB_reversed.#NotB._must: non-concrete value string in operand to !=:
-+        //     ./in.cue:98:17
-+        //     ./in.cue:96:11
-+        //     ./in.cue:97:3
-+      }
-+    }
-+    a: (string){
-+      "a"
-+      _must: (bool){ true }
-+    }
-+  }
-   panic1: (struct){
-     #TypeFoo: (#struct){
-       name: (string){ "foo" }
-@@ -69,8 +114,8 @@
-       foo_field: (string){ string }
-     }
-     #TypeBar: (#struct){
--      name: (string){ "bar" }
-       bar_field?: (string){ string }
-+      name: (string){ "bar" }
-     }
-     #TypeBar2: (#struct){
-       name: (string){ "bar" }
-@@ -77,21 +122,21 @@
-     }
-     objs: (struct){
-       obj1: (struct){
--        type: (#struct){ |((#struct){
-+        type: (struct){ |((#struct){
-             name: (string){ "foo" }
-             foo_field: (string){ string }
-           }, (#struct){
--            name: (string){ "bar" }
-             bar_field?: (string){ string }
-+            name: (string){ "bar" }
-           }) }
-       }
-     }
--    out: (#struct){ |((#struct){
-+    out: (struct){ |((#struct){
-         name: (string){ "foo" }
-         foo_field: (string){ string }
-       }, (#struct){
--        name: (string){ "bar" }
-         bar_field?: (string){ string }
-+        name: (string){ "bar" }
-       }) }
-   }
- }
--- diff/todo/p2 --
-cyclicalInsertInDisjunction.maybe: discrepancy may be okay
-cyclicalInsertInDisjunction.err1: should be an err for the old and new evaluator.
--- diff/todo/p3 --
-preseveBottomSemantics: both the old and new evaluator are incorrect here.
-  The result should be either _ or _|{}.
--- diff/explanation --
-cyclicalInsertInDisjunction.err2: The new evaluator handles this correctly.
-eliminateOpenVariant.ok: closedness of c is different. Seems correct, or at
-  least okay.
-cyclicSelfElimination.ok: The new evaluator handles this correctly.
+-- out/todo.txt --
+issue4251_notC, issue4251_notB, issue4251_notB_reversed: these are only evaluated correctly by v3.
+cyclicalInsertInDisjunction.err1: should be an error for both evaluators but both produce concrete values.
+preseveBottomSemantics: both evaluators are incorrect; result should be _ or _|{}.
 -- out/compile --
 --- in.cue
 {

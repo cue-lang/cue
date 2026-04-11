@@ -3,7 +3,6 @@
 # accumulate redundant conjunctions instead of preserving the recursive structure.
 # https://cuelang.org/issue/545
 title: Simplification of validators.
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 package main
 
@@ -27,6 +26,31 @@ t1: {
 	bar: #Test & {
 		source: foo
 	}
+	@test(eq, {
+		#Test: {
+			#HTTP: =~"^http://"
+			#SSH: !~"^ssh://"
+			#USER: strings.MinRunes(3)
+			source: =~"^http://" | !~"^ssh://" | strings.MinRunes(3)
+		}
+		foo: {
+			source: "http://blablabla"
+			#HTTP: =~"^http://"
+			#SSH: !~"^ssh://"
+			#USER: strings.MinRunes(3)
+		}
+		bar: {
+			source: {
+				source: "http://blablabla"
+				#HTTP: =~"^http://"
+				#SSH: !~"^ssh://"
+				#USER: strings.MinRunes(3)
+			}
+			#HTTP: =~"^http://"
+			#SSH: !~"^ssh://"
+			#USER: strings.MinRunes(3)
+		}
+	})
 }
 
 t2: {
@@ -38,6 +62,15 @@ t2: {
 	d: time.Time
 	e: time.Time()
 	f: d & e & d & e
+	@test(eq, {
+		str: "foo"
+		a: =~"foo"
+		b: =~"foo"
+		c: =~"foo"
+		d: time.Time()
+		e: time.Time()
+		f: time.Time()
+	})
 }
 -- out/eval/stats --
 Leaks:  7
@@ -52,115 +85,6 @@ Disjuncts:    16
 Notifications: 3
 
 NumCloseIDs: 22
--- out/evalalpha --
-(struct){
-  t1: (struct){
-    #Test: (#struct){
-      #HTTP: (string){ =~"^http://" }
-      #SSH: (string){ !~"^ssh://" }
-      #USER: (string){ strings.MinRunes(3) }
-      source: (string){ |((string){ =~"^http://" }, (string){ !~"^ssh://" }, (string){ strings.MinRunes(3) }) }
-    }
-    foo: (#struct){
-      source: (string){ "http://blablabla" }
-      #HTTP: (string){ =~"^http://" }
-      #SSH: (string){ !~"^ssh://" }
-      #USER: (string){ strings.MinRunes(3) }
-    }
-    bar: (#struct){
-      source: (#struct){
-        source: (string){ "http://blablabla" }
-        #HTTP: (string){ =~"^http://" }
-        #SSH: (string){ !~"^ssh://" }
-        #USER: (string){ strings.MinRunes(3) }
-      }
-      #HTTP: (string){ =~"^http://" }
-      #SSH: (string){ !~"^ssh://" }
-      #USER: (string){ strings.MinRunes(3) }
-    }
-  }
-  t2: (struct){
-    str: (string){ "foo" }
-    a: (string){ =~"foo" }
-    b: (string){ =~"foo" }
-    c: (string){ =~"foo" }
-    d: (string){ time.Time() }
-    e: (string){ time.Time() }
-    f: (string){ time.Time() }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -7,21 +7,21 @@
-       source: (string){ |((string){ =~"^http://" }, (string){ !~"^ssh://" }, (string){ strings.MinRunes(3) }) }
-     }
-     foo: (#struct){
--      #HTTP: (string){ =~"^http://" }
--      #SSH: (string){ !~"^ssh://" }
--      #USER: (string){ strings.MinRunes(3) }
-       source: (string){ "http://blablabla" }
-+      #HTTP: (string){ =~"^http://" }
-+      #SSH: (string){ !~"^ssh://" }
-+      #USER: (string){ strings.MinRunes(3) }
-     }
-     bar: (#struct){
--      #HTTP: (string){ =~"^http://" }
--      #SSH: (string){ !~"^ssh://" }
--      #USER: (string){ strings.MinRunes(3) }
-       source: (#struct){
-+        source: (string){ "http://blablabla" }
-         #HTTP: (string){ =~"^http://" }
-         #SSH: (string){ !~"^ssh://" }
-         #USER: (string){ strings.MinRunes(3) }
--        source: (string){ "http://blablabla" }
-       }
-+      #HTTP: (string){ =~"^http://" }
-+      #SSH: (string){ !~"^ssh://" }
-+      #USER: (string){ strings.MinRunes(3) }
-     }
-   }
-   t2: (struct){
--- diff/todo/p3 --
-Reordering.
--- out/eval --
-(struct){
-  t1: (struct){
-    #Test: (#struct){
-      #HTTP: (string){ =~"^http://" }
-      #SSH: (string){ !~"^ssh://" }
-      #USER: (string){ strings.MinRunes(3) }
-      source: (string){ |((string){ =~"^http://" }, (string){ !~"^ssh://" }, (string){ strings.MinRunes(3) }) }
-    }
-    foo: (#struct){
-      #HTTP: (string){ =~"^http://" }
-      #SSH: (string){ !~"^ssh://" }
-      #USER: (string){ strings.MinRunes(3) }
-      source: (string){ "http://blablabla" }
-    }
-    bar: (#struct){
-      #HTTP: (string){ =~"^http://" }
-      #SSH: (string){ !~"^ssh://" }
-      #USER: (string){ strings.MinRunes(3) }
-      source: (#struct){
-        #HTTP: (string){ =~"^http://" }
-        #SSH: (string){ !~"^ssh://" }
-        #USER: (string){ strings.MinRunes(3) }
-        source: (string){ "http://blablabla" }
-      }
-    }
-  }
-  t2: (struct){
-    str: (string){ "foo" }
-    a: (string){ =~"foo" }
-    b: (string){ =~"foo" }
-    c: (string){ =~"foo" }
-    d: (string){ time.Time() }
-    e: (string){ time.Time() }
-    f: (string){ time.Time() }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -188,3 +112,5 @@ Reordering.
     f: (((〈0;d〉 & 〈0;e〉) & 〈0;d〉) & 〈0;e〉)
   }
 }
+-- out/todo.txt --
+Reordering of fields in t1.foo and t1.bar between v2 and v3 (source field order differs).

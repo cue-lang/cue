@@ -1,4 +1,7 @@
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
+// Tests dynamic field key resolution including string interpolations, chained
+// resolution, and comprehension with let bindings. Covers panic fix for issue799
+// (struct used in string interpolation) and issue3828 (let inside comprehension
+// with dynamic field key).
 -- in.cue --
 a: "foo"
 "\(a)": b: c: d: e
@@ -14,56 +17,56 @@ withError: {
 	// Panic when running cue eval with a struct used in a string interpolation.
 	// https://cuelang.org/issue/799
 	issue799: {key: int32} & {"\(1 & 2)": 123}
+	@test(err, code=eval, contains="conflicting values 2 and 1", pos=[3:28, 3:31, 3:35])
 }
 
 parenExprRefParent: {
 	a: (x): {}
 	x: "foo"
+	@test(eq, {a: {foo: {}}, x: "foo"})
 }
 parenExprRefEqual: {
 	(x): {}
 	x: "foo"
+	@test(eq, {x: "foo", foo: {}})
 }
-chainedResolution: {
-	p1: {
-		(p1.baz): "bar"
-		(p1.foo): "baz"
-		baz: "foo"
-	}
-	p2: {
-		(p2.baz): "bar"
-		baz: "foo"
-		(p2.foo): "baz"
-	}
-	p3: {
-		baz: "foo"
-		(p3.baz): "bar"
-		(p3.foo): "baz"
-	}
-	p4: {
-		(p4.foo): "baz"
-		(p4.baz): "bar"
-		baz: "foo"
-	}
-	p5: {
-		(p5.foo): "baz"
-		baz: "foo"
-		(p5.baz): "bar"
-	}
-	p6: {
-		baz: "foo"
-		(p6.foo): "baz"
-		(p6.baz): "bar"
-	}
+chainedResolution: x: {
+	@test(permute)
+	@test(permuteCount, 6)
+	(x.baz): "bar"
+	(x.foo): "baz"
+	baz: "foo"
+	@test(eq, {
+		baz: "foo", foo: "bar", bar: "baz"
+	})
 }
 
-// Issue #1407
+// A dynamic field key that references an incomplete value (string interpolation
+// using abstract string) must produce an "incomplete" error, not a spurious
+// "cycle error". The error should also include path and position information.
+// https://cuelang.org/issue/1407
 noCycleError: {
 	foo: [_]: {
 		#ID: "\(string)"
 	}
 	foo: bar: entries: (foo.baz.#ID): true
 	foo: baz: {}
+	@test(err, at=foo.bar.entries, code=incomplete,
+		suberr=(code=incomplete, contains="dynamic field must be concrete", pos=[4:22]),
+		suberr=(code=incomplete, contains="non-concrete value string", pos=[2:8, 2:11]),
+	)
+	@test(err, at=foo.bar.#ID, code=incomplete, contains="non-concrete value string", pos=[2:8, 2:11])
+	@test(err, at=foo.baz.#ID, code=incomplete, contains="non-concrete value string", pos=[2:8, 2:11])
+
+	@test(eq, {
+		foo: {
+			bar: {
+				entries: _|_
+				#ID: _|_
+			}
+			baz: { #ID: _|_ }
+		}
+	})
 }
 
 -- constraints.cue --
@@ -71,6 +74,7 @@ constraints: {
 	t1: "foo"
 	t2: "bar"
 	(t1)?: (t2)!: 3
+	@test(eq, {t1: "foo", t2: "bar", foo?: {bar!: 3}})
 }
 -- issue3828.cue --
 // evalv3 regression: a let inside a comprehension with a dynamic field key
@@ -84,6 +88,7 @@ issue3828: reduced: {
 		}
 	}
 	str: "foobot1"
+	@test(eq, {a: {b: {foobot1: true}}, str: "foobot1"})
 }
 issue3828: full: {
 	orgs: org1: {
@@ -96,7 +101,30 @@ issue3828: full: {
 			collaborators: (repo_name): (orgBotUser): true
 		}
 	}
+	@test(eq, {
+		orgs: org1: {
+			repos: {repo1: {}}
+			collaborators: {repo1: {bot1: true}}
+		}
+		botUser: "bot1"
+	})
 }
+-- out/errors.txt --
+[eval] invalid interpolation: conflicting values 2 and 1:
+    ./in.cue:14:28
+    ./in.cue:14:31
+    ./in.cue:14:35
+[incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:45:8
+    ./in.cue:45:11
+noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string)):
+    ./in.cue:47:22
+[incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:45:8
+    ./in.cue:45:11
+[incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:45:8
+    ./in.cue:45:11
 -- out/eval/stats --
 Leaks:  4
 Freed:  74
@@ -109,366 +137,6 @@ Conjuncts:    91
 Disjuncts:    0
 
 NumCloseIDs: 4
--- out/evalalpha --
-Errors:
-invalid interpolation: conflicting values 2 and 1:
-    ./in.cue:14:28
-    ./in.cue:14:31
-    ./in.cue:14:35
-
-Result:
-(_|_){
-  // [eval]
-  constraints: (struct){
-    t1: (string){ "foo" }
-    t2: (string){ "bar" }
-    foo?: (struct){
-      bar!: (int){ 3 }
-    }
-  }
-  a: (string){ "foo" }
-  e: (int){ 2 }
-  b: (string){ "bar" }
-  c: ~(bar)
-  withError: (_|_){
-    // [eval]
-    issue799: (_|_){
-      // [eval] invalid interpolation: conflicting values 2 and 1:
-      //     ./in.cue:14:28
-      //     ./in.cue:14:31
-      //     ./in.cue:14:35
-      key: (int){ &(>=-2147483648, <=2147483647, int) }
-    }
-  }
-  parenExprRefParent: (struct){
-    a: (struct){
-      foo: (struct){
-      }
-    }
-    x: (string){ "foo" }
-  }
-  parenExprRefEqual: (struct){
-    x: (string){ "foo" }
-    foo: (struct){
-    }
-  }
-  chainedResolution: (struct){
-    p1: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p2: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p3: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p4: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p5: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p6: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-  }
-  noCycleError: (struct){
-    foo: (struct){
-      bar: (struct){
-        entries: (_|_){
-          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-          //     ./in.cue:61:8
-          //     ./in.cue:61:11
-          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string)):
-          //     ./in.cue:63:22
-        }
-        #ID: (_|_){
-          // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
-          //     ./in.cue:61:8
-          //     ./in.cue:61:11
-        }
-      }
-      baz: (struct){
-        #ID: (_|_){
-          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-          //     ./in.cue:61:8
-          //     ./in.cue:61:11
-        }
-      }
-    }
-  }
-  issue3828: (struct){
-    reduced: (struct){
-      a: (struct){
-        b: (struct){
-          foobot1: (bool){ true }
-        }
-      }
-      str: (string){ "foobot1" }
-    }
-    full: (struct){
-      orgs: (struct){
-        org1: (struct){
-          repos: (struct){
-            repo1: (struct){
-            }
-          }
-          collaborators: (struct){
-            repo1: (struct){
-              bot1: (bool){ true }
-            }
-          }
-        }
-      }
-      botUser: (string){ "bot1" }
-    }
-  }
-  bar: (struct){
-    a: (int){ 1 }
-  }
-  foo: (struct){
-    b: (struct){
-      c: (struct){
-        d: (int){ 2 }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,8 @@
- Errors:
- invalid interpolation: conflicting values 2 and 1:
--    ./in.cue:12:28
--    ./in.cue:12:31
--    ./in.cue:12:35
-+    ./in.cue:14:28
-+    ./in.cue:14:31
-+    ./in.cue:14:35
- 
- Result:
- (_|_){
-@@ -17,16 +17,14 @@
-   a: (string){ "foo" }
-   e: (int){ 2 }
-   b: (string){ "bar" }
--  c: (struct){
--    a: (int){ 1 }
--  }
-+  c: ~(bar)
-   withError: (_|_){
-     // [eval]
-     issue799: (_|_){
-       // [eval] invalid interpolation: conflicting values 2 and 1:
--      //     ./in.cue:12:28
--      //     ./in.cue:12:31
--      //     ./in.cue:12:35
-+      //     ./in.cue:14:28
-+      //     ./in.cue:14:31
-+      //     ./in.cue:14:35
-       key: (int){ &(>=-2147483648, <=2147483647, int) }
-     }
-   }
-@@ -79,20 +77,22 @@
-       bar: (struct){
-         entries: (_|_){
-           // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
--          //     ./in.cue:59:8
--          //     ./in.cue:59:11
-+          //     ./in.cue:61:8
-+          //     ./in.cue:61:11
-+          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string)):
-+          //     ./in.cue:63:22
-         }
-         #ID: (_|_){
-           // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
--          //     ./in.cue:59:8
--          //     ./in.cue:59:11
-+          //     ./in.cue:61:8
-+          //     ./in.cue:61:11
-         }
-       }
-       baz: (struct){
-         #ID: (_|_){
-           // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
--          //     ./in.cue:59:8
--          //     ./in.cue:59:11
-+          //     ./in.cue:61:8
-+          //     ./in.cue:61:11
-         }
-       }
-     }
-@@ -123,6 +123,9 @@
-       botUser: (string){ "bot1" }
-     }
-   }
-+  bar: (struct){
-+    a: (int){ 1 }
-+  }
-   foo: (struct){
-     b: (struct){
-       c: (struct){
-@@ -130,7 +133,4 @@
-       }
-     }
-   }
--  bar: (struct){
--    a: (int){ 1 }
--  }
- }
--- diff/todo/p2 --
-Added near-duplicate message
--- out/eval --
-Errors:
-invalid interpolation: conflicting values 2 and 1:
-    ./in.cue:12:28
-    ./in.cue:12:31
-    ./in.cue:12:35
-
-Result:
-(_|_){
-  // [eval]
-  constraints: (struct){
-    t1: (string){ "foo" }
-    t2: (string){ "bar" }
-    foo?: (struct){
-      bar!: (int){ 3 }
-    }
-  }
-  a: (string){ "foo" }
-  e: (int){ 2 }
-  b: (string){ "bar" }
-  c: (struct){
-    a: (int){ 1 }
-  }
-  withError: (_|_){
-    // [eval]
-    issue799: (_|_){
-      // [eval] invalid interpolation: conflicting values 2 and 1:
-      //     ./in.cue:12:28
-      //     ./in.cue:12:31
-      //     ./in.cue:12:35
-      key: (int){ &(>=-2147483648, <=2147483647, int) }
-    }
-  }
-  parenExprRefParent: (struct){
-    a: (struct){
-      foo: (struct){
-      }
-    }
-    x: (string){ "foo" }
-  }
-  parenExprRefEqual: (struct){
-    x: (string){ "foo" }
-    foo: (struct){
-    }
-  }
-  chainedResolution: (struct){
-    p1: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p2: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p3: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p4: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p5: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-    p6: (struct){
-      baz: (string){ "foo" }
-      foo: (string){ "bar" }
-      bar: (string){ "baz" }
-    }
-  }
-  noCycleError: (struct){
-    foo: (struct){
-      bar: (struct){
-        entries: (_|_){
-          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-          //     ./in.cue:59:8
-          //     ./in.cue:59:11
-        }
-        #ID: (_|_){
-          // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
-          //     ./in.cue:59:8
-          //     ./in.cue:59:11
-        }
-      }
-      baz: (struct){
-        #ID: (_|_){
-          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-          //     ./in.cue:59:8
-          //     ./in.cue:59:11
-        }
-      }
-    }
-  }
-  issue3828: (struct){
-    reduced: (struct){
-      a: (struct){
-        b: (struct){
-          foobot1: (bool){ true }
-        }
-      }
-      str: (string){ "foobot1" }
-    }
-    full: (struct){
-      orgs: (struct){
-        org1: (struct){
-          repos: (struct){
-            repo1: (struct){
-            }
-          }
-          collaborators: (struct){
-            repo1: (struct){
-              bot1: (bool){ true }
-            }
-          }
-        }
-      }
-      botUser: (string){ "bot1" }
-    }
-  }
-  foo: (struct){
-    b: (struct){
-      c: (struct){
-        d: (int){ 2 }
-      }
-    }
-  }
-  bar: (struct){
-    a: (int){ 1 }
-  }
-}
 -- out/compile --
 --- constraints.cue
 {
@@ -514,35 +182,10 @@ Result:
     x: "foo"
   }
   chainedResolution: {
-    p1: {
-      〈1;p1〉.baz: "bar"
-      〈1;p1〉.foo: "baz"
+    x: {
+      〈1;x〉.baz: "bar"
+      〈1;x〉.foo: "baz"
       baz: "foo"
-    }
-    p2: {
-      〈1;p2〉.baz: "bar"
-      baz: "foo"
-      〈1;p2〉.foo: "baz"
-    }
-    p3: {
-      baz: "foo"
-      〈1;p3〉.baz: "bar"
-      〈1;p3〉.foo: "baz"
-    }
-    p4: {
-      〈1;p4〉.foo: "baz"
-      〈1;p4〉.baz: "bar"
-      baz: "foo"
-    }
-    p5: {
-      〈1;p5〉.foo: "baz"
-      baz: "foo"
-      〈1;p5〉.baz: "bar"
-    }
-    p6: {
-      baz: "foo"
-      〈1;p6〉.foo: "baz"
-      〈1;p6〉.baz: "bar"
     }
   }
   noCycleError: {
@@ -604,3 +247,6 @@ Result:
     }
   }
 }
+-- out/todo.txt --
+c: v3 uses structure sharing (~(bar)), v2 expands it.
+noCycleError: v3 adds extra error message about key value; v2 only reports invalid interpolation.

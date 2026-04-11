@@ -1,15 +1,15 @@
-#name: predefined ranges
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 k1: int8
-k1: 44
+k1: 44   @test(eq, 44)
 
 k2: int64
-k2: -8_000_000_000
+k2: -8_000_000_000   @test(eq, -8000000000)
 
 e1: int16
-e1: 100_000
+e1: 100_000   @test(err, code=eval, contains="invalid value 100000", pos=[0:5])
+-- out/errors.txt --
+[eval] e1: invalid value 100000 (out of bound <=32767):
+    ./in.cue:8:5
 -- out/compile --
 --- in.cue
 {
@@ -30,18 +30,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-e1: invalid value 100000 (out of bound <=32767):
-    ./in.cue:8:5
-
-Result:
-(_|_){
-  // [eval]
-  k1: (int){ 44 }
-  k2: (int){ -8000000000 }
-  e1: (_|_){
-    // [eval] e1: invalid value 100000 (out of bound <=32767):
-    //     ./in.cue:8:5
-  }
-}

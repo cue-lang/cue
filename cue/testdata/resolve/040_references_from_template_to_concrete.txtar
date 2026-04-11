@@ -1,14 +1,17 @@
-#name: references from template to concrete
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-res: [t]
+res: [t] @test(eq, [{
+	x: {
+		a: "XDDDD"
+		b: str: "DDDD"
+		c: "X"
+	}
+}])
 t: [X=string]: {
 	a: c + b.str
 	b: str: string
 	c: "X"
 }
-t: x: {b: str: "DDDD"}
+t: x: {b: str: "DDDD"} @test(eq, {b: {str: "DDDD"}, a: "XDDDD", c: "X"})
 -- out/compile --
 --- in.cue
 {
@@ -42,61 +45,5 @@ Retain: 0
 Unifications: 9
 Conjuncts:    13
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  res: (#list){
-    0: ~(t)
-  }
-  t: (struct){
-    x: (struct){
-      b: (struct){
-        str: (string){ "DDDD" }
-      }
-      a: (string){ "XDDDD" }
-      c: (string){ "X" }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,14 +1,6 @@
- (struct){
-   res: (#list){
--    0: (struct){
--      x: (struct){
--        b: (struct){
--          str: (string){ "DDDD" }
--        }
--        a: (string){ "XDDDD" }
--        c: (string){ "X" }
--      }
--    }
-+    0: ~(t)
-   }
-   t: (struct){
-     x: (struct){
--- out/eval --
-(struct){
-  res: (#list){
-    0: (struct){
-      x: (struct){
-        b: (struct){
-          str: (string){ "DDDD" }
-        }
-        a: (string){ "XDDDD" }
-        c: (string){ "X" }
-      }
-    }
-  }
-  t: (struct){
-    x: (struct){
-      b: (struct){
-        str: (string){ "DDDD" }
-      }
-      a: (string){ "XDDDD" }
-      c: (string){ "X" }
-    }
-  }
-}
+-- out/todo.txt --
+res[0]: v2 evaluator expands res[0] to a full struct; v3 shares the vertex with t.

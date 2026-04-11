@@ -1,9 +1,7 @@
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 a: _
-b: a
-a: {d: 1, d: _}
+b: a @test(eq, {d: 1}) @test(shareID=ba)
+a: {d: 1, d: _} @test(eq, {d: 1}) @test(shareID=ba)
 b: _
 -- out/compile --
 --- in.cue
@@ -26,32 +24,5 @@ Retain: 0
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  a: (struct){
-    d: (int){ 1 }
-  }
-  b: ~(a)
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -2,7 +2,5 @@
-   a: (struct){
-     d: (int){ 1 }
-   }
--  b: (struct){
--    d: (int){ 1 }
--  }
-+  b: ~(a)
- }
--- out/eval --
-(struct){
-  a: (struct){
-    d: (int){ 1 }
-  }
-  b: (struct){
-    d: (int){ 1 }
-  }
-}
+-- out/todo.txt --
+b: v2 evaluator expands b to a full struct; v3 shares the vertex with a.

@@ -1,11 +1,22 @@
-#name: structs
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-a: t & {c:  5} // {c:5,d:15}
-b: ti & {c: 7} // {c:7,d:21}
-t: {c: number, d: c * 3} // {c:number,d:number*3}
-ti: t & {c: int}
+a: t & {c:  5}   @test(eq, {c: 5, d: 15}) // {c:5,d:15}
+b: ti & {c: 7}   @test(eq, {c: 7, d: 21}) // {c:7,d:21}
+t: { // {c:number,d:number*3}
+	c: number
+	d: c * 3   @test(err, code=incomplete, contains="non-concrete value number in operand to *", pos=[0:5, -1:5])
+}
+ti: t & {c: int}   @test(eq, {
+	c: int
+	d: _|_ @test(err, code=incomplete, contains="non-concrete value number in operand to *", pos=[5:5 4:5 7:13])
+})
+-- out/errors.txt --
+[incomplete] t.d: non-concrete value number in operand to *:
+    ./in.cue:5:5
+    ./in.cue:4:5
+[incomplete] ti.d: non-concrete value int in operand to *:
+    ./in.cue:5:5
+    ./in.cue:4:5
+    ./in.cue:7:13
 -- out/compile --
 --- in.cue
 {
@@ -35,31 +46,3 @@ Conjuncts:    25
 Disjuncts:    0
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  a: (struct){
-    c: (int){ 5 }
-    d: (int){ 15 }
-  }
-  b: (struct){
-    c: (int){ 7 }
-    d: (int){ 21 }
-  }
-  t: (struct){
-    c: (number){ number }
-    d: (_|_){
-      // [incomplete] t.d: non-concrete value number in operand to *:
-      //     ./in.cue:3:19
-      //     ./in.cue:3:8
-    }
-  }
-  ti: (struct){
-    c: (int){ int }
-    d: (_|_){
-      // [incomplete] ti.d: non-concrete value int in operand to *:
-      //     ./in.cue:3:19
-      //     ./in.cue:3:8
-      //     ./in.cue:4:13
-    }
-  }
-}

@@ -37,6 +37,11 @@ func printNode(node interface{}, f *printer) error {
 		if f.cfg.simplify {
 			ls.markReferences(x)
 		}
+		// Prefer the language version from the AST (set by the parser from the
+		// module file) over any explicit option, which is used as a fallback.
+		if x.LanguageVersion != "" {
+			f.cfg.languageVersion = x.LanguageVersion
+		}
 		s.file(x)
 	case ast.Expr:
 		if f.cfg.simplify {
@@ -237,9 +242,50 @@ func fallbackKeyword(n *ast.Comprehension) token.Token {
 	return token.ELSE
 }
 
-func (f *formatter) walkListElems(list []ast.Expr) {
+// listOmitsCommas reports whether the list source omits commas between
+// elements. It returns true when any inter-element comma is missing, meaning
+// the formatter should use the comma-free style. For single-element lists
+// the trailing comma (before ']') is checked instead.
+//
+// The Scanned bit on lbrack distinguishes scanner-produced lists from
+// programmatically constructed ASTs. For programmatic ASTs (where Scanned
+// is false), this always returns false to keep commas.
+//
+// TODO: consider whether programmatic ASTs should default to comma-free
+// style, which would remove the need for this check.
+func listOmitsCommas(list []ast.Expr, lbrack, rbrack token.Pos) bool {
+	if len(list) == 0 || !lbrack.Scanned() {
+		return false
+	}
+	// Check commas between consecutive elements: element[i].Pos().HasComma()
+	// indicates an explicit comma preceded that token (i.e. after element[i-1]).
+	for i := 1; i < len(list); i++ {
+		if !list[i].Pos().HasComma() {
+			return true
+		}
+	}
+	// For single-element lists there are no inter-element gaps to check,
+	// so use the trailing comma (before ']') to determine style.
+	if len(list) == 1 {
+		return !rbrack.HasComma()
+	}
+	return false
+}
+
+func (f *formatter) walkListElems(list []ast.Expr, lbrack, rbrack token.Pos) {
 	f.before(nil)
-	for _, x := range list {
+	// Use declcomma (same mechanism as struct fields) when commas should be
+	// omitted. This prints ", " only when elements are on the same line.
+	// The separator is placed before the next element so that trailing
+	// comments on the previous element are printed without a comma.
+	//
+	// Commas are omitted when the source is missing a comma between any
+	// two consecutive elements.
+	useNewCommaStyle := listOmitsCommas(list, lbrack, rbrack)
+	for i, x := range list {
+		if i > 0 && useNewCommaStyle {
+			f.print(declcomma)
+		}
 		f.before(x)
 
 		// Collect comments that appear after the element's start position.
@@ -292,8 +338,9 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 		case ast.Expr:
 			f.exprRaw(n, token.LowestPrec, 1)
 		}
-		f.print(comma, blank)
-
+		if !useNewCommaStyle {
+			f.print(comma, blank)
+		}
 		if splitComments {
 			f.current.cg = commentsAfter
 		}
@@ -820,7 +867,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		if !f.inLabel {
 			f.breakTableStack[len(f.breakTableStack)-1] = true
 		}
-		f.walkListElems(x.Elts)
+		f.walkListElems(x.Elts, x.Lbrack, x.Rbrack)
 		f.print(trailcomma, noblank)
 		f.visitComments(f.current.pos)
 		f.matchUnindent()

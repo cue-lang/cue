@@ -87,13 +87,17 @@ Examples:
 					if err := inst.Err; err != nil {
 						return err
 					}
+					var version string
+					if inst.ModuleFile != nil && inst.ModuleFile.Language != nil {
+						version = inst.ModuleFile.Language.Version
+					}
 					for _, file := range inst.BuildFiles {
 						shouldFormat := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir
 						if !shouldFormat {
 							continue
 						}
 
-						wasModified, err := formatFile(file, formatOpts, doDiff, check, cmd)
+						wasModified, err := formatFile(file, formatOpts, version, doDiff, check, cmd)
 						if err != nil {
 							return err
 						}
@@ -128,7 +132,7 @@ Examples:
 						file.Source = contents
 					}
 
-					wasModified, err := formatFile(file, formatOpts, doDiff, check, cmd)
+					wasModified, err := formatFile(file, formatOpts, "", doDiff, check, cmd)
 					if err != nil {
 						return err
 					}
@@ -189,7 +193,7 @@ Examples:
 
 // formatFile formats a single file.
 // It returns true if the file was not well formatted.
-func formatFile(file *build.File, opts []format.Option, doDiff, check bool, cmd *Command) (bool, error) {
+func formatFile(file *build.File, opts []format.Option, version string, doDiff, check bool, cmd *Command) (bool, error) {
 	// We buffer the input and output bytes to compare them.
 	// This allows us to determine whether a file is already
 	// formatted, without modifying the file.
@@ -198,7 +202,11 @@ func formatFile(file *build.File, opts []format.Option, doDiff, check bool, cmd 
 		return false, err
 	}
 
-	syntax, err := parser.ParseFile(file.Filename, src, parser.ParseComments)
+	parseOpts := []parser.Option{parser.ParseComments}
+	if version != "" {
+		parseOpts = append(parseOpts, parser.Version(version))
+	}
+	syntax, err := parser.ParseFile(file.Filename, src, parseOpts...)
 	if err != nil {
 		return false, err
 	}

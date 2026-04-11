@@ -1,0 +1,60 @@
+#simplify
+#version: v0.17.0
+
+# With --simplify and v0.17.0, commas are preserved (not actively removed).
+# Comma removal is done via cue fix, not cue fmt --simplify.
+
+-- simplify-v17.input --
+// Multiline list: commas are preserved.
+a: [
+	1,
+	2,
+	3,
+]
+
+// Same-line commas are kept.
+b: [1, 2, 3]
+
+// Elements without commas stay without commas.
+c: [
+	1
+	2
+	3
+]
+
+// Field label brackets are not affected.
+[string]: [1, 2, 3]
+
+// Trailing line comments on elements: commas are preserved.
+d: [
+	1, // first
+	2, // second
+	3, // third
+]
+-- out/format/simplify-v17.golden --
+// Multiline list: commas are preserved.
+a: [
+	1,
+	2,
+	3,
+]
+
+// Same-line commas are kept.
+b: [1, 2, 3]
+
+// Elements without commas stay without commas.
+c: [
+	1
+	2
+	3
+]
+
+// Field label brackets are not affected.
+[string]: [1, 2, 3]
+
+// Trailing line comments on elements: commas are preserved.
+d: [
+	1, // first
+	2, // second
+	3, // third
+]

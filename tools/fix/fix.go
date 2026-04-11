@@ -29,14 +29,16 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/mod/semver"
 )
 
 type Option func(*options)
 
 type options struct {
-	simplify       bool
-	exps           []string
-	upgradeVersion string
+	simplify         bool
+	exps             []string
+	upgradeVersion   string
+	removeListCommas bool
 }
 
 // Simplify enables fixes that simplify the code, but are not strictly
@@ -57,6 +59,12 @@ func Experiments(experiment ...string) Option {
 			}
 		}
 	}
+}
+
+// RemoveListCommas removes explicit commas from multiline list elements,
+// converting to the v0.17.0+ comma-free style.
+func RemoveListCommas() Option {
+	return func(o *options) { o.removeListCommas = true }
 }
 
 // UpgradeVersion enables upgrade fixes to the specified language version,
@@ -188,6 +196,10 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		return true
 	}).(*ast.File)
 
+	if options.removeListCommas && (version == "" || semver.Compare(version, "v0.17.0") >= 0) {
+		fixListCommas(f)
+	}
+
 	if options.simplify {
 		f = simplify(f)
 	}
@@ -197,6 +209,30 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		return nil, errors.Wrapf(err, token.NoPos, "fix: sanitize failed")
 	}
 	return f, nil
+}
+
+// fixListCommas removes explicit commas from list elements by clearing the
+// HasComma bit on element positions. The formatter then uses the comma-free
+// style for multiline lists. Single-line lists are unaffected because the
+// formatter always prints commas between inline elements regardless of
+// HasComma bits.
+func fixListCommas(f *ast.File) {
+	ast.Walk(f, func(n ast.Node) bool {
+		list, ok := n.(*ast.ListLit)
+		if !ok {
+			return true
+		}
+		for _, elt := range list.Elts {
+			p := elt.Pos()
+			if p.HasComma() {
+				ast.SetPos(elt, p.WithComma(false))
+			}
+		}
+		if list.Rbrack.HasComma() {
+			list.Rbrack = list.Rbrack.WithComma(false)
+		}
+		return true
+	}, nil)
 }
 
 func expandConcats(exprs ...ast.Expr) (result []ast.Expr) {

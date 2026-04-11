@@ -71,6 +71,9 @@ current version.
 	cmd.Flags().StringSlice("exp", nil,
 		"list of experiments to port")
 
+	cmd.Flags().Bool("remove-list-commas", false,
+		"remove commas from multiline list elements (v0.17.0+)")
+
 	return cmd
 }
 
@@ -82,6 +85,10 @@ func runFixAll(cmd *Command, args []string) error {
 
 	if exps, err := cmd.Flags().GetStringSlice("exp"); err == nil && len(exps) > 0 {
 		opts = append(opts, fix.Experiments(exps...))
+	}
+
+	if ok, err := cmd.Flags().GetBool("remove-list-commas"); err == nil && ok {
+		opts = append(opts, fix.RemoveListCommas())
 	}
 
 	_, errs := fixInstances(cmd, args, flagForce.Bool(cmd), opts...)

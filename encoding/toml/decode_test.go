@@ -664,7 +664,7 @@ line two.\
 					subtable: {
 						name: "bar"
 					}
-				}
+				},
 			]
 			`,
 	}, {
@@ -715,7 +715,7 @@ line two.\
 							deeper: [
 								{
 									nest2d: "nest2d value"
-								}
+								},
 							]
 						},
 					]

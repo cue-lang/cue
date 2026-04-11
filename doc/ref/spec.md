@@ -2461,6 +2461,12 @@ as the operands. The right operand is evaluated conditionally.
 !     NOT                !p      is  "not p"
 ```
 
+When `@experiment(shortcircuit)` is present in a file (available from v0.17.0),
+short-circuit evaluation is enabled for `&&` and `||`. When the result is
+determined by the left operand alone — `false &&` or `true ||` — the right
+operand is not evaluated and any error or incomplete value it carries is
+suppressed.
+
 
 <!--
 ### TODO TODO TODO

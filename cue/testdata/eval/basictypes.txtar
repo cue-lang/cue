@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- cue.mod/module.cue --
 module: "test.com"
 language: version: "v0.15.0"
@@ -21,45 +20,6 @@ comparison: {
 	typeComparison: err: string == number  // error for non-concrete
 	structEquality: t: {name: "test"} == {name: "test"}
 	nestedComparison: t: {data: {value: 1}} == {data: {value: 1}}
-}
--- out/evalalpha --
-comparison.typeComparison.err: invalid operand string ('==' requires concrete value):
-    ./in.cue:16:23
-comparison.typeComparison.err: invalid operand number ('==' requires concrete value):
-    ./in.cue:16:33
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,12 +1,4 @@
--(struct){
--  top: (struct){
--    a: (_){ _ }
--    b: (_){ _ }
--  }
--  scalar: (struct){
--    a: (string){ string }
--    b: (string){ string }
--    c: (number){ number }
--    d: (number){ number }
--  }
--}
-+comparison.typeComparison.err: invalid operand string ('==' requires concrete value):
-+    ./in.cue:16:23
-+comparison.typeComparison.err: invalid operand number ('==' requires concrete value):
-+    ./in.cue:16:33
--- out/eval --
-(struct){
-  top: (struct){
-    a: (_){ _ }
-    b: (_){ _ }
-  }
-  scalar: (struct){
-    a: (string){ string }
-    b: (string){ string }
-    c: (number){ number }
-    d: (number){ number }
-  }
 }
 -- out/compile --
 comparison.typeComparison.err: invalid operand string ('==' requires concrete value):
@@ -115,3 +75,8 @@ comparison.typeComparison.err: invalid operand number ('==' requires concrete va
     }
   }
 }
+-- out/evalalpha --
+comparison.typeComparison.err: invalid operand string ('==' requires concrete value):
+    ./in.cue:16:23
+comparison.typeComparison.err: invalid operand number ('==' requires concrete value):
+    ./in.cue:16:33

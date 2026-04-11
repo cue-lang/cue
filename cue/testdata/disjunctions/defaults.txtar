@@ -1,9 +1,8 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
-passToSingleValue: p1: _ | *((_ | *"x") & "y")
-passToSingleValue: p2: _ | *((*"x" | _) & "y")
-passToSingleValue: p3: *((_ | *"x") & "y") | _
-passToSingleValue: p4: *((*"x" | _) & "y") | _
+passToSingleValue: p1: _ | *((_ | *"x") & "y") @test(eq, *"y" | _)
+passToSingleValue: p2: _ | *((*"x" | _) & "y") @test(eq, *"y" | _)
+passToSingleValue: p3: *((_ | *"x") & "y") | _ @test(eq, *"y" | _)
+passToSingleValue: p4: *((*"x" | _) & "y") | _ @test(eq, *"y" | _)
 
 // eval: "incomplete value" regression with defaults involving multiple
 // definitions; default values that depend on other fields should resolve.
@@ -19,6 +18,17 @@ issue3779: {
 		fieldFoo: _
 		fieldBar: string | *fieldFoo
 	}
+	@test(eq, {
+		out: {
+			fieldFoo: "foo"
+			fieldBar: *"foo" | string
+		}
+		#Foo: {
+			fieldFoo: *"foo-default" | string
+			fieldBar: *"foo-default" | string
+		}
+		#Bar: {fieldFoo: _, fieldBar: *_ | string}
+	})
 }
 -- out/compile --
 --- in.cue
@@ -45,29 +55,6 @@ issue3779: {
     #Bar: {
       fieldFoo: _
       fieldBar: (string|*〈0;fieldFoo〉)
-    }
-  }
-}
--- out/evalalpha --
-(struct){
-  passToSingleValue: (struct){
-    p1: (_){ |(*(string){ "y" }, (_){ _ }) }
-    p2: (_){ |(*(string){ "y" }, (_){ _ }) }
-    p3: (_){ |(*(string){ "y" }, (_){ _ }) }
-    p4: (_){ |(*(string){ "y" }, (_){ _ }) }
-  }
-  issue3779: (struct){
-    out: (#struct){
-      fieldFoo: (string){ "foo" }
-      fieldBar: (string){ |(*(string){ "foo" }, (string){ string }) }
-    }
-    #Foo: (#struct){
-      fieldFoo: (string){ |(*(string){ "foo-default" }, (string){ string }) }
-      fieldBar: (string){ |(*(string){ "foo-default" }, (string){ string }) }
-    }
-    #Bar: (#struct){
-      fieldFoo: (_){ _ }
-      fieldBar: (_){ |(*(_){ _ }, (string){ string }) }
     }
   }
 }

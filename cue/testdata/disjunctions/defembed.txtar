@@ -1,170 +1,62 @@
 Interaction between defaults, embedding and disjunctions.
 
 // TODO: at the moment, using a default will select it.
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 x: {
 	// All of these resolve to *2 | 3
 	m1: (1 | (*2 | 3)) & (>=2 & <=3)
 	m2: (1 | (*2 | 3)) & (2 | 3)
 	m3: (*1 | *(*2 | 3)) & (2 | 3)
+	@test(eq, {m1: *2 | 3, m2: *2 | 3, m3: *2 | 3})
 }
 y1: x & {
 	{m4: x.m1 + x.m2 + x.m3}
-}
+} @test(eq, {
+	m4: 6
+	m1: *2 | 3
+	m2: *2 | 3
+	m3: *2 | 3
+})
 y2: {
 	x
 	{m4: y2.m1 + y2.m2 + y2.m3}
+	@test(eq, {
+		m4: 6
+		m1: *2 | 3
+		m2: *2 | 3
+		m3: *2 | 3
+	})
 }
 Y=y3: {
 	x
 	{m4: Y.m1 + Y.m2 + Y.m3}
 }
+@test(eq, {
+	m4: 6
+	m1: *2 | 3
+	m2: *2 | 3
+	m3: *2 | 3
+}, at=y3)
+
 y4: x & {
 	{m4: y4.m1 + y4.m2 + y4.m3}
-}
+} @test(eq, {
+	m4: 6
+	m1: *2 | 3
+	m2: *2 | 3
+	m3: *2 | 3
+})
 
 // Second disjunct in embedding is not possible because of previous declaration
 // of `b`, so it should be resolved to {a: 1}.
 z: {
 	b: (*"a" | "b") | "c"
 	{a: b} | {b: int}
+	@test(eq, {
+		b: *"a" | "b" | "c"
+		a: *"a" | "b" | "c"
+	})
 }
--- out/eval/stats --
-Leaks:  40
-Freed:  120
-Reused: 108
-Allocs: 52
-Retain: 0
-
-Unifications: 28
-Conjuncts:    192
-Disjuncts:    130
-
-NumCloseIDs: 16
--- out/eval --
-(struct){
-  x: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-  }
-  y1: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m4: (int){ 6 }
-  }
-  y2: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m4: (int){ 6 }
-  }
-  y3: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m4: (int){ 6 }
-  }
-  y4: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m4: (int){ 6 }
-  }
-  z: (struct){
-    b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-    a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-  }
-}
--- out/evalalpha --
-(struct){
-  x: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-  }
-  y1: (struct){
-    m4: (int){ 6 }
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-  }
-  y2: (struct){
-    m4: (int){ 6 }
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-  }
-  y3: (struct){
-    m4: (int){ 6 }
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-  }
-  y4: (struct){
-    m4: (int){ 6 }
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-  }
-  z: (struct){
-    b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-    a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,28 +5,28 @@
-     m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-   }
-   y1: (struct){
--    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m4: (int){ 6 }
-+    m4: (int){ 6 }
-+    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-   }
-   y2: (struct){
--    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m4: (int){ 6 }
-+    m4: (int){ 6 }
-+    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-   }
-   y3: (struct){
--    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m4: (int){ 6 }
-+    m4: (int){ 6 }
-+    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-   }
-   y4: (struct){
--    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
--    m4: (int){ 6 }
-+    m4: (int){ 6 }
-+    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-   }
-   z: (struct){
-     b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
--- diff/todo/p3 --
-Reordering.
 -- out/compile --
 --- in.cue
 {
@@ -204,3 +96,17 @@ Reordering.
     })
   }
 }
+-- out/eval/stats --
+Leaks:  40
+Freed:  120
+Reused: 108
+Allocs: 52
+Retain: 0
+
+Unifications: 28
+Conjuncts:    192
+Disjuncts:    130
+
+NumCloseIDs: 16
+-- out/todo.txt --
+Reordering: v3 reorders y1-y4 to put m4 first.

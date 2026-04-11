@@ -1,6 +1,5 @@
 # Tests that nested comprehensions with let bindings across multiple files work.
 # Issue #3763: for comprehension with multi-level let bindings and pattern constraints.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- reduced.cue --
 reduced: {
 	A: x1: y?: int // needs to be optional
@@ -11,6 +10,14 @@ reduced: {
 		let Z = [for _, x in A {x}]
 		B: [for z in Z if z.y != _|_ { b: 1 }]
 	}
+	@test(eq, {
+		A: {
+			x1: {y?: int}
+			x2: {y?: int}
+			x3: {y?: int}
+		}
+		B: []
+	})
 }
 -- full.cue --
 full: {
@@ -21,6 +28,7 @@ full: {
 		}
 	}
 
+	@test(shareID=L, at=k.n.n1._cs.l)
 	k: n: n1: {
 		_CL: "l"
 	}
@@ -49,8 +57,52 @@ full: {
 		}]
 	}
 
-	_cl: l: {}
+	_cl: l: {} @test(shareID=L)
+	@test(eq, {
+		_core_v1: #cp: {
+			hostPort?: >=-2147483648 & <=2147483647 & int
+			cp:        >=-2147483648 & <=2147483647 & int
+		}
+		k: n: n1: {
+			_CL: "l"
+			_cs: l: _ports: {
+				"1": {
+					hostPort?: >=-2147483648 & <=2147483647 & int
+					cp:        >=-2147483648 & <=2147483647 & int
+				}
+				"2": {
+					hostPort?: >=-2147483648 & <=2147483647 & int
+					cp:        >=-2147483648 & <=2147483647 & int
+				}
+				"3": {
+					hostPort?: >=-2147483648 & <=2147483647 & int
+					cp:        >=-2147483648 & <=2147483647 & int
+				}
+			}
+		}
+		_cl: l: _ports: {
+			"1": {
+				hostPort?: >=-2147483648 & <=2147483647 & int
+				cp:        >=-2147483648 & <=2147483647 & int
+			}
+			"2": {
+				hostPort?: >=-2147483648 & <=2147483647 & int
+				cp:        >=-2147483648 & <=2147483647 & int
+			}
+			"3": {
+				hostPort?: >=-2147483648 & <=2147483647 & int
+				cp:        >=-2147483648 & <=2147483647 & int
+			}
+		}
+		ports: []
+	})
 }
+-- out/errors.txt --
+-- out/todo.txt --
+full.k.n.n1._cs.l: v3 uses structure sharing (~(full._cl.l)) where v2 expands
+the full _ports struct inline.
+reduced.let Z: v3 shows a multi-comprehension (let Z#3multi) where v2 shows a
+concrete list.
 -- out/eval/stats --
 Leaks:  19
 Freed:  53
@@ -63,218 +115,6 @@ Conjuncts:    126
 Disjuncts:    0
 
 NumCloseIDs: 38
--- out/evalalpha --
-(struct){
-  full: (struct){
-    _core_v1: (struct){
-      #cp: (#struct){
-        hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-        cp: (int){ &(>=-2147483648, <=2147483647, int) }
-      }
-    }
-    k: (struct){
-      n: (struct){
-        n1: (struct){
-          _CL: (string){ "l" }
-          _cs: (struct){
-            l: ~(full._cl.l)
-          }
-        }
-      }
-    }
-    let nc#1 = (struct){
-      _ports: (struct){
-      }
-    }
-    _cl: (struct){
-      l: (struct){
-        _ports: (struct){
-          "1": (#struct){
-            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-            cp: (int){ &(>=-2147483648, <=2147483647, int) }
-          }
-          "2": (#struct){
-            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-            cp: (int){ &(>=-2147483648, <=2147483647, int) }
-          }
-          "3": (#struct){
-            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-            cp: (int){ &(>=-2147483648, <=2147483647, int) }
-          }
-        }
-      }
-    }
-    let cps#2multi = [
-      for _, c in 〈2;n〉._cs for _, cps in 〈0;c〉._ports {
-        〈1;cps〉
-      },
-    ]
-    ports: (#list){
-    }
-  }
-  reduced: (struct){
-    A: (struct){
-      x1: (struct){
-        y?: (int){ int }
-      }
-      x2: (struct){
-        y?: (int){ int }
-      }
-      x3: (struct){
-        y?: (int){ int }
-      }
-    }
-    let Z#3multi = [
-      for _, x in 〈2;A〉 {
-        〈1;x〉
-      },
-    ]
-    B: (#list){
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -11,22 +11,7 @@
-         n1: (struct){
-           _CL: (string){ "l" }
-           _cs: (struct){
--            l: (struct){
--              _ports: (struct){
--                "1": (#struct){
--                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
--                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
--                }
--                "2": (#struct){
--                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
--                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
--                }
--                "3": (#struct){
--                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
--                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
--                }
--              }
--            }
-+            l: ~(full._cl.l)
-           }
-         }
-       }
-@@ -73,17 +58,11 @@
-         y?: (int){ int }
-       }
-     }
--    let Z#3 = (#list){
--      0: (struct){
--        y?: (int){ int }
--      }
--      1: (struct){
--        y?: (int){ int }
--      }
--      2: (struct){
--        y?: (int){ int }
--      }
--    }
-+    let Z#3multi = [
-+      for _, x in 〈2;A〉 {
-+        〈1;x〉
-+      },
-+    ]
-     B: (#list){
-     }
-   }
--- out/eval --
-(struct){
-  full: (struct){
-    _core_v1: (struct){
-      #cp: (#struct){
-        hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-        cp: (int){ &(>=-2147483648, <=2147483647, int) }
-      }
-    }
-    k: (struct){
-      n: (struct){
-        n1: (struct){
-          _CL: (string){ "l" }
-          _cs: (struct){
-            l: (struct){
-              _ports: (struct){
-                "1": (#struct){
-                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
-                }
-                "2": (#struct){
-                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
-                }
-                "3": (#struct){
-                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    let nc#1 = (struct){
-      _ports: (struct){
-      }
-    }
-    _cl: (struct){
-      l: (struct){
-        _ports: (struct){
-          "1": (#struct){
-            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-            cp: (int){ &(>=-2147483648, <=2147483647, int) }
-          }
-          "2": (#struct){
-            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-            cp: (int){ &(>=-2147483648, <=2147483647, int) }
-          }
-          "3": (#struct){
-            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
-            cp: (int){ &(>=-2147483648, <=2147483647, int) }
-          }
-        }
-      }
-    }
-    let cps#2multi = [
-      for _, c in 〈2;n〉._cs for _, cps in 〈0;c〉._ports {
-        〈1;cps〉
-      },
-    ]
-    ports: (#list){
-    }
-  }
-  reduced: (struct){
-    A: (struct){
-      x1: (struct){
-        y?: (int){ int }
-      }
-      x2: (struct){
-        y?: (int){ int }
-      }
-      x3: (struct){
-        y?: (int){ int }
-      }
-    }
-    let Z#3 = (#list){
-      0: (struct){
-        y?: (int){ int }
-      }
-      1: (struct){
-        y?: (int){ int }
-      }
-      2: (struct){
-        y?: (int){ int }
-      }
-    }
-    B: (#list){
-    }
-  }
-}
 -- out/compile --
 --- full.cue
 {

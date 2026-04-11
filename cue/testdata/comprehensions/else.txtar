@@ -1,65 +1,76 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 @experiment(try)
 
 // if-else: condition true - no else
 ifTrue: {
 	if true { a: 1 } else { b: 2 }
+	@test(eq, {a: 1})
 }
 
 // if-else: condition false - else yields
 ifFalse: {
 	if false { a: 1 } else { b: 2 }
+	@test(eq, {b: 2})
 }
 
 // for-else: non-empty source - no else
 forNonEmpty: {
 	for x in [1, 2] { "\(x)": x } fallback { empty: true }
+	@test(eq, {"1": 1, "2": 2})
 }
 
 // for-else: empty source - else yields
 forEmpty: {
 	for x in [] { "\(x)": x } fallback { empty: true }
+	@test(eq, {empty: true})
 }
 
 // for-else with filter: filter removes all - else yields
 forFilteredAll: {
 	for x in [1, 2, 3] if x > 10 { "\(x)": x } fallback { empty: true }
+	@test(eq, {empty: true})
 }
 
 // for-else with filter: filter keeps some - no else
 forFilteredSome: {
 	for x in [1, 2, 3] if x > 1 { "\(x)": x } fallback { empty: true }
+	@test(eq, {"2": 2, "3": 3})
 }
 
 // if-for-fallback: if true, for empty - fallback yields
 ifTrueForEmpty: {
 	if true for x in [] { "\(x)": x } fallback { empty: true }
+	@test(eq, {empty: true})
 }
 
 // if-for-fallback: if false, for non-empty - fallback yields (if blocks iteration)
 ifFalseForNonEmpty: {
 	if false for x in [1, 2] { "\(x)": x } fallback { empty: true }
+	@test(eq, {empty: true})
 }
 
 // if-for-fallback: if true, for non-empty - no fallback
 ifTrueForNonEmpty: {
 	if true for x in [1, 2] { "\(x)": x } fallback { empty: true }
+	@test(eq, {"1": 1, "2": 2})
 }
 
 // if-if-fallback: both true - no fallback
 ifIfBothTrue: {
 	if true if true { a: 1 } fallback { b: 2 }
+	@test(eq, {a: 1})
 }
 
 // if-if-fallback: first false - fallback yields
 ifIfFirstFalse: {
 	if false if true { a: 1 } fallback { b: 2 }
+	@test(eq, {b: 2})
 }
 
 // if-if-fallback: second false - fallback yields
 ifIfSecondFalse: {
 	if true if false { a: 1 } fallback { b: 2 }
+	@test(eq, {b: 2})
 }
 
 // try-try-fallback: both succeed - no fallback
@@ -67,6 +78,7 @@ tryTryBothSucceed: {
 	a: 1
 	b: 2
 	try x = a? try y = b? { result: x + y } fallback { default: 0 }
+	@test(eq, {a: 1, b: 2, result: 3})
 }
 
 missing?: int
@@ -75,90 +87,104 @@ missing?: int
 tryTryFirstFails: {
 	b: 2
 	try x = missing? try y = b? { result: x + y } fallback { default: -1 }
+	@test(eq, {b: 2, default: -1})
 }
 
 // try-try-fallback: second fails - fallback yields
 tryTrySecondFails: {
 	a: 1
 	try x = a? try y = missing? { result: x + y } fallback { default: -2 }
+	@test(eq, {a: 1, default: -2})
 }
 
 // list if-else: true
 listIfTrue: [
 	if true { 1 } else { 2 }
-]
+] @test(eq, [1])
 
 // list if-else: false
 listIfFalse: [
 	if false { 1 } else { 2 }
-]
+] @test(eq, [2])
 
 // list for-else: empty
 listForEmpty: [
 	for x in [] { x } fallback { 0 }
-]
+] @test(eq, [0])
 
 // list for-else: non-empty
 listForNonEmpty: [
 	for x in [1, 2] { x * 2 } fallback { 0 }
-]
+] @test(eq, [2, 4])
 
 // else with multiple fields
 elseMultipleFields: {
 	if false { a: 1 } else { b: 2, c: 3 }
+	@test(eq, {b: 2, c: 3})
 }
 
 // else embeds into existing struct
 elseEmbeds: {
 	existing: 1
 	if false { added: 2 } else { fallback: 3 }
+	@test(eq, {existing: 1, fallback: 3})
 }
 
 // fallback with outer scope access
 outerScope: {
 	let threshold = 10
 	for x in [] { x } fallback { fallbackField: threshold }
+	@test(eq, {fallbackField: 10})
 }
 
 // if-else: nested body fields - else yields once
 ifNestedBody: {
 	if false { a: b: 1 } else { c: 2 }
+	@test(eq, {c: 2})
 }
 
 // if-else: nested else fields
 ifNestedElse: {
 	if false { a: 1 } else { b: c: 2 }
+	@test(eq, {b: {c: 2}})
 }
 
 // if-else: nested fields in both
 ifNestedBoth: {
 	if false { a: b: 1 } else { c: d: 2 }
+	@test(eq, {c: {d: 2}})
 }
 
 // if-else: deeply nested fields
 ifDeeplyNested: {
 	if false { a: b: c: 1 } else { a: b: c: 2 }
+	@test(eq, {a: {b: {c: 2}}})
 }
 
 // for-fallback: nested body fields, empty source
 forNestedEmpty: {
 	for x in [] { a: b: (x): x } fallback { a: b: none: true }
+	@test(eq, {a: {b: {none: true}}})
 }
 
 // for-fallback: nested body fields, non-empty source - no fallback
 forNestedNonEmpty: {
 	for x in [1] { a: b: "\(x)": x } fallback { a: b: none: true }
+	@test(eq, {a: {b: {"1": 1}}})
 }
 
 // nested comprehensions - outer fallback triggers
 nestedOuterFallback: {
 	for x in [] { for y in [1] { y } fallback { inner: true } } fallback { outer: true }
+	@test(eq, {outer: true})
 }
 
 // nested comprehensions - inner fallback triggers
 nestedInnerFallback: {
 	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
+	@test(eq, {inner: true})
 }
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  16
 Freed:  114
@@ -171,127 +197,6 @@ Conjuncts:    180
 Disjuncts:    0
 
 NumCloseIDs: 69
--- out/evalalpha --
-(struct){
-  ifTrue: (struct){
-    a: (int){ 1 }
-  }
-  ifFalse: (struct){
-    b: (int){ 2 }
-  }
-  forNonEmpty: (struct){
-    "1": (int){ 1 }
-    "2": (int){ 2 }
-  }
-  forEmpty: (struct){
-    empty: (bool){ true }
-  }
-  forFilteredAll: (struct){
-    empty: (bool){ true }
-  }
-  forFilteredSome: (struct){
-    "2": (int){ 2 }
-    "3": (int){ 3 }
-  }
-  ifTrueForEmpty: (struct){
-    empty: (bool){ true }
-  }
-  ifFalseForNonEmpty: (struct){
-    empty: (bool){ true }
-  }
-  ifTrueForNonEmpty: (struct){
-    "1": (int){ 1 }
-    "2": (int){ 2 }
-  }
-  ifIfBothTrue: (struct){
-    a: (int){ 1 }
-  }
-  ifIfFirstFalse: (struct){
-    b: (int){ 2 }
-  }
-  ifIfSecondFalse: (struct){
-    b: (int){ 2 }
-  }
-  tryTryBothSucceed: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-    result: (int){ 3 }
-  }
-  missing?: (int){ int }
-  tryTryFirstFails: (struct){
-    b: (int){ 2 }
-    default: (int){ -1 }
-  }
-  tryTrySecondFails: (struct){
-    a: (int){ 1 }
-    default: (int){ -2 }
-  }
-  listIfTrue: (#list){
-    0: (int){ 1 }
-  }
-  listIfFalse: (#list){
-    0: (int){ 2 }
-  }
-  listForEmpty: (#list){
-    0: (int){ 0 }
-  }
-  listForNonEmpty: (#list){
-    0: (int){ 2 }
-    1: (int){ 4 }
-  }
-  elseMultipleFields: (struct){
-    b: (int){ 2 }
-    c: (int){ 3 }
-  }
-  elseEmbeds: (struct){
-    existing: (int){ 1 }
-    fallback: (int){ 3 }
-  }
-  outerScope: (struct){
-    let threshold#1 = (int){ 10 }
-    fallbackField: (int){ 10 }
-  }
-  ifNestedBody: (struct){
-    c: (int){ 2 }
-  }
-  ifNestedElse: (struct){
-    b: (struct){
-      c: (int){ 2 }
-    }
-  }
-  ifNestedBoth: (struct){
-    c: (struct){
-      d: (int){ 2 }
-    }
-  }
-  ifDeeplyNested: (struct){
-    a: (struct){
-      b: (struct){
-        c: (int){ 2 }
-      }
-    }
-  }
-  forNestedEmpty: (struct){
-    a: (struct){
-      b: (struct){
-        none: (bool){ true }
-      }
-    }
-  }
-  forNestedNonEmpty: (struct){
-    a: (struct){
-      b: (struct){
-        "1": (int){ 1 }
-      }
-    }
-  }
-  nestedOuterFallback: (struct){
-    outer: (bool){ true }
-  }
-  nestedInnerFallback: (struct){
-    inner: (bool){ true }
-  }
-}
 -- out/compile --
 --- in.cue
 {

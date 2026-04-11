@@ -2,7 +2,6 @@
 # default values (disjunctions using *). Issue #507: comprehensions over
 # [...T] | *[elem] lists failed with "invalid operand" errors.
 # https://cuelang.org/issue/507
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 package x
 
@@ -12,22 +11,23 @@ foo: [
 	for e in somelist {
 		"hello foo: \(e)"
 	},
-]
+] @test(eq, [])
 
-otherlist: ["something"]
+otherlist: ["something"] @test(eq, ["something"])
 // Works fine as well
 z: [
 	for e in otherlist {
 		"hello z: \(e)"
 	},
-]
+] @test(eq, ["hello z: something"])
 
 extlist: [...string] | *["something"]
 bar: [
 	for e in extlist {
 		"hello bar: \(e)"
 	},
-]
+] @test(eq, ["hello bar: something"])
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
@@ -40,27 +40,6 @@ Conjuncts:    17
 Disjuncts:    4
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  somelist: (list){ |(*(#list){
-    }, (list){
-    }) }
-  foo: (#list){
-  }
-  otherlist: (#list){
-    0: (string){ "something" }
-  }
-  z: (#list){
-    0: (string){ "hello z: something" }
-  }
-  extlist: (list){ |(*(#list){
-      0: (string){ "something" }
-    }, (list){
-    }) }
-  bar: (#list){
-    0: (string){ "hello bar: something" }
-  }
-}
 -- out/compile --
 --- in.cue
 {

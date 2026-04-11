@@ -1,81 +1,67 @@
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 self: t1: {
 	a?: int
+	@test(eq, {a?: int})
 }
 
 self: t2: {
 	a!: int
 	a!: int
+	@test(eq, {a!: int})
 }
 
-unify: t1: p1: {
+unify: t1: {
+	@test(permute)
 	a!: int
 	a: int
+	@test(eq, {a: int})
 }
 
-unify: t1: p2: {
-	a: int
-	a!: int
-}
-
-unify: t2: p1: {
+unify: t2: {
+	@test(permute)
 	a!: int
 	a?: int
+	@test(eq, {a!: int})
 }
 
-unify: t2: p2: {
-	a?: int
-	a!: int
-}
 #Def: t1: {
 	a!: int
+	@test(eq, {a!: int})
 }
 
 // Required fields do not cause vet to fail with definitions: a required field
 // in one definition should block a disallowed field from another definition.
 // https://cuelang.org/issue/2306
-allowed: issue2306: {
-	#A: a!: int
-	#A: #B
+allowed: {
+	issue2306: {
+		#A: a!: int
+		#A: #B @test(err, code=eval, contains="field not allowed", pos=[-1:7])
 
-	#B: b!: int
+		#B: b!: int
+	}
 }
 
 reference: {
-	toWithinDefinition: p1:{
+	toWithinDefinition: {
+		@test(permute)
 		#Foo: a!: int
-		b: #Foo.a
+		b: #Foo.a @test(err, code=incomplete, contains="required field missing: a", pos=[0:11])
 	}
-	toWithinDefinition: p2:{
-		b: #Foo.a
-		#Foo: a!: int
-	}
-	toFieldFromDefinition: p1: {
+	toFieldFromDefinition: {
+		@test(permute)
 		#Foo: a!: int
 		b: #Foo
-		c: b.a
+		c: b.a @test(err, code=incomplete, contains="required field missing: a", pos=[0:8])
 	}
-	toFieldFromDefinition: p2: {
-		c: b.a
-		b: #Foo
-		#Foo: a!: int
-	}
-	toNonDefinition: p1: {
+	toNonDefinition: {
+		@test(permute)
 		x: y!: _
-		b: x.y
+		b: x.y @test(err, code=incomplete, contains="required field missing: y", pos=[0:8])
 	}
-	toNonDefinition: p2: {
-		b: x.y
-		x: y!: _
-	}
-	toConcrete: p1: {
+	toConcrete: {
+		@test(permute)
 		a!: 1
-		b: a + 1
-	}
-	toConcrete: p2: {
-		b: a + 1
-		a!: 1
+		b: a + 1 @test(err, code=incomplete, contains="required field missing: a", pos=[0:6])
 	}
 }
 -- issue3918.cue --
@@ -84,38 +70,79 @@ import "strings"
 // Required fields do not work on the function pattern: a required field used
 // as an input to a definition-based function was not satisfied at the call site.
 // https://cuelang.org/issue/3918
-issue3918: reduced: {
-	#disjuncts: {
-		in!: [...string]
-		out: strings.Join(in, "|")
-	}
+issue3918: {
+	reduced: {
+		#disjuncts: {
+			in!: [...string]
+			out: strings.Join(in, "|") @test(err, code=incomplete, contains="required field missing: in", pos=[0:22])
+		}
 
-	x: (#disjuncts & {
-		in: ["foo", "bar"]
-	}).out
-		      // [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
-		      //     issue3918.cue:9:21
-}
-issue3918: noFunction: {
-	#disjuncts: {
-		in!: [...string]
-		out: in
+		x: (#disjuncts & {
+			in: ["foo", "bar"]
+		}).out
+		@test(eq, {
+			#disjuncts: {
+				in!: []
+				out: _|_
+			}
+			x: "foo|bar"
+		})
 	}
-	_foo: #disjuncts & {}
-	x: _foo.out
+	noFunction: {
+		#disjuncts: {
+			in!: [...string]
+			out: in @test(err, code=incomplete, contains="required field missing: in", pos=[0:9])
+		}
+		_foo: #disjuncts & {}
+		x: _foo.out
+		@test(eq, {
+			#disjuncts: {
+				in!: []
+				out: _|_
+			}
+			_foo: {
+				in!: []
+				out: _|_ @test(err, code=incomplete, contains="issue3918.noFunction._foo.out: required field missing: in", pos=[27:9])
+			}
+			x: _|_
+		})
+	}
 }
 // A required field error is incomplete error. Ensure that setting a vertex
 // to this error does not escalate it to an evaluation error.
 doNotEscalateError: {
 	a: {
 		in:  _
-		out: in.self
+		out: in.self @test(err, code=incomplete, contains="in.self undefined as in is incomplete (type _)", pos=[0:8])
 	}
 	b: {
 		required!: _
-		pass:    (a & {in: required}).out
+		pass:    (a & {in: required}).out @test(err, code=incomplete, contains="undefined field: self", pos=[-4:11])
 	}
 }
+-- out/errors.txt --
+[eval] allowed.issue2306.#A.a: field not allowed:
+    ./in.cue:36:7
+[incomplete] reference.toWithinDefinition.b: required field missing: a:
+    ./in.cue:47:11
+[incomplete] reference.toFieldFromDefinition.c: required field missing: a:
+    ./in.cue:53:8
+[incomplete] reference.toNonDefinition.b: required field missing: y:
+    ./in.cue:58:8
+[incomplete] reference.toConcrete.b: required field missing: a:
+    ./in.cue:63:6
+[incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
+    ./issue3918.cue:10:22
+[incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:
+    ./issue3918.cue:27:9
+[incomplete] issue3918.noFunction._foo.out: required field missing: in:
+    ./issue3918.cue:27:9
+[incomplete] issue3918.noFunction._foo.out: required field missing: in:
+    ./issue3918.cue:27:9
+[incomplete] doNotEscalateError.a.out: in.self undefined as in is incomplete (type _):
+    ./issue3918.cue:49:8
+[incomplete] doNotEscalateError.b.pass: undefined field: self:
+    ./issue3918.cue:49:11
 -- out/compile --
 --- in.cue
 {
@@ -132,34 +159,14 @@ doNotEscalateError: {
   }
   unify: {
     t1: {
-      p1: {
-        a!: int
-        a: int
-      }
-    }
-  }
-  unify: {
-    t1: {
-      p2: {
-        a: int
-        a!: int
-      }
+      a!: int
+      a: int
     }
   }
   unify: {
     t2: {
-      p1: {
-        a!: int
-        a?: int
-      }
-    }
-  }
-  unify: {
-    t2: {
-      p2: {
-        a?: int
-        a!: int
-      }
+      a!: int
+      a?: int
     }
   }
   #Def: {
@@ -180,66 +187,27 @@ doNotEscalateError: {
   }
   reference: {
     toWithinDefinition: {
-      p1: {
-        #Foo: {
-          a!: int
-        }
-        b: 〈0;#Foo〉.a
+      #Foo: {
+        a!: int
       }
-    }
-    toWithinDefinition: {
-      p2: {
-        b: 〈0;#Foo〉.a
-        #Foo: {
-          a!: int
-        }
-      }
+      b: 〈0;#Foo〉.a
     }
     toFieldFromDefinition: {
-      p1: {
-        #Foo: {
-          a!: int
-        }
-        b: 〈0;#Foo〉
-        c: 〈0;b〉.a
+      #Foo: {
+        a!: int
       }
-    }
-    toFieldFromDefinition: {
-      p2: {
-        c: 〈0;b〉.a
-        b: 〈0;#Foo〉
-        #Foo: {
-          a!: int
-        }
-      }
+      b: 〈0;#Foo〉
+      c: 〈0;b〉.a
     }
     toNonDefinition: {
-      p1: {
-        x: {
-          y!: _
-        }
-        b: 〈0;x〉.y
+      x: {
+        y!: _
       }
-    }
-    toNonDefinition: {
-      p2: {
-        b: 〈0;x〉.y
-        x: {
-          y!: _
-        }
-      }
+      b: 〈0;x〉.y
     }
     toConcrete: {
-      p1: {
-        a!: 1
-        b: (〈0;a〉 + 1)
-      }
-    }
-    toConcrete: {
-      p2: {
-        b: (〈0;a〉 + 1)
-        a!: 1
-      }
+      a!: 1
+      b: (〈0;a〉 + 1)
     }
   }
 }
@@ -260,8 +228,6 @@ doNotEscalateError: {
         ]
       }).out
     }
-  }
-  issue3918: {
     noFunction: {
       #disjuncts: {
         in!: [
@@ -298,460 +264,6 @@ Conjuncts:    131
 Disjuncts:    0
 
 NumCloseIDs: 15
--- out/evalalpha --
-(_|_){
-  // [eval]
-  self: (struct){
-    t1: (struct){
-      a?: (int){ int }
-    }
-    t2: (struct){
-      a!: (int){ int }
-    }
-  }
-  unify: (struct){
-    t1: (struct){
-      p1: (struct){
-        a: (int){ int }
-      }
-      p2: (struct){
-        a: (int){ int }
-      }
-    }
-    t2: (struct){
-      p1: (struct){
-        a!: (int){ int }
-      }
-      p2: (struct){
-        a!: (int){ int }
-      }
-    }
-  }
-  #Def: (#struct){
-    t1: (#struct){
-      a!: (int){ int }
-    }
-  }
-  allowed: (_|_){
-    // [eval]
-    issue2306: (_|_){
-      // [eval]
-      #A: (_|_){
-        // [eval]
-        a!: (_|_){
-          // [eval] allowed.issue2306.#A.a: field not allowed:
-          //     ./in.cue:37:6
-        }
-        b!: (int){ int }
-      }
-      #B: (#struct){
-        b!: (int){ int }
-      }
-    }
-  }
-  reference: (struct){
-    toWithinDefinition: (struct){
-      p1: (struct){
-        #Foo: (#struct){
-          a!: (int){ int }
-        }
-        b: (_|_){
-          // [incomplete] reference.toWithinDefinition.p1.b: required field missing: a:
-          //     ./in.cue:46:11
-        }
-      }
-      p2: (struct){
-        b: (_|_){
-          // [incomplete] reference.toWithinDefinition.p2.b: required field missing: a:
-          //     ./in.cue:49:11
-        }
-        #Foo: (#struct){
-          a!: (int){ int }
-        }
-      }
-    }
-    toFieldFromDefinition: (struct){
-      p1: (struct){
-        #Foo: (#struct){
-          a!: (int){ int }
-        }
-        b: ~(reference.toFieldFromDefinition.p1.#Foo)
-        c: (_|_){
-          // [incomplete] reference.toFieldFromDefinition.p1.c: required field missing: a:
-          //     ./in.cue:55:8
-        }
-      }
-      p2: (struct){
-        c: (_|_){
-          // [incomplete] reference.toFieldFromDefinition.p2.c: required field missing: a:
-          //     ./in.cue:58:8
-        }
-        b: ~(reference.toFieldFromDefinition.p2.#Foo)
-        #Foo: (#struct){
-          a!: (int){ int }
-        }
-      }
-    }
-    toNonDefinition: (struct){
-      p1: (struct){
-        x: (struct){
-          y!: (_){ _ }
-        }
-        b: (_|_){
-          // [incomplete] reference.toNonDefinition.p1.b: required field missing: y:
-          //     ./in.cue:64:8
-        }
-      }
-      p2: (struct){
-        b: (_|_){
-          // [incomplete] reference.toNonDefinition.p2.b: required field missing: y:
-          //     ./in.cue:67:8
-        }
-        x: (struct){
-          y!: (_){ _ }
-        }
-      }
-    }
-    toConcrete: (struct){
-      p1: (struct){
-        a!: (int){ 1 }
-        b: (_|_){
-          // [incomplete] reference.toConcrete.p1.b: required field missing: a:
-          //     ./in.cue:72:6
-        }
-      }
-      p2: (struct){
-        b: (_|_){
-          // [incomplete] reference.toConcrete.p2.b: required field missing: a:
-          //     ./in.cue:75:6
-        }
-        a!: (int){ 1 }
-      }
-    }
-  }
-  issue3918: (struct){
-    reduced: (struct){
-      #disjuncts: (#struct){
-        in!: (list){
-        }
-        out: (_|_){
-          // [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
-          //     ./issue3918.cue:9:21
-        }
-      }
-      x: (string){ "foo|bar" }
-    }
-    noFunction: (struct){
-      #disjuncts: (#struct){
-        in!: (list){
-        }
-        out: (_|_){
-          // [incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:
-          //     ./issue3918.cue:21:8
-        }
-      }
-      _foo: (#struct){
-        in!: (list){
-        }
-        out: (_|_){
-          // [incomplete] issue3918.noFunction._foo.out: required field missing: in:
-          //     ./issue3918.cue:21:8
-        }
-      }
-      x: (_|_){
-        // [incomplete] issue3918.noFunction._foo.out: required field missing: in:
-        //     ./issue3918.cue:21:8
-      }
-    }
-  }
-  doNotEscalateError: (struct){
-    a: (struct){
-      in: (_){ _ }
-      out: (_|_){
-        // [incomplete] doNotEscalateError.a.out: in.self undefined as in is incomplete (type _):
-        //     ./issue3918.cue:31:8
-      }
-    }
-    b: (struct){
-      required!: (_){ _ }
-      pass: (_|_){
-        // [incomplete] doNotEscalateError.b.pass: undefined field: self:
-        //     ./issue3918.cue:31:11
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -39,8 +39,6 @@
-         // [eval]
-         a!: (_|_){
-           // [eval] allowed.issue2306.#A.a: field not allowed:
--          //     ./in.cue:34:6
--          //     ./in.cue:35:6
-           //     ./in.cue:37:6
-         }
-         b!: (int){ int }
-@@ -56,10 +54,16 @@
-         #Foo: (#struct){
-           a!: (int){ int }
-         }
--        b: (int){ int }
--      }
--      p2: (struct){
--        b: (int){ int }
-+        b: (_|_){
-+          // [incomplete] reference.toWithinDefinition.p1.b: required field missing: a:
-+          //     ./in.cue:46:11
-+        }
-+      }
-+      p2: (struct){
-+        b: (_|_){
-+          // [incomplete] reference.toWithinDefinition.p2.b: required field missing: a:
-+          //     ./in.cue:49:11
-+        }
-         #Foo: (#struct){
-           a!: (int){ int }
-         }
-@@ -70,16 +74,18 @@
-         #Foo: (#struct){
-           a!: (int){ int }
-         }
--        b: (#struct){
--          a!: (int){ int }
--        }
--        c: (int){ int }
--      }
--      p2: (struct){
--        c: (int){ int }
--        b: (#struct){
--          a!: (int){ int }
--        }
-+        b: ~(reference.toFieldFromDefinition.p1.#Foo)
-+        c: (_|_){
-+          // [incomplete] reference.toFieldFromDefinition.p1.c: required field missing: a:
-+          //     ./in.cue:55:8
-+        }
-+      }
-+      p2: (struct){
-+        c: (_|_){
-+          // [incomplete] reference.toFieldFromDefinition.p2.c: required field missing: a:
-+          //     ./in.cue:58:8
-+        }
-+        b: ~(reference.toFieldFromDefinition.p2.#Foo)
-         #Foo: (#struct){
-           a!: (int){ int }
-         }
-@@ -90,10 +96,16 @@
-         x: (struct){
-           y!: (_){ _ }
-         }
--        b: (_){ _ }
--      }
--      p2: (struct){
--        b: (_){ _ }
-+        b: (_|_){
-+          // [incomplete] reference.toNonDefinition.p1.b: required field missing: y:
-+          //     ./in.cue:64:8
-+        }
-+      }
-+      p2: (struct){
-+        b: (_|_){
-+          // [incomplete] reference.toNonDefinition.p2.b: required field missing: y:
-+          //     ./in.cue:67:8
-+        }
-         x: (struct){
-           y!: (_){ _ }
-         }
-@@ -102,11 +114,68 @@
-     toConcrete: (struct){
-       p1: (struct){
-         a!: (int){ 1 }
--        b: (int){ 2 }
--      }
--      p2: (struct){
--        b: (int){ 2 }
--        a!: (int){ 1 }
-+        b: (_|_){
-+          // [incomplete] reference.toConcrete.p1.b: required field missing: a:
-+          //     ./in.cue:72:6
-+        }
-+      }
-+      p2: (struct){
-+        b: (_|_){
-+          // [incomplete] reference.toConcrete.p2.b: required field missing: a:
-+          //     ./in.cue:75:6
-+        }
-+        a!: (int){ 1 }
-+      }
-+    }
-+  }
-+  issue3918: (struct){
-+    reduced: (struct){
-+      #disjuncts: (#struct){
-+        in!: (list){
-+        }
-+        out: (_|_){
-+          // [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
-+          //     ./issue3918.cue:9:21
-+        }
-+      }
-+      x: (string){ "foo|bar" }
-+    }
-+    noFunction: (struct){
-+      #disjuncts: (#struct){
-+        in!: (list){
-+        }
-+        out: (_|_){
-+          // [incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:
-+          //     ./issue3918.cue:21:8
-+        }
-+      }
-+      _foo: (#struct){
-+        in!: (list){
-+        }
-+        out: (_|_){
-+          // [incomplete] issue3918.noFunction._foo.out: required field missing: in:
-+          //     ./issue3918.cue:21:8
-+        }
-+      }
-+      x: (_|_){
-+        // [incomplete] issue3918.noFunction._foo.out: required field missing: in:
-+        //     ./issue3918.cue:21:8
-+      }
-+    }
-+  }
-+  doNotEscalateError: (struct){
-+    a: (struct){
-+      in: (_){ _ }
-+      out: (_|_){
-+        // [incomplete] doNotEscalateError.a.out: in.self undefined as in is incomplete (type _):
-+        //     ./issue3918.cue:31:8
-+      }
-+    }
-+    b: (struct){
-+      required!: (_){ _ }
-+      pass: (_|_){
-+        // [incomplete] doNotEscalateError.b.pass: undefined field: self:
-+        //     ./issue3918.cue:31:11
-       }
-     }
-   }
--- diff/todo/p2 --
-Missing position.
--- out/eval --
-(_|_){
-  // [eval]
-  self: (struct){
-    t1: (struct){
-      a?: (int){ int }
-    }
-    t2: (struct){
-      a!: (int){ int }
-    }
-  }
-  unify: (struct){
-    t1: (struct){
-      p1: (struct){
-        a: (int){ int }
-      }
-      p2: (struct){
-        a: (int){ int }
-      }
-    }
-    t2: (struct){
-      p1: (struct){
-        a!: (int){ int }
-      }
-      p2: (struct){
-        a!: (int){ int }
-      }
-    }
-  }
-  #Def: (#struct){
-    t1: (#struct){
-      a!: (int){ int }
-    }
-  }
-  allowed: (_|_){
-    // [eval]
-    issue2306: (_|_){
-      // [eval]
-      #A: (_|_){
-        // [eval]
-        a!: (_|_){
-          // [eval] allowed.issue2306.#A.a: field not allowed:
-          //     ./in.cue:34:6
-          //     ./in.cue:35:6
-          //     ./in.cue:37:6
-        }
-        b!: (int){ int }
-      }
-      #B: (#struct){
-        b!: (int){ int }
-      }
-    }
-  }
-  reference: (struct){
-    toWithinDefinition: (struct){
-      p1: (struct){
-        #Foo: (#struct){
-          a!: (int){ int }
-        }
-        b: (int){ int }
-      }
-      p2: (struct){
-        b: (int){ int }
-        #Foo: (#struct){
-          a!: (int){ int }
-        }
-      }
-    }
-    toFieldFromDefinition: (struct){
-      p1: (struct){
-        #Foo: (#struct){
-          a!: (int){ int }
-        }
-        b: (#struct){
-          a!: (int){ int }
-        }
-        c: (int){ int }
-      }
-      p2: (struct){
-        c: (int){ int }
-        b: (#struct){
-          a!: (int){ int }
-        }
-        #Foo: (#struct){
-          a!: (int){ int }
-        }
-      }
-    }
-    toNonDefinition: (struct){
-      p1: (struct){
-        x: (struct){
-          y!: (_){ _ }
-        }
-        b: (_){ _ }
-      }
-      p2: (struct){
-        b: (_){ _ }
-        x: (struct){
-          y!: (_){ _ }
-        }
-      }
-    }
-    toConcrete: (struct){
-      p1: (struct){
-        a!: (int){ 1 }
-        b: (int){ 2 }
-      }
-      p2: (struct){
-        b: (int){ 2 }
-        a!: (int){ 1 }
-      }
-    }
-  }
-}
+-- out/todo.txt --
+v3 reports incomplete errors for reference.toWithinDefinition, toFieldFromDefinition, toNonDefinition, toConcrete sub-fields (required field missing), whereas v2 resolved those fields to concrete values. v3 also shows structure sharing (~) for reference.toFieldFromDefinition.p1.b and p2.b.
+issue3918.noFunction.x: v3 evaluates x as a structure-shared reference to _foo.in (formatted as a bare identifier "in" that cannot be compiled standalone); the expected struct only asserts on #disjuncts and _foo.

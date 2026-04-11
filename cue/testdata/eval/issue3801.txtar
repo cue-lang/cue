@@ -1,5 +1,4 @@
 # This issue addresses evaluation in nested lets.
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- nested.cue --
 issue3801: let: reduced: {
 	let F = {
@@ -11,6 +10,7 @@ issue3801: let: reduced: {
 		filled: base & {in: "foo"} // failure is here
 	}
 	z: F.filled.out
+	@test(eq, {z: "foo"})
 }
 issue3801: nonRooted: reduced: {
 	#Output: output: {
@@ -22,12 +22,40 @@ issue3801: nonRooted: reduced: {
 		out: #base & {val0: "foo"}
 	}
 	out: (#Output & {}).output // non-concrete
+	@test(eq, {
+		#Output: {
+			output: {
+				#base: {
+					val0: string
+					msgObj: string
+					value: string
+				}
+				out: {
+					val0: "foo"
+					msgObj: "foo"
+					value: "foo"
+				}
+			}
+		}
+		out: {
+			#base: {
+				val0: string
+				msgObj: string
+				value: string
+			}
+			out: {
+				val0: "foo"
+				msgObj: "foo"
+				value: "foo"
+			}
+		}
+	})
 }
 issue3801: let: full: {
 	#Resource: {
 		someMsg: string
 		obs: {} | *{missing: true}
-	
+
 		let pickMsg = [
 			if obs.missing {msg: "\(someMsg)"},
 			{msg: "bar"},
@@ -38,7 +66,7 @@ issue3801: let: full: {
 			value: pickMsg.msg
 		}]
 	}
-	
+
 	#Patches: [string]: _
 	#JSONPatch: {
 		namespace?: string
@@ -53,22 +81,43 @@ issue3801: let: full: {
 		op:   "remove"
 		path: string
 	}
-	
+
 	#Main: {
 		NS=namespace: string
-	
+
 		output: jsonPatch.output
-	
+
 		let jsonPatch = #JSONPatch & {
 			let base = #Resource & {}
 			let withMsg = base & {someMsg: "foo"}
-	
+
 			namespace: NS
-	
+
 			patch: withMsg.patches
 		}
 	}
 	out: (#Main & {namespace: "ns1"}).output
+	@test(eq, {
+		#Resource: {
+			someMsg: string
+			obs: *{missing: true} | {}
+			patches: [{op: "add", path: "/metadata", value: _ @test(ignore)}]
+		}
+		#Patches: {}
+		#JSONPatch: {
+			namespace?: string
+			patch: []
+			output: _|_ @test(err, code=incomplete, contains="key value of dynamic field must be concrete", pos=[72:24])
+		}
+		#JSONOp: {op: "add", path: string, value: _} | {op: "remove", path: string}
+		#Main: {
+			namespace: string
+			output: #Patches & {(namespace): patch}
+		}
+		out: {
+			ns1: [{op: "add", path: "/metadata", value: "foo"}]
+		}
+	})
 }
 issue3801: nonRooted: full: {
 	#Output: {
@@ -83,19 +132,32 @@ issue3801: nonRooted: full: {
 		}).output
 	}
 	out: (#Output & {namespace: "ns1"}).output
-	
+
 	#SubOutput: {
 		namespace?: string
-	
+
 		patch: _
 		output: (namespace): patch
 	}
-	
+
 	#Base: {
 		val0: string
 		let msgObj = [val0][0]
 		value: msgObj
 	}
+	@test(eq, {
+		#Output: {
+			namespace: string
+			output: _|_ @test(err, code=incomplete, contains="issue3801.nonRooted.full.#Output.output: key value of dynamic field must be concrete, found string", pos=[138:12, 135:15])
+		}
+		out: {ns1: "foo"}
+		#SubOutput: {
+			namespace?: string
+			patch: _
+			output: _|_ @test(err, code=incomplete, contains="issue3801.nonRooted.full.#SubOutput.output: key value of dynamic field must be concrete, found _|_(issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace) (and 1 more errors)", pos=[138:12])
+		}
+		#Base: {val0: string, value: string}
+	})
 }
 -- out/eval/stats --
 Leaks:  40
@@ -109,544 +171,6 @@ Conjuncts:    327
 Disjuncts:    14
 
 NumCloseIDs: 77
--- out/evalalpha --
-(struct){
-  issue3801: (struct){
-    let: (struct){
-      reduced: (struct){
-        let F#1 = (struct){
-          base: (struct){
-            in: (string){ string }
-            let X#2 = (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:5:16
-              //     ./nested.cue:4:8
-            }
-            out: (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.out: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:5:16
-              //     ./nested.cue:4:8
-            }
-          }
-          filled: (struct){
-            in: (string){ "foo" }
-            let X#2 = (string){ "foo" }
-            out: (string){ "foo" }
-          }
-        }
-        z: (string){ "foo" }
-      }
-      full: (struct){
-        #Resource: (#struct){
-          someMsg: (string){ string }
-          obs: (#struct){ |(*(#struct){
-              missing: (bool){ true }
-            }, (#struct){
-            }) }
-          let pickMsg#4 = (#struct){
-            msg: (_|_){
-              // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:29:25
-              //     ./nested.cue:25:12
-            }
-          }
-          patches: (#list){
-            0: (#struct){
-              op: (string){ "add" }
-              path: (string){ "/metadata" }
-              value: (_|_){
-                // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                //     ./nested.cue:29:25
-                //     ./nested.cue:25:12
-              }
-            }
-          }
-        }
-        #Patches: (#struct){
-        }
-        #JSONPatch: (#struct){
-          namespace?: (string){ string }
-          patch: (list){
-          }
-          output: (_|_){
-            // [incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
-            //     ./nested.cue:43:24
-          }
-        }
-        #JSONOp: (#struct){ |((#struct){
-            op: (string){ "add" }
-            path: (string){ string }
-            value: (_){ _ }
-          }, (#struct){
-            op: (string){ "remove" }
-            path: (string){ string }
-          }) }
-        #Main: (#struct){
-          namespace: (string){ string }
-          output: (_|_){
-            // [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
-            //     ./nested.cue:43:24
-            //     ./nested.cue:41:15
-          }
-          let jsonPatch#5 = (#struct){
-            let base#8 = (#struct){
-              someMsg: (string){ string }
-              obs: (#struct){ |(*(#struct){
-                  missing: (bool){ true }
-                }, (#struct){
-                }) }
-              let pickMsg#4 = (#struct){
-                msg: (_|_){
-                  // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                  //     ./nested.cue:29:25
-                  //     ./nested.cue:25:12
-                }
-              }
-              patches: (#list){
-                0: (#struct){
-                  op: (string){ "add" }
-                  path: (string){ "/metadata" }
-                  value: (_|_){
-                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                    //     ./nested.cue:29:25
-                    //     ./nested.cue:25:12
-                  }
-                }
-              }
-            }
-            let withMsg#9 = (#struct){
-              someMsg: (string){ "foo" }
-              obs: (#struct){ |(*(#struct){
-                  missing: (bool){ true }
-                }, (#struct){
-                }) }
-              let pickMsg#4 = (#struct){
-                msg: (string){ "foo" }
-              }
-              patches: (#list){
-                0: (#struct){
-                  op: (string){ "add" }
-                  path: (string){ "/metadata" }
-                  value: (string){ "foo" }
-                }
-              }
-            }
-            namespace: (string){ string }
-            patch: (#list){
-              0: (#struct){
-                op: (string){ "add" }
-                path: (string){ "/metadata" }
-                value: (string){ "foo" }
-              }
-            }
-            output: (_|_){
-              // [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
-              //     ./nested.cue:43:24
-              //     ./nested.cue:41:15
-            }
-          }
-        }
-        out: (#struct){
-          ns1: (#list){
-            0: (#struct){
-              op: (string){ "add" }
-              path: (string){ "/metadata" }
-              value: (string){ "foo" }
-            }
-          }
-        }
-      }
-    }
-    nonRooted: (struct){
-      reduced: (struct){
-        #Output: (#struct){
-          output: (#struct){
-            #base: (#struct){
-              val0: (string){ string }
-              msgObj: (string){ string }
-              value: (string){ string }
-            }
-            out: (#struct){
-              val0: (string){ "foo" }
-              msgObj: (string){ "foo" }
-              value: (string){ "foo" }
-            }
-          }
-        }
-        out: (#struct){
-          #base: (#struct){
-            val0: (string){ string }
-            msgObj: (string){ string }
-            value: (string){ string }
-          }
-          out: (#struct){
-            val0: (string){ "foo" }
-            msgObj: (string){ "foo" }
-            value: (string){ "foo" }
-          }
-        }
-      }
-      full: (struct){
-        #Output: (#struct){
-          namespace: (string){ string }
-          output: (_|_){
-            // [incomplete] issue3801.nonRooted.full.#Output.output: key value of dynamic field must be concrete, found string:
-            //     ./nested.cue:88:12
-            //     ./nested.cue:85:15
-          }
-        }
-        out: (#struct){
-          ns1: (string){ "foo" }
-        }
-        #SubOutput: (#struct){
-          namespace?: (string){ string }
-          patch: (_){ _ }
-          output: (_|_){
-            // [incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
-            //     ./nested.cue:88:12
-          }
-        }
-        #Base: (#struct){
-          val0: (string){ string }
-          let msgObj#D = (string){ string }
-          value: (string){ string }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -43,7 +43,7 @@
-               op: (string){ "add" }
-               path: (string){ "/metadata" }
-               value: (_|_){
--                // [incomplete] issue3801.let.full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
-+                // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                 //     ./nested.cue:29:25
-                 //     ./nested.cue:25:12
-               }
-@@ -72,38 +72,11 @@
-         #Main: (#struct){
-           namespace: (string){ string }
-           output: (_|_){
--            // [incomplete] issue3801.let.full.#Main.output: invalid non-ground value string (must be concrete string):
-+            // [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
-+            //     ./nested.cue:43:24
-             //     ./nested.cue:41:15
--            //     ./nested.cue:63:15
--            _: (#list){
--              0: (#struct){
--                op: (string){ "add" }
--                path: (string){ "/metadata" }
--                value: (string){ "foo" }
--              }
--            }
-           }
-           let jsonPatch#5 = (#struct){
--            namespace: (string){ string }
--            patch: (#list){
--              0: (#struct){
--                op: (string){ "add" }
--                path: (string){ "/metadata" }
--                value: (string){ "foo" }
--              }
--            }
--            output: (_|_){
--              // [incomplete] issue3801.let.full.#Main.jsonPatch.output: invalid non-ground value string (must be concrete string):
--              //     ./nested.cue:41:15
--              //     ./nested.cue:63:15
--              _: (#list){
--                0: (#struct){
--                  op: (string){ "add" }
--                  path: (string){ "/metadata" }
--                  value: (string){ "foo" }
--                }
--              }
--            }
-             let base#8 = (#struct){
-               someMsg: (string){ string }
-               obs: (#struct){ |(*(#struct){
-@@ -122,7 +95,7 @@
-                   op: (string){ "add" }
-                   path: (string){ "/metadata" }
-                   value: (_|_){
--                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
-+                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                     //     ./nested.cue:29:25
-                     //     ./nested.cue:25:12
-                   }
-@@ -146,6 +119,19 @@
-                 }
-               }
-             }
-+            namespace: (string){ string }
-+            patch: (#list){
-+              0: (#struct){
-+                op: (string){ "add" }
-+                path: (string){ "/metadata" }
-+                value: (string){ "foo" }
-+              }
-+            }
-+            output: (_|_){
-+              // [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
-+              //     ./nested.cue:43:24
-+              //     ./nested.cue:41:15
-+            }
-           }
-         }
-         out: (#struct){
-@@ -175,7 +161,7 @@
-             }
-           }
-         }
--        out: (struct){
-+        out: (#struct){
-           #base: (#struct){
-             val0: (string){ string }
-             msgObj: (string){ string }
-@@ -192,13 +178,12 @@
-         #Output: (#struct){
-           namespace: (string){ string }
-           output: (_|_){
--            // [incomplete] issue3801.nonRooted.full.#Output.output: invalid non-ground value string (must be concrete string):
-+            // [incomplete] issue3801.nonRooted.full.#Output.output: key value of dynamic field must be concrete, found string:
-+            //     ./nested.cue:88:12
-             //     ./nested.cue:85:15
--            //     ./nested.cue:74:15
--            _: (string){ "foo" }
--          }
--        }
--        out: (struct){
-+          }
-+        }
-+        out: (#struct){
-           ns1: (string){ "foo" }
-         }
-         #SubOutput: (#struct){
--- out/eval --
-(struct){
-  issue3801: (struct){
-    let: (struct){
-      reduced: (struct){
-        let F#1 = (struct){
-          base: (struct){
-            in: (string){ string }
-            let X#2 = (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:5:16
-              //     ./nested.cue:4:8
-            }
-            out: (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.out: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:5:16
-              //     ./nested.cue:4:8
-            }
-          }
-          filled: (struct){
-            in: (string){ "foo" }
-            let X#2 = (string){ "foo" }
-            out: (string){ "foo" }
-          }
-        }
-        z: (string){ "foo" }
-      }
-      full: (struct){
-        #Resource: (#struct){
-          someMsg: (string){ string }
-          obs: (#struct){ |(*(#struct){
-              missing: (bool){ true }
-            }, (#struct){
-            }) }
-          let pickMsg#4 = (#struct){
-            msg: (_|_){
-              // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:29:25
-              //     ./nested.cue:25:12
-            }
-          }
-          patches: (#list){
-            0: (#struct){
-              op: (string){ "add" }
-              path: (string){ "/metadata" }
-              value: (_|_){
-                // [incomplete] issue3801.let.full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
-                //     ./nested.cue:29:25
-                //     ./nested.cue:25:12
-              }
-            }
-          }
-        }
-        #Patches: (#struct){
-        }
-        #JSONPatch: (#struct){
-          namespace?: (string){ string }
-          patch: (list){
-          }
-          output: (_|_){
-            // [incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
-            //     ./nested.cue:43:24
-          }
-        }
-        #JSONOp: (#struct){ |((#struct){
-            op: (string){ "add" }
-            path: (string){ string }
-            value: (_){ _ }
-          }, (#struct){
-            op: (string){ "remove" }
-            path: (string){ string }
-          }) }
-        #Main: (#struct){
-          namespace: (string){ string }
-          output: (_|_){
-            // [incomplete] issue3801.let.full.#Main.output: invalid non-ground value string (must be concrete string):
-            //     ./nested.cue:41:15
-            //     ./nested.cue:63:15
-            _: (#list){
-              0: (#struct){
-                op: (string){ "add" }
-                path: (string){ "/metadata" }
-                value: (string){ "foo" }
-              }
-            }
-          }
-          let jsonPatch#5 = (#struct){
-            namespace: (string){ string }
-            patch: (#list){
-              0: (#struct){
-                op: (string){ "add" }
-                path: (string){ "/metadata" }
-                value: (string){ "foo" }
-              }
-            }
-            output: (_|_){
-              // [incomplete] issue3801.let.full.#Main.jsonPatch.output: invalid non-ground value string (must be concrete string):
-              //     ./nested.cue:41:15
-              //     ./nested.cue:63:15
-              _: (#list){
-                0: (#struct){
-                  op: (string){ "add" }
-                  path: (string){ "/metadata" }
-                  value: (string){ "foo" }
-                }
-              }
-            }
-            let base#8 = (#struct){
-              someMsg: (string){ string }
-              obs: (#struct){ |(*(#struct){
-                  missing: (bool){ true }
-                }, (#struct){
-                }) }
-              let pickMsg#4 = (#struct){
-                msg: (_|_){
-                  // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                  //     ./nested.cue:29:25
-                  //     ./nested.cue:25:12
-                }
-              }
-              patches: (#list){
-                0: (#struct){
-                  op: (string){ "add" }
-                  path: (string){ "/metadata" }
-                  value: (_|_){
-                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
-                    //     ./nested.cue:29:25
-                    //     ./nested.cue:25:12
-                  }
-                }
-              }
-            }
-            let withMsg#9 = (#struct){
-              someMsg: (string){ "foo" }
-              obs: (#struct){ |(*(#struct){
-                  missing: (bool){ true }
-                }, (#struct){
-                }) }
-              let pickMsg#4 = (#struct){
-                msg: (string){ "foo" }
-              }
-              patches: (#list){
-                0: (#struct){
-                  op: (string){ "add" }
-                  path: (string){ "/metadata" }
-                  value: (string){ "foo" }
-                }
-              }
-            }
-          }
-        }
-        out: (#struct){
-          ns1: (#list){
-            0: (#struct){
-              op: (string){ "add" }
-              path: (string){ "/metadata" }
-              value: (string){ "foo" }
-            }
-          }
-        }
-      }
-    }
-    nonRooted: (struct){
-      reduced: (struct){
-        #Output: (#struct){
-          output: (#struct){
-            #base: (#struct){
-              val0: (string){ string }
-              msgObj: (string){ string }
-              value: (string){ string }
-            }
-            out: (#struct){
-              val0: (string){ "foo" }
-              msgObj: (string){ "foo" }
-              value: (string){ "foo" }
-            }
-          }
-        }
-        out: (struct){
-          #base: (#struct){
-            val0: (string){ string }
-            msgObj: (string){ string }
-            value: (string){ string }
-          }
-          out: (#struct){
-            val0: (string){ "foo" }
-            msgObj: (string){ "foo" }
-            value: (string){ "foo" }
-          }
-        }
-      }
-      full: (struct){
-        #Output: (#struct){
-          namespace: (string){ string }
-          output: (_|_){
-            // [incomplete] issue3801.nonRooted.full.#Output.output: invalid non-ground value string (must be concrete string):
-            //     ./nested.cue:85:15
-            //     ./nested.cue:74:15
-            _: (string){ "foo" }
-          }
-        }
-        out: (struct){
-          ns1: (string){ "foo" }
-        }
-        #SubOutput: (#struct){
-          namespace?: (string){ string }
-          patch: (_){ _ }
-          output: (_|_){
-            // [incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
-            //     ./nested.cue:88:12
-          }
-        }
-        #Base: (#struct){
-          val0: (string){ string }
-          let msgObj#D = (string){ string }
-          value: (string){ string }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- nested.cue
 {
@@ -789,3 +313,5 @@ diff old new
     }
   }
 }
+-- out/todo.txt --
+v3 differences in error messages and closedness for nonRooted.reduced.out (#struct vs struct).

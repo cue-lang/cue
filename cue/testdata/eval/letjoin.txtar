@@ -1,4 +1,3 @@
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 // Test that an error in a let that is merged with itself from two different
 // origins does not result in an error as long as the error is not referenced
@@ -22,6 +21,12 @@ t1: {
 	x2: a: 2
 
 	xy: x1.y & x2.y
+	@test(eq, {
+		x: {a: int, y: {v: 1}}
+		x1: {a: 1, y: {v: 1}}
+		x2: {a: 2, y: {v: 1}}
+		xy: {v: 1}
+	})
 }
 
 t2: {
@@ -43,6 +48,12 @@ t2: {
 	x2: a: r: 2
 
 	xy: x1 & x2
+	@test(eq, {
+		x: {a: {}, y: {v: 1}}
+		x1: {a: {q: 1}, y: {v: 1}}
+		x2: {a: {r: 2}, y: {v: 1}}
+		xy: {a: {q: 1, r: 2}, y: {v: 1}}
+	})
 }
 -- issue3590.cue --
 // Conflicting values in for loop with let expressions: two chained let bindings
@@ -69,35 +80,62 @@ issue3590: reduced: {
 
 		result: "conflicting-\(v.p)": Items
 	}
+	@test(eq, {
+		result: {
+			"conflicting-A": {item: "A"}
+			"conflicting-B": {item: "B"}
+		}
+		_input: {A: {p: "A"}, B: {p: "B"}}
+	})
 }
-issue3590: full: {
-	#Result: [_]: {[string]: string}
+issue3590: {
+	full: {
+		#Result: [_]: {[string]: string}
 
-	result: #Result
+		result: #Result
 
-	#Input: {
-		p: "A" | "B"
-	}
-
-	_input: [Parm=_]: #Input & {
-		p: Parm
-	}
-
-	_input: {
-		A: {}
-		B: {}
-	}
-
-	for _, v in _input {
-		let Var1 = v.p
-		let Var2 = Var1
-
-		let Items = {
-			"item": Var2
+		#Input: {
+			p: "A" | "B"
 		}
 
-		result: "conflicting-\(v.p)": Items
+		_input: [Parm=_]: #Input & {
+			p: Parm
+		}
+
+		_input: {
+			A: {}
+			B: {}
+		}
+
+		for _, v in _input {
+			let Var1 = v.p
+			let Var2 = Var1
+
+			let Items = {
+				"item": Var2
+			}
+
+			result: "conflicting-\(v.p)": Items
+		}
 	}
+	@test(eq, {
+		reduced: {
+			result: {
+				"conflicting-A": {item: "A"}
+				"conflicting-B": {item: "B"}
+			}
+			_input: {A: {p: "A"}, B: {p: "B"}}
+		}
+		full: {
+			#Result: {}
+			result: {
+				"conflicting-A": {item: "A"}
+				"conflicting-B": {item: "B"}
+			}
+			#Input: {p: "A" | "B"}
+			_input: {A: {p: "A"}, B: {p: "B"}}
+		}
+	})
 }
 // Issue #3591 is related
 // Missing items in for loop with let expressions: items produced inside a
@@ -107,37 +145,47 @@ issue3591: missing: {
 	#Result: [_]: {[string]: string}
 
 	result: #Result
-	
+
 	#Input: {
 		p: "A" | "B"
 	}
-	
+
 	_input: [Parm=_]: #Input & {
 		p: Parm
 	}
-	
+
 	_input: {
 		A: {}
 		B: {}
 	}
-	
+
 	for _, v in _input {
 		let Var1 = v.p
 		let Var2 = Var1
-	
+
 		let Items = {
 			"item": {
 				key1: Var2
 			}
 		}
-	
+
 		result: "missing-items-\(v.p)": {
 			for s, attr in Items {
 				if attr.key1 != _|_ {(s): attr.key1}
 			}
 		}
 	}
+	@test(eq, {
+		#Result: {}
+		result: {
+			"missing-items-A": {item: "A"}
+			"missing-items-B": {item: "B"}
+		}
+		#Input: {p: "A" | "B"}
+		_input: {A: {p: "A"}, B: {p: "B"}}
+	})
 }
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  54
 Freed:  139
@@ -150,524 +198,6 @@ Conjuncts:    328
 Disjuncts:    32
 
 NumCloseIDs: 87
--- out/evalalpha --
-(struct){
-  t1: (struct){
-    x: (struct){
-      a: (int){ int }
-      y: (struct){
-        let X#1 = (struct){
-          b: (int){ int }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    x1: (struct){
-      a: (int){ 1 }
-      y: (struct){
-        let X#1 = (struct){
-          b: (int){ 1 }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    x2: (struct){
-      a: (int){ 2 }
-      y: (struct){
-        let X#1 = (struct){
-          b: (int){ 2 }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    xy: (struct){
-      let X#1multi = {
-        b: 〈2;a〉
-        c: 1
-      }
-      v: (int){ 1 }
-    }
-  }
-  t2: (struct){
-    x: (struct){
-      a: (struct){
-      }
-      y: (struct){
-        let X#2 = (struct){
-          b: (struct){
-          }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    x1: (struct){
-      a: (struct){
-        q: (int){ 1 }
-      }
-      y: (struct){
-        let X#2 = (struct){
-          b: ~(t2.x1.a)
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    x2: (struct){
-      a: (struct){
-        r: (int){ 2 }
-      }
-      y: (struct){
-        let X#2 = (struct){
-          b: ~(t2.x2.a)
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    xy: (struct){
-      a: (struct){
-        q: (int){ 1 }
-        r: (int){ 2 }
-      }
-      y: (struct){
-        let X#2 = (struct){
-          b: ~(t2.xy.a)
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-  }
-  issue3590: (struct){
-    reduced: (struct){
-      result: (struct){
-        "conflicting-A": (struct){
-          item: (string){ "A" }
-        }
-        "conflicting-B": (struct){
-          item: (string){ "B" }
-        }
-      }
-      _input: (struct){
-        A: (struct){
-          p: (string){ "A" }
-        }
-        B: (struct){
-          p: (string){ "B" }
-        }
-      }
-      let Var1#3multi = 〈1;v〉.p
-      let Var2#4multi = 〈0;let Var1#3〉
-      let Items#5multi = {
-        item: 〈1;let Var2#4〉
-      }
-    }
-    full: (struct){
-      #Result: (#struct){
-      }
-      result: (#struct){
-        "conflicting-A": (#struct){
-          item: (string){ "A" }
-        }
-        "conflicting-B": (#struct){
-          item: (string){ "B" }
-        }
-      }
-      #Input: (#struct){
-        p: (string){ |((string){ "A" }, (string){ "B" }) }
-      }
-      _input: (struct){
-        A: (#struct){
-          p: (string){ "A" }
-        }
-        B: (#struct){
-          p: (string){ "B" }
-        }
-      }
-      let Var1#6multi = 〈1;v〉.p
-      let Var2#7multi = 〈0;let Var1#6〉
-      let Items#8multi = {
-        item: 〈1;let Var2#7〉
-      }
-    }
-  }
-  issue3591: (struct){
-    missing: (struct){
-      #Result: (#struct){
-      }
-      result: (#struct){
-        "missing-items-A": (#struct){
-          item: (string){ "A" }
-        }
-        "missing-items-B": (#struct){
-          item: (string){ "B" }
-        }
-      }
-      #Input: (#struct){
-        p: (string){ |((string){ "A" }, (string){ "B" }) }
-      }
-      _input: (struct){
-        A: (#struct){
-          p: (string){ "A" }
-        }
-        B: (#struct){
-          p: (string){ "B" }
-        }
-      }
-      let Var1#9multi = 〈1;v〉.p
-      let Var2#Amulti = 〈0;let Var1#9〉
-      let Items#Bmulti = {
-        item: {
-          key1: 〈2;let Var2#A〉
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -57,37 +57,33 @@
-       }
-       y: (struct){
-         let X#2 = (struct){
--          b: (struct){
--            q: (int){ 1 }
--          }
--          c: (int){ 1 }
--        }
--        v: (int){ 1 }
--      }
--    }
--    x2: (struct){
--      a: (struct){
--        r: (int){ 2 }
--      }
--      y: (struct){
--        let X#2 = (struct){
--          b: (struct){
--            r: (int){ 2 }
--          }
--          c: (int){ 1 }
--        }
--        v: (int){ 1 }
--      }
--    }
--    xy: (struct){
--      a: (struct){
--        q: (int){ 1 }
--        r: (int){ 2 }
--      }
--      y: (struct){
--        let X#2multi = {
--          b: 〈2;a〉
--          c: 1
-+          b: ~(t2.x1.a)
-+          c: (int){ 1 }
-+        }
-+        v: (int){ 1 }
-+      }
-+    }
-+    x2: (struct){
-+      a: (struct){
-+        r: (int){ 2 }
-+      }
-+      y: (struct){
-+        let X#2 = (struct){
-+          b: ~(t2.x2.a)
-+          c: (int){ 1 }
-+        }
-+        v: (int){ 1 }
-+      }
-+    }
-+    xy: (struct){
-+      a: (struct){
-+        q: (int){ 1 }
-+        r: (int){ 2 }
-+      }
-+      y: (struct){
-+        let X#2 = (struct){
-+          b: ~(t2.xy.a)
-+          c: (int){ 1 }
-         }
-         v: (int){ 1 }
-       }
-@@ -113,17 +109,8 @@
-       }
-       let Var1#3multi = 〈1;v〉.p
-       let Var2#4multi = 〈0;let Var1#3〉
--      let Items#5 = (_|_){
--        // [eval]
--        item: (_|_){
--          // [eval] issue3590.reduced.Items.item: conflicting values "B" and "A":
--          //     ./issue3590.cue:5:9
--          //     ./issue3590.cue:6:9
--          //     ./issue3590.cue:9:2
--          //     ./issue3590.cue:10:14
--          //     ./issue3590.cue:14:14
--          //     ./issue3590.cue:17:10
--        }
-+      let Items#5multi = {
-+        item: 〈1;let Var2#4〉
-       }
-     }
-     full: (struct){
-@@ -150,16 +137,8 @@
-       }
-       let Var1#6multi = 〈1;v〉.p
-       let Var2#7multi = 〈0;let Var1#6〉
--      let Items#8 = (_|_){
--        // [eval]
--        item: (_|_){
--          // [eval] issue3590.full.Items.item: conflicting values "B" and "A":
--          //     ./issue3590.cue:33:6
--          //     ./issue3590.cue:41:2
--          //     ./issue3590.cue:42:14
--          //     ./issue3590.cue:43:14
--          //     ./issue3590.cue:46:12
--        }
-+      let Items#8multi = {
-+        item: 〈1;let Var2#7〉
-       }
-     }
-   }
-@@ -188,18 +167,9 @@
-       }
-       let Var1#9multi = 〈1;v〉.p
-       let Var2#Amulti = 〈0;let Var1#9〉
--      let Items#B = (_|_){
--        // [eval]
--        item: (_|_){
--          // [eval]
--          key1: (_|_){
--            // [eval] issue3591.missing.Items.item.key1: conflicting values "B" and "A":
--            //     ./issue3590.cue:63:6
--            //     ./issue3590.cue:71:2
--            //     ./issue3590.cue:72:14
--            //     ./issue3590.cue:73:14
--            //     ./issue3590.cue:77:11
--          }
-+      let Items#Bmulti = {
-+        item: {
-+          key1: 〈2;let Var2#A〉
-         }
-       }
-     }
--- diff/todo/p4 --
-Reduce conjunct group size. Semantically correct, though.
--- out/eval --
-(struct){
-  t1: (struct){
-    x: (struct){
-      a: (int){ int }
-      y: (struct){
-        let X#1 = (struct){
-          b: (int){ int }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    x1: (struct){
-      a: (int){ 1 }
-      y: (struct){
-        let X#1 = (struct){
-          b: (int){ 1 }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    x2: (struct){
-      a: (int){ 2 }
-      y: (struct){
-        let X#1 = (struct){
-          b: (int){ 2 }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    xy: (struct){
-      let X#1multi = {
-        b: 〈2;a〉
-        c: 1
-      }
-      v: (int){ 1 }
-    }
-  }
-  t2: (struct){
-    x: (struct){
-      a: (struct){
-      }
-      y: (struct){
-        let X#2 = (struct){
-          b: (struct){
-          }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    x1: (struct){
-      a: (struct){
-        q: (int){ 1 }
-      }
-      y: (struct){
-        let X#2 = (struct){
-          b: (struct){
-            q: (int){ 1 }
-          }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    x2: (struct){
-      a: (struct){
-        r: (int){ 2 }
-      }
-      y: (struct){
-        let X#2 = (struct){
-          b: (struct){
-            r: (int){ 2 }
-          }
-          c: (int){ 1 }
-        }
-        v: (int){ 1 }
-      }
-    }
-    xy: (struct){
-      a: (struct){
-        q: (int){ 1 }
-        r: (int){ 2 }
-      }
-      y: (struct){
-        let X#2multi = {
-          b: 〈2;a〉
-          c: 1
-        }
-        v: (int){ 1 }
-      }
-    }
-  }
-  issue3590: (struct){
-    reduced: (struct){
-      result: (struct){
-        "conflicting-A": (struct){
-          item: (string){ "A" }
-        }
-        "conflicting-B": (struct){
-          item: (string){ "B" }
-        }
-      }
-      _input: (struct){
-        A: (struct){
-          p: (string){ "A" }
-        }
-        B: (struct){
-          p: (string){ "B" }
-        }
-      }
-      let Var1#3multi = 〈1;v〉.p
-      let Var2#4multi = 〈0;let Var1#3〉
-      let Items#5 = (_|_){
-        // [eval]
-        item: (_|_){
-          // [eval] issue3590.reduced.Items.item: conflicting values "B" and "A":
-          //     ./issue3590.cue:5:9
-          //     ./issue3590.cue:6:9
-          //     ./issue3590.cue:9:2
-          //     ./issue3590.cue:10:14
-          //     ./issue3590.cue:14:14
-          //     ./issue3590.cue:17:10
-        }
-      }
-    }
-    full: (struct){
-      #Result: (#struct){
-      }
-      result: (#struct){
-        "conflicting-A": (#struct){
-          item: (string){ "A" }
-        }
-        "conflicting-B": (#struct){
-          item: (string){ "B" }
-        }
-      }
-      #Input: (#struct){
-        p: (string){ |((string){ "A" }, (string){ "B" }) }
-      }
-      _input: (struct){
-        A: (#struct){
-          p: (string){ "A" }
-        }
-        B: (#struct){
-          p: (string){ "B" }
-        }
-      }
-      let Var1#6multi = 〈1;v〉.p
-      let Var2#7multi = 〈0;let Var1#6〉
-      let Items#8 = (_|_){
-        // [eval]
-        item: (_|_){
-          // [eval] issue3590.full.Items.item: conflicting values "B" and "A":
-          //     ./issue3590.cue:33:6
-          //     ./issue3590.cue:41:2
-          //     ./issue3590.cue:42:14
-          //     ./issue3590.cue:43:14
-          //     ./issue3590.cue:46:12
-        }
-      }
-    }
-  }
-  issue3591: (struct){
-    missing: (struct){
-      #Result: (#struct){
-      }
-      result: (#struct){
-        "missing-items-A": (#struct){
-          item: (string){ "A" }
-        }
-        "missing-items-B": (#struct){
-          item: (string){ "B" }
-        }
-      }
-      #Input: (#struct){
-        p: (string){ |((string){ "A" }, (string){ "B" }) }
-      }
-      _input: (struct){
-        A: (#struct){
-          p: (string){ "A" }
-        }
-        B: (#struct){
-          p: (string){ "B" }
-        }
-      }
-      let Var1#9multi = 〈1;v〉.p
-      let Var2#Amulti = 〈0;let Var1#9〉
-      let Items#B = (_|_){
-        // [eval]
-        item: (_|_){
-          // [eval]
-          key1: (_|_){
-            // [eval] issue3591.missing.Items.item.key1: conflicting values "B" and "A":
-            //     ./issue3590.cue:63:6
-            //     ./issue3590.cue:71:2
-            //     ./issue3590.cue:72:14
-            //     ./issue3590.cue:73:14
-            //     ./issue3590.cue:77:11
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -820,3 +350,5 @@ Reduce conjunct group size. Semantically correct, though.
     }
   }
 }
+-- out/todo.txt --
+v3 uses structure sharing (~) for let bindings in t2's x1/x2/xy. v2 incorrectly showed conflicting values errors for issue3590's let Items; v3 correctly handles chained let bindings in for comprehensions.

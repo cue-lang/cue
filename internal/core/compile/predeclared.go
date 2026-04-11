@@ -76,6 +76,21 @@ func predeclared(n *ast.Ident) adt.Expr {
 
 	case "__test_experiment":
 		return testExperiment
+
+	case "allows", "__allows":
+		return allows
+	case "exists", "__exists":
+		return exists
+	case "existsN", "__existsN":
+		return existN
+	case "isValid", "__isValid":
+		return isValid
+	case "validN", "__validN":
+		return validN
+	case "isConcrete", "__isConcrete":
+		return isConcrete
+	case "concreteN", "__concreteN":
+		return concreteN
 	}
 
 	if r, ok := predefinedRanges[n.Name]; ok {

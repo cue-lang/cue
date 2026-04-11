@@ -1,4 +1,7 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Cannot convert to inline @test format: the CUE source contains compile-time
+# errors (e.g. "struct-form try clause must be the last clause", "optional
+# marker (?) is only valid within a try clause", "reference not found") which
+# prevent the inline runner from compiling and loading the source file.
 -- in.cue --
 @experiment(try)
 

@@ -1,6 +1,5 @@
 # Tests that nested for comprehensions within field patterns work correctly.
 # The test uses a kubernetes-like structure with services and deployments.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 package kube
 
@@ -24,6 +23,17 @@ deployment: "node-exporter": {
 			}]
 		}
 	}
+	@test(eq, {
+		spec: template: spec: containers: [{
+			ports: [{
+				_export$kube: _ @test(ignore)
+				containerPort: 9100
+				name:          "scrape"
+			}]
+			name: string
+		}]
+		_name$kube: string
+	})
 }
 service: [ID=string]: {
 	spec: {
@@ -61,6 +71,39 @@ for k, v in deployment {
 		]
 	}
 }
+@test(eq, {
+	service: "node-exporter": spec: {
+		ports: [{
+			name:       "metrics"
+			port:       9100
+			protocol:   "TCP"
+			targetPort: *9100 | int
+		}]
+		selector: _|_ @test(err, code=incomplete, contains="service.\"node-exporter\".spec.selector: undefined field: metadata", pos=[59:35])
+	}
+	deployment: "node-exporter": {
+		spec: template: spec: containers: [{
+			ports: [{
+				containerPort: 9100
+				name:          "scrape"
+				_export$kube:  *true | false
+			}]
+			name: string
+		}]
+		_name$kube: string
+	}
+	_spec$kube: {
+		_name$kube: string
+		spec: template: spec: containers: [{
+			name: string
+			ports: []
+		}]
+	}
+})
+
+-- out/errors.txt --
+[incomplete] service."node-exporter".spec.selector: undefined field: metadata:
+    ./in.cue:59:35
 -- out/eval/stats --
 Leaks:  6
 Freed:  40
@@ -173,67 +216,6 @@ NumCloseIDs: 5
               targetPort: (*〈0;let Port#1〉|int)
             },
           ]
-        }
-      }
-    }
-  }
-}
--- out/evalalpha --
-(struct){
-  service: (struct){
-    "node-exporter": (struct){
-      spec: (struct){
-        ports: (#list){
-          0: (struct){
-            name: (string){ "metrics" }
-            port: (int){ 9100 }
-            protocol: (string){ "TCP" }
-            let Port#1 = (int){ 9100 }
-            targetPort: (int){ |(*(int){ 9100 }, (int){ int }) }
-          }
-        }
-        selector: (_|_){
-          // [incomplete] service."node-exporter".spec.selector: undefined field: metadata:
-          //     ./in.cue:48:35
-        }
-      }
-    }
-  }
-  deployment: (struct){
-    "node-exporter": (struct){
-      spec: (struct){
-        template: (struct){
-          spec: (struct){
-            containers: (#list){
-              0: (struct){
-                ports: (#list){
-                  0: (struct){
-                    containerPort: (int){ 9100 }
-                    name: (string){ "scrape" }
-                    _export(:kube): (bool){ |(*(bool){ true }, (bool){ false }) }
-                  }
-                }
-                name: (string){ string }
-              }
-            }
-          }
-        }
-      }
-      _name(:kube): (string){ string }
-    }
-  }
-  _spec(:kube): (struct){
-    _name(:kube): (string){ string }
-    spec: (struct){
-      template: (struct){
-        spec: (struct){
-          containers: (#list){
-            0: (struct){
-              name: (string){ string }
-              ports: (list){
-              }
-            }
-          }
         }
       }
     }

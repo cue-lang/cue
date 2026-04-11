@@ -1,7 +1,6 @@
 Issue #560
 # Issue #560: Tests that for comprehensions correctly iterate over struct fields,
 # skipping optionals, and that missing required fields produce errors.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"
@@ -13,6 +12,7 @@ dynamic: {
 		(s):       1
 		"\(s)bar": 2
 	}
+	@test(eq, {foo: 1, foobar: 2})
 }
 
 ignoreOptional: {
@@ -27,6 +27,10 @@ ignoreOptional: {
 			(k): "exists"
 		}
 	}
+	@test(eq, {
+		#x: {a?: string, b?: string, c: string}
+		y: {c: "exists"}
+	})
 }
 
 missingRequiredError:  {
@@ -42,6 +46,7 @@ missingRequiredError:  {
 			(k): "exists"
 		}
 	}
+	@test(err, code=incomplete, at=y, contains="missing required field", pos=[9:3, 3:3, 9:14])
 }
 
 // issue560: Tests that for comprehensions over definitions with interpolated
@@ -62,7 +67,29 @@ issue560: {
 		#User
 		tags_str: "b {c}"
 	}
+	@test(eq, {
+		#User: {
+			tags_str: string
+			tags_map: {"{a}": string}
+		}
+		user: {
+			tags_str: "b {c}"
+			tags_map: {
+				"{a}": string
+				b: string
+				"{c}": string
+			}
+		}
+	})
 }
+-- out/errors.txt --
+[incomplete] missingRequiredError.y: missing required field in for comprehension: a:
+    ./in.cue:38:3
+    ./in.cue:32:3
+    ./in.cue:38:14
+[incomplete] issue560.#User.tags_map: error in call to strings.Split: non-concrete value string:
+    ./in.cue:52:16
+    ./in.cue:50:13
 -- out/eval/stats --
 Leaks:  0
 Freed:  30
@@ -75,55 +102,6 @@ Conjuncts:    37
 Disjuncts:    0
 
 NumCloseIDs: 12
--- out/evalalpha --
-(struct){
-  dynamic: (struct){
-    foo: (int){ 1 }
-    foobar: (int){ 2 }
-  }
-  ignoreOptional: (struct){
-    #x: (#struct){
-      a?: (string){ string }
-      b?: (string){ string }
-      c: (string){ string }
-    }
-    y: (struct){
-      c: (string){ "exists" }
-    }
-  }
-  missingRequiredError: (struct){
-    #x: (#struct){
-      a!: (string){ string }
-      b?: (string){ string }
-      c: (string){ string }
-    }
-    y: (_|_){
-      // [incomplete] missingRequiredError.y: missing required field in for comprehension: a:
-      //     ./in.cue:33:3
-      //     ./in.cue:27:3
-      //     ./in.cue:33:14
-    }
-  }
-  issue560: (struct){
-    #User: (#struct){
-      tags_str: (string){ string }
-      tags_map: (_|_){
-        // [incomplete] issue560.#User.tags_map: error in call to strings.Split: non-concrete value string:
-        //     ./in.cue:46:16
-        //     ./in.cue:44:13
-        "{a}": (string){ string }
-      }
-    }
-    user: (#struct){
-      tags_str: (string){ "b {c}" }
-      tags_map: (#struct){
-        "{a}": (string){ string }
-        b: (string){ string }
-        "{c}": (string){ string }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -1,4 +1,6 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
+# Cannot convert to inline format: in.cue contains compile-time error expressions
+# (e.g., string arithmetic s+s, e5:<e5&s) which prevent the inline test runner
+# from compiling the source. Keep in golden-file format.
 -- in.cue --
 s: string
 

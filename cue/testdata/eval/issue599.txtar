@@ -2,7 +2,6 @@
 # inheritance and embedding using the & operator. The issue caused CUE to reject
 # fields that should be permitted under the merged schema definitions.
 # https://cuelang.org/issue/599
-#todo:inline: medium — large complex test with many interdependent fields
 -- in.cue --
 package deps
 
@@ -40,6 +39,35 @@ a: {
 		i: "hello bar"
 		depends_on: [s.foo]
 	}
+	@test(eq, {
+		#A: {n: string, depends_on: []}
+		#AnyA: {n: string, depends_on: []}
+		#A1: {
+			x: int
+			y: {z: string}
+			n: string
+			depends_on: []
+		}
+		#A2: {i: string, n: string, depends_on: []}
+		s: {
+			foo: {
+				x: 10
+				y: {z: "z"}
+				n: "foo"
+				depends_on: []
+			}
+			bar: {
+				i: "hello bar"
+				depends_on: [{
+		depends_on: []
+		n: "foo"
+		x: 10
+		y: z: "z"
+	}]
+				n: "bar"
+			}
+		}
+	})
 }
 
 b: {
@@ -63,6 +91,12 @@ b: {
 			d: foo: "bar"
 		}
 	}
+	@test(eq, {
+		#A: {f: {}}
+		#A1: {f: {}}
+		#C: {d: {}}
+		s: {foo: {f: {d: {foo: "bar"}}}}
+	})
 }
 -- out/eval/stats --
 Leaks:  0
@@ -81,234 +115,6 @@ ConjunctInfos:       87
 MaxConjunctInfos:    6
 MaxReqSets:          11
 MaxRedirect:         2
--- out/evalalpha --
-(struct){
-  a: (struct){
-    #A: (#struct){
-      n: (string){ string }
-      depends_on: (list){
-      }
-    }
-    #AnyA: (#struct){
-      n: (string){ string }
-      depends_on: (list){
-      }
-    }
-    #A1: (#struct){
-      x: (int){ int }
-      y: (#struct){
-        z: (string){ string }
-      }
-      n: (string){ string }
-      depends_on: (list){
-      }
-    }
-    #A2: (#struct){
-      i: (string){ string }
-      n: (string){ string }
-      depends_on: (list){
-      }
-    }
-    s: (struct){
-      foo: (#struct){
-        x: (int){ 10 }
-        y: (#struct){
-          z: (string){ "z" }
-        }
-        n: (string){ "foo" }
-        depends_on: (list){
-        }
-      }
-      bar: (#struct){
-        i: (string){ "hello bar" }
-        depends_on: (#list){
-          0: (#struct){
-            x: (int){ 10 }
-            y: (#struct){
-              z: (string){ "z" }
-            }
-            n: (string){ "foo" }
-            depends_on: (list){
-            }
-          }
-        }
-        n: (string){ "bar" }
-      }
-    }
-  }
-  b: (struct){
-    #A: (#struct){
-      f: (#struct){
-      }
-    }
-    #A1: (#struct){
-      f: (#struct){
-      }
-    }
-    #C: (#struct){
-      d: (#struct){
-      }
-    }
-    s: (struct){
-      foo: (#struct){
-        f: (#struct){
-          d: (#struct){
-            foo: (string){ "bar" }
-          }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -11,44 +11,44 @@
-       }
-     }
-     #A1: (#struct){
--      n: (string){ string }
--      depends_on: (list){
--      }
-       x: (int){ int }
-       y: (#struct){
-         z: (string){ string }
-       }
-+      n: (string){ string }
-+      depends_on: (list){
-+      }
-     }
-     #A2: (#struct){
--      n: (string){ string }
--      depends_on: (list){
--      }
-       i: (string){ string }
--    }
--    s: (struct){
--      foo: (#struct){
--        n: (string){ "foo" }
--        depends_on: (list){
--        }
-+      n: (string){ string }
-+      depends_on: (list){
-+      }
-+    }
-+    s: (struct){
-+      foo: (#struct){
-         x: (int){ 10 }
-         y: (#struct){
-           z: (string){ "z" }
-         }
-+        n: (string){ "foo" }
-+        depends_on: (list){
-+        }
-       }
-       bar: (#struct){
--        n: (string){ "bar" }
-+        i: (string){ "hello bar" }
-         depends_on: (#list){
-           0: (#struct){
--            n: (string){ "foo" }
--            depends_on: (list){
--            }
-             x: (int){ 10 }
-             y: (#struct){
-               z: (string){ "z" }
-             }
--          }
--        }
--        i: (string){ "hello bar" }
-+            n: (string){ "foo" }
-+            depends_on: (list){
-+            }
-+          }
-+        }
-+        n: (string){ "bar" }
-       }
-     }
-   }
--- diff/todo/p3 --
-Reordering
--- out/eval --
-(struct){
-  a: (struct){
-    #A: (#struct){
-      n: (string){ string }
-      depends_on: (list){
-      }
-    }
-    #AnyA: (#struct){
-      n: (string){ string }
-      depends_on: (list){
-      }
-    }
-    #A1: (#struct){
-      n: (string){ string }
-      depends_on: (list){
-      }
-      x: (int){ int }
-      y: (#struct){
-        z: (string){ string }
-      }
-    }
-    #A2: (#struct){
-      n: (string){ string }
-      depends_on: (list){
-      }
-      i: (string){ string }
-    }
-    s: (struct){
-      foo: (#struct){
-        n: (string){ "foo" }
-        depends_on: (list){
-        }
-        x: (int){ 10 }
-        y: (#struct){
-          z: (string){ "z" }
-        }
-      }
-      bar: (#struct){
-        n: (string){ "bar" }
-        depends_on: (#list){
-          0: (#struct){
-            n: (string){ "foo" }
-            depends_on: (list){
-            }
-            x: (int){ 10 }
-            y: (#struct){
-              z: (string){ "z" }
-            }
-          }
-        }
-        i: (string){ "hello bar" }
-      }
-    }
-  }
-  b: (struct){
-    #A: (#struct){
-      f: (#struct){
-      }
-    }
-    #A1: (#struct){
-      f: (#struct){
-      }
-    }
-    #C: (#struct){
-      d: (#struct){
-      }
-    }
-    s: (struct){
-      foo: (#struct){
-        f: (#struct){
-          d: (#struct){
-            foo: (string){ "bar" }
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -387,3 +193,5 @@ Reordering
     }
   }
 }
+-- out/todo.txt --
+Reordering of fields between v2 and v3.

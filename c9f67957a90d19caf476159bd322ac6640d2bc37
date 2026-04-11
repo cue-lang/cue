@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a8bea74_e897d046",
+        "filename": "cue/testdata/compile/fields.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T11:42:57Z",
+      "side": 0,
+      "message": "Do not remove if there is nothing to say or change.",
+      "revId": "c9f67957a90d19caf476159bd322ac6640d2bc37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

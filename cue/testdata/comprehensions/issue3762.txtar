@@ -1,6 +1,5 @@
 # Tests that comprehensions over intersections of hidden fields work correctly.
 # Issue #3762: for comprehensions over _a & _b where both have patterns.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 full: {
 	kube: node: n1: {
@@ -10,20 +9,41 @@ full: {
 			opts: {}
 		}
 	}
-	
+
 	_a: "l": {
 		_ba?: string
 		opts: {
 			if _ba != _|_ {b: (_ba)}
 		}
 	}
-	
+
 	for k, _ in _a & _b {
 		x: 5
 	}
-	
+
 	_a: [ID=_]: vms: [{ name: "hello" }]
 	_b: [ID=_]: vms: [{ name: "again" }]
+	@test(eq, {
+		kube: node: n1: {
+			_CL: "l"
+			_cs: l: {
+				opts: {}
+				_ba?: string
+				vms: [{
+					name: "hello"
+				}]
+			}
+		}
+		_a: l: {
+			_ba?: string
+			opts: {}
+			vms: [{
+				name: "hello"
+			}]
+		}
+		x: 5
+		_b: {}
+	})
 }
 reduced: p1: {
 	_cs: _a.l & {
@@ -39,12 +59,20 @@ reduced: p1: {
 		}
 		vms: "hello"
 	}
-	
+
 	_b: l: vms: "again"
-	
+
 	for k, _ in _a & _b {
 		x: 5
 	}
+	@test(eq, {
+		_cs: {opts: {}, _ba?: string, vms: "hello"}
+		_a: {
+			l: {_ba?: string, opts: {}, vms: "hello"}
+		}
+		_b: {l: {vms: "again"}}
+		x: 5
+	})
 }
 reduced: p2: {
 	for k, _ in _a & _b {
@@ -64,22 +92,36 @@ reduced: p2: {
 		}
 		vms: "hello"
 	}
-	
+
 	_b: l: vms: "again"
+	@test(eq, {
+		x: 5
+		_cs: {opts: {}, _ba?: string, vms: "hello"}
+		_a: {
+			l: {_ba?: string, opts: {}, vms: "hello"}
+		}
+		_b: {l: {vms: "again"}}
+	})
 }
 reference: {
 	_x: {
 		f: true
 	}
-	
+
 	_y: {
 		f: false
 	}
-	
+
 	for k, _ in _x & _y {
 		ok: true
 	}
+	@test(eq, {
+		_x: {f: true}
+		_y: {f: false}
+		ok: true
+	})
 }
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  6
 Freed:  74
@@ -92,235 +134,6 @@ Conjuncts:    107
 Disjuncts:    0
 
 NumCloseIDs: 25
--- out/evalalpha --
-(struct){
-  full: (struct){
-    kube: (struct){
-      node: (struct){
-        n1: (struct){
-          _CL: (string){ "l" }
-          _cs: (struct){
-            l: (struct){
-              opts: (struct){
-              }
-              _ba?: (string){ string }
-              vms: (#list){
-                0: (struct){
-                  name: (string){ "hello" }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    _a: (struct){
-      l: (struct){
-        _ba?: (string){ string }
-        opts: (struct){
-        }
-        vms: (#list){
-          0: (struct){
-            name: (string){ "hello" }
-          }
-        }
-      }
-    }
-    x: (int){ 5 }
-    _b: (struct){
-    }
-  }
-  reduced: (struct){
-    p1: (struct){
-      _cs: (struct){
-        opts: (struct){
-        }
-        _ba?: (string){ string }
-        vms: (string){ "hello" }
-      }
-      _a: (struct){
-        l: (struct){
-          _ba?: (string){ string }
-          opts: (struct){
-          }
-          vms: (string){ "hello" }
-        }
-      }
-      _b: (struct){
-        l: (struct){
-          vms: (string){ "again" }
-        }
-      }
-      x: (int){ 5 }
-    }
-    p2: (struct){
-      x: (int){ 5 }
-      _cs: (struct){
-        opts: (struct){
-        }
-        _ba?: (string){ string }
-        vms: (string){ "hello" }
-      }
-      _a: (struct){
-        l: (struct){
-          _ba?: (string){ string }
-          opts: (struct){
-          }
-          vms: (string){ "hello" }
-        }
-      }
-      _b: (struct){
-        l: (struct){
-          vms: (string){ "again" }
-        }
-      }
-    }
-  }
-  reference: (struct){
-    _x: (struct){
-      f: (bool){ true }
-    }
-    _y: (struct){
-      f: (bool){ false }
-    }
-    ok: (bool){ true }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -6,9 +6,9 @@
-           _CL: (string){ "l" }
-           _cs: (struct){
-             l: (struct){
--              _ba?: (string){ string }
-               opts: (struct){
-               }
-+              _ba?: (string){ string }
-               vms: (#list){
-                 0: (struct){
-                   name: (string){ "hello" }
-@@ -38,9 +38,9 @@
-   reduced: (struct){
-     p1: (struct){
-       _cs: (struct){
--        _ba?: (string){ string }
--        opts: (struct){
--        }
-+        opts: (struct){
-+        }
-+        _ba?: (string){ string }
-         vms: (string){ "hello" }
-       }
-       _a: (struct){
-@@ -61,9 +61,9 @@
-     p2: (struct){
-       x: (int){ 5 }
-       _cs: (struct){
--        _ba?: (string){ string }
--        opts: (struct){
--        }
-+        opts: (struct){
-+        }
-+        _ba?: (string){ string }
-         vms: (string){ "hello" }
-       }
-       _a: (struct){
--- out/eval --
-(struct){
-  full: (struct){
-    kube: (struct){
-      node: (struct){
-        n1: (struct){
-          _CL: (string){ "l" }
-          _cs: (struct){
-            l: (struct){
-              _ba?: (string){ string }
-              opts: (struct){
-              }
-              vms: (#list){
-                0: (struct){
-                  name: (string){ "hello" }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    _a: (struct){
-      l: (struct){
-        _ba?: (string){ string }
-        opts: (struct){
-        }
-        vms: (#list){
-          0: (struct){
-            name: (string){ "hello" }
-          }
-        }
-      }
-    }
-    x: (int){ 5 }
-    _b: (struct){
-    }
-  }
-  reduced: (struct){
-    p1: (struct){
-      _cs: (struct){
-        _ba?: (string){ string }
-        opts: (struct){
-        }
-        vms: (string){ "hello" }
-      }
-      _a: (struct){
-        l: (struct){
-          _ba?: (string){ string }
-          opts: (struct){
-          }
-          vms: (string){ "hello" }
-        }
-      }
-      _b: (struct){
-        l: (struct){
-          vms: (string){ "again" }
-        }
-      }
-      x: (int){ 5 }
-    }
-    p2: (struct){
-      x: (int){ 5 }
-      _cs: (struct){
-        _ba?: (string){ string }
-        opts: (struct){
-        }
-        vms: (string){ "hello" }
-      }
-      _a: (struct){
-        l: (struct){
-          _ba?: (string){ string }
-          opts: (struct){
-          }
-          vms: (string){ "hello" }
-        }
-      }
-      _b: (struct){
-        l: (struct){
-          vms: (string){ "again" }
-        }
-      }
-    }
-  }
-  reference: (struct){
-    _x: (struct){
-      f: (bool){ true }
-    }
-    _y: (struct){
-      f: (bool){ false }
-    }
-    ok: (bool){ true }
-  }
-}
 -- out/compile --
 --- in.cue
 {

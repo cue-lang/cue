@@ -1,8 +1,8 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 given: {
 	INC: USD: 2.0
 	USD: GBP: 3.0
+	@test(eq, {INC: {USD: 2.0}, USD: {GBP: 3.0}})
 }
 hydrated: {
 	for k, v in given {
@@ -13,6 +13,11 @@ hydrated: {
 			"\(k1)": "\(k)":  number
 		}
 	}
+	@test(eq, {
+		INC: {INC: 1.0, USD: 2.0}
+		USD: {USD: 1.0, INC: number, GBP: 3.0}
+		GBP: {GBP: 1.0, USD: number}
+	})
 }
 
 foo: {
@@ -22,6 +27,7 @@ foo: {
 			b: 20
 		}
 	}
+	@test(eq, {a: 10, b: 20})
 }
 
 indirectlyNested: {
@@ -33,6 +39,7 @@ indirectlyNested: {
 			}
 		}
 	}
+	@test(eq, {a: true, b: true})
 }
 
 directlyNestedEmpty: {
@@ -41,14 +48,16 @@ directlyNestedEmpty: {
 		if a {
 		}
 	}
+	@test(eq, {a: true})
 }
 
 directlyDoublyNestedEmpty: {
-	a: true 
+	a: true
 	if true {
 		if a {
 		}
 	}
+	@test(eq, {a: true})
 }
 
 indirectlyDoublyNestedEmpty: {
@@ -65,6 +74,7 @@ indirectlyDoublyNestedEmpty: {
 			}
 		}
 	}
+	@test(eq, {a: true, b: true})
 }
 
 indirectlyDoublyNested: {
@@ -79,6 +89,7 @@ indirectlyDoublyNested: {
 			c: 1
 		}
 	}
+	@test(eq, {a: true, c: 1, b: 1})
 }
 
 // This case used to trigger an over-aggressive deduplication.
@@ -96,10 +107,14 @@ issue1974: {
 			"\(k)": "\(vk)": vv
 		}
 	}
+	@test(eq, {
+		X: {foo: {bar: "", baz: ""}}
+		out: {foo: {bar: "", baz: ""}}
+	})
 }
 -- pending.cue --
 // Trigger notification while an arc is still pending.
-T: int
+T: int @test(eq, 1)
 for C in Y {
 	let X = C.M
 	T:  X.V
@@ -109,6 +124,7 @@ Y: x: {
 	for _ in M {
 		if true { M: {} }
 	}
+	@test(eq, {M: {V: 1}})
 }
 -- issue3940.cue --
 // issue3940: Tests that chained comprehension clauses do not trigger spurious
@@ -128,6 +144,17 @@ issue3940: reduced1: {
 			}
 		}
 	}
+
+	@test(eq, {
+		a: {
+			b: {
+				a: {b: {y: {a: {}, objects: {}}}}
+				objects: _|_ @test(err, code=incomplete, contains="issue3940.reduced1.a.b.objects: undefined field: objects", pos=[14:22])
+			}
+		}
+		X: {a: {}, objects: {}}
+		objects: _|_ @test(err, code=incomplete, contains="objects: undefined field: objects", pos=[14:22])
+	})
 }
 
 // Test nested comprehensions (with braces) - should work as before
@@ -145,6 +172,16 @@ issue3940: reduced2: {
 			}
 		}
 	}
+	@test(eq, {
+		a: {
+			b: {
+				a: {b: {y: {a: {}, objects: {}}}}
+				objects: _|_ @test(err, code=incomplete, contains="issue3940.reduced2.a.b.objects: undefined field: objects", pos=[42:22])
+			}
+		}
+		X: {a: {}, objects: {}}
+		objects: _|_ @test(err, code=incomplete, contains="objects: undefined field: objects", pos=[42:22])
+	})
 }
 issue3940: reduced3: {
 	a: E
@@ -154,6 +191,14 @@ issue3940: reduced3: {
 		i: {}
 		o: [for m in i for v in ({} & m).o {}]
 	}
+	@test(eq, {
+		a: {
+			i: {x: {i: {x: {i: {}, o: []}}, o: []}}
+			o: []
+		}
+		E: {i: {}, o: []}
+	})
+
 }
 issue3940: reduced4: {
 	out: Exporter & {
@@ -173,6 +218,24 @@ issue3940: reduced4: {
 			},
 		]
 	}
+	@test(eq, {
+		out: {
+			_imports: [{
+				objects: {}
+				#export: {
+					_imports: [{
+						#export: {
+							_imports: []
+							objects: []
+						}
+					}]
+					objects: []
+				}
+			}]
+			objects: []
+		}
+		Exporter: {_imports: [], objects: []}
+	})
 }
 issue3940: let: {
 	X
@@ -234,6 +297,85 @@ issue3940: full: {
 			},
 		]
 	}
+	@test(eq, at=out, {
+		_imports: [{
+			objects: branch: {
+				#conf: _ @test(ignore)
+				region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+			}
+			imports: [{
+				objects: leaf: {
+					#conf: _ @test(ignore)
+					region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+				}
+				#export: {
+					_objects: leaf: {
+						#conf: _ @test(ignore)
+						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+					}
+					#conf: _ @test(ignore)
+					_imports: []
+					objects: [{
+						leaf: {
+							#conf: _ @test(ignore)
+							region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+						}
+					}]
+				}
+			}]
+			#export: {
+				_objects: branch: {
+					#conf: _ @test(ignore)
+					region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+				}
+				_imports: [{
+					objects: leaf: {
+						#conf: _ @test(ignore)
+						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+					}
+					#export: {
+						_objects: leaf: {
+							#conf: _ @test(ignore)
+							region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+						}
+						#conf: _ @test(ignore)
+						_imports: []
+						objects: [{
+							leaf: {
+								#conf: _ @test(ignore)
+								region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+							}
+						}]
+					}
+				}]
+				#conf: _ @test(ignore)
+				objects: [{
+					branch: {
+						#conf: _ @test(ignore)
+						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+					}
+				}, {
+					leaf: {
+						#conf: _ @test(ignore)
+						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+					}
+				}]
+			}
+		}]
+		#conf: {global: {region: "Europe"}}
+		_objects: {}
+		objects: [{
+			branch: {
+				#conf: {global: {region: "Europe"}}
+				region: "Europe"
+			}
+		}, {
+			leaf: {
+				#conf: {global: {region: "Europe"}}
+				region: "Europe"
+			}
+		}]
+	})
 }
 -- issue3990.cue --
 // issue3990: Tests that nested comprehensions within struct definitions do not
@@ -268,7 +410,105 @@ issue3990: {
 			volumeNames: [for _, v in _names {v}]
 		}
 	}
+	@test(eq, {
+		_imports: [{
+			name: "noVolumes"
+			exportObjs: deployment: {volumes: [], _names: {}}
+		}, {
+			name: "someVolumes"
+			exportObjs: deployment: {
+				_names: {data: "data"}
+				volumeNames: ["data"]
+				volumes: [{
+					name: "data"
+				}]
+			}
+		}]
+		_noVolumes: {
+			name: "noVolumes"
+			exportObjs: {deployment: {volumes: [], _names: {}}}
+		}
+		_someVolumes: {
+			name: "someVolumes"
+			exportObjs: {
+				deployment: {
+					volumes: [{ name: "data" }]
+					_names: {data: "data"}
+					volumeNames: ["data"]
+				}
+			}
+		}
+		_Deployment: {
+			_names: _|_ @test(err, code=incomplete, contains="issue3990._Deployment._names: undefined field: volumes", pos=[24:21])
+		}
+		someVolumes: {
+			volumes: [{ name: "data" }]
+			_names: {data: "data"}
+			volumeNames: ["data"]
+		}
+		noVolumes: {volumes: [], _names: {}}
+	})
 }
+-- out/errors.txt --
+[incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
+    ./issue3940.cue:14:22
+[incomplete] objects: undefined field: objects:
+    ./issue3940.cue:14:22
+[incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
+    ./issue3940.cue:42:22
+[incomplete] objects: undefined field: objects:
+    ./issue3940.cue:42:22
+[incomplete] issue3940.let.a.b.objects: undefined field: objects:
+    ./issue3940.cue:122:15
+[incomplete] objects: undefined field: objects:
+    ./issue3940.cue:122:15
+[incomplete] issue3940.full.out._imports.0.objects.branch.region: undefined field: global:
+    ./issue3940.cue:136:18
+[incomplete] issue3940.full.out._imports.0.imports.0.objects.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full.out._imports.0.imports.0.#export._objects.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full.out._imports.0.imports.0.#export.objects.0.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full.out._imports.0.#export._objects.branch.region: undefined field: global:
+    ./issue3940.cue:136:18
+[incomplete] issue3940.full.out._imports.0.#export._imports.0.objects.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full.out._imports.0.#export._imports.0.#export._objects.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full.out._imports.0.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full.out._imports.0.#export.objects.0.branch.region: undefined field: global:
+    ./issue3940.cue:136:18
+[incomplete] issue3940.full.out._imports.0.#export.objects.1.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full._branch.objects.branch.region: undefined field: global:
+    ./issue3940.cue:136:18
+[incomplete] issue3940.full._branch.#export._objects.branch.region: undefined field: global:
+    ./issue3940.cue:136:18
+[incomplete] issue3940.full._branch.#export._imports.0.objects.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full._branch.#export._imports.0.#export._objects.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full._branch.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full._branch.#export.objects.0.branch.region: undefined field: global:
+    ./issue3940.cue:136:18
+[incomplete] issue3940.full._branch.#export.objects.1.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full._leaf.objects.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full._leaf.#export._objects.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3940.full._leaf.#export.objects.0.leaf.region: undefined field: global:
+    ./issue3940.cue:147:18
+[incomplete] issue3990._Deployment._names: undefined field: volumes:
+    ./issue3990.cue:24:21
+-- out/todo.txt --
+v3 uses structure sharing (~) for several fields in issue3940 and issue3990,
+showing them as shared references rather than expanded inline values.
+In particular issue3940.reduced1/2/let show y: ~(X), issue3990 shows _imports
+elements as shared references.
 -- out/eval/stats --
 Leaks:  16
 Freed:  414
@@ -282,1879 +522,6 @@ Disjuncts:    0
 Notifications: 5
 
 NumCloseIDs: 217
--- out/evalalpha --
-(struct){
-  given: (struct){
-    INC: (struct){
-      USD: (float){ 2.0 }
-    }
-    USD: (struct){
-      GBP: (float){ 3.0 }
-    }
-  }
-  hydrated: (struct){
-    INC: (struct){
-      INC: (float){ 1.0 }
-      USD: (float){ 2.0 }
-    }
-    USD: (struct){
-      USD: (float){ 1.0 }
-      INC: (number){ number }
-      GBP: (float){ 3.0 }
-    }
-    GBP: (struct){
-      GBP: (float){ 1.0 }
-      USD: (number){ number }
-    }
-  }
-  foo: (struct){
-    a: (int){ 10 }
-    b: (int){ 20 }
-  }
-  indirectlyNested: (struct){
-    a: (bool){ true }
-    b: (bool){ true }
-  }
-  directlyNestedEmpty: (struct){
-    a: (bool){ true }
-  }
-  directlyDoublyNestedEmpty: (struct){
-    a: (bool){ true }
-  }
-  indirectlyDoublyNestedEmpty: (struct){
-    a: (bool){ true }
-    b: (bool){ true }
-  }
-  indirectlyDoublyNested: (struct){
-    a: (bool){ true }
-    c: (int){ 1 }
-    b: (int){ 1 }
-  }
-  issue1974: (struct){
-    X: (struct){
-      foo: (struct){
-        bar: (string){ "" }
-        baz: (string){ "" }
-      }
-    }
-    out: (struct){
-      foo: (struct){
-        bar: (string){ "" }
-        baz: (string){ "" }
-      }
-    }
-  }
-  issue3940: (struct){
-    reduced1: (struct){
-      a: (struct){
-        b: (struct){
-          a: (struct){
-            b: (struct){
-              y: ~(issue3940.reduced1.X)
-            }
-          }
-          objects: (_|_){
-            // [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:14:22
-          }
-        }
-      }
-      X: (struct){
-        a: (struct){
-        }
-        objects: (struct){
-        }
-      }
-      objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:14:22
-      }
-    }
-    reduced2: (struct){
-      a: (struct){
-        b: (struct){
-          a: (struct){
-            b: (struct){
-              y: ~(issue3940.reduced2.X)
-            }
-          }
-          objects: (_|_){
-            // [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:31:22
-          }
-        }
-      }
-      X: (struct){
-        a: (struct){
-        }
-        objects: (struct){
-        }
-      }
-      objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:31:22
-      }
-    }
-    reduced3: (struct){
-      a: (struct){
-        i: (struct){
-          x: (struct){
-            i: (struct){
-              x: ~(issue3940.reduced3.E)
-            }
-            o: (#list){
-            }
-          }
-        }
-        o: (#list){
-        }
-      }
-      E: (struct){
-        i: (struct){
-        }
-        o: (#list){
-        }
-      }
-    }
-    reduced4: (struct){
-      out: (struct){
-        _imports: (#list){
-          0: (struct){
-            objects: (struct){
-            }
-            #export: (#struct){
-              _imports: (#list){
-                0: (#struct){
-                  #export: (#struct){
-                    _imports: (list){
-                    }
-                    objects: (#list){
-                    }
-                  }
-                }
-              }
-              objects: (#list){
-              }
-            }
-          }
-        }
-        objects: (#list){
-        }
-      }
-      Exporter: (struct){
-        _imports: (list){
-        }
-        objects: (#list){
-        }
-      }
-    }
-    let: (struct){
-      a: (struct){
-        b: (struct){
-          a: (struct){
-            b: (struct){
-              y: ~(issue3940.let.X)
-            }
-          }
-          objects: (_|_){
-            // [incomplete] issue3940.let.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:75:15
-          }
-        }
-      }
-      X: (struct){
-        a: (struct){
-        }
-        objects: (struct){
-        }
-      }
-      objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:75:15
-      }
-    }
-    full: (struct){
-      out: (#struct){
-        _imports: (#list){
-          0: (#struct){
-            objects: (#struct){
-              branch: (#struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full.out._imports.0.objects.branch.region: undefined field: global:
-                  //     ./issue3940.cue:89:18
-                }
-              }
-            }
-            imports: (#list){
-              0: (#struct){
-                objects: (#struct){
-                  leaf: (#struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full.out._imports.0.imports.0.objects.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:100:18
-                    }
-                  }
-                }
-                #export: (#struct){
-                  _objects: (#struct){
-                    leaf: (#struct){
-                      #conf: (#struct){
-                      }
-                      region: (_|_){
-                        // [incomplete] issue3940.full.out._imports.0.imports.0.#export._objects.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:100:18
-                      }
-                    }
-                  }
-                  #conf: (#struct){
-                  }
-                  _imports: (list){
-                  }
-                  objects: (#list){
-                    0: (#struct){
-                      leaf: (#struct){
-                        #conf: (#struct){
-                        }
-                        region: (_|_){
-                          // [incomplete] issue3940.full.out._imports.0.imports.0.#export.objects.0.leaf.region: undefined field: global:
-                          //     ./issue3940.cue:100:18
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            #export: (#struct){
-              _objects: (#struct){
-                branch: (#struct){
-                  #conf: (#struct){
-                  }
-                  region: (_|_){
-                    // [incomplete] issue3940.full.out._imports.0.#export._objects.branch.region: undefined field: global:
-                    //     ./issue3940.cue:89:18
-                  }
-                }
-              }
-              _imports: (#list){
-                0: (#struct){
-                  objects: (#struct){
-                    leaf: (#struct){
-                      #conf: (#struct){
-                      }
-                      region: (_|_){
-                        // [incomplete] issue3940.full.out._imports.0.#export._imports.0.objects.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:100:18
-                      }
-                    }
-                  }
-                  #export: (#struct){
-                    _objects: (#struct){
-                      leaf: (#struct){
-                        #conf: (#struct){
-                        }
-                        region: (_|_){
-                          // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export._objects.leaf.region: undefined field: global:
-                          //     ./issue3940.cue:100:18
-                        }
-                      }
-                    }
-                    #conf: (#struct){
-                    }
-                    _imports: (list){
-                    }
-                    objects: (#list){
-                      0: (#struct){
-                        leaf: (#struct){
-                          #conf: (#struct){
-                          }
-                          region: (_|_){
-                            // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
-                            //     ./issue3940.cue:100:18
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              #conf: (#struct){
-              }
-              objects: (#list){
-                0: (#struct){
-                  branch: (#struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full.out._imports.0.#export.objects.0.branch.region: undefined field: global:
-                      //     ./issue3940.cue:89:18
-                    }
-                  }
-                }
-                1: (#struct){
-                  leaf: (#struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full.out._imports.0.#export.objects.1.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:100:18
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        #conf: (#struct){
-          global: (#struct){
-            region: (string){ "Europe" }
-          }
-        }
-        _objects: (#struct){
-        }
-        objects: (#list){
-          0: (#struct){
-            branch: (#struct){
-              #conf: (#struct){
-                global: (#struct){
-                  region: (string){ "Europe" }
-                }
-              }
-              region: (string){ "Europe" }
-            }
-          }
-          1: (#struct){
-            leaf: (#struct){
-              #conf: (#struct){
-                global: (#struct){
-                  region: (string){ "Europe" }
-                }
-              }
-              region: (string){ "Europe" }
-            }
-          }
-        }
-      }
-      _branch: (struct){
-        objects: (struct){
-          branch: (struct){
-            #conf: (#struct){
-            }
-            region: (_|_){
-              // [incomplete] issue3940.full._branch.objects.branch.region: undefined field: global:
-              //     ./issue3940.cue:89:18
-            }
-          }
-        }
-        imports: (#list){
-          0: ~(issue3940.full._leaf)
-        }
-        #export: (#struct){
-          _objects: (#struct){
-            branch: (#struct){
-              #conf: (#struct){
-              }
-              region: (_|_){
-                // [incomplete] issue3940.full._branch.#export._objects.branch.region: undefined field: global:
-                //     ./issue3940.cue:89:18
-              }
-            }
-          }
-          _imports: (#list){
-            0: (#struct){
-              objects: (#struct){
-                leaf: (#struct){
-                  #conf: (#struct){
-                  }
-                  region: (_|_){
-                    // [incomplete] issue3940.full._branch.#export._imports.0.objects.leaf.region: undefined field: global:
-                    //     ./issue3940.cue:100:18
-                  }
-                }
-              }
-              #export: (#struct){
-                _objects: (#struct){
-                  leaf: (#struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full._branch.#export._imports.0.#export._objects.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:100:18
-                    }
-                  }
-                }
-                #conf: (#struct){
-                }
-                _imports: (list){
-                }
-                objects: (#list){
-                  0: (#struct){
-                    leaf: (#struct){
-                      #conf: (#struct){
-                      }
-                      region: (_|_){
-                        // [incomplete] issue3940.full._branch.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:100:18
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          #conf: (#struct){
-          }
-          objects: (#list){
-            0: (#struct){
-              branch: (#struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full._branch.#export.objects.0.branch.region: undefined field: global:
-                  //     ./issue3940.cue:89:18
-                }
-              }
-            }
-            1: (#struct){
-              leaf: (#struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full._branch.#export.objects.1.leaf.region: undefined field: global:
-                  //     ./issue3940.cue:100:18
-                }
-              }
-            }
-          }
-        }
-      }
-      _leaf: (struct){
-        objects: (struct){
-          leaf: (struct){
-            #conf: (#struct){
-            }
-            region: (_|_){
-              // [incomplete] issue3940.full._leaf.objects.leaf.region: undefined field: global:
-              //     ./issue3940.cue:100:18
-            }
-          }
-        }
-        #export: (#struct){
-          _objects: (#struct){
-            leaf: (#struct){
-              #conf: (#struct){
-              }
-              region: (_|_){
-                // [incomplete] issue3940.full._leaf.#export._objects.leaf.region: undefined field: global:
-                //     ./issue3940.cue:100:18
-              }
-            }
-          }
-          #conf: (#struct){
-          }
-          _imports: (list){
-          }
-          objects: (#list){
-            0: (#struct){
-              leaf: (#struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full._leaf.#export.objects.0.leaf.region: undefined field: global:
-                  //     ./issue3940.cue:100:18
-                }
-              }
-            }
-          }
-        }
-      }
-      #Exporter: (#struct){
-        #conf: (#struct){
-        }
-        _objects: (#struct){
-        }
-        _imports: (list){
-        }
-        objects: (#list){
-        }
-      }
-    }
-  }
-  issue3990: (struct){
-    _imports: (#list){
-      0: ~(issue3990._noVolumes)
-      1: ~(issue3990._someVolumes)
-    }
-    _noVolumes: (struct){
-      name: (string){ "noVolumes" }
-      exportObjs: (struct){
-        deployment: (struct){
-          volumes: (#list){
-          }
-          _names: (struct){
-          }
-        }
-      }
-    }
-    _someVolumes: (struct){
-      name: (string){ "someVolumes" }
-      exportObjs: (struct){
-        deployment: (struct){
-          volumes: (#list){
-            0: (struct){
-              name: (string){ "data" }
-            }
-          }
-          _names: (struct){
-            data: (string){ "data" }
-          }
-          volumeNames: (#list){
-            0: (string){ "data" }
-          }
-        }
-      }
-    }
-    _Deployment: (_|_){
-      // [incomplete] issue3990._Deployment._names: undefined field: volumes:
-      //     ./issue3990.cue:24:21
-      _names: (_|_){
-        // [incomplete] issue3990._Deployment._names: undefined field: volumes:
-        //     ./issue3990.cue:24:21
-      }
-    }
-    someVolumes: (struct){
-      volumes: (#list){
-        0: (struct){
-          name: (string){ "data" }
-        }
-      }
-      _names: (struct){
-        data: (string){ "data" }
-      }
-      volumeNames: (#list){
-        0: (string){ "data" }
-      }
-    }
-    noVolumes: (struct){
-      volumes: (#list){
-      }
-      _names: (struct){
-      }
-    }
-  }
-  T: (int){ 1 }
-  let X#1multi = 〈1;C〉.M
-  Y: (struct){
-    x: (struct){
-      M: (struct){
-        V: (int){ 1 }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -65,29 +65,24 @@
-         b: (struct){
-           a: (struct){
-             b: (struct){
--              y: (struct){
--                a: (struct){
--                }
--                objects: (struct){
--                }
--              }
-+              y: ~(issue3940.reduced1.X)
-             }
-           }
-           objects: (_|_){
-             // [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
--            //     ./issue3940.cue:12:22
--          }
--        }
--      }
--      X: (struct){
--        a: (struct){
--        }
--        objects: (struct){
--        }
--      }
--      objects: (_|_){
--        // [incomplete] objects: undefined field: objects:
--        //     ./issue3940.cue:12:22
-+            //     ./issue3940.cue:14:22
-+          }
-+        }
-+      }
-+      X: (struct){
-+        a: (struct){
-+        }
-+        objects: (struct){
-+        }
-+      }
-+      objects: (_|_){
-+        // [incomplete] objects: undefined field: objects:
-+        //     ./issue3940.cue:14:22
-       }
-     }
-     reduced2: (struct){
-@@ -95,29 +90,24 @@
-         b: (struct){
-           a: (struct){
-             b: (struct){
--              y: (struct){
--                a: (struct){
--                }
--                objects: (struct){
--                }
--              }
-+              y: ~(issue3940.reduced2.X)
-             }
-           }
-           objects: (_|_){
-             // [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
--            //     ./issue3940.cue:29:22
--          }
--        }
--      }
--      X: (struct){
--        a: (struct){
--        }
--        objects: (struct){
--        }
--      }
--      objects: (_|_){
--        // [incomplete] objects: undefined field: objects:
--        //     ./issue3940.cue:29:22
-+            //     ./issue3940.cue:31:22
-+          }
-+        }
-+      }
-+      X: (struct){
-+        a: (struct){
-+        }
-+        objects: (struct){
-+        }
-+      }
-+      objects: (_|_){
-+        // [incomplete] objects: undefined field: objects:
-+        //     ./issue3940.cue:31:22
-       }
-     }
-     reduced3: (struct){
-@@ -125,12 +115,7 @@
-         i: (struct){
-           x: (struct){
-             i: (struct){
--              x: (struct){
--                i: (struct){
--                }
--                o: (#list){
--                }
--              }
-+              x: ~(issue3940.reduced3.E)
-             }
-             o: (#list){
-             }
-@@ -183,67 +168,53 @@
-         b: (struct){
-           a: (struct){
-             b: (struct){
--              y: (struct){
--                a: (struct){
--                }
--                objects: (struct){
--                }
--              }
-+              y: ~(issue3940.let.X)
-             }
-           }
-           objects: (_|_){
-             // [incomplete] issue3940.let.a.b.objects: undefined field: objects:
--            //     ./issue3940.cue:73:15
--          }
--        }
--      }
--      X: (struct){
--        a: (struct){
--        }
--        objects: (struct){
--        }
--      }
--      objects: (_|_){
--        // [incomplete] objects: undefined field: objects:
--        //     ./issue3940.cue:73:15
-+            //     ./issue3940.cue:75:15
-+          }
-+        }
-+      }
-+      X: (struct){
-+        a: (struct){
-+        }
-+        objects: (struct){
-+        }
-+      }
-+      objects: (_|_){
-+        // [incomplete] objects: undefined field: objects:
-+        //     ./issue3940.cue:75:15
-       }
-     }
-     full: (struct){
-       out: (#struct){
--        #conf: (#struct){
--          global: (#struct){
--            region: (string){ "Europe" }
--          }
--        }
--        _objects: (#struct){
--        }
--        _imports: (#list){
--          0: (struct){
--            objects: (struct){
--              branch: (struct){
-+        _imports: (#list){
-+          0: (#struct){
-+            objects: (#struct){
-+              branch: (#struct){
-                 #conf: (#struct){
-                 }
-                 region: (_|_){
-                   // [incomplete] issue3940.full.out._imports.0.objects.branch.region: undefined field: global:
--                  //     ./issue3940.cue:87:18
-+                  //     ./issue3940.cue:89:18
-                 }
-               }
-             }
-             imports: (#list){
--              0: (struct){
--                objects: (struct){
--                  leaf: (struct){
-+              0: (#struct){
-+                objects: (#struct){
-+                  leaf: (#struct){
-                     #conf: (#struct){
-                     }
-                     region: (_|_){
-                       // [incomplete] issue3940.full.out._imports.0.imports.0.objects.leaf.region: undefined field: global:
--                      //     ./issue3940.cue:98:18
-+                      //     ./issue3940.cue:100:18
-                     }
-                   }
-                 }
-                 #export: (#struct){
--                  #conf: (#struct){
--                  }
-                   _objects: (#struct){
-                     leaf: (#struct){
-                       #conf: (#struct){
-@@ -250,9 +221,11 @@
-                       }
-                       region: (_|_){
-                         // [incomplete] issue3940.full.out._imports.0.imports.0.#export._objects.leaf.region: undefined field: global:
--                        //     ./issue3940.cue:98:18
--                      }
--                    }
-+                        //     ./issue3940.cue:100:18
-+                      }
-+                    }
-+                  }
-+                  #conf: (#struct){
-                   }
-                   _imports: (list){
-                   }
-@@ -263,17 +236,15 @@
-                         }
-                         region: (_|_){
-                           // [incomplete] issue3940.full.out._imports.0.imports.0.#export.objects.0.leaf.region: undefined field: global:
--                          //     ./issue3940.cue:98:18
--                        }
--                      }
--                    }
--                  }
--                }
--              }
--            }
--            #export: (#struct){
--              #conf: (#struct){
--              }
-+                          //     ./issue3940.cue:100:18
-+                        }
-+                      }
-+                    }
-+                  }
-+                }
-+              }
-+            }
-+            #export: (#struct){
-               _objects: (#struct){
-                 branch: (#struct){
-                   #conf: (#struct){
-@@ -280,7 +251,7 @@
-                   }
-                   region: (_|_){
-                     // [incomplete] issue3940.full.out._imports.0.#export._objects.branch.region: undefined field: global:
--                    //     ./issue3940.cue:87:18
-+                    //     ./issue3940.cue:89:18
-                   }
-                 }
-               }
-@@ -292,13 +263,11 @@
-                       }
-                       region: (_|_){
-                         // [incomplete] issue3940.full.out._imports.0.#export._imports.0.objects.leaf.region: undefined field: global:
--                        //     ./issue3940.cue:98:18
--                      }
--                    }
--                  }
--                  #export: (#struct){
--                    #conf: (#struct){
--                    }
-+                        //     ./issue3940.cue:100:18
-+                      }
-+                    }
-+                  }
-+                  #export: (#struct){
-                     _objects: (#struct){
-                       leaf: (#struct){
-                         #conf: (#struct){
-@@ -305,9 +274,11 @@
-                         }
-                         region: (_|_){
-                           // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export._objects.leaf.region: undefined field: global:
--                          //     ./issue3940.cue:98:18
--                        }
--                      }
-+                          //     ./issue3940.cue:100:18
-+                        }
-+                      }
-+                    }
-+                    #conf: (#struct){
-                     }
-                     _imports: (list){
-                     }
-@@ -318,13 +289,15 @@
-                           }
-                           region: (_|_){
-                             // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
--                            //     ./issue3940.cue:98:18
--                          }
--                        }
--                      }
--                    }
--                  }
--                }
-+                            //     ./issue3940.cue:100:18
-+                          }
-+                        }
-+                      }
-+                    }
-+                  }
-+                }
-+              }
-+              #conf: (#struct){
-               }
-               objects: (#list){
-                 0: (#struct){
-@@ -333,7 +306,7 @@
-                     }
-                     region: (_|_){
-                       // [incomplete] issue3940.full.out._imports.0.#export.objects.0.branch.region: undefined field: global:
--                      //     ./issue3940.cue:87:18
-+                      //     ./issue3940.cue:89:18
-                     }
-                   }
-                 }
-@@ -343,13 +316,20 @@
-                     }
-                     region: (_|_){
-                       // [incomplete] issue3940.full.out._imports.0.#export.objects.1.leaf.region: undefined field: global:
--                      //     ./issue3940.cue:98:18
--                    }
--                  }
--                }
--              }
--            }
--          }
-+                      //     ./issue3940.cue:100:18
-+                    }
-+                  }
-+                }
-+              }
-+            }
-+          }
-+        }
-+        #conf: (#struct){
-+          global: (#struct){
-+            region: (string){ "Europe" }
-+          }
-+        }
-+        _objects: (#struct){
-         }
-         objects: (#list){
-           0: (#struct){
-@@ -381,55 +361,14 @@
-             }
-             region: (_|_){
-               // [incomplete] issue3940.full._branch.objects.branch.region: undefined field: global:
--              //     ./issue3940.cue:87:18
-+              //     ./issue3940.cue:89:18
-             }
-           }
-         }
-         imports: (#list){
--          0: (struct){
--            objects: (struct){
--              leaf: (struct){
--                #conf: (#struct){
--                }
--                region: (_|_){
--                  // [incomplete] issue3940.full._branch.imports.0.objects.leaf.region: undefined field: global:
--                  //     ./issue3940.cue:98:18
--                }
--              }
--            }
--            #export: (#struct){
--              #conf: (#struct){
--              }
--              _objects: (#struct){
--                leaf: (#struct){
--                  #conf: (#struct){
--                  }
--                  region: (_|_){
--                    // [incomplete] issue3940.full._branch.imports.0.#export._objects.leaf.region: undefined field: global:
--                    //     ./issue3940.cue:98:18
--                  }
--                }
--              }
--              _imports: (list){
--              }
--              objects: (#list){
--                0: (#struct){
--                  leaf: (#struct){
--                    #conf: (#struct){
--                    }
--                    region: (_|_){
--                      // [incomplete] issue3940.full._branch.imports.0.#export.objects.0.leaf.region: undefined field: global:
--                      //     ./issue3940.cue:98:18
--                    }
--                  }
--                }
--              }
--            }
--          }
--        }
--        #export: (#struct){
--          #conf: (#struct){
--          }
-+          0: ~(issue3940.full._leaf)
-+        }
-+        #export: (#struct){
-           _objects: (#struct){
-             branch: (#struct){
-               #conf: (#struct){
-@@ -436,7 +375,7 @@
-               }
-               region: (_|_){
-                 // [incomplete] issue3940.full._branch.#export._objects.branch.region: undefined field: global:
--                //     ./issue3940.cue:87:18
-+                //     ./issue3940.cue:89:18
-               }
-             }
-           }
-@@ -448,13 +387,11 @@
-                   }
-                   region: (_|_){
-                     // [incomplete] issue3940.full._branch.#export._imports.0.objects.leaf.region: undefined field: global:
--                    //     ./issue3940.cue:98:18
-+                    //     ./issue3940.cue:100:18
-                   }
-                 }
-               }
-               #export: (#struct){
--                #conf: (#struct){
--                }
-                 _objects: (#struct){
-                   leaf: (#struct){
-                     #conf: (#struct){
-@@ -461,9 +398,11 @@
-                     }
-                     region: (_|_){
-                       // [incomplete] issue3940.full._branch.#export._imports.0.#export._objects.leaf.region: undefined field: global:
--                      //     ./issue3940.cue:98:18
--                    }
--                  }
-+                      //     ./issue3940.cue:100:18
-+                    }
-+                  }
-+                }
-+                #conf: (#struct){
-                 }
-                 _imports: (list){
-                 }
-@@ -474,13 +413,15 @@
-                       }
-                       region: (_|_){
-                         // [incomplete] issue3940.full._branch.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
--                        //     ./issue3940.cue:98:18
--                      }
--                    }
--                  }
--                }
--              }
--            }
-+                        //     ./issue3940.cue:100:18
-+                      }
-+                    }
-+                  }
-+                }
-+              }
-+            }
-+          }
-+          #conf: (#struct){
-           }
-           objects: (#list){
-             0: (#struct){
-@@ -489,7 +430,7 @@
-                 }
-                 region: (_|_){
-                   // [incomplete] issue3940.full._branch.#export.objects.0.branch.region: undefined field: global:
--                  //     ./issue3940.cue:87:18
-+                  //     ./issue3940.cue:89:18
-                 }
-               }
-             }
-@@ -499,7 +440,7 @@
-                 }
-                 region: (_|_){
-                   // [incomplete] issue3940.full._branch.#export.objects.1.leaf.region: undefined field: global:
--                  //     ./issue3940.cue:98:18
-+                  //     ./issue3940.cue:100:18
-                 }
-               }
-             }
-@@ -513,13 +454,11 @@
-             }
-             region: (_|_){
-               // [incomplete] issue3940.full._leaf.objects.leaf.region: undefined field: global:
--              //     ./issue3940.cue:98:18
--            }
--          }
--        }
--        #export: (#struct){
--          #conf: (#struct){
--          }
-+              //     ./issue3940.cue:100:18
-+            }
-+          }
-+        }
-+        #export: (#struct){
-           _objects: (#struct){
-             leaf: (#struct){
-               #conf: (#struct){
-@@ -526,9 +465,11 @@
-               }
-               region: (_|_){
-                 // [incomplete] issue3940.full._leaf.#export._objects.leaf.region: undefined field: global:
--                //     ./issue3940.cue:98:18
--              }
--            }
-+                //     ./issue3940.cue:100:18
-+              }
-+            }
-+          }
-+          #conf: (#struct){
-           }
-           _imports: (list){
-           }
-@@ -539,7 +480,7 @@
-                 }
-                 region: (_|_){
-                   // [incomplete] issue3940.full._leaf.#export.objects.0.leaf.region: undefined field: global:
--                  //     ./issue3940.cue:98:18
-+                  //     ./issue3940.cue:100:18
-                 }
-               }
-             }
-@@ -560,43 +501,16 @@
-   }
-   issue3990: (struct){
-     _imports: (#list){
--      0: (struct){
--        name: (string){ "noVolumes" }
--        exportObjs: (struct){
--          deployment: (struct){
--            _names: (struct){
--            }
--            volumes: (#list){
--            }
--          }
--        }
--      }
--      1: (struct){
--        name: (string){ "someVolumes" }
--        exportObjs: (struct){
--          deployment: (struct){
--            _names: (struct){
--              data: (string){ "data" }
--            }
--            volumeNames: (#list){
--              0: (string){ "data" }
--            }
--            volumes: (#list){
--              0: (struct){
--                name: (string){ "data" }
--              }
--            }
--          }
--        }
--      }
-+      0: ~(issue3990._noVolumes)
-+      1: ~(issue3990._someVolumes)
-     }
-     _noVolumes: (struct){
-       name: (string){ "noVolumes" }
-       exportObjs: (struct){
-         deployment: (struct){
--          _names: (struct){
--          }
--          volumes: (#list){
-+          volumes: (#list){
-+          }
-+          _names: (struct){
-           }
-         }
-       }
-@@ -605,6 +519,11 @@
-       name: (string){ "someVolumes" }
-       exportObjs: (struct){
-         deployment: (struct){
-+          volumes: (#list){
-+            0: (struct){
-+              name: (string){ "data" }
-+            }
-+          }
-           _names: (struct){
-             data: (string){ "data" }
-           }
-@@ -611,29 +530,23 @@
-           volumeNames: (#list){
-             0: (string){ "data" }
-           }
--          volumes: (#list){
--            0: (struct){
--              name: (string){ "data" }
--            }
--          }
-         }
-       }
-     }
-     _Deployment: (_|_){
-       // [incomplete] issue3990._Deployment._names: undefined field: volumes:
--      //     ./issue3990.cue:21:21
-+      //     ./issue3990.cue:24:21
-       _names: (_|_){
-         // [incomplete] issue3990._Deployment._names: undefined field: volumes:
--        //     ./issue3990.cue:21:21
--      }
--    }
--    noVolumes: (struct){
--      _names: (struct){
--      }
--      volumes: (#list){
-+        //     ./issue3990.cue:24:21
-       }
-     }
-     someVolumes: (struct){
-+      volumes: (#list){
-+        0: (struct){
-+          name: (string){ "data" }
-+        }
-+      }
-       _names: (struct){
-         data: (string){ "data" }
-       }
-@@ -640,10 +553,11 @@
-       volumeNames: (#list){
-         0: (string){ "data" }
-       }
--      volumes: (#list){
--        0: (struct){
--          name: (string){ "data" }
--        }
-+    }
-+    noVolumes: (struct){
-+      volumes: (#list){
-+      }
-+      _names: (struct){
-       }
-     }
-   }
--- out/eval --
-(struct){
-  given: (struct){
-    INC: (struct){
-      USD: (float){ 2.0 }
-    }
-    USD: (struct){
-      GBP: (float){ 3.0 }
-    }
-  }
-  hydrated: (struct){
-    INC: (struct){
-      INC: (float){ 1.0 }
-      USD: (float){ 2.0 }
-    }
-    USD: (struct){
-      USD: (float){ 1.0 }
-      INC: (number){ number }
-      GBP: (float){ 3.0 }
-    }
-    GBP: (struct){
-      GBP: (float){ 1.0 }
-      USD: (number){ number }
-    }
-  }
-  foo: (struct){
-    a: (int){ 10 }
-    b: (int){ 20 }
-  }
-  indirectlyNested: (struct){
-    a: (bool){ true }
-    b: (bool){ true }
-  }
-  directlyNestedEmpty: (struct){
-    a: (bool){ true }
-  }
-  directlyDoublyNestedEmpty: (struct){
-    a: (bool){ true }
-  }
-  indirectlyDoublyNestedEmpty: (struct){
-    a: (bool){ true }
-    b: (bool){ true }
-  }
-  indirectlyDoublyNested: (struct){
-    a: (bool){ true }
-    c: (int){ 1 }
-    b: (int){ 1 }
-  }
-  issue1974: (struct){
-    X: (struct){
-      foo: (struct){
-        bar: (string){ "" }
-        baz: (string){ "" }
-      }
-    }
-    out: (struct){
-      foo: (struct){
-        bar: (string){ "" }
-        baz: (string){ "" }
-      }
-    }
-  }
-  issue3940: (struct){
-    reduced1: (struct){
-      a: (struct){
-        b: (struct){
-          a: (struct){
-            b: (struct){
-              y: (struct){
-                a: (struct){
-                }
-                objects: (struct){
-                }
-              }
-            }
-          }
-          objects: (_|_){
-            // [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:12:22
-          }
-        }
-      }
-      X: (struct){
-        a: (struct){
-        }
-        objects: (struct){
-        }
-      }
-      objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:12:22
-      }
-    }
-    reduced2: (struct){
-      a: (struct){
-        b: (struct){
-          a: (struct){
-            b: (struct){
-              y: (struct){
-                a: (struct){
-                }
-                objects: (struct){
-                }
-              }
-            }
-          }
-          objects: (_|_){
-            // [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:29:22
-          }
-        }
-      }
-      X: (struct){
-        a: (struct){
-        }
-        objects: (struct){
-        }
-      }
-      objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:29:22
-      }
-    }
-    reduced3: (struct){
-      a: (struct){
-        i: (struct){
-          x: (struct){
-            i: (struct){
-              x: (struct){
-                i: (struct){
-                }
-                o: (#list){
-                }
-              }
-            }
-            o: (#list){
-            }
-          }
-        }
-        o: (#list){
-        }
-      }
-      E: (struct){
-        i: (struct){
-        }
-        o: (#list){
-        }
-      }
-    }
-    reduced4: (struct){
-      out: (struct){
-        _imports: (#list){
-          0: (struct){
-            objects: (struct){
-            }
-            #export: (#struct){
-              _imports: (#list){
-                0: (#struct){
-                  #export: (#struct){
-                    _imports: (list){
-                    }
-                    objects: (#list){
-                    }
-                  }
-                }
-              }
-              objects: (#list){
-              }
-            }
-          }
-        }
-        objects: (#list){
-        }
-      }
-      Exporter: (struct){
-        _imports: (list){
-        }
-        objects: (#list){
-        }
-      }
-    }
-    let: (struct){
-      a: (struct){
-        b: (struct){
-          a: (struct){
-            b: (struct){
-              y: (struct){
-                a: (struct){
-                }
-                objects: (struct){
-                }
-              }
-            }
-          }
-          objects: (_|_){
-            // [incomplete] issue3940.let.a.b.objects: undefined field: objects:
-            //     ./issue3940.cue:73:15
-          }
-        }
-      }
-      X: (struct){
-        a: (struct){
-        }
-        objects: (struct){
-        }
-      }
-      objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
-        //     ./issue3940.cue:73:15
-      }
-    }
-    full: (struct){
-      out: (#struct){
-        #conf: (#struct){
-          global: (#struct){
-            region: (string){ "Europe" }
-          }
-        }
-        _objects: (#struct){
-        }
-        _imports: (#list){
-          0: (struct){
-            objects: (struct){
-              branch: (struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full.out._imports.0.objects.branch.region: undefined field: global:
-                  //     ./issue3940.cue:87:18
-                }
-              }
-            }
-            imports: (#list){
-              0: (struct){
-                objects: (struct){
-                  leaf: (struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full.out._imports.0.imports.0.objects.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:98:18
-                    }
-                  }
-                }
-                #export: (#struct){
-                  #conf: (#struct){
-                  }
-                  _objects: (#struct){
-                    leaf: (#struct){
-                      #conf: (#struct){
-                      }
-                      region: (_|_){
-                        // [incomplete] issue3940.full.out._imports.0.imports.0.#export._objects.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:98:18
-                      }
-                    }
-                  }
-                  _imports: (list){
-                  }
-                  objects: (#list){
-                    0: (#struct){
-                      leaf: (#struct){
-                        #conf: (#struct){
-                        }
-                        region: (_|_){
-                          // [incomplete] issue3940.full.out._imports.0.imports.0.#export.objects.0.leaf.region: undefined field: global:
-                          //     ./issue3940.cue:98:18
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            #export: (#struct){
-              #conf: (#struct){
-              }
-              _objects: (#struct){
-                branch: (#struct){
-                  #conf: (#struct){
-                  }
-                  region: (_|_){
-                    // [incomplete] issue3940.full.out._imports.0.#export._objects.branch.region: undefined field: global:
-                    //     ./issue3940.cue:87:18
-                  }
-                }
-              }
-              _imports: (#list){
-                0: (#struct){
-                  objects: (#struct){
-                    leaf: (#struct){
-                      #conf: (#struct){
-                      }
-                      region: (_|_){
-                        // [incomplete] issue3940.full.out._imports.0.#export._imports.0.objects.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:98:18
-                      }
-                    }
-                  }
-                  #export: (#struct){
-                    #conf: (#struct){
-                    }
-                    _objects: (#struct){
-                      leaf: (#struct){
-                        #conf: (#struct){
-                        }
-                        region: (_|_){
-                          // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export._objects.leaf.region: undefined field: global:
-                          //     ./issue3940.cue:98:18
-                        }
-                      }
-                    }
-                    _imports: (list){
-                    }
-                    objects: (#list){
-                      0: (#struct){
-                        leaf: (#struct){
-                          #conf: (#struct){
-                          }
-                          region: (_|_){
-                            // [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
-                            //     ./issue3940.cue:98:18
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              objects: (#list){
-                0: (#struct){
-                  branch: (#struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full.out._imports.0.#export.objects.0.branch.region: undefined field: global:
-                      //     ./issue3940.cue:87:18
-                    }
-                  }
-                }
-                1: (#struct){
-                  leaf: (#struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full.out._imports.0.#export.objects.1.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:98:18
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        objects: (#list){
-          0: (#struct){
-            branch: (#struct){
-              #conf: (#struct){
-                global: (#struct){
-                  region: (string){ "Europe" }
-                }
-              }
-              region: (string){ "Europe" }
-            }
-          }
-          1: (#struct){
-            leaf: (#struct){
-              #conf: (#struct){
-                global: (#struct){
-                  region: (string){ "Europe" }
-                }
-              }
-              region: (string){ "Europe" }
-            }
-          }
-        }
-      }
-      _branch: (struct){
-        objects: (struct){
-          branch: (struct){
-            #conf: (#struct){
-            }
-            region: (_|_){
-              // [incomplete] issue3940.full._branch.objects.branch.region: undefined field: global:
-              //     ./issue3940.cue:87:18
-            }
-          }
-        }
-        imports: (#list){
-          0: (struct){
-            objects: (struct){
-              leaf: (struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full._branch.imports.0.objects.leaf.region: undefined field: global:
-                  //     ./issue3940.cue:98:18
-                }
-              }
-            }
-            #export: (#struct){
-              #conf: (#struct){
-              }
-              _objects: (#struct){
-                leaf: (#struct){
-                  #conf: (#struct){
-                  }
-                  region: (_|_){
-                    // [incomplete] issue3940.full._branch.imports.0.#export._objects.leaf.region: undefined field: global:
-                    //     ./issue3940.cue:98:18
-                  }
-                }
-              }
-              _imports: (list){
-              }
-              objects: (#list){
-                0: (#struct){
-                  leaf: (#struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full._branch.imports.0.#export.objects.0.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:98:18
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        #export: (#struct){
-          #conf: (#struct){
-          }
-          _objects: (#struct){
-            branch: (#struct){
-              #conf: (#struct){
-              }
-              region: (_|_){
-                // [incomplete] issue3940.full._branch.#export._objects.branch.region: undefined field: global:
-                //     ./issue3940.cue:87:18
-              }
-            }
-          }
-          _imports: (#list){
-            0: (#struct){
-              objects: (#struct){
-                leaf: (#struct){
-                  #conf: (#struct){
-                  }
-                  region: (_|_){
-                    // [incomplete] issue3940.full._branch.#export._imports.0.objects.leaf.region: undefined field: global:
-                    //     ./issue3940.cue:98:18
-                  }
-                }
-              }
-              #export: (#struct){
-                #conf: (#struct){
-                }
-                _objects: (#struct){
-                  leaf: (#struct){
-                    #conf: (#struct){
-                    }
-                    region: (_|_){
-                      // [incomplete] issue3940.full._branch.#export._imports.0.#export._objects.leaf.region: undefined field: global:
-                      //     ./issue3940.cue:98:18
-                    }
-                  }
-                }
-                _imports: (list){
-                }
-                objects: (#list){
-                  0: (#struct){
-                    leaf: (#struct){
-                      #conf: (#struct){
-                      }
-                      region: (_|_){
-                        // [incomplete] issue3940.full._branch.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
-                        //     ./issue3940.cue:98:18
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          objects: (#list){
-            0: (#struct){
-              branch: (#struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full._branch.#export.objects.0.branch.region: undefined field: global:
-                  //     ./issue3940.cue:87:18
-                }
-              }
-            }
-            1: (#struct){
-              leaf: (#struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full._branch.#export.objects.1.leaf.region: undefined field: global:
-                  //     ./issue3940.cue:98:18
-                }
-              }
-            }
-          }
-        }
-      }
-      _leaf: (struct){
-        objects: (struct){
-          leaf: (struct){
-            #conf: (#struct){
-            }
-            region: (_|_){
-              // [incomplete] issue3940.full._leaf.objects.leaf.region: undefined field: global:
-              //     ./issue3940.cue:98:18
-            }
-          }
-        }
-        #export: (#struct){
-          #conf: (#struct){
-          }
-          _objects: (#struct){
-            leaf: (#struct){
-              #conf: (#struct){
-              }
-              region: (_|_){
-                // [incomplete] issue3940.full._leaf.#export._objects.leaf.region: undefined field: global:
-                //     ./issue3940.cue:98:18
-              }
-            }
-          }
-          _imports: (list){
-          }
-          objects: (#list){
-            0: (#struct){
-              leaf: (#struct){
-                #conf: (#struct){
-                }
-                region: (_|_){
-                  // [incomplete] issue3940.full._leaf.#export.objects.0.leaf.region: undefined field: global:
-                  //     ./issue3940.cue:98:18
-                }
-              }
-            }
-          }
-        }
-      }
-      #Exporter: (#struct){
-        #conf: (#struct){
-        }
-        _objects: (#struct){
-        }
-        _imports: (list){
-        }
-        objects: (#list){
-        }
-      }
-    }
-  }
-  issue3990: (struct){
-    _imports: (#list){
-      0: (struct){
-        name: (string){ "noVolumes" }
-        exportObjs: (struct){
-          deployment: (struct){
-            _names: (struct){
-            }
-            volumes: (#list){
-            }
-          }
-        }
-      }
-      1: (struct){
-        name: (string){ "someVolumes" }
-        exportObjs: (struct){
-          deployment: (struct){
-            _names: (struct){
-              data: (string){ "data" }
-            }
-            volumeNames: (#list){
-              0: (string){ "data" }
-            }
-            volumes: (#list){
-              0: (struct){
-                name: (string){ "data" }
-              }
-            }
-          }
-        }
-      }
-    }
-    _noVolumes: (struct){
-      name: (string){ "noVolumes" }
-      exportObjs: (struct){
-        deployment: (struct){
-          _names: (struct){
-          }
-          volumes: (#list){
-          }
-        }
-      }
-    }
-    _someVolumes: (struct){
-      name: (string){ "someVolumes" }
-      exportObjs: (struct){
-        deployment: (struct){
-          _names: (struct){
-            data: (string){ "data" }
-          }
-          volumeNames: (#list){
-            0: (string){ "data" }
-          }
-          volumes: (#list){
-            0: (struct){
-              name: (string){ "data" }
-            }
-          }
-        }
-      }
-    }
-    _Deployment: (_|_){
-      // [incomplete] issue3990._Deployment._names: undefined field: volumes:
-      //     ./issue3990.cue:21:21
-      _names: (_|_){
-        // [incomplete] issue3990._Deployment._names: undefined field: volumes:
-        //     ./issue3990.cue:21:21
-      }
-    }
-    noVolumes: (struct){
-      _names: (struct){
-      }
-      volumes: (#list){
-      }
-    }
-    someVolumes: (struct){
-      _names: (struct){
-        data: (string){ "data" }
-      }
-      volumeNames: (#list){
-        0: (string){ "data" }
-      }
-      volumes: (#list){
-        0: (struct){
-          name: (string){ "data" }
-        }
-      }
-    }
-  }
-  T: (int){ 1 }
-  let X#1multi = 〈1;C〉.M
-  Y: (struct){
-    x: (struct){
-      M: (struct){
-        V: (int){ 1 }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

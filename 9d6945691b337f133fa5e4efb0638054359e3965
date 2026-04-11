@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2206135e_0a085c78",
+        "filename": "internal/cuetxtar/inline_err.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 857,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:43:08Z",
+      "side": 1,
+      "message": "Add a TODO that this should be fixed at the API level.",
+      "revId": "9d6945691b337f133fa5e4efb0638054359e3965",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

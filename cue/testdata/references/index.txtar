@@ -1,35 +1,65 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
-intIndex:    [2][0]
-stringIndex: {foo: "bar"}["foo"]
+intIndex:    [2][0] @test(eq, 2)
+stringIndex: {foo: "bar"}["foo"] @test(eq, "bar")
 
-stringOfNumberIndex: {"3": 3}["3"]
+stringOfNumberIndex: {"3": 3}["3"] @test(eq, 3)
 
-indexToDefault:         (*[0] | {})[0]
-outOfBoundsDisjunction: (*[] | {})[1]
+indexToDefault:         (*[0] | {})[0] @test(eq, 0)
+outOfBoundsDisjunction: (*[] | {})[1] @test(err, code=eval, contains="index out of range [1] with length 0", pos=[0:36])
 
 // Ensure these are errors.
-indexDoesNotDistribute: (*[] | [1])[0]
+indexDoesNotDistribute: (*[] | [1])[0] @test(err, code=eval, contains="index out of range [0] with length 0", pos=[0:37])
 doesNotDistributeType: {
 	l: []
-	a: (*l | {"3": 3})["3"]
+	a: (*l | {"3": 3})["3"] @test(err, code=eval, contains="undefined field", pos=[0:21])
 }
 
-stringIndexToList: [2][""]
-indexOutOfBounds2: 2[2]
-booleanIndex:      [][true]
-indexOutOfBounds3: [1, 2, 3][4]
-negativeIndex:     [1, 2, 3][-1]
+stringIndexToList: [2][""] @test(err, code=eval, contains="undefined field", pos=[0:24])
+indexOutOfBounds2: 2[2] @test(err, code=eval, contains="invalid operand 2 (found int, want list or struct)", pos=[0:20])
+booleanIndex:      [][true] @test(err, code=eval, contains="invalid index true (invalid type bool)", pos=[0:20, 0:23])
+indexOutOfBounds3: [1, 2, 3][4] @test(err, code=eval, contains="index out of range [4] with length 3", pos=[0:30])
+negativeIndex:     [1, 2, 3][-1] @test(err, code=eval, contains="invalid index -1 (index must be non-negative)", pos=[0:20, 0:30])
 
 varIndexTooLarge: {
 	n: 3
-	a: [1, 2, 3][n]
+	a: [1, 2, 3][n] @test(err, code=eval, contains="index out of range [3] with length 3", pos=[0:15])
 }
 
 varNegativeIndex: {
 	n: -1
-	a: [1, 2, 3][n]
+	a: [1, 2, 3][n] @test(err, code=eval, contains="index n out of range [-1]", pos=[0:5, -1:5, 0:15])
 }
+-- out/errors.txt --
+[eval] outOfBoundsDisjunction: index out of range [1] with length 0:
+    ./in.cue:7:36
+[eval] indexDoesNotDistribute: index out of range [0] with length 0:
+    ./in.cue:10:37
+[eval] doesNotDistributeType.a: undefined field: "3":
+    ./in.cue:13:21
+[eval] stringIndexToList: undefined field: "":
+    ./in.cue:16:24
+[eval] indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
+    ./in.cue:17:20
+[eval] booleanIndex: invalid index true (invalid type bool):
+    ./in.cue:18:20
+    ./in.cue:18:23
+[eval] indexOutOfBounds3: index out of range [4] with length 3:
+    ./in.cue:19:30
+[eval] negativeIndex: invalid index -1 (index must be non-negative):
+    ./in.cue:20:20
+    ./in.cue:20:30
+[eval] varIndexTooLarge.a: index out of range [3] with length 3:
+    ./in.cue:24:15
+[eval] varNegativeIndex.a: index n out of range [-1]:
+    ./in.cue:29:5
+    ./in.cue:28:5
+    ./in.cue:29:15
+-- out/todo.txt --
+Error messages slightly different between v2 and v3:
+- outOfBoundsDisjunction: v2 says "invalid list index 1 (out of bounds)", v3 says "index out of range [1] with length 0"
+- doesNotDistributeType.a: v2 says "invalid list index \"3\" (type string)", v3 says "undefined field: \"3\""
+- stringIndexToList: v2 says "invalid list index \"\" (type string)", v3 says "undefined field: \"\""
+- indexOutOfBounds3: v2 says "invalid list index 4 (out of bounds)", v3 says "index out of range [4] with length 3"
 -- out/eval/stats --
 Leaks:  0
 Freed:  61
@@ -42,253 +72,6 @@ Conjuncts:    50
 Disjuncts:    8
 
 NumCloseIDs: 5
--- out/evalalpha --
-Errors:
-outOfBoundsDisjunction: index out of range [1] with length 0:
-    ./in.cue:7:36
-indexDoesNotDistribute: index out of range [0] with length 0:
-    ./in.cue:10:37
-doesNotDistributeType.a: undefined field: "3":
-    ./in.cue:13:21
-stringIndexToList: undefined field: "":
-    ./in.cue:16:24
-indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
-    ./in.cue:17:20
-booleanIndex: invalid index true (invalid type bool):
-    ./in.cue:18:20
-    ./in.cue:18:23
-indexOutOfBounds3: index out of range [4] with length 3:
-    ./in.cue:19:30
-negativeIndex: invalid index -1 (index must be non-negative):
-    ./in.cue:20:20
-    ./in.cue:20:30
-varIndexTooLarge.a: index out of range [3] with length 3:
-    ./in.cue:24:15
-varNegativeIndex.a: index n out of range [-1]:
-    ./in.cue:29:5
-    ./in.cue:28:5
-    ./in.cue:29:15
-
-Result:
-(_|_){
-  // [eval]
-  intIndex: (int){ 2 }
-  stringIndex: (string){ "bar" }
-  stringOfNumberIndex: (int){ 3 }
-  indexToDefault: (int){ 0 }
-  outOfBoundsDisjunction: (_|_){
-    // [eval] outOfBoundsDisjunction: index out of range [1] with length 0:
-    //     ./in.cue:7:36
-  }
-  indexDoesNotDistribute: (_|_){
-    // [eval] indexDoesNotDistribute: index out of range [0] with length 0:
-    //     ./in.cue:10:37
-  }
-  doesNotDistributeType: (_|_){
-    // [eval]
-    l: (#list){
-    }
-    a: (_|_){
-      // [eval] doesNotDistributeType.a: undefined field: "3":
-      //     ./in.cue:13:21
-    }
-  }
-  stringIndexToList: (_|_){
-    // [eval] stringIndexToList: undefined field: "":
-    //     ./in.cue:16:24
-  }
-  indexOutOfBounds2: (_|_){
-    // [eval] indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
-    //     ./in.cue:17:20
-  }
-  booleanIndex: (_|_){
-    // [eval] booleanIndex: invalid index true (invalid type bool):
-    //     ./in.cue:18:20
-    //     ./in.cue:18:23
-  }
-  indexOutOfBounds3: (_|_){
-    // [eval] indexOutOfBounds3: index out of range [4] with length 3:
-    //     ./in.cue:19:30
-  }
-  negativeIndex: (_|_){
-    // [eval] negativeIndex: invalid index -1 (index must be non-negative):
-    //     ./in.cue:20:20
-    //     ./in.cue:20:30
-  }
-  varIndexTooLarge: (_|_){
-    // [eval]
-    n: (int){ 3 }
-    a: (_|_){
-      // [eval] varIndexTooLarge.a: index out of range [3] with length 3:
-      //     ./in.cue:24:15
-    }
-  }
-  varNegativeIndex: (_|_){
-    // [eval]
-    n: (int){ -1 }
-    a: (_|_){
-      // [eval] varNegativeIndex.a: index n out of range [-1]:
-      //     ./in.cue:29:5
-      //     ./in.cue:28:5
-      //     ./in.cue:29:15
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,11 @@
- Errors:
--outOfBoundsDisjunction: invalid list index 1 (out of bounds):
-+outOfBoundsDisjunction: index out of range [1] with length 0:
-     ./in.cue:7:36
- indexDoesNotDistribute: index out of range [0] with length 0:
-     ./in.cue:10:37
--doesNotDistributeType.a: invalid list index "3" (type string):
-+doesNotDistributeType.a: undefined field: "3":
-     ./in.cue:13:21
--stringIndexToList: invalid list index "" (type string):
-+stringIndexToList: undefined field: "":
-     ./in.cue:16:24
- indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
-     ./in.cue:17:20
-@@ -12,7 +12,7 @@
- booleanIndex: invalid index true (invalid type bool):
-     ./in.cue:18:20
-     ./in.cue:18:23
--indexOutOfBounds3: invalid list index 4 (out of bounds):
-+indexOutOfBounds3: index out of range [4] with length 3:
-     ./in.cue:19:30
- negativeIndex: invalid index -1 (index must be non-negative):
-     ./in.cue:20:20
-@@ -32,7 +32,7 @@
-   stringOfNumberIndex: (int){ 3 }
-   indexToDefault: (int){ 0 }
-   outOfBoundsDisjunction: (_|_){
--    // [eval] outOfBoundsDisjunction: invalid list index 1 (out of bounds):
-+    // [eval] outOfBoundsDisjunction: index out of range [1] with length 0:
-     //     ./in.cue:7:36
-   }
-   indexDoesNotDistribute: (_|_){
-@@ -44,12 +44,12 @@
-     l: (#list){
-     }
-     a: (_|_){
--      // [eval] doesNotDistributeType.a: invalid list index "3" (type string):
-+      // [eval] doesNotDistributeType.a: undefined field: "3":
-       //     ./in.cue:13:21
-     }
-   }
-   stringIndexToList: (_|_){
--    // [eval] stringIndexToList: invalid list index "" (type string):
-+    // [eval] stringIndexToList: undefined field: "":
-     //     ./in.cue:16:24
-   }
-   indexOutOfBounds2: (_|_){
-@@ -62,7 +62,7 @@
-     //     ./in.cue:18:23
-   }
-   indexOutOfBounds3: (_|_){
--    // [eval] indexOutOfBounds3: invalid list index 4 (out of bounds):
-+    // [eval] indexOutOfBounds3: index out of range [4] with length 3:
-     //     ./in.cue:19:30
-   }
-   negativeIndex: (_|_){
--- diff/todo/p4 --
-Error messages slightly different.
--- out/eval --
-Errors:
-outOfBoundsDisjunction: invalid list index 1 (out of bounds):
-    ./in.cue:7:36
-indexDoesNotDistribute: index out of range [0] with length 0:
-    ./in.cue:10:37
-doesNotDistributeType.a: invalid list index "3" (type string):
-    ./in.cue:13:21
-stringIndexToList: invalid list index "" (type string):
-    ./in.cue:16:24
-indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
-    ./in.cue:17:20
-booleanIndex: invalid index true (invalid type bool):
-    ./in.cue:18:20
-    ./in.cue:18:23
-indexOutOfBounds3: invalid list index 4 (out of bounds):
-    ./in.cue:19:30
-negativeIndex: invalid index -1 (index must be non-negative):
-    ./in.cue:20:20
-    ./in.cue:20:30
-varIndexTooLarge.a: index out of range [3] with length 3:
-    ./in.cue:24:15
-varNegativeIndex.a: index n out of range [-1]:
-    ./in.cue:29:5
-    ./in.cue:28:5
-    ./in.cue:29:15
-
-Result:
-(_|_){
-  // [eval]
-  intIndex: (int){ 2 }
-  stringIndex: (string){ "bar" }
-  stringOfNumberIndex: (int){ 3 }
-  indexToDefault: (int){ 0 }
-  outOfBoundsDisjunction: (_|_){
-    // [eval] outOfBoundsDisjunction: invalid list index 1 (out of bounds):
-    //     ./in.cue:7:36
-  }
-  indexDoesNotDistribute: (_|_){
-    // [eval] indexDoesNotDistribute: index out of range [0] with length 0:
-    //     ./in.cue:10:37
-  }
-  doesNotDistributeType: (_|_){
-    // [eval]
-    l: (#list){
-    }
-    a: (_|_){
-      // [eval] doesNotDistributeType.a: invalid list index "3" (type string):
-      //     ./in.cue:13:21
-    }
-  }
-  stringIndexToList: (_|_){
-    // [eval] stringIndexToList: invalid list index "" (type string):
-    //     ./in.cue:16:24
-  }
-  indexOutOfBounds2: (_|_){
-    // [eval] indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
-    //     ./in.cue:17:20
-  }
-  booleanIndex: (_|_){
-    // [eval] booleanIndex: invalid index true (invalid type bool):
-    //     ./in.cue:18:20
-    //     ./in.cue:18:23
-  }
-  indexOutOfBounds3: (_|_){
-    // [eval] indexOutOfBounds3: invalid list index 4 (out of bounds):
-    //     ./in.cue:19:30
-  }
-  negativeIndex: (_|_){
-    // [eval] negativeIndex: invalid index -1 (index must be non-negative):
-    //     ./in.cue:20:20
-    //     ./in.cue:20:30
-  }
-  varIndexTooLarge: (_|_){
-    // [eval]
-    n: (int){ 3 }
-    a: (_|_){
-      // [eval] varIndexTooLarge.a: index out of range [3] with length 3:
-      //     ./in.cue:24:15
-    }
-  }
-  varNegativeIndex: (_|_){
-    // [eval]
-    n: (int){ -1 }
-    a: (_|_){
-      // [eval] varNegativeIndex.a: index n out of range [-1]:
-      //     ./in.cue:29:5
-      //     ./in.cue:28:5
-      //     ./in.cue:29:15
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

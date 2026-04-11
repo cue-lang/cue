@@ -1,5 +1,4 @@
 exec cue eval ./pkg:foo
-#todo:inline: medium — multi-package test; check subpath handling
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"
@@ -9,7 +8,7 @@ package foo
 import "mod.test/pkg:bar"
 
 bar
-z: 3
+z: 3 @test(eq, 3)
 -- pkg/bar.cue --
 package bar
 
@@ -37,45 +36,6 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 9
--- out/evalalpha --
-(struct){
-  z: (int){ 3 }
-  foo: (struct){
-    y: (int){ 2 }
-    x: (int){ 1 }
-  }
-  y: (int){ 2 }
-  x: (int){ 1 }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- (struct){
-+  z: (int){ 3 }
-   foo: (struct){
--    x: (int){ 1 }
-     y: (int){ 2 }
-+    x: (int){ 1 }
-   }
--  x: (int){ 1 }
-   y: (int){ 2 }
--  z: (int){ 3 }
-+  x: (int){ 1 }
- }
--- diff/todo/p3 --
-Reordering
--- out/eval --
-(struct){
-  foo: (struct){
-    x: (int){ 1 }
-    y: (int){ 2 }
-  }
-  x: (int){ 1 }
-  y: (int){ 2 }
-  z: (int){ 3 }
-}
 -- out/compile --
 --- in.cue
 {

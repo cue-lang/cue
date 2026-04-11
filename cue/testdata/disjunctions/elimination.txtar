@@ -1,7 +1,6 @@
 // Ensure that disjunction elimination is not done prematurely.
 
 // Issue #651
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 import "struct"
 
@@ -15,6 +14,11 @@ disambiguateClosed: {
 	b: #Def & a
 	a: #Def
 	#Def: {{x: true} | {y: true}}
+	@test(eq, {
+		b: {x: true} | {y: true}
+		a: {x: true} | {y: true}
+		#Def: {x: true} | {y: true}
+	})
 }
 
 // Checks should never be disabled for field matching.
@@ -22,6 +26,7 @@ alwaysCheckMatchers1: {
 	b: {[=~"^xxxx$"]: int} | null
 	b: {c:            string} | null
 	b: c: "yyyyy"
+	@test(eq, {b: {c: "yyyyy"}})
 }
 
 alwaysCheckPatterns2: {
@@ -35,112 +40,137 @@ alwaysCheckPatterns2: {
 		c: string
 		{[=~"^xxxx$"]: int}
 	}
+	@test(eq, {
+		a: {c: "yyyyy"}
+		b: {c: "yyyyy"}
+		#X: string | {c: string}
+	})
 }
 
 nestedNonMonotonic: resolved: n1: {
 	x: {a:    struct.MinFields(2)} | null
 	x: {a: c: 1} | null
 	x: {a: d: 1} | null
+	@test(eq, {x: {a: {c: 1, d: 1}} | null})
 }
 
 nestedNonMonotonic: resolved: n2: {
 	x: {a: b:    struct.MinFields(2)} | null
 	x: {a: b: c: 1} | null
 	x: {a: b: d: 1} | null
+	@test(eq, {x: {a: {b: {c: 1, d: 1}}} | null})
 }
 
 nestedNonMonotonic: eliminated: n1: p1: {
 	x: {a:    struct.MaxFields(1)} | null
 	x: {a: c: 1} | null
 	x: {a: d: 1} | null
+	@test(eq, {x: null})
 }
 
 nestedNonMonotonic: eliminated: n1: p2: {
 	x: {a: c: 1} | null
 	x: {a:    struct.MaxFields(1)} | null
 	x: {a: d: 1} | null
+	@test(eq, {x: null})
 }
 
 nestedNonMonotonic: eliminated: n1: p2: {
 	x: {a: c: 1} | null
 	x: {a: d: 1} | null
 	x: {a:    struct.MaxFields(1)} | null
+	// TODO: Should be p3, fix.
 }
 
 nestedNonMonotonic: eliminated: n2: p1: {
 	x: {a: b:    struct.MaxFields(1)} | null
 	x: {a: b: c: 1} | null
 	x: {a: b: d: 1} | null
+	@test(eq, {x: null})
 }
 
 nestedNonMonotonic: eliminated: n2: p2: {
 	x: {a: b: c: 1} | null
 	x: {a: b:    struct.MaxFields(1)} | null
 	x: {a: b: d: 1} | null
+	@test(eq, {x: null})
 }
 
 nestedNonMonotonic: eliminated: n2: p2: {
 	x: {a: b: c: 1} | null
 	x: {a: b: d: 1} | null
 	x: {a: b:    struct.MaxFields(1)} | null
+	// TODO: should be p3
 }
 
 // TODO: should be incomplete.
 nestedNonMonotonic: incomplete: a: n1: p1: {
 	x: {a:    struct.MinFields(2)} | null
 	x: {a: c: 1} | null
+	@test(eq, {x: null})
+	@test(eq:todo, {x: {a: {c: 1} & struct.MinFields(2)} | null})
 }
 
 // TODO: should be incomplete.
 nestedNonMonotonic: incomplete: a: n1: p2: {
 	x: {a: c: 1} | null
 	x: {a:    struct.MinFields(2)} | null
+	@test(eq, {x: null})
+	@test(eq:todo, {x: {a: {c: 1} & struct.MinFields(2)} | null})
 }
 
 nestedNonMonotonic: incomplete: a: n2: p1: {
 	x: {a: b:    struct.MinFields(2)} | null
 	x: {a: b: c: 1} | null
+	@test(eq, {x: {a: {b: {c: 1}}} | null})
 }
 
 nestedNonMonotonic: incomplete: a: n2: p2: {
 	x: {a: b: c: 1} | null
 	x: {a: b:    struct.MinFields(2)} | null
+	@test(eq, {x: {a: {b: {c: 1}}} | null})
 }
 
 nestedNonMonotonic: incomplete: b: n1: p1: {
 	x: {a:    struct.MinFields(3)} | null
 	x: {a: c: 1} | null
 	x: {a: d: 1} | null
+	@test(eq, {x: null})
 }
 
 nestedNonMonotonic: incomplete: b: n1: p2: {
 	x: {a: c: 1} | null
 	x: {a:    struct.MinFields(3)} | null
 	x: {a: d: 1} | null
+	@test(eq, {x: null})
 }
 
 nestedNonMonotonic: incomplete: b: n1: p3: {
 	x: {a: c: 1} | null
 	x: {a: d: 1} | null
 	x: {a:    struct.MinFields(3)} | null
+	@test(eq, {x: null})
 }
 
 nestedNonMonotonic: incomplete: b: n2: p1: {
 	x: {a: b:    struct.MinFields(3)} | null
 	x: {a: b: c: 1} | null
 	x: {a: b: d: 1} | null
+	@test(eq, {x: {a: {b: {c: 1, d: 1}}} | null})
 }
 
 nestedNonMonotonic: incomplete: b: n2: p1: {
 	x: {a: b: c: 1} | null
 	x: {a: b:    struct.MinFields(3)} | null
 	x: {a: b: d: 1} | null
+	@test(eq) // TODO: rename to p2
 }
 
 nestedNonMonotonic: incomplete: b: n2: p1: {
 	x: {a: b: c: 1} | null
 	x: {a: b: d: 1} | null
 	x: {a: b:    struct.MinFields(3)} | null
+	@test(eq, {x: {a: {b: {c: 1, d: 1}}} | null}) // TODO: rename to p3
 }
 
 preserveClosedness: small: p1: {
@@ -149,6 +179,10 @@ preserveClosedness: small: p1: {
 		*{} | {a: string}
 		*{} | {b: int}
 	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, b: int}
+		#B: *{} | {b: int} | {a: string} | {a: string, b: int}
+	})
 }
 
 preserveClosedness: small: p2: {
@@ -157,6 +191,10 @@ preserveClosedness: small: p2: {
 		{a: string} | *{}
 		*{} | {b: int}
 	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, b: int}
+		#B: *{} | {a: string, b: int} | {a: string} | {b: int}
+	})
 }
 
 preserveClosedness: medium: p1: {
@@ -165,6 +203,10 @@ preserveClosedness: medium: p1: {
 		*{} | {a: string} | {b: string}
 		*{} | {c: int} | {d: string}
 	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, c: int} | {a: string, d: string}
+		#B: *{} | {c: int} | {d: string} | {a: string} | {a: string, c: int} | {a: string, d: string} | {b: string} | {b: string, c: int} | {b: string, d: string}
+	})
 }
 
 preserveClosedness: medium: p2: {
@@ -173,6 +215,10 @@ preserveClosedness: medium: p2: {
 		{a: string} | *{} | {b: string}
 		*{} | {c: int} | {d: string}
 	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, c: int} | {a: string, d: string}
+		#B: *{} | {a: string, c: int} | {a: string, d: string} | {a: string} | {c: int} | {d: string} | {b: string} | {b: string, c: int} | {b: string, d: string}
+	})
 }
 
 preserveClosedness: medium: p3: {
@@ -181,6 +227,10 @@ preserveClosedness: medium: p3: {
 		{a: string} | {b: string} | *{}
 		*{} | {c: int} | {d: string}
 	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, c: int} | {a: string, d: string}
+		#B: *{} | {a: string, c: int} | {a: string, d: string} | {b: string} | {b: string, c: int} | {b: string, d: string} | {a: string} | {c: int} | {d: string}
+	})
 }
 
 // If an error occurred in the last disjunction, it may sometimes be propagated
@@ -192,50 +242,70 @@ noChildError: issue1608: {
 	#type: fieldName: #subtype
 
 	#subtype: string | {foo: string} | {bar: #subtype}
+	@test(eq, {
+		myValue: {fieldName: "some string"}
+		#type: {fieldName: string | {foo: string}}
+		#subtype: string | {foo: string}
+	})
 }
 
 noChildError: t1: {
 	#D: {b: string} | {c: #D }
 	o: #D & {b: "test"}
+	@test(eq, {#D: {b: string}, o: {b: "test"}})
 }
 
 noChildError: t2: {
 	o: #D & {b: "test"}
 	#D: {b: string} | {c: #D }
+	@test(eq, {o: {b: "test"}, #D: {b: string}})
 }
 
 noChildError: t3: {
 	#D: {a: null} | {b: string} | {c: #D }
 	o: #D & {b: "test"}
+	@test(eq, {
+		#D: {a: null} | {b: string}
+		o: {b: "test"}
+	})
 }
 
 noChildError: t4: {
 	o: #D & {b: "test"}
 	#D: {a: null} | {b: string} | {c: #D }
+	@test(eq, {
+		o: {b: "test"}
+		#D: {a: null} | {b: string}
+	})
 }
 
 
 issue1924: t1: {
 	m: a: 2
 	x: *[m.b] | 2
+	@test(eq, {m: {a: 2}, x: 2})
 }
 issue1924: t2: {
 	m: a: 2
 	x: *{v: m.b} | 3
+	@test(eq, {m: {a: 2}, x: 3})
 }
 issue1924: t3: {
 	m: a: 2
 	x: *m.b | 1
+	@test(eq, {m: {a: 2}, x: 1})
 }
 
 // should eliminate erroneous comprehension and pass
 issue1838: t1: {
 	p?: []
 	a: [for k in p {k}] | null
+	@test(eq, {p?: [], a: null})
 }
 issue1838: t2: {
 	p?: []
 	a: null | [for k in p {k}]
+	@test(eq, {p?: [], a: null})
 }
 
 noHang: {
@@ -246,6 +316,7 @@ noHang: {
 
 	#X: x
 	#X: #T
+	@test(eq, {#T: ["d"], x: ["d"], #X: ["d"]})
 }
 
 issue1940: {
@@ -258,6 +329,12 @@ issue1940: {
 	#C: #B & {
 		x: #A
 	}
+	@test(eq, {
+		#T: ["d", []]
+		#A: {type: ["d", []]}
+		#B: {}
+		#C: {x: {type: ["d", []]}}
+	})
 }
 
 -- issue2209full.cue --
@@ -276,6 +353,30 @@ issue2209: simplified: t1: {
 		}
 		X: spec
 	}
+	@test(eq, {
+		#SpecFoo: {foo: {min: 1}}
+		#SpecBar: {bar: {min: 1}}
+		spec: {bar: {min: 1}}
+		out: {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullFoo: null
+			minFoo: int
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullFoo: null
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullBar: null,
+			minFoo: int
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullBar: null
+		}
+	})
 }
 
 issue2209: simplified: t2: {
@@ -288,6 +389,34 @@ issue2209: simplified: t2: {
 	}
 	{f1: int} | {b2: int}
 	{f2: int} | {b2: int}
+	@test(eq, {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		f1: int
+		f2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		f1: int
+		b2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		b2: int
+		f2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		b2: int
+	})
 }
 
 // This test fails for 0.4 and 0.5.
@@ -299,11 +428,65 @@ issue2209: simplified: t3: {
 	S: *#A | #B
 	#B: {x: 1, y: 1}
 	S: x: 1
+	@test(eq, {
+		#A: {v: 1}
+		BAZ: 1
+		S: {x: 1, y: 1}
+		#B: {x: 1, y: 1}
+		f1: int
+		f2: int
+	} | {
+		#A: {v: 1}
+		BAZ: 1
+		S: {x: 1, y: 1}
+		#B: {x: 1, y: 1}
+		f1: int
+		b2: int
+	} | {
+		#A: {v: 1}
+		BAZ: 1
+		S: {x: 1, y: 1}
+		#B: {x: 1, y: 1}
+		b2: int
+		f2: int
+	} | {
+		#A: {v: 1}
+		BAZ: 1
+		S: {x: 1, y: 1}
+		#B: {x: 1, y: 1}
+		b2: int
+	})
 }
 
 issue2209: full: {
 	Foo: #Abstract & {spec: foo: {}}
+	@test(shareID=FooSpec, at=Foo.spec)
+	@test(shareID=FooSpec, at=Foo.resource._X.spec)
+	@test(eq, at=Foo, {
+		spec: {foo: {min: *10 | int, max: *20 | int}}
+		resource: {
+			_X: spec: {foo: {min: *10 | int, max: *20 | int}}
+			spec: *{
+				minFoo: *10 | int
+				maxFoo: *20 | int
+				minBar?: null
+				maxBar?: null
+				hoge?: null | bool
+				fuga?: null
+			} | {
+				minFoo: *10 | int
+				maxFoo: *20 | int
+				minBar?: null
+				maxBar?: null
+				hoge?: null
+				fuga?: null | bool
+			}
+		}
+	})
+
 	Bar: #Abstract & {spec: bar: {}}
+	@test(shareID=BarSpec, at=Bar.spec)
+	@test(shareID=BarSpec, at=Bar.resource._X.spec)
 
 	#Abstract: X={
 		spec: _#Spec
@@ -374,6 +557,115 @@ issue2209: full: {
 			fuga?: null | bool
 		}
 	}
+
+	@test(eq, at=Bar, {
+		spec: {bar: {min: *30 | int, max: *40 | int}}
+		resource: {
+			_X: spec: {bar: {min: *30 | int, max: *40 | int}}
+			spec: *{
+				minFoo?: null
+				maxFoo?: null
+				minBar: *30 | int
+				maxBar: *40 | int
+				hoge?: null | bool
+				fuga?: null
+			} | {
+				minFoo?: null
+				maxFoo?: null
+				minBar: *30 | int
+				maxBar: *40 | int
+				hoge?: null
+				fuga?: null | bool
+			}
+		}
+	})
+	// 	#Abstract: {
+	// 		spec: *{
+	// 			foo: {min: *10 | int, max: *20 | int}
+	// 		} | {
+	// 			bar: {min: *30 | int, max: *40 | int}
+	// 		}
+	// 		resource: {
+	// 			_X: {
+	// 				spec: *{
+	// 					foo: {min: *10 | int, max: *20 | int}
+	// 					} | {
+	// 						bar: {min: *30 | int, max: *40 | int}
+	// 					}
+	// 			}
+	// 			spec: *{
+	// 				minFoo: *10 | int
+	// 				maxFoo: *20 | int
+	// 				minBar?: null
+	// 				maxBar?: null
+	// 				hoge?: null | bool
+	// 				fuga?: null
+	// 			} | {
+	// 				minFoo: *10 | int
+	// 				maxFoo: *20 | int
+	// 				minBar?: null
+	// 				maxBar?: null
+	// 				hoge?: null
+	// 				fuga?: null | bool
+	// 			}
+	// 		}
+	// 	}
+	// 	_#Spec: *{
+	// 		foo: {min: *10 | int, max: *20 | int}
+	// 	} | {
+	// 		bar: {min: *30 | int, max: *40 | int}
+	// 	}
+	// 	_#SpecFoo: {foo: {min: *10 | int, max: *20 | int}}
+	// 	_#SpecBar: {bar: {min: *30 | int, max: *40 | int}}
+	// 	_Thing: {
+	// 		_X: _
+	// 		spec: *{
+	// 			minFoo: *10 | int
+	// 			maxFoo: *20 | int
+	// 			minBar?: null
+	// 			maxBar?: null
+	// 			hoge?: null | bool
+	// 			fuga?: null
+	// 		} | *{
+	// 			minFoo?: null
+	// 			maxFoo?: null
+	// 			minBar: *30 | int
+	// 			maxBar: *40 | int
+	// 			hoge?: null | bool
+	// 			fuga?: null
+	// 		} | {
+	// 			minFoo: *10 | int
+	// 			maxFoo: *20 | int
+	// 			minBar?: null
+	// 			maxBar?: null
+	// 			hoge?: null
+	// 			fuga?: null | bool
+	// 		} | {
+	// 			minFoo?: null
+	// 			maxFoo?: null
+	// 			minBar: *30 | int
+	// 			maxBar: *40 | int
+	// 			hoge?: null
+	// 			fuga?: null | bool}
+	// 	}
+	// 	#Constrained: {
+	// 		spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | *{minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null | bool, fuga?: null
+	// 		} | {
+	// 			minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool
+	// 		} | {
+	// 			minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null, fuga?: null | bool}
+	// 	}
+	// 	#Base: {
+	// 		spec: {
+	// 			minFoo?: null | int
+	// 			maxFoo?: null | int
+	// 			minBar?: null | int
+	// 			maxBar?: null | int
+	// 			hoge?: null | bool
+	// 			fuga?: null | bool
+	// 		}
+	// 	}
+	// })
 }
 
 
@@ -386,6 +678,14 @@ issue2246: simplified: {
 	data: {fooID: "123"}
 	out1: #Form & data
 	out2: #Form & out1
+	@test(eq, {
+		#FormFoo: {fooID: string}
+		#FormBar: {barID: string}
+		#Form: {fooID: string} | {barID: string}
+		data: {fooID: "123"}
+		out1: {fooID: "123"}
+		out2: {fooID: "123"}
+	})
 }
 issue2246: full: {
 	data: forms: [{
@@ -422,6 +722,21 @@ issue2246: full: {
 		in:  #Input
 		out: (#summarizeReturn & {"in": in}).out
 	}
+	@test(eq, {
+		data: {forms: [{
+		fooID: "00-0000001"
+	}]}
+		form1040: [3]
+		#K1: {
+			#_base: {common: 3}
+			#FormFoo: {fooID: string, common: 3}
+			#FormBar: {barID: string, common: 3}
+			#Form: {fooID: string, common: 3} | {barID: string, common: 3}
+		}
+		#Input: {forms: []}
+		#summarizeReturn: {in: {forms: []}, out: []}
+		#compute: {in: {forms: []}, out: []}
+	})
 }
 
 -- issue2263.cue --
@@ -439,6 +754,12 @@ issue2263: simplified: {
 
 	#IDSource: id: string
 	#TargetAverage: avg: number
+	@test(eq, {
+		metrics: {id: "foo", avg: 60}
+		#Metric: {id: string, avg: number} | {id: string} | {avg: number} | {}
+		#IDSource: {id: string}
+		#TargetAverage: {avg: number}
+	})
 }
 issue2263: full: {
 	metrics: [...#Metric]
@@ -485,12 +806,38 @@ issue2263: full: {
 	#TargetValue: {
 		value: number
 	}
+	@test(eq, {
+		metrics: [{
+		avg: 60
+		id:  "foo"
+	}, {
+		id:    "bar"
+		value: 80
+	}, {
+		avg: 70
+		uri: "baz"
+	}, {
+		uri:   "qux"
+		value: 90
+	}]
+		#Metric: {id: string, avg: number} | {id: string, value: number} | {uri: string, avg: number} | {uri: string, value: number}
+		#Source: {id: string} | {uri: string}
+		#Target: {avg: number} | {value: number}
+		#IDSource: {id: string}
+		#URISource: {uri: string}
+		#TargetAverage: {avg: number}
+		#TargetValue: {value: number}
+	})
 }
 -- issue1417.cue --
 issue1417: {
 	#ID: !~"^a" | =~"^ab$" | =~"^aB$"
 	#ID: =~"^a" | !~"[A-Z]"
 	ids: [...#ID] & ["xyz", "ab", "aB"]
+	@test(eq, {
+		#ID: !~"^a" & =~"^a" | !~"^a" & !~"[A-Z]" | =~"^ab$" & =~"^a" | =~"^ab$" & !~"[A-Z]" | =~"^aB$" & =~"^a" | =~"^aB$" & !~"[A-Z]"
+		ids: ["xyz", "ab", "aB"]
+	})
 }
 -- issue3149.cue --
 issue3149: {
@@ -504,6 +851,20 @@ issue3149: {
 		{name: "FooQuuxFoo"},
 		{name: "an exception"},
 	]
+	@test(eq, {
+		#valid: {
+			name!: =~"^Foo" & =~"Foo$" | "an exception"
+		}
+		list: [{
+		name: "FooBarFoo"
+	}, {
+		name: "FooBazFoo"
+	}, {
+		name: "FooQuuxFoo"
+	}, {
+		name: "an exception"
+	}]
+	})
 }
 -- issue770.cue --
 issue770: {
@@ -524,6 +885,16 @@ issue770: {
 	h: boo: _
 	h: c:   _
 	h: coo: _
+	@test(eq, {
+		#A: {v: "a" | "b" | "c"}
+		h: {
+			a: {v: *"a" | "b" | "c"}
+			b: {v: *"a" | "b" | "c"}
+			boo: {v: *"a" | "b" | "c"}
+			c: {v: *"a" | "b" | "c"}
+			coo: {v: *"a" | "b" | "c"}
+		}
+	})
 }
 -- issue3528.cue --
 issue3528: original: {
@@ -536,6 +907,19 @@ issue3528: original: {
 		container: [string]: string | #container
 		#container: string | {volumes?: [...string]}
 	}
+	@test(eq, {
+		workflows: [
+			{container: {}, #container: string | {volumes?: []}},
+		]
+		test: {
+			container: {}
+			#container: string | {volumes?: []}
+		}
+		#Workflow: {
+			container: {}
+			#container: string | {volumes?: []}
+		}
+	})
 }
 issue3528: reduced: {
 	a?: #A
@@ -544,20 +928,36 @@ issue3528: reduced: {
 		A: [string]: 1 | #a
 		#a: 2 | {v: 1}
 	}
+	@test(eq, {
+		a: {A: {}, #a: 2 | {v: 1}}
+		#A: {A: {}, #a: 2 | {v: 1}}
+	})
 }
 issue3528: counter: {
+	@test(eq, {})
 }
 issue3528: nested: t1: {
 	{v: 1} | (2 | 3)
 	{v: 1} | (2 | 3)
 	{v: 1} | (2 | 3)
 	{v: 1} | (2 | 3)
+	@test(eq, {v: 1} | {
+		2
+		@test(eq)
+	} | {
+		3
+		@test(eq)
+	})
 }
 issue3528: nested: t2: {
 	{v: 1} | 2
 	{v: 1} | (2 | 3)
 	{v: 1} | 2
 	{v: 1} | 2
+	@test(eq, {v: 1} | {
+		2
+		@test(eq)
+	})
 }
 -- issue3784.cue --
 issue3784: reduced: {
@@ -574,6 +974,12 @@ issue3784: reduced: {
 		kind: "A"
 		b: c: "x"
 	}
+	@test(eq, {
+		#Schema: {
+			a: {kind: "A", b: {c?: string}} | {kind: "B"}
+		}
+		out: {a: {kind: "A", b: {c: "x"}}}
+	})
 }
 issue3784: full: {
 	#Schema: {
@@ -605,6 +1011,18 @@ issue3784: full: {
 			}
 		}
 	}
+	@test(eq, {
+		#Schema: {
+			pages?: {build_type!: "legacy", source!: {branch!: string, path?: string}, cname?: string} | {build_type!: "workflow", source?: {branch?: string, path?: string}, cname?: string}
+		}
+		out: {
+			pages: {
+				cname: "foo.com"
+				build_type: "legacy"
+				source: {branch: "main", path: "/"}
+			}
+		}
+	})
 }
 issue3784: variant1: {
 	#Schema: {
@@ -626,6 +1044,15 @@ issue3784: variant1: {
 			cname?:      _
 		})
 	}
+	@test(eq, {
+		#Schema: {
+			pages: {
+				build_type!: "legacy"
+				source: {branch!: string, path?: string}
+				cname?: string
+			}
+		}
+	})
 }
 issue3784: variant2: {
 	#Schema: {
@@ -646,6 +1073,17 @@ issue3784: variant2: {
 		}
 		cname?: string
 	}
+	@test(eq, {
+		#Schema: {build_type!: "legacy", source!: {branch!: _}} | {build_type!: "workflow", cname?: _}
+		a: {
+			build_type!: "legacy"
+			source: {
+				branch!: string
+				path?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.source.path: field not allowed", pos=[110:4])
+			}
+			cname?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.cname: field not allowed", pos=[112:3])
+		}
+	})
 }
 -- issue3958.cue --
 issue3958: t1: {
@@ -654,10 +1092,19 @@ issue3958: t1: {
 
 	test1: #schema & {int | *2}
 	test2: #schema & {int | *4}
+	@test(eq, {
+		#schema: int | 3 | 1
+		test1: int | 3 | 1 | 2
+		test2: int | 3 | 1 | 4
+	})
 }
 issue3958: t2: {
  	a: (int | *4) & (int | *1) & (int | *3) & (int | *8)
 	b: (int | *4) & (int | *1) & (int | *3)
+	@test(eq, {
+		a: int | 8 | 3 | 1 | 4
+		b: int | 3 | 1 | 4
+	})
 }
 -- issue2685.cue --
 issue2685: {
@@ -674,6 +1121,10 @@ issue2685: {
 	{
 		foo: #Foo
 	}
+	@test(eq, {
+		#Foo: *{opt: int} | {bar: int, opt?: int}
+		foo: {bar: 0, opt?: int}
+	})
 }
 -- out/eval/stats --
 Leaks:  218
@@ -688,2287 +1139,9 @@ Disjuncts:    1302
 Notifications: 4
 
 NumCloseIDs: 323
--- diff/explanation --
-issue2209.simplified.t2.BAZ: now fixed
-issue2209.simplified.t3.BAZ: missing error.
-issue2209.simplified.t3: new evaluator fixes known bug.
-preserveClosedness.medium.p*: discarding of default is correct.
-issue1417: new evaluator fixes known bug
-issue3149: new evaluator fixes known bug
-issue770: new evaluator fixes a bug in "c" and "coo" where defaults did not apply correctly.
--- out/evalalpha --
-(struct){
-  disambiguateClosed: (struct){
-    b: (#struct){ |((#struct){
-        x: (bool){ true }
-      }, (#struct){
-        y: (bool){ true }
-      }) }
-    a: (#struct){ |((#struct){
-        x: (bool){ true }
-      }, (#struct){
-        y: (bool){ true }
-      }) }
-    #Def: (#struct){ |((#struct){
-        x: (bool){ true }
-      }, (#struct){
-        y: (bool){ true }
-      }) }
-  }
-  alwaysCheckMatchers1: (struct){
-    b: (struct){
-      c: (string){ "yyyyy" }
-    }
-  }
-  alwaysCheckPatterns2: (struct){
-    a: (#struct){
-      c: (string){ "yyyyy" }
-    }
-    b: (#struct){
-      c: (string){ "yyyyy" }
-    }
-    #X: ((string|struct)){ |((string){ string }, (#struct){
-        c: (string){ string }
-      }) }
-  }
-  nestedNonMonotonic: (struct){
-    resolved: (struct){
-      n1: (struct){
-        x: ((null|struct)){ |((struct){
-            a: (struct){
-              c: (int){ 1 }
-              d: (int){ 1 }
-            }
-          }, (null){ null }) }
-      }
-      n2: (struct){
-        x: ((null|struct)){ |((struct){
-            a: (struct){
-              b: (struct){
-                c: (int){ 1 }
-                d: (int){ 1 }
-              }
-            }
-          }, (null){ null }) }
-      }
-    }
-    eliminated: (struct){
-      n1: (struct){
-        p1: (struct){
-          x: (null){ null }
-        }
-        p2: (struct){
-          x: (null){ null }
-        }
-      }
-      n2: (struct){
-        p1: (struct){
-          x: (null){ null }
-        }
-        p2: (struct){
-          x: (null){ null }
-        }
-      }
-    }
-    incomplete: (struct){
-      a: (struct){
-        n1: (struct){
-          p1: (struct){
-            x: (null){ null }
-          }
-          p2: (struct){
-            x: (null){ null }
-          }
-        }
-        n2: (struct){
-          p1: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
-                    //     ./in.cue:96:15
-                    //     ./in.cue:96:32
-                    //     ./in.cue:97:12
-                    c: (int){ 1 }
-                  }
-                }
-              }, (null){ null }) }
-          }
-          p2: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
-                    //     ./in.cue:102:15
-                    //     ./in.cue:101:12
-                    //     ./in.cue:102:32
-                    c: (int){ 1 }
-                  }
-                }
-              }, (null){ null }) }
-          }
-        }
-      }
-      b: (struct){
-        n1: (struct){
-          p1: (struct){
-            x: (null){ null }
-          }
-          p2: (struct){
-            x: (null){ null }
-          }
-          p3: (struct){
-            x: (null){ null }
-          }
-        }
-        n2: (struct){
-          p1: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
-                    //     ./in.cue:138:15
-                    //     ./in.cue:124:15
-                    //     ./in.cue:125:12
-                    //     ./in.cue:126:12
-                    //     ./in.cue:130:12
-                    //     ./in.cue:131:15
-                    //     ./in.cue:132:12
-                    //     ./in.cue:136:12
-                    //     ./in.cue:137:12
-                    //     ./in.cue:138:32
-                    c: (int){ 1 }
-                    d: (int){ 1 }
-                  }
-                }
-              }, (null){ null }) }
-          }
-        }
-      }
-    }
-  }
-  preserveClosedness: (struct){
-    small: (struct){
-      p1: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (int){ int }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            b: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (int){ int }
-          }) }
-      }
-      p2: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (int){ int }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            a: (string){ string }
-            b: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            b: (int){ int }
-          }) }
-      }
-    }
-    medium: (struct){
-      p1: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            c: (int){ int }
-          }, (#struct){
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            b: (string){ string }
-            d: (string){ string }
-          }) }
-      }
-      p2: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            c: (int){ int }
-          }, (#struct){
-            d: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            b: (string){ string }
-            d: (string){ string }
-          }) }
-      }
-      p3: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            b: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            c: (int){ int }
-          }, (#struct){
-            d: (string){ string }
-          }) }
-      }
-    }
-  }
-  noChildError: (struct){
-    issue1608: (struct){
-      myValue: (#struct){
-        fieldName: (string){ "some string" }
-      }
-      #type: (#struct){
-        fieldName: ((string|struct)){ |((string){ string }, (#struct){
-            foo: (string){ string }
-          }) }
-      }
-      #subtype: ((string|struct)){ |((string){ string }, (#struct){
-          foo: (string){ string }
-        }) }
-    }
-    t1: (struct){
-      #D: (#struct){
-        b: (string){ string }
-      }
-      o: (#struct){
-        b: (string){ "test" }
-      }
-    }
-    t2: (struct){
-      o: (#struct){
-        b: (string){ "test" }
-      }
-      #D: (#struct){
-        b: (string){ string }
-      }
-    }
-    t3: (struct){
-      #D: (#struct){ |((#struct){
-          a: (null){ null }
-        }, (#struct){
-          b: (string){ string }
-        }) }
-      o: (#struct){
-        b: (string){ "test" }
-      }
-    }
-    t4: (struct){
-      o: (#struct){
-        b: (string){ "test" }
-      }
-      #D: (#struct){ |((#struct){
-          a: (null){ null }
-        }, (#struct){
-          b: (string){ string }
-        }) }
-    }
-  }
-  issue1924: (struct){
-    t1: (struct){
-      m: (struct){
-        a: (int){ 2 }
-      }
-      x: (int){ 2 }
-    }
-    t2: (struct){
-      m: (struct){
-        a: (int){ 2 }
-      }
-      x: (int){ 3 }
-    }
-    t3: (struct){
-      m: (struct){
-        a: (int){ 2 }
-      }
-      x: (int){ 1 }
-    }
-  }
-  issue1838: (struct){
-    t1: (struct){
-      p?: (#list){
-      }
-      a: (null){ null }
-    }
-    t2: (struct){
-      p?: (#list){
-      }
-      a: (null){ null }
-    }
-  }
-  noHang: (struct){
-    #T: (list){
-      0: (string){ "d" }
-    }
-    x: ~(noHang.#T)
-    #X: ~(noHang.#T)
-  }
-  issue1940: (struct){
-    #T: (#list){
-      0: (string){ "d" }
-      1: (list){
-      }
-    }
-    #A: (#struct){
-      type: ~(issue1940.#T)
-    }
-    #B: (#struct){
-    }
-    #C: (#struct){
-      x: ~(issue1940.#A)
-    }
-  }
-  issue1417: (struct){
-    #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
-    ids: (#list){
-      0: (string){ "xyz" }
-      1: (string){ "ab" }
-      2: (string){ "aB" }
-    }
-  }
-  issue2209: (struct){
-    simplified: (struct){
-      t1: (struct){
-        #SpecFoo: (#struct){
-          foo: (#struct){
-            min: (int){ 1 }
-          }
-        }
-        #SpecBar: (#struct){
-          bar: (#struct){
-            min: (int){ 1 }
-          }
-        }
-        spec: (#struct){
-          bar: (#struct){
-            min: (int){ 1 }
-          }
-        }
-        out: (struct){ |((struct){
-            minBar: (int){ 1 }
-            X: ~(issue2209.simplified.t1.spec)
-            nullFoo: (null){ null }
-            minFoo: (int){ int }
-          }, (struct){
-            minBar: (int){ 1 }
-            X: ~(issue2209.simplified.t1.spec)
-            nullFoo: (null){ null }
-          }, (struct){
-            minBar: (int){ 1 }
-            X: ~(issue2209.simplified.t1.spec)
-            nullBar: (null){ null }
-            minFoo: (int){ int }
-          }, (struct){
-            minBar: (int){ 1 }
-            X: ~(issue2209.simplified.t1.spec)
-            nullBar: (null){ null }
-          }) }
-      }
-      t2: (struct){ |((struct){
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          BAZ: (int){ 1 }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          BAZ: (int){ 1 }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          BAZ: (int){ 1 }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          BAZ: (int){ 1 }
-          b2: (int){ int }
-        }) }
-      t3: (struct){ |((struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-        }) }
-    }
-    full: (struct){
-      Foo: (#struct){
-        spec: (#struct){
-          foo: (#struct){
-            min: (int){ |(*(int){ 10 }, (int){ int }) }
-            max: (int){ |(*(int){ 20 }, (int){ int }) }
-          }
-        }
-        resource: (#struct){
-          _X: (#struct){
-            spec: ~(issue2209.full.Foo.spec)
-          }
-          spec: (#struct){ |(*(#struct){
-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-              minBar?: (null){ null }
-              maxBar?: (null){ null }
-              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-              fuga?: (null){ null }
-            }, (#struct){
-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-              minBar?: (null){ null }
-              maxBar?: (null){ null }
-              hoge?: (null){ null }
-              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            }) }
-        }
-      }
-      Bar: (#struct){
-        spec: (#struct){
-          bar: (#struct){
-            min: (int){ |(*(int){ 30 }, (int){ int }) }
-            max: (int){ |(*(int){ 40 }, (int){ int }) }
-          }
-        }
-        resource: (#struct){
-          _X: (#struct){
-            spec: ~(issue2209.full.Bar.spec)
-          }
-          spec: (#struct){ |(*(#struct){
-              minFoo?: (null){ null }
-              maxFoo?: (null){ null }
-              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-              fuga?: (null){ null }
-            }, (#struct){
-              minFoo?: (null){ null }
-              maxFoo?: (null){ null }
-              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-              hoge?: (null){ null }
-              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            }) }
-        }
-      }
-      #Abstract: (#struct){
-        spec: (#struct){ |(*(#struct){
-            foo: (#struct){
-              min: (int){ |(*(int){ 10 }, (int){ int }) }
-              max: (int){ |(*(int){ 20 }, (int){ int }) }
-            }
-          }, (#struct){
-            bar: (#struct){
-              min: (int){ |(*(int){ 30 }, (int){ int }) }
-              max: (int){ |(*(int){ 40 }, (int){ int }) }
-            }
-          }) }
-        resource: (#struct){
-          _X: (#struct){
-            spec: (#struct){ |(*(#struct){
-                foo: (#struct){
-                  min: (int){ |(*(int){ 10 }, (int){ int }) }
-                  max: (int){ |(*(int){ 20 }, (int){ int }) }
-                }
-              }, (#struct){
-                bar: (#struct){
-                  min: (int){ |(*(int){ 30 }, (int){ int }) }
-                  max: (int){ |(*(int){ 40 }, (int){ int }) }
-                }
-              }) }
-          }
-          spec: (#struct){ |(*(#struct){
-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-              minBar?: (null){ null }
-              maxBar?: (null){ null }
-              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-              fuga?: (null){ null }
-            }, (#struct){
-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-              minBar?: (null){ null }
-              maxBar?: (null){ null }
-              hoge?: (null){ null }
-              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            }) }
-        }
-      }
-      _#Spec: (#struct){ |(*(#struct){
-          foo: (#struct){
-            min: (int){ |(*(int){ 10 }, (int){ int }) }
-            max: (int){ |(*(int){ 20 }, (int){ int }) }
-          }
-        }, (#struct){
-          bar: (#struct){
-            min: (int){ |(*(int){ 30 }, (int){ int }) }
-            max: (int){ |(*(int){ 40 }, (int){ int }) }
-          }
-        }) }
-      _#SpecFoo: (#struct){
-        foo: (#struct){
-          min: (int){ |(*(int){ 10 }, (int){ int }) }
-          max: (int){ |(*(int){ 20 }, (int){ int }) }
-        }
-      }
-      _#SpecBar: (#struct){
-        bar: (#struct){
-          min: (int){ |(*(int){ 30 }, (int){ int }) }
-          max: (int){ |(*(int){ 40 }, (int){ int }) }
-        }
-      }
-      _Thing: (#struct){
-        _X: (_){ _ }
-        spec: (#struct){ |(*(#struct){
-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-            minBar?: (null){ null }
-            maxBar?: (null){ null }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            fuga?: (null){ null }
-          }, *(#struct){
-            minFoo?: (null){ null }
-            maxFoo?: (null){ null }
-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            fuga?: (null){ null }
-          }, (#struct){
-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-            minBar?: (null){ null }
-            maxBar?: (null){ null }
-            hoge?: (null){ null }
-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          }, (#struct){
-            minFoo?: (null){ null }
-            maxFoo?: (null){ null }
-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            hoge?: (null){ null }
-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          }) }
-      }
-      #Constrained: (#struct){
-        spec: (#struct){ |(*(#struct){
-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-            minBar?: (null){ null }
-            maxBar?: (null){ null }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            fuga?: (null){ null }
-          }, *(#struct){
-            minFoo?: (null){ null }
-            maxFoo?: (null){ null }
-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            fuga?: (null){ null }
-          }, (#struct){
-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-            minBar?: (null){ null }
-            maxBar?: (null){ null }
-            hoge?: (null){ null }
-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          }, (#struct){
-            minFoo?: (null){ null }
-            maxFoo?: (null){ null }
-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            hoge?: (null){ null }
-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          }) }
-      }
-      #Base: (#struct){
-        spec: (#struct){
-          minFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
-          maxFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
-          minBar?: ((null|int)){ |((null){ null }, (int){ int }) }
-          maxBar?: ((null|int)){ |((null){ null }, (int){ int }) }
-          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-        }
-      }
-    }
-  }
-  issue2246: (struct){
-    simplified: (struct){
-      #FormFoo: (#struct){
-        fooID: (string){ string }
-      }
-      #FormBar: (#struct){
-        barID: (string){ string }
-      }
-      #Form: (#struct){ |((#struct){
-          fooID: (string){ string }
-        }, (#struct){
-          barID: (string){ string }
-        }) }
-      data: (struct){
-        fooID: (string){ "123" }
-      }
-      out1: (#struct){
-        fooID: (string){ "123" }
-      }
-      out2: (#struct){
-        fooID: (string){ "123" }
-      }
-    }
-    full: (struct){
-      data: (struct){
-        forms: (#list){
-          0: (struct){
-            fooID: (string){ "00-0000001" }
-          }
-        }
-      }
-      form1040: (#list){
-        0: (int){ 3 }
-      }
-      #K1: (#struct){
-        #_base: (#struct){
-          common: (int){ 3 }
-        }
-        #FormFoo: (#struct){
-          fooID: (string){ string }
-          common: (int){ 3 }
-        }
-        #FormBar: (#struct){
-          barID: (string){ string }
-          common: (int){ 3 }
-        }
-        #Form: (#struct){ |((#struct){
-            fooID: (string){ string }
-            common: (int){ 3 }
-          }, (#struct){
-            barID: (string){ string }
-            common: (int){ 3 }
-          }) }
-      }
-      #Input: (#struct){
-        forms: (list){
-        }
-      }
-      #summarizeReturn: (#struct){
-        in: ~(issue2246.full.#Input)
-        out: (#list){
-        }
-      }
-      #compute: (#struct){
-        in: ~(issue2246.full.#Input)
-        out: (#list){
-        }
-      }
-    }
-  }
-  issue2263: (struct){
-    simplified: (struct){
-      metrics: (#struct){
-        id: (string){ "foo" }
-        avg: (int){ 60 }
-      }
-      #Metric: (#struct){ |((#struct){
-          id: (string){ string }
-          avg: (number){ number }
-        }, (#struct){
-          id: (string){ string }
-        }, (#struct){
-          avg: (number){ number }
-        }, (#struct){
-        }) }
-      #IDSource: (#struct){
-        id: (string){ string }
-      }
-      #TargetAverage: (#struct){
-        avg: (number){ number }
-      }
-    }
-    full: (struct){
-      metrics: (#list){
-        0: (#struct){
-          id: (string){ "foo" }
-          avg: (int){ 60 }
-        }
-        1: (#struct){
-          id: (string){ "bar" }
-          value: (int){ 80 }
-        }
-        2: (#struct){
-          uri: (string){ "baz" }
-          avg: (int){ 70 }
-        }
-        3: (#struct){
-          uri: (string){ "qux" }
-          value: (int){ 90 }
-        }
-      }
-      #Metric: (#struct){ |((#struct){
-          id: (string){ string }
-          avg: (number){ number }
-        }, (#struct){
-          id: (string){ string }
-          value: (number){ number }
-        }, (#struct){
-          uri: (string){ string }
-          avg: (number){ number }
-        }, (#struct){
-          uri: (string){ string }
-          value: (number){ number }
-        }) }
-      #Source: (#struct){ |((#struct){
-          id: (string){ string }
-        }, (#struct){
-          uri: (string){ string }
-        }) }
-      #Target: (#struct){ |((#struct){
-          avg: (number){ number }
-        }, (#struct){
-          value: (number){ number }
-        }) }
-      #IDSource: (#struct){
-        id: (string){ string }
-      }
-      #URISource: (#struct){
-        uri: (string){ string }
-      }
-      #TargetAverage: (#struct){
-        avg: (number){ number }
-      }
-      #TargetValue: (#struct){
-        value: (number){ number }
-      }
-    }
-  }
-  issue2685: (struct){
-    #Foo: (#struct){ |(*(#struct){
-        opt: (int){ int }
-      }, (#struct){
-        bar: (int){ int }
-        opt?: (int){ int }
-      }) }
-    foo: (#struct){
-      bar: (int){ 0 }
-      opt?: (int){ int }
-    }
-  }
-  issue3149: (struct){
-    #valid: (#struct){
-      name!: (string){ |((string){ &(=~"^Foo", =~"Foo$") }, (string){ "an exception" }) }
-    }
-    list: (#list){
-      0: (#struct){
-        name: (string){ "FooBarFoo" }
-      }
-      1: (#struct){
-        name: (string){ "FooBazFoo" }
-      }
-      2: (#struct){
-        name: (string){ "FooQuuxFoo" }
-      }
-      3: (#struct){
-        name: (string){ "an exception" }
-      }
-    }
-  }
-  issue3528: (struct){
-    original: (struct){
-      workflows: (#list){
-        0: (#struct){
-          container: (#struct){
-          }
-          #container: ((string|struct)){ |((string){ string }, (#struct){
-              volumes?: (list){
-              }
-            }) }
-        }
-      }
-      test: (#struct){
-        container: (#struct){
-        }
-        #container: ((string|struct)){ |((string){ string }, (#struct){
-            volumes?: (list){
-            }
-          }) }
-      }
-      #Workflow: (#struct){
-        container: (#struct){
-        }
-        #container: ((string|struct)){ |((string){ string }, (#struct){
-            volumes?: (list){
-            }
-          }) }
-      }
-    }
-    reduced: (struct){
-      a: (#struct){
-        A: (#struct){
-        }
-        #a: ((int|struct)){ |((int){ 2 }, (#struct){
-            v: (int){ 1 }
-          }) }
-      }
-      #A: (#struct){
-        A: (#struct){
-        }
-        #a: ((int|struct)){ |((int){ 2 }, (#struct){
-            v: (int){ 1 }
-          }) }
-      }
-    }
-    counter: (struct){
-    }
-    nested: (struct){
-      t1: ((int|struct)){ |((struct){
-          v: (int){ 1 }
-        }, (int){ 2 }, (int){ 3 }) }
-      t2: ((int|struct)){ |((struct){
-          v: (int){ 1 }
-        }, (int){ 2 }) }
-    }
-  }
-  issue3784: (struct){
-    reduced: (struct){
-      #Schema: (#struct){
-        a: (#struct){ |((#struct){
-            kind: (string){ "A" }
-            b: (#struct){
-              c?: (string){ string }
-            }
-          }, (#struct){
-            kind: (string){ "B" }
-          }) }
-      }
-      out: (#struct){
-        a: (#struct){
-          kind: (string){ "A" }
-          b: (#struct){
-            c: (string){ "x" }
-          }
-        }
-      }
-    }
-    full: (struct){
-      #Schema: (#struct){
-        pages?: (#struct){ |((#struct){
-            build_type!: (string){ "legacy" }
-            source!: (#struct){
-              branch!: (string){ string }
-              path?: (string){ string }
-            }
-            cname?: (string){ string }
-          }, (#struct){
-            build_type!: (string){ "workflow" }
-            source?: (_|_){
-              // [eval] issue3784.full.#Schema.pages.source: field not allowed:
-              //     ./issue3784.cue:20:4
-              branch?: (string){ string }
-              path?: (string){ string }
-            }
-            cname?: (string){ string }
-          }) }
-      }
-      out: (#struct){
-        pages: (#struct){
-          cname: (string){ "foo.com" }
-          build_type: (string){ "legacy" }
-          source: (#struct){
-            branch: (string){ "main" }
-            path: (string){ "/" }
-          }
-        }
-      }
-    }
-    variant1: (struct){
-      #Schema: (#struct){
-        pages: (#struct){
-          build_type!: (string){ "legacy" }
-          source: (#struct){
-            branch!: (string){ string }
-            path?: (string){ string }
-          }
-          cname?: (string){ string }
-        }
-      }
-    }
-    variant2: (struct){
-      #Schema: (#struct){ |((#struct){
-          build_type!: (string){ "legacy" }
-          source!: (#struct){
-            branch!: (_){ _ }
-          }
-        }, (#struct){
-          build_type!: (string){ "workflow" }
-          cname?: (_){ _ }
-        }) }
-      a: (#struct){
-        build_type!: (string){ "legacy" }
-        source: (#struct){
-          branch!: (string){ string }
-          path?: (_|_){
-            // [eval] issue3784.variant2.a.source.path: field not allowed:
-            //     ./issue3784.cue:83:4
-          }
-        }
-        cname?: (_|_){
-          // [eval] issue3784.variant2.a.cname: field not allowed:
-          //     ./issue3784.cue:85:3
-        }
-      }
-    }
-  }
-  issue3958: (struct){
-    t1: (struct){
-      #schema: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }) }
-      test1: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 2 }) }
-      test2: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
-    }
-    t2: (struct){
-      a: (int){ |((int){ int }, (int){ 8 }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
-      b: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
-    }
-  }
-  issue770: (struct){
-    #A: (#struct){
-      v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
-    }
-    h: (struct){
-      a: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      b: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      boo: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      c: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      coo: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -917,6 +917,18 @@
-       }
-     }
-   }
-+  issue2685: (struct){
-+    #Foo: (#struct){ |(*(#struct){
-+        opt: (int){ int }
-+      }, (#struct){
-+        bar: (int){ int }
-+        opt?: (int){ int }
-+      }) }
-+    foo: (#struct){
-+      bar: (int){ 0 }
-+      opt?: (int){ int }
-+    }
-+  }
-   issue3149: (struct){
-     #valid: (#struct){
-       name!: (string){ |((string){ &(=~"^Foo", =~"Foo$") }, (string){ "an exception" }) }
--- out/eval --
-(struct){
-  disambiguateClosed: (struct){
-    b: (#struct){ |((#struct){
-        x: (bool){ true }
-      }, (#struct){
-        y: (bool){ true }
-      }) }
-    a: (#struct){ |((#struct){
-        x: (bool){ true }
-      }, (#struct){
-        y: (bool){ true }
-      }) }
-    #Def: (#struct){ |((#struct){
-        x: (bool){ true }
-      }, (#struct){
-        y: (bool){ true }
-      }) }
-  }
-  alwaysCheckMatchers1: (struct){
-    b: (struct){
-      c: (string){ "yyyyy" }
-    }
-  }
-  alwaysCheckPatterns2: (struct){
-    a: (#struct){
-      c: (string){ "yyyyy" }
-    }
-    b: (#struct){
-      c: (string){ "yyyyy" }
-    }
-    #X: ((string|struct)){ |((string){ string }, (#struct){
-        c: (string){ string }
-      }) }
-  }
-  nestedNonMonotonic: (struct){
-    resolved: (struct){
-      n1: (struct){
-        x: ((null|struct)){ |((struct){
-            a: (struct){
-              c: (int){ 1 }
-              d: (int){ 1 }
-            }
-          }, (null){ null }) }
-      }
-      n2: (struct){
-        x: ((null|struct)){ |((struct){
-            a: (struct){
-              b: (struct){
-                c: (int){ 1 }
-                d: (int){ 1 }
-              }
-            }
-          }, (null){ null }) }
-      }
-    }
-    eliminated: (struct){
-      n1: (struct){
-        p1: (struct){
-          x: (null){ null }
-        }
-        p2: (struct){
-          x: (null){ null }
-        }
-      }
-      n2: (struct){
-        p1: (struct){
-          x: (null){ null }
-        }
-        p2: (struct){
-          x: (null){ null }
-        }
-      }
-    }
-    incomplete: (struct){
-      a: (struct){
-        n1: (struct){
-          p1: (struct){
-            x: (null){ null }
-          }
-          p2: (struct){
-            x: (null){ null }
-          }
-        }
-        n2: (struct){
-          p1: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
-                    //     ./in.cue:96:15
-                    //     ./in.cue:96:32
-                    //     ./in.cue:97:12
-                    c: (int){ 1 }
-                  }
-                }
-              }, (null){ null }) }
-          }
-          p2: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
-                    //     ./in.cue:102:15
-                    //     ./in.cue:101:12
-                    //     ./in.cue:102:32
-                    c: (int){ 1 }
-                  }
-                }
-              }, (null){ null }) }
-          }
-        }
-      }
-      b: (struct){
-        n1: (struct){
-          p1: (struct){
-            x: (null){ null }
-          }
-          p2: (struct){
-            x: (null){ null }
-          }
-          p3: (struct){
-            x: (null){ null }
-          }
-        }
-        n2: (struct){
-          p1: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
-                    //     ./in.cue:138:15
-                    //     ./in.cue:124:15
-                    //     ./in.cue:125:12
-                    //     ./in.cue:126:12
-                    //     ./in.cue:130:12
-                    //     ./in.cue:131:15
-                    //     ./in.cue:132:12
-                    //     ./in.cue:136:12
-                    //     ./in.cue:137:12
-                    //     ./in.cue:138:32
-                    c: (int){ 1 }
-                    d: (int){ 1 }
-                  }
-                }
-              }, (null){ null }) }
-          }
-        }
-      }
-    }
-  }
-  preserveClosedness: (struct){
-    small: (struct){
-      p1: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (int){ int }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            b: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (int){ int }
-          }) }
-      }
-      p2: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (int){ int }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            a: (string){ string }
-            b: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            b: (int){ int }
-          }) }
-      }
-    }
-    medium: (struct){
-      p1: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            c: (int){ int }
-          }, (#struct){
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            b: (string){ string }
-            d: (string){ string }
-          }) }
-      }
-      p2: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            c: (int){ int }
-          }, (#struct){
-            d: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            b: (string){ string }
-            d: (string){ string }
-          }) }
-      }
-      p3: (struct){
-        #A: (#struct){ |(*(#struct){
-            a: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }) }
-        #B: (#struct){ |(*(#struct){
-          }, (#struct){
-            a: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-          }, (#struct){
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            b: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-          }, (#struct){
-            c: (int){ int }
-          }, (#struct){
-            d: (string){ string }
-          }) }
-      }
-    }
-  }
-  noChildError: (struct){
-    issue1608: (struct){
-      myValue: (#struct){
-        fieldName: (string){ "some string" }
-      }
-      #type: (#struct){
-        fieldName: ((string|struct)){ |((string){ string }, (#struct){
-            foo: (string){ string }
-          }) }
-      }
-      #subtype: ((string|struct)){ |((string){ string }, (#struct){
-          foo: (string){ string }
-        }) }
-    }
-    t1: (struct){
-      #D: (#struct){
-        b: (string){ string }
-      }
-      o: (#struct){
-        b: (string){ "test" }
-      }
-    }
-    t2: (struct){
-      o: (#struct){
-        b: (string){ "test" }
-      }
-      #D: (#struct){
-        b: (string){ string }
-      }
-    }
-    t3: (struct){
-      #D: (#struct){ |((#struct){
-          a: (null){ null }
-        }, (#struct){
-          b: (string){ string }
-        }) }
-      o: (#struct){
-        b: (string){ "test" }
-      }
-    }
-    t4: (struct){
-      o: (#struct){
-        b: (string){ "test" }
-      }
-      #D: (#struct){ |((#struct){
-          a: (null){ null }
-        }, (#struct){
-          b: (string){ string }
-        }) }
-    }
-  }
-  issue1924: (struct){
-    t1: (struct){
-      m: (struct){
-        a: (int){ 2 }
-      }
-      x: (int){ 2 }
-    }
-    t2: (struct){
-      m: (struct){
-        a: (int){ 2 }
-      }
-      x: (int){ 3 }
-    }
-    t3: (struct){
-      m: (struct){
-        a: (int){ 2 }
-      }
-      x: (int){ 1 }
-    }
-  }
-  issue1838: (struct){
-    t1: (struct){
-      p?: (#list){
-      }
-      a: (null){ null }
-    }
-    t2: (struct){
-      p?: (#list){
-      }
-      a: (null){ null }
-    }
-  }
-  noHang: (struct){
-    #T: (list){
-      0: (string){ "d" }
-    }
-    x: ~(noHang.#T)
-    #X: ~(noHang.#T)
-  }
-  issue1940: (struct){
-    #T: (#list){
-      0: (string){ "d" }
-      1: (list){
-      }
-    }
-    #A: (#struct){
-      type: ~(issue1940.#T)
-    }
-    #B: (#struct){
-    }
-    #C: (#struct){
-      x: ~(issue1940.#A)
-    }
-  }
-  issue1417: (struct){
-    #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
-    ids: (#list){
-      0: (string){ "xyz" }
-      1: (string){ "ab" }
-      2: (string){ "aB" }
-    }
-  }
-  issue2209: (struct){
-    simplified: (struct){
-      t1: (struct){
-        #SpecFoo: (#struct){
-          foo: (#struct){
-            min: (int){ 1 }
-          }
-        }
-        #SpecBar: (#struct){
-          bar: (#struct){
-            min: (int){ 1 }
-          }
-        }
-        spec: (#struct){
-          bar: (#struct){
-            min: (int){ 1 }
-          }
-        }
-        out: (struct){ |((struct){
-            minBar: (int){ 1 }
-            X: ~(issue2209.simplified.t1.spec)
-            nullFoo: (null){ null }
-            minFoo: (int){ int }
-          }, (struct){
-            minBar: (int){ 1 }
-            X: ~(issue2209.simplified.t1.spec)
-            nullFoo: (null){ null }
-          }, (struct){
-            minBar: (int){ 1 }
-            X: ~(issue2209.simplified.t1.spec)
-            nullBar: (null){ null }
-            minFoo: (int){ int }
-          }, (struct){
-            minBar: (int){ 1 }
-            X: ~(issue2209.simplified.t1.spec)
-            nullBar: (null){ null }
-          }) }
-      }
-      t2: (struct){ |((struct){
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          BAZ: (int){ 1 }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          BAZ: (int){ 1 }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          BAZ: (int){ 1 }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          BAZ: (int){ 1 }
-          b2: (int){ int }
-        }) }
-      t3: (struct){ |((struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-        }) }
-    }
-    full: (struct){
-      Foo: (#struct){
-        spec: (#struct){
-          foo: (#struct){
-            min: (int){ |(*(int){ 10 }, (int){ int }) }
-            max: (int){ |(*(int){ 20 }, (int){ int }) }
-          }
-        }
-        resource: (#struct){
-          _X: (#struct){
-            spec: ~(issue2209.full.Foo.spec)
-          }
-          spec: (#struct){ |(*(#struct){
-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-              minBar?: (null){ null }
-              maxBar?: (null){ null }
-              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-              fuga?: (null){ null }
-            }, (#struct){
-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-              minBar?: (null){ null }
-              maxBar?: (null){ null }
-              hoge?: (null){ null }
-              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            }) }
-        }
-      }
-      Bar: (#struct){
-        spec: (#struct){
-          bar: (#struct){
-            min: (int){ |(*(int){ 30 }, (int){ int }) }
-            max: (int){ |(*(int){ 40 }, (int){ int }) }
-          }
-        }
-        resource: (#struct){
-          _X: (#struct){
-            spec: ~(issue2209.full.Bar.spec)
-          }
-          spec: (#struct){ |(*(#struct){
-              minFoo?: (null){ null }
-              maxFoo?: (null){ null }
-              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-              fuga?: (null){ null }
-            }, (#struct){
-              minFoo?: (null){ null }
-              maxFoo?: (null){ null }
-              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-              hoge?: (null){ null }
-              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            }) }
-        }
-      }
-      #Abstract: (#struct){
-        spec: (#struct){ |(*(#struct){
-            foo: (#struct){
-              min: (int){ |(*(int){ 10 }, (int){ int }) }
-              max: (int){ |(*(int){ 20 }, (int){ int }) }
-            }
-          }, (#struct){
-            bar: (#struct){
-              min: (int){ |(*(int){ 30 }, (int){ int }) }
-              max: (int){ |(*(int){ 40 }, (int){ int }) }
-            }
-          }) }
-        resource: (#struct){
-          _X: (#struct){
-            spec: (#struct){ |(*(#struct){
-                foo: (#struct){
-                  min: (int){ |(*(int){ 10 }, (int){ int }) }
-                  max: (int){ |(*(int){ 20 }, (int){ int }) }
-                }
-              }, (#struct){
-                bar: (#struct){
-                  min: (int){ |(*(int){ 30 }, (int){ int }) }
-                  max: (int){ |(*(int){ 40 }, (int){ int }) }
-                }
-              }) }
-          }
-          spec: (#struct){ |(*(#struct){
-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-              minBar?: (null){ null }
-              maxBar?: (null){ null }
-              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-              fuga?: (null){ null }
-            }, (#struct){
-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-              minBar?: (null){ null }
-              maxBar?: (null){ null }
-              hoge?: (null){ null }
-              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            }) }
-        }
-      }
-      _#Spec: (#struct){ |(*(#struct){
-          foo: (#struct){
-            min: (int){ |(*(int){ 10 }, (int){ int }) }
-            max: (int){ |(*(int){ 20 }, (int){ int }) }
-          }
-        }, (#struct){
-          bar: (#struct){
-            min: (int){ |(*(int){ 30 }, (int){ int }) }
-            max: (int){ |(*(int){ 40 }, (int){ int }) }
-          }
-        }) }
-      _#SpecFoo: (#struct){
-        foo: (#struct){
-          min: (int){ |(*(int){ 10 }, (int){ int }) }
-          max: (int){ |(*(int){ 20 }, (int){ int }) }
-        }
-      }
-      _#SpecBar: (#struct){
-        bar: (#struct){
-          min: (int){ |(*(int){ 30 }, (int){ int }) }
-          max: (int){ |(*(int){ 40 }, (int){ int }) }
-        }
-      }
-      _Thing: (#struct){
-        _X: (_){ _ }
-        spec: (#struct){ |(*(#struct){
-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-            minBar?: (null){ null }
-            maxBar?: (null){ null }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            fuga?: (null){ null }
-          }, *(#struct){
-            minFoo?: (null){ null }
-            maxFoo?: (null){ null }
-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            fuga?: (null){ null }
-          }, (#struct){
-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-            minBar?: (null){ null }
-            maxBar?: (null){ null }
-            hoge?: (null){ null }
-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          }, (#struct){
-            minFoo?: (null){ null }
-            maxFoo?: (null){ null }
-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            hoge?: (null){ null }
-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          }) }
-      }
-      #Constrained: (#struct){
-        spec: (#struct){ |(*(#struct){
-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-            minBar?: (null){ null }
-            maxBar?: (null){ null }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            fuga?: (null){ null }
-          }, *(#struct){
-            minFoo?: (null){ null }
-            maxFoo?: (null){ null }
-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-            fuga?: (null){ null }
-          }, (#struct){
-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
-            minBar?: (null){ null }
-            maxBar?: (null){ null }
-            hoge?: (null){ null }
-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          }, (#struct){
-            minFoo?: (null){ null }
-            maxFoo?: (null){ null }
-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            hoge?: (null){ null }
-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          }) }
-      }
-      #Base: (#struct){
-        spec: (#struct){
-          minFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
-          maxFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
-          minBar?: ((null|int)){ |((null){ null }, (int){ int }) }
-          maxBar?: ((null|int)){ |((null){ null }, (int){ int }) }
-          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-        }
-      }
-    }
-  }
-  issue2246: (struct){
-    simplified: (struct){
-      #FormFoo: (#struct){
-        fooID: (string){ string }
-      }
-      #FormBar: (#struct){
-        barID: (string){ string }
-      }
-      #Form: (#struct){ |((#struct){
-          fooID: (string){ string }
-        }, (#struct){
-          barID: (string){ string }
-        }) }
-      data: (struct){
-        fooID: (string){ "123" }
-      }
-      out1: (#struct){
-        fooID: (string){ "123" }
-      }
-      out2: (#struct){
-        fooID: (string){ "123" }
-      }
-    }
-    full: (struct){
-      data: (struct){
-        forms: (#list){
-          0: (struct){
-            fooID: (string){ "00-0000001" }
-          }
-        }
-      }
-      form1040: (#list){
-        0: (int){ 3 }
-      }
-      #K1: (#struct){
-        #_base: (#struct){
-          common: (int){ 3 }
-        }
-        #FormFoo: (#struct){
-          fooID: (string){ string }
-          common: (int){ 3 }
-        }
-        #FormBar: (#struct){
-          barID: (string){ string }
-          common: (int){ 3 }
-        }
-        #Form: (#struct){ |((#struct){
-            fooID: (string){ string }
-            common: (int){ 3 }
-          }, (#struct){
-            barID: (string){ string }
-            common: (int){ 3 }
-          }) }
-      }
-      #Input: (#struct){
-        forms: (list){
-        }
-      }
-      #summarizeReturn: (#struct){
-        in: ~(issue2246.full.#Input)
-        out: (#list){
-        }
-      }
-      #compute: (#struct){
-        in: ~(issue2246.full.#Input)
-        out: (#list){
-        }
-      }
-    }
-  }
-  issue2263: (struct){
-    simplified: (struct){
-      metrics: (#struct){
-        id: (string){ "foo" }
-        avg: (int){ 60 }
-      }
-      #Metric: (#struct){ |((#struct){
-          id: (string){ string }
-          avg: (number){ number }
-        }, (#struct){
-          id: (string){ string }
-        }, (#struct){
-          avg: (number){ number }
-        }, (#struct){
-        }) }
-      #IDSource: (#struct){
-        id: (string){ string }
-      }
-      #TargetAverage: (#struct){
-        avg: (number){ number }
-      }
-    }
-    full: (struct){
-      metrics: (#list){
-        0: (#struct){
-          id: (string){ "foo" }
-          avg: (int){ 60 }
-        }
-        1: (#struct){
-          id: (string){ "bar" }
-          value: (int){ 80 }
-        }
-        2: (#struct){
-          uri: (string){ "baz" }
-          avg: (int){ 70 }
-        }
-        3: (#struct){
-          uri: (string){ "qux" }
-          value: (int){ 90 }
-        }
-      }
-      #Metric: (#struct){ |((#struct){
-          id: (string){ string }
-          avg: (number){ number }
-        }, (#struct){
-          id: (string){ string }
-          value: (number){ number }
-        }, (#struct){
-          uri: (string){ string }
-          avg: (number){ number }
-        }, (#struct){
-          uri: (string){ string }
-          value: (number){ number }
-        }) }
-      #Source: (#struct){ |((#struct){
-          id: (string){ string }
-        }, (#struct){
-          uri: (string){ string }
-        }) }
-      #Target: (#struct){ |((#struct){
-          avg: (number){ number }
-        }, (#struct){
-          value: (number){ number }
-        }) }
-      #IDSource: (#struct){
-        id: (string){ string }
-      }
-      #URISource: (#struct){
-        uri: (string){ string }
-      }
-      #TargetAverage: (#struct){
-        avg: (number){ number }
-      }
-      #TargetValue: (#struct){
-        value: (number){ number }
-      }
-    }
-  }
-  issue3149: (struct){
-    #valid: (#struct){
-      name!: (string){ |((string){ &(=~"^Foo", =~"Foo$") }, (string){ "an exception" }) }
-    }
-    list: (#list){
-      0: (#struct){
-        name: (string){ "FooBarFoo" }
-      }
-      1: (#struct){
-        name: (string){ "FooBazFoo" }
-      }
-      2: (#struct){
-        name: (string){ "FooQuuxFoo" }
-      }
-      3: (#struct){
-        name: (string){ "an exception" }
-      }
-    }
-  }
-  issue3528: (struct){
-    original: (struct){
-      workflows: (#list){
-        0: (#struct){
-          container: (#struct){
-          }
-          #container: ((string|struct)){ |((string){ string }, (#struct){
-              volumes?: (list){
-              }
-            }) }
-        }
-      }
-      test: (#struct){
-        container: (#struct){
-        }
-        #container: ((string|struct)){ |((string){ string }, (#struct){
-            volumes?: (list){
-            }
-          }) }
-      }
-      #Workflow: (#struct){
-        container: (#struct){
-        }
-        #container: ((string|struct)){ |((string){ string }, (#struct){
-            volumes?: (list){
-            }
-          }) }
-      }
-    }
-    reduced: (struct){
-      a: (#struct){
-        A: (#struct){
-        }
-        #a: ((int|struct)){ |((int){ 2 }, (#struct){
-            v: (int){ 1 }
-          }) }
-      }
-      #A: (#struct){
-        A: (#struct){
-        }
-        #a: ((int|struct)){ |((int){ 2 }, (#struct){
-            v: (int){ 1 }
-          }) }
-      }
-    }
-    counter: (struct){
-    }
-    nested: (struct){
-      t1: ((int|struct)){ |((struct){
-          v: (int){ 1 }
-        }, (int){ 2 }, (int){ 3 }) }
-      t2: ((int|struct)){ |((struct){
-          v: (int){ 1 }
-        }, (int){ 2 }) }
-    }
-  }
-  issue3784: (struct){
-    reduced: (struct){
-      #Schema: (#struct){
-        a: (#struct){ |((#struct){
-            kind: (string){ "A" }
-            b: (#struct){
-              c?: (string){ string }
-            }
-          }, (#struct){
-            kind: (string){ "B" }
-          }) }
-      }
-      out: (#struct){
-        a: (#struct){
-          kind: (string){ "A" }
-          b: (#struct){
-            c: (string){ "x" }
-          }
-        }
-      }
-    }
-    full: (struct){
-      #Schema: (#struct){
-        pages?: (#struct){ |((#struct){
-            build_type!: (string){ "legacy" }
-            source!: (#struct){
-              branch!: (string){ string }
-              path?: (string){ string }
-            }
-            cname?: (string){ string }
-          }, (#struct){
-            build_type!: (string){ "workflow" }
-            source?: (_|_){
-              // [eval] issue3784.full.#Schema.pages.source: field not allowed:
-              //     ./issue3784.cue:20:4
-              branch?: (string){ string }
-              path?: (string){ string }
-            }
-            cname?: (string){ string }
-          }) }
-      }
-      out: (#struct){
-        pages: (#struct){
-          cname: (string){ "foo.com" }
-          build_type: (string){ "legacy" }
-          source: (#struct){
-            branch: (string){ "main" }
-            path: (string){ "/" }
-          }
-        }
-      }
-    }
-    variant1: (struct){
-      #Schema: (#struct){
-        pages: (#struct){
-          build_type!: (string){ "legacy" }
-          source: (#struct){
-            branch!: (string){ string }
-            path?: (string){ string }
-          }
-          cname?: (string){ string }
-        }
-      }
-    }
-    variant2: (struct){
-      #Schema: (#struct){ |((#struct){
-          build_type!: (string){ "legacy" }
-          source!: (#struct){
-            branch!: (_){ _ }
-          }
-        }, (#struct){
-          build_type!: (string){ "workflow" }
-          cname?: (_){ _ }
-        }) }
-      a: (#struct){
-        build_type!: (string){ "legacy" }
-        source: (#struct){
-          branch!: (string){ string }
-          path?: (_|_){
-            // [eval] issue3784.variant2.a.source.path: field not allowed:
-            //     ./issue3784.cue:83:4
-          }
-        }
-        cname?: (_|_){
-          // [eval] issue3784.variant2.a.cname: field not allowed:
-          //     ./issue3784.cue:85:3
-        }
-      }
-    }
-  }
-  issue3958: (struct){
-    t1: (struct){
-      #schema: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }) }
-      test1: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 2 }) }
-      test2: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
-    }
-    t2: (struct){
-      a: (int){ |((int){ int }, (int){ 8 }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
-      b: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
-    }
-  }
-  issue770: (struct){
-    #A: (#struct){
-      v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
-    }
-    h: (struct){
-      a: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      b: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      boo: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      c: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      coo: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-    }
-  }
-}
+-- out/errors.txt --
+-- out/todo.txt --
+issue2685: only evaluated by v3 evaluator.
 -- out/compile --
 --- in.cue
 {

@@ -1,7 +1,6 @@
 # Cross-package embedded disjunction of definitions should correctly
 # eliminate branches when unified with a concrete field.
 # From issue #4197.
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- cue.mod/module.cue --
 module: "foo.test/main"
 language: version: "v0.14.0"
@@ -11,7 +10,7 @@ package main
 import "foo.test/main/imported"
 
 out: imported
-out: either: foo: "world"
+out: either: foo: "world" @test(eq, "world")
 -- imported/imported.cue --
 package imported
 
@@ -31,21 +30,6 @@ Conjuncts:    18
 Disjuncts:    2
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  out: (struct){
-    either: (#struct){
-      foo: (string){ "world" }
-    }
-    #Foo: (#struct){
-      foo: (_){ _ }
-    }
-    #Bar: (#struct){
-      bar: (_){ _ }
-    }
-  }
-}
--- out/eval --
 -- out/compile --
 --- in.cue
 {

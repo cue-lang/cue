@@ -1,15 +1,16 @@
 // Ensure that references are resolved on the boundaries of disjunctions.
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 resolveAcrossDisjunct: t1: {
 	{} | { #B: 1} // d resolves to 1 in the second case.
 	{d: #B} | {}
 	#B: int
+	@test(eq, {#B: int, d: int} | {#B: int} | {#B: 1, d: 1} | {#B: 1})
 }
 resolveAcrossDisjunct: nested: {
 	{} | { a: b: #B: 1} // d resolves to 1 in the second case.
 	{d: a.b.#B} | {}
 	a: b: #B: int
+	@test(eq, {a: {b: {#B: int}}, d: int} | {a: {b: {#B: int}}} | {a: {b: {#B: 1}}, d: 1} | {a: {b: {#B: 1}}})
 }
 -- out/eval/stats --
 Leaks:  0
@@ -23,49 +24,6 @@ Conjuncts:    33
 Disjuncts:    12
 
 NumCloseIDs: 6
--- out/evalalpha --
-(struct){
-  resolveAcrossDisjunct: (struct){
-    t1: (struct){ |((struct){
-        #B: (int){ int }
-        d: (int){ int }
-      }, (struct){
-        #B: (int){ int }
-      }, (struct){
-        #B: (int){ 1 }
-        d: (int){ 1 }
-      }, (struct){
-        #B: (int){ 1 }
-      }) }
-    nested: (struct){ |((struct){
-        a: (struct){
-          b: (struct){
-            #B: (int){ int }
-          }
-        }
-        d: (int){ int }
-      }, (struct){
-        a: (struct){
-          b: (struct){
-            #B: (int){ int }
-          }
-        }
-      }, (struct){
-        a: (struct){
-          b: (struct){
-            #B: (int){ 1 }
-          }
-        }
-        d: (int){ 1 }
-      }, (struct){
-        a: (struct){
-          b: (struct){
-            #B: (int){ 1 }
-          }
-        }
-      }) }
-  }
-}
 -- out/compile --
 --- in.cue
 {

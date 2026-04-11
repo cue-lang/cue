@@ -1,6 +1,10 @@
-# Tests that comprehensions over pattern-constrained structs work correctly
-# with nested definitions and if-comprehensions. Issue #3929.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# evalv3 regression: nested if-comprehensions inside a definition accessed via
+# a for-comprehension over a pattern-constrained struct incorrectly produced an
+# "incomplete value" error. The if-comprehensions (e.g. strings.HasSuffix
+# guards) failed to evaluate when the definition was reached through multiple
+# layers of embedding (_#cronjob → _#pod → _#container). evalv2 (v0.12.1)
+# accepted the code correctly.
+# https://cuelang.org/issue/3929
 -- in.cue --
 package main
 
@@ -35,6 +39,38 @@ reduced: {
 	in: name: "foobar"
 
 	out: (#def1 & {_in: in}).def1
+	@test(eq, {
+		#Input: {name: string, age: "one" | "two"}
+		#def1: {
+			_in$main: _
+			def1: {
+				_in$main: _
+				def2: {
+					_in$main: {name: string, age: "one" | "two"}
+					def3: "one" | "two"
+				}
+			}
+		}
+		#def2: {
+			_in$main: _
+			def2: {
+				_in$main: {name: string, age: "one" | "two"}
+				def3: "one" | "two"
+			}
+		}
+		#def3: {
+			_in$main: {name: string, age: "one" | "two"}
+			def3: "one" | "two"
+		}
+		in: {name: "foobar"}
+		out: {
+			_in$main: {name: "foobar"}
+			def2: {
+				_in$main: {name: "foobar", age: "one" | "two"}
+				def3: "one" | "two"
+			}
+		}
+	})
 }
 
 full: {
@@ -88,7 +124,79 @@ full: {
 	for k, v in cronjob {
 		objects: cronjob: "\(k)": (_#cronjob & {_config: v}).out
 	}
+	@test(eq, {
+		cronjob: foobar: {
+			image:           "foobar:latest"
+			imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
+		}
+		#CronjobConfig: {
+			image:           string
+			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		}
+		#PodConfig: {
+			image:           string
+			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		}
+		#ContainerConfig: {
+			image:           string
+			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		}
+		_#cronjob$main: {
+			_config$main: {
+				image:           string
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}
+			out: spec: jobTemplate: spec: template: {
+				_config$main: {
+					image:           string
+					imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+				}
+				spec: containers: [{
+					_config$main:    _ @test(ignore)
+					imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+				}]
+			}
+		}
+		_#pod$main: {
+			_config$main: {
+				image:           string
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}
+			spec: containers: [{
+				_config$main:    _ @test(ignore)
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}]
+		}
+		_#container$main: {
+			_config$main: {
+				image:           string
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}
+			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		}
+		objects: cronjob: foobar: spec: jobTemplate: spec: template: {
+			_config$main: {
+				image:           "foobar:latest"
+				imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
+			}
+			spec: containers: [{
+				_config$main:    _ @test(ignore)
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}]
+		}
+	})
 }
+-- out/errors.txt --
+-- out/todo.txt --
+reduced.out.def2._in.age and reduced.out.def2.def3: v3 shows disjunction
+"one"|"two" where v2 resolves to "one". Also, reduced.out._in is a (#struct)
+in v3 vs (struct) in v2.
+reduced.#def3._in: v3 shows ~(reduced.#Input) (structure sharing) where v2
+expands the full struct.
+full._#cronjob, full._#pod, full._#container: v3 uses structure sharing for
+_config fields where v2 expands them.
+full.objects.cronjob.foobar: v3 shows (#struct) type where v2 shows plain
+(struct); inner imagePullPolicy defaults differ between evaluators.
 -- out/eval/stats --
 Leaks:  0
 Freed:  153
@@ -106,406 +214,6 @@ ConjunctInfos:       157
 MaxConjunctInfos:    6
 MaxReqSets:          13
 MaxRedirect:         3
--- out/evalalpha --
-(struct){
-  reduced: (struct){
-    #Input: (#struct){
-      name: (string){ string }
-      age: (string){ |((string){ "one" }, (string){ "two" }) }
-    }
-    #def1: (#struct){
-      _in(:main): (_){ _ }
-      def1: (#struct){
-        _in(:main): (_){ _ }
-        def2: (#struct){
-          _in(:main): (#struct){
-            name: (string){ string }
-            age: (string){ |((string){ "one" }, (string){ "two" }) }
-          }
-          def3: (string){ |((string){ "one" }, (string){ "two" }) }
-        }
-      }
-    }
-    #def2: (#struct){
-      _in(:main): (_){ _ }
-      def2: (#struct){
-        _in(:main): (#struct){
-          name: (string){ string }
-          age: (string){ |((string){ "one" }, (string){ "two" }) }
-        }
-        def3: (string){ |((string){ "one" }, (string){ "two" }) }
-      }
-    }
-    #def3: (#struct){
-      _in(:main): ~(reduced.#Input)
-      def3: (string){ |((string){ "one" }, (string){ "two" }) }
-    }
-    in: (struct){
-      name: (string){ "foobar" }
-    }
-    out: (#struct){
-      _in(:main): (#struct){
-        name: (string){ "foobar" }
-      }
-      def2: (#struct){
-        _in(:main): (#struct){
-          name: (string){ "foobar" }
-          age: (string){ |((string){ "one" }, (string){ "two" }) }
-        }
-        def3: (string){ |((string){ "one" }, (string){ "two" }) }
-      }
-    }
-  }
-  full: (struct){
-    cronjob: (struct){
-      foobar: (#struct){
-        image: (string){ "foobar:latest" }
-        imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
-      }
-    }
-    #CronjobConfig: (#struct){
-      image: (string){ string }
-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-    }
-    #PodConfig: (#struct){
-      image: (string){ string }
-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-    }
-    #ContainerConfig: (#struct){
-      image: (string){ string }
-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-    }
-    _#cronjob(:main): (#struct){
-      _config(:main): ~(full.#CronjobConfig)
-      out: (#struct){
-        spec: (#struct){
-          jobTemplate: (#struct){
-            spec: (#struct){
-              template: (#struct){
-                _config(:main): (#struct){
-                  image: (string){ string }
-                  imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                }
-                spec: (#struct){
-                  containers: (#list){
-                    0: (#struct){
-                      _config(:main): (#struct){
-                        image: (string){ string }
-                        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                      }
-                      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    _#pod(:main): (#struct){
-      _config(:main): ~(full.#PodConfig)
-      spec: (#struct){
-        containers: (#list){
-          0: (#struct){
-            _config(:main): (#struct){
-              image: (string){ string }
-              imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-            }
-            imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-          }
-        }
-      }
-    }
-    _#container(:main): (#struct){
-      _config(:main): ~(full.#ContainerConfig)
-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-    }
-    objects: (struct){
-      cronjob: (struct){
-        foobar: (#struct){
-          spec: (#struct){
-            jobTemplate: (#struct){
-              spec: (#struct){
-                template: (#struct){
-                  _config(:main): (#struct){
-                    image: (string){ "foobar:latest" }
-                    imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
-                  }
-                  spec: (#struct){
-                    containers: (#list){
-                      0: (#struct){
-                        _config(:main): (#struct){
-                          image: (string){ "foobar:latest" }
-                          imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                        }
-                        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -28,10 +28,7 @@
-       }
-     }
-     #def3: (#struct){
--      _in(:main): (#struct){
--        name: (string){ string }
--        age: (string){ |((string){ "one" }, (string){ "two" }) }
--      }
-+      _in(:main): ~(reduced.#Input)
-       def3: (string){ |((string){ "one" }, (string){ "two" }) }
-     }
-     in: (struct){
-@@ -38,15 +35,15 @@
-       name: (string){ "foobar" }
-     }
-     out: (#struct){
--      _in(:main): (struct){
-+      _in(:main): (#struct){
-         name: (string){ "foobar" }
-       }
-       def2: (#struct){
-         _in(:main): (#struct){
-           name: (string){ "foobar" }
--          age: (string){ "one" }
--        }
--        def3: (string){ "one" }
-+          age: (string){ |((string){ "one" }, (string){ "two" }) }
-+        }
-+        def3: (string){ |((string){ "one" }, (string){ "two" }) }
-       }
-     }
-   }
-@@ -70,10 +67,7 @@
-       imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-     }
-     _#cronjob(:main): (#struct){
--      _config(:main): (#struct){
--        image: (string){ string }
--        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
--      }
-+      _config(:main): ~(full.#CronjobConfig)
-       out: (#struct){
-         spec: (#struct){
-           jobTemplate: (#struct){
-@@ -101,10 +95,7 @@
-       }
-     }
-     _#pod(:main): (#struct){
--      _config(:main): (#struct){
--        image: (string){ string }
--        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
--      }
-+      _config(:main): ~(full.#PodConfig)
-       spec: (#struct){
-         containers: (#list){
-           0: (#struct){
-@@ -118,18 +109,15 @@
-       }
-     }
-     _#container(:main): (#struct){
--      _config(:main): (#struct){
--        image: (string){ string }
--        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
--      }
-+      _config(:main): ~(full.#ContainerConfig)
-       imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-     }
-     objects: (struct){
-       cronjob: (struct){
--        foobar: (struct){
--          spec: (struct){
--            jobTemplate: (struct){
--              spec: (struct){
-+        foobar: (#struct){
-+          spec: (#struct){
-+            jobTemplate: (#struct){
-+              spec: (#struct){
-                 template: (#struct){
-                   _config(:main): (#struct){
-                     image: (string){ "foobar:latest" }
-@@ -140,9 +128,9 @@
-                       0: (#struct){
-                         _config(:main): (#struct){
-                           image: (string){ "foobar:latest" }
--                          imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
-+                          imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                         }
--                        imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
-+                        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                       }
-                     }
-                   }
--- out/eval --
-(struct){
-  reduced: (struct){
-    #Input: (#struct){
-      name: (string){ string }
-      age: (string){ |((string){ "one" }, (string){ "two" }) }
-    }
-    #def1: (#struct){
-      _in(:main): (_){ _ }
-      def1: (#struct){
-        _in(:main): (_){ _ }
-        def2: (#struct){
-          _in(:main): (#struct){
-            name: (string){ string }
-            age: (string){ |((string){ "one" }, (string){ "two" }) }
-          }
-          def3: (string){ |((string){ "one" }, (string){ "two" }) }
-        }
-      }
-    }
-    #def2: (#struct){
-      _in(:main): (_){ _ }
-      def2: (#struct){
-        _in(:main): (#struct){
-          name: (string){ string }
-          age: (string){ |((string){ "one" }, (string){ "two" }) }
-        }
-        def3: (string){ |((string){ "one" }, (string){ "two" }) }
-      }
-    }
-    #def3: (#struct){
-      _in(:main): (#struct){
-        name: (string){ string }
-        age: (string){ |((string){ "one" }, (string){ "two" }) }
-      }
-      def3: (string){ |((string){ "one" }, (string){ "two" }) }
-    }
-    in: (struct){
-      name: (string){ "foobar" }
-    }
-    out: (#struct){
-      _in(:main): (struct){
-        name: (string){ "foobar" }
-      }
-      def2: (#struct){
-        _in(:main): (#struct){
-          name: (string){ "foobar" }
-          age: (string){ "one" }
-        }
-        def3: (string){ "one" }
-      }
-    }
-  }
-  full: (struct){
-    cronjob: (struct){
-      foobar: (#struct){
-        image: (string){ "foobar:latest" }
-        imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
-      }
-    }
-    #CronjobConfig: (#struct){
-      image: (string){ string }
-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-    }
-    #PodConfig: (#struct){
-      image: (string){ string }
-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-    }
-    #ContainerConfig: (#struct){
-      image: (string){ string }
-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-    }
-    _#cronjob(:main): (#struct){
-      _config(:main): (#struct){
-        image: (string){ string }
-        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-      }
-      out: (#struct){
-        spec: (#struct){
-          jobTemplate: (#struct){
-            spec: (#struct){
-              template: (#struct){
-                _config(:main): (#struct){
-                  image: (string){ string }
-                  imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                }
-                spec: (#struct){
-                  containers: (#list){
-                    0: (#struct){
-                      _config(:main): (#struct){
-                        image: (string){ string }
-                        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                      }
-                      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    _#pod(:main): (#struct){
-      _config(:main): (#struct){
-        image: (string){ string }
-        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-      }
-      spec: (#struct){
-        containers: (#list){
-          0: (#struct){
-            _config(:main): (#struct){
-              image: (string){ string }
-              imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-            }
-            imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-          }
-        }
-      }
-    }
-    _#container(:main): (#struct){
-      _config(:main): (#struct){
-        image: (string){ string }
-        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-      }
-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
-    }
-    objects: (struct){
-      cronjob: (struct){
-        foobar: (struct){
-          spec: (struct){
-            jobTemplate: (struct){
-              spec: (struct){
-                template: (#struct){
-                  _config(:main): (#struct){
-                    image: (string){ "foobar:latest" }
-                    imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
-                  }
-                  spec: (#struct){
-                    containers: (#list){
-                      0: (#struct){
-                        _config(:main): (#struct){
-                          image: (string){ "foobar:latest" }
-                          imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
-                        }
-                        imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 @experiment(try)
 
@@ -6,20 +5,22 @@
 // Basic try with successful evaluation
 // =============================================================================
 
-a: 1
-b: 2
+a: 1 @test(eq, 1)
+b: 2 @test(eq, 2)
 c?: int  // undefined optional field
 incomplete: int
 
 // Try with successful optional references (both defined)
 success: {
     try { result: a? + b? }
+    @test(eq, {result: 3})
 }
 
 // Try with single optional reference
 single: {
     x: 5
     try { y: x? * 2 }
+    @test(eq, {x: 5, y: 10})
 }
 
 // =============================================================================
@@ -36,11 +37,13 @@ elseNotTriggered: {
 // Note: else uses different field name to avoid merge conflicts with trial evaluation
 elseTriggered: {
     try { v: c? } else { fallback: -1 }
+    @test(eq, {fallback: -1})
 }
 
 // Else with different field names (avoids conflict with trial evaluation)
 elseMultiField: {
     try { x: c?, y: c? } else { fallback: true }
+    @test(eq, {fallback: true})
 }
 
 // =============================================================================
@@ -461,6 +464,51 @@ recursive: t1: { try { for x in [b?] { x } } }
 recursive: t2: { try { {x: b?, y: c?} } }
 recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}
 
+-- out/errors.txt --
+[incomplete] requiredUnfilled.x: required field missing: a:
+    ./in.cue:78:12
+[incomplete] requiredWithType.x: required field missing: a:
+    ./in.cue:91:12
+[eval] closedness.notExistsDef.v: undefined field: g:
+    ./in.cue:181:23
+[eval] closedness.notExistsValue.v: undefined field: g:
+    ./in.cue:184:20
+[eval] indexTests.outOfRangeClosed.v: index out of range [10] with length 3:
+    ./in.cue:209:29
+[eval] indexTests.outOfRangeClosedNoElse.v: index out of range [100] with length 3:
+    ./in.cue:214:29
+[eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
+    ./in.cue:259:12
+[eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
+    ./in.cue:259:12
+[eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
+    ./in.cue:259:12
+[eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
+    ./in.cue:259:12
+[incomplete] refIntoTry.failedRef1.v: undefined field: foo:
+    ./in.cue:313:30
+[incomplete] refIntoTry.failedRef2.v: undefined field: foo:
+    ./in.cue:316:30
+[eval] errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
+    ./in.cue:330:18
+    ./in.cue:7:4
+    ./in.cue:330:23
+[eval] errorPrecedence.divByZero.v: failed arithmetic: division by zero:
+    ./in.cue:341:18
+[eval] errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
+    ./in.cue:7:4
+    ./in.cue:345:20
+    ./in.cue:346:9
+    ./in.cue:346:18
+    ./in.cue:346:23
+[eval] assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
+    ./in.cue:418:22
+[eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
+    ./in.cue:439:17
+-- out/todo.txt --
+In v2, the try mechanism does not exist and many operations that succeed in v3
+produce errors in v2 (type errors, index out of range on open lists, etc.).
+v3 adds the @experiment(try) feature that catches optional reference failures.
 -- out/eval/stats --
 Leaks:  53
 Freed:  354
@@ -473,810 +521,6 @@ Conjuncts:    507
 Disjuncts:    0
 
 NumCloseIDs: 173
--- out/evalalpha --
-Errors:
-errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
-    ./in.cue:7:4
-    ./in.cue:341:20
-    ./in.cue:342:9
-    ./in.cue:342:18
-    ./in.cue:342:23
-closedness.notExistsDef.v: undefined field: g:
-    ./in.cue:177:23
-closedness.notExistsValue.v: undefined field: g:
-    ./in.cue:180:20
-indexTests.outOfRangeClosed.v: index out of range [10] with length 3:
-    ./in.cue:205:29
-indexTests.outOfRangeClosedNoElse.v: index out of range [100] with length 3:
-    ./in.cue:210:29
-edgeCases.referenceError.a: failed arithmetic: division by zero:
-    ./in.cue:255:12
-errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-    ./in.cue:326:18
-    ./in.cue:7:4
-    ./in.cue:326:23
-errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-    ./in.cue:337:18
-assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-    ./in.cue:414:22
-assignmentForm.withRealError.result: failed arithmetic: division by zero:
-    ./in.cue:435:17
-
-Result:
-(_|_){
-  // [eval]
-  a: (int){ 1 }
-  b: (int){ 2 }
-  c?: (int){ int }
-  incomplete: (int){ int }
-  success: (struct){
-    result: (int){ 3 }
-  }
-  single: (struct){
-    x: (int){ 5 }
-    y: (int){ 10 }
-  }
-  fallbackDef: (int){ 42 }
-  elseNotTriggered: (struct){
-    v: (int){ 42 }
-  }
-  elseTriggered: (struct){
-    fallback: (int){ -1 }
-  }
-  elseMultiField: (struct){
-    fallback: (bool){ true }
-  }
-  emptyOnFail: (struct){
-  }
-  mixedRefs: (struct){
-    fallback: (bool){ true }
-  }
-  incompleteOK: (struct){
-    x: (int){ int }
-  }
-  incompleteNestedBody: (struct){
-    x: (struct){
-      y: (int){ int }
-    }
-  }
-  requiredUnfilled: (struct){
-    a!: (_){ _ }
-    x: (_|_){
-      // [incomplete] requiredUnfilled.x: required field missing: a:
-      //     ./in.cue:74:12
-    }
-  }
-  requiredFilled: (struct){
-    a: (int){ 5 }
-    x: (int){ 5 }
-  }
-  requiredWithType: (struct){
-    a!: (int){ int }
-    x: (_|_){
-      // [incomplete] requiredWithType.x: required field missing: a:
-      //     ./in.cue:87:12
-    }
-  }
-  forWithDefinedSource: (struct){
-    val: (int){ 2 }
-  }
-  forWithUndefinedSource: (struct){
-    empty: (bool){ true }
-  }
-  nested: (struct){
-    outer: (struct){
-      inner: (int){ 1 }
-    }
-    multi: (struct){
-      first: (int){ 1 }
-      second: (int){ 2 }
-    }
-    deepNested: (struct){
-      level1: (struct){
-        level2: (int){ 1 }
-      }
-    }
-  }
-  complexExpr: (struct){
-    binOp: (struct){
-      sum: (int){ 3 }
-      prod: (int){ 2 }
-    }
-    list: (struct){
-      items: (#list){
-        0: (int){ 1 }
-        1: (int){ 2 }
-        2: (int){ 3 }
-      }
-    }
-  }
-  selectorTests: (struct){
-    data: (struct){
-      nested: (struct){
-        value: (int){ 100 }
-      }
-    }
-    definedSelector: (struct){
-      v: (int){ 100 }
-    }
-  }
-  closedness: (_|_){
-    // [eval]
-    #Def: (#struct){
-      f: (int){ int }
-    }
-    d: ~(closedness.#Def)
-    exists: (struct){
-      v: (int){ int }
-    }
-    notExistsDef: (_|_){
-      // [eval]
-      v: (_|_){
-        // [eval] closedness.notExistsDef.v: undefined field: g:
-        //     ./in.cue:177:23
-      }
-    }
-    notExistsValue: (_|_){
-      // [eval]
-      v: (_|_){
-        // [eval] closedness.notExistsValue.v: undefined field: g:
-        //     ./in.cue:180:20
-      }
-    }
-  }
-  indexTests: (_|_){
-    // [eval]
-    closedList: (#list){
-      0: (int){ 10 }
-      1: (int){ 20 }
-      2: (int){ 30 }
-    }
-    openList: (list){
-      0: (int){ 10 }
-      1: (int){ 20 }
-      2: (int){ 30 }
-    }
-    definedIndex: (struct){
-      v: (int){ 10 }
-    }
-    middleIndex: (struct){
-      v: (int){ 20 }
-    }
-    outOfRangeClosed: (_|_){
-      // [eval]
-      v: (_|_){
-        // [eval] indexTests.outOfRangeClosed.v: index out of range [10] with length 3:
-        //     ./in.cue:205:29
-      }
-    }
-    outOfRangeClosedNoElse: (_|_){
-      // [eval]
-      v: (_|_){
-        // [eval] indexTests.outOfRangeClosedNoElse.v: index out of range [100] with length 3:
-        //     ./in.cue:210:29
-      }
-    }
-    outOfRangeOpen: (struct){
-      fallback: (int){ -1 }
-    }
-    outOfRangeOpenNoElse: (struct){
-    }
-    multipleIndex: (struct){
-      x: (int){ 10 }
-      y: (int){ 20 }
-      z: (int){ 30 }
-    }
-  }
-  edgeCases: (_|_){
-    // [eval]
-    emptyBody: (struct){
-    }
-    literalOnly: (struct){
-      x: (int){ 42 }
-    }
-    firstFails: (struct){
-      skipped: (bool){ true }
-    }
-    secondFails: (struct){
-      skipped: (bool){ true }
-    }
-    referenceError: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-        //     ./in.cue:255:12
-        _b: (int){ 2 }
-      }
-      direct: (_|_){
-        // [eval]
-        v: ~(edgeCases.referenceError.a)
-      }
-      dontSkipError1: (_|_){
-        // [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-        //     ./in.cue:255:12
-      }
-      dontSkipError2: (_|_){
-        // [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-        //     ./in.cue:255:12
-      }
-    }
-  }
-  refIntoTry: (struct){
-    source: (struct){
-      val: (int){ 1 }
-    }
-    ref: (int){ 1 }
-    nestedSource: (struct){
-      inner: (struct){
-        deep: (int){ 2 }
-      }
-    }
-    nestedRef: (int){ 2 }
-    nestedSkipped?: (struct){
-    }
-    mixedSource: (struct){
-      bar?: (int){ 1 }
-      baz: (int){ 1 }
-    }
-    skippedRef: (struct){
-      missing: (bool){ true }
-    }
-    failedRef1: (struct){
-      v: (_|_){
-        // [incomplete] refIntoTry.failedRef1.v: undefined field: foo:
-        //     ./in.cue:309:30
-      }
-    }
-    failedRef2: (struct){
-      v: (_|_){
-        // [incomplete] refIntoTry.failedRef2.v: undefined field: foo:
-        //     ./in.cue:312:30
-      }
-    }
-    successRef: (struct){
-      v: (int){ 1 }
-    }
-  }
-  errorPrecedence: (_|_){
-    // [eval]
-    typeErrorDefined: (_|_){
-      // [eval]
-      v: (_|_){
-        // [eval] errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-        //     ./in.cue:326:18
-        //     ./in.cue:7:4
-        //     ./in.cue:326:23
-      }
-    }
-    typeErrorUndefined: (struct){
-      fallback: (string){ "ok" }
-    }
-    divByZero: (_|_){
-      // [eval]
-      v: (_|_){
-        // [eval] errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-        //     ./in.cue:337:18
-      }
-    }
-    conflictError: (_|_){
-      // [eval]
-      v: (_|_){
-        // [eval] errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
-        //     ./in.cue:7:4
-        //     ./in.cue:341:20
-        //     ./in.cue:342:9
-        //     ./in.cue:342:18
-        //     ./in.cue:342:23
-      }
-    }
-    mixedError: (struct){
-      fallback: (string){ "ok" }
-    }
-    mixedErrorMultiple: (struct){
-      fallback: (string){ "ok" }
-    }
-  }
-  assignmentForm: (_|_){
-    // [eval]
-    basicDefined: (struct){
-      result: (int){ 1 }
-    }
-    basicUndefined: (struct){
-      fallback: (int){ 0 }
-    }
-    noElseUndefined: (struct){
-    }
-    withExpression: (struct){
-      result: (int){ 3 }
-    }
-    withFailingExpr: (struct){
-      fallback: (int){ -1 }
-    }
-    chained: (struct){
-      result: (int){ 3 }
-    }
-    withSelector: (struct){
-      data: (struct){
-        inner: (int){ 42 }
-      }
-      result: (int){ 42 }
-    }
-    withIndex: (struct){
-      list: (#list){
-        0: (int){ 10 }
-        1: (int){ 20 }
-        2: (int){ 30 }
-      }
-      result: (int){ 20 }
-    }
-    withOutOfRangeIndex: (_|_){
-      // [eval]
-      list: (#list){
-        0: (int){ 10 }
-        1: (int){ 20 }
-        2: (int){ 30 }
-      }
-      result: (_|_){
-        // [eval] assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-        //     ./in.cue:414:22
-      }
-    }
-    withOutOfRangeIndexOpen: (struct){
-      list: (list){
-        0: (int){ 10 }
-        1: (int){ 20 }
-        2: (int){ 30 }
-      }
-      fallback: (int){ -1 }
-    }
-    nestedUse: (struct){
-      inner: (struct){
-        value: (int){ 2 }
-      }
-    }
-    chainedOneFails: (struct){
-    }
-    withRealError: (_|_){
-      // [eval]
-      result: (_|_){
-        // [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
-        //     ./in.cue:435:17
-      }
-    }
-    withFor: (struct){
-      "0": (int){ 3 }
-      "1": (int){ 4 }
-    }
-    withIf: (struct){
-      positive: (int){ 1 }
-    }
-    withLet: (struct){
-      doubled: (int){ 2 }
-    }
-  }
-  recursive: (struct){
-    t1: (int){ 2 }
-    t2: (struct){
-    }
-    t3: (struct){
-      z: (int){ 23 }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,40 @@
--(struct){
-+Errors:
-+errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
-+    ./in.cue:7:4
-+    ./in.cue:341:20
-+    ./in.cue:342:9
-+    ./in.cue:342:18
-+    ./in.cue:342:23
-+closedness.notExistsDef.v: undefined field: g:
-+    ./in.cue:177:23
-+closedness.notExistsValue.v: undefined field: g:
-+    ./in.cue:180:20
-+indexTests.outOfRangeClosed.v: index out of range [10] with length 3:
-+    ./in.cue:205:29
-+indexTests.outOfRangeClosedNoElse.v: index out of range [100] with length 3:
-+    ./in.cue:210:29
-+edgeCases.referenceError.a: failed arithmetic: division by zero:
-+    ./in.cue:255:12
-+errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-+    ./in.cue:326:18
-+    ./in.cue:7:4
-+    ./in.cue:326:23
-+errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-+    ./in.cue:337:18
-+assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-+    ./in.cue:414:22
-+assignmentForm.withRealError.result: failed arithmetic: division by zero:
-+    ./in.cue:435:17
-+
-+Result:
-+(_|_){
-+  // [eval]
-   a: (int){ 1 }
-   b: (int){ 2 }
-+  c?: (int){ int }
-+  incomplete: (int){ int }
-   success: (struct){
--    c: (int){ 3 }
-+    result: (int){ 3 }
-   }
-   single: (struct){
-     x: (int){ 5 }
-@@ -9,7 +41,349 @@
-     y: (int){ 10 }
-   }
-   fallbackDef: (int){ 42 }
--  withFallbackDef: (struct){
-+  elseNotTriggered: (struct){
-     v: (int){ 42 }
-   }
-+  elseTriggered: (struct){
-+    fallback: (int){ -1 }
-+  }
-+  elseMultiField: (struct){
-+    fallback: (bool){ true }
-+  }
-+  emptyOnFail: (struct){
-+  }
-+  mixedRefs: (struct){
-+    fallback: (bool){ true }
-+  }
-+  incompleteOK: (struct){
-+    x: (int){ int }
-+  }
-+  incompleteNestedBody: (struct){
-+    x: (struct){
-+      y: (int){ int }
-+    }
-+  }
-+  requiredUnfilled: (struct){
-+    a!: (_){ _ }
-+    x: (_|_){
-+      // [incomplete] requiredUnfilled.x: required field missing: a:
-+      //     ./in.cue:74:12
-+    }
-+  }
-+  requiredFilled: (struct){
-+    a: (int){ 5 }
-+    x: (int){ 5 }
-+  }
-+  requiredWithType: (struct){
-+    a!: (int){ int }
-+    x: (_|_){
-+      // [incomplete] requiredWithType.x: required field missing: a:
-+      //     ./in.cue:87:12
-+    }
-+  }
-+  forWithDefinedSource: (struct){
-+    val: (int){ 2 }
-+  }
-+  forWithUndefinedSource: (struct){
-+    empty: (bool){ true }
-+  }
-+  nested: (struct){
-+    outer: (struct){
-+      inner: (int){ 1 }
-+    }
-+    multi: (struct){
-+      first: (int){ 1 }
-+      second: (int){ 2 }
-+    }
-+    deepNested: (struct){
-+      level1: (struct){
-+        level2: (int){ 1 }
-+      }
-+    }
-+  }
-+  complexExpr: (struct){
-+    binOp: (struct){
-+      sum: (int){ 3 }
-+      prod: (int){ 2 }
-+    }
-+    list: (struct){
-+      items: (#list){
-+        0: (int){ 1 }
-+        1: (int){ 2 }
-+        2: (int){ 3 }
-+      }
-+    }
-+  }
-+  selectorTests: (struct){
-+    data: (struct){
-+      nested: (struct){
-+        value: (int){ 100 }
-+      }
-+    }
-+    definedSelector: (struct){
-+      v: (int){ 100 }
-+    }
-+  }
-+  closedness: (_|_){
-+    // [eval]
-+    #Def: (#struct){
-+      f: (int){ int }
-+    }
-+    d: ~(closedness.#Def)
-+    exists: (struct){
-+      v: (int){ int }
-+    }
-+    notExistsDef: (_|_){
-+      // [eval]
-+      v: (_|_){
-+        // [eval] closedness.notExistsDef.v: undefined field: g:
-+        //     ./in.cue:177:23
-+      }
-+    }
-+    notExistsValue: (_|_){
-+      // [eval]
-+      v: (_|_){
-+        // [eval] closedness.notExistsValue.v: undefined field: g:
-+        //     ./in.cue:180:20
-+      }
-+    }
-+  }
-+  indexTests: (_|_){
-+    // [eval]
-+    closedList: (#list){
-+      0: (int){ 10 }
-+      1: (int){ 20 }
-+      2: (int){ 30 }
-+    }
-+    openList: (list){
-+      0: (int){ 10 }
-+      1: (int){ 20 }
-+      2: (int){ 30 }
-+    }
-+    definedIndex: (struct){
-+      v: (int){ 10 }
-+    }
-+    middleIndex: (struct){
-+      v: (int){ 20 }
-+    }
-+    outOfRangeClosed: (_|_){
-+      // [eval]
-+      v: (_|_){
-+        // [eval] indexTests.outOfRangeClosed.v: index out of range [10] with length 3:
-+        //     ./in.cue:205:29
-+      }
-+    }
-+    outOfRangeClosedNoElse: (_|_){
-+      // [eval]
-+      v: (_|_){
-+        // [eval] indexTests.outOfRangeClosedNoElse.v: index out of range [100] with length 3:
-+        //     ./in.cue:210:29
-+      }
-+    }
-+    outOfRangeOpen: (struct){
-+      fallback: (int){ -1 }
-+    }
-+    outOfRangeOpenNoElse: (struct){
-+    }
-+    multipleIndex: (struct){
-+      x: (int){ 10 }
-+      y: (int){ 20 }
-+      z: (int){ 30 }
-+    }
-+  }
-+  edgeCases: (_|_){
-+    // [eval]
-+    emptyBody: (struct){
-+    }
-+    literalOnly: (struct){
-+      x: (int){ 42 }
-+    }
-+    firstFails: (struct){
-+      skipped: (bool){ true }
-+    }
-+    secondFails: (struct){
-+      skipped: (bool){ true }
-+    }
-+    referenceError: (_|_){
-+      // [eval]
-+      a: (_|_){
-+        // [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-+        //     ./in.cue:255:12
-+        _b: (int){ 2 }
-+      }
-+      direct: (_|_){
-+        // [eval]
-+        v: ~(edgeCases.referenceError.a)
-+      }
-+      dontSkipError1: (_|_){
-+        // [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-+        //     ./in.cue:255:12
-+      }
-+      dontSkipError2: (_|_){
-+        // [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-+        //     ./in.cue:255:12
-+      }
-+    }
-+  }
-+  refIntoTry: (struct){
-+    source: (struct){
-+      val: (int){ 1 }
-+    }
-+    ref: (int){ 1 }
-+    nestedSource: (struct){
-+      inner: (struct){
-+        deep: (int){ 2 }
-+      }
-+    }
-+    nestedRef: (int){ 2 }
-+    nestedSkipped?: (struct){
-+    }
-+    mixedSource: (struct){
-+      bar?: (int){ 1 }
-+      baz: (int){ 1 }
-+    }
-+    skippedRef: (struct){
-+      missing: (bool){ true }
-+    }
-+    failedRef1: (struct){
-+      v: (_|_){
-+        // [incomplete] refIntoTry.failedRef1.v: undefined field: foo:
-+        //     ./in.cue:309:30
-+      }
-+    }
-+    failedRef2: (struct){
-+      v: (_|_){
-+        // [incomplete] refIntoTry.failedRef2.v: undefined field: foo:
-+        //     ./in.cue:312:30
-+      }
-+    }
-+    successRef: (struct){
-+      v: (int){ 1 }
-+    }
-+  }
-+  errorPrecedence: (_|_){
-+    // [eval]
-+    typeErrorDefined: (_|_){
-+      // [eval]
-+      v: (_|_){
-+        // [eval] errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-+        //     ./in.cue:326:18
-+        //     ./in.cue:7:4
-+        //     ./in.cue:326:23
-+      }
-+    }
-+    typeErrorUndefined: (struct){
-+      fallback: (string){ "ok" }
-+    }
-+    divByZero: (_|_){
-+      // [eval]
-+      v: (_|_){
-+        // [eval] errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-+        //     ./in.cue:337:18
-+      }
-+    }
-+    conflictError: (_|_){
-+      // [eval]
-+      v: (_|_){
-+        // [eval] errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
-+        //     ./in.cue:7:4
-+        //     ./in.cue:341:20
-+        //     ./in.cue:342:9
-+        //     ./in.cue:342:18
-+        //     ./in.cue:342:23
-+      }
-+    }
-+    mixedError: (struct){
-+      fallback: (string){ "ok" }
-+    }
-+    mixedErrorMultiple: (struct){
-+      fallback: (string){ "ok" }
-+    }
-+  }
-+  assignmentForm: (_|_){
-+    // [eval]
-+    basicDefined: (struct){
-+      result: (int){ 1 }
-+    }
-+    basicUndefined: (struct){
-+      fallback: (int){ 0 }
-+    }
-+    noElseUndefined: (struct){
-+    }
-+    withExpression: (struct){
-+      result: (int){ 3 }
-+    }
-+    withFailingExpr: (struct){
-+      fallback: (int){ -1 }
-+    }
-+    chained: (struct){
-+      result: (int){ 3 }
-+    }
-+    withSelector: (struct){
-+      data: (struct){
-+        inner: (int){ 42 }
-+      }
-+      result: (int){ 42 }
-+    }
-+    withIndex: (struct){
-+      list: (#list){
-+        0: (int){ 10 }
-+        1: (int){ 20 }
-+        2: (int){ 30 }
-+      }
-+      result: (int){ 20 }
-+    }
-+    withOutOfRangeIndex: (_|_){
-+      // [eval]
-+      list: (#list){
-+        0: (int){ 10 }
-+        1: (int){ 20 }
-+        2: (int){ 30 }
-+      }
-+      result: (_|_){
-+        // [eval] assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-+        //     ./in.cue:414:22
-+      }
-+    }
-+    withOutOfRangeIndexOpen: (struct){
-+      list: (list){
-+        0: (int){ 10 }
-+        1: (int){ 20 }
-+        2: (int){ 30 }
-+      }
-+      fallback: (int){ -1 }
-+    }
-+    nestedUse: (struct){
-+      inner: (struct){
-+        value: (int){ 2 }
-+      }
-+    }
-+    chainedOneFails: (struct){
-+    }
-+    withRealError: (_|_){
-+      // [eval]
-+      result: (_|_){
-+        // [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
-+        //     ./in.cue:435:17
-+      }
-+    }
-+    withFor: (struct){
-+      "0": (int){ 3 }
-+      "1": (int){ 4 }
-+    }
-+    withIf: (struct){
-+      positive: (int){ 1 }
-+    }
-+    withLet: (struct){
-+      doubled: (int){ 2 }
-+    }
-+  }
-+  recursive: (struct){
-+    t1: (int){ 2 }
-+    t2: (struct){
-+    }
-+    t3: (struct){
-+      z: (int){ 23 }
-+    }
-+  }
- }
--- out/eval --
-(struct){
-  a: (int){ 1 }
-  b: (int){ 2 }
-  success: (struct){
-    c: (int){ 3 }
-  }
-  single: (struct){
-    x: (int){ 5 }
-    y: (int){ 10 }
-  }
-  fallbackDef: (int){ 42 }
-  withFallbackDef: (struct){
-    v: (int){ 42 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

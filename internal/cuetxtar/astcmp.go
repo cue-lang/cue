@@ -186,17 +186,26 @@ func valuesEqual(a, b cue.Value) bool {
 	if a.Equals(b) {
 		return true
 	}
-	// Normalize ArcType: temporarily set b's ArcType to match a's.
 	av, bv := a.Core().V, b.Core().V
-	if av.ArcType == bv.ArcType {
-		return false // ArcType already matches; genuine inequality.
-	}
-	saved := bv.ArcType
-	bv.ArcType = av.ArcType
 	opCtx := value.OpContext(a)
-	eq := adt.Equal(opCtx, av, bv, 0)
-	bv.ArcType = saved
-	return eq
+	// Follow structure-sharing pointers on both sides and compare the terminal
+	// scalar BaseValues directly. This handles two v3 evaluator behaviors:
+	//
+	//  1. Disjunct arc vertices may be thin wrappers (ArcType mismatch,
+	//     BaseValue = *adt.Vertex sharing) whose deref'd scalar matches a.
+	//  2. Arc vertices may have extra hidden arcs via the shared vertex that
+	//     prevent adt.Equal from succeeding even when scalar values agree.
+	avFinal := av.DerefValue()
+	bvFinal := bv.DerefValue()
+	if avFinal.Kind() == bvFinal.Kind() {
+		avBV, avOk := avFinal.BaseValue.(adt.Value)
+		bvBV, bvOk := bvFinal.BaseValue.(adt.Value)
+		if avOk && bvOk && adt.Equal(opCtx, avBV, bvBV, 0) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // isASTDisjunction reports whether expr represents a disjunction (| or *).
@@ -242,7 +251,7 @@ func checkStructuralMatch(path cue.Path, expr ast.Expr, val cue.Value) error {
 	case *adt.Conjunction:
 		if !isASTConjunction(expr) {
 			return pathErr(path, "value is a conjunction but expected expression is not; "+
-				"use a conjunction in the expected value")
+				"use a conjunction in the expected value or @test(final) on the field")
 		}
 	}
 
@@ -826,8 +835,9 @@ func (c *cmpCtx) cmpDisjunction(path cue.Path, expr ast.Expr, val cue.Value) err
 			len(astNonDefaults), len(vNonDefs))
 	}
 
-	// Order-independent matching: defaults against defaults.
 	opCtx := value.OpContext(val)
+
+	// Order-independent matching: defaults against defaults.
 	if err := c.matchDisjuncts(path, opCtx, "default", astDefaults, vDefs); err != nil {
 		return err
 	}

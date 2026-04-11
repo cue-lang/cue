@@ -1,19 +1,36 @@
 #name: ips
 #evalFull
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 import "list"
 
-IP: list.Repeat([uint8], 4)
+IP: list.Repeat([uint8], 4) @test(leq, [...uint8])
 
 Private:
 	*[ 192, 168, uint8, uint8] |
 	[ 10, uint8, uint8, uint8] |
-	[ 172, >=16 & <=32, uint8, uint8]
+	[ 172, >=16 & <=32, uint8, uint8] @test(leq, [...uint8])
 
-Inst: Private & [ _, 10, ...]
+Inst: Private & [ _, 10, ...] @test(leq, [_, 10, uint8, uint8])
 
-MyIP: Inst & [_, _, 10, 10]
+MyIP: Inst & [_, _, 10, 10] @test(eq, [10, 10, 10, 10])
+@test(eq, {
+	IP: [
+		>=0 & <=255 & int,
+		>=0 & <=255 & int,
+		>=0 & <=255 & int,
+		>=0 & <=255 & int
+	]
+	Private: *[192, 168, >=0 & <=255 & int, >=0 & <=255 & int] |
+		[10, >=0 & <=255 & int, >=0 & <=255 & int, >=0 & <=255 & int] |
+		[172, >=16 & <=32, >=0 & <=255 & int, >=0 & <=255 & int]
+	Inst: [
+		10,
+		10,
+		>=0 & <=255 & int,
+		>=0 & <=255 & int
+	]
+	MyIP: [10, 10, 10, 10]
+})
 -- out/compile --
 --- in.cue
 {
@@ -60,40 +77,3 @@ Conjuncts:    86
 Disjuncts:    9
 
 NumCloseIDs: 8
--- out/evalalpha --
-(struct){
-  IP: (#list){
-    0: (int){ &(>=0, <=255, int) }
-    1: (int){ &(>=0, <=255, int) }
-    2: (int){ &(>=0, <=255, int) }
-    3: (int){ &(>=0, <=255, int) }
-  }
-  Private: (list){ |(*(#list){
-      0: (int){ 192 }
-      1: (int){ 168 }
-      2: (int){ &(>=0, <=255, int) }
-      3: (int){ &(>=0, <=255, int) }
-    }, (#list){
-      0: (int){ 10 }
-      1: (int){ &(>=0, <=255, int) }
-      2: (int){ &(>=0, <=255, int) }
-      3: (int){ &(>=0, <=255, int) }
-    }, (#list){
-      0: (int){ 172 }
-      1: (number){ &(>=16, <=32) }
-      2: (int){ &(>=0, <=255, int) }
-      3: (int){ &(>=0, <=255, int) }
-    }) }
-  Inst: (#list){
-    0: (int){ 10 }
-    1: (int){ 10 }
-    2: (int){ &(>=0, <=255, int) }
-    3: (int){ &(>=0, <=255, int) }
-  }
-  MyIP: (#list){
-    0: (int){ 10 }
-    1: (int){ 10 }
-    2: (int){ 10 }
-    3: (int){ 10 }
-  }
-}

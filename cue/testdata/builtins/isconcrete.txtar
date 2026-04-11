@@ -1,0 +1,196 @@
+# Tests for isConcrete and concreteN builtins
+
+-- in.cue --
+// isConcrete with concrete values
+concreteConcrete: {
+	a:      1
+	checkA: isConcrete(a)   @test(eq, true)
+	b:      "hello"
+	checkB: isConcrete(b)   @test(eq, true)
+
+	c? int
+	checkC: isConcrete(c)   @test(err)
+}
+
+// isConcrete with types (non-concrete)
+concreteTypes: {
+	a:      int
+	checkA: isConcrete(a)   @test(eq, false)
+	b:      string
+	checkB: isConcrete(b)   @test(eq, false)
+}
+
+// isConcrete with constraints (non-concrete)
+concreteConstraints: {
+	a:      >0
+	checkA: isConcrete(a)   @test(eq, false)
+	b:      =~"hello"
+	checkB: isConcrete(b)   @test(eq, false)
+}
+
+// isConcrete with disjunctions
+concreteDisjunction: {
+	a:      1 | 2    // no default: not concrete
+	checkA: isConcrete(a)   @test(eq, false)
+	b:      1 | *2   // single default: concrete (finalization selects it)
+	checkB: isConcrete(b)   @test(eq, true)
+}
+
+// concreteN with count constraints (a and c are concrete, b is not)
+concreteNCount: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(2, a, b, c)
+	@test(eq, {a: 1, b: int, c: "hello"})
+}
+
+// concreteN with all concrete
+concreteNAll: {
+	a: 1
+	b: 2
+	c: 3
+	concreteN(3, a, b, c)
+	@test(eq, {a: 1, b: 2, c: 3})
+}
+
+// isConcrete with concrete struct
+concreteStruct: {
+	s:      {a: 1, b: "x"}
+	checkS: isConcrete(s)   @test(eq, true)
+}
+
+// isConcrete with concrete struct with optional field
+concreteStructWithOptional: {
+	s:      {a: 1, b?: int}
+	checkS: isConcrete(s)   @test(eq, true)
+}
+
+// isConcrete with concrete list
+concreteList: {
+	l:      [1, 2, 3]
+	checkL: isConcrete(l)   @test(eq, true)
+}
+
+// isConcrete with struct containing non-concrete field
+concreteStructNonConcrete: {
+	s:      {a: int}
+	checkS: isConcrete(s)   @test(eq, false)
+}
+
+// isConcrete with errors returns false
+concreteError: {
+	a:      1 & "x"   @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[1, "x", int, string], pos=[0:10, 0:14])
+	checkA: isConcrete(a)   @test(eq, false)
+}
+
+// concreteN with bound constraints (a and c are concrete, b is not)
+concreteNBounds: {
+	a:  1
+	b:  int
+	c:  "hello"
+	concreteN(>=1, a, b, c)
+	concreteN(<=2, a, b, c)
+	@test(eq, {a: 1, b: int, c: "hello"})
+}
+
+// concreteN failure - requires all 3 concrete but only 2 are
+concreteNFailure: {
+	a: 1
+	b: int // not concrete
+	c: "hello"
+	concreteN(3, a, b, c)
+	@test(err, code=incomplete, contains="%s", args=[concreteN], pos=[4:2, 4:12])
+}
+-- out/errors.txt --
+[eval] concreteError.a: conflicting values 1 and "x" (mismatched types int and string):
+    ./in.cue:77:10
+    ./in.cue:77:14
+[incomplete] concreteNFailure: concreteN: concreteN: 2 matched, expected 3:
+    ./in.cue:96:2
+    ./in.cue:96:12
+-- out/compile --
+--- in.cue
+{
+  concreteConcrete: {
+    a: 1
+    checkA: isConcrete(〈0;a〉)
+    b: "hello"
+    checkB: isConcrete(〈0;b〉)
+  }
+  concreteTypes: {
+    a: int
+    checkA: isConcrete(〈0;a〉)
+    b: string
+    checkB: isConcrete(〈0;b〉)
+  }
+  concreteConstraints: {
+    a: >0
+    checkA: isConcrete(〈0;a〉)
+    b: =~"hello"
+    checkB: isConcrete(〈0;b〉)
+  }
+  concreteDisjunction: {
+    a: (1|2)
+    checkA: isConcrete(〈0;a〉)
+    b: (1|*2)
+    checkB: isConcrete(〈0;b〉)
+  }
+  concreteNCount: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNAll: {
+    a: 1
+    b: 2
+    c: 3
+    concreteN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteStruct: {
+    s: {
+      a: 1
+      b: "x"
+    }
+    checkS: isConcrete(〈0;s〉)
+  }
+  concreteStructWithOptional: {
+    s: {
+      a: 1
+      b?: int
+    }
+    checkS: isConcrete(〈0;s〉)
+  }
+  concreteList: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    checkL: isConcrete(〈0;l〉)
+  }
+  concreteStructNonConcrete: {
+    s: {
+      a: int
+    }
+    checkS: isConcrete(〈0;s〉)
+  }
+  concreteError: {
+    a: (1 & "x")
+    checkA: isConcrete(〈0;a〉)
+  }
+  concreteNBounds: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+    concreteN(<=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNFailure: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+}

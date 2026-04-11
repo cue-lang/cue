@@ -1,0 +1,266 @@
+# Tests for isValid and validN builtins
+
+-- in.cue --
+// isValid with concrete values
+validConcrete: {
+	a:      1
+	checkA: isValid(a)
+}
+
+// isValid with non-concrete values (types, constraints)
+validNonConcrete: {
+	a:      int
+	checkA: isValid(a)
+	b:      >0
+	checkB: isValid(b)
+}
+
+// isValid with errors (conflicting unification)
+validErrors: {
+	a:      1 & 2
+	checkA: isValid(a)
+
+	b:      int & string
+	checkB: isValid(b)
+
+	c: {a: 1} & {a: 2}
+	checkC: isValid(c)
+
+	d: {a: b: c: d: int} & {a: b: c: d: string}
+	checkD: isValid(d)
+}
+
+// validN with count constraints
+validNCount: {
+	a: 1
+	b: 2
+	c: 1 & 2
+	validN(2, a, b, c)
+}
+
+// isValid with literal
+validLiteral: {
+	checkInt:    isValid(42)
+	checkString: isValid("hello")
+}
+
+// isValid with computation
+validComputation: {
+	checkAdd: isValid(1 + 2)
+}
+
+// validN with bound constraints
+validNBounds: {
+	a:  1
+	b:  2
+	c:  1 & 2
+	t1: validN(>=1, a, b, c)
+	t2: validN(<=2, a, b, c)
+}
+
+// validN failure - requires all 3 valid but only 2 are
+validNFailure: {
+	a: 1
+	b: 2
+	c: 1 & 2
+	// can never still have 3 valid values, as there are only 3 values total and c is always invalid.
+	t1: validN(3, a, b, c)
+}
+
+// validN embedded failure - requires >=3 valid but only 2 are possible (c is permanently invalid)
+validNEmbedFail: {
+	a:  1
+	b:  2
+	c:  1 & 2
+	t1: validN(>=3, a, b, c)
+}
+
+// isValid on non-existent reference returns false (not error)
+// Missing field is an evaluation error, and isValid returns false for any error
+isValidMissingRef: {
+	a: b?: c: {}
+	check: isValid(a.b.c)
+}
+
+// isValid on existing but invalid reference should return false
+isValidExistingInvalid: {
+	a: x: 1 & "foo"
+	check: isValid(a.x)
+}
+-- existing.cue --
+import "list"
+
+isValidIncomplete: {
+	xc: close({})
+	xo: {}
+	okc2: {
+		if isValid({} & {s: [for y in xc.undefined {}]}) {a: 1}
+	}
+	oko2: {
+		if isValid({} & {s: [for y in xo.undefined {}]}) {a: 1}
+	}
+	okc3: {
+		if isValid({s: [for y in xc.undefined {}]}) {a: 1}
+	}
+
+	oko3: {
+		if isValid({s: [for y in xo.undefined {}]}) {a: 1}
+	}
+
+	// Pass final error back from list argument, though comprehension, and
+	// pass up.
+	// https://cuelang.org/issue/1969
+	viaLet: okc: {
+		let X = xc.undefined
+		let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
+
+		if isValid(Y) {Y}
+	}
+
+}
+-- out/compile --
+--- existing.cue
+{
+  isValidIncomplete: {
+    xc: close({})
+    xo: {}
+    okc2: {
+      if isValid(({} & {
+        s: [
+          for _, y in 〈3;xc〉.undefined {},
+        ]
+      })) {
+        a: 1
+      }
+    }
+    oko2: {
+      if isValid(({} & {
+        s: [
+          for _, y in 〈3;xo〉.undefined {},
+        ]
+      })) {
+        a: 1
+      }
+    }
+    okc3: {
+      if isValid({
+        s: [
+          for _, y in 〈3;xc〉.undefined {},
+        ]
+      }) {
+        a: 1
+      }
+    }
+    oko3: {
+      if isValid({
+        s: [
+          for _, y in 〈3;xo〉.undefined {},
+        ]
+      }) {
+        a: 1
+      }
+    }
+    viaLet: {
+      okc: {
+        let X#1 = 〈2;xc〉.undefined
+        let Y#2 = ({} & {
+          s: [
+            for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+          ]
+        })
+        if isValid(〈0;let Y#2〉) {
+          〈1;let Y#2〉
+        }
+      }
+    }
+  }
+}
+--- in.cue
+{
+  validConcrete: {
+    a: 1
+    checkA: isValid(〈0;a〉)
+  }
+  validNonConcrete: {
+    a: int
+    checkA: isValid(〈0;a〉)
+    b: >0
+    checkB: isValid(〈0;b〉)
+  }
+  validErrors: {
+    a: (1 & 2)
+    checkA: isValid(〈0;a〉)
+    b: (int & string)
+    checkB: isValid(〈0;b〉)
+    c: ({
+      a: 1
+    } & {
+      a: 2
+    })
+    checkC: isValid(〈0;c〉)
+    d: ({
+      a: {
+        b: {
+          c: {
+            d: int
+          }
+        }
+      }
+    } & {
+      a: {
+        b: {
+          c: {
+            d: string
+          }
+        }
+      }
+    })
+    checkD: isValid(〈0;d〉)
+  }
+  validNCount: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    validN(2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  validLiteral: {
+    checkInt: isValid(42)
+    checkString: isValid("hello")
+  }
+  validComputation: {
+    checkAdd: isValid((1 + 2))
+  }
+  validNBounds: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: validN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+    t2: validN(<=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  validNFailure: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: validN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  validNEmbedFail: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: validN(>=3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  isValidMissingRef: {
+    a: {
+      b?: {
+        c: {}
+      }
+    }
+    check: isValid(〈0;a〉.b.c)
+  }
+  isValidExistingInvalid: {
+    a: {
+      x: (1 & "foo")
+    }
+    check: isValid(〈0;a〉.x)
+  }
+}

@@ -44,6 +44,9 @@ func TestFiles(t *testing.T) {
 		if t.HasTag("simplify") {
 			opts = append(opts, format.Simplify())
 		}
+		if version, ok := t.Value("version"); ok {
+			opts = append(opts, format.Version(version))
+		}
 		// TODO(mvdan): note that this option is not exposed in the API,
 		// nor does it seem to be actually tested in any of the txtar testdata files.
 		// if t.HasTag("sort-imports") {

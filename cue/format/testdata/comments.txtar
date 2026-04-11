@@ -326,7 +326,7 @@ foo: [
 ]
 
 [
-	if true {}, // inline comment
+	if true {} // inline comment
 ]
 
 {
@@ -343,7 +343,7 @@ foo: [
 
 // issue #4238
 [string]: [
-	...string, // inline comment without a comma
+	...string // inline comment without a comma
 ]
 [string]: [
 	...string, // inline comment with a comma

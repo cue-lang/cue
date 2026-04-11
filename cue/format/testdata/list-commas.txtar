@@ -1,0 +1,60 @@
+# Test that without --simplify, the formatter preserves existing comma style.
+# Lists with all explicit commas keep them; lists without commas don't get them added.
+# Mixed lists (some commas, some not) normalize to no commas.
+
+-- with-commas.input --
+a: [
+	1,
+	2,
+	3,
+]
+
+b: [1, 2, 3]
+-- out/format/with-commas.golden --
+a: [
+	1,
+	2,
+	3,
+]
+
+b: [1, 2, 3]
+-- without-commas.input --
+a: [
+	1
+	2
+	3
+]
+
+b: [1, 2, 3]
+-- out/format/without-commas.golden --
+a: [
+	1
+	2
+	3
+]
+
+b: [1, 2, 3]
+-- mixed-commas.input --
+a: [
+	1,
+	2
+	3,
+]
+-- out/format/mixed-commas.golden --
+a: [
+	1
+	2
+	3
+]
+-- last-commas-missing.input --
+a: [
+	1,
+	2,
+	3
+]
+-- out/format/last-commas-missing.golden --
+a: [
+	1,
+	2,
+	3,
+]

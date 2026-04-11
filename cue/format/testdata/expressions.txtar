@@ -422,7 +422,7 @@ import "list"
 	e: [...]
 	e: [
 		...]
-	e: [...,
+	e: [...
 	]
 	e: [1, 2, ...]
 	e: [1, 2,
@@ -594,11 +594,11 @@ machine_type: [
 ][0]
 
 long_field_name: ([
-	"foo",
+	"foo"
 ])
 
 long_field_name: [
-	"foo",
+	"foo"
 ].bar
 
 _foo: {

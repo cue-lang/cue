@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4ef9acd_118963ed",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1442,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:16:42Z",
+      "side": 1,
+      "message": "Ah, I think I misunderstood. Done",
+      "parentUuid": "87d14ace_2b573416",
+      "revId": "4a24873be1aa87c2c843d8d508a8eb3f70191e39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94dc2d69_6aee8804",

@@ -373,6 +373,15 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 	// walkStruct records @test decl attrs and recurses into all sub-fields.
 	var walkStruct func(sl *ast.StructLit, path cue.Path)
 
+	// scanUnreachableTests scans expr for @test attributes that appear inside
+	// struct literals which are binary-expression operands. Such attributes are
+	// never visited by walkField/walkStruct and would be silently ignored;
+	// they are reported here as parse errors so the test suite fails loudly.
+	//
+	// inOperand must be true when expr is already inside a binary-expression
+	// operand (meaning all @test within it are unreachable regardless of depth).
+	var scanUnreachableTests func(expr ast.Expr, path cue.Path, inOperand bool)
+
 	walkField = func(field *ast.Field, path cue.Path) {
 		fieldBaseLine := field.Pos().Line()
 
@@ -396,6 +405,8 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 
 		if sl, ok := field.Value.(*ast.StructLit); ok {
 			walkStruct(sl, path)
+		} else {
+			scanUnreachableTests(field.Value, path, false)
 		}
 	}
 
@@ -463,6 +474,50 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 						})
 					}
 				}
+
+			case *ast.EmbedDecl:
+				// Bare embeddings (e.g. `A & {f: v @test(...)}`) are not
+				// walked by walkField/walkStruct, so any @test inside them
+				// would be silently ignored. Scan and report them as errors.
+				scanUnreachableTests(e.Expr, path, false)
+			}
+		}
+	}
+
+	scanUnreachableTests = func(expr ast.Expr, path cue.Path, inOperand bool) {
+		switch e := expr.(type) {
+		case *ast.BinaryExpr:
+			scanUnreachableTests(e.X, path, true)
+			scanUnreachableTests(e.Y, path, true)
+		case *ast.ParenExpr:
+			scanUnreachableTests(e.X, path, inOperand)
+		case *ast.StructLit:
+			if !inOperand {
+				return // reachable; handled by walkField/walkStruct
+			}
+			for _, elt := range e.Elts {
+				switch elt := elt.(type) {
+				case *ast.Attribute:
+					k, _ := elt.Split()
+					if k == "test" {
+						appendErrRecord(elt, path, true, false, fmt.Errorf(
+							"@test inside a struct literal that is a binary-expression operand "+
+								"(e.g. X & {@test(...)}) is not reachable by the test runner; "+
+								"place @test after the field value (e.g. f: X & {...} @test(...)) "+
+								"or as a decl attribute in the enclosing struct"))
+					}
+				case *ast.Field:
+					for _, a := range elt.Attrs {
+						k, _ := a.Split()
+						if k == "test" {
+							appendErrRecord(a, path, false, false, fmt.Errorf(
+								"@test on a field inside a struct literal that is a binary-expression operand "+
+									"(e.g. X & {f: v @test(...)}) is not reachable by the test runner; "+
+									"place @test after the enclosing field value (e.g. f: X & {...} @test(...))"))
+						}
+					}
+					scanUnreachableTests(elt.Value, path, true)
+				}
 			}
 		}
 	}
@@ -489,13 +544,16 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 	}
 
 	for _, decl := range f.Decls {
-		field, ok := decl.(*ast.Field)
-		if !ok {
-			continue
-		}
-		fieldPath := appendPath(cue.Path{}, field.Label, hidPkg)
-		if fieldPath.Err() == nil {
-			walkField(field, fieldPath)
+		switch d := decl.(type) {
+		case *ast.Field:
+			fieldPath := appendPath(cue.Path{}, d.Label, hidPkg)
+			if fieldPath.Err() == nil {
+				walkField(d, fieldPath)
+			}
+		case *ast.EmbedDecl:
+			// Top-level bare embeddings are also not walked by walkField, so
+			// scan them for unreachable @test attributes.
+			scanUnreachableTests(d.Expr, cue.Path{}, false)
 		}
 	}
 

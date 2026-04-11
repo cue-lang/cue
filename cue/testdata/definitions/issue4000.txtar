@@ -1,6 +1,5 @@
 # Tests that list.Sort with complex type definitions involving defaults works.
 # Issue: https://cuelang.org/issue/4000
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 import "list"
 
@@ -8,11 +7,28 @@ items: list.Sort(#List.items, {
 	x:    {}
 	y:    {}
 	less: x.kind < y.kind
-})
+}) @test(eq, [{
+		spec: [{rules: [{expr: "x"}]}]
+		kind: *"default" | string
+
+		@test(shareID=L0)
+	},{
+		spec: [{rules: [{expr: "y"}]}]
+		kind: *"default" | string
+
+		@test(shareID=L1)
+	}]
+)
 
 #List: items: list.Concat(_items)
 
 _items: [#VMRuleList]
+
+// TODO: this works, but make the in-place ones work as well for lists.
+// @test(shareID=L0, at=items.0)
+// @test(shareID=L1, at=items.1)
+// @test(shareID=L0, at=#VMRuleList.0)
+// @test(shareID=L1, at=#VMRuleList.1)
 
 #VMRuleList: [...null | #VMRule] & [{
 	spec: [{
@@ -22,74 +38,36 @@ _items: [#VMRuleList]
 	spec: [{
 		rules: [{expr: "y"}]
 	}]
-}]
+}] @test(eq, [{
+	@test(shareID=L0)
+
+	kind: *"default" | string
+	spec: [{
+		rules: [{
+			expr: "x"
+		}]
+	}]
+}, {
+	@test(shareID=L1)
+
+	kind: *"default" | string
+	spec: [{
+		rules: [{
+			expr: "y"
+		}]
+	}]
+}])
 
 #RuleGroup: rules: [...#Rule]
 
-#Rule: expr: string
+#Rule: expr: string @test(eq, string)
 
 #VMRule: {
 	#TypeMeta
 	spec: [...#RuleGroup]
 }
 #TypeMeta: kind: string | *"default"
--- out/evalalpha --
-(struct){
-  items: (#list){
-    0: ~(#VMRuleList.0)
-    1: ~(#VMRuleList.1)
-  }
-  #List: (#struct){
-    items: (#list){
-      0: ~(#VMRuleList.0)
-      1: ~(#VMRuleList.1)
-    }
-  }
-  _items: (#list){
-    0: ~(#VMRuleList)
-  }
-  #VMRuleList: (#list){
-    0: (#struct){
-      spec: (#list){
-        0: (#struct){
-          rules: (#list){
-            0: (#struct){
-              expr: (string){ "x" }
-            }
-          }
-        }
-      }
-      kind: (string){ |(*(string){ "default" }, (string){ string }) }
-    }
-    1: (#struct){
-      spec: (#list){
-        0: (#struct){
-          rules: (#list){
-            0: (#struct){
-              expr: (string){ "y" }
-            }
-          }
-        }
-      }
-      kind: (string){ |(*(string){ "default" }, (string){ string }) }
-    }
-  }
-  #RuleGroup: (#struct){
-    rules: (list){
-    }
-  }
-  #Rule: (#struct){
-    expr: (string){ string }
-  }
-  #VMRule: (#struct){
-    spec: (list){
-    }
-    kind: (string){ |(*(string){ "default" }, (string){ string }) }
-  }
-  #TypeMeta: (#struct){
-    kind: (string){ |(*(string){ "default" }, (string){ string }) }
-  }
-}
+-- out/errors.txt --
 -- out/compile --
 --- in.cue
 {
@@ -160,235 +138,6 @@ Conjuncts:    77
 Disjuncts:    12
 
 NumCloseIDs: 17
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,85 +1,16 @@
- (struct){
-   items: (#list){
--    0: (#struct){
--      spec: (#list){
--        0: (#struct){
--          rules: (#list){
--            0: (#struct){
--              expr: (string){ "x" }
--            }
--          }
--        }
--      }
--      kind: (string){ |(*(string){ "default" }, (string){ string }) }
--    }
--    1: (#struct){
--      spec: (#list){
--        0: (#struct){
--          rules: (#list){
--            0: (#struct){
--              expr: (string){ "y" }
--            }
--          }
--        }
--      }
--      kind: (string){ |(*(string){ "default" }, (string){ string }) }
--    }
-+    0: ~(#VMRuleList.0)
-+    1: ~(#VMRuleList.1)
-   }
-   #List: (#struct){
-     items: (#list){
--      0: (#struct){
--        spec: (#list){
--          0: (#struct){
--            rules: (#list){
--              0: (#struct){
--                expr: (string){ "x" }
--              }
--            }
--          }
--        }
--        kind: (string){ |(*(string){ "default" }, (string){ string }) }
--      }
--      1: (#struct){
--        spec: (#list){
--          0: (#struct){
--            rules: (#list){
--              0: (#struct){
--                expr: (string){ "y" }
--              }
--            }
--          }
--        }
--        kind: (string){ |(*(string){ "default" }, (string){ string }) }
--      }
-+      0: ~(#VMRuleList.0)
-+      1: ~(#VMRuleList.1)
-     }
-   }
-   _items: (#list){
--    0: (#list){
--      0: (#struct){
--        spec: (#list){
--          0: (#struct){
--            rules: (#list){
--              0: (#struct){
--                expr: (string){ "x" }
--              }
--            }
--          }
--        }
--        kind: (string){ |(*(string){ "default" }, (string){ string }) }
--      }
--      1: (#struct){
--        spec: (#list){
--          0: (#struct){
--            rules: (#list){
--              0: (#struct){
--                expr: (string){ "y" }
--              }
--            }
--          }
--        }
--        kind: (string){ |(*(string){ "default" }, (string){ string }) }
--      }
--    }
-+    0: ~(#VMRuleList)
-   }
-   #VMRuleList: (#list){
-     0: (#struct){
-@@ -115,9 +46,9 @@
-     expr: (string){ string }
-   }
-   #VMRule: (#struct){
--    kind: (string){ |(*(string){ "default" }, (string){ string }) }
-     spec: (list){
-     }
-+    kind: (string){ |(*(string){ "default" }, (string){ string }) }
-   }
-   #TypeMeta: (#struct){
-     kind: (string){ |(*(string){ "default" }, (string){ string }) }
--- out/eval --
-(struct){
-  items: (#list){
-    0: (#struct){
-      spec: (#list){
-        0: (#struct){
-          rules: (#list){
-            0: (#struct){
-              expr: (string){ "x" }
-            }
-          }
-        }
-      }
-      kind: (string){ |(*(string){ "default" }, (string){ string }) }
-    }
-    1: (#struct){
-      spec: (#list){
-        0: (#struct){
-          rules: (#list){
-            0: (#struct){
-              expr: (string){ "y" }
-            }
-          }
-        }
-      }
-      kind: (string){ |(*(string){ "default" }, (string){ string }) }
-    }
-  }
-  #List: (#struct){
-    items: (#list){
-      0: (#struct){
-        spec: (#list){
-          0: (#struct){
-            rules: (#list){
-              0: (#struct){
-                expr: (string){ "x" }
-              }
-            }
-          }
-        }
-        kind: (string){ |(*(string){ "default" }, (string){ string }) }
-      }
-      1: (#struct){
-        spec: (#list){
-          0: (#struct){
-            rules: (#list){
-              0: (#struct){
-                expr: (string){ "y" }
-              }
-            }
-          }
-        }
-        kind: (string){ |(*(string){ "default" }, (string){ string }) }
-      }
-    }
-  }
-  _items: (#list){
-    0: (#list){
-      0: (#struct){
-        spec: (#list){
-          0: (#struct){
-            rules: (#list){
-              0: (#struct){
-                expr: (string){ "x" }
-              }
-            }
-          }
-        }
-        kind: (string){ |(*(string){ "default" }, (string){ string }) }
-      }
-      1: (#struct){
-        spec: (#list){
-          0: (#struct){
-            rules: (#list){
-              0: (#struct){
-                expr: (string){ "y" }
-              }
-            }
-          }
-        }
-        kind: (string){ |(*(string){ "default" }, (string){ string }) }
-      }
-    }
-  }
-  #VMRuleList: (#list){
-    0: (#struct){
-      spec: (#list){
-        0: (#struct){
-          rules: (#list){
-            0: (#struct){
-              expr: (string){ "x" }
-            }
-          }
-        }
-      }
-      kind: (string){ |(*(string){ "default" }, (string){ string }) }
-    }
-    1: (#struct){
-      spec: (#list){
-        0: (#struct){
-          rules: (#list){
-            0: (#struct){
-              expr: (string){ "y" }
-            }
-          }
-        }
-      }
-      kind: (string){ |(*(string){ "default" }, (string){ string }) }
-    }
-  }
-  #RuleGroup: (#struct){
-    rules: (list){
-    }
-  }
-  #Rule: (#struct){
-    expr: (string){ string }
-  }
-  #VMRule: (#struct){
-    kind: (string){ |(*(string){ "default" }, (string){ string }) }
-    spec: (list){
-    }
-  }
-  #TypeMeta: (#struct){
-    kind: (string){ |(*(string){ "default" }, (string){ string }) }
-  }
-}
+-- out/diff-v2-v3.txt --
+Structure sharing: v3 uses ~(#VMRuleList.0) etc. for items list elements.
+Default disjunction: kind field uses *"default" | string — needs @test(final) for precise testing.

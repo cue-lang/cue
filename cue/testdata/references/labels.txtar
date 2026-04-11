@@ -1,36 +1,42 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 // Label aliases
 
 // direct
 a: [X=string]: X
 a: bar:        _
+@test(eq, {bar: "bar"}, at=a)
 
 // in struct
 b: [X=string]: {X}
 b: bar: _
+@test(eq, {bar: "bar"}, at=b)
 
 // in structs
 c: [X=string]: X
 c: [Y=string]: {{{Y}}}
 c: bar: _
+@test(eq, {bar: "bar"}, at=c)
 
 // in sub field
 d: [X=string]: name: X
 d: bar: {}
+@test(eq, {bar: {name: "bar"}}, at=d)
 
 // nested
 e: [X=string]: [Y=string]: X + Y
 e: foo: bar:               _
+@test(eq, {foo: {bar: "foobar"}}, at=e)
 
 patternField: t1: {
 	r=[string]: {b: r | null}
 	a: {r: 0}
+	@test(eq, {a: {r: 0, b: null}})
 }
 
 patternField: t2: {
 	a: {r: 0}
 	x=[string]: {z: 1, b: x.z}
+	@test(eq, {a: {r: 0, z: 1, b: 1}})
 }
 
 // Field aliases
@@ -40,6 +46,13 @@ f1: C="foo\(bar)": {
 	name: "xx"
 	foo:  C.name
 }
+@test(eq, {
+	foo3: {
+		name: "xx"
+		foo: "xx"
+		foo3baz: {name: "xx", a: "xx", b: "xx"}
+	}
+}, at=f1)
 
 // nested
 f1: D="foo\(bar)": E="foo\(bar)baz": {
@@ -55,10 +68,13 @@ c1: C="foo\(bar)": [D=string]: {
 	foo:  C.x.name
 }
 c1: foo3: x: _
+@test(eq, {foo3: {x: {name: "x", foo: "x"}}}, at=c1)
+
 
 emptyLabel: {
 	"": 1
 	a:  emptyLabel[""]
+	@test(eq, {"": 1, a: 1})
 }
 
 underscore: a: {
@@ -66,23 +82,27 @@ underscore: a: {
 	foo: #Foo
 	foo: "_":     "bar"
 	#Foo: [=~""]: string
+	@test(eq, {foo: {"_": "bar"}, #Foo: {}})
 }
 
 underscore: c: {
 	foo: "_":    "any"
 	foo: [=~""]: string
+	@test(eq, {foo: {"_": "any"}})
 }
 
 underscore: d: {
 	bar: "_":       "any"
 	#bar: [string]: string
 	bar: #bar
+	@test(eq, {bar: {"_": "any"}, #bar: {}})
 }
 
 underscore: e: {
 	baz: "_h":     "any"
 	#baz: [=~"_"]: string
 	baz: #baz
+	@test(eq, {baz: {"_h": "any"}, #baz: {}})
 }
 
 // TODO: support. Also not yet supported in old implementation.
@@ -97,7 +117,11 @@ underscore: e: {
 invalidPattern: {
 	[=~"BAD)" & =~"x"]: string
 	y: 123
+	@test(err, code=eval, contains="invalid regexp", pos=[1:22])
 }
+-- out/errors.txt --
+[eval] invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
+    ./in.cue:117:22
 -- out/eval/stats --
 Leaks:  1
 Freed:  60
@@ -110,106 +134,6 @@ Conjuncts:    101
 Disjuncts:    2
 
 NumCloseIDs: 9
--- out/evalalpha --
-Errors:
-invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
-    ./in.cue:96:22
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    bar: (string){ "bar" }
-  }
-  b: (struct){
-    bar: (string){ "bar" }
-  }
-  c: (struct){
-    bar: (string){ "bar" }
-  }
-  d: (struct){
-    bar: (struct){
-      name: (string){ "bar" }
-    }
-  }
-  e: (struct){
-    foo: (struct){
-      bar: (string){ "foobar" }
-    }
-  }
-  patternField: (struct){
-    t1: (struct){
-      a: (struct){
-        r: (int){ 0 }
-        b: (null){ null }
-      }
-    }
-    t2: (struct){
-      a: (struct){
-        r: (int){ 0 }
-        z: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-  }
-  bar: (int){ 3 }
-  f1: (struct){
-    foo3: (struct){
-      name: (string){ "xx" }
-      foo: (string){ "xx" }
-      foo3baz: (struct){
-        name: (string){ "xx" }
-        a: (string){ "xx" }
-        b: (string){ "xx" }
-      }
-    }
-  }
-  c1: (struct){
-    foo3: (struct){
-      x: (struct){
-        name: (string){ "x" }
-        foo: (string){ "x" }
-      }
-    }
-  }
-  emptyLabel: (struct){
-    "": (int){ 1 }
-    a: (int){ 1 }
-  }
-  underscore: (struct){
-    a: (struct){
-      foo: (#struct){
-        "_": (string){ "bar" }
-      }
-      #Foo: (#struct){
-      }
-    }
-    c: (struct){
-      foo: (struct){
-        "_": (string){ "any" }
-      }
-    }
-    d: (struct){
-      bar: (#struct){
-        "_": (string){ "any" }
-      }
-      #bar: (#struct){
-      }
-    }
-    e: (struct){
-      baz: (#struct){
-        "_h": (string){ "any" }
-      }
-      #baz: (#struct){
-      }
-    }
-  }
-  invalidPattern: (_|_){
-    // [eval] invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
-    //     ./in.cue:96:22
-    y: (int){ 123 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

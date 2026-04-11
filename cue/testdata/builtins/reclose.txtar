@@ -1,4 +1,3 @@
-#todo:inline: medium — builtin function calls; use InferBuiltins for validators
 -- in.cue --
 @experiment(explicitopen)
 
@@ -9,6 +8,11 @@ noClose: {
 	})
 
 	t1: ok: a & {b: 1}
+	@test(eq, {
+		foo: {a: int}
+		a: {a: int}
+		t1: {ok: {b: 1, a: int}}
+	})
 }
 
 recursive: {
@@ -20,24 +24,24 @@ recursive: {
 	})
 
 	// Test that extra fields are not allowed (should error)
-	t1: err: a & {extra: "not allowed"}
+	t1: err: a & {extra: "not allowed"} @test(err, code=eval, path=extra, contains="field not allowed", pos=[0:16])
 
-	t2: ok: a & {nested: field2: 5}
-	t3: ok: a & {foo: 5}
+	t2: ok: a & {nested: field2: 5} @test(eq, {nested: {field2: 5}, foo: int})
+	t3: ok: a & {foo: 5}  @test(eq, {foo: 5, nested: {field2: int}})
 
 
 	// Test that nested extra fields are not allowed (should error)
 	t4: err: a & {
-		field1: 1
 		nested: {
-			field2: "hello"
+			field2: 1
 			extra: "not allowed"
 		}
-	}
+	} @test(err, code=eval, path=nested.extra, contains="field not allowed", pos=[3:4])
 
 	// Test with empty struct
+	// TODO(eval): is this correct?
 	e: __reclose({})
-	t5: err: e & {extra: "not allowed"}  // should error
+	t5: err: e & {extra: "not allowed"} @test(eq, {extra: "not allowed"})
 }
 
 
@@ -47,17 +51,17 @@ nonRecursive: {
 		c: int
 		d: e: int
 	})
-	y: err: x & {f: int}
-	z: ok: x & {d: f: int}
+	y: err: x & {f: int}   @test(err, code=eval, path=f, contains="field not allowed", pos=[0:15])
+	z: ok: x & {d: f: int} @test(eq, {d: {f: int, e: int}, c: int, b: int})
 }
 
 nonStructLiterals: {
 	// Test with non-struct should error
-	t1: err: __reclose("not a struct")
+	t1: err: __reclose("not a struct") @test(err, code=eval, contains="error in call to %s", args=[__reclose], pos=[0:11])
 
 
 	#A: a: int
-	t4: err: __reclose(#A)
+	t4: err: __reclose(#A) @test(err, code=eval, contains="error in call to %s", args=[__reclose], pos=[0:11])
 }
 
 nonStructDefinitions: {
@@ -67,17 +71,37 @@ nonStructDefinitions: {
 		#Def...
 	})
 
-	t1: ok: a & 1
+	t1: ok: a & 1  @test(eq, 1)
 
-	t2: err: a & {b: 1} // errors because of regular field + embedded scalar
+	// errors because of regular field + embedded scalar
+	t2: err: a & {b: 1}  @test(err, code=eval,
+		contains="conflicting values %s and %s (mismatched types %s and %s)",
+		args=[{b:1}, 1, struct, int], pos=[-9:8, 0:11, 0:15])
 }
 
 -- old.cue --
 retro: {
 	// May not be used if explicitopen is not set.
-	t1: err: __reclose({})
+	t1: err: __reclose({}) @test(err, code=eval, contains="error in call to %s", args=[__reclose], pos=[0:11])
 }
 
+-- out/errors.txt --
+[eval] recursive.t1.err.extra: field not allowed:
+    ./in.cue:26:16
+[eval] recursive.t4.err.nested.extra: field not allowed:
+    ./in.cue:36:4
+[eval] nonRecursive.y.err.f: field not allowed:
+    ./in.cue:53:15
+[eval] nonStructLiterals.t1.err: error in call to __reclose: argument must be a struct or list literal:
+    ./in.cue:59:11
+[eval] nonStructLiterals.t4.err: error in call to __reclose: argument must be a struct or list literal:
+    ./in.cue:63:11
+[eval] nonStructDefinitions.t2.err: conflicting values {b:1} and 1 (mismatched types struct and int):
+    ./in.cue:67:8
+    ./in.cue:76:11
+    ./in.cue:76:15
+[eval] retro.t1.err: error in call to __reclose: __reclose may only be used when explicitopen is enabled:
+    ./old.cue:3:11
 -- out/compile --
 --- in.cue
 {
@@ -123,9 +147,8 @@ retro: {
     }
     t4: {
       err: (〈1;a〉 & {
-        field1: 1
         nested: {
-          field2: "hello"
+          field2: 1
           extra: "not allowed"
         }
       })
@@ -191,196 +214,6 @@ retro: {
   retro: {
     t1: {
       err: __reclose({})
-    }
-  }
-}
--- out/evalalpha --
-Errors:
-nonRecursive.y.err.f: field not allowed:
-    ./in.cue:48:15
-nonStructDefinitions.t2.err: conflicting values {b:1} and 1 (mismatched types struct and int):
-    ./in.cue:62:8
-    ./in.cue:70:11
-    ./in.cue:70:15
-recursive.t1.err.extra: field not allowed:
-    ./in.cue:21:16
-recursive.t4.err.nested.field2: conflicting values "hello" and int (mismatched types string and int):
-    ./in.cue:17:19
-    ./in.cue:28:11
-    ./in.cue:31:12
-nonStructLiterals.t1.err: error in call to __reclose: argument must be a struct or list literal:
-    ./in.cue:54:11
-nonStructLiterals.t4.err: error in call to __reclose: argument must be a struct or list literal:
-    ./in.cue:58:11
-retro.t1.err: error in call to __reclose: __reclose may only be used when explicitopen is enabled:
-    ./old.cue:3:11
-
-Result:
-(_|_){
-  // [eval]
-  noClose: (struct){
-    foo: (struct){
-      a: (int){ int }
-    }
-    a: (struct){
-      a: (int){ int }
-    }
-    t1: (struct){
-      ok: (struct){
-        b: (int){ 1 }
-        a: (int){ int }
-      }
-    }
-  }
-  recursive: (_|_){
-    // [eval]
-    #x: (#struct){
-      foo: (int){ int }
-    }
-    a: (#struct){
-      nested: (#struct){
-        field2: (int){ int }
-      }
-      foo: (int){ int }
-    }
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        extra: (_|_){
-          // [eval] recursive.t1.err.extra: field not allowed:
-          //     ./in.cue:21:16
-        }
-        nested: (#struct){
-          field2: (int){ int }
-        }
-        foo: (int){ int }
-      }
-    }
-    t2: (struct){
-      ok: (#struct){
-        nested: (struct){
-          field2: (int){ 5 }
-        }
-        foo: (int){ int }
-      }
-    }
-    t3: (struct){
-      ok: (#struct){
-        foo: (int){ 5 }
-        nested: (#struct){
-          field2: (int){ int }
-        }
-      }
-    }
-    t4: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        field1: (int){ 1 }
-        nested: (_|_){
-          // [eval]
-          field2: (_|_){
-            // [eval] recursive.t4.err.nested.field2: conflicting values "hello" and int (mismatched types string and int):
-            //     ./in.cue:17:19
-            //     ./in.cue:28:11
-            //     ./in.cue:31:12
-          }
-          extra: (string){ "not allowed" }
-        }
-        foo: (int){ int }
-      }
-    }
-    e: (struct){
-    }
-    t5: (struct){
-      err: (struct){
-        extra: (string){ "not allowed" }
-      }
-    }
-  }
-  nonRecursive: (_|_){
-    // [eval]
-    x: (#struct){
-      c: (int){ int }
-      d: (struct){
-        e: (int){ int }
-      }
-      b: (int){ int }
-    }
-    y: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        f: (_|_){
-          // [eval] nonRecursive.y.err.f: field not allowed:
-          //     ./in.cue:48:15
-        }
-        c: (int){ int }
-        d: (struct){
-          e: (int){ int }
-        }
-        b: (int){ int }
-      }
-    }
-    z: (struct){
-      ok: (#struct){
-        d: (struct){
-          f: (int){ int }
-          e: (int){ int }
-        }
-        c: (int){ int }
-        b: (int){ int }
-      }
-    }
-  }
-  nonStructLiterals: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval] nonStructLiterals.t1.err: error in call to __reclose: argument must be a struct or list literal:
-        //     ./in.cue:54:11
-      }
-    }
-    #A: (#struct){
-      a: (int){ int }
-    }
-    t4: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval] nonStructLiterals.t4.err: error in call to __reclose: argument must be a struct or list literal:
-        //     ./in.cue:58:11
-      }
-    }
-  }
-  nonStructDefinitions: (_|_){
-    // [eval]
-    #Def: (int){ 1 }
-    a: (int){ 1 }
-    t1: (struct){
-      ok: (int){ 1 }
-    }
-    t2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval] nonStructDefinitions.t2.err: conflicting values {b:1} and 1 (mismatched types struct and int):
-        //     ./in.cue:62:8
-        //     ./in.cue:70:11
-        //     ./in.cue:70:15
-        b: (_|_){// 1
-        }
-      }
-    }
-  }
-  retro: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval] retro.t1.err: error in call to __reclose: __reclose may only be used when explicitopen is enabled:
-        //     ./old.cue:3:11
-      }
     }
   }
 }

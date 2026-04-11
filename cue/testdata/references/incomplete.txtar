@@ -1,35 +1,48 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 comprehensions: {
 	a: {}
 	b: {
 		if a.b {
 		}
-	}
+	} @test(err, code=incomplete, contains="undefined field: b", pos=[1:8])
 	c: {
 		for x in a.b {x}
-	}
+	} @test(err, code=incomplete, contains="comprehensions.c: undefined field: b", pos=[1:14])
 }
 
 openStruct: {
 	a: {}
-	b: a.c
+	b: a.c @test(err, code=incomplete, contains="openStruct.b: undefined field: c", pos=[0:7])
 }
 
 selectFromTop: {
 	top: _
-	a:   top.foo
+	a:   top.foo @test(err, code=incomplete, contains="top.foo undefined as top is incomplete", pos=[0:7])
 }
 
 indexOnTop: {
 	top: _
-	a:   top[2]
+	a:   top[2] @test(err, code=incomplete, contains="top[2] undefined as top is incomplete", pos=[0:7])
 }
 
 incompleteIndex: {
 	top: _
-	a:   [1][top]
+	a:   [1][top] @test(err, code=eval, contains="invalid index top (invalid type _)", pos=[0:7, 0:11])
 }
+-- out/errors.txt --
+[incomplete] comprehensions.b: undefined field: b:
+    ./in.cue:4:8
+[incomplete] comprehensions.c: undefined field: b:
+    ./in.cue:8:14
+[incomplete] openStruct.b: undefined field: c:
+    ./in.cue:14:7
+[incomplete] selectFromTop.a: top.foo undefined as top is incomplete (type _):
+    ./in.cue:19:7
+[incomplete] indexOnTop.a: top[2] undefined as top is incomplete (type _):
+    ./in.cue:24:7
+[eval] incompleteIndex.a: invalid index top (invalid type _):
+    ./in.cue:29:7
+    ./in.cue:29:11
 -- out/eval/stats --
 Leaks:  0
 Freed:  19
@@ -42,59 +55,6 @@ Conjuncts:    18
 Disjuncts:    0
 
 NumCloseIDs: 4
--- out/evalalpha --
-Errors:
-incompleteIndex.a: invalid index top (invalid type _):
-    ./in.cue:29:7
-    ./in.cue:29:11
-
-Result:
-(_|_){
-  // [eval]
-  comprehensions: (struct){
-    a: (struct){
-    }
-    b: (_|_){
-      // [incomplete] comprehensions.b: undefined field: b:
-      //     ./in.cue:4:8
-    }
-    c: (_|_){
-      // [incomplete] comprehensions.c: undefined field: b:
-      //     ./in.cue:8:14
-    }
-  }
-  openStruct: (struct){
-    a: (struct){
-    }
-    b: (_|_){
-      // [incomplete] openStruct.b: undefined field: c:
-      //     ./in.cue:14:7
-    }
-  }
-  selectFromTop: (struct){
-    top: (_){ _ }
-    a: (_|_){
-      // [incomplete] selectFromTop.a: top.foo undefined as top is incomplete (type _):
-      //     ./in.cue:19:7
-    }
-  }
-  indexOnTop: (struct){
-    top: (_){ _ }
-    a: (_|_){
-      // [incomplete] indexOnTop.a: top[2] undefined as top is incomplete (type _):
-      //     ./in.cue:24:7
-    }
-  }
-  incompleteIndex: (_|_){
-    // [eval]
-    top: (_){ _ }
-    a: (_|_){
-      // [eval] incompleteIndex.a: invalid index top (invalid type _):
-      //     ./in.cue:29:7
-      //     ./in.cue:29:11
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

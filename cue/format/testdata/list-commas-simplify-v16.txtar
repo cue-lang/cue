@@ -1,0 +1,21 @@
+#simplify
+#version: v0.16.0
+
+# With --simplify and v0.16.0, multiline list commas are kept (pre-v0.17.0 style).
+
+-- simplify-v16.input --
+a: [
+	1,
+	2,
+	3,
+]
+
+b: [1, 2, 3]
+-- out/format/simplify-v16.golden --
+a: [
+	1,
+	2,
+	3,
+]
+
+b: [1, 2, 3]

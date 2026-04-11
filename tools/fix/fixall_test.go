@@ -39,6 +39,9 @@ func TestInstances(t *testing.T) {
 		if str, ok := t.Value("upgrade"); ok {
 			opts = append(opts, UpgradeVersion(str))
 		}
+		if t.HasTag("removelistcommas") {
+			opts = append(opts, RemoveListCommas())
+		}
 		err := Instances(a, opts...)
 		t.WriteErrors(err)
 		for _, b := range a {

@@ -1379,6 +1379,16 @@ func (p *parser) parseList() (expr ast.Expr) {
 		}
 	}
 
+	// Mark the first element as CUE-parsed so the formatter can distinguish
+	// parsed lists from programmatically constructed ones when deciding comma
+	// style. We use element[0] rather than Lbrack to avoid conflating this
+	// marker with inter-element comma information.
+	// TODO: consider having a separate flag that is always set by the parser
+	// to indicate CUE-parsed nodes.
+	if len(elts) > 0 {
+		ast.SetPos(elts[0], elts[0].Pos().WithComma(true))
+	}
+
 	rbrack := p.expectClosing(token.RBRACK, "list literal")
 	return &ast.ListLit{
 		Lbrack: lbrack,

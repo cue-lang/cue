@@ -199,7 +199,13 @@ const (
 	NewSection // section
 
 	relMask  = 0xf
-	relShift = 4
+	relShift = 5
+
+	// commaBit is set in the position offset when the token was preceded
+	// by an explicit comma in the source. This allows the formatter to
+	// distinguish between explicit commas and auto-inserted (newline)
+	// commas without needing extra AST fields.
+	commaBit = 0x10
 )
 
 func (p RelPos) Pos() Pos {
@@ -268,6 +274,21 @@ func (p Pos) WithRel(rel RelPos) Pos {
 
 func (p Pos) RelPos() RelPos {
 	return RelPos(p.offset & relMask)
+}
+
+// HasComma reports whether this token was preceded by an explicit comma
+// in the source text. This is set by the scanner and used by the formatter
+// to preserve comma style in lists.
+func (p Pos) HasComma() bool {
+	return p.offset&commaBit != 0
+}
+
+// WithComma returns a position with the comma bit set or cleared.
+func (p Pos) WithComma(hasComma bool) Pos {
+	if hasComma {
+		return Pos{p.file, p.offset | commaBit}
+	}
+	return Pos{p.file, p.offset &^ commaBit}
 }
 
 func (p Pos) index() index {

@@ -50,6 +50,7 @@ type Scanner struct {
 	linesSinceLast  int
 	spacesSinceLast int
 	insertEOL       bool // insert a comma before next newline
+	nextHasComma    bool // next token was preceded by an explicit comma
 
 	quoteStack []quoteInfo
 
@@ -775,6 +776,7 @@ scanAgain:
 	// current token start
 	offset := s.offset
 	pos = s.file.Pos(offset, rel)
+	hadComma := s.nextHasComma
 
 	// determine token value
 	insertEOL := false
@@ -934,6 +936,7 @@ scanAgain:
 		case ',':
 			tok = token.COMMA
 			lit = ","
+			s.nextHasComma = true
 		case '(':
 			tok = token.LPAREN
 		case ')':
@@ -1030,6 +1033,14 @@ scanAgain:
 	}
 	if s.mode&DontInsertCommas == 0 {
 		s.insertEOL = insertEOL
+	}
+
+	// Apply the HasComma bit to the first non-comment token after an
+	// explicit comma. Comments between a comma and the next token must
+	// not consume the bit.
+	if hadComma && tok != token.COMMENT {
+		pos = pos.WithComma(true)
+		s.nextHasComma = false
 	}
 
 	s.linesSinceLast = 0

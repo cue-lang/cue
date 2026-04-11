@@ -8,7 +8,7 @@ a: b: c: d: string
 	res: [ {d: "b", s: "ab"} ]
 	a: b: c: {
 		d: string
-		s: _|_ @test(err, code=incomplete, pos=[4:23, 4:34, 5:13])
+		s: _|_ @test(err, code=incomplete, pos=[4:34, 4:23, 5:13])
 	}
 })
 -- out/compile --

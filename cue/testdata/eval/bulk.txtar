@@ -1,5 +1,8 @@
-#expandLetExpr: true
-#todo:inline: medium — disjunctions; use @test(final) for default selection
+// Tests bulk pattern constraints including pattern cycles, multiple pattern
+// constraints, and field-not-allowed errors from pattern constraint closedness.
+// Also covers regressions: issue 2109 (pattern cycle detection), issue 3638
+// (closedness/default markers erased in multiple contexts), and issue 3670
+// (int pattern incorrectly allowing non-int fields).
 -- in.cue --
 a: {
 	foo: a: 1
@@ -20,6 +23,7 @@ t1: {
 	}
 	b: #a & {f: 4}
 	c: #a & {z: 4}
+	@test(err, code=eval, at=c.z, contains="field not allowed", pos=[5:11])
 }
 
 t2: {
@@ -28,6 +32,7 @@ t2: {
 	}
 	b: #a & {x: 4}
 	c: #a & {z: 4}
+	@test(err, code=eval, at=c.z, contains="field not allowed", pos=[5:11])
 }
 
 -- issue2109.cue --
@@ -43,32 +48,56 @@ patternCycle: issue2109: p1: {
 	countries: ["US", "GB", "AU"]
 	FlagsURLs: {[or(countries)]: string}
 	FlagsURLs
+	@test(eq, {
+		countries: ["US", "GB", "AU"]
+		FlagsURLs: {}
+	})
 }
 patternCycle: issue2109: p2: {
 	FlagsURLs: {[or(countries)]: string}
 	FlagsURLs
 	countries: ["US", "GB", "AU"]
+	@test(eq, {
+		FlagsURLs: {}
+		countries: ["US", "GB", "AU"]
+	})
 }
 patternCycle: issue2109: p3: {
 	FlagsURLs
 	FlagsURLs: {[or(countries)]: string}
 	countries: ["US", "GB", "AU"]
+	@test(eq, {
+		FlagsURLs: {}
+		countries: ["US", "GB", "AU"]
+	})
 }
 
 patternCycle: t1: p1: {
 	countries: "US" | "GB" | "AU"
 	FlagsURLs: {[countries]: string}
 	FlagsURLs
+	@test(eq, {
+		countries: "US" | "GB" | "AU"
+		FlagsURLs: {}
+	})
 }
 patternCycle: t1: p2: {
 	FlagsURLs
 	countries: "US" | "GB" | "AU"
 	FlagsURLs: {[countries]: string}
+	@test(eq, {
+		countries: "US" | "GB" | "AU"
+		FlagsURLs: {}
+	})
 }
 patternCycle: t1: p3: {
 	FlagsURLs
 	FlagsURLs: {[countries]: string}
 	countries: "US" | "GB" | "AU"
+	@test(eq, {
+		FlagsURLs: {}
+		countries: "US" | "GB" | "AU"
+	})
 }
 
 -- intpattern.cue --
@@ -79,6 +108,7 @@ issue3670: {
 	#X: [int]: string
 	a: #X
 	a: "not_int": "c"
+	@test(err, code=eval, at=a.not_int, contains="field not allowed", pos=[3:5])
 }
 dual: {
 	_
@@ -98,6 +128,7 @@ dual: {
 issue3638: full: {
 	routes: default: {}
 	routes: [string]: spec: [{
+
 		refs: [{"default"}]
 	}]
 	#Fields: {
@@ -126,6 +157,52 @@ issue3638: full: {
 	used: #Kubernetes & {
 		Routes: route: routes
 	}
+	@test(eq, {
+		routes: {
+			default: {spec: [{
+				refs: ["default"]
+			}]}
+		}
+		#Fields: {
+			input: _
+			output: _|_ @test(err, code=incomplete, contains="issue3638.full.#Fields.output: cannot range over input (incomplete type _)", pos=[14:21])
+		}
+		#Kubernetes: {
+			Routes: {route: {}}
+			input: {res1: {route: {}}}
+			output: [{
+		route: {}
+	}]
+		}
+		entrypoint: [{
+		route: default: spec: [{
+			refs: ["default"]
+		}]
+	}]
+		used: {
+			Routes: {
+				route: {
+					default: {spec: [{
+		refs: ["default"]
+	}]}
+				}
+			}
+			input: {
+				res1: {
+					route: {
+						default: {spec: [{
+		refs: ["default"]
+	}]}
+					}
+				}
+			}
+			output: [{
+		route: default: spec: [{
+			refs: ["default"]
+		}]
+	}]
+		}
+	})
 }
 issue3638: reduced: {
 	input: k1: [string]: a: 1
@@ -135,6 +212,11 @@ issue3638: reduced: {
 		for x in input { x }
 	}
 	#x: { a: int } | *{ b: 2 }
+	@test(eq, {
+		input: {k1: {foo: {a: 1}}}
+		out: {foo: {a: 1}}
+		#x: *{b: 2} | {a: int}
+	})
 }
 // We expect that changing the pattern constraint into a field should give
 // not materially change the outcome.
@@ -146,7 +228,21 @@ issue3638: compare: {
 		for x in input { x }
 	}
 	#x: { a: int } | *{ b: 2 }
+	@test(eq, {
+		input: {k1: {foo: {a: 1}}}
+		out: {foo: {a: 1}}
+		#x: *{b: 2} | {a: int}
+	})
 }
+-- out/errors.txt --
+[eval] t1.c.z: field not allowed:
+    ./in.cue:19:11
+[eval] t2.c.z: field not allowed:
+    ./in.cue:28:11
+[eval] issue3670.a.not_int: field not allowed:
+    ./intpattern.cue:7:5
+[incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
+    ./multi.cue:14:21
 -- out/eval/stats --
 Leaks:  20
 Freed:  183
@@ -160,866 +256,6 @@ Disjuncts:    35
 Notifications: 6
 
 NumCloseIDs: 80
--- out/evalalpha --
-Errors:
-issue3670.a.not_int: field not allowed:
-    ./intpattern.cue:7:5
-t1.c.z: field not allowed:
-    ./in.cue:19:11
-t2.c.z: field not allowed:
-    ./in.cue:27:11
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    foo: (struct){
-      a: (int){ 1 }
-      b: (int){ 1 }
-      name: (string){ "foo" }
-    }
-  }
-  d: (struct){
-    foobar: (struct){
-      c: (int){ 2 }
-      b: (int){ 1 }
-      name: (string){ "foobar" }
-    }
-    foo: (struct){
-      a: (int){ 1 }
-      b: (int){ 1 }
-      name: (string){ "foo" }
-    }
-  }
-  t1: (_|_){
-    // [eval]
-    #a: (#struct){
-    }
-    b: (#struct){
-      f: (int){ 4 }
-    }
-    c: (_|_){
-      // [eval]
-      z: (_|_){
-        // [eval] t1.c.z: field not allowed:
-        //     ./in.cue:19:11
-      }
-    }
-  }
-  t2: (_|_){
-    // [eval]
-    #a: (#struct){
-    }
-    b: (#struct){
-      x: (int){ 4 }
-    }
-    c: (_|_){
-      // [eval]
-      z: (_|_){
-        // [eval] t2.c.z: field not allowed:
-        //     ./in.cue:27:11
-      }
-    }
-  }
-  issue3670: (_|_){
-    // [eval]
-    #X: (#struct){
-    }
-    a: (_|_){
-      // [eval]
-      not_int: (_|_){
-        // [eval] issue3670.a.not_int: field not allowed:
-        //     ./intpattern.cue:7:5
-      }
-    }
-  }
-  dual: (_){ _ }
-  patternCycle: (struct){
-    issue2109: (struct){
-      p1: (struct){
-        countries: (#list){
-          0: (string){ "US" }
-          1: (string){ "GB" }
-          2: (string){ "AU" }
-        }
-        FlagsURLs: (struct){
-        }
-      }
-      p2: (struct){
-        FlagsURLs: (struct){
-        }
-        countries: (#list){
-          0: (string){ "US" }
-          1: (string){ "GB" }
-          2: (string){ "AU" }
-        }
-      }
-      p3: (struct){
-        FlagsURLs: (struct){
-        }
-        countries: (#list){
-          0: (string){ "US" }
-          1: (string){ "GB" }
-          2: (string){ "AU" }
-        }
-      }
-    }
-    t1: (struct){
-      p1: (struct){
-        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
-        FlagsURLs: (struct){
-        }
-      }
-      p2: (struct){
-        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
-        FlagsURLs: (struct){
-        }
-      }
-      p3: (struct){
-        FlagsURLs: (struct){
-        }
-        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
-      }
-    }
-  }
-  issue3638: (struct){
-    full: (struct){
-      routes: (struct){
-        default: (struct){
-          spec: (#list){
-            0: (struct){
-              refs: (#list){
-                0: (string){ "default" }
-              }
-            }
-          }
-        }
-      }
-      #Fields: (#struct){
-        input: (_){ _ }
-        output: (_|_){
-          // [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
-          //     ./multi.cue:13:21
-        }
-      }
-      #Kubernetes: (#struct){
-        Routes: (#struct){
-          route: (#struct){
-          }
-        }
-        input: (#struct){
-          res1: ~(issue3638.full.#Kubernetes.Routes)
-        }
-        output: (#list){
-          0: (#struct){
-            route: (#struct){
-            }
-          }
-        }
-      }
-      let HTTPROUTESPEC#1 = (struct){
-        #x: (#list){ |(*(#list){
-            0: (#struct){
-              other: (#list){
-              }
-            }
-          }, (list){
-          }) }
-      }
-      entrypoint: ~(issue3638.full.used.output)
-      used: (#struct){
-        Routes: (#struct){
-          route: (#struct){
-            default: (#struct){
-              spec: (#list){
-                0: (#struct){
-                  refs: (#list){
-                    0: (string){ "default" }
-                  }
-                }
-              }
-            }
-          }
-        }
-        input: (#struct){
-          res1: (#struct){
-            route: (#struct){
-              default: (#struct){
-                spec: (#list){
-                  0: (#struct){
-                    refs: (#list){
-                      0: (string){ "default" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        output: (#list){
-          0: (#struct){
-            route: (#struct){
-              default: (#struct){
-                spec: (#list){
-                  0: (#struct){
-                    refs: (#list){
-                      0: (string){ "default" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    reduced: (struct){
-      input: (struct){
-        k1: (struct){
-          foo: (#struct){
-            a: (int){ 1 }
-          }
-        }
-      }
-      out: (struct){
-        foo: (#struct){
-          a: (int){ 1 }
-        }
-      }
-      #x: (#struct){ |(*(#struct){
-          b: (int){ 2 }
-        }, (#struct){
-          a: (int){ int }
-        }) }
-    }
-    compare: (struct){
-      input: (struct){
-        k1: (struct){
-          foo: (#struct){
-            a: (int){ 1 }
-          }
-        }
-      }
-      out: (struct){
-        foo: (#struct){
-          a: (int){ 1 }
-        }
-      }
-      #x: (#struct){ |(*(#struct){
-          b: (int){ 2 }
-        }, (#struct){
-          a: (int){ int }
-        }) }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,7 @@
- Errors:
- issue3670.a.not_int: field not allowed:
--    ./intpattern.cue:2:6
--    ./intpattern.cue:3:5
--    ./intpattern.cue:4:5
-+    ./intpattern.cue:7:5
- t1.c.z: field not allowed:
--    ./in.cue:15:6
--    ./in.cue:19:5
-     ./in.cue:19:11
- t2.c.z: field not allowed:
-     ./in.cue:27:11
-@@ -21,16 +17,16 @@
-     }
-   }
-   d: (struct){
--    foo: (struct){
--      a: (int){ 1 }
--      b: (int){ 1 }
--      name: (string){ "foo" }
--    }
-     foobar: (struct){
-       c: (int){ 2 }
-       b: (int){ 1 }
-       name: (string){ "foobar" }
-     }
-+    foo: (struct){
-+      a: (int){ 1 }
-+      b: (int){ 1 }
-+      name: (string){ "foo" }
-+    }
-   }
-   t1: (_|_){
-     // [eval]
-@@ -43,8 +39,6 @@
-       // [eval]
-       z: (_|_){
-         // [eval] t1.c.z: field not allowed:
--        //     ./in.cue:15:6
--        //     ./in.cue:19:5
-         //     ./in.cue:19:11
-       }
-     }
-@@ -60,8 +54,6 @@
-       // [eval]
-       z: (_|_){
-         // [eval] t2.c.z: field not allowed:
--        //     ./in.cue:23:6
--        //     ./in.cue:27:5
-         //     ./in.cue:27:11
-       }
-     }
-@@ -74,9 +66,7 @@
-       // [eval]
-       not_int: (_|_){
-         // [eval] issue3670.a.not_int: field not allowed:
--        //     ./intpattern.cue:2:6
--        //     ./intpattern.cue:3:5
--        //     ./intpattern.cue:4:5
-+        //     ./intpattern.cue:7:5
-       }
-     }
-   }
-@@ -111,37 +101,21 @@
-         }
-       }
-     }
--    t1: (_|_){
--      // [eval]
--      p1: (_|_){
--        // [eval]
--        countries: (_|_){
--          // [eval] patternCycle.t1.p1.countries: cyclic pattern constraint:
--          //     ./issue2109.cue:27:15
--          //     ./issue2109.cue:26:13
--        }
--        FlagsURLs: (struct){
--        }
--      }
--      p2: (_|_){
--        // [eval]
--        countries: (_|_){
--          // [eval] patternCycle.t1.p2.countries: cyclic pattern constraint:
--          //     ./issue2109.cue:33:15
--          //     ./issue2109.cue:32:13
--        }
--        FlagsURLs: (struct){
--        }
--      }
--      p3: (_|_){
--        // [eval]
--        FlagsURLs: (struct){
--        }
--        countries: (_|_){
--          // [eval] patternCycle.t1.p3.countries: cyclic pattern constraint:
--          //     ./issue2109.cue:37:15
--          //     ./issue2109.cue:38:13
--        }
-+    t1: (struct){
-+      p1: (struct){
-+        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
-+        FlagsURLs: (struct){
-+        }
-+      }
-+      p2: (struct){
-+        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
-+        FlagsURLs: (struct){
-+        }
-+      }
-+      p3: (struct){
-+        FlagsURLs: (struct){
-+        }
-+        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
-       }
-     }
-   }
-@@ -162,24 +136,21 @@
-         input: (_){ _ }
-         output: (_|_){
-           // [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
--          //     ./multi.cue:10:21
-+          //     ./multi.cue:13:21
-         }
-       }
-       #Kubernetes: (#struct){
--        input: (#struct){
--          res1: (#struct){
--            route: (#struct){
--            }
--          }
--        }
--        output: (#list){
--          0: (#struct){
--            route: (#struct){
--            }
--          }
--        }
--        Routes: (#struct){
--          route: (#struct){
-+        Routes: (#struct){
-+          route: (#struct){
-+          }
-+        }
-+        input: (#struct){
-+          res1: ~(issue3638.full.#Kubernetes.Routes)
-+        }
-+        output: (#list){
-+          0: (#struct){
-+            route: (#struct){
-+            }
-           }
-         }
-       }
-@@ -192,60 +163,8 @@
-           }, (list){
-           }) }
-       }
--      entrypoint: (#list){
--        0: (struct){
--          route: (struct){
--            default: (struct){
--              spec: (#list){
--                0: (#struct){
--                  refs: (#list){
--                    0: (string){ "default" }
--                  }
--                }
--              }
--            }
--          }
--        }
--      }
-+      entrypoint: ~(issue3638.full.used.output)
-       used: (#struct){
--        input: (#struct){
--          res1: (#struct){
--            route: (#struct){
--              default: (#struct){
--                spec: (#list){
--                  0: (#struct){
--                    refs: (#list){
--                      0: (string){ "default" }
--                    }
--                  }
--                }
--              }
--            }
--          }
--        }
--        output: (#list){
--          0: (#struct){
--            route: (#struct){
--              default: (#struct){
--                spec: (list){ |(*(#list){
--                    0: (#struct){
--                      refs: (#list){
--                        0: (string){ "default" }
--                      }
--                      other: (#list){
--                      }
--                    }
--                  }, (#list){
--                    0: (#struct){
--                      refs: (#list){
--                        0: (string){ "default" }
--                      }
--                    }
--                  }) }
--              }
--            }
--          }
--        }
-         Routes: (#struct){
-           route: (#struct){
-             default: (#struct){
-@@ -259,6 +178,36 @@
-             }
-           }
-         }
-+        input: (#struct){
-+          res1: (#struct){
-+            route: (#struct){
-+              default: (#struct){
-+                spec: (#list){
-+                  0: (#struct){
-+                    refs: (#list){
-+                      0: (string){ "default" }
-+                    }
-+                  }
-+                }
-+              }
-+            }
-+          }
-+        }
-+        output: (#list){
-+          0: (#struct){
-+            route: (#struct){
-+              default: (#struct){
-+                spec: (#list){
-+                  0: (#struct){
-+                    refs: (#list){
-+                      0: (string){ "default" }
-+                    }
-+                  }
-+                }
-+              }
-+            }
-+          }
-+        }
-       }
-     }
-     reduced: (struct){
-@@ -270,12 +219,9 @@
-         }
-       }
-       out: (struct){
--        foo: (#struct){ |(*(#struct){
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }, (#struct){
--            a: (int){ 1 }
--          }) }
-+        foo: (#struct){
-+          a: (int){ 1 }
-+        }
-       }
-       #x: (#struct){ |(*(#struct){
-           b: (int){ 2 }
-@@ -292,12 +238,9 @@
-         }
-       }
-       out: (struct){
--        foo: (#struct){ |(*(#struct){
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }, (#struct){
--            a: (int){ 1 }
--          }) }
-+        foo: (#struct){
-+          a: (int){ 1 }
-+        }
-       }
-       #x: (#struct){ |(*(#struct){
-           b: (int){ 2 }
--- diff/todo/p3 --
-Reordering of error messages.
--- diff/explanation --
-Overall, the previous errors now passing is acceptable and consistent with
-the behavior of the new evaluator.
-issue3638: in V2, there was a spurious default marker to disambiguate
-a disjunction that should have already been disambiguated.
-In V3, the disjunction is properly disambiguated.
--- out/eval --
-Errors:
-issue3670.a.not_int: field not allowed:
-    ./intpattern.cue:2:6
-    ./intpattern.cue:3:5
-    ./intpattern.cue:4:5
-t1.c.z: field not allowed:
-    ./in.cue:15:6
-    ./in.cue:19:5
-    ./in.cue:19:11
-t2.c.z: field not allowed:
-    ./in.cue:27:11
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    foo: (struct){
-      a: (int){ 1 }
-      b: (int){ 1 }
-      name: (string){ "foo" }
-    }
-  }
-  d: (struct){
-    foo: (struct){
-      a: (int){ 1 }
-      b: (int){ 1 }
-      name: (string){ "foo" }
-    }
-    foobar: (struct){
-      c: (int){ 2 }
-      b: (int){ 1 }
-      name: (string){ "foobar" }
-    }
-  }
-  t1: (_|_){
-    // [eval]
-    #a: (#struct){
-    }
-    b: (#struct){
-      f: (int){ 4 }
-    }
-    c: (_|_){
-      // [eval]
-      z: (_|_){
-        // [eval] t1.c.z: field not allowed:
-        //     ./in.cue:15:6
-        //     ./in.cue:19:5
-        //     ./in.cue:19:11
-      }
-    }
-  }
-  t2: (_|_){
-    // [eval]
-    #a: (#struct){
-    }
-    b: (#struct){
-      x: (int){ 4 }
-    }
-    c: (_|_){
-      // [eval]
-      z: (_|_){
-        // [eval] t2.c.z: field not allowed:
-        //     ./in.cue:23:6
-        //     ./in.cue:27:5
-        //     ./in.cue:27:11
-      }
-    }
-  }
-  issue3670: (_|_){
-    // [eval]
-    #X: (#struct){
-    }
-    a: (_|_){
-      // [eval]
-      not_int: (_|_){
-        // [eval] issue3670.a.not_int: field not allowed:
-        //     ./intpattern.cue:2:6
-        //     ./intpattern.cue:3:5
-        //     ./intpattern.cue:4:5
-      }
-    }
-  }
-  dual: (_){ _ }
-  patternCycle: (struct){
-    issue2109: (struct){
-      p1: (struct){
-        countries: (#list){
-          0: (string){ "US" }
-          1: (string){ "GB" }
-          2: (string){ "AU" }
-        }
-        FlagsURLs: (struct){
-        }
-      }
-      p2: (struct){
-        FlagsURLs: (struct){
-        }
-        countries: (#list){
-          0: (string){ "US" }
-          1: (string){ "GB" }
-          2: (string){ "AU" }
-        }
-      }
-      p3: (struct){
-        FlagsURLs: (struct){
-        }
-        countries: (#list){
-          0: (string){ "US" }
-          1: (string){ "GB" }
-          2: (string){ "AU" }
-        }
-      }
-    }
-    t1: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
-        countries: (_|_){
-          // [eval] patternCycle.t1.p1.countries: cyclic pattern constraint:
-          //     ./issue2109.cue:27:15
-          //     ./issue2109.cue:26:13
-        }
-        FlagsURLs: (struct){
-        }
-      }
-      p2: (_|_){
-        // [eval]
-        countries: (_|_){
-          // [eval] patternCycle.t1.p2.countries: cyclic pattern constraint:
-          //     ./issue2109.cue:33:15
-          //     ./issue2109.cue:32:13
-        }
-        FlagsURLs: (struct){
-        }
-      }
-      p3: (_|_){
-        // [eval]
-        FlagsURLs: (struct){
-        }
-        countries: (_|_){
-          // [eval] patternCycle.t1.p3.countries: cyclic pattern constraint:
-          //     ./issue2109.cue:37:15
-          //     ./issue2109.cue:38:13
-        }
-      }
-    }
-  }
-  issue3638: (struct){
-    full: (struct){
-      routes: (struct){
-        default: (struct){
-          spec: (#list){
-            0: (struct){
-              refs: (#list){
-                0: (string){ "default" }
-              }
-            }
-          }
-        }
-      }
-      #Fields: (#struct){
-        input: (_){ _ }
-        output: (_|_){
-          // [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
-          //     ./multi.cue:10:21
-        }
-      }
-      #Kubernetes: (#struct){
-        input: (#struct){
-          res1: (#struct){
-            route: (#struct){
-            }
-          }
-        }
-        output: (#list){
-          0: (#struct){
-            route: (#struct){
-            }
-          }
-        }
-        Routes: (#struct){
-          route: (#struct){
-          }
-        }
-      }
-      let HTTPROUTESPEC#1 = (struct){
-        #x: (#list){ |(*(#list){
-            0: (#struct){
-              other: (#list){
-              }
-            }
-          }, (list){
-          }) }
-      }
-      entrypoint: (#list){
-        0: (struct){
-          route: (struct){
-            default: (struct){
-              spec: (#list){
-                0: (#struct){
-                  refs: (#list){
-                    0: (string){ "default" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      used: (#struct){
-        input: (#struct){
-          res1: (#struct){
-            route: (#struct){
-              default: (#struct){
-                spec: (#list){
-                  0: (#struct){
-                    refs: (#list){
-                      0: (string){ "default" }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        output: (#list){
-          0: (#struct){
-            route: (#struct){
-              default: (#struct){
-                spec: (list){ |(*(#list){
-                    0: (#struct){
-                      refs: (#list){
-                        0: (string){ "default" }
-                      }
-                      other: (#list){
-                      }
-                    }
-                  }, (#list){
-                    0: (#struct){
-                      refs: (#list){
-                        0: (string){ "default" }
-                      }
-                    }
-                  }) }
-              }
-            }
-          }
-        }
-        Routes: (#struct){
-          route: (#struct){
-            default: (#struct){
-              spec: (#list){
-                0: (#struct){
-                  refs: (#list){
-                    0: (string){ "default" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    reduced: (struct){
-      input: (struct){
-        k1: (struct){
-          foo: (#struct){
-            a: (int){ 1 }
-          }
-        }
-      }
-      out: (struct){
-        foo: (#struct){ |(*(#struct){
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }, (#struct){
-            a: (int){ 1 }
-          }) }
-      }
-      #x: (#struct){ |(*(#struct){
-          b: (int){ 2 }
-        }, (#struct){
-          a: (int){ int }
-        }) }
-    }
-    compare: (struct){
-      input: (struct){
-        k1: (struct){
-          foo: (#struct){
-            a: (int){ 1 }
-          }
-        }
-      }
-      out: (struct){
-        foo: (#struct){ |(*(#struct){
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }, (#struct){
-            a: (int){ 1 }
-          }) }
-      }
-      #x: (#struct){ |(*(#struct){
-          b: (int){ 2 }
-        }, (#struct){
-          a: (int){ int }
-        }) }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -1192,21 +428,7 @@ Result:
           Routes: {
             route: {
               [_]: {
-                spec!: 〈5;let HTTPROUTESPEC#1〉=>{
-                  #x: ([
-                    ...{
-                      refs: [
-                        ...{
-                          string
-                        },
-                      ]
-                    },
-                  ]|*[
-                    {
-                      other: []
-                    },
-                  ])
-                }.#x
+                spec!: 〈5;let HTTPROUTESPEC#1〉.#x
               }
             }
           }
@@ -1299,3 +521,8 @@ Result:
     }
   }
 }
+-- out/todo.txt --
+patternCycle.t1.{p1,p2,p3}: v2 had cyclic pattern constraint errors; v3 resolves correctly.
+issue3638.full.entrypoint and issue3638.full.#Kubernetes.input.res1: v3 uses structure sharing (~), v2 expands.
+issue3638.reduced.out.foo: v3 has only one disjunct ({a:1}); v2 has two (*(a:1,b:2) | {a:1}).
+d field ordering: v3 puts foobar before foo; v2 puts foo before foobar.

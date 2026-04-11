@@ -2,7 +2,6 @@
 # default values evaluate correctly in evalv3. The issue caused math.Abs to fail
 # with "non-concrete value" when the port field had a default defined after the call.
 # https://cuelang.org/issue/3919
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 import "math"
 
@@ -17,12 +16,16 @@ full: {
 			port: int | *30080
 		}
 	}
+	@test(eq, {
+		out: {env: {PORT: 30080}, port: *30080 | int}
+	})
 }
 reduced: {
 	if true {
 		a: math.Abs(port)
 	}
 	port: int | *30080
+	@test(eq, {a: 30080, port: *30080 | int})
 }
 -- secondary.cue --
 related: {
@@ -42,6 +45,22 @@ related: {
 			bar_total: foo.fooData.total
 		}
 	}
+	@test(eq, {
+		foo: {
+			fooData: {
+				total: {tags: {extra: {}}}
+				_hidden: {extra: {}}
+			}
+			shared: {all_total: {tags: {extra: {}}}}
+		}
+		#Tags: {}
+		bar: {
+			shared: {
+				bar_total: {tags: {extra: {}}}
+				all_total: {tags: {extra: {}}}
+			}
+		}
+	})
 }
 -- let.cue --
 // issue3931: evalv3 raises "field set was already referenced" when processing
@@ -60,6 +79,14 @@ issue3931: full: {
 		label?: string
 		expr?: [...string]
 	}
+	@test(eq, {
+		bar: {
+			bar1: {
+				spec: {selector: {label: "foo", expr?: []}}
+			}
+		}
+		foo: {label: "foo"}
+	})
 }
 -- issue3946.cue --
 // issue3946: evalv3 regression reporting a cyclic reference error when a field
@@ -78,6 +105,15 @@ issue3946: reduced:{
 	if true {
 		_inputs: input1: name: "input1"
 	}
+	@test(eq, {
+		out: [{
+		doExtra?: bool
+		name:     "input1"
+	}]
+		_inputs: {
+			input1: {name: "input1", doExtra?: bool}
+		}
+	})
 }
 -- out/eval/stats --
 Leaks:  2
@@ -91,234 +127,6 @@ Conjuncts:    100
 Disjuncts:    4
 
 NumCloseIDs: 27
--- out/evalalpha --
-(struct){
-  full: (struct){
-    out: (struct){
-      env: (struct){
-        PORT: (int){ 30080 }
-      }
-      port: (int){ |(*(int){ 30080 }, (int){ int }) }
-    }
-  }
-  reduced: (struct){
-    a: (int){ 30080 }
-    port: (int){ |(*(int){ 30080 }, (int){ int }) }
-  }
-  issue3946: (struct){
-    reduced: (struct){
-      out: (#list){
-        0: (struct){
-          name: (string){ "input1" }
-          doExtra?: (bool){ bool }
-        }
-      }
-      _inputs: (struct){
-        input1: (struct){
-          name: (string){ "input1" }
-          doExtra?: (bool){ bool }
-        }
-      }
-    }
-  }
-  issue3931: (struct){
-    full: (struct){
-      bar: (struct){
-        bar1: (struct){
-          spec: (struct){
-            selector: (struct){
-              label: (string){ "foo" }
-              expr?: (list){
-              }
-            }
-          }
-        }
-      }
-      foo: (struct){
-        label: (string){ "foo" }
-      }
-      let Spec#1 = (struct){
-        selector?: (struct){
-          label?: (string){ string }
-          expr?: (list){
-          }
-        }
-      }
-      let Selector#2 = (struct){
-        label?: (string){ string }
-        expr?: (list){
-        }
-      }
-    }
-  }
-  related: (struct){
-    foo: (struct){
-      fooData: (struct){
-        total: (struct){
-          tags: ~(related.foo.fooData._hidden)
-        }
-        _hidden: (struct){
-          extra: (struct){
-          }
-        }
-      }
-      shared: (struct){
-        all_total: ~(related.foo.fooData.total)
-      }
-    }
-    #Tags: (#struct){
-    }
-    bar: (struct){
-      shared: (struct){
-        bar_total: (struct){
-          tags: (#struct){
-            extra: (#struct){
-            }
-          }
-        }
-        all_total: (struct){
-          tags: (#struct){
-            extra: (#struct){
-            }
-          }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -61,10 +61,7 @@
-     foo: (struct){
-       fooData: (struct){
-         total: (struct){
--          tags: (struct){
--            extra: (struct){
--            }
--          }
-+          tags: ~(related.foo.fooData._hidden)
-         }
-         _hidden: (struct){
-           extra: (struct){
-@@ -72,12 +69,7 @@
-         }
-       }
-       shared: (struct){
--        all_total: (struct){
--          tags: (struct){
--            extra: (struct){
--            }
--          }
--        }
-+        all_total: ~(related.foo.fooData.total)
-       }
-     }
-     #Tags: (#struct){
--- out/eval --
-(struct){
-  full: (struct){
-    out: (struct){
-      env: (struct){
-        PORT: (int){ 30080 }
-      }
-      port: (int){ |(*(int){ 30080 }, (int){ int }) }
-    }
-  }
-  reduced: (struct){
-    a: (int){ 30080 }
-    port: (int){ |(*(int){ 30080 }, (int){ int }) }
-  }
-  issue3946: (struct){
-    reduced: (struct){
-      out: (#list){
-        0: (struct){
-          name: (string){ "input1" }
-          doExtra?: (bool){ bool }
-        }
-      }
-      _inputs: (struct){
-        input1: (struct){
-          name: (string){ "input1" }
-          doExtra?: (bool){ bool }
-        }
-      }
-    }
-  }
-  issue3931: (struct){
-    full: (struct){
-      bar: (struct){
-        bar1: (struct){
-          spec: (struct){
-            selector: (struct){
-              label: (string){ "foo" }
-              expr?: (list){
-              }
-            }
-          }
-        }
-      }
-      foo: (struct){
-        label: (string){ "foo" }
-      }
-      let Spec#1 = (struct){
-        selector?: (struct){
-          label?: (string){ string }
-          expr?: (list){
-          }
-        }
-      }
-      let Selector#2 = (struct){
-        label?: (string){ string }
-        expr?: (list){
-        }
-      }
-    }
-  }
-  related: (struct){
-    foo: (struct){
-      fooData: (struct){
-        total: (struct){
-          tags: (struct){
-            extra: (struct){
-            }
-          }
-        }
-        _hidden: (struct){
-          extra: (struct){
-          }
-        }
-      }
-      shared: (struct){
-        all_total: (struct){
-          tags: (struct){
-            extra: (struct){
-            }
-          }
-        }
-      }
-    }
-    #Tags: (#struct){
-    }
-    bar: (struct){
-      shared: (struct){
-        bar_total: (struct){
-          tags: (#struct){
-            extra: (#struct){
-            }
-          }
-        }
-        all_total: (struct){
-          tags: (#struct){
-            extra: (#struct){
-            }
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -436,3 +244,5 @@ diff old new
     }
   }
 }
+-- out/todo.txt --
+related: v3 uses structure sharing (~) for related.foo.fooData.total.tags and related.foo.shared.all_total, v2 expands them.

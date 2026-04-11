@@ -1,8 +1,8 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 dynamicTop: {
 	#D: {
 		for k, v in {foo: 123} {(k): v}
+		@test(eq, {foo: 123})
 	}
 }
 
@@ -11,6 +11,7 @@ dynamicDepth1: {
 	#D: {
 		a: foo: 123
 		b: {for k, v in a {(k): v}}
+		@test(eq, {a: {foo: 123}, b: {foo: 123}})
 	}
 }
 
@@ -22,6 +23,7 @@ allowed: {
 	}
 
 	vErr: #D & {d: 5}
+	@test(eq, {#D: {d: int}, vErr: {d: 5}})
 }
 
 disallowed: {
@@ -32,6 +34,7 @@ disallowed: {
 	}
 
 	vErr: #D & {d: 5}
+	@test(err, code=eval, at=vErr.d, contains="field not allowed", pos=[3:4, 7:14])
 }
 
 // Interpret comprehensions as embeddings.
@@ -49,12 +52,18 @@ comprehensionIsEmbed: {
 	x: #B & {
 		kind: "A"
 	}
+	@test(eq, {
+		#A: {size: *1 | int}
+		#B: {kind: string, size: *1 | int}
+		x: {kind: "A", size: *1 | int}
+	})
 }
 
 // This comprehension is inside a definition and should still disallow b.
 noEraseDefinition: {
 	#Foo: [if true {a: int}]
 	a: { #Foo & [{ b: 2 }] } // Error
+	@test(err, code=eval, at=a.0.b, contains="field not allowed", pos=[2:17])
 }
 
 // issue1956: Tests that conditional comprehensions correctly embed definitions
@@ -75,6 +84,11 @@ issue1956: {
 	x: #Thing & {
 		kind: "KindA"
 	}
+	@test(eq, {
+		#Details: {size: *1 | int}
+		#Thing: {kind: "KindA" | "KindB"}
+		x: {kind: "KindA", size: *1 | int}
+	})
 }
 
 // This triggers adding the same "closedInfo" twice, potentially causing
@@ -92,6 +106,10 @@ dedupTodo: {
 		c: n: "c" // Do not combine with &, as the original issue relies on this.
 		c: n: string
 	}
+	@test(eq, {
+		#sub: {c: _}
+		out: {c: {n: "c"}, X: {test: {n: "c"}}}
+	})
 }
 
 -- v3issues.cue --
@@ -105,6 +123,10 @@ issue3483: {
 			schemaField: 3
 		}
 	}
+	@test(eq, {
+		#Schema: {schemaField: int}
+		out1: {out2: {schemaField: int}}
+	})
 }
 // issue3486: Tests that embedding a definition inside an if comprehension does
 // not produce spurious "field not allowed" errors.
@@ -119,7 +141,18 @@ issue3486: {
 			extra: "foo"
 		}
 	}
+	@test(eq, {#schema: {}, out: {extra: "foo"}})
 }
+-- out/errors.txt --
+[eval] disallowed.vErr.d: field not allowed:
+    ./in.cue:31:4
+    ./in.cue:35:14
+[eval] noEraseDefinition.a.0.b: field not allowed:
+    ./in.cue:64:17
+[incomplete] issue1956.#Thing: unresolved disjunction "KindA" | "KindB" (type string):
+    ./in.cue:78:6
+[incomplete] dedupTodo.#sub: c.n undefined as c is incomplete (type _):
+    ./in.cue:98:6
 -- out/eval/stats --
 Leaks:  4
 Freed:  77
@@ -132,132 +165,6 @@ Conjuncts:    125
 Disjuncts:    14
 
 NumCloseIDs: 46
--- out/evalalpha --
-Errors:
-disallowed.vErr.d: field not allowed:
-    ./in.cue:28:4
-    ./in.cue:32:14
-noEraseDefinition.a.0.b: field not allowed:
-    ./in.cue:55:17
-
-Result:
-(_|_){
-  // [eval]
-  dynamicTop: (struct){
-    #D: (#struct){
-      foo: (int){ 123 }
-    }
-  }
-  dynamicDepth1: (struct){
-    #D: (#struct){
-      a: (#struct){
-        foo: (int){ 123 }
-      }
-      b: (#struct){
-        foo: (int){ 123 }
-      }
-    }
-  }
-  allowed: (struct){
-    #D: (#struct){
-      d: (int){ int }
-    }
-    vErr: (#struct){
-      d: (int){ 5 }
-    }
-  }
-  disallowed: (_|_){
-    // [eval]
-    #D: (#struct){
-    }
-    vErr: (_|_){
-      // [eval]
-      d: (_|_){
-        // [eval] disallowed.vErr.d: field not allowed:
-        //     ./in.cue:28:4
-        //     ./in.cue:32:14
-      }
-    }
-  }
-  comprehensionIsEmbed: (struct){
-    #A: (#struct){
-      size: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-    #B: (#struct){
-      kind: (string){ string }
-      size: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-    x: (#struct){
-      kind: (string){ "A" }
-      size: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-  }
-  noEraseDefinition: (_|_){
-    // [eval]
-    #Foo: (#list){
-      0: (#struct){
-        a: (int){ int }
-      }
-    }
-    a: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] noEraseDefinition.a.0.b: field not allowed:
-          //     ./in.cue:55:17
-        }
-        a: (int){ int }
-      }
-    }
-  }
-  issue1956: (struct){
-    #Details: (#struct){
-      size: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-    #Thing: (_|_){
-      // [incomplete] issue1956.#Thing: unresolved disjunction "KindA" | "KindB" (type string):
-      //     ./in.cue:68:6
-      kind: (string){ |((string){ "KindA" }, (string){ "KindB" }) }
-    }
-    x: (#struct){
-      kind: (string){ "KindA" }
-      size: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-  }
-  dedupTodo: (struct){
-    #sub: (_|_){
-      // [incomplete] dedupTodo.#sub: c.n undefined as c is incomplete (type _):
-      //     ./in.cue:83:6
-      c: (_){ _ }
-    }
-    out: (#struct){
-      c: (#struct){
-        n: (string){ "c" }
-      }
-      X: (#struct){
-        test: ~(dedupTodo.out.c)
-      }
-    }
-  }
-  issue3483: (struct){
-    #Schema: (#struct){
-      schemaField: (int){ int }
-    }
-    out1: (struct){
-      out2: (#struct){
-        schemaField: (int){ int }
-      }
-    }
-  }
-  issue3486: (struct){
-    #schema: (#struct){
-    }
-    out: (#struct){
-      extra: (string){ "foo" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

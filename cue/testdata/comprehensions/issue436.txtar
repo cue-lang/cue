@@ -2,11 +2,11 @@
 # values when the condition is satisfied. Issue #436: conditional in a definition
 # unified with a concrete value was not evaluating the condition correctly.
 # https://cuelang.org/issue/436
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #a: {
 	val:    string
 	result: string
+	@test(closed)
 }
 
 a: #a & {
@@ -15,15 +15,16 @@ a: #a & {
 	if (val == "match") {
 		result: "matched"
 	}
-}
+} @test(eq, {val: *"default" | string, result: *"not-matched" | string}) @test(closed)
 
 match: a & {
 	val: "match"
-}
+} @test(eq, {val: "match", result: "matched"}) @test(closed)
 
 not: a & {
 	val: "other"
-}
+} @test(eq, {val: "other", result: *"not-matched" | string}) @test(closed)
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  3
 Freed:  22
@@ -36,25 +37,6 @@ Conjuncts:    47
 Disjuncts:    12
 
 NumCloseIDs: 11
--- out/evalalpha --
-(struct){
-  #a: (#struct){
-    val: (string){ string }
-    result: (string){ string }
-  }
-  a: (#struct){
-    val: (string){ |(*(string){ "default" }, (string){ string }) }
-    result: (string){ |(*(string){ "not-matched" }, (string){ string }) }
-  }
-  match: (#struct){
-    val: (string){ "match" }
-    result: (string){ "matched" }
-  }
-  not: (#struct){
-    val: (string){ "other" }
-    result: (string){ |(*(string){ "not-matched" }, (string){ string }) }
-  }
-}
 -- out/compile --
 --- in.cue
 {

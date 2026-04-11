@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf988dae_8a949630",
+        "filename": "cue/testdata/compile/files.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:45:32Z",
+      "side": 1,
+      "message": "should include cuelang.org/issue/NNNN link",
+      "revId": "8778a3c69b12fdb651d5c0fce71598a45501db61",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6096366_4fee1760",
+        "filename": "cue/testdata/compile/json.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:45:32Z",
+      "side": 1,
+      "message": "should include cuelang.org/issue/NNNN link instead.",
+      "revId": "8778a3c69b12fdb651d5c0fce71598a45501db61",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

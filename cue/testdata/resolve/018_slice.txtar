@@ -1,16 +1,30 @@
-#name: slice
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-a:  [2][0:0]
-b:  [0][1:1]
-e1: [][1:1]
-e2: [0][-1:0]
-e3: [0][1:0]
-e4: [0][1:2]
-e5: 4[1:2]
-e6: [2]["":]
-e7: [2][:"9"]
+a:  [2][0:0]   @test(eq, [])
+b:  [0][1:1]   @test(eq, [])
+e1: [][1:1]    @test(err, code=eval, contains="index 1 out of range", pos=[0:5])
+e2: [0][-1:0]  @test(err, code=eval, contains="cannot convert negative number", pos=[0:5])
+e3: [0][1:0]   @test(err, code=eval, contains="invalid slice index", pos=[0:5])
+e4: [0][1:2]   @test(err, code=eval, contains="index 2 out of range", pos=[0:5])
+e5: 4[1:2]     @test(err, code=eval, contains="cannot slice 4", pos=[0:5])
+e6: [2]["":] @test(err, code=eval, contains="cannot use \"\"", pos=[0:5, 0:9])
+e7: [2][:"9"]  @test(err, code=eval, contains="cannot use \"9\"", pos=[0:5, 0:10])
+-- out/errors.txt --
+[eval] e1: index 1 out of range:
+    ./in.cue:3:5
+[eval] e2: cannot convert negative number to uint64:
+    ./in.cue:4:5
+[eval] e3: invalid slice index: 1 > 0:
+    ./in.cue:5:5
+[eval] e4: index 2 out of range:
+    ./in.cue:6:5
+[eval] e5: cannot slice 4 (type int):
+    ./in.cue:7:5
+[eval] e6: cannot use "" (type string) as type int in slice index:
+    ./in.cue:8:5
+    ./in.cue:8:9
+[eval] e7: cannot use "9" (type string) as type int in slice index:
+    ./in.cue:9:5
+    ./in.cue:9:10
 -- out/compile --
 --- in.cue
 {
@@ -48,60 +62,3 @@ Retain: 0
 Unifications: 18
 Conjuncts:    18
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-e1: index 1 out of range:
-    ./in.cue:3:5
-e2: cannot convert negative number to uint64:
-    ./in.cue:4:5
-e3: invalid slice index: 1 > 0:
-    ./in.cue:5:5
-e4: index 2 out of range:
-    ./in.cue:6:5
-e5: cannot slice 4 (type int):
-    ./in.cue:7:5
-e6: cannot use "" (type string) as type int in slice index:
-    ./in.cue:8:5
-    ./in.cue:8:9
-e7: cannot use "9" (type string) as type int in slice index:
-    ./in.cue:9:5
-    ./in.cue:9:10
-
-Result:
-(_|_){
-  // [eval]
-  a: (#list){
-  }
-  b: (#list){
-  }
-  e1: (_|_){
-    // [eval] e1: index 1 out of range:
-    //     ./in.cue:3:5
-  }
-  e2: (_|_){
-    // [eval] e2: cannot convert negative number to uint64:
-    //     ./in.cue:4:5
-  }
-  e3: (_|_){
-    // [eval] e3: invalid slice index: 1 > 0:
-    //     ./in.cue:5:5
-  }
-  e4: (_|_){
-    // [eval] e4: index 2 out of range:
-    //     ./in.cue:6:5
-  }
-  e5: (_|_){
-    // [eval] e5: cannot slice 4 (type int):
-    //     ./in.cue:7:5
-  }
-  e6: (_|_){
-    // [eval] e6: cannot use "" (type string) as type int in slice index:
-    //     ./in.cue:8:5
-    //     ./in.cue:8:9
-  }
-  e7: (_|_){
-    // [eval] e7: cannot use "9" (type string) as type int in slice index:
-    //     ./in.cue:9:5
-    //     ./in.cue:9:10
-  }
-}

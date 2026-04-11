@@ -1,52 +1,77 @@
-#name: range unification
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 // with concrete values
-a1: >=1 & <=5 & 3
-a2: >=1 & <=5 & 1
-a3: >=1 & <=5 & 5
-a4: >=1 & <=5 & 6
-a5: >=1 & <=5 & 0
+a1: >=1 & <=5 & 3 @test(eq, 3)
+a2: >=1 & <=5 & 1 @test(eq, 1)
+a3: >=1 & <=5 & 5 @test(eq, 5)
+a4: >=1 & <=5 & 6 @test(err, code=eval, contains="invalid value 6", pos=[0:11, 0:17])
+a5: >=1 & <=5 & 0 @test(err, code=eval, contains="invalid value 0", pos=[0:5, 0:17])
 
-a6:  3 & >=1 & <=5
-a7:  1 & >=1 & <=5
-a8:  5 & >=1 & <=5
-a9:  6 & >=1 & <=5
-a10: 0 & >=1 & <=5
+a6:  3 & >=1 & <=5 @test(eq, 3)
+a7:  1 & >=1 & <=5 @test(eq, 1)
+a8:  5 & >=1 & <=5 @test(eq, 5)
+a9:  6 & >=1 & <=5 @test(err, code=eval, contains="invalid value 6", pos=[0:16, 0:6])
+a10: 0 & >=1 & <=5 @test(err, code=eval, contains="invalid value 0", pos=[0:10, 0:6])
 
 // with ranges
-b1: >=1 & <=5 & >=1 & <=5
-b2: >=1 & <=5 & >=1 & <=1
-b3: >=1 & <=5 & >=5 & <=5
-b4: >=1 & <=5 & >=2 & <=3
-b5: >=1 & <=5 & >=3 & <=9
-b6: >=1 & <=5 & >=5 & <=9
-b7: >=1 & <=5 & >=6 & <=9
+b1: >=1 & <=5 & >=1 & <=5 @test(eq, >=1 & <=5)
+b2: >=1 & <=5 & >=1 & <=1 @test(eq, >=1 & <=1)
+b3: >=1 & <=5 & >=5 & <=5 @test(eq, >=5 & <=5)
+b4: >=1 & <=5 & >=2 & <=3 @test(eq, >=2 & <=3)
+b5: >=1 & <=5 & >=3 & <=9 @test(eq, >=3 & <=5)
+b6: >=1 & <=5 & >=5 & <=9 @test(eq, >=5 & <=5)
+b7: >=1 & <=5 & >=6 & <=9 @test(err, code=eval, contains="incompatible number bounds", pos=[0:17, 0:11])
 
-b8:  >=1 & <=5 & >=1 & <=5
-b9:  >=1 & <=1 & >=1 & <=5
-b10: >=5 & <=5 & >=1 & <=5
-b11: >=2 & <=3 & >=1 & <=5
-b12: >=3 & <=9 & >=1 & <=5
-b13: >=5 & <=9 & >=1 & <=5
-b14: >=6 & <=9 & >=1 & <=5
+b8:  >=1 & <=5 & >=1 & <=5 @test(eq, >=1 & <=5)
+b9:  >=1 & <=1 & >=1 & <=5 @test(eq, >=1 & <=1)
+b10: >=5 & <=5 & >=1 & <=5 @test(eq, >=5 & <=5)
+b11: >=2 & <=3 & >=1 & <=5 @test(eq, >=2 & <=3)
+b12: >=3 & <=9 & >=1 & <=5 @test(eq, >=3 & <=5)
+b13: >=5 & <=9 & >=1 & <=5 @test(eq, >=5 & <=5)
+b14: >=6 & <=9 & >=1 & <=5 @test(err, code=eval, contains="incompatible number bounds", pos=[0:24, 0:6])
 
 // ranges with more general types
-c1: int & >=1 & <=5
-c2: >=1 & <=5 & int
-c3: string & >=1 & <=5
-c4: >=1 & <=5 & string
+c1: int & >=1 & <=5 @test(eq, >=1 & <=5 & int)
+c2: >=1 & <=5 & int @test(eq, >=1 & <=5 & int)
+c3: string & >=1 & <=5 @test(err, code=eval, contains="conflicting values string and >=1", pos=[0:5, 0:14])
+c4: >=1 & <=5 & string @test(err, code=eval, contains="conflicting values string and >=1", pos=[0:5, 0:17])
 
 // other types
-s1: >="d" & <="z" & "e"
-s2: >="d" & <="z" & "ee"
+s1: >="d" & <="z" & "e" @test(eq, "e")
+s2: >="d" & <="z" & "ee" @test(eq, "ee")
 
-n1: number & >=1 & <=2
-n2: int & >=1.1 & <=1.3
-n3: >=1.0 & <=3.0 & 2
-n4: >=0.0 & <=0.1 & 0.09999
-n5: >=1 & <=5 & 2.5
+n1: number & >=1 & <=2 @test(eq, >=1 & <=2)
+n2: int & >=1.1 & <=1.3 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:19, 0:11])
+n3: >=1.0 & <=3.0 & 2 @test(eq, 2)
+n4: >=0.0 & <=0.1 & 0.09999 @test(eq, 0.09999)
+n5: >=1 & <=5 & 2.5 @test(eq, 2.5)
+-- out/errors.txt --
+[eval] a4: invalid value 6 (out of bound <=5):
+    ./in.cue:5:11
+    ./in.cue:5:17
+[eval] a5: invalid value 0 (out of bound >=1):
+    ./in.cue:6:5
+    ./in.cue:6:17
+[eval] a9: invalid value 6 (out of bound <=5):
+    ./in.cue:11:16
+    ./in.cue:11:6
+[eval] a10: invalid value 0 (out of bound >=1):
+    ./in.cue:12:10
+    ./in.cue:12:6
+[eval] b7: incompatible number bounds <=5 and >=6:
+    ./in.cue:21:17
+    ./in.cue:21:11
+[eval] b14: incompatible number bounds <=5 and >=6:
+    ./in.cue:29:24
+    ./in.cue:29:6
+[eval] c3: conflicting values string and >=1 (mismatched types string and number):
+    ./in.cue:34:5
+    ./in.cue:34:14
+[eval] c4: conflicting values string and >=1 (mismatched types string and number):
+    ./in.cue:35:5
+    ./in.cue:35:17
+[eval] n2: incompatible integer bounds <=1.3 and >=1.1:
+    ./in.cue:42:19
+    ./in.cue:42:11
 -- out/compile --
 --- in.cue
 {
@@ -96,295 +121,5 @@ Retain: 0
 Unifications: 36
 Conjuncts:    120
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-c3: conflicting values string and >=1 (mismatched types string and number):
-    ./in.cue:34:5
-    ./in.cue:34:14
-c4: conflicting values string and >=1 (mismatched types string and number):
-    ./in.cue:35:5
-    ./in.cue:35:17
-a4: invalid value 6 (out of bound <=5):
-    ./in.cue:5:11
-    ./in.cue:5:17
-a5: invalid value 0 (out of bound >=1):
-    ./in.cue:6:5
-    ./in.cue:6:17
-a9: invalid value 6 (out of bound <=5):
-    ./in.cue:11:16
-    ./in.cue:11:6
-a10: invalid value 0 (out of bound >=1):
-    ./in.cue:12:10
-    ./in.cue:12:6
-b7: incompatible number bounds <=5 and >=6:
-    ./in.cue:21:17
-    ./in.cue:21:11
-b14: incompatible number bounds <=5 and >=6:
-    ./in.cue:29:24
-    ./in.cue:29:6
-n2: incompatible integer bounds <=1.3 and >=1.1:
-    ./in.cue:42:19
-    ./in.cue:42:11
-
-Result:
-(_|_){
-  // [eval]
-  a1: (int){ 3 }
-  a2: (int){ 1 }
-  a3: (int){ 5 }
-  a4: (_|_){
-    // [eval] a4: invalid value 6 (out of bound <=5):
-    //     ./in.cue:5:11
-    //     ./in.cue:5:17
-  }
-  a5: (_|_){
-    // [eval] a5: invalid value 0 (out of bound >=1):
-    //     ./in.cue:6:5
-    //     ./in.cue:6:17
-  }
-  a6: (int){ 3 }
-  a7: (int){ 1 }
-  a8: (int){ 5 }
-  a9: (_|_){
-    // [eval] a9: invalid value 6 (out of bound <=5):
-    //     ./in.cue:11:16
-    //     ./in.cue:11:6
-  }
-  a10: (_|_){
-    // [eval] a10: invalid value 0 (out of bound >=1):
-    //     ./in.cue:12:10
-    //     ./in.cue:12:6
-  }
-  b1: (number){ &(>=1, <=5) }
-  b2: (number){ &(>=1, <=1) }
-  b3: (number){ &(>=5, <=5) }
-  b4: (number){ &(>=2, <=3) }
-  b5: (number){ &(>=3, <=5) }
-  b6: (number){ &(>=5, <=5) }
-  b7: (_|_){
-    // [eval] b7: incompatible number bounds <=5 and >=6:
-    //     ./in.cue:21:17
-    //     ./in.cue:21:11
-  }
-  b8: (number){ &(>=1, <=5) }
-  b9: (number){ &(>=1, <=1) }
-  b10: (number){ &(>=5, <=5) }
-  b11: (number){ &(>=2, <=3) }
-  b12: (number){ &(>=3, <=5) }
-  b13: (number){ &(>=5, <=5) }
-  b14: (_|_){
-    // [eval] b14: incompatible number bounds <=5 and >=6:
-    //     ./in.cue:29:24
-    //     ./in.cue:29:6
-  }
-  c1: (int){ &(>=1, <=5, int) }
-  c2: (int){ &(>=1, <=5, int) }
-  c3: (_|_){
-    // [eval] c3: conflicting values string and >=1 (mismatched types string and number):
-    //     ./in.cue:34:5
-    //     ./in.cue:34:14
-  }
-  c4: (_|_){
-    // [eval] c4: conflicting values string and >=1 (mismatched types string and number):
-    //     ./in.cue:35:5
-    //     ./in.cue:35:17
-  }
-  s1: (string){ "e" }
-  s2: (string){ "ee" }
-  n1: (number){ &(>=1, <=2) }
-  n2: (_|_){
-    // [eval] n2: incompatible integer bounds <=1.3 and >=1.1:
-    //     ./in.cue:42:19
-    //     ./in.cue:42:11
-  }
-  n3: (int){ 2 }
-  n4: (float){ 0.09999 }
-  n5: (float){ 2.5 }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,19 +1,10 @@
- Errors:
--b14: incompatible number bounds <=5 and >=6:
--    ./in.cue:29:6
--    ./in.cue:29:24
--b7: incompatible number bounds <=5 and >=6:
--    ./in.cue:21:11
--    ./in.cue:21:17
- c3: conflicting values string and >=1 (mismatched types string and number):
-     ./in.cue:34:5
-     ./in.cue:34:14
--c4: conflicting values >=1 and string (mismatched types number and string):
-+c4: conflicting values string and >=1 (mismatched types string and number):
-     ./in.cue:35:5
-     ./in.cue:35:17
--n2: incompatible integer bounds <=1.3 and >=1.1:
--    ./in.cue:42:11
--    ./in.cue:42:19
- a4: invalid value 6 (out of bound <=5):
-     ./in.cue:5:11
-     ./in.cue:5:17
-@@ -26,6 +17,15 @@
- a10: invalid value 0 (out of bound >=1):
-     ./in.cue:12:10
-     ./in.cue:12:6
-+b7: incompatible number bounds <=5 and >=6:
-+    ./in.cue:21:17
-+    ./in.cue:21:11
-+b14: incompatible number bounds <=5 and >=6:
-+    ./in.cue:29:24
-+    ./in.cue:29:6
-+n2: incompatible integer bounds <=1.3 and >=1.1:
-+    ./in.cue:42:19
-+    ./in.cue:42:11
- 
- Result:
- (_|_){
-@@ -64,8 +64,8 @@
-   b6: (number){ &(>=5, <=5) }
-   b7: (_|_){
-     // [eval] b7: incompatible number bounds <=5 and >=6:
--    //     ./in.cue:21:11
-     //     ./in.cue:21:17
-+    //     ./in.cue:21:11
-   }
-   b8: (number){ &(>=1, <=5) }
-   b9: (number){ &(>=1, <=1) }
-@@ -75,8 +75,8 @@
-   b13: (number){ &(>=5, <=5) }
-   b14: (_|_){
-     // [eval] b14: incompatible number bounds <=5 and >=6:
--    //     ./in.cue:29:6
-     //     ./in.cue:29:24
-+    //     ./in.cue:29:6
-   }
-   c1: (int){ &(>=1, <=5, int) }
-   c2: (int){ &(>=1, <=5, int) }
-@@ -86,7 +86,7 @@
-     //     ./in.cue:34:14
-   }
-   c4: (_|_){
--    // [eval] c4: conflicting values >=1 and string (mismatched types number and string):
-+    // [eval] c4: conflicting values string and >=1 (mismatched types string and number):
-     //     ./in.cue:35:5
-     //     ./in.cue:35:17
-   }
-@@ -95,8 +95,8 @@
-   n1: (number){ &(>=1, <=2) }
-   n2: (_|_){
-     // [eval] n2: incompatible integer bounds <=1.3 and >=1.1:
--    //     ./in.cue:42:11
-     //     ./in.cue:42:19
-+    //     ./in.cue:42:11
-   }
-   n3: (int){ 2 }
-   n4: (float){ 0.09999 }
--- diff/todo/p3 --
+-- out/todo.txt --
 Reordering of error messages.
--- out/eval --
-Errors:
-b14: incompatible number bounds <=5 and >=6:
-    ./in.cue:29:6
-    ./in.cue:29:24
-b7: incompatible number bounds <=5 and >=6:
-    ./in.cue:21:11
-    ./in.cue:21:17
-c3: conflicting values string and >=1 (mismatched types string and number):
-    ./in.cue:34:5
-    ./in.cue:34:14
-c4: conflicting values >=1 and string (mismatched types number and string):
-    ./in.cue:35:5
-    ./in.cue:35:17
-n2: incompatible integer bounds <=1.3 and >=1.1:
-    ./in.cue:42:11
-    ./in.cue:42:19
-a4: invalid value 6 (out of bound <=5):
-    ./in.cue:5:11
-    ./in.cue:5:17
-a5: invalid value 0 (out of bound >=1):
-    ./in.cue:6:5
-    ./in.cue:6:17
-a9: invalid value 6 (out of bound <=5):
-    ./in.cue:11:16
-    ./in.cue:11:6
-a10: invalid value 0 (out of bound >=1):
-    ./in.cue:12:10
-    ./in.cue:12:6
-
-Result:
-(_|_){
-  // [eval]
-  a1: (int){ 3 }
-  a2: (int){ 1 }
-  a3: (int){ 5 }
-  a4: (_|_){
-    // [eval] a4: invalid value 6 (out of bound <=5):
-    //     ./in.cue:5:11
-    //     ./in.cue:5:17
-  }
-  a5: (_|_){
-    // [eval] a5: invalid value 0 (out of bound >=1):
-    //     ./in.cue:6:5
-    //     ./in.cue:6:17
-  }
-  a6: (int){ 3 }
-  a7: (int){ 1 }
-  a8: (int){ 5 }
-  a9: (_|_){
-    // [eval] a9: invalid value 6 (out of bound <=5):
-    //     ./in.cue:11:16
-    //     ./in.cue:11:6
-  }
-  a10: (_|_){
-    // [eval] a10: invalid value 0 (out of bound >=1):
-    //     ./in.cue:12:10
-    //     ./in.cue:12:6
-  }
-  b1: (number){ &(>=1, <=5) }
-  b2: (number){ &(>=1, <=1) }
-  b3: (number){ &(>=5, <=5) }
-  b4: (number){ &(>=2, <=3) }
-  b5: (number){ &(>=3, <=5) }
-  b6: (number){ &(>=5, <=5) }
-  b7: (_|_){
-    // [eval] b7: incompatible number bounds <=5 and >=6:
-    //     ./in.cue:21:11
-    //     ./in.cue:21:17
-  }
-  b8: (number){ &(>=1, <=5) }
-  b9: (number){ &(>=1, <=1) }
-  b10: (number){ &(>=5, <=5) }
-  b11: (number){ &(>=2, <=3) }
-  b12: (number){ &(>=3, <=5) }
-  b13: (number){ &(>=5, <=5) }
-  b14: (_|_){
-    // [eval] b14: incompatible number bounds <=5 and >=6:
-    //     ./in.cue:29:6
-    //     ./in.cue:29:24
-  }
-  c1: (int){ &(>=1, <=5, int) }
-  c2: (int){ &(>=1, <=5, int) }
-  c3: (_|_){
-    // [eval] c3: conflicting values string and >=1 (mismatched types string and number):
-    //     ./in.cue:34:5
-    //     ./in.cue:34:14
-  }
-  c4: (_|_){
-    // [eval] c4: conflicting values >=1 and string (mismatched types number and string):
-    //     ./in.cue:35:5
-    //     ./in.cue:35:17
-  }
-  s1: (string){ "e" }
-  s2: (string){ "ee" }
-  n1: (number){ &(>=1, <=2) }
-  n2: (_|_){
-    // [eval] n2: incompatible integer bounds <=1.3 and >=1.1:
-    //     ./in.cue:42:11
-    //     ./in.cue:42:19
-  }
-  n3: (int){ 2 }
-  n4: (float){ 0.09999 }
-  n5: (float){ 2.5 }
-}

@@ -1,9 +1,6 @@
-#name: list unification
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-a: {l: ["foo", v], v: l[1]}
-b: a & {l: [_, "bar"]}
+a: {l: ["foo", v], v: l[1]}   @test(eq, {l: ["foo", _], v: _})
+b: a & {l: [_, "bar"]}   @test(eq, {l: ["foo", "bar"], v: "bar"})
 -- out/compile --
 --- in.cue
 {
@@ -33,20 +30,3 @@ Conjuncts:    17
 Disjuncts:    0
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  a: (struct){
-    l: (#list){
-      0: (string){ "foo" }
-      1: (_){ _ }
-    }
-    v: (_){ _ }
-  }
-  b: (struct){
-    l: (#list){
-      0: (string){ "foo" }
-      1: (string){ "bar" }
-    }
-    v: (string){ "bar" }
-  }
-}

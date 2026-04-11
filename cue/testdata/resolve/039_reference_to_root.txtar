@@ -1,26 +1,38 @@
-#name: reference to root
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-a: {b: int}
+a: {b: int}   @test(eq, {b: int})
 c: a & {
 	b: 100
 	d: a.b + 3 // do not resolve as c != a.
-}
+} @test(eq, {b: 100, d: _|_}) // d should be incomplete, not 103.
 x: {
 	b: int
-	c: b + 5
+	c: b + 5   @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[0:5, -1:5])
+	@test(eq, {b: int, c: _|_})
 }
-y: x & {
-	b: 100
-	// c should resolve to 105
-}
+y: x & {b: 100}   @test(eq, {b: 100, c: 105}) // c should resolve to 105
 v: {
 	b: int
-	c: v.b + 5 // reference starting from copied node.
+	c: v.b + 5   @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[0:5, -1:5]) // reference starting from copied node.
+	@test(eq, {b: int, c: _|_})
 }
-w:  v & {b: 100}
-wp: v & {b: 100}
+w:  v & {b: 100}   @test(eq, {b: 100, c: _|_})
+wp: v & {b: 100}   @test(eq, {b: 100, c: _|_})
+-- out/errors.txt --
+[incomplete] c.d: non-concrete value int in operand to +:
+    ./in.cue:4:5
+    ./in.cue:1:8
+[incomplete] x.c: non-concrete value int in operand to +:
+    ./in.cue:8:5
+    ./in.cue:7:5
+[incomplete] v.c: non-concrete value int in operand to +:
+    ./in.cue:14:5
+    ./in.cue:13:5
+[incomplete] w.c: non-concrete value int in operand to +:
+    ./in.cue:14:5
+    ./in.cue:13:5
+[incomplete] wp.c: non-concrete value int in operand to +:
+    ./in.cue:14:5
+    ./in.cue:13:5
 -- out/compile --
 --- in.cue
 {
@@ -61,53 +73,3 @@ Conjuncts:    33
 Disjuncts:    0
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  a: (struct){
-    b: (int){ int }
-  }
-  c: (struct){
-    b: (int){ 100 }
-    d: (_|_){
-      // [incomplete] c.d: non-concrete value int in operand to +:
-      //     ./in.cue:4:5
-      //     ./in.cue:1:8
-    }
-  }
-  x: (struct){
-    b: (int){ int }
-    c: (_|_){
-      // [incomplete] x.c: non-concrete value int in operand to +:
-      //     ./in.cue:8:5
-      //     ./in.cue:7:5
-    }
-  }
-  y: (struct){
-    b: (int){ 100 }
-    c: (int){ 105 }
-  }
-  v: (struct){
-    b: (int){ int }
-    c: (_|_){
-      // [incomplete] v.c: non-concrete value int in operand to +:
-      //     ./in.cue:16:5
-      //     ./in.cue:15:5
-    }
-  }
-  w: (struct){
-    b: (int){ 100 }
-    c: (_|_){
-      // [incomplete] w.c: non-concrete value int in operand to +:
-      //     ./in.cue:16:5
-      //     ./in.cue:15:5
-    }
-  }
-  wp: (struct){
-    b: (int){ 100 }
-    c: (_|_){
-      // [incomplete] wp.c: non-concrete value int in operand to +:
-      //     ./in.cue:16:5
-      //     ./in.cue:15:5
-    }
-  }
-}

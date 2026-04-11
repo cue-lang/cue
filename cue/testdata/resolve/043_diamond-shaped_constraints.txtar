@@ -1,6 +1,3 @@
-#name: diamond-shaped constraints
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 S: {
 	A: {
@@ -9,6 +6,7 @@ S: {
 	B: A & {
 		b: 2
 	}
+	@test(eq, {A: {a: 1}, B: {b: 2, a: 1}})
 }
 T: S & {// S == { A: { a:1 }, B: { a:1, b:2 } }
 	A: {
@@ -17,7 +15,9 @@ T: S & {// S == { A: { a:1 }, B: { a:1, b:2 } }
 	B: {
 		d: 4 // Combines constraints S.A, S.B, T.A, and T.B // S.B & A
 	}
-}
+} @test(eq, {A: {c: 3, a: 1}, B: {d: 4, b: 2, c: 3, a: 1}})
+-- out/todo.txt --
+Reordering
 -- out/compile --
 --- in.cue
 {
@@ -50,46 +50,22 @@ Conjuncts:    25
 Disjuncts:    0
 
 NumCloseIDs: 3
--- out/evalalpha --
-(struct){
-  S: (struct){
-    A: (struct){
-      a: (int){ 1 }
-    }
-    B: (struct){
-      b: (int){ 2 }
-      a: (int){ 1 }
-    }
-  }
-  T: (struct){
-    A: (struct){
-      c: (int){ 3 }
-      a: (int){ 1 }
-    }
-    B: (struct){
-      d: (int){ 4 }
-      b: (int){ 2 }
-      c: (int){ 3 }
-      a: (int){ 1 }
-    }
-  }
-}
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
 @@ -4,20 +4,20 @@
-       a: (int){ 1 }
-     }
-     B: (struct){
+      a: (int){ 1 }
+    }
+    B: (struct){
 -      a: (int){ 1 }
 -      b: (int){ 2 }
 +      b: (int){ 2 }
 +      a: (int){ 1 }
-     }
-   }
-   T: (struct){
-     A: (struct){
+    }
+  }
+  T: (struct){
+    A: (struct){
 -      a: (int){ 1 }
 -      c: (int){ 3 }
 -    }
@@ -105,32 +81,6 @@ diff old new
 +      b: (int){ 2 }
 +      c: (int){ 3 }
 +      a: (int){ 1 }
-     }
-   }
- }
--- diff/todo/p3 --
-Reordering
--- out/eval --
-(struct){
-  S: (struct){
-    A: (struct){
-      a: (int){ 1 }
-    }
-    B: (struct){
-      a: (int){ 1 }
-      b: (int){ 2 }
-    }
-  }
-  T: (struct){
-    A: (struct){
-      a: (int){ 1 }
-      c: (int){ 3 }
-    }
-    B: (struct){
-      a: (int){ 1 }
-      c: (int){ 3 }
-      b: (int){ 2 }
-      d: (int){ 4 }
     }
   }
 }

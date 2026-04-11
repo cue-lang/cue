@@ -1,12 +1,14 @@
-#name: optional field resolves to incomplete
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 r: {
 	a?: 3
-	b:  a
-	c:  r["a"]
+	b:  a      @test(err, code=incomplete, contains="cannot reference optional field: a", pos=[0:6])
+	c:  r["a"] @test(err, code=incomplete, contains="cannot reference optional field: a", pos=[0:8])
 }
+-- out/errors.txt --
+[incomplete] r.b: cannot reference optional field: a:
+    ./in.cue:3:6
+[incomplete] r.c: cannot reference optional field: a:
+    ./in.cue:4:8
 -- out/compile --
 --- in.cue
 {
@@ -26,17 +28,3 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  r: (struct){
-    a?: (int){ 3 }
-    b: (_|_){
-      // [incomplete] r.b: cannot reference optional field: a:
-      //     ./in.cue:3:6
-    }
-    c: (_|_){
-      // [incomplete] r.c: cannot reference optional field: a:
-      //     ./in.cue:4:8
-    }
-  }
-}

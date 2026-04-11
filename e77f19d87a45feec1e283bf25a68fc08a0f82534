@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8c49bb5_e60127ff",
+        "filename": "internal/cuetxtar/astcmp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T13:55:37Z",
+      "side": 1,
+      "message": "Use internal.IsDefOrHidden. Do not duplicate.",
+      "revId": "e77f19d87a45feec1e283bf25a68fc08a0f82534",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1311a8fc_0a404e4c",
+        "filename": "internal/cuetxtar/astcmp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T13:55:37Z",
+      "side": 1,
+      "message": "use internal variant.",
+      "revId": "e77f19d87a45feec1e283bf25a68fc08a0f82534",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8f2676d_09d9574d",
+        "filename": "internal/cuetxtar/astcmp_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T13:55:37Z",
+      "side": 1,
+      "message": "Add TODO to investigate why creating it with this indirection of looking up with X versus just defining it directly is necessary.",
+      "revId": "e77f19d87a45feec1e283bf25a68fc08a0f82534",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -82,6 +82,15 @@ Available per-file experiments:
     Proposal:      https://cuelang.org/issue/4019
     Spec change:   https://cuelang.org/cl/1231444
 
+  shortcircuit (preview: v0.17.0)
+    shortcircuit enables short-circuit evaluation for the logical operators
+    && and ||. When the result is fully determined by the left operand alone
+    (false && ... or true || ...), the right operand is not evaluated and any
+    error or incomplete value it carries is suppressed.
+    This matches the behavior documented in the CUE spec ("The right operand
+    is evaluated conditionally") and is consistent with all mainstream
+    languages.
+
 
 ## Global Experiments
 

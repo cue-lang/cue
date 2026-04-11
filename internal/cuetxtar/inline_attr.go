@@ -498,18 +498,32 @@ func labelSelector(label ast.Label, hidPkg string) cue.Selector {
 
 // appendPath appends a selector for label to path.
 // hidPkg is forwarded to labelSelector; see its documentation.
+//
+// NOTE: a fresh slice is allocated intentionally so that multiple calls with
+// the same base do not share the same backing array. cue.Path.Append reuses
+// excess capacity, so callers that store the result and then append again from
+// the same base would silently overwrite each other's stored paths.
 func appendPath(base cue.Path, label ast.Label, hidPkg string) cue.Path {
-	return base.Append(labelSelector(label, hidPkg))
+	sels := base.Selectors()
+	fresh := make([]cue.Selector, len(sels)+1)
+	copy(fresh, sels)
+	fresh[len(sels)] = labelSelector(label, hidPkg)
+	return cue.MakePath(fresh...)
 }
 
 // parseAtPath parses an at= selector string into a cue.Path.
-// Unlike cue.ParsePath, it handles hidden field names with a $pkg qualifier
-// (e.g. "_foo$pkg" → cue.Hid("_foo", ":pkg"), matching the same syntax
-// accepted inside @test(eq, {...}) bodies). Dotted paths are split on "." and
-// each segment is processed independently, so "a._foo$pkg.b" works correctly.
+// Unlike cue.ParsePath, it handles:
+//   - Hidden field names with a $pkg qualifier, e.g. "_foo$pkg" →
+//     cue.Hid("_foo", ":pkg"), matching the syntax used inside @test(eq, ...)
+//     bodies.
+//   - Integer segments as list-index selectors, e.g. "items.0" →
+//     [items, Index(0)].
+//
+// Dotted paths are split on "." and each segment is processed independently,
+// so "a._foo$pkg.0" works correctly.
 func parseAtPath(at string) (cue.Path, error) {
-	// Fast path: if there are no hidden-field indicators, delegate directly.
-	if !strings.Contains(at, "_") {
+	// Fast path: no hidden fields and no integers — delegate directly.
+	if !strings.Contains(at, "_") && !strings.ContainsAny(at, "0123456789") {
 		p := cue.ParsePath(at)
 		return p, p.Err()
 	}
@@ -523,6 +537,8 @@ func parseAtPath(at string) (cue.Path, error) {
 				name = name[:i]
 			}
 			sels = append(sels, cue.Hid(name, pkg))
+		} else if n, err := strconv.Atoi(seg); err == nil {
+			sels = append(sels, cue.Index(n))
 		} else {
 			p := cue.ParsePath(seg)
 			if err := p.Err(); err != nil {

@@ -897,6 +897,14 @@ func (r *inlineRunner) runKindAssertion(t testing.TB, path cue.Path, val cue.Val
 		}
 		expectedKind |= k
 	}
+	if pa.isTodo {
+		if gotKind == expectedKind {
+			t.Logf("WARNING: path %s: TODO kind:todo now passes — consider upgrading to @test(kind=%s)", path, expectedStr)
+		} else {
+			t.Logf("path %s: TODO kind:todo still failing: got kind %v, want %v", path, gotKind, expectedKind)
+		}
+		return
+	}
 	if gotKind != expectedKind {
 		t.Errorf("path %s: @test(kind=%s): got kind %v, want %v", path, expectedStr, gotKind, expectedKind)
 		logHint(t, pa.hint)

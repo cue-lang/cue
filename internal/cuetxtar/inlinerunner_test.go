@@ -185,6 +185,16 @@ x: 42 @test(eq, 99) @test(todo, p=1, why="known issue")
 		runExpectPass(t, "-- test.cue --\nx: 42 @test(err:todo, p=1, code=eval)\n")
 	})
 
+	t.Run("kind:todo still failing does not fail test", func(t *testing.T) {
+		// @test(kind:todo=int) where kind is float: no test failure.
+		runExpectPass(t, "-- test.cue --\nx: 1.0 @test(kind:todo=int)\n")
+	})
+
+	t.Run("kind:todo passing does not fail test", func(t *testing.T) {
+		// @test(kind:todo=int) where kind matches: logs a warning but no failure.
+		runExpectPass(t, "-- test.cue --\nx: int @test(kind:todo=int)\n")
+	})
+
 	t.Run("eq incorrect passing logs note", func(t *testing.T) {
 		// @test(eq, X, incorrect) where value matches X: suppresses "this is wrong"
 		// feeling by logging a NOTE, but does not fail.

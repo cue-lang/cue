@@ -1,5 +1,4 @@
 exec cue eval ./pkg:foo
-#todo:inline: medium — multi-package test; check subpath handling
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"
@@ -11,6 +10,8 @@ import pkg2 "mod.test/foo/pkg1"
 #pkg1: pkg2.Object
 
 "Hello \(#pkg1)!"
+
+@test(eq, {"Hello World!", #pkg1: "World"})
 -- foo/pkg1/file.cue --
 package pkg1
 
@@ -27,11 +28,6 @@ Conjuncts:    5
 Disjuncts:    0
 
 NumCloseIDs: 2
--- out/evalalpha --
-(string){
-  "Hello World!"
-  #pkg1: (string){ "World" }
-}
 -- out/compile --
 --- in.cue
 {

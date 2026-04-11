@@ -3,7 +3,6 @@
 # "pull" branch is selected and expressions using the defaulted tag
 # field (tag: *"latest" | string) evaluate concretely.
 #evalFull
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #Task: {
 	{
@@ -17,7 +16,13 @@
 	}
 }
 
-foo: #Task & {"op": "pull"}
+foo: #Task & {"op": "pull"} @test(eq, {
+	op: "pull"
+	tag: *"latest" | string
+	refToTag: *"latest" | string
+	tagExpr: "latestdd"
+	tagInString: "latest"
+})
 -- out/compile --
 --- in.cue
 {
@@ -48,22 +53,3 @@ Conjuncts:    28
 Disjuncts:    8
 
 NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  #Task: (#struct){ |((#struct){
-      op: (string){ "pull" }
-      tag: (string){ |(*(string){ "latest" }, (string){ string }) }
-      refToTag: (string){ |(*(string){ "latest" }, (string){ string }) }
-      tagExpr: (string){ "latestdd" }
-      tagInString: (string){ "latest" }
-    }, (#struct){
-      op: (string){ "scratch" }
-    }) }
-  foo: (#struct){
-    op: (string){ "pull" }
-    tag: (string){ |(*(string){ "latest" }, (string){ string }) }
-    refToTag: (string){ |(*(string){ "latest" }, (string){ string }) }
-    tagExpr: (string){ "latestdd" }
-    tagInString: (string){ "latest" }
-  }
-}

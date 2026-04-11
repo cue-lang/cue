@@ -3,7 +3,6 @@
 # Tests that optional fields with label filters enforce their constraints:
 # fields not matching the pattern or constraint fail with "field not allowed"
 # or bound violations. jobs is the happy path; jobs1, jobs2, jobs3 are faulty.
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- in.cue --
 #JobID: =~"^[a-zA-Z]*$"
 #Job: {
@@ -21,13 +20,29 @@ jobs: foo: name: "allGood"
 
 jobs1:          #Jobs
 jobs1: foo1: {} // faulty
+@test(err, code=eval, at=jobs1.foo1, contains="field not allowed", pos=[-1:8])
 
 jobs2: #Jobs
 jobs2: fooTest: name: "badName" // faulty
+@test(err, code=eval, at=jobs2.fooTest.name, contains="invalid value", pos=[-12:22, -18:8, -1:23])
 
 jobs3: #Jobs
 jobs3: [string]: #Job
 jobs3: fooTest1: name: "badName" // faulty
+@test(err, code=eval, at=jobs3.fooTest1, contains="field not allowed", pos=[-2:8, -1:8])
+
+-- out/errors.txt --
+[eval] jobs1.foo1: field not allowed:
+    ./in.cue:16:8
+[eval] jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
+    ./in.cue:9:22
+    ./in.cue:3:8
+    ./in.cue:20:23
+[eval] jobs3.fooTest1: field not allowed:
+    ./in.cue:24:8
+    ./in.cue:25:8
+-- out/todo.txt --
+v2 reports additional error positions for jobs1.foo1 and jobs3.fooTest1 (extra positions for pattern/optional constraints); v3 only reports the direct definition position.
 -- out/compile --
 --- in.cue
 {
@@ -88,199 +103,3 @@ Conjuncts:    45
 Disjuncts:    0
 
 NumCloseIDs: 17
--- out/evalalpha --
-Errors:
-jobs1.foo1: field not allowed:
-    ./in.cue:16:8
-jobs3.fooTest1: field not allowed:
-    ./in.cue:22:8
-    ./in.cue:23:8
-jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
-    ./in.cue:9:22
-    ./in.cue:3:8
-    ./in.cue:19:23
-
-Result:
-(_|_){
-  // [eval]
-  #JobID: (string){ =~"^[a-zA-Z]*$" }
-  #Job: (#struct){
-    name: (string){ string }
-    cmd: (string){ string }
-  }
-  #Jobs: (#struct){
-  }
-  jobs: (struct){
-    foo: (struct){
-      name: (string){ "allGood" }
-    }
-  }
-  jobs1: (_|_){
-    // [eval]
-    foo1: (_|_){
-      // [eval] jobs1.foo1: field not allowed:
-      //     ./in.cue:16:8
-    }
-  }
-  jobs2: (_|_){
-    // [eval]
-    fooTest: (_|_){
-      // [eval]
-      name: (_|_){
-        // [eval] jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
-        //     ./in.cue:9:22
-        //     ./in.cue:3:8
-        //     ./in.cue:19:23
-      }
-      cmd: (string){ string }
-    }
-  }
-  jobs3: (_|_){
-    // [eval]
-    fooTest1: (_|_){
-      // [eval] jobs3.fooTest1: field not allowed:
-      //     ./in.cue:22:8
-      //     ./in.cue:23:8
-      name: (_|_){
-        // [eval] jobs3.fooTest1.name: field not allowed:
-        //     ./in.cue:3:2
-        //     ./in.cue:23:18
-      }
-      cmd: (_|_){
-        // [eval] jobs3.fooTest1.cmd: field not allowed:
-        //     ./in.cue:4:2
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,15 +1,7 @@
- Errors:
- jobs1.foo1: field not allowed:
--    ./in.cue:6:8
--    ./in.cue:7:2
--    ./in.cue:9:2
--    ./in.cue:15:17
-     ./in.cue:16:8
- jobs3.fooTest1: field not allowed:
--    ./in.cue:6:8
--    ./in.cue:7:2
--    ./in.cue:9:2
--    ./in.cue:21:8
-     ./in.cue:22:8
-     ./in.cue:23:8
- jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
-@@ -36,10 +28,6 @@
-     // [eval]
-     foo1: (_|_){
-       // [eval] jobs1.foo1: field not allowed:
--      //     ./in.cue:6:8
--      //     ./in.cue:7:2
--      //     ./in.cue:9:2
--      //     ./in.cue:15:17
-       //     ./in.cue:16:8
-     }
-   }
-@@ -60,14 +48,17 @@
-     // [eval]
-     fooTest1: (_|_){
-       // [eval] jobs3.fooTest1: field not allowed:
--      //     ./in.cue:6:8
--      //     ./in.cue:7:2
--      //     ./in.cue:9:2
--      //     ./in.cue:21:8
-       //     ./in.cue:22:8
-       //     ./in.cue:23:8
--      name: (string){ "badName" }
--      cmd: (string){ string }
-+      name: (_|_){
-+        // [eval] jobs3.fooTest1.name: field not allowed:
-+        //     ./in.cue:3:2
-+        //     ./in.cue:23:18
-+      }
-+      cmd: (_|_){
-+        // [eval] jobs3.fooTest1.cmd: field not allowed:
-+        //     ./in.cue:4:2
-+      }
-     }
-   }
- }
--- diff/todo/p2 --
-Missing error positions.
--- out/eval --
-Errors:
-jobs1.foo1: field not allowed:
-    ./in.cue:6:8
-    ./in.cue:7:2
-    ./in.cue:9:2
-    ./in.cue:15:17
-    ./in.cue:16:8
-jobs3.fooTest1: field not allowed:
-    ./in.cue:6:8
-    ./in.cue:7:2
-    ./in.cue:9:2
-    ./in.cue:21:8
-    ./in.cue:22:8
-    ./in.cue:23:8
-jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
-    ./in.cue:9:22
-    ./in.cue:3:8
-    ./in.cue:19:23
-
-Result:
-(_|_){
-  // [eval]
-  #JobID: (string){ =~"^[a-zA-Z]*$" }
-  #Job: (#struct){
-    name: (string){ string }
-    cmd: (string){ string }
-  }
-  #Jobs: (#struct){
-  }
-  jobs: (struct){
-    foo: (struct){
-      name: (string){ "allGood" }
-    }
-  }
-  jobs1: (_|_){
-    // [eval]
-    foo1: (_|_){
-      // [eval] jobs1.foo1: field not allowed:
-      //     ./in.cue:6:8
-      //     ./in.cue:7:2
-      //     ./in.cue:9:2
-      //     ./in.cue:15:17
-      //     ./in.cue:16:8
-    }
-  }
-  jobs2: (_|_){
-    // [eval]
-    fooTest: (_|_){
-      // [eval]
-      name: (_|_){
-        // [eval] jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
-        //     ./in.cue:9:22
-        //     ./in.cue:3:8
-        //     ./in.cue:19:23
-      }
-      cmd: (string){ string }
-    }
-  }
-  jobs3: (_|_){
-    // [eval]
-    fooTest1: (_|_){
-      // [eval] jobs3.fooTest1: field not allowed:
-      //     ./in.cue:6:8
-      //     ./in.cue:7:2
-      //     ./in.cue:9:2
-      //     ./in.cue:21:8
-      //     ./in.cue:22:8
-      //     ./in.cue:23:8
-      name: (string){ "badName" }
-      cmd: (string){ string }
-    }
-  }
-}

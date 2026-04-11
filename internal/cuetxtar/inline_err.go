@@ -179,6 +179,16 @@ type posUpdate struct {
 // posWrite is an alias for inlineFillWrite, used for pos= attribute updates.
 type posWrite = inlineFillWrite
 
+// nestedPosEntry accumulates pos=[] fill-ins for nested @test(err) attributes
+// inside a single outer @test(eq, {...}) attribute. Multiple fills for the same
+// outer attribute are merged sequentially so only one write is produced.
+type nestedPosEntry struct {
+	fileName    string
+	attrOffset  int
+	attrLen     int    // byte length of the original outer attribute
+	currentText string // attr text with fills applied so far
+}
+
 // parseErrArgs extracts err sub-options from an already-parsed Attr.
 // The attribute body is expected to start with "err" as the first positional arg.
 func parseErrArgs(a *internal.Attr) (errArgs, error) {
@@ -711,12 +721,14 @@ func replacePosSpec(text string, offset int, newContent string) (string, bool) {
 // original. applyInlineFillWritebacks drains nestedPosFills into pendingPosWrites.
 func (r *inlineRunner) enqueueNestedPosWrite(outerPa parsedTestAttr, innerAttrText string, positions []token.Pos) {
 	outerOffset := outerPa.srcAttr.Pos().Offset()
+
+	// Look up or create the accumulator entry for this outer attribute.
 	if r.nestedPosFills == nil {
-		r.nestedPosFills = make(map[int]*nestedPosFillEntry)
+		r.nestedPosFills = make(map[int]*nestedPosEntry)
 	}
 	entry, ok := r.nestedPosFills[outerOffset]
 	if !ok {
-		entry = &nestedPosFillEntry{
+		entry = &nestedPosEntry{
 			fileName:    outerPa.srcFileName,
 			attrOffset:  outerOffset,
 			attrLen:     len(outerPa.srcAttr.Text),
@@ -724,20 +736,23 @@ func (r *inlineRunner) enqueueNestedPosWrite(outerPa parsedTestAttr, innerAttrTe
 		}
 		r.nestedPosFills[outerOffset] = entry
 	}
+
+	// Search for the inner attr text within the current accumulated text so
+	// that previously-filled placeholders do not confuse the index.
 	innerIdx := strings.Index(entry.currentText, innerAttrText)
 	if innerIdx < 0 {
 		return // inner attr not found — skip
 	}
-	// Use baseLine=0 so specs are absolute line numbers, matching the
-	// cmpCtx.baseLine=0 convention used when checking nested pos= in cmpErr.
+	// Use baseLine=0: nested pos= specs use absolute line numbers.
 	parts := make([]string, len(positions))
 	for i, p := range positions {
 		parts[i] = r.formatPosSpec(p, 0, outerPa.srcFileName)
 	}
 	newText, replaced := replacePosSpec(entry.currentText, innerIdx, strings.Join(parts, ", "))
-	if replaced {
-		entry.currentText = newText
+	if !replaced {
+		return
 	}
+	entry.currentText = newText
 }
 
 func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUpdate) {
@@ -833,6 +848,10 @@ func positionsFromSingleError(e cueerrors.Error) []token.Pos {
 	slices.SortFunc(a[sortOffset:], token.Pos.Compare)
 	return slices.Compact(a)
 }
+
+// TODO: position matching by decomposing token.Pos into filename/line/column is
+// a workaround; this should be fixed at the cueerrors API level so callers need
+// not manually inspect token.Pos values.
 
 // posSpecsMatch reports whether positions match specs in any order.
 // baseLine is the line number of the @test attribute; used to resolve relative specs.

@@ -3,7 +3,7 @@ a: close({
 	a: b: int
 })
 
-b: a & {x:    int @test(err, code=eval, contains="field not allowed", pos=[])} // err
+b: a & {x: int} @test(err, code=eval, at=x, contains="field not allowed", pos=[0:9]) // err
 c: a & {a: c: int} // okay (non-recursive close)
 
 inDisjunctions: {

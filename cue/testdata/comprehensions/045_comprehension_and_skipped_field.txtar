@@ -4,7 +4,8 @@
 # Tests that a comprehension iterating over a struct whose values contain
 # a hidden field (_p) correctly skips that hidden field and still evaluates
 # the visible result field using a disjunction with a comprehension body.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Note: cannot convert to inline @test format because the top-level fields
+# are all generated dynamically by a for comprehension with no named fields.
 -- in.cue --
 
 for key, value in {x: v: 1} {

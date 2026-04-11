@@ -1,25 +1,29 @@
-#name: non-closed definition carries over closedness to enclosed template
-#evalPartial
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #S: {
 	[string]: {a: int}
-}
+} @test(eq, {}) @test(closed)
 a: #S & {
 	v: {b: int}
-}
+} @test(err, code=eval, contains="field not allowed", pos=[1:6])
 #Q: {
 	[string]: {a: int} | {b: int}
-}
+} @test(eq, {}) @test(closed)
 b: #Q & {
 	w: {c: int}
-}
+} @test(err, code=eval, contains="field not allowed", pos=[1:6])
 #R: {
 	[string]: [{a: int}, {b: int}]
-}
+} @test(eq, {}) @test(closed)
 c: #R & {
 	w: [{d: int}, ...]
-}
+} @test(err, code=eval, contains="field not allowed", pos=[1:7])
+-- out/errors.txt --
+[eval] a.v.b: field not allowed:
+    ./in.cue:5:6
+[eval] b.w.c: field not allowed:
+    ./in.cue:11:6
+[eval] c.w.0.d: field not allowed:
+    ./in.cue:17:7
 -- out/compile --
 --- in.cue
 {
@@ -76,198 +80,5 @@ Conjuncts:    33
 Disjuncts:    2
 
 NumCloseIDs: 3
--- out/evalalpha --
-Errors:
-a.v.b: field not allowed:
-    ./in.cue:5:6
-b.w.c: field not allowed:
-    ./in.cue:11:6
-c.w.0.d: field not allowed:
-    ./in.cue:17:7
-
-Result:
-(_|_){
-  // [eval]
-  #S: (#struct){
-  }
-  a: (_|_){
-    // [eval]
-    v: (_|_){
-      // [eval]
-      b: (_|_){
-        // [eval] a.v.b: field not allowed:
-        //     ./in.cue:5:6
-      }
-      a: (int){ int }
-    }
-  }
-  #Q: (#struct){
-  }
-  b: (_|_){
-    // [eval]
-    w: (_|_){
-      // [eval] b.w.c: field not allowed:
-      //     ./in.cue:11:6
-      c: (int){ int }
-    }
-  }
-  #R: (#struct){
-  }
-  c: (_|_){
-    // [eval]
-    w: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval]
-        d: (_|_){
-          // [eval] c.w.0.d: field not allowed:
-          //     ./in.cue:17:7
-        }
-        a: (int){ int }
-      }
-      1: (#struct){
-        b: (int){ int }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,16 +1,9 @@
- Errors:
- a.v.b: field not allowed:
--    ./in.cue:2:12
--    ./in.cue:4:4
-     ./in.cue:5:6
- b.w.c: field not allowed:
--    ./in.cue:8:12
--    ./in.cue:10:4
-     ./in.cue:11:6
- c.w.0.d: field not allowed:
--    ./in.cue:14:12
--    ./in.cue:14:13
--    ./in.cue:16:4
-     ./in.cue:17:7
- 
- Result:
-@@ -24,8 +17,6 @@
-       // [eval]
-       b: (_|_){
-         // [eval] a.v.b: field not allowed:
--        //     ./in.cue:2:12
--        //     ./in.cue:4:4
-         //     ./in.cue:5:6
-       }
-       a: (int){ int }
-@@ -37,17 +28,8 @@
-     // [eval]
-     w: (_|_){
-       // [eval] b.w.c: field not allowed:
--      //     ./in.cue:8:12
--      //     ./in.cue:10:4
-       //     ./in.cue:11:6
--      c: (_|_){
--        // [eval] b.w.c: field not allowed:
--        //     ./in.cue:8:12
--        //     ./in.cue:8:23
--        //     ./in.cue:10:4
--        //     ./in.cue:11:6
--      }
--      b: (int){ int }
-+      c: (int){ int }
-     }
-   }
-   #R: (#struct){
-@@ -60,11 +42,7 @@
-         // [eval]
-         d: (_|_){
-           // [eval] c.w.0.d: field not allowed:
--          //     ./in.cue:14:12
--          //     ./in.cue:14:13
--          //     ./in.cue:16:4
-           //     ./in.cue:17:7
--          //     ./in.cue:19:7
-         }
-         a: (int){ int }
-       }
--- diff/todo/p3 --
+-- out/todo.txt --
 Missing error positions.
--- out/eval --
-Errors:
-a.v.b: field not allowed:
-    ./in.cue:2:12
-    ./in.cue:4:4
-    ./in.cue:5:6
-b.w.c: field not allowed:
-    ./in.cue:8:12
-    ./in.cue:10:4
-    ./in.cue:11:6
-c.w.0.d: field not allowed:
-    ./in.cue:14:12
-    ./in.cue:14:13
-    ./in.cue:16:4
-    ./in.cue:17:7
-
-Result:
-(_|_){
-  // [eval]
-  #S: (#struct){
-  }
-  a: (_|_){
-    // [eval]
-    v: (_|_){
-      // [eval]
-      b: (_|_){
-        // [eval] a.v.b: field not allowed:
-        //     ./in.cue:2:12
-        //     ./in.cue:4:4
-        //     ./in.cue:5:6
-      }
-      a: (int){ int }
-    }
-  }
-  #Q: (#struct){
-  }
-  b: (_|_){
-    // [eval]
-    w: (_|_){
-      // [eval] b.w.c: field not allowed:
-      //     ./in.cue:8:12
-      //     ./in.cue:10:4
-      //     ./in.cue:11:6
-      c: (_|_){
-        // [eval] b.w.c: field not allowed:
-        //     ./in.cue:8:12
-        //     ./in.cue:8:23
-        //     ./in.cue:10:4
-        //     ./in.cue:11:6
-      }
-      b: (int){ int }
-    }
-  }
-  #R: (#struct){
-  }
-  c: (_|_){
-    // [eval]
-    w: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval]
-        d: (_|_){
-          // [eval] c.w.0.d: field not allowed:
-          //     ./in.cue:14:12
-          //     ./in.cue:14:13
-          //     ./in.cue:16:4
-          //     ./in.cue:17:7
-          //     ./in.cue:19:7
-        }
-        a: (int){ int }
-      }
-      1: (#struct){
-        b: (int){ int }
-      }
-    }
-  }
-}

@@ -24,11 +24,11 @@ items: list.Sort(#List.items, {
 
 _items: [#VMRuleList]
 
-// TODO: this works, but make the in-place ones work as well for lists.
-// @test(shareID=L0, at=items.0)
-// @test(shareID=L1, at=items.1)
-// @test(shareID=L0, at=#VMRuleList.0)
-// @test(shareID=L1, at=#VMRuleList.1)
+// This is an alternative way of writing sharing.
+@test(shareID=L0, at=items.0)
+@test(shareID=L1, at=items.1)
+@test(shareID=L0, at=#VMRuleList.0)
+@test(shareID=L1, at=#VMRuleList.1)
 
 #VMRuleList: [...null | #VMRule] & [{
 	spec: [{

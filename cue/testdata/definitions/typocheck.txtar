@@ -44,8 +44,8 @@ embed: andEmbed: {
 	@test(err, at=d.err, code=eval, contains="field not allowed", pos=[4:11])
 }
 and: transitive: ok: {
-	Z: {a: string} @test(shareID=Z)
-	#Y: Z @test(shareID=Z)
+	Z: {a: string} @test(shareID:todo=Z)
+	#Y: Z          @test(shareID:todo=Z)
 	#X: #Y & Z
 	out: #X & {
 		a: "foo"

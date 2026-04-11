@@ -1,0 +1,416 @@
+# Tests for exists and existsN builtins
+
+-- in.cue --
+// Field references
+fieldRef: {
+	a:       1
+	existsA: exists(a)
+	b?:      string
+	existsB: exists(b)
+}
+
+// Selector: all intermediates exist
+selector: {
+	x: y: z:  1
+	x: y: v?: 1
+	existsXYZ: exists(x.y.z)
+	existsXYV: exists(x.y.v)
+	existsXYW: exists(x.y.w)
+
+	#Def: {a: 1, opt?: 2, req!: 3}
+	existsDefA:   exists(#Def.a)
+	existsDefOpt: exists(#Def.opt)
+	existsDefReq: exists(#Def.req)
+	existsDefNE:  exists(#Def.ne)
+
+	Ref:          #Def
+	existsRefA:   exists(Ref.a)
+	existsRefOpt: exists(Ref.opt)
+	existsRefReq: exists(Ref.req)
+	existsRefNE:  exists(Ref.ne)
+
+	D: #Def & {opt: 2, req: 3}
+	existsDOpt: exists(D.opt)
+	existsDReq: exists(D.req)
+
+	R: Ref & {opt: _, req: _}
+	existsROpt: exists(R.opt)
+	existsRReq: exists(R.req)
+}
+
+// Selector: optional intermediate not ? marked → error
+selectorRequiredIntermediate: {
+	x: y?: z: 1
+	existsXYZ: exists(x.y.z)
+}
+
+// Index expressions - list
+indexList: {
+	list: [1, 2, 3]
+	c: exists0: exists(list[0])
+	c: exists2: exists(list[2])
+	c: ne1:     exists(list[3])
+
+	open: [1, 2, 3, ...]
+	o: exists0: exists(open[0])
+	o: exists2: exists(open[2])
+	o: ne1:     exists(open[3])
+}
+
+// Index expressions - struct with string key
+indexStruct: {
+	data: foo: "bar"
+	existsFoo: exists(data["foo"])
+	existsBaz: exists(data["baz"])
+
+	// Parent is an unresolved disjunction with a default: index lookup
+	// follows the default, parallel to selector behavior on disjunctions.
+	d: *{a: 1} | {b: 2}
+	existsA: exists(d["a"])
+	existsB: exists(d["b"])
+}
+
+invalidValues: {
+	b:         1
+	existsFoo: exists(1)
+	existsBaz: exists(1 + b)
+	existsBaz: exists("string")
+	existsBaz: exists("string"[0])
+}
+
+// existsN - exact count (a and b exist, c does not)
+existsNTest: {
+	a:  1
+	b:  2
+	c?: string
+	existsN(2, a, b, c)
+}
+
+// existsN with bound constraints (only a exists)
+existsNBounds: {
+	a:  1
+	b?: int
+	c?: int
+	existsN(>=1, a, b, c)
+	existsN(<=2, a, b, c)
+}
+
+// exists in conditionals
+conditionalExists: {
+	x?:      int
+	y:       1
+	existsY: exists(y)
+	result: {
+		if exists(y) {
+			hasY: true
+		}
+	}
+}
+
+// existsN with all existing
+existsNAll: {
+	a: 1
+	b: 2
+	c: 3
+	existsN(3, a, b, c)
+}
+
+// existsN with none existing (all optional, none set)
+existsNNone: {
+	a?: int
+	b?: int
+	existsN(0, a, b)
+}
+
+// List index out of bounds returns false for open and closed lists.
+indexOutOfBounds: {
+	list: [1, 2, 3]
+	closed10: exists(list[10])
+	open: [1, 2, 3, ...]
+	open10: exists(open[10])
+}
+
+// Final component missing → false (no ? needed on final)
+missingNested: {
+	a: b: {}
+	existsABC: exists(a.b.c)
+}
+
+// Intermediate missing + not ? marked → error
+missingIntermediateRequired: {
+	a: {}
+	existsABC: exists(a.b.c)
+}
+
+// At most one of the optional fields can be present (protobuf oneOf)
+oneOfPattern: {
+	a?: int
+	b?: string
+	c?: bool
+	existsN(<=1, a, b, c)
+}
+
+// oneOf with one field present - should pass
+oneOfWithValue: {
+	a?: int
+	b?: string
+	c?: bool
+	a:  42
+	existsN(<=1, a, b, c)
+}
+
+// oneOf with two fields present - should fail
+oneOfViolation: {
+	a?: int
+	b?: string
+	c?: bool
+	a:  42
+	b:  "hello"
+	existsN(<=1, a, b, c)
+}
+
+// existsN failure - requires at least 2 but only 1 exists
+existsNTooFew: {
+	a:  1
+	b?: int
+	c?: int
+	existsN(>=2, a, b, c)
+}
+
+// existsN failure - exact count mismatch
+existsNExactFail: {
+	a:  1
+	b?: int
+	existsN(2, a, b)
+}
+-- cycle.cue --
+minimal: {
+	a: {
+		if !exists(b.port) {
+			port: ""
+		}
+	}
+
+	b: {
+		if !exists(a.port) {
+			port: ""
+		}
+	}
+}
+-- out/compile --
+--- cycle.cue
+{
+  minimal: {
+    a: {
+      if !exists(〈1;b〉.port) {
+        port: ""
+      }
+    }
+    b: {
+      if !exists(〈1;a〉.port) {
+        port: ""
+      }
+    }
+  }
+}
+--- in.cue
+{
+  fieldRef: {
+    a: 1
+    existsA: exists(〈0;a〉)
+    b?: string
+    existsB: exists(〈0;b〉)
+  }
+  selector: {
+    x: {
+      y: {
+        z: 1
+      }
+    }
+    x: {
+      y: {
+        v?: 1
+      }
+    }
+    existsXYZ: exists(〈0;x〉.y.z)
+    existsXYV: exists(〈0;x〉.y.v)
+    existsXYW: exists(〈0;x〉.y.w)
+    #Def: {
+      a: 1
+      opt?: 2
+      req!: 3
+    }
+    existsDefA: exists(〈0;#Def〉.a)
+    existsDefOpt: exists(〈0;#Def〉.opt)
+    existsDefReq: exists(〈0;#Def〉.req)
+    existsDefNE: exists(〈0;#Def〉.ne)
+    Ref: 〈0;#Def〉
+    existsRefA: exists(〈0;Ref〉.a)
+    existsRefOpt: exists(〈0;Ref〉.opt)
+    existsRefReq: exists(〈0;Ref〉.req)
+    existsRefNE: exists(〈0;Ref〉.ne)
+    D: (〈0;#Def〉 & {
+      opt: 2
+      req: 3
+    })
+    existsDOpt: exists(〈0;D〉.opt)
+    existsDReq: exists(〈0;D〉.req)
+    R: (〈0;Ref〉 & {
+      opt: _
+      req: _
+    })
+    existsROpt: exists(〈0;R〉.opt)
+    existsRReq: exists(〈0;R〉.req)
+  }
+  selectorRequiredIntermediate: {
+    x: {
+      y?: {
+        z: 1
+      }
+    }
+    existsXYZ: exists(〈0;x〉.y.z)
+  }
+  indexList: {
+    list: [
+      1,
+      2,
+      3,
+    ]
+    c: {
+      exists0: exists(〈1;list〉[0])
+    }
+    c: {
+      exists2: exists(〈1;list〉[2])
+    }
+    c: {
+      ne1: exists(〈1;list〉[3])
+    }
+    open: [
+      1,
+      2,
+      3,
+      ...,
+    ]
+    o: {
+      exists0: exists(〈1;open〉[0])
+    }
+    o: {
+      exists2: exists(〈1;open〉[2])
+    }
+    o: {
+      ne1: exists(〈1;open〉[3])
+    }
+  }
+  indexStruct: {
+    data: {
+      foo: "bar"
+    }
+    existsFoo: exists(〈0;data〉["foo"])
+    existsBaz: exists(〈0;data〉["baz"])
+    d: (*{
+      a: 1
+    }|{
+      b: 2
+    })
+    existsA: exists(〈0;d〉["a"])
+    existsB: exists(〈0;d〉["b"])
+  }
+  invalidValues: {
+    b: 1
+    existsFoo: exists(1)
+    existsBaz: exists((1 + 〈0;b〉))
+    existsBaz: exists("string")
+    existsBaz: exists("string"[0])
+  }
+  existsNTest: {
+    a: 1
+    b: 2
+    c?: string
+    existsN(2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  existsNBounds: {
+    a: 1
+    b?: int
+    c?: int
+    existsN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+    existsN(<=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  conditionalExists: {
+    x?: int
+    y: 1
+    existsY: exists(〈0;y〉)
+    result: {
+      if exists(〈1;y〉) {
+        hasY: true
+      }
+    }
+  }
+  existsNAll: {
+    a: 1
+    b: 2
+    c: 3
+    existsN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  existsNNone: {
+    a?: int
+    b?: int
+    existsN(0, 〈0;a〉, 〈0;b〉)
+  }
+  indexOutOfBounds: {
+    list: [
+      1,
+      2,
+      3,
+    ]
+    closed10: exists(〈0;list〉[10])
+    open: [
+      1,
+      2,
+      3,
+      ...,
+    ]
+    open10: exists(〈0;open〉[10])
+  }
+  missingNested: {
+    a: {
+      b: {}
+    }
+    existsABC: exists(〈0;a〉.b.c)
+  }
+  missingIntermediateRequired: {
+    a: {}
+    existsABC: exists(〈0;a〉.b.c)
+  }
+  oneOfPattern: {
+    a?: int
+    b?: string
+    c?: bool
+    existsN(<=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  oneOfWithValue: {
+    a?: int
+    b?: string
+    c?: bool
+    a: 42
+    existsN(<=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  oneOfViolation: {
+    a?: int
+    b?: string
+    c?: bool
+    a: 42
+    b: "hello"
+    existsN(<=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  existsNTooFew: {
+    a: 1
+    b?: int
+    c?: int
+    existsN(>=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  existsNExactFail: {
+    a: 1
+    b?: int
+    existsN(2, 〈0;a〉, 〈0;b〉)
+  }
+}

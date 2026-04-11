@@ -1,0 +1,307 @@
+# Tests for isValid and validN builtins
+
+-- in.cue --
+// isValid with concrete values
+validConcrete: {
+	a:      1
+	checkA: isValid(a)   @test(eq, true)
+}
+
+// isValid with non-concrete values (types, constraints)
+validNonConcrete: {
+	a:      int
+	checkA: isValid(a)   @test(eq, true)
+	b:      >0
+	checkB: isValid(b)   @test(eq, true)
+}
+
+// isValid with errors (conflicting unification)
+validErrors: {
+	a:      1 & 2   @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:10, 0:14])
+	checkA: isValid(a)   @test(eq, false)
+
+	b: int & string   @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[int, string, int, string], pos=[0:5, 0:11])
+	checkB: isValid(b)   @test(eq, false)
+
+	c: {a: 1} & {a: 2}   @test(err, code=eval, path=a, contains="conflicting values %s and %s", args=[2, 1], pos=[0:9, 0:18])
+	checkC: isValid(c)   @test(eq, false)
+
+	d: {a: b: c: d: int} & {a: b: c: d: string}   @test(err, code=eval, path=a.b.c.d, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[int, string, int, string], pos=[0:18, 0:38])
+	checkD: isValid(d)   @test(eq, false)
+}
+
+// validN with count constraints
+validNCount: {
+	a: 1   @test(eq, 1)
+	b: 2   @test(eq, 2)
+	c: 1 & 2   @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[-3:14, 0:5, 0:9])
+	validN(2, a, b, c)
+}
+
+// isValid with literal
+validLiteral: {
+	checkInt:    isValid(42)        @test(eq, true)
+	checkString: isValid("hello")   @test(eq, true)
+}
+
+// isValid with computation
+validComputation: {
+	checkAdd: isValid(1 + 2)   @test(eq, true)
+}
+
+// validN with bound constraints
+validNBounds: {
+	a: 1
+	b: 2
+	c: 1 & 2   @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:5, 0:9])
+	t1: validN(>=1, a, b, c) @test(eq, validN(>=1, 1, 2, _|_))
+	t2: validN(<=2, a, b, c) @test(eq, validN(<=2, 1, 2, _|_))
+}
+
+// validN failure - requires all 3 valid but only 2 are
+validNFailure: {
+	a: 1
+	b: 2
+	c: 1 & 2   @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:5, 0:9])
+	// can never still have 3 valid values, as there are only 3 values total and c is always invalid.
+	t1: validN(3, a, b, c) @test(err, code=eval, contains="%s: %d matched, expected %v", args=[validN, 2, 3], pos=[0:6, 0:13])
+}
+
+// validN embedded failure - requires >=3 valid but only 2 are possible (c is permanently invalid)
+validNEmbedFail: {
+	a: 1
+	b: 2
+	c: 1 & 2   @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:5, 0:9])
+	t1: validN(>=3, a, b, c) @test(err, code=eval, contains="%s: %d matched, expected %v", args=[validN, 2, >=3], pos=[0:6, 0:13])
+}
+
+// isValid on non-existent reference returns false (not error)
+// Missing field is an evaluation error, and isValid returns false for any error
+isValidMissingRef: {
+	a:     b?: c: {}
+	check: isValid(a.b.c)   @test(eq, false)
+}
+
+// isValid on existing but invalid reference should return false
+isValidExistingInvalid: {
+	a:     x: 1 & "foo"   @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[1, "foo", int, string], pos=[0:12, 0:16])
+	check: isValid(a.x)   @test(eq, false)
+}
+
+-- existing.cue --
+import "list"
+
+isValidIncomplete: {
+	xc: close({})
+	xo: {}
+	okc2: {
+		if isValid({} & {s: [for y in xc.undefined {}]}) {a: 1}
+		@test(eq, {})
+	}
+	oko2: {
+		if isValid({} & {s: [for y in xo.undefined {}]}) {a: 1}
+		@test(eq, {a: 1})
+	}
+	okc3: {
+		if isValid({s: [for y in xc.undefined {}]}) {a: 1}
+		@test(eq, {})
+	}
+
+	oko3: {
+		if isValid({s: [for y in xo.undefined {}]}) {a: 1}
+		@test(eq, {a: 1})
+	}
+
+	// Pass final error back from list argument, though comprehension, and
+	// pass up.
+	// https://cuelang.org/issue/1969
+	viaLet: okc: {
+		let X = xc.undefined
+		let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
+
+		if isValid(Y) {Y}
+		@test(eq, {})
+	}
+
+}
+-- out/errors.txt --
+[eval] validErrors.a: conflicting values 2 and 1:
+    ./in.cue:17:10
+    ./in.cue:17:14
+[eval] validErrors.b: conflicting values int and string (mismatched types int and string):
+    ./in.cue:20:5
+    ./in.cue:20:11
+[eval] validErrors.c.a: conflicting values 2 and 1:
+    ./in.cue:23:9
+    ./in.cue:23:18
+[eval] validErrors.d.a.b.c.d: conflicting values int and string (mismatched types int and string):
+    ./in.cue:26:18
+    ./in.cue:26:38
+[eval] validNCount.c: conflicting values 2 and 1:
+    ./in.cue:31:14
+    ./in.cue:34:5
+    ./in.cue:34:9
+[eval] validNBounds.c: conflicting values 2 and 1:
+    ./in.cue:53:5
+    ./in.cue:53:9
+[eval] validNFailure.c: conflicting values 2 and 1:
+    ./in.cue:62:5
+    ./in.cue:62:9
+[eval] validNFailure.t1: validN: 2 matched, expected 3:
+    ./in.cue:64:6
+    ./in.cue:64:13
+[eval] validNEmbedFail.c: conflicting values 2 and 1:
+    ./in.cue:71:5
+    ./in.cue:71:9
+[eval] validNEmbedFail.t1: validN: 2 matched, expected >=3:
+    ./in.cue:72:6
+    ./in.cue:72:13
+[eval] isValidExistingInvalid.a.x: conflicting values 1 and "foo" (mismatched types int and string):
+    ./in.cue:84:12
+    ./in.cue:84:16
+-- out/compile --
+--- existing.cue
+{
+  isValidIncomplete: {
+    xc: close({})
+    xo: {}
+    okc2: {
+      if isValid(({} & {
+        s: [
+          for _, y in 〈3;xc〉.undefined {},
+        ]
+      })) {
+        a: 1
+      }
+    }
+    oko2: {
+      if isValid(({} & {
+        s: [
+          for _, y in 〈3;xo〉.undefined {},
+        ]
+      })) {
+        a: 1
+      }
+    }
+    okc3: {
+      if isValid({
+        s: [
+          for _, y in 〈3;xc〉.undefined {},
+        ]
+      }) {
+        a: 1
+      }
+    }
+    oko3: {
+      if isValid({
+        s: [
+          for _, y in 〈3;xo〉.undefined {},
+        ]
+      }) {
+        a: 1
+      }
+    }
+    viaLet: {
+      okc: {
+        let X#1 = 〈2;xc〉.undefined
+        let Y#2 = ({} & {
+          s: [
+            for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+          ]
+        })
+        if isValid(〈0;let Y#2〉) {
+          〈1;let Y#2〉
+        }
+      }
+    }
+  }
+}
+--- in.cue
+{
+  validConcrete: {
+    a: 1
+    checkA: isValid(〈0;a〉)
+  }
+  validNonConcrete: {
+    a: int
+    checkA: isValid(〈0;a〉)
+    b: >0
+    checkB: isValid(〈0;b〉)
+  }
+  validErrors: {
+    a: (1 & 2)
+    checkA: isValid(〈0;a〉)
+    b: (int & string)
+    checkB: isValid(〈0;b〉)
+    c: ({
+      a: 1
+    } & {
+      a: 2
+    })
+    checkC: isValid(〈0;c〉)
+    d: ({
+      a: {
+        b: {
+          c: {
+            d: int
+          }
+        }
+      }
+    } & {
+      a: {
+        b: {
+          c: {
+            d: string
+          }
+        }
+      }
+    })
+    checkD: isValid(〈0;d〉)
+  }
+  validNCount: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    validN(2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  validLiteral: {
+    checkInt: isValid(42)
+    checkString: isValid("hello")
+  }
+  validComputation: {
+    checkAdd: isValid((1 + 2))
+  }
+  validNBounds: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: validN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+    t2: validN(<=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  validNFailure: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: validN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  validNEmbedFail: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: validN(>=3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  isValidMissingRef: {
+    a: {
+      b?: {
+        c: {}
+      }
+    }
+    check: isValid(〈0;a〉.b.c)
+  }
+  isValidExistingInvalid: {
+    a: {
+      x: (1 & "foo")
+    }
+    check: isValid(〈0;a〉.x)
+  }
+}

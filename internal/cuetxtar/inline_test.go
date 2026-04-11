@@ -745,3 +745,73 @@ func TestHintFlag(t *testing.T) {
 		}
 	})
 }
+
+// TestUnreachableTestAttr verifies that @test directives placed inside struct
+// literals that are binary-expression operands (e.g. X & {@test(...)}) are
+// detected and reported as errors rather than silently ignored.
+func TestUnreachableTestAttr(t *testing.T) {
+	tests := []struct {
+		name        string
+		src         string
+		wantErrFrag string // non-empty means a parseErr record with this substring is expected
+	}{
+		{
+			name:        "decl attr in conjunction operand",
+			src:         "f: X & {\n\t@test(eq, 1)\n}\n",
+			wantErrFrag: "not reachable by the test runner",
+		},
+		{
+			name:        "field attr in conjunction operand",
+			src:         "f: X & {\n\tv: 1 @test(eq, 1)\n}\n",
+			wantErrFrag: "not reachable by the test runner",
+		},
+		{
+			name:        "decl attr in bare embedding conjunction",
+			src:         "f: 1\nX & {\n\t@test(eq, 1)\n}\n",
+			wantErrFrag: "not reachable by the test runner",
+		},
+		{
+			// @test as a field attr after the full expression must NOT be flagged.
+			name: "field attr after conjunction is valid",
+			src:  "f: X & {} @test(eq, 1)\n",
+		},
+		{
+			// Decl @test inside a plain struct (not a binary operand) is valid.
+			name: "decl attr in plain struct is valid",
+			src:  "f: {\n\t@test(eq, {v: 1})\n\tv: 1\n}\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f, err := parser.ParseFile("test.cue", tt.src)
+			if err != nil {
+				t.Fatalf("parse error: %v", err)
+			}
+			records := extractTestAttrs(f, "test.cue")
+
+			var errMsgs []string
+			for _, r := range records {
+				if r.parseErr != nil {
+					errMsgs = append(errMsgs, r.parseErr.Error())
+				}
+			}
+
+			if tt.wantErrFrag == "" {
+				if len(errMsgs) > 0 {
+					t.Errorf("expected no parse errors, got: %v", errMsgs)
+				}
+				return
+			}
+			if len(errMsgs) == 0 {
+				t.Errorf("expected a parse error containing %q, got none", tt.wantErrFrag)
+				return
+			}
+			for _, msg := range errMsgs {
+				if strings.Contains(msg, tt.wantErrFrag) {
+					return
+				}
+			}
+			t.Errorf("no error message contains %q; got: %v", tt.wantErrFrag, errMsgs)
+		})
+	}
+}

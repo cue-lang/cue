@@ -1,7 +1,6 @@
 # Tests that a list constrained with [...#X] where #X is a disjunction of
 # definitions correctly accepts values matching either branch of the disjunction.
 # https://cuelang.org/issue/419
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 #A: {
 	a: string
@@ -18,6 +17,8 @@ l: [...#X]
 l: [
 	{b: "bar"},
 ]
+
+_lFirst: l[0] @test(eq, {b: "bar"})
 -- out/eval/stats --
 Leaks:  2
 Freed:  16
@@ -30,25 +31,7 @@ Conjuncts:    24
 Disjuncts:    4
 
 NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  #A: (#struct){
-    a: (string){ string }
-  }
-  #B: (#struct){
-    b: (string){ string }
-  }
-  #X: (#struct){ |((#struct){
-      a: (string){ string }
-    }, (#struct){
-      b: (string){ string }
-    }) }
-  l: (#list){
-    0: (#struct){
-      b: (string){ "bar" }
-    }
-  }
-}
+-- out/errors.txt --
 -- out/compile --
 --- in.cue
 {

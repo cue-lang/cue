@@ -1,7 +1,6 @@
 # Tests that unifying a disjunction of definitions with an additional constraint
 # (#a: (#c | #d) & {name: string}) does not incorrectly reject fields from either branch.
 # https://cuelang.org/issue/471
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 package x
 
@@ -26,6 +25,8 @@ package x
 	name:    string
 	address: string
 }
+
+_cName: #c.name @test(eq, string)
 -- out/eval/stats --
 Leaks:  0
 Freed:  21
@@ -38,32 +39,7 @@ Conjuncts:    30
 Disjuncts:    2
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  #a: (#struct){ |((#struct){
-      name: (string){ string }
-      age: (int){ int }
-    }, (#struct){
-      name: (string){ string }
-      address: (string){ string }
-    }) }
-  #a1: (#struct){
-    name: (string){ string }
-    age: (int){ int }
-  }
-  #a2: (#struct){
-    name: (string){ string }
-    address: (string){ string }
-  }
-  #c: (#struct){
-    name: (string){ string }
-    age: (int){ int }
-  }
-  #d: (#struct){
-    name: (string){ string }
-    address: (string){ string }
-  }
-}
+-- out/errors.txt --
 -- out/compile --
 --- in.cue
 {

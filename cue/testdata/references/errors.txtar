@@ -1,36 +1,50 @@
-#todo:inline: medium — multiple error cases; annotate with @test(err) per field
 -- references.cue --
 missingField: {
 	a: {}
-	r: a.b
+	r: a.b @test(err, code=incomplete, contains="missingField.r: undefined field: b", pos=[0:7])
 }
 
 missingFieldClosed: {
 	#a: {}
-	r: #a.b
+	r: #a.b @test(err, code=eval, contains="undefined field: b", pos=[0:8])
 }
 
 missingFieldNested: {
 	a: {}
 	// Must refer to `b` in error
-	r: a.b.c
+	r: a.b.c @test(err, code=incomplete, contains="undefined field: b", pos=[0:7])
 }
 
 missingFieldNestedClosed: {
 	#a: {}
 
 	// Must refer to `d` in error
-	r: #a.d.c
+	r: #a.d.c @test(err, code=eval, contains="undefined field: d", pos=[0:8])
 }
 
 missingFieldNestedInInterpolation: {
 	a: {}
 	// Must refer to `b` in error
-	r1: "\(a.b.c)"
+	r1: "\(a.b.c)" @test(err, code=incomplete, contains="invalid interpolation: undefined field: b", pos=[0:6, 0:11])
 	// Must refer to `d` in error: in case only one error is shown for a
 	// a location, ensure it doesn't alphabetically sort and pick `c` instead.
-	r2: "\(a.d.c)"
+	r2: "\(a.d.c)" @test(err, code=incomplete, contains="invalid interpolation: undefined field: d", pos=[0:6, 0:11])
 }
+-- out/errors.txt --
+[incomplete] missingField.r: undefined field: b:
+    ./references.cue:3:7
+[eval] missingFieldClosed.r: undefined field: b:
+    ./references.cue:8:8
+[incomplete] missingFieldNested.r: undefined field: b:
+    ./references.cue:14:7
+[eval] missingFieldNestedClosed.r: undefined field: d:
+    ./references.cue:21:8
+[incomplete] missingFieldNestedInInterpolation.r1: invalid interpolation: undefined field: b:
+    ./references.cue:27:6
+    ./references.cue:27:11
+[incomplete] missingFieldNestedInInterpolation.r2: invalid interpolation: undefined field: d:
+    ./references.cue:30:6
+    ./references.cue:30:11
 -- out/eval/stats --
 Leaks:  0
 Freed:  17
@@ -41,65 +55,6 @@ Retain: 0
 Unifications: 17
 Conjuncts:    17
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-missingFieldClosed.r: undefined field: b:
-    ./references.cue:8:8
-missingFieldNestedClosed.r: undefined field: d:
-    ./references.cue:21:8
-
-Result:
-(_|_){
-  // [eval]
-  missingField: (struct){
-    a: (struct){
-    }
-    r: (_|_){
-      // [incomplete] missingField.r: undefined field: b:
-      //     ./references.cue:3:7
-    }
-  }
-  missingFieldClosed: (_|_){
-    // [eval]
-    #a: (#struct){
-    }
-    r: (_|_){
-      // [eval] missingFieldClosed.r: undefined field: b:
-      //     ./references.cue:8:8
-    }
-  }
-  missingFieldNested: (struct){
-    a: (struct){
-    }
-    r: (_|_){
-      // [incomplete] missingFieldNested.r: undefined field: b:
-      //     ./references.cue:14:7
-    }
-  }
-  missingFieldNestedClosed: (_|_){
-    // [eval]
-    #a: (#struct){
-    }
-    r: (_|_){
-      // [eval] missingFieldNestedClosed.r: undefined field: d:
-      //     ./references.cue:21:8
-    }
-  }
-  missingFieldNestedInInterpolation: (struct){
-    a: (struct){
-    }
-    r1: (_|_){
-      // [incomplete] missingFieldNestedInInterpolation.r1: invalid interpolation: undefined field: b:
-      //     ./references.cue:27:6
-      //     ./references.cue:27:11
-    }
-    r2: (_|_){
-      // [incomplete] missingFieldNestedInInterpolation.r2: invalid interpolation: undefined field: d:
-      //     ./references.cue:30:6
-      //     ./references.cue:30:11
-    }
-  }
-}
 -- out/compile --
 --- references.cue
 {

@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 import "list"
 
@@ -56,13 +55,22 @@ incompleteLet: {
 		let mx = list.max
 
 		min: mn
-		max: mx
+		max: mx @test(err, code=incomplete, contains="undefined field: max", pos=[-3:17])
 	}
 
 	x: {
 		if list.max < 0 {
 		}
 	}
+	@test(eq, {
+		input: [1, 2, 3, 4, 5]
+		last: {min: 1, max: 5}
+		bar: {
+			min: 1
+			max: _|_ @test(err, code=incomplete, contains="incompleteLet.bar.max: undefined field: max", pos=[54:17])
+		}
+		x: _|_ @test(err, code=incomplete, contains="incompleteLet.x: undefined field: max", pos=[61:11])
+	})
 }
 
 // Let references should also work inside embedded scalars.
@@ -109,6 +117,28 @@ issue1116: {
 	        //     in.cue:54:17
 	      // [incomplete] incompleteLet.x: undefined field: max:
 	      //     in.cue:61:11
+-- out/errors.txt --
+[incomplete] incompleteLet.bar.max: undefined field: max:
+    ./in.cue:54:17
+[incomplete] incompleteLet.x: undefined field: max:
+    ./in.cue:61:11
+-- out/todo.txt --
+v2 reports a cycle error for issue1116.b (let List = #a before #a is defined):
+  issue1116.b: let List#11 = (_|_){ // [incomplete] cycle error referencing #a }
+v3 resolves this correctly using structure sharing: let List#11 = ~(issue1116.b.#a)
+-- out/eval/stats --
+Leaks:  4
+Freed:  101
+Reused: 73
+Allocs: 32
+Retain: 0
+
+Unifications: 103
+Conjuncts:    130
+Disjuncts:    0
+Notifications: 2
+
+NumCloseIDs: 45
 -- out/compile --
 --- in.cue
 {
@@ -291,489 +321,6 @@ issue1116: {
         "a",
         "b",
       ]
-    }
-  }
-}
--- out/eval/stats --
-Leaks:  4
-Freed:  101
-Reused: 73
-Allocs: 32
-Retain: 0
-
-Unifications: 103
-Conjuncts:    130
-Disjuncts:    0
-Notifications: 2
-
-NumCloseIDs: 45
--- out/evalalpha --
-(struct){
-  a1list: (#list){
-    0: (int){ 1 }
-  }
-  let A1#1 = ~(a1list)
-  a1: (int){ 101 }
-  a2list: (#list){
-    0: (int){ 2 }
-  }
-  let A2#2 = ~(a2list)
-  a2: (struct){
-    b: (int){ 202 }
-  }
-  a3list: (#list){
-    0: (int){ 3 }
-  }
-  let A3#3 = ~(a3list)
-  a3: (struct){
-    b: (struct){
-      c: (int){ 303 }
-    }
-  }
-  a4list: (#list){
-    0: (int){ 4 }
-  }
-  let A4#4 = ~(a4list)
-  a4: (#list){
-    0: (struct){
-      v: (int){ 404 }
-    }
-  }
-  a5list: (#list){
-    0: (int){ 5 }
-  }
-  let A5#5 = ~(a5list)
-  a5: (struct){
-    b: (#list){
-      0: (struct){
-        v: (int){ 505 }
-      }
-    }
-  }
-  a6list: (#list){
-    0: (int){ 6 }
-  }
-  let A6#6 = ~(a6list)
-  a6: (struct){
-    b: (struct){
-      c: (#list){
-        0: (struct){
-          v: (int){ 606 }
-        }
-      }
-    }
-  }
-  a7list: (#list){
-    0: (int){ 7 }
-  }
-  let A7#7 = ~(a7list)
-  a7: (struct){
-    v: (int){ 707 }
-  }
-  a8list: (#list){
-    0: (int){ 8 }
-  }
-  let A8#8 = ~(a8list)
-  a8: (struct){
-    b: (struct){
-      v: (int){ 808 }
-    }
-  }
-  a9list: (#list){
-    0: (int){ 9 }
-  }
-  let A9#9 = ~(a9list)
-  a9: (struct){
-    b: (struct){
-      c: (struct){
-        v: (int){ 909 }
-      }
-    }
-  }
-  incompleteLet: (struct){
-    input: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-      3: (int){ 4 }
-      4: (int){ 5 }
-    }
-    last: (struct){
-      min: (int){ 1 }
-      max: (int){ 5 }
-    }
-    bar: (struct){
-      let mn#A = (int){ 1 }
-      let mx#B = (_|_){
-        // [incomplete] incompleteLet.bar.mx: undefined field: max:
-        //     ./in.cue:54:17
-      }
-      min: (int){ 1 }
-      max: (_|_){
-        // [incomplete] incompleteLet.bar.max: undefined field: max:
-        //     ./in.cue:54:17
-      }
-    }
-    x: (_|_){
-      // [incomplete] incompleteLet.x: undefined field: max:
-      //     ./in.cue:61:11
-    }
-  }
-  scalarReference: (struct){
-    inScalar: (struct){
-      p0: (int){
-        5
-        let x#C = (int){ 6 }
-        #b: (int){ 6 }
-      }
-      p1: (int){
-        5
-        #b: (int){ 6 }
-        let x#D = (int){ 6 }
-      }
-    }
-    inList: (struct){
-      p0: (#list){
-        let x#E = (struct){
-          a: (int){ 1 }
-        }
-        0: (struct){
-          a: (int){ 1 }
-        }
-      }
-      p1: (#list){
-        let x#F = (struct){
-          a: (int){ 1 }
-        }
-        0: (struct){
-          a: (int){ 1 }
-        }
-      }
-    }
-  }
-  issue1116: (struct){
-    a: (string){
-      "b"
-      #a: (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
-      }
-      let List#10 = ~(issue1116.a.#a)
-    }
-    b: (string){
-      "b"
-      let List#11 = ~(issue1116.b.#a)
-      #a: (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -2,16 +2,12 @@
-   a1list: (#list){
-     0: (int){ 1 }
-   }
--  let A1#1 = (#list){
--    0: (int){ 1 }
--  }
-+  let A1#1 = ~(a1list)
-   a1: (int){ 101 }
-   a2list: (#list){
-     0: (int){ 2 }
-   }
--  let A2#2 = (#list){
--    0: (int){ 2 }
--  }
-+  let A2#2 = ~(a2list)
-   a2: (struct){
-     b: (int){ 202 }
-   }
-@@ -18,9 +14,7 @@
-   a3list: (#list){
-     0: (int){ 3 }
-   }
--  let A3#3 = (#list){
--    0: (int){ 3 }
--  }
-+  let A3#3 = ~(a3list)
-   a3: (struct){
-     b: (struct){
-       c: (int){ 303 }
-@@ -29,9 +23,7 @@
-   a4list: (#list){
-     0: (int){ 4 }
-   }
--  let A4#4 = (#list){
--    0: (int){ 4 }
--  }
-+  let A4#4 = ~(a4list)
-   a4: (#list){
-     0: (struct){
-       v: (int){ 404 }
-@@ -40,9 +32,7 @@
-   a5list: (#list){
-     0: (int){ 5 }
-   }
--  let A5#5 = (#list){
--    0: (int){ 5 }
--  }
-+  let A5#5 = ~(a5list)
-   a5: (struct){
-     b: (#list){
-       0: (struct){
-@@ -53,9 +43,7 @@
-   a6list: (#list){
-     0: (int){ 6 }
-   }
--  let A6#6 = (#list){
--    0: (int){ 6 }
--  }
-+  let A6#6 = ~(a6list)
-   a6: (struct){
-     b: (struct){
-       c: (#list){
-@@ -68,9 +56,7 @@
-   a7list: (#list){
-     0: (int){ 7 }
-   }
--  let A7#7 = (#list){
--    0: (int){ 7 }
--  }
-+  let A7#7 = ~(a7list)
-   a7: (struct){
-     v: (int){ 707 }
-   }
-@@ -77,9 +63,7 @@
-   a8list: (#list){
-     0: (int){ 8 }
-   }
--  let A8#8 = (#list){
--    0: (int){ 8 }
--  }
-+  let A8#8 = ~(a8list)
-   a8: (struct){
-     b: (struct){
-       v: (int){ 808 }
-@@ -88,9 +72,7 @@
-   a9list: (#list){
-     0: (int){ 9 }
-   }
--  let A9#9 = (#list){
--    0: (int){ 9 }
--  }
-+  let A9#9 = ~(a9list)
-   a9: (struct){
-     b: (struct){
-       c: (struct){
-@@ -166,17 +148,11 @@
-         0: (string){ "a" }
-         1: (string){ "b" }
-       }
--      let List#10 = (#list){
--        0: (string){ "a" }
--        1: (string){ "b" }
--      }
-+      let List#10 = ~(issue1116.a.#a)
-     }
-     b: (string){
-       "b"
--      let List#11 = (_|_){
--        // [incomplete] issue1116.b.List: cycle error referencing #a:
--        //     ./in.cue:96:14
--      }
-+      let List#11 = ~(issue1116.b.#a)
-       #a: (#list){
-         0: (string){ "a" }
-         1: (string){ "b" }
--- out/eval --
-(struct){
-  a1list: (#list){
-    0: (int){ 1 }
-  }
-  let A1#1 = (#list){
-    0: (int){ 1 }
-  }
-  a1: (int){ 101 }
-  a2list: (#list){
-    0: (int){ 2 }
-  }
-  let A2#2 = (#list){
-    0: (int){ 2 }
-  }
-  a2: (struct){
-    b: (int){ 202 }
-  }
-  a3list: (#list){
-    0: (int){ 3 }
-  }
-  let A3#3 = (#list){
-    0: (int){ 3 }
-  }
-  a3: (struct){
-    b: (struct){
-      c: (int){ 303 }
-    }
-  }
-  a4list: (#list){
-    0: (int){ 4 }
-  }
-  let A4#4 = (#list){
-    0: (int){ 4 }
-  }
-  a4: (#list){
-    0: (struct){
-      v: (int){ 404 }
-    }
-  }
-  a5list: (#list){
-    0: (int){ 5 }
-  }
-  let A5#5 = (#list){
-    0: (int){ 5 }
-  }
-  a5: (struct){
-    b: (#list){
-      0: (struct){
-        v: (int){ 505 }
-      }
-    }
-  }
-  a6list: (#list){
-    0: (int){ 6 }
-  }
-  let A6#6 = (#list){
-    0: (int){ 6 }
-  }
-  a6: (struct){
-    b: (struct){
-      c: (#list){
-        0: (struct){
-          v: (int){ 606 }
-        }
-      }
-    }
-  }
-  a7list: (#list){
-    0: (int){ 7 }
-  }
-  let A7#7 = (#list){
-    0: (int){ 7 }
-  }
-  a7: (struct){
-    v: (int){ 707 }
-  }
-  a8list: (#list){
-    0: (int){ 8 }
-  }
-  let A8#8 = (#list){
-    0: (int){ 8 }
-  }
-  a8: (struct){
-    b: (struct){
-      v: (int){ 808 }
-    }
-  }
-  a9list: (#list){
-    0: (int){ 9 }
-  }
-  let A9#9 = (#list){
-    0: (int){ 9 }
-  }
-  a9: (struct){
-    b: (struct){
-      c: (struct){
-        v: (int){ 909 }
-      }
-    }
-  }
-  incompleteLet: (struct){
-    input: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-      3: (int){ 4 }
-      4: (int){ 5 }
-    }
-    last: (struct){
-      min: (int){ 1 }
-      max: (int){ 5 }
-    }
-    bar: (struct){
-      let mn#A = (int){ 1 }
-      let mx#B = (_|_){
-        // [incomplete] incompleteLet.bar.mx: undefined field: max:
-        //     ./in.cue:54:17
-      }
-      min: (int){ 1 }
-      max: (_|_){
-        // [incomplete] incompleteLet.bar.max: undefined field: max:
-        //     ./in.cue:54:17
-      }
-    }
-    x: (_|_){
-      // [incomplete] incompleteLet.x: undefined field: max:
-      //     ./in.cue:61:11
-    }
-  }
-  scalarReference: (struct){
-    inScalar: (struct){
-      p0: (int){
-        5
-        let x#C = (int){ 6 }
-        #b: (int){ 6 }
-      }
-      p1: (int){
-        5
-        #b: (int){ 6 }
-        let x#D = (int){ 6 }
-      }
-    }
-    inList: (struct){
-      p0: (#list){
-        let x#E = (struct){
-          a: (int){ 1 }
-        }
-        0: (struct){
-          a: (int){ 1 }
-        }
-      }
-      p1: (#list){
-        let x#F = (struct){
-          a: (int){ 1 }
-        }
-        0: (struct){
-          a: (int){ 1 }
-        }
-      }
-    }
-  }
-  issue1116: (struct){
-    a: (string){
-      "b"
-      #a: (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
-      }
-      let List#10 = (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
-      }
-    }
-    b: (string){
-      "b"
-      let List#11 = (_|_){
-        // [incomplete] issue1116.b.List: cycle error referencing #a:
-        //     ./in.cue:96:14
-      }
-      #a: (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
-      }
     }
   }
 }

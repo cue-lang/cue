@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/mod/semver"
 )
 
 // An Option sets behavior of the formatter.
@@ -67,6 +68,17 @@ func TabIndent(indent bool) Option {
 // IndentPrefix specifies the number of tabstops to use as a prefix for every line.
 func IndentPrefix(n int) Option {
 	return func(c *config) { c.indent = n }
+}
+
+// Version specifies the CUE language version to use when formatting.
+// This affects which canonical style is applied when combined with [Simplify];
+// for instance, as of v0.17.0 commas between list elements on separate lines
+// are omitted when simplifying. An empty version string means the version is
+// taken from the [*ast.File] node being formatted, falling back to conservative
+// behavior (same as pre-v0.17.0: always emit explicit commas). The version must
+// be a valid semantic version string as checked by [semver.IsValid].
+func Version(v string) Option {
+	return func(c *config) { c.languageVersion = v }
 }
 
 // TODO: make public
@@ -113,7 +125,13 @@ func Node(node ast.Node, opt ...Option) ([]byte, error) {
 func Source(b []byte, opt ...Option) ([]byte, error) {
 	cfg := newConfig(opt)
 
-	f, err := parser.ParseFile("", b, parser.ParseComments)
+	// Pass the language version to the parser so that ast.File.LanguageVersion
+	// is set correctly; the formatter then reads it back from the AST.
+	parseOpts := []parser.Option{parser.ParseComments}
+	if cfg.languageVersion != "" {
+		parseOpts = append(parseOpts, parser.Version(cfg.languageVersion))
+	}
+	f, err := parser.ParseFile("", b, parseOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("parse: %s", err)
 	}
@@ -128,8 +146,17 @@ type config struct {
 	tabWidth  int  // default: 4
 	indent    int  // default: 0 (all code is indented at least by this much)
 
-	simplify    bool // default: false
-	sortImports bool // default: false
+	simplify        bool   // default: false
+	sortImports     bool   // default: false
+	languageVersion string // empty = conservative (always emit explicit commas)
+}
+
+// versionAtLeast reports whether the configured language version is at least v.
+// An empty language version is treated conservatively (returns false), so that
+// default formatting never silently changes existing comma style.
+func (cfg *config) versionAtLeast(v string) bool {
+	fv := cfg.languageVersion
+	return fv != "" && semver.Compare(fv, v) >= 0
 }
 
 func newConfig(opt []Option) *config {
@@ -219,7 +246,7 @@ const (
 
 	comma      // print a comma, unless trailcomma overrides it
 	trailcomma // print a trailing comma unless closed on same line
-	declcomma  // write a comma when not at the end of line
+	declcomma  // write a comma when not at the end of line (same as struct field separator)
 
 	newline    // write a line in a table
 	formfeed   // next line is not part of the table

@@ -1,0 +1,33 @@
+# Test that without --simplify, existing commas are preserved in lists
+# and missing commas are added (standard formatting).
+
+-- default.input --
+a: [
+	1,
+	2,
+	3,
+]
+
+// Missing commas are normalised: the formatter adds them.
+b: [
+	1
+	2
+	3
+]
+
+c: [1, 2, 3]
+-- out/format/default.golden --
+a: [
+	1,
+	2,
+	3,
+]
+
+// Missing commas are normalised: the formatter adds them.
+b: [
+	1,
+	2,
+	3,
+]
+
+c: [1, 2, 3]

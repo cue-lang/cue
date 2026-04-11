@@ -37,6 +37,11 @@ func printNode(node interface{}, f *printer) error {
 		if f.cfg.simplify {
 			ls.markReferences(x)
 		}
+		// Prefer the language version from the AST (set by the parser from the
+		// module file) over any explicit option, which is used as a fallback.
+		if x.LanguageVersion != "" {
+			f.cfg.languageVersion = x.LanguageVersion
+		}
 		s.file(x)
 	case ast.Expr:
 		if f.cfg.simplify {
@@ -239,7 +244,15 @@ func fallbackKeyword(n *ast.Comprehension) token.Token {
 
 func (f *formatter) walkListElems(list []ast.Expr) {
 	f.before(nil)
-	for _, x := range list {
+	// v0.17.0+ simplify: use declcomma (same mechanism as struct fields),
+	// which prints ", " only when elements are on the same line and nothing
+	// otherwise. The separator is placed before the next element so that
+	// trailing comments on the previous element are printed without a comma.
+	useNewCommaStyle := f.cfg.simplify && f.cfg.versionAtLeast("v0.17.0")
+	for i, x := range list {
+		if i > 0 && useNewCommaStyle {
+			f.print(declcomma)
+		}
 		f.before(x)
 
 		// Collect comments that appear after the element's start position.
@@ -292,10 +305,11 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 		case ast.Expr:
 			f.exprRaw(n, token.LowestPrec, 1)
 		}
-		f.print(comma, blank)
-
 		if splitComments {
 			f.current.cg = commentsAfter
+		}
+		if !useNewCommaStyle {
+			f.print(comma, blank)
 		}
 		f.after(x)
 	}

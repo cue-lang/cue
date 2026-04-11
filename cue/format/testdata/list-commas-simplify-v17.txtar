@@ -1,0 +1,59 @@
+#simplify
+#version: v0.17.0
+
+# With --simplify and v0.17.0, multiline list commas are omitted.
+
+-- simplify-v17.input --
+// Multiline list: commas are removed.
+a: [
+	1,
+	2,
+	3,
+]
+
+// Same-line commas are kept.
+b: [1, 2, 3]
+
+// Elements without commas stay without commas.
+c: [
+	1
+	2
+	3
+]
+
+// Field label brackets are not affected.
+[string]: [1, 2, 3]
+
+// Trailing line comments on elements: comma is also removed.
+d: [
+	1, // first
+	2, // second
+	3, // third
+]
+-- out/format/simplify-v17.golden --
+// Multiline list: commas are removed.
+a: [
+	1
+	2
+	3
+]
+
+// Same-line commas are kept.
+b: [1, 2, 3]
+
+// Elements without commas stay without commas.
+c: [
+	1
+	2
+	3
+]
+
+// Field label brackets are not affected.
+[string]: [1, 2, 3]
+
+// Trailing line comments on elements: comma is also removed.
+d: [
+	1 // first
+	2 // second
+	3 // third
+]

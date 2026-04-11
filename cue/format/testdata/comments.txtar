@@ -255,7 +255,7 @@ list1: [
 	// Comment2
 
 	// Another comment
-	{},
+	{}
 
 	// Comment 3
 ]
@@ -271,18 +271,18 @@ list3: [
 ]
 
 list4: [
-	1,                    // number
-	a.b,                  // selector
-	(a),                  // paren
-	+1,                   // unary
-	a[0],                 // index
-	a[2:3],               // slice
-	strings.Sort([1, 2]), // call
+	1                    // number
+	a.b                  // selector
+	(a)                  // paren
+	+1                   // unary
+	a[0]                 // index
+	a[2:3]               // slice
+	strings.Sort([1, 2]) // call
 
-	a.b,
+	a.b
 	// under selector
 
-	a.b,
+	a.b
 	// multiple
 	// under
 
@@ -322,11 +322,11 @@ funcArg3: foo(
 
 // issue #2567
 foo: [
-	bar["baz"], //some comment
+	bar["baz"] //some comment
 ]
 
 [
-	if true {}, // inline comment
+	if true {} // inline comment
 ]
 
 {
@@ -343,10 +343,10 @@ foo: [
 
 // issue #4238
 [string]: [
-	...string, // inline comment without a comma
+	...string // inline comment without a comma
 ]
 [string]: [
-	...string, // inline comment with a comma
+	...string // inline comment with a comma
 ]
 -- comment_alone.input --
 // Just one comment on its own.
@@ -405,9 +405,9 @@ very_long_to_push_out_the_comment: {// comment
 } | "very_long_to_push_out_the_comment" // comment
 
 very_long_to_push_out_the_comment: [// comment
-	a, // comment
+	a // comment
 
-	b, // comment
+	b // comment
 ] | "very_long_to_push_out_the_comment" // comment
 
 very_long_to_push_out_the_comment: f( // comment

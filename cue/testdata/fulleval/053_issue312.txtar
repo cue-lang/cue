@@ -4,11 +4,23 @@
 # correctly.
 #name: issue312
 #evalFull
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 
 for x in [1] {
 	*close({}) | {[_]: null}
+}
+
+@test(eq, *{} | {})
+-- out/compile --
+--- in.cue
+{
+  for _, x in [
+    1,
+  ] {
+    (*close({})|{
+      [_]: null
+    })
+  }
 }
 -- out/eval/stats --
 Leaks:  0
@@ -22,18 +34,3 @@ Conjuncts:    10
 Disjuncts:    2
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){ |(*(#struct){
-  }, (struct){
-  }) }
--- out/compile --
---- in.cue
-{
-  for _, x in [
-    1,
-  ] {
-    (*close({})|{
-      [_]: null
-    })
-  }
-}

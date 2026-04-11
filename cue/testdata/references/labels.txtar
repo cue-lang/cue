@@ -1,4 +1,3 @@
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 // Label aliases
 
@@ -97,7 +96,11 @@ underscore: e: {
 invalidPattern: {
 	[=~"BAD)" & =~"x"]: string
 	y: 123
+	@test(err, code=eval, contains="invalid regexp", pos=[1:22])
 }
+-- out/errors.txt --
+[eval] invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
+    ./in.cue:96:22
 -- out/eval/stats --
 Leaks:  1
 Freed:  60
@@ -110,106 +113,6 @@ Conjuncts:    101
 Disjuncts:    2
 
 NumCloseIDs: 9
--- out/evalalpha --
-Errors:
-invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
-    ./in.cue:96:22
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    bar: (string){ "bar" }
-  }
-  b: (struct){
-    bar: (string){ "bar" }
-  }
-  c: (struct){
-    bar: (string){ "bar" }
-  }
-  d: (struct){
-    bar: (struct){
-      name: (string){ "bar" }
-    }
-  }
-  e: (struct){
-    foo: (struct){
-      bar: (string){ "foobar" }
-    }
-  }
-  patternField: (struct){
-    t1: (struct){
-      a: (struct){
-        r: (int){ 0 }
-        b: (null){ null }
-      }
-    }
-    t2: (struct){
-      a: (struct){
-        r: (int){ 0 }
-        z: (int){ 1 }
-        b: (int){ 1 }
-      }
-    }
-  }
-  bar: (int){ 3 }
-  f1: (struct){
-    foo3: (struct){
-      name: (string){ "xx" }
-      foo: (string){ "xx" }
-      foo3baz: (struct){
-        name: (string){ "xx" }
-        a: (string){ "xx" }
-        b: (string){ "xx" }
-      }
-    }
-  }
-  c1: (struct){
-    foo3: (struct){
-      x: (struct){
-        name: (string){ "x" }
-        foo: (string){ "x" }
-      }
-    }
-  }
-  emptyLabel: (struct){
-    "": (int){ 1 }
-    a: (int){ 1 }
-  }
-  underscore: (struct){
-    a: (struct){
-      foo: (#struct){
-        "_": (string){ "bar" }
-      }
-      #Foo: (#struct){
-      }
-    }
-    c: (struct){
-      foo: (struct){
-        "_": (string){ "any" }
-      }
-    }
-    d: (struct){
-      bar: (#struct){
-        "_": (string){ "any" }
-      }
-      #bar: (#struct){
-      }
-    }
-    e: (struct){
-      baz: (#struct){
-        "_h": (string){ "any" }
-      }
-      #baz: (#struct){
-      }
-    }
-  }
-  invalidPattern: (_|_){
-    // [eval] invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
-    //     ./in.cue:96:22
-    y: (int){ 123 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

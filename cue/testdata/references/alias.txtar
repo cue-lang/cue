@@ -1,4 +1,3 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 @experiment(aliasv2)
 
@@ -101,7 +100,7 @@ comp: {
 constrained~X10?: {
 	required: true
 }
-test1: X10.required
+test1: X10.required @test(err, code=incomplete, contains="cannot reference optional field: constrained", pos=[0:8])
 
 // Interpolation with postfix alias
 "\("inter")"~X11: {
@@ -112,7 +111,7 @@ b6: X11.foo + 5
 // Postfix alias with optional and default
 opt~X12?: {
 	a: 1
-	b: X12
+	b: X12 @test(err, code=incomplete, contains="field not found: opt", pos=[])
 }
 
 // TODO: seemingly wrong semantics, but matches old behavior.
@@ -179,155 +178,11 @@ deep: {
 	field: 42
 }
 usedef: X21.field
--- out/evalalpha --
-(struct){
-  a1: (struct){
-    foo: (int){ 1 }
-  }
-  b1: (int){ 3 }
-  a2: (struct){
-    name: (string){ "a2" }
-    val: (int){ 42 }
-    foo: (int){ 42 }
-  }
-  a3: (struct){
-    foo: (int){ 1 }
-  }
-  b3: (string){ "a3" }
-  a4: (struct){
-    foo: (int){ 1 }
-  }
-  b4: (int){ 3 }
-  b5: (int){ 11 }
-  dyn2: (struct){
-    foo: (int){ 100 }
-    name: (string){ "dyn2" }
-    val: (int){ 100 }
-  }
-  pattern: (struct){
-    foo: (struct){
-      labelRef: (string){ "foo" }
-    }
-  }
-  pattern2: (struct){
-    foo: (struct){
-      data: (int){ 1 }
-      labelVal: (string){ "foo" }
-      fieldVal: (int){ 1 }
-    }
-    bar: (struct){
-      data: (int){ 2 }
-      labelVal: (string){ "bar" }
-      fieldVal: (int){ 2 }
-    }
-  }
-  nested: (struct){
-    inner: (struct){
-      a: (int){ 1 }
-    }
-    b: (int){ 2 }
-  }
-  result1: (int){ 2 }
-  multi: (struct){
-    a: (int){ 1 }
-    b: (int){ 3 }
-    c: (int){ 6 }
-  }
-  comp: (struct){
-    items: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-    }
-    "0": (struct){
-      index: (int){ 0 }
-      value: (int){ 1 }
-      double: (int){ 2 }
-    }
-    "1": (struct){
-      index: (int){ 1 }
-      value: (int){ 2 }
-      double: (int){ 4 }
-    }
-    "2": (struct){
-      index: (int){ 2 }
-      value: (int){ 3 }
-      double: (int){ 6 }
-    }
-  }
-  constrained?: (struct){
-    required: (bool){ true }
-  }
-  test1: (_|_){
-    // [incomplete] test1: cannot reference optional field: constrained:
-    //     ./in.cue:102:8
-  }
-  b6: (int){ 6 }
-  opt?: (struct){
-    a: (int){ 1 }
-    b: (_|_){
-      // [incomplete] opt.b: cannot reference optional field: opt:
-      //     ./in.cue:113:5
-    }
-  }
-  def: (struct){ |((struct){
-      b: (int){ 2 }
-      c: (int){ 2 }
-    }, (struct){
-      b: (int){ 3 }
-    }) }
-  pattern3: (struct){
-    test: (struct){
-      labelName: (string){ "test" }
-    }
-  }
-  pattern4: (struct){
-    test: (struct){
-      x: (int){ 99 }
-      fieldRef: (int){ 99 }
-    }
-  }
-  same: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-    c: (int){ 3 }
-  }
-  chain: (struct){
-    a: (int){ 1 }
-  }
-  chain2: (struct){
-    ref: (int){ 1 }
-  }
-  result2: (int){ 1 }
-  list: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 3 }
-  }
-  b7: (int){ 3 }
-  disj: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
-  b8: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
-  deep: (struct){
-    bar: (struct){
-      foo: (struct){
-        x: (int){ 1 }
-        outer: (string){ "bar" }
-        inner: (string){ "foo" }
-        value: (int){ 1 }
-      }
-    }
-  }
-  #Def: (#struct){
-    field: (int){ 42 }
-  }
-  usedef: (int){ 42 }
-  dyn: (struct){
-    foo: (int){ 1 }
-  }
-  inter: (struct){
-    foo: (int){ 1 }
-  }
-}
+-- out/errors.txt --
+[incomplete] test1: cannot reference optional field: constrained:
+    ./in.cue:102:8
+[incomplete] opt.b: cannot reference optional field: opt:
+    ./in.cue:113:5
 -- out/compile --
 --- in.cue
 {

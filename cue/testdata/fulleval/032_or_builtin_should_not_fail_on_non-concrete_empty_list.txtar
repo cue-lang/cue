@@ -4,51 +4,23 @@
 # successfully resolve to a concrete string once jobs has at least one entry.
 #name: or builtin should not fail on non-concrete empty list
 #evalFull
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #Workflow: {
 	jobs: {
 		[jobID=string]: {
 		}
 	}
-	#JobID: or([for k, _ in jobs {k}])
+	#JobID: or([for k, _ in jobs {k}]) @test(err, code=incomplete, contains="empty list in call to or", pos=[0:10])
 	// #JobID is incomplete when jobs has no entries — or([]) is not allowed.
 }
 
 foo: #Workflow & {
 	jobs: foo: {
 	}
-}
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 4
-Allocs: 7
-Retain: 0
-
-Unifications: 10
-Conjuncts:    17
-Disjuncts:    0
-
-NumCloseIDs: 5
--- out/evalalpha --
-(struct){
-  #Workflow: (#struct){
-    jobs: (#struct){
-    }
-    #JobID: (_|_){
-      // [incomplete] #Workflow.#JobID: error in call to or: empty list in call to or:
-      //     ./in.cue:6:10
-    }
-  }
-  foo: (#struct){
-    jobs: (#struct){
-      foo: (#struct){
-      }
-    }
-    #JobID: (string){ "foo" }
-  }
-}
+} @test(eq, {jobs: {foo: {}}, #JobID: "foo"})
+-- out/errors.txt --
+[incomplete] #Workflow.#JobID: error in call to or: empty list in call to or:
+    ./in.cue:6:10
 -- out/compile --
 --- in.cue
 {
@@ -68,3 +40,15 @@ NumCloseIDs: 5
     }
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 4
+Allocs: 7
+Retain: 0
+
+Unifications: 10
+Conjuncts:    17
+Disjuncts:    0
+
+NumCloseIDs: 5

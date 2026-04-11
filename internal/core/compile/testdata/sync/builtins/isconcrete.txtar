@@ -1,0 +1,182 @@
+# Tests for isConcrete and concreteN builtins
+
+-- in.cue --
+// isConcrete with concrete values
+concreteConcrete: {
+	a:      1
+	checkA: isConcrete(a)
+	b:      "hello"
+	checkB: isConcrete(b)
+}
+
+// isConcrete with types (non-concrete)
+concreteTypes: {
+	a:      int
+	checkA: isConcrete(a)
+	b:      string
+	checkB: isConcrete(b)
+}
+
+// isConcrete with constraints (non-concrete)
+concreteConstraints: {
+	a:      >0
+	checkA: isConcrete(a)
+	b:      =~"hello"
+	checkB: isConcrete(b)
+}
+
+// isConcrete with disjunctions
+concreteDisjunction: {
+	a:      1 | 2 // no default: not concrete
+	checkA: isConcrete(a)
+	b:      1 | *2 // single default: concrete (finalization selects it)
+	checkB: isConcrete(b)
+}
+
+// concreteN with count constraints (a and c are concrete, b is not)
+concreteNCount: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(2, a, b, c)
+}
+
+// concreteN with all concrete
+concreteNAll: {
+	a: 1
+	b: 2
+	c: 3
+	concreteN(3, a, b, c)
+}
+
+// isConcrete with concrete struct
+concreteStruct: {
+	s: {a: 1, b: "x"}
+	checkS: isConcrete(s)
+}
+
+// isConcrete with concrete struct with optional field
+concreteStructWithOptional: {
+	s: {a: 1, b?: int}
+	checkS: isConcrete(s)
+}
+
+// isConcrete with concrete list
+concreteList: {
+	l: [1, 2, 3]
+	checkL: isConcrete(l)
+}
+
+// isConcrete with struct containing non-concrete field
+concreteStructNonConcrete: {
+	s: {a: int}
+	checkS: isConcrete(s)
+}
+
+// isConcrete with errors returns false
+concreteError: {
+	a:      1 & "x"
+	checkA: isConcrete(a)
+}
+
+// concreteN with bound constraints (a and c are concrete, b is not)
+concreteNBounds: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(>=1, a, b, c)
+	concreteN(<=2, a, b, c)
+}
+
+// concreteN failure - requires all 3 concrete but only 2 are
+concreteNFailure: {
+	a: 1
+	b: int // not concrete
+	c: "hello"
+	concreteN(3, a, b, c)
+}
+-- out/compile --
+--- in.cue
+{
+  concreteConcrete: {
+    a: 1
+    checkA: isConcrete(〈0;a〉)
+    b: "hello"
+    checkB: isConcrete(〈0;b〉)
+  }
+  concreteTypes: {
+    a: int
+    checkA: isConcrete(〈0;a〉)
+    b: string
+    checkB: isConcrete(〈0;b〉)
+  }
+  concreteConstraints: {
+    a: >0
+    checkA: isConcrete(〈0;a〉)
+    b: =~"hello"
+    checkB: isConcrete(〈0;b〉)
+  }
+  concreteDisjunction: {
+    a: (1|2)
+    checkA: isConcrete(〈0;a〉)
+    b: (1|*2)
+    checkB: isConcrete(〈0;b〉)
+  }
+  concreteNCount: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNAll: {
+    a: 1
+    b: 2
+    c: 3
+    concreteN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteStruct: {
+    s: {
+      a: 1
+      b: "x"
+    }
+    checkS: isConcrete(〈0;s〉)
+  }
+  concreteStructWithOptional: {
+    s: {
+      a: 1
+      b?: int
+    }
+    checkS: isConcrete(〈0;s〉)
+  }
+  concreteList: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    checkL: isConcrete(〈0;l〉)
+  }
+  concreteStructNonConcrete: {
+    s: {
+      a: int
+    }
+    checkS: isConcrete(〈0;s〉)
+  }
+  concreteError: {
+    a: (1 & "x")
+    checkA: isConcrete(〈0;a〉)
+  }
+  concreteNBounds: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+    concreteN(<=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNFailure: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+}

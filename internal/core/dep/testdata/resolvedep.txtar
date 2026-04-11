@@ -10,7 +10,7 @@ _convert: {
 	out: _
 	_firstOne: (#selectFirstOne & {"in": in})
 	_computed: (#chainedCompute & {"in": _firstOne.out}).out
-	if _computed != _|_ {
+	if  _computed != _|_ {
 		out: result: _computed
 	}
 }

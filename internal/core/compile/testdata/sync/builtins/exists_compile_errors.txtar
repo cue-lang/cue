@@ -1,0 +1,40 @@
+#inlinetest:exclude CUE source contains compile-time errors (? marker not allowed in exists path argument)
+
+# Compile-time errors for exists/existsN with ? markers
+
+-- in.cue --
+// ? marker in exists path argument → compile error
+existsOptionalMarker: {
+	a: b?: c: 1
+	check: exists(a.b?.c)
+}
+
+// ? marker in existsN path argument → compile error
+existsNOptionalMarker: {
+	a: b?: c: 1
+	existsN(1, a.b?.c)
+}
+-- out/compile --
+existsOptionalMarker.check: optional marker (?) requires the try experiment (language version v0.16.0 or later):
+    ./in.cue:4:16
+existsNOptionalMarker: optional marker (?) requires the try experiment (language version v0.16.0 or later):
+    ./in.cue:10:13
+--- in.cue
+{
+  existsOptionalMarker: {
+    a: {
+      b?: {
+        c: 1
+      }
+    }
+    check: exists(〈0;a〉.b?.c)
+  }
+  existsNOptionalMarker: {
+    a: {
+      b?: {
+        c: 1
+      }
+    }
+    existsN(1, 〈0;a〉.b?.c)
+  }
+}

@@ -344,6 +344,144 @@ func (c *OpContext) Err() *Bottom {
 	return b
 }
 
+// ResolveExists reports whether the field reference, selector, or index
+// expression x refers to a regular member that is present. It returns an error
+// for a non-reference argument, a missing intermediate component, or when the
+// answer would be order-dependent (a cycle). name labels the builtin in error
+// messages.
+func (c *OpContext) ResolveExists(x Expr, name string) (bool, *Bottom) {
+	env := c.Env(0)
+	var value Expr
+	var sel Feature
+	var pos token.Pos
+
+	switch r := x.(type) {
+	case *FieldReference:
+		x := c.MakeConjunct(r)
+		arc, _ := c.Resolve(x, r)
+		if arc == nil {
+			return false, nil
+		}
+		return arc.ArcType == ArcMember, nil
+
+	case *SelectorExpr:
+		value = r.X
+		sel = r.Sel
+		if r.Src != nil {
+			pos = r.Src.Sel.Pos()
+		}
+
+	case *IndexExpr:
+		idx, idxOK := c.Evaluate(c.Env(0), r.Index)
+		if _, isErr := idx.(*Bottom); isErr || !idxOK {
+			return false, nil
+		}
+		sel = c.Label(r.Index, idx)
+		if c.HasErr() {
+			return false, nil
+		}
+		value = r.X
+		if r.Src != nil {
+			pos = r.Src.Index.Pos()
+		}
+
+	default:
+		return false, c.NewErrf("%s: argument must be a field reference, selector, or index expression", name)
+	}
+
+	peerV, _ := c.Evaluate(env, value)
+	if b, isErr := peerV.(*Bottom); isErr {
+		return false, b
+	}
+	parent, ok := peerV.(*Vertex)
+	if !ok {
+		return false, c.NewErrf("%s: cannot index non-struct/list value", name)
+	}
+
+	// Follow defaults: a selection on a disjunction with a default picks the
+	// default disjunct, as the old `!= _|_` validator did via
+	// [OpContext.getDefault]. Only descend when the value is actually a
+	// disjunction; otherwise Default() can produce a stale copy.
+	if _, isDisjunction := parent.BaseValue.(*Disjunction); isDisjunction {
+		parent = parent.Default()
+	}
+	parent = parent.DerefValue()
+
+	s := c.PushState(env, x.Source())
+
+	c.inValidator++
+	defer func() { c.inValidator-- }()
+
+	flags := Flags{
+		status:    conjuncts,
+		condition: needTasksDone,
+		mode:      finalize,
+	}
+	var v Value
+	arc := c.lookup(parent, pos, sel, flags)
+	if arc != nil {
+		arc.CompleteArcsOnly(c)
+		v = arc.DerefNonShared()
+		if arc.ArcType == ArcMember {
+			return true, nil
+		}
+
+	}
+	if c.HasErr() {
+		v = c.errs
+	}
+
+	u, _ := c.getDefault(v)
+	c.PopState(s)
+
+	if v, ok := Unwrap(u).(*Bottom); ok {
+		switch v.Code {
+		case CycleError:
+			return false, v
+		case IncompleteError:
+			c.verifyNonMonotonicResult(env, x, true)
+
+			// For a SelectorExpr or IndexExpr `peer.field`, identify the peer
+			// vertex (distinct from the caller). If the peer is
+			// mid-evaluation with a pending comp that could yet
+			// add this field, propagate so we don't commit to a
+			// stale "field absent" answer.
+			caller := env.DerefVertex(c)
+			if parent != caller {
+				if isCyclePlaceholder(parent.BaseValue) || hasPendingComp(parent) {
+					return false, v
+				}
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// hasPendingComp reports whether the given vertex has a comprehension
+// dependency that has not yet been definitively settled, OR is itself in
+// mid-evaluation (any non-success task remaining, including a builtin call
+// awaiting an input). A still-running task could yet insert arcs or
+// otherwise change what exists() observes; a registered postCheck means a
+// previous comp evaluated its condition under IncompleteError and may flip
+// later. In either case a "doesn't exist" answer right now would be
+// order-dependent.
+func hasPendingComp(v *Vertex) bool {
+	if v == nil || v.state == nil {
+		return false
+	}
+	if len(v.state.postChecks) > 0 {
+		return true
+	}
+	for _, t := range v.state.tasks {
+		if t.state == taskSUCCESS {
+			continue
+		}
+		return true
+	}
+	return false
+}
+
 func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...interface{}) {
 	err := c.NewPosf(pos, msg, args...)
 	c.addErr(code, err)
@@ -657,6 +795,48 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 	}
 
 	return val, true
+}
+
+// IsValidExpr evaluates expression x and reports whether it does not result in
+// a permanent error, using full finalization (as the != _|_ comparison did) so
+// that sub-field errors are detected. Any errors produced during evaluation are
+// discarded after checking. Incomplete errors, including those from
+// comprehensions over undefined fields and unresolved disjunctions, do not make
+// it return false.
+func (c *OpContext) IsValidExpr(env *Environment, x Expr) bool {
+	s := c.PushState(env, x.Source())
+	v := c.evalState(x, Flags{
+		status:    finalized,
+		condition: needTasksDone,
+		mode:      finalize,
+	})
+	// Save errors accumulated during evaluation (e.g. ChildErrors from
+	// sub-evaluations propagated via c.AddBottom in BinaryExpr/StructLit.evaluate).
+	errsFromEval := c.errs
+	// getDefault may add an IncompleteError for unresolved disjunctions.
+	// That should not make isValid return false: an unresolved disjunction
+	// is a valid (abstract) value, not an error. Restore after the call.
+	u, _ := c.getDefault(v)
+	c.errs = errsFromEval
+
+	var valid bool
+	switch val := u.(type) {
+	case *Bottom:
+	case *Vertex:
+		val.Finalize(c)
+
+		// isFinalError covers non-incomplete errors in BaseValue.
+		// c.errs covers ChildErrors propagated by BinaryExpr/StructLit.evaluate
+		// (inline struct/binary expressions are re-evaluated with c.inValidator>0).
+		valid = !isFinalError(val) && c.errs == nil
+
+	default:
+		// nil means the value is abstract/incomplete but not an error.
+		// Non-nil non-vertex/bottom values (scalars) are valid.
+		valid = c.errs == nil
+	}
+	_ = c.PopState(s)
+	return valid
 }
 
 // EvaluateKeepState does an evaluate, but leaves any errors and cycle info

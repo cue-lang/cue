@@ -1,0 +1,108 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d25cdfa_78b2382b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:19:43Z",
+      "side": 1,
+      "message": "Done. Restored `#todo:inline:` in `compile/fields.txtar` in this commit; it is now removed in the conversion commit (choosedefault/ and compile/, CL 1235288) where the `@test` directives are added.",
+      "parentUuid": "005e4c8c_86ff6731",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fab810bc_539d4693",
+        "filename": "cue/testdata/builtins/issue299.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:19:43Z",
+      "side": 1,
+      "message": "don\u0027t remove todo:inline",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "374aa926_011c28ac",
+        "filename": "cue/testdata/builtins/issue4208.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:19:43Z",
+      "side": 1,
+      "message": "don\u0027t remove todo:inline",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee95b4a9_3c7cea75",
+        "filename": "cue/testdata/builtins/issue490.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:19:43Z",
+      "side": 1,
+      "message": "don\u0027t remove todo:inline",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "512534c8_3b42038a",
+        "filename": "cue/testdata/builtins/list/issue332.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:19:43Z",
+      "side": 1,
+      "message": "don\u0027t remove todo:inline. And many more",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b0f3800_9c19242e",
+        "filename": "cue/testdata/compile/fields.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-11T12:19:43Z",
+      "side": 1,
+      "message": "Done. The `#todo:inline:` is no longer removed here.",
+      "parentUuid": "8a8bea74_e897d046",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

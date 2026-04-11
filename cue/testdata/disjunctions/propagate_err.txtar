@@ -1,6 +1,5 @@
 // Issue 4055: crash variant
 // Issue 4056
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- issue4056.cue --
 import "strings"
 
@@ -13,6 +12,7 @@ issue4056: full: {
 	if strings.HasPrefix(a, "foo") {
 		a: _ | error("error message 2")
 	}
+	@test(eq, {a: "foo-bar"})
 }
 issue4056: reduced: {
 	a: "x"
@@ -20,6 +20,7 @@ issue4056: reduced: {
 	if len(a) > 0 {
 		a: _ | error("b")
 	}
+	@test(eq, {a: "x"})
 }
 variant: {
 	a: "x"
@@ -27,6 +28,7 @@ variant: {
 	if len(a) > 0 {
 		a: _
 	}
+	@test(eq, {a: "x"})
 }
 -- pending.cue --
 // Be sure to emit errors for uncompleted pending arcs.
@@ -34,35 +36,11 @@ err: {
 	A: "forty two"
 	if A < 100 {B: true}
 }
--- out/evalalpha --
-Errors:
-err: invalid operands "forty two" and 100 to '<' (type string and int):
+-- out/errors.txt --
+[eval] err: invalid operands "forty two" and 100 to '<' (type string and int):
     ./pending.cue:4:5
     ./pending.cue:3:5
     ./pending.cue:4:9
-
-Result:
-(_|_){
-  // [eval]
-  issue4056: (struct){
-    full: (struct){
-      a: (string){ "foo-bar" }
-    }
-    reduced: (struct){
-      a: (string){ "x" }
-    }
-  }
-  variant: (struct){
-    a: (string){ "x" }
-  }
-  err: (_|_){
-    // [eval] err: invalid operands "forty two" and 100 to '<' (type string and int):
-    //     ./pending.cue:4:5
-    //     ./pending.cue:3:5
-    //     ./pending.cue:4:9
-    A: (string){ "forty two" }
-  }
-}
 -- out/compile --
 --- issue4056.cue
 {

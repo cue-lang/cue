@@ -1259,6 +1259,29 @@ func (x *BinaryExpr) evaluate(c *OpContext, state Flags) Value {
 		return v
 	}
 
+	// Short-circuit evaluation for && and ||: when the left operand alone
+	// determines the result, skip evaluating the right operand. This matches
+	// the spec ("The right operand is evaluated conditionally") and suppresses
+	// any error or incomplete value on the right when not needed.
+	if Pos(x).Experiment().ShortCircuit {
+		switch x.Op {
+		case BoolAndOp:
+			if c.concreteIsPossible(x.Op, x.X) {
+				left, _ := c.concrete(env, x.X, x.Op)
+				if b, ok := left.(*Bool); ok && !b.B {
+					return c.NewBool(false)
+				}
+			}
+		case BoolOrOp:
+			if c.concreteIsPossible(x.Op, x.X) {
+				left, _ := c.concrete(env, x.X, x.Op)
+				if b, ok := left.(*Bool); ok && b.B {
+					return c.NewBool(true)
+				}
+			}
+		}
+	}
+
 	if !c.concreteIsPossible(x.Op, x.X) || !c.concreteIsPossible(x.Op, x.Y) {
 		return nil
 	}

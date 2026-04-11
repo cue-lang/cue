@@ -1,0 +1,16 @@
+# Verifies that without @experiment(shortcircuit), errors on the right operand
+# of && and || still propagate (pre-v0.17.0 behavior is unchanged).
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.17.0"
+-- in.cue --
+// Without @experiment(shortcircuit), both operands are always evaluated.
+// Errors on the right side propagate even when left would short-circuit.
+noExpAnd: false && _|_  @test(err)
+noExpOr:  true  || _|_  @test(err)
+-- out/compile --
+--- in.cue
+{
+  noExpAnd: (false && _|_(explicit error (_|_ literal) in source))
+  noExpOr: (true || _|_(explicit error (_|_ literal) in source))
+}

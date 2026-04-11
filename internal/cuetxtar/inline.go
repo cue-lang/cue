@@ -151,6 +151,13 @@ type inlineRunner struct {
 	// archive file after all subtests have run (CUE_UPDATE mode only).
 	pendingPosWrites []posWrite
 
+	// nestedPosFills accumulates pos=[] fill-ins for nested @test(err) attrs
+	// inside @test(eq, {...}) bodies. Keyed by outer attribute byte offset.
+	// Multiple fills for the same outer attribute are merged here so that only
+	// one write is produced per outer attribute, avoiding duplicate-bracket
+	// artifacts when two pos=[] placeholders share the same outer @test(eq).
+	nestedPosFills map[int]*nestedPosEntry
+
 	// pendingInlineFillWrites accumulates inline @test attribute rewrites
 	// (fill, force overwrite, regression guard, stale-skip cleanup) to apply
 	// after all subtests have run (CUE_UPDATE mode only).

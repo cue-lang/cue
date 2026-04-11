@@ -212,5 +212,5 @@ NumCloseIDs: 43
   }
 }
 -- out/todo.txt --
-conjunct.t1/t2/t3: complex disjunctions with embedded hidden fields; only @test(pass) checked.
+conjunct.t1/t2/t3: complex disjunctions with embedded hidden fields; only @test(eq) checked.
 issue2355.export: v3 correctly closes it (closing in new evaluator), v2 does not close.

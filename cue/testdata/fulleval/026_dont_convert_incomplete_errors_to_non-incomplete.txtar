@@ -1,183 +1,63 @@
 #name: dont convert incomplete errors to non-incomplete
 #evalFull
-#todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- in.cue --
 import "strings"
 
-n1: {min: <max, max: >min}
-n2: -num
-n3: +num
-n4: num + num
-n5: num - num
-n6: num * num
-n7: num / num
+n1: {min: <max, max: >min} @test(eq, {
+	min: _|_ @test(err, code=cycle, contains="n1.max: cycle with field: min (and 1 more errors)", pos=[3:23])
+	max: _|_ @test(err, code=cycle, contains="n1.max: cycle with field: min (and 1 more errors)", pos=[3:23])
+})
+n2: -num      @test(err, code=incomplete, contains="operand num of '-' not concrete", pos=[0:6])
+n3: +num      @test(err, code=incomplete, contains="operand num of '+' not concrete", pos=[0:6])
+n4: num + num @test(err, code=incomplete, contains="non-concrete value <4 in operand to +", pos=[0:5, 12:6])
+n5: num - num @test(err, code=incomplete, contains="non-concrete value <4 in operand to -", pos=[0:5, 11:6])
+n6: num * num @test(err, code=incomplete, contains="non-concrete value <4 in operand to *", pos=[0:5, 10:6])
+n7: num / num @test(err, code=incomplete, contains="non-concrete value <4 in operand to /", pos=[0:5, 9:6])
 
-b1: !is
+b1: !is @test(err, code=incomplete, contains="operand is of '!' not concrete", pos=[0:6])
 
-s1: "\(str)"
-s2: strings.ContainsAny("dd")
-s3: strings.ContainsAny(str, "dd")
+s1: "\(str)"                       @test(err, code=incomplete, contains="non-concrete value string", pos=[0:5, 4:6])
+s2: strings.ContainsAny("dd")      @test(kind=string)
+s3: strings.ContainsAny(str, "dd") @test(err, code=incomplete, contains="non-concrete value string", pos=[0:5, 2:6])
 
-str: string
-num: <4
-is:  bool
--- out/eval/stats --
-Leaks:  0
-Freed:  17
-Reused: 0
-Allocs: 17
-Retain: 0
-
-Unifications: 17
-Conjuncts:    17
-Disjuncts:    0
--- out/evalalpha --
-(struct){
-  n1: (struct){
-    min: (_|_){
-      // [cycle] n1.min: cycle with field: max:
-      //     ./in.cue:3:12
-      // n1.max: cycle with field: min:
-      //     ./in.cue:3:23
-    }
-    max: (_|_){
-      // [cycle] n1.min: cycle with field: max:
-      //     ./in.cue:3:12
-      // n1.max: cycle with field: min:
-      //     ./in.cue:3:23
-    }
-  }
-  n2: (_|_){
-    // [incomplete] n2: operand num of '-' not concrete (was number):
-    //     ./in.cue:4:6
-  }
-  n3: (_|_){
-    // [incomplete] n3: operand num of '+' not concrete (was number):
-    //     ./in.cue:5:6
-  }
-  n4: (_|_){
-    // [incomplete] n4: non-concrete value <4 in operand to +:
-    //     ./in.cue:6:5
-    //     ./in.cue:18:6
-  }
-  n5: (_|_){
-    // [incomplete] n5: non-concrete value <4 in operand to -:
-    //     ./in.cue:7:5
-    //     ./in.cue:18:6
-  }
-  n6: (_|_){
-    // [incomplete] n6: non-concrete value <4 in operand to *:
-    //     ./in.cue:8:5
-    //     ./in.cue:18:6
-  }
-  n7: (_|_){
-    // [incomplete] n7: non-concrete value <4 in operand to /:
-    //     ./in.cue:9:5
-    //     ./in.cue:18:6
-  }
-  b1: (_|_){
-    // [incomplete] b1: operand is of '!' not concrete (was bool):
-    //     ./in.cue:11:6
-  }
-  s1: (_|_){
-    // [incomplete] s1: invalid interpolation: non-concrete value string (type string):
-    //     ./in.cue:13:5
-    //     ./in.cue:17:6
-  }
-  s2: (string){ strings.ContainsAny("dd") }
-  s3: (_|_){
-    // [incomplete] s3: error in call to strings.ContainsAny: non-concrete value string:
-    //     ./in.cue:15:5
-    //     ./in.cue:17:6
-  }
-  str: (string){ string }
-  num: (number){ <4 }
-  is: (bool){ bool }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,12 +1,16 @@
- (struct){
-   n1: (struct){
-     min: (_|_){
--      // [cycle] cycle error
-+      // [cycle] n1.min: cycle with field: max:
-+      //     ./in.cue:3:12
-+      // n1.max: cycle with field: min:
-+      //     ./in.cue:3:23
-     }
-     max: (_|_){
--      // [cycle] cycle error
--      // cycle error:
--      //     ./in.cue:3:22
-+      // [cycle] n1.min: cycle with field: max:
-+      //     ./in.cue:3:12
-+      // n1.max: cycle with field: min:
-+      //     ./in.cue:3:23
-     }
-   }
-   n2: (_|_){
--- out/eval --
-(struct){
-  n1: (struct){
-    min: (_|_){
-      // [cycle] cycle error
-    }
-    max: (_|_){
-      // [cycle] cycle error
-      // cycle error:
-      //     ./in.cue:3:22
-    }
-  }
-  n2: (_|_){
-    // [incomplete] n2: operand num of '-' not concrete (was number):
-    //     ./in.cue:4:6
-  }
-  n3: (_|_){
-    // [incomplete] n3: operand num of '+' not concrete (was number):
-    //     ./in.cue:5:6
-  }
-  n4: (_|_){
-    // [incomplete] n4: non-concrete value <4 in operand to +:
-    //     ./in.cue:6:5
-    //     ./in.cue:18:6
-  }
-  n5: (_|_){
-    // [incomplete] n5: non-concrete value <4 in operand to -:
-    //     ./in.cue:7:5
-    //     ./in.cue:18:6
-  }
-  n6: (_|_){
-    // [incomplete] n6: non-concrete value <4 in operand to *:
-    //     ./in.cue:8:5
-    //     ./in.cue:18:6
-  }
-  n7: (_|_){
-    // [incomplete] n7: non-concrete value <4 in operand to /:
-    //     ./in.cue:9:5
-    //     ./in.cue:18:6
-  }
-  b1: (_|_){
-    // [incomplete] b1: operand is of '!' not concrete (was bool):
-    //     ./in.cue:11:6
-  }
-  s1: (_|_){
-    // [incomplete] s1: invalid interpolation: non-concrete value string (type string):
-    //     ./in.cue:13:5
-    //     ./in.cue:17:6
-  }
-  s2: (string){ strings.ContainsAny("dd") }
-  s3: (_|_){
-    // [incomplete] s3: error in call to strings.ContainsAny: non-concrete value string:
-    //     ./in.cue:15:5
-    //     ./in.cue:17:6
-  }
-  str: (string){ string }
-  num: (number){ <4 }
-  is: (bool){ bool }
-}
+str: string @test(eq, string)
+num: <4     @test(eq, <4)
+is:  bool   @test(eq, bool)
+-- out/errors.txt --
+[cycle] n1.min: cycle with field: max:
+    ./in.cue:3:12
+n1.max: cycle with field: min:
+    ./in.cue:3:23
+[cycle] n1.min: cycle with field: max:
+    ./in.cue:3:12
+n1.max: cycle with field: min:
+    ./in.cue:3:23
+[incomplete] n2: operand num of '-' not concrete (was number):
+    ./in.cue:7:6
+[incomplete] n3: operand num of '+' not concrete (was number):
+    ./in.cue:8:6
+[incomplete] n4: non-concrete value <4 in operand to +:
+    ./in.cue:9:5
+    ./in.cue:21:6
+[incomplete] n5: non-concrete value <4 in operand to -:
+    ./in.cue:10:5
+    ./in.cue:21:6
+[incomplete] n6: non-concrete value <4 in operand to *:
+    ./in.cue:11:5
+    ./in.cue:21:6
+[incomplete] n7: non-concrete value <4 in operand to /:
+    ./in.cue:12:5
+    ./in.cue:21:6
+[incomplete] b1: operand is of '!' not concrete (was bool):
+    ./in.cue:14:6
+[incomplete] s1: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:16:5
+    ./in.cue:20:6
+[incomplete] s3: error in call to strings.ContainsAny: non-concrete value string:
+    ./in.cue:18:5
+    ./in.cue:20:6
+-- out/todo.txt --
+n1.min and n1.max: v2 reports "cycle error" without position details; v3 reports the full cycle with positions.
 -- out/compile --
 --- in.cue
 {
@@ -199,3 +79,13 @@ diff old new
   num: <4
   is: bool
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  17
+Reused: 0
+Allocs: 17
+Retain: 0
+
+Unifications: 17
+Conjuncts:    17
+Disjuncts:    0

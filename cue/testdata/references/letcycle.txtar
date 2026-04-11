@@ -1,5 +1,9 @@
+# Tests that mutually recursive let bindings produce "cyclic references in let
+# clause or alias" errors. Issue #1042: a 4-bit adder circuit expressed with
+# two mutually dependent let bindings (fulladders and carries) should be
+# detected as a cycle at compile time rather than causing a runtime panic.
 #expandLetExpr: true
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# So no @test because of compile-time errors.
 -- in.cue --
 import "list"
 
@@ -47,6 +51,11 @@ cycles: {
 		}
 	}
 }
+-- out/todo.txt --
+v2 error paths are more verbose than v3:
+  v2: cycles.a.let[].c.c, v3: cycles.a.let[].c
+  v2: cycles.b.let[].c.c, v3: cycles.b.let[].c
+  v2: cycles.issue1042.#Add16.let[].for[].c.for[].for[].c, v3: cycles.issue1042.#Add16.let[].for[].c
 -- out/compile --
 cycles.a.let[].c: cyclic references in let clause or alias:
     ./in.cue:5:15
@@ -164,25 +173,4 @@ cycles.a.let[].c: cyclic references in let clause or alias:
 cycles.b.let[].c: cyclic references in let clause or alias:
     ./in.cue:11:15
 cycles.issue1042.#Add16.let[].for[].c: cyclic references in let clause or alias:
-    ./in.cue:34:45
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,6 @@
--cycles.a.let[].c.c: cyclic references in let clause or alias:
-+cycles.a.let[].c: cyclic references in let clause or alias:
-     ./in.cue:5:15
--cycles.b.let[].c.c: cyclic references in let clause or alias:
-+cycles.b.let[].c: cyclic references in let clause or alias:
-     ./in.cue:11:15
--cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
-+cycles.issue1042.#Add16.let[].for[].c: cyclic references in let clause or alias:
-     ./in.cue:34:45
--- out/eval --
-cycles.a.let[].c.c: cyclic references in let clause or alias:
-    ./in.cue:5:15
-cycles.b.let[].c.c: cyclic references in let clause or alias:
-    ./in.cue:11:15
-cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
     ./in.cue:34:45

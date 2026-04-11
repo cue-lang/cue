@@ -51,9 +51,9 @@ type inlineFillWrite struct {
 // descending-offset pass per file so that no write shifts the byte positions
 // used by another write in the same pass.
 func (r *inlineRunner) applyInlineFillWritebacks() {
-	// Drain nestedPosFills: each accumulated entry represents one outer
-	// @test(eq, {...}) attribute with all its nested pos= fills applied
-	// sequentially. Emit a single posWrite per outer attribute.
+	// Flush nestedPosFills into pendingPosWrites: each accumulated entry
+	// represents an outer @test(eq, {...}) attribute whose text was updated
+	// in-place to fill nested pos=[] placeholders.
 	for _, entry := range r.nestedPosFills {
 		r.pendingPosWrites = append(r.pendingPosWrites, posWrite{
 			fileName:    entry.fileName,

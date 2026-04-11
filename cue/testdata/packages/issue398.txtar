@@ -2,7 +2,6 @@
 # bar which imports baz, evaluating foo should include values from all three
 # packages rather than omitting the transitively imported baz contents.
 # https://cuelang.org/issue/398
-#todo:inline: medium — multi-package test; check subpath handling
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"
@@ -13,6 +12,7 @@ import "mod.test/pkg:bar"
 
 bar
 zz: 3
+@test(eq, {zz: 3, yy: 2, xx: 1})
 -- pkg/bar.cue --
 package bar
 
@@ -36,32 +36,8 @@ Conjuncts:    8
 Disjuncts:    0
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  zz: (int){ 3 }
-  yy: (int){ 2 }
-  xx: (int){ 1 }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,5 +1,5 @@
- (struct){
--  xx: (int){ 1 }
--  yy: (int){ 2 }
-   zz: (int){ 3 }
-+  yy: (int){ 2 }
-+  xx: (int){ 1 }
- }
--- diff/todo/p3 --
+-- out/todo.txt --
 Reordering
--- out/eval --
-(struct){
-  xx: (int){ 1 }
-  yy: (int){ 2 }
-  zz: (int){ 3 }
-}
 -- out/compile --
 --- foo.cue
 {

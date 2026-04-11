@@ -1,20 +1,17 @@
-#name: definitions
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
 #Foo: {
 	field: int
 	recursive: {
 		field: string
 	}
-}
+} @test(eq, {field: int, recursive: {field: string}}) @test(closed)
 
 // Allowed
 #Foo1: {field: int}
-#Foo1: {field2: string}
+#Foo1: {field2: string} @test(eq, {field: int, field2: string}) @test(closed)
 
 foo: #Foo
-foo: {feild: 2}
+foo: {feild: 2} @test(err, code=eval, contains="field not allowed", pos=[0:7])
 
 foo1: #Foo
 foo1: {
@@ -22,20 +19,25 @@ foo1: {
 	recursive: {
 		feild: 2 // Not caught as per spec. TODO: change?
 	}
-}
+} @test(err, code=eval, contains="field not allowed", pos=[3:3])
 
 #Bar: {
 	field: int
 	{[A=_]: int}
-}
+} @test(eq, {field: int}) @test(closed)
 bar: #Bar
-bar: {feild: 2}
+bar: {feild: 2} @test(eq, {feild: 2, field: int})
 
-#Mixed: string
-Mixed:  string
+#Mixed: string @test(eq, string)
+Mixed:  string @test(eq, string)
 
 mixedRec: {#Mixed: string}
-mixedRec: {Mixed: string}
+mixedRec: {Mixed: string} @test(eq, {#Mixed: string, Mixed: string})
+-- out/errors.txt --
+[eval] foo.feild: field not allowed:
+    ./in.cue:13:7
+[eval] foo1.recursive.feild: field not allowed:
+    ./in.cue:19:3
 -- out/compile --
 --- in.cue
 {
@@ -93,189 +95,5 @@ Conjuncts:    43
 Disjuncts:    0
 
 NumCloseIDs: 7
--- out/evalalpha --
-Errors:
-foo.feild: field not allowed:
-    ./in.cue:13:7
-foo1.recursive.feild: field not allowed:
-    ./in.cue:19:3
-
-Result:
-(_|_){
-  // [eval]
-  #Foo: (#struct){
-    field: (int){ int }
-    recursive: (#struct){
-      field: (string){ string }
-    }
-  }
-  #Foo1: (#struct){
-    field: (int){ int }
-    field2: (string){ string }
-  }
-  foo: (_|_){
-    // [eval]
-    feild: (_|_){
-      // [eval] foo.feild: field not allowed:
-      //     ./in.cue:13:7
-    }
-    field: (int){ int }
-    recursive: (#struct){
-      field: (string){ string }
-    }
-  }
-  foo1: (_|_){
-    // [eval]
-    field: (int){ 2 }
-    recursive: (_|_){
-      // [eval]
-      feild: (_|_){
-        // [eval] foo1.recursive.feild: field not allowed:
-        //     ./in.cue:19:3
-      }
-      field: (string){ string }
-    }
-  }
-  #Bar: (#struct){
-    field: (int){ int }
-  }
-  bar: (#struct){
-    feild: (int){ 2 }
-    field: (int){ int }
-  }
-  #Mixed: (string){ string }
-  Mixed: (string){ string }
-  mixedRec: (struct){
-    #Mixed: (string){ string }
-    Mixed: (string){ string }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,7 @@
- Errors:
- foo.feild: field not allowed:
--    ./in.cue:1:7
--    ./in.cue:12:6
-     ./in.cue:13:7
- foo1.recursive.feild: field not allowed:
--    ./in.cue:3:13
--    ./in.cue:15:7
-     ./in.cue:19:3
- 
- Result:
-@@ -23,16 +19,14 @@
-   }
-   foo: (_|_){
-     // [eval]
--    field: (int){ int }
--    recursive: (#struct){
--      field: (string){ string }
--    }
-     feild: (_|_){
-       // [eval] foo.feild: field not allowed:
--      //     ./in.cue:1:7
--      //     ./in.cue:12:6
-       //     ./in.cue:13:7
-     }
-+    field: (int){ int }
-+    recursive: (#struct){
-+      field: (string){ string }
-+    }
-   }
-   foo1: (_|_){
-     // [eval]
-@@ -39,13 +33,11 @@
-     field: (int){ 2 }
-     recursive: (_|_){
-       // [eval]
--      field: (string){ string }
-       feild: (_|_){
-         // [eval] foo1.recursive.feild: field not allowed:
--        //     ./in.cue:3:13
--        //     ./in.cue:15:7
-         //     ./in.cue:19:3
-       }
-+      field: (string){ string }
-     }
-   }
-   #Bar: (#struct){
-@@ -52,8 +44,8 @@
-     field: (int){ int }
-   }
-   bar: (#struct){
--    field: (int){ int }
-     feild: (int){ 2 }
-+    field: (int){ int }
-   }
-   #Mixed: (string){ string }
-   Mixed: (string){ string }
--- diff/todo/p2 --
+-- out/todo.txt --
 Positions / reordering.
--- out/eval --
-Errors:
-foo.feild: field not allowed:
-    ./in.cue:1:7
-    ./in.cue:12:6
-    ./in.cue:13:7
-foo1.recursive.feild: field not allowed:
-    ./in.cue:3:13
-    ./in.cue:15:7
-    ./in.cue:19:3
-
-Result:
-(_|_){
-  // [eval]
-  #Foo: (#struct){
-    field: (int){ int }
-    recursive: (#struct){
-      field: (string){ string }
-    }
-  }
-  #Foo1: (#struct){
-    field: (int){ int }
-    field2: (string){ string }
-  }
-  foo: (_|_){
-    // [eval]
-    field: (int){ int }
-    recursive: (#struct){
-      field: (string){ string }
-    }
-    feild: (_|_){
-      // [eval] foo.feild: field not allowed:
-      //     ./in.cue:1:7
-      //     ./in.cue:12:6
-      //     ./in.cue:13:7
-    }
-  }
-  foo1: (_|_){
-    // [eval]
-    field: (int){ 2 }
-    recursive: (_|_){
-      // [eval]
-      field: (string){ string }
-      feild: (_|_){
-        // [eval] foo1.recursive.feild: field not allowed:
-        //     ./in.cue:3:13
-        //     ./in.cue:15:7
-        //     ./in.cue:19:3
-      }
-    }
-  }
-  #Bar: (#struct){
-    field: (int){ int }
-  }
-  bar: (#struct){
-    field: (int){ int }
-    feild: (int){ 2 }
-  }
-  #Mixed: (string){ string }
-  Mixed: (string){ string }
-  mixedRec: (struct){
-    #Mixed: (string){ string }
-    Mixed: (string){ string }
-  }
-}

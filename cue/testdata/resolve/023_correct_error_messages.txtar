@@ -1,8 +1,9 @@
-#name: correct error messages
-#evalPartial
-#todo:inline: medium — evalPartial; incomplete values may need @test(kind=...) or @test(final)
 -- in.cue --
-a: "a" & 1
+a: "a" & 1   @test(err, code=eval, contains="conflicting values \"a\" and 1", pos=[0:4, 0:10])
+-- out/errors.txt --
+[eval] a: conflicting values "a" and 1 (mismatched types string and int):
+    ./in.cue:1:4
+    ./in.cue:1:10
 -- out/compile --
 --- in.cue
 {
@@ -18,18 +19,3 @@ Retain: 0
 Unifications: 2
 Conjuncts:    3
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-a: conflicting values "a" and 1 (mismatched types string and int):
-    ./in.cue:1:4
-    ./in.cue:1:10
-
-Result:
-(_|_){
-  // [eval]
-  a: (_|_){
-    // [eval] a: conflicting values "a" and 1 (mismatched types string and int):
-    //     ./in.cue:1:4
-    //     ./in.cue:1:10
-  }
-}

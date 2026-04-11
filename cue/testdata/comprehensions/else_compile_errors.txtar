@@ -1,4 +1,6 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
+# Note: cannot convert to inline @test format because the CUE source files
+# contain compile-time errors (references to out-of-scope variables), which
+# prevents the inline test runner from compiling the source.
 -- in.cue --
 @experiment(try)
 

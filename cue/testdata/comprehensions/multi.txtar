@@ -1,8 +1,7 @@
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
-list: [2, 3]
-a: [ 3, for x in list {x}, for x in list {x}]
-b: [ 3, if true {3}, for x in list if x > 2 {x}]
+list: [2, 3] @test(eq, [2, 3])
+a: [ 3, for x in list {x}, for x in list {x}] @test(eq, [3, 2, 3, 2, 3])
+b: [ 3, if true {3}, for x in list if x > 2 {x}] @test(eq, [3, 3, 3])
 
 // issue574: Tests that if and for comprehensions inside list literals
 // correctly include or exclude elements based on conditions.
@@ -24,7 +23,9 @@ issue574: {
 			"bye"
 		},
 	]
+	@test(eq, {greet: true, bye: true, message1: ["hello", "how are you doing?", "bye"], message2: ["how are you doing?", "bye"]})
 }
+-- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  24
@@ -37,38 +38,6 @@ Conjuncts:    37
 Disjuncts:    0
 
 NumCloseIDs: 21
--- out/evalalpha --
-(struct){
-  list: (#list){
-    0: (int){ 2 }
-    1: (int){ 3 }
-  }
-  a: (#list){
-    0: (int){ 3 }
-    1: (int){ 2 }
-    2: (int){ 3 }
-    3: (int){ 2 }
-    4: (int){ 3 }
-  }
-  b: (#list){
-    0: (int){ 3 }
-    1: (int){ 3 }
-    2: (int){ 3 }
-  }
-  issue574: (struct){
-    greet: (bool){ true }
-    bye: (bool){ true }
-    message1: (#list){
-      0: (string){ "hello" }
-      1: (string){ "how are you doing?" }
-      2: (string){ "bye" }
-    }
-    message2: (#list){
-      0: (string){ "how are you doing?" }
-      1: (string){ "bye" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

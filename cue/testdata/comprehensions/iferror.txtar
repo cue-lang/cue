@@ -92,7 +92,7 @@ issue1972: {
 			patchs: _
 		}
 	}
-	@test(err, code=eval, contains="conflicting values", pos=[9:8, 11:11, 12:3])
+	@test(err, code=eval, at=err1, contains="conflicting values", pos=[9:8, 11:11, 12:3])
 }
 -- out/errors.txt --
 [eval] wrongConcreteType: cannot use 2 (type int) as type bool:

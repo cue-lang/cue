@@ -1,46 +1,19 @@
-#name: custom validators
-#evalPartial
-#todo:inline: medium — imported builtin validators; needs cmpBuiltinExpr path
 -- in.cue --
 import "strings"
 
 a: strings.ContainsAny("ab")
-a: "after"
+a: "after" @test(eq, "after")
 
 b: strings.ContainsAny("c")
-b: "dog"
+b: "dog" @test(err, code=eval, contains="invalid value \"dog\"", pos=[-1:4, -1:24, 0:4])
 
 c: strings.ContainsAny("d") & strings.ContainsAny("g")
-c: "dog"
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 0
-Allocs: 4
-Retain: 0
-
-Unifications: 4
-Conjuncts:    8
-Disjuncts:    0
--- out/evalalpha --
-Errors:
-b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
+c: "dog" @test(eq, "dog")
+-- out/errors.txt --
+[eval] b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
     ./in.cue:6:4
     ./in.cue:6:24
     ./in.cue:7:4
-
-Result:
-(_|_){
-  // [eval]
-  a: (string){ "after" }
-  b: (_|_){
-    // [eval] b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
-    //     ./in.cue:6:4
-    //     ./in.cue:6:24
-    //     ./in.cue:7:4
-  }
-  c: (string){ "dog" }
-}
 -- out/compile --
 --- in.cue
 {
@@ -51,3 +24,13 @@ Result:
   c: (〈import;strings〉.ContainsAny("d") & 〈import;strings〉.ContainsAny("g"))
   c: "dog"
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  4
+Reused: 0
+Allocs: 4
+Retain: 0
+
+Unifications: 4
+Conjuncts:    8
+Disjuncts:    0

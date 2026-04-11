@@ -1,6 +1,3 @@
-#name: incomplete comprehensions
-#evalPartial
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 A: {
 	for v in src {
@@ -10,10 +7,19 @@ A: {
 	if true {
 		baz: "baz"
 	}
+	@test(err, code=incomplete, contains="cannot range over src", pos=[1:11])
 }
 B: A & {
 	src: ["foo", "bar"]
-}
+}   @test(eq, {
+	src: ["foo", "bar"]
+	baz: "baz"
+	foo: "foo"
+	bar: "bar"
+})
+-- out/errors.txt --
+[incomplete] A: cannot range over src (incomplete type _):
+    ./in.cue:2:11
 -- out/compile --
 --- in.cue
 {
@@ -45,21 +51,3 @@ Conjuncts:    18
 Disjuncts:    0
 
 NumCloseIDs: 7
--- out/evalalpha --
-(struct){
-  A: (_|_){
-    // [incomplete] A: cannot range over src (incomplete type _):
-    //     ./in.cue:2:11
-    src: (_){ _ }
-    baz: (string){ "baz" }
-  }
-  B: (struct){
-    src: (#list){
-      0: (string){ "foo" }
-      1: (string){ "bar" }
-    }
-    baz: (string){ "baz" }
-    foo: (string){ "foo" }
-    bar: (string){ "bar" }
-  }
-}

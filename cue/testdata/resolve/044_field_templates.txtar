@@ -1,22 +1,25 @@
-#name: field templates
-#evalPartial
-#todo:inline: medium — disjunctions; use @test(final) for default selection
 -- in.cue --
 a: {
 	{[name=_]: int}
 	k: 1
-}
+} @test(eq, {k: 1})
 b: {
 	{[X=_]: {x: 0, y: *1 | int}}
 	v: {}
 	w: {x: 0}
 }
-b: {[y=_]: {}}
+b: {[y=_]: {}} @test(eq, {
+	v: {x: 0, y: *1 | int}
+	w: {x: 0, y: *1 | int}
+})
 c: {
 	{[Name=_]: {name: Name, y: 1}}
 	foo: {}
 	bar: _
-}
+} @test(eq, {
+	foo: {name: "foo", y: 1}
+	bar: {name: "bar", y: 1}
+})
 -- out/compile --
 --- in.cue
 {
@@ -64,29 +67,3 @@ Conjuncts:    33
 Disjuncts:    4
 
 NumCloseIDs: 6
--- out/evalalpha --
-(struct){
-  a: (struct){
-    k: (int){ 1 }
-  }
-  b: (struct){
-    v: (struct){
-      x: (int){ 0 }
-      y: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-    w: (struct){
-      x: (int){ 0 }
-      y: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-  }
-  c: (struct){
-    foo: (struct){
-      name: (string){ "foo" }
-      y: (int){ 1 }
-    }
-    bar: (struct){
-      name: (string){ "bar" }
-      y: (int){ 1 }
-    }
-  }
-}

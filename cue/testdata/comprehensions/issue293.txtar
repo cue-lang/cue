@@ -1,7 +1,6 @@
 # Issue #1969: Tests that comparing fields to _|_ (checking if defined) works
 # correctly for both closed and open structs, including edge cases with
 # comprehensions and let clauses.
-#todo:inline: medium — comprehension; may need @test(final) for incomplete fields
 -- in.cue --
 #T: {
 	if true {
@@ -24,6 +23,7 @@ z: #T & {
 		f2: "i want to disallow this"
 	}
 }
+@test(err, code=eval, at=z.x.f2, contains="field not allowed", pos=[-3:3])
 
 t: #C
 #C: {
@@ -41,6 +41,19 @@ t: p: "foo"
 	x: close({ f1: int })
 	x: f2: 2
 }
+@test(err, code=eval, at=#V1.x.f2, contains="field not allowed", pos=[-2:5])
+-- out/errors.txt --
+[eval] z.x.f2: field not allowed:
+    ./in.cue:19:3
+[eval] #V1.x.f2: field not allowed:
+    ./variant1.cue:3:5
+-- out/todo.txt --
+Missing positions
+Reordering
+z.x.f2: v2 reports additional positions ./in.cue:2:2, ./in.cue:5:12,
+./in.cue:11:4, ./in.cue:14:3 that v3 does not.
+#V1.x.f2: v2 reports additional position ./variant1.cue:2:11 that v3 does not;
+v3 shows f2 before f1 in result.
 -- out/eval/stats --
 Leaks:  0
 Freed:  28
@@ -53,150 +66,6 @@ Conjuncts:    40
 Disjuncts:    0
 
 NumCloseIDs: 15
--- out/evalalpha --
-Errors:
-#V1.x.f2: field not allowed:
-    ./variant1.cue:3:5
-z.x.f2: field not allowed:
-    ./in.cue:19:3
-
-Result:
-(_|_){
-  // [eval]
-  #T: (#struct){
-    x: (#struct){
-      f1: (int){ int }
-    }
-  }
-  z: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval]
-      f1: (int){ 99 }
-      f2: (_|_){
-        // [eval] z.x.f2: field not allowed:
-        //     ./in.cue:19:3
-      }
-    }
-  }
-  t: (#struct){
-    p: (string){ "foo" }
-  }
-  #C: (#struct){
-    p: (_){ _ }
-  }
-  #V1: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval]
-      f2: (_|_){
-        // [eval] #V1.x.f2: field not allowed:
-        //     ./variant1.cue:3:5
-      }
-      f1: (int){ int }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,12 +1,8 @@
- Errors:
- #V1.x.f2: field not allowed:
--    ./variant1.cue:2:11
-     ./variant1.cue:3:5
- z.x.f2: field not allowed:
--    ./in.cue:2:2
--    ./in.cue:5:12
--    ./in.cue:11:4
--    ./in.cue:14:3
-+    ./in.cue:19:3
- 
- Result:
- (_|_){
-@@ -23,10 +19,7 @@
-       f1: (int){ 99 }
-       f2: (_|_){
-         // [eval] z.x.f2: field not allowed:
--        //     ./in.cue:2:2
--        //     ./in.cue:5:12
--        //     ./in.cue:11:4
--        //     ./in.cue:14:3
-+        //     ./in.cue:19:3
-       }
-     }
-   }
-@@ -40,12 +33,11 @@
-     // [eval]
-     x: (_|_){
-       // [eval]
--      f1: (int){ int }
-       f2: (_|_){
-         // [eval] #V1.x.f2: field not allowed:
--        //     ./variant1.cue:2:11
-         //     ./variant1.cue:3:5
-       }
-+      f1: (int){ int }
-     }
-   }
- }
--- diff/todo/p2 --
-Missing positions
--- diff/todo/p3 --
-Reordering
--- out/eval --
-Errors:
-#V1.x.f2: field not allowed:
-    ./variant1.cue:2:11
-    ./variant1.cue:3:5
-z.x.f2: field not allowed:
-    ./in.cue:2:2
-    ./in.cue:5:12
-    ./in.cue:11:4
-    ./in.cue:14:3
-
-Result:
-(_|_){
-  // [eval]
-  #T: (#struct){
-    x: (#struct){
-      f1: (int){ int }
-    }
-  }
-  z: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval]
-      f1: (int){ 99 }
-      f2: (_|_){
-        // [eval] z.x.f2: field not allowed:
-        //     ./in.cue:2:2
-        //     ./in.cue:5:12
-        //     ./in.cue:11:4
-        //     ./in.cue:14:3
-      }
-    }
-  }
-  t: (#struct){
-    p: (string){ "foo" }
-  }
-  #C: (#struct){
-    p: (_){ _ }
-  }
-  #V1: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval]
-      f1: (int){ int }
-      f2: (_|_){
-        // [eval] #V1.x.f2: field not allowed:
-        //     ./variant1.cue:2:11
-        //     ./variant1.cue:3:5
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

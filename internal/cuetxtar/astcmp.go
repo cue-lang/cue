@@ -26,15 +26,24 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/value"
 )
 
 // cmpCtx carries comparison options through the recursive astCmp calls.
 type cmpCtx struct {
-	// baseLine is the 1-indexed source line used to resolve relative pos=
-	// specs in nested @test(err) directives. When 0, deltaLine values in
-	// pos specs are treated as absolute line numbers.
+	// baseLine resolves pos= specs in nested @test(err) directives:
+	// wantLine = baseLine + deltaLine.  runEqInline keeps it 0, so deltaLine
+	// values in nested pos= specs are absolute 1-indexed line numbers.  This
+	// differs from top-level @test(err) where pa.baseLine makes deltaLine a
+	// relative offset; changing it here would break existing specs.
 	baseLine int
+	// posWriteback, when non-nil, is called by cmpErr when it encounters a
+	// pos=[] placeholder inside an @test(eq, {...}) body.  The runner uses it
+	// to locate and fill that placeholder in the source attribute.
+	// innerAttrText is the raw text of the inner @test(err,...) attribute
+	// (used to locate it within the outer @test(eq,...) source text).
+	posWriteback func(innerAttrText string, positions []token.Pos)
 }
 
 // astCompare compares a parsed CUE AST expression against an evaluated
@@ -102,6 +111,9 @@ func (c *cmpCtx) astCmp(path cue.Path, expr ast.Expr, val cue.Value) error {
 	case *ast.ParenExpr:
 		return c.astCmp(path, e.X, val)
 	case *ast.BottomLit:
+		if val.Err() == nil {
+			return pathErr(path, "_|_: expected error, got %v", val)
+		}
 		return nil
 	case *ast.CallExpr, *ast.SelectorExpr:
 		return cmpBuiltinExpr(path, expr, val)
@@ -297,6 +309,7 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 							if errCk == nil {
 								errCk = &errArgs{} // bare @test(err)
 							}
+							errCk.srcAttrText = a.Text
 						case "shareID":
 							// The first field with a given shareID name runs the eq check
 							// normally so every value-expr pair is checked at least once.
@@ -649,15 +662,19 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 			return pathErr(path, "@test(err): expected error code %v, got %q", ea.codes, gotCode)
 		}
 	}
-	// TODO: support CUE_UPDATE=1 and CUE_UPDATE=force for nested pos= specs.
-	// This requires rewriting text inside the outer @test(eq, {...}) attribute
-	// body, which the current enqueuePosWrite machinery doesn't handle.
 	if ea.posSet {
 		err := val.Err()
 		if err == nil {
 			return pathErr(path, "@test(err, pos=...): value has no error")
 		}
 		positions := cueerrors.Positions(err)
+		isPlaceholder := len(ea.pos) == 0
+		// pos=[] is a fill-in placeholder: update with CUE_UPDATE=1, same as
+		// the top-level @test(err, pos=[]) path in checkErrPositions.
+		if ((isPlaceholder && cuetest.UpdateGoldenFiles) || cuetest.ForceUpdateGoldenFiles) && c.posWriteback != nil && ea.srcAttrText != "" {
+			c.posWriteback(ea.srcAttrText, positions)
+			return nil
+		}
 		if len(positions) != len(ea.pos) {
 			var got []string
 			for _, p := range positions {

@@ -1,11 +1,11 @@
 -- in.cue --
-r0: int & >0.1 & <=1.9 @test(eq, >0.1 & <=1.9 & int)
-r1: int & >0.1 & <1.9 @test(eq, >0.1 & <1.9 & int)
-r2: int & >=0.1 & <1.9 @test(eq, >=0.1 & <1.9 & int)
+r0: int & >0.1 & <=1.9    @test(eq, >0.1 & <=1.9 & int)
+r1: int & >0.1 & <1.9     @test(eq, >0.1 & <1.9 & int)
+r2: int & >=0.1 & <1.9    @test(eq, >=0.1 & <1.9 & int)
 r3: int & >=-1.9 & <=-0.1 @test(eq, >=-1.9 & <=-0.1 & int)
-r4: int & >-1.9 & <=-0.1 @test(eq, >-1.9 & <=-0.1 & int)
+r4: int & >-1.9 & <=-0.1  @test(eq, >-1.9 & <=-0.1 & int)
 
-r5: >=1.1 & <=1.1 @test(eq, >=1.1 & <=1.1)
+r5: >=1.1 & <=1.1 @test(eq, >=1.1 & <=1.1) @test(eq:todo, ==1.1)
 r6: r5 & 1.1 @test(eq, 1.1)
 
 c1: (1.2 & >1.3) & <2 @test(err, code=eval, contains="invalid value 1.2", pos=[0:12, 0:6])

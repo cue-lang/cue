@@ -3,7 +3,8 @@ a: {b: int}   @test(eq, {b: int})
 c: a & {
 	b: 100
 	d: a.b + 3 // do not resolve as c != a.
-} @test(eq, {b: 100, d: _|_}) // d should be incomplete, not 103.
+} @test(eq, {b: 100, d: _|_ @test(err,
+	code=incomplete, contains="non-concrete value int in operand to +", pos=[4:5, 1:8])})
 x: {
 	b: int
 	c: b + 5   @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[0:5, -1:5])
@@ -22,17 +23,17 @@ wp: v & {b: 100}   @test(eq, {b: 100, c: _|_})
     ./in.cue:4:5
     ./in.cue:1:8
 [incomplete] x.c: non-concrete value int in operand to +:
+    ./in.cue:9:5
     ./in.cue:8:5
-    ./in.cue:7:5
 [incomplete] v.c: non-concrete value int in operand to +:
+    ./in.cue:15:5
     ./in.cue:14:5
-    ./in.cue:13:5
 [incomplete] w.c: non-concrete value int in operand to +:
+    ./in.cue:15:5
     ./in.cue:14:5
-    ./in.cue:13:5
 [incomplete] wp.c: non-concrete value int in operand to +:
+    ./in.cue:15:5
     ./in.cue:14:5
-    ./in.cue:13:5
 -- out/compile --
 --- in.cue
 {

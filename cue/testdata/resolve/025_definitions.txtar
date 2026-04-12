@@ -4,7 +4,10 @@
 	recursive: {
 		field: string
 	}
-} @test(eq, {field: int, recursive: {field: string}}) @test(closed)
+
+	@test(eq, {field: int, recursive: {field: string}})
+	@test(closed)
+}
 
 // Allowed
 #Foo1: {field: int}
@@ -17,27 +20,30 @@ foo1: #Foo
 foo1: {
 	field: 2
 	recursive: {
-		feild: 2 // Not caught as per spec. TODO: change?
+		feild: 2 @test(err, code=eval, contains="field not allowed", pos=[0:3])
 	}
-} @test(err, code=eval, contains="field not allowed", pos=[3:3])
+}
 
 #Bar: {
 	field: int
 	{[A=_]: int}
-} @test(eq, {field: int}) @test(closed)
+
+	@test(eq, {field: int, [_]: int})
+	@test(closed)
+}
 bar: #Bar
 bar: {feild: 2} @test(eq, {feild: 2, field: int})
 
-#Mixed: string @test(eq, string)
-Mixed:  string @test(eq, string)
+#Mixed: string
+Mixed:  string
 
 mixedRec: {#Mixed: string}
 mixedRec: {Mixed: string} @test(eq, {#Mixed: string, Mixed: string})
 -- out/errors.txt --
 [eval] foo.feild: field not allowed:
-    ./in.cue:13:7
+    ./in.cue:16:7
 [eval] foo1.recursive.feild: field not allowed:
-    ./in.cue:19:3
+    ./in.cue:22:3
 -- out/compile --
 --- in.cue
 {

@@ -14,7 +14,9 @@
 V: #S & {
 	c: e:     int
 	b: extra: int
-} @test(err, code=eval, contains="field not allowed", pos=[2:5])
+}
+@test(err, code=eval, at=V.b.extra, contains="field not allowed", pos=[-2:5])
+@test(err, code=eval, at=V.c.e, contains="field not allowed", pos=[-4:5])
 -- out/errors.txt --
 [eval] V.c.e: field not allowed:
     ./in.cue:14:5

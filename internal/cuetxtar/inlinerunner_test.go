@@ -69,9 +69,20 @@ func TestInlineRunner_Basic(t *testing.T) {
 		},
 		{
 			// @test(err) inside @test(eq) body can carry filled pos= specs.
-			// pos=[3:5] means absolute line 3, col 5 (baseLine=0 convention).
+			// pos=[4:5, 1:8] uses absolute line numbers (baseLine=0 convention).
 			name:    "eq with nested @test(err, pos=) passes",
 			archive: "-- test.cue --\na: {b: int}\nc: a & {\n\tb: 100\n\td: a.b + 3\n} @test(eq, {b: 100, d: _|_ @test(err, code=incomplete, pos=[4:5, 1:8])})\n",
+		},
+		{
+			// Full @test(err) annotation with code, contains, and positions — the
+			// format that eqWriteErrAnnotation generates after CUE_UPDATE fills pos=[].
+			name: "eq with full nested @test(err) annotation passes",
+			archive: "-- test.cue --\n" +
+				"a: {b: int}\n" +
+				"c: a & {\n" +
+				"\tb: 100\n" +
+				"\td: a.b + 3\n" +
+				`} @test(eq, {b: 100, d: _|_ @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[4:5, 1:8])})` + "\n",
 		},
 	}
 

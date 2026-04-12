@@ -157,6 +157,7 @@ func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value, nestedI
 	// This avoids the confusing let-containing struct that v.Syntax(Final())
 	// generates when it tries to make the expression self-contained.
 	// astCmp requires _|_ to match only error values.
+	// eqWriteStruct adds the @test(err, ...) annotation after _|_ for field arcs.
 	if v.Err() != nil {
 		b.WriteString("_|_")
 		return
@@ -197,6 +198,39 @@ func eqWriteConjunction(opCtx *adt.OpContext, b *strings.Builder, conj *adt.Conj
 	}
 }
 
+// isLeafError reports whether eqWriteValue would render v as bare _|_
+// (i.e. an error that is neither a struct with child arcs nor a list).
+// Used by eqWriteStruct to decide whether to append a @test(err, ...) annotation.
+func isLeafError(v cue.Value) bool {
+	if v.Err() == nil {
+		return false
+	}
+	tv := v.Core()
+	vx := tv.V.DerefValue()
+	k := v.IncompleteKind()
+	return !((k == cue.StructKind || len(vx.Arcs) > 0) && k != cue.ListKind)
+}
+
+// eqWriteErrAnnotation appends a @test(err, code=..., contains="...", pos=[])
+// annotation for a leaf error arc value.  code= and contains= are filled with
+// the actual error details; pos=[] is a placeholder that CUE_UPDATE=1 fills in.
+func eqWriteErrAnnotation(b *strings.Builder, v cue.Value) {
+	tv := v.Core()
+	if tv.V == nil {
+		return
+	}
+	bot := tv.V.DerefValue().Bottom()
+	if bot == nil {
+		return
+	}
+	b.WriteString(" @test(err, code=")
+	b.WriteString(bot.Code.String())
+	if bot.Err != nil {
+		fmt.Fprintf(b, ", contains=%q", bot.Err.Error())
+	}
+	b.WriteString(", pos=[])")
+}
+
 // eqWriteStruct emits a struct using _foo$pkg notation for hidden-field labels.
 //
 // nestedIndent controls layout:
@@ -228,7 +262,13 @@ func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex, nes
 		first = false
 		eqWriteLabel(opCtx, b, arc.Label, arc.ArcType)
 		b.WriteString(": ")
-		eqWriteValue(opCtx, b, value.Make(opCtx, arc), nestedIndent+"\t")
+		arcVal := value.Make(opCtx, arc)
+		eqWriteValue(opCtx, b, arcVal, nestedIndent+"\t")
+		// For leaf error fields, append a @test(err, ...) annotation with
+		// actual error details and a pos=[] placeholder for CUE_UPDATE=1.
+		if isLeafError(arcVal) {
+			eqWriteErrAnnotation(b, arcVal)
+		}
 	}
 	if nestedIndent != "" && !first {
 		b.WriteString("\n" + nestedIndent[:len(nestedIndent)-1])

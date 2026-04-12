@@ -82,6 +82,12 @@ type errArgs struct {
 	// msgArgs holds expected fmt.Sprint representations of Msg() args to check
 	// order-independently against the error's Msg() arguments.
 	msgArgs []string
+	// srcAttrText is the raw text of the @test(err,...) attribute as it
+	// appears in source (e.g. "@test(err, code=eval, pos=[])").  Set only for
+	// @test(err) attributes that appear inside an @test(eq, {...}) body; used
+	// by cmpErr to locate and rewrite a pos=[] placeholder in the outer
+	// @test(eq,...) attribute text.
+	srcAttrText string
 }
 
 // matchesCode reports whether the given error code satisfies the codes
@@ -560,18 +566,61 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 	}
 }
 
-// enqueueSubErrPosWrites applies all sub-error position updates atomically to
-// the source attribute, producing a single posWrite entry. Each update replaces
-// pos=[...] in the expIdx-th suberr=(...) group.
 // formatPosSpec converts a single token.Pos to a position spec string.
-// Positions in the same file as the @test attribute are written as
-// deltaLine:col (relative to pa.baseLine); positions in other files are
-// written as filename:absLine:col (absolute).
-func (r *inlineRunner) formatPosSpec(p token.Pos, pa parsedTestAttr) string {
-	if p.Filename() == "" || r.relFilename(p.Filename()) == pa.srcFileName {
-		return fmt.Sprintf("%d:%d", p.Line()-pa.baseLine, p.Column())
+// Positions in the same file are written as deltaLine:col (relative to
+// baseLine); positions in other files are written as filename:absLine:col.
+// Pass pa.baseLine and pa.srcFileName for top-level @test(err) directives
+// (relative delta form).  Pass 0 for baseLine to produce absolute line
+// numbers (used for nested @test(err) inside @test(eq) bodies).
+func (r *inlineRunner) formatPosSpec(p token.Pos, baseLine int, srcFileName string) string {
+	if p.Filename() == "" || r.relFilename(p.Filename()) == srcFileName {
+		return fmt.Sprintf("%d:%d", p.Line()-baseLine, p.Column())
 	}
 	return fmt.Sprintf("%s:%d:%d", r.relFilename(p.Filename()), p.Line(), p.Column())
+}
+
+// replacePosSpec replaces the content of the first pos=[...] found in text
+// starting at offset with newContent. Returns (newText, true) on success, or
+// (text, false) when no pos=[...] bracket pair is found.
+func replacePosSpec(text string, offset int, newContent string) (string, bool) {
+	prefix, rest, found := strings.Cut(text[offset:], "pos=[")
+	if !found {
+		return text, false
+	}
+	_, suffix, found := strings.Cut(rest, "]")
+	if !found {
+		return text, false
+	}
+	return text[:offset] + prefix + "pos=[" + newContent + "]" + suffix, true
+}
+
+// enqueueNestedPosWrite fills a pos=[] placeholder inside an @test(eq, {...})
+// body.  innerAttrText is the raw text of the inner @test(err,...) attribute
+// (e.g. "@test(err, code=eval, pos=[])"); it is located by substring search
+// within the outer @test(eq,...) attribute text and the pos=[...] within it is
+// replaced with the formatted positions.
+func (r *inlineRunner) enqueueNestedPosWrite(outerPa parsedTestAttr, innerAttrText string, positions []token.Pos) {
+	outerText := outerPa.srcAttr.Text
+	innerIdx := strings.Index(outerText, innerAttrText)
+	if innerIdx < 0 {
+		return // inner attr not found in outer text — skip
+	}
+	// Use baseLine=0 so specs are absolute line numbers, matching the
+	// cmpCtx.baseLine=0 convention used when checking nested pos= in cmpErr.
+	parts := make([]string, len(positions))
+	for i, p := range positions {
+		parts[i] = r.formatPosSpec(p, 0, outerPa.srcFileName)
+	}
+	newAttrText, ok := replacePosSpec(outerText, innerIdx, strings.Join(parts, ", "))
+	if !ok {
+		return
+	}
+	r.pendingPosWrites = append(r.pendingPosWrites, posWrite{
+		fileName:    outerPa.srcFileName,
+		attrOffset:  outerPa.srcAttr.Pos().Offset(),
+		attrLen:     len(outerPa.srcAttr.Text),
+		newAttrText: newAttrText,
+	})
 }
 
 func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUpdate) {
@@ -583,7 +632,7 @@ func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUp
 	for _, u := range updates {
 		parts := make([]string, len(u.positions))
 		for i, p := range u.positions {
-			parts[i] = r.formatPosSpec(p, pa)
+			parts[i] = r.formatPosSpec(p, pa.baseLine, pa.srcFileName)
 		}
 		newPosStr := strings.Join(parts, ", ")
 		newAttrText = replaceSuberrPos(newAttrText, u.expIdx, newPosStr)
@@ -629,17 +678,10 @@ func replaceSuberrPos(attrText string, n int, newPosContent string) string {
 	}
 	// attrText[innerStart:end] is the content inside suberr=(...).
 	inner := attrText[innerStart:end]
-	posIdx := strings.Index(inner, "pos=[")
-	if posIdx < 0 {
+	newInner, ok := replacePosSpec(inner, 0, newPosContent)
+	if !ok {
 		return attrText // no pos= in this suberr group
 	}
-	bracket := posIdx + len("pos=[")
-	closeIdx := strings.Index(inner[bracket:], "]")
-	if closeIdx < 0 {
-		return attrText
-	}
-	closeIdx += bracket + 1 // include "]"
-	newInner := inner[:posIdx] + "pos=[" + newPosContent + "]" + inner[closeIdx:]
 	return attrText[:innerStart] + newInner + attrText[end:]
 }
 
@@ -800,23 +842,12 @@ func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Va
 func (r *inlineRunner) enqueuePosWrite(pa parsedTestAttr, positions []token.Pos) {
 	parts := make([]string, len(positions))
 	for i, p := range positions {
-		parts[i] = r.formatPosSpec(p, pa)
+		parts[i] = r.formatPosSpec(p, pa.baseLine, pa.srcFileName)
 	}
-	newPosStr := strings.Join(parts, ", ")
-
-	old := pa.srcAttr.Text
-	start := strings.Index(old, "pos=[")
-	if start < 0 {
+	newAttrText, ok := replacePosSpec(pa.srcAttr.Text, 0, strings.Join(parts, ", "))
+	if !ok {
 		return
 	}
-	bracket := start + len("pos=[")
-	end := strings.Index(old[bracket:], "]")
-	if end < 0 {
-		return
-	}
-	end += bracket + 1 // include the "]"
-	newAttrText := old[:start] + "pos=[" + newPosStr + "]" + old[end:]
-
 	r.pendingPosWrites = append(r.pendingPosWrites, posWrite{
 		fileName:    pa.srcFileName,
 		attrOffset:  pa.srcAttr.Pos().Offset(),

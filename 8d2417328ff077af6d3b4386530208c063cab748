@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c27f9446_217d0f38",
+        "filename": "cmd/cue/cmd/integration/workspace/organizeimports_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-12T22:38:09Z",
+      "side": 1,
+      "message": "nit: mixing tabs and spaces",
+      "revId": "8d2417328ff077af6d3b4386530208c063cab748",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

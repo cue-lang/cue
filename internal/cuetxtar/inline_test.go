@@ -305,16 +305,33 @@ func makeRec(path string, directive, version string) attrRecord {
 		parsed: parsedTestAttr{
 			directive: directive,
 			version:   version,
+			raw:       internal.ParseAttrBody(token.NoPos, directive),
 		},
 	}
 }
+
+// makeRecAt creates an attrRecord whose @test directive includes an at= field.
+// This is used to test that directives with different at= values are treated
+// as independent assertions and both survive deduplication.
+func makeRecAt(path, directive, atVal string) attrRecord {
+	body := directive + ", at=" + atVal
+	return attrRecord{
+		path: testMakePath(path),
+		parsed: parsedTestAttr{
+			directive: directive,
+			raw:       internal.ParseAttrBody(token.NoPos, body),
+		},
+	}
+}
+
 func TestSelectActiveDirectives(t *testing.T) {
 	tests := []struct {
-		name     string
-		records  []attrRecord
-		path     string
-		version  string
-		wantDirs []string
+		name      string
+		records   []attrRecord
+		path      string
+		version   string
+		wantDirs  []string
+		wantCount int // if non-zero, check exact result count
 	}{
 		{
 			name:     "unversioned applies to all",
@@ -360,10 +377,38 @@ func TestSelectActiveDirectives(t *testing.T) {
 			version:  "v3",
 			wantDirs: []string{"eq", "err"},
 		},
+		{
+			// Two err directives with different at= values must both survive;
+			// a single err without at= would be collapsed to one.
+			name: "multiple err directives with distinct at= values both survive",
+			records: []attrRecord{
+				makeRecAt("field1", "err", "path.a"),
+				makeRecAt("field1", "err", "path.b"),
+			},
+			path:      "field1",
+			version:   "v3",
+			wantDirs:  []string{"err", "err"},
+			wantCount: 2,
+		},
+		{
+			// Same at= value: treated as one directive, last wins.
+			name: "duplicate err directives with same at= value deduplicated",
+			records: []attrRecord{
+				makeRecAt("field1", "err", "path.a"),
+				makeRecAt("field1", "err", "path.a"),
+			},
+			path:      "field1",
+			version:   "v3",
+			wantDirs:  []string{"err"},
+			wantCount: 1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := selectActiveDirectives(tt.records, testMakePath(tt.path), tt.version)
+			if tt.wantCount != 0 && len(got) != tt.wantCount {
+				t.Errorf("got %d results, want %d", len(got), tt.wantCount)
+			}
 			var gotDirs []string
 			for _, pa := range got {
 				gotDirs = append(gotDirs, pa.directive)

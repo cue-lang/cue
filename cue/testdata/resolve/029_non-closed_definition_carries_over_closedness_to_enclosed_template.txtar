@@ -4,26 +4,31 @@
 } @test(eq, {}) @test(closed)
 a: #S & {
 	v: {b: int}
-} @test(err, code=eval, contains="field not allowed", pos=[1:6])
+} @test(err, code=eval, at=v.b, contains="field not allowed", pos=[1:6])
 #Q: {
 	[string]: {a: int} | {b: int}
 } @test(eq, {}) @test(closed)
 b: #Q & {
 	w: {c: int}
-} @test(err, code=eval, contains="field not allowed", pos=[1:6])
+} @test(err, code=eval, at=w, contains="field not allowed", pos=[1:6])
+// NOTE: the above test is marked at w, not w.c, because it fails both
+// disjunctions. We probably want to record it at c, or at least give a better
+// error message.
+@test(err:todo, code=eval, at=b.w.c, contains="field not allowed")
+
 #R: {
 	[string]: [{a: int}, {b: int}]
 } @test(eq, {}) @test(closed)
 c: #R & {
 	w: [{d: int}, ...]
-} @test(err, code=eval, contains="field not allowed", pos=[1:7])
+} @test(err, code=eval, at=w.0.d, contains="field not allowed", pos=[1:7])
 -- out/errors.txt --
 [eval] a.v.b: field not allowed:
     ./in.cue:5:6
 [eval] b.w.c: field not allowed:
     ./in.cue:11:6
 [eval] c.w.0.d: field not allowed:
-    ./in.cue:17:7
+    ./in.cue:22:7
 -- out/compile --
 --- in.cue
 {

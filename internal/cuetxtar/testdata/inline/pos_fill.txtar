@@ -40,4 +40,5 @@ z: {
 	})
 }
 -- out/status.txt --
+update: output passes run
 force:  identical to update

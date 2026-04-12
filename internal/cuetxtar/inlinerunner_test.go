@@ -61,6 +61,18 @@ func TestInlineRunner_Basic(t *testing.T) {
 			name:    "eq passes for selector (math.Pi)",
 			archive: "-- test.cue --\nimport \"math\"\nx: math.Pi @test(eq, math.Pi)\n",
 		},
+		{
+			// Incomplete field (int + 3 where int is abstract) must match _|_ and
+			// must not generate a let-containing struct in the fill output.
+			name:    "eq matches _|_ for incomplete field in struct",
+			archive: "-- test.cue --\na: {b: int}\nc: a & {\n\tb: 100\n\td: a.b + 3\n} @test(eq, {b: 100, d: _|_})\n",
+		},
+		{
+			// @test(err) inside @test(eq) body can carry filled pos= specs.
+			// pos=[3:5] means absolute line 3, col 5 (baseLine=0 convention).
+			name:    "eq with nested @test(err, pos=) passes",
+			archive: "-- test.cue --\na: {b: int}\nc: a & {\n\tb: 100\n\td: a.b + 3\n} @test(eq, {b: 100, d: _|_ @test(err, code=incomplete, pos=[4:5, 1:8])})\n",
+		},
 	}
 
 	for _, tt := range tests {

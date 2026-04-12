@@ -153,9 +153,18 @@ func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value, nestedI
 		return
 	}
 
+	// Error/incomplete values (e.g. int + 3 where int is abstract) — emit _|_.
+	// This avoids the confusing let-containing struct that v.Syntax(Final())
+	// generates when it tries to make the expression self-contained.
+	// astCmp requires _|_ to match only error values.
+	if v.Err() != nil {
+		b.WriteString("_|_")
+		return
+	}
+
 	// Scalar values and lists: fall back to the standard syntax formatter.
 	// cue.Final() resolves defaults and avoids _#def wrapping.
-	syn := v.Syntax(cue.Docs(false), cue.Final(), cue.Optional(true))
+	syn := v.Syntax(cue.Docs(false), cue.Final(), cue.Optional(true), cue.Raw())
 	stripComments(syn)
 	bs, err := format.Node(syn, format.Simplify())
 	if err != nil {

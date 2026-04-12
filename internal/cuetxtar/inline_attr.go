@@ -518,6 +518,18 @@ func appendPath(base cue.Path, label ast.Label, hidPkg string) cue.Path {
 //   - Integer segments as list-index selectors, e.g. "items.0" →
 //     [items, Index(0)].
 //
+// directiveKey returns the deduplication key for a directive. Two directives
+// with the same name but different at= values are independent assertions and
+// must both survive deduplication in selectActiveDirectives.
+func directiveKey(pa parsedTestAttr) string {
+	for i := 1; i < len(pa.raw.Fields); i++ {
+		if kv := pa.raw.Fields[i]; kv.Key() == "at" {
+			return pa.directive + "\x00" + kv.Value()
+		}
+	}
+	return pa.directive
+}
+
 // Dotted paths are split on "." and each segment is processed independently,
 // so "a._foo$pkg.0" works correctly.
 func parseAtPath(at string) (cue.Path, error) {

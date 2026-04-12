@@ -1,5 +1,6 @@
 -- in.cue --
-a: "a" & 1   @test(err, code=eval, contains="conflicting values \"a\" and 1", pos=[0:4, 0:10])
+a: "a" & 1   @test(err, code=eval, contains="conflicting values",
+	args=["a", 1], pos=[0:4, 0:10])
 -- out/errors.txt --
 [eval] a: conflicting values "a" and 1 (mismatched types string and int):
     ./in.cue:1:4

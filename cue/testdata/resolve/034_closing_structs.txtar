@@ -1,22 +1,22 @@
 -- in.cue --
-op: {x: int} @test(eq, {x: int}) // {x: int}
-ot: {x: int, ...} @test(eq, {x: int}) // {x: int, ...}
+op: {x: int}             @test(eq, {x: int}) // {x: int}
+ot: {x: int, ...}        @test(eq, {x: int}) // {x: int, ...}
 cp: close({x: int})      @test(eq, {x: int}) @test(closed) // closed({x: int})
-ct: close({x: int, ...}) @test(eq, {x: int}) @test(closed) @test(shareID=ctct) // {x: int, ...}
+ct: close({x: int, ...}) @test(eq, {x: int}) @test(closed) @test(shareID=ctct) @test(allows, [string])
 
 opot: op & ot @test(eq, {x: int}) // {x: int, ...}
 otop: ot & op @test(eq, {x: int}) // {x: int, ...}
-opcp: op & cp @test(eq, {x: int}) @test(closed) // closed({x: int})
-cpop: cp & op @test(eq, {x: int}) @test(closed) // closed({x: int})
-opct: op & ct @test(eq, {x: int}) @test(closed) // {x: int, ...}
-ctop: ct & op @test(eq, {x: int}) @test(closed) // {x: int, ...}
-otcp: ot & cp @test(eq, {x: int}) @test(closed) // closed({x: int})
-cpot: cp & ot @test(eq, {x: int}) @test(closed) // closed({x: int})
-otct: ot & ct @test(eq, {x: int}) @test(closed) // {x: int, ...}
-ctot: ct & ot @test(eq, {x: int}) @test(closed) // {x: int, ...}
-cpct: cp & ct @test(eq, {x: int}) @test(closed) // closed({x: int})
-ctcp: ct & cp @test(eq, {x: int}) @test(closed) // closed({x: int})
-ctct: ct & ct @test(eq, {x: int}) @test(closed) @test(shareID=ctct) // {x: int, ...}
+opcp: op & cp @test(eq, {x: int}) @test(closed) @test(allows=false, [string])
+cpop: cp & op @test(eq, {x: int}) @test(closed) @test(allows=false, [string])
+opct: op & ct @test(eq, {x: int}) @test(closed) @test(allows, [string])
+ctop: ct & op @test(eq, {x: int}) @test(closed) @test(allows, [string])
+otcp: ot & cp @test(eq, {x: int}) @test(closed) @test(allows, [string]) @test(allows:todo=false, [string])
+cpot: cp & ot @test(eq, {x: int}) @test(closed) @test(allows, [string]) @test(allows:todo=false, [string])
+otct: ot & ct @test(eq, {x: int}) @test(closed) @test(allows, [string])
+ctot: ct & ot @test(eq, {x: int}) @test(closed) @test(allows, [string])
+cpct: cp & ct @test(eq, {x: int}) @test(closed) @test(allows, [string]) @test(allows:todo=false, [string])
+ctcp: ct & cp @test(eq, {x: int}) @test(closed) @test(allows, [string]) @test(allows:todo=false, [string])
+ctct: ct & ct @test(eq, {x: int}) @test(closed) @test(shareID=ctct) @test(allows, [string])
 -- out/compile --
 --- in.cue
 {
@@ -62,3 +62,4 @@ Disjuncts:    0
 NumCloseIDs: 38
 -- out/todo.txt --
 ctct: v2 evaluator expands ctct to a full struct; v3 shares the vertex with ct.
+Note that the output of Allows is incorrect for various cases.

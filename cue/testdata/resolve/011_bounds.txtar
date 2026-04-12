@@ -11,29 +11,29 @@ s4: <10 & !=10        @test(eq, <10)
 s5: !=2 & !=2         @test(eq, !=2)
 
 // TODO: could change inequality
-s6: !=2 & >=2 @test(eq, >=2 & !=2) // >2
-s7: >=2 & !=2 @test(eq, >=2 & !=2) // >2
+s6: !=2 & >=2 @test(eq, >=2 & !=2) @test(eq:todo, >2)
+s7: >=2 & !=2 @test(eq, >=2 & !=2) @test(eq:todo, >2)
 
 s8: !=5 & >5 @test(eq, >5)
 
 s10: >=0 & <=10 & <12 & >1 @test(eq, >1 & <=10) // >1  & <=10
-s11: >0 & >=0 & <=12 & <12 @test(eq, >0 & <12) // >0  & <12
+s11: >0 & >=0 & <=12 & <12 @test(eq, >0 & <12)  // >0  & <12
 
-s20: >=10 & <=10 @test(eq, >=10 & <=10) // 10
+s20: >=10 & <=10 @test(eq, >=10 & <=10) @test(eq:todo, ==10)
 
 s22:  >5 & <=6         @test(eq, >5 & <=6) // no simplification
-s22a: >5 & (<=6 & int) @test(eq, >5 & <=6 & int) // 6
-s22b: (int & >5) & <=6 @test(eq, >5 & <=6 & int) // 6
-s22c: >=5 & (<6 & int) @test(eq, >=5 & <6 & int) // 5
-s22d: (int & >=5) & <6 @test(eq, >=5 & <6 & int) // 5
-s22e: (>=5 & <6) & int @test(eq, >=5 & <6 & int) // 5
-s22f: int & (>=5 & <6) @test(eq, >=5 & <6 & int) // 5
+s22a: >5 & (<=6 & int) @test(eq, >5 & <=6 & int) @test(eq:todo, ==6)
+s22b: (int & >5) & <=6 @test(eq, >5 & <=6 & int) @test(eq:todo, ==6)
+s22c: >=5 & (<6 & int) @test(eq, >=5 & <6 & int) @test(eq:todo, ==5)
+s22d: (int & >=5) & <6 @test(eq, >=5 & <6 & int) @test(eq:todo, ==5)
+s22e: (>=5 & <6) & int @test(eq, >=5 & <6 & int) @test(eq:todo, ==5)
+s22f: int & (>=5 & <6) @test(eq, >=5 & <6 & int) @test(eq:todo, ==5)
 
 s23:  >0 & <2         @test(eq, >0 & <2) // no simplification
-s23a: (>0 & <2) & int @test(eq, >0 & <2 & int) // int & 1
-s23b: int & (>0 & <2) @test(eq, >0 & <2 & int) // int & 1
-s23c: (int & >0) & <2 @test(eq, >0 & <2 & int) // int & 1
-s23d: >0 & (int & <2) @test(eq, >0 & <2 & int) // int & 1
+s23a: (>0 & <2) & int @test(eq, >0 & <2 & int) @test(eq:todo, ==1)
+s23b: int & (>0 & <2) @test(eq, >0 & <2 & int) @test(eq:todo, ==1)
+s23c: (int & >0) & <2 @test(eq, >0 & <2 & int) @test(eq:todo, ==1)
+s23d: >0 & (int & <2) @test(eq, >0 & <2 & int) @test(eq:todo, ==1)
 s23e: >0.0 & <2.0     @test(eq, >0.0 & <2.0) // no simplification
 
 s30: >0 & int @test(eq, >0 & int)
@@ -42,10 +42,10 @@ floats: {
 	[string]: float
 	f1:       <10.0 & <=5.0 @test(eq, <=5.0 & float)
 	f2:       <=10.0 & <5.0 @test(eq, <5.0 & float)
-	f3:       <1.1 & <=1.1 @test(eq, <1.1 & float)
+	f3:       <1.1 & <=1.1  @test(eq, <1.1 & float)
 	f4:       <=1.1 & <=1.1 @test(eq, <=1.1 & float)
-	f5:       >1.1 & >=1.1 @test(eq, >1.1 & float)
-	f6:       >=1.1 & >1.1 @test(eq, >1.1 & float)
+	f5:       >1.1 & >=1.1  @test(eq, >1.1 & float)
+	f6:       >=1.1 & >1.1  @test(eq, >1.1 & float)
 	f7:       >=1.1 & <=1.1 @test(eq, >=1.1 & <=1.1 & float)
 
 	issue1310: >=2.1 & <=1.0 @test(err, code=eval, contains="incompatible number bounds", pos=[0:21, 0:13])
@@ -57,13 +57,13 @@ floats: {
 
 e1: null & !=null @test(err, code=eval, contains="conflicting values null and !=null", pos=[0:5, 0:12])
 e2: !=null & null @test(err, code=eval, contains="conflicting values null and !=null", pos=[0:5, 0:14])
-e3: >1 & 1 @test(err, code=eval, contains="invalid value 1", pos=[0:5, 0:10])
-e4: <0 & 0 @test(err, code=eval, contains="invalid value 0", pos=[0:5, 0:10])
-e5: >1 & <0 @test(err, code=eval, contains="incompatible number bounds", pos=[0:10, 0:5])
-e6: >11 & <11 @test(err, code=eval, contains="incompatible number bounds", pos=[0:11, 0:5])
+e3: >1 & 1     @test(err, code=eval, contains="invalid value 1", pos=[0:5, 0:10])
+e4: <0 & 0     @test(err, code=eval, contains="invalid value 0", pos=[0:5, 0:10])
+e5: >1 & <0    @test(err, code=eval, contains="incompatible number bounds", pos=[0:10, 0:5])
+e6: >11 & <11  @test(err, code=eval, contains="incompatible number bounds", pos=[0:11, 0:5])
 e7: >=11 & <11 @test(err, code=eval, contains="incompatible number bounds", pos=[0:12, 0:5])
 e8: >11 & <=11 @test(err, code=eval, contains="incompatible number bounds", pos=[0:11, 0:5])
-e9: >"a" & <1 @test(err, code=eval, contains="conflicting values", pos=[0:5, 0:12])
+e9: >"a" & <1  @test(err, code=eval, contains="conflicting values", pos=[0:5, 0:12])
 -- out/errors.txt --
 [eval] floats.issue1310: incompatible number bounds <=1.0 and >=2.1:
     ./in.cue:50:21

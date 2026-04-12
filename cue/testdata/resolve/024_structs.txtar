@@ -1,7 +1,7 @@
 -- in.cue --
 a: t & {c:  5}   @test(eq, {c: 5, d: 15}) // {c:5,d:15}
 b: ti & {c: 7}   @test(eq, {c: 7, d: 21}) // {c:7,d:21}
-t: { // {c:number,d:number*3}
+t: {
 	c: number
 	d: c * 3   @test(err, code=incomplete, contains="non-concrete value number in operand to *", pos=[0:5, -1:5])
 }
@@ -16,7 +16,7 @@ ti: t & {c: int}   @test(eq, {
 [incomplete] ti.d: non-concrete value int in operand to *:
     ./in.cue:5:5
     ./in.cue:4:5
-    ./in.cue:7:13
+    ./in.cue:10:13
 -- out/compile --
 --- in.cue
 {

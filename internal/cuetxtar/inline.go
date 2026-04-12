@@ -52,6 +52,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
@@ -825,7 +826,13 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	// marks a known discrepancy recorded by a prior manual annotation.
 	_, hasSkip := attrHasSkip(pa.raw)
 
-	cmpErr := (&cmpCtx{baseLine: 0}).astCmp(cue.Path{}, expr, val)
+	ctx := &cmpCtx{
+		baseLine: 0, // nested pos= specs use absolute line numbers (deltaLine == absLine)
+		posWriteback: func(innerAttrText string, positions []token.Pos) {
+			r.enqueueNestedPosWrite(pa, innerAttrText, positions)
+		},
+	}
+	cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {
 		// Assertion passes via AST comparison.
 		if hasSkip && cuetest.UpdateGoldenFiles {

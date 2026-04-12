@@ -6,12 +6,15 @@ res: [t] @test(eq, [{
 		c: "X"
 	}
 }])
+@test(shareID=T, at=res[0])
+@test(shareID=T, at=t)
 t: [X=string]: {
 	a: c + b.str
 	b: str: string
 	c: "X"
 }
 t: x: {b: str: "DDDD"} @test(eq, {b: {str: "DDDD"}, a: "XDDDD", c: "X"})
+
 -- out/compile --
 --- in.cue
 {

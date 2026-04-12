@@ -606,16 +606,18 @@ func selectActiveDirectives(records []attrRecord, path cue.Path, version string)
 		candidates = append(candidates, entry{pa: pa, versioned: versioned})
 	}
 
-	// For each directive name, prefer the versioned form.
+	// For each (directive, at) pair, prefer the versioned form.
+	// Two directives with the same name but different at= values are independent
+	// assertions and must both survive deduplication.
 	byDirective := make(map[string]parsedTestAttr)
 	hasVersioned := make(map[string]bool)
 	for _, c := range candidates {
-		dir := c.pa.directive
+		key := directiveKey(c.pa)
 		if c.versioned {
-			byDirective[dir] = c.pa
-			hasVersioned[dir] = true
-		} else if !hasVersioned[dir] {
-			byDirective[dir] = c.pa
+			byDirective[key] = c.pa
+			hasVersioned[key] = true
+		} else if !hasVersioned[key] {
+			byDirective[key] = c.pa
 		}
 	}
 

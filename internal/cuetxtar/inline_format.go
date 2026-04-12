@@ -391,17 +391,15 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 	expected := pa.raw.Fields[1].Value()
 	actual := r.debugPrinterOutput(val)
 	match := normalizeLines(actual) == normalizeLines(expected)
-	if match && !cuetest.ForceUpdateGoldenFiles {
+	if match {
 		return
 	}
 	if cuetest.ForceUpdateGoldenFiles || cuetest.UpdateGoldenFiles {
 		r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		return
 	}
-	if !match {
-		t.Errorf("path %s: @test(debugCheck) mismatch:\ngot:  %q\nwant: %q", path, actual, expected)
-		logHint(t, pa.hint)
-	}
+	t.Errorf("path %s: @test(debugCheck) mismatch:\ngot:  %q\nwant: %q", path, actual, expected)
+	logHint(t, pa.hint)
 }
 
 // runDebugOutputInline captures the debug printer output of val as an
@@ -421,7 +419,7 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 	}
 	expected := pa.raw.Fields[1].Value()
 	match := normalizeLines(actual) == normalizeLines(expected)
-	if match && !cuetest.ForceUpdateGoldenFiles {
+	if match {
 		return
 	}
 	// Always auto-update on mismatch (informational, not an assertion).
@@ -429,9 +427,7 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 		r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		return
 	}
-	if !match {
-		t.Logf("path %s: @test(debug) changed:\ngot:  %q\nwant: %q", path, actual, expected)
-	}
+	t.Logf("path %s: @test(debug) changed:\ngot:  %q\nwant: %q", path, actual, expected)
 }
 
 // formatDebugAttr returns the @test(name, ...) attribute text for a debug value.

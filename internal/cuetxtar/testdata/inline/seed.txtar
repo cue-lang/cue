@@ -3,4 +3,5 @@ a: 1 @test(eq)
 -- out/update/test.cue --
 a: 1 @test(eq, 1)
 -- out/status.txt --
+update: output passes run
 force:  identical to update

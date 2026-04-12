@@ -232,7 +232,7 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 				}
 				t.Errorf("path %s: @test(permute): ordering [%s] produces a different result\ngot:  %s\nwant: %s",
 					structPath, strings.Join(permNames, ", "),
-					r.formatValue(permVal), r.formatValue(baseline))
+					r.formatValue(permVal, ""), r.formatValue(baseline, ""))
 			}
 			return
 		}

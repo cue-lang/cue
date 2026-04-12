@@ -1,0 +1,19 @@
+# Tests that CUE_UPDATE=1 emits a @test(err, code=..., contains="...", pos=[...])
+# annotation for error-valued fields when filling a bare @test(eq) body.
+# Positions are filled immediately so the output is stable after a single pass.
+-- in/test.cue --
+x: {
+	a: int
+	b: a + 3
+} @test(eq)
+-- out/update/test.cue --
+x: {
+	a: int
+	b: a + 3
+} @test(eq, {
+	a: int
+	b: _|_ @test(err, code=incomplete, contains="x.b: non-concrete value int in operand to +", pos=[3:5, 2:5])
+})
+-- out/status.txt --
+update: output passes run
+force:  identical to update

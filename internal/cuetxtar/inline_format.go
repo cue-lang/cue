@@ -27,20 +27,35 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/value"
 )
 
+// eqWriter bundles the runner and source file name for writing @test(eq, ...)
+// bodies. Methods on eqWriter access r.formatPosSpec and the opCtx directly,
+// eliminating the need to thread a formatPos closure through every call.
+type eqWriter struct {
+	r           *inlineRunner
+	srcFileName string
+	opCtx       *adt.OpContext
+}
+
+func (w *eqWriter) formatPos(p token.Pos) string {
+	return w.r.formatPosSpec(p, 0, w.srcFileName)
+}
+
 // eqFillAttr builds an @test(eq, <value>[, at=<atStr>]) attribute for fill/force-update.
 func (r *inlineRunner) eqFillAttr(v cue.Value, atStr string, pa parsedTestAttr) string {
 	if r.isError(v) {
 		return "@test(err)"
 	}
-	return r.eqFillAttrStr(r.formatValue(v), atStr, pa)
+	return r.eqFillAttrStr(r.formatValue(v, pa.srcFileName), atStr, pa)
 }
 
 // eqFillAttrStr builds @test(eq, <exprStr>[, at=<atStr>]).
@@ -90,7 +105,7 @@ func compactCUEExpr(s string) string {
 }
 
 // eqCompactThreshold is the maximum byte length of a compact struct expression
-// before eqWriteValue switches to multi-line (one field per line) form.
+// before writeValue switches to multi-line (one field per line) form.
 const eqCompactThreshold = 40
 
 // formatValue returns a human-readable CUE string for a value.
@@ -98,13 +113,14 @@ const eqCompactThreshold = 40
 // form exceeds eqCompactThreshold are returned in multi-line form with
 // recursive indentation; eqFillAttrStr handles re-indentation relative to the
 // source attribute line.
-func (r *inlineRunner) formatValue(v cue.Value) string {
+func (r *inlineRunner) formatValue(v cue.Value, srcFileName string) string {
 	var b strings.Builder
-	eqWriteValue(value.OpContext(v), &b, v, "\t")
+	w := &eqWriter{r: r, srcFileName: srcFileName, opCtx: value.OpContext(v)}
+	w.writeValue(&b, v, "\t")
 	return b.String()
 }
 
-// eqWriteValue writes a CUE value to b in @test(eq, ...) body notation.
+// writeValue writes a CUE value to b in @test(eq, ...) body notation.
 //
 // nestedIndent controls multi-line formatting for struct values: when non-empty,
 // a struct whose compact form exceeds eqCompactThreshold is written in
@@ -119,16 +135,16 @@ func (r *inlineRunner) formatValue(v cue.Value) string {
 //   - adt.Disjunction values are emitted as *d1 | d2 (with * for defaults)
 //     instead of being collapsed to the default by cue.Final().
 //   - adt.Conjunction values are emitted as c1 & c2.
-func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value, nestedIndent string) {
+func (w *eqWriter) writeValue(b *strings.Builder, v cue.Value, nestedIndent string) {
 	tv := v.Core()
 	vx := tv.V.DerefValue()
 
 	switch bv := vx.BaseValue.(type) {
 	case *adt.Disjunction:
-		eqWriteDisjunction(opCtx, b, bv)
+		w.writeDisjunction(b, bv)
 		return
 	case *adt.Conjunction:
-		eqWriteConjunction(opCtx, b, bv)
+		w.writeConjunction(b, bv)
 		return
 	}
 
@@ -143,13 +159,13 @@ func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value, nestedI
 		if nestedIndent != "" {
 			// Multi-line mode: use compact if it fits, else recurse one level deeper.
 			var compact strings.Builder
-			eqWriteStruct(opCtx, &compact, vx, "")
+			w.writeStruct(&compact, vx, "")
 			if compact.Len() <= eqCompactThreshold {
 				b.WriteString(compact.String())
 				return
 			}
 		}
-		eqWriteStruct(opCtx, b, vx, nestedIndent)
+		w.writeStruct(b, vx, nestedIndent)
 		return
 	}
 
@@ -157,6 +173,7 @@ func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value, nestedI
 	// This avoids the confusing let-containing struct that v.Syntax(Final())
 	// generates when it tries to make the expression self-contained.
 	// astCmp requires _|_ to match only error values.
+	// writeStruct adds the @test(err, ...) annotation after _|_ for field arcs.
 	if v.Err() != nil {
 		b.WriteString("_|_")
 		return
@@ -174,8 +191,8 @@ func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value, nestedI
 	}
 }
 
-// eqWriteDisjunction emits disjuncts as *d1 | d2 | d3 (defaults first with *).
-func eqWriteDisjunction(opCtx *adt.OpContext, b *strings.Builder, dj *adt.Disjunction) {
+// writeDisjunction emits disjuncts as *d1 | d2 | d3 (defaults first with *).
+func (w *eqWriter) writeDisjunction(b *strings.Builder, dj *adt.Disjunction) {
 	for i, v := range dj.Values {
 		if i > 0 {
 			b.WriteString(" | ")
@@ -183,28 +200,71 @@ func eqWriteDisjunction(opCtx *adt.OpContext, b *strings.Builder, dj *adt.Disjun
 		if i < dj.NumDefaults {
 			b.WriteByte('*')
 		}
-		eqWriteValue(opCtx, b, value.Make(opCtx, v), "")
+		w.writeValue(b, value.Make(w.opCtx, v), "")
 	}
 }
 
-// eqWriteConjunction emits conjuncts as c1 & c2 & c3.
-func eqWriteConjunction(opCtx *adt.OpContext, b *strings.Builder, conj *adt.Conjunction) {
+// writeConjunction emits conjuncts as c1 & c2 & c3.
+func (w *eqWriter) writeConjunction(b *strings.Builder, conj *adt.Conjunction) {
 	for i, v := range conj.Values {
 		if i > 0 {
 			b.WriteString(" & ")
 		}
-		eqWriteValue(opCtx, b, value.Make(opCtx, v), "")
+		w.writeValue(b, value.Make(w.opCtx, v), "")
 	}
 }
 
-// eqWriteStruct emits a struct using _foo$pkg notation for hidden-field labels.
+// isLeafError reports whether writeValue would render v as bare _|_
+// (i.e. an error that is neither a struct with child arcs nor a list).
+// Used by writeStruct to decide whether to append a @test(err, ...) annotation.
+func isLeafError(v cue.Value) bool {
+	if v.Err() == nil {
+		return false
+	}
+	tv := v.Core()
+	vx := tv.V.DerefValue()
+	k := v.IncompleteKind()
+	return !((k == cue.StructKind || len(vx.Arcs) > 0) && k != cue.ListKind)
+}
+
+// writeErrAnnotation appends a @test(err, code=..., contains="...", pos=[...])
+// annotation for a leaf error arc value. code=, contains=, and pos= are all
+// filled immediately from the actual error so the annotation is stable after a
+// single CUE_UPDATE=1 pass.
+func (w *eqWriter) writeErrAnnotation(b *strings.Builder, v cue.Value) {
+	tv := v.Core()
+	if tv.V == nil {
+		return
+	}
+	bot := tv.V.DerefValue().Bottom()
+	if bot == nil {
+		return
+	}
+	b.WriteString(" @test(err, code=")
+	b.WriteString(bot.Code.String())
+	if bot.Err != nil {
+		fmt.Fprintf(b, ", contains=%q", bot.Err.Error())
+	}
+	// Fill positions immediately so the annotation is stable in one pass.
+	positions := cueerrors.Positions(v.Err())
+	b.WriteString(", pos=[")
+	for i, p := range positions {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(w.formatPos(p))
+	}
+	b.WriteString("])")
+}
+
+// writeStruct emits a struct using _foo$pkg notation for hidden-field labels.
 //
 // nestedIndent controls layout:
 //   - ""  (compact): fields are separated by ", ".
 //   - non-empty: each field is preceded by "\n"+nestedIndent; the closing "}"
 //     is preceded by "\n"+nestedIndent[:-1] (one tab less). Field values
 //     receive nestedIndent+"\t" so they can recurse one level deeper.
-func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex, nestedIndent string) {
+func (w *eqWriter) writeStruct(b *strings.Builder, vx *adt.Vertex, nestedIndent string) {
 	b.WriteByte('{')
 	first := true
 	for _, arc := range vx.Arcs {
@@ -215,7 +275,7 @@ func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex, nes
 		// module path (e.g. "mod.test/pkg") which cannot be encoded as a
 		// valid CUE identifier in the $pkg suffix notation.
 		if arc.Label.IsHidden() {
-			pkg := arc.Label.PkgID(opCtx)
+			pkg := arc.Label.PkgID(w.opCtx)
 			if pkg != "_" && !strings.HasPrefix(pkg, ":") {
 				continue
 			}
@@ -226,9 +286,15 @@ func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex, nes
 			b.WriteString(", ")
 		}
 		first = false
-		eqWriteLabel(opCtx, b, arc.Label, arc.ArcType)
+		eqWriteLabel(w.opCtx, b, arc.Label, arc.ArcType)
 		b.WriteString(": ")
-		eqWriteValue(opCtx, b, value.Make(opCtx, arc), nestedIndent+"\t")
+		arcVal := value.Make(w.opCtx, arc)
+		w.writeValue(b, arcVal, nestedIndent+"\t")
+		// For leaf error fields, append a @test(err, ...) annotation with
+		// actual error details and immediately-filled positions.
+		if isLeafError(arcVal) {
+			w.writeErrAnnotation(b, arcVal)
+		}
 	}
 	if nestedIndent != "" && !first {
 		b.WriteString("\n" + nestedIndent[:len(nestedIndent)-1])
@@ -240,7 +306,7 @@ func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex, nes
 // For hidden labels the $pkg qualifier is included when the field is
 // package-scoped (pkg != "_"). Callers must ensure the label's PkgID is
 // either "_" or colon-prefixed (inline package) before calling — see
-// the skip guard in eqWriteStruct.
+// the skip guard in writeStruct.
 func eqWriteLabel(opCtx *adt.OpContext, b *strings.Builder, f adt.Feature, arcType adt.ArcType) {
 	if f.IsHidden() {
 		name := f.IdentString(opCtx)

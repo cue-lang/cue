@@ -96,9 +96,9 @@ func (r *inlineRunner) applyInlineFillWritebacks() {
 // formatCoverAttr returns the @test attribute text to insert for a field whose
 // evaluated value is v.  For non-error values this is @test(eq, <value>).
 // For error values it falls back to a bare @test(err) placeholder.
-func (r *inlineRunner) formatCoverAttr(v cue.Value) string {
+func (r *inlineRunner) formatCoverAttr(v cue.Value, srcFileName string) string {
 	if r.isError(v) {
 		return "@test(err)"
 	}
-	return fmt.Sprintf("@test(eq, %s)", r.formatValue(v))
+	return fmt.Sprintf("@test(eq, %s)", r.formatValue(v, srcFileName))
 }

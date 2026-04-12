@@ -151,6 +151,24 @@ func runUpdateTest(t *testing.T, filePath string) {
 		staleMsg:    "out/update/ sections present but update produces same result as input (run with CUE_UPDATE=1 to remove)",
 	})
 
+	// --- Plain run on update output ---
+	// When update changed the source, run the updated files as a fresh test to
+	// verify the update output is itself a passing test. This replaces the need
+	// for separate *_run.txtar files that duplicate the update output as input.
+	updateOutputPasses := updateIdentical // trivially true when nothing changed
+	if !updateIdentical {
+		capUR := &cuetxtar.FailCapture{TB: t}
+		withUpdateMode(false, false, func() {
+			runner := cuetxtar.NewInlineRunnerCapture(t, nil, cloneTxtarArchive(update1), t.TempDir(), capUR)
+			runner.Run()
+		})
+		if errs := capUR.Messages(); errs != "" {
+			t.Errorf("plain run of update output produced errors:\n%s", errs)
+		} else {
+			updateOutputPasses = true
+		}
+	}
+
 	// --- Force update (CUE_UPDATE=force) ---
 	// out/force/ sections: present only when force produces a different result than update.
 
@@ -178,6 +196,8 @@ func runUpdateTest(t *testing.T, filePath string) {
 	var statusLines []string
 	if updateIdentical {
 		statusLines = append(statusLines, "update: identical to input")
+	} else if updateOutputPasses {
+		statusLines = append(statusLines, "update: output passes run")
 	}
 	if !forceDiffers {
 		statusLines = append(statusLines, "force:  identical to update")

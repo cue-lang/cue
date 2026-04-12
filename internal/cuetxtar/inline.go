@@ -791,7 +791,7 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 	case "":
 		// Empty placeholder @test() — fill with actual value when CUE_UPDATE=1.
 		if cuetest.UpdateGoldenFiles {
-			r.enqueueInlineFill(pa, r.formatCoverAttr(val))
+			r.enqueueInlineFill(pa, r.formatCoverAttr(val, pa.srcFileName))
 		}
 	default:
 		t.Errorf("path %s: unknown @test directive %q", path, pa.directive)
@@ -880,6 +880,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		posWriteback: func(innerAttrText string, positions []token.Pos) {
 			r.enqueueNestedPosWrite(pa, innerAttrText, positions)
 		},
+		formatPos: func(p token.Pos) string { return r.formatPosSpec(p, 0, pa.srcFileName) },
 	}
 	cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {

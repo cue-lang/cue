@@ -44,6 +44,16 @@ type cmpCtx struct {
 	// innerAttrText is the raw text of the inner @test(err,...) attribute
 	// (used to locate it within the outer @test(eq,...) source text).
 	posWriteback func(innerAttrText string, positions []token.Pos)
+	// formatPos, when non-nil, formats a token.Pos for error messages.
+	// When nil, positions are formatted as line:col.
+	formatPos func(token.Pos) string
+}
+
+func (c *cmpCtx) fmtPos(p token.Pos) string {
+	if c.formatPos != nil {
+		return c.formatPos(p)
+	}
+	return fmt.Sprintf("%d:%d", p.Line(), p.Column())
 }
 
 // astCompare compares a parsed CUE AST expression against an evaluated
@@ -678,7 +688,7 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 		if len(positions) != len(ea.pos) {
 			var got []string
 			for _, p := range positions {
-				got = append(got, fmt.Sprintf("%d:%d", p.Line(), p.Column()))
+				got = append(got, c.fmtPos(p))
 			}
 			msg := formatPosCountMismatch("@test(err, pos=...)", len(positions), len(ea.pos))
 			return pathErr(path, "%s %v", msg, got)
@@ -710,7 +720,7 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 			if !found {
 				var got []string
 				for _, p := range positions {
-					got = append(got, fmt.Sprintf("%d:%d", p.Line(), p.Column()))
+					got = append(got, c.fmtPos(p))
 				}
 				wantLine := c.baseLine + exp.deltaLine
 				return pathErr(path, "@test(err, pos=...): no match for expected position %d:%d in %v",

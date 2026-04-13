@@ -41,18 +41,18 @@ func Extract(filename string, src any) (*ast.File, error) {
 	}
 	a := []ast.Expr{}
 	d := cueyaml.NewDecoder(filename, data)
+	var expr ast.Expr
 	for {
-		expr, err := d.Decode()
+		expr, err = d.Decode()
+		if expr != nil {
+			a = append(a, expr)
+		}
 		if err != nil {
-			if err != io.EOF {
-				return nil, err
-			}
-			if expr != nil {
-				a = append(a, expr)
+			if err == io.EOF {
+				err = nil
 			}
 			break
 		}
-		a = append(a, expr)
 	}
 	f := &ast.File{Filename: filename}
 	switch len(a) {
@@ -67,7 +67,7 @@ func Extract(filename string, src any) (*ast.File, error) {
 	default:
 		f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: &ast.ListLit{Elts: a}}}
 	}
-	return f, nil
+	return f, err
 }
 
 // Encode returns the YAML encoding of v.

@@ -405,19 +405,26 @@ func (d *decoder) Decode() (ast.Expr, error) {
 // Unmarshal parses a single YAML value to a CUE expression.
 func Unmarshal(filename string, data []byte) (ast.Expr, error) {
 	d := NewDecoder(filename, data)
-	n, err := d.Decode()
-	if err != nil {
-		if err == io.EOF {
+	n, firstErr := d.Decode()
+	if n == nil && firstErr != nil {
+		if firstErr == io.EOF {
 			return nil, nil // empty input
 		}
-		return nil, err
+		return nil, firstErr
 	}
+	// Check there's no second document.
 	if n2, err := d.Decode(); err == nil {
 		return nil, fmt.Errorf("%s: expected a single YAML document", n2.Pos())
 	} else if err != io.EOF {
-		return nil, fmt.Errorf("expected a single YAML document: %v", err)
+		// If the first Decode succeeded with a partial result, the second
+		// call may return the parse error. That's fine — we have our single
+		// document. But if the second call returns an actual second document
+		// and error, report the multi-document issue.
+		if n2 != nil {
+			return nil, fmt.Errorf("%s: expected a single YAML document", n2.Pos())
+		}
 	}
-	return n, nil
+	return n, firstErr
 }
 
 // goccyOffset converts a goccy AST node's position to a 0-based byte offset.
@@ -680,20 +687,38 @@ func (d *decoder) isCommentLine(lineIdx int) bool {
 }
 
 // scopeEndBefore computes the scope end before the given YAML node,
-// excluding any head comments and their surrounding blank lines.
+// excluding any head comments and their surrounding blank lines from
+// the scope. This ensures that comments belonging to the next sibling
+// are not consumed by the current node's scope.
 func (d *decoder) scopeEndBefore(n gast.Node) int {
 	line := goccyLine(n)
 	end := d.tokLines[line-1]
-	lineIdx := line - 2
-	for lineIdx >= 0 && d.isBlankLine(lineIdx) {
-		lineIdx--
+
+	// Check if the node has head comments by looking for comment lines
+	// immediately above it (possibly separated by blank lines).
+	// Only skip blank/comment lines when they belong to the next node's
+	// head comments. Without head comments, the blank lines belong to
+	// the current node's scope.
+	lineIdx := line - 2 // 0-indexed line just before the node
+
+	// First check for blank lines, then comment lines.
+	blankStart := lineIdx
+	for blankStart >= 0 && d.isBlankLine(blankStart) {
+		blankStart--
 	}
-	for lineIdx >= 0 && d.isCommentLine(lineIdx) {
-		lineIdx--
+	// Check if there are comment lines above the blank lines.
+	commentStart := blankStart
+	for commentStart >= 0 && d.isCommentLine(commentStart) {
+		commentStart--
 	}
-	if lineIdx < line-2 {
-		return d.tokLines[lineIdx+1]
+
+	if commentStart < blankStart {
+		// There are comment lines above blank lines: the comments are head
+		// comments for the next node. Exclude them and their surrounding blanks.
+		return d.tokLines[commentStart+1]
 	}
+	// No head comments — the blank lines are just separators and belong
+	// to the current node's scope.
 	return end
 }
 
@@ -883,6 +908,12 @@ func (d *decoder) tagged(n *gast.TagNode) (ast.Expr, error) {
 			// Convert YAML 1.1 octal to CUE octal.
 			if len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9' {
 				value = "0o" + value[1:]
+			}
+			// Validate that the value is actually a number.
+			var info literal.NumInfo
+			if err := literal.ParseNum(value, &info); err != nil {
+				return nil, fmt.Errorf("%s:%d: cannot decode %q as !!float: %v",
+					d.tokFile.Name(), goccyLine(n), value, err)
 			}
 			if strings.IndexAny(value, ".eEiInN") == -1 {
 				value = fmt.Sprintf("number & %s", value)
@@ -1178,7 +1209,12 @@ func (d *decoder) label(key gast.MapKeyNode) (ast.Label, error) {
 		if !ok {
 			return nil, fmt.Errorf("%s:%d: unknown anchor %q", d.tokFile.Name(), goccyLine(node), name)
 		}
-		return d.label(target.(gast.MapKeyNode))
+		mapKey, ok := target.(gast.MapKeyNode)
+		if !ok {
+			return nil, fmt.Errorf("%s:%d: alias %q resolves to non-scalar %T, cannot use as map key",
+				d.tokFile.Name(), goccyLine(node), name, target)
+		}
+		return d.label(mapKey)
 	default:
 		return nil, fmt.Errorf("%s:%d: invalid map key type: %T",
 			d.tokFile.Name(), goccyLine(node), key)
@@ -1279,11 +1315,11 @@ func (d *decoder) sequence(yn *gast.SequenceNode) (ast.Expr, error) {
 func (d *decoder) alias(yn *gast.AliasNode) (ast.Expr, error) {
 	name := yn.Value.GetToken().Value
 	if d.extractingAliases[name] {
-		return nil, fmt.Errorf("anchor %q value contains itself", name)
+		return nil, fmt.Errorf("%s: anchor %q value contains itself", d.tokFile.Name(), name)
 	}
 	target, ok := d.anchors[name]
 	if !ok {
-		return nil, fmt.Errorf("unknown anchor %q", name)
+		return nil, fmt.Errorf("%s: unknown anchor %q referenced", d.tokFile.Name(), name)
 	}
 
 	if d.extractingAliases == nil {
@@ -1312,7 +1348,7 @@ func (d *decoder) alias(yn *gast.AliasNode) (ast.Expr, error) {
 
 	// Override brace/bracket positions for container types to the alias site.
 	aliasStart := d.goccyOffset(yn)
-	aliasEnd := aliasStart + 1 + len(name) // *name
+	aliasEnd := aliasStart + len(name) // *name: alias ends at last char of name
 	switch n := node.(type) {
 	case *ast.StructLit:
 		n.Lbrace = d.tokFile.Pos(aliasStart, token.Blank)
@@ -1342,7 +1378,7 @@ func (d *decoder) merge(yn gast.Node, m *ast.StructLit, multiline bool) error {
 		name := n.Value.GetToken().Value
 		target, ok := d.anchors[name]
 		if !ok {
-			return fmt.Errorf("unknown anchor %q in merge", name)
+			return fmt.Errorf("%s: unknown anchor %q referenced in merge", d.tokFile.Name(), name)
 		}
 		// Unwrap anchor if the target is an anchor node.
 		if anchor, ok := target.(*gast.AnchorNode); ok {
@@ -1351,7 +1387,7 @@ func (d *decoder) merge(yn gast.Node, m *ast.StructLit, multiline bool) error {
 		if mapping, ok := target.(*gast.MappingNode); ok {
 			return d.insertMap(mapping.Values, m, multiline, true, d.scopeEnd)
 		}
-		return fmt.Errorf("map merge requires map as the value")
+		return fmt.Errorf("%s: map merge requires map as the value", d.tokFile.Name())
 	case *gast.SequenceNode:
 		// Merge sequence of maps in reverse order (earlier takes precedence).
 		for i := len(n.Values) - 1; i >= 0; i-- {
@@ -1361,7 +1397,7 @@ func (d *decoder) merge(yn gast.Node, m *ast.StructLit, multiline bool) error {
 		}
 		return nil
 	default:
-		return fmt.Errorf("map merge requires map or sequence of maps as the value")
+		return fmt.Errorf("%s: map merge requires map or sequence of maps as the value", d.tokFile.Name())
 	}
 }
 

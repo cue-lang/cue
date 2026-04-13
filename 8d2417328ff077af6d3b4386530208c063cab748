@@ -16,6 +16,24 @@
       "message": "nit: mixing tabs and spaces",
       "revId": "8d2417328ff077af6d3b4386530208c063cab748",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89b5e21e_de43053c",
+        "filename": "cmd/cue/cmd/integration/workspace/organizeimports_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-13T10:18:04Z",
+      "side": 1,
+      "message": "Yes, this is deliberate.",
+      "parentUuid": "c27f9446_217d0f38",
+      "revId": "8d2417328ff077af6d3b4386530208c063cab748",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

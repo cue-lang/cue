@@ -16,6 +16,24 @@
       "message": "I think you will want to gate this on the first cue versions that will accept this. Otherwise people can write cue with this using an otherwise older language version which than will not work on older versions.",
       "revId": "2046a84ddc41999802227569568f7140f8fba3d4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9e40a57_d78d9ef5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-13T13:59:36Z",
+      "side": 1,
+      "message": "as discussed, this is tightening the spec, not the implementation, so that\u0027s not a concern",
+      "parentUuid": "b1687669_44dd5d4f",
+      "revId": "2046a84ddc41999802227569568f7140f8fba3d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

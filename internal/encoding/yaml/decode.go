@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"sort"
 	"strings"
 	"unicode/utf16"
 
+	gyaml "github.com/goccy/go-yaml"
 	gast "github.com/goccy/go-yaml/ast"
+	glexer "github.com/goccy/go-yaml/lexer"
 	gparser "github.com/goccy/go-yaml/parser"
 	gtoken "github.com/goccy/go-yaml/token"
 
@@ -40,6 +43,11 @@ type decoder struct {
 
 	// decodeErr is returned by any further calls to Decode when not nil.
 	decodeErr error
+
+	// parseErr records an error from parsing (possibly with partial recovery).
+	// When non-nil and docs is also non-nil, it indicates a partial result:
+	// the docs contain the successfully parsed prefix of the input.
+	parseErr error
 
 	// isEmpty is true when the input was entirely empty (no content, not even ---).
 	isEmpty bool
@@ -82,10 +90,6 @@ func NewDecoder(filename string, b []byte) *decoder {
 	// YAML 1.1 allows UTF-16 with BOM; goccy only handles UTF-8.
 	b = decodeUTF16BOM(b)
 
-	// goccy's scanner rejects tab characters in some contexts where
-	// yaml.v3 accepted them. We handle this by retrying with tab
-	// replacement if parsing fails (see parseWithTabRetry).
-
 	// Note that we add an extra byte to the file size to handle edge cases
 	// where a position might be just past the end of the input.
 	tokFile := token.NewFile(filename, 0, len(b)+1)
@@ -104,31 +108,171 @@ func NewDecoder(filename string, b []byte) *decoder {
 		return d
 	}
 
-	file, err := gparser.ParseBytes(b, gparser.ParseComments)
-	if err != nil && bytes.ContainsRune(b, '\t') {
-		// goccy rejects tabs in some places where yaml.v3 accepted them.
-		// Retry with tabs replaced by spaces.
-		b2 := bytes.ReplaceAll(b, []byte("\t"), []byte(" "))
-		file2, err2 := gparser.ParseBytes(b2, gparser.ParseComments)
-		if err2 == nil {
-			file = file2
-			err = nil
-			// Update source and line table for the tab-replaced input.
-			d.src = b2
-			tokFile2 := token.NewFile(filename, 0, len(b2)+1)
-			tokFile2.SetLinesForContent(b2)
-			d.tokFile = tokFile2
-			d.tokLines = append(tokFile2.Lines(), len(b2))
-		}
+	file, err := d.parseYAML(b)
+	if file != nil && hasContent(file) {
+		d.docs = file.Docs
 	}
 	if err != nil {
-		e := err.Error()
-		d.decodeErr = fmt.Errorf("%s: %s", filename, e)
-	} else if file != nil {
-		d.docs = file.Docs
+		fmtErr := fmt.Errorf("%s: %s", filename, err)
+		if len(d.docs) > 0 {
+			// Partial result: we recovered some content despite errors.
+			d.parseErr = fmtErr
+		} else {
+			// Total failure: no content recovered.
+			d.decodeErr = fmtErr
+		}
 	}
 
 	return d
+}
+
+// parseYAML tokenizes and parses YAML input with error recovery.
+//
+// Rather than using gparser.ParseBytes directly, we use the lower-level
+// lexer.Tokenize + parser.Parse pipeline. This gives us control over
+// error recovery: when parsing fails, we can truncate the token stream
+// at the error position and retry, yielding a partial AST for everything
+// before the first error.
+//
+// The recovery strategy has two levels:
+//
+//  1. Scanner errors: goccy's lexer produces InvalidType tokens for
+//     scanner-level errors (e.g. tab characters in indentation).
+//     We strip these and everything after them before parsing.
+//
+//  2. Parser errors: when the parser rejects structurally valid tokens
+//     (e.g. unclosed brackets, unexpected keys), its error includes
+//     the offending token's position. We truncate before that position
+//     and retry. This typically converges in 1–2 iterations.
+//
+// If the original input contains tabs that cause scanner errors, we
+// also attempt parsing with tabs replaced by spaces as a fallback.
+func (d *decoder) parseYAML(b []byte) (*gast.File, error) {
+	file, firstErr := d.parseWithRecovery(string(b))
+	if firstErr == nil {
+		return file, nil
+	}
+
+	// If the error might be tab-related, retry with tabs replaced.
+	if bytes.ContainsRune(b, '\t') {
+		b2 := bytes.ReplaceAll(b, []byte("\t"), []byte(" "))
+		file2, err2 := d.parseWithRecovery(string(b2))
+		if err2 == nil || (file2 != nil && hasContent(file2)) {
+			// Update source and line table for the tab-replaced input.
+			d.src = b2
+			tokFile2 := token.NewFile(d.tokFile.Name(), 0, len(b2)+1)
+			tokFile2.SetLinesForContent(b2)
+			d.tokFile = tokFile2
+			d.tokLines = append(tokFile2.Lines(), len(b2))
+			d.scopeEnd = len(b2)
+			return file2, err2
+		}
+	}
+
+	return file, firstErr
+}
+
+// parseWithRecovery tokenizes src and attempts to parse it, falling
+// back to progressively shorter token prefixes on parse errors.
+// It returns the best AST it can produce, along with the first error
+// encountered (which may be non-nil even when a partial AST is returned).
+func (d *decoder) parseWithRecovery(src string) (*gast.File, error) {
+	tokens := glexer.Tokenize(src)
+
+	// Level 1: strip invalid tokens (scanner-level errors like tabs).
+	var firstErr error
+	validTokens := stripInvalidTokens(tokens, &firstErr)
+
+	// Try parsing the valid token prefix.
+	file, err := gparser.Parse(validTokens, gparser.ParseComments)
+	if err == nil {
+		return file, firstErr // firstErr may be non-nil if we stripped tokens
+	}
+	if firstErr == nil {
+		firstErr = err
+	}
+
+	// Level 2: parser-level recovery. Use the error's token position
+	// to truncate before the problematic area and retry.
+	for range 10 {
+		errTok := syntaxErrorToken(err)
+		if errTok == nil || errTok.Position == nil {
+			// No position info; drop the last token and retry.
+			if len(validTokens) == 0 {
+				break
+			}
+			validTokens = validTokens[:len(validTokens)-1]
+		} else {
+			shorter := truncateTokensBefore(validTokens, errTok.Position.Line, errTok.Position.Column)
+			if len(shorter) == len(validTokens) {
+				// No progress from position-based truncation; drop last token.
+				if len(validTokens) == 0 {
+					break
+				}
+				validTokens = validTokens[:len(validTokens)-1]
+			} else {
+				validTokens = shorter
+			}
+		}
+
+		if len(validTokens) == 0 {
+			break
+		}
+		file, err = gparser.Parse(validTokens, gparser.ParseComments)
+		if err == nil {
+			return file, firstErr
+		}
+	}
+
+	// All recovery attempts failed. Return whatever we have.
+	return file, firstErr
+}
+
+// stripInvalidTokens returns the prefix of tokens up to (but not including)
+// the first InvalidType token. If an invalid token is found, *errOut is set
+// to an error describing it (if *errOut is nil).
+func stripInvalidTokens(tokens gtoken.Tokens, errOut *error) gtoken.Tokens {
+	for i, tk := range tokens {
+		if tk.Type == gtoken.InvalidType {
+			if *errOut == nil {
+				*errOut = fmt.Errorf("%s (at line %d)", tk.Error, tk.Position.Line)
+			}
+			return tokens[:i]
+		}
+	}
+	return tokens
+}
+
+// truncateTokensBefore returns the prefix of tokens that appear strictly
+// before the given line and column.
+func truncateTokensBefore(tokens gtoken.Tokens, line, col int) gtoken.Tokens {
+	for i, tk := range tokens {
+		if tk.Position.Line > line ||
+			(tk.Position.Line == line && tk.Position.Column >= col) {
+			return tokens[:i]
+		}
+	}
+	return tokens
+}
+
+// syntaxErrorToken extracts the offending token from a goccy parse error.
+func syntaxErrorToken(err error) *gtoken.Token {
+	var se *gyaml.SyntaxError
+	if errors.As(err, &se) {
+		return se.GetToken()
+	}
+	return nil
+}
+
+// hasContent reports whether a parsed YAML file has at least one
+// document with a non-nil body.
+func hasContent(f *gast.File) bool {
+	for _, doc := range f.Docs {
+		if doc.Body != nil {
+			return true
+		}
+	}
+	return false
 }
 
 // decodeUTF16BOM detects a UTF-16 LE or BE BOM at the start of b
@@ -171,6 +315,13 @@ func decodeUTF16BOM(b []byte) []byte {
 //
 // A nil node with an io.EOF error is returned once no more YAML values
 // are available for decoding.
+//
+// When the YAML input contains errors, Decode uses error recovery to
+// return a partial AST for the valid prefix of the input. In this case,
+// the returned expression is non-nil AND the error is non-nil: the
+// expression contains whatever could be parsed, and the error describes
+// what went wrong. Callers that want best-effort results (e.g. LSP)
+// should check the expression even when the error is non-nil.
 func (d *decoder) Decode() (ast.Expr, error) {
 	if err := d.decodeErr; err != nil {
 		return nil, err
@@ -201,6 +352,14 @@ func (d *decoder) Decode() (ast.Expr, error) {
 	}
 
 	if d.docIdx >= len(d.docs) {
+		if d.parseErr != nil {
+			// We had a partial recovery: return the parse error now
+			// that all recovered documents have been consumed.
+			err := d.parseErr
+			d.parseErr = nil
+			d.decodeErr = io.EOF
+			return nil, err
+		}
 		d.decodeErr = io.EOF
 		return nil, io.EOF
 	}
@@ -222,7 +381,22 @@ func (d *decoder) Decode() (ast.Expr, error) {
 			// Skip directive-only documents.
 			continue
 		}
-		return d.extract(doc.Body)
+		expr, err := d.extract(doc.Body)
+		if err != nil {
+			return expr, err
+		}
+		// If this is the last document and we had recovery errors,
+		// return both the expression and the error.
+		if d.docIdx >= len(d.docs) && d.parseErr != nil {
+			return expr, d.parseErr
+		}
+		return expr, nil
+	}
+	if d.parseErr != nil {
+		err := d.parseErr
+		d.parseErr = nil
+		d.decodeErr = io.EOF
+		return nil, err
 	}
 	d.decodeErr = io.EOF
 	return nil, io.EOF

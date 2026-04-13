@@ -1357,3 +1357,86 @@ func TestTrailingInput(t *testing.T) {
 	}
 
 }
+
+// TestDecodeRecovery tests that the decoder produces partial AST results
+// when the YAML input contains errors. This is important for the LSP
+// where we want to provide completions/diagnostics even when the user
+// is mid-edit and the file is temporarily invalid.
+func TestDecodeRecovery(t *testing.T) {
+	tests := []struct {
+		name string
+		data string
+		// want is the CUE output from the recovered partial AST.
+		// Empty string means no content was recovered.
+		want string
+		// wantErr indicates whether an error is expected.
+		wantErr bool
+	}{
+		{
+			name: "valid input",
+			data: "a: 1\nb: 2\n",
+			want: "a: 1\nb: 2",
+		},
+		{
+			name:    "garbage in middle",
+			data:    "a: 1\n{{{invalid\nc: 3\n",
+			want:    "a: 1",
+			wantErr: true,
+		},
+		{
+			name:    "unclosed bracket at end",
+			data:    "foo: bar\nbaz:\n  - 1\n  - 2\nbroken: [\n",
+			want:    "foo: \"bar\"\nbaz: [\n\t1,\n\t2,\n]\nbroken: null",
+			wantErr: true,
+		},
+		{
+			name:    "valid start, broken end",
+			data:    "x: 1\ny: 2\nz: 3\nbroken: {{{ !!!\na: 10\nb: 20\n",
+			want:    "x:      1\ny:      2\nz:      3\nbroken: null",
+			wantErr: true,
+		},
+		{
+			name: "typing in progress, incomplete key",
+			data: "a: 1\nb: 2\nc:\n",
+			want: "a: 1\nb: 2\nc: null",
+		},
+		{
+			name: "typing in progress, incomplete value",
+			data: "name: Alice\nage: 30\naddress:\n  street: 123 Main\n  city:\n",
+			want: "name: \"Alice\"\nage:  30\naddress: {\n\tstreet: \"123 Main\"\n\tcity:   null\n}",
+		},
+		{
+			name:    "completely broken",
+			data:    "{{{",
+			want:    "",
+			wantErr: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			dec := yaml.NewDecoder("test.yaml", []byte(tc.data))
+			expr, err := dec.Decode()
+
+			got := ""
+			if expr != nil {
+				got = cueStr(expr)
+			}
+
+			if tc.wantErr && err == nil {
+				t.Errorf("expected an error but got nil")
+			}
+			if !tc.wantErr && err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+
+			if got != tc.want {
+				t.Errorf("CUE output mismatch:\n  got:  %q\n  want: %q", got, tc.want)
+			}
+
+			if err != nil && expr != nil {
+				t.Logf("partial recovery succeeded: got %d bytes of CUE from invalid YAML (error: %v)", len(got), err)
+			}
+		})
+	}
+}

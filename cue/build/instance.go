@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modfiledata"
+	"cuelang.org/go/mod/module"
 )
 
 // An Instance describes the collection of files, and its imports, necessary
@@ -87,6 +88,12 @@ type Instance struct {
 	// the packages within the directory structure of the module are to be
 	// imported by other packages, including those within the module.
 	Module string
+
+	// ModuleVersion holds the resolved module version for the package.
+	// For packages from external dependencies, this includes the full
+	// resolved version. For packages in the main module, the version
+	// will be empty.
+	ModuleVersion module.Version
 
 	// ModuleFile holds the actual module file data, if available.
 	ModuleFile *modfiledata.File

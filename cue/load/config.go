@@ -603,6 +603,9 @@ func (c *Config) newErrInstance(err error) *build.Instance {
 	i := c.Context.NewInstance("", nil)
 	i.Root = c.ModuleRoot
 	i.Module = c.Module
+	if c.Module != "" {
+		i.ModuleVersion, _ = module.NewVersion(c.Module, "")
+	}
 	i.ModuleFile = c.modFile
 	i.Err = errors.Promote(err, "")
 	if c.FS != nil {

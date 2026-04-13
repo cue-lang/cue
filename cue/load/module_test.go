@@ -19,6 +19,7 @@ import (
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/modregistrytest"
+	"cuelang.org/go/mod/module"
 )
 
 func TestModuleLoadWithInvalidRegistryConfig(t *testing.T) {
@@ -144,6 +145,58 @@ func writeInstanceInfo(t *testing.T, w io.Writer, inst *build.Instance, depth in
 	for _, f := range inst.Files {
 		qt.Check(t, qt.Equals(f.LanguageVersion, inst.ModuleFile.Language.Version), qt.Commentf("pkg %v", inst.ImportPath))
 	}
+}
+
+func TestInstanceModuleVersion(t *testing.T) {
+	a := txtar.Parse([]byte(`
+-- cue.mod/module.cue --
+module: "main.test"
+language: version: "v0.9.0"
+deps: "example.com@v0": v: "v0.0.1"
+-- main.cue --
+package main
+import "example.com@v0:foo"
+foo
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_v0.0.1/foo.cue --
+package foo
+foo: "bar"
+`))
+	tfs, err := txtar.FS(a)
+	qt.Assert(t, qt.IsNil(err))
+	rfs, err := fs.Sub(tfs, "_registry")
+	qt.Assert(t, qt.IsNil(err))
+	r, err := modregistrytest.New(rfs, "")
+	qt.Assert(t, qt.IsNil(err))
+	defer r.Close()
+
+	dir := t.TempDir()
+	cfg := &load.Config{
+		Dir:     dir,
+		Overlay: map[string]load.Source{},
+		Env: []string{
+			"CUE_CACHE_DIR=" + filepath.Join(dir, "cache"),
+			"CUE_REGISTRY=" + r.Host() + "+insecure",
+		},
+	}
+	for _, f := range a.Files {
+		if !strings.HasPrefix(f.Name, "_registry/") {
+			cfg.Overlay[filepath.Join(dir, f.Name)] = load.FromBytes(f.Data)
+		}
+	}
+	defer modcache.RemoveAll(filepath.Join(dir, "cache"))
+	insts := load.Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.HasLen(insts, 1))
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+
+	// Main module instance should have the module path but no version.
+	qt.Assert(t, qt.Equals(insts[0].ModuleVersion, module.MustNewVersion("main.test@v0", "")))
+
+	// External dependency should have the full resolved version.
+	qt.Assert(t, qt.HasLen(insts[0].Imports, 1))
+	qt.Assert(t, qt.Equals(insts[0].Imports[0].ModuleVersion, module.MustNewVersion("example.com@v0", "v0.0.1")))
 }
 
 func TestExplicitCUEFilesGetModuleVersion(t *testing.T) {

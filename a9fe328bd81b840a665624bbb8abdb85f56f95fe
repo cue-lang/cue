@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b4bd5b4_5177c983",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-13T10:55:06Z",
+      "side": 1,
+      "message": "I\u0027ve moved the packages to cue/inject and set up forwarding logic for the only function that is likely to cause issues for users (embed.New).",
+      "parentUuid": "47afc23d_662a9b7a",
+      "revId": "a9fe328bd81b840a665624bbb8abdb85f56f95fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9c67bbe_091f54ac",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "It\u0027s no more public than it was before AFAICS. For now, we\u0027re just renaming things, not changing visibility.\n\nWe can\u0027t refer to cuecontext.Injector here that would result in a cyclic dependency, as cuecontext imports this interpreter/embed.\n\nIn the future, we\u0027ll probably need another package (cue/inject ?) where the public interfaces are defined but for now I think this should be OK.",
       "parentUuid": "f9c67bbe_091f54ac",
+      "revId": "a9fe328bd81b840a665624bbb8abdb85f56f95fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39ee97a0_902e862e",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-13T10:55:06Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "fadf6cc0_63d7a137",
       "revId": "a9fe328bd81b840a665624bbb8abdb85f56f95fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

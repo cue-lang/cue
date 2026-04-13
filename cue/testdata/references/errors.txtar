@@ -1,7 +1,7 @@
 -- references.cue --
 missingField: {
 	a: {}
-	r: a.b @test(err, code=incomplete, contains="missingField.r: undefined field: b", pos=[0:7])
+	r: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:7])
 }
 
 missingFieldClosed: {

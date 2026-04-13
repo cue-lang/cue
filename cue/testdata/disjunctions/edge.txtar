@@ -35,6 +35,7 @@ cyclicalInsertInDisjunction: {
 		// resolve x to a concrete value. As `x` is defined outside the
 		// disjunction, and the disjunction cannot be resolved without it, `x`
 		// cannot be evaluated to a concrete value, resulting in an error.
+		@test(permute)
 		x: c.e
 		c: d: x
 		c: {d: 1, e: 2} | {d : 2, e: 2}
@@ -45,6 +46,9 @@ cyclicalInsertInDisjunction: {
 		// requires a concrete value for c.e. However, the disjunction can only
 		// be disambiguated as a result of computing x. This means c.e cannot
 		// be concrete at the time of evaluation.
+		// NOTE: not so obvious. It clearly works, and arguably it should.
+		@test(permute)
+		@test(permuteCount, 6)
 		x: div(c.e, 2)
 		c: d: x
 		c: {d: 1, e: 2} | {d : 2, e: 3}
@@ -53,11 +57,12 @@ cyclicalInsertInDisjunction: {
 	err3: {
 		// Here it is clear that d will not disambiguate the disjunction at c.
 		// So c.e. cannot be resolved.
-		x: c.e
+		@test(permute)
+		x: c.e @test(err, code=incomplete, contains="unresolved disjunction", pos=[0:6])
 		c: d: 1 | 2 | x
 		c: {d: 1, e: 2} | {d : 2, e: 3}
 		@test(eq, {
-			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction", pos=[50:6])
+			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction", pos=[55:6])
 			c: {d: 1, e: 2} | {d: 2, e: 3}
 		})
 	}
@@ -67,7 +72,7 @@ cyclicalInsertInDisjunction: {
 		err1: {x: 2, c: {d: 2, e: 2}}
 		err2: {x: 1, c: {d: 1, e: 2}}
 		err3: {
-			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct)", pos=[50:6])
+			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct)", pos=[55:6])
 			c: {d: 1, e: 2} | {d: 2, e: 3}
 		}
 	})
@@ -103,7 +108,7 @@ cyclicSelfElimination: ok: {
 issue4251_notC: {
 	#NotC: x={
 		string
-		_must: true & x != "c"
+		_must: true & x != "c" @test(err, code=incomplete, contains="non-concrete value string in operand to !=", pos=[0:17, -2:11, -1:3])
 	}
 	@test(err, at=#NotC._must, =incomplete, contains="non-concrete value string in operand to !=", pos=[3:17, 1:11, 2:3])
 
@@ -114,7 +119,7 @@ issue4251_notC: {
 issue4251_notB: {
 	#NotB: x={
 		string
-		_must: true & x != "b"
+		_must: true & x != "b" @test(err, code=incomplete, contains="non-concrete value string in operand to !=", pos=[0:17, -2:11, -1:3])
 	}
 	@test(err, at=#NotB._must, code=incomplete, contains="non-concrete value string in operand to !=", pos=[3:17, 1:11, 2:3])
 	a: #NotB
@@ -124,7 +129,7 @@ issue4251_notB: {
 issue4251_notB_reversed: {
 	#NotB: x={
 		string
-		_must: true & x != "b"
+		_must: true & x != "b" @test(err, code=incomplete, contains="non-concrete value string in operand to !=", pos=[0:17, -2:11, -1:3])
 	}
 	@test(err, at=#NotB._must, code=incomplete, contains="non-concrete value string in operand to !=", pos=[3:17, 1:11, 2:3])
 	a: #NotB
@@ -149,7 +154,9 @@ panic1: {
 	objs: obj1: {
 		type: #TypeFoo | #TypeBar
 		type: *objs["missing"] | #TypeFoo | #TypeBar
-	}
+	} 	@test(eq, {
+		type: {name: "foo", foo_field: string} | {bar_field?: string, name: "bar"}
+	})
 
 	out: #TypeFoo | #TypeBar
 	out: objs["obj1"].type
@@ -167,19 +174,19 @@ panic1: {
 }
 -- out/errors.txt --
 [incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
-    ./in.cue:50:6
+    ./in.cue:55:6
 [incomplete] issue4251_notC.#NotC._must: non-concrete value string in operand to !=:
-    ./in.cue:100:17
-    ./in.cue:98:11
-    ./in.cue:99:3
+    ./in.cue:105:17
+    ./in.cue:103:11
+    ./in.cue:104:3
 [incomplete] issue4251_notB.#NotB._must: non-concrete value string in operand to !=:
-    ./in.cue:111:17
-    ./in.cue:109:11
-    ./in.cue:110:3
+    ./in.cue:116:17
+    ./in.cue:114:11
+    ./in.cue:115:3
 [incomplete] issue4251_notB_reversed.#NotB._must: non-concrete value string in operand to !=:
-    ./in.cue:121:17
-    ./in.cue:119:11
-    ./in.cue:120:3
+    ./in.cue:126:17
+    ./in.cue:124:11
+    ./in.cue:125:3
 -- out/eval/stats --
 Leaks:  24
 Freed:  175

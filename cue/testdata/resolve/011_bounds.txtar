@@ -52,7 +52,6 @@ floats: {
 	fe2:       >2.1 & <=2.1 @test(err, code=eval, contains="incompatible number bounds", pos=[0:20, 0:13])
 
 	fe3: float & >2 & <=3 @test(eq, >2 & <=3 & float)
-	@test(err, code=eval)
 }
 
 e1: null & !=null @test(err, code=eval, contains="conflicting values null and !=null", pos=[0:5, 0:12])
@@ -72,32 +71,32 @@ e9: >"a" & <1  @test(err, code=eval, contains="conflicting values", pos=[0:5, 0:
     ./in.cue:51:20
     ./in.cue:51:13
 [eval] e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):
-    ./in.cue:57:5
-    ./in.cue:57:12
+    ./in.cue:56:5
+    ./in.cue:56:12
 [eval] e2: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):
-    ./in.cue:58:5
-    ./in.cue:58:14
+    ./in.cue:57:5
+    ./in.cue:57:14
 [eval] e3: invalid value 1 (out of bound >1):
+    ./in.cue:58:5
+    ./in.cue:58:10
+[eval] e4: invalid value 0 (out of bound <0):
     ./in.cue:59:5
     ./in.cue:59:10
-[eval] e4: invalid value 0 (out of bound <0):
-    ./in.cue:60:5
-    ./in.cue:60:10
 [eval] e5: incompatible number bounds <0 and >1:
-    ./in.cue:61:10
-    ./in.cue:61:5
+    ./in.cue:60:10
+    ./in.cue:60:5
 [eval] e6: incompatible number bounds <11 and >11:
-    ./in.cue:62:11
-    ./in.cue:62:5
+    ./in.cue:61:11
+    ./in.cue:61:5
 [eval] e7: incompatible number bounds <11 and >=11:
-    ./in.cue:63:12
-    ./in.cue:63:5
+    ./in.cue:62:12
+    ./in.cue:62:5
 [eval] e8: incompatible number bounds <=11 and >11:
-    ./in.cue:64:11
-    ./in.cue:64:5
+    ./in.cue:63:11
+    ./in.cue:63:5
 [eval] e9: conflicting values >"a" and <1 (mismatched types string and number):
-    ./in.cue:65:5
-    ./in.cue:65:12
+    ./in.cue:64:5
+    ./in.cue:64:12
 -- out/compile --
 --- in.cue
 {

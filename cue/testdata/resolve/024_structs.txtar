@@ -16,7 +16,7 @@ ti: t & {c: int}   @test(eq, {
 [incomplete] ti.d: non-concrete value int in operand to *:
     ./in.cue:5:5
     ./in.cue:4:5
-    ./in.cue:10:13
+    ./in.cue:7:13
 -- out/compile --
 --- in.cue
 {

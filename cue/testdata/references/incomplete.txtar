@@ -4,7 +4,7 @@ comprehensions: {
 	b: {
 		if a.b {
 		}
-	}
+	} @test(err, code=incomplete, contains="undefined field: b", pos=[1:8])
 	c: {
 		for x in a.b {x}
 	}
@@ -26,20 +26,12 @@ openStruct: {
 
 selectFromTop: {
 	top: _
-	a:   top.foo
-	@test(eq, {
-		top: _
-		a: _|_ @test(err, code=incomplete, contains="selectFromTop.a: top.foo undefined as top is incomplete (type _)", pos=[28:7])
-	})
+	a:   top.foo @test(err, code=incomplete, contains="top.foo undefined as top is incomplete", pos=[0:7])
 }
 
 indexOnTop: {
 	top: _
-	a:   top[2]
-	@test(eq, {
-		top: _
-		a: _|_ @test(err, code=incomplete, contains="indexOnTop.a: top[2] undefined as top is incomplete (type _)", pos=[37:7])
-	})
+	a:   top[2] @test(err, code=incomplete, contains="top[2] undefined as top is incomplete", pos=[0:7])
 }
 
 incompleteIndex: {
@@ -56,10 +48,10 @@ incompleteIndex: {
 [incomplete] selectFromTop.a: top.foo undefined as top is incomplete (type _):
     ./in.cue:28:7
 [incomplete] indexOnTop.a: top[2] undefined as top is incomplete (type _):
-    ./in.cue:37:7
+    ./in.cue:33:7
 [eval] incompleteIndex.a: invalid index top (invalid type _):
-    ./in.cue:46:7
-    ./in.cue:46:11
+    ./in.cue:38:7
+    ./in.cue:38:11
 -- out/eval/stats --
 Leaks:  0
 Freed:  19

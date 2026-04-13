@@ -35,6 +35,7 @@ variant: {
 err: {
 	A: "forty two"
 	if A < 100 {B: true}
+	@test(err, code=eval, contains="invalid operands", pos=[2:5, 1:5, 2:9])
 }
 -- out/errors.txt --
 [eval] err: invalid operands "forty two" and 100 to '<' (type string and int):

@@ -4,11 +4,12 @@
 d: {a: 1, b?: 3} | {a: 2} @test(eq, {a: 1, b?: 3} | {a: 2})
 
 // the following conjunction should not eliminate any disjuncts
-c: d & {b?: 4} @test(eq, {b?: _|_ @test(err, code=eval, contains="c.b: conflicting values 3 and 4", pos=[1:15, 4:4, 4:13]), a: 1} | {b?: 4, a: 2})
-        // [eval] c.b: conflicting values 3 and 4:
-        //     ./in.cue:1:15
-        //     ./in.cue:4:4
-        //     ./in.cue:4:13
+c: d & {b?: 4} @test(eq, {
+	b?: _|_ @test(err, code=eval, contains="conflicting values", args=[3, 4], pos=[1:15, 4:4, 4:13])
+	a: 1
+} | {
+	b?: 4, a: 2
+})
 -- out/compile --
 --- in.cue
 {

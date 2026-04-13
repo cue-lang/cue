@@ -16,7 +16,7 @@ incompleteError1: {
 		kv: joel: "testing"
 	}
 	@test(eq, {
-		MyType: {kv: {}}
+		MyType: {kv: struct.MinFields(1)}
 		foo: {kv: {joel: "testing"}}
 	})
 }
@@ -24,24 +24,21 @@ incompleteError1: {
 incompleteError2: {
 	MyType: {
 		kv: [string]: string
-		kv: struct.MinFields(1)
+		kv: struct.MinFields(1) @test(err, code=incomplete,
+			contains="does not satisfy struct.MinFields(1)", pos=[0:7, -1:7, 0:24])
 	}
 
 	foo: MyType & {
 		kv: joel: "testing"
-	}
-	@test(eq, {
-		MyType: {
-			kv: _|_ @test(err, code=incomplete, contains="incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)", pos=[26:7, 25:7, 26:24])
-		}
-		foo: {kv: {joel: "testing"}}
+	} @test(eq, {
+		kv: {joel: "testing"}
 	})
 }
 
 incompleteError3: {
 	t: string
 	t: json.Validate(string)
-	@test(eq, {t: json.Validate(string) & string})
+	@test(eq, {t: string & json.Validate(string)})
 }
 
 uniqueConstrains1: {
@@ -54,31 +51,25 @@ uniqueConstrains1: {
 uniqueConstrains2: {
 	t: struct.MaxFields(1)
 	t: struct.MaxFields(1)
-	@test(eq, {t: {}})
+	@test(eq, {t: struct.MaxFields(1)})
 }
 
 violation: {
 	#MyType: {
 		kv: [string]: string
-		kv: struct.MinFields(1)
+		kv: struct.MinFields(1) @test(err, code=incomplete, contains="does not satisfy struct.MinFields(1)", pos=[0:7, -1:7, 0:24])
 	}
 
 	foo: #MyType & {
 		kv: joel: "testing"
 		kv: tony: "testing"
-	}
-	@test(eq, {
-		#MyType: {
-			kv: _|_ @test(err, code=incomplete, contains="violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)", pos=[62:7, 61:7, 62:24])
-		}
-		foo: {kv: {joel: "testing", tony: "testing"}}
-	})
+	} @test(eq, {kv: {joel: "testing", tony: "testing"}})
 }
 
 conjuncts: {
 	kv: struct.MinFields(1)
 	kv: struct.MaxFields(3)
-	@test(eq, {kv: {} & {}})
+	@test(eq, {kv: struct.MinFields(1) & struct.MaxFields(3)})
 }
 
 // TODO: stripe off conflicting pairs
@@ -92,7 +83,7 @@ conjuncts: {
 bareBuiltin: {
 	a: json.Valid
 	a: json.Valid
-	@test(eq, {a: json.Valid()})
+	@test(eq, { a: json.Valid() })
 }
 
 bareBuiltinCheck: {
@@ -115,8 +106,8 @@ builtinValidatorCheck: {
 
 callOfCallToValidator: {
 	a: json.Valid
-	b: a()
-	e: b() // not allowed
+	b: a() @test(eq, { json.Valid() })
+	e: b() @test(err, code=eval, contains="cannot call previously called validator", pos=[0:5])
 	e: "5"
 }
 
@@ -133,39 +124,42 @@ issue2098: ok1: {
 	_a: [1, ...]
 	_a: list.MinItems(1)
 	_a[0]
-	@test(eq, {_a: [1]})
+	@test(eq, {_a: [1], 1})
 }
 
 issue2098: incomplete1: {
 	_a: [...]
 	_a: list.MinItems(1)
 	_a[0]
+	@test(err, code=incomplete, contains="index out of range", pos=[3:5])
 }
-
-@test(err, code=eval, at=callOfCallToValidator.e, contains="cannot call previously called validator", pos=[-26:5])
-@test(err, code=incomplete, at=issue2098.incomplete1, contains="index out of range", pos=[-4:5])
 
 -- issue3418.cue --
 // issue3418: Tests that matchN correctly reports validation failures when
 // combined with conflicting constraints, regardless of operand order.
 // https://cuelang.org/issue/3418
-issue3418: t1: "foo" & matchN(1, [1&2]) & matchN(1, [_])
-issue3418: t2: "foo" & matchN(1, [_]) & matchN(1, [1&2])
+issue3418: t1: "foo" & matchN(1, [1&2]) & matchN(1, [_]) @test(err, code=eval,
+	contains="does not satisfy matchN", pos=[0:24, 0:16, 0:31, 0:35, 0:37])
+
+issue3418: t2: "foo" & matchN(1, [_]) & matchN(1, [1&2]) @test(err, code=eval,
+	contains="does not satisfy matchN", pos=[0:41, 0:16, 0:48, 0:52, 0:54])
+
 issue3418: t3: {
 	x: "foo"
 	x: matchN(1, [_])
 	x: matchN(1, [1&2])
+
+	@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[3:5, 1:5, 2:5, 3:12, 3:16, 3:18])
+
 }
 issue3418: t4: {
 	x: "foo"
 	x: matchN(1, [1&2])
 	x: matchN(1, [_])
+
+	@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[2:5, 1:5, 2:12, 2:16, 2:18, 3:5])
 }
 
-@test(err, code=eval, at=issue3418.t1, contains="does not satisfy matchN", pos=[-13:24, -13:16, -13:31, -13:35, -13:37])
-@test(err, code=eval, at=issue3418.t2, contains="does not satisfy matchN", pos=[-13:41, -13:16, -13:48, -13:52, -13:54])
-@test(err, code=eval, at=issue3418.t3.x, contains="does not satisfy matchN", pos=[-10:5, -12:5, -11:5, -10:12, -10:16, -10:18])
-@test(err, code=eval, at=issue3418.t4.x, contains="does not satisfy matchN", pos=[-7:5, -8:5, -7:12, -7:16, -7:18, -6:5])
 
 -- issue3474.cue --
 import "struct"
@@ -186,24 +180,21 @@ issue3474: structValidator: failAfter: {
 	A: {
 		C: true
 		if true {B: true}
-	}
+	} @test(err, code=eval, contains="does not satisfy struct.MaxFields(1)", pos=[-1:5, -1:22, 0:5])
 }
 issue3474: structValidator: incomplete: {
 	// Passes neither before nor after the comprehension is evaluated.
 	A: struct.MinFields(1)
 	A: {
 		if true {}
-	}
-	@test(eq, {
-		A: _|_ @test(err, code=incomplete, contains="issue3474.structValidator.incomplete.A: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)", pos=[23:5, 23:22, 24:5])
-	})
+	} @test(err, code=incomplete, contains="len(fields) < MinFields(1) (0 < 1)", pos=[-1:5, -1:22, 0:5])
 }
 issue3474: structValidator: failClosed: {
 	// Passes neither before nor after the comprehension is evaluated.
 	#A: struct.MinFields(1)
 	#A: {
 		if true {}
-	}
+	} @test(err, code=eval, contains="does not satisfy struct.MinFields", pos=[-1:6, -1:23, 0:6])
 }
 
 
@@ -218,7 +209,8 @@ issue3474: topValidator: fail: {
 	A: matchN(1, [>10])
 	A: {
 		if true {1}
-	}
+	} @test(err, code=eval, contains="does not satisfy matchN", pos=[-1:5, -1:12, 0:5, 1:12])
+
 }
 issue3474: topValidator: incomplete: {
 	A: matchN(1, [>10])
@@ -231,13 +223,8 @@ issue3474: topValidator: failType: {
 	A: matchN(1, [>10])
 	A: {
 		if true {C: 1}
-	}
+	} @test(err, code=eval, contains="does not satisfy matchN", pos=[-1:5, -1:12, 0:5])
 }
-
-@test(err, code=eval, at=issue3474.structValidator.failAfter.A, contains="does not satisfy struct.MaxFields", pos=[-52:5, -52:22, -51:5])
-@test(err, code=eval, at=issue3474.structValidator.failClosed.#A, contains="does not satisfy struct.MinFields", pos=[-35:6, -35:23, -34:6])
-@test(err, code=eval, at=issue3474.topValidator.fail.A, contains="does not satisfy matchN", pos=[-21:5, -21:12, -20:5, -19:12])
-@test(err, code=eval, at=issue3474.topValidator.failType.A, contains="does not satisfy matchN", pos=[-9:5, -9:12, -8:5])
 
 -- validator_is_top.cue --
 // issue3639: Tests that embedding a matchN validator struct alongside direct
@@ -248,9 +235,7 @@ issue3639: {
 	#X: matchN(1, [{b: int}])
 	@test(eq, {
 		a: {b: 1}
-		#X: matchN(1, [{
-		b: int
-	}])
+		#X: matchN(1, [{ b: int }])
 	})
 }
 // issue3661: Tests that matchN with a required field validator works when
@@ -261,9 +246,7 @@ issue3661: {
 	a: #X
 	["a"]: #X
 	@test(eq, {
-		#X: matchN(1, [{
-		b!: int
-	}])
+		#X: matchN(1, [{ b!: int }])
 		a: {b: 1}
 	})
 }
@@ -282,11 +265,7 @@ issue3678: {
 	y: x
 	x: #X
 	@test(eq, {
-		#X: matchN(1, [{
-		a!: string
-	}, {
-		c!: string
-	}])
+		#X: matchN(1, [{ a!: string }, { c!: string }])
 		x: {c: "c"}
 		y: {c: "c"}
 	})
@@ -311,13 +290,13 @@ issue3981: matchWithClose: {
     ./in.cue:25:7
     ./in.cue:26:24
 [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
-    ./in.cue:62:7
-    ./in.cue:61:7
-    ./in.cue:62:24
+    ./in.cue:59:7
+    ./in.cue:58:7
+    ./in.cue:59:24
 [eval] callOfCallToValidator.e: cannot call previously called validator b:
-    ./in.cue:118:5
+    ./in.cue:109:5
 [incomplete] issue2098.incomplete1: index out of range [0] with length 1:
-    ./in.cue:141:5
+    ./in.cue:132:5
 [eval] issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
     ./issue3418.cue:4:24
     ./issue3418.cue:4:16
@@ -325,25 +304,25 @@ issue3981: matchWithClose: {
     ./issue3418.cue:4:35
     ./issue3418.cue:4:37
 [eval] issue3418.t2: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
-    ./issue3418.cue:5:41
-    ./issue3418.cue:5:16
-    ./issue3418.cue:5:48
-    ./issue3418.cue:5:52
-    ./issue3418.cue:5:54
+    ./issue3418.cue:7:41
+    ./issue3418.cue:7:16
+    ./issue3418.cue:7:48
+    ./issue3418.cue:7:52
+    ./issue3418.cue:7:54
 [eval] issue3418.t3.x: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
-    ./issue3418.cue:9:5
-    ./issue3418.cue:7:5
-    ./issue3418.cue:8:5
-    ./issue3418.cue:9:12
-    ./issue3418.cue:9:16
-    ./issue3418.cue:9:18
-[eval] issue3418.t4.x: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
     ./issue3418.cue:13:5
+    ./issue3418.cue:11:5
     ./issue3418.cue:12:5
     ./issue3418.cue:13:12
     ./issue3418.cue:13:16
     ./issue3418.cue:13:18
-    ./issue3418.cue:14:5
+[eval] issue3418.t4.x: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
+    ./issue3418.cue:20:5
+    ./issue3418.cue:19:5
+    ./issue3418.cue:20:12
+    ./issue3418.cue:20:16
+    ./issue3418.cue:20:18
+    ./issue3418.cue:21:5
 [eval] issue3474.structValidator.failAfter.A: invalid value {C:true,B:true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
     ./issue3474.cue:15:5
     ./issue3474.cue:15:22
@@ -353,25 +332,25 @@ issue3981: matchWithClose: {
     ./issue3474.cue:23:22
     ./issue3474.cue:24:5
 [eval] issue3474.structValidator.failClosed.#A: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
-    ./issue3474.cue:33:6
-    ./issue3474.cue:33:23
-    ./issue3474.cue:34:6
+    ./issue3474.cue:30:6
+    ./issue3474.cue:30:23
+    ./issue3474.cue:31:6
 [eval] issue3474.topValidator.fail.A: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
-    ./issue3474.cue:48:5
-    ./issue3474.cue:48:12
-    ./issue3474.cue:49:5
-    ./issue3474.cue:50:12
+    ./issue3474.cue:45:5
+    ./issue3474.cue:45:12
+    ./issue3474.cue:46:5
+    ./issue3474.cue:47:12
 issue3474.topValidator.fail.A: invalid value 1 (out of bound >10):
-    ./issue3474.cue:48:16
-    ./issue3474.cue:50:12
+    ./issue3474.cue:45:16
+    ./issue3474.cue:47:12
 [eval] issue3474.topValidator.failType.A: conflicting values {C:1} and >10 (mismatched types struct and number):
-    ./issue3474.cue:61:5
-    ./issue3474.cue:61:16
-    ./issue3474.cue:62:5
+    ./issue3474.cue:59:5
+    ./issue3474.cue:59:16
+    ./issue3474.cue:60:5
 issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
-    ./issue3474.cue:61:5
-    ./issue3474.cue:61:12
-    ./issue3474.cue:62:5
+    ./issue3474.cue:59:5
+    ./issue3474.cue:59:12
+    ./issue3474.cue:60:5
 -- out/todo.txt --
 issue3474.topValidator.failType.A: v2 reports "conflicting values >10 and {C:1}" (number and struct order), v3 reports "{C:1} and >10" (struct and number order).
 -- out/eval/stats --
@@ -392,7 +371,7 @@ NumCloseIDs: 76
 {
   incompleteError1: {
     MyType: {
-      kv: struct.MinFields(1)
+      kv: 〈import;struct〉.MinFields(1)
     }
     foo: (〈0;MyType〉 & {
       kv: {
@@ -405,7 +384,7 @@ NumCloseIDs: 76
       kv: {
         [string]: string
       }
-      kv: struct.MinFields(1)
+      kv: 〈import;struct〉.MinFields(1)
     }
     foo: (〈0;MyType〉 & {
       kv: {
@@ -423,15 +402,15 @@ NumCloseIDs: 76
     t: 〈import;"encoding/json"〉.Validate(string)
   }
   uniqueConstrains2: {
-    t: struct.MaxFields(1)
-    t: struct.MaxFields(1)
+    t: 〈import;struct〉.MaxFields(1)
+    t: 〈import;struct〉.MaxFields(1)
   }
   violation: {
     #MyType: {
       kv: {
         [string]: string
       }
-      kv: struct.MinFields(1)
+      kv: 〈import;struct〉.MinFields(1)
     }
     foo: (〈0;#MyType〉 & {
       kv: {
@@ -443,8 +422,8 @@ NumCloseIDs: 76
     })
   }
   conjuncts: {
-    kv: struct.MinFields(1)
-    kv: struct.MaxFields(3)
+    kv: 〈import;struct〉.MinFields(1)
+    kv: 〈import;struct〉.MaxFields(3)
   }
   bareBuiltin: {
     a: 〈import;"encoding/json"〉.Valid
@@ -479,7 +458,7 @@ NumCloseIDs: 76
         1,
         ...,
       ]
-      _a: list.MinItems(1)
+      _a: 〈import;list〉.MinItems(1)
       〈0;_a〉[0]
     }
   }
@@ -488,7 +467,7 @@ NumCloseIDs: 76
       _a: [
         ...,
       ]
-      _a: list.MinItems(1)
+      _a: 〈import;list〉.MinItems(1)
       〈0;_a〉[0]
     }
   }
@@ -537,7 +516,7 @@ NumCloseIDs: 76
   issue3474: {
     structValidator: {
       ok: {
-        A: struct.MinFields(1)
+        A: 〈import;struct〉.MinFields(1)
         A: {
           if true {
             B: true
@@ -549,7 +528,7 @@ NumCloseIDs: 76
   issue3474: {
     structValidator: {
       failAfter: {
-        A: struct.MaxFields(1)
+        A: 〈import;struct〉.MaxFields(1)
         A: {
           C: true
           if true {
@@ -562,7 +541,7 @@ NumCloseIDs: 76
   issue3474: {
     structValidator: {
       incomplete: {
-        A: struct.MinFields(1)
+        A: 〈import;struct〉.MinFields(1)
         A: {
           if true {}
         }
@@ -572,7 +551,7 @@ NumCloseIDs: 76
   issue3474: {
     structValidator: {
       failClosed: {
-        #A: struct.MinFields(1)
+        #A: 〈import;struct〉.MinFields(1)
         #A: {
           if true {}
         }

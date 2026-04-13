@@ -95,7 +95,7 @@ e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:
     a: 1
     #b: 3
   }
-  e7: 〈0;def〉["b"]
+  e10: 〈0;def〉["b"]
 }
 -- out/eval/stats --
 Leaks:  0

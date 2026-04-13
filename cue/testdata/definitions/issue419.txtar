@@ -18,7 +18,15 @@ l: [
 	{b: "bar"},
 ]
 
-_lFirst: l[0] @test(eq, {b: "bar"})
+_lFirst: l[0]
+
+@test(eq, {
+	#A: {a: string}
+	#B: {b: string}
+	#X: {a: string} | {b: string}
+	l: [{ b: "bar" }]
+	_lFirst: {b: "bar"}
+})
 -- out/eval/stats --
 Leaks:  2
 Freed:  16
@@ -50,4 +58,5 @@ NumCloseIDs: 5
       b: "bar"
     },
   ]
+  _lFirst: 〈0;l〉[0]
 }

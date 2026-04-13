@@ -111,12 +111,6 @@ issue1116: {
 		#a: ["a", "b"]
 	}
 }
-	        // [incomplete] incompleteLet.bar.mx: undefined field: max:
-	        //     in.cue:54:17
-	        // [incomplete] incompleteLet.bar.max: undefined field: max:
-	        //     in.cue:54:17
-	      // [incomplete] incompleteLet.x: undefined field: max:
-	      //     in.cue:61:11
 -- out/errors.txt --
 [incomplete] incompleteLet.bar.max: undefined field: max:
     ./in.cue:54:17

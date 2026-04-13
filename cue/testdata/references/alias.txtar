@@ -111,7 +111,7 @@ b6: X11.foo + 5
 // Postfix alias with optional and default
 opt~X12?: {
 	a: 1
-	b: X12
+	b: X12 @test(err, code=incomplete, contains="field not found: opt", pos=[])
 }
 
 // TODO: seemingly wrong semantics, but matches old behavior.

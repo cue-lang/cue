@@ -7,12 +7,18 @@ import "math"
 
 match: {
 	[=~"^single"]: matchN(1, [#Foo])
-	singleOK: a: 2       @test(eq)
-	singleErr: a: "foo"  @test(eq)
+	singleOK: a: 2
+	singleErr: {
+		a: "foo"
+		@test(err, code=eval, contains="does not satisfy matchN", pos=[-2:17, -2:24, 0:13])
+	}
 
 	[=~"^incomplete"]: matchN(1, [#Foo])
-	incompleteOK: a: int     @test(eq)
-	incompleteErr: a: string @test(eq)
+	incompleteOK: {a: int} @test(eq, {a: int})
+	incompleteErr: {
+		a: string
+		@test(err, code=eval, contains="does not satisfy matchN", pos=[-2:21, -2:28, 0:17])
+	}
 
 	#A: {
 		a: int
@@ -28,21 +34,38 @@ match: {
 		// rethink, as it seems less than ideal. Note that this typically not an
 		// issue if the schema matched against is not concrete.
 		[=~"^pickTop"]: matchN(1, [2])
-		pickTopOK1: *2 | int
-		pickTopOK2: int
-		pickTopErr: *3 | int // Final values taken.
+		// TODO(inline): this matches the debug output, but it nonetheless doesn't pass.
+		pickTopOK1: *2 | int  @test(eq:todo, *2 | matchN(1, [2]) & int)
+		pickTopOK2: int       @test(eq, matchN(1, [2]) & int)
+		pickTopErr: *3 | int  @test(eq:todo,
+			hint="or should this be an error? Depends on when value is finalized.",
+			matchN(1, [2]) & int) @test(debugCheck, """
+			(int){ &(matchN(1, (#list){
+			    0: (int){ 2 }
+			  }), int) }
+			""")
 
 		// Nested default values will be evaluated and may not be overridden by
 		// values in the validator.
 		[=~"^pickNested1"]: matchN(1, [{a: 2}])
-		pickNested1OK1: a: *2 | int
-		pickNested1OK2: a: int
-		pickNested1Err: a: *3 | int
+		pickNested1OK1: {a: *2 | int} @test(eq, {a: *2 | int})
+		pickNested1OK2: {a: int}      @test(eq, {a: int})
+		pickNested1Err: {
+			a: *3 | int
+			@test(err, code=eval,
+				hint="should this be an incomplete error, as a may still change and pass?",
+				contains="does not satisfy matchN", pos=[-3:23, -3:30, 0:19])
+		}
 
 		[=~"^pickNested2"]: matchN(1, [{a: <=2}])
-		pickNested2OK1: a: *2 | int
-		pickNested2OK2: a: int
-		pickNested2Err: a: *3 | int
+		pickNested2OK1: {a: *2 | int} @test(eq, {a: *2 | int})
+		pickNested2OK2: {a: int}      @test(eq, {a: int})
+		pickNested2Err: {
+			a: *3 | int
+			@test(err, code=eval,
+				hint="should this be an incomplete error, as a may still change and pass?",
+				contains="does not satisfy matchN", pos=[-3:23, -3:30, 0:19])
+		}
 	}
 
 	// Stress test potential exponential behavior.
@@ -55,125 +78,129 @@ match: {
 	
 			a: 3
 			b: matchN(4, [#A, #A, #A, #A])
-			b: a: 4
+			b: {a: 4}
 			c: matchN(4, [#A, #A, #A, #A])
-			c: a: 5
+			c: {a: 5}
+
+			@test(eq, {a: 3, b: {a: 4}, c: {a: 5}})
 		}
 		c: {
 			matchN(4, [#A, #A, #A, #A])
-	
+
 			a: 3
 			b: matchN(4, [#A, #A, #A, #A])
-			b: a: 4
+			b: {a: 4}
 			c: matchN(4, [#A, #A, #A, #A])
-			c: a: 5
+			c: {a: 5}
+
+			@test(eq, {a: 3, b: {a: 4}, c: {a: 5}})
 		}
 	}
 }
 
 not: {
 	[=~"^single"]: matchN(0, [#Foo])
-	singleOK: a: "foo"
-	singleErr: a: 2
+	singleOK: {a: "foo"} @test(eq, {a: "foo"})
+	singleErr: {
+		a: 2
+		@test(err, code=eval, contains="does not satisfy matchN", pos=[-2:17, -2:24, 0:13])
+	}
 
 	[=~"^double"]: matchN(0, [matchN(0, [#Foo])])
-	doubleOK: a: 2
-	doubleErr: a: "foo"
+	doubleOK: {a: 2} @test(eq, {a: 2})
+	doubleErr: {
+		a: "foo"
+		@test(err, code=eval, contains="does not satisfy matchN", pos=[-2:17, -2:24, 0:13])
+	}
 }
 
 oneOf: {
 	[=~"^multiple1"]: matchN(1, [math.MultipleOf(3), math.MultipleOf(5)])
 
-	multiple1Err1: 1
+	multiple1Err1: 1 @test(err, code=eval, contains="does not satisfy matchN", pos=[-2:20, -2:27, 0:17])
 
-	multiple1OK1: 3
-	multiple1OK2: 5
+	multiple1OK1: 3 @test(eq, 3)
+	multiple1OK2: 5 @test(eq, 5)
 
-	multiple1Err2: 15
+	multiple1Err2: 15 @test(err, code=eval, contains="does not satisfy matchN", pos=[-7:20, -7:27, 0:17])
 }
 
 anyOf: {
 	[=~"^multiple1"]: matchN(>0, [math.MultipleOf(3), math.MultipleOf(5)])
 
-	multiple1Err1: 1
+	multiple1Err1: 1 @test(err, code=eval, contains="does not satisfy matchN", pos=[-2:20, -2:27, 0:17])
 
-	multiple1OK1: 3
-	multiple1OK2: 5
-	multiple1OK3: 15
+	multiple1OK1: 3  @test(eq, 3)
+	multiple1OK2: 5  @test(eq, 5)
+	multiple1OK3: 15 @test(eq, 15)
 }
 
 
 allOf: {
 	[=~"^multiple1"]: matchN(2, [math.MultipleOf(3), math.MultipleOf(5)])
 
-	multiple1Err1: 1
-	multiple1Err2: 3
-	multiple1Err3: 5
+	multiple1Err1: 1 @test(err, code=eval, contains="does not satisfy matchN", pos=[-2:20, -2:27, 0:17])
+	multiple1Err2: 3 @test(err, code=eval, contains="does not satisfy matchN", pos=[-3:20, -3:27, 0:17])
+	multiple1Err3: 5 @test(err, code=eval, contains="does not satisfy matchN", pos=[-4:20, -4:27, 0:17])
 
-	multiple1OK1: 15
+	multiple1OK1: 15 @test(eq, 15)
 }
 
 bare: {
 	embed: t1: {
 		a: {matchN(1, [>10])}
 		b: {a}
+
+		@test(eq, {
+			a: matchN(1, [>10])
+			b: matchN(1, [>10])
+		})
 	}
 	embed: t2: {
 		b: {a}
 		a: {matchN(1, [>10])}
+
+		@test(eq, {
+			b: matchN(1, [>10])
+			a: matchN(1, [>10])
+		})
 	}
 	direct: t1: {
 		a: matchN(1, [>10])
 		b: a
+
+		@test(eq, {
+			a: matchN(1, [>10])
+			b: matchN(1, [>10])
+		})
 	}
 	direct: t2: {
 		b: a
 		a: matchN(1, [>10])
+
+		@test(eq, {
+			b: matchN(1, [>10])
+			a: matchN(1, [>10])
+		})
 	}
-	@test(eq, {
-		embed: {
-			t1: {
-				a: matchN(1, [>10])
-				b: matchN(1, [>10])
-			}
-			t2: {
-				b: matchN(1, [>10])
-				a: matchN(1, [>10])
-			}
-		}
-		direct: {
-			t1: {
-				a: matchN(1, [>10])
-				b: matchN(1, [>10])
-			}
-			t2: {
-				b: matchN(1, [>10])
-				a: matchN(1, [>10])
-			}
-		}
-	})
 }
 
 required: {
 	ok1: {
 		x: matchN(0, [{foo!: string}])
 		x: bar: 2
+		@test(eq, {x: {bar: 2}})
 	}
 	ok2: {
 		x: matchN(0, [{foo!: string}])
+		@test(eq, {x: matchN(0, [{ foo!: string }])})
 	}
 	// not matching for different reasons
 	ok3: {
 		x: matchN(0, [{bar!: string}])
 		x: bar: 2
+		@test(eq, {x: {bar: 2}})
 	}
-	@test(eq, {
-		ok1: {x: {bar: 2}}
-		ok2: {x: matchN(0, [{
-		foo!: string
-	}])}
-		ok3: {x: {bar: 2}}
-	})
 }
 
 // issue3575: Tests that matchN correctly validates structs with extra fields
@@ -187,6 +214,7 @@ issue3575: {
 		])
 		x: #x
 		x: [{a: 1}]
+		@test(eq, {#x: matchN(1, [[{}]]), x: [{ a: 1 }]})
 	}
 	test2: {
 		#x: matchN(1, [
@@ -194,27 +222,9 @@ issue3575: {
 		])
 		x: #x
 		x: {a: 1}
+		@test(eq, {#x: matchN(1, [{}]), x: {a: 1}})
 	}
-	@test(eq, {
-		test1: {#x: matchN(1, [[{}]]), x: [{
-		a: 1
-	}]}
-		test2: {#x: matchN(1, [{}]), x: {a: 1}}
-	})
 }
-
-@test(err, code=eval, at=match.singleErr, contains="does not satisfy matchN", pos=[-197:17, -197:24, -195:13])
-@test(err, code=eval, at=match.incompleteErr, contains="does not satisfy matchN", pos=[-194:21, -194:28, -192:17])
-@test(err, code=eval, at=match.defaults.pickNested1Err, contains="does not satisfy matchN", pos=[-171:23, -171:30, -168:19])
-@test(err, code=eval, at=match.defaults.pickNested2Err, contains="does not satisfy matchN", pos=[-167:23, -167:30, -164:19])
-@test(err, code=eval, at=not.singleErr, contains="does not satisfy matchN", pos=[-135:17, -135:24, -133:13])
-@test(err, code=eval, at=not.doubleErr, contains="does not satisfy matchN", pos=[-132:17, -132:24, -130:13])
-@test(err, code=eval, at=oneOf.multiple1Err1, contains="does not satisfy matchN", pos=[-127:20, -127:27, -125:17])
-@test(err, code=eval, at=oneOf.multiple1Err2, contains="does not satisfy matchN", pos=[-128:20, -128:27, -121:17])
-@test(err, code=eval, at=anyOf.multiple1Err1, contains="does not satisfy matchN", pos=[-118:20, -118:27, -116:17])
-@test(err, code=eval, at=allOf.multiple1Err1, contains="does not satisfy matchN", pos=[-108:20, -108:27, -106:17])
-@test(err, code=eval, at=allOf.multiple1Err2, contains="does not satisfy matchN", pos=[-109:20, -109:27, -106:17])
-@test(err, code=eval, at=allOf.multiple1Err3, contains="does not satisfy matchN", pos=[-110:20, -110:27, -106:17])
 
 -- incomplete.cue --
 import "math"
@@ -225,54 +235,85 @@ incomplete: {
 	incomplete1: {
 		x: matchN(1, [{foo!: string}])
 		x: bar: 2
+		@test(err, code=incomplete, at=x,
+			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:18]))
 	}
 	// foo could still be provided later.
 	incomplete2: {
 		x: matchN(1, [{foo!: string}])
+		@test(eq, {x: matchN(1, [{
+			foo!: string
+		}])})
 	}
 	// in case of doubt, we should mark an error as incomplete to be safe.
 	incomplete3: {
 		x: matchN(math.MultipleOf(2), [{bar!: int}, {foo!: int}])
 		x: bar: 2
+		@test(eq, {x: {bar: 2}})
+		@test(err, code=incomplete, at=x,
+			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:48]))
 	}
 	incomplete4: {
 		x: matchN(math.MultipleOf(2), [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
+		@test(eq, {x: {bar: 2}})
+		@test(err, code=incomplete, at=x,
+			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:61]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:48]))
+
 	}
 	incomplete5: {
 		x: matchN(>1 & <=3, [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
+		@test(eq, {x: {bar: 2}})
+		@test(err, code=incomplete, at=x,
+			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:38]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:51]))
 	}
 	incomplete6: {
 		x: matchN(2|3, [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
+		@test(eq, {x: {bar: 2}})
+		@test(err, code=incomplete, at=x,
+			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:33]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:46]))
 	}
 
 	// incorrect type cannot be corrected
 	err1: {
 		x: matchN(1, [{bar!: string}])
 		x: bar: 2
+		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 	// additional incomplete matches should not be counted if they can otherwise
 	// not satisfy the constraint.
 	err2: {
 		x: matchN(0, [{bar!: int}, {foo!: int}])
 		x: bar: 2
+		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 	// additional incomplete matches should not be counted if they can otherwise
 	// not satisfy the constraint.
 	err3: {
 		x: matchN(2, [{bar!: string}, {foo!: string}])
 		x: bar: 2
+		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 	// one additional potential match cannot make up to satisfy the bound.
 	err4: {
 		x: matchN(>1, [{bar!: string}, {foo!: string}])
 		x: bar: 2
+		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 	err5: {
 		x: matchN(<1, [{bar!: int}, {foo!: int}])
 		x: bar: 2
+		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 }
 // issue3389: Tests that matchN only reports schema errors of lesser severity,
@@ -281,13 +322,23 @@ issue3389: {
 	// only report schema errors that are of a lesser severity.
 	x: bar: 2
 	x: matchN(1, [{bar: 3}, {bar: 2, foo!: int}])
+
+	@test(debug, """
+		(struct){
+		  x: (_|_){
+		    // [incomplete] issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+		    //     incomplete.cue:95:5
+		    //     incomplete.cue:94:5
+		    //     incomplete.cue:95:12
+		    // issue3389.x.foo: field is required but not present:
+		    //     incomplete.cue:95:5
+		    //     incomplete.cue:95:35
+		    bar: (int){ 2 }
+		  }
+		}
+		""")
 }
 
-@test(err, code=eval, at=incomplete.err1.x, contains="does not satisfy matchN", pos=[-33:6, -33:13, -32:6])
-@test(err, code=eval, at=incomplete.err2.x, contains="does not satisfy matchN", pos=[-28:6, -28:13, -27:6])
-@test(err, code=eval, at=incomplete.err3.x, contains="does not satisfy matchN", pos=[-23:6, -23:13, -22:6])
-@test(err, code=eval, at=incomplete.err4.x, contains="does not satisfy matchN", pos=[-19:6, -19:13, -18:6])
-@test(err, code=eval, at=incomplete.err5.x, contains="does not satisfy matchN", pos=[-16:6, -16:13, -15:6])
 
 -- closedness.cue --
 ellipsis: ok: {
@@ -301,17 +352,11 @@ ellipsis: ok: {
 	@test(eq, {
 		out: {
 			field: {shouldBeAllowed: 123}
-			#anything: matchN(1, [{
-		...
-	}])
+			#anything: matchN(1, [{ ... }])
 		}
 		#Schema: {
-			field?: matchN(1, [{
-		...
-	}])
-			#anything: matchN(1, [{
-		...
-	}])
+			field?: matchN(1, [{ ... }])
+			#anything: matchN(1, [{ ... }])
 		}
 	})
 }
@@ -342,7 +387,6 @@ openArguments: err2: {
 		a: allowed: "once"
 	}
 	@test(err, code=eval, at=out.a, contains="does not satisfy matchN", pos=[2:13, 2:20, 9:6])
-
 }
 explicitClose: err1: {
 	#Schema: {{
@@ -363,19 +407,7 @@ explicitClose: ok2: {
 	}}
 	out: #Schema & {
 		a: allowed: "once"
-	}
-	@test(eq, {
-		#Schema: {
-			a?: matchN(1, [null, close({
-		[string]: string
-	}), close({
-		b: {
-			...
-		}
-	})])
-		}
-		out: {a: {allowed: "once"}}
-	})
+	} @test(eq, {a: {allowed: "once"}})
 }
 mixed: ok3: {
 	#Schema: {
@@ -453,7 +485,6 @@ closedByDefinition: err5: {
 		exports: exp1: "./main-module.js"
 	}
 	@test(err, code=eval, at=out.exports, contains="does not satisfy matchN", pos=[2:13, 2:20, 8:12])
-
 }
 
 -- issue3694.cue --
@@ -489,6 +520,8 @@ issue3694: simple: {
 	})
 	@test(eq, {#step: {uses?: string}})
 }
+@test(err, code=incomplete, at=issue3694.full.#step, contains="does not satisfy matchN", pos=[-29:9, -29:16, -22:9])
+@test(err, code=incomplete, at=issue3694.simple.#step, contains="does not satisfy matchN", pos=[-9:9, -9:16, -6:9])
 -- out/eval/stats --
 Leaks:  130
 Freed:  1058
@@ -508,159 +541,159 @@ MaxReqSets:          4
 MaxRedirect:         2
 -- out/errors.txt --
 [eval] openArguments.err2.out.a: conflicting values {allowed:"once"} and null (mismatched types struct and null):
-    ./closedness.cue:42:11
-    ./closedness.cue:42:12
-    ./closedness.cue:43:13
-    ./closedness.cue:44:5
-    ./closedness.cue:49:7
-    ./closedness.cue:50:6
+    ./closedness.cue:36:11
+    ./closedness.cue:36:12
+    ./closedness.cue:37:13
+    ./closedness.cue:38:5
+    ./closedness.cue:43:7
+    ./closedness.cue:44:6
 openArguments.err2.out.a: invalid value {allowed:"once"} (does not satisfy matchN): 2 matched, expected 1:
-    ./closedness.cue:43:13
-    ./closedness.cue:43:20
-    ./closedness.cue:50:6
+    ./closedness.cue:37:13
+    ./closedness.cue:37:20
+    ./closedness.cue:44:6
 [eval] explicitClose.err1.out.a: conflicting values {baz:"notAllowed"} and "all" (mismatched types struct and string):
-    ./closedness.cue:56:11
-    ./closedness.cue:56:12
-    ./closedness.cue:57:6
-    ./closedness.cue:57:17
-    ./closedness.cue:59:7
-    ./closedness.cue:60:6
+    ./closedness.cue:49:11
+    ./closedness.cue:49:12
+    ./closedness.cue:50:6
+    ./closedness.cue:50:17
+    ./closedness.cue:52:7
+    ./closedness.cue:53:6
 explicitClose.err1.out.a: invalid value {baz:"notAllowed"} (does not satisfy matchN): 0 matched, expected 1:
-    ./closedness.cue:57:6
-    ./closedness.cue:57:13
-    ./closedness.cue:60:6
+    ./closedness.cue:50:6
+    ./closedness.cue:50:13
+    ./closedness.cue:53:6
 explicitClose.err1.out.a.baz: field not allowed:
-    ./closedness.cue:57:6
-    ./closedness.cue:60:11
+    ./closedness.cue:50:6
+    ./closedness.cue:53:11
 [eval] closedByDefinition.err5.out.exports: conflicting values {exp1:"./main-module.js"} and null (mismatched types struct and null):
-    ./closedness.cue:155:13
-    ./closedness.cue:155:24
-    ./closedness.cue:160:7
-    ./closedness.cue:161:12
+    ./closedness.cue:136:13
+    ./closedness.cue:136:24
+    ./closedness.cue:141:7
+    ./closedness.cue:142:12
 closedByDefinition.err5.out.exports.exp1: conflicting values "./main-module.js" and null (mismatched types string and null):
-    ./closedness.cue:155:30
-    ./closedness.cue:156:24
-    ./closedness.cue:157:26
-    ./closedness.cue:160:7
-    ./closedness.cue:161:18
+    ./closedness.cue:136:30
+    ./closedness.cue:137:24
+    ./closedness.cue:138:26
+    ./closedness.cue:141:7
+    ./closedness.cue:142:18
 closedByDefinition.err5.out.exports.exp1: conflicting values "./main-module.js" and {exp1?:#exports} (mismatched types string and struct):
-    ./closedness.cue:155:30
-    ./closedness.cue:156:30
-    ./closedness.cue:157:19
-    ./closedness.cue:157:26
-    ./closedness.cue:160:7
-    ./closedness.cue:161:18
+    ./closedness.cue:136:30
+    ./closedness.cue:137:30
+    ./closedness.cue:138:19
+    ./closedness.cue:138:26
+    ./closedness.cue:141:7
+    ./closedness.cue:142:18
 closedByDefinition.err5.out.exports: invalid value {exp1:"./main-module.js"} (does not satisfy matchN): 0 matched, expected 1:
-    ./closedness.cue:155:13
-    ./closedness.cue:155:20
-    ./closedness.cue:161:12
+    ./closedness.cue:136:13
+    ./closedness.cue:136:20
+    ./closedness.cue:142:12
 closedByDefinition.err5.out.exports.exp1: invalid value "./main-module.js" (does not satisfy matchN): 0 matched, expected 1:
-    ./closedness.cue:156:13
-    ./closedness.cue:156:20
-    ./closedness.cue:157:26
-    ./closedness.cue:161:18
+    ./closedness.cue:137:13
+    ./closedness.cue:137:20
+    ./closedness.cue:138:26
+    ./closedness.cue:142:18
 [eval] match.singleErr.a: conflicting values "foo" and int (mismatched types string and int):
     ./in.cue:4:5
     ./in.cue:8:28
-    ./in.cue:10:16
+    ./in.cue:11:6
 match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:8:17
     ./in.cue:8:24
     ./in.cue:10:13
 [eval] match.incompleteErr.a: conflicting values string and int (mismatched types string and int):
     ./in.cue:4:5
-    ./in.cue:12:32
-    ./in.cue:14:20
+    ./in.cue:15:32
+    ./in.cue:18:6
 match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
-    ./in.cue:12:21
-    ./in.cue:12:28
-    ./in.cue:14:17
+    ./in.cue:15:21
+    ./in.cue:15:28
+    ./in.cue:17:17
 [eval] match.defaults.pickNested1Err.a: conflicting values 2 and 3:
-    ./in.cue:36:38
-    ./in.cue:39:23
+    ./in.cue:49:38
+    ./in.cue:53:8
 match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
-    ./in.cue:36:23
-    ./in.cue:36:30
-    ./in.cue:39:19
+    ./in.cue:49:23
+    ./in.cue:49:30
+    ./in.cue:52:19
 [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
-    ./in.cue:41:23
-    ./in.cue:41:30
-    ./in.cue:44:19
+    ./in.cue:59:23
+    ./in.cue:59:30
+    ./in.cue:62:19
 match.defaults.pickNested2Err.a: invalid value 3 (out of bound <=2):
-    ./in.cue:41:38
-    ./in.cue:44:23
+    ./in.cue:59:38
+    ./in.cue:63:8
 [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN): 1 matched, expected 0:
-    ./in.cue:74:17
-    ./in.cue:74:24
-    ./in.cue:76:13
+    ./in.cue:101:17
+    ./in.cue:101:24
+    ./in.cue:103:13
 [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN): 1 matched, expected 0:
-    ./in.cue:78:17
-    ./in.cue:78:24
-    ./in.cue:80:13
+    ./in.cue:108:17
+    ./in.cue:108:24
+    ./in.cue:110:13
 [eval] oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
-    ./in.cue:84:20
-    ./in.cue:84:27
-    ./in.cue:86:17
+    ./in.cue:117:20
+    ./in.cue:117:27
+    ./in.cue:119:17
 oneOf.multiple1Err1: invalid value 1 (does not satisfy math.MultipleOf(3)):
-    ./in.cue:84:31
-    ./in.cue:84:20
-    ./in.cue:84:47
-    ./in.cue:86:17
+    ./in.cue:117:31
+    ./in.cue:117:20
+    ./in.cue:117:47
+    ./in.cue:119:17
 oneOf.multiple1Err1: invalid value 1 (does not satisfy math.MultipleOf(5)):
-    ./in.cue:84:51
-    ./in.cue:84:20
-    ./in.cue:84:67
-    ./in.cue:86:17
+    ./in.cue:117:51
+    ./in.cue:117:20
+    ./in.cue:117:67
+    ./in.cue:119:17
 [eval] oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN): 2 matched, expected 1:
-    ./in.cue:84:20
-    ./in.cue:84:27
-    ./in.cue:91:17
+    ./in.cue:117:20
+    ./in.cue:117:27
+    ./in.cue:124:17
 [eval] anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected >0:
-    ./in.cue:95:20
-    ./in.cue:95:27
-    ./in.cue:97:17
+    ./in.cue:128:20
+    ./in.cue:128:27
+    ./in.cue:130:17
 anyOf.multiple1Err1: invalid value 1 (does not satisfy math.MultipleOf(3)):
-    ./in.cue:95:32
-    ./in.cue:95:20
-    ./in.cue:95:48
-    ./in.cue:97:17
+    ./in.cue:128:32
+    ./in.cue:128:20
+    ./in.cue:128:48
+    ./in.cue:130:17
 anyOf.multiple1Err1: invalid value 1 (does not satisfy math.MultipleOf(5)):
-    ./in.cue:95:52
-    ./in.cue:95:20
-    ./in.cue:95:68
-    ./in.cue:97:17
+    ./in.cue:128:52
+    ./in.cue:128:20
+    ./in.cue:128:68
+    ./in.cue:130:17
 [eval] allOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 2:
-    ./in.cue:106:20
-    ./in.cue:106:27
-    ./in.cue:108:17
+    ./in.cue:139:20
+    ./in.cue:139:27
+    ./in.cue:141:17
 allOf.multiple1Err1: invalid value 1 (does not satisfy math.MultipleOf(3)):
-    ./in.cue:106:31
-    ./in.cue:106:20
-    ./in.cue:106:47
-    ./in.cue:108:17
+    ./in.cue:139:31
+    ./in.cue:139:20
+    ./in.cue:139:47
+    ./in.cue:141:17
 allOf.multiple1Err1: invalid value 1 (does not satisfy math.MultipleOf(5)):
-    ./in.cue:106:51
-    ./in.cue:106:20
-    ./in.cue:106:67
-    ./in.cue:108:17
+    ./in.cue:139:51
+    ./in.cue:139:20
+    ./in.cue:139:67
+    ./in.cue:141:17
 [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN): 1 matched, expected 2:
-    ./in.cue:106:20
-    ./in.cue:106:27
-    ./in.cue:109:17
+    ./in.cue:139:20
+    ./in.cue:139:27
+    ./in.cue:142:17
 allOf.multiple1Err2: invalid value 3 (does not satisfy math.MultipleOf(5)):
-    ./in.cue:106:51
-    ./in.cue:106:20
-    ./in.cue:106:67
-    ./in.cue:109:17
+    ./in.cue:139:51
+    ./in.cue:139:20
+    ./in.cue:139:67
+    ./in.cue:142:17
 [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
-    ./in.cue:106:20
-    ./in.cue:106:27
-    ./in.cue:110:17
+    ./in.cue:139:20
+    ./in.cue:139:27
+    ./in.cue:143:17
 allOf.multiple1Err3: invalid value 5 (does not satisfy math.MultipleOf(3)):
-    ./in.cue:106:31
-    ./in.cue:106:20
-    ./in.cue:106:47
-    ./in.cue:110:17
+    ./in.cue:139:31
+    ./in.cue:139:20
+    ./in.cue:139:47
+    ./in.cue:143:17
 [incomplete] incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
     ./incomplete.cue:7:6
     ./incomplete.cue:7:13
@@ -669,78 +702,78 @@ incomplete.incomplete1.x.foo: field is required but not present:
     ./incomplete.cue:7:6
     ./incomplete.cue:7:18
 [incomplete] incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
-    ./incomplete.cue:16:6
-    ./incomplete.cue:16:13
-    ./incomplete.cue:17:6
+    ./incomplete.cue:22:6
+    ./incomplete.cue:22:13
+    ./incomplete.cue:23:6
 incomplete.incomplete3.x.foo: field is required but not present:
-    ./incomplete.cue:16:6
-    ./incomplete.cue:16:48
+    ./incomplete.cue:22:6
+    ./incomplete.cue:22:48
 [incomplete] incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
-    ./incomplete.cue:20:6
-    ./incomplete.cue:20:13
-    ./incomplete.cue:21:6
+    ./incomplete.cue:30:6
+    ./incomplete.cue:30:13
+    ./incomplete.cue:31:6
 incomplete.incomplete4.x.baz: field is required but not present:
-    ./incomplete.cue:20:6
-    ./incomplete.cue:20:61
+    ./incomplete.cue:30:6
+    ./incomplete.cue:30:61
 incomplete.incomplete4.x.foo: field is required but not present:
-    ./incomplete.cue:20:6
-    ./incomplete.cue:20:48
+    ./incomplete.cue:30:6
+    ./incomplete.cue:30:48
 [incomplete] incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected >1 & <=3:
-    ./incomplete.cue:24:6
-    ./incomplete.cue:24:13
-    ./incomplete.cue:25:6
-incomplete.incomplete5.x.baz: field is required but not present:
-    ./incomplete.cue:24:6
-    ./incomplete.cue:24:51
-incomplete.incomplete5.x.foo: field is required but not present:
-    ./incomplete.cue:24:6
-    ./incomplete.cue:24:38
-[incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
-    ./incomplete.cue:28:6
-    ./incomplete.cue:28:13
-    ./incomplete.cue:29:6
-incomplete.incomplete6.x.baz: field is required but not present:
-    ./incomplete.cue:28:6
-    ./incomplete.cue:28:46
-incomplete.incomplete6.x.foo: field is required but not present:
-    ./incomplete.cue:28:6
-    ./incomplete.cue:28:33
-[eval] incomplete.err1.x.bar: conflicting values 2 and string (mismatched types int and string):
-    ./incomplete.cue:34:24
-    ./incomplete.cue:35:11
-incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
-    ./incomplete.cue:34:6
-    ./incomplete.cue:34:13
-    ./incomplete.cue:35:6
-[eval] incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 0:
     ./incomplete.cue:40:6
     ./incomplete.cue:40:13
     ./incomplete.cue:41:6
+incomplete.incomplete5.x.baz: field is required but not present:
+    ./incomplete.cue:40:6
+    ./incomplete.cue:40:51
+incomplete.incomplete5.x.foo: field is required but not present:
+    ./incomplete.cue:40:6
+    ./incomplete.cue:40:38
+[incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
+    ./incomplete.cue:49:6
+    ./incomplete.cue:49:13
+    ./incomplete.cue:50:6
+incomplete.incomplete6.x.baz: field is required but not present:
+    ./incomplete.cue:49:6
+    ./incomplete.cue:49:46
+incomplete.incomplete6.x.foo: field is required but not present:
+    ./incomplete.cue:49:6
+    ./incomplete.cue:49:33
+[eval] incomplete.err1.x.bar: conflicting values 2 and string (mismatched types int and string):
+    ./incomplete.cue:60:24
+    ./incomplete.cue:61:11
+incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+    ./incomplete.cue:60:6
+    ./incomplete.cue:60:13
+    ./incomplete.cue:61:6
+[eval] incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 0:
+    ./incomplete.cue:67:6
+    ./incomplete.cue:67:13
+    ./incomplete.cue:68:6
 [eval] incomplete.err3.x.bar: conflicting values 2 and string (mismatched types int and string):
-    ./incomplete.cue:46:24
-    ./incomplete.cue:47:11
+    ./incomplete.cue:74:24
+    ./incomplete.cue:75:11
 incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
-    ./incomplete.cue:46:6
-    ./incomplete.cue:46:13
-    ./incomplete.cue:47:6
+    ./incomplete.cue:74:6
+    ./incomplete.cue:74:13
+    ./incomplete.cue:75:6
 [eval] incomplete.err4.x.bar: conflicting values 2 and string (mismatched types int and string):
-    ./incomplete.cue:51:25
-    ./incomplete.cue:52:11
+    ./incomplete.cue:80:25
+    ./incomplete.cue:81:11
 incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
-    ./incomplete.cue:51:6
-    ./incomplete.cue:51:13
-    ./incomplete.cue:52:6
+    ./incomplete.cue:80:6
+    ./incomplete.cue:80:13
+    ./incomplete.cue:81:6
 [eval] incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected <1:
-    ./incomplete.cue:55:6
-    ./incomplete.cue:55:13
-    ./incomplete.cue:56:6
+    ./incomplete.cue:85:6
+    ./incomplete.cue:85:13
+    ./incomplete.cue:86:6
 [incomplete] issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
-    ./incomplete.cue:64:5
-    ./incomplete.cue:63:5
-    ./incomplete.cue:64:12
+    ./incomplete.cue:95:5
+    ./incomplete.cue:94:5
+    ./incomplete.cue:95:12
 issue3389.x.foo: field is required but not present:
-    ./incomplete.cue:64:5
-    ./incomplete.cue:64:35
+    ./incomplete.cue:95:5
+    ./incomplete.cue:95:35
 [incomplete] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
     ./issue3694.cue:4:9
     ./issue3694.cue:4:16

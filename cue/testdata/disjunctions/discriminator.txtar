@@ -9,7 +9,11 @@ noKind: {
 		#Def: {<10, _hidden: "field"} | >200 | string
 
 		// The data is an int, but the struct embeds a matching scalar kind too.
-		out: #Def & 123 @test(err, suberr=(code=eval, contains="conflicting values 123 and string"), suberr=(code=eval, contains="invalid value 123 (out of bound <10)"), suberr=(code=eval, contains="invalid value 123 (out of bound >200)"), pos=[])
+		out: #Def & 123 @test(err,
+			suberr=(code=eval, contains="conflicting values", args=[123, string]),
+			suberr=(code=eval, contains="invalid value", args=[123, <10]),
+			suberr=(code=eval, contains="invalid value", args=[123, >200]),
+			pos=[])
 	}
 	manyStructsEmpty: {
 		#Def: {f1!: int} | {f2!: int} | string
@@ -21,13 +25,20 @@ noKind: {
 		#Def: 1 | 2 | 3
 
 		// The data is an int, which matches all of the disjunct kinds.
-		out: #Def & 123 @test(err, suberr=(code=eval, contains="conflicting values 1 and 123"), suberr=(code=eval, contains="conflicting values 2 and 123"), suberr=(code=eval, contains="conflicting values 3 and 123"), pos=[])
+		out: #Def & 123 @test(err,
+			suberr=(code=eval, contains="conflicting values", args=[1, 123], pos=[-3:9, 0:8, 0:15]),
+			suberr=(code=eval, contains="conflicting values", args=[2, 123], pos=[-3:13, 0:8, 0:15]),
+			suberr=(code=eval, contains="conflicting values", args=[3, 123], pos=[-3:17, 0:8, 0:15]))
 	}
 	zeroScalars: {
 		#Def: int | string | null
 
 		// The data is a bool, which matches none of the disjunct scalar kinds.
-		out: #Def & true @test(err, suberr=(code=eval, contains="conflicting values true and int"), suberr=(code=eval, contains="conflicting values true and string"), suberr=(code=eval, contains="conflicting values true and null"), pos=[])
+		out: #Def & true @test(err,
+			suberr=(code=eval, contains="conflicting values", args=[true, int]),
+			suberr=(code=eval, contains="conflicting values", args=[true, null]),
+			suberr=(code=eval, contains="conflicting values", args=[true, string]),
+			pos=[])
 	}
 }
 
@@ -40,7 +51,15 @@ byKind: {
 		#Def3: {f3: null | int}
 
 		// The data is a struct, not a null.
-		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval, contains="6 errors in empty disjunction", pos=[])
+		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval,
+			contains="6 errors in empty disjunction",
+			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:15, 0:8, 0:21]),
+			suberr=(code=eval, contains="4 errors in empty disjunction"),
+			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:22, -4:15, 0:8, 0:25]),
+			suberr=(code=eval, contains="2 errors in empty disjunction"),
+			suberr=(code=eval, contains="conflicting values", args=["not an int", int], pos=[-5:22, -4:22, -3:22, 0:8, 0:29]),
+			suberr=(code=eval, contains="conflicting values", args=["not an int", null], pos=[-5:22, -4:22, -3:15, 0:8, 0:29]),
+			pos=[])
 	}
 
 	nullableStructRequired: {
@@ -49,7 +68,15 @@ byKind: {
 		#Def3: {f3!: null | int}
 
 		// The data is a struct, not a null.
-		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval, contains="6 errors in empty disjunction", pos=[])
+		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval,
+			contains="6 errors in empty disjunction",
+			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:16, 0:8, 0:21]),
+			suberr=(code=eval, contains="4 errors in empty disjunction"),
+			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:23, -4:16, 0:8, 0:25]),
+			suberr=(code=eval, contains="2 errors in empty disjunction"),
+			suberr=(code=eval, contains="conflicting values", args=["not an int", int], pos=[-5:23, -4:23, -3:23, 0:8, 0:29]),
+			suberr=(code=eval, contains="conflicting values", args=["not an int", null], pos=[-5:23, -4:23, -3:16, 0:8, 0:29]),
+			pos=[])
 	}
 
 	nullableStructOptional: {
@@ -58,7 +85,15 @@ byKind: {
 		#Def3: {f3?: null | int}
 
 		// The data is a struct, not a null.
-		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval, contains="6 errors in empty disjunction", pos=[])
+		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval,
+			contains="6 errors in empty disjunction",
+			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:16, 0:8, 0:21]),
+			suberr=(code=eval, contains="4 errors in empty disjunction"),
+			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:23, -4:16, 0:8, 0:25]),
+			suberr=(code=eval, contains="2 errors in empty disjunction"),
+			suberr=(code=eval, contains="conflicting values", args=["not an int", int], pos=[-5:23, -4:23, -3:23, 0:8, 0:29]),
+			suberr=(code=eval, contains="conflicting values", args=["not an int", null], pos=[-5:23, -4:23, -3:16, 0:8, 0:29]),
+			pos=[])
 	}
 
 	nullableList: {
@@ -67,14 +102,27 @@ byKind: {
 		#Def3: [...null | int]
 
 		// The data is a list, not a null.
-		out: #Def1 & [[["not an int"]]] @test(err, code=eval, contains="6 errors in empty disjunction", pos=[])
+		out: #Def1 & [[["not an int"]]] @test(err, code=eval,
+			contains="6 errors in empty disjunction",
+			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:14, 0:8, 0:17]),
+			suberr=(code=eval, contains="4 errors in empty disjunction"),
+			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:21, -4:14, 0:8, 0:18]),
+			suberr=(code=eval, contains="2 errors in empty disjunction"),
+			suberr=(code=eval, contains="conflicting values", args=["not an int", int], pos=[-5:21, -4:21, -3:21, 0:8, 0:19]),
+			suberr=(code=eval, contains="conflicting values", args=["not an int", null], pos=[-5:21, -4:21, -3:14, 0:8, 0:19]),
+			pos=[])
 	}
 
 	scalarConstraints: {
 		#Def: >10 | "" | null | false
 
 		// The data is an integer, not any other scalar type.
-		out: #Def & 5 @test(err, suberr=(code=eval, contains="conflicting values 5 and \"\""), suberr=(code=eval, contains="conflicting values 5 and false"), suberr=(code=eval, contains="conflicting values 5 and null"), suberr=(code=eval, contains="invalid value 5 (out of bound >10)"), pos=[])
+		out: #Def & 5 @test(err,
+			suberr=(code=eval, contains="conflicting values", args=[5, ""]),
+			suberr=(code=eval, contains="conflicting values", args=[5, false]),
+			suberr=(code=eval, contains="conflicting values", args=[5, null]),
+			suberr=(code=eval, contains="invalid value", args=[5, >10]),
+			pos=[])
 	}
 }
 -- out/errors.txt --
@@ -91,142 +139,142 @@ noKind.manyWithStructEmbed.out: invalid value 123 (out of bound >200):
     ./in.cue:11:15
 [eval] noKind.manyScalars.out: 3 errors in empty disjunction:
 noKind.manyScalars.out: conflicting values 1 and 123:
-    ./in.cue:20:9
-    ./in.cue:23:8
-    ./in.cue:23:15
+    ./in.cue:24:9
+    ./in.cue:27:8
+    ./in.cue:27:15
 noKind.manyScalars.out: conflicting values 2 and 123:
-    ./in.cue:20:13
-    ./in.cue:23:8
-    ./in.cue:23:15
+    ./in.cue:24:13
+    ./in.cue:27:8
+    ./in.cue:27:15
 noKind.manyScalars.out: conflicting values 3 and 123:
-    ./in.cue:20:17
-    ./in.cue:23:8
-    ./in.cue:23:15
+    ./in.cue:24:17
+    ./in.cue:27:8
+    ./in.cue:27:15
 [eval] noKind.zeroScalars.out: 3 errors in empty disjunction:
 noKind.zeroScalars.out: conflicting values true and int (mismatched types bool and int):
-    ./in.cue:26:9
-    ./in.cue:29:8
-    ./in.cue:29:15
+    ./in.cue:33:9
+    ./in.cue:36:8
+    ./in.cue:36:15
 noKind.zeroScalars.out: conflicting values true and null (mismatched types bool and null):
-    ./in.cue:26:24
-    ./in.cue:29:8
-    ./in.cue:29:15
+    ./in.cue:33:24
+    ./in.cue:36:8
+    ./in.cue:36:15
 noKind.zeroScalars.out: conflicting values true and string (mismatched types bool and string):
-    ./in.cue:26:15
-    ./in.cue:29:8
-    ./in.cue:29:15
+    ./in.cue:33:15
+    ./in.cue:36:8
+    ./in.cue:36:15
 [eval] byKind.nullableStructRegular.out.f1: 6 errors in empty disjunction:
 byKind.nullableStructRegular.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
-    ./in.cue:37:15
-    ./in.cue:42:8
-    ./in.cue:42:21
+    ./in.cue:48:15
+    ./in.cue:53:8
+    ./in.cue:53:21
 byKind.nullableStructRegular.out.f1.f2: 4 errors in empty disjunction:
 byKind.nullableStructRegular.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
-    ./in.cue:37:22
-    ./in.cue:38:15
-    ./in.cue:42:8
-    ./in.cue:42:25
+    ./in.cue:48:22
+    ./in.cue:49:15
+    ./in.cue:53:8
+    ./in.cue:53:25
 byKind.nullableStructRegular.out.f1.f2.f3: 2 errors in empty disjunction:
 byKind.nullableStructRegular.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
-    ./in.cue:37:22
-    ./in.cue:38:22
-    ./in.cue:39:22
-    ./in.cue:42:8
-    ./in.cue:42:29
+    ./in.cue:48:22
+    ./in.cue:49:22
+    ./in.cue:50:22
+    ./in.cue:53:8
+    ./in.cue:53:29
 byKind.nullableStructRegular.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
-    ./in.cue:37:22
-    ./in.cue:38:22
-    ./in.cue:39:15
-    ./in.cue:42:8
-    ./in.cue:42:29
+    ./in.cue:48:22
+    ./in.cue:49:22
+    ./in.cue:50:15
+    ./in.cue:53:8
+    ./in.cue:53:29
 [eval] byKind.nullableStructRequired.out.f1: 6 errors in empty disjunction:
 byKind.nullableStructRequired.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
-    ./in.cue:46:16
-    ./in.cue:51:8
-    ./in.cue:51:21
+    ./in.cue:65:16
+    ./in.cue:70:8
+    ./in.cue:70:21
 byKind.nullableStructRequired.out.f1.f2: 4 errors in empty disjunction:
 byKind.nullableStructRequired.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
-    ./in.cue:46:23
-    ./in.cue:47:16
-    ./in.cue:51:8
-    ./in.cue:51:25
+    ./in.cue:65:23
+    ./in.cue:66:16
+    ./in.cue:70:8
+    ./in.cue:70:25
 byKind.nullableStructRequired.out.f1.f2.f3: 2 errors in empty disjunction:
 byKind.nullableStructRequired.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
-    ./in.cue:46:23
-    ./in.cue:47:23
-    ./in.cue:48:23
-    ./in.cue:51:8
-    ./in.cue:51:29
+    ./in.cue:65:23
+    ./in.cue:66:23
+    ./in.cue:67:23
+    ./in.cue:70:8
+    ./in.cue:70:29
 byKind.nullableStructRequired.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
-    ./in.cue:46:23
-    ./in.cue:47:23
-    ./in.cue:48:16
-    ./in.cue:51:8
-    ./in.cue:51:29
+    ./in.cue:65:23
+    ./in.cue:66:23
+    ./in.cue:67:16
+    ./in.cue:70:8
+    ./in.cue:70:29
 [eval] byKind.nullableStructOptional.out.f1: 6 errors in empty disjunction:
 byKind.nullableStructOptional.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
-    ./in.cue:55:16
-    ./in.cue:60:8
-    ./in.cue:60:21
+    ./in.cue:82:16
+    ./in.cue:87:8
+    ./in.cue:87:21
 byKind.nullableStructOptional.out.f1.f2: 4 errors in empty disjunction:
 byKind.nullableStructOptional.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
-    ./in.cue:55:23
-    ./in.cue:56:16
-    ./in.cue:60:8
-    ./in.cue:60:25
+    ./in.cue:82:23
+    ./in.cue:83:16
+    ./in.cue:87:8
+    ./in.cue:87:25
 byKind.nullableStructOptional.out.f1.f2.f3: 2 errors in empty disjunction:
 byKind.nullableStructOptional.out.f1.f2.f3: conflicting values "not an int" and int (mismatched types string and int):
-    ./in.cue:55:23
-    ./in.cue:56:23
-    ./in.cue:57:23
-    ./in.cue:60:8
-    ./in.cue:60:29
+    ./in.cue:82:23
+    ./in.cue:83:23
+    ./in.cue:84:23
+    ./in.cue:87:8
+    ./in.cue:87:29
 byKind.nullableStructOptional.out.f1.f2.f3: conflicting values "not an int" and null (mismatched types string and null):
-    ./in.cue:55:23
-    ./in.cue:56:23
-    ./in.cue:57:16
-    ./in.cue:60:8
-    ./in.cue:60:29
+    ./in.cue:82:23
+    ./in.cue:83:23
+    ./in.cue:84:16
+    ./in.cue:87:8
+    ./in.cue:87:29
 [eval] byKind.nullableList.out.0: 6 errors in empty disjunction:
 byKind.nullableList.out.0: conflicting values [["not an int"]] and null (mismatched types list and null):
-    ./in.cue:64:14
-    ./in.cue:69:8
-    ./in.cue:69:17
+    ./in.cue:99:14
+    ./in.cue:104:8
+    ./in.cue:104:17
 byKind.nullableList.out.0.0: 4 errors in empty disjunction:
 byKind.nullableList.out.0.0: conflicting values ["not an int"] and null (mismatched types list and null):
-    ./in.cue:64:21
-    ./in.cue:65:14
-    ./in.cue:69:8
-    ./in.cue:69:18
+    ./in.cue:99:21
+    ./in.cue:100:14
+    ./in.cue:104:8
+    ./in.cue:104:18
 byKind.nullableList.out.0.0.0: 2 errors in empty disjunction:
 byKind.nullableList.out.0.0.0: conflicting values "not an int" and int (mismatched types string and int):
-    ./in.cue:64:21
-    ./in.cue:65:21
-    ./in.cue:66:21
-    ./in.cue:69:8
-    ./in.cue:69:19
+    ./in.cue:99:21
+    ./in.cue:100:21
+    ./in.cue:101:21
+    ./in.cue:104:8
+    ./in.cue:104:19
 byKind.nullableList.out.0.0.0: conflicting values "not an int" and null (mismatched types string and null):
-    ./in.cue:64:21
-    ./in.cue:65:21
-    ./in.cue:66:14
-    ./in.cue:69:8
-    ./in.cue:69:19
+    ./in.cue:99:21
+    ./in.cue:100:21
+    ./in.cue:101:14
+    ./in.cue:104:8
+    ./in.cue:104:19
 [eval] byKind.scalarConstraints.out: 4 errors in empty disjunction:
 byKind.scalarConstraints.out: conflicting values 5 and "" (mismatched types int and string):
-    ./in.cue:73:15
-    ./in.cue:76:8
-    ./in.cue:76:15
+    ./in.cue:116:15
+    ./in.cue:119:8
+    ./in.cue:119:15
 byKind.scalarConstraints.out: conflicting values 5 and false (mismatched types int and bool):
-    ./in.cue:73:27
-    ./in.cue:76:8
-    ./in.cue:76:15
+    ./in.cue:116:27
+    ./in.cue:119:8
+    ./in.cue:119:15
 byKind.scalarConstraints.out: conflicting values 5 and null (mismatched types int and null):
-    ./in.cue:73:20
-    ./in.cue:76:8
-    ./in.cue:76:15
+    ./in.cue:116:20
+    ./in.cue:119:8
+    ./in.cue:119:15
 byKind.scalarConstraints.out: invalid value 5 (out of bound >10):
-    ./in.cue:73:9
-    ./in.cue:76:15
+    ./in.cue:116:9
+    ./in.cue:119:15
 -- out/eval/stats --
 Leaks:  0
 Freed:  188

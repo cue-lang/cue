@@ -26,7 +26,16 @@ package x
 	address: string
 }
 
-_cName: #c.name @test(eq, string)
+_cName: #c.name
+
+@test(eq, {
+	#a: {name: string, age: int} | {name: string, address: string}
+	#a1: {name: string, age: int}
+	#a2: {name: string, address: string}
+	#c: {name: string, age: int}
+	#d: {name: string, address: string}
+	_cName$x: string
+})
 -- out/eval/stats --
 Leaks:  0
 Freed:  21
@@ -60,4 +69,5 @@ NumCloseIDs: 4
     name: string
     address: string
   }
+  _cName(:x): 〈0;#c〉.name
 }

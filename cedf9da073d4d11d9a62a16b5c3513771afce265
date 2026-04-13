@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5516d76a_7e9f9b5a",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-13T12:45:51Z",
+      "side": 1,
+      "message": "The check is needed because `s` here is the body after `ParseQuotes` strips the opening delimiter, newline, and whitespace prefix. `ParseQuotes` finds the closing delimiter from the end, so the body can start with `\"\"\"`. For example:\n\n```\n\"\"\"\n\t\"\"\"0\n\t\"\"\"\n```\n\n`ParseQuotes` strips `\"\"\"\\n\\t`, leaving `s` \u003d `\"\"\"0\\n\\t\"\"\"`. Without the check, `Unquote` would accept this as body `\"\"\"0`, but the scanner would greedily match `\\t\"\"\"` as the closer — so we need to reject it here to stay consistent.\n\nIn other words, one of the added test cases fails without this check.",
+      "parentUuid": "b8fb7f51_dc7bb068",
+      "revId": "cedf9da073d4d11d9a62a16b5c3513771afce265",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de6a6f1d_74c0ccec",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-13T10:09:07Z",
       "side": 1,
       "message": "nit: I\u0027d be tempted to name this \"hasClosingDelimPrefix\" so that it\u0027s a little closer to strings.HasPrefix, which is really what it is.",
+      "revId": "cedf9da073d4d11d9a62a16b5c3513771afce265",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82219304_eac0a7eb",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-13T12:45:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de6a6f1d_74c0ccec",
       "revId": "cedf9da073d4d11d9a62a16b5c3513771afce265",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

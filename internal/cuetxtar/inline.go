@@ -313,7 +313,7 @@ func (r *inlineRunner) runArchive() {
 	// An invalid @test attribute is always a test failure.
 	for _, rec := range allRecords {
 		if rec.parseErr != nil {
-			r.t.Errorf("@test parse error at %s: %v", rec.parsed.srcAttr.Pos(), rec.parseErr)
+			r.t.Errorf("@test parse error at %s (%s): %v", rec.parsed.srcAttr.Pos(), rec.parsed.srcAttr.Text, rec.parseErr)
 		}
 	}
 

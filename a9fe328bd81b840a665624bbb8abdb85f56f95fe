@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bca8fb37_24b245ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T09:57:03Z",
+      "side": 1,
+      "message": "It is now a bit awkward that the packages live in the \"interpreter\" directory. How would you address that?",
+      "revId": "a9fe328bd81b840a665624bbb8abdb85f56f95fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9c67bbe_091f54ac",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T09:57:03Z",
+      "side": 1,
+      "message": "Since this is now public, shouldn\u0027t it be cuecontext.Injector?",
+      "revId": "a9fe328bd81b840a665624bbb8abdb85f56f95fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -316,6 +316,9 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	// p.ImportPath = string(dir) // compute unique ID.
 	p.Root = l.cfg.ModuleRoot
 	p.Module = l.cfg.Module
+	if l.cfg.Module != "" {
+		p.ModuleVersion, _ = module.NewVersion(l.cfg.Module, "")
+	}
 	p.ModuleFile = l.cfg.modFile
 
 	var err errors.Error
@@ -418,6 +421,7 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 		i.Root = root
 	}
 	i.Module = mv.Path()
+	i.ModuleVersion = mv
 	i.ModuleFile = mf
 	setFSLoc(l.cfg, i)
 

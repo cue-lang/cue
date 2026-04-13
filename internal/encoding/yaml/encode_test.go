@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"go.yaml.in/yaml/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
@@ -381,11 +380,7 @@ true
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			n, err := encode(tc.in)
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, err := yaml.Marshal(n)
+			b, err := Encode(tc.in)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -18,12 +18,9 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"math/big"
 	"regexp"
 	"strings"
 	"sync"
-
-	"go.yaml.in/yaml/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -48,116 +45,437 @@ import (
 //
 // TODO: support anchors through Ident.
 func Encode(n ast.Node) (b []byte, err error) {
-	y, err := encode(n)
-	if err != nil {
+	e := &yamlWriter{}
+	if err := e.encodeTop(n); err != nil {
 		return nil, err
 	}
-	w := &bytes.Buffer{}
-	enc := yaml.NewEncoder(w)
-	// Use idiomatic indentation.
-	enc.SetIndent(2)
-	if err = enc.Encode(y); err != nil {
-		return nil, err
-	}
-	return w.Bytes(), nil
+	return e.buf.Bytes(), nil
 }
 
-func encode(n ast.Node) (y *yaml.Node, err error) {
+// yamlWriter emits YAML text from CUE AST nodes.
+type yamlWriter struct {
+	buf    bytes.Buffer
+	indent int // current indentation level in spaces
+}
+
+func (w *yamlWriter) writeIndent() {
+	for i := 0; i < w.indent; i++ {
+		w.buf.WriteByte(' ')
+	}
+}
+
+func (w *yamlWriter) encodeTop(n ast.Node) error {
 	switch x := n.(type) {
-	case *ast.BasicLit:
-		y, err = encodeScalar(x)
+	case *ast.File:
+		return w.encodeDecls(x.Decls)
+	case *ast.StructLit:
+		// A top-level struct with braces on same line is flow style.
+		line := x.Lbrace.Line()
+		if line > 0 && line == x.Rbrace.Line() {
+			return w.encodeFlowMapping(x.Elts)
+		}
+		return w.encodeDecls(x.Elts)
+	default:
+		return w.encodeValue(n)
+	}
+}
+
+func (w *yamlWriter) encodeDecls(decls []ast.Decl) error {
+	docForNext := strings.Builder{}
+	hasEmbed := false
+	for _, d := range decls {
+		switch x := d.(type) {
+		default:
+			return errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
+
+		case *ast.Package:
+			continue
+
+		case *ast.CommentGroup:
+			// Accumulate standalone comment groups to be written before the next field.
+			if docForNext.Len() > 0 {
+				docForNext.WriteString("\n\n")
+			}
+			docForNext.WriteString(docToYAMLComment(x))
+			continue
+
+		case *ast.Attribute:
+			continue
+
+		case *ast.Field:
+			if !internal.IsRegularField(x) {
+				return errors.Newf(x.TokenPos, "yaml: definition or hidden fields not allowed")
+			}
+			if x.Constraint != token.ILLEGAL {
+				return errors.Newf(x.TokenPos, "yaml: optional fields not allowed")
+			}
+			if hasEmbed {
+				return errors.Newf(x.TokenPos, "yaml: embedding mixed with fields")
+			}
+			name, _, err := ast.LabelName(x.Label)
+			if err != nil {
+				return errors.Newf(x.Label.Pos(), "yaml: only literal labels allowed")
+			}
+
+			// Write head comments from the field's label.
+			w.writeNodeHeadComments(x.Label)
+
+			// Write head comments accumulated from comment groups.
+			if docForNext.Len() > 0 {
+				w.writeIndent()
+				w.buf.WriteString(docForNext.String())
+				w.buf.WriteByte('\n')
+				docForNext.Reset()
+			}
+
+			// Write head comments from the field itself.
+			w.writeNodeHeadComments(x)
+
+			// Write the key.
+			w.writeIndent()
+			w.writeYAMLKey(name)
+			w.buf.WriteString(":")
+
+			// Check for @yaml(,tag="...") attribute.
+			yamlTag, err := extractYAMLTag(x.Attrs)
+			if err != nil {
+				return err
+			}
+			if yamlTag != "" {
+				w.buf.WriteByte(' ')
+				w.buf.WriteString(yamlTag)
+			}
+
+			// Write the value.
+			if err := w.encodeFieldValue(x.Value); err != nil {
+				return err
+			}
+
+			// Write line comment.
+			w.writeNodeLineComment(x)
+			w.writeNodeLineComment(x.Value)
+			w.buf.WriteByte('\n')
+
+			// Write foot comments.
+			w.writeNodeFootComments(x)
+
+		case *ast.EmbedDecl:
+			if hasEmbed {
+				return errors.Newf(x.Pos(), "yaml: multiple embedded values")
+			}
+			hasEmbed = true
+			if docForNext.Len() > 0 {
+				w.buf.WriteString(docForNext.String())
+				docForNext.Reset()
+			}
+			w.writeNodeHeadComments(x)
+			if err := w.encodeValue(x.Expr); err != nil {
+				return err
+			}
+			w.writeNodeLineComment(x)
+			w.buf.WriteByte('\n')
+			w.writeNodeFootComments(x)
+		}
+	}
+
+	// Trailing standalone comments.
+	if docForNext.Len() > 0 {
+		w.buf.WriteString(docForNext.String())
+	}
+
+	return nil
+}
+
+// encodeFieldValue writes the value portion of a mapping entry.
+// For block-style structs/lists, it writes a newline then indented content.
+// For flow-style or scalars, it writes on the same line.
+func (w *yamlWriter) encodeFieldValue(n ast.Node) error {
+	switch x := n.(type) {
+	case *ast.StructLit:
+		line := x.Lbrace.Line()
+		if line > 0 && line == x.Rbrace.Line() {
+			// Flow style: {key: val, ...}
+			w.buf.WriteByte(' ')
+			return w.encodeFlowMapping(x.Elts)
+		}
+		// Block style: indented on next lines.
+		w.buf.WriteByte('\n')
+		w.indent += 2
+		err := w.encodeDecls(x.Elts)
+		w.indent -= 2
+		return err
 
 	case *ast.ListLit:
-		y, err = encodeExprs(x.Elts)
 		line := x.Lbrack.Line()
-		if err == nil && line > 0 && line == x.Rbrack.Line() {
-			y.Style = yaml.FlowStyle
+		if line > 0 && line == x.Rbrack.Line() {
+			// Flow style: [val, ...]
+			w.buf.WriteByte(' ')
+			return w.encodeFlowSequence(x.Elts)
 		}
+		// Block style: - entries. Use yaml.v3-compatible compact notation
+		// where the `-` is indented to the same level as the key.
+		w.buf.WriteByte('\n')
+		w.indent += 2
+		err := w.encodeBlockSequence(x.Elts)
+		w.indent -= 2
+		return err
 
-	case *ast.StructLit:
-		y, err = encodeDecls(x.Elts)
-		line := x.Lbrace.Line()
-		if err == nil && line > 0 && line == x.Rbrace.Line() {
-			y.Style = yaml.FlowStyle
-		}
+	default:
+		w.buf.WriteByte(' ')
+		return w.encodeValue(n)
+	}
+}
 
-	case *ast.File:
-		y, err = encodeDecls(x.Decls)
-
+func (w *yamlWriter) encodeValue(n ast.Node) error {
+	switch x := n.(type) {
+	case *ast.BasicLit:
+		return w.encodeScalar(x)
 	case *ast.UnaryExpr:
 		b, ok := x.X.(*ast.BasicLit)
 		if ok && x.Op == token.SUB && (b.Kind == token.INT || b.Kind == token.FLOAT) {
-			y, err = encodeScalar(b)
-			if !strings.HasPrefix(y.Value, "-") {
-				y.Value = "-" + y.Value
-				break
-			}
+			w.buf.WriteByte('-')
+			return w.encodeScalar(b)
 		}
-		return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
+		return errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
+	case *ast.StructLit:
+		line := x.Lbrace.Line()
+		if line > 0 && line == x.Rbrace.Line() {
+			return w.encodeFlowMapping(x.Elts)
+		}
+		return w.encodeDecls(x.Elts)
+	case *ast.ListLit:
+		line := x.Lbrack.Line()
+		if line > 0 && line == x.Rbrack.Line() {
+			return w.encodeFlowSequence(x.Elts)
+		}
+		return w.encodeBlockSequence(x.Elts)
 	default:
-		return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
+		return errors.Newf(n.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(n), n)
 	}
-	if err != nil {
-		return nil, err
-	}
-	addDocs(n, y, y)
-	return y, nil
 }
 
-func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
-	n = &yaml.Node{Kind: yaml.ScalarNode}
-
-	// TODO: use cue.Value and support attributes for setting YAML tags.
-
+func (w *yamlWriter) encodeScalar(b *ast.BasicLit) error {
 	switch b.Kind {
 	case token.INT:
-		var x big.Int
-		if err := setNum(n, b.Value, &x); err != nil {
-			return nil, err
+		value := b.Value
+		// Convert CUE number formats to YAML-compatible form.
+		// CUE supports SI suffixes (1K → 1000) and underscores that YAML doesn't.
+		// Binary (0b), hex (0x), and octal (0o) are preserved as yaml.v3 did.
+		var ni literal.NumInfo
+		if err := literal.ParseNum(value, &ni); err != nil {
+			return err
 		}
+		// ni.String() normalizes everything to decimal. We only want to
+		// normalize CUE-specific features (SI suffixes like 1K → 1000,
+		// and underscores like 1_000 → 1000), while preserving the base
+		// (0b, 0x, 0o) which YAML understands.
+		if ni.Multiplier() != 0 || ni.UseSep {
+			// Has SI suffix or separators: use fully normalized form.
+			w.buf.WriteString(ni.String())
+		} else {
+			// Preserve original format (including 0b, 0x, 0o prefix).
+			w.buf.WriteString(value)
+		}
+		return nil
 
 	case token.FLOAT:
-		var x big.Float
-		if err := setNum(n, b.Value, &x); err != nil {
-			return nil, err
-		}
+		w.buf.WriteString(b.Value)
+		return nil
 
-	case token.TRUE, token.FALSE, token.NULL:
-		n.Value = b.Value
+	case token.TRUE:
+		w.buf.WriteString("true")
+		return nil
+
+	case token.FALSE:
+		w.buf.WriteString("false")
+		return nil
+
+	case token.NULL:
+		w.buf.WriteString("null")
+		return nil
 
 	case token.STRING:
 		info, nStart, _, err := literal.ParseQuotes(b.Value, b.Value)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		str, err := info.Unquote(b.Value[nStart:])
 		if err != nil {
-			panic(fmt.Sprintf("invalid string: %v", err))
+			return fmt.Errorf("invalid string: %v", err)
 		}
-		n.SetString(str)
 
 		switch {
 		case !info.IsDouble():
-			n.Tag = "!!binary"
-			n.Value = base64.StdEncoding.EncodeToString([]byte(str))
+			// Bytes literal → !!binary.
+			w.buf.WriteString("!!binary ")
+			w.buf.WriteString(base64.StdEncoding.EncodeToString([]byte(str)))
 
 		case info.IsMulti():
-			// Preserve multi-line format.
-			n.Style = yaml.LiteralStyle
+			// Multi-line string → literal block scalar.
+			w.buf.WriteString("|-")
+			lines := strings.Split(str, "\n")
+			for _, line := range lines {
+				w.buf.WriteByte('\n')
+				w.writeIndent()
+				w.buf.WriteString("  ")
+				w.buf.WriteString(line)
+			}
 
 		default:
 			if shouldQuote(str) {
-				n.Style = yaml.DoubleQuotedStyle
+				w.buf.WriteByte('\'')
+				w.buf.WriteString(strings.ReplaceAll(str, "'", "''"))
+				w.buf.WriteByte('\'')
+			} else {
+				w.buf.WriteString(str)
 			}
 		}
+		return nil
 
 	default:
-		return nil, errors.Newf(b.Pos(), "unknown literal type %v", b.Kind)
+		return errors.Newf(b.Pos(), "unknown literal type %v", b.Kind)
 	}
-	return n, nil
 }
 
-// shouldQuote indicates that a string may be a YAML 1.1. legacy value and that
+func (w *yamlWriter) encodeFlowMapping(decls []ast.Decl) error {
+	w.buf.WriteByte('{')
+	first := true
+	for _, d := range decls {
+		f, ok := d.(*ast.Field)
+		if !ok {
+			continue
+		}
+		if !first {
+			w.buf.WriteString(", ")
+		}
+		first = false
+		name, _, err := ast.LabelName(f.Label)
+		if err != nil {
+			return err
+		}
+		w.writeYAMLKey(name)
+		w.buf.WriteString(": ")
+		if err := w.encodeValue(f.Value); err != nil {
+			return err
+		}
+	}
+	w.buf.WriteByte('}')
+	return nil
+}
+
+func (w *yamlWriter) encodeFlowSequence(elts []ast.Expr) error {
+	w.buf.WriteByte('[')
+	for i, e := range elts {
+		if i > 0 {
+			w.buf.WriteString(", ")
+		}
+		if err := w.encodeValue(e); err != nil {
+			return err
+		}
+	}
+	w.buf.WriteByte(']')
+	return nil
+}
+
+func (w *yamlWriter) encodeBlockSequence(elts []ast.Expr) error {
+	for _, e := range elts {
+		w.writeIndent()
+		// For struct elements in a list, the first field goes after "- "
+		// and subsequent fields are indented to align.
+		if sl, ok := e.(*ast.StructLit); ok {
+			line := sl.Lbrace.Line()
+			isFlow := line > 0 && line == sl.Rbrace.Line()
+			if isFlow {
+				w.buf.WriteString("- ")
+				if err := w.encodeFlowMapping(sl.Elts); err != nil {
+					return err
+				}
+				w.buf.WriteByte('\n')
+			} else {
+				// Write struct fields with "- " prefix for the first.
+				for i, d := range sl.Elts {
+					f, ok := d.(*ast.Field)
+					if !ok {
+						continue
+					}
+					name, _, err := ast.LabelName(f.Label)
+					if err != nil {
+						return err
+					}
+					if i == 0 {
+						w.buf.WriteString("- ")
+					} else {
+						w.writeIndent()
+						w.buf.WriteString("  ")
+					}
+					w.writeYAMLKey(name)
+					w.buf.WriteByte(':')
+					if err := w.encodeFieldValue(f.Value); err != nil {
+						return err
+					}
+					w.buf.WriteByte('\n')
+				}
+			}
+		} else {
+			w.buf.WriteString("- ")
+			if err := w.encodeValue(e); err != nil {
+				return err
+			}
+			w.buf.WriteByte('\n')
+		}
+	}
+	return nil
+}
+
+// writeYAMLKey writes a mapping key, quoting if necessary.
+func (w *yamlWriter) writeYAMLKey(name string) {
+	if shouldQuote(name) {
+		w.buf.WriteByte('"')
+		w.buf.WriteString(name)
+		w.buf.WriteByte('"')
+	} else {
+		w.buf.WriteString(name)
+	}
+}
+
+// Comment helpers
+
+func (w *yamlWriter) writeNodeHeadComments(n ast.Node) {
+	for _, c := range ast.Comments(n) {
+		if !c.Doc {
+			continue
+		}
+		w.writeIndent()
+		w.buf.WriteString(docToYAMLComment(c))
+		w.buf.WriteByte('\n')
+	}
+}
+
+func (w *yamlWriter) writeNodeLineComment(n ast.Node) {
+	for _, c := range ast.Comments(n) {
+		if !c.Line {
+			continue
+		}
+		w.buf.WriteByte(' ')
+		w.buf.WriteString(docToYAMLComment(c))
+	}
+}
+
+func (w *yamlWriter) writeNodeFootComments(n ast.Node) {
+	for _, c := range ast.Comments(n) {
+		if c.Position <= 0 || c.Doc || c.Line {
+			continue
+		}
+		if c.Pos().RelPos() == token.NewSection {
+			w.buf.WriteByte('\n')
+		}
+		w.writeIndent()
+		w.buf.WriteString(docToYAMLComment(c))
+		w.buf.WriteByte('\n')
+	}
+}
+
+// shouldQuote indicates that a string may be a YAML 1.1 legacy value and that
 // the string should be quoted.
 func shouldQuote(str string) bool {
 	return legacyStrings[str] || useQuote().MatchString(str)
@@ -170,73 +488,19 @@ var useQuote = sync.OnceValue(func() *regexp.Regexp {
 })
 
 // legacyStrings contains a map of fixed strings with special meaning for any
-// type in the YAML Tag registry (https://yaml.org/type/index.html) as used
-// in YAML 1.1.
-//
-// These strings are always quoted upon export to allow for backward
-// compatibility with YAML 1.1 parsers.
+// type in the YAML Tag registry as used in YAML 1.1.
 var legacyStrings = map[string]bool{
-	"y":     true,
-	"Y":     true,
-	"yes":   true,
-	"Yes":   true,
-	"YES":   true,
-	"n":     true,
-	"N":     true,
-	"t":     true,
-	"T":     true,
-	"f":     true,
-	"F":     true,
-	"no":    true,
-	"No":    true,
-	"NO":    true,
-	"true":  true,
-	"True":  true,
-	"TRUE":  true,
-	"false": true,
-	"False": true,
-	"FALSE": true,
-	"on":    true,
-	"On":    true,
-	"ON":    true,
-	"off":   true,
-	"Off":   true,
-	"OFF":   true,
-
-	// Non-standard.
+	"y": true, "Y": true, "yes": true, "Yes": true, "YES": true,
+	"n": true, "N": true, "t": true, "T": true, "f": true, "F": true,
+	"no": true, "No": true, "NO": true,
+	"true": true, "True": true, "TRUE": true,
+	"false": true, "False": true, "FALSE": true,
+	"on": true, "On": true, "ON": true,
+	"off": true, "Off": true, "OFF": true,
 	".Nan": true,
 }
 
-func setNum(n *yaml.Node, s string, x interface{}) error {
-	if yaml.Unmarshal([]byte(s), x) == nil {
-		n.Value = s
-		return nil
-	}
-
-	var ni literal.NumInfo
-	if err := literal.ParseNum(s, &ni); err != nil {
-		return err
-	}
-	n.Value = ni.String()
-	return nil
-}
-
-func encodeExprs(exprs []ast.Expr) (n *yaml.Node, err error) {
-	n = &yaml.Node{Kind: yaml.SequenceNode}
-
-	for _, elem := range exprs {
-		e, err := encode(elem)
-		if err != nil {
-			return nil, err
-		}
-		n.Content = append(n.Content, e)
-	}
-	return n, nil
-}
-
 // extractYAMLTag looks for @yaml(,tag="...") attribute and returns the tag value.
-// Returns an empty string if no @yaml attribute or no tag argument is found.
-// Returns an error if the attribute is malformed.
 func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
 	for _, attr := range attrs {
 		if attr.Name() != "yaml" {
@@ -255,151 +519,10 @@ func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
 	return "", nil
 }
 
-// encodeDecls converts a sequence of declarations to a value. If it encounters
-// an embedded value, it will return this expression. This is more relaxed for
-// structs than is currently allowed for CUE, but the expectation is that this
-// will be allowed at some point. The input would still be illegal CUE.
-func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
-	n = &yaml.Node{Kind: yaml.MappingNode}
-
-	docForNext := strings.Builder{}
-	var lastHead, lastFoot *yaml.Node
-	hasEmbed := false
-	for _, d := range decls {
-		switch x := d.(type) {
-		default:
-			return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
-
-		case *ast.Package:
-			if len(n.Content) > 0 {
-				return nil, errors.Newf(x.Pos(), "invalid package clause")
-			}
-			continue
-
-		case *ast.CommentGroup:
-			docForNext.WriteString(docToYAML(x))
-			docForNext.WriteString("\n\n")
-			continue
-
-		case *ast.Attribute:
-			continue
-
-		case *ast.Field:
-			if !internal.IsRegularField(x) {
-				return nil, errors.Newf(x.TokenPos, "yaml: definition or hidden fields not allowed")
-			}
-			if x.Constraint != token.ILLEGAL {
-				return nil, errors.Newf(x.TokenPos, "yaml: optional fields not allowed")
-			}
-			if hasEmbed {
-				return nil, errors.Newf(x.TokenPos, "yaml: embedding mixed with fields")
-			}
-			name, _, err := ast.LabelName(x.Label)
-			if err != nil {
-				return nil, errors.Newf(x.Label.Pos(), "yaml: only literal labels allowed")
-			}
-
-			label := &yaml.Node{}
-			addDocs(x.Label, label, label)
-			label.SetString(name)
-			if shouldQuote(name) {
-				label.Style = yaml.DoubleQuotedStyle
-			}
-
-			value, err := encode(x.Value)
-			if err != nil {
-				return nil, err
-			}
-
-			yamlTag, err := extractYAMLTag(x.Attrs)
-			if err != nil {
-				return nil, err
-			}
-			if yamlTag != "" {
-				value.Tag = yamlTag
-			}
-
-			lastHead = label
-			lastFoot = value
-			addDocs(x, label, value)
-			n.Content = append(n.Content, label)
-			n.Content = append(n.Content, value)
-
-		case *ast.EmbedDecl:
-			if hasEmbed {
-				return nil, errors.Newf(x.Pos(), "yaml: multiple embedded values")
-			}
-			hasEmbed = true
-			e, err := encode(x.Expr)
-			if err != nil {
-				return nil, err
-			}
-			addDocs(x, e, e)
-			lastHead = e
-			lastFoot = e
-			n.Content = append(n.Content, e)
-		}
-		if docForNext.Len() > 0 {
-			docForNext.WriteString(lastHead.HeadComment)
-			lastHead.HeadComment = docForNext.String()
-			docForNext.Reset()
-		}
-	}
-
-	if docForNext.Len() > 0 && lastFoot != nil {
-		if !strings.HasSuffix(lastFoot.FootComment, "\n") {
-			lastFoot.FootComment += "\n"
-		}
-		n := docForNext.Len()
-		lastFoot.FootComment += docForNext.String()[:n-1]
-	}
-
-	if hasEmbed {
-		return n.Content[0], nil
-	}
-
-	return n, nil
-}
-
-// addDocs prefixes head, replaces line and appends foot comments.
-func addDocs(n ast.Node, h, f *yaml.Node) {
-	head := ""
-	isDoc := false
-	for _, c := range ast.Comments(n) {
-		switch {
-		case c.Line:
-			f.LineComment = docToYAML(c)
-
-		case c.Position > 0:
-			if f.FootComment != "" {
-				f.FootComment += "\n\n"
-			} else if relPos := c.Pos().RelPos(); relPos == token.NewSection {
-				f.FootComment += "\n"
-			}
-			f.FootComment += docToYAML(c)
-
-		default:
-			if head != "" {
-				head += "\n\n"
-			}
-			head += docToYAML(c)
-			isDoc = isDoc || c.Doc
-		}
-	}
-
-	if head != "" {
-		if h.HeadComment != "" || !isDoc {
-			head += "\n\n"
-		}
-		h.HeadComment = head + h.HeadComment
-	}
-}
-
-// docToYAML converts a CUE CommentGroup to a YAML comment string. This ensures
-// that comments with empty lines get properly converted.
-func docToYAML(c *ast.CommentGroup) string {
+// docToYAMLComment converts a CUE CommentGroup to a YAML comment string.
+func docToYAMLComment(c *ast.CommentGroup) string {
 	s := c.Text()
-	s = strings.TrimSuffix(s, "\n") // always trims
+	s = strings.TrimSuffix(s, "\n")
 	lines := strings.Split(s, "\n")
 	for i, l := range lines {
 		if l == "" {

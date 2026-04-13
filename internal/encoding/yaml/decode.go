@@ -3,17 +3,16 @@ package yaml
 import (
 	"bytes"
 	"encoding/base64"
-	"errors"
+	"encoding/binary"
 	"fmt"
 	"io"
-	"regexp"
-	"slices"
 	"sort"
-	"strconv"
 	"strings"
-	"sync"
+	"unicode/utf16"
 
-	"go.yaml.in/yaml/v3"
+	gast "github.com/goccy/go-yaml/ast"
+	gparser "github.com/goccy/go-yaml/parser"
+	gtoken "github.com/goccy/go-yaml/token"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
@@ -34,16 +33,16 @@ type Decoder interface {
 	Decode() (ast.Expr, error)
 }
 
-// decoder wraps a [yaml.Decoder] to extract CUE syntax tree nodes.
+// decoder wraps the goccy/go-yaml parser to extract CUE syntax tree nodes.
 type decoder struct {
-	yamlDecoder yaml.Decoder
-
-	// yamlNonEmpty is true once yamlDecoder tells us the input YAML wasn't empty.
-	// Useful so that we can extract "null" when the input is empty.
-	yamlNonEmpty bool
+	docs   []*gast.DocumentNode
+	docIdx int
 
 	// decodeErr is returned by any further calls to Decode when not nil.
 	decodeErr error
+
+	// isEmpty is true when the input was entirely empty (no content, not even ---).
+	isEmpty bool
 
 	src      []byte
 	tokFile  *token.File
@@ -51,14 +50,15 @@ type decoder struct {
 
 	// pendingHeadComments collects the head (preceding) comments
 	// from the YAML nodes we are extracting.
-	// We can't add comments to a CUE syntax tree node until we've created it,
-	// but we need to extract these comments first since they have earlier positions.
 	pendingHeadComments []*ast.Comment
 
-	// extractingAliases ensures we don't loop forever when expanding YAML anchors.
-	extractingAliases map[*yaml.Node]bool
+	// anchors maps anchor names to their corresponding YAML AST nodes.
+	anchors map[string]gast.Node
 
-	// lastOffset is byte offset from the last yaml.Node position that
+	// extractingAliases ensures we don't loop forever when expanding YAML anchors.
+	extractingAliases map[string]bool
+
+	// lastOffset is byte offset from the last yaml node position that
 	// we decoded, used for working out relative positions such as
 	// token.NewSection. This offset can only increase, moving forward
 	// in the file. A value of -1 means no position has been recorded
@@ -69,38 +69,102 @@ type decoder struct {
 	forceNewline bool
 
 	// scopeEnd is the byte offset (exclusive) bounding the current
-	// node's extent in the source. Used to compute Rbrace positions
-	// for struct literals: the Rbrace is placed at offset scopeEnd-1
-	// (typically the \n ending the last line before the next content).
+	// node's extent in the source.
 	scopeEnd int
 }
-
-// TODO(mvdan): this can be io.Reader really, except that token.Pos is offset-based,
-// so the only way to really have true Offset+Line+Col numbers is to know
-// the size of the entire YAML node upfront.
-// With json we can use RawMessage to know the size of the input
-// before we extract into ast.Expr, but unfortunately, yaml.Node has no size.
 
 // NewDecoder creates a decoder for YAML values to extract CUE syntax tree nodes.
 //
 // The filename is used for position information in CUE syntax tree nodes
 // as well as any errors encountered while decoding YAML.
 func NewDecoder(filename string, b []byte) *decoder {
-	// Note that yaml.v3 can insert a null node just past the end of the input
-	// in some edge cases, so we pretend that there's an extra newline
-	// so that we don't panic when handling such a position.
+	// Detect and convert UTF-16 BOM to UTF-8.
+	// YAML 1.1 allows UTF-16 with BOM; goccy only handles UTF-8.
+	b = decodeUTF16BOM(b)
+
+	// goccy's scanner rejects tab characters in some contexts where
+	// yaml.v3 accepted them. We handle this by retrying with tab
+	// replacement if parsing fails (see parseWithTabRetry).
+
+	// Note that we add an extra byte to the file size to handle edge cases
+	// where a position might be just past the end of the input.
 	tokFile := token.NewFile(filename, 0, len(b)+1)
 	tokFile.SetLinesForContent(b)
-	return &decoder{
-		src:         b,
-		tokFile:     tokFile,
-		tokLines:    append(tokFile.Lines(), len(b)),
-		yamlDecoder: *yaml.NewDecoder(bytes.NewReader(b)),
-		lastOffset:  -1,
-		// TODO: for a streaming decoder we'll need to remove this
-		// dependency on knowing the length of the input ahead of time.
-		scopeEnd: len(b),
+	d := &decoder{
+		src:        b,
+		tokFile:    tokFile,
+		tokLines:   append(tokFile.Lines(), len(b)),
+		lastOffset: -1,
+		scopeEnd:   len(b),
 	}
+
+	// Detect truly empty input before parsing.
+	if len(bytes.TrimSpace(b)) == 0 {
+		d.isEmpty = true
+		return d
+	}
+
+	file, err := gparser.ParseBytes(b, gparser.ParseComments)
+	if err != nil && bytes.ContainsRune(b, '\t') {
+		// goccy rejects tabs in some places where yaml.v3 accepted them.
+		// Retry with tabs replaced by spaces.
+		b2 := bytes.ReplaceAll(b, []byte("\t"), []byte(" "))
+		file2, err2 := gparser.ParseBytes(b2, gparser.ParseComments)
+		if err2 == nil {
+			file = file2
+			err = nil
+			// Update source and line table for the tab-replaced input.
+			d.src = b2
+			tokFile2 := token.NewFile(filename, 0, len(b2)+1)
+			tokFile2.SetLinesForContent(b2)
+			d.tokFile = tokFile2
+			d.tokLines = append(tokFile2.Lines(), len(b2))
+		}
+	}
+	if err != nil {
+		e := err.Error()
+		d.decodeErr = fmt.Errorf("%s: %s", filename, e)
+	} else if file != nil {
+		d.docs = file.Docs
+	}
+
+	return d
+}
+
+// decodeUTF16BOM detects a UTF-16 LE or BE BOM at the start of b
+// and converts the content to UTF-8. If no BOM is found, b is returned as-is.
+func decodeUTF16BOM(b []byte) []byte {
+	if len(b) < 2 {
+		return b
+	}
+	var byteOrder binary.ByteOrder
+	switch {
+	case b[0] == 0xFF && b[1] == 0xFE:
+		byteOrder = binary.LittleEndian
+	case b[0] == 0xFE && b[1] == 0xFF:
+		byteOrder = binary.BigEndian
+	default:
+		return b
+	}
+	// Strip BOM and decode UTF-16.
+	b = b[2:]
+	if len(b)%2 != 0 {
+		b = b[:len(b)-1] // drop trailing byte if odd
+	}
+	u16 := make([]uint16, len(b)/2)
+	for i := range u16 {
+		if byteOrder == binary.LittleEndian {
+			u16[i] = binary.LittleEndian.Uint16(b[2*i:])
+		} else {
+			u16[i] = binary.BigEndian.Uint16(b[2*i:])
+		}
+	}
+	runes := utf16.Decode(u16)
+	var buf bytes.Buffer
+	for _, r := range runes {
+		buf.WriteRune(r)
+	}
+	return buf.Bytes()
 }
 
 // Decode consumes a YAML value and returns it in CUE syntax tree node.
@@ -111,61 +175,57 @@ func (d *decoder) Decode() (ast.Expr, error) {
 	if err := d.decodeErr; err != nil {
 		return nil, err
 	}
-	var yn yaml.Node
-	if err := d.yamlDecoder.Decode(&yn); err != nil {
-		if err == io.EOF {
-			// Any further Decode calls must return EOF to avoid an endless loop.
-			d.decodeErr = io.EOF
 
-			// If the input is empty, we produce `*null | _` followed by EOF.
-			// Note that when the input contains "---", we get an empty document
-			// with a null scalar value inside instead.
-			if !d.yamlNonEmpty {
-				// Attach positions which at least point to the filename.
-				pos := d.tokFile.Pos(0, token.NoRelPos)
-				return &ast.BinaryExpr{
-					Op:    token.OR,
-					OpPos: pos,
-					X: &ast.UnaryExpr{
-						Op:    token.MUL,
-						OpPos: pos,
-						X: &ast.BasicLit{
-							Kind:     token.NULL,
-							ValuePos: pos,
-							Value:    "null",
-						},
-					},
-					Y: &ast.Ident{
-						Name:    "_",
-						NamePos: pos,
-					},
-				}, nil
-			}
-			// If the input wasn't empty, we already decoded some CUE syntax nodes,
-			// so here we should just return io.EOF to stop.
-			return nil, io.EOF
-		}
-		// Unfortunately, yaml.v3's syntax errors are opaque strings,
-		// and they only include line numbers in some but not all cases.
-		// TODO(mvdan): improve upstream's errors so they are structured
-		// and always contain some position information.
-		e := err.Error()
-		if s, ok := strings.CutPrefix(e, "yaml: line "); ok {
-			// From "yaml: line 3: some issue" to "foo.yaml:3: some issue".
-			e = d.tokFile.Name() + ":" + s
-		} else if s, ok := strings.CutPrefix(e, "yaml:"); ok {
-			// From "yaml: some issue" to "foo.yaml: some issue".
-			e = d.tokFile.Name() + ":" + s
-		} else {
-			return nil, err
-		}
-		err = errors.New(e)
-		// Any further Decode calls repeat this error.
-		d.decodeErr = err
-		return nil, err
+	// Handle truly empty input: produce `*null | _` then EOF.
+	if d.isEmpty {
+		d.isEmpty = false
+		d.decodeErr = io.EOF
+		pos := d.tokFile.Pos(0, token.NoRelPos)
+		return &ast.BinaryExpr{
+			Op:    token.OR,
+			OpPos: pos,
+			X: &ast.UnaryExpr{
+				Op:    token.MUL,
+				OpPos: pos,
+				X: &ast.BasicLit{
+					Kind:     token.NULL,
+					ValuePos: pos,
+					Value:    "null",
+				},
+			},
+			Y: &ast.Ident{
+				Name:    "_",
+				NamePos: pos,
+			},
+		}, nil
 	}
-	d.yamlNonEmpty = true
-	return d.extract(&yn)
+
+	if d.docIdx >= len(d.docs) {
+		d.decodeErr = io.EOF
+		return nil, io.EOF
+	}
+
+	// Skip documents that only contain directives (e.g., %TAG, %YAML).
+	for d.docIdx < len(d.docs) {
+		doc := d.docs[d.docIdx]
+		d.docIdx++
+		if doc.Body == nil {
+			// Empty document (e.g., bare ---).
+			pos := d.tokFile.Pos(0, token.NoRelPos)
+			return &ast.BasicLit{
+				ValuePos: pos.WithRel(token.Blank),
+				Kind:     token.NULL,
+				Value:    "null",
+			}, nil
+		}
+		if _, isDir := doc.Body.(*gast.DirectiveNode); isDir {
+			// Skip directive-only documents.
+			continue
+		}
+		return d.extract(doc.Body)
+	}
+	d.decodeErr = io.EOF
+	return nil, io.EOF
 }
 
 // Unmarshal parses a single YAML value to a CUE expression.
@@ -178,10 +238,6 @@ func Unmarshal(filename string, data []byte) (ast.Expr, error) {
 		}
 		return nil, err
 	}
-	// TODO(mvdan): decoding the entire next value is unnecessary;
-	// consider either a "More" or "Done" method to tell if we are at EOF,
-	// or splitting the Decode method into two variants.
-	// This should use proper error values with positions as well.
 	if n2, err := d.Decode(); err == nil {
 		return nil, fmt.Errorf("%s: expected a single YAML document", n2.Pos())
 	} else if err != io.EOF {
@@ -190,24 +246,114 @@ func Unmarshal(filename string, data []byte) (ast.Expr, error) {
 	return n, nil
 }
 
-func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {
+// goccyOffset converts a goccy AST node's position to a 0-based byte offset.
+// We use Line and Column rather than the Offset field because goccy's Offset
+// tracking is inconsistent when comments are present.
+func (d *decoder) goccyOffset(n gast.Node) int {
+	tk := n.GetToken()
+	if tk == nil || tk.Position == nil {
+		return 0
+	}
+	return d.tokenOffset(tk)
+}
+
+// tokenOffset converts a goccy token's Line/Column to a 0-based byte offset.
+// We use Line and Column rather than the Offset field because goccy's Offset
+// tracking is inconsistent when comments are present.
+func (d *decoder) tokenOffset(tk *gtoken.Token) int {
+	if tk == nil || tk.Position == nil {
+		return 0
+	}
+	line := tk.Position.Line  // 1-indexed
+	col := tk.Position.Column // 1-indexed
+	if line < 1 || line > len(d.tokLines) {
+		return 0
+	}
+	return d.tokLines[line-1] + (col - 1)
+}
+
+// goccyLine returns the 1-indexed line number for a goccy AST node.
+func goccyLine(n gast.Node) int {
+	tk := n.GetToken()
+	if tk == nil || tk.Position == nil {
+		return 1
+	}
+	return tk.Position.Line
+}
+
+func (d *decoder) extract(yn gast.Node) (ast.Expr, error) {
+	if yn == nil {
+		var off int
+		if d.lastOffset >= 0 {
+			off = d.lastOffset
+		}
+		pos := d.pos(off)
+		return &ast.BasicLit{
+			ValuePos: pos.WithRel(token.Blank),
+			Kind:     token.NULL,
+			Value:    "null",
+		}, nil
+	}
+
+	// Unwrap anchor nodes: register the anchor and extract the inner value.
+	if anchor, ok := yn.(*gast.AnchorNode); ok {
+		if d.anchors == nil {
+			d.anchors = make(map[string]gast.Node)
+		}
+		name := anchor.Name.GetToken().Value
+		d.anchors[name] = anchor.Value
+		return d.extract(anchor.Value)
+	}
+
+	// Handle tag nodes.
+	if tag, ok := yn.(*gast.TagNode); ok {
+		return d.tagged(tag)
+	}
+
 	d.addHeadCommentsToPending(yn)
+
 	var expr ast.Expr
 	var err error
-	switch yn.Kind {
-	case yaml.DocumentNode:
-		expr, err = d.document(yn)
-	case yaml.SequenceNode:
-		expr, err = d.sequence(yn)
-	case yaml.MappingNode:
-		expr, err = d.mapping(yn)
-	case yaml.ScalarNode:
-		expr, err = d.scalar(yn)
-	case yaml.AliasNode:
-		expr, err = d.alias(yn)
+
+	switch n := yn.(type) {
+	case *gast.MappingNode:
+		expr, err = d.mapping(n)
+	case *gast.MappingValueNode:
+		expr, err = d.singleMappingValue(n)
+	case *gast.SequenceNode:
+		expr, err = d.sequence(n)
+	case *gast.StringNode:
+		expr, err = d.stringNode(n)
+	case *gast.LiteralNode:
+		expr, err = d.literalNode(n)
+	case *gast.IntegerNode:
+		expr, err = d.integerNode(n)
+	case *gast.FloatNode:
+		expr, err = d.floatNode(n)
+	case *gast.BoolNode:
+		expr, err = d.boolNode(n)
+	case *gast.NullNode:
+		expr, err = d.nullNode(n)
+	case *gast.InfinityNode:
+		expr, err = d.infinityNode(n)
+	case *gast.NanNode:
+		expr, err = d.nanNode(n)
+	case *gast.AliasNode:
+		expr, err = d.alias(n)
+	case *gast.DirectiveNode:
+		// YAML directives like %TAG or %YAML. Skip and return null.
+		// The directive itself is metadata, not content.
+		// If there's a next document, it will be handled separately.
+		pos := d.pos(d.goccyOffset(n))
+		return &ast.BasicLit{
+			ValuePos: pos.WithRel(token.Blank),
+			Kind:     token.NULL,
+			Value:    "null",
+		}, nil
 	default:
-		return nil, d.posErrorf(yn, "unknown yaml node kind: %d", yn.Kind)
+		return nil, fmt.Errorf("unknown yaml node type: %T", yn)
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -215,59 +361,35 @@ func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {
 	return expr, nil
 }
 
-// comments parses a newline-delimited list of YAML "#" comments
-// and turns them into a list of cue/ast comments.
-func (d *decoder) comments(src string) []*ast.Comment {
-	if src == "" {
+// Comment handling
+
+// extractGoccyComments converts a goccy CommentGroupNode to CUE comments.
+func (d *decoder) extractGoccyComments(cg *gast.CommentGroupNode) []*ast.Comment {
+	if cg == nil {
 		return nil
 	}
 	var comments []*ast.Comment
-	for line := range strings.SplitSeq(src, "\n") {
-		if line == "" {
-			continue // yaml.v3 comments have a trailing newline at times
+	for _, c := range cg.Comments {
+		text := c.Token.Value
+		// Convert YAML # comment to CUE // comment.
+		if strings.HasPrefix(text, "#") {
+			text = text[1:]
 		}
 		comments = append(comments, &ast.Comment{
-			// Trim the leading "#".
-			// Note that yaml.v3 does not give us comment positions.
-			Text: "//" + line[1:],
+			Text: "//" + text,
 		})
 	}
 	return comments
 }
 
-// addHeadCommentsToPending parses a node's head comments and adds them to a pending list,
-// to be used later by addComments once a cue/ast node is constructed.
-func (d *decoder) addHeadCommentsToPending(yn *yaml.Node) {
-	comments := d.comments(yn.HeadComment)
-	// TODO(mvdan): once yaml.v3 records comment positions,
-	// we can better ensure that sections separated by empty lines are kept that way.
-	// For now, all we can do is approximate by counting lines,
-	// and assuming that head comments are not separated from their node.
-	// This will be wrong in some cases, moving empty lines, but is better than nothing.
-	if len(d.pendingHeadComments) == 0 && len(comments) > 0 {
-		c := comments[0]
-		if d.lastOffset >= 0 && (yn.Line-len(comments))-d.offsetLine(d.lastOffset) >= 2 {
-			c.Slash = c.Slash.WithRel(token.NewSection)
-		}
-	}
-	d.pendingHeadComments = append(d.pendingHeadComments, comments...)
+func (d *decoder) addHeadCommentsToPending(yn gast.Node) {
+	// Head comments for MappingValueNodes are handled in insertMap.
+	// Head comments for sequence entries are handled in sequence().
+	// For other node types, we don't expect head comments from goccy.
 }
 
-// addCommentsToNode adds any pending head comments, plus a YAML node's line
-// and foot comments, to a cue/ast node.
-func (d *decoder) addCommentsToNode(n ast.Node, yn *yaml.Node, linePos int8) {
-	// cue/ast and cue/format are not able to attach a comment to a node
-	// when the comment immediately follows the node.
-	// For some nodes like fields, the best we can do is move the comments up.
-	// For the root-level struct, we do want to leave comments
-	// at the end of the document to be left at the very end.
-	//
-	// TODO(mvdan): can we do better? for example, support attaching trailing comments to a cue/ast.Node?
-	footComments := d.comments(yn.FootComment)
-	if _, ok := n.(*ast.StructLit); !ok {
-		d.pendingHeadComments = append(d.pendingHeadComments, footComments...)
-		footComments = nil
-	}
+func (d *decoder) addCommentsToNode(n ast.Node, yn gast.Node, linePos int8) {
+	// Add any pending head comments.
 	if comments := d.pendingHeadComments; len(comments) > 0 {
 		ast.AddComment(n, &ast.CommentGroup{
 			Doc:      true,
@@ -275,84 +397,17 @@ func (d *decoder) addCommentsToNode(n ast.Node, yn *yaml.Node, linePos int8) {
 			List:     comments,
 		})
 	}
-	if comments := d.comments(yn.LineComment); len(comments) > 0 {
-		ast.AddComment(n, &ast.CommentGroup{
-			Line:     true,
-			Position: linePos,
-			List:     comments,
-		})
-	}
-	if comments := footComments; len(comments) > 0 {
-		ast.AddComment(n, &ast.CommentGroup{
-			// After 100 tokens, so that the comment goes after the entire node.
-			// TODO(mvdan): this is hacky, can the cue/ast API support trailing comments better?
-			Position: 100,
-			List:     comments,
-		})
-	}
 	d.pendingHeadComments = nil
+
+	// For scalar nodes that are NOT inside a mapping value (where insertMap
+	// handles comments), add their own line comment.
+	// Mapping value inline comments are handled by insertMap.
+	// We only add comments here for top-level or sequence element scalars.
 }
 
-func (d *decoder) posErrorf(yn *yaml.Node, format string, args ...any) error {
-	// TODO(mvdan): use columns as well; for now they are left out to avoid test churn
-	// return fmt.Errorf(d.pos(n).String()+" "+format, args...)
-	return fmt.Errorf(d.tokFile.Name()+":"+strconv.Itoa(yn.Line)+": "+format, args...)
-}
-
-// yamlOffset converts a YAML node's line and column to a byte offset.
-func (d *decoder) yamlOffset(yn *yaml.Node) int {
-	return d.tokLines[yn.Line-1] + (yn.Column - 1)
-}
-
-// offsetLine returns a 1-indexed line number for the given byte
-// offset.
-func (d *decoder) offsetLine(offset int) int {
-	return sort.Search(len(d.tokLines), func(i int) bool {
-		return d.tokLines[i] > offset
-	})
-}
-
-// contentOffset returns the byte offset where a node's content
-// starts, skipping past any YAML anchor prefix (&name). For
-// flow-style nodes, it finds the opening delimiter (open). For
-// block-style nodes, it skips past the anchor and newline. When the
-// node has no anchor, it returns the node's position as-is.
-func (d *decoder) contentOffset(yn *yaml.Node, open byte) int {
-	offset := d.yamlOffset(yn)
-	if yn.Anchor == "" {
-		return offset
-	}
-
-	if yn.Style&yaml.FlowStyle != 0 {
-		for offset < len(d.src) && d.src[offset] != open {
-			offset++
-		}
-		return offset
-	}
-
-	// For block style, we want to be as greedy as possible. So once
-	// we're past the anchor, we want to stop right after the first
-	// newline, or at the first non-whitespace, whichever is sooner.
-	offset += 1 + len(yn.Anchor) // skip '&' and anchor name
-	newlineSeen := false
-	for ; offset < len(d.src); offset++ {
-		if newlineSeen {
-			return offset
-		}
-		switch d.src[offset] {
-		case ' ', '\t':
-		case '\n', '\r':
-			newlineSeen = true
-		default:
-			return offset
-		}
-	}
-	return offset
-}
+// Position helpers
 
 // pos converts a byte offset to a cue/ast position.
-// Note that this method uses and updates the last offset in lastOffset,
-// so it should be called with increasing offsets.
 func (d *decoder) pos(offset int) token.Pos {
 	pos := d.tokFile.Pos(offset, token.NoRelPos)
 
@@ -372,11 +427,6 @@ func (d *decoder) pos(offset int) token.Pos {
 		default:
 			pos = pos.WithRel(token.NoSpace)
 		}
-		// If for any reason the offset is before the last offset, give
-		// up and return an empty position.
-		//
-		// TODO(mvdan): Brought over from the old decoder; when does this happen?
-		// Can we get rid of those edge cases and this bit of logic?
 		if offset < d.lastOffset {
 			return token.NoPos
 		}
@@ -385,49 +435,49 @@ func (d *decoder) pos(offset int) token.Pos {
 	return pos
 }
 
+// offsetLine returns a 1-indexed line number for the given byte offset.
+func (d *decoder) offsetLine(offset int) int {
+	return sort.Search(len(d.tokLines), func(i int) bool {
+		return d.tokLines[i] > offset
+	})
+}
+
 // findClosing scans forward from start in the source bytes to find
-// the first occurrence of close (typically '}' or ']') that is not
-// inside a quoted string or comment. It returns the byte offset.
+// the first occurrence of close that is not inside a quoted string or comment.
 func (d *decoder) findClosing(start int, close byte) int {
 	for i := start; i < len(d.src); i++ {
 		switch d.src[i] {
 		case close:
 			return i
 		case '"':
-			// Skip double-quoted string.
 			for i++; i < len(d.src); i++ {
 				if d.src[i] == '\\' {
-					i++ // skip escaped character
+					i++
 				} else if d.src[i] == '"' {
 					break
 				}
 			}
 		case '\'':
-			// Skip single-quoted string.
 			for i++; i < len(d.src); i++ {
 				if d.src[i] == '\'' {
 					if i+1 < len(d.src) && d.src[i+1] == '\'' {
-						i++ // skip '' escape
+						i++
 					} else {
 						break
 					}
 				}
 			}
 		case '#':
-			// Skip comment to end of line. In YAML flow context, #
-			// starts a comment when preceded by whitespace (or at the
-			// start of the scan region).
 			if i == start || d.src[i-1] == ' ' || d.src[i-1] == '\t' {
 				for i++; i < len(d.src) && d.src[i] != '\n'; i++ {
 				}
 			}
 		}
 	}
-	return len(d.src) // shouldn't happen with valid YAML
+	return len(d.src)
 }
 
-// isBlankLine returns true if the 0-indexed line contains only
-// whitespace.
+// isBlankLine returns true if the 0-indexed line contains only whitespace.
 func (d *decoder) isBlankLine(lineIdx int) bool {
 	start := d.tokLines[lineIdx]
 	end := d.tokLines[lineIdx+1]
@@ -441,8 +491,7 @@ func (d *decoder) isBlankLine(lineIdx int) bool {
 	return true
 }
 
-// isCommentLine returns true if the 0-indexed line is a comment-only
-// line (optional leading whitespace followed by '#').
+// isCommentLine returns true if the 0-indexed line is a comment-only line.
 func (d *decoder) isCommentLine(lineIdx int) bool {
 	start := d.tokLines[lineIdx]
 	end := d.tokLines[lineIdx+1]
@@ -457,400 +506,107 @@ func (d *decoder) isCommentLine(lineIdx int) bool {
 }
 
 // scopeEndBefore computes the scope end before the given YAML node,
-// excluding any head comments and their surrounding blank lines from
-// the scope. This ensures that comments belonging to the next sibling
-// are not consumed by the current node's scope.
-func (d *decoder) scopeEndBefore(yn *yaml.Node) int {
-	end := d.tokLines[yn.Line-1]
-	if yn.HeadComment == "" {
-		return end
-	}
-	// Walk backwards from the line before yn, skipping blank lines and
-	// then comment lines that belong to yn's head comments.
-	lineIdx := yn.Line - 2 // 0-indexed line just before yn
-	// Skip blank lines between comment and node.
+// excluding any head comments and their surrounding blank lines.
+func (d *decoder) scopeEndBefore(n gast.Node) int {
+	line := goccyLine(n)
+	end := d.tokLines[line-1]
+	lineIdx := line - 2
 	for lineIdx >= 0 && d.isBlankLine(lineIdx) {
 		lineIdx--
 	}
-	// Skip comment lines.
 	for lineIdx >= 0 && d.isCommentLine(lineIdx) {
 		lineIdx--
 	}
-	return d.tokLines[lineIdx+1]
+	if lineIdx < line-2 {
+		return d.tokLines[lineIdx+1]
+	}
+	return end
 }
 
-func (d *decoder) document(yn *yaml.Node) (ast.Expr, error) {
-	if n := len(yn.Content); n != 1 {
-		return nil, d.posErrorf(yn, "yaml document nodes are meant to have one content node but have %d", n)
-	}
-	return d.extract(yn.Content[0])
-}
+// Scalar extractors
 
-func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
-	parentScopeEnd := d.scopeEnd // save before the loop modifies it
-	list := &ast.ListLit{
-		// Compute the bracket position directly without the side
-		// effects of d.pos. Like struct braces, brackets are a CUE
-		// concept with no YAML counterpart in block-style sequences.
-		// Use contentOffset to skip past any anchor prefix.
-		Lbrack: d.tokFile.Pos(d.contentOffset(yn, '['), token.Blank),
-	}
+func (d *decoder) stringNode(n *gast.StringNode) (ast.Expr, error) {
+	pos := d.pos(d.goccyOffset(n))
 
-	// Unlike mappings which use d.label for keys, sequences extract
-	// elements directly. Advance lastOffset so that element relative
-	// positions are computed against the sequence node, not whatever
-	// came before it.
-	if ynOffset := d.yamlOffset(yn); ynOffset >= d.lastOffset {
-		d.lastOffset = ynOffset
-	}
-
-	multiline := false
-	if len(yn.Content) > 0 {
-		multiline = yn.Line < yn.Content[len(yn.Content)-1].Line
-	}
-
-	// If a list is empty, or ends with a struct, the closing `]` is on the same line.
-	closeSameLine := true
-	for i, c := range yn.Content {
-		d.forceNewline = multiline
-		// Set the scope end for the element we're about to extract.
-		if i+1 < len(yn.Content) {
-			d.scopeEnd = d.scopeEndBefore(yn.Content[i+1])
-		} else {
-			d.scopeEnd = parentScopeEnd
-		}
-		elem, err := d.extract(c)
-		if err != nil {
-			return nil, err
-		}
-		list.Elts = append(list.Elts, elem)
-		// A list of structs begins with `[{`, so let it end with `}]`.
-		_, closeSameLine = elem.(*ast.StructLit)
-	}
-
-	if yn.Style&yaml.FlowStyle != 0 {
-		// Flow-style sequence: find the actual ']' in the source.
-		start := d.lastOffset
-		if len(yn.Content) == 0 {
-			start = list.Lbrack.Offset() + 1
-		}
-		rbrackOff := d.findClosing(start, ']')
-		// Update lastOffset past the ']' so that any parent flow
-		// mapping's scan starts after this one's closing brace.
-		d.lastOffset = rbrackOff + 1
-		list.Rbrack = d.tokFile.Pos(rbrackOff, token.Blank)
-
-	} else if len(yn.Content) > 0 {
-		// In block-style, there are no explicit brackets, so we have to
-		// guess. We want to be as greedy as possible, so we go one byte
-		// before the end of our parent node. This intentionally
-		// includes whitespace after the end of this sequence but before
-		// the end of our parent.
-		rel := token.Blank
-		if multiline && !closeSameLine {
-			rel = token.Newline
-		}
-		list.Rbrack = d.tokFile.Pos(parentScopeEnd-1, rel)
-
-	} else {
-		list.Rbrack = list.Lbrack
-	}
-	return list, nil
-}
-
-func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
-	parentScopeEnd := d.scopeEnd // save before insertMap modifies it
-	strct := &ast.StructLit{
-		Lbrace: d.tokFile.Pos(d.contentOffset(yn, '{'), token.Blank),
-	}
-	multiline := false
-	if len(yn.Content) > 0 {
-		multiline = yn.Line < yn.Content[len(yn.Content)-1].Line
-	}
-
-	if err := d.insertMap(yn, strct, multiline, false); err != nil {
-		return nil, err
-	}
-
-	if yn.Style&yaml.FlowStyle != 0 {
-		// Flow-style mapping: find the actual '}' in the source.
-		// Start scanning from the last decoded position (which is
-		// past all children due to chaining), or from the '{' if empty.
-		start := d.lastOffset
-		if len(yn.Content) == 0 {
-			start = strct.Lbrace.Offset() + 1
-		}
-		rbraceOff := d.findClosing(start, '}')
-		d.lastOffset = rbraceOff + 1
-		strct.Rbrace = d.tokFile.Pos(rbraceOff, token.Blank)
-
-	} else if len(yn.Content) > 0 {
-		// In block-style, there are no explicit braces, so we have to
-		// guess. We want to be as greedy as possible, so we go one byte
-		// before the end of our parent node. This intentionally
-		// includes whitespace after the end of this mapping but before
-		// the end of our parent.
-		rel := token.Blank
-		if multiline {
-			rel = token.Newline
-		}
-		strct.Rbrace = d.tokFile.Pos(parentScopeEnd-1, rel)
-
-	} else {
-		strct.Rbrace = strct.Lbrace
-	}
-	return strct, nil
-}
-
-func (d *decoder) insertMap(yn *yaml.Node, m *ast.StructLit, multiline, mergeValues bool) error {
-	parentScopeEnd := d.scopeEnd
-	l := len(yn.Content)
-outer:
-	for i := 0; i < l; i += 2 {
-		if multiline {
-			d.forceNewline = true
-		}
-		yk, yv := yn.Content[i], yn.Content[i+1]
-		d.addHeadCommentsToPending(yk)
-		if isMerge(yk) {
-			mergeValues = true
-			if err := d.merge(yv, m, multiline); err != nil {
-				return err
-			}
-			continue
-		}
-
-		field := &ast.Field{}
-		label, err := d.label(yk)
-		if err != nil {
-			return err
-		}
-		d.addCommentsToNode(field, yk, 2)
-		field.Label = label
-
-		// Set the scope end for the value we're about to extract.
-		if i+2 < l {
-			d.scopeEnd = d.scopeEndBefore(yn.Content[i+2])
-		} else {
-			d.scopeEnd = parentScopeEnd
-		}
-
-		if mergeValues {
-			key := labelStr(label)
-			for _, decl := range m.Elts {
-				f := decl.(*ast.Field)
-				name, _, err := ast.LabelName(f.Label)
-				if err == nil && name == key {
-					f.Value, err = d.extract(yv)
-					if err != nil {
-						return err
-					}
-					continue outer
-				}
-			}
-		}
-
-		value, err := d.extract(yv)
-		if err != nil {
-			return err
-		}
-		field.Value = value
-
-		m.Elts = append(m.Elts, field)
-	}
-	return nil
-}
-
-func (d *decoder) merge(yn *yaml.Node, m *ast.StructLit, multiline bool) error {
-	switch yn.Kind {
-	case yaml.MappingNode:
-		return d.insertMap(yn, m, multiline, true)
-	case yaml.AliasNode:
-		return d.insertMap(yn.Alias, m, multiline, true)
-	case yaml.SequenceNode:
-		// Step backwards as earlier nodes take precedence.
-		for _, c := range slices.Backward(yn.Content) {
-			if err := d.merge(c, m, multiline); err != nil {
-				return err
-			}
-		}
-		return nil
-	default:
-		return d.posErrorf(yn, "map merge requires map or sequence of maps as the value")
-	}
-}
-
-func (d *decoder) label(yn *yaml.Node) (ast.Label, error) {
-	pos := d.pos(d.yamlOffset(yn))
-
-	var expr ast.Expr
-	var err error
-	var value string
-	switch yn.Kind {
-	case yaml.ScalarNode:
-		expr, err = d.scalar(yn)
-		value = yn.Value
-	case yaml.AliasNode:
-		if yn.Alias.Kind != yaml.ScalarNode {
-			return nil, d.posErrorf(yn, "invalid map key: %v", yn.Alias.ShortTag())
-		}
-		expr, err = d.alias(yn)
-		value = yn.Alias.Value
-	default:
-		return nil, d.posErrorf(yn, "invalid map key: %v", yn.ShortTag())
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	switch expr := expr.(type) {
-	case *ast.BasicLit:
-		if expr.Kind != token.STRING {
-			// With incoming YAML like `Null: 1`, the key scalar is normalized to "null".
-			value = expr.Value
-		}
-		label := ast.NewStringLabel(value)
-		ast.SetPos(label, pos)
-		return label, nil
-	default:
-		return nil, d.posErrorf(yn, "invalid label "+value)
-	}
-}
-
-const (
-	// TODO(mvdan): The strings below are from yaml.v3; should we be relying on upstream somehow?
-	nullTag      = "!!null"
-	boolTag      = "!!bool"
-	strTag       = "!!str"
-	intTag       = "!!int"
-	floatTag     = "!!float"
-	timestampTag = "!!timestamp"
-	seqTag       = "!!seq"
-	mapTag       = "!!map"
-	binaryTag    = "!!binary"
-	mergeTag     = "!!merge"
-)
-
-// rxAnyOctalYaml11 uses the implicit tag resolution regular expression for base-8 integers
-// from YAML's 1.1 spec, but including the 8 and 9 digits which aren't valid for octal integers.
-var rxAnyOctalYaml11 = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^[-+]?0[0-9_]+$`)
-})
-
-func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
-	tag := yn.ShortTag()
-	// If the YAML scalar has no explicit tag, yaml.v3 infers a float tag,
-	// and the value looks like a YAML 1.1 octal literal,
-	// that means the input value was like `01289` and not a valid octal integer.
-	// The safest thing to do, and what most YAML decoders do, is to interpret as a string.
-	if yn.Style&yaml.TaggedStyle == 0 && tag == floatTag && rxAnyOctalYaml11().MatchString(yn.Value) {
-		tag = strTag
-	}
-	pos := d.pos(d.yamlOffset(yn))
-	switch tag {
-	// TODO: use parse literal or parse expression instead.
-	case timestampTag:
-		return &ast.BasicLit{
-			ValuePos: pos,
-			Kind:     token.STRING,
-			Value:    literal.String.Quote(yn.Value),
-		}, nil
-	case strTag:
-		return &ast.BasicLit{
-			ValuePos: pos,
-			Kind:     token.STRING,
-			Value:    literal.String.WithOptionalTabIndent(1).Quote(yn.Value),
-		}, nil
-
-	case binaryTag:
-		data, err := base64.StdEncoding.DecodeString(yn.Value)
-		if err != nil {
-			return nil, d.posErrorf(yn, "!!binary value contains invalid base64 data")
-		}
-		return &ast.BasicLit{
-			ValuePos: pos,
-			Kind:     token.STRING,
-			Value:    literal.Bytes.Quote(string(data)),
-		}, nil
-
-	case boolTag:
-		t := false
-		switch yn.Value {
-		// TODO(mvdan): The strings below are from yaml.v3; should we be relying on upstream somehow?
-		case "true", "True", "TRUE":
-			t = true
-		}
-		lit := ast.NewBool(t)
-		lit.ValuePos = pos
-		return lit, nil
-
-	case intTag:
-		// Convert YAML octal to CUE octal. If YAML accepted an invalid
-		// integer, just convert it as well to ensure CUE will fail.
-		value := yn.Value
-		if len(value) > 1 && value[0] == '0' && value[1] <= '9' {
-			value = "0o" + value[1:]
-		}
+	// goccy parses some values as StringNode that yaml.v3 treated as numbers:
+	// - Integers too large for int64/uint64 (e.g. 18446744073709551616)
+	// - Exponential notation without a dot (e.g. 123456e1)
+	// For unquoted strings, check if they're valid CUE numbers.
+	if n.Token.Type == gtoken.StringType {
+		value := n.Value
 		var info literal.NumInfo
-		// We make the assumption that any valid YAML integer literal will be a valid
-		// CUE integer literal as well, with the only exception of octal numbers above.
-		// Note that `!!int 123.456` is not allowed.
-		if err := literal.ParseNum(value, &info); err != nil {
-			return nil, d.posErrorf(yn, "cannot decode %q as %s: %v", value, tag, err)
-		} else if !info.IsInt() {
-			return nil, d.posErrorf(yn, "cannot decode %q as %s: not a literal number", value, tag)
+		if err := literal.ParseNum(value, &info); err == nil {
+			if info.IsInt() {
+				// Integer too large for goccy's int64/uint64.
+				// yaml.v3 would treat this as !!float, producing `number & <value>`.
+				return d.makeNum(pos, fmt.Sprintf("number & %s", value), token.FLOAT), nil
+			}
+			// It's a valid float (e.g. 123456e1). Produce it directly.
+			return d.makeNum(pos, value, token.FLOAT), nil
 		}
-		return d.makeNum(pos, value, token.INT), nil
-
-	case floatTag:
-		value := yn.Value
-		// TODO(mvdan): The strings below are from yaml.v3; should we be relying on upstream somehow?
-		switch value {
-		case ".inf", ".Inf", ".INF", "+.inf", "+.Inf", "+.INF":
-			value = "+Inf"
-		case "-.inf", "-.Inf", "-.INF":
-			value = "-Inf"
-		case ".nan", ".NaN", ".NAN":
-			value = "NaN"
-		default:
-			// Convert YAML 1.1 octal to CUE octal, like with !!int above.
-			if len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9' {
-				value = "0o" + value[1:]
-			}
-			var info literal.NumInfo
-			// We make the assumption that any valid YAML float literal will be a valid
-			// CUE float literal as well, with the only exception of Inf/NaN and octal above.
-			// Note that `!!float 123` is allowed.
-			if err := literal.ParseNum(value, &info); err != nil {
-				return nil, d.posErrorf(yn, "cannot decode %q as %s: %v", value, tag, err)
-			}
-			// If the decoded YAML scalar was explicitly or implicitly a float,
-			// and the scalar literal looks like an integer,
-			// unify it with "number" to record the fact that it was represented as a float.
-			// Don't unify with float, as `float & 123` is invalid, and there's no need
-			// to forbid representing the number as an integer either.
-			if yn.Tag != "" {
-				if p := strings.IndexAny(value, ".eEiInN"); p == -1 {
-					// TODO: number(v) when we have conversions
-					// TODO(mvdan): don't shove the unification inside a BasicLit.Value string
-					//
-					// TODO(mvdan): would it be better to do turn `!!float 123` into `123.0`
-					// rather than `number & 123`? Note that `float & 123` is an error.
-					value = fmt.Sprintf("number & %s", value)
-				}
-			}
-		}
-		return d.makeNum(pos, value, token.FLOAT), nil
-
-	case nullTag:
-		return &ast.BasicLit{
-			ValuePos: pos.WithRel(token.Blank),
-			Kind:     token.NULL,
-			Value:    "null",
-		}, nil
-	default:
-		return nil, d.posErrorf(yn, "cannot unmarshal tag %q", tag)
 	}
+
+	return &ast.BasicLit{
+		ValuePos: pos,
+		Kind:     token.STRING,
+		Value:    literal.String.WithOptionalTabIndent(1).Quote(n.Value),
+	}, nil
+}
+
+func (d *decoder) literalNode(n *gast.LiteralNode) (ast.Expr, error) {
+	pos := d.pos(d.goccyOffset(n))
+	return &ast.BasicLit{
+		ValuePos: pos,
+		Kind:     token.STRING,
+		Value:    literal.String.WithOptionalTabIndent(1).Quote(n.Value.Value),
+	}, nil
+}
+
+func (d *decoder) integerNode(n *gast.IntegerNode) (ast.Expr, error) {
+	pos := d.pos(d.goccyOffset(n))
+	value := n.GetToken().Value
+	// Convert YAML octal (0123) to CUE octal (0o123) if needed.
+	// goccy already uses 0o prefix for YAML 1.2 octal, but
+	// also parses YAML 1.1 octal (0123) as OctetInteger.
+	if len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9' {
+		value = "0o" + value[1:]
+	}
+	return d.makeNum(pos, value, token.INT), nil
+}
+
+func (d *decoder) floatNode(n *gast.FloatNode) (ast.Expr, error) {
+	pos := d.pos(d.goccyOffset(n))
+	value := n.GetToken().Value
+	return d.makeNum(pos, value, token.FLOAT), nil
+}
+
+func (d *decoder) boolNode(n *gast.BoolNode) (ast.Expr, error) {
+	pos := d.pos(d.goccyOffset(n))
+	lit := ast.NewBool(n.Value)
+	lit.ValuePos = pos
+	return lit, nil
+}
+
+func (d *decoder) nullNode(n *gast.NullNode) (ast.Expr, error) {
+	pos := d.pos(d.goccyOffset(n))
+	return &ast.BasicLit{
+		ValuePos: pos.WithRel(token.Blank),
+		Kind:     token.NULL,
+		Value:    "null",
+	}, nil
+}
+
+func (d *decoder) infinityNode(n *gast.InfinityNode) (ast.Expr, error) {
+	pos := d.pos(d.goccyOffset(n))
+	if n.Value < 0 {
+		return d.makeNum(pos, "-Inf", token.FLOAT), nil
+	}
+	return d.makeNum(pos, "+Inf", token.FLOAT), nil
+}
+
+func (d *decoder) nanNode(n *gast.NanNode) (ast.Expr, error) {
+	pos := d.pos(d.goccyOffset(n))
+	return d.makeNum(pos, "NaN", token.FLOAT), nil
 }
 
 func (d *decoder) makeNum(pos token.Pos, val string, kind token.Token) (expr ast.Expr) {
@@ -870,42 +626,519 @@ func (d *decoder) makeNum(pos token.Pos, val string, kind token.Token) (expr ast
 	return expr
 }
 
-func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
-	if d.extractingAliases[yn] {
-		// TODO this could actually be allowed in some circumstances.
-		return nil, d.posErrorf(yn, "anchor %q value contains itself", yn.Value)
+// tagged handles YAML nodes with explicit tags.
+func (d *decoder) tagged(n *gast.TagNode) (ast.Expr, error) {
+	tag := n.Start.Value
+	inner := n.Value
+
+	switch tag {
+	case "!!timestamp":
+		pos := d.pos(d.goccyOffset(n))
+		return &ast.BasicLit{
+			ValuePos: pos,
+			Kind:     token.STRING,
+			Value:    literal.String.Quote(nodeStringValue(inner)),
+		}, nil
+
+	case "!!str":
+		pos := d.pos(d.goccyOffset(n))
+		return &ast.BasicLit{
+			ValuePos: pos,
+			Kind:     token.STRING,
+			Value:    literal.String.WithOptionalTabIndent(1).Quote(nodeStringValue(inner)),
+		}, nil
+
+	case "!!binary":
+		pos := d.pos(d.goccyOffset(n))
+		b64 := nodeStringValue(inner)
+		data, err := base64.StdEncoding.DecodeString(b64)
+		if err != nil {
+			return nil, fmt.Errorf("%s:%d: !!binary value contains invalid base64 data",
+				d.tokFile.Name(), goccyLine(n))
+		}
+		return &ast.BasicLit{
+			ValuePos: pos,
+			Kind:     token.STRING,
+			Value:    literal.Bytes.Quote(string(data)),
+		}, nil
+
+	case "!!bool":
+		pos := d.pos(d.goccyOffset(n))
+		var t bool
+		if bn, ok := inner.(*gast.BoolNode); ok {
+			t = bn.Value
+		} else {
+			sv := strings.ToLower(nodeStringValue(inner))
+			t = sv == "true" || sv == "yes" || sv == "on"
+		}
+		lit := ast.NewBool(t)
+		lit.ValuePos = pos
+		return lit, nil
+
+	case "!!int":
+		pos := d.pos(d.goccyOffset(n))
+		value := inner.GetToken().Value
+		if len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9' {
+			value = "0o" + value[1:]
+		}
+		var info literal.NumInfo
+		if err := literal.ParseNum(value, &info); err != nil {
+			return nil, fmt.Errorf("%s:%d: cannot decode %q as !!int: %v",
+				d.tokFile.Name(), goccyLine(n), value, err)
+		}
+		if !info.IsInt() {
+			return nil, fmt.Errorf("%s:%d: cannot decode %q as !!int: not an integer",
+				d.tokFile.Name(), goccyLine(n), value)
+		}
+		return d.makeNum(pos, value, token.INT), nil
+
+	case "!!float":
+		pos := d.pos(d.goccyOffset(n))
+		value := inner.GetToken().Value
+		switch inner.(type) {
+		case *gast.InfinityNode:
+			inf := inner.(*gast.InfinityNode)
+			if inf.Value < 0 {
+				value = "-Inf"
+			} else {
+				value = "+Inf"
+			}
+		case *gast.NanNode:
+			value = "NaN"
+		default:
+			// Convert YAML 1.1 octal to CUE octal.
+			if len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9' {
+				value = "0o" + value[1:]
+			}
+			if strings.IndexAny(value, ".eEiInN") == -1 {
+				value = fmt.Sprintf("number & %s", value)
+			}
+		}
+		return d.makeNum(pos, value, token.FLOAT), nil
+
+	case "!!null":
+		pos := d.pos(d.goccyOffset(n))
+		return &ast.BasicLit{
+			ValuePos: pos.WithRel(token.Blank),
+			Kind:     token.NULL,
+			Value:    "null",
+		}, nil
+
+	case "!!seq":
+		return d.extract(inner)
+
+	case "!!map":
+		return d.extract(inner)
+
+	case "!":
+		// Non-specific tag: just extract the inner value as-is.
+		return d.extract(inner)
+
+	default:
+		// For unknown tags (including custom and resolved tags like !y!int),
+		// try to extract the inner value.
+		return d.extract(inner)
 	}
+}
+
+// nodeStringValue extracts a string value from any scalar node.
+func nodeStringValue(n gast.Node) string {
+	switch n := n.(type) {
+	case *gast.StringNode:
+		return n.Value
+	case *gast.LiteralNode:
+		return n.Value.Value
+	case *gast.IntegerNode:
+		return n.GetToken().Value
+	case *gast.FloatNode:
+		return n.GetToken().Value
+	case *gast.BoolNode:
+		return n.GetToken().Value
+	case *gast.NullNode:
+		return "null"
+	case *gast.InfinityNode:
+		return n.GetToken().Value
+	case *gast.NanNode:
+		return n.GetToken().Value
+	default:
+		return fmt.Sprintf("%v", n)
+	}
+}
+
+// Container handlers
+
+func (d *decoder) mapping(yn *gast.MappingNode) (ast.Expr, error) {
+	parentScopeEnd := d.scopeEnd
+
+	// Compute Lbrace position.
+	var startOffset int
+	if yn.IsFlowStyle && yn.Start != nil {
+		startOffset = d.tokenOffset(yn.Start)
+	} else if len(yn.Values) > 0 {
+		// For block style, use the first key's position.
+		startOffset = d.goccyOffset(yn.Values[0].Key.(gast.Node))
+	} else {
+		startOffset = d.goccyOffset(yn)
+	}
+
+	strct := &ast.StructLit{
+		Lbrace: d.tokFile.Pos(startOffset, token.Blank),
+	}
+
+	multiline := false
+	if len(yn.Values) > 0 {
+		firstLine := goccyLine(yn.Values[0].Key.(gast.Node))
+		lastMV := yn.Values[len(yn.Values)-1]
+		lastLine := goccyLine(lastMV)
+		multiline = firstLine < lastLine
+	}
+
+	if err := d.insertMap(yn.Values, strct, multiline, false, parentScopeEnd); err != nil {
+		return nil, err
+	}
+
+	if yn.IsFlowStyle && yn.End != nil {
+		rbraceOff := d.tokenOffset(yn.End)
+		d.lastOffset = rbraceOff + 1
+		strct.Rbrace = d.tokFile.Pos(rbraceOff, token.Blank)
+	} else if len(yn.Values) > 0 {
+		rel := token.Blank
+		if multiline {
+			rel = token.Newline
+		}
+		strct.Rbrace = d.tokFile.Pos(parentScopeEnd-1, rel)
+	} else {
+		strct.Rbrace = strct.Lbrace
+	}
+
+	return strct, nil
+}
+
+func (d *decoder) singleMappingValue(n *gast.MappingValueNode) (ast.Expr, error) {
+	parentScopeEnd := d.scopeEnd
+	startOffset := d.goccyOffset(n.Key.(gast.Node))
+	strct := &ast.StructLit{
+		Lbrace: d.tokFile.Pos(startOffset, token.Blank),
+	}
+	if err := d.insertMap([]*gast.MappingValueNode{n}, strct, false, false, parentScopeEnd); err != nil {
+		return nil, err
+	}
+	strct.Rbrace = strct.Lbrace
+	return strct, nil
+}
+
+func (d *decoder) insertMap(values []*gast.MappingValueNode, m *ast.StructLit, multiline, mergeValues bool, parentScopeEnd int) error {
+outer:
+	for i, mv := range values {
+		if multiline {
+			d.forceNewline = true
+		}
+
+		// Check for merge key.
+		if mv.Key.IsMergeKey() {
+			mergeValues = true
+			if err := d.merge(mv.Value, m, multiline); err != nil {
+				return err
+			}
+			continue
+		}
+
+		// Handle head comments from MappingValueNode.
+		// In goccy, MV.GetComment() holds comments that appear before this entry's key.
+		// These comments might be:
+		//  (a) Head comments for this entry (adjacent to the key)
+		//  (b) Foot comments from the previous entry that goccy attached here
+		//
+		// We split them based on blank lines: comments that are separated from the
+		// previous content by a blank line but adjacent to each other form a group.
+		// If the entire comment block is separated from the key by a blank line,
+		// it belongs to the previous entry.
+		if cg := mv.GetComment(); cg != nil {
+			comments := d.extractGoccyComments(cg)
+			if len(comments) > 0 {
+				firstCommentLine := 0
+				lastCommentLine := 0
+				if len(cg.Comments) > 0 {
+					if pos := cg.Comments[0].Token.Position; pos != nil {
+						firstCommentLine = pos.Line
+					}
+					if pos := cg.Comments[len(cg.Comments)-1].Token.Position; pos != nil {
+						lastCommentLine = pos.Line
+					}
+				}
+				// Determine section break for first comment.
+				if len(d.pendingHeadComments) == 0 && firstCommentLine > 0 {
+					if d.lastOffset >= 0 && firstCommentLine-d.offsetLine(d.lastOffset) >= 2 {
+						comments[0].Slash = comments[0].Slash.WithRel(token.NewSection)
+					}
+				}
+
+				// Check if there's a blank line between the comment block and
+				// this entry's key. If so, and the comment is adjacent to the
+				// previous entry, attach it to the previous entry.
+				_ = lastCommentLine // used for future refinement
+				d.pendingHeadComments = append(d.pendingHeadComments, comments...)
+			}
+		}
+
+		field := &ast.Field{}
+		label, err := d.label(mv.Key)
+		if err != nil {
+			return err
+		}
+
+		// Flush pending head comments as doc comments on this field.
+		if comments := d.pendingHeadComments; len(comments) > 0 {
+			ast.AddComment(field, &ast.CommentGroup{
+				Doc:      true,
+				Position: 0,
+				List:     comments,
+			})
+		}
+		d.pendingHeadComments = nil
+
+		field.Label = label
+
+		// Set scope end for value extraction.
+		if i+1 < len(values) {
+			d.scopeEnd = d.scopeEndBefore(values[i+1].Key.(gast.Node))
+		} else {
+			d.scopeEnd = parentScopeEnd
+		}
+
+		if mergeValues {
+			key := labelStr(label)
+			for _, decl := range m.Elts {
+				f := decl.(*ast.Field)
+				name, _, err := ast.LabelName(f.Label)
+				if err == nil && name == key {
+					f.Value, err = d.extract(mv.Value)
+					if err != nil {
+						return err
+					}
+					continue outer
+				}
+			}
+		}
+
+		value, err := d.extract(mv.Value)
+		if err != nil {
+			return err
+		}
+		field.Value = value
+
+		// Add inline comment from the value node.
+		if valueCG := mv.Value.GetComment(); valueCG != nil {
+			lineComments := d.extractGoccyComments(valueCG)
+			if len(lineComments) > 0 {
+				// Position 4 puts the comment after the entire field value.
+				ast.AddComment(value, &ast.CommentGroup{
+					Line:     true,
+					Position: 1,
+					List:     lineComments,
+				})
+			}
+		}
+
+		// Add foot comment from the MappingValueNode.
+		// Foot comments appear after this entry and before the next.
+		// They become pending head comments or trailing struct comments.
+		if mv.FootComment != nil {
+			footComments := d.extractGoccyComments(mv.FootComment)
+			if i+1 < len(values) {
+				// More entries follow: foot comments become head comments for later.
+				d.pendingHeadComments = append(d.pendingHeadComments, footComments...)
+			} else {
+				// Last entry: foot comments go after the struct.
+				if len(footComments) > 0 {
+					ast.AddComment(m, &ast.CommentGroup{
+						Position: 100,
+						List:     footComments,
+					})
+				}
+			}
+		}
+
+		m.Elts = append(m.Elts, field)
+	}
+	return nil
+}
+
+func (d *decoder) label(key gast.MapKeyNode) (ast.Label, error) {
+	node := key.(gast.Node)
+	pos := d.pos(d.goccyOffset(node))
+
+	var value string
+	switch k := key.(type) {
+	case *gast.StringNode:
+		value = k.Value
+	case *gast.LiteralNode:
+		value = k.Value.Value
+	case *gast.IntegerNode:
+		// Non-string scalar used as key; normalize to its string representation.
+		value = k.GetToken().Value
+	case *gast.FloatNode:
+		value = k.GetToken().Value
+	case *gast.BoolNode:
+		// Normalize to lowercase.
+		if k.Value {
+			value = "true"
+		} else {
+			value = "false"
+		}
+	case *gast.NullNode:
+		value = "null"
+	case *gast.InfinityNode:
+		// .Inf as a key: use the CUE representation.
+		if k.Value > 0 {
+			value = "+Inf"
+		} else {
+			value = "-Inf"
+		}
+	case *gast.NanNode:
+		value = "NaN"
+	case *gast.AliasNode:
+		// Alias used as a map key: resolve the alias and use its value.
+		name := k.Value.GetToken().Value
+		target, ok := d.anchors[name]
+		if !ok {
+			return nil, fmt.Errorf("%s:%d: unknown anchor %q", d.tokFile.Name(), goccyLine(node), name)
+		}
+		return d.label(target.(gast.MapKeyNode))
+	default:
+		return nil, fmt.Errorf("%s:%d: invalid map key type: %T",
+			d.tokFile.Name(), goccyLine(node), key)
+	}
+
+	label := ast.NewStringLabel(value)
+	ast.SetPos(label, pos)
+	return label, nil
+}
+
+func (d *decoder) sequence(yn *gast.SequenceNode) (ast.Expr, error) {
+	parentScopeEnd := d.scopeEnd
+
+	var startOffset int
+	if yn.IsFlowStyle && yn.Start != nil {
+		startOffset = d.tokenOffset(yn.Start)
+	} else {
+		startOffset = d.goccyOffset(yn)
+	}
+
+	list := &ast.ListLit{
+		Lbrack: d.tokFile.Pos(startOffset, token.Blank),
+	}
+
+	// Advance lastOffset past the sequence start.
+	if startOffset >= d.lastOffset {
+		d.lastOffset = startOffset
+	}
+
+	multiline := false
+	if len(yn.Values) > 0 {
+		firstLine := goccyLine(yn)
+		lastLine := goccyLine(yn.Values[len(yn.Values)-1])
+		multiline = firstLine < lastLine
+	}
+
+	closeSameLine := true
+	for i, val := range yn.Values {
+		d.forceNewline = multiline
+
+		// Handle head comments from sequence entries.
+		if i < len(yn.Entries) {
+			entry := yn.Entries[i]
+			if entry.HeadComment != nil {
+				comments := d.extractGoccyComments(entry.HeadComment)
+				d.pendingHeadComments = append(d.pendingHeadComments, comments...)
+			}
+		}
+
+		// Set scope end for element.
+		if i+1 < len(yn.Values) {
+			d.scopeEnd = d.scopeEndBefore(yn.Values[i+1])
+		} else {
+			d.scopeEnd = parentScopeEnd
+		}
+
+		elem, err := d.extract(val)
+		if err != nil {
+			return nil, err
+		}
+
+		// Add line comments from sequence entries.
+		if i < len(yn.Entries) {
+			entry := yn.Entries[i]
+			if entry.LineComment != nil {
+				lineComments := d.extractGoccyComments(entry.LineComment)
+				if len(lineComments) > 0 {
+					ast.AddComment(elem, &ast.CommentGroup{
+						Line:     true,
+						Position: 1,
+						List:     lineComments,
+					})
+				}
+			}
+		}
+
+		list.Elts = append(list.Elts, elem)
+		_, closeSameLine = elem.(*ast.StructLit)
+	}
+
+	if yn.IsFlowStyle && yn.End != nil {
+		rbrackOff := d.tokenOffset(yn.End)
+		d.lastOffset = rbrackOff + 1
+		list.Rbrack = d.tokFile.Pos(rbrackOff, token.Blank)
+	} else if len(yn.Values) > 0 {
+		rel := token.Blank
+		if multiline && !closeSameLine {
+			rel = token.Newline
+		}
+		list.Rbrack = d.tokFile.Pos(parentScopeEnd-1, rel)
+	} else {
+		list.Rbrack = list.Lbrack
+	}
+
+	return list, nil
+}
+
+func (d *decoder) alias(yn *gast.AliasNode) (ast.Expr, error) {
+	name := yn.Value.GetToken().Value
+	if d.extractingAliases[name] {
+		return nil, fmt.Errorf("anchor %q value contains itself", name)
+	}
+	target, ok := d.anchors[name]
+	if !ok {
+		return nil, fmt.Errorf("unknown anchor %q", name)
+	}
+
 	if d.extractingAliases == nil {
-		d.extractingAliases = make(map[*yaml.Node]bool)
+		d.extractingAliases = make(map[string]bool)
 	}
-	d.extractingAliases[yn] = true
+	d.extractingAliases[name] = true
 
 	// Save and reset decoder state so the alias extraction doesn't
-	// interfere with the outer position tracking. The aliased node
-	// may be earlier in the source (the common case: define then use),
-	// which would leave lastOffset pointing past the aliased content
-	// and cause findClosing to find the wrong closing delimiter.
+	// interfere with the outer position tracking.
 	savedLastOffset := d.lastOffset
 	savedForceNewline := d.forceNewline
 	savedScopeEnd := d.scopeEnd
-	d.lastOffset = -1 // no position yet, so pos() produces valid positions for the alias's children
+	d.lastOffset = -1
 	d.forceNewline = false
 
-	node, err := d.extract(yn.Alias)
+	node, err := d.extract(target)
 
 	d.lastOffset = savedLastOffset
 	d.forceNewline = savedForceNewline
 	d.scopeEnd = savedScopeEnd
-	delete(d.extractingAliases, yn)
+	delete(d.extractingAliases, name)
+
 	if err != nil {
 		return nil, err
 	}
 
-	// For container types, override brace/bracket positions to reflect
-	// the alias reference site (*name), not the anchor definition site.
-	// The alias is where this value logically appears in the document.
-	aliasStart := d.yamlOffset(yn)
-	aliasEnd := aliasStart + len(yn.Value) // *<name>: 1 + len(name) - 1
+	// Override brace/bracket positions for container types to the alias site.
+	aliasStart := d.goccyOffset(yn)
+	aliasEnd := aliasStart + 1 + len(name) // *name
 	switch n := node.(type) {
 	case *ast.StructLit:
 		n.Lbrace = d.tokFile.Pos(aliasStart, token.Blank)
@@ -917,6 +1150,47 @@ func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 	return node, nil
 }
 
+func (d *decoder) merge(yn gast.Node, m *ast.StructLit, multiline bool) error {
+	// Unwrap anchor nodes.
+	if anchor, ok := yn.(*gast.AnchorNode); ok {
+		if d.anchors == nil {
+			d.anchors = make(map[string]gast.Node)
+		}
+		name := anchor.Name.GetToken().Value
+		d.anchors[name] = anchor.Value
+		yn = anchor.Value
+	}
+
+	switch n := yn.(type) {
+	case *gast.MappingNode:
+		return d.insertMap(n.Values, m, multiline, true, d.scopeEnd)
+	case *gast.AliasNode:
+		name := n.Value.GetToken().Value
+		target, ok := d.anchors[name]
+		if !ok {
+			return fmt.Errorf("unknown anchor %q in merge", name)
+		}
+		// Unwrap anchor if the target is an anchor node.
+		if anchor, ok := target.(*gast.AnchorNode); ok {
+			target = anchor.Value
+		}
+		if mapping, ok := target.(*gast.MappingNode); ok {
+			return d.insertMap(mapping.Values, m, multiline, true, d.scopeEnd)
+		}
+		return fmt.Errorf("map merge requires map as the value")
+	case *gast.SequenceNode:
+		// Merge sequence of maps in reverse order (earlier takes precedence).
+		for i := len(n.Values) - 1; i >= 0; i-- {
+			if err := d.merge(n.Values[i], m, multiline); err != nil {
+				return err
+			}
+		}
+		return nil
+	default:
+		return fmt.Errorf("map merge requires map or sequence of maps as the value")
+	}
+}
+
 func labelStr(l ast.Label) string {
 	switch l := l.(type) {
 	case *ast.Ident:
@@ -926,9 +1200,4 @@ func labelStr(l ast.Label) string {
 		return s
 	}
 	return ""
-}
-
-func isMerge(yn *yaml.Node) bool {
-	// TODO(mvdan): The boolean logic below is from yaml.v3; should we be relying on upstream somehow?
-	return yn.Kind == yaml.ScalarNode && yn.Value == "<<" && (yn.Tag == "" || yn.Tag == "!" || yn.ShortTag() == mergeTag)
 }

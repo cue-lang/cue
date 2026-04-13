@@ -225,18 +225,149 @@ type attrRecord struct {
 	isDeclAttr bool
 }
 
+// attrExtractor holds state for the extractTestAttrs walk.
+type attrExtractor struct {
+	records  []attrRecord
+	hidPkg   string
+	fileName string
+	// visited tracks all @test attribute nodes that have been seen by the
+	// walker, whether or not they were added to records. Any @test attr in
+	// the file that is not in visited after the walk is unreachable and is
+	// reported as an error.
+	visited map[*ast.Attribute]bool
+}
+
+// processAttr handles a single @test attribute: marks it visited, parses it,
+// and appends an attrRecord (or an error record on parse failure).
+func (ex *attrExtractor) processAttr(a *ast.Attribute, path cue.Path, isDeclAttr, fileLevel bool, baseLine int) {
+	ex.visited[a] = true
+	pa, err := parseTestAttr(a)
+	if err != nil {
+		ex.records = append(ex.records, attrRecord{
+			path:       path,
+			parsed:     parsedTestAttr{srcAttr: a, srcFileName: ex.fileName},
+			parseErr:   err,
+			isDeclAttr: isDeclAttr,
+			fileLevel:  fileLevel,
+		})
+		return
+	}
+	pa.baseLine = baseLine
+	pa.srcFileName = ex.fileName
+	ex.records = append(ex.records, attrRecord{
+		path:       path,
+		parsed:     pa,
+		isDeclAttr: isDeclAttr,
+		fileLevel:  fileLevel,
+	})
+}
+
+// walkField records @test field attrs, then recurses into the field's
+// struct value (if any). Attributes are NOT stripped from the AST so that
+// the evaluated value is built from the original source; CUE ignores
+// attributes during evaluation, so positions reference original source lines.
+func (ex *attrExtractor) walkField(field *ast.Field, path cue.Path) {
+	fieldBaseLine := field.Pos().Line()
+
+	for _, a := range field.Attrs {
+		k, _ := a.Split()
+		if k != "test" {
+			continue
+		}
+		ex.processAttr(a, path, false, false, fieldBaseLine)
+	}
+
+	expr := field.Value
+	if alias, ok := expr.(*ast.Alias); ok {
+		expr = alias.Expr
+	}
+	if sl, ok := expr.(*ast.StructLit); ok {
+		ex.walkStruct(sl, path)
+	}
+	// Non-struct field values (e.g. binary exprs) are not recursed into.
+	// Any @test attrs inside them will be caught by the unreachable-attr check.
+}
+
+// walkStruct records @test decl attrs and recurses into all sub-fields.
+func (ex *attrExtractor) walkStruct(sl *ast.StructLit, path cue.Path) {
+	// Use the opening brace line as the base for decl-level @test pos= specs.
+	// File-level @test attrs (no braces) use their own line as baseLine (see below).
+	structBaseLine := sl.Lbrace.Line()
+
+	for _, elt := range sl.Elts {
+		switch e := elt.(type) {
+		case *ast.Attribute:
+			k, _ := e.Split()
+			if k != "test" {
+				continue
+			}
+			ex.processAttr(e, path, true, false, structBaseLine)
+
+		case *ast.Field:
+			subPath := appendPath(path, e.Label, ex.hidPkg)
+			if subPath.Err() == nil {
+				ex.walkField(e, subPath)
+			} else {
+				// Non-static label (e.g. string interpolation): cannot
+				// register a path from the AST. Still process
+				// @test(shareID=name, at=sel) where at= is a non-integer
+				// field name giving the resolved key, so the shareID check
+				// can look it up in the evaluated value.
+				for _, a := range e.Attrs {
+					k, _ := a.Split()
+					if k != "test" {
+						continue
+					}
+					// Mark as seen regardless of whether it is added to records,
+					// so the unreachable-attr check does not flag it as an error.
+					ex.visited[a] = true
+					pa, err := parseTestAttr(a)
+					if err != nil {
+						ex.records = append(ex.records, attrRecord{
+							path:     path,
+							parsed:   parsedTestAttr{srcAttr: a, srcFileName: ex.fileName},
+							parseErr: err,
+						})
+						continue
+					}
+					if pa.directive != "shareID" || len(pa.raw.Fields) == 0 {
+						continue
+					}
+					// Require a non-integer at= giving the resolved field name.
+					// applyShareIDAt (called in collectDirectShareIDs) will
+					// append it to the parent path stored here.
+					if !hasShareIDAtSel(pa) {
+						continue // no usable at=sel for dynamic key
+					}
+					pa.baseLine = a.Pos().Line()
+					pa.srcFileName = ex.fileName
+					// Store the parent path; applyShareIDAt in
+					// collectDirectShareIDs appends the at= selector.
+					ex.records = append(ex.records, attrRecord{
+						path:   path,
+						parsed: pa,
+					})
+				}
+			}
+
+			// EmbedDecl and other element types are not recursed into.
+			// Any @test attrs inside them will be caught by the unreachable-attr check.
+		}
+	}
+}
+
 // extractTestAttrs walks ast.File and:
 //  1. Collects all @test(...) attributes from field attrs, struct decl attrs,
 //     and file-level decl attrs.
-//  2. Removes them from the AST (in-place).
+//  2. Reports any @test attrs not reached by the walk as errors. This catches
+//     attributes in unreachable positions (e.g. inside binary-expression operands
+//     or bare embedding expressions).
 //  3. Preserves all non-@test attributes.
 //
 // Returns the collected records.
 // File-level decl attributes produce records with an empty path and
 // fileLevel=true; these check the entire file's evaluated value.
 func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
-	var records []attrRecord
-
 	// hidPkg is the package scope for hidden fields in this file.
 	// Inline-compiled sources use ":" + pkgname; anonymous files use "_".
 	hidPkg := ":" + f.PackageName()
@@ -244,175 +375,10 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 		hidPkg = "_"
 	}
 
-	// appendErrRecord records a @test attribute whose parseTestAttr call failed.
-	// The runner reports all parseErr records as test failures before running
-	// any assertions.
-	appendErrRecord := func(attr *ast.Attribute, path cue.Path, isDeclAttr, fileLevel bool, err error) {
-		records = append(records, attrRecord{
-			path:       path,
-			parsed:     parsedTestAttr{srcAttr: attr, srcFileName: fileName},
-			parseErr:   err,
-			isDeclAttr: isDeclAttr,
-			fileLevel:  fileLevel,
-		})
-	}
-
-	// walkField records @test field attrs, then recurses into the field's
-	// struct value (if any). Attributes are NOT stripped from the AST so that
-	// the evaluated value is built from the original source; CUE ignores
-	// attributes during evaluation, so positions reference original source lines.
-	var walkField func(field *ast.Field, path cue.Path)
-
-	// walkStruct records @test decl attrs and recurses into all sub-fields.
-	var walkStruct func(sl *ast.StructLit, path cue.Path)
-
-	// scanUnreachableTests scans expr for @test attributes that appear inside
-	// struct literals which are binary-expression operands. Such attributes are
-	// never visited by walkField/walkStruct and would be silently ignored;
-	// they are reported here as parse errors so the test suite fails loudly.
-	//
-	// inOperand must be true when expr is already inside a binary-expression
-	// operand (meaning all @test within it are unreachable regardless of depth).
-	var scanUnreachableTests func(expr ast.Expr, path cue.Path, inOperand bool)
-
-	walkField = func(field *ast.Field, path cue.Path) {
-		fieldBaseLine := field.Pos().Line()
-
-		for _, a := range field.Attrs {
-			k, _ := a.Split()
-			if k != "test" {
-				continue
-			}
-			pa, err := parseTestAttr(a)
-			if err != nil {
-				appendErrRecord(a, path, false, false, err)
-				continue
-			}
-			pa.baseLine = fieldBaseLine
-			pa.srcFileName = fileName
-			records = append(records, attrRecord{
-				path:   path,
-				parsed: pa,
-			})
-		}
-
-		if sl, ok := field.Value.(*ast.StructLit); ok {
-			walkStruct(sl, path)
-		} else {
-			scanUnreachableTests(field.Value, path, false)
-		}
-	}
-
-	walkStruct = func(sl *ast.StructLit, path cue.Path) {
-		// Use the opening brace line as the base for decl-level @test pos= specs.
-		// File-level @test attrs (no braces) use their own line as baseLine (see below).
-		structBaseLine := sl.Lbrace.Line()
-
-		for _, elt := range sl.Elts {
-			switch e := elt.(type) {
-			case *ast.Attribute:
-				k, _ := e.Split()
-				if k != "test" {
-					continue
-				}
-				pa, err := parseTestAttr(e)
-				if err != nil {
-					appendErrRecord(e, path, true, false, err)
-					continue
-				}
-				pa.baseLine = structBaseLine
-				pa.srcFileName = fileName
-				records = append(records, attrRecord{
-					path:       path,
-					parsed:     pa,
-					isDeclAttr: true,
-				})
-
-			case *ast.Field:
-				subPath := appendPath(path, e.Label, hidPkg)
-				if subPath.Err() == nil {
-					walkField(e, subPath)
-				} else {
-					// Non-static label (e.g. string interpolation): cannot
-					// register a path from the AST. Still process
-					// @test(shareID=name, at=sel) where at= is a non-integer
-					// field name giving the resolved key, so the shareID check
-					// can look it up in the evaluated value.
-					for _, a := range e.Attrs {
-						k, _ := a.Split()
-						if k != "test" {
-							continue
-						}
-						pa, err := parseTestAttr(a)
-						if err != nil {
-							appendErrRecord(a, path, false, false, err)
-							continue
-						}
-						if pa.directive != "shareID" || len(pa.raw.Fields) == 0 {
-							continue
-						}
-						// Require a non-integer at= giving the resolved field name.
-						// applyShareIDAt (called in collectDirectShareIDs) will
-						// append it to the parent path stored here.
-						if !hasShareIDAtSel(pa) {
-							continue // no usable at=sel for dynamic key
-						}
-						pa.baseLine = a.Pos().Line()
-						pa.srcFileName = fileName
-						// Store the parent path; applyShareIDAt in
-						// collectDirectShareIDs appends the at= selector.
-						records = append(records, attrRecord{
-							path:   path,
-							parsed: pa,
-						})
-					}
-				}
-
-			case *ast.EmbedDecl:
-				// Bare embeddings (e.g. `A & {f: v @test(...)}`) are not
-				// walked by walkField/walkStruct, so any @test inside them
-				// would be silently ignored. Scan and report them as errors.
-				scanUnreachableTests(e.Expr, path, false)
-			}
-		}
-	}
-
-	scanUnreachableTests = func(expr ast.Expr, path cue.Path, inOperand bool) {
-		switch e := expr.(type) {
-		case *ast.BinaryExpr:
-			scanUnreachableTests(e.X, path, true)
-			scanUnreachableTests(e.Y, path, true)
-		case *ast.ParenExpr:
-			scanUnreachableTests(e.X, path, inOperand)
-		case *ast.StructLit:
-			if !inOperand {
-				return // reachable; handled by walkField/walkStruct
-			}
-			for _, elt := range e.Elts {
-				switch elt := elt.(type) {
-				case *ast.Attribute:
-					k, _ := elt.Split()
-					if k == "test" {
-						appendErrRecord(elt, path, true, false, fmt.Errorf(
-							"@test inside a struct literal that is a binary-expression operand "+
-								"(e.g. X & {@test(...)}) is not reachable by the test runner; "+
-								"place @test after the field value (e.g. f: X & {...} @test(...)) "+
-								"or as a decl attribute in the enclosing struct"))
-					}
-				case *ast.Field:
-					for _, a := range elt.Attrs {
-						k, _ := a.Split()
-						if k == "test" {
-							appendErrRecord(a, path, false, false, fmt.Errorf(
-								"@test on a field inside a struct literal that is a binary-expression operand "+
-									"(e.g. X & {f: v @test(...)}) is not reachable by the test runner; "+
-									"place @test after the enclosing field value (e.g. f: X & {...} @test(...))"))
-						}
-					}
-					scanUnreachableTests(elt.Value, path, true)
-				}
-			}
-		}
+	ex := &attrExtractor{
+		hidPkg:   hidPkg,
+		fileName: fileName,
+		visited:  make(map[*ast.Attribute]bool),
 	}
 
 	// Handle file-level decl attributes (@test as a top-level declaration).
@@ -420,37 +386,41 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 		if a, ok := decl.(*ast.Attribute); ok {
 			k, _ := a.Split()
 			if k == "test" {
-				pa, err := parseTestAttr(a)
-				if err != nil {
-					appendErrRecord(a, cue.Path{}, false, true, err)
-					continue
-				}
-				pa.baseLine = a.Pos().Line()
-				pa.srcFileName = fileName
-				records = append(records, attrRecord{
-					path:      cue.Path{},
-					parsed:    pa,
-					fileLevel: true,
-				})
+				ex.processAttr(a, cue.Path{}, false, true, a.Pos().Line())
 			}
 		}
 	}
 
+	// Walk top-level fields.
 	for _, decl := range f.Decls {
-		switch d := decl.(type) {
-		case *ast.Field:
-			fieldPath := appendPath(cue.Path{}, d.Label, hidPkg)
+		if d, ok := decl.(*ast.Field); ok {
+			fieldPath := appendPath(cue.Path{}, d.Label, ex.hidPkg)
 			if fieldPath.Err() == nil {
-				walkField(d, fieldPath)
+				ex.walkField(d, fieldPath)
 			}
-		case *ast.EmbedDecl:
-			// Top-level bare embeddings are also not walked by walkField, so
-			// scan them for unreachable @test attributes.
-			scanUnreachableTests(d.Expr, cue.Path{}, false)
 		}
 	}
 
-	return records
+	// Report any @test attrs in the file not visited by the walk above.
+	// These are unreachable and would be silently ignored without this check.
+	ast.Walk(f, func(n ast.Node) bool {
+		a, ok := n.(*ast.Attribute)
+		if !ok {
+			return true
+		}
+		k, _ := a.Split()
+		if k != "test" || ex.visited[a] {
+			return true
+		}
+		ex.records = append(ex.records, attrRecord{
+			path:     cue.Path{},
+			parsed:   parsedTestAttr{srcAttr: a, srcFileName: fileName},
+			parseErr: fmt.Errorf("@test attribute is not reachable by the test runner; @test is only valid on top-level fields, fields inside struct literals, or as decl attributes in a struct"),
+		})
+		return true
+	}, nil)
+
+	return ex.records
 }
 
 // identStr returns the string form of an AST label that is a simple identifier

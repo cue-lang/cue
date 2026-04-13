@@ -16,6 +16,24 @@
       "message": "SGTM although I would have thought we could do this in plain CUE instead.",
       "revId": "0a6bae1c36f73e39da6ca1bdf9294e7508df7b2c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7ecd09e_99307c96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T20:28:08Z",
+      "side": 1,
+      "message": "Unfortunately not the way attributes work. With rog\u0027s new extension to the attribute parsing we could use plain CUE, once that is in.",
+      "parentUuid": "c9cc822e_a96f0936",
+      "revId": "0a6bae1c36f73e39da6ca1bdf9294e7508df7b2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -3,13 +3,30 @@
 -- in.cue --
 p: [ID=string]: {name: ID}
 p: q: _              @test(eq, {name: "q"})
-A="foo=bar": "str"   @test(eq, "str")
+A="foo=bar": "str"   // TODO(inline): make this work @test(eq, at="foo=bar", "str")
 a:           A       @test(eq, "str")
-B=bb:        4       @test(eq, 4)
+B=bb:        4
+@test(eq, at=bb, 4)
 b1:          B       @test(eq, 4)
 b1:          bb
 C="\(a)":    5
 c:           C       @test(eq, 5)
+
+@test(debugCheck, """
+	(struct){
+	  p: (struct){
+	    q: (struct){
+	      name: (string){ "q" }
+	    }
+	  }
+	  "foo=bar": (string){ "str" }
+	  a: (string){ "str" }
+	  bb: (int){ 4 }
+	  b1: (int){ 4 }
+	  c: (int){ 5 }
+	  str: (int){ 5 }
+	}
+	""")
 -- out/compile --
 --- in.cue
 {

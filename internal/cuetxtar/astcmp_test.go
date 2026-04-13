@@ -378,7 +378,17 @@ func TestAstCompare_ErrDirective(t *testing.T) {
 	})
 	t.Run("err wrong code", func(t *testing.T) {
 		expr := parseExpr(t, "{\nb: 1\na: _|_ @test(err, code=incomplete)\n}")
-		checkErr(t, astCompare(expr, errStruct), "@test(err): expected error code")
+		checkErr(t, astCompare(expr, errStruct), "expected error code")
+	})
+	t.Run("err wrong contains in eq body fails", func(t *testing.T) {
+		// contains= mismatch inside an @test(eq, {...}) body must return an
+		// error; it must not be silently ignored.
+		expr := parseExpr(t, `{b: 1, a: _|_ @test(err, contains="WRONG_SUBSTRING")}`)
+		checkErr(t, astCompare(expr, errStruct), `expected error message to contain "WRONG_SUBSTRING"`)
+	})
+	t.Run("err correct contains in eq body passes", func(t *testing.T) {
+		expr := parseExpr(t, `{b: 1, a: _|_ @test(err, contains="conflicting values")}`)
+		checkErr(t, astCompare(expr, errStruct), "")
 	})
 }
 

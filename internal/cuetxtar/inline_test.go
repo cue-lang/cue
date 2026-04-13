@@ -612,6 +612,83 @@ func TestShareIDPathAliasing(t *testing.T) {
 	}
 }
 
+// TestErrContainsCheck verifies that the contains= flag in @test(err) is
+// actually enforced for direct field annotations. A wrong substring must cause
+// runErrAssertion to report a failure, not silently pass.
+func TestErrContainsCheck(t *testing.T) {
+	ctx := cuecontext.New()
+	r := &inlineRunner{}
+	path := cue.MakePath(cue.Str("errField"))
+	val := ctx.CompileString("errField: 1 & 2").LookupPath(path)
+
+	t.Run("wrong contains= in direct annotation fails", func(t *testing.T) {
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{
+			directive: "err",
+			errArgs:   &errArgs{contains: "WRONG_SUBSTRING"},
+		}
+		r.runErrAssertion(rec, path, val, pa)
+		if !rec.failed {
+			t.Errorf("expected failure for wrong contains=, but it passed")
+		}
+	})
+
+	t.Run("correct contains= in direct annotation passes", func(t *testing.T) {
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{
+			directive: "err",
+			errArgs:   &errArgs{contains: "conflicting values"},
+		}
+		r.runErrAssertion(rec, path, val, pa)
+		if rec.failed {
+			t.Errorf("expected pass for correct contains=, got: %s", rec.msgs.String())
+		}
+	})
+}
+
+// TestAliasAnnotationPickedUp verifies that @test(err) annotations on fields
+// inside value alias expressions (field: x={...}) are not silently ignored.
+// Before the alias fix, walkField did not recurse into *ast.Alias values,
+// causing any @test directives inside them to be dropped entirely.
+func TestAliasAnnotationPickedUp(t *testing.T) {
+	// errField: x={bad: 1 & x @test(err, contains="WRONG_SUBSTRING")}
+	// x is the alias binding (self-reference), making the alias well-formed.
+	// bad: 1 & x is a conflict (int vs struct), so it evaluates to an error.
+	src := "errField: x={\n\tbad: 1 & x @test(err, contains=\"WRONG_SUBSTRING\")\n}\n"
+
+	f, err := parser.ParseFile("test.cue", src, parser.ParseComments)
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	records := extractTestAttrs(f, "test.cue")
+
+	// The @test annotation must be collected — if the alias is not unwrapped,
+	// records will be empty and the annotation is silently ignored.
+	var errRecords []attrRecord
+	for _, rec := range records {
+		if rec.parsed.directive == "err" {
+			errRecords = append(errRecords, rec)
+		}
+	}
+	if len(errRecords) == 0 {
+		t.Fatal("@test(err) inside alias was not picked up by extractTestAttrs (alias not unwrapped)")
+	}
+
+	// Running the assertion with a wrong contains= must fail — confirming that
+	// the annotation was both discovered and actually executed.
+	ctx := cuecontext.New()
+	r := &inlineRunner{}
+	root := ctx.CompileString(src)
+	for _, rec := range errRecords {
+		fieldVal := root.LookupPath(rec.path)
+		fc := &failCapture{TB: t}
+		r.runErrAssertion(fc, rec.path, fieldVal, rec.parsed)
+		if !fc.failed {
+			t.Errorf("path %s: expected failure for wrong contains=, but assertion passed", rec.path)
+		}
+	}
+}
+
 // TestAtDirective verifies that @test(err, at=<path>, ...) navigates to a
 // sub-path before checking the error.
 func TestAtDirective(t *testing.T) {

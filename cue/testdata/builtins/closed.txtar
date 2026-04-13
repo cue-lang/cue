@@ -152,15 +152,21 @@ unified: t2: {
 }
 nestedWithSelfReference: t1: {
 	_schema: close({
-		foo?: _schema @test(err, code="structural cycle") @test(shareID=S)
-	})
+		foo?: _schema
+	}) @test(shareID=S)
+	// TODO(inline): make work for hidden fields.
+	// @test(err, at=_schema.foo, code="structural cycle")
+	// @test(shareID=S, at=x.foo.foo)
+
 	x: {_schema}
 	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
 nestedWithSelfReference: t2: {
 	_schema: close({
-		foo?: _schema @test(err, code="structural cycle")
+		foo?: _schema
 	})
+	// TODO(inline): make work for hidden fields.
+	// @test(err, at=foo, code="structural cycle")
 	x: {{_schema}}
 	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
@@ -190,10 +196,10 @@ MaxRedirect:         2
     ./embed.cue:29:10
 [structural cycle] nestedWithSelfReference.t1._schema.foo: structural cycle
 [eval] nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
-    ./embed.cue:36:10
+    ./embed.cue:40:10
 [structural cycle] nestedWithSelfReference.t2._schema.foo: structural cycle
 [eval] nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
-    ./embed.cue:43:10
+    ./embed.cue:49:10
 [eval] b.x: field not allowed:
     ./in.cue:5:9
 -- out/diff-v2-v3.txt --

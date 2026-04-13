@@ -22,6 +22,7 @@ package cuetxtar
 import (
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -167,6 +168,7 @@ func eqWriteValue(opCtx *adt.OpContext, b *strings.Builder, v cue.Value, nestedI
 	// cue.Final() resolves defaults and avoids _#def wrapping.
 	syn := v.Syntax(cue.Docs(false), cue.Final(), cue.Optional(true), cue.Raw())
 	stripComments(syn)
+	syn = stripImports(syn)
 	bs, err := format.Node(syn, format.Simplify())
 	if err != nil {
 		fmt.Fprintf(b, "%#v", v)
@@ -295,6 +297,28 @@ func eqWriteLabel(opCtx *adt.OpContext, b *strings.Builder, f adt.Feature, arcTy
 		b.WriteString(f.SelectorString(opCtx))
 	}
 	b.WriteString(arcType.Suffix())
+}
+
+// stripImports removes import declarations from a syntax node, since the
+// test runner uses InferBuiltins(true) when parsing expected expressions,
+// making explicit import declarations unnecessary and invalid inside @test(eq, ...).
+// If the node is an *ast.File and after stripping imports it contains a single
+// *ast.EmbedDecl, the embedded expression is returned directly.
+func stripImports(node ast.Node) ast.Node {
+	f, ok := node.(*ast.File)
+	if !ok {
+		return node
+	}
+	f.Decls = slices.DeleteFunc(f.Decls, func(d ast.Decl) bool {
+		_, ok := d.(*ast.ImportDecl)
+		return ok
+	})
+	if len(f.Decls) == 1 {
+		if embed, ok := f.Decls[0].(*ast.EmbedDecl); ok {
+			return embed.Expr
+		}
+	}
+	return f
 }
 
 // stripComments removes all comment groups from every node in the AST.

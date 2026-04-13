@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb0b4848_dcf0d817",
+        "filename": "cue/testdata/builtins/issue299.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T20:17:46Z",
+      "side": 1,
+      "message": "Done. Restored `#todo:inline:` here and in all other files where it was removed in this CL (61 files total). The `#todo:inline:` lines are now only removed in the respective conversion CLs where `@test` directives are added.",
+      "parentUuid": "fab810bc_539d4693",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "374aa926_011c28ac",
@@ -49,6 +67,24 @@
       "writtenOn": "2026-04-11T12:19:43Z",
       "side": 1,
       "message": "don\u0027t remove todo:inline",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b13e634_7357acaa",
+        "filename": "cue/testdata/builtins/issue4208.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T20:17:46Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "374aa926_011c28ac",
       "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -70,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e3b6844_5d48269b",
+        "filename": "cue/testdata/builtins/issue490.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T20:17:46Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "ee95b4a9_3c7cea75",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "512534c8_3b42038a",
@@ -83,6 +137,24 @@
       "writtenOn": "2026-04-11T12:19:43Z",
       "side": 1,
       "message": "don\u0027t remove todo:inline. And many more",
+      "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "127a0059_25823ac3",
+        "filename": "cue/testdata/builtins/list/issue332.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T20:17:46Z",
+      "side": 1,
+      "message": "Done. Restored `#todo:inline:` in all 61 files where it was removed (builtins, compile, comprehensions, definitions, disjunctions, eval, fulleval, packages, resolve).",
+      "parentUuid": "512534c8_3b42038a",
       "revId": "1c83b4d246318b0f6323c79b0cd23b896ffe2cf1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

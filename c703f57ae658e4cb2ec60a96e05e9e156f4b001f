@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c130682b_8bcad27d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T20:20:47Z",
+      "side": 1,
+      "message": "Done. Updated `doc/specs/inline-test-attributes/spec.md` (renamed heading and all body references from `debugOutput` to `debug`) and `cue/testdata/readme.md` (added a `debug` section describing the informational annotation semantics).",
+      "parentUuid": "74c607e7_7388817c",
+      "revId": "c703f57ae658e4cb2ec60a96e05e9e156f4b001f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

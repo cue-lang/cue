@@ -98,6 +98,55 @@ func (ea *errArgs) matchesCode(got string) bool {
 	return slices.Contains(ea.codes, got)
 }
 
+// errCodeStr returns the string representation of val's error code,
+// or "" if val is not an error value.
+func errCodeStr(val cue.Value) string {
+	core := val.Core()
+	if core.V == nil {
+		return ""
+	}
+	b := core.V.Bottom()
+	if b == nil {
+		return ""
+	}
+	return b.Code.String()
+}
+
+// checkIsErr returns nil when val is an error value (bottom), or a descriptive
+// error when it is not. Used by both runErrAssertion and cmpErr.
+func checkIsErr(val cue.Value) error {
+	core := val.Core()
+	if core.V == nil {
+		return fmt.Errorf("@test(err): value has no vertex")
+	}
+	if core.V.Bottom() == nil {
+		return fmt.Errorf("@test(err): expected error, got non-error value")
+	}
+	return nil
+}
+
+// validateErrProperties checks the error properties (code, contains, …) of val
+// against ea. It assumes val is already known to be an error value (call
+// checkIsErr first). Adding a new check here automatically covers all callers:
+// runErrAssertion and cmpErr.
+//
+// Returns the first failing check's error, or nil when all pass.
+func (ea *errArgs) validateErrProperties(val cue.Value) error {
+	if len(ea.codes) > 0 {
+		gotCode := errCodeStr(val)
+		if !ea.matchesCode(gotCode) {
+			return fmt.Errorf("expected error code %v, got %q", ea.codes, gotCode)
+		}
+	}
+	if ea.contains != "" {
+		msg := valErr(val).Error()
+		if !strings.Contains(msg, ea.contains) {
+			return fmt.Errorf("expected error message to contain %q, got %q", ea.contains, msg)
+		}
+	}
+	return nil
+}
+
 // posUpdate records a pending pos=[...] replacement within a suberr=(...) group.
 type posUpdate struct {
 	expIdx    int         // 0-based index of the suberr=(...) group in the attribute
@@ -314,8 +363,8 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 	ea := pa.errArgs
 	if ea == nil {
 		// Bare @test(err) — just check that the value is an error.
-		if !r.isError(val) {
-			t.Errorf("path %s: expected error, got non-error value", path)
+		if err := checkIsErr(val); err != nil {
+			t.Errorf("path %s: %v", path, err)
 			logHint(t, pa.hint)
 		}
 		return
@@ -363,27 +412,15 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		return
 	}
 
-	if !r.isError(val) {
-		t.Errorf("path %s: expected error, got non-error value", path)
+	if err := checkIsErr(val); err != nil {
+		t.Errorf("path %s: %v", path, err)
 		logHint(t, pa.hint)
 		return
 	}
-
-	// Validate error code (uses adt.Bottom.Code, only available at cue.Value level).
-	if len(ea.codes) > 0 {
-		gotCode := r.errorCode(val)
-		if !ea.matchesCode(gotCode) {
-			t.Errorf("path %s: expected error code %v, got %q", path, ea.codes, gotCode)
-			logHint(t, pa.hint)
-		}
-	}
-	// Validate error message contains.
-	if ea.contains != "" {
-		msg := r.errorMessage(val)
-		if !strings.Contains(msg, ea.contains) {
-			t.Errorf("path %s: expected error message to contain %q, got %q", path, ea.contains, msg)
-			logHint(t, pa.hint)
-		}
+	// Validate error properties (code, contains, …).
+	if err := ea.validateErrProperties(val); err != nil {
+		t.Errorf("path %s: @test(err): %v", path, err)
+		logHint(t, pa.hint)
 	}
 	// Validate Msg() args (order-independent).
 	if len(ea.msgArgs) > 0 {
@@ -861,24 +898,7 @@ func (r *inlineRunner) applyPosWritebacks() {}
 
 // isError reports whether val is an error value (bottom).
 func (r *inlineRunner) isError(val cue.Value) bool {
-	core := val.Core()
-	if core.V == nil {
-		return false
-	}
-	return core.V.Bottom() != nil
-}
-
-// errorCode returns the string code of the error at val, or "" if not an error.
-func (r *inlineRunner) errorCode(val cue.Value) string {
-	core := val.Core()
-	if core.V == nil {
-		return ""
-	}
-	b := core.V.Bottom()
-	if b == nil {
-		return ""
-	}
-	return b.Code.String()
+	return checkIsErr(val) == nil
 }
 
 // valErr returns the error for val.  It prefers val.Err() but falls back
@@ -899,14 +919,6 @@ func valErr(val cue.Value) error {
 		}
 	}
 	return nil
-}
-
-// errorMessage returns the human-readable error message for val.
-func (r *inlineRunner) errorMessage(val cue.Value) string {
-	if err := valErr(val); err != nil {
-		return err.Error()
-	}
-	return ""
 }
 
 // msgArgsMatch reports whether err's Msg() args include all strings in expected
@@ -948,12 +960,10 @@ func checkMsgArgs(t testing.TB, path cue.Path, e cueerrors.Error, expected []str
 // findDescendantError walks val looking for any descendant with an error
 // matching ea (code=, contains=, args=). Returns true if found.
 func (r *inlineRunner) findDescendantError(val cue.Value, ea *errArgs) bool {
-	if r.isError(val) {
-		if ea.matchesCode(r.errorCode(val)) &&
-			(ea.contains == "" || strings.Contains(r.errorMessage(val), ea.contains)) &&
-			msgArgsMatch(val.Err(), ea.msgArgs) {
-			return true
-		}
+	if checkIsErr(val) == nil &&
+		ea.validateErrProperties(val) == nil &&
+		msgArgsMatch(val.Err(), ea.msgArgs) {
+		return true
 	}
 	// Walk fields.
 	iter, err := val.Fields()

@@ -297,10 +297,14 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 			})
 		}
 
-		if sl, ok := field.Value.(*ast.StructLit); ok {
+		expr := field.Value
+		if alias, ok := expr.(*ast.Alias); ok {
+			expr = alias.Expr
+		}
+		if sl, ok := expr.(*ast.StructLit); ok {
 			walkStruct(sl, path)
 		} else {
-			scanUnreachableTests(field.Value, path, false)
+			scanUnreachableTests(expr, path, false)
 		}
 	}
 

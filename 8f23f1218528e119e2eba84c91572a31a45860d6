@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca044b02_eb36c6d2",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-13T17:44:21Z",
+      "side": 1,
+      "message": "How do we know the error is actually related to the pattern constraint?  This seems very trigger happy. Is this really what we want?  Why not do this at the point where we check for pattern constraints?\n\nWe will need a lot more tests to show all the edge cases and get more comfortable with that this is what we want.",
+      "revId": "8f23f1218528e119e2eba84c91572a31a45860d6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

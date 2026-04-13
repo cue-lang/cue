@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "47afc23d_662a9b7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-13T10:53:00Z",
+      "side": 1,
+      "message": "That\u0027s a good question.",
+      "parentUuid": "bca8fb37_24b245ea",
+      "revId": "a9fe328bd81b840a665624bbb8abdb85f56f95fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f9c67bbe_091f54ac",
         "filename": "cue/interpreter/embed/embed.go",
         "patchSetId": 5
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-13T09:57:03Z",
       "side": 1,
       "message": "Since this is now public, shouldn\u0027t it be cuecontext.Injector?",
+      "revId": "a9fe328bd81b840a665624bbb8abdb85f56f95fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fadf6cc0_63d7a137",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-13T10:53:00Z",
+      "side": 1,
+      "message": "It\u0027s no more public than it was before AFAICS. For now, we\u0027re just renaming things, not changing visibility.\n\nWe can\u0027t refer to cuecontext.Injector here that would result in a cyclic dependency, as cuecontext imports this interpreter/embed.\n\nIn the future, we\u0027ll probably need another package (cue/inject ?) where the public interfaces are defined but for now I think this should be OK.",
+      "parentUuid": "f9c67bbe_091f54ac",
       "revId": "a9fe328bd81b840a665624bbb8abdb85f56f95fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,5 +1,6 @@
 -- in.cue --
-a="a": 3        @test(eq, 3)
+a="a": 3
+@test(eq, at=a, 3)
 b:     a        @test(eq, 3)
 o: {"a\nb": 2}  @test(eq, {"a\nb": 2})
 c: o["a\nb"]    @test(eq, 2)

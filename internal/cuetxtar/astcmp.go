@@ -658,19 +658,11 @@ func cmpFieldAttrs(path cue.Path, expected []*ast.Attribute, child cue.Value) er
 // Position specs use absolute line numbers (not deltas) since nested @test(err)
 // attributes have no source line to be relative to.
 func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
-	core := val.Core()
-	if core.V == nil {
-		return pathErr(path, "@test(err): value has no vertex")
+	if err := checkIsErr(val); err != nil {
+		return pathErr(path, "%v", err)
 	}
-	b := core.V.Bottom()
-	if b == nil {
-		return pathErr(path, "@test(err): expected error, got non-error value")
-	}
-	if len(ea.codes) > 0 {
-		gotCode := b.Code.String()
-		if !ea.matchesCode(gotCode) {
-			return pathErr(path, "@test(err): expected error code %v, got %q", ea.codes, gotCode)
-		}
+	if err := ea.validateErrProperties(val); err != nil {
+		return pathErr(path, "%v", err)
 	}
 	if ea.posSet {
 		err := val.Err()

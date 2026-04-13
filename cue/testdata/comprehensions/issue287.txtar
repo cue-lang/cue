@@ -1,12 +1,14 @@
 -- in.cue --
  if #E["x"] != _|_ {
-	#E: {y: true} @test(eq, {y: true, x: true})
+	#E: {y: true}
 }
 if #E["y"] != _|_ {
-	z: true @test(eq, true)
+	z: true
 }
 #E: [_]: bool
 #E: x:   true
+#E: _ @test(eq, {y: true, x: true})
+z: _ @test(eq, true)
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
@@ -38,4 +40,6 @@ NumCloseIDs: 2
   #E: {
     x: true
   }
+  #E: _
+  z: _
 }

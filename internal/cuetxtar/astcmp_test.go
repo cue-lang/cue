@@ -378,7 +378,7 @@ func TestAstCompare_ErrDirective(t *testing.T) {
 	})
 	t.Run("err wrong code", func(t *testing.T) {
 		expr := parseExpr(t, "{\nb: 1\na: _|_ @test(err, code=incomplete)\n}")
-		checkErr(t, astCompare(expr, errStruct), "@test(err): expected error code")
+		checkErr(t, astCompare(expr, errStruct), "expected error code")
 	})
 }
 

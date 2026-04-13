@@ -1,0 +1,37 @@
+# Tests that contains= in @test(err) is enforced in both direct field
+# annotations and inside @test(eq, {...}) bodies (cmpErr path).
+#
+# TODO: CUE_UPDATE=force incorrectly replaces wrongEq's @test(eq, {...}) body
+# with a bare @test(err) because the struct containing an error arc is itself
+# treated as an error vertex (v.Err() != nil). Force should preserve the eq
+# body instead of overwriting it. Fix: skip force-fill when the generated
+# annotation would be @test(err) but the existing annotation is @test(eq).
+-- in/test.cue --
+right: 1 & 2 @test(err, contains="conflicting values")
+wrong: 1 & 2 @test(err, contains="WRONG_SUBSTRING")
+
+rightEq: {b: 1, a: null & string} @test(eq, {b: 1, a: _|_ @test(err, contains="conflicting values")})
+wrongEq: {b: 1, a: null & string} @test(eq, {b: 1, a: _|_ @test(err, contains="WRONG_SUBSTRING")})
+
+inAlias: x={
+	bad: 1 & x @test(err, contains="WRONG")
+}
+-- out/run/errors.txt --
+path wrong: @test(err): expected error message to contain "WRONG_SUBSTRING", got "wrong: conflicting values 2 and 1"
+path wrongEq: a: expected error message to contain "WRONG_SUBSTRING", got "wrongEq.a: conflicting values null and string (mismatched types null and string)"
+path inAlias.bad: @test(err): expected error message to contain "WRONG", got "inAlias.bad: conflicting values 1 and {bad:(1 & x)} (mismatched types int and struct)"
+-- out/force/test.cue --
+right: 1 & 2 @test(err, contains="conflicting values")
+wrong: 1 & 2 @test(err, contains="WRONG_SUBSTRING")
+
+rightEq: {b: 1, a: null & string} @test(eq, {b: 1, a: _|_ @test(err, contains="conflicting values")})
+wrongEq: {b: 1, a: null & string} @test(err)
+
+inAlias: x={
+	bad: 1 & x @test(err, contains="WRONG")
+}
+-- out/force/errors.txt --
+path wrong: @test(err): expected error message to contain "WRONG_SUBSTRING", got "wrong: conflicting values 2 and 1"
+path inAlias.bad: @test(err): expected error message to contain "WRONG", got "inAlias.bad: conflicting values 1 and {bad:(1 & x)} (mismatched types int and struct)"
+-- out/status.txt --
+update: identical to input

@@ -22,6 +22,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -180,7 +181,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if err := cueexperiment.Init(); err != nil {
 			return err
 		}
-		var opts []cuecontext.Option
+		opts := slices.Clone(c.contextOptions)
 		if wasmInterp != nil {
 			opts = append(opts, cuecontext.WithInjection(wasmInterp))
 		}
@@ -281,7 +282,11 @@ func (chdirFlag) Set(string) error {
 
 // New creates the top-level command.
 // The returned error is always nil, and is a historical artifact.
-func New(args []string) (*Command, error) {
+//
+// Any options passed will be used when creating a [cue.Context]
+// for the command, in addition to any options that the command
+// would use by default.
+func New(args []string, options ...cuecontext.Option) (*Command, error) {
 	args, err := handleChdirFlag(args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -310,8 +315,9 @@ func New(args []string) (*Command, error) {
 	}
 
 	c := &Command{
-		Command: cmd,
-		root:    cmd,
+		Command:        cmd,
+		root:           cmd,
+		contextOptions: options,
 	}
 	c.cmdCmd = newCmdCmd(c)
 
@@ -364,8 +370,14 @@ func New(args []string) (*Command, error) {
 
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
+	return MainWithOptions()
+}
+
+// MainWithOptions is like [Main] but accepts [cuecontext.Option] values
+// that will be used when creating the [cue.Context] for the command.
+func MainWithOptions(options ...cuecontext.Option) int {
 	start := time.Now()
-	cmd, _ := New(os.Args[1:])
+	cmd, _ := New(os.Args[1:], options...)
 	// CUE_BENCH makes the cue tool act like a `go test -bench=. -benchmem` benchmark,
 	// doing all of its work and then only printing a benchmark result line to stdout
 	// including the elapsed time, Go allocated bytes, and Go allocations count.
@@ -420,7 +432,8 @@ type Command struct {
 	// _tool.cue subcommands.
 	cmdCmd *cobra.Command
 
-	ctx *cue.Context
+	ctx            *cue.Context
+	contextOptions []cuecontext.Option
 
 	hasErr bool
 }

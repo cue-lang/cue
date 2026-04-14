@@ -129,7 +129,7 @@ issue3801: nonRooted: full: {
 				output: base & {val0: "foo"}
 			}
 			patch: base2.output.value
-		}).output
+		}).output @test(err, code=incomplete, contains="key value of dynamic field must be concrete, found %v", args=[string], pos=[15:12, 12:15])
 	}
 	out: (#Output & {namespace: "ns1"}).output
 
@@ -138,6 +138,12 @@ issue3801: nonRooted: full: {
 
 		patch: _
 		output: (namespace): patch
+
+		// TODO(eval): our message is substituted as a string instead of being wrapped as an error.
+		@test(err, at=output, code=incomplete,
+			suberr=(code=incomplete, contains="key value of dynamic field must be concrete, found %v",
+				args=[_|_(issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace)], pos=[4:12]),
+			suberr=(code=incomplete, contains="cannot reference optional field: %s", args=[namespace], pos=[4:12]))
 	}
 
 	#Base: {
@@ -148,13 +154,13 @@ issue3801: nonRooted: full: {
 	@test(eq, {
 		#Output: {
 			namespace: string
-			output: _|_ @test(err, code=incomplete, contains="issue3801.nonRooted.full.#Output.output: key value of dynamic field must be concrete, found string", pos=[138:12, 135:15])
+			output: _|_
 		}
 		out: {ns1: "foo"}
 		#SubOutput: {
 			namespace?: string
 			patch: _
-			output: _|_ @test(err, code=incomplete, contains="issue3801.nonRooted.full.#SubOutput.output: key value of dynamic field must be concrete, found _|_(issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace) (and 1 more errors)", pos=[138:12])
+			output: _|_
 		}
 		#Base: {val0: string, value: string}
 	})

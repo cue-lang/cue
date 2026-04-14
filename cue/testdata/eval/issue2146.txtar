@@ -25,7 +25,11 @@ p1: {
 	a: #A & { x: 3 }
 	b: #A & a
 	@test(eq, {
-		#A: *{x?: _|_ @test(err, code=user, contains="explicit error", pos=[10:8]), y: 1, all: [1]} | {x?: int, y?: int, all: []}
+		#A: *{
+			y: 1, all: [1], x?: _|_ @test(err, code=user, contains="explicit error", pos=[10:8])
+		} | {
+			x?: int, y?: int, all: []
+		}
 		a: {x: 3, y?: int, all: [3]}
 		b: {x: 3, y?: int, all: [3]}
 	})
@@ -47,7 +51,11 @@ p2: {
 	a: #A & { x: 3, y: 2 }
 	b: #A & a
 	@test(eq, {
-		#A: *{x?: _|_ @test(err, code=user, contains="explicit error", pos=[32:8]), y: 1, all: [1]} | {x?: int, y?: int, all: []}
+		#A: *{
+			y: 1, all: [1], x?: _|_ @test(err, code=user, contains="explicit error")
+		} | {
+			x?: int, y?: int, all: []
+		}
 		a: {x: 3, y: 2, all: [3, 2]}
 		b: {x: 3, y: 2, all: [3, 2]}
 	})

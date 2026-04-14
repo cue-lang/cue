@@ -1,0 +1,16 @@
+# Tests that @test attributes on fields with alias labels are not flagged as
+# unreachable. Field labels of the form B=bb (identifier alias) or A="foo=bar"
+# (string alias) are *ast.Alias nodes; labelSelector must unwrap them to find
+# the underlying label before dispatching, or the @test attr is silently lost.
+-- in/test.cue --
+// Identifier alias: B=bb — alias B is used in 'doubled' to keep the CUE
+// compilation valid. The @test(eq) must apply to field bb, not be flagged.
+B=bb: 4 @test(eq, 4)
+doubled: B * 2 @test(eq, 8)
+
+// String alias: A="foo=bar" — alias A is used in 'greeting' similarly.
+A="foo=bar": "str" @test(eq, "str")
+greeting: "hello, " + A @test(eq, "hello, str")
+-- out/status.txt --
+update: identical to input
+force:  identical to update

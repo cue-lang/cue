@@ -1,0 +1,34 @@
+# Two multi-line string fields and a simple field. Each multi-line
+# string introduces forced newlines, so it flushes the alignment —
+# every row becomes its own single-row segment with no cross-row
+# padding.
+-- in.cue --
+{
+	apple: """
+  first
+  """
+	banana: """
+   second
+   """
+	carrots: 42
+}
+-- out/relpos --
+{
+	apple: """
+  first
+  """
+	banana: """
+   second
+   """
+	carrots: 42
+}
+-- out/norelpos --
+{
+	apple: """
+  first
+  """
+	banana: """
+   second
+   """
+	carrots: 42
+}

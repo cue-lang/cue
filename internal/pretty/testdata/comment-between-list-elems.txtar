@@ -1,0 +1,21 @@
+-- in.cue --
+[
+1,
+  // between
+	2,
+		3
+]
+-- out/relpos --
+[
+	1,
+	// between
+	2,
+	3,
+]
+-- out/norelpos --
+[
+	1,
+	// between
+	2,
+	3,
+]

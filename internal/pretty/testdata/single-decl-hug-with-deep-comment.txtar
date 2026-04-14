@@ -1,0 +1,61 @@
+# A single-decl struct/list/call hugs its braces around the decl
+# (no outer Nest) when the inner content is forced to break. The
+# guard for `//` comments only applies to comments attached directly
+# to the immediate child — comments living deeper in the subtree
+# stay inside their own brackets and never reach the outer
+# `}`/`]`/`)` boundary, so they should not block the hug.
+#
+# Without this, adding a `//` comment inside an inner struct would
+# silently re-introduce the double-indent that the same-line-opener
+# rule was meant to prevent.
+-- in.cue --
+direct: x: {a: int & {
+	b: _
+}}
+
+with_comment: x: {a: int & {
+	// comment
+	b: _
+}}
+
+deeper: x: {a: {
+	// outer comment
+	b: int & {
+		// inner comment
+		c: _
+	}
+}}
+-- out/relpos --
+direct: x: {a: int & {
+	b: _
+}}
+
+with_comment: x: {a: int & {
+	// comment
+	b: _
+}}
+
+deeper: x: {a: {
+	// outer comment
+	b: int & {
+		// inner comment
+		c: _
+	}
+}}
+-- out/norelpos --
+direct: x: {a: int & {b: _}}
+with_comment: x: {
+	a: int & {
+		// comment
+		b: _
+	}
+}
+deeper: x: {
+	a: {
+		// outer comment
+		b: int & {
+			// inner comment
+			c: _
+		}
+	}
+}

@@ -1,0 +1,32 @@
+# A struct value written on its own lines (RelPos-driven newlines)
+# flushes the alignment: the rows before it align amongst
+# themselves, while the rows after form a new segment. When the
+# struct value fits flat (`{a: 1}` in the norelpos case) it joins
+# the single alignment group with everything else.
+-- config --
+width: 20
+-- in.cue --
+{
+	x: 1
+	longname: "hello"
+	nested: {
+	a: 1
+	}
+	baz: true
+}
+-- out/relpos --
+{
+	x:        1
+	longname: "hello"
+	nested: {
+		a: 1
+	}
+	baz: true
+}
+-- out/norelpos --
+{
+	x:        1
+	longname: "hello"
+	nested:   {a: 1}
+	baz:      true
+}

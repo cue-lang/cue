@@ -1,0 +1,19 @@
+# Multi-line call args: RelPos is honoured end-to-end. A Newline
+# RelPos on an arg puts it on its own line; a NewSection RelPos on
+# the closing ')' (blank line before ')' in the source) is preserved
+# as a blank line in the output. RelPos is data the user put there
+# and the formatter must not silently delete it.
+-- in.cue --
+x: strings.Join(
+			a,
+	            ",",
+
+	)
+-- out/relpos --
+x: strings.Join(
+	a,
+	",",
+
+)
+-- out/norelpos --
+x: strings.Join(a, ",")

@@ -1,0 +1,25 @@
+# A single-element list whose element does not carry a Newline RelPos
+# hugs the brackets around the element, mirroring ParenExpr. The
+# element's own layout (a struct that breaks internally) renders
+# between '[' and ']' without the list inserting its own breaks, its
+# own Nest, or a trailing comma. A Newline RelPos on the element
+# disables hugging (see list-single-elem-explicit-break).
+-- in.cue --
+versions!: [...{
+	name!: string
+	schema!: {
+		openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)
+	}
+}]
+-- out/relpos --
+versions!: [...{
+	name!: string
+	schema!: {
+		openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)
+	}
+}]
+-- out/norelpos --
+versions!: [...{
+	name!: string
+	schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}
+}]

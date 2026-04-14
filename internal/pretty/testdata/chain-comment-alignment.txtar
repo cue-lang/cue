@@ -1,0 +1,31 @@
+# When a | or & chain has trailing //-comments on its operator lines,
+# the chain is rendered using a Table so those comments align in a
+# single column. A field-level trailing comment on such a chain is
+# passed through to the chain's Table (via chainFieldTrailing) so it
+# aligns with the arm-level comments too. Interior comments on an
+# arm that is a braced StructLit (e.g. the "// a: 5" inside "{}") are
+# injected into the struct's body.
+-- in.cue --
+#X: {a?: int}
+foo: #X |        // comment
+    {
+        // a: 5
+    } | // another
+    {} |        // also
+    {} // here
+-- out/relpos --
+#X: {a?: int}
+foo: #X | // comment
+	{
+		// a: 5
+	} |  // another
+	{} | // also
+	{}   // here
+-- out/norelpos --
+#X: {a?: int}
+foo: #X | // comment
+	{
+		// a: 5
+	} |  // another
+	{} | // also
+	{}   // here

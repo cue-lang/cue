@@ -1,0 +1,26 @@
+# Multi-line string value is a BasicLit, so the field participates
+# in table alignment. name: is padded to match description:.
+-- in.cue --
+{
+	description: """
+		This is a long
+		description field
+		"""
+	name: "foo"
+}
+-- out/relpos --
+{
+	description: """
+		This is a long
+		description field
+		"""
+	name:        "foo"
+}
+-- out/norelpos --
+{
+	description: """
+		This is a long
+		description field
+		"""
+	name:        "foo"
+}

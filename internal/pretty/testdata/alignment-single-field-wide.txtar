@@ -1,0 +1,14 @@
+# A single simple field: no alignment padding needed.
+# The input is parsed with Newline RelPos (multi-line source),
+# so it stays multi-line regardless of width.
+# Without RelPos, the struct is free to flatten at width 80.
+-- in.cue --
+{
+x: 1
+}
+-- out/relpos --
+{
+	x: 1
+}
+-- out/norelpos --
+{x: 1}

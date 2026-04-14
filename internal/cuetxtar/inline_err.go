@@ -21,6 +21,7 @@ package cuetxtar
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -883,6 +884,15 @@ func posMatchesSpec(got token.Pos, exp posSpec, baseLine int, relFilename func(s
 	return got.Line() == baseLine+exp.deltaLine && got.Column() == exp.col
 }
 
+// fmtPos formats a token.Pos for display in error messages, including the
+// base filename when available: "file.cue:line:col" or "line:col".
+func fmtPos(p token.Pos) string {
+	if f := p.Filename(); f != "" {
+		return fmt.Sprintf("%s:%d:%d", filepath.Base(f), p.Line(), p.Column())
+	}
+	return fmt.Sprintf("%d:%d", p.Line(), p.Column())
+}
+
 // formatPosCountMismatch returns a consistent mismatch message for @test(err,
 // pos=...) assertions. When got has extra positions, it explains that this can
 // be acceptable after validating relevance.
@@ -902,7 +912,7 @@ func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive 
 	if len(positions) != len(specs) {
 		t.Errorf("path %s: %s", path, formatPosCountMismatch(directive, len(positions), len(specs)))
 		for _, p := range positions {
-			t.Logf("  actual: %d:%d", p.Line(), p.Column())
+			t.Logf("  actual: %s", fmtPos(p))
 		}
 		logHint(t, hint)
 		return
@@ -927,7 +937,7 @@ func (r *inlineRunner) reportPosMismatch(t testing.TB, path cue.Path, directive 
 				t.Errorf("path %s: %s: unmatched position %d:%d (spec %d:%d); actual positions:", path, directive, baseLine+exp.deltaLine, exp.col, exp.deltaLine, exp.col)
 			}
 			for _, p := range positions {
-				t.Logf("  actual: %d:%d", p.Line(), p.Column())
+				t.Logf("  actual: %s", fmtPos(p))
 			}
 			logHint(t, hint)
 		}

@@ -23,7 +23,12 @@ issue574: {
 			"bye"
 		},
 	]
-	@test(eq, {greet: true, bye: true, message1: ["hello", "how are you doing?", "bye"], message2: ["how are you doing?", "bye"]})
+	@test(eq, {
+		greet: true
+		bye: true
+		message1: ["hello", "how are you doing?", "bye"]
+		message2: ["how are you doing?", "bye"]
+	})
 }
 -- out/errors.txt --
 -- out/eval/stats --

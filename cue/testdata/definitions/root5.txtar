@@ -103,28 +103,3 @@ NumCloseIDs: 7
 -- out/diff-v2-v3.txt --
 Reordering
 Verdict: cosmetic -- Field reordering only. No semantic change.
--- out/evalalpha --
-(#struct){
-  _schema: ~(#Schema)
-  #Schema: (#struct){
-    a?: (#struct){
-      b?: (string){ string }
-    }
-  }
-  a: (#struct){
-    b: (string){ "foo" }
-  }
-  c: (string){ "foo" }
-  x: (#struct){
-    _schema: ~(x.#Schema)
-    #Schema: (#struct){
-      a?: (#struct){
-        b?: (string){ string }
-      }
-    }
-    a: (#struct){
-      b: (string){ "foo" }
-    }
-    c: (string){ "foo" }
-  }
-}

@@ -20,53 +20,53 @@ b6: int & >5 & <=6  @test(eq, >5 & <=6 & int)
 
 simplifyExpr: {
 	// TODO: fill out later.
-	less1: <(<3)   @test(err, code=incomplete)
-	less2: <(<=3)  @test(err, code=incomplete)
-	less3: <=(<3)  @test(err, code=incomplete)
-	less4: <=(<=3) @test(err, code=incomplete)
-	less5: <(!=3)  @test(err, code=incomplete)
-	less6: <=(!=3) @test(err, code=incomplete)
+	less1: <(<3)   @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:11])
+	less2: <(<=3)  @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:11])
+	less3: <=(<3)  @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:12])
+	less4: <=(<=3) @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:12])
+	less5: <(!=3)  @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:11])
+	less6: <=(!=3) @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:12])
 
-	gtr1: >(>3)   @test(err, code=incomplete)
-	gtr2: >(>=3)  @test(err, code=incomplete)
-	gtr3: >=(>3)  @test(err, code=incomplete)
-	gtr4: >=(>=3) @test(err, code=incomplete)
-	gtr5: >(!=3)  @test(err, code=incomplete)
-	gtr6: >=(!=3) @test(err, code=incomplete)
+	gtr1: >(>3)   @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:10])
+	gtr2: >(>=3)  @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:10])
+	gtr3: >=(>3)  @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:11])
+	gtr4: >=(>=3) @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:11])
+	gtr5: >(!=3)  @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:10])
+	gtr6: >=(!=3) @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:11])
 
-	lg1: <(>3)   @test(err, code=incomplete)
-	lg2: <(>=3)  @test(err, code=incomplete)
-	lg3: <=(>3)  @test(err, code=incomplete)
-	lg4: <=(>=3) @test(err, code=incomplete)
+	lg1: <(>3)   @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:9])
+	lg2: <(>=3)  @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:9])
+	lg3: <=(>3)  @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:10])
+	lg4: <=(>=3) @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:10])
 
-	gl1: >(<3)   @test(err, code=incomplete)
-	gl2: >(<=3)  @test(err, code=incomplete)
-	gl3: >=(<3)  @test(err, code=incomplete)
-	gl4: >=(<=3) @test(err, code=incomplete)
+	gl1: >(<3)   @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:9])
+	gl2: >(<=3)  @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:9])
+	gl3: >=(<3)  @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:10])
+	gl4: >=(<=3) @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:10])
 
-	ne1: !=(!=3) @test(err, code=incomplete)
-	ne2: !=(<3)  @test(err, code=incomplete)
-	ne3: !=(<=3) @test(err, code=incomplete)
-	ne4: !=(>3)  @test(err, code=incomplete)
-	ne5: !=(>=3) @test(err, code=incomplete)
+	ne1: !=(!=3) @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:10])
+	ne2: !=(<3)  @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:10])
+	ne3: !=(<=3) @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:10])
+	ne4: !=(>3)  @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:10])
+	ne5: !=(>=3) @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:10])
 
 	s:      string
 	n:      number
 	i:      int
 	f:      float
 	b:      bytes
-	basic1: <(i)  @test(err)
-	basic2: >(n)  @test(err)
-	basic3: >=(s) @test(err)
-	basic4: <=(f) @test(err)
-	basic5: <=(b) @test(err)
+	basic1: <(i)  @test(err, code=incomplete, contains="non-concrete value i", pos=[0:12])
+	basic2: >(n)  @test(err, code=incomplete, contains="non-concrete value n", pos=[0:12])
+	basic3: >=(s) @test(err, code=incomplete, contains="non-concrete value s", pos=[0:13])
+	basic4: <=(f) @test(err, code=incomplete, contains="non-concrete value f", pos=[0:13])
+	basic5: <=(b) @test(err, code=incomplete, contains="non-concrete value b", pos=[0:13])
 
 	// Do NOT interpret this the same as `!= type`.
-	bne1: !=(s) @test(err)
-	bne2: !=(n) @test(err)
-	bne3: !=(n) @test(err)
-	bne4: !=(i) @test(err)
-	bne5: !=(b) @test(err)
+	bne1: !=(s) @test(err, code=incomplete, contains="non-concrete value s", pos=[0:11])
+	bne2: !=(n) @test(err, code=incomplete, contains="non-concrete value n", pos=[0:11])
+	bne3: !=(n) @test(err, code=incomplete, contains="non-concrete value n", pos=[0:11])
+	bne4: !=(i) @test(err, code=incomplete, contains="non-concrete value i", pos=[0:11])
+	bne5: !=(b) @test(err, code=incomplete, contains="non-concrete value b", pos=[0:11])
 
 	e1: <(=~"foo") @test(err, code=incomplete, contains="non-concrete value =~", pos=[0:8])
 	e2: >(null)    @test(err, code=eval, contains="cannot use null for bound", pos=[0:8])
@@ -521,24 +521,38 @@ NumCloseIDs: 8
     float: {
       err1: {
         p1: (<1 & >2)
+      }
+      err1: {
         p2: (>2 & <1)
       }
       err2: {
         p1: (>2 & <=1)
+      }
+      err2: {
         p2: (<=1 & >2)
       }
       err3: {
         p1: (>=2 & <2)
+      }
+      err3: {
         p2: (<2 & >=2)
+      }
+      err3: {
         p3: (>2 & <=2)
+      }
+      err3: {
         p4: (<=2 & >2)
       }
       ok1: {
         p1: (>1 & <2)
+      }
+      ok1: {
         p2: (<2 & >1)
       }
       ok2: {
         p1: (>=2 & <=2)
+      }
+      ok2: {
         p2: (<=2 & >=2)
       }
     }
@@ -550,34 +564,56 @@ NumCloseIDs: 8
       }
       err1: {
         p1: (<1 & >2)
+      }
+      err1: {
         p2: (>2 & <1)
       }
       err2: {
         p1: (>2 & <=1)
+      }
+      err2: {
         p2: (<=1 & >2)
       }
       err3: {
         p1: (>=2 & <2)
+      }
+      err3: {
         p2: (<2 & >=2)
+      }
+      err3: {
         p3: (>2 & <=2)
+      }
+      err3: {
         p4: (<=2 & >2)
       }
       err4: {
         p1: (>1 & <2)
+      }
+      err4: {
         p2: (<2 & >1)
       }
       ok1: {
         p1: (>=2 & <=3)
+      }
+      ok1: {
         p2: (<=3 & >=2)
       }
       ok2: {
         p1: (>=2 & <=2)
+      }
+      ok2: {
         p2: (<=2 & >=2)
       }
       ok3: {
         p1: (>=2 & <3)
+      }
+      ok3: {
         p2: (>2 & <=3)
+      }
+      ok3: {
         p3: (<3 & >=2)
+      }
+      ok3: {
         p4: (<=3 & >2)
       }
     }
@@ -589,30 +625,50 @@ NumCloseIDs: 8
     strings: {
       err1: {
         p1: (<"a" & >"b")
+      }
+      err1: {
         p2: (>"b" & <"a")
       }
       err2: {
         p1: (>"b" & <="a")
+      }
+      err2: {
         p2: (<="a" & >"b")
       }
       err3: {
         p1: (>="b" & <"b")
+      }
+      err3: {
         p2: (<"b" & >="b")
+      }
+      err3: {
         p3: (>"b" & <="b")
+      }
+      err3: {
         p4: (<="b" & >"b")
       }
       ok1: {
         p1: (>"a" & <"b")
+      }
+      ok1: {
         p2: (<"b" & >"a")
       }
       ok2: {
         p1: (>"a" & <="b")
+      }
+      ok2: {
         p2: (<="b" & >"a")
+      }
+      ok2: {
         p3: (>="a" & <"b")
+      }
+      ok2: {
         p4: (<"b" & >="a")
       }
       ok3: {
         p1: (>="b" & <="c")
+      }
+      ok3: {
         p2: (<="c" & >="b")
       }
       ok4: {
@@ -624,30 +680,50 @@ NumCloseIDs: 8
     byte: {
       err1: {
         p1: (<'a' & >'b')
+      }
+      err1: {
         p2: (>'b' & <'a')
       }
       err2: {
         p1: (>'b' & <='a')
+      }
+      err2: {
         p2: (<='a' & >'b')
       }
       err3: {
         p1: (>='b' & <'b')
+      }
+      err3: {
         p2: (<'b' & >='b')
+      }
+      err3: {
         p3: (>'b' & <='b')
+      }
+      err3: {
         p4: (<='b' & >'b')
       }
       ok1: {
         p1: (>'a' & <'b')
+      }
+      ok1: {
         p2: (<'b' & >'a')
       }
       ok2: {
         p1: (>'a' & <='b')
+      }
+      ok2: {
         p2: (<='b' & >'a')
+      }
+      ok2: {
         p3: (>='a' & <'b')
+      }
+      ok2: {
         p4: (<'b' & >='a')
       }
       ok3: {
         p1: (>='b' & <='c')
+      }
+      ok3: {
         p2: (<='c' & >='b')
       }
       ok4: {

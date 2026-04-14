@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fb44649_2cfd6cd0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-14T10:59:40Z",
+      "side": 1,
+      "message": "bad wrapping; re-run the AI on these commit messages",
+      "revId": "c4cfdf0056a8ec733c25e60f6d307d6471a77107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

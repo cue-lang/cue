@@ -9,6 +9,14 @@ issue3062: ok1: {
 	o: X
 	X: x: A
 	A: "a"
+
+	@test(eq, {
+		#S: "a"
+		#o: {x: "a"}
+		o: {x: "a"}
+		X: {x: "a"}
+		A: "a"
+	})
 }
 
 // evalv3 "field not allowed" regression from v2 involving structure sharing
@@ -18,27 +26,33 @@ issue3601: ok1: {
 	Y: (X & __no_sharing).a
 	X: a: b: a.b
 	out: Y & __no_sharing
+
+	@test(eq, {Y: {b: _}, X: {a: {b: _}}, out: {b: _}})
 }
 
 // Test debug facilities to turn of sharing.
 debug: {
 	sharingOn: {
-		a: b
-		b: c: 1
+		a: b @test(shareID=sharingOn_ab)
+		b: {c: 1} @test(shareID=sharingOn_ab)
+		@test(eq, {a: {c: 1}, b: {c: 1}})
 	}
 	sharingOff: t1: {
 		a: b & __no_sharing
 		b: c: 1
+		@test(eq, {a: {c: 1}, b: {c: 1}})
 	}
 	sharingOff: t2: {
 		a: b
 		a: __no_sharing
 		b: c: 1
+		@test(eq, {a: {c: 1}, b: {c: 1}})
 	}
 	sharingOff: t3: {
 		a: __no_sharing
 		a: b
 		b: c: 1
+		@test(eq, {a: {c: 1}, b: {c: 1}})
 	}
 }
 -- dupshare.cue --
@@ -50,47 +64,67 @@ debug: {
 // unified into a field multiple times with different closedness histories.
 // https://cuelang.org/issue/3641
 issue3641: simplified: t1: {
-	#Context1: ctx: {}
-	Context2: ctx: {}
+	#Context1: {ctx: {}} @test(shareID=t1ctx1)
+	Context2: {ctx: {}} @test(shareID=t1ctx2)
 
 	// Must both refer to #Context1
-	#Config1: cfg: #Context1
-	#Config3: cfg: #Context1
+	#Config1: {cfg: #Context1 @test(shareID=t1ctx1)}
+	#Config3: {cfg: #Context1 @test(shareID=t1ctx1)}
 
-	Config2: cfg: Context2
+	Config2: {cfg: Context2 @test(shareID=t1ctx2)}
 
 	Config: #Config1 & Config2
 
 	// order matters
 	out: Config // Indirection necessary.
 	out: #Config3
+
+	@test(eq, {
+		#Context1: {ctx: {}}
+		Context2: {ctx: {}}
+		#Config1: {cfg: {ctx: {}}}
+		#Config3: {cfg: {ctx: {}}}
+		Config2: {cfg: {ctx: {}}}
+		Config: {cfg: {ctx: {}}}
+		out: {cfg: {ctx: {}}}
+	})
 }
 issue3641: simplified: t2: {
-	#Context1: ctx: {}
-	Context2: ctx: {}
+	#Context1: {ctx: {}} @test(shareID=t2ctx1)
+	Context2: {ctx: {}} @test(shareID=t2ctx2)
 
 	// Must both refer to #Context1
-	#Config1: cfg: #Context1
-	#Config3: cfg: #Context1
+	#Config1: {cfg: #Context1 @test(shareID=t2ctx1)}
+	#Config3: {cfg: #Context1 @test(shareID=t2ctx1)}
 
-	Config2: cfg: Context2
-	
+	Config2: {cfg: Context2 @test(shareID=t2ctx2)}
+
 	Config: #Config1 & Config2
 
 	// order matters
 	out: Config // Indirection necessary.
 	out: #Config3
+
+	@test(eq, {
+		#Context1: {ctx: {}}
+		Context2: {ctx: {}}
+		#Config1: {cfg: {ctx: {}}}
+		#Config3: {cfg: {ctx: {}}}
+		Config2: {cfg: {ctx: {}}}
+		Config: {cfg: {ctx: {}}}
+		out: {cfg: {ctx: {}}}
+	})
 }
 // Variant where sharing is explicitly disabled.
 issue3641: simplified: t3: {
-	#Context1: ctx: {}
-	Context2: ctx: {}
+	#Context1: {ctx: {}} @test(shareID=t3ctx1)
+	Context2: {ctx: {}} @test(shareID=t3ctx2)
 
 	// Must both refer to #Context1
-	#Config1: cfg: #Context1
-	#Config3: cfg: #Context1
+	#Config1: {cfg: #Context1 @test(shareID=t3ctx1)}
+	#Config3: {cfg: #Context1 @test(shareID=t3ctx1)}
 
-	Config2: cfg: Context2
+	Config2: {cfg: Context2 @test(shareID=t3ctx2)}
 
 	Config: #Config1 & Config2
 
@@ -98,15 +132,25 @@ issue3641: simplified: t3: {
 	out: __no_sharing
 	out: Config // Indirection necessary.
 	out: #Config3
+
+	@test(eq, {
+		#Context1: {ctx: {}}
+		Context2: {ctx: {}}
+		#Config1: {cfg: {ctx: {}}}
+		#Config3: {cfg: {ctx: {}}}
+		Config2: {cfg: {ctx: {}}}
+		Config: {cfg: {ctx: {}}}
+		out: {cfg: {ctx: {}}}
+	})
 }
 issue3641: full: {
-	#Context1: ctx: {}
-	#Context2: ctx: {}
+	#Context1: {ctx: {}} @test(shareID=fullctx1)
+	#Context2: {ctx: {}} @test(shareID=fullctx2)
 
-	#Config1: cfg: #Context1
-	#Config2: cfg: #Context2
+	#Config1: {cfg: #Context1 @test(shareID=fullctx1)} @test(shareID=fullcfg1)
+	#Config2: {cfg: #Context2 @test(shareID=fullctx2)}
 
-	#Schema: sch: #Config1
+	#Schema: {sch: #Config1 @test(shareID=fullcfg1)}
 
 	#Config: #Config1 & #Config2
 
@@ -114,6 +158,16 @@ issue3641: full: {
 	out: #Schema & {
 		sch: config
 	}
+
+	@test(eq, {
+		#Context1: {ctx: {}}
+		#Context2: {ctx: {}}
+		#Config1: {cfg: {ctx: {}}}
+		#Config2: {cfg: {ctx: {}}}
+		#Schema: {sch: {cfg: {ctx: {}}}}
+		#Config: {cfg: {ctx: {}}}
+		out: {sch: {cfg: {ctx: {}}}}
+	})
 }
 // "field not allowed" evalv3 regression with lists: a list value shared from
 // a definition constraint was incorrectly rejected in a regular field.
@@ -130,6 +184,15 @@ issue3546: reduced: {
 
 	out: #Network
 	out: val
+
+	@test(eq, {
+		all: ["a"]
+		#all: ["a"]
+		#Network: {list: []}
+		#List: []
+		val: {list: ["a"]}
+		out: {list: ["a"]}
+	})
 }
 -- sharecycle.cue --
 shareCycle: t1: {
@@ -137,21 +200,24 @@ shareCycle: t1: {
 	Y: {
 		x: #X & Y
 	}
+	@test(err, code=structural cycle, path=Y.x.x, contains="structural cycle", pos=[])
 }
 shareCycle: t2: {
 	#X: int
 	Y: {
 		x: #X & Y
 	}
+	@test(err, code=eval, path=Y.x,
+		contains="conflicting values %s and %s (mismatched types %s and %s)",
+		args=[int, {x:(#X & Y)}, int, struct], pos=[1:6, 2:5, 3:6, 3:11])
 }
-shareCycle: {
-	t3: {
-		#X: {}
-		Y: {
-			x: Y & #X
-		}
+shareCycle: t3: {
+	#X: {}
+	Y: {
+		x: Y & #X
 	}
-} @test(err, code=eval, contains="structural cycle", pos=[])
+	@test(err, code=structural cycle, at=Y.x.x, contains="structural cycle", pos=[])
+}
 -- acrossdisjunction.cue --
 import "list"
 
@@ -164,6 +230,8 @@ issue3679: {
 	// works arcross disjunction boundaries.
 	b: null | [string]
 	b: list.Repeat([for k, v in [0] { "bar" }], 1)
+
+	@test(eq, {b: ["bar"]})
 }
 -- issue3835.cue --
 // evalv3 regression with "cycle with field" error involving a comprehension
@@ -179,6 +247,11 @@ issue3835: {
 			out: "prefix: " + orgBotUser
 		}
 	}
+
+	@test(eq, {
+		foo: {out: "prefix: global value"}
+		_global: "global value"
+	})
 }
 -- pendingarcs.cue --
 pending: t1: {
@@ -186,8 +259,14 @@ pending: t1: {
 	if true {
 		a: b: c: e: 1
 	}
-	X: b: Y
-	Y: c: d: int
+	X: {b: Y @test(shareID=pendXbY)}
+	Y: {c: d: int} @test(shareID=pendXbY)
+
+	@test(eq, {
+		a: {b: {c: {e: 1, d: int}}}
+		X: {b: {c: {d: int}}}
+		Y: {c: {d: int}}
+	})
 }
 // evalv3 "field not allowed" regression with a comprehension that conditionally
 // sets a field inside a definition with an optional nested definition.
@@ -199,6 +278,16 @@ issue3849: {
 	}
 	#Deployment: metadata?: #ObjectMeta
 	#ObjectMeta: name?: [string]: string
+
+	// TODO(inline): investigate why these do not match. Optionals?
+	// @test(shareID=Meta, at=#Deployment.metadata)
+	// @test(shareID=Meta, at=#ObjectMeta)
+
+	@test(eq, {
+		dep: {metadata: {name: {app: "mysql"}}}
+		#Deployment: {metadata?: {name?: {}}}
+		#ObjectMeta: {name?: {}}
+	})
 }
 -- let.cue --
 import "list"
@@ -224,8 +313,22 @@ issue3903: full: {
 	}
 	_template: {
 		input: name: string
-		result: "result-\(input.name)"
+		result: "result-\(input.name)" @test(err, code=incomplete,
+			contains="non-concrete value string (type string)",
+			pos=[0:11, -1:16])
 	}
+	@test(eq, {
+		_input: *{name: "foo"} | null
+		_inputByName: {foo: {name: "foo"}}
+		_template: {
+			input: {name: string}
+			result: _|_
+		}
+		foo: {
+			input: {name: "foo"}
+			result: "result-foo"
+		}
+	})
 }
 issue3903: noshare: {
 	_input: null | *{name: "foo"}
@@ -244,25 +347,40 @@ issue3903: noshare: {
 	}
 	_template: {
 		input:  name: string
-		result: "result-\(input.name)"
+		result: "result-\(input.name)" @test(err, code=incomplete,
+			contains="non-concrete value string (type string)",
+			pos=[0:11, -1:17])
 	}
+	@test(eq, {
+		_input: *{name: "foo"} | null
+		_inputByName: {foo: {name: "foo"}}
+		_template: {
+			input: {name: string}
+			result: _|_
+		}
+		foo: {
+			input: {name: string}
+			result: _|_ @test(err, code=incomplete,
+				contains="non-concrete value string (type string)")
+		}
+	})
 }
 -- out/errors.txt --
 [incomplete] issue3903.full._template.result: invalid interpolation: non-concrete value string (type string):
     ./let.cue:24:11
     ./let.cue:23:16
 [incomplete] issue3903.noshare._template.result: invalid interpolation: non-concrete value string (type string):
-    ./let.cue:44:11
-    ./let.cue:43:17
+    ./let.cue:58:11
+    ./let.cue:57:17
 [incomplete] issue3903.noshare.foo.result: invalid interpolation: non-concrete value string (type string):
-    ./let.cue:44:11
-    ./let.cue:43:17
+    ./let.cue:58:11
+    ./let.cue:57:17
 [structural cycle] shareCycle.t1.Y.x.x: structural cycle
 [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
-    ./sharecycle.cue:8:6
-    ./sharecycle.cue:9:5
-    ./sharecycle.cue:10:6
-    ./sharecycle.cue:10:11
+    ./sharecycle.cue:9:6
+    ./sharecycle.cue:10:5
+    ./sharecycle.cue:11:6
+    ./sharecycle.cue:11:11
 [structural cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
 Leaks:  7

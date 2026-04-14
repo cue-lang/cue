@@ -84,6 +84,14 @@ func TestInlineRunner_Basic(t *testing.T) {
 				"\td: a.b + 3\n" +
 				`} @test(eq, {b: 100, d: _|_ @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[4:5, 1:8])})` + "\n",
 		},
+		{
+			// List elements that are structs with definition fields (#D1, #D2) must
+			// be matched including those definitions in the @test(eq, [...]) body.
+			name: "eq passes for list with struct element containing definitions",
+			archive: "-- test.cue --\n" +
+				"#S: {x: 1, #D: \"d\"}\n" +
+				`data: [#S & {}] @test(eq, [{x: 1, #D: "d"}])` + "\n",
+		},
 	}
 
 	for _, tt := range tests {

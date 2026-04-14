@@ -9,13 +9,8 @@ F2: {
 D: {}
 let L = D
 -- out/definition --
-
 let L = D
-F1: {
-	sub1: {
-		sub2: L
-	}
-}
+F1: sub1: sub2: L
 F2: {
 	(string): _
 	L
@@ -56,11 +51,7 @@ in the new evaluator. This is probably for the better.
 == Simplified
 {
 	let L = D
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
+	F1: sub1: sub2: {}
 	F2: {
 		(string): _
 		L
@@ -70,11 +61,7 @@ in the new evaluator. This is probably for the better.
 == Raw
 {
 	let L = D
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
+	F1: sub1: sub2: {}
 	F2: {
 		(string): _
 		L
@@ -83,22 +70,14 @@ in the new evaluator. This is probably for the better.
 }
 == Final
 {
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
+	F1: sub1: sub2: {}
 	F2: _|_ // F2: key value of dynamic field must be concrete, found string
-	D: {}
+	D:  {}
 }
 == All
 {
 	let L = D
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
+	F1: sub1: sub2: {}
 	F2: {
 		(string): _
 		L
@@ -108,11 +87,7 @@ in the new evaluator. This is probably for the better.
 == Eval
 {
 	let L = D
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
+	F1: sub1: sub2: {}
 	F2: {
 		(string): _
 		L
@@ -123,15 +98,72 @@ in the new evaluator. This is probably for the better.
 diff old new
 --- old
 +++ new
-@@ -33,7 +33,7 @@
- 			sub2: {}
- 		}
- 	}
+@@ -1,11 +1,7 @@
+ == Simplified
+ {
+ 	let L = D
+-	F1: {
+-		sub1: {
+-			sub2: {}
+-		}
+-	}
++	F1: sub1: sub2: {}
+ 	F2: {
+ 		(string): _
+ 		L
+@@ -15,11 +11,7 @@
+ == Raw
+ {
+ 	let L = D
+-	F1: {
+-		sub1: {
+-			sub2: {}
+-		}
+-	}
++	F1: sub1: sub2: {}
+ 	F2: {
+ 		(string): _
+ 		L
+@@ -28,22 +20,14 @@
+ }
+ == Final
+ {
+-	F1: {
+-		sub1: {
+-			sub2: {}
+-		}
+-	}
 -	F2: _|_ // F2: invalid non-ground value string (must be concrete string)
+-	D: {}
++	F1: sub1: sub2: {}
 +	F2: _|_ // F2: key value of dynamic field must be concrete, found string
- 	D: {}
++	D:  {}
  }
  == All
+ {
+ 	let L = D
+-	F1: {
+-		sub1: {
+-			sub2: {}
+-		}
+-	}
++	F1: sub1: sub2: {}
+ 	F2: {
+ 		(string): _
+ 		L
+@@ -53,11 +37,7 @@
+ == Eval
+ {
+ 	let L = D
+-	F1: {
+-		sub1: {
+-			sub2: {}
+-		}
+-	}
++	F1: sub1: sub2: {}
+ 	F2: {
+ 		(string): _
+ 		L
 -- diff/value/todo/p2 --
 Seemingly benign change in error message.
 -- out/value --

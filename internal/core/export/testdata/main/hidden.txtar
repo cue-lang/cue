@@ -32,28 +32,18 @@ a: pkg.#A & {
 [a _#val]
 -- out/value --
 == Simplified
-{
-	a: {}
-}
+{a: {}}
 == Raw
-{
-	a: {
-		_val:  3
-		_#val: 6
-	}
-}
+{a: {
+	_val:  3
+	_#val: 6
+}}
 == Final
-{
-	a: {}
-}
+{a: {}}
 == All
-{
-	a: {
-		_val:  3
-		_#val: 6
-	}
-}
+{a: {
+	_val:  3
+	_#val: 6
+}}
 == Eval
-{
-	a: {}
-}
+{a: {}}

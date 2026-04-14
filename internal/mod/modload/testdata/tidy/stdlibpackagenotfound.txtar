@@ -3,9 +3,7 @@
 
 -- want --
 module: "main.org@v0"
-language: {
-	version: "v0.8.100"
-}
+language: version: "v0.8.100"
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: {

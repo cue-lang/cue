@@ -480,9 +480,7 @@ d: 2`,
 	}, {
 		"a: &a {c: 1}\nb: *a",
 		`a: {c: 1}
-b: {
-	c: 1
-}`,
+b: {c: 1}`,
 	}, {
 		"a: &a [1, 2]\nb: *a",
 		"a: [1, 2]\nb: [1, 2]", // TODO: a: [1, 2], b: a
@@ -609,11 +607,7 @@ a:
   - { "a": 1, "b": 2 }
   - { "c": 1, "d": 2 }
 `,
-		`a: [{
-	a: 1, b: 2
-}, {
-	c: 1, d: 2
-}]`,
+		`a: [{a: 1, b: 2}, {c: 1, d: 2}]`,
 	},
 
 	{
@@ -706,7 +700,7 @@ a:
 	// TODO(mvdan): avoid losing comments in empty lists and objects.
 	{
 		"# Start\n\na: 123\n\n# Middle\n\nb: 456\n\n# End",
-		"// Start\na: 123\n\n// Middle\nb: 456\n// End",
+		"// Start\na: 123\n\n// Middle\nb: 456\n\n// End",
 	},
 	{
 		"a: [\n\t# Comment\n]",

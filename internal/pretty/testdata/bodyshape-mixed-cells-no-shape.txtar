@@ -1,0 +1,25 @@
+# A list whose cells are not all bracketed-no-relpos falls back to
+# the standard bracketedLayout path - [docBodyShape] does not fire.
+# Here a BasicLit `1` sits next to a struct cell, so
+# [allBracketsLackRelPos] returns false and `useBodyShape` is left
+# off. The output exhibits the conventional explode-when-broken
+# behaviour: each cell on its own line, brackets on their own
+# lines, trailing comma.
+#
+# This contrasts with the all-bracketed bodies covered by the
+# other bodyshape-* tests, where the hug shape's "brackets adjacent
+# to multi-line cells inline" pattern fires.
+-- config --
+width: 15
+-- in.cue --
+x: [1, {a: _, b: _}]
+-- out/relpos --
+x: [1, {a: _, b: _}]
+-- out/norelpos --
+x: [
+	1,
+	{
+		a: _
+		b: _
+	},
+]

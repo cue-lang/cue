@@ -11,7 +11,6 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-
 // Specifies runtime quota rules.
 //  * Uses Istio attributes to match individual requests
 //  * Specifies list of quotas to use for matched requests.
@@ -97,9 +96,7 @@ package client
 	//       exact: SOURCE_UID
 	//     request.http_method:
 	//       exact: POST
-	clause?: {
-		[string]: #StringMatch
-	} @protobuf(1,map[string]StringMatch)
+	clause?: {[string]: #StringMatch} @protobuf(1,map[string]StringMatch)
 }
 
 // Specifies a quota to use with quota name and amount.

@@ -77,24 +77,12 @@ import "encoding/yaml"
 	fn:    _
 	data1: "a: 2"
 	t1: {
-		ok1: data1 & fn({
-			a!: int
-		} | {
-			b!: int
-		})
-		ok2: data1 & fn(close({
-			a: int
-		}) | close({
-			b: int
-		}))
+		ok1: data1 & fn({a!: int} | {b!: int})
+		ok2: data1 & fn(close({a: int}) | close({b: int}))
 		ok3: data1 & fn(#A | #B)
 	}
-	#A: {
-		a: int
-	}
-	#B: {
-		b: int
-	}
+	#A: a: int
+	#B: b: int
 	data2: "'foo'"
 	t2: {
 		ok1: data2 & fn(*int | string)
@@ -112,12 +100,8 @@ validate: {
 		ok2: "a: 2"
 		ok3: "a: 2"
 	}
-	#A: {
-		a: int
-	}
-	#B: {
-		b: int
-	}
+	#A: a: int
+	#B: b: int
 	data2: "'foo'"
 	t2: {
 		ok1: "'foo'"
@@ -132,12 +116,8 @@ validatePartial: {
 		ok2: "a: 2"
 		ok3: "a: 2"
 	}
-	#A: {
-		a: int
-	}
-	#B: {
-		b: int
-	}
+	#A: a: int
+	#B: b: int
 	data2: "'foo'"
 	t2: {
 		ok1: "'foo'"

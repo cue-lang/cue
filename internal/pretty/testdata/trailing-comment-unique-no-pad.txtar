@@ -1,0 +1,26 @@
+# When only one row in a table has a trailing-comment cell, that
+# cell has no alignment target on any other row. The value column
+# must not be padded just to make room for the lone comment — the
+# comment should sit one space after the value, not at the
+# column-1 max-width position.
+-- in.cue --
+#File: {
+	filename?:       string // only filled in FromFile, but not in ParseFile
+	encoding!:       #Encoding
+	interpretation?: #Interpretation
+	form?:           #Form
+}
+-- out/relpos --
+#File: {
+	filename?:       string // only filled in FromFile, but not in ParseFile
+	encoding!:       #Encoding
+	interpretation?: #Interpretation
+	form?:           #Form
+}
+-- out/norelpos --
+#File: {
+	filename?:       string // only filled in FromFile, but not in ParseFile
+	encoding!:       #Encoding
+	interpretation?: #Interpretation
+	form?:           #Form
+}

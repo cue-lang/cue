@@ -1,0 +1,21 @@
+# Exercises the postfixAlias converter for both forms: the simple
+# `label~X` and the dual `label~(K,V)`. Requires @experiment(aliasv2)
+# for the parser to recognise the syntax.
+-- in.cue --
+@experiment(aliasv2)
+#Simple: {
+	x~X: int
+}
+#Dual: {
+	x~(K, V): int
+}
+-- out/relpos --
+@experiment(aliasv2)
+#Simple: {
+	x~X: int
+}
+#Dual: {
+	x~(K,V): int
+}
+-- out/norelpos --
+@experiment(aliasv2), #Simple: {x~X: int}, #Dual: {x~(K,V): int}

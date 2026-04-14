@@ -1,0 +1,29 @@
+# A doc-commented field after a definition gets a blank line
+# before it ONLY when no leading layout intent is specified
+# (rel == NoRelPos — typically programmatic ASTs). In parsed
+# source, rel = Newline (single newline between #Foo and
+# `// doc`), which declSep respects as authored intent — no
+# blank line is inserted.
+#
+# In the norelpos case, stripRelPos reduces every RelPos to
+# NoRelPos, so the heuristic kicks in and inserts a blank
+# line, separating the two table segments.
+-- in.cue --
+{
+	#Foo: string
+	// doc comment
+	x: #Foo
+}
+-- out/relpos --
+{
+	#Foo: string
+	// doc comment
+	x: #Foo
+}
+-- out/norelpos --
+{
+	#Foo: string
+
+	// doc comment
+	x: #Foo
+}

@@ -1,0 +1,11 @@
+-- in.cue --
+{
+	let    x =
+        1
+}
+-- out/relpos --
+{
+	let x = 1
+}
+-- out/norelpos --
+{let x = 1}

@@ -1,0 +1,16 @@
+# A doc comment on the RHS operand of a binary expression is handled
+# internally by the binary expression formatter. It does not trigger
+# the field-level "value on its own line" behavior — the LHS stays
+# on the same line as the key.
+-- in.cue --
+x: a + // xx
+   // yy
+b
+-- out/relpos --
+x: a + // xx
+	// yy
+	b
+-- out/norelpos --
+x: a + // xx
+	// yy
+	b

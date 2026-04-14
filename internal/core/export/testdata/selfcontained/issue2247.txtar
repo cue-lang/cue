@@ -40,22 +40,10 @@ f: {
 	c: [int]
 	d: [c][0]
 	// TODO: simplify these:
-	e: {
-		out: c
-	}.out
-	f: {
-		out: Q
-	}.out
-	g: {
-		out: Q
-	}.out
-	h: {
-		out: {
-			r: {
-				s: string
-			}
-		}
-	}.out
+	e: {out: c}.out
+	f: {out: Q}.out
+	g: {out: Q}.out
+	h: {out: r: s: string}.out
 	i: h.r
 	j: h.r.s
 	k: K
@@ -63,11 +51,7 @@ f: {
 }
 
 //cue:path: "example.com/t".q
-let Q = {
-	x: [...int]
-}
+let Q = {x: [...int]}
 
 //cue:path: "example.com/t".r.k
-let K = {
-	l: string
-}
+let K = {l: string}

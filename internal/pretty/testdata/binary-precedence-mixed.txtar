@@ -1,0 +1,8 @@
+# Precedence-based spacing: spaces around lower-precedence operators,
+# no spaces around higher-precedence operators when mixed.
+-- in.cue --
+x:   a*b + c *  d
+-- out/relpos --
+x: a*b + c*d
+-- out/norelpos --
+x: a*b + c*d

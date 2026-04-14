@@ -146,7 +146,55 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 
 	err = astutil.Sanitize(p.file)
 
+	dropLeadingStructSection(p.file)
+
 	return p, err
+}
+
+// dropLeadingStructSection removes the leading NewSection that the
+// message and enum converters attach (via addComments / a label
+// position) to separate a decl from its predecessor, when that decl
+// is the first element of its struct body. With no predecessor the
+// separation would render as a blank line right after the opening
+// brace. The proto element index that normally drives the separation
+// does not always line up with the CUE element index - a leading
+// proto comment or option shifts it - so the correction is done
+// structurally here over the finished AST. Struct bodies only: a
+// file's first top-level message legitimately keeps its blank line
+// after the imports.
+func dropLeadingStructSection(f *ast.File) {
+	ast.Walk(f, func(n ast.Node) bool {
+		s, ok := n.(*ast.StructLit)
+		if !ok {
+			return true
+		}
+		for _, d := range s.Elts {
+			if _, isComment := d.(*ast.CommentGroup); isComment {
+				continue
+			}
+			clampLeadingNewSection(d)
+			break
+		}
+		return true
+	}, nil)
+}
+
+// clampLeadingNewSection lowers d's leading NewSection - on its first
+// doc comment if it has one, otherwise on its own position - to a
+// plain Newline, leaving weaker positions untouched.
+func clampLeadingNewSection(d ast.Decl) {
+	for _, cg := range ast.Comments(d) {
+		if cg.Position != 0 {
+			continue
+		}
+		if len(cg.List) > 0 && cg.List[0].Slash.RelPos() == token.NewSection {
+			cg.List[0].Slash = token.Newline.Pos()
+		}
+		return
+	}
+	if d.Pos().RelPos() == token.NewSection {
+		ast.SetRelPos(d, token.Newline)
+	}
 }
 
 // A protoConverter converts a proto definition to CUE. Proto files map to

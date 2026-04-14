@@ -56,74 +56,42 @@ _foo: a?: int
 		S1: {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 		S2: {
 			type:                 "object"
 			additionalProperties: true
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 		"_foo": {
 			type: "object"
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 	}
 	type: "object"
 	properties: {
-		t01: {
-			$ref: "#/$defs/S1"
-		}
-		t02: {
-			$ref: "#/$defs/S2"
-		}
-		t03: {
-			$ref: "#/$defs/_foo"
-		}
+		t01: $ref: "#/$defs/S1"
+		t02: $ref: "#/$defs/S2"
+		t03: $ref: "#/$defs/_foo"
 		t04: {
 			type:                 "object"
 			additionalProperties: true
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 		t05: {
 			type: "object"
-			additionalProperties: {
-				type: "integer"
-			}
+			additionalProperties: type: "integer"
 		}
 		t06: {
 			type: "object"
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 		t07: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				a: {
-					type: "string"
-				}
-				b: {
-					type: "integer"
-				}
+				a: type: "string"
+				b: type: "integer"
 			}
 			required: ["a", "b"]
 		}
@@ -143,53 +111,35 @@ _foo: a?: int
 				a:  true
 				ab: true
 				b:  true
-				x: {
-					type: "string"
-				}
+				x: type: "string"
 			}
 		}
 		t09: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				a: {
-					type: "integer"
-				}
-				b: {
-					type: "integer"
-				}
+				a: type: "integer"
+				b: type: "integer"
 			}
 		}
 		t10: {
 			type: "object"
-			additionalProperties: {
-				type: "integer"
-			}
+			additionalProperties: type: "integer"
 		}
 		t11: {
 			type: "object"
-			patternProperties: {
-				"": {
-					type: "integer"
-				}
-			}
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			patternProperties: "": type: "integer"
+			properties: a: type:         "integer"
 		}
 		t12: {
 			type: "object"
 			patternProperties: {
-				"": {
-					allOf: [{
-						pattern: "bar"
-					}, {
-						type:    "string"
-						pattern: "foo"
-					}]
-				}
+				"": allOf: [{
+					pattern: "bar"
+				}, {
+					type:    "string"
+					pattern: "foo"
+				}]
 				x: {
 					type:      "string"
 					minLength: 1

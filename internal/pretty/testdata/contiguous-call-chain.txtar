@@ -1,0 +1,21 @@
+# Same-line opener chains involving calls must not compound indent.
+# When `Join(SortStrings([` opens three constructs on a single line,
+# the broken body lands at one indent level deeper than that line -
+# not three. The mechanism: each call/index expression qualifies as
+# a "contiguous opener" (its rendering wraps inner content in a Nest)
+# so the enclosing construct can drop its own Nest and let the inner
+# Nest provide the single +1.
+-- in.cue --
+strings.Join(list.SortStrings([
+	for k, v in _postgresParams {
+		"\(k)=\(v)"
+	},
+]), " ")
+-- out/relpos --
+strings.Join(list.SortStrings([
+	for k, v in _postgresParams {
+		"\(k)=\(v)"
+	},
+]), " ")
+-- out/norelpos --
+strings.Join(list.SortStrings([for k, v in _postgresParams {"\(k)=\(v)"}]), " ")

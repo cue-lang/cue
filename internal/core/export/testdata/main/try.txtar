@@ -163,9 +163,7 @@ diff old new
 	}
 
 	// Try with else - optional field missing (uses else)
-	tryWithElseMissing: {
-		z: 0
-	}
+	tryWithElseMissing: z: 0
 
 	// Try assignment form
 	tryAssign: {
@@ -174,9 +172,7 @@ diff old new
 	}
 
 	// Try assignment with else - optional field missing
-	tryAssignElse: {
-		z: 0
-	}
+	tryAssignElse: z: 0
 }
 == Raw
 {
@@ -220,16 +216,12 @@ diff old new
 		x: 1
 		y: 1
 	}
-	tryWithElseMissing: {
-		z: 0
-	}
+	tryWithElseMissing: z: 0
 	tryAssign: {
 		x: 1
 		y: 1
 	}
-	tryAssignElse: {
-		z: 0
-	}
+	tryAssignElse: z: 0
 }
 == All
 {
@@ -295,7 +287,57 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -83,6 +83,9 @@
+@@ -13,20 +13,16 @@
+ 	}
+ 
+ 	// Try with else - optional field missing (uses else)
+-	tryWithElseMissing: {
+-		z: 0
+-	}
+-
+-	// Try assignment form
+-	tryAssign: {
+-		x: 1
+-		y: 1
+-	}
+-
+-	// Try assignment with else - optional field missing
+-	tryAssignElse: {
+-		z: 0
+-	}
++	tryWithElseMissing: z: 0
++
++	// Try assignment form
++	tryAssign: {
++		x: 1
++		y: 1
++	}
++
++	// Try assignment with else - optional field missing
++	tryAssignElse: z: 0
+ }
+ == Raw
+ {
+@@ -70,19 +66,18 @@
+ 		x: 1
+ 		y: 1
+ 	}
+-	tryWithElseMissing: {
+-		z: 0
+-	}
+-	tryAssign: {
+-		x: 1
+-		y: 1
+-	}
+-	tryAssignElse: {
+-		z: 0
+-	}
++	tryWithElseMissing: z: 0
++	tryAssign: {
++		x: 1
++		y: 1
++	}
++	tryAssignElse: z: 0
  }
  == All
  {
@@ -305,7 +347,7 @@ diff old new
  	// Basic try with successful reference
  	tryBasic: {
  		x: 1
-@@ -115,22 +118,26 @@
+@@ -115,22 +110,26 @@
  }
  == Eval
  {

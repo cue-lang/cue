@@ -144,9 +144,7 @@ import (
 	// Map of control configuration indexed by destination.service. This
 	// is used to support per-service configuration for cases where a
 	// mixerclient serves multiple services.
-	serviceConfigs?: {
-		[string]: #ServiceConfig
-	} @protobuf(2,map[string]ServiceConfig,service_configs)
+	serviceConfigs?: {[string]: #ServiceConfig} @protobuf(2,map[string]ServiceConfig,service_configs)
 
 	// Default destination service name if none was specified in the
 	// client request.

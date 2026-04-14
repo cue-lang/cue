@@ -81,18 +81,10 @@ errorNotLessEqual: {
 		}
 		t02: {
 			type: "string"
-			not: {
-				pattern: "bar"
-			}
+			not: pattern: "bar"
 		}
-		t03: {
-			const: 1
-		}
-		t04: {
-			not: {
-				const: 1
-			}
-		}
+		t03: const: 1
+		t04: not: const: 1
 		t05: {
 			type:             "number"
 			exclusiveMinimum: 5
@@ -109,12 +101,8 @@ errorNotLessEqual: {
 			type:    "number"
 			maximum: 10
 		}
-		t09: {
-			type: "string"
-		}
-		t10: {
-			type: "string"
-		}
+		t09: type: "string"
+		t10: type: "string"
 	}
 }
 -- out/generate-v3/ok --

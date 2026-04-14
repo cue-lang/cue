@@ -1,0 +1,12 @@
+# A comment at the end of a file, separated by a blank line,
+# is preserved with the blank line.
+-- in.cue --
+x: true
+
+// a comment
+-- out/relpos --
+x: true
+
+// a comment
+-- out/norelpos --
+x: true // a comment

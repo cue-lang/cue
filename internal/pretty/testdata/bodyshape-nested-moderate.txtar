@@ -1,0 +1,22 @@
+# Nested at a moderate width (24) where the outer list's body
+# doesn't fit on its indented line but the inner list's body does.
+# The per-level [docBodyShape] decision yields a mixed cascade: the
+# hug shape at the outer level (cells force-broken, brackets hug the
+# edges) and the indented shape at the inner level (brackets on their
+# own lines with the body inline at indent+1).
+#
+# The indented shape's trailing comma on `{b: _}` makes the output
+# idempotent: the re-parsed AST has `Rbrack.RelPos == Newline`, so the
+# standard layout re-adds the trailing comma, matching the first render.
+-- config --
+width: 24
+-- in.cue --
+x: [[{a: _}, {b: _}], {c: _}]
+-- out/relpos --
+x: [[{a: _}, {b: _}], {c: _}]
+-- out/norelpos --
+x: [[
+	{a: _}, {b: _},
+], {
+	c: _
+}]

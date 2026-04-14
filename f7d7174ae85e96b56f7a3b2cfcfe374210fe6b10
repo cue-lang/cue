@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29defc46_72358647",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-14T13:00:09Z",
+      "side": 1,
+      "message": "just `.gocache/` will do the trick. the trailing asterisk is unnecessary.",
+      "revId": "f7d7174ae85e96b56f7a3b2cfcfe374210fe6b10",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fc11b0e_534a7003",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-14T13:00:09Z",
+      "side": 1,
+      "message": "I would also document this section to say it\u0027s for AI temporary files",
+      "revId": "f7d7174ae85e96b56f7a3b2cfcfe374210fe6b10",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

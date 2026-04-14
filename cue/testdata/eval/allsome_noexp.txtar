@@ -1,0 +1,20 @@
+# Verifies that without @experiment(shortcircuit), calling all() and some()
+# yields an error explaining the experiment is required.
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.17.0"
+-- in.cue --
+// Without @experiment(shortcircuit), all and some are still predeclared
+// but calling them produces an experiment-required error.
+noExpAll:  all([true])  @test(err)
+noExpSome: some([true]) @test(err)
+-- out/compile --
+--- in.cue
+{
+  noExpAll: all([
+    true,
+  ])
+  noExpSome: some([
+    true,
+  ])
+}

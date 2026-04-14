@@ -305,7 +305,7 @@ func makeRec(path string, directive, version string) attrRecord {
 		parsed: parsedTestAttr{
 			directive: directive,
 			version:   version,
-			raw:       internal.ParseAttrBody(token.NoPos, directive),
+			raw:       internal.ParseAttr(&ast.Attribute{Text: "@test(" + directive + ")"}),
 		},
 	}
 }
@@ -319,7 +319,7 @@ func makeRecAt(path, directive, atVal string) attrRecord {
 		path: testMakePath(path),
 		parsed: parsedTestAttr{
 			directive: directive,
-			raw:       internal.ParseAttrBody(token.NoPos, body),
+			raw:       internal.ParseAttr(&ast.Attribute{Text: "@test(" + body + ")"}),
 		},
 	}
 }
@@ -728,6 +728,80 @@ func TestAtDirective(t *testing.T) {
 			t.Errorf("expected failure when sub-path is not an error")
 		}
 	})
+
+	t.Run("isBareAt true for only-at= errArgs", func(t *testing.T) {
+		a := internal.ParseAttr(&ast.Attribute{Text: "@test(err, at=b)"})
+		ea, err := parseErrArgs(a)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !ea.isBareAt() {
+			t.Error("expected isBareAt() true for @test(err, at=b)")
+		}
+	})
+
+	t.Run("isBareAt false when other flags present", func(t *testing.T) {
+		a := internal.ParseAttr(&ast.Attribute{Text: `@test(err, at=b, contains="foo")`})
+		ea, err := parseErrArgs(a)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ea.isBareAt() {
+			t.Error("expected isBareAt() false when contains= is also set")
+		}
+	})
+
+	t.Run("multi-error fill includes code= at outer and suberr level, relative path=", func(t *testing.T) {
+		// x: ({a: int & string} | {b: int & bool}) produces two sub-errors.
+		// The fill should include code= at the @test(err, ...) level and in each
+		// suberr=(...), and path= relative to the annotated field x.
+		ctx := cuecontext.New()
+		r := &inlineRunner{
+			dir:     t.TempDir(),
+			archive: &txtar.Archive{},
+		}
+		val := ctx.CompileString(`x: ({a: int & string} | {b: int & bool})`).LookupPath(cue.MakePath(cue.Str("x")))
+		if val.Err() == nil {
+			t.Fatal("expected error at x")
+		}
+		pa := parsedTestAttr{srcFileName: "test.cue", baseLine: 1}
+		got := r.formatErrFillAttr(val, pa, "x", "")
+		// Outer level must carry code=.
+		if !strings.Contains(got, "@test(err, code=") {
+			t.Errorf("outer annotation should contain code=: %q", got)
+		}
+		// Each suberr entry must carry code= immediately inside suberr=(...).
+		if !strings.Contains(got, "suberr=(code=") {
+			t.Errorf("suberr entries should start with code=: %q", got)
+		}
+		// Paths in suberr entries must be relative to x (i.e. "a" and "b", not "x.a"/"x.b").
+		if strings.Contains(got, "path=x.") {
+			t.Errorf("suberr path= should be relative (no 'x.' prefix): %q", got)
+		}
+		if !strings.Contains(got, "path=a") && !strings.Contains(got, "path=b") {
+			t.Errorf("expected relative paths a and b in suberr entries: %q", got)
+		}
+	})
+
+	t.Run("formatErrFillAttrAt includes at= and sub-path error details", func(t *testing.T) {
+		ctx := cuecontext.New()
+		r := &inlineRunner{
+			dir:     t.TempDir(),
+			archive: &txtar.Archive{},
+		}
+		pa := parsedTestAttr{srcFileName: "test.cue", baseLine: 5}
+		subVal := ctx.CompileString("b: int & string").LookupPath(cue.MakePath(cue.Str("b")))
+		got := r.formatErrFillAttrAt(subVal, pa, "b")
+		if !strings.HasPrefix(got, "@test(err, at=b") {
+			t.Errorf("output should start with @test(err, at=b: %q", got)
+		}
+		if !strings.Contains(got, "contains=") {
+			t.Errorf("output should contain contains=: %q", got)
+		}
+		if !strings.Contains(got, "pos=[") {
+			t.Errorf("output should contain pos=[: %q", got)
+		}
+	})
 }
 
 // TestRunAllowsAssertion verifies that @test(allows, sel) and @test(allows=false, sel)
@@ -780,7 +854,7 @@ func TestRunAllowsAssertion(t *testing.T) {
 	t.Run("allows passes for AnyIndex on open list", func(t *testing.T) {
 		val := ctx.CompileString("x: [...]")
 		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, [int])"})}
+		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, int)"})}
 		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
 		if rec.failed {
 			t.Errorf("unexpected failure: open list should allow int indices\n%s", rec.msgs.String())
@@ -987,4 +1061,270 @@ func TestUnreachableTestAttr(t *testing.T) {
 			t.Errorf("no error message contains %q; got: %v", tt.wantErrFrag, errMsgs)
 		})
 	}
+}
+
+// TestFormatErrMsg verifies that formatErrMsg produces correct contains= and
+// args= output.  Uses stubError so results are fully deterministic.
+func TestFormatErrMsg(t *testing.T) {
+	tests := []struct {
+		name   string
+		format string
+		args   []any
+		want   string
+	}{
+		{
+			name:   "no args — only contains=",
+			format: "value is not allowed",
+			args:   nil,
+			want:   `, contains="value is not allowed"`,
+		},
+		{
+			name:   "two args — conflicting-values style",
+			format: "conflicting values %v and %v",
+			args:   []any{"s", 1},
+			want:   `, contains="conflicting values %v and %v", args=[s, 1]`,
+		},
+		{
+			name:   "one arg — undefined field style",
+			format: "undefined field: %v",
+			args:   []any{"foo"},
+			want:   `, contains="undefined field: %v", args=[foo]`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var b strings.Builder
+			formatErrMsg(&b, stubError{format: tc.format, args: tc.args})
+			if got := b.String(); got != tc.want {
+				t.Errorf("got %q\nwant %q", got, tc.want)
+			}
+		})
+	}
+}
+
+// TestParseErrArgs verifies that parseErrArgs correctly handles the args=[...]
+// directive and the at=[...] list form.
+func TestParseErrArgs(t *testing.T) {
+	parse := func(body string) (errArgs, error) {
+		a := internal.ParseAttr(&ast.Attribute{Text: "@test(" + body + ")"})
+		return parseErrArgs(a)
+	}
+
+	t.Run("args with two bare tokens", func(t *testing.T) {
+		// Bare tokens (no surrounding quotes) are stored as-is and match
+		// fmt.Sprint of the corresponding CUE values (e.g. type names, integers).
+		ea, err := parse(`err, args=[s, 1]`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(ea.msgArgs) != 2 || ea.msgArgs[0] != "s" || ea.msgArgs[1] != "1" {
+			t.Errorf("got msgArgs=%v, want [s 1]", ea.msgArgs)
+		}
+	})
+
+	t.Run("args with double-quoted tokens retain quotes", func(t *testing.T) {
+		// Double-quoted tokens (e.g. CUE string sprint form) are stored with their
+		// surrounding quotes intact so they match fmt.Sprint of CUE string values.
+		ea, err := parse(`err, args=["s", "1"]`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(ea.msgArgs) != 2 || ea.msgArgs[0] != `"s"` || ea.msgArgs[1] != `"1"` {
+			t.Errorf("got msgArgs=%v, want [\"s\" \"1\"]", ea.msgArgs)
+		}
+	})
+
+	t.Run("args empty list", func(t *testing.T) {
+		ea, err := parse(`err, args=[]`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(ea.msgArgs) != 0 {
+			t.Errorf("got msgArgs=%v, want empty", ea.msgArgs)
+		}
+	})
+
+	t.Run("args malformed — missing brackets", func(t *testing.T) {
+		_, err := parse(`err, args=foo`)
+		if err == nil {
+			t.Error("expected error for malformed args, got nil")
+		}
+	})
+
+	t.Run("at= single path", func(t *testing.T) {
+		ea, err := parse(`err, at=a.b`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if ea.at != "a.b" {
+			t.Errorf("got at=%q, want %q", ea.at, "a.b")
+		}
+	})
+
+	t.Run("path= single value", func(t *testing.T) {
+		ea, err := parse(`err, path=a.b`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if ea.path != "a.b" {
+			t.Errorf("got path=%q, want %q", ea.path, "a.b")
+		}
+	})
+}
+
+// TestPathFlag verifies that @test(err, path=...) checks the path reported by
+// cueerrors.Error.Path(), expressed relative to the annotated field's path.
+// This is distinct from at=: at= navigates to a sub-value before checking,
+// while path= asserts what the error self-reports.
+func TestPathFlag(t *testing.T) {
+	ctx := cuecontext.New()
+
+	// Error at x.y, annotated field at x → relative path is "y".
+	vx := ctx.CompileString("x: {y: int & string}").LookupPath(cue.MakePath(cue.Str("x")))
+	if vx.Err() == nil {
+		t.Fatal("expected error at x")
+	}
+
+	t.Run("relative path passes", func(t *testing.T) {
+		r := &inlineRunner{}
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "err", errArgs: &errArgs{path: "y"}}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), vx, pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: %s", rec.msgs.String())
+		}
+	})
+
+	t.Run("absolute path also accepted", func(t *testing.T) {
+		// Absolute path "x.y" is accepted when the annotation is on field x
+		// (in addition to the relative form "y").
+		r := &inlineRunner{}
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "err", errArgs: &errArgs{path: "x.y"}}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), vx, pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: %s", rec.msgs.String())
+		}
+	})
+
+	t.Run("wrong path fails", func(t *testing.T) {
+		r := &inlineRunner{}
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{directive: "err", errArgs: &errArgs{path: "wrong"}}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), vx, pa)
+		if !rec.failed {
+			t.Errorf("expected failure for wrong path=")
+		}
+	})
+
+	t.Run("isBareAt false when path= set", func(t *testing.T) {
+		a := internal.ParseAttr(&ast.Attribute{Text: `@test(err, at=b, path=b)`})
+		ea, err := parseErrArgs(a)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ea.isBareAt() {
+			t.Error("expected isBareAt() false when path= is also set")
+		}
+	})
+}
+
+// TestInlineRunner_ErrArgs exercises @test(err, args=[...]) matching through
+// the full inline runner pipeline.
+func TestInlineRunner_ErrArgs(t *testing.T) {
+	// Passing case: the type conflict carries the type names as Msg() args;
+	// type names sprint without surrounding quotes, so args=[int] (bare).
+	t.Run("correct single-arg passes", func(t *testing.T) {
+		archive := txtar.Parse([]byte(
+			"-- test.cue --\n" +
+				`x: 1 & "s" @test(err, args=[int])` + "\n",
+		))
+		NewInlineRunner(t, nil, archive, t.TempDir()).Run()
+	})
+
+	// Failing case: checked via runErrAssertion directly to avoid propagating
+	// the expected failure to the parent test.
+	t.Run("wrong arg fails", func(t *testing.T) {
+		ctx := cuecontext.New()
+		r := &inlineRunner{}
+		val := ctx.CompileString(`x: 1 & "s"`).LookupPath(cue.MakePath(cue.Str("x")))
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{
+			directive: "err",
+			errArgs:   &errArgs{msgArgs: []string{"WRONG"}},
+		}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), val, pa)
+		if !rec.failed {
+			t.Errorf("expected failure for wrong args=, but test passed")
+		}
+	})
+}
+
+// TestSuberrPathFlag verifies that path= in suberr=(...) is relative to the
+// annotated field's path. Disjunction branch errors at "x.a" and "x.b"
+// are stored as path="a" and path="b" when the annotation is on field x.
+func TestSuberrPathFlag(t *testing.T) {
+	ctx := cuecontext.New()
+	// x: ({a: int & string} | {b: int & bool}) produces two sub-errors with
+	// absolute paths "x.a" and "x.b"; relative to field x they are "a" and "b".
+	vx := ctx.CompileString(`x: ({a: int & string} | {b: int & bool})`).LookupPath(cue.MakePath(cue.Str("x")))
+	if vx.Err() == nil {
+		t.Fatal("expected error at x")
+	}
+
+	t.Run("relative suberr paths pass", func(t *testing.T) {
+		r := &inlineRunner{}
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{
+			directive: "err",
+			errArgs: &errArgs{
+				suberrs: []*errArgs{
+					{path: "a"},
+					{path: "b"},
+				},
+			},
+		}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), vx, pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: %s", rec.msgs.String())
+		}
+	})
+
+	t.Run("wrong suberr path fails", func(t *testing.T) {
+		r := &inlineRunner{}
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{
+			directive: "err",
+			errArgs: &errArgs{
+				suberrs: []*errArgs{
+					{path: "a"},
+					{path: "WRONG"}, // should not match b
+				},
+			},
+		}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), vx, pa)
+		if !rec.failed {
+			t.Errorf("expected failure for wrong suberr path=")
+		}
+	})
+
+	t.Run("suberr path discriminates identical contains", func(t *testing.T) {
+		// Both sub-errors contain "conflicting values"; path= is the only
+		// discriminator. Paths are relative to the annotated field x.
+		r := &inlineRunner{}
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{
+			directive: "err",
+			errArgs: &errArgs{
+				suberrs: []*errArgs{
+					{path: "b", contains: "bool"},
+					{path: "a", contains: "string"},
+				},
+			},
+		}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), vx, pa)
+		if rec.failed {
+			t.Errorf("unexpected failure: %s", rec.msgs.String())
+		}
+	})
 }

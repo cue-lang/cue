@@ -248,6 +248,7 @@ The `err` directive SHALL assert that an error exists at the annotated location.
 - `contains="substring"` — the error message must contain the given substring.
 - `any` (bare flag) — at least one **descendant** of the annotated field must have an error. The annotated field itself is not required to be an error. `code` MUST be specified when `any` is used.
 - `at=<path>` — navigate to the given CUE path (relative to the annotated field) before checking the error. Useful when the erroneous sub-field cannot be directly annotated (e.g. it is inside a comprehension or a pattern constraint). `pos=` is not compatible with `any`; `at=` and `any` may not be combined.
+- `path=<dotted-path>` — asserts the dotted CUE path that the error self-reports (the `Path()` return value of `cueerrors.Error`, joined with `"."`). This differs from `at=`: `at=` controls *where the runner navigates* before checking; `path=` asserts *what the error itself reports as its location*. Also supported inside `suberr=(...)` for discriminating sub-errors by location. `CUE_UPDATE=1` generates `path=` automatically, with two suppression rules: (1) path= is omitted when the error path equals the current annotated field's path (the error is local); (2) path= is omitted when the `at=` value is a path-boundary suffix of the error path (the `at=` flag already encodes the location).
 - `args=[v1, v2, ...]` — the values returned by the error's `Msg()` method must include all listed strings (matched via `fmt.Sprint`, order-independent, subset check). See `Requirement: err directive — args= sub-option` for details.
 - `suberr=(...)` — matches one sub-error of a multi-error value (e.g. a failed disjunction). Multiple `suberr=` entries match sub-errors order-independently. The body accepts the same sub-options as `@test(err, ...)`. See `Requirement: err directive — suberr=(...)` for details.
 - `pos=[spec, ...]` — asserts the set of source positions reported by the error (as returned by `cuelang.org/go/cue/errors.Positions`). Matching is **order-independent**: the order of specs need not match the order of actual positions. **Commas between specs are required.** Each spec takes one of two forms:
@@ -273,6 +274,22 @@ The `err` directive SHALL assert that an error exists at the annotated location.
 #### Scenario: at= sub-path not found fails
 - **WHEN** `x: {a: 1} @test(err, at=a.nonexistent)` is declared
 - **THEN** the test fails reporting that the sub-path was not found
+
+#### Scenario: path= matches error's self-reported path
+- **WHEN** `x: int & string @test(err, path=x)` is declared and the error at `x` reports path `["x"]`
+- **THEN** the test passes
+
+#### Scenario: path= mismatch fails
+- **WHEN** `x: int & string @test(err, path=wrong)` is declared but the error reports path `["x"]`
+- **THEN** the test fails
+
+#### Scenario: path= generation suppressed when equal to current field
+- **WHEN** `x: int & string @test(err)` is filled by `CUE_UPDATE=1` and the error reports path `["x"]`
+- **THEN** the generated attribute does NOT include `path=x` (the error is local to the annotated field)
+
+#### Scenario: path= generation suppressed when at= is a suffix
+- **WHEN** `outer: {a: {b: int & string}} @test(err, at=a.b)` is filled by `CUE_UPDATE=1` and the error reports path `["outer", "a", "b"]`
+- **THEN** the generated attribute does NOT include `path=outer.a.b` (the `at=a.b` value is a suffix of the error path)
 
 #### Scenario: Error code mismatch
 - **WHEN** a field carries `@test(err, code=cycle)` and the error code is `incomplete`
@@ -337,11 +354,11 @@ e3: [3][-1] @test(err, code=eval, args=[-1])
 ---
 
 ### Requirement: `err` directive — `suberr=(...)` sub-option
-The `suberr=(...)` sub-option of `@test(err, ...)` asserts properties of individual sub-errors within a multi-error value (e.g., a failed disjunction). Each `suberr=(...)` entry matches one sub-error; multiple entries match sub-errors order-independently. The body of `suberr=(...)` accepts the same sub-options as `@test(err, ...)`: `code=`, `contains=`, `pos=`, `args=`.
+The `suberr=(...)` sub-option of `@test(err, ...)` asserts properties of individual sub-errors within a multi-error value (e.g., a failed disjunction). Each `suberr=(...)` entry matches one sub-error; multiple entries match sub-errors order-independently. The body of `suberr=(...)` accepts the same sub-options as `@test(err, ...)`: `code=`, `contains=`, `path=`, `pos=`, `args=`.
 
 Matching is two-pass:
 1. Specs with non-empty `pos=` are matched first against sub-errors with matching positions (position is a stronger discriminator than text content).
-2. Remaining specs are matched by `contains=` against unmatched actual sub-errors.
+2. Remaining specs are matched by `contains=` and/or `path=` against unmatched actual sub-errors.
 
 `pos=[]` placeholders inside `suberr=(...)` trigger write-back on `CUE_UPDATE=1`. All position updates for the same `@test` attribute are applied atomically.
 

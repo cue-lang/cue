@@ -1,0 +1,79 @@
+# Tests for the all() and some() built-in functions, available under
+# @experiment(shortcircuit). all() is logical AND over a bool list;
+# some() is logical OR over a bool list. Both evaluate all elements strictly:
+# any error or incomplete element causes an error regardless of other values.
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.17.0"
+-- in.cue --
+@experiment(shortcircuit)
+
+incompleteBool: bool
+
+// all: returns true if every element is true.
+allAllTrue:  all([true, true, true])  @test(eq, true)
+allOneFalse: all([true, false, true]) @test(eq, false)
+allEmpty:    all([])                  @test(eq, true)
+
+// all: any incomplete element is an error, even when false is also present.
+allFalseFirst:     all([false, incompleteBool]) @test(err)
+allFalseSecond:    all([incompleteBool, false]) @test(err)
+allIncompleteOnly: all([incompleteBool])        @test(err)
+
+// some: returns true if any element is true.
+someOneTrue:  some([false, true, false]) @test(eq, true)
+someAllFalse: some([false, false])       @test(eq, false)
+someEmpty:    some([])                   @test(eq, false)
+
+// some: any incomplete element is an error, even when true is also present.
+someTrueFirst:     some([true, incompleteBool]) @test(err)
+someTrueSecond:    some([incompleteBool, true]) @test(err)
+someIncompleteOnly: some([incompleteBool])      @test(err)
+-- out/compile --
+--- in.cue
+{
+  incompleteBool: bool
+  allAllTrue: all([
+    true,
+    true,
+    true,
+  ])
+  allOneFalse: all([
+    true,
+    false,
+    true,
+  ])
+  allEmpty: all([])
+  allFalseFirst: all([
+    false,
+    〈1;incompleteBool〉,
+  ])
+  allFalseSecond: all([
+    〈1;incompleteBool〉,
+    false,
+  ])
+  allIncompleteOnly: all([
+    〈1;incompleteBool〉,
+  ])
+  someOneTrue: some([
+    false,
+    true,
+    false,
+  ])
+  someAllFalse: some([
+    false,
+    false,
+  ])
+  someEmpty: some([])
+  someTrueFirst: some([
+    true,
+    〈1;incompleteBool〉,
+  ])
+  someTrueSecond: some([
+    〈1;incompleteBool〉,
+    true,
+  ])
+  someIncompleteOnly: some([
+    〈1;incompleteBool〉,
+  ])
+}

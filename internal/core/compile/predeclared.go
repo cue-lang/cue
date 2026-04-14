@@ -58,6 +58,10 @@ func predeclared(n *ast.Ident) adt.Expr {
 		return andBuiltin
 	case "or", "__or":
 		return orBuiltin
+	case "all", "__all":
+		return allBuiltin
+	case "some", "__some":
+		return someBuiltin
 	case "div", "__div":
 		return divBuiltin
 	case "mod", "__mod":

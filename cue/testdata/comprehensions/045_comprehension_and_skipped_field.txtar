@@ -4,8 +4,6 @@
 # Tests that a comprehension iterating over a struct whose values contain
 # a hidden field (_p) correctly skips that hidden field and still evaluates
 # the visible result field using a disjunction with a comprehension body.
-# Note: cannot convert to inline @test format because the top-level fields
-# are all generated dynamically by a for comprehension with no named fields.
 -- in.cue --
 
 for key, value in {x: v: 1} {
@@ -14,6 +12,7 @@ for key, value in {x: v: 1} {
 		_p: 3
 	}
 }
+@test(eq, {x: {v: {"1": 2}, _p: 3}})
 -- out/compile --
 --- in.cue
 {
@@ -44,12 +43,3 @@ Conjuncts:    11
 Disjuncts:    2
 
 NumCloseIDs: 3
--- out/evalalpha --
-(struct){
-  x: (struct){
-    v: (struct){
-      "1": (int){ 2 }
-    }
-    _p: (int){ 3 }
-  }
-}

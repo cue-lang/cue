@@ -16,7 +16,6 @@ import "list"
 	@test(eq, {
 		as: []
 		#c: [{
-		@test(eq)
 		do: "f1"
 		as: ["go"]
 	}]

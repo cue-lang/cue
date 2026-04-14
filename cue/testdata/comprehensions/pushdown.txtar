@@ -48,11 +48,11 @@ fail: {
 		if a.b == _|_ {
 			b: 1
 		}
-	} @test(err, code=incomplete, contains="fail.a.b: cyclic reference to field b", pos=[6:3])
+	} @test(err, code=incomplete, path=b, contains="cyclic reference to field %[1]v", args=[b], pos=[6:3])
 }
 
 embed: {
-	fail1: #C1
+	fail1: #C1 @test(err, code=eval, path=p, contains="field not allowed", pos=[9:4, 12:9])
 	#C1: {
 		// TODO(errors): don't include all positions of p in the normal list of
 		// positions, or rather categorize the positions to show:
@@ -67,7 +67,7 @@ embed: {
 	fail1: p: "foo" // this should fail, as p is not present.
 
 
-	success2: #C2
+	success2: #C2 @test(eq, {p: "foo"})
 	#C2: {
 		if true {
 			p: _
@@ -75,7 +75,7 @@ embed: {
 	}
 	success2: p: "foo" // this succeeds as p is present.
 
-	success3: #C3
+	success3: #C3 @test(eq, {})
 	#C3: {}
 	success3: {
 		if false {
@@ -95,7 +95,7 @@ embed: {
 				}
 			}
 		}
-	}
+	} @test(eq, {#X: {y: string}, x: {y: string}})
 
 	fail4: #C4
 	#C4: {}
@@ -104,14 +104,14 @@ embed: {
 			// error as p is not allowed in fail4
 			p: q: 1
 		}
-	}
+	} @test(err, code=eval, path=p, contains="field not allowed", pos=[3:4])
 
 	incomplete5: {
 		a: bool
 		if a {
 			p: q: 1
 		}
-	}
+	} @test(err, code=incomplete, contains="incomplete %s: %s", args=[bool, bool], pos=[1:6])
 
 	incomplete6: {
 		if false {
@@ -119,15 +119,20 @@ embed: {
 		}
 		p: q + 1
 		q: int
-	}
+	} @test(eq, {
+		p: _|_ @test(err, code=incomplete, contains="embed.incomplete6.p: non-concrete value int in operand to +", pos=[117:6, 118:6])
+		q: int
+	})
 	incomplete7: {
 		p: q + 1
 		q: int
 		if false {
 			q: 1 // do not inadvertently pick up a void arc.
 		}
-	}
-	@test(err, code=eval, at=fail1.p, contains="field not allowed", pos=[10:4, 13:9])
+	} @test(eq, {
+		p: _|_ @test(err, code=incomplete, contains="embed.incomplete7.p: non-concrete value int in operand to +", pos=[124:6, 125:6, 126:3])
+		q: int
+	})
 }
 
 // Mix of both dynamic and static fields.
@@ -148,6 +153,7 @@ mixedFieldsSuccess: {
 	b: x: b.#Def
 	b: x: X: _
 	b: x: foo: _
+
 
 	c: #Def: {
 		X:   int
@@ -218,6 +224,11 @@ provideIncompleteSuccess: {
 		}
 		x: (#a & {b: true}) & {c: 4}
 		y: x
+		@test(eq, {
+			#a: {_|_, b: bool}
+			x: {b: true, c: 4}
+			y: {b: true, c: 4}
+		})
 	}
 
 	t2: {
@@ -227,7 +238,7 @@ provideIncompleteSuccess: {
 				c: 4
 			}
 			b: true
-		}
+		} @test(eq, {c: 4, b: true})
 
 		#c: {}
 		a: {
@@ -237,10 +248,9 @@ provideIncompleteSuccess: {
 			b: true
 			// d is disallowed, even though it is added by embedding.
 			// TODO: this seems right, but it may be good to clarify why.
-			c: #c
+			c: #c @test(err, code=eval, at=d, contains="field not allowed", pos=[-5:8])
 		}
 	}
-	@test(err, code=eval, at=t2.a.c.d, contains="field not allowed", pos=[24:8])
 }
 
 // voidArcs tests that fields are dropped and reference up counts are adjusted
@@ -282,8 +292,8 @@ voidArcs: {
 
 cyclicError: {
 	a: {
-		x: bool
-		y: bool
+		x: bool @test(err, code=incomplete, path=cyclicError.a, contains="incomplete %s: %s", args=[bool, bool], pos=[0:6])
+		y: bool @test(err, code=incomplete, path=cyclicError.a, contains="incomplete %s: %s", args=[bool, bool], pos=[-1:6])
 		if a.x  {
 			y: true
 		}
@@ -295,14 +305,14 @@ cyclicError: {
 	// The evaluation of `b` in `a` triggers a to be fully evaluated, which
 	// is not possible because the evaluation of `a` depends on incomplete
 	// values.
-	c: a.b
+	c: a.b @test(err, code=incomplete, path=cyclicError.a, contains="incomplete %s: %s", args=[bool, bool], pos=[-13:6])
 	@test(eq, {
 		a: {
-			x: _|_ @test(err, code=incomplete, contains="cyclicError.a: incomplete bool: bool", pos=[282:6])
-			y: _|_ @test(err, code=incomplete, contains="cyclicError.a: incomplete bool: bool", pos=[282:6])
+			x: _|_
+			y: _|_
 			b: {}
 		}
-		c: _|_ @test(err, code=incomplete, contains="cyclicError.a: incomplete bool: bool", pos=[282:6])
+		c: _|_
 	})
 }
 
@@ -386,10 +396,10 @@ emptyComprehensionIncomplete: {
 		// b should be an incomplete error
 		if a.b {
 		}
-	}
+	} @test(err, code=incomplete, contains="undefined field: %s", args=[b], pos=[2:8])
 	@test(eq, {
 		a: {}
-		b: _|_ @test(err, code=incomplete, contains="emptyComprehensionIncomplete.b: undefined field: b", pos=[384:8])
+		b: _|_
 	})
 }
 
@@ -403,6 +413,7 @@ voidEliminationSuccess: t1: {
 	if false {
 		a: b: true
 	}
+	@test(eq, {})
 }
 
 voidEliminationSuccess: t2: {
@@ -432,6 +443,14 @@ voidEliminationSuccess: t2: {
 	components: sinks: blah: {
 		kind: "source"
 	}
+	@test(eq, {
+		components: {
+			sinks: {
+				blah: {kind: "source", configuration: {}}
+			}
+			#C: {kind: string, configuration: {}}
+		}
+	})
 }
 
 voidEliminationSuccess: derefRef1: {
@@ -447,6 +466,13 @@ voidEliminationSuccess: derefRef1: {
 		e: bool
 		f: !e // remains incomplete
 	}
+	@test(eq, {
+		a: {b: {c: {}}}
+		E: {
+			e: bool
+			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool)", pos=[464:7])
+		}
+	})
 }
 
 voidEliminationSuccess: derefRef2: {
@@ -463,6 +489,17 @@ voidEliminationSuccess: derefRef2: {
 		e: bool
 		f: !e // remains incomplete
 	}
+	@test(eq, {
+		a: {b: {c: {}}}
+		E: {
+			e: bool
+			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool)", pos=[487:7])
+		}
+		#F: {
+			e: bool
+			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool)", pos=[487:7])
+		}
+	})
 }
 
 voidEliminationSuccess: derefDisj1: {
@@ -481,6 +518,10 @@ voidEliminationSuccess: derefDisj1: {
 		g: bool
 		h: !g
 	}
+	@test(eq, {
+		a: {b: {c: {}}}
+		E: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction: (and 2 more errors)", pos=[])
+	})
 }
 
 voidEliminationSuccess: derefDisj2: {
@@ -499,6 +540,10 @@ voidEliminationSuccess: derefDisj2: {
 		g: bool
 		h: !g
 	}
+	@test(eq, {
+		a: {b: {c: {}}}
+		E: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction: (and 2 more errors)", pos=[])
+	})
 }
 
 voidEliminationSuccess: bulk1: {
@@ -512,6 +557,7 @@ voidEliminationSuccess: bulk1: {
 		}
 		d: c.e
 	}
+	@test(eq, {a: {b: {c: {e: string}, d: string}}})
 }
 
 voidEliminationSuccess: opt1: {
@@ -525,6 +571,7 @@ voidEliminationSuccess: opt1: {
 		}
 		d: c.e
 	}
+	@test(eq, {a: {b: {c: {e: string}, d: string}}})
 }
 
 voidEliminationSuccess: noCycle1: {
@@ -538,6 +585,7 @@ voidEliminationSuccess: noCycle1: {
 			if false {g: _}
 		}
 	}
+	@test(eq, {_x: {}, a: {c: {h: "stream"}, b: {}}})
 }
 
 voidEliminationSuccess: noCycle2: {
@@ -551,6 +599,7 @@ voidEliminationSuccess: noCycle2: {
 		}
 	}
 	_x: a.b
+	@test(eq, {a: {c: {h: "stream"}, b: {}}, _x: {}})
 }
 
 voidLookup: {
@@ -576,12 +625,16 @@ voidLookup: {
 	@test(eq, {
 		a: {
 			x: {
-				z: _|_ @test(err, code=incomplete, contains="voidLookup.a.x.z: undefined field: void", pos=[554:17])
-				c: _|_ @test(err, code=incomplete, contains="voidLookup.a.x.z: undefined field: void", pos=[554:17])
+				z: _|_
+				c: _|_
 			}
 			y: {c: _, z: {}}
 		}
 	})
+	@test(err, at=a.x.z, code=incomplete,
+		contains="undefined field: %s", args=[void], pos=[1:17])
+	@test(err, at=a.x.c, code=incomplete,
+		path=voidLookup.a.x.z, contains="undefined field: %s", args=[void], pos=[1:17])
 }
 
 
@@ -595,8 +648,9 @@ topElimination: {
 	}
 	@test(eq, {
 		a: int
-		x: _|_ @test(err, code=incomplete, contains="topElimination.x: non-concrete value int in operand to +", pos=[591:6, 588:5])
+		x: _|_
 	})
+	@test(err, at=x, code=incomplete, contains="non-concrete value %v in operand to %s", args=[int, +], pos=[4:6, 1:5])
 }
 
 voidEliminationSuccess: drop1: {
@@ -974,6 +1028,7 @@ issue3621: reduced: t1: {
 		a: b1.b2.b3
 		b1: b2: b3: "Foo"
 	}
+	@test(eq, {a: "Foo", b1: {b2: {b3: "Foo"}}})
 }
 issue3621: reduced: t2: {
 	outer: {}
@@ -981,6 +1036,10 @@ issue3621: reduced: t2: {
 		inner: inner2: name: "Foo"
 		outer: b: inner.inner2.name
 	}
+	@test(eq, {
+		outer: {b: "Foo"}
+		inner: {inner2: {name: "Foo"}}
+	})
 }
 issue3621: full: {
 	hello: "world"
@@ -1252,59 +1311,59 @@ issue3935: full: {
     ./in.cue:117:6
     ./in.cue:118:6
 [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
-    ./in.cue:121:6
-    ./in.cue:122:6
-    ./in.cue:123:3
+    ./in.cue:124:6
+    ./in.cue:125:6
+    ./in.cue:126:3
 [eval] fieldMismatch.a: cannot combine regular field "x" with 2:
-    ./in.cue:179:7
-    ./in.cue:177:3
+    ./in.cue:185:7
+    ./in.cue:183:3
 [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
 [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
 [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-    ./in.cue:214:7
+    ./in.cue:220:7
 [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
-    ./in.cue:232:8
+    ./in.cue:243:8
 [incomplete] cyclicError.a: incomplete bool: bool:
-    ./in.cue:282:6
+    ./in.cue:292:6
 [incomplete] cyclicError.a: incomplete bool: bool:
-    ./in.cue:282:6
+    ./in.cue:292:6
 [incomplete] closedCheck.success1.#D: non-concrete value string in operand to !=:
-    ./in.cue:331:6
-    ./in.cue:330:6
+    ./in.cue:341:6
+    ./in.cue:340:6
 [incomplete] closedCheck.success2.#D: non-concrete value string in operand to !=:
-    ./in.cue:351:6
-    ./in.cue:350:6
+    ./in.cue:361:6
+    ./in.cue:360:6
 [incomplete] closedCheck.success3.#D.e: non-concrete value string in operand to !=:
-    ./in.cue:368:7
-    ./in.cue:366:6
+    ./in.cue:378:7
+    ./in.cue:376:6
 [incomplete] emptyComprehensionIncomplete.b: undefined field: b:
-    ./in.cue:384:8
+    ./in.cue:394:8
 [incomplete] voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:445:7
+    ./in.cue:464:7
 [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
-    ./in.cue:461:7
+    ./in.cue:487:7
 [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:476:7
+    ./in.cue:513:7
 voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
-    ./in.cue:479:7
+    ./in.cue:516:7
 [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:494:7
+    ./in.cue:535:7
 voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
-    ./in.cue:497:7
+    ./in.cue:538:7
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:554:17
+    ./in.cue:603:17
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:554:17
+    ./in.cue:603:17
 [incomplete] topElimination.x: non-concrete value int in operand to +:
-    ./in.cue:591:6
-    ./in.cue:588:5
+    ./in.cue:644:6
+    ./in.cue:641:5
 [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    ./in.cue:621:5
-    ./in.cue:619:5
+    ./in.cue:675:5
+    ./in.cue:673:5
 [eval] structShare.err1.x.d.e: field not allowed:
-    ./in.cue:671:9
+    ./in.cue:725:9
 [incomplete] errorPropagation: undefined field: env2:
     ./issue2113.cue:32:19
 [eval] issue3535.regular.foo.regular: field not allowed:

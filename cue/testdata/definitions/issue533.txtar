@@ -14,14 +14,18 @@ _#x: {
 
 x1: #x & {
 	Name: "hello"
-	Age:  50 @test(err, code=eval, contains="field not allowed", pos=[])
-}
+	Age:  50
+} @test(err, code=eval, at=Age, contains="field not allowed", pos=[2:2])
 
 x2: _#x & {
 	Name: "hello"
-	Age:  50 @test(err, code=eval, contains="field not allowed", pos=[])
-}
+	Age:  50
+} @test(err, code=eval, at=Age, contains="field not allowed", pos=[2:2])
 -- out/errors.txt --
+[eval] x1.Age: field not allowed:
+    ./in.cue:13:2
+[eval] x2.Age: field not allowed:
+    ./in.cue:18:2
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
@@ -55,36 +59,3 @@ NumCloseIDs: 2
 -- out/diff-v2-v3.txt --
 Positions: v3 reports fewer positions than v2 for the "field not allowed" errors.
 Verdict: worsening -- v3 reports fewer error positions than v2.
--- out/evalalpha --
-Errors:
-x1.Age: field not allowed:
-    ./in.cue:13:2
-x2.Age: field not allowed:
-    ./in.cue:18:2
-
-Result:
-(_|_){
-  // [eval]
-  #x: (#struct){
-    Name: (string){ string }
-  }
-  _#x(:x): (#struct){
-    Name: (string){ string }
-  }
-  x1: (_|_){
-    // [eval]
-    Name: (string){ "hello" }
-    Age: (_|_){
-      // [eval] x1.Age: field not allowed:
-      //     ./in.cue:13:2
-    }
-  }
-  x2: (_|_){
-    // [eval]
-    Name: (string){ "hello" }
-    Age: (_|_){
-      // [eval] x2.Age: field not allowed:
-      //     ./in.cue:18:2
-    }
-  }
-}

@@ -1,0 +1,15 @@
+-- in.cue --
+z:          #"""
+	a raw multi-line
+	string
+	"""#
+-- out/relpos --
+z: #"""
+	a raw multi-line
+	string
+	"""#
+-- out/norelpos --
+z: #"""
+	a raw multi-line
+	string
+	"""#

@@ -139,20 +139,12 @@ errorListDef: {
 import mystrings "strings"
 
 @foo(bar)
-p1: {
-	[X=string]: {
-		name: X
-	}
-}
-d1: {
-	"foobar": int
-}
+p1: [X=string]: name: X
+d1: "foobar": int
 bar: "bar"
-d2: {
-	C="foobar": {
-		name: "xx"
-		foo:  C.name
-	}
+d2: C="foobar": {
+	name: "xx"
+	foo:  C.name
 }
 
 // Issue #1910
@@ -166,7 +158,7 @@ comp: {
 }
 bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'
 c1:    mystrings.Contains("aa", "a")
-s1:    """
+s1: """
 	multi
 	\(bar)
 	line
@@ -197,14 +189,8 @@ e5:  e1 + e2 - e3
 e6:  !t
 e7:  !t || !false
 e8?: !false
-m1: {
-	[string]: uint
-} & {
-	{
-		[string]: int
-	} & {
-		[string]: int64
-	}
+m1: {[string]: uint} & {
+	{[string]: int} & {[string]: int64}
 
 	// foo is an optional field
 	foo?: 3
@@ -234,7 +220,8 @@ y1: {
 		for x in src
 		let y = x {
 			y
-		}]
+		}
+	]
 }
 preserveKeyFieldInComprehension: {
 	for _, s in [1] {
@@ -346,18 +333,15 @@ _|_ // e3: index out of range [2] with length 2
 _|_ // e3: index out of range [2] with length 2
 == All
 {
+
 	@foo(bar)
-	x: int
+	x:  int
 	p1: {}
-	d1: {
-		foobar: int
-	}
+	d1: foobar: int
 	bar: "bar"
-	d2: {
-		foobar: {
-			name: "xx"
-			foo:  "xx"
-		}
+	d2: foobar: {
+		name: "xx"
+		foo:  "xx"
 	}
 
 	// Issue #1910
@@ -418,8 +402,8 @@ _|_ // e3: index out of range [2] with length 2
 		bar2: 3
 		foo1: 2
 		foo2: 3
-		src: [1, 2, 3]
-		x: [1, 2, 3]
+		src:  [1, 2, 3]
+		x:    [1, 2, 3]
 	}
 	preserveKeyFieldInComprehension: 1
 	errorStructDef: {

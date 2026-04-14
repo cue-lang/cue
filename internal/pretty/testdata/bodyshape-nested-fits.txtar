@@ -1,0 +1,9 @@
+# Nested list-of-list-of-structs at a wide width: every level fits
+# flat, so [docBodyShape] picks the flat shape throughout - the
+# whole expression renders on a single line with cells inline.
+-- in.cue --
+x: [[{a: _}, {b: _}], {c: _}]
+-- out/relpos --
+x: [[{a: _}, {b: _}], {c: _}]
+-- out/norelpos --
+x: [[{a: _}, {b: _}], {c: _}]

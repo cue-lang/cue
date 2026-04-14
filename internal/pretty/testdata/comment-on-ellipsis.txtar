@@ -1,0 +1,18 @@
+-- in.cue --
+{
+		x: 1
+	// doc on ellipsis
+	  ...
+}
+-- out/relpos --
+{
+	x: 1
+	// doc on ellipsis
+	...
+}
+-- out/norelpos --
+{
+	x: 1
+	// doc on ellipsis
+	...
+}

@@ -35,121 +35,65 @@ out: {
 	}
 }
 -- out/self-v3/default --
-jobs: {
-	workflow1_job1: {
-		"runs-on": "ubuntu-latest"
-		steps: [STEP.#x & {
-			run: ""
-		}]
-	}
+jobs: workflow1_job1: {
+	"runs-on": "ubuntu-latest"
+	steps:     [STEP.#x & {run: ""}]
 }
 
 //cue:path: _#step
-let STEP = {
-	#x: ((JOB.#x & {
-		steps: _
-	}).steps & [_])[0]
-}
+let STEP = {#x: ((JOB.#x & {steps: _}).steps & [_])[0]}
 
 //cue:path: _#job
-let JOB = {
-	#x: (JOBS.#x & {
-		x: _
-	}).x
-}
+let JOB = {#x: (JOBS.#x & {x: _}).x}
 
 //cue:path: #Workflow.jobs
-let JOBS = {
-	#x: {
-		[string]: NORMALJOB.#x | REUSABLEWORKFLOWCALLJOB.#x
-	}
-}
+let JOBS = {#x: [string]: NORMALJOB.#x | REUSABLEWORKFLOWCALLJOB.#x}
 
 //cue:path: #Workflow.#normalJob
 let NORMALJOB = {
 	#x: {
-		steps?: [...{
-			run?: string
-		}]
-		strategy?: {
-			matrix: {
-				[string]: [...CONFIGURATION_1.#x]
-			}
-		}
+		steps?: [...{run?: string}]
+		strategy?: matrix: [string]: [...CONFIGURATION_1.#x]
 	}
 }
 
 //cue:path: #Workflow.#configuration
-let CONFIGURATION_1 = {
-	#x: [...CONFIGURATION.#x]
-}
+let CONFIGURATION_1 = {#x: [...CONFIGURATION.#x]}
 
 //cue:path: #configuration
-let CONFIGURATION = {
-	#x: [...#x]
-}
+let CONFIGURATION = {#x: [...#x]}
 
 //cue:path: #reusableWorkflowCallJob
-let REUSABLEWORKFLOWCALLJOB = {
-	#x: {}
-}
+let REUSABLEWORKFLOWCALLJOB = {#x: {}}
 -- out/self-v3-noshare/default --
-jobs: {
-	workflow1_job1: {
-		"runs-on": "ubuntu-latest"
-		steps: [STEP.#x & {
-			run: ""
-		}]
-	}
+jobs: workflow1_job1: {
+	"runs-on": "ubuntu-latest"
+	steps:     [STEP.#x & {run: ""}]
 }
 
 //cue:path: _#step
-let STEP = {
-	#x: ((JOB.#x & {
-		steps: _
-	}).steps & [_])[0]
-}
+let STEP = {#x: ((JOB.#x & {steps: _}).steps & [_])[0]}
 
 //cue:path: _#job
-let JOB = {
-	#x: (JOBS.#x & {
-		x: _
-	}).x
-}
+let JOB = {#x: (JOBS.#x & {x: _}).x}
 
 //cue:path: #Workflow.jobs
-let JOBS = {
-	#x: {
-		[string]: NORMALJOB.#x | REUSABLEWORKFLOWCALLJOB.#x
-	}
-}
+let JOBS = {#x: [string]: NORMALJOB.#x | REUSABLEWORKFLOWCALLJOB.#x}
 
 //cue:path: #Workflow.#normalJob
 let NORMALJOB = {
 	#x: {
-		steps?: [...{
-			run?: string
-		}]
-		strategy?: {
-			matrix: {
-				[string]: [...CONFIGURATION_1.#x]
-			}
-		}
+		steps?: [...{run?: string}]
+		strategy?: matrix: [string]: [...CONFIGURATION_1.#x]
 	}
 }
 
 //cue:path: #Workflow.#configuration
-let CONFIGURATION_1 = {
-	#x: [...CONFIGURATION.#x]
-}
+let CONFIGURATION_1 = {#x: [...CONFIGURATION.#x]}
 
 //cue:path: #configuration
-let CONFIGURATION = {
-	#x: [...#x]
-}
+let CONFIGURATION = {#x: [...#x]}
 
 //cue:path: #reusableWorkflowCallJob
-let REUSABLEWORKFLOWCALLJOB = {
-	#x: {}
-}
+let REUSABLEWORKFLOWCALLJOB = {#x: {}}
 -- out/self/default --

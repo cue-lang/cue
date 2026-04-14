@@ -11,9 +11,7 @@ foo: {
 	json1: json.Marshal(_cue_json1)
 	let _cue_json1 = [1, 2]
 	json2: json.Marshal(_cue_json2)
-	let _cue_json2 = {
-		key: "value"
-	}
+	let _cue_json2 = {key: "value"}
 	yaml1: yaml.Marshal(_cue_yaml1)
 	let _cue_yaml1 = {
 		a: "b"

@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3b86be4_016ac987",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T16:24:32Z",
+      "side": 1,
+      "message": "Done. Rewrote the commit message manually: subject is now \"internal/cuetxtar: extend shareID checks and fix path aliasing\" with a tightly wrapped bullet-point body describing each change.",
+      "parentUuid": "4fb44649_2cfd6cd0",
+      "revId": "42e988bf4d3b3081ee59e7658f0d5348edb57af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

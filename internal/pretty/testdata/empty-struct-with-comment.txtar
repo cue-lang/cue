@@ -1,0 +1,15 @@
+# A comment inside an otherwise empty struct body is attached to the
+# StructLit itself (Position > 0). It must be rendered inside the
+# braces, not after them.
+-- in.cue --
+#s: {
+	// comment
+}
+-- out/relpos --
+#s: {
+	// comment
+}
+-- out/norelpos --
+#s: {
+	// comment
+}

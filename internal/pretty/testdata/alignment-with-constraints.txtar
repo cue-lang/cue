@@ -1,0 +1,21 @@
+# Optional/required markers are part of the key column.
+-- config --
+width: 20
+-- in.cue --
+{
+	name: string
+age?:     int
+	id!:  string
+}
+-- out/relpos --
+{
+	name: string
+	age?: int
+	id!:  string
+}
+-- out/norelpos --
+{
+	name: string
+	age?: int
+	id!:  string
+}

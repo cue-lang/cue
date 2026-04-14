@@ -1,0 +1,13 @@
+# Slice expressions: both bounds, low-only, high-only, and no bounds.
+-- in.cue --
+a: x[1:3]
+b: x[:3]
+c: x[1:]
+d: x[:]
+-- out/relpos --
+a: x[1:3]
+b: x[:3]
+c: x[1:]
+d: x[:]
+-- out/norelpos --
+a: x[1:3], b: x[:3], c: x[1:], d: x[:]

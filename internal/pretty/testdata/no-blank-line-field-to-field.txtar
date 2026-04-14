@@ -1,0 +1,21 @@
+# Between two regular fields (no definitions), a doc comment does
+# NOT trigger a blank line upgrade. The doc comment forces the
+# struct to break (so the comment isn't lost).
+-- in.cue --
+{
+	apple: 1
+	// doc comment
+	banana: 2
+}
+-- out/relpos --
+{
+	apple: 1
+	// doc comment
+	banana: 2
+}
+-- out/norelpos --
+{
+	apple: 1
+	// doc comment
+	banana: 2
+}

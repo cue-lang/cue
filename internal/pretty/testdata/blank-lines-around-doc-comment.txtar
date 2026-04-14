@@ -1,0 +1,46 @@
+# Blank lines around a doc comment inside a list or struct must be
+# preserved. The parser attaches the blank-line signal via
+# NewSection RelPos: on the comment (blank line before the comment)
+# and on the node the comment documents (blank line between comment
+# and body). The opening '[' or '{' uses leadingRel (the doc
+# comment's RelPos if any, otherwise the element's own) so the blank
+# before the comment is emitted; the row's DocComment carries its own
+# trailing separator driven by the element's own RelPos, so the blank
+# between the comment and the body lands on the right side.
+-- in.cue --
+x: [
+
+	// comment
+
+	{},
+]
+
+y: {
+
+	// comment
+
+	z
+}
+-- out/relpos --
+x: [
+
+	// comment
+
+	{},
+]
+
+y: {
+
+	// comment
+
+	z
+}
+-- out/norelpos --
+x: [
+	// comment
+	{},
+]
+y: {
+	// comment
+	z
+}

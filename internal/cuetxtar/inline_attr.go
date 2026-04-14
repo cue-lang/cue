@@ -449,6 +449,13 @@ func identStr(label ast.Label) string {
 //     carry a $pkg suffix (e.g. "_foo$mypkg"), which is stripped and converted
 //     to ":" + pkgname. Without a suffix, "_" is used (anonymous hidden field).
 func labelSelector(label ast.Label, hidPkg string) cue.Selector {
+	// Unwrap field aliases (e.g. A="foo=bar" or B=bb): the alias binds a name
+	// to the field value; the actual label is the aliased expression.
+	if alias, ok := label.(*ast.Alias); ok {
+		if l, ok := alias.Expr.(ast.Label); ok {
+			label = l
+		}
+	}
 	if ident, ok := label.(*ast.Ident); ok && internal.IsHidden(ident.Name) {
 		name := ident.Name
 		pkg := hidPkg

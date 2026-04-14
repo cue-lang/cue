@@ -1,0 +1,16 @@
+# A comment written on the same line as the "{" of a conjunction's
+# RHS struct. The parser attaches it to the enclosing BinaryExpr at
+# Position=1 Line=true (not to the empty StructLit), but it is
+# logically interior to the struct: injecting it back into the struct
+# body preserves the user's visual position and round-trips cleanly.
+-- in.cue --
+foo: #X & {//a: 5
+}
+-- out/relpos --
+foo: #X & {
+	//a: 5
+}
+-- out/norelpos --
+foo: #X & {
+	//a: 5
+}

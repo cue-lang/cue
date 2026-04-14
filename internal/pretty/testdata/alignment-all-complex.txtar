@@ -1,0 +1,18 @@
+# All fields have struct/list values - no table alignment at all.
+-- config --
+width: 20
+-- in.cue --
+{
+	apple: {x: 1}
+ball:      [1, 2]
+}
+-- out/relpos --
+{
+	apple: {x: 1}
+	ball: [1, 2]
+}
+-- out/norelpos --
+{
+	apple: {x: 1}
+	ball: [1, 2]
+}

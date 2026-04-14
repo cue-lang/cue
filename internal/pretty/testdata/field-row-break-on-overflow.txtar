@@ -1,0 +1,28 @@
+# Regression: plain `key: value` fields whose flat width exceeds
+# the available budget break before the value, with the value
+# indented one level deeper than the key. AllowRowBreak gates this
+# behaviour: only field rows opt in, so list/call/chain rows with
+# trailing comments aren't subject to the break.
+#
+# longestAlignedPrefix segments around AllowRowBreak rows whose own
+# flat width exceeds avail, so each overflowing field becomes its own
+# single-row segment, and renderTableSegment's breakRow path emits a
+# break before the value cell.
+#
+# Only the norelpos pass exercises the break: in the relpos pass
+# the file is wrapped in an infinite-width scope (parsed-mode), and
+# rowFits's AllowRowBreak guard skips itself under infinite width so
+# the user's layout is preserved.
+-- config --
+width: 20
+-- in.cue --
+aaaaaaaaaaaaaaa: bbbbbbbbbbbbbbb
+aaaaaaaaaaaaaac: bbbbbbbbbbbbbbd
+-- out/relpos --
+aaaaaaaaaaaaaaa: bbbbbbbbbbbbbbb
+aaaaaaaaaaaaaac: bbbbbbbbbbbbbbd
+-- out/norelpos --
+aaaaaaaaaaaaaaa:
+	bbbbbbbbbbbbbbb
+aaaaaaaaaaaaaac:
+	bbbbbbbbbbbbbbd

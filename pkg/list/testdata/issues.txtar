@@ -111,22 +111,8 @@ issue3541: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (typ
 
 Result:
 issue563: {
-	#MyDef: {
-		name: string
-	}
-	output: [{
-		name: "a"
-	}, {
-		name: "b"
-	}, {
-		name: "c"
-	}, {
-		name: "1"
-	}, {
-		name: "2"
-	}, {
-		name: "3"
-	}]
+	#MyDef: name: string
+	output: [{name: "a"}, {name: "b"}, {name: "c"}, {name: "1"}, {name: "2"}, {name: "3"}]
 }
 issue1404: {
 	a:   *1 | 2
@@ -156,20 +142,8 @@ issue2594: {
 	}
 }
 issue3416: {
-	sumFirst: {
-		a: {
-			b: {
-				111
-			}
-		}
-	}
-	sumSecond: {
-		a: {
-			b: {
-				111
-			}
-		}
-	}
+	sumFirst: a: b:  {111}
+	sumSecond: a: b: {111}
 }
 
 // The default "yes" is selected, so the list contains "yes": expect true.
@@ -178,7 +152,7 @@ issue3950: true
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,9 @@
+@@ -1,36 +1,20 @@
  Errors:
 -issue2594.sumSecond.x: conflicting values 0 and 6:
 -    ./in.cue:71:3
@@ -195,7 +169,26 @@ diff old new
  
  Result:
  issue563: {
-@@ -30,7 +28,7 @@
+-	#MyDef: {
+-		name: string
+-	}
+-	output: [{
+-		name: "a"
+-	}, {
+-		name: "b"
+-	}, {
+-		name: "c"
+-	}, {
+-		name: "1"
+-	}, {
+-		name: "2"
+-	}, {
+-		name: "3"
+-	}]
++	#MyDef: name: string
++	output: [{name: "a"}, {name: "b"}, {name: "c"}, {name: "1"}, {name: "2"}, {name: "3"}]
+ }
+ issue1404: {
  	a:   *1 | 2
  	sum: 1
  }
@@ -204,7 +197,7 @@ diff old new
  issue2594: {
  	sumFirst: {
  		#Def: {
-@@ -47,20 +45,28 @@
+@@ -47,20 +31,16 @@
  			0
  			#In: [...number]
  		}
@@ -216,8 +209,8 @@ diff old new
  	}
  }
  issue3416: {
- 	sumFirst: {
- 		a: {
+-	sumFirst: {
+-		a: {
 -			b: _|_ // issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle (and 1 more errors)
 -		}
 -	}
@@ -229,18 +222,8 @@ diff old new
 -		}
 -	}
 -}
-+			b: {
-+				111
-+			}
-+		}
-+	}
-+	sumSecond: {
-+		a: {
-+			b: {
-+				111
-+			}
-+		}
-+	}
++	sumFirst: a: b:  {111}
++	sumSecond: a: b: {111}
 +}
 +
 +// The default "yes" is selected, so the list contains "yes": expect true.

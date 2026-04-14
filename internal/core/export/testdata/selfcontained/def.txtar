@@ -9,8 +9,4 @@ a: b: c: #def
 c: DEF.#x
 
 //cue:path: #def
-let DEF = {
-	#x: {
-		a: 1
-	}
-}
+let DEF = {#x: a: 1}

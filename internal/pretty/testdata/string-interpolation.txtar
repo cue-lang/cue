@@ -1,0 +1,29 @@
+# String interpolation in both values and labels. The converter for
+# Interpolation walks the alternating string-fragment and
+# interpolated-expression parts of the AST; it is the only path that
+# exercises the ast.Interpolation type as both a value and a label
+# (dynamic field name).
+-- in.cue --
+name: "world"
+greeting: "hello \(name)!"
+"static-\(name)": 1
+multi: "a=\(a) b=\(b) c=\(c)"
+a: 1
+b: 2
+c: 3
+-- out/relpos --
+name:             "world"
+greeting:         "hello \(name)!"
+"static-\(name)": 1
+multi:            "a=\(a) b=\(b) c=\(c)"
+a:                1
+b:                2
+c:                3
+-- out/norelpos --
+name:             "world"
+greeting:         "hello \(name)!"
+"static-\(name)": 1
+multi:            "a=\(a) b=\(b) c=\(c)"
+a:                1
+b:                2
+c:                3

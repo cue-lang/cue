@@ -42,7 +42,5 @@ package client
 	//
 	// *Note:* When used for a VirtualService destination, labels MUST be empty.
 	//
-	labels?: {
-		[string]: string
-	} @protobuf(5,map[string]string)
+	labels?: {[string]: string} @protobuf(5,map[string]string)
 }

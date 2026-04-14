@@ -1073,4 +1073,3 @@ func TestInlineRunner_ErrArgs(t *testing.T) {
 		}
 	})
 }
-

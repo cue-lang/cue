@@ -48,7 +48,11 @@ a: {
 			n: string
 			depends_on: []
 		}
-		#A2: {i: string, n: string, depends_on: []}
+		#A2: {
+			i: string
+			n: string
+			depends_on: []
+		}
 		s: {
 			foo: {
 				x: 10
@@ -59,11 +63,11 @@ a: {
 			bar: {
 				i: "hello bar"
 				depends_on: [{
-		depends_on: []
-		n: "foo"
-		x: 10
-		y: z: "z"
-	}]
+					x: 10
+					y: {z: "z"}
+					n: "foo"
+					depends_on: []
+				}]
 				n: "bar"
 			}
 		}

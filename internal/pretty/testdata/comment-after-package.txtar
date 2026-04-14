@@ -1,0 +1,22 @@
+# Blank line before doc-commented field after package clause
+# (a non-field decl) is always inserted by the heuristic,
+# even without RelPos. The blank line is supplied by
+# style.Config.Annotate (A4 + A1), so this test enables the
+# annotate pre-pass.
+-- config --
+annotate: true
+-- in.cue --
+package foo
+
+// a comment
+x: 1
+-- out/relpos --
+package foo
+
+// a comment
+x: 1
+-- out/norelpos --
+package foo
+
+// a comment
+x: 1

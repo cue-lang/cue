@@ -1,0 +1,11 @@
+# Multi-line input so Newline RelPos is honoured.
+-- in.cue --
+{
+	foo?: 1
+}
+-- out/relpos --
+{
+	foo?: 1
+}
+-- out/norelpos --
+{foo?: 1}

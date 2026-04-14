@@ -1,0 +1,25 @@
+## When RelPos is stripped (programmatic AST), a multi-element list
+## whose content overflows the width fully explodes: every element
+## lands on its own line at +1 indent, and the closing `]` returns to
+## the list's caller indent. The same-line-opener / shareIndent
+## shortcut that drops the list's Nest only applies in parsed mode
+## (where it preserves the user's layout) - for programmatic input
+## the list's Nest is needed so width-driven explode lays each
+## element consistently at one indent level.
+##
+## Parsed input keeps the user's single-line layout: width-driven
+## breaks only fire on programmatic ASTs (no RelPos).
+-- config --
+width: 40
+-- in.cue --
+x: [1, {aaaaaaaaa: 111111111, bbbbbbbbbb: 2222222222222222}]
+-- out/relpos --
+x: [1, {aaaaaaaaa: 111111111, bbbbbbbbbb: 2222222222222222}]
+-- out/norelpos --
+x: [
+	1,
+	{
+		aaaaaaaaa:  111111111
+		bbbbbbbbbb: 2222222222222222
+	},
+]

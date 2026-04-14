@@ -1,0 +1,37 @@
+# Nested at a moderate width where the outer list's body cannot
+# fit on its indented line but the inner list's body can. The
+# per-level [docBodyShape] decision yields a mixed cascade: the
+# hug shape at the outer level (cells force-broken, brackets hug
+# the edges), the indented shape at the inner level (brackets on
+# their own lines with the body inline at indent+1).
+#
+# Budget analysis at width 24:
+#   - outer flat: `x: [[{a: _}, {b: _}], {c: _}]` = 28 > 24 -> outer
+#     list's group broken.
+#   - outer body flat at indent+1 (1 tab = 4 cols): need to fit in
+#     `24 - 4 = 20` cols; body = `[{a:_}, {b:_}], {c:_}` (21) does
+#     not fit -> outer bodyShape picks the hug shape.
+#   - inner is force-broken via its [docNextGroupNoop] wrapping;
+#     inner's own list's group breaks. Inner body flat at indent+1
+#     (also 4 cols here, since the outer hug shape leaves the
+#     inner at the outer's caller indent): `{a:_}, {b:_}` = 14 <= 20
+#     -> inner bodyShape picks the indented shape.
+#   - outer struct `{c:_}` is force-broken too; its body is small
+#     but the NextGroupNoop wrapper still forces multi-line.
+#
+# The indented shape's trailing comma on `{b: _}` is what makes the
+# output idempotent: the re-parsed AST has `Rbrack.RelPos == Newline`,
+# which makes the standard layout add a trailing comma on re-render,
+# matching the first render.
+-- config --
+width: 24
+-- in.cue --
+x: [[{a: _}, {b: _}], {c: _}]
+-- out/relpos --
+x: [[{a: _}, {b: _}], {c: _}]
+-- out/norelpos --
+x: [[
+	{a: _}, {b: _},
+], {
+	c: _
+}]

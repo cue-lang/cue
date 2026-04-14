@@ -25,6 +25,6 @@ sortedx: error in call to list.Sort: non-concrete argument 1:
 -- expect-stdout2 --
 import "list"
 
-x: [1, 2, 3]
+x:       [1, 2, 3]
 sortedx: list.Sort(x, cmp)
 cmp:     _

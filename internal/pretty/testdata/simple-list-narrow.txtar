@@ -1,0 +1,16 @@
+# Single-line input at narrow width: parsed source is preserved as-is
+# (the user wrote everything on one line, so the formatter does not
+# add width-driven newlines). Only when RelPos is stripped - the
+# programmatic-AST case - does the width limit drive a break.
+-- config --
+width: 6
+-- in.cue --
+[1, 2, 3]
+-- out/relpos --
+[1, 2, 3]
+-- out/norelpos --
+[
+	1,
+	2,
+	3,
+]

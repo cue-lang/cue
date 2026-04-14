@@ -35,22 +35,18 @@ posTieBreaker: {
 import "list"
 
 basicFirst: {
-	sort: Z & {
-		a: _x
-	}
-	_x: y + ""
-	y:  string
-	Z: {
-		a: string
-	}
+	sort: Z & {a: _x}
+	_x:   y + ""
+	y:    string
+	Z: a: string
 }
 literalLast: {
 	p1: {
 		[string]: list.UniqueItems()
-		a: [_, _]
+		a:        [_, _]
 	}
 	p2: {
-		a: [_, _]
+		a:        [_, _]
 		[string]: list.UniqueItems()
 	}
 }
@@ -97,21 +93,13 @@ posTieBreaker: {
 == Simplified
 {
 	basicFirst: {
-		sort: {
-			a: string & _x
-		}
+		sort: a: string & _x
 		y: string
-		Z: {
-			a: string
-		}
+		Z: a: string
 	}
 	literalLast: {
-		p1: {
-			a: list.UniqueItems() & [_, _]
-		}
-		p2: {
-			a: list.UniqueItems() & [_, _]
-		}
+		p1: a: list.UniqueItems() & [_, _]
+		p2: a: list.UniqueItems() & [_, _]
 	}
 	posTieBreaker: {
 		p1: {
@@ -129,22 +117,14 @@ posTieBreaker: {
 == Raw
 {
 	basicFirst: {
-		sort: {
-			a: string & _x
-		}
+		sort: a: string & _x
 		_x: y + ""
 		y:  string
-		Z: {
-			a: string
-		}
+		Z: a: string
 	}
 	literalLast: {
-		p1: {
-			a: list.UniqueItems() & [_, _]
-		}
-		p2: {
-			a: list.UniqueItems() & [_, _]
-		}
+		p1: a: list.UniqueItems() & [_, _]
+		p2: a: list.UniqueItems() & [_, _]
 	}
 	posTieBreaker: {
 		p1: {
@@ -162,21 +142,13 @@ posTieBreaker: {
 == Final
 {
 	basicFirst: {
-		sort: {
-			a: _|_ // basicFirst.sort.a: non-concrete value string in operand to +
-		}
+		sort: a: _|_ // basicFirst.sort.a: non-concrete value string in operand to +
 		y: string
-		Z: {
-			a: string
-		}
+		Z: a: string
 	}
 	literalLast: {
-		p1: {
-			a: _|_ // literalLast.p1.a: invalid value [_,_] (does not satisfy list.UniqueItems): equal values at position 0 and 1
-		}
-		p2: {
-			a: _|_ // literalLast.p2.a: invalid value [_,_] (does not satisfy list.UniqueItems): equal values at position 0 and 1
-		}
+		p1: a: _|_ // literalLast.p1.a: invalid value [_,_] (does not satisfy list.UniqueItems): equal values at position 0 and 1
+		p2: a: _|_ // literalLast.p2.a: invalid value [_,_] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 	}
 	posTieBreaker: {
 		p1: {
@@ -194,22 +166,14 @@ posTieBreaker: {
 == All
 {
 	basicFirst: {
-		sort: {
-			a: string & _x
-		}
+		sort: a: string & _x
 		_x: y + ""
 		y:  string
-		Z: {
-			a: string
-		}
+		Z: a: string
 	}
 	literalLast: {
-		p1: {
-			a: list.UniqueItems() & [_, _]
-		}
-		p2: {
-			a: list.UniqueItems() & [_, _]
-		}
+		p1: a: list.UniqueItems() & [_, _]
+		p2: a: list.UniqueItems() & [_, _]
 	}
 	posTieBreaker: {
 		p1: {
@@ -227,21 +191,13 @@ posTieBreaker: {
 == Eval
 {
 	basicFirst: {
-		sort: {
-			a: string & _x
-		}
+		sort: a: string & _x
 		y: string
-		Z: {
-			a: string
-		}
+		Z: a: string
 	}
 	literalLast: {
-		p1: {
-			a: list.UniqueItems() & [_, _]
-		}
-		p2: {
-			a: list.UniqueItems() & [_, _]
-		}
+		p1: a: list.UniqueItems() & [_, _]
+		p2: a: list.UniqueItems() & [_, _]
 	}
 	posTieBreaker: {
 		p1: {

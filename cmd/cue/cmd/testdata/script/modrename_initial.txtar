@@ -39,9 +39,7 @@ import "main.org:a"
 a.foo
 -- module.cue-1 --
 module: "other.org@v0"
-language: {
-	version: "v0.9.0-alpha.0"
-}
+language: version: "v0.9.0-alpha.0"
 -- x.cue-1 --
 package x
 
@@ -60,9 +58,7 @@ import "other.org:a"
 a.foo
 -- module.cue-2 --
 module: "another.blah/a"
-language: {
-	version: "v0.9.0-alpha.0"
-}
+language: version: "v0.9.0-alpha.0"
 -- x.cue-2 --
 package x
 

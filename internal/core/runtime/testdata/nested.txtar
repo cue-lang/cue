@@ -27,8 +27,6 @@ a: foo: Bar: {
 	a: {
 		Foo:    implFoo1
 		Rename: implEmaner1
-		foo: {
-			Bar: impl2
-		}
+		foo: Bar: impl2
 	}
 }

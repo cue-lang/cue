@@ -130,9 +130,8 @@ func TestNewStruct(t *testing.T) {
 }`,
 	}, {
 		input: []any{ast.Embed(ast.NewBool(true))},
-		want: `{
-	true
-}`}}
+		want:  `{true}`,
+	}}
 	// TODO(tdtest): use cuetest.Run when supported.
 	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 		s := ast.NewStruct(tc.input...)

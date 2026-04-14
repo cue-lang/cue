@@ -1,0 +1,31 @@
+# A doc-commented field after a non-field decl (let, embed,
+# comprehension, attribute, ...) always gets a blank line before
+# it, regardless of authored RelPos. Non-field decls are visually
+# distinct enough from a doc-commented sibling field that the
+# formatter fills in the blank line even when the source had only
+# a single newline.
+#
+# The blank line is supplied by style.Config.Annotate's A4 rule, so
+# this test enables the annotate pre-pass.
+-- config --
+annotate: true
+-- in.cue --
+{
+	let X = 1
+	// doc comment
+	port: X
+}
+-- out/relpos --
+{
+	let X = 1
+
+	// doc comment
+	port: X
+}
+-- out/norelpos --
+{
+	let X = 1
+
+	// doc comment
+	port: X
+}

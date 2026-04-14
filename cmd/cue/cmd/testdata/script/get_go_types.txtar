@@ -350,42 +350,36 @@ import (
 	Byte:          uint8              @go(,byte)
 
 	// Time is mapped to CUE's internal type.
-	Time:    time.Time
-	Barzer:  p2.#Barzer
-	Alias1?: null | p2.#Barzer @go(,*MyBarzer)
-	EmbedAliasInline: {
-		p2.#Barzer
-	} @go(,"struct{MyBarzer \"json:\\\",inline\\\"\"}")
-	SliceAlias: [...p2.#Barzer] @go(,[]MyBarzer)
+	Time:             time.Time
+	Barzer:           p2.#Barzer
+	Alias1?:          null | p2.#Barzer @go(,*MyBarzer)
+	EmbedAliasInline: {p2.#Barzer}      @go(,"struct{MyBarzer \"json:\\\",inline\\\"\"}")
+	SliceAlias:       [...p2.#Barzer]   @go(,[]MyBarzer)
 
 	// Note: Go encodings of protobuf tags are lossy. So this is a best-effort
 	// thing.
-	Map: {[string]: null | #CustomJSON} @go(,map[string]*CustomJSON) @protobuf(1,map[bytes]bytes,name=intf)
-	MapString: {[string]: string} @go(,map[string]string)
-	Slice1: [...int] @go(,[]int)
-	Slice2: [...] @go(,[]interface{})
-	Slice3?: null | [...] @go(,*[]json.Unmarshaler)
-	Slice4: [...int] @go(,[]*int)
-	Array1: 5 * [int] @go(,[5]int)
-	Array2: 5 * [_] @go(,[5]interface{})
-	Array3?: null | 5*[_] @go(,*[5]json.Marshaler)
-	Array4: bytes      @go(,[5]byte)
-	Intf:   #Interface @protobuf(2,varint,name=intf)
-	Intf2:  _          @go(,interface{})
-	Intf3: {
-		Interface: #Interface
-	} @go(,struct{Interface})
-	Intf4: _ @go(,"interface{Foo()}")
+	Map:       {[string]: null | #CustomJSON} @go(,map[string]*CustomJSON) @protobuf(1,map[bytes]bytes,name=intf)
+	MapString: {[string]: string}             @go(,map[string]string)
+	Slice1:    [...int]                       @go(,[]int)
+	Slice2:    [..._]                         @go(,[]interface{})
+	Slice3?:   null | [..._]                  @go(,*[]json.Unmarshaler)
+	Slice4:    [...int]                       @go(,[]*int)
+	Array1:    5 * [int]                      @go(,[5]int)
+	Array2:    5 * [_]                        @go(,[5]interface{})
+	Array3?:   null | 5 * [_]                 @go(,*[5]json.Marshaler)
+	Array4:    bytes                          @go(,[5]byte)
+	Intf:      #Interface                     @protobuf(2,varint,name=intf)
+	Intf2:     _                              @go(,interface{})
+	Intf3:     {Interface: #Interface}        @go(,struct{Interface})
+	Intf4:     _                              @go(,"interface{Foo()}")
 
 	// Even though this struct as a type implements MarshalJSON, it is known
 	// that it is really only implemented by the embedded field.
-	Embed: {
-		CustomJSON: #CustomJSON
-	} @go(,struct{CustomJSON})
-	MapKeyNamedString: {[string]: #MyString} @go(,map[MyString]MyString)
-	optionalOmitEmptyJSON?: string    @go(OptionalOmitEmptyJSON)
-	optionalOmitZeroJSON?:  time.Time @go(OptionalOmitZeroJSON)
-	optionalOmitEmptyYAML?: string    @go(OptionalOmitEmptyYAML)
+	Embed:                  {CustomJSON: #CustomJSON} @go(,struct{CustomJSON})
+	MapKeyNamedString:      {[string]: #MyString}     @go(,map[MyString]MyString)
+	optionalOmitEmptyJSON?: string                    @go(OptionalOmitEmptyJSON)
+	optionalOmitZeroJSON?:  time.Time                 @go(OptionalOmitZeroJSON)
+	optionalOmitEmptyYAML?: string                    @go(OptionalOmitEmptyYAML)
 
 	// +optional
 	optionalComment?: string @go(OptionalComment)
@@ -459,9 +453,9 @@ _#internalIdentifier: #Identifier & "internal"
 
 #enumLevel:
 	#Unknown |
-	#Low |
-	#Medium |
-	#High
+		#Low |
+		#Medium |
+		#High
 
 #values_Level: {
 	Unknown: #Unknown
@@ -485,7 +479,7 @@ _#internalIdentifier: #Identifier & "internal"
 
 #enumLevel2:
 	#AnotherLevel1 |
-	#AnotherLevel2
+		#AnotherLevel2
 
 #values_Level2: {
 	AnotherLevel1: #AnotherLevel1
@@ -544,15 +538,15 @@ import t "time"
 
 // A Barzer barzes.
 #Barzer: {
-	a:     int @go(A) @protobuf(2,varint,)
+	a:     int           @go(A) @protobuf(2,varint,)
 	T:     t.Time
 	B?:    null | int    @go(,*big.Int)
 	C:     int           @go(,big.Int)
 	F:     string        @go(,big.Float) @xml(,attr)
 	G?:    null | string @go(,*big.Float)
 	S:     string
-	"x-y": bool @go(XY)
-	Err:   _    @go(,error)
+	"x-y": bool          @go(XY)
+	Err:   _             @go(,error)
 
 	// Field tag strings which need quoting as CUE attributes.
 	Slashes:   _ @go(,any) @xml("https://foo.test/bar#fragment")
@@ -596,9 +590,7 @@ type A struct {
 
 package pkg4
 
-#A: {
-	UnsafePointer: uint64 @go(,unsafe.Pointer)
-}
+#A: UnsafePointer: uint64 @go(,unsafe.Pointer)
 -- pkg_generics/pkg_generics.go --
 package pkg_generics
 
@@ -653,37 +645,25 @@ package pkg_generics
 
 #SomeUnionInterface: string | int | uint8
 
-#SomeStructAny: {
-	SomeField: _ @go(,T)
-}
+#SomeStructAny: SomeField: _ @go(,T)
 
-#SomeStructString: {
-	SomeField: string @go(,T)
-}
+#SomeStructString: SomeField: string @go(,T)
 
-#SomeStructSomeInterface: {
-	SomeField: #SomeUnionInterface @go(,T)
-}
+#SomeStructSomeInterface: SomeField: #SomeUnionInterface @go(,T)
 
 #SomeStructMultipleTypeParameters: {
 	SomeField:      string @go(,T)
 	SomeOtherField: int    @go(,Z)
 }
 
-#SomeStructComparable: {
-	SomeField: _ @go(,T)
-}
+#SomeStructComparable: SomeField: _ @go(,T)
 
 #SomeInterfaceWithMethod: int
 
 #SomeAlias: string
 
-#StructWithAlias: {
-	SomeField: string @go(,T)
-}
+#StructWithAlias: SomeField: string @go(,T)
 
 #SomeType: int
 
-#StructWithType: {
-	SomeField: #SomeType @go(,T)
-}
+#StructWithType: SomeField: #SomeType @go(,T)

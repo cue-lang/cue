@@ -85,38 +85,18 @@ errorListWrongLength: {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	type:    "object"
 	properties: {
-		bool: {
-			const: true
+		bool: const: true
+		closedStruct: const: {
+			a: "foo"
+			b: 123
 		}
-		closedStruct: {
-			const: {
-				a: "foo"
-				b: 123
-			}
-		}
-		closedStructWithNull: {
-			const: {
-				a: null
-			}
-		}
-		float: {
-			const: 1.5
-		}
-		int: {
-			const: 2
-		}
-		listConcrete: {
-			const: ["a", "b", "c"]
-		}
-		listWithUnaryEquals: {
-			const: [1, 2, 3]
-		}
-		null: {
-			type: "null"
-		}
-		string: {
-			const: "something"
-		}
+		closedStructWithNull: const: a: null
+		float: const:               1.5
+		int: const:                 2
+		listConcrete: const:        ["a", "b", "c"]
+		listWithUnaryEquals: const: [1, 2, 3]
+		null: type:                 "null"
+		string: const:              "something"
 		unaryEquals: {
 			description: "Test different forms of const as mentioned in constValueOf doc comment:"
 			const:       42

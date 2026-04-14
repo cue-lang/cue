@@ -39,8 +39,8 @@ package a
 
 #enumC:
 	#A |
-	_#b |
-	_#c
+		_#b |
+		_#c
 
 #values_C: {
 	A: #A

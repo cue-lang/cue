@@ -8,12 +8,8 @@
 	drawStyle?: int
 }
 -- out/definition --
-#LineConfig: {
-	lineColor?: string
-}
-#GraphFieldConfig: #LineConfig & {
-	drawStyle?: int
-}
+#LineConfig: lineColor?: string
+#GraphFieldConfig: #LineConfig & {drawStyle?: int}
 -- out/doc-v3 --
 []
 [#LineConfig]
@@ -46,9 +42,7 @@ reordering
 {}
 == Raw
 {
-	#LineConfig: {
-		lineColor?: string
-	}
+	#LineConfig: lineColor?: string
 	#GraphFieldConfig: {
 		drawStyle?: int
 		lineColor?: string
@@ -58,9 +52,7 @@ reordering
 {}
 == All
 {
-	#LineConfig: {
-		lineColor?: string
-	}
+	#LineConfig: lineColor?: string
 	#GraphFieldConfig: {
 		drawStyle?: int
 		lineColor?: string
@@ -68,9 +60,7 @@ reordering
 }
 == Eval
 {
-	#LineConfig: {
-		lineColor?: string
-	}
+	#LineConfig: lineColor?: string
 	#GraphFieldConfig: {
 		drawStyle?: int
 		lineColor?: string

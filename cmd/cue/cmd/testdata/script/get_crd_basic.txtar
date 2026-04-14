@@ -174,16 +174,14 @@ package v1
 	_embeddedResource: {
 		apiVersion!: string
 		kind!:       string
-		metadata?: {
-			...
-		}
+		metadata?:   {...}
 	}
 	apiVersion: "example.com/v1"
 	kind:       "Foo"
 	metadata!: {
 		name!:      string
 		namespace!: string
-		labels?: [string]: string
+		labels?: [string]:      string
 		annotations?: [string]: string
 		...
 	}
@@ -201,16 +199,14 @@ package v1
 	_embeddedResource: {
 		apiVersion!: string
 		kind!:       string
-		metadata?: {
-			...
-		}
+		metadata?:   {...}
 	}
 	apiVersion: "example.com/v1"
 	kind:       "Foo"
 	metadata!: {
 		name!:      string
 		namespace!: string
-		labels?: [string]: string
+		labels?: [string]:      string
 		annotations?: [string]: string
 		...
 	}
@@ -232,16 +228,14 @@ package v1beta1
 	_embeddedResource: {
 		apiVersion!: string
 		kind!:       string
-		metadata?: {
-			...
-		}
+		metadata?:   {...}
 	}
 	apiVersion: "example.com/v1beta1"
 	kind:       "Bar"
 	metadata!: {
 		name!:      string
 		namespace?: string
-		labels?: [string]: string
+		labels?: [string]:      string
 		annotations?: [string]: string
 		...
 	}

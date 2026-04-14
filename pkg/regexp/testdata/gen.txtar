@@ -59,9 +59,7 @@ t9: [{
 	A: "r"
 	B: "o"
 }]
-t10: [{
-	A: ""
-}]
+t10: [{A: ""}]
 t11: _|_ // t11: error in call to regexp.FindAllNamedSubmatch: no match
 t12: "valid"
 t13: _|_ // t13: invalid value "invalid)" (does not satisfy regexp.Valid): error parsing regexp: unexpected ): `invalid)`

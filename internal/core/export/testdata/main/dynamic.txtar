@@ -27,18 +27,14 @@ a: {
 	labelY: Y
 	labelZ: Z
 }
-E=["cue"]: {
-	name: E | null
-}
+E=["cue"]: name: E | null
 q:      "q"
 q1:     "q1"
 r:      "r"
 r1:     "r1"
 "s-q"?: 1
 "s-r"!: 2
-"s-q1"?: {
-	(r1)!: 3
-}
+"s-q1"?: (r1)!: 3
 -- out/doc-v3 --
 []
 [x]
@@ -103,18 +99,14 @@ bogus field for a failed dynamic field.
 		labelY: Y
 		labelZ: Z
 	}
-	E=["cue"]: {
-		name: E | null
-	}
+	E=["cue"]: name: E | null
 	q:           "q"
 	q1:          "q1"
 	r:           "r"
 	r1:          "r1"
 	("s-" + q)?: 1
 	("s-" + r)!: 2
-	("s-" + q1)?: {
-		(r1)!: 3
-	}
+	("s-" + q1)?: (r1)!: 3
 }
 == Raw
 {
@@ -127,18 +119,14 @@ bogus field for a failed dynamic field.
 		labelY: Y
 		labelZ: Z
 	}
-	E=["cue"]: {
-		name: E | null
-	}
+	E=["cue"]: name: E | null
 	q:           "q"
 	q1:          "q1"
 	r:           "r"
 	r1:          "r1"
 	("s-" + q)?: 1
 	("s-" + r)!: 2
-	("s-" + q1)?: {
-		(r1)!: 3
-	}
+	("s-" + q1)?: (r1)!: 3
 }
 == Final
 _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 3 more errors)
@@ -153,18 +141,14 @@ _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 
 		labelY: Y
 		labelZ: Z
 	}
-	E=["cue"]: {
-		name: E | null
-	}
+	E=["cue"]: name: E | null
 	q:           "q"
 	q1:          "q1"
 	r:           "r"
 	r1:          "r1"
 	("s-" + q)?: 1
 	("s-" + r)!: 2
-	("s-" + q1)?: {
-		(r1)!: 3
-	}
+	("s-" + q1)?: (r1)!: 3
 }
 == Eval
 {
@@ -177,24 +161,20 @@ _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 
 		labelY: Y
 		labelZ: Z
 	}
-	E=["cue"]: {
-		name: E | null
-	}
+	E=["cue"]: name: E | null
 	q:           "q"
 	q1:          "q1"
 	r:           "r"
 	r1:          "r1"
 	("s-" + q)?: 1
 	("s-" + r)!: 2
-	("s-" + q1)?: {
-		(r1)!: 3
-	}
+	("s-" + q1)?: (r1)!: 3
 }
 -- diff/-out/value-v3<==>+out/value --
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,98 @@
+@@ -1,10 +1,82 @@
  == Simplified
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
 +{
@@ -207,18 +187,14 @@ diff old new
 +		labelY: Y
 +		labelZ: Z
 +	}
-+	E=["cue"]: {
-+		name: E | null
-+	}
++	E=["cue"]: name: E | null
 +	q:           "q"
 +	q1:          "q1"
 +	r:           "r"
 +	r1:          "r1"
 +	("s-" + q)?: 1
 +	("s-" + r)!: 2
-+	("s-" + q1)?: {
-+		(r1)!: 3
-+	}
++	("s-" + q1)?: (r1)!: 3
 +}
  == Raw
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
@@ -232,18 +208,14 @@ diff old new
 +		labelY: Y
 +		labelZ: Z
 +	}
-+	E=["cue"]: {
-+		name: E | null
-+	}
++	E=["cue"]: name: E | null
 +	q:           "q"
 +	q1:          "q1"
 +	r:           "r"
 +	r1:          "r1"
 +	("s-" + q)?: 1
 +	("s-" + r)!: 2
-+	("s-" + q1)?: {
-+		(r1)!: 3
-+	}
++	("s-" + q1)?: (r1)!: 3
 +}
  == Final
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
@@ -260,18 +232,14 @@ diff old new
 +		labelY: Y
 +		labelZ: Z
 +	}
-+	E=["cue"]: {
-+		name: E | null
-+	}
++	E=["cue"]: name: E | null
 +	q:           "q"
 +	q1:          "q1"
 +	r:           "r"
 +	r1:          "r1"
 +	("s-" + q)?: 1
 +	("s-" + r)!: 2
-+	("s-" + q1)?: {
-+		(r1)!: 3
-+	}
++	("s-" + q1)?: (r1)!: 3
 +}
  == Eval
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
@@ -285,18 +253,14 @@ diff old new
 +		labelY: Y
 +		labelZ: Z
 +	}
-+	E=["cue"]: {
-+		name: E | null
-+	}
++	E=["cue"]: name: E | null
 +	q:           "q"
 +	q1:          "q1"
 +	r:           "r"
 +	r1:          "r1"
 +	("s-" + q)?: 1
 +	("s-" + r)!: 2
-+	("s-" + q1)?: {
-+		(r1)!: 3
-+	}
++	("s-" + q1)?: (r1)!: 3
 +}
 -- diff/value/todo/p0 --
 Ignored errors?

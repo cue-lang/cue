@@ -62,16 +62,14 @@ spread: {
 	}
 }
 -- out/definition-v3 --
-@experiment(explicitopen)
-spread: {
+@experiment(explicitopen), spread: {
 	a: 1
 	b: a...
 	c: a...
 	d: close({})...
 }
 -- out/definition-v3-noshare --
-@experiment(explicitopen)
-spread: {
+@experiment(explicitopen), spread: {
 	a: 1
 	b: a...
 	c: a...

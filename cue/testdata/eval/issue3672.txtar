@@ -131,6 +131,12 @@ value0: Only: [{UseSectionName: true}]
 	Only: [{ UseSectionName: true }]
 	orgSyntax: "Only [UseSectionName]"
 }, at=value0)
+
+@test(err, at=#mkFinDefSet.#Type, code=incomplete, contains="error in call to %s", args=[or], pos=[-108:9, -108:25])
+// TODO(inline): test wrapped errors
+@test(err, at=#orgForConfigTextRules.orgSyntax, code=incomplete, path=elems, contains="invalid interpolation", pos=[-16:5, -18:18])
+@test(err, at=#FinDefSetConfigTextElem.toString._output, code=incomplete, path=elems, contains="invalid interpolation", pos=[-17:5, -19:18])
+
 -- out/errors.txt --
 [incomplete] #mkFinDefSet.#Type: error in call to or: required field missing: #Definition:
     ./x.cue:22:9

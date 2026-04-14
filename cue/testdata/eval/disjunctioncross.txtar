@@ -48,17 +48,13 @@ valueDiscriminator: local: {
 		oneOrTwo: X={ *_appDefaults[X.kind] | _ }
 	}
 	@test(eq, {
-		out: {
-			oneOrTwo:
-				*{kind: "two", two: {optional: *"optional set" | string}} |
-				 {kind: "two", two: {optional?: string}}
-		}
-		#Application: {
-			oneOrTwo:
-				*{kind: "two", two: {optional: *"optional set" | string}} |
-				 {kind: "one", one: {oneField: "value"}} |
-				  {kind: "two", two: {optional?: string}}
-		}
+		out: oneOrTwo:
+			*{kind: "two", two: {optional: *"optional set" | string}} |
+				{kind: "two", two: {optional?: string}}
+		#Application: oneOrTwo:
+			*{kind: "two", two: {optional: *"optional set" | string}} |
+				{kind: "one", one: {oneField: "value"}} |
+				{kind: "two", two: {optional?: string}}
 	})
 }
 
@@ -77,17 +73,13 @@ fieldDiscriminator: crossing:{
 		oneOrTwo: *_appDefaults[oneOrTwo.kind] | _
 	}
 	@test(eq, {
-		out: {
-			oneOrTwo:
-				*{two: {optional: *"optional set" | string}, kind: "two"} |
-				 {two: {optional?: string}, kind: "two"}
-		}
-		#Application: {
-			oneOrTwo:
-				*{kind: "two", two: {optional: *"optional set" | string}} |
-				 {kind: "one", one: {oneField: "value"}} |
-				 {kind: "two", two: {optional?: string}}
-		}
+		out: oneOrTwo:
+			*{two: {optional: *"optional set" | string}, kind: "two"} |
+				{two: {optional?: string}, kind: "two"}
+		#Application: oneOrTwo:
+			*{kind: "two", two: {optional: *"optional set" | string}} |
+				{kind: "one", one: {oneField: "value"}} |
+				{kind: "two", two: {optional?: string}}
 	})
 }
 
@@ -185,15 +177,15 @@ issue3967: {
 }
 -- out/errors.txt --
 [incomplete] issue3967.error.nested.out: undefined field: kind:
-    ./in.cue:139:17
+    ./in.cue:131:17
 [cycle] issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
-    ./in.cue:158:10
+    ./in.cue:150:10
 issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
-    ./in.cue:163:8
+    ./in.cue:155:8
 issue3967.error.local.out.oneOrTwo.two: field not allowed:
-    ./in.cue:163:8
-    ./in.cue:152:14
-    ./in.cue:157:6
+    ./in.cue:155:8
+    ./in.cue:144:14
+    ./in.cue:149:6
 -- out/eval/stats --
 Leaks:  16
 Freed:  278

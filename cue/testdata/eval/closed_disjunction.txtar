@@ -2,7 +2,7 @@
 #A: {
 	b?: int
 	*{} | {c?: int} | {d?: int} | {e?: int}
-}
+} @test(eq, *{b?: int} | {b?: int, c?: int} | {b?: int, d?: int} | {b?: int, e?: int})
 
 a: #A & {
 	b: 3
@@ -12,7 +12,10 @@ a: #A & {
 b: #A & {
 	c: 3
 	d: 4
-} @test(err, suberr=(code=eval, contains="field not allowed", pos=[1:2]), suberr=(code=eval, contains="field not allowed", pos=[2:2]))
+} @test(err, code=eval, contains="2 errors in empty disjunction",,
+	suberr=(code=eval, contains="field not allowed", pos=[1:2]),
+	suberr=(code=eval, contains="field not allowed", pos=[2:2])
+)
 -- out/errors.txt --
 [eval] b: 2 errors in empty disjunction:
 b.c: field not allowed:

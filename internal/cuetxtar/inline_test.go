@@ -1095,6 +1095,16 @@ func TestUnreachableTestAttr(t *testing.T) {
 			name: "decl attr in plain struct is valid",
 			src:  "f: {\n\t@test(eq, {v: 1})\n\tv: 1\n}\n",
 		},
+		{
+			// @test on a field with an identifier alias (B=bb) must NOT be flagged.
+			name: "field attr on identifier alias label is valid",
+			src:  "B=bb: 4 @test(eq, 4)\n",
+		},
+		{
+			// @test on a field with a string alias (A="foo=bar") must NOT be flagged.
+			name: "field attr on string alias label is valid",
+			src:  "A=\"foo=bar\": \"str\" @test(eq, \"str\")\n",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

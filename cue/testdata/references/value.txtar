@@ -1,15 +1,15 @@
 -- in.cue --
-structShorthand: X={b: 3, c: X.b}
+structShorthand: X={b: 3, c: X.b} @test(eq, {b: 3, c: 3})
 
 // Note that X and Y are subtly different, as they have different bindings:
 // one binds to the field, the other to the value. In this case, that does not
 // make a difference.
-fieldAndValue: X=foo: Y={3, #sum: X + Y}
+fieldAndValue: X=foo: Y={3, #sum: X + Y} @test(eq, {3, #sum: 6})
 
-valueCycle: b: X=3 + X
+valueCycle: b: X=3 + X @test(err, code=cycle, contains="cycle with field", pos=[0:22])
 
 // Issue #1003
-listValueAlias: X = [1, 2, X[0]]
+listValueAlias: X = [1, 2, X[0]] @test(eq, [1, 2, 1])
 
 -- err.cue --
 @experiment(structcmp)
@@ -17,7 +17,18 @@ listValueAlias: X = [1, 2, X[0]]
 cycleErr: X={
 	err3: == (X + 1)
 	err3: 4
+	@test(err, code=eval, contains="invalid operands", pos=[1:12, 0:13, 1:16])
 }
+-- out/errors.txt --
+[eval] cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
+    ./err.cue:4:12
+    ./err.cue:3:13
+    ./err.cue:4:16
+[cycle] valueCycle.b: cycle with field: X:
+    ./in.cue:8:22
+-- out/todo.txt --
+v2 does not include cycleErr (no @experiment(structcmp) support).
+v2 cycle error message: "[cycle] cycle error" vs v3 "cycle with field: X".
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
@@ -30,85 +41,6 @@ Conjuncts:    18
 Disjuncts:    0
 
 NumCloseIDs: 2
--- out/evalalpha --
-Errors:
-cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
-    ./err.cue:4:12
-    ./err.cue:3:13
-    ./err.cue:4:16
-
-Result:
-(_|_){
-  // [eval]
-  cycleErr: (_|_){
-    // [eval]
-    err3: (_|_){
-      // [eval] cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
-      //     ./err.cue:4:12
-      //     ./err.cue:3:13
-      //     ./err.cue:4:16
-    }
-  }
-  structShorthand: (struct){
-    b: (int){ 3 }
-    c: (int){ 3 }
-  }
-  fieldAndValue: (struct){
-    foo: (int){
-      3
-      #sum: (int){ 6 }
-    }
-  }
-  valueCycle: (struct){
-    b: (_|_){
-      // [cycle] valueCycle.b: cycle with field: X:
-      //     ./in.cue:8:22
-    }
-  }
-  listValueAlias: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 1 }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,21 @@
--(struct){
-+Errors:
-+cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
-+    ./err.cue:4:12
-+    ./err.cue:3:13
-+    ./err.cue:4:16
-+
-+Result:
-+(_|_){
-+  // [eval]
-+  cycleErr: (_|_){
-+    // [eval]
-+    err3: (_|_){
-+      // [eval] cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
-+      //     ./err.cue:4:12
-+      //     ./err.cue:3:13
-+      //     ./err.cue:4:16
-+    }
-+  }
-   structShorthand: (struct){
-     b: (int){ 3 }
-     c: (int){ 3 }
-@@ -11,8 +28,8 @@
-   }
-   valueCycle: (struct){
-     b: (_|_){
--      // [cycle] cycle error:
--      //     ./in.cue:8:18
-+      // [cycle] valueCycle.b: cycle with field: X:
-+      //     ./in.cue:8:22
-     }
-   }
-   listValueAlias: (#list){
 -- out/eval --
 (struct){
   structShorthand: (struct){

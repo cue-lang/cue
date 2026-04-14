@@ -30,7 +30,8 @@ single: {
 // Else NOT triggered when try succeeds (value is defined)
 fallbackDef: 42
 elseNotTriggered: {
-    try { v: fallbackDef? } else { fallback: 0 }
+	try { v: fallbackDef? } else { fallback: 0 }
+	@test(eq, {v: 42})
 }
 
 // Else triggered when try fails (optional field undefined)
@@ -52,21 +53,25 @@ elseMultiField: {
 
 // Try produces empty struct when optional fails (no else)
 emptyOnFail: {
-    try { z: c? + 1 }
+	try { z: c? + 1 }
+	@test(eq, {})
 }
 
 // Try with mix of defined and undefined - all must succeed
 mixedRefs: {
-    try { x: a?, y: c? } else { fallback: true }
+	try { x: a?, y: c? } else { fallback: true }
+	@test(eq, {fallback: true})
 }
 
 incompleteOK: {
-  try { x: incomplete? } else { fallback: 23 }
+	try { x: incomplete? } else { fallback: 23 }
+	@test(eq, {x: int})
 }
 
 // Nested struct in try body with incomplete value
 incompleteNestedBody: {
-  try { x: y: incomplete? } else { fallback: 23 }
+	try { x: y: incomplete? } else { fallback: 23 }
+	@test(eq, {x: {y: int}})
 }
 
 // =============================================================================
@@ -75,21 +80,30 @@ incompleteNestedBody: {
 
 // Unfilled required field triggers else
 requiredUnfilled: {
-  a!: _
-  try { x: a? } else { fallback: 23 }
+	a!: _
+	try { x: a? } else { fallback: 23 }
+	@test(eq, {
+		a!: _
+		x: _|_ @test(err, code=incomplete, contains="requiredUnfilled.x: required field missing: a", pos=[83:11])
+	})
 }
 
 // Filled required field succeeds
 requiredFilled: {
-  a!: _
-  a: 5
-  try { x: a? } else { fallback: 23 }
+	a!: _
+	a: 5
+	try { x: a? } else { fallback: 23 }
+	@test(eq, {a: 5, x: 5})
 }
 
 // Required field with type constraint triggers else
 requiredWithType: {
-  a!: int
-  try { x: a? } else { fallback: 23 }
+	a!: int
+	try { x: a? } else { fallback: 23 }
+	@test(eq, {
+		a!: int
+		x: _|_ @test(err, code=incomplete, contains="requiredWithType.x: required field missing: a", pos=[101:11])
+	})
 }
 
 // =============================================================================
@@ -99,11 +113,13 @@ requiredWithType: {
 // For with optional source that exists
 forWithDefinedSource: {
     try { for x in [b?] { val: x } }
+	@test(eq, {val: 2})
 }
 
 // For with optional source that's undefined
 forWithUndefinedSource: {
-    try { for x in [c?] { val: x } } else { empty: true }
+	try { for x in [c?] { val: x } } else { empty: true }
+	@test(eq, {empty: true})
 }
 
 // =============================================================================
@@ -111,25 +127,28 @@ forWithUndefinedSource: {
 // =============================================================================
 
 nested: {
-    // Try inside struct
-    outer: {
-        try { inner: a? }
-    }
+	// Try inside struct
+	outer: {
+		try { inner: a? }
+		@test(eq, {inner: 1})
+	}
 
-    // Multiple try clauses in same struct
-    multi: {
-        try { first: a? }
-        try { second: b? }
-    }
+	// Multiple try clauses in same struct
+	multi: {
+		try { first: a? }
+		try { second: b? }
+		@test(eq, {first: 1, second: 2})
+	}
 
-    // Try with nested struct in body
-    deepNested: {
-        try {
-            level1: {
-                level2: a?
-            }
-        }
-    }
+	// Try with nested struct in body
+	deepNested: {
+		try {
+			level1: {
+				level2: a?
+			}
+		}
+		@test(eq, {level1: {level2: 1}})
+	}
 }
 
 // =============================================================================
@@ -137,53 +156,63 @@ nested: {
 // =============================================================================
 
 complexExpr: {
-    // Binary operations
-    binOp: {
-        try { sum: a? + b?, prod: a? * b? }
-    }
+	// Binary operations
+	binOp: {
+		try { sum: a? + b?, prod: a? * b? }
+		@test(eq, {sum: 3, prod: 2})
+	}
 
-    // Conditional with optional
-    list: {
-        try { items: [a?, b?, a? + b?] }
-    }
+	// Conditional with optional
+	list: {
+		try { items: [a?, b?, a? + b?] }
+		@test(eq, {items: [1, 2, 3]})
+	}
 }
 
 // =============================================================================
 // Selector expressions with optional
 // =============================================================================
 
-selectorTests: {
-    data: {
-        nested: {
-            value: 100
-        }
-    }
+	selectorTests: {
+	data: {
+		nested: {
+			value: 100
+		}
+	}
 
-    // Selector on defined path
-    definedSelector: {
-        try { v: data.nested.value? }
-    }
+	// Selector on defined path
+	definedSelector: {
+		try { v: data.nested.value? }
+	}
 
-    // Note: selector on undefined path would be compile error
+	@test(eq, {
+		data: {nested: {value: 100}}
+		definedSelector: {v: 100}
+	})
+
+	// Note: selector on undefined path would be compile error
 }
 
 // =============================================================================
 // Refer to closed structs
 // =============================================================================
 closedness: {
-    #Def: {f: int}
+	#Def: {f: int}
 
-    d: #Def
+	d: #Def
 
-    exists: {
-        try { v: #Def.f? }
-    }
-    notExistsDef: {
-        try { v: #Def.g? }
-    }
-    notExistsValue: {
-        try { v: d.g? }
-    }
+	exists: {
+		try { v: #Def.f? }
+		@test(eq, {v: int})
+	}
+	notExistsDef: {
+		try { v: #Def.g? }
+		@test(err, code=eval, path=v, contains="undefined field: %s", args=[g], pos=[1:17])
+	}
+	notExistsValue: {
+		try { v: d.g? }
+		@test(err, code=eval, path=v, contains="undefined field: %s", args=[g], pos=[1:14])
+	}
 }
 
 
@@ -192,43 +221,50 @@ closedness: {
 // =============================================================================
 
 indexTests: {
-    closedList: [10, 20, 30]
-    openList: [10, 20, 30, ...]
+	closedList: [10, 20, 30]
+	openList: [10, 20, 30, ...]
 
-    // Index on defined position (closed list)
-    definedIndex: {
-        try { v: closedList[0]? }
-    }
+	// Index on defined position (closed list)
+	definedIndex: {
+		try { v: closedList[0]? }
+		@test(eq, {v: 10})
+	}
 
-    // Index on defined position (middle)
-    middleIndex: {
-        try { v: closedList[1]? }
-    }
+	// Index on defined position (middle)
+	middleIndex: {
+		try { v: closedList[1]? }
+		@test(eq, {v: 20})
+	}
 
-    // Index out of range on CLOSED list - should ERROR (can never be satisfied)
-    outOfRangeClosed: {
-        try { v: closedList[10]? } else { fallback: -1 }
-    }
+	// Index out of range on CLOSED list - should ERROR (can never be satisfied)
+	outOfRangeClosed: {
+		try { v: closedList[10]? } else { fallback: -1 }
+		@test(err, code=eval, path=v, contains="index out of range [%d] with length %d", args=[10, 3], pos=[1:23])
+	}
 
-    // Index out of range on CLOSED list without else - should ERROR
-    outOfRangeClosedNoElse: {
-        try { v: closedList[100]? }
-    }
+	// Index out of range on CLOSED list without else - should ERROR
+	outOfRangeClosedNoElse: {
+		try { v: closedList[100]? }
+		@test(err, code=eval, path=v, contains="index out of range [%d] with length %d", args=[100, 3], pos=[1:23])
+	}
 
-    // Index out of range on OPEN list - should trigger else (list might grow)
-    outOfRangeOpen: {
-        try { v: openList[10]? } else { fallback: -1 }
-    }
+	// Index out of range on OPEN list - should trigger else (list might grow)
+	outOfRangeOpen: {
+		try { v: openList[10]? } else { fallback: -1 }
+		@test(eq, {fallback: -1})
+	}
 
-    // Index out of range on OPEN list without else - empty struct
-    outOfRangeOpenNoElse: {
-        try { v: openList[100]? }
-    }
+	// Index out of range on OPEN list without else - empty struct
+	outOfRangeOpenNoElse: {
+		try { v: openList[100]? }
+		@test(eq, {})
+	}
 
-    // Multiple index accesses on closed list
-    multipleIndex: {
-        try { x: closedList[0]?, y: closedList[1]?, z: closedList[2]? }
-    }
+	// Multiple index accesses on closed list
+	multipleIndex: {
+		try { x: closedList[0]?, y: closedList[1]?, z: closedList[2]? }
+		@test(eq, {x: 10, y: 20, z: 30})
+	}
 }
 
 // =============================================================================
@@ -236,41 +272,48 @@ indexTests: {
 // =============================================================================
 
 edgeCases: {
-    // Empty try body (should produce empty struct)
-    emptyBody: {
-        try { }
-    }
+	// Empty try body (should produce empty struct)
+	emptyBody: {
+		try { }
+		@test(eq, {})
+	}
 
-    // Try with only literal (no optional refs) - should always succeed
-    literalOnly: {
-        try { x: 42 }
-    }
+	// Try with only literal (no optional refs) - should always succeed
+	literalOnly: {
+		try { x: 42 }
+		@test(eq, {x: 42})
+	}
 
-    // Multiple optional refs, first fails
-    firstFails: {
-        try { x: c?, y: a? } else { skipped: true }
-    }
+	// Multiple optional refs, first fails
+	firstFails: {
+		try { x: c?, y: a? } else { skipped: true }
+		@test(eq, {skipped: true})
+	}
 
-    // Multiple optional refs, second fails
-    secondFails: {
-        try { x: a?, y: c? } else { skipped: true }
-    }
+	// Multiple optional refs, second fails
+	secondFails: {
+		try { x: a?, y: c? } else { skipped: true }
+		@test(eq, {skipped: true})
+	}
 
-    referenceError: {
-        a: 1 / 0
-        a: _b: 2
+	referenceError: {
+		a: 1 / 0
+		a: _b: 2
 
-        direct: {
-            try { v: a? } else { skipped: true }
-            // v shares the error from a
-        }
-        dontSkipError1: {
-            try { a._b? } else { skipped: true }
-        }
-        dontSkipError2: {
-            try { a?._b? } else { skipped: true }
-        }
-    }
+		direct: {
+			try { v: a? } else { skipped: true }
+			@test(err, code=eval, path=edgeCases.referenceError.a, contains="failed arithmetic: %v", args=[division by zero], pos=[-3:6])
+			// v shares the error from a
+		}
+		dontSkipError1: {
+			try { a._b? } else { skipped: true }
+			@test(err, code=eval, path=edgeCases.referenceError.a, contains="failed arithmetic: %v", args=[division by zero], pos=[-8:6])
+		}
+		dontSkipError2: {
+			try { a?._b? } else { skipped: true }
+			@test(err, code=eval, path=edgeCases.referenceError.a, contains="failed arithmetic: %v", args=[division by zero], pos=[-12:6])
+		}
+	}
 }
 
 // =============================================================================
@@ -281,44 +324,55 @@ edgeCases: {
 // to exist and be concrete. No ? needed outside of try context.
 
 refIntoTry: {
-    // Try that succeeds - inner fields are accessible
-    source: {
-        try { val: a? }
-    }
-    // Reference into successful try result (no ? needed)
-    ref: source.val  // Should resolve to 1
+	// Try that succeeds - inner fields are accessible
+	source: {
+		try { val: a? }
+		@test(eq, {val: 1})
+	}
+	// Reference into successful try result (no ? needed)
+	ref: source.val @test(eq, 1) // Should resolve to 1
 
-    // Nested try - outer succeeds, inner may or may not
-    nestedSource: {
-        try {
-            inner: {
-                try { deep: b? }
-            }
-        }
-    }
-    // Reference into nested try result (no ? needed)
-    nestedRef: nestedSource.inner.deep  // Should resolve to 2
+	// Nested try - outer succeeds, inner may or may not
+	nestedSource: {
+		try {
+			inner: {
+				try { deep: b? }
+			}
+		}
+		@test(eq, {inner: {deep: 2}})
+	}
+	// Reference into nested try result (no ? needed)
+	nestedRef: nestedSource.inner.deep  @test(eq, 2) // Should resolve to 2
 
-    // Try that fails - struct is empty, reference fails
-    nestedSkipped?: { try { c? } }
-    mixedSource: {
-        try { foo: nestedSkipped? }
-        bar?: 1
-        baz: 1
-    }
-    // Reference into failed try - use try to handle the missing field
-    skippedRef: {
-        try { v: mixedSource.foo? } else { missing: true }
-    }
-    failedRef1: {
-        try { v: mixedSource.foo } else { missing: true }
-    }
-    failedRef2: {
-        try { v: mixedSource.foo } else { missing: true }
-    }
-    successRef: {
-        try { v: mixedSource.baz? } else { missing: true }
-    }
+	// Try that fails - struct is empty, reference fails
+	nestedSkipped?: { try { c? } } @test(err, code=incomplete, path=refIntoTry, contains="field not found: %v", args=[nestedSkipped], pos=[])
+	mixedSource: {
+		try { foo: nestedSkipped? }
+		bar?: 1
+		baz: 1
+		@test(eq, {bar?: 1, baz: 1})
+	}
+	// Reference into failed try - use try to handle the missing field
+	skippedRef: {
+		try { v: mixedSource.foo? } else { missing: true }
+		@test(eq, {missing: true})
+	}
+	failedRef1: {
+		try { v: mixedSource.foo } else { missing: true }
+		@test(eq, {
+			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef1.v: undefined field: foo", pos=[360:24])
+		})
+	}
+	failedRef2: {
+		try { v: mixedSource.foo } else { missing: true }
+		@test(eq, {
+			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef2.v: undefined field: foo", pos=[366:24])
+		})
+	}
+	successRef: {
+		try { v: mixedSource.baz? } else { missing: true }
+		@test(eq, {v: 1})
+	}
 }
 
 // =============================================================================
@@ -326,44 +380,56 @@ refIntoTry: {
 // =============================================================================
 
 errorPrecedence: {
-    // Type error with optional that exists - should error
-    typeErrorDefined: {
-        try { v: a? + "string" } else { fallback: "ok" }
-    }
+	// Type error with optional that exists - should error
+	typeErrorDefined: {
+		try { v: a? + "string" } else { fallback: "ok" }
+		@test(err, code=eval, path=v,
+			contains="invalid operands %s and %s to '%s' (type %s and %s)",
+			args=[1, "string", +, int, string], pos=[1:12, -376:4, 1:17])
+	}
 
-    // Type error AND undefined optional - depends on evaluation order
-    // If c? is evaluated first and fails, the type error is never reached
-    typeErrorUndefined: {
-        try { v: c? + "string" } else { fallback: "ok" }
-    }
+	// Type error AND undefined optional - depends on evaluation order
+	// If c? is evaluated first and fails, the type error is never reached
+	typeErrorUndefined: {
+		try { v: c? + "string" } else { fallback: "ok" }
+		@test(eq, {fallback: "ok"})
+	}
 
-    // Division by zero with optional
-    divByZero: {
-        try { v: a? / 0 } else { fallback: "ok" }
-    }
+	// Division by zero with optional
+	divByZero: {
+		try { v: a? / 0 } else { fallback: "ok" }
+		@test(err, code=eval, path=v, contains="failed arithmetic: %v",
+			args=[division by zero], pos=[1:12])
+	}
 
-    // Error from conflicting values
-    conflictError: {
-        try { v: a? & "notanint" } else { fallback: "ok" }
-    }
+	// Error from conflicting values
+	conflictError: {
+		try { v: a? & "notanint" } else { fallback: "ok" }
+		@test(err, code=eval, path=v,
+			contains="conflicting values %s and %s (mismatched types %s and %s)",
+			args=["notanint", 1, string, int],
+			pos=[-398:4, 0:17, 1:3, 1:12, 1:17])
+	}
 
-    // Mixed case: OptionalUndefined in one field, real error in another
-    // The real error should still propagate
-    mixedError: {
-        try {
-            x: c?      // undefined
-            y: 1 / 0   // real error (independent)
-        } else { fallback: "ok" }
-    }
+	// Mixed case: OptionalUndefined in one field, real error in another
+	// The real error should still propagate
+	mixedError: {
+		try {
+			x: c?      // undefined
+			y: 1 / 0   // real error (independent)
+		} else { fallback: "ok" }
+		@test(eq, {fallback: "ok"})
+	}
 
-    // Mixed case 2: multiple optionals, one undefined, one with error
-    mixedErrorMultiple: {
-        try {
-            x: a?      // defined (1)
-            y: c?      // undefined
-            z: a? / 0  // real error
-        } else { fallback: "ok" }
-    }
+	// Mixed case 2: multiple optionals, one undefined, one with error
+	mixedErrorMultiple: {
+		try {
+			x: a?      // defined (1)
+			y: c?      // undefined
+			z: a? / 0  // real error
+		} else { fallback: "ok" }
+		@test(eq, {fallback: "ok"})
+	}
 }
 
 // =============================================================================
@@ -371,140 +437,158 @@ errorPrecedence: {
 // =============================================================================
 
 assignmentForm: {
-    // Basic assignment with defined value
-    basicDefined: {
-        try x = a? { result: x }
-    }
+	// Basic assignment with defined value
+	basicDefined: {
+		try x = a? { result: x }
+		@test(eq, {result: 1})
+	}
 
-    // Assignment with undefined optional - should trigger else
-    basicUndefined: {
-        try x = c? { result: x } else { fallback: 0 }
-    }
+	// Assignment with undefined optional - should trigger else
+	basicUndefined: {
+		try x = c? { result: x } else { fallback: 0 }
+		@test(eq, {fallback: 0})
+	}
 
-    // Assignment without else - should produce empty struct
-    noElseUndefined: {
-        try x = c? { result: x }
-    }
+	// Assignment without else - should produce empty struct
+	noElseUndefined: {
+		try x = c? { result: x }
+		@test(eq, {})
+	}
 
-    // Assignment with expression
-    withExpression: {
-        try sum = a? + b? { result: sum }
-    }
+	// Assignment with expression
+	withExpression: {
+		try sum = a? + b? { result: sum }
+		@test(eq, {result: 3})
+	}
 
-    // Assignment with failing expression - triggers else
-    withFailingExpr: {
-        try sum = a? + c? { result: sum } else { fallback: -1 }
-    }
+	// Assignment with failing expression - triggers else
+	withFailingExpr: {
+		try sum = a? + c? { result: sum } else { fallback: -1 }
+		@test(eq, {fallback: -1})
+	}
 
-    // Chained assignments
-    chained: {
-        try x = a? try y = b? { result: x + y }
-    }
+	// Chained assignments
+	chained: {
+		try x = a? try y = b? { result: x + y }
+		@test(eq, {result: 3})
+	}
 
-    // Assignment with selector
-    withSelector: {
-        data: { inner: 42 }
-        try v = data.inner? { result: v }
-    }
+	// Assignment with selector
+	withSelector: {
+		data: { inner: 42 }
+		try v = data.inner? { result: v }
+		@test(eq, {data: {inner: 42}, result: 42})
+	}
 
-    // Assignment with index
-    withIndex: {
-        list: [10, 20, 30]
-        try v = list[1]? { result: v }
-    }
+	// Assignment with index
+	withIndex: {
+		list: [10, 20, 30]
+		try v = list[1]? { result: v }
+		@test(eq, {list: [10, 20, 30], result: 20})
+	}
 
-    // Assignment with out-of-range index on closed list - should ERROR
-    withOutOfRangeIndex: {
-        list: [10, 20, 30]
-        try v = list[10]? { result: v } else { fallback: -1 }
-    }
+	// Assignment with out-of-range index on closed list - should ERROR
+	withOutOfRangeIndex: {
+		list: [10, 20, 30]
+		try v = list[10]? { result: v } else { fallback: -1 }
+		@test(err, code=eval, path=result,
+			contains="index out of range [%d] with length %d", args=[10, 3], pos=[2:16])
+	}
 
-    // Assignment with out-of-range index on open list - should trigger else
-    withOutOfRangeIndexOpen: {
-        list: [10, 20, 30, ...]
-        try v = list[10]? { result: v } else { fallback: -1 }
-    }
+	// Assignment with out-of-range index on open list - should trigger else
+	withOutOfRangeIndexOpen: {
+		list: [10, 20, 30, ...]
+		try v = list[10]? { result: v } else { fallback: -1 }
+		@test(eq, {list: [10, 20, 30], fallback: -1})
+	}
 
-    // Assignment used in nested expression
-    nestedUse: {
-        try x = a? { inner: { value: x * 2 } }
-    }
+	// Assignment used in nested expression
+	nestedUse: {
+		try x = a? { inner: { value: x * 2 } }
+		@test(eq, {inner: {value: 2}})
+	}
 
-    // Multiple chained try assignments with one failing
-    chainedOneFails: {
-        try x = a? try y = c? { result: x + y }
-    }
+	// Multiple chained try assignments with one failing
+	chainedOneFails: {
+		try x = a? try y = c? { result: x + y }
+		@test(eq, {})
+	}
 
-    // Assignment with real error - should propagate
-    withRealError: {
-        try x = a? / 0 { result: x } else { fallback: "ok" }
-    }
+	// Assignment with real error - should propagate
+	withRealError: {
+		try x = a? / 0 { result: x } else { fallback: "ok" }
+		@test(err, code=eval, path=result,
+			contains="failed arithmetic: %v", args=[division by zero], pos=[1:11])
+	}
 
-    // Assignment combined with for
-    withFor: {
-        try x = b? for i, v in [1, 2] { "\(i)": x + v }
-    }
+	// Assignment combined with for
+	withFor: {
+		try x = b? for i, v in [1, 2] { "\(i)": x + v }
+		@test(eq, {"0": 3, "1": 4})
+	}
 
-    // Assignment combined with if
-    withIf: {
-        try x = a? if x > 0 { positive: x }
-    }
+	// Assignment combined with if
+	withIf: {
+		try x = a? if x > 0 { positive: x }
+		@test(eq, {positive: 1})
+	}
 
-    // Assignment combined with let
-    withLet: {
-        try x = a? let y = x * 2 { doubled: y }
-    }
+	// Assignment combined with let
+	withLet: {
+		try x = a? let y = x * 2 { doubled: y }
+		@test(eq, {doubled: 2})
+	}
 }
 
 // =============================================================================
 // Original recursive tests
 // =============================================================================
 
-recursive: t1: { try { for x in [b?] { x } } }
-recursive: t2: { try { {x: b?, y: c?} } }
-recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}
+recursive: t1: { try { for x in [b?] { x } } }           @test(eq, 2)
+recursive: t2: { try { {x: b?, y: c?} } }                @test(eq, {})
+recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}  @test(eq, {z: 23})
 
 -- out/errors.txt --
 [incomplete] requiredUnfilled.x: required field missing: a:
-    ./in.cue:78:12
+    ./in.cue:83:11
 [incomplete] requiredWithType.x: required field missing: a:
-    ./in.cue:91:12
+    ./in.cue:101:11
 [eval] closedness.notExistsDef.v: undefined field: g:
-    ./in.cue:181:23
+    ./in.cue:208:17
 [eval] closedness.notExistsValue.v: undefined field: g:
-    ./in.cue:184:20
+    ./in.cue:212:14
 [eval] indexTests.outOfRangeClosed.v: index out of range [10] with length 3:
-    ./in.cue:209:29
+    ./in.cue:240:23
 [eval] indexTests.outOfRangeClosedNoElse.v: index out of range [100] with length 3:
-    ./in.cue:214:29
+    ./in.cue:246:23
 [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-    ./in.cue:259:12
+    ./in.cue:299:6
 [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-    ./in.cue:259:12
+    ./in.cue:299:6
 [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-    ./in.cue:259:12
+    ./in.cue:299:6
 [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
-    ./in.cue:259:12
+    ./in.cue:299:6
 [incomplete] refIntoTry.failedRef1.v: undefined field: foo:
-    ./in.cue:313:30
+    ./in.cue:360:24
 [incomplete] refIntoTry.failedRef2.v: undefined field: foo:
-    ./in.cue:316:30
+    ./in.cue:366:24
 [eval] errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
-    ./in.cue:330:18
+    ./in.cue:384:12
     ./in.cue:7:4
-    ./in.cue:330:23
+    ./in.cue:384:17
 [eval] errorPrecedence.divByZero.v: failed arithmetic: division by zero:
-    ./in.cue:341:18
+    ./in.cue:399:12
 [eval] errorPrecedence.conflictError.v: conflicting values "notanint" and 1 (mismatched types string and int):
     ./in.cue:7:4
-    ./in.cue:345:20
-    ./in.cue:346:9
-    ./in.cue:346:18
-    ./in.cue:346:23
+    ./in.cue:405:17
+    ./in.cue:406:3
+    ./in.cue:406:12
+    ./in.cue:406:17
 [eval] assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
-    ./in.cue:418:22
+    ./in.cue:492:16
 [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
-    ./in.cue:439:17
+    ./in.cue:518:11
 -- out/todo.txt --
 In v2, the try mechanism does not exist and many operations that succeed in v3
 produce errors in v2 (type errors, index out of range on open lists, etc.).

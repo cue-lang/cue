@@ -689,7 +689,7 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 		if len(positions) != len(ea.pos) {
 			var got []string
 			for _, p := range positions {
-				got = append(got, c.fmtPos(p))
+				got = append(got, fmtPos(p))
 			}
 			msg := formatPosCountMismatch("@test(err, pos=...)", len(positions), len(ea.pos))
 			return pathErr(path, "%s %v", msg, got)
@@ -721,7 +721,7 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 			if !found {
 				var got []string
 				for _, p := range positions {
-					got = append(got, c.fmtPos(p))
+					got = append(got, fmtPos(p))
 				}
 				wantLine := c.baseLine + exp.deltaLine
 				return pathErr(path, "@test(err, pos=...): no match for expected position %d:%d in %v",

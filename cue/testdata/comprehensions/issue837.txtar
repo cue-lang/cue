@@ -5,7 +5,9 @@
 
 #Manifest: {
 	ref:         #ManifestRef
-	description: #KumoriKinds[ref.kind]
+	description: #KumoriKinds[ref.kind] @test(err, code=incomplete,
+		contains="unresolved disjunction %v (type %s)",
+		args=["service" | "deployment", string], pos=[0:15])
 }
 
 #ManifestRef: kind: #KindsNames
@@ -23,6 +25,8 @@
 			service: (#Configure & {
 				_params: hsize: dep.hsize
 			}).service
+			@test(err, at=service.description.role, code=incomplete,
+				contains="undefined field: %s", args=[role], pos=[24:19])
 		}
 	}
 }
@@ -40,7 +44,8 @@
 				role: "admin"
 			}).out
 
-			role: configed.role
+			role: configed.role @test(err, code=incomplete,
+				contains="undefined field: %s", args=[role], pos=[0:19])
 		}
 	}
 }
@@ -51,9 +56,11 @@
 	}
 
 	out: {
-		labstr: $p.label
+		labstr: $p.label @test(err, code=eval,
+			contains="undefined field: %s", args=[label], pos=[0:14])
+
 	}
-} @test(err, code=eval, contains="undefined field: label", pos=[6:14])
+} @test(err, code=eval)
 
 #RoleSize: {
 	$_instances: >=0 | *1
@@ -65,17 +72,20 @@
 }
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
+@test(err, at=#ServiceManifest.description, code=incomplete,
+	contains="undefined field: %s", args=[service], pos=[-67:28])
+
 -- out/errors.txt --
 [incomplete] #Manifest.description: unresolved disjunction "service" | "deployment" (type string):
     ./in.cue:5:15
 [incomplete] #ServiceManifest.description: undefined field: service:
     ./in.cue:5:28
 [incomplete] #DoDeploy.deployment.description.service.description.role: undefined field: role:
-    ./in.cue:40:19
+    ./in.cue:44:19
 [incomplete] #Configure.service.description.role: undefined field: role:
-    ./in.cue:40:19
+    ./in.cue:44:19
 [eval] #RelabelService.out.labstr: undefined field: label:
-    ./in.cue:51:14
+    ./in.cue:56:14
 [incomplete] #ServiceManifest.description: undefined field: service:
     ./in.cue:5:28
 [incomplete] #ServiceManifest.description: undefined field: service:

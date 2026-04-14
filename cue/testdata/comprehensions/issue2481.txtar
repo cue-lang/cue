@@ -5,7 +5,6 @@
 // Mixing struct fields and embedded scalars should error. Using comprehensions
 // this follows a different path which may miss the error.
 // TODO: fix
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // Mixing struct fields and embedded scalars should error. Using comprehensions
 // this follows a different path which may miss the error.
@@ -19,6 +18,7 @@ out: {
 			}
 		}
 	}
+	@test(err, code=eval, contains="cannot combine regular field", pos=[31:2])
 }
 
 // multiple lets are mapped to the same location and will conflict. This is
@@ -34,18 +34,20 @@ multiLets: {
 			}
 		}
 	}
+	@test(eq, "b")
 }
 
 keys: [
 	// order matters
 	"a",
 	"b",
-]
+] @test(eq, ["a", "b"])
 
 values: {
 	// order does not matter
 	"b": "member"
 	"c": "foo"
+	@test(eq, {b: "member", c: "foo"})
 }
 
 full: {
@@ -53,13 +55,13 @@ full: {
 
 		// changing this to a list of the keys "fixes" things, i.e. this comprehension is required
 		for k, _ in #github_team_membership {
-	
+
 			// Remove this comprehension to trigger a different type of cycle error
 			if ( values[k] != _|_ ) {
-	
+
 				// This let is also required
 				let val = values[k]
-	
+
 				if val != null && ((val & string) != _|_) {
 					(k): val
 				}
@@ -76,6 +78,7 @@ full: {
 		"role":     "member"
 		"username": "foo"
 	}
+	@test(eq, {out: {role: "member"}, #github_team_membership: {team_id: string, role: string}, values: {role: "member", username: "foo"}})
 }
 -- out/eval/stats --
 Leaks:  3
@@ -89,46 +92,6 @@ Conjuncts:    54
 Disjuncts:    0
 
 NumCloseIDs: 22
--- out/evalalpha --
-Errors:
-out: cannot combine regular field "val" with "b":
-    ./in.cue:33:2
-
-Result:
-(_|_){
-  // [eval]
-  out: (_|_){
-    // [eval] out: cannot combine regular field "val" with "b":
-    //     ./in.cue:33:2
-    val: (string){ "b" }
-  }
-  multiLets: (string){
-    "b"
-    let val#1multi = 〈2;k〉
-  }
-  keys: (#list){
-    0: (string){ "a" }
-    1: (string){ "b" }
-  }
-  values: (struct){
-    b: (string){ "member" }
-    c: (string){ "foo" }
-  }
-  full: (struct){
-    out: (struct){
-      let val#2multi = 〈4;values〉[〈2;k〉]
-      role: (string){ "member" }
-    }
-    #github_team_membership: (#struct){
-      team_id: (string){ string }
-      role: (string){ string }
-    }
-    values: (struct){
-      role: (string){ "member" }
-      username: (string){ "foo" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

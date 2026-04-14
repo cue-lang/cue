@@ -13,7 +13,9 @@ circularFor: {
 		tail: #list | *null
 		for x in tail != null {
 		}
-		@test(err, code=eval, contains="cannot range over", pos=[2:12])
+		@test(err, code=eval,
+			contains="cannot range over %s (found %s, want list or struct)",
+			args=[tail != null, bool], pos=[2:12])
 	}
 }
 
@@ -46,21 +48,24 @@ conflictRangingOverSelf: {
 			(k): k
 		}
 	}
-	@test(err, code=eval, at=x.age, contains="conflicting values", pos=[3:9, 6:5, 7:3, 8:9])
+	@test(err, code=eval, at=x.age,
+		contains="conflicting values %s and %s (mismatched types %s and %s)",
+		args=[int, "age", int, string],
+		pos=[3:9, 6:5, 7:3, 8:9])
 }
 -- out/errors.txt --
 [eval] circularFor.#list: cannot range over tail != null (found bool, want list or struct):
     ./in.cue:13:12
 [incomplete] userError: non-concrete value string in operand to !=:
-    ./in.cue:23:5
-    ./in.cue:22:5
+    ./in.cue:25:5
+    ./in.cue:24:5
 [eval] intField: integer fields not supported:
-    ./in.cue:30:4
+    ./in.cue:32:4
 [eval] conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
-    ./in.cue:40:9
-    ./in.cue:43:5
-    ./in.cue:44:3
-    ./in.cue:45:9
+    ./in.cue:42:9
+    ./in.cue:45:5
+    ./in.cue:46:3
+    ./in.cue:47:9
 -- out/todo.txt --
 Missing error message.
 circularIf.#list.tail: v2 shows a more specific disjunction type with the recursive #list;

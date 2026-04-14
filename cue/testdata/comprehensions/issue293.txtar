@@ -22,10 +22,10 @@ z: #T & {
 		f1: 99
 		f2: "i want to disallow this"
 	}
-}
-@test(err, code=eval, at=z.x.f2, contains="field not allowed", pos=[-3:3])
+} @test(err, code=eval, at=x.f2, contains="field not allowed", pos=[3:3])
 
-t: #C
+
+t: #C @test(eq, {p: "foo"})
 #C: {
 	if true {
 		p: _
@@ -39,9 +39,9 @@ t: p: "foo"
 -- variant1.cue --
 #V1: {
 	x: close({ f1: int })
-	x: f2: 2
+	x: f2: 2 @test(err, code=eval, contains="field not allowed", pos=[0:5])
 }
-@test(err, code=eval, at=#V1.x.f2, contains="field not allowed", pos=[-2:5])
+
 -- out/errors.txt --
 [eval] z.x.f2: field not allowed:
     ./in.cue:19:3

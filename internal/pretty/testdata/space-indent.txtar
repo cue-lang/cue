@@ -1,0 +1,20 @@
+# Multi-line input: Newline RelPos honoured.
+# Without RelPos at width 8: doesn't fit, so breaks anyway.
+-- config --
+width: 8
+indent: 2
+-- in.cue --
+{
+  a: 1
+  b: 2
+}
+-- out/relpos --
+{
+  a: 1
+  b: 2
+}
+-- out/norelpos --
+{
+  a: 1
+  b: 2
+}

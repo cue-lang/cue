@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cb5546b_facb7350",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 1613,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T19:02:14Z",
+      "side": 1,
+      "message": "Done. Removed `\"[int]\"` from the case — only `\"int\"` remains.",
+      "parentUuid": "dc2173c1_56f5b4d1",
+      "revId": "9cb27d6a8a8e88c020f095a8ea0eb10b0e41d985",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

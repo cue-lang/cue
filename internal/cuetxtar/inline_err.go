@@ -70,6 +70,11 @@ type errArgs struct {
 	// annotated field before checking the error. Allows asserting errors in
 	// sub-fields that cannot be directly annotated.
 	at string
+	// path is the expected dotted CUE path reported by the error itself
+	// (cueerrors.Error.Path() joined with "."). This may differ from at=: at=
+	// navigates where we check, while path= asserts what the error reports as
+	// its own location. An empty string means no path check is performed.
+	path string
 	// pos lists expected error positions as (deltaLine:col) pairs relative to
 	// the line containing the @test attribute.
 	pos []posSpec
@@ -141,11 +146,28 @@ func (ea *errArgs) validateErrProperties(val cue.Value) error {
 	}
 	if ea.contains != "" {
 		msg := valErr(val).Error()
-		if !strings.Contains(msg, ea.contains) {
+		if !ea.containsMatch(msg, valErr(val)) {
 			return fmt.Errorf("expected error message to contain %q, got %q", ea.contains, msg)
 		}
 	}
 	return nil
+}
+
+// containsMatch reports whether ea.contains appears in the rendered error
+// message or, if err implements cueerrors.Error, in the raw Msg() format
+// string. Checking the format string allows contains= written as the
+// literal format (e.g. "conflicting values %s and %s") to match even when
+// the rendered message has the args substituted.
+func (ea *errArgs) containsMatch(msg string, err error) bool {
+	if strings.Contains(msg, ea.contains) {
+		return true
+	}
+	var ce cueerrors.Error
+	if errors.As(err, &ce) {
+		format, _ := ce.Msg()
+		return strings.Contains(format, ea.contains)
+	}
+	return false
 }
 
 // posUpdate records a pending pos=[...] replacement within a suberr=(...) group.
@@ -176,6 +198,8 @@ func parseErrArgs(a *internal.Attr) (errArgs, error) {
 			ea.any = true
 		case kv.Key() == "at":
 			ea.at = kv.Value()
+		case kv.Key() == "path":
+			ea.path = kv.Value()
 		case kv.Key() == "pos":
 			specs, err := parsePosSpecs(kv.Value())
 			if err != nil {
@@ -302,7 +326,10 @@ func parsePosSpecs(s string) ([]posSpec, error) {
 }
 
 // parseArgsList parses a bracket-enclosed, comma-separated list of arg strings,
-// e.g. "[list, int]" → ["list", "int"].
+// e.g. `["list", "int"]` → ["list", "int"].
+// Tokens wrapped in double quotes are unquoted via strconv.Unquote so that the
+// stored form (produced by formatErrMsg using strconv.Quote) round-trips back to
+// the original string that fmt.Sprint of the Msg() argument would produce.
 func parseArgsList(s string) ([]string, error) {
 	inner, err := trimSurrounding(s, '[', ']')
 	if err != nil {
@@ -327,9 +354,15 @@ func parseArgsList(s string) ([]string, error) {
 //
 // code= is not checked here because cueerrors.Error does not expose adt.Code
 // directly; code checking is done at the cue.Value level in runErrAssertion.
-func (r *inlineRunner) matchesErrSpec(act cueerrors.Error, ea *errArgs, baseLine int) bool {
-	if ea.contains != "" && !strings.Contains(act.Error(), ea.contains) {
+func (r *inlineRunner) matchesErrSpec(act cueerrors.Error, ea *errArgs, baseLine int, fieldPath string) bool {
+	if ea.contains != "" && !ea.containsMatch(act.Error(), act) {
 		return false
+	}
+	if ea.path != "" {
+		gotPath := strings.Join(act.Path(), ".")
+		if relativePathTo(gotPath, fieldPath) != ea.path && gotPath != ea.path {
+			return false
+		}
 	}
 	// Only use pos for discrimination when it is non-empty. An empty pos=[]
 	// is a placeholder; positions are validated separately by checkSubErrPositions.
@@ -364,11 +397,17 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		return
 	}
 	ea := pa.errArgs
-	if ea == nil {
-		// Bare @test(err) — just check that the value is an error.
+	// Bare @test(err): no arguments beyond the "err" directive keyword itself.
+	// parseErrArgs always returns a non-nil errArgs, so check the field count.
+	if ea == nil || (pa.raw != nil && len(pa.raw.Fields) == 1) {
+		// Bare @test(err) — check that the value is an error.
 		if err := checkIsErr(val); err != nil {
 			t.Errorf("path %s: %v", path, err)
 			logHint(t, pa.hint)
+			return
+		}
+		if cuetest.UpdateGoldenFiles {
+			r.enqueueInlineFill(pa, r.formatErrFillAttr(val, pa, path.String(), ""))
 		}
 		return
 	}
@@ -391,11 +430,19 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 			codes:    ea.codes,
 			contains: ea.contains,
 			any:      false, // don't cascade any= to the sub-check
+			path:     ea.path,
 			posSet:   ea.posSet,
 			pos:      ea.pos,
 			suberrs:  ea.suberrs,
 			msgArgs:  ea.msgArgs,
 			// at is intentionally omitted: we already navigated to the sub-path.
+		}
+		// Bare @test(err, at=<path>): only at= present, no other constraints.
+		// Fill from the sub-path error when CUE_UPDATE=1.
+		if ea.isBareAt() && cuetest.UpdateGoldenFiles && pa.srcAttr != nil {
+			if checkIsErr(subVal) == nil {
+				r.enqueueInlineFill(pa, r.formatErrFillAttrAt(subVal, pa, ea.at))
+			}
 		}
 		r.runErrAssertion(t, subFullPath, subVal, subPA)
 		return
@@ -424,6 +471,18 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 	if err := ea.validateErrProperties(val); err != nil {
 		t.Errorf("path %s: @test(err): %v", path, err)
 		logHint(t, pa.hint)
+	}
+	// Validate error path (cueerrors.Error.Path joined with ".", relative to the annotated field).
+	if ea.path != "" {
+		var e cueerrors.Error
+		if errors.As(val.Err(), &e) {
+			gotPath := strings.Join(e.Path(), ".")
+			gotRel := relativePathTo(gotPath, path.String())
+			if gotRel != ea.path && gotPath != ea.path {
+				t.Errorf("path %s: @test(err, path=...): expected error path %q, got %q", path, ea.path, gotRel)
+				logHint(t, pa.hint)
+			}
+		}
 	}
 	// Validate Msg() args (order-independent).
 	if len(ea.msgArgs) > 0 {
@@ -459,6 +518,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 // the form "N errors in empty disjunction:" to the list; checkSubErrors
 // detects and skips this header.
 func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value, ea *errArgs, pa parsedTestAttr) {
+	fieldPath := path.String()
 	t.Helper()
 	all := cueerrors.Errors(val.Err())
 	// Skip the disjunction header entry if present.
@@ -499,7 +559,7 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 			continue
 		}
 		for j, act := range actual {
-			if !usedAct[j] && r.matchesErrSpec(act, exp, pa.baseLine) {
+			if !usedAct[j] && r.matchesErrSpec(act, exp, pa.baseLine, fieldPath) {
 				usedAct[j] = true
 				expMatched[i] = true
 				pairs = append(pairs, matchedPair{act, exp, i})
@@ -521,7 +581,7 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 		}
 		matched := false
 		for j, act := range actual {
-			if !usedAct[j] && r.matchesErrSpec(act, exp, pa.baseLine) {
+			if !usedAct[j] && r.matchesErrSpec(act, exp, pa.baseLine, fieldPath) {
 				usedAct[j] = true
 				expMatched[i] = true
 				matched = true
@@ -595,8 +655,16 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 	if needWriteback {
 		r.enqueueSubErrPosWrites(pa, posUpdates)
 	}
-	// Validate Msg() args for matched pairs (order-independent).
+	// Validate Msg() args and path for matched pairs (order-independent).
 	for _, p := range pairs {
+		if p.exp.path != "" {
+			gotPath := strings.Join(p.act.Path(), ".")
+			gotRel := relativePathTo(gotPath, fieldPath)
+			if gotRel != p.exp.path && gotPath != p.exp.path {
+				t.Errorf("path %s: @test(err, suberr=...): expected error path %q, got %q", path, p.exp.path, gotRel)
+				logHint(t, pa.hint)
+			}
+		}
 		if len(p.exp.msgArgs) > 0 {
 			checkMsgArgs(t, path, p.act, p.exp.msgArgs, "@test(err, suberr=...)", pa.hint)
 		}
@@ -636,11 +704,29 @@ func replacePosSpec(text string, offset int, newContent string) (string, bool) {
 // (e.g. "@test(err, code=eval, pos=[])"); it is located by substring search
 // within the outer @test(eq,...) attribute text and the pos=[...] within it is
 // replaced with the formatted positions.
+//
+// Multiple calls for the same outer attribute accumulate into nestedPosFills
+// (keyed by outer attr byte offset) so that all fills are applied sequentially
+// to the same evolving text, rather than each independently overwriting the
+// original. applyInlineFillWritebacks drains nestedPosFills into pendingPosWrites.
 func (r *inlineRunner) enqueueNestedPosWrite(outerPa parsedTestAttr, innerAttrText string, positions []token.Pos) {
-	outerText := outerPa.srcAttr.Text
-	innerIdx := strings.Index(outerText, innerAttrText)
+	outerOffset := outerPa.srcAttr.Pos().Offset()
+	if r.nestedPosFills == nil {
+		r.nestedPosFills = make(map[int]*nestedPosFillEntry)
+	}
+	entry, ok := r.nestedPosFills[outerOffset]
+	if !ok {
+		entry = &nestedPosFillEntry{
+			fileName:    outerPa.srcFileName,
+			attrOffset:  outerOffset,
+			attrLen:     len(outerPa.srcAttr.Text),
+			currentText: outerPa.srcAttr.Text,
+		}
+		r.nestedPosFills[outerOffset] = entry
+	}
+	innerIdx := strings.Index(entry.currentText, innerAttrText)
 	if innerIdx < 0 {
-		return // inner attr not found in outer text — skip
+		return // inner attr not found — skip
 	}
 	// Use baseLine=0 so specs are absolute line numbers, matching the
 	// cmpCtx.baseLine=0 convention used when checking nested pos= in cmpErr.
@@ -648,16 +734,10 @@ func (r *inlineRunner) enqueueNestedPosWrite(outerPa parsedTestAttr, innerAttrTe
 	for i, p := range positions {
 		parts[i] = r.formatPosSpec(p, 0, outerPa.srcFileName)
 	}
-	newAttrText, ok := replacePosSpec(outerText, innerIdx, strings.Join(parts, ", "))
-	if !ok {
-		return
+	newText, replaced := replacePosSpec(entry.currentText, innerIdx, strings.Join(parts, ", "))
+	if replaced {
+		entry.currentText = newText
 	}
-	r.pendingPosWrites = append(r.pendingPosWrites, posWrite{
-		fileName:    outerPa.srcFileName,
-		attrOffset:  outerPa.srcAttr.Pos().Offset(),
-		attrLen:     len(outerPa.srcAttr.Text),
-		newAttrText: newAttrText,
-	})
 }
 
 func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUpdate) {
@@ -973,4 +1053,196 @@ func (r *inlineRunner) findDescendantError(val cue.Value, ea *errArgs) bool {
 		}
 	}
 	return false
+}
+
+// isBareAt reports whether ea has only at= set and no other constraints.
+// Used to detect @test(err, at=<path>) that should be auto-filled from the
+// sub-path error on CUE_UPDATE=1.
+func (ea *errArgs) isBareAt() bool {
+	return ea.codes == nil && ea.contains == "" && !ea.any && ea.path == "" &&
+		!ea.posSet && ea.suberrs == nil && ea.msgArgs == nil
+}
+
+// formatErrFillAttrAt generates a filled @test(err, at=<atPath>, ...) string
+// by delegating to formatErrFillAttr and injecting the at= flag immediately
+// after the opening "err" keyword.
+func (r *inlineRunner) formatErrFillAttrAt(val cue.Value, pa parsedTestAttr, atPath string) string {
+	fill := r.formatErrFillAttr(val, pa, "", atPath)
+	// fill is "@test(err, ...)" or "@test(err)" (no error case).
+	// Insert ", at=<path>" right after "@test(err".
+	const marker = "@test(err"
+	if !strings.HasPrefix(fill, marker) {
+		return fill
+	}
+	rest := fill[len(marker):]
+	// rest starts with ")" or ", ...". Prepend the at= flag.
+	if rest == ")" {
+		return marker + ", at=" + atPath + ")"
+	}
+	return marker + ", at=" + atPath + rest
+}
+
+// isRedundantPath reports whether epath is redundant given atPath.
+// When the at= flag already navigates to a sub-path, the error's own path
+// (epath) is a postfix of that sub-path — generating path= would duplicate
+// information that at= already encodes. Returns true when atPath is non-empty
+// and is a path-boundary-aware suffix of epath:
+//
+//	isRedundantPath("a.b", "x.a.b") == true   (suffix at "." boundary)
+//	isRedundantPath("a.b", "a.b")   == true   (exact match)
+//	isRedundantPath("a.b", "xa.b")  == false  (no boundary before "a.b")
+//	isRedundantPath("", "a.b")      == false  (no at= present)
+func isRedundantPath(atPath, epath string) bool {
+	if atPath == "" || epath == "" {
+		return false
+	}
+	return epath == atPath || strings.HasSuffix(epath, "."+atPath)
+}
+
+// relativePathTo returns epath relative to fieldPath:
+//   - "" if epath == fieldPath (caller should suppress path=)
+//   - epath[len(fieldPath)+1:] if epath starts with fieldPath+"."
+//   - epath unchanged otherwise (error outside the field's subtree)
+func relativePathTo(epath, fieldPath string) string {
+	if fieldPath == "" {
+		return epath
+	}
+	if epath == fieldPath {
+		return ""
+	}
+	if strings.HasPrefix(epath, fieldPath+".") {
+		return epath[len(fieldPath)+1:]
+	}
+	return epath
+}
+
+// errFillIndent returns the indentation to use for suberr=(...) continuation
+// lines in a multi-error fill: the @test attribute's own source-line
+// indentation (tabs only) plus one additional tab.
+func (r *inlineRunner) errFillIndent(pa parsedTestAttr) string {
+	if pa.srcAttr == nil {
+		return "\t"
+	}
+	return r.attrLineIndent(pa) + "\t"
+}
+
+// formatErrFillAttr formats a filled @test(err, ...) attribute string for val.
+// Used by CUE_UPDATE=1 to replace bare @test(err) placeholders.
+//
+// fieldPath is the CUE path string (dot-joined) of the field being annotated.
+// path= is suppressed when the error's own path equals fieldPath (error is at
+// the current field) or when atPath is a path-boundary suffix of the error's
+// path (the at= flag already encodes that location).
+//
+// Single errors produce:
+//
+//	@test(err, code=eval, contains="format string", args=["arg"], pos=[0:5])
+//
+// Multi-error values produce one suberr=(...) per sub-error, each on its own line:
+//
+//	@test(err,
+//		suberr=(contains="...", pos=[0:5]),
+//		suberr=(contains="...", pos=[]))
+func (r *inlineRunner) formatErrFillAttr(val cue.Value, pa parsedTestAttr, fieldPath, atPath string) string {
+	err := valErr(val)
+	if err == nil {
+		return "@test(err)"
+	}
+
+	all := cueerrors.Errors(err)
+	actual := all
+	if len(all) > 1 && isDisjunctionHeader(all[0]) {
+		actual = all[1:]
+	}
+
+	var b strings.Builder
+	b.WriteString("@test(err")
+
+	if len(actual) <= 1 {
+		// Single error: include code, path, contains, args, pos inline.
+		if code := errCodeStr(val); code != "" {
+			b.WriteString(", code=")
+			b.WriteString(code)
+		}
+		var e cueerrors.Error
+		if errors.As(err, &e) {
+			if epath := strings.Join(e.Path(), "."); epath != "" && !isRedundantPath(atPath, epath) {
+				if rel := relativePathTo(epath, fieldPath); rel != "" {
+					b.WriteString(", path=")
+					b.WriteString(rel)
+				}
+			}
+			formatErrMsg(&b, e)
+			positions := positionsFromSingleError(e)
+			r.formatErrPos(&b, positions, pa)
+		}
+	} else {
+		// Multiple sub-errors: include code= at the outer level, then one
+		// suberr=(...) per error, each on its own line, indented one tab beyond
+		// the @test attribute's own indentation level.
+		// code= is taken from the outer value and reused in suberr entries
+		// because cueerrors.Error does not expose the error code directly.
+		code := errCodeStr(val)
+		if code != "" {
+			b.WriteString(", code=")
+			b.WriteString(code)
+		}
+		indent := r.errFillIndent(pa)
+		for _, e := range actual {
+			b.WriteString(",\n")
+			b.WriteString(indent)
+			// Build the suberr body in a separate builder so we can strip the
+			// leading ", " that formatErrMsg always prepends — inside suberr=(...)
+			// there is no preceding content to separate from.
+			var inner strings.Builder
+			if code != "" {
+				fmt.Fprintf(&inner, ", code=%s", code)
+			}
+			if epath := strings.Join(e.Path(), "."); epath != "" && !isRedundantPath(atPath, epath) {
+				if rel := relativePathTo(epath, fieldPath); rel != "" {
+					fmt.Fprintf(&inner, ", path=%s", rel)
+				}
+			}
+			formatErrMsg(&inner, e)
+			positions := positionsFromSingleError(e)
+			r.formatErrPos(&inner, positions, pa)
+			b.WriteString("suberr=(")
+			b.WriteString(strings.TrimPrefix(inner.String(), ", "))
+			b.WriteByte(')')
+		}
+	}
+
+	b.WriteByte(')')
+	return b.String()
+}
+
+// formatErrMsg appends contains= and (if present) args= for e to b.
+// The format string from Msg() is used verbatim as contains=; args holds the
+// raw fmt.Sprint representations of any Msg() arguments.
+func formatErrMsg(b *strings.Builder, e cueerrors.Error) {
+	format, args := e.Msg()
+	b.WriteString(", contains=")
+	b.WriteString(strconv.Quote(format))
+	if len(args) > 0 {
+		b.WriteString(", args=[")
+		for i, a := range args {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			fmt.Fprint(b, a)
+		}
+		b.WriteByte(']')
+	}
+}
+
+// formatErrPos appends a pos=[...] spec for positions to b.
+func (r *inlineRunner) formatErrPos(b *strings.Builder, positions []token.Pos, pa parsedTestAttr) {
+	b.WriteString(", pos=[")
+	for i, p := range positions {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(r.formatPosSpec(p, pa.baseLine, pa.srcFileName))
+	}
+	b.WriteByte(']')
 }

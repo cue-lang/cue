@@ -16,6 +16,9 @@ wrongEq: {b: 1, a: null & string} @test(eq, {b: 1, a: _|_ @test(err, contains="W
 inAlias: x={
 	bad: 1 & x @test(err, contains="WRONG")
 }
+
+rightFmt: int & string @test(err, contains="conflicting values %s and %s (mismatched types %s and %s)")
+
 -- out/run/errors.txt --
 path wrong: @test(err): expected error message to contain "WRONG_SUBSTRING", got "wrong: conflicting values 2 and 1"
 path wrongEq: a: expected error message to contain "WRONG_SUBSTRING", got "wrongEq.a: conflicting values null and string (mismatched types null and string)"
@@ -30,6 +33,9 @@ wrongEq: {b: 1, a: null & string} @test(err)
 inAlias: x={
 	bad: 1 & x @test(err, contains="WRONG")
 }
+
+rightFmt: int & string @test(err, contains="conflicting values %s and %s (mismatched types %s and %s)")
+
 -- out/force/errors.txt --
 path wrong: @test(err): expected error message to contain "WRONG_SUBSTRING", got "wrong: conflicting values 2 and 1"
 path inAlias.bad: @test(err): expected error message to contain "WRONG", got "inAlias.bad: conflicting values 1 and {bad:(1 & x)} (mismatched types int and struct)"

@@ -55,18 +55,18 @@ simplifyExpr: {
 	i:      int
 	f:      float
 	b:      bytes
-	basic1: <(i)  @test(err)
-	basic2: >(n)  @test(err)
-	basic3: >=(s) @test(err)
-	basic4: <=(f) @test(err)
-	basic5: <=(b) @test(err)
+	basic1: <(i)  @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[i, <], pos=[0:12])
+	basic2: >(n)  @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[n, >], pos=[0:12])
+	basic3: >=(s) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[s, >=], pos=[0:13])
+	basic4: <=(f) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[f, <=], pos=[0:13])
+	basic5: <=(b) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[b, <=], pos=[0:13])
 
 	// Do NOT interpret this the same as `!= type`.
-	bne1: !=(s) @test(err)
-	bne2: !=(n) @test(err)
-	bne3: !=(n) @test(err)
-	bne4: !=(i) @test(err)
-	bne5: !=(b) @test(err)
+	bne1: !=(s) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[s, !=], pos=[0:11])
+	bne2: !=(n) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[n, !=], pos=[0:11])
+	bne3: !=(n) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[n, !=], pos=[0:11])
+	bne4: !=(i) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[i, !=], pos=[0:11])
+	bne5: !=(b) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[b, !=], pos=[0:11])
 
 	e1: <(=~"foo") @test(err, code=incomplete, contains="non-concrete value =~", pos=[0:8])
 	e2: >(null)    @test(err, code=eval, contains="cannot use null for bound", pos=[0:8])

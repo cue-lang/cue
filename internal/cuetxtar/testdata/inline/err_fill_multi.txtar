@@ -1,0 +1,11 @@
+# Tests that CUE_UPDATE=1 fills bare @test(err) on a disjunction value with
+# multiple sub-errors using suberr=(...) entries, one per sub-error.
+-- in/test.cue --
+x: ({a: int & string} | {b: int & bool}) @test(err)
+-- out/update/test.cue --
+x: ({a: int & string} | {b: int & bool}) @test(err, code=eval,
+	suberr=(code=eval, path=a, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[int, string, int, string], pos=[0:9, 0:15]),
+	suberr=(code=eval, path=b, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[int, bool, int, bool], pos=[0:29, 0:35]))
+-- out/status.txt --
+update: output passes run
+force:  identical to update

@@ -92,6 +92,13 @@ func TestInlineRunner_Basic(t *testing.T) {
 				"#S: {x: 1, #D: \"d\"}\n" +
 				`data: [#S & {}] @test(eq, [{x: 1, #D: "d"}])` + "\n",
 		},
+		{
+			// Structs with an embedded scalar (e.g. {let X = v*4; X}) must include
+			// the embedded value in the @test(eq) body — {4}, not {}.
+			name: "eq passes for list with embedded-scalar struct elements",
+			archive: "-- test.cue --\n" +
+				"data: [for v in [1] {\n\tlet X = v*4\n\tX\n}] @test(eq, [{4}])\n",
+		},
 	}
 
 	for _, tt := range tests {

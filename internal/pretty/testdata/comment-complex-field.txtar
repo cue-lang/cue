@@ -1,0 +1,19 @@
+-- in.cue --
+{
+// doc on struct field
+x: {
+a: 1
+}
+}
+-- out/relpos --
+{
+	// doc on struct field
+	x: {
+		a: 1
+	}
+}
+-- out/norelpos --
+{
+	// doc on struct field
+	x: {a: 1}
+}

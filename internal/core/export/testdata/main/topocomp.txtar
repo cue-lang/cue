@@ -26,13 +26,11 @@ view: {
 -- out/value-v3 --
 == Simplified
 {
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-		}
+	out: top: {
+		A1: true
+		A2: true
+		B1: true
+		B2: true
 	}
 	view: {
 		A1: "A1"
@@ -43,13 +41,11 @@ view: {
 }
 == Raw
 {
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-		}
+	out: top: {
+		A1: true
+		A2: true
+		B1: true
+		B2: true
 	}
 	view: {
 		A1: "A1"
@@ -60,13 +56,11 @@ view: {
 }
 == Final
 {
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-		}
+	out: top: {
+		A1: true
+		A2: true
+		B1: true
+		B2: true
 	}
 	view: {
 		A1: "A1"
@@ -77,13 +71,11 @@ view: {
 }
 == All
 {
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-		}
+	out: top: {
+		A1: true
+		A2: true
+		B1: true
+		B2: true
 	}
 	view: {
 		A1: "A1"
@@ -94,13 +86,11 @@ view: {
 }
 == Eval
 {
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-		}
+	out: top: {
+		A1: true
+		A2: true
+		B1: true
+		B2: true
 	}
 	view: {
 		A1: "A1"
@@ -113,12 +103,8 @@ view: {
 out: {
 	for x in ["A", "B"] {
 		top: {
-			{
-				"\(x)1": true
-			}
-			{
-				"\(x)2": true
-			}
+			{"\(x)1": true}
+			{"\(x)2": true}
 		}
 	}
 }
@@ -131,12 +117,8 @@ view: {
 out: {
 	for x in ["A", "B"] {
 		top: {
-			{
-				"\(x)1": true
-			}
-			{
-				"\(x)2": true
-			}
+			{"\(x)1": true}
+			{"\(x)2": true}
 		}
 	}
 }

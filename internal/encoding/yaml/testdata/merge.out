@@ -1,15 +1,7 @@
 // From http://yaml.org/type/merge.html
 // Test
 anchors: {
-	list: [{
-		x: 1, y: 2
-	}, {
-		x: 0, y: 2
-	}, {
-		r: 10
-	}, {
-		r: 1
-	}]
+	list: [{x: 1, y: 2}, {x: 0, y: 2}, {r: 10}, {r: 1}]
 }
 
 // All the following maps are equal:

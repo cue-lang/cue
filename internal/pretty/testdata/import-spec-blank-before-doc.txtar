@@ -1,0 +1,31 @@
+# When two specs in a single parenthesised import group are separated
+# by a blank line and the second spec has a doc comment, the parser
+# attaches the NewSection RelPos to the doc comment (the first visible
+# token of the spec), not the spec itself. importDecl uses leadingRel
+# so the blank line is preserved - without it, the spec's own RelPos
+# is just Newline and the blank gets silently dropped.
+-- in.cue --
+package p
+
+import (
+	"a"
+
+	// doc on b
+	"b"
+)
+-- out/relpos --
+package p
+
+import (
+	"a"
+
+	// doc on b
+	"b"
+)
+-- out/norelpos --
+package p
+import (
+	"a"
+	// doc on b
+	"b"
+)

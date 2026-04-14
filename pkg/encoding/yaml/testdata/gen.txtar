@@ -74,13 +74,9 @@ t9: """
 
 	"""
 unmarshalStream: {
-	t1: [{
-		a: 1
-	}, {
-		b: 2
-	}]
+	t1:    [{a: 1}, {b: 2}]
 	empty: [*null | _]
-	nums: [1, 2]
+	nums:  [1, 2]
 	null1: [1, null, 2]
 	null2: [1, null, 2]
 }

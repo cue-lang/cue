@@ -1,0 +1,10 @@
+-- in.cue --
+{
+for   k,   v   in   x  {   (k): v}
+}
+-- out/relpos --
+{
+	for k, v in x {(k): v}
+}
+-- out/norelpos --
+{for k, v in x {(k): v}}

@@ -42,7 +42,7 @@ package a
 out: "A" | // first letter
 	"B" | // second letter
 	"C" | // third letter
-										"D" // fourth letter
+	"D"   // fourth letter
 -- m/a/nopkg.cue --
 x: 3
     y: x
@@ -98,7 +98,7 @@ x: 4
 		})
 	})
 
-	t.Run("format with broken formatter", func(t *testing.T) {
+	t.Run("format with fixed formatter", func(t *testing.T) {
 		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.Await(

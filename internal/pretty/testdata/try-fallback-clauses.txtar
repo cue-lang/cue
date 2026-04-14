@@ -1,0 +1,64 @@
+# Exercises the try-clause and fallback-clause rendering paths of the
+# comprehension converter. Requires @experiment(try) so the parser
+# recognises `try`, `else`, and `fallback` keywords. Note that the
+# parser normalises `fallback` to the AST node that the pretty-printer
+# emits as `otherwise` after a for-clause and as `else` after an
+# if/try-clause, per the keyword rule in fallbackClause.
+-- in.cue --
+@experiment(try)
+a: {
+	if false {
+		x: 1
+	} else {
+		x: 2
+	}
+}
+b: {
+	for x in [] {
+		y: x
+	} fallback {
+		y: 0
+	}
+}
+c: {
+	for x in y try z = x {
+		z
+	}
+}
+d: {
+	for x in y try {
+		z: x
+	}
+}
+-- out/relpos --
+@experiment(try)
+a: {
+	if false {
+		x: 1
+	} else {
+		x: 2
+	}
+}
+b: {
+	for x in [] {
+		y: x
+	} otherwise {
+		y: 0
+	}
+}
+c: {
+	for x in y try z = x {
+		z
+	}
+}
+d: {
+	for x in y try {
+		z: x
+	}
+}
+-- out/norelpos --
+@experiment(try)
+a: {if false {x: 1} else {x: 2}}
+b: {for x in [] {y: x} otherwise {y: 0}}
+c: {for x in y try z = x {z}}
+d: {for x in y try {z: x}}

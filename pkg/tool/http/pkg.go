@@ -30,8 +30,8 @@
 //
 //		request: {
 //			body?: bytes | string
-//			header: [string]: [string, ...string]
-//			trailer: [string]: [string, ...string]
+//			header: [string]: string | [...string]
+//			trailer: [string]: string | [...string]
 //		}
 //		response: {
 //			status:     string
@@ -227,8 +227,8 @@ var p = &pkg.Package{
 		}
 		request: {
 			body?: bytes | string
-			header: [string]: [string, ...string]
-			trailer: [string]: [string, ...string]
+			header: [string]: string | [...string]
+			trailer: [string]: string | [...string]
 		}
 		response: {
 			status:     string

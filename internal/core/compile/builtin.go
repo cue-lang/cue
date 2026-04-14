@@ -266,6 +266,73 @@ var orBuiltin = &adt.Builtin{
 	},
 }
 
+// boolListOp is the shared implementation for all() and some(). It evaluates
+// every element strictly: any error or incomplete value causes an error even
+// if the boolean result is already determined. identity=true means all (AND),
+// identity=false means some (OR). Requires @experiment(shortcircuit).
+func boolListOp(call adt.BuiltinCallContext, identity bool, opName string) adt.Expr {
+	if !call.Pos().Experiment().ShortCircuit {
+		return call.OpContext().NewErrf("%s requires @experiment(shortcircuit)", opName)
+	}
+	c := call.OpContext()
+	result := identity
+	var firstErr *adt.Bottom
+	for elem := range c.Elems(call.Value(0)) {
+		val := elem.Value()
+		switch v := val.(type) {
+		case *adt.Bool:
+			if identity {
+				result = result && v.B
+			} else {
+				result = result || v.B
+			}
+		case *adt.Bottom:
+			if firstErr == nil {
+				firstErr = v
+			}
+		default:
+			if elem.Kind()&adt.BoolKind == 0 {
+				return c.NewErrf("non-bool value in call to %s", opName)
+			}
+			if firstErr == nil {
+				b := c.NewErrf("incomplete bool in call to %s", opName)
+				b.Code = adt.IncompleteError
+				firstErr = b
+			}
+		}
+	}
+	if firstErr != nil {
+		return firstErr
+	}
+	return c.NewBool(result)
+}
+
+// allBuiltin returns true if every element of the list is true (identity for
+// empty list), false if any element is false. Any error or incomplete element
+// causes an error. Requires @experiment(shortcircuit).
+var allBuiltin = &adt.Builtin{
+	Name:   "all",
+	Added:  "v0.17.0",
+	Params: []adt.Param{listParam},
+	Result: adt.BoolKind,
+	Func: func(call adt.BuiltinCallContext) adt.Expr {
+		return boolListOp(call, true, "all")
+	},
+}
+
+// someBuiltin returns true if any element of the list is true, false if all
+// elements are false (identity for empty list). Any error or incomplete element
+// causes an error. Requires @experiment(shortcircuit).
+var someBuiltin = &adt.Builtin{
+	Name:   "some",
+	Added:  "v0.17.0",
+	Params: []adt.Param{listParam},
+	Result: adt.BoolKind,
+	Func: func(call adt.BuiltinCallContext) adt.Expr {
+		return boolListOp(call, false, "some")
+	},
+}
+
 var divBuiltin = &adt.Builtin{
 	Name:   "div",
 	Params: []adt.Param{intParam, intParam},

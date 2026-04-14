@@ -1,0 +1,78 @@
+# A `//` comment on its own line after the last element of a list,
+# before the closing bracket, attaches to the previous element at
+# Position=2 (the parser has nowhere else to put it). It must NOT be
+# folded into the previous element's value cell — that would put the
+# trailing comma after the comment text, which `//` would then absorb,
+# producing `// comment,` and a missing comma after the value.
+#
+# The fix: such own-line comments emerge from listElemRow as
+# "post-element" comments and are inserted as their own Raw rows in
+# the list's table, so the comma stays glued to the value and the
+# comment renders on its own line(s).
+-- in.cue --
+steps: [
+	a,
+	b,
+
+	// comment
+]
+
+call: f(
+	x,
+	y,
+	// trailing
+)
+
+// also covers multiple post-comments and consecutive ones with no
+// blank line between them
+multi: [
+	x,
+
+	// first
+
+	// second
+	// third
+]
+-- out/relpos --
+steps: [
+	a,
+	b,
+
+	// comment
+]
+
+call: f(
+	x,
+	y
+	// trailing
+)
+
+// also covers multiple post-comments and consecutive ones with no
+// blank line between them
+multi: [
+	x,
+
+	// first
+
+	// second
+	// third
+]
+-- out/norelpos --
+steps: [
+	a,
+	b,
+	// comment
+]
+call: f(
+	x,
+	y
+	// trailing
+)
+// also covers multiple post-comments and consecutive ones with no
+// blank line between them
+multi: [
+	x,
+	// first
+	// second
+	// third
+]

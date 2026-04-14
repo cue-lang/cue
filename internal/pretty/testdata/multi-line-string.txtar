@@ -1,0 +1,15 @@
+-- in.cue --
+x: """
+	hello
+	world
+	"""
+-- out/relpos --
+x: """
+	hello
+	world
+	"""
+-- out/norelpos --
+x: """
+	hello
+	world
+	"""

@@ -1,0 +1,29 @@
+# A comment that appears AFTER the last field of a struct but BEFORE
+# the closing `}` is attached by the parser to the containing
+# StructLit with Position=2 (meaning "between last element and `}`"
+# per CUE's `<0> { <1> Elts <2> } <3>` numbering). It must stay in
+# that position when rendered; the previous implementation treated
+# all non-doc non-trailing interior comments as "prefix" and
+# prepended them, moving the comment to the top of the struct.
+-- in.cue --
+list1: [
+	{
+		key1: "value1"
+		key2: "value2"
+		// key3: "value3"
+	},
+]
+-- out/relpos --
+list1: [
+	{
+		key1: "value1"
+		key2: "value2"
+		// key3: "value3"
+	},
+]
+-- out/norelpos --
+list1: [{
+	key1: "value1"
+	key2: "value2"
+	// key3: "value3"
+}]

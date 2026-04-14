@@ -1,0 +1,21 @@
+# Attributes get their own column and align across rows, just like
+# trailing comments do. A row without attributes has a nil cell in
+# the attr column so the later columns still line up; a row without
+# comments emits nothing for the comment column.
+-- config --
+width: 40
+-- in.cue --
+{
+	name: string     @go(Name)
+longField:   int @go(LongField)
+}
+-- out/relpos --
+{
+	name:      string @go(Name)
+	longField: int    @go(LongField)
+}
+-- out/norelpos --
+{
+	name:      string @go(Name)
+	longField: int    @go(LongField)
+}

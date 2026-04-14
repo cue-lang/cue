@@ -1,0 +1,57 @@
+# Field rows can break before their value when their flat width
+# exceeds the available budget. The break only fires for single-row
+# segments (so multi-row alignment, even when slightly overflowing,
+# still wins) and only when the second cell is atomic — that is,
+# its Doc has no internal Group / soft Line / Table that could break
+# on its own. The restriction keeps `key: {…}` style hugging intact
+# for struct/list values: the value's own Group breaks instead of
+# the row.
+#
+# Braceless chain keys (`a: b: c: val`) are built as a tree of
+# nested Groups, one per split point. When the value is also atomic
+# it sits inside the deepest Group's Nest, so each split point's
+# flat-fit check includes val. Wadler-Lindig's left-to-right rule
+# then breaks the outermost Group first and only descends as deep
+# as needed. The result: the chain breaks only enough to fit val on
+# the chain's last line. When the value is complex (struct/list/
+# multi-line string) it stays in a separate cell so its own break
+# handles overflow.
+-- config --
+width: 30
+-- in.cue --
+short: 1
+
+abcabcabcabcabcabcabcabcabcabcabc: 6
+
+aaaa: bbbb: ccccccccccccccccccc: 7
+
+chain_fits: a: b: c: 8
+
+aaaaaaaaa: bbbbbbbbb: ccccccccc: ddddddddd: 6
+-- out/relpos --
+short: 1
+
+abcabcabcabcabcabcabcabcabcabcabc:
+	6
+
+aaaa:
+	bbbb:
+		ccccccccccccccccccc: 7
+
+chain_fits: a: b: c: 8
+
+aaaaaaaaa:
+	bbbbbbbbb:
+		ccccccccc:
+			ddddddddd: 6
+-- out/norelpos --
+short:                             1
+abcabcabcabcabcabcabcabcabcabcabc: 6
+aaaa:
+	bbbb:
+		ccccccccccccccccccc: 7
+chain_fits: a: b: c: 8
+aaaaaaaaa:
+	bbbbbbbbb:
+		ccccccccc:
+			ddddddddd: 6

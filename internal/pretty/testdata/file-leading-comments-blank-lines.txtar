@@ -1,0 +1,49 @@
+# Blank lines between file-level leading comments must be preserved
+# (each gap collapses to exactly one blank line, so 1+ blank lines all
+# render as one). Each comment's RelPos drives the separator before
+# it: NewSection means the user wrote a blank line, Newline means the
+# comments are adjacent. Without RelPos there is no way to tell, so
+# the comments collapse to adjacent lines — that is acceptable since
+# the source signal is gone.
+#
+# The separator before the body must consider the first decl's *doc*
+# comment, not just the decl's label, so a blank line between a file-
+# level leading comment and the first decl's doc comment is preserved
+# (case d: `// c1\n\n// c2\nfield`).
+-- in.cue --
+// header 1
+
+
+// header 2
+
+// header 3
+// header 4
+
+x: 1
+
+// c1
+
+// c2
+y: _
+-- out/relpos --
+// header 1
+
+// header 2
+
+// header 3
+// header 4
+
+x: 1
+
+// c1
+
+// c2
+y: _
+-- out/norelpos --
+// header 1
+// header 2
+// header 3
+// header 4
+x: 1 // c1
+// c2
+y: _

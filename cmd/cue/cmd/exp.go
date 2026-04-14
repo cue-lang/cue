@@ -24,7 +24,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/encoding/gotypes"
@@ -256,7 +255,7 @@ func runExpWritefs(cmd *Command, args []string) error {
 		}
 	}
 
-	ctx := cuecontext.New()
+	ctx := cmd.ctx
 
 	for fp, f := range todo.Create {
 		fp = filepath.FromSlash(fp)

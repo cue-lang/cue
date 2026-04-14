@@ -506,6 +506,13 @@ func TestMain(m *testing.M) {
 	}
 	testscript.Main(m, map[string]func(){
 		"cue": func() { os.Exit(cuecmd.Main()) },
+		"cue_inject": func() {
+			j := cuecontext.NewInjector()
+			j.AllowAll()
+			ctx := cuecontext.New()
+			j.Register("test.value", ctx.CompileString(`"hello from injector"`))
+			os.Exit(cuecmd.MainWithOptions(cuecontext.Inject(j)))
+		},
 		// Until https://github.com/rogpeppe/go-internal/issues/93 is fixed,
 		// or we have some other way to use "exec" without caring about success,
 		// this is an easy way for us to mimic `? exec cue`.

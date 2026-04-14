@@ -21,6 +21,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strings"
 	"testing"
 
@@ -258,6 +259,37 @@ func TestRedirect(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// TestRequestHeaders verifies that headers specified as either a single string
+// or a list of strings are actually sent in the HTTP request.
+func TestRequestHeaders(t *testing.T) {
+	var gotHeaders http.Header
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotHeaders = r.Header
+		w.Write([]byte("ok"))
+	}))
+	t.Cleanup(server.Close)
+
+	v := parse(t, "tool/http.Do", fmt.Sprintf(`{
+		method: "GET"
+		url: "%s"
+		request: header: {
+			"X-Single": "single-value"
+			"X-List":   ["val-a", "val-b"]
+		}
+	}`, server.URL))
+
+	_, err := (*httpCmd).Run(nil, &task.Context{Obj: v})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := gotHeaders.Get("X-Single"), "single-value"; got != want {
+		t.Errorf("X-Single: got %q, want %q", got, want)
+	}
+	if got, want := gotHeaders.Values("X-List"), []string{"val-a", "val-b"}; !slices.Equal(got, want) {
+		t.Errorf("X-List: got %v, want %v", got, want)
 	}
 }
 

@@ -1,0 +1,27 @@
+# Even at narrow width, multi-line string content is never reflowed.
+-- config --
+width: 10
+-- in.cue --
+{
+        x: """
+                hello
+                world
+                """
+        y: 1
+}
+-- out/relpos --
+{
+	x: """
+                hello
+                world
+                """
+	y: 1
+}
+-- out/norelpos --
+{
+	x: """
+                hello
+                world
+                """
+	y: 1
+}

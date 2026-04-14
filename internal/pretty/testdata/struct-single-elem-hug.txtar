@@ -1,0 +1,24 @@
+# A single-decl struct whose subtree carries an explicit Newline
+# RelPos (so the decl WILL render with forced breaks) and no
+# attached comments hugs its braces around the decl:
+# "{a: {...}}" rather than "{\n    a: {...}\n}". Mirrors the
+# single-element hug in listLit and the single-argument hug in
+# callExpr. With RelPos stripped the hug's precondition fails and
+# the standard width-based break cascades through.
+-- in.cue --
+versions!: {a: {
+	name!: string
+	schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}
+}}
+-- out/relpos --
+versions!: {a: {
+	name!: string
+	schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}
+}}
+-- out/norelpos --
+versions!: {
+	a: {
+		name!: string
+		schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}
+	}
+}

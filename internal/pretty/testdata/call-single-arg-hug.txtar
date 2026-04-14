@@ -1,0 +1,18 @@
+# A call with a single argument whose RelPos does not demand a
+# newline, and that has no doc comment of its own, hugs the argument
+# directly: "f([...])" rather than "f(\n    [...],\n)". Mirrors the
+# single-element hug in listLit. An explicit Newline RelPos on the
+# argument disables the hug.
+-- in.cue --
+let cacheModes = list.Concat([[
+	"go",
+], #in.additionalCaches])
+-- out/relpos --
+let cacheModes = list.Concat([
+	[
+		"go",
+	],
+	#in.additionalCaches,
+])
+-- out/norelpos --
+let cacheModes = list.Concat([["go"], #in.additionalCaches])

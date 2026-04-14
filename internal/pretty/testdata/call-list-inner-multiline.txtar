@@ -1,0 +1,20 @@
+# A call whose single argument is a list that contains a multi-line
+# inner list should not cascade-break the outer call or the outer
+# list just because the inner list breaks. Each Group decides its own
+# flat/broken state independently: measureFlat treats nested Groups
+# as opaque fit units, and Nest is a no-op in flat mode so a flat
+# outer Group doesn't contribute to indent for the broken content of
+# a nested Group.
+-- in.cue --
+let cacheModes = list.Concat([[
+	"go",
+], #in.additionalCaches])
+-- out/relpos --
+let cacheModes = list.Concat([
+	[
+		"go",
+	],
+	#in.additionalCaches,
+])
+-- out/norelpos --
+let cacheModes = list.Concat([["go"], #in.additionalCaches])

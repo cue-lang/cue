@@ -1,0 +1,9 @@
+# A pattern label's alias (e.g. [x=string]) must use tight "=" with
+# no surrounding spaces, matching cue/format. The element inside the
+# brackets is an *ast.Alias expression, not a decl-level alias.
+-- in.cue --
+[x=string]: x
+-- out/relpos --
+[x=string]: x
+-- out/norelpos --
+[x=string]: x

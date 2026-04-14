@@ -1,0 +1,10 @@
+# A trailing comment with Newline (not NewSection) RelPos
+# goes on the next line, not the same line.
+-- in.cue --
+x: true
+// a comment
+-- out/relpos --
+x: true
+// a comment
+-- out/norelpos --
+x: true // a comment

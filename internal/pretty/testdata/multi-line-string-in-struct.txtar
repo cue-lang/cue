@@ -1,0 +1,27 @@
+# A multi-line string value introduces forced newlines (LitLine),
+# so it flushes the surrounding alignment table: `name` sits on its
+# own without being padded to `description:`'s key width.
+-- in.cue --
+{
+	description: """
+		This is a long
+		description field
+		"""
+	name: "foo"
+}
+-- out/relpos --
+{
+	description: """
+		This is a long
+		description field
+		"""
+	name: "foo"
+}
+-- out/norelpos --
+{
+	description: """
+		This is a long
+		description field
+		"""
+	name: "foo"
+}

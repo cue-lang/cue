@@ -1,0 +1,15 @@
+-- in.cue --
+import (
+	"strings"
+	"list"
+)
+-- out/relpos --
+import (
+	"strings"
+	"list"
+)
+-- out/norelpos --
+import (
+	"strings"
+	"list"
+)

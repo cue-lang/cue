@@ -1,0 +1,23 @@
+# Clauses on separate lines: RelPos Newline between them is honoured.
+-- in.cue --
+{
+for a in [1, 10]
+	let x = {
+		value: a + 1
+	}
+   if x.value > 5 {
+		b: x
+		}
+}
+-- out/relpos --
+{
+	for a in [1, 10]
+	let x = {
+		value: a + 1
+	}
+	if x.value > 5 {
+		b: x
+	}
+}
+-- out/norelpos --
+{for a in [1, 10] let x = {value: a + 1} if x.value > 5 {b: x}}

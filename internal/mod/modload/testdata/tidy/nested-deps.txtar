@@ -5,22 +5,12 @@
 module is not tidy: missing dependency providing package example.com.*
 -- want --
 module: "main.org@v0"
-language: {
-	version: "v0.8.100"
-}
+language: version: "v0.8.100"
 deps: {
-	"bar.com@v0": {
-		v: "v0.5.0"
-	}
-	"baz.org@v0": {
-		v: "v0.10.1"
-	}
-	"example.com@v0": {
-		v: "v0.0.1"
-	}
-	"foo.com/bar/hello@v0": {
-		v: "v0.2.3"
-	}
+	"bar.com@v0": v:           "v0.5.0"
+	"baz.org@v0": v:           "v0.10.1"
+	"example.com@v0": v:       "v0.0.1"
+	"foo.com/bar/hello@v0": v: "v0.2.3"
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"

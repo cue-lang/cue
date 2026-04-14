@@ -53,7 +53,7 @@ badTupleType: {
 	properties: {
 		emptyList: {
 			description: "Empty list"
-			const: []
+			const:       []
 		}
 		emptyOpenList: {
 			type:        "array"
@@ -62,40 +62,26 @@ badTupleType: {
 		mixedTuple: {
 			type:        "array"
 			description: "Mixed tuple with concrete values"
-			prefixItems: [{
-				type: "string"
-			}, {
-				const: 2
-			}, {
-				type: "boolean"
-			}]
-			maxItems: 3
-			minItems: 3
+			prefixItems: [{type: "string"}, {const: 2}, {type: "boolean"}]
+			maxItems:    3
+			minItems:    3
 		}
 		numberList: {
 			type:        "array"
 			description: "Open list with number elements"
-			items: {
-				type: "number"
-			}
+			items: type: "number"
 		}
 		stringList: {
 			type:        "array"
 			description: "Open list with element type"
-			items: {
-				type: "string"
-			}
+			items: type: "string"
 		}
 		tuple: {
 			type:        "array"
 			description: "Closed list (tuple)"
-			prefixItems: [{
-				type: "string"
-			}, {
-				type: "integer"
-			}]
-			maxItems: 2
-			minItems: 2
+			prefixItems: [{type: "string"}, {type: "integer"}]
+			maxItems:    2
+			minItems:    2
 		}
 	}
 }

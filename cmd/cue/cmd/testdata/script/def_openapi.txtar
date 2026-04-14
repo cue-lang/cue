@@ -192,12 +192,12 @@ info: {
 paths: {}
 components: schemas: {
 	Bar: {
-		type: "object"
+		type:     "object"
 		required: ["foo"]
 		properties: foo: $ref: "#/components/schemas/Foo"
 	}
 	Foo: {
-		type: "object"
+		type:     "object"
 		required: ["a", "b"]
 		properties: {
 			a: type: "integer"
@@ -274,12 +274,12 @@ info: {
 paths: {}
 components: schemas: {
 	Bar: {
-		type: "object"
+		type:     "object"
 		required: ["foo"]
 		properties: foo: $ref: "#/components/schemas/Foo"
 	}
 	Foo: {
-		type: "object"
+		type:     "object"
 		required: ["a", "b"]
 		properties: {
 			a: type: "integer"

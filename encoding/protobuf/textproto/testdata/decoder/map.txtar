@@ -33,17 +33,9 @@ intMap: {
 }
 
 -- out/decode --
-map: {
-	"foo": 2
-}
-map: {
-	"bar": 3
-}
+map:      {"foo": 2}
+map:      {"bar": 3}
 implicit: {}
 implicit: {}
-intMap: {
-	"100": 2
-}
-intMap: {
-	"102": 3
-}
+intMap:   {"100": 2}
+intMap:   {"102": 3}

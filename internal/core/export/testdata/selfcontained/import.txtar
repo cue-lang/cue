@@ -105,25 +105,15 @@ run:     exec.Run
 _hidden: int
 
 //cue:path: "mod.test/a/pkg".a.b
-let B = {
-	c: {
-		d: int
-	}
-}
+let B = {c: d: int}
 
 //cue:path: "mod.test/a/pkg".#Def.f
-let F = {
-	#x: {
-		g: int
-	}
-}
+let F = {#x: g: int}
 
 //cue:path: "mod.test/a/pkg".w
 let W = {
 	a: _hidden_567475F3
-	_hidden_567475F3: {
-		a: 1
-	}
+	_hidden_567475F3: a: 1
 	b: 1
 	x: {
 		_hidden2_567475F3: _hidden_567475F3

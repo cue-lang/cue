@@ -36,14 +36,9 @@
 
 _
 
-#ref: matchN(1, [matchN(0, [string]) & {
-	...
-}, null]) & (null | {
-	branches?: {
-		...
-	}
-	"branches-ignore"?: {
-		...
-	}
+#ref: matchN(1, [matchN(0, [string]) & {...}, null]) &
+(null | {
+	branches?:          {...}
+	"branches-ignore"?: {...}
 	...
 })

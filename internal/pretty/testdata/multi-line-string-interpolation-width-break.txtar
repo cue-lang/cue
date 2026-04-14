@@ -1,0 +1,27 @@
+# An interpolation `\(...)` inside a multi-line string carries an
+# expression that the formatter will width-break when no RelPos is
+# available - for example a CallExpr whose flat width exceeds the
+# configured width. The break must land one indent level deeper than
+# the line that holds the `\(` (i.e. the body's strip prefix + 1),
+# not at the field's nest level.
+#
+# In the parsed (RelPos-kept) case the user's single-line layout is
+# preserved end to end: the call stays flat inside `\(...)`.
+-- config --
+width: 40
+-- in.cue --
+x: """
+	prefix \(someFunc(longArg1aaaaaaaaaa, longArg2bbbbbbbbbb, longArg3cccccccccc)) suffix
+	"""
+-- out/relpos --
+x: """
+	prefix \(someFunc(longArg1aaaaaaaaaa, longArg2bbbbbbbbbb, longArg3cccccccccc)) suffix
+	"""
+-- out/norelpos --
+x: """
+	prefix \(someFunc(
+		longArg1aaaaaaaaaa,
+		longArg2bbbbbbbbbb,
+		longArg3cccccccccc,
+	)) suffix
+	"""

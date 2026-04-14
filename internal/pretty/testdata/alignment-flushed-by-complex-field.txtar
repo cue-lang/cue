@@ -1,0 +1,28 @@
+# A complex field - one that simpleFieldChain rejects, e.g. because
+# its value is on its own line, has a doc comment, or sits in a
+# non-collapsible chain - flushes the alignment table at the
+# construction stage, just like a non-field decl. Simple fields
+# above and below the complex field form independent alignment
+# groups and do not pad to a shared key column.
+#
+# In the norelpos case the value's Newline RelPos is gone, so
+# `deep` becomes a simple field; the file is then in a Group
+# (programmatic-source path) and the whole struct fits flat at
+# width 80, so it renders as a single comma-separated line with
+# no padding involved.
+-- in.cue --
+foo: 1
+longname: 22
+deep:
+	9
+bar: 333
+bazinga: 4444
+-- out/relpos --
+foo:      1
+longname: 22
+deep:
+	9
+bar:     333
+bazinga: 4444
+-- out/norelpos --
+foo: 1, longname: 22, deep: 9, bar: 333, bazinga: 4444

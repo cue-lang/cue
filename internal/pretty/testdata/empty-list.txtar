@@ -1,0 +1,10 @@
+-- in.cue --
+{
+x: [  ]
+}
+-- out/relpos --
+{
+	x: []
+}
+-- out/norelpos --
+{x: []}

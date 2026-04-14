@@ -10,10 +10,5 @@ is already a definition.
 
 #a: b: c: #def
 -- out/self/default --
-
 _#def
-_#def: {
-	c: {
-		a: 1
-	}
-}
+_#def: c: a: 1

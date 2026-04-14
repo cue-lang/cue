@@ -18,12 +18,8 @@ x:    #Def & 5
 package blah
 
 #Def: int
-x: #Def & {
-	5
-}
+x:    #Def & {5}
 -- self_contained.golden --
 package blah
 
-int & {
-	5
-}
+int & {5}

@@ -1,0 +1,54 @@
+# Field rows can break before their value when their flat width
+# exceeds the available budget. longestAlignedPrefix isolates
+# overflowing AllowRowBreak rows into their own single-row segments
+# so siblings don't pad to the broken row's wide cell-0 width. The
+# break only fires when the second cell is atomic (no internal Group /
+# soft Line / Table); for struct/list values the value's own Group
+# breaks instead, keeping `key: {...}` hugging intact.
+#
+# Braceless chain keys (`a: b: c: val`) build a tree of nested Groups,
+# one per split point, with an atomic value inside the deepest Nest.
+# Wadler-Lindig's left-to-right rule breaks the outermost Group first
+# and descends only as deep as needed, so the chain breaks just enough
+# to fit val on its last line. A complex value stays in a separate cell
+# and its own break handles overflow.
+#
+# This all applies only without an infinite-width wrapper. In the
+# relpos variant the surrounding subtree carries Newline/NewSection
+# RelPos, so the body is wrapped in an infinite-width scope: Groups
+# never break on width, and width-only overflow adds no newlines. The
+# user must place a Newline RelPos to opt back into multi-line layout.
+-- config --
+width: 30
+-- in.cue --
+short: 1
+
+abcabcabcabcabcabcabcabcabcabcabc: 6
+
+aaaa: bbbb: ccccccccccccccccccc: 7
+
+chain_fits: a: b: c: 8
+
+aaaaaaaaa: bbbbbbbbb: ccccccccc: ddddddddd: 6
+-- out/relpos --
+short: 1
+
+abcabcabcabcabcabcabcabcabcabcabc: 6
+
+aaaa: bbbb: ccccccccccccccccccc: 7
+
+chain_fits: a: b: c: 8
+
+aaaaaaaaa: bbbbbbbbb: ccccccccc: ddddddddd: 6
+-- out/norelpos --
+short: 1
+abcabcabcabcabcabcabcabcabcabcabc:
+	6
+aaaa:
+	bbbb:
+		ccccccccccccccccccc: 7
+chain_fits: a: b: c: 8
+aaaaaaaaa:
+	bbbbbbbbb:
+		ccccccccc:
+			ddddddddd: 6

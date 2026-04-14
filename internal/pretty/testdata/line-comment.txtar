@@ -1,0 +1,6 @@
+-- in.cue --
+   x:   1   // a comment
+-- out/relpos --
+x: 1 // a comment
+-- out/norelpos --
+x: 1 // a comment

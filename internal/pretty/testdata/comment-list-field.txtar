@@ -1,0 +1,15 @@
+-- in.cue --
+{
+// doc on list field
+    x: [  1, 2, 3]
+}
+-- out/relpos --
+{
+	// doc on list field
+	x: [1, 2, 3]
+}
+-- out/norelpos --
+{
+	// doc on list field
+	x: [1, 2, 3]
+}

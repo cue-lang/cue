@@ -1,0 +1,26 @@
+# A doc-commented field after a non-field decl (let, embed,
+# comprehension, attribute, ...) always gets a blank line before
+# it, regardless of authored RelPos. This matches cue/format's
+# convention: non-field decls are visually distinct enough from a
+# doc-commented sibling field that the formatter fills in the
+# blank line even when the source had only a single newline.
+-- in.cue --
+{
+	let X = 1
+	// doc comment
+	port: X
+}
+-- out/relpos --
+{
+	let X = 1
+
+	// doc comment
+	port: X
+}
+-- out/norelpos --
+{
+	let X = 1
+
+	// doc comment
+	port: X
+}

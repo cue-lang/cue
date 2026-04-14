@@ -1,0 +1,21 @@
+# Tests that a fully-specified @test(err) annotation (with code=, contains=,
+# and concrete pos=[]) nested inside @test(eq, {...}) passes correctly.
+# This verifies the runner can parse and validate all nested-err attributes
+# after CUE_UPDATE=1 has filled them in.
+-- in/test.cue --
+a: {b: int}
+c: a & {
+	b: 100
+	d: a.b + 3
+} @test(eq, {b: 100, d: _|_ @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[])})
+-- out/status.txt --
+update: output passes run
+force:  identical to update
+-- out/run/errors.txt --
+path c: d: @test(err, pos=...): got 2 position(s), want 0; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...] [4:5 1:8]
+-- out/update/test.cue --
+a: {b: int}
+c: a & {
+	b: 100
+	d: a.b + 3
+} @test(eq, {b: 100, d: _|_ @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[4:5, 1:8])})

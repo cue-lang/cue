@@ -1,0 +1,44 @@
+# Tests that @test(eq) correctly handles list elements containing definition
+# fields (#X). Previously list elements were formatted via v.Syntax() which
+# omits definitions, causing spurious @test(eq) failures.
+#
+# compact: small element fits on one line as [{x: 1, #D: "d"}].
+# seed:    bare @test(eq) on a list is filled with definitions included.
+# multiLine: large element forces [{ on one line, fields indented.
+-- in/test.cue --
+// Compact: small struct element with definition — already filled, must pass.
+#S: {x: 1, #D: "d"}
+compact: [#S & {}] @test(eq, [{x: 1, #D: "d"}])
+
+// Seed: bare @test(eq) on a list; CUE_UPDATE=1 must include #D in the result.
+seed: [#S & {}] @test(eq)
+
+// Multi-line: struct element large enough to wrap; must start with [{.
+#S2: {
+	runs?: "foo" | (["d1"] | ["d1", "d2"])
+	#D1: "d1"
+	#D2: "d2"
+}
+multiLine: [#S2 & {}] @test(eq)
+-- out/status.txt --
+update: output passes run
+force:  identical to update
+-- out/update/test.cue --
+// Compact: small struct element with definition — already filled, must pass.
+#S: {x: 1, #D: "d"}
+compact: [#S & {}] @test(eq, [{x: 1, #D: "d"}])
+
+// Seed: bare @test(eq) on a list; CUE_UPDATE=1 must include #D in the result.
+seed: [#S & {}] @test(eq, [{x: 1, #D: "d"}])
+
+// Multi-line: struct element large enough to wrap; must start with [{.
+#S2: {
+	runs?: "foo" | (["d1"] | ["d1", "d2"])
+	#D1: "d1"
+	#D2: "d2"
+}
+multiLine: [#S2 & {}] @test(eq, [{
+	runs?: "foo" | ["d1"] | ["d1", "d2"]
+	#D1: "d1"
+	#D2: "d2"
+}])

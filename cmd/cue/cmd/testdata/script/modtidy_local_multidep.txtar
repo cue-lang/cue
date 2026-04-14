@@ -18,22 +18,14 @@ exec cue mod tidy --check
 
 -- want-module --
 module: "main.org@v0"
-language: {
-	version: "v0.17.0"
-}
+language: version: "v0.17.0"
 deps: {
-	"example.com/dep@v0": {
-		v: "v0.1.0"
-	}
-	"example.com/other@v0": {
-		v: "v0.2.0"
-	}
+	"example.com/dep@v0": v:   "v0.1.0"
+	"example.com/other@v0": v: "v0.2.0"
 }
 -- want-local --
 deps: {
-	"example.com/dep@v0": {
-		replace: "./local_dep"
-	}
+	"example.com/dep@v0": replace: "./local_dep"
 	"example.com/other@v0": {}
 }
 -- want-stdout --

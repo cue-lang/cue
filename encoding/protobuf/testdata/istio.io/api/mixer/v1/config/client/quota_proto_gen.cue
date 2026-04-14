@@ -97,9 +97,7 @@ package client
 	//       exact: SOURCE_UID
 	//     request.http_method:
 	//       exact: POST
-	clause?: {
-		[string]: #StringMatch
-	} @protobuf(1,map[string]StringMatch)
+	clause?: {[string]: #StringMatch} @protobuf(1,map[string]StringMatch)
 }
 
 // Specifies a quota to use with quota name and amount.

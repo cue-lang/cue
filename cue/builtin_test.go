@@ -102,9 +102,7 @@ func TestBuiltins(t *testing.T) {
 		`_|_ // conflicting values "" and struct.MinFields(0) (mismatched types string and struct)`,
 	}, {
 		test("struct", `struct.MinFields(0) & {a: 1}`),
-		`{
-	a: 1
-}`,
+		`{a: 1}`,
 	}, {
 		test("struct", `struct.MinFields(2) & {a: 1}`),
 		// TODO: original value may be better.

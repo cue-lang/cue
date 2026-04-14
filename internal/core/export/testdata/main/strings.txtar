@@ -20,9 +20,7 @@ a: """
 	line
 	"""
 b: "message: \(a)!"
-c: {
-	d: a
-}
+c: d: a
 bin1: '\(a)'
 bin2: '''
 	multi
@@ -47,12 +45,10 @@ bin2: '''
 		message: multi
 		line!
 		"""
-	c: {
-		d: """
-			multi
-			line
-			"""
-	}
+	c: d: """
+		multi
+		line
+		"""
 	bin1: '''
 		multi
 		line
@@ -73,12 +69,10 @@ bin2: '''
 		message: multi
 		line!
 		"""
-	c: {
-		d: """
-			multi
-			line
-			"""
-	}
+	c: d: """
+		multi
+		line
+		"""
 	bin1: '''
 		multi
 		line
@@ -99,12 +93,10 @@ bin2: '''
 		message: multi
 		line!
 		"""
-	c: {
-		d: """
-			multi
-			line
-			"""
-	}
+	c: d: """
+		multi
+		line
+		"""
 	bin1: '''
 		multi
 		line
@@ -125,12 +117,10 @@ bin2: '''
 		message: multi
 		line!
 		"""
-	c: {
-		d: """
-			multi
-			line
-			"""
-	}
+	c: d: """
+		multi
+		line
+		"""
 	bin1: '''
 		multi
 		line
@@ -151,12 +141,10 @@ bin2: '''
 		message: multi
 		line!
 		"""
-	c: {
-		d: """
-			multi
-			line
-			"""
-	}
+	c: d: """
+		multi
+		line
+		"""
 	bin1: '''
 		multi
 		line

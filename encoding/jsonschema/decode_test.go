@@ -461,9 +461,7 @@ $ref: "#/$defs/foo"
 import "otherpkg.example/foo"
 
 @jsonschema(id="https://this.test")
-foo.#x & {
-	...
-}
+foo.#x & {...}
 `[1:]))
 	qt.Check(t, qt.DeepEquals(defines, map[string]string{
 		"otherpkg.example/bar.#x": "bool",

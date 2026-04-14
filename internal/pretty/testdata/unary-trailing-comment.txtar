@@ -1,0 +1,8 @@
+# A trailing comment on the operand of a unary expression stays
+# after the operator+operand unit, not between them.
+-- in.cue --
+x: !true // comment
+-- out/relpos --
+x: !true // comment
+-- out/norelpos --
+x: !true // comment

@@ -1,0 +1,34 @@
+# A blank line between two doc-position comment groups attached to
+# the same field/element/expression must be preserved - collapsing
+# them to a single block changes the user's intent (visually grouped
+# vs. visually separated). All four sites that build a multi-group
+# doc-comment block (withComments, fieldRow, listElemRow,
+# binaryExprPrec) now go through docCommentBlock, which picks
+# BlankLine when a group's RelPos is NewSection and HardLine
+# otherwise.
+-- in.cue --
+a: {
+	// c1
+	// c2
+
+	// c3
+	// c4
+	b: _
+}
+-- out/relpos --
+a: {
+	// c1
+	// c2
+
+	// c3
+	// c4
+	b: _
+}
+-- out/norelpos --
+a: {
+	// c1
+	// c2
+	// c3
+	// c4
+	b: _
+}

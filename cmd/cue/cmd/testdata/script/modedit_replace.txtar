@@ -38,32 +38,20 @@ cmp cue.mod/module.cue want-module
 
 -- want-module --
 module: "main.org@v0"
-language: {
-	version: "v0.17.0"
-}
+language: version: "v0.17.0"
 deps: {
-	"example.com/dep@v0": {
-		v: "v0.1.0"
-	}
-	"example.com/other@v0": {
-		v: "v0.2.0"
-	}
+	"example.com/dep@v0": v:   "v0.1.0"
+	"example.com/other@v0": v: "v0.2.0"
 }
 -- want-local-1 --
 deps: {
-	"example.com/dep@v0": {
-		replace: "./local_dep"
-	}
+	"example.com/dep@v0": replace: "./local_dep"
 	"example.com/other@v0": {}
 }
 -- want-local-2 --
 deps: {
-	"example.com/dep@v0": {
-		replace: "./local_dep"
-	}
-	"example.com/other@v0": {
-		replace: "example.com/replacement@v1.2.3"
-	}
+	"example.com/dep@v0": replace:   "./local_dep"
+	"example.com/other@v0": replace: "example.com/replacement@v1.2.3"
 }
 -- want-stdout --
 {

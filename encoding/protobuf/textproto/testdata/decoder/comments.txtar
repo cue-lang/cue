@@ -75,22 +75,20 @@ b: [
 	// pre-elem comment
 	// doc elem 0
 	123, // elem 0 line comment
-
 	// trailing elem 0
 	// inbetween comment 1
 	// inbetween comment 2
 	// doc elem 1
 	456, // elem 1 line comment
-
 	// trailing elem 1
 	// final floating 1
-
 	// final floating 2
 ]
 
 // floating end
 
-c: [2342134, // line elem 0
+c: [
+	2342134, // line elem 0
 	2342135, // line elem 1
 	// inbetween elems
 	2342136, // line elem 2
@@ -100,18 +98,18 @@ c: [2342134, // line elem 0
 
 // floating
 
-m: [{
-	x: "sdfff" // inner line comment
-	y: "q\"qq\\q\n"
+m: [
+	{
+		x: "sdfff" // inner line comment
+		y: "q\"qq\\q\n"
 
-	// after last value
-
-}, // after elem line
+		// after last value
+	}, // after elem line
 	// after elem separate
 	{
 		x: "   sdfff2  тест "
 		y: "q\tqq<>q2&\u0001�"
-	}, // after list line
+	} // after list line
 ]
 
 // after list

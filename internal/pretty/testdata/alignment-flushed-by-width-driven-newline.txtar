@@ -1,0 +1,39 @@
+# When a field's value has no RelPos newlines but the
+# Wadler-Lindig algorithm is forced to break it because it does
+# not fit on the current line, the resulting newlines also flush
+# the surrounding alignment table. Here the `wide` field's list
+# value fits flat within width=40 on its own line but not when
+# placed at its indented position inside the struct; it therefore
+# breaks across multiple lines. The rows before it (`a`, `bb`) form
+# one aligned segment and the rows after it (`c`, `dd`) start a
+# fresh alignment that does not stretch to the wide key.
+-- config --
+width: 40
+-- in.cue --
+a: 1
+bb: 22
+wide: [1000000, 2000000, 3000000, 4000000]
+ccc: 3
+dddd: 44
+-- out/relpos --
+a:  1
+bb: 22
+wide: [
+	1000000,
+	2000000,
+	3000000,
+	4000000,
+]
+ccc:  3
+dddd: 44
+-- out/norelpos --
+a:  1
+bb: 22
+wide: [
+	1000000,
+	2000000,
+	3000000,
+	4000000,
+]
+ccc:  3
+dddd: 44

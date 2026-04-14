@@ -1,0 +1,10 @@
+-- in.cue --
+{
+	a: { b: {  c: 1   }}
+}
+-- out/relpos --
+{
+	a: {b: {c: 1}}
+}
+-- out/norelpos --
+{a: {b: {c: 1}}}

@@ -1,0 +1,70 @@
+# When two or more opening brackets/braces/parens land on the same
+# line, the inner content sits at one shared level of indent — even
+# when other elements (numbers, idents, ...) sit between the openers.
+# The rule is symmetric across list, struct, and call constructs and
+# fires for openers anywhere in the element/decl/arg sequence, not
+# only at the first/last position.
+-- in.cue --
+list_mid: [1, {
+	x: _
+}, 2]
+
+list_first: [{
+	x: _
+}, 2]
+
+list_last: [1, {
+	x: _
+}]
+
+struct_mid: {a: 1, {
+	x: _
+}, b: 2}
+
+call_mid: f(1, {
+	x: _
+}, 2)
+
+call_last: f(1, {
+	x: _
+})
+
+deeper: [1, [{
+	x: _
+}]]
+-- out/relpos --
+list_mid: [1, {
+	x: _
+}, 2]
+
+list_first: [{
+	x: _
+}, 2]
+
+list_last: [1, {
+	x: _
+}]
+
+struct_mid: {a: 1, {
+	x: _
+}, b: 2}
+
+call_mid: f(1, {
+	x: _
+}, 2)
+
+call_last: f(1, {
+	x: _
+})
+
+deeper: [1, [{
+	x: _
+}]]
+-- out/norelpos --
+list_mid:   [1, {x: _}, 2]
+list_first: [{x: _}, 2]
+list_last:  [1, {x: _}]
+struct_mid: {a: 1, {x: _}, b: 2}
+call_mid:   f(1, {x: _}, 2)
+call_last:  f(1, {x: _})
+deeper:     [1, [{x: _}]]

@@ -1,0 +1,17 @@
+# A comment on the same line as { inside a conjunction's RHS struct.
+# The parser attaches it to the BinaryExpr at Position 1 with Line=true,
+# but it should still be injected into the struct body (not treated as
+# a trailing comment on the operator line).
+-- in.cue --
+foo: #X & {//a: 5
+}
+-- out/relpos --
+foo: #X &
+	{
+		//a: 5
+	}
+-- out/norelpos --
+foo: #X &
+	{
+		//a: 5
+	}

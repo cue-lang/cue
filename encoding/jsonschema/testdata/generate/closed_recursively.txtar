@@ -14,17 +14,11 @@ package test
 	type:                 "object"
 	additionalProperties: false
 	properties: {
-		a: {
-			type: "string"
-		}
+		a: type: "string"
 		b: {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				b2: {
-					type: "string"
-				}
-			}
+			properties: b2: type: "string"
 		}
 	}
 }

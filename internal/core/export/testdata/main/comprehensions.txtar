@@ -36,14 +36,11 @@ dropEmpty: {
 			d: ""
 		}
 	}
-	a: #A & {
-		b: "c"
-	}
+	a: #A & {b: "c"}
 }
 nested: {
 	if true
 	if true
-
 	let x = [1]
 	for y in x {
 		y

@@ -1,0 +1,63 @@
+# Field rows can break before their value when their flat width
+# exceeds the available budget. longestAlignedPrefix isolates
+# overflowing AllowRowBreak rows into their own single-row
+# segments so siblings don't pad to the broken row's wide cell-0
+# width. The break only fires when the second cell is atomic -
+# that is, its Doc has no internal Group / soft Line / Table that
+# could break on its own. The restriction keeps `key: {...}` style
+# hugging intact for struct/list values: the value's own Group
+# breaks instead of the row.
+#
+# Braceless chain keys (`a: b: c: val`) are built as a tree of
+# nested Groups, one per split point. When the value is also atomic
+# it sits inside the deepest Group's Nest, so each split point's
+# flat-fit check includes val. Wadler-Lindig's left-to-right rule
+# then breaks the outermost Group first and only descends as deep
+# as needed. The result: the chain breaks only enough to fit val on
+# the chain's last line. When the value is complex (struct/list/
+# multi-line string) it stays in a separate cell so its own break
+# handles overflow.
+#
+# All of the above only applies when no infinite-width wrapper is in
+# effect. In the relpos variant the surrounding subtree carries
+# Newline/NewSection RelPos (the user separated each field with a
+# blank line), so the file's body is wrapped in an infinite-width
+# scope. Inside it, Groups never break on width - chains, calls, and
+# lists all stay flat regardless of how far they overshoot the
+# budget. Width-only overflow adds no newlines anywhere; the user
+# must put a Newline RelPos inside the chain (or call, or list) to
+# opt back into multi-line layout.
+-- config --
+width: 30
+-- in.cue --
+short: 1
+
+abcabcabcabcabcabcabcabcabcabcabc: 6
+
+aaaa: bbbb: ccccccccccccccccccc: 7
+
+chain_fits: a: b: c: 8
+
+aaaaaaaaa: bbbbbbbbb: ccccccccc: ddddddddd: 6
+-- out/relpos --
+short: 1
+
+abcabcabcabcabcabcabcabcabcabcabc: 6
+
+aaaa: bbbb: ccccccccccccccccccc: 7
+
+chain_fits: a: b: c: 8
+
+aaaaaaaaa: bbbbbbbbb: ccccccccc: ddddddddd: 6
+-- out/norelpos --
+short: 1
+abcabcabcabcabcabcabcabcabcabcabc:
+	6
+aaaa:
+	bbbb:
+		ccccccccccccccccccc: 7
+chain_fits: a: b: c: 8
+aaaaaaaaa:
+	bbbbbbbbb:
+		ccccccccc:
+			ddddddddd: 6

@@ -65,11 +65,11 @@ var p = &pkg.Package{
 	Native: []*pkg.Builtin{},
 	CUE: `{
 	Run: {
-		$id: _id
-		_id: *"tool/exec.Run" | "exec"
-		cmd: string | [string, ...string]
-		dir?: string
-		env: *{[string]: string} | [...=~"="]
+		$id:         _id
+		_id:         *"tool/exec.Run" | "exec"
+		cmd:         string | [string, ...string]
+		dir?:        string
+		env:         *{[string]: string} | [...=~"="]
 		stdout:      *null | string | bytes
 		stderr:      *null | string | bytes
 		stdin:       *null | string | bytes

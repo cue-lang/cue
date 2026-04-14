@@ -1,0 +1,34 @@
+# A doc-commented field after a definition always gets a blank
+# line before it, regardless of authored RelPos. Definitions are a
+# strong enough visual section break that the formatter fills in
+# the blank line even if the source had only a single newline (or
+# none, in programmatic ASTs).
+#
+# Non-field decls (let, embed, comprehension, etc.) follow a
+# narrower rule - they only get the upgrade when no leading
+# intent was specified - but definitions don't.
+#
+# The blank line is supplied by style.Config.Annotate's A4 rule, so
+# this test enables the annotate pre-pass.
+-- config --
+annotate: true
+-- in.cue --
+{
+	#Foo: string
+	// doc comment
+	x: #Foo
+}
+-- out/relpos --
+{
+	#Foo: string
+
+	// doc comment
+	x: #Foo
+}
+-- out/norelpos --
+{
+	#Foo: string
+
+	// doc comment
+	x: #Foo
+}

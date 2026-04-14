@@ -1,0 +1,31 @@
+# Three levels of all-bracketed nesting at a moderate width. Each
+# level applies its own [docBodyShape] decision based on what fits
+# at its own indent column, yielding mixed shapes across depths.
+#
+# At width 26:
+#   - outermost flat (~40 chars) does not fit -> broken; outer body
+#     flat (~34 chars) doesn't fit at indent+1 (22 cols) -> hug shape.
+#   - middle (force-broken via [docNextGroupNoop]): its body flat
+#     `[{a:_}, {b:_}], {c:_}` is 24 chars and the available budget
+#     at indent+1 is 22 -> hug shape.
+#   - innermost (force-broken too): its body flat `{a:_}, {b:_}`
+#     is 14 chars and fits at indent+1 (22) -> indented shape.
+#
+# The result is the hug shape at depths 1 and 2 and the indented
+# shape at depth 3, demonstrating that the cascade is genuinely
+# per-level - not just "all hug" or "all indented" but whatever each
+# level's own budget supports.
+-- config --
+width: 26
+-- in.cue --
+x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
+-- out/relpos --
+x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
+-- out/norelpos --
+x: [[[
+	{a: _}, {b: _},
+], {
+	c: _
+}], {
+	d: _
+}]

@@ -1,0 +1,34 @@
+# Commenting out a sibling element must not shift the surviving
+# element's body by an indent level. The same-line-opener rule
+# (shareIndent) drops the list's own Nest so an inner `[{...}` keeps
+# the struct body at one shared indent level rather than two; a
+# post-element comment after a struct shouldn't disable that.
+#
+# hug (which strips the *closer's* break entirely) does still need
+# the no-post-comment gate - otherwise `]` would land on a comment
+# line and `//` would swallow the bracket. shareIndent keeps
+# closeBreak, so post-element comments render as their own rows
+# safely above the closer.
+-- in.cue --
+c: [{
+	name: "n1"
+},
+// {
+// 	name: "n2"
+// },
+]
+-- out/relpos --
+c: [{
+	name: "n1"
+},
+// {
+// 	name: "n2"
+// },
+]
+-- out/norelpos --
+c: [
+	{name: "n1"},
+	// {
+	// 	name: "n2"
+	// },
+]

@@ -82,22 +82,18 @@ _out: [
 	if k =~ #K {v},
 ]
 -- expect/issue4202/stdout --
-
 [
     for k, v in X
     if k =~ K.#x {
         v
-    }]
+    }
+]
 
 //cue:path: x
 let X = {
-    {
-        [K.#x]: _
-    }
+    {[K.#x]: _}
     a: 1
 }
 
 //cue:path: #K
-let K = {
-    #x: string
-}
+let K = {#x: string}

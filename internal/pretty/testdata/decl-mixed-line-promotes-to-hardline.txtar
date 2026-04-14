@@ -1,0 +1,29 @@
+# A struct with a mix of newline-separated and comma-separated fields
+# is normalised so every field lands on its own line. Without this the
+# table-aligned keys produce awkward `key:    val, key:   val, ...`
+# rows where the comma-joined keys still get padded out to the column
+# max width. Lists and call arguments are unaffected - this rule is
+# scoped to struct declarations (declSlice).
+-- in.cue --
+{
+	token?: string
+	"replaces-base"?: bool, organization?: string, repo?: string, "auth-key"?: string, "public-key-fingerprint"?: string
+}
+-- out/relpos --
+{
+	token?:                    string
+	"replaces-base"?:          bool
+	organization?:             string
+	repo?:                     string
+	"auth-key"?:               string
+	"public-key-fingerprint"?: string
+}
+-- out/norelpos --
+{
+	token?:                    string
+	"replaces-base"?:          bool
+	organization?:             string
+	repo?:                     string
+	"auth-key"?:               string
+	"public-key-fingerprint"?: string
+}

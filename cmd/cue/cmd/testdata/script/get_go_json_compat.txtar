@@ -74,8 +74,8 @@ const NonUTF8 = "a\xffb\xC0\xAFc\xff"
 package decls
 
 #Root: {
-	Duration: int @go(,time.Duration)
-	Strings: [...string] @go(,[]string)
+	Duration: int         @go(,time.Duration)
+	Strings:  [...string] @go(,[]string)
 
 	// We can't roundtrip NonUTF8 directly because of https://cuelang.org/issue/3823.
 	// Roundtrip its third byte for now, which does work.

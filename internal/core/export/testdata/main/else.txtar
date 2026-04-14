@@ -261,48 +261,30 @@ diff old new
 == Simplified
 {
 	// if-else
-	ifElse: {
-		b: 2
-	}
+	ifElse: b: 2
 
 	// for-fallback with empty list
-	forFallback: {
-		empty: true
-	}
+	forFallback: empty: true
 
 	// for-fallback with outer scope reference
-	forFallbackOuter: {
-		fallbackField: 10
-	}
+	forFallbackOuter: fallbackField: 10
 }
 == Raw
 {
 	// if-else
-	ifElse: {
-		b: 2
-	}
+	ifElse: b: 2
 
 	// for-fallback with empty list
-	forFallback: {
-		empty: true
-	}
+	forFallback: empty: true
 
 	// for-fallback with outer scope reference
-	forFallbackOuter: {
-		fallbackField: 10
-	}
+	forFallbackOuter: fallbackField: 10
 }
 == Final
 {
-	ifElse: {
-		b: 2
-	}
-	forFallback: {
-		empty: true
-	}
-	forFallbackOuter: {
-		fallbackField: 10
-	}
+	ifElse: b:                       2
+	forFallback: empty:              true
+	forFallbackOuter: fallbackField: 10
 }
 == All
 {
@@ -311,32 +293,20 @@ diff old new
 	// Test export of fallback clause in comprehensions
 
 	// if-else
-	ifElse: {
-		b: 2
-	}
+	ifElse: b: 2
 
 	// for-fallback with empty list
-	forFallback: {
-		empty: true
-	}
+	forFallback: empty: true
 
 	// for-fallback with outer scope reference
-	forFallbackOuter: {
-		fallbackField: 10
-	}
+	forFallbackOuter: fallbackField: 10
 }
 == Eval
 {
 	@experiment(try)
 
 	// Test export of fallback clause in comprehensions
-	ifElse: {
-		b: 2
-	}
-	forFallback: {
-		empty: true
-	}
-	forFallbackOuter: {
-		fallbackField: 10
-	}
+	ifElse: b:                       2
+	forFallback: empty:              true
+	forFallbackOuter: fallbackField: 10
 }

@@ -51,9 +51,7 @@ func TestSanitize(t *testing.T) {
 	list_9 "list"
 )
 
-{
-	list: list_9.Min()
-}
+{list: list_9.Min()}
 `,
 	}, {
 		desc: "Take existing import and rename it",
@@ -72,9 +70,7 @@ func TestSanitize(t *testing.T) {
 		}(),
 		want: `import list_9 "list"
 
-a: {
-	list: list_9.Min()
-}
+a: {list: list_9.Min()}
 `,
 	}, {
 		desc: "One import added, one removed",
@@ -191,9 +187,7 @@ a: {
 
 import "bar"
 
-a: {
-	list: bar.Min()
-}
+a: {list: bar.Min()}
 `,
 	}, {
 		desc: "Clear reference that does not exist in scope",
@@ -353,7 +347,7 @@ c: {
 	e: X_9
 	f: Y
 }
-`,
+`[1:],
 	}, {
 		desc: "Add let clause to nested shadowed field",
 		// Resolve both identifiers to same clause.

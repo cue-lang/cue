@@ -160,7 +160,7 @@ func TestPaths(t *testing.T) {
 			x: y: X.a
 		`,
 		path: cue.ParsePath("x.y"),
-		out:  "{\n\tb: 0\n}",
+		out:  `{b: 0}`,
 		str:  "x.y",
 	}, {
 		// Issue 2060

@@ -14,13 +14,7 @@ fail: {
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	type:    "object"
-	properties: {
-		errorField: {
-			oneOf: [{
-				type: "integer"
-			}, false]
-		}
-	}
+	properties: errorField: oneOf: [{type: "integer"}, false]
 }
 -- out/generate-v3/fail --
 fail.data.errorField: conflicting values "foo" and int (mismatched types string and int):

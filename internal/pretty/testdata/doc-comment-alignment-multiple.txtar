@@ -1,0 +1,27 @@
+# Multiple fields with doc comments. A doc comment flushes the
+# preceding table, so alignment groups don't cross doc comments.
+# Doc comments force the struct to break.
+-- in.cue --
+{
+	// comment on a
+	a: 1
+	// comment on longname
+	longname: 2
+	b: 3
+}
+-- out/relpos --
+{
+	// comment on a
+	a: 1
+	// comment on longname
+	longname: 2
+	b:        3
+}
+-- out/norelpos --
+{
+	// comment on a
+	a: 1
+	// comment on longname
+	longname: 2
+	b:        3
+}

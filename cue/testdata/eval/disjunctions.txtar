@@ -746,69 +746,79 @@ MaxRedirect:         2
     }))
   }
   t10: {
-    schema: 〈0;test〉
-    schema: (string|{
-      name: string
-    })
-    #A: {
-      (string|{
+    p1: {
+      schema: 〈0;test〉
+      schema: (string|{
         name: string
       })
+      #A: {
+        (string|{
+          name: string
+        })
+      }
+      test: {
+        name: "Test"
+      }
+      test: 〈0;#A〉
     }
-    test: {
-      name: "Test"
-    }
-    test: 〈0;#A〉
   }
   t10: {
-    schema: (string|{
-      name: string
-    })
-    schema: 〈0;test〉
-    #A: {
-      (string|{
+    p2: {
+      schema: (string|{
         name: string
       })
+      schema: 〈0;test〉
+      #A: {
+        (string|{
+          name: string
+        })
+      }
+      test: {
+        name: "Test"
+      }
+      test: 〈0;#A〉
     }
-    test: {
-      name: "Test"
-    }
-    test: 〈0;#A〉
   }
   t10: {
-    #A: {
-      (string|{
+    p3: {
+      #A: {
+        (string|{
+          name: string
+        })
+      }
+      test: {
+        name: "Test"
+      }
+      test: 〈0;#A〉
+      schema: (string|{
         name: string
       })
+      schema: 〈0;test〉
     }
-    test: {
-      name: "Test"
-    }
-    test: 〈0;#A〉
-    schema: (string|{
-      name: string
-    })
-    schema: 〈0;test〉
   }
   t11: {
-    a: 〈0;#A〉
-    a: 〈0;b〉
-    b: (〈0;#A〉 & [
-      "b",
-    ])
-    #A: ([
-      ("a"|"b"),
-    ]|{})
+    p1: {
+      a: 〈0;#A〉
+      a: 〈0;b〉
+      b: (〈0;#A〉 & [
+        "b",
+      ])
+      #A: ([
+        ("a"|"b"),
+      ]|{})
+    }
   }
   t11: {
-    b: (〈0;#A〉 & [
-      "b",
-    ])
-    #A: ([
-      ("a"|"b"),
-    ]|{})
-    a: 〈0;b〉
-    a: 〈0;#A〉
+    p2: {
+      b: (〈0;#A〉 & [
+        "b",
+      ])
+      #A: ([
+        ("a"|"b"),
+      ]|{})
+      a: 〈0;b〉
+      a: 〈0;#A〉
+    }
   }
   cross: {
     a: (*"word"|string)
@@ -1101,18 +1111,8 @@ MaxRedirect:         2
 {
   issue3899: {
     reduced: {
-      p1: {
-        b: ((〈0;c〉 + "")|string)
-        c?: string
-      }
-    }
-  }
-  issue3899: {
-    reduced: {
-      p1: {
-        c?: string
-        b: ((〈0;c〉 + "")|string)
-      }
+      b: ((〈0;c〉 + "")|string)
+      c?: string
     }
   }
   issue3899: {

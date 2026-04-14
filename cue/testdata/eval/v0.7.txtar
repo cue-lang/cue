@@ -275,6 +275,8 @@ issue3194: reduced: {
 		out: close({ b: A })
 		out: b: A
 	}.out
+
+	@test(eq, {A: *0 | >10, b: *0 | >10})
 }
 
 -- chained.cue --
@@ -290,6 +292,14 @@ issue3925: reduced: {
 		a: "actual" | "other"
 		b: (a): c: "str"
 	}
+
+	@test(eq, {
+		out: """
+		c: str
+
+		"""
+		in: {a: "actual", b: {actual: {c: "str"}}}
+	})
 }
 issue3925: full: {
 	for name, _ in _inputs {
@@ -305,6 +315,24 @@ issue3925: full: {
 	for name, input in _inputs {
 		out: (name): lateYAML: yaml.Marshal(input.config[input.name])
 	}
+
+	@test(eq, {
+		out: {
+			input1: {
+				early: "early value"
+				lateYAML: """
+					one: one value
+
+					"""
+			}
+		}
+		_inputs: {
+			input1: {
+				name: "actual"
+				config: {actual: {one: "one value"}}
+			}
+		}
+	})
 }
 -- out/errors.txt --
 [eval] definition.t0.err.d1.env.c: field not allowed:

@@ -1,0 +1,36 @@
+# Comments between two single-import declarations must be preserved.
+# The parser attaches these comments to the first ImportSpec with
+# Position=2, so importDecl has to wrap each spec with its comments for
+# them to render.
+-- in.cue --
+package p1
+
+import "math"
+
+// a comment
+
+// another comment
+
+import "strings"
+
+x: strings.X() + math.Y()
+-- out/relpos --
+package p1
+
+import "math"
+
+// a comment
+
+// another comment
+
+import "strings"
+
+x: strings.X() + math.Y()
+-- out/norelpos --
+package p1
+import "math"
+
+// a comment
+// another comment
+import "strings"
+x: strings.X() + math.Y()

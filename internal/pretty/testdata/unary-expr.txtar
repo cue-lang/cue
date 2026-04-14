@@ -1,0 +1,10 @@
+-- in.cue --
+{
+	x: !   true
+}
+-- out/relpos --
+{
+	x: ! true
+}
+-- out/norelpos --
+{x: !true}

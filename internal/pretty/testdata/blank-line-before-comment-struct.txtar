@@ -1,0 +1,22 @@
+# Blank line before a doc comment inside a struct.
+# The doc comment forces the struct to break.
+-- in.cue --
+{
+	xylophone: 5
+
+	// a comment
+	yacht:     6
+}
+-- out/relpos --
+{
+	xylophone: 5
+
+	// a comment
+	yacht: 6
+}
+-- out/norelpos --
+{
+	xylophone: 5
+	// a comment
+	yacht: 6
+}

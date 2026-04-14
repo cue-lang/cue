@@ -1,0 +1,13 @@
+# A single simple field at narrow width: breaks regardless.
+-- config --
+width: 3
+-- in.cue --
+{x: 1}
+-- out/relpos --
+{
+	x: 1
+}
+-- out/norelpos --
+{
+	x: 1
+}

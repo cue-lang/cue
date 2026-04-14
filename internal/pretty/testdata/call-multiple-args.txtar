@@ -1,0 +1,31 @@
+# Function calls never get a trailing comma on the last argument,
+# even when the call breaks across lines. Unlike list literals,
+# CUE's formatting convention for calls is `foo(a, b)` / multi-line
+# without a trailing `,`. An empty-list argument `foo([])` is the
+# smallest case where a spurious trailing comma was surfacing.
+-- config --
+width: 20
+-- in.cue --
+{
+	y: foo(a, b)
+	z: foo(aaaaa, bbbbb)
+	w: foo([])
+}
+-- out/relpos --
+{
+	y: foo(a, b)
+	z: foo(
+		aaaaa,
+		bbbbb
+	)
+	w: foo([])
+}
+-- out/norelpos --
+{
+	y: foo(a, b)
+	z: foo(
+		aaaaa,
+		bbbbb
+	)
+	w: foo([])
+}

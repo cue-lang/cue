@@ -1,0 +1,21 @@
+# Comments on disjunction arms are preserved. Each // comment
+# appears after the "|" on the same line as the preceding arm.
+# Continuation disjuncts are indented one level.
+# The last comment ("fourth food") is a field-level trailing comment
+# that is passed into the chain table for alignment with the other
+# trailing comments.
+-- in.cue --
+out: "Apple" | // first food
+      "Banana" | // second food
+    "Carrot" | // third food
+            "Doughnut" // fourth food
+-- out/relpos --
+out: "Apple" | // first food
+	"Banana" | // second food
+	"Carrot" | // third food
+	"Doughnut" // fourth food
+-- out/norelpos --
+out: "Apple" | // first food
+	"Banana" | // second food
+	"Carrot" | // third food
+	"Doughnut" // fourth food

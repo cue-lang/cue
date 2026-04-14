@@ -1,0 +1,17 @@
+# Test that MainWithOptions passes context options through
+# to the cue context, in this case an injector.
+
+exec cue_inject export in.cue
+cmp stdout expect-stdout
+
+-- in.cue --
+@extern(inject)
+
+package p
+
+x: _ @inject(name="test.value")
+
+-- expect-stdout --
+{
+    "x": "hello from injector"
+}

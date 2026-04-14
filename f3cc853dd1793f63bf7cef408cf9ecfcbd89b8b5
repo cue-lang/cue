@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34af65a0_a3b0d752",
+        "filename": "cue/testdata/compile/files.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T05:35:44Z",
+      "side": 1,
+      "message": "Done. Added `# https://cuelang.org/issue/946` to files.txtar.",
+      "parentUuid": "cf988dae_8a949630",
+      "revId": "f3cc853dd1793f63bf7cef408cf9ecfcbd89b8b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a3a4e09_cc31c058",
+        "filename": "cue/testdata/compile/json.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T05:35:44Z",
+      "side": 1,
+      "message": "Done. Added `# https://cuelang.org/issue/721` to json.txtar.",
+      "parentUuid": "b6096366_4fee1760",
+      "revId": "f3cc853dd1793f63bf7cef408cf9ecfcbd89b8b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

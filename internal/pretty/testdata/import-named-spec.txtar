@@ -1,0 +1,37 @@
+# An ImportSpec with a local name uses the `s.Name != nil` branch of
+# importSpec, which renders `name "path"`. Covers both the
+# single-import form (`import foo "..."`) and named specs inside an
+# import group.
+-- in.cue --
+package p
+
+import foo "path/to/pkg"
+
+import (
+	bar "path/a"
+	"path/b"
+	baz "path/c"
+)
+
+x: foo.X + bar.Y + baz.Z
+-- out/relpos --
+package p
+
+import foo "path/to/pkg"
+
+import (
+	bar "path/a"
+	"path/b"
+	baz "path/c"
+)
+
+x: foo.X + bar.Y + baz.Z
+-- out/norelpos --
+package p
+import foo "path/to/pkg"
+import (
+	bar "path/a"
+	"path/b"
+	baz "path/c"
+)
+x: foo.X + bar.Y + baz.Z

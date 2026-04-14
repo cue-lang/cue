@@ -1,0 +1,96 @@
+# Exhaustive coverage of the contiguous-opener rule across all
+# opener pair combinations and a few deeper stacks. Each chain of
+# contiguous `{`, `[`, `(` characters shares one level of indent no
+# matter how deep, so the body always sits at exactly one tab from
+# the outer base. Chains that are broken up by a field label
+# (`a: ...`) start a fresh opener chain, so those lines step in one
+# more tab.
+#
+# CUE syntax forbids a newline immediately before `)` (auto-comma
+# insertion triggers), so paren-as-inner cases ([(, ((, {() can only
+# appear with flat content — the rule applies trivially there.
+-- in.cue --
+a1: [[
+	1
+]]
+a2: [{
+	x: 1
+}]
+a3: [(1 + 2)]
+
+b1: ([
+	1
+])
+b2: ({
+	x: 1
+})
+b3: ((1 + 2))
+
+c1: {[
+	1
+]}
+c2: {{
+	x: 1
+}}
+c3: {(1 + 2)}
+
+d1: {[{
+	x: 1
+}]}
+d2: [({
+	x: 1
+})]
+d3: [{
+	a: [
+		1
+	]
+}]
+-- out/relpos --
+a1: [[
+	1,
+]]
+a2: [{
+	x: 1
+}]
+a3: [(1 + 2)]
+
+b1: ([
+	1,
+])
+b2: ({
+	x: 1
+})
+b3: ((1 + 2))
+
+c1: {[
+	1,
+]}
+c2: {{
+	x: 1
+}}
+c3: {(1 + 2)}
+
+d1: {[{
+	x: 1
+}]}
+d2: [({
+	x: 1
+})]
+d3: [{
+	a: [
+		1,
+	]
+}]
+-- out/norelpos --
+a1: [[1]]
+a2: [{x: 1}]
+a3: [(1 + 2)]
+b1: ([1])
+b2: ({x: 1})
+b3: ((1 + 2))
+c1: {[1]}
+c2: {{x: 1}}
+c3: {(1 + 2)}
+d1: {[{x: 1}]}
+d2: [({x: 1})]
+d3: [{a: [1]}]

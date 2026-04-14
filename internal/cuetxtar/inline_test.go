@@ -804,6 +804,56 @@ func TestAtDirective(t *testing.T) {
 	})
 }
 
+// TestFormatValueList verifies that formatValue includes definition fields
+// (#X) inside list element structs (not just top-level struct fields), and
+// that the generated form uses [{...}] (opening brace on the same line as [)
+// for large struct elements to avoid an extra indentation level.
+func TestFormatValueList(t *testing.T) {
+	ctx := cuecontext.New()
+	r := &inlineRunner{
+		dir:     t.TempDir(),
+		archive: &txtar.Archive{},
+	}
+
+	t.Run("compact: definitions included", func(t *testing.T) {
+		// Small element fits on one line: [{x: 1, #D: "d"}].
+		val := ctx.CompileString("#S: {x: 1, #D: \"d\"}\ndata: [#S & {}]").LookupPath(cue.MakePath(cue.Str("data")))
+		got := r.formatValue(val)
+		if !strings.Contains(got, "#D") {
+			t.Errorf("definition #D missing: %s", got)
+		}
+		if !strings.Contains(got, "x: 1") {
+			t.Errorf("regular field x missing: %s", got)
+		}
+		// Compact list: no newlines.
+		if strings.Contains(got, "\n") {
+			t.Errorf("expected compact one-line form, got multiline: %s", got)
+		}
+	})
+
+	t.Run("multi-line: opening brace on same line as [", func(t *testing.T) {
+		// Large element forces multi-line; opening { must follow [ directly.
+		src := `#S2: {
+	runs?: "foo" | (["d1"] | ["d1", "d2"])
+	#D1: "d1"
+	#D2: "d2"
+}
+data2: [#S2 & {}]`
+		val := ctx.CompileString(src).LookupPath(cue.MakePath(cue.Str("data2")))
+		got := r.formatValue(val)
+		if !strings.HasPrefix(got, "[{") {
+			t.Errorf("multi-line list should start with '[{', got: %s", got)
+		}
+		if !strings.Contains(got, "#D1") {
+			t.Errorf("definition #D1 missing: %s", got)
+		}
+		// Open-list ellipsis must not appear (TODO: support in the future).
+		if strings.Contains(got, "...") {
+			t.Errorf("unexpected '...' in list output: %s", got)
+		}
+	})
+}
+
 // TestRunAllowsAssertion verifies that @test(allows, sel) and @test(allows=false, sel)
 // correctly report failures when the assertion is wrong.
 func TestRunAllowsAssertion(t *testing.T) {

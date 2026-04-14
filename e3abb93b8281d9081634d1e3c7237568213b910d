@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "837ce1ea_c7cb61ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-14T11:00:32Z",
+      "side": 1,
+      "message": "I don\u0027t see any txtar files being changed",
+      "revId": "e3abb93b8281d9081634d1e3c7237568213b910d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

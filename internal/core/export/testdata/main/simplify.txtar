@@ -18,9 +18,7 @@ additional: {
 import "strings"
 
 x: {
-	{
-		[string]: int64
-	}
+	{[string]: int64}
 	y: int
 }
 s: strings.MinRunes(4) & strings.MaxRunes(7)
@@ -44,9 +42,7 @@ Benign change in error message.
 -- out/value-v3 --
 == Simplified
 {
-	x: {
-		y: int64
-	}
+	x: y: int64
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env: _
@@ -57,9 +53,7 @@ Benign change in error message.
 }
 == Raw
 {
-	x: {
-		y: int & >=-9223372036854775808 & <=9223372036854775807
-	}
+	x: y: int & >=-9223372036854775808 & <=9223372036854775807
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env: _
@@ -70,9 +64,7 @@ Benign change in error message.
 }
 == Final
 {
-	x: {
-		y: int64
-	}
+	x: y: int64
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env:   _
@@ -81,9 +73,7 @@ Benign change in error message.
 }
 == All
 {
-	x: {
-		y: int64
-	}
+	x: y: int64
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env: _
@@ -94,9 +84,7 @@ Benign change in error message.
 }
 == Eval
 {
-	x: {
-		y: int & >=-9223372036854775808 & <=9223372036854775807
-	}
+	x: y: int & >=-9223372036854775808 & <=9223372036854775807
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env: _
@@ -109,7 +97,35 @@ Benign change in error message.
 diff old new
 --- old
 +++ new
-@@ -32,7 +32,7 @@
+@@ -1,8 +1,6 @@
+ == Simplified
+ {
+-	x: {
+-		y: int64
+-	}
++	x: y: int64
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
+@@ -13,9 +11,7 @@
+ }
+ == Raw
+ {
+-	x: {
+-		y: int & >=-9223372036854775808 & <=9223372036854775807
+-	}
++	x: y: int & >=-9223372036854775808 & <=9223372036854775807
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
+@@ -26,20 +22,16 @@
+ }
+ == Final
+ {
+-	x: {
+-		y: int64
+-	}
++	x: y: int64
  	s: strings.MinRunes(4) & strings.MaxRunes(7)
  	additional: {
  		env:   _
@@ -118,6 +134,25 @@ diff old new
  	}
  }
  == All
+ {
+-	x: {
+-		y: int64
+-	}
++	x: y: int64
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
+@@ -50,9 +42,7 @@
+ }
+ == Eval
+ {
+-	x: {
+-		y: int & >=-9223372036854775808 & <=9223372036854775807
+-	}
++	x: y: int & >=-9223372036854775808 & <=9223372036854775807
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
 -- out/value --
 == Simplified
 {

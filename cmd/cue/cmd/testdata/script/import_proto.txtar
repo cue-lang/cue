@@ -175,7 +175,7 @@ import (
 #Attributes: {
 	#Type:
 		#TYPE_A |
-		#TYPE_B
+			#TYPE_B
 
 	#TYPE_A: 1
 	#TYPE_B: 2
@@ -186,9 +186,7 @@ import (
 	}
 
 	// A map of attribute name to its value.
-	attributes?: {
-		[string]: #AttributeValue
-	} @protobuf(1,map[string]AttributeValue)
+	attributes?: {[string]: #AttributeValue} @protobuf(1,map[string]AttributeValue)
 
 	// Specifies one attribute value with different type.
 	#AttributeValue: {
@@ -218,9 +216,7 @@ import (
 	// Defines a string map.
 	#StringMap: {
 		// Holds a set of name/value pairs.
-		entries?: {
-			[string]: string
-		} @protobuf(1,map[string]string)
+		entries?: {[string]: string} @protobuf(1,map[string]string)
 	}
 }
 -- expect-client_config_proto_gen.cue --

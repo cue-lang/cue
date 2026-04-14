@@ -58,16 +58,14 @@ parse: {
 	t2: "2021-02-19T00:00:00Z"
 	t3: "2006-01-02T22:04:05Z"
 }
-split: {
-	t1: {
-		year:       2017
-		month:      7
-		day:        14
-		hour:       2
-		minute:     40
-		second:     0
-		nanosecond: 123456
-	}
+split: t1: {
+	year:       2017
+	month:      7
+	day:        14
+	hour:       2
+	minute:     40
+	second:     0
+	nanosecond: 123456
 }
 toUnix: {
 	epoch:       0

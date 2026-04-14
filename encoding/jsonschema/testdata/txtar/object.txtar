@@ -72,9 +72,7 @@
 import "struct"
 
 close({
-	fields?: struct.MinFields(3) & struct.MaxFields(10) & {
-		[=~"^\\P{Lu}"]: _
-	}
+	fields?: struct.MinFields(3) & struct.MaxFields(10) & {[=~"^\\P{Lu}"]: _}
 	additional?: {
 		foo?: number
 		bar?: number
@@ -105,7 +103,8 @@ close({
 		{[=~"^\\P{Lo}"]: int}
 		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
 	}
-	multi?: >=7 | struct.MaxFields(5) & {
+	multi?: >=7 |
+	struct.MaxFields(5) & {
 		foo?: number
 		bar?: number
 		...

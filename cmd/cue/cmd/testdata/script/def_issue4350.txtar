@@ -20,7 +20,6 @@ cmp stderr def-d.stderr
 	b?: b2?: string
 }
 -- def-e.stdout --
-
 _#def
 _#def: {
 	a?: string

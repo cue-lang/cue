@@ -25,6 +25,6 @@ payments: [{
 	currency: "GBP"
 }]
 
-payments: [... {
+payments: [...{
 	currency: *"EUR" | string
 }]

@@ -47,9 +47,12 @@ import (
 
 	cuecmd "cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cueversion"
@@ -531,6 +534,13 @@ func TestMain(m *testing.M) {
 	}
 	testscript.Main(m, map[string]func(){
 		"cue": func() { os.Exit(cuecmd.Main()) },
+		"cue_inject": func() {
+			// Use a minimal self-contained injection rather than the
+			// @extern(inject) machinery, so this only exercises that
+			// MainWithOptions passes context options through to the
+			// cue context.
+			os.Exit(cuecmd.MainWithOptions(cuecontext.WithInjection(testInjection{})))
+		},
 		// Until https://github.com/rogpeppe/go-internal/issues/93 is fixed,
 		// or we have some other way to use "exec" without caring about success,
 		// this is an easy way for us to mimic `? exec cue`.
@@ -598,6 +608,21 @@ func TestMain(m *testing.M) {
 			check(err)
 		},
 	})
+}
+
+// testInjection is a minimal [cuecontext.Injection] used by the cue_inject
+// testscript command. It injects a fixed string value at every field marked
+// with @testinject, independently of the @extern(inject) functionality.
+type testInjection struct{}
+
+func (testInjection) Kind() string { return "testinject" }
+
+func (testInjection) InjectorForInstance(b *build.Instance, r *runtime.Runtime) (runtime.Injector, errors.Error) {
+	return testInjection{}, nil
+}
+
+func (testInjection) InjectedValue(attr *runtime.ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
+	return &adt.String{Str: "hello from injector"}, nil
 }
 
 func tsExpand(ts *testscript.TestScript, s string) string {

@@ -245,9 +245,7 @@ orField: {
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
-language: {
-	version: "v0.15.0"
-}
+language: version: "v0.15.0"
 --- in.cue
 @experiment(explicitopen)
 
@@ -264,7 +262,7 @@ closeOnly: {
 		b: int
 	})
 	t1: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
-	t2: v & {b: 1} @test(eq, {b: 1, a: int})
+	t2: v & {b: 1}   @test(eq, {b: 1, a: int})
 }
 
 // close() + non-def reference → __reclose wraps struct, close() left as-is.
@@ -275,7 +273,7 @@ closeAndRef: {
 	}))
 
 	t1: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
-	t2: v & {a: 1} @test(eq, {a: 1})
+	t2: v & {a: 1}   @test(eq, {a: 1})
 }
 
 // Mixed definition + close() → __closeAll wraps struct, close() left as-is.
@@ -286,11 +284,12 @@ mixedDefClose: {
 		{b: c: {}}
 	})
 
-	t1: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
-	t2: v & {b: d: 1} @test(err, code=eval, contains="field not allowed")
+	t1: v & {c: 1}       @test(err, code=eval, path=c, contains="field not allowed")
+	t2: v & {b: d: 1}    @test(err, code=eval, contains="field not allowed")
 	t3: v & {b: c: d: 1} @test(err, code=eval, contains="field not allowed")
-	t4: v & {b: c: {}} @test(eq, {b: {c: {}}, x: {y: {}}})
-	t5: v & {x: y: {}} @test(eq, {x: {y: {}}, b: {c: {}}})
+	t4: v & {b: c: {}}   @test(eq, {b: {c: {}}, x: {y: {}}})
+	t5: v & {x: y: {}}   @test(eq, {x: {y: {}}, b: {c: {}}})
+
 }
 
 // Conjunct → single embed, simplified.

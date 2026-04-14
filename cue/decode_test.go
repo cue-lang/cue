@@ -404,9 +404,7 @@ field: string | {
 `).Decode(&st)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(fmt.Sprintf("%#v", st.Field), `(string | {
-	#x!: {
-		...
-	}
+	#x!: {...}
 	...
 }) & {
 	#x: _

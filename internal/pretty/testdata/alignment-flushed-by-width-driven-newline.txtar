@@ -1,0 +1,35 @@
+# With RelPos (parsed source), table alignment is not influenced by
+# width: every contiguous run of simple fields shares one column
+# layout regardless of how wide any individual value is. Inner Groups
+# in an infinite-width scope never break on width - they only break on
+# a HardLine - so the `wide` list stays flat at its full width and the
+# row simply overflows the configured budget. The user wrote the
+# layout; the formatter aligns and indents but does not segment.
+#
+# Without RelPos (programmatic AST) width drives layout: the list
+# breaks on overflow and explodes its elements onto one-per-line.
+-- config --
+width: 40
+-- in.cue --
+a: 1
+bb: 22
+wide: [1000000, 2000000, 3000000, 4000000]
+ccc: 3
+dddd: 44
+-- out/relpos --
+a:    1
+bb:   22
+wide: [1000000, 2000000, 3000000, 4000000]
+ccc:  3
+dddd: 44
+-- out/norelpos --
+a:  1
+bb: 22
+wide: [
+	1000000,
+	2000000,
+	3000000,
+	4000000,
+]
+ccc:  3
+dddd: 44

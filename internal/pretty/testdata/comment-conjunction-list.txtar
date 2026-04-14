@@ -1,0 +1,76 @@
+# A comment inside an empty list on the RHS of a conjunction (or
+# disjunction). The parser attaches comments inside an otherwise-empty
+# "[ ... ]" to the enclosing BinaryExpr (not the ListLit), the same way
+# it does for empty "{ ... }"; the renderer injects them back into the
+# bracket body so the output parses to the same attachment and
+# preserves the user's visual intent.
+-- in.cue --
+package p
+
+foo: a & [
+	// c
+]
+
+bar: a & [ // header
+]
+
+baz: a & [
+	// c1
+	// c2
+]
+
+qux: a | [
+	// l
+] | b
+
+quux: a | {
+	// s
+} | [
+	// l
+]
+-- out/relpos --
+package p
+
+foo: a & [
+	// c
+]
+
+bar: a & [ // header
+]
+
+baz: a & [
+	// c1
+	// c2
+]
+
+qux: a | [
+	// l
+] | b
+
+quux: a | {
+	// s
+} | [
+	// l
+]
+-- out/norelpos --
+package p
+foo: a & [
+	// c
+]
+bar: a & [
+	// header
+]
+baz: a & [
+	// c1
+	// c2
+]
+qux: a |
+	[
+		// l
+	] |
+	b
+quux: a | {
+	// s
+} | [
+	// l
+]

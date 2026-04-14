@@ -25,23 +25,15 @@ encodeB: yaml.Marshal(b.item)
 import "encoding/yaml"
 
 a: {
-	for key, value in {
-		test: _
-	} {
-		"item": {
-			foo: key
-		}
+	for key, value in {test: _} {
+		"item": foo: key
 	}
 	item: {}
 }
 encodeA: yaml.Marshal(a.item)
 b: {
-	for key, value in {
-		test: _
-	} {
-		[string]: {
-			"": key
-		}
+	for key, value in {test: _} {
+		[string]: "": key
 	}
 	item: {}
 }
@@ -59,20 +51,12 @@ encodeB: yaml.Marshal(b.item)
 -- out/value --
 == Simplified
 {
-	a: {
-		item: {
-			foo: "test"
-		}
-	}
+	a: item: foo: "test"
 	encodeA: """
 		foo: test
 
 		"""
-	b: {
-		item: {
-			"": "test"
-		}
-	}
+	b: item: "": "test"
 	encodeB: """
 		"": test
 
@@ -80,20 +64,12 @@ encodeB: yaml.Marshal(b.item)
 }
 == Raw
 {
-	a: {
-		item: {
-			foo: "test"
-		}
-	}
+	a: item: foo: "test"
 	encodeA: """
 		foo: test
 
 		"""
-	b: {
-		item: {
-			"": "test"
-		}
-	}
+	b: item: "": "test"
 	encodeB: """
 		"": test
 
@@ -101,20 +77,12 @@ encodeB: yaml.Marshal(b.item)
 }
 == Final
 {
-	a: {
-		item: {
-			foo: "test"
-		}
-	}
+	a: item: foo: "test"
 	encodeA: """
 		foo: test
 
 		"""
-	b: {
-		item: {
-			"": "test"
-		}
-	}
+	b: item: "": "test"
 	encodeB: """
 		"": test
 
@@ -122,20 +90,12 @@ encodeB: yaml.Marshal(b.item)
 }
 == All
 {
-	a: {
-		item: {
-			foo: "test"
-		}
-	}
+	a: item: foo: "test"
 	encodeA: """
 		foo: test
 
 		"""
-	b: {
-		item: {
-			"": "test"
-		}
-	}
+	b: item: "": "test"
 	encodeB: """
 		"": test
 
@@ -143,20 +103,12 @@ encodeB: yaml.Marshal(b.item)
 }
 == Eval
 {
-	a: {
-		item: {
-			foo: "test"
-		}
-	}
+	a: item: foo: "test"
 	encodeA: """
 		foo: test
 
 		"""
-	b: {
-		item: {
-			"": "test"
-		}
-	}
+	b: item: "": "test"
 	encodeB: """
 		"": test
 

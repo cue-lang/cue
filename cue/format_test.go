@@ -111,9 +111,7 @@ func ExampleValue_Format() {
 	// ---
 	// _#def
 	// _#def: {
-	// 	{
-	// 		[string]: int
-	// 	}
+	// 	{[string]: int}
 	// 	a: 3
 	// 	b: 3
 	// }
@@ -214,9 +212,7 @@ func TestFormat(t *testing.T) {
 	a: string
 	b: "hello \(a)"
 }
-d: #D & {
-	a: "world"
-}
+d: #D & {a: "world"}
 x: *1 | int`,
 			"%+v", `{
 	d: {
@@ -247,14 +243,14 @@ a: {
 	}
 }`,
 			"%3v", `{
-				a: {
-					b: """
-						foo
-						bar
-						"""
-					c: int
-				}
-			}`,
+	a: {
+		b: """
+			foo
+			bar
+			"""
+		c: int
+	}
+}`,
 			"%.1v", `{
  a: {
   b: """
@@ -265,14 +261,14 @@ a: {
  }
 }`,
 			"%3.1v", `{
-    a: {
-     b: """
-      foo
-      bar
-      """
-     c: int
-    }
-   }`,
+ a: {
+  b: """
+   foo
+   bar
+   """
+  c: int
+ }
+}`,
 		),
 	}, {
 		// References to predeclared builtins shadowed by a same-named field must
@@ -280,12 +276,8 @@ a: {
 		desc: "shadowed builtin",
 		in:   `"matchN": matchN`,
 		out: tests(
-			"%v", `{
-	matchN: __matchN
-}`,
-			"%+v", `{
-	matchN: __matchN
-}`,
+			"%v", `{matchN: __matchN}`,
+			"%+v", `{matchN: __matchN}`,
 			"%#v", `matchN: __matchN`,
 		),
 	}, {
@@ -295,12 +287,8 @@ a: {
 		a: strings.Contains("foo")
 		`,
 		out: tests(
-			"%v", `{
-	a: strings.Contains("foo")
-}`,
-			"%+v", `{
-	a: strings.Contains("foo")
-}`,
+			"%v", `{a: strings.Contains("foo")}`,
+			"%+v", `{a: strings.Contains("foo")}`,
 			"%#v", `import "strings"
 
 a: strings.Contains("foo")`,

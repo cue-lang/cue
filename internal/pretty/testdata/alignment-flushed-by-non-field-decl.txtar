@@ -1,0 +1,100 @@
+# Non-field decls (LetClause, EmbedDecl, Comprehension, Attribute,
+# Ellipsis) flush the alignment table at the construction stage:
+# rows on either side of the non-field decl form independent
+# alignment groups and do not pad to a shared key column.
+#
+# Without this rule, all four field-value rows in each struct below
+# would align to the widest key (`bazinga:`) - the non-field row
+# would sit silently in the same table contributing no Cells but
+# also not breaking the segment, and `foo:` would be padded to nine
+# columns. With the flush, the rows above the non-field align only
+# amongst themselves (key column = `longname:`) and the rows below
+# align amongst themselves (key column = `bazinga:`).
+-- in.cue --
+let_between: {
+	foo: 1
+	longname: 22
+	let X = 9
+	bar: 333
+	bazinga: 4444
+}
+
+embed_between: {
+	foo: 1
+	longname: 22
+	embedded
+	bar: 333
+	bazinga: 4444
+}
+
+for_between: {
+	foo: 1
+	longname: 22
+	for k, v in src {(k): v}
+	bar: 333
+	bazinga: 4444
+}
+
+attr_between: {
+	foo: 1
+	longname: 22
+	@meta(x)
+	bar: 333
+	bazinga: 4444
+}
+
+ellipsis_after: {
+	foo: 1
+	longname: 22
+	...
+}
+-- out/relpos --
+let_between: {
+	foo:      1
+	longname: 22
+	let X = 9
+	bar:     333
+	bazinga: 4444
+}
+
+embed_between: {
+	foo:      1
+	longname: 22
+	embedded
+	bar:     333
+	bazinga: 4444
+}
+
+for_between: {
+	foo:      1
+	longname: 22
+	for k, v in src {(k): v}
+	bar:     333
+	bazinga: 4444
+}
+
+attr_between: {
+	foo:      1
+	longname: 22
+	@meta(x)
+	bar:     333
+	bazinga: 4444
+}
+
+ellipsis_after: {
+	foo:      1
+	longname: 22
+	...
+}
+-- out/norelpos --
+let_between:   {foo: 1, longname: 22, let X = 9, bar: 333, bazinga: 4444}
+embed_between: {foo: 1, longname: 22, embedded, bar: 333, bazinga: 4444}
+for_between: {
+	foo:      1
+	longname: 22
+	for k, v in src {(k): v}
+	bar:     333
+	bazinga: 4444
+}
+attr_between:   {foo: 1, longname: 22, @meta(x), bar: 333, bazinga: 4444}
+ellipsis_after: {foo: 1, longname: 22, ...}

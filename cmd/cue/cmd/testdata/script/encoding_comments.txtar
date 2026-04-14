@@ -147,7 +147,7 @@ Data: #Schema & {
 list: [1, 2, 3]
 
 // implicitUnified is any non-empty string.
-
+//
 // implicitUnified is some string value.
 implicitUnified: "some value"
 
@@ -170,9 +170,7 @@ _disjunction2: int
 disjunction: _disjunction1 | _disjunction2
 -- eval-cue.stdout --
 #Schema: {}
-Data: {
-    name: "Foo"
-}
+Data: name: "Foo"
 foo:              "bar"
 implicitUnified:  "some value"
 explicitUnified1: "some default"
@@ -188,7 +186,7 @@ list: [1, 2, 3]
 // Data fits the schema.
 Data: {
 	// name is a specific name.
-
+	//
 	// name is the schema name.
 	name: "Foo"
 }
@@ -197,7 +195,7 @@ Data: {
 foo: "bar"
 
 // implicitUnified is any non-empty string.
-
+//
 // implicitUnified is some string value.
 implicitUnified: "some value"
 

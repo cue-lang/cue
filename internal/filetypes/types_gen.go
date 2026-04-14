@@ -321,9 +321,7 @@ func (t subsidiaryBoolTags) marshalToMap() map[string]bool {
 // unifySubsidiaryTags_0 unifies subsidiaryTags values according to the following CUE logic:
 //
 //	{
-//		{
-//			[string]: string
-//		}
+//		{[string]: string}
 //		lang: "go"
 //	}
 func unifySubsidiaryTags_0(t subsidiaryTags) (subsidiaryTags, error) {
@@ -338,12 +336,8 @@ func unifySubsidiaryTags_0(t subsidiaryTags) (subsidiaryTags, error) {
 // unifySubsidiaryTags_2 unifies subsidiaryTags values according to the following CUE logic:
 //
 //	{
-//		{
-//			[string]: string
-//		}
-//		lang: (*"" | string) & {
-//			"go"
-//		}
+//		{[string]: string}
+//		lang: (*"" | string) & {"go"}
 //	}
 func unifySubsidiaryTags_2(t subsidiaryTags) (subsidiaryTags, error) {
 	var r subsidiaryTags
@@ -357,9 +351,7 @@ func unifySubsidiaryTags_2(t subsidiaryTags) (subsidiaryTags, error) {
 // unifySubsidiaryTags_1 unifies subsidiaryTags values according to the following CUE logic:
 //
 //	{
-//		{
-//			[string]: string
-//		}
+//		{[string]: string}
 //		lang: *"" | string
 //	}
 func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
@@ -374,9 +366,7 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 // unifySubsidiaryBoolTags_3 unifies subsidiaryBoolTags values according to the following CUE logic:
 //
 //	{
-//		{
-//			[string]: bool
-//		}
+//		{[string]: bool}
 //		koala:                *false | bool
 //		strict:               *false | bool
 //		strictKeywords:       *strict | bool
@@ -411,9 +401,7 @@ func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 // unifySubsidiaryBoolTags_4 unifies subsidiaryBoolTags values according to the following CUE logic:
 //
 //	{
-//		{
-//			[string]: bool
-//		}
+//		{[string]: bool}
 //		koala:          *false | bool
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
@@ -446,9 +434,7 @@ func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 // unifySubsidiaryBoolTags_0 unifies subsidiaryBoolTags values according to the following CUE logic:
 //
 //	{
-//		{
-//			[string]: bool
-//		}
+//		{[string]: bool}
 //		koala: *false | bool
 //	}
 func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
@@ -475,9 +461,7 @@ func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 // unifySubsidiaryBoolTags_1 unifies subsidiaryBoolTags values according to the following CUE logic:
 //
 //	{
-//		{
-//			[string]: bool
-//		}
+//		{[string]: bool}
 //		strict:               *false | bool
 //		strictKeywords:       *strict | bool
 //		strictFeatures:       *strict | bool
@@ -510,9 +494,7 @@ func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 // unifySubsidiaryBoolTags_2 unifies subsidiaryBoolTags values according to the following CUE logic:
 //
 //	{
-//		{
-//			[string]: bool
-//		}
+//		{[string]: bool}
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
 //		strictFeatures: *strict | bool

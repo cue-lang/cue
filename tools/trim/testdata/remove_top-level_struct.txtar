@@ -21,7 +21,6 @@ for k, v in a {
 }
 
 z: {
-
 	a: b: 3
 	for k, v in a {
 		c: "\(k)": v

@@ -1,0 +1,36 @@
+# Function calls get a trailing comma on the last argument when the
+# closing ')' lands on its own line - same rule as list literals.
+# Single-line calls keep `foo(a, b)` with no trailing comma. An
+# empty-list argument `foo([])` is the smallest case that guards
+# against a spurious trailing comma.
+#
+# In the RelPos variant the struct is wrapped in an infinite-width
+# scope (the fields carry Newline RelPos), so the call's argument
+# Group stays flat regardless of width - `foo(aaaaa, bbbbb)`
+# overshoots the 20-column budget but keeps everything on one line.
+# The norelpos variant exercises the width-driven multi-line call
+# layout, where the trailing comma fires because ')' lands on its
+# own line.
+-- config --
+width: 20
+-- in.cue --
+{
+	y: foo(a, b)
+	z: foo(aaaaa, bbbbb)
+	w: foo([])
+}
+-- out/relpos --
+{
+	y: foo(a, b)
+	z: foo(aaaaa, bbbbb)
+	w: foo([])
+}
+-- out/norelpos --
+{
+	y: foo(a, b)
+	z: foo(
+		aaaaa,
+		bbbbb,
+	)
+	w: foo([])
+}

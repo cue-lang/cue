@@ -116,9 +116,7 @@ fail.withLet: invalid value [3,1,1] (does not satisfy list.UniqueItems): equal v
 Result:
 import "list"
 
-#a: {
-	a: 1
-}
+#a: a: 1
 #ab: {
 	a:  1
 	b?: int
@@ -127,22 +125,14 @@ import "list"
 	a:  1
 	b?: int & string
 }
-#b: {
-	b: 1
-}
-#c: {
-	c: int
-}
+#b: b: 1
+#c: c: int
 ok: {
 	t1: [1, 2, 3]
 	t2: [int, string, bool]
 	t3: ["1", 1]
 	t4: ["1", "2"]
-	t5: [{
-		a: 1
-	}, {
-		b: 1
-	}]
+	t5: [{a: 1}, {b: 1}]
 }
 
 // These have all equal elements, but
@@ -171,11 +161,7 @@ incomplete: {
 	withOptional3: list.UniqueItems() & [#a, #ab]
 
 	// Ditto. There are not optional fields, but the structs are open.
-	openSpecific: list.UniqueItems() & [{
-		a: 1
-	}, {
-		a: 1
-	}]
+	openSpecific: list.UniqueItems() & [{a: 1}, {a: 1}]
 
 	// Fully identical closed structs, but with non-concrete values.
 	structs: list.UniqueItems() & [#c, #c]
@@ -229,7 +215,7 @@ diff old new
      ./in.cue:3:21
      ./in.cue:52:18
  fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
-@@ -10,10 +10,16 @@
+@@ -10,17 +10,21 @@
      ./in.cue:44:8
  fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
      ./in.cue:3:21
@@ -248,7 +234,54 @@ diff old new
  
  Result:
  import "list"
-@@ -98,7 +104,7 @@
+ 
+-#a: {
+-	a: 1
+-}
++#a: a: 1
+ #ab: {
+ 	a:  1
+ 	b?: int
+@@ -29,22 +33,14 @@
+ 	a:  1
+ 	b?: int & string
+ }
+-#b: {
+-	b: 1
+-}
+-#c: {
+-	c: int
+-}
++#b: b: 1
++#c: c: int
+ ok: {
+ 	t1: [1, 2, 3]
+ 	t2: [int, string, bool]
+ 	t3: ["1", 1]
+ 	t4: ["1", "2"]
+-	t5: [{
+-		a: 1
+-	}, {
+-		b: 1
+-	}]
++	t5: [{a: 1}, {b: 1}]
+ }
+ 
+ // These have all equal elements, but
+@@ -73,11 +69,7 @@
+ 	withOptional3: list.UniqueItems() & [#a, #ab]
+ 
+ 	// Ditto. There are not optional fields, but the structs are open.
+-	openSpecific: list.UniqueItems() & [{
+-		a: 1
+-	}, {
+-		a: 1
+-	}]
++	openSpecific: list.UniqueItems() & [{a: 1}, {a: 1}]
+ 
+ 	// Fully identical closed structs, but with non-concrete values.
+ 	structs: list.UniqueItems() & [#c, #c]
+@@ -98,7 +90,7 @@
  }
  fail: {
  	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2
@@ -257,7 +290,7 @@ diff old new
  
  	// Hidden values do not play a role in the comparisson.
  	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
-@@ -105,7 +111,13 @@
+@@ -105,7 +97,13 @@
  
  	// This can be a permanent error, as the optional field of the second
  	// element is erroneous an cannot match.

@@ -18,6 +18,7 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -49,8 +50,8 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 				continue
 			}
 			fields = append(fields, f)
-			for _, cg := range ast.Comments(f) {
-				if !containsDoc(docs, cg) && cg.Doc {
+			for _, cg := range leadingDocComments(ast.Comments(f)) {
+				if !containsDoc(docs, cg) {
 					docs = append(docs, cg)
 				}
 			}
@@ -76,8 +77,8 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 			for _, child := range fields {
 				if nested == child {
 					newFields = append(newFields, f)
-					for _, cg := range ast.Comments(f) {
-						if !containsDoc(docs, cg) && cg.Doc {
+					for _, cg := range leadingDocComments(ast.Comments(f)) {
+						if !containsDoc(docs, cg) {
 							docs = append(docs, cg)
 						}
 					}
@@ -119,6 +120,37 @@ func nestedField(f *ast.Field) *ast.Field {
 
 	f, _ = s.Elts[0].(*ast.Field)
 	return f
+}
+
+// leadingDocComments returns the doc-position comment groups in cgs,
+// in order. When non-doc comment groups that the exporter discards
+// precede the first doc comment, that first doc comment inherits the
+// leading RelPos of cgs[0].
+func leadingDocComments(cgs []*ast.CommentGroup) []*ast.CommentGroup {
+	var docs []*ast.CommentGroup
+	for i, cg := range cgs {
+		if cg.Doc {
+			if i > 0 && len(docs) == 0 {
+				cg = withLeadingRelPos(cg, cgs[0].Pos().RelPos())
+			}
+			docs = append(docs, cg)
+		}
+	}
+	return docs
+}
+
+// withLeadingRelPos returns cg with the RelPos of its first comment's
+// slash set to rel. It clones cg so the input is unaltered. cg is
+// returned unchanged when it is empty or already carries rel.
+func withLeadingRelPos(cg *ast.CommentGroup, rel token.RelPos) *ast.CommentGroup {
+	if cg == nil || len(cg.List) == 0 || cg.Pos().RelPos() == rel {
+		return cg
+	}
+	clone := *cg
+	clone.List = slices.Clone(cg.List)
+	first := clone.List[0]
+	first.Slash = first.Slash.WithRel(rel)
+	return &clone
 }
 
 func containsDoc(a []*ast.CommentGroup, cg *ast.CommentGroup) bool {

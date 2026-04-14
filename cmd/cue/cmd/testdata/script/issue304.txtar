@@ -2,7 +2,6 @@ exec cue def -e '#Foo' x.cue
 cmp stdout expect-stdout
 
 -- expect-stdout --
-
 _#def
 _#def: {
 	x: int

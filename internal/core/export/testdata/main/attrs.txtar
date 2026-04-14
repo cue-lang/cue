@@ -103,58 +103,35 @@ a: {
 } @field(2) @field(1) @field(4) @field(3) @field(5)
 doNotPropagate: {
 	#A: {} @attr1()
-	a: #A
+	a:  #A
 
 	// Do not accumulated field attributes in embedding.
 	#B: {} @attr1()
-	b: #B
+	b:  #B
 }
-embedScalarField: {
-	a: 2 @attr1() @attr2()
-}
+embedScalarField: a: 2 @attr1() @attr2()
 embedScalarDecl: {
-	b0: {
-		@attr1()
-		2
-	}
+	b0: {@attr1(), 2}
 	b1: b0
-	b2: {
-		@attr2()
-		b0
-		2
-	}
+	b2: {@attr2(), b0, 2}
 }
 dontMergeForDef: {
-	a: {
-		@decl1()
-	}
-	b: a & {
-		@decl2()
-		x: 1
-	}
-	c: a & {
-		@decl2()
-	}
-	d: {
-		@decl2()
-		a
-	}
+	a: {@decl1()}
+	b: a & {@decl2(), x: 1}
+	c: a & {@decl2()}
+	d: {@decl2(), a}
 }
 comprehensions: {
 	@step(0)
 	c1: {} @step(1)
 	if true {
 		@step(2c)
-		c2: {
-			@step(2a)
-		} @step(2b)
+		c2: {@step(2a)} @step(2b)
 	}
 	c3: {} @step(3)
 	if false {
 		@step(4c)
-		c4: {
-			@step(4a)
-		} @step(4b)
+		c4: {@step(4a)} @step(4b)
 	}
 }
 dynamicComplex: {
@@ -211,9 +188,7 @@ dynamicSimple: {
 		a: {}
 		b: {}
 	}
-	embedScalarField: {
-		a: 2
-	}
+	embedScalarField: a: 2
 	embedScalarDecl: {
 		b0: 2
 		b1: 2
@@ -221,9 +196,7 @@ dynamicSimple: {
 	}
 	dontMergeForDef: {
 		a: {}
-		b: {
-			x: 1
-		}
+		b: x: 1
 		c: {}
 		d: {}
 	}
@@ -236,24 +209,20 @@ dynamicSimple: {
 		a:   "foo"
 		foo: "foo"
 	}
-	dynamicSimple: {
-		a: "foo"
-	}
+	dynamicSimple: a: "foo"
 }
 == Raw
 {
 	a: {}
 	doNotPropagate: {
 		#A: {}
-		a: {}
+		a:  {}
 
 		// Do not accumulated field attributes in embedding.
 		#B: {}
-		b: {}
+		b:  {}
 	}
-	embedScalarField: {
-		a: 2
-	}
+	embedScalarField: a: 2
 	embedScalarDecl: {
 		b0: 2
 		b1: 2
@@ -261,9 +230,7 @@ dynamicSimple: {
 	}
 	dontMergeForDef: {
 		a: {}
-		b: {
-			x: 1
-		}
+		b: x: 1
 		c: {}
 		d: {}
 	}
@@ -289,9 +256,7 @@ dynamicSimple: {
 		a: {}
 		b: {}
 	}
-	embedScalarField: {
-		a: 2
-	}
+	embedScalarField: a: 2
 	embedScalarDecl: {
 		b0: 2
 		b1: 2
@@ -299,9 +264,7 @@ dynamicSimple: {
 	}
 	dontMergeForDef: {
 		a: {}
-		b: {
-			x: 1
-		}
+		b: x: 1
 		c: {}
 		d: {}
 	}
@@ -314,12 +277,11 @@ dynamicSimple: {
 		a:   "foo"
 		foo: "foo"
 	}
-	dynamicSimple: {
-		a: "foo"
-	}
+	dynamicSimple: a: "foo"
 }
 == All
 {
+
 	@file("foo")
 
 	@file("bar")
@@ -331,49 +293,30 @@ dynamicSimple: {
 	} @field(2) @field(1) @field(4) @field(3) @field(5)
 	doNotPropagate: {
 		#A: {} @attr1()
-		a: {}
+		a:  {}
 
 		// Do not accumulated field attributes in embedding.
 		#B: {} @attr1()
-		b: {}
+		b:  {}
 	}
-	embedScalarField: {
-		a: 2 @attr1() @attr2()
-	}
+	embedScalarField: a: 2 @attr1() @attr2()
 	embedScalarDecl: {
-		b0: {
-			2, @attr1()
-		}
-		b1: {
-			2, @attr1()
-		}
-		b2: {
-			2, @attr2(), @attr1()
-		}
+		b0: {2, @attr1()}
+		b1: {2, @attr1()}
+		b2: {2, @attr2(), @attr1()}
 	}
 	dontMergeForDef: {
-		a: {
-			@decl1()
-		}
-		b: {
-			@decl2(), @decl1()
-			x: 1
-		}
-		c: {
-			@decl2(), @decl1()
-		}
-		d: {
-			@decl2(), @decl1()
-		}
+		a: {@decl1()}
+		b: {@decl2(), @decl1(), x: 1}
+		c: {@decl2(), @decl1()}
+		d: {@decl2(), @decl1()}
 	}
 	comprehensions: {
 		@step(0)
 		@step(2c)
-		c2: {
-			@step(2a)
-		} @step(2b)
-		c1: {} @step(1)
-		c3: {} @step(3)
+		c2: {@step(2a)} @step(2b)
+		c1: {}          @step(1)
+		c3: {}          @step(3)
 	}
 	dynamicComplex: {
 		a:   "foo" @step(3) @step(2)
@@ -387,6 +330,7 @@ dynamicSimple: {
 }
 == Eval
 {
+
 	@file("foo")
 
 	@file("bar")
@@ -398,47 +342,28 @@ dynamicSimple: {
 	} @field(2) @field(1) @field(4) @field(3) @field(5)
 	doNotPropagate: {
 		#A: {} @attr1()
-		a: {}
+		a:  {}
 		#B: {} @attr1()
-		b: {}
+		b:  {}
 	}
-	embedScalarField: {
-		a: 2 @attr1() @attr2()
-	}
+	embedScalarField: a: 2 @attr1() @attr2()
 	embedScalarDecl: {
-		b0: {
-			2, @attr1()
-		}
-		b1: {
-			2, @attr1()
-		}
-		b2: {
-			2, @attr2(), @attr1()
-		}
+		b0: {2, @attr1()}
+		b1: {2, @attr1()}
+		b2: {2, @attr2(), @attr1()}
 	}
 	dontMergeForDef: {
-		a: {
-			@decl1()
-		}
-		b: {
-			@decl2(), @decl1()
-			x: 1
-		}
-		c: {
-			@decl2(), @decl1()
-		}
-		d: {
-			@decl2(), @decl1()
-		}
+		a: {@decl1()}
+		b: {@decl2(), @decl1(), x: 1}
+		c: {@decl2(), @decl1()}
+		d: {@decl2(), @decl1()}
 	}
 	comprehensions: {
 		@step(0)
 		@step(2c)
-		c2: {
-			@step(2a)
-		} @step(2b)
-		c1: {} @step(1)
-		c3: {} @step(3)
+		c2: {@step(2a)} @step(2b)
+		c1: {}          @step(1)
+		c3: {}          @step(3)
 	}
 	dynamicComplex: {
 		a:   "foo" @step(3) @step(2)
@@ -454,40 +379,344 @@ dynamicSimple: {
 diff old new
 --- old
 +++ new
-@@ -150,11 +150,11 @@
- 			@decl1()
- 		}
- 		b: {
+@@ -5,34 +5,28 @@
+ 		a: {}
+ 		b: {}
+ 	}
+-	embedScalarField: {
+-		a: 2
+-	}
+-	embedScalarDecl: {
+-		b0: 2
+-		b1: 2
+-		b2: 2
+-	}
+-	dontMergeForDef: {
+-		a: {}
+-		b: {
+-			x: 1
+-		}
+-		c: {}
+-		d: {}
+-	}
+-	comprehensions: {
+-		c2: {}
+-		c1: {}
+-		c3: {}
+-	}
+-	dynamicComplex: {
+-		a:   "foo"
+-		foo: "foo"
+-	}
+-	dynamicSimple: {
+-		a: "foo"
+-	}
++	embedScalarField: a: 2
++	embedScalarDecl: {
++		b0: 2
++		b1: 2
++		b2: 2
++	}
++	dontMergeForDef: {
++		a: {}
++		b: x: 1
++		c: {}
++		d: {}
++	}
++	comprehensions: {
++		c2: {}
++		c1: {}
++		c3: {}
++	}
++	dynamicComplex: {
++		a:   "foo"
++		foo: "foo"
++	}
++	dynamicSimple: a: "foo"
+ }
+ == Raw
+ {
+@@ -39,25 +33,21 @@
+ 	a: {}
+ 	doNotPropagate: {
+ 		#A: {}
+-		a: {}
++		a:  {}
+ 
+ 		// Do not accumulated field attributes in embedding.
+ 		#B: {}
+-		b: {}
+-	}
+-	embedScalarField: {
+-		a: 2
+-	}
+-	embedScalarDecl: {
+-		b0: 2
+-		b1: 2
+-		b2: 2
+-	}
+-	dontMergeForDef: {
+-		a: {}
+-		b: {
+-			x: 1
+-		}
++		b:  {}
++	}
++	embedScalarField: a: 2
++	embedScalarDecl: {
++		b0: 2
++		b1: 2
++		b2: 2
++	}
++	dontMergeForDef: {
++		a: {}
++		b: x: 1
+ 		c: {}
+ 		d: {}
+ 	}
+@@ -83,91 +73,67 @@
+ 		a: {}
+ 		b: {}
+ 	}
+-	embedScalarField: {
+-		a: 2
+-	}
+-	embedScalarDecl: {
+-		b0: 2
+-		b1: 2
+-		b2: 2
+-	}
+-	dontMergeForDef: {
+-		a: {}
+-		b: {
+-			x: 1
+-		}
+-		c: {}
+-		d: {}
+-	}
+-	comprehensions: {
+-		c2: {}
+-		c1: {}
+-		c3: {}
+-	}
+-	dynamicComplex: {
+-		a:   "foo"
+-		foo: "foo"
+-	}
+-	dynamicSimple: {
+-		a: "foo"
+-	}
++	embedScalarField: a: 2
++	embedScalarDecl: {
++		b0: 2
++		b1: 2
++		b2: 2
++	}
++	dontMergeForDef: {
++		a: {}
++		b: x: 1
++		c: {}
++		d: {}
++	}
++	comprehensions: {
++		c2: {}
++		c1: {}
++		c3: {}
++	}
++	dynamicComplex: {
++		a:   "foo"
++		foo: "foo"
++	}
++	dynamicSimple: a: "foo"
+ }
+ == All
+ {
+-	@file("foo")
+-
+-	@file("bar")
+-	a: {
+-		@decl(1)
+-		@decl(2)
+-		@decl(3)
+-		@decl(5)
+-	} @field(2) @field(1) @field(4) @field(3) @field(5)
+-	doNotPropagate: {
+-		#A: {} @attr1()
+-		a: {}
+-
+-		// Do not accumulated field attributes in embedding.
+-		#B: {} @attr1()
+-		b: {}
+-	}
+-	embedScalarField: {
+-		a: 2 @attr1() @attr2()
+-	}
+-	embedScalarDecl: {
+-		b0: {
+-			2, @attr1()
+-		}
+-		b1: {
+-			2, @attr1()
+-		}
+-		b2: {
+-			2, @attr2(), @attr1()
+-		}
+-	}
+-	dontMergeForDef: {
+-		a: {
+-			@decl1()
+-		}
+-		b: {
 -			@decl1(), @decl2()
 -			x: 1
 -		}
 -		c: {
 -			@decl1(), @decl2()
-+			@decl2(), @decl1()
-+			x: 1
-+		}
-+		c: {
-+			@decl2(), @decl1()
- 		}
- 		d: {
- 			@decl2(), @decl1()
-@@ -215,11 +215,11 @@
- 			@decl1()
- 		}
- 		b: {
+-		}
+-		d: {
+-			@decl2(), @decl1()
+-		}
+-	}
+-	comprehensions: {
+-		@step(0)
+-		@step(2c)
+-		c2: {
+-			@step(2a)
+-		} @step(2b)
+-		c1: {} @step(1)
+-		c3: {} @step(3)
++
++	@file("foo")
++
++	@file("bar")
++	a: {
++		@decl(1)
++		@decl(2)
++		@decl(3)
++		@decl(5)
++	} @field(2) @field(1) @field(4) @field(3) @field(5)
++	doNotPropagate: {
++		#A: {} @attr1()
++		a:  {}
++
++		// Do not accumulated field attributes in embedding.
++		#B: {} @attr1()
++		b:  {}
++	}
++	embedScalarField: a: 2 @attr1() @attr2()
++	embedScalarDecl: {
++		b0: {2, @attr1()}
++		b1: {2, @attr1()}
++		b2: {2, @attr2(), @attr1()}
++	}
++	dontMergeForDef: {
++		a: {@decl1()}
++		b: {@decl2(), @decl1(), x: 1}
++		c: {@decl2(), @decl1()}
++		d: {@decl2(), @decl1()}
++	}
++	comprehensions: {
++		@step(0)
++		@step(2c)
++		c2: {@step(2a)} @step(2b)
++		c1: {}          @step(1)
++		c3: {}          @step(3)
+ 	}
+ 	dynamicComplex: {
+ 		a:   "foo" @step(3) @step(2)
+@@ -181,58 +147,40 @@
+ }
+ == Eval
+ {
+-	@file("foo")
+-
+-	@file("bar")
+-	a: {
+-		@decl(1)
+-		@decl(2)
+-		@decl(3)
+-		@decl(5)
+-	} @field(2) @field(1) @field(4) @field(3) @field(5)
+-	doNotPropagate: {
+-		#A: {} @attr1()
+-		a: {}
+-		#B: {} @attr1()
+-		b: {}
+-	}
+-	embedScalarField: {
+-		a: 2 @attr1() @attr2()
+-	}
+-	embedScalarDecl: {
+-		b0: {
+-			2, @attr1()
+-		}
+-		b1: {
+-			2, @attr1()
+-		}
+-		b2: {
+-			2, @attr2(), @attr1()
+-		}
+-	}
+-	dontMergeForDef: {
+-		a: {
+-			@decl1()
+-		}
+-		b: {
 -			@decl1(), @decl2()
 -			x: 1
 -		}
 -		c: {
 -			@decl1(), @decl2()
-+			@decl2(), @decl1()
-+			x: 1
-+		}
-+		c: {
-+			@decl2(), @decl1()
- 		}
- 		d: {
- 			@decl2(), @decl1()
+-		}
+-		d: {
+-			@decl2(), @decl1()
+-		}
+-	}
+-	comprehensions: {
+-		@step(0)
+-		@step(2c)
+-		c2: {
+-			@step(2a)
+-		} @step(2b)
+-		c1: {} @step(1)
+-		c3: {} @step(3)
++
++	@file("foo")
++
++	@file("bar")
++	a: {
++		@decl(1)
++		@decl(2)
++		@decl(3)
++		@decl(5)
++	} @field(2) @field(1) @field(4) @field(3) @field(5)
++	doNotPropagate: {
++		#A: {} @attr1()
++		a:  {}
++		#B: {} @attr1()
++		b:  {}
++	}
++	embedScalarField: a: 2 @attr1() @attr2()
++	embedScalarDecl: {
++		b0: {2, @attr1()}
++		b1: {2, @attr1()}
++		b2: {2, @attr2(), @attr1()}
++	}
++	dontMergeForDef: {
++		a: {@decl1()}
++		b: {@decl2(), @decl1(), x: 1}
++		c: {@decl2(), @decl1()}
++		d: {@decl2(), @decl1()}
++	}
++	comprehensions: {
++		@step(0)
++		@step(2c)
++		c2: {@step(2a)} @step(2b)
++		c1: {}          @step(1)
++		c3: {}          @step(3)
+ 	}
+ 	dynamicComplex: {
+ 		a:   "foo" @step(3) @step(2)
 -- diff/value/todo/p3 --
 Reordering of attributes.
 -- out/value --

@@ -25,9 +25,7 @@ stderr 'tag "notknown" not used in any file'
 
 -- want-module --
 module: "main.org"
-language: {
-	version: "v0.9.2"
-}
+language: version: "v0.9.2"
 deps: {
 	"test.example/d1@v0": {
 		v:       "v0.0.1"
@@ -44,17 +42,13 @@ deps: {
 }
 -- want-stdout-1 --
 prod: false
-x: {
-    self: "test.example/d2"
-}
+x: self: "test.example/d2"
 -- want-stdout-2 --
 prod: true
 x: {
     self:        "test.example/d1"
     prodenabled: false
-    y: {
-        self: "test.example/d4"
-    }
+    y: self: "test.example/d4"
 }
 -- cue.mod/module.cue --
 module: "main.org"

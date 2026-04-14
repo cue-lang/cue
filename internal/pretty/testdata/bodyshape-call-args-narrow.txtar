@@ -1,0 +1,23 @@
+# [docBodyShape] also drives the layout of CallExpr argument lists
+# (via callExpr passing useBodyShape into elementRows). When every
+# argument is bracketed-no-relpos, the call's argument layout
+# follows the same per-level decision: flat shape when the whole
+# call fits on one line, indented shape when only the argument body
+# fits at indent+1, hug shape otherwise.
+#
+# At width 12, `f({a: _}, {b: _})` flat (18) exceeds the budget,
+# and the indented body (14 chars) also doesn't fit at indent+1 (8
+# remaining), so the hug shape fires for the call: `f({`, struct1
+# multi-line, `}, {`, struct2 multi-line, `})`.
+-- config --
+width: 12
+-- in.cue --
+x: f({a: _}, {b: _})
+-- out/relpos --
+x: f({a: _}, {b: _})
+-- out/norelpos --
+x: f({
+	a: _
+}, {
+	b: _
+})

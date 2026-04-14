@@ -5,7 +5,6 @@ package full_references
 }
 
 #FullReferenceNestedMsg: {
-
 	#FullReferenceDoubleNestedMsg: {
 		value?: string @protobuf(1,string)
 	}
@@ -27,7 +26,6 @@ package full_references
 
 	// AmbiguousMsg is a message that is ambiguous between a top-level message and a nested message.
 	#AmbiguousMsg: {
-
 		#Inner: {
 			// nested_field is a field that distinguishes this Inner from the in the top-level AmbiguousMsg message.
 			nestedField?: string @protobuf(1,string,name=nested_field)
@@ -55,7 +53,6 @@ package full_references
 
 // AmbiguousMsg is a message that is ambiguous between a top-level message and a nested message.
 #AmbiguousMsg: {
-
 	#Inner: {
 		// top_level_inner is a field that distinguishes this Inner from the one nested in FullReferenceMsg.
 		topLevelInner?: string @protobuf(1,string,name=top_level_inner)

@@ -9,6 +9,4 @@ package nullinit
 foo: _ @testfn("file.xx")
 
 -- out/extern --
-{
-	foo: _
-}
+{foo: _}

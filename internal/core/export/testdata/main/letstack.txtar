@@ -19,59 +19,34 @@ x: "s"
 == Simplified
 {
 	// Must be at root to cause problem
-	s: [{
-		f1: {
-			f2: "s"
-		}
-	}]
+	s: [{f1: f2: "s"}]
 	x: "s"
 }
 == Raw
 {
 	// Must be at root to cause problem
-	s: [{
-		f1: {
-			f2: "s"
-		}
-	}]
+	s: [{f1: f2: "s"}]
 	x: "s"
 }
 == Final
 {
-	s: [{
-		f1: {
-			f2: "s"
-		}
-	}]
+	s: [{f1: f2: "s"}]
 	x: "s"
 }
 == All
 {
 	// Must be at root to cause problem
-	s: [{
-		f1: {
-			f2: "s"
-		}
-	}]
+	s: [{f1: f2: "s"}]
 	x: "s"
 }
 == Eval
 {
-	s: [{
-		f1: {
-			f2: "s"
-		}
-	}]
+	s: [{f1: f2: "s"}]
 	x: "s"
 }
 -- out/definition --
-
 let N = x
 
 // Must be at root to cause problem
-(N): [{
-	f1: {
-		f2: N
-	}
-}]
-x: "s"
+(N): [{f1: f2: N}]
+x:   "s"

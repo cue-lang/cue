@@ -89,9 +89,7 @@ graph TD
 -- out/run/t2/value --
 {
 	$id: "run"
-	env: {
-		input: "foo"
-	}
+	env: input: "foo"
 	stdout: "foo"
 }
 -- out/run-v3/t2/stats --

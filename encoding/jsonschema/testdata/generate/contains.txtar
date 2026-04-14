@@ -46,12 +46,8 @@ ok2: data: {}
 			contains: {
 				type: "object"
 				properties: {
-					name: {
-						type: "string"
-					}
-					type: {
-						const: "user"
-					}
+					name: type:  "string"
+					type: const: "user"
 				}
 				required: ["name"]
 			}
@@ -87,9 +83,7 @@ ok2: data: {}
 		stringContains: {
 			type:        "array"
 			description: "Contains with a specific schema"
-			contains: {
-				type: "string"
-			}
+			contains: type: "string"
 			minContains: 1
 		}
 	}

@@ -201,9 +201,7 @@ aliasenclosing: {
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "test.example"
-language: {
-	version: "v0.15.0"
-}
+language: version: "v0.15.0"
 --- a.cue
 @experiment(aliasv2)
 
@@ -385,7 +383,7 @@ enclosinglet: {
 	let self = {z: 99}
 	inner: {
 		let X = __self
-		i: X.a @test(eq, 1)
+		i: X.a    @test(eq, 1)
 		a: 1
 		j: self.z @test(eq, 99)
 	}

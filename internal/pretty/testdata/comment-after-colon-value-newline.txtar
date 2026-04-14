@@ -1,0 +1,29 @@
+# A `//` comment after the colon (Position=2 with Line=true /
+# Slash.RelPos = Blank), with the value on its own line below.
+#
+# In the with-relpos case the comment stays on the colon's line -
+# that's what the user authored, and `//` runs to end-of-line so
+# the value can only follow on a new line. There must be exactly
+# one break between the comment and the value, not a blank line:
+# the comment and the value's leading break together contribute a
+# single newline.
+#
+# In the norelpos case stripRelPos clears Line and Slash.RelPos,
+# so the comment becomes "own-line, no specific RelPos". field()
+# routes it through fieldValDoc's preVal at the value's indent
+# level - which round-trips cleanly: the parser re-attaches such
+# a comment as a doc of the value with Newline RelPos, and
+# re-formatting produces the same indented placement. Note also
+# that fields with Position=2 comments are routed to field()
+# (not fieldRow) since their value can't share a line with the
+# comment in a table layout - see simpleFieldChain.
+-- in.cue --
+d: // c
+ 1
+-- out/relpos --
+d: // c
+	1
+-- out/norelpos --
+d:
+	// c
+	1

@@ -21,11 +21,9 @@ import (
 )
 
 #StructWrap: {
-	struct?: {
-		...
-	} @protobuf(1,google.protobuf.Struct)
-	any?: _ @protobuf(2,google.protobuf.Value)
-	listVal?: [...] @protobuf(3,google.protobuf.ListValue)
+	struct?:    {...}  @protobuf(1,google.protobuf.Struct)
+	any?:       _      @protobuf(2,google.protobuf.Value)
+	listVal?:   [...]  @protobuf(3,google.protobuf.ListValue)
 	boolVal?:   bool   @protobuf(4,google.protobuf.BoolValue)
 	stringVal?: string @protobuf(5,google.protobuf.StringValue)
 	numberVal?: number @protobuf(6,google.protobuf.NumberValue)
@@ -50,9 +48,7 @@ import (
 //
 #Attributes: {
 	// A map of attribute name to its value.
-	attributes?: {
-		[string]: #AttributeValue
-	} @protobuf(1,map[string]AttributeValue)
+	attributes?: {[string]: #AttributeValue} @protobuf(1,map[string]AttributeValue)
 
 	// Specifies one attribute value with different type.
 	#AttributeValue: {
@@ -91,9 +87,7 @@ import (
 	// Defines a string map.
 	#StringMap: {
 		// Holds a set of name/value pairs.
-		entries?: {
-			[string]: string
-		} @protobuf(1,map[string]string)
+		entries?: {[string]: string} @protobuf(1,map[string]string)
 	}
 }
 
@@ -109,53 +103,35 @@ import (
 	words?: [...string] @protobuf(1,string)
 
 	// Holds attributes of type STRING, DNS_NAME, EMAIL_ADDRESS, URI
-	strings?: {
-		[string]: int32
-	} @protobuf(2,map[sint32]sint32)
+	strings?: {[string]: int32} @protobuf(2,map[sint32]sint32)
 
 	// Holds attributes of type INT64
-	int64s?: {
-		[string]: int64
-	} @protobuf(3,map[sint32]int64)
+	int64s?: {[string]: int64} @protobuf(3,map[sint32]int64)
 
 	// Holds attributes of type DOUBLE
-	doubles?: {
-		[string]: float64
-	} @protobuf(4,map[sint32]double)
+	doubles?: {[string]: float64} @protobuf(4,map[sint32]double)
 
 	// Holds attributes of type BOOL
-	bools?: {
-		[string]: bool
-	} @protobuf(5,map[sint32]bool)
+	bools?: {[string]: bool} @protobuf(5,map[sint32]bool)
 
 	// Holds attributes of type TIMESTAMP
-	time?: {
-		[string]: time_9.Time
-	} @protobuf(6,map[sint32]google.protobuf.Timestamp,"(gogoproto.nullable)=false","(gogoproto.stdtime)")
+	time?: {[string]: time_9.Time} @protobuf(6,map[sint32]google.protobuf.Timestamp,"(gogoproto.nullable)=false","(gogoproto.stdtime)")
 
 	// Holds attributes of type DURATION
-	durations?: {
-		[string]: time_9.Duration
-	} @protobuf(7,map[sint32]google.protobuf.Duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
+	durations?: {[string]: time_9.Duration} @protobuf(7,map[sint32]google.protobuf.Duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
 
 	// Holds attributes of type BYTES
-	bytes?: {
-		[string]: bytes_B
-	} @protobuf(8,map[sint32]bytes)
+	bytes?: {[string]: bytes_B} @protobuf(8,map[sint32]bytes)
 
 	// Holds attributes of type STRING_MAP
-	stringMaps?: {
-		[string]: #StringMap
-	} @protobuf(9,map[sint32]StringMap,string_maps,"(gogoproto.nullable)=false")
+	stringMaps?: {[string]: #StringMap} @protobuf(9,map[sint32]StringMap,string_maps,"(gogoproto.nullable)=false")
 }
 
 // A map of string to string. The keys and values in this map are dictionary
 // indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)
 #StringMap: {
 	// Holds a set of name/value pairs.
-	entries?: {
-		[string]: int32
-	} @protobuf(1,map[sint32]sint32)
+	entries?: {[string]: int32} @protobuf(1,map[sint32]sint32)
 }
 
 let bytes_B = bytes

@@ -307,9 +307,7 @@ a: x: "hello"
 		`,
 		kind: Modified,
 		diff: `  {
--     a: {
--     	x: "hello"
--     }
+-     a: {x: "hello"}
   }
 `,
 	}, {
@@ -599,9 +597,7 @@ a: x: "hello"
 		kind: Modified,
 		diff: `  [
 -     1,
-+     {
-+     	a: 1
-+     },
++     {a: 1},
   ]
 `,
 	}}

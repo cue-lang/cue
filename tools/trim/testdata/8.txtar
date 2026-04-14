@@ -16,37 +16,43 @@ b: [=~ ".*"]: x: "hi"
 a: [string]: _
 a: [string]: x: "hi"
 
-b: [string]: x: string
-b: [=~".*"]: x: "hi"
+b: [string]: x:  string
+b: [=~ ".*"]: x: "hi"
 -- diff/-out/trim-v3<==>+out/trim --
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,5 @@
+@@ -1,6 +1,6 @@
  == a.cue
 -a: [string]: x: string
 +a: [string]: _
  a: [string]: x: "hi"
  
- b: [string]: x: string
+-b: [string]: x: string
+-b: [=~".*"]: x: "hi"
++b: [string]: x:  string
++b: [=~ ".*"]: x: "hi"
 -- out/trim-v3-noshare --
 == a.cue
 a: [string]: _
 a: [string]: x: "hi"
 
-b: [string]: x: string
-b: [=~".*"]: x: "hi"
+b: [string]: x:  string
+b: [=~ ".*"]: x: "hi"
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,5 @@
+@@ -1,6 +1,6 @@
  == a.cue
 -a: [string]: x: string
 +a: [string]: _
  a: [string]: x: "hi"
  
- b: [string]: x: string
+-b: [string]: x: string
+-b: [=~".*"]: x: "hi"
++b: [string]: x:  string
++b: [=~ ".*"]: x: "hi"
 -- out/trim --
 == a.cue
 a: [string]: x: string

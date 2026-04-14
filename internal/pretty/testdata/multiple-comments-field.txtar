@@ -1,0 +1,18 @@
+-- in.cue --
+{
+	// first doc
+	  // second doc
+	x: 1 // trailing
+}
+-- out/relpos --
+{
+	// first doc
+	// second doc
+	x: 1 // trailing
+}
+-- out/norelpos --
+{
+	// first doc
+	// second doc
+	x: 1 // trailing
+}

@@ -1260,10 +1260,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		return e.makeType(typ.Elem(), kind, attrs)
 
 	case *types.Struct:
-		st := &cueast.StructLit{
-			Lbrace: cuetoken.Blank.Pos(),
-			Rbrace: cuetoken.Newline.Pos(),
-		}
+		st := &cueast.StructLit{}
 		e.addFields(typ, st)
 		return st
 

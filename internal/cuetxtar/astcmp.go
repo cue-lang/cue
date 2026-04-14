@@ -679,7 +679,7 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 		if len(positions) != len(ea.pos) {
 			var got []string
 			for _, p := range positions {
-				got = append(got, fmt.Sprintf("%d:%d", p.Line(), p.Column()))
+				got = append(got, fmtPos(p))
 			}
 			msg := formatPosCountMismatch("@test(err, pos=...)", len(positions), len(ea.pos))
 			return pathErr(path, "%s %v", msg, got)

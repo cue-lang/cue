@@ -35,7 +35,7 @@ w: {
 path x: @test(err, pos=...): unmatched position 1:999999 (spec 0:999999); actual positions:
 path y.b: @test(err, pos=...): unmatched position 4:99999 (spec 0:99999); actual positions:
 path z: c: @test(err, pos=...): no match for expected position 9:99999 in [8:5 9:5 9:9]
-path w: a: @test(err, pos=...): got 2 position(s), want 1; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...] [20:5 20:11]
+path w: a: @test(err, pos=...): got 2 position(s), want 1; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...] [test.cue:20:5 test.cue:20:11]
 -- out/status.txt --
 update: identical to input
 -- out/force/test.cue --

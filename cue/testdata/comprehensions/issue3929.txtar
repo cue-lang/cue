@@ -12,6 +12,7 @@ import "strings"
 
 reduced: {
 	#Input: {
+		@test(shareID=reducedInput)
 		name:  string
 		age:   "one" | "two"
 		if name != _|_ {
@@ -32,7 +33,7 @@ reduced: {
 	}
 
 	#def3: {
-		_in: #Input
+		_in: #Input @test(shareID=reducedInput)
 		def3: _in.age
 	}
 
@@ -77,14 +78,17 @@ full: {
 	cronjob: [string]: #CronjobConfig
 
 	#CronjobConfig: {
+		@test(shareID=cronjobConfig)
 		#PodConfig
 	}
 
 	#PodConfig: {
+		@test(shareID=podConfig)
 		#ContainerConfig
 	}
 
 	#ContainerConfig: {
+		@test(shareID=containerConfig)
 		image:           string
 		imagePullPolicy: "IfNotPresent" | "Always" | "Never"
 		if image != _|_ {
@@ -98,13 +102,13 @@ full: {
 	}
 
 	_#cronjob: {
-		c=_config: #CronjobConfig
+		c=_config: #CronjobConfig @test(shareID=cronjobConfig)
 
 		out: spec: jobTemplate: spec: template: _#pod & {_config: c}
 	}
 
 	_#pod: {
-		c=_config: #PodConfig
+		c=_config: #PodConfig @test(shareID=podConfig)
 
 		spec: containers: [{
 			_#container & {
@@ -114,7 +118,7 @@ full: {
 	}
 
 	_#container: {
-		c=_config: #ContainerConfig
+		c=_config: #ContainerConfig @test(shareID=containerConfig)
 
 		imagePullPolicy: c.imagePullPolicy
 	}
@@ -185,6 +189,9 @@ full: {
 			}]
 		}
 	})
+	// TODO(inline) support at for closed.
+	// @test(closed, at=full.objects.cronjob.foobar)
+
 }
 -- out/errors.txt --
 -- out/todo.txt --

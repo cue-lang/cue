@@ -60,7 +60,9 @@ issue560: {
 				"\(v)": string
 			}
 			"{a}": string
-		}
+		} @test(err, code=incomplete,
+			contains="error in call to %s", args=[strings.Split],
+			pos=[1:16, -1:13])
 	}
 
 	user: {

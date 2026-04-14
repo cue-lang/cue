@@ -126,6 +126,90 @@ foo: {
 		}
 	}
 }
+@test(eq, {
+	networkingv1: {
+		metav1: {#LabelSelector: {matchLabels: {}}}
+		#NetworkPolicy: {spec: {ingress: [], egress: []}}
+		#NetworkPolicySpec: {ingress: [], egress: []}
+		#NetworkPolicyIngressRule: {from: []}
+		#NetworkPolicyEgressRule: {to: []}
+		#NetworkPolicyPeer: {
+			namespaceSelector: null | {matchLabels: {}}
+		}
+	}
+	global_config: {
+		#GlobalConfig: {auth0: {enabled: bool}}
+	}
+	common: {#SomeConfig: {_|_, enabled: bool}}
+	foo: {
+		#Values: {global: {auth0: {enabled: bool}}}
+	}
+	#Config: {
+		tenant: {id: string}
+		auth0: {_|_, enabled: bool}
+		charts: {
+			foo: {
+				global: {
+					auth0: {
+						enabled: _|_ @test(err, code=incomplete, contains="#Config.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+					}
+				}
+			}
+		}
+		global: {
+			auth0: {
+				enabled: _|_ @test(err, code=incomplete, contains="#Config.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+			}
+		}
+	}
+	#NetworkPolicy: {spec: {ingress: [], egress: []}}
+	#Flux: {
+		charts: {
+			foo: {global: {auth0: {enabled: bool}}}
+		}
+		formatOutput: {
+			foo: {}
+			"ns/network": {
+				spec: {
+					ingress: [{
+						from: [{
+							namespaceSelector: {matchLabels: {tenant: string}}
+						}]
+					}]
+					egress: [{
+						to: [{
+							namespaceSelector: {matchLabels: {tenant: string}}
+						}]
+					}]
+				}
+			}
+		}
+		_outputs$config: {
+			foo: {}
+			"ns/network": {
+				spec: {
+					ingress: [{
+						from: [{
+							namespaceSelector: {matchLabels: {tenant: string}}
+						}]
+					}]
+					egress: [{
+						to: [{
+							namespaceSelector: {matchLabels: {tenant: string}}
+						}]
+					}]
+				}
+			}
+		}
+		tenant: {id: string}
+		auth0: {_|_, enabled: bool}
+		global: {
+			auth0: {
+				enabled: _|_ @test(err, code=incomplete, contains="#Flux.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+			}
+		}
+	}
+})
 -- out/errors.txt --
 [incomplete] common.#SomeConfig: incomplete bool: bool:
     ./in.cue:41:12

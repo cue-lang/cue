@@ -1,0 +1,15 @@
+# A non-same-line comment between the operator and the next arm of
+# a chained expression stays before the arm, not after it.
+-- in.cue --
+x: a | // xx
+    // yy
+
+   b
+-- out/relpos --
+x: a | // xx
+	// yy
+	b
+-- out/norelpos --
+x: a | // xx
+	// yy
+	b

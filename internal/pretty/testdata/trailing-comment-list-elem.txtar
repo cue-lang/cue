@@ -1,0 +1,19 @@
+# Trailing // comments on list elements: comma comes before comment.
+-- in.cue --
+[
+	1, // first
+	2 , // second
+	3 ,  // third
+]
+-- out/relpos --
+[
+	1, // first
+	2, // second
+	3, // third
+]
+-- out/norelpos --
+[
+	1, // first
+	2, // second
+	3, // third
+]

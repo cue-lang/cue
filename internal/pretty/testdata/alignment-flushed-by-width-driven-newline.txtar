@@ -1,0 +1,42 @@
+# Inside a NoWidth context (the parent struct's subtree carries
+# Newline RelPos because the user separated the fields with line
+# breaks), Groups never break on width — they only break on a
+# HardLine. The `wide` list value therefore stays flat regardless
+# of how far it overshoots the configured width. To force the list
+# to render multi-line the user must put a Newline RelPos somewhere
+# inside it.
+#
+# Segment boundaries still fire on the wide row: longestAlignedPrefix
+# uses real width to decide whether a row whose flat content exceeds
+# the budget should join the surrounding segment. Boundaries do not
+# add newlines — they just keep alignment from spanning a row that
+# the renderer is unlikely to keep aligned with its neighbours.
+#
+# Without RelPos the list breaks on width as before — Groups are
+# free to fit-test on real width since nothing wraps them in
+# NoWidth.
+-- config --
+width: 40
+-- in.cue --
+a: 1
+bb: 22
+wide: [1000000, 2000000, 3000000, 4000000]
+ccc: 3
+dddd: 44
+-- out/relpos --
+a:  1
+bb: 22
+wide: [1000000, 2000000, 3000000, 4000000]
+ccc:  3
+dddd: 44
+-- out/norelpos --
+a:  1
+bb: 22
+wide: [
+	1000000,
+	2000000,
+	3000000,
+	4000000,
+]
+ccc:  3
+dddd: 44

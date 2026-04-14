@@ -1,0 +1,19 @@
+## A non-first opener that shares `[`'s line still triggers the
+## same-line rule when there is no user-supplied RelPos and the inner
+## content is too wide to fit. The struct breaks at one shared
+## indent level, not two — mirroring contiguous-openers-width-break
+## but with a non-opener element preceding the brace.
+-- config --
+width: 40
+-- in.cue --
+x: [1, {aaaaaaaaa: 111111111, bbbbbbbbbb: 2222222222222222}]
+-- out/relpos --
+x: [1, {
+	aaaaaaaaa:  111111111
+	bbbbbbbbbb: 2222222222222222
+}]
+-- out/norelpos --
+x: [1, {
+	aaaaaaaaa:  111111111
+	bbbbbbbbbb: 2222222222222222
+}]

@@ -1,0 +1,27 @@
+# A comment inside the RHS struct of a conjunction. The parser
+# attaches comments inside an otherwise-empty "{ ... }" to the
+# enclosing BinaryExpr (not the StructLit); the renderer injects them
+# back into the struct body so the output parses to the same
+# attachment and preserves the user's visual intent.
+-- in.cue --
+package p
+
+#X: {a?: int}
+
+foo: #X & {
+	// a: 5
+}
+-- out/relpos --
+package p
+
+#X: {a?: int}
+
+foo: #X & {
+	// a: 5
+}
+-- out/norelpos --
+package p
+#X: {a?: int}
+foo: #X & {
+	// a: 5
+}

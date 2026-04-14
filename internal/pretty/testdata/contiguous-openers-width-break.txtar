@@ -1,0 +1,19 @@
+# Even without user-supplied RelPos, the contiguous-openers rule
+# applies: when `[{` would be contiguous and the content is too wide
+# to fit, the struct breaks internally rather than breaking between
+# `[` and `{`. The result is `[{`, broken content at one indent
+# level, and `}]` adjacent — one shared indent, not two.
+-- config --
+width: 40
+-- in.cue --
+x: [{aaaaaaaaa: 111111111, bbbbbbbbbb: 2222222222222222}]
+-- out/relpos --
+x: [{
+	aaaaaaaaa:  111111111
+	bbbbbbbbbb: 2222222222222222
+}]
+-- out/norelpos --
+x: [{
+	aaaaaaaaa:  111111111
+	bbbbbbbbbb: 2222222222222222
+}]

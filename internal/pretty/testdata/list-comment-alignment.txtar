@@ -1,0 +1,17 @@
+# Trailing comments on list elements should align in a column,
+# just like trailing comments on struct fields.
+-- in.cue --
+x: [
+	"apple", // pie
+	"banana",  // sunday
+]
+-- out/relpos --
+x: [
+	"apple",  // pie
+	"banana", // sunday
+]
+-- out/norelpos --
+x: [
+	"apple",  // pie
+	"banana", // sunday
+]

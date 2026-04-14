@@ -1,0 +1,49 @@
+# A `// c` written immediately after an opener (`{ // c`, `[ // c`,
+# `( // c`) trails the opener on the same line in the source. The
+# CUE parser flags it with Line=true and either attaches it as a
+# Position=1 prefix on the bracketed node (when there is no body) or
+# as a Position=0 doc on the first child (when there is). In both
+# shapes the formatter keeps the comment on the opener's line and
+# emits a single space between the opener and `//` — the layout the
+# user wrote.
+#
+# This is distinct from a `// c` on its own line inside the brackets,
+# which is Line=false and renders on its own indented line. Tests for
+# that shape live in empty-struct-with-comment.txtar.
+-- in.cue --
+struct_with_content: { // header
+	x: _
+}
+
+list_with_content: [ // header
+	1,
+	2,
+]
+
+call_with_args: f( // header
+	1
+)
+-- out/relpos --
+struct_with_content: { // header
+	x: _
+}
+
+list_with_content: [ // header
+	1,
+	2,
+]
+
+call_with_args: f( // header
+	1
+)
+-- out/norelpos --
+struct_with_content: { // header
+	x: _
+}
+list_with_content: [ // header
+	1,
+	2,
+]
+call_with_args: f( // header
+	1
+)

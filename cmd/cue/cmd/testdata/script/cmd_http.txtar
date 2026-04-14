@@ -20,6 +20,10 @@ command: http: {
 	task: http: h.Get & {
 		url: env.GOPROXY + "/externalmod.test/imports/@v/v1.0.0.info"
 
+		// Regression test for https://cuelang.org/issue/4329.
+		// Setting a request header as a single string value must be allowed.
+		request: header: "X-Test": "some-value"
+
 		response: body: string // TODO: allow this to be a struct, parsing the body.
 	}
 	task: print: cli.Print & {

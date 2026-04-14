@@ -1,0 +1,28 @@
+# Trailing comments on chain arms should be aligned. The struct arm
+# (which renders multi-line) should NOT inflate the comment column.
+# The field's trailing comment ("// here") should be integrated into
+# the chain table for alignment with the chain's other comments.
+-- in.cue --
+#X: {a?: int}
+foo: #X |        // comment
+    {
+        // a: 5
+    } | // another
+    {} |        // also
+    {} // here
+-- out/relpos --
+#X: {a?: int}
+foo: #X | // comment
+	{
+		// a: 5
+	} |  // another
+	{} | // also
+	{}   // here
+-- out/norelpos --
+#X: {a?: int}
+foo: #X | // comment
+	{
+		// a: 5
+	} |  // another
+	{} | // also
+	{}   // here

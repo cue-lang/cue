@@ -1,0 +1,8 @@
+# An inline struct stays inline because Blank RelPos is honoured.
+# Without RelPos, same result - fits on one line.
+-- in.cue --
+{x: 1}
+-- out/relpos --
+{x: 1}
+-- out/norelpos --
+{x: 1}

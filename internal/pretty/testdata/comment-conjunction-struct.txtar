@@ -1,0 +1,28 @@
+# A comment inside a struct that is the RHS of a conjunction.
+# The parser attaches the comment to the BinaryExpr at Position 1,
+# but the printer injects it inside the struct body so it re-parses
+# at the same position.
+-- in.cue --
+package p
+
+#X: {a?: int}
+
+foo: #X & {
+	// a: 5
+}
+-- out/relpos --
+package p
+
+#X: {a?: int}
+
+foo: #X &
+	{
+		// a: 5
+	}
+-- out/norelpos --
+package p
+#X: {a?: int}
+foo: #X &
+	{
+		// a: 5
+	}

@@ -1,0 +1,20 @@
+# A ParenExpr wrapping a disjunction of multi-line struct arms. The
+# '(' hugs the inner expression (no newline after '(') because no
+# Newline RelPos was requested on the inner expression.
+-- in.cue --
+#s1: ({
+    a!: string
+} | {
+    a!: string
+    b: "b"
+})
+-- out/relpos --
+#s1: ({
+		a!: string
+	} |
+	{
+		a!: string
+		b:  "b"
+	})
+-- out/norelpos --
+#s1: ({a!: string} | {a!: string, b: "b"})

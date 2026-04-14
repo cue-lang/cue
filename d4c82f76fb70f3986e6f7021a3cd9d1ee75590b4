@@ -1,0 +1,57 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f769524c_75d70243",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T16:23:37Z",
+      "side": 1,
+      "message": "Landed in 1235394 to avoid rebase issues.",
+      "revId": "d4c82f76fb70f3986e6f7021a3cd9d1ee75590b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37d38c56_e4fcd0d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T16:23:37Z",
+      "side": 1,
+      "message": "Done. Replaced the narrow \"known-bad-position\" check with a proper mark-and-sweep: `extractTestAttrs` now tracks every `*ast.Attribute` it visits in a `visited` map, then a final `ast.Walk` over the whole file reports any `@test` attribute that was never visited as unreachable.",
+      "parentUuid": "db8eb2d6_328487ac",
+      "revId": "d4c82f76fb70f3986e6f7021a3cd9d1ee75590b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83377b49_dcd877e6",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T16:23:37Z",
+      "side": 1,
+      "message": "Done. Replaced the local closure vars (`walkField`, `walkStruct`, `scanUnreachableTests`, `appendErrRecord`) with an `attrExtractor` struct that holds the shared state (`records`, `hidPkg`, `fileName`, `visited`) and exposes `processAttr`, `walkField`, and `walkStruct` as methods. No closure capturing needed.",
+      "parentUuid": "dd018c9f_cbcbd273",
+      "revId": "d4c82f76fb70f3986e6f7021a3cd9d1ee75590b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

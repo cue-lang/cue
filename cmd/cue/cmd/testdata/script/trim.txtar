@@ -10,15 +10,15 @@ foo: [string]: {
 	b: string
 	d: 8
 	e: "foo"
-	f: ">> \( _value) <<"
+	f: ">> \(_value) <<"
 	n: 5
 
 	list: ["foo", 8.0]
 
 	struct: {a: 3.0}
 
-	sList: [{a: 8, b: string}, {a: 9, b: *"foo" | string}]
-	rList: [{a: "a"}]
+	sList:  [{a: 8, b: string}, {a: 9, b: *"foo" | string}]
+	rList:  [{a: "a"}]
 	rcList: [{a: "a", c: b}]
 
 	t: [string]: {

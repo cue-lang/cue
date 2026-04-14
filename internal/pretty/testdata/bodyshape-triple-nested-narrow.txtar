@@ -1,0 +1,29 @@
+# Three levels of nested all-bracketed lists, each at its own
+# narrow [docBodyShape] decision. The width is small enough that
+# every level commits to the hug shape: brackets hug at each level,
+# the inter-cell separators stay literal " ", and the innermost
+# struct's body is forced multi-line via the NextGroupNoop chain
+# (each outer level's modeBreak propagates down through one Group
+# at a time).
+#
+# This locks in the per-level cascade: there is no single "decide
+# once at the top" hug; each list re-evaluates with its own column
+# context. At a much wider width the same input renders the flat
+# shape throughout; at intermediate widths the inner lists can pick
+# the indented shape independently of their parents.
+-- config --
+width: 12
+-- in.cue --
+x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
+-- out/relpos --
+x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
+-- out/norelpos --
+x: [[[{
+	a: _
+}, {
+	b: _
+}], {
+	c: _
+}], {
+	d: _
+}]

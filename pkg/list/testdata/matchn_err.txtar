@@ -65,9 +65,5 @@ t1: {
 	l5: _|_ // t1.l5: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): t1.l5: [int] matches 1 list items, want string
 	l6: _|_ // t1.l6: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): t1.l6: {too:int} matches 0 list items, want >0
 }
-issue3519: {
-	a: _|_ // issue3519.a: invalid value [{}] (does not satisfy list.MatchN): issue3519.a: {a!:_} matches 0 list items, want 1
-}
-#TOO: {
-	too: int
-}
+issue3519: a: _|_ // issue3519.a: invalid value [{}] (does not satisfy list.MatchN): issue3519.a: {a!:_} matches 0 list items, want 1
+#TOO: too:    int

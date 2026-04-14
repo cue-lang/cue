@@ -16,18 +16,12 @@ package test
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
-	$defs: {
-		T: {
-			type:                 "object"
-			additionalProperties: false
-			properties: {
-				a: {
-					type: "integer"
-				}
-				b: {
-					type: "string"
-				}
-			}
+	$defs: T: {
+		type:                 "object"
+		additionalProperties: false
+		properties: {
+			a: type: "integer"
+			b: type: "string"
 		}
 	}
 	type: "object"

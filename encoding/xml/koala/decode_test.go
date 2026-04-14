@@ -310,11 +310,7 @@ func TestElementDecoding(t *testing.T) {
 </h:table>`,
 			wantCUE: `"h:table": {
 	"$xmlns:h": "http://www.w3.org/TR/html4/"
-	"h:tr": "h:td": [{
-		$$: "Apples"
-	}, {
-		$$: "Bananas"
-	}]
+	"h:tr": "h:td": [{$$: "Apples"}, {$$: "Bananas"}]
 }
 `,
 		},
@@ -351,11 +347,7 @@ func TestElementDecoding(t *testing.T) {
 	"$xmlns:h": "http://www.w3.org/TR/html4/"
 	"$xmlns:r": "d"
 	"h:tr": {
-		"h:td": [{
-			$$: "Apples"
-		}, {
-			$$: "Bananas"
-		}]
+		"h:td": [{$$: "Apples"}, {$$: "Bananas"}]
 		"r:blah": $$: "e3r"
 	}
 }
@@ -374,11 +366,7 @@ func TestElementDecoding(t *testing.T) {
 	"$xmlns:h": "http://www.w3.org/TR/html4/"
 	"$xmlns:r": "d"
 	"h:tr": {
-		"h:td": [{
-			$$: "Apples"
-		}, {
-			$$: "Bananas"
-		}]
+		"h:td": [{$$: "Apples"}, {$$: "Bananas"}]
 		"r:td": $$: "e3r"
 	}
 }

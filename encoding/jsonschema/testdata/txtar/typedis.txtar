@@ -41,5 +41,5 @@
 intOrString1?: int | string
 intOrString2?: matchN(1, [int, string])
 intOrString3?: matchN(>=1, [int, string])
-disjunction?: matchN(1, [matchN(>=1, [int, string]), int & >=3])
+disjunction?:  matchN(1, [matchN(>=1, [int, string]), int & >=3])
 ...

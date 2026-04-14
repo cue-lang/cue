@@ -12,6 +12,4 @@ Foo: _ @testfn(file.xx, abi=c, sig="func(int)int")
 
 -- extern/out --
 -- out/extern --
-{
-	Foo: _
-}
+{Foo: _}

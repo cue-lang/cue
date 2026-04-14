@@ -44,6 +44,4 @@ w: {
 -- expect-stdout-def --
 import "mod.test/config/components:widget"
 
-w: widget.#Widget & {
-	model: "retroencabulator"
-}
+w: widget.#Widget & {model: "retroencabulator"}

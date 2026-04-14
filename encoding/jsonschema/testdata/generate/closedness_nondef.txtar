@@ -71,124 +71,72 @@ conjunctionOfDisjunctionsClosedExtra: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				h: {
-					type: "integer"
-				}
-				v: {
-					type: "integer"
-				}
+				h: type: "integer"
+				v: type: "integer"
 			}
 		}
-		WrapsConjunctionOfDisjunctions: {
-			allOf: [{
-				anyOf: [{
-					type: "object"
-					properties: {
-						v: {
-							type: "integer"
-						}
-					}
-				}, {
-					type: "integer"
-				}]
+		WrapsConjunctionOfDisjunctions: allOf: [{
+			anyOf: [{
+				type: "object"
+				properties: v: type: "integer"
 			}, {
-				anyOf: [{
-					type: "object"
-					properties: {
-						h: {
-							type: "integer"
-						}
-					}
-				}, {
-					type: "integer"
-				}]
+				type: "integer"
 			}]
-		}
+		}, {
+			anyOf: [{
+				type: "object"
+				properties: h: type: "integer"
+			}, {
+				type: "integer"
+			}]
+		}]
 		WrapsHidden: {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				h: {
-					type: "integer"
-				}
-			}
+			properties: h: type: "integer"
 		}
 		WrapsShared: {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				v: {
-					type: "integer"
-				}
-			}
+			properties: v: type: "integer"
 		}
 		"_hidden": {
 			type: "object"
-			properties: {
-				h: {
-					type: "integer"
-				}
-			}
+			properties: h: type: "integer"
 		}
 		"_shared": {
 			type: "object"
-			properties: {
-				v: {
-					type: "integer"
-				}
-			}
+			properties: v: type: "integer"
 		}
 	}
 	type: "object"
 	properties: {
-		t01: {
-			$ref: "#/$defs/WrapsHidden"
-		}
-		t02closed: {
-			$ref: "#/$defs/WrapsShared"
-		}
-		t02open: {
+		t01: $ref:       "#/$defs/WrapsHidden"
+		t02closed: $ref: "#/$defs/WrapsShared"
+		t02open: $ref:   "#/$defs/_shared"
+		t03closed: $ref: "#/$defs/WrapsConjunction"
+		t03open: allOf: [{
+			$ref: "#/$defs/_hidden"
+		}, {
+			type: "object"
 			$ref: "#/$defs/_shared"
-		}
-		t03closed: {
-			$ref: "#/$defs/WrapsConjunction"
-		}
-		t03open: {
-			allOf: [{
-				$ref: "#/$defs/_hidden"
-			}, {
+		}]
+		t04closed: $ref: "#/$defs/WrapsConjunctionOfDisjunctions"
+		t04open: allOf: [{
+			anyOf: [{
 				type: "object"
-				$ref: "#/$defs/_shared"
-			}]
-		}
-		t04closed: {
-			$ref: "#/$defs/WrapsConjunctionOfDisjunctions"
-		}
-		t04open: {
-			allOf: [{
-				anyOf: [{
-					type: "object"
-					properties: {
-						v: {
-							type: "integer"
-						}
-					}
-				}, {
-					type: "integer"
-				}]
+				properties: v: type: "integer"
 			}, {
-				anyOf: [{
-					type: "object"
-					properties: {
-						h: {
-							type: "integer"
-						}
-					}
-				}, {
-					type: "integer"
-				}]
+				type: "integer"
 			}]
-		}
+		}, {
+			anyOf: [{
+				type: "object"
+				properties: h: type: "integer"
+			}, {
+				type: "integer"
+			}]
+		}]
 	}
 }
 -- out/generate-v3/hiddenValid --

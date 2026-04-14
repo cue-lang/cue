@@ -332,7 +332,7 @@ import "list"
 	a: b: 3
 	a: bb: cc: 3
 
-	empty: {}
+	empty:        {}
 	emptyNewLine: {}
 	someObject: {
 		a:   8
@@ -352,16 +352,14 @@ import "list"
 	}
 
 	attrs: {
-		a:    8 @go(A) // comment
-		aa:   8 @go(A) // comment
+		a:    8   @go(A)                // comment
+		aa:   8   @go(A)                // comment
 		bb:   9
 		bbb:  10  @go(Bbb) @xml(,attr)  // comment
 		bbbb: 100 @go(Bbbb) @xml(,attr) // comment
 	}
 
-	foo: {
-		bar: string @go(-)
-	}
+	foo: bar: string @go(-)
 
 	e:  1 + 2*3
 	e:  1 * 2 * 3 // error
@@ -384,8 +382,8 @@ import "list"
 
 	e:
 		a |
-		b | c |
-		d
+			b | c |
+			d
 
 	e: f(3 + 4 + 5)
 	e: f(3 * 4 * 5)
@@ -435,7 +433,8 @@ import "list"
 	]
 	e: [...]
 	e: [
-		...]
+		...
+	]
 	e: [...
 	]
 	e: [1, 2, ...]
@@ -450,10 +449,12 @@ import "list"
 	e: [for x in someObject if x > 9 {x}]
 	e: [
 		for x in someObject
-		if x > 9 {x}]
+		if x > 9 {x}
+	]
 	e: [
 		for x in someObject
-		if x > 9 {x}]
+		if x > 9 {x}
+	]
 
 	e: [
 		if x > 1 {},
@@ -485,7 +486,8 @@ import "list"
 		let x = v
 		if k > "a" {
 			"\(k)": x
-		}}
+		}
+	}
 
 	if a |
 		b {
@@ -498,8 +500,7 @@ import "list"
 
 	e: [{
 		a: 1, b: 2
-	},
-	]
+	}]
 
 	e: [{
 		a: 1, b: 2
@@ -510,8 +511,8 @@ import "list"
 	e: [{
 		a: 1, b: 2
 	},
-		3,
-		4,
+	3,
+	4,
 	]
 
 	e: e.f(1, 2)
@@ -528,11 +529,8 @@ import "list"
 	a: "foo-bar": 3
 	b: a."foo-bar"
 	c: a."foo-bar".b
-	d: a.
-		"foo-bar"
-	e: a.
-		"foo-bar".
-		b
+	d: a."foo-bar"
+	e: a."foo-bar".b
 	f: 2
 
 	"contains		tabs": 123
@@ -584,14 +582,11 @@ import "list"
 	idx1: bar["baz"]
 	idx2: bar["baz"]
 	idx3: bar[
-			"baz"
-			]
+		"baz"]
 	idx4: bar[
-			"baz"
-			]
+		"baz"]
 	idx5: bar[foo[
-			"baz"
-			]]
+			"baz"]]
 }
 -- issue2496.input --
 machine_type: [

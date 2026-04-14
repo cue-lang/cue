@@ -1,0 +1,15 @@
+# Single-line input at narrow width: must break regardless of RelPos.
+-- config --
+width: 8
+-- in.cue --
+{a: 1, b: 2}
+-- out/relpos --
+{
+	a: 1
+	b: 2
+}
+-- out/norelpos --
+{
+	a: 1
+	b: 2
+}

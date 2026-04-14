@@ -1,0 +1,29 @@
+# Simple fields x, longname, baz are aligned across the struct.
+# nested (struct value) is interspersed but does not affect alignment.
+-- config --
+width: 20
+-- in.cue --
+{
+	x: 1
+	longname: "hello"
+	nested: {
+	a: 1
+	}
+	baz: true
+}
+-- out/relpos --
+{
+	x:        1
+	longname: "hello"
+	nested: {
+		a: 1
+	}
+	baz:      true
+}
+-- out/norelpos --
+{
+	x:        1
+	longname: "hello"
+	nested: {a: 1}
+	baz:      true
+}

@@ -1,0 +1,14 @@
+# A doc comment on a field's value expression is preserved.
+# The comment and value are indented one level from the key.
+-- in.cue --
+x:
+		// doc on value
+	1
+-- out/relpos --
+x:
+	// doc on value
+	1
+-- out/norelpos --
+x:
+	// doc on value
+	1

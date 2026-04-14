@@ -1,0 +1,37 @@
+# Within a multi-line string body, the formatter must never alter
+# the user's leading whitespace - neither *adding* nor *removing*.
+#
+# Lines that start with the strip prefix are stripped on the way in
+# and re-emitted via AtIndent's prefix on the way out (byte-for-byte
+# the same prefix string the user wrote before the closing `"""`).
+#
+# Lines that *don't* start with the strip prefix - bare empty lines,
+# or whitespace shorter than the prefix - are emitted with a bare
+# LitLine (no AtIndent prefix) followed by the user's literal text,
+# so an empty line stays empty and a spaces-only line stays spaces-only. The
+# previous behaviour silently added the strip prefix to every body
+# line, turning a bare empty line into a tab-only line.
+-- in.cue --
+x: """
+	first \(name)
+
+	mid
+
+	end
+	"""
+-- out/relpos --
+x: """
+	first \(name)
+
+	mid
+
+	end
+	"""
+-- out/norelpos --
+x: """
+	first \(name)
+
+	mid
+
+	end
+	"""

@@ -1,0 +1,17 @@
+# A width (30) chosen so the three nesting levels each pick a
+# different shape, demonstrating that per-level [docBodyShape]
+# produces mixed cascades. The cascade here is hug (outermost) ->
+# indented (middle) -> flat (innermost, since middle's indented body
+# renders its cell in modeFlat).
+-- config --
+width: 30
+-- in.cue --
+x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
+-- out/relpos --
+x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
+-- out/norelpos --
+x: [[
+	[{a: _}, {b: _}], {c: _},
+], {
+	d: _
+}]

@@ -8,6 +8,4 @@ package foo
 Foo: _ @testfn(file1.xx, abi=c, sig="func(int)int")
 
 -- out/extern --
-{
-	Foo: implFoo1
-}
+{Foo: implFoo1}

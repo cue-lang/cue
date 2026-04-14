@@ -1,0 +1,15 @@
+# When consecutive fields have differently-shaped composite keys
+# (different braceless-chain lengths), the alignment table is flushed
+# so values only align within runs of same-shape keys. Here the first
+# two rows have two-level chains and align together; the third row has
+# a three-level chain and is rendered without joining that group.
+-- in.cue --
+aa: bb: 1
+c: d: 2
+eee: f: g: 3
+-- out/relpos --
+aa: bb: 1
+c: d:   2
+eee: f: g: 3
+-- out/norelpos --
+aa: bb: 1, c: d: 2, eee: f: g: 3

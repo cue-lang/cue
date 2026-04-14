@@ -296,7 +296,7 @@ funcArg1: foo(
 	3,
 
 	// Comment3
-	)
+)
 
 funcArg2: foo(
 	// Comment1
@@ -305,7 +305,7 @@ funcArg2: foo(
 
 	3,
 	// Comment3
-	)
+)
 
 funcArg3: foo(
 	2,
@@ -316,7 +316,7 @@ funcArg3: foo(
 	3,
 
 	// Comment3
-	)
+)
 
 //	comment including		some tabs
 
@@ -330,7 +330,6 @@ foo: [
 ]
 
 {
-
 	foo: {
 		// some
 		... // comment
@@ -352,6 +351,7 @@ foo: [
 // Just one comment on its own.
 -- out/format/comment_alone.golden --
 // Just one comment on its own.
+
 -- comment_field.input --
 // Just one comment on a field.
 foo: string
@@ -364,6 +364,7 @@ foo: string
 -- out/format/comments_alone.golden --
 // Just a few comments
 // on their own.
+
 -- comments_field.input --
 // Just a few comments
 // on a field.
@@ -398,13 +399,13 @@ very_long_to_push_out_the_comment: f( // comment
 // issue #1006: comments should not be aligned across the opening
 // or closing token of a multi-line struct, list, or func call.
 
-very_long_to_push_out_the_comment: {// comment
+very_long_to_push_out_the_comment: { // comment
 	a: string // comment
 
 	b: string // comment
 } | "very_long_to_push_out_the_comment" // comment
 
-very_long_to_push_out_the_comment: [// comment
+very_long_to_push_out_the_comment: [ // comment
 	a, // comment
 
 	b, // comment
@@ -414,4 +415,4 @@ very_long_to_push_out_the_comment: f( // comment
 	a, // comment
 
 	b, // comment
-	) | "very_long_to_push_out_the_comment" // comment
+) | "very_long_to_push_out_the_comment" // comment

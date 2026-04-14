@@ -70,31 +70,19 @@ ok3: data: {}
 			else: {
 				type:                 "object"
 				additionalProperties: true
-				properties: {
-					c: {
-						type: "string"
-					}
-				}
+				properties: c: type: "string"
 				required: ["c"]
 			}
 			if: {
 				type:                 "object"
 				additionalProperties: true
-				properties: {
-					a: {
-						type: "number"
-					}
-				}
+				properties: a: type: "number"
 				required: ["a"]
 			}
 			then: {
 				type:                 "object"
 				additionalProperties: true
-				properties: {
-					b: {
-						type: "number"
-					}
-				}
+				properties: b: type: "number"
 				required: ["b"]
 			}
 		}
@@ -103,11 +91,7 @@ ok3: data: {}
 			if: {
 				type:                 "object"
 				additionalProperties: true
-				properties: {
-					foo: {
-						type: "string"
-					}
-				}
+				properties: foo: type: "string"
 				required: ["foo"]
 			}
 		}
@@ -116,21 +100,13 @@ ok3: data: {}
 			if: {
 				type:                 "object"
 				additionalProperties: true
-				properties: {
-					x: {
-						type: "integer"
-					}
-				}
+				properties: x: type: "integer"
 				required: ["x"]
 			}
 			then: {
 				type:                 "object"
 				additionalProperties: true
-				properties: {
-					y: {
-						type: "integer"
-					}
-				}
+				properties: y: type: "integer"
 				required: ["y"]
 			}
 		}

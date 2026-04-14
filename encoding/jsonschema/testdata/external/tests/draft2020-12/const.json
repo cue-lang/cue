@@ -322,7 +322,7 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "conflicting values 0.0 and 0 (mismatched types float and int):\n    2:2\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values 0.0 and 0 (mismatched types float and int):\n    1:2\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -365,7 +365,7 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "conflicting values 1.0 and 1 (mismatched types float and int):\n    2:2\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values 1.0 and 1 (mismatched types float and int):\n    1:2\n    instance.json:1:1\n"
 				}
 			}
 		]
@@ -383,7 +383,7 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values -2 and -2.0 (mismatched types int and float):\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "conflicting values -2 and -2.0 (mismatched types int and float):\n    2:2\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values -2 and -2.0 (mismatched types int and float):\n    1:2\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -431,7 +431,7 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values 9007199254740992.0 and 9007199254740992 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "conflicting values 9007199254740992.0 and 9007199254740992 (mismatched types float and int):\n    2:2\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values 9007199254740992.0 and 9007199254740992 (mismatched types float and int):\n    1:2\n    instance.json:1:1\n"
 				}
 			},
 			{

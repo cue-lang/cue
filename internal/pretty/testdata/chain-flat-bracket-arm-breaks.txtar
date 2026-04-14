@@ -1,0 +1,60 @@
+# A | or & chain whose last arm is a bracketed opener (struct, list,
+# call, etc.) and whose body breaks across lines: when the chain
+# itself stays flat, the bracket arm's body must indent off the
+# parent's level (parent+1) - not off the chain's continuation
+# indent. The 2-arm form `a & {...}` renders via binaryExprPrec with
+# no Nest. The 3-arm form `a & b & {...}` renders via chainGroupArms,
+# which must not add its own Nest on top of the struct's Nest while
+# the chain is flat: stacking the two would push the body to
+# parent+2 instead of parent+1.
+#
+# Source-broken chains (`a |\n\tb |\n\t{...}`) are unaffected - those
+# carry Newline RelPos on arm separators, so chainGroupArms keeps
+# its Nest and the body lands at parent+2 (one deeper than `{`,
+# which sits at chain+1).
+-- in.cue --
+two_arm_and: x: a & {
+	c: _
+}
+
+three_arm_and: x: a & b & {
+	c: _
+}
+
+three_arm_or: x: a | b | {
+	c: _
+}
+
+four_arm_and: x: a & b & c & {
+	d: _
+}
+
+middle_bracket: x: a & {middle: 1} & c & {
+	d: _
+}
+-- out/relpos --
+two_arm_and: x: a & {
+	c: _
+}
+
+three_arm_and: x: a & b & {
+	c: _
+}
+
+three_arm_or: x: a | b | {
+	c: _
+}
+
+four_arm_and: x: a & b & c & {
+	d: _
+}
+
+middle_bracket: x: a & {middle: 1} & c & {
+	d: _
+}
+-- out/norelpos --
+two_arm_and: x:    a & {c: _}
+three_arm_and: x:  a & b & {c: _}
+three_arm_or: x:   a | b | {c: _}
+four_arm_and: x:   a & b & c & {d: _}
+middle_bracket: x: a & {middle: 1} & c & {d: _}

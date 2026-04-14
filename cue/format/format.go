@@ -25,11 +25,15 @@ package format
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/tabwriter"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/pretty"
+	"cuelang.org/go/internal/pretty/style"
 )
 
 // An Option sets behavior of the formatter.
@@ -97,16 +101,37 @@ func sortImportsOption() Option {
 
 // Node formats node in canonical cue fmt style and writes the result to dst.
 //
-// The node type must be [*ast.File], [][ast.Decl], [ast.Expr], [ast.Decl], or
-// [ast.Spec]. Node does not modify node. Imports are not sorted for nodes
-// representing partial source files (for instance, if the node is not an
-// *ast.File).
+// The node type must be [*ast.File], [][ast.Decl], [ast.Expr],
+// [ast.Decl], or [ast.Spec]. Imports are not sorted for nodes
+// representing partial source files (for instance, if the node is not
+// an *ast.File). If [Simplify] is enabled then the AST may be
+// mutated.
 //
 // The function may return early (before the entire result is written) and
 // return a formatting error, for instance due to an incorrect AST.
 func Node(node ast.Node, opt ...Option) ([]byte, error) {
+	cueexperiment.Init()
+
 	cfg := newConfig(opt)
+
+	if cueexperiment.Flags.FormatterV2 {
+		styleConfig(cfg).Annotate(node)
+		return configToV2(cfg).Node(node)
+	}
+
 	return cfg.fprint(node)
+}
+
+// styleConfig builds the [style.Config] that drives the v2
+// pre-pass. RelPos is always on (it replaces what the old printer
+// did implicitly); the simplification flags follow cfg.simplify.
+func styleConfig(cfg *config) style.Config {
+	return style.Config{
+		RelPos:        true,
+		InlineStructs: cfg.simplify,
+		Labels:        cfg.simplify,
+		Ellipsis:      cfg.simplify,
+	}
 }
 
 // Source formats src in canonical cue fmt style and returns the result or an
@@ -122,6 +147,8 @@ func Node(node ast.Node, opt ...Option) ([]byte, error) {
 // version of cue (for instance, such as for presubmit checks) should execute
 // that cue binary instead of calling Source.
 func Source(b []byte, opt ...Option) ([]byte, error) {
+	cueexperiment.Init()
+
 	cfg := newConfig(opt)
 
 	// Pass the language version to the parser so that ast.File.LanguageVersion
@@ -133,6 +160,11 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 	f, err := parser.ParseFile("", b, parseOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("parse: %s", err)
+	}
+
+	if cueexperiment.Flags.FormatterV2 {
+		styleConfig(cfg).Annotate(f)
+		return configToV2(cfg).Node(f)
 	}
 
 	// print AST
@@ -160,6 +192,18 @@ func newConfig(opt []Option) *config {
 		o(cfg)
 	}
 	return cfg
+}
+
+func configToV2(cfg *config) *pretty.Config {
+	cfgV2 := &pretty.Config{
+		IndentWidth: cfg.tabWidth,
+	}
+	if cfg.tabIndent {
+		cfgV2.Indent = "\t"
+	} else {
+		cfgV2.Indent = strings.Repeat(" ", cfg.tabWidth)
+	}
+	return cfgV2
 }
 
 // Config defines the output of Fprint.

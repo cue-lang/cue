@@ -1,0 +1,11 @@
+# Conjunction chain flattened and indented like disjunctions.
+-- in.cue --
+x: int &
+>0 &
+<100
+-- out/relpos --
+x: int &
+	>0 &
+	<100
+-- out/norelpos --
+x: int & >0 & <100

@@ -153,37 +153,25 @@ language: version: "v0.9.0"
 -- out/noembed --
 error in CUE_EXPERIMENT: cannot disable stable experiment "embed"
 -- out/eval --
-a: {
-    x: 34
-}
-b: {
-    a1: 2
-}
+a: x:  34
+b: a1: 2
 c: """
     { "x": 34 }
 
     """
 d: {
-    "x/input.yaml": {
-        a1: 2
-    }
-    "y/_test.json": {
-        z: 45
-    }
-    "y/test.json": {
-        x: 34
-    }
+    "x/input.yaml": a1: 2
+    "y/_test.json": z:  45
+    "y/test.json": x:   34
 }
 f: {
     info: {
         title:   "My OpenAPI"
         version: "v1alpha1"
     }
-    #Bar: {
-        foo!: {
-            a!: int
-            b!: uint & <10
-        }
+    #Bar: foo!: {
+        a!: int
+        b!: uint & <10
     }
     #Foo: {
         a!: int
@@ -197,29 +185,21 @@ g: {
         version: "v1alpha1"
     }
     paths: {}
-    components: {
-        schemas: {
-            Bar: {
-                type: "object"
-                required: ["foo"]
-                properties: {
-                    foo: {
-                        $ref: "#/components/schemas/Foo"
-                    }
-                }
-            }
-            Foo: {
-                type: "object"
-                required: ["a", "b"]
-                properties: {
-                    a: {
-                        type: "integer"
-                    }
-                    b: {
-                        type:             "integer"
-                        minimum:          0
-                        exclusiveMaximum: 10
-                    }
+    components: schemas: {
+        Bar: {
+            type:     "object"
+            required: ["foo"]
+            properties: foo: $ref: "#/components/schemas/Foo"
+        }
+        Foo: {
+            type:     "object"
+            required: ["a", "b"]
+            properties: {
+                a: type: "integer"
+                b: {
+                    type:             "integer"
+                    minimum:          0
+                    exclusiveMaximum: 10
                 }
             }
         }
@@ -238,26 +218,12 @@ j: '''
 
     '''
 special: {
-    underscoreFile: {
-        z: 45
-    }
-    dotFile: {
-        z: 46
-    }
-    dotFileExplicit: {
-        "y/.test.json": {
-            z: 46
-        }
-    }
-    dotdotFile: {
-        dotdot: true
-    }
-    underscoreDir: {
-        z: 47
-    }
-    dotDir: {
-        z: 48
-    }
+    underscoreFile: z: 45
+    dotFile: z:        46
+    dotFileExplicit: "y/.test.json": z: 46
+    dotdotFile: dotdot: true
+    underscoreDir: z:   47
+    dotDir: z:          48
 }
 -- out/export --
 a: x:  34
@@ -284,12 +250,12 @@ g: {
 	paths: {}
 	components: schemas: {
 		Bar: {
-			type: "object"
+			type:     "object"
 			required: ["foo"]
 			properties: foo: $ref: "#/components/schemas/Foo"
 		}
 		Foo: {
-			type: "object"
+			type:     "object"
 			required: ["a", "b"]
 			properties: {
 				a: type: "integer"

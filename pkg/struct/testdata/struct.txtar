@@ -65,27 +65,15 @@ Result:
 import "struct"
 
 minFields1: {
-	incomplete1: struct.MinFields(1) & {}
-	optIncomplete: struct.MinFields(1) & {
-		a?: string
-	}
-	fail1: _|_ // minFields1.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
-	optCloseIncomplete: struct.MinFields(1) & close({
-		a?: 1
-	})
-	failHidden1: _|_ // minFields1.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
-	ok4: {
-		a: 1
-	}
-	ok1: {
-		a: 1
-	}
-	ok2: {
-		a: 1
-	}
-	ok3: {
-		a: 1
-	}
+	incomplete1:        struct.MinFields(1) & {}
+	optIncomplete:      struct.MinFields(1) & {a?: string}
+	fail1:              _|_ // minFields1.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+	optCloseIncomplete: struct.MinFields(1) & close({a?: 1})
+	failHidden1:        _|_ // minFields1.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+	ok4: a: 1
+	ok1: a: 1
+	ok2: a: 1
+	ok3: a: 1
 	ok5: {
 		#a: int
 		a:  1
@@ -114,19 +102,13 @@ minFields2: {
 }
 maxFields: {
 	ok1: {}
-	ok2: {
-		a: 1
-	}
-	ok3: {
-		a: 1
-	}
+	ok2: a: 1
+	ok3: a: 1
 	ok4: {
 		a?: 1
 		b?: 2
 	}
-	ok5: {
-		a: 1
-	}
+	ok5: a: 1
 	ok6: {
 		a:  1
 		#b: int
@@ -148,7 +130,44 @@ diff old new
  maxFields.fail1: invalid value {a:1,b:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
      ./in.cue:32:12
      ./in.cue:32:29
-@@ -61,9 +65,7 @@
+@@ -16,27 +20,15 @@
+ import "struct"
+ 
+ minFields1: {
+-	incomplete1: struct.MinFields(1) & {}
+-	optIncomplete: struct.MinFields(1) & {
+-		a?: string
+-	}
+-	fail1: _|_ // minFields1.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+-	optCloseIncomplete: struct.MinFields(1) & close({
+-		a?: 1
+-	})
+-	failHidden1: _|_ // minFields1.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+-	ok4: {
+-		a: 1
+-	}
+-	ok1: {
+-		a: 1
+-	}
+-	ok2: {
+-		a: 1
+-	}
+-	ok3: {
+-		a: 1
+-	}
++	incomplete1:        struct.MinFields(1) & {}
++	optIncomplete:      struct.MinFields(1) & {a?: string}
++	fail1:              _|_ // minFields1.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
++	optCloseIncomplete: struct.MinFields(1) & close({a?: 1})
++	failHidden1:        _|_ // minFields1.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
++	ok4: a: 1
++	ok1: a: 1
++	ok2: a: 1
++	ok3: a: 1
+ 	ok5: {
+ 		#a: int
+ 		a:  1
+@@ -61,25 +53,17 @@
  		b?: int
  		c?: int
  	})
@@ -159,6 +178,25 @@ diff old new
  }
  maxFields: {
  	ok1: {}
+-	ok2: {
+-		a: 1
+-	}
+-	ok3: {
+-		a: 1
+-	}
++	ok2: a: 1
++	ok3: a: 1
+ 	ok4: {
+ 		a?: 1
+ 		b?: 2
+ 	}
+-	ok5: {
+-		a: 1
+-	}
++	ok5: a: 1
+ 	ok6: {
+ 		a:  1
+ 		#b: int
 -- diff/todo/p2 --
 Missing error positions.
 -- diff/explanation --

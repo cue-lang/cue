@@ -1,0 +1,20 @@
+-- config --
+width: 20
+-- in.cue --
+{
+	foo: 1
+	barbaz: 2
+	x: 3
+}
+-- out/relpos --
+{
+	foo:    1
+	barbaz: 2
+	x:      3
+}
+-- out/norelpos --
+{
+	foo:    1
+	barbaz: 2
+	x:      3
+}

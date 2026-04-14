@@ -80,7 +80,7 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 			}
 
 			if e.cfg.ShowDocs {
-				ast.SetComments(decl, filterDocs(ast.Comments(d.Source())))
+				ast.SetComments(decl, leadingDocComments(ast.Comments(d.Source())))
 			}
 			// TODO: use e.copyMeta for positions, but only when the original
 			// source is available.
@@ -662,16 +662,9 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 
 func (e *exporter) copyMeta(dst, src ast.Node) {
 	if e.cfg.ShowDocs {
-		ast.SetComments(dst, filterDocs(ast.Comments(src)))
+		ast.SetComments(dst, leadingDocComments(ast.Comments(src)))
 	}
 	astutil.CopyPosition(dst, src)
-}
-
-func filterDocs(a []*ast.CommentGroup) (out []*ast.CommentGroup) {
-	out = append(out, a...)
-	return slices.DeleteFunc(out, func(c *ast.CommentGroup) bool {
-		return !c.Doc
-	})
 }
 
 func (e *exporter) setField(label adt.Feature, f *ast.Field) {

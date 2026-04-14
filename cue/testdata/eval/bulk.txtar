@@ -10,29 +10,42 @@ a: {
 		b:    1
 		name: X
 	}
+
+	@test(eq, {
+		[=~"foo"]: { b: 1, name: string }
+		foo: {a: 1, b: 1, name: "foo"}
+	})
+	@test(allows, foo)
+	@test(allows, foobar)
+	@test(allows, string)
+	// TODO(eval): struct isn't closed, so this should be true.
+	@test(allows:todo=false, bar)
 }
 d: a & {
 	"foobar": {
 		c: 2
 	}
-}
+} @test(eq, {
+	foobar: {c: 2, b: 1, name: "foobar"}
+	foo:    {a: 1, b: 1, name: "foo"}
+})
 
 t1: {
 	#a: {
 		[>"e" & <"z"]: int
 	}
-	b: #a & {f: 4}
-	c: #a & {z: 4}
-	@test(err, code=eval, at=c.z, contains="field not allowed", pos=[5:11])
+	// TODO(inline): support allow on fields.
+	b: #a & {f: 4} @test(eq, {f: 4}) @test(allows, f) @test(allows=false, a) @test(allows=false, string)
+	c: #a & {z: 4} @test(err, code=eval, at=z, contains="field not allowed", pos=[0:11])
 }
 
 t2: {
 	#a: {
 		["x" | "y"]: int
 	}
-	b: #a & {x: 4}
-	c: #a & {z: 4}
-	@test(err, code=eval, at=c.z, contains="field not allowed", pos=[5:11])
+	// TODO(inline): support allow on fields.
+	b: #a & {x: 4} @test(eq, {x: 4}) @test(allows, x) @test(allows=false, z) @test(allows=false, string)
+	c: #a & {z: 4} @test(err, code=eval, at=z, contains="field not allowed", pos=[0:11])
 }
 
 -- issue2109.cue --
@@ -45,6 +58,8 @@ t2: {
 // could see it does not apply to countries. For now we stick with this
 // approach understanding that it is easier to relax later.
 patternCycle: issue2109: p1: {
+	// TODO(inline: permute doesn't permute embeddings, so the permute count
+	// here is 2, not 6. Fix this.
 	countries: ["US", "GB", "AU"]
 	FlagsURLs: {[or(countries)]: string}
 	FlagsURLs
@@ -107,8 +122,7 @@ patternCycle: t1: p3: {
 issue3670: {
 	#X: [int]: string
 	a: #X
-	a: "not_int": "c"
-	@test(err, code=eval, at=a.not_int, contains="field not allowed", pos=[3:5])
+	a: "not_int": "c" @test(err, code=eval, contains="field not allowed", pos=[0:5])
 }
 dual: {
 	_
@@ -118,6 +132,10 @@ dual: {
 	// break it now.
 	[string]: _
 	[int]: _
+
+	@test(eq, {_, [int]: _, [string]: _})
+
+	// TODO: test allows once we know what it means in this case.
 }
 -- multi.cue --
 // evalv3 regression: closedness values and default markers were incorrectly
@@ -133,7 +151,7 @@ issue3638: full: {
 	}]
 	#Fields: {
 		input: _
-		output: [for x in input { x }]
+		output: [for x in input { x }] @test(err, code=incomplete, contains="cannot range over input (incomplete type _)", pos=[0:21])
 		...
 	}
 	#Kubernetes: {
@@ -158,49 +176,23 @@ issue3638: full: {
 		Routes: route: routes
 	}
 	@test(eq, {
-		routes: {
-			default: {spec: [{
-				refs: ["default"]
-			}]}
-		}
+		routes: default: {spec: [{ refs: ["default"] }]}
 		#Fields: {
-			input: _
-			output: _|_ @test(err, code=incomplete, contains="issue3638.full.#Fields.output: cannot range over input (incomplete type _)", pos=[14:21])
+			input:  _
+			output: _|_
 		}
 		#Kubernetes: {
-			Routes: {route: {}}
-			input: {res1: {route: {}}}
-			output: [{
-		route: {}
-	}]
+			Routes: route:      {}
+			input: res1: route: {}
+			output:             [{ route: {} }]
 		}
-		entrypoint: [{
-		route: default: spec: [{
-			refs: ["default"]
-		}]
-	}]
+		entrypoint: [{ route: default: spec: [{ refs: ["default"] }] }]
 		used: {
-			Routes: {
-				route: {
-					default: {spec: [{
-		refs: ["default"]
-	}]}
-				}
-			}
-			input: {
-				res1: {
-					route: {
-						default: {spec: [{
-		refs: ["default"]
-	}]}
-					}
-				}
-			}
+			Routes: route: default: spec:      [{ refs: ["default"] }]
+			input: res1: route: default: spec: [{ refs: ["default"] }]
 			output: [{
-		route: default: spec: [{
-			refs: ["default"]
-		}]
-	}]
+				route: default: spec: [{ refs: ["default"] }]
+			}]
 		}
 	})
 }
@@ -213,8 +205,8 @@ issue3638: reduced: {
 	}
 	#x: { a: int } | *{ b: 2 }
 	@test(eq, {
-		input: {k1: {foo: {a: 1}}}
-		out: {foo: {a: 1}}
+		input: k1: foo: {a: 1}
+		out: foo: a: 1
 		#x: *{b: 2} | {a: int}
 	})
 }
@@ -229,16 +221,16 @@ issue3638: compare: {
 	}
 	#x: { a: int } | *{ b: 2 }
 	@test(eq, {
-		input: {k1: {foo: {a: 1}}}
-		out: {foo: {a: 1}}
+		input: k1: foo: {a: 1}
+		out: foo: a: 1
 		#x: *{b: 2} | {a: int}
 	})
 }
 -- out/errors.txt --
 [eval] t1.c.z: field not allowed:
-    ./in.cue:19:11
+    ./in.cue:33:11
 [eval] t2.c.z: field not allowed:
-    ./in.cue:28:11
+    ./in.cue:42:11
 [eval] issue3670.a.not_int: field not allowed:
     ./intpattern.cue:7:5
 [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):

@@ -91,7 +91,9 @@ issue3780: panic1: {
 		kind: "object"
 		...
 	}
-	@test(err, code=incomplete, contains="required field missing: param", pos=[3:5])
+	@test(err, code=incomplete,
+		suberr=(code=incomplete, contains="required field missing: %s", args=[param], pos=[3:5]),
+		suberr=(code=incomplete, contains="required field missing: %s", args=[param], pos=[3:5]))
 }
 issue3780: panic2: {
 	parent: {

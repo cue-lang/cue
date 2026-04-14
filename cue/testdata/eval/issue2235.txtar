@@ -105,6 +105,35 @@ for clusterName, cluster in clusters {
 }
 
 clusters: foo: {}
+
+@test(eq, {
+	foo: {
+		clusterName: "foo"
+		shorewallPrefix: "KUBERNETES_FOO"
+		globalIngressControllers: admin: {
+			class: "admin"
+			objects: namespaced: ingress: Service: {
+				"admin-nginx-ingress-controller": {
+					spec: {externalIPs: ["127.0.0.1"]}
+					metadata: labels: {
+						"ingress-class": "admin"
+						stack: "ingress"
+					}
+				}
+			}
+		}
+		objects: namespaced: ingress: {
+			Service: "admin-nginx-ingress-controller": {
+				spec: {externalIPs: ["127.0.0.1"]}
+				metadata: labels: {
+					"ingress-class": "admin"
+					stack: "ingress"
+				}
+			}
+		}
+	}
+}, at=clusters)
+
 -- out/eval/stats --
 Leaks:  2
 Freed:  68

@@ -1,0 +1,30 @@
+# A doc-commented field after a definition always gets a blank
+# line before it, regardless of authored RelPos. This matches the
+# long-standing cue/format convention: definitions are a strong
+# enough visual section break that the formatter will fill in the
+# blank line even if the source had only a single newline (or
+# none, in programmatic ASTs).
+#
+# Non-field decls (let, embed, comprehension, etc.) follow a
+# narrower rule — they only get the upgrade when no leading
+# intent was specified — but definitions don't.
+-- in.cue --
+{
+	#Foo: string
+	// doc comment
+	x: #Foo
+}
+-- out/relpos --
+{
+	#Foo: string
+
+	// doc comment
+	x: #Foo
+}
+-- out/norelpos --
+{
+	#Foo: string
+
+	// doc comment
+	x: #Foo
+}

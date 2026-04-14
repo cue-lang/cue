@@ -1,0 +1,12 @@
+# A top-level attribute is an *ast.Attribute Decl, which the decl()
+# switch renders verbatim from its Text field.
+-- in.cue --
+@experiment(aliasv2)
+@name("value")
+a: 1
+-- out/relpos --
+@experiment(aliasv2)
+@name("value")
+a: 1
+-- out/norelpos --
+@experiment(aliasv2), @name("value"), a: 1

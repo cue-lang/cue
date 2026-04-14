@@ -11,15 +11,8 @@ cmp stdout stdout.golden
     #c: [string]: #c
 }
 -- stdout.golden --
-
 _#def
-_#def: {
-	[string]: [string]: C.#x
-}
+_#def: [string]: [string]: C.#x
 
 //cue:path: #c
-let C = {
-	#x: {
-		[string]: #x
-	}
-}
+let C = {#x: [string]: #x}

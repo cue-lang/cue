@@ -26,65 +26,43 @@ package pkg
 	out: (#Extract & {req: features: devMode: true}).out
 }
 -- out/self-v3/default --
-
 _#def
-_#def: (EXTRACT.#x & {
-	req: {
-		features: {
-			devMode: true
-		}
-	}
-}).out
+_#def: (EXTRACT.#x & {req: features: devMode: true}).out
 
 //cue:path: #Extract
 let EXTRACT = {
 	#x: {
-		req: {
-			...
-		}
+		req: {...}
 		out: [
 			if FEATURES != _|_ // explicit error (_|_ literal) in source
 			{
 				FEATURES
-			}, {
-				devMode: false
-			}][0]
+			},
+			{devMode: false}
+		][0]
 	}
 }
 
 //cue:path: req.features
-let FEATURES = {
-	devMode: true
-}
+let FEATURES = {devMode: true}
 -- out/self-v3-noshare/default --
-
 _#def
-_#def: (EXTRACT.#x & {
-	req: {
-		features: {
-			devMode: true
-		}
-	}
-}).out
+_#def: (EXTRACT.#x & {req: features: devMode: true}).out
 
 //cue:path: #Extract
 let EXTRACT = {
 	#x: {
-		req: {
-			...
-		}
+		req: {...}
 		out: [
 			if FEATURES != _|_ // explicit error (_|_ literal) in source
 			{
 				FEATURES
-			}, {
-				devMode: false
-			}][0]
+			},
+			{devMode: false}
+		][0]
 	}
 }
 
 //cue:path: req.features
-let FEATURES = {
-	devMode: true
-}
+let FEATURES = {devMode: true}
 -- out/self/default --

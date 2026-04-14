@@ -32,6 +32,4 @@ import "list"
 
 out: list.Repeat(["baz"], 3)
 -- p/three.cue.fixed --
-import "list"
-
-out: list.Concat([["a"], (list.Concat([(list.Repeat(["a"], 7)), ["gh"]]))])
+import "list", out: list.Concat([["a"], (list.Concat([(list.Repeat(["a"], 7)), ["gh"]]))])

@@ -96,4 +96,15 @@ files: {
     root_1:       0
     root_3:       0
 }
-flat: ["root_1", "root_3", "child_1", "child_2", "child_3", "child_5", "child_6", "child_7", "grandchild_1", "grandchild_2"]
+flat: [
+    "root_1",
+    "root_3",
+    "child_1",
+    "child_2",
+    "child_3",
+    "child_5",
+    "child_6",
+    "child_7",
+    "grandchild_1",
+    "grandchild_2",
+]

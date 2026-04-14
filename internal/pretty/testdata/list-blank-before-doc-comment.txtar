@@ -1,0 +1,28 @@
+# A post-block comment inside a list is attached by the parser as a
+# doc comment on the element that follows it (with NewSection RelPos
+# on the comment). elemBreak must honour that RelPos — the blank line
+# belongs between the previous element and the doc comment, not lost
+# or folded into the element break.
+-- in.cue --
+x: [
+	1,
+
+	// doc on 2
+	2,
+	3,
+]
+-- out/relpos --
+x: [
+	1,
+
+	// doc on 2
+	2,
+	3,
+]
+-- out/norelpos --
+x: [
+	1,
+	// doc on 2
+	2,
+	3,
+]

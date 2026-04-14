@@ -25,5 +25,5 @@ foo : 2
 a: {b: 3} // a comment
 -- formatted --
 foo: 2
-a: {b: 3} // a comment
+a:   {b: 3} // a comment
 -- fmt/cue.mod/module.cue --

@@ -142,50 +142,34 @@ import "encoding/json"
 validate: {
 	t1: {
 		str: *"{\"a\":10}" | string
-		schema: {
-			b: string
-		}
+		schema: b: string
 		result: true
 	}
 	t2: {
 		str: *"{\"a\":10}" | string
-		schema: {
-			a: <3
-		}
+		schema: a: <3
 		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.result.a: invalid value 10 (out of bound <3)
 	}
 	disjunctionRequired: {
-		str: *"{\"a\":10}" | string
-		schema: {
-			a!: int
-		} | {
-			b!: int
-		}
+		str:    *"{\"a\":10}" | string
+		schema: {a!: int} | {b!: int}
 		result: true
 	}
 	disjunctionClosed: {
-		str: *"{\"a\":10}" | string
-		schema: {
-			a: int
-		} | {
-			b: int
-		}
+		str:    *"{\"a\":10}" | string
+		schema: {a: int} | {b: int}
 		result: true
 	}
 	invalidDisjuntion: {
 		str: *"{\"a\":10}" | string
-		schema: {
-			a: 1 | 2
-		}
+		schema: a: 1 | 2
 		result: _|_ // validate.invalidDisjuntion.result: error in call to encoding/json.Validate: validate.invalidDisjuntion.result.a: 2 errors in empty disjunction: (and 2 more errors)
 	}
 
 	// Issue #2395
 	enforceRequired: {
 		str: "{}"
-		schema: {
-			x!: int
-		}
+		schema: x!: int
 		result: json.Validate(str, schema)
 	}
 
@@ -200,45 +184,33 @@ validate: {
 		result: _|_ // validate.multiConflict.result: error in call to encoding/json.Validate: validate.multiConflict.result.field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)
 	}
 }
-issue3932: {
-	f: "{\"name\":\"foo\"}"
+issue3932: f: "{\"name\":\"foo\"}"
+valid: t1: {
+	"1"
+	#result: json.Valid(string)
 }
-valid: {
-	t1: {
-		"1"
-		#result: json.Valid(string)
-	}
+compact: t1: {
+	"[1, 2]"
+	#result: "[1,2]"
 }
-compact: {
-	t1: {
-		"[1, 2]"
-		#result: "[1,2]"
-	}
-}
-indent: {
-	t1: {
-		"{\"a\": 1, \"b\": 2}"
-		#initial: *"" | string
-		#indent:  *"  " | string
-		#result: """
-			{
-			  "a": 1,
-			  "b": 2
-			}
-			"""
-	}
+indent: t1: {
+	"{\"a\": 1, \"b\": 2}"
+	#initial: *"" | string
+	#indent:  *"  " | string
+	#result: """
+		{
+		  "a": 1,
+		  "b": 2
+		}
+		"""
 }
 unmarshal: {
 	t1: {
 		"1"
 		#result: 1
 	}
-	trailingValid: {
-		#result: _|_ // unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON
-	}
-	trailingInvalid: {
-		#result: _|_ // unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON
-	}
+	trailingValid: #result:   _|_ // unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON
+	trailingInvalid: #result: _|_ // unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON
 }
 marshalStream: {
 	t1: {
@@ -247,11 +219,7 @@ marshalStream: {
 			{"b":2}
 
 			"""
-		[{
-			a: 1
-		}, {
-			b: 2
-		}]
+		[{a: 1}, {b: 2}]
 	}
 	t2: {
 		#result: """
@@ -259,11 +227,7 @@ marshalStream: {
 			{"b":2}
 
 			"""
-		[{
-			a: 1
-		}, {
-			b: *2 | int
-		}]
+		[{a: 1}, {b: *2 | int}]
 	}
 	t3: {
 		#result: """
@@ -271,11 +235,7 @@ marshalStream: {
 			{"b":""}
 
 			"""
-		[{
-			a: "\\ \" & < >"
-		}, {
-			b: ""
-		}]
+		[{a: "\\ \" & < >"}, {b: ""}]
 	}
 }
 marshal: {
@@ -296,10 +256,10 @@ htmlEscape: {
 	}
 	t2: {
 		"""
-		{"a":"\\\\ \\" & < >"}
-		{"b":""}
+			{"a":"\\\\ \\" & < >"}
+			{"b":""}
 
-		"""
+			"""
 		#result: """
 			{"a":"\\\\ \\" \\u0026 \\u003c \\u003e"}
 			{"b":""}
@@ -310,19 +270,11 @@ htmlEscape: {
 unmarshalStream: {
 	t1: {
 		"{\"a\": 1}{\"b\": 2}"
-		#result: [{
-			a: 1
-		}, {
-			b: 2
-		}]
+		#result: [{a: 1}, {b: 2}]
 	}
 	t2: {
 		'{"a": 1}{"b": 2}'
-		#result: [{
-			a: 1
-		}, {
-			b: 2
-		}]
+		#result: [{a: 1}, {b: 2}]
 	}
 	empty1: {
 		''

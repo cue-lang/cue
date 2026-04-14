@@ -45,19 +45,11 @@ stderr 'other requirements prevent changing module baz.org@v0 to version v0.5.0 
 
 -- want-module-1 --
 module: "main.org@v0"
-language: {
-	version: "v0.8.0"
-}
+language: version: "v0.8.0"
 deps: {
-	"bar.com@v0": {
-		v: "v0.5.0"
-	}
-	"baz.org@v0": {
-		v: "v0.10.2"
-	}
-	"example.com@v0": {
-		v: "v0.0.1"
-	}
+	"bar.com@v0": v:     "v0.5.0"
+	"baz.org@v0": v:     "v0.10.2"
+	"example.com@v0": v: "v0.0.1"
 	"foo.com/bar/hello@v0": {
 		v:       "v0.2.3"
 		default: true
@@ -73,19 +65,11 @@ deps: {
 }
 -- want-module-2 --
 module: "main.org@v0"
-language: {
-	version: "v0.8.0"
-}
+language: version: "v0.8.0"
 deps: {
-	"bar.com@v0": {
-		v: "v0.5.0"
-	}
-	"baz.org@v0": {
-		v: "v0.11.0-alpha"
-	}
-	"example.com@v0": {
-		v: "v0.0.1"
-	}
+	"bar.com@v0": v:     "v0.5.0"
+	"baz.org@v0": v:     "v0.11.0-alpha"
+	"example.com@v0": v: "v0.0.1"
 	"foo.com/bar/hello@v0": {
 		v:       "v0.2.3"
 		default: true

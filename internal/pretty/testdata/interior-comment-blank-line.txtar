@@ -1,0 +1,28 @@
+# Two interior comments attached to a StructLit (Position=1, prefix
+# slot) and separated by a blank line in the source must keep that
+# blank line on render. The parser records the gap as NewSection on
+# the second CommentGroup's RelPos; wrapInteriorComments routes both
+# blocks through renderCommentChain, which upgrades the inter-comment
+# break to BlankLine when the next group is NewSection.
+#
+# In the norelpos case stripRelPos clears RelPos on the second comment
+# group, so the NewSection signal is gone and the two comments
+# collapse onto consecutive lines - the comments themselves still
+# render, just without the authored gap.
+-- in.cue --
+x: {
+	// first
+
+	// second
+}
+-- out/relpos --
+x: {
+	// first
+
+	// second
+}
+-- out/norelpos --
+x: {
+	// first
+	// second
+}

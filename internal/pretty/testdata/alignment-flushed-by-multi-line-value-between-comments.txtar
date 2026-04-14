@@ -1,0 +1,31 @@
+# Three field rows, each with a trailing //-comment. The middle
+# row's value is a multi-line struct (newlines forced by RelPos),
+# which flushes the alignment table. As a result each of the three
+# rows renders as its own single-row segment, and the `// comment 1`
+# and `// comment 3` comments do not align with each other across
+# the multi-line row. This is the explicit trade-off: the alignment
+# table never spans a row whose value contains newlines, keeping
+# table semantics consistent between field-level and chain-level
+# tables.
+-- in.cue --
+a: {
+	bb: _ // comment 1
+	ccc: {
+		dddd: _
+	} // comment 2
+	eeeee: _ // comment 3
+}
+-- out/relpos --
+a: {
+	bb: _ // comment 1
+	ccc: {
+		dddd: _
+	} // comment 2
+	eeeee: _ // comment 3
+}
+-- out/norelpos --
+a: {
+	bb:    _         // comment 1
+	ccc:   {dddd: _} // comment 2
+	eeeee: _         // comment 3
+}

@@ -49,34 +49,16 @@ kind: Deployment
 kind: Other
 
 -- output-noempty-list.cue --
-[{
-	kind: "Deployment"
-}, {
-	kind: "Deployment"
-}, {
-	kind: "Other"
-}]
+[{kind: "Deployment"}, {kind: "Deployment"}, {kind: "Other"}]
 -- output-noempty-exprpath.cue --
 deployment: kind: "Deployment"
 deployment: kind: "Deployment"
 other: kind:      "Other"
 -- output-noempty-list-exprpath.cue --
-deployment: [{
-	kind: "Deployment"
-}, {
-	kind: "Deployment"
-}]
-other: [{
-	kind: "Other"
-}]
+deployment: [{kind: "Deployment"}, {kind: "Deployment"}]
+other:      [{kind: "Other"}]
 -- output-noempty-list-fixedpath.cue --
-fixedpath: [{
-	kind: "Deployment"
-}, {
-	kind: "Deployment"
-}, {
-	kind: "Other"
-}]
+fixedpath: [{kind: "Deployment"}, {kind: "Deployment"}, {kind: "Other"}]
 -- input-withempty.yaml --
 ---
 kind: Deployment
@@ -86,34 +68,16 @@ kind: Deployment
 ---
 kind: Other
 -- output-withempty-list.cue --
-[{
-	kind: "Deployment"
-}, null, {
-	kind: "Deployment"
-}, {
-	kind: "Other"
-}]
+[{kind: "Deployment"}, null, {kind: "Deployment"}, {kind: "Other"}]
 -- output-withempty-exprpath.cue --
 deployment: kind: "Deployment"
 deployment: kind: "Deployment"
 other: kind:      "Other"
 -- output-withempty-list-exprpath.cue --
-deployment: [{
-	kind: "Deployment"
-}, {
-	kind: "Deployment"
-}]
-other: [{
-	kind: "Other"
-}]
+deployment: [{kind: "Deployment"}, {kind: "Deployment"}]
+other:      [{kind: "Other"}]
 -- output-withempty-list-fixedpath.cue --
-fixedpath: [{
-	kind: "Deployment"
-}, null, {
-	kind: "Deployment"
-}, {
-	kind: "Other"
-}]
+fixedpath: [{kind: "Deployment"}, null, {kind: "Deployment"}, {kind: "Other"}]
 -- input-withnull.yaml --
 ---
 kind: Deployment
@@ -124,34 +88,16 @@ kind: Deployment
 ---
 kind: Other
 -- output-withnull-list.cue --
-[{
-	kind: "Deployment"
-}, null, {
-	kind: "Deployment"
-}, {
-	kind: "Other"
-}]
+[{kind: "Deployment"}, null, {kind: "Deployment"}, {kind: "Other"}]
 -- output-withnull-exprpath.cue --
 deployment: kind: "Deployment"
 deployment: kind: "Deployment"
 other: kind:      "Other"
 -- output-withnull-list-exprpath.cue --
-deployment: [{
-	kind: "Deployment"
-}, {
-	kind: "Deployment"
-}]
-other: [{
-	kind: "Other"
-}]
+deployment: [{kind: "Deployment"}, {kind: "Deployment"}]
+other:      [{kind: "Other"}]
 -- output-withnull-list-fixedpath.cue --
-fixedpath: [{
-	kind: "Deployment"
-}, null, {
-	kind: "Deployment"
-}, {
-	kind: "Other"
-}]
+fixedpath: [{kind: "Deployment"}, null, {kind: "Deployment"}, {kind: "Other"}]
 -- input-missing-key.yaml --
 ---
 kind: Deployment
@@ -162,27 +108,11 @@ kind: Deployment
 ---
 kind: Other
 -- output-missing-key-list.cue --
-[{
-	kind: "Deployment"
-}, {
-	notkind: "Other"
-}, {
-	kind: "Deployment"
-}, {
-	kind: "Other"
-}]
+[{kind: "Deployment"}, {notkind: "Other"}, {kind: "Deployment"}, {kind: "Other"}]
 -- output-missing-key-exprpath.cue --
 -- output-missing-key-list-exprpath.cue --
 -- output-missing-key-list-fixedpath.cue --
-fixedpath: [{
-	kind: "Deployment"
-}, {
-	notkind: "Other"
-}, {
-	kind: "Deployment"
-}, {
-	kind: "Other"
-}]
+fixedpath: [{kind: "Deployment"}, {notkind: "Other"}, {kind: "Deployment"}, {kind: "Other"}]
 -- output-missing-key-typopath.cue --
 -- output-withempty-witcontext-index.cue --
 "number-1": kind: "Deployment"
@@ -192,4 +122,4 @@ fixedpath: [{
 -- output-withempty-witcontext-index-kind.cue --
 "number-1": Deployment: kind: "Deployment"
 "number-3": Deployment: kind: "Deployment"
-"number-4": Other: kind: "Other"
+"number-4": Other: kind:      "Other"

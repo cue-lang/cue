@@ -1,0 +1,34 @@
+# When a chain of & or | arms has every post-first arm starting with
+# its own opening bracket ({, [, or (), the operator stays on the
+# closing-bracket line of the previous arm and the next arm's opening
+# bracket follows with a single space — "} | {" — instead of breaking
+# onto a new indented line. The chain's own Nest is skipped too, so
+# the bracketed arms share the enclosing context's indent (their own
+# brackets provide visual grouping).
+-- in.cue --
+x: {
+	pb: *{
+		encoding:       "binarypb"
+		interpretation: ""
+	} | {
+		encoding:       !="binarypb"
+		interpretation: "pb"
+	}
+}
+-- out/relpos --
+x: {
+	pb: *{
+		encoding:       "binarypb"
+		interpretation: ""
+	} | {
+		encoding:       !="binarypb"
+		interpretation: "pb"
+	}
+}
+-- out/norelpos --
+x: {
+	pb: *{encoding: "binarypb", interpretation: ""} | {
+		encoding:       !="binarypb"
+		interpretation: "pb"
+	}
+}

@@ -1,0 +1,10 @@
+-- in.cue --
+{
+	x:   strings.Join ( a,  ","  )
+}
+-- out/relpos --
+{
+	x: strings.Join(a, ",")
+}
+-- out/norelpos --
+{x: strings.Join(a, ",")}

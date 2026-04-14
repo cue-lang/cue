@@ -1,0 +1,20 @@
+# A trailing comment on a binary expression's operator line is
+# preserved in position. The // comment runs to end of line, so
+# the RHS is forced onto a new line regardless of RelPos.
+# The RHS is indented one level, matching | and & chains.
+# The // comment forces the struct to break.
+-- in.cue --
+{
+	x: 1 + // trailing on plus
+2
+}
+-- out/relpos --
+{
+	x: 1 + // trailing on plus
+		2
+}
+-- out/norelpos --
+{
+	x: 1 + // trailing on plus
+		2
+}

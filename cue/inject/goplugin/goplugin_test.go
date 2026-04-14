@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/inject/goplugin"
 	"cuelang.org/go/cue/load"
@@ -393,6 +394,315 @@ language: version: "v0.12.0"
 	insts := load.Instances([]string{"."}, cfg)
 	qt.Assert(t, qt.IsNil(insts[0].Err))
 	return ctx.BuildInstance(insts[0])
+}
+
+func TestReferencesQualified(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go, import=("example.com/pkg"))
+
+		package example
+
+		x: _ @go(pkg.Greet)
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference{{
+		GoPackage:        "example.com/pkg",
+		CUEModuleVersion: "test.example@v0",
+		Name:             "Greet",
+	}}))
+}
+
+func TestReferencesUnqualified(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go)
+
+		package example
+
+		x: _ @go(Bar)
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference{{
+		GoPackage:        ".",
+		CUEModuleVersion: "test.example@v0",
+		CUEInstance:      "test.example@v0:example",
+		Name:             "Bar",
+	}}))
+}
+
+func TestReferencesEmptyRef(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go)
+
+		package example
+
+		Foo: _ @go()
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference{{
+		GoPackage:        ".",
+		CUEModuleVersion: "test.example@v0",
+		CUEInstance:      "test.example@v0:example",
+		Name:             "Foo",
+	}}))
+}
+
+func TestReferencesMultipleImports(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go, import=(
+			"example.com/alpha"
+			"example.com/beta"
+		))
+
+		package example
+
+		a: _ @go(alpha.A)
+		b: _ @go(beta.B)
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference{{
+		GoPackage:        "example.com/alpha",
+		CUEModuleVersion: "test.example@v0",
+		Name:             "A",
+	}, {
+		GoPackage:        "example.com/beta",
+		CUEModuleVersion: "test.example@v0",
+		Name:             "B",
+	}}))
+}
+
+func TestReferencesAliasedImport(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go, import=(short "example.com/some/longname"))
+
+		package example
+
+		x: _ @go(short.Func)
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference{{
+		GoPackage:        "example.com/some/longname",
+		CUEModuleVersion: "test.example@v0",
+		Name:             "Func",
+	}}))
+}
+
+func TestReferencesV2ModulePath(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go, import=("example.com/foo/bar/v2"))
+
+		package example
+
+		x: _ @go(bar.Func)
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference{{
+		GoPackage:        "example.com/foo/bar/v2",
+		CUEModuleVersion: "test.example@v0",
+		Name:             "Func",
+	}}))
+}
+
+func TestReferencesMixedLocalAndImported(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go, import=("example.com/ext"))
+
+		package example
+
+		a: _ @go(ext.ExtVal)
+		b: _ @go(LocalVal)
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference{{
+		GoPackage:        "example.com/ext",
+		CUEModuleVersion: "test.example@v0",
+		Name:             "ExtVal",
+	}, {
+		GoPackage:        ".",
+		CUEModuleVersion: "test.example@v0",
+		CUEInstance:      "test.example@v0:example",
+		Name:             "LocalVal",
+	}}))
+}
+
+func TestReferencesNoExtern(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		package example
+
+		x: "original" @go(Foo)
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference(nil)))
+}
+
+func TestReferencesUnknownImportIdent(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go, import=("example.com/pkg"))
+
+		package example
+
+		x: _ @go(unknown.Func)
+	`)
+	var errs []string
+	for _, err := range goplugin.References(inst) {
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+	}
+	qt.Assert(t, qt.HasLen(errs, 1))
+	qt.Assert(t, qt.Matches(errs[0], `.*unknown import identifier "unknown".*`))
+}
+
+func TestReferencesInvalidImportSyntax(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go, import=(not valid go))
+
+		package example
+
+		x: _ @go(Func)
+	`)
+	var errs []string
+	for _, err := range goplugin.References(inst) {
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+	}
+	qt.Assert(t, qt.HasLen(errs, 1))
+	qt.Assert(t, qt.Matches(errs[0], `.*cannot parse Go import declaration.*`))
+}
+
+func TestReferencesMultipleFiles(t *testing.T) {
+	dir := t.TempDir()
+	cfg := &load.Config{
+		Dir: dir,
+		Overlay: map[string]load.Source{
+			filepath.Join(dir, "cue.mod", "module.cue"): load.FromString(`
+module: "test.example@v0"
+language: version: "v0.12.0"
+`),
+			filepath.Join(dir, "a.cue"): load.FromString(`
+@extern(go, import=("example.com/alpha"))
+
+package example
+
+a: _ @go(alpha.A)
+`),
+			filepath.Join(dir, "b.cue"): load.FromString(`
+@extern(go, import=("example.com/beta"))
+
+package example
+
+b: _ @go(beta.B)
+`),
+		},
+	}
+	insts := load.Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+
+	refMap := make(map[goplugin.Reference]bool)
+	for ref, err := range goplugin.References(insts[0]) {
+		qt.Assert(t, qt.IsNil(err))
+		refMap[ref] = true
+	}
+	qt.Assert(t, qt.IsTrue(refMap[goplugin.Reference{
+		GoPackage:        "example.com/alpha",
+		CUEModuleVersion: "test.example@v0",
+		Name:             "A",
+	}]))
+	qt.Assert(t, qt.IsTrue(refMap[goplugin.Reference{
+		GoPackage:        "example.com/beta",
+		CUEModuleVersion: "test.example@v0",
+		Name:             "B",
+	}]))
+	qt.Assert(t, qt.Equals(len(refMap), 2))
+}
+
+func TestReferencesNonGoExternIgnored(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(embed)
+
+		package example
+
+		x: _ @embed(file="data.json")
+	`)
+	var got []goplugin.Reference
+	for ref, err := range goplugin.References(inst) {
+		qt.Assert(t, qt.IsNil(err))
+		got = append(got, ref)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []goplugin.Reference(nil)))
+}
+
+func TestReferencesDuplicateImportIdent(t *testing.T) {
+	inst := loadInstance(t, "test.example@v0", `
+		@extern(go, import=(
+			"example.com/foo/pkg"
+			"example.com/bar/pkg"
+		))
+
+		package example
+
+		x: _ @go(pkg.Func)
+	`)
+	var errs []string
+	for _, err := range goplugin.References(inst) {
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+	}
+	qt.Assert(t, qt.HasLen(errs, 1))
+	qt.Assert(t, qt.Matches(errs[0], `.*duplicate import identifier "pkg".*`))
+}
+
+// loadInstance loads a build.Instance from a module with the given
+// module path and CUE source.
+func loadInstance(t *testing.T, modulePath, cueSrc string) *build.Instance {
+	t.Helper()
+	dir := t.TempDir()
+	cfg := &load.Config{
+		Dir: dir,
+		Overlay: map[string]load.Source{
+			filepath.Join(dir, "cue.mod", "module.cue"): load.FromString(fmt.Sprintf(`
+module: %q
+language: version: "v0.12.0"
+`, modulePath)),
+			filepath.Join(dir, "x.cue"): load.FromString(cueSrc),
+		},
+	}
+	insts := load.Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+	return insts[0]
 }
 
 func cueValue(s string) cue.Value {

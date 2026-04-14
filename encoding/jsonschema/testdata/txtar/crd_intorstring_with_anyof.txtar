@@ -41,9 +41,7 @@ spec?: matchN(>=1, [int, string]) & (int | string)
 _embeddedResource: {
 	apiVersion!: string
 	kind!:       string
-	metadata?: {
-		...
-	}
+	metadata?:   {...}
 }
 -- out/decodeCRD/extractCRD/0/v1 --
 package v1
@@ -54,16 +52,14 @@ spec?: matchN(>=1, [int, string]) & (int | string)
 _embeddedResource: {
 	apiVersion!: string
 	kind!:       string
-	metadata?: {
-		...
-	}
+	metadata?:   {...}
 }
 apiVersion: "example.com/v1"
 kind:       "MyApp"
 metadata!: {
 	name!:      string
 	namespace!: string
-	labels?: [string]: string
+	labels?: [string]:      string
 	annotations?: [string]: string
 	...
 }

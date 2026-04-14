@@ -39,12 +39,8 @@ a: _ @embed(file=foo.txt)
 -- _registry/example.com_e_v0.0.1/foo.txt --
 hello
 -- out/eval --
-a: {
-    x: 34
-}
-b: {
-    x: 35
-}
+a: x: 34
+b: x: 35
 c: """
     hello
 

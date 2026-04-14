@@ -25,43 +25,21 @@ package pkg
 	out: (#A & {}).out
 }
 -- out/self-v3/default --
-
 _#def
 _#def: (A.#x & {}).out
 
 //cue:path: #A
-let A = {
-	#x: {
-		out: (B.#x & {}).out
-	}
-}
+let A = {#x: out: (B.#x & {}).out}
 
 //cue:path: #B
-let B = {
-	#x: {
-		out: {
-			x: 1
-		}
-	}
-}
+let B = {#x: out: x: 1}
 -- out/self-v3-noshare/default --
-
 _#def
 _#def: (A.#x & {}).out
 
 //cue:path: #A
-let A = {
-	#x: {
-		out: (B.#x & {}).out
-	}
-}
+let A = {#x: out: (B.#x & {}).out}
 
 //cue:path: #B
-let B = {
-	#x: {
-		out: {
-			x: 1
-		}
-	}
-}
+let B = {#x: out: x: 1}
 -- out/self/default --

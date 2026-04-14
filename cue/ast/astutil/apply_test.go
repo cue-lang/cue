@@ -141,10 +141,7 @@ everywhere: new
 				`,
 		out: `
 foo: {
-	a: [string]: {
-		c:   3
-		iam: new
-	}
+	a: [string]: {c: 3, iam: new}
 }
 	`,
 		before: func(c astutil.Cursor) bool {

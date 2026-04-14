@@ -8,6 +8,4 @@ a: int | *1
 
 a: int | *2
 -- out/layer --
-{
-	a: *2 | 1 | int
-}
+{a: *2 | 1 | int}

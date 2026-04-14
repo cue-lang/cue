@@ -38,12 +38,8 @@ badUniqueBools: {
 	type:    "object"
 	properties: {
 		uniqueBools: {
-			type: "array"
-			prefixItems: [{
-				type: "boolean"
-			}, {
-				type: "boolean"
-			}]
+			type:        "array"
+			prefixItems: [{type: "boolean"}, {type: "boolean"}]
 			maxItems:    2
 			minItems:    2
 			uniqueItems: true

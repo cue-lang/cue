@@ -211,9 +211,9 @@ var _ = adt.TopKind // in case the adt package isn't used
 var p = &pkg.Package{
 	Native: []*pkg.Builtin{},
 	CUE: `{
-	Get: Do & {method: "GET"}
-	Post: Do & {method: "POST"}
-	Put: Do & {method: "PUT"}
+	Get:    Do & {method: "GET"}
+	Post:   Do & {method: "POST"}
+	Put:    Do & {method: "PUT"}
 	Delete: Do & {method: "DELETE"}
 	Do: {
 		$id:             _id
@@ -227,14 +227,14 @@ var p = &pkg.Package{
 		}
 		request: {
 			body?: bytes | string
-			header: [string]: string | [...string]
+			header: [string]:  string | [...string]
 			trailer: [string]: string | [...string]
 		}
 		response: {
 			status:     string
 			statusCode: int
 			body:       *bytes | string
-			header: [string]: string | [...string]
+			header: [string]:  string | [...string]
 			trailer: [string]: string | [...string]
 		}
 	}
@@ -252,14 +252,14 @@ var p = &pkg.Package{
 			body:   *bytes | string
 			value?: _
 			pathValues: [string]: string
-			form: [string]: [string, ...string]
-			header: [string]: [string, ...string]
-			trailer: [string]: [string, ...string]
+			form: [string]:       [string, ...string]
+			header: [string]:     [string, ...string]
+			trailer: [string]:    [string, ...string]
 		}
 		response: {
 			statusCode?: int
 			body?:       *bytes | string
-			header?: [string]: string | [string, ...string]
+			header?: [string]:  string | [string, ...string]
 			trailer?: [string]: string | [string, ...string]
 		}
 	}

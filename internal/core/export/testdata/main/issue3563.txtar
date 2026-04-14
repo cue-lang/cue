@@ -40,6 +40,4 @@ Issue #3563.
 	matchN?: __matchN(1, [string, bool])
 }
 == Eval
-{
-	matchN?: __matchN(1, [string, bool])
-}
+{matchN?: __matchN(1, [string, bool])}

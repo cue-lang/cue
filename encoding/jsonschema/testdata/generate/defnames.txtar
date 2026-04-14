@@ -22,60 +22,32 @@ Bar: y?: int
 		"#Bar": {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				x: {
-					type: "integer"
-				}
-			}
+			properties: x: type: "integer"
 		}
 		Bar: {
 			type: "object"
-			properties: {
-				y: {
-					type: "integer"
-				}
-			}
+			properties: y: type: "integer"
 		}
 		"x.Baz": {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				z: {
-					type: "integer"
-				}
-			}
+			properties: z: type: "integer"
 		}
 		"y.Baz": {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				w: {
-					type: "integer"
-				}
-			}
+			properties: w: type: "integer"
 		}
 	}
 	type: "object"
 	properties: {
 		Bar: {
 			type: "object"
-			properties: {
-				y: {
-					type: "integer"
-				}
-			}
+			properties: y: type: "integer"
 		}
-		a: {
-			$ref: "#/$defs/%23Bar"
-		}
-		b: {
-			$ref: "#/$defs/Bar"
-		}
-		c: {
-			$ref: "#/$defs/x.Baz"
-		}
-		d: {
-			$ref: "#/$defs/y.Baz"
-		}
+		a: $ref: "#/$defs/%23Bar"
+		b: $ref: "#/$defs/Bar"
+		c: $ref: "#/$defs/x.Baz"
+		d: $ref: "#/$defs/y.Baz"
 	}
 }

@@ -1,0 +1,35 @@
+# When a bracketed construct (struct/list/call) is "visually flat" -
+# every element shares a line with its predecessor (no Newline /
+# NewSection RelPos on any element) - its Nest is unused under
+# preFlatten and stacking it on top of an inner construct's Nest
+# pushes inner breaks one indent level too deep.
+#
+# Example: the inline struct `{sh: ..., options: [...]}` is on one
+# line up to the inner list's `[`. The inner list breaks because its
+# elements carry Newline RelPos. Without the visually-flat rule, the
+# inner list's body lands at outer-list-Nest + struct-Nest +
+# inner-list-Nest = +3, and `]` at +2. With the rule, the struct
+# drops its Nest (it's flat) and the body lands at +2 with `]` at +1.
+-- in.cue --
+binaries: [
+	{merge: ["builder", "modules"]},
+	{sh: "go build -o /cowsayd", options: [
+		{cache: goBuildCache},
+		{mount: buildDir, from: "project"},
+	]},
+]
+-- out/relpos --
+binaries: [
+	{merge: ["builder", "modules"]},
+	{sh: "go build -o /cowsayd", options: [
+		{cache: goBuildCache},
+		{mount: buildDir, from: "project"},
+	]},
+]
+-- out/norelpos --
+binaries: [{
+	merge: ["builder", "modules"]
+}, {
+	sh:      "go build -o /cowsayd"
+	options: [{cache: goBuildCache}, {mount: buildDir, from: "project"}]
+}]

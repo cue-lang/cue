@@ -112,6 +112,23 @@ When converting a txtar test from golden-file format to inline annotations:
    x: a | b @test(err, suberr=(code=eval, contains="..."), suberr=(code=eval, contains="..."))
    ```
 
+3a. **`path=` flag**: Checks the dotted CUE path that the error self-reports via
+    `cueerrors.Error.Path()`. This is distinct from `at=`: `at=` navigates to a
+    sub-value before checking, while `path=` asserts what the error reports as its
+    own location. `CUE_UPDATE=1` generates `path=` automatically with two suppression
+    rules: (1) path= is omitted when the error's path equals the annotated field's path;
+    (2) path= is omitted when the `at=` value is a path-boundary suffix of the error path
+    (e.g. `at=w.y.z.b.E` suppresses `path=fieldNotAllowed.t3.w.y.z.b.E`). The flag is
+    also supported inside `suberr=(...)` for discriminating sub-errors by location:
+    ```
+    // sub-errors carry distinct paths; path= is generated because they differ from "x":
+    x: ({a: int & string} | {b: int & bool}) @test(err,
+        suberr=(path=x.a, contains="string"),
+        suberr=(path=x.b, contains="bool"))
+    // at= covers the location; path= is suppressed on CUE_UPDATE=1 fill:
+    outer: {a: {b: int & string}} @test(err, at=a.b, contains="conflicting values")
+    ```
+
 4. **Files with compile-time errors**: CUE source files that themselves produce
    compile errors (e.g., arithmetic on abstract types like `string + ":" + string`,
    or comparisons like `string == number`) **cannot** be converted to inline test

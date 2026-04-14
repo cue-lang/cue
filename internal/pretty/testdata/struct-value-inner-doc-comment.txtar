@@ -1,0 +1,19 @@
+# A field's value is a struct literal whose inner element has a doc
+# comment. The doc comment lives inside the braces; the field's value
+# should not be forced onto a new line just because a descendant has
+# a doc comment (the bracketed body already contains it).
+-- in.cue --
+#s: {
+	// comment
+	x
+}
+-- out/relpos --
+#s: {
+	// comment
+	x
+}
+-- out/norelpos --
+#s: {
+	// comment
+	x
+}

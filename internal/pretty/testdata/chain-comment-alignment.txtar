@@ -1,0 +1,34 @@
+# When a | or & chain has trailing //-comments on its operator lines,
+# the chain is rendered using a Table so those comments align in a
+# single column. Interior comments on an arm that is a braced
+# StructLit (e.g. the "// a: 5" inside "{}") are injected into the
+# struct's body. The multi-line arm (`{ // a: 5 }`) introduces
+# forced newlines, which flushes the alignment table: the preceding
+# `// comment` and the following `// another` comment on that row
+# are no longer padded to align with the `// also` / `// here`
+# comments on the later simple arms. The last two arms, both
+# single-line, still share column alignment with each other.
+-- in.cue --
+#X: {a?: int}
+foo: #X |        // comment
+    {
+        // a: 5
+    } | // another
+    {} |        // also
+    {} // here
+-- out/relpos --
+#X: {a?: int}
+foo: #X | // comment
+	{
+		// a: 5
+	} | // another
+	{} | // also
+	{}   // here
+-- out/norelpos --
+#X: {a?: int}
+foo: #X | // comment
+	{
+		// a: 5
+	} | // another
+	{} | // also
+	{}   // here

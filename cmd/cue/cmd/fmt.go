@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/pretty"
 	"cuelang.org/go/internal/source"
 )
 
@@ -203,10 +204,8 @@ func formatFile(file *build.File, opts []format.Option, doDiff, check bool, cmd 
 		return false, err
 	}
 
-	formatted, err := format.Node(syntax, opts...)
-	if err != nil {
-		return false, err
-	}
+	cfg := pretty.Config{Indent: "\t", Width: 120}
+	formatted := cfg.Node(syntax)
 
 	stdout := cmd.OutOrStdout()
 	// Always write to stdout if the file is read from stdin.

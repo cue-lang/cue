@@ -1,0 +1,19 @@
+# Attributes are part of the value column.
+# Keys are padded so values align.
+-- config --
+width: 40
+-- in.cue --
+{
+	name: string     @go(Name)
+longField:   int @go(LongField)
+}
+-- out/relpos --
+{
+	name:      string @go(Name)
+	longField: int @go(LongField)
+}
+-- out/norelpos --
+{
+	name:      string @go(Name)
+	longField: int @go(LongField)
+}

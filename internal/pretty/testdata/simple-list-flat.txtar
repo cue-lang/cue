@@ -1,0 +1,7 @@
+# Single-line input: fits on one line.
+-- in.cue --
+                                                                                               [1, 2, 3]
+-- out/relpos --
+[1, 2, 3]
+-- out/norelpos --
+[1, 2, 3]

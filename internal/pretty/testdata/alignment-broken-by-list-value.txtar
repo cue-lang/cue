@@ -1,0 +1,23 @@
+# A list-valued field is interspersed among simple fields.
+# Simple fields x and y are aligned (both have key width 2).
+# items (list value) is a raw row and does not affect alignment.
+-- config --
+width: 20
+-- in.cue --
+{
+x:       1
+	items: [1, 2, 3]
+	  y:2
+}
+-- out/relpos --
+{
+	x: 1
+	items: [1, 2, 3]
+	y: 2
+}
+-- out/norelpos --
+{
+	x: 1
+	items: [1, 2, 3]
+	y: 2
+}

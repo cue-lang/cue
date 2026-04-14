@@ -77,29 +77,15 @@ allOfNotMatch: {
 		}
 		anyOfTest: {
 			description: "matchN(>=1, [...]) -> anyOf"
-			anyOf: [{
-				type: "integer"
-			}, {
-				type: "string"
-			}, {
-				type: "boolean"
-			}]
+			anyOf:       [{type: "integer"}, {type: "string"}, {type: "boolean"}]
 		}
 		complexAnyOf: {
-			anyOf: [{
-				type: "integer"
-			}, {
-				type: "string"
-			}]
-			not: {
-				const: 5
-			}
+			anyOf: [{type: "integer"}, {type: "string"}]
+			not: const: 5
 		}
 		complexOneOf: {
 			description: "Combined with other constraints"
-			not: {
-				const: null
-			}
+			not: const: null
 			oneOf: [{
 				allOf: [{
 					type: "number"
@@ -116,9 +102,7 @@ allOfNotMatch: {
 		}
 		notTest: {
 			description: "matchN(0, [x]) -> not"
-			not: {
-				type: "integer"
-			}
+			not: type: "integer"
 		}
 		oneOfTest: {
 			description: "matchN(1, [...]) -> oneOf"
@@ -131,26 +115,12 @@ allOfNotMatch: {
 				exclusiveMinimum: 5
 			}]
 		}
-		singleAllOf: {
-			oneOf: [{
-				type: "integer"
-			}]
-		}
-		singleAnyOf: {
-			anyOf: [{
-				type: "integer"
-			}]
-		}
-		singleNot: {
-			not: {
-				type: "boolean"
-			}
-		}
+		singleAllOf: oneOf: [{type: "integer"}]
+		singleAnyOf: anyOf: [{type: "integer"}]
+		singleNot: not: type: "boolean"
 		singleOneOf: {
 			description: "Edge cases"
-			oneOf: [{
-				type: "string"
-			}]
+			oneOf:       [{type: "string"}]
 		}
 	}
 }

@@ -6,6 +6,4 @@ cmp cue.mod/module.cue want-module.cue
 
 -- want-module.cue --
 module: "cue.example"
-language: {
-	version: "$CUE_LANGUAGE_VERSION"
-}
+language: version: "v0.17.0"

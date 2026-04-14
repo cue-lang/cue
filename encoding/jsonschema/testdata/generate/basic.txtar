@@ -25,32 +25,14 @@ ok: data: {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	type:    "object"
 	properties: {
-		t1: {
-			type: "integer"
-		}
-		t2: {
-			type: "number"
-		}
-		t3: {
-			type: "number"
-		}
-		t4: {
-			type: "string"
-		}
-		t5: {
-			type: "boolean"
-		}
-		t6: {
-			anyOf: [{
-				type: "string"
-			}, {
-				type: "integer"
-			}]
-		}
+		t1: type:  "integer"
+		t2: type:  "number"
+		t3: type:  "number"
+		t4: type:  "string"
+		t5: type:  "boolean"
+		t6: anyOf: [{type: "string"}, {type: "integer"}]
 		t7: true
-		t8: {
-			type: "null"
-		}
+		t8: type: "null"
 	}
 }
 -- out/generate-v3/ok --

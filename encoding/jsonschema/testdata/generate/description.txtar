@@ -29,29 +29,23 @@ missingName: {
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
-	$defs: {
-		User: {
-			type:                 "object"
-			description:          "A user definition."
-			additionalProperties: false
-			properties: {
-				email: {
-					type:        "string"
-					description: "The user's email."
-				}
-				phone: {
-					type: "string"
-				}
+	$defs: User: {
+		type:                 "object"
+		description:          "A user definition."
+		additionalProperties: false
+		properties: {
+			email: {
+				type:        "string"
+				description: "The user's email."
 			}
-			required: ["email"]
+			phone: type: "string"
 		}
+		required: ["email"]
 	}
 	type:        "object"
 	description: "This is the root description."
 	properties: {
-		age: {
-			type: "integer"
-		}
+		age: type: "integer"
 		name: {
 			type:        "string"
 			description: "A name field."

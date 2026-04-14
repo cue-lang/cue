@@ -36,9 +36,7 @@ func TestStructBuilderSelfRef(t *testing.T) {
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `
 _schema
-_schema: {
-	next?: _schema
-}
+_schema: next?: _schema
 `)
 }
 
@@ -51,6 +49,7 @@ func TestStructBuilderEntryInsideValue(t *testing.T) {
 	assertStructBuilderSyntax(t, &b, `
 // foo comment
 #foo: {
+
 	"hello"
 
 	// baz comment

@@ -1,0 +1,15 @@
+# A blank line before a doc comment block is preserved.
+-- in.cue --
+x: 5
+
+// a comment
+y: 6
+-- out/relpos --
+x: 5
+
+// a comment
+y: 6
+-- out/norelpos --
+x: 5
+// a comment
+y: 6

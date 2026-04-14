@@ -1,0 +1,63 @@
+# A single-field struct full-breaks rather than hugging its field
+# (`{a: {` would wedge the label between the braces). Comments at any
+# depth are preserved through the break - a `//` attached to the
+# immediate child, or living deeper in an inner struct, all survive in
+# place. With RelPos stripped and the content narrow enough to fit, the
+# width-driven layout keeps it inline instead.
+-- in.cue --
+direct: x: {a: int & {
+	b: _
+}}
+
+with_comment: x: {a: int & {
+	// comment
+	b: _
+}}
+
+deeper: x: {a: {
+	// outer comment
+	b: int & {
+		// inner comment
+		c: _
+	}
+}}
+-- out/relpos --
+direct: x: {
+	a: int & {
+		b: _
+	}
+}
+
+with_comment: x: {
+	a: int & {
+		// comment
+		b: _
+	}
+}
+
+deeper: x: {
+	a: {
+		// outer comment
+		b: int & {
+			// inner comment
+			c: _
+		}
+	}
+}
+-- out/norelpos --
+direct: x: {a: int & {b: _}}
+with_comment: x: {
+	a: int & {
+		// comment
+		b: _
+	}
+}
+deeper: x: {
+	a: {
+		// outer comment
+		b: int & {
+			// inner comment
+			c: _
+		}
+	}
+}

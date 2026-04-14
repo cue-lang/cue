@@ -12,9 +12,9 @@ d: {
 -- out/trim-v3 --
 == a.cue
 d: {
-	jack:    _
-	gill:    _
-	hilbert: _ & _
+	jack:     _
+	gill:     _
+	hilbert:  _ & _
 	[string]: {age: 5}
 }
 -- diff/-out/trim-v3<==>+out/trim --
@@ -27,17 +27,17 @@ diff old new
 -	jack: {}
 -	gill: {}
 -	hilbert: {} & {}
-+	jack:    _
-+	gill:    _
-+	hilbert: _ & _
++	jack:     _
++	gill:     _
++	hilbert:  _ & _
  	[string]: {age: 5}
  }
 -- out/trim-v3-noshare --
 == a.cue
 d: {
-	jack:    _
-	gill:    _
-	hilbert: _ & _
+	jack:     _
+	gill:     _
+	hilbert:  _ & _
 	[string]: {age: 5}
 }
 -- diff/-out/trim-v3-noshare<==>+out/trim --
@@ -50,9 +50,9 @@ diff old new
 -	jack: {}
 -	gill: {}
 -	hilbert: {} & {}
-+	jack:    _
-+	gill:    _
-+	hilbert: _ & _
++	jack:     _
++	gill:     _
++	hilbert:  _ & _
  	[string]: {age: 5}
  }
 -- out/trim --

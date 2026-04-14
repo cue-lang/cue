@@ -72,7 +72,7 @@ person?: {
 
 	// A very large comment that will be wrapped after a certain line length. Let's
 	// keep on going and see what happens.
-	children?: [...string]
+	children?:     [...string]
 	"home phone"?: #."phone number" @deprecated()
 
 	// AllConditions enable variable-based conditional rule execution. This is useful for
@@ -82,7 +82,6 @@ person?: {
 	bio?: string
 	...
 }
-
 // a telephone number
 #: "phone number": string
 

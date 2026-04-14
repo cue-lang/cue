@@ -11,36 +11,20 @@ t6: {x?: 4, y: 1}	// fully concrete struct -> optional
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	type:    "object"
 	properties: {
-		t1: {
-			type: "integer"
-		}
-		t2: {
-			type: "integer"
-		}
-		t3: {
-			type: "integer"
-		}
-		t4: {
-			const: true
-		}
+		t1: type:  "integer"
+		t2: type:  "integer"
+		t3: type:  "integer"
+		t4: const: true
 		t5: {
 			type: "object"
-			properties: {
-				x: {
-					type: "integer"
-				}
-			}
+			properties: x: type: "integer"
 			required: ["x"]
 		}
 		t6: {
 			type: "object"
 			properties: {
-				x: {
-					const: 4
-				}
-				y: {
-					const: 1
-				}
+				x: const: 4
+				y: const: 1
 			}
 		}
 	}

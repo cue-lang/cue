@@ -321,6 +321,21 @@ objsLoop:
 				}
 			}
 			list := idx.field.Value.(*ast.ListLit)
+			// A doc decoded from a multi-document stream carries the
+			// per-document separator (the blank line / NewSection the
+			// decoder derives from the `---` gaps) as its leading
+			// RelPos. Once the doc becomes a list element that separator
+			// is meaningless and would render as a stray blank line
+			// before the element, so clear the element's leading
+			// position and let it be laid out by its own content,
+			// uniformly with its siblings. A braceless StructLit takes
+			// its leading position from its first element, so clear that
+			// instead.
+			leadElem := ast.Node(expr)
+			if sl, ok := expr.(*ast.StructLit); ok && !sl.Lbrace.IsValid() && len(sl.Elts) > 0 {
+				leadElem = sl.Elts[0]
+			}
+			ast.SetRelPos(leadElem, token.NoRelPos)
 			list.Elts = append(list.Elts, expr)
 		} else if len(labels) == 0 {
 			obj, ok := expr.(*ast.StructLit)

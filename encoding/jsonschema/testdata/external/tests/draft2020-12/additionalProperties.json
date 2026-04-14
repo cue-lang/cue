@@ -229,7 +229,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:6:3\n",
+			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:5:43\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

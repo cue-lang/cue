@@ -305,7 +305,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: disallowed:\n    generated.cue:2:9\n",
+			"v3": "extract error: cannot compile resulting schema: disallowed:\n    generated.cue:1:9\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

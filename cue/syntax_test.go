@@ -75,9 +75,7 @@ func TestSyntax(t *testing.T) {
 		out: `
 {
 	x: {}
-	t: {
-		name: string
-	}
+	t: name: string
 	output: [...t & x.value]
 }`,
 	}, {
@@ -93,9 +91,7 @@ func TestSyntax(t *testing.T) {
 	[...T & {}.value]
 
 	//cue:path: t
-	let T = {
-		name: string
-	}
+	let T = {name: string}
 }`,
 	}, {
 		// Structural errors (and worse) are reported as is.
@@ -183,11 +179,9 @@ _|_ // #List.next: structural cycle
 		containers: [{
 			image: "myimage"
 			name:  "main"
-			envs: []
+			envs:  []
 		}]
-		other: {
-			option: int
-		}
+		other: option: int
 	}
 	incomplete: {
 		x: {}.x
@@ -212,9 +206,7 @@ if true {
 		out: `
 {
 	s: string
-	out: {
-		"\(s)": 3
-	}
+	out: "\(s)": 3
 }
 	`,
 	}, {

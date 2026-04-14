@@ -1,0 +1,10 @@
+# When a list of structs fits entirely on one line, the
+# [docBodyShape] machinery picks the flat shape: brackets adjacent
+# to cells, cells inline with a single space separator. Verified at
+# a width that comfortably accommodates the whole expression.
+-- in.cue --
+x: [{a: _}, {b: _}]
+-- out/relpos --
+x: [{a: _}, {b: _}]
+-- out/norelpos --
+x: [{a: _}, {b: _}]

@@ -57,12 +57,13 @@ b: "bar"`,
 b: bar
 c: baz
 `,
-		want: `[{
-	a: "foo"
-}, {
-	b: "bar"
-	c: "baz"
-}]`,
+		want: `[
+	{a: "foo"},
+	{
+		b: "bar"
+		c: "baz"
+	}
+]`,
 		isStream: true,
 	}, {
 		name: "stream with null",
@@ -90,12 +91,15 @@ null
 `,
 		// TODO(bug): seems like bug in yaml parser. Try moving to yaml.v3,
 		// or validate that this is indeed a correct interpretation.
-		want: `[{
-	a: "foo"
-}, null, {
-	b: "bar"
-	c: "baz"
-}, null]`,
+		want: `[
+	{a: "foo"},
+	null,
+	{
+		b: "bar"
+		c: "baz"
+	},
+	null
+]`,
 		isStream: true,
 	}}
 	ctx := cuecontext.New()
@@ -168,9 +172,7 @@ b: bar`,
 	}, {
 		name: "single struct - inline",
 		yaml: `a: foo`,
-		want: []string{`{
-	a: "foo"
-}`},
+		want: []string{`{a: "foo"}`},
 	}, {
 		name: "single list",
 		yaml: `[1, 2, 3]`,
@@ -178,9 +180,7 @@ b: bar`,
 	}, {
 		name: "single object",
 		yaml: `{"key": "value"}`,
-		want: []string{`{
-	key: "value"
-}`},
+		want: []string{`{key: "value"}`},
 	}, {
 		name: "single string",
 		yaml: `simple string`,
@@ -204,9 +204,7 @@ b: bar`,
 b: bar
 c: baz`,
 		want: []string{
-			`{
-	a: "foo"
-}`,
+			`{a: "foo"}`,
 			`{
 	b: "bar"
 	c: "baz"
@@ -220,15 +218,11 @@ name: second
 ---
 name: third`,
 		want: []string{
+			`{name: "first"}`,
 			`{
-	name: "first"
-}`,
-			`{
-
 	name: "second"
 }`,
 			`{
-
 	name: "third"
 }`,
 		},
@@ -258,7 +252,6 @@ a: value`,
 		want: []string{
 			`null`,
 			`{
-
 	a: "value"
 }`,
 		},

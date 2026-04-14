@@ -26,31 +26,17 @@ missingX: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				x: {
-					type: "integer"
-				}
-				y: {
-					$ref: "#/$defs/D2"
-				}
-				z: {
-					$ref: "#/$defs/D3"
-				}
+				x: type: "integer"
+				y: $ref: "#/$defs/D2"
+				z: $ref: "#/$defs/D3"
 			}
 			required: ["x"]
 		}
-		D2: {
-			type: "string"
-		}
-		D3: {
-			enum: ["a", "b", "c"]
-		}
+		D2: type: "string"
+		D3: enum: ["a", "b", "c"]
 	}
 	type: "object"
-	properties: {
-		foo: {
-			$ref: "#/$defs/D1"
-		}
-	}
+	properties: foo: $ref: "#/$defs/D1"
 	required: ["foo"]
 }
 -- out/generate-v3/simple --

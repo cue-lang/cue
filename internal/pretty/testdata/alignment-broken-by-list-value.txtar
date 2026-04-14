@@ -1,0 +1,24 @@
+# A list-valued field is interspersed among simple fields. The
+# list `[1, 2, 3]` fits on a single line, so its row shares the
+# alignment with `x` and `y`: all three keys pad to `items:`'s
+# width.
+-- config --
+width: 20
+-- in.cue --
+{
+x:       1
+	items: [1, 2, 3]
+	  y:2
+}
+-- out/relpos --
+{
+	x:     1
+	items: [1, 2, 3]
+	y:     2
+}
+-- out/norelpos --
+{
+	x:     1
+	items: [1, 2, 3]
+	y:     2
+}

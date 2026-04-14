@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 
-	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -17,6 +16,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 	"cuelang.org/go/internal/lsp/fscache"
+	"cuelang.org/go/internal/pretty"
 )
 
 // Formatting formats the params.TextDocument.URI as canonical cue.
@@ -45,14 +45,8 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 	}
 
 	node := fscache.RemovePhantomPackageDecl(parsedFile)
-	formatted, err := cueformat.Node(node)
-	if err != nil {
-		// TODO fix up the AST like gopls so we can do more with
-		// partial/incomplete code.
-		//
-		// For now return early because there is nothing we can do.
-		return nil, nil
-	}
+	cfg := pretty.Config{Indent: "\t", Width: 120}
+	formatted := cfg.Node(node)
 
 	src := fh.Content()
 	if bytes.Equal(formatted, src) {

@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d84e611c_396394f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T19:15:22Z",
+      "side": 1,
+      "message": "Done. Rewrote the commit message: subject is now \"cue/testdata: convert resolve/ tests to inline @test format\".",
+      "parentUuid": "62db4370_28416b1f",
+      "revId": "071892a8fd23f788009ab6e5e8da016e751a189a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

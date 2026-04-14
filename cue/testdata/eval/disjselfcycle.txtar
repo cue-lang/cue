@@ -11,6 +11,9 @@ issue4119: reduced: {
 			f: i.f
 		}
 	]
+	@test(eq, {x: *[{
+		f: 123
+	}] | []})
 }
 // This test is added to test the memory management bug isn't triggered
 // one level deeper. This test is expected to fail, as it now triggers
@@ -24,47 +27,57 @@ issue4119: reducedNested: {
 			f: i.f
 		}
 	]}
+	@test(err, code=eval, path=x.y.0.f, contains="undefined field: %s", args=[f], pos=[5:9])
 }
-issue4119: {
-	full: {
-		_img: img={
-			val: string
-			accounts: {
-				groups: img.accounts.groups | *[{gid: 65532}]
+issue4119: full: {
+	_img: img={
+		val: string
+		accounts: {
+			groups: img.accounts.groups | *[{gid: 65532}]
 
-				// Recursive comprehension - this triggers the bug
-				groups: [
-					for g in groups
-					let _gid = g.gid {
-						gid: [
-							if _gid != _|_ {_gid},
-							65532,
-						][0]
-					},
-				]
-			}
+			// Recursive comprehension - this triggers the bug
+			groups: [
+				for g in groups
+				let _gid = g.gid {
+					gid: [
+						if _gid != _|_ {_gid},
+						65532,
+					][0]
+				},
+			]
 		}
+	}
 
-		art: {
-			images: [string]: #Image
-			for k, v in images {
-				images: (k): _img & v
-			}
+	art: {
+		images: [string]: #Image
+		for k, v in images {
+			images: (k): _img & v
 		}
-		#Image: {
+	}
+	#Image: {
+		val: string
+		accounts?: {
+			groups?: [...]
+		}
+	}
+	art: images: ko: {
+		val: "test"
+	}
+	@test(eq, {
+		_img: {
 			val: string
-			accounts?: {
-				groups?: [...]
-			}
+			accounts: {groups: [{ gid: 65532 }]}
 		}
 		art: images: ko: {
 			val: "test"
+			accounts: {groups: *[{ gid: 65532 }] | []}
 		}
-	}
-} @test(err, code=eval, contains="undefined field: f", pos=[-4:9])
+		#Image: {val: string, accounts?: groups?: []}
+	})
+}
 -- out/errors.txt --
 [eval] issue4119.reducedNested.x.y.0.f: undefined field: f:
-    ./comprehensions.cue:22:9
+    ./comprehensions.cue:25:9
 -- out/compile --
 --- comprehensions.cue
 {

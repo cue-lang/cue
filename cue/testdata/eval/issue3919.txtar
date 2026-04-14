@@ -107,9 +107,9 @@ issue3946: reduced:{
 	}
 	@test(eq, {
 		out: [{
-		doExtra?: bool
-		name:     "input1"
-	}]
+			doExtra?: bool
+			name:     "input1"
+		}]
 		_inputs: {
 			input1: {name: "input1", doExtra?: bool}
 		}

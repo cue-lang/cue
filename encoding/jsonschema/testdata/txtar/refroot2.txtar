@@ -14,7 +14,6 @@
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 _schema
 _schema:
-
 	null | bool | number | string | [...] | {
 		value?: _
 		next?:  _schema

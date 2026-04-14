@@ -23,63 +23,35 @@ _foo: a?: int
 	$defs: {
 		S1: {
 			type: "object"
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 		S2: {
 			type:                 "object"
 			additionalProperties: true
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 		"_foo": {
 			type: "object"
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 	}
 	type: "object"
 	properties: {
-		t1: {
-			$ref: "#/$defs/S1"
-		}
-		t2: {
-			$ref: "#/$defs/S2"
-		}
-		t3: {
-			$ref: "#/$defs/_foo"
-		}
+		t1: $ref: "#/$defs/S1"
+		t2: $ref: "#/$defs/S2"
+		t3: $ref: "#/$defs/_foo"
 		t4: {
 			type:                 "object"
 			additionalProperties: true
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 		t5: {
 			type: "object"
-			additionalProperties: {
-				type: "integer"
-			}
+			additionalProperties: type: "integer"
 		}
 		t6: {
 			type: "object"
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			properties: a: type: "integer"
 		}
 	}
 }

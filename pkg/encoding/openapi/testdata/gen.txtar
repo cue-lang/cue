@@ -529,12 +529,10 @@ constraints: {
 		selfContained:    *false | bool
 		expandReferences: *false | bool
 	}
-	schema: {
-		#User: {
-			name:  string & len(_) > 0
-			age:   uint & <=120
-			email: =~"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-		}
+	schema: #User: {
+		name:  string & len(_) > 0
+		age:   uint & <=120
+		email: =~"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
 	}
 	result: json.Indent(openapi.MarshalSchema(config, schema), "", "  ")
 }
@@ -562,13 +560,11 @@ optional: {
 		selfContained:    *false | bool
 		expandReferences: *false | bool
 	}
-	schema: {
-		#User: {
-			name!:  string
-			age?:   int
-			email?: string
-			metadata?: {}
-		}
+	schema: #User: {
+		name!:     string
+		age?:      int
+		email?:    string
+		metadata?: {}
 	}
 	result: """
 		{
@@ -844,11 +840,7 @@ invalidVersion: {
 		selfContained:    *false | bool
 		expandReferences: *false | bool
 	}
-	schema: {
-		#User: {
-			name: string
-		}
-	}
+	schema: #User: name: string
 	result: _|_ // invalidVersion.config.version: conflicting values "3.0.0" and "invalid.version"
 }
 
@@ -875,11 +867,7 @@ minimal: {
 		selfContained:    *false | bool
 		expandReferences: *false | bool
 	}
-	schema: {
-		#Simple: {
-			value: string
-		}
-	}
+	schema: #Simple: value: string
 	result: """
 		{
 		  "openapi": "3.0.0",

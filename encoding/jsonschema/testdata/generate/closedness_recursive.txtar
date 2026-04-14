@@ -120,24 +120,16 @@ closedLeftRightLeftExtra: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				b: {
-					$ref: "#/$defs/B"
-				}
-				x: {
-					type: "integer"
-				}
+				b: $ref: "#/$defs/B"
+				x: type: "integer"
 			}
 		}
 		B: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				a: {
-					$ref: "#/$defs/A"
-				}
-				y: {
-					type: "string"
-				}
+				a: $ref: "#/$defs/A"
+				y: type: "string"
 			}
 		}
 		ClosedLeft: {
@@ -148,119 +140,73 @@ closedLeftRightLeftExtra: {
 					type:                 "object"
 					additionalProperties: false
 					properties: {
-						left: {
-							$ref: "#/$defs/ClosedLeft"
-						}
-						value: {
-							type: "string"
-						}
+						left: $ref:  "#/$defs/ClosedLeft"
+						value: type: "string"
 					}
 				}
-				value: {
-					type: "integer"
-				}
+				value: type: "integer"
 			}
 		}
-		Expr: {
-			anyOf: [{
-				type: "integer"
-			}, {
-				type:                 "object"
-				additionalProperties: false
-				properties: {
-					left: {
-						$ref: "#/$defs/Expr"
-					}
-					op: {
-						type: "string"
-					}
-					right: {
-						$ref: "#/$defs/Expr"
-					}
-				}
-			}]
-		}
+		Expr: anyOf: [{
+			type: "integer"
+		}, {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				left: $ref:  "#/$defs/Expr"
+				op: type:    "string"
+				right: $ref: "#/$defs/Expr"
+			}
+		}]
 		Tree: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
 				children: {
 					type: "array"
-					items: {
-						$ref: "#/$defs/Tree"
-					}
+					items: $ref: "#/$defs/Tree"
 				}
-				value: {
-					type: "integer"
-				}
+				value: type: "integer"
 			}
 		}
 		WrapsNode: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				next: {
-					$ref: "#/$defs/WrapsNode"
-				}
-				value: {
-					type: "integer"
-				}
+				next: $ref:  "#/$defs/WrapsNode"
+				value: type: "integer"
 			}
 		}
 		"_left": {
 			type: "object"
 			properties: {
-				right: {
-					$ref: "#/$defs/_right"
-				}
-				value: {
-					type: "integer"
-				}
+				right: $ref: "#/$defs/_right"
+				value: type: "integer"
 			}
 		}
 		"_node": {
 			type: "object"
 			properties: {
-				next: {
-					$ref: "#/$defs/_node"
-				}
-				value: {
-					type: "integer"
-				}
+				next: $ref:  "#/$defs/_node"
+				value: type: "integer"
 			}
 		}
 		"_right": {
 			type: "object"
 			properties: {
-				left: {
-					$ref: "#/$defs/_left"
-				}
-				value: {
-					type: "string"
-				}
+				left: $ref:  "#/$defs/_left"
+				value: type: "string"
 			}
 		}
 	}
 	type: "object"
 	properties: {
-		t01: {
-			$ref: "#/$defs/Tree"
-		}
-		t02: {
-			$ref: "#/$defs/A"
-		}
-		t03: {
-			$ref: "#/$defs/Expr"
-		}
-		t04: {
-			$ref: "#/$defs/_node"
-		}
-		t05: {
-			$ref: "#/$defs/WrapsNode"
-		}
-		t06: {
-			$ref: "#/$defs/ClosedLeft"
-		}
+		t01: $ref: "#/$defs/Tree"
+		t02: $ref: "#/$defs/A"
+		t03: $ref: "#/$defs/Expr"
+		t04: $ref: "#/$defs/_node"
+		t05: $ref: "#/$defs/WrapsNode"
+		t06: $ref: "#/$defs/ClosedLeft"
 	}
 }
 -- out/generate-v3/treeValid --

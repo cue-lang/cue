@@ -1,38 +1,20 @@
 -- in.cue --
 p: [name=_]: "name": name
 -- out/definition-v3 --
-p: {
-	[name_1=_]: {
-		name: name_1
-	}
-}
+p: [name_1=_]: name: name_1
 -- out/definition-v3-noshare --
-p: {
-	[name_1=_]: {
-		name: name_1
-	}
-}
+p: [name_1=_]: name: name_1
 -- out/doc-v3 --
 []
 [p]
 -- out/value-v3 --
 == Simplified
-{
-	p: {}
-}
+{p: {}}
 == Raw
-{
-	p: {}
-}
+{p: {}}
 == Final
-{
-	p: {}
-}
+{p: {}}
 == All
-{
-	p: {}
-}
+{p: {}}
 == Eval
-{
-	p: {}
-}
+{p: {}}

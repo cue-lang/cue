@@ -12,5 +12,4 @@
 
 result: (#R & {x: "s"}).out
 -- out/self/default --
-
 "default"

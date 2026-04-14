@@ -1,0 +1,66 @@
+# Post-element comments (Position >= 3, Line=false attached to a list
+# element by the parser) must land *after* the row's separator/comma,
+# not inside the cell. Previously, bracketed/chain element types
+# (StructLit, ListLit, BinaryExpr) baked their trailing comments into
+# the body via applyBeforeAfter, which displaced the parent's comma:
+# `{} // c\n,` instead of `{},\n// c`. For BinaryExpr chains routed
+# through chainGroupArms / chainTableExpr, the comments were dropped
+# entirely.
+#
+# The fix: structLit / listLit return only the body (with interior
+# comments processed); BinaryExpr's binaryExprPrec stops collecting
+# posDoc / posTrailingMin comments. expr() always wraps with
+# withComments, and listElemRow categorises comments uniformly across
+# all element types, sending post-element comments to the postCommentRows
+# path so they appear as separate rows after the element's row.
+-- in.cue --
+x: [
+	{},
+	// a
+	// b
+]
+
+y: [
+	[],
+	// c
+
+	// d
+]
+
+z: [
+	a | b,
+	// e
+]
+-- out/relpos --
+x: [
+	{},
+	// a
+	// b
+]
+
+y: [
+	[],
+	// c
+
+	// d
+]
+
+z: [
+	a | b,
+	// e
+]
+-- out/norelpos --
+x: [
+	{},
+	// a
+	// b
+]
+y: [
+	[],
+	// c
+	// d
+]
+z: [
+	a | b,
+	// e
+]

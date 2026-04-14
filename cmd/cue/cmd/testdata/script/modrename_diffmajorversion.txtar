@@ -24,14 +24,8 @@ cmp bar/bar.cue bar/bar.cue-0
 
 -- cue.mod/module.cue --
 module: "main.org/foo@v0"
-language: {
-	version: "v0.9.0"
-}
-deps: {
-	"main.org/foo@v1": {
-		v: "v1.2.3"
-	}
-}
+language: version: "v0.9.0"
+deps: "main.org/foo@v1": v: "v1.2.3"
 -- foo.cue --
 package foo
 
@@ -47,14 +41,8 @@ foo.x
 
 -- cue.mod/module.cue-1 --
 module: "other.org/bar"
-language: {
-	version: "v0.9.0"
-}
-deps: {
-	"main.org/foo@v1": {
-		v: "v1.2.3"
-	}
-}
+language: version: "v0.9.0"
+deps: "main.org/foo@v1": v: "v1.2.3"
 -- foo.cue-1 --
 package foo
 

@@ -68,6 +68,13 @@ type decoder struct {
 	// forceNewline ensures that the next position will be on a new line.
 	forceNewline bool
 
+	// forceInline ensures that the next position will be on the same
+	// line, overriding both forceNewline and the line-delta
+	// heuristic. Set for the first field of a single-line flow-style
+	// mapping `{a: 1, b: 2}`, whose first field sits on a different
+	// source line than the preceding sibling but must render inline.
+	forceInline bool
+
 	// scopeEnd is the byte offset (exclusive) bounding the current
 	// node's extent in the source. Used to compute Rbrace positions
 	// for struct literals: the Rbrace is placed at offset scopeEnd-1
@@ -356,7 +363,11 @@ func (d *decoder) contentOffset(yn *yaml.Node, open byte) int {
 func (d *decoder) pos(offset int) token.Pos {
 	pos := d.tokFile.Pos(offset, token.NoRelPos)
 
-	if d.forceNewline {
+	if d.forceInline {
+		d.forceInline = false
+		d.forceNewline = false
+		pos = pos.WithRel(token.Blank)
+	} else if d.forceNewline {
 		d.forceNewline = false
 		pos = pos.WithRel(token.Newline)
 	} else if d.lastOffset >= 0 {
@@ -566,6 +577,19 @@ func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
 	multiline := false
 	if len(yn.Content) > 0 {
 		multiline = yn.Line < yn.Content[len(yn.Content)-1].Line
+	}
+
+	// A single-line flow-style mapping `{a: 1, b: 2}` is inline: its
+	// braces are Blank and its fields stay on one line. Force the
+	// first field inline so neither a pending forceNewline (set by an
+	// enclosing block sequence per element) nor the line-delta
+	// heuristic (the map sits on a different source line than the
+	// preceding sibling) leaks onto it and forces the map open; the
+	// remaining fields are already on the same line. A multiline flow
+	// mapping still breaks its fields: insertMap re-arms forceNewline
+	// per field below.
+	if yn.Style&yaml.FlowStyle != 0 && !multiline {
+		d.forceInline = true
 	}
 
 	if err := d.insertMap(yn, strct, multiline, false); err != nil {

@@ -1,0 +1,29 @@
+# A single-element list whose element's subtree carries an explicit
+# Newline RelPos (so the element WILL render with forced breaks)
+# hugs the brackets around the element, mirroring structLit and
+# callExpr. The element's own layout (a struct that breaks
+# internally) renders between '[' and ']' without the list inserting
+# its own breaks, its own Nest, or a trailing comma. With RelPos
+# stripped the hug's precondition fails and the standard width-based
+# break cascades through.
+-- in.cue --
+versions!: [...{
+	name!: string
+	schema!: {
+		openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)
+	}
+}]
+-- out/relpos --
+versions!: [...{
+	name!: string
+	schema!: {
+		openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)
+	}
+}]
+-- out/norelpos --
+versions!: [
+	...{
+		name!:   string
+		schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}
+	},
+]

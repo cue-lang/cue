@@ -1,0 +1,19 @@
+# Trailing // comments on consecutive fields are vertically aligned.
+-- in.cue --
+{
+	x: "hello"   // greeting
+	y: "goodbye"   // farewell
+	zebra: "hi"      // short
+}
+-- out/relpos --
+{
+	x:     "hello"   // greeting
+	y:     "goodbye" // farewell
+	zebra: "hi"      // short
+}
+-- out/norelpos --
+{
+	x:     "hello"   // greeting
+	y:     "goodbye" // farewell
+	zebra: "hi"      // short
+}

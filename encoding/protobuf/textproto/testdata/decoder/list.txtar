@@ -34,12 +34,17 @@ string1: [
 float1: [ 1e+2 1. 0]
 -- out/decode --
 empty1: []
-empty2: [// foo
+empty2: [
+	// foo
 ]
 int1: [1, 2]
 int2: [1, 2] // omitting commas okay
-int3: [1, // omitting comma okay
-	2]
-string1: ["a", // omitting comma NOT supported
-	"b"]
+int3: [
+	1, // omitting comma okay
+	2,
+]
+string1: [
+	"a", // omitting comma NOT supported
+	"b",
+]
 float1: [1e+2, 1.0, 0]

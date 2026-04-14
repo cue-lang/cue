@@ -1,0 +1,51 @@
+# A field whose value is a 2-arm disjunction with only a field-level
+# trailing comment stays on one line when it fits. The trailing
+# comment sits at the end of the line (the chain is the last cell of
+# the enclosing field row) with nothing after it for `//` to swallow,
+# so it does not force the chain's Table to break and flat rendering
+# is safe.
+-- in.cue --
+#F: {
+	data:       *true | false // include/allow regular fields
+	references: *true | false // don't resolve/allow references
+	cycles:     *true | false // cycles are permitted
+	definitions?:  bool          // include/allow definition fields
+	optional?:     bool          // include/allow definition fields
+	constraints?:  bool          // include/allow constraints
+	keepDefaults?: bool          // select/allow default values
+	incomplete?:   bool          // permit incomplete values
+	imports?:      bool          // don't expand/allow imports
+	stream?:       bool          // permit streaming
+	docs?:         bool          // show/allow docs
+	attributes?:   bool          // include/allow attributes
+}
+-- out/relpos --
+#F: {
+	data:          *true | false // include/allow regular fields
+	references:    *true | false // don't resolve/allow references
+	cycles:        *true | false // cycles are permitted
+	definitions?:  bool          // include/allow definition fields
+	optional?:     bool          // include/allow definition fields
+	constraints?:  bool          // include/allow constraints
+	keepDefaults?: bool          // select/allow default values
+	incomplete?:   bool          // permit incomplete values
+	imports?:      bool          // don't expand/allow imports
+	stream?:       bool          // permit streaming
+	docs?:         bool          // show/allow docs
+	attributes?:   bool          // include/allow attributes
+}
+-- out/norelpos --
+#F: {
+	data:          *true | false // include/allow regular fields
+	references:    *true | false // don't resolve/allow references
+	cycles:        *true | false // cycles are permitted
+	definitions?:  bool          // include/allow definition fields
+	optional?:     bool          // include/allow definition fields
+	constraints?:  bool          // include/allow constraints
+	keepDefaults?: bool          // select/allow default values
+	incomplete?:   bool          // permit incomplete values
+	imports?:      bool          // don't expand/allow imports
+	stream?:       bool          // permit streaming
+	docs?:         bool          // show/allow docs
+	attributes?:   bool          // include/allow attributes
+}

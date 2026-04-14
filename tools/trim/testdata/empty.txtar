@@ -18,7 +18,7 @@ deployment: [ID=string]: {}
 deployment: alertmanager: {
 	empty: {}
 	volumes: [{
-		name: "alertmanager"
+		name:     "alertmanager"
 		emptyDir: {}
 	}]
 }

@@ -1,0 +1,29 @@
+# A single-line struct value `{inner: true}` participates in the
+# alignment table like any other value; its row's value column
+# lines up with the simple values on either side.
+-- config --
+width: 28
+-- in.cue --
+{
+	short: 1
+longname: 2
+	mid: {inner: true}
+a: 3
+	bc: 4
+}
+-- out/relpos --
+{
+	short:    1
+	longname: 2
+	mid:      {inner: true}
+	a:        3
+	bc:       4
+}
+-- out/norelpos --
+{
+	short:    1
+	longname: 2
+	mid:      {inner: true}
+	a:        3
+	bc:       4
+}

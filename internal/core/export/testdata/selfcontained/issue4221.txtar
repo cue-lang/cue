@@ -22,54 +22,36 @@ d: {
 	}
 }
 -- out/self-v3/default --
-
 for k, v in MATRIX {
 	(k): v
 }
 
 //cue:path: d.matrix
 let MATRIX = {
-	local: T & {
-		GOOS: GOOS_1
-	}
-	linux: T & {
-		GOOS: "linux"
-	}
-	darwin: T & {
-		GOOS: GOOS_1
-	}
+	local:  T & {GOOS: GOOS_1}
+	linux:  T & {GOOS: "linux"}
+	darwin: T & {GOOS: GOOS_1}
 }
 
 //cue:path: d._t
-let T = {
-	GOOS: string
-}
+let T = {GOOS: string}
 
 //cue:path: flags.goos
 let GOOS_1 = string | *"darwin"
 -- out/self-v3-noshare/default --
-
 for k, v in MATRIX {
 	(k): v
 }
 
 //cue:path: d.matrix
 let MATRIX = {
-	local: T & {
-		GOOS: GOOS_1
-	}
-	linux: T & {
-		GOOS: "linux"
-	}
-	darwin: T & {
-		GOOS: GOOS_1
-	}
+	local:  T & {GOOS: GOOS_1}
+	linux:  T & {GOOS: "linux"}
+	darwin: T & {GOOS: GOOS_1}
 }
 
 //cue:path: d._t
-let T = {
-	GOOS: string
-}
+let T = {GOOS: string}
 
 //cue:path: flags.goos
 let GOOS_1 = string | *"darwin"

@@ -310,6 +310,17 @@ objsLoop:
 		}
 
 		if b.useList {
+			// A doc decoded from a multi-document stream carries the
+			// per-document separator (the blank line / NewSection the
+			// decoder derives from the `---` gaps) as its leading
+			// RelPos. Remove it to avoid a leading stray blank line.
+			leadElem := ast.Node(expr)
+			if sl, ok := expr.(*ast.StructLit); ok && !sl.Lbrace.IsValid() && len(sl.Elts) > 0 {
+				// A braceless StructLit takes its leading position from
+				// its first element, so clear that instead.
+				leadElem = sl.Elts[0]
+			}
+			ast.SetRelPos(leadElem, token.NoRelPos)
 			idx := index
 			for _, e := range labels {
 				idx = idx.label(e)

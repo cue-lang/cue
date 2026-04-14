@@ -1,0 +1,6 @@
+-- in.cue --
+package foo
+-- out/relpos --
+package foo
+-- out/norelpos --
+package foo

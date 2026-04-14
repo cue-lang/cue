@@ -1,0 +1,21 @@
+# When RelPos is stripped (programmatic AST) and a list/struct/call/
+# disjunction overflows the configured width, every subvalue lands on
+# its own line at +1 indent and the closing bracket returns to the
+# parent indent. Single-element collections still hug their inner
+# bracket (`[{...}]`-style) - only multi-element collections explode.
+#
+# Parsed source preserves the user's layout regardless of width: the
+# only newlines added are the ones the user wrote.
+-- config --
+width: 6
+-- in.cue --
+abc: [1, 2, 3, 4]
+-- out/relpos --
+abc: [1, 2, 3, 4]
+-- out/norelpos --
+abc: [
+	1,
+	2,
+	3,
+	4,
+]

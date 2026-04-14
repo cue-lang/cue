@@ -47,18 +47,34 @@ import "list"
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 
 close({
-	foo?: [...string]
-	tuple?: [string, int, 2, ...]
-	has?: list.MatchN(>=1, 3)
-	too?: list.MatchN(>=1, string)
-	size?: list.MaxItems(9) & list.UniqueItems() & [_, _, _, ...]
+	foo?:        [...string]
+	tuple?:      [string, int, 2, ...]
+	has?:        list.MatchN(>=1, 3)
+	too?:        list.MatchN(>=1, string)
+	size?:       list.MaxItems(9) & list.UniqueItems() & [_, _, _, ...]
 	additional?: [int, int, ...string]
 })
 -- out/decode/testerr/err-foo-not-string --
 foo.0: conflicting values true and string (mismatched types bool and string):
     generated.cue:5:1
     generated.cue:6:12
+    test/err-foo-not-string.json:9:10
+-- out/decode-v3/testerr/err-foo-not-string --
+foo.0: conflicting values true and string (mismatched types bool and string):
+    generated.cue:5:1
+    generated.cue:6:19
     test/err-foo-not-string.json:2:10
+-- diff/-out/decode-v3/testerr/err-foo-not-string<==>+out/decode/testerr/err-foo-not-string --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,4 @@
+ foo.0: conflicting values true and string (mismatched types bool and string):
+     generated.cue:5:1
+-    generated.cue:6:12
+-    test/err-foo-not-string.json:9:10
++    generated.cue:6:19
++    test/err-foo-not-string.json:2:10
 -- test/empty.json --
 {}
 -- test/foo-items.json --

@@ -1,0 +1,25 @@
+# A doc comment attached to a field carries two independent vertical
+# separation decisions: one before the comment (driven by the
+# comment's own RelPos) and one between the comment and the field
+# body (driven by the field's own RelPos). Collapsing them to max()
+# moves the blank line onto the wrong side. Here the user wrote the
+# blank line *after* the comment (between comment and `b`); the
+# pretty-printer must render the blank line on that side, not move it
+# to be between `{` and the comment.
+-- in.cue --
+a: {
+	// comment
+
+	b: _
+}
+-- out/relpos --
+a: {
+	// comment
+
+	b: _
+}
+-- out/norelpos --
+a: {
+	// comment
+	b: _
+}

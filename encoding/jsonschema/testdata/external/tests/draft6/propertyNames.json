@@ -7,7 +7,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:4:3\n",
+			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:3:43\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -175,7 +175,7 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v3": "disallowed:\n    generated.cue:3:3\n    generated.cue:2:1\n    instance.json:1:1\n",
+					"v3": "disallowed:\n    generated.cue:1:43\n    generated.cue:1:1\n    instance.json:1:1\n",
 					"v3-roundtrip": "could not extract schema"
 				}
 			}

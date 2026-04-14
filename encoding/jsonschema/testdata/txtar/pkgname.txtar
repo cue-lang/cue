@@ -27,10 +27,7 @@ package somepkg
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 
 // A person is a human being.
-person?: {
-	...
-}
-
+person?: {...}
 // a telephone number
 #: "phone number": string
 ...

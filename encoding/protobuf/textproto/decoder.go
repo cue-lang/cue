@@ -272,6 +272,7 @@ func (d *decoder) decodeMsg(m *mapping, n []*pbast.Node) ast.Expr {
 				}
 			}
 			if cg := addComments(x.ClosingBraceComment); cg != nil {
+				cg.Line = true
 				cg.Position = 4
 				ast.AddComment(list, cg)
 			}

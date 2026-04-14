@@ -54,9 +54,7 @@ matchN(1, [{
 }, {
     b!: _
     c?: _
-}]) & {
-    c!: _
-}
+}]) & {c!: _}
 -- out/stdout-d --
 import "struct"
 
@@ -73,18 +71,14 @@ import "struct"
 }, {
     b!: _
     c?: _
-}]) & {
-    c!: _
-}
+}]) & {c!: _}
 d: struct.MinFields(3) & {
     x!: 4
     ...
 }
 issue3633: {
     data: #s & {}
-    #s: matchN(1, [matchN(1, [{
-        a!: _
-    }])])
+    #s:   matchN(1, [matchN(1, [{a!: _}])])
 }
 -- out/stdout-4029 --
 #Suffix:      string

@@ -27,9 +27,7 @@ cmp stdout expect-stdout
 -- expect-stdout --
 #Pipeline: {
 	@jsonschema(id="https://foo.com/this-id-is-required-to-reproduce-the-case")
-	a?: #User
-	#User: close({
-		name?: string
-	})
+	a?:    #User
+	#User: close({name?: string})
 	...
 }

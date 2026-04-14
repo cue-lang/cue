@@ -37,7 +37,6 @@ a: B=b: {
 
 [NAME=string]: b: name: NAME
 -- out/self/default --
-
 {
 	x: string
 	y: x
@@ -63,34 +62,24 @@ a: B=b: {
 		ext2: EXT
 		ext3: {
 			two: 2
-			b: {
-				name: "ext1"
-			}
+			b: name: "ext1"
 		}
 		ext4: EXT2
 		ext5: EXT2.a
 	}
-	other: {
-		[INNER=string]: {
-			name: INNER
-		}
-	}
+	other: [INNER=string]: name: INNER
 }
 name: "a"
 
 //cue:path: ext
 let EXT = {
 	one: 1
-	b: {
-		name: "ext"
-	}
+	b: name: "ext"
 }
 
 //cue:path: ext2
 let EXT2 = {
 	three: 3
-	b: {
-		name: "ext2"
-	}
+	b: name: "ext2"
 	a: int
 }

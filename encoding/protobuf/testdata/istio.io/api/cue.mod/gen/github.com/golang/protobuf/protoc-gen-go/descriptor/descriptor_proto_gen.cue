@@ -27,7 +27,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 // Author: kenton@google.com (Kenton Varda)
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
@@ -35,10 +34,8 @@
 // The messages in this file describe the definitions found in .proto files.
 // A valid .proto file can be translated directly to a FileDescriptorProto
 // without any other information (e.g. without reading its imports).
-
 // ===================================================================
 // Options
-
 // Each of the definitions above may have "options" attached.  These are
 // just annotations which may cause code to be generated slightly differently
 // or may contain hints for code that manipulates protocol messages.
@@ -67,7 +64,6 @@
 //   https://developers.google.com/protocol-buffers/docs/proto#options
 //   If this turns out to be popular, a web service will be set up
 //   to automatically assign option numbers.
-
 // ===================================================================
 // Optional source code info
 package descriptor
@@ -94,11 +90,11 @@ package descriptor
 	weakDependency?: [...int32] @protobuf(11,int32,name=weak_dependency)
 
 	// All top-level definitions in this file.
-	messageType?: [...#DescriptorProto] @protobuf(4,DescriptorProto,name=message_type)
-	enumType?: [...#EnumDescriptorProto] @protobuf(5,EnumDescriptorProto,name=enum_type)
-	service?: [...#ServiceDescriptorProto] @protobuf(6,ServiceDescriptorProto)
-	extension?: [...#FieldDescriptorProto] @protobuf(7,FieldDescriptorProto)
-	options?: #FileOptions @protobuf(8,FileOptions)
+	messageType?: [...#DescriptorProto]        @protobuf(4,DescriptorProto,name=message_type)
+	enumType?:    [...#EnumDescriptorProto]    @protobuf(5,EnumDescriptorProto,name=enum_type)
+	service?:     [...#ServiceDescriptorProto] @protobuf(6,ServiceDescriptorProto)
+	extension?:   [...#FieldDescriptorProto]   @protobuf(7,FieldDescriptorProto)
+	options?:     #FileOptions                 @protobuf(8,FileOptions)
 
 	// This field contains optional information about the original source code.
 	// You may safely remove this entire field without harming runtime
@@ -113,20 +109,20 @@ package descriptor
 
 // Describes a message type.
 #DescriptorProto: {
-	name?: string @protobuf(1,string)
-	field?: [...#FieldDescriptorProto] @protobuf(2,FieldDescriptorProto)
-	extension?: [...#FieldDescriptorProto] @protobuf(6,FieldDescriptorProto)
-	nestedType?: [...#DescriptorProto] @protobuf(3,DescriptorProto,name=nested_type)
-	enumType?: [...#EnumDescriptorProto] @protobuf(4,EnumDescriptorProto,name=enum_type)
+	name?:       string                     @protobuf(1,string)
+	field?:      [...#FieldDescriptorProto] @protobuf(2,FieldDescriptorProto)
+	extension?:  [...#FieldDescriptorProto] @protobuf(6,FieldDescriptorProto)
+	nestedType?: [...#DescriptorProto]      @protobuf(3,DescriptorProto,name=nested_type)
+	enumType?:   [...#EnumDescriptorProto]  @protobuf(4,EnumDescriptorProto,name=enum_type)
 
 	#ExtensionRange: {
 		start?:   int32                  @protobuf(1,int32) // Inclusive.
 		end?:     int32                  @protobuf(2,int32) // Exclusive.
 		options?: #ExtensionRangeOptions @protobuf(3,ExtensionRangeOptions)
 	}
-	extensionRange?: [...#ExtensionRange] @protobuf(5,ExtensionRange,name=extension_range)
-	oneofDecl?: [...#OneofDescriptorProto] @protobuf(8,OneofDescriptorProto,name=oneof_decl)
-	options?: #MessageOptions @protobuf(7,MessageOptions)
+	extensionRange?: [...#ExtensionRange]       @protobuf(5,ExtensionRange,name=extension_range)
+	oneofDecl?:      [...#OneofDescriptorProto] @protobuf(8,OneofDescriptorProto,name=oneof_decl)
+	options?:        #MessageOptions            @protobuf(7,MessageOptions)
 
 	// Range of reserved tag numbers. Reserved tag numbers may not be used by
 	// fields or extension ranges in the same message. Reserved ranges may
@@ -168,29 +164,29 @@ package descriptor
 		{"TYPE_FIXED32", #enumValue: 7} |
 		{"TYPE_BOOL", #enumValue: 8} |
 		{"TYPE_STRING", #enumValue: 9} | {
-			// Tag-delimited aggregate.
-			// Group type is deprecated and not supported in proto3. However, Proto3
-			// implementations should still be able to parse the group wire format and
-			// treat group fields as unknown fields.
-			"TYPE_GROUP"
-			#enumValue: 10
-		} | {
-			"TYPE_MESSAGE" // Length-delimited aggregate.
-			#enumValue: 11
-		} | {
-			// New in version 2.
-			"TYPE_BYTES"
-			#enumValue: 12
-		} | {"TYPE_UINT32", #enumValue: 13} |
+		// Tag-delimited aggregate.
+		// Group type is deprecated and not supported in proto3. However, Proto3
+		// implementations should still be able to parse the group wire format and
+		// treat group fields as unknown fields.
+		"TYPE_GROUP"
+		#enumValue: 10
+	} | {
+		"TYPE_MESSAGE" // Length-delimited aggregate.
+		#enumValue: 11
+	} | {
+		// New in version 2.
+		"TYPE_BYTES"
+		#enumValue: 12
+	} | {"TYPE_UINT32", #enumValue: 13} |
 		{"TYPE_ENUM", #enumValue: 14} |
 		{"TYPE_SFIXED32", #enumValue: 15} |
 		{"TYPE_SFIXED64", #enumValue: 16} | {
-			"TYPE_SINT32" // Uses ZigZag encoding.
-			#enumValue: 17
-		} | {
-			"TYPE_SINT64" // Uses ZigZag encoding.
-			#enumValue: 18
-		}
+		"TYPE_SINT32" // Uses ZigZag encoding.
+		#enumValue: 17
+	} | {
+		"TYPE_SINT64" // Uses ZigZag encoding.
+		#enumValue: 18
+	}
 
 	#Type_value: {
 		"TYPE_DOUBLE":   1
@@ -271,9 +267,9 @@ package descriptor
 
 // Describes an enum type.
 #EnumDescriptorProto: {
-	name?: string @protobuf(1,string)
-	value?: [...#EnumValueDescriptorProto] @protobuf(2,EnumValueDescriptorProto)
-	options?: #EnumOptions @protobuf(3,EnumOptions)
+	name?:    string                         @protobuf(1,string)
+	value?:   [...#EnumValueDescriptorProto] @protobuf(2,EnumValueDescriptorProto)
+	options?: #EnumOptions                   @protobuf(3,EnumOptions)
 
 	// Range of reserved numeric values. Reserved values may not be used by
 	// entries in the same enum. Reserved ranges may not overlap.
@@ -305,9 +301,9 @@ package descriptor
 
 // Describes a service.
 #ServiceDescriptorProto: {
-	name?: string @protobuf(1,string)
-	method?: [...#MethodDescriptorProto] @protobuf(2,MethodDescriptorProto)
-	options?: #ServiceOptions @protobuf(3,ServiceOptions)
+	name?:    string                      @protobuf(1,string)
+	method?:  [...#MethodDescriptorProto] @protobuf(2,MethodDescriptorProto)
+	options?: #ServiceOptions             @protobuf(3,ServiceOptions)
 }
 
 // Describes a method of a service.
@@ -699,6 +695,7 @@ package descriptor
 // or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
 // in them.
 #UninterpretedOption: {
+
 	// The name of the uninterpreted option.  Each string represents a segment in
 	// a dot-separated name.  is_extension is true iff a segment represents an
 	// extension (denoted with parentheses in options specs in .proto files).
@@ -848,8 +845,8 @@ package descriptor
 		//   optional int32 grault = 6;
 		//
 		//   // ignored detached comments.
-		leadingComments?:  string @protobuf(3,string,name=leading_comments)
-		trailingComments?: string @protobuf(4,string,name=trailing_comments)
+		leadingComments?:         string      @protobuf(3,string,name=leading_comments)
+		trailingComments?:        string      @protobuf(4,string,name=trailing_comments)
 		leadingDetachedComments?: [...string] @protobuf(6,string,name=leading_detached_comments)
 	}
 }

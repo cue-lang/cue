@@ -1,0 +1,26 @@
+# Multiple contiguous opening brackets/braces/parens share a single
+# level of indent rather than each adding one. When the user writes
+# `[{...}, {...}]` with the first `{` contiguous with `[` (no newline
+# between), the struct's own Nest already provides one level of
+# indent; the list should not stack another on top. Contiguous
+# opening/closing also means `[{` and `}]` stay adjacent even when
+# content inside the structs breaks — the inner Group is free to
+# break, but the list's brackets never inject a newline at those
+# boundaries. Consequently no trailing comma is added when `]` hugs
+# the last `}`.
+-- in.cue --
+x: [{
+		a: _
+	},
+	{
+		a: _
+	}]
+-- out/relpos --
+x: [{
+	a: _
+},
+{
+	a: _
+}]
+-- out/norelpos --
+x: [{a: _}, {a: _}]

@@ -23,12 +23,8 @@ a: foo: Bar: {
 
 -- extern/out --
 -- out/extern --
-{
-	a: {
-		Foo:    implFoo1
-		Rename: implEmaner1
-		foo: {
-			Bar: impl2
-		}
-	}
-}
+{a: {
+	Foo:    implFoo1
+	Rename: implEmaner1
+	foo: Bar: impl2
+}}

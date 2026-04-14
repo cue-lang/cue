@@ -35,9 +35,7 @@ a: PKG
 b: PKG.v.a
 
 //cue:path: "mod.test/a/pkg"
-let PKG = {
-	v: {
-		a: int
-		b: a
-	}
-}
+let PKG = {v: {
+	a: int
+	b: a
+}}

@@ -11,11 +11,9 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-
 // $title: Mixer Client
 // $description: Configuration state for the Mixer client library.
 // $location: https://istio.io/docs/reference/config/policy-and-telemetry/istio.mixer.v1.config.client
-
 // Describes the configuration state for the Mixer client library that's built into Envoy.
 package client
 
@@ -26,6 +24,7 @@ import (
 
 // Specifies the behavior when the client is unable to connect to Mixer.
 #NetworkFailPolicy: {
+
 	// Example of single-value enum.
 	#FailPolicy: {
 		// If network connection fails, request is allowed and delivered to the
@@ -144,9 +143,7 @@ import (
 	// Map of control configuration indexed by destination.service. This
 	// is used to support per-service configuration for cases where a
 	// mixerclient serves multiple services.
-	serviceConfigs?: {
-		[string]: #ServiceConfig
-	} @protobuf(2,map[string]ServiceConfig,service_configs)
+	serviceConfigs?: {[string]: #ServiceConfig} @protobuf(2,map[string]ServiceConfig,service_configs)
 
 	// Default destination service name if none was specified in the
 	// client request.

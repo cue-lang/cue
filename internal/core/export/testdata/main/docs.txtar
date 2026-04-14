@@ -204,9 +204,7 @@ Foo: {
 
 // foos are instances of Foo.
 foos: {
-	{
-		[string]: Foo
-	}
+	{[string]: Foo}
 	MyFoo: {
 		// local field comment.
 		field1: 0
@@ -242,7 +240,6 @@ sub: {
 	let y = x
 	// nested for
 	for z in [y]
-
 	// nested if
 	if z == 1 {
 		innerField: y
@@ -251,6 +248,7 @@ sub: {
 -- out/value-v3 --
 == Simplified
 {
+
 	// A Foo fooses stuff.
 	Foo: {
 		// field1 is an int.
@@ -263,10 +261,10 @@ sub: {
 
 	// foos are instances of Foo.
 	foos: {
+
 		// My first little foo.
 		MyFoo: {
 			// local field comment.
-
 			// field1 is an int.
 			field1: 0
 
@@ -285,7 +283,6 @@ sub: {
 	}
 	baz: {
 		// comment from baz on field 1
-
 		// comment from bar on field 1
 		field1: int
 		// comment from bar on field 2
@@ -299,6 +296,7 @@ sub: {
 }
 == Raw
 {
+
 	// A Foo fooses stuff.
 	Foo: {
 		// field1 is an int.
@@ -311,10 +309,10 @@ sub: {
 
 	// foos are instances of Foo.
 	foos: {
+
 		// My first little foo.
 		MyFoo: {
 			// local field comment.
-
 			// field1 is an int.
 			field1: 0
 
@@ -333,7 +331,6 @@ sub: {
 	}
 	baz: {
 		// comment from baz on field 1
-
 		// comment from bar on field 1
 		field1: int
 		// comment from bar on field 2
@@ -352,12 +349,10 @@ sub: {
 		field2: int
 		dup3:   int
 	}
-	foos: {
-		MyFoo: {
-			field1: 0
-			field2: 1
-			dup3:   int
-		}
+	foos: MyFoo: {
+		field1: 0
+		field2: 1
+		dup3:   int
 	}
 	bar: {
 		field1: int
@@ -374,6 +369,7 @@ sub: {
 }
 == All
 {
+
 	// A Foo fooses stuff.
 	Foo: {
 		// field1 is an int.
@@ -386,10 +382,10 @@ sub: {
 
 	// foos are instances of Foo.
 	foos: {
+
 		// My first little foo.
 		MyFoo: {
 			// local field comment.
-
 			// field1 is an int.
 			field1: 0
 
@@ -408,7 +404,6 @@ sub: {
 	}
 	baz: {
 		// comment from baz on field 1
-
 		// comment from bar on field 1
 		field1: int
 		// comment from bar on field 2
@@ -427,12 +422,10 @@ sub: {
 		field2: int
 		dup3:   int
 	}
-	foos: {
-		MyFoo: {
-			field1: 0
-			field2: 1
-			dup3:   int
-		}
+	foos: MyFoo: {
+		field1: 0
+		field2: 1
+		dup3:   int
 	}
 	bar: {
 		field1: int
@@ -451,45 +444,276 @@ sub: {
 diff old new
 --- old
 +++ new
-@@ -33,9 +33,9 @@
- 		field2: int
- 	}
- 	baz: {
+@@ -1,41 +1,41 @@
+ == Simplified
+ {
+-	// A Foo fooses stuff.
+-	Foo: {
+-		// field1 is an int.
+-		field1: int
+-		field2: int
+-
+-		// duplicate field comment
+-		dup3: int
+-	}
+-
+-	// foos are instances of Foo.
+-	foos: {
+-		// My first little foo.
+-		MyFoo: {
+-			// local field comment.
+-
+-			// field1 is an int.
+-			field1: 0
+-
+-			// other field comment.
+-			field2: 1
+-
+-			// duplicate field comment
+-			dup3: int
+-		}
+-	}
+-	bar: {
+-		// comment from bar on field 1
+-		field1: int
+-		// comment from bar on field 2
+-		field2: int
+-	}
+-	baz: {
 -		// comment from bar on field 1
 -
 -		// comment from baz on field 1
-+		// comment from baz on field 1
 +
++	// A Foo fooses stuff.
++	Foo: {
++		// field1 is an int.
++		field1: int
++		field2: int
++
++		// duplicate field comment
++		dup3: int
++	}
++
++	// foos are instances of Foo.
++	foos: {
++
++		// My first little foo.
++		MyFoo: {
++			// local field comment.
++			// field1 is an int.
++			field1: 0
++
++			// other field comment.
++			field2: 1
++
++			// duplicate field comment
++			dup3: int
++		}
++	}
++	bar: {
++		// comment from bar on field 1
++		field1: int
++		// comment from bar on field 2
++		field2: int
++	}
++	baz: {
++		// comment from baz on field 1
 +		// comment from bar on field 1
  		field1: int
  		// comment from bar on field 2
  		field2: int
-@@ -81,9 +81,9 @@
- 		field2: int
- 	}
- 	baz: {
+@@ -48,42 +48,42 @@
+ }
+ == Raw
+ {
+-	// A Foo fooses stuff.
+-	Foo: {
+-		// field1 is an int.
+-		field1: int
+-		field2: int
+-
+-		// duplicate field comment
+-		dup3: int
+-	}
+-
+-	// foos are instances of Foo.
+-	foos: {
+-		// My first little foo.
+-		MyFoo: {
+-			// local field comment.
+-
+-			// field1 is an int.
+-			field1: 0
+-
+-			// other field comment.
+-			field2: 1
+-
+-			// duplicate field comment
+-			dup3: int
+-		}
+-	}
+-	bar: {
+-		// comment from bar on field 1
+-		field1: int
+-		// comment from bar on field 2
+-		field2: int
+-	}
+-	baz: {
 -		// comment from bar on field 1
 -
 -		// comment from baz on field 1
-+		// comment from baz on field 1
 +
++	// A Foo fooses stuff.
++	Foo: {
++		// field1 is an int.
++		field1: int
++		field2: int
++
++		// duplicate field comment
++		dup3: int
++	}
++
++	// foos are instances of Foo.
++	foos: {
++
++		// My first little foo.
++		MyFoo: {
++			// local field comment.
++			// field1 is an int.
++			field1: 0
++
++			// other field comment.
++			field2: 1
++
++			// duplicate field comment
++			dup3: int
++		}
++	}
++	bar: {
++		// comment from bar on field 1
++		field1: int
++		// comment from bar on field 2
++		field2: int
++	}
++	baz: {
++		// comment from baz on field 1
 +		// comment from bar on field 1
  		field1: int
  		// comment from bar on field 2
  		field2: int
-@@ -156,9 +156,9 @@
+@@ -101,12 +101,10 @@
  		field2: int
+ 		dup3:   int
  	}
- 	baz: {
+-	foos: {
+-		MyFoo: {
+-			field1: 0
+-			field2: 1
+-			dup3:   int
+-		}
++	foos: MyFoo: {
++		field1: 0
++		field2: 1
++		dup3:   int
+ 	}
+ 	bar: {
+ 		field1: int
+@@ -123,42 +121,42 @@
+ }
+ == All
+ {
+-	// A Foo fooses stuff.
+-	Foo: {
+-		// field1 is an int.
+-		field1: int
+-		field2: int
+-
+-		// duplicate field comment
+-		dup3: int
+-	}
+-
+-	// foos are instances of Foo.
+-	foos: {
+-		// My first little foo.
+-		MyFoo: {
+-			// local field comment.
+-
+-			// field1 is an int.
+-			field1: 0
+-
+-			// other field comment.
+-			field2: 1
+-
+-			// duplicate field comment
+-			dup3: int
+-		}
+-	}
+-	bar: {
+-		// comment from bar on field 1
+-		field1: int
+-		// comment from bar on field 2
+-		field2: int
+-	}
+-	baz: {
 -		// comment from bar on field 1
 -
 -		// comment from baz on field 1
-+		// comment from baz on field 1
 +
++	// A Foo fooses stuff.
++	Foo: {
++		// field1 is an int.
++		field1: int
++		field2: int
++
++		// duplicate field comment
++		dup3: int
++	}
++
++	// foos are instances of Foo.
++	foos: {
++
++		// My first little foo.
++		MyFoo: {
++			// local field comment.
++			// field1 is an int.
++			field1: 0
++
++			// other field comment.
++			field2: 1
++
++			// duplicate field comment
++			dup3: int
++		}
++	}
++	bar: {
++		// comment from bar on field 1
++		field1: int
++		// comment from bar on field 2
++		field2: int
++	}
++	baz: {
++		// comment from baz on field 1
 +		// comment from bar on field 1
  		field1: int
  		// comment from bar on field 2
  		field2: int
+@@ -176,12 +174,10 @@
+ 		field2: int
+ 		dup3:   int
+ 	}
+-	foos: {
+-		MyFoo: {
+-			field1: 0
+-			field2: 1
+-			dup3:   int
+-		}
++	foos: MyFoo: {
++		field1: 0
++		field2: 1
++		dup3:   int
+ 	}
+ 	bar: {
+ 		field1: int
 -- diff/value/explanation --
 Reordering.
 -- out/value --

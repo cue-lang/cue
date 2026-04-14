@@ -1,0 +1,24 @@
+# A field whose value contains newlines flushes the surrounding
+# alignment table. Here `middle`'s struct value is written on its
+# own lines (RelPos-driven HardLine breaks), so it forms its own
+# boundary segment. The rows before it (`foo`, `bar`) align
+# amongst themselves; `end` starts a fresh segment after the
+# boundary with nothing else to align against. If the alignment
+# spanned the multi-line value, `end:` would be padded out to match
+# the widest simple key — that no longer happens.
+-- in.cue --
+foo: 1
+barley: 22
+middle: {
+	inner: 9
+}
+end: 333
+-- out/relpos --
+foo:    1
+barley: 22
+middle: {
+	inner: 9
+}
+end: 333
+-- out/norelpos --
+foo: 1, barley: 22, middle: {inner: 9}, end: 333

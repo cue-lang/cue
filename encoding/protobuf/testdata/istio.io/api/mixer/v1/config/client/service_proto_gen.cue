@@ -11,7 +11,6 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-
 // NOTE: this is a duplicate of proxy.v1.config.IstioService from
 // proxy/v1alpha1/config/route_rules.proto.
 //
@@ -42,7 +41,5 @@ package client
 	//
 	// *Note:* When used for a VirtualService destination, labels MUST be empty.
 	//
-	labels?: {
-		[string]: string
-	} @protobuf(5,map[string]string)
+	labels?: {[string]: string} @protobuf(5,map[string]string)
 }

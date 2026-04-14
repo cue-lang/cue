@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 // Copyright 2017 Istio Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,11 +24,9 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-
 // $title: Gateway
 // $description: Configuration affecting edge load balancer.
 // $location: https://istio.io/docs/reference/config/networking/v1alpha3/gateway.html
-
 // `Gateway` describes a load balancer operating at the edge of the mesh
 // receiving incoming or outgoing HTTP/TCP connections. The specification
 // describes a set of ports that should be exposed, the type of protocol to
@@ -212,9 +209,7 @@ package v1alpha3
 	// label search is restricted to the configuration namespace in which the
 	// the resource is present. In other words, the Gateway resource must
 	// reside in the same namespace as the gateway workload instance.
-	selector?: {
-		[string]: string
-	} @protobuf(2,map[string]string)
+	selector?: {[string]: string} @protobuf(2,map[string]string)
 	selector?: {[name=_]: name}
 }
 

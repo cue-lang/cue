@@ -327,12 +327,10 @@ func TestFromGo(t *testing.T) {
 	}
 
 	syn, _ := format.Node(v.Syntax())
-	if got := string(syn); got != `{
-	hello: {
-		A: "a"
-		B: "b"
-	}
-}` {
+	if got := string(syn); got != `{hello: {
+	A: "a"
+	B: "b"
+}}` {
 		t.Errorf("incorrect ordering: %s\n", got)
 	}
 }

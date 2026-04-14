@@ -31,87 +31,65 @@ out: {
 [out top D4]
 -- out/value-v3 --
 == Simplified
-{
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-			C3: true
-			C4: true
-			D3: true
-			D4: true
-		}
-	}
-}
+{out: top: {
+	A1: true
+	A2: true
+	B1: true
+	B2: true
+	C3: true
+	C4: true
+	D3: true
+	D4: true
+}}
 == Raw
-{
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-			C3: true
-			C4: true
-			D3: true
-			D4: true
-		}
-	}
-}
+{out: top: {
+	A1: true
+	A2: true
+	B1: true
+	B2: true
+	C3: true
+	C4: true
+	D3: true
+	D4: true
+}}
 == Final
-{
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-			C3: true
-			C4: true
-			D3: true
-			D4: true
-		}
-	}
-}
+{out: top: {
+	A1: true
+	A2: true
+	B1: true
+	B2: true
+	C3: true
+	C4: true
+	D3: true
+	D4: true
+}}
 == All
-{
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-			C3: true
-			C4: true
-			D3: true
-			D4: true
-		}
-	}
-}
+{out: top: {
+	A1: true
+	A2: true
+	B1: true
+	B2: true
+	C3: true
+	C4: true
+	D3: true
+	D4: true
+}}
 == Eval
-{
-	out: {
-		top: {
-			A1: true
-			A2: true
-			B1: true
-			B2: true
-			C3: true
-			C4: true
-			D3: true
-			D4: true
-		}
-	}
-}
+{out: top: {
+	A1: true
+	A2: true
+	B1: true
+	B2: true
+	C3: true
+	C4: true
+	D3: true
+	D4: true
+}}
 -- out/definition-v3 --
 out: {
 	for x in ["A", "B"] {
 		top: {
-			{
-				"\(x)1": true
-			}
+			{"\(x)1": true}
 			{
 				"\(x)2": true
 			}
@@ -119,9 +97,7 @@ out: {
 	}
 	for y in ["C", "D"] {
 		top: {
-			{
-				"\(y)3": true
-			}
+			{"\(y)3": true}
 			{
 				"\(y)4": true
 			}
@@ -132,9 +108,7 @@ out: {
 out: {
 	for x in ["A", "B"] {
 		top: {
-			{
-				"\(x)1": true
-			}
+			{"\(x)1": true}
 			{
 				"\(x)2": true
 			}
@@ -142,9 +116,7 @@ out: {
 	}
 	for y in ["C", "D"] {
 		top: {
-			{
-				"\(y)3": true
-			}
+			{"\(y)3": true}
 			{
 				"\(y)4": true
 			}

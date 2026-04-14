@@ -150,6 +150,7 @@ diff old new
 -- out/value-v3 --
 == Simplified
 {
+
 	// Basic try with successful reference
 	tryBasic: {
 		x: 1
@@ -163,9 +164,7 @@ diff old new
 	}
 
 	// Try with else - optional field missing (uses else)
-	tryWithElseMissing: {
-		z: 0
-	}
+	tryWithElseMissing: z: 0
 
 	// Try assignment form
 	tryAssign: {
@@ -174,12 +173,11 @@ diff old new
 	}
 
 	// Try assignment with else - optional field missing
-	tryAssignElse: {
-		z: 0
-	}
+	tryAssignElse: z: 0
 }
 == Raw
 {
+
 	// Basic try with successful reference
 	tryBasic: {
 		x: 1
@@ -220,16 +218,12 @@ diff old new
 		x: 1
 		y: 1
 	}
-	tryWithElseMissing: {
-		z: 0
-	}
+	tryWithElseMissing: z: 0
 	tryAssign: {
 		x: 1
 		y: 1
 	}
-	tryAssignElse: {
-		z: 0
-	}
+	tryAssignElse: z: 0
 }
 == All
 {
@@ -268,34 +262,114 @@ diff old new
 }
 == Eval
 {
-	@experiment(try)
-	// Test export of try clause in comprehensions
-	tryBasic: {
-		x: 1
-		y: 1
-	}
-	tryWithElseExists: {
-		x: 1
-		y: 1
-	}
-	tryWithElseMissing: {
-		optField?: int
-		z:         0
-	}
-	tryAssign: {
-		x: 1
-		y: 1
-	}
-	tryAssignElse: {
-		optField?: int
-		z:         0
-	}
+@experiment(try)
+// Test export of try clause in comprehensions
+tryBasic: {
+	x: 1
+	y: 1
+}
+tryWithElseExists: {
+	x: 1
+	y: 1
+}
+tryWithElseMissing: {
+	optField?: int
+	z:         0
+}
+tryAssign: {
+	x: 1
+	y: 1
+}
+tryAssignElse: {
+	optField?: int
+	z:         0
+}
 }
 -- diff/-out/value-v3<==>+out/value --
 diff old new
 --- old
 +++ new
-@@ -83,6 +83,9 @@
+@@ -1,35 +1,33 @@
+ == Simplified
+ {
+-	// Basic try with successful reference
+-	tryBasic: {
+-		x: 1
+-		y: 1
+-	}
+-
+-	// Try with else - reference exists
+-	tryWithElseExists: {
+-		x: 1
+-		y: 1
+-	}
+-
+-	// Try with else - optional field missing (uses else)
+-	tryWithElseMissing: {
+-		z: 0
+-	}
+-
+-	// Try assignment form
+-	tryAssign: {
+-		x: 1
+-		y: 1
+-	}
+-
+-	// Try assignment with else - optional field missing
+-	tryAssignElse: {
+-		z: 0
+-	}
++
++	// Basic try with successful reference
++	tryBasic: {
++		x: 1
++		y: 1
++	}
++
++	// Try with else - reference exists
++	tryWithElseExists: {
++		x: 1
++		y: 1
++	}
++
++	// Try with else - optional field missing (uses else)
++	tryWithElseMissing: z: 0
++
++	// Try assignment form
++	tryAssign: {
++		x: 1
++		y: 1
++	}
++
++	// Try assignment with else - optional field missing
++	tryAssignElse: z: 0
+ }
+ == Raw
+ {
++
+ 	// Basic try with successful reference
+ 	tryBasic: {
+ 		x: 1
+@@ -70,19 +68,18 @@
+ 		x: 1
+ 		y: 1
+ 	}
+-	tryWithElseMissing: {
+-		z: 0
+-	}
+-	tryAssign: {
+-		x: 1
+-		y: 1
+-	}
+-	tryAssignElse: {
+-		z: 0
+-	}
++	tryWithElseMissing: z: 0
++	tryAssign: {
++		x: 1
++		y: 1
++	}
++	tryAssignElse: z: 0
  }
  == All
  {
@@ -305,7 +379,7 @@ diff old new
  	// Basic try with successful reference
  	tryBasic: {
  		x: 1
-@@ -115,22 +118,26 @@
+@@ -115,22 +112,26 @@
  }
  == Eval
  {
@@ -326,28 +400,29 @@ diff old new
 -	}
 -	tryAssignElse: {
 -		z: 0
-+	@experiment(try)
-+	// Test export of try clause in comprehensions
-+	tryBasic: {
-+		x: 1
-+		y: 1
-+	}
-+	tryWithElseExists: {
-+		x: 1
-+		y: 1
-+	}
-+	tryWithElseMissing: {
-+		optField?: int
-+		z:         0
-+	}
-+	tryAssign: {
-+		x: 1
-+		y: 1
-+	}
-+	tryAssignElse: {
-+		optField?: int
-+		z:         0
- 	}
+-	}
++@experiment(try)
++// Test export of try clause in comprehensions
++tryBasic: {
++	x: 1
++	y: 1
++}
++tryWithElseExists: {
++	x: 1
++	y: 1
++}
++tryWithElseMissing: {
++	optField?: int
++	z:         0
++}
++tryAssign: {
++	x: 1
++	y: 1
++}
++tryAssignElse: {
++	optField?: int
++	z:         0
++}
  }
 -- out/value --
 == Simplified

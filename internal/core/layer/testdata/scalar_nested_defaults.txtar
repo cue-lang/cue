@@ -13,10 +13,8 @@ config: {
 	timeout: int | *30
 }
 -- out/layer --
-{
-	config: {
-		port:    *9000 | int | 8080
-		host:    *"localhost" | string
-		timeout: *30 | int
-	}
-}
+{config: {
+	port:    *9000 | int | 8080
+	host:    *"localhost" | string
+	timeout: *30 | int
+}}

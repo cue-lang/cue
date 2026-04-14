@@ -1,0 +1,14 @@
+# Multi-byte rune field names: alignment uses rune count, not byte count,
+# so values line up visually (assuming the rune is rendered in 1 column).
+-- in.cue --
+{
+	"💩": 3
+	y:4
+}
+-- out/relpos --
+{
+	"💩": 3
+	y:   4
+}
+-- out/norelpos --
+{"💩": 3, y: 4}

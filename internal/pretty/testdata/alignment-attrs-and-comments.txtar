@@ -1,0 +1,28 @@
+# Attributes and comments each get their own column in the table, so
+# consecutive rows with attrs line up their `@...` tokens, and
+# consecutive rows with comments line up their `//` tokens
+# independently. Rows without attrs leave the attr column blank;
+# their comment still lands in the comment column so it aligns with
+# other comments. Rows without comments drop the trailing column
+# entirely (no stray whitespace).
+-- in.cue --
+{
+	a: 1 @tag(a) // short comment
+	bb: 22 @tag(bb) // longer comment here
+	ccc: 333 @tag(ccc)
+	dddd: 4444 // no attr on this one
+}
+-- out/relpos --
+{
+	a:    1    @tag(a)   // short comment
+	bb:   22   @tag(bb)  // longer comment here
+	ccc:  333  @tag(ccc)
+	dddd: 4444           // no attr on this one
+}
+-- out/norelpos --
+{
+	a:    1    @tag(a)   // short comment
+	bb:   22   @tag(bb)  // longer comment here
+	ccc:  333  @tag(ccc)
+	dddd: 4444           // no attr on this one
+}

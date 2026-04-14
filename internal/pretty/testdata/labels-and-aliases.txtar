@@ -1,0 +1,18 @@
+# Exercises the various label forms dispatched by label(): computed
+# labels (`[expr]: ...`), parenthesised labels (`(expr): ...`), and
+# alias labels (`X=foo: ...`). Each hits a distinct case of the
+# label() switch.
+-- in.cue --
+[string]: int
+(foo): 1
+X=bar: 2
+foo: "static"
+bar: "other"
+-- out/relpos --
+[string]: int
+(foo):    1
+X=bar:    2
+foo:      "static"
+bar:      "other"
+-- out/norelpos --
+[string]: int, (foo): 1, X=bar: 2, foo: "static", bar: "other"

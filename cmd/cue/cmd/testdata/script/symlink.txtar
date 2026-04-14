@@ -43,35 +43,23 @@ cmp stdout $WORK/want-stdout-3
 x: true
 -- want-module --
 module: "test.example/main"
-language: {
-	version: "v0.9.2"
-}
-source: {
-	kind: "self"
-}
-deps: {
-	"deps.example/d1@v0": {
-		v:       "v0.0.1"
-		default: true
-	}
+language: version: "v0.9.2"
+source: kind:      "self"
+deps: "deps.example/d1@v0": {
+	v:       "v0.0.1"
+	default: true
 }
 -- want-module-2 --
 module: "test2.example/main"
-language: {
-	version: "v0.9.2"
-}
-deps: {
-	"test.example/main@v0": {
-		v:       "v0.0.1"
-		default: true
-	}
+language: version: "v0.9.2"
+deps: "test.example/main@v0": {
+	v:       "v0.0.1"
+	default: true
 }
 -- want-stdout-2 --
 x: true
 z: true
-dep: {
-    self: "deps.example/d1"
-}
+dep: self: "deps.example/d1"
 -- want-stdout-3 --
 x: true
 -- cue.mod/module.cue --

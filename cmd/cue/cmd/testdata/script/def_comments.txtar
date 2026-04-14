@@ -253,7 +253,7 @@ package t // 1.cue: pkg comment 1
 // 1.cue: pkg comment 2
 
 // 1.cue: d comment
-
+//
 // 2.cue: d
 d:   1
 di:  1
@@ -273,7 +273,7 @@ package t // 1.cue: pkg comment 1
 // 1.cue: pkg comment 2
 
 // 1.cue: d comment
-
+//
 // 2.cue: d
 d:   1
 di:  1
@@ -291,7 +291,7 @@ package t // 1.cue: pkg comment 1
 // 3.cue: pkg comment 1
 
 // 1.cue: d comment
-
+//
 // 3.cue: d comment
 d:   1
 di:  1
@@ -309,7 +309,7 @@ package t // 1.cue: pkg comment 1
 // 3.cue: pkg comment 1
 
 // 1.cue: d comment
-
+//
 // 3.cue: d comment
 d:   1
 di:  1
@@ -328,7 +328,7 @@ dii: 1
 // 4.cue: file comment 2
 
 // 2.cue: d
-
+//
 // 4.cue: d
 d:   1
 di:  1
@@ -348,7 +348,7 @@ dii: 1
 package t
 
 // 2.cue: d
-
+//
 // 4.cue: d
 d:   1
 di:  1

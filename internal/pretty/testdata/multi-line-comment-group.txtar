@@ -1,0 +1,15 @@
+-- in.cue --
+ // line one
+// line two
+  // line three
+x: 1
+-- out/relpos --
+// line one
+// line two
+// line three
+x: 1
+-- out/norelpos --
+// line one
+// line two
+// line three
+x: 1

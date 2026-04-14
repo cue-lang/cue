@@ -22,7 +22,7 @@ out: #Schema & {type: "A"}
 == a.cue
 #Schema: {type: *"A" | string}
 #Schema: {type: "A"} | {type: "CNAME"}
-out: #Schema & {type: "A"}
+out:     #Schema & {type: "A"}
 -- diff/-out/trim-v3<==>+out/trim --
 diff old new
 --- old
@@ -32,12 +32,12 @@ diff old new
  #Schema: {type: *"A" | string}
  #Schema: {type: "A"} | {type: "CNAME"}
 -out: #Schema & {}
-+out: #Schema & {type: "A"}
++out:     #Schema & {type: "A"}
 -- out/trim-v3-noshare --
 == a.cue
 #Schema: {type: *"A" | string}
 #Schema: {type: "A"} | {type: "CNAME"}
-out: #Schema & {type: "A"}
+out:     #Schema & {type: "A"}
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old
@@ -47,7 +47,7 @@ diff old new
  #Schema: {type: *"A" | string}
  #Schema: {type: "A"} | {type: "CNAME"}
 -out: #Schema & {}
-+out: #Schema & {type: "A"}
++out:     #Schema & {type: "A"}
 -- out/trim --
 == a.cue
 #Schema: {type: *"A" | string}

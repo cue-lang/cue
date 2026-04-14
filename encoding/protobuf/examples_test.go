@@ -50,10 +50,8 @@ func ExampleExtract() {
 	// 	stringValue?: string @protobuf(1,string,name=string_value) // just any 'ole string
 	//
 	// 	// A method must start with a capital letter.
-	// 	method?: [...string] @protobuf(2,string)
-	// 	method?: [...=~"^[A-Z]"]
-	// 	exampleMap?: {
-	// 		[string]: string
-	// 	} @protobuf(3,map[string]string,example_map)
+	// 	method?:     [...string]        @protobuf(2,string)
+	// 	method?:     [...=~"^[A-Z]"]
+	// 	exampleMap?: {[string]: string} @protobuf(3,map[string]string,example_map)
 	// }
 }

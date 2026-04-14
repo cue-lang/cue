@@ -34,6 +34,4 @@ references not allowed in data mode:
     ./bar.cue:3:8
 -- expect-graph-bar --
 a: 4
-b: {
-    c: 4
-}
+b: c: 4

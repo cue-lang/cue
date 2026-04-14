@@ -1277,13 +1277,11 @@ func TestFill2(t *testing.T) {
 	a:           int
 	b:           int
 }
-providers: {
-	myprovider: {
-		ID:          "12345"
-		notConcrete: bool
-		a:           int
-		b:           int
-	}
+providers: myprovider: {
+	ID:          "12345"
+	notConcrete: bool
+	a:           int
+	b:           int
 }`
 	if got != want {
 		t.Errorf("got:  %s\nwant: %s", got, want)
@@ -1823,9 +1821,7 @@ func TestAllows(t *testing.T) {
 func TestFillFloat(t *testing.T) {
 	// This tests panics for issue #749
 
-	want := `{
-	x: 3.14
-}`
+	want := `{x: 3.14}`
 
 	filltest := func(x interface{}) {
 		ctx := cuecontext.New()
@@ -2086,17 +2082,17 @@ func TestElem(t *testing.T) {
 		[Name=string]: { a: Name }
 		`,
 		path: []string{""},
-		want: "{\n\ta: string\n}",
+		want: "{a: string}",
 	}, {
 		value: `
 		a: [Foo=string]: [Bar=string]: { b: Foo+Bar }
 		`,
 		path: []string{"a", "", ""},
-		want: "{\n\tb: string + string\n}",
+		want: "{b: string + string}",
 	}, {
 		value: `
 		a: [Foo=string]: b: [Bar=string]: { c: Foo+Bar }
-		a: foo: b: [Bar=string]: { d: Bar }
+		a: foo: b: [Bar=string]: d: Bar
 		`,
 		path: []string{"a", "foo", "b", ""},
 		want: "{\n\tc: \"foo\" + string\n\td: string\n}",
@@ -2513,9 +2509,7 @@ func TestUnifyAccept(t *testing.T) {
 		#w: {b:1}
 		#accept: {...}
 		`,
-		want: `{
-	b: 1
-}`,
+		want: `{b: 1}`,
 	}}
 
 	matrix := cuetdtest.FullMatrix
@@ -2561,9 +2555,7 @@ func TestConjunctDedup(t *testing.T) {
 		#t: {} | {f1: int}
 		#t: {f: string}
 		`,
-		want: `{
-	f: string
-} | {
+		want: `{f: string} | {
 	f1: int
 	f:  string
 }`,

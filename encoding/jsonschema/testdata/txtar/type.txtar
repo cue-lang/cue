@@ -35,8 +35,6 @@
 close({
 	// an integer or string.
 	intString?: null | bool | int | string | [...]
-	object?: {
-		...
-	}
+	object?:    {...}
 	numOrList?: matchN(1, [number, [...number]])
 })

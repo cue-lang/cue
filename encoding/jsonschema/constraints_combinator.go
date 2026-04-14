@@ -56,8 +56,7 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 			s.all.add(n, a[0])
 			return
 		}
-		s.all.add(n, ast.NewCall(
-			ast.NewIdent("matchN"),
+		s.all.add(n, matchN(
 			// TODO it would be nice to be able to use a special sentinel "all" value
 			// here rather than redundantly encoding the length of the list.
 			&ast.BasicLit{
@@ -99,8 +98,7 @@ func constraintAnyOf(key string, n cue.Value, s *state) {
 	}
 	s.allowedTypes &= types
 	s.knownTypes &= knownTypes
-	s.all.add(n, ast.NewCall(
-		ast.NewIdent("matchN"),
+	s.all.add(n, matchN(
 		&ast.UnaryExpr{
 			Op: token.GEQ,
 			X: &ast.BasicLit{
@@ -151,8 +149,7 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 			s.all.add(n, a[0])
 			return
 		}
-		s.all.add(n, ast.NewCall(
-			ast.NewIdent("matchN"),
+		s.all.add(n, matchN(
 			&ast.BasicLit{
 				Kind:  token.INT,
 				Value: "1",
@@ -167,8 +164,7 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 
 func constraintNot(key string, n cue.Value, s *state) {
 	subSchema := s.schema(n)
-	s.all.add(n, ast.NewCall(
-		ast.NewIdent("matchN"),
+	s.all.add(n, matchN(
 		&ast.BasicLit{
 			Kind:  token.INT,
 			Value: "0",
@@ -219,4 +215,14 @@ func constraintIfThenElse(s *state) {
 		thenExpr,
 		elseExpr,
 	))
+}
+
+// matchN creates a matchN call expression and makes sure the first
+// argument (which is often a lexcially-short constraint) is kept on
+// the same line as the matchN token itself.
+func matchN(args ...ast.Expr) *ast.CallExpr {
+	if len(args) > 0 {
+		ast.SetRelPos(args[0], token.NoSpace)
+	}
+	return ast.NewCall(ast.NewIdent("matchN"), args...)
 }

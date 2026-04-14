@@ -152,9 +152,7 @@ func TestNodes(t *testing.T) {
 		}(),
 		out: `{
 	// FOO
-	info: {
-		version: "foo"
-	}
+	info: {version: "foo"}
 }`,
 	}}
 	for _, tc := range testCases {
@@ -419,8 +417,11 @@ func TestSourceOptions(t *testing.T) {
 		{
 			name:    "IndentPrefix(3)",
 			options: []format.Option{format.IndentPrefix(3)},
-			want:    "\"foo\": {\n\t\t\t\ta:         1\n\t\t\t\tlongField: 2\n\t\t\t}\n\t\t",
-		},
+			want: `"foo": {
+	a:         1
+	longField: 2
+}
+`},
 	}
 	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 		t.Update(cuetest.UpdateGoldenFiles)

@@ -3,7 +3,4 @@
 t: {name: string}
 output: [...t]
 -- out/self/default --
-
-[...{
-	name: string
-}]
+[...{name: string}]

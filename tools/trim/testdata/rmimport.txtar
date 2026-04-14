@@ -27,8 +27,7 @@ language: version: "v0.9.0"
 == b.cue
 package b
 
-import (
-)
+
 
 #Def: {
 	y: 5
@@ -40,7 +39,17 @@ x: _
 diff old new
 --- old
 +++ new
-@@ -9,4 +9,4 @@
+@@ -1,8 +1,7 @@
+ == b.cue
+ package b
+ 
+-import (
+-)
++
+ 
+ #Def: {
+ 	y: 5
+@@ -9,4 +8,4 @@
  }
  
  x: #Def
@@ -50,8 +59,7 @@ diff old new
 == b.cue
 package b
 
-import (
-)
+
 
 #Def: {
 	y: 5
@@ -63,7 +71,17 @@ x: _
 diff old new
 --- old
 +++ new
-@@ -9,4 +9,4 @@
+@@ -1,8 +1,7 @@
+ == b.cue
+ package b
+ 
+-import (
+-)
++
+ 
+ #Def: {
+ 	y: 5
+@@ -9,4 +8,4 @@
  }
  
  x: #Def

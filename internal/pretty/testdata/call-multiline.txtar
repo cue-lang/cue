@@ -1,0 +1,14 @@
+# Multi-line call args: RelPos Newline honoured, args stay on separate lines.
+-- in.cue --
+x: strings.Join(
+			a,
+	            ",",
+
+	)
+-- out/relpos --
+x: strings.Join(
+	a,
+	",",
+)
+-- out/norelpos --
+x: strings.Join(a, ",")

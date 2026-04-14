@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05649b92_cbeb057c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-14T16:25:35Z",
+      "side": 1,
+      "message": "Done. Removed the false \"Update affected txtar golden files\" sentence — no txtar files were changed in this CL.",
+      "parentUuid": "837ce1ea_c7cb61ce",
+      "revId": "2aaaeda9d035a0b14c00d87d54180d3f36bcca04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

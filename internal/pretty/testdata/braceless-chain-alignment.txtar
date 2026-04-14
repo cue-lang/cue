@@ -1,0 +1,34 @@
+# Braceless chained fields (x: y: z: val) are represented by the
+# parser as a Field whose value is a synthetic (no-brace) StructLit
+# containing a single inner Field, recursively. For alignment
+# purposes the whole chain is treated as the row's key and only the
+# leaf value sits in the value column, so leaf values line up across
+# sibling rows regardless of how many chain levels each row has.
+# This works because renderTableSegment first checks whether the
+# segment's aligned width fits in the available budget; when it does
+# (as here, at width 80), the row's separated [chainKey, val] cells
+# render with column padding. Only when the aligned width doesn't
+# fit does the renderer fall back to the merged chain+val Doc per
+# row, where partial breaks can land val on the chain's deepest
+# line at the cost of cross-row val alignment.
+-- in.cue --
+extensions: "-": encoding: *"cue" | _
+extensions: ".json": interpretation: *"auto" | _
+extensions: ".yaml": interpretation: *"auto" | _
+extensions: ".yml": interpretation: *"auto" | _
+extensions: ".toml": interpretation: *"auto" | _
+extensions: ".xml": interpretation: *"auto" | _
+-- out/relpos --
+extensions: "-": encoding:           *"cue" | _
+extensions: ".json": interpretation: *"auto" | _
+extensions: ".yaml": interpretation: *"auto" | _
+extensions: ".yml": interpretation:  *"auto" | _
+extensions: ".toml": interpretation: *"auto" | _
+extensions: ".xml": interpretation:  *"auto" | _
+-- out/norelpos --
+extensions: "-": encoding:           *"cue" | _
+extensions: ".json": interpretation: *"auto" | _
+extensions: ".yaml": interpretation: *"auto" | _
+extensions: ".yml": interpretation:  *"auto" | _
+extensions: ".toml": interpretation: *"auto" | _
+extensions: ".xml": interpretation:  *"auto" | _

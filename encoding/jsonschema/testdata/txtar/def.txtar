@@ -46,7 +46,7 @@ billing_address?:  #address
 shipping_address?: #address
 
 #: "per-son": {
-	name?: string
+	name?:     string
 	children?: [...#."per-son"]
 	...
 }

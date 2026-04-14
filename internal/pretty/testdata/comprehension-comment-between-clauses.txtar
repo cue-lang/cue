@@ -1,0 +1,20 @@
+# A doc comment on a clause inside a comprehension is preserved. The
+# parser attaches the comment to the clause it precedes (here the
+# LetClause); the comprehension converter must wrap each clause with
+# its own comments so the comment isn't silently dropped.
+-- in.cue --
+for x in y
+// comment
+let z = x {
+	z
+}
+-- out/relpos --
+for x in y
+// comment
+let z = x {
+	z
+}
+-- out/norelpos --
+for x in y
+// comment
+let z = x {z}

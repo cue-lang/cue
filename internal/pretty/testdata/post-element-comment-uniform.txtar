@@ -1,0 +1,58 @@
+# Post-element comments (Position >= 3, Line=false attached to a list
+# element by the parser) must land *after* the row's separator/comma,
+# not inside the cell - `{},\n// c`, not `{} // c\n,`. This holds
+# uniformly across element types: listElemRow categorises comments the
+# same way for StructLit, ListLit, and BinaryExpr chains, sending
+# post-element comments to the postCommentRows path so they render as
+# separate rows after the element's row.
+-- in.cue --
+x: [
+	{},
+	// a
+	// b
+]
+
+y: [
+	[],
+	// c
+
+	// d
+]
+
+z: [
+	a | b,
+	// e
+]
+-- out/relpos --
+x: [
+	{},
+	// a
+	// b
+]
+
+y: [
+	[],
+	// c
+
+	// d
+]
+
+z: [
+	a | b,
+	// e
+]
+-- out/norelpos --
+x: [
+	{},
+	// a
+	// b
+]
+y: [
+	[],
+	// c
+	// d
+]
+z: [
+	a | b,
+	// e
+]

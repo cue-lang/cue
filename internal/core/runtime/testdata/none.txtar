@@ -2,6 +2,4 @@
 -- in.cue --
 a: 2
 -- out/extern --
-{
-	a: 2
-}
+{a: 2}

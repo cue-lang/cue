@@ -1,0 +1,14 @@
+# Boundary case: imports immediately followed by a field with no
+# blank line. The parser still accepts this (the field has Newline
+# RelPos rather than NewSection). The header-body separator must
+# resolve to a HardLine, not a BlankLine, and not get dropped.
+-- in.cue --
+import "strings"
+foo: 1
+longname: 22
+-- out/relpos --
+import "strings"
+foo:      1
+longname: 22
+-- out/norelpos --
+import "strings", foo: 1, longname: 22

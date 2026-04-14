@@ -1,0 +1,26 @@
+# A single-FIELD struct does NOT hug its braces around the field. A
+# field renders as `label: value`, so hugging would wedge the label
+# between the braces ("{a: {"); the struct full-breaks instead -
+# "{\n    a: {...}\n}" - the same with or without RelPos. The
+# single-element hug is reserved for value-leading elements that read
+# as adjacent openers: list elements ("[{"), call arguments ("f({"),
+# and struct embeds ("{ {").
+-- in.cue --
+versions!: {a: {
+	name!: string
+	schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}
+}}
+-- out/relpos --
+versions!: {
+	a: {
+		name!:   string
+		schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}
+	}
+}
+-- out/norelpos --
+versions!: {
+	a: {
+		name!:   string
+		schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}
+	}
+}

@@ -64,77 +64,45 @@ mixedChildExtra: {
 		Inner: {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				x: {
-					type: "integer"
-				}
-			}
+			properties: x: type: "integer"
 		}
 		MixedRef: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				child: {
-					$ref: "#/$defs/Inner"
-				}
-				x: {
-					type: "integer"
-				}
-				z: {
-					type: "string"
-				}
+				child: $ref: "#/$defs/Inner"
+				x: type:     "integer"
+				z: type:     "string"
 			}
 		}
 		WithSpread: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				x: {
-					type: "integer"
-				}
-				y: {
-					type: "string"
-				}
+				x: type: "integer"
+				y: type: "string"
 			}
 		}
 		"_bar": {
 			type: "object"
-			properties: {
-				y: {
-					type: "integer"
-				}
-			}
+			properties: y: type: "integer"
 			$ref: "#/$defs/Inner"
 		}
 		"_foo": {
 			type: "object"
 			properties: {
-				x: {
-					type: "integer"
-				}
-				y: {
-					type: "integer"
-				}
+				x: type: "integer"
+				y: type: "integer"
 			}
 		}
 	}
 	type: "object"
 	properties: {
-		t01: {
-			$ref: "#/$defs/WithSpread"
-		}
-		t02: {
-			$ref: "#/$defs/Inner"
-		}
-		t03: {
-			$ref: "#/$defs/MixedRef"
-		}
-		t04: {
-			$ref: "#/$defs/_foo"
-		}
-		t05: {
-			$ref: "#/$defs/_bar"
-		}
+		t01: $ref: "#/$defs/WithSpread"
+		t02: $ref: "#/$defs/Inner"
+		t03: $ref: "#/$defs/MixedRef"
+		t04: $ref: "#/$defs/_foo"
+		t05: $ref: "#/$defs/_bar"
 	}
 }
 -- out/generate-v3/spreadValid --

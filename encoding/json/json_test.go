@@ -40,8 +40,8 @@ func TestExtract(t *testing.T) {
 		name: "break across new lines",
 		in:   `{"a":32,"b":[1,2],"c-d":"foo-bar-baz"}`,
 		out: `{
-	a: 32
-	b: [1, 2]
+	a:     32
+	b:     [1, 2]
 	"c-d": "foo-bar-baz"
 }`,
 	}, {
@@ -100,7 +100,7 @@ func TestExtract(t *testing.T) {
 	}, {
 		name: "reflow large values unconditionally",
 		in:   `{"a": "11111111112222222222333333333344444444445555555555"}`,
-		out:  "{\n\ta: \"11111111112222222222333333333344444444445555555555\"\n}",
+		out:  `{a: "11111111112222222222333333333344444444445555555555"}`,
 	}, {
 		name: "invalid JSON",
 		in:   `[3_]`,

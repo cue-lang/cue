@@ -50,13 +50,9 @@ checks: [string]: ok: true
 #Team: {}
 team: {
     alice: ["EM"]
-    bob: ["TL"]
+    bob:   ["TL"]
 }
 checks: {
-    enoughMembers: {
-        ok: true
-    }
-    hasManager: {
-        ok: true
-    }
+    enoughMembers: ok: true
+    hasManager: ok:    true
 }

@@ -70,9 +70,7 @@ _schema
 _schema: {
 	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-eNNNN@1.json")
 	$else?: #."jsone-value"
-	$let?: [string]: null | bool | number | string | [...] | {
-		[string]: _schema
-	}
+	$let?: [string]: null | bool | number | string | [...] | {[string]: _schema}
 	$sort?: matchN(>=1, [_schema, [...number]])
 	{[!~"^(\\$else|\\$let|\\$sort)$"]: #."jsone-value"}
 

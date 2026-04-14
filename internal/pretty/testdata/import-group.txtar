@@ -1,0 +1,18 @@
+# Parenthesized import. The parser puts Newline RelPos on each spec
+# and on Rparen, so relpos rendering keeps the multi-line form. With
+# RelPos stripped (and no style pre-pass), the parenthesised body
+# carries no break hints and collapses to compact `import ("a", "b")`
+# at the default width - the renderer treats the parentheses as a
+# Group that picks flat when the line fits.
+-- in.cue --
+import (
+	"strings"
+	"list"
+)
+-- out/relpos --
+import (
+	"strings"
+	"list"
+)
+-- out/norelpos --
+import ("strings", "list")

@@ -40,10 +40,9 @@ graph TD
 {
 	$id:    "tool/http.Do"
 	method: "GET"
-	request: {
-		body: ""
-	}
-	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+	request: body: ""
+	url:
+		"https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	stdout: "foo"
 }
 -- out/run-v3/t1/stats --
@@ -102,8 +101,9 @@ graph TD
 -- out/run/t2/value --
 {
 	$id: "tool/exec.Run"
-	cmd: "cue-fake import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
-	env: {}
+	cmd:
+		"cue-fake import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	env:         {}
 	stderr:      null
 	stdin:       GET.response.body & (*null | string | bytes)
 	stdout:      "foo"
@@ -115,15 +115,12 @@ graph TD
 		$id:    "tool/http.Do"
 		method: "GET"
 		url:    string
-		request: {
-			body: *bytes | string
-		}
+		request: body: *bytes | string
 	} & {
-		request: {
-			body: ""
-		}
+		request: body: ""
 		stdout: "foo"
-		url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+		url:
+			"https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	}
 }
 -- out/run-v3/t2/stats --

@@ -46,7 +46,5 @@ level2: #Level2 & {
         }
 }
 -- stdout.golden --
-structure: {
-    f: "a"
-}
+structure: f: "a"
 settings: {}

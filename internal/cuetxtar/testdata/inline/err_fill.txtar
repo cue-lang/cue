@@ -1,0 +1,12 @@
+# Tests that CUE_UPDATE=1 fills bare @test(err) with full error details:
+# code=, contains=, args=, pos=[].
+# Also tests that a bare @test(err, at=<path>) is filled when CUE_UPDATE=1.
+-- in/test.cue --
+x: int & string @test(err)
+atBare: {b: int & string} @test(err, at=b)
+-- out/update/test.cue --
+x: int & string @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[int, string, int, string], pos=[0:4, 0:10])
+atBare: {b: int & string} @test(err, at=b, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[int, string, int, string], pos=[0:13, 0:19])
+-- out/status.txt --
+update: output passes run
+force:  identical to update

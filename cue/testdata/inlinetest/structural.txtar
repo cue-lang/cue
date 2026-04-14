@@ -3,21 +3,11 @@
 
 // ── error-only ─────────────────────────
 
-errOnly: 1 & 2 @test(err) @test(debugCheck, """
-	(_|_){
-	  // [eval] errOnly: conflicting values 2 and 1:
-	  //     in.cue:5:10
-	  //     in.cue:5:14
-	}
-	""")
+errOnly: 1 & 2 @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:10, 0:14])
 
-errWithCode: string & 1 @test(err, code=eval) @test(debug, """
-	(_|_){
-	  // [eval] errWithCode: conflicting values string and 1 (mismatched types string and int):
-	  //     in.cue:13:14
-	  //     in.cue:13:23
-	}
-	""")
+errWithCode: string & 1 @test(err, code=eval,
+	contains="conflicting values %s and %s (mismatched types %s and %s)",
+	args=[string, 1, string, int], pos=[0:14, 0:23])
 
 // ── eq: computed struct ────────────────
 

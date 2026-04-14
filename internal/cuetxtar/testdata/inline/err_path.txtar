@@ -1,0 +1,20 @@
+# Tests that path= validates the error's own path (cueerrors.Error.Path()).
+# Relative paths are matched against the error path stripped of the field prefix.
+# path= also works as a discriminator inside suberr=(...).
+-- in/test.cue --
+xRight: {y: int & string} @test(err, path=y)
+xAbsolute: {y: int & string} @test(err, path=xAbsolute.y)
+xWrong: {y: int & string} @test(err, path=wrong)
+
+suberrRight: ({a: int & string} | {b: int & bool}) @test(err,
+	suberr=(path=a, contains="string"),
+	suberr=(path=b, contains="bool"))
+suberrWrong: ({a: int & string} | {b: int & bool}) @test(err,
+	suberr=(path=WRONG, contains="string"),
+	suberr=(path=b, contains="bool"))
+-- out/run/errors.txt --
+path xWrong: @test(err, path=...): expected error path "wrong", got "y"
+path suberrWrong: @test(err, suberr=...): no sub-error matched "string"
+-- out/status.txt --
+update: identical to input
+force:  identical to update

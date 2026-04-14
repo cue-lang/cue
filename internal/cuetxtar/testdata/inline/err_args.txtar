@@ -1,0 +1,11 @@
+# Tests that args= matches the Msg() arguments of the error order-independently.
+# args=[] tokens are bare fmt.Sprint representations; type names like "int"
+# appear unquoted.
+-- in/test.cue --
+rightArgs: 1 & "s" @test(err, args=[int])
+wrongArgs: 1 & "s" @test(err, args=[WRONG])
+-- out/run/errors.txt --
+path wrongArgs: @test(err, args=...): args: expected "WRONG" in Msg() args, got [1 "s" int string]
+-- out/status.txt --
+update: identical to input
+force:  identical to update

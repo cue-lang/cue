@@ -10,6 +10,7 @@ package goplugin
 import (
 	"go/parser"
 	gotoken "go/token"
+	"iter"
 	"path"
 	"strconv"
 	"strings"
@@ -46,6 +47,44 @@ type Reference struct {
 
 	// Name holds the name to import from the Go package.
 	Name string
+}
+
+// References returns a sequence of all the references found in the given
+// instance.
+func References(inst *build.Instance) iter.Seq2[Reference, error] {
+	return func(yield func(Reference, error) bool) {
+		b := refBuilder{
+			inst:       inst,
+			modVersion: inst.ModuleVersion.String(),
+		}
+		for _, f := range inst.Files {
+			extAttrs, err := runtime.ExternAttrsForFile(f)
+			if err != nil {
+				if !yield(Reference{}, err) {
+					return
+				}
+				continue
+			}
+			if extAttrs.TopLevel["go"] == nil {
+				continue
+			}
+			for attr := range extAttrs.Body {
+				if attr.Attr.Name != "go" {
+					continue
+				}
+				ref, err := b.referenceForAttr(&attr)
+				if err != nil {
+					if !yield(Reference{}, err) {
+						return
+					}
+					continue
+				}
+				if !yield(ref, nil) {
+					return
+				}
+			}
+		}
+	}
 }
 
 // Injection returns a [cuecontext.Injection] that provides Go plugin

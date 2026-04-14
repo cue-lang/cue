@@ -831,6 +831,24 @@ func TestFormatValueList(t *testing.T) {
 		}
 	})
 
+	t.Run("compact: embedded scalar in struct element", func(t *testing.T) {
+		// A struct from a for-comprehension body {let X = v*4; X} evaluated
+		// with v=1 produces a vertex with embedded scalar BaseValue 4.
+		// formatValue must produce {4}, not {}.
+		src := `data: [for v in [1, 2, 3] {
+	let X = v*4
+	X
+}]`
+		val := ctx.CompileString(src).LookupPath(cue.MakePath(cue.Str("data")))
+		got := r.formatValue(val)
+		if !strings.Contains(got, "4") {
+			t.Errorf("embedded scalar 4 missing from output: %s", got)
+		}
+		if strings.Contains(got, "{}") {
+			t.Errorf("formatValue must not emit empty struct for embedded-scalar element: %s", got)
+		}
+	})
+
 	t.Run("multi-line: opening brace on same line as [", func(t *testing.T) {
 		// Large element forces multi-line; opening { must follow [ directly.
 		src := `#S2: {

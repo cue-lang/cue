@@ -1060,7 +1060,6 @@ issue3729: withoutDisjunctionWithEmbed: {
 	if true {
 		root: {_, #sub1?: #sub2: true}
 	}
-	// TODO(inline): auto-generate embedded value.
 	@test(eq, {root: {null, #sub1?: {#sub2: true}}})
 }
 issue3729: definitionsOnly: {

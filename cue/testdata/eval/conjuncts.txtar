@@ -64,12 +64,12 @@ issue2351: hidden: {
 issue2355: {
 	#GetF1: {
 		in:  _
-		out: in.f1
+		out: in.f1 @test(err, code=incomplete, contains="%s undefined as %s is incomplete (type %s)", args=[in.f1, in, _], pos=[0:8])
 	}
 
 	#PutOut1: {
 		in: _
-		out: out1: "\(in)"
+		out: out1: "\(in)" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:14])
 	}
 
 	export: {
@@ -83,12 +83,12 @@ issue2355: {
 	@test(eq, {
 		#GetF1: {
 			in: _
-			out: _|_ @test(err, code=incomplete, contains="issue2355.#GetF1.out: in.f1 undefined as in is incomplete (type _)", pos=[7:8])
+			out: _|_
 		}
 		#PutOut1: {
 			in: _
 			out: {
-				out1: _|_ @test(err, code=incomplete, contains="issue2355.#PutOut1.out.out1: invalid interpolation: non-concrete value _ (type _)", pos=[12:14])
+				out1: _|_
 			}
 		}
 		export: {out1: "foo"}

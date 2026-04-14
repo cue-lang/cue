@@ -35,7 +35,7 @@ unify: t2: {
 allowed: {
 	issue2306: {
 		#A: a!: int
-		#A: #B @test(err, code=eval, contains="field not allowed", pos=[-1:7])
+		#A: #B @test(err, code=eval, path=a, contains="field not allowed", pos=[-1:7])
 
 		#B: b!: int
 	}
@@ -45,23 +45,23 @@ reference: {
 	toWithinDefinition: {
 		@test(permute)
 		#Foo: a!: int
-		b: #Foo.a @test(err, code=incomplete, contains="required field missing: a", pos=[0:11])
+		b: #Foo.a @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:11])
 	}
 	toFieldFromDefinition: {
 		@test(permute)
 		#Foo: a!: int
 		b: #Foo
-		c: b.a @test(err, code=incomplete, contains="required field missing: a", pos=[0:8])
+		c: b.a @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:8])
 	}
 	toNonDefinition: {
 		@test(permute)
 		x: y!: _
-		b: x.y @test(err, code=incomplete, contains="required field missing: y", pos=[0:8])
+		b: x.y @test(err, code=incomplete, contains="required field missing: %s", args=[y], pos=[0:8])
 	}
 	toConcrete: {
 		@test(permute)
 		a!: 1
-		b: a + 1 @test(err, code=incomplete, contains="required field missing: a", pos=[0:6])
+		b: a + 1 @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:6])
 	}
 }
 -- issue3918.cue --
@@ -74,7 +74,7 @@ issue3918: {
 	reduced: {
 		#disjuncts: {
 			in!: [...string]
-			out: strings.Join(in, "|") @test(err, code=incomplete, contains="required field missing: in", pos=[0:22])
+			out: strings.Join(in, "|") @test(err, code=incomplete, contains="required field missing: %s", args=[in], pos=[0:22])
 		}
 
 		x: (#disjuncts & {
@@ -91,10 +91,10 @@ issue3918: {
 	noFunction: {
 		#disjuncts: {
 			in!: [...string]
-			out: in @test(err, code=incomplete, contains="required field missing: in", pos=[0:9])
+			out: in @test(err, code=incomplete, contains="required field missing: %s", args=[in], pos=[0:9])
 		}
-		_foo: #disjuncts & {}
-		x: _foo.out
+		_foo: #disjuncts & {} @test(err, at=out, code=incomplete, contains="required field missing: %s", args=[in], pos=[-2:9])
+		x: _foo.out @test(err, code=incomplete, path=_foo.out, contains="required field missing: %s", args=[in], pos=[-3:9])
 		@test(eq, {
 			#disjuncts: {
 				in!: []
@@ -102,7 +102,7 @@ issue3918: {
 			}
 			_foo: {
 				in!: []
-				out: _|_ @test(err, code=incomplete, contains="issue3918.noFunction._foo.out: required field missing: in", pos=[27:9])
+				out: _|_
 			}
 			x: _|_
 		})
@@ -113,11 +113,11 @@ issue3918: {
 doNotEscalateError: {
 	a: {
 		in:  _
-		out: in.self @test(err, code=incomplete, contains="in.self undefined as in is incomplete (type _)", pos=[0:8])
+		out: in.self @test(err, code=incomplete, contains="%s undefined as %s is incomplete (type %s)", args=[in.self, in, _], pos=[0:8])
 	}
 	b: {
 		required!: _
-		pass:    (a & {in: required}).out @test(err, code=incomplete, contains="undefined field: self", pos=[-4:11])
+		pass:    (a & {in: required}).out @test(err, code=incomplete, contains="undefined field: %s", args=[self], pos=[-4:11])
 	}
 }
 -- out/errors.txt --

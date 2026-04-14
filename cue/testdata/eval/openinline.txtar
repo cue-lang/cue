@@ -55,7 +55,7 @@ outerErr: {
 
 		t1: #Outer
 		t1: version: (_inToOut & {in: #Inner}).out
-		@test(err, code=eval, contains="field not allowed", pos=[3:22])
+		@test(err, code=eval, at=t1.version.major, contains="field not allowed", pos=[3:22])
 	}
 
 	// Test that the mechanism still works with extra nesting: the closedness of

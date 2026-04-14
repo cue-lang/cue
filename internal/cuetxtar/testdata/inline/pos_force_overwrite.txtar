@@ -1,6 +1,8 @@
 # Tests that CUE_UPDATE=force overwrites wrong (non-placeholder) positions, while
 # CUE_UPDATE=1 leaves them unchanged and reports a position mismatch error.
-# The input has pos=[0:4] but the error has two positions; force update corrects it.
+# Also tests that two wrong positions inside the same @test(eq, {...}) are both
+# corrected — exercising the nestedPosFills accumulator that merges multiple
+# nested pos writes for the same outer attribute into a single write.
 -- in/test.cue --
 x: 100 & 200 @test(err, code=eval, pos=[0:4, 0:999999])
 
@@ -17,10 +19,23 @@ z: {
 		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:99999])
 	})
 }
+
+// w tests two wrong pos= specs inside the same @test(eq, {...}), requiring
+// both nested rewrites to be merged before the outer attribute is written back.
+w: {
+	a: 100 & 200
+	b: 100 & 200
+
+	@test(eq, {
+		a: _|_ @test(err, code=eval, pos=[22:99999])
+		b: _|_ @test(err, code=eval, pos=[23:99999])
+	})
+}
 -- out/run/errors.txt --
 path x: @test(err, pos=...): unmatched position 1:999999 (spec 0:999999); actual positions:
 path y.b: @test(err, pos=...): unmatched position 4:99999 (spec 0:99999); actual positions:
 path z: c: @test(err, pos=...): no match for expected position 9:99999 in [8:5 9:5 9:9]
+path w: a: @test(err, pos=...): got 2 position(s), want 1; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...] [20:5 20:11]
 -- out/status.txt --
 update: identical to input
 -- out/force/test.cue --
@@ -37,5 +52,17 @@ z: {
 	@test(eq, {
 		b: int
 		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:9])
+	})
+}
+
+// w tests two wrong pos= specs inside the same @test(eq, {...}), requiring
+// both nested rewrites to be merged before the outer attribute is written back.
+w: {
+	a: 100 & 200
+	b: 100 & 200
+
+	@test(eq, {
+		a: _|_ @test(err, code=eval, pos=[20:5, 20:11])
+		b: _|_ @test(err, code=eval, pos=[21:5, 21:11])
 	})
 }

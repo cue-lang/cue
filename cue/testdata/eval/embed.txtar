@@ -93,8 +93,19 @@ fieldNotAllowed: {
 			}
 		}
 		@test(err, at=#AddTwo.objs.two.labels.app, code=incomplete, contains="undefined field: one", pos=[13:23])
-		@test(err, code=eval, contains="field not allowed", pos=[18:5])
-		@test(err)
+
+		@test(err, at=#AddTwo.objs.two.extra,        code=eval, contains="field not allowed", pos=[3:5])
+		@test(err, at=#AddTwo.objs.two.extra.unused, code=eval, contains="field not allowed", pos=[3:12])
+		@test(err, at=out.objs.one.extra.unused,     code=eval, contains="field not allowed", pos=[3:12])
+		@test(err, at=out.objs.one.extra,            code=eval, contains="field not allowed", pos=[3:5])
+		@test(err, at=out.objs.one.name,             code=eval, contains="field not allowed", pos=[18:5])
+		@test(err, at=out.objs.two.extra.unused,     code=eval, contains="field not allowed", pos=[3:12])
+
+		// This error is perculated up.
+		@test(err, code=eval,
+			hint="the error chosen here is somewhat arbitrary, okay to ignore as long as the others are good",
+			suberr=(code=eval, path=out.objs.one.name, contains="field not allowed", pos=[18:5]),
+			suberr=(code=eval, path=out.objs.one.extra, contains="field not allowed", pos=[3:5]))
 	}
 	t3: {
 		x: #X
@@ -106,6 +117,8 @@ fieldNotAllowed: {
 			...
 		}
 
+		@test(shareID=YY, at=#Y)
+		@test(shareID=YY, at=x1.y)
 		x1: y: #Y
 		#Y: port?: string
 
@@ -113,88 +126,22 @@ fieldNotAllowed: {
 			z: b: E: string
 			port: z.b.E
 			z: a: c?: string
-		}
+		} @test(eq, {
+			z: {b: E: "1", a: c?: string}
+			port: "1"
+		})
 
 		if true {
 			w: x & {
 				y: x1.y
 			}
 		}
-		@test(err, code=eval, contains="field not allowed", pos=[5:5, 14:7])
-		// TODO(inline): convert to series of @test(err) when we can
-		// automatically convert those.
-		@test(debugCheck, """
-			(_|_){
-			  // [eval]
-			  x: (#struct){
-			    y: (#struct){
-			      z: (#struct){
-			        b: (#struct){
-			          E: (string){ "1" }
-			        }
-			        a: (#struct){
-			          c?: (string){ string }
-			        }
-			      }
-			      port: (string){ "1" }
-			    }
-			  }
-			  #X: (#struct){
-			    y: (#struct){
-			      z: (#struct){
-			        a: (#struct){
-			        }
-			        b: (#struct){
-			          E: (string){ "1" }
-			        }
-			      }
-			    }
-			  }
-			  x1: (struct){
-			    y: ~(fieldNotAllowed.t3.#Y)
-			  }
-			  #Y: (#struct){
-			    port?: (string){ string }
-			  }
-			  w: (_|_){
-			    // [eval]
-			    y: (_|_){
-			      // [eval]
-			      z: (_|_){
-			        // [eval]
-			        b: (_|_){
-			          // [eval] fieldNotAllowed.t3.w.y.z.b: field not allowed:
-			          //     noclose.cue:70:5
-			          //     noclose.cue:79:7
-			          E: (_|_){
-			            // [eval] fieldNotAllowed.t3.w.y.z.b.E: field not allowed:
-			            //     noclose.cue:70:8
-			            //     noclose.cue:79:10
-			          }
-			        }
-			        a: (_|_){
-			          // [eval] fieldNotAllowed.t3.w.y.z.a: field not allowed:
-			          //     noclose.cue:69:5
-			          //     noclose.cue:81:7
-			          c?: (_|_){
-			            // [eval] fieldNotAllowed.t3.w.y.z.a.c: field not allowed:
-			            //     noclose.cue:69:8
-			            //     noclose.cue:81:10
-			          }
-			        }
-			      }
-			      port: (_|_){
-			        // [eval] fieldNotAllowed.t3.w.y.z.a: field not allowed:
-			        //     noclose.cue:69:5
-			        //     noclose.cue:81:7
-			        // fieldNotAllowed.t3.w.y.z.b: field not allowed:
-			        //     noclose.cue:70:5
-			        //     noclose.cue:79:7
-			      }
-			    }
-			  }
-			}
-			""")
+		@test(err, at=w.y.z.b.E, code=eval, contains="field not allowed", pos=[5:8, 16:10])
+		@test(err, at=w.y.z.a,   code=eval, contains="field not allowed", pos=[4:5, 18:7])
+		@test(err, at=w.y.z.b,   code=eval, contains="field not allowed", pos=[5:5, 16:7])
+		@test(err, code=eval,
+			suberr=(code=eval, path=w.y.z.b, contains="field not allowed", pos=[5:5, 16:7]),
+			suberr=(code=eval, path=w.y.z.a, contains="field not allowed", pos=[4:5, 18:7]))
 	}
 }
 closednessInversion: {
@@ -234,17 +181,17 @@ fieldNotAllowed.t2.out.objs.one.name: field not allowed:
 [eval] fieldNotAllowed.t2.out.objs.two.extra.unused: field not allowed:
     ./noclose.cue:43:12
 [eval] fieldNotAllowed.t3.w.y.z.b: field not allowed:
-    ./noclose.cue:70:5
-    ./noclose.cue:79:7
+    ./noclose.cue:81:5
+    ./noclose.cue:92:7
 [eval] fieldNotAllowed.t3.w.y.z.a: field not allowed:
-    ./noclose.cue:69:5
-    ./noclose.cue:81:7
+    ./noclose.cue:80:5
+    ./noclose.cue:94:7
 [eval] fieldNotAllowed.t3.w.y.z.a: field not allowed:
-    ./noclose.cue:69:5
-    ./noclose.cue:81:7
+    ./noclose.cue:80:5
+    ./noclose.cue:94:7
 fieldNotAllowed.t3.w.y.z.b: field not allowed:
-    ./noclose.cue:70:5
-    ./noclose.cue:79:7
+    ./noclose.cue:81:5
+    ./noclose.cue:92:7
 -- out/eval/stats --
 Leaks:  0
 Freed:  115

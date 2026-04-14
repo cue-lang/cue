@@ -1,8 +1,11 @@
 # Tests that pos=[] placeholders are filled with actual error positions on
-# CUE_UPDATE=1. The input has a conflict error (1 & 2) with an empty pos=[]
-# placeholder; after update, the placeholder is replaced with the two source
-# positions of the conflicting values. Force update (CUE_UPDATE=force) also
-# fills placeholders, producing the same result.
+# CUE_UPDATE=1. The input has a conflict error (100 & 200) with empty pos=[]
+# placeholders; after update, the placeholders are replaced with the actual
+# source positions of the conflicting values. This applies to top-level
+# @test(err) attrs and to nested @test(err) attrs inside @test(eq, {...}).
+# Also tests that wrong (non-placeholder) positions in w are left unchanged by
+# CUE_UPDATE=1 (force-only), and that force corrects them on top of filling
+# the placeholders, producing a different result than plain update.
 -- in/test.cue --
 x: 100 & 200 @test(err, code=eval, pos=[])
 
@@ -19,10 +22,24 @@ z: {
 		c: _|_ @test(err, code=eval, pos=[])
 	})
 }
+
+
+// w tests two wrong pos= specs inside the same @test(eq, {...}), requiring
+// both nested rewrites to be merged before the outer attribute is written back.
+w: {
+	a: 100 & 200
+	b: 100 & 200
+
+	@test(eq, {
+		a: _|_ @test(err, code=eval, pos=[])
+		b: _|_ @test(err, code=eval, pos=[])
+	})
+}
 -- out/run/errors.txt --
 path x: @test(err, pos=...): got 2 position(s), want 0; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...]
 path y.b: @test(err, pos=...): got 2 position(s), want 0; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...]
 path z: c: @test(err, pos=...): got 3 position(s), want 0; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...] [8:5 9:5 9:9]
+path w: a: @test(err, pos=...): got 2 position(s), want 0; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...] [21:5 21:11]
 -- out/update/test.cue --
 x: 100 & 200 @test(err, code=eval, pos=[0:4, 0:10])
 
@@ -37,6 +54,19 @@ z: {
 	@test(eq, {
 		b: int
 		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:9])
+	})
+}
+
+
+// w tests two wrong pos= specs inside the same @test(eq, {...}), requiring
+// both nested rewrites to be merged before the outer attribute is written back.
+w: {
+	a: 100 & 200
+	b: 100 & 200
+
+	@test(eq, {
+		a: _|_ @test(err, code=eval, pos=[21:5, 21:11])
+		b: _|_ @test(err, code=eval, pos=[22:5, 22:11])
 	})
 }
 -- out/status.txt --

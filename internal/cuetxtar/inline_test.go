@@ -651,6 +651,39 @@ func TestAtDirective(t *testing.T) {
 			t.Errorf("expected failure when sub-path is not an error")
 		}
 	})
+
+	t.Run("isBareAt true for only-at= errArgs", func(t *testing.T) {
+		a := internal.ParseAttr(&ast.Attribute{Text: "@test(err, at=b)"})
+		ea, err := parseErrArgs(a)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !ea.isBareAt() {
+			t.Error("expected isBareAt() true for @test(err, at=b)")
+		}
+	})
+
+	t.Run("isBareAt false when other flags present", func(t *testing.T) {
+		a := internal.ParseAttr(&ast.Attribute{Text: `@test(err, at=b, contains="foo")`})
+		ea, err := parseErrArgs(a)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ea.isBareAt() {
+			t.Error("expected isBareAt() false when contains= is also set")
+		}
+	})
+
+	t.Run("isBareAt false when path= set", func(t *testing.T) {
+		a := internal.ParseAttr(&ast.Attribute{Text: `@test(err, at=b, path=b)`})
+		ea, err := parseErrArgs(a)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ea.isBareAt() {
+			t.Error("expected isBareAt() false when path= is also set")
+		}
+	})
 }
 
 // TestRunAllowsAssertion verifies that @test(allows, sel) and @test(allows=false, sel)
@@ -911,3 +944,133 @@ func TestUnreachableTestAttr(t *testing.T) {
 		})
 	}
 }
+
+// TestFormatErrMsg verifies that formatErrMsg produces correct contains= and
+// args= output.  Uses stubError so results are fully deterministic.
+func TestFormatErrMsg(t *testing.T) {
+	tests := []struct {
+		name   string
+		format string
+		args   []any
+		want   string
+	}{
+		{
+			name:   "no args — only contains=",
+			format: "value is not allowed",
+			args:   nil,
+			want:   `, contains="value is not allowed"`,
+		},
+		{
+			name:   "two args — conflicting-values style",
+			format: "conflicting values %v and %v",
+			args:   []any{"s", 1},
+			want:   `, contains="conflicting values %v and %v", args=[s, 1]`,
+		},
+		{
+			name:   "one arg — undefined field style",
+			format: "undefined field: %v",
+			args:   []any{"foo"},
+			want:   `, contains="undefined field: %v", args=[foo]`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var b strings.Builder
+			formatErrMsg(&b, stubError{format: tc.format, args: tc.args})
+			if got := b.String(); got != tc.want {
+				t.Errorf("got %q\nwant %q", got, tc.want)
+			}
+		})
+	}
+}
+
+// TestParseErrArgs verifies that parseErrArgs correctly handles the args=[...]
+// directive and the at=[...] list form.
+func TestParseErrArgs(t *testing.T) {
+	parse := func(body string) (errArgs, error) {
+		a := internal.ParseAttr(&ast.Attribute{Text: "@test(" + body + ")"})
+		return parseErrArgs(a)
+	}
+
+	t.Run("args with two bare tokens", func(t *testing.T) {
+		// Bare tokens (no surrounding quotes) are stored as-is and match
+		// fmt.Sprint of the corresponding CUE values (e.g. type names, integers).
+		ea, err := parse(`err, args=[s, 1]`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(ea.msgArgs) != 2 || ea.msgArgs[0] != "s" || ea.msgArgs[1] != "1" {
+			t.Errorf("got msgArgs=%v, want [s 1]", ea.msgArgs)
+		}
+	})
+
+	t.Run("args with double-quoted tokens retain quotes", func(t *testing.T) {
+		// Double-quoted tokens (e.g. CUE string sprint form) are stored with their
+		// surrounding quotes intact so they match fmt.Sprint of CUE string values.
+		ea, err := parse(`err, args=["s", "1"]`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(ea.msgArgs) != 2 || ea.msgArgs[0] != `"s"` || ea.msgArgs[1] != `"1"` {
+			t.Errorf("got msgArgs=%v, want [\"s\" \"1\"]", ea.msgArgs)
+		}
+	})
+
+	t.Run("args empty list", func(t *testing.T) {
+		ea, err := parse(`err, args=[]`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(ea.msgArgs) != 0 {
+			t.Errorf("got msgArgs=%v, want empty", ea.msgArgs)
+		}
+	})
+
+	t.Run("args malformed — missing brackets", func(t *testing.T) {
+		_, err := parse(`err, args=foo`)
+		if err == nil {
+			t.Error("expected error for malformed args, got nil")
+		}
+	})
+
+	t.Run("at= single path", func(t *testing.T) {
+		ea, err := parse(`err, at=a.b`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if ea.at != "a.b" {
+			t.Errorf("got at=%q, want %q", ea.at, "a.b")
+		}
+	})
+
+	t.Run("path= single value", func(t *testing.T) {
+		ea, err := parse(`err, path=a.b`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if ea.path != "a.b" {
+			t.Errorf("got path=%q, want %q", ea.path, "a.b")
+		}
+	})
+}
+
+// TestInlineRunner_ErrArgs exercises @test(err, args=[...]) matching through
+// the full inline runner pipeline via runErrAssertion directly, to capture the
+// expected failure without propagating it to the parent test.
+func TestInlineRunner_ErrArgs(t *testing.T) {
+	t.Run("wrong arg fails", func(t *testing.T) {
+		ctx := cuecontext.New()
+		r := &inlineRunner{}
+		val := ctx.CompileString(`x: 1 & "s"`).LookupPath(cue.MakePath(cue.Str("x")))
+		rec := &failCapture{TB: t}
+		pa := parsedTestAttr{
+			directive: "err",
+			errArgs:   &errArgs{msgArgs: []string{"WRONG"}},
+		}
+		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), val, pa)
+		if !rec.failed {
+			t.Errorf("expected failure for wrong args=, but test passed")
+		}
+	})
+}
+

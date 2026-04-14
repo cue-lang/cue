@@ -159,10 +159,27 @@ type inlineRunner struct {
 	// archive file after all subtests have run (CUE_UPDATE mode only).
 	pendingPosWrites []posWrite
 
+	// nestedPosFills accumulates nested pos= fills for the same outer
+	// @test(eq, {...}) attribute. Keyed by the outer attribute's byte offset.
+	// Multiple calls to enqueueNestedPosWrite for the same outer attribute
+	// accumulate here so that a single posWrite is emitted per attribute,
+	// preventing later entries from clobbering earlier ones.
+	// Flushed into pendingPosWrites by applyInlineFillWritebacks.
+	nestedPosFills map[int]*nestedPosFillEntry
+
 	// pendingInlineFillWrites accumulates inline @test attribute rewrites
 	// (fill, force overwrite, regression guard, stale-skip cleanup) to apply
 	// after all subtests have run (CUE_UPDATE mode only).
 	pendingInlineFillWrites []inlineFillWrite
+}
+
+// nestedPosFillEntry tracks accumulated pos= replacements for a single outer
+// @test(eq, {...}) attribute across multiple enqueueNestedPosWrite calls.
+type nestedPosFillEntry struct {
+	fileName    string
+	attrOffset  int
+	attrLen     int
+	currentText string // starts as original attr text; updated by each fill
 }
 
 // sinkOrSub returns the errSink if set, otherwise the given sub-test t.

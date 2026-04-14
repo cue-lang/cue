@@ -1,0 +1,24 @@
+# A doc-commented field after a definition gets a blank line
+# before it, even if the RelPos doesn't already specify one.
+# Table alignment does not cross blank lines, so #Foo: and x:
+# are in separate tables and x: is not padded.
+-- in.cue --
+{
+	#Foo: string
+	// doc comment
+	x: #Foo
+}
+-- out/relpos --
+{
+	#Foo: string
+
+	// doc comment
+	x: #Foo
+}
+-- out/norelpos --
+{
+	#Foo: string
+
+	// doc comment
+	x: #Foo
+}

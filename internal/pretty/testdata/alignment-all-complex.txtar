@@ -1,0 +1,20 @@
+# Struct and list values that fit on a single line still participate
+# in column alignment: the `apple`/`ball` value columns line up
+# because neither value introduces a newline.
+-- config --
+width: 20
+-- in.cue --
+{
+	apple: {x: 1}
+ball:      [1, 2]
+}
+-- out/relpos --
+{
+	apple: {x: 1}
+	ball:  [1, 2]
+}
+-- out/norelpos --
+{
+	apple: {x: 1}
+	ball:  [1, 2]
+}

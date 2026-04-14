@@ -1,0 +1,35 @@
+# Function calls never get a trailing comma on the last argument,
+# even when the call breaks across lines. Unlike list literals,
+# CUE's formatting convention for calls is `foo(a, b)` / multi-line
+# without a trailing `,`. An empty-list argument `foo([])` is the
+# smallest case where a spurious trailing comma was surfacing.
+#
+# In the RelPos variant the struct is wrapped in NoWidth (the
+# fields carry Newline RelPos), so the call's argument Group stays
+# flat regardless of width — `foo(aaaaa, bbbbb)` overshoots the
+# 20-column budget but keeps everything on one line. The
+# norelpos variant exercises the original width-driven multi-line
+# call layout.
+-- config --
+width: 20
+-- in.cue --
+{
+	y: foo(a, b)
+	z: foo(aaaaa, bbbbb)
+	w: foo([])
+}
+-- out/relpos --
+{
+	y: foo(a, b)
+	z: foo(aaaaa, bbbbb)
+	w: foo([])
+}
+-- out/norelpos --
+{
+	y: foo(a, b)
+	z: foo(
+		aaaaa,
+		bbbbb
+	)
+	w: foo([])
+}

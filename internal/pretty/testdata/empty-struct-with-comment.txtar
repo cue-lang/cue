@@ -1,0 +1,34 @@
+# A comment inside an otherwise empty struct body is attached to the
+# StructLit itself (Position > 0). It must be rendered inside the
+# braces, not after them. Two layouts are possible and each is
+# preserved:
+#
+#   - own-line: `{\n\t// c\n}` — the comment stands on its own line
+#     between the braces.
+#   - open-line: `{ // c\n}` — the comment trails the opener on the
+#     same line, separated by a single space.
+#
+# The CUE parser distinguishes them via CommentGroup.Line: false for
+# the own-line shape, true for the open-line shape. The important
+# invariant is that the comment never escapes to a trailing position
+# on the surrounding field, regardless of layout.
+-- in.cue --
+a: {
+	// own-line interior
+}
+
+b: { // open-line interior
+}
+-- out/relpos --
+a: {
+	// own-line interior
+}
+
+b: { // open-line interior
+}
+-- out/norelpos --
+a: {
+	// own-line interior
+}
+b: { // open-line interior
+}

@@ -153,10 +153,8 @@ func (w *eqWriter) writeValue(b *strings.Builder, v cue.Value, nestedIndent stri
 	// latter handles error vertices that still carry child fields (e.g. a
 	// struct with one bad field: the parent vertex is _|_ but its arcs hold
 	// the successfully-evaluated sibling fields).
-	// Lists also have arcs (integer-indexed elements) but must fall through
-	// to the standard syntax formatter so they render as [v1, v2] not {0: v1}.
 	k := v.IncompleteKind()
-	if (k == cue.StructKind || len(vx.Arcs) > 0) && k != cue.ListKind {
+	if k == cue.StructKind || (len(vx.Arcs) > 0 && k != cue.ListKind) {
 		if nestedIndent != "" {
 			// Multi-line mode: use compact if it fits, else recurse one level deeper.
 			var compact strings.Builder
@@ -170,6 +168,22 @@ func (w *eqWriter) writeValue(b *strings.Builder, v cue.Value, nestedIndent stri
 		return
 	}
 
+	// Lists: use a custom formatter so that struct elements (which may carry
+	// definition fields like #D1) are routed through eqWriteValue instead of
+	// v.Syntax(), which omits definitions without cue.All().
+	if k == cue.ListKind {
+		if nestedIndent != "" {
+			var compact strings.Builder
+			w.writeList(&compact, vx, "")
+			if compact.Len() <= eqCompactThreshold {
+				b.WriteString(compact.String())
+				return
+			}
+		}
+		w.writeList(b, vx, nestedIndent)
+		return
+	}
+
 	// Error/incomplete values (e.g. int + 3 where int is abstract) — emit _|_.
 	// This avoids the confusing let-containing struct that v.Syntax(Final())
 	// generates when it tries to make the expression self-contained.
@@ -180,7 +194,7 @@ func (w *eqWriter) writeValue(b *strings.Builder, v cue.Value, nestedIndent stri
 		return
 	}
 
-	// Scalar values and lists: fall back to the standard syntax formatter.
+	// Scalar values: fall back to the standard syntax formatter.
 	// cue.Final() resolves defaults and avoids _#def wrapping.
 	syn := v.Syntax(cue.Docs(false), cue.Final(), cue.Optional(true), cue.Raw())
 	stripComments(syn)
@@ -216,7 +230,49 @@ func (w *eqWriter) writeConjunction(b *strings.Builder, conj *adt.Conjunction) {
 	}
 }
 
-// isLeafError reports whether writeValue would render v as bare _|_
+// eqWriteList emits a list value, routing each integer-indexed arc through
+// eqWriteValue so that struct elements include their definition fields (#X).
+// nestedIndent follows the same compact/multi-line convention as eqWriteStruct.
+//
+// In multi-line mode the first element starts immediately after '[' (no extra
+// newline), saving one level of indentation. Struct elements that contain their
+// own newlines (e.g. {field: val}) therefore produce output like:
+//
+//	[{
+//		field: val
+//	}]
+//
+// Subsequent elements are placed on a new line at the outer indent level.
+func (w *eqWriter) writeList(b *strings.Builder, vx *adt.Vertex, nestedIndent string) {
+	b.WriteByte('[')
+	first := true
+	for _, arc := range vx.Arcs {
+		if !arc.Label.IsInt() || arc.ArcType == adt.ArcNotPresent {
+			continue
+		}
+		if !first && nestedIndent != "" {
+			// Subsequent elements: new line at the outer indent level so the
+			// element's opening { aligns with the closing } of the previous one.
+			b.WriteString(",\n" + nestedIndent[:len(nestedIndent)-1])
+		} else if !first {
+			b.WriteString(", ")
+		}
+		first = false
+		// Pass nestedIndent (not nestedIndent+"\t") so that struct fields land
+		// at nestedIndent and the closing } lands at nestedIndent[:-1], i.e.
+		// immediately before ']'.
+		w.writeValue(b, value.Make(w.opCtx, arc), nestedIndent)
+	}
+	// TODO: emit "..." for open lists so that the generated expression captures
+	// the open-list constraint. Currently omitted because astCmp accepts the
+	// omission and the ellipsis syntax inside @test(eq) is not yet supported.
+
+	// In multi-line mode the last element's struct already wrote "\n"+indent[:-1]
+	// before its closing '}', so ']' can follow directly without an extra newline.
+	b.WriteByte(']')
+}
+
+// isLeafError reports whether eqWriteValue would render v as bare _|_
 // (i.e. an error that is neither a struct with child arcs nor a list).
 // Used by writeStruct to decide whether to append a @test(err, ...) annotation.
 func isLeafError(v cue.Value) bool {

@@ -2808,6 +2808,43 @@ or([a])              a
 or([])               _|_
 ```
 
+### `all` and `some` (experiment: shortcircuit)
+
+The builtin functions `all` and `some` are available when
+`@experiment(shortcircuit)` is present in a file (v0.17.0 and later).
+They apply strict logical conjunction and disjunction over a list of boolean
+values. Unlike `&&` and `||`, they evaluate every element: any error or
+incomplete value causes an error regardless of the other elements.
+
+`all(list)` returns `true` if every element of the list is `true`, and `false`
+if any element is `false`. It returns `true` for the empty list (vacuous truth).
+
+`some(list)` returns `true` if any element of the list is `true`, and `false`
+if all elements are `false`. It returns `false` for the empty list.
+
+Any error or incomplete element causes an error, even if the boolean result
+is already determined by the other elements.
+
+```cue rows
+Expression                        Result
+all([true, false, true])          false
+all([true, true, true])           true
+a: bool
+all([true, true, a])              incomplete error
+all([])                           true
+some([false, false, true])        true
+some([false, false, false])       false
+some([true, false, a])            incomplete error
+some([])                          false
+```
+
+<-- In the future we may support a lazy=true flag to allow short-circuiting -->
+
+Unlike `and` and `or`, which apply CUE's `&` and `|` operators over arbitrary
+values, `all` and `some` operate exclusively on boolean values and return a
+boolean result. Unlike `&&` and `||`, they do not short-circuit: all elements
+must be concrete and error-free.
+
 ### `div`, `mod`, `quo` and `rem`
 
 For two integer values `x` and `y`,

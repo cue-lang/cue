@@ -92,7 +92,6 @@ issue3415: full: {
 	#A: {
 		i: *0 | number
 	}
-	// TODO(inline): include embedded scalars when generating.
 	@test(eq, {
 		A: {i: {11, _a: 1, _b: 10}}
 		#A: {i: *0 | number}

@@ -299,6 +299,19 @@ func eqWriteErrAnnotation(b *strings.Builder, v cue.Value) {
 func eqWriteStruct(opCtx *adt.OpContext, b *strings.Builder, vx *adt.Vertex, nestedIndent string) {
 	b.WriteByte('{')
 	first := true
+
+	// If BaseValue is a concrete scalar or constraint (not a struct/list
+	// marker), it represents an embedded expression, e.g. {4} or {>=5}.
+	// *StructMarker and *ListMarker do not implement adt.Value (they lack
+	// Concreteness()), so this check correctly skips them.
+	if embVal, ok := vx.BaseValue.(adt.Value); ok {
+		if nestedIndent != "" {
+			b.WriteString("\n" + nestedIndent)
+		}
+		first = false
+		eqWriteValue(opCtx, b, value.Make(opCtx, embVal), nestedIndent+"\t")
+	}
+
 	for _, arc := range vx.Arcs {
 		if arc.ArcType == adt.ArcNotPresent || arc.Label.IsLet() {
 			continue

@@ -23,7 +23,8 @@ b: {
 
 	a: T
 	b: F
-}
+} @test(eq, {a: 4718592, b: 288})
+
 // Nil pointer in *core/adt.Environment.evalCached caused by a let binding
 // that references a list comprehension over another let-bound list.
 // https://cuelang.org/issue/1828
@@ -36,10 +37,14 @@ issue1828: {
 
 	let L2 = L1
 	let L1 = []
+
+	@test(eq, {volumes: {}})
 }
 ignoreErrorInLet: {
 	let X = 1 & 2
 	disjunction: *X | 3
+
+	@test(eq, {disjunction: 3})
 }
 -- incomprehension.cue --
 // for comprehensions in list do not have to split the let as each instance
@@ -52,6 +57,7 @@ list: {
 			X
 		}
 	]
+	@test(eq, {l: [1, 2, 3], c: [{4}, {8}, {12}]})
 }
 
 referencesForDirectly: {
@@ -60,6 +66,12 @@ referencesForDirectly: {
 		let Y = v*4 // multi
 		"\(k)": Y
 	}
+	@test(eq, {
+		l: [1, 2, 3]
+		"0": 4
+		"1": 8
+		"2": 12
+	})
 }
 
 referencesForViaLet: {
@@ -68,6 +80,12 @@ referencesForViaLet: {
 		let Y = X // multi
 		"\(k)": Y
 	}
+	@test(eq, {
+		l: [1, 2, 3]
+		"0": 4
+		"1": 8
+		"2": 12
+	})
 }
 
 letClauseReferencesInert: {
@@ -77,6 +95,13 @@ letClauseReferencesInert: {
 		let Y = X // can share
 		"\(k)": Y
 	}
+	@test(eq, {
+		x: 2
+		l: [1, 2, 3]
+		"0": 2
+		"1": 2
+		"2": 2
+	})
 }
 
 // for indirect references, it is okay to not "split" a let clause, as the
@@ -89,7 +114,13 @@ indirectReference: {
 		let X = y*4 // can share, as y fails if let fails.
 		"\(k)": X
 	}
-} @test(err, code=eval, contains="conflicting values", pos=[0:20, 1:7, 1:10, 2:2, 3:6])
+	@test(err, code=eval,
+		suberr=(code=eval, path=y, contains="conflicting values %s and %s", args=[2, 1], pos=[0:20, 1:7, 1:10, 2:2, 3:6]),
+		suberr=(code=eval, path=y, contains="conflicting values %s and %s", args=[3, 1], pos=[0:20, 1:7, 1:13, 2:2, 3:6]))
+
+} @test(err, code=eval,
+	suberr=(code=eval, path=y, contains="conflicting values %s and %s", args=[2, 1], pos=[0:20, 1:7, 1:10, 2:2, 3:6]),
+	suberr=(code=eval, path=y, contains="conflicting values %s and %s", args=[3, 1], pos=[0:20, 1:7, 1:13, 2:2, 3:6]))
 
 nestedFor: {
 	for k, y in [ 4, 5 ] {
@@ -101,6 +132,10 @@ nestedFor: {
 		}
 		"\(k)": X
 	}
+	@test(eq, {
+		"0": {"1": 1, "2": 2}
+		"1": {"1": 1, "2": 2}
+	})
 }
 -- issue2166.cue --
 // Using a let clause inside a field comprehension to create a dynamic key
@@ -116,6 +151,7 @@ letWithDynamicInComprehension: {
 		let T = v
 		(T): "1"
 	}
+	@test(eq, {_i: {a: "d", b: "e"}, e: "1", d: "1"})
 }
 -- issue2218.cue --
 // Earlier let evaluation results in the wrong value: a let inside a for
@@ -123,7 +159,7 @@ letWithDynamicInComprehension: {
 // https://cuelang.org/issue/2218
 _parent_configs: {
 	PARENT: true
-}
+} @test(eq)
 _configs: {
 	CHILD1: {
 		property: true
@@ -139,6 +175,7 @@ disabled_parent_test: {for k, v in _configs {
 		"parent_config": parent_config
 	}
 }}
+
 -- issue2063.cue --
 import (
 	"encoding/yaml"
@@ -156,6 +193,7 @@ keepDescending: t1: {
 		if m == _|_ { }
 		x: y: ""
 	}
+	@test(eq, {ec: {}, bs: {x: {y: ""}}})
 }
 
 keepDescending: t2: {
@@ -167,6 +205,11 @@ keepDescending: t2: {
 		if m.b == _|_ { }
 		X: Y: strings.Join([], "")
 	}
+	@test(eq, {
+		x: "X:\n  \"Y\": \"\"\n"
+		ec: {}
+		bs: {X: {Y: ""}}
+	})
 }
 -- interpolation.cue --
 // evalv3 closedness regression with disjunctions and ellipses where a let
@@ -177,56 +220,57 @@ issue4022: full: {
 	_env: {
 		KEY: *"" | _
 	}
+	@test(eq, {envScript: [""], _env: {KEY: *"" | _}})
 }
 -- out/errors.txt --
 [eval] indirectReference.y: conflicting values 2 and 1:
-    ./incomprehension.cue:41:20
-    ./incomprehension.cue:42:7
-    ./incomprehension.cue:42:10
-    ./incomprehension.cue:43:2
-    ./incomprehension.cue:44:6
+    ./incomprehension.cue:61:20
+    ./incomprehension.cue:62:7
+    ./incomprehension.cue:62:10
+    ./incomprehension.cue:63:2
+    ./incomprehension.cue:64:6
 indirectReference.y: conflicting values 3 and 1:
-    ./incomprehension.cue:41:20
-    ./incomprehension.cue:42:7
-    ./incomprehension.cue:42:13
-    ./incomprehension.cue:43:2
-    ./incomprehension.cue:44:6
+    ./incomprehension.cue:61:20
+    ./incomprehension.cue:62:7
+    ./incomprehension.cue:62:13
+    ./incomprehension.cue:63:2
+    ./incomprehension.cue:64:6
 [eval] indirectReference.y: conflicting values 2 and 1:
-    ./incomprehension.cue:41:20
-    ./incomprehension.cue:42:7
-    ./incomprehension.cue:42:10
-    ./incomprehension.cue:43:2
-    ./incomprehension.cue:44:6
+    ./incomprehension.cue:61:20
+    ./incomprehension.cue:62:7
+    ./incomprehension.cue:62:10
+    ./incomprehension.cue:63:2
+    ./incomprehension.cue:64:6
 indirectReference.y: conflicting values 3 and 1:
-    ./incomprehension.cue:41:20
-    ./incomprehension.cue:42:7
-    ./incomprehension.cue:42:13
-    ./incomprehension.cue:43:2
-    ./incomprehension.cue:44:6
+    ./incomprehension.cue:61:20
+    ./incomprehension.cue:62:7
+    ./incomprehension.cue:62:13
+    ./incomprehension.cue:63:2
+    ./incomprehension.cue:64:6
 [eval] indirectReference.y: conflicting values 2 and 1:
-    ./incomprehension.cue:41:20
-    ./incomprehension.cue:42:7
-    ./incomprehension.cue:42:10
-    ./incomprehension.cue:43:2
-    ./incomprehension.cue:44:6
+    ./incomprehension.cue:61:20
+    ./incomprehension.cue:62:7
+    ./incomprehension.cue:62:10
+    ./incomprehension.cue:63:2
+    ./incomprehension.cue:64:6
 indirectReference.y: conflicting values 3 and 1:
-    ./incomprehension.cue:41:20
-    ./incomprehension.cue:42:7
-    ./incomprehension.cue:42:13
-    ./incomprehension.cue:43:2
-    ./incomprehension.cue:44:6
+    ./incomprehension.cue:61:20
+    ./incomprehension.cue:62:7
+    ./incomprehension.cue:62:13
+    ./incomprehension.cue:63:2
+    ./incomprehension.cue:64:6
 [eval] indirectReference.y: conflicting values 2 and 1:
-    ./incomprehension.cue:41:20
-    ./incomprehension.cue:42:7
-    ./incomprehension.cue:42:10
-    ./incomprehension.cue:43:2
-    ./incomprehension.cue:44:6
+    ./incomprehension.cue:61:20
+    ./incomprehension.cue:62:7
+    ./incomprehension.cue:62:10
+    ./incomprehension.cue:63:2
+    ./incomprehension.cue:64:6
 indirectReference.y: conflicting values 3 and 1:
-    ./incomprehension.cue:41:20
-    ./incomprehension.cue:42:7
-    ./incomprehension.cue:42:13
-    ./incomprehension.cue:43:2
-    ./incomprehension.cue:44:6
+    ./incomprehension.cue:61:20
+    ./incomprehension.cue:62:7
+    ./incomprehension.cue:62:13
+    ./incomprehension.cue:63:2
+    ./incomprehension.cue:64:6
 -- out/eval/stats --
 Leaks:  52
 Freed:  163

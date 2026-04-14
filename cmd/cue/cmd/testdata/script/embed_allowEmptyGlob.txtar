@@ -50,6 +50,6 @@ nonEmptyGlob: {
 }
 
 // Test allowEmptyGlob with different file types
-emptyText: {}
+emptyText:   {}
 emptyBinary: {}
 -- out/vet --

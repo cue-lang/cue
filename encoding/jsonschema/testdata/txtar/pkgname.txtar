@@ -18,6 +18,64 @@
         }
     }
 }
+-- out/decode-v3/extract --
+// Main schema
+//
+// Specify who you are and all.
+package somepkg
+
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+
+// A person is a human being.
+person?: {...}
+// a telephone number
+#: "phone number": string
+...
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -6,10 +6,7 @@
+ @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+ 
+ // A person is a human being.
+-person?: {
+-	...
+-}
+-
++person?: {...}
+ // a telephone number
+ #: "phone number": string
+ ...
+-- out/decode-v3-noshare/extract --
+// Main schema
+//
+// Specify who you are and all.
+package somepkg
+
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+
+// A person is a human being.
+person?: {...}
+// a telephone number
+#: "phone number": string
+...
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -6,10 +6,7 @@
+ @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+ 
+ // A person is a human being.
+-person?: {
+-	...
+-}
+-
++person?: {...}
+ // a telephone number
+ #: "phone number": string
+ ...
 -- out/decode/extract --
 // Main schema
 //

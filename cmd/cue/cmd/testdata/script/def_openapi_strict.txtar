@@ -86,9 +86,7 @@ info: {
 	title:   *"My OpenAPI" | string
 	version: *"v1alpha1" | string
 }
-#Bar: {
-	...
-}
+#Bar: {...}
 -- expect-stderr-2 --
 unknown keyword "unknown":
     ./openapi-badkeyword.json:12:18

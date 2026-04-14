@@ -1,0 +1,25 @@
+# A field with both an inline trailing comment and a post-field block
+# of comments (separated by a blank line). The parser attaches both
+# to the same Field node (Position=5); the trailing must stay on the
+# field's line while the post-block must render below, separated by
+# a blank line.
+-- in.cue --
+extensions: {
+	".textpb": tagInfo.textproto // perhaps also pbtxt
+
+	// TODO: jsonseq,
+	// ".pb":        tagInfo.binpb // binarypb
+}
+-- out/relpos --
+extensions: {
+	".textpb": tagInfo.textproto // perhaps also pbtxt
+
+	// TODO: jsonseq,
+	// ".pb":        tagInfo.binpb // binarypb
+}
+-- out/norelpos --
+extensions: {
+	".textpb": tagInfo.textproto // perhaps also pbtxt
+	// TODO: jsonseq,
+	// ".pb":        tagInfo.binpb // binarypb
+}

@@ -171,26 +171,18 @@ concat: {
 		v: _|_ // concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list
 	}
 }
-unique: {
-	issue797: {
-		mylst: [{
-			foo: "bar"
-		}, {
-			foo: "baz"
-		}]
-	}
-}
+unique: issue797: mylst: [{foo: "bar"}, {foo: "baz"}]
 // Issue #2099
 minItems: {
 	incomplete1: list.MinItems(1) & [...]
-	fail1: _|_ // minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1)
-	ok1: [0, ...]
-	ok2: [0]
+	fail1:       _|_ // minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1)
+	ok1:         [0, ...]
+	ok2:         [0]
 }
 maxItems: {
-	ok1: [...]
-	ok2: [0, ...]
-	ok3: [0, ...]
+	ok1:   [...]
+	ok2:   [0, ...]
+	ok3:   [0, ...]
 	fail1: _|_ // maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems(1)): len(list) > MaxItems(1) (2 > 1)
 }
 reverse: {

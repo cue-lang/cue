@@ -40,9 +40,7 @@ a: {
 == Simplified
 {
 	"#def": int
-	a: {
-		"#def": int
-	}
+	a: "#def": int
 }
 == Raw
 {
@@ -60,9 +58,7 @@ a: {
 == Final
 {
 	"#def": int
-	a: {
-		"#def": int
-	}
+	a: "#def": int
 }
 == All
 {

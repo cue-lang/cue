@@ -29,6 +29,52 @@
   "additionalProperties": false
 }
 
+-- out/decode-v3/extract --
+// Main schema
+
+close({
+	// an integer or string.
+	intString?: null | bool | int | string | [...]
+	object?:    {...}
+	numOrList?: matchN(1, [number, [...number]])
+})
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -3,8 +3,6 @@
+ close({
+ 	// an integer or string.
+ 	intString?: null | bool | int | string | [...]
+-	object?: {
+-		...
+-	}
++	object?:    {...}
+ 	numOrList?: matchN(1, [number, [...number]])
+ })
+-- out/decode-v3-noshare/extract --
+// Main schema
+
+close({
+	// an integer or string.
+	intString?: null | bool | int | string | [...]
+	object?:    {...}
+	numOrList?: matchN(1, [number, [...number]])
+})
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -3,8 +3,6 @@
+ close({
+ 	// an integer or string.
+ 	intString?: null | bool | int | string | [...]
+-	object?: {
+-		...
+-	}
++	object?:    {...}
+ 	numOrList?: matchN(1, [number, [...number]])
+ })
 -- out/decode/extract --
 // Main schema
 

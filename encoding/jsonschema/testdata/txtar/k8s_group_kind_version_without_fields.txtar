@@ -76,6 +76,64 @@ even when the kind and apiVersion properties aren't defined.
   "openapi": "3.0.0",
   "paths": {}
 }
+-- out/decode-v3/extract --
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
+	serverAddressByClientCIDRs!: [
+		..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR",
+	]
+	versions!:  [...string]
+	apiVersion: "v1"
+	kind:       "APIVersions"
+}
+
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR": {
+	clientCIDR!:    string
+	serverAddress!: string
+}
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,8 @@
+ _#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
+-	serverAddressByClientCIDRs!: [..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"]
+-	versions!: [...string]
++	serverAddressByClientCIDRs!: [
++		..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR",
++	]
++	versions!:  [...string]
+ 	apiVersion: "v1"
+ 	kind:       "APIVersions"
+ }
+-- out/decode-v3-noshare/extract --
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
+	serverAddressByClientCIDRs!: [
+		..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR",
+	]
+	versions!:  [...string]
+	apiVersion: "v1"
+	kind:       "APIVersions"
+}
+
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR": {
+	clientCIDR!:    string
+	serverAddress!: string
+}
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,8 @@
+ _#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
+-	serverAddressByClientCIDRs!: [..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"]
+-	versions!: [...string]
++	serverAddressByClientCIDRs!: [
++		..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR",
++	]
++	versions!:  [...string]
+ 	apiVersion: "v1"
+ 	kind:       "APIVersions"
+ }
 -- out/decode/extract --
 _#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
 	serverAddressByClientCIDRs!: [..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"]

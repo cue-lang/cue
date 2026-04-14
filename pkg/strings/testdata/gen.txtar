@@ -43,12 +43,12 @@ t17: invalid value "hello" (does not satisfy strings.MinRunes(10)):
     ./in.cue:19:29
 
 Result:
-t1: "Hello World!"
-t2: _|_ // t2: error in call to strings.Join: t2: invalid list element 0 in argument 0 to call: cannot use value 1 (int) as string
-t3: 97
-t4: 'llo'
-t5: "✓ H"
-t6: [67, 97, 102, 233]
+t1:  "Hello World!"
+t2:  _|_ // t2: error in call to strings.Join: t2: invalid list element 0 in argument 0 to call: cannot use value 1 (int) as string
+t3:  97
+t4:  'llo'
+t5:  "✓ H"
+t6:  [67, 97, 102, 233]
 t7:  "alphaBeta"
 t8:  "Alpha"
 t9:  "foo"

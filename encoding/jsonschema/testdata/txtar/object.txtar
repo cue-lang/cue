@@ -66,6 +66,144 @@
   },
   "additionalProperties": false
 }
+-- out/decode-v3/extract --
+// Main schema
+
+import "struct"
+
+close({
+	fields?: struct.MinFields(3) & struct.MaxFields(10) & {[=~"^\\P{Lu}"]: _}
+	additional?: {
+		foo?: number
+		bar?: number
+		{[!~"^(foo|bar)$"]: string}
+	}
+	map?: [string]: string
+	patterns?: {
+		foo?: number
+		bar?: number
+
+		{[=~"^\\P{Lu}"]: string}
+
+		{[=~"^\\P{Lo}"]: int}
+		...
+	}
+	patternsNoProps?: {
+		{[=~"^\\P{Lu}"]: string}
+
+		{[=~"^\\P{Lo}"]: int}
+		...
+	}
+	complex?: {
+		foo?: number
+		bar?: number
+
+		{[=~"^\\P{Lu}"]: string}
+
+		{[=~"^\\P{Lo}"]: int}
+		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
+	}
+	multi?: >=7 |
+	struct.MaxFields(5) & {
+		foo?: number
+		bar?: number
+		...
+	}
+})
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -3,9 +3,7 @@
+ import "struct"
+ 
+ close({
+-	fields?: struct.MinFields(3) & struct.MaxFields(10) & {
+-		[=~"^\\P{Lu}"]: _
+-	}
++	fields?: struct.MinFields(3) & struct.MaxFields(10) & {[=~"^\\P{Lu}"]: _}
+ 	additional?: {
+ 		foo?: number
+ 		bar?: number
+@@ -36,7 +34,8 @@
+ 		{[=~"^\\P{Lo}"]: int}
+ 		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
+ 	}
+-	multi?: >=7 | struct.MaxFields(5) & {
++	multi?: >=7 |
++	struct.MaxFields(5) & {
+ 		foo?: number
+ 		bar?: number
+ 		...
+-- out/decode-v3-noshare/extract --
+// Main schema
+
+import "struct"
+
+close({
+	fields?: struct.MinFields(3) & struct.MaxFields(10) & {[=~"^\\P{Lu}"]: _}
+	additional?: {
+		foo?: number
+		bar?: number
+		{[!~"^(foo|bar)$"]: string}
+	}
+	map?: [string]: string
+	patterns?: {
+		foo?: number
+		bar?: number
+
+		{[=~"^\\P{Lu}"]: string}
+
+		{[=~"^\\P{Lo}"]: int}
+		...
+	}
+	patternsNoProps?: {
+		{[=~"^\\P{Lu}"]: string}
+
+		{[=~"^\\P{Lo}"]: int}
+		...
+	}
+	complex?: {
+		foo?: number
+		bar?: number
+
+		{[=~"^\\P{Lu}"]: string}
+
+		{[=~"^\\P{Lo}"]: int}
+		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
+	}
+	multi?: >=7 |
+	struct.MaxFields(5) & {
+		foo?: number
+		bar?: number
+		...
+	}
+})
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -3,9 +3,7 @@
+ import "struct"
+ 
+ close({
+-	fields?: struct.MinFields(3) & struct.MaxFields(10) & {
+-		[=~"^\\P{Lu}"]: _
+-	}
++	fields?: struct.MinFields(3) & struct.MaxFields(10) & {[=~"^\\P{Lu}"]: _}
+ 	additional?: {
+ 		foo?: number
+ 		bar?: number
+@@ -36,7 +34,8 @@
+ 		{[=~"^\\P{Lo}"]: int}
+ 		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
+ 	}
+-	multi?: >=7 | struct.MaxFields(5) & {
++	multi?: >=7 |
++	struct.MaxFields(5) & {
+ 		foo?: number
+ 		bar?: number
+ 		...
 -- out/decode/extract --
 // Main schema
 

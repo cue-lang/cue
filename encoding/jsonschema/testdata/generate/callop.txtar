@@ -105,14 +105,12 @@ badScore2: {
 			description: "Math constraints"
 			multipleOf:  5
 		}
-		score: {
-			allOf: [{
-				type: "number"
-			}, {
-				type:       "integer"
-				multipleOf: 10
-			}]
-		}
+		score: allOf: [{
+			type: "number"
+		}, {
+			type:       "integer"
+			multipleOf: 10
+		}]
 		shortList: {
 			type:        "array"
 			description: "List constraints"

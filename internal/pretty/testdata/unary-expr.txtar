@@ -1,0 +1,12 @@
+-- in.cue --
+{
+	x: !   true
+	y: ! =~"pat"
+}
+-- out/relpos --
+{
+	x: !true
+	y: ! =~"pat"
+}
+-- out/norelpos --
+{x: !true, y: ! =~"pat"}

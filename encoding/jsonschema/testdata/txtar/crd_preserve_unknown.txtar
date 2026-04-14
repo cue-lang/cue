@@ -75,6 +75,97 @@
     }
 }
 
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -2,25 +2,19 @@
+ alpha?: string
+ beta?:  number
+ preserving?: {
+-	preserving?: {
+-		...
+-	}
+-	pruning?: {}
++	preserving?: {...}
++	pruning?:    {}
+ 	pruning2?: [string]: preserved?: string
+ 	...
+ }
+ pruning?: {
+-	preserving?: {
+-		...
+-	}
+-	pruning?: {}
++	preserving?: {...}
++	pruning?:    {}
+ }
+ 
+ _embeddedResource: {
+ 	apiVersion!: string
+ 	kind!:       string
+-	metadata?: {
+-		...
+-	}
++	metadata?:   {...}
+ }
+ ...
+-- out/decode-v3-noshare/extract --
+_embeddedResource
+alpha?: string
+beta?:  number
+preserving?: {
+	preserving?: {...}
+	pruning?:    {}
+	pruning2?: [string]: preserved?: string
+	...
+}
+pruning?: {
+	preserving?: {...}
+	pruning?:    {}
+}
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+...
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -2,25 +2,19 @@
+ alpha?: string
+ beta?:  number
+ preserving?: {
+-	preserving?: {
+-		...
+-	}
+-	pruning?: {}
++	preserving?: {...}
++	pruning?:    {}
+ 	pruning2?: [string]: preserved?: string
+ 	...
+ }
+ pruning?: {
+-	preserving?: {
+-		...
+-	}
+-	pruning?: {}
++	preserving?: {...}
++	pruning?:    {}
+ }
+ 
+ _embeddedResource: {
+ 	apiVersion!: string
+ 	kind!:       string
+-	metadata?: {
+-		...
+-	}
++	metadata?:   {...}
+ }
+ ...
 -- out/decode/extract --
 _embeddedResource
 alpha?: string
@@ -102,6 +193,160 @@ _embeddedResource: {
 	}
 }
 ...
+-- out/decodeCRD-v3/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+alpha?: string
+beta?:  number
+preserving?: {
+	preserving?: {...}
+	pruning?:    {}
+	pruning2?: [string]: preserved?: string
+	...
+}
+pruning?: {
+	preserving?: {...}
+	pruning?:    {}
+}
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]:      string
+	annotations?: [string]: string
+	...
+}
+...
+-- diff/-out/decodeCRD-v3/extractCRD/0/v1<==>+out/decodeCRD/extractCRD/0/v1 --
+diff old new
+--- old
++++ new
+@@ -4,26 +4,20 @@
+ alpha?: string
+ beta?:  number
+ preserving?: {
+-	preserving?: {
+-		...
+-	}
+-	pruning?: {}
++	preserving?: {...}
++	pruning?:    {}
+ 	pruning2?: [string]: preserved?: string
+ 	...
+ }
+ pruning?: {
+-	preserving?: {
+-		...
+-	}
+-	pruning?: {}
++	preserving?: {...}
++	pruning?:    {}
+ }
+ 
+ _embeddedResource: {
+ 	apiVersion!: string
+ 	kind!:       string
+-	metadata?: {
+-		...
+-	}
++	metadata?:   {...}
+ }
+ apiVersion: "example.com/v1"
+ kind:       "MyApp"
+@@ -30,7 +24,7 @@
+ metadata!: {
+ 	name!:      string
+ 	namespace!: string
+-	labels?: [string]: string
++	labels?: [string]:      string
+ 	annotations?: [string]: string
+ 	...
+ }
+-- out/decodeCRD-v3-noshare/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+alpha?: string
+beta?:  number
+preserving?: {
+	preserving?: {...}
+	pruning?:    {}
+	pruning2?: [string]: preserved?: string
+	...
+}
+pruning?: {
+	preserving?: {...}
+	pruning?:    {}
+}
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]:      string
+	annotations?: [string]: string
+	...
+}
+...
+-- diff/-out/decodeCRD-v3-noshare/extractCRD/0/v1<==>+out/decodeCRD/extractCRD/0/v1 --
+diff old new
+--- old
++++ new
+@@ -4,26 +4,20 @@
+ alpha?: string
+ beta?:  number
+ preserving?: {
+-	preserving?: {
+-		...
+-	}
+-	pruning?: {}
++	preserving?: {...}
++	pruning?:    {}
+ 	pruning2?: [string]: preserved?: string
+ 	...
+ }
+ pruning?: {
+-	preserving?: {
+-		...
+-	}
+-	pruning?: {}
++	preserving?: {...}
++	pruning?:    {}
+ }
+ 
+ _embeddedResource: {
+ 	apiVersion!: string
+ 	kind!:       string
+-	metadata?: {
+-		...
+-	}
++	metadata?:   {...}
+ }
+ apiVersion: "example.com/v1"
+ kind:       "MyApp"
+@@ -30,7 +24,7 @@
+ metadata!: {
+ 	name!:      string
+ 	namespace!: string
+-	labels?: [string]: string
++	labels?: [string]:      string
+ 	annotations?: [string]: string
+ 	...
+ }
 -- out/decodeCRD/extractCRD/0/v1 --
 package v1
 
@@ -138,5 +383,26 @@ metadata!: {
 	labels?: [string]: string
 	annotations?: [string]: string
 	...
+}
+...
+-- out/decode-v3/extract --
+_embeddedResource
+alpha?: string
+beta?:  number
+preserving?: {
+	preserving?: {...}
+	pruning?:    {}
+	pruning2?: [string]: preserved?: string
+	...
+}
+pruning?: {
+	preserving?: {...}
+	pruning?:    {}
+}
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
 }
 ...

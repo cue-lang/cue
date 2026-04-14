@@ -36,6 +36,42 @@
     }
   }
 }
+-- out/decode-v3/extract --
+// Main schema
+intOrString1?: int | string
+intOrString2?: matchN(1, [int, string])
+intOrString3?: matchN(>=1, [int, string])
+disjunction?:  matchN(1, [matchN(>=1, [int, string]), int & >=3])
+...
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -2,5 +2,5 @@
+ intOrString1?: int | string
+ intOrString2?: matchN(1, [int, string])
+ intOrString3?: matchN(>=1, [int, string])
+-disjunction?: matchN(1, [matchN(>=1, [int, string]), int & >=3])
++disjunction?:  matchN(1, [matchN(>=1, [int, string]), int & >=3])
+ ...
+-- out/decode-v3-noshare/extract --
+// Main schema
+intOrString1?: int | string
+intOrString2?: matchN(1, [int, string])
+intOrString3?: matchN(>=1, [int, string])
+disjunction?:  matchN(1, [matchN(>=1, [int, string]), int & >=3])
+...
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -2,5 +2,5 @@
+ intOrString1?: int | string
+ intOrString2?: matchN(1, [int, string])
+ intOrString3?: matchN(>=1, [int, string])
+-disjunction?: matchN(1, [matchN(>=1, [int, string]), int & >=3])
++disjunction?:  matchN(1, [matchN(>=1, [int, string]), int & >=3])
+ ...
 -- out/decode/extract --
 // Main schema
 intOrString1?: int | string

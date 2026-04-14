@@ -667,11 +667,8 @@ func (e *exporter) copyMeta(dst, src ast.Node) {
 	astutil.CopyPosition(dst, src)
 }
 
-func filterDocs(a []*ast.CommentGroup) (out []*ast.CommentGroup) {
-	out = append(out, a...)
-	return slices.DeleteFunc(out, func(c *ast.CommentGroup) bool {
-		return !c.Doc
-	})
+func filterDocs(a []*ast.CommentGroup) []*ast.CommentGroup {
+	return leadingDocComments(a)
 }
 
 func (e *exporter) setField(label adt.Feature, f *ast.Field) {

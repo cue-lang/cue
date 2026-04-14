@@ -22,6 +22,58 @@
     }
   }
 }
+-- out/decode-v3/extract --
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+
+_
+
+#obj1: null | {...}
+
+#obj2: null | {...}
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -2,10 +2,6 @@
+ 
+ _
+ 
+-#obj1: null | {
+-	...
+-}
+-
+-#obj2: null | {
+-	...
+-}
++#obj1: null | {...}
++
++#obj2: null | {...}
+-- out/decode-v3-noshare/extract --
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+
+_
+
+#obj1: null | {...}
+
+#obj2: null | {...}
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -2,10 +2,6 @@
+ 
+ _
+ 
+-#obj1: null | {
+-	...
+-}
+-
+-#obj2: null | {
+-	...
+-}
++#obj1: null | {...}
++
++#obj2: null | {...}
 -- out/decode/extract --
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 

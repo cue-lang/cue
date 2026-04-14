@@ -258,9 +258,7 @@ func TestDecode(t *testing.T) {
 		}(),
 		want: `{
 	A: ""
-	t: {
-		B: 0
-	}
+	t: B: 0
 }`,
 	}}
 	c := New(cuecontext.New(), nil)

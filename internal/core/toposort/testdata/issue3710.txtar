@@ -30,23 +30,11 @@ _app2: {
 }
 -- out/TestTopologicalSort/lexicographical=false --
 {
-	#Exporter: {
-		objects: []
-	}
-	out: {
-		objects: [{
-			leafField: "leaf value"
-		}]
-	}
+	#Exporter: objects: []
+	out: objects:       [{leafField: "leaf value"}]
 }
 -- out/TestTopologicalSort/lexicographical=true --
 {
-	#Exporter: {
-		objects: []
-	}
-	out: {
-		objects: [{
-			leafField: "leaf value"
-		}]
-	}
+	#Exporter: objects: []
+	out: objects:       [{leafField: "leaf value"}]
 }

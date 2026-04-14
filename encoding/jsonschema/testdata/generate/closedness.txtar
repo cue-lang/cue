@@ -57,84 +57,48 @@ twoStructDisjExtra: {
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	$defs: {
-		Disj: {
-			anyOf: [{
-				type: "integer"
-			}, {
-				type:                 "object"
-				additionalProperties: false
-				properties: {
-					a: {
-						type: "integer"
-					}
-				}
-			}]
-		}
+		Disj: anyOf: [{
+			type: "integer"
+		}, {
+			type:                 "object"
+			additionalProperties: false
+			properties: a: type: "integer"
+		}]
 		NestedDisj: {
 			type:                 "object"
 			additionalProperties: false
-			properties: {
-				x: {
-					anyOf: [{
-						type: "string"
-					}, {
-						type:                 "object"
-						additionalProperties: false
-						properties: {
-							y: {
-								type: "integer"
-							}
-						}
-					}]
-				}
-			}
+			properties: x: anyOf: [{
+				type: "string"
+			}, {
+				type:                 "object"
+				additionalProperties: false
+				properties: y: type: "integer"
+			}]
 		}
 		Simple: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				a: {
-					type: "integer"
-				}
-				b: {
-					type: "string"
-				}
+				a: type: "integer"
+				b: type: "string"
 			}
 		}
-		TwoStructDisj: {
-			anyOf: [{
-				type:                 "object"
-				additionalProperties: false
-				properties: {
-					a: {
-						type: "integer"
-					}
-				}
-			}, {
-				type:                 "object"
-				additionalProperties: false
-				properties: {
-					b: {
-						type: "string"
-					}
-				}
-			}]
-		}
+		TwoStructDisj: anyOf: [{
+			type:                 "object"
+			additionalProperties: false
+			properties: a: type: "integer"
+		}, {
+			type:                 "object"
+			additionalProperties: false
+			properties: b: type: "string"
+		}]
 	}
 	type: "object"
 	properties: {
-		t01: {
-			$ref: "#/$defs/Disj"
-		}
-		t02: {
-			$ref: "#/$defs/Simple"
-		}
-		t03: {
-			$ref: "#/$defs/NestedDisj"
-		}
-		t04: {
-			$ref: "#/$defs/TwoStructDisj"
-		}
+		t01: $ref: "#/$defs/Disj"
+		t02: $ref: "#/$defs/Simple"
+		t03: $ref: "#/$defs/NestedDisj"
+		t04: $ref: "#/$defs/TwoStructDisj"
 	}
 }
 -- out/generate-v3/disjInt --

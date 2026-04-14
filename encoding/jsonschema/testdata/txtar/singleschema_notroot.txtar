@@ -22,6 +22,50 @@ spec:
               description: description of bar
               allOf:
                 - $ref: '#/spec/versions/0/schema/openAPIV3Schema/properties/foo'
+-- out/decode-v3/extract --
+// Something about a CRD.
+// description of foo
+foo?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+
+// description of bar
+bar?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+// description of foo
+_#defs: "/spec/versions/0/schema/openAPIV3Schema/properties/foo": string
+...
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -4,7 +4,6 @@
+ 
+ // description of bar
+ bar?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+-
+ // description of foo
+ _#defs: "/spec/versions/0/schema/openAPIV3Schema/properties/foo": string
+ ...
+-- out/decode-v3-noshare/extract --
+// Something about a CRD.
+// description of foo
+foo?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+
+// description of bar
+bar?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+// description of foo
+_#defs: "/spec/versions/0/schema/openAPIV3Schema/properties/foo": string
+...
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -4,7 +4,6 @@
+ 
+ // description of bar
+ bar?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+-
+ // description of foo
+ _#defs: "/spec/versions/0/schema/openAPIV3Schema/properties/foo": string
+ ...
 -- out/decode/extract --
 // Something about a CRD.
 // description of foo

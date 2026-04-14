@@ -32,6 +32,66 @@ spec:
             type: number
             format: uint32
 
+-- out/decode-v3/extract --
+_embeddedResource
+spec?:     {...}
+intField?: uint32
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,9 @@
+ _embeddedResource
+-spec?: {
+-	...
+-}
++spec?:     {...}
+ intField?: uint32
+ 
+ _embeddedResource: {
+ 	apiVersion!: string
+ 	kind!:       string
+-	metadata?: {
+-		...
+-	}
++	metadata?:   {...}
+ }
+-- out/decode-v3-noshare/extract --
+_embeddedResource
+spec?:     {...}
+intField?: uint32
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,9 @@
+ _embeddedResource
+-spec?: {
+-	...
+-}
++spec?:     {...}
+ intField?: uint32
+ 
+ _embeddedResource: {
+ 	apiVersion!: string
+ 	kind!:       string
+-	metadata?: {
+-		...
+-	}
++	metadata?:   {...}
+ }
 -- out/decode/extract --
 _embeddedResource
 spec?: {
@@ -46,6 +106,114 @@ _embeddedResource: {
 		...
 	}
 }
+-- out/decodeCRD-v3/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+spec?:     {...}
+intField?: uint32
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]:      string
+	annotations?: [string]: string
+	...
+}
+-- diff/-out/decodeCRD-v3/extractCRD/0/v1<==>+out/decodeCRD/extractCRD/0/v1 --
+diff old new
+--- old
++++ new
+@@ -1,17 +1,13 @@
+ package v1
+ 
+ _embeddedResource
+-spec?: {
+-	...
+-}
++spec?:     {...}
+ intField?: uint32
+ 
+ _embeddedResource: {
+ 	apiVersion!: string
+ 	kind!:       string
+-	metadata?: {
+-		...
+-	}
++	metadata?:   {...}
+ }
+ apiVersion: "example.com/v1"
+ kind:       "MyApp"
+@@ -18,7 +14,7 @@
+ metadata!: {
+ 	name!:      string
+ 	namespace!: string
+-	labels?: [string]: string
++	labels?: [string]:      string
+ 	annotations?: [string]: string
+ 	...
+ }
+-- out/decodeCRD-v3-noshare/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+spec?:     {...}
+intField?: uint32
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]:      string
+	annotations?: [string]: string
+	...
+}
+-- diff/-out/decodeCRD-v3-noshare/extractCRD/0/v1<==>+out/decodeCRD/extractCRD/0/v1 --
+diff old new
+--- old
++++ new
+@@ -1,17 +1,13 @@
+ package v1
+ 
+ _embeddedResource
+-spec?: {
+-	...
+-}
++spec?:     {...}
+ intField?: uint32
+ 
+ _embeddedResource: {
+ 	apiVersion!: string
+ 	kind!:       string
+-	metadata?: {
+-		...
+-	}
++	metadata?:   {...}
+ }
+ apiVersion: "example.com/v1"
+ kind:       "MyApp"
+@@ -18,7 +14,7 @@
+ metadata!: {
+ 	name!:      string
+ 	namespace!: string
+-	labels?: [string]: string
++	labels?: [string]:      string
+ 	annotations?: [string]: string
+ 	...
+ }
 -- out/decodeCRD/extractCRD/0/v1 --
 package v1
 

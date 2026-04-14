@@ -15,6 +15,70 @@
 		}
 	}
 }
+-- out/decode-v3/extract --
+import "strings"
+
+matchN(1, [
+	{...},
+	strings.MaxRunes(
+		3
+	)
+]) & (string | {
+	{[=~"^x-"]: string}
+	...
+})
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,11 @@
+ import "strings"
+ 
+-matchN(1, [{
+-	...
+-}, strings.MaxRunes(
+-	3)]) & (string | {
++matchN(1, [
++	{...},
++	strings.MaxRunes(
++		3
++	)
++]) & (string | {
+ 	{[=~"^x-"]: string}
+ 	...
+ })
+-- out/decode-v3-noshare/extract --
+import "strings"
+
+matchN(1, [
+	{...},
+	strings.MaxRunes(
+		3
+	)
+]) & (string | {
+	{[=~"^x-"]: string}
+	...
+})
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,11 @@
+ import "strings"
+ 
+-matchN(1, [{
+-	...
+-}, strings.MaxRunes(
+-	3)]) & (string | {
++matchN(1, [
++	{...},
++	strings.MaxRunes(
++		3
++	)
++]) & (string | {
+ 	{[=~"^x-"]: string}
+ 	...
+ })
 -- out/decode/extract --
 import "strings"
 

@@ -5,6 +5,28 @@
     "const": {"a": 1}
 }
 
+-- out/decode-v3/extract --
+close({a!: 1})
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,1 @@
+-close({
+-	a!: 1
+-})
++close({a!: 1})
+-- out/decode-v3-noshare/extract --
+close({a!: 1})
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,1 @@
+-close({
+-	a!: 1
+-})
++close({a!: 1})
 -- out/decode/extract --
 close({
 	a!: 1

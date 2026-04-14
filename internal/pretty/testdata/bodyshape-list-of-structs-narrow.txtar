@@ -1,0 +1,25 @@
+# At a width too narrow for either the flat or the indented shape
+# to fit, [docBodyShape] picks the hug shape: the brackets hug the
+# first and last cell (no openBreak/closeBreak around the body),
+# the inter-cell separator stays a literal " " (via
+# [bracketsLackRelPos]) so the cells remain horizontally adjacent,
+# and each cell's [docNextGroupNoop] wrapper consumes modeBreak to
+# neutralise the cell's outer docGroup so the struct's body
+# renders multi-line.
+#
+# Concretely: at width 10, neither `[{a: _}, {b: _}]` flat (16) nor
+# `{a: _}, {b: _}` indented at 1 tab (14 + 4 = 18) fits in 10
+# columns, so the hug shape is chosen. Each struct's body still
+# fits flat inside the bracket-adjacent layout.
+-- config --
+width: 10
+-- in.cue --
+x: [{a: _}, {b: _}]
+-- out/relpos --
+x: [{a: _}, {b: _}]
+-- out/norelpos --
+x: [{
+	a: _
+}, {
+	b: _
+}]

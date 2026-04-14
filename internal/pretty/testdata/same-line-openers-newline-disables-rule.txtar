@@ -1,0 +1,45 @@
+## When an opener element starts on a new line, it is no longer on
+## the parent's opener line, so the same-line-opener rule does not
+## fire and the parent's `[`/`{`/`(` adds its own level of indent on
+## top of the inner opener's. The walk is left-to-right: a Newline
+## on any element earlier than the opener also disables the rule.
+-- in.cue --
+// Opener on its own line — list adds one indent, struct adds another.
+opener_on_new_line: [
+	1,
+	{
+		x: _
+	},
+]
+
+// Opener after a sibling that starts on a new line — chain is broken
+// before reaching the opener.
+sibling_breaks_chain: [
+	1,
+	2, {
+		x: _
+	},
+]
+-- out/relpos --
+// Opener on its own line — list adds one indent, struct adds another.
+opener_on_new_line: [
+	1,
+	{
+		x: _
+	},
+]
+
+// Opener after a sibling that starts on a new line — chain is broken
+// before reaching the opener.
+sibling_breaks_chain: [
+	1,
+	2, {
+		x: _
+	},
+]
+-- out/norelpos --
+// Opener on its own line — list adds one indent, struct adds another.
+opener_on_new_line: [1, {x: _}]
+// Opener after a sibling that starts on a new line — chain is broken
+// before reaching the opener.
+sibling_breaks_chain: [1, 2, {x: _}]

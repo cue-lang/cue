@@ -1,0 +1,24 @@
+# A blank line between a header comment (copyright / license /
+# file-level note) and the package declaration must be preserved.
+# The parser attaches the header to the File node as a Position=0
+# comment, and the Package decl carries NewSection RelPos. The
+# renderer must honour that NewSection when placing the comment.
+-- in.cue --
+// Copyright 2026 ACME
+// Licensed under Apache 2.0.
+
+package foo
+
+x: 1
+-- out/relpos --
+// Copyright 2026 ACME
+// Licensed under Apache 2.0.
+
+package foo
+
+x: 1
+-- out/norelpos --
+// Copyright 2026 ACME
+// Licensed under Apache 2.0.
+package foo
+x: 1

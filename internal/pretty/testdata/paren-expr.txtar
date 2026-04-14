@@ -1,0 +1,10 @@
+-- in.cue --
+{
+	x:   (1 + 2)
+}
+-- out/relpos --
+{
+	x: (1 + 2)
+}
+-- out/norelpos --
+{x: (1 + 2)}

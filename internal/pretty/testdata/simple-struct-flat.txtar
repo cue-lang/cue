@@ -1,0 +1,7 @@
+# Single-line input: parser gives Blank RelPos. Fits on one line.
+-- in.cue --
+{a: 1, b: 2}
+-- out/relpos --
+{a: 1, b: 2}
+-- out/norelpos --
+{a: 1, b: 2}

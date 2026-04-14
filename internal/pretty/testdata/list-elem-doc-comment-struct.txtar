@@ -1,0 +1,20 @@
+# A doc comment on a list element that is a StructLit. The parser
+# attaches the comment to the StructLit at Position=0; structLit
+# already renders its own before/after comments, so listElem must
+# not re-wrap with withComments — doing so would duplicate the
+# comment.
+-- in.cue --
+x: [
+	// comment
+	{},
+]
+-- out/relpos --
+x: [
+	// comment
+	{},
+]
+-- out/norelpos --
+x: [
+	// comment
+	{},
+]

@@ -1,0 +1,20 @@
+# Only rows with comments participate in comment alignment;
+# rows without comments don't get extra padding.
+-- in.cue --
+{
+	apple: 100 // has comment
+	banana:        2
+	carrot: 3     // also has comment
+}
+-- out/relpos --
+{
+	apple:  100 // has comment
+	banana: 2
+	carrot: 3   // also has comment
+}
+-- out/norelpos --
+{
+	apple:  100 // has comment
+	banana: 2
+	carrot: 3   // also has comment
+}

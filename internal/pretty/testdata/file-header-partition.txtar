@@ -1,0 +1,41 @@
+# Header decls (Package, ImportDecl, free-floating CommentGroup)
+# are partitioned out of f.Decls before declSlice runs. The header
+# is rendered as a sequence of standalone decls; the body is a
+# normal table of fields. The relpos-driven separator between the
+# last header decl and the first body decl is preserved (a blank
+# line stays a blank line, a Newline stays a HardLine).
+#
+# Body fields align amongst themselves with the header out of the
+# way: `foo`/`longname`/`y` are padded to `longname:`'s width, and
+# the import line above does not pad them to its longer text.
+-- in.cue --
+package foo
+
+import "strings"
+import "list"
+
+// header-adjacent comment
+
+foo: 1
+longname: 22
+y: 333
+-- out/relpos --
+package foo
+
+import "strings"
+import "list"
+
+// header-adjacent comment
+
+foo:      1
+longname: 22
+y:        333
+-- out/norelpos --
+package foo
+import "strings"
+import "list"
+
+// header-adjacent comment
+foo:      1
+longname: 22
+y:        333

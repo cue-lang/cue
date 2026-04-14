@@ -1,0 +1,31 @@
+# Two multi-line string fields and a simple field.
+-- in.cue --
+{
+	apple: """
+  first
+  """
+	banana: """
+   second
+   """
+	carrots: 42
+}
+-- out/relpos --
+{
+	apple:   """
+  first
+  """
+	banana:  """
+   second
+   """
+	carrots: 42
+}
+-- out/norelpos --
+{
+	apple:   """
+  first
+  """
+	banana:  """
+   second
+   """
+	carrots: 42
+}

@@ -1,0 +1,17 @@
+# A call whose single argument is a list that contains a multi-line
+# inner list preserves the user's layout: the inner list breaks
+# because its contents do, but the outer list keeps its sibling
+# elements on the same line as the user wrote them. The renderer
+# pre-flattens soft breaks wherever the AST subtree carries any
+# Newline/NewSection RelPos, so width-driven breaks only fire in
+# subtrees where the user has expressed no layout opinion.
+-- in.cue --
+let cacheModes = list.Concat([[
+	"go",
+], #in.additionalCaches])
+-- out/relpos --
+let cacheModes = list.Concat([[
+		"go",
+	], #in.additionalCaches,])
+-- out/norelpos --
+let cacheModes = list.Concat([["go"], #in.additionalCaches])

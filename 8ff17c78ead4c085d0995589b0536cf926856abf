@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db8eb2d6_328487ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-14T08:15:59Z",
+      "side": 1,
+      "message": "I would expect this to work differently, like:\n* find all test attributes and mark them \"unused\"\n* do your testing and mark the ones used as \"used\"\n* fail if any \"unused\" attributes remain\n\nwhat you do here is rather specific - you look for test attributes that you know you don\u0027t support - but this is error-prone, as there could be other edge cases that the code isn\u0027t thinking about. we should reject any test attribute that we don\u0027t visit.",
+      "revId": "8ff17c78ead4c085d0995589b0536cf926856abf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd018c9f_cbcbd273",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-14T08:15:59Z",
+      "side": 1,
+      "message": "I would avoid the sprawl of these local func vars; it\u0027s really adding to the complexity of the code. unless these really benefit from capturing closures, and e.g. avoiding arguments across many calls due to that, I would move them to top-level funcs.",
+      "revId": "8ff17c78ead4c085d0995589b0536cf926856abf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

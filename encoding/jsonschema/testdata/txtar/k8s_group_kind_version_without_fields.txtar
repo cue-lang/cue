@@ -78,8 +78,10 @@ even when the kind and apiVersion properties aren't defined.
 }
 -- out/decode/extract --
 _#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
-	serverAddressByClientCIDRs!: [..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"]
-	versions!: [...string]
+	serverAddressByClientCIDRs!: [
+		..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"
+	]
+	versions!:  [...string]
 	apiVersion: "v1"
 	kind:       "APIVersions"
 }

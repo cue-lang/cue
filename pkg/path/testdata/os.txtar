@@ -152,57 +152,57 @@ Volume: [_]: {
 }
 
 -- out/path --
-#OSes: ["unix", "windows", "plan9"]
+#OSes:  ["unix", "windows", "plan9"]
 #AnyOS: "unix" | "windows" | "plan9"
 Split: {
 	unix: {
-		"/foo/bar/baz": ["/foo/bar/", "baz"]
-		"a/b": ["a/", "b"]
-		"//host/share/foo": ["//host/share/", "foo"]
+		"/foo/bar/baz":         ["/foo/bar/", "baz"]
+		"a/b":                  ["a/", "b"]
+		"//host/share/foo":     ["//host/share/", "foo"]
 		"\\\\host\\share\\foo": ["", "\\\\host\\share\\foo"]
-		"c:/foo/bar": ["c:/foo/", "bar"]
-		"c:\\foo\\bar": ["", "c:\\foo\\bar"]
+		"c:/foo/bar":           ["c:/foo/", "bar"]
+		"c:\\foo\\bar":         ["", "c:\\foo\\bar"]
 	}
 	plan9: {
-		"/foo/bar/baz": ["/foo/bar/", "baz"]
-		"a/b": ["a/", "b"]
-		"//host/share/foo": ["//host/share/", "foo"]
+		"/foo/bar/baz":         ["/foo/bar/", "baz"]
+		"a/b":                  ["a/", "b"]
+		"//host/share/foo":     ["//host/share/", "foo"]
 		"\\\\host\\share\\foo": ["", "\\\\host\\share\\foo"]
-		"c:/foo/bar": ["c:/foo/", "bar"]
-		"c:\\foo\\bar": ["", "c:\\foo\\bar"]
+		"c:/foo/bar":           ["c:/foo/", "bar"]
+		"c:\\foo\\bar":         ["", "c:\\foo\\bar"]
 	}
 	windows: {
-		"/foo/bar/baz": ["/foo/bar/", "baz"]
-		"a/b": ["a/", "b"]
-		"//host/share/foo": ["//host/share/", "foo"]
+		"/foo/bar/baz":         ["/foo/bar/", "baz"]
+		"a/b":                  ["a/", "b"]
+		"//host/share/foo":     ["//host/share/", "foo"]
 		"\\\\host\\share\\foo": ["\\\\host\\share\\", "foo"]
-		"c:/foo/bar": ["c:/foo/", "bar"]
-		"c:\\foo\\bar": ["c:\\foo\\", "bar"]
+		"c:/foo/bar":           ["c:/foo/", "bar"]
+		"c:\\foo\\bar":         ["c:\\foo\\", "bar"]
 	}
 	default: {
-		"/foo/bar/baz": ["/foo/bar/", "baz"]
-		"a/b": ["a/", "b"]
-		"//host/share/foo": ["//host/share/", "foo"]
+		"/foo/bar/baz":         ["/foo/bar/", "baz"]
+		"a/b":                  ["a/", "b"]
+		"//host/share/foo":     ["//host/share/", "foo"]
 		"\\\\host\\share\\foo": ["", "\\\\host\\share\\foo"]
-		"c:/foo/bar": ["c:/foo/", "bar"]
-		"c:\\foo\\bar": ["", "c:\\foo\\bar"]
+		"c:/foo/bar":           ["c:/foo/", "bar"]
+		"c:\\foo\\bar":         ["", "c:\\foo\\bar"]
 	}
 }
 SplitList: {
 	unix: {
-		"a:b": ["a", "b"]
+		"a:b":      ["a", "b"]
 		"a\u0000b": ["a\u0000b"]
-		"a;b": ["a;b"]
+		"a;b":      ["a;b"]
 	}
 	plan9: {
-		"a:b": ["a:b"]
+		"a:b":      ["a:b"]
 		"a\u0000b": ["a", "b"]
-		"a;b": ["a;b"]
+		"a;b":      ["a;b"]
 	}
 	windows: {
-		"a:b": ["a:b"]
+		"a:b":      ["a:b"]
 		"a\u0000b": ["a\u0000b"]
-		"a;b": ["a", "b"]
+		"a;b":      ["a", "b"]
 	}
 }
 Clean: {
@@ -225,48 +225,24 @@ Clean: {
 }
 Match: {
 	unix: {
-		"*c": {
-			abc: true
-		}
-		"*.txt": {
-			"a/b.txt": false
-		}
-		"*.zip": {
-			"c:\\a\\b\\file.zip": true
-		}
+		"*c": abc:                     true
+		"*.txt": "a/b.txt":            false
+		"*.zip": "c:\\a\\b\\file.zip": true
 	}
 	plan9: {
-		"*c": {
-			abc: true
-		}
-		"*.txt": {
-			"a/b.txt": false
-		}
-		"*.zip": {
-			"c:\\a\\b\\file.zip": true
-		}
+		"*c": abc:                     true
+		"*.txt": "a/b.txt":            false
+		"*.zip": "c:\\a\\b\\file.zip": true
 	}
 	windows: {
-		"*c": {
-			abc: true
-		}
-		"*.txt": {
-			"a/b.txt": true
-		}
-		"*.zip": {
-			"c:\\a\\b\\file.zip": false
-		}
+		"*c": abc:                     true
+		"*.txt": "a/b.txt":            true
+		"*.zip": "c:\\a\\b\\file.zip": false
 	}
 	default: {
-		"*c": {
-			abc: true
-		}
-		"*.txt": {
-			"a/b.txt": false
-		}
-		"*.zip": {
-			"c:\\a\\b\\file.zip": true
-		}
+		"*c": abc:                     true
+		"*.txt": "a/b.txt":            false
+		"*.zip": "c:\\a\\b\\file.zip": true
 	}
 }
 Slash: {
@@ -385,60 +361,36 @@ Ext: {
 }
 Resolve: {
 	unix: {
-		"a/b/c": {
-			"d/e": "a/b/c/d/e"
-		}
-		"/a/b": {
-			"/c/d": "/c/d"
-		}
-		"c:/a": {
-			"d:\\": "c:/a/d:\\"
-		}
+		"a/b/c": "d/e": "a/b/c/d/e"
+		"/a/b": "/c/d": "/c/d"
+		"c:/a": "d:\\": "c:/a/d:\\"
 		"//home/user/foo": {
 			bar:               "/home/user/foo/bar"
 			"//other/abs/foo": "/other/abs/foo"
 		}
 	}
 	plan9: {
-		"a/b/c": {
-			"d/e": "a/b/c/d/e"
-		}
-		"/a/b": {
-			"/c/d": "/c/d"
-		}
-		"c:/a": {
-			"d:\\": "c:/a/d:\\"
-		}
+		"a/b/c": "d/e": "a/b/c/d/e"
+		"/a/b": "/c/d": "/c/d"
+		"c:/a": "d:\\": "c:/a/d:\\"
 		"//home/user/foo": {
 			bar:               "/home/user/foo/bar"
 			"//other/abs/foo": "/other/abs/foo"
 		}
 	}
 	windows: {
-		"a/b/c": {
-			"d/e": "a\\b\\c\\d\\e"
-		}
-		"/a/b": {
-			"/c/d": "\\a\\b\\c\\d"
-		}
-		"c:/a": {
-			"d:\\": "d:\\"
-		}
+		"a/b/c": "d/e": "a\\b\\c\\d\\e"
+		"/a/b": "/c/d": "\\a\\b\\c\\d"
+		"c:/a": "d:\\": "d:\\"
 		"//home/user/foo": {
 			bar:               "\\\\home\\user\\foo\\bar"
 			"//other/abs/foo": "\\\\other\\abs\\foo"
 		}
 	}
 	default: {
-		"a/b/c": {
-			"d/e": "a/b/c/d/e"
-		}
-		"/a/b": {
-			"/c/d": "/c/d"
-		}
-		"c:/a": {
-			"d:\\": "c:/a/d:\\"
-		}
+		"a/b/c": "d/e": "a/b/c/d/e"
+		"/a/b": "/c/d": "/c/d"
+		"c:/a": "d:\\": "c:/a/d:\\"
 		"//home/user/foo": {
 			"//other/abs/foo": "/other/abs/foo"
 			bar:               "/home/user/foo/bar"

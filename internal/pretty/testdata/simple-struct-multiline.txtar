@@ -1,0 +1,15 @@
+# Multi-line input: parser gives Newline RelPos.
+# With RelPos: Newline is honoured, stays multi-line even at width 80.
+# Without RelPos: fits on one line.
+-- in.cue --
+{
+	a: 1
+	b: 2
+}
+-- out/relpos --
+{
+	a: 1
+	b: 2
+}
+-- out/norelpos --
+{a: 1, b: 2}

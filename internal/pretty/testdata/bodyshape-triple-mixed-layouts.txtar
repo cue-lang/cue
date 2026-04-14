@@ -1,0 +1,29 @@
+# A width chosen so the three levels of nesting each pick a
+# different shape, demonstrating that per-level [docBodyShape]
+# can produce arbitrarily mixed cascades.
+#
+# At width 30:
+#   - outermost flat (~40 chars) does not fit; body flat (~34) does
+#     not fit at indent+1 (avail = 26) -> outer picks the hug shape.
+#   - middle (force-broken via outer's [docNextGroupNoop]): body
+#     flat `[{a:_}, {b:_}], {c:_}` = 24 <= avail 26 -> middle picks
+#     the indented shape; its body renders inline at indent+1.
+#   - innermost (a cell of middle's indented body, which renders in
+#     modeFlat): its own [docBodyShape] is entered in modeFlat,
+#     so it takes the flat-shape path - just renders the body flat.
+#     The result is `[{a:_}, {b:_}]` inline at depth 2.
+#
+# So the cascade is: hug -> indented -> flat across the three levels,
+# none of them all-the-same.
+-- config --
+width: 30
+-- in.cue --
+x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
+-- out/relpos --
+x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
+-- out/norelpos --
+x: [[
+	[{a: _}, {b: _}], {c: _},
+], {
+	d: _
+}]

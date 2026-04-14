@@ -192,9 +192,9 @@ var p = &pkg.Package{
 		target:   !=""
 	}
 	Glob: {
-		$id:  _id
-		_id:  "tool/file.Glob"
-		glob: !=""
+		$id:   _id
+		_id:   "tool/file.Glob"
+		glob:  !=""
 		files: [...string]
 	}
 	Mkdir: {

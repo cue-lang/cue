@@ -1,0 +1,15 @@
+# An outer list whose first element is a multi-line list does not gain
+# a spurious trailing comma. The outer list itself has no direct
+# newline intent (its `]` is on the same line as the last element), so
+# no trailing comma should appear before the outer `]`. The inner list,
+# which the user wrote multi-line, keeps its own trailing comma.
+-- in.cue --
+x: [[
+	"go",
+], b]
+-- out/relpos --
+x: [[
+	"go",
+], b]
+-- out/norelpos --
+x: [["go"], b]

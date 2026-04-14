@@ -1,0 +1,19 @@
+# A doc comment on a list element is preserved.
+-- in.cue --
+[
+// doc on elem
+   1,
+	2,
+]
+-- out/relpos --
+[
+	// doc on elem
+	1,
+	2,
+]
+-- out/norelpos --
+[
+	// doc on elem
+	1,
+	2,
+]

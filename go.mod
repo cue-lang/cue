@@ -7,7 +7,7 @@ require (
 	github.com/cockroachdb/apd/v3 v3.2.3
 	github.com/coder/websocket v1.8.14
 	github.com/emicklei/proto v1.14.3
-	github.com/go-quicktest/qt v1.101.0
+	github.com/go-quicktest/qt v1.102.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
@@ -15,7 +15,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/pelletier/go-toml/v2 v2.3.0
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20260217160748-a481f6a22f94
-	github.com/rogpeppe/go-internal v1.14.2-0.20260415112238-aa1b1e25579a
+	github.com/rogpeppe/go-internal v1.14.2-0.20260417101104-5cab5df19260
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/tetratelabs/wazero v1.11.0

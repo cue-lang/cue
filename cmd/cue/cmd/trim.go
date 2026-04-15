@@ -98,7 +98,7 @@ func runTrim(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	binst := loadFromArgs(args, defCfg.loadCfg)
+	binst := loadFromArgs(cmd, args, defCfg.loadCfg)
 	if binst == nil {
 		return nil
 	}

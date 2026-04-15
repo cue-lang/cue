@@ -1,0 +1,13 @@
+metadata foo.com/bar/hello@v0.2.3 org.cuelang.vcs-type=git org.cuelang.vcs-commit=abc123def456 org.cuelang.vcs-commit-time=2024-07-15T10:30:00Z
+
+-- foo.com_bar_hello_v0.2.3/_module_meta.json --
+{
+    "org.cuelang.vcs-type": "git",
+    "org.cuelang.vcs-commit": "abc123def456",
+    "org.cuelang.vcs-commit-time": "2024-07-15T10:30:00Z"
+}
+-- foo.com_bar_hello_v0.2.3/cue.mod/module.cue --
+module: "foo.com/bar/hello@v0"
+language: version: "v0.8.0"
+-- foo.com_bar_hello_v0.2.3/x.cue --
+package hello

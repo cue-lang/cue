@@ -354,7 +354,7 @@ func pushContent(ctx context.Context, client *modregistry.Client, mods map[modul
 			if err := m.writeZip(&zipContent); err != nil {
 				return err
 			}
-			if err := client.PutModule(ctx, v, bytes.NewReader(zipContent.Bytes()), int64(zipContent.Len())); err != nil {
+			if err := client.PutModuleWithMetadata(ctx, v, bytes.NewReader(zipContent.Bytes()), int64(zipContent.Len()), m.metadata); err != nil {
 				return err
 			}
 			pushed[v] = true
@@ -448,6 +448,14 @@ func getModules(fsys fs.FS) (map[module.Version]*moduleContent, []byte, error) {
 		if err != nil {
 			return err
 		}
+		if rest == moduleMetaFile {
+			var meta modregistry.Metadata
+			if err := json.Unmarshal(data, &meta); err != nil {
+				return fmt.Errorf("cannot parse %s in %s: %v", moduleMetaFile, modver, err)
+			}
+			content.metadata = &meta
+			return nil
+		}
 		content.files = append(content.files, txtar.File{
 			Name: rest,
 			Data: data,
@@ -469,14 +477,17 @@ func getModules(fsys fs.FS) (map[module.Version]*moduleContent, []byte, error) {
 }
 
 type moduleContent struct {
-	version module.Version
-	files   []txtar.File
-	modFile *modfile.File
+	version  module.Version
+	files    []txtar.File
+	modFile  *modfile.File
+	metadata *modregistry.Metadata
 }
 
 func (c *moduleContent) writeZip(w io.Writer) error {
 	return modzip.Create(w, c.version, c.files, txtarFileIO{})
 }
+
+const moduleMetaFile = "_module_meta.json"
 
 func (c *moduleContent) init(versDir string) error {
 	found := false

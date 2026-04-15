@@ -76,6 +76,7 @@ Available Commands:
   import      convert other formats to CUE files
   login       log into a CUE registry
   mod         module maintenance
+  plugin      manage Go plugins
   trim        remove superfluous fields
   version     print the CUE version and build information
   vet         validate data

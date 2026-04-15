@@ -73,7 +73,7 @@ Examples:
 
 			var foundBadlyFormatted bool
 			if !flagFiles.Bool(cmd) { // format packages
-				builds := loadFromArgs(args, &load.Config{
+				builds := loadFromArgs(cmd, args, &load.Config{
 					Tests:       true,
 					Tools:       true,
 					AllCUEFiles: true,

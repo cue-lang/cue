@@ -59,12 +59,14 @@ func getLang() language.Tag {
 	return language.Make(loc)
 }
 
-func loadFromArgs(args []string, cfg *load.Config) []*build.Instance {
+func loadFromArgs(cmd *Command, args []string, cfg *load.Config) []*build.Instance {
+	if err := checkPlugin(cmd); err != nil {
+		return []*build.Instance{{Err: errors.Promote(err, "")}}
+	}
 	binst := load.Instances(args, cfg)
 	if len(binst) == 0 {
 		return nil
 	}
-
 	return binst
 }
 
@@ -498,7 +500,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		return nil, err
 	}
 
-	builds := loadFromArgs(args, cfg.loadCfg)
+	builds := loadFromArgs(cmd, args, cfg.loadCfg)
 	if builds == nil {
 		return nil, errors.Newf(token.NoPos, "invalid args")
 	}
@@ -782,7 +784,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	loadCfg.Tools = true
 	setTags(&loadCfg, cmd.cmdCmd.Flags())
 
-	binst := loadFromArgs(args, &loadCfg)
+	binst := loadFromArgs(cmd, args, &loadCfg)
 	if len(binst) == 0 {
 		return nil, nil
 	}

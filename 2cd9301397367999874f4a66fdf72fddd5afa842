@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08f46b6d_24a644a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-15T09:16:51Z",
+      "side": 1,
+      "message": "LGTM with one thought.",
+      "revId": "2cd9301397367999874f4a66fdf72fddd5afa842",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70e56b4e_e3e29b6b",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_http.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-15T09:16:51Z",
+      "side": 1,
+      "message": "I know it\u0027s not part of the regression here, but it would be kinda nice to have something that demonstrated that the header does actually end up in the request.",
+      "revId": "2cd9301397367999874f4a66fdf72fddd5afa842",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

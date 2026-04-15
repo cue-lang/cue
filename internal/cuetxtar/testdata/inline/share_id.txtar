@@ -1,0 +1,56 @@
+# Tests @test(shareID=name) vertex-sharing assertions (positive/passing cases).
+# Negative cases (checking that non-shared vertices are rejected) are in
+# TestRunShareIDChecks_Negative which calls runShareIDChecks directly.
+-- in/test.cue --
+// p and q both reference g — same vertex
+g: {x: 1, y: 2}
+p: g @test(shareID=V)
+q: g @test(shareID=V)
+
+// shareID inside @test(eq, {...}) body
+root: {
+	a: {x: 1}
+	b: a
+	@test(eq, {
+		a: {x: 1} @test(shareID=AB)
+		b: a       @test(shareID=AB)
+	})
+}
+
+// Solo shareID annotation is silently skipped (no pair to compare against)
+solo: {x: 1} @test(shareID=SOLO)
+
+// l[0] is the same vertex as a because l: [a]
+a: {x: 1}
+l: [a] @test(shareID=EL, at=0)
+m: a   @test(shareID=EL)
+
+// shareID inside eq body with at=0 for list element
+listRoot: {
+	la: {x: 1}
+	ll: [la]
+	@test(eq, {
+		la: {x: 1}   @test(shareID=LAB)
+		ll: [la]     @test(shareID=LAB, at=0)
+	})
+}
+
+// Nested fields across different roots — both inner fields reference g2
+g2: {x: 1}
+outer1: {inner: g2 @test(shareID=W)}
+outer2: {inner: g2 @test(shareID=W)}
+
+// at=selector for dynamic key: def and dyn_a share the same vertex
+k: "a"
+X: {
+	def: {x: 1} @test(shareID=D)
+	"dyn_\(k)": def @test(shareID=D, at=dyn_a)
+}
+
+// Sharing across different nesting depths
+g3: {x: 1} @test(shareID=Z)
+pz: g3          @test(shareID=Z)
+outerZ: {qz: g3 @test(shareID=Z)}
+-- out/status.txt --
+update: identical to input
+force:  identical to update

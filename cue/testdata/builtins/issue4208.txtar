@@ -15,7 +15,7 @@ invalid: #Envs
 invalid: foo: {} @test(err, code=eval, contains="field not allowed", incorrect) @test(err:todo, code=eval, contains="Must specify a valid environment")
 
 
-@test(debug, #"""
+@test(debug, """
 	(_|_){
 	  // [eval]
 	  #Environment: (string){ |((string){ "sbx" }, (string){ "stg" }, (string){ "pro" }) }
@@ -33,7 +33,7 @@ invalid: foo: {} @test(err, code=eval, contains="field not allowed", incorrect) 
 	    }
 	  }
 	}
-	"""#)
+	""")
 
 -- out/errors.txt --
 [eval] invalid.foo: field not allowed:

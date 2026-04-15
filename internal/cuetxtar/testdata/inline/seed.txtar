@@ -1,0 +1,6 @@
+-- in/test.cue --
+a: 1 @test(eq)
+-- out/update/test.cue --
+a: 1 @test(eq, 1)
+-- out/status.txt --
+force:  identical to update

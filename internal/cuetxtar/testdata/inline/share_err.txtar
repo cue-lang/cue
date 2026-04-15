@@ -1,0 +1,8 @@
+-- in/test.cue --
+x: int @test(shareID=S)
+y: int @test(shareID=S)
+-- out/run/errors.txt --
+@test(shareID=S): x and y are not shared (different vertices)
+-- out/status.txt --
+update: identical to input
+force:  identical to update

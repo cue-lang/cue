@@ -1,0 +1,20 @@
+# Tests @test(err, suberr=(...)) sub-error matching.
+# A disjunction unified with a conflicting closed struct produces two sub-errors;
+# suberr=() specs are matched order-independently against the actual sub-errors.
+-- in/test.cue --
+#empty: {}
+
+// Both sub-errors matched in declaration order
+x: null | {n: 3}
+x: #empty & {n: 3} @test(err, code=eval,
+	suberr=(contains="conflicting values"),
+	suberr=(contains="not allowed"))
+
+// Both sub-errors matched in reversed order (order-independent matching)
+y: null | {n: 3}
+y: #empty & {n: 3} @test(err, code=eval,
+	suberr=(contains="not allowed"),
+	suberr=(contains="conflicting values"))
+-- out/status.txt --
+update: identical to input
+force:  identical to update

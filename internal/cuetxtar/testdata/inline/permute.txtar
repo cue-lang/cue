@@ -1,0 +1,30 @@
+# Tests @test(permute) assertions.
+# Two-field permute: a and b are permuted, c is not. The eq on myStruct
+# must pass for both declaration orderings of a and b.
+# Single-field permute: only one field marked, nothing to permute; silently
+# skipped (no error produced).
+-- in/test.cue --
+// Two-field permute: a=b+1 and b=2 are permuted; c=99 is not.
+myStruct: {
+	a: b + 1 @test(permute)
+	b: 2 @test(permute)
+	c: 99
+	@test(permuteCount)
+} @test(eq, {a: 3, b: 2, c: 99})
+
+// Single permute field: nothing to permute, silently skipped.
+single: {a: 1 @test(permute), b: 2} @test(eq, {a: 1, b: 2})
+-- out/status.txt --
+update: output passes run
+force:  identical to update
+-- out/update/test.cue --
+// Two-field permute: a=b+1 and b=2 are permuted; c=99 is not.
+myStruct: {
+	a: b + 1 @test(permute)
+	b: 2 @test(permute)
+	c: 99
+	@test(permuteCount, 2)
+} @test(eq, {a: 3, b: 2, c: 99})
+
+// Single permute field: nothing to permute, silently skipped.
+single: {a: 1 @test(permute), b: 2} @test(eq, {a: 1, b: 2})

@@ -497,7 +497,8 @@ issue3891: reduced: {
 	{x: _} | null
 	{x: _} | null
 	x: *a.y | _
-	a: b
+	a: b @test(shareID=r3891ab)
+	@test(shareID=r3891ab, at=b)
 	b: y: 1
 	@test(eq, {x: *1 | _, a: {y: 1}, b: {y: 1}})
 }

@@ -7,9 +7,10 @@
 	[string]: #PatientViewSection
 }
 
-#PatientViewSection: #PvSection
+#PatientViewSection: #PvSection @test(shareID=pvSection)
 
 #PvSection: {
+	@test(shareID=pvSection)
 	Section: {
 		display?: string
 		entries:  #PatientViewEntries

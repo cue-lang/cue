@@ -33,6 +33,24 @@
       "message": "I know it\u0027s not part of the regression here, but it would be kinda nice to have something that demonstrated that the header does actually end up in the request.",
       "revId": "2cd9301397367999874f4a66fdf72fddd5afa842",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14559c1b_7aef9456",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_http.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-15T13:04:19Z",
+      "side": 1,
+      "message": "good point; moved to a unit test that does check both forms. it still covers the CUE input.",
+      "parentUuid": "70e56b4e_e3e29b6b",
+      "revId": "2cd9301397367999874f4a66fdf72fddd5afa842",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

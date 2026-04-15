@@ -1,0 +1,14 @@
+# Test that cue plugin build reports when no plugins are needed.
+
+exec cue plugin build
+stderr 'no plugins needed'
+! exists cue.mod/plugin
+
+-- cue.mod/module.cue --
+module: "test.example@v0"
+language: version: "v0.17.0"
+
+-- main.cue --
+package main
+
+x: 42

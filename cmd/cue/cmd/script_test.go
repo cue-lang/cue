@@ -99,7 +99,51 @@ func TestLatest(t *testing.T) {
 	}
 }
 
+// cueSourceRoot returns the root directory of the cuelang.org/go source tree.
+// It searches upward from the current directory for go.mod.
+func cueSourceRoot(t *testing.T) string {
+	t.Helper()
+	dir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			t.Fatal("cannot find cuelang.org/go module root")
+		}
+		dir = parent
+	}
+}
+
+//// sharedTestGoModCache returns a stable-path GOMODCACHE directory shared
+//// across all TestScript sub-tests, pre-populated with the current
+//// module's dependencies. Using a stable path ensures the Go build cache
+//// (GOCACHE) entries remain valid across test runs.
+//func sharedTestGoModCache(t *testing.T, srcRoot string) string {
+//	cacheDir := t.TempDir()
+//	// Pre-populate with all dependencies of the CUE module so that
+//	// parallel test execution doesn't contend on downloads.
+//	cmd := exec.Command("go", "mod", "download", cueversion.ModuleVersion().Path)
+//	cmd.Dir = srcRoot
+//	cmd.Env = append(os.Environ(), "GOMODCACHE="+dir)
+//	if out, err := cmd.CombinedOutput(); err != nil {
+//		t.Fatalf("pre-populating GOMODCACHE: %v\n%s", err, out)
+//	}
+//	return dir
+//}
+
 func TestScript(t *testing.T) {
+	srcRoot := cueSourceRoot(t)
+	// Use a shared GOMODCACHE across all sub-tests at a stable path, so
+	// that Go build cache entries (keyed on source file paths) remain valid
+	// both across sub-tests and across test runs. Without this, each test
+	// gets an empty GOMODCACHE at a unique path, causing full recompilation
+	// of all dependencies in tests that run `go build` (like the plugin tests).
+	//sharedGoModCache := sharedTestGoModCache(t, srcRoot)
 	p := testscript.Params{
 		Dir:                 filepath.Join("testdata", "script"),
 		UpdateScripts:       cuetest.UpdateGoldenFiles,
@@ -367,6 +411,15 @@ func TestScript(t *testing.T) {
 				"CUE_LANGUAGE_VERSION="+cueversion.LanguageVersion(),
 				// A later language version which only increases the bugfix release, e.g. v0.10.99.
 				"CUE_LANGUAGE_VERSION_BUGFIX="+semver.MajorMinor(cueversion.LanguageVersion())+".99",
+
+				// Provide the source root for cue plugin build tests so
+				// the generated go.mod can use a replace directive.
+				"CUE_PLUGIN_CUE_REPLACE="+srcRoot,
+
+				// Override GOMODCACHE so all sub-tests share one module
+				// cache directory instead of each deriving an empty one
+				// from its isolated GOPATH.
+				//"GOMODCACHE="+sharedGoModCache,
 			)
 			entries, err := os.ReadDir(e.WorkDir)
 			if err != nil {

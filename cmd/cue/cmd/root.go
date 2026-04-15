@@ -300,6 +300,7 @@ func New(args []string, options ...cuecontext.Option) (*Command, error) {
 		newImportCmd(c),
 		newLoginCmd(c),
 		newModCmd(c),
+		newPluginCmd(c),
 		newRefactorCmd(c),
 		newTrimCmd(c),
 		newVersionCmd(c),
@@ -344,6 +345,10 @@ func MainWithOptions(options ...cuecontext.Option) int {
 	)
 	exitCode := 0
 	if err := cmd.Run(ctx); err != nil {
+		var npe *needPluginError
+		if errors.As(err, &npe) {
+			return execPlugin(npe)
+		}
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{
 				Cwd:     rootWorkingDir(),

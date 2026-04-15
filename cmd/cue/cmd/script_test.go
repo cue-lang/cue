@@ -99,7 +99,28 @@ func TestLatest(t *testing.T) {
 	}
 }
 
+// cueSourceRoot returns the root directory of the cuelang.org/go source tree.
+// It searches upward from the current directory for go.mod.
+func cueSourceRoot(t *testing.T) string {
+	t.Helper()
+	dir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			t.Fatal("cannot find cuelang.org/go module root")
+		}
+		dir = parent
+	}
+}
+
 func TestScript(t *testing.T) {
+	srcRoot := cueSourceRoot(t)
 	p := testscript.Params{
 		Dir:                 filepath.Join("testdata", "script"),
 		UpdateScripts:       cuetest.UpdateGoldenFiles,
@@ -367,6 +388,10 @@ func TestScript(t *testing.T) {
 				"CUE_LANGUAGE_VERSION="+cueversion.LanguageVersion(),
 				// A later language version which only increases the bugfix release, e.g. v0.10.99.
 				"CUE_LANGUAGE_VERSION_BUGFIX="+semver.MajorMinor(cueversion.LanguageVersion())+".99",
+
+				// Provide the source root for cue plugin build tests so
+				// the generated go.mod can use a replace directive.
+				"CUE_PLUGIN_CUE_REPLACE="+srcRoot,
 			)
 			entries, err := os.ReadDir(e.WorkDir)
 			if err != nil {

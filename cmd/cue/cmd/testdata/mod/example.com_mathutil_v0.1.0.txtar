@@ -1,0 +1,17 @@
+-- .mod --
+module example.com/mathutil
+
+-- .info --
+{"Version":"v0.1.0","Time":"2024-01-01T00:00:00Z"}
+
+-- go.mod --
+module example.com/mathutil
+
+go 1.21
+
+-- mathutil.go --
+package mathutil
+
+func Add(a, b int) (int, error) {
+	return a + b, nil
+}

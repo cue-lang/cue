@@ -1,0 +1,19 @@
+-- .mod --
+module example.com/strutil
+
+-- .info --
+{"Version":"v0.1.0","Time":"2024-01-01T00:00:00Z"}
+
+-- go.mod --
+module example.com/strutil
+
+go 1.21
+
+-- strutil.go --
+package strutil
+
+import "strings"
+
+func Upper(s string) (string, error) {
+	return strings.ToUpper(s), nil
+}

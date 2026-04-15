@@ -7,7 +7,7 @@ require (
 	github.com/cockroachdb/apd/v3 v3.2.3
 	github.com/coder/websocket v1.8.14
 	github.com/emicklei/proto v1.14.3
-	github.com/go-quicktest/qt v1.101.0
+	github.com/go-quicktest/qt v1.102.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
@@ -39,6 +39,8 @@ require (
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
+
+replace github.com/rogpeppe/go-internal => /home/rogpeppe/src/go-internal
 
 tool (
 	cuelang.org/go/cmd/cue

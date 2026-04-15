@@ -1,0 +1,93 @@
+# Tests @test(todo) and variant directives (eq:todo, err:todo, kind:todo).
+# All cases produce no run errors: todo suppresses failures, and a passing todo
+# only logs a warning (t.Logf, not captured in errors.txt).
+// TODO(inline): we should get rid of @test(todo). As it turns out, we
+// exclusively use @test(directive:todo) variants.
+// TODO(inline): would be good to capture the warning and put them in a log
+// as well.
+-- in/test.cue --
+// @test(todo) suppresses a failing @test(eq) — 42 != 99 normally fails
+suppressFailingEq: 42 @test(eq, 99) @test(todo)
+
+// @test(todo) with a passing @test(eq) — passes normally, warning logged
+todoPassingEq: 42 @test(eq, 42) @test(todo)
+
+// @test(todo) with priority and why flags
+todoWithFlags: 42 @test(eq, 99) @test(todo, p=1, why="known issue")
+
+// @test(todo) suppresses a failing @test(err) — 42 is not an error
+suppressFailingErr: 42 @test(err) @test(todo)
+
+// @test(eq:todo, X) where value != X: silent non-failure
+eqTodoStillFailing: 42 @test(eq, 42) @test(eq:todo, 99)
+
+// @test(eq:todo, X) where value == X: warning logged, no failure
+eqTodoPassing: 42 @test(eq, 42) @test(eq:todo, 42)
+
+// @test(eq, ...) and @test(eq:todo, ...) coexist independently
+eqAndEqTodoCoexist: 42 @test(eq, 42) @test(eq:todo, 99)
+
+// @test(err:todo) where value is not an error: silent non-failure
+errTodoStillFailing: 42 @test(err:todo, code=eval)
+
+// @test(err:todo) where value IS an error: warning logged, no failure
+errTodoPassing: 1 & 2 @test(err:todo, code=eval)
+
+// @test(err:todo) with priority flag
+errTodoWithPriority: 42 @test(err:todo, p=1, code=eval)
+
+// @test(kind:todo=int) where kind is float: silent non-failure
+kindTodoStillFailing: 1.0 @test(kind:todo=int)
+
+// @test(kind:todo=int) where kind matches: warning logged, no failure
+kindTodoPassing: int @test(kind:todo=int)
+
+// @test(eq, X, incorrect) where value == X: logs note, no failure
+eqIncorrectPassing: 42 @test(eq, 42, incorrect)
+
+// @test(eq, X, incorrect) and @test(err:todo) coexist
+eqIncorrectAndErrTodo: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)
+-- out/status.txt --
+update: identical to input
+-- out/force/test.cue --
+// @test(todo) suppresses a failing @test(eq) — 42 != 99 normally fails
+suppressFailingEq: 42 @test(eq, 42) @test(todo)
+
+// @test(todo) with a passing @test(eq) — passes normally, warning logged
+todoPassingEq: 42 @test(eq, 42) @test(todo)
+
+// @test(todo) with priority and why flags
+todoWithFlags: 42 @test(eq, 42) @test(todo, p=1, why="known issue")
+
+// @test(todo) suppresses a failing @test(err) — 42 is not an error
+suppressFailingErr: 42 @test(err) @test(todo)
+
+// @test(eq:todo, X) where value != X: silent non-failure
+eqTodoStillFailing: 42 @test(eq, 42) @test(eq:todo, 99)
+
+// @test(eq:todo, X) where value == X: warning logged, no failure
+eqTodoPassing: 42 @test(eq, 42) @test(eq:todo, 42)
+
+// @test(eq, ...) and @test(eq:todo, ...) coexist independently
+eqAndEqTodoCoexist: 42 @test(eq, 42) @test(eq:todo, 99)
+
+// @test(err:todo) where value is not an error: silent non-failure
+errTodoStillFailing: 42 @test(err:todo, code=eval)
+
+// @test(err:todo) where value IS an error: warning logged, no failure
+errTodoPassing: 1 & 2 @test(err:todo, code=eval)
+
+// @test(err:todo) with priority flag
+errTodoWithPriority: 42 @test(err:todo, p=1, code=eval)
+
+// @test(kind:todo=int) where kind is float: silent non-failure
+kindTodoStillFailing: 1.0 @test(kind:todo=int)
+
+// @test(kind:todo=int) where kind matches: warning logged, no failure
+kindTodoPassing: int @test(kind:todo=int)
+
+// @test(eq, X, incorrect) where value == X: logs note, no failure
+eqIncorrectPassing: 42 @test(eq, 42, incorrect)
+
+// @test(eq, X, incorrect) and @test(err:todo) coexist
+eqIncorrectAndErrTodo: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)

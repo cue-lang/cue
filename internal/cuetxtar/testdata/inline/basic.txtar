@@ -1,0 +1,42 @@
+# Tests basic passing assertions: eq, err, kind=, closed, leq, builtin validators,
+# and selector references. Each case exercises a distinct directive handler in
+# the inline runner's runDirective dispatcher.
+-- in/test.cue --
+import (
+	"math"
+	"struct"
+)
+
+// eq: concrete values
+intEq: 42      @test(eq, 42)
+strEq: "hello" @test(eq, "hello")
+
+// err: conflict error detected
+errField: 1 & 2 @test(err, code=eval,
+	contains="conflicting values %s and %s", args=[2, 1], pos=[0:11, 0:15]
+)
+
+// kind=: abstract type check
+kindInt:     int @test(kind=int)
+kindIntFail: int @test(kind=string)
+
+// closed: close({}) makes struct closed
+closedStruct: close({a: 1}) @test(closed)
+
+// leq: 42 satisfies number constraint
+leqField: 42 @test(leq, number)
+
+// eq: builtin validator call expression
+maxFields: struct.MaxFields(2) & {} @test(eq, struct.MaxFields(2) & {})
+
+// eq: selector reference (math.Pi)
+piField: math.Pi @test(eq, math.Pi)
+
+// eq: incomplete field in struct — incompleteA.b is abstract, so incompleteA.b+3 is _|_
+incompleteA: {b: int}
+incompleteC: incompleteA & {b: 100, d: incompleteA.b + 3} @test(eq, {b: 100, d: _|_})
+-- out/status.txt --
+update: identical to input
+force:  identical to update
+-- out/run/errors.txt --
+path kindIntFail: @test(kind=string): got kind int, want string

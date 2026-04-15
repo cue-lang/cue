@@ -1,0 +1,9 @@
+// TODO(inline): hints should be shown in error messages when they exist.
+-- in/test.cue --
+hint1: 1 @test(eq, 2, hint="Sometimes 1 is just 2.")
+-- out/run/errors.txt --
+path hint1: expected 2, got 1
+-- out/force/test.cue --
+hint1: 1 @test(eq, 1)
+-- out/status.txt --
+update: identical to input

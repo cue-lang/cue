@@ -1,0 +1,90 @@
+# Tests @test(permute) assertions.
+# Two-field permute: a and b are permuted, c is not. The eq on myStruct
+# must pass for both declaration orderings of a and b.
+# Single-field permute: only one field marked, nothing to permute; silently
+# skipped (no error produced).
+-- in/test.cue --
+// Two-field permute: a=b+1 and b=2 are permuted; c=99 is not.
+myStruct: {
+	a: b + 1 @test(permute)
+	b: 2     @test(permute)
+	c: 99
+	@test(permuteCount)
+} @test(eq, {a: 3, b: 2, c: 99})
+
+// Single permute field: nothing to permute, silently skipped.
+single: {
+	a: 1 @test(permute)
+	b: 2
+	@test(permuteCount) // NOTE: Permute count not set because it skips.
+} @test(eq, {a: 1, b: 2})
+
+all: {
+	@test(permute)
+	a: 1
+	b: 2
+	c: 3
+	d: 4
+	@test(permuteCount)
+	@test(eq, {a: 1, b: 2, c: 3, d: 4})
+}
+
+// toposort in action..
+// TODO(inline): we could perhaps modify the original positions to throw off
+// toposort so that we can make this test fail. This would allow us to test
+// a negative case for permute.
+toposort: {
+	src: {
+		@test(permute)
+		@test(permuteCount)
+		a: 1
+		b: 2
+	}
+	_list: [ for x in src {x} ]
+	@test(eq, {src: {a: 1, b: 2}, _list: [1, 2]})
+}
+
+-- out/update/test.cue --
+// Two-field permute: a=b+1 and b=2 are permuted; c=99 is not.
+myStruct: {
+	a: b + 1 @test(permute)
+	b: 2     @test(permute)
+	c: 99
+	@test(permuteCount, 2)
+} @test(eq, {a: 3, b: 2, c: 99})
+
+// Single permute field: nothing to permute, silently skipped.
+single: {
+	a: 1 @test(permute)
+	b: 2
+	@test(permuteCount) // NOTE: Permute count not set because it skips.
+} @test(eq, {a: 1, b: 2})
+
+all: {
+	@test(permute)
+	a: 1
+	b: 2
+	c: 3
+	d: 4
+	@test(permuteCount, 24)
+	@test(eq, {a: 1, b: 2, c: 3, d: 4})
+}
+
+// toposort in action..
+// TODO(inline): we could perhaps modify the original positions to throw off
+// toposort so that we can make this test fail. This would allow us to test
+// a negative case for permute.
+toposort: {
+	src: {
+		@test(permute)
+		@test(permuteCount, 2)
+		a: 1
+		b: 2
+	}
+	_list: [ for x in src {x} ]
+	@test(eq, {src: {a: 1, b: 2}, _list: [1, 2]})
+}
+
+-- out/status.txt --
+update: output passes run
+force:  identical to update

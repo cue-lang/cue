@@ -1,0 +1,9 @@
+# Tests that fields without @test are silently skipped (not run as sub-tests)
+# but are still accessible to other test fields in the same archive.
+-- in/test.cue --
+// Plain fixture field in same file: no @test, not a sub-test, but accessible.
+fixture: {foo: 1}
+a: fixture.foo & int @test(eq, 1)
+-- out/status.txt --
+update: identical to input
+force:  identical to update

@@ -1,0 +1,6 @@
+-- in/test.cue --
+args:        1 & 2 @test(err, code=eval, args=[2, 1])
+argsReverse: 1 & 2 @test(err, code=eval, args=[1, 2])
+-- out/status.txt --
+update: identical to input
+force:  identical to update

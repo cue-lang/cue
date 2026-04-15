@@ -1,0 +1,32 @@
+# Tests @test(allows, <sel>) and @test(allows=false, <sel>) assertions.
+# allows passes when the selector is allowed by the value's type/constraint.
+# allows=false passes when the selector is NOT allowed.
+-- in/test.cue --
+// open list allows integer indices
+openList: [...] @test(allows, int)
+
+// open struct allows any field name
+openStruct: {a: 1} @test(allows, b)
+
+// closed struct denies unknown field — allows=false passes
+closedDenies: close({a: 1}) @test(allows=false, b)
+
+// closed struct does not allow unknown field — allows fails
+closedAllows: close({a: 1}) @test(allows, b)
+
+// closed struct allows known field — allows=false fails
+closedKnownField: close({a: 1}) @test(allows=false, a)
+
+// string-keyed closed struct does not allow int pattern — allows fails
+stringKeyInt: close({[string]: 1}) @test(allows, int)
+
+// allows on a scalar value fails (not a struct or list)
+scalarValue: 42 @test(allows, foo)
+-- out/run/errors.txt --
+path closedAllows: @test(allows, b): got Allows=false, want true
+path closedKnownField: @test(allows, a): got Allows=true, want false
+path stringKeyInt: @test(allows, int): got Allows=false, want true
+path scalarValue: @test(allows): directive only valid on struct or list values, got int
+-- out/status.txt --
+update: identical to input
+force:  identical to update

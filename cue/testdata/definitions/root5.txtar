@@ -33,7 +33,7 @@ x: {
 	}
 })
 // TODO(inline): fix sharing detection across hidden fields.
-@test(debug, #"""
+@test(debug, """
 	(#struct){
 	  _schema: ~(#Schema)
 	  #Schema: (#struct){
@@ -58,7 +58,7 @@ x: {
 	    c: (string){ "foo" }
 	  }
 	}
-	"""#)
+	""")
 -- out/eval/stats --
 Leaks:  0
 Freed:  16

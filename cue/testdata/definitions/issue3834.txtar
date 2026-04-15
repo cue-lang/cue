@@ -95,7 +95,7 @@ sub: t4: {
 		_a: _ | close({y!: z?: _})
 		_b: _a & {y: {}}
 		concrete: _b.y @test(eq, {})
-		@test(debug, #"""
+		@test(debug, """
 			(#struct){
 			  _a: (#struct){
 			    foo: (bool){ true }
@@ -108,7 +108,7 @@ sub: t4: {
 			  concrete: (#struct){
 			  }
 			}
-			"""#)
+			""")
 	}
 	#X
 

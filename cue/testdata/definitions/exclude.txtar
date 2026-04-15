@@ -5,7 +5,7 @@ excludeLet: {
 	// Two lets with the same name should not unify and checked by definition.
 	#D: { let X = {}, #foo: X, f: _ }
 	a: #D
-	a: { let X = { a: 1 }, f: X } @test(debugCheck, #"""
+	a: { let X = { a: 1 }, f: X } @test(debugCheck, """
 		(#struct){
 		  let X#2 = (struct){
 		    a: (int){ 1 }
@@ -18,7 +18,7 @@ excludeLet: {
 		  #foo: (#struct){
 		  }
 		}
-		"""#)
+		""")
 
 	@test(eq, {
 		#D: {

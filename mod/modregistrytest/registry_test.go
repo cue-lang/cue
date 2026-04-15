@@ -2,6 +2,7 @@ package modregistrytest
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -80,6 +81,39 @@ func runTest(t *testing.T, registry ociregistry.Interface, script string, ar *tx
 			}
 			if string(gotData) != string(wantData) {
 				t.Errorf("unexpected GET response\ngot %q\nwant %q", gotData, wantData)
+			}
+		case "metadata":
+			if len(args) < 3 {
+				t.Fatalf("usage: metadata $version key=value...")
+			}
+			mv, err := module.ParseVersion(args[1])
+			if err != nil {
+				t.Fatalf("invalid version %q in metadata", args[1])
+			}
+			m, err := client.GetModule(ctx, mv)
+			if err != nil {
+				t.Fatal(err)
+			}
+			meta, err := m.Metadata()
+			if err != nil {
+				t.Fatal(err)
+			}
+			gotData, err := json.Marshal(meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var gotMap map[string]string
+			if err := json.Unmarshal(gotData, &gotMap); err != nil {
+				t.Fatal(err)
+			}
+			for _, kv := range args[2:] {
+				k, v, ok := strings.Cut(kv, "=")
+				if !ok {
+					t.Fatalf("invalid key=value %q", kv)
+				}
+				if got := gotMap[k]; got != v {
+					t.Errorf("metadata %q: got %q, want %q", k, got, v)
+				}
 			}
 		default:
 			t.Fatalf("unknown command %q", line)

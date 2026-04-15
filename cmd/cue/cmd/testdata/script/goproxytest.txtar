@@ -27,3 +27,34 @@ module test
 go 1.14
 
 require externalmod.test/mixfiles v1.0.0
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/.mod --
+module externalmod.test/mixfiles
+
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/.info --
+{"Version":"v1.0.0","Time":"2018-10-22T18:45:39Z"}
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/go.mod --
+// A module which mixes CUE, Go, and other files, to be tested with `cue get go`.
+
+module externalmod.test/mixfiles
+
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/aa_first_noextension --
+Mix an uninteresting file at the beginning of the directory list
+to verify that we don't stop looking at the rest of the files.
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/code_one.go --
+package mixfiles
+
+// Some fruit
+const NameOne = "Orange"
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/code_two.go --
+package mixfiles
+
+const NameTwo = "Apple"
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/config_one.cue --
+package mixfiles
+
+Type: "Fruit"
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/config_two.cue --
+package mixfiles
+
+Type: string
+-- .gomodproxy/externalmod.test_mixfiles_v1.0.0/zz_last_noextension --

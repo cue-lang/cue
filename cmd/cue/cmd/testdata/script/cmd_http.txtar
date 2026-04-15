@@ -3,7 +3,36 @@ cmp stdout cmd_http.out
 -- cmd_http.out --
 {"Version":"v1.0.0","Time":"2018-10-22T18:45:39Z"}
 
+-- .gomodproxy/externalmod.test_imports_v1.0.0/.mod --
+module externalmod.test/imports
 
+-- .gomodproxy/externalmod.test_imports_v1.0.0/.info --
+{"Version":"v1.0.0","Time":"2018-10-22T18:45:39Z"}
+-- .gomodproxy/externalmod.test_imports_v1.0.0/go.mod --
+module externalmod.test/imports
+
+-- .gomodproxy/externalmod.test_imports_v1.0.0/root/p.go --
+package root
+
+import "externalmod.test/imports/sub1"
+
+type Type struct {
+	Sub1 sub1.Type
+}
+-- .gomodproxy/externalmod.test_imports_v1.0.0/sub1/p.go --
+package sub1
+
+import "externalmod.test/imports/sub2"
+
+type Type struct {
+	Sub2 sub2.Type
+}
+-- .gomodproxy/externalmod.test_imports_v1.0.0/sub2/p.go --
+package sub2
+
+type Type struct {
+	Leaf int
+}
 -- task_tool.cue --
 package home
 

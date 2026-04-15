@@ -100,7 +100,6 @@ func TestLatest(t *testing.T) {
 }
 
 func TestScript(t *testing.T) {
-	srv := goproxytest.NewTestServer(t, filepath.Join("testdata", "mod"), "")
 	p := testscript.Params{
 		Dir:                 filepath.Join("testdata", "script"),
 		UpdateScripts:       cuetest.UpdateGoldenFiles,
@@ -364,9 +363,6 @@ func TestScript(t *testing.T) {
 			}
 
 			e.Vars = append(e.Vars,
-				"GOPROXY="+srv.URL,
-				"GONOSUMDB=*", // GOPROXY is a private proxy
-
 				// The current language version which would be added by `cue mod init`, e.g. v0.10.0.
 				"CUE_LANGUAGE_VERSION="+cueversion.LanguageVersion(),
 				// A later language version which only increases the bugfix release, e.g. v0.10.99.
@@ -439,6 +435,7 @@ func TestScript(t *testing.T) {
 	if err := gotooltest.Setup(&p); err != nil {
 		t.Fatal(err)
 	}
+	goproxytest.Setup(&p)
 	testscript.Run(t, p)
 }
 

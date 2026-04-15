@@ -37,7 +37,7 @@ import (
 //
 //  2. Decl attribute: @test(permute) as a declaration inside a struct means
 //     "permute all fields within this struct."
-func (r *inlineRunner) runInlinePermutes(t *testing.T, rootPath cue.Path, records []attrRecord, version string) {
+func (r *inlineRunner) runInlinePermutes(t testing.TB, rootPath cue.Path, records []attrRecord, version string) {
 	type permuteGroup struct {
 		parentPath cue.Path
 		fields     []string // nil means permute all fields
@@ -113,7 +113,7 @@ func (r *inlineRunner) runInlinePermutes(t *testing.T, rootPath cue.Path, record
 // checkPermuteCount verifies or auto-updates a @test(permuteCount, N) directive
 // at path after all permutations for a group have run. When CUE_UPDATE=1, the
 // count is filled or replaced with the actual value.
-func (r *inlineRunner) checkPermuteCount(t *testing.T, path cue.Path, records []attrRecord, version string, actualCount int) {
+func (r *inlineRunner) checkPermuteCount(t testing.TB, path cue.Path, records []attrRecord, version string, actualCount int) {
 	t.Helper()
 	directives := selectActiveDirectives(records, path, version)
 	for _, pa := range directives {
@@ -151,7 +151,7 @@ func (r *inlineRunner) checkPermuteCount(t *testing.T, path cue.Path, records []
 // Uses Heap's algorithm to enumerate permutations without allocating N! slices.
 // Returns the total number of permutations evaluated (N!), or 0 if skipped
 // (fewer than 2 permutable fields).
-func (r *inlineRunner) runPermuteAssertion(t *testing.T, structPath cue.Path, fieldNames []string) int {
+func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fieldNames []string) int {
 	t.Helper()
 	if r.cueFiles == nil {
 		return 0

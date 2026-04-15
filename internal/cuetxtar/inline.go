@@ -130,6 +130,13 @@ func NewInlineRunner(t *testing.T, m *cuetdtest.M, archive *txtar.Archive, dir s
 	return &InlineRunner{r: &inlineRunner{t: t, m: m, archive: archive, dir: dir}}
 }
 
+// NewInlineRunnerCapture creates an InlineRunner that captures assertion
+// failures into cap without propagating them to t. Infrastructure errors
+// (compile errors, write-back failures) still propagate through t.
+func NewInlineRunnerCapture(t *testing.T, m *cuetdtest.M, archive *txtar.Archive, dir string, cap *FailCapture) *InlineRunner {
+	return &InlineRunner{r: &inlineRunner{t: t, m: m, archive: archive, dir: dir, errSink: cap}}
+}
+
 // Run executes all inline test cases in the archive.
 func (ir *InlineRunner) Run() {
 	ir.r.runArchive()
@@ -141,6 +148,7 @@ func (ir *InlineRunner) Run() {
 // inlineRunner handles execution of a single txtar archive in inline mode.
 type inlineRunner struct {
 	t        *testing.T
+	errSink  testing.TB // if non-nil, assertion errors go here instead of the sub-test t
 	m        *cuetdtest.M
 	archive  *txtar.Archive
 	dir      string
@@ -155,6 +163,24 @@ type inlineRunner struct {
 	// (fill, force overwrite, regression guard, stale-skip cleanup) to apply
 	// after all subtests have run (CUE_UPDATE mode only).
 	pendingInlineFillWrites []inlineFillWrite
+}
+
+// sinkOrSub returns the errSink if set, otherwise the given sub-test t.
+// Used in runArchive to route assertion errors in capture mode.
+func (r *inlineRunner) sinkOrSub(sub *testing.T) testing.TB {
+	if r.errSink != nil {
+		return r.errSink
+	}
+	return sub
+}
+
+// sinkOrT returns the errSink if set, otherwise r.t.
+// Used for assertions that run outside a per-root sub-test.
+func (r *inlineRunner) sinkOrT() testing.TB {
+	if r.errSink != nil {
+		return r.errSink
+	}
+	return r.t
 }
 
 // failCapture wraps *testing.T and captures failures without propagating them.
@@ -180,6 +206,29 @@ func (c *failCapture) Errorf(format string, args ...any) {
 	fmt.Fprintf(&c.msgs, format+"\n", args...)
 }
 
+// FailCapture wraps a testing.TB and captures Error/Errorf calls without
+// propagating failures to the testing framework. All other testing.TB methods
+// delegate to the embedded TB. Use with NewInlineRunnerCapture.
+type FailCapture struct {
+	testing.TB
+	msgs strings.Builder
+}
+
+func (c *FailCapture) Error(args ...any) {
+	fmt.Fprintln(&c.msgs, args...)
+}
+
+func (c *FailCapture) Errorf(format string, args ...any) {
+	fmt.Fprintf(&c.msgs, format, args...)
+	fmt.Fprintln(&c.msgs)
+}
+
+// Failed reports whether any errors were captured.
+func (c *FailCapture) Failed() bool { return c.msgs.Len() > 0 }
+
+// Messages returns the accumulated error text.
+func (c *FailCapture) Messages() string { return c.msgs.String() }
+
 // runDirectivesForPath runs all directives for a single path, handling
 // @test(skip) and @test(todo) according to their semantics:
 //   - skip directives fire first so t.Skip() is called before other assertions
@@ -187,7 +236,7 @@ func (c *failCapture) Errorf(format string, args ...any) {
 //
 // path is used both as the argument to runDirective and in log messages;
 // an empty path is displayed as "(file level)".
-func (r *inlineRunner) runDirectivesForPath(t *testing.T, path cue.Path, val cue.Value, directives []parsedTestAttr) {
+func (r *inlineRunner) runDirectivesForPath(t testing.TB, path cue.Path, val cue.Value, directives []parsedTestAttr) {
 	for _, pa := range directives {
 		if pa.directive == "skip" {
 			r.runDirective(t, path, val, pa)
@@ -301,7 +350,7 @@ func (r *inlineRunner) runArchive() {
 			}
 			seenFilePaths[rec.path.String()] = true
 			directives := selectActiveDirectives(allRecords, rec.path, version)
-			r.runDirectivesForPath(r.t, cue.Path{}, val, directives)
+			r.runDirectivesForPath(r.sinkOrT(), cue.Path{}, val, directives)
 		}
 	}
 
@@ -331,7 +380,7 @@ func (r *inlineRunner) runArchive() {
 		root := root
 		name := r.subTestName(root, allRecords)
 		r.t.Run(name, func(t *testing.T) {
-			r.runInline(t, root, val, allRecords)
+			r.runInline(r.sinkOrSub(t), root, val, allRecords)
 		})
 	}
 
@@ -341,7 +390,7 @@ func (r *inlineRunner) runArchive() {
 	// over all records and check after all subtests run.
 	version := r.versionName()
 	if fileShareGroups := r.collectDirectShareIDs(allRecords, version); len(fileShareGroups) > 0 {
-		r.runShareIDChecks(r.t, val, fileShareGroups)
+		r.runShareIDChecks(r.sinkOrT(), val, fileShareGroups)
 	}
 
 	// After all subtests complete, write back any pending updates.
@@ -631,7 +680,7 @@ func selectActiveDirectives(records []attrRecord, path cue.Path, version string)
 // ─────────────────────────────────────────────────────────────────────────────
 
 // runInline runs assertions for an inline-form test-case root.
-func (r *inlineRunner) runInline(t *testing.T, root testCaseRoot, fileVal cue.Value, records []attrRecord) {
+func (r *inlineRunner) runInline(t testing.TB, root testCaseRoot, fileVal cue.Value, records []attrRecord) {
 	t.Helper()
 	version := r.versionName()
 

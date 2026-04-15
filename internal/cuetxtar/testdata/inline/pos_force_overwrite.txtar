@@ -1,0 +1,41 @@
+# Tests that CUE_UPDATE=force overwrites wrong (non-placeholder) positions, while
+# CUE_UPDATE=1 leaves them unchanged and reports a position mismatch error.
+# The input has pos=[0:4] but the error has two positions; force update corrects it.
+-- in/test.cue --
+x: 100 & 200 @test(err, code=eval, pos=[0:4, 0:999999])
+
+y: {
+	b: 100 & 200 @test(err, code=eval, pos=[0:5, 0:99999])
+}
+
+z: {
+	b: int
+	c: b & "foo"
+
+	@test(eq, {
+		b: int
+		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:99999])
+	})
+}
+-- out/run/errors.txt --
+path x: @test(err, pos=...): unmatched position 1:999999 (spec 0:999999); actual positions:
+path y.b: @test(err, pos=...): unmatched position 4:99999 (spec 0:99999); actual positions:
+path z: c: @test(err, pos=...): no match for expected position 9:99999 in [8:5 9:5 9:9]
+-- out/status.txt --
+update: identical to input
+-- out/force/test.cue --
+x: 100 & 200 @test(err, code=eval, pos=[0:4, 0:10])
+
+y: {
+	b: 100 & 200 @test(err, code=eval, pos=[0:5, 0:11])
+}
+
+z: {
+	b: int
+	c: b & "foo"
+
+	@test(eq, {
+		b: int
+		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:9])
+	})
+}

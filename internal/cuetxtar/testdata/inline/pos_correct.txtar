@@ -1,0 +1,22 @@
+# Tests that a test with already-correct positions is left unchanged by both
+# CUE_UPDATE=1 and CUE_UPDATE=force. Covers different @test(err) placement forms:
+# field attribute, nested field inside struct, and nested inside @test(eq).
+-- in/test.cue --
+x: 100 & 200 @test(err, code=eval, pos=[0:4, 0:10])
+
+y: {
+	b: 100 & 200 @test(err, code=eval, pos=[0:5, 0:11])
+}
+
+z: {
+	b: int
+	c: b & "foo"
+
+	@test(eq, {
+		b: int
+		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:9])
+	})
+}
+-- out/status.txt --
+update: identical to input
+force:  identical to update

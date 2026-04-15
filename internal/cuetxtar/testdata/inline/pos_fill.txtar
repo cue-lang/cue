@@ -1,0 +1,43 @@
+# Tests that pos=[] placeholders are filled with actual error positions on
+# CUE_UPDATE=1. The input has a conflict error (1 & 2) with an empty pos=[]
+# placeholder; after update, the placeholder is replaced with the two source
+# positions of the conflicting values. Force update (CUE_UPDATE=force) also
+# fills placeholders, producing the same result.
+-- in/test.cue --
+x: 100 & 200 @test(err, code=eval, pos=[])
+
+y: {
+	b: 100 & 200 @test(err, code=eval, pos=[])
+}
+
+z: {
+	b: int
+	c: b & "foo"
+
+	@test(eq, {
+		b: int
+		c: _|_ @test(err, code=eval, pos=[])
+	})
+}
+-- out/run/errors.txt --
+path x: @test(err, pos=...): got 2 position(s), want 0; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...]
+path y.b: @test(err, pos=...): got 2 position(s), want 0; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...]
+path z: c: @test(err, pos=...): got 3 position(s), want 0; extra positions are often acceptable, and after confirming they are relevant to this error you can add them to pos=[...] [8:5 9:5 9:9]
+-- out/update/test.cue --
+x: 100 & 200 @test(err, code=eval, pos=[0:4, 0:10])
+
+y: {
+	b: 100 & 200 @test(err, code=eval, pos=[0:5, 0:11])
+}
+
+z: {
+	b: int
+	c: b & "foo"
+
+	@test(eq, {
+		b: int
+		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:9])
+	})
+}
+-- out/status.txt --
+force:  identical to update

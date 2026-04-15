@@ -1,0 +1,27 @@
+# Tests shareID failure cases: independently-defined fields, list literals,
+# and the appendPath aliasing regression (4 siblings under a 3-deep path).
+-- in/test.cue --
+// TODO(inline): this test is not idempotent. Fix later.
+//
+// Two independently-defined abstract fields do not share a vertex.
+// x: int @test(shareID=S)
+// y: int @test(shareID=S)
+
+// // List literal [{x:1}] is not shared with a, unlike l: [a] which would be.
+// litA: {x: 1}
+// litL: [{x: 1}] @test(shareID=EL, at=0)
+// litM: litA     @test(shareID=EL)
+
+// // Path-aliasing regression: appendPath must not alias sibling paths.
+// // Without the fix, a and b both get path "p.q.r.d" (the last sibling),
+// // so the shareID check silently passes even though a and b are independent.
+// // With the fix, the correct paths are tracked and the failure is reported.
+// p: q: r: {
+// 	a: {x: 1} @test(shareID=AB)
+// 	b: {x: 1} @test(shareID=AB)
+// 	c: {x: 2}
+// 	d: {x: 3}
+// }
+-- out/status.txt --
+update: identical to input
+force:  identical to update

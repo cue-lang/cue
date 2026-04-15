@@ -1,0 +1,14 @@
+# Tests @test(err, at=<path>) failure modes.
+# The passing case (bare at= gets auto-filled) is covered by err_fill.txtar.
+-- in/test.cue --
+// at= with missing sub-path: fails
+missingPath: {a: 1} @test(err, at=a.nonexistent)
+
+// at= sub-path is not an error: fails
+notErr: {a: {b: 42}} @test(err, at=a.b)
+-- out/run/errors.txt --
+path missingPath: @test(err, at=a.nonexistent): sub-path not found
+path notErr.a.b: @test(err): expected error, got non-error value
+-- out/status.txt --
+update: identical to input
+force:  identical to update

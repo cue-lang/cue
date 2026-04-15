@@ -1,0 +1,29 @@
+# Tests that @test(err, pos=[...]) passes when the positions are already correct.
+# baseLine is the line of the field (for field attrs) or struct opening brace
+# (for decl attrs inside structs). deltaLine is relative to baseLine.
+-- in/test.cue --
+// Field attr on same line: "1 & 2" has 1 at col 10, 2 at col 14 in "oneLine: 1 & 2"
+oneLine: 1 & 2 @test(err, code=eval, pos=[0:10, 0:14])
+
+// Field attr with conflict below: a:1 and a:2 values at col 5 (after tab)
+nested: {
+	a: 1
+	a: 2
+} @test(err, code=eval, pos=[1:5, 2:5])
+
+// Decl attr inside struct: baseLine = opening brace line; a:1 at delta 2, a:2 at delta 3
+declAttr: {
+	@test(err, code=eval, pos=[2:5, 3:5])
+	a: 1
+	a: 2
+}
+
+// Prior passing field doesn't shift the baseLine of subsequent fields
+prior: 1 @test(eq, 1)
+afterPrior: 1 & 2 @test(err, code=eval, pos=[0:13, 0:17])
+
+// Relative pos= form (delta from field line)
+absPos: 1 & 2 @test(err, code=eval, pos=[0:9, 0:13])
+-- out/status.txt --
+update: identical to input
+force:  identical to update

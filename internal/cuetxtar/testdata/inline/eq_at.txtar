@@ -1,0 +1,33 @@
+# Tests @test(eq, at=<sel>) sub-path navigation and eq on shared/forwarding
+# vertices. at= navigates to a sub-field of the struct before comparison.
+-- in/test.cue --
+// at=b checks only the b sub-field (value 2), not the full struct
+s: {a: 1, b: 2} @test(eq, 2, at=b)
+
+// test_1 is assigned #Dis which is structure-shared in v3. DerefValue() is
+// needed to reach the *adt.Disjunction base value for eq comparison.
+#Dis:   {x: 1} | {y: 2}
+test_1: #Dis @test(shareID=D) @test(eq, {x: 1} | {y: 2})
+#Dis:   _    @test(shareID=D)
+
+-- in/test2.cue --
+#Dis2:   {x: 1} | {y: 2}
+test_2: #Dis2 @test(eq, {x: 1} | {y: 2})
+#Dis2:   _
+
+@test(shareID=D2, at=test_2)
+@test(shareID=D2, at=#Dis2)
+
+-- in/test3.cue --
+#Dis3:   {x: 1} | {y: 2}
+test_3: #Dis3 @test(eq, {x: 1} | {y: 2})
+#Dis3:   _
+other: a: 1
+
+@test(shareID=D3, at=other.a) // NOT shared.
+@test(shareID=D3, at=#Dis3)
+-- out/status.txt --
+update: identical to input
+force:  identical to update
+-- out/run/errors.txt --
+@test(shareID=D3): other.a and #Dis3 are not shared (different vertices)

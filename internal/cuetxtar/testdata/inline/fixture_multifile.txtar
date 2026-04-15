@@ -1,0 +1,15 @@
+# Tests that a pure fixture file (no @test attrs in fixture.cue) can be used
+# for cross-file identifier resolution. Package declarations are required for
+# CUE to combine multiple files into a single package.
+-- in/fixture.cue --
+package p
+
+fixture: foo: 1
+-- in/test.cue --
+package p
+
+// a references fixture.foo from fixture.cue; fixture.cue has no @test attrs.
+a: fixture.foo & int @test(eq, 1)
+-- out/status.txt --
+update: identical to input
+force:  identical to update

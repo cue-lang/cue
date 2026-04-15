@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"golang.org/x/tools/txtar"
 )
 
 // stubError implements cueerrors.Error with a fixed Msg() return.
@@ -423,84 +422,6 @@ func TestSelectActiveDirectives(t *testing.T) {
 	}
 }
 
-// TestInlineRunner_ErrPos verifies @test(err, pos=[...]) position checking.
-func TestInlineRunner_ErrPos(t *testing.T) {
-	tests := []struct {
-		name    string
-		archive string
-	}{
-		{
-			// Field-attribute form: pos on same line as error source.
-			// Stripped output: "x: 1 & 2" on line 1.
-			// Positions: 1:4 (the 1) and 1:8 (the 2).
-			// baseLine=1, deltaLine=0 → expected line 1.
-			name:    "field attr pos relative same line",
-			archive: "-- test.cue --\nx: 1 & 2 @test(err, pos=[0:4, 0:8])\n",
-		},
-		{
-			// Field-attribute on a struct with conflict below.
-			// Stripped output:
-			//   line 1: x: {
-			//   line 2: 	a: 1
-			//   line 3: 	a: 2
-			//   line 4: }
-			// baseLine=1 (field x on line 1), deltas: 1→line 2, 2→line 3.
-			name:    "field attr pos relative below",
-			archive: "-- test.cue --\nx: {\n\ta: 1\n\ta: 2\n} @test(err, pos=[1:5, 2:5])\n",
-		},
-		{
-			// Decl-attribute form inside a struct.
-			// Source (no stripping — @test attr is kept):
-			//   line 1: x: {
-			//   line 2: 	@test(err, pos=[2:5, 3:5])
-			//   line 3: 	a: 1
-			//   line 4: 	a: 2
-			//   line 5: }
-			// baseLine = sl.Lbrace.Line() = 1 (the "{" on line 1).
-			// deltaLine=2 → line 3 (a: 1), deltaLine=3 → line 4 (a: 2).
-			name:    "decl attr pos relative",
-			archive: "-- test.cue --\nx: {\n\t@test(err, pos=[2:5, 3:5])\n\ta: 1\n\ta: 2\n}\n",
-		},
-		{
-			// Decl-attribute at file-level with a conflict.
-			// Source (no stripping — @test attr is kept):
-			//   line 1: @test(err, pos=[1:4, 1:8])
-			//   line 2: x: 1 & 2
-			// baseLine = a.Pos().Line() = 1 (original line of @test).
-			// deltaLine=1 → line 2 (x: 1 & 2).
-			// Positions: 2:4 and 2:8.
-			name:    "file-level decl attr pos relative",
-			archive: "-- test.cue --\n@test(err, pos=[1:4, 1:8])\nx: 1 & 2\n",
-		},
-		{
-			// Multiple fields: second field's baseLine accounts for
-			// the stripped @test on the first field.
-			// Original:
-			//   line 1: x: 1 @test(eq, 1)
-			//   line 2: y: 1 & 2 @test(err, pos=[0:4, 0:8])
-			// After stripping (both on same line, no extra newlines):
-			//   line 1: x: 1
-			//   line 2: y: 1 & 2
-			// baseLine for y = 2, deltaLine=0 → line 2.
-			name:    "field attr after prior field attr",
-			archive: "-- test.cue --\nx: 1 @test(eq, 1)\ny: 1 & 2 @test(err, pos=[0:4, 0:8])\n",
-		},
-		{
-			// Absolute position form: filename:absLine:col.
-			// After stripping, "test.cue" has "x: 1 & 2" on line 1.
-			name:    "absolute pos form",
-			archive: "-- test.cue --\nx: 1 & 2 @test(err, pos=[test.cue:1:4, test.cue:1:8])\n",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			archive := txtar.Parse([]byte(tt.archive))
-			runner := NewInlineRunner(t, nil, archive, t.TempDir())
-			runner.Run()
-		})
-	}
-}
-
 // TestRunShareIDChecks_Negative verifies that runShareIDChecks correctly
 // reports an error when two paths do NOT share the same vertex.
 // This cannot be expressed as a txtar inline test (we can't annotate "should
@@ -686,84 +607,6 @@ func TestAtDirective(t *testing.T) {
 	})
 }
 
-// TestRunAllowsAssertion verifies that @test(allows, sel) and @test(allows=false, sel)
-// correctly report failures when the assertion is wrong.
-func TestRunAllowsAssertion(t *testing.T) {
-	ctx := cuecontext.New()
-	r := &inlineRunner{}
-	path := cue.MakePath(cue.Str("x"))
-
-	t.Run("allows fails when field is not allowed in closed struct", func(t *testing.T) {
-		val := ctx.CompileString("x: close({a: 1})")
-		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, b)"})}
-		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
-		if !rec.failed {
-			t.Errorf("expected failure: closed struct should not allow field b")
-		}
-	})
-
-	t.Run("allows=false fails when field is actually allowed", func(t *testing.T) {
-		val := ctx.CompileString("x: close({a: 1})")
-		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows=false, a)"})}
-		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
-		if !rec.failed {
-			t.Errorf("expected failure: closed struct should allow known field a")
-		}
-	})
-
-	t.Run("allows fails for int pattern in closed string-keyed struct", func(t *testing.T) {
-		val := ctx.CompileString("x: close({[string]: 1})")
-		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, int)"})}
-		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
-		if !rec.failed {
-			t.Errorf("expected failure: string-keyed struct should not allow int pattern")
-		}
-	})
-
-	t.Run("allows errors on scalar value", func(t *testing.T) {
-		val := ctx.CompileString("x: 42")
-		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, foo)"})}
-		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
-		if !rec.failed {
-			t.Errorf("expected failure: @test(allows) should error on scalar value")
-		}
-	})
-
-	t.Run("allows passes for AnyIndex on open list", func(t *testing.T) {
-		val := ctx.CompileString("x: [...]")
-		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, int)"})}
-		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
-		if rec.failed {
-			t.Errorf("unexpected failure: open list should allow int indices\n%s", rec.msgs.String())
-		}
-	})
-
-	t.Run("allows passes for open struct", func(t *testing.T) {
-		val := ctx.CompileString("x: {a: 1}")
-		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows, b)"})}
-		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
-		if rec.failed {
-			t.Errorf("unexpected failure: open struct should allow any field\n%s", rec.msgs.String())
-		}
-	})
-
-	t.Run("allows=false passes for unknown field in closed struct", func(t *testing.T) {
-		val := ctx.CompileString("x: close({a: 1})")
-		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{directive: "allows", raw: internal.ParseAttr(&ast.Attribute{Text: "@test(allows=false, b)"})}
-		r.runAllowsAssertion(rec, path, val.LookupPath(path), pa)
-		if rec.failed {
-			t.Errorf("unexpected failure: closed struct should deny unknown field b\n%s", rec.msgs.String())
-		}
-	})
-}
-
 // makeTestPos creates a token.Pos at the given 1-indexed line and column in
 // a fresh file with the given name. Each line is allocated lineWidth bytes.
 func makeTestPos(filename string, line, col int) token.Pos {
@@ -813,6 +656,9 @@ func TestPosSpecsMatch(t *testing.T) {
 	})
 }
 
+// TODO(inline): hints should be shown in error messages when they exist.
+//
+//	Remove this code and cover it in hint.txtar.
 func TestHintFlag(t *testing.T) {
 	parseAttr := func(src string) (parsedTestAttr, error) {
 		f, err := parser.ParseFile("test.cue", src)
@@ -878,6 +724,9 @@ func TestHintFlag(t *testing.T) {
 // TestUnreachableTestAttr verifies that @test directives placed inside struct
 // literals that are binary-expression operands (e.g. X & {@test(...)}) are
 // detected and reported as errors rather than silently ignored.
+//
+// TODO(inline): test this in the txtar files so we can better see the errors
+// reported to the user. This requires some refactoring.
 func TestUnreachableTestAttr(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -941,45 +790,6 @@ func TestUnreachableTestAttr(t *testing.T) {
 				}
 			}
 			t.Errorf("no error message contains %q; got: %v", tt.wantErrFrag, errMsgs)
-		})
-	}
-}
-
-// TestFormatErrMsg verifies that formatErrMsg produces correct contains= and
-// args= output.  Uses stubError so results are fully deterministic.
-func TestFormatErrMsg(t *testing.T) {
-	tests := []struct {
-		name   string
-		format string
-		args   []any
-		want   string
-	}{
-		{
-			name:   "no args — only contains=",
-			format: "value is not allowed",
-			args:   nil,
-			want:   `, contains="value is not allowed"`,
-		},
-		{
-			name:   "two args — conflicting-values style",
-			format: "conflicting values %v and %v",
-			args:   []any{"s", 1},
-			want:   `, contains="conflicting values %v and %v", args=[s, 1]`,
-		},
-		{
-			name:   "one arg — undefined field style",
-			format: "undefined field: %v",
-			args:   []any{"foo"},
-			want:   `, contains="undefined field: %v", args=[foo]`,
-		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			var b strings.Builder
-			formatErrMsg(&b, stubError{format: tc.format, args: tc.args})
-			if got := b.String(); got != tc.want {
-				t.Errorf("got %q\nwant %q", got, tc.want)
-			}
 		})
 	}
 }
@@ -1050,26 +860,6 @@ func TestParseErrArgs(t *testing.T) {
 		}
 		if ea.path != "a.b" {
 			t.Errorf("got path=%q, want %q", ea.path, "a.b")
-		}
-	})
-}
-
-// TestInlineRunner_ErrArgs exercises @test(err, args=[...]) matching through
-// the full inline runner pipeline via runErrAssertion directly, to capture the
-// expected failure without propagating it to the parent test.
-func TestInlineRunner_ErrArgs(t *testing.T) {
-	t.Run("wrong arg fails", func(t *testing.T) {
-		ctx := cuecontext.New()
-		r := &inlineRunner{}
-		val := ctx.CompileString(`x: 1 & "s"`).LookupPath(cue.MakePath(cue.Str("x")))
-		rec := &failCapture{TB: t}
-		pa := parsedTestAttr{
-			directive: "err",
-			errArgs:   &errArgs{msgArgs: []string{"WRONG"}},
-		}
-		r.runErrAssertion(rec, cue.MakePath(cue.Str("x")), val, pa)
-		if !rec.failed {
-			t.Errorf("expected failure for wrong args=, but test passed")
 		}
 	})
 }

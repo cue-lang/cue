@@ -1,5 +1,10 @@
-// Issue-specific tests. Essence tested in evaluate.txtar (LetCycle*).
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
+# Tests that let-alias cycles and comprehension cycles in deeply nested structs
+# do not cause incorrect "was already used" or spurious cycle errors. t1 uses a
+# let alias that indirectly references an enclosing comprehension variable; t2
+# has the same structure but with an unreferenced let (compile-time error in
+# CUE, so this file cannot be converted to inline @test format). t3 exercises a
+# recursive definition with computed-field access through a let and a comprehension.
+# Cannot convert to inline format: t2 has a compile-time unreferenced-alias error.
 -- issue1960.cue --
 // evalv3 regression: a spurious structural cycle error was reported for a
 // pattern that had previously evaluated correctly, causing valid CUE to fail.
@@ -76,7 +81,7 @@ t2.z.hello: unreferenced alias or let clause q:
     ./issue1960.cue:18:3
 -- out/compile --
 t2.z.hello: unreferenced alias or let clause q:
-    ./issue1960.cue:15:3
+    ./issue1960.cue:18:3
 --- issue1960.cue
 {
   t1: {

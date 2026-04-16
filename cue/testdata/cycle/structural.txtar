@@ -4,26 +4,32 @@ import "list"
 
 a1: {
 	f: [f]
+	@test(err, code=structural cycle, path=f.0, contains="structural cycle", pos=[])
 }
 
 a2: {
 	f: f
+	@test(eq, {f: _})
 }
 
 a3: {
 	f: {g: f}
+	@test(err, code=structural cycle, path=f.g, contains="structural cycle", pos=[])
 }
 
 a4: {
 	a: [a | int]
+	@test(eq, {a: [int]})
 }
 
 a5: {
 	a: b: a | int
+	@test(eq, {a: {b: int}})
 }
 
 a6: {
 	a: a | int
+	@test(eq, {a: _ | int})
 }
 
 a7: {
@@ -36,26 +42,35 @@ a7: {
 		x: b.y
 		y: 3
 	}
+	@test(eq, {
+		a: "foo"
+		b: {x: {x: "foo", y: 3}, y: "foo"}
+		c: {x: "foo", y: 3}
+	})
 }
 
 b1: {
 	b: a & [1]
 	a: [a | int]
+	@test(eq, {b: [1], a: [int]})
 }
 
 b2: {
 	a: [a | int]
 	b: a & [1]
+	@test(eq, {a: [int], b: [1]})
 }
 
 b3: {
 	x: a: [a | int]
 	b: x & {a: [1]}
+	@test(eq, {x: {a: [int]}, b: {a: [1]}})
 }
 
 b4: {
 	b: x.y & [1]
 	x: y: [y]
+	@test(err, code=eval, path=b.0, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[1, [y], int, list], pos=[1:5, 1:12, 2:8, 2:9])
 }
 
 // Ensure that the cycle error is not blindly copied to a referring field,
@@ -68,6 +83,7 @@ b4: cond1: {
 			[y]
 		}
 	}
+	@test(err, code=structural cycle, path=x.y.0, contains="structural cycle", pos=[])
 }
 
 // This reports a structural cycle at b4.cond2.b, because the value it refers
@@ -85,21 +101,27 @@ b4: cond2: {
 		}
 	}
 	b: x.y & { _z: false, [1] }
+	@test(err, code=structural cycle, path=x.y.0, contains="structural cycle", pos=[])
 }
 
 b5: {
 	b: x.y & {a: [1]}
 	x: y: a: [a | int]
+	@test(eq, {b: {a: [1]}, x: {y: {a: [int]}}})
 }
 
 b6: {
 	b: x & {a: [1]}
 	x: a: [a]
+	@test(err, code=eval, path=b.a.0, contains="conflicting values %s and %s (mismatched types %s and %s)",
+		args=[1, [1], int, list], pos=[1:5, 1:13, 1:14, 2:9])
 }
 
 b7: {
 	b: a & [[1]]
 	a: [a]
+	@test(err, code=eval, path=b.0.0, contains="conflicting values %s and %s (mismatched types %s and %s)",
+		args=[1, [a], int, list], pos=[1:5, 1:11, 2:5, 2:6])
 }
 
 // Issue #555
@@ -107,6 +129,11 @@ b8: {
 	x: a
 	a: f: b
 	b: a | string
+	@test(eq, {
+		x: {f: string}
+		a: {f: string}
+		b: string
+	})
 }
 
 // Issue #555
@@ -117,6 +144,18 @@ b9: {
 	}
 	#ref: ref: string
 	x: #b | #ref
+	@test(eq, {
+		#a: string | {ref: string}
+		#b: {
+			c: [string | {ref: string},
+			string | {ref: string},
+			string | {ref: string}]
+		}
+		#ref: {ref: string}
+		x: {c: [string | {ref: string},
+	string | {ref: string},
+	string | {ref: string}]} | {ref: string}
+	})
 }
 
 // Issue #534
@@ -133,6 +172,13 @@ b10: {
 	})
 
 	d: d: b: string
+	@test(eq, {
+		a: {b: string | {d: string}}
+		c: {
+			d: string | {b: string | {b: string | {b: string}}}
+		}
+		d: {d: {b: string}}
+	})
 }
 
 // Issue #509 -- with comprehension
@@ -142,6 +188,7 @@ b11: {
 		if tail != null {
 		}
 	}
+	@test(eq, {#list: {tail: null}})
 }
 
 // Issue #509 -- with comprehension
@@ -170,6 +217,26 @@ b12: {
 			}
 		}
 	}
+	@test(eq, {
+		#list: {value: int, tail: null, sum: int}
+		list1: {
+			value: 1
+			tail: {
+				value: 2
+				tail: {
+					value: 3
+					tail: {
+						value: 4
+						tail: *null | {value: int, tail: null, sum: int}
+						sum: 4
+					}
+					sum: 7
+				}
+				sum: 9
+			}
+			sum: 10
+		}
+	})
 }
 
 // More trigger happy on stack overflows.
@@ -180,9 +247,9 @@ b12b: {
 		if tail != null {
 			sum: tail.sum
 		}
-	}
+	} @test(err, code=structural cycle, path=tail, contains="structural cycle", pos=[])
 
-	list1: #list
+	list1: #list  @test(err, code=structural cycle, path=b12b.#list.tail, contains="structural cycle", pos=[])
 	list1: {
 		tail: {
 			tail: {
@@ -192,7 +259,10 @@ b12b: {
 }
 
 // Issue #587
-b13: root: a: [for x in root {x}]
+b13: {
+	root: a: [for x in root {x}]
+	@test(err, code=structural cycle, path=root.a.0.0, contains="structural cycle", pos=[])
+}
 
 // Issue #587
 // TODO: this should probably be okay if we allow shallow evaluation of
@@ -207,11 +277,15 @@ b14: {
 
 		b: [for x in root {x}]
 	}
+	@test(err, code=structural cycle, path=root.b.1.1, contains="structural cycle", pos=[])
 }
 
 // This is okay
 // Issue #587
-b15: root: a: {for x in root {x}}
+b15: {
+	root: a: {for x in root {x}}
+	@test(eq, {root: {a: {}}})
+}
 
 // Issue #502 -- unused bulk constraints are not cyclic
 p1: {
@@ -222,6 +296,14 @@ p1: {
 	a: #T & {
 		a: one: link: a: two: {}
 	}
+	@test(eq, {
+		#T: {a: {}}
+		a: {
+			a: {
+				one: {link: {a: {two: {link: {a: {}}}}}}
+			}
+		}
+	})
 }
 
 // Issue #502 -- but they are if it is invoked within the struct.
@@ -234,6 +316,8 @@ p2: {
 	a: #T & {
 		a: one: link: a: two: {}
 	}
+	@test(eq, {one: {link: {a: {two: {}}}}}, at=a.a)
+	@test(err, code=structural cycle, path=#T.a.b.link, contains="structural cycle", pos=[])
 }
 
 // Issue #502 -- or added later.
@@ -245,11 +329,11 @@ p3: {
 	#U: {
 		#S
 		#T: a: b: {}
-	}
+	} @test(err, code=structural cycle, path=#T.a.b.link, contains="structural cycle", pos=[])
 
 	a: #U.#T & {
 		a: one: link: a: two: {}
-	}
+	} @test(err, code=structural cycle, path=p3.#U.#T.a.b.link, contains="structural cycle", pos=[])
 }
 
 // Issue #502 -- unused bulk constraints are not cyclic
@@ -261,6 +345,10 @@ p4: {
 	a: #T & {
 		a: [{link: a: [{}]}]
 	}
+	@test(eq, {
+		#T: {a: []}
+		a: {a: [{link: {a: [{link: {a: []}}]}}]}
+	})
 }
 
 // Issue #502 -- but they are if it is invoked within the struct.
@@ -273,6 +361,8 @@ p5: {
 	a: #T & {
 		a: [{link: a: [{}]}]
 	}
+	@test(err, code=structural cycle, path=#T.a.0.link, contains="structural cycle", pos=[])
+	@test(eq, [{link: {a: [{}]}}], at=a.a)
 }
 
 // Issue #502 -- or added later.
@@ -284,11 +374,12 @@ p6: {
 	#U: {
 		#S
 		#T: a: [{}]
-	}
+	} @test(err, code=structural cycle, path=#T.a.0.link, contains="structural cycle", pos=[])
 
 	a: #U.#T & {
 		a: [{link: a: [{}]}]
-	}
+	} @test(err, code=structural cycle, path=p6.#U.#T.a.0.link, contains="structural cycle", pos=[])
+	@test(err, code=structural cycle, path=#U.#T.a.0.link, contains="structural cycle", pos=[])
 }
 
 c1: {
@@ -296,20 +387,27 @@ c1: {
 		b: {}
 		c: a & b
 	}
+	@test(err, code=structural cycle, path=a.c.c, contains="structural cycle", pos=[])
 }
 
 // indirection
 d1: {
 	a: b: c: d: {h: int, t: r}
-	r: a.b
+	@test(err, at=a.b.c.d.t, code=structural cycle, path=d1.r, contains="structural cycle", pos=[])
+
+	r: a.b @test(err, code=structural cycle, contains="structural cycle", pos=[])
 
 	x: a.b.c
+
 }
 
 d2: {
-	x: a.b.c
+	x: a.b.c @test(shareID=X)
+	@test(shareID=X, at=a.b.c)
 
-	r: a.b
+	r: a.b @test(shareID=R)
+	@test(shareID=R, at=a.b)
+
 	a: b: c: d: {h: int, t: r}
 }
 
@@ -320,6 +418,13 @@ d3: {
 		i:        int | *1
 	}
 	x: config & {i: 0}
+	@test(err, at=x.indirect, code=structural cycle, contains="structural cycle", pos=[])
+	@test(err, at=x.a.b.c, code=structural cycle, contains="structural cycle", pos=[])
+	@test(eq, at=config, {
+		a: {b: {c: null}}
+		indirect: null
+		i: *1 | int
+	})
 }
 
 // Ensure that the cycles here fail early.
@@ -332,6 +437,7 @@ shortPathFail: doubleRef: {
 	// result to be longer than perhaps expected.
 	a: #List
 	#List: Next: #List | *null
+	@test(eq, {a: {Next: null}, #List: {Next: null}})
 }
 
 shortPathFail: elipsis: {
@@ -340,10 +446,12 @@ shortPathFail: elipsis: {
 	t1: {
 		#Foo: ref:  null | #Foo
 		#Foo: { ... }
+		@test(eq, {#Foo: {ref: null}})
 	}
 	t2: {
 		Foo: ref:  Foo
 		Foo: {...}
+		@test(err, code=structural cycle, at=Foo.ref, contains="structural cycle", pos=[])
 	}
 }
 
@@ -449,11 +557,13 @@ nestedList: {
 	v1: {
 		x: [x | int, 1]
 		y: x & [[[2, 1], 1], 1]
+		@test(eq, {x: [int, 1], y: [[[2, 1], 1], 1]})
 	}
 
 	v2: {
 		y: x & [[[2, 1], 1], 1]
 		x: [x | int, 1]
+		@test(eq, {y: [[[2, 1], 1], 1], x: [int, 1]})
 	}
 }
 
@@ -473,6 +583,19 @@ v3: {
 			}
 		}
 	}
+	@test(eq, {
+		list: {head: int, tail: null}
+		myList: {
+			head: 2
+			tail: {
+				head: 3
+				tail: {
+					head: 4
+					tail: {head: int, tail: null} | null
+				}
+			}
+		}
+	})
 }
 
 v4: {
@@ -486,6 +609,16 @@ v4: {
 		head: 2
 		tail: head: 3
 	}
+	@test(eq, {
+		list: {head: int, tail: 1}
+		myList: {
+			head: 2
+			tail: {
+				head: 3
+				tail: {head: int, tail: 1} | 1
+			}
+		}
+	})
 }
 
 v5: {
@@ -499,6 +632,13 @@ v5: {
 		head: 2
 		tail: head: 3
 	}
+	@test(eq, {
+		list: {head: int, tail: {}}
+		myList: {
+			head: 2
+			tail: {head: 3, tail: {head: int, tail: {}} | {}} | {head: 3}
+		}
+	})
 }
 
 // Example from "The Logic of Type Feature Structures" (Bob Carpenter)/
@@ -512,6 +652,7 @@ z1: {
 		g: f
 	}
 	z: x & y
+	@test(err, code=structural cycle, path=z.g, contains="structural cycle", pos=[])
 }
 
 // Cross references. Here there is no cycle, but the repeated instantiations
@@ -525,6 +666,10 @@ crossRefNoCycle: t1: {
 		y: x
 	}
 	C: { x: T } & T
+	@test(eq, {
+		T: {x: _, y: _}
+		C: {x: {x: _, y: _}, y: {x: _, y: _}}
+	})
 }
 
 crossRefNoCycle: t2: {
@@ -533,6 +678,10 @@ crossRefNoCycle: t2: {
 		y: x
 	}
 	C: T & { x: T }
+	@test(eq, {
+		T: {x: _, y: _}
+		C: {x: {x: _, y: _}, y: {x: _, y: _}}
+	})
 }
 
 crossRefNoCycle: t3: {
@@ -542,6 +691,14 @@ crossRefNoCycle: t3: {
 		z: y
 	}
 	C: T & { x: T }
+	@test(eq, {
+		T: {x: _, y: _, z: _}
+		C: {
+			x: {x: _, y: _, z: _}
+			y: {x: _, y: _, z: _}
+			z: {x: _, y: _, z: _}
+		}
+	})
 }
 
 crossRefNoCycle: t4: {
@@ -551,6 +708,26 @@ crossRefNoCycle: t4: {
 		z: y
 	}
 	C: T & { x: T & { x: T } }
+	@test(eq, {
+		T: {x: _, y: _, z: _}
+		C: {
+			x: {
+				x: {x: _, y: _, z: _}
+				y: {x: _, y: _, z: _}
+				z: {x: _, y: _, z: _}
+			}
+			y: {
+				x: {x: _, y: _, z: _}
+				y: {x: _, y: _, z: _}
+				z: {x: _, y: _, z: _}
+			}
+			z: {
+				x: {x: _, y: _, z: _}
+				y: {x: _, y: _, z: _}
+				z: {x: _, y: _, z: _}
+			}
+		}
+	})
 }
 
 crossRefNoCycle: t5: {
@@ -562,10 +739,33 @@ crossRefNoCycle: t5: {
 
 // Ensure these are NOT treated as structural errors.
 
-n1: a: b: int
-n2: n1 & {a: n1}
-n3: n1 & {n1}
-n4: n1 & {x: n1 & {y: n1 & {z: int}}}
+n1: {
+	a: b: int
+	@test(eq, {a: {b: int}})
+}
+n2: {
+	n1
+	a: n1
+	@test(eq, {a: {b: int, a: {b: int}}})
+}
+n3: {
+	n1
+	@test(eq, {a: {b: int}})
+}
+n4: {
+	n1
+	x: {
+		n1
+		y: {
+			n1
+			z: int
+		}
+	}
+	@test(eq, {
+		x: {y: {z: int, a: {b: int}}, a: {b: int}}
+		a: {b: int}
+	})
+}
 -- edge.cue --
 resolveToAncestor: {
 	t1: X: {
@@ -4234,17 +4434,21 @@ Result:
       b: int
     }
   }
-  n2: (〈0;n1〉 & {
-    a: 〈1;n1〉
-  })
-  n3: (〈0;n1〉 & {
+  n2: {
     〈1;n1〉
-  })
-  n4: (〈0;n1〉 & {
-    x: (〈1;n1〉 & {
-      y: (〈2;n1〉 & {
+    a: 〈1;n1〉
+  }
+  n3: {
+    〈1;n1〉
+  }
+  n4: {
+    〈1;n1〉
+    x: {
+      〈2;n1〉
+      y: {
+        〈3;n1〉
         z: int
-      })
-    })
-  })
+      }
+    }
+  }
 }

@@ -1,4 +1,3 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #Value: int
 
@@ -7,8 +6,8 @@ foo: !=bar
 bar: #Value
 bar: !=foo
 
-bar: 0
-foo: 1
+bar: 0 @test(eq, 0)
+foo: 1 @test(eq, 1)
 -- out/compile --
 --- in.cue
 {
@@ -32,9 +31,3 @@ Conjuncts:    10
 Disjuncts:    0
 
 NumCloseIDs: 2
--- out/evalalpha --
-(struct){
-  #Value: (int){ int }
-  foo: (int){ 1 }
-  bar: (int){ 0 }
-}

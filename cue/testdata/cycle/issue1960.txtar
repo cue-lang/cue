@@ -1,6 +1,9 @@
 // Issue-specific tests. Essence tested in evaluate.txtar (LetCycle*).
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- issue1960.cue --
+// evalv3 regression: a spurious structural cycle error was reported for a
+// pattern that had previously evaluated correctly, causing valid CUE to fail.
+// https://cuelang.org/issue/1960
 t1: {
 	z: blah: s: [for z in z {}]
 	z: hello: {
@@ -70,10 +73,10 @@ t3: {
 }
 -- out/evalalpha --
 t2.z.hello: unreferenced alias or let clause q:
-    ./issue1960.cue:15:3
+    ./issue1960.cue:18:3
 -- out/compile --
 t2.z.hello: unreferenced alias or let clause q:
-    ./issue1960.cue:15:3
+    ./issue1960.cue:18:3
 --- issue1960.cue
 {
   t1: {

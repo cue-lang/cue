@@ -1,3 +1,6 @@
+# CUE panics/crashes instead of reporting a clean error when evaluating
+# values with cyclic field dependencies.
+# https://cuelang.org/issue/306
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 a: 12

@@ -1,3 +1,6 @@
+# CUE incorrectly reports a structural cycle error for a valid CUE expression
+# that does not actually contain a cycle, producing a false positive.
+# https://cuelang.org/issue/990
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // A simple discriminated element

@@ -1,4 +1,6 @@
-// This code caused a hang on evalv2.
+# The evaluator enters an infinite loop when processing a cycle involving
+# struct embeddings, causing `cue eval` to hang indefinitely.
+# https://cuelang.org/issue/2526
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 x

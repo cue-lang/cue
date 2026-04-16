@@ -1,3 +1,9 @@
+# `a: [rn=string]: _Q[0:len(a[rn])]` silently produces wrong output: `a.ben`
+# should be `[{pos: 0}]` (a one-element slice matching the concrete entry's
+# length) but instead produces `[{}]` with `pos` missing and no error reported.
+# The equivalent closed-type pattern `#d: [rn=string]: [...] & _Q[0:len(#d[rn])]`
+# works correctly. The self-referential slice constraint is not being unified.
+# https://cuelang.org/issue/494
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 _Q: [{pos: 0}, {pos: 1}]

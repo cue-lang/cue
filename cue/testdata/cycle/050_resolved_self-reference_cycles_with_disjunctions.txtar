@@ -1,10 +1,15 @@
 #name: resolved self-reference cycles with disjunctions
 #evalPartial
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 a: b & {x: 1} | {y:     1} // {x:1,y:3,z:2} | {y:1}
 b: {x:     2} | c & {z: 2} // {x:2} | {x:1,y:3,z:2}
 c: a & {y: 3} | {z:     3} // {x:1,y:3,z:2} | {z:3}
+
+@test(eq, {
+	a: {x: 1, z: 2, y: 3} | {y: 1}
+	b: {x: 2} | {z: 2, y: 3, x: 1}
+	c: {y: 3, x: 1, z: 2} | {z: 3}
+})
 -- out/compile --
 --- in.cue
 {
@@ -36,27 +41,3 @@ Conjuncts:    55
 Disjuncts:    18
 
 NumCloseIDs: 6
--- out/evalalpha --
-(struct){
-  a: (struct){ |((struct){
-      x: (int){ 1 }
-      z: (int){ 2 }
-      y: (int){ 3 }
-    }, (struct){
-      y: (int){ 1 }
-    }) }
-  b: (struct){ |((struct){
-      x: (int){ 2 }
-    }, (struct){
-      z: (int){ 2 }
-      y: (int){ 3 }
-      x: (int){ 1 }
-    }) }
-  c: (struct){ |((struct){
-      y: (int){ 3 }
-      x: (int){ 1 }
-      z: (int){ 2 }
-    }, (struct){
-      z: (int){ 3 }
-    }) }
-}

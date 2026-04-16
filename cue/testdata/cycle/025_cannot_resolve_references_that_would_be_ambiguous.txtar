@@ -1,18 +1,30 @@
 #name: cannot resolve references that would be ambiguous
 #evalFull
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 a1: *0 | 1
-a1: a3 - a2
+a1: a3 - a2 @test(err, code=cycle, pos=[2:10])
 a2: *0 | 1
-a2: a3 - a1
-a3: 1
+a2: a3 - a1 @test(err, code=cycle, pos=[0:10])
+a3: 1 @test(eq, 1)
 
-b1: (*0 | 1) & b2
-b2: (0 | *1) & b1
+b1: (*0 | 1) & b2 @test(eq, 0|1)
+b2: (0 | *1) & b1 @test(eq, 0|1)
 
-c1: (*{a: 1} | {b: 1}) & c2
-c2: (*{a: 2} | {b: 2}) & c1
+c1: (*{a: 1} | {b: 1}) & c2 @test(eq, {a: 1, b: 2} | {b: 1, a: 2})
+c2: (*{a: 2} | {b: 2}) & c1 @test(eq, {a: 2, b: 1} | {b: 2, a: 1})
+-- out/errors.txt --
+[cycle] a1: cycle with field: a2:
+    ./in.cue:2:10
+a1: 2 errors in empty disjunction::
+    ./in.cue:4:10
+a2: unresolved disjunction: a1:
+    ./in.cue:4:10
+[cycle] a1: cycle with field: a2:
+    ./in.cue:2:10
+a1: 2 errors in empty disjunction::
+    ./in.cue:4:10
+a2: unresolved disjunction: a1:
+    ./in.cue:4:10
 -- out/compile --
 --- in.cue
 {
@@ -46,39 +58,3 @@ Conjuncts:    62
 Disjuncts:    28
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  a1: (_|_){
-    // [cycle] a1: cycle with field: a2:
-    //     ./in.cue:2:10
-    // a1: 2 errors in empty disjunction::
-    //     ./in.cue:4:10
-    // a2: unresolved disjunction: a1:
-    //     ./in.cue:4:10
-  }
-  a2: (_|_){
-    // [cycle] a1: cycle with field: a2:
-    //     ./in.cue:2:10
-    // a1: 2 errors in empty disjunction::
-    //     ./in.cue:4:10
-    // a2: unresolved disjunction: a1:
-    //     ./in.cue:4:10
-  }
-  a3: (int){ 1 }
-  b1: (int){ |((int){ 0 }, (int){ 1 }) }
-  b2: (int){ |((int){ 0 }, (int){ 1 }) }
-  c1: (struct){ |((struct){
-      a: (int){ 1 }
-      b: (int){ 2 }
-    }, (struct){
-      b: (int){ 1 }
-      a: (int){ 2 }
-    }) }
-  c2: (struct){ |((struct){
-      a: (int){ 2 }
-      b: (int){ 1 }
-    }, (struct){
-      b: (int){ 2 }
-      a: (int){ 1 }
-    }) }
-}

@@ -2,11 +2,11 @@
 // references. Non-structural cyclic references are okay, as long a property
 // that is dependended upon in the cycle is not changed after the fact,
 // that is, a value may not become more specific after it is used.
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 freezing: t1: ok: {
 	#a: x: "a"
 	len(#a) // 1
+	@test(eq, {1, #a: {x: "a"}})
 }
 
 -- comprehension.cue --
@@ -14,7 +14,10 @@ freezing: t1: ok: {
 // comprehension loops. Adding a field z to x would fix this.
 // This test would fail in the old evaluator, depending on ordering.
 comprehension: t1: _
-comprehension: t1: ok: p0: {
+comprehension: t1: ok:{
+	@test(permute)
+	@test(permuteCount)
+
 	x: y: {}
 	// order of comprehensions matter in old evaluator.
 	for _ in x {
@@ -23,58 +26,8 @@ comprehension: t1: ok: p0: {
 	if true {
 		if true { x: z: a: {} }
 	}
+	@test(eq, {x: {y: {}, z: {a: {}}}})
 }
-
-comprehension: t1: ok: p1: {
-	for _ in x {
-		if true { x: z: a: {} }
-	}
-	x: y: {}
-	if true {
-		if true { x: z: a: {} }
-	}
-}
-
-comprehension: t1: ok: p2: {
-	for _ in x {
-		if true { x: z: a: {} }
-	}
-	if true {
-		if true { x: z: a: {} }
-	}
-	x: y: {}
-}
-
-comprehension: t1: ok: p3: {
-	x: y: {}
-	if true {
-		if true { x: z: a: {} }
-	}
-	for _ in x {
-		if true { x: z: a: {} }
-	}
-}
-
-comprehension: t1: ok: p4: {
-	if true {
-		if true { x: z: a: {} }
-	}
-	x: y: {}
-	for _ in x {
-		if true { x: z: a: {} }
-	}
-}
-
-comprehension: t1: ok: p5: {
-	if true {
-		if true { x: z: a: {} }
-	}
-	for _ in x {
-		if true { x: z: a: {} }
-	}
-	x: y: {}
-}
-
 
 comprehension: t2: err: {
 	a: {
@@ -82,6 +35,7 @@ comprehension: t2: err: {
 		for k, v in a {
 			(k+"q"): v // This increases the set of fields in a.
 		}
+		@test(err, code=eval, contains="adding field %v not allowed as field set was already referenced", args=[xq], pos=[3:13])
 	}
 }
 
@@ -93,11 +47,15 @@ comprehension: t3: err: {
 		for k, v in b {
 			(k+"q"): v
 		}
+		@test(err, code=eval,
+			suberr=(code=eval, contains="adding field %v not allowed as field set was already referenced", args=[yq], pos=[2:13]),
+			suberr=(code=eval, contains="adding field %v not allowed as field set was already referenced", args=[xq], pos=[2:13]))
 	}
 	b: {
 		for k, v in a {
 			(k): v
 		}
+		@test(eq, {y: 1, x: 1})
 	}
 }
 
@@ -107,6 +65,7 @@ comprehension: t4: ok: {
 	for _ in x {
 		if true { x: y: a: {} }
 	}
+	@test(eq, {x: {y: {a: {}}}})
 }
 
 comprehension: moreSpecific: ok: {
@@ -115,6 +74,7 @@ comprehension: moreSpecific: ok: {
 		for k, v in a {
 			(k): 1
 		}
+		@test(eq, {x: 1})
 	}
 }
 
@@ -125,6 +85,8 @@ comprehension: moreSpecific: err: {
 		for k, v in a if len(v) > 0 {
 			(k): {z: 1}
 		}
+		@test(err, code=eval, path=x,
+			contains="adding field %v not allowed as field set was already referenced", args=[z], pos=[4:9])
 	}
 }
 -- issue3178.cue --
@@ -143,7 +105,15 @@ issue3178: {
 	}
 	for name, v in output {
 	}
+	@test(eq, {input: ["Value"], output: {Value: true}})
 }
+-- out/errors.txt --
+[eval] comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
+    ./comprehension.cue:24:13
+[eval] comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
+    ./comprehension.cue:36:13
+[eval] comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
+    ./comprehension.cue:74:9
 -- out/eval/stats --
 Leaks:  4
 Freed:  68
@@ -156,158 +126,6 @@ Conjuncts:    193
 Disjuncts:    0
 
 NumCloseIDs: 54
--- out/evalalpha --
-Errors:
-comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
-    ./comprehension.cue:71:13
-comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
-    ./comprehension.cue:82:13
-comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
-    ./comprehension.cue:114:9
-
-Result:
-(_|_){
-  // [eval]
-  comprehension: (_|_){
-    // [eval]
-    t1: (struct){
-      ok: (struct){
-        p0: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p1: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p2: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p3: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p4: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-        p5: (struct){
-          x: (struct){
-            y: (struct){
-            }
-            z: (struct){
-              a: (struct){
-              }
-            }
-          }
-        }
-      }
-    }
-    t2: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
-          //     ./comprehension.cue:71:13
-          x: (int){ 1 }
-        }
-      }
-    }
-    t3: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
-          //     ./comprehension.cue:82:13
-          x: (int){ 1 }
-        }
-        b: (struct){
-          y: (int){ 1 }
-          x: (int){ 1 }
-        }
-      }
-    }
-    t4: (struct){
-      ok: (struct){
-        x: (struct){
-          y: (struct){
-            a: (struct){
-            }
-          }
-        }
-      }
-    }
-    moreSpecific: (_|_){
-      // [eval]
-      ok: (struct){
-        a: (struct){
-          x: (int){ 1 }
-        }
-      }
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
-          //     ./comprehension.cue:114:9
-          x: (struct){
-            y: (int){ 1 }
-          }
-        }
-      }
-    }
-  }
-  freezing: (struct){
-    t1: (struct){
-      ok: (int){
-        1
-        #a: (#struct){
-          x: (string){ "a" }
-        }
-      }
-    }
-  }
-  issue3178: (struct){
-    input: (#list){
-      0: (string){ "Value" }
-    }
-    output: (struct){
-      Value: (bool){ true }
-    }
-  }
-}
 -- out/compile --
 --- comprehension.cue
 {
@@ -317,172 +135,25 @@ Result:
   comprehension: {
     t1: {
       ok: {
-        p0: {
-          x: {
-            y: {}
-          }
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
+        x: {
+          y: {}
+        }
+        for _, _ in 〈0;x〉 {
           if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
+            x: {
+              z: {
+                a: {}
               }
             }
           }
         }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p1: {
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          x: {
-            y: {}
-          }
+        if true {
           if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
+            x: {
+              z: {
+                a: {}
               }
             }
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p2: {
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          x: {
-            y: {}
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p3: {
-          x: {
-            y: {}
-          }
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p4: {
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          x: {
-            y: {}
-          }
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  comprehension: {
-    t1: {
-      ok: {
-        p5: {
-          if true {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          for _, _ in 〈0;x〉 {
-            if true {
-              x: {
-                z: {
-                  a: {}
-                }
-              }
-            }
-          }
-          x: {
-            y: {}
           }
         }
       }

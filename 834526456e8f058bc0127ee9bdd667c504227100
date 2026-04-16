@@ -16,6 +16,24 @@
       "message": "are these lines helpful even though we already have errors.txt below? the main point of this test is to visualize and regression test the quality of the errors, so seeing them in plaintext below like the CLI shows them is more helpful than as inline test assertions here. but I forget if errors.txt is just for debug purposes.",
       "revId": "834526456e8f058bc0127ee9bdd667c504227100",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d73ca87_22fd7571",
+        "filename": "cue/testdata/disjunctions/discriminator.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T16:34:42Z",
+      "side": 1,
+      "message": "I\u0027m not sure yet. It normalizes the errors. I can see how much noise this gives and decide. It would be nice if at some point we do not need the messages below.",
+      "parentUuid": "f2b398bc_bcbec139",
+      "revId": "834526456e8f058bc0127ee9bdd667c504227100",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

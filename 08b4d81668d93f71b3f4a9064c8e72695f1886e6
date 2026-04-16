@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eccbf7fa_1ac14426",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-16T15:04:11Z",
+      "side": 1,
+      "message": "was this meant to be a list?",
+      "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88d38f03_d2438a60",
+        "filename": "cue/testdata/comprehensions/iferror.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-16T15:04:11Z",
+      "side": 1,
+      "message": "nit: in cases like this I would place the closing parenthesis on a new line, so that it\u0027s visually clearer where `@test` starts and ends. otherwise it almost looks like the next input CUE field is part of `@test`.",
+      "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cae17fd5_a7ce246e",
+        "filename": "cue/testdata/comprehensions/issue1732.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-16T15:04:11Z",
+      "side": 1,
+      "message": "are we OK with such large bits of CUE inside `@test`? I would imagine that we want to test specific and short properties, rather than \"equals these 80 lines of CUE\".\n\nalso, is it expected and ideal that we have nested `@test` attributes?",
+      "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cba2f78_35e2ed0a",
+        "filename": "internal/cuetxtar/inline_err.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-16T15:04:11Z",
+      "side": 1,
+      "message": "not the first time I\u0027m reviewing this code, no?",
+      "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

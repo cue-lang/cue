@@ -1,4 +1,3 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import "list"
 
@@ -379,7 +378,6 @@ p6: {
 	a: #U.#T & {
 		a: [{link: a: [{}]}]
 	} @test(err, code=structural cycle, path=p6.#U.#T.a.0.link, contains="structural cycle", pos=[])
-	@test(err, code=structural cycle, path=#U.#T.a.0.link, contains="structural cycle", pos=[])
 }
 
 c1: {
@@ -455,9 +453,14 @@ shortPathFail: elipsis: {
 	}
 }
 
+// Issue #2374: a pattern constraint with an alias referring back to itself
+// (e.g., `r=[string]: {b: r}`) should be detected as a structural cycle,
+// but the evaluator instead emitted output with a renamed alias.
+// https://cuelang.org/issue/2374
 patternFail: issue2374: {
 	r=[string]: {b: r}
 	a: {r: 0}
+	@test(err, code=structural cycle, at=a.b, contains="structural cycle", pos=[])
 }
 
 shortPathFail: comprehension: {
@@ -466,19 +469,27 @@ shortPathFail: comprehension: {
 		if tail != null {
 		}
 	}
+	@test(eq, {#list: {tail: null}})
 }
 
 withLetFail: {
 	schema: next:  _schema_1
 	let _schema_1 = schema
+	@test(err, code=structural cycle, at=schema.next, contains="structural cycle", pos=[])
 }
 
+// Issue #3310: `list.Sum` called with a comprehension iterating over the
+// enclosing struct causes a structural cycle because `total` is included in
+// its own computation. The cycle error is correct; evalv2 incorrectly produced
+// a wrong numeric result instead of erroring.
+// https://cuelang.org/issue/3310
 fieldsSumInfinite: issue3310: {
 	cheeseburger: 3.00
 	fries:        2.00
 	sprite:       1.00
 
 	total: list.Sum([for _, v in issue3310 {v}])
+	@test(err, code=structural cycle, at=total, contains="error in call to %s", args=[list.Sum], pos=[5:9])
 }
 
 listOptOK: {
@@ -487,6 +498,22 @@ listOptOK: {
 		tail?: list
 	}
 	a: list & {head: 3, tail: head: 2}
+	@test(eq, {
+		list: {
+			head: int
+			tail?: _|_ @test(err, code=structural cycle, contains="list.tail: structural cycle", pos=[])
+		}
+		a: {
+			head: 3
+			tail: {
+				head: 2
+				tail?: {
+					head: int
+					tail?: _|_ @test(err, code=structural cycle, contains="list.tail: structural cycle", pos=[])
+				}
+			}
+		}
+	})
 }
 
 // The cyclic definitions below used to work OK on old versions of evalv2,
@@ -499,6 +526,12 @@ issue2545: {
 	#B: {
 		A: #A
 	}
+	@test(err, code="structural cycle",
+		hint="the comment says this should succeed since the optional field breaks the cycle, but it still errors in both v2 and v3")
+	@test(eq:todo, {
+		#A: {B?: _ @test(ignore)}
+		#B: {A: {B?: _|_}}
+	})
 }
 
 // combining structural with reference cycles
@@ -508,6 +541,8 @@ e1: {
 
 	b: c: b
 	b: b
+	@test(err, code=structural cycle, at=a.c, contains="structural cycle", pos=[])
+	@test(err, code=structural cycle, at=b.c, contains="structural cycle", pos=[])
 }
 
 e2: {
@@ -516,13 +551,15 @@ e2: {
 
 	b: c: b
 	b: {b}
+	@test(err, code=structural cycle, at=a.c, contains="structural cycle", pos=[])
+	@test(err, code=structural cycle, at=b.c, contains="structural cycle", pos=[])
 }
 
 e3: {
-	a: [a]
-	a: c: a
+	a: [a]  @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[[a], {c:a}, list, struct], pos=[0:5, 1:5])
+	a: c: a @test(err, code=structural cycle, contains="structural cycle", pos=[])
 
-	b: [b]
+	b: [b] @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[[b], {c:b}, list, struct], pos=[0:5, 1:5])
 	b: c: b
 }
 
@@ -532,6 +569,9 @@ e4: {
 
 	b: [[{c: 1}]]
 	b: [b | {}]
+	@test(err, code=eval,
+		suberr=(code=eval, path=a.0, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[[{c:1}], {}, list, struct], pos=[1:10, 2:6]),
+		suberr=(code=eval, path=a.0.0, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{c:1}, [{c:1}], struct, list], pos=[1:6, 2:6, 2:7]))
 }
 
 e5: {
@@ -540,6 +580,7 @@ e5: {
 
 	b: b | int
 	b: c: b | int
+	@test(eq, {a: {c: int}, b: {c: int}})
 }
 
 // validating values
@@ -547,11 +588,21 @@ nestedList: {
 	v1e: {
 		x: [x | int, 1]
 		y: x & [[[2], 1], 1]
+		@test(err, code=eval,
+			suberr=(code=eval, path=y.0, contains="conflicting values %s and %s (mismatched types %s and %s)", pos=[1:11, 2:6, 2:11]),
+			suberr=(code=eval, path=y.0.0, contains="%d errors in empty disjunction:", args=[2], pos=[]),
+			suberr=(code=eval, path=y.0.0, contains="conflicting values %s and %s (mismatched types %s and %s)", pos=[1:7, 1:11, 2:6, 2:12]),
+			suberr=(code=eval, path=y.0.0, contains="incompatible list lengths (%d and %d)", args=[1, 2], pos=[1:6]))
 	}
 
 	v2e: {
 		y: x & [[[2], 1], 1]
 		x: [x | int, 1]
+		@test(err, code=eval,
+			suberr=(code=eval, path=y.0, contains="conflicting values %s and %s (mismatched types %s and %s)", pos=[1:6, 1:11, 2:11]),
+			suberr=(code=eval, path=y.0.0, contains="%d errors in empty disjunction:", args=[2], pos=[]),
+			suberr=(code=eval, path=y.0.0, contains="conflicting values %s and %s (mismatched types %s and %s)", pos=[1:6, 1:12, 2:7, 2:11]),
+			suberr=(code=eval, path=y.0.0, contains="incompatible list lengths (%d and %d)", args=[1, 2], pos=[2:6]))
 	}
 
 	v1: {
@@ -735,6 +786,19 @@ crossRefNoCycle: t5: {
 		y: X.x
 	}
 	C: T & { x: T  }
+	@test(eq, {
+		T: {
+			y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+		}
+		C: {
+			x: {
+				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+			}
+			y: {
+				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+			}
+		}
+	})
 }
 
 // Ensure these are NOT treated as structural errors.
@@ -767,16 +831,168 @@ n4: {
 	})
 }
 -- edge.cue --
+// TODO(eval): notice the difference, not a huge deal, but still.
 resolveToAncestor: {
 	t1: X: {
-		a: b.a
-		b: X
+		a: b.a   @test(eq, _) @test(err:todo, code=structural cycle)
+		b: X     @test(err, code=structural cycle, contains="structural cycle", pos=[])
 	}
 	t2: X: {
-		b: X
-		a: b.a
+		b: X    @test(err, code=structural cycle, contains="structural cycle", pos=[])
+		a: b.a  @test(err, code=structural cycle, path=resolveToAncestor.t2.X.b, contains="structural cycle", pos=[])
 	}
 }
+-- out/errors.txt --
+[structural cycle] resolveToAncestor.t1.X.b: structural cycle
+[structural cycle] resolveToAncestor.t2.X.b: structural cycle
+[structural cycle] resolveToAncestor.t2.X.b: structural cycle
+[structural cycle] a1.f.0: structural cycle
+[structural cycle] a3.f.g: structural cycle
+[eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
+    ./in.cue:69:5
+    ./in.cue:69:12
+    ./in.cue:70:8
+    ./in.cue:70:9
+[structural cycle] b4.x.y.0: structural cycle
+[structural cycle] b4.cond1.x.y.0: structural cycle
+[structural cycle] b4.cond2.x.y.0: structural cycle
+[structural cycle] b4.cond2.x.y.0: structural cycle
+[eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
+    ./in.cue:112:5
+    ./in.cue:112:13
+    ./in.cue:112:14
+    ./in.cue:113:9
+[structural cycle] b6.x.a.0: structural cycle
+[eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
+    ./in.cue:119:5
+    ./in.cue:119:11
+    ./in.cue:120:5
+    ./in.cue:120:6
+[structural cycle] b7.a.0: structural cycle
+[structural cycle] b12b.#list.tail: structural cycle
+[structural cycle] b12b.#list.tail: structural cycle
+[structural cycle] b13.root.a.0.0: structural cycle
+[structural cycle] b14.root.b.1.1: structural cycle
+[structural cycle] p2.#T.a.b.link: structural cycle
+[structural cycle] p3.#U.#T.a.b.link: structural cycle
+[structural cycle] p3.#U.#T.a.b.link: structural cycle
+[structural cycle] p5.#T.a.0.link: structural cycle
+[structural cycle] p6.#U.#T.a.0.link: structural cycle
+[structural cycle] p6.#U.#T.a.0.link: structural cycle
+[structural cycle] c1.a.c.c: structural cycle
+[structural cycle] d1.r: structural cycle
+[structural cycle] d1.r: structural cycle
+[structural cycle] d1.r: structural cycle
+[structural cycle] d2.a.b.c.d.t: structural cycle
+[structural cycle] d3.x.indirect: structural cycle
+[structural cycle] d3.x.indirect: structural cycle
+[structural cycle] shortPathFail.elipsis.t2.Foo.ref: structural cycle
+[structural cycle] patternFail.issue2374.a.b: structural cycle
+[structural cycle] withLetFail.schema.next: structural cycle
+[structural cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
+    ./in.cue:490:9
+[structural cycle] listOptOK.list.tail: structural cycle
+[structural cycle] issue2545.#B.A: structural cycle
+[structural cycle] e1.a.c: structural cycle
+[structural cycle] e1.b.c: structural cycle
+[structural cycle] e2.a.c: structural cycle
+[structural cycle] e2.b.c: structural cycle
+[eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
+    ./in.cue:558:5
+    ./in.cue:559:5
+[eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
+    ./in.cue:561:5
+    ./in.cue:562:5
+[eval] e4.a.0: 2 errors in empty disjunction:
+e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+    ./in.cue:566:10
+    ./in.cue:567:6
+e4.a.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
+    ./in.cue:566:6
+    ./in.cue:567:6
+    ./in.cue:567:7
+[eval] e4.b.0: 2 errors in empty disjunction:
+e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+    ./in.cue:569:6
+    ./in.cue:570:10
+e4.b.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
+    ./in.cue:569:6
+    ./in.cue:569:7
+    ./in.cue:570:6
+[eval] nestedList.v1e.y.0: 4 errors in empty disjunction:
+nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
+    ./in.cue:588:11
+    ./in.cue:589:6
+    ./in.cue:589:11
+nestedList.v1e.y.0.0: 2 errors in empty disjunction:
+nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
+    ./in.cue:588:7
+    ./in.cue:588:11
+    ./in.cue:589:6
+    ./in.cue:589:12
+nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
+    ./in.cue:588:6
+[eval] nestedList.v2e.y.0: 4 errors in empty disjunction:
+nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
+    ./in.cue:598:6
+    ./in.cue:598:11
+    ./in.cue:599:11
+nestedList.v2e.y.0.0: 2 errors in empty disjunction:
+nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
+    ./in.cue:598:6
+    ./in.cue:598:12
+    ./in.cue:599:7
+    ./in.cue:599:11
+nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
+    ./in.cue:599:6
+[structural cycle] z1.z.g: structural cycle
+[structural cycle] z1.z.g: structural cycle
+[incomplete] crossRefNoCycle.t5.T.y: undefined field: x:
+    ./in.cue:785:8
+-- out/todo.txt --
+Structural cycles are reported in all chains compared to old implementation.
+
+b4.b: In evalv3 the structural error is converted to an eval error (conflicting values),
+   which is correct. evalv2 did not report this error.
+
+b6.b.a.0.0: evalv2 reports an additional structural cycle error here, evalv3 does not.
+
+b7.b.0.0: evalv3 correctly reports an eval error (conflicting values); the structural
+   cycle is nested one too deep before detection in evalv2.
+
+b10.c.d: evalv3 allows b: string in the position, which is correct.
+
+d1: evalv3 reports the error at d1.r, evalv2 at d1.a.b.c.d.t.
+
+d2: evalv2 additionally reports d2.r.c.d.t as structural cycle.
+
+d3: evalv3 reports at d3.x.indirect, evalv2 at d3.x.a.b.c.
+
+e3: evalv2 additionally reports e3.a.c and e3.b.c as structural cycles.
+
+e4: evalv2 reports 4 errors in empty disjunction; evalv3 reports 2.
+
+fieldsSumInfinite.issue3310: evalv3 correctly spots a structural cycle;
+   evalv2 computes an incorrect result without erroring.
+
+issue2545: the source comment says the optional field should break the cycle and
+   this should succeed. Both v2 and v3 report a structural cycle; this is an open bug.
+
+nestedList.v1e/v2e: evalv2/evalv3 differ in error message details for empty disjunction.
+
+resolveToAncestor.t1.X: evalv2 reports both a and b as cyclic; evalv3 only reports b.
+
+shortPathFail.comprehension: evalv2 shows a disjunction in tail; evalv3 shows null.
+
+shortPathFail.elipsis.t1: evalv2 shows a disjunction in #Foo.ref; evalv3 shows null.
+
+withLetFail: evalv2 attributes error to _schema_1, evalv3 to schema.next.
+
+z1.z: evalv2 reports z1.z.f.h and z1.z.g.h; evalv3 reports z1.z.g.
+
+b12: evalv3 shows a tail disjunction in the innermost list1 node; evalv2 shows null.
+
+n4: field ordering differs between evalv2 and evalv3.
 -- out/eval/stats --
 Leaks:  96
 Freed:  712
@@ -789,2834 +1005,6 @@ Conjuncts:    998
 Disjuncts:    149
 
 NumCloseIDs: 172
--- out/evalalpha --
-Errors:
-a1.f.0: structural cycle
-a3.f.g: structural cycle
-b12b.#list.tail: structural cycle
-b13.root.a.0.0: structural cycle
-b14.root.b.1.1: structural cycle
-b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
-    ./in.cue:55:5
-    ./in.cue:55:12
-    ./in.cue:56:8
-    ./in.cue:56:9
-b4.cond1.x.y.0: structural cycle
-b4.cond2.x.y.0: structural cycle
-b4.x.y.0: structural cycle
-b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
-    ./in.cue:94:5
-    ./in.cue:94:13
-    ./in.cue:94:14
-    ./in.cue:95:9
-b6.x.a.0: structural cycle
-b7.a.0: structural cycle
-b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
-    ./in.cue:99:5
-    ./in.cue:99:11
-    ./in.cue:100:5
-    ./in.cue:100:6
-c1.a.c.c: structural cycle
-d1.r: structural cycle
-d2.a.b.c.d.t: structural cycle
-d3.x.indirect: structural cycle
-e1.a.c: structural cycle
-e1.b.c: structural cycle
-e2.a.c: structural cycle
-e2.b.c: structural cycle
-e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-    ./in.cue:412:5
-    ./in.cue:413:5
-e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-    ./in.cue:415:5
-    ./in.cue:416:5
-e4.a.0: 2 errors in empty disjunction:
-e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:420:10
-    ./in.cue:421:6
-e4.a.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-    ./in.cue:420:6
-    ./in.cue:421:6
-    ./in.cue:421:7
-e4.b.0: 2 errors in empty disjunction:
-e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:423:6
-    ./in.cue:424:10
-e4.b.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-    ./in.cue:423:6
-    ./in.cue:423:7
-    ./in.cue:424:6
-issue2545.#B.A: structural cycle
-nestedList.v1e.y.0: 4 errors in empty disjunction:
-nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-    ./in.cue:438:11
-    ./in.cue:439:6
-    ./in.cue:439:11
-nestedList.v1e.y.0.0: 2 errors in empty disjunction:
-nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-    ./in.cue:438:7
-    ./in.cue:438:11
-    ./in.cue:439:6
-    ./in.cue:439:12
-nestedList.v2e.y.0: 4 errors in empty disjunction:
-nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-    ./in.cue:443:6
-    ./in.cue:443:11
-    ./in.cue:444:11
-nestedList.v2e.y.0.0: 2 errors in empty disjunction:
-nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-    ./in.cue:443:6
-    ./in.cue:443:12
-    ./in.cue:444:7
-    ./in.cue:444:11
-p2.#T.a.b.link: structural cycle
-p3.#U.#T.a.b.link: structural cycle
-p5.#T.a.0.link: structural cycle
-p6.#U.#T.a.0.link: structural cycle
-patternFail.issue2374.a.b: structural cycle
-resolveToAncestor.t1.X.b: structural cycle
-resolveToAncestor.t2.X.b: structural cycle
-shortPathFail.elipsis.t2.Foo.ref: structural cycle
-withLetFail.schema.next: structural cycle
-z1.z.g: structural cycle
-fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
-    ./in.cue:371:9
-nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
-    ./in.cue:438:6
-nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
-    ./in.cue:444:6
-
-Result:
-(_|_){
-  // [eval]
-  resolveToAncestor: (_|_){
-    // [structural cycle]
-    t1: (_|_){
-      // [structural cycle]
-      X: (_|_){
-        // [structural cycle]
-        a: (_){ _ }
-        b: (_|_){
-          // [structural cycle] resolveToAncestor.t1.X.b: structural cycle
-        }
-      }
-    }
-    t2: (_|_){
-      // [structural cycle]
-      X: (_|_){
-        // [structural cycle]
-        b: (_|_){
-          // [structural cycle] resolveToAncestor.t2.X.b: structural cycle
-        }
-        a: (_|_){
-          // [structural cycle] resolveToAncestor.t2.X.b: structural cycle
-        }
-      }
-    }
-  }
-  a1: (_|_){
-    // [structural cycle]
-    f: (_|_){
-      // [structural cycle]
-      0: (_|_){
-        // [structural cycle] a1.f.0: structural cycle
-      }
-    }
-  }
-  a2: (struct){
-    f: (_){ _ }
-  }
-  a3: (_|_){
-    // [structural cycle]
-    f: (_|_){
-      // [structural cycle]
-      g: (_|_){
-        // [structural cycle] a3.f.g: structural cycle
-      }
-    }
-  }
-  a4: (struct){
-    a: (#list){
-      0: (int){ int }
-    }
-  }
-  a5: (struct){
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  a6: (struct){
-    a: (_){ |((_){ _ }, (int){ int }) }
-  }
-  a7: (struct){
-    a: (string){ "foo" }
-    b: (struct){
-      x: ~(a7.c)
-      y: (string){ "foo" }
-    }
-    c: (struct){
-      x: (string){ "foo" }
-      y: (int){ 3 }
-    }
-  }
-  b1: (struct){
-    b: (#list){
-      0: (int){ 1 }
-    }
-    a: (#list){
-      0: (int){ int }
-    }
-  }
-  b2: (struct){
-    a: (#list){
-      0: (int){ int }
-    }
-    b: (#list){
-      0: (int){ 1 }
-    }
-  }
-  b3: (struct){
-    x: (struct){
-      a: (#list){
-        0: (int){ int }
-      }
-    }
-    b: (struct){
-      a: (#list){
-        0: (int){ 1 }
-      }
-    }
-  }
-  b4: (_|_){
-    // [eval]
-    b: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
-        //     ./in.cue:55:5
-        //     ./in.cue:55:12
-        //     ./in.cue:56:8
-        //     ./in.cue:56:9
-        0: (_|_){// 〈1;y〉
-        }
-      }
-    }
-    x: (_|_){
-      // [structural cycle]
-      y: (_|_){
-        // [structural cycle]
-        0: (_|_){
-          // [structural cycle] b4.x.y.0: structural cycle
-        }
-      }
-    }
-    cond1: (_|_){
-      // [structural cycle]
-      b: (#list){
-        _z: (bool){ false }
-        0: (int){ 1 }
-      }
-      x: (_|_){
-        // [structural cycle]
-        y: (_|_){
-          // [structural cycle]
-          _z: (bool){ |(*(bool){ true }, (bool){ bool }) }
-          0: (_|_){
-            // [structural cycle] b4.cond1.x.y.0: structural cycle
-          }
-        }
-      }
-    }
-    cond2: (_|_){
-      // [structural cycle]
-      x: (_|_){
-        // [structural cycle]
-        y: (_|_){
-          // [structural cycle]
-          _z: (bool){ |(*(bool){ true }, (bool){ bool }) }
-          0: (_|_){
-            // [structural cycle] b4.cond2.x.y.0: structural cycle
-          }
-        }
-      }
-      b: (_|_){
-        // [structural cycle] b4.cond2.x.y.0: structural cycle
-      }
-    }
-  }
-  b5: (struct){
-    b: (struct){
-      a: (#list){
-        0: (int){ 1 }
-      }
-    }
-    x: (struct){
-      y: (struct){
-        a: (#list){
-          0: (int){ int }
-        }
-      }
-    }
-  }
-  b6: (_|_){
-    // [eval]
-    b: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
-          //     ./in.cue:94:5
-          //     ./in.cue:94:13
-          //     ./in.cue:94:14
-          //     ./in.cue:95:9
-          0: (_|_){// 1 & 〈1;a〉
-          }
-        }
-      }
-    }
-    x: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        0: (_|_){
-          // [structural cycle] b6.x.a.0: structural cycle
-        }
-      }
-    }
-  }
-  b7: (_|_){
-    // [eval]
-    b: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
-          //     ./in.cue:99:5
-          //     ./in.cue:99:11
-          //     ./in.cue:100:5
-          //     ./in.cue:100:6
-          0: (_|_){// 〈1;a〉
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle]
-      0: (_|_){
-        // [structural cycle] b7.a.0: structural cycle
-      }
-    }
-  }
-  b8: (struct){
-    x: ~(b8.a)
-    a: (struct){
-      f: (string){ string }
-    }
-    b: (string){ string }
-  }
-  b9: (struct){
-    #a: ((string|struct)){ |((string){ string }, (#struct){
-        ref: (string){ string }
-      }) }
-    #b: (#struct){
-      c: (#list){
-        0: ((string|struct)){ |((string){ string }, (#struct){
-            ref: (string){ string }
-          }) }
-        1: ((string|struct)){ |((string){ string }, (#struct){
-            ref: (string){ string }
-          }) }
-        2: ((string|struct)){ |((string){ string }, (#struct){
-            ref: (string){ string }
-          }) }
-      }
-    }
-    #ref: (#struct){
-      ref: (string){ string }
-    }
-    x: (struct){ |((#struct){
-        c: (#list){
-          0: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-          1: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-          2: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-        }
-      }, (#struct){
-        ref: (string){ string }
-      }) }
-  }
-  b10: (struct){
-    a: (#struct){
-      b: ((string|struct)){ |((string){ string }, (#struct){
-          d: (string){ string }
-        }) }
-    }
-    c: (#struct){
-      d: ((string|struct)){ |((string){ string }, (#struct){
-          b: ((string|struct)){ |((string){ string }, (#struct){
-              b: ((string|struct)){ |((string){ string }, (#struct){
-                  b: (string){ string }
-                }) }
-            }) }
-        }) }
-    }
-    d: (struct){
-      d: (struct){
-        b: (string){ string }
-      }
-    }
-  }
-  b11: (struct){
-    #list: (#struct){
-      tail: (null){ null }
-    }
-  }
-  b12: (struct){
-    #list: (#struct){
-      value: (int){ int }
-      tail: (null){ null }
-      sum: (int){ int }
-    }
-    list1: (#struct){
-      value: (int){ 1 }
-      tail: (#struct){
-        value: (int){ 2 }
-        tail: (#struct){
-          value: (int){ 3 }
-          tail: (#struct){
-            value: (int){ 4 }
-            tail: ((null|struct)){ |(*(null){ null }, (#struct){
-                value: (int){ int }
-                tail: (null){ null }
-                sum: (int){ int }
-              }) }
-            sum: (int){ 4 }
-          }
-          sum: (int){ 7 }
-        }
-        sum: (int){ 9 }
-      }
-      sum: (int){ 10 }
-    }
-  }
-  b12b: (_|_){
-    // [structural cycle]
-    #list: (_|_){
-      // [structural cycle] b12b.#list.tail: structural cycle
-    }
-    list1: (_|_){
-      // [structural cycle] b12b.#list.tail: structural cycle
-    }
-  }
-  b13: (_|_){
-    // [structural cycle]
-    root: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        0: (_|_){
-          // [structural cycle]
-          0: (_|_){
-            // [structural cycle] b13.root.a.0.0: structural cycle
-          }
-        }
-      }
-    }
-  }
-  b14: (_|_){
-    // [structural cycle]
-    root: (_|_){
-      // [structural cycle]
-      a: (list){
-      }
-      b: (_|_){
-        // [structural cycle]
-        0: (list){
-        }
-        1: (_|_){
-          // [structural cycle]
-          0: (list){
-          }
-          1: (_|_){
-            // [structural cycle] b14.root.b.1.1: structural cycle
-          }
-        }
-      }
-    }
-  }
-  b15: (struct){
-    root: (struct){
-      a: (struct){
-      }
-    }
-  }
-  p1: (struct){
-    #T: (#struct){
-      a: (#struct){
-      }
-    }
-    a: (#struct){
-      a: (#struct){
-        one: (#struct){
-          link: (#struct){
-            a: (#struct){
-              two: (#struct){
-                link: ~(p1.#T)
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  p2: (_|_){
-    // [structural cycle]
-    #T: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        b: (_|_){
-          // [structural cycle]
-          link: (_|_){
-            // [structural cycle] p2.#T.a.b.link: structural cycle
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle]
-      a: (struct){
-        one: (struct){
-          link: (struct){
-            a: (struct){
-              two: (struct){
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  p3: (_|_){
-    // [structural cycle]
-    #S: (#struct){
-      #T: (#struct){
-        a: (#struct){
-        }
-      }
-    }
-    #U: (_|_){
-      // [structural cycle]
-      #T: (_|_){
-        // [structural cycle]
-        a: (_|_){
-          // [structural cycle]
-          b: (_|_){
-            // [structural cycle]
-            link: (_|_){
-              // [structural cycle] p3.#U.#T.a.b.link: structural cycle
-            }
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle] p3.#U.#T.a.b.link: structural cycle
-    }
-  }
-  p4: (struct){
-    #T: (#struct){
-      a: (list){
-      }
-    }
-    a: (#struct){
-      a: (#list){
-        0: (#struct){
-          link: (#struct){
-            a: (#list){
-              0: (#struct){
-                link: ~(p4.#T)
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  p5: (_|_){
-    // [structural cycle]
-    #T: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        0: (_|_){
-          // [structural cycle]
-          link: (_|_){
-            // [structural cycle] p5.#T.a.0.link: structural cycle
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle]
-      a: (#list){
-        0: (struct){
-          link: (struct){
-            a: (#list){
-              0: (struct){
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  p6: (_|_){
-    // [structural cycle]
-    #S: (#struct){
-      #T: (#struct){
-        a: (list){
-        }
-      }
-    }
-    #U: (_|_){
-      // [structural cycle]
-      #T: (_|_){
-        // [structural cycle]
-        a: (_|_){
-          // [structural cycle]
-          0: (_|_){
-            // [structural cycle]
-            link: (_|_){
-              // [structural cycle] p6.#U.#T.a.0.link: structural cycle
-            }
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle] p6.#U.#T.a.0.link: structural cycle
-    }
-  }
-  c1: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      b: (struct){
-      }
-      c: (_|_){
-        // [structural cycle]
-        b: (struct){
-        }
-        c: (_|_){
-          // [structural cycle] c1.a.c.c: structural cycle
-        }
-      }
-    }
-  }
-  d1: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      b: (_|_){
-        // [structural cycle]
-        c: (_|_){
-          // [structural cycle]
-          d: (_|_){
-            // [structural cycle]
-            h: (int){ int }
-            t: (_|_){
-              // [structural cycle] d1.r: structural cycle
-            }
-          }
-        }
-      }
-    }
-    r: (_|_){
-      // [structural cycle] d1.r: structural cycle
-    }
-    x: (_|_){
-      // [structural cycle] d1.r: structural cycle
-    }
-  }
-  d2: (_|_){
-    // [structural cycle]
-    x: ~(d2.a.b.c)
-    r: ~(d2.a.b)
-    a: (_|_){
-      // [structural cycle]
-      b: (_|_){
-        // [structural cycle]
-        c: (_|_){
-          // [structural cycle]
-          d: (_|_){
-            // [structural cycle]
-            h: (int){ int }
-            t: (_|_){
-              // [structural cycle] d2.a.b.c.d.t: structural cycle
-            }
-          }
-        }
-      }
-    }
-  }
-  d3: (_|_){
-    // [structural cycle]
-    config: (struct){
-      a: (struct){
-        b: (struct){
-          c: (null){ null }
-        }
-      }
-      indirect: (null){ null }
-      i: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-    x: (_|_){
-      // [structural cycle]
-      i: (int){ 0 }
-      a: (_|_){
-        // [structural cycle]
-        b: (_|_){
-          // [structural cycle]
-          c: (_|_){
-            // [structural cycle] d3.x.indirect: structural cycle
-          }
-        }
-      }
-      indirect: (_|_){
-        // [structural cycle] d3.x.indirect: structural cycle
-      }
-    }
-  }
-  shortPathFail: (_|_){
-    // [structural cycle]
-    doubleRef: (struct){
-      a: ~(shortPathFail.doubleRef.#List)
-      #List: (#struct){
-        Next: (null){ null }
-      }
-    }
-    elipsis: (_|_){
-      // [structural cycle]
-      t1: (struct){
-        #Foo: (#struct){
-          ref: (null){ null }
-        }
-      }
-      t2: (_|_){
-        // [structural cycle]
-        Foo: (_|_){
-          // [structural cycle]
-          ref: (_|_){
-            // [structural cycle] shortPathFail.elipsis.t2.Foo.ref: structural cycle
-          }
-        }
-      }
-    }
-    comprehension: (struct){
-      #list: (#struct){
-        tail: (null){ null }
-      }
-    }
-  }
-  patternFail: (_|_){
-    // [structural cycle]
-    issue2374: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        r: (int){ 0 }
-        b: (_|_){
-          // [structural cycle] patternFail.issue2374.a.b: structural cycle
-        }
-      }
-    }
-  }
-  withLetFail: (_|_){
-    // [structural cycle]
-    schema: (_|_){
-      // [structural cycle]
-      next: (_|_){
-        // [structural cycle] withLetFail.schema.next: structural cycle
-      }
-    }
-    let _schema_1#1 = (_|_){
-      // [structural cycle] withLetFail.schema.next: structural cycle
-    }
-  }
-  fieldsSumInfinite: (_|_){
-    // [structural cycle]
-    issue3310: (_|_){
-      // [structural cycle]
-      cheeseburger: (float){ 3.00 }
-      fries: (float){ 2.00 }
-      sprite: (float){ 1.00 }
-      total: (_|_){
-        // [structural cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
-        //     ./in.cue:371:9
-      }
-    }
-  }
-  listOptOK: (struct){
-    list: (struct){
-      head: (int){ int }
-      tail?: (_|_){
-        // [structural cycle] listOptOK.list.tail: structural cycle
-      }
-    }
-    a: (struct){
-      head: (int){ 3 }
-      tail: (struct){
-        head: (int){ 2 }
-        tail?: ~(listOptOK.list)
-      }
-    }
-  }
-  issue2545: (_|_){
-    // [structural cycle]
-    #A: (#struct){
-      B?: ~(issue2545.#B)
-    }
-    #B: (_|_){
-      // [structural cycle]
-      A: (_|_){
-        // [structural cycle] issue2545.#B.A: structural cycle
-      }
-    }
-  }
-  e1: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      c: (_|_){
-        // [structural cycle] e1.a.c: structural cycle
-      }
-    }
-    b: (_|_){
-      // [structural cycle]
-      c: (_|_){
-        // [structural cycle] e1.b.c: structural cycle
-      }
-    }
-  }
-  e2: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      c: (_|_){
-        // [structural cycle] e2.a.c: structural cycle
-      }
-    }
-    b: (_|_){
-      // [structural cycle]
-      c: (_|_){
-        // [structural cycle] e2.b.c: structural cycle
-      }
-    }
-  }
-  e3: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-      //     ./in.cue:412:5
-      //     ./in.cue:413:5
-      c: (_|_){// 〈1;a〉
-      }
-      0: (_|_){// 〈1;a〉
-      }
-    }
-    b: (_|_){
-      // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-      //     ./in.cue:415:5
-      //     ./in.cue:416:5
-      c: (_|_){// 〈1;b〉
-      }
-      0: (_|_){// 〈1;b〉
-      }
-    }
-  }
-  e4: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval] e4.a.0: 2 errors in empty disjunction:
-        // e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-        //     ./in.cue:420:10
-        //     ./in.cue:421:6
-        // e4.a.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-        //     ./in.cue:420:6
-        //     ./in.cue:421:6
-        //     ./in.cue:421:7
-        0: (struct){
-          c: (int){ 1 }
-        }
-      }
-    }
-    b: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval] e4.b.0: 2 errors in empty disjunction:
-        // e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-        //     ./in.cue:423:6
-        //     ./in.cue:424:10
-        // e4.b.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-        //     ./in.cue:423:6
-        //     ./in.cue:423:7
-        //     ./in.cue:424:6
-        0: (struct){
-          c: (int){ 1 }
-        }
-      }
-    }
-  }
-  e5: (struct){
-    a: (struct){
-      c: (int){ int }
-    }
-    b: (struct){
-      c: (int){ int }
-    }
-  }
-  nestedList: (_|_){
-    // [eval]
-    v1e: (_|_){
-      // [eval]
-      x: (#list){
-        0: (int){ int }
-        1: (int){ 1 }
-      }
-      y: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] nestedList.v1e.y.0: 4 errors in empty disjunction:
-          // nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-          //     ./in.cue:438:11
-          //     ./in.cue:439:6
-          //     ./in.cue:439:11
-          // nestedList.v1e.y.0.0: 2 errors in empty disjunction:
-          // nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-          //     ./in.cue:438:7
-          //     ./in.cue:438:11
-          //     ./in.cue:439:6
-          //     ./in.cue:439:12
-          // nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
-          //     ./in.cue:438:6
-          0: (list){ list }
-          1: (int){ 1 }
-        }
-        1: (int){ 1 }
-      }
-    }
-    v2e: (_|_){
-      // [eval]
-      y: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] nestedList.v2e.y.0: 4 errors in empty disjunction:
-          // nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-          //     ./in.cue:443:6
-          //     ./in.cue:443:11
-          //     ./in.cue:444:11
-          // nestedList.v2e.y.0.0: 2 errors in empty disjunction:
-          // nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-          //     ./in.cue:443:6
-          //     ./in.cue:443:12
-          //     ./in.cue:444:7
-          //     ./in.cue:444:11
-          // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
-          //     ./in.cue:444:6
-          0: (list){ list }
-          1: (int){ 1 }
-        }
-        1: (int){ 1 }
-      }
-      x: (#list){
-        0: (int){ int }
-        1: (int){ 1 }
-      }
-    }
-    v1: (struct){
-      x: (#list){
-        0: (int){ int }
-        1: (int){ 1 }
-      }
-      y: (#list){
-        0: (#list){
-          0: (#list){
-            0: (int){ 2 }
-            1: (int){ 1 }
-          }
-          1: (int){ 1 }
-        }
-        1: (int){ 1 }
-      }
-    }
-    v2: (struct){
-      y: (#list){
-        0: (#list){
-          0: (#list){
-            0: (int){ 2 }
-            1: (int){ 1 }
-          }
-          1: (int){ 1 }
-        }
-        1: (int){ 1 }
-      }
-      x: (#list){
-        0: (int){ int }
-        1: (int){ 1 }
-      }
-    }
-  }
-  v3: (struct){
-    list: (struct){
-      head: (int){ int }
-      tail: (null){ null }
-    }
-    myList: (struct){
-      head: (int){ 2 }
-      tail: (struct){
-        head: (int){ 3 }
-        tail: (struct){
-          head: (int){ 4 }
-          tail: ((null|struct)){ |((struct){
-              head: (int){ int }
-              tail: (null){ null }
-            }, (null){ null }) }
-        }
-      }
-    }
-  }
-  v4: (struct){
-    list: (struct){
-      head: (int){ int }
-      tail: (int){ 1 }
-    }
-    myList: (struct){
-      head: (int){ 2 }
-      tail: (struct){
-        head: (int){ 3 }
-        tail: ((int|struct)){ |((struct){
-            head: (int){ int }
-            tail: (int){ 1 }
-          }, (int){ 1 }) }
-      }
-    }
-  }
-  v5: (struct){
-    list: (struct){
-      head: (int){ int }
-      tail: (struct){
-      }
-    }
-    myList: (struct){
-      head: (int){ 2 }
-      tail: (struct){ |((struct){
-          head: (int){ 3 }
-          tail: (struct){ |((struct){
-              head: (int){ int }
-              tail: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
-          head: (int){ 3 }
-        }) }
-    }
-  }
-  z1: (_|_){
-    // [structural cycle]
-    y: (struct){
-      f: (struct){
-        h: (_){ _ }
-      }
-      g: (_){ _ }
-    }
-    x: (struct){
-      f: (_){ _ }
-      g: (_){ _ }
-    }
-    z: (_|_){
-      // [structural cycle]
-      f: (_|_){
-        // [structural cycle]
-        h: (_|_){
-          // [structural cycle] z1.z.g: structural cycle
-        }
-      }
-      g: (_|_){
-        // [structural cycle] z1.z.g: structural cycle
-      }
-    }
-  }
-  crossRefNoCycle: (struct){
-    t1: (struct){
-      T: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-      C: (struct){
-        x: ~(crossRefNoCycle.t1.T)
-        y: ~(crossRefNoCycle.t1.T)
-      }
-    }
-    t2: (struct){
-      T: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-      C: (struct){
-        x: ~(crossRefNoCycle.t2.T)
-        y: ~(crossRefNoCycle.t2.T)
-      }
-    }
-    t3: (struct){
-      T: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-        z: (_){ _ }
-      }
-      C: (struct){
-        x: ~(crossRefNoCycle.t3.T)
-        y: ~(crossRefNoCycle.t3.T)
-        z: ~(crossRefNoCycle.t3.T)
-      }
-    }
-    t4: (struct){
-      T: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-        z: (_){ _ }
-      }
-      C: (struct){
-        x: (struct){
-          x: ~(crossRefNoCycle.t4.T)
-          y: ~(crossRefNoCycle.t4.T)
-          z: ~(crossRefNoCycle.t4.T)
-        }
-        y: ~(crossRefNoCycle.t4.C.x)
-        z: ~(crossRefNoCycle.t4.C.x)
-      }
-    }
-    t5: (struct){
-      T: (struct){
-        y: (_|_){
-          // [incomplete] crossRefNoCycle.t5.T.y: undefined field: x:
-          //     ./in.cue:556:8
-        }
-      }
-      C: (struct){
-        x: ~(crossRefNoCycle.t5.T)
-        y: ~(crossRefNoCycle.t5.T)
-      }
-    }
-  }
-  n1: (struct){
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  n2: (struct){
-    a: (struct){
-      b: (int){ int }
-      a: (struct){
-        b: (int){ int }
-      }
-    }
-  }
-  n3: (struct){
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  n4: (struct){
-    x: (struct){
-      y: (struct){
-        z: (int){ int }
-        a: (struct){
-          b: (int){ int }
-        }
-      }
-      a: (struct){
-        b: (int){ int }
-      }
-    }
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -4,6 +4,11 @@
- b12b.#list.tail: structural cycle
- b13.root.a.0.0: structural cycle
- b14.root.b.1.1: structural cycle
-+b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
-+    ./in.cue:55:5
-+    ./in.cue:55:12
-+    ./in.cue:56:8
-+    ./in.cue:56:9
- b4.cond1.x.y.0: structural cycle
- b4.cond2.x.y.0: structural cycle
- b4.x.y.0: structural cycle
-@@ -12,14 +17,17 @@
-     ./in.cue:94:13
-     ./in.cue:94:14
-     ./in.cue:95:9
--b6.b.a.0.0: structural cycle
- b6.x.a.0: structural cycle
- b7.a.0: structural cycle
-+b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
-+    ./in.cue:99:5
-+    ./in.cue:99:11
-+    ./in.cue:100:5
-+    ./in.cue:100:6
- c1.a.c.c: structural cycle
--d1.a.b.c.d.t: structural cycle
-+d1.r: structural cycle
- d2.a.b.c.d.t: structural cycle
--d2.r.c.d.t: structural cycle
--d3.x.a.b.c: structural cycle
-+d3.x.indirect: structural cycle
- e1.a.c: structural cycle
- e1.b.c: structural cycle
- e2.a.c: structural cycle
-@@ -27,70 +35,64 @@
- e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-     ./in.cue:412:5
-     ./in.cue:413:5
--e3.a.c: structural cycle
- e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-     ./in.cue:415:5
-     ./in.cue:416:5
--e3.b.c: structural cycle
--e4.a.0: 4 errors in empty disjunction:
-+e4.a.0: 2 errors in empty disjunction:
- e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-     ./in.cue:420:10
-     ./in.cue:421:6
--e4.a.0.0: 2 errors in empty disjunction:
--e4.a.0.0: conflicting values [[{c:1}]] and {c:1} (mismatched types list and struct):
--    ./in.cue:421:5
--    ./in.cue:421:7
--e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-+e4.a.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-     ./in.cue:420:6
--    ./in.cue:420:10
--    ./in.cue:421:6
--e4.b.0: 4 errors in empty disjunction:
-+    ./in.cue:421:6
-+    ./in.cue:421:7
-+e4.b.0: 2 errors in empty disjunction:
- e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-     ./in.cue:423:6
-     ./in.cue:424:10
--e4.b.0.0: 2 errors in empty disjunction:
--e4.b.0.0: conflicting values [(b|{})] and {c:1} (mismatched types list and struct):
-+e4.b.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-+    ./in.cue:423:6
-     ./in.cue:423:7
--    ./in.cue:424:5
--e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
--    ./in.cue:423:6
-     ./in.cue:424:6
--    ./in.cue:424:10
- issue2545.#B.A: structural cycle
- nestedList.v1e.y.0: 4 errors in empty disjunction:
--nestedList.v1e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
--    ./in.cue:438:11
-+nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-+    ./in.cue:438:11
-+    ./in.cue:439:6
-     ./in.cue:439:11
- nestedList.v1e.y.0.0: 2 errors in empty disjunction:
--nestedList.v1e.y.0.0: conflicting values int and [2] (mismatched types int and list):
--    ./in.cue:438:11
-+nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-+    ./in.cue:438:7
-+    ./in.cue:438:11
-+    ./in.cue:439:6
-     ./in.cue:439:12
--nestedList.v1e.y.0.0: incompatible list lengths (1 and 2)
- nestedList.v2e.y.0: 4 errors in empty disjunction:
--nestedList.v2e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
-+nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-+    ./in.cue:443:6
-     ./in.cue:443:11
-     ./in.cue:444:11
- nestedList.v2e.y.0.0: 2 errors in empty disjunction:
--nestedList.v2e.y.0.0: conflicting values int and [2] (mismatched types int and list):
-+nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-+    ./in.cue:443:6
-     ./in.cue:443:12
--    ./in.cue:444:11
--nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
-+    ./in.cue:444:7
-+    ./in.cue:444:11
- p2.#T.a.b.link: structural cycle
- p3.#U.#T.a.b.link: structural cycle
- p5.#T.a.0.link: structural cycle
- p6.#U.#T.a.0.link: structural cycle
- patternFail.issue2374.a.b: structural cycle
-+resolveToAncestor.t1.X.b: structural cycle
- resolveToAncestor.t2.X.b: structural cycle
--shortPathFail.elipsis.t2.Foo.ref.ref: structural cycle
-+shortPathFail.elipsis.t2.Foo.ref: structural cycle
- withLetFail.schema.next: structural cycle
--z1.z.f.h: structural cycle
--z1.z.g.h: structural cycle
--resolveToAncestor.t1.X.b: structural cycle:
--    ./edge.cue:3:6
--d1.r: structural cycle:
--    ./in.cue:301:26
--d3.x.indirect: structural cycle:
--    ./in.cue:316:12
-+z1.z.g: structural cycle
-+fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
-+    ./in.cue:371:9
-+nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
-+    ./in.cue:438:6
-+nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
-+    ./in.cue:444:6
- 
- Result:
- (_|_){
-@@ -101,13 +103,9 @@
-       // [structural cycle]
-       X: (_|_){
-         // [structural cycle]
--        a: (_|_){
--          // [structural cycle] resolveToAncestor.t1.X.b: structural cycle:
--          //     ./edge.cue:3:6
--        }
--        b: (_|_){
--          // [structural cycle] resolveToAncestor.t1.X.b: structural cycle:
--          //     ./edge.cue:3:6
-+        a: (_){ _ }
-+        b: (_|_){
-+          // [structural cycle] resolveToAncestor.t1.X.b: structural cycle
-         }
-       }
-     }
-@@ -402,7 +400,11 @@
-           value: (int){ 3 }
-           tail: (#struct){
-             value: (int){ 4 }
--            tail: (null){ null }
-+            tail: ((null|struct)){ |(*(null){ null }, (#struct){
-+                value: (int){ int }
-+                tail: (null){ null }
-+                sum: (int){ int }
-+              }) }
-             sum: (int){ 4 }
-           }
-           sum: (int){ 7 }
-@@ -686,20 +688,19 @@
-     }
-     x: (_|_){
-       // [structural cycle]
-+      i: (int){ 0 }
-       a: (_|_){
-         // [structural cycle]
-         b: (_|_){
-           // [structural cycle]
-           c: (_|_){
--            // [structural cycle] d3.x.a.b.c: structural cycle
-+            // [structural cycle] d3.x.indirect: structural cycle
-           }
-         }
-       }
-       indirect: (_|_){
--        // [structural cycle] d3.x.indirect: structural cycle:
--        //     ./in.cue:316:12
--      }
--      i: (int){ 0 }
-+        // [structural cycle] d3.x.indirect: structural cycle
-+      }
-     }
-   }
-   shortPathFail: (_|_){
-@@ -714,9 +715,7 @@
-       // [structural cycle]
-       t1: (struct){
-         #Foo: (#struct){
--          ref: ((null|struct)){ |((null){ null }, (#struct){
--              ref: (null){ null }
--            }) }
-+          ref: (null){ null }
-         }
-       }
-       t2: (_|_){
-@@ -731,9 +730,7 @@
-     }
-     comprehension: (struct){
-       #list: (#struct){
--        tail: ((null|struct)){ |(*(null){ null }, (#struct){
--            tail: (null){ null }
--          }) }
-+        tail: (null){ null }
-       }
-     }
-   }
-@@ -759,8 +756,7 @@
-       }
-     }
-     let _schema_1#1 = (_|_){
--      // [structural cycle] withLetFail._schema_1: structural cycle:
--      //     ./in.cue:362:17
-+      // [structural cycle] withLetFail.schema.next: structural cycle
-     }
-   }
-   fieldsSumInfinite: (_|_){
-@@ -771,7 +767,7 @@
-       fries: (float){ 2.00 }
-       sprite: (float){ 1.00 }
-       total: (_|_){
--        // [structural cycle] 3: structural cycle:
-+        // [structural cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
-         //     ./in.cue:371:9
-       }
-     }
-@@ -839,11 +835,9 @@
-       // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-       //     ./in.cue:412:5
-       //     ./in.cue:413:5
--      c: (_|_){
--        // [structural cycle] e3.a.c: structural cycle
--      }
--      0: (_|_){
--        // [structural cycle] e3.a.c: structural cycle
-+      c: (_|_){// 〈1;a〉
-+      }
-+      0: (_|_){// 〈1;a〉
-       }
-     }
-     b: (_|_){
-@@ -850,11 +844,9 @@
-       // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-       //     ./in.cue:415:5
-       //     ./in.cue:416:5
--      c: (_|_){
--        // [structural cycle] e3.b.c: structural cycle
--      }
--      0: (_|_){
--        // [structural cycle] e3.b.c: structural cycle
-+      c: (_|_){// 〈1;b〉
-+      }
-+      0: (_|_){// 〈1;b〉
-       }
-     }
-   }
-@@ -863,40 +855,30 @@
-     a: (_|_){
-       // [eval]
-       0: (_|_){
--        // [eval] e4.a.0: 4 errors in empty disjunction:
-+        // [eval] e4.a.0: 2 errors in empty disjunction:
-         // e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-         //     ./in.cue:420:10
-         //     ./in.cue:421:6
--        // e4.a.0.0: 2 errors in empty disjunction:
--        // e4.a.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
-+        // e4.a.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-         //     ./in.cue:420:6
-         //     ./in.cue:421:6
-         //     ./in.cue:421:7
--        // e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
--        //     ./in.cue:420:6
--        //     ./in.cue:420:10
--        //     ./in.cue:421:6
--        0: (struct){
--          c: (int){ 1 }
--        }
--      }
--    }
--    b: (_|_){
--      // [eval]
--      0: (_|_){
--        // [eval] e4.b.0: 4 errors in empty disjunction:
-+        0: (struct){
-+          c: (int){ 1 }
-+        }
-+      }
-+    }
-+    b: (_|_){
-+      // [eval]
-+      0: (_|_){
-+        // [eval] e4.b.0: 2 errors in empty disjunction:
-         // e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-         //     ./in.cue:423:6
-         //     ./in.cue:424:10
--        // e4.b.0.0: 2 errors in empty disjunction:
--        // e4.b.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
-+        // e4.b.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-         //     ./in.cue:423:6
-         //     ./in.cue:423:7
-         //     ./in.cue:424:6
--        // e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
--        //     ./in.cue:423:6
--        //     ./in.cue:424:6
--        //     ./in.cue:424:10
-         0: (struct){
-           c: (int){ 1 }
-         }
-@@ -957,10 +939,9 @@
-           //     ./in.cue:443:12
-           //     ./in.cue:444:7
-           //     ./in.cue:444:11
--          // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
--          0: (#list){
--            0: (int){ 2 }
--          }
-+          // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
-+          //     ./in.cue:444:6
-+          0: (list){ list }
-           1: (int){ 1 }
-         }
-         1: (int){ 1 }
-@@ -1075,13 +1056,12 @@
-       // [structural cycle]
-       f: (_|_){
-         // [structural cycle]
--        h: ~(z1.z.g)
--      }
--      g: (_|_){
--        // [structural cycle]
-         h: (_|_){
--          // [structural cycle] z1.z.g.h: structural cycle
--        }
-+          // [structural cycle] z1.z.g: structural cycle
-+        }
-+      }
-+      g: (_|_){
-+        // [structural cycle] z1.z.g: structural cycle
-       }
-     }
-   }
-@@ -1092,11 +1072,8 @@
-         y: (_){ _ }
-       }
-       C: (struct){
--        x: (struct){
--          x: (_){ _ }
--          y: (_){ _ }
--        }
--        y: ~(crossRefNoCycle.t1.C.x)
-+        x: ~(crossRefNoCycle.t1.T)
-+        y: ~(crossRefNoCycle.t1.T)
-       }
-     }
-     t2: (struct){
-@@ -1105,11 +1082,8 @@
-         y: (_){ _ }
-       }
-       C: (struct){
--        x: (struct){
--          x: (_){ _ }
--          y: (_){ _ }
--        }
--        y: ~(crossRefNoCycle.t2.C.x)
-+        x: ~(crossRefNoCycle.t2.T)
-+        y: ~(crossRefNoCycle.t2.T)
-       }
-     }
-     t3: (struct){
-@@ -1119,13 +1093,9 @@
-         z: (_){ _ }
-       }
-       C: (struct){
--        x: (struct){
--          x: (_){ _ }
--          y: (_){ _ }
--          z: (_){ _ }
--        }
--        y: ~(crossRefNoCycle.t3.C.x)
--        z: ~(crossRefNoCycle.t3.C.x)
-+        x: ~(crossRefNoCycle.t3.T)
-+        y: ~(crossRefNoCycle.t3.T)
-+        z: ~(crossRefNoCycle.t3.T)
-       }
-     }
-     t4: (struct){
-@@ -1136,13 +1106,9 @@
-       }
-       C: (struct){
-         x: (struct){
--          x: (struct){
--            x: (_){ _ }
--            y: (_){ _ }
--            z: (_){ _ }
--          }
--          y: ~(crossRefNoCycle.t4.C.x.x)
--          z: ~(crossRefNoCycle.t4.C.x.x)
-+          x: ~(crossRefNoCycle.t4.T)
-+          y: ~(crossRefNoCycle.t4.T)
-+          z: ~(crossRefNoCycle.t4.T)
-         }
-         y: ~(crossRefNoCycle.t4.C.x)
-         z: ~(crossRefNoCycle.t4.C.x)
-@@ -1180,19 +1146,19 @@
-     }
-   }
-   n4: (struct){
--    a: (struct){
--      b: (int){ int }
--    }
--    x: (struct){
--      a: (struct){
--        b: (int){ int }
--      }
--      y: (struct){
-+    x: (struct){
-+      y: (struct){
-+        z: (int){ int }
-         a: (struct){
-           b: (int){ int }
-         }
--        z: (int){ int }
--      }
-+      }
-+      a: (struct){
-+        b: (int){ int }
-+      }
-+    }
-+    a: (struct){
-+      b: (int){ int }
-     }
-   }
- }
--- diff/todo/p2 --
-Investigate differing counts for empty disjunction errors.
-fieldsSumInfinite.issue3310.3: path missing in error
-b7.b.0.0.0: cycle too deep before detection.
-TODO(share): fix the following bug once we have structure sharing.
-p3.a.a: field not allowed incorrect?
--- diff/todo/p3 --
-n4: Reordering.
-b12b: reported at correct level, but investigate if it is not processing
-    too deep anyway.
--- diff/explanation --
-Structural cycles are reported in all chains. compared to old implementation.
-b4.b: Structural error converted to eval error: there is both a structural and
-   eval error at this field. The newly reported error is correct.
-b7.b.0.0: structural cycle nested one too deep: the eval error takes precedence.
-   The cycle is reported at the correct level according to the spec.
-b10.c.d: position now allows b: string as well. This is correct. This is mostly
-   a representational issue, as the evaluator would still accept such values
-   when merged, but it is still useful.
-fieldsSumInfinite.issue3310: evalv3 correctly spots a structural cycle,
-   where evalv2 computes an incorrect result without erroring.
-issue2545: a regression in evalv2 around v0.6 is fixed in evalv3.
--- out/eval --
-Errors:
-a1.f.0: structural cycle
-a3.f.g: structural cycle
-b12b.#list.tail: structural cycle
-b13.root.a.0.0: structural cycle
-b14.root.b.1.1: structural cycle
-b4.cond1.x.y.0: structural cycle
-b4.cond2.x.y.0: structural cycle
-b4.x.y.0: structural cycle
-b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
-    ./in.cue:94:5
-    ./in.cue:94:13
-    ./in.cue:94:14
-    ./in.cue:95:9
-b6.b.a.0.0: structural cycle
-b6.x.a.0: structural cycle
-b7.a.0: structural cycle
-c1.a.c.c: structural cycle
-d1.a.b.c.d.t: structural cycle
-d2.a.b.c.d.t: structural cycle
-d2.r.c.d.t: structural cycle
-d3.x.a.b.c: structural cycle
-e1.a.c: structural cycle
-e1.b.c: structural cycle
-e2.a.c: structural cycle
-e2.b.c: structural cycle
-e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-    ./in.cue:412:5
-    ./in.cue:413:5
-e3.a.c: structural cycle
-e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-    ./in.cue:415:5
-    ./in.cue:416:5
-e3.b.c: structural cycle
-e4.a.0: 4 errors in empty disjunction:
-e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:420:10
-    ./in.cue:421:6
-e4.a.0.0: 2 errors in empty disjunction:
-e4.a.0.0: conflicting values [[{c:1}]] and {c:1} (mismatched types list and struct):
-    ./in.cue:421:5
-    ./in.cue:421:7
-e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:420:6
-    ./in.cue:420:10
-    ./in.cue:421:6
-e4.b.0: 4 errors in empty disjunction:
-e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:423:6
-    ./in.cue:424:10
-e4.b.0.0: 2 errors in empty disjunction:
-e4.b.0.0: conflicting values [(b|{})] and {c:1} (mismatched types list and struct):
-    ./in.cue:423:7
-    ./in.cue:424:5
-e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:423:6
-    ./in.cue:424:6
-    ./in.cue:424:10
-issue2545.#B.A: structural cycle
-nestedList.v1e.y.0: 4 errors in empty disjunction:
-nestedList.v1e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
-    ./in.cue:438:11
-    ./in.cue:439:11
-nestedList.v1e.y.0.0: 2 errors in empty disjunction:
-nestedList.v1e.y.0.0: conflicting values int and [2] (mismatched types int and list):
-    ./in.cue:438:11
-    ./in.cue:439:12
-nestedList.v1e.y.0.0: incompatible list lengths (1 and 2)
-nestedList.v2e.y.0: 4 errors in empty disjunction:
-nestedList.v2e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
-    ./in.cue:443:11
-    ./in.cue:444:11
-nestedList.v2e.y.0.0: 2 errors in empty disjunction:
-nestedList.v2e.y.0.0: conflicting values int and [2] (mismatched types int and list):
-    ./in.cue:443:12
-    ./in.cue:444:11
-nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
-p2.#T.a.b.link: structural cycle
-p3.#U.#T.a.b.link: structural cycle
-p5.#T.a.0.link: structural cycle
-p6.#U.#T.a.0.link: structural cycle
-patternFail.issue2374.a.b: structural cycle
-resolveToAncestor.t2.X.b: structural cycle
-shortPathFail.elipsis.t2.Foo.ref.ref: structural cycle
-withLetFail.schema.next: structural cycle
-z1.z.f.h: structural cycle
-z1.z.g.h: structural cycle
-resolveToAncestor.t1.X.b: structural cycle:
-    ./edge.cue:3:6
-d1.r: structural cycle:
-    ./in.cue:301:26
-d3.x.indirect: structural cycle:
-    ./in.cue:316:12
-
-Result:
-(_|_){
-  // [eval]
-  resolveToAncestor: (_|_){
-    // [structural cycle]
-    t1: (_|_){
-      // [structural cycle]
-      X: (_|_){
-        // [structural cycle]
-        a: (_|_){
-          // [structural cycle] resolveToAncestor.t1.X.b: structural cycle:
-          //     ./edge.cue:3:6
-        }
-        b: (_|_){
-          // [structural cycle] resolveToAncestor.t1.X.b: structural cycle:
-          //     ./edge.cue:3:6
-        }
-      }
-    }
-    t2: (_|_){
-      // [structural cycle]
-      X: (_|_){
-        // [structural cycle]
-        b: (_|_){
-          // [structural cycle] resolveToAncestor.t2.X.b: structural cycle
-        }
-        a: (_|_){
-          // [structural cycle] resolveToAncestor.t2.X.b: structural cycle
-        }
-      }
-    }
-  }
-  a1: (_|_){
-    // [structural cycle]
-    f: (_|_){
-      // [structural cycle]
-      0: (_|_){
-        // [structural cycle] a1.f.0: structural cycle
-      }
-    }
-  }
-  a2: (struct){
-    f: (_){ _ }
-  }
-  a3: (_|_){
-    // [structural cycle]
-    f: (_|_){
-      // [structural cycle]
-      g: (_|_){
-        // [structural cycle] a3.f.g: structural cycle
-      }
-    }
-  }
-  a4: (struct){
-    a: (#list){
-      0: (int){ int }
-    }
-  }
-  a5: (struct){
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  a6: (struct){
-    a: (_){ |((_){ _ }, (int){ int }) }
-  }
-  a7: (struct){
-    a: (string){ "foo" }
-    b: (struct){
-      x: ~(a7.c)
-      y: (string){ "foo" }
-    }
-    c: (struct){
-      x: (string){ "foo" }
-      y: (int){ 3 }
-    }
-  }
-  b1: (struct){
-    b: (#list){
-      0: (int){ 1 }
-    }
-    a: (#list){
-      0: (int){ int }
-    }
-  }
-  b2: (struct){
-    a: (#list){
-      0: (int){ int }
-    }
-    b: (#list){
-      0: (int){ 1 }
-    }
-  }
-  b3: (struct){
-    x: (struct){
-      a: (#list){
-        0: (int){ int }
-      }
-    }
-    b: (struct){
-      a: (#list){
-        0: (int){ 1 }
-      }
-    }
-  }
-  b4: (_|_){
-    // [eval]
-    b: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
-        //     ./in.cue:55:5
-        //     ./in.cue:55:12
-        //     ./in.cue:56:8
-        //     ./in.cue:56:9
-        0: (_|_){// 〈1;y〉
-        }
-      }
-    }
-    x: (_|_){
-      // [structural cycle]
-      y: (_|_){
-        // [structural cycle]
-        0: (_|_){
-          // [structural cycle] b4.x.y.0: structural cycle
-        }
-      }
-    }
-    cond1: (_|_){
-      // [structural cycle]
-      b: (#list){
-        _z: (bool){ false }
-        0: (int){ 1 }
-      }
-      x: (_|_){
-        // [structural cycle]
-        y: (_|_){
-          // [structural cycle]
-          _z: (bool){ |(*(bool){ true }, (bool){ bool }) }
-          0: (_|_){
-            // [structural cycle] b4.cond1.x.y.0: structural cycle
-          }
-        }
-      }
-    }
-    cond2: (_|_){
-      // [structural cycle]
-      x: (_|_){
-        // [structural cycle]
-        y: (_|_){
-          // [structural cycle]
-          _z: (bool){ |(*(bool){ true }, (bool){ bool }) }
-          0: (_|_){
-            // [structural cycle] b4.cond2.x.y.0: structural cycle
-          }
-        }
-      }
-      b: (_|_){
-        // [structural cycle] b4.cond2.x.y.0: structural cycle
-      }
-    }
-  }
-  b5: (struct){
-    b: (struct){
-      a: (#list){
-        0: (int){ 1 }
-      }
-    }
-    x: (struct){
-      y: (struct){
-        a: (#list){
-          0: (int){ int }
-        }
-      }
-    }
-  }
-  b6: (_|_){
-    // [eval]
-    b: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
-          //     ./in.cue:94:5
-          //     ./in.cue:94:13
-          //     ./in.cue:94:14
-          //     ./in.cue:95:9
-          0: (_|_){// 1 & 〈1;a〉
-          }
-        }
-      }
-    }
-    x: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        0: (_|_){
-          // [structural cycle] b6.x.a.0: structural cycle
-        }
-      }
-    }
-  }
-  b7: (_|_){
-    // [eval]
-    b: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
-          //     ./in.cue:99:5
-          //     ./in.cue:99:11
-          //     ./in.cue:100:5
-          //     ./in.cue:100:6
-          0: (_|_){// 〈1;a〉
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle]
-      0: (_|_){
-        // [structural cycle] b7.a.0: structural cycle
-      }
-    }
-  }
-  b8: (struct){
-    x: ~(b8.a)
-    a: (struct){
-      f: (string){ string }
-    }
-    b: (string){ string }
-  }
-  b9: (struct){
-    #a: ((string|struct)){ |((string){ string }, (#struct){
-        ref: (string){ string }
-      }) }
-    #b: (#struct){
-      c: (#list){
-        0: ((string|struct)){ |((string){ string }, (#struct){
-            ref: (string){ string }
-          }) }
-        1: ((string|struct)){ |((string){ string }, (#struct){
-            ref: (string){ string }
-          }) }
-        2: ((string|struct)){ |((string){ string }, (#struct){
-            ref: (string){ string }
-          }) }
-      }
-    }
-    #ref: (#struct){
-      ref: (string){ string }
-    }
-    x: (struct){ |((#struct){
-        c: (#list){
-          0: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-          1: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-          2: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-        }
-      }, (#struct){
-        ref: (string){ string }
-      }) }
-  }
-  b10: (struct){
-    a: (#struct){
-      b: ((string|struct)){ |((string){ string }, (#struct){
-          d: (string){ string }
-        }) }
-    }
-    c: (#struct){
-      d: ((string|struct)){ |((string){ string }, (#struct){
-          b: ((string|struct)){ |((string){ string }, (#struct){
-              b: ((string|struct)){ |((string){ string }, (#struct){
-                  b: (string){ string }
-                }) }
-            }) }
-        }) }
-    }
-    d: (struct){
-      d: (struct){
-        b: (string){ string }
-      }
-    }
-  }
-  b11: (struct){
-    #list: (#struct){
-      tail: (null){ null }
-    }
-  }
-  b12: (struct){
-    #list: (#struct){
-      value: (int){ int }
-      tail: (null){ null }
-      sum: (int){ int }
-    }
-    list1: (#struct){
-      value: (int){ 1 }
-      tail: (#struct){
-        value: (int){ 2 }
-        tail: (#struct){
-          value: (int){ 3 }
-          tail: (#struct){
-            value: (int){ 4 }
-            tail: (null){ null }
-            sum: (int){ 4 }
-          }
-          sum: (int){ 7 }
-        }
-        sum: (int){ 9 }
-      }
-      sum: (int){ 10 }
-    }
-  }
-  b12b: (_|_){
-    // [structural cycle]
-    #list: (_|_){
-      // [structural cycle] b12b.#list.tail: structural cycle
-    }
-    list1: (_|_){
-      // [structural cycle] b12b.#list.tail: structural cycle
-    }
-  }
-  b13: (_|_){
-    // [structural cycle]
-    root: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        0: (_|_){
-          // [structural cycle]
-          0: (_|_){
-            // [structural cycle] b13.root.a.0.0: structural cycle
-          }
-        }
-      }
-    }
-  }
-  b14: (_|_){
-    // [structural cycle]
-    root: (_|_){
-      // [structural cycle]
-      a: (list){
-      }
-      b: (_|_){
-        // [structural cycle]
-        0: (list){
-        }
-        1: (_|_){
-          // [structural cycle]
-          0: (list){
-          }
-          1: (_|_){
-            // [structural cycle] b14.root.b.1.1: structural cycle
-          }
-        }
-      }
-    }
-  }
-  b15: (struct){
-    root: (struct){
-      a: (struct){
-      }
-    }
-  }
-  p1: (struct){
-    #T: (#struct){
-      a: (#struct){
-      }
-    }
-    a: (#struct){
-      a: (#struct){
-        one: (#struct){
-          link: (#struct){
-            a: (#struct){
-              two: (#struct){
-                link: ~(p1.#T)
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  p2: (_|_){
-    // [structural cycle]
-    #T: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        b: (_|_){
-          // [structural cycle]
-          link: (_|_){
-            // [structural cycle] p2.#T.a.b.link: structural cycle
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle]
-      a: (struct){
-        one: (struct){
-          link: (struct){
-            a: (struct){
-              two: (struct){
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  p3: (_|_){
-    // [structural cycle]
-    #S: (#struct){
-      #T: (#struct){
-        a: (#struct){
-        }
-      }
-    }
-    #U: (_|_){
-      // [structural cycle]
-      #T: (_|_){
-        // [structural cycle]
-        a: (_|_){
-          // [structural cycle]
-          b: (_|_){
-            // [structural cycle]
-            link: (_|_){
-              // [structural cycle] p3.#U.#T.a.b.link: structural cycle
-            }
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle] p3.#U.#T.a.b.link: structural cycle
-    }
-  }
-  p4: (struct){
-    #T: (#struct){
-      a: (list){
-      }
-    }
-    a: (#struct){
-      a: (#list){
-        0: (#struct){
-          link: (#struct){
-            a: (#list){
-              0: (#struct){
-                link: ~(p4.#T)
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  p5: (_|_){
-    // [structural cycle]
-    #T: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        0: (_|_){
-          // [structural cycle]
-          link: (_|_){
-            // [structural cycle] p5.#T.a.0.link: structural cycle
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle]
-      a: (#list){
-        0: (struct){
-          link: (struct){
-            a: (#list){
-              0: (struct){
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  p6: (_|_){
-    // [structural cycle]
-    #S: (#struct){
-      #T: (#struct){
-        a: (list){
-        }
-      }
-    }
-    #U: (_|_){
-      // [structural cycle]
-      #T: (_|_){
-        // [structural cycle]
-        a: (_|_){
-          // [structural cycle]
-          0: (_|_){
-            // [structural cycle]
-            link: (_|_){
-              // [structural cycle] p6.#U.#T.a.0.link: structural cycle
-            }
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural cycle] p6.#U.#T.a.0.link: structural cycle
-    }
-  }
-  c1: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      b: (struct){
-      }
-      c: (_|_){
-        // [structural cycle]
-        b: (struct){
-        }
-        c: (_|_){
-          // [structural cycle] c1.a.c.c: structural cycle
-        }
-      }
-    }
-  }
-  d1: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      b: (_|_){
-        // [structural cycle]
-        c: (_|_){
-          // [structural cycle]
-          d: (_|_){
-            // [structural cycle]
-            h: (int){ int }
-            t: (_|_){
-              // [structural cycle] d1.r: structural cycle
-            }
-          }
-        }
-      }
-    }
-    r: (_|_){
-      // [structural cycle] d1.r: structural cycle
-    }
-    x: (_|_){
-      // [structural cycle] d1.r: structural cycle
-    }
-  }
-  d2: (_|_){
-    // [structural cycle]
-    x: ~(d2.a.b.c)
-    r: ~(d2.a.b)
-    a: (_|_){
-      // [structural cycle]
-      b: (_|_){
-        // [structural cycle]
-        c: (_|_){
-          // [structural cycle]
-          d: (_|_){
-            // [structural cycle]
-            h: (int){ int }
-            t: (_|_){
-              // [structural cycle] d2.a.b.c.d.t: structural cycle
-            }
-          }
-        }
-      }
-    }
-  }
-  d3: (_|_){
-    // [structural cycle]
-    config: (struct){
-      a: (struct){
-        b: (struct){
-          c: (null){ null }
-        }
-      }
-      indirect: (null){ null }
-      i: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-    x: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        b: (_|_){
-          // [structural cycle]
-          c: (_|_){
-            // [structural cycle] d3.x.a.b.c: structural cycle
-          }
-        }
-      }
-      indirect: (_|_){
-        // [structural cycle] d3.x.indirect: structural cycle:
-        //     ./in.cue:316:12
-      }
-      i: (int){ 0 }
-    }
-  }
-  shortPathFail: (_|_){
-    // [structural cycle]
-    doubleRef: (struct){
-      a: ~(shortPathFail.doubleRef.#List)
-      #List: (#struct){
-        Next: (null){ null }
-      }
-    }
-    elipsis: (_|_){
-      // [structural cycle]
-      t1: (struct){
-        #Foo: (#struct){
-          ref: ((null|struct)){ |((null){ null }, (#struct){
-              ref: (null){ null }
-            }) }
-        }
-      }
-      t2: (_|_){
-        // [structural cycle]
-        Foo: (_|_){
-          // [structural cycle]
-          ref: (_|_){
-            // [structural cycle] shortPathFail.elipsis.t2.Foo.ref: structural cycle
-          }
-        }
-      }
-    }
-    comprehension: (struct){
-      #list: (#struct){
-        tail: ((null|struct)){ |(*(null){ null }, (#struct){
-            tail: (null){ null }
-          }) }
-      }
-    }
-  }
-  patternFail: (_|_){
-    // [structural cycle]
-    issue2374: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        r: (int){ 0 }
-        b: (_|_){
-          // [structural cycle] patternFail.issue2374.a.b: structural cycle
-        }
-      }
-    }
-  }
-  withLetFail: (_|_){
-    // [structural cycle]
-    schema: (_|_){
-      // [structural cycle]
-      next: (_|_){
-        // [structural cycle] withLetFail.schema.next: structural cycle
-      }
-    }
-    let _schema_1#1 = (_|_){
-      // [structural cycle] withLetFail._schema_1: structural cycle:
-      //     ./in.cue:362:17
-    }
-  }
-  fieldsSumInfinite: (_|_){
-    // [structural cycle]
-    issue3310: (_|_){
-      // [structural cycle]
-      cheeseburger: (float){ 3.00 }
-      fries: (float){ 2.00 }
-      sprite: (float){ 1.00 }
-      total: (_|_){
-        // [structural cycle] 3: structural cycle:
-        //     ./in.cue:371:9
-      }
-    }
-  }
-  listOptOK: (struct){
-    list: (struct){
-      head: (int){ int }
-      tail?: (_|_){
-        // [structural cycle] listOptOK.list.tail: structural cycle
-      }
-    }
-    a: (struct){
-      head: (int){ 3 }
-      tail: (struct){
-        head: (int){ 2 }
-        tail?: ~(listOptOK.list)
-      }
-    }
-  }
-  issue2545: (_|_){
-    // [structural cycle]
-    #A: (#struct){
-      B?: ~(issue2545.#B)
-    }
-    #B: (_|_){
-      // [structural cycle]
-      A: (_|_){
-        // [structural cycle] issue2545.#B.A: structural cycle
-      }
-    }
-  }
-  e1: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      c: (_|_){
-        // [structural cycle] e1.a.c: structural cycle
-      }
-    }
-    b: (_|_){
-      // [structural cycle]
-      c: (_|_){
-        // [structural cycle] e1.b.c: structural cycle
-      }
-    }
-  }
-  e2: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      c: (_|_){
-        // [structural cycle] e2.a.c: structural cycle
-      }
-    }
-    b: (_|_){
-      // [structural cycle]
-      c: (_|_){
-        // [structural cycle] e2.b.c: structural cycle
-      }
-    }
-  }
-  e3: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-      //     ./in.cue:412:5
-      //     ./in.cue:413:5
-      c: (_|_){
-        // [structural cycle] e3.a.c: structural cycle
-      }
-      0: (_|_){
-        // [structural cycle] e3.a.c: structural cycle
-      }
-    }
-    b: (_|_){
-      // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-      //     ./in.cue:415:5
-      //     ./in.cue:416:5
-      c: (_|_){
-        // [structural cycle] e3.b.c: structural cycle
-      }
-      0: (_|_){
-        // [structural cycle] e3.b.c: structural cycle
-      }
-    }
-  }
-  e4: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval] e4.a.0: 4 errors in empty disjunction:
-        // e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-        //     ./in.cue:420:10
-        //     ./in.cue:421:6
-        // e4.a.0.0: 2 errors in empty disjunction:
-        // e4.a.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
-        //     ./in.cue:420:6
-        //     ./in.cue:421:6
-        //     ./in.cue:421:7
-        // e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-        //     ./in.cue:420:6
-        //     ./in.cue:420:10
-        //     ./in.cue:421:6
-        0: (struct){
-          c: (int){ 1 }
-        }
-      }
-    }
-    b: (_|_){
-      // [eval]
-      0: (_|_){
-        // [eval] e4.b.0: 4 errors in empty disjunction:
-        // e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-        //     ./in.cue:423:6
-        //     ./in.cue:424:10
-        // e4.b.0.0: 2 errors in empty disjunction:
-        // e4.b.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
-        //     ./in.cue:423:6
-        //     ./in.cue:423:7
-        //     ./in.cue:424:6
-        // e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-        //     ./in.cue:423:6
-        //     ./in.cue:424:6
-        //     ./in.cue:424:10
-        0: (struct){
-          c: (int){ 1 }
-        }
-      }
-    }
-  }
-  e5: (struct){
-    a: (struct){
-      c: (int){ int }
-    }
-    b: (struct){
-      c: (int){ int }
-    }
-  }
-  nestedList: (_|_){
-    // [eval]
-    v1e: (_|_){
-      // [eval]
-      x: (#list){
-        0: (int){ int }
-        1: (int){ 1 }
-      }
-      y: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] nestedList.v1e.y.0: 4 errors in empty disjunction:
-          // nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-          //     ./in.cue:438:11
-          //     ./in.cue:439:6
-          //     ./in.cue:439:11
-          // nestedList.v1e.y.0.0: 2 errors in empty disjunction:
-          // nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-          //     ./in.cue:438:7
-          //     ./in.cue:438:11
-          //     ./in.cue:439:6
-          //     ./in.cue:439:12
-          // nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
-          //     ./in.cue:438:6
-          0: (list){ list }
-          1: (int){ 1 }
-        }
-        1: (int){ 1 }
-      }
-    }
-    v2e: (_|_){
-      // [eval]
-      y: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] nestedList.v2e.y.0: 4 errors in empty disjunction:
-          // nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-          //     ./in.cue:443:6
-          //     ./in.cue:443:11
-          //     ./in.cue:444:11
-          // nestedList.v2e.y.0.0: 2 errors in empty disjunction:
-          // nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-          //     ./in.cue:443:6
-          //     ./in.cue:443:12
-          //     ./in.cue:444:7
-          //     ./in.cue:444:11
-          // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
-          0: (#list){
-            0: (int){ 2 }
-          }
-          1: (int){ 1 }
-        }
-        1: (int){ 1 }
-      }
-      x: (#list){
-        0: (int){ int }
-        1: (int){ 1 }
-      }
-    }
-    v1: (struct){
-      x: (#list){
-        0: (int){ int }
-        1: (int){ 1 }
-      }
-      y: (#list){
-        0: (#list){
-          0: (#list){
-            0: (int){ 2 }
-            1: (int){ 1 }
-          }
-          1: (int){ 1 }
-        }
-        1: (int){ 1 }
-      }
-    }
-    v2: (struct){
-      y: (#list){
-        0: (#list){
-          0: (#list){
-            0: (int){ 2 }
-            1: (int){ 1 }
-          }
-          1: (int){ 1 }
-        }
-        1: (int){ 1 }
-      }
-      x: (#list){
-        0: (int){ int }
-        1: (int){ 1 }
-      }
-    }
-  }
-  v3: (struct){
-    list: (struct){
-      head: (int){ int }
-      tail: (null){ null }
-    }
-    myList: (struct){
-      head: (int){ 2 }
-      tail: (struct){
-        head: (int){ 3 }
-        tail: (struct){
-          head: (int){ 4 }
-          tail: ((null|struct)){ |((struct){
-              head: (int){ int }
-              tail: (null){ null }
-            }, (null){ null }) }
-        }
-      }
-    }
-  }
-  v4: (struct){
-    list: (struct){
-      head: (int){ int }
-      tail: (int){ 1 }
-    }
-    myList: (struct){
-      head: (int){ 2 }
-      tail: (struct){
-        head: (int){ 3 }
-        tail: ((int|struct)){ |((struct){
-            head: (int){ int }
-            tail: (int){ 1 }
-          }, (int){ 1 }) }
-      }
-    }
-  }
-  v5: (struct){
-    list: (struct){
-      head: (int){ int }
-      tail: (struct){
-      }
-    }
-    myList: (struct){
-      head: (int){ 2 }
-      tail: (struct){ |((struct){
-          head: (int){ 3 }
-          tail: (struct){ |((struct){
-              head: (int){ int }
-              tail: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
-          head: (int){ 3 }
-        }) }
-    }
-  }
-  z1: (_|_){
-    // [structural cycle]
-    y: (struct){
-      f: (struct){
-        h: (_){ _ }
-      }
-      g: (_){ _ }
-    }
-    x: (struct){
-      f: (_){ _ }
-      g: (_){ _ }
-    }
-    z: (_|_){
-      // [structural cycle]
-      f: (_|_){
-        // [structural cycle]
-        h: ~(z1.z.g)
-      }
-      g: (_|_){
-        // [structural cycle]
-        h: (_|_){
-          // [structural cycle] z1.z.g.h: structural cycle
-        }
-      }
-    }
-  }
-  crossRefNoCycle: (struct){
-    t1: (struct){
-      T: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-      C: (struct){
-        x: (struct){
-          x: (_){ _ }
-          y: (_){ _ }
-        }
-        y: ~(crossRefNoCycle.t1.C.x)
-      }
-    }
-    t2: (struct){
-      T: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-      }
-      C: (struct){
-        x: (struct){
-          x: (_){ _ }
-          y: (_){ _ }
-        }
-        y: ~(crossRefNoCycle.t2.C.x)
-      }
-    }
-    t3: (struct){
-      T: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-        z: (_){ _ }
-      }
-      C: (struct){
-        x: (struct){
-          x: (_){ _ }
-          y: (_){ _ }
-          z: (_){ _ }
-        }
-        y: ~(crossRefNoCycle.t3.C.x)
-        z: ~(crossRefNoCycle.t3.C.x)
-      }
-    }
-    t4: (struct){
-      T: (struct){
-        x: (_){ _ }
-        y: (_){ _ }
-        z: (_){ _ }
-      }
-      C: (struct){
-        x: (struct){
-          x: (struct){
-            x: (_){ _ }
-            y: (_){ _ }
-            z: (_){ _ }
-          }
-          y: ~(crossRefNoCycle.t4.C.x.x)
-          z: ~(crossRefNoCycle.t4.C.x.x)
-        }
-        y: ~(crossRefNoCycle.t4.C.x)
-        z: ~(crossRefNoCycle.t4.C.x)
-      }
-    }
-    t5: (struct){
-      T: (struct){
-        y: (_|_){
-          // [incomplete] crossRefNoCycle.t5.T.y: undefined field: x:
-          //     ./in.cue:556:8
-        }
-      }
-      C: (struct){
-        x: ~(crossRefNoCycle.t5.T)
-        y: ~(crossRefNoCycle.t5.T)
-      }
-    }
-  }
-  n1: (struct){
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  n2: (struct){
-    a: (struct){
-      b: (int){ int }
-      a: (struct){
-        b: (int){ int }
-      }
-    }
-  }
-  n3: (struct){
-    a: (struct){
-      b: (int){ int }
-    }
-  }
-  n4: (struct){
-    a: (struct){
-      b: (int){ int }
-    }
-    x: (struct){
-      a: (struct){
-        b: (int){ int }
-      }
-      y: (struct){
-        a: (struct){
-          b: (int){ int }
-        }
-        z: (int){ int }
-      }
-    }
-  }
-}
 -- out/compile --
 --- edge.cue
 {

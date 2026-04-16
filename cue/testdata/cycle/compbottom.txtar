@@ -23,10 +23,6 @@
 //     X: "message: hello"
 //
 // for the simple example.
-//
-// These are not automatically tested using CUE to avoid interfering with the
-// evaluation.
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import "regexp"
 
@@ -34,6 +30,9 @@ simple: {
 	#message: #"^(message: (?P<message>.*))?$"#
 
 	p1: {
+		@test(permute)
+		@test(permuteCount, 24)
+
 		X: "message: hello"
 		#aux: {
 			if Y.message == _|_ {
@@ -46,81 +45,11 @@ simple: {
 
 		Y: regexp.FindNamedSubmatch(#message, X)
 		X: #aux.message
-	}
-
-	p2: {
-		#aux: {
-			if Y.message == _|_ {
-				message: ""
-			}
-			if Y.message != _|_ {
-				message: "message: " + Y.message
-			}
-		}
-
-		X: "message: hello"
-		Y: regexp.FindNamedSubmatch(#message, X)
-		X: #aux.message
-	}
-
-	p3: {
-		#aux: {
-			if Y.message == _|_ {
-				message: ""
-			}
-			if Y.message != _|_ {
-				message: "message: " + Y.message
-			}
-		}
-
-		Y: regexp.FindNamedSubmatch(#message, X)
-		X: "message: hello"
-		X: #aux.message
-	}
-
-	p4: {
-		X: #aux.message
-		#aux: {
-			if Y.message == _|_ {
-				message: ""
-			}
-			if Y.message != _|_ {
-				message: "message: " + Y.message
-			}
-		}
-
-		Y: regexp.FindNamedSubmatch(#message, X)
-		X: "message: hello"
-	}
-
-	p5: {
-		#aux: {
-			if Y.message == _|_ {
-				message: ""
-			}
-			if Y.message != _|_ {
-				message: "message: " + Y.message
-			}
-		}
-
-		X: #aux.message
-		Y: regexp.FindNamedSubmatch(#message, X)
-		X: "message: hello"
-	}
-
-	p6: {
-		#aux: {
-			if Y.message == _|_ {
-				message: ""
-			}
-			if Y.message != _|_ {
-				message: "message: " + Y.message
-			}
-		}
-
-		Y: regexp.FindNamedSubmatch(#message, X)
-		X: #aux.message
-		X: "message: hello"
+		@test(eq, {
+			X: "message: hello"
+			#aux: {message: "message: hello"}
+			Y: {message: "hello"}
+		})
 	}
 }
 
@@ -128,6 +57,9 @@ medium: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"#
 
 	p1: {
+		@test(permute)
+		@test(permuteCount, 120)
+
 		Y: {
 			userinfo: "user"
 			host:     "mod.test"
@@ -162,98 +94,17 @@ medium: {
 		}
 
 		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-	}
-
-	p2: {
-		X: #X.userinfo + #X.host
-
-		Y: {
-			userinfo: "user"
-			host:     "mod.test"
-		}
-
-		#X: {
-			if Y.userinfo == _|_ {
-				userinfo: ""
-			}
-			if Y.userinfo != _|_ {
-				userinfo: Y.userinfo + "@"
-			}
-
-			host: Y.host
-		}
-
-		Y: {
-			if #Y.userinfo != _|_ {
-				userinfo: #Y.userinfo
-			}
-
-			host: #Y.host
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-	}
-
-	p3: {
-		X: #X.userinfo + #X.host
-
-		#X: {
-			if Y.userinfo == _|_ {
-				userinfo: ""
-			}
-			if Y.userinfo != _|_ {
-				userinfo: Y.userinfo + "@"
-			}
-
-			host: Y.host
-		}
-
-		Y: {
-			userinfo: "user"
-			host:     "mod.test"
-		}
-
-		Y: {
-			if #Y.userinfo != _|_ {
-				userinfo: #Y.userinfo
-			}
-
-			host: #Y.host
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-	}
-
-	p4: {
-		X: #X.userinfo + #X.host
-
-		#X: {
-			if Y.userinfo == _|_ {
-				userinfo: ""
-			}
-			if Y.userinfo != _|_ {
-				userinfo: Y.userinfo + "@"
-			}
-
-			host: Y.host
-		}
-
-		Y: {
-			if #Y.userinfo != _|_ {
-				userinfo: #Y.userinfo
-			}
-
-			host: #Y.host
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-
-		Y: {
-			userinfo: "user"
-			host:     "mod.test"
-		}
+		@test(eq, {
+			Y: {userinfo: "user", host: "mod.test"}
+			X: "user@mod.test"
+			#X: {userinfo: "user@", host: "mod.test"}
+			#Y: {host: "mod.test", userinfo: "user"}
+		})
 	}
 }
+-- out/errors.txt --
+-- out/todo.txt --
+medium.p1-p4: field ordering of userinfo/host in #Y differs between v2 (host first) and v3 (userinfo first).
 -- out/eval/stats --
 Leaks:  0
 Freed:  85
@@ -266,329 +117,6 @@ Conjuncts:    177
 Disjuncts:    0
 
 NumCloseIDs: 72
--- out/evalalpha --
-(struct){
-  simple: (struct){
-    #message: (string){ "^(message: (?P<message>.*))?$" }
-    p1: (struct){
-      X: (string){ "message: hello" }
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-    }
-    p2: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      X: (string){ "message: hello" }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-    }
-    p3: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-      X: (string){ "message: hello" }
-    }
-    p4: (struct){
-      X: (string){ "message: hello" }
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-    }
-    p5: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      X: (string){ "message: hello" }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-    }
-    p6: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-      X: (string){ "message: hello" }
-    }
-  }
-  medium: (struct){
-    #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$" }
-    p1: (struct){
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-      X: (string){ "user@mod.test" }
-      #X: (#struct){
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p2: (struct){
-      X: (string){ "user@mod.test" }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-      #X: (#struct){
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (#struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-    }
-    p3: (struct){
-      X: (string){ "user@mod.test" }
-      #X: (#struct){
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (#struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-    }
-    p4: (struct){
-      X: (string){ "user@mod.test" }
-      #X: (#struct){
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (#struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -84,38 +84,38 @@
-         host: (string){ "mod.test" }
-       }
-       #Y: (#struct){
--        host: (string){ "mod.test" }
--        userinfo: (string){ "user" }
--      }
--    }
--    p3: (struct){
--      X: (string){ "user@mod.test" }
--      #X: (#struct){
--        userinfo: (string){ "user@" }
--        host: (string){ "mod.test" }
--      }
--      Y: (struct){
--        userinfo: (string){ "user" }
--        host: (string){ "mod.test" }
--      }
--      #Y: (#struct){
--        host: (string){ "mod.test" }
--        userinfo: (string){ "user" }
--      }
--    }
--    p4: (struct){
--      X: (string){ "user@mod.test" }
--      #X: (#struct){
--        userinfo: (string){ "user@" }
--        host: (string){ "mod.test" }
--      }
--      Y: (struct){
--        userinfo: (string){ "user" }
--        host: (string){ "mod.test" }
--      }
--      #Y: (#struct){
--        host: (string){ "mod.test" }
--        userinfo: (string){ "user" }
-+        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
-+      }
-+    }
-+    p3: (struct){
-+      X: (string){ "user@mod.test" }
-+      #X: (#struct){
-+        userinfo: (string){ "user@" }
-+        host: (string){ "mod.test" }
-+      }
-+      Y: (struct){
-+        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
-+      }
-+      #Y: (#struct){
-+        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
-+      }
-+    }
-+    p4: (struct){
-+      X: (string){ "user@mod.test" }
-+      #X: (#struct){
-+        userinfo: (string){ "user@" }
-+        host: (string){ "mod.test" }
-+      }
-+      Y: (struct){
-+        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
-+      }
-+      #Y: (#struct){
-+        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
-       }
-     }
-   }
--- diff/todo/p3 --
-Reordering
--- out/eval --
-(struct){
-  simple: (struct){
-    #message: (string){ "^(message: (?P<message>.*))?$" }
-    p1: (struct){
-      X: (string){ "message: hello" }
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-    }
-    p2: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      X: (string){ "message: hello" }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-    }
-    p3: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-      X: (string){ "message: hello" }
-    }
-    p4: (struct){
-      X: (string){ "message: hello" }
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-    }
-    p5: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      X: (string){ "message: hello" }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-    }
-    p6: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
-      }
-      Y: (struct){
-        message: (string){ "hello" }
-      }
-      X: (string){ "message: hello" }
-    }
-  }
-  medium: (struct){
-    #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$" }
-    p1: (struct){
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-      X: (string){ "user@mod.test" }
-      #X: (#struct){
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p2: (struct){
-      X: (string){ "user@mod.test" }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-      #X: (#struct){
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p3: (struct){
-      X: (string){ "user@mod.test" }
-      #X: (#struct){
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p4: (struct){
-      X: (string){ "user@mod.test" }
-      #X: (#struct){
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        userinfo: (string){ "user" }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -606,71 +134,6 @@ Reordering
       }
       Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
       X: 〈0;#aux〉.message
-    }
-    p2: {
-      #aux: {
-        if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
-          message: ""
-        }
-        if (〈1;Y〉.message != _|_(explicit error (_|_ literal) in source)) {
-          message: ("message: " + 〈2;Y〉.message)
-        }
-      }
-      X: "message: hello"
-      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
-      X: 〈0;#aux〉.message
-    }
-    p3: {
-      #aux: {
-        if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
-          message: ""
-        }
-        if (〈1;Y〉.message != _|_(explicit error (_|_ literal) in source)) {
-          message: ("message: " + 〈2;Y〉.message)
-        }
-      }
-      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
-      X: "message: hello"
-      X: 〈0;#aux〉.message
-    }
-    p4: {
-      X: 〈0;#aux〉.message
-      #aux: {
-        if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
-          message: ""
-        }
-        if (〈1;Y〉.message != _|_(explicit error (_|_ literal) in source)) {
-          message: ("message: " + 〈2;Y〉.message)
-        }
-      }
-      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
-      X: "message: hello"
-    }
-    p5: {
-      #aux: {
-        if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
-          message: ""
-        }
-        if (〈1;Y〉.message != _|_(explicit error (_|_ literal) in source)) {
-          message: ("message: " + 〈2;Y〉.message)
-        }
-      }
-      X: 〈0;#aux〉.message
-      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
-      X: "message: hello"
-    }
-    p6: {
-      #aux: {
-        if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
-          message: ""
-        }
-        if (〈1;Y〉.message != _|_(explicit error (_|_ literal) in source)) {
-          message: ("message: " + 〈2;Y〉.message)
-        }
-      }
-      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
-      X: 〈0;#aux〉.message
-      X: "message: hello"
     }
   }
   medium: {
@@ -697,75 +160,6 @@ Reordering
         host: 〈1;#Y〉.host
       }
       #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
-    }
-    p2: {
-      X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
-      Y: {
-        userinfo: "user"
-        host: "mod.test"
-      }
-      #X: {
-        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
-          userinfo: ""
-        }
-        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: (〈2;Y〉.userinfo + "@")
-        }
-        host: 〈1;Y〉.host
-      }
-      Y: {
-        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: 〈2;#Y〉.userinfo
-        }
-        host: 〈1;#Y〉.host
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
-    }
-    p3: {
-      X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
-      #X: {
-        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
-          userinfo: ""
-        }
-        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: (〈2;Y〉.userinfo + "@")
-        }
-        host: 〈1;Y〉.host
-      }
-      Y: {
-        userinfo: "user"
-        host: "mod.test"
-      }
-      Y: {
-        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: 〈2;#Y〉.userinfo
-        }
-        host: 〈1;#Y〉.host
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
-    }
-    p4: {
-      X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
-      #X: {
-        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
-          userinfo: ""
-        }
-        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: (〈2;Y〉.userinfo + "@")
-        }
-        host: 〈1;Y〉.host
-      }
-      Y: {
-        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: 〈2;#Y〉.userinfo
-        }
-        host: 〈1;#Y〉.host
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
-      Y: {
-        userinfo: "user"
-        host: "mod.test"
-      }
     }
   }
 }

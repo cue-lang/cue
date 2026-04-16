@@ -377,3 +377,24 @@ func TestFromAPI(t *testing.T) {
 		})
 	}
 }
+
+// TestNoPanicCyclicBuiltinValidator is a regression test for a stack overflow
+// in vertex() when a BuiltinValidator argument contains a vertex that is
+// already on the export stack. For example, exporting
+//
+//	#c: { a?: matchN(1, [#c]) }
+//
+// caused infinite recursion: vertex(#c) → structComposite → vertex(a) →
+// builtinValidator → value([#c]) → vertex(#c) → …
+func TestNoPanicCyclicBuiltinValidator(t *testing.T) {
+	cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
+		v := ctx.CompileString(`#c: { a?: matchN(1, [#c]) }`)
+		if err := v.Err(); err != nil {
+			t.Fatal(err)
+		}
+		r, x := value.ToInternal(v)
+		// Must complete without stack overflow.
+		_, _ = export.Def(r, "", x)
+	})
+}

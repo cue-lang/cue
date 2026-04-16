@@ -1,4 +1,6 @@
-// This code caused a panic on evalv2.
+# evalv2 panics in `DerefValue` when processing a specific CUE input
+# discovered via oss-fuzz, reproducing on both v0.9.2 and v0.10.1.
+# https://cuelang.org/issue/3570
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 foo: foo: 25 | 44

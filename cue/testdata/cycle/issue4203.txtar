@@ -1,3 +1,6 @@
+# A CUE file using comprehensions and struct embeddings that exports
+# successfully in v0.13.2 fails with "undefined field" in later versions.
+# https://cuelang.org/issue/4203
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import "strings"

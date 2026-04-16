@@ -731,6 +731,9 @@ structShare: err1: {
 }
 
 -- issue2208.cue --
+// Regression where definitions that compiled correctly with 0.4.3 failed to
+// compile with 0.5.0-beta.2 due to incorrect handling of void errors.
+// https://cuelang.org/issue/2208
 voidErrorIncomplete: {
 	#Schema: [string]: {
 		required: bool
@@ -772,6 +775,8 @@ voidErrorIncomplete: {
 
 
 -- issue1759.cue --
+// Tests that len() and comprehensions correctly see the full struct/list value.
+// https://cuelang.org/issue/1759
 // Tests derived from Unity.
 unity: success1: {
 	#Config: {
@@ -841,7 +846,9 @@ arcAlignment: t1: {
 }
 
 -- issue2111.cue --
-// All arc types, not just regular fields, should be pushed down.
+// Evaluator regression where circular dependency in evaluation of conditionals
+// caused incorrect results. All arc types, not just regular fields, should be pushed down.
+// https://cuelang.org/issue/2111
 letPushdown: {
 	_c: y: 1
 
@@ -856,6 +863,9 @@ letPushdown: {
 }
 
 -- issue2113.cue --
+// Evaluator regression where a nested comprehension caused "was already used"
+// errors when the enclosing value was not yet fully evaluated.
+// https://cuelang.org/issue/2113
 // Ensure that an enclosing Value clause of a nested comprehension is evaluated
 // before the nested comprehension itself is evaluated.
 nestedWithEmbeddingOK: {
@@ -1365,7 +1375,7 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
 [eval] structShare.err1.x.d.e: field not allowed:
     ./in.cue:725:9
 [incomplete] errorPropagation: undefined field: env2:
-    ./issue2113.cue:32:19
+    ./issue2113.cue:35:19
 [eval] issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:29:4
 [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):

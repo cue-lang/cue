@@ -1,3 +1,7 @@
+# A `let` binding that factors out a repeated expression changes the evaluation
+# result unexpectedly compared to the inline form, indicating a bug in how
+# `let`-bound values are resolved relative to their enclosing scope.
+# https://cuelang.org/issue/4244
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import "strings"

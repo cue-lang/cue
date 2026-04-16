@@ -102,6 +102,9 @@ recursive: {
 })
 
 -- issue2169.cue --
+// Evaluator regression where "cannot add field $X: was already used" errors
+// appeared incorrectly when a field was referenced before being defined.
+// https://cuelang.org/issue/2169
 embeddedFunctionalExpr: {
 	#fn: {
 		#in: _

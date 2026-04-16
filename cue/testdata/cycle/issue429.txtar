@@ -1,5 +1,11 @@
-TODO: a bound value resolving to a disjunction should probably
-be an error. In this case #Size.amx should resolve.
+# `cue export` incorrectly rejects a `#Size` definition with interdependent
+# bound constraints (`num: >res | *(1+res)`, `max: >=num | *num`) when a
+# concrete value is provided, e.g. `a: #Size & { num: 5 }`. Expected output
+# would be `{ res: 0, num: 5, max: 5 }` but instead CUE reports empty
+# disjunction errors for both `num` and `max`. Works correctly in v0.2.1.
+# TODO: a bound value resolving to a disjunction should probably be an error.
+# In this case #Size.amx should resolve.
+# https://cuelang.org/issue/429
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // Range disjunction without cycle (checks only one-way).

@@ -44,6 +44,14 @@ func (e *exporter) bareValue(v adt.Value) ast.Expr {
 // value with a reference in graph mode.
 
 func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
+	// Guard against infinite recursion when a vertex cycles back to itself
+	// through BuiltinValidator arguments or other value-level cycles.
+	for i := range e.stack {
+		if e.stack[i].node == n {
+			return ast.NewIdent("_")
+		}
+	}
+
 	var attrs []*ast.Attribute
 	if e.cfg.ShowAttributes {
 		attrs = ExtractDeclAttrs(n)

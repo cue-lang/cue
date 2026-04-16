@@ -796,10 +796,9 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 	case "desc":
 		// @test(desc="...") is a human-readable description annotation — no assertions.
 	case "":
-		// Empty placeholder @test() — fill with actual value when CUE_UPDATE=1.
-		if cuetest.UpdateGoldenFiles {
-			r.enqueueInlineFill(pa, r.formatCoverAttr(val, pa.srcFileName))
-		}
+		// Empty placeholder @test() — treat as @test(eq) so CUE_UPDATE fills in
+		// the actual value using the same equality-fill logic.
+		r.runEqInline(t, path, val, pa)
 	default:
 		t.Errorf("path %s: unknown @test directive %q", path, pa.directive)
 	}

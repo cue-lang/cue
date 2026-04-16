@@ -16,6 +16,24 @@
       "message": "again the wrapping is very short here",
       "revId": "b48e5679f525fab06d902a549a98fb306e0ec575",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc89c3e5_5738cdfb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T17:30:54Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e08f8d04_37a24d5b",
+      "revId": "b48e5679f525fab06d902a549a98fb306e0ec575",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

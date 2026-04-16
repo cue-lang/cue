@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0bf0ae6_726f365c",
+        "filename": "cue/testdata/references/value.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-16T09:33:04Z",
+      "side": 0,
+      "message": "you didn\u0027t actually convert this test though; perhaps mark these with a comment at the top to clarify if this is intentional",
+      "revId": "834526456e8f058bc0127ee9bdd667c504227100",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

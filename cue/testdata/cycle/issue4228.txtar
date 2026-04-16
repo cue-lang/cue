@@ -1,8 +1,7 @@
 # Test that cyclic error formatting doesn't cause stack overflow.
 # The combination of error() with self interpolation and complex nested
 # struct patterns can cause infinite recursion when formatting error messages.
-#
-# Issue #4228
+# https://cuelang.org/issue/4228
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 package main

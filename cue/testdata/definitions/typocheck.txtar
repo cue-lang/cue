@@ -575,6 +575,9 @@ issue3921: full: {
 	})
 }
 -- issue3843.cue --
+// evalv3 "field not allowed" regression when a definition is reused at
+// multiple levels and pattern constraints are unified more than once.
+// https://cuelang.org/issue/3843
 // Pattern is unified twice. Ensure that deduping is handled correctly.
 dedupPattern: t1: p1: {
 	A: {
@@ -607,6 +610,9 @@ dedupPattern: t1: p2: {
 	})
 }
 -- issue3858.cue --
+// evalv3 "field not allowed" regression with embeddings where a definition
+// with an embedded field reference was incorrectly rejected.
+// https://cuelang.org/issue/3858
 orig: t1: {
 	#Image: embed: image: "foo:v1"
 	#JobConfig: {
@@ -1052,7 +1058,7 @@ embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched
     ./issue3833.cue:29:6
     ./issue3833.cue:31:9
 [incomplete] orig.t2.#Output.out: undefined field: input:
-    ./issue3858.cue:74:18
+    ./issue3858.cue:77:18
 [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
     ./large.cue:7:25
     ./large.cue:3:12

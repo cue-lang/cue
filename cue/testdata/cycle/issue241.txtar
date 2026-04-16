@@ -1,3 +1,7 @@
+# `!=` applied to a disjunction before structural cycle is concrete:
+# CUE incorrectly reports an empty disjunction error instead of handling
+# the abstract `!=` constraint between fields sharing a disjunction type.
+# https://cuelang.org/issue/241
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #Value: 0 | 1

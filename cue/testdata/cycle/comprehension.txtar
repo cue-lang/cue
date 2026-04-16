@@ -350,6 +350,10 @@ issue2310: reduced: {
 	#subs: [0, 1, 2]
 }
 -- issue3903.cue --
+// evalv3 structural cycle regression: a schema with `_deps` and comprehensions
+// over those deps triggered a spurious structural cycle error that exported
+// successfully under evalv2.
+// https://cuelang.org/issue/3903
 issue3903: reduced: {
 	s1: #Schema
 	s1: _deps: [#Schema]
@@ -388,6 +392,10 @@ issue3903: full: {
 	}
 }
 -- issue2405.cue --
+// A recursive disjunction type (`#Copy` with struct/list/scalar alternatives)
+// was rejected as a structural cycle even though the structure is bounded and
+// should evaluate successfully.
+// https://cuelang.org/issue/2405
 issue2405: {
 	#Copy: {
 		param: {...}
@@ -412,6 +420,10 @@ issue2405: {
 	foo: param: a: [{b: 134}]
 }
 -- issue3941.cue --
+// evalv3 regression: a comprehension iterating over a pattern-constrained field
+// (`resource: [string]: [string]: #Resource`) produced a spurious "field set was
+// already referenced" error that evalv2 did not emit.
+// https://cuelang.org/issue/3941
 issue3941: full: {
 	#Metadata: name: string
 	#Resource: metadata: #Metadata
@@ -430,7 +442,9 @@ issue3941: full: {
 	}
 }
 -- issue2229.cue --
-// Caused evalv2 to stack overflow.
+// A list comprehension whose result was unified back into the same list caused
+// an endless recursion and panic rather than being caught as a structural cycle.
+// https://cuelang.org/issue/2229
 issue2229: full_ok: X={
 	build: bool | *true
 	test:  bool | *true
@@ -442,7 +456,9 @@ issue2229: reduced_fail: X={
 	y: [ for _, v in X if v & true { _ } ]
 }
 -- issue4100.cue --
-// Caused a panic in freeNodeContext during memory reclamation.
+// Segmentation fault in `adt.(*OpContext).freeNodeContext` in v0.14.1,
+// triggered by a let binding inside a conditional that feeds into a for loop.
+// https://cuelang.org/issue/4100
 issue4100: {
 	a: {
 		let l = [0]
@@ -455,13 +471,13 @@ issue4100: {
 -- out/evalalpha --
 Errors:
 conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
-    ./issue2229.cue:10:5
-    ./issue2229.cue:10:24
-    ./issue2229.cue:10:28
+    ./issue2229.cue:12:5
+    ./issue2229.cue:12:24
+    ./issue2229.cue:12:28
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:122:14
 structural cycle:
-    ./issue2229.cue:10:24
+    ./issue2229.cue:12:24
 
 Result:
 (_|_){
@@ -1075,11 +1091,11 @@ Result:
       x: (bool){ true }
       y: (_|_){
         // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
-        //     ./issue2229.cue:10:5
-        //     ./issue2229.cue:10:24
-        //     ./issue2229.cue:10:28
+        //     ./issue2229.cue:12:5
+        //     ./issue2229.cue:12:24
+        //     ./issue2229.cue:12:28
         // structural cycle:
-        //     ./issue2229.cue:10:24
+        //     ./issue2229.cue:12:24
         0: (_){ _ }
       }
     }
@@ -1217,13 +1233,13 @@ diff old new
 @@ -1,6 +1,12 @@
  Errors:
 +conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
-+    ./issue2229.cue:10:5
-+    ./issue2229.cue:10:24
-+    ./issue2229.cue:10:28
++    ./issue2229.cue:12:5
++    ./issue2229.cue:12:24
++    ./issue2229.cue:12:28
  selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
      ./in.cue:122:14
 +structural cycle:
-+    ./issue2229.cue:10:24
++    ./issue2229.cue:12:24
  
  Result:
  (_|_){
@@ -1296,11 +1312,11 @@ diff old new
 +      x: (bool){ true }
 +      y: (_|_){
 +        // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
-+        //     ./issue2229.cue:10:5
-+        //     ./issue2229.cue:10:24
-+        //     ./issue2229.cue:10:28
++        //     ./issue2229.cue:12:5
++        //     ./issue2229.cue:12:24
++        //     ./issue2229.cue:12:28
 +        // structural cycle:
-+        //     ./issue2229.cue:10:24
++        //     ./issue2229.cue:12:24
 +        0: (_){ _ }
 +      }
 +    }

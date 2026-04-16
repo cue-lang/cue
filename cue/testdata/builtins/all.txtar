@@ -26,6 +26,7 @@ okIncompleteChild: {
 // reference defined after its use does not crash (nil pointer
 // dereference in matchPatternValue). Issue: evalv3 panicked when
 // #constraints appeared after its usage in the pattern key.
+// https://cuelang.org/issue/3412
 andInPattern: {
 	out: {
 		[and(#constraints)]: _

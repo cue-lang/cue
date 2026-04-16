@@ -250,6 +250,10 @@ listMatchN: ok: {
 	z: y: [{}]
 }
 -- issue3634.cue --
+// evalv3 structural cycle regression: using `len(...)` with a `#Schema`
+// embedding inside `list.Repeat` caused a spurious structural cycle error
+// that did not occur in evalv2.
+// https://cuelang.org/issue/3634
 import "list"
 
 issue3634: full: {
@@ -271,6 +275,9 @@ issue3634: reduced: {
 	out: len(#D & list.Repeat([#D & { a: b: 1 }], 1)[0])
 }
 -- issue3743.cue --
+// Passing a cyclic value to `yaml.MarshalStream` caused a stack overflow
+// instead of a clean structural cycle error.
+// https://cuelang.org/issue/3743
 import "encoding/yaml"
 
 issue3743: {

@@ -1,3 +1,6 @@
+# evalv3 incorrectly reports a structural cycle error for a CUE definition that
+# validates correctly under evalv2, representing a regression in cycle detection.
+# https://cuelang.org/issue/3571
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // These tests should NOT have structural cycles.

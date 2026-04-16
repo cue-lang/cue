@@ -1,3 +1,9 @@
+# A recursive configuration using `_link: #T` in a map's entry struct is
+# incorrectly rejected as a structural cycle in v0.3.0+, but worked in v0.2.2.
+# The user expects config values to propagate through linked chains (e.g. nested
+# `mas: one: { mas: two: { ... } }`) but gets "structural cycle" errors for
+# `#a.mas.one._link.mas.two.link` etc. Shallow nesting (one level) works fine.
+# https://cuelang.org/issue/502
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #T: {

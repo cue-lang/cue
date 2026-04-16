@@ -16,6 +16,24 @@
       "message": "you didn\u0027t actually convert this test though; perhaps mark these with a comment at the top to clarify if this is intentional",
       "revId": "834526456e8f058bc0127ee9bdd667c504227100",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18576a0c_7890aa4e",
+        "filename": "cue/testdata/references/value.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T16:36:31Z",
+      "side": 0,
+      "message": "I\u0027ve addressed this in a CL down the line called cue/testdata/comprehensions: manual corrections",
+      "parentUuid": "a0bf0ae6_726f365c",
+      "revId": "834526456e8f058bc0127ee9bdd667c504227100",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

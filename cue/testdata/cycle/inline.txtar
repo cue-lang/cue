@@ -1,26 +1,26 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- x.cue --
 // variants of fib
 
 inline: small: {
 	f: {
 		n: int
-		out: (f & {"n": n - 1}).out
+		out: (f & {"n": n - 1}).out @test(err, code=structural cycle, contains="structural cycle", pos=[0:9])
 	}
 }
 
 inline: medium: {
-	f2:  (f & {n: 2}).out
+	f2:  (f & {n: 2}).out @test(err, code=structural cycle, contains="structural cycle", pos=[1:24])
 	fRec: {nn: int, out: (f & {n: nn}).out}
+	@test(err, at=fRec.out, code=structural cycle, contains="structural cycle", pos=[6:9])
 	f: {
 		n: int
-		out: (fRec & {nn: n - 1}).out
+		out: (fRec & {nn: n - 1}).out @test(err, code=structural cycle, contains="structural cycle", pos=[0:9])
 	}
 }
 
 inline: patterns: {
 	f: n: (f & {n: {}}).n
-	f: n: {}
+	f: n: {}  @test(err, code=structural cycle, contains="structural cycle", pos=[-1:9])
 	[string]: {n: {}}
 	f: [string]: {}
 	f: {}
@@ -38,6 +38,16 @@ inline: acrossFields: fail1: {
 
 	// invalid recursion is here.
 	k10: (f & {in: k30}).out
+	@test(eq, {
+		f: {
+			in: number
+			out: _|_ @test(err, code=incomplete, contains="inline.acrossFields.fail1.f.out: non-concrete value number in operand to +", pos=[31:8, 30:8])
+		}
+		k00: 0
+		k10: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 36:17])
+		k20: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 39:17])
+		k30: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 35:17])
+	})
 }
 
 // Issue #2163
@@ -54,6 +64,13 @@ inline: acrossFields: ok1: {
 	// TODO: what is correct behavior here.
 	// This is borderline okay.
 	k10: (f & {in: k30}).out
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	}, hint="might be okay to fail")
 }
 -- inlineexpand.cue --
 inlined: {
@@ -62,6 +79,10 @@ inlined: {
 		output: input.a
 	}
 	root: a: (X & {input: root}).output
+	@test(eq, {
+		X: {input: {a: _}, output: _}
+		root: {a: _}
+	})
 }
 expanded1: hasCycle: {
 	X: {
@@ -72,6 +93,7 @@ expanded1: hasCycle: {
 		a: _a.output
 		_a: X & {input: root}
 	}
+	@test(err, code=structural cycle, at=root._a.input._a.input, contains="structural cycle", pos=[])
 }
 expanded2: noCycle: {
 	X: {
@@ -80,6 +102,11 @@ expanded2: noCycle: {
 	}
 	root: a: _a.output
 	_a: X & {input: root}
+	@test(eq, {
+		X: {input: {a: _}, output: _}
+		root: {a: _}
+		_a: {input: {a: _}, output: _}
+	})
 }
 issue3731: reduced: {
 	#lookup: {
@@ -93,6 +120,13 @@ issue3731: reduced: {
 		self: show: true
 		others: (#lookup & {input: root}).output
 	}
+	@test(eq, {
+		#lookup: {input: {}, output: []}
+		root: {
+			self: {show: true}
+			others: [{show: true}]
+		}
+	})
 }
 issue3731: expanded: {
 	#lookup: {
@@ -107,6 +141,7 @@ issue3731: expanded: {
 		others: _others.output
 		_others: #lookup & {input: root}
 	}
+	@test(err, code=structural cycle, at=root._others.input._others.input, contains="structural cycle", pos=[])
 }
 issue3731: full: {
 	#Workspace: {
@@ -148,7 +183,84 @@ issue3731: full: {
 	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
 		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
 	}
+	@test(eq, {
+		#Workspace: {workspaceA?: {}, workspaceB?: {}}
+		#AccountConfig: {
+			workspaces: {workspaceA?: {}, workspaceB?: {}}
+			siblings?: []
+		}
+		#AccountConfigSub1: {
+			workspaces: {workspaceA: {}, workspaceB?: {}}
+			siblings?: []
+		}
+		#AccountConfigSub2: {
+			workspaces: {workspaceB: {}, workspaceA?: {}}
+			siblings?: []
+		}
+		tree: {
+			env1: {
+				region1: {
+					"env1-r1-account-sub1": {
+						siblings: ["env1-r1-account-sub2-1"]
+						workspaces: {workspaceA: {}, workspaceB?: {}}
+					}
+					"env1-r1-account-sub2-1": {
+						siblings: ["env1-r1-account-sub2-1"]
+						workspaces: {workspaceB: {}, workspaceA?: {}}
+					}
+				}
+			}
+		}
+		#lookupSiblings: {envtree: {}, out: []}
+	})
 }
+-- out/errors.txt --
+[structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
+[structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle
+[structural cycle] structural cycle:
+    ./x.cue:6:9
+[structural cycle] structural cycle:
+    ./x.cue:12:24
+[structural cycle] structural cycle:
+    ./x.cue:16:9
+[structural cycle] structural cycle:
+    ./x.cue:16:9
+[structural cycle] structural cycle:
+    ./x.cue:21:9
+[incomplete] inline.acrossFields.fail1.f.out: non-concrete value number in operand to +:
+    ./x.cue:31:8
+    ./x.cue:30:8
+[incomplete] in: non-concrete value number in operand to +:
+    ./x.cue:31:8
+    ./x.cue:30:8
+    ./x.cue:36:17
+[incomplete] in: non-concrete value number in operand to +:
+    ./x.cue:31:8
+    ./x.cue:30:8
+    ./x.cue:39:17
+[incomplete] in: non-concrete value number in operand to +:
+    ./x.cue:31:8
+    ./x.cue:30:8
+    ./x.cue:35:17
+-- out/todo.txt --
+inline.acrossFields.fail1: v2 had structural cycle error, v3 succeeds with incomplete errors on k10/k20/k30.
+inline.medium.f2: different structural cycle error position in v2 (x.cue:15:9) vs v3 (x.cue:12:24).
+issue3731.reduced.root.others.0: v2 shows (struct), v3 shows (#struct).
+issue3731.expanded.root.others: v2 expanded list, v3 uses structure sharing ~(_others.output).
+issue3731.full.#AccountConfig.workspaces: v2 expands fields, v3 uses structure sharing ~(#Workspace).
+issue3731.full.tree.env1.region1.*: siblings/workspaces field ordering differs between v2 and v3.
+-- out/eval/stats --
+Leaks:  5
+Freed:  311
+Reused: 273
+Allocs: 43
+Retain: 0
+
+Unifications: 247
+Conjuncts:    623
+Disjuncts:    0
+
+NumCloseIDs: 202
 -- out/compile --
 --- inlineexpand.cue
 {
@@ -395,850 +507,3 @@ issue3731: full: {
     }
   }
 }
--- out/eval/stats --
-Leaks:  5
-Freed:  311
-Reused: 273
-Allocs: 43
-Retain: 0
-
-Unifications: 247
-Conjuncts:    623
-Disjuncts:    0
-
-NumCloseIDs: 202
--- out/eval --
-Errors:
-expanded1.hasCycle.root._a.input._a.input: structural cycle:
-    ./inlineexpand.cue:11:11
-issue3731.expanded.root._others.input._others.input: structural cycle:
-    ./inlineexpand.cue:43:16
-structural cycle:
-    ./x.cue:6:9
-structural cycle:
-    ./x.cue:15:9
-structural cycle:
-    ./x.cue:20:9
-in: structural cycle:
-    ./x.cue:30:8
-
-Result:
-(_|_){
-  // [structural cycle]
-  inlined: (struct){
-    X: (struct){
-      input: (struct){
-        a: (_){ _ }
-      }
-      output: (_){ _ }
-    }
-    root: (struct){
-      a: (_){ _ }
-    }
-  }
-  expanded1: (_|_){
-    // [structural cycle]
-    hasCycle: (_|_){
-      // [structural cycle]
-      X: (struct){
-        input: (struct){
-          a: (_){ _ }
-        }
-        output: (_){ _ }
-      }
-      root: (_|_){
-        // [structural cycle]
-        a: (_){ _ }
-        _a: (_|_){
-          // [structural cycle]
-          input: (_|_){
-            // [structural cycle]
-            a: (_|_){
-              // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
-              //     ./inlineexpand.cue:11:11
-            }
-            _a: (_|_){
-              // [structural cycle]
-              input: (_|_){
-                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
-                //     ./inlineexpand.cue:11:11
-              }
-              output: (_|_){
-                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
-                //     ./inlineexpand.cue:11:11
-              }
-            }
-          }
-          output: (_|_){
-            // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
-            //     ./inlineexpand.cue:11:11
-          }
-        }
-      }
-    }
-  }
-  expanded2: (struct){
-    noCycle: (struct){
-      X: (struct){
-        input: (struct){
-          a: (_){ _ }
-        }
-        output: (_){ _ }
-      }
-      root: (struct){
-        a: (_){ _ }
-      }
-      _a: (struct){
-        input: (struct){
-          a: (_){ _ }
-        }
-        output: (_){ _ }
-      }
-    }
-  }
-  issue3731: (_|_){
-    // [structural cycle]
-    reduced: (struct){
-      #lookup: (#struct){
-        input: (#struct){
-        }
-        output: (#list){
-        }
-      }
-      root: (struct){
-        self: (struct){
-          show: (bool){ true }
-        }
-        others: (#list){
-          0: (struct){
-            show: (bool){ true }
-          }
-        }
-      }
-    }
-    expanded: (_|_){
-      // [structural cycle]
-      #lookup: (#struct){
-        input: (#struct){
-        }
-        output: (#list){
-        }
-      }
-      root: (_|_){
-        // [structural cycle]
-        self: (struct){
-          show: (bool){ true }
-        }
-        others: (#list){
-          0: (struct){
-            show: (bool){ true }
-          }
-        }
-        _others: (_|_){
-          // [structural cycle]
-          input: (_|_){
-            // [structural cycle]
-            self: (struct){
-              show: (bool){ true }
-            }
-            others: (_|_){
-              // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
-              //     ./inlineexpand.cue:43:16
-            }
-            _others: (_|_){
-              // [structural cycle]
-              input: (_|_){
-                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
-                //     ./inlineexpand.cue:43:16
-              }
-              output: (_|_){
-                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
-                //     ./inlineexpand.cue:43:16
-              }
-            }
-          }
-          output: (#list){
-            0: (#struct){
-              show: (bool){ true }
-            }
-          }
-        }
-      }
-    }
-    full: (struct){
-      #Workspace: (#struct){
-        workspaceA?: (#struct){
-        }
-        workspaceB?: (#struct){
-        }
-      }
-      #AccountConfig: (#struct){
-        workspaces: (#struct){
-          workspaceA?: (#struct){
-          }
-          workspaceB?: (#struct){
-          }
-        }
-        siblings?: (list){
-        }
-      }
-      #AccountConfigSub1: (#struct){
-        workspaces: (#struct){
-          workspaceA: (#struct){
-          }
-          workspaceB?: (#struct){
-          }
-        }
-        siblings?: (list){
-        }
-      }
-      #AccountConfigSub2: (#struct){
-        workspaces: (#struct){
-          workspaceA?: (#struct){
-          }
-          workspaceB: (#struct){
-          }
-        }
-        siblings?: (list){
-        }
-      }
-      tree: (struct){
-        env1: (struct){
-          region1: (struct){
-            "env1-r1-account-sub1": (#struct){
-              workspaces: (#struct){
-                workspaceA: (#struct){
-                }
-                workspaceB?: (#struct){
-                }
-              }
-              siblings: (#list){
-                0: (string){ "env1-r1-account-sub2-1" }
-              }
-            }
-            "env1-r1-account-sub2-1": (#struct){
-              workspaces: (#struct){
-                workspaceA?: (#struct){
-                }
-                workspaceB: (#struct){
-                }
-              }
-              siblings: (#list){
-                0: (string){ "env1-r1-account-sub2-1" }
-              }
-            }
-          }
-        }
-      }
-      #lookupSiblings: (#struct){
-        envtree: (#struct){
-        }
-        out: (#list){
-        }
-      }
-    }
-  }
-  inline: (_|_){
-    // [structural cycle]
-    small: (_|_){
-      // [structural cycle]
-      f: (_|_){
-        // [structural cycle]
-        n: (int){ int }
-        out: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./x.cue:6:9
-        }
-      }
-    }
-    medium: (_|_){
-      // [structural cycle]
-      f2: (_|_){
-        // [structural cycle] structural cycle:
-        //     ./x.cue:15:9
-      }
-      fRec: (_|_){
-        // [structural cycle]
-        nn: (int){ int }
-        out: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./x.cue:15:9
-        }
-      }
-      f: (_|_){
-        // [structural cycle]
-        n: (int){ int }
-        out: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./x.cue:15:9
-        }
-      }
-    }
-    patterns: (_|_){
-      // [structural cycle]
-      f: (_|_){
-        // [structural cycle]
-        n: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./x.cue:20:9
-        }
-      }
-    }
-    acrossFields: (_|_){
-      // [structural cycle]
-      fail1: (_|_){
-        // [structural cycle]
-        f: (struct){
-          in: (number){ number }
-          out: (_|_){
-            // [incomplete] inline.acrossFields.fail1.f.out: non-concrete value number in operand to +:
-            //     ./x.cue:30:8
-            //     ./x.cue:29:8
-          }
-        }
-        k00: (int){ 0 }
-        k10: (_|_){
-          // [structural cycle] in: structural cycle:
-          //     ./x.cue:30:8
-        }
-        k20: (_|_){
-          // [structural cycle] in: structural cycle:
-          //     ./x.cue:30:8
-        }
-        k30: (_|_){
-          // [structural cycle] in: structural cycle:
-          //     ./x.cue:30:8
-        }
-      }
-      ok1: (struct){
-        f: (struct){
-          in: (number){ number }
-          out: (number){ number }
-        }
-        k00: (int){ 0 }
-        k10: (int){ 0 }
-        k20: (int){ 0 }
-        k30: (int){ 0 }
-      }
-    }
-  }
-}
--- out/evalalpha --
-Errors:
-expanded1.hasCycle.root._a.input._a.input: structural cycle
-issue3731.expanded.root._others.input._others.input: structural cycle
-structural cycle:
-    ./x.cue:6:9
-structural cycle:
-    ./x.cue:12:24
-structural cycle:
-    ./x.cue:15:9
-structural cycle:
-    ./x.cue:20:9
-
-Result:
-(_|_){
-  // [structural cycle]
-  inlined: (struct){
-    X: (struct){
-      input: (struct){
-        a: (_){ _ }
-      }
-      output: (_){ _ }
-    }
-    root: (struct){
-      a: (_){ _ }
-    }
-  }
-  expanded1: (_|_){
-    // [structural cycle]
-    hasCycle: (_|_){
-      // [structural cycle]
-      X: (struct){
-        input: (struct){
-          a: (_){ _ }
-        }
-        output: (_){ _ }
-      }
-      root: (_|_){
-        // [structural cycle]
-        a: (_){ _ }
-        _a: (_|_){
-          // [structural cycle]
-          input: (_|_){
-            // [structural cycle]
-            a: (_){ _ }
-            _a: (_|_){
-              // [structural cycle]
-              input: (_|_){
-                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
-              }
-              output: (_){ _ }
-            }
-          }
-          output: (_){ _ }
-        }
-      }
-    }
-  }
-  expanded2: (struct){
-    noCycle: (struct){
-      X: (struct){
-        input: (struct){
-          a: (_){ _ }
-        }
-        output: (_){ _ }
-      }
-      root: (struct){
-        a: (_){ _ }
-      }
-      _a: (struct){
-        input: (struct){
-          a: (_){ _ }
-        }
-        output: (_){ _ }
-      }
-    }
-  }
-  issue3731: (_|_){
-    // [structural cycle]
-    reduced: (struct){
-      #lookup: (#struct){
-        input: (#struct){
-        }
-        output: (#list){
-        }
-      }
-      root: (struct){
-        self: (struct){
-          show: (bool){ true }
-        }
-        others: (#list){
-          0: (#struct){
-            show: (bool){ true }
-          }
-        }
-      }
-    }
-    expanded: (_|_){
-      // [structural cycle]
-      #lookup: (#struct){
-        input: (#struct){
-        }
-        output: (#list){
-        }
-      }
-      root: (_|_){
-        // [structural cycle]
-        self: (struct){
-          show: (bool){ true }
-        }
-        others: ~(issue3731.expanded.root._others.output)
-        _others: (_|_){
-          // [structural cycle]
-          input: (_|_){
-            // [structural cycle]
-            self: (#struct){
-              show: (bool){ true }
-            }
-            others: (#list){
-            }
-            _others: (_|_){
-              // [structural cycle]
-              input: (_|_){
-                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle
-              }
-              output: (#list){
-              }
-            }
-          }
-          output: (#list){
-            0: (#struct){
-              show: (bool){ true }
-            }
-          }
-        }
-      }
-    }
-    full: (struct){
-      #Workspace: (#struct){
-        workspaceA?: (#struct){
-        }
-        workspaceB?: (#struct){
-        }
-      }
-      #AccountConfig: (#struct){
-        workspaces: ~(issue3731.full.#Workspace)
-        siblings?: (list){
-        }
-      }
-      #AccountConfigSub1: (#struct){
-        workspaces: (#struct){
-          workspaceA: (#struct){
-          }
-          workspaceB?: (#struct){
-          }
-        }
-        siblings?: (list){
-        }
-      }
-      #AccountConfigSub2: (#struct){
-        workspaces: (#struct){
-          workspaceB: (#struct){
-          }
-          workspaceA?: (#struct){
-          }
-        }
-        siblings?: (list){
-        }
-      }
-      tree: (struct){
-        env1: (struct){
-          region1: (struct){
-            "env1-r1-account-sub1": (#struct){
-              siblings: (#list){
-                0: (string){ "env1-r1-account-sub2-1" }
-              }
-              workspaces: (#struct){
-                workspaceA: (#struct){
-                }
-                workspaceB?: (#struct){
-                }
-              }
-            }
-            "env1-r1-account-sub2-1": (#struct){
-              siblings: (#list){
-                0: (string){ "env1-r1-account-sub2-1" }
-              }
-              workspaces: (#struct){
-                workspaceB: (#struct){
-                }
-                workspaceA?: (#struct){
-                }
-              }
-            }
-          }
-        }
-      }
-      #lookupSiblings: (#struct){
-        envtree: (#struct){
-        }
-        out: (#list){
-        }
-      }
-    }
-  }
-  inline: (_|_){
-    // [structural cycle]
-    small: (_|_){
-      // [structural cycle]
-      f: (_|_){
-        // [structural cycle]
-        n: (int){ int }
-        out: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./x.cue:6:9
-        }
-      }
-    }
-    medium: (_|_){
-      // [structural cycle]
-      f2: (_|_){
-        // [structural cycle] structural cycle:
-        //     ./x.cue:12:24
-      }
-      fRec: (_|_){
-        // [structural cycle]
-        nn: (int){ int }
-        out: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./x.cue:15:9
-        }
-      }
-      f: (_|_){
-        // [structural cycle]
-        n: (int){ int }
-        out: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./x.cue:15:9
-        }
-      }
-    }
-    patterns: (_|_){
-      // [structural cycle]
-      f: (_|_){
-        // [structural cycle]
-        n: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./x.cue:20:9
-        }
-      }
-    }
-    acrossFields: (struct){
-      fail1: (struct){
-        f: (struct){
-          in: (number){ number }
-          out: (_|_){
-            // [incomplete] inline.acrossFields.fail1.f.out: non-concrete value number in operand to +:
-            //     ./x.cue:30:8
-            //     ./x.cue:29:8
-          }
-        }
-        k00: (int){ 0 }
-        k10: (_|_){
-          // [incomplete] in: non-concrete value number in operand to +:
-          //     ./x.cue:30:8
-          //     ./x.cue:29:8
-          //     ./x.cue:35:17
-        }
-        k20: (_|_){
-          // [incomplete] in: non-concrete value number in operand to +:
-          //     ./x.cue:30:8
-          //     ./x.cue:29:8
-          //     ./x.cue:38:17
-        }
-        k30: (_|_){
-          // [incomplete] in: non-concrete value number in operand to +:
-          //     ./x.cue:30:8
-          //     ./x.cue:29:8
-          //     ./x.cue:34:17
-        }
-      }
-      ok1: (struct){
-        f: (struct){
-          in: (number){ number }
-          out: (number){ number }
-        }
-        k00: (int){ 0 }
-        k10: (int){ 0 }
-        k20: (int){ 0 }
-        k30: (int){ 0 }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,16 +1,14 @@
- Errors:
--expanded1.hasCycle.root._a.input._a.input: structural cycle:
--    ./inlineexpand.cue:11:11
--issue3731.expanded.root._others.input._others.input: structural cycle:
--    ./inlineexpand.cue:43:16
-+expanded1.hasCycle.root._a.input._a.input: structural cycle
-+issue3731.expanded.root._others.input._others.input: structural cycle
- structural cycle:
-     ./x.cue:6:9
- structural cycle:
-+    ./x.cue:12:24
-+structural cycle:
-     ./x.cue:15:9
- structural cycle:
-     ./x.cue:20:9
--in: structural cycle:
--    ./x.cue:30:8
- 
- Result:
- (_|_){
-@@ -43,26 +41,16 @@
-           // [structural cycle]
-           input: (_|_){
-             // [structural cycle]
--            a: (_|_){
--              // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
--              //     ./inlineexpand.cue:11:11
--            }
-+            a: (_){ _ }
-             _a: (_|_){
-               // [structural cycle]
-               input: (_|_){
--                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
--                //     ./inlineexpand.cue:11:11
--              }
--              output: (_|_){
--                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
--                //     ./inlineexpand.cue:11:11
--              }
--            }
--          }
--          output: (_|_){
--            // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
--            //     ./inlineexpand.cue:11:11
--          }
-+                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
-+              }
-+              output: (_){ _ }
-+            }
-+          }
-+          output: (_){ _ }
-         }
-       }
-     }
-@@ -100,7 +88,7 @@
-           show: (bool){ true }
-         }
-         others: (#list){
--          0: (struct){
-+          0: (#struct){
-             show: (bool){ true }
-           }
-         }
-@@ -119,31 +107,22 @@
-         self: (struct){
-           show: (bool){ true }
-         }
--        others: (#list){
--          0: (struct){
--            show: (bool){ true }
--          }
--        }
-+        others: ~(issue3731.expanded.root._others.output)
-         _others: (_|_){
-           // [structural cycle]
-           input: (_|_){
-             // [structural cycle]
--            self: (struct){
--              show: (bool){ true }
--            }
--            others: (_|_){
--              // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
--              //     ./inlineexpand.cue:43:16
-+            self: (#struct){
-+              show: (bool){ true }
-+            }
-+            others: (#list){
-             }
-             _others: (_|_){
-               // [structural cycle]
-               input: (_|_){
--                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
--                //     ./inlineexpand.cue:43:16
--              }
--              output: (_|_){
--                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
--                //     ./inlineexpand.cue:43:16
-+                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle
-+              }
-+              output: (#list){
-               }
-             }
-           }
-@@ -163,12 +142,7 @@
-         }
-       }
-       #AccountConfig: (#struct){
--        workspaces: (#struct){
--          workspaceA?: (#struct){
--          }
--          workspaceB?: (#struct){
--          }
--        }
-+        workspaces: ~(issue3731.full.#Workspace)
-         siblings?: (list){
-         }
-       }
-@@ -184,10 +158,10 @@
-       }
-       #AccountConfigSub2: (#struct){
-         workspaces: (#struct){
--          workspaceA?: (#struct){
--          }
-           workspaceB: (#struct){
-           }
-+          workspaceA?: (#struct){
-+          }
-         }
-         siblings?: (list){
-         }
-@@ -196,6 +170,9 @@
-         env1: (struct){
-           region1: (struct){
-             "env1-r1-account-sub1": (#struct){
-+              siblings: (#list){
-+                0: (string){ "env1-r1-account-sub2-1" }
-+              }
-               workspaces: (#struct){
-                 workspaceA: (#struct){
-                 }
-@@ -202,19 +179,16 @@
-                 workspaceB?: (#struct){
-                 }
-               }
--              siblings: (#list){
--                0: (string){ "env1-r1-account-sub2-1" }
--              }
-             }
-             "env1-r1-account-sub2-1": (#struct){
--              workspaces: (#struct){
--                workspaceA?: (#struct){
--                }
-+              siblings: (#list){
-+                0: (string){ "env1-r1-account-sub2-1" }
-+              }
-+              workspaces: (#struct){
-                 workspaceB: (#struct){
-                 }
--              }
--              siblings: (#list){
--                0: (string){ "env1-r1-account-sub2-1" }
-+                workspaceA?: (#struct){
-+                }
-               }
-             }
-           }
-@@ -245,7 +219,7 @@
-       // [structural cycle]
-       f2: (_|_){
-         // [structural cycle] structural cycle:
--        //     ./x.cue:15:9
-+        //     ./x.cue:12:24
-       }
-       fRec: (_|_){
-         // [structural cycle]
-@@ -274,10 +248,8 @@
-         }
-       }
-     }
--    acrossFields: (_|_){
--      // [structural cycle]
--      fail1: (_|_){
--        // [structural cycle]
-+    acrossFields: (struct){
-+      fail1: (struct){
-         f: (struct){
-           in: (number){ number }
-           out: (_|_){
-@@ -288,16 +260,22 @@
-         }
-         k00: (int){ 0 }
-         k10: (_|_){
--          // [structural cycle] in: structural cycle:
--          //     ./x.cue:30:8
-+          // [incomplete] in: non-concrete value number in operand to +:
-+          //     ./x.cue:30:8
-+          //     ./x.cue:29:8
-+          //     ./x.cue:35:17
-         }
-         k20: (_|_){
--          // [structural cycle] in: structural cycle:
--          //     ./x.cue:30:8
-+          // [incomplete] in: non-concrete value number in operand to +:
-+          //     ./x.cue:30:8
-+          //     ./x.cue:29:8
-+          //     ./x.cue:38:17
-         }
-         k30: (_|_){
--          // [structural cycle] in: structural cycle:
--          //     ./x.cue:30:8
-+          // [incomplete] in: non-concrete value number in operand to +:
-+          //     ./x.cue:30:8
-+          //     ./x.cue:29:8
-+          //     ./x.cue:34:17
-         }
-       }
-       ok1: (struct){
--- diff/todo/p2 --
-One test now fails. Given TODO, this may be okay.
-This does break Issue #2163.

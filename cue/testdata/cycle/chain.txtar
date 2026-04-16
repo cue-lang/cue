@@ -1,4 +1,5 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
+# Tests that chaining existing fields through comprehensions and builtins does
+# not trigger spurious cycle detection errors.
 -- in.cue --
 import "list"
 
@@ -25,6 +26,12 @@ chain: t1: {
 		#in: _
 		#out: {}
 	}
+	@test(eq, {
+		#maxiter: 2
+		x: {}
+		a: {x2: null, x0: {}, x1: {}}
+		#DepthF: {#in: _, #out: {}}
+	})
 }
 
 chain: t2: p1: {
@@ -38,6 +45,7 @@ chain: t2: p1: {
 	x: _
 
 	x.x0
+	@test(eq, {X: 1, x: {x0: {}, x1: {}}})
 }
 
 chain: t2: p2: {
@@ -51,6 +59,7 @@ chain: t2: p2: {
 	x.x0
 
 	X: 1
+	@test(eq, {x: {x0: {}, x1: {}}, X: 1})
 }
 
 chain: t3: p1: {
@@ -75,6 +84,7 @@ chain: t3: p1: {
 	x.x0
 
 	X: 1
+	@test(eq, {X: 1, x: {x0: {}}})
 }
 
 -- issue2052.cue --
@@ -95,6 +105,14 @@ issue2052: reduced: t1: {
 		funcs: {}
 		funcs["0"]
 	}
+	@test(eq, {
+		A: {a: _}
+		Depth: {
+			#maxiter: 1
+			funcs: {"0": {a: _}}
+			a: _
+		}
+	})
 }
 issue2052: reduced: t2: {
 	A: a: _
@@ -106,6 +124,10 @@ issue2052: reduced: t2: {
 		funcs: {}
 		funcs["0"]
 	}
+	@test(eq, {
+		A: {a: _}
+		Depth: {maxiter: 1, funcs: {"0": {a: _}}, a: _}
+	})
 }
 issue2052: medium: t1: {
 	#Depth: {
@@ -138,6 +160,39 @@ issue2052: medium: t1: {
 
 	d: #Depth & {#in: tree}
 
+	@test(eq, {
+		#Depth: {
+			#maxiter: 4
+			#funcs: {
+				"4": null
+				"0": {#in: _, #basic: string | null, out: 1}
+				"1": {#in: _, #basic: string | null, out: 1}
+				"2": {#in: _, #basic: string | null, out: 1}
+				"3": {#in: _, #basic: string | null, out: 1}
+			}
+			#in: _
+			#basic: string | null
+			out: 1
+		}
+		#DepthF: {
+			#next: _
+			#func: {#in: _, #basic: string | null, out: 1}
+		}
+		tree: "bar"
+		d: {
+			#in: "bar"
+			#maxiter: 4
+			#funcs: {
+				"4": null
+				"0": {#in: _, #basic: string | null, out: 1}
+				"1": {#in: _, #basic: string | null, out: 1}
+				"2": {#in: _, #basic: string | null, out: 1}
+				"3": {#in: _, #basic: string | null, out: 1}
+			}
+			#basic: string | null
+			out: 1
+		}
+	})
 }
 
 issue2052: medium: t2: {
@@ -176,6 +231,39 @@ issue2052: medium: t2: {
 	tree: "bar"
 
 	d: #Depth & {#in: tree}
+	@test(eq, {
+		#Depth: {
+			#maxiter: 4
+			#funcs: {
+				"4": null
+				"0": {#in: _, #basic: string | null, out: 1}
+				"1": {#in: _, #basic: string | null, out: 1}
+				"2": {#in: _, #basic: string | null, out: 1}
+				"3": {#in: _, #basic: string | null, out: 1}
+			}
+			#in: _
+			#basic: string | null
+			out: 1
+		}
+		#DepthF: {
+			#next: _
+			#func: {#in: _, #basic: string | null, out: 1}
+		}
+		tree: "bar"
+		d: {
+			#in: "bar"
+			#maxiter: 4
+			#funcs: {
+				"4": null
+				"0": {#in: _, #basic: string | null, out: 1}
+				"1": {#in: _, #basic: string | null, out: 1}
+				"2": {#in: _, #basic: string | null, out: 1}
+				"3": {#in: _, #basic: string | null, out: 1}
+			}
+			#basic: string | null
+			out: 1
+		}
+	})
 }
 
 issue2052: full: {
@@ -234,1438 +322,185 @@ issue2052: full: {
 	}
 
 	d: #Depth & {#in: tree}
+	@test(eq, {
+		#RecurseN: {
+			_
+			#maxiter: *4 | >=0 & int
+			#funcFactory: {#next: _, #func: _}
+			#funcs: {
+				"4": null
+				"0": _
+				"1": _
+				"2": _
+				"3": _
+			}
+		}
+		#DepthF: {
+			#next: _
+			#func: {
+				#in: _
+				#basic: int | number | string | bytes | null
+				out: {1}
+			}
+		}
+		#Depth: {
+			#maxiter: 11
+			#funcFactory: {
+				#next: _
+				#func: {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+			}
+			#funcs: {
+				"11": null
+				"0": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"1": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"2": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"3": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"4": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"5": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"6": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"7": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"8": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"9": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"10": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+			}
+			#in: _
+			#basic: int | number | string | bytes | null
+			out: {1}
+		}
+		tree: {
+			a: {foo: "bar", a: {b: {c: "d"}}}
+			cow: "moo"
+		}
+		d: {
+			#in: {
+				a: {foo: "bar", a: {b: {c: "d"}}}
+				cow: "moo"
+			}
+			#maxiter: 11
+			#funcFactory: {
+				#next: _
+				#func: {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+			}
+			#funcs: {
+				"11": null
+				"0": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"1": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"2": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"3": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"4": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"5": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"6": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"7": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"8": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"9": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"10": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+			}
+			#basic: int | number | string | bytes | null
+			out: {5}
+		}
+	})
 }
--- out/evalalpha --
-(struct){
-  chain: (struct){
-    t1: (struct){
-      #maxiter: (int){ 2 }
-      x: (#struct){
-      }
-      a: (struct){
-        x2: (null){ null }
-        x0: (#struct){
-        }
-        x1: (#struct){
-        }
-      }
-      #DepthF: (#struct){
-        #in: (_){ _ }
-        #out: (#struct){
-        }
-      }
-    }
-    t2: (struct){
-      p1: (struct){
-        X: (int){ 1 }
-        x: (struct){
-          x0: (struct){
-          }
-          x1: (struct){
-          }
-        }
-      }
-      p2: (struct){
-        x: (struct){
-          x0: (struct){
-          }
-          x1: (struct){
-          }
-        }
-        X: (int){ 1 }
-      }
-    }
-    t3: (struct){
-      p1: (struct){
-        X: (int){ 1 }
-        x: (struct){
-          x0: (struct){
-          }
-        }
-      }
-    }
-  }
-  issue2052: (struct){
-    reduced: (struct){
-      t1: (struct){
-        A: (struct){
-          a: (_){ _ }
-        }
-        Depth: (struct){
-          #maxiter: (int){ 1 }
-          funcs: (struct){
-            "0": ~(issue2052.reduced.t1.A)
-          }
-          a: (_){ _ }
-        }
-      }
-      t2: (struct){
-        A: (struct){
-          a: (_){ _ }
-        }
-        Depth: (struct){
-          maxiter: (int){ 1 }
-          funcs: (struct){
-            "0": ~(issue2052.reduced.t2.A)
-          }
-          a: (_){ _ }
-        }
-      }
-    }
-    medium: (struct){
-      t1: (struct){
-        #Depth: (#struct){
-          #maxiter: (int){ 4 }
-          #funcs: (#struct){
-            "4": (null){ null }
-            "0": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "1": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "2": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "3": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-          }
-          #in: (_){ _ }
-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-          out: (int){ 1 }
-        }
-        #DepthF: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-            out: (int){ 1 }
-          }
-        }
-        tree: (string){ "bar" }
-        d: (#struct){
-          #in: (string){ "bar" }
-          #maxiter: (int){ 4 }
-          #funcs: (#struct){
-            "4": (null){ null }
-            "0": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "1": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "2": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "3": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-          }
-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-          out: (int){ 1 }
-        }
-      }
-      t2: (struct){
-        #Depth: (#struct){
-          #maxiter: (int){ 4 }
-          #funcs: (#struct){
-            "4": (null){ null }
-            "0": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "1": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "2": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "3": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-          }
-          #in: (_){ _ }
-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-          out: (int){ 1 }
-        }
-        #DepthF: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-            out: (int){ 1 }
-          }
-        }
-        tree: (string){ "bar" }
-        d: (#struct){
-          #in: (string){ "bar" }
-          #maxiter: (int){ 4 }
-          #funcs: (#struct){
-            "4": (null){ null }
-            "0": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "1": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "2": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "3": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-          }
-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-          out: (int){ 1 }
-        }
-      }
-    }
-    full: (struct){
-      #RecurseN: (_){
-        _
-        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (_){ _ }
-        }
-        #funcs: (#struct){
-          "4": (null){ null }
-          "0": (_){ _ }
-          "1": (_){ _ }
-          "2": (_){ _ }
-          "3": (_){ _ }
-        }
-      }
-      #DepthF: (#struct){
-        #next: (_){ _ }
-        #func: (#struct){
-          #in: (_){ _ }
-          #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-          out: (int){
-            1
-            let depths#1multi = [
-              for k, v in 〈3;#in〉 {
-                (〈6;#next〉 & {
-                  #in: 〈2;v〉
-                }).out
-              },
-            ]
-          }
-        }
-      }
-      #Depth: (#struct){
-        #maxiter: (int){ 11 }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-        }
-        #funcs: (#struct){
-          "11": (null){ null }
-          "0": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "1": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "2": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "3": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "4": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "5": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "6": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "7": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "8": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "9": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "10": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-        }
-        #in: (_){ _ }
-        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-        out: (int){
-          1
-          let depths#1multi = [
-            for k, v in 〈3;#in〉 {
-              (〈6;#next〉 & {
-                #in: 〈2;v〉
-              }).out
-            },
-          ]
-        }
-      }
-      tree: (struct){
-        a: (struct){
-          foo: (string){ "bar" }
-          a: (struct){
-            b: (struct){
-              c: (string){ "d" }
-            }
-          }
-        }
-        cow: (string){ "moo" }
-      }
-      d: (#struct){
-        #in: (#struct){
-          a: (#struct){
-            foo: (string){ "bar" }
-            a: (#struct){
-              b: (#struct){
-                c: (string){ "d" }
-              }
-            }
-          }
-          cow: (string){ "moo" }
-        }
-        #maxiter: (int){ 11 }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-        }
-        #funcs: (#struct){
-          "11": (null){ null }
-          "0": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "1": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "2": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "3": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "4": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "5": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "6": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "7": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "8": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "9": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-          "10": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1multi = [
-                for k, v in 〈3;#in〉 {
-                  (〈6;#next〉 & {
-                    #in: 〈2;v〉
-                  }).out
-                },
-              ]
-            }
-          }
-        }
-        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-        out: (int){
-          5
-          let depths#1multi = [
-            for k, v in 〈3;#in〉 {
-              (〈6;#next〉 & {
-                #in: 〈2;v〉
-              }).out
-            },
-          ]
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -27,15 +27,11 @@
-           }
-         }
-       }
--      p2: (_|_){
--        // [incomplete] chain.t2.p2.0.1: invalid interpolation: cycle error referencing X:
--        //     ./in.cue:44:6
--        //     ./in.cue:43:28
--        x: (_|_){
--          // [incomplete] chain.t2.p2.0.1: invalid interpolation: cycle error referencing X:
--          //     ./in.cue:44:6
--          //     ./in.cue:43:28
--          x0: (struct){
-+      p2: (struct){
-+        x: (struct){
-+          x0: (struct){
-+          }
-+          x1: (struct){
-           }
-         }
-         X: (int){ 1 }
-@@ -60,9 +56,7 @@
-         Depth: (struct){
-           #maxiter: (int){ 1 }
-           funcs: (struct){
--            "0": (struct){
--              a: (_){ _ }
--            }
-+            "0": ~(issue2052.reduced.t1.A)
-           }
-           a: (_){ _ }
-         }
-@@ -74,9 +68,7 @@
-         Depth: (struct){
-           maxiter: (int){ 1 }
-           funcs: (struct){
--            "0": (struct){
--              a: (_){ _ }
--            }
-+            "0": ~(issue2052.reduced.t2.A)
-           }
-           a: (_){ _ }
-         }
-@@ -123,100 +115,100 @@
-         }
-         tree: (string){ "bar" }
-         d: (#struct){
--          #maxiter: (int){ 4 }
--          #funcs: (#struct){
--            "4": (null){ null }
--            "0": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "1": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "2": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "3": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--          }
--          #in: (string){ "bar" }
--          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--          out: (int){ 1 }
--        }
--      }
--      t2: (struct){
--        #Depth: (#struct){
--          #maxiter: (int){ 4 }
--          #funcs: (#struct){
--            "4": (null){ null }
--            "0": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "1": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "2": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "3": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--          }
--          #in: (_){ _ }
--          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--          out: (int){ 1 }
--        }
--        #DepthF: (#struct){
--          #next: (_){ _ }
--          #func: (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--            out: (int){ 1 }
--          }
--        }
--        tree: (string){ "bar" }
--        d: (#struct){
--          #maxiter: (int){ 4 }
--          #funcs: (#struct){
--            "4": (null){ null }
--            "0": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "1": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "2": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--            "3": (#struct){
--              #in: (_){ _ }
--              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--              out: (int){ 1 }
--            }
--          }
--          #in: (string){ "bar" }
-+          #in: (string){ "bar" }
-+          #maxiter: (int){ 4 }
-+          #funcs: (#struct){
-+            "4": (null){ null }
-+            "0": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "1": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "2": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "3": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+          }
-+          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+          out: (int){ 1 }
-+        }
-+      }
-+      t2: (struct){
-+        #Depth: (#struct){
-+          #maxiter: (int){ 4 }
-+          #funcs: (#struct){
-+            "4": (null){ null }
-+            "0": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "1": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "2": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "3": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+          }
-+          #in: (_){ _ }
-+          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+          out: (int){ 1 }
-+        }
-+        #DepthF: (#struct){
-+          #next: (_){ _ }
-+          #func: (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+            out: (int){ 1 }
-+          }
-+        }
-+        tree: (string){ "bar" }
-+        d: (#struct){
-+          #in: (string){ "bar" }
-+          #maxiter: (int){ 4 }
-+          #funcs: (#struct){
-+            "4": (null){ null }
-+            "0": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "1": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "2": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+            "3": (#struct){
-+              #in: (_){ _ }
-+              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+              out: (int){ 1 }
-+            }
-+          }
-           #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-           out: (int){ 1 }
-         }
-@@ -245,7 +237,13 @@
-           #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-           out: (int){
-             1
--            let depths#1 = (_){ _ }
-+            let depths#1multi = [
-+              for k, v in 〈3;#in〉 {
-+                (〈6;#next〉 & {
-+                  #in: 〈2;v〉
-+                }).out
-+              },
-+            ]
-           }
-         }
-       }
-@@ -258,98 +256,170 @@
-             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-             out: (int){
-               1
--              let depths#1 = (_){ _ }
--            }
--          }
--        }
--        #funcs: (#struct){
--          "11": (null){ null }
--          "0": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "1": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "2": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "3": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "4": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "5": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "6": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "7": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "8": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "9": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "10": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+        }
-+        #funcs: (#struct){
-+          "11": (null){ null }
-+          "0": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "1": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "2": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "3": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "4": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "5": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "6": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "7": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "8": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "9": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "10": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-             }
-           }
-         }
-@@ -357,7 +427,13 @@
-         #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-         out: (int){
-           1
--          let depths#1 = (_){ _ }
-+          let depths#1multi = [
-+            for k, v in 〈3;#in〉 {
-+              (〈6;#next〉 & {
-+                #in: 〈2;v〉
-+              }).out
-+            },
-+          ]
-         }
-       }
-       tree: (struct){
-@@ -371,49 +447,7 @@
-         }
-         cow: (string){ "moo" }
-       }
--      d: (_|_){
--        // [incomplete] issue2052.full.d: cannot add field #maxiter: was already used:
--        //     ./issue2052.cue:143:23
--        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
--        #funcFactory: (#struct){
--          #next: (_){ _ }
--          #func: (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--        }
--        #funcs: (#struct){
--          "4": (null){ null }
--          "0": (_){ _ }
--          "1": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "2": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "3": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--        }
-+      d: (#struct){
-         #in: (#struct){
-           a: (#struct){
-             foo: (string){ "bar" }
-@@ -425,6 +459,192 @@
-           }
-           cow: (string){ "moo" }
-         }
-+        #maxiter: (int){ 11 }
-+        #funcFactory: (#struct){
-+          #next: (_){ _ }
-+          #func: (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+        }
-+        #funcs: (#struct){
-+          "11": (null){ null }
-+          "0": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "1": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "2": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "3": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "4": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "5": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "6": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "7": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "8": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "9": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+          "10": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1multi = [
-+                for k, v in 〈3;#in〉 {
-+                  (〈6;#next〉 & {
-+                    #in: 〈2;v〉
-+                  }).out
-+                },
-+              ]
-+            }
-+          }
-+        }
-+        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+        out: (int){
-+          5
-+          let depths#1multi = [
-+            for k, v in 〈3;#in〉 {
-+              (〈6;#next〉 & {
-+                #in: 〈2;v〉
-+              }).out
-+            },
-+          ]
-+        }
-       }
-     }
-   }
+-- out/errors.txt --
+-- out/todo.txt --
+chain.t2.p2 produces an incomplete error in v2 (cycle error referencing X)
+but succeeds in v3. issue2052.reduced.t1 and t2 show structure sharing
+(funcs."0" shared with A) in v3 where v2 expanded the struct.
 -- out/eval/stats --
 Leaks:  152
 Freed:  2975
@@ -1679,438 +514,6 @@ Disjuncts:    1615
 Notifications: 15
 
 NumCloseIDs: 1501
--- out/eval --
-(struct){
-  chain: (struct){
-    t1: (struct){
-      #maxiter: (int){ 2 }
-      x: (#struct){
-      }
-      a: (struct){
-        x2: (null){ null }
-        x0: (#struct){
-        }
-        x1: (#struct){
-        }
-      }
-      #DepthF: (#struct){
-        #in: (_){ _ }
-        #out: (#struct){
-        }
-      }
-    }
-    t2: (struct){
-      p1: (struct){
-        X: (int){ 1 }
-        x: (struct){
-          x0: (struct){
-          }
-          x1: (struct){
-          }
-        }
-      }
-      p2: (_|_){
-        // [incomplete] chain.t2.p2.0.1: invalid interpolation: cycle error referencing X:
-        //     ./in.cue:44:6
-        //     ./in.cue:43:28
-        x: (_|_){
-          // [incomplete] chain.t2.p2.0.1: invalid interpolation: cycle error referencing X:
-          //     ./in.cue:44:6
-          //     ./in.cue:43:28
-          x0: (struct){
-          }
-        }
-        X: (int){ 1 }
-      }
-    }
-    t3: (struct){
-      p1: (struct){
-        X: (int){ 1 }
-        x: (struct){
-          x0: (struct){
-          }
-        }
-      }
-    }
-  }
-  issue2052: (struct){
-    reduced: (struct){
-      t1: (struct){
-        A: (struct){
-          a: (_){ _ }
-        }
-        Depth: (struct){
-          #maxiter: (int){ 1 }
-          funcs: (struct){
-            "0": (struct){
-              a: (_){ _ }
-            }
-          }
-          a: (_){ _ }
-        }
-      }
-      t2: (struct){
-        A: (struct){
-          a: (_){ _ }
-        }
-        Depth: (struct){
-          maxiter: (int){ 1 }
-          funcs: (struct){
-            "0": (struct){
-              a: (_){ _ }
-            }
-          }
-          a: (_){ _ }
-        }
-      }
-    }
-    medium: (struct){
-      t1: (struct){
-        #Depth: (#struct){
-          #maxiter: (int){ 4 }
-          #funcs: (#struct){
-            "4": (null){ null }
-            "0": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "1": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "2": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "3": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-          }
-          #in: (_){ _ }
-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-          out: (int){ 1 }
-        }
-        #DepthF: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-            out: (int){ 1 }
-          }
-        }
-        tree: (string){ "bar" }
-        d: (#struct){
-          #maxiter: (int){ 4 }
-          #funcs: (#struct){
-            "4": (null){ null }
-            "0": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "1": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "2": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "3": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-          }
-          #in: (string){ "bar" }
-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-          out: (int){ 1 }
-        }
-      }
-      t2: (struct){
-        #Depth: (#struct){
-          #maxiter: (int){ 4 }
-          #funcs: (#struct){
-            "4": (null){ null }
-            "0": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "1": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "2": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "3": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-          }
-          #in: (_){ _ }
-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-          out: (int){ 1 }
-        }
-        #DepthF: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-            out: (int){ 1 }
-          }
-        }
-        tree: (string){ "bar" }
-        d: (#struct){
-          #maxiter: (int){ 4 }
-          #funcs: (#struct){
-            "4": (null){ null }
-            "0": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "1": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "2": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-            "3": (#struct){
-              #in: (_){ _ }
-              #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-              out: (int){ 1 }
-            }
-          }
-          #in: (string){ "bar" }
-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-          out: (int){ 1 }
-        }
-      }
-    }
-    full: (struct){
-      #RecurseN: (_){
-        _
-        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (_){ _ }
-        }
-        #funcs: (#struct){
-          "4": (null){ null }
-          "0": (_){ _ }
-          "1": (_){ _ }
-          "2": (_){ _ }
-          "3": (_){ _ }
-        }
-      }
-      #DepthF: (#struct){
-        #next: (_){ _ }
-        #func: (#struct){
-          #in: (_){ _ }
-          #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-          out: (int){
-            1
-            let depths#1 = (_){ _ }
-          }
-        }
-      }
-      #Depth: (#struct){
-        #maxiter: (int){ 11 }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-        }
-        #funcs: (#struct){
-          "11": (null){ null }
-          "0": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "1": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "2": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "3": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "4": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "5": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "6": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "7": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "8": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "9": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "10": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-        }
-        #in: (_){ _ }
-        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-        out: (int){
-          1
-          let depths#1 = (_){ _ }
-        }
-      }
-      tree: (struct){
-        a: (struct){
-          foo: (string){ "bar" }
-          a: (struct){
-            b: (struct){
-              c: (string){ "d" }
-            }
-          }
-        }
-        cow: (string){ "moo" }
-      }
-      d: (_|_){
-        // [incomplete] issue2052.full.d: cannot add field #maxiter: was already used:
-        //     ./issue2052.cue:143:23
-        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-        }
-        #funcs: (#struct){
-          "4": (null){ null }
-          "0": (_){ _ }
-          "1": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "2": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-          "3": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-        }
-        #in: (#struct){
-          a: (#struct){
-            foo: (string){ "bar" }
-            a: (#struct){
-              b: (#struct){
-                c: (string){ "d" }
-              }
-            }
-          }
-          cow: (string){ "moo" }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

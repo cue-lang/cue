@@ -1,14 +1,15 @@
 // Lots of cycle-reference goodness.
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
+# Tests that pattern constraints on cyclically-referenced fields do not
+# cause infinite evaluation. Also tests issue3326 (cyclic pattern constraints).
 -- in.cue --
 [!~"^[.]"]: c
 a:          b
 b: [string]: int
 c: a:        int
 [string]: c
-a:        b
+a:        b      @test(eq, {a: int})
 b: [string]: int
-c: a:        int
+c: a:        int @test(eq, int)
 
 -- issue3326.cue --
 // https://cuelang.org/issue/3326
@@ -22,7 +23,11 @@ issue3326: {
 	_self: x: [...and(x)]
 	_self
 	x: [1]
+	@test(eq, {_self: {x: []}, x: [1], a: int})
 }
+-- out/errors.txt --
+-- out/todo.txt --
+issue3326 is present in v3 (evalalpha) but not in v2 (eval) — v2 did not evaluate it.
 -- out/eval/stats --
 Leaks:  0
 Freed:  13
@@ -36,59 +41,6 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 7
--- out/evalalpha --
-(struct){
-  a: (struct){
-    a: (int){ int }
-  }
-  b: (struct){
-    a: (int){ int }
-  }
-  c: (struct){
-    a: (int){ int }
-  }
-  issue3326: (struct){
-    _self: (struct){
-      x: (list){
-      }
-    }
-    x: (#list){
-      0: (int){ 1 }
-    }
-    a: (int){ int }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -8,4 +8,14 @@
-   c: (struct){
-     a: (int){ int }
-   }
-+  issue3326: (struct){
-+    _self: (struct){
-+      x: (list){
-+      }
-+    }
-+    x: (#list){
-+      0: (int){ 1 }
-+    }
-+    a: (int){ int }
-+  }
- }
--- out/eval --
-(struct){
-  a: (struct){
-    a: (int){ int }
-  }
-  b: (struct){
-    a: (int){ int }
-  }
-  c: (struct){
-    a: (int){ int }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1911b12b_53c3e9c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T17:33:00Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "eccbf7fa_1ac14426",
+      "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88d38f03_d2438a60",
@@ -49,6 +67,24 @@
       "writtenOn": "2026-04-16T15:04:11Z",
       "side": 1,
       "message": "nit: in cases like this I would place the closing parenthesis on a new line, so that it\u0027s visually clearer where `@test` starts and ends. otherwise it almost looks like the next input CUE field is part of `@test`.",
+      "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f52ceb38_e7ebf441",
+        "filename": "cue/testdata/comprehensions/iferror.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T17:33:00Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "88d38f03_d2438a60",
       "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -83,6 +119,24 @@
       "writtenOn": "2026-04-16T16:41:32Z",
       "side": 1,
       "message": "Ideally, yes, but it is a bit laborious to address this. At some point that would be great.\n\nRegarding nested @test: yes. The reason for it is that there there are not always positions within the config at which to mark the error. We could hoist the directives and add \"at\" in many cases, but this is not always possible, like inside disjunctions.",
+      "parentUuid": "cae17fd5_a7ce246e",
+      "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f76a220_ea5b44a7",
+        "filename": "cue/testdata/comprehensions/issue1732.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T17:33:00Z",
+      "side": 1,
+      "message": "Acknowledged. Addressing the large eq bodies is on the backlog; the current size is acceptable for now as a coverage baseline.",
       "parentUuid": "cae17fd5_a7ce246e",
       "revId": "08b4d81668d93f71b3f4a9064c8e72695f1886e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"

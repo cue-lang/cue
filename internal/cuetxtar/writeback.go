@@ -21,13 +21,10 @@ package cuetxtar
 // cleanup operations.
 
 import (
-	"fmt"
 	"os"
 	"slices"
 
 	"golang.org/x/tools/txtar"
-
-	"cuelang.org/go/cue"
 )
 
 // ── inline fill write-back ─────────────────────────────────────────────────────
@@ -104,14 +101,4 @@ func (r *inlineRunner) applyInlineFillWritebacks() {
 			r.t.Errorf("inline: fill write-back to %s: %v", r.filePath, err)
 		}
 	}
-}
-
-// formatCoverAttr returns the @test attribute text to insert for a field whose
-// evaluated value is v.  For non-error values this is @test(eq, <value>).
-// For error values it falls back to a bare @test(err) placeholder.
-func (r *inlineRunner) formatCoverAttr(v cue.Value, srcFileName string) string {
-	if r.isError(v) {
-		return "@test(err)"
-	}
-	return fmt.Sprintf("@test(eq, %s)", r.formatValue(v, srcFileName))
 }

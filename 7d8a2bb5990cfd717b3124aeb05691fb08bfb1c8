@@ -16,6 +16,24 @@
       "message": "another misformatted commit message, please fix up all the commit messages in this stack",
       "revId": "7d8a2bb5990cfd717b3124aeb05691fb08bfb1c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ae43709_79b045f5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T17:33:12Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "6abf927c_8ca2439a",
+      "revId": "7d8a2bb5990cfd717b3124aeb05691fb08bfb1c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

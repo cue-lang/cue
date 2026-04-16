@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31878c76_54b72ed2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T17:30:41Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "1a68418b_a8fb02e9",
+      "revId": "ecbeba73ab3dfe7ce183defd284562c626ac6827",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e4e79dc_abfeeb9b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-16T09:20:03Z",
       "side": 1,
       "message": "I would join these two ifs to unindent",
+      "revId": "ecbeba73ab3dfe7ce183defd284562c626ac6827",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28ddd561_efe1f0d2",
+        "filename": "internal/cuetxtar/inline_err.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-16T17:30:41Z",
+      "side": 1,
+      "message": "Done. Declared `var e cueerrors.Error` once before both blocks and joined each nested if into a single `if ... \u0026\u0026 errors.As(...)` condition.",
+      "parentUuid": "9e4e79dc_abfeeb9b",
       "revId": "ecbeba73ab3dfe7ce183defd284562c626ac6827",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

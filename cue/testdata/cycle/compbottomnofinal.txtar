@@ -1,5 +1,4 @@
 // Issues: #667, #695, #622
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import (
 	"strconv"
@@ -15,12 +14,14 @@ minimal: {
 		if b.port == _|_ {
 			port: ""
 		}
+		@test(err, code=incomplete, path=port, contains="cyclic reference to field %[1]v", args=[port], pos=[1:3])
 	}
 
 	b: {
 		if a.port == _|_ {
 			port: ""
 		}
+		@test(err, code=incomplete, path=port, contains="cyclic reference to field %[1]v", args=[port], pos=[1:3])
 	}
 }
 
@@ -28,6 +29,8 @@ small: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
 	p1: {
+		@test(permute)
+		@test(permuteCount, 2)
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
 		#X: {
@@ -38,19 +41,10 @@ small: {
 				port: ":" + strconv.FormatInt(#Y.port, 10)
 			}
 		}
-	}
-
-	p2: {
-		#X: {
-			if #Y.port == _|_ {
-				port: ""
-			}
-			if #Y.port != _|_ {
-				port: ":" + strconv.FormatInt(#Y.port, 10)
-			}
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+		@test(eq, {
+			#Y: _|_ @test(err, code=incomplete, contains="#Y: undefined field: port", pos=[32:50])
+			#X: _|_ @test(err, code=incomplete, contains="#X.port: cyclic reference to field port", pos=[35:4])
+		})
 	}
 }
 
@@ -58,6 +52,9 @@ medium: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
 	p1: {
+		@test(permute)
+		@test(permuteCount, 6)
+
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
 		Y: {
@@ -77,116 +74,11 @@ medium: {
 				port: ":" + strconv.FormatInt(Y.port, 10)
 			}
 		}
-	}
-
-	p2: {
-		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
-
-		#X: {
-			// Can never determine whether Y.port exists as its resolution
-			// depends on #Y becoming finalized, which, in turn, depends on #X
-			// becoming finalized.
-			if Y.port == _|_ {
-				port: ""
-			}
-			if Y.port != _|_ {
-				port: ":" + strconv.FormatInt(Y.port, 10)
-			}
-		}
-
-		Y: {
-			if #Y.port != _|_ {
-				port: strconv.Atoi(#Y.port)
-			}
-		}
-	}
-
-	p3: {
-		Y: {
-			if #Y.port != _|_ {
-				port: strconv.Atoi(#Y.port)
-			}
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
-
-		#X: {
-			// Can never determine whether Y.port exists as its resolution
-			// depends on #Y becoming finalized, which, in turn, depends on #X
-			// becoming finalized.
-			if Y.port == _|_ {
-				port: ""
-			}
-			if Y.port != _|_ {
-				port: ":" + strconv.FormatInt(Y.port, 10)
-			}
-		}
-	}
-
-	p4: {
-		Y: {
-			if #Y.port != _|_ {
-				port: strconv.Atoi(#Y.port)
-			}
-		}
-
-		#X: {
-			// Can never determine whether Y.port exists as its resolution
-			// depends on #Y becoming finalized, which, in turn, depends on #X
-			// becoming finalized.
-			if Y.port == _|_ {
-				port: ""
-			}
-			if Y.port != _|_ {
-				port: ":" + strconv.FormatInt(Y.port, 10)
-			}
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
-	}
-
-	p5: {
-		#X: {
-			// Can never determine whether Y.port exists as its resolution
-			// depends on #Y becoming finalized, which, in turn, depends on #X
-			// becoming finalized.
-			if Y.port == _|_ {
-				port: ""
-			}
-			if Y.port != _|_ {
-				port: ":" + strconv.FormatInt(Y.port, 10)
-			}
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
-
-		Y: {
-			if #Y.port != _|_ {
-				port: strconv.Atoi(#Y.port)
-			}
-		}
-	}
-
-	p6: {
-		#X: {
-			// Can never determine whether Y.port exists as its resolution
-			// depends on #Y becoming finalized, which, in turn, depends on #X
-			// becoming finalized.
-			if Y.port == _|_ {
-				port: ""
-			}
-			if Y.port != _|_ {
-				port: ":" + strconv.FormatInt(Y.port, 10)
-			}
-		}
-
-		Y: {
-			if #Y.port != _|_ {
-				port: strconv.Atoi(#Y.port)
-			}
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+		@test(eq, {
+			#Y: _|_ @test(err, code=incomplete, contains="medium.p1.#Y: undefined field: port", pos=[56:50])
+			Y: {}
+			#X: _|_ @test(err, code=incomplete, contains="medium.p1.#X.port: cyclic reference to field port", pos=[68:4])
+		})
 	}
 }
 
@@ -194,6 +86,9 @@ large: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\d+))?$"#
 
 	p1: {
+		@test(permute)
+		@test(permuteCount, 120)
+
 		Y: {
 			userinfo: "user"
 			host:     "mod.test"
@@ -232,131 +127,48 @@ large: {
 		}
 
 		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-	}
-
-	p2: {
-		X: #X.userinfo + #X.host + #X.port
-
-		Y: {
-			userinfo: "user"
-			host:     "mod.test"
-		}
-
-		#X: {
-			if Y.userinfo == _|_ {
-				userinfo: ""
+		@test(eq, {
+			Y: {
+				userinfo: "user"
+				host: _|_ @test(err, code=incomplete, contains="large.p1.Y.host: undefined field: host", pos=[120:13])
 			}
-			if Y.userinfo != _|_ {
-				userinfo: Y.userinfo + "@"
+			X: _|_ @test(err, code=incomplete, contains="large.p1.X: undefined field: port", pos=[95:33])
+			#X: {
+				_|_
+				userinfo: "user@"
+				host: "mod.test"
 			}
-
-			host: Y.host
-
-			if Y.port == _|_ {
-				port: ""
-			}
-			if Y.port != _|_ {
-				port: ":" + strconv.FormatInt(Y.port, 10)
-			}
-		}
-
-		Y: {
-			if #Y.userinfo != _|_ {
-				userinfo: #Y.userinfo
-			}
-
-			host: #Y.host
-
-			if #Y.port != _|_ {
-				port: strconv.Atoi(#Y.port)
-			}
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-	}
-
-	p3: {
-		X: #X.userinfo + #X.host + #X.port
-
-		#X: {
-			if Y.userinfo == _|_ {
-				userinfo: ""
-			}
-			if Y.userinfo != _|_ {
-				userinfo: Y.userinfo + "@"
-			}
-
-			host: Y.host
-
-			if Y.port == _|_ {
-				port: ""
-			}
-			if Y.port != _|_ {
-				port: ":" + strconv.FormatInt(Y.port, 10)
-			}
-		}
-
-		Y: {
-			userinfo: "user"
-			host:     "mod.test"
-		}
-
-		Y: {
-			if #Y.userinfo != _|_ {
-				userinfo: #Y.userinfo
-			}
-
-			host: #Y.host
-
-			if #Y.port != _|_ {
-				port: strconv.Atoi(#Y.port)
-			}
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-	}
-
-	p4: {
-		X: #X.userinfo + #X.host + #X.port
-
-		#X: {
-			if Y.userinfo == _|_ {
-				userinfo: ""
-			}
-			if Y.userinfo != _|_ {
-				userinfo: Y.userinfo + "@"
-			}
-
-			host: Y.host
-
-			if Y.port == _|_ {
-				port: ""
-			}
-			if Y.port != _|_ {
-				port: ":" + strconv.FormatInt(Y.port, 10)
-			}
-		}
-
-		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-
-		Y: {
-			userinfo: "user"
-			host:     "mod.test"
-		}
-
-		Y: {
-			if #Y.userinfo != _|_ {
-				userinfo: #Y.userinfo
-			}
-
-			host: #Y.host
-
-			if #Y.port != _|_ {
-				port: strconv.Atoi(#Y.port)
-			}
-		}
+			#Y: _|_ @test(err, code=incomplete, contains="large.p1.X: undefined field: port", pos=[95:33])
+		})
 	}
 }
+-- out/errors.txt --
+[incomplete] minimal.a.port: cyclic reference to field port:
+    ./in.cue:12:3
+[incomplete] minimal.b.port: cyclic reference to field port:
+    ./in.cue:19:3
+[incomplete] small.p1.#Y: undefined field: port:
+    ./in.cue:32:50
+[incomplete] small.p1.#X.port: cyclic reference to field port:
+    ./in.cue:35:4
+[incomplete] medium.p1.#Y: undefined field: port:
+    ./in.cue:56:50
+[incomplete] medium.p1.#X.port: cyclic reference to field port:
+    ./in.cue:68:4
+[incomplete] large.p1.Y.host: undefined field: host:
+    ./in.cue:120:13
+[incomplete] large.p1.X: undefined field: port:
+    ./in.cue:95:33
+[incomplete] large.p1.#X.port: cyclic reference to field port:
+    ./in.cue:107:4
+[incomplete] large.p1.X: undefined field: port:
+    ./in.cue:95:33
+-- out/todo.txt --
+minimal.a/b: different error code in v2 (cycle) and v3 (incomplete).
+small.p1: v2 #Y succeeds with port="", v3 #Y errors; error codes differ.
+medium.p1/p2: v2 #X/#Y succeed with port="", v3 all error with incomplete.
+medium.p3-p6: similar changes from cycle (v2) to incomplete (v3).
+large.p1-p4: similar changes from cycle (v2) to incomplete (v3).
 -- out/eval/stats --
 Leaks:  44
 Freed:  76
@@ -369,780 +181,6 @@ Conjuncts:    140
 Disjuncts:    0
 
 NumCloseIDs: 76
--- out/evalalpha --
-(struct){
-  minimal: (struct){
-    a: (_|_){
-      // [incomplete] minimal.a.port: cyclic reference to field port:
-      //     ./in.cue:12:3
-    }
-    b: (_|_){
-      // [incomplete] minimal.b.port: cyclic reference to field port:
-      //     ./in.cue:18:3
-    }
-  }
-  small: (struct){
-    #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-    p1: (struct){
-      #Y: (_|_){
-        // [incomplete] small.p1.#Y: undefined field: port:
-        //     ./in.cue:28:50
-      }
-      #X: (_|_){
-        // [incomplete] small.p1.#X.port: cyclic reference to field port:
-        //     ./in.cue:31:4
-      }
-    }
-    p2: (struct){
-      #X: (_|_){
-        // [incomplete] small.p2.#X.port: cyclic reference to field port:
-        //     ./in.cue:42:4
-      }
-      #Y: (_|_){
-        // [incomplete] small.p2.#Y: undefined field: port:
-        //     ./in.cue:50:50
-      }
-    }
-  }
-  medium: (struct){
-    #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-    p1: (struct){
-      #Y: (_|_){
-        // [incomplete] medium.p1.#Y: undefined field: port:
-        //     ./in.cue:58:50
-      }
-      Y: (struct){
-      }
-      #X: (_|_){
-        // [incomplete] medium.p1.#X.port: cyclic reference to field port:
-        //     ./in.cue:70:4
-      }
-    }
-    p2: (struct){
-      #Y: (_|_){
-        // [incomplete] medium.p2.#Y: undefined field: port:
-        //     ./in.cue:80:50
-      }
-      #X: (_|_){
-        // [incomplete] medium.p2.#X.port: cyclic reference to field port:
-        //     ./in.cue:86:4
-      }
-      Y: (struct){
-      }
-    }
-    p3: (struct){
-      Y: (struct){
-      }
-      #Y: (_|_){
-        // [incomplete] medium.p3.#Y: undefined field: port:
-        //     ./in.cue:108:50
-      }
-      #X: (_|_){
-        // [incomplete] medium.p3.#X.port: cyclic reference to field port:
-        //     ./in.cue:114:4
-      }
-    }
-    p4: (struct){
-      Y: (struct){
-      }
-      #X: (_|_){
-        // [incomplete] medium.p4.#X.port: cyclic reference to field port:
-        //     ./in.cue:134:4
-      }
-      #Y: (_|_){
-        // [incomplete] medium.p4.#Y: undefined field: port:
-        //     ./in.cue:142:50
-      }
-    }
-    p5: (struct){
-      #X: (_|_){
-        // [incomplete] medium.p5.#X.port: cyclic reference to field port:
-        //     ./in.cue:150:4
-      }
-      #Y: (_|_){
-        // [incomplete] medium.p5.#Y: undefined field: port:
-        //     ./in.cue:158:50
-      }
-      Y: (struct){
-      }
-    }
-    p6: (struct){
-      #X: (_|_){
-        // [incomplete] medium.p6.#X.port: cyclic reference to field port:
-        //     ./in.cue:172:4
-      }
-      Y: (struct){
-      }
-      #Y: (_|_){
-        // [incomplete] medium.p6.#Y: undefined field: port:
-        //     ./in.cue:186:50
-      }
-    }
-  }
-  large: (struct){
-    #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
-    p1: (struct){
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (_|_){
-          // [incomplete] large.p1.Y.host: undefined field: host:
-          //     ./in.cue:224:13
-        }
-      }
-      X: (_|_){
-        // [incomplete] large.p1.X: undefined field: port:
-        //     ./in.cue:199:33
-      }
-      #X: (_|_){
-        // [incomplete] large.p1.#X.port: cyclic reference to field port:
-        //     ./in.cue:211:4
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (_|_){
-        // [incomplete] large.p1.X: undefined field: port:
-        //     ./in.cue:199:33
-      }
-    }
-    p2: (struct){
-      X: (_|_){
-        // [incomplete] large.p2.X: undefined field: port:
-        //     ./in.cue:235:33
-      }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (_|_){
-          // [incomplete] large.p2.Y.host: undefined field: host:
-          //     ./in.cue:265:13
-        }
-      }
-      #X: (_|_){
-        // [incomplete] large.p2.#X.port: cyclic reference to field port:
-        //     ./in.cue:252:4
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (_|_){
-        // [incomplete] large.p2.X: undefined field: port:
-        //     ./in.cue:235:33
-      }
-    }
-    p3: (struct){
-      X: (_|_){
-        // [incomplete] large.p3.X: undefined field: port:
-        //     ./in.cue:276:33
-      }
-      #X: (_|_){
-        // [incomplete] large.p3.#X.port: cyclic reference to field port:
-        //     ./in.cue:288:4
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (_|_){
-          // [incomplete] large.p3.Y.host: undefined field: host:
-          //     ./in.cue:306:13
-        }
-      }
-      #Y: (_|_){
-        // [incomplete] large.p3.X: undefined field: port:
-        //     ./in.cue:276:33
-      }
-    }
-    p4: (struct){
-      X: (_|_){
-        // [incomplete] large.p4.X: undefined field: port:
-        //     ./in.cue:317:33
-      }
-      #X: (_|_){
-        // [incomplete] large.p4.#X.port: cyclic reference to field port:
-        //     ./in.cue:329:4
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-      }
-      #Y: (_|_){
-        // [incomplete] large.p4.X: undefined field: port:
-        //     ./in.cue:317:33
-      }
-      Y: (struct){
-        userinfo: (string){ "user" }
-        host: (_|_){
-          // [incomplete] large.p4.X: undefined field: port:
-          //     ./in.cue:317:33
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,35 +1,34 @@
- (struct){
-   minimal: (struct){
-     a: (_|_){
--      // [cycle] minimal.b: cycle with field a.port:
--      //     ./in.cue:18:6
-+      // [incomplete] minimal.a.port: cyclic reference to field port:
-+      //     ./in.cue:12:3
-     }
-     b: (_|_){
--      // [cycle] minimal.b: cycle with field a.port:
--      //     ./in.cue:18:6
-+      // [incomplete] minimal.b.port: cyclic reference to field port:
-+      //     ./in.cue:18:3
-     }
-   }
-   small: (struct){
-     #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-     p1: (struct){
--      #Y: (#struct){
--        port: (string){ "" }
--      }
--      #X: (_|_){
--        // [cycle] small.p1.#X: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
--        //     ./in.cue:31:7
--        // small.p1.#X: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
--        //     ./in.cue:34:7
--      }
--    }
--    p2: (struct){
--      #X: (_|_){
--        // [cycle] small.p2.#Y: cycle with field #X.port:
--        //     ./in.cue:50:47
--      }
--      #Y: (_|_){
--        // [cycle] small.p2.#Y: cycle with field #X.port:
--        //     ./in.cue:50:47
-+      #Y: (_|_){
-+        // [incomplete] small.p1.#Y: undefined field: port:
-+        //     ./in.cue:28:50
-+      }
-+      #X: (_|_){
-+        // [incomplete] small.p1.#X.port: cyclic reference to field port:
-+        //     ./in.cue:31:4
-+      }
-+    }
-+    p2: (struct){
-+      #X: (_|_){
-+        // [incomplete] small.p2.#X.port: cyclic reference to field port:
-+        //     ./in.cue:42:4
-+      }
-+      #Y: (_|_){
-+        // [incomplete] small.p2.#Y: undefined field: port:
-+        //     ./in.cue:50:50
-       }
-     }
-   }
-@@ -36,65 +35,61 @@
-   medium: (struct){
-     #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-     p1: (struct){
--      #Y: (#struct){
--        port: (string){ "" }
--      }
--      Y: (_|_){
--        // [cycle] medium.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
--        //     ./in.cue:61:7
--      }
--      #X: (#struct){
--        port: (string){ "" }
--      }
--    }
--    p2: (struct){
--      #Y: (#struct){
--        port: (string){ "" }
--      }
--      #X: (#struct){
--        port: (string){ "" }
--      }
--      Y: (_|_){
--        // [cycle] medium.p2.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
--        //     ./in.cue:95:7
--      }
--    }
--    p3: (struct){
--      Y: (_|_){
--        // [cycle] medium.p3.#X: cycle with field Y.port:
--        //     ./in.cue:114:7
-+      #Y: (_|_){
-+        // [incomplete] medium.p1.#Y: undefined field: port:
-+        //     ./in.cue:58:50
-+      }
-+      Y: (struct){
-+      }
-+      #X: (_|_){
-+        // [incomplete] medium.p1.#X.port: cyclic reference to field port:
-+        //     ./in.cue:70:4
-+      }
-+    }
-+    p2: (struct){
-+      #Y: (_|_){
-+        // [incomplete] medium.p2.#Y: undefined field: port:
-+        //     ./in.cue:80:50
-+      }
-+      #X: (_|_){
-+        // [incomplete] medium.p2.#X.port: cyclic reference to field port:
-+        //     ./in.cue:86:4
-+      }
-+      Y: (struct){
-+      }
-+    }
-+    p3: (struct){
-+      Y: (struct){
-       }
-       #Y: (_|_){
-         // [incomplete] medium.p3.#Y: undefined field: port:
--        //     ./in.cue:108:47
--      }
--      #X: (_|_){
--        // [cycle] medium.p3.#X: cycle with field Y.port:
--        //     ./in.cue:114:7
--      }
--    }
--    p4: (struct){
--      Y: (_|_){
--        // [cycle] medium.p4.#X: cycle with field Y.port:
--        //     ./in.cue:134:7
--      }
--      #X: (_|_){
--        // [cycle] medium.p4.#X: cycle with field Y.port:
--        //     ./in.cue:134:7
--      }
--      #Y: (_|_){
--        // [cycle] medium.p4.#X: cycle with field Y.port:
--        //     ./in.cue:134:7
-+        //     ./in.cue:108:50
-+      }
-+      #X: (_|_){
-+        // [incomplete] medium.p3.#X.port: cyclic reference to field port:
-+        //     ./in.cue:114:4
-+      }
-+    }
-+    p4: (struct){
-+      Y: (struct){
-+      }
-+      #X: (_|_){
-+        // [incomplete] medium.p4.#X.port: cyclic reference to field port:
-+        //     ./in.cue:134:4
-+      }
-+      #Y: (_|_){
-+        // [incomplete] medium.p4.#Y: undefined field: port:
-+        //     ./in.cue:142:50
-       }
-     }
-     p5: (struct){
-       #X: (_|_){
--        // [cycle] medium.p5.#Y: cycle with field #X.port:
--        //     ./in.cue:158:47
--      }
--      #Y: (_|_){
--        // [cycle] medium.p5.#Y: cycle with field #X.port:
--        //     ./in.cue:158:47
-+        // [incomplete] medium.p5.#X.port: cyclic reference to field port:
-+        //     ./in.cue:150:4
-+      }
-+      #Y: (_|_){
-+        // [incomplete] medium.p5.#Y: undefined field: port:
-+        //     ./in.cue:158:50
-       }
-       Y: (struct){
-       }
-@@ -101,14 +96,14 @@
-     }
-     p6: (struct){
-       #X: (_|_){
--        // [cycle] medium.p6.#Y: cycle with field #X.port:
--        //     ./in.cue:186:47
--      }
--      Y: (struct){
--      }
--      #Y: (_|_){
--        // [cycle] medium.p6.#Y: cycle with field #X.port:
--        //     ./in.cue:186:47
-+        // [incomplete] medium.p6.#X.port: cyclic reference to field port:
-+        //     ./in.cue:172:4
-+      }
-+      Y: (struct){
-+      }
-+      #Y: (_|_){
-+        // [incomplete] medium.p6.#Y: undefined field: port:
-+        //     ./in.cue:186:50
-       }
-     }
-   }
-@@ -115,81 +110,95 @@
-   large: (struct){
-     #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
-     p1: (struct){
--      Y: (_|_){
--        // [cycle] large.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
--        //     ./in.cue:226:7
--      }
--      X: (string){ "user@mod.test" }
--      #X: (_|_){
--        // [cycle] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
--        //     ./in.cue:202:7
--        // large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
--        //     ./in.cue:205:7
--      }
--      #Y: (#struct){
--        host: (string){ "mod.test" }
--        port: (string){ "" }
--        userinfo: (string){ "user" }
--      }
--    }
--    p2: (struct){
--      X: (string){ "user@mod.test" }
--      Y: (_|_){
--        // [cycle] large.p2.Y: cycle error referencing port:
--        //     ./in.cue:267:10
--      }
--      #X: (_|_){
--        // [cycle] large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
--        //     ./in.cue:243:7
--        // large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
--        //     ./in.cue:246:7
--        // large.p2.Y: cycle error referencing port:
--        //     ./in.cue:267:10
--      }
--      #Y: (#struct){
--        host: (string){ "mod.test" }
--        port: (string){ "" }
--        userinfo: (string){ "user" }
--      }
--    }
--    p3: (struct){
--      X: (string){ "user@mod.test" }
--      #X: (_|_){
--        // [cycle] large.p3.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
--        //     ./in.cue:279:7
--        // large.p3.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
--        //     ./in.cue:282:7
--        // large.p3.Y: cycle error referencing port:
--        //     ./in.cue:308:10
--      }
--      Y: (_|_){
--        // [cycle] large.p3.Y: cycle error referencing port:
--        //     ./in.cue:308:10
--      }
--      #Y: (#struct){
--        host: (string){ "mod.test" }
--        port: (string){ "" }
--        userinfo: (string){ "user" }
--      }
--    }
--    p4: (struct){
--      X: (string){ "user@mod.test" }
--      #X: (_|_){
--        // [cycle] large.p4.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
--        //     ./in.cue:320:7
--        // large.p4.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
--        //     ./in.cue:323:7
--        // large.p4.Y: cycle error referencing port:
--        //     ./in.cue:351:10
--      }
--      #Y: (#struct){
--        host: (string){ "mod.test" }
--        port: (string){ "" }
--        userinfo: (string){ "user" }
--      }
--      Y: (_|_){
--        // [cycle] large.p4.Y: cycle error referencing port:
--        //     ./in.cue:351:10
-+      Y: (struct){
-+        userinfo: (string){ "user" }
-+        host: (_|_){
-+          // [incomplete] large.p1.Y.host: undefined field: host:
-+          //     ./in.cue:224:13
-+        }
-+      }
-+      X: (_|_){
-+        // [incomplete] large.p1.X: undefined field: port:
-+        //     ./in.cue:199:33
-+      }
-+      #X: (_|_){
-+        // [incomplete] large.p1.#X.port: cyclic reference to field port:
-+        //     ./in.cue:211:4
-+        userinfo: (string){ "user@" }
-+        host: (string){ "mod.test" }
-+      }
-+      #Y: (_|_){
-+        // [incomplete] large.p1.X: undefined field: port:
-+        //     ./in.cue:199:33
-+      }
-+    }
-+    p2: (struct){
-+      X: (_|_){
-+        // [incomplete] large.p2.X: undefined field: port:
-+        //     ./in.cue:235:33
-+      }
-+      Y: (struct){
-+        userinfo: (string){ "user" }
-+        host: (_|_){
-+          // [incomplete] large.p2.Y.host: undefined field: host:
-+          //     ./in.cue:265:13
-+        }
-+      }
-+      #X: (_|_){
-+        // [incomplete] large.p2.#X.port: cyclic reference to field port:
-+        //     ./in.cue:252:4
-+        userinfo: (string){ "user@" }
-+        host: (string){ "mod.test" }
-+      }
-+      #Y: (_|_){
-+        // [incomplete] large.p2.X: undefined field: port:
-+        //     ./in.cue:235:33
-+      }
-+    }
-+    p3: (struct){
-+      X: (_|_){
-+        // [incomplete] large.p3.X: undefined field: port:
-+        //     ./in.cue:276:33
-+      }
-+      #X: (_|_){
-+        // [incomplete] large.p3.#X.port: cyclic reference to field port:
-+        //     ./in.cue:288:4
-+        userinfo: (string){ "user@" }
-+        host: (string){ "mod.test" }
-+      }
-+      Y: (struct){
-+        userinfo: (string){ "user" }
-+        host: (_|_){
-+          // [incomplete] large.p3.Y.host: undefined field: host:
-+          //     ./in.cue:306:13
-+        }
-+      }
-+      #Y: (_|_){
-+        // [incomplete] large.p3.X: undefined field: port:
-+        //     ./in.cue:276:33
-+      }
-+    }
-+    p4: (struct){
-+      X: (_|_){
-+        // [incomplete] large.p4.X: undefined field: port:
-+        //     ./in.cue:317:33
-+      }
-+      #X: (_|_){
-+        // [incomplete] large.p4.#X.port: cyclic reference to field port:
-+        //     ./in.cue:329:4
-+        userinfo: (string){ "user@" }
-+        host: (string){ "mod.test" }
-+      }
-+      #Y: (_|_){
-+        // [incomplete] large.p4.X: undefined field: port:
-+        //     ./in.cue:317:33
-+      }
-+      Y: (struct){
-+        userinfo: (string){ "user" }
-+        host: (_|_){
-+          // [incomplete] large.p4.X: undefined field: port:
-+          //     ./in.cue:317:33
-+        }
-       }
-     }
-   }
--- diff/todo/p2 --
-error message: no mention of cycle path
--- out/eval --
-(struct){
-  minimal: (struct){
-    a: (_|_){
-      // [cycle] minimal.b: cycle with field a.port:
-      //     ./in.cue:18:6
-    }
-    b: (_|_){
-      // [cycle] minimal.b: cycle with field a.port:
-      //     ./in.cue:18:6
-    }
-  }
-  small: (struct){
-    #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-    p1: (struct){
-      #Y: (#struct){
-        port: (string){ "" }
-      }
-      #X: (_|_){
-        // [cycle] small.p1.#X: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
-        //     ./in.cue:31:7
-        // small.p1.#X: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
-        //     ./in.cue:34:7
-      }
-    }
-    p2: (struct){
-      #X: (_|_){
-        // [cycle] small.p2.#Y: cycle with field #X.port:
-        //     ./in.cue:50:47
-      }
-      #Y: (_|_){
-        // [cycle] small.p2.#Y: cycle with field #X.port:
-        //     ./in.cue:50:47
-      }
-    }
-  }
-  medium: (struct){
-    #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-    p1: (struct){
-      #Y: (#struct){
-        port: (string){ "" }
-      }
-      Y: (_|_){
-        // [cycle] medium.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
-        //     ./in.cue:61:7
-      }
-      #X: (#struct){
-        port: (string){ "" }
-      }
-    }
-    p2: (struct){
-      #Y: (#struct){
-        port: (string){ "" }
-      }
-      #X: (#struct){
-        port: (string){ "" }
-      }
-      Y: (_|_){
-        // [cycle] medium.p2.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
-        //     ./in.cue:95:7
-      }
-    }
-    p3: (struct){
-      Y: (_|_){
-        // [cycle] medium.p3.#X: cycle with field Y.port:
-        //     ./in.cue:114:7
-      }
-      #Y: (_|_){
-        // [incomplete] medium.p3.#Y: undefined field: port:
-        //     ./in.cue:108:47
-      }
-      #X: (_|_){
-        // [cycle] medium.p3.#X: cycle with field Y.port:
-        //     ./in.cue:114:7
-      }
-    }
-    p4: (struct){
-      Y: (_|_){
-        // [cycle] medium.p4.#X: cycle with field Y.port:
-        //     ./in.cue:134:7
-      }
-      #X: (_|_){
-        // [cycle] medium.p4.#X: cycle with field Y.port:
-        //     ./in.cue:134:7
-      }
-      #Y: (_|_){
-        // [cycle] medium.p4.#X: cycle with field Y.port:
-        //     ./in.cue:134:7
-      }
-    }
-    p5: (struct){
-      #X: (_|_){
-        // [cycle] medium.p5.#Y: cycle with field #X.port:
-        //     ./in.cue:158:47
-      }
-      #Y: (_|_){
-        // [cycle] medium.p5.#Y: cycle with field #X.port:
-        //     ./in.cue:158:47
-      }
-      Y: (struct){
-      }
-    }
-    p6: (struct){
-      #X: (_|_){
-        // [cycle] medium.p6.#Y: cycle with field #X.port:
-        //     ./in.cue:186:47
-      }
-      Y: (struct){
-      }
-      #Y: (_|_){
-        // [cycle] medium.p6.#Y: cycle with field #X.port:
-        //     ./in.cue:186:47
-      }
-    }
-  }
-  large: (struct){
-    #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
-    p1: (struct){
-      Y: (_|_){
-        // [cycle] large.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
-        //     ./in.cue:226:7
-      }
-      X: (string){ "user@mod.test" }
-      #X: (_|_){
-        // [cycle] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-        //     ./in.cue:202:7
-        // large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-        //     ./in.cue:205:7
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        port: (string){ "" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p2: (struct){
-      X: (string){ "user@mod.test" }
-      Y: (_|_){
-        // [cycle] large.p2.Y: cycle error referencing port:
-        //     ./in.cue:267:10
-      }
-      #X: (_|_){
-        // [cycle] large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-        //     ./in.cue:243:7
-        // large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-        //     ./in.cue:246:7
-        // large.p2.Y: cycle error referencing port:
-        //     ./in.cue:267:10
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        port: (string){ "" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p3: (struct){
-      X: (string){ "user@mod.test" }
-      #X: (_|_){
-        // [cycle] large.p3.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-        //     ./in.cue:279:7
-        // large.p3.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-        //     ./in.cue:282:7
-        // large.p3.Y: cycle error referencing port:
-        //     ./in.cue:308:10
-      }
-      Y: (_|_){
-        // [cycle] large.p3.Y: cycle error referencing port:
-        //     ./in.cue:308:10
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        port: (string){ "" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p4: (struct){
-      X: (string){ "user@mod.test" }
-      #X: (_|_){
-        // [cycle] large.p4.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-        //     ./in.cue:320:7
-        // large.p4.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-        //     ./in.cue:323:7
-        // large.p4.Y: cycle error referencing port:
-        //     ./in.cue:351:10
-      }
-      #Y: (#struct){
-        host: (string){ "mod.test" }
-        port: (string){ "" }
-        userinfo: (string){ "user" }
-      }
-      Y: (_|_){
-        // [cycle] large.p4.Y: cycle error referencing port:
-        //     ./in.cue:351:10
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -1171,17 +209,6 @@ error message: no mention of cycle path
         }
       }
     }
-    p2: {
-      #X: {
-        if (〈1;#Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;#Y〉.port, 10))
-        }
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
-    }
   }
   medium: {
     #userHostPort: "^(:(?P<port>\\d+))?$"
@@ -1200,86 +227,6 @@ error message: no mention of cycle path
           port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
         }
       }
-    }
-    p2: {
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
-      #X: {
-        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
-        }
-      }
-      Y: {
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
-        }
-      }
-    }
-    p3: {
-      Y: {
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
-        }
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
-      #X: {
-        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
-        }
-      }
-    }
-    p4: {
-      Y: {
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
-        }
-      }
-      #X: {
-        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
-        }
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
-    }
-    p5: {
-      #X: {
-        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
-        }
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
-      Y: {
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
-        }
-      }
-    }
-    p6: {
-      #X: {
-        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
-        }
-      }
-      Y: {
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
-        }
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
     }
   }
   large: {
@@ -1315,102 +262,6 @@ error message: no mention of cycle path
         }
       }
       #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
-    }
-    p2: {
-      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
-      Y: {
-        userinfo: "user"
-        host: "mod.test"
-      }
-      #X: {
-        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
-          userinfo: ""
-        }
-        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: (〈2;Y〉.userinfo + "@")
-        }
-        host: 〈1;Y〉.host
-        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
-        }
-      }
-      Y: {
-        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: 〈2;#Y〉.userinfo
-        }
-        host: 〈1;#Y〉.host
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
-        }
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
-    }
-    p3: {
-      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
-      #X: {
-        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
-          userinfo: ""
-        }
-        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: (〈2;Y〉.userinfo + "@")
-        }
-        host: 〈1;Y〉.host
-        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
-        }
-      }
-      Y: {
-        userinfo: "user"
-        host: "mod.test"
-      }
-      Y: {
-        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: 〈2;#Y〉.userinfo
-        }
-        host: 〈1;#Y〉.host
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
-        }
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
-    }
-    p4: {
-      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
-      #X: {
-        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
-          userinfo: ""
-        }
-        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: (〈2;Y〉.userinfo + "@")
-        }
-        host: 〈1;Y〉.host
-        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
-          port: ""
-        }
-        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
-        }
-      }
-      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
-      Y: {
-        userinfo: "user"
-        host: "mod.test"
-      }
-      Y: {
-        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
-          userinfo: 〈2;#Y〉.userinfo
-        }
-        host: 〈1;#Y〉.host
-        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
-          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
-        }
-      }
     }
   }
 }

@@ -1,18 +1,25 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
+# Tests cycle patterns involving default values and range constraints.
 -- in.cue --
 range1: {
 	min:   *1 | int
 	range: >min
 	range: 8
+	@test(eq, {min: *1 | int, range: 8})
 }
 range2: {
 	min: *1 | int
 	max: int & >min
+	@test(eq, {min: *1 | int, max: >1 & int})
 }
-rg: range2 & {
+rg: range2
+rg: {
 	//   min: 1
 	max: 8
+	@test(eq, {max: 8, min: *1 | int})
 }
+-- out/errors.txt --
+-- out/todo.txt --
+rg field ordering differs between v2 and v3: v2 has min before max, v3 has max before min.
 -- out/eval/stats --
 Leaks:  2
 Freed:  14
@@ -25,51 +32,6 @@ Conjuncts:    22
 Disjuncts:    6
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  range1: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    range: (int){ 8 }
-  }
-  range2: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    max: (int){ &(>1, int) }
-  }
-  rg: (struct){
-    max: (int){ 8 }
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -8,7 +8,7 @@
-     max: (int){ &(>1, int) }
-   }
-   rg: (struct){
--    min: (int){ |(*(int){ 1 }, (int){ int }) }
-     max: (int){ 8 }
-+    min: (int){ |(*(int){ 1 }, (int){ int }) }
-   }
- }
--- diff/todo/p3 --
-Reordering.
--- out/eval --
-(struct){
-  range1: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    range: (int){ 8 }
-  }
-  range2: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    max: (int){ &(>1, int) }
-  }
-  rg: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    max: (int){ 8 }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -82,7 +44,8 @@ Reordering.
     min: (*1|int)
     max: (int & >〈0;min〉)
   }
-  rg: (〈0;range2〉 & {
+  rg: 〈0;range2〉
+  rg: {
     max: 8
-  })
+  }
 }

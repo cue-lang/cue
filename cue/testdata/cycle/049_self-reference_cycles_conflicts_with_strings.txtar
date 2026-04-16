@@ -1,12 +1,15 @@
 #name: self-reference cycles conflicts with strings
 #evalPartial
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 a: {
 	x: y + "?"
-	y: x + "!"
+	y: x + "!" @test(eq, "hey!")
 }
-a: x: "hey"
+a: x: "hey" @test(err, code=eval, contains="conflicting values", pos=[-3:5, 0:7])
+-- out/errors.txt --
+[eval] a.x: conflicting values "hey!?" and "hey":
+    ./in.cue:2:5
+    ./in.cue:5:7
 -- out/compile --
 --- in.cue
 {
@@ -28,22 +31,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    6
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-a.x: conflicting values "hey!?" and "hey":
-    ./in.cue:2:5
-    ./in.cue:5:7
-
-Result:
-(_|_){
-  // [eval]
-  a: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval] a.x: conflicting values "hey!?" and "hey":
-      //     ./in.cue:2:5
-      //     ./in.cue:5:7
-    }
-    y: (string){ "hey!" }
-  }
-}

@@ -1,3 +1,7 @@
+# evalv3 incorrectly produces a "field not allowed" error when unifying against
+# a definition that succeeds without error under evalv2, regressing on a
+# real-world GitHub Actions schema.
+# https://cuelang.org/issue/3827
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 reduced: {

@@ -1,8 +1,9 @@
-// Issue #4210
-//
-// CUE hangs when evaluating expressions like `a: b: c: {a}.b` — a structural
-// cycle where a cyclic reference is embedded within braces and followed by a
-// selector. Without braces (`a: b: c: a.b`), the cycle is correctly detected.
+# CUE hangs indefinitely when a structural cycle reference is wrapped in braces
+# before a field selector, e.g. `a: b: c: {a}.b`. Without braces (`a: b: c:
+# a.b`) the cycle is correctly detected and reported as an error. The braces
+# prevent cycle detection, causing CUE to loop forever instead of reporting an
+# error. Affects all variants: `{a & _}.b`, `{a.b}.c`, nested structs, etc.
+# https://cuelang.org/issue/4210
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 t1: {

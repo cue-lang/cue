@@ -1,8 +1,9 @@
-// Issue #4230
-//
-// Calls with only literal arguments like `or(["west", "east"])` were
-// incorrectly deferred when evaluated from within a cyclic context,
-// resulting in empty results.
+# The new evaluator (v3) produces empty output for `or(["eu-west-1", "us-east-1"])`
+# when used inside a self-referential struct, while the old evaluator produces the
+# correct result. Replacing `or([...])` with a plain disjunction `"a" | "b"` works
+# correctly. The root cause: calls with only literal arguments were incorrectly
+# deferred when evaluated from within a cyclic context, resulting in empty output.
+# https://cuelang.org/issue/4230
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #transform: {

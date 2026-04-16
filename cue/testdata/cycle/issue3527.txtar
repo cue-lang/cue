@@ -1,5 +1,7 @@
-// Issue #3527
-// This code caused a panic before.
+# evalv3 panics with nil pointer dereference on a reduced real-world CUE file
+# involving `let` bindings and mutual references between definitions, whereas
+# evalv2 handles it correctly.
+# https://cuelang.org/issue/3527
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 package p

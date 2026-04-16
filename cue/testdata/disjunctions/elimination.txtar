@@ -338,6 +338,9 @@ issue1940: {
 }
 
 -- issue2209full.cue --
+// Evaluator 0.5 regression where disjunctions combined with comprehensions
+// produced incorrect results or spurious errors.
+// https://cuelang.org/issue/2209
 // TODO: fix
 
 issue2209: simplified: t1: {
@@ -670,6 +673,9 @@ issue2209: full: {
 
 
 -- issue2246.cue --
+// Evaluator regression where repeated use of an embedded disjunction resulted
+// in spurious "field not allowed" errors.
+// https://cuelang.org/issue/2246
 issue2246: simplified: {
 	#FormFoo: fooID: string
 	#FormBar: barID: string
@@ -740,6 +746,9 @@ issue2246: full: {
 }
 
 -- issue2263.cue --
+// Disjunction regression in v0.5.0-beta.5 where multiple embedded disjunctions
+// in a definition were not evaluated correctly.
+// https://cuelang.org/issue/2263
 issue2263: simplified: {
 	metrics: #Metric
 	#Metric: {
@@ -830,6 +839,9 @@ issue2263: full: {
 	})
 }
 -- issue1417.cue --
+// Regression where disjuncts sometimes behaved like conjuncts, causing
+// incorrect unification of disjunction members.
+// https://cuelang.org/issue/1417
 issue1417: {
 	#ID: !~"^a" | =~"^ab$" | =~"^aB$"
 	#ID: =~"^a" | !~"[A-Z]"
@@ -840,6 +852,9 @@ issue1417: {
 	})
 }
 -- issue3149.cue --
+// Evaluator regression where unifying disjunctions incorrectly failed to
+// validate a fixed value that satisfied the constraint.
+// https://cuelang.org/issue/3149
 issue3149: {
 	#valid: {
 		name!: ( (=~"^Foo") | "an exception") & ( (=~"Foo$") | "an exception")
@@ -867,6 +882,9 @@ issue3149: {
 	})
 }
 -- issue770.cue --
+// Default value resolution issue where chained pattern constraints with default
+// disjunctions did not propagate defaults correctly.
+// https://cuelang.org/issue/770
 issue770: {
 	#A: {
 		v: "a" | "b" | "c"
@@ -897,6 +915,9 @@ issue770: {
 	})
 }
 -- issue3528.cue --
+// evalv3 "incDependent: already closed" panic with repeated disjunctions
+// and definitions in workflow container schemas.
+// https://cuelang.org/issue/3528
 issue3528: original: {
 	workflows: [...#Workflow]
 	workflows: [test]
@@ -960,6 +981,9 @@ issue3528: nested: t2: {
 	})
 }
 -- issue3784.cue --
+// evalv3 regressions with "conflicting values" and "field not allowed" errors
+// when evaluating schemas similar to the GitHub Terraform provider schema.
+// https://cuelang.org/issue/3784
 issue3784: reduced: {
 	#Schema: a: {
 		kind: "A"
@@ -1079,13 +1103,16 @@ issue3784: variant2: {
 			build_type!: "legacy"
 			source: {
 				branch!: string
-				path?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.source.path: field not allowed", pos=[110:4])
+				path?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.source.path: field not allowed", pos=[113:4])
 			}
-			cname?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.cname: field not allowed", pos=[112:3])
+			cname?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.cname: field not allowed", pos=[115:3])
 		}
 	})
 }
 -- issue3958.cue --
+// evalv3 regression where unifying an odd number of default disjunctions no
+// longer produced an error as expected.
+// https://cuelang.org/issue/3958
 issue3958: t1: {
 	#schema: int | *1
 	#schema: int | *3
@@ -1107,6 +1134,9 @@ issue3958: t2: {
 	})
 }
 -- issue2685.cue --
+// Nested definition with a default value incorrectly took the default value
+// even when a concrete value was provided via unification.
+// https://cuelang.org/issue/2685
 issue2685: {
 	#Foo: {
 		bar: int

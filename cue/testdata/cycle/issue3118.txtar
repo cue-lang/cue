@@ -1,3 +1,6 @@
+# Cycle errors report no source position information, making it impossible
+# to locate the offending code.
+# https://cuelang.org/issue/3118
 #todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #TimeSpan: {

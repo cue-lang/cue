@@ -11,6 +11,7 @@ b: [string]: int
 c: a:        int
 
 -- issue3326.cue --
+// https://cuelang.org/issue/3326
 issue3326: {
 	// This issue triggered a cyclic evaluation in pattern constraints.
 	//

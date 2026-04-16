@@ -128,6 +128,9 @@ comprehension: moreSpecific: err: {
 	}
 }
 -- issue3178.cue --
+// evalv3 regression: exporting via the Go API produced an error that evalv2
+// did not, for a case involving chained comprehensions.
+// https://cuelang.org/issue/3178
 issue3178: {
 	// This should pass. Reasoning:
 	// - second comprehension runs

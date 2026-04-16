@@ -74,12 +74,15 @@ issue1969: oko: {
 	})
 }
 -- issue2245.cue --
+// Evaluator regression where comparing an incomplete struct to bottom in a
+// comprehension condition produced incorrect results.
+// https://cuelang.org/issue/2245
 yo: {
 	f: int
 	g: f < 10
 	@test(eq, {
 		f: int
-		g: _|_ @test(err, code=incomplete, contains="yo.g: non-concrete value int in operand to <", pos=[3:5, 2:5])
+		g: _|_ @test(err, code=incomplete, contains="yo.g: non-concrete value int in operand to <", pos=[6:5, 5:5])
 	})
 }
 okyo: {
@@ -123,8 +126,8 @@ structs: {
 [incomplete] issue1969.oko.X: undefined field: undefined:
     ./in.cue:62:13
 [incomplete] yo.g: non-concrete value int in operand to <:
-    ./issue2245.cue:3:5
-    ./issue2245.cue:2:5
+    ./issue2245.cue:6:5
+    ./issue2245.cue:5:5
 -- out/eval/stats --
 Leaks:  14
 Freed:  95

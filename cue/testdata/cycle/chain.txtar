@@ -78,6 +78,9 @@ chain: t3: p1: {
 }
 
 -- issue2052.cue --
+// Bounded recursion regression: a pattern that evaluated correctly in v0.4.3
+// began failing in v0.5.0-alpha.1 with spurious unbounded recursion errors.
+// https://cuelang.org/issue/2052
 import (
 	"list"
 	"math"

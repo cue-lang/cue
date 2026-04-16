@@ -1,4 +1,3 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // All these should pass. These look like recursive inlined calls, but they are
 // not.
@@ -12,6 +11,13 @@ ok1: {
 	k10: (f & {in: k00}).out
 	k20: (f & {in: k10}).out
 	k30: (f & {in: k20}).out
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	})
 }
 
 ok2: {
@@ -23,6 +29,13 @@ ok2: {
 	k10: {(f & {in: k00}).out}
 	k20: {(f & {in: k10}).out}
 	k30: {(f & {in: k20}).out}
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	})
 }
 
 ok3: {
@@ -34,6 +47,13 @@ ok3: {
 	k10: {close((f & {in: k00})).out}
 	k20: {close((f & {in: k10})).out}
 	k30: {close((f & {in: k20})).out}
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	})
 }
 
 ok4: {
@@ -45,9 +65,20 @@ ok4: {
 	k10: {out: {(f & {in: k00}).out}}.out
 	k20: {out: {(f & {in: k10}).out}}.out
 	k30: {out: {(f & {in: k20}).out}}.out
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	})
 }
 
-// Issue #1708
+// Issue #1708: nested indirect selectors on a definition instantiated more than
+// twice cause a false structural cycle. Concrete conjuncts like `{in: kN}` are
+// not recognized as cycle-breakers, so successive `(#add10 & {in: k}).out`
+// chains are incorrectly treated as self-recursive.
+// https://cuelang.org/issue/1708
 issue1708: {
 	#add10: {
 		in: number
@@ -58,6 +89,23 @@ issue1708: {
 	k10: (#add10 & {in: k00}).out
 	k20: (#add10 & {in: k10}).out
 	k30: (#add10 & {in: k20}).out
+
+	// TODO(inline): the generation of this value is broken, had to hand-adjust.
+	// TODO(inline): file positions are absolute instead of relative to the definition.
+	@test(eq, {
+		#add10: {
+			in: number
+			a10: {
+				i: number
+				o: _|_ @test(err, code=incomplete, contains="non-concrete value number in operand to +", pos=[84:20, 83:7])
+			}
+			out: _|_ @test(err)
+		}
+		k00: 0
+		k10: 10
+		k20: 20
+		k30: _|_ @test(err, code=incomplete, contains="undefined field: out", pos=[88:28])
+	})
 }
 -- issue3182.cue --
 // evalv3 regression: references under projections (e.g. `{ a: x }.a`) were
@@ -66,13 +114,16 @@ issue1708: {
 issue3182: {
 	first: t1: {
 		x: { a: x }.a
+		@test(eq, {x: _})
 	}
 	first: t2: {
 		x: { a: b: x }.a
+		@test(err, code=structural cycle)
 	}
 	second: {
 		{ t: x }.t.y
 		x: y: x: y: a: 1
+		@test(eq, {x: {y: {x: {y: {a: 1}}, a: 1}}, a: 1})
 	}
 	third: {
 		{
@@ -81,6 +132,7 @@ issue3182: {
 			  y: 1
 			}
 		}.p.x.y
+		@test(eq, 1)
 	}
 }
 -- select.cue --
@@ -88,183 +140,41 @@ issue3182: {
 select: direct: {
 	#Step: (#Job & {opt: _}).opt
 	#Job: matchN(1, [#NormalJob])
+	// TODO(inline): broken generation: retains reference.
+	@test(eq, {
+		#Step: _
+		#Job: matchN(1, [{req!: int, opt?: {run?: string}}])
+	})
 }
 select: indirect: {
 	#Step: #Job.opt
 	#Job: matchN(1, [#NormalJob]) & {opt: _}
+	@test(eq, {#Step: _, #Job: {_|_, opt: _}})
 }
 #NormalJob: {
 	req!: int
 	opt?: run?: string
 }
--- out/evalalpha --
-Errors:
-issue3182.first.t2.x.b: structural cycle
-
-Result:
-(_|_){
-  // [structural cycle]
-  ok1: (struct){
-    f: (struct){
-      in: (number){ number }
-      out: (number){ number }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 0 }
-    k20: (int){ 0 }
-    k30: (int){ 0 }
-  }
-  ok2: (struct){
-    f: (struct){
-      in: (number){ number }
-      out: (number){ number }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 0 }
-    k20: (int){ 0 }
-    k30: (int){ 0 }
-  }
-  ok3: (struct){
-    f: (struct){
-      in: (number){ number }
-      out: (number){ number }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 0 }
-    k20: (int){ 0 }
-    k30: (int){ 0 }
-  }
-  ok4: (struct){
-    f: (struct){
-      in: (number){ number }
-      out: (number){ number }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 0 }
-    k20: (int){ 0 }
-    k30: (int){ 0 }
-  }
-  issue1708: (struct){
-    #add10: (#struct){
-      in: (number){ number }
-      a10: (#struct){
-        i: (number){ number }
-        o: (_|_){
-          // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
-          //     ./in.cue:52:20
-          //     ./in.cue:51:7
-        }
-      }
-      out: (_|_){
-        // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
-        //     ./in.cue:52:20
-        //     ./in.cue:51:7
-      }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 10 }
-    k20: (int){ 20 }
-    k30: (_|_){
-      // [incomplete] a10.i: undefined field: out:
-      //     ./in.cue:56:28
-    }
-  }
-  issue3182: (_|_){
-    // [structural cycle]
-    first: (_|_){
-      // [structural cycle]
-      t1: (struct){
-        x: (_){ _ }
-      }
-      t2: (_|_){
-        // [structural cycle]
-        x: (_|_){
-          // [structural cycle]
-          b: (_|_){
-            // [structural cycle] issue3182.first.t2.x.b: structural cycle
-          }
-        }
-      }
-    }
-    second: (struct){
-      x: (struct){
-        y: (struct){
-          x: (struct){
-            y: (struct){
-              a: (int){ 1 }
-            }
-          }
-          a: (int){ 1 }
-        }
-      }
-      a: (int){ 1 }
-    }
-    third: (int){ 1 }
-  }
-  select: (struct){
-    direct: (struct){
-      #Step: (_){ _ }
-      #Job: (_){ matchN(1, (#list){
-          0: (_|_){// 〈3;#NormalJob〉
-          }
-        }) }
-    }
-    indirect: (struct){
-      #Step: (_){ _ }
-      #Job: (_|_){
-        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
-        //     ./select.cue:8:8
-        //     ./select.cue:8:15
-        // select.indirect.#Job.req: field is required but not present:
-        //     ./select.cue:8:8
-        //     ./select.cue:8:19
-        //     ./select.cue:11:2
-        opt: (_){ _ }
-      }
-    }
-  }
-  #NormalJob: (#struct){
-    req!: (int){ int }
-    opt?: (#struct){
-      run?: (string){ string }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -53,20 +53,21 @@
-           // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
-           //     ./in.cue:52:20
-           //     ./in.cue:51:7
--          //     ./in.cue:52:13
-         }
-       }
-       out: (_|_){
--        // [incomplete] issue1708.#add10.out: non-concrete value number in operand to +:
-+        // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
-         //     ./in.cue:52:20
-         //     ./in.cue:51:7
--        //     ./in.cue:52:13
-       }
-     }
-     k00: (int){ 0 }
-     k10: (int){ 10 }
-     k20: (int){ 20 }
--    k30: (int){ 30 }
-+    k30: (_|_){
-+      // [incomplete] a10.i: undefined field: out:
-+      //     ./in.cue:56:28
-+    }
-   }
-   issue3182: (_|_){
-     // [structural cycle]
--- diff/todo/p2 --
-issue1708.k30: no longer evaluates. Not the worst, but would ideally be fixed.
--- diff/todo/p3 --
-Error positions.
-Incorrect path due to structure sharing.
+-- out/errors.txt --
+[incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
+    ./in.cue:84:20
+    ./in.cue:83:7
+[incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
+    ./in.cue:84:20
+    ./in.cue:83:7
+[incomplete] a10.i: undefined field: out:
+    ./in.cue:88:28
+[structural cycle] issue3182.first.t2.x.b: structural cycle
+[incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
+    ./select.cue:13:8
+    ./select.cue:13:15
+select.indirect.#Job.req: field is required but not present:
+    ./select.cue:13:8
+    ./select.cue:13:19
+    ./select.cue:17:2
+-- out/todo.txt --
+issue1708.k30: evaluates to 30 in v2 but errors (incomplete: undefined field: out) in v3.
+issue1708 error positions differ between v2 and v3.
 -- out/eval/stats --
 Leaks:  1
 Freed:  226
@@ -278,138 +188,6 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 169
--- out/eval --
-Errors:
-issue3182.first.t2.x.b: structural cycle
-
-Result:
-(_|_){
-  // [structural cycle]
-  ok1: (struct){
-    f: (struct){
-      in: (number){ number }
-      out: (number){ number }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 0 }
-    k20: (int){ 0 }
-    k30: (int){ 0 }
-  }
-  ok2: (struct){
-    f: (struct){
-      in: (number){ number }
-      out: (number){ number }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 0 }
-    k20: (int){ 0 }
-    k30: (int){ 0 }
-  }
-  ok3: (struct){
-    f: (struct){
-      in: (number){ number }
-      out: (number){ number }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 0 }
-    k20: (int){ 0 }
-    k30: (int){ 0 }
-  }
-  ok4: (struct){
-    f: (struct){
-      in: (number){ number }
-      out: (number){ number }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 0 }
-    k20: (int){ 0 }
-    k30: (int){ 0 }
-  }
-  issue1708: (struct){
-    #add10: (#struct){
-      in: (number){ number }
-      a10: (#struct){
-        i: (number){ number }
-        o: (_|_){
-          // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
-          //     ./in.cue:52:20
-          //     ./in.cue:51:7
-          //     ./in.cue:52:13
-        }
-      }
-      out: (_|_){
-        // [incomplete] issue1708.#add10.out: non-concrete value number in operand to +:
-        //     ./in.cue:52:20
-        //     ./in.cue:51:7
-        //     ./in.cue:52:13
-      }
-    }
-    k00: (int){ 0 }
-    k10: (int){ 10 }
-    k20: (int){ 20 }
-    k30: (int){ 30 }
-  }
-  issue3182: (_|_){
-    // [structural cycle]
-    first: (_|_){
-      // [structural cycle]
-      t1: (struct){
-        x: (_){ _ }
-      }
-      t2: (_|_){
-        // [structural cycle]
-        x: (_|_){
-          // [structural cycle]
-          b: (_|_){
-            // [structural cycle] issue3182.first.t2.x.b: structural cycle
-          }
-        }
-      }
-    }
-    second: (struct){
-      x: (struct){
-        y: (struct){
-          x: (struct){
-            y: (struct){
-              a: (int){ 1 }
-            }
-          }
-          a: (int){ 1 }
-        }
-      }
-      a: (int){ 1 }
-    }
-    third: (int){ 1 }
-  }
-  select: (struct){
-    direct: (struct){
-      #Step: (_){ _ }
-      #Job: (_){ matchN(1, (#list){
-          0: (_|_){// 〈3;#NormalJob〉
-          }
-        }) }
-    }
-    indirect: (struct){
-      #Step: (_){ _ }
-      #Job: (_|_){
-        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
-        //     ./select.cue:8:8
-        //     ./select.cue:8:15
-        // select.indirect.#Job.req: field is required but not present:
-        //     ./select.cue:8:8
-        //     ./select.cue:8:19
-        //     ./select.cue:11:2
-        opt: (_){ _ }
-      }
-    }
-  }
-  #NormalJob: (#struct){
-    req!: (int){ int }
-    opt?: (#struct){
-      run?: (string){ string }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "737ec444_883421b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-16T09:43:06Z",
+      "side": 1,
+      "message": "bad wrapping again",
+      "revId": "8e4e40795561040a5c4214dff49e651766103e85",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "134098f5_b76231d7",
+        "filename": "internal/cuetxtar/inline_format.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-16T09:43:06Z",
+      "side": 1,
+      "message": "combining a strings.Builder and adding strings seems a bit odd",
+      "revId": "8e4e40795561040a5c4214dff49e651766103e85",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

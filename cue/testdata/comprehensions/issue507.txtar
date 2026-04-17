@@ -27,7 +27,6 @@ bar: [
 		"hello bar: \(e)"
 	},
 ] @test(eq, ["hello bar: something"])
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  15

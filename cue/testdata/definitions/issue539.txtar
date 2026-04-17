@@ -18,7 +18,6 @@ hello: #Schema & Component @test(closed) @test(eq, {
 	hostname: *"localhost" | string
 	_#foo: {hello: "world"}
 })
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  14

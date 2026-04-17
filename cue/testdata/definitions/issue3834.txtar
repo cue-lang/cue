@@ -147,7 +147,6 @@ full: {
 		out: true
 	})
 }
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  60
 Freed:  279

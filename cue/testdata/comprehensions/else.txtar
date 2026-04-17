@@ -184,7 +184,6 @@ nestedInnerFallback: {
 	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
 	@test(eq, {inner: true})
 }
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  16
 Freed:  114

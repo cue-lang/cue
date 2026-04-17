@@ -70,7 +70,6 @@ issue3908: full: {
 		#Schema: field: *null | string
 	})
 }
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  30
 Freed:  352

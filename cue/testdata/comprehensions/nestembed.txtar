@@ -20,7 +20,6 @@ New_infra: {
 	}
 	@test(eq, {gcp: {cluters: 10}, aws: {clusters: 20}})
 }
--- out/errors.txt --
 -- out/todo.txt --
 In v3, New_infra.gcp and New_infra.aws are shared references (~) to useful_infra.gcp
 and useful_infra.aws respectively, while in v2 they are expanded inline.

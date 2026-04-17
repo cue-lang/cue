@@ -100,7 +100,6 @@ medium: {
 		})
 	}
 }
--- out/errors.txt --
 -- out/todo.txt --
 medium.p1-p4: field ordering of userinfo/host in #Y differs between v2 (host first) and v3 (userinfo first).
 -- out/eval/stats --

@@ -45,7 +45,6 @@ Conjuncts:    30
 Disjuncts:    2
 
 NumCloseIDs: 4
--- out/errors.txt --
 -- out/compile --
 --- in.cue
 {

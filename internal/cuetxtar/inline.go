@@ -452,41 +452,43 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 		}
 	}
 
-	changed := false
+	// Determine the existing content (nil if absent, []byte{} if present-but-empty).
+	var existing []byte
 	if sectionIdx >= 0 {
-		existing := r.archive.Files[sectionIdx].Data
-		if bytes.Equal(existing, resultBytes) {
-			return // already up to date
-		}
-		if cuetest.DiffGoldenFiles {
-			r.t.Errorf("result for %s differs: (-want +got)\n%s",
-				sectionName, cmp.Diff(string(existing), result))
-			return
-		}
-		if !cuetest.UpdateGoldenFiles {
-			return // silently skip
-		}
-		if len(resultBytes) == 0 {
-			// Remove the empty section.
-			r.archive.Files = slices.Delete(r.archive.Files, sectionIdx, sectionIdx+1)
-		} else {
-			r.archive.Files[sectionIdx].Data = resultBytes
-		}
+		existing = r.archive.Files[sectionIdx].Data
+	}
+
+	// No change needed only when section exists with matching non-empty content.
+	if sectionIdx >= 0 && len(resultBytes) > 0 && bytes.Equal(existing, resultBytes) {
+		return // already up to date
+	}
+	// No section and no errors: nothing to do.
+	if sectionIdx < 0 && len(resultBytes) == 0 {
+		return
+	}
+
+	// Section needs to be added, removed, or updated.
+	if cuetest.DiffGoldenFiles {
+		r.t.Errorf("result for %s differs: (-want +got)\n%s",
+			sectionName, cmp.Diff(string(existing), result))
+		return
+	}
+	if !cuetest.UpdateGoldenFiles {
+		return // silently skip
+	}
+
+	changed := false
+	switch {
+	case sectionIdx >= 0 && len(resultBytes) == 0:
+		// Section exists but should be absent — remove it.
+		r.archive.Files = slices.Delete(r.archive.Files, sectionIdx, sectionIdx+1)
 		changed = true
-	} else {
-		// Section absent.
-		if len(resultBytes) == 0 {
-			return // nothing to do
-		}
-		if cuetest.DiffGoldenFiles {
-			r.t.Errorf("result for %s differs: (-want +got)\n%s",
-				sectionName, cmp.Diff("", result))
-			return
-		}
-		if !cuetest.UpdateGoldenFiles {
-			return // silently skip
-		}
-		// Insert after the last input file (before any out/ section).
+	case sectionIdx >= 0:
+		// Section exists with wrong content — update in place.
+		r.archive.Files[sectionIdx].Data = resultBytes
+		changed = true
+	default:
+		// Section absent but should exist — insert after last input file.
 		insertIdx := r.errorsInsertIdx()
 		r.archive.Files = slices.Insert(r.archive.Files, insertIdx,
 			txtar.File{Name: sectionName, Data: resultBytes})

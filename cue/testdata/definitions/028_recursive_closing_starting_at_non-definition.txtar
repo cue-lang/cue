@@ -9,7 +9,6 @@ z: a: {
 	}
 }
 A: z & {a: {#B: {c: e: 2}}} @test(eq, {a: #B: c: {e: 2, d: 1, f: 1}})
--- out/errors.txt --
 -- out/compile --
 --- in.cue
 {

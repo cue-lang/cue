@@ -67,7 +67,6 @@ _items: [#VMRuleList]
 	spec: [...#RuleGroup]
 }
 #TypeMeta: kind: string | *"default"
--- out/errors.txt --
 -- out/compile --
 --- in.cue
 {

@@ -58,7 +58,6 @@ x: Something & #Deployment @test(closed) @test(eq, {
 		}
 	}]
 })
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  52

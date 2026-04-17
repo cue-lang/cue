@@ -25,7 +25,6 @@ issue3326: {
 	x: [1]
 	@test(eq, {_self: {x: []}, x: [1], a: int})
 }
--- out/errors.txt --
 -- out/todo.txt --
 issue3326 is present in v3 (evalalpha) but not in v2 (eval) — v2 did not evaluate it.
 -- out/eval/stats --

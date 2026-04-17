@@ -193,7 +193,6 @@ full: {
 	// @test(closed, at=full.objects.cronjob.foobar)
 
 }
--- out/errors.txt --
 -- out/todo.txt --
 reduced.out.def2._in.age and reduced.out.def2.def3: v3 shows disjunction
 "one"|"two" where v2 resolves to "one". Also, reduced.out._in is a (#struct)

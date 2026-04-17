@@ -1,18 +1,9 @@
-#Issue: 1684
+# Tests that recursive secret/nested-map structures (#secrets) unify correctly
+# without exponential conjunct expansion. Performance regression originally
+# caused quadratic growth when #secrets disjunctions were repeatedly applied.
+# https://cuelang.org/issue/1684
 
 // TODO: significantly reduce the number of counts in this evaluation.
-#todo:inline: skip — performance benchmark, not a functional test
--- stats.txt --
-Leaks:  0
-Freed:  995025
-Reused: 994976
-Allocs: 49
-Retain: 0
-
-Unifications: 740771
-Conjuncts:    3143640
-Disjuncts:    995025
-
 -- in.cue --
 #Secret: {
 	$secret: id: string
@@ -32,20 +23,23 @@ out: #secrets & {
 out: #secrets & {
 	FOO: $secret: _id: "100"
 	ONE: TWO: THREE: $secret: _id: "123"
-}
+} @test(eq, {
+	FOO: $secret:             {id: "100", _id: "100"}
+	ONE: TWO: THREE: $secret: {id: "123", _id: "123"}
+})
 
 -- perf.cue --
 nestedCross: closed: {
 	#D: {id: string} | {[string]: #D}
 	#D: {id: string} | {[string]: #D}
 	#D: {id: string} | {[string]: #D}
-}
+} @test(eq, {#D: {id: string} | {}})
 
 nestedCross: open: {
 	D: {id: string} | {[string]: D}
 	D: {id: string} | {[string]: D}
 	D: {id: string} | {[string]: D}
-}
+} @test(eq, {D: {id: string} | {}})
 
 // TODO(perf): support this case.  This is currently highly exponential.
 // The old evaluator solved this performance issue by simply ignoring equality
@@ -61,7 +55,7 @@ nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 	D: {id: {}} | {[string]: D}
 	D: {id: {}} | {[string]: D}
-}
+} @test(eq, {D: {id: {}} | {id: {id: {}} | {}} | {}})
 -- out/eval/stats --
 Leaks:  13915
 Freed:  11162
@@ -79,76 +73,13 @@ ConjunctInfos:       7501
 MaxConjunctInfos:    4
 MaxReqSets:          12
 MaxRedirect:         5
--- diff/explanation --
+-- out/todo.txt --
 New algorithm is better at trimming recursive disjunctions.
 Note that the old closedness implementation of V3 was able to reduce this to
 445 unification ops. This could be due to the fact that the old closedness could
 in some cases eliminate earlier than with a flat structure. So this may not be
 attainable with the current implementation.
 TODO(perf): investigate nonetheless.
--- out/evalalpha --
-(struct){
-  #Secret: (#struct){
-    $secret: (#struct){
-      id: (string){ string }
-      _id: (string){ string }
-    }
-  }
-  #secrets: (#struct){ |((#struct){
-      $secret: (#struct){
-        id: (string){ string }
-        _id: (string){ string }
-      }
-    }, (#struct){
-    }) }
-  out: (#struct){
-    FOO: (#struct){
-      $secret: (#struct){
-        id: (string){ "100" }
-        _id: (string){ "100" }
-      }
-    }
-    ONE: (#struct){
-      TWO: (#struct){
-        THREE: (#struct){
-          $secret: (#struct){
-            id: (string){ "123" }
-            _id: (string){ "123" }
-          }
-        }
-      }
-    }
-  }
-  nestedCross: (struct){
-    closed: (struct){
-      #D: (#struct){ |((#struct){
-          id: (string){ string }
-        }, (#struct){
-        }) }
-    }
-    open: (struct){
-      D: (struct){ |((struct){
-          id: (string){ string }
-        }, (struct){
-        }) }
-    }
-  }
-  nestedClosed: (struct){
-    passing: (struct){
-      D: (struct){ |((struct){
-          id: (struct){
-          }
-        }, (struct){
-          id: (struct){ |((struct){
-              id: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
-        }) }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

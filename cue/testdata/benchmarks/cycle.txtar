@@ -1,26 +1,25 @@
-#todo:inline: skip — performance benchmark, not a functional test
--- stats.txt --
-Leaks:  0
-Freed:  25
-Reused: 15
-Allocs: 10
-Retain: 1
-
-Unifications: 15
-Conjuncts:    30
-Disjuncts:    26
-
 -- in.cue --
 sameValues: SmustBeF: {
 	T: string | F
-	F: x: T
-	S: F
+	F: {
+		x: T
+		@test(eq, {x: string})
+		@test(shareID=SF)
+	}
+	S: F @test(eq, {x: string}) @test(shareID=SF)
 }
 
 sameValues: CmustBeA: {
-	A: x: [ string | A ]
-	C: A
+	A: {
+		x: [ string | A ]
+		@test(eq, {x: [string]})
+		@test(shareID=CA)
+	}
+	C: A @test(eq, {x: [string]}) @test(shareID=CA)
 }
+-- out/todo.txt --
+v2 expanded S and C into independent copies; v3 uses structure sharing
+(S: ~(sameValues.SmustBeF.F), C: ~(sameValues.CmustBeA.A)).
 -- out/compile --
 --- in.cue
 {
@@ -56,77 +55,3 @@ Conjuncts:    19
 Disjuncts:    4
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  sameValues: (struct){
-    SmustBeF: (struct){
-      T: (string){ string }
-      F: (struct){
-        x: (string){ string }
-      }
-      S: ~(sameValues.SmustBeF.F)
-    }
-    CmustBeA: (struct){
-      A: (struct){
-        x: (#list){
-          0: (string){ string }
-        }
-      }
-      C: ~(sameValues.CmustBeA.A)
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,9 +5,7 @@
-       F: (struct){
-         x: (string){ string }
-       }
--      S: (struct){
--        x: (string){ string }
--      }
-+      S: ~(sameValues.SmustBeF.F)
-     }
-     CmustBeA: (struct){
-       A: (struct){
-@@ -15,11 +13,7 @@
-           0: (string){ string }
-         }
-       }
--      C: (struct){
--        x: (#list){
--          0: (string){ string }
--        }
--      }
-+      C: ~(sameValues.CmustBeA.A)
-     }
-   }
- }
--- out/eval --
-(struct){
-  sameValues: (struct){
-    SmustBeF: (struct){
-      T: (string){ string }
-      F: (struct){
-        x: (string){ string }
-      }
-      S: (struct){
-        x: (string){ string }
-      }
-    }
-    CmustBeA: (struct){
-      A: (struct){
-        x: (#list){
-          0: (string){ string }
-        }
-      }
-      C: (struct){
-        x: (#list){
-          0: (string){ string }
-        }
-      }
-    }
-  }
-}

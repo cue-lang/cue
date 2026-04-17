@@ -28,49 +28,49 @@ t4.x.y.z.z: structural cycle
 
 Result:
 (_|_){
-  // [structural cycle]
+  // [structural_cycle]
   t1: (_|_){
-    // [structural cycle]
+    // [structural_cycle]
     a: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       b: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         c: (_|_){
-          // [structural cycle]
+          // [structural_cycle]
           c: (_|_){
-            // [structural cycle] t1.a.b.c.c: structural cycle
+            // [structural_cycle] t1.a.b.c.c: structural cycle
           }
         }
       }
     }
   }
   t2: (_|_){
-    // [structural cycle]
+    // [structural_cycle]
     a: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       b: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         c: (_|_){
-          // [structural cycle]
+          // [structural_cycle]
           c: (_|_){
-            // [structural cycle] t2.a.b.c.c: structural cycle
+            // [structural_cycle] t2.a.b.c.c: structural cycle
           }
         }
       }
     }
   }
   t3: (_|_){
-    // [structural cycle]
+    // [structural_cycle]
     a: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       b: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         c: (_|_){
-          // [structural cycle]
+          // [structural_cycle]
           d: (_|_){
-            // [structural cycle]
+            // [structural_cycle]
             d: (_|_){
-              // [structural cycle] t3.a.b.c.d.d: structural cycle
+              // [structural_cycle] t3.a.b.c.d.d: structural cycle
             }
           }
         }
@@ -78,21 +78,21 @@ Result:
     }
   }
   t4: (_|_){
-    // [structural cycle]
+    // [structural_cycle]
     x: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       y: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         z: (_|_){
-          // [structural cycle]
+          // [structural_cycle]
           z: (_|_){
-            // [structural cycle] t4.x.y.z.z: structural cycle
+            // [structural_cycle] t4.x.y.z.z: structural cycle
           }
         }
       }
     }
     a: (_|_){
-      // [structural cycle] t4.x.y.z.z: structural cycle
+      // [structural_cycle] t4.x.y.z.z: structural cycle
     }
   }
 }

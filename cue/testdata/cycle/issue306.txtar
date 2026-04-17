@@ -23,14 +23,14 @@ Errors:
 
 Result:
 (_|_){
-  // [structural cycle]
+  // [structural_cycle]
   a: (int){ 12 }
   #Controller: (_|_){
-    // [structural cycle]
+    // [structural_cycle]
     settings: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       controller: (_|_){
-        // [structural cycle] #Controller.settings.controller: structural cycle
+        // [structural_cycle] #Controller.settings.controller: structural cycle
       }
     }
   }

@@ -581,7 +581,7 @@ Result:
       #D: (#struct){
         b?: (int){ int }
         a?: (_|_){
-          // [structural cycle] issue3634.reduced.#D.a: structural cycle
+          // [structural_cycle] issue3634.reduced.#D.a: structural cycle
         }
       }
       out: (int){ 1 }
@@ -602,13 +602,13 @@ Result:
     out: (string){ "- x\n" }
   }
   jsonCycle: (_|_){
-    // [structural cycle]
+    // [structural_cycle]
     t1: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       x: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         y: (_|_){
-          // [structural cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
+          // [structural_cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
           //     ./jsoncycle.cue:4:8
           //     ./jsoncycle.cue:5:8
         }
@@ -846,24 +846,24 @@ Result:
       }
     }
     yamlVal: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       t1: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         x: (_|_){
-          // [structural cycle]
+          // [structural_cycle]
           y: (_|_){
-            // [structural cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
+            // [structural_cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
             //     ./yamlcycle.cue:24:8
             //     ./yamlcycle.cue:25:8
           }
         }
       }
       t2: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         x: (_|_){
-          // [structural cycle]
+          // [structural_cycle]
           y: (_|_){
-            // [structural cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
+            // [structural_cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
             //     ./yamlcycle.cue:30:8
             //     ./yamlcycle.cue:31:8
             //     ./yamlcycle.cue:32:8
@@ -873,36 +873,36 @@ Result:
       }
     }
     yamlFun: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       t1: (struct){
         x: (struct){
           y?: (bool){ true }
         }
       }
       t2: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         z: (_|_){
-          // [structural cycle]
+          // [structural_cycle]
           y: (_|_){
-            // [structural cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
+            // [structural_cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
             //     ./yamlcycle.cue:41:8
           }
         }
         x: (_|_){
-          // [structural cycle]
+          // [structural_cycle]
           y: (_|_){
-            // [structural cycle] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
+            // [structural_cycle] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
             //     ./yamlcycle.cue:41:8
           }
         }
       }
     }
     yamlValidatePartial: (_|_){
-      // [structural cycle]
+      // [structural_cycle]
       x: (_|_){
-        // [structural cycle]
+        // [structural_cycle]
         y: (_|_){
-          // [structural cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
+          // [structural_cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
           //     ./yamlcycle.cue:44:8
           //     ./yamlcycle.cue:45:8
         }
@@ -1151,7 +1151,14 @@ diff old new
    builtinCyclePerm0: (struct){
      X: (string){ "mod.test" }
      Y: (struct){
-@@ -239,13 +279,31 @@
+@@ -233,19 +273,37 @@
+       #D: (#struct){
+         b?: (int){ int }
+         a?: (_|_){
+-          // [structural cycle] issue3634.reduced.#D.a: structural cycle
++          // [structural_cycle] issue3634.reduced.#D.a: structural cycle
+         }
+       }
        out: (int){ 1 }
      }
    }
@@ -1170,15 +1177,19 @@ diff old new
 +    out: (string){ "- x\n" }
 +  }
    jsonCycle: (_|_){
-     // [structural cycle]
-     t1: (_|_){
-       // [structural cycle]
-       x: (_|_){
+-    // [structural cycle]
+-    t1: (_|_){
+-      // [structural cycle]
+-      x: (_|_){
 -        // [structural cycle] jsonCycle.t1.x.y.y: structural cycle:
 -        //     ./jsoncycle.cue:4:22
-+        // [structural cycle]
++    // [structural_cycle]
++    t1: (_|_){
++      // [structural_cycle]
++      x: (_|_){
++        // [structural_cycle]
 +        y: (_|_){
-+          // [structural cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
++          // [structural_cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
 +          //     ./jsoncycle.cue:4:8
 +          //     ./jsoncycle.cue:5:8
 +        }
@@ -1288,7 +1299,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -446,19 +533,8 @@
+@@ -446,67 +533,71 @@
          }
        }
      }
@@ -1310,10 +1321,10 @@ diff old new
        }
      }
      yamlVal: (_|_){
-@@ -466,25 +542,33 @@
-       t1: (_|_){
-         // [structural cycle]
-         x: (_|_){
+-      // [structural cycle]
+-      t1: (_|_){
+-        // [structural cycle]
+-        x: (_|_){
 -          // [structural cycle] selfCycle.yamlVal.t1.x.y.y: structural cycle:
 -          //     ./yamlcycle.cue:24:22
 -        }
@@ -1323,20 +1334,24 @@ diff old new
 -        x: (_|_){
 -          // [structural cycle] selfCycle.yamlVal.t2.x.y.y: structural cycle:
 -          //     ./yamlcycle.cue:32:22
-+          // [structural cycle]
++      // [structural_cycle]
++      t1: (_|_){
++        // [structural_cycle]
++        x: (_|_){
++          // [structural_cycle]
 +          y: (_|_){
-+            // [structural cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
++            // [structural_cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
 +            //     ./yamlcycle.cue:24:8
 +            //     ./yamlcycle.cue:25:8
 +          }
 +        }
 +      }
 +      t2: (_|_){
-+        // [structural cycle]
++        // [structural_cycle]
 +        x: (_|_){
-+          // [structural cycle]
++          // [structural_cycle]
 +          y: (_|_){
-+            // [structural cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
++            // [structural_cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
 +            //     ./yamlcycle.cue:30:8
 +            //     ./yamlcycle.cue:31:8
 +            //     ./yamlcycle.cue:32:8
@@ -1346,22 +1361,27 @@ diff old new
        }
      }
      yamlFun: (_|_){
-       // [structural cycle]
+-      // [structural cycle]
 -      t1: (_|_){
 -        // [structural cycle]
 -        x: (_|_){
 -          // [structural cycle] selfCycle.yamlFun.t1.x.y.y: structural cycle:
 -          //     ./yamlcycle.cue:36:29
+-        }
+-      }
+-      t2: (_|_){
+-        // [structural cycle]
++      // [structural_cycle]
 +      t1: (struct){
 +        x: (struct){
 +          y?: (bool){ true }
-         }
-       }
-       t2: (_|_){
-@@ -492,13 +576,16 @@
++        }
++      }
++      t2: (_|_){
++        // [structural_cycle]
          z: (_|_){
-           // [structural cycle]
-           y: (_|_){
+-          // [structural cycle]
+-          y: (_|_){
 -            // [structural cycle] selfCycle.yamlFun.t2.x.y.y: structural cycle:
 -            //     ./yamlcycle.cue:41:28
 -          }
@@ -1369,28 +1389,31 @@ diff old new
 -        x: (_|_){
 -          // [structural cycle] selfCycle.yamlFun.t2.x.y.y: structural cycle:
 -          //     ./yamlcycle.cue:41:28
-+            // [structural cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
++          // [structural_cycle]
++          y: (_|_){
++            // [structural_cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
 +            //     ./yamlcycle.cue:41:8
 +          }
 +        }
 +        x: (_|_){
-+          // [structural cycle]
++          // [structural_cycle]
 +          y: (_|_){
-+            // [structural cycle] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
++            // [structural_cycle] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
 +            //     ./yamlcycle.cue:41:8
 +          }
          }
        }
      }
-@@ -505,8 +592,12 @@
      yamlValidatePartial: (_|_){
-       // [structural cycle]
-       x: (_|_){
+-      // [structural cycle]
+-      x: (_|_){
 -        // [structural cycle] selfCycle.yamlValidatePartial.x.y.y: structural cycle:
 -        //     ./yamlcycle.cue:44:29
-+        // [structural cycle]
++      // [structural_cycle]
++      x: (_|_){
++        // [structural_cycle]
 +        y: (_|_){
-+          // [structural cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
++          // [structural_cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
 +          //     ./yamlcycle.cue:44:8
 +          //     ./yamlcycle.cue:45:8
 +        }

@@ -82,9 +82,9 @@ Result:
 (_|_){
   // [eval]
   cycle: (_|_){
-    // [structural cycle]
+    // [structural_cycle]
     a: (_|_){
-      // [structural cycle] cycle.a: structural cycle
+      // [structural_cycle] cycle.a: structural cycle
     }
   }
   r1a: (int){ int }
@@ -162,7 +162,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,14 +1,14 @@
+@@ -1,22 +1,22 @@
  Errors:
  cycle.a: structural cycle
  issue3042.data: 2 errors in empty disjunction:
@@ -185,6 +185,16 @@ diff old new
  
  Result:
  (_|_){
+   // [eval]
+   cycle: (_|_){
+-    // [structural cycle]
++    // [structural_cycle]
+     a: (_|_){
+-      // [structural cycle] cycle.a: structural cycle
++      // [structural_cycle] cycle.a: structural cycle
+     }
+   }
+   r1a: (int){ int }
 @@ -76,14 +76,14 @@
        }) }
      data: (_|_){

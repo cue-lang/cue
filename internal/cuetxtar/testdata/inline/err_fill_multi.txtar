@@ -9,3 +9,11 @@ x: ({a: int & string} | {b: int & bool}) @test(err, code=eval,
 -- out/status.txt --
 update: output passes run
 force:  identical to update
+-- out/update/out/errors.txt --
+[eval] x: 2 errors in empty disjunction:
+x.a: conflicting values int and string (mismatched types int and string):
+    ./test.cue:1:9
+    ./test.cue:1:15
+x.b: conflicting values int and bool (mismatched types int and bool):
+    ./test.cue:1:29
+    ./test.cue:1:35

@@ -97,7 +97,6 @@ full: {
 		ports: []
 	})
 }
--- out/errors.txt --
 -- out/todo.txt --
 full.k.n.n1._cs.l: v3 uses structure sharing (~(full._cl.l)) where v2 expands
 the full _ports struct inline.

@@ -10,6 +10,13 @@ b2: 'abc' * 2     @test(eq, 'abcabc')
 // TODO: consider the semantics of this and perhaps allow this.
 e0: "a" + ''  @test(err, code=eval)
 e1: 'b' + "c" @test(err, code=eval)
+-- out/errors.txt --
+[eval] e0: invalid operands "a" and '' to '+' (type string and bytes):
+    ./in.cue:10:5
+    ./in.cue:10:11
+[eval] e1: invalid operands 'b' and "c" to '+' (type bytes and string):
+    ./in.cue:11:5
+    ./in.cue:11:11
 -- out/compile --
 --- in.cue
 {

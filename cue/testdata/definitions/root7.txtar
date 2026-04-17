@@ -3,7 +3,6 @@ root: input: #deps: root: {}
 {root.input.#deps}
 
 @test(eq, { root: input: #deps: root: {} })
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  5

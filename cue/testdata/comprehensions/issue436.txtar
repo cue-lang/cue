@@ -24,7 +24,6 @@ match: a & {
 not: a & {
 	val: "other"
 } @test(eq, {val: "other", result: *"not-matched" | string}) @test(closed)
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  3
 Freed:  22

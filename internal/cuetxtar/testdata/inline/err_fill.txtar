@@ -10,3 +10,10 @@ atBare: {b: int & string} @test(err, at=b, code=eval, contains="conflicting valu
 -- out/status.txt --
 update: output passes run
 force:  identical to update
+-- out/update/out/errors.txt --
+[eval] x: conflicting values int and string (mismatched types int and string):
+    ./test.cue:1:4
+    ./test.cue:1:10
+[eval] atBare.b: conflicting values int and string (mismatched types int and string):
+    ./test.cue:2:13
+    ./test.cue:2:19

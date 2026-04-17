@@ -17,7 +17,6 @@ rg: {
 	max: 8
 	@test(eq, {max: 8, min: *1 | int})
 }
--- out/errors.txt --
 -- out/todo.txt --
 rg field ordering differs between v2 and v3: v2 has min before max, v3 has max before min.
 -- out/eval/stats --

@@ -14,7 +14,6 @@ foo: #foo & {
 	#name: "baz"
 	name: string
 })
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  8

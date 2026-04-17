@@ -121,7 +121,6 @@ reference: {
 		ok: true
 	})
 }
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  6
 Freed:  74

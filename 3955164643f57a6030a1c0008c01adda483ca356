@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4cb0f1a_1adecfc8",
+        "filename": "cue/testdata/basicrewrite/007_strings_and_bytes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T14:42:45Z",
+      "side": 1,
+      "message": "these changes seem entirely unrelated? perhaps part of the parent commit?",
+      "revId": "3955164643f57a6030a1c0008c01adda483ca356",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

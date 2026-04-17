@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bdc6bdb_24537b11",
+        "filename": "cue/testdata/basicrewrite/018_self-reference_cycles.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T09:57:47Z",
+      "side": 1,
+      "message": "should we be trying to use todo attribute annotations instead? those are in the input CUE directly, so they are easier to visualize and track.",
+      "revId": "3ef24c253a058f00c46bb6289442cef0395d5c89",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b76bcc39_99ddfeae",
+        "filename": "cue/testdata/cycle/023_reentrance.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T09:57:47Z",
+      "side": 1,
+      "message": "nit: I find it a little harder to parse this if you have `key\u003dvalue with spaces`. how about using underscores instead of spaces? alternatively double quotes, but I\u0027d like to avoid that.",
+      "revId": "3ef24c253a058f00c46bb6289442cef0395d5c89",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

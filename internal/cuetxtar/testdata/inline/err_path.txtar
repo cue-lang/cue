@@ -16,5 +16,40 @@ suberrWrong: ({a: int & string} | {b: int & bool}) @test(err,
 path xWrong: @test(err, path=...): expected error path "wrong", got "y"
 path suberrWrong: @test(err, suberr=...): no sub-error matched "string"
 -- out/status.txt --
-update: identical to input
+update: output passes run
 force:  identical to update
+-- out/update/test.cue --
+xRight: {y: int & string} @test(err, path=y)
+xAbsolute: {y: int & string} @test(err, path=xAbsolute.y)
+xWrong: {y: int & string} @test(err, path=wrong)
+
+suberrRight: ({a: int & string} | {b: int & bool}) @test(err,
+	suberr=(path=a, contains="string"),
+	suberr=(path=b, contains="bool"))
+suberrWrong: ({a: int & string} | {b: int & bool}) @test(err,
+	suberr=(path=WRONG, contains="string"),
+	suberr=(path=b, contains="bool"))
+-- out/update/out/errors.txt --
+[eval] xRight.y: conflicting values int and string (mismatched types int and string):
+    ./test.cue:1:13
+    ./test.cue:1:19
+[eval] xAbsolute.y: conflicting values int and string (mismatched types int and string):
+    ./test.cue:2:16
+    ./test.cue:2:22
+[eval] xWrong.y: conflicting values int and string (mismatched types int and string):
+    ./test.cue:3:13
+    ./test.cue:3:19
+[eval] suberrRight: 2 errors in empty disjunction:
+suberrRight.a: conflicting values int and string (mismatched types int and string):
+    ./test.cue:5:19
+    ./test.cue:5:25
+suberrRight.b: conflicting values int and bool (mismatched types int and bool):
+    ./test.cue:5:39
+    ./test.cue:5:45
+[eval] suberrWrong: 2 errors in empty disjunction:
+suberrWrong.a: conflicting values int and string (mismatched types int and string):
+    ./test.cue:8:19
+    ./test.cue:8:25
+suberrWrong.b: conflicting values int and bool (mismatched types int and bool):
+    ./test.cue:8:39
+    ./test.cue:8:45

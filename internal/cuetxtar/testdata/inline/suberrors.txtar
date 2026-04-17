@@ -46,3 +46,27 @@ seed: null | {n: 3}
 seed: #empty @test(err, code=eval,
 	suberr=(code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{}, null, struct, null], pos=[-18:9, -1:7, 0:7]),
 	suberr=(code=eval, path=n, contains="field not allowed", pos=[-1:15]))
+-- out/update/out/errors.txt --
+[eval] x: 2 errors in empty disjunction:
+x: conflicting values {n:3} and null (mismatched types struct and null):
+    ./test.cue:4:4
+    ./test.cue:5:4
+    ./test.cue:5:13
+x.n: field not allowed:
+    ./test.cue:4:12
+    ./test.cue:5:14
+[eval] y: 2 errors in empty disjunction:
+y: conflicting values {n:3} and null (mismatched types struct and null):
+    ./test.cue:11:4
+    ./test.cue:12:4
+    ./test.cue:12:13
+y.n: field not allowed:
+    ./test.cue:11:12
+    ./test.cue:12:14
+[eval] seed: 2 errors in empty disjunction:
+seed: conflicting values {} and null (mismatched types struct and null):
+    ./test.cue:1:9
+    ./test.cue:18:7
+    ./test.cue:19:7
+seed.n: field not allowed:
+    ./test.cue:18:15

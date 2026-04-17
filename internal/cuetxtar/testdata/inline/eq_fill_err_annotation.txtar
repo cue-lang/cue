@@ -17,3 +17,7 @@ x: {
 -- out/status.txt --
 update: output passes run
 force:  identical to update
+-- out/update/out/errors.txt --
+[incomplete] x.b: non-concrete value int in operand to +:
+    ./test.cue:3:5
+    ./test.cue:2:5

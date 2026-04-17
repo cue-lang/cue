@@ -410,24 +410,19 @@ func (r *inlineRunner) runArchive() {
 }
 
 // handleErrorsTxtSection manages the out/errors.txt documentary section.
-// The section is only processed if it already exists in the archive:
-//   - CUE_UPDATE=1:    updates the section with current error output
-//   - otherwise:       silently skips any difference
+//
+// On CUE_UPDATE=1:
+//   - If the section is absent and there are errors → insert it after the
+//     last input file (before any out/ section such as out/compile).
+//   - If the section is present and there are no errors → remove it.
+//   - If the section is present and content differs → update it in place.
+//
+// On CUE_UPDATE=diff:
+//   - Report a diff if present content or absent-but-needed differs.
+//
+// Otherwise: silently skip any difference.
 func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 	const sectionName = "out/errors.txt"
-
-	// Find the section in the archive.
-	sectionIdx := -1
-	for i, f := range r.archive.Files {
-		if f.Name == sectionName {
-			sectionIdx = i
-			break
-		}
-	}
-	// Never auto-create the section.
-	if sectionIdx < 0 {
-		return
-	}
 
 	// Collect all errors (including incomplete) from the evaluated value.
 	// Do not pass Cwd: cueerrors.Print prepends "./" to relative paths for
@@ -448,28 +443,75 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 	}
 	resultBytes := []byte(result)
 
-	existing := r.archive.Files[sectionIdx].Data
-	if bytes.Equal(existing, resultBytes) {
-		return
-	}
-
-	if cuetest.UpdateGoldenFiles {
-		r.archive.Files[sectionIdx].Data = resultBytes
-		if r.filePath != "" {
-			out := txtar.Format(r.archive)
-			if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
-				r.t.Errorf("inline: errors.txt write-back to %s: %v", r.filePath, err)
-			}
+	// Find the section in the archive.
+	sectionIdx := -1
+	for i, f := range r.archive.Files {
+		if f.Name == sectionName {
+			sectionIdx = i
+			break
 		}
-		return
 	}
 
-	if cuetest.DiffGoldenFiles {
-		r.t.Errorf("result for %s differs: (-want +got)\n%s",
-			sectionName,
-			cmp.Diff(string(existing), result),
-		)
+	changed := false
+	if sectionIdx >= 0 {
+		existing := r.archive.Files[sectionIdx].Data
+		if bytes.Equal(existing, resultBytes) {
+			return // already up to date
+		}
+		if cuetest.DiffGoldenFiles {
+			r.t.Errorf("result for %s differs: (-want +got)\n%s",
+				sectionName, cmp.Diff(string(existing), result))
+			return
+		}
+		if !cuetest.UpdateGoldenFiles {
+			return // silently skip
+		}
+		if len(resultBytes) == 0 {
+			// Remove the empty section.
+			r.archive.Files = slices.Delete(r.archive.Files, sectionIdx, sectionIdx+1)
+		} else {
+			r.archive.Files[sectionIdx].Data = resultBytes
+		}
+		changed = true
+	} else {
+		// Section absent.
+		if len(resultBytes) == 0 {
+			return // nothing to do
+		}
+		if cuetest.DiffGoldenFiles {
+			r.t.Errorf("result for %s differs: (-want +got)\n%s",
+				sectionName, cmp.Diff("", result))
+			return
+		}
+		if !cuetest.UpdateGoldenFiles {
+			return // silently skip
+		}
+		// Insert after the last input file (before any out/ section).
+		insertIdx := r.errorsInsertIdx()
+		r.archive.Files = slices.Insert(r.archive.Files, insertIdx,
+			txtar.File{Name: sectionName, Data: resultBytes})
+		changed = true
 	}
+
+	if changed && r.filePath != "" {
+		out := txtar.Format(r.archive)
+		if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
+			r.t.Errorf("inline: errors.txt write-back to %s: %v", r.filePath, err)
+		}
+	}
+}
+
+// errorsInsertIdx returns the index at which to insert out/errors.txt:
+// directly after the last input file (name not starting with "out/"),
+// which places it before any out/ sections such as out/compile.
+func (r *inlineRunner) errorsInsertIdx() int {
+	last := -1
+	for i, f := range r.archive.Files {
+		if !strings.HasPrefix(f.Name, "out/") {
+			last = i
+		}
+	}
+	return last + 1
 }
 
 // subTestName returns the sub-test name for a root.

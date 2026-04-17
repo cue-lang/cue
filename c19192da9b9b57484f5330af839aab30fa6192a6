@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53a9785d_25d5977a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "023057a9_228f59d6",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec112e34_8d13343a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-14T11:57:53Z",
       "side": 1,
       "message": "nit: remove one of the two signed-off-by lines",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "094ee7ac_927e0888",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ec112e34_8d13343a",
       "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0759955_284a6b94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7a5c9c17_b59523b6",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00b2ee5e_f180fb67",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-14T11:57:53Z",
       "side": 1,
       "message": "clarify if any sort of escaping is in scope or out of scope for now. I think it\u0027s fine to leave out for now, but make a note that some INI variants use it.",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f7ffb24_c5a27676",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "00b2ee5e_f180fb67",
       "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc4d6bac_c73336e3",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Good point. Adding a config option for the case sensitivity",
+      "parentUuid": "1dd1a176_2156eaa3",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9fd46ee9_d6140954",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-04-14T11:57:53Z",
       "side": 1,
       "message": "I would make a blanket statement that any other non-standard features are not supported for now, like:\n\n* multi-line strings or escaped line continuations\n* array and struct values on the right side",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aba0c083_f83a2d9c",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9fd46ee9_d6140954",
       "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f42283d8_e1de12a1",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d260dfeb_bc63dda5",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18e0eab0_7b2053f1",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-04-14T11:57:53Z",
       "side": 1,
       "message": "nit: bytes.SplitSeq",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98924306_230f68dc",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "18e0eab0_7b2053f1",
       "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -156,6 +300,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a02a1376_d7595f60",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "After giving it a second thought, since INI treats all values as strings by default, it probably would make more sense to treat any quotes in the values as literals, especially when escape sequences are parsed as literals too. Otherwise, there\u0027s no way for user to specify quotes in the cases where the quotes do have their meanings.\n\nI\u0027ve made the changes in the code accordingly. Please let me know what you think.",
+      "parentUuid": "668b261e_3e27efb6",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "90eb887b_15c84ac7",
         "filename": "encoding/ini/decode.go",
         "patchSetId": 5
@@ -167,6 +329,24 @@
       "writtenOn": "2026-04-14T11:57:53Z",
       "side": 1,
       "message": "note that this passively accepts any valid Go int or float representation; that\u0027s probably too lax for INI. what formats should we accept here?\n\ne.g. I think only accepting valid JSON ints or strings could be a better starting point than accepting Go. At least JSON is a more widespread standard.\n\nBut I have no clue in terms of what INI actually accepts. Ideally we stick with INI\u0027s common denominator, and anything else can be a config option.",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6186b709_74e72da0",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-04-17T07:20:23Z",
+      "side": 1,
+      "message": "Good point. I did a search and it seems that INI commonly just treats all values simply as strings. I\u0027ve added another config options for \"TypedValues\", which defaults to \"false\" and the values will all be just treated as strings by default.",
+      "parentUuid": "90eb887b_15c84ac7",
       "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

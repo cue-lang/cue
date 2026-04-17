@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c24ef37d_436aa0fb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T09:53:36Z",
+      "side": 1,
+      "message": "but you\u0027re not removing inlinerunner_test.go at all, nor any parts of inline_test.go.",
+      "revId": "fe6bebca7e40429949df4478381673222f66dde0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6da6fad_864eaa87",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T09:53:36Z",
+      "side": 1,
+      "message": "again you\u0027re not removing TestUnreachableTestAttr, you\u0027re just moving it.",
+      "revId": "fe6bebca7e40429949df4478381673222f66dde0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

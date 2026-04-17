@@ -9,23 +9,20 @@ myStruct: {
 	a: b + 1 @test(permute)
 	b: 2     @test(permute)
 	c: 99
-	@test(permuteCount)
 } @test(eq, {a: 3, b: 2, c: 99})
 
 // Single permute field: nothing to permute, silently skipped.
 single: {
 	a: 1 @test(permute)
 	b: 2
-	@test(permuteCount) // NOTE: Permute count not set because it skips.
 } @test(eq, {a: 1, b: 2})
 
 all: {
-	@test(permute)
+	@test(permute, count=)
 	a: 1
 	b: 2
 	c: 3
 	d: 4
-	@test(permuteCount)
 	@test(eq, {a: 1, b: 2, c: 3, d: 4})
 }
 
@@ -35,8 +32,7 @@ all: {
 // a negative case for permute.
 toposort: {
 	src: {
-		@test(permute)
-		@test(permuteCount)
+		@test(permute, count=)
 		a: 1
 		b: 2
 	}
@@ -47,26 +43,23 @@ toposort: {
 -- out/update/test.cue --
 // Two-field permute: a=b+1 and b=2 are permuted; c=99 is not.
 myStruct: {
-	a: b + 1 @test(permute)
+	a: b + 1 @test(permute, count=2)
 	b: 2     @test(permute)
 	c: 99
-	@test(permuteCount, 2)
 } @test(eq, {a: 3, b: 2, c: 99})
 
 // Single permute field: nothing to permute, silently skipped.
 single: {
 	a: 1 @test(permute)
 	b: 2
-	@test(permuteCount) // NOTE: Permute count not set because it skips.
 } @test(eq, {a: 1, b: 2})
 
 all: {
-	@test(permute)
+	@test(permute, count=24)
 	a: 1
 	b: 2
 	c: 3
 	d: 4
-	@test(permuteCount, 24)
 	@test(eq, {a: 1, b: 2, c: 3, d: 4})
 }
 
@@ -76,8 +69,7 @@ all: {
 // a negative case for permute.
 toposort: {
 	src: {
-		@test(permute)
-		@test(permuteCount, 2)
+		@test(permute, count=2)
 		a: 1
 		b: 2
 	}

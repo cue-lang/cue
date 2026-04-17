@@ -61,8 +61,7 @@ d6: {
 }
 
 t10: p1: {
-	// @test(permute)
-	// @test(permuteCount, 120) // TODO(inline): we could reduce this by grouping fields.
+	// @test(permute, count=120) // TODO(inline): we could reduce this by grouping fields.
 	schema: test
 	schema: string | {name: string}
 	#A: {string | {name: string}}
@@ -144,7 +143,7 @@ d100: {
 	j: i.bar
 	@test(eq, {
 		i: null | {bar: 2}
-		j: _|_ @test(err, code=incomplete, contains="d100.j: unresolved disjunction null | {bar:2} (type (null|struct))", pos=[143:5])
+		j: _|_ @test(err, code=incomplete, contains="d100.j: unresolved disjunction null | {bar:2} (type (null|struct))", pos=[142:5])
 	})
 }
 
@@ -456,7 +455,7 @@ indexElimination: {
 // a string interpolation references an optional field inside a disjunction.
 // https://cuelang.org/issue/3899
 issue3899: reduced: {
-	@test(permute)
+	@test(permute, count=2)
 	b: c + "" | string
 	c?: string
 	@test(eq, {b: string, c?: string})
@@ -545,7 +544,7 @@ f.val: conflicting values 3 and string (mismatched types int and string):
     ./in.cue:15:4
     ./in.cue:15:27
 [incomplete] d100.j: unresolved disjunction null | {bar:2} (type (null|struct)):
-    ./in.cue:143:5
+    ./in.cue:142:5
 [incomplete] issue3899.full.#Schema.deployImage: invalid non-ground value string (must be concrete string):
     ./issue3899.cue:18:18
 -- out/todo.txt --

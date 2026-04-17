@@ -1,7 +1,6 @@
 -- in.cue --
 dynamic: {
-	@test(permute)
-	@test(permuteCount, 6)
+	@test(permute, count=6)
 
 	X=(a): 1
 	x: X

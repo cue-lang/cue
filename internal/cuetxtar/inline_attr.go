@@ -175,7 +175,7 @@ func parseTestAttr(astAttr *ast.Attribute) (parsedTestAttr, error) {
 			}
 		default:
 			switch result.directive {
-			case "err", "todo", "skip", "shareID":
+			case "err", "todo", "skip", "shareID", "permute":
 				// These directives parse their own flags elsewhere.
 			default:
 				return result, fmt.Errorf("@test(%s): unknown flag %q", result.directive, kv.Key())

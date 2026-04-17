@@ -33,8 +33,7 @@ parenExprRefEqual: {
 	@test(eq, {x: "foo", foo: {}})
 }
 chainedResolution: x: {
-	@test(permute)
-	@test(permuteCount, 6)
+	@test(permute, count=6)
 	(x.baz): "bar"
 	(x.foo): "baz"
 	baz: "foo"
@@ -117,16 +116,16 @@ issue3828: full: {
     ./in.cue:14:31
     ./in.cue:14:35
 [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:47:8
-    ./in.cue:47:11
+    ./in.cue:46:8
+    ./in.cue:46:11
 noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string)):
-    ./in.cue:49:22
+    ./in.cue:48:22
 [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:47:8
-    ./in.cue:47:11
+    ./in.cue:46:8
+    ./in.cue:46:11
 [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:47:8
-    ./in.cue:47:11
+    ./in.cue:46:8
+    ./in.cue:46:11
 -- out/eval/stats --
 Leaks:  4
 Freed:  74

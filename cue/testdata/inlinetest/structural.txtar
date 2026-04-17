@@ -47,6 +47,13 @@ refsFixture: plainFixture.x @test(eq, 42)
 // ── mixed inline ──────────────────────
 
 mixedInline: 42 @test(eq, 42)
+-- out/errors.txt --
+[eval] errOnly: conflicting values 2 and 1:
+    ./in.cue:5:10
+    ./in.cue:5:14
+[eval] errWithCode: conflicting values string and 1 (mismatched types string and int):
+    ./in.cue:7:14
+    ./in.cue:7:23
 -- out/compile --
 --- in.cue
 {

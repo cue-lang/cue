@@ -4,23 +4,23 @@
 inline: small: {
 	f: {
 		n: int
-		out: (f & {"n": n - 1}).out @test(err, code=structural cycle, contains="structural cycle", pos=[0:9])
+		out: (f & {"n": n - 1}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[0:9])
 	}
 }
 
 inline: medium: {
-	f2:  (f & {n: 2}).out @test(err, code=structural cycle, contains="structural cycle", pos=[1:24])
+	f2:  (f & {n: 2}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[1:24])
 	fRec: {nn: int, out: (f & {n: nn}).out}
-	@test(err, at=fRec.out, code=structural cycle, contains="structural cycle", pos=[6:9])
+	@test(err, at=fRec.out, code=structural_cycle, contains="structural cycle", pos=[6:9])
 	f: {
 		n: int
-		out: (fRec & {nn: n - 1}).out @test(err, code=structural cycle, contains="structural cycle", pos=[0:9])
+		out: (fRec & {nn: n - 1}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[0:9])
 	}
 }
 
 inline: patterns: {
 	f: n: (f & {n: {}}).n
-	f: n: {}  @test(err, code=structural cycle, contains="structural cycle", pos=[-1:9])
+	f: n: {}  @test(err, code=structural_cycle, contains="structural cycle", pos=[-1:9])
 	[string]: {n: {}}
 	f: [string]: {}
 	f: {}
@@ -93,7 +93,7 @@ expanded1: hasCycle: {
 		a: _a.output
 		_a: X & {input: root}
 	}
-	@test(err, code=structural cycle, at=root._a.input._a.input, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=root._a.input._a.input, contains="structural cycle", pos=[])
 }
 expanded2: noCycle: {
 	X: {
@@ -141,7 +141,7 @@ issue3731: expanded: {
 		others: _others.output
 		_others: #lookup & {input: root}
 	}
-	@test(err, code=structural cycle, at=root._others.input._others.input, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=root._others.input._others.input, contains="structural cycle", pos=[])
 }
 issue3731: full: {
 	#Workspace: {
@@ -215,17 +215,17 @@ issue3731: full: {
 	})
 }
 -- out/errors.txt --
-[structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
-[structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle
-[structural cycle] structural cycle:
+[structural_cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
+[structural_cycle] issue3731.expanded.root._others.input._others.input: structural cycle
+[structural_cycle] structural cycle:
     ./x.cue:6:9
-[structural cycle] structural cycle:
+[structural_cycle] structural cycle:
     ./x.cue:12:24
-[structural cycle] structural cycle:
+[structural_cycle] structural cycle:
     ./x.cue:16:9
-[structural cycle] structural cycle:
+[structural_cycle] structural cycle:
     ./x.cue:16:9
-[structural cycle] structural cycle:
+[structural_cycle] structural cycle:
     ./x.cue:21:9
 [incomplete] inline.acrossFields.fail1.f.out: non-concrete value number in operand to +:
     ./x.cue:31:8

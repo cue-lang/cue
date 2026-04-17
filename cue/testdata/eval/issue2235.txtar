@@ -134,6 +134,13 @@ clusters: foo: {}
 	}
 }, at=clusters)
 
+-- out/errors.txt --
+[incomplete] #Cluster.shorewallPrefix: invalid interpolation: error in call to strings.ToUpper: non-concrete value string:
+    ./issue2235.cue:14:19
+    ./issue2235.cue:13:19
+    ./issue2235.cue:14:33
+[incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string)):
+    ./issue2235.cue:43:12
 -- out/eval/stats --
 Leaks:  2
 Freed:  68

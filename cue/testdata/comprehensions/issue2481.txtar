@@ -80,6 +80,9 @@ full: {
 	}
 	@test(eq, {out: {role: "member"}, #github_team_membership: {team_id: string, role: string}, values: {role: "member", username: "foo"}})
 }
+-- out/errors.txt --
+[eval] out: cannot combine regular field "val" with "b":
+    ./in.cue:35:2
 -- out/eval/stats --
 Leaks:  3
 Freed:  23

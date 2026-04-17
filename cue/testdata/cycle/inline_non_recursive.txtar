@@ -118,7 +118,7 @@ issue3182: {
 	}
 	first: t2: {
 		x: { a: b: x }.a
-		@test(err, code=structural cycle)
+		@test(err, code=structural_cycle)
 	}
 	second: {
 		{ t: x }.t.y
@@ -164,7 +164,7 @@ select: indirect: {
     ./in.cue:83:7
 [incomplete] a10.i: undefined field: out:
     ./in.cue:88:28
-[structural cycle] issue3182.first.t2.x.b: structural cycle
+[structural_cycle] issue3182.first.t2.x.b: structural cycle
 [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
     ./select.cue:13:8
     ./select.cue:13:15

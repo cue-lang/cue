@@ -11,7 +11,7 @@ self: t2: {
 }
 
 unify: t1: {
-	@test(permute)
+	@test(permute, count=2)
 	a!: int
 	a: int
 	@test(eq, {a: int})
@@ -43,23 +43,23 @@ allowed: {
 
 reference: {
 	toWithinDefinition: {
-		@test(permute)
+		@test(permute, count=2)
 		#Foo: a!: int
 		b: #Foo.a @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:11])
 	}
 	toFieldFromDefinition: {
-		@test(permute)
+		@test(permute, count=6)
 		#Foo: a!: int
 		b: #Foo
 		c: b.a @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:8])
 	}
 	toNonDefinition: {
-		@test(permute)
+		@test(permute, count=2)
 		x: y!: _
 		b: x.y @test(err, code=incomplete, contains="required field missing: %s", args=[y], pos=[0:8])
 	}
 	toConcrete: {
-		@test(permute)
+		@test(permute, count=2)
 		a!: 1
 		b: a + 1 @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:6])
 	}

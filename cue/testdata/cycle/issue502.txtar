@@ -216,10 +216,10 @@ NumCloseIDs: 45
             z: (#struct){
               x: (#struct){
                 y?: (_|_){
-                  // [structural cycle]
+                  // [structural_cycle]
                   V: (_){ _ }
                   z: (_|_){
-                    // [structural cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
+                    // [structural_cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
                   }
                 }
               }
@@ -246,10 +246,10 @@ NumCloseIDs: 45
                   z: (#struct){
                     x: (#struct){
                       y?: (_|_){
-                        // [structural cycle]
+                        // [structural_cycle]
                         V: (_){ _ }
                         z: (_|_){
-                          // [structural cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
+                          // [structural_cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
                         }
                       }
                     }
@@ -267,6 +267,19 @@ NumCloseIDs: 45
 diff old new
 --- old
 +++ new
+@@ -156,10 +156,10 @@
+             z: (#struct){
+               x: (#struct){
+                 y?: (_|_){
+-                  // [structural cycle]
++                  // [structural_cycle]
+                   V: (_){ _ }
+                   z: (_|_){
+-                    // [structural cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
++                    // [structural_cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
+                   }
+                 }
+               }
 @@ -170,7 +170,7 @@
        a: (#struct){
          x: (#struct){
@@ -276,6 +289,19 @@ diff old new
                x: (struct){
                  y: (struct){
                    V: (struct){
+@@ -186,10 +186,10 @@
+                   z: (#struct){
+                     x: (#struct){
+                       y?: (_|_){
+-                        // [structural cycle]
++                        // [structural_cycle]
+                         V: (_){ _ }
+                         z: (_|_){
+-                          // [structural cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
++                          // [structural_cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
+                         }
+                       }
+                     }
 -- out/eval --
 (struct){
   #T: (#struct){

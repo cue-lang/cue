@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0e653a3_eaae859a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T14:41:46Z",
+      "side": 1,
+      "message": "should I not see empty errors.txt txtar entries being removed? or were they all removed already in earlier commits?",
+      "revId": "e68360e97bfbb6cd40507ac54132ce31267a5e76",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+# Test that cue plugin init-go correctly filters functions based on
+# parameter and return types, including methods, complex types, and
+# struct-typed functions.
+
+exec cue plugin init-go
+
+cmp mypkg.cue want.cue
+
+-- want.cue --
+@extern(go)
+
+package mypkg
+
+IntSlice: _ @go()
+MapFunc: _ @go()
+PtrFunc: _ @go()
+Simple: _ @go()
+-- cue.mod/module.cue --
+module: "test.example/mypkg@v0"
+language: version: "v0.17.0"
+-- go.mod --
+module test.example/mypkg
+
+go 1.22
+-- funcs.go --
+package mypkg
+
+func Simple(s string) string {
+	return s
+}
+
+func IntSlice(vals []int) []int {
+	return vals
+}
+
+func MapFunc(m map[string]int) map[string]int {
+	return m
+}
+
+func PtrFunc(p *string) *string {
+	return p
+}
+
+// Method has a receiver so should be excluded.
+type MyType struct{}
+
+func (t MyType) Method(s string) string {
+	return s
+}
+
+// IntKey has a map with non-string key, should be excluded.
+func IntKey(m map[int]string) string {
+	return ""
+}
+
+// ChanParam has an unsupported type.
+func ChanParam(c chan int) string {
+	return ""
+}
+
+// FuncParam has a function parameter.
+func FuncParam(f func()) string {
+	return ""
+}
+
+// InterfaceParam has an interface parameter.
+func InterfaceParam(i interface{}) string {
+	return ""
+}

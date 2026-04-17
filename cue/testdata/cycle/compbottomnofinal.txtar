@@ -29,8 +29,7 @@ small: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
 	p1: {
-		@test(permute)
-		@test(permuteCount, 2)
+		@test(permute, count=2)
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
 		#X: {
@@ -42,8 +41,8 @@ small: {
 			}
 		}
 		@test(eq, {
-			#Y: _|_ @test(err, code=incomplete, contains="#Y: undefined field: port", pos=[32:50])
-			#X: _|_ @test(err, code=incomplete, contains="#X.port: cyclic reference to field port", pos=[35:4])
+			#Y: _|_ @test(err, code=incomplete, contains="#Y: undefined field: port", pos=[31:50])
+			#X: _|_ @test(err, code=incomplete, contains="#X.port: cyclic reference to field port", pos=[34:4])
 		})
 	}
 }
@@ -52,8 +51,7 @@ medium: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
 	p1: {
-		@test(permute)
-		@test(permuteCount, 6)
+		@test(permute, count=6)
 
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
@@ -75,9 +73,9 @@ medium: {
 			}
 		}
 		@test(eq, {
-			#Y: _|_ @test(err, code=incomplete, contains="medium.p1.#Y: undefined field: port", pos=[56:50])
+			#Y: _|_ @test(err, code=incomplete, contains="medium.p1.#Y: undefined field: port", pos=[54:50])
 			Y: {}
-			#X: _|_ @test(err, code=incomplete, contains="medium.p1.#X.port: cyclic reference to field port", pos=[68:4])
+			#X: _|_ @test(err, code=incomplete, contains="medium.p1.#X.port: cyclic reference to field port", pos=[66:4])
 		})
 	}
 }
@@ -86,8 +84,7 @@ large: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\d+))?$"#
 
 	p1: {
-		@test(permute)
-		@test(permuteCount, 120)
+		@test(permute, count=120)
 
 		Y: {
 			userinfo: "user"
@@ -130,15 +127,15 @@ large: {
 		@test(eq, {
 			Y: {
 				userinfo: "user"
-				host: _|_ @test(err, code=incomplete, contains="large.p1.Y.host: undefined field: host", pos=[120:13])
+				host: _|_ @test(err, code=incomplete, contains="large.p1.Y.host: undefined field: host", pos=[117:13])
 			}
-			X: _|_ @test(err, code=incomplete, contains="large.p1.X: undefined field: port", pos=[95:33])
+			X: _|_ @test(err, code=incomplete, contains="large.p1.X: undefined field: port", pos=[92:33])
 			#X: {
 				_|_
 				userinfo: "user@"
 				host: "mod.test"
 			}
-			#Y: _|_ @test(err, code=incomplete, contains="large.p1.X: undefined field: port", pos=[95:33])
+			#Y: _|_ @test(err, code=incomplete, contains="large.p1.X: undefined field: port", pos=[92:33])
 		})
 	}
 }
@@ -148,21 +145,21 @@ large: {
 [incomplete] minimal.b.port: cyclic reference to field port:
     ./in.cue:19:3
 [incomplete] small.p1.#Y: undefined field: port:
-    ./in.cue:32:50
+    ./in.cue:31:50
 [incomplete] small.p1.#X.port: cyclic reference to field port:
-    ./in.cue:35:4
+    ./in.cue:34:4
 [incomplete] medium.p1.#Y: undefined field: port:
-    ./in.cue:56:50
+    ./in.cue:54:50
 [incomplete] medium.p1.#X.port: cyclic reference to field port:
-    ./in.cue:68:4
+    ./in.cue:66:4
 [incomplete] large.p1.Y.host: undefined field: host:
-    ./in.cue:120:13
+    ./in.cue:117:13
 [incomplete] large.p1.X: undefined field: port:
-    ./in.cue:95:33
+    ./in.cue:92:33
 [incomplete] large.p1.#X.port: cyclic reference to field port:
-    ./in.cue:107:4
+    ./in.cue:104:4
 [incomplete] large.p1.X: undefined field: port:
-    ./in.cue:95:33
+    ./in.cue:92:33
 -- out/todo.txt --
 minimal.a/b: different error code in v2 (cycle) and v3 (incomplete).
 small.p1: v2 #Y succeeds with port="", v3 #Y errors; error codes differ.

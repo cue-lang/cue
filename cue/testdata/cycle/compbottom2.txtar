@@ -102,8 +102,7 @@ mutual: {
 	}
 
 	oneDirectionalBrokenConflictSuccess: {
-		@test(permute)
-		@test(permuteCount, 6)
+		@test(permute, count=6)
 		b: foo: ""
 		a: { if b.foo == _|_ { bar: "" } }
 		b: { if a.bar == _|_ { new: "" } }

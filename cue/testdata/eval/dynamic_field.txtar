@@ -33,8 +33,7 @@ parenExprRefEqual: {
 	@test(eq, {x: "foo", foo: {}})
 }
 chainedResolution: x: {
-	@test(permute)
-	@test(permuteCount, 6)
+	@test(permute, count=6)
 	(x.baz): "bar"
 	(x.foo): "baz"
 	baz: "foo"

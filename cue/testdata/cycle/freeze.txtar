@@ -15,8 +15,7 @@ freezing: t1: ok: {
 // This test would fail in the old evaluator, depending on ordering.
 comprehension: t1: _
 comprehension: t1: ok:{
-	@test(permute)
-	@test(permuteCount)
+	@test(permute, count=)
 
 	x: y: {}
 	// order of comprehensions matter in old evaluator.

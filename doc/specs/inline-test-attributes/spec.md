@@ -701,33 +701,33 @@ The runner SHALL generate all N! permutations of the marked fields, evaluate eac
 
 ---
 
-### Requirement: `permuteCount` directive
-The `permuteCount` directive asserts the total number of permutations that were executed for the test case root. It is placed alongside `@test(permute)` (either in the same struct as a decl attr, or on the parent struct). When `CUE_UPDATE=1` is set, the count is auto-filled if empty or replaced if it differs.
+### Requirement: `permute` with `count=` option
+The `count=N` option on a decl-form `@test(permute)` asserts the number of permutations executed for that group. When `CUE_UPDATE=1` is set, the count is auto-filled if empty (`count=`) or replaced if it differs.
 
 ```cue
 in: {
-    @test(permute)
+    @test(permute, count=2)
     a: 1, b: a+1
-    @test(permuteCount, 2)
 }
 ```
 
-For multiple permutation groups within one test root, `@test(permuteCount, N)` at the root asserts the total across all groups:
+For multiple permutation groups, each struct has its own `count=N`:
 
 ```cue
 multiPermute: {
-    x: { @test(permute); alpha: 1, beta: 2, gamma: 3 }
-    y: { @test(permute); alpha: 1, beta: 2, gamma: 3 }
-    @test(permuteCount, 12) // 2 groups × 3! = 12 total
+    x: { @test(permute, count=6); alpha: 1, beta: 2, gamma: 3 }
+    y: { @test(permute, count=6); alpha: 1, beta: 2, gamma: 3 }
 }
 ```
 
+The `count=` option is only supported in the **decl attribute form** (where `@test(permute)` is a standalone declaration inside the struct). It is not available in the field attribute form.
+
 #### Scenario: Permutation count matches
-- **WHEN** `@test(permuteCount, 6)` is declared and exactly 6 permutations ran
+- **WHEN** `@test(permute, count=6)` is declared and exactly 6 permutations ran
 - **THEN** the test passes
 
 #### Scenario: Permutation count mismatch
-- **WHEN** `@test(permuteCount, 6)` is declared but only 2 permutations ran
+- **WHEN** `@test(permute, count=6)` is declared but only 2 permutations ran
 - **THEN** the test fails reporting the count mismatch
 
 ---

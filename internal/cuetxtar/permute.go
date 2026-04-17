@@ -35,12 +35,16 @@ import (
 //  1. Field attribute: @test(permute) on individual fields collects those fields
 //     into a group under their parent struct. Only the marked fields are permuted.
 //
-//  2. Decl attribute: @test(permute) as a declaration inside a struct means
-//     "permute all fields within this struct."
+//  2. Decl attribute: @test(permute[, count=N]) as a declaration inside a struct
+//     means "permute all fields within this struct." The optional count=N asserts
+//     the number of permutations (N!); count= (empty) is a fill-in placeholder
+//     that CUE_UPDATE=1 fills automatically.
 func (r *inlineRunner) runInlinePermutes(t testing.TB, rootPath cue.Path, records []attrRecord, version string) {
 	type permuteGroup struct {
 		parentPath cue.Path
-		fields     []string // nil means permute all fields
+		fields     []string       // nil means permute all fields
+		permutePA  parsedTestAttr // permute directive (decl form); used for count
+		hasPA      bool           // true when permutePA is set (decl form)
 	}
 	var permuteGroups []permuteGroup
 	parentSeen := map[string]int{} // parentPath.String() → index in permuteGroups
@@ -54,17 +58,22 @@ func (r *inlineRunner) runInlinePermutes(t testing.TB, rootPath cue.Path, record
 				continue
 			}
 			if rec.isDeclAttr {
-				// Decl form: @test(permute) inside a struct → permute all
+				// Decl form: @test(permute[, count=N]) inside a struct → permute all
 				// fields in that struct. The path points to the struct itself.
 				key := rec.path.String()
 				if _, ok := parentSeen[key]; !ok {
 					parentSeen[key] = len(permuteGroups)
-					permuteGroups = append(permuteGroups, permuteGroup{rec.path, nil})
+					permuteGroups = append(permuteGroups, permuteGroup{
+						parentPath: rec.path,
+						permutePA:  pa,
+						hasPA:      true,
+					})
 				}
 				continue
 			}
 
 			// Field form: @test(permute) on a field → collect into parent group.
+			// The first field in the group holds the count= option.
 			sels := rec.path.Selectors()
 			if len(sels) < 2 {
 				continue // top-level field permute not supported in inline form
@@ -76,73 +85,86 @@ func (r *inlineRunner) runInlinePermutes(t testing.TB, rootPath cue.Path, record
 				permuteGroups[idx].fields = append(permuteGroups[idx].fields, fieldName)
 			} else {
 				parentSeen[key] = len(permuteGroups)
-				permuteGroups = append(permuteGroups, permuteGroup{parentPath, []string{fieldName}})
+				permuteGroups = append(permuteGroups, permuteGroup{
+					parentPath: parentPath,
+					fields:     []string{fieldName},
+					permutePA:  pa, // first field holds the count= option
+					hasPA:      true,
+				})
 			}
 		}
 	}
 
-	totalPerms := 0
 	for _, group := range permuteGroups {
 		groupPerms := r.runPermuteAssertion(t, group.parentPath, group.fields)
-		// @test(permuteCount, N) placed alongside @test(permute) in the same
-		// struct is checked here with the per-group count.
-		if groupPerms > 0 {
-			r.checkPermuteCount(t, group.parentPath, records, version, groupPerms)
-		}
-		totalPerms += groupPerms
-	}
-	// Also check @test(permuteCount, N) at the root with the total across all
-	// groups — but only when the root path is not itself one of the group paths
-	// (to avoid double-checking single-group cases where the permuted struct IS
-	// the root).
-	if totalPerms > 0 {
-		rootStr := rootPath.String()
-		rootIsGroup := false
-		for _, group := range permuteGroups {
-			if group.parentPath.String() == rootStr {
-				rootIsGroup = true
-				break
-			}
-		}
-		if !rootIsGroup {
-			r.checkPermuteCount(t, rootPath, records, version, totalPerms)
+		if groupPerms > 0 && group.hasPA {
+			r.checkPermuteCount(t, group.parentPath, group.permutePA, groupPerms)
 		}
 	}
 }
 
-// checkPermuteCount verifies or auto-updates a @test(permuteCount, N) directive
-// at path after all permutations for a group have run. When CUE_UPDATE=1, the
-// count is filled or replaced with the actual value.
-func (r *inlineRunner) checkPermuteCount(t testing.TB, path cue.Path, records []attrRecord, version string, actualCount int) {
+// checkPermuteCount verifies or auto-updates the count= option inside a
+// @test(permute, count=N) directive after all permutations for a group have
+// run. When CUE_UPDATE=1, the count is filled or replaced with the actual value.
+func (r *inlineRunner) checkPermuteCount(t testing.TB, path cue.Path, pa parsedTestAttr, actualCount int) {
 	t.Helper()
-	directives := selectActiveDirectives(records, path, version)
-	for _, pa := range directives {
-		if pa.directive != "permuteCount" {
-			continue
+	// Find the count= option.
+	countVal := ""
+	hasCount := false
+	for _, f := range pa.raw.Fields[1:] {
+		if f.Key() == "count" {
+			hasCount = true
+			countVal = f.Value()
+			break
 		}
-		if len(pa.raw.Fields) < 2 {
-			// Bare @test(permuteCount) — fill with actual count.
-			if cuetest.UpdateGoldenFiles {
-				r.enqueueInlineFill(pa, fmt.Sprintf("@test(permuteCount, %d)", actualCount))
-			}
-			return
+	}
+	if !hasCount {
+		// No count= option yet — add it when updating.
+		if cuetest.UpdateGoldenFiles {
+			r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
 		}
-		expectedStr := pa.raw.Fields[1].Value()
-		expected, err := strconv.Atoi(expectedStr)
-		if err != nil {
-			t.Errorf("path %s: @test(permuteCount, %q): cannot parse as integer", path, expectedStr)
-			return
-		}
-		if expected == actualCount {
-			return // matches
-		}
-		if cuetest.UpdateGoldenFiles || cuetest.ForceUpdateGoldenFiles {
-			r.enqueueInlineFill(pa, fmt.Sprintf("@test(permuteCount, %d)", actualCount))
-			return
-		}
-		t.Errorf("path %s: @test(permuteCount): got %d permutations, want %d", path, actualCount, expected)
 		return
 	}
+	if countVal == "" {
+		// Empty count= placeholder — fill with actual count.
+		if cuetest.UpdateGoldenFiles {
+			r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
+		}
+		return
+	}
+	expected, err := strconv.Atoi(countVal)
+	if err != nil {
+		t.Errorf("path %s: @test(permute, count=%q): cannot parse as integer", path, countVal)
+		return
+	}
+	if expected == actualCount {
+		return // matches
+	}
+	if cuetest.UpdateGoldenFiles || cuetest.ForceUpdateGoldenFiles {
+		r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
+		return
+	}
+	t.Errorf("path %s: @test(permute, count=...): got %d permutations, want %d", path, actualCount, expected)
+}
+
+// buildPermuteAttr constructs the replacement text for a @test(permute, count=N)
+// directive, preserving any version suffix and non-count options.
+func buildPermuteAttr(pa parsedTestAttr, count int) string {
+	directive := "permute"
+	if pa.version != "" {
+		directive += ":" + pa.version
+	}
+	var extras []string
+	for _, f := range pa.raw.Fields[1:] {
+		if f.Key() == "count" {
+			continue // replaced below
+		}
+		extras = append(extras, f.Text())
+	}
+	if len(extras) > 0 {
+		return fmt.Sprintf("@test(%s, %s, count=%d)", directive, strings.Join(extras, ", "), count)
+	}
+	return fmt.Sprintf("@test(%s, count=%d)", directive, count)
 }
 
 // runPermuteAssertion evaluates all N! field-order permutations of the struct

@@ -139,8 +139,7 @@ hidden: {
 // regardless of which field is declared first. The @test(permute) exercises all
 // declaration orders to confirm order-independence.
 merged: t1: {
-	@test(permute)
-	@test(permuteCount, 6)
+	@test(permute, count=6)
 
 	#fn: { #in2: _, _ }
 	#fn: { #in2: c1: string, #in2.c1 }

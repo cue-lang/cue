@@ -16,6 +16,24 @@
       "message": "these changes seem entirely unrelated? perhaps part of the parent commit?",
       "revId": "3955164643f57a6030a1c0008c01adda483ca356",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3adae1c_1cc1a7fc",
+        "filename": "cue/testdata/basicrewrite/007_strings_and_bytes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-17T14:55:15Z",
+      "side": 1,
+      "message": "I think what happened is that an update just caught this were it missed the previous. I\u0027ll rebase.",
+      "parentUuid": "d4cb0f1a_1adecfc8",
+      "revId": "3955164643f57a6030a1c0008c01adda483ca356",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab71ab16_06a83c8c",
+        "filename": "cue/testdata/basicrewrite/018_self-reference_cycles.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-17T12:13:00Z",
+      "side": 1,
+      "message": "We don\u0027t have a directive for testing field order yet. But yes once we have that.",
+      "parentUuid": "5bdc6bdb_24537b11",
+      "revId": "3ef24c253a058f00c46bb6289442cef0395d5c89",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b76bcc39_99ddfeae",

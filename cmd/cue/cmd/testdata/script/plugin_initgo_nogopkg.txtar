@@ -1,0 +1,12 @@
+# Test that cue plugin init-go errors when no Go package is found.
+
+! exec cue plugin init-go
+stderr 'no Go package found in current directory'
+
+-- cue.mod/module.cue --
+module: "test.example/mypkg@v0"
+language: version: "v0.17.0"
+-- go.mod --
+module test.example/mypkg
+
+go 1.22

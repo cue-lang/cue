@@ -1,15 +1,3 @@
-#todo:inline: skip — performance benchmark, not a functional test
--- stats.txt --
-Leaks:  0
-Freed:  11
-Reused: 6
-Allocs: 5
-Retain: 0
-
-Unifications: 7
-Conjuncts:    29
-Disjuncts:    11
-
 -- in.cue --
 package bench1
 
@@ -31,6 +19,11 @@ foo: #Value
 foo: #Value
 foo: #Value
 foo: #Value
+
+@test(eq, {
+	#Value: {type: "float"} | {type: "string"}
+	foo: {type: "string"}
+})
 -- out/eval/stats --
 Leaks:  2
 Freed:  10
@@ -43,17 +36,6 @@ Conjuncts:    28
 Disjuncts:    4
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  #Value: (#struct){ |((#struct){
-      type: (string){ "float" }
-    }, (#struct){
-      type: (string){ "string" }
-    }) }
-  foo: (#struct){
-    type: (string){ "string" }
-  }
-}
 -- out/compile --
 --- in.cue
 {

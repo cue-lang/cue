@@ -1,4 +1,7 @@
-#todo:inline: skip — performance benchmark, not a functional test
+# Tests that a single top-level disjunction (null | Schema) applied to a deeply
+# nested struct does not cause exponential evaluation. Schema is a recursive
+# JSON-Schema-like definition with many optional disjunctive fields.
+# https://cuelang.org/issue/3334
 -- in.cue --
 // Single disjunction at the top.
 x?: null | Schema
@@ -43,6 +46,213 @@ Schema: {
 	example?:  null | _
 	nullable?: bool
 }
+
+@test(eq, at=x, {
+	properties: {
+		disableSelfServiceScrape: {
+			title?: string
+			$ref?: null | string
+			enum?: []
+			required?: []
+			items?: null | _
+			anyOf?: []
+			allOf?: []
+			oneOf?: []
+			not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+			properties?: {}
+			additionalProperties?: null | _
+			patternProperties?: {}
+			dependencies?: {}
+			additionalItems?: null | _
+			definitions?: {}
+			externalDocs?: null | {description?: string, url?: string}
+			example?: null | _
+			nullable?: bool
+		}
+		dnsConfig: {
+			properties: {
+				nameservers: {
+					title?: string
+					$ref?: null | string
+					enum?: []
+					required?: []
+					items?: null | _
+					anyOf?: []
+					allOf?: []
+					oneOf?: []
+					not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+					properties?: {}
+					additionalProperties?: null | _
+					patternProperties?: {}
+					dependencies?: {}
+					additionalItems?: null | _
+					definitions?: {}
+					externalDocs?: null | {description?: string, url?: string}
+					example?: null | _
+					nullable?: bool
+				}
+			}
+			title?: string
+			$ref?: null | string
+			enum?: []
+			required?: []
+			items?: null | _
+			anyOf?: []
+			allOf?: []
+			oneOf?: []
+			not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+			additionalProperties?: null | _
+			patternProperties?: {}
+			dependencies?: {}
+			additionalItems?: null | _
+			definitions?: {}
+			externalDocs?: null | {description?: string, url?: string}
+			example?: null | _
+			nullable?: bool
+		}
+		podDisruptionBudget: {
+			properties: {
+				maxUnavailable: {
+					title?: string
+					$ref?: null | string
+					enum?: []
+					required?: []
+					items?: null | _
+					anyOf?: []
+					allOf?: []
+					oneOf?: []
+					not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+					properties?: {}
+					additionalProperties?: null | _
+					patternProperties?: {}
+					dependencies?: {}
+					additionalItems?: null | _
+					definitions?: {}
+					externalDocs?: null | {description?: string, url?: string}
+					example?: null | _
+					nullable?: bool
+				}
+				minAvailable: {
+					anyOf: [{
+						title?: string
+						$ref?: null | string
+						enum?: []
+						required?: []
+						items?: null | _
+						anyOf?: []
+						allOf?: []
+						oneOf?: []
+						not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+						properties?: {}
+						additionalProperties?: null | _
+						patternProperties?: {}
+						dependencies?: {}
+						additionalItems?: null | _
+						definitions?: {}
+						externalDocs?: null | {description?: string, url?: string}
+						example?: null | _
+						nullable?: bool
+					},
+					{
+						title?: string
+						$ref?: null | string
+						enum?: []
+						required?: []
+						items?: null | _
+						anyOf?: []
+						allOf?: []
+						oneOf?: []
+						not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+						properties?: {}
+						additionalProperties?: null | _
+						patternProperties?: {}
+						dependencies?: {}
+						additionalItems?: null | _
+						definitions?: {}
+						externalDocs?: null | {description?: string, url?: string}
+						example?: null | _
+						nullable?: bool
+					}]
+					title?: string
+					$ref?: null | string
+					enum?: []
+					required?: []
+					items?: null | _
+					allOf?: []
+					oneOf?: []
+					not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+					properties?: {}
+					additionalProperties?: null | _
+					patternProperties?: {}
+					dependencies?: {}
+					additionalItems?: null | _
+					definitions?: {}
+					externalDocs?: null | {description?: string, url?: string}
+					example?: null | _
+					nullable?: bool
+				}
+				labels: {
+					title?: string
+					$ref?: null | string
+					enum?: []
+					required?: []
+					items?: null | _
+					anyOf?: []
+					allOf?: []
+					oneOf?: []
+					not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+					properties?: {}
+					additionalProperties?: null | _
+					patternProperties?: {}
+					dependencies?: {}
+					additionalItems?: null | _
+					definitions?: {}
+					externalDocs?: null | {description?: string, url?: string}
+					example?: null | _
+					nullable?: bool
+				}
+			}
+			title?: string
+			$ref?: null | string
+			enum?: []
+			required?: []
+			items?: null | _
+			anyOf?: []
+			allOf?: []
+			oneOf?: []
+			not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+			additionalProperties?: null | _
+			patternProperties?: {}
+			dependencies?: {}
+			additionalItems?: null | _
+			definitions?: {}
+			externalDocs?: null | {description?: string, url?: string}
+			example?: null | _
+			nullable?: bool
+		}
+	}
+	title?: string
+	$ref?: null | string
+	enum?: []
+	required?: []
+	items?: null | _
+	anyOf?: []
+	allOf?: []
+	oneOf?: []
+	not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+	additionalProperties?: null | _
+	patternProperties?: {}
+	dependencies?: {}
+	additionalItems?: null | _
+	definitions?: {}
+	externalDocs?: null | {description?: string, url?: string}
+	example?: null | _
+	nullable?: bool
+})
+-- out/todo.txt --
+v2 collapses `not?` fields within nested Schema structs to `(null){ null }`,
+while v3 expands them to the full `null | Schema` disjunction. This affects
+all `not?` occurrences inside `x.properties.*` and their nested structures.
 -- out/eval/stats --
 Leaks:  715
 Freed:  69
@@ -55,1704 +265,6 @@ Conjuncts:    797
 Disjuncts:    310
 
 NumCloseIDs: 21
--- out/evalalpha --
-(struct){
-  x: (struct){
-    properties: (struct){
-      disableSelfServiceScrape: (struct){
-        title?: (string){ string }
-        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-        enum?: (list){
-        }
-        required?: (list){
-        }
-        items?: (_){ |((null){ null }, (_){ _ }) }
-        anyOf?: (list){
-        }
-        allOf?: (list){
-        }
-        oneOf?: (list){
-        }
-        not?: ((null|struct)){ |((null){ null }, (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: (null){ null }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }) }
-        properties?: (struct){
-        }
-        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-        patternProperties?: (struct){
-        }
-        dependencies?: (struct){
-        }
-        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-        definitions?: (struct){
-        }
-        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-            description?: (string){ string }
-            url?: (string){ string }
-          }) }
-        example?: (_){ |((null){ null }, (_){ _ }) }
-        nullable?: (bool){ bool }
-      }
-      dnsConfig: (struct){
-        properties: (struct){
-          nameservers: (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: ((null|struct)){ |((null){ null }, (struct){
-                title?: (string){ string }
-                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                enum?: (list){
-                }
-                required?: (list){
-                }
-                items?: (_){ |((null){ null }, (_){ _ }) }
-                anyOf?: (list){
-                }
-                allOf?: (list){
-                }
-                oneOf?: (list){
-                }
-                not?: (null){ null }
-                properties?: (struct){
-                }
-                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                patternProperties?: (struct){
-                }
-                dependencies?: (struct){
-                }
-                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                definitions?: (struct){
-                }
-                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                    description?: (string){ string }
-                    url?: (string){ string }
-                  }) }
-                example?: (_){ |((null){ null }, (_){ _ }) }
-                nullable?: (bool){ bool }
-              }) }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }
-        }
-        title?: (string){ string }
-        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-        enum?: (list){
-        }
-        required?: (list){
-        }
-        items?: (_){ |((null){ null }, (_){ _ }) }
-        anyOf?: (list){
-        }
-        allOf?: (list){
-        }
-        oneOf?: (list){
-        }
-        not?: ((null|struct)){ |((null){ null }, (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: (null){ null }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }) }
-        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-        patternProperties?: (struct){
-        }
-        dependencies?: (struct){
-        }
-        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-        definitions?: (struct){
-        }
-        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-            description?: (string){ string }
-            url?: (string){ string }
-          }) }
-        example?: (_){ |((null){ null }, (_){ _ }) }
-        nullable?: (bool){ bool }
-      }
-      podDisruptionBudget: (struct){
-        properties: (struct){
-          maxUnavailable: (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: ((null|struct)){ |((null){ null }, (struct){
-                title?: (string){ string }
-                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                enum?: (list){
-                }
-                required?: (list){
-                }
-                items?: (_){ |((null){ null }, (_){ _ }) }
-                anyOf?: (list){
-                }
-                allOf?: (list){
-                }
-                oneOf?: (list){
-                }
-                not?: (null){ null }
-                properties?: (struct){
-                }
-                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                patternProperties?: (struct){
-                }
-                dependencies?: (struct){
-                }
-                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                definitions?: (struct){
-                }
-                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                    description?: (string){ string }
-                    url?: (string){ string }
-                  }) }
-                example?: (_){ |((null){ null }, (_){ _ }) }
-                nullable?: (bool){ bool }
-              }) }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }
-          minAvailable: (struct){
-            anyOf: (#list){
-              0: (struct){
-                title?: (string){ string }
-                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                enum?: (list){
-                }
-                required?: (list){
-                }
-                items?: (_){ |((null){ null }, (_){ _ }) }
-                anyOf?: (list){
-                }
-                allOf?: (list){
-                }
-                oneOf?: (list){
-                }
-                not?: ((null|struct)){ |((null){ null }, (struct){
-                    title?: (string){ string }
-                    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                    enum?: (list){
-                    }
-                    required?: (list){
-                    }
-                    items?: (_){ |((null){ null }, (_){ _ }) }
-                    anyOf?: (list){
-                    }
-                    allOf?: (list){
-                    }
-                    oneOf?: (list){
-                    }
-                    not?: (null){ null }
-                    properties?: (struct){
-                    }
-                    additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                    patternProperties?: (struct){
-                    }
-                    dependencies?: (struct){
-                    }
-                    additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                    definitions?: (struct){
-                    }
-                    externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                        description?: (string){ string }
-                        url?: (string){ string }
-                      }) }
-                    example?: (_){ |((null){ null }, (_){ _ }) }
-                    nullable?: (bool){ bool }
-                  }) }
-                properties?: (struct){
-                }
-                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                patternProperties?: (struct){
-                }
-                dependencies?: (struct){
-                }
-                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                definitions?: (struct){
-                }
-                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                    description?: (string){ string }
-                    url?: (string){ string }
-                  }) }
-                example?: (_){ |((null){ null }, (_){ _ }) }
-                nullable?: (bool){ bool }
-              }
-              1: (struct){
-                title?: (string){ string }
-                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                enum?: (list){
-                }
-                required?: (list){
-                }
-                items?: (_){ |((null){ null }, (_){ _ }) }
-                anyOf?: (list){
-                }
-                allOf?: (list){
-                }
-                oneOf?: (list){
-                }
-                not?: ((null|struct)){ |((null){ null }, (struct){
-                    title?: (string){ string }
-                    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                    enum?: (list){
-                    }
-                    required?: (list){
-                    }
-                    items?: (_){ |((null){ null }, (_){ _ }) }
-                    anyOf?: (list){
-                    }
-                    allOf?: (list){
-                    }
-                    oneOf?: (list){
-                    }
-                    not?: (null){ null }
-                    properties?: (struct){
-                    }
-                    additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                    patternProperties?: (struct){
-                    }
-                    dependencies?: (struct){
-                    }
-                    additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                    definitions?: (struct){
-                    }
-                    externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                        description?: (string){ string }
-                        url?: (string){ string }
-                      }) }
-                    example?: (_){ |((null){ null }, (_){ _ }) }
-                    nullable?: (bool){ bool }
-                  }) }
-                properties?: (struct){
-                }
-                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                patternProperties?: (struct){
-                }
-                dependencies?: (struct){
-                }
-                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                definitions?: (struct){
-                }
-                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                    description?: (string){ string }
-                    url?: (string){ string }
-                  }) }
-                example?: (_){ |((null){ null }, (_){ _ }) }
-                nullable?: (bool){ bool }
-              }
-            }
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: ((null|struct)){ |((null){ null }, (struct){
-                title?: (string){ string }
-                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                enum?: (list){
-                }
-                required?: (list){
-                }
-                items?: (_){ |((null){ null }, (_){ _ }) }
-                anyOf?: (list){
-                }
-                allOf?: (list){
-                }
-                oneOf?: (list){
-                }
-                not?: (null){ null }
-                properties?: (struct){
-                }
-                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                patternProperties?: (struct){
-                }
-                dependencies?: (struct){
-                }
-                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                definitions?: (struct){
-                }
-                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                    description?: (string){ string }
-                    url?: (string){ string }
-                  }) }
-                example?: (_){ |((null){ null }, (_){ _ }) }
-                nullable?: (bool){ bool }
-              }) }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }
-          labels: (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: ((null|struct)){ |((null){ null }, (struct){
-                title?: (string){ string }
-                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                enum?: (list){
-                }
-                required?: (list){
-                }
-                items?: (_){ |((null){ null }, (_){ _ }) }
-                anyOf?: (list){
-                }
-                allOf?: (list){
-                }
-                oneOf?: (list){
-                }
-                not?: (null){ null }
-                properties?: (struct){
-                }
-                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                patternProperties?: (struct){
-                }
-                dependencies?: (struct){
-                }
-                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                definitions?: (struct){
-                }
-                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                    description?: (string){ string }
-                    url?: (string){ string }
-                  }) }
-                example?: (_){ |((null){ null }, (_){ _ }) }
-                nullable?: (bool){ bool }
-              }) }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }
-        }
-        title?: (string){ string }
-        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-        enum?: (list){
-        }
-        required?: (list){
-        }
-        items?: (_){ |((null){ null }, (_){ _ }) }
-        anyOf?: (list){
-        }
-        allOf?: (list){
-        }
-        oneOf?: (list){
-        }
-        not?: ((null|struct)){ |((null){ null }, (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: (null){ null }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }) }
-        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-        patternProperties?: (struct){
-        }
-        dependencies?: (struct){
-        }
-        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-        definitions?: (struct){
-        }
-        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-            description?: (string){ string }
-            url?: (string){ string }
-          }) }
-        example?: (_){ |((null){ null }, (_){ _ }) }
-        nullable?: (bool){ bool }
-      }
-    }
-    title?: (string){ string }
-    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-    enum?: (list){
-    }
-    required?: (list){
-    }
-    items?: (_){ |((null){ null }, (_){ _ }) }
-    anyOf?: (list){
-    }
-    allOf?: (list){
-    }
-    oneOf?: (list){
-    }
-    not?: ((null|struct)){ |((null){ null }, (struct){
-        title?: (string){ string }
-        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-        enum?: (list){
-        }
-        required?: (list){
-        }
-        items?: (_){ |((null){ null }, (_){ _ }) }
-        anyOf?: (list){
-        }
-        allOf?: (list){
-        }
-        oneOf?: (list){
-        }
-        not?: ((null|struct)){ |((null){ null }, (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: (null){ null }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }) }
-        properties?: (struct){
-        }
-        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-        patternProperties?: (struct){
-        }
-        dependencies?: (struct){
-        }
-        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-        definitions?: (struct){
-        }
-        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-            description?: (string){ string }
-            url?: (string){ string }
-          }) }
-        example?: (_){ |((null){ null }, (_){ _ }) }
-        nullable?: (bool){ bool }
-      }) }
-    additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-    patternProperties?: (struct){
-    }
-    dependencies?: (struct){
-    }
-    additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-    definitions?: (struct){
-    }
-    externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-        description?: (string){ string }
-        url?: (string){ string }
-      }) }
-    example?: (_){ |((null){ null }, (_){ _ }) }
-    nullable?: (bool){ bool }
-  }
-  Schema: (struct){
-    title?: (string){ string }
-    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-    enum?: (list){
-    }
-    required?: (list){
-    }
-    items?: (_){ |((null){ null }, (_){ _ }) }
-    anyOf?: (list){
-    }
-    allOf?: (list){
-    }
-    oneOf?: (list){
-    }
-    not?: (null){ null }
-    properties?: (struct){
-    }
-    additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-    patternProperties?: (struct){
-    }
-    dependencies?: (struct){
-    }
-    additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-    definitions?: (struct){
-    }
-    externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-        description?: (string){ string }
-        url?: (string){ string }
-      }) }
-    example?: (_){ |((null){ null }, (_){ _ }) }
-    nullable?: (bool){ bool }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -15,7 +15,38 @@
-         }
-         oneOf?: (list){
-         }
--        not?: (null){ null }
-+        not?: ((null|struct)){ |((null){ null }, (struct){
-+            title?: (string){ string }
-+            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+            enum?: (list){
-+            }
-+            required?: (list){
-+            }
-+            items?: (_){ |((null){ null }, (_){ _ }) }
-+            anyOf?: (list){
-+            }
-+            allOf?: (list){
-+            }
-+            oneOf?: (list){
-+            }
-+            not?: (null){ null }
-+            properties?: (struct){
-+            }
-+            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+            patternProperties?: (struct){
-+            }
-+            dependencies?: (struct){
-+            }
-+            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+            definitions?: (struct){
-+            }
-+            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                description?: (string){ string }
-+                url?: (string){ string }
-+              }) }
-+            example?: (_){ |((null){ null }, (_){ _ }) }
-+            nullable?: (bool){ bool }
-+          }) }
-         properties?: (struct){
-         }
-         additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-@@ -49,39 +80,101 @@
-             }
-             oneOf?: (list){
-             }
--            not?: (null){ null }
--            properties?: (struct){
--            }
--            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
--            patternProperties?: (struct){
--            }
--            dependencies?: (struct){
--            }
--            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
--            definitions?: (struct){
--            }
--            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
--                description?: (string){ string }
--                url?: (string){ string }
--              }) }
--            example?: (_){ |((null){ null }, (_){ _ }) }
--            nullable?: (bool){ bool }
--          }
--        }
--        title?: (string){ string }
--        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
--        enum?: (list){
--        }
--        required?: (list){
--        }
--        items?: (_){ |((null){ null }, (_){ _ }) }
--        anyOf?: (list){
--        }
--        allOf?: (list){
--        }
--        oneOf?: (list){
--        }
--        not?: (null){ null }
-+            not?: ((null|struct)){ |((null){ null }, (struct){
-+                title?: (string){ string }
-+                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+                enum?: (list){
-+                }
-+                required?: (list){
-+                }
-+                items?: (_){ |((null){ null }, (_){ _ }) }
-+                anyOf?: (list){
-+                }
-+                allOf?: (list){
-+                }
-+                oneOf?: (list){
-+                }
-+                not?: (null){ null }
-+                properties?: (struct){
-+                }
-+                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+                patternProperties?: (struct){
-+                }
-+                dependencies?: (struct){
-+                }
-+                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+                definitions?: (struct){
-+                }
-+                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                    description?: (string){ string }
-+                    url?: (string){ string }
-+                  }) }
-+                example?: (_){ |((null){ null }, (_){ _ }) }
-+                nullable?: (bool){ bool }
-+              }) }
-+            properties?: (struct){
-+            }
-+            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+            patternProperties?: (struct){
-+            }
-+            dependencies?: (struct){
-+            }
-+            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+            definitions?: (struct){
-+            }
-+            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                description?: (string){ string }
-+                url?: (string){ string }
-+              }) }
-+            example?: (_){ |((null){ null }, (_){ _ }) }
-+            nullable?: (bool){ bool }
-+          }
-+        }
-+        title?: (string){ string }
-+        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+        enum?: (list){
-+        }
-+        required?: (list){
-+        }
-+        items?: (_){ |((null){ null }, (_){ _ }) }
-+        anyOf?: (list){
-+        }
-+        allOf?: (list){
-+        }
-+        oneOf?: (list){
-+        }
-+        not?: ((null|struct)){ |((null){ null }, (struct){
-+            title?: (string){ string }
-+            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+            enum?: (list){
-+            }
-+            required?: (list){
-+            }
-+            items?: (_){ |((null){ null }, (_){ _ }) }
-+            anyOf?: (list){
-+            }
-+            allOf?: (list){
-+            }
-+            oneOf?: (list){
-+            }
-+            not?: (null){ null }
-+            properties?: (struct){
-+            }
-+            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+            patternProperties?: (struct){
-+            }
-+            dependencies?: (struct){
-+            }
-+            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+            definitions?: (struct){
-+            }
-+            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                description?: (string){ string }
-+                url?: (string){ string }
-+              }) }
-+            example?: (_){ |((null){ null }, (_){ _ }) }
-+            nullable?: (bool){ bool }
-+          }) }
-         additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-         patternProperties?: (struct){
-         }
-@@ -113,7 +206,38 @@
-             }
-             oneOf?: (list){
-             }
--            not?: (null){ null }
-+            not?: ((null|struct)){ |((null){ null }, (struct){
-+                title?: (string){ string }
-+                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+                enum?: (list){
-+                }
-+                required?: (list){
-+                }
-+                items?: (_){ |((null){ null }, (_){ _ }) }
-+                anyOf?: (list){
-+                }
-+                allOf?: (list){
-+                }
-+                oneOf?: (list){
-+                }
-+                not?: (null){ null }
-+                properties?: (struct){
-+                }
-+                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+                patternProperties?: (struct){
-+                }
-+                dependencies?: (struct){
-+                }
-+                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+                definitions?: (struct){
-+                }
-+                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                    description?: (string){ string }
-+                    url?: (string){ string }
-+                  }) }
-+                example?: (_){ |((null){ null }, (_){ _ }) }
-+                nullable?: (bool){ bool }
-+              }) }
-             properties?: (struct){
-             }
-             additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-@@ -147,7 +271,38 @@
-                 }
-                 oneOf?: (list){
-                 }
--                not?: (null){ null }
-+                not?: ((null|struct)){ |((null){ null }, (struct){
-+                    title?: (string){ string }
-+                    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+                    enum?: (list){
-+                    }
-+                    required?: (list){
-+                    }
-+                    items?: (_){ |((null){ null }, (_){ _ }) }
-+                    anyOf?: (list){
-+                    }
-+                    allOf?: (list){
-+                    }
-+                    oneOf?: (list){
-+                    }
-+                    not?: (null){ null }
-+                    properties?: (struct){
-+                    }
-+                    additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+                    patternProperties?: (struct){
-+                    }
-+                    dependencies?: (struct){
-+                    }
-+                    additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+                    definitions?: (struct){
-+                    }
-+                    externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                        description?: (string){ string }
-+                        url?: (string){ string }
-+                      }) }
-+                    example?: (_){ |((null){ null }, (_){ _ }) }
-+                    nullable?: (bool){ bool }
-+                  }) }
-                 properties?: (struct){
-                 }
-                 additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-@@ -179,37 +334,99 @@
-                 }
-                 oneOf?: (list){
-                 }
--                not?: (null){ null }
--                properties?: (struct){
--                }
--                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
--                patternProperties?: (struct){
--                }
--                dependencies?: (struct){
--                }
--                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
--                definitions?: (struct){
--                }
--                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
--                    description?: (string){ string }
--                    url?: (string){ string }
--                  }) }
--                example?: (_){ |((null){ null }, (_){ _ }) }
--                nullable?: (bool){ bool }
--              }
--            }
--            title?: (string){ string }
--            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
--            enum?: (list){
--            }
--            required?: (list){
--            }
--            items?: (_){ |((null){ null }, (_){ _ }) }
--            allOf?: (list){
--            }
--            oneOf?: (list){
--            }
--            not?: (null){ null }
-+                not?: ((null|struct)){ |((null){ null }, (struct){
-+                    title?: (string){ string }
-+                    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+                    enum?: (list){
-+                    }
-+                    required?: (list){
-+                    }
-+                    items?: (_){ |((null){ null }, (_){ _ }) }
-+                    anyOf?: (list){
-+                    }
-+                    allOf?: (list){
-+                    }
-+                    oneOf?: (list){
-+                    }
-+                    not?: (null){ null }
-+                    properties?: (struct){
-+                    }
-+                    additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+                    patternProperties?: (struct){
-+                    }
-+                    dependencies?: (struct){
-+                    }
-+                    additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+                    definitions?: (struct){
-+                    }
-+                    externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                        description?: (string){ string }
-+                        url?: (string){ string }
-+                      }) }
-+                    example?: (_){ |((null){ null }, (_){ _ }) }
-+                    nullable?: (bool){ bool }
-+                  }) }
-+                properties?: (struct){
-+                }
-+                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+                patternProperties?: (struct){
-+                }
-+                dependencies?: (struct){
-+                }
-+                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+                definitions?: (struct){
-+                }
-+                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                    description?: (string){ string }
-+                    url?: (string){ string }
-+                  }) }
-+                example?: (_){ |((null){ null }, (_){ _ }) }
-+                nullable?: (bool){ bool }
-+              }
-+            }
-+            title?: (string){ string }
-+            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+            enum?: (list){
-+            }
-+            required?: (list){
-+            }
-+            items?: (_){ |((null){ null }, (_){ _ }) }
-+            allOf?: (list){
-+            }
-+            oneOf?: (list){
-+            }
-+            not?: ((null|struct)){ |((null){ null }, (struct){
-+                title?: (string){ string }
-+                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+                enum?: (list){
-+                }
-+                required?: (list){
-+                }
-+                items?: (_){ |((null){ null }, (_){ _ }) }
-+                anyOf?: (list){
-+                }
-+                allOf?: (list){
-+                }
-+                oneOf?: (list){
-+                }
-+                not?: (null){ null }
-+                properties?: (struct){
-+                }
-+                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+                patternProperties?: (struct){
-+                }
-+                dependencies?: (struct){
-+                }
-+                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+                definitions?: (struct){
-+                }
-+                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                    description?: (string){ string }
-+                    url?: (string){ string }
-+                  }) }
-+                example?: (_){ |((null){ null }, (_){ _ }) }
-+                nullable?: (bool){ bool }
-+              }) }
-             properties?: (struct){
-             }
-             additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-@@ -241,69 +458,193 @@
-             }
-             oneOf?: (list){
-             }
--            not?: (null){ null }
--            properties?: (struct){
--            }
--            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
--            patternProperties?: (struct){
--            }
--            dependencies?: (struct){
--            }
--            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
--            definitions?: (struct){
--            }
--            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
--                description?: (string){ string }
--                url?: (string){ string }
--              }) }
--            example?: (_){ |((null){ null }, (_){ _ }) }
--            nullable?: (bool){ bool }
--          }
--        }
--        title?: (string){ string }
--        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
--        enum?: (list){
--        }
--        required?: (list){
--        }
--        items?: (_){ |((null){ null }, (_){ _ }) }
--        anyOf?: (list){
--        }
--        allOf?: (list){
--        }
--        oneOf?: (list){
--        }
--        not?: (null){ null }
--        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
--        patternProperties?: (struct){
--        }
--        dependencies?: (struct){
--        }
--        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
--        definitions?: (struct){
--        }
--        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
--            description?: (string){ string }
--            url?: (string){ string }
--          }) }
--        example?: (_){ |((null){ null }, (_){ _ }) }
--        nullable?: (bool){ bool }
--      }
--    }
--    title?: (string){ string }
--    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
--    enum?: (list){
--    }
--    required?: (list){
--    }
--    items?: (_){ |((null){ null }, (_){ _ }) }
--    anyOf?: (list){
--    }
--    allOf?: (list){
--    }
--    oneOf?: (list){
--    }
--    not?: (null){ null }
-+            not?: ((null|struct)){ |((null){ null }, (struct){
-+                title?: (string){ string }
-+                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+                enum?: (list){
-+                }
-+                required?: (list){
-+                }
-+                items?: (_){ |((null){ null }, (_){ _ }) }
-+                anyOf?: (list){
-+                }
-+                allOf?: (list){
-+                }
-+                oneOf?: (list){
-+                }
-+                not?: (null){ null }
-+                properties?: (struct){
-+                }
-+                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+                patternProperties?: (struct){
-+                }
-+                dependencies?: (struct){
-+                }
-+                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+                definitions?: (struct){
-+                }
-+                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                    description?: (string){ string }
-+                    url?: (string){ string }
-+                  }) }
-+                example?: (_){ |((null){ null }, (_){ _ }) }
-+                nullable?: (bool){ bool }
-+              }) }
-+            properties?: (struct){
-+            }
-+            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+            patternProperties?: (struct){
-+            }
-+            dependencies?: (struct){
-+            }
-+            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+            definitions?: (struct){
-+            }
-+            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                description?: (string){ string }
-+                url?: (string){ string }
-+              }) }
-+            example?: (_){ |((null){ null }, (_){ _ }) }
-+            nullable?: (bool){ bool }
-+          }
-+        }
-+        title?: (string){ string }
-+        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+        enum?: (list){
-+        }
-+        required?: (list){
-+        }
-+        items?: (_){ |((null){ null }, (_){ _ }) }
-+        anyOf?: (list){
-+        }
-+        allOf?: (list){
-+        }
-+        oneOf?: (list){
-+        }
-+        not?: ((null|struct)){ |((null){ null }, (struct){
-+            title?: (string){ string }
-+            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+            enum?: (list){
-+            }
-+            required?: (list){
-+            }
-+            items?: (_){ |((null){ null }, (_){ _ }) }
-+            anyOf?: (list){
-+            }
-+            allOf?: (list){
-+            }
-+            oneOf?: (list){
-+            }
-+            not?: (null){ null }
-+            properties?: (struct){
-+            }
-+            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+            patternProperties?: (struct){
-+            }
-+            dependencies?: (struct){
-+            }
-+            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+            definitions?: (struct){
-+            }
-+            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                description?: (string){ string }
-+                url?: (string){ string }
-+              }) }
-+            example?: (_){ |((null){ null }, (_){ _ }) }
-+            nullable?: (bool){ bool }
-+          }) }
-+        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+        patternProperties?: (struct){
-+        }
-+        dependencies?: (struct){
-+        }
-+        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+        definitions?: (struct){
-+        }
-+        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+            description?: (string){ string }
-+            url?: (string){ string }
-+          }) }
-+        example?: (_){ |((null){ null }, (_){ _ }) }
-+        nullable?: (bool){ bool }
-+      }
-+    }
-+    title?: (string){ string }
-+    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+    enum?: (list){
-+    }
-+    required?: (list){
-+    }
-+    items?: (_){ |((null){ null }, (_){ _ }) }
-+    anyOf?: (list){
-+    }
-+    allOf?: (list){
-+    }
-+    oneOf?: (list){
-+    }
-+    not?: ((null|struct)){ |((null){ null }, (struct){
-+        title?: (string){ string }
-+        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+        enum?: (list){
-+        }
-+        required?: (list){
-+        }
-+        items?: (_){ |((null){ null }, (_){ _ }) }
-+        anyOf?: (list){
-+        }
-+        allOf?: (list){
-+        }
-+        oneOf?: (list){
-+        }
-+        not?: ((null|struct)){ |((null){ null }, (struct){
-+            title?: (string){ string }
-+            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-+            enum?: (list){
-+            }
-+            required?: (list){
-+            }
-+            items?: (_){ |((null){ null }, (_){ _ }) }
-+            anyOf?: (list){
-+            }
-+            allOf?: (list){
-+            }
-+            oneOf?: (list){
-+            }
-+            not?: (null){ null }
-+            properties?: (struct){
-+            }
-+            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+            patternProperties?: (struct){
-+            }
-+            dependencies?: (struct){
-+            }
-+            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+            definitions?: (struct){
-+            }
-+            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+                description?: (string){ string }
-+                url?: (string){ string }
-+              }) }
-+            example?: (_){ |((null){ null }, (_){ _ }) }
-+            nullable?: (bool){ bool }
-+          }) }
-+        properties?: (struct){
-+        }
-+        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-+        patternProperties?: (struct){
-+        }
-+        dependencies?: (struct){
-+        }
-+        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-+        definitions?: (struct){
-+        }
-+        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-+            description?: (string){ string }
-+            url?: (string){ string }
-+          }) }
-+        example?: (_){ |((null){ null }, (_){ _ }) }
-+        nullable?: (bool){ bool }
-+      }) }
-     additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-     patternProperties?: (struct){
-     }
--- out/eval --
-(struct){
-  x: (struct){
-    properties: (struct){
-      disableSelfServiceScrape: (struct){
-        title?: (string){ string }
-        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-        enum?: (list){
-        }
-        required?: (list){
-        }
-        items?: (_){ |((null){ null }, (_){ _ }) }
-        anyOf?: (list){
-        }
-        allOf?: (list){
-        }
-        oneOf?: (list){
-        }
-        not?: (null){ null }
-        properties?: (struct){
-        }
-        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-        patternProperties?: (struct){
-        }
-        dependencies?: (struct){
-        }
-        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-        definitions?: (struct){
-        }
-        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-            description?: (string){ string }
-            url?: (string){ string }
-          }) }
-        example?: (_){ |((null){ null }, (_){ _ }) }
-        nullable?: (bool){ bool }
-      }
-      dnsConfig: (struct){
-        properties: (struct){
-          nameservers: (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: (null){ null }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }
-        }
-        title?: (string){ string }
-        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-        enum?: (list){
-        }
-        required?: (list){
-        }
-        items?: (_){ |((null){ null }, (_){ _ }) }
-        anyOf?: (list){
-        }
-        allOf?: (list){
-        }
-        oneOf?: (list){
-        }
-        not?: (null){ null }
-        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-        patternProperties?: (struct){
-        }
-        dependencies?: (struct){
-        }
-        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-        definitions?: (struct){
-        }
-        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-            description?: (string){ string }
-            url?: (string){ string }
-          }) }
-        example?: (_){ |((null){ null }, (_){ _ }) }
-        nullable?: (bool){ bool }
-      }
-      podDisruptionBudget: (struct){
-        properties: (struct){
-          maxUnavailable: (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: (null){ null }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }
-          minAvailable: (struct){
-            anyOf: (#list){
-              0: (struct){
-                title?: (string){ string }
-                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                enum?: (list){
-                }
-                required?: (list){
-                }
-                items?: (_){ |((null){ null }, (_){ _ }) }
-                anyOf?: (list){
-                }
-                allOf?: (list){
-                }
-                oneOf?: (list){
-                }
-                not?: (null){ null }
-                properties?: (struct){
-                }
-                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                patternProperties?: (struct){
-                }
-                dependencies?: (struct){
-                }
-                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                definitions?: (struct){
-                }
-                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                    description?: (string){ string }
-                    url?: (string){ string }
-                  }) }
-                example?: (_){ |((null){ null }, (_){ _ }) }
-                nullable?: (bool){ bool }
-              }
-              1: (struct){
-                title?: (string){ string }
-                $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-                enum?: (list){
-                }
-                required?: (list){
-                }
-                items?: (_){ |((null){ null }, (_){ _ }) }
-                anyOf?: (list){
-                }
-                allOf?: (list){
-                }
-                oneOf?: (list){
-                }
-                not?: (null){ null }
-                properties?: (struct){
-                }
-                additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-                patternProperties?: (struct){
-                }
-                dependencies?: (struct){
-                }
-                additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-                definitions?: (struct){
-                }
-                externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                    description?: (string){ string }
-                    url?: (string){ string }
-                  }) }
-                example?: (_){ |((null){ null }, (_){ _ }) }
-                nullable?: (bool){ bool }
-              }
-            }
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: (null){ null }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }
-          labels: (struct){
-            title?: (string){ string }
-            $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-            enum?: (list){
-            }
-            required?: (list){
-            }
-            items?: (_){ |((null){ null }, (_){ _ }) }
-            anyOf?: (list){
-            }
-            allOf?: (list){
-            }
-            oneOf?: (list){
-            }
-            not?: (null){ null }
-            properties?: (struct){
-            }
-            additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-            patternProperties?: (struct){
-            }
-            dependencies?: (struct){
-            }
-            additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-            definitions?: (struct){
-            }
-            externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-                description?: (string){ string }
-                url?: (string){ string }
-              }) }
-            example?: (_){ |((null){ null }, (_){ _ }) }
-            nullable?: (bool){ bool }
-          }
-        }
-        title?: (string){ string }
-        $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-        enum?: (list){
-        }
-        required?: (list){
-        }
-        items?: (_){ |((null){ null }, (_){ _ }) }
-        anyOf?: (list){
-        }
-        allOf?: (list){
-        }
-        oneOf?: (list){
-        }
-        not?: (null){ null }
-        additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-        patternProperties?: (struct){
-        }
-        dependencies?: (struct){
-        }
-        additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-        definitions?: (struct){
-        }
-        externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-            description?: (string){ string }
-            url?: (string){ string }
-          }) }
-        example?: (_){ |((null){ null }, (_){ _ }) }
-        nullable?: (bool){ bool }
-      }
-    }
-    title?: (string){ string }
-    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-    enum?: (list){
-    }
-    required?: (list){
-    }
-    items?: (_){ |((null){ null }, (_){ _ }) }
-    anyOf?: (list){
-    }
-    allOf?: (list){
-    }
-    oneOf?: (list){
-    }
-    not?: (null){ null }
-    additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-    patternProperties?: (struct){
-    }
-    dependencies?: (struct){
-    }
-    additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-    definitions?: (struct){
-    }
-    externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-        description?: (string){ string }
-        url?: (string){ string }
-      }) }
-    example?: (_){ |((null){ null }, (_){ _ }) }
-    nullable?: (bool){ bool }
-  }
-  Schema: (struct){
-    title?: (string){ string }
-    $ref?: ((null|string)){ |((null){ null }, (string){ string }) }
-    enum?: (list){
-    }
-    required?: (list){
-    }
-    items?: (_){ |((null){ null }, (_){ _ }) }
-    anyOf?: (list){
-    }
-    allOf?: (list){
-    }
-    oneOf?: (list){
-    }
-    not?: (null){ null }
-    properties?: (struct){
-    }
-    additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
-    patternProperties?: (struct){
-    }
-    dependencies?: (struct){
-    }
-    additionalItems?: (_){ |((null){ null }, (_){ _ }) }
-    definitions?: (struct){
-    }
-    externalDocs?: ((null|struct)){ |((null){ null }, (struct){
-        description?: (string){ string }
-        url?: (string){ string }
-      }) }
-    example?: (_){ |((null){ null }, (_){ _ }) }
-    nullable?: (bool){ bool }
-  }
-}
 -- out/compile --
 --- in.cue
 {

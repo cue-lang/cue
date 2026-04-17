@@ -152,11 +152,19 @@ func runUpdateTest(t *testing.T, filePath string) {
 	})
 
 	// --- Plain run on update output ---
-	// When update changed the source, run the updated files as a fresh test to
-	// verify the update output is itself a passing test. This replaces the need
-	// for separate *_run.txtar files that duplicate the update output as input.
-	updateOutputPasses := updateIdentical // trivially true when nothing changed
-	if !updateIdentical {
+	// When update changed source (non-out/) files, run the updated files as a
+	// fresh test to verify the update output is itself a passing test. This
+	// replaces the need for separate *_run.txtar files that duplicate the
+	// update output as input.
+	//
+	// We only check source files here because changes to out/ sections (e.g.
+	// auto-creation of out/errors.txt) are documentary and do not affect
+	// @test assertion behavior. If only out/ sections changed, the assertions
+	// are unchanged from before update, so the plain run would produce the
+	// same result as the original run — no new failures are possible.
+	updateSourceIdentical := txtarSourceFileDiff(inputArchive, update1) == ""
+	updateOutputPasses := updateIdentical || updateSourceIdentical
+	if !updateSourceIdentical {
 		capUR := &cuetxtar.FailCapture{TB: t}
 		withUpdateMode(false, false, func() {
 			runner := cuetxtar.NewInlineRunnerCapture(t, nil, cloneTxtarArchive(update1), t.TempDir(), capUR)
@@ -396,6 +404,36 @@ func compareTxtarSections(t *testing.T, ar *txtar.Archive, prefix string, src *t
 			t.Errorf("%s: %s%s: in testdata but not produced by runner", hint, prefix, name)
 		}
 	}
+}
+
+// txtarSourceFileDiff returns a human-readable diff of non-out/ files between
+// a and b. Returns "" if all source files are identical. Changes to out/
+// sections are ignored since they are documentary and do not affect @test
+// assertion behavior.
+func txtarSourceFileDiff(a, b *txtar.Archive) string {
+	aMap := make(map[string]string)
+	for _, f := range a.Files {
+		if !strings.HasPrefix(f.Name, "out/") {
+			aMap[f.Name] = string(f.Data)
+		}
+	}
+	var diffs []string
+	for _, f := range b.Files {
+		if strings.HasPrefix(f.Name, "out/") {
+			continue
+		}
+		ac, ok := aMap[f.Name]
+		if !ok {
+			diffs = append(diffs, fmt.Sprintf("file %s: only in second archive", f.Name))
+		} else if ac != string(f.Data) {
+			diffs = append(diffs, fmt.Sprintf("file %s: differs", f.Name))
+		}
+		delete(aMap, f.Name)
+	}
+	for name := range aMap {
+		diffs = append(diffs, fmt.Sprintf("file %s: only in first archive", name))
+	}
+	return strings.Join(diffs, "\n")
 }
 
 // txtarFileDiff returns a human-readable description of file-by-file differences

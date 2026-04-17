@@ -165,6 +165,20 @@ issue3801: nonRooted: full: {
 		#Base: {val0: string, value: string}
 	})
 }
+-- out/errors.txt --
+[incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+    ./nested.cue:58:25
+    ./nested.cue:54:12
+[incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
+    ./nested.cue:72:24
+[incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
+    ./nested.cue:72:24
+    ./nested.cue:70:15
+[incomplete] issue3801.nonRooted.full.#Output.output: key value of dynamic field must be concrete, found string:
+    ./nested.cue:138:12
+    ./nested.cue:135:15
+[incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
+    ./nested.cue:138:12
 -- out/eval/stats --
 Leaks:  40
 Freed:  200

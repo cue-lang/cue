@@ -6,6 +6,13 @@ d: _|_ != b.a           @test(eq, false)
 e: _|_ == _|_           @test(eq, true)
 f: ({} & false) == _|_  @test(eq, true)
 g: _|_ != ({} & false)  @test(eq, false)
+-- out/errors.txt --
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:1:4
+explicit error (_|_ literal) in source:
+    ./in.cue:1:10
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:2:11
 -- out/compile --
 --- in.cue
 {

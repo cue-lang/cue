@@ -35,7 +35,7 @@ cyclicalInsertInDisjunction: {
 		// resolve x to a concrete value. As `x` is defined outside the
 		// disjunction, and the disjunction cannot be resolved without it, `x`
 		// cannot be evaluated to a concrete value, resulting in an error.
-		@test(permute)
+		@test(permute, count=6)
 		x: c.e
 		c: d: x
 		c: {d: 1, e: 2} | {d : 2, e: 2}
@@ -47,8 +47,7 @@ cyclicalInsertInDisjunction: {
 		// be disambiguated as a result of computing x. This means c.e cannot
 		// be concrete at the time of evaluation.
 		// NOTE: not so obvious. It clearly works, and arguably it should.
-		@test(permute)
-		@test(permuteCount, 6)
+		@test(permute, count=6)
 		x: div(c.e, 2)
 		c: d: x
 		c: {d: 1, e: 2} | {d : 2, e: 3}
@@ -57,12 +56,12 @@ cyclicalInsertInDisjunction: {
 	err3: {
 		// Here it is clear that d will not disambiguate the disjunction at c.
 		// So c.e. cannot be resolved.
-		@test(permute)
+		@test(permute, count=6)
 		x: c.e @test(err, code=incomplete, contains="unresolved disjunction", pos=[0:6])
 		c: d: 1 | 2 | x
 		c: {d: 1, e: 2} | {d : 2, e: 3}
 		@test(eq, {
-			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction", pos=[55:6])
+			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction", pos=[54:6])
 			c: {d: 1, e: 2} | {d: 2, e: 3}
 		})
 	}
@@ -72,7 +71,7 @@ cyclicalInsertInDisjunction: {
 		err1: {x: 2, c: {d: 2, e: 2}}
 		err2: {x: 1, c: {d: 1, e: 2}}
 		err3: {
-			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct)", pos=[55:6])
+			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct)", pos=[54:6])
 			c: {d: 1, e: 2} | {d: 2, e: 3}
 		}
 	})
@@ -174,19 +173,19 @@ panic1: {
 }
 -- out/errors.txt --
 [incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
-    ./in.cue:55:6
+    ./in.cue:54:6
 [incomplete] issue4251_notC.#NotC._must: non-concrete value string in operand to !=:
-    ./in.cue:105:17
-    ./in.cue:103:11
-    ./in.cue:104:3
+    ./in.cue:104:17
+    ./in.cue:102:11
+    ./in.cue:103:3
 [incomplete] issue4251_notB.#NotB._must: non-concrete value string in operand to !=:
-    ./in.cue:116:17
-    ./in.cue:114:11
-    ./in.cue:115:3
+    ./in.cue:115:17
+    ./in.cue:113:11
+    ./in.cue:114:3
 [incomplete] issue4251_notB_reversed.#NotB._must: non-concrete value string in operand to !=:
-    ./in.cue:126:17
-    ./in.cue:124:11
-    ./in.cue:125:3
+    ./in.cue:125:17
+    ./in.cue:123:11
+    ./in.cue:124:3
 -- out/eval/stats --
 Leaks:  24
 Freed:  175

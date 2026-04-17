@@ -788,8 +788,6 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 		// @test(todo) is handled at the loop level in runInline; no-op here.
 	case "permute":
 		// Handled by permute-group collection in runInline; no-op here.
-	case "permuteCount":
-		// Handled by checkPermuteCount after permutations run; no-op here.
 	case "shareID":
 		// @test(shareID=name) annotations appear on fields within @test(eq, {...})
 		// bodies; sharing is verified by runShareIDChecks in runInline — no-op here.

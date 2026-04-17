@@ -209,8 +209,7 @@ brokenRing: t1: {
 	}
 	p2: {
 		// TODO(eval): fix permute or eval: error messages differ based on path in the two cases.
-		// @test(permute)
-		// @test(permuteCount, 2)
+		// @test(permute, count=2)
 		T: b: D
 		D: a?: T
 		@test(eq, {

@@ -10,7 +10,7 @@ t1: {
 	)
 }
 t2: {
-	@test(permute)
+	@test(permute, count=2)
 	d: d.a
 	d: a: a: 2|1
 	@test(err, code=eval, contains="empty disjunction",
@@ -19,7 +19,7 @@ t2: {
 	)
 }
 t3: {
-	@test(permute)
+	@test(permute, count=6)
 	b: a
 	b: (1|2) | 2
 	a: 1 | 2

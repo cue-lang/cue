@@ -303,47 +303,23 @@ permuteStruct: {
     x: y + 1 @test(permute)
     y: 2     @test(permute)
     @test(eq, {x: 3, y: 2})
-    @test(permuteCount, 2)
 }
 
 // Decl attribute form: permute all fields in the struct.
+// The optional count=N option asserts the number of permutations (N!).
+// count= (empty) is a fill-in placeholder auto-updated by CUE_UPDATE=1.
 permuteStruct: {
-    @test(permute)
+    @test(permute, count=6)
     a: b + c
     b: 1
     c: 2
     @test(eq, {a: 3, b: 1, c: 2})
-    @test(permuteCount, 6)
 }
 ```
 
-### `permuteCount` — verify permutation count
-
-```cue
-permuteStruct: {
-    a: b + c @test(permute)
-    b: 1     @test(permute)
-    c: 2     @test(permute)
-    @test(eq, {a: 3, b: 1, c: 2})
-    @test(permuteCount, 6)
-}
-```
-
-Placed alongside `@test(permute)` in the same struct, asserts the count for
-that permutation group.  May also be placed at the test-root level to assert
-the **total** count across all groups within the root:
-
-```cue
-concretePermute: {
-    x: { @test(permute); alpha: 1, beta: 2, gamma: 3 }
-    y: { @test(permute); alpha: 1, beta: 2, gamma: 3 }
-    @test(eq, {x: {alpha: 1, beta: 2, gamma: 3}, y: {alpha: 1, beta: 2, gamma: 3}})
-    @test(permuteCount, 12) // 2 structs × 3! = 12
-}
-```
-
-`@test(permuteCount)` (no argument) is a fill-in placeholder.  Auto-updated
-by `CUE_UPDATE=1`; `CUE_UPDATE=force` overwrites an existing non-empty count.
+The `count=N` option is supported only in the **decl attribute form** (where
+`@test(permute)` is a standalone declaration inside the struct, not a field
+attribute). `CUE_UPDATE=1` inserts or updates the count automatically.
 
 ### `todo` — expected-to-fail wrapper
 

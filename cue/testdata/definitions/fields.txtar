@@ -224,7 +224,7 @@ ok: t14: {
 // either allow for an error variant that only "allows" all fields but does not
 // define them as optional top, or rethink the closedness model altogether.
 err: t1: {
-	@test(permute)
+	@test(permute, count=6)
 	#D: _ & {a: 2}
 	a: #D
 	a: disallowed: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])

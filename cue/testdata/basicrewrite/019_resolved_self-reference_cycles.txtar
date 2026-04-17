@@ -4,12 +4,11 @@
 # mutual struct cycles with two (nodes.t2) and three (nodes.t3) participants.
 -- in.cue --
 math: {
-	@test(permute)
+	@test(permute, count=6)
 	a: b - 100
 	b: a + 100
 	b: 200
 	@test(eq, {a: 100, b: 200})
-	@test(permuteCount, 6)
 }
 
 a: 100 @test(eq, 100)
@@ -28,20 +27,18 @@ nodes: t1: p1: s1: s1 & {a: 1} @test(eq, {a: 1})
 nodes: t1: p2: s1: {a: 1} & s1 @test(eq, {a: 1})
 // nodes.t2: two-node mutual cycle; field order must not affect the result.
 nodes: t2: {
-	@test(permute)
+	@test(permute, count=2)
 	s1: s2 & {a: 1}
 	s2: s1 & {b: 2}
 	@test(eq, {s1: {a: 1, b: 2}, s2: {b: 2, a: 1}})
-	@test(permuteCount, 2)
 }
 // nodes.t3: three-node mutual cycle; all 6 orderings must yield equal results.
 nodes: t3: {
-	@test(permute)
+	@test(permute, count=6)
 	s1: s2 & {a: 1}
 	s2: s3 & {b: 2}
 	s3: s1 & {c: 3}
 	@test(eq, {s1: {a: 1, b: 2, c: 3}, s2: {b: 2, c: 3, a: 1}, s3: {c: 3, a: 1, b: 2}})
-	@test(permuteCount, 6)
 }
 
 -- out/eval/stats --

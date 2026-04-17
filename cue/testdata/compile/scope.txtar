@@ -40,12 +40,12 @@ let B = {open: int}
 f: B @test(eq, {open: int})
 
 schema: {
-	next: _schema_1 @test(err, code=structural cycle)
+	next: _schema_1 @test(err, code=structural_cycle)
 }
 
 let _schema_1 = schema
 -- out/errors.txt --
-[structural cycle] schema.next: structural cycle
+[structural_cycle] schema.next: structural cycle
 -- out/compile --
 --- in.cue
 {

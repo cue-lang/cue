@@ -3,7 +3,7 @@ import "list"
 
 a1: {
 	f: [f]
-	@test(err, code=structural cycle, path=f.0, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=f.0, contains="structural cycle", pos=[])
 }
 
 a2: {
@@ -13,7 +13,7 @@ a2: {
 
 a3: {
 	f: {g: f}
-	@test(err, code=structural cycle, path=f.g, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=f.g, contains="structural cycle", pos=[])
 }
 
 a4: {
@@ -82,7 +82,7 @@ b4: cond1: {
 			[y]
 		}
 	}
-	@test(err, code=structural cycle, path=x.y.0, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=x.y.0, contains="structural cycle", pos=[])
 }
 
 // This reports a structural cycle at b4.cond2.b, because the value it refers
@@ -100,7 +100,7 @@ b4: cond2: {
 		}
 	}
 	b: x.y & { _z: false, [1] }
-	@test(err, code=structural cycle, path=x.y.0, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=x.y.0, contains="structural cycle", pos=[])
 }
 
 b5: {
@@ -246,9 +246,9 @@ b12b: {
 		if tail != null {
 			sum: tail.sum
 		}
-	} @test(err, code=structural cycle, path=tail, contains="structural cycle", pos=[])
+	} @test(err, code=structural_cycle, path=tail, contains="structural cycle", pos=[])
 
-	list1: #list  @test(err, code=structural cycle, path=b12b.#list.tail, contains="structural cycle", pos=[])
+	list1: #list  @test(err, code=structural_cycle, path=b12b.#list.tail, contains="structural cycle", pos=[])
 	list1: {
 		tail: {
 			tail: {
@@ -260,7 +260,7 @@ b12b: {
 // Issue #587
 b13: {
 	root: a: [for x in root {x}]
-	@test(err, code=structural cycle, path=root.a.0.0, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=root.a.0.0, contains="structural cycle", pos=[])
 }
 
 // Issue #587
@@ -276,7 +276,7 @@ b14: {
 
 		b: [for x in root {x}]
 	}
-	@test(err, code=structural cycle, path=root.b.1.1, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=root.b.1.1, contains="structural cycle", pos=[])
 }
 
 // This is okay
@@ -316,7 +316,7 @@ p2: {
 		a: one: link: a: two: {}
 	}
 	@test(eq, {one: {link: {a: {two: {}}}}}, at=a.a)
-	@test(err, code=structural cycle, path=#T.a.b.link, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=#T.a.b.link, contains="structural cycle", pos=[])
 }
 
 // Issue #502 -- or added later.
@@ -328,11 +328,11 @@ p3: {
 	#U: {
 		#S
 		#T: a: b: {}
-	} @test(err, code=structural cycle, path=#T.a.b.link, contains="structural cycle", pos=[])
+	} @test(err, code=structural_cycle, path=#T.a.b.link, contains="structural cycle", pos=[])
 
 	a: #U.#T & {
 		a: one: link: a: two: {}
-	} @test(err, code=structural cycle, path=p3.#U.#T.a.b.link, contains="structural cycle", pos=[])
+	} @test(err, code=structural_cycle, path=p3.#U.#T.a.b.link, contains="structural cycle", pos=[])
 }
 
 // Issue #502 -- unused bulk constraints are not cyclic
@@ -360,7 +360,7 @@ p5: {
 	a: #T & {
 		a: [{link: a: [{}]}]
 	}
-	@test(err, code=structural cycle, path=#T.a.0.link, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=#T.a.0.link, contains="structural cycle", pos=[])
 	@test(eq, [{link: {a: [{}]}}], at=a.a)
 }
 
@@ -373,11 +373,11 @@ p6: {
 	#U: {
 		#S
 		#T: a: [{}]
-	} @test(err, code=structural cycle, path=#T.a.0.link, contains="structural cycle", pos=[])
+	} @test(err, code=structural_cycle, path=#T.a.0.link, contains="structural cycle", pos=[])
 
 	a: #U.#T & {
 		a: [{link: a: [{}]}]
-	} @test(err, code=structural cycle, path=p6.#U.#T.a.0.link, contains="structural cycle", pos=[])
+	} @test(err, code=structural_cycle, path=p6.#U.#T.a.0.link, contains="structural cycle", pos=[])
 }
 
 c1: {
@@ -385,15 +385,15 @@ c1: {
 		b: {}
 		c: a & b
 	}
-	@test(err, code=structural cycle, path=a.c.c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=a.c.c, contains="structural cycle", pos=[])
 }
 
 // indirection
 d1: {
 	a: b: c: d: {h: int, t: r}
-	@test(err, at=a.b.c.d.t, code=structural cycle, path=d1.r, contains="structural cycle", pos=[])
+	@test(err, at=a.b.c.d.t, code=structural_cycle, path=d1.r, contains="structural cycle", pos=[])
 
-	r: a.b @test(err, code=structural cycle, contains="structural cycle", pos=[])
+	r: a.b @test(err, code=structural_cycle, contains="structural cycle", pos=[])
 
 	x: a.b.c
 
@@ -416,8 +416,8 @@ d3: {
 		i:        int | *1
 	}
 	x: config & {i: 0}
-	@test(err, at=x.indirect, code=structural cycle, contains="structural cycle", pos=[])
-	@test(err, at=x.a.b.c, code=structural cycle, contains="structural cycle", pos=[])
+	@test(err, at=x.indirect, code=structural_cycle, contains="structural cycle", pos=[])
+	@test(err, at=x.a.b.c, code=structural_cycle, contains="structural cycle", pos=[])
 	@test(eq, at=config, {
 		a: {b: {c: null}}
 		indirect: null
@@ -449,7 +449,7 @@ shortPathFail: elipsis: {
 	t2: {
 		Foo: ref:  Foo
 		Foo: {...}
-		@test(err, code=structural cycle, at=Foo.ref, contains="structural cycle", pos=[])
+		@test(err, code=structural_cycle, at=Foo.ref, contains="structural cycle", pos=[])
 	}
 }
 
@@ -460,7 +460,7 @@ shortPathFail: elipsis: {
 patternFail: issue2374: {
 	r=[string]: {b: r}
 	a: {r: 0}
-	@test(err, code=structural cycle, at=a.b, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=a.b, contains="structural cycle", pos=[])
 }
 
 shortPathFail: comprehension: {
@@ -475,7 +475,7 @@ shortPathFail: comprehension: {
 withLetFail: {
 	schema: next:  _schema_1
 	let _schema_1 = schema
-	@test(err, code=structural cycle, at=schema.next, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=schema.next, contains="structural cycle", pos=[])
 }
 
 // Issue #3310: `list.Sum` called with a comprehension iterating over the
@@ -489,7 +489,7 @@ fieldsSumInfinite: issue3310: {
 	sprite:       1.00
 
 	total: list.Sum([for _, v in issue3310 {v}])
-	@test(err, code=structural cycle, at=total, contains="error in call to %s", args=[list.Sum], pos=[5:9])
+	@test(err, code=structural_cycle, at=total, contains="error in call to %s", args=[list.Sum], pos=[5:9])
 }
 
 listOptOK: {
@@ -501,7 +501,7 @@ listOptOK: {
 	@test(eq, {
 		list: {
 			head: int
-			tail?: _|_ @test(err, code=structural cycle, contains="list.tail: structural cycle", pos=[])
+			tail?: _|_ @test(err, code=structural_cycle, contains="list.tail: structural cycle", pos=[])
 		}
 		a: {
 			head: 3
@@ -509,7 +509,7 @@ listOptOK: {
 				head: 2
 				tail?: {
 					head: int
-					tail?: _|_ @test(err, code=structural cycle, contains="list.tail: structural cycle", pos=[])
+					tail?: _|_ @test(err, code=structural_cycle, contains="list.tail: structural cycle", pos=[])
 				}
 			}
 		}
@@ -526,7 +526,7 @@ issue2545: {
 	#B: {
 		A: #A
 	}
-	@test(err, code="structural cycle",
+	@test(err, code=structural_cycle,
 		hint="the comment says this should succeed since the optional field breaks the cycle, but it still errors in both v2 and v3")
 	@test(eq:todo, {
 		#A: {B?: _ @test(ignore)}
@@ -541,8 +541,8 @@ e1: {
 
 	b: c: b
 	b: b
-	@test(err, code=structural cycle, at=a.c, contains="structural cycle", pos=[])
-	@test(err, code=structural cycle, at=b.c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=a.c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=b.c, contains="structural cycle", pos=[])
 }
 
 e2: {
@@ -551,13 +551,13 @@ e2: {
 
 	b: c: b
 	b: {b}
-	@test(err, code=structural cycle, at=a.c, contains="structural cycle", pos=[])
-	@test(err, code=structural cycle, at=b.c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=a.c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=b.c, contains="structural cycle", pos=[])
 }
 
 e3: {
 	a: [a]  @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[[a], {c:a}, list, struct], pos=[0:5, 1:5])
-	a: c: a @test(err, code=structural cycle, contains="structural cycle", pos=[])
+	a: c: a @test(err, code=structural_cycle, contains="structural cycle", pos=[])
 
 	b: [b] @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[[b], {c:b}, list, struct], pos=[0:5, 1:5])
 	b: c: b
@@ -703,7 +703,7 @@ z1: {
 		g: f
 	}
 	z: x & y
-	@test(err, code=structural cycle, path=z.g, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=z.g, contains="structural cycle", pos=[])
 }
 
 // Cross references. Here there is no cycle, but the repeated instantiations
@@ -834,69 +834,69 @@ n4: {
 // TODO(eval): notice the difference, not a huge deal, but still.
 resolveToAncestor: {
 	t1: X: {
-		a: b.a   @test(eq, _) @test(err:todo, code=structural cycle)
-		b: X     @test(err, code=structural cycle, contains="structural cycle", pos=[])
+		a: b.a   @test(eq, _) @test(err:todo, code=structural_cycle)
+		b: X     @test(err, code=structural_cycle, contains="structural cycle", pos=[])
 	}
 	t2: X: {
-		b: X    @test(err, code=structural cycle, contains="structural cycle", pos=[])
-		a: b.a  @test(err, code=structural cycle, path=resolveToAncestor.t2.X.b, contains="structural cycle", pos=[])
+		b: X    @test(err, code=structural_cycle, contains="structural cycle", pos=[])
+		a: b.a  @test(err, code=structural_cycle, path=resolveToAncestor.t2.X.b, contains="structural cycle", pos=[])
 	}
 }
 -- out/errors.txt --
-[structural cycle] resolveToAncestor.t1.X.b: structural cycle
-[structural cycle] resolveToAncestor.t2.X.b: structural cycle
-[structural cycle] resolveToAncestor.t2.X.b: structural cycle
-[structural cycle] a1.f.0: structural cycle
-[structural cycle] a3.f.g: structural cycle
+[structural_cycle] resolveToAncestor.t1.X.b: structural cycle
+[structural_cycle] resolveToAncestor.t2.X.b: structural cycle
+[structural_cycle] resolveToAncestor.t2.X.b: structural cycle
+[structural_cycle] a1.f.0: structural cycle
+[structural_cycle] a3.f.g: structural cycle
 [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
     ./in.cue:69:5
     ./in.cue:69:12
     ./in.cue:70:8
     ./in.cue:70:9
-[structural cycle] b4.x.y.0: structural cycle
-[structural cycle] b4.cond1.x.y.0: structural cycle
-[structural cycle] b4.cond2.x.y.0: structural cycle
-[structural cycle] b4.cond2.x.y.0: structural cycle
+[structural_cycle] b4.x.y.0: structural cycle
+[structural_cycle] b4.cond1.x.y.0: structural cycle
+[structural_cycle] b4.cond2.x.y.0: structural cycle
+[structural_cycle] b4.cond2.x.y.0: structural cycle
 [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
     ./in.cue:112:5
     ./in.cue:112:13
     ./in.cue:112:14
     ./in.cue:113:9
-[structural cycle] b6.x.a.0: structural cycle
+[structural_cycle] b6.x.a.0: structural cycle
 [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
     ./in.cue:119:5
     ./in.cue:119:11
     ./in.cue:120:5
     ./in.cue:120:6
-[structural cycle] b7.a.0: structural cycle
-[structural cycle] b12b.#list.tail: structural cycle
-[structural cycle] b12b.#list.tail: structural cycle
-[structural cycle] b13.root.a.0.0: structural cycle
-[structural cycle] b14.root.b.1.1: structural cycle
-[structural cycle] p2.#T.a.b.link: structural cycle
-[structural cycle] p3.#U.#T.a.b.link: structural cycle
-[structural cycle] p3.#U.#T.a.b.link: structural cycle
-[structural cycle] p5.#T.a.0.link: structural cycle
-[structural cycle] p6.#U.#T.a.0.link: structural cycle
-[structural cycle] p6.#U.#T.a.0.link: structural cycle
-[structural cycle] c1.a.c.c: structural cycle
-[structural cycle] d1.r: structural cycle
-[structural cycle] d1.r: structural cycle
-[structural cycle] d1.r: structural cycle
-[structural cycle] d2.a.b.c.d.t: structural cycle
-[structural cycle] d3.x.indirect: structural cycle
-[structural cycle] d3.x.indirect: structural cycle
-[structural cycle] shortPathFail.elipsis.t2.Foo.ref: structural cycle
-[structural cycle] patternFail.issue2374.a.b: structural cycle
-[structural cycle] withLetFail.schema.next: structural cycle
-[structural cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
+[structural_cycle] b7.a.0: structural cycle
+[structural_cycle] b12b.#list.tail: structural cycle
+[structural_cycle] b12b.#list.tail: structural cycle
+[structural_cycle] b13.root.a.0.0: structural cycle
+[structural_cycle] b14.root.b.1.1: structural cycle
+[structural_cycle] p2.#T.a.b.link: structural cycle
+[structural_cycle] p3.#U.#T.a.b.link: structural cycle
+[structural_cycle] p3.#U.#T.a.b.link: structural cycle
+[structural_cycle] p5.#T.a.0.link: structural cycle
+[structural_cycle] p6.#U.#T.a.0.link: structural cycle
+[structural_cycle] p6.#U.#T.a.0.link: structural cycle
+[structural_cycle] c1.a.c.c: structural cycle
+[structural_cycle] d1.r: structural cycle
+[structural_cycle] d1.r: structural cycle
+[structural_cycle] d1.r: structural cycle
+[structural_cycle] d2.a.b.c.d.t: structural cycle
+[structural_cycle] d3.x.indirect: structural cycle
+[structural_cycle] d3.x.indirect: structural cycle
+[structural_cycle] shortPathFail.elipsis.t2.Foo.ref: structural cycle
+[structural_cycle] patternFail.issue2374.a.b: structural cycle
+[structural_cycle] withLetFail.schema.next: structural cycle
+[structural_cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
     ./in.cue:490:9
-[structural cycle] listOptOK.list.tail: structural cycle
-[structural cycle] issue2545.#B.A: structural cycle
-[structural cycle] e1.a.c: structural cycle
-[structural cycle] e1.b.c: structural cycle
-[structural cycle] e2.a.c: structural cycle
-[structural cycle] e2.b.c: structural cycle
+[structural_cycle] listOptOK.list.tail: structural cycle
+[structural_cycle] issue2545.#B.A: structural cycle
+[structural_cycle] e1.a.c: structural cycle
+[structural_cycle] e1.b.c: structural cycle
+[structural_cycle] e2.a.c: structural cycle
+[structural_cycle] e2.b.c: structural cycle
 [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
     ./in.cue:558:5
     ./in.cue:559:5
@@ -945,8 +945,8 @@ nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and 
     ./in.cue:599:11
 nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
     ./in.cue:599:6
-[structural cycle] z1.z.g: structural cycle
-[structural cycle] z1.z.g: structural cycle
+[structural_cycle] z1.z.g: structural cycle
+[structural_cycle] z1.z.g: structural cycle
 [incomplete] crossRefNoCycle.t5.T.y: undefined field: x:
     ./in.cue:785:8
 -- out/todo.txt --

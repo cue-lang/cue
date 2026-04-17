@@ -16,13 +16,13 @@ expr: error2: {
 listConcat: error1: {
 	a: ["1", "2"]
 	a: list.Concat([a, ["3"]])
-	@test(err, code=structural cycle, path=a, contains="error in call to %s", args=[list.Concat], pos=[2:5])
+	@test(err, code=structural_cycle, path=a, contains="error in call to %s", args=[list.Concat], pos=[2:5])
 }
 
 listConcat: error2: {
 	a: list.Concat([["3"], a])
 	a: ["1", "2"]
-	@test(err, code=structural cycle, path=a, contains="error in call to %s", args=[list.Concat], pos=[1:5])
+	@test(err, code=structural_cycle, path=a, contains="error in call to %s", args=[list.Concat], pos=[1:5])
 }
 
 selfEmbed: ok1: {
@@ -363,9 +363,9 @@ issue4125: t2_alias: X={
 [eval] expr.error2.a: conflicting values 4 and 3:
     ./in.cue:11:5
     ./in.cue:12:5
-[structural cycle] listConcat.error1.a: error in call to list.Concat: structural cycle:
+[structural_cycle] listConcat.error1.a: error in call to list.Concat: structural cycle:
     ./in.cue:17:5
-[structural cycle] listConcat.error2.a: error in call to list.Concat: structural cycle:
+[structural_cycle] listConcat.error2.a: error in call to list.Concat: structural cycle:
     ./in.cue:22:5
 -- out/todo.txt --
 listConcat.error1/error2.a: v2 shows list elements inside structural cycle error, v3 shows proper error message.

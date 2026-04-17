@@ -134,8 +134,8 @@ noCyclePattern: t6: {
 noCancelSelfInvoke: t1: {
 	y: [string]: b: y
 	x: y
-	x: c: x @test(err, at=b.b, code=structural cycle) @test(err, at=c, code=structural cycle)
-	@test(err, code=structural cycle)
+	x: c: x @test(err, at=b.b, code=structural_cycle) @test(err, at=c, code=structural_cycle)
+	@test(err, code=structural_cycle)
 }
 
 
@@ -150,7 +150,7 @@ selfTriggerCycle: t1: {
 	a: #T @test(shareID=T)
 	#T: {
 		[string]: #T
-		b: {} @test(err, at=b, code=structural cycle)
+		b: {} @test(err, at=b, code=structural_cycle)
 	} @test(shareID=T)
 }
 
@@ -159,7 +159,7 @@ selfTriggerCycle: t2: {
 		a: X
 	}
 	b: #T
-	b: c: {} @test(err, at=a, code=structural cycle)
+	b: c: {} @test(err, at=a, code=structural_cycle)
 }
 
 selfTriggerCycle: long1: {
@@ -168,7 +168,7 @@ selfTriggerCycle: long1: {
 	// triggered.
 	a: [string]: b: a     // -> record conjunct from pattern per field.
 	a: c: b: c: b: c: {}  // -> track if any of the fields is not a cycle.
-	@test(err, at=a.c.b.c.b.c.b, code=structural cycle)
+	@test(err, at=a.c.b.c.b.c.b, code=structural_cycle)
 }
 
 // TODO: see comment at selfTriggerCycle.t1
@@ -180,10 +180,10 @@ selfTriggerCycle: issue1503: {
 		a: [string]: link: #T
 		a: b: {}
 	}
-	@test(err, at=#T.a.b.link, code=structural cycle)
-	@test(err, at=a.a.b.link, code=structural cycle)
-	@test(err, at=a.a.one.link.a.b.link, code=structural cycle)
-	@test(err, at=a.a.one.link.a.two.link, code=structural cycle)
+	@test(err, at=#T.a.b.link, code=structural_cycle)
+	@test(err, at=a.a.b.link, code=structural_cycle)
+	@test(err, at=a.a.one.link.a.b.link, code=structural_cycle)
+	@test(err, at=a.a.one.link.a.two.link, code=structural_cycle)
 }
 
 mutuallyTriggeringCycle: t1: {
@@ -193,7 +193,7 @@ mutuallyTriggeringCycle: t1: {
 	y: [string]: b: y
 	x: y
 	x: c: y
-	@test(err, at=x.c.b.b.b.b.b, code=structural cycle)
+	@test(err, at=x.c.b.b.b.b.b, code=structural_cycle)
 }
 -- ring.cue --
 brokenRing: t1: {
@@ -204,7 +204,7 @@ brokenRing: t1: {
 	p1: {
 		D: a?: T
 		T: b: D
-		@test(err, code=structural cycle)
+		@test(err, code=structural_cycle)
 	 	// @test(debug)
 	}
 	p2: {
@@ -215,11 +215,11 @@ brokenRing: t1: {
 		@test(eq, {
 			T: {
 				b: {
-					a?: _|_ @test(err, code=structural cycle, contains="structural cycle", pos=[])
+					a?: _|_ @test(err, code=structural_cycle, contains="structural cycle", pos=[])
 				}
 			}
 			D: {
-				a?: _|_ @test(err, code=structural cycle, contains="structural cycle", pos=[])
+				a?: _|_ @test(err, code=structural_cycle, contains="structural cycle", pos=[])
 			}
 		})
 	}
@@ -240,8 +240,8 @@ brokenRing: t2: p2: {
 cyclicRing: t1: {
 	D: a: T
 	T: b: D
-	@test(err, at=T.b, code=structural cycle)
-	@test(err, at=D.a.b, code=structural cycle)
+	@test(err, at=T.b, code=structural_cycle)
+	@test(err, at=D.a.b, code=structural_cycle)
 	// TODO(inline): fix shareID here.
 	// @test(shareID=T, at=D.a)
 	// @test(shareID=T, at=T)
@@ -289,16 +289,16 @@ issue3509: {
 	})
 }
 -- out/errors.txt --
-[structural cycle] noCancelSelfInvoke.t1.x.c.b.b: structural cycle
-[structural cycle] noCancelSelfInvoke.t1.x.c.c: structural cycle
-[structural cycle] selfTriggerCycle.t1.#T.b.b: structural cycle
-[structural cycle] selfTriggerCycle.t2.b.c.a: structural cycle
-[structural cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
-[structural cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
-[structural cycle] mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
-[structural cycle] brokenRing.t1.p1.T.b: structural cycle
-[structural cycle] brokenRing.t1.p2.D.a: structural cycle
-[structural cycle] cyclicRing.t1.T.b: structural cycle
+[structural_cycle] noCancelSelfInvoke.t1.x.c.b.b: structural cycle
+[structural_cycle] noCancelSelfInvoke.t1.x.c.c: structural cycle
+[structural_cycle] selfTriggerCycle.t1.#T.b.b: structural cycle
+[structural_cycle] selfTriggerCycle.t2.b.c.a: structural cycle
+[structural_cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+[structural_cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
+[structural_cycle] mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
+[structural_cycle] brokenRing.t1.p1.T.b: structural cycle
+[structural_cycle] brokenRing.t1.p2.D.a: structural cycle
+[structural_cycle] cyclicRing.t1.T.b: structural cycle
 -- out/todo.txt --
 v2/v3 differences: structural cycle detection depth differs slightly, resulting in
 different error path locations (e.g. noCancelSelfInvoke.t1.x.c.b.b in v3 vs

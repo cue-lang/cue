@@ -152,7 +152,7 @@ Result:
 (_|_){
   // [eval]
   let _globalScope#1 = (_|_){
-    // [structural cycle] _globalScope: structural cycle
+    // [structural_cycle] _globalScope: structural cycle
   }
   #export: (#struct){
     #entries: (list){

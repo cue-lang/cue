@@ -199,7 +199,7 @@ Result:
   }
   withLet: (struct){
     let X#1 = (_|_){
-      // [structural cycle] withLet.X: structural cycle
+      // [structural_cycle] withLet.X: structural cycle
     }
     foo: (int){ 1 }
     bar: (struct){

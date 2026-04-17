@@ -63,7 +63,7 @@ const (
 	// cycles are permanent errors, but they are not passed up recursively,
 	// as a unification of a value with a structural cycle with one that
 	// doesn't may still give a useful result.
-	StructuralCycleError // structural cycle
+	StructuralCycleError // structural_cycle
 
 	// IncompleteError means an evaluation could not complete because of
 	// insufficient information that may still be added later.

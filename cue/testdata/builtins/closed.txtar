@@ -155,7 +155,7 @@ nestedWithSelfReference: t1: {
 		foo?: _schema
 	}) @test(shareID=S)
 	// TODO(inline): make work for hidden fields.
-	// @test(err, at=_schema.foo, code="structural cycle")
+	// @test(err, at=_schema.foo, code=structural_cycle)
 	// @test(shareID=S, at=x.foo.foo)
 
 	x: {_schema}
@@ -166,7 +166,7 @@ nestedWithSelfReference: t2: {
 		foo?: _schema
 	})
 	// TODO(inline): make work for hidden fields.
-	// @test(err, at=foo, code="structural cycle")
+	// @test(err, at=foo, code=structural_cycle)
 	x: {{_schema}}
 	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
@@ -194,10 +194,10 @@ MaxRedirect:         2
     ./embed.cue:25:10
 [eval] unified.t2.x.foo.disallowed: field not allowed:
     ./embed.cue:29:10
-[structural cycle] nestedWithSelfReference.t1._schema.foo: structural cycle
+[structural_cycle] nestedWithSelfReference.t1._schema.foo: structural cycle
 [eval] nestedWithSelfReference.t1.x.foo.disallowed: field not allowed:
     ./embed.cue:40:10
-[structural cycle] nestedWithSelfReference.t2._schema.foo: structural cycle
+[structural_cycle] nestedWithSelfReference.t2._schema.foo: structural cycle
 [eval] nestedWithSelfReference.t2.x.foo.disallowed: field not allowed:
     ./embed.cue:49:10
 [eval] b.x: field not allowed:

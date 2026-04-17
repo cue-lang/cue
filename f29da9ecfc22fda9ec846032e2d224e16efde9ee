@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de0f3b7c_3cb77b88",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T10:00:09Z",
+      "side": 1,
+      "message": "duplicate",
+      "revId": "f29da9ecfc22fda9ec846032e2d224e16efde9ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59fbca09_f0d935d6",
+        "filename": "cue/testdata/cycle/compbottom.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T10:00:09Z",
+      "side": 1,
+      "message": "nit: I would try to join these attributes if possible",
+      "revId": "f29da9ecfc22fda9ec846032e2d224e16efde9ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "517cfd33_cde45068",
+        "filename": "cue/testdata/cycle/compbottom.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T10:00:09Z",
+      "side": 1,
+      "message": "what\u0027s the point of an empty errors.txt? I would almost want this to be a failure",
+      "revId": "f29da9ecfc22fda9ec846032e2d224e16efde9ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cc3be68_5f83a5c5",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-17T10:00:09Z",
+      "side": 1,
+      "message": "I would try to be careful to use the past tense for cases which work as expected today, e.g. \"emitted output\" to clarify that it was an old evaluator version which misbehaved.",
+      "range": {
+        "startLine": 458,
+        "startChar": 29,
+        "endLine": 458,
+        "endChar": 34
+      },
+      "revId": "f29da9ecfc22fda9ec846032e2d224e16efde9ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

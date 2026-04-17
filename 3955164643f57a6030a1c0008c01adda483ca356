@@ -34,6 +34,24 @@
       "parentUuid": "d4cb0f1a_1adecfc8",
       "revId": "3955164643f57a6030a1c0008c01adda483ca356",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b32c3f6a_31e1dc30",
+        "filename": "cue/testdata/basicrewrite/007_strings_and_bytes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-17T16:07:29Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "e3adae1c_1cc1a7fc",
+      "revId": "3955164643f57a6030a1c0008c01adda483ca356",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

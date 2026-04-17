@@ -1,0 +1,32 @@
+# Test that cue plugin init-go generates a skeleton file with helpful
+# comments when no eligible exported functions are found.
+
+exec cue plugin init-go
+
+cmp mypkg.cue want.cue
+
+-- want.cue --
+@extern(go)
+
+package mypkg
+
+// No eligible exported functions were found in this package.
+// Add @go() declarations here manually. For example:
+//   MyFunc: _ @go()
+-- cue.mod/module.cue --
+module: "test.example/mypkg@v0"
+language: version: "v0.17.0"
+-- go.mod --
+module test.example/mypkg
+
+go 1.22
+-- funcs.go --
+package mypkg
+
+// unexported is not eligible.
+func unexported(s string) string {
+	return s
+}
+
+// MyType is not a function.
+type MyType struct{}

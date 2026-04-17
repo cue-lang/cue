@@ -185,7 +185,6 @@ issue3591: missing: {
 		_input: {A: {p: "A"}, B: {p: "B"}}
 	})
 }
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  54
 Freed:  139

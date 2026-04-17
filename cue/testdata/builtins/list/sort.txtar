@@ -2,7 +2,6 @@
 import "list"
 
 a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y}) @test(eq, [1, 2, 3, 4])
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  15

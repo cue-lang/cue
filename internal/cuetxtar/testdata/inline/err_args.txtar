@@ -7,5 +7,15 @@ wrongArgs: 1 & "s" @test(err, args=[WRONG])
 -- out/run/errors.txt --
 path wrongArgs: @test(err, args=...): args: expected "WRONG" in Msg() args, got [1 "s" int string]
 -- out/status.txt --
-update: identical to input
+update: output passes run
 force:  identical to update
+-- out/update/test.cue --
+rightArgs: 1 & "s" @test(err, args=[int])
+wrongArgs: 1 & "s" @test(err, args=[WRONG])
+-- out/update/out/errors.txt --
+[eval] rightArgs: conflicting values 1 and "s" (mismatched types int and string):
+    ./test.cue:1:12
+    ./test.cue:1:16
+[eval] wrongArgs: conflicting values 1 and "s" (mismatched types int and string):
+    ./test.cue:2:12
+    ./test.cue:2:16

@@ -72,3 +72,20 @@ w: {
 -- out/status.txt --
 update: output passes run
 force:  identical to update
+-- out/update/out/errors.txt --
+[eval] x: conflicting values 200 and 100:
+    ./test.cue:1:4
+    ./test.cue:1:10
+[eval] y.b: conflicting values 200 and 100:
+    ./test.cue:4:5
+    ./test.cue:4:11
+[eval] z.c: conflicting values "foo" and int (mismatched types string and int):
+    ./test.cue:8:5
+    ./test.cue:9:5
+    ./test.cue:9:9
+[eval] w.a: conflicting values 200 and 100:
+    ./test.cue:21:5
+    ./test.cue:21:11
+[eval] w.b: conflicting values 200 and 100:
+    ./test.cue:22:5
+    ./test.cue:22:11

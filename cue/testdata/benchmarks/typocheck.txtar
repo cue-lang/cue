@@ -24,6 +24,9 @@ _input: {
 _checkB1:  out.B1  @test(eq, "name1")
 _checkB50: out.B50 @test(eq, "name50")
 _checkB99: out.B99 @test(eq, "name99")
+-- out/errors.txt --
+[incomplete] #Output: cannot range over #input (incomplete type _):
+    ./in.cue:15:17
 -- out/eval/stats --
 Leaks:  0
 Freed:  700

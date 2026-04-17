@@ -70,7 +70,6 @@ import "list"
 	from: #c1
 	@test(eq, {do: "f2", from: {_, #c: []}})
 }
--- out/errors.txt --
 -- out/todo.txt --
 Field ordering differs between v2 and v3 in #d1.#c.0 and #d2.#c.0:
 v3 puts `as` before `do`, while v2 puts `do` before `as`.

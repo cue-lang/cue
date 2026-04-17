@@ -13,6 +13,10 @@ b1: {
 	d: "s" + c @test(err, code=incomplete)
 	c: string
 }
+-- out/errors.txt --
+[incomplete] b1.d: non-concrete value string in operand to +:
+    ./in.cue:10:5
+    ./in.cue:11:5
 -- out/compile --
 --- in.cue
 {

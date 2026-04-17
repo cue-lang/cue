@@ -1169,7 +1169,6 @@ Disjuncts:    1302
 Notifications: 4
 
 NumCloseIDs: 323
--- out/errors.txt --
 -- out/todo.txt --
 issue2685: only evaluated by v3 evaluator.
 -- out/compile --

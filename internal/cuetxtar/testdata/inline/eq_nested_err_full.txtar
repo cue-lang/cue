@@ -19,3 +19,7 @@ c: a & {
 	b: 100
 	d: a.b + 3
 } @test(eq, {b: 100, d: _|_ @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[4:5, 1:8])})
+-- out/update/out/errors.txt --
+[incomplete] c.d: non-concrete value int in operand to +:
+    ./test.cue:4:5
+    ./test.cue:1:8

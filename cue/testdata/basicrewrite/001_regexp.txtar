@@ -24,6 +24,19 @@ e2: "foo" !~ true  @test(err, code=eval,
         contains="cannot use true", pos=[0:5, 0:14])
 e3: !="a" & <5     @test(err, code=eval,
         contains="conflicting values", pos=[0:5, 0:13])
+-- out/errors.txt --
+[eval] b3: invalid value "foo" (out of bound =~"[a-z]{4}"):
+    ./in.cue:10:5
+    ./in.cue:11:5
+[eval] e1: cannot use 1 (type int) as type (string|bytes):
+    ./in.cue:20:5
+    ./in.cue:20:14
+[eval] e2: cannot use true (type bool) as type (string|bytes):
+    ./in.cue:22:5
+    ./in.cue:22:14
+[eval] e3: conflicting values !="a" and <5 (mismatched types string and number):
+    ./in.cue:24:5
+    ./in.cue:24:13
 -- out/compile --
 --- in.cue
 {

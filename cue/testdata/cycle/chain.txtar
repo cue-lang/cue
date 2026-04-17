@@ -496,7 +496,6 @@ issue2052: full: {
 		}
 	})
 }
--- out/errors.txt --
 -- out/todo.txt --
 chain.t2.p2 produces an incomplete error in v2 (cycle error referencing X)
 but succeeds in v3. issue2052.reduced.t1 and t2 show structure sharing

@@ -30,7 +30,6 @@ issue574: {
 		message2: ["how are you doing?", "bye"]
 	})
 }
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  24

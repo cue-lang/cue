@@ -8,7 +8,6 @@ x: _
 	#D: b: _
 	b: _
 })
--- out/errors.txt --
 -- out/eval/stats --
 Leaks:  0
 Freed:  5

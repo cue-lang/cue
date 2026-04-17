@@ -31,5 +31,51 @@ w: {
 	})
 }
 -- out/status.txt --
-update: identical to input
+update: output passes run
 force:  identical to update
+-- out/update/test.cue --
+x: 100 & 200 @test(err, code=eval, pos=[0:4, 0:10])
+
+y: {
+	b: 100 & 200 @test(err, code=eval, pos=[0:5, 0:11])
+}
+
+z: {
+	b: int
+	c: b & "foo"
+
+	@test(eq, {
+		b: int
+		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:9])
+	})
+}
+
+
+// w tests two wrong pos= specs inside the same @test(eq, {...}), requiring
+// both nested rewrites to be merged before the outer attribute is written back.
+w: {
+	a: 100 & 200
+	b: 100 & 200
+
+	@test(eq, {
+		a: _|_ @test(err, code=eval, pos=[21:5, 21:11])
+		b: _|_ @test(err, code=eval, pos=[22:5, 22:11])
+	})
+}
+-- out/update/out/errors.txt --
+[eval] x: conflicting values 200 and 100:
+    ./test.cue:1:4
+    ./test.cue:1:10
+[eval] y.b: conflicting values 200 and 100:
+    ./test.cue:4:5
+    ./test.cue:4:11
+[eval] z.c: conflicting values "foo" and int (mismatched types string and int):
+    ./test.cue:8:5
+    ./test.cue:9:5
+    ./test.cue:9:9
+[eval] w.a: conflicting values 200 and 100:
+    ./test.cue:21:5
+    ./test.cue:21:11
+[eval] w.b: conflicting values 200 and 100:
+    ./test.cue:22:5
+    ./test.cue:22:11

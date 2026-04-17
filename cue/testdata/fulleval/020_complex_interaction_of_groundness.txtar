@@ -11,6 +11,11 @@ a: b: c: d: string
 		s: _|_ @test(err, code=incomplete, pos=[4:34, 4:23, 5:13])
 	}
 })
+-- out/errors.txt --
+[incomplete] a.b.c.s: non-concrete value string in operand to +:
+    ./in.cue:4:34
+    ./in.cue:4:23
+    ./in.cue:5:13
 -- out/compile --
 --- in.cue
 {

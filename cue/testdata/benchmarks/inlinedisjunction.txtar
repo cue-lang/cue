@@ -1,4 +1,3 @@
-#todo:inline: skip — performance benchmark, not a functional test
 -- in.cue --
 #def: {
     {} | {c: string}
@@ -14,24 +13,11 @@
 }
 x: #def
 x: c: "foo"
--- out/evalalpha --
-(struct){
-  #def: (#struct){ |((#struct){
-    }, (#struct){
-      a: (string){ string }
-    }, (#struct){
-      c: (string){ string }
-    }, (#struct){
-      c: (string){ string }
-      a: (string){ string }
-    }) }
-  x: (#struct){ |((#struct){
-      c: (string){ "foo" }
-    }, (#struct){
-      c: (string){ "foo" }
-      a: (string){ string }
-    }) }
-}
+
+@test(eq, {
+	#def: {} | {a: string} | {c: string} | {c: string, a: string}
+	x: {c: "foo"} | {c: "foo", a: string}
+})
 -- out/eval/stats --
 Leaks:  0
 Freed:  112

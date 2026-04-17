@@ -1,17 +1,5 @@
 // Triggering recomputation of disjunctions on each branch results
 // in exponential run time. Ensure this does not happen.
-#todo:inline: skip — performance benchmark, not a functional test
--- stats.txt --
-Leaks:  0
-Freed:  82
-Reused: 74
-Allocs: 8
-Retain: 0
-
-Unifications: 4
-Conjuncts:    143
-Disjuncts:    82
-
 -- in.cue --
 x: a0: {}
 x: [_]: f: *1 | int
@@ -35,7 +23,10 @@ x: [_]: f: *1 | int
 x: [_]: f: *1 | int
 x: [_]: f: *1 | int
 
-x: a0: {}
+x: {
+	a0: {}
+	@test(eq, {a0: {f: *1 | int}})
+}
 -- out/compile --
 --- in.cue
 {
@@ -156,11 +147,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    143
 Disjuncts:    78
--- out/evalalpha --
-(struct){
-  x: (struct){
-    a0: (struct){
-      f: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-  }
-}

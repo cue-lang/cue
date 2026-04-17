@@ -1,6 +1,5 @@
 // TODO: make special benchmark test that tests repeated lines more accurately
 // and and automatically.
-#todo:inline: skip — performance benchmark, not a functional test
 -- in.cue --
 // Should linearly increase with each repeated line.
 // automatically.
@@ -13,7 +12,8 @@ pat: {[string]: 1} | {a: 2} // 67  conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 78  conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 89  conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 100 conjuncts (+11)
-pat: {[string]: 1} | {a: 2} // 111 conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 111 conjuncts (+11) @test(leq, {} | {a: 2})
+@test(eq, {} | {a: 2}, at=pat)
 
 // This also should grow linearly per repeated line.
 // Indicated
@@ -23,7 +23,8 @@ list: [1] | [2] | [3] | [4] // 85  conjuncts; 36  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 118 conjuncts; 52  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 151 conjuncts; 68  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 184 conjuncts; 84  disjuncts (+33; +16)
-list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16) @test(leq, [1] | [2] | [3] | [4])
+@test(eq, [1] | [2] | [3] | [4], at=list)
 
 issue3610: {
 	// Ensure disjuncts are disambiguated. The string field here is a reference
@@ -38,6 +39,16 @@ issue3610: {
 	#a: <"a" | >"b" | string // conjuncts 403  disjuncts 390 (+92; +90)
 	#a: <"a" | >"b" | string // conjuncts 495  disjuncts 480 (+92; +90)
 }
+@test(eq, at=issue3610, {
+	<"a"
+	#a: <"a" | >"b" | string
+} | {
+	>"b"
+	#a: <"a" | >"b" | string
+} | {
+	string
+	#a: <"a" | >"b" | string
+})
 
 -- out/eval/stats --
 Leaks:  0
@@ -52,32 +63,6 @@ Disjuncts:    618
 Notifications: 1
 
 NumCloseIDs: 3
--- out/evalalpha --
-(struct){
-  pat: (struct){ |((struct){
-    }, (struct){
-      a: (int){ 2 }
-    }) }
-  list: (list){ |((#list){
-      0: (int){ 1 }
-    }, (#list){
-      0: (int){ 2 }
-    }, (#list){
-      0: (int){ 3 }
-    }, (#list){
-      0: (int){ 4 }
-    }) }
-  issue3610: (string){ |((string){
-      <"a"
-      #a: (string){ |((string){ <"a" }, (string){ >"b" }, (string){ string }) }
-    }, (string){
-      >"b"
-      #a: (string){ |((string){ <"a" }, (string){ >"b" }, (string){ string }) }
-    }, (string){
-      string
-      #a: (string){ |((string){ <"a" }, (string){ >"b" }, (string){ string }) }
-    }) }
-}
 -- out/compile --
 --- in.cue
 {

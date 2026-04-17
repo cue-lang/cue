@@ -1,29 +1,20 @@
-#Issue: 1940
-#todo:inline: skip — performance benchmark, not a functional test
--- stats.txt --
-Leaks:  0
-Freed:  447
-Reused: 439
-Allocs: 8
-Retain: 0
-
-Unifications: 287
-Conjuncts:    894
-Disjuncts:    447
-
+# Tests that a recursive list-typed disjunction (#T) shared across multiple
+# fields does not cause exponential blowup. x and y both reference #T and
+# should share the same vertex rather than being independently expanded.
+# https://cuelang.org/issue/1940
 -- in.cue --
 #T:
 	["a", #T] |
 	["b", #T] |
 	["c", #T] |
-	["d", ...#T]
+	["d", ...#T] @test(shareID=T)
 
-x: #T
-y: #T
-z: #T
-v: #T
+x: #T @test(shareID=T)
+y: #T @test(shareID=T)
+z: #T @test(shareID=T)
+v: #T @test(shareID=T)
 
-#X: x
+#X: x @test(shareID=T)
 #X: y
 #X: z
 #X: v
@@ -54,19 +45,6 @@ v: #T
   #X: 〈0;v〉
   #X: 〈0;#T〉
 }
--- out/evalalpha --
-(struct){
-  #T: (list){
-    0: (string){ "d" }
-  }
-  x: ~(#T)
-  y: ~(#T)
-  z: ~(#T)
-  v: ~(#T)
-  #X: ~(#T)
-}
--- diff/explanation --
-Differences fully due to rendered structure sharing.
 -- out/eval/stats --
 Leaks:  2
 Freed:  16

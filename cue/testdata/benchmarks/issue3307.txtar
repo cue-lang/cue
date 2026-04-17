@@ -1,5 +1,9 @@
-#todo:inline: skip — performance benchmark, not a functional test
+# Tests that a large `if` guard on an incomplete bool does not trigger
+# O(n) work per field inside the conditional block. Each field in the
+# guarded struct should not independently re-evaluate the condition.
+# https://cuelang.org/issue/3307
 -- in.cue --
+@test(err, code=incomplete, contains="incomplete bool")
 if _request.enabled {
     r1: {
         k1: 0
@@ -23,6 +27,8 @@ if _request.enabled {
 }
 
 _request: enabled: _
+-- out/errors.txt --
+[incomplete] incomplete bool: _
 -- out/eval/stats --
 Leaks:  18
 Freed:  3
@@ -35,13 +41,6 @@ Conjuncts:    21
 Disjuncts:    0
 
 NumCloseIDs: 1
--- out/evalalpha --
-(_|_){
-  // [incomplete] incomplete bool: _
-  _request: (struct){
-    enabled: (_){ _ }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -1,28 +1,37 @@
-# CLAUDE.md
+# CUE
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Common guidance
 
-## Project Overview
+Use the cueckoo MCP server's `guidance` tool to get the latest common
+guidance for CUE project repos. The server is registered as the
+`cueckoo` MCP server (via `cueckoo mcp`). Follow all instructions
+returned by the `guidance` tool. See https://github.com/cue-lang/contrib-tools
+for more information on `cueckoo` and related tooling.
 
-This is the CUE language repository. CUE (Configure, Unify, Execute) is a general-purpose, strongly typed constraint-based language for data templating, validation, code generation, and scripting.
+## Project-specific instructions
 
-## Common Development Commands
+This is the CUE language repository. CUE (Configure, Unify, Execute) is a
+general-purpose, strongly typed constraint-based language for data
+templating, validation, code generation, and scripting.
 
-### Running the "cue" command
+Module: `cuelang.org/go`. Requires Go 1.25 or later.
+
+### Common development commands
+
+#### Running the "cue" command
 
 ```bash
 # Build and run ./cmd/cue via a cached binary
 go tool cue
 
-# Or build and install it in $PATH.
+# Or build and install it in $PATH
 go install ./cmd/cue
 ```
 
-### Testing
+#### Testing
 
 ```bash
-# Run all tests
-# Any change to the repo should run all tests to ensure correctness.
+# Run all tests. Any change to the repo should run all tests to ensure correctness.
 go test ./...
 
 # Run tests for a specific package
@@ -41,22 +50,17 @@ CUE_UPDATE=1 go test ./...
 go test -race ./...
 ```
 
-### Code Quality
+#### Code quality
 
 ```bash
-# Run go vet (catches common mistakes)
 go vet ./...
-
-# Run staticcheck (more comprehensive static analysis)
 go tool -modfile=internal/tools.mod staticcheck ./...
-
-# Format code (CUE uses standard Go formatting)
 go fmt ./...
 ```
 
-## Code Architecture
+### Code architecture
 
-### Core Language Implementation
+#### Core language implementation
 - `/cue/` - Core CUE language implementation
   - `ast/` - Abstract Syntax Tree
   - `parser/` - Language parser
@@ -68,23 +72,21 @@ go fmt ./...
   - `dep/` - Dependency analysis
   - `export/` - Export functionality
 
-### Command-Line Tool
+#### Command-line tool
 - `/cmd/cue/` - CLI implementation for all CUE commands (eval, export, import, fmt, vet, mod, etc.)
 
-### Standard Library
+#### Standard library
 - `/pkg/` - Built-in packages (crypto, encoding, math, net, path, strings, etc.)
 
-### Format Support
+#### Format support
 - `/encoding/` - Encoders/decoders for JSON, YAML, TOML, Protobuf, OpenAPI, JSON Schema
 
-### Testing Infrastructure
-- **Test Format**: Uses `.txtar` (text archive) files containing input files and expected outputs
-- **Test Organization**: Unit tests alongside code (`*_test.go`), integration tests in `testdata/` directories
-- **Testscript Framework**: Command-line integration tests in `/cmd/cue/cmd/testdata/script/`
+#### Testing infrastructure
+- **Test format**: Uses `.txtar` (text archive) files containing input files and expected outputs
+- **Test organization**: Unit tests alongside code (`*_test.go`), integration tests in `testdata/` directories
+- **Testscript framework**: Command-line integration tests in `/cmd/cue/cmd/testdata/script/`
 
-## Key Development Patterns
-
-### Working with Tests
+### Working with tests
 - Tests use the `.txtar` format which contains both input and expected output in a single file
 - Use `TestX` functions in test files for debugging individual test cases
 - The `CUE_UPDATE=1` environment variable updates golden files with actual output
@@ -186,26 +188,7 @@ of the CUE project should do so.
     y: x            @test(eq, {a: 1, b: 1}) @test(shareID=xy)
     ```
 
-### Contribution Model
-- Single commit per PR/CL model
-- Uses `git codereview` workflow for managing changes
-- Runs `cueckoo runtrybot [CL|commit]` to kick off CI testing.
-- Requires DCO (Developer Certificate of Origin) sign-off
-- Both GitHub PRs and GerritHub CLs are supported
-- Changes should be linked to a GitHub issue (except trivial changes)
-
-### Module Information
-- Module: `cuelang.org/go`
-- Requires Go 1.25 or later
-- Uses Go modules for dependency management
-
-### Important Conventions
-- Don't update copyright years in existing files
-- Follow existing code style and patterns in the package you're modifying
-- Check neighboring files for framework choices and conventions
-- Use existing libraries and utilities rather than assuming new dependencies
-
-## Rules to follow
+### Rules to follow
 
 These rules MUST be followed at all times:
 - Do not use commands like `cat` to read or write files; read and write files directly

@@ -35,8 +35,8 @@ deps: {
 package main
 
 import (
-	"example.com/strutil@v0:strutil"
-	"example.com/mathutil@v0:mathutil"
+	"example.com/strutil"
+	"example.com/mathutil"
 )
 
 upper: strutil.Upper("hello")

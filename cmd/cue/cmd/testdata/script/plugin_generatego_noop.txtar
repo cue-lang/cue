@@ -1,0 +1,17 @@
+# Test that cue plugin generate-go reports an error when no
+# @extern(go) declarations are found.
+
+! exec cue plugin generate-go
+stderr 'no @extern\(go\) declarations found'
+
+-- cue.mod/module.cue --
+module: "test.example/mypkg@v0"
+language: version: "v0.17.0"
+-- go.mod --
+module test.example/mypkg
+
+go 1.21
+-- mypkg.cue --
+package mypkg
+
+x: 42

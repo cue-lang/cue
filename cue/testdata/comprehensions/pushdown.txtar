@@ -209,7 +209,7 @@ noStackOverflowStructCycle: {
 			sum: tail.sum
 		}
 	}
-	@test(err, code="structural cycle", at="#list.tail", contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at="#list.tail", contains="structural cycle", pos=[])
 }
 
 
@@ -1327,8 +1327,8 @@ issue3935: full: {
 [eval] fieldMismatch.a: cannot combine regular field "x" with 2:
     ./in.cue:185:7
     ./in.cue:183:3
-[structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
-[structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
+[structural_cycle] noStackOverflowStructCycle.#list.tail: structural cycle
+[structural_cycle] noStackOverflowStructCycle.list.tail: structural cycle
 [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
     ./in.cue:220:7
 [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:

@@ -200,7 +200,7 @@ shareCycle: t1: {
 	Y: {
 		x: #X & Y
 	}
-	@test(err, code=structural cycle, path=Y.x.x, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=Y.x.x, contains="structural cycle", pos=[])
 }
 shareCycle: t2: {
 	#X: int
@@ -216,7 +216,7 @@ shareCycle: t3: {
 	Y: {
 		x: Y & #X
 	}
-	@test(err, code=structural cycle, at=Y.x.x, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=Y.x.x, contains="structural cycle", pos=[])
 }
 -- acrossdisjunction.cue --
 import "list"
@@ -375,13 +375,13 @@ issue3903: noshare: {
 [incomplete] issue3903.noshare.foo.result: invalid interpolation: non-concrete value string (type string):
     ./let.cue:58:11
     ./let.cue:57:17
-[structural cycle] shareCycle.t1.Y.x.x: structural cycle
+[structural_cycle] shareCycle.t1.Y.x.x: structural cycle
 [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
     ./sharecycle.cue:9:6
     ./sharecycle.cue:10:5
     ./sharecycle.cue:11:6
     ./sharecycle.cue:11:11
-[structural cycle] shareCycle.t3.Y.x.x: structural cycle
+[structural_cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
 Leaks:  7
 Freed:  229

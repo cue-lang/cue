@@ -16,7 +16,7 @@ func _() {
 	_ = x[CycleError-5]
 }
 
-const _ErrorCode_name = "evaluseruserstructural cycleincompletecycle"
+const _ErrorCode_name = "evaluseruserstructural_cycleincompletecycle"
 
 var _ErrorCode_index = [...]uint8{0, 4, 8, 12, 28, 38, 43}
 

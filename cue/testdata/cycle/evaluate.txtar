@@ -36,7 +36,7 @@ letCycleFail: t1: {
 		let X = a
 		c: X
 	}
-	@test(err, code=structural cycle, path=a.c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=a.c, contains="structural cycle", pos=[])
 }
 
 // Cycles should also be detected in evaluation paths that descend into
@@ -53,7 +53,7 @@ letCycleFail: t2: {
 		(struct){
 		  a: (struct){
 		    let X#4 = (_|_){
-		      // [structural cycle] letCycleFail.t2.a.X: structural cycle
+		      // [structural_cycle] letCycleFail.t2.a.X: structural cycle
 		    }
 		    x: (struct){
 		      y: (string){ "" }
@@ -83,7 +83,7 @@ disjunctionCycle: {
 forCycle: {
 	#A: a: #B // TODO(errors): Correct error position, or at all.
 	#B: or([for x in #A { b: x }])
-	@test(err, code=structural cycle, path=#B.b, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=#B.b, contains="structural cycle", pos=[])
 }
 
 letCycleWithAnd: {
@@ -97,14 +97,14 @@ closeCycle: {
 	a: b
 	b: close({d: c})
 	c: a
-	@test(err, code=structural cycle, path=c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=c, contains="structural cycle", pos=[])
 }
 
 structCycle: {
 	a: b
 	b: and([{d: c}])
 	c: a
-	@test(err, code=structural cycle, path=c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=c, contains="structural cycle", pos=[])
 }
 
 embedCycle: {
@@ -118,14 +118,14 @@ listAddCycle: {
 	a: b
 	b: list.Concat([[c], [c]])
 	c: a
-	@test(err, code=structural cycle, path=b, contains="error in call to %s", args=[list.Concat], pos=[2:5])
+	@test(err, code=structural_cycle, path=b, contains="error in call to %s", args=[list.Concat], pos=[2:5])
 }
 
 listMulCycle: {
 	a: b
 	b: list.Repeat([{a: b: c}], 3)
 	c: a
-	@test(err, code=structural cycle, path=b, contains="error in call to %s", args=[list.Repeat], pos=[2:5])
+	@test(err, code=structural_cycle, path=b, contains="error in call to %s", args=[list.Repeat], pos=[2:5])
 }
 
 // consult the correct closeness info in the face of it being passed down
@@ -144,7 +144,7 @@ printCycle: {
 		if X {
 		}
 	}
-	@test(err, code=structural cycle, path=a.X, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=a.X, contains="structural cycle", pos=[])
 }
 -- self.cue --
 issue3978: {
@@ -155,34 +155,34 @@ issue3978: {
 	@test(eq, {a: {}})
 }
 -- out/errors.txt --
-[structural cycle] letCycleFail.t1.a.c: structural cycle
+[structural_cycle] letCycleFail.t1.a.c: structural cycle
 [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:74:9
 [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:74:9
 [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:74:9
-[structural cycle] forCycle.#B.b: structural cycle
-[structural cycle] closeCycle.c: structural cycle
-[structural cycle] closeCycle.c: structural cycle
-[structural cycle] structCycle.c: structural cycle
-[structural cycle] structCycle.c: structural cycle
-[structural cycle] listAddCycle.b: error in call to list.Concat: structural cycle:
+[structural_cycle] forCycle.#B.b: structural cycle
+[structural_cycle] closeCycle.c: structural cycle
+[structural_cycle] closeCycle.c: structural cycle
+[structural_cycle] structCycle.c: structural cycle
+[structural_cycle] structCycle.c: structural cycle
+[structural_cycle] listAddCycle.b: error in call to list.Concat: structural cycle:
     ./in.cue:118:5
-[structural cycle] listAddCycle.b: error in call to list.Concat: structural cycle:
+[structural_cycle] listAddCycle.b: error in call to list.Concat: structural cycle:
     ./in.cue:118:5
-[structural cycle] listAddCycle.c: structural cycle:
+[structural_cycle] listAddCycle.c: structural cycle:
     ./in.cue:118:5
-[structural cycle] listMulCycle.b: error in call to list.Repeat: structural cycle:
+[structural_cycle] listMulCycle.b: error in call to list.Repeat: structural cycle:
     ./in.cue:125:5
-[structural cycle] listMulCycle.b: error in call to list.Repeat: structural cycle:
+[structural_cycle] listMulCycle.b: error in call to list.Repeat: structural cycle:
     ./in.cue:125:5
-[structural cycle] listMulCycle.c: structural cycle:
+[structural_cycle] listMulCycle.c: structural cycle:
     ./in.cue:125:5
 [eval] closeFail.x.b: field not allowed:
     ./in.cue:133:6
     ./in.cue:136:5
-[structural cycle] printCycle.a.X: structural cycle
+[structural_cycle] printCycle.a.X: structural cycle
 -- out/todo.txt --
 embedCycle: error in v2 (structural cycle) but success in v3 (close({c}) not truly structural cycle).
 closeCycle/structCycle: different error paths reported in v2 vs v3.

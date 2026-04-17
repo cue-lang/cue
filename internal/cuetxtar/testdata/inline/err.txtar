@@ -2,5 +2,15 @@
 args:        1 & 2 @test(err, code=eval, args=[2, 1])
 argsReverse: 1 & 2 @test(err, code=eval, args=[1, 2])
 -- out/status.txt --
-update: identical to input
+update: output passes run
 force:  identical to update
+-- out/update/test.cue --
+args:        1 & 2 @test(err, code=eval, args=[2, 1])
+argsReverse: 1 & 2 @test(err, code=eval, args=[1, 2])
+-- out/update/out/errors.txt --
+[eval] args: conflicting values 2 and 1:
+    ./test.cue:1:14
+    ./test.cue:1:18
+[eval] argsReverse: conflicting values 2 and 1:
+    ./test.cue:2:14
+    ./test.cue:2:18

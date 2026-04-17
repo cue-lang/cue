@@ -40,4 +40,57 @@ rightFmt: int & string @test(err, contains="conflicting values %s and %s (mismat
 path wrong: @test(err): expected error message to contain "WRONG_SUBSTRING", got "wrong: conflicting values 2 and 1"
 path inAlias.bad: @test(err): expected error message to contain "WRONG", got "inAlias.bad: conflicting values 1 and {bad:(1 & x)} (mismatched types int and struct)"
 -- out/status.txt --
-update: identical to input
+update: output passes run
+-- out/update/test.cue --
+right: 1 & 2 @test(err, contains="conflicting values")
+wrong: 1 & 2 @test(err, contains="WRONG_SUBSTRING")
+
+rightEq: {b: 1, a: null & string} @test(eq, {b: 1, a: _|_ @test(err, contains="conflicting values")})
+wrongEq: {b: 1, a: null & string} @test(eq, {b: 1, a: _|_ @test(err, contains="WRONG_SUBSTRING")})
+
+inAlias: x={
+	bad: 1 & x @test(err, contains="WRONG")
+}
+
+rightFmt: int & string @test(err, contains="conflicting values %s and %s (mismatched types %s and %s)")
+
+-- out/update/out/errors.txt --
+[eval] right: conflicting values 2 and 1:
+    ./test.cue:1:8
+    ./test.cue:1:12
+[eval] wrong: conflicting values 2 and 1:
+    ./test.cue:2:8
+    ./test.cue:2:12
+[eval] rightEq.a: conflicting values null and string (mismatched types null and string):
+    ./test.cue:4:20
+    ./test.cue:4:27
+[eval] wrongEq.a: conflicting values null and string (mismatched types null and string):
+    ./test.cue:5:20
+    ./test.cue:5:27
+[eval] inAlias.bad: conflicting values 1 and {bad:(1 & x)} (mismatched types int and struct):
+    ./test.cue:7:12
+    ./test.cue:8:7
+    ./test.cue:8:11
+[eval] rightFmt: conflicting values int and string (mismatched types int and string):
+    ./test.cue:11:11
+    ./test.cue:11:17
+-- out/force/out/errors.txt --
+[eval] right: conflicting values 2 and 1:
+    ./test.cue:1:8
+    ./test.cue:1:12
+[eval] wrong: conflicting values 2 and 1:
+    ./test.cue:2:8
+    ./test.cue:2:12
+[eval] rightEq.a: conflicting values null and string (mismatched types null and string):
+    ./test.cue:4:20
+    ./test.cue:4:27
+[eval] wrongEq.a: conflicting values null and string (mismatched types null and string):
+    ./test.cue:5:20
+    ./test.cue:5:27
+[eval] inAlias.bad: conflicting values 1 and {bad:(1 & x)} (mismatched types int and struct):
+    ./test.cue:7:12
+    ./test.cue:8:7
+    ./test.cue:8:11
+[eval] rightFmt: conflicting values int and string (mismatched types int and string):
+    ./test.cue:11:11
+    ./test.cue:11:17

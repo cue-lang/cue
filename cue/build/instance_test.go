@@ -44,7 +44,6 @@ func TestPartiallyResolved(t *testing.T) {
 				Expr:  &ast.Ident{Name: "bar", Node: spec2},
 			},
 		},
-		Imports: []*ast.ImportSpec{spec1, spec2},
 	}
 
 	p := &Instance{

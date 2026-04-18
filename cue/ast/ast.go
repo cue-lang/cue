@@ -1093,10 +1093,6 @@ type File struct {
 	Filename string
 	Decls    []Decl // top-level declarations; or nil
 
-	// Deprecated: use [File.ImportSpecs].
-	// TODO(mvdan): remove in mid 2026.
-	Imports []*ImportSpec // imports in this file
-
 	Unresolved []*Ident // unresolved identifiers in this file
 
 	// TODO remove this field: it's here as a temporary

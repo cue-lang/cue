@@ -72,8 +72,6 @@ type parser struct {
 
 	// Non-syntactic parser control
 	exprLev int // < 0: in control clause, >= 0: in expression
-
-	imports []*ast.ImportSpec // list of imports
 }
 
 func (p *parser) init(filename string, src []byte, opts []Option) {
@@ -1860,7 +1858,6 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 		Path: &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: path},
 	}
 	c.closeNode(p, spec)
-	p.imports = append(p.imports, spec)
 
 	return spec
 }
@@ -1978,7 +1975,6 @@ func (p *parser) parseFile() *ast.File {
 	p.closeList()
 
 	f := &ast.File{
-		Imports:         p.imports,
 		Decls:           decls,
 		LanguageVersion: p.cfg.Version,
 	}

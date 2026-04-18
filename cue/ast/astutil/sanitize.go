@@ -17,6 +17,7 @@ package astutil
 import (
 	"fmt"
 	"math/rand/v2"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -171,19 +172,12 @@ func (z *sanitizer) markUsed(s *scope, n *ast.Ident) bool {
 }
 
 func (z *sanitizer) cleanImports() {
-	var fileImports []*ast.ImportSpec
 	for decl := range z.file.ImportDecls() {
-		newLen := 0
-		for _, spec := range decl.Specs {
-			if _, ok := z.referenced[spec]; ok {
-				fileImports = append(fileImports, spec)
-				decl.Specs[newLen] = spec
-				newLen++
-			}
-		}
-		decl.Specs = decl.Specs[:newLen]
+		decl.Specs = slices.DeleteFunc(decl.Specs, func(spec *ast.ImportSpec) bool {
+			_, ok := z.referenced[spec]
+			return !ok
+		})
 	}
-	z.file.Imports = fileImports
 	// Ensure that the first import always starts a new section
 	// so that if the file has a comment, it won't be associated with
 	// the import comment rather than the file.

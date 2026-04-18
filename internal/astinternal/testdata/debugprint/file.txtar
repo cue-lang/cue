@@ -100,33 +100,6 @@ import (
 			Rparen: token.Pos("imports.cue:8:1", newline)
 		}
 	}
-	Imports: []*ast.ImportSpec{
-		{
-			Path: *ast.BasicLit{
-				ValuePos: token.Pos("imports.cue:3:8", blank)
-				Kind: token.Token("STRING")
-				Value: "\"foo\""
-			}
-		}
-		{
-			Path: *ast.BasicLit{
-				ValuePos: token.Pos("imports.cue:6:2", newline)
-				Kind: token.Token("STRING")
-				Value: "\"bar\""
-			}
-		}
-		{
-			Name: *ast.Ident{
-				NamePos: token.Pos("imports.cue:7:2", newline)
-				Name: "name"
-			}
-			Path: *ast.BasicLit{
-				ValuePos: token.Pos("imports.cue:7:7", blank)
-				Kind: token.Token("STRING")
-				Value: "\"baz\""
-			}
-		}
-	}
 	LanguageVersion: "v0.13.0"
 }
 -- out/debugprint/empty.cue/omitempty-strings --
@@ -196,26 +169,6 @@ import (
 						Value: "\"baz\""
 					}
 				}
-			}
-		}
-	}
-	Imports: []*ast.ImportSpec{
-		{
-			Path: *ast.BasicLit{
-				Value: "\"foo\""
-			}
-		}
-		{
-			Path: *ast.BasicLit{
-				Value: "\"bar\""
-			}
-		}
-		{
-			Name: *ast.Ident{
-				Name: "name"
-			}
-			Path: *ast.BasicLit{
-				Value: "\"baz\""
 			}
 		}
 	}

@@ -5,8 +5,12 @@ env oldRegistry=$CUE_REGISTRY
 # smoke-test the dry-run output.
 exec cue mod mirror --dry-run --to $MEMREGISTRY example.com
 stdout '^mirroring baz.org@v0.5.0$'
-stdout '^push .*/baz.org@sha256:6a99876cf4d65e06d0d7ce3e5e7a8217d919f0b603c47d39b0ecf7db5299d85a \[355 bytes\]$'
-stdout '^tag .*/baz.org:v0.5.0@sha256:c145b84adf1458ec694b142ba85cd4a39aec82c1b31936694e0ca0abfc99a4fc$'
+# Go 1.27 brings a new compress/flate algorithm in https://go.dev/cl/707355,
+# which is faster but changes the resulting compressed zips.
+[!go1.27] stdout '^push .*/baz.org@sha256:6a99876cf4d65e06d0d7ce3e5e7a8217d919f0b603c47d39b0ecf7db5299d85a \[355 bytes\]$'
+[go1.27]  stdout '^push .*/baz.org@sha256:3511ef8f3d2017fe5ba11fdea01b8e5d2446e5f56f295d471ec21409ed83d30c \[357 bytes\]$'
+[!go1.27] stdout '^tag .*/baz.org:v0.5.0@sha256:c145b84adf1458ec694b142ba85cd4a39aec82c1b31936694e0ca0abfc99a4fc$'
+[go1.27]  stdout '^tag .*/baz.org:v0.5.0@sha256:acd2edc15c85c43fb1b2792b06ee15d78c016474f3cbceec40ed20108251ce92$'
 
 exec cue mod mirror --to $MEMREGISTRY example.com
 cmp stdout want-mirror1-stdout

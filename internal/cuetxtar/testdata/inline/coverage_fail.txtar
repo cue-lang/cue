@@ -1,0 +1,13 @@
+# Tests that top-level fields in a @test-bearing file without @test and not
+# reachable from a tested field are reported as uncovered.
+-- in/test.cue --
+// tested: has @test
+a: 1 @test(eq, 1)
+
+// b: no @test and not referenced from a tested field → must fail
+b: 2
+-- out/run/errors.txt --
+test.cue:5: field b is not covered: add a @test directive or reference it from a tested field
+-- out/status.txt --
+update: identical to input
+force:  identical to update

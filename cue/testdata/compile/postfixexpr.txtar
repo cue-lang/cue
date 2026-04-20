@@ -22,7 +22,7 @@ c: (x & y)... @test(eq, _)
 d: fn()... @test(err, code=incomplete, contains="cannot call non-concrete value fn", pos=[0:4])
 
 // As an expression
-e: #Base... & {y: int}
+e: #Base... & {y: int} @test(eq, {y: int, x: int})
 
 foo: {} @test(eq, {})
 

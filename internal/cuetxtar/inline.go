@@ -347,6 +347,14 @@ func (r *inlineRunner) runArchive() {
 		rootNames[sels[0]] = true
 	}
 
+	// Check that every top-level field in a @test-bearing file is either
+	// directly tested or reachable (by identifier reference) from a tested field.
+	// Skipped when #subpath restricts which roots run, since only a subset of
+	// the file is exercised.
+	if subpath == "" {
+		r.checkFieldCoverage(r.sinkOrT(), fileLevelRecords, rootNames, allRecords)
+	}
+
 	// Run file-level @test assertions against the entire file value.
 	if len(fileLevelRecords) > 0 {
 		version := r.versionName()

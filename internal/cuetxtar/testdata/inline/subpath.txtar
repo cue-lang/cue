@@ -7,8 +7,4 @@ first:  1 @test(eq, 999)
 second: 2 @test(eq, 2)
 -- out/status.txt --
 update: identical to input
--- out/run/errors.txt --
-path first: expected 999, got 1
--- out/force/test.cue --
-first:  1 @test(eq, 1)
-second: 2 @test(eq, 2)
+force:  identical to update

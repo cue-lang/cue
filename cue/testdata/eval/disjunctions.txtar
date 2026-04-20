@@ -1,6 +1,6 @@
 -- in.cue --
-a:  *1 | int
-aa: *1 | *2 | int
+a:  *1 | int       @test(eq, *1 | int)
+aa: *1 | *2 | int  @test(eq, *1 | *2 | int)
 
 b: {
 	name: "int"
@@ -8,7 +8,7 @@ b: {
 } | {
 	name: "str"
 	val:  string
-}
+} @test(eq, {name: "int", val: int} | {name: "str", val: string})
 
 d: b & {val:  3}             @test(eq, {val: 3, name: "int"})
 c: b & {name: "int", val: 3} @test(eq, {name: "int", val: 3})
@@ -432,9 +432,9 @@ issue3699: {
 import "math/bits"
 
 indexElimination: {
-	inStruct: x: { a: *x[0] | 0 }.a
-	inList1: x: [x[0]][0]
-	inList2: x: [*x[0] | 0][0]
+	inStruct: x: { a: *x[0] | 0 }.a @test(eq, 0)
+	inList1: x: [x[0]][0]           @test(eq, _)
+	inList2: x: [*x[0] | 0][0]      @test(eq, 0)
 	// evalv3 strange behavior with chaining of list comprehensions,
 	// incorrect results when indexing the output of a for loop.
 	// https://cuelang.org/issue/3124

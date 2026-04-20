@@ -309,6 +309,9 @@ func withUpdateMode(update, force bool, fn func()) {
 
 // extractTxtarSections returns a new archive built from files in ar whose names
 // start with the given prefix; the prefix is stripped from each file name.
+// The archive comment is copied so that archive-level directives (e.g.
+// #no-coverage, #subpath) written in the outer meta-test comment are applied
+// to the inner archive under test.
 func extractTxtarSections(ar *txtar.Archive, prefix string) *txtar.Archive {
 	var files []txtar.File
 	for _, f := range ar.Files {
@@ -316,7 +319,7 @@ func extractTxtarSections(ar *txtar.Archive, prefix string) *txtar.Archive {
 			files = append(files, txtar.File{Name: name, Data: bytes.Clone(f.Data)})
 		}
 	}
-	return &txtar.Archive{Files: files}
+	return &txtar.Archive{Comment: bytes.Clone(ar.Comment), Files: files}
 }
 
 // cloneTxtarArchive returns a deep copy of ar.

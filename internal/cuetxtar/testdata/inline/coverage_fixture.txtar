@@ -1,0 +1,18 @@
+# Tests that files without any @test are treated as fixture files and are
+# exempt from field-coverage checks. The helper fields in fixture.cue do not
+# need @test directives even though they are referenced by test.cue.
+-- in/fixture.cue --
+package p
+
+// Pure fixture — no @test anywhere; its fields need not be individually tested.
+base: 100
+
+-- in/test.cue --
+package p
+
+// test.cue has @test attributes, so it is a test file.
+// References base from fixture.cue to exercise coverage propagation.
+result: base + 1 @test(eq, 101)
+-- out/status.txt --
+update: identical to input
+force:  identical to update

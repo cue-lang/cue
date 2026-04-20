@@ -1,0 +1,11 @@
+# Tests that a file-level @test (no field path) exempts the whole file from the
+# field-coverage check; all fields are considered implicitly covered.
+-- in/test.cue --
+// File-level @test covers the whole file; no per-field coverage needed.
+@test(eq, {a: 1, b: 2})
+
+a: 1
+b: 2
+-- out/status.txt --
+update: identical to input
+force:  identical to update

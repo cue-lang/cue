@@ -153,21 +153,22 @@ issue3599: full: {
 			if !doWrite { read: "somefile.txt" }
 		}
 	}
-	// @test(eq, {
-	// 	#Action: {
-	// 		action: {read!: string, write?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[])} | {write!: string, read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[])}
-	// 	}
-	// 	#Minio: {
-	// 		container: {
-	// 			action: {
-	// 				write: "somefile.txt"
-	// 				read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source (and 1 more errors)", pos=[23:13])
-	// 			}
-	// 		}
-	// 		doWrite: *true | bool
-	// 		defaultAction: {write: "somefile.txt"}
-	// 	}
-	// })
+	@test(skip, hint="somehow this test doesn't work. Fix it.")
+	@test(eq:todo, {
+		#Action: {
+			action: {read!: string, write?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[])} | {write!: string, read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[])}
+		}
+		#Minio: {
+			container: {
+				action: {
+					write: "somefile.txt"
+					read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source (and 1 more errors)", pos=[23:13])
+				}
+			}
+			doWrite: *true | bool
+			defaultAction: {write: "somefile.txt"}
+		}
+	})
 }
 issue3599: reduced: p1: {
 	{ a?:  1&2 } | { a:  string, b?: 1&2 }

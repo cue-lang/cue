@@ -168,13 +168,19 @@ _configs: {
 		property: true
 		parent:      "PARENT"
 	}
-}
-disabled_parent_test: {for k, v in _configs {
-	let parent_config = (*_parent_configs[v.parent] | false)
-	"\(k)": {
-		"parent_config": parent_config
+} @test(ignore)
+disabled_parent_test: {
+	for k, v in _configs {
+		let parent_config = (*_parent_configs[v.parent] | false)
+		"\(k)": {
+			"parent_config": parent_config
+		}
 	}
-}}
+	@test(eq, {
+		CHILD1: {parent_config: false}
+		CHILD2: {parent_config: *true | false}
+	})
+}
 
 -- issue2063.cue --
 import (

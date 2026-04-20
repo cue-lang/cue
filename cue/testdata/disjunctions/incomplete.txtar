@@ -8,6 +8,7 @@ issue700: {
 	a: y: "y"
 	test1: *a.x | 1
 	test2: *a.y | 1
+	@test(eq, {a: {y: "y"}, test1: 1, test2: *"y" | 1})
 }
 
 lookup: {
@@ -103,22 +104,22 @@ issue3680: t2: {
 }
 -- out/errors.txt --
 [incomplete] lookup.y: undefined field: a:
-    ./in.cue:16:14
+    ./in.cue:17:14
 [incomplete] lookup.allFail1: 2 errors in empty disjunction:
 lookup.allFail1: undefined field: a:
-    ./in.cue:23:14
+    ./in.cue:24:14
 lookup.allFail1: undefined field: b:
-    ./in.cue:23:20
+    ./in.cue:24:20
 [incomplete] lookup.allFail2: 2 errors in empty disjunction:
 lookup.allFail2: undefined field: a:
-    ./in.cue:27:14
+    ./in.cue:28:14
 lookup.allFail2: undefined field: b:
-    ./in.cue:27:20
+    ./in.cue:28:20
 [incomplete] func.ok1: 2 errors in empty disjunction:
 func.ok1: error in call to encoding/yaml.MarshalStream: non-concrete argument 0:
-    ./in.cue:35:7
+    ./in.cue:36:7
 func.ok1: error in call to encoding/yaml.Marshal: non-concrete argument 0:
-    ./in.cue:35:31
+    ./in.cue:36:31
 -- out/eval/stats --
 Leaks:  15
 Freed:  83

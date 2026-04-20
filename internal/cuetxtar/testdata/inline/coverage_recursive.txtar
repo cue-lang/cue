@@ -1,0 +1,13 @@
+# Tests that coverage checking applies recursively into struct literal values.
+# In testCat: { a: 1 @test(); b: 2 }, b must be covered or reported as uncovered.
+-- in/test.cue --
+// testCat has @test on a but not on b; b is not referenced from a → must fail.
+testCat: {
+	a: 1 @test(eq, 1)
+	b: 2
+}
+-- out/run/errors.txt --
+test.cue:4: field testCat.b is not covered: add a @test directive or reference it from a tested field
+-- out/status.txt --
+update: identical to input
+force:  identical to update

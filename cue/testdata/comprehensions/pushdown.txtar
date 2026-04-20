@@ -1358,33 +1358,33 @@ issue3935: full: {
     ./in.cue:382:7
     ./in.cue:380:6
 [incomplete] emptyComprehensionIncomplete.b: undefined field: b:
-    ./in.cue:402:8
+    ./in.cue:405:8
 [incomplete] voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:472:7
+    ./in.cue:475:7
 [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
-    ./in.cue:495:7
+    ./in.cue:498:7
 [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:521:7
-voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
     ./in.cue:524:7
+voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
+    ./in.cue:527:7
 [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:543:7
-voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./in.cue:546:7
+voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
+    ./in.cue:549:7
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:611:17
+    ./in.cue:614:17
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:611:17
+    ./in.cue:614:17
 [incomplete] topElimination.x: non-concrete value int in operand to +:
-    ./in.cue:652:6
-    ./in.cue:649:5
+    ./in.cue:655:6
+    ./in.cue:652:5
 [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    ./in.cue:683:5
-    ./in.cue:681:5
+    ./in.cue:686:5
+    ./in.cue:684:5
 [eval] structShare.err1.x.d.e: field not allowed:
-    ./in.cue:733:9
+    ./in.cue:736:9
 [incomplete] errorPropagation: undefined field: env2:
     ./issue2113.cue:35:19
 [eval] issue3535.regular.foo.regular: field not allowed:

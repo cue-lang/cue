@@ -1,5 +1,5 @@
 raw: true
-#todo:inline: skip — tests export format, not evaluator semantics
+#inlinetest:exclude skip — tests export format, not evaluator semantics
 -- in.cue --
 {a: {b: []}, c: a.b, d: a["b"]}
 -- out/compile --

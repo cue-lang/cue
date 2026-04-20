@@ -1,3 +1,5 @@
+#inlinetest:exclude imports an undefined package "x/y"; the inline runner cannot
+# compile the source when package resolution fails.
 -- x.cue --
 import "x/y"
 

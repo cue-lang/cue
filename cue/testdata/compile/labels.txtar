@@ -1,4 +1,4 @@
-#todo:inline: skip: compile errors.
+#inlinetest:exclude skip: compile errors.
 -- in.cue --
 package compile
 

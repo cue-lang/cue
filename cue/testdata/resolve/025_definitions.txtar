@@ -18,7 +18,7 @@ foo: {feild: 2} @test(err, code=eval, contains="field not allowed", pos=[0:7])
 
 foo1: #Foo
 foo1: {
-	field: 2
+	field: 2 @test(eq, 2)
 	recursive: {
 		feild: 2 @test(err, code=eval, contains="field not allowed", pos=[0:3])
 	}

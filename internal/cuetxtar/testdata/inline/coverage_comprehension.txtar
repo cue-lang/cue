@@ -1,0 +1,13 @@
+# Tests that fields referenced only from a comprehension are covered when any
+# other field in that comprehension is tested. Without this rule, 'items' would
+# be reported as uncovered: its name never appears in 'results: {}', only in
+# the comprehension body.
+-- in/test.cue --
+items: {x: 1}
+results: {} @test(eq, {x: 1})
+for k, v in items {
+	results: "\(k)": v
+}
+-- out/status.txt --
+update: identical to input
+force:  identical to update

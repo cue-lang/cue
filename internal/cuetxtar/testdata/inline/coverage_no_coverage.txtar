@@ -1,0 +1,11 @@
+# Tests that the #no-coverage directive in the archive comment header suppresses
+# the field-coverage check, allowing uncovered fields without errors.
+#no-coverage
+-- in/test.cue --
+a: 1 @test(eq, 1)
+
+// b: uncovered but suppressed by #no-coverage in archive header
+b: 2
+-- out/status.txt --
+update: identical to input
+force:  identical to update

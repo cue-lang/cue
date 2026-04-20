@@ -370,6 +370,10 @@ closedCheck: success2: {
 		d:      "d"
 		foobar: "ok"
 	}
+	@test(eq, {
+		a: {b: {c: {d: "d", foobar: "ok"}}}
+		#D: {d: string}
+	})
 }
 
 closedCheck: success3: {
@@ -388,6 +392,13 @@ closedCheck: success3: {
 		d: "d"
 		e: "ok"
 	}
+	@test(eq, {
+		a: {b: {c: {d: "d", e: "ok"}}}
+		#D: {
+			d: string
+			e: _|_ @test(err, code=incomplete, contains="closedCheck.success3.#D.e: non-concrete value string in operand to !=", pos=[382:7, 380:6])
+		}
+	})
 }
 
 emptyComprehensionIncomplete: {
@@ -470,7 +481,7 @@ voidEliminationSuccess: derefRef1: {
 		a: {b: {c: {}}}
 		E: {
 			e: bool
-			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool)", pos=[464:7])
+			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool)", pos=[475:7])
 		}
 	})
 }
@@ -493,11 +504,11 @@ voidEliminationSuccess: derefRef2: {
 		a: {b: {c: {}}}
 		E: {
 			e: bool
-			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool)", pos=[487:7])
+			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool)", pos=[498:7])
 		}
 		#F: {
 			e: bool
-			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool)", pos=[487:7])
+			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool)", pos=[498:7])
 		}
 	})
 }
@@ -1344,36 +1355,36 @@ issue3935: full: {
     ./in.cue:361:6
     ./in.cue:360:6
 [incomplete] closedCheck.success3.#D.e: non-concrete value string in operand to !=:
-    ./in.cue:378:7
-    ./in.cue:376:6
+    ./in.cue:382:7
+    ./in.cue:380:6
 [incomplete] emptyComprehensionIncomplete.b: undefined field: b:
-    ./in.cue:394:8
+    ./in.cue:402:8
 [incomplete] voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:464:7
+    ./in.cue:472:7
 [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
-    ./in.cue:487:7
+    ./in.cue:495:7
 [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:513:7
+    ./in.cue:521:7
 voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
-    ./in.cue:516:7
+    ./in.cue:524:7
 [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:535:7
+    ./in.cue:543:7
 voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
-    ./in.cue:538:7
+    ./in.cue:546:7
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:603:17
+    ./in.cue:611:17
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:603:17
+    ./in.cue:611:17
 [incomplete] topElimination.x: non-concrete value int in operand to +:
-    ./in.cue:644:6
-    ./in.cue:641:5
+    ./in.cue:652:6
+    ./in.cue:649:5
 [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    ./in.cue:675:5
-    ./in.cue:673:5
+    ./in.cue:683:5
+    ./in.cue:681:5
 [eval] structShare.err1.x.d.e: field not allowed:
-    ./in.cue:725:9
+    ./in.cue:733:9
 [incomplete] errorPropagation: undefined field: env2:
     ./issue2113.cue:35:19
 [eval] issue3535.regular.foo.regular: field not allowed:

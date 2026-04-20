@@ -10,7 +10,7 @@ foo: {
 	_hidden: 5
 	@test(eq, {opt?: 1, txt: 2, #def: 3, regular: 4, _hidden: 5})
 }
-comp: {for k, v in foo {"\(k)": v}}
+comp: { for k, v in foo {"\(k)": v} } @test(eq, {txt: 2, regular: 4})
 select: {
 	opt:     foo.opt     @test(err, code=incomplete, contains="cannot reference optional field", pos=[0:15])
 	"txt":   foo.txt     @test(eq, 2)
@@ -27,13 +27,13 @@ index: {
 }
 -- out/errors.txt --
 [incomplete] select.opt: cannot reference optional field: opt:
-    ./in.cue:11:15
+    ./in.cue:14:15
 [incomplete] index.opt: cannot reference optional field: opt:
-    ./in.cue:18:15
+    ./in.cue:21:15
 [incomplete] index.#def: undefined field: "#def":
-    ./in.cue:20:15
+    ./in.cue:23:15
 [incomplete] index._hidden: undefined field: "_hidden":
-    ./in.cue:22:15
+    ./in.cue:25:15
 -- out/eval/stats --
 Leaks:  0
 Freed:  22

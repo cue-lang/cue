@@ -102,6 +102,7 @@ optionalExists: {
 			other: int
 		}
 	}
+	@test(eq, { string } | {value?: string})
 }
 
 optionalCheck: {

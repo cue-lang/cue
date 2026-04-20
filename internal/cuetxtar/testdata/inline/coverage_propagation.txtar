@@ -1,0 +1,23 @@
+# Tests that coverage propagates from tested fields to fields they reference:
+# (1) direct identifier reference, (2) let binding,
+# (3) top-level comprehension. All fields become covered so the run passes.
+-- in/test.cue --
+// (1) direct reference: a tested field references b → b is covered
+b: 10
+a: b + 1 @test(eq, 11)
+
+// (2) let binding: tested field d uses let L = c → c is covered
+c: 20
+let L = c
+d: L + 1 @test(eq, 21)
+
+// (3) top-level comprehension: both 'items' and 'results' appear in the
+// comprehension; since 'results' has @test, 'items' is covered too.
+items: {x: 1}
+results: {} @test(eq, {x: 1})
+for k, v in items {
+	results: "\(k)": v
+}
+-- out/status.txt --
+update: identical to input
+force:  identical to update

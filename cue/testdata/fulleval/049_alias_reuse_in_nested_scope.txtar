@@ -5,6 +5,9 @@
 #Foo: {
 	let X = or([for k, _ in {} {k}])
 	connection: [X]: X @test(err, code=incomplete, pos=[0:11], contains="in call", args=[or])
+	@test(eq, {
+		connection: _|_ @test(err, code=incomplete, contains="#Foo.X: error in call to or: empty list in call to or", pos=[2:10])
+	})
 }
 #A: {
 	foo: "key"

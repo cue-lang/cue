@@ -1,6 +1,5 @@
 -- in.cue --
 l: *[int, int] | [string, string]
-l1: ["a", "b"]
 
 t1: {
 	l & ["c", "d"]
@@ -16,10 +15,6 @@ t1: {
     string,
     string,
   ])
-  l1: [
-    "a",
-    "b",
-  ]
   t1: {
     (〈1;l〉 & [
       "c",

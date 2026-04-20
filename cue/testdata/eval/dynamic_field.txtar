@@ -5,13 +5,13 @@
 -- in.cue --
 a: "foo"
 "\(a)": b: c: d: e
-e: 2
+e: 2 @test(eq, 2)
 
 b: "bar"
 X="\(b)": {
 	a: 1
 }
-c: X
+c: X @test(eq, {a: 1})
 
 withError: {
 	// Panic when running cue eval with a struct used in a string interpolation.

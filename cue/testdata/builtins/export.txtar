@@ -6,7 +6,11 @@ import "encoding/yaml"
 issue3972: {
 	// yaml uses Syntax to convert CUE to YAML. Ensure that unresolved values
 	// are properly handled.
-	output: out0: "static" // has to go first
+	// TODO(inline): the inline testing framework indicated that this field
+	// was not used in the computation of the test result. That seems correct.
+	// But maybe this test is then not testing what it is supposed to do.
+	// Investigate against the original issue.
+	output: out0: "static" @test(eq, "static") // has to go first
 
 	input: inputStatic: "static"
 	if false {

@@ -10,7 +10,7 @@ bytes1b: '\(b1)'        @test(eq, 'a\xed\x95a')
 
 // two replacement characters
 b2:      'a\x80\x95a'   @test(eq, 'a\x80\x95a')
-bytes2s: "\(b2)"
+bytes2s: "\(b2)" @test(eq, "a�a")
 bytes2b: '\(b2)'        @test(eq, 'a\x80\x95a')
 
 // preserve precision

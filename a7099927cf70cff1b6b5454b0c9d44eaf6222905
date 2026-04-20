@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99b82235_c01c2953",
+        "filename": "CLAUDE.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-20T16:06:44Z",
+      "side": 1,
+      "message": "should we include how to do an initial install of the tool, for the sake of boostrapping? it will then update going forwards.",
+      "revId": "a7099927cf70cff1b6b5454b0c9d44eaf6222905",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

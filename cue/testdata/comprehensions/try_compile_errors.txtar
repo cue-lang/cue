@@ -1,7 +1,5 @@
-# Cannot convert to inline @test format: the CUE source contains compile-time
-# errors (e.g. "struct-form try clause must be the last clause", "optional
-# marker (?) is only valid within a try clause", "reference not found") which
-# prevent the inline runner from compiling and loading the source file.
+#inlinetest:exclude CUE source contains compile-time errors (try-clause syntax, missing
+# references) which prevent the inline runner from compiling the source.
 -- in.cue --
 @experiment(try)
 

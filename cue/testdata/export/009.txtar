@@ -1,4 +1,4 @@
-#todo:inline: skip — tests export format, not evaluator semantics
+#inlinetest:exclude skip — tests export format, not evaluator semantics
 -- in.cue --
 import "list"
 

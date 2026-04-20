@@ -1,4 +1,4 @@
-#todo:inline: skip: compile errors. TODO: investigates
+#inlinetest:exclude skip: compile errors. TODO: investigates
 -- cue.mod/module.cue --
 module: "test.com"
 language: version: "v0.15.0"

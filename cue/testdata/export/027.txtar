@@ -4,7 +4,7 @@ TODO: Should #Bar result in string or #Foo | string?
 
 raw: true
 eval: true
-#todo:inline: skip — tests export format, not evaluator semantics
+#inlinetest:exclude skip — tests export format, not evaluator semantics
 -- in.cue --
 {
 	#Foo: {

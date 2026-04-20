@@ -1,3 +1,5 @@
+#inlinetest:exclude the CUE source triggers a compile-time version error which
+# prevents the inline runner from compiling the source.
 -- cue.mod/module.cue --
 module: "cuelang.org/go/internal/core/adt/eval_test"
 language: version: "v0.8.0"

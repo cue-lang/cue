@@ -1,7 +1,7 @@
 raw: true
 eval: true
 noOpt: true
-#todo:inline: skip — tests export format, not evaluator semantics
+#inlinetest:exclude skip — tests export format, not evaluator semantics
 -- in.cue --
 {
 	job: [Name=_]: {

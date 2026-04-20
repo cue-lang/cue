@@ -1,5 +1,6 @@
-#todo:inline: skip — we need to represent structure sharing across disjunctions
+#inlinetest:exclude skip — we need to represent structure sharing across disjunctions
 # properly to encode this test. We probably need to auto-insert shareIDs as well.
+# TODO(inline): implement structure sharing checks across disjunctions.
 -- in.cue --
 // Test that cyclic references do not break structure sharing. This was the
 // underlying problem of Issue #3587. Note that this is not a problem related

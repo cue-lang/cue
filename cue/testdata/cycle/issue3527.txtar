@@ -2,7 +2,6 @@
 # involving `let` bindings and mutual references between definitions, whereas
 # evalv2 handles it correctly.
 # https://cuelang.org/issue/3527
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 package p
 
@@ -22,6 +21,24 @@ subject: {
 #computeF1040: in:      #ReturnData
 #ReturnData: taxPayer?: #TaxPayer
 #TaxPayer: self?:       _
+
+@test(eq, {
+	_taxPayer$p: {self: {}}
+	assert: {
+		invoke: {taxPayer: {self: {}}}
+		res: {
+			in: {taxPayer: {self: {}}}
+			_computed$p: {in: {taxPayer: {self: {}}}}
+		}
+	}
+	subject: {
+		in: {taxPayer?: {self?: _}}
+		_computed$p: {in: {taxPayer?: {self?: _}}}
+	}
+	#computeF1040: {in: {taxPayer?: {self?: _}}}
+	#ReturnData: {taxPayer?: {self?: _}}
+	#TaxPayer: {self?: _}
+})
 -- out/eval/stats --
 Leaks:  0
 Freed:  26

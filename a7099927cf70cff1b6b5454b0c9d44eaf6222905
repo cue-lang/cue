@@ -16,6 +16,24 @@
       "message": "should we include how to do an initial install of the tool, for the sake of boostrapping? it will then update going forwards.",
       "revId": "a7099927cf70cff1b6b5454b0c9d44eaf6222905",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e53e74b_290744d8",
+        "filename": "CLAUDE.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-04-21T16:31:46Z",
+      "side": 1,
+      "message": "The README in that repo is clear on this. Per our offline chat we are also going to have `cueckoo` self-update the binary, and provide a means by which the guidance can be reliably re-read when it changes, even for long running sessions. But none of that requires changes here.",
+      "parentUuid": "99b82235_c01c2953",
+      "revId": "a7099927cf70cff1b6b5454b0c9d44eaf6222905",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

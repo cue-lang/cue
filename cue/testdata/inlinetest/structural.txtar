@@ -19,10 +19,6 @@ eqComputed: {
 	y: x * 2
 }
 
-// ── leq: subsumption ──────────────────
-
-leqBasic: {x: 42} @test(leq, {x: int}) @test(eq, {x: 42})
-
 // ── skip ──────────────────────────────
 
 skippedTest: {a: 1} @test(skip, why="demonstrating skip")
@@ -66,9 +62,6 @@ mixedInline: 42 @test(eq, 42)
   eqComputed: {
     x: 10
     y: (〈0;x〉 * 2)
-  }
-  leqBasic: {
-    x: 42
   }
   skippedTest: {
     a: 1

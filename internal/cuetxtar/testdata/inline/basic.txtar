@@ -1,4 +1,4 @@
-# Tests basic passing assertions: eq, err, kind=, closed, leq, builtin validators,
+# Tests basic passing assertions: eq, err, kind=, closed, builtin validators,
 # and selector references. Each case exercises a distinct directive handler in
 # the inline runner's runDirective dispatcher.
 -- in/test.cue --
@@ -22,9 +22,6 @@ kindIntFail: int @test(kind=string)
 
 // closed: close({}) makes struct closed
 closedStruct: close({a: 1}) @test(closed)
-
-// leq: 42 satisfies number constraint
-leqField: 42 @test(leq, number)
 
 // eq: builtin validator call expression
 maxFields: struct.MaxFields(2) & {} @test(eq, struct.MaxFields(2) & {})
@@ -62,9 +59,6 @@ kindIntFail: int @test(kind=string)
 // closed: close({}) makes struct closed
 closedStruct: close({a: 1}) @test(closed)
 
-// leq: 42 satisfies number constraint
-leqField: 42 @test(leq, number)
-
 // eq: builtin validator call expression
 maxFields: struct.MaxFields(2) & {} @test(eq, struct.MaxFields(2) & {})
 
@@ -79,5 +73,5 @@ incompleteC: incompleteA & {b: 100, d: incompleteA.b + 3} @test(eq, {b: 100, d: 
     ./test.cue:11:11
     ./test.cue:11:15
 [incomplete] incompleteC.d: non-concrete value int in operand to +:
-    ./test.cue:33:40
-    ./test.cue:32:18
+    ./test.cue:30:40
+    ./test.cue:29:18

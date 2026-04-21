@@ -9,7 +9,7 @@ A: #Task
 B: #steps: #Script & {mount: [A]}
 C: #steps: #Script & {mount: [B]}
 
-#Script: {mount: [...#Task]} @test(leq, {mount: []})
+#Script: {mount: [...#Task]} @test(eq, {mount: []})
 
 #Task: {
 	// Without the proper constructs, repeating the below results

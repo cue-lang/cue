@@ -19,12 +19,12 @@ i2: [0, 2, 3][2]                 @test(eq, 3)
 t0: [...{a: 8}]
 t0: [{}] @test(eq, [{a: 8}])
 t1: [...]
-t1: [...int] @test(leq, [...int])
+t1: [...int] @test(eq, [])
 
 e0: list.Repeat([{}], 2)
 e0: [{}] @test(err, code=eval, contains="incompatible list lengths", args=[1, 2], pos=[], hint="missing positions")
 e1: [...int]
-e1: [...float] @test(leq, [...int])
+e1: [...float] @test(eq, [])
 -- out/errors.txt --
 [eval] e0: incompatible list lengths (1 and 2)
 -- out/compile --

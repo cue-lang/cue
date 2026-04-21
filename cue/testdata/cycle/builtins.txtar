@@ -35,8 +35,12 @@ issue3410: {
 	_s: {
 		#x: matchN(1, [_s, [..._s]])
 	}
-	// Cannot use @test(eq) with private field reference _s in expected value.
-	@test(leq, {#x: _})
+	// TODO(inline): inline test outputs references in calls. This was crafted
+	// by hand.
+	@test(eq, {
+		_s: {#x: matchN(1, [_|_, []])}
+		#x: matchN(1, [_|_, []])
+	})
 }
 issue3420: {
 	matches1: {
@@ -127,7 +131,24 @@ issue3649: noCycle: t1: {
 		a?: matchN(1, [#c])
 	}
 	// Cannot use @test(eq) with self-referential #c in expected value.
-	@test(leq, {data: {a: {b: "foo"}}})
+	@test(eq, "foo", at=data.a.b)
+	@test(debug, """
+		(struct){
+		  data: (#struct){
+		    a: (#struct){
+		      b: (string){ "foo" }
+		    }
+		    b?: (string){ string }
+		  }
+		  #c: (#struct){
+		    b?: (string){ string }
+		    a?: (_){ matchN(1, (#list){
+		        0: (_|_){// 〈2;#c〉
+		        }
+		      }) }
+		  }
+		}
+		""")
 }
 // Same as above, but with longer paths.
 issue3649: noCycle: t2: {
@@ -138,7 +159,32 @@ issue3649: noCycle: t2: {
 		y: a?: matchN(1, [{d: c}])
 	}
 	// Cannot use @test(eq) with self-referential c in expected value.
-	@test(leq, {x: {y: {a: {d: {b: "foo"}}}}})
+	@test(eq, {a: {d: {b: "foo"}}}, at=x.y)
+	@test(debug, """
+		(struct){
+		  x: (struct){
+		    y: (struct){
+		      a: (struct){
+		        d: (struct){
+		          b: (string){ "foo" }
+		        }
+		      }
+		    }
+		    b?: (string){ string }
+		  }
+		  c: (struct){
+		    b?: (string){ string }
+		    y: (struct){
+		      a?: (_){ matchN(1, (#list){
+		          0: (_|_){// {
+		            //   d: 〈4;c〉
+		            // }
+		          }
+		        }) }
+		    }
+		  }
+		}
+		""")
 }
 issue3649: cycle: t1: {
 	data: #c
@@ -241,7 +287,20 @@ listMatchN: ok: {
     z: x
 	z: y: [{}]
 	// x.y? is non-concrete (list.MatchN validator); only check z.y which is concrete.
-	@test(leq, {z: {y: [{}]}})
+	@test(eq, [{}], at=z.y)
+	@test(debug, """
+		(struct){
+		  x: (struct){
+		    y?: (list){ list.MatchN(1, listMatchN.ok.x) }
+		  }
+		  z: (struct){
+		    y: (#list){
+		      0: (struct){
+		      }
+		    }
+		  }
+		}
+		""")
 }
 -- issue3634.cue --
 // evalv3 structural cycle regression: using `len(...)` with a `#Schema`
@@ -317,17 +376,17 @@ issue3743: {
 noCycle.t1.#x.#x: structural cycle:
     ./cycle.cue:6:7
 [eval] issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:38:6
-    ./cycle.cue:35:11
-    ./cycle.cue:38:13
+    ./cycle.cue:80:6
+    ./cycle.cue:77:11
+    ./cycle.cue:80:13
 issue3649.cycle.t1.data.a.a: structural cycle:
-    ./cycle.cue:38:6
+    ./cycle.cue:80:6
 [eval] 0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
-    ./cycle.cue:45:24
+    ./cycle.cue:87:24
 issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:45:14
-    ./cycle.cue:45:21
-    ./cycle.cue:46:5
+    ./cycle.cue:87:14
+    ./cycle.cue:87:21
+    ./cycle.cue:88:5
 [structural_cycle] issue3634.reduced.#D.a: structural cycle
 [structural_cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
     ./jsoncycle.cue:4:8
@@ -339,46 +398,46 @@ issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, ex
     ./listmatchncycle.cue:5:5
     ./listmatchncycle.cue:5:8
 [eval] issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
-    ./matchn.cue:21:7
+    ./matchn.cue:46:7
 [eval] issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:40:7
-    ./matchn.cue:40:14
-    ./matchn.cue:52:7
-    ./matchn.cue:53:7
+    ./matchn.cue:65:7
+    ./matchn.cue:65:14
+    ./matchn.cue:77:7
+    ./matchn.cue:78:7
 issue3443.cycle1.cycle.s.n: invalid value {n:_} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:40:7
-    ./matchn.cue:40:14
-    ./matchn.cue:40:22
-    ./matchn.cue:53:10
+    ./matchn.cue:65:7
+    ./matchn.cue:65:14
+    ./matchn.cue:65:22
+    ./matchn.cue:78:10
 issue3443.cycle1.cycle.s.n.n: structural cycle:
-    ./matchn.cue:40:7
+    ./matchn.cue:65:7
 [eval] issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:60:13
-    ./matchn.cue:60:20
+    ./matchn.cue:85:13
+    ./matchn.cue:85:20
 issue3443.cycle2.fail.#S.n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:60:13
-    ./matchn.cue:60:20
-    ./matchn.cue:60:28
-    ./matchn.cue:60:40
+    ./matchn.cue:85:13
+    ./matchn.cue:85:20
+    ./matchn.cue:85:28
+    ./matchn.cue:85:40
 issue3443.cycle2.fail.#S.n.n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:60:13
-    ./matchn.cue:60:20
-    ./matchn.cue:60:28
-    ./matchn.cue:60:40
-    ./matchn.cue:60:43
+    ./matchn.cue:85:13
+    ./matchn.cue:85:20
+    ./matchn.cue:85:28
+    ./matchn.cue:85:40
+    ./matchn.cue:85:43
 issue3443.cycle2.fail.#S.n.n.n: structural cycle:
-    ./matchn.cue:60:13
+    ./matchn.cue:85:13
 [incomplete] issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:69:6
-    ./matchn.cue:68:8
-    ./matchn.cue:69:13
+    ./matchn.cue:94:6
+    ./matchn.cue:93:8
+    ./matchn.cue:94:13
 issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:69:17
-    ./matchn.cue:68:8
-    ./matchn.cue:69:24
+    ./matchn.cue:94:17
+    ./matchn.cue:93:8
+    ./matchn.cue:94:24
 issue3633.final.data.a: field is required but not present:
-    ./matchn.cue:69:17
-    ./matchn.cue:69:29
+    ./matchn.cue:94:17
+    ./matchn.cue:94:29
 [eval] selfCycle.t1.c: invalid value {d:{}} (does not satisfy matchN): 0 matched, expected 1:
     ./yamlcycle.cue:24:5
     ./yamlcycle.cue:24:12

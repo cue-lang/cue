@@ -10,7 +10,7 @@ simplified: {
 		[R+""][0]
 	}
 	out: yaml.Marshal(x)
-	@test(leq, {x: {d: ".*"}, out: string})
+	@test(eq, {x: {d: ".*"}, out: "d: .*\n"})
 }
 
 original: {
@@ -32,8 +32,27 @@ original: {
 		}
 	}
 	out: yaml.Marshal(rule)
-	// TODO(inline): support multi-line strings.
-	@test(leq, {out: string})
+	@test(eq, {
+		#testableRegexp: {
+			string
+			#test: {
+				in: string
+				out: _|_ @test(err, code=incomplete, contains="original.#testableRegexp.#test.out: non-concrete value string in operand to +", pos=[21:29, 16:21, 17:3])
+			}
+		}
+		rule: {
+			#patterns: {
+				bar: {
+					"(.*)"
+					#test: {in: "testcontent", out: "testcontent"}
+				}
+			}
+		}
+		out: """
+		{}
+
+		"""
+	})
 }
 -- out/errors.txt --
 [incomplete] original.#testableRegexp.#test.out: non-concrete value string in operand to +:

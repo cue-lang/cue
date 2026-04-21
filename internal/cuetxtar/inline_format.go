@@ -72,6 +72,17 @@ func (r *inlineRunner) eqFillAttrStr(exprStr, atStr string, pa parsedTestAttr) s
 		} else {
 			indent := r.attrLineIndent(pa)
 			exprStr = strings.ReplaceAll(exprStr, "\n", "\n"+indent)
+			// Strip trailing whitespace from blank lines to avoid
+			// "non-matching whitespace" parse errors in multiline strings:
+			// a blank line that is all-whitespace must have zero characters
+			// (not indentation spaces) to satisfy CUE's multiline string rules.
+			lines := strings.Split(exprStr, "\n")
+			for i, line := range lines {
+				if strings.TrimSpace(line) == "" {
+					lines[i] = ""
+				}
+			}
+			exprStr = strings.Join(lines, "\n")
 		}
 	}
 	if atStr != "" {

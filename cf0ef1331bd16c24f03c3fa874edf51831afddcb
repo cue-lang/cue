@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "831d2d5c_5261412a",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-21T14:09:54Z",
+      "side": 1,
+      "message": "maybe put this helper function towards the end of the methods rather than before the methods that use it?",
+      "revId": "cf0ef1331bd16c24f03c3fa874edf51831afddcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a6c9990_ece39366",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-21T14:19:46Z",
+      "side": 1,
+      "message": "I don\u0027t think this is right. This means that the omitted-comma form isn\u0027t stable - as soon as anyone runs `cue fmt` _without_ `--simplify`, the commas come back. In general ISTM that `--simplify` should only introduce simplifications to the syntax that stay around when running `cue format` afterwards.\n\nPersonally I think that we should probably omit commas on list elements exactly as we omit commas in any other situation (i.e. always), but if we feel that will be too disruptive a change, then I\u0027d suggest omitting all commas if any comma is already omitted within a given list literal.",
+      "revId": "40cc025d269127a0c29163ac928120882d50621e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

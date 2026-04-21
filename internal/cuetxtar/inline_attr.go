@@ -589,8 +589,12 @@ func isInlineMode(archive *txtar.Archive) bool {
 		if !strings.HasSuffix(f.Name, ".cue") {
 			continue
 		}
-		af, err := parser.ParseFile(f.Name, f.Data)
-		if err != nil {
+		// Use error-recovery parsing so that @test directives are detected
+		// even when the file has parse errors. Without this, a parse error
+		// causes us to skip the file entirely, resulting in a misleading
+		// "archive has no @test directives" report.
+		af, _ := parser.ParseFile(f.Name, f.Data, parser.AllErrors)
+		if af == nil {
 			continue
 		}
 		if declsHaveTestAttrs(af.Decls) {

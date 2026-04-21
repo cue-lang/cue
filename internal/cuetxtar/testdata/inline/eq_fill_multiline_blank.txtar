@@ -1,0 +1,23 @@
+# Tests that CUE_UPDATE=1 generates valid (parseable) @test(eq, ...) output when
+# the filled value contains a string with an embedded blank line. The generator
+# re-indents the multiline expression; blank lines must remain completely empty
+# (no trailing whitespace) so CUE's multiline-string whitespace rule is satisfied.
+-- in/test.cue --
+outer: {
+	x: {
+		s: "line1\n\nline2"
+	} @test(eq)
+}
+-- out/update/test.cue --
+outer: {
+	x: {
+		s: "line1\n\nline2"
+	} @test(eq, {s: """
+		line1
+
+		line2
+		"""})
+}
+-- out/status.txt --
+update: output passes run
+force:  identical to update

@@ -45,7 +45,7 @@ type Option struct {
 func New(options ...Option) *cue.Context {
 	r := runtime.New()
 	// Embedding is always available.
-	r.SetInjection(embed.New())
+	r.AddInjection(embed.New())
 	for _, o := range options {
 		o.apply(r)
 	}
@@ -65,9 +65,11 @@ func Interpreter(i ExternInterpreter) Option {
 }
 
 // WithInjection associates an injection for external code with this context.
+// Note that several injections can be associated with the same extern
+// kind; if so, all apply and their results are unifed.
 func WithInjection(i Injection) Option {
 	return Option{func(r *runtime.Runtime) {
-		r.SetInjection(i)
+		r.AddInjection(i)
 	}}
 }
 

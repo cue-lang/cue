@@ -26,13 +26,25 @@ import (
 	"cuelang.org/go/internal/core/walk"
 )
 
-// SetInjection sets the injection value to be used for injection
+// AddInjection sets an injection value to be used for injection
 // of values with an @extern(kind) attribute where kind is i.Kind().
-func (r *Runtime) SetInjection(i Injection) {
+// If there's more than one injection registered for a given kind,
+// the results from all of them will be unified.
+func (r *Runtime) AddInjection(i Injection) {
 	if r.injections == nil {
 		r.injections = map[string]Injection{}
 	}
-	r.injections[i.Kind()] = i
+	switch ij := r.injections[i.Kind()].(type) {
+	case nil:
+		r.injections[i.Kind()] = i
+	case *multiInjection:
+		ij.injections = append(ij.injections, i)
+	default:
+		r.injections[i.Kind()] = &multiInjection{
+			kind:       i.Kind(),
+			injections: []Injection{ij, i},
+		}
+	}
 }
 
 // Injection defines an entrypoint for creating per-instance injectors.
@@ -405,6 +417,57 @@ func (d *externDecorator) injectedValue(astAttr *ast.Attribute, parent ast.Node,
 	return b
 }
 
-func ref[T any](x T) *T {
-	return &x
+// multiInjection combines multiple [Injection] implementations
+// into a single implementation that unifies the results from all of them.
+type multiInjection struct {
+	kind       string
+	injections []Injection
+}
+
+func (ij *multiInjection) Kind() string {
+	return ij.kind
+}
+
+func (ij *multiInjection) InjectorForInstance(b *build.Instance, r *Runtime) (Injector, errors.Error) {
+	var injectors multiInjector
+	var errs errors.Error
+	for _, inj := range ij.injections {
+		injector, err := inj.InjectorForInstance(b, r)
+		if err != nil {
+			errs = errors.Append(errs, err)
+			continue
+		}
+		injectors = append(injectors, injector)
+	}
+	if errs != nil {
+		return nil, errs
+	}
+	return injectors, nil
+}
+
+type multiInjector []Injector
+
+func (ij multiInjector) InjectedValue(attr *ExternAttr, scope *adt.Vertex) (adt.Expr, errors.Error) {
+	var expr adt.Expr
+	var errs errors.Error
+	for _, inj := range ij {
+		e, err := inj.InjectedValue(attr, scope)
+		if err != nil {
+			errs = errors.Append(errs, err)
+			continue
+		}
+		if expr == nil {
+			expr = e
+		} else {
+			expr = &adt.BinaryExpr{
+				Op: adt.AndOp,
+				X:  expr,
+				Y:  e,
+			}
+		}
+	}
+	if errs != nil {
+		return nil, errs
+	}
+	return expr, nil
 }

@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f9e17c0_9db6f005",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_issue4289.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-04-21T19:15:35Z",
+      "side": 1,
+      "message": "Done. Replaced the testscript with a targeted unit test (TestScanUnderscoreOr) in cue/scanner/scanner_test.go that asserts the expected token sequences for `_|_`, `_|1`, and `_||true`. PTAL",
+      "parentUuid": "8b8c0a59_f674dd7b",
+      "revId": "427365545fba548eea46556b4e90926194ff5eb2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

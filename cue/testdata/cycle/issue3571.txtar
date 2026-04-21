@@ -1,7 +1,6 @@
 # evalv3 incorrectly reports a structural cycle error for a CUE definition that
 # validates correctly under evalv2, representing a regression in cycle detection.
 # https://cuelang.org/issue/3571
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // These tests should NOT have structural cycles.
 simplified: {
@@ -9,11 +8,17 @@ simplified: {
 	in: _
 	x: #T
 	x: x: #T
-	
+
 	#T: {
 		in: x
 		x: _
 	}
+
+	@test(eq, {
+		in: {x: {in: _, x: _}, in: {in: _, x: _}}
+		x: {x: {in: _, x: _}, in: {in: _, x: _}}
+		#T: {in: _, x: _}
+	})
 }
 
 issue3571: {
@@ -30,6 +35,26 @@ issue3571: {
 		in:  #in
 		#in: _
 	}
+
+	@test(eq, {
+		a: {
+			in: {
+				f: true
+				g: {
+					#in: {f: {#in: {x: true}, in: {x: true}}}
+					in: {f: {#in: {x: true}, in: {x: true}}}
+				}
+			}
+			#in: {
+				g: {
+					#in: {f: {#in: {x: true}, in: {x: true}}}
+					in: {f: {#in: {x: true}, in: {x: true}}}
+				}
+				f?: _
+			}
+		}
+		#T: {in: _, #in: _}
+	})
 }
 -- out/eval/stats --
 Leaks:  0
@@ -44,252 +69,13 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 12
--- out/evalalpha --
-(struct){
-  simplified: (#struct){
-    in: (#struct){
-      x: ~(simplified.#T)
-      in: ~(simplified.#T)
-    }
-    x: (#struct){
-      x: ~(simplified.#T)
-      in: ~(simplified.#T)
-    }
-    #T: (#struct){
-      in: (_){ _ }
-      x: (_){ _ }
-    }
-  }
-  issue3571: (struct){
-    a: (#struct){
-      in: (#struct){
-        f: (bool){ true }
-        g: (#struct){
-          #in: (#struct){
-            f: (#struct){
-              #in: (#struct){
-                x: (bool){ true }
-              }
-              in: ~(issue3571.a.in.g.#in.f.#in)
-            }
-          }
-          in: ~(issue3571.a.in.g.#in)
-        }
-      }
-      #in: (#struct){
-        g: (#struct){
-          #in: (#struct){
-            f: (#struct){
-              #in: (#struct){
-                x: (bool){ true }
-              }
-              in: ~(issue3571.a.#in.g.#in.f.#in)
-            }
-          }
-          in: ~(issue3571.a.#in.g.#in)
-        }
-        f?: (_){ _ }
-      }
-    }
-    #T: (#struct){
-      in: (_){ _ }
-      #in: (_){ _ }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,24 +1,12 @@
- (struct){
-   simplified: (#struct){
-     in: (#struct){
--      in: (#struct){
--        in: (_){ _ }
--        x: (_){ _ }
--      }
--      x: (#struct){
--        in: (_){ _ }
--        x: (_){ _ }
--      }
-+      x: ~(simplified.#T)
-+      in: ~(simplified.#T)
-     }
-     x: (#struct){
--      in: (#struct){
--        in: (_){ _ }
--        x: (_){ _ }
--      }
--      x: (#struct){
--        in: (_){ _ }
--        x: (_){ _ }
--      }
-+      x: ~(simplified.#T)
-+      in: ~(simplified.#T)
-     }
-     #T: (#struct){
-       in: (_){ _ }
-@@ -28,52 +16,30 @@
-   issue3571: (struct){
-     a: (#struct){
-       in: (#struct){
--        g: (#struct){
--          in: (#struct){
--            f: (#struct){
--              in: (#struct){
--                x: (bool){ true }
--              }
--              #in: (#struct){
--                x: (bool){ true }
--              }
--            }
--          }
--          #in: (#struct){
--            f: (#struct){
--              in: (#struct){
--                x: (bool){ true }
--              }
--              #in: (#struct){
--                x: (bool){ true }
--              }
--            }
--          }
--        }
-         f: (bool){ true }
-+        g: (#struct){
-+          #in: (#struct){
-+            f: (#struct){
-+              #in: (#struct){
-+                x: (bool){ true }
-+              }
-+              in: ~(issue3571.a.in.g.#in.f.#in)
-+            }
-+          }
-+          in: ~(issue3571.a.in.g.#in)
-+        }
-       }
-       #in: (#struct){
-         g: (#struct){
--          in: (#struct){
--            f: (#struct){
--              in: (#struct){
--                x: (bool){ true }
--              }
--              #in: (#struct){
--                x: (bool){ true }
--              }
--            }
--          }
--          #in: (#struct){
--            f: (#struct){
--              in: (#struct){
--                x: (bool){ true }
--              }
--              #in: (#struct){
--                x: (bool){ true }
--              }
--            }
--          }
-+          #in: (#struct){
-+            f: (#struct){
-+              #in: (#struct){
-+                x: (bool){ true }
-+              }
-+              in: ~(issue3571.a.#in.g.#in.f.#in)
-+            }
-+          }
-+          in: ~(issue3571.a.#in.g.#in)
-         }
-         f?: (_){ _ }
-       }
--- out/eval --
-(struct){
-  simplified: (#struct){
-    in: (#struct){
-      in: (#struct){
-        in: (_){ _ }
-        x: (_){ _ }
-      }
-      x: (#struct){
-        in: (_){ _ }
-        x: (_){ _ }
-      }
-    }
-    x: (#struct){
-      in: (#struct){
-        in: (_){ _ }
-        x: (_){ _ }
-      }
-      x: (#struct){
-        in: (_){ _ }
-        x: (_){ _ }
-      }
-    }
-    #T: (#struct){
-      in: (_){ _ }
-      x: (_){ _ }
-    }
-  }
-  issue3571: (struct){
-    a: (#struct){
-      in: (#struct){
-        g: (#struct){
-          in: (#struct){
-            f: (#struct){
-              in: (#struct){
-                x: (bool){ true }
-              }
-              #in: (#struct){
-                x: (bool){ true }
-              }
-            }
-          }
-          #in: (#struct){
-            f: (#struct){
-              in: (#struct){
-                x: (bool){ true }
-              }
-              #in: (#struct){
-                x: (bool){ true }
-              }
-            }
-          }
-        }
-        f: (bool){ true }
-      }
-      #in: (#struct){
-        g: (#struct){
-          in: (#struct){
-            f: (#struct){
-              in: (#struct){
-                x: (bool){ true }
-              }
-              #in: (#struct){
-                x: (bool){ true }
-              }
-            }
-          }
-          #in: (#struct){
-            f: (#struct){
-              in: (#struct){
-                x: (bool){ true }
-              }
-              #in: (#struct){
-                x: (bool){ true }
-              }
-            }
-          }
-        }
-        f?: (_){ _ }
-      }
-    }
-    #T: (#struct){
-      in: (_){ _ }
-      #in: (_){ _ }
-    }
-  }
-}
+-- out/todo.txt --
+v2 expands all structure-shared fields inline (no ~() references), while v3
+uses structure sharing (~(path) notation) for fields that share the same
+underlying vertex. Specifically, in `simplified`, v2 expands `in` and `x`
+with their full #T contents, while v3 represents them as ~(simplified.#T).
+Similarly in `issue3571.a`, v2 expands `in` and `#in` fully, while v3 uses
+shared references like ~(issue3571.a.in.g.#in) and ~(issue3571.a.#in.g.#in).
 -- out/compile --
 --- in.cue
 {

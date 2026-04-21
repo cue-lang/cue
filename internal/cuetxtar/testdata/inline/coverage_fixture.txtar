@@ -1,6 +1,6 @@
-# Tests that files without any @test are treated as fixture files and are
-# exempt from field-coverage checks. The helper fields in fixture.cue do not
-# need @test directives even though they are referenced by test.cue.
+# Tests that fixture files (no @test) with fields reachable from tested fields
+# pass coverage checks without needing @test directives of their own.
+# base in fixture.cue is referenced by result in test.cue, so it is covered.
 -- in/fixture.cue --
 package p
 

@@ -1,4 +1,3 @@
-#todo:inline: skip — tests export format, not evaluator semantics
 -- in.cue --
 import (
 	"encoding/yaml"
@@ -11,6 +10,7 @@ simplified: {
 		[R+""][0]
 	}
 	out: yaml.Marshal(x)
+	@test(leq, {x: {d: ".*"}, out: string})
 }
 
 original: {
@@ -32,7 +32,14 @@ original: {
 		}
 	}
 	out: yaml.Marshal(rule)
+	// TODO(inline): support multi-line strings.
+	@test(leq, {out: string})
 }
+-- out/errors.txt --
+[incomplete] original.#testableRegexp.#test.out: non-concrete value string in operand to +:
+    ./in.cue:21:29
+    ./in.cue:16:21
+    ./in.cue:17:3
 -- out/eval/stats --
 Leaks:  0
 Freed:  31
@@ -45,41 +52,6 @@ Conjuncts:    36
 Disjuncts:    0
 
 NumCloseIDs: 14
--- out/evalalpha --
-(struct){
-  simplified: (struct){
-    x: (struct){
-      d: (string){ ".*" }
-    }
-    out: (string){ "d: .*\n" }
-  }
-  original: (struct){
-    #testableRegexp: (string){
-      string
-      #test: (#struct){
-        in: (string){ string }
-        out: (_|_){
-          // [incomplete] original.#testableRegexp.#test.out: non-concrete value string in operand to +:
-          //     ./in.cue:20:29
-          //     ./in.cue:15:21
-          //     ./in.cue:16:3
-        }
-      }
-    }
-    rule: (struct){
-      #patterns: (#struct){
-        bar: (string){
-          "(.*)"
-          #test: (#struct){
-            in: (string){ "testcontent" }
-            out: (string){ "testcontent" }
-          }
-        }
-      }
-    }
-    out: (string){ "{}\n" }
-  }
-}
 -- out/compile --
 --- in.cue
 {

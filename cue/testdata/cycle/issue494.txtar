@@ -4,32 +4,37 @@
 # The equivalent closed-type pattern `#d: [rn=string]: [...] & _Q[0:len(#d[rn])]`
 # works correctly. The self-referential slice constraint is not being unified.
 # https://cuelang.org/issue/494
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 _Q: [{pos: 0}, {pos: 1}]
 
 a: [rn=string]: _Q[0:len(a[rn])]
-a: ben: [{}]
+a: ben: [{}] @test(eq, [{pos: 0}])
 
 b: [rn=string]: _Q[0:1]
-b: ben: [{}]
+b: ben: [{}] @test(eq, [{pos: 0}])
 
 c: [rn=string]: [...{l: len(a[rn])}]
-c: ben: [{}]
+c: ben: [{}] @test(eq, [{l: 1}])
 
 #d: [rn=string]: [...{pos: uint}] & _Q[0:len(#d[rn])]
-#d: ben: [{}]
+#d: ben: [{}] @test(eq, [{pos: 0}])
 
-d: #d
+d: #d @test(eq, {ben: [{pos: 0}]})
 
 e: [rn=string]: _Q[0 : len(a[rn])+1]
-e: ben: [{}, ...]
+e: ben: [{}, ...] @test(eq, [{pos: 0}, {pos: 1}])
 
 f: [rn=string]: _Q[0 : len(a[rn])+1]
-f: ben: [{}]
+f: ben: [{}] @test(err, code=eval, contains="incompatible list lengths", pos=[])
 
 g: [rn=string]: _Q[0:len(a[rn])]
-g: ben: [{}, {}]
+g: ben: [{}, {}] @test(err, code=eval, contains="incompatible list lengths", pos=[])
+-- out/errors.txt --
+[eval] f.ben: incompatible list lengths (1 and 2)
+[eval] g.ben: incompatible list lengths (1 and 2)
+-- out/todo.txt --
+v2 expands `d` into an independent struct; v3 shares the same vertex as `#d` (d: ~(#d)).
+v2 includes extra sub-fields pos values in f.ben and g.ben error output.
 -- out/eval/stats --
 Leaks:  0
 Freed:  36
@@ -40,205 +45,6 @@ Retain: 0
 Unifications: 36
 Conjuncts:    59
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-f.ben: incompatible list lengths (1 and 2)
-g.ben: incompatible list lengths (1 and 2)
-
-Result:
-(_|_){
-  // [eval]
-  _Q: (#list){
-    0: (struct){
-      pos: (int){ 0 }
-    }
-    1: (struct){
-      pos: (int){ 1 }
-    }
-  }
-  a: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  b: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  c: (struct){
-    ben: (#list){
-      0: (struct){
-        l: (int){ 1 }
-      }
-    }
-  }
-  #d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  d: ~(#d)
-  e: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-      1: (struct){
-        pos: (int){ 1 }
-      }
-    }
-  }
-  f: (_|_){
-    // [eval]
-    ben: (_|_){
-      // [eval] f.ben: incompatible list lengths (1 and 2)
-      0: (struct){
-      }
-    }
-  }
-  g: (_|_){
-    // [eval]
-    ben: (_|_){
-      // [eval] g.ben: incompatible list lengths (1 and 2)
-      0: (struct){
-      }
-      1: (struct){
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -41,13 +41,7 @@
-       }
-     }
-   }
--  d: (#struct){
--    ben: (#list){
--      0: (#struct){
--        pos: (int){ 0 }
--      }
--    }
--  }
-+  d: ~(#d)
-   e: (struct){
-     ben: (#list){
-       0: (struct){
-@@ -63,10 +57,6 @@
-     ben: (_|_){
-       // [eval] f.ben: incompatible list lengths (1 and 2)
-       0: (struct){
--        pos: (int){ 0 }
--      }
--      1: (struct){
--        pos: (int){ 1 }
-       }
-     }
-   }
-@@ -75,7 +65,6 @@
-     ben: (_|_){
-       // [eval] g.ben: incompatible list lengths (1 and 2)
-       0: (struct){
--        pos: (int){ 0 }
-       }
-       1: (struct){
-       }
--- diff/todo/p2 --
-error path moved
--- out/eval --
-Errors:
-f.ben: incompatible list lengths (1 and 2)
-g.ben: incompatible list lengths (1 and 2)
-
-Result:
-(_|_){
-  // [eval]
-  _Q: (#list){
-    0: (struct){
-      pos: (int){ 0 }
-    }
-    1: (struct){
-      pos: (int){ 1 }
-    }
-  }
-  a: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  b: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  c: (struct){
-    ben: (#list){
-      0: (struct){
-        l: (int){ 1 }
-      }
-    }
-  }
-  #d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  e: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-      1: (struct){
-        pos: (int){ 1 }
-      }
-    }
-  }
-  f: (_|_){
-    // [eval]
-    ben: (_|_){
-      // [eval] f.ben: incompatible list lengths (1 and 2)
-      0: (struct){
-        pos: (int){ 0 }
-      }
-      1: (struct){
-        pos: (int){ 1 }
-      }
-    }
-  }
-  g: (_|_){
-    // [eval]
-    ben: (_|_){
-      // [eval] g.ben: incompatible list lengths (1 and 2)
-      0: (struct){
-        pos: (int){ 0 }
-      }
-      1: (struct){
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

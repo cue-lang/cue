@@ -1,4 +1,4 @@
-#todo:inline: compile-time alias errors prevent CUE source compilation; @test(err) requires successful compile
+#inlinetest:exclude compile-time alias errors prevent CUE source compilation; @test(err) requires successful compile
 -- old.cue --
 // issue2527: self-referential alias in key `x=(x):` caused an "unreachable"
 // panic (https://cuelang.org/issue/2527).

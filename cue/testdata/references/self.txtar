@@ -1,21 +1,20 @@
 Test various self reference cases.
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 @experiment(aliasv2)
 
 // Basic self usage - top level
-a: self.b
+a: self.b  @test(eq, "hello")
 b: "hello"
 
 // Nested self usage - should refer to x struct
 x: {
     y: self.z
     z: "world"
-}
+}  @test(eq, {y: "world", z: "world"})
 
 // Shorthand notation - self should refer to foo struct
-foo: bar: self.baz
-foo: baz: "greeting"
+foo: bar: self.baz    @test(eq, "greeting")
+foo: baz: "greeting"  @test(eq, "greeting") // TODO(inline): reference marking does not work with "self"
 
 // Multiple levels of nesting
 nested: {
@@ -23,23 +22,32 @@ nested: {
         field: self.value
         value: "level1 value"
     }
-}
+}  @test(eq, {
+	level1: {
+		field: "level1 value"
+		value: "level1 value"
+	}
+})
 
 // Self in list context
 listTest: {
     items: [1, 2, self[0], self[1]]
     first: 1
     second: 2
-}
+}  @test(eq, {
+	items: [1, 2, 1, 2]
+	first: 1
+	second: 2
+})
 
 // Self with computed selectors
 computed: {
     key: "test"
     value: self["key"]
-}
+}  @test(eq, {key: "test", value: "test"})
 
 // Cyclic reference detection
-cycle: self.cycle
+cycle: self.cycle  @test(eq, _)
 
 -- list.cue --
 @experiment(aliasv2)
@@ -47,10 +55,10 @@ import "list"
 
 #IntStrings: {list.Repeat([int, string], div(len(self), 2))}
 listCheck: ok1: #IntStrings
-listCheck: ok1: [1, "foo", 2, "bar"]
+listCheck: ok1: [1, "foo", 2, "bar"] @test(eq, [1, "foo", 2, "bar"])
 
 listCheck: err: #IntStrings
-listCheck: err: [1, "foo", "bar", 2]
+listCheck: err: [1, "foo", "bar", 2] @test(err, code=eval, path=2, contains="conflicting values %s and %s (mismatched types %s and %s)", args=["bar", int, string, int], pos=[-5:14, -5:15, -5:28, -1:17, 0:28])
 
 -- withlet.cue --
 @experiment(aliasv2)
@@ -62,21 +70,30 @@ withLet: {
 	bar: {
 		baz: X.foo
 	}
-}
+} @test(eq, {foo: 1, bar: {baz: 1}})
 -- validator.cue --
 @experiment(structcmp)
 @experiment(aliasv2)
 
 validator: {
-	err1: {{{{== (self + 1)}}}}
+	err1: {{{{== (self + 1)}}}}  @test(err, code=eval,
+		contains="invalid value %v (out of bound %s)", args=[2, ==3],
+		pos=[0:12, 0:8, 4:8]
+	)
 	err1: 2
 
-	err2: {== (self + 1)}
+	err2: {== (self + 1)}  @test(err, code=eval,
+		contains="invalid value %v (out of bound %s)", args=[2, ==3],
+		pos=[0:9, 0:8, 4:8]
+	)
 	err2: 2
 }
 
 cyclicErr: {
-	err3: == (self + 1)
+	err3: == (self + 1)  @test(err, code=eval,
+		contains="invalid operands %s and %s to '%s' (type %s and %s)",
+		pos=[0:12, -1:12, 0:19]
+	)
 	err3: 4
 }
 
@@ -215,6 +232,31 @@ a: {
     c: 3
 }
 
+-- out/errors.txt --
+[eval] listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
+    ./list.cue:4:14
+    ./list.cue:4:15
+    ./list.cue:4:28
+    ./list.cue:8:17
+    ./list.cue:9:28
+[eval] listCheck.err.3: conflicting values 2 and string (mismatched types int and string):
+    ./list.cue:4:14
+    ./list.cue:4:15
+    ./list.cue:4:33
+    ./list.cue:8:17
+    ./list.cue:9:35
+[eval] validator.err1: invalid value 2 (out of bound ==3):
+    ./validator.cue:5:12
+    ./validator.cue:5:8
+    ./validator.cue:9:8
+[eval] validator.err2: invalid value 2 (out of bound ==3):
+    ./validator.cue:11:9
+    ./validator.cue:11:8
+    ./validator.cue:15:8
+[eval] cyclicErr.err3: invalid operands {err3:_|_(cyclicErr.err3: invalid operands value at path 'cyclicErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
+    ./validator.cue:19:12
+    ./validator.cue:18:12
+    ./validator.cue:19:19
 -- out/compile --
 --- in.cue
 {

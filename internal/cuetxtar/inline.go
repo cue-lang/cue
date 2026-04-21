@@ -543,9 +543,10 @@ type cueFileResult struct {
 	name        string
 	strippedAST *ast.File // original parsed AST (attrs retained)
 	// hasTestAttrs is true when the file contained at least one @test attribute.
-	// Files where this is false are treated as fixture files: they are still
-	// compiled into the evaluated value (so references from other files work)
-	// but their top-level fields are NOT required to carry @test directives.
+	// Files where this is false are compiled into the evaluated value (so
+	// cross-file references work) but their fields must still be reachable
+	// (transitively) from tested fields via identifier references; unreachable
+	// fields are reported as uncovered by checkFieldCoverage.
 	hasTestAttrs bool
 }
 

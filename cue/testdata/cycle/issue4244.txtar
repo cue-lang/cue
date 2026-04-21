@@ -2,7 +2,6 @@
 # result unexpectedly compared to the inline form, indicating a bug in how
 # `let`-bound values are resolved relative to their enclosing scope.
 # https://cuelang.org/issue/4244
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import "strings"
 
@@ -10,76 +9,45 @@ import "strings"
 	let splits = strings.Split(id, "_never_")
 	let prefix = splits[0]
 
-	#ID:    =~"^\(prefix)$"
-	#SubID: =~"^\(prefix):sub$"
+	#ID:    =~"^\(prefix)$" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:12, -2:22])
+	#SubID: =~"^\(prefix):sub$" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:12, -3:22])
 
-	id:    #ID
-	subid: #SubID
+	id:    #ID @test(err, code=incomplete, contains="invalid interpolation", pos=[-3:12, -5:22])
+	subid: #SubID @test(err, code=incomplete, contains="invalid interpolation", pos=[-3:12, -6:22])
 }
 
 case1: #schema & {
 	id:    "foo"
 	subid: "foo:sub"
-}
+} @test(eq, {
+	id: "foo"
+	subid: "foo:sub"
+	#ID: =~"^foo$"
+	#SubID: =~"^foo:sub$"
+})
 
 case2: #schema & {
 	subid: "foo:sub"
 	id:    "foo"
-}
--- out/evalalpha --
-(struct){
-  #schema: (#struct){
-    let splits#1 = (_|_){
-      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
-      //     ./in.cue:7:12
-      //     ./in.cue:5:22
-    }
-    let prefix#2 = (_|_){
-      // [incomplete] #schema.prefix: index out of range [0] with length 1:
-      //     ./in.cue:5:22
-    }
-    #ID: (_|_){
-      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
-      //     ./in.cue:7:12
-      //     ./in.cue:5:22
-    }
-    #SubID: (_|_){
-      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
-      //     ./in.cue:8:12
-      //     ./in.cue:5:22
-    }
-    id: (_|_){
-      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
-      //     ./in.cue:7:12
-      //     ./in.cue:5:22
-    }
-    subid: (_|_){
-      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
-      //     ./in.cue:8:12
-      //     ./in.cue:5:22
-    }
-  }
-  case1: (#struct){
-    id: (string){ "foo" }
-    subid: (string){ "foo:sub" }
-    let splits#1 = (#list){
-      0: (string){ "foo" }
-    }
-    let prefix#2 = (string){ "foo" }
-    #ID: (string){ =~"^foo$" }
-    #SubID: (string){ =~"^foo:sub$" }
-  }
-  case2: (#struct){
-    subid: (string){ "foo:sub" }
-    id: (string){ "foo" }
-    let splits#1 = (#list){
-      0: (string){ "foo" }
-    }
-    let prefix#2 = (string){ "foo" }
-    #ID: (string){ =~"^foo$" }
-    #SubID: (string){ =~"^foo:sub$" }
-  }
-}
+} @test(eq, {
+	subid: "foo:sub"
+	id: "foo"
+	#ID: =~"^foo$"
+	#SubID: =~"^foo:sub$"
+})
+-- out/errors.txt --
+[incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
+    ./in.cue:7:12
+    ./in.cue:5:22
+[incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
+    ./in.cue:8:12
+    ./in.cue:5:22
+[incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
+    ./in.cue:7:12
+    ./in.cue:5:22
+[incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
+    ./in.cue:8:12
+    ./in.cue:5:22
 -- out/compile --
 --- in.cue
 {

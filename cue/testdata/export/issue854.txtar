@@ -1,4 +1,3 @@
-#todo:inline: skip — tests export format, not evaluator semantics
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"
@@ -7,7 +6,7 @@ package a
 
 import "mod.test/b"
 
-theb: b.name
+theb: b.name @test(err, code=incomplete, path=b, contains="undefined field: %s", args=[c], pos=[b/b.cue:5:6])
 -- b/b.cue --
 package b
 
@@ -20,6 +19,9 @@ b: c.c & {
 name: b.other
 -- c/c.cue --
 package c
+-- out/errors.txt --
+[incomplete] b: undefined field: c:
+    ./b/b.cue:5:6
 -- out/compile --
 --- a.cue
 {
@@ -37,10 +39,3 @@ Conjuncts:    8
 Disjuncts:    0
 
 NumCloseIDs: 1
--- out/evalalpha --
-(struct){
-  theb: (_|_){
-    // [incomplete] b: undefined field: c:
-    //     ./b/b.cue:5:6
-  }
-}

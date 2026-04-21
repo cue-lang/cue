@@ -156,6 +156,92 @@ func TestInjectNoExternAttribute(t *testing.T) {
 	qt.Assert(t, qt.Equals(got, "original"))
 }
 
+func TestInjectMultipleInjectors(t *testing.T) {
+	j1 := cuecontext.NewInjector()
+	j1.AllowAll()
+	j2 := cuecontext.NewInjector()
+	j2.AllowAll()
+	ctx := cuecontext.New(cuecontext.Inject(j1), cuecontext.Inject(j2))
+
+	j1.Register("example.com/val", ctx.CompileString(`{a: int}`))
+	j2.Register("example.com/val", ctx.CompileString(`{a: 42}`))
+
+	v := ctx.CompileString(`
+		@extern(inject)
+
+		package foo
+
+		x: _ @inject(name="example.com/val")
+	`)
+	qt.Assert(t, qt.IsNil(v.Err()))
+
+	a := v.LookupPath(cue.ParsePath("x.a"))
+	qt.Assert(t, qt.IsNil(a.Err()))
+
+	got, err := a.Int64()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(got, int64(42)))
+}
+
+func TestInjectThreeInjectors(t *testing.T) {
+	j1 := cuecontext.NewInjector()
+	j1.AllowAll()
+	j2 := cuecontext.NewInjector()
+	j2.AllowAll()
+	j3 := cuecontext.NewInjector()
+	j3.AllowAll()
+	ctx := cuecontext.New(
+		cuecontext.Inject(j1),
+		cuecontext.Inject(j2),
+		cuecontext.Inject(j3),
+	)
+
+	j1.Register("example.com/val", ctx.CompileString(`{a: int, b: int}`))
+	j2.Register("example.com/val", ctx.CompileString(`{a: 42}`))
+	j3.Register("example.com/val", ctx.CompileString(`{b: 99}`))
+
+	v := ctx.CompileString(`
+		@extern(inject)
+
+		package foo
+
+		x: _ @inject(name="example.com/val")
+	`)
+	qt.Assert(t, qt.IsNil(v.Err()))
+
+	a := v.LookupPath(cue.ParsePath("x.a"))
+	qt.Assert(t, qt.IsNil(a.Err()))
+	gotA, err := a.Int64()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(gotA, int64(42)))
+
+	b := v.LookupPath(cue.ParsePath("x.b"))
+	qt.Assert(t, qt.IsNil(b.Err()))
+	gotB, err := b.Int64()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(gotB, int64(99)))
+}
+
+func TestInjectMultipleInjectorsError(t *testing.T) {
+	j1 := cuecontext.NewInjector()
+	j1.AllowAll()
+	j2 := cuecontext.NewInjector()
+	// j2 has no Allow function configured, so it will fail.
+	ctx := cuecontext.New(cuecontext.Inject(j1), cuecontext.Inject(j2))
+
+	j1.Register("example.com/val", ctx.CompileString(`"hello"`))
+
+	v := ctx.CompileString(`
+		@extern(inject)
+
+		package foo
+
+		x: _ @inject(name="example.com/val")
+	`)
+	qt.Assert(t, qt.IsNotNil(v.Err()))
+	qt.Assert(t, qt.ErrorMatches(v.Err(), `.*no Allow function configured.*`))
+}
+
 func TestInjectEmptyName(t *testing.T) {
 	j := cuecontext.NewInjector()
 	j.AllowAll()

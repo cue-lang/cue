@@ -66,7 +66,7 @@ func (j *Injector) AllowAll() {
 // as an injection for @extern(inject) attributes.
 func Inject(j *Injector) Option {
 	return Option{func(r *runtime.Runtime) {
-		r.SetInjection(&injectInjection{injector: j})
+		r.AddInjection(&injectInjection{injector: j})
 	}}
 }
 

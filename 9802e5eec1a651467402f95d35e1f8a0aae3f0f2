@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49ea311e_dac12c23",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1039400
+      },
+      "writtenOn": "2026-04-21T18:52:30Z",
+      "side": 1,
+      "message": "1235759: CLAUDE.md: use cueckoo guidance as a base | https://gerrithub.io/c/cue-lang/cue/+/1235759",
+      "revId": "9802e5eec1a651467402f95d35e1f8a0aae3f0f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

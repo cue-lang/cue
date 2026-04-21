@@ -1,9 +1,6 @@
-# Tests that mutually recursive let bindings produce "cyclic references in let
-# clause or alias" errors. Issue #1042: a 4-bit adder circuit expressed with
-# two mutually dependent let bindings (fulladders and carries) should be
-# detected as a cycle at compile time rather than causing a runtime panic.
+#inlinetest:exclude mutually recursive let bindings produce compile-time cycle errors
+# which prevent the inline runner from compiling the source. Issue #1042.
 #expandLetExpr: true
-# So no @test because of compile-time errors.
 -- in.cue --
 import "list"
 

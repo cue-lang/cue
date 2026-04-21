@@ -27,13 +27,13 @@ index: {
 }
 -- out/errors.txt --
 [incomplete] select.opt: cannot reference optional field: opt:
-    ./in.cue:14:15
+    ./in.cue:11:15
 [incomplete] index.opt: cannot reference optional field: opt:
-    ./in.cue:21:15
+    ./in.cue:18:15
 [incomplete] index.#def: undefined field: "#def":
-    ./in.cue:23:15
+    ./in.cue:20:15
 [incomplete] index._hidden: undefined field: "_hidden":
-    ./in.cue:25:15
+    ./in.cue:22:15
 -- out/eval/stats --
 Leaks:  0
 Freed:  22

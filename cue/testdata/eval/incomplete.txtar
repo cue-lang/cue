@@ -1,25 +1,30 @@
-# Cannot convert to inline format: in.cue contains compile-time error expressions
-# (e.g., string arithmetic s+s, e5:<e5&s) which prevent the inline test runner
-# from compiling the source. Keep in golden-file format.
+# Tests incomplete-error reporting for various expressions: string arithmetic,
+# non-concrete bounds, self-referential bounds, mutual dependencies, and
+# undefined-field lookups. All produce [incomplete] errors except e2 which
+# succeeds because "bar" is concrete. issue1837 checks that incomplete errors
+# are correctly preferred over cycle errors in conditional comprehensions.
 -- in.cue --
 s: string
 
-e1:  s + s
-e2:  >"bar" & s // okay
-e3:  >s & "foo" // not okay
-e3b: >s
+e1:  s + s  @test(err, code=incomplete,
+	suberr=(code=incomplete, contains="non-concrete value %v in operand to %s", args=[string, +], pos=[0:6, -2:4]),
+	suberr=(code=incomplete, contains="non-concrete value %v in operand to %s", args=[string, +], pos=[0:6, -2:4]),
+)
+e2:  >"bar" & s @test(eq, >"bar") // okay: "bar" is concrete, result is a valid bound
+e3:  >s & "foo" @test(err, code=incomplete, contains="non-concrete value s for bound >", pos=[0:7])
+e3b: >s @test(err, code=incomplete, contains="non-concrete value s for bound >", pos=[0:7])
 
-e4: >e1 & s
-e5: <e5 & s
+e4: >e1 & s @test(err, code=incomplete, pos=[-8:6, -10:4])
+e5: <e5 & s @test(err, code=incomplete|cycle, pos=[0:6])
 
 E: {
-	a: c - b
-	b: c - a
-	c: a+b & >=5
+	a: c - b @test(err, code=incomplete, pos=[0:5, 2:5, 2:11])
+	b: c - a @test(err, code=incomplete, pos=[0:5, 1:5, 1:11])
+	c: a+b & >=5 @test(err, code=incomplete, pos=[-1:5, 0:5, 0:11])
 }
 
-a:    int
-okay: (>10 & <a) + 3
+a:    int @test(eq, int)
+okay: (>10 & <a) + 3 @test(err, code=incomplete, contains="non-concrete value a for bound <", pos=[0:15])
 
 // No output or "cycle error" when checking existence of non-existing fields;
 // an incomplete error should be reported instead of a cycle error.
@@ -27,26 +32,44 @@ okay: (>10 & <a) + 3
 issue1837: {
 	// x is properly recognized as erroneous and the "message" field is added
 	// with the value "a", instead of as a cycle error.
+
+	// TODO(inline): use permute, but ensure comprehensions are permuted too first.
+	// @test(permute)
 	p1: {
 		context: {}
-		x: context.b // incomplete error
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
 		if x == _|_ {
 			message: "a"
 		}
+		@test(eq, {
+			context: {}
+			x: _|_
+			message: "a"
+		})
 	}
 	p2: {
 		if x == _|_ {
 			message: "a"
 		}
-		x: context.b // incomplete error
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
 		context: {}
+		@test(eq, {
+			message: "a"
+			x: _|_
+			context: {}
+		})
 	}
 	p3: {
 		if x == _|_ {
 			message: "a"
 		}
 		context: {}
-		x: context.b // incomplete error
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		@test(eq, {
+			message: "a"
+			context: {}
+			x: _|_
+		})
 	}
 }
 -- out/eval/stats --
@@ -61,239 +84,43 @@ Conjuncts:    40
 Disjuncts:    0
 
 NumCloseIDs: 9
--- out/eval --
-(struct){
-  s: (string){ string }
-  e1: (_|_){
-    // [incomplete] e1: non-concrete value string in operand to +:
-    //     ./in.cue:3:6
-    //     ./in.cue:1:4
-  }
-  e2: (string){ >"bar" }
-  e3: (_|_){
-    // [incomplete] e3: non-concrete value s for bound >:
-    //     ./in.cue:5:7
-  }
-  e3b: (_|_){
-    // [incomplete] e3b: non-concrete value s for bound >:
-    //     ./in.cue:6:7
-  }
-  e4: (_|_){
-    // [incomplete] e1: non-concrete value string in operand to +:
-    //     ./in.cue:3:6
-    //     ./in.cue:1:4
-  }
-  e5: (_|_){
-    // [cycle] cycle error
-  }
-  E: (struct){
-    a: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:12:5
-    }
-    b: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:13:5
-    }
-    c: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:12:5
-      // cycle error:
-      //     ./in.cue:13:5
-    }
-  }
-  a: (int){ int }
-  okay: (_|_){
-    // [incomplete] non-concrete value a for bound <:
-    //     ./in.cue:18:15
-  }
-  issue1837: (struct){
-    p1: (struct){
-      context: (struct){
-      }
-      x: (_|_){
-        // [incomplete] issue1837.p1.x: undefined field: b:
-        //     ./in.cue:25:14
-        //     ./in.cue:28:14
-      }
-      message: (string){ "a" }
-    }
-    p2: (struct){
-      message: (string){ "a" }
-      x: (_|_){
-        // [incomplete] issue1837.p2.x: undefined field: b:
-        //     ./in.cue:34:14
-        //     ./in.cue:37:14
-      }
-      context: (struct){
-      }
-    }
-    p3: (struct){
-      message: (string){ "a" }
-      context: (struct){
-      }
-      x: (_|_){
-        // [incomplete] issue1837.p3.x: undefined field: b:
-        //     ./in.cue:42:14
-      }
-    }
-  }
-}
--- out/evalalpha --
-(struct){
-  s: (string){ string }
-  e1: (_|_){
-    // [incomplete] e1: non-concrete value string in operand to +:
-    //     ./in.cue:3:6
-    //     ./in.cue:1:4
-  }
-  e2: (string){ >"bar" }
-  e3: (_|_){
-    // [incomplete] e3: non-concrete value s for bound >:
-    //     ./in.cue:5:7
-  }
-  e3b: (_|_){
-    // [incomplete] e3b: non-concrete value s for bound >:
-    //     ./in.cue:6:7
-  }
-  e4: (_|_){
-    // [incomplete] e1: non-concrete value string in operand to +:
-    //     ./in.cue:3:6
-    //     ./in.cue:1:4
-  }
-  e5: (_|_){
-    // [incomplete] e5: non-concrete value e5 for bound <:
-    //     ./in.cue:9:6
-  }
-  E: (struct){
-    a: (_|_){
-      // [incomplete] E.a: non-concrete value >=5 in operand to -:
-      //     ./in.cue:12:5
-      //     ./in.cue:14:5
-      //     ./in.cue:14:11
-      // E.b: non-concrete value >=5 in operand to -:
-      //     ./in.cue:13:5
-      //     ./in.cue:14:5
-      //     ./in.cue:14:11
-    }
-    b: (_|_){
-      // [incomplete] E.b: non-concrete value >=5 in operand to -:
-      //     ./in.cue:13:5
-      //     ./in.cue:14:5
-      //     ./in.cue:14:11
-    }
-    c: (_|_){
-      // [incomplete] E.b: non-concrete value >=5 in operand to -:
-      //     ./in.cue:13:5
-      //     ./in.cue:14:5
-      //     ./in.cue:14:11
-    }
-  }
-  a: (int){ int }
-  okay: (_|_){
-    // [incomplete] non-concrete value a for bound <:
-    //     ./in.cue:18:15
-  }
-  issue1837: (struct){
-    p1: (struct){
-      context: (struct){
-      }
-      x: (_|_){
-        // [incomplete] issue1837.p1.x: undefined field: b:
-        //     ./in.cue:28:14
-      }
-      message: (string){ "a" }
-    }
-    p2: (struct){
-      message: (string){ "a" }
-      x: (_|_){
-        // [incomplete] issue1837.p2.x: undefined field: b:
-        //     ./in.cue:37:14
-      }
-      context: (struct){
-      }
-    }
-    p3: (struct){
-      message: (string){ "a" }
-      context: (struct){
-      }
-      x: (_|_){
-        // [incomplete] issue1837.p3.x: undefined field: b:
-        //     ./in.cue:45:14
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -20,22 +20,31 @@
-     //     ./in.cue:1:4
-   }
-   e5: (_|_){
--    // [cycle] cycle error
-+    // [incomplete] e5: non-concrete value e5 for bound <:
-+    //     ./in.cue:9:6
-   }
-   E: (struct){
-     a: (_|_){
--      // [cycle] cycle error:
--      //     ./in.cue:12:5
-+      // [incomplete] E.a: non-concrete value >=5 in operand to -:
-+      //     ./in.cue:12:5
-+      //     ./in.cue:14:5
-+      //     ./in.cue:14:11
-+      // E.b: non-concrete value >=5 in operand to -:
-+      //     ./in.cue:13:5
-+      //     ./in.cue:14:5
-+      //     ./in.cue:14:11
-     }
-     b: (_|_){
--      // [cycle] cycle error:
--      //     ./in.cue:13:5
-+      // [incomplete] E.b: non-concrete value >=5 in operand to -:
-+      //     ./in.cue:13:5
-+      //     ./in.cue:14:5
-+      //     ./in.cue:14:11
-     }
-     c: (_|_){
--      // [cycle] cycle error:
--      //     ./in.cue:12:5
--      // cycle error:
--      //     ./in.cue:13:5
-+      // [incomplete] E.b: non-concrete value >=5 in operand to -:
-+      //     ./in.cue:13:5
-+      //     ./in.cue:14:5
-+      //     ./in.cue:14:11
-     }
-   }
-   a: (int){ int }
-@@ -49,7 +58,6 @@
-       }
-       x: (_|_){
-         // [incomplete] issue1837.p1.x: undefined field: b:
--        //     ./in.cue:25:14
-         //     ./in.cue:28:14
-       }
-       message: (string){ "a" }
-@@ -58,7 +66,6 @@
-       message: (string){ "a" }
-       x: (_|_){
-         // [incomplete] issue1837.p2.x: undefined field: b:
--        //     ./in.cue:34:14
-         //     ./in.cue:37:14
-       }
-       context: (struct){
-@@ -70,7 +77,7 @@
-       }
-       x: (_|_){
-         // [incomplete] issue1837.p3.x: undefined field: b:
--        //     ./in.cue:42:14
-+        //     ./in.cue:45:14
-       }
-     }
-   }
+-- out/errors.txt --
+[incomplete] e1: non-concrete value string in operand to +:
+    ./in.cue:3:6
+    ./in.cue:1:4
+[incomplete] e3: non-concrete value s for bound >:
+    ./in.cue:8:7
+[incomplete] e3b: non-concrete value s for bound >:
+    ./in.cue:9:7
+[incomplete] e1: non-concrete value string in operand to +:
+    ./in.cue:3:6
+    ./in.cue:1:4
+[incomplete] e5: non-concrete value e5 for bound <:
+    ./in.cue:12:6
+[incomplete] E.a: non-concrete value >=5 in operand to -:
+    ./in.cue:15:5
+    ./in.cue:17:5
+    ./in.cue:17:11
+E.b: non-concrete value >=5 in operand to -:
+    ./in.cue:16:5
+    ./in.cue:17:5
+    ./in.cue:17:11
+[incomplete] E.b: non-concrete value >=5 in operand to -:
+    ./in.cue:16:5
+    ./in.cue:17:5
+    ./in.cue:17:11
+[incomplete] E.b: non-concrete value >=5 in operand to -:
+    ./in.cue:16:5
+    ./in.cue:17:5
+    ./in.cue:17:11
+[incomplete] non-concrete value a for bound <:
+    ./in.cue:21:15
+[incomplete] issue1837.p1.x: undefined field: b:
+    ./in.cue:34:14
+[incomplete] issue1837.p2.x: undefined field: b:
+    ./in.cue:48:14
+[incomplete] issue1837.p3.x: undefined field: b:
+    ./in.cue:61:14
 -- out/compile --
 --- in.cue
 {

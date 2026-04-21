@@ -4,7 +4,6 @@
 # correctly. The root cause: calls with only literal arguments were incorrectly
 # deferred when evaluated from within a cyclic context, resulting in empty output.
 # https://cuelang.org/issue/4230
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #transform: {
 	_input: {...}
@@ -18,7 +17,10 @@
 x: X={
 	regions: (#transform & {_input: X})._output
 	app: region: or(["west", "east"]) & "west"
-}
+} @test(eq, {
+	regions: ["west"]
+	app: {region: "west"}
+})
 -- out/compile --
 --- in.cue
 {
@@ -41,23 +43,6 @@ x: X={
         "west",
         "east",
       ]) & "west")
-    }
-  }
-}
--- out/evalalpha --
-(struct){
-  #transform: (#struct){
-    _input: (#struct){
-    }
-    _output: (#list){
-    }
-  }
-  x: (struct){
-    regions: (#list){
-      0: (string){ "west" }
-    }
-    app: (struct){
-      region: (string){ "west" }
     }
   }
 }

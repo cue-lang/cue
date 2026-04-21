@@ -1,13 +1,15 @@
 # The evaluator enters an infinite loop when processing a cycle involving
 # struct embeddings, causing `cue eval` to hang indefinitely.
 # https://cuelang.org/issue/2526
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 x
 x: {
 	y
 	y: x
 }
+@test(err, code=structural_cycle, path=x.y, contains="structural cycle", pos=[])
+-- out/errors.txt --
+[structural_cycle] x.y: structural cycle
 -- out/compile --
 --- in.cue
 {
@@ -15,22 +17,5 @@ x: {
   x: {
     〈0;y〉
     y: 〈1;x〉
-  }
-}
--- out/evalalpha --
-Errors:
-x.y: structural cycle
-
-Result:
-(_|_){
-  // [structural_cycle]
-  x: (_|_){
-    // [structural_cycle]
-    y: (_|_){
-      // [structural_cycle] x.y: structural cycle
-    }
-  }
-  y: (_|_){
-    // [structural_cycle] x.y: structural cycle
   }
 }

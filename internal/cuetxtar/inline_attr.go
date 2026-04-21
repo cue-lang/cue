@@ -600,6 +600,18 @@ func isInlineMode(archive *txtar.Archive) bool {
 	return false
 }
 
+// hasInlinetestExclude reports whether the archive comment contains a
+// "#inlinetest:exclude" line, meaning the archive is explicitly excluded from
+// the inline @test framework with a stated reason.
+func hasInlinetestExclude(a *txtar.Archive) bool {
+	for line := range strings.SplitSeq(string(a.Comment), "\n") {
+		if strings.HasPrefix(strings.TrimSpace(line), "#inlinetest:exclude") {
+			return true
+		}
+	}
+	return false
+}
+
 // declsHaveTestAttrs recursively searches decls for any @test(...) attribute,
 // descending into struct-valued fields and comprehension bodies at any depth.
 func declsHaveTestAttrs(decls []ast.Decl) bool {

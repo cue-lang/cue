@@ -4,98 +4,29 @@
 # prevent cycle detection, causing CUE to loop forever instead of reporting an
 # error. Affects all variants: `{a & _}.b`, `{a.b}.c`, nested structs, etc.
 # https://cuelang.org/issue/4210
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 t1: {
 	a: b: c: {a}.b
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
 }
 t2: {
 	a: b: c: {a & _}.b
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
 }
 t3: {
 	a: b: c: d: {a.b}.c
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
 }
 t4: {
 	x: y: z: {a}.y
 	a: x
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
 }
--- out/evalalpha --
-Errors:
-t1.a.b.c.c: structural cycle
-t2.a.b.c.c: structural cycle
-t3.a.b.c.d.d: structural cycle
-t4.x.y.z.z: structural cycle
-
-Result:
-(_|_){
-  // [structural_cycle]
-  t1: (_|_){
-    // [structural_cycle]
-    a: (_|_){
-      // [structural_cycle]
-      b: (_|_){
-        // [structural_cycle]
-        c: (_|_){
-          // [structural_cycle]
-          c: (_|_){
-            // [structural_cycle] t1.a.b.c.c: structural cycle
-          }
-        }
-      }
-    }
-  }
-  t2: (_|_){
-    // [structural_cycle]
-    a: (_|_){
-      // [structural_cycle]
-      b: (_|_){
-        // [structural_cycle]
-        c: (_|_){
-          // [structural_cycle]
-          c: (_|_){
-            // [structural_cycle] t2.a.b.c.c: structural cycle
-          }
-        }
-      }
-    }
-  }
-  t3: (_|_){
-    // [structural_cycle]
-    a: (_|_){
-      // [structural_cycle]
-      b: (_|_){
-        // [structural_cycle]
-        c: (_|_){
-          // [structural_cycle]
-          d: (_|_){
-            // [structural_cycle]
-            d: (_|_){
-              // [structural_cycle] t3.a.b.c.d.d: structural cycle
-            }
-          }
-        }
-      }
-    }
-  }
-  t4: (_|_){
-    // [structural_cycle]
-    x: (_|_){
-      // [structural_cycle]
-      y: (_|_){
-        // [structural_cycle]
-        z: (_|_){
-          // [structural_cycle]
-          z: (_|_){
-            // [structural_cycle] t4.x.y.z.z: structural cycle
-          }
-        }
-      }
-    }
-    a: (_|_){
-      // [structural_cycle] t4.x.y.z.z: structural cycle
-    }
-  }
-}
+-- out/errors.txt --
+[structural_cycle] t1.a.b.c.c: structural cycle
+[structural_cycle] t2.a.b.c.c: structural cycle
+[structural_cycle] t3.a.b.c.d.d: structural cycle
+[structural_cycle] t4.x.y.z.z: structural cycle
 -- out/compile --
 --- in.cue
 {

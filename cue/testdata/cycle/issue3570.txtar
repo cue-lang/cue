@@ -1,23 +1,12 @@
 # evalv2 panics in `DerefValue` when processing a specific CUE input
 # discovered via oss-fuzz, reproducing on both v0.9.2 and v0.10.1.
 # https://cuelang.org/issue/3570
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 foo: foo: 25 | 44
 foo
-foo: foo
--- out/compile --
---- in.cue
-{
-  foo: {
-    foo: (25|44)
-  }
-  〈0;foo〉
-  foo: 〈0;foo〉
-}
--- out/evalalpha --
-Errors:
-2 errors in empty disjunction:
+foo: foo @test(eq, {foo: _})
+-- out/errors.txt --
+[eval] 2 errors in empty disjunction:
 conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 25 (mismatched types struct and int):
     ./in.cue:1:1
     ./in.cue:1:11
@@ -26,19 +15,12 @@ conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 44 (mismatched types stru
     ./in.cue:1:1
     ./in.cue:1:16
     ./in.cue:2:1
-
-Result:
-(_|_){
-  // [eval] 2 errors in empty disjunction:
-  // conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 25 (mismatched types struct and int):
-  //     ./in.cue:1:1
-  //     ./in.cue:1:11
-  //     ./in.cue:2:1
-  // conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 44 (mismatched types struct and int):
-  //     ./in.cue:1:1
-  //     ./in.cue:1:16
-  //     ./in.cue:2:1
-  foo: (struct){
-    foo: (_){ _ }
+-- out/compile --
+--- in.cue
+{
+  foo: {
+    foo: (25|44)
   }
+  〈0;foo〉
+  foo: 〈0;foo〉
 }

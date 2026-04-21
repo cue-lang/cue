@@ -1,3 +1,5 @@
+#inlinetest:exclude source contains compile-time error expressions (abstract arithmetic,
+# bound comparisons) which prevent the inline runner from compiling the source.
 // Issue #742
 // Issue #405
 -- in.cue --

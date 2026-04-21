@@ -503,6 +503,15 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				return
 			}
 
+			// When inline mode is enabled, every archive that lacks @test
+			// directives must carry a #inlinetest:exclude comment explaining
+			// why it is excluded. This prevents new unconverted files from
+			// being added silently.
+			if x.Inline && !hasInlinetestExclude(a) {
+				t.Errorf("archive has no @test directives and no #inlinetest:exclude comment;\n" +
+					"\tadd @test directives or add '#inlinetest:exclude <reason>' to the archive comment")
+			}
+
 			tc := &Test{
 				T:       t,
 				M:       m,

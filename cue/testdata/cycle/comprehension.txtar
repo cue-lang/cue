@@ -1,4 +1,3 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import (
 	"list"
@@ -11,11 +10,11 @@ A: {
 	a: {
 		parent: ""
 		children: [for k, v in A if v.parent == k {k}]
-	}
+	} @test(eq, {parent: "", children: []})
 	b: {
 		parent: "a"
 		children: [for k, v in A if v.parent == k {k}]
-	}
+	} @test(eq, {parent: "a", children: []})
 }
 
 // This should result in an incomplete error (a reference cycle error classifies
@@ -24,10 +23,15 @@ B: {
 	a: {
 		parent: ""
 		children: [for k, v in B for _, w in v.children {k}]
-	}
+	} @test(eq, {
+		parent: ""
+		children: _|_ @test(err, code=incomplete, contains="B.a.children: cannot range over v.children (incomplete type list)", pos=[24:40])
+	})
 }
 
-// Issue #486
+// Issue #486: stack overflow in v0.3.0 when evaluating parametric fields with
+// conditional comprehensions; the same code worked correctly in v0.2.0.
+// https://cuelang.org/issue/486
 Issue486: {
 	A: {
 		a: {
@@ -52,9 +56,18 @@ Issue486: {
 			},
 		]
 	}
+	@test(eq, {
+		A: {
+			a: {parent: "", children: ["b"]}
+			b: {parent: "a", children: ["c"]}
+			c: {parent: "b", children: []}
+		}
+	})
 }
 
-// Issue #1666
+// Issue #1666: evaluator hangs indefinitely when combining disjunctions with
+// for comprehensions iterating over mapped fields.
+// https://cuelang.org/issue/1666
 issue1666: {
 	#E: {
 		f1: [string]: #E | [...#E]
@@ -71,11 +84,21 @@ issue1666: {
 			}
 		}
 	}
+	@test(eq, {
+		#E: {f1: {}, f2: {}}
+		_e: {f2: {a: {t: {f1: {}, f2: {}}}}, f1: {}}
+		e: {
+			f1: {a: {f1: {}, f2: {}}}
+			f2: {a: {t: {f1: {}, f2: {}}}}
+		}
+	})
 }
 
-// Issue #779: bidirectional projection
+// Issue #779: for comprehension incorrectly rejected valid bidirectional
+// projection patterns, reporting a cycle error even when no true cycle exists.
 // Should be allowed as long as the set of fields is not modified as a result
 // of a comprehension.
+// https://cuelang.org/issue/779
 issue779: {
 	X: Y.message
 	STATE: {
@@ -88,11 +111,18 @@ issue779: {
 	Y: STATE & { message: X }
 	X: "test"
 	STATE: { code: 101 }
+	@test(eq, {
+		X: "test"
+		STATE: {code: 101}
+		Y: {message: "test", code: 101}
+	})
 }
 
+// Issue #1934: regression in v0.4.1 where nested comprehensions referencing
+// fields within the same struct were incorrectly reported as cycles.
 // Comprehension ends up inserting in the same arcs over which it
 // is iterating. This is fine as long as the set is not altered.
-// Issue #1934
+// https://cuelang.org/issue/1934
 selfReferential: T1: {
 	S: d: "bar"
 
@@ -101,10 +131,14 @@ selfReferential: T1: {
 	for s, v in S for t, _ in T {
 		T: (t): S: (s): v
 	}
+	@test(eq, {
+		S: {d: "bar"}
+		T: {e: {S: {a: "foo", d: "bar"}}}
+	})
 }
 
-// selfReferential comprehenion for list.
-// Issue #1934
+// selfReferential comprehension for list.
+// https://cuelang.org/issue/1934
 selfReferential: list: {
 	panels: [
 		for i, _ in panels {
@@ -112,6 +146,7 @@ selfReferential: list: {
 		}
 	]
 	panels: [{}, {}, {}]
+	@test(eq, {panels: [{id: 0}, {id: 1}, {id: 2}]})
 }
 
 selfReferential: insertionError: {
@@ -123,6 +158,7 @@ selfReferential: insertionError: {
 			// defined.
 			("foo3"): 1
 		}
+		@test(err, code=eval, contains="adding field foo3 not allowed as field set was already referenced", pos=[6:14])
 	}
 }
 
@@ -140,6 +176,15 @@ selfReferential: acrossOr: t1: p1: {
 	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
+	@test(eq, {
+		o: {retry: {reject: "ok"}}
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {reject: string} | {resource: string}
+		}
+		#Output: {reject: string} | {resource: string}
+	})
 }
 
 selfReferential: acrossOr: t1: p2: {
@@ -154,6 +199,15 @@ selfReferential: acrossOr: t1: p2: {
 		resource: string
 		retry: #Output
 	}
+	@test(eq, {
+		#Output: {reject: string} | {resource: string}
+		o: {retry: {reject: "ok"}}
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {reject: string} | {resource: string}
+		}
+	})
 }
 
 selfReferential: acrossOr: t1: p3: {
@@ -168,6 +222,15 @@ selfReferential: acrossOr: t1: p3: {
 	}
 
 	o: #Output & { retry: reject: "ok" }
+	@test(eq, {
+		#Output: {reject: string} | {resource: string}
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {reject: string} | {resource: string}
+		}
+		o: {retry: {reject: "ok"}}
+	})
 }
 
 selfReferential: acrossOr: t2: p1: {
@@ -178,6 +241,15 @@ selfReferential: acrossOr: t2: p1: {
 		d2: string
 		d3: b: d
 	}
+	@test(eq, {
+		d: int | string
+		o: {b: 2}
+		#A: {
+			d1: int
+			d2: string
+			d3: {b: int | string}
+		}
+	})
 }
 
 selfReferential: acrossOr: t2: p2: {
@@ -188,6 +260,15 @@ selfReferential: acrossOr: t2: p2: {
 		d2: string
 		d3: b: d
 	}
+	@test(eq, {
+		o: {b: 2}
+		d: int | string
+		#A: {
+			d1: int
+			d2: string
+			d3: {b: int | string}
+		}
+	})
 }
 
 selfReferential: acrossOr: t2: p3: {
@@ -198,8 +279,20 @@ selfReferential: acrossOr: t2: p3: {
 		d3: b: d
 	}
 	d: or([for x, y in #A { y }])
+	@test(eq, {
+		o: {b: 2}
+		#A: {
+			d1: int
+			d2: string
+			d3: {b: int | string}
+		}
+		d: int | string
+	})
 }
 
+// Issue #1881: evaluator required the source of a for comprehension to be
+// fully evaluated before iterating, causing false structural cycle errors.
+// https://cuelang.org/issue/1881
 issue1881: p1: {
 	o: #Output & { retry: output: reject: "ok" }
 
@@ -212,6 +305,17 @@ issue1881: p1: {
 	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
+	@test(eq, {
+		o: {retry: {output: {reject: "ok"}}}
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {
+				output: {reject: string} | {resource: string}
+			}
+		}
+		#Output: {reject: string} | {resource: string}
+	})
 }
 
 issue1881: p2: {
@@ -226,6 +330,17 @@ issue1881: p2: {
 	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
+	@test(eq, {
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {
+				output: {reject: string} | {resource: string}
+			}
+		}
+		o: {retry: {output: {reject: "ok"}}}
+		#Output: {reject: string} | {resource: string}
+	})
 }
 
 issue1881: p3: {
@@ -240,6 +355,17 @@ issue1881: p3: {
 	}])
 
 	o: #Output & { retry: output: reject: "ok" }
+	@test(eq, {
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {
+				output: {reject: string} | {resource: string}
+			}
+		}
+		#Output: {reject: string} | {resource: string}
+		o: {retry: {output: {reject: "ok"}}}
+	})
 }
 
 siblingInsertion: t1: p1: {
@@ -254,6 +380,15 @@ siblingInsertion: t1: p1: {
 	for id, v in D {
 		deployment: (id): env2: ENV: "True"
 	}
+	@test(eq, {
+		D: {logging: _}
+		deployment: {
+			logging: {
+				env2: {ENV: "True"}
+				env: {ENV: "True"}
+			}
+		}
+	})
 }
 
 siblingInsertion: t1: p2: {
@@ -268,6 +403,15 @@ siblingInsertion: t1: p2: {
 	for k1, v2 in v.env2 {
 		deployment: (k): env: (k1): v2
 	}
+	@test(eq, {
+		D: {logging: _}
+		deployment: {
+			logging: {
+				env2: {ENV: "True"}
+				env: {ENV: "True"}
+			}
+		}
+	})
 }
 
 siblingInsertion: t2: p1: {
@@ -283,6 +427,15 @@ siblingInsertion: t2: p1: {
 	for id, v in D {
 		deployment: (id): env2: ENV: "True"
 	}
+	@test(eq, {
+		D: {logging: _}
+		deployment: {
+			logging: {
+				env2: {ENV: "True"}
+				env: {ENV: "True"}
+			}
+		}
+	})
 }
 
 siblingInsertion: t2: p2: {
@@ -298,24 +451,43 @@ siblingInsertion: t2: p2: {
 	for id, v in D {
 		deployment: (id): env2: ENV: "True"
 	}
+	@test(eq, {
+		D: {logging: _}
+		deployment: {
+			logging: {
+				env2: {ENV: "True"}
+				env: {ENV: "True"}
+			}
+		}
+	})
 }
 
-// Issue #1407
-// Ensure there is a useful error message.
+// Issue #1407: cue export produced a misleading, location-free "cycle error"
+// for incomplete values; the actual problem was an incomplete value, not a
+// true cycle. Ensure there is a useful error message.
+// https://cuelang.org/issue/1407
 selfReferential: fail: {
 	a: {}
 	b: a.x != ""
 	if b {
 	}
+	@test(err, code=incomplete, contains="undefined field: x", pos=[2:7])
 }
 
-// avoid infinite recursion
+// Issue #2367: stack overflow triggered by a comprehension that inserts into
+// the same field it iterates over; the evaluator recurses infinitely instead
+// of returning an error.
+// https://cuelang.org/issue/2367
 issue2367: {
 	a: _
 	for x in [a] {a: x}
+	@test(eq, {a: _})
 }
 
-// evalv2 incorrectly reported structural cycles here.
+// Issue #2310: evalv2 incorrectly reported a structural cycle when a
+// comprehension contained three or more identical substitutions, despite the
+// same pattern working with two substitutions.
+// https://cuelang.org/issue/2310
 issue2310: original: {
 	#s: {#_1: string, #_2: string, #_3: string, strings.Replace(#_1, #_2, #_3, -1)}
 
@@ -337,6 +509,79 @@ issue2310: original: {
 		#s & {#_2: "c", #_3: "d", _},
 		#s & {#_2: "e", #_3: "f", _},
 	]
+	@test(eq, {
+		#s: {
+			_|_
+			#_1: string
+			#_2: string
+			#_3: string
+		}
+		#sub: {
+			_|_
+			#a: string
+			_#X: [string,
+			{_|_, #_1: string, #_2: "a", #_3: "b"},
+			{
+				_|_
+				#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
+				#_2: "c"
+				#_3: "d"
+			},
+			{
+				_|_
+				#_1: {
+					_|_
+					#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
+					#_2: "c"
+					#_3: "d"
+				}
+				#_2: "e"
+				#_3: "f"
+			}]
+			#_1: {
+				_|_
+				#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
+				#_2: "c"
+				#_3: "d"
+			}
+			#_2: "e"
+			#_3: "f"
+		}
+		res: {
+			"bbb"
+			#a: "aaa"
+			_#X: ["aaa",
+			{"bbb", #_1: "aaa", #_2: "a", #_3: "b"},
+			{
+				"bbb"
+				#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
+				#_2: "c"
+				#_3: "d"
+			},
+			{
+				"bbb"
+				#_1: {
+					"bbb"
+					#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
+					#_2: "c"
+					#_3: "d"
+				}
+				#_2: "e"
+				#_3: "f"
+			}]
+			#_1: {
+				"bbb"
+				#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
+				#_2: "c"
+				#_3: "d"
+			}
+			#_2: "e"
+			#_3: "f"
+		}
+		#subs: [{_|_, #_2: "a", #_3: "b", #_1: string},
+		{_|_, #_2: "c", #_3: "d", #_1: string},
+		{_|_, #_2: "e", #_3: "f", #_1: string}]
+	})
 }
 issue2310: reduced: {
 	res: {
@@ -348,7 +593,23 @@ issue2310: reduced: {
 
 	#s: {#str: string, #str + "a"}
 	#subs: [0, 1, 2]
+	@test(eq, {
+		res: {
+			"Xaaa"
+			#X: ["X",
+			{"Xa", #str: "X"},
+			{"Xaa", #str: {"Xa", #str: "X"}},
+			{
+				"Xaaa"
+				#str: {"Xaa", #str: {"Xa", #str: "X"}}
+			}]
+			#str: {"Xaa", #str: {"Xa", #str: "X"}}
+		}
+		#s: {_|_, #str: string}
+		#subs: [0, 1, 2]
+	})
 }
+
 -- issue3903.cue --
 // evalv3 structural cycle regression: a schema with `_deps` and comprehensions
 // over those deps triggered a spurious structural cycle error that exported
@@ -367,6 +628,13 @@ issue3903: reduced: {
 			}
 		]
 	}
+	@test(eq, {
+		s1: {
+			_deps: [{_deps: [], objs: []}]
+			objs: []
+		}
+		#Schema: {_deps: [], objs: []}
+	})
 }
 issue3903: full: {
 	s1: #Schema & {
@@ -390,6 +658,23 @@ issue3903: full: {
 			},
 		]
 	}
+	@test(eq, {
+		s1: {
+			_deps: [{
+				_local: ["s2 local"]
+				_deps: []
+				objs: ["s2 local"]
+			}]
+			_local: ["s1 local"]
+			objs: ["s1 local", "s2 local"]
+		}
+		s2: {
+			_local: ["s2 local"]
+			_deps: []
+			objs: ["s2 local"]
+		}
+		#Schema: {_local: [], _deps: [], objs: []}
+	})
 }
 -- issue2405.cue --
 // A recursive disjunction type (`#Copy` with struct/list/scalar alternatives)
@@ -418,6 +703,13 @@ issue2405: {
 
 	foo: #Copy
 	foo: param: a: [{b: 134}]
+	@test(eq, {
+		#Copy: {param: {}, result: {}} | {param: [], result: []} | {param: number, result: number}
+		foo: {
+			param: {a: [{b: 134}]}
+			result: {a: [{b: 134}]}
+		}
+	})
 }
 -- issue3941.cue --
 // evalv3 regression: a comprehension iterating over a pattern-constrained field
@@ -440,6 +732,17 @@ issue3941: full: {
 			}
 		}
 	}
+	@test(eq, {
+		#Metadata: {name: string}
+		#Resource: {metadata: {name: string}}
+		out: {
+			_metadata: {name: "foo"}
+			resource: {
+				level1: {foo: {metadata: {name: "foo"}}}
+			}
+			_names: ["foo"]
+		}
+	})
 }
 -- issue2229.cue --
 // A list comprehension whose result was unified back into the same list caused
@@ -450,11 +753,19 @@ issue2229: full_ok: X={
 	test:  bool | *true
 
 	make: [ for k, v in X if (v & true) != _|_ { k } ]
-}
+} @test(eq, {
+	build: *true | bool
+	test: *true | bool
+	make: ["build", "test"]
+})
 issue2229: reduced_fail: X={
 	x: true
 	y: [ for _, v in X if v & true { _ } ]
-}
+} @test(err, code=eval,
+	suberr=(code=eval, contains="conflicting values", pos=[2:5, 2:24, 2:28]),
+	suberr=(code=eval, contains="conflicting values", pos=[2:5, 2:24, 2:28]),
+	suberr=(code=eval, contains="structural cycle", pos=[2:24]),
+)
 -- issue4100.cue --
 // Segmentation fault in `adt.(*OpContext).freeNodeContext` in v0.14.1,
 // triggered by a let binding inside a conditional that feeds into a for loop.
@@ -467,919 +778,8 @@ issue4100: {
 		}
 	}
 	for _ in a {}
+	@test(eq, {a: [0]})
 }
--- out/evalalpha --
-Errors:
-conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
-    ./issue2229.cue:12:5
-    ./issue2229.cue:12:24
-    ./issue2229.cue:12:28
-selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
-    ./in.cue:122:14
-structural cycle:
-    ./issue2229.cue:12:24
-
-Result:
-(_|_){
-  // [eval]
-  A: (struct){
-    a: (struct){
-      parent: (string){ "" }
-      children: (#list){
-      }
-    }
-    b: (struct){
-      parent: (string){ "a" }
-      children: (#list){
-      }
-    }
-  }
-  B: (struct){
-    a: (struct){
-      parent: (string){ "" }
-      children: (_|_){
-        // [incomplete] B.a.children: cannot range over v.children (incomplete type list):
-        //     ./in.cue:24:40
-      }
-    }
-  }
-  Issue486: (struct){
-    A: (struct){
-      a: (struct){
-        parent: (string){ "" }
-        children: (#list){
-          0: (string){ "b" }
-        }
-      }
-      b: (struct){
-        parent: (string){ "a" }
-        children: (#list){
-          0: (string){ "c" }
-        }
-      }
-      c: (struct){
-        parent: (string){ "b" }
-        children: (#list){
-        }
-      }
-    }
-  }
-  issue1666: (struct){
-    #E: (#struct){
-      f1: (#struct){
-      }
-      f2: (#struct){
-      }
-    }
-    _e: (#struct){
-      f2: (#struct){
-        a: (#struct){
-          t: ~(issue1666.#E)
-        }
-      }
-      f1: (#struct){
-      }
-    }
-    e: (#struct){
-      f1: (#struct){
-        a: (#struct){
-          f1: (#struct){
-          }
-          f2: (#struct){
-          }
-        }
-      }
-      f2: (#struct){
-        a: (#struct){
-          t: ~(issue1666.#E)
-        }
-      }
-    }
-  }
-  issue779: (struct){
-    X: (string){ "test" }
-    STATE: (struct){
-      code: (int){ 101 }
-    }
-    Y: (struct){
-      message: (string){ "test" }
-      code: (int){ 101 }
-    }
-  }
-  selfReferential: (_|_){
-    // [eval]
-    T1: (struct){
-      S: (struct){
-        d: (string){ "bar" }
-      }
-      T: (struct){
-        e: (struct){
-          S: (struct){
-            a: (string){ "foo" }
-            d: (string){ "bar" }
-          }
-        }
-      }
-    }
-    list: (struct){
-      panels: (#list){
-        0: (struct){
-          id: (int){ 0 }
-        }
-        1: (struct){
-          id: (int){ 1 }
-        }
-        2: (struct){
-          id: (int){ 2 }
-        }
-      }
-    }
-    insertionError: (_|_){
-      // [eval]
-      A: (_|_){
-        // [eval] selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
-        //     ./in.cue:122:14
-        foo: (int){ 1 }
-      }
-    }
-    acrossOr: (struct){
-      t1: (struct){
-        p1: (struct){
-          o: (#struct){
-            retry: (#struct){
-              reject: (string){ "ok" }
-            }
-          }
-          #AllOutputs: (#struct){
-            reject: (string){ string }
-            resource: (string){ string }
-            retry: (#struct){ |((#struct){
-                reject: (string){ string }
-              }, (#struct){
-                resource: (string){ string }
-              }) }
-          }
-          #Output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-        }
-        p2: (struct){
-          #Output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-          o: (#struct){
-            retry: (#struct){
-              reject: (string){ "ok" }
-            }
-          }
-          #AllOutputs: (#struct){
-            reject: (string){ string }
-            resource: (string){ string }
-            retry: (#struct){ |((#struct){
-                reject: (string){ string }
-              }, (#struct){
-                resource: (string){ string }
-              }) }
-          }
-        }
-        p3: (struct){
-          #Output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-          #AllOutputs: (#struct){
-            reject: (string){ string }
-            resource: (string){ string }
-            retry: (#struct){ |((#struct){
-                reject: (string){ string }
-              }, (#struct){
-                resource: (string){ string }
-              }) }
-          }
-          o: (#struct){
-            retry: (#struct){
-              reject: (string){ "ok" }
-            }
-          }
-        }
-      }
-      t2: (struct){
-        p1: (struct){
-          d: ((int|string)){ |((int){ int }, (string){ string }) }
-          o: (struct){
-            b: (int){ 2 }
-          }
-          #A: (#struct){
-            d1: (int){ int }
-            d2: (string){ string }
-            d3: (#struct){
-              b: ((int|string)){ |((int){ int }, (string){ string }) }
-            }
-          }
-        }
-        p2: (struct){
-          o: (struct){
-            b: (int){ 2 }
-          }
-          d: ((int|string)){ |((int){ int }, (string){ string }) }
-          #A: (#struct){
-            d1: (int){ int }
-            d2: (string){ string }
-            d3: (#struct){
-              b: ((int|string)){ |((int){ int }, (string){ string }) }
-            }
-          }
-        }
-        p3: (struct){
-          o: (struct){
-            b: (int){ 2 }
-          }
-          #A: (#struct){
-            d1: (int){ int }
-            d2: (string){ string }
-            d3: (#struct){
-              b: ((int|string)){ |((int){ int }, (string){ string }) }
-            }
-          }
-          d: ((int|string)){ |((int){ int }, (string){ string }) }
-        }
-      }
-    }
-    fail: (_|_){
-      // [incomplete] selfReferential.fail.b: undefined field: x:
-      //     ./in.cue:305:7
-      a: (struct){
-      }
-      b: (_|_){
-        // [incomplete] selfReferential.fail.b: undefined field: x:
-        //     ./in.cue:305:7
-      }
-    }
-  }
-  issue1881: (struct){
-    p1: (struct){
-      o: (#struct){
-        retry: (#struct){
-          output: (#struct){
-            reject: (string){ "ok" }
-          }
-        }
-      }
-      #AllOutputs: (#struct){
-        reject: (string){ string }
-        resource: (string){ string }
-        retry: (#struct){
-          output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-        }
-      }
-      #Output: (#struct){ |((#struct){
-          reject: (string){ string }
-        }, (#struct){
-          resource: (string){ string }
-        }) }
-    }
-    p2: (struct){
-      #AllOutputs: (#struct){
-        reject: (string){ string }
-        resource: (string){ string }
-        retry: (#struct){
-          output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-        }
-      }
-      o: (#struct){
-        retry: (#struct){
-          output: (#struct){
-            reject: (string){ "ok" }
-          }
-        }
-      }
-      #Output: (#struct){ |((#struct){
-          reject: (string){ string }
-        }, (#struct){
-          resource: (string){ string }
-        }) }
-    }
-    p3: (struct){
-      #AllOutputs: (#struct){
-        reject: (string){ string }
-        resource: (string){ string }
-        retry: (#struct){
-          output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-        }
-      }
-      #Output: (#struct){ |((#struct){
-          reject: (string){ string }
-        }, (#struct){
-          resource: (string){ string }
-        }) }
-      o: (#struct){
-        retry: (#struct){
-          output: (#struct){
-            reject: (string){ "ok" }
-          }
-        }
-      }
-    }
-  }
-  siblingInsertion: (struct){
-    t1: (struct){
-      p1: (struct){
-        D: (struct){
-          logging: (_){ _ }
-        }
-        deployment: (struct){
-          logging: (struct){
-            env2: (struct){
-              ENV: (string){ "True" }
-            }
-            env: (struct){
-              ENV: (string){ "True" }
-            }
-          }
-        }
-      }
-      p2: (struct){
-        D: (struct){
-          logging: (_){ _ }
-        }
-        deployment: (struct){
-          logging: (struct){
-            env2: (struct){
-              ENV: (string){ "True" }
-            }
-            env: (struct){
-              ENV: (string){ "True" }
-            }
-          }
-        }
-      }
-    }
-    t2: (struct){
-      p1: (struct){
-        D: (struct){
-          logging: (_){ _ }
-        }
-        deployment: (struct){
-          logging: (struct){
-            env2: (struct){
-              ENV: (string){ "True" }
-            }
-            env: (struct){
-              ENV: (string){ "True" }
-            }
-          }
-        }
-      }
-      p2: (struct){
-        D: (struct){
-          logging: (_){ _ }
-        }
-        deployment: (struct){
-          logging: (struct){
-            env2: (struct){
-              ENV: (string){ "True" }
-            }
-            env: (struct){
-              ENV: (string){ "True" }
-            }
-          }
-        }
-      }
-    }
-  }
-  issue2367: (struct){
-    a: (_){ _ }
-  }
-  issue2310: (struct){
-    original: (struct){
-      #s: (_|_){
-        // [incomplete] issue2310.original.#s: error in call to strings.Replace: non-concrete value string:
-        //     ./in.cue:318:46
-        //     ./in.cue:318:38
-        #_1: (string){ string }
-        #_2: (string){ string }
-        #_3: (string){ string }
-      }
-      #sub: (_|_){
-        // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-        //     ./in.cue:318:46
-        //     ./in.cue:318:12
-        #a: (string){ string }
-        _#X: (#list){
-          0: (string){ string }
-          1: (_|_){
-            // [incomplete] issue2310.original.#sub._#X.1: error in call to strings.Replace: non-concrete value string:
-            //     ./in.cue:318:46
-            //     ./in.cue:318:12
-            #_1: (string){ string }
-            #_2: (string){ "a" }
-            #_3: (string){ "b" }
-          }
-          2: (_|_){
-            // [incomplete] issue2310.original.#sub._#X.2.#_1: error in call to strings.Replace: non-concrete value string:
-            //     ./in.cue:318:46
-            //     ./in.cue:318:12
-            #_1: (_|_){
-              // [incomplete] issue2310.original.#sub._#X.2.#_1: error in call to strings.Replace: non-concrete value string:
-              //     ./in.cue:318:46
-              //     ./in.cue:318:12
-              #_1: (string){ string }
-              #_2: (string){ "a" }
-              #_3: (string){ "b" }
-            }
-            #_2: (string){ "c" }
-            #_3: (string){ "d" }
-          }
-          3: (_|_){
-            // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-            //     ./in.cue:318:46
-            //     ./in.cue:318:12
-            #_1: (_|_){
-              // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-              //     ./in.cue:318:46
-              //     ./in.cue:318:12
-              #_1: (_|_){
-                // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-                //     ./in.cue:318:46
-                //     ./in.cue:318:12
-                #_1: (string){ string }
-                #_2: (string){ "a" }
-                #_3: (string){ "b" }
-              }
-              #_2: (string){ "c" }
-              #_3: (string){ "d" }
-            }
-            #_2: (string){ "e" }
-            #_3: (string){ "f" }
-          }
-        }
-        #_1: (_|_){
-          // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-          //     ./in.cue:318:46
-          //     ./in.cue:318:12
-          #_1: (_|_){
-            // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-            //     ./in.cue:318:46
-            //     ./in.cue:318:12
-            #_1: (string){ string }
-            #_2: (string){ "a" }
-            #_3: (string){ "b" }
-          }
-          #_2: (string){ "c" }
-          #_3: (string){ "d" }
-        }
-        #_2: (string){ "e" }
-        #_3: (string){ "f" }
-      }
-      res: (string){
-        "bbb"
-        #a: (string){ "aaa" }
-        _#X: (#list){
-          0: (string){ "aaa" }
-          1: (string){
-            "bbb"
-            #_1: (string){ "aaa" }
-            #_2: (string){ "a" }
-            #_3: (string){ "b" }
-          }
-          2: (string){
-            "bbb"
-            #_1: (string){
-              "bbb"
-              #_1: (string){ "aaa" }
-              #_2: (string){ "a" }
-              #_3: (string){ "b" }
-            }
-            #_2: (string){ "c" }
-            #_3: (string){ "d" }
-          }
-          3: (string){
-            "bbb"
-            #_1: (string){
-              "bbb"
-              #_1: (string){
-                "bbb"
-                #_1: (string){ "aaa" }
-                #_2: (string){ "a" }
-                #_3: (string){ "b" }
-              }
-              #_2: (string){ "c" }
-              #_3: (string){ "d" }
-            }
-            #_2: (string){ "e" }
-            #_3: (string){ "f" }
-          }
-        }
-        #_1: (string){
-          "bbb"
-          #_1: (string){
-            "bbb"
-            #_1: (string){ "aaa" }
-            #_2: (string){ "a" }
-            #_3: (string){ "b" }
-          }
-          #_2: (string){ "c" }
-          #_3: (string){ "d" }
-        }
-        #_2: (string){ "e" }
-        #_3: (string){ "f" }
-      }
-      #subs: (#list){
-        0: (_|_){
-          // [incomplete] issue2310.original.#subs.0: error in call to strings.Replace: non-concrete value string:
-          //     ./in.cue:318:46
-          //     ./in.cue:318:12
-          #_2: (string){ "a" }
-          #_3: (string){ "b" }
-          #_1: (string){ string }
-        }
-        1: (_|_){
-          // [incomplete] issue2310.original.#subs.1: error in call to strings.Replace: non-concrete value string:
-          //     ./in.cue:318:46
-          //     ./in.cue:318:12
-          #_2: (string){ "c" }
-          #_3: (string){ "d" }
-          #_1: (string){ string }
-        }
-        2: (_|_){
-          // [incomplete] issue2310.original.#subs.2: error in call to strings.Replace: non-concrete value string:
-          //     ./in.cue:318:46
-          //     ./in.cue:318:12
-          #_2: (string){ "e" }
-          #_3: (string){ "f" }
-          #_1: (string){ string }
-        }
-      }
-    }
-    reduced: (struct){
-      res: (string){
-        "Xaaa"
-        #X: (#list){
-          0: (string){ "X" }
-          1: (string){
-            "Xa"
-            #str: (string){ "X" }
-          }
-          2: (string){
-            "Xaa"
-            #str: (string){
-              "Xa"
-              #str: (string){ "X" }
-            }
-          }
-          3: (string){
-            "Xaaa"
-            #str: (string){
-              "Xaa"
-              #str: (string){
-                "Xa"
-                #str: (string){ "X" }
-              }
-            }
-          }
-        }
-        #str: (string){
-          "Xaa"
-          #str: (string){
-            "Xa"
-            #str: (string){ "X" }
-          }
-        }
-      }
-      #s: (_|_){
-        // [incomplete] issue2310.reduced.#s: non-concrete value string in operand to +:
-        //     ./in.cue:347:21
-        //     ./in.cue:347:13
-        #str: (string){ string }
-      }
-      #subs: (#list){
-        0: (int){ 0 }
-        1: (int){ 1 }
-        2: (int){ 2 }
-      }
-    }
-  }
-  issue2229: (_|_){
-    // [eval]
-    full_ok: (struct){
-      build: (bool){ |(*(bool){ true }, (bool){ bool }) }
-      test: (bool){ |(*(bool){ true }, (bool){ bool }) }
-      make: (#list){
-        0: (string){ "build" }
-        1: (string){ "test" }
-      }
-    }
-    reduced_fail: (_|_){
-      // [eval]
-      x: (bool){ true }
-      y: (_|_){
-        // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
-        //     ./issue2229.cue:12:5
-        //     ./issue2229.cue:12:24
-        //     ./issue2229.cue:12:28
-        // structural cycle:
-        //     ./issue2229.cue:12:24
-        0: (_){ _ }
-      }
-    }
-  }
-  issue2405: (struct){
-    #Copy: (#struct){ |((#struct){
-        param: (#struct){
-        }
-        result: (#struct){
-        }
-      }, (#struct){
-        param: (list){
-        }
-        result: (#list){
-        }
-      }, (#struct){
-        param: (number){ number }
-        result: (number){ number }
-      }) }
-    foo: (#struct){
-      param: (#struct){
-        a: (#list){
-          0: (struct){
-            b: (int){ 134 }
-          }
-        }
-      }
-      result: (#struct){
-        a: (#list){
-          0: (#struct){
-            b: (int){ 134 }
-          }
-        }
-      }
-    }
-  }
-  issue3903: (struct){
-    reduced: (struct){
-      s1: (#struct){
-        _deps: (#list){
-          0: ~(issue3903.reduced.#Schema)
-        }
-        objs: (#list){
-        }
-      }
-      #Schema: (#struct){
-        _deps: (list){
-        }
-        objs: (#list){
-        }
-      }
-    }
-    full: (struct){
-      s1: (#struct){
-        _deps: (#list){
-          0: (#struct){
-            _local: (#list){
-              0: (string){ "s2 local" }
-            }
-            _deps: (list){
-            }
-            objs: (#list){
-              0: (string){ "s2 local" }
-            }
-          }
-        }
-        _local: (#list){
-          0: (string){ "s1 local" }
-        }
-        objs: (#list){
-          0: (string){ "s1 local" }
-          1: (string){ "s2 local" }
-        }
-      }
-      s2: (#struct){
-        _local: (#list){
-          0: (string){ "s2 local" }
-        }
-        _deps: (list){
-        }
-        objs: (#list){
-          0: (string){ "s2 local" }
-        }
-      }
-      #Schema: (#struct){
-        _local: (list){
-        }
-        _deps: (list){
-        }
-        objs: (#list){
-        }
-      }
-    }
-  }
-  issue3941: (struct){
-    full: (struct){
-      #Metadata: (#struct){
-        name: (string){ string }
-      }
-      #Resource: (#struct){
-        metadata: ~(issue3941.full.#Metadata)
-      }
-      out: (struct){
-        _metadata: (struct){
-          name: (string){ "foo" }
-        }
-        resource: (struct){
-          level1: (struct){
-            foo: (#struct){
-              metadata: (#struct){
-                name: (string){ "foo" }
-              }
-            }
-          }
-        }
-        _names: (#list){
-          0: (string){ "foo" }
-        }
-      }
-    }
-  }
-  issue4100: (struct){
-    a: (#list){
-      let l#1 = (#list){
-        0: (int){ 0 }
-      }
-      0: (int){ 0 }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,12 @@
- Errors:
-+conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
-+    ./issue2229.cue:12:5
-+    ./issue2229.cue:12:24
-+    ./issue2229.cue:12:28
- selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
-     ./in.cue:122:14
-+structural cycle:
-+    ./issue2229.cue:12:24
- 
- Result:
- (_|_){
-@@ -55,12 +61,12 @@
-       }
-     }
-     _e: (#struct){
--      f1: (#struct){
--      }
--      f2: (#struct){
--        a: (#struct){
--          t: ~(issue1666.#E)
--        }
-+      f2: (#struct){
-+        a: (#struct){
-+          t: ~(issue1666.#E)
-+        }
-+      }
-+      f1: (#struct){
-       }
-     }
-     e: (#struct){
-@@ -529,25 +535,25 @@
-           // [incomplete] issue2310.original.#subs.0: error in call to strings.Replace: non-concrete value string:
-           //     ./in.cue:318:46
-           //     ./in.cue:318:12
--          #_1: (string){ string }
-           #_2: (string){ "a" }
-           #_3: (string){ "b" }
-+          #_1: (string){ string }
-         }
-         1: (_|_){
-           // [incomplete] issue2310.original.#subs.1: error in call to strings.Replace: non-concrete value string:
-           //     ./in.cue:318:46
-           //     ./in.cue:318:12
--          #_1: (string){ string }
--          #_2: (string){ "c" }
--          #_3: (string){ "d" }
-+          #_2: (string){ "c" }
-+          #_3: (string){ "d" }
-+          #_1: (string){ string }
-         }
-         2: (_|_){
-           // [incomplete] issue2310.original.#subs.2: error in call to strings.Replace: non-concrete value string:
-           //     ./in.cue:318:46
-           //     ./in.cue:318:12
--          #_1: (string){ string }
-           #_2: (string){ "e" }
-           #_3: (string){ "f" }
-+          #_1: (string){ string }
-         }
-       }
-     }
-@@ -599,16 +605,67 @@
-       }
-     }
-   }
-+  issue2229: (_|_){
-+    // [eval]
-+    full_ok: (struct){
-+      build: (bool){ |(*(bool){ true }, (bool){ bool }) }
-+      test: (bool){ |(*(bool){ true }, (bool){ bool }) }
-+      make: (#list){
-+        0: (string){ "build" }
-+        1: (string){ "test" }
-+      }
-+    }
-+    reduced_fail: (_|_){
-+      // [eval]
-+      x: (bool){ true }
-+      y: (_|_){
-+        // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
-+        //     ./issue2229.cue:12:5
-+        //     ./issue2229.cue:12:24
-+        //     ./issue2229.cue:12:28
-+        // structural cycle:
-+        //     ./issue2229.cue:12:24
-+        0: (_){ _ }
-+      }
-+    }
-+  }
-+  issue2405: (struct){
-+    #Copy: (#struct){ |((#struct){
-+        param: (#struct){
-+        }
-+        result: (#struct){
-+        }
-+      }, (#struct){
-+        param: (list){
-+        }
-+        result: (#list){
-+        }
-+      }, (#struct){
-+        param: (number){ number }
-+        result: (number){ number }
-+      }) }
-+    foo: (#struct){
-+      param: (#struct){
-+        a: (#list){
-+          0: (struct){
-+            b: (int){ 134 }
-+          }
-+        }
-+      }
-+      result: (#struct){
-+        a: (#list){
-+          0: (#struct){
-+            b: (int){ 134 }
-+          }
-+        }
-+      }
-+    }
-+  }
-   issue3903: (struct){
-     reduced: (struct){
-       s1: (#struct){
-         _deps: (#list){
--          0: (#struct){
--            _deps: (list){
--            }
--            objs: (#list){
--            }
--          }
-+          0: ~(issue3903.reduced.#Schema)
-         }
-         objs: (#list){
-         }
-@@ -689,4 +746,12 @@
-       }
-     }
-   }
-+  issue4100: (struct){
-+    a: (#list){
-+      let l#1 = (#list){
-+        0: (int){ 0 }
-+      }
-+      0: (int){ 0 }
-+    }
-+  }
- }
 -- out/eval/stats --
 Leaks:  91
 Freed:  821
@@ -1398,701 +798,37 @@ ConjunctInfos:       1048
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1
--- diff/explanation --
-B.a.children: now correctly marked as incomplete
--- out/eval --
-Errors:
-selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
-    ./in.cue:122:14
-
-Result:
-(_|_){
-  // [eval]
-  A: (struct){
-    a: (struct){
-      parent: (string){ "" }
-      children: (#list){
-      }
-    }
-    b: (struct){
-      parent: (string){ "a" }
-      children: (#list){
-      }
-    }
-  }
-  B: (struct){
-    a: (struct){
-      parent: (string){ "" }
-      children: (_|_){
-        // [incomplete] B.a.children: cannot range over v.children (incomplete type list):
-        //     ./in.cue:24:40
-      }
-    }
-  }
-  Issue486: (struct){
-    A: (struct){
-      a: (struct){
-        parent: (string){ "" }
-        children: (#list){
-          0: (string){ "b" }
-        }
-      }
-      b: (struct){
-        parent: (string){ "a" }
-        children: (#list){
-          0: (string){ "c" }
-        }
-      }
-      c: (struct){
-        parent: (string){ "b" }
-        children: (#list){
-        }
-      }
-    }
-  }
-  issue1666: (struct){
-    #E: (#struct){
-      f1: (#struct){
-      }
-      f2: (#struct){
-      }
-    }
-    _e: (#struct){
-      f1: (#struct){
-      }
-      f2: (#struct){
-        a: (#struct){
-          t: ~(issue1666.#E)
-        }
-      }
-    }
-    e: (#struct){
-      f1: (#struct){
-        a: (#struct){
-          f1: (#struct){
-          }
-          f2: (#struct){
-          }
-        }
-      }
-      f2: (#struct){
-        a: (#struct){
-          t: ~(issue1666.#E)
-        }
-      }
-    }
-  }
-  issue779: (struct){
-    X: (string){ "test" }
-    STATE: (struct){
-      code: (int){ 101 }
-    }
-    Y: (struct){
-      message: (string){ "test" }
-      code: (int){ 101 }
-    }
-  }
-  selfReferential: (_|_){
-    // [eval]
-    T1: (struct){
-      S: (struct){
-        d: (string){ "bar" }
-      }
-      T: (struct){
-        e: (struct){
-          S: (struct){
-            a: (string){ "foo" }
-            d: (string){ "bar" }
-          }
-        }
-      }
-    }
-    list: (struct){
-      panels: (#list){
-        0: (struct){
-          id: (int){ 0 }
-        }
-        1: (struct){
-          id: (int){ 1 }
-        }
-        2: (struct){
-          id: (int){ 2 }
-        }
-      }
-    }
-    insertionError: (_|_){
-      // [eval]
-      A: (_|_){
-        // [eval] selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
-        //     ./in.cue:122:14
-        foo: (int){ 1 }
-      }
-    }
-    acrossOr: (struct){
-      t1: (struct){
-        p1: (struct){
-          o: (#struct){
-            retry: (#struct){
-              reject: (string){ "ok" }
-            }
-          }
-          #AllOutputs: (#struct){
-            reject: (string){ string }
-            resource: (string){ string }
-            retry: (#struct){ |((#struct){
-                reject: (string){ string }
-              }, (#struct){
-                resource: (string){ string }
-              }) }
-          }
-          #Output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-        }
-        p2: (struct){
-          #Output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-          o: (#struct){
-            retry: (#struct){
-              reject: (string){ "ok" }
-            }
-          }
-          #AllOutputs: (#struct){
-            reject: (string){ string }
-            resource: (string){ string }
-            retry: (#struct){ |((#struct){
-                reject: (string){ string }
-              }, (#struct){
-                resource: (string){ string }
-              }) }
-          }
-        }
-        p3: (struct){
-          #Output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-          #AllOutputs: (#struct){
-            reject: (string){ string }
-            resource: (string){ string }
-            retry: (#struct){ |((#struct){
-                reject: (string){ string }
-              }, (#struct){
-                resource: (string){ string }
-              }) }
-          }
-          o: (#struct){
-            retry: (#struct){
-              reject: (string){ "ok" }
-            }
-          }
-        }
-      }
-      t2: (struct){
-        p1: (struct){
-          d: ((int|string)){ |((int){ int }, (string){ string }) }
-          o: (struct){
-            b: (int){ 2 }
-          }
-          #A: (#struct){
-            d1: (int){ int }
-            d2: (string){ string }
-            d3: (#struct){
-              b: ((int|string)){ |((int){ int }, (string){ string }) }
-            }
-          }
-        }
-        p2: (struct){
-          o: (struct){
-            b: (int){ 2 }
-          }
-          d: ((int|string)){ |((int){ int }, (string){ string }) }
-          #A: (#struct){
-            d1: (int){ int }
-            d2: (string){ string }
-            d3: (#struct){
-              b: ((int|string)){ |((int){ int }, (string){ string }) }
-            }
-          }
-        }
-        p3: (struct){
-          o: (struct){
-            b: (int){ 2 }
-          }
-          #A: (#struct){
-            d1: (int){ int }
-            d2: (string){ string }
-            d3: (#struct){
-              b: ((int|string)){ |((int){ int }, (string){ string }) }
-            }
-          }
-          d: ((int|string)){ |((int){ int }, (string){ string }) }
-        }
-      }
-    }
-    fail: (_|_){
-      // [incomplete] selfReferential.fail.b: undefined field: x:
-      //     ./in.cue:305:7
-      a: (struct){
-      }
-      b: (_|_){
-        // [incomplete] selfReferential.fail.b: undefined field: x:
-        //     ./in.cue:305:7
-      }
-    }
-  }
-  issue1881: (struct){
-    p1: (struct){
-      o: (#struct){
-        retry: (#struct){
-          output: (#struct){
-            reject: (string){ "ok" }
-          }
-        }
-      }
-      #AllOutputs: (#struct){
-        reject: (string){ string }
-        resource: (string){ string }
-        retry: (#struct){
-          output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-        }
-      }
-      #Output: (#struct){ |((#struct){
-          reject: (string){ string }
-        }, (#struct){
-          resource: (string){ string }
-        }) }
-    }
-    p2: (struct){
-      #AllOutputs: (#struct){
-        reject: (string){ string }
-        resource: (string){ string }
-        retry: (#struct){
-          output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-        }
-      }
-      o: (#struct){
-        retry: (#struct){
-          output: (#struct){
-            reject: (string){ "ok" }
-          }
-        }
-      }
-      #Output: (#struct){ |((#struct){
-          reject: (string){ string }
-        }, (#struct){
-          resource: (string){ string }
-        }) }
-    }
-    p3: (struct){
-      #AllOutputs: (#struct){
-        reject: (string){ string }
-        resource: (string){ string }
-        retry: (#struct){
-          output: (#struct){ |((#struct){
-              reject: (string){ string }
-            }, (#struct){
-              resource: (string){ string }
-            }) }
-        }
-      }
-      #Output: (#struct){ |((#struct){
-          reject: (string){ string }
-        }, (#struct){
-          resource: (string){ string }
-        }) }
-      o: (#struct){
-        retry: (#struct){
-          output: (#struct){
-            reject: (string){ "ok" }
-          }
-        }
-      }
-    }
-  }
-  siblingInsertion: (struct){
-    t1: (struct){
-      p1: (struct){
-        D: (struct){
-          logging: (_){ _ }
-        }
-        deployment: (struct){
-          logging: (struct){
-            env2: (struct){
-              ENV: (string){ "True" }
-            }
-            env: (struct){
-              ENV: (string){ "True" }
-            }
-          }
-        }
-      }
-      p2: (struct){
-        D: (struct){
-          logging: (_){ _ }
-        }
-        deployment: (struct){
-          logging: (struct){
-            env2: (struct){
-              ENV: (string){ "True" }
-            }
-            env: (struct){
-              ENV: (string){ "True" }
-            }
-          }
-        }
-      }
-    }
-    t2: (struct){
-      p1: (struct){
-        D: (struct){
-          logging: (_){ _ }
-        }
-        deployment: (struct){
-          logging: (struct){
-            env2: (struct){
-              ENV: (string){ "True" }
-            }
-            env: (struct){
-              ENV: (string){ "True" }
-            }
-          }
-        }
-      }
-      p2: (struct){
-        D: (struct){
-          logging: (_){ _ }
-        }
-        deployment: (struct){
-          logging: (struct){
-            env2: (struct){
-              ENV: (string){ "True" }
-            }
-            env: (struct){
-              ENV: (string){ "True" }
-            }
-          }
-        }
-      }
-    }
-  }
-  issue2367: (struct){
-    a: (_){ _ }
-  }
-  issue2310: (struct){
-    original: (struct){
-      #s: (_|_){
-        // [incomplete] issue2310.original.#s: error in call to strings.Replace: non-concrete value string:
-        //     ./in.cue:318:46
-        //     ./in.cue:318:38
-        #_1: (string){ string }
-        #_2: (string){ string }
-        #_3: (string){ string }
-      }
-      #sub: (_|_){
-        // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-        //     ./in.cue:318:46
-        //     ./in.cue:318:12
-        #a: (string){ string }
-        _#X: (#list){
-          0: (string){ string }
-          1: (_|_){
-            // [incomplete] issue2310.original.#sub._#X.1: error in call to strings.Replace: non-concrete value string:
-            //     ./in.cue:318:46
-            //     ./in.cue:318:12
-            #_1: (string){ string }
-            #_2: (string){ "a" }
-            #_3: (string){ "b" }
-          }
-          2: (_|_){
-            // [incomplete] issue2310.original.#sub._#X.2.#_1: error in call to strings.Replace: non-concrete value string:
-            //     ./in.cue:318:46
-            //     ./in.cue:318:12
-            #_1: (_|_){
-              // [incomplete] issue2310.original.#sub._#X.2.#_1: error in call to strings.Replace: non-concrete value string:
-              //     ./in.cue:318:46
-              //     ./in.cue:318:12
-              #_1: (string){ string }
-              #_2: (string){ "a" }
-              #_3: (string){ "b" }
-            }
-            #_2: (string){ "c" }
-            #_3: (string){ "d" }
-          }
-          3: (_|_){
-            // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-            //     ./in.cue:318:46
-            //     ./in.cue:318:12
-            #_1: (_|_){
-              // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-              //     ./in.cue:318:46
-              //     ./in.cue:318:12
-              #_1: (_|_){
-                // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-                //     ./in.cue:318:46
-                //     ./in.cue:318:12
-                #_1: (string){ string }
-                #_2: (string){ "a" }
-                #_3: (string){ "b" }
-              }
-              #_2: (string){ "c" }
-              #_3: (string){ "d" }
-            }
-            #_2: (string){ "e" }
-            #_3: (string){ "f" }
-          }
-        }
-        #_1: (_|_){
-          // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-          //     ./in.cue:318:46
-          //     ./in.cue:318:12
-          #_1: (_|_){
-            // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-            //     ./in.cue:318:46
-            //     ./in.cue:318:12
-            #_1: (string){ string }
-            #_2: (string){ "a" }
-            #_3: (string){ "b" }
-          }
-          #_2: (string){ "c" }
-          #_3: (string){ "d" }
-        }
-        #_2: (string){ "e" }
-        #_3: (string){ "f" }
-      }
-      res: (string){
-        "bbb"
-        #a: (string){ "aaa" }
-        _#X: (#list){
-          0: (string){ "aaa" }
-          1: (string){
-            "bbb"
-            #_1: (string){ "aaa" }
-            #_2: (string){ "a" }
-            #_3: (string){ "b" }
-          }
-          2: (string){
-            "bbb"
-            #_1: (string){
-              "bbb"
-              #_1: (string){ "aaa" }
-              #_2: (string){ "a" }
-              #_3: (string){ "b" }
-            }
-            #_2: (string){ "c" }
-            #_3: (string){ "d" }
-          }
-          3: (string){
-            "bbb"
-            #_1: (string){
-              "bbb"
-              #_1: (string){
-                "bbb"
-                #_1: (string){ "aaa" }
-                #_2: (string){ "a" }
-                #_3: (string){ "b" }
-              }
-              #_2: (string){ "c" }
-              #_3: (string){ "d" }
-            }
-            #_2: (string){ "e" }
-            #_3: (string){ "f" }
-          }
-        }
-        #_1: (string){
-          "bbb"
-          #_1: (string){
-            "bbb"
-            #_1: (string){ "aaa" }
-            #_2: (string){ "a" }
-            #_3: (string){ "b" }
-          }
-          #_2: (string){ "c" }
-          #_3: (string){ "d" }
-        }
-        #_2: (string){ "e" }
-        #_3: (string){ "f" }
-      }
-      #subs: (#list){
-        0: (_|_){
-          // [incomplete] issue2310.original.#subs.0: error in call to strings.Replace: non-concrete value string:
-          //     ./in.cue:318:46
-          //     ./in.cue:318:12
-          #_1: (string){ string }
-          #_2: (string){ "a" }
-          #_3: (string){ "b" }
-        }
-        1: (_|_){
-          // [incomplete] issue2310.original.#subs.1: error in call to strings.Replace: non-concrete value string:
-          //     ./in.cue:318:46
-          //     ./in.cue:318:12
-          #_1: (string){ string }
-          #_2: (string){ "c" }
-          #_3: (string){ "d" }
-        }
-        2: (_|_){
-          // [incomplete] issue2310.original.#subs.2: error in call to strings.Replace: non-concrete value string:
-          //     ./in.cue:318:46
-          //     ./in.cue:318:12
-          #_1: (string){ string }
-          #_2: (string){ "e" }
-          #_3: (string){ "f" }
-        }
-      }
-    }
-    reduced: (struct){
-      res: (string){
-        "Xaaa"
-        #X: (#list){
-          0: (string){ "X" }
-          1: (string){
-            "Xa"
-            #str: (string){ "X" }
-          }
-          2: (string){
-            "Xaa"
-            #str: (string){
-              "Xa"
-              #str: (string){ "X" }
-            }
-          }
-          3: (string){
-            "Xaaa"
-            #str: (string){
-              "Xaa"
-              #str: (string){
-                "Xa"
-                #str: (string){ "X" }
-              }
-            }
-          }
-        }
-        #str: (string){
-          "Xaa"
-          #str: (string){
-            "Xa"
-            #str: (string){ "X" }
-          }
-        }
-      }
-      #s: (_|_){
-        // [incomplete] issue2310.reduced.#s: non-concrete value string in operand to +:
-        //     ./in.cue:347:21
-        //     ./in.cue:347:13
-        #str: (string){ string }
-      }
-      #subs: (#list){
-        0: (int){ 0 }
-        1: (int){ 1 }
-        2: (int){ 2 }
-      }
-    }
-  }
-  issue3903: (struct){
-    reduced: (struct){
-      s1: (#struct){
-        _deps: (#list){
-          0: (#struct){
-            _deps: (list){
-            }
-            objs: (#list){
-            }
-          }
-        }
-        objs: (#list){
-        }
-      }
-      #Schema: (#struct){
-        _deps: (list){
-        }
-        objs: (#list){
-        }
-      }
-    }
-    full: (struct){
-      s1: (#struct){
-        _deps: (#list){
-          0: (#struct){
-            _local: (#list){
-              0: (string){ "s2 local" }
-            }
-            _deps: (list){
-            }
-            objs: (#list){
-              0: (string){ "s2 local" }
-            }
-          }
-        }
-        _local: (#list){
-          0: (string){ "s1 local" }
-        }
-        objs: (#list){
-          0: (string){ "s1 local" }
-          1: (string){ "s2 local" }
-        }
-      }
-      s2: (#struct){
-        _local: (#list){
-          0: (string){ "s2 local" }
-        }
-        _deps: (list){
-        }
-        objs: (#list){
-          0: (string){ "s2 local" }
-        }
-      }
-      #Schema: (#struct){
-        _local: (list){
-        }
-        _deps: (list){
-        }
-        objs: (#list){
-        }
-      }
-    }
-  }
-  issue3941: (struct){
-    full: (struct){
-      #Metadata: (#struct){
-        name: (string){ string }
-      }
-      #Resource: (#struct){
-        metadata: ~(issue3941.full.#Metadata)
-      }
-      out: (struct){
-        _metadata: (struct){
-          name: (string){ "foo" }
-        }
-        resource: (struct){
-          level1: (struct){
-            foo: (#struct){
-              metadata: (#struct){
-                name: (string){ "foo" }
-              }
-            }
-          }
-        }
-        _names: (#list){
-          0: (string){ "foo" }
-        }
-      }
-    }
-  }
-}
+-- out/errors.txt --
+[incomplete] B.a.children: cannot range over v.children (incomplete type list):
+    ./in.cue:24:40
+[eval] selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
+    ./in.cue:158:14
+[incomplete] selfReferential.fail.b: undefined field: x:
+    ./in.cue:470:7
+[incomplete] issue2310.original.#s: error in call to strings.Replace: non-concrete value string:
+    ./in.cue:491:46
+    ./in.cue:491:38
+[incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
+    ./in.cue:491:46
+    ./in.cue:491:12
+[incomplete] issue2310.original.#subs.0: error in call to strings.Replace: non-concrete value string:
+    ./in.cue:491:46
+    ./in.cue:491:12
+[incomplete] issue2310.original.#subs.1: error in call to strings.Replace: non-concrete value string:
+    ./in.cue:491:46
+    ./in.cue:491:12
+[incomplete] issue2310.original.#subs.2: error in call to strings.Replace: non-concrete value string:
+    ./in.cue:491:46
+    ./in.cue:491:12
+[incomplete] issue2310.reduced.#s: non-concrete value string in operand to +:
+    ./in.cue:593:21
+    ./in.cue:593:13
+[eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
+    ./issue2229.cue:16:5
+    ./issue2229.cue:16:24
+    ./issue2229.cue:16:28
+structural cycle:
+    ./issue2229.cue:16:24
 -- out/compile --
 --- in.cue
 {

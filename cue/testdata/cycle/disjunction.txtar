@@ -1,39 +1,68 @@
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // cycle is a structural cycle
-cycle: a: cycle
+cycle: a: cycle  @test(err, code=structural_cycle, pos=[])
 
 // reference to outside structural cycle
-r1a: cycle | int
-r1b: int | cycle
+r1a: cycle | int  @test(eq, int)
+r1b: int | cycle  @test(eq, int)
 
-r2a: cycle | 1
-r2b: 1 | cycle
+r2a: cycle | 1  @test(eq, 1)
+r2b: 1 | cycle  @test(eq, 1)
 
-r3a: cycle | null
-r3b: null | cycle
+r3a: cycle | null  @test(eq, null)
+r3b: null | cycle  @test(eq, null)
 
-r4a: cycle | {}
-r4b: {} | cycle
+r4a: cycle | {}  @test(eq, {})
+r4b: {} | cycle  @test(eq, {})
 
-r5a: cycle | []
-r5b: [] | cycle
+r5a: cycle | []  @test(eq, [])
+r5b: [] | cycle  @test(eq, [])
 
 // reference to ancestor node
-s1a: x: s1a | int
-s1b: x: int | s1b
+s1a: {
+	x: s1a | int
+	@test(eq, {x: int})
+}
+s1b: {
+	x: int | s1b
+	@test(eq, {x: int})
+}
 
-s2a: x: s2a | 1
-s2b: x: 1 | s2b
+s2a: {
+	x: s2a | 1
+	@test(eq, {x: 1})
+}
+s2b: {
+	x: 1 | s2b
+	@test(eq, {x: 1})
+}
 
-s3a: x: s3a | null
-s3b: x: null | s3b
+s3a: {
+	x: s3a | null
+	@test(eq, {x: null})
+}
+s3b: {
+	x: null | s3b
+	@test(eq, {x: null})
+}
 
-s4a: x: s4a | {}
-s4b: x: {} | s4b
+s4a: {
+	x: s4a | {}
+	@test(eq, {x: {}})
+}
+s4b: {
+	x: {} | s4b
+	@test(eq, {x: {}})
+}
 
-s5a: x: s5a | []
-s5b: x: [] | s5b
+s5a: {
+	x: s5a | []
+	@test(eq, {x: []})
+}
+s5b: {
+	x: [] | s5b
+	@test(eq, {x: []})
+}
 
 -- issue3042.cue --
 // Array element validation not being enforced for elements nested inside
@@ -52,7 +81,22 @@ issue3042: {
 			]
 		}
 	}
+	@test(err, code=eval,
+		suberr=(code=eval, path=data, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{secret:{infra:[{name:"bar1"}]}}, [...#nesting], struct, list], pos=[4:57, 6:8, 6:19]),
+		suberr=(code=eval, path=data, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{secret:{infra:[{name:"bar1"}]}}, string, struct, string], pos=[4:12, 6:8, 6:19]),
+	)
 }
+-- out/errors.txt --
+[structural_cycle] cycle.a: structural cycle
+[eval] issue3042.data: 2 errors in empty disjunction:
+issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and [...#nesting] (mismatched types struct and list):
+    ./issue3042.cue:8:57
+    ./issue3042.cue:10:8
+    ./issue3042.cue:10:19
+issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and string (mismatched types struct and string):
+    ./issue3042.cue:8:12
+    ./issue3042.cue:10:8
+    ./issue3042.cue:10:19
 -- out/eval/stats --
 Leaks:  25
 Freed:  117
@@ -65,252 +109,6 @@ Conjuncts:    159
 Disjuncts:    73
 
 NumCloseIDs: 20
--- out/evalalpha --
-Errors:
-cycle.a: structural cycle
-issue3042.data: 2 errors in empty disjunction:
-issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and [...#nesting] (mismatched types struct and list):
-    ./issue3042.cue:8:57
-    ./issue3042.cue:10:8
-    ./issue3042.cue:10:19
-issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and string (mismatched types struct and string):
-    ./issue3042.cue:8:12
-    ./issue3042.cue:10:8
-    ./issue3042.cue:10:19
-
-Result:
-(_|_){
-  // [eval]
-  cycle: (_|_){
-    // [structural_cycle]
-    a: (_|_){
-      // [structural_cycle] cycle.a: structural cycle
-    }
-  }
-  r1a: (int){ int }
-  r1b: (int){ int }
-  r2a: (int){ 1 }
-  r2b: (int){ 1 }
-  r3a: (null){ null }
-  r3b: (null){ null }
-  r4a: (struct){
-  }
-  r4b: (struct){
-  }
-  r5a: (#list){
-  }
-  r5b: (#list){
-  }
-  s1a: (struct){
-    x: (int){ int }
-  }
-  s1b: (struct){
-    x: (int){ int }
-  }
-  s2a: (struct){
-    x: (int){ 1 }
-  }
-  s2b: (struct){
-    x: (int){ 1 }
-  }
-  s3a: (struct){
-    x: (null){ null }
-  }
-  s3b: (struct){
-    x: (null){ null }
-  }
-  s4a: (struct){
-    x: (struct){
-    }
-  }
-  s4b: (struct){
-    x: (struct){
-    }
-  }
-  s5a: (struct){
-    x: (#list){
-    }
-  }
-  s5b: (struct){
-    x: (#list){
-    }
-  }
-  issue3042: (_|_){
-    // [eval]
-    #foo: (string){ =~"^foo" }
-    #nesting: ((string|list|struct)){ |((string){ string }, (#struct){
-        name?: (string){ =~"^foo" }
-      }, (list){
-      }) }
-    data: (_|_){
-      // [eval] issue3042.data: 2 errors in empty disjunction:
-      // issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and [...#nesting] (mismatched types struct and list):
-      //     ./issue3042.cue:8:57
-      //     ./issue3042.cue:10:8
-      //     ./issue3042.cue:10:19
-      // issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and string (mismatched types struct and string):
-      //     ./issue3042.cue:8:12
-      //     ./issue3042.cue:10:8
-      //     ./issue3042.cue:10:19
-      secret: (struct){
-        infra: (list){ list }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,22 +1,22 @@
- Errors:
- cycle.a: structural cycle
- issue3042.data: 2 errors in empty disjunction:
--issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
--    ./issue3042.cue:5:57
--    ./issue3042.cue:7:8
--    ./issue3042.cue:7:19
--issue3042.data: conflicting values string and {secret:{infra:[{name:"bar1"}]}} (mismatched types string and struct):
--    ./issue3042.cue:5:12
--    ./issue3042.cue:7:8
--    ./issue3042.cue:7:19
-+issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and [...#nesting] (mismatched types struct and list):
-+    ./issue3042.cue:8:57
-+    ./issue3042.cue:10:8
-+    ./issue3042.cue:10:19
-+issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and string (mismatched types struct and string):
-+    ./issue3042.cue:8:12
-+    ./issue3042.cue:10:8
-+    ./issue3042.cue:10:19
- 
- Result:
- (_|_){
-   // [eval]
-   cycle: (_|_){
--    // [structural cycle]
-+    // [structural_cycle]
-     a: (_|_){
--      // [structural cycle] cycle.a: structural cycle
-+      // [structural_cycle] cycle.a: structural cycle
-     }
-   }
-   r1a: (int){ int }
-@@ -76,14 +76,14 @@
-       }) }
-     data: (_|_){
-       // [eval] issue3042.data: 2 errors in empty disjunction:
--      // issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
--      //     ./issue3042.cue:5:57
--      //     ./issue3042.cue:7:8
--      //     ./issue3042.cue:7:19
--      // issue3042.data: conflicting values string and {secret:{infra:[{name:"bar1"}]}} (mismatched types string and struct):
--      //     ./issue3042.cue:5:12
--      //     ./issue3042.cue:7:8
--      //     ./issue3042.cue:7:19
-+      // issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and [...#nesting] (mismatched types struct and list):
-+      //     ./issue3042.cue:8:57
-+      //     ./issue3042.cue:10:8
-+      //     ./issue3042.cue:10:19
-+      // issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and string (mismatched types struct and string):
-+      //     ./issue3042.cue:8:12
-+      //     ./issue3042.cue:10:8
-+      //     ./issue3042.cue:10:19
-       secret: (struct){
-         infra: (list){ list }
-       }
--- out/eval --
-Errors:
-cycle.a: structural cycle
-issue3042.data: 2 errors in empty disjunction:
-issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
-    ./issue3042.cue:5:57
-    ./issue3042.cue:7:8
-    ./issue3042.cue:7:19
-issue3042.data: conflicting values string and {secret:{infra:[{name:"bar1"}]}} (mismatched types string and struct):
-    ./issue3042.cue:5:12
-    ./issue3042.cue:7:8
-    ./issue3042.cue:7:19
-
-Result:
-(_|_){
-  // [eval]
-  cycle: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle] cycle.a: structural cycle
-    }
-  }
-  r1a: (int){ int }
-  r1b: (int){ int }
-  r2a: (int){ 1 }
-  r2b: (int){ 1 }
-  r3a: (null){ null }
-  r3b: (null){ null }
-  r4a: (struct){
-  }
-  r4b: (struct){
-  }
-  r5a: (#list){
-  }
-  r5b: (#list){
-  }
-  s1a: (struct){
-    x: (int){ int }
-  }
-  s1b: (struct){
-    x: (int){ int }
-  }
-  s2a: (struct){
-    x: (int){ 1 }
-  }
-  s2b: (struct){
-    x: (int){ 1 }
-  }
-  s3a: (struct){
-    x: (null){ null }
-  }
-  s3b: (struct){
-    x: (null){ null }
-  }
-  s4a: (struct){
-    x: (struct){
-    }
-  }
-  s4b: (struct){
-    x: (struct){
-    }
-  }
-  s5a: (struct){
-    x: (#list){
-    }
-  }
-  s5b: (struct){
-    x: (#list){
-    }
-  }
-  issue3042: (_|_){
-    // [eval]
-    #foo: (string){ =~"^foo" }
-    #nesting: ((string|list|struct)){ |((string){ string }, (#struct){
-        name?: (string){ =~"^foo" }
-      }, (list){
-      }) }
-    data: (_|_){
-      // [eval] issue3042.data: 2 errors in empty disjunction:
-      // issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
-      //     ./issue3042.cue:5:57
-      //     ./issue3042.cue:7:8
-      //     ./issue3042.cue:7:19
-      // issue3042.data: conflicting values string and {secret:{infra:[{name:"bar1"}]}} (mismatched types string and struct):
-      //     ./issue3042.cue:5:12
-      //     ./issue3042.cue:7:8
-      //     ./issue3042.cue:7:19
-      secret: (struct){
-        infra: (list){ list }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

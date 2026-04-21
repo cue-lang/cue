@@ -1,7 +1,6 @@
 # A CUE file using comprehensions and struct embeddings that exports
 # successfully in v0.13.2 fails with "undefined field" in later versions.
 # https://cuelang.org/issue/4203
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 import "strings"
 
@@ -27,48 +26,29 @@ if true {
 
 	output: _input[0].variable
 }
--- out/evalalpha --
-(struct){
-  _listBuilder: (struct){
-    kind: (string){ "kind1" }
-    _deps: (list){
-    }
-    _kindJoin: (struct){
-      _objs: (list){
-      }
-      _out: (string){ "" }
-    }
-    _depKinds: (string){ "" }
-    variable: (string){ "{}" }
-  }
-  output: (string){ "{kind1}" }
-  _input: (#list){
-    0: (struct){
-      _deps: (#list){
-        0: (struct){
-          kind: (string){ "kind1" }
-          _deps: (list){
-          }
-          _kindJoin: (struct){
-            _objs: (list){
-            }
-            _out: (string){ "" }
-          }
-          _depKinds: (string){ "" }
-          variable: (string){ "{}" }
-        }
-      }
-      kind: (string){ "kind1" }
-      _kindJoin: (struct){
-        _objs: (list){
-        }
-        _out: (string){ "" }
-      }
-      _depKinds: (string){ "kind1" }
-      variable: (string){ "{kind1}" }
-    }
-  }
-}
+@test(eq, {
+	_listBuilder: {
+		kind: "kind1"
+		_deps: []
+		_kindJoin: {_objs: [], _out: ""}
+		_depKinds: ""
+		variable: "{}"
+	}
+	output: "{kind1}"
+	_input: [{
+		_deps: [{
+			kind: "kind1"
+			_deps: []
+			_kindJoin: {_objs: [], _out: ""}
+			_depKinds: ""
+			variable: "{}"
+		}]
+		kind: "kind1"
+		_kindJoin: {_objs: [], _out: ""}
+		_depKinds: "kind1"
+		variable: "{kind1}"
+	}]
+})
 -- out/compile --
 --- in.cue
 {

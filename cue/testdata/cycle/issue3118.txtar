@@ -1,7 +1,6 @@
 # Cycle errors report no source position information, making it impossible
 # to locate the offending code.
 # https://cuelang.org/issue/3118
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #TimeSpan: {
 	start:    float
@@ -20,15 +19,87 @@ examples: [string]: #TimeSpan
 examples: eg1: {
     start: 10.0
     duration: 2.1
+    @test(eq, {start: 10.0, duration: 2.1, end: 12.1})
 }
 
 examples: eg2: {
     start: 10.0
+    @test(eq, {
+	start: _|_    @test(err, code=incomplete, pos=[6:12, 4:12, 8:12])
+	duration: _|_ @test(err, code=incomplete, pos=[7:12, 4:12, 8:12])
+	end: _|_      @test(err, code=incomplete, pos=[7:12, 4:12, 8:12])
+})
 }
 
 examples: eg3: {
     end: 10.0
+    @test(eq, {
+	end: _|_      @test(err, code=incomplete, pos=[8:12, 2:12, 6:12, 10:9])
+	start: _|_    @test(err, code=incomplete, pos=[7:12, 2:12, 6:12, 10:9])
+	duration: _|_ @test(err, code=incomplete, pos=[7:12, 2:12, 6:12, 10:9])
+})
 }
+-- out/errors.txt --
+[incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+    ./in.cue:10:11
+#TimeSpan.start: non-concrete value float in operand to -:
+    ./in.cue:6:12
+    ./in.cue:4:12
+    ./in.cue:8:12
+#TimeSpan.duration: non-concrete value float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:4:12
+    ./in.cue:8:12
+[incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+    ./in.cue:10:11
+#TimeSpan.duration: non-concrete value float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:4:12
+    ./in.cue:8:12
+[incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+    ./in.cue:10:11
+#TimeSpan.duration: non-concrete value float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:4:12
+    ./in.cue:8:12
+[incomplete] examples.eg2.start: non-concrete value end for bound <=:
+    ./in.cue:10:11
+examples.eg2.start: non-concrete value float in operand to -:
+    ./in.cue:6:12
+    ./in.cue:4:12
+    ./in.cue:8:12
+examples.eg2.duration: non-concrete value float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:4:12
+    ./in.cue:8:12
+[incomplete] examples.eg2.duration: non-concrete value float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:4:12
+    ./in.cue:8:12
+[incomplete] examples.eg2.duration: non-concrete value float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:4:12
+    ./in.cue:8:12
+[incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:2:12
+    ./in.cue:6:12
+    ./in.cue:10:9
+examples.eg3.end: non-concrete value <=10.0 & float in operand to +:
+    ./in.cue:8:12
+    ./in.cue:2:12
+    ./in.cue:6:12
+    ./in.cue:10:9
+[incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:2:12
+    ./in.cue:6:12
+    ./in.cue:10:9
+[incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
+    ./in.cue:7:12
+    ./in.cue:2:12
+    ./in.cue:6:12
+    ./in.cue:10:9
 -- out/eval/stats --
 Leaks:  0
 Freed:  18
@@ -41,100 +112,6 @@ Conjuncts:    47
 Disjuncts:    0
 
 NumCloseIDs: 3
--- out/evalalpha --
-(struct){
-  #TimeSpan: (#struct){
-    start: (_|_){
-      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-      //     ./in.cue:10:11
-      // #TimeSpan.start: non-concrete value float in operand to -:
-      //     ./in.cue:6:12
-      //     ./in.cue:4:12
-      //     ./in.cue:8:12
-      // #TimeSpan.duration: non-concrete value float in operand to -:
-      //     ./in.cue:7:12
-      //     ./in.cue:4:12
-      //     ./in.cue:8:12
-    }
-    duration: (_|_){
-      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-      //     ./in.cue:10:11
-      // #TimeSpan.duration: non-concrete value float in operand to -:
-      //     ./in.cue:7:12
-      //     ./in.cue:4:12
-      //     ./in.cue:8:12
-    }
-    end: (_|_){
-      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-      //     ./in.cue:10:11
-      // #TimeSpan.duration: non-concrete value float in operand to -:
-      //     ./in.cue:7:12
-      //     ./in.cue:4:12
-      //     ./in.cue:8:12
-    }
-  }
-  examples: (struct){
-    eg1: (#struct){
-      start: (float){ 10.0 }
-      duration: (float){ 2.1 }
-      end: (float){ 12.1 }
-    }
-    eg2: (#struct){
-      start: (_|_){
-        // [incomplete] examples.eg2.start: non-concrete value end for bound <=:
-        //     ./in.cue:10:11
-        // examples.eg2.start: non-concrete value float in operand to -:
-        //     ./in.cue:6:12
-        //     ./in.cue:4:12
-        //     ./in.cue:8:12
-        // examples.eg2.duration: non-concrete value float in operand to -:
-        //     ./in.cue:7:12
-        //     ./in.cue:4:12
-        //     ./in.cue:8:12
-      }
-      duration: (_|_){
-        // [incomplete] examples.eg2.duration: non-concrete value float in operand to -:
-        //     ./in.cue:7:12
-        //     ./in.cue:4:12
-        //     ./in.cue:8:12
-      }
-      end: (_|_){
-        // [incomplete] examples.eg2.duration: non-concrete value float in operand to -:
-        //     ./in.cue:7:12
-        //     ./in.cue:4:12
-        //     ./in.cue:8:12
-      }
-    }
-    eg3: (#struct){
-      end: (_|_){
-        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
-        //     ./in.cue:7:12
-        //     ./in.cue:2:12
-        //     ./in.cue:6:12
-        //     ./in.cue:10:9
-        // examples.eg3.end: non-concrete value <=10.0 & float in operand to +:
-        //     ./in.cue:8:12
-        //     ./in.cue:2:12
-        //     ./in.cue:6:12
-        //     ./in.cue:10:9
-      }
-      start: (_|_){
-        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
-        //     ./in.cue:7:12
-        //     ./in.cue:2:12
-        //     ./in.cue:6:12
-        //     ./in.cue:10:9
-      }
-      duration: (_|_){
-        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
-        //     ./in.cue:7:12
-        //     ./in.cue:2:12
-        //     ./in.cue:6:12
-        //     ./in.cue:10:9
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -2,11 +2,11 @@
 # a definition that succeeds without error under evalv2, regressing on a
 # real-world GitHub Actions schema.
 # https://cuelang.org/issue/3827
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 reduced: {
 	A: b: (A.c & {}).x
 	A: null | { c: x: 1 }
+	@test(eq, {A: {b: 1, c: {x: 1}}})
 }
 
 full: {
@@ -17,15 +17,25 @@ full: {
 			path: "bar"
 		}
 	}
-	
+
 	Y=#Workflow: #Step: (Y.steps & {x: {}}).x
-	
+
 	#Workflow: null | {
 		steps: [string]: {
 			uses?: string
 			with?: [string]: string
 		}
 	}
+	@test(eq, {
+		out: {
+			uses: "actions/upload-artifact@v3"
+			with: {name: "foo", path: "bar"}
+		}
+		#Workflow: {
+			#Step: {uses?: string, with?: {}}
+			steps: {}
+		}
+	})
 }
 -- out/eval/stats --
 Leaks:  9
@@ -40,35 +50,6 @@ Disjuncts:    4
 Notifications: 2
 
 NumCloseIDs: 7
--- out/evalalpha --
-(struct){
-  reduced: (struct){
-    A: (struct){
-      b: (int){ 1 }
-      c: (struct){
-        x: (int){ 1 }
-      }
-    }
-  }
-  full: (struct){
-    out: (#struct){
-      uses: (string){ "actions/upload-artifact@v3" }
-      with: (#struct){
-        name: (string){ "foo" }
-        path: (string){ "bar" }
-      }
-    }
-    #Workflow: (#struct){
-      #Step: (#struct){
-        uses?: (string){ string }
-        with?: (#struct){
-        }
-      }
-      steps: (#struct){
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

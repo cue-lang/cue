@@ -1,5 +1,5 @@
-# The CUE source contains compile-time errors (invalid operands to *),
-# so inline @test() annotations are not possible. Keep golden sections.
+#inlinetest:exclude CUE source contains compile-time errors (invalid operands to *)
+# which prevent the inline runner from compiling the source.
 #name: list arithmetic
 #evalPartial
 -- in.cue --

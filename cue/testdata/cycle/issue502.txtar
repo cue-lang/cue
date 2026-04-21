@@ -4,7 +4,6 @@
 # `mas: one: { mas: two: { ... } }`) but gets "structural cycle" errors for
 # `#a.mas.one._link.mas.two.link` etc. Shallow nesting (one level) works fine.
 # https://cuelang.org/issue/502
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #T: {
 	config: _
@@ -35,7 +34,31 @@
 	}
 }
 
-a: #a & {config: a: 34}
+a: #a & {config: a: 34} @test(eq, {
+	config: {a: 34}
+	body: 34
+	mas: one: {
+		cfg: {b: 34}
+		_link: {
+			config: {b: int}
+			body: int
+			mas: two: {
+				cfg: {c: int}
+				_link: {config: {c: int}, body: int, mas: {}}
+				link: {config: {c: int}, body: int, mas: {}}
+			}
+		}
+		link: {
+			config: {b: 34}
+			body: 34
+			mas: two: {
+				cfg: {c: 34}
+				_link: {config: {c: int}, body: int, mas: {}}
+				link: {config: {c: 34}, body: 34, mas: {}}
+			}
+		}
+	}
+})
 -- reduced.cue --
 reduced: t1: {
 	#T: x: y?: {
@@ -44,6 +67,28 @@ reduced: t1: {
 	}
 	a: #T
 	a: x: y: V: x: y: V: {}
+
+	@test(eq, {
+		#T: x: y?: {
+			V: _
+			z: x: y?: {
+				_|_
+				V: _
+				z: _|_ @test(err, code=structural_cycle, contains="reduced.t1.#T.x.y.z.x.y.z: structural cycle", pos=[])
+			}
+		}
+		a: x: y: {
+			V: x: y: V: {}
+			z: x: y: {
+				V: {}
+				z: x: y?: {
+					_|_
+					V: _
+					z: _|_ @test(err, code=structural_cycle, contains="reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle", pos=[])
+				}
+			}
+		}
+	})
 }
 -- out/eval/stats --
 Leaks:  1
@@ -57,457 +102,9 @@ Conjuncts:    276
 Disjuncts:    0
 
 NumCloseIDs: 45
--- out/evalalpha --
-(struct){
-  #T: (#struct){
-    config: (_){ _ }
-    body: (_){ _ }
-    mas: (#struct){
-    }
-  }
-  #a: (#struct){
-    config: (#struct){
-      a: (int){ int }
-    }
-    body: (int){ int }
-    mas: (#struct){
-      one: (#struct){
-        cfg: (#struct){
-          b: (int){ int }
-        }
-        _link: (#struct){
-          config: (#struct){
-            b: (int){ int }
-          }
-          body: (int){ int }
-          mas: (#struct){
-            two: (#struct){
-              cfg: (#struct){
-                c: (int){ int }
-              }
-              _link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-              link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-            }
-          }
-        }
-        link: (#struct){
-          config: (#struct){
-            b: (int){ int }
-          }
-          body: (int){ int }
-          mas: (#struct){
-            two: (#struct){
-              cfg: (#struct){
-                c: (int){ int }
-              }
-              _link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-              link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  a: (#struct){
-    config: (#struct){
-      a: (int){ 34 }
-    }
-    body: (int){ 34 }
-    mas: (#struct){
-      one: (#struct){
-        cfg: (#struct){
-          b: (int){ 34 }
-        }
-        _link: (#struct){
-          config: (#struct){
-            b: (int){ int }
-          }
-          body: (int){ int }
-          mas: (#struct){
-            two: (#struct){
-              cfg: (#struct){
-                c: (int){ int }
-              }
-              _link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-              link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-            }
-          }
-        }
-        link: (#struct){
-          config: (#struct){
-            b: (int){ 34 }
-          }
-          body: (int){ 34 }
-          mas: (#struct){
-            two: (#struct){
-              cfg: (#struct){
-                c: (int){ 34 }
-              }
-              _link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-              link: (#struct){
-                config: (#struct){
-                  c: (int){ 34 }
-                }
-                body: (int){ 34 }
-                mas: (#struct){
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  reduced: (struct){
-    t1: (struct){
-      #T: (#struct){
-        x: (#struct){
-          y?: (#struct){
-            V: (_){ _ }
-            z: (#struct){
-              x: (#struct){
-                y?: (_|_){
-                  // [structural_cycle]
-                  V: (_){ _ }
-                  z: (_|_){
-                    // [structural_cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      a: (#struct){
-        x: (#struct){
-          y: (#struct){
-            V: (#struct){
-              x: (struct){
-                y: (struct){
-                  V: (struct){
-                  }
-                }
-              }
-            }
-            z: (#struct){
-              x: (#struct){
-                y: (#struct){
-                  V: (#struct){
-                  }
-                  z: (#struct){
-                    x: (#struct){
-                      y?: (_|_){
-                        // [structural_cycle]
-                        V: (_){ _ }
-                        z: (_|_){
-                          // [structural_cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -156,10 +156,10 @@
-             z: (#struct){
-               x: (#struct){
-                 y?: (_|_){
--                  // [structural cycle]
-+                  // [structural_cycle]
-                   V: (_){ _ }
-                   z: (_|_){
--                    // [structural cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
-+                    // [structural_cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
-                   }
-                 }
-               }
-@@ -170,7 +170,7 @@
-       a: (#struct){
-         x: (#struct){
-           y: (#struct){
--            V: (struct){
-+            V: (#struct){
-               x: (struct){
-                 y: (struct){
-                   V: (struct){
-@@ -186,10 +186,10 @@
-                   z: (#struct){
-                     x: (#struct){
-                       y?: (_|_){
--                        // [structural cycle]
-+                        // [structural_cycle]
-                         V: (_){ _ }
-                         z: (_|_){
--                          // [structural cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
-+                          // [structural_cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
-                         }
-                       }
-                     }
--- out/eval --
-(struct){
-  #T: (#struct){
-    config: (_){ _ }
-    body: (_){ _ }
-    mas: (#struct){
-    }
-  }
-  #a: (#struct){
-    config: (#struct){
-      a: (int){ int }
-    }
-    body: (int){ int }
-    mas: (#struct){
-      one: (#struct){
-        cfg: (#struct){
-          b: (int){ int }
-        }
-        _link: (#struct){
-          config: (#struct){
-            b: (int){ int }
-          }
-          body: (int){ int }
-          mas: (#struct){
-            two: (#struct){
-              cfg: (#struct){
-                c: (int){ int }
-              }
-              _link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-              link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-            }
-          }
-        }
-        link: (#struct){
-          config: (#struct){
-            b: (int){ int }
-          }
-          body: (int){ int }
-          mas: (#struct){
-            two: (#struct){
-              cfg: (#struct){
-                c: (int){ int }
-              }
-              _link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-              link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  a: (#struct){
-    config: (#struct){
-      a: (int){ 34 }
-    }
-    body: (int){ 34 }
-    mas: (#struct){
-      one: (#struct){
-        cfg: (#struct){
-          b: (int){ 34 }
-        }
-        _link: (#struct){
-          config: (#struct){
-            b: (int){ int }
-          }
-          body: (int){ int }
-          mas: (#struct){
-            two: (#struct){
-              cfg: (#struct){
-                c: (int){ int }
-              }
-              _link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-              link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-            }
-          }
-        }
-        link: (#struct){
-          config: (#struct){
-            b: (int){ 34 }
-          }
-          body: (int){ 34 }
-          mas: (#struct){
-            two: (#struct){
-              cfg: (#struct){
-                c: (int){ 34 }
-              }
-              _link: (#struct){
-                config: (#struct){
-                  c: (int){ int }
-                }
-                body: (int){ int }
-                mas: (#struct){
-                }
-              }
-              link: (#struct){
-                config: (#struct){
-                  c: (int){ 34 }
-                }
-                body: (int){ 34 }
-                mas: (#struct){
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  reduced: (struct){
-    t1: (struct){
-      #T: (#struct){
-        x: (#struct){
-          y?: (#struct){
-            V: (_){ _ }
-            z: (#struct){
-              x: (#struct){
-                y?: (_|_){
-                  // [structural cycle]
-                  V: (_){ _ }
-                  z: (_|_){
-                    // [structural cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      a: (#struct){
-        x: (#struct){
-          y: (#struct){
-            V: (struct){
-              x: (struct){
-                y: (struct){
-                  V: (struct){
-                  }
-                }
-              }
-            }
-            z: (#struct){
-              x: (#struct){
-                y: (#struct){
-                  V: (#struct){
-                  }
-                  z: (#struct){
-                    x: (#struct){
-                      y?: (_|_){
-                        // [structural cycle]
-                        V: (_){ _ }
-                        z: (_|_){
-                          // [structural cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+-- out/errors.txt --
+[structural_cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
+[structural_cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
 -- out/compile --
 --- in.cue
 {

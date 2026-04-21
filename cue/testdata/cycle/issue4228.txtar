@@ -2,7 +2,6 @@
 # The combination of error() with self interpolation and complex nested
 # struct patterns can cause infinite recursion when formatting error messages.
 # https://cuelang.org/issue/4228
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 package main
 
@@ -69,7 +68,7 @@ _namespacedResourceKinds: {
 // Usage
 argocd: _namespacedResourceKinds & {
 	app: apps: {}
-}
+} @test(err, code=eval)
 
 -- export.cue --
 @experiment(aliasv2)
@@ -93,6 +92,49 @@ let _globalScope = self
 }
 
 #manifests: {#export, #entries: [_globalScope]}.yamlStream
+
+@test(err, code=eval)
+-- out/errors.txt --
+[eval] #manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:_|_(#entries.0.argocd.app.apps: <- invalid value at path '#entries.0.argocd.app.apps'),name:string}:
+    ./export.cue:18:14
+    ./in.cue:15:38
+    ./in.cue:16:8
+    ./in.cue:23:3
+    ./in.cue:40:8
+    ./in.cue:47:22
+    ./in.cue:65:13
+[incomplete] _setTypeMeta.#template.k8s.apiVersion: required field missing: #apiVersion:
+    ./in.cue:23:20
+[incomplete] _setTypeMeta.#template.k8s.kind: required field missing: #kind:
+    ./in.cue:24:14
+[eval] _namespacedResourceKinds.app.#template.k8s.apiVersion: field not allowed:
+    ./in.cue:23:3
+[eval] _namespacedResourceKinds.app.#template.k8s.kind: field not allowed:
+    ./in.cue:24:3
+[eval] _namespacedResourceKinds.app.#template.k8s.metadata: field not allowed:
+    ./in.cue:5:7
+    ./in.cue:11:7
+[eval] argocd.app.apps: 4 errors in empty disjunction:
+argocd.app.apps.k8s.apiVersion: field not allowed:
+    ./in.cue:23:3
+argocd.app.apps.k8s.kind: field not allowed:
+    ./in.cue:24:3
+argocd.app.apps.k8s.metadata: field not allowed:
+    ./in.cue:5:7
+    ./in.cue:11:7
+argocd.app.apps: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:_|_(argocd.app.apps.k8s.apiVersion: field not allowed (and 2 more errors)),name:string}:
+    ./in.cue:16:8
+    ./in.cue:15:38
+    ./in.cue:40:8
+    ./in.cue:47:22
+    ./in.cue:65:13
+[eval] argocd.app.#template.k8s.apiVersion: field not allowed:
+    ./in.cue:23:3
+[eval] argocd.app.#template.k8s.kind: field not allowed:
+    ./in.cue:24:3
+[eval] argocd.app.#template.k8s.metadata: field not allowed:
+    ./in.cue:5:7
+    ./in.cue:11:7
 -- out/eval/stats --
 Leaks:  1
 Freed:  187

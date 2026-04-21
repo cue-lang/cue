@@ -1,0 +1,16 @@
+# Tests that a fixture file (no @test) with a field unreachable from any tested
+# field is flagged as uncovered. This catches test-case files that were added
+# to an inline archive without @test directives.
+-- in/fixture.cue --
+package p
+
+orphan: 42
+-- in/test.cue --
+package p
+
+a: 1 @test(eq, 1)
+-- out/run/errors.txt --
+fixture.cue:3: field orphan is not covered: add a @test directive or reference it from a tested field
+-- out/status.txt --
+update: identical to input
+force:  identical to update

@@ -1,12 +1,13 @@
 # CUE panics/crashes instead of reporting a clean error when evaluating
 # values with cyclic field dependencies.
 # https://cuelang.org/issue/306
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
-a: 12
+a: 12 @test(eq, 12)
 #Controller: settings: {
 	controller: #Controller
-}
+} @test(err, code=structural_cycle, path=controller, contains="structural cycle", pos=[])
+-- out/errors.txt --
+[structural_cycle] #Controller.settings.controller: structural cycle
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
@@ -17,24 +18,6 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    0
--- out/evalalpha --
-Errors:
-#Controller.settings.controller: structural cycle
-
-Result:
-(_|_){
-  // [structural_cycle]
-  a: (int){ 12 }
-  #Controller: (_|_){
-    // [structural_cycle]
-    settings: (_|_){
-      // [structural_cycle]
-      controller: (_|_){
-        // [structural_cycle] #Controller.settings.controller: structural cycle
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

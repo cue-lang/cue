@@ -2,20 +2,19 @@
 # CUE incorrectly reports an empty disjunction error instead of handling
 # the abstract `!=` constraint between fields sharing a disjunction type.
 # https://cuelang.org/issue/241
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 #Value: 0 | 1
 
-foo: #Value
+foo: #Value  @test(err, code=cycle|incomplete, args=[bar], pos=[-2:13, 2:6, 3:6])
 foo: !=bar
-bar: #Value
-bar: !=foo
+bar: #Value  @test(eq, 0 | 1)
+bar: !=foo   @test(err:todo, code=cycle|incomplete)
 
 #Value: 0 | 1
 
-Foo: #Value
+Foo: #Value  @test(eq, 1)
 Foo: !=Bar
-Bar: #Value
+Bar: #Value  @test(eq, 0)
 Bar: !=Foo
 Bar: 0
 
@@ -23,11 +22,16 @@ cell: a: 0 | 1
 cell: a: !=cell.b
 cell: b: 0 | 1
 cell: b: !=cell.a
-cell: a: 0
-cell: b: _
+cell: a: 0   @test(eq, 0)
+cell: b: _   @test(eq, 1)
 
-a: cell.a
-b: cell.b
+a: cell.a  @test(eq, 0)
+b: cell.b  @test(eq, 1)
+-- out/errors.txt --
+[cycle] foo: cycle across unresolved disjunction referenced by bar:
+    ./in.cue:1:13
+    ./in.cue:5:6
+    ./in.cue:6:6
 -- out/eval/stats --
 Leaks:  6
 Freed:  37
@@ -40,25 +44,6 @@ Conjuncts:    66
 Disjuncts:    32
 
 NumCloseIDs: 4
--- out/evalalpha --
-(struct){
-  #Value: (int){ |((int){ 0 }, (int){ 1 }) }
-  foo: (_|_){
-    // [cycle] foo: cycle across unresolved disjunction referenced by bar:
-    //     ./in.cue:1:13
-    //     ./in.cue:5:6
-    //     ./in.cue:6:6
-  }
-  bar: (int){ |((int){ 0 }, (int){ 1 }) }
-  Foo: (int){ 1 }
-  Bar: (int){ 0 }
-  cell: (struct){
-    a: (int){ 0 }
-    b: (int){ 1 }
-  }
-  a: (int){ 0 }
-  b: (int){ 1 }
-}
 -- out/compile --
 --- in.cue
 {

@@ -37,7 +37,11 @@ package cuetxtar
 //     ... }` ties items and results together: testing results implicitly
 //     exercises items. See coverage_comprehension.txtar for an example.
 //
-// Files without any @test attribute are exempt (they are fixture files).
+// CUE files without any @test attribute (fixture files) are still included in
+// the coverage check: their fields must be reachable from tested fields via
+// identifier references. A fixture file whose top-level fields are all
+// referenced (transitively) by tested fields is fine; one with unreachable
+// fields is flagged, since those fields are never exercised.
 // Archives with a file-level @test that covers the whole file are exempt too.
 // Suppressing the check for a specific archive is possible via:
 //
@@ -119,9 +123,6 @@ func (r *inlineRunner) checkFieldCoverage(t testing.TB, fileLevelRecords []attrR
 		compRefs     []map[string]bool
 	)
 	for _, cf := range r.cueFiles {
-		if !cf.hasTestAttrs {
-			continue
-		}
 		parseDecls(cf.strippedAST.Decls, cf.name, &entries, allNames, aliasToField, letRefs, &compRefs)
 	}
 	if len(entries) == 0 {

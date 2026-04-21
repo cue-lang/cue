@@ -6,7 +6,6 @@
 # TODO: a bound value resolving to a disjunction should probably be an error.
 # In this case #Size.amx should resolve.
 # https://cuelang.org/issue/429
-#todo:inline: hard — cycle semantics require @test(err, code=cycle) and careful scoping
 -- in.cue --
 // Range disjunction without cycle (checks only one-way).
 #Size: {
@@ -15,22 +14,39 @@
 	max: >min | *min
 }
 
-s0: #Size & {res: 1}
+s0: #Size & {res: 1} @test(eq, {
+	res: 1
+	min: *2 | >1
+	max: *2 | >1 | >2
+})
+
 // This discards the default for max. This is correct, but unfortunate.
 // TODO: is there a tweak to the default mechanism possible that would fix that?
 //       Tread very carefully, though! Perhaps we could have a builtin that
 //       discards any default, so that we can at least manually override this
 //       behavior.
-s1: #Size & {min: 5}
-s2: #Size & {max: 5}
+s1: #Size & {min: 5}  @test(eq, {
+	min: 5
+	res: *0 | >=0 & int
+	max: *5 | >5
+})
+s2: #Size & {max: 5}  @test(eq, {
+	max: 5
+	res: *0 | >=0 & int
+	min: *1 | >0
+})
 s3: #Size & {
 	min: 5
 	max: 10
-}
+} @test(eq, {min: 5, max: 10, res: *0 | >=0 & int})
 es3: #Size & {
 	min: 10
 	max: 5
-}
+} @test(err, code=eval,
+	suberr=(code=eval, path=max, contains="%d errors in empty disjunction:", args=[2], pos=[]),
+	suberr=(code=eval, path=max, contains="conflicting values %s and %s", args=[1, 5], pos=[-29:16, -28:15, 0:6, 2:7]),
+	suberr=(code=eval, path=max, contains="conflicting values %s and %s", args=[10, 5], pos=[-28:15, 0:6, 1:7, 2:7]),
+	suberr=(code=eval, path=max, contains="invalid value %v (out of bound %s)", args=[5, >10], pos=[-28:7, 2:7]))
 
 // Disjunctions with cycles
 // TODO: improve error message here. Logic is correct, though.
@@ -41,153 +57,72 @@ es3: #Size & {
 }
 r1: #nonEmptyRange & {
 	min: 3
-}
+} @test(eq, {
+	min: _|_ @test(err, code=incomplete, contains="r1.min: non-concrete value max for bound < (and 2 more errors)", pos=[46:8])
+	max: >3
+})
 r2: #nonEmptyRange & {
 	max: 5
-}
+} @test(eq, {max: 5, min: *1 | <5 & int})
 r3: #nonEmptyRange & {
 	min: 3
 	max: 6
-}
+} @test(eq, {min: 3, max: 6})
 
 er3: #nonEmptyRange & {
 	min: 5
 	max: 5
-}
--- out/evalalpha --
-Errors:
-er3.min: 2 errors in empty disjunction:
-er3.min: conflicting values 1 and 5:
-    ./in.cue:28:8
-    ./in.cue:43:6
-    ./in.cue:44:7
-es3.max: 2 errors in empty disjunction:
+} @test(err, code=eval,
+	suberr=(code=eval, path=min, contains="conflicting values %s and %s", args=[1, 5], pos=[-18:8, 0:6, 1:7]),
+	suberr=(code=eval, path=min, contains="invalid value %v (out of bound %s)", args=[5, <5], pos=[-17:7, 1:7]),
+	suberr=(code=eval, path=min, contains="invalid value %v (out of bound %s)", args=[5, <5], pos=[-17:7, 1:7]))
+-- out/errors.txt --
+[eval] es3.max: 2 errors in empty disjunction:
 es3.max: 4 errors in empty disjunction:
 es3.max: conflicting values 1 and 5:
     ./in.cue:4:16
     ./in.cue:5:15
-    ./in.cue:20:6
-    ./in.cue:22:7
+    ./in.cue:33:6
+    ./in.cue:35:7
 es3.max: conflicting values 10 and 5:
     ./in.cue:5:15
-    ./in.cue:20:6
-    ./in.cue:21:7
-    ./in.cue:22:7
+    ./in.cue:33:6
+    ./in.cue:34:7
+    ./in.cue:35:7
 es3.max: invalid value 5 (out of bound >10):
     ./in.cue:5:7
-    ./in.cue:22:7
+    ./in.cue:35:7
+[cycle] #nonEmptyRange.min: cycle with field: max:
+    ./in.cue:46:8
+#nonEmptyRange.max: cycle with field: min:
+    ./in.cue:47:8
+[cycle] #nonEmptyRange.min: cycle with field: max:
+    ./in.cue:46:8
+#nonEmptyRange.max: cycle with field: min:
+    ./in.cue:47:8
+[incomplete] r1.min: 2 errors in empty disjunction:
+r1.min: conflicting values 1 and 3:
+    ./in.cue:45:8
+    ./in.cue:49:5
+    ./in.cue:50:7
+r1.min: non-concrete value max for bound <:
+    ./in.cue:46:8
+[eval] er3.min: 2 errors in empty disjunction:
+er3.min: conflicting values 1 and 5:
+    ./in.cue:45:8
+    ./in.cue:63:6
+    ./in.cue:64:7
 er3.min: invalid value 5 (out of bound <5):
-    ./in.cue:29:7
-    ./in.cue:44:7
-
-Result:
-(_|_){
-  // [eval]
-  #Size: (#struct){
-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
-    max: (number){ |(*(int){ 1 }, (number){ >0 }, (number){ >1 }) }
-  }
-  s0: (#struct){
-    res: (int){ 1 }
-    min: (number){ |(*(int){ 2 }, (number){ >1 }) }
-    max: (number){ |(*(int){ 2 }, (number){ >1 }, (number){ >2 }) }
-  }
-  s1: (#struct){
-    min: (int){ 5 }
-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
-  }
-  s2: (#struct){
-    max: (int){ 5 }
-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
-  }
-  s3: (#struct){
-    min: (int){ 5 }
-    max: (int){ 10 }
-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-  }
-  es3: (_|_){
-    // [eval]
-    min: (int){ 10 }
-    max: (_|_){
-      // [eval] es3.max: 2 errors in empty disjunction:
-      // es3.max: 4 errors in empty disjunction:
-      // es3.max: conflicting values 1 and 5:
-      //     ./in.cue:4:16
-      //     ./in.cue:5:15
-      //     ./in.cue:20:6
-      //     ./in.cue:22:7
-      // es3.max: conflicting values 10 and 5:
-      //     ./in.cue:5:15
-      //     ./in.cue:20:6
-      //     ./in.cue:21:7
-      //     ./in.cue:22:7
-      // es3.max: invalid value 5 (out of bound >10):
-      //     ./in.cue:5:7
-      //     ./in.cue:22:7
-    }
-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-  }
-  #nonEmptyRange: (#struct){
-    min: (_|_){
-      // [cycle] #nonEmptyRange.min: cycle with field: max:
-      //     ./in.cue:29:8
-      // #nonEmptyRange.max: cycle with field: min:
-      //     ./in.cue:30:8
-    }
-    max: (_|_){
-      // [cycle] #nonEmptyRange.min: cycle with field: max:
-      //     ./in.cue:29:8
-      // #nonEmptyRange.max: cycle with field: min:
-      //     ./in.cue:30:8
-    }
-  }
-  r1: (#struct){
-    min: (_|_){
-      // [incomplete] r1.min: 2 errors in empty disjunction:
-      // r1.min: conflicting values 1 and 3:
-      //     ./in.cue:28:8
-      //     ./in.cue:32:5
-      //     ./in.cue:33:7
-      // r1.min: non-concrete value max for bound <:
-      //     ./in.cue:29:8
-    }
-    max: (number){ >3 }
-  }
-  r2: (#struct){
-    max: (int){ 5 }
-    min: (int){ |(*(int){ 1 }, (int){ &(<5, int) }) }
-  }
-  r3: (#struct){
-    min: (int){ 3 }
-    max: (int){ 6 }
-  }
-  er3: (_|_){
-    // [eval]
-    min: (_|_){
-      // [eval] er3.min: 2 errors in empty disjunction:
-      // er3.min: conflicting values 1 and 5:
-      //     ./in.cue:28:8
-      //     ./in.cue:43:6
-      //     ./in.cue:44:7
-      // er3.min: invalid value 5 (out of bound <5):
-      //     ./in.cue:29:7
-      //     ./in.cue:44:7
-    }
-    max: (_|_){
-      // [eval] er3.min: 2 errors in empty disjunction:
-      // er3.min: conflicting values 1 and 5:
-      //     ./in.cue:28:8
-      //     ./in.cue:43:6
-      //     ./in.cue:44:7
-      // er3.min: invalid value 5 (out of bound <5):
-      //     ./in.cue:29:7
-      //     ./in.cue:44:7
-    }
-  }
-}
+    ./in.cue:46:7
+    ./in.cue:64:7
+[eval] er3.min: 2 errors in empty disjunction:
+er3.min: conflicting values 1 and 5:
+    ./in.cue:45:8
+    ./in.cue:63:6
+    ./in.cue:64:7
+er3.min: invalid value 5 (out of bound <5):
+    ./in.cue:46:7
+    ./in.cue:64:7
 -- out/compile --
 --- in.cue
 {

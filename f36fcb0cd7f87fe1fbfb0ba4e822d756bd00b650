@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34320eba_aa71712a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "We need error test cases; for example, add `wantErr string` next to `wantCUE`, declaring that a test case is expected to fail. We want to capture failures like:\n* invalid INI: `[]\\n`, `[foo\\n`, `foo \u003d`, etc\n* duplicate key/section errors\n* cue literal parsing errors: `foo \u003d \"bar`, `foo \u003d baz\"`, `foo \u003d 34.bad`, etc\n\nOverall SGTM, if you\u0027re happy to make these adjustments I\u0027ll do one final pass and then merge.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4a69e82_fbafc469",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "Rather than trying to document case sensitivity and value type parsing here, which is hard, document it properly in the enums themselves, and add short lines here like:\n\n```\n- Key and section name case sensitivity is configured via [Config.CaseSensitivity]\n- Value type parsing is configured via [Config.ValueTypes]\n```",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0abb754a_c5c0176f",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "this is not right; in \"CUE literal types\" mode as described below, we do interpret them.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98a223a0_407dacba",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "I think this should be an enum as well, because some more complex uses of INI will for sure want flexibility here. Much like with the CaseSensitivityStrategyhe modes could be:\n\n```\nValueTypes ValueTypesStrategy\n\n[...]\n\ntype ValueTypesStrategy int\n\nconst (\n    valueTypesUnset CaseSensitivityStrategy \u003d iota // default zero value; equal to [ValuesRawStrings] for now\n    ValuesRawStrings\n    ValuesCUELiterals\n)\n```\n\nin the future, we can e.g. add more modes for JSON parsing, arrays, etc if needed.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4a06b40_473de7e8",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "The case insensitive matching needs to be guarded based on the config option.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da813ecf_b2f32193",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "nit: you can write this like:\n\n```\nswitch s :\u003d strings.ToLower(s); s {\ncase \"true\", \"false\":\n  b :\u003d ast.NewBool(s \u003d\u003d \"true\")\n  ast.SetPos(b, pos)\n  return b\n}\n// continue here...\n```\n\nthis avoids duplication, and we also unindent the code below.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d51b8f65_bbc38385",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "use https://pkg.go.dev/cuelang.org/go/cue/literal#ParseNum instead for parsing numbers; it\u0027s better to interpret numbers as CUE than as Go. ultimately, the fact that this encoding is written in Go is an implementation detail; we want this encoding to be CUE-aware but otherwise fairly language agnostic.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac5bfd65_1a4890b9",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "this seems incomplete; if the INI has `foo \u003d \"bar\"` or `foo \u003d \"bar with spaces\"`, we need to use `cue/literal.Unquote` to parse the input string value, stripping quotes and interpreting escape sequences.\n\nand when Unquote errors, such as with `foo \u003d bar`, you use the input string as-is, because it\u0027s unquoted.\n\nadd test cases for these too.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dab2f695_2c33354f",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "use `cue/literal.Unquote` for string literals, panicking when it fails as that is unexpected.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef2338cd_5309cd18",
+        "filename": "encoding/ini/decode_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "having one table test per option does not scale well; instead, have a single table-driven test, and add `config` to the set of fields for each test case. when left unset, it\u0027s the defaults.",
+      "revId": "f36fcb0cd7f87fe1fbfb0ba4e822d756bd00b650",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

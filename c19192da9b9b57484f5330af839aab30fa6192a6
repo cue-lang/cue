@@ -178,6 +178,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "be846630_137ee84f",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T09:43:08Z",
+      "side": 1,
+      "message": "sorry, this is not done - I did mean using a named type enum. using a boolean means we only have two options going forward and we\u0027re restricted from adding more variants. instead, do:\n\n```\nCaseSensitivity CaseSensitivityStrategy\n\n[...]\n\ntype CaseSensitivityStrategy int\n\nconst (\n    caseSensitivityUnset CaseSensitivityStrategy \u003d iota // default zero value; equal to [CaseSensitive] for now\n    CaseSensitive\n    CaseLower\n)\n```",
+      "parentUuid": "cc4d6bac_c73336e3",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9fd46ee9_d6140954",
         "filename": "encoding/ini/decode.go",
         "patchSetId": 5

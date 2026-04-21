@@ -17,6 +17,24 @@
       "parentUuid": "8b8c0a59_f674dd7b",
       "revId": "427365545fba548eea46556b4e90926194ff5eb2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b29d683_c8638a1e",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_issue4289.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-21T19:47:31Z",
+      "side": 1,
+      "message": "I don\u0027t think a new test is necessary; e.g. in cue/parser.TestParse you have a test case with `f: _|_`, so you could add another test case like that for the `_|X` variants.",
+      "parentUuid": "4f9e17c0_9db6f005",
+      "revId": "427365545fba548eea46556b4e90926194ff5eb2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

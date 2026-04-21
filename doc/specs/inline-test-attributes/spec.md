@@ -81,7 +81,7 @@ The first positional argument of a `@test(...)` attribute SHALL be the *directiv
 ### Requirement: `guidance=` universal flag
 Any `@test(...)` directive that can produce a test failure MAY carry a `guidance="..."` key-value flag. When an assertion fails, the runner logs the guidance string as an additional note after the failure message. This is intended to provide context for automated tools (such as AI assistants) that inspect test failures, and for human readers who need background on why the expected value was chosen.
 
-`guidance=` is purely informational — it has no effect on whether a test passes or fails. It does not modify any comparison or matching logic. It is silently accepted by all directives that report failures (`eq`, `leq`, `err`, `kind`, `closed`, `debugCheck`).
+`guidance=` is purely informational — it has no effect on whether a test passes or fails. It does not modify any comparison or matching logic. It is silently accepted by all directives that report failures (`eq`, `err`, `kind`, `closed`, `debugCheck`).
 
 ```cue
 a: c: 1 @test(err, code=eval,
@@ -225,19 +225,6 @@ obj: {a: 1, b: 2} @test(eq, {a: 1, b: 2})
 #### Scenario: @test(ignore) does not suppress other directives
 - **WHEN** `@test(eq, {b: _ @test(ignore) @test(err, any, code=cycle)})` is declared and `b` in the evaluated value contains a cycle error somewhere in its subtree
 - **THEN** the `eq` check on `b` is skipped, but the `@test(err, any, code=cycle)` assertion still runs and passes
-
----
-
-### Requirement: `leq` directive
-The `leq` directive SHALL assert that the evaluated value is *subsumed by* the given CUE expression (i.e., the constraint subsumes the result — the result is at least as specific as the constraint). This allows asserting type-level constraints without pinning an exact value.
-
-#### Scenario: Value subsumed by type constraint
-- **WHEN** a field carries `@test(leq, int)` and evaluates to `42`
-- **THEN** the test passes because `int` subsumes `42`
-
-#### Scenario: Value not subsumed
-- **WHEN** a field carries `@test(leq, string)` and evaluates to `42`
-- **THEN** the test fails
 
 ---
 
@@ -589,7 +576,7 @@ x: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)
 ---
 
 ### Requirement: `incorrect` universal modifier
-Any assertion directive (`eq`, `err`, `leq`, `kind`, `closed`, etc.) MAY carry `incorrect` as a positional flag. This marks the assertion as documenting the current *known-incorrect* behavior of the field — that is, the value or property the evaluator currently produces even though it is wrong.
+Any assertion directive (`eq`, `err`, `kind`, `closed`, etc.) MAY carry `incorrect` as a positional flag. This marks the assertion as documenting the current *known-incorrect* behavior of the field — that is, the value or property the evaluator currently produces even though it is wrong.
 
 Behavior when the assertion runs:
 - **If the assertion passes** (the documented incorrect value still matches): the test does NOT fail; the runner logs `NOTE: ... matches (documented as known incorrect behavior)`.

@@ -117,15 +117,6 @@ struct literals.  It is not valid CUE syntax in regular source files.
 
 ---
 
-### `leq` — subsumption constraint
-
-```cue
-count: 5 @test(leq, int)
-```
-
-Asserts `evaluate(field) ⊑ constraint`.  Useful for type-level assertions
-without pinning an exact value.
-
 ### `err` — error assertion
 
 ```cue

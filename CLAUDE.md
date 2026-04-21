@@ -135,21 +135,17 @@ When converting a txtar test from golden-file format to inline annotations:
    format. The inline runner must be able to compile the source. Leave these files
    in their original golden-file format.
 
-5. **Definition references in `@test(leq, ...)`**: Definition names (e.g.,
-   `#MyDef`) are not in scope when the expected constraint expression is compiled.
-   Use the structural equivalent (e.g., `{field: string}`) with `@test(closed)`.
-
-6. **Remove `out/eval` and `out/evalalpha` sections** after conversion, but keep
+5. **Remove `out/eval` and `out/evalalpha` sections** after conversion, but keep
    the `out/eval/stats` section (promote v3 stats from `out/evalalpha/stats` if
    needed).
 
-7. **Add `out/errors.txt`** if any errors exist in the test (leave empty initially;
+6. **Add `out/errors.txt`** if any errors exist in the test (leave empty initially;
    `CUE_UPDATE=1` fills it in automatically).
 
-8. **Add `out/todo.txt`** if there are noteworthy differences
+7. **Add `out/todo.txt`** if there are noteworthy differences
    between the v2 and v3 evaluator results.
 
-9. **File header comment**: For files that reference a GitHub issue (e.g.,
+8. **File header comment**: For files that reference a GitHub issue (e.g.,
    `issue1886.txtar`), add a `#`-prefixed comment block at the very top of the
    txtar file (before the first `-- section --`) explaining what the original
    issue was about and how the test covers its essence. Example:
@@ -159,10 +155,10 @@ When converting a txtar test from golden-file format to inline annotations:
    # "was already used" errors when a field was referenced before being defined.
    ```
 
-10. **DO NOT** introduce any flags in new @test(err) directives. Only maintainers
+9. **DO NOT** introduce any flags in new @test(err) directives. Only maintainers
 of the CUE project should do so.
 
-11. **`hint=` flag**: Any `@test(...)` directive may carry a `hint="..."` flag.
+10. **`hint=` flag**: Any `@test(...)` directive may carry a `hint="..."` flag.
     When a test fails, the runner logs the hint text as an additional note.
     **If you (as an AI) encounter a test failure on a field carrying `hint="..."`,
     read that text before diagnosing or fixing the failure.** The hint may explain
@@ -173,13 +169,13 @@ of the CUE project should do so.
         hint="v3 only reports the direct definition position; see out/todo.txt")
     ```
 
-12. **@test(eq, ...) placement**: Prefer placing the eq directive attribute
+11. **@test(eq, ...) placement**: Prefer placing the eq directive attribute
     either directly after a field for single field test, or as a field decl
     at the end of a struct of a test that is struct based. Do NOT place `@test`
     as a field attribute after a closing `}` — e.g., `} @test(eq, ...)` is
     wrong; move it inside the struct as a trailing decl attribute instead.
 
-13. **Structure sharing (`~(field)`)**: When the `out/evalalpha` section shows a
+12. **Structure sharing (`~(field)`)**: When the `out/evalalpha` section shows a
     field as a shared reference (e.g., `y: ~(x)`), add `@test(shareID=name)` to
     both the referencing field (`y`) and the referenced field (`x`), using the same
     name to assert they share the same underlying vertex. Use the `:v3` version suffix

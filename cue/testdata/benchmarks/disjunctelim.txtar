@@ -12,7 +12,7 @@ pat: {[string]: 1} | {a: 2} // 67  conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 78  conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 89  conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 100 conjuncts (+11)
-pat: {[string]: 1} | {a: 2} // 111 conjuncts (+11) @test(leq, {} | {a: 2})
+pat: {[string]: 1} | {a: 2} // 111 conjuncts (+11)
 @test(eq, {} | {a: 2}, at=pat)
 
 // This also should grow linearly per repeated line.
@@ -23,7 +23,7 @@ list: [1] | [2] | [3] | [4] // 85  conjuncts; 36  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 118 conjuncts; 52  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 151 conjuncts; 68  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 184 conjuncts; 84  disjuncts (+33; +16)
-list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16) @test(leq, [1] | [2] | [3] | [4])
+list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16)
 @test(eq, [1] | [2] | [3] | [4], at=list)
 
 issue3610: {

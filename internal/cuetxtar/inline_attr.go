@@ -39,7 +39,7 @@ import (
 // parsedTestAttr holds the result of parsing a single @test(...) attribute.
 type parsedTestAttr struct {
 	// directive is the primary directive name, e.g. "eq", "err", "kind",
-	// "closed", "leq", "skip", "permute", "file", "desc".
+	// "closed", "skip", "permute", "file", "desc".
 	directive string
 
 	// version is the optional version suffix from directive:vN, e.g. "v3".

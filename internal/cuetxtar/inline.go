@@ -814,8 +814,6 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 		r.runEqInline(t, path, val, pa)
 	case "err":
 		r.runErrAssertion(t, path, val, pa)
-	case "leq":
-		r.runLeqInline(t, path, val, pa)
 	case "kind":
 		r.runKindAssertion(t, path, val, pa)
 	case "closed":
@@ -960,32 +958,6 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	if !hasSkip {
 		t.Errorf("path %s: %v", path, cmpErr)
 		logHint(t, pa.hint)
-	}
-}
-
-// runLeqInline checks that val is subsumed by the constraint in pa.
-func (r *inlineRunner) runLeqInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
-	t.Helper()
-	if len(pa.raw.Fields) < 2 {
-		t.Errorf("path %s: @test(leq) requires a constraint argument", path)
-		return
-	}
-	exprStr := pa.raw.Fields[1].Text()
-	ctx := r.cueContext()
-	constraint := ctx.CompileString(exprStr)
-	if constraint.Err() != nil {
-		t.Errorf("path %s: @test(leq, ...): cannot compile constraint: %v", path, constraint.Err())
-		return
-	}
-	r.runLeqAssertion(t, path, val, constraint, pa.hint)
-}
-
-// runLeqAssertion asserts that val is subsumed by constraint (constraint ⊑ val, i.e. val is at least as specific).
-func (r *inlineRunner) runLeqAssertion(t testing.TB, path cue.Path, val, constraint cue.Value, hint string) {
-	t.Helper()
-	if err := constraint.Subsume(val); err != nil {
-		t.Errorf("path %s: @test(leq): value %v is not subsumed by constraint %v: %v", path, val, constraint, err)
-		logHint(t, hint)
 	}
 }
 

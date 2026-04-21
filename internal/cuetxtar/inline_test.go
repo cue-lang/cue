@@ -19,6 +19,8 @@ import (
 	"strings"
 	"testing"
 
+	"golang.org/x/tools/txtar"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
@@ -862,4 +864,22 @@ func TestParseErrArgs(t *testing.T) {
 			t.Errorf("got path=%q, want %q", ea.path, "a.b")
 		}
 	})
+}
+
+// TestIsInlineModeParsedError verifies that isInlineMode returns true for an
+// archive whose CUE file has a parse error in a @test attribute body. Before
+// the AllErrors fix, isInlineMode skipped files with parse errors and returned
+// false, producing a misleading "archive has no @test directives" error.
+func TestIsInlineModeParsedError(t *testing.T) {
+	// A @test attribute whose argument is a multiline string with whitespace
+	// mismatch: the blank line has 1 tab but the closing """ has 2 tabs.
+	// parser.ParseFile fails on this input, but the partial AST still
+	// contains the @test attribute.
+	src := "x: 1 @test(eq, \"\"\"\n\t\thello\n\t\n\t\t\"\"\")"
+	ar := &txtar.Archive{
+		Files: []txtar.File{{Name: "test.cue", Data: []byte(src)}},
+	}
+	if !isInlineMode(ar) {
+		t.Error("isInlineMode returned false for archive with @test in parse-error file; want true")
+	}
 }

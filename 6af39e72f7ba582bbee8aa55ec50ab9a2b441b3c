@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bb3c7da_756cdbaa",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1689,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-22T22:01:43Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "28c11dc7_115b7211",
+      "revId": "6af39e72f7ba582bbee8aa55ec50ab9a2b441b3c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51f2ccbc_4d8c1dc4",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1718,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-22T22:01:43Z",
+      "side": 1,
+      "message": "Done, renamed to isMultilineString.",
+      "parentUuid": "f4e19da8_5f79b812",
+      "revId": "6af39e72f7ba582bbee8aa55ec50ab9a2b441b3c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "278d31e4_e2da2e3d",
+        "filename": "cue/parser/parser_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 629,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-22T22:01:43Z",
+      "side": 1,
+      "message": "Switched approach: no breaking change in the parser. Newlines between `\\(` and `)` are accepted in both single-line and multi-line string literals. The formatter then normalizes the surrounding whitespace depending on the kind of string:\n\n- In single-line strings, any newlines inside an interpolation expression are collapsed so the result stays on one line. This aligns user code with the Swift model that Marcel wants, without directly breaking user code or causing any regressions.\n- In multi-line strings, the newlines around each interpolation expression are balanced — either both the leading and trailing newlines are present or neither is; if only one is present, the formatter inserts the other. This matches how the formatter already enforces symmetry in other cases with surrounding delimiters.\n\nTests updated and a new testdata/interpolation.txtar covers both cases.",
+      "parentUuid": "6d53ce4e_88b0c980",
+      "revId": "6af39e72f7ba582bbee8aa55ec50ab9a2b441b3c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

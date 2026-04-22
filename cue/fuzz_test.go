@@ -91,18 +91,18 @@ list.Concat(["foo"], [])
 			// so ParseExpr and IsValidIdent correctly accept them.
 			if s != "package" && s != "import" {
 				if exprErr == nil {
-					t.Errorf("ParseFile rejects this input but ParseExpr does not: %s", s)
+					t.Errorf("ParseFile rejects this input but ParseExpr does not: %q", s)
 				}
 				if ast.IsValidIdent(s) {
-					t.Errorf("cue/parser rejects this identifier but cue/ast accepts it as valid: %s", s)
+					t.Errorf("cue/parser rejects this identifier but cue/ast accepts it as valid: %q", s)
 				}
 			}
 			var info literal.NumInfo
 			if err := literal.ParseNum(s, &info); err == nil {
-				t.Errorf("cue/parser rejects this number but cue/literal accepts it as valid: %s", s)
+				t.Errorf("cue/parser rejects this number but cue/literal accepts it as valid: %q", s)
 			}
 			if _, err := literal.Unquote(s); err == nil {
-				t.Errorf("cue/parser rejects this string but cue/literal accepts it as valid: %s", s)
+				t.Errorf("cue/parser rejects this string but cue/literal accepts it as valid: %q", s)
 			}
 
 			// Nothing else to do for invalid syntax; stop here.
@@ -125,14 +125,14 @@ list.Concat(["foo"], [])
 				switch node := node.(type) {
 				case *ast.Ident:
 					if !ast.IsValidIdent(node.Name) {
-						t.Errorf("cue/parser accepts this identifier as valid but cue/ast does not: %s", node.Name)
+						t.Errorf("cue/parser accepts this identifier as valid but cue/ast does not: %q", node.Name)
 					}
 				case *ast.BasicLit:
 					switch node.Kind {
 					case token.INT, token.FLOAT:
 						var info literal.NumInfo
 						if err := literal.ParseNum(node.Value, &info); err != nil {
-							t.Errorf("cue/parser accepts this number as valid but cue/literal does not: %s", node.Value)
+							t.Errorf("cue/parser accepts this number as valid but cue/literal does not: %q", node.Value)
 						}
 					case token.STRING:
 						if _, ok := c.Parent().Node().(*ast.Interpolation); ok {
@@ -140,7 +140,7 @@ list.Concat(["foo"], [])
 							break
 						}
 						if _, err := literal.Unquote(node.Value); err != nil {
-							t.Errorf("cue/parser accepts this string as valid but cue/literal does not: %s", node.Value)
+							t.Errorf("cue/parser accepts this string as valid but cue/literal does not: %q", node.Value)
 						}
 					}
 				}

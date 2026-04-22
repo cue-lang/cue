@@ -5,9 +5,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"go/format"
 	"go/types"
+	"log"
 	"maps"
 	"os"
 	"os/exec"
@@ -23,6 +25,7 @@ import (
 	"golang.org/x/tools/go/packages"
 
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/inject/goplugin"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/cueconfig"
@@ -124,6 +127,7 @@ func runPluginBuild(cmd *Command, args []string) error {
 	if err := os.WriteFile(filepath.Join(pluginDir, "go.mod"), goModData, 0o666); err != nil {
 		return err
 	}
+	log.Printf("go.mod contents: %q", goModData)
 	if err := os.WriteFile(filepath.Join(pluginDir, "main.go"), interimMainData, 0o666); err != nil {
 		return err
 	}
@@ -142,6 +146,20 @@ func runPluginBuild(cmd *Command, args []string) error {
 		return err
 	}
 	if err := os.WriteFile(filepath.Join(pluginDir, "main.go"), mainGoData, 0o666); err != nil {
+		return err
+	}
+
+	// Generate and write the plugin manifest.
+	manifest, err := buildManifest(refs, resolved, pluginDir)
+	if err != nil {
+		return fmt.Errorf("building manifest: %v", err)
+	}
+	manifestData, err := json.MarshalIndent(manifest, "", "\t")
+	if err != nil {
+		return fmt.Errorf("encoding manifest: %v", err)
+	}
+	manifestData = append(manifestData, '\n')
+	if err := os.WriteFile(filepath.Join(pluginDir, "manifest.json"), manifestData, 0o666); err != nil {
 		return err
 	}
 
@@ -314,7 +332,7 @@ func findGoMod(dir string, cache map[string]goModule, cueModuleRoot string) (goM
 		if err == nil {
 			f, parseErr := gomodfile.Parse(goModPath, data, nil)
 			if parseErr != nil {
-				return goModule{}, fmt.Errorf("parsing %s: %v", goModPath, parseErr)
+				return goModule{}, fmt.Errorf("parsing %s: %v (%q)", goModPath, parseErr, data)
 			}
 			m := goModule{
 				dir: d,
@@ -543,6 +561,14 @@ func buildWrapExpr(alias, funcName string, sig *types.Signature, qualifier types
 func goVersionForMod() string {
 	// runtime.Version() returns something like "go1.23.4".
 	v := runtime.Version()
+	// When Go is a development version, it can
+	// include a date and time too, and a hyphenated
+	// pre-release version, so strip that.
+	// (note that the prerelease version doesn't fit with
+	// the standard semver syntax so we cannot use
+	// primitives from the semver package here.
+	v, _, _ = strings.Cut(v, " ")
+	v, _, _ = strings.Cut(v, "-")
 	v, _ = strings.CutPrefix(v, "go")
 	// go.mod only wants major.minor, not patch.
 	parts := strings.SplitN(v, ".", 3)
@@ -763,7 +789,7 @@ func (e *needPluginError) Error() string {
 // and the cue command was not invoked via MainWithOptions.
 // It returns a *needPluginError if so, nil otherwise.
 func checkPlugin(cmd *Command) error {
-	if len(cmd.contextOptions) > 0 {
+	if cmd.runningInPlugin {
 		return nil
 	}
 	modRoot, err := findModuleRoot()
@@ -811,4 +837,117 @@ func pluginHash(pluginDir string) (string, error) {
 	}
 	h.Write(mainGoData)
 	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// buildManifest creates a [goplugin.Manifest] from the collected references
+// and the tidied go.mod in the plugin directory.
+func buildManifest(refs []instanceReference, resolved []resolvedRef, pluginDir string) (*goplugin.Manifest, error) {
+	goModData, err := os.ReadFile(filepath.Join(pluginDir, "go.mod"))
+	if err != nil {
+		return nil, fmt.Errorf("reading plugin go.mod: %v", err)
+	}
+	goModFile, err := gomodfile.Parse("go.mod", goModData, nil)
+	if err != nil {
+		return nil, fmt.Errorf("parsing plugin go.mod: %v", err)
+	}
+
+	manifest := &goplugin.Manifest{
+		Modules:    map[string]goplugin.Module{},
+		GoPackages: map[string]goplugin.GoModule{},
+	}
+
+	for i, ir := range refs {
+		r := resolved[i]
+		modPath := ir.inst.ModuleVersion.Path()
+		cueImportPath := ir.inst.ImportPath
+
+		mod := manifest.Modules[modPath]
+		if mod.Instances == nil {
+			mod.Instances = map[string]goplugin.Instance{}
+		}
+		inst := mod.Instances[cueImportPath]
+		if inst.GoPackages == nil {
+			inst.GoPackages = map[string][]string{}
+		}
+
+		goPkg := r.goPkg
+		names := inst.GoPackages[goPkg]
+		if !slices.Contains(names, ir.ref.Name) {
+			inst.GoPackages[goPkg] = append(names, ir.ref.Name)
+		}
+
+		if ir.ref.GoPackage == "." {
+			inst.ColocatedGoPackage = goPkg
+		}
+
+		mod.Instances[cueImportPath] = inst
+		manifest.Modules[modPath] = mod
+
+		if _, ok := manifest.GoPackages[goPkg]; !ok {
+			manifest.GoPackages[goPkg] = manifestGoModule(goModFile, goPkg)
+		}
+	}
+
+	return manifest, nil
+}
+
+// manifestGoModule finds the Go module that provides the given package
+// by matching against the requirements in the given go.mod file.
+func manifestGoModule(goModFile *gomodfile.File, pkgPath string) goplugin.GoModule {
+	var bestPath string
+	var bestVersion string
+	for _, req := range goModFile.Require {
+		if hasPathPrefix(pkgPath, req.Mod.Path) && len(req.Mod.Path) > len(bestPath) {
+			bestPath = req.Mod.Path
+			bestVersion = req.Mod.Version
+		}
+	}
+	if bestPath == "" {
+		return goplugin.GoModule{}
+	}
+	for _, rep := range goModFile.Replace {
+		if rep.Old.Path == bestPath && rep.New.Version == "" {
+			return goplugin.GoModule{
+				Path: bestPath,
+				Dir:  rep.New.Path,
+			}
+		}
+	}
+	return goplugin.GoModule{
+		Path:    bestPath,
+		Version: bestVersion,
+	}
+}
+
+// pluginCheckerOption reads the manifest file from cue.mod/plugin/manifest.json
+// and returns a cuecontext.Option that adds a Checker injection.
+// It returns ok as false when no manifest file is found.
+// It returns an error if the manifest file exists but cannot be parsed.
+func appendPluginCheckerOptions(cmd *Command, opts []cuecontext.Option) (opt []cuecontext.Option, err error) {
+	if !cmd.runningInPlugin {
+		// Not running in plugin: no need for checking plugins.
+		return opts, nil
+	}
+	modRoot, err := findModuleRoot()
+	if err != nil {
+		return opts, nil
+	}
+	data, err := os.ReadFile(filepath.Join(modRoot, "cue.mod", "plugin", "manifest.json"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			return opts, nil
+		}
+		return nil, err
+	}
+	var manifest goplugin.Manifest
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		return nil, fmt.Errorf("cannot read plugin manifest: %v", err)
+	}
+	return append(opts,
+		cuecontext.WithInjection(
+			goplugin.Checker(&manifest, func(goplugin.ResolvedReference) error {
+				return nil
+			}),
+		),
+	), nil
 }

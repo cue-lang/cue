@@ -6,6 +6,7 @@ package protocol
 
 // Custom code actions that aren't explicitly stated in LSP
 const (
-	RefactorRewriteConvertToStruct   CodeActionKind = "refactor.rewrite.convertToStruct"
-	RefactorRewriteConvertFromStruct CodeActionKind = "refactor.rewrite.convertFromStruct"
+	RefactorRewriteConvertToStruct    CodeActionKind = "refactor.rewrite.convertToStruct"
+	RefactorRewriteConvertFromStruct  CodeActionKind = "refactor.rewrite.convertFromStruct"
+	RefactorRewriteToggleStructBraces CodeActionKind = "refactor.rewrite.toggleStructBraces"
 )

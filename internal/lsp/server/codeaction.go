@@ -15,6 +15,7 @@
 package server
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"slices"
@@ -94,6 +95,24 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 		codeActions = append(codeActions, action)
 	}
 
+	// "Toggle surrounding struct braces" exists so it can be bound to a
+	// single keystroke for the 0 <-> 1 brace cycle. If "Remove..." is
+	// available at the cursor it is used; otherwise "Add..." is used.
+	// The two primitives above remain available so users can still
+	// deepen nesting explicitly.
+	if toggleEdit := cmp.Or(convertFromStructEdit, convertToStructEdit); toggleEdit != nil {
+		action := protocol.CodeAction{
+			Title: "Toggle surrounding struct braces",
+			Kind:  protocol.RefactorRewriteToggleStructBraces,
+		}
+		if delayEdit {
+			action.Data = &raw
+		} else {
+			action.Edit = toggleEdit
+		}
+		codeActions = append(codeActions, action)
+	}
+
 	organizeImportsEdit, err := s.workspace.CodeActionOrganizeImports(ctx, params, delayEdit)
 	if err != nil {
 		return nil, err
@@ -139,6 +158,22 @@ func (s *server) ResolveCodeAction(ctx context.Context, action *protocol.CodeAct
 			return nil, err
 		}
 		action.Edit = convertFromStructEdit
+		return action, nil
+
+	case protocol.RefactorRewriteToggleStructBraces:
+		convertFromStructEdit, err := s.workspace.CodeActionConvertFromStruct(ctx, &params, false)
+		if err != nil {
+			return nil, err
+		}
+		if convertFromStructEdit != nil {
+			action.Edit = convertFromStructEdit
+			return action, nil
+		}
+		convertToStructEdit, err := s.workspace.CodeActionConvertToStruct(ctx, &params, false)
+		if err != nil {
+			return nil, err
+		}
+		action.Edit = convertToStructEdit
 		return action, nil
 
 	case protocol.SourceOrganizeImports:

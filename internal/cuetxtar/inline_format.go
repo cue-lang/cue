@@ -46,10 +46,27 @@ type eqWriter struct {
 	srcFileName string
 	baseLine    int
 	opCtx       *adt.OpContext
+	// seen tracks vertices currently on the write stack for cycle detection.
+	// When writeStruct encounters a vertex already in seen, it emits "~" to
+	// indicate a shared/cyclic reference and avoids infinite recursion.
+	seen map[*adt.Vertex]bool
 }
 
 func (w *eqWriter) formatPos(p token.Pos) string {
 	return w.r.formatPosSpec(p, w.baseLine, w.srcFileName)
+}
+
+// makeSafeVal wraps v in a cue.Value via value.Make, guarding against infinite
+// evaluator recursion. When v is an *adt.Vertex that has already been touched
+// by the evaluator (BaseValue != nil), it may be stuck in "evaluating" state
+// due to a structural cycle. Calling value.Make would trigger Finalize, which
+// re-enters the evaluator and recurses infinitely. ForceDone marks the vertex
+// as finalized so that Finalize is an immediate no-op for such vertices.
+func (w *eqWriter) makeSafeVal(v adt.Value) cue.Value {
+	if vx, ok := v.(*adt.Vertex); ok && vx.BaseValue != nil {
+		vx.ForceDone()
+	}
+	return value.Make(w.opCtx, v)
 }
 
 // eqFillAttr builds an @test(eq, <value>[, at=<atStr>]) attribute for fill/force-update.
@@ -244,7 +261,7 @@ func (w *eqWriter) writeDisjunction(b *strings.Builder, dj *adt.Disjunction) {
 		if i < dj.NumDefaults {
 			b.WriteByte('*')
 		}
-		w.writeValue(b, value.Make(w.opCtx, v), "")
+		w.writeValue(b, w.makeSafeVal(v), "")
 	}
 }
 
@@ -254,7 +271,7 @@ func (w *eqWriter) writeConjunction(b *strings.Builder, conj *adt.Conjunction) {
 		if i > 0 {
 			b.WriteString(" & ")
 		}
-		w.writeValue(b, value.Make(w.opCtx, v), "")
+		w.writeValue(b, w.makeSafeVal(v), "")
 	}
 }
 
@@ -290,7 +307,7 @@ func (w *eqWriter) writeList(b *strings.Builder, vx *adt.Vertex, nestedIndent st
 		// Pass nestedIndent (not nestedIndent+"\t") so that struct fields land
 		// at nestedIndent and the closing } lands at nestedIndent[:-1], i.e.
 		// immediately before ']'.
-		w.writeValue(b, value.Make(w.opCtx, arc), nestedIndent)
+		w.writeValue(b, w.makeSafeVal(arc), nestedIndent)
 	}
 	// TODO: emit "..." for open lists so that the generated expression captures
 	// the open-list constraint. Currently omitted because astCmp accepts the
@@ -369,6 +386,18 @@ func (w *eqWriter) writeErrAnnotationBody(b *strings.Builder, v cue.Value) {
 //     is preceded by "\n"+nestedIndent[:-1] (one tab less). Field values
 //     receive nestedIndent+"\t" so they can recurse one level deeper.
 func (w *eqWriter) writeStruct(b *strings.Builder, vx *adt.Vertex, nestedIndent string) {
+	// Cycle guard: if vx is already on the write stack (structure sharing),
+	// emit a placeholder to avoid infinite recursion.
+	if w.seen[vx] {
+		b.WriteString("~")
+		return
+	}
+	if w.seen == nil {
+		w.seen = make(map[*adt.Vertex]bool)
+	}
+	w.seen[vx] = true
+	defer delete(w.seen, vx)
+
 	b.WriteByte('{')
 	first := true
 
@@ -379,11 +408,54 @@ func (w *eqWriter) writeStruct(b *strings.Builder, vx *adt.Vertex, nestedIndent 
 	// handled by writeValue's early-return path, so they never reach
 	// writeStruct.
 	if embVal, ok := vx.BaseValue.(adt.Value); ok {
-		if nestedIndent != "" {
-			b.WriteString("\n" + nestedIndent)
+		// Build the representation of the embedded value into a scratch buffer
+		// so we know whether anything was written before committing to the
+		// indent and first-separator bookkeeping.
+		var emb strings.Builder
+		switch ev := embVal.(type) {
+		case *adt.Bottom:
+			// Error or cycle placeholder: write directly to avoid the
+			// infinite-recursion loop where a fresh vertex wrapping Bottom
+			// also has BaseValue=Bottom, firing this path forever.
+			emb.WriteString("_|_")
+		case *adt.Conjunction:
+			// Avoid re-evaluating cyclic conjuncts via value.Make.
+			w.writeConjunction(&emb, ev)
+		case *adt.Disjunction:
+			// Avoid re-evaluating cyclic disjuncts via value.Make.
+			w.writeDisjunction(&emb, ev)
+		case *adt.Vertex:
+			// Structure-sharing embedded vertex: write directly via writeStruct
+			// to avoid value.Make → Finalize → evaluator recursion.
+			// This handles both ev.BaseValue==nil (vertex stuck in cyclic
+			// evaluation) and ev.BaseValue!=nil cases. The seen-map in
+			// writeStruct provides cycle detection.
+			w.writeStruct(&emb, ev, "")
+		case *adt.BasicType:
+			// BasicType represents a type constraint (int, string, etc.).
+			// For struct/list kinds, skip the embVal — it is redundant with
+			// the outer struct/list literal AND debug.NodeString produces
+			// "struct"/"list" which are not valid CUE identifiers.
+			// For scalar kinds, debug.NodeString produces the valid CUE name.
+			if ev.K != adt.StructKind && ev.K != adt.ListKind {
+				emb.WriteString(debug.NodeString(w.opCtx, ev, nil))
+			}
+		default:
+			// Scalar, bound, builtin, etc.: use debug.NodeString for a safe
+			// representation that avoids evaluator recursion.
+			// value.Make would create a new vertex from embVal via
+			// exprToVertex and then Finalize it, which re-evaluates
+			// potentially-cyclic references (e.g. a BuiltinValidator whose
+			// arguments depend on a cyclic field).
+			emb.WriteString(debug.NodeString(w.opCtx, embVal, nil))
 		}
-		first = false
-		w.writeValue(b, value.Make(w.opCtx, embVal), nestedIndent+"\t")
+		if emb.Len() > 0 {
+			if nestedIndent != "" {
+				b.WriteString("\n" + nestedIndent)
+			}
+			first = false
+			b.WriteString(emb.String())
+		}
 	}
 
 	for _, arc := range vx.Arcs {
@@ -407,7 +479,7 @@ func (w *eqWriter) writeStruct(b *strings.Builder, vx *adt.Vertex, nestedIndent 
 		first = false
 		eqWriteLabel(w.opCtx, b, arc.Label, arc.ArcType)
 		b.WriteString(": ")
-		arcVal := value.Make(w.opCtx, arc)
+		arcVal := w.makeSafeVal(arc)
 		w.writeValue(b, arcVal, nestedIndent+"\t")
 		// For leaf error fields, append a @test(err, ...) annotation with
 		// actual error details and immediately-filled positions.

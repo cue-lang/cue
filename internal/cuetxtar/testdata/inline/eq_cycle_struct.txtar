@@ -1,0 +1,72 @@
+# Tests that @test(eq) and @test(debug) do not recurse infinitely when a
+# struct contains mutually-cyclic field references that produce cycle errors.
+# Before the fix, writeStruct could re-enter itself or makeSafeVal could
+# trigger Finalize recursively, causing an infinite loop or stack overflow.
+#
+# The "minimal" pattern has two fields a and b each conditionally defining
+# port based on the other's port — a classic comprehension cycle.
+-- in/test.cue --
+// Cyclic comprehension: a.port and b.port depend on each other.
+// writeStruct / makeSafeVal must not recurse infinitely on the cycle errors.
+cyclic: {
+	a: {
+		if b.port == _|_ {
+			port: ""
+		}
+	}
+	b: {
+		if a.port == _|_ {
+			port: ""
+		}
+	}
+	@test(eq, {a: {}, b: {}})
+}
+-- out/update/test.cue --
+// Cyclic comprehension: a.port and b.port depend on each other.
+// writeStruct / makeSafeVal must not recurse infinitely on the cycle errors.
+cyclic: {
+	a: {
+		if b.port == _|_ {
+			port: ""
+		}
+	}
+	b: {
+		if a.port == _|_ {
+			port: ""
+		}
+	}
+	@test(eq, {a: {}, b: {}})
+}
+-- out/update/out/errors.txt --
+[cycle] cyclic.a: cyclic reference to field port:
+    ./test.cue:5:8
+[cycle] cyclic.b: undefined field: port:
+    ./test.cue:10:8
+-- out/status.txt --
+update: output passes run
+-- out/run/errors.txt --
+path cyclic: a: value is an error (cyclic.a: cyclic reference to field port) but expected struct has no embedded _|_; use {_|_, ...} to assert error
+-- out/force/test.cue --
+// Cyclic comprehension: a.port and b.port depend on each other.
+// writeStruct / makeSafeVal must not recurse infinitely on the cycle errors.
+cyclic: {
+	a: {
+		if b.port == _|_ {
+			port: ""
+		}
+	}
+	b: {
+		if a.port == _|_ {
+			port: ""
+		}
+	}
+	@test(eq, {
+		a: _|_ @test(err, code=cycle, contains="cyclic.a: cyclic reference to field port", pos=[2:8])
+		b: _|_ @test(err, code=cycle, contains="cyclic.b: undefined field: port", pos=[7:8])
+	})
+}
+-- out/force/out/errors.txt --
+[cycle] cyclic.a: cyclic reference to field port:
+    ./test.cue:5:8
+[cycle] cyclic.b: undefined field: port:
+    ./test.cue:10:8

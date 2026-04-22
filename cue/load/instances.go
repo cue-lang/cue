@@ -172,6 +172,30 @@ func Instances(args []string, c *Config) []*build.Instance {
 		tg.tags = append(tg.tags, tags...)
 	}
 
+	// Collect module-scoped tags (scope=mod) from transitive imports within
+	// the same module. These tags are injected even when their package is
+	// not a root package but is merely imported.
+	if c.Module != "" {
+		// `capacity` is over-estimated because it counts shared and out-of-module
+		// deps, but it avoids rehashing as findModuleScopedTags adds entries.
+		capacity := len(a)
+		for _, p := range a {
+			capacity += len(p.Deps)
+		}
+		visited := make(map[string]struct{}, capacity)
+		// Seed visited with root package paths to avoid double-processing.
+		for _, p := range a {
+			visited[p.ImportPath] = struct{}{}
+		}
+		for _, p := range a {
+			tags, err := findModuleScopedTags(p, c.Module, visited)
+			if err != nil {
+				p.ReportError(err)
+			}
+			tg.tags = append(tg.tags, tags...)
+		}
+	}
+
 	// TODO(api): have API call that returns an error which is the aggregate
 	// of all build errors. Certain errors, like these, hold across builds.
 	if err := tg.injectTags(c.Tags); err != nil {

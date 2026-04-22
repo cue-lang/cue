@@ -1,0 +1,87 @@
+# Test that @tag(name,scope=mod) injects tag values into fields in imported
+# packages within the same module (issue #1070).
+
+# scope=mod: tag injection works even when the tagged field is in an imported package.
+exec cue eval -t name=foo ./schema/v1alpha1
+cmp stdout expect-v1alpha1
+
+# scope=mod: works with the -e flag to extract a specific field.
+exec cue eval -t name=foo -e test ./schema/v1alpha1
+cmp stdout expect-v1alpha1-e
+
+# scope=mod tags can be injected when evaluating multiple packages at once.
+exec cue eval -t name=foo ./schema/...
+cmp stdout expect-all
+
+# Without scope=mod, cross-package tag injection still fails (regression guard):
+# a package whose import chain has no scope=mod tag for "name" should error.
+! exec cue eval -t name=foo ./schema/v1alpha2
+stderr 'no tag for "name"'
+
+# Invalid scope value is an error.
+! exec cue eval ./invalid
+stderr 'invalid tag scope "bad"'
+
+-- cue.mod/module.cue --
+module: "mod.test/test"
+language: version: "v0.9.0"
+
+-- schema/base/base.cue --
+package base
+
+#metadata: {
+	name: string @tag(name,scope=mod)
+}
+
+#base: {
+	metadata: #metadata
+}
+
+-- schema/v1alpha1/test.cue --
+package v1alpha1
+
+import "mod.test/test/schema/base"
+
+test: base.#base & {
+	metadata: name: string
+}
+
+-- schema/v1alpha2/test.cue --
+package v1alpha2
+
+// This package does NOT import base, so there is no scope=mod tag for "name"
+// anywhere in its import chain.
+x: string @tag(other)
+
+-- invalid/invalid.cue --
+package invalid
+
+x: string @tag(foo,scope=bad)
+
+-- expect-v1alpha1 --
+test: {
+    metadata: {
+        name: "foo"
+    }
+}
+-- expect-v1alpha1-e --
+metadata: {
+    name: "foo"
+}
+-- expect-all --
+#metadata: {
+    name: "foo"
+}
+#base: {
+    metadata: {
+        name: "foo"
+    }
+}
+// ---
+test: {
+    metadata: {
+        name: "foo"
+    }
+}
+// ---
+x: string

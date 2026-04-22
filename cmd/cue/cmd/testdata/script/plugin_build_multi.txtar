@@ -10,6 +10,9 @@ cmp cue.mod/plugin/main.go want-main.go
 # Verify generated go.mod references cuelang.org/go.
 grep 'cuelang.org/go' cue.mod/plugin/go.mod
 
+# Verify the generated manifest matches expected output.
+cmp cue.mod/plugin/manifest.json want-manifest.json
+
 # Execute the cue command and verify output.
 exec cue export .
 cmp stdout want-export
@@ -116,6 +119,43 @@ func main() {
 		},
 	}
 	os.Exit(cmd.MainWithOptions(cuecontext.WithInjection(goplugin.Injection(refs))))
+}
+-- want-manifest.json --
+{
+	"modules": {
+		"example.com/mathutil@v0": {
+			"instances": {
+				"example.com/mathutil": {
+					"goPackages": {
+						"example.com/gomathutil": [
+							"Add"
+						]
+					}
+				}
+			}
+		},
+		"example.com/strutil@v0": {
+			"instances": {
+				"example.com/strutil": {
+					"goPackages": {
+						"example.com/gostrutil": [
+							"Upper"
+						]
+					}
+				}
+			}
+		}
+	},
+	"goPackages": {
+		"example.com/gomathutil": {
+			"path": "example.com/gomathutil",
+			"version": "v0.1.0"
+		},
+		"example.com/gostrutil": {
+			"path": "example.com/gostrutil",
+			"version": "v0.1.0"
+		}
+	}
 }
 -- .gomodproxy/_enable_overlay --
 -- .gomodproxy/example.com_gostrutil_v0.1.0/go.mod --

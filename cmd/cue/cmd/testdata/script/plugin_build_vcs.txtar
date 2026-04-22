@@ -15,6 +15,9 @@ cmp cue.mod/plugin/main.go want-main.go
 grep 'example.com/strutil v0.0.0-20240715103000-abc123def456' cue.mod/plugin/go.mod
 ! grep 'replace.*example.com/strutil' cue.mod/plugin/go.mod
 
+# Verify the generated manifest matches expected output.
+cmp cue.mod/plugin/manifest.json want-manifest.json
+
 exec cue export .
 cmp stdout want-export
 
@@ -93,6 +96,29 @@ func main() {
 		},
 	}
 	os.Exit(cmd.MainWithOptions(cuecontext.WithInjection(goplugin.Injection(refs))))
+}
+-- want-manifest.json --
+{
+	"modules": {
+		"example.com/strutil@v0": {
+			"instances": {
+				"example.com/strutil": {
+					"colocatedGoPackage": "example.com/strutil",
+					"goPackages": {
+						"example.com/strutil": [
+							"Upper"
+						]
+					}
+				}
+			}
+		}
+	},
+	"goPackages": {
+		"example.com/strutil": {
+			"path": "example.com/strutil",
+			"version": "v0.0.0-20240715103000-abc123def456"
+		}
+	}
 }
 -- .gomodproxy/_enable_overlay --
 -- .gomodproxy/example.com_strutil_v0.0.0-20240715103000-abc123def456/go.mod --

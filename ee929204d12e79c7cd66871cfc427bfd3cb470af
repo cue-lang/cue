@@ -16,6 +16,24 @@
       "message": "I would expand this godoc to explain this new multi/unify behavior",
       "revId": "ee929204d12e79c7cd66871cfc427bfd3cb470af",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f458137_32c60c25",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-22T16:00:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89d6c3e3_84c26e0c",
+      "revId": "ee929204d12e79c7cd66871cfc427bfd3cb470af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

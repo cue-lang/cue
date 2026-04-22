@@ -1,0 +1,30 @@
+# Tests that @test(eq) correctly handles structs whose BaseValue is
+# *adt.BasicType{K: StructKind}, which arises for structs returned by builtins
+# like regexp.FindNamedSubmatch. Such a BaseValue must NOT be treated as an
+# embedded expression during comparison or fill, otherwise the runner would
+# report "value has embedded struct but expected struct has no embedded
+# expression" on a perfectly valid @test(eq, {port: "8080"}) annotation.
+#
+# pass: already-filled @test(eq) must pass.
+# seed: bare @test(eq) must be seeded with {port: "8080"}, not {struct …}.
+-- in/test.cue --
+import "regexp"
+
+// Pass: regexp.FindNamedSubmatch returns a struct with BasicType BaseValue;
+// the eq check must not complain about a spurious embedded expression.
+pass: regexp.FindNamedSubmatch(#"^(?P<port>\d+)$"#, "8080") @test(eq, {port: "8080"})
+
+// Seed: CUE_UPDATE=1 must fill {port: "8080"}, not {struct port: "8080"}.
+seed: regexp.FindNamedSubmatch(#"^(?P<port>\d+)$"#, "8080") @test(eq)
+-- out/update/test.cue --
+import "regexp"
+
+// Pass: regexp.FindNamedSubmatch returns a struct with BasicType BaseValue;
+// the eq check must not complain about a spurious embedded expression.
+pass: regexp.FindNamedSubmatch(#"^(?P<port>\d+)$"#, "8080") @test(eq, {port: "8080"})
+
+// Seed: CUE_UPDATE=1 must fill {port: "8080"}, not {struct port: "8080"}.
+seed: regexp.FindNamedSubmatch(#"^(?P<port>\d+)$"#, "8080") @test(eq, {port: "8080"})
+-- out/status.txt --
+update: output passes run
+force:  identical to update

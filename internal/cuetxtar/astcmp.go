@@ -1094,6 +1094,13 @@ func embeddedScalar(val cue.Value) (cue.Value, bool) {
 			v = vertex // follow structure-sharing indirection
 			continue
 		}
+		// *adt.BasicType{K: StructKind|ListKind} is semantically equivalent to
+		// *StructMarker/*ListMarker: it just means "it's a struct/list". Treat
+		// it the same way so that {port: ""} matches a struct whose BaseValue
+		// is BasicType{StructKind} without requiring an embedded expression.
+		if bt, ok2 := bv.(*adt.BasicType); ok2 && (bt.K == adt.StructKind || bt.K == adt.ListKind) {
+			return cue.Value{}, false
+		}
 		return value.Make(value.OpContext(val), bv), true
 	}
 	return cue.Value{}, false

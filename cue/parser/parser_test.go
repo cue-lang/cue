@@ -466,6 +466,12 @@ cannot import package as definition identifier`,
 			out: "a: >=1&<=2, b: >2.0&<=40.0, c: >\"a\"&<=\"b\", v: (>=1&<=2)&<=(>=5&<=10), w: >1&<=2&<=3, d: >=3T&<=5M",
 		},
 		{
+			desc: "trailing digits after SI multiplier",
+			in:   `a: 0K0`,
+			out: `a: 0K, <*ast.BadExpr>
+missing ',' in struct literal (and 1 more errors)`,
+		},
+		{
 			desc: "indices",
 			in: `{
 			a: b[2]

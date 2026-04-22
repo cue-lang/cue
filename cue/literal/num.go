@@ -321,6 +321,9 @@ exponent:
 		} else {
 			p.mul |= mulDec
 		}
+		if p.ch != 0 {
+			return p.errorf("illegal trailing characters in number %q", p.src)
+		}
 		var v apd.Decimal
 		p.isFloat = false
 		return p.decimal(&v)

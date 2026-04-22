@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28878002_ba486971",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_issue4289.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-04-22T04:12:05Z",
+      "side": 1,
+      "message": "Done. Dropped the dedicated scanner test and extended the existing \"expressions\" test case in cue/parser.TestParse with `g: _|1` and `h: _||true`. PTAL.",
+      "parentUuid": "9b29d683_c8638a1e",
+      "revId": "480b5f68eb179c05aa66dbddb3b3553fba40a35b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

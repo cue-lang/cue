@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62314ded_fe5cff8a",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-22T13:49:15Z",
+      "side": 1,
+      "message": "what\u0027s this commented out code for? it either needs a clear TODO, or simply be deleted",
+      "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6716468_3db46f5b",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-22T13:49:15Z",
+      "side": 1,
+      "message": "can we briefly document these new methods?",
+      "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5399bb65_6dbf75d7",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-22T13:49:15Z",
+      "side": 1,
+      "message": "surely this constant doesn\u0027t belong inside a func? ideally we have it in a central place and reuse it.",
+      "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b3813b0_e9354059",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-22T13:49:15Z",
+      "side": 1,
+      "message": "avoid extra whitespaces changes like this if you can",
+      "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

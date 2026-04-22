@@ -184,6 +184,10 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if wasmInterp != nil {
 			opts = append(opts, cuecontext.WithInjection(wasmInterp))
 		}
+		opts, err = appendPluginCheckerOptions(c, opts)
+		if err != nil {
+			return err
+		}
 		c.ctx = cuecontext.New(opts...)
 		// Some init work, such as in internal/filetypes, evaluates CUE by design.
 		// We don't want that work to count towards $CUE_STATS.
@@ -264,9 +268,10 @@ func New(args []string, options ...cuecontext.Option) (*Command, error) {
 	}
 
 	c := &Command{
-		Command:        cmd,
-		root:           cmd,
-		contextOptions: options,
+		Command:         cmd,
+		root:            cmd,
+		contextOptions:  options,
+		runningInPlugin: len(options) > 0,
 	}
 	c.cmdCmd = newCmdCmd(c)
 
@@ -386,8 +391,9 @@ type Command struct {
 	// _tool.cue subcommands.
 	cmdCmd *cobra.Command
 
-	ctx            *cue.Context
-	contextOptions []cuecontext.Option
+	ctx             *cue.Context
+	contextOptions  []cuecontext.Option
+	runningInPlugin bool
 
 	hasErr bool
 }

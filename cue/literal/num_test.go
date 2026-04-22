@@ -152,6 +152,9 @@ func TestNumErrors(t *testing.T) {
 		`"a`,
 		`23.34e`,
 		`23.34e33pp`,
+		"0\x00",
+		"1\x00",
+		"\x000",
 	}
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%+q", tc), func(t *testing.T) {

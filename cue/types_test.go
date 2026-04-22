@@ -3559,7 +3559,11 @@ func TestReferencePath(t *testing.T) {
 				if tc.alt != "" {
 					want = tc.alt
 				}
-				v := fmt.Sprint(inst.Lookup(a...))
+				sels := make([]cue.Selector, len(a))
+				for i, p := range a {
+					sels[i] = cue.Str(p)
+				}
+				v := fmt.Sprint(inst.Value().LookupPath(cue.MakePath(sels...)))
 				if v != want {
 					t.Errorf("path resolved to %s; want %s", v, want)
 				}

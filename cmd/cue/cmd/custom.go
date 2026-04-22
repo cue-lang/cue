@@ -61,7 +61,7 @@ func splitLine(s string) (line, tail string) {
 // and adds them as cobra subcommands to cmd.
 // The func is only used in `cue help cmd`, which doesn't show errors.
 func addCustomCommands(c *Command, cmd *cobra.Command, typ string, tools *cue.Instance) {
-	commands := tools.Lookup(typ)
+	commands := tools.Value().LookupPath(cue.MakePath(cue.Str(typ)))
 	if !commands.Exists() {
 		return
 	}
@@ -84,8 +84,8 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 	}
 
 	// TODO: validate allowing incomplete.
-	cmds := tools.Lookup(typ)
-	o := cmds.Lookup(name)
+	cmds := tools.Value().LookupPath(cue.MakePath(cue.Str(typ)))
+	o := cmds.LookupPath(cue.MakePath(cue.Str(name)))
 	if !o.Exists() {
 		return nil, o.Err()
 	}

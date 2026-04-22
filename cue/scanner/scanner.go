@@ -873,6 +873,17 @@ scanAgain:
 					tok, lit = s.scanString(offs, quote, false)
 				}
 			case 2:
+				// A raw string with three consecutive quote characters may
+				// still be a single-line string whose content is a single
+				// quote, e.g. #"""# or ##"""##. This is not covered by the
+				// language spec but matches Swift's behavior, which we adopt
+				// to keep the scanner aligned with cue/literal's parser.
+				if quote.numHash > 0 {
+					if n := s.scanHashes(quote.numHash); n == quote.numHash {
+						tok, lit = token.STRING, string(s.src[offs:s.offset])
+						break
+					}
+				}
 				quote.numChar = 3
 				switch s.ch {
 				case '\n':

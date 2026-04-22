@@ -93,6 +93,8 @@ var testTokens = [...]elt{
 	{tok: token.INT, lit: "12345_67890_12345_6788_90", class: literal},
 	{tok: token.INT, lit: "1234567M", class: literal},
 	{tok: token.INT, lit: "1234567Mi", class: literal},
+	{tok: token.INT, lit: "0M", class: literal},
+	{tok: token.INT, lit: "0Ki", class: literal},
 	{tok: token.INT, lit: "1234567", class: literal},
 	{tok: token.INT, lit: ".3Mi", class: literal},
 	{tok: token.INT, lit: "3.3Mi", class: literal},

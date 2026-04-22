@@ -305,6 +305,9 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 				// integer other than 0 may not start with 0
 				s.errf(offs, "illegal integer number")
 			}
+			// A bare "0" may still be followed by an SI/IEC multiplier,
+			// forming a valid si_lit per the spec (e.g. "0M", "0Ki").
+			goto exponent
 		}
 		goto exit
 	}

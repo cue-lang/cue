@@ -177,6 +177,12 @@ func (p *NumInfo) next() bool {
 	}
 	p.ch = p.src[p.p]
 	p.p++
+	if p.ch == 0 {
+		// The NUL byte is disallowed in source text (see the spec,
+		// "Source code representation"). Reject it explicitly so it
+		// cannot be confused with the end-of-input sentinel below.
+		p.err = p.errorf("illegal character NUL")
+	}
 	if p.ch == '.' {
 		if len(p.buf) == 0 {
 			p.buf = append(p.buf, '0')

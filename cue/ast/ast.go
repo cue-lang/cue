@@ -562,6 +562,23 @@ type Interpolation struct {
 	label
 }
 
+// Quotes returns the opening and closing string fragments of x.
+// A well-formed Interpolation has an odd number of elements whose first
+// and last are [*BasicLit]s; when there is only one element, it is
+// returned as both first and last. Quotes panics if x is empty or if
+// either boundary element is not a [*BasicLit].
+func (x *Interpolation) Quotes() (first, last *BasicLit) {
+	if len(x.Elts) == 0 {
+		panic("ast.Interpolation has no elements")
+	}
+	first, ok1 := x.Elts[0].(*BasicLit)
+	last, ok2 := x.Elts[len(x.Elts)-1].(*BasicLit)
+	if !ok1 || !ok2 {
+		panic("ast.Interpolation boundary element is not a *BasicLit")
+	}
+	return first, last
+}
+
 // A Func node represents a function type.
 //
 // This is an experimental type and the contents will change without notice.

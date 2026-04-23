@@ -519,6 +519,52 @@ func (e *Evaluator) Reset() {
 	}
 }
 
+func (e *Evaluator) Exported() iter.Seq2[string, []ast.Node] {
+	e.bootFiles()
+
+	keysMap := make(map[string][]*navigable)
+	seen := make(map[*navigable]struct{})
+	var worklist []*navigable
+	for _, fr := range e.pkgFrame.childFrames {
+		worklist = append(worklist, fr.navigable)
+	}
+	for i := 0; i < len(worklist); i++ {
+		nav := worklist[i]
+		if _, found := seen[nav]; found {
+			continue
+		}
+		seen[nav] = struct{}{}
+		nav.eval()
+		for key, childNav := range nav.bindings {
+			keysMap[key] = append(keysMap[key], childNav)
+		}
+		worklist = slices.AppendSeq(worklist, maps.Keys(nav.resolvesTo))
+	}
+	if len(keysMap) == 0 {
+		return nil
+	}
+
+	keys := slices.Collect(maps.Keys(keysMap))
+	slices.Sort(keys)
+
+	return func(yield func(string, []ast.Node) bool) {
+		for _, key := range keys {
+			var nodes []ast.Node
+			for _, nav := range keysMap[key] {
+				for _, fr := range nav.frames {
+					if fr.key == nil {
+						continue
+					}
+					nodes = append(nodes, fr.key)
+				}
+			}
+			if !yield(key, nodes) {
+				return
+			}
+		}
+	}
+}
+
 // ForFile looks up the [FileEvaluator] for the given filename.
 func (e *Evaluator) ForFile(filename string) *FileEvaluator {
 	e.bootFiles()

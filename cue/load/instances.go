@@ -35,6 +35,7 @@ import (
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
+	pkgpath "cuelang.org/go/pkg/path"
 )
 
 // Instances returns the instances named by the command line arguments 'args'.
@@ -49,6 +50,30 @@ func Instances(args []string, c *Config) []*build.Instance {
 	// Note that Config is used early on to return error instances; ensure it's not nil.
 	if c == nil {
 		c = &Config{}
+	}
+
+	ctx := context.TODO()
+	newC, err := c.complete()
+	if err != nil {
+		return []*build.Instance{c.newErrInstance(err)}
+	}
+	c = newC
+
+	// Rewrite absolute directory arguments as relative paths rooted at
+	// [Config.Dir] so the rest of the loading logic handles them as ordinary
+	// local import paths. Must happen before the package/file split, as
+	// [filetypes.IsPackage] rejects Windows paths like `C:\foo` due to the colon.
+	// Also rewrite \ to / as a courtesy to Windows developers.
+	args = slices.Clone(args)
+	for i, p := range args {
+		if pkgpath.IsAbs(p, c.pathOS) {
+			rel, err := pkgpath.Rel(c.Dir, p, c.pathOS)
+			if err != nil {
+				return []*build.Instance{c.newErrInstance(err)}
+			}
+			p = "./" + rel
+		}
+		args[i] = pkgpath.ToSlash(p, c.pathOS)
 	}
 
 	// TODO: This requires packages to be placed before files. At some point this
@@ -69,12 +94,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
-	ctx := context.TODO()
-	newC, err := c.complete()
-	if err != nil {
-		return []*build.Instance{c.newErrInstance(err)}
-	}
-	c = newC
 	for _, f := range otherFiles {
 		if err := setFileSource(c, f); err != nil {
 			return []*build.Instance{c.newErrInstance(err)}
@@ -88,15 +107,12 @@ func Instances(args []string, c *Config) []*build.Instance {
 		// between package paths specified as arguments, which
 		// have the qualifier added, and package paths that are dependencies
 		// of those, which don't.
-		pkgArgs1 := make([]string, 0, len(pkgArgs))
-		for _, p := range pkgArgs {
+		for i, p := range pkgArgs {
 			if ip := ast.ParseImportPath(p); !ip.ExplicitQualifier {
 				ip.Qualifier = c.Package
-				p = ip.String()
+				pkgArgs[i] = ip.String()
 			}
-			pkgArgs1 = append(pkgArgs1, p)
 		}
-		pkgArgs = pkgArgs1
 	}
 
 	// When outside a module, a major-only version like foo.com/bar@v2

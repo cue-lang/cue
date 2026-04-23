@@ -1,0 +1,77 @@
+# Patterns and dynamic fields in cue doc. Both are anonymous, so they
+# are documented under their rendered labels, after the named fields
+# of their section. Their contents are documented like any other
+# field's, including constraint markers, and a pattern declared by one
+# branch of a disjunction is attributed to that branch. The label is
+# shown even when the field carries a value alias.
+exec cue doc
+cmp stdout expect-stdout
+
+-- cue.mod/module.cue --
+module: "mod.test/m"
+language: version: "v0.9.0"
+-- a.cue --
+package p
+
+k: "kk"
+
+// s is a schema with a pattern constraint.
+s: {
+	// name is a regular field.
+	name: string
+
+	// The pattern documents every other field.
+	[string]: {
+		// weight is required for pattern matches.
+		weight!: int
+	}
+}
+
+// d holds dynamic fields.
+d: {
+	// da is computed from k.
+	(k): {a: int}
+
+	// db is interpolated. Note this doc comment would attach to c
+	// were the value not braced, because "\(k)-b": c?: int is a
+	// shorthand chain whose docs belong to the leaf.
+	"\(k)-b": {c?: int}
+}
+
+// The alias v refers to the pattern's value.
+v=[string]: {pat: int, r: v.pat}
+
+// pdisj declares a pattern in its first branch only.
+pdisj: {[int]: pb: int} | {n: int}
+-- expect-stdout --
+Docs for pkg mod.test/m@v0:p
+d:
+    d holds dynamic fields.
+    (k):
+        da is computed from k.
+        a:
+    "\(k)-b":
+        db is interpolated. Note this doc comment would attach to c
+        were the value not braced, because "\(k)-b": c?: int is a
+        shorthand chain whose docs belong to the leaf.
+        c?:
+k:
+pdisj:
+    pdisj declares a pattern in its first branch only.
+    one of:
+        [int]:
+            pb:
+    or:
+        n:
+s:
+    s is a schema with a pattern constraint.
+    name:
+        name is a regular field.
+    [string]:
+        The pattern documents every other field.
+        weight!:
+            weight is required for pattern matches.
+[string]:
+    The alias v refers to the pattern's value.
+    pat:
+    r:

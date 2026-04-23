@@ -1,0 +1,163 @@
+# Disjunctions in cue doc. Fields declared by exactly one branch are
+# grouped under "one of:"/"or:" headers, in source order; a branch
+# that is a reference gets its "also includes" link attributed to the
+# branch. Fields declared by several branches are present whichever
+# branch is taken, so they are documented before the branches, as are
+# fields declared outside the disjunction. A disjunction of scalars
+# has nothing to document per branch, so no branch headers appear.
+exec cue doc
+cmp stdout expect-stdout
+
+-- cue.mod/module.cue --
+module: "mod.test/m"
+language: version: "v0.9.0"
+-- a.cue --
+package p
+
+// d merges the fields of both branches.
+d: {
+	// da is in the first branch.
+	da: int
+} | {
+	// db is in the second branch.
+	db: int
+}
+
+// y holds b and c.
+y: {b: int, c: int}
+
+// dref's first branch references y; the second is a literal.
+dref: y | {
+	// dz is in the literal branch.
+	dz: int
+}
+
+// dopt's branches disagree about oa's optionality: the regular
+// declaration wins, so oa carries no marker.
+dopt: {oa?: int} | {
+	// oa is regular in this branch.
+	oa: int
+}
+
+// ddeep nests a disjunction below a disjunction branch.
+ddeep: {
+	// inner is itself a disjunction.
+	inner: {ia: int} | {ib: int}
+} | {ic: int}
+
+// dmixed declares common outside the disjunction.
+dmixed: {
+	// common is present whichever branch is taken.
+	common: int
+} & ({ma: int} | {mb: int})
+
+// ddef's first branch is the default.
+ddef: *{
+	// da is in the default branch.
+	da: int
+} | {db: int}
+
+// dscalar is an enum: nothing to document per branch.
+dscalar: "small" | "medium" | "large"
+
+// dchain has three branches.
+dchain: {c1: int} | {c2: int} | {c3: int}
+
+// dparen also has three branches: parentheses group, they do not
+// create alternatives.
+dparen: ({pa: int} | {pb: int}) | {pc: int}
+
+// dindep is subject to two independent disjunctions, each presented
+// as its own group of alternatives.
+dindep: ({ia: int} | {ib: int}) & ({ic: int} | {id: int})
+
+// dpref's default branch is a parenthesized reference.
+dpref: *(y) | {pz: int}
+-- expect-stdout --
+Docs for pkg mod.test/m@v0:p
+d:
+    d merges the fields of both branches.
+    one of:
+        da:
+            da is in the first branch.
+    or:
+        db:
+            db is in the second branch.
+dchain:
+    dchain has three branches.
+    one of:
+        c1:
+    or:
+        c2:
+    or:
+        c3:
+ddeep:
+    ddeep nests a disjunction below a disjunction branch.
+    one of:
+        inner:
+            inner is itself a disjunction.
+            one of:
+                ia:
+            or:
+                ib:
+    or:
+        ic:
+ddef:
+    ddef's first branch is the default.
+    one of:
+        da:
+            da is in the default branch.
+    or:
+        db:
+dindep:
+    dindep is subject to two independent disjunctions, each presented
+    as its own group of alternatives.
+    one of:
+        ia:
+    or:
+        ib:
+    one of:
+        ic:
+    or:
+        id:
+dmixed:
+    dmixed declares common outside the disjunction.
+    common:
+        common is present whichever branch is taken.
+    one of:
+        ma:
+    or:
+        mb:
+dopt:
+    dopt's branches disagree about oa's optionality: the regular
+    declaration wins, so oa carries no marker.
+    oa:
+        oa is regular in this branch.
+dparen:
+    dparen also has three branches: parentheses group, they do not
+    create alternatives.
+    one of:
+        pa:
+    or:
+        pb:
+    or:
+        pc:
+dpref:
+    dpref's default branch is a parenthesized reference.
+    one of:
+        also includes y
+    or:
+        pz:
+dref:
+    dref's first branch references y; the second is a literal.
+    one of:
+        also includes y
+    or:
+        dz:
+            dz is in the literal branch.
+dscalar:
+    dscalar is an enum: nothing to document per branch.
+y:
+    y holds b and c.
+    b:
+    c:

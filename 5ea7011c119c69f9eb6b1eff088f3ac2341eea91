@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "115aead5_d7055f0b",
+        "filename": "cue/literal/num.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-23T08:18:03Z",
+      "side": 1,
+      "message": "maybe just give a hint that it\u0027s the trailing digits that are the problem here?",
+      "revId": "5ea7011c119c69f9eb6b1eff088f3ac2341eea91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

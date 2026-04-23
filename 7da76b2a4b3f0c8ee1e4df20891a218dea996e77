@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8217461e_45c7b1b6",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 883,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-23T08:06:36Z",
+      "side": 1,
+      "message": "Well. TIL. I don\u0027t love this because we don\u0027t record that this is how it was formatted in the source, and so we don\u0027t output it in the same way. But this isn\u0027t a change - the `case 1` above already suffers from this - input of `#\"\"hello\"\"#` is output as `\"\\\"hello\\\"\"`, so it\u0027s at least an orthogonal issue.",
+      "revId": "7da76b2a4b3f0c8ee1e4df20891a218dea996e77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

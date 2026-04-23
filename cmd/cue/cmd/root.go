@@ -349,6 +349,7 @@ func New(args []string) (*Command, error) {
 		newTrimCmd(c),
 		newVersionCmd(c),
 		newVetCmd(c),
+		newDocCmd(c),
 
 		// Hidden
 		newExpCmd(c),

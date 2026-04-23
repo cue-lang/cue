@@ -89,3 +89,5 @@ handling issues can be found in the [Code of Conduct](https://cuelang.org/docs/r
 - Ask questions via [GitHub Discussions](https://github.com/cue-lang/cue/discussions)
 - Chat with us on [Slack](https://cuelang.org/s/slack) and [Discord](https://cuelang.org/s/discord)
 - Subscribe to our [Community Calendar](https://cuelang.org/s/community-calendar) for community updates, demos, office hours, etc
+
+

@@ -859,14 +859,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 // position-driven newlines are emitted, collapsing the interpolation
 // to a single line.
 func interpolationNormalize(x *ast.Interpolation) []bool {
-	if len(x.Elts) < 3 {
-		return nil
-	}
-	first, ok := x.Elts[0].(*ast.BasicLit)
-	if !ok {
-		return nil
-	}
-	last, ok := x.Elts[len(x.Elts)-1].(*ast.BasicLit)
+	first, last, ok := x.Quotes()
 	if !ok {
 		return nil
 	}
@@ -914,14 +907,10 @@ func interpolationNormalize(x *ast.Interpolation) []bool {
 func (f *formatter) interpolationReindent(x *ast.Interpolation) (search, replace string) {
 	// TODO: only do this when simplifying, like the indent < 6
 	// check in the printer for token.STRING.
-	if f.indent >= 6 || len(x.Elts) < 2 {
+	if f.indent >= 6 {
 		return "", ""
 	}
-	first, ok := x.Elts[0].(*ast.BasicLit)
-	if !ok {
-		return "", ""
-	}
-	last, ok := x.Elts[len(x.Elts)-1].(*ast.BasicLit)
+	first, last, ok := x.Quotes()
 	if !ok {
 		return "", ""
 	}

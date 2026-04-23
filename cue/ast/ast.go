@@ -562,6 +562,22 @@ type Interpolation struct {
 	label
 }
 
+// Quotes returns the opening and closing string fragments of x. A valid
+// interpolation has at least three elements (open quote, expression, close
+// quote); ok is false if x has fewer or if either boundary element is not
+// a [*BasicLit], which can happen for malformed or synthesized nodes.
+func (x *Interpolation) Quotes() (first, last *BasicLit, ok bool) {
+	if len(x.Elts) < 3 {
+		return nil, nil, false
+	}
+	first, ok1 := x.Elts[0].(*BasicLit)
+	last, ok2 := x.Elts[len(x.Elts)-1].(*BasicLit)
+	if !ok1 || !ok2 {
+		return nil, nil, false
+	}
+	return first, last, true
+}
+
 // A Func node represents a function type.
 //
 // This is an experimental type and the contents will change without notice.

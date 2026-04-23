@@ -1203,16 +1203,9 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		return c.parse(n)
 
 	case *ast.Interpolation:
-		if len(n.Elts) == 0 {
+		first, last, ok := n.Quotes()
+		if !ok {
 			return c.errf(n, "invalid interpolation")
-		}
-		first, ok1 := n.Elts[0].(*ast.BasicLit)
-		last, ok2 := n.Elts[len(n.Elts)-1].(*ast.BasicLit)
-		if !ok1 || !ok2 {
-			return c.errf(n, "invalid interpolation")
-		}
-		if len(n.Elts) == 1 {
-			return c.expr(n.Elts[0])
 		}
 		lit := &adt.Interpolation{Src: n}
 		info, prefixLen, _, err := literal.ParseQuotes(first.Value, last.Value)

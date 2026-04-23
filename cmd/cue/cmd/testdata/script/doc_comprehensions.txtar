@@ -1,0 +1,57 @@
+# Comprehensions in cue doc. Comprehension bodies contribute their
+# fields to the enclosing node; as a MAY-analysis the evaluator
+# includes them unconditionally, so even fields guarded by a false
+# condition are documented.
+exec cue doc
+cmp stdout expect-stdout
+
+-- cue.mod/module.cue --
+module: "mod.test/m"
+language: version: "v0.9.0"
+-- a.cue --
+package p
+
+// comp gathers fields from comprehension bodies.
+comp: {
+	if true {
+		// ca is declared in an if body.
+		ca: int
+	}
+	for i in [1] {
+		// cb is declared in a for body.
+		cb: int
+	}
+}
+
+// condfalse's field is documented even though the condition is
+// false: inclusion is not evaluated.
+condfalse: {
+	if false {
+		// maybe is documented regardless of the condition.
+		maybe: int
+	}
+}
+
+// topcomp is declared inside a file-level comprehension.
+if true {
+	topcomp: {
+		// tc is nested within it.
+		tc: int
+	}
+}
+-- expect-stdout --
+Docs for pkg mod.test/m@v0:p
+comp:
+    comp gathers fields from comprehension bodies.
+    ca:
+        ca is declared in an if body.
+    cb:
+        cb is declared in a for body.
+condfalse:
+    condfalse's field is documented even though the condition is
+    false: inclusion is not evaluated.
+    maybe:
+        maybe is documented regardless of the condition.
+topcomp:
+    tc:
+        tc is nested within it.

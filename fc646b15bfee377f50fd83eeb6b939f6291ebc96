@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "359e6840_29cb8e90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-23T15:48:37Z",
+      "side": 1,
+      "message": "Did a new version which resolves the Windows failure too.",
+      "parentUuid": "cd8f866b_9e54d799",
+      "revId": "fc646b15bfee377f50fd83eeb6b939f6291ebc96",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "577a106c_6ce0abfd",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-06-04T15:23:25Z",
       "side": 1,
       "message": "Can we test what happens if we use an absolute path to a directory outside the current module? Is that allowed, in fact?",
+      "revId": "fc646b15bfee377f50fd83eeb6b939f6291ebc96",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "131e528f_74863582",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_filetypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-23T15:48:37Z",
+      "side": 1,
+      "message": "we did reject this with a \"dir outside of root\" error, but we had no tests. adding a test as a parent commit.",
+      "parentUuid": "577a106c_6ce0abfd",
       "revId": "fc646b15bfee377f50fd83eeb6b939f6291ebc96",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

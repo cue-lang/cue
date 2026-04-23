@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46813a56_6b3ea9f1",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_filetypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-23T15:48:37Z",
+      "side": 1,
+      "message": "Added a test case: an absolute path pointing outside the current module is rejected with `cannot determine import path for \"./../somepkg\" (dir outside of root)`, which falls out of the conversion to a relative path and the existing loader check. Extended cmd_filetypes.txtar with a nested module to exercise this.",
+      "parentUuid": "577a106c_6ce0abfd",
+      "revId": "1caabc4e63e75294994d35ffefad391cfbad016d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "maybe just give a hint that it\u0027s the trailing digits that are the problem here?",
       "revId": "5ea7011c119c69f9eb6b1eff088f3ac2341eea91",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce76c45f_75b726d9",
+        "filename": "cue/literal/num.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-23T11:56:40Z",
+      "side": 1,
+      "message": "Done — reworded to \"illegal trailing characters in number %q\".",
+      "parentUuid": "115aead5_d7055f0b",
+      "revId": "5ea7011c119c69f9eb6b1eff088f3ac2341eea91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

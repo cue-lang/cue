@@ -68,6 +68,7 @@ Available Commands:
   cmd         run a user-defined workflow command
   completion  Generate completion script
   def         print consolidated definitions
+  doc         docs for a pkg
   eval        evaluate and print a configuration
   export      output data in a standard format
   fix         rewrite packages to latest standards

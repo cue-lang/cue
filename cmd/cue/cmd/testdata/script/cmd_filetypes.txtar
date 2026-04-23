@@ -59,6 +59,12 @@ stderr '\./somefile is a file and not a package directory'
 [!windows] stderr 'cannot use absolute directory ".*somefile" as package path'
 [windows] stderr 'no encoding specified for file ".*somefile"'
 
+# A package path pointing outside the current module is rejected.
+cd nested
+! exec cue export ./../somepkg
+stderr 'cannot determine import path for "\./\.\./somepkg" \(dir outside of root\)'
+cd ${WORK}
+
 -- cue.mod/module.cue --
 module: "mod.test/test"
 language: version: "v0.9.0"
@@ -68,6 +74,13 @@ a: 5
 package somepkg
 
 a: 5
+-- nested/cue.mod/module.cue --
+module: "mod.test/nested"
+language: version: "v0.9.0"
+-- nested/x.cue --
+package nested
+
+a: 1
 -- export.golden --
 {
     "a": 5

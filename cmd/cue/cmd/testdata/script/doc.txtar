@@ -1,0 +1,87 @@
+# Basic behavior of cue doc: package docs, docs merged across files,
+# unlimited depth, optionality markers, and hidden fields.
+exec cue doc
+cmp stdout expect-stdout
+
+-- cue.mod/module.cue --
+module: "mod.test/m"
+language: version: "v0.9.0"
+-- a.cue --
+// Package p demonstrates cue doc.
+package p
+
+// top is a struct with nested fields.
+top: {
+	// mid documents the middle level.
+	mid: {
+		// deep is nested three levels down.
+		deep: {
+			// deepest still has docs.
+			deepest: int
+		}
+	}
+}
+
+// opt is optional.
+opt?: int
+
+// req is required.
+req!: int
+
+// mix is optional here...
+mix?: int
+
+// blend is required here...
+blend!: int
+blend?: int
+
+// optconj stays optional: the conjunction operands within its value
+// carry no constraint of their own.
+optconj?: {oca: int} & {ocb: int}
+
+_hidden: int
+
+// #Schema is a definition.
+#Schema: {
+	// name is public.
+	name: string
+	_priv: int
+}
+-- b.cue --
+package p
+
+// top gains docs from a second file.
+top: {}
+
+// ...but mix is declared regular here, so it has no marker.
+mix: int
+-- expect-stdout --
+Docs for pkg mod.test/m@v0:p
+Package p demonstrates cue doc.
+#Schema:
+    #Schema is a definition.
+    name:
+        name is public.
+blend!:
+    blend is required here...
+mix:
+    mix is optional here...
+    ...but mix is declared regular here, so it has no marker.
+opt?:
+    opt is optional.
+optconj?:
+    optconj stays optional: the conjunction operands within its value
+    carry no constraint of their own.
+    oca:
+    ocb:
+req!:
+    req is required.
+top:
+    top is a struct with nested fields.
+    top gains docs from a second file.
+    mid:
+        mid documents the middle level.
+        deep:
+            deep is nested three levels down.
+            deepest:
+                deepest still has docs.

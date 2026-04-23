@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "196cd97a_fa482d4f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-23T11:57:28Z",
+      "side": 1,
+      "message": "LGTM with a few minor suggestions.",
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8750aab_1adeb2b2",
+        "filename": "cue/format/node.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 861,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-23T11:57:28Z",
+      "side": 1,
+      "message": "FWIW I\u0027d probably return `[]bool` rather than `map[int]bool` - cheaper and simpler.",
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2010b350_e5ea76c0",
+        "filename": "cue/format/node.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 885,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-23T11:57:28Z",
+      "side": 1,
+      "message": "I\u0027m not convinced it\u0027s worthwhile to do something different in each other element - we can just use ast.Walk on all elements. And if we\u0027re doing that, we might as well inline the clearNewline func:\n\n\n\n```suggestion\n\t\t// Remove newlines from all elements except the first.\n\t\tfor _, e :\u003d range x.Elts[1:] {\n\t\t\tast.Walk(e, func(n ast.Node) bool {\n\t\t\t\tif n !\u003d nil \u0026\u0026 n.Pos().RelPos() \u003e\u003d token.Newline {\n\t\t\t\t\tast.SetRelPos(n, token.NoRelPos)\n\t\t\t\t}\n\t\t\t\treturn true\n\t\t\t}, nil)\n\t\t}\n```",
+      "range": {
+        "startLine": 870,
+        "startChar": 0,
+        "endLine": 885,
+        "endChar": 0
+      },
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "364b5095_64b75cf5",
+        "filename": "cue/format/node.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 891,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-23T11:57:28Z",
+      "side": 1,
+      "message": "Maybe put these checks in the same order that the positions are\nreferenced in the code just below so it\u0027s easy to check correspondence\nbetween the two?",
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c070558_6ae6e6f2",
+        "filename": "cue/format/node.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 915,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-23T11:57:28Z",
+      "side": 1,
+      "message": "Couldn\u0027t we just use `literal.ParseQuotes` here to avoid duplicating the functionality? (I\u0027d probably pass it the *ast.Interpolation rather than just the first part of it)",
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

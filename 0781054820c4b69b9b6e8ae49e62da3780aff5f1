@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc0e8ef2_6d7275e0",
+        "filename": "cue/format/node.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 861,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-23T12:07:58Z",
+      "side": 1,
+      "message": "Done. Switched to []bool of length len(x.Elts); caller now guards with an index check so a nil slice is fine.",
+      "parentUuid": "c8750aab_1adeb2b2",
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2010b350_e5ea76c0",
@@ -58,6 +76,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fac2b429_77e9fc9d",
+        "filename": "cue/format/node.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 885,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-23T12:07:58Z",
+      "side": 1,
+      "message": "Done. Inlined clearNewline and now walk all elements from index 1.",
+      "parentUuid": "2010b350_e5ea76c0",
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "364b5095_64b75cf5",
@@ -75,6 +111,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a62f853_5d33e236",
+        "filename": "cue/format/node.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 891,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-23T12:07:58Z",
+      "side": 1,
+      "message": "Done. Reordered to expr.Pos, prev.End, next.Pos, expr.End to match the order the positions are consumed below.",
+      "parentUuid": "364b5095_64b75cf5",
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c070558_6ae6e6f2",
@@ -88,6 +142,24 @@
       "writtenOn": "2026-04-23T11:57:28Z",
       "side": 1,
       "message": "Couldn\u0027t we just use `literal.ParseQuotes` here to avoid duplicating the functionality? (I\u0027d probably pass it the *ast.Interpolation rather than just the first part of it)",
+      "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "220af571_dd591f25",
+        "filename": "cue/format/node.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 915,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-23T12:07:58Z",
+      "side": 1,
+      "message": "Done. Replaced isMultilineStringLit with literal.ParseQuotes on the first and last fragments of the interpolation. A parse error leaves qi zero-valued, so IsMulti() returns false and we take the single-line branch as before.\n\nnote that we cannot pass the interpolation directly to ParseQuotes, as it expects two strings.",
+      "parentUuid": "8c070558_6ae6e6f2",
       "revId": "0781054820c4b69b9b6e8ae49e62da3780aff5f1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

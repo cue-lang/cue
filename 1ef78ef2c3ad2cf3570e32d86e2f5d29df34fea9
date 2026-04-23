@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a526a4ed_36a88841",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-23T14:44:57Z",
+      "side": 1,
+      "message": "Seems like a reasonable approach, but I have a slightly alternative suggestion.",
+      "revId": "1ef78ef2c3ad2cf3570e32d86e2f5d29df34fea9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ae0ef88_227a2691",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-23T14:44:57Z",
+      "side": 1,
+      "message": "I wonder if it\u0027s maybe better to panic if there\u0027s not at least one element (technically it could be considered OK to produce an Interpolation node with only a single basic lit element but there must always be an odd number) or if the first and last nodes aren\u0027t BasicLits (that definitely violates the contract) and then we won\u0027t need the ok return.\n\nWhen there\u0027s only one element, we can return it for both first and last.\n\nI\u0027m really thinking forward here to tagged interpolations (see https://cue.gerrithub.io/c/cue-lang/cue/+/1171061/25/cue/ast/ast.go) where it\u0027s definitely possible to have an Interpolation with only a single element, and that works out fine.",
+      "revId": "1ef78ef2c3ad2cf3570e32d86e2f5d29df34fea9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

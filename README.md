@@ -79,6 +79,13 @@ matching Go's [security policy](https://go.dev/doc/security/policy).
 For example, if CUE v0.7.0 is released when Go's latest version is 1.21.5,
 v0.7.x including any following bugfix releases will require Go 1.20 or later.
 
+## Using Claude with this repository
+
+This repository includes a [`CLAUDE.md`](./CLAUDE.md) with guidance for using
+[Claude](https://www.anthropic.com/claude) and Claude Code when working on CUE.
+See that file for details on project conventions, common commands, and testing
+workflows that Claude should follow.
+
 ## Code of Conduct
 
 Guidelines for participating in CUE community spaces and a reporting process for

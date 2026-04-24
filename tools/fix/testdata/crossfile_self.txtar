@@ -1,0 +1,51 @@
+
+#exp:aliasv2
+
+-- cue.mod/module.cue --
+module: "test.example"
+
+language: version: "v0.15.0"
+
+-- a.cue --
+// This file defines a top-level field named "self" that shadows
+// the predeclared "self" identifier.
+package foo
+
+self: 42
+-- b.cue --
+// This file uses a value alias that converts to "let X = self".
+// Since "self" is shadowed by a top-level field in a.cue, the
+// generated code should use "__self" instead.
+package foo
+
+// Value alias conversion should detect cross-file shadowing
+foo: X={
+	i: X.a
+	a: 1
+}
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "test.example"
+language: {
+	version: "v0.15.0"
+}
+--- a.cue
+// This file defines a top-level field named "self" that shadows
+// the predeclared "self" identifier.
+package foo
+
+self: 42
+--- b.cue
+@experiment(aliasv2)
+
+// This file uses a value alias that converts to "let X = self".
+// Since "self" is shadowed by a top-level field in a.cue, the
+// generated code should use "__self" instead.
+package foo
+
+// Value alias conversion should detect cross-file shadowing
+foo: {
+	let X = __self
+	i: X.a
+	a: 1
+}

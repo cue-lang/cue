@@ -1,5 +1,9 @@
 # Test that cue plugin build generates correct wrapper code.
 
+env CUE_CONFIG_DIR=$WORK/.cueconfig
+mkdir $CUE_CONFIG_DIR
+cp allow-trust.cue $CUE_CONFIG_DIR/plugin-trust.cue
+
 exec go env
 exec cue plugin build
 
@@ -114,3 +118,5 @@ import "strings"
 func Upper(s string) string {
 	return strings.ToUpper(s)
 }
+-- allow-trust.cue --
+rules: [{effect: "allow", cueModule: "..."}]

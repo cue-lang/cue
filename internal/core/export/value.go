@@ -192,6 +192,12 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 			return e.bareValue(x.Values[0])
 		}
 
+		if e.cfg.Simplify {
+			if name := adt.MatchBuiltinRange(x); name != "" {
+				return ast.NewIdent(name)
+			}
+		}
+
 		a := []adt.Value{}
 		b := boundSimplifier{e: e}
 		for _, v := range x.Values {

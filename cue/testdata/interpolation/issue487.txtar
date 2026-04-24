@@ -21,7 +21,7 @@ t2: {
 	a: #R & {pos: "a"} @test(eq, {pos: "a", name: "hello_a"}) @test(closed)
 }
 -- out/errors.txt --
-[incomplete] t1.#R.name: invalid interpolation: non-concrete value >=0 & int (type int):
+[incomplete] t1.#R.name: invalid interpolation: non-concrete value uint (type int):
     ./in.cue:4:9
 [incomplete] t2.#R.name: invalid interpolation: non-concrete value string (type string):
     ./in.cue:11:9

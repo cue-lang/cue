@@ -26,13 +26,13 @@ f32: float32 & "foo"
 f64: float64 & "foo"
 un:  uint & "foo"
 -- expect-stderr --
-f32: conflicting values >=-340282346638528859811704183484516925440 & <=340282346638528859811704183484516925440 and "foo" (mismatched types number and string):
+f32: conflicting values float32 and "foo" (mismatched types number and string):
     ./bad.cue:3:16
-f64: conflicting values >=-1.797693134862315708145274237317043567981E+308 & <=1.797693134862315708145274237317043567981E+308 and "foo" (mismatched types number and string):
+f64: conflicting values float64 and "foo" (mismatched types number and string):
     ./bad.cue:4:16
-i16: conflicting values int & >=-32768 & <=32767 and "foo" (mismatched types int and string):
+i16: conflicting values int16 and "foo" (mismatched types int and string):
     ./bad.cue:1:14
-u8: conflicting values int & >=0 & <=255 and "foo" (mismatched types int and string):
+u8: conflicting values uint8 and "foo" (mismatched types int and string):
     ./bad.cue:2:14
-un: conflicting values int & >=0 and "foo" (mismatched types int and string):
+un: conflicting values uint and "foo" (mismatched types int and string):
     ./bad.cue:5:13

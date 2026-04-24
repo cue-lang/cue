@@ -16,6 +16,24 @@
       "message": "This is a debug printer. It SHOULD NOT print something different than what is generated.",
       "revId": "a656dba357d7862d7eb0ae95eb0ca68174513b54",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd10f1ea_98efe466",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-24T10:21:53Z",
+      "side": 1,
+      "message": "as already discussed, the debug printer is used for values in error messages, so it\u0027s not just about debug output.\n\nthe error and test debug output cases were already separated by Config.Compact, but I\u0027ve added Config.CompactBuiltins to further clarify this layer.",
+      "parentUuid": "dbfb6dbe_ab857bde",
+      "revId": "a656dba357d7862d7eb0ae95eb0ca68174513b54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

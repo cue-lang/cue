@@ -16,6 +16,24 @@
       "message": "maybe put this helper function towards the end of the methods rather than before the methods that use it?",
       "revId": "cf0ef1331bd16c24f03c3fa874edf51831afddcb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d69510b8_ba902776",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-24T08:57:56Z",
+      "side": 1,
+      "message": "Moved it up instead, as I expect other changes may want to use it.",
+      "parentUuid": "831d2d5c_5261412a",
+      "revId": "cf0ef1331bd16c24f03c3fa874edf51831afddcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

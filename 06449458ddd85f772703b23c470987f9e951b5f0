@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ed40a5c_7fc15717",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-24T14:15:41Z",
+      "side": 1,
+      "message": "I don\u0027t follow why we need \"container\" attributes. the koala decoder doesn\u0027t generate these attributes, so I don\u0027t see why the encoder needs them. in other words, the decode-then-encode roundtrip should work without the presence of any CUE attributes.",
+      "revId": "06449458ddd85f772703b23c470987f9e951b5f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc82afd0_18c29a0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-24T14:15:41Z",
+      "side": 1,
+      "message": "Thanks! Some initial high-level thoughts. Happy to do a second pass when you\u0027re ready.",
+      "revId": "06449458ddd85f772703b23c470987f9e951b5f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32a7e780_f75b52e0",
+        "filename": "encoding/xml/koala/encode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-24T14:15:41Z",
+      "side": 1,
+      "message": "encoding/xml supports encoding `any`, so I don\u0027t think we need to stringify everything; we just need to convert to basic Go values - string, bool, int, float.",
+      "revId": "06449458ddd85f772703b23c470987f9e951b5f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5864ce0_9219a010",
+        "filename": "encoding/xml/koala/encode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-24T14:15:41Z",
+      "side": 1,
+      "message": "we shouldn\u0027t be implementing an XML syntax encoder ourselves; one already exists in https://pkg.go.dev/encoding/xml#NewEncoder. note how it supports writing tokens and not just Go values.",
+      "revId": "06449458ddd85f772703b23c470987f9e951b5f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70294b81_1b8028a7",
+        "filename": "pkg/encoding/xml/koala/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-24T14:15:41Z",
+      "side": 1,
+      "message": "please split this into a second commit, so that we can review and merge the XML encoder separately",
+      "revId": "06449458ddd85f772703b23c470987f9e951b5f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

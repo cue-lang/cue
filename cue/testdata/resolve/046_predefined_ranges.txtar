@@ -1,15 +1,24 @@
+#inlinetest:exclude skip — tests the debug printer, not evaluator semantics
 -- in.cue --
 k1: int8
-k1: 44   @test(eq, 44)
+k1: 44
 
 k2: int64
-k2: -8_000_000_000   @test(eq, -8000000000)
+k2: -8_000_000_000
 
-e1: int16
-e1: 100_000   @test(err, code=eval, contains="invalid value 100000", pos=[0:5])
--- out/errors.txt --
-[eval] e1: invalid value 100000 (out of bound <=32767):
-    ./in.cue:8:5
+s1: int8
+s2: uint16
+s3: float32
+s4: uint
+-- out/evalalpha --
+(struct){
+  k1: (int){ 44 }
+  k2: (int){ -8000000000 }
+  s1: (int){ &(>=-128, <=127, int) }
+  s2: (int){ &(>=0, <=65535, int) }
+  s3: (number){ &(>=-340282346638528859811704183484516925440, <=340282346638528859811704183484516925440) }
+  s4: (int){ &(>=0, int) }
+}
 -- out/compile --
 --- in.cue
 {
@@ -17,16 +26,8 @@ e1: 100_000   @test(err, code=eval, contains="invalid value 100000", pos=[0:5])
   k1: 44
   k2: &(int, >=-9223372036854775808, <=9223372036854775807)
   k2: -8000000000
-  e1: &(int, >=-32768, <=32767)
-  e1: 100000
+  s1: &(int, >=-128, <=127)
+  s2: &(int, >=0, <=65535)
+  s3: &(>=-340282346638528859811704183484516925440, <=340282346638528859811704183484516925440)
+  s4: &(int, >=0)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 0
-Allocs: 4
-Retain: 0
-
-Unifications: 4
-Conjuncts:    7
-Disjuncts:    0

@@ -16,6 +16,24 @@
       "message": "@matthew@cue.works - handing over to you!",
       "revId": "28e08505d454b21bad2a99387a40639dc9ec5d71",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddabe773_e8e6903e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-24T13:32:25Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7cf47536_135017b1",
+      "revId": "28e08505d454b21bad2a99387a40639dc9ec5d71",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

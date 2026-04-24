@@ -16,6 +16,24 @@
       "message": "I think the toggle one needs to be the only preferred one now; it would be odd if the order is \"remove; toggle; add\" for example. and toggle leans towards removal anyway.\n\nAnd if any of these is present, then toggle is present, so keeping it at the top also shows a more consistent UI",
       "revId": "7fb98cf570ce5f77c22b84c50bc2c0546c336b43",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9318caa2_f003cc7f",
+        "filename": "internal/lsp/server/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-04-24T13:32:25Z",
+      "side": 1,
+      "message": "Agreed. Done.",
+      "parentUuid": "89ea1cbf_8822fdd8",
+      "revId": "7fb98cf570ce5f77c22b84c50bc2c0546c336b43",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

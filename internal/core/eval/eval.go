@@ -55,7 +55,7 @@ func (e *Unifier) NewContext(v *adt.Vertex) *adt.OpContext {
 	return NewContext(e.r, v)
 }
 
-var printConfig = &debug.Config{Compact: true}
+var printConfig = &debug.Config{Compact: true, CompactBuiltins: true}
 
 func nodeFormat(r adt.Runtime, n adt.Node) string {
 	return debug.NodeString(r, n, printConfig)

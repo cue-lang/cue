@@ -1519,7 +1519,7 @@ func (p *parser) parsePostfixAlias() *ast.PostfixAlias {
 
 	switch p.tok {
 	case token.LPAREN:
-		// Dual form: ~(K,V)
+		// Parenthesized form: ~(X) or ~(K,V)
 		lparen := p.pos
 		p.next()
 
@@ -1528,6 +1528,18 @@ func (p *parser) parsePostfixAlias() *ast.PostfixAlias {
 			return nil
 		}
 		k := p.parseIdent()
+
+		if p.tok == token.RPAREN {
+			// Single form with parens: ~(X)
+			rparen := p.pos
+			p.next()
+			return &ast.PostfixAlias{
+				Tilde:  pos,
+				Lparen: lparen,
+				Field:  k,
+				Rparen: rparen,
+			}
+		}
 
 		comma := p.expect(token.COMMA)
 		if !comma.IsValid() {

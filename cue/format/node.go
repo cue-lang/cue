@@ -426,8 +426,10 @@ func (f *formatter) decl(decl ast.Decl) {
 				f.expr(a.Field)
 				f.print(a.Rparen, token.RPAREN, noblank)
 			} else {
-				// Simple form: ~X
+				// Simple form: always output with parens ~(X)
+				f.print(a.Lparen, token.LPAREN, noblank)
 				f.expr(a.Field)
+				f.print(a.Rparen, token.RPAREN, noblank)
 			}
 		}
 

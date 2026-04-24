@@ -7,6 +7,12 @@ a1~X1: {
 }
 b1: X1.foo + 2 @test(eq, 3)
 
+a1p~(X1p): {
+	foo: 1
+}
+b1p: X1p.foo + 2 @test(eq, 3)
+
+
 // Basic postfix alias - dual form
 a2~(K2,V2): {
 	name: K2
@@ -207,9 +213,9 @@ deep: {
 usedef: X21.field  @test(eq, 42)
 -- out/errors.txt --
 [incomplete] test1: cannot reference optional field: constrained:
-    ./in.cue:114:8
+    ./in.cue:120:8
 [incomplete] opt.b: cannot reference optional field: opt:
-    ./in.cue:125:5
+    ./in.cue:131:5
 -- out/compile --
 --- in.cue
 {
@@ -217,6 +223,10 @@ usedef: X21.field  @test(eq, 42)
     foo: 1
   }
   b1: (〈0;a1〉.foo + 2)
+  a1p: {
+    foo: 1
+  }
+  b1p: (〈0;a1p〉.foo + 2)
   a2: {
     name: "a2"
     val: 〈1;a2〉.foo

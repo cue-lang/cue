@@ -134,7 +134,7 @@ func (ij *checkerInjector) InjectedValue(attr *runtime.ExternAttr, scope *adt.Ve
 		return nil, errors.Newf(attr.Attr.Pos, "%v", rErr)
 	}
 	if cErr := ij.injection.check(resolved); cErr != nil {
-		return nil, errors.Newf(attr.Attr.Pos, "%v", cErr)
+		return nil, errors.Wrapf(cErr, attr.Attr.Pos, "")
 	}
 	return &adt.Top{}, nil
 }

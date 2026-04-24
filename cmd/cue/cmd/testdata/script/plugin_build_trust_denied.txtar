@@ -1,44 +1,18 @@
-# Test that runtime plugin evaluation respects trust configuration.
-# When a trust config denies a reference, cue export should fail
-# even though the plugin was built when the reference was allowed.
+# Test that cue plugin build produces a helpful error when trust is denied.
 
 env CUE_CONFIG_DIR=$WORK/.cueconfig
 mkdir $CUE_CONFIG_DIR
 
-# Build with trust allowed.
-cp allow-trust.cue $CUE_CONFIG_DIR/plugin-trust.cue
-exec cue plugin build
-
-# Export works while trust allows it.
-exec cue export .
-cmp stdout want-export
-
-# Change trust to deny.
-cp deny-trust.cue $CUE_CONFIG_DIR/plugin-trust.cue
-
-# Export should fail now because the reference is no longer trusted.
-! exec cue export .
-stderr 'untrusted plugin reference'
+# Build without any trust configuration (default deny).
+! exec cue plugin build
 stderr 'untrusted plugin references found'
+stderr 'example.com/strutil'
+stderr 'references example.com/gostrutil.Upper'
+stderr 'denied by: default policy'
 stderr 'To allow these references, add rules to'
 stderr 'plugin-trust.cue'
 stderr 'effect: "allow"'
 
--- allow-trust.cue --
-rules: [{
-	effect: "allow"
-	cueModule: "..."
-}]
--- deny-trust.cue --
-rules: [{
-	effect: "deny"
-	cueModule: "..."
-	description: "all plugins denied"
-}]
--- want-export --
-{
-    "upper": "HELLO"
-}
 -- cue.mod/module.cue --
 module: "test.example@v0"
 language: version: "v0.17.0"

@@ -1,0 +1,46 @@
+# Test that cue export produces a helpful error when a module
+# uses Go plugins but "cue plugin build" has not been run.
+
+! exec cue export .
+stderr 'no injection defined for "go"'
+stderr 'run "cue plugin build" first'
+
+-- cue.mod/module.cue --
+module: "test.example@v0"
+language: version: "v0.17.0"
+deps: {
+	"example.com/strutil@v0": {
+		v: "v0.0.1"
+	}
+}
+
+-- main.cue --
+package main
+
+import "example.com/strutil"
+
+upper: strutil.Upper("hello")
+
+-- _registry/example.com_strutil_v0.0.1/cue.mod/module.cue --
+module: "example.com/strutil@v0"
+language: version: "v0.17.0"
+-- _registry/example.com_strutil_v0.0.1/strutil.cue --
+@extern(go, import=("example.com/gostrutil"))
+package strutil
+
+Upper: _ @go(gostrutil.Upper)
+-- _registry/example.com_strutil_v0.0.1/go.mod --
+module example.com/strutil
+go 1.21
+require example.com/gostrutil v0.1.0
+-- .gomodproxy/_enable_overlay --
+-- .gomodproxy/example.com_gostrutil_v0.1.0/go.mod --
+module example.com/gostrutil
+-- .gomodproxy/example.com_gostrutil_v0.1.0/util.go --
+package gostrutil
+
+import "strings"
+
+func Upper(s string) string {
+	return strings.ToUpper(s)
+}

@@ -411,6 +411,12 @@ func MainWithOptions(options ...cuecontext.Option) int {
 				ToSlash: testing.Testing(),
 			})
 		}
+		if suggestion := denialSuggestion(err); suggestion != "" {
+			fmt.Fprintf(os.Stderr, "\n%s\n", suggestion)
+		}
+		if suggestion := noInjectionSuggestion(err); suggestion != "" {
+			fmt.Fprintf(os.Stderr, "\n%s\n", suggestion)
+		}
 		exitCode = 1
 	}
 	if benchName != "" {

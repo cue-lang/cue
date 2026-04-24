@@ -15,6 +15,7 @@
 package runtime
 
 import (
+	"fmt"
 	"iter"
 
 	"cuelang.org/go/cue/ast"
@@ -215,6 +216,16 @@ loop:
 	return kinds, f.Decls[p:], err
 }
 
+// NoInjectionError is returned when an @extern attribute references
+// a kind for which no injection has been registered.
+type NoInjectionError struct {
+	Kind string
+}
+
+func (e *NoInjectionError) Error() string {
+	return fmt.Sprintf("no injection defined for %q", e.Kind)
+}
+
 // initInjector initializes the injector for kind, if applicable. The pos
 // argument represents the position of the file-level @extern attribute.
 func (d *externDecorator) initInjector(kind string, pos token.Pos) errors.Error {
@@ -226,7 +237,7 @@ func (d *externDecorator) initInjector(kind string, pos token.Pos) errors.Error 
 	}
 	x := d.runtime.injections[kind]
 	if x == nil {
-		return errors.Newf(pos, "no injection defined for %q", kind)
+		return errors.Wrapf(&NoInjectionError{Kind: kind}, pos, "")
 	}
 	inj, err := x.InjectorForInstance(d.pkg, d.runtime)
 	if err != nil {

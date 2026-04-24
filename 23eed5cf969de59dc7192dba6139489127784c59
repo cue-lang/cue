@@ -16,6 +16,24 @@
       "message": "I would have expected some evaluator tests here too. Ideally, the simplification already happens at that stage.",
       "revId": "23eed5cf969de59dc7192dba6139489127784c59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aaddd8a6_aab15b87",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-24T10:21:53Z",
+      "side": 1,
+      "message": "done; tweaked and split cue/testdata/resolve/046_predefined_ranges.txtar to show `out/evalalpha` with these ranges.",
+      "parentUuid": "22beaea7_cc55d139",
+      "revId": "23eed5cf969de59dc7192dba6139489127784c59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

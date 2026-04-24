@@ -2,6 +2,10 @@
 # to resolve Go module versions when the Go package is local to the
 # CUE module's own go.mod.
 
+env CUE_CONFIG_DIR=$WORK/.cueconfig
+mkdir $CUE_CONFIG_DIR
+cp allow-trust.cue $CUE_CONFIG_DIR/plugin-trust.cue
+
 exec cue plugin build
 
 # Verify generated files exist.
@@ -135,3 +139,5 @@ import "strings"
 func Upper(s string) string {
 	return strings.ToUpper(s)
 }
+-- allow-trust.cue --
+rules: [{effect: "allow", cueModule: "..."}]

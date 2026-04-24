@@ -398,46 +398,46 @@ issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, ex
     ./listmatchncycle.cue:5:5
     ./listmatchncycle.cue:5:8
 [eval] issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
-    ./matchn.cue:46:7
+    ./matchn.cue:25:7
 [eval] issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:65:7
-    ./matchn.cue:65:14
-    ./matchn.cue:77:7
-    ./matchn.cue:78:7
+    ./matchn.cue:44:7
+    ./matchn.cue:44:14
+    ./matchn.cue:56:7
+    ./matchn.cue:57:7
 issue3443.cycle1.cycle.s.n: invalid value {n:_} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:65:7
-    ./matchn.cue:65:14
-    ./matchn.cue:65:22
-    ./matchn.cue:78:10
+    ./matchn.cue:44:7
+    ./matchn.cue:44:14
+    ./matchn.cue:44:22
+    ./matchn.cue:57:10
 issue3443.cycle1.cycle.s.n.n: structural cycle:
-    ./matchn.cue:65:7
+    ./matchn.cue:44:7
 [eval] issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:85:13
-    ./matchn.cue:85:20
+    ./matchn.cue:64:13
+    ./matchn.cue:64:20
 issue3443.cycle2.fail.#S.n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:85:13
-    ./matchn.cue:85:20
-    ./matchn.cue:85:28
-    ./matchn.cue:85:40
+    ./matchn.cue:64:13
+    ./matchn.cue:64:20
+    ./matchn.cue:64:28
+    ./matchn.cue:64:40
 issue3443.cycle2.fail.#S.n.n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:85:13
-    ./matchn.cue:85:20
-    ./matchn.cue:85:28
-    ./matchn.cue:85:40
-    ./matchn.cue:85:43
+    ./matchn.cue:64:13
+    ./matchn.cue:64:20
+    ./matchn.cue:64:28
+    ./matchn.cue:64:40
+    ./matchn.cue:64:43
 issue3443.cycle2.fail.#S.n.n.n: structural cycle:
-    ./matchn.cue:85:13
+    ./matchn.cue:64:13
 [incomplete] issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:94:6
-    ./matchn.cue:93:8
-    ./matchn.cue:94:13
+    ./matchn.cue:73:6
+    ./matchn.cue:72:8
+    ./matchn.cue:73:13
 issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:94:17
-    ./matchn.cue:93:8
-    ./matchn.cue:94:24
+    ./matchn.cue:73:17
+    ./matchn.cue:72:8
+    ./matchn.cue:73:24
 issue3633.final.data.a: field is required but not present:
-    ./matchn.cue:94:17
-    ./matchn.cue:94:29
+    ./matchn.cue:73:17
+    ./matchn.cue:73:29
 [eval] selfCycle.t1.c: invalid value {d:{}} (does not satisfy matchN): 0 matched, expected 1:
     ./yamlcycle.cue:24:5
     ./yamlcycle.cue:24:12

@@ -16,6 +16,24 @@
       "message": "I don\u0027t think this is right. This means that the omitted-comma form isn\u0027t stable - as soon as anyone runs `cue fmt` _without_ `--simplify`, the commas come back. In general ISTM that `--simplify` should only introduce simplifications to the syntax that stay around when running `cue format` afterwards.\n\nPersonally I think that we should probably omit commas on list elements exactly as we omit commas in any other situation (i.e. always), but if we feel that will be too disruptive a change, then I\u0027d suggest omitting all commas if any comma is already omitted within a given list literal.",
       "revId": "40cc025d269127a0c29163ac928120882d50621e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc5d229e_aa9f0635",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-24T09:00:48Z",
+      "side": 1,
+      "message": "Good point about stability. I\u0027ve reworked this so that:\n\n1. `cue fmt` now preserves existing comma style — it no longer adds commas back to lists that don\u0027t have them, and keeps commas in lists that do. Mixed lists (some elements with commas, some without) normalize to no-comma style.\n2. `cue fmt --simplify` has no effect.\n3. A separate `cue fix` option to remove commas as the primary migration path for explicitly converting all lists to the no-comma style.\n\nSome modifications to the scanner were made to track which elements have commas attached to them.\n\nIn the future, we can make removing commas the default. Maybe the new formatter experiment will be a good point to add that.",
+      "parentUuid": "3a6c9990_ece39366",
+      "revId": "40cc025d269127a0c29163ac928120882d50621e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

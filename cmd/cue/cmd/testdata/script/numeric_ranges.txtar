@@ -1,0 +1,38 @@
+# Predeclared ranged numeric types must render by name rather than as their
+# expanded bounds, both in "cue def" output and in error messages.
+
+exec cue def schema.cue
+cmp stdout expect-stdout
+
+! exec cue export bad.cue
+cmp stderr expect-stderr
+
+-- schema.cue --
+a: int16
+b: uint8
+c: float32
+d: float64
+e: int64
+-- expect-stdout --
+a: int16
+b: uint8
+c: float32
+d: float64
+e: int64
+-- bad.cue --
+i16: int16 & "foo"
+u8:  uint8 & "foo"
+f32: float32 & "foo"
+f64: float64 & "foo"
+un:  uint & "foo"
+-- expect-stderr --
+f32: conflicting values >=-340282346638528859811704183484516925440 & <=340282346638528859811704183484516925440 and "foo" (mismatched types number and string):
+    ./bad.cue:3:16
+f64: conflicting values >=-1.797693134862315708145274237317043567981E+308 & <=1.797693134862315708145274237317043567981E+308 and "foo" (mismatched types number and string):
+    ./bad.cue:4:16
+i16: conflicting values int & >=-32768 & <=32767 and "foo" (mismatched types int and string):
+    ./bad.cue:1:14
+u8: conflicting values int & >=0 & <=255 and "foo" (mismatched types int and string):
+    ./bad.cue:2:14
+un: conflicting values int & >=0 and "foo" (mismatched types int and string):
+    ./bad.cue:5:13

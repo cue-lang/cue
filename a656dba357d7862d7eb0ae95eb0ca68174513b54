@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbfb6dbe_ab857bde",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-24T08:53:09Z",
+      "side": 1,
+      "message": "This is a debug printer. It SHOULD NOT print something different than what is generated.",
+      "revId": "a656dba357d7862d7eb0ae95eb0ca68174513b54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

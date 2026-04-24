@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go/format"
 	"go/types"
@@ -25,8 +26,10 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/inject/goplugin"
 	"cuelang.org/go/cue/load"
+	cueruntime "cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/semver"
@@ -931,6 +934,7 @@ func checkPluginTrust(manifest *goplugin.Manifest, refs []instanceReference, res
 	if err != nil {
 		return fmt.Errorf("reading plugin trust configuration: %v", err)
 	}
+	var denials []*plugintrust.DenialError
 	for i, ir := range refs {
 		r := resolved[i]
 		goMod := manifest.GoPackages[r.goPkg]
@@ -942,8 +946,17 @@ func checkPluginTrust(manifest *goplugin.Manifest, refs []instanceReference, res
 			Name:          ir.ref.Name,
 		}
 		if err := checker.Check(ref); err != nil {
-			return err
+			var de *plugintrust.DenialError
+			if errors.As(err, &de) {
+				denials = append(denials, de)
+			} else {
+				return err
+			}
 		}
+	}
+	if len(denials) > 0 {
+		configPath, _ := plugintrust.ConfigPath(os.Getenv)
+		return fmt.Errorf("%s", formatDenials(denials, configPath))
 	}
 	return nil
 }
@@ -981,4 +994,63 @@ func appendPluginCheckerOptions(cmd *Command, opts []cuecontext.Option) (opt []c
 			goplugin.Checker(&manifest, checker.Check),
 		),
 	), nil
+}
+
+func formatDenials(denials []*plugintrust.DenialError, configPath string) string {
+	var b strings.Builder
+	b.WriteString("untrusted plugin references found\n")
+	for _, d := range denials {
+		fmt.Fprintf(&b, "\n  %s (CUE module %s)\n", d.Ref.CUEModule.BasePath(), d.Ref.CUEModule)
+		fmt.Fprintf(&b, "    references %s.%s\n", d.Ref.GoImportPath, d.Ref.Name)
+		fmt.Fprintf(&b, "    denied by: %s\n", d.Description)
+	}
+	seen := map[string]bool{}
+	var basePaths []string
+	for _, d := range denials {
+		bp := d.Ref.CUEModule.BasePath()
+		if !seen[bp] {
+			seen[bp] = true
+			basePaths = append(basePaths, bp)
+		}
+	}
+	fmt.Fprintf(&b, "\nTo allow these references, add rules to %s.\nFor example:\n\n", configPath)
+	fmt.Fprintf(&b, "  rules: [\n")
+	for _, bp := range basePaths {
+		fmt.Fprintf(&b, "      {effect: \"allow\", cueModule: %q},\n", bp)
+	}
+	fmt.Fprintf(&b, "  ]")
+	return b.String()
+}
+
+// denialSuggestion checks whether err contains any *plugintrust.DenialError
+// values and, if so, returns a formatted suggestion for the user.
+// It returns the empty string if no denial errors are found.
+func denialSuggestion(err error) string {
+	var denials []*plugintrust.DenialError
+	seen := map[plugintrust.DenialError]bool{}
+	for _, e := range cueerrors.Errors(err) {
+		var de *plugintrust.DenialError
+		if errors.As(e, &de) && !seen[*de] {
+			seen[*de] = true
+			denials = append(denials, de)
+		}
+	}
+	if len(denials) == 0 {
+		return ""
+	}
+	configPath, _ := plugintrust.ConfigPath(os.Getenv)
+	return formatDenials(denials, configPath)
+}
+
+// noInjectionSuggestion checks whether err contains any
+// *runtime.NoInjectionError for the "go" kind and, if so,
+// returns a suggestion to run "cue plugin build".
+func noInjectionSuggestion(err error) string {
+	for _, e := range cueerrors.Errors(err) {
+		var nie *cueruntime.NoInjectionError
+		if errors.As(e, &nie) && nie.Kind == "go" {
+			return `this module uses Go plugins via @extern(go); run "cue plugin build" first`
+		}
+	}
+	return ""
 }

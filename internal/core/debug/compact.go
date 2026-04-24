@@ -330,6 +330,10 @@ func (w *printer) compactNode(n adt.Node) {
 		w.string(")")
 
 	case *adt.Conjunction:
+		if name := adt.MatchBuiltinRange(x); name != "" {
+			w.string(name)
+			break
+		}
 		for i, c := range x.Values {
 			if i > 0 {
 				w.string(" & ")

@@ -19,8 +19,8 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-// boundSimplifier simplifies bound values into predeclared identifiers, if
-// possible.
+// boundSimplifier collapses BasicType and BoundValue conjuncts into a compact
+// int/uint prefix plus the remaining bounds.
 type boundSimplifier struct {
 	e *exporter
 
@@ -90,31 +90,16 @@ func (s *boundSimplifier) expr(ctx *adt.OpContext) (e ast.Expr) {
 	if s.min == nil || s.max == nil {
 		return nil
 	}
-	switch {
-	case s.isInt:
-		t := s.matchRange(adt.IntBuiltinRanges)
-		if t != "" {
-			e = ast.NewIdent(t)
-			break
-		}
+	if s.isInt {
 		if sign := s.minNum.X.Sign(); sign == -1 {
 			e = ast.NewIdent("int")
-
 		} else {
 			e = ast.NewIdent("uint")
 			if sign == 0 && s.min.Op == adt.GreaterEqualOp {
 				s.min = nil
-				break
 			}
 		}
-		fallthrough
-	default:
-		t := s.matchRange(adt.FloatBuiltinRanges)
-		if t != "" {
-			e = wrapBin(e, ast.NewIdent(t), adt.AndOp)
-		}
 	}
-
 	if s.min != nil {
 		e = wrapBin(e, s.e.expr(nil, s.min), adt.AndOp)
 	}
@@ -122,40 +107,6 @@ func (s *boundSimplifier) expr(ctx *adt.OpContext) (e ast.Expr) {
 		e = wrapBin(e, s.e.expr(nil, s.max), adt.AndOp)
 	}
 	return e
-}
-
-func (s *boundSimplifier) matchRange(ranges []adt.BuiltinRange) (t string) {
-	for _, r := range ranges {
-		if !s.minNum.X.IsZero() && s.min.Op == adt.GreaterEqualOp && s.minNum.X.Cmp(r.Lo) == 0 {
-			switch s.maxNum.X.Cmp(r.Hi) {
-			case 0:
-				if s.max.Op == adt.LessEqualOp {
-					s.max = nil
-				}
-				s.min = nil
-				return r.Name
-			case -1:
-				if !s.minNum.X.IsZero() {
-					s.min = nil
-					return r.Name
-				}
-			case 1:
-			}
-		} else if s.max.Op == adt.LessEqualOp && s.maxNum.X.Cmp(r.Hi) == 0 {
-			switch s.minNum.X.Cmp(r.Lo) {
-			case -1:
-			case 0:
-				if s.min.Op == adt.GreaterEqualOp {
-					s.min = nil
-				}
-				fallthrough
-			case 1:
-				s.max = nil
-				return r.Name
-			}
-		}
-	}
-	return ""
 }
 
 func wrapBin(a, b ast.Expr, op adt.Op) ast.Expr {

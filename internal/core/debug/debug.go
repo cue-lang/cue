@@ -46,6 +46,12 @@ type Config struct {
 	// Error arguments are always rendered compactly, regardless of this flag.
 	Compact bool
 
+	// CompactBuiltins, when set together with Compact, collapses conjunctions
+	// that precisely represent a predeclared ranged numeric type back to that
+	// name (e.g. {int, >=-128, <=127} renders as "int8"). It is always enabled
+	// when rendering error arguments.
+	CompactBuiltins bool
+
 	// Raw, when set in combination with Compact, prints a Vertex as the
 	// conjunction of its original conjuncts rather than its evaluated value,
 	// unless the Vertex already holds concrete data.
@@ -62,7 +68,13 @@ func AppendNode(dst []byte, i adt.StringIndexer, n adt.Node, config *Config) []b
 	if config == nil {
 		config = &Config{}
 	}
-	p := printer{dst: dst, index: i, cfg: config, compact: config.Compact}
+	p := printer{
+		dst:             dst,
+		index:           i,
+		cfg:             config,
+		compact:         config.Compact,
+		compactBuiltins: config.CompactBuiltins,
+	}
 	p.node(n)
 	return p.dst
 }
@@ -77,11 +89,12 @@ func NodeString(i adt.StringIndexer, n adt.Node, config *Config) string {
 }
 
 type printer struct {
-	dst     []byte
-	index   adt.StringIndexer
-	indent  string
-	cfg     *Config
-	compact bool // copied from config.Compact
+	dst             []byte
+	index           adt.StringIndexer
+	indent          string
+	cfg             *Config
+	compact         bool // copied from config.Compact
+	compactBuiltins bool // copied from config.CompactBuiltins
 
 	// keep track of vertices to avoid cycles.
 	stack []*adt.Vertex
@@ -130,11 +143,12 @@ type formatter struct {
 
 func (f formatter) String() string {
 	p := printer{
-		dst:     make([]byte, 0, 128),
-		index:   f.r,
-		cfg:     f.p.cfg,
-		compact: true, // Always compact for error arguments.
-		stack:   f.p.stack,
+		dst:             make([]byte, 0, 128),
+		index:           f.r,
+		cfg:             f.p.cfg,
+		compact:         true, // Always compact for error arguments.
+		compactBuiltins: true,
+		stack:           f.p.stack,
 	}
 	p.node(f.x)
 	return string(p.dst)

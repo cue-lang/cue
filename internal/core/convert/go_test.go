@@ -385,7 +385,7 @@ func TestConvertType(t *testing.T) {
 			C int8 `cue:"A+B"`
 		}{},
 		// TODO: should B be marked as optional?
-		want: "(struct){\n  A: (_|_){\n    // [incomplete] A: non-concrete value >=-128 & <=127 & int in operand to -:\n    //     <field:>:1:1\n    // A: cannot reference optional field: B:\n    //     <field:>:1:3\n  }\n  B?: (_|_){\n    // [incomplete] B: non-concrete value >=-128 & <=127 & int in operand to -:\n    //     <field:>:1:1\n  }\n  C: (_|_){\n    // [incomplete] C: non-concrete value >=-128 & <=127 & int in operand to +:\n    //     <field:>:1:1\n    // C: cannot reference optional field: B:\n    //     <field:>:1:3\n  }\n}",
+		want: "(struct){\n  A: (_|_){\n    // [incomplete] A: non-concrete value int8 in operand to -:\n    //     <field:>:1:1\n    // A: cannot reference optional field: B:\n    //     <field:>:1:3\n  }\n  B?: (_|_){\n    // [incomplete] B: non-concrete value int8 in operand to -:\n    //     <field:>:1:1\n  }\n  C: (_|_){\n    // [incomplete] C: non-concrete value int8 in operand to +:\n    //     <field:>:1:1\n    // C: cannot reference optional field: B:\n    //     <field:>:1:3\n  }\n}",
 	}, {
 		goTyp: []string{},
 		want: `((null|list)){ |(*(null){ null }, (list){

@@ -35,14 +35,25 @@ const (
 	closeTuple = "\u3009"
 )
 
+// Config configures how [AppendNode] and [NodeString] render an ADT node.
+// A nil *Config is treated as a zero-value Config.
 type Config struct {
-	Cwd     string
-	Compact bool
-	Raw     bool
+	// Cwd is used to shorten file paths in rendered error messages,
+	// so that paths are printed relative to Cwd.
+	Cwd string
 
-	// ExpandLetExpr causes the expression of let reference to be printed.
-	// Note that this may result in large outputs. Use with care.
-	// Only applies if Compact is false.
+	// Compact selects single-line output without indentation or newlines.
+	// Error arguments are always rendered compactly, regardless of this flag.
+	Compact bool
+
+	// Raw, when set in combination with Compact, prints a Vertex as the
+	// conjunction of its original conjuncts rather than its evaluated value,
+	// unless the Vertex already holds concrete data.
+	Raw bool
+
+	// ExpandLetExpr causes the expression of a let reference to be printed
+	// inline after the reference. Note that this may result in large outputs;
+	// use with care. Only applies if Compact is false.
 	ExpandLetExpr bool
 }
 

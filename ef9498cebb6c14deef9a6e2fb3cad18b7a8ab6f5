@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f8da58c_0ef5c478",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-04-24T14:04:16Z",
+      "side": 1,
+      "message": "This is clearly junk. Please remove.",
+      "revId": "ef9498cebb6c14deef9a6e2fb3cad18b7a8ab6f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

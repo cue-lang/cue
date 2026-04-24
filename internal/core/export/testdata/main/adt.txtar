@@ -198,7 +198,7 @@ e6:  !t
 e7:  !t || !false
 e8?: !false
 m1: {
-	[string]: int & >=0
+	[string]: uint
 } & {
 	{
 		[string]: int

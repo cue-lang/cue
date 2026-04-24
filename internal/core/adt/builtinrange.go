@@ -16,12 +16,9 @@ package adt
 
 import "github.com/cockroachdb/apd/v3"
 
-// BuiltinRange describes a predeclared ranged numeric type such as int16 or
-// float32.
-type BuiltinRange struct {
-	Name string
-	Lo   *apd.Decimal
-	Hi   *apd.Decimal
+type builtinRange struct {
+	name   string
+	lo, hi *apd.Decimal
 }
 
 func mustDec(s string) *apd.Decimal {
@@ -32,8 +29,7 @@ func mustDec(s string) *apd.Decimal {
 	return d
 }
 
-// IntBuiltinRanges lists the predeclared sized integer types.
-var IntBuiltinRanges = []BuiltinRange{
+var intBuiltinRanges = []builtinRange{
 	{"int8", mustDec("-128"), mustDec("127")},
 	{"int16", mustDec("-32768"), mustDec("32767")},
 	{"int32", mustDec("-2147483648"), mustDec("2147483647")},
@@ -49,8 +45,7 @@ var IntBuiltinRanges = []BuiltinRange{
 	{"uint128", mustDec("0"), mustDec("340282366920938463463374607431768211455")},
 }
 
-// FloatBuiltinRanges lists the predeclared sized float types.
-var FloatBuiltinRanges = []BuiltinRange{
+var floatBuiltinRanges = []builtinRange{
 	// 2**127 * (2**24 - 1) / 2**23
 	{"float32",
 		mustDec("-3.40282346638528859811704183484516925440e+38"),
@@ -109,23 +104,19 @@ func MatchBuiltinRange(c *Conjunction) string {
 		}
 	}
 
-	if lo != nil && hi == nil && hasInt && lo.X.Sign() == 0 {
+	if lo != nil && hi == nil && hasInt && lo.X.IsZero() {
 		return "uint"
 	}
 	if lo == nil || hi == nil {
 		return ""
 	}
-
-	var ranges []BuiltinRange
-	switch {
-	case hasInt:
-		ranges = IntBuiltinRanges
-	default:
-		ranges = FloatBuiltinRanges
+	ranges := floatBuiltinRanges
+	if hasInt {
+		ranges = intBuiltinRanges
 	}
 	for _, r := range ranges {
-		if lo.X.Cmp(r.Lo) == 0 && hi.X.Cmp(r.Hi) == 0 {
-			return r.Name
+		if lo.X.Cmp(r.lo) == 0 && hi.X.Cmp(r.hi) == 0 {
+			return r.name
 		}
 	}
 	return ""

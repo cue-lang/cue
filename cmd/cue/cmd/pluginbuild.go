@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"go/format"
 	"go/types"
-	"log"
 	"maps"
 	"os"
 	"os/exec"
@@ -31,6 +30,7 @@ import (
 	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/internal/plugintrust"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modregistry"
 )
@@ -127,7 +127,6 @@ func runPluginBuild(cmd *Command, args []string) error {
 	if err := os.WriteFile(filepath.Join(pluginDir, "go.mod"), goModData, 0o666); err != nil {
 		return err
 	}
-	log.Printf("go.mod contents: %q", goModData)
 	if err := os.WriteFile(filepath.Join(pluginDir, "main.go"), interimMainData, 0o666); err != nil {
 		return err
 	}
@@ -149,11 +148,18 @@ func runPluginBuild(cmd *Command, args []string) error {
 		return err
 	}
 
-	// Generate and write the plugin manifest.
+	// Generate the plugin manifest.
 	manifest, err := buildManifest(refs, resolved, pluginDir)
 	if err != nil {
 		return fmt.Errorf("building manifest: %v", err)
 	}
+
+	// Check trust configuration before proceeding.
+	if err := checkPluginTrust(manifest, refs, resolved); err != nil {
+		return err
+	}
+
+	// Write the manifest to disk.
 	manifestData, err := json.MarshalIndent(manifest, "", "\t")
 	if err != nil {
 		return fmt.Errorf("encoding manifest: %v", err)
@@ -302,6 +308,13 @@ func resolveGoPackages(ctx context.Context, regClient *modregistry.Client, refs 
 // to a module requirement corresponding to the currently
 // running cue binary.
 func cueModRequirement() (goModRequire, error) {
+	if cueReplace := os.Getenv("CUE_PLUGIN_CUE_REPLACE"); cueReplace != "" {
+		return goModRequire{
+			Path:    cueModulePath,
+			Version: "v0.0.0",
+			Replace: cueReplace,
+		}, nil
+	}
 	cueVersion := cueversion.ModuleVersion()
 	if semver.IsValid(cueVersion) {
 		return goModRequire{
@@ -309,15 +322,7 @@ func cueModRequirement() (goModRequire, error) {
 			Version: cueVersion,
 		}, nil
 	}
-	cueReplace := os.Getenv("CUE_PLUGIN_CUE_REPLACE")
-	if cueReplace == "" {
-		return goModRequire{}, fmt.Errorf("cannot determine cuelang.org/go version (got %q); set CUE_PLUGIN_CUE_REPLACE to a local path", cueVersion)
-	}
-	return goModRequire{
-		Path:    cueModulePath,
-		Version: "v0.0.0",
-		Replace: cueReplace,
-	}, nil
+	return goModRequire{}, fmt.Errorf("cannot determine cuelang.org/go version (got %q); set CUE_PLUGIN_CUE_REPLACE to a local path", cueVersion)
 }
 
 // findGoMod searches upward from dir for a go.mod file and returns
@@ -919,6 +924,30 @@ func manifestGoModule(goModFile *gomodfile.File, pkgPath string) goplugin.GoModu
 	}
 }
 
+// checkPluginTrust evaluates all resolved references against the user's
+// trust configuration. It returns an error if any reference is denied.
+func checkPluginTrust(manifest *goplugin.Manifest, refs []instanceReference, resolved []resolvedRef) error {
+	checker, err := plugintrust.ReadConfig(os.Getenv)
+	if err != nil {
+		return fmt.Errorf("reading plugin trust configuration: %v", err)
+	}
+	for i, ir := range refs {
+		r := resolved[i]
+		goMod := manifest.GoPackages[r.goPkg]
+		ref := goplugin.ResolvedReference{
+			CUEModule:     ir.inst.ModuleVersion,
+			CUEImportPath: ir.inst.ImportPath,
+			GoModule:      goMod,
+			GoImportPath:  r.goPkg,
+			Name:          ir.ref.Name,
+		}
+		if err := checker.Check(ref); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // pluginCheckerOption reads the manifest file from cue.mod/plugin/manifest.json
 // and returns a cuecontext.Option that adds a Checker injection.
 // It returns ok as false when no manifest file is found.
@@ -943,11 +972,13 @@ func appendPluginCheckerOptions(cmd *Command, opts []cuecontext.Option) (opt []c
 	if err := json.Unmarshal(data, &manifest); err != nil {
 		return nil, fmt.Errorf("cannot read plugin manifest: %v", err)
 	}
+	checker, err := plugintrust.ReadConfig(os.Getenv)
+	if err != nil {
+		return nil, fmt.Errorf("reading plugin trust configuration: %v", err)
+	}
 	return append(opts,
 		cuecontext.WithInjection(
-			goplugin.Checker(&manifest, func(goplugin.ResolvedReference) error {
-				return nil
-			}),
+			goplugin.Checker(&manifest, checker.Check),
 		),
 	), nil
 }

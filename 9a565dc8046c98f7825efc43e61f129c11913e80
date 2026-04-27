@@ -33,6 +33,24 @@
       "message": "I\u0027m very confused. I did this fix in https://review.gerrithub.io/c/cue-lang/cue/+/1232779, the code is right there in line 444. is this not a duplicate? if it\u0027s really needed, please explain and document properly.",
       "revId": "9a565dc8046c98f7825efc43e61f129c11913e80",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19ced94f_415b7d72",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T14:53:46Z",
+      "side": 1,
+      "message": "Must have crossed paths.",
+      "parentUuid": "affa530d_75ffb9fa",
+      "revId": "9a565dc8046c98f7825efc43e61f129c11913e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

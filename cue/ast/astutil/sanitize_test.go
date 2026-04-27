@@ -20,6 +20,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 
 	"github.com/go-quicktest/qt"
@@ -466,6 +467,133 @@ a: list.Min
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			err := astutil.Sanitize(tc.file)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			b, errs := format.Node(tc.file)
+			if errs != nil {
+				t.Fatal(errs)
+			}
+
+			got := string(b)
+			qt.Assert(t, qt.Equals(got, tc.want))
+		})
+	}
+}
+
+func TestSanitizeCrossFileShadowing(t *testing.T) {
+	testCases := []struct {
+		desc     string
+		file     *ast.File
+		pkgFiles []*ast.File
+		want     string
+	}{{
+		desc: "Predeclared self shadowed by top-level field in another file",
+		file: func() *ast.File {
+			// File with a reference to predeclared "self"
+			selfIdent := ast.NewPredeclared("self")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("foo"),
+					Value: ast.NewStruct(
+						&ast.LetClause{
+							Ident: ast.NewIdent("X"),
+							Expr:  selfIdent,
+						},
+						ast.NewIdent("a"), ast.NewIdent("X"),
+					),
+				},
+			}}
+		}(),
+		pkgFiles: []*ast.File{{
+			// Another file in the package with top-level "self" field
+			Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("self"),
+					Value: ast.NewLit(token.INT, "42"),
+				},
+			},
+		}},
+		want: `foo: {
+	let X = __self
+	a: X
+}
+`,
+	}, {
+		desc: "Predeclared self not shadowed when no cross-file conflict",
+		file: func() *ast.File {
+			selfIdent := ast.NewPredeclared("self")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("foo"),
+					Value: ast.NewStruct(
+						&ast.LetClause{
+							Ident: ast.NewIdent("X"),
+							Expr:  selfIdent,
+						},
+						ast.NewIdent("a"), ast.NewIdent("X"),
+					),
+				},
+			}}
+		}(),
+		pkgFiles: []*ast.File{{
+			// Another file without "self" field
+			Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("other"),
+					Value: ast.NewLit(token.INT, "42"),
+				},
+			},
+		}},
+		want: `foo: {
+	let X = self
+	a: X
+}
+`,
+	}, {
+		desc: "Predeclared self shadowed by aliased field in another file",
+		file: func() *ast.File {
+			selfIdent := ast.NewPredeclared("self")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("foo"),
+					Value: ast.NewStruct(
+						&ast.LetClause{
+							Ident: ast.NewIdent("X"),
+							Expr:  selfIdent,
+						},
+						ast.NewIdent("a"), ast.NewIdent("X"),
+					),
+				},
+			}}
+		}(),
+		pkgFiles: []*ast.File{{
+			// Another file with aliased "self" field (X=self: ...)
+			Decls: []ast.Decl{
+				&ast.Field{
+					Label: &ast.Alias{
+						Ident: ast.NewIdent("X"),
+						Expr:  ast.NewIdent("self"),
+					},
+					Value: ast.NewLit(token.INT, "42"),
+				},
+			},
+		}},
+		want: `foo: {
+	let X = __self
+	a: X
+}
+`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			var err error
+			if tc.pkgFiles != nil {
+				err = astutil.SanitizeFiles(append(tc.pkgFiles, tc.file))
+			} else {
+				err = astutil.Sanitize(tc.file)
+			}
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd64a2db_314ba4c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T14:56:56Z",
+      "side": 1,
+      "message": "Rebased and removed.",
+      "parentUuid": "1040b102_992ef127",
+      "revId": "9a565dc8046c98f7825efc43e61f129c11913e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "affa530d_75ffb9fa",

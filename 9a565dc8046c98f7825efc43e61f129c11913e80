@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1040b102_992ef127",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-27T14:45:22Z",
+      "side": 1,
+      "message": "SGTM but the compiler changes seem odd. Did you perhaps write that before rebasing and picking up my fix?",
+      "revId": "9a565dc8046c98f7825efc43e61f129c11913e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "affa530d_75ffb9fa",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-27T14:45:22Z",
+      "side": 1,
+      "message": "I\u0027m very confused. I did this fix in https://review.gerrithub.io/c/cue-lang/cue/+/1232779, the code is right there in line 444. is this not a duplicate? if it\u0027s really needed, please explain and document properly.",
+      "revId": "9a565dc8046c98f7825efc43e61f129c11913e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -33,6 +33,24 @@
       "message": "I already reviewed this in https://cue.gerrithub.io/c/cue-lang/cue/+/1235485",
       "revId": "2e9cfe0902c898abc44c52f8169f42f937d959d2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b2c10a0_a8ea3e93",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T13:37:10Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a78e4269_72325e71",
+      "revId": "2e9cfe0902c898abc44c52f8169f42f937d959d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

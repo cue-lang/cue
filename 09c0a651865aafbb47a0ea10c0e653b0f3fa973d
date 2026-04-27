@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b425dfec_2e8e7baf",
+        "filename": ".gitignore",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-04-27T14:06:17Z",
+      "side": 1,
+      "message": "Can I suggest the better thing to do here is have a `/tmp/` entry, and then whatever can safely go in `/tmp` in the root of a repo, including cache stuff.",
+      "revId": "09c0a651865aafbb47a0ea10c0e653b0f3fa973d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

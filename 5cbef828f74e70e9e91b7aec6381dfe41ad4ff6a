@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12a54b04_80210feb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-27T10:24:01Z",
+      "side": 1,
+      "message": "LGTM although I don\u0027t fully understand the various pieces in play here.",
+      "revId": "5cbef828f74e70e9e91b7aec6381dfe41ad4ff6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e16571ba_6965a013",
+        "filename": "cue/format/node.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-27T10:24:01Z",
+      "side": 1,
+      "message": "I don\u0027t quite understand how this can definitely indicate that fact, given that someone manipulating the AST might (for example) insert or append an element to a set of elements inside a list literal that has been parsed from CUE source.",
+      "revId": "5cbef828f74e70e9e91b7aec6381dfe41ad4ff6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe1827c0_27453fc1",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-04-27T10:24:01Z",
+      "side": 1,
+      "message": "This comment doesn\u0027t seem to align with the code: AFAICS the relpos on Rbrack field signifies whether the very last element finished with a newline, but lack of a newline there doesn\u0027t necessarily signify that it\u0027s not a multiline list, e.g.\n\n```\nx: [\n\t1,\n\t2,\n\t3]\n```\nI can\u0027t work out if that\u0027s actually an issue or not!",
+      "revId": "5cbef828f74e70e9e91b7aec6381dfe41ad4ff6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

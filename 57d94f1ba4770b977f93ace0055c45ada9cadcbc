@@ -34,6 +34,24 @@
       "parentUuid": "7194b8df_56dde6bf",
       "revId": "57d94f1ba4770b977f93ace0055c45ada9cadcbc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9af6d34_4207e92e",
+        "filename": "tools/fix/fixall.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T14:41:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a878eb5_fc3efb87",
+      "revId": "57d94f1ba4770b977f93ace0055c45ada9cadcbc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

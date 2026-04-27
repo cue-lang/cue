@@ -22,6 +22,30 @@
       },
       "revId": "eeb646e78e2fb0e0795b876be2194d0027a22db6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "591af1ed_cd57cdc3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T15:46:21Z",
+      "side": 1,
+      "message": "Done. Not sure why the other TODOs were though, so restored.",
+      "parentUuid": "b6ae0b21_6c90b072",
+      "range": {
+        "startLine": 15,
+        "startChar": 6,
+        "endLine": 15,
+        "endChar": 62
+      },
+      "revId": "eeb646e78e2fb0e0795b876be2194d0027a22db6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

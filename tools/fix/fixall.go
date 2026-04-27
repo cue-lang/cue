@@ -18,6 +18,7 @@ import (
 	"os"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -75,6 +76,10 @@ func Instances(a []*build.Instance, o ...Option) errors.Error {
 			if err != nil {
 				return err
 			}
+		}
+
+		if err := astutil.SanitizeFiles(b.Files); err != nil {
+			return errors.Wrapf(err, token.NoPos, "fix: sanitize failed")
 		}
 	}
 

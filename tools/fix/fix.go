@@ -79,6 +79,9 @@ func File(f *ast.File, o ...Option) *ast.File {
 	if err != nil {
 		panic(err)
 	}
+	if err := astutil.Sanitize(f); err != nil {
+		panic(err)
+	}
 	return f
 }
 
@@ -192,10 +195,6 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		f = simplify(f)
 	}
 
-	err = astutil.Sanitize(f)
-	if err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "fix: sanitize failed")
-	}
 	return f, nil
 }
 

@@ -118,7 +118,8 @@ errorListWrongLength: {
 			const: "something"
 		}
 		unaryEquals: {
-			const: 42
+			description: "Test different forms of const as mentioned in constValueOf doc comment:"
+			const:       42
 		}
 	}
 }
@@ -164,4 +165,4 @@ errorNonClosedStructFieldB.data.closedStruct.b: conflicting values 123 and 456:
 -- out/generate-v3/errorNonUnaryEquals --
 errorNonUnaryEquals.data.unaryEquals: conflicting values 42 and 99:
     ./datatest/tests.cue:44:21
-    1:388
+    1:476

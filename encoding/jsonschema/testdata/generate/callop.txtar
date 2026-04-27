@@ -88,8 +88,9 @@ badScore2: {
 			format: "date"
 		}
 		dateTime: {
-			type:   "string"
-			format: "date-time"
+			type:        "string"
+			description: "Time format constraints"
+			format:      "date-time"
 		}
 		longList: {
 			type:     "array"
@@ -100,8 +101,9 @@ badScore2: {
 			minLength: 5
 		}
 		multiple: {
-			type:       "number"
-			multipleOf: 5
+			type:        "number"
+			description: "Math constraints"
+			multipleOf:  5
 		}
 		score: {
 			allOf: [{
@@ -112,21 +114,24 @@ badScore2: {
 			}]
 		}
 		shortList: {
-			type:     "array"
-			maxItems: 3
+			type:        "array"
+			description: "List constraints"
+			maxItems:    3
 		}
 		shortString: {
-			type:      "string"
-			maxLength: 10
+			type:        "string"
+			description: "String rune constraints"
+			maxLength:   10
 		}
 		timeOnly: {
 			type:   "string"
 			format: "time"
 		}
 		userName: {
-			type:      "string"
-			maxLength: 20
-			minLength: 3
+			type:        "string"
+			description: "Combined constraints"
+			maxLength:   20
+			minLength:   3
 		}
 	}
 }
@@ -137,34 +142,34 @@ badDate.data.date: invalid value "2025-10-40" (does not satisfy time.Format("200
 -- out/generate-v3/badDateTime --
 badDateTime.data.dateTime: invalid value "2025-10-02T13" (does not satisfy time.Time): invalid time "2025-10-02T13":
     ./datatest/tests.cue:26:18
-    1:215
+    1:255
 -- out/generate-v3/badScore2 --
 badScore2.data.score: invalid value 5 (does not satisfy math.MultipleOf(10)):
-    1:421
+    1:494
     ./datatest/tests.cue:42:15
-    1:376
+    1:449
 -- out/generate-v3/badTime --
 badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-01-02")): invalid time "25:00:10":
     1:170
     ./datatest/tests.cue:34:14
 -- out/generate-v3/badUserName --
 badUserName.data.userName: invalid value "x" (does not satisfy strings.MinRunes(3)):
-    1:617
+    1:800
     ./datatest/tests.cue:38:18
-    1:602
-    1:617
+    1:785
+    1:800
 -- out/generate-v3/notMultiple --
 notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5)):
-    1:351
+    1:424
     ./datatest/tests.cue:22:18
 -- out/generate-v3/ok --
 -- out/generate-v3/stringTooLong --
 stringTooLong.data.shortString: invalid value "01234567890" (does not satisfy strings.MaxRunes(10)):
-    1:513
+    1:659
     ./datatest/tests.cue:14:21
-    1:513
+    1:659
 -- out/generate-v3/stringTooShort --
 stringTooShort.data.longString: invalid value "x" (does not satisfy strings.MinRunes(5)):
-    1:308
+    1:348
     ./datatest/tests.cue:18:20
-    1:308
+    1:348

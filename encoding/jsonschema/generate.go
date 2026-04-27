@@ -283,7 +283,11 @@ func (g *generator) addErrorf(pos cue.Value, f string, a ...any) {
 // makeItem returns an item representing the JSON Schema
 // for v in naive form.
 func (g *generator) makeItem(v cue.Value, mode closedMode) internItem {
-	return g.unique.intern(g.makeItem0(v, mode))
+	it := g.unique.intern(g.makeItem0(v, mode))
+	if desc := docString(v); desc != "" {
+		it = g.unique.intern(&itemDescription{description: desc, elem: it})
+	}
+	return it
 }
 
 func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
@@ -1231,6 +1235,27 @@ func isConcreteScalar(v cue.Value) bool {
 		return false
 	}
 	return (v.Kind() & (cue.StructKind | cue.ListKind)) == 0
+}
+
+func docString(v cue.Value) string {
+	docs := v.Doc()
+	var txt string
+	switch len(docs) {
+	case 0:
+		return ""
+	case 1:
+		txt = strings.TrimSpace(docs[0].Text())
+	default:
+		var b strings.Builder
+		for i, d := range docs {
+			if i > 0 {
+				b.WriteString("\n\n")
+			}
+			b.WriteString(strings.TrimSpace(d.Text()))
+		}
+		txt = b.String()
+	}
+	return txt
 }
 
 // DefaultNameFunc holds the default function used by [Generate]

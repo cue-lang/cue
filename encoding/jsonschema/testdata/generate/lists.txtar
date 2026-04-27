@@ -52,13 +52,16 @@ badTupleType: {
 	type:    "object"
 	properties: {
 		emptyList: {
+			description: "Empty list"
 			const: []
 		}
 		emptyOpenList: {
-			type: "array"
+			type:        "array"
+			description: "Empty open list"
 		}
 		mixedTuple: {
-			type: "array"
+			type:        "array"
+			description: "Mixed tuple with concrete values"
 			prefixItems: [{
 				type: "string"
 			}, {
@@ -70,19 +73,22 @@ badTupleType: {
 			minItems: 3
 		}
 		numberList: {
-			type: "array"
+			type:        "array"
+			description: "Open list with number elements"
 			items: {
 				type: "number"
 			}
 		}
 		stringList: {
-			type: "array"
+			type:        "array"
+			description: "Open list with element type"
 			items: {
 				type: "string"
 			}
 		}
 		tuple: {
-			type: "array"
+			type:        "array"
+			description: "Closed list (tuple)"
 			prefixItems: [{
 				type: "string"
 			}, {
@@ -102,9 +108,9 @@ badStringList.data.stringList.2: conflicting values 3 and string (mismatched typ
     ./datatest/tests.cue:14:27
 -- out/generate-v3/badTupleLength --
 badTupleLength.data.tuple: incompatible list lengths (1 and 3):
-    1:404
+    1:639
 badTupleLength.data.tuple: incompatible list lengths (1 and 3):
-    1:470
+    1:705
 -- out/generate-v3/badTupleType --
 badTupleType.data.tuple.0: conflicting values 1 and string (mismatched types int and string):
     ./datatest/tests.cue:24:16

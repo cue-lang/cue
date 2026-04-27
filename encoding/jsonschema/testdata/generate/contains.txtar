@@ -41,7 +41,8 @@ ok2: data: {}
 	type:    "object"
 	properties: {
 		complexContains: {
-			type: "array"
+			type:        "array"
+			description: "Contains with complex schema"
 			contains: {
 				type: "object"
 				properties: {
@@ -59,28 +60,33 @@ ok2: data: {}
 		}
 		p1: {
 			type:        "array"
+			description: "Contains with default minimum (1)"
 			contains:    true
 			minContains: 1
 		}
 		p2: {
 			type:        "array"
+			description: "Contains with minimum 0"
 			contains:    true
 			minContains: 0
 		}
 		p3: {
 			type:        "array"
+			description: "Contains with minimum and maximum"
 			contains:    true
 			maxContains: 6
 			minContains: 1
 		}
 		p4: {
 			type:        "array"
+			description: "Contains with minimum 3 and maximum 6"
 			contains:    true
 			maxContains: 6
 			minContains: 3
 		}
 		stringContains: {
-			type: "array"
+			type:        "array"
+			description: "Contains with a specific schema"
 			contains: {
 				type: "string"
 			}

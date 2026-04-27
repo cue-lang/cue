@@ -1,0 +1,68 @@
+-- test.cue --
+// This is the root description.
+package test
+
+// A name field.
+name!: string
+
+age?: int
+
+// A user definition.
+#User: {
+	// The user's email.
+	email!: string
+	phone?: string
+}
+
+// The primary user.
+user?: #User
+
+-- datatest/tests.cue --
+package datatest
+simple: {
+	data: {name: "Alice", user: {email: "alice@example.com"}}
+}
+missingName: {
+	data: {age: 30}
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		"#User": {
+			type:                 "object"
+			description:          "A user definition."
+			additionalProperties: false
+			properties: {
+				email: {
+					type:        "string"
+					description: "The user's email."
+				}
+				phone: {
+					type: "string"
+				}
+			}
+			required: ["email"]
+		}
+	}
+	type:        "object"
+	description: "This is the root description."
+	properties: {
+		age: {
+			type: "integer"
+		}
+		name: {
+			type:        "string"
+			description: "A name field."
+		}
+		user: {
+			description: "The primary user."
+			$ref:        "#/$defs/%23User"
+		}
+	}
+	required: ["name"]
+}
+-- out/generate-v3/simple --
+-- out/generate-v3/missingName --
+missingName.data.name: field is required but not present

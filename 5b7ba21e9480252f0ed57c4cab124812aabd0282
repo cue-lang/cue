@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f63c804_0f31279c",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T14:17:55Z",
+      "side": 1,
+      "message": "Deleted for now.",
+      "parentUuid": "62314ded_fe5cff8a",
+      "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6716468_3db46f5b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-22T13:49:15Z",
       "side": 1,
       "message": "can we briefly document these new methods?",
+      "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50291109_62755593",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T14:17:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6716468_3db46f5b",
       "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2c95ec3_b52d4c0f",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T14:17:55Z",
+      "side": 1,
+      "message": "hoisted",
+      "parentUuid": "5399bb65_6dbf75d7",
+      "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b3813b0_e9354059",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-22T13:49:15Z",
       "side": 1,
       "message": "avoid extra whitespaces changes like this if you can",
+      "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97795021_ea8536d7",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T14:17:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b3813b0_e9354059",
       "revId": "5b7ba21e9480252f0ed57c4cab124812aabd0282",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

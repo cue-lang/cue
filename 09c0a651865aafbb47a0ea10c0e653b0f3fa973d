@@ -16,6 +16,24 @@
       "message": "Can I suggest the better thing to do here is have a `/tmp/` entry, and then whatever can safely go in `/tmp` in the root of a repo, including cache stuff.",
       "revId": "09c0a651865aafbb47a0ea10c0e653b0f3fa973d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c1f5827_ec2a6f1a",
+        "filename": ".gitignore",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-27T14:13:06Z",
+      "side": 1,
+      "message": "That\u0027s usually what happens. This is just a fallback in case it doesn\u0027t. It is just a unnecessary time sync to have to deal with such a derailment.",
+      "parentUuid": "b425dfec_2e8e7baf",
+      "revId": "09c0a651865aafbb47a0ea10c0e653b0f3fa973d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

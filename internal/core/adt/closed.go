@@ -96,6 +96,16 @@ func (v *Vertex) ShouldRecursivelyClose() bool {
 	return v.state.embedsRecursivelyClosed
 }
 
+// ShouldClose reports whether this vertex should be closed non-recursively
+// using __reclose. This is set when a non-recursively closed value (e.g.
+// from close()) was embedded through a spread operator.
+func (v *Vertex) ShouldClose() bool {
+	if v.state == nil {
+		return false
+	}
+	return v.state.embedsClosed
+}
+
 // posInfo is a compact representation of position information for error reporting.
 // It stores only the essential fields needed for tracking positions and priority,
 // saving significant memory compared to the full CloseInfo struct.

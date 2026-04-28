@@ -348,8 +348,13 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo.enclosingEmbed != 0 {
 		closeInfo.FromDef = false
 	}
-	if arc.ClosedRecursive && c.CloseInfo.Opened {
-		n.embedsRecursivelyClosed = true
+	if c.CloseInfo.Opened {
+		if arc.ClosedRecursive {
+			n.embedsRecursivelyClosed = true
+		}
+		if arc.ClosedNonRecursive {
+			n.embedsClosed = true
+		}
 	}
 
 	// disjunctions, we need to dereference he underlying node.

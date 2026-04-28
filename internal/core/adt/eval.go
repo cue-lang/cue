@@ -348,6 +348,11 @@ type nodeContextState struct {
 	// result will just be an unnecessary call to __reclose.
 	embedsRecursivelyClosed bool
 
+	// embedsClosed is the non-recursive counterpart of
+	// embedsRecursivelyClosed. It is set when a vertex that is
+	// non-recursively closed is embedded through a spread operator.
+	embedsClosed bool
+
 	// isCompleting > 0 indicates whether a call to completeNodeTasks is in
 	// progress.
 	isCompleting int

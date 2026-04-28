@@ -14,6 +14,10 @@ type Metadata struct {
 	VCSType       string    `json:"org.cuelang.vcs-type"`
 	VCSCommit     string    `json:"org.cuelang.vcs-commit"`
 	VCSCommitTime time.Time `json:"org.cuelang.vcs-commit-time"`
+
+	// GoPluginModuleVersion holds the version of the Go module
+	// co-located with the CUE module that provides Go plugin code.
+	GoPluginModuleVersion string `json:"org.cuelang.go-plugin-module-version,omitempty"`
 }
 
 func newMetadataFromAnnotations(annotations map[string]string) (*Metadata, error) {
@@ -32,10 +36,17 @@ func newMetadataFromAnnotations(annotations map[string]string) (*Metadata, error
 }
 
 func (m *Metadata) annotations() (map[string]string, error) {
-	// The "is-empty" checks don't work for time.Time
-	// so check explicitly.
-	if m.VCSCommitTime.IsZero() {
-		return nil, fmt.Errorf("no commit time in metadata")
+	hasVCS := m.VCSType != "" || m.VCSCommit != "" || !m.VCSCommitTime.IsZero()
+	if hasVCS {
+		if m.VCSType == "" {
+			return nil, fmt.Errorf("empty metadata value for field %q", "org.cuelang.vcs-type")
+		}
+		if m.VCSCommit == "" {
+			return nil, fmt.Errorf("empty metadata value for field %q", "org.cuelang.vcs-commit")
+		}
+		if m.VCSCommitTime.IsZero() {
+			return nil, fmt.Errorf("no commit time in metadata")
+		}
 	}
 	// TODO if this ever turned out to be a bottleneck we could
 	// improve performance by avoiding the round-trip through JSON.
@@ -51,8 +62,16 @@ func (m *Metadata) annotations() (map[string]string, error) {
 	}
 	for field, val := range annotations {
 		if val == "" {
-			return nil, fmt.Errorf("empty metadata value for field %q", field)
+			delete(annotations, field)
 		}
+	}
+	// time.Time zero value marshals to a non-empty string;
+	// remove it when VCS info isn't present.
+	if !hasVCS {
+		delete(annotations, "org.cuelang.vcs-commit-time")
+	}
+	if len(annotations) == 0 {
+		return nil, fmt.Errorf("no metadata values set")
 	}
 	return annotations, nil
 }

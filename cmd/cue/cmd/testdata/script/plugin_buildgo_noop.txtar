@@ -1,0 +1,24 @@
+# Test that cue plugin build-go reports "no plugins needed" when there are none.
+
+exec cue plugin build-go
+stderr 'no plugins needed'
+
+# Verify no generated file was created.
+! exists cue_plugins_gen.go
+
+-- go.mod --
+module test.example
+
+go 1.25
+
+-- main.go --
+package main
+
+-- cue.mod/module.cue --
+module: "test.example@v0"
+language: version: "v0.17.0"
+
+-- main.cue --
+package main
+
+x: 42

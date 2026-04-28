@@ -1,0 +1,65 @@
+# Test that cue plugin build-go respects --package, --func, and --output flags.
+
+env CUE_CONFIG_DIR=$WORK/.cueconfig
+mkdir $CUE_CONFIG_DIR
+cp allow-trust.cue $CUE_CONFIG_DIR/plugin-trust.cue
+
+exec cue plugin build-go --package=mypkg --func=MyPlugins --output=plugins_gen.go
+
+# Verify generated file has the right name.
+exists plugins_gen.go
+! exists cue_plugins_gen.go
+
+# Verify the generated Go file uses the custom package and function name.
+grep 'package mypkg' plugins_gen.go
+grep 'func MyPlugins' plugins_gen.go
+
+-- go.mod --
+module test.example
+
+go 1.25
+
+-- main.go --
+package main
+
+-- cue.mod/module.cue --
+module: "test.example@v0"
+language: version: "v0.17.0"
+deps: {
+	"example.com/strutil@v0": {
+		v: "v0.0.1"
+	}
+}
+
+-- main.cue --
+package main
+
+import "example.com/strutil"
+
+upper: strutil.Upper("hello")
+
+-- _registry/example.com_strutil_v0.0.1/cue.mod/module.cue --
+module: "example.com/strutil@v0"
+language: version: "v0.17.0"
+-- _registry/example.com_strutil_v0.0.1/strutil.cue --
+@extern(go, import=("example.com/gostrutil"))
+package strutil
+
+Upper: _ @go(gostrutil.Upper)
+-- _registry/example.com_strutil_v0.0.1/go.mod --
+module example.com/strutil
+go 1.21
+require example.com/gostrutil v0.1.0
+-- .gomodproxy/_enable_overlay --
+-- .gomodproxy/example.com_gostrutil_v0.1.0/go.mod --
+module example.com/gostrutil
+-- .gomodproxy/example.com_gostrutil_v0.1.0/util.go --
+package gostrutil
+
+import "strings"
+
+func Upper(s string) string {
+	return strings.ToUpper(s)
+}
+-- allow-trust.cue --
+rules: [{effect: "allow", cueModule: "..."}]

@@ -27,7 +27,7 @@ package foo
 
 #A: a: int
 
-X: __reclose({
-	#A...
-})
+X: {
+	#A
+}
 #Y: {#A...}

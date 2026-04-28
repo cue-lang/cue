@@ -360,13 +360,13 @@ func findGoMod(dir string, cache map[string]goModule, cueModuleRoot string) (goM
 	}
 }
 
-// goModuleForPackage finds which Go module in the given go.mod provides
+// requirementForPackage finds which Go module in the given go.mod provides
 // the specified package path as imported inside the given CUE instance.
 //
 // If the package is not found as a requirement in the Go module, we
 // don't have a version for it, so we first attempt to find a version
-// by using the commit from the CUE module metadata, falling back
-// to using a directory replace directive if that isn't present.
+// from the Go plugin module version in the CUE module metadata,
+// falling back to using a directory replace directive if that isn't present.
 func requirementForPackage(ctx context.Context, regClient *modregistry.Client, goMod goModule, pkgPath string, foundIn *build.Instance) (goModRequire, error) {
 	var req goModRequire
 	for _, mreq := range goMod.mod.Require {
@@ -378,7 +378,7 @@ func requirementForPackage(ctx context.Context, regClient *modregistry.Client, g
 		}
 	}
 	if p := goMod.mod.Module.Mod.Path; req.Path == "" && hasPathPrefix(pkgPath, p) {
-		if v, ok := vcsVersion(ctx, regClient, foundIn); ok {
+		if v, ok := goPluginModuleVersion(ctx, regClient, foundIn); ok {
 			req = goModRequire{
 				Path:    goMod.path(),
 				Version: v,
@@ -731,12 +731,11 @@ func runGoCommand(cmd *Command, dir string, goArgs ...string) error {
 	return nil
 }
 
-// vcsVersion attempts to find a Go module version for a Go module
-// by looking up the VCS commit metadata from the CUE module registry.
-// It returns the commit hash and true if successful, or ("", false) if
-// no version could be determined. The raw commit hash is returned
-// directly; go mod tidy will resolve it to a proper pseudo-version.
-func vcsVersion(ctx context.Context, regClient *modregistry.Client, foundIn *build.Instance) (string, bool) {
+// goPluginModuleVersion looks up the Go plugin module version
+// from the CUE module registry metadata for the module that
+// the given instance was found in. It returns the version and true
+// if successful, or ("", false) if no version could be determined.
+func goPluginModuleVersion(ctx context.Context, regClient *modregistry.Client, foundIn *build.Instance) (string, bool) {
 	mv := foundIn.ModuleVersion
 	if mv.Version() == "" {
 		return "", false
@@ -750,10 +749,10 @@ func vcsVersion(ctx context.Context, regClient *modregistry.Client, foundIn *bui
 		return "", false
 	}
 	meta, err := m.Metadata()
-	if err != nil || meta == nil || meta.VCSCommit == "" {
+	if err != nil || meta == nil || meta.GoPluginModuleVersion == "" {
 		return "", false
 	}
-	return meta.VCSCommit, true
+	return meta.GoPluginModuleVersion, true
 }
 
 func newRegistryClient() (*modregistry.Client, error) {

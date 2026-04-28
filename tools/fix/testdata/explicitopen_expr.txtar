@@ -1,0 +1,366 @@
+
+#exp:explicitopen
+
+# Test __closeAll vs __reclose wrapper selection for various embedding patterns:
+# close() variants, conjunctions, disjunctions, and combinations with fields.
+
+#no-coverage
+
+-- cue.mod/module.cue --
+module: "builtins.test"
+
+language: version: "v0.15.0"
+
+-- in.cue --
+package foo
+
+#A: a: int
+#D: x: int
+_repo: {}
+
+// close()-oAnd indeed, the post-fix is incorrect. nly embedding → no change needed.
+closeOnly: {
+	v: {
+		close({a: int})
+		b: int
+	}
+	t1: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
+	t2: v & {b: 1}   @test(eq, {b: 1, a: int})
+}
+
+
+
+// close() + non-def reference → __reclose wraps struct, close() left as-is.
+closeAndRef: {
+	v: {
+		close({a: int})
+		_repo
+	}
+
+	t1: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
+	t2: v & {a: 1}   @test(eq, {a: 1})
+}
+
+
+
+// Mixed definition + close() → __closeAll wraps struct, close() left as-is.
+mixedDefClose: {
+	#E: x: y: {}
+	v: {
+		#E
+		close({b: c: {}})
+	}
+
+	t1: v & {c: 1}       @test(err, code=eval, path=c, contains="field not allowed")
+	t2: v & {b: d: 1}    @test(err, code=eval, contains="field not allowed")
+	t3: v & {b: c: d: 1} @test(err, code=eval, contains="field not allowed")
+	t4: v & {b: c: {}}   @test(eq, {b: {c: {}}, x: {y: {}}})
+	t5: v & {x: y: {}}   @test(eq, {x: {y: {}}, b: {c: {}}})
+
+}
+
+
+// Conjunct → single embed, simplified.
+conjunct: {
+	#A: a: int
+	_repo: {}
+
+	v: {
+		#A & _repo
+	}
+
+	t1: v & {a: 1} @test(eq, {a: 1})
+	t2: v & {b: 1} @test(err, code=eval)
+}
+
+#C1: {a?: int, c: int}
+#C2: {b?: int, c: int}
+conjunctComplex: {
+	v: {
+		#C1 & #C2
+		d: int
+	}
+	// TODO:
+	// The new semantics is more permissive here:
+	// t1: v & {a: 1} @test(err, code=eval)
+	// t2: v & {b: 1} @test(err, code=eval)
+
+	t3: v & {c: 1} @test(eq, {
+		c: 1
+		d: int
+		a?: _|_
+		b?: _|_
+	})
+	t4: v & {d: 1} @test(eq, {
+		d: 1
+		a?: _|_
+		c: int
+		b?: _|_
+	})
+	t5: v & {e: 1} @test(err, code=eval)
+}
+
+
+// Disjunct → single embed, simplified.
+disjunct: {
+	#A | _repo
+}
+
+// Parenthesized conjunct.
+parenConj: {
+	(#A & _repo)
+}
+
+// Embedded close() with def arg → __closeAll wraps, close() left as-is.
+embeddedCloseOnly: {
+	close(#A)
+}
+
+// Embedded close() with def arg + extra field → __closeAll wraps.
+embeddedCloseField: {
+	#A: a: int
+	v: {
+		close(#A)
+		b: int
+	}
+
+	t1: v & {a: 1} @test(eq, {a: 1, b: int})
+	t2: v & {b: 1} @test(eq, {b: 1, a: int})
+	t3: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// Conjunction with extra field → not simplified, __closeAll wraps.
+conjunctField: {
+	#A & _repo
+	b: int
+}
+
+// Disjunction with extra field → not simplified, __reclose wraps.
+disjunctField: {
+	#A | _repo
+	b: int
+}
+
+// Pure-definition disjunction → __closeAll (all operands are defs).
+disjunctDefs: {
+	#A | #D
+}
+
+// and() with extra field → not simplified, __reclose wraps.
+andField: {
+	#A: {a: int, b?: int}
+	#D: {a: int, c?: int}
+	v: {
+		and([#A, #D])
+		b: int
+	}
+
+	t1: v & {a: 1} @test(eq, {a: 1, b: int, c?: _|_})
+	t2: v & {b: 1} @test(eq, {a: int, b: 1, c?: _|_})
+
+	// TODO: the new semantics is more permissive here:
+	// t3: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// or() with extra field → not simplified, __reclose wraps.
+orField: {
+	or([#A, #D])
+	b: int
+}
+
+-- out/errors.txt --
+[eval] closeOnly.t1.c: field not allowed:
+    ./in.cue:13:11
+[eval] closeAndRef.t1.c: field not allowed:
+    ./in.cue:26:11
+[eval] mixedDefClose.t1.c: field not allowed:
+    ./in.cue:40:11
+[eval] mixedDefClose.t2.b.d: field not allowed:
+    ./in.cue:41:14
+[eval] mixedDefClose.t3.b.c.d: field not allowed:
+    ./in.cue:42:17
+[eval] conjunct.t2.b: field not allowed:
+    ./in.cue:59:11
+[eval] conjunctComplex.v.a: field not allowed:
+    ./in.cue:62:7
+[eval] conjunctComplex.v.b: field not allowed:
+    ./in.cue:63:7
+[eval] conjunctComplex.t3.a: field not allowed:
+    ./in.cue:62:7
+[eval] conjunctComplex.t3.b: field not allowed:
+    ./in.cue:63:7
+[eval] conjunctComplex.t4.a: field not allowed:
+    ./in.cue:62:7
+[eval] conjunctComplex.t4.b: field not allowed:
+    ./in.cue:63:7
+[eval] conjunctComplex.t5.e: field not allowed:
+    ./in.cue:86:11
+[eval] conjunctComplex.t5.a: field not allowed:
+    ./in.cue:62:7
+[eval] conjunctComplex.t5.b: field not allowed:
+    ./in.cue:63:7
+[eval] embeddedCloseField.t3.c: field not allowed:
+    ./in.cue:115:11
+[eval] andField.v.c: field not allowed:
+    ./in.cue:138:15
+[eval] andField.t1.c: field not allowed:
+    ./in.cue:138:15
+[eval] andField.t2.c: field not allowed:
+    ./in.cue:138:15
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "builtins.test"
+language: {
+	version: "v0.15.0"
+}
+--- in.cue
+@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+#D: x: int
+_repo: {}
+
+// close()-oAnd indeed, the post-fix is incorrect. nly embedding → no change needed.
+closeOnly: {
+	v: close({
+		{a: int}
+		b: int
+	})
+	t1: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
+	t2: v & {b: 1} @test(eq, {b: 1, a: int})
+}
+
+// close() + non-def reference → __reclose wraps struct, close() left as-is.
+closeAndRef: {
+	v: close(__reclose({
+		{a: int}
+		_repo...
+	}))
+
+	t1: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
+	t2: v & {a: 1} @test(eq, {a: 1})
+}
+
+// Mixed definition + close() → __closeAll wraps struct, close() left as-is.
+mixedDefClose: {
+	#E: x: y: {}
+	v: __closeAll({
+		#E...
+		{b: c: {}}
+	})
+
+	t1: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+	t2: v & {b: d: 1} @test(err, code=eval, contains="field not allowed")
+	t3: v & {b: c: d: 1} @test(err, code=eval, contains="field not allowed")
+	t4: v & {b: c: {}} @test(eq, {b: {c: {}}, x: {y: {}}})
+	t5: v & {x: y: {}} @test(eq, {x: {y: {}}, b: {c: {}}})
+}
+
+// Conjunct → single embed, simplified.
+conjunct: {
+	#A: a: int
+	_repo: {}
+
+	v: {
+		#A & _repo
+	}
+
+	t1: v & {a: 1} @test(eq, {a: 1})
+	t2: v & {b: 1} @test(err, code=eval)
+}
+
+#C1: {a?: int, c: int}
+#C2: {b?: int, c: int}
+conjunctComplex: {
+	v: __closeAll({
+		(#C1 & #C2)...
+		d: int
+	})
+	// TODO:
+	// The new semantics is more permissive here:
+	// t1: v & {a: 1} @test(err, code=eval)
+	// t2: v & {b: 1} @test(err, code=eval)
+
+	t3: v & {c: 1} @test(eq, {
+		c: 1
+		d: int
+		a?: _|_
+		b?: _|_
+	})
+	t4: v & {d: 1} @test(eq, {
+		d: 1
+		a?: _|_
+		c: int
+		b?: _|_
+	})
+	t5: v & {e: 1} @test(err, code=eval)
+}
+
+// Disjunct → single embed, simplified.
+disjunct: {
+	#A | _repo
+}
+
+// Parenthesized conjunct.
+parenConj: {
+	(#A & _repo)
+}
+
+// Embedded close() with def arg → __closeAll wraps, close() left as-is.
+embeddedCloseOnly: {
+	#A
+}
+
+// Embedded close() with def arg + extra field → __closeAll wraps.
+embeddedCloseField: {
+	#A: a: int
+	v: __closeAll({
+		#A...
+		b: int
+	})
+
+	t1: v & {a: 1} @test(eq, {a: 1, b: int})
+	t2: v & {b: 1} @test(eq, {b: 1, a: int})
+	t3: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// Conjunction with extra field → not simplified, __closeAll wraps.
+conjunctField: __closeAll({
+	(#A & _repo)...
+	b: int
+})
+
+// Disjunction with extra field → not simplified, __reclose wraps.
+disjunctField: __reclose({
+	(#A | _repo)...
+	b: int
+})
+
+// Pure-definition disjunction → __closeAll (all operands are defs).
+disjunctDefs: {
+	#A | #D
+}
+
+// and() with extra field → not simplified, __reclose wraps.
+andField: {
+	#A: {a: int, b?: int}
+	#D: {a: int, c?: int}
+	v: __reclose({
+		and([#A, #D])...
+		b: int
+	})
+
+	t1: v & {a: 1} @test(eq, {a: 1, b: int, c?: _|_})
+	t2: v & {b: 1} @test(eq, {a: int, b: 1, c?: _|_})
+
+	// TODO: the new semantics is more permissive here:
+	// t3: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// or() with extra field → not simplified, __reclose wraps.
+orField: __reclose({
+	or([#A, #D])...
+	b: int
+})

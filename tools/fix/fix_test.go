@@ -120,7 +120,7 @@ package foo
 #A: a: int
 #B: b: int
 
-X: __reclose({
+X: __closeAll({
 	#A... // foo
 
 	// bar

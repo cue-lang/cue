@@ -1,5 +1,6 @@
 
 #exp:aliasv2
+#no-coverage
 
 -- cue.mod/module.cue --
 module: "test.example"
@@ -12,7 +13,7 @@ package foo
 // Simple field alias
 X=a: {
 	foo: 1
-	bar: X.foo + 2
+	bar: X.foo + 2 @test(eq, 3)
 }
 
 // Multiple aliases
@@ -20,8 +21,9 @@ Y=b: {
 	data: 42
 }
 Z=c: {
-	val: Y.data
+	val: Y.data @test(eq, 42)
 }
+zref: Z.val @test(eq, 42)
 -- b.cue --
 package foo
 
@@ -31,9 +33,9 @@ outer: {
 		Leaf=deep: {
 			value: 1
 		}
-		ref: Leaf.value
+		ref: Leaf.value @test(eq, 1)
 	}
-	ref2: Inner.Leaf.value
+	ref2: Inner.deep.value @test(eq, 1)
 }
 -- c.cue --
 package foo
@@ -42,10 +44,12 @@ package foo
 OptField=a?: {
 	value: 1
 }
+optRef: OptField.value
 
 ReqField=b!: {
 	value: 2
 }
+reqRef: ReqField.value
 -- d.cue --
 // Already has postfix alias experiment, so do not do any changes.
 @experiment(aliasv2)
@@ -55,6 +59,7 @@ package foo
 a~X: {
 	foo: 1
 }
+ref: X.foo
 -- e.cue --
 package foo
 
@@ -73,6 +78,9 @@ schema: {
 -- f.cue --
 package foo
 
+x:    "key"
+name: "dyn"
+
 // Dynamic fields with old alias syntax
 DynAlias=(x): {
 	field: 1
@@ -90,6 +98,7 @@ DynInterpAlias=("\(name)"): {
 	val: 3
 	ref: InterpAlias.val
 }
+dynRef: DynInterpAlias.val
 // Just the interpolation
 InterpAlias="\(name)": {
 	val: 3
@@ -100,22 +109,22 @@ package foo
 
 // Value aliases - old syntax X={...}
 // Should convert to let with self
-foo: X={
-	x: X.a
-	y: X.b
+valAlias: X={
+	x: X.a @test(eq, 1)
+	y: X.b @test(eq, 2)
 	a: 1
 	b: 2
 }
 
-bar: Y={
-	data: Y.x + 10
+computed: Y={
+	data: Y.x + 10 @test(eq, 15)
 	x: 5
 }
 
 // Nested value alias
-outer: {
+nested: {
 	inner: Z={
-		value: Z.n * 2
+		value: Z.n * 2 @test(eq, 6)
 		n: 3
 	}
 }
@@ -123,11 +132,11 @@ outer: {
 // Multiple fields with value aliases
 multi: {
 	first: A={
-		val: A.base * 2
+		val: A.base * 2 @test(eq, 20)
 		base: 10
 	}
 	second: B={
-		val: B.base * 3
+		val: B.base * 3 @test(eq, 60)
 		base: 20
 	}
 }
@@ -141,7 +150,7 @@ package foo
 
 // Field named self in same struct
 samestruct: X={
-	i:    X.self
+	i:    X.self @test(eq, 42)
 	self: 42
 }
 
@@ -149,7 +158,7 @@ samestruct: X={
 enclosingfield: {
 	self: 42
 	inner: X={
-		i: X.a
+		i: X.a @test(eq, 1)
 		a: 1
 	}
 }
@@ -158,9 +167,9 @@ enclosingfield: {
 enclosinglet: {
 	let self = {z: 99}
 	inner: X={
-		i: X.a
+		i: X.a @test(eq, 1)
 		a: 1
-		j: self.z
+		j: self.z @test(eq, 99)
 	}
 }
 
@@ -169,9 +178,9 @@ aliassamescope: {
 	self=bar: {
 		data: 1
 	}
-	baz: self.data
-	foo: X={
-		i: X.a
+	baz: self.data @test(eq, 1)
+	valAlias: X={
+		i: X.a @test(eq, 1)
 		a: 1
 	}
 }
@@ -181,10 +190,10 @@ aliasenclosing: {
 	self=bar: {
 		data: 1
 	}
-	baz: self.data
+	baz: self.data @test(eq, 1)
 	inner: {
-		foo: X={
-			i: X.a
+		valAlias: X={
+			i: X.a @test(eq, 1)
 			a: 1
 		}
 	}
@@ -203,7 +212,7 @@ package foo
 // Simple field alias
 a~(X): {
 	foo: 1
-	bar: X.foo + 2
+	bar: X.foo + 2 @test(eq, 3)
 }
 
 // Multiple aliases
@@ -211,8 +220,9 @@ b~(Y): {
 	data: 42
 }
 c~(Z): {
-	val: Y.data
+	val: Y.data @test(eq, 42)
 }
+zref: Z.val @test(eq, 42)
 --- b.cue
 @experiment(aliasv2)
 
@@ -224,9 +234,9 @@ outer: {
 		deep~(Leaf): {
 			value: 1
 		}
-		ref: Leaf.value
+		ref: Leaf.value @test(eq, 1)
 	}
-	ref2: Inner.Leaf.value
+	ref2: Inner.deep.value @test(eq, 1)
 }
 --- c.cue
 @experiment(aliasv2)
@@ -237,9 +247,11 @@ package foo
 a~(OptField)?: {
 	value: 1
 }
+optRef: OptField.value
 b~(ReqField)!: {
 	value: 2
 }
+reqRef: ReqField.value
 --- d.cue
 // Already has postfix alias experiment, so do not do any changes.
 @experiment(aliasv2)
@@ -249,6 +261,7 @@ package foo
 a~(X): {
 	foo: 1
 }
+ref: X.foo
 --- e.cue
 @experiment(aliasv2)
 
@@ -271,6 +284,9 @@ schema: {
 
 package foo
 
+x:    "key"
+name: "dyn"
+
 // Dynamic fields with old alias syntax
 (x)~(DynAlias): {
 	field: 1
@@ -288,6 +304,7 @@ package foo
 	val: 3
 	ref: InterpAlias.val
 }
+dynRef: DynInterpAlias.val
 // Just the interpolation
 "\(name)"~(InterpAlias): {
 	val: 3
@@ -300,25 +317,25 @@ package foo
 
 // Value aliases - old syntax X={...}
 // Should convert to let with self
-foo: {
+valAlias: {
 	let X = self
-	x: X.a
-	y: X.b
+	x: X.a @test(eq, 1)
+	y: X.b @test(eq, 2)
 	a: 1
 	b: 2
 }
 
-bar: {
+computed: {
 	let Y = self
-	data: Y.x + 10
+	data: Y.x + 10 @test(eq, 15)
 	x:    5
 }
 
 // Nested value alias
-outer: {
+nested: {
 	inner: {
 		let Z = self
-		value: Z.n * 2
+		value: Z.n * 2 @test(eq, 6)
 		n:     3
 	}
 }
@@ -327,12 +344,12 @@ outer: {
 multi: {
 	first: {
 		let A = self
-		val:  A.base * 2
+		val:  A.base * 2 @test(eq, 20)
 		base: 10
 	}
 	second: {
 		let B = self
-		val:  B.base * 3
+		val:  B.base * 3 @test(eq, 60)
 		base: 20
 	}
 }
@@ -349,7 +366,7 @@ package foo
 // Field named self in same struct
 samestruct: {
 	let X = __self
-	i:    X.self
+	i:    X.self @test(eq, 42)
 	self: 42
 }
 
@@ -358,7 +375,7 @@ enclosingfield: {
 	self: 42
 	inner: {
 		let X = __self
-		i: X.a
+		i: X.a @test(eq, 1)
 		a: 1
 	}
 }
@@ -368,9 +385,9 @@ enclosinglet: {
 	let self = {z: 99}
 	inner: {
 		let X = __self
-		i: X.a
+		i: X.a @test(eq, 1)
 		a: 1
-		j: self.z
+		j: self.z @test(eq, 99)
 	}
 }
 
@@ -379,10 +396,10 @@ aliassamescope: {
 	bar~(self): {
 		data: 1
 	}
-	baz: self.data
-	foo: {
+	baz: self.data @test(eq, 1)
+	valAlias: {
 		let X = __self
-		i: X.a
+		i: X.a @test(eq, 1)
 		a: 1
 	}
 }
@@ -392,11 +409,11 @@ aliasenclosing: {
 	bar~(self): {
 		data: 1
 	}
-	baz: self.data
+	baz: self.data @test(eq, 1)
 	inner: {
-		foo: {
+		valAlias: {
 			let X = __self
-			i: X.a
+			i: X.a @test(eq, 1)
 			a: 1
 		}
 	}

@@ -24,6 +24,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -35,6 +36,7 @@ import (
 	ocispecroot "github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/spf13/cobra"
+	gomodfile "golang.org/x/mod/modfile"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modload"
@@ -71,6 +73,7 @@ https://github.com/opencontainers/image-spec/blob/8f3820ccf8f65db8744e626df17fe8
 	cmd.Flags().BoolP(string(flagDryRun), "n", false, "only run simulation")
 	cmd.Flags().Bool(string(flagJSON), false, "print verbose information in JSON format (implies --dry-run)")
 	cmd.Flags().String(string(flagOut), "", "write module contents to specified directory in OCI Image Layout format (implies --dry-run)")
+	cmd.Flags().String(string(flagGoPluginModuleVersion), "", "version of the co-located Go plugin module (determined automatically if not specified)")
 
 	return cmd
 }
@@ -252,6 +255,18 @@ func runModUpload(cmd *Command, args []string) error {
 			VCSCommitTime: status.CommitTime,
 		}
 	}
+
+	goPluginVersion, err := resolveGoPluginModuleVersion(ctx, cmd, modRoot, meta)
+	if err != nil {
+		return err
+	}
+	if goPluginVersion != "" {
+		if meta == nil {
+			meta = &modregistry.Metadata{}
+		}
+		meta.GoPluginModuleVersion = goPluginVersion
+	}
+
 	info, err := zf.Stat()
 	if err != nil {
 		return err
@@ -644,4 +659,154 @@ func (r *publishRegistryShim) PushManifest(ctx context.Context, repoName string,
 	default:
 		return r.registry.PushManifest(ctx, repoName, tag, data, mediaType)
 	}
+}
+
+// resolveGoPluginModuleVersion checks for a co-located Go module in the
+// CUE module root and resolves its version. If there is no co-located Go
+// module it returns ("", nil).
+func resolveGoPluginModuleVersion(ctx context.Context, cmd *Command, modRoot string, meta *modregistry.Metadata) (string, error) {
+	explicitVersion := flagGoPluginModuleVersion.String(cmd)
+
+	goModPath := filepath.Join(modRoot, "go.mod")
+	goModData, err := os.ReadFile(goModPath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			if explicitVersion != "" {
+				return "", fmt.Errorf("--go-plugin-module-version specified but no go.mod found in module root")
+			}
+			return "", nil
+		}
+		return "", err
+	}
+
+	goMod, err := gomodfile.Parse(goModPath, goModData, nil)
+	if err != nil {
+		return "", fmt.Errorf("parsing go.mod: %v", err)
+	}
+	goModulePath := goMod.Module.Mod.Path
+
+	var version string
+	if explicitVersion != "" {
+		version = explicitVersion
+	} else {
+		if meta == nil || meta.VCSCommit == "" {
+			return "", fmt.Errorf("module contains co-located Go module %q but no VCS commit is available to determine its version; use --go-plugin-module-version to specify it", goModulePath)
+		}
+		version, err = queryGoModuleVersion(ctx, goModulePath, meta.VCSCommit)
+		if err != nil {
+			return "", fmt.Errorf("cannot determine version of co-located Go module %q from commit %s: %v\nuse --go-plugin-module-version to specify the version explicitly", goModulePath, meta.VCSCommit, err)
+		}
+	}
+
+	if err := verifyGoModuleContent(ctx, goModulePath, version, modRoot); err != nil {
+		return "", err
+	}
+
+	return version, nil
+}
+
+// queryGoModuleVersion queries the Go proxy to resolve a VCS commit hash
+// to a Go module version. It returns the canonical version string.
+func queryGoModuleVersion(ctx context.Context, goModulePath, commit string) (string, error) {
+	tmpDir, err := os.MkdirTemp("", "cue-publish-")
+	if err != nil {
+		return "", err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	if err := os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module temp\n"), 0o666); err != nil {
+		return "", err
+	}
+
+	goCmd := exec.CommandContext(ctx, "go", "list", "-m", "-json", goModulePath+"@"+commit)
+	goCmd.Dir = tmpDir
+	output, err := goCmd.Output()
+	if err != nil {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			return "", fmt.Errorf("%s\n%s", err, exitErr.Stderr)
+		}
+		return "", err
+	}
+
+	var info struct {
+		Version string `json:"Version"`
+	}
+	if err := json.Unmarshal(output, &info); err != nil {
+		return "", fmt.Errorf("parsing module info: %v", err)
+	}
+	if info.Version == "" {
+		return "", fmt.Errorf("no version returned for %s@%s", goModulePath, commit)
+	}
+	return info.Version, nil
+}
+
+// verifyGoModuleContent downloads the Go module at the given version
+// and verifies that its content matches the files in localDir.
+func verifyGoModuleContent(ctx context.Context, goModulePath, version, localDir string) error {
+	tmpDir, err := os.MkdirTemp("", "cue-publish-verify-")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	if err := os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module temp\n"), 0o666); err != nil {
+		return err
+	}
+
+	goCmd := exec.CommandContext(ctx, "go", "mod", "download", "-json", goModulePath+"@"+version)
+	goCmd.Dir = tmpDir
+	output, err := goCmd.Output()
+	if err != nil {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			return fmt.Errorf("downloading Go module for verification: %s\n%s", err, exitErr.Stderr)
+		}
+		return fmt.Errorf("downloading Go module for verification: %v", err)
+	}
+
+	var dlInfo struct {
+		Dir string `json:"Dir"`
+	}
+	if err := json.Unmarshal(output, &dlInfo); err != nil {
+		return fmt.Errorf("parsing module download info: %v", err)
+	}
+
+	return compareGoModuleContent(dlInfo.Dir, localDir)
+}
+
+// compareGoModuleContent compares every file in the downloaded Go module
+// directory against the corresponding file in the local directory. Files
+// present locally but absent from the Go module are ignored (they may be
+// CUE-only files).
+func compareGoModuleContent(goModDir, localDir string) error {
+	return filepath.WalkDir(goModDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		rel, err := filepath.Rel(goModDir, path)
+		if err != nil {
+			return err
+		}
+		localPath := filepath.Join(localDir, rel)
+
+		goContent, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("reading Go module file %s: %v", rel, err)
+		}
+		localContent, err := os.ReadFile(localPath)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				return fmt.Errorf("file %s exists in Go module but not in the CUE module", rel)
+			}
+			return fmt.Errorf("reading local file %s: %v", rel, err)
+		}
+		if !bytes.Equal(goContent, localContent) {
+			return fmt.Errorf("file %s differs between Go module %s and local copy", rel, filepath.Base(goModDir))
+		}
+		return nil
+	})
 }

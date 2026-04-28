@@ -1,0 +1,147 @@
+
+#exp:explicitopen
+
+# Test single-embed shorthands (where { expr } ≡ expr, so no wrapper needed)
+# and TODO comments generated inside comprehensions.
+
+-- cue.mod/module.cue --
+module: "shorthands.test"
+
+language: version: "v0.15.0"
+
+-- in.cue --
+package foo
+
+#A: a: int
+#D: x: int
+_repo: {}
+
+// Top-level definition embedding → opened with TODO.
+#A
+
+// Single definition embedding → use definition directly.
+singleDef: {
+	#D
+}
+
+// Embedded and() call → single embed, used directly.
+embeddedAnd: {
+	and([#A, #D])
+}
+
+// Embedded or() call → single embed, used directly.
+embeddedOr: {
+	or([#A, #D])
+}
+
+// Embedded pkg.Func() call → no change (std lib doesn't return closed).
+embeddedPkgFunc: {
+	len("foo")
+}
+
+// Embedded selector (e.g. foo.bar) → single embed, used directly.
+embeddedSel: {
+	_repo.foo
+}
+
+// Definition in comprehension → TODO.
+compDef: {
+	for v in _repo {
+		#D
+	}
+}
+
+// Non-def reference in comprehension → TODO.
+compRef: {
+	for v in _repo {
+		v
+	}
+}
+
+// Comprehension inside a list.
+inList: {
+	steps: [
+		for v in _repo.checkoutCode {v},
+		for v in _repo.installGo {v},
+		{
+			name: "foo"
+		},
+	]
+}
+
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "shorthands.test"
+language: {
+	version: "v0.15.0"
+}
+--- in.cue
+@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+#D: x: int
+_repo: {}
+
+// Top-level definition embedding → opened with TODO.
+// TODO(cue-fix): top-level definition embedding opened; if this is intended as a schema, remove the '...'.
+#A...
+
+// Single definition embedding → use definition directly.
+singleDef: {
+	#D
+}
+
+// Embedded and() call → single embed, used directly.
+embeddedAnd: {
+	and([#A, #D])
+}
+
+// Embedded or() call → single embed, used directly.
+embeddedOr: {
+	or([#A, #D])
+}
+
+// Embedded pkg.Func() call → no change (std lib doesn't return closed).
+embeddedPkgFunc: {
+	len("foo")
+}
+
+// Embedded selector (e.g. foo.bar) → single embed, used directly.
+embeddedSel: {
+	_repo.foo
+}
+
+// Definition in comprehension → TODO.
+compDef: __closeAll({
+	for v in _repo {
+		// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+		#D...
+	}
+})
+
+// Non-def reference in comprehension → TODO.
+compRef: __reclose({
+	for v in _repo {
+		// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+		v...
+	}
+})
+
+// Comprehension inside a list.
+inList: {
+	steps: [
+		for v in _repo.checkoutCode {
+			// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+			v...
+		},
+		for v in _repo.installGo {
+			// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+			v...
+		},
+		{
+			name: "foo"
+		},
+	]
+}

@@ -13,9 +13,11 @@ language: { version: "v0.14.0" }
 package foo
 
 #A: a: int
+A: #A
 
 X: {
-	#A
+	A
+	b: int
 }
 -- out/fixmod --
 --- cue.mod/module.cue
@@ -29,7 +31,9 @@ language: {
 package foo
 
 #A: a: int
+A: #A
 
 X: __reclose({
-	#A...
+	A...
+	b: int
 })

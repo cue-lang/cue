@@ -27,15 +27,6 @@ Y: {
 }
 
 _repo: {}
-inList: {
-	steps: [
-		for v in _repo.checkoutCode {v},
-		for v in installGo {v},
-		{
-			name: "foo"
-		},
-	]
-}
 inClose: {
 	workflows: close({
 		_repo
@@ -46,6 +37,13 @@ nestedStruct: {
 		{#foo}
 	}
 }
+nestedStructWithEmbed: {
+	a: {
+		{#Def}  // doesn't count as single.
+		b: int
+	}
+}
+
 -- b.cue --
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)
@@ -70,9 +68,9 @@ package foo
 
 #A: a: int
 
-X: __reclose({
-	#A...
-})
+X: {
+	#A
+}
 str: "bar"
 Y: {
 	// Do not add ellipsis where unnecessary.
@@ -86,23 +84,20 @@ Y: {
 }
 
 _repo: {}
-inList: {
-	steps: [
-		for v in _repo.checkoutCode {v...},
-		for v in installGo {v...},
-		{
-			name: "foo"
-		},
-	]
-}
 inClose: {
-	workflows: close(__reclose({
-		_repo...
-	}))
+	workflows: close({
+		_repo
+	})
 }
 nestedStruct: {
-	containsTrybotTrailer: __reclose({
+	containsTrybotTrailer: {
 		{#foo...}
+	}
+}
+nestedStructWithEmbed: {
+	a: __closeAll({
+		{#Def...} // doesn't count as single.
+		b: int
 	})
 }
 --- b.cue

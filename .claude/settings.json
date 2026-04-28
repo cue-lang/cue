@@ -69,12 +69,6 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:cue.gerrithub.io)",
       "WebSearch"
-    ],
-    "deny": [
-      "Bash(cat:*)",
-      "Bash(sed:*)",
-      "Bash(git -C:*)",
-      "Edit(//tmp/**/*)"
     ]
   }
 }

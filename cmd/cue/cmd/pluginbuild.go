@@ -138,7 +138,7 @@ func runPluginBuild(cmd *Command, args []string) error {
 	}
 	// Phase 3: Load packages with go/types to inspect function signatures,
 	// then generate the final main.go with typed wrappers.
-	imports, refEntries, err := resolveAndBuildRefs(pluginDir, resolved)
+	imports, refEntries, err := resolveAndBuildRefs(pluginDir, resolved, "")
 	if err != nil {
 		return err
 	}
@@ -427,7 +427,10 @@ type pluginRefEntry struct {
 
 // resolveAndBuildRefs loads the Go packages with type information and builds
 // the import list and reference entries needed for the final generated main.go.
-func resolveAndBuildRefs(pluginDir string, resolved []resolvedRef) ([]pluginImport, []pluginRefEntry, error) {
+// If localPkgPath is non-empty, that package is excluded from the returned
+// imports and its functions are referenced without a package qualifier
+// (because the generated code will be in the same package).
+func resolveAndBuildRefs(pluginDir string, resolved []resolvedRef, localPkgPath string) ([]pluginImport, []pluginRefEntry, error) {
 	pkgPaths := uniquePackages(resolved)
 
 	loadCfg := &packages.Config{
@@ -452,6 +455,10 @@ func resolveAndBuildRefs(pluginDir string, resolved []resolvedRef) ([]pluginImpo
 	aliasCount := map[string]int{}
 
 	for _, pkgPath := range pkgPaths {
+		if pkgPath == localPkgPath {
+			aliasForPkg[pkgPath] = ""
+			continue
+		}
 		pkg := pkgMap[pkgPath]
 		if pkg == nil {
 			return nil, nil, fmt.Errorf("package %s not found in loaded packages", pkgPath)
@@ -468,6 +475,9 @@ func resolveAndBuildRefs(pluginDir string, resolved []resolvedRef) ([]pluginImpo
 
 	var imports []pluginImport
 	for _, pkgPath := range pkgPaths {
+		if pkgPath == localPkgPath {
+			continue
+		}
 		imports = append(imports, pluginImport{
 			Alias: aliasForPkg[pkgPath],
 			Path:  pkgPath,
@@ -540,7 +550,10 @@ func buildWrapExpr(alias, funcName string, sig *types.Signature, qualifier types
 		return "", fmt.Errorf("function must return 1 or 2 values, got %d", results.Len())
 	}
 
-	qualifiedFunc := alias + "." + funcName
+	qualifiedFunc := funcName
+	if alias != "" {
+		qualifiedFunc = alias + "." + funcName
+	}
 
 	if hasError {
 		return fmt.Sprintf("cue.NewPureFunc%d(%s)", nParams, qualifiedFunc), nil

@@ -1,6 +1,6 @@
-# Test that cue plugin build uses VCS metadata from the CUE registry
-# to resolve Go module versions when the Go package is local to the
-# CUE module's own go.mod.
+# Test that cue plugin build uses the Go plugin module version metadata
+# from the CUE registry to resolve Go module versions when the Go
+# package is local to the CUE module's own go.mod.
 
 env CUE_CONFIG_DIR=$WORK/.cueconfig
 mkdir $CUE_CONFIG_DIR
@@ -49,7 +49,8 @@ upper: strutil.Upper("hello")
 {
     "org.cuelang.vcs-type": "git",
     "org.cuelang.vcs-commit": "abc123def4560ab45a53021fff95f24d9ab1b79a",
-    "org.cuelang.vcs-commit-time": "2024-07-15T10:30:00Z"
+    "org.cuelang.vcs-commit-time": "2024-07-15T10:30:00Z",
+    "org.cuelang.go-plugin-module-version": "v0.0.0-20240715103000-abc123def456"
 }
 -- _registry/example.com_strutil_v0.0.1/cue.mod/module.cue --
 module: "example.com/strutil@v0"

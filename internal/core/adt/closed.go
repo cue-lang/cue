@@ -83,17 +83,40 @@ func (v *Vertex) IsRecursivelyClosed() bool {
 	return v.ClosedRecursive
 }
 
-// ShouldRecursivelyClose reports whether this vertex should be closed
-// recursively using __reclose. This is to simulate compatibility mode
-// with the semantics from before explicitOpen was introduced.
-//
-// This is the case if any of the embeddings marked with ... were recursively
-// closed before opening them up with ....
-func (v *Vertex) ShouldRecursivelyClose() bool {
-	if v.state == nil {
-		return false
+// embedClosedness represents the strongest closedness level among vertices
+// embedded through a spread operator. Higher values take precedence.
+type embedClosedness uint8
+
+const (
+	embedOpen              embedClosedness = iota
+	embedNonRecursivelyClosed              // from close()
+	embedRecursivelyClosed                 // from definitions
+)
+
+// setEmbedClosedness upgrades the embed closedness level based on the
+// closedness of arc. Higher levels take precedence; never downgrades.
+func (n *nodeContext) setEmbedClosedness(arc *Vertex) {
+	switch {
+	case arc.ClosedRecursive:
+		n.embedClosedness = embedRecursivelyClosed
+	case arc.ClosedNonRecursive && n.embedClosedness < embedNonRecursivelyClosed:
+		n.embedClosedness = embedNonRecursivelyClosed
 	}
-	return v.state.embedsRecursivelyClosed
+}
+
+// ApplyEmbedClosedness sets ClosedRecursive or ClosedNonRecursive on v
+// based on the strongest closedness level among vertices embedded through
+// a spread operator. This is used by __reclose.
+func (v *Vertex) ApplyEmbedClosedness() {
+	if v.state == nil {
+		return
+	}
+	switch v.state.embedClosedness {
+	case embedRecursivelyClosed:
+		v.ClosedRecursive = true
+	case embedNonRecursivelyClosed:
+		v.ClosedNonRecursive = true
+	}
 }
 
 // posInfo is a compact representation of position information for error reporting.

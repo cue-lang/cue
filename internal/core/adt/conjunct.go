@@ -348,8 +348,8 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo.enclosingEmbed != 0 {
 		closeInfo.FromDef = false
 	}
-	if arc.ClosedRecursive && c.CloseInfo.Opened {
-		n.embedsRecursivelyClosed = true
+	if c.CloseInfo.Opened {
+		n.setEmbedClosedness(arc)
 	}
 
 	// disjunctions, we need to dereference he underlying node.
@@ -374,7 +374,9 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	switch isDef, _ := IsDef(c.Expr()); {
 	case isDef || arc.Label.IsDef() || closeInfo.TopDef:
 		if c.CloseInfo.Opened {
-			n.embedsRecursivelyClosed = true
+			// Definitions are always recursively closed, even if arc
+			// doesn't have ClosedRecursive set yet at this point.
+			n.embedClosedness = embedRecursivelyClosed
 		}
 		n.isDef = true
 		// n.node.ClosedRecursive = true // TODO: should we set this here?

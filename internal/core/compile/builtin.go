@@ -188,17 +188,24 @@ var recloseBuiltin = &adt.Builtin{
 		c := call.OpContext()
 
 		x := call.Expr(0)
-		switch x.(type) {
+		switch x := x.(type) {
 		case *adt.StructLit, *adt.ListLit:
 			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
 				// Allow usage if explicit open is set
 				return c.NewErrf("__reclose may only be used when explicitopen is enabled")
 			}
+		case *adt.CallExpr:
+			// Allow __reclose(close(...)) so that __reclose can wrap
+			// a close() call and conditionally add recursive closing.
+			if b, ok := x.Fun.(*adt.Builtin); !ok || b.Name != "close" {
+				return c.NewErrf("argument must be a struct or list literal, or a close() call")
+			}
+			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
+				return c.NewErrf("__reclose may only be used when explicitopen is enabled")
+			}
 		default:
 			return c.NewErrf("argument must be a struct or list literal")
 		}
-
-		// must be literal struct
 
 		// Note that we could have an embedded scalar here, so having a struct
 		// or list does not guarantee that the result is that as well.
@@ -207,8 +214,8 @@ var recloseBuiltin = &adt.Builtin{
 		//	a: __reclose({ #Def })
 		//
 		arg := call.Value(0)
-		if s, ok := arg.(*adt.Vertex); ok && s.ShouldRecursivelyClose() {
-			s.ClosedRecursive = true
+		if s, ok := arg.(*adt.Vertex); ok {
+			s.ApplyEmbedClosedness()
 		}
 
 		return arg

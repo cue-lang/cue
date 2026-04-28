@@ -16,6 +16,7 @@ extends the cue command with Go function implementations.
 `,
 	})
 	cmd.AddCommand(newPluginBuildCmd(c))
+	cmd.AddCommand(newPluginBuildGoCmd(c))
 	cmd.AddCommand(newPluginGenerateGoCmd(c))
 	cmd.AddCommand(newPluginInitGoCmd(c))
 	return cmd

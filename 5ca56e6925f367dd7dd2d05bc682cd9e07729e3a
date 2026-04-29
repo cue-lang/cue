@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "387fe1c5_85fd6db0",
+        "filename": "cue/ast/astutil/testdata/resolve/redeclared.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-29T09:53:33Z",
+      "side": 1,
+      "message": "Nor sure if we have to refer to a previous behavior.",
+      "revId": "5ca56e6925f367dd7dd2d05bc682cd9e07729e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

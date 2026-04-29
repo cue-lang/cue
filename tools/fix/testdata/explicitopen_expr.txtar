@@ -73,31 +73,28 @@ conjunct: {
 	t2: v & {b: 1} @test(err, code=eval)
 }
 
-#C1: {a?: int, c: int}
-#C2: {b?: int, c: int}
 conjunctComplex: {
+	#C1: {a?: int, c: int}
+	#C2: {b?: int, c: int}
 	v: {
 		#C1 & #C2
 		d: int
 	}
-	// TODO:
-	// The new semantics is more permissive here:
-	// t1: v & {a: 1} @test(err, code=eval)
-	// t2: v & {b: 1} @test(err, code=eval)
-
-	t3: v & {c: 1} @test(eq, {
-		c: 1
-		d: int
-		a?: _|_
-		b?: _|_
-	})
-	t4: v & {d: 1} @test(eq, {
-		d: 1
-		a?: _|_
-		c: int
-		b?: _|_
-	})
+	t1: v & {a: 1} @test(err, code=eval)
+	t2: v & {b: 1} @test(err, code=eval)
+	t3: v & {c: 1} @test(eq, { c: 1, d: int })
+	t4: v & {d: 1} @test(eq, { d: 1, c: int })
 	t5: v & {e: 1} @test(err, code=eval)
+
+	#C: #C1 & #C2
+	vb: {
+		#C
+		d: int
+	}
+	tb1: vb & {a: 1} @test(err, code=eval)
+	tb2: vb & {b: 1} @test(err, code=eval)
+	tb3: vb & {c: 1} @test(eq, { c: 1, d: int })
+	tb5: vb & {e: 1} @test(err, code=eval)
 }
 
 
@@ -182,31 +179,69 @@ orField: {
 [eval] conjunct.t2.b: field not allowed:
     ./in.cue:59:11
 [eval] conjunctComplex.v.a: field not allowed:
-    ./in.cue:62:7
+    ./in.cue:63:8
 [eval] conjunctComplex.v.b: field not allowed:
-    ./in.cue:63:7
+    ./in.cue:64:8
+[eval] conjunctComplex.t1.a: field not allowed:
+    ./in.cue:63:8
+    ./in.cue:69:11
+[eval] conjunctComplex.t1.b: field not allowed:
+    ./in.cue:64:8
+[eval] conjunctComplex.t2.b: field not allowed:
+    ./in.cue:64:8
+    ./in.cue:70:11
+[eval] conjunctComplex.t2.a: field not allowed:
+    ./in.cue:63:8
 [eval] conjunctComplex.t3.a: field not allowed:
-    ./in.cue:62:7
+    ./in.cue:63:8
 [eval] conjunctComplex.t3.b: field not allowed:
-    ./in.cue:63:7
+    ./in.cue:64:8
 [eval] conjunctComplex.t4.a: field not allowed:
-    ./in.cue:62:7
+    ./in.cue:63:8
 [eval] conjunctComplex.t4.b: field not allowed:
-    ./in.cue:63:7
+    ./in.cue:64:8
 [eval] conjunctComplex.t5.e: field not allowed:
-    ./in.cue:86:11
+    ./in.cue:73:11
 [eval] conjunctComplex.t5.a: field not allowed:
-    ./in.cue:62:7
+    ./in.cue:63:8
 [eval] conjunctComplex.t5.b: field not allowed:
-    ./in.cue:63:7
+    ./in.cue:64:8
+[eval] conjunctComplex.#C.a: field not allowed:
+    ./in.cue:63:8
+[eval] conjunctComplex.#C.b: field not allowed:
+    ./in.cue:64:8
+[eval] conjunctComplex.vb.a: field not allowed:
+    ./in.cue:63:8
+[eval] conjunctComplex.vb.b: field not allowed:
+    ./in.cue:64:8
+[eval] conjunctComplex.tb1.a: field not allowed:
+    ./in.cue:63:8
+    ./in.cue:80:13
+[eval] conjunctComplex.tb1.b: field not allowed:
+    ./in.cue:64:8
+[eval] conjunctComplex.tb2.b: field not allowed:
+    ./in.cue:64:8
+    ./in.cue:81:13
+[eval] conjunctComplex.tb2.a: field not allowed:
+    ./in.cue:63:8
+[eval] conjunctComplex.tb3.a: field not allowed:
+    ./in.cue:63:8
+[eval] conjunctComplex.tb3.b: field not allowed:
+    ./in.cue:64:8
+[eval] conjunctComplex.tb5.e: field not allowed:
+    ./in.cue:83:13
+[eval] conjunctComplex.tb5.a: field not allowed:
+    ./in.cue:63:8
+[eval] conjunctComplex.tb5.b: field not allowed:
+    ./in.cue:64:8
 [eval] embeddedCloseField.t3.c: field not allowed:
-    ./in.cue:115:11
+    ./in.cue:112:11
 [eval] andField.v.c: field not allowed:
-    ./in.cue:138:15
+    ./in.cue:135:15
 [eval] andField.t1.c: field not allowed:
-    ./in.cue:138:15
+    ./in.cue:135:15
 [eval] andField.t2.c: field not allowed:
-    ./in.cue:138:15
+    ./in.cue:135:15
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -271,31 +306,28 @@ conjunct: {
 	t2: v & {b: 1} @test(err, code=eval)
 }
 
-#C1: {a?: int, c: int}
-#C2: {b?: int, c: int}
 conjunctComplex: {
+	#C1: {a?: int, c: int}
+	#C2: {b?: int, c: int}
 	v: __closeAll({
 		(#C1 & #C2)...
 		d: int
 	})
-	// TODO:
-	// The new semantics is more permissive here:
-	// t1: v & {a: 1} @test(err, code=eval)
-	// t2: v & {b: 1} @test(err, code=eval)
-
-	t3: v & {c: 1} @test(eq, {
-		c: 1
-		d: int
-		a?: _|_
-		b?: _|_
-	})
-	t4: v & {d: 1} @test(eq, {
-		d: 1
-		a?: _|_
-		c: int
-		b?: _|_
-	})
+	t1: v & {a: 1} @test(err, code=eval)
+	t2: v & {b: 1} @test(err, code=eval)
+	t3: v & {c: 1} @test(eq, { c: 1, d: int })
+	t4: v & {d: 1} @test(eq, { d: 1, c: int })
 	t5: v & {e: 1} @test(err, code=eval)
+
+	#C: #C1 & #C2
+	vb: __closeAll({
+		#C...
+		d: int
+	})
+	tb1: vb & {a: 1} @test(err, code=eval)
+	tb2: vb & {b: 1} @test(err, code=eval)
+	tb3: vb & {c: 1} @test(eq, { c: 1, d: int })
+	tb5: vb & {e: 1} @test(err, code=eval)
 }
 
 // Disjunct → single embed, simplified.

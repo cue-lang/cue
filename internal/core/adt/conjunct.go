@@ -97,8 +97,26 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		// NOTE: do not unshare: a conjunction could still allow structure
 		// sharing, such as in the case of `ref & ref`.
 		if x.Op == AndOp {
-			n.scheduleConjunct(MakeConjunct(env, x.X, id), id)
-			n.scheduleConjunct(MakeConjunct(env, x.Y, id), id)
+			// For (A & B)..., mark operands as ConjunctOpened instead of
+			// Opened. This keeps each operand's close group active (for
+			// mutual constraint checking between A and B) while still
+			// suppressing closeOuter (so extra fields like d in
+			// __closeAll({(#C1 & #C2)..., d: int}) are allowed).
+			//
+			// In ExplicitOpen mode, injectEmbedNode is a no-op, so no
+			// embedding scope is created for the conjunction. We re-inject
+			// it here so the evidence mechanism can distinguish between
+			// fields from within the conjunction vs extra fields in the
+			// enclosing struct.
+			inner := id
+			if inner.Opened {
+				inner.Opened = false
+				inner.ConjunctOpened = true
+				inner.FromEmbed = true
+				inner = n.newReq(x, inner, defEmbedding)
+			}
+			n.scheduleConjunct(MakeConjunct(env, x.X, inner), inner)
+			n.scheduleConjunct(MakeConjunct(env, x.Y, inner), inner)
 			return
 		}
 
@@ -348,7 +366,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo.enclosingEmbed != 0 {
 		closeInfo.FromDef = false
 	}
-	if c.CloseInfo.Opened {
+	if c.CloseInfo.Opened || c.CloseInfo.ConjunctOpened {
 		n.setEmbedClosedness(arc)
 	}
 
@@ -373,7 +391,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	// once.
 	switch isDef, _ := IsDef(c.Expr()); {
 	case isDef || arc.Label.IsDef() || closeInfo.TopDef:
-		if c.CloseInfo.Opened {
+		if c.CloseInfo.Opened || c.CloseInfo.ConjunctOpened {
 			// Definitions are always recursively closed, even if arc
 			// doesn't have ClosedRecursive set yet at this point.
 			n.embedClosedness = embedRecursivelyClosed

@@ -246,6 +246,12 @@ type refInfo struct {
 
 	// isRecursive indicates this is recursively closed.
 	isRecursive bool
+
+	// conjunctOpened indicates this resolver is from an opened conjunction
+	// operand ((A & B)...). It must not use the parent==0 shortcut in
+	// hasEvidenceForOne, so that mutual constraints between conjunction
+	// operands are enforced.
+	conjunctOpened bool
 }
 
 type conjunctFlags uint8
@@ -345,7 +351,7 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 	}
 
 	// This can only be true when not using the @experiment(explicitopen).
-	closeOuter := id.FromDef && id.FromEmbed && !id.Opened
+	closeOuter := id.FromDef && id.FromEmbed && !id.Opened && !id.ConjunctOpened
 
 	if closeOuter && !forceIgnore {
 		// Walk up the parent chain of the outer structs to "activate" them.
@@ -415,13 +421,14 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 		dstID = next
 
 		n.reqDefIDs = append(n.reqDefIDs, refInfo{
-			v:           v,
-			id:          dstID,
-			parent:      id.outerID,
-			ignore:      ignore,
-			kind:        defReference,
-			embed:       id.enclosingEmbed,
-			isRecursive: v.ClosedRecursive,
+			v:              v,
+			id:             dstID,
+			parent:         id.outerID,
+			ignore:         ignore,
+			kind:           defReference,
+			embed:          id.enclosingEmbed,
+			isRecursive:    v.ClosedRecursive,
+			conjunctOpened: id.ConjunctOpened,
 		})
 	}
 	srcID := id.defID
@@ -633,6 +640,7 @@ func (n *nodeContext) checkTypos() {
 				a.removed = true
 			}
 		}
+
 		// TODO(perf): somehow prevent error generation of recursive structures,
 		// or at least make it cheap. Right now if this field is a typo, likely
 		// all descendents will be regarded as typos.
@@ -701,6 +709,21 @@ func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conju
 	embedScope, ok := all.lookupSet(a.embed)
 	if !ok {
 		return false
+	}
+
+	// For conjunctOpened resolvers with no parent: determine if the
+	// field has any conjuncts from within the conjunction's embedding
+	// scope. If not, the field is external to the conjunction and
+	// should be allowed (the ... opened it). If yes, the field is
+	// "known" to the conjunction, and the first check above already
+	// determined there's no direct evidence, so reject it.
+	if a.conjunctOpened && a.parent == 0 {
+		for _, c := range conjuncts {
+			if n.containsDefID(embedScope.id, c.embed) {
+				return false
+			}
+		}
+		return true
 	}
 
 	outerScope, ok := all.lookupSet(a.parent)
@@ -877,6 +900,10 @@ type reqSet struct {
 	// we still need to track the group memberships for embeddings or enclosing
 	// structs.
 	removed bool
+
+	// conjunctOpened indicates this requirement is from an opened conjunction
+	// operand. See [refInfo.conjunctOpened].
+	conjunctOpened bool
 }
 
 // mergeCloseInfo merges the conjunctInfo of nw that is missing from nv into nv.
@@ -973,12 +1000,13 @@ outer:
 		}
 
 		a = append(a, reqSet{
-			id:      y.id,
-			parent:  y.parent,
-			once:    once,
-			ignored: y.ignore,
-			embed:   y.embed,
-			kind:    y.kind,
+			id:             y.id,
+			parent:         y.parent,
+			once:           once,
+			ignored:        y.ignore,
+			embed:          y.embed,
+			kind:           y.kind,
+			conjunctOpened: y.conjunctOpened,
 		})
 
 		if y.parent != 0 && !y.ignore {

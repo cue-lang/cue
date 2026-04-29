@@ -21,6 +21,7 @@ import (
 	"text/tabwriter"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cuetxtar"
 )
@@ -37,6 +38,11 @@ func TestResolve(t *testing.T) {
 		// Resolve is used just after parsing anyway, so lower level
 		// is more appropriate.
 		a := t.RawInstances()[0]
+
+		if a.Err != nil {
+			b := t.Writer("errors")
+			errors.Print(b, a.Err, &errors.Config{Cwd: t.Dir, ToSlash: true})
+		}
 
 		for _, f := range a.Files {
 			if filepath.Ext(f.Filename) != ".cue" {

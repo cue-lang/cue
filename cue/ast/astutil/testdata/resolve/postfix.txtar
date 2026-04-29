@@ -1,4 +1,6 @@
 -- simple.cue --
+@experiment(aliasv2)
+
 a~X: 1
 b:   X
 c:   a
@@ -10,6 +12,8 @@ c:   a
 9[c]:  Scope: 0[<nil>]     Node: 0[]
 10[a]: Scope: 1[*ast.File] Node: 0[1]
 -- dual.cue --
+@experiment(aliasv2)
+
 a~(K, V): 1
 b:        K
 c:        V
@@ -21,10 +25,12 @@ d:        a
 7[b]:  Scope: 0[<nil>]      Node: 0[]
 8[K]:  Scope: 2[*ast.Field] Node: 4[K]
 10[c]: Scope: 0[<nil>]      Node: 0[]
-11[V]: Scope: 1[*ast.File]  Node: 2[a~(K, V): 1]
+11[V]: Scope: 1[*ast.File]  Node: 2[a~(K,V): 1]
 13[d]: Scope: 0[<nil>]      Node: 0[]
 14[a]: Scope: 1[*ast.File]  Node: 0[1]
 -- pattern.cue --
+@experiment(aliasv2)
+
 [string]~X: int
 y:          X
 -- out/resolve/pattern --
@@ -34,6 +40,8 @@ y:          X
 7[y]:      Scope: 0[<nil>] Node: 0[]
 8[X]:      Scope: 0[<nil>] Node: 0[]
 -- pattern_dual.cue --
+@experiment(aliasv2)
+
 [string]~(K, V): int
 y:               K
 z:               V

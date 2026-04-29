@@ -1,0 +1,67 @@
+# Scenarios that produce alias-redeclaration errors from astutil.Resolve.
+# Each .cue file isolates one scenario so out/resolve/errors lists all of
+# them in one place.
+-- old_label.cue --
+// Old-style label alias on sibling fields.
+N=("foo"): 1
+N=("bar"): 2
+-- postfix_single.cue --
+@experiment(aliasv2)
+
+// Postfix single-form alias on sibling fields.
+a~X: 1
+b~X: 2
+-- postfix_field.cue --
+@experiment(aliasv2)
+
+// Postfix dual-form, V (field reference) shared across siblings.
+"foo"~(_, V): {a: 1}
+"bar"~(_, V): {b: 2}
+-- postfix_label.cue --
+@experiment(aliasv2)
+
+// Postfix dual-form, K (label name capture) shared across siblings.
+//
+// TODO(https://cuelang.org/issue/4342): this should also report `alias
+// "N" redeclared in same scope`, matching the equivalent old-style
+// `N=("foo"):` form, but the uniqueness check in astutil/resolve.go
+// does not currently see the K binding as let-like, so the second
+// declaration silently overrides the first.
+"foo"~(N, _): 1
+"bar"~(N, _): 2
+-- let_clauses.cue --
+// Two let clauses with the same name in the same scope.
+top: {
+	let X = 1
+	let X = 2
+	v: X
+}
+-- let_clauses_top.cue --
+// Two let clauses with the same name at file scope.
+let Y = 1
+let Y = 2
+v: Y
+-- alias_field_clash.cue --
+// An alias and a regular field cannot share a name in one scope.
+clash: {
+	let X = 1
+	X: 2
+}
+-- out/resolve/errors --
+cannot have both alias and field with name "X" in same scope:
+    ./alias_field_clash.cue:4:5
+alias "X" redeclared in same scope:
+    ./let_clauses.cue:4:2
+alias "Y" redeclared in same scope:
+    ./let_clauses_top.cue:3:1
+alias "N" redeclared in same scope:
+    ./old_label.cue:3:1
+alias "V" redeclared in same scope:
+    ./postfix_field.cue:5:1
+alias "X" redeclared in same scope:
+    ./postfix_single.cue:5:1
+-- out/resolve/postfix_label --
+3[N]: Scope: 0[<nil>] Node: 0[]
+4[_]: Scope: 0[<nil>] Node: 0[]
+6[N]: Scope: 0[<nil>] Node: 0[]
+7[_]: Scope: 0[<nil>] Node: 0[]

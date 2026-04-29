@@ -17,3 +17,6 @@ refs: [
 9[baz]:  Scope: 0[<nil>] Node: 3["foo.com/bar:baz"]
 10[p]:   Scope: 0[<nil>] Node: 4["other.org/p@v1"]
 11[q]:   Scope: 0[<nil>] Node: 5["other.org/p@v2:q"]
+-- out/resolve/errors --
+import failed: imports are unavailable because there is no cue.mod/module.cue file:
+    ./in.cue:2:2

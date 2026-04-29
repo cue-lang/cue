@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "696cc0d9_f20da352",
+        "filename": "cmd/cue/cmd/testdata/script/help_cmd.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-04-29T19:59:46Z",
+      "side": 1,
+      "message": "I would argue this language (even though it mirrors Go) doesn\u0027t work here because `dir` does not refer to anything. Unlike the following from https://pkg.go.dev/cmd/go#hdr-Compile_packages_and_dependencies:\n\n```\n-C dir\n\tChange to dir before running the command.\n\tAny files named on the command line are interpreted after\n\tchanging directories.\n```",
+      "range": {
+        "startLine": 176,
+        "startChar": 33,
+        "endLine": 176,
+        "endChar": 36
+      },
+      "revId": "0834fbcc8d2e8da71e93af803e7a930e5c5988e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

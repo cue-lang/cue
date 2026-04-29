@@ -22,6 +22,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -233,9 +234,59 @@ var rootWorkingDir = func() string { panic("must be replaced by a sync.OnceValue
 // The API could also be made clearer if we want to keep cmd public,
 // such as not leaking *cobra.Command via embedding.
 
+// handleChdirFlag consumes a leading -C flag from args, if any, and changes
+// the working directory accordingly. The flag must be the first argument, in
+// one of the forms "-C dir", "-C=dir", "--chdir dir", or "--chdir=dir". Modeled
+// on cmd/go's handling of -C; see https://go.dev/cl/421436.
+//
+// Any -C left in args is rejected later by cobra via [chdirFlag.Set], which
+// covers both repeated -C flags and -C following another flag.
+func handleChdirFlag(args []string) ([]string, error) {
+	if len(args) == 0 {
+		return args, nil
+	}
+	a := args[0]
+	var dir string
+	switch {
+	case a == "-C" || a == "--chdir":
+		if len(args) < 2 {
+			// Let cobra report the missing argument.
+			return args, nil
+		}
+		dir = args[1]
+		args = args[2:]
+	case strings.HasPrefix(a, "-C=") || strings.HasPrefix(a, "--chdir="):
+		_, dir, _ = strings.Cut(a, "=")
+		args = args[1:]
+	default:
+		return args, nil
+	}
+	if err := os.Chdir(dir); err != nil {
+		return args, err
+	}
+	return args, nil
+}
+
+// chdirFlag is a [pflag.Value] that always rejects assignment. The actual -C
+// handling happens in [handleChdirFlag] before cobra parses; cobra only sees
+// -C if it appears after another argument or is repeated, both of which are
+// errors.
+type chdirFlag struct{}
+
+func (chdirFlag) String() string { return "" }
+func (chdirFlag) Type() string   { return "string" }
+func (chdirFlag) Set(string) error {
+	return fmt.Errorf("must be the first argument")
+}
+
 // New creates the top-level command.
 // The returned error is always nil, and is a historical artifact.
 func New(args []string) (*Command, error) {
+	args, err := handleChdirFlag(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
 	// Each call to New resets rootWorkingDir, to support [os.Chdir] calls in between.
 	rootWorkingDir = sync.OnceValue(func() string {
 		wd, err := os.Getwd()

@@ -27,6 +27,7 @@ const (
 	flagAllErrors       flagName = "all-errors"
 	flagAllMajor        flagName = "all-major"
 	flagAllVersions     flagName = "all-versions"
+	flagChdir           flagName = "chdir"
 	flagCheck           flagName = "check"
 	flagDeps            flagName = "deps"
 	flagDiff            flagName = "diff"
@@ -93,6 +94,7 @@ func addGlobalFlags(cmd *cobra.Command) {
 	f.BoolP(string(flagIgnore), "i", false,
 		"proceed in the presence of errors")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")
+	f.VarP(chdirFlag{}, string(flagChdir), "C", "change working directory before running command (must be the first flag)")
 
 	f.String(string(flagCpuProfile), "", "write a CPU profile to the specified file before exiting")
 	f.MarkHidden(string(flagCpuProfile))

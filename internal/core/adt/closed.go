@@ -180,6 +180,13 @@ type CloseInfo struct {
 	// This conjunct was opened by the ... postfix operator.
 	Opened bool
 
+	// ConjunctOpened indicates that this conjunct is an operand of a
+	// conjunction that was opened with ... (e.g. (#A & #B)...). The operand
+	// itself is NOT opened (its close group stays active for mutual constraint
+	// checking), but closeOuter is suppressed so that extra fields in the
+	// enclosing struct are still allowed.
+	ConjunctOpened bool
+
 	CycleInfo
 }
 

@@ -113,8 +113,11 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 		return
 	}
 	ci := ctx.ci
-	if arc.OpenedShared {
+	if arc.OpenedShared || t.id.Opened {
 		ci.Opened = true
+	}
+	if t.id.ConjunctOpened {
+		ci.ConjunctOpened = true
 	}
 
 	arc = arc.DerefNonDisjunct()

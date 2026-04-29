@@ -1,0 +1,52 @@
+# Verify that the top-level -C flag changes the working directory before
+# running the requested subcommand. Mirrors the behavior of cmd/go's -C flag.
+
+exec cue -C sub export
+cmp stdout expect-stdout
+
+exec cue -C=sub export
+cmp stdout expect-stdout
+
+exec cue --chdir sub export
+cmp stdout expect-stdout
+
+# -C must be the first argument; placing it after a subcommand fails.
+! exec cue export -C sub
+cmp stderr stderr-not-first
+
+# -C must come before any other global flag, too.
+# Note that the "invalid argument" part of the error is unfortunate,
+# but avoiding that with cobra and pflag is cumbersome.
+! exec cue -E -C sub export
+cmp stderr stderr-not-first
+
+# -C may only be given once.
+! exec cue -C sub -C nested export
+cmp stderr stderr-repeated
+
+# -C must be followed by an argument.
+! exec cue -C
+cmp stderr stderr-missing-arg
+
+# -C must point to an existing directory.
+# Note that the underlying OS error message varies on Windows.
+! exec cue -C nonexistent export
+[unix] cmp stderr stderr-bad-dir-unix
+[windows] stderr 'chdir nonexistent:'
+
+-- expect-stdout --
+{
+    "foo": 42
+}
+-- stderr-not-first --
+invalid argument "sub" for "-C, --chdir" flag: must be the first argument
+-- stderr-repeated --
+invalid argument "nested" for "-C, --chdir" flag: must be the first argument
+-- stderr-missing-arg --
+flag needs an argument: 'C' in -C
+-- stderr-bad-dir-unix --
+chdir nonexistent: no such file or directory
+-- sub/x.cue --
+package x
+
+foo: 42

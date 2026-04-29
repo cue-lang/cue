@@ -120,7 +120,7 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	n.isShared = true
 	n.shared = c
 	n.addShared(id)
-	n.node.OpenedShared = id.Opened
+	n.node.OpenedShared = id.Opened || id.ConjunctOpened
 
 	if arc.IsDetached() && arc.MayAttach() { // TODO: Second check necessary?
 		// This node can safely be shared. Since it is not rooted, though, it

@@ -21,12 +21,7 @@ b~X: 2
 @experiment(aliasv2)
 
 // Postfix dual-form, K (label name capture) shared across siblings.
-//
-// TODO(https://cuelang.org/issue/4342): this should also report `alias
-// "N" redeclared in same scope`, matching the equivalent old-style
-// `N=("foo"):` form, but the uniqueness check in astutil/resolve.go
-// does not currently see the K binding as let-like, so the second
-// declaration silently overrides the first.
+// Regression test for https://cuelang.org/issue/4342.
 "foo"~(N, _): 1
 "bar"~(N, _): 2
 -- let_clauses.cue --
@@ -58,6 +53,8 @@ alias "N" redeclared in same scope:
     ./old_label.cue:3:1
 alias "V" redeclared in same scope:
     ./postfix_field.cue:5:1
+alias "N" redeclared in same scope:
+    ./postfix_label.cue:6:8
 alias "X" redeclared in same scope:
     ./postfix_single.cue:5:1
 -- out/resolve/postfix_label --

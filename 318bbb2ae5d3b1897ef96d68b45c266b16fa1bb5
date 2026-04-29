@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb560a7b_850caf4a",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-29T11:02:33Z",
+      "side": 1,
+      "message": "Actually, changed how the function works as a result of your other comment.",
+      "parentUuid": "5440fa6f_3bb8df2e",
+      "revId": "318bbb2ae5d3b1897ef96d68b45c266b16fa1bb5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06b4811d_4cc12b3f",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-04-29T11:02:33Z",
+      "side": 1,
+      "message": "Done. Replaced the two bools with an unexported `embedClosedness` enum (embedOpen \u003c embedNonRecursivelyClosed \u003c embedRecursivelyClosed). `setEmbedClosedness(arc)` inspects the arc\u0027s closed flags and only upgrades, never downgrades. A single `ApplyEmbedClosedness()` method on Vertex applies the result back, keeping all the logic in one place.",
+      "parentUuid": "7d5bc414_10b4d992",
+      "revId": "318bbb2ae5d3b1897ef96d68b45c266b16fa1bb5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

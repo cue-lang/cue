@@ -16,6 +16,24 @@
       "message": "Nor sure if we have to refer to a previous behavior.",
       "revId": "5ca56e6925f367dd7dd2d05bc682cd9e07729e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd70360c_62868747",
+        "filename": "cue/ast/astutil/testdata/resolve/redeclared.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-29T10:01:29Z",
+      "side": 1,
+      "message": "done; shortened.",
+      "parentUuid": "387fe1c5_85fd6db0",
+      "revId": "5ca56e6925f367dd7dd2d05bc682cd9e07729e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

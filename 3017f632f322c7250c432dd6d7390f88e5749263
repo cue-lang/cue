@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5440fa6f_3bb8df2e",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-29T10:19:12Z",
+      "side": 1,
+      "message": "perhaps call it `ShouldReclose` for clarity?",
+      "revId": "3017f632f322c7250c432dd6d7390f88e5749263",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d5bc414_10b4d992",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-29T10:19:12Z",
+      "side": 1,
+      "message": "I wonder if we should join these two fields via an enum, so that it\u0027s not possible for e.g. both to be true at once, which could lead to confusing behavior.",
+      "revId": "3017f632f322c7250c432dd6d7390f88e5749263",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

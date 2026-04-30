@@ -22,6 +22,24 @@
       },
       "revId": "0834fbcc8d2e8da71e93af803e7a930e5c5988e7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb937633_1c217a3b",
+        "filename": "cmd/cue/cmd/testdata/script/help_cmd.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-30T10:29:49Z",
+      "side": 1,
+      "message": "Reworded to \"change working directory before running command\", since the help line shows the placeholder as \"string\" rather than naming a `dir` argument.",
+      "parentUuid": "696cc0d9_f20da352",
+      "revId": "0834fbcc8d2e8da71e93af803e7a930e5c5988e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

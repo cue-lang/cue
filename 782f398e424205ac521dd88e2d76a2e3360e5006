@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81da9761_eca7ce76",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-30T12:43:26Z",
+      "side": 1,
+      "message": "fix the commit message please",
+      "revId": "782f398e424205ac521dd88e2d76a2e3360e5006",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "414e16c9_163ef147",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-30T12:43:26Z",
+      "side": 1,
+      "message": "please use backticks as delimiters for code examples, as otherwise it\u0027s hard to see exactly where each example starts and ends.",
+      "revId": "782f398e424205ac521dd88e2d76a2e3360e5006",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b3baa9e_9d1b6c80",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 905,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-04-30T12:43:26Z",
+      "side": 1,
+      "message": "nit: linkify these, like:\n\n```suggestion\n\t// operand. See [refInfo.conjunctOpened].\n```",
+      "revId": "782f398e424205ac521dd88e2d76a2e3360e5006",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

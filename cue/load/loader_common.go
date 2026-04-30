@@ -86,11 +86,12 @@ func setFSLoc(c *Config, p *build.Instance) {
 			p.Root = c.FromFSPath(p.Root)
 		}
 	} else {
+		ov, _ := c.fileSystem.(*overlayFileSystem)
 		if p.DirLoc.IsZero() && p.Dir != "" {
-			p.DirLoc = makeOSFSLoc(p.Dir, c.pathOS)
+			p.DirLoc = makeOSFSLoc(p.Dir, c.pathOS, ov)
 		}
 		if p.Root != "" {
-			p.RootLoc = makeOSFSLoc(p.Root, c.pathOS)
+			p.RootLoc = makeOSFSLoc(p.Root, c.pathOS, ov)
 		}
 	}
 }
@@ -113,11 +114,14 @@ func makeFSLoc(fsys fs.FS, loaderPath string, cfgFromFSPath func(string) string)
 	}
 }
 
-// makeOSFSLoc creates an FSLoc backed by [os.DirFS] for an absolute
-// OS path. The FS is rooted at the filesystem root ("/" on Unix,
-// the volume root on Windows). The returned FSLoc.Path is a valid
-// [fs.FS] path (forward-slash separated, no leading separator).
-func makeOSFSLoc(absPath string, pathOS pkgpath.OS) token.FSLoc {
+// makeOSFSLoc creates an FSLoc for an absolute OS path. The FS is rooted at
+// the filesystem root ("/" on Unix, the volume root on Windows). When a
+// non-nil overlay [overlayFileSystem] is provided, its overlay-aware
+// [fs.FS] view is used so that overlay entries are visible alongside the
+// underlying OS filesystem; otherwise a plain [os.DirFS] is used. The
+// returned FSLoc.Path is a valid [fs.FS] path (forward-slash separated, no
+// leading separator).
+func makeOSFSLoc(absPath string, pathOS pkgpath.OS, overlay *overlayFileSystem) token.FSLoc {
 	root := "/"
 	if pathOS == pkgpath.Windows {
 		vol := pkgpath.VolumeName(absPath, pathOS)
@@ -131,8 +135,14 @@ func makeOSFSLoc(absPath string, pathOS pkgpath.OS) token.FSLoc {
 			return root + strings.ReplaceAll(p, "/", `\`)
 		}
 	}
+	var fsys fs.FS
+	if overlay != nil {
+		fsys = overlay.ioFS(root, "")
+	} else {
+		fsys = os.DirFS(root)
+	}
 	return token.FSLoc{
-		FS:         os.DirFS(root),
+		FS:         fsys,
 		Path:       fsPath,
 		FromFSPath: fromFSPath,
 	}
@@ -289,7 +299,8 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 	if fp.c.FS != nil {
 		file.FilenameLoc = makeFSLoc(fp.c.FS, file.Filename, fp.c.FromFSPath)
 	} else {
-		file.FilenameLoc = makeOSFSLoc(file.Filename, fp.c.pathOS)
+		ov, _ := fp.c.fileSystem.(*overlayFileSystem)
+		file.FilenameLoc = makeOSFSLoc(file.Filename, fp.c.pathOS, ov)
 	}
 	// Apply FromFSPath to transform the filename for display/position purposes.
 	// This must be done after setFileSource (which uses the FS path to read

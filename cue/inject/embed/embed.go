@@ -94,9 +94,7 @@ package embed
 
 import (
 	iofs "io/fs"
-	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -155,7 +153,7 @@ type injector struct {
 
 	// file system cache
 	dir string
-	fs  iofs.StatFS
+	fs  iofs.FS
 	pos token.Pos
 }
 
@@ -239,12 +237,16 @@ func (c *injector) InjectedValue(attr *runtime.ExternAttr, scope *adt.Vertex) (a
 	pos := a.Pos
 	c.pos = pos
 
-	// Jump through some hoops to get file operations to behave the same for
-	// Windows and Unix.
-	// TODO: obtain an iofs.FS from load or something similar.
-	dir := filepath.Dir(pos.File().Name())
+	// Resolve the FS from the file's recorded FSLoc, which is populated
+	// by cue/load for both [load.Config.FS] and [load.Config.Overlay].
+	loc := pos.File().FSLoc()
+	dir := path.Dir(loc.Path)
 	if c.dir != dir {
-		c.fs = os.DirFS(dir).(iofs.StatFS) // Documented as implementing iofs.StatFS
+		fsys, err := iofs.Sub(loc.FS, dir)
+		if err != nil {
+			return nil, errors.Newf(pos, "cannot embed: %v", err)
+		}
+		c.fs = fsys
 		c.dir = dir
 	}
 
@@ -255,7 +257,7 @@ func (c *injector) InjectedValue(attr *runtime.ExternAttr, scope *adt.Vertex) (a
 
 	if file != "" {
 		for dir := path.Dir(file); dir != "."; dir = path.Dir(dir) {
-			if _, err := c.fs.Stat(path.Join(dir, "cue.mod")); err == nil {
+			if _, err := iofs.Stat(c.fs, path.Join(dir, "cue.mod")); err == nil {
 				return nil, errors.Newf(pos, "cannot embed file %q: in different module", file)
 			}
 		}
@@ -280,7 +282,7 @@ func (c *injector) processGlob(glob, scope string, allowEmptyGlob bool) (adt.Exp
 		// TODO: lots of stat calls happening in this MVP so another won't hurt.
 		// We don't support '**' initially, and '*' only matches files, so skip
 		// any directories.
-		if fi, err := c.fs.Stat(f); err != nil {
+		if fi, err := iofs.Stat(c.fs, f); err != nil {
 			return nil, errors.Newf(c.pos, "failed to stat %s: %v", f, err)
 		} else if fi.IsDir() {
 			continue
@@ -306,7 +308,7 @@ func (c *injector) processGlob(glob, scope string, allowEmptyGlob bool) (adt.Exp
 	// Check that none of the matches were in a nested module
 	// directory.
 	for dir, f := range dirs {
-		if _, err := c.fs.Stat(path.Join(dir, "cue.mod")); err == nil {
+		if _, err := iofs.Stat(c.fs, path.Join(dir, "cue.mod")); err == nil {
 			return nil, errors.Newf(c.pos, "cannot embed file %q: in different module", f)
 		}
 	}

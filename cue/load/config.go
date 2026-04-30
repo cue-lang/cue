@@ -614,7 +614,8 @@ func (c *Config) newErrInstance(err error) *build.Instance {
 			i.Root = c.FromFSPath(c.ModuleRoot)
 		}
 	} else if c.ModuleRoot != "" {
-		i.RootLoc = makeOSFSLoc(c.ModuleRoot, c.pathOS)
+		ov, _ := c.fileSystem.(*overlayFileSystem)
+		i.RootLoc = makeOSFSLoc(c.ModuleRoot, c.pathOS, ov)
 	}
 	return i
 }

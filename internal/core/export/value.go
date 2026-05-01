@@ -328,7 +328,7 @@ func (e *exporter) boundValue(n *adt.BoundValue) ast.Expr {
 
 func (e *exporter) builtin(x *adt.Builtin) ast.Expr {
 	if x.Package == 0 {
-		return ast.NewIdent(x.Name)
+		return ast.NewPredeclared(x.Name)
 	}
 	spec := ast.NewImport(nil, x.Package.StringValue(e.index))
 	info, _ := astutil.ParseImportSpec(spec)

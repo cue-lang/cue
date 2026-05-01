@@ -9,7 +9,7 @@
 // exported reference to the builtin must be rewritten to its
 // "__"-prefixed form to avoid binding to the field instead.
 // Issue #3563.
-matchN?: matchN(1, [string, bool])
+matchN?: __matchN(1, [string, bool])
 -- out/doc-v3 --
 []
 [matchN]

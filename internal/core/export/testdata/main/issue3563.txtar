@@ -1,0 +1,45 @@
+-- in.cue --
+// When a field has the same name as a predeclared builtin, the
+// exported reference to the builtin must be rewritten to its
+// "__"-prefixed form to avoid binding to the field instead.
+// Issue #3563.
+"matchN"?: matchN(1, [string, bool])
+-- out/definition --
+// When a field has the same name as a predeclared builtin, the
+// exported reference to the builtin must be rewritten to its
+// "__"-prefixed form to avoid binding to the field instead.
+// Issue #3563.
+matchN?: matchN(1, [string, bool])
+-- out/doc-v3 --
+[]
+[matchN]
+- When a field has the same name as a predeclared builtin, the
+exported reference to the builtin must be rewritten to its
+"__"-prefixed form to avoid binding to the field instead.
+Issue #3563.
+
+-- out/value-v3 --
+== Simplified
+{}
+== Raw
+{
+	// When a field has the same name as a predeclared builtin, the
+	// exported reference to the builtin must be rewritten to its
+	// "__"-prefixed form to avoid binding to the field instead.
+	// Issue #3563.
+	matchN?: matchN(1, [string, bool])
+}
+== Final
+{}
+== All
+{
+	// When a field has the same name as a predeclared builtin, the
+	// exported reference to the builtin must be rewritten to its
+	// "__"-prefixed form to avoid binding to the field instead.
+	// Issue #3563.
+	matchN?: matchN(1, [string, bool])
+}
+== Eval
+{
+	matchN?: matchN(1, [string, bool])
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c9c969c_e5c8d410",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-01T14:54:39Z",
+      "side": 1,
+      "message": "nit: Not sure \"the returned file is discarded.\" adds anything useful?",
+      "revId": "d13fd8d655eb7bac372c3fefea3f55402fa422cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

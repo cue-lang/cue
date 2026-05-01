@@ -275,6 +275,20 @@ a: {
    }`,
 		),
 	}, {
+		// References to predeclared builtins shadowed by a same-named field must
+		// be rewritten to their "__"-prefixed form so the output roundtrips.
+		desc: "shadowed builtin",
+		in:   `"matchN": matchN`,
+		out: tests(
+			"%v", `{
+	matchN: matchN
+}`,
+			"%+v", `{
+	matchN: matchN
+}`,
+			"%#v", `matchN: __matchN`,
+		),
+	}, {
 		desc: "imports",
 		in: `
 		import "strings"

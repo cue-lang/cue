@@ -8,11 +8,13 @@ cmp stdout expect-x.stdout
 exec cue export .
 cmp stdout expect-x.stdout
 
-# BUG: the nested module's package is wrongly resolved as a sub-package of
-# example.com/x, both via its (would-be) full import path and via a relative
-# path. Both invocations should fail; instead they currently succeed.
-exec cue export example.com/x/y
-exec cue export ./y
+# The nested module's package must not resolve as a sub-package of
+# example.com/x, whether referenced by its (would-be) full import path
+# or by a relative path.
+! exec cue export example.com/x/y
+stderr 'cannot find package "example.com/x/y"'
+! exec cue export ./y
+stderr 'cannot determine import path for "./y" \(directory is in a nested module\)'
 
 -- cue.mod/module.cue --
 module: "example.com/x"

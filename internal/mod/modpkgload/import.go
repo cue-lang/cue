@@ -255,17 +255,17 @@ func locInModule(pkgPath, mpath string, mloc module.SourceLoc, isLocal bool) (lo
 	// So we only check local module trees
 	// (the main module and, in the future, any directory trees pointed at by replace directives).
 	if isLocal {
-		for d := loc.Dir; d != mloc.Dir && len(d) > len(mloc.Dir); {
-			_, err := fs.Stat(mloc.FS, path.Join(d, "cue.mod/module.cue"))
+		// Normalize so that paths like "." and "", which path.Join collapses
+		// when joining with a sub-path, compare equal.
+		mdir := path.Clean(mloc.Dir)
+		d := path.Clean(loc.Dir)
+		for d != mdir {
 			// TODO should we count it as a module file if it's a directory?
-			haveCUEMod := err == nil
-			if haveCUEMod {
+			if _, err := fs.Stat(mloc.FS, path.Join(d, "cue.mod/module.cue")); err == nil {
 				return module.SourceLoc{}, false, nil
 			}
 			parent := path.Dir(d)
-			if parent == d {
-				// Break the loop, as otherwise we'd loop
-				// forever if d=="." and mdir=="".
+			if parent == d || parent == mdir {
 				break
 			}
 			d = parent

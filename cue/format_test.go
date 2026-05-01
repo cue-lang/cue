@@ -281,10 +281,10 @@ a: {
 		in:   `"matchN": matchN`,
 		out: tests(
 			"%v", `{
-	matchN: matchN
+	matchN: __matchN
 }`,
 			"%+v", `{
-	matchN: matchN
+	matchN: __matchN
 }`,
 			"%#v", `matchN: __matchN`,
 		),

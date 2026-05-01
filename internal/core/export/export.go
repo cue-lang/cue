@@ -310,6 +310,13 @@ func Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 func (p *Profile) Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 	e := newExporter(p, r, pkgID, n)
 	v := e.value(n)
+	// finalize runs astutil.Sanitize, which edits v in place via the shared
+	// StructLit Elts.
+	if vx, ok := n.(*adt.Vertex); ok {
+		if _, err := e.finalize(vx, v); err != nil {
+			return v, errors.Append(e.errs, err)
+		}
+	}
 	return v, e.errs
 }
 

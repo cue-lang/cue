@@ -364,7 +364,8 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 		return "", fmt.Errorf("cannot determine import path for %q (root undefined)", origPath)
 	}
 
-	subdir, ok := strings.CutPrefix(pkgpath.Clean(absDir, c.pathOS), c.ModuleRoot)
+	absDir = pkgpath.Clean(absDir, c.pathOS)
+	subdir, ok := strings.CutPrefix(absDir, c.ModuleRoot)
 	if !ok {
 		return "", fmt.Errorf("cannot determine import path for %q (dir outside of root)", origPath)
 	}
@@ -385,6 +386,16 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 	case c.Module == "":
 		return "", fmt.Errorf("cannot determine import path for %q (no module)", origPath)
 	default:
+		// Reject directories that are inside a nested module (a subdirectory
+		// containing its own cue.mod/module.cue). Such a directory belongs to
+		// a different module and is not part of c.Module.
+		root := pkgpath.Clean(c.ModuleRoot, c.pathOS)
+		for dir := absDir; dir != root; dir = pkgpath.Dir(dir, c.pathOS) {
+			modCue := pkgpath.Join([]string{dir, modDir, moduleFile}, c.pathOS)
+			if _, err := c.fileSystem.stat(modCue); err == nil {
+				return "", fmt.Errorf("cannot determine import path for %q (directory is in a nested module)", origPath)
+			}
+		}
 		impPath := ast.ParseImportPath(c.Module)
 		impPath.Path += pkg
 		impPath.Qualifier = ""

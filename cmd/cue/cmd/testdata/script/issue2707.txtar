@@ -1,0 +1,38 @@
+# A package within a directory that contains a cue.mod is its own module
+# and must not be considered part of any enclosing module.
+# https://cuelang.org/issue/2707
+
+# Loading the parent module's package works as usual.
+exec cue export example.com/x
+cmp stdout expect-x.stdout
+exec cue export .
+cmp stdout expect-x.stdout
+
+# BUG: the nested module's package is wrongly resolved as a sub-package of
+# example.com/x, both via its (would-be) full import path and via a relative
+# path. Both invocations should fail; instead they currently succeed.
+exec cue export example.com/x/y
+exec cue export ./y
+
+-- cue.mod/module.cue --
+module: "example.com/x"
+language: version: "v0.13.0"
+
+-- x.cue --
+package x
+
+xfield: "from outer x"
+
+-- y/cue.mod/module.cue --
+module: "other.com/y"
+language: version: "v0.13.0"
+
+-- y/y.cue --
+package y
+
+yfield: "from nested y"
+
+-- expect-x.stdout --
+{
+    "xfield": "from outer x"
+}

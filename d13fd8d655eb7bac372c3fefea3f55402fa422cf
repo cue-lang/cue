@@ -16,6 +16,24 @@
       "message": "nit: Not sure \"the returned file is discarded.\" adds anything useful?",
       "revId": "d13fd8d655eb7bac372c3fefea3f55402fa422cf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5e68bdf_acc1bec4",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-01T14:58:57Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "9c9c969c_e5c8d410",
+      "revId": "d13fd8d655eb7bac372c3fefea3f55402fa422cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

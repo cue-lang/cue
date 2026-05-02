@@ -28,7 +28,6 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-	"sort"
 	"strings"
 	"text/template"
 
@@ -544,8 +543,8 @@ func allTags(rootVal cue.Value) (_ map[string]tagInfo, topLevel []string, subsid
 	}
 	addSubsidiary(lookup(rootVal, "interpretations"))
 	addSubsidiary(lookup(rootVal, "forms"))
-	sort.Strings(topLevel)
-	sort.Strings(subsid)
+	slices.Sort(topLevel)
+	slices.Sort(subsid)
 	return tags, topLevel, subsid
 }
 

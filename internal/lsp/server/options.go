@@ -17,7 +17,7 @@ package server
 import (
 	"context"
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -64,11 +64,11 @@ func (s *server) handleOptionResults(ctx context.Context, results settings.Optio
 	msgType := protocol.Warning
 	if len(errors) > 0 {
 		msgType = protocol.Error
-		sort.Strings(errors)
+		slices.Sort(errors)
 		msgs = append(msgs, errors...)
 	}
 	if len(warnings) > 0 {
-		sort.Strings(warnings)
+		slices.Sort(warnings)
 		msgs = append(msgs, warnings...)
 	}
 

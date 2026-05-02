@@ -101,7 +101,7 @@ func main() {
 var exclusions []*regexp.Regexp
 
 func initExclusions() {
-	for _, re := range strings.Split(*exclude, ",") {
+	for re := range strings.SplitSeq(*exclude, ",") {
 		if re != "" {
 			exclusions = append(exclusions, regexp.MustCompile(re))
 		}

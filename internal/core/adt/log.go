@@ -73,7 +73,7 @@ func (c *OpContext) Indentf(v *Vertex, format string, args ...any) (s nestString
 		// any arguments passed to ...args above escape to the heap and allocate.
 		panic("avoid calling OpContext.Indentf when logging is disabled to prevent overhead")
 	}
-	name := strings.Split(format, "(")[0]
+	name, _, _ := strings.Cut(format, "(")
 	if name == "" {
 		name, _ = getCallerFunctionName(1)
 		format = name + format

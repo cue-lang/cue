@@ -347,12 +347,14 @@ func fsGlob(fsys iofs.FS, pattern string) ([]string, error) {
 func filterFsGlobResults(pattern string, matches ...string) []string {
 	patElems := strings.Split(pattern, "/")
 	included := func(m string) bool {
-		for i, elem := range strings.Split(m, "/") {
+		i := 0
+		for elem := range strings.SplitSeq(m, "/") {
 			// Technically there should never be more elements in m than
 			// there are in patElems, but be defensive and check bounds just in case.
 			if strings.HasPrefix(elem, ".") && (i >= len(patElems) || !strings.HasPrefix(patElems[i], ".")) {
 				return false
 			}
+			i++
 		}
 		return true
 	}

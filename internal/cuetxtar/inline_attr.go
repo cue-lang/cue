@@ -516,7 +516,7 @@ func parseAtPath(at string) (cue.Path, error) {
 		return p, p.Err()
 	}
 	var sels []cue.Selector
-	for _, seg := range strings.Split(at, ".") {
+	for seg := range strings.SplitSeq(at, ".") {
 		if internal.IsHidden(seg) {
 			name := seg
 			pkg := "_"

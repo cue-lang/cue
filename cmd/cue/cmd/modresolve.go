@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 	"strings"
 
@@ -79,15 +80,8 @@ func runModResolve(cmd *Command, args []string) error {
 			return nil
 		}
 
-		// Collect all module paths and sort them for consistent output
-		var modulePaths []string
-		for modPath := range mf.Deps {
-			modulePaths = append(modulePaths, modPath)
-		}
-		slices.Sort(modulePaths)
-
 		var hadErrors bool
-		for _, modPath := range modulePaths {
+		for _, modPath := range slices.Sorted(maps.Keys(mf.Deps)) {
 			dep := mf.Deps[modPath]
 			mpath, _, ok := strings.Cut(modPath, "@")
 			if !ok {

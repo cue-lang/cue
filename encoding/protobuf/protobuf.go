@@ -87,6 +87,7 @@ package protobuf
 //                   ...}
 
 import (
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -302,9 +303,7 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 
 		inst.Files = append(inst.Files, f)
 
-		for pkg := range r.p.imported {
-			inst.ImportPaths = append(inst.ImportPaths, pkg)
-		}
+		inst.ImportPaths = slices.AppendSeq(inst.ImportPaths, maps.Keys(r.p.imported))
 	}
 
 	for _, p := range b.imports {

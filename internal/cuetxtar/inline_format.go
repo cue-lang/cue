@@ -129,6 +129,13 @@ func (r *inlineRunner) formatValue(v cue.Value, srcFileName string) string {
 	var b strings.Builder
 	w := &eqWriter{r: r, srcFileName: srcFileName, opCtx: value.OpContext(v)}
 	w.writeValue(&b, v, "\t")
+	// When the root value itself collapses to a bare _|_ (e.g. a struct
+	// whose BaseValue is *adt.Bottom), there is no enclosing writeStruct
+	// to attach the @test(err, ...) annotation. Add it here so the
+	// rendered output remains informative at any nesting depth.
+	if isLeafError(v) {
+		w.writeErrAnnotation(&b, v)
+	}
 	return b.String()
 }
 
@@ -157,6 +164,15 @@ func (w *eqWriter) writeValue(b *strings.Builder, v cue.Value, nestedIndent stri
 		return
 	case *adt.Conjunction:
 		w.writeConjunction(b, bv)
+		return
+	case *adt.Bottom:
+		// A struct-level error: emit just _|_ and skip the (possibly
+		// successfully-evaluated) child arcs. The error itself is what
+		// matters; the children may diverge across orderings without
+		// changing the meaning of the test. Caller's isLeafError check
+		// appends the @test(err, ...) annotation.
+		_ = bv
+		b.WriteString("_|_")
 		return
 	}
 
@@ -293,6 +309,11 @@ func isLeafError(v cue.Value) bool {
 	}
 	tv := v.Core()
 	vx := tv.V.DerefValue()
+	// BaseValue=Bottom: writeValue emits bare _|_ regardless of arcs,
+	// so the annotation belongs at this level too.
+	if _, isBot := vx.BaseValue.(*adt.Bottom); isBot {
+		return true
+	}
 	k := v.IncompleteKind()
 	return !((k == cue.StructKind || len(vx.Arcs) > 0) && k != cue.ListKind)
 }
@@ -302,6 +323,18 @@ func isLeafError(v cue.Value) bool {
 // filled immediately from the actual error so the annotation is stable after a
 // single CUE_UPDATE=1 pass.
 func (w *eqWriter) writeErrAnnotation(b *strings.Builder, v cue.Value) {
+	if v.Core().V == nil || v.Core().V.DerefValue().Bottom() == nil {
+		return
+	}
+	b.WriteString(" @test(")
+	w.writeErrAnnotationBody(b, v)
+	b.WriteByte(')')
+}
+
+// writeErrAnnotationBody writes the contents of an err annotation body —
+// "err, code=..., contains=..., pos=[...]" — without surrounding "@test(...)".
+// Caller is responsible for the @test( ... ) framing. v must be a Bottom.
+func (w *eqWriter) writeErrAnnotationBody(b *strings.Builder, v cue.Value) {
 	tv := v.Core()
 	if tv.V == nil {
 		return
@@ -310,7 +343,7 @@ func (w *eqWriter) writeErrAnnotation(b *strings.Builder, v cue.Value) {
 	if bot == nil {
 		return
 	}
-	b.WriteString(" @test(err, code=")
+	b.WriteString("err, code=")
 	b.WriteString(bot.Code.String())
 	if bot.Err != nil {
 		fmt.Fprintf(b, ", contains=%q", bot.Err.Error())
@@ -324,7 +357,7 @@ func (w *eqWriter) writeErrAnnotation(b *strings.Builder, v cue.Value) {
 		}
 		b.WriteString(w.formatPos(p))
 	}
-	b.WriteString("])")
+	b.WriteString("]")
 }
 
 // writeStruct emits a struct using _foo$pkg notation for hidden-field labels.
@@ -341,7 +374,9 @@ func (w *eqWriter) writeStruct(b *strings.Builder, vx *adt.Vertex, nestedIndent 
 	// If BaseValue is a concrete scalar or constraint (not a struct/list
 	// marker), it represents an embedded expression, e.g. {4} or {>=5}.
 	// *StructMarker and *ListMarker do not implement adt.Value (they lack
-	// Concreteness()), so this check correctly skips them.
+	// Concreteness()), so this check correctly skips them. Bottoms are
+	// handled by writeValue's early-return path, so they never reach
+	// writeStruct.
 	if embVal, ok := vx.BaseValue.(adt.Value); ok {
 		if nestedIndent != "" {
 			b.WriteString("\n" + nestedIndent)

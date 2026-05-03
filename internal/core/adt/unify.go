@@ -415,6 +415,15 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 			return true
 		}
 
+		// Report the cycle on n (the sharing vertex, typically a
+		// disjunct's view of w) so the failure is scoped to this
+		// evaluation context rather than polluting w with a structural
+		// cycle. See sharedTargetHasInProgressCycle for the trigger.
+		if sharedTargetHasInProgressCycle(c, w) {
+			n.reportCycleError()
+			return true
+		}
+
 		// Ensure that shared nodes comply to the same requirements as we
 		// need for the current node.
 		w.unify(c, Flags{condition: needs, mode: mode, checkTypos: checkTypos})

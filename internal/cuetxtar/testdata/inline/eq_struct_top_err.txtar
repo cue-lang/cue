@@ -1,0 +1,32 @@
+# Tests that an @test(eq, {...}) body containing an embedded `_|_` paired
+# with a top-level `@test(err, ...)` attribute checks the actual value's
+# error against the annotation. This exercises the cmpStruct path that
+# treats a top-level @test(err, ...) inside an eq body as the error check
+# for the struct's BaseValue (rather than for any specific field).
+-- in/test.cue --
+y: {
+	a: 1
+	b: 1 & 2
+} @test(eq, {
+	_|_
+	@test(err, code=eval, contains="conflicting values 2 and 1")
+	a: 1
+	b: _|_
+})
+-- out/status.txt --
+update: output passes run
+force:  identical to update
+-- out/update/test.cue --
+y: {
+	a: 1
+	b: 1 & 2
+} @test(eq, {
+	_|_
+	@test(err, code=eval, contains="conflicting values 2 and 1")
+	a: 1
+	b: _|_
+})
+-- out/update/out/errors.txt --
+[eval] y.b: conflicting values 2 and 1:
+    ./test.cue:3:5
+    ./test.cue:3:9

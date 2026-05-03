@@ -593,6 +593,43 @@ func (c *OpContext) hasDepthCycle(v *Vertex) bool {
 	return false
 }
 
+// sharedTargetHasInProgressCycle reports whether w has a pending
+// (not yet run) Resolver task whose resolution target is currently
+// on the evaluation stack (i.e., would produce a depth cycle). This
+// is used by the sharing path in [Vertex.unify] to skip a recursive
+// w.unify call that would otherwise lock in a structural cycle on w
+// while w's dependency is still being evaluated. The cycle gets
+// resolved later, once w's dependency completes.
+func sharedTargetHasInProgressCycle(c *OpContext, w *Vertex) bool {
+	s := w.state
+	if s == nil {
+		return false
+	}
+	for _, t := range s.tasks {
+		if t.state != taskREADY || t.run != handleResolver {
+			continue
+		}
+		r, ok := t.x.(Resolver)
+		if !ok {
+			continue
+		}
+		// Peek-resolve the reference using the task's env. If it
+		// points to a vertex currently on the evaluation stack,
+		// calling w.unify would recurse and trigger a structural
+		// cycle on w.
+		saved := c.PushConjunct(MakeConjunct(t.env, t.x, t.id))
+		arc := r.resolve(c, Flags{condition: fieldSetKnown, mode: ignore})
+		c.PopState(saved)
+		if arc == nil || arc == emptyNode {
+			continue
+		}
+		if c.hasDepthCycle(arc.DerefNonDisjunct()) {
+			return true
+		}
+	}
+	return false
+}
+
 // hasAncestor checks whether a node is currently being processed. The code
 // still assumes that is includes any node that is currently being processed.
 func (n *nodeContext) hasAncestor(arc *Vertex) bool {

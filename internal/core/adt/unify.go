@@ -415,6 +415,20 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 			return true
 		}
 
+		// If the shared node w has a pending resolver task whose
+		// target is currently being evaluated (depth cycle), running
+		// w.unify here would lock in a structural cycle on w from
+		// inside this evaluation context. Instead, report the cycle
+		// on the current node (the sharing vertex, typically a
+		// disjunct's view of w) so this evaluation context fails
+		// without polluting w. This typically arises with
+		// self-referential or() patterns where w is shared from a
+		// disjunct of the very disjunction being processed.
+		if sharedTargetHasInProgressCycle(c, w) {
+			n.reportCycleError()
+			return true
+		}
+
 		// Ensure that shared nodes comply to the same requirements as we
 		// need for the current node.
 		w.unify(c, Flags{condition: needs, mode: mode, checkTypos: checkTypos})

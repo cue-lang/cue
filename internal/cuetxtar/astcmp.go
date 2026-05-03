@@ -287,6 +287,8 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 	checkOrder := false
 	allFinal := false
 	hasEmbed := false
+	hasEmbedBottom := false    // expected struct has embedded _|_ (lenient mode)
+	var embedErrCheck *errArgs // @test(err, ...) at struct top level (applies to BaseValue)
 	seenShareIDs := make(map[string]bool)
 
 	for _, d := range s.Elts {
@@ -301,6 +303,15 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 						checkOrder = true
 					case "final":
 						allFinal = true
+					case "err":
+						// Top-level @test(err, ...) refers to the error
+						// carried by the struct's BaseValue (paired with an
+						// embedded _|_ on the same struct).
+						embedErrCheck = pa.errArgs
+						if embedErrCheck == nil {
+							embedErrCheck = &errArgs{}
+						}
+						embedErrCheck.srcAttrText = d.Text
 					}
 				}
 			}
@@ -396,6 +407,9 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 			}
 		case *ast.EmbedDecl:
 			hasEmbed = true
+			if isBottomExpr(d.Expr) {
+				hasEmbedBottom = true
+			}
 			if err := c.cmpEmbedExpr(path, d.Expr, val); err != nil {
 				return err
 			}
@@ -412,6 +426,25 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 			return pathErr(path, "value has embedded %v but expected struct has no embedded expression",
 				scalar)
 		}
+	}
+
+	// Check struct-level @test(err, ...) (paired with embedded _|_) against
+	// the BaseValue's error.
+	if embedErrCheck != nil {
+		if err := c.cmpErr(path, val, embedErrCheck); err != nil {
+			return err
+		}
+	}
+
+	// Lenient mode: when the expected struct has an embedded _|_, the
+	// struct itself is being asserted as erroneous. The error itself
+	// (and any @test(err, ...) annotation) is what matters; the other
+	// expected decls (fields, patterns, lets, attributes) are
+	// informational and may diverge across evaluation orderings. Skip
+	// them so test assertions are robust to where exactly within the
+	// erroneous subtree the error surfaces.
+	if hasEmbedBottom {
+		return nil
 	}
 
 	// Compare regular fields (including definitions, optional, required, hidden).
@@ -1044,6 +1077,19 @@ func embeddedScalar(val cue.Value) (cue.Value, bool) {
 		return value.Make(value.OpContext(val), bv), true
 	}
 	return cue.Value{}, false
+}
+
+// isBottomExpr reports whether an AST expression is a bottom literal `_|_`
+// in any of the forms the parser may produce: a *BottomLit, or an *Ident
+// with name "_|_".
+func isBottomExpr(e ast.Expr) bool {
+	if _, ok := e.(*ast.BottomLit); ok {
+		return true
+	}
+	if id, ok := e.(*ast.Ident); ok && id.Name == "_|_" {
+		return true
+	}
+	return false
 }
 
 func pathErr(path cue.Path, format string, args ...any) error {

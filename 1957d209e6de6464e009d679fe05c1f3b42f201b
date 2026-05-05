@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb40c8bf_328b0c1e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-05T08:45:52Z",
+      "side": 1,
+      "message": "nit: it might be nice to say why. Clearly in a couple of cases this saves code, which is worth doing by itself, but presumably the result isn\u0027t actually going to be faster - the amount of work done is the same?",
+      "revId": "1957d209e6de6464e009d679fe05c1f3b42f201b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -107,11 +107,22 @@ type Decoder struct {
 	lineOffsets []int
 }
 
-// section pairs an AST struct with the set of keys already defined in it,
-// so that duplicate-key detection lives alongside the data it protects.
+type fieldKind int
+
+const (
+	kindProperty fieldKind = iota + 1 // zero means "no such field"
+	kindSection
+)
+
+// section tracks per-section state needed to detect name collisions.
 type section struct {
+	// struct_ holds this section's fields.
 	struct_ *ast.StructLit
-	keys    map[string]bool
+	// keys records the kind of each name in struct_ for collision checks.
+	keys map[string]fieldKind
+	// explicit is true for [name] headers, and false for implicit parents
+	// of a nested path like `a` in [a.b].
+	explicit bool
 }
 
 // Decode parses the input stream as INI and converts it to a CUE [ast.Expr].
@@ -132,14 +143,15 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	d.tokenFile = tokenFile
 	d.lineOffsets = tokenFile.Lines()
 
-	topLevel := &ast.StructLit{}
-
-	// sections maps each section path to its struct and key set.
-	// The empty string key is the global (pre-header) section.
-	sections := map[string]*section{
-		"": {struct_: topLevel, keys: make(map[string]bool)},
+	topSection := &section{
+		struct_:  &ast.StructLit{},
+		keys:     make(map[string]fieldKind),
+		explicit: true,
 	}
-	cur := sections[""]
+	cur := topSection
+
+	// sections maps each section path to its struct; "" is the pre-header global section.
+	sections := map[string]*section{"": topSection}
 
 	lineNum := 0
 	for line := range bytes.SplitSeq(data, []byte("\n")) {
@@ -164,17 +176,16 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 			if sectionName == "" {
 				return nil, d.posErrf(lineNum, "empty section name")
 			}
-			if sections[sectionName] != nil {
+			if existing := sections[sectionName]; existing != nil && existing.explicit {
 				return nil, d.posErrf(lineNum, "duplicate section: %s", sectionName)
 			}
 
-			// Build nested structs for dot-separated section names.
-			parts := strings.Split(sectionName, ".")
-			cur = &section{
-				struct_: d.buildNestedSection(topLevel, parts, lineNum),
-				keys:    make(map[string]bool),
+			sec, err := d.buildNestedSection(sections, sectionName, lineNum)
+			if err != nil {
+				return nil, err
 			}
-			sections[sectionName] = cur
+			sec.explicit = true
+			cur = sec
 			continue
 		}
 
@@ -187,10 +198,13 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		if d.cfg.CaseSensitivity == CaseLower {
 			key = strings.ToLower(key)
 		}
-		if cur.keys[key] {
+		switch cur.keys[key] {
+		case kindSection:
+			return nil, d.posErrf(lineNum, "property %s conflicts with section of the same name", key)
+		case kindProperty:
 			return nil, d.posErrf(lineNum, "duplicate key: %s", key)
 		}
-		cur.keys[key] = true
+		cur.keys[key] = kindProperty
 
 		pos := d.posForLine(lineNum)
 		field, err := makeField(key, value, pos, d.cfg.ValueTypes == ValuesCUELiterals)
@@ -199,7 +213,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		}
 		cur.struct_.Elts = append(cur.struct_.Elts, field)
 	}
-	return topLevel, nil
+	return topSection.struct_, nil
 }
 
 // parseKeyValue splits a line into key and value using "=" as delimiter.
@@ -234,51 +248,40 @@ func parseKeyValue(line string) (key, value string, ok bool) {
 	return key, value, true
 }
 
-// buildNestedSection ensures that a chain of nested struct fields exists
-// for the given section path parts, and returns the innermost struct.
-// For example, for section [database.pool], then the parts will be ["database", "pool"]
-// It ensures:
-//
-//	database: { pool: { ... } }
-//
-// If existing fields already exist (from earlier sections or dotted keys), they are reused.
-func (d *Decoder) buildNestedSection(root *ast.StructLit, parts []string, lineNum int) *ast.StructLit {
-	current := root
-	for _, part := range parts {
-		found := false
-		for _, elt := range current.Elts {
-			field, ok := elt.(*ast.Field)
-			if !ok {
-				continue
-			}
-			name := fieldName(field)
-			var match bool
-			if d.cfg.CaseSensitivity == CaseLower {
-				match = strings.EqualFold(name, part)
-			} else {
-				match = name == part
-			}
-			if match {
-				if inner, ok := field.Value.(*ast.StructLit); ok {
-					current = inner
-					found = true
-					break
-				}
-			}
+// buildNestedSection walks the dot-separated path, creating and registering
+// missing sections along the way, and returns the innermost one. Existing
+// sections are reused; an error is returned if any segment collides with a
+// property in its parent.
+func (d *Decoder) buildNestedSection(sections map[string]*section, sectionName string, lineNum int) (*section, error) {
+	parent := sections[""]
+	var path string
+	for part := range strings.SplitSeq(sectionName, ".") {
+		if path == "" {
+			path = part
+		} else {
+			path = path + "." + part
 		}
-		if !found {
-			pos := d.posForLine(lineNum)
-			inner := &ast.StructLit{}
-			field := &ast.Field{
-				Label:    makeLabel(part, pos),
-				Value:    inner,
-				TokenPos: pos,
-			}
-			current.Elts = append(current.Elts, field)
-			current = inner
+		if existing := sections[path]; existing != nil {
+			parent = existing
+			continue
 		}
+		if parent.keys[part] == kindProperty {
+			return nil, d.posErrf(lineNum, "section %s conflicts with property of the same name", part)
+		}
+		pos := d.posForLine(lineNum)
+		inner := &ast.StructLit{}
+		field := &ast.Field{
+			Label:    makeLabel(part, pos),
+			Value:    inner,
+			TokenPos: pos,
+		}
+		parent.struct_.Elts = append(parent.struct_.Elts, field)
+		parent.keys[part] = kindSection
+		sec := &section{struct_: inner, keys: make(map[string]fieldKind)}
+		sections[path] = sec
+		parent = sec
 	}
-	return current
+	return parent, nil
 }
 
 // makeField creates a CUE field with an appropriate value literal.
@@ -348,21 +351,6 @@ func newStringLit(s string, pos token.Pos) *ast.BasicLit {
 	lit := ast.NewString(s)
 	ast.SetPos(lit, pos)
 	return lit
-}
-
-// fieldName extracts the name string from a CUE field label.
-func fieldName(f *ast.Field) string {
-	switch label := f.Label.(type) {
-	case *ast.Ident:
-		return label.Name
-	case *ast.BasicLit:
-		s, err := literal.Unquote(label.Value)
-		if err != nil {
-			panic(fmt.Sprintf("unexpected unquote error for label %q: %v", label.Value, err))
-		}
-		return s
-	}
-	return ""
 }
 
 // posForLine returns a token.Pos for the start of the given 1-based line number.

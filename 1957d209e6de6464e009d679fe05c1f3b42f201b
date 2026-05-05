@@ -16,6 +16,24 @@
       "message": "nit: it might be nice to say why. Clearly in a couple of cases this saves code, which is worth doing by itself, but presumably the result isn\u0027t actually going to be faster - the amount of work done is the same?",
       "revId": "1957d209e6de6464e009d679fe05c1f3b42f201b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92b99aba_2dec0e87",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-05T09:45:42Z",
+      "side": 1,
+      "message": "yep, this is mainly about nicer code, the performance should be about the same. clarified.",
+      "parentUuid": "cb40c8bf_328b0c1e",
+      "revId": "1957d209e6de6464e009d679fe05c1f3b42f201b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

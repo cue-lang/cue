@@ -65,7 +65,7 @@ func TestDecoder(t *testing.T) {
 			`,
 		wantErr: `
 			invalid character at start of key: =:
-			    test.toml:2:15
+			    test.toml:2:1
 			`,
 	}, {
 		name: "RootKeysOne",

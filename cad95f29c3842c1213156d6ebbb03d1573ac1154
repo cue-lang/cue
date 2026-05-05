@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1b5ec60_271bf5d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-05T20:11:54Z",
+      "side": 1,
+      "message": "rebasing and re-running `go generate ./...` to fix the tests.\n\nI now notice that my first review mentioning the `.dat` files was misguided; those are the internal/filetypes generated files, not files that you added as part of the INI work. the Gerrit UI confused me.",
+      "revId": "cad95f29c3842c1213156d6ebbb03d1573ac1154",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

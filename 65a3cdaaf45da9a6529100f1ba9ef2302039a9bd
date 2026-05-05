@@ -122,6 +122,24 @@
       "parentUuid": "ad4fd454_5abb9260",
       "revId": "65a3cdaaf45da9a6529100f1ba9ef2302039a9bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed0300a1_6d31e678",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-05T10:35:13Z",
+      "side": 1,
+      "message": "ack; manually reverted the bits where we\u0027ve added complexity for no benefit.",
+      "parentUuid": "b29d2b8a_10d437a4",
+      "revId": "65a3cdaaf45da9a6529100f1ba9ef2302039a9bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

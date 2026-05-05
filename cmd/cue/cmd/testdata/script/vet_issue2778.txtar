@@ -1,0 +1,21 @@
+# https://cuelang.org/issues/2778
+#
+# vet should report each list.Contains validation failure separately,
+# not collapse failures with same-length list arguments into a single error.
+
+! exec cue vet file.cue
+stderr -count=7 'does not satisfy list.Contains'
+
+-- file.cue --
+package p
+
+import "list"
+
+x: [[1, 2, 3]]
+x: list.Contains([1, 2])
+x: list.Contains([3, 4])
+x: list.Contains([5, 6])
+x: list.Contains(["5", "6"])
+x: list.Contains([3, 4, 5])
+x: list.Contains([4, 5, 6])
+x: list.Contains("aString")

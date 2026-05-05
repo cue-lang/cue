@@ -1,0 +1,17 @@
+# https://cuelang.org/issue/1745
+#
+# Underscore followed by a digit like _5 is a valid hidden field identifier
+# per the spec; ensure it is emitted unquoted.
+
+exec cue eval -H in.cue
+cmp stdout expect-stdout
+
+exec cue def in.cue
+cmp stdout expect-stdout
+
+-- in.cue --
+_5: 2
+_a: 3
+-- expect-stdout --
+_5: 2
+_a: 3

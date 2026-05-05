@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae95bcf6_3bd89db9",
+        "filename": "cue/load/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-05T10:15:53Z",
+      "side": 1,
+      "message": "Done — extracted the cleaned absDir into a `cleanDir` var and reused it in the nested-module walk.",
+      "parentUuid": "7a2a579d_6dc86ecf",
+      "revId": "65a3cdaaf45da9a6529100f1ba9ef2302039a9bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45f8d719_3f1c21c6",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f2c49a7_9ef8138c",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-05T10:15:53Z",
+      "side": 1,
+      "message": "Done — replaced the em-dashes with commas.",
+      "parentUuid": "45f8d719_3f1c21c6",
+      "revId": "65a3cdaaf45da9a6529100f1ba9ef2302039a9bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "950371fd_5ca7b6c2",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-05-05T09:03:05Z",
       "side": 1,
       "message": "I think this loop is now a bit confused - it seems unfortunate to have two exit points. It seems like combining with the loop condition is not easy, so I think I\u0027d be in favour of something like:\n\n```\nd :\u003d path.Clean...\nfor {\n  ...\n  parent :\u003d path.Dir(d)\n  if parent \u003d\u003d d || parent \u003d\u003d mdir {\n    break\n  }\n  d \u003d parent\n}\n```",
+      "revId": "65a3cdaaf45da9a6529100f1ba9ef2302039a9bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad4fd454_5abb9260",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-05T10:15:53Z",
+      "side": 1,
+      "message": "Restructured along the lines you suggested: lifted `d` out of the for clause, dropped the inline `haveCUEMod`, and added `parent \u003d\u003d mdir` to the break condition so the upward step stops on hitting the module root. I kept the `d !\u003d mdir` for-condition rather than going to `for { ... }`, because `loc.Dir` can equal `mloc.Dir` on entry (the `pkgPath \u003d\u003d mpath` branch above sets `loc \u003d mloc`), and we mustn\u0027t stat the module\u0027s own cue.mod/module.cue in that case. Happy to switch to the bare `for { }` if you\u0027d prefer adding an explicit guard for that case instead.",
+      "parentUuid": "950371fd_5ca7b6c2",
       "revId": "65a3cdaaf45da9a6529100f1ba9ef2302039a9bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

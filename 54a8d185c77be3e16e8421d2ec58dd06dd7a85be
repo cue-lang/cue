@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccaee8a7_ced5833f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-05T15:45:04Z",
+      "side": 1,
+      "message": "Thanks! The design SGTM and this can be merged. I have some further thoughts and tweaks but I\u0027ll make these as follow-up changes, for the sake of including this in the next alpha.",
+      "revId": "54a8d185c77be3e16e8421d2ec58dd06dd7a85be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -340,6 +340,34 @@ func TestDecoder(t *testing.T) {
 			    test.ini:4:1
 			`,
 	}, {
+		name:   "PropertyShadowsExistingSubsection",
+		config: &ini.Config{SectionNameNesting: ini.SectionNamesDotted},
+		input: `
+			[a.b]
+			x = 1
+
+			[a]
+			b = 2
+			`,
+		wantErr: `
+			property b conflicts with section of the same name:
+			    test.ini:5:1
+			`,
+	}, {
+		name:   "SubsectionShadowsExistingProperty",
+		config: &ini.Config{SectionNameNesting: ini.SectionNamesDotted},
+		input: `
+			[a]
+			b = 1
+
+			[a.b]
+			x = 2
+			`,
+		wantErr: `
+			section b conflicts with property of the same name:
+			    test.ini:4:1
+			`,
+	}, {
 		name: "MissingClosingBracket",
 		input: `
 			[section

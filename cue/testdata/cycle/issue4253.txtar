@@ -1,0 +1,51 @@
+# Non-CallExpr conjuncts (=~, == _|_, interpolation) must not be deferred
+# under a cyclic context; companion to issue4230.txtar which covers CallExpr.
+# https://cuelang.org/issue/4253
+-- in.cue --
+@experiment(aliasv2)
+
+x: {
+	#tmpl: {
+		let _self = self
+		foo: 1
+		k8s: foo: _self.foo
+	}
+
+	#allowed: =~"^[a-z0-9]+$"
+
+	[string]: {
+		[string]~(ID,_): {
+			#tmpl
+			if (#allowed & ID) == _|_ {
+				error("bad: \(ID)")
+			}
+		}
+	}
+
+	gateway: whoami2: {}
+} @test(eq, at=gateway.whoami2, {foo: 1, k8s: {foo: 1}})
+-- out/compile --
+--- in.cue
+{
+  x: {
+    #tmpl: {
+      let _self#1 = 〈1〉
+      foo: 1
+      k8s: {
+        foo: 〈1;let _self#1〉.foo
+      }
+    }
+    #allowed: =~"^[a-z0-9]+$"
+    [string]: {
+      [string]: {
+        〈2;#tmpl〉
+        if ((〈2;#allowed〉 & 〈1;-〉) == _|_(explicit error (_|_ literal) in source)) {
+          error("bad: \(〈2;-〉)")
+        }
+      }
+    }
+    gateway: {
+      whoami2: {}
+    }
+  }
+}

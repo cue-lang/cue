@@ -104,6 +104,24 @@
       "parentUuid": "950371fd_5ca7b6c2",
       "revId": "65a3cdaaf45da9a6529100f1ba9ef2302039a9bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b29d2b8a_10d437a4",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-05T10:26:01Z",
+      "side": 1,
+      "message": "Well, I now think this is worse. As claude says, you have to keep the condition on the for loop itself because of loop entry.",
+      "parentUuid": "ad4fd454_5abb9260",
+      "revId": "65a3cdaaf45da9a6529100f1ba9ef2302039a9bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

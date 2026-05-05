@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "159896a2_54a4dd7e",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-05T10:26:01Z",
+      "side": 1,
+      "message": "fwiw, I think this should be `absDir \u003d ...` - you don\u0027t use absDir again after cleaning and to me, `cleanDir` is less meaningful than `absDir`",
+      "revId": "1c6b20fa15345d0f277749e9f04238e9969d2f04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

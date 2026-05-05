@@ -194,6 +194,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5f43cc2_f4997513",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-05-05T07:23:13Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "be846630_137ee84f",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9fd46ee9_d6140954",
@@ -330,6 +348,24 @@
       "side": 1,
       "message": "After giving it a second thought, since INI treats all values as strings by default, it probably would make more sense to treat any quotes in the values as literals, especially when escape sequences are parsed as literals too. Otherwise, there\u0027s no way for user to specify quotes in the cases where the quotes do have their meanings.\n\nI\u0027ve made the changes in the code accordingly. Please let me know what you think.",
       "parentUuid": "668b261e_3e27efb6",
+      "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1dc4ab9_c370b7b0",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-05-05T07:23:13Z",
+      "side": 1,
+      "message": "This is no longer relevant after adding the valueTypesStrategy",
+      "parentUuid": "a02a1376_d7595f60",
       "revId": "c19192da9b9b57484f5330af839aab30fa6192a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

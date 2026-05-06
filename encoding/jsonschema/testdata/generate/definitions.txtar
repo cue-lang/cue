@@ -22,7 +22,7 @@ missingX: {
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	$defs: {
-		"#D1": {
+		D1: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
@@ -30,25 +30,25 @@ missingX: {
 					type: "integer"
 				}
 				y: {
-					$ref: "#/$defs/%23D2"
+					$ref: "#/$defs/D2"
 				}
 				z: {
-					$ref: "#/$defs/%23D3"
+					$ref: "#/$defs/D3"
 				}
 			}
 			required: ["x"]
 		}
-		"#D2": {
+		D2: {
 			type: "string"
 		}
-		"#D3": {
+		D3: {
 			enum: ["a", "b", "c"]
 		}
 	}
 	type: "object"
 	properties: {
 		foo: {
-			$ref: "#/$defs/%23D1"
+			$ref: "#/$defs/D1"
 		}
 	}
 	required: ["foo"]

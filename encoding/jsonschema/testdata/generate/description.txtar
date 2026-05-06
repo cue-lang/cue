@@ -30,7 +30,7 @@ missingName: {
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	$defs: {
-		"#User": {
+		User: {
 			type:                 "object"
 			description:          "A user definition."
 			additionalProperties: false
@@ -58,7 +58,7 @@ missingName: {
 		}
 		user: {
 			description: "The primary user."
-			$ref:        "#/$defs/%23User"
+			$ref:        "#/$defs/User"
 		}
 	}
 	required: ["name"]

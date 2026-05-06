@@ -71,6 +71,9 @@ func labelName(label ast.Label) string {
 //   - auto inserts imports associated with Idents
 //   - unshadows imports associated with idents
 //   - unshadows references for identifiers that were already resolved.
+//
+// Deprecated: use [SanitizeFiles] to sanitize all files in a package together,
+// to avoid issues such as one file shadowing a builtin name in the package scope.
 func Sanitize(f *ast.File) error {
 	return sanitize(f, nil)
 }

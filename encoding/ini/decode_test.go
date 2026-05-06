@@ -722,10 +722,8 @@ func TestDecoder(t *testing.T) {
 			qt.Assert(t, qt.IsNil(err))
 
 			// Verify second decode returns EOF.
-			if test.name == "SecondDecodeReturnsEOF" {
-				_, err = dec.Decode()
-				qt.Assert(t, qt.ErrorMatches(err, "EOF"))
-			}
+			_, err = dec.Decode()
+			qt.Assert(t, qt.ErrorMatches(err, "EOF"))
 
 			wantCUE := unindent(test.wantCUE)
 

@@ -16,6 +16,24 @@
       "message": "nit: \"it should not collapse...\"?",
       "revId": "c0dc78104589b59a8e83f6d3cec03b80728628be",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1704b0f7_e23cbdc1",
+        "filename": "cmd/cue/cmd/testdata/script/vet_issue2778.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-06T08:18:05Z",
+      "side": 1,
+      "message": "I think \"it should do X, not Y\" reads fine to me.",
+      "parentUuid": "87804226_d1091581",
+      "revId": "c0dc78104589b59a8e83f6d3cec03b80728628be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

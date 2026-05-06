@@ -302,27 +302,37 @@ func (i *itemEnum) apply(f func(internItem, *uniqueItems) internItem, u *uniqueI
 	return i
 }
 
-type itemRef struct {
-	defName string
+// CUERef represents a reference within CUE source.
+type CUERef struct {
+	// Inst holds the package where the reference is.
+	Inst cue.Value
+
+	// Path holds the path within Inst.
+	Path cue.Path
+
+	// Name holds the name to use for the reference within
+	// the generated JSON Schema. It is the responsibility
+	// of the [GenerateConfig.NamesFunc] to set this.
+	Name string
 }
 
-func (it *itemRef) hash(h *maphash.Hash, u *uniqueItems) {
-	h.WriteString(it.defName)
+func (it *CUERef) hash(h *maphash.Hash, u *uniqueItems) {
+	h.WriteString(it.Name)
 }
 
-func (i *itemRef) generate(g *generator) ast.Expr {
+func (i *CUERef) generate(g *generator) ast.Expr {
 	// Note: we might need to escape the fragment to produce
 	// a valid URI. Also, if the definition name itself contains
 	// a slash, it should be treated as a literal slash not as a JSON Pointer
 	// separator.
-	jptr := json.PointerFromTokens(slices.Values([]string{"$defs", i.defName}))
+	jptr := json.PointerFromTokens(slices.Values([]string{"$defs", i.Name}))
 	u := &url.URL{
 		Fragment: string(jptr),
 	}
 	return singleKeyword("$ref", ast.NewString(u.String()))
 }
 
-func (i *itemRef) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {
+func (i *CUERef) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {
 	return i
 }
 

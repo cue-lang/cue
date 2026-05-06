@@ -5,6 +5,9 @@
 // Package anyhash defines hash-based containers such as [Map].
 // It's a clone of the up-coming functionality in the Go stdlib,
 // taken from https://go-review.googlesource.com/c/go/+/612217/30
+//
+// TODO change to use container/hash when it has landed in a Go version we're allowed
+// to depend on.
 package anyhash
 
 import (
@@ -210,12 +213,21 @@ func (m *Map[K, V]) DeleteFunc(del func(K, V) bool) bool {
 // Get reports whether the map contains the specified key, and returns
 // the corresponding value if found, or the zero value if not.
 func (m *Map[K, V]) Get(key K) (V, bool) {
+	_, v, ok := m.Get2(key)
+	return v, ok
+}
+
+// Get2 is like [Map.Get] but also returns the actual key that's stored
+// in the map.
+// NOTE: this method was not present in the CL this code
+// was taken from.
+func (m *Map[K, V]) Get2(key K) (K, V, bool) {
 	for _, e := range m.table[m.hash(key)] {
 		if e.used && m.hasher.Equal(key, e.key) {
-			return e.value, true
+			return e.key, e.value, true
 		}
 	}
-	return *new(V), false
+	return *new(K), *new(V), false
 }
 
 // At returns the value corresponding the given key,

@@ -21,7 +21,7 @@ _foo: a?: int
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	$defs: {
-		"#S1": {
+		S1: {
 			type: "object"
 			properties: {
 				a: {
@@ -29,7 +29,7 @@ _foo: a?: int
 				}
 			}
 		}
-		"#S2": {
+		S2: {
 			type:                 "object"
 			additionalProperties: true
 			properties: {
@@ -50,10 +50,10 @@ _foo: a?: int
 	type: "object"
 	properties: {
 		t1: {
-			$ref: "#/$defs/%23S1"
+			$ref: "#/$defs/S1"
 		}
 		t2: {
-			$ref: "#/$defs/%23S2"
+			$ref: "#/$defs/S2"
 		}
 		t3: {
 			$ref: "#/$defs/_foo"

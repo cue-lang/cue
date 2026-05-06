@@ -1,0 +1,50 @@
+# Test that definition names are generated cleanly:
+# - '#' is stripped from definition names when there are no clashes
+# - when a definition and a non-definition have the same base name,
+#   the '#' is preserved for the definition to avoid clashes
+-- test.cue --
+package test
+a?: #Bar
+b?: Bar
+#Bar: x?: int
+Bar: y?: int
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		"#Bar": {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				x: {
+					type: "integer"
+				}
+			}
+		}
+		Bar: {
+			type: "object"
+			properties: {
+				y: {
+					type: "integer"
+				}
+			}
+		}
+	}
+	type: "object"
+	properties: {
+		Bar: {
+			type: "object"
+			properties: {
+				y: {
+					type: "integer"
+				}
+			}
+		}
+		a: {
+			$ref: "#/$defs/%23Bar"
+		}
+		b: {
+			$ref: "#/$defs/Bar"
+		}
+	}
+}

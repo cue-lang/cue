@@ -5,6 +5,9 @@
 // Package anyhash defines hash-based containers such as [Map].
 // It's a clone of the up-coming functionality in the Go stdlib,
 // taken from https://go-review.googlesource.com/c/go/+/612217/30
+//
+// TODO change to use container/hash when it has landed in a Go version we're allowed
+// to depend on.
 package anyhash
 
 import (

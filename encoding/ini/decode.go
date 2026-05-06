@@ -43,7 +43,6 @@
 package ini
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -154,9 +153,9 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	sections := map[string]*section{"": topSection}
 
 	lineNum := 0
-	for line := range bytes.SplitSeq(data, []byte("\n")) {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		lineNum++
-		trimmed := strings.TrimSpace(string(line))
+		trimmed := strings.TrimSpace(line)
 
 		// Skip blank lines and comments.
 		if trimmed == "" || trimmed[0] == ';' || trimmed[0] == '#' {
@@ -219,16 +218,16 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 // parseKeyValue splits a line into key and value using "=" as delimiter.
 // It returns the trimmed key, trimmed value and whether the split succeeded.
 func parseKeyValue(line string) (key, value string, ok bool) {
-	// Find the first "=".
-	sepIdx := strings.IndexByte(line, '=')
-	if sepIdx < 0 {
+	// Split on the first "=".
+	rawKey, rawValue, ok := strings.Cut(line, "=")
+	if !ok {
 		return "", "", false
 	}
-	key = strings.TrimSpace(line[:sepIdx])
+	key = strings.TrimSpace(rawKey)
 	if key == "" {
 		return "", "", false
 	}
-	value = strings.TrimSpace(line[sepIdx+1:])
+	value = strings.TrimSpace(rawValue)
 
 	// Strip inline comments (only if preceded by whitespace).
 	// For quoted values, only comments after the closing quote are stripped.

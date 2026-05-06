@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8a60485_17435df4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-06T08:11:49Z",
+      "side": 1,
+      "message": "this commit message gives the impression that _5 is a special case, and that _4, _6 etc worked correctly before. I suspect you don\u0027t mean that.",
+      "revId": "16679f3b09e1f37e3fce9d996963e25d232ee6ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

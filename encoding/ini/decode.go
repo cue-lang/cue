@@ -43,7 +43,6 @@
 package ini
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -169,9 +168,9 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	sections := map[string]*section{"": topSection}
 
 	lineNum := 0
-	for line := range bytes.SplitSeq(data, []byte("\n")) {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		lineNum++
-		trimmed := strings.TrimSpace(string(line))
+		trimmed := strings.TrimSpace(line)
 
 		// Skip blank lines and comments.
 		if trimmed == "" || trimmed[0] == ';' || trimmed[0] == '#' {
@@ -234,7 +233,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 // parseKeyValue splits a line into key and value using "=" as delimiter.
 // It returns the trimmed key, trimmed value and whether the split succeeded.
 func parseKeyValue(line string) (key, value string, ok bool) {
-	// Find the first "=".
+	// Split on the first "=".
 	key, value, ok = strings.Cut(line, "=")
 	if !ok {
 		return "", "", false

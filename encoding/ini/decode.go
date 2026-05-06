@@ -114,11 +114,10 @@ func NewDecoder(filename string, r io.Reader, cfg *Config) *Decoder {
 // Note that INI files never decode multiple CUE nodes;
 // subsequent calls to [Decoder.Decode] may return [io.EOF].
 type Decoder struct {
-	r           io.Reader
-	filename    string
-	cfg         *Config
-	tokenFile   *token.File
-	lineOffsets []int
+	r         io.Reader
+	filename  string
+	cfg       *Config
+	tokenFile *token.File
 }
 
 type fieldKind int
@@ -155,7 +154,6 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	tokenFile := token.NewFile(d.filename, 0, len(data))
 	tokenFile.SetLinesForContent(data)
 	d.tokenFile = tokenFile
-	d.lineOffsets = tokenFile.Lines()
 
 	topSection := &section{
 		struct_:  &ast.StructLit{},
@@ -167,9 +165,10 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	// sections maps each section path to its struct; "" is the pre-header global section.
 	sections := map[string]*section{"": topSection}
 
-	lineNum := 0
+	offset := 0
 	for line := range strings.SplitSeq(string(data), "\n") {
-		lineNum++
+		pos := tokenFile.Pos(offset, token.NoRelPos)
+		offset += len(line) + 1
 		trimmed := strings.TrimSpace(line)
 
 		// Skip blank lines and comments.
@@ -181,20 +180,20 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		if trimmed[0] == '[' {
 			closeIdx := strings.IndexByte(trimmed, ']')
 			if closeIdx < 0 {
-				return nil, d.posErrf(lineNum, "missing closing bracket for section header")
+				return nil, errors.Newf(pos, "missing closing bracket for section header")
 			}
 			sectionName := strings.TrimSpace(trimmed[1:closeIdx])
 			if d.cfg.CaseSensitivity == CaseLower {
 				sectionName = strings.ToLower(sectionName)
 			}
 			if sectionName == "" {
-				return nil, d.posErrf(lineNum, "empty section name")
+				return nil, errors.Newf(pos, "empty section name")
 			}
 			if existing := sections[sectionName]; existing != nil && existing.explicit {
-				return nil, d.posErrf(lineNum, "duplicate section: %s", sectionName)
+				return nil, errors.Newf(pos, "duplicate section: %s", sectionName)
 			}
 
-			sec, err := d.buildNestedSection(sections, sectionName, lineNum)
+			sec, err := d.buildNestedSection(sections, sectionName, pos)
 			if err != nil {
 				return nil, err
 			}
@@ -206,7 +205,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		// Key-value pair.
 		key, value, ok := parseKeyValue(trimmed)
 		if !ok {
-			return nil, d.posErrf(lineNum, "invalid line: %s", trimmed)
+			return nil, errors.Newf(pos, "invalid line: %s", trimmed)
 		}
 
 		if d.cfg.CaseSensitivity == CaseLower {
@@ -214,16 +213,15 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		}
 		switch cur.keys[key] {
 		case kindSection:
-			return nil, d.posErrf(lineNum, "property %s conflicts with section of the same name", key)
+			return nil, errors.Newf(pos, "property %s conflicts with section of the same name", key)
 		case kindProperty:
-			return nil, d.posErrf(lineNum, "duplicate key: %s", key)
+			return nil, errors.Newf(pos, "duplicate key: %s", key)
 		}
 		cur.keys[key] = kindProperty
 
-		pos := d.posForLine(lineNum)
 		field, err := makeField(key, value, pos, d.cfg.ValueTypes == ValuesCUELiterals)
 		if err != nil {
-			return nil, d.posErrf(lineNum, "%v", err)
+			return nil, errors.Newf(pos, "%v", err)
 		}
 		cur.struct_.Elts = append(cur.struct_.Elts, field)
 	}
@@ -268,7 +266,7 @@ func parseKeyValue(line string) (key, value string, ok bool) {
 // opts in via [SectionNamesDotted]; otherwise the whole name is a single
 // segment. Existing sections are reused; an error is returned if any segment
 // collides with a property in its parent.
-func (d *Decoder) buildNestedSection(sections map[string]*section, sectionName string, lineNum int) (*section, error) {
+func (d *Decoder) buildNestedSection(sections map[string]*section, sectionName string, pos token.Pos) (*section, error) {
 	parts := []string{sectionName}
 	if d.cfg.SectionNameNesting == SectionNamesDotted {
 		// Explicitly opt-in to splitting section names by dots.
@@ -287,9 +285,8 @@ func (d *Decoder) buildNestedSection(sections map[string]*section, sectionName s
 			continue
 		}
 		if parent.keys[part] == kindProperty {
-			return nil, d.posErrf(lineNum, "section %s conflicts with property of the same name", part)
+			return nil, errors.Newf(pos, "section %s conflicts with property of the same name", part)
 		}
-		pos := d.posForLine(lineNum)
 		inner := &ast.StructLit{}
 		field := &ast.Field{
 			Label:    makeLabel(part, pos),
@@ -372,17 +369,4 @@ func newStringLit(s string, pos token.Pos) *ast.BasicLit {
 	lit := ast.NewString(s)
 	ast.SetPos(lit, pos)
 	return lit
-}
-
-// posForLine returns a token.Pos for the start of the given 1-based line number.
-func (d *Decoder) posForLine(lineNum int) token.Pos {
-	if lineNum < 1 || lineNum > len(d.lineOffsets) {
-		return token.NoPos
-	}
-	return d.tokenFile.Pos(d.lineOffsets[lineNum-1], token.NoRelPos)
-}
-
-// posErrf returns a position-aware error for the given 1-based line number.
-func (d *Decoder) posErrf(lineNum int, format string, args ...any) error {
-	return errors.Newf(d.posForLine(lineNum), format, args...)
 }

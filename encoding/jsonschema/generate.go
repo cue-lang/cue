@@ -15,7 +15,9 @@
 package jsonschema
 
 import (
+	"cmp"
 	"fmt"
+	"hash/maphash"
 	"iter"
 	"maps"
 	"regexp"
@@ -27,6 +29,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/anyhash"
 )
 
 // GenerateConfig configures JSON Schema generation from CUE values.
@@ -35,13 +38,25 @@ type GenerateConfig struct {
 	// Currently only [VersionDraft2020_12] is supported.
 	Version Version
 
-	// NameFunc is used to determine how references map to
-	// JSON Schema definition names. It is passed the
-	// root value (usually a package) and the path to that value
-	// within it, as returned by [cue.Value.ReferencePath].
+	// NameFunc is used to determine how a reference maps to a JSON Schema
+	// definition name. It is passed the root value (usually a package)
+	// and the path to that value within it, as returned by [cue.Value.ReferencePath].
 	//
-	// If this is nil, [DefaultNameFunc] will be used.
+	// If both NameFunc and NamesFunc are nil, [DefaultNamesFunc] will be used.
+	//
+	// Deprecated: use [GenerateConfig.NamesFunc] instead, which
+	// allows all references to be named with full knowledge of all
+	// the other references.
 	NameFunc func(root cue.Value, path cue.Path) string
+
+	// NamesFunc is used to determine how references map to JSON Schema
+	// definition names. It is passed all the distinct references made
+	// by the schema being generated. It is the responsibility of the
+	// function to set a different [CUERef.Name] for each reference.
+	//
+	// If this is nil and [GenerateConfig.NameFunc] is also nil,
+	// [DefaultNamesFunc] will be used.
+	NamesFunc func(refs []*CUERef)
 
 	// ExplicitOpen, when true, will never close a schema with `additionalProperties: false`
 	// (but _will_ explicitly open a schema with `additionalProperties: true`
@@ -84,8 +99,17 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 		// Prevent mutation of the argument.
 		cfg = *ref(cfg)
 	}
-	if cfg.NameFunc == nil {
-		cfg.NameFunc = DefaultNameFunc
+	if cfg.NamesFunc == nil {
+		if cfg.NameFunc != nil {
+			nameFunc := cfg.NameFunc
+			cfg.NamesFunc = func(refs []*CUERef) {
+				for _, ref := range refs {
+					ref.Name = nameFunc(ref.Inst, ref.Path)
+				}
+			}
+		} else {
+			cfg.NamesFunc = DefaultNamesFunc
+		}
 	}
 	if cfg.Version == VersionUnknown {
 		cfg.Version = VersionDraft2020_12
@@ -96,7 +120,7 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 
 	g := &generator{
 		cfg:    cfg,
-		defs:   make(map[string]internItem),
+		defs:   anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
 		unique: newUniqueItems(),
 	}
 	mode := open
@@ -106,23 +130,49 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	case v.IsClosedRecursively():
 		mode = closedRecursively
 	}
-	item := optimize(g.makeItem(v, mode), g.unique)
-	expr := item.Value().generate(g)
 
-	// Check if the result is a boolean literal
+	// Phase 1: build the item tree, collecting all references.
+	rootItem := g.makeItem(v, mode)
+
+	// Phase 2: assign names to all collected references before
+	// generating any AST, because CUERef.generate uses the Name.
+	var defKeys []*CUERef
+	if n := g.defs.Len(); n != 0 {
+		defKeys = slices.Collect(g.defs.Keys())
+		slices.SortFunc(defKeys, func(k1, k2 *CUERef) int {
+			return k1.Path.Compare(k2.Path)
+		})
+		g.cfg.NamesFunc(defKeys)
+		slices.SortFunc(defKeys, func(k1, k2 *CUERef) int {
+			return cmp.Compare(k1.Name, k2.Name)
+		})
+		if defKeys[0].Name == "" {
+			return nil, fmt.Errorf("NamesFunc did not set Name field in all *CUERef values")
+		}
+		prev := ""
+		for _, k := range defKeys {
+			if k.Name == prev {
+				return nil, fmt.Errorf("NamesFunc returned non-unique name %q", k.Name)
+			}
+			prev = k.Name
+		}
+	}
+
+	// Phase 3: optimize and generate the AST.
+	rootItem = optimize(rootItem, g.unique)
+	expr := rootItem.Value().generate(g)
+
+	// Check if the result is a boolean literal.
 	if lit, ok := expr.(*ast.BasicLit); ok && (lit.Kind == token.TRUE || lit.Kind == token.FALSE) {
 		if lit.Kind == token.FALSE {
-			// There should already be an error; if not, create one
 			if g.err == nil {
 				g.addError(v, fmt.Errorf("schema cannot be satisfied"))
 			}
 			return nil, g.err
 		}
-		// true means empty struct
 		expr = &ast.StructLit{}
 	}
 
-	// The result should be a struct literal
 	st, ok := expr.(*ast.StructLit)
 	if !ok {
 		return nil, fmt.Errorf("expected struct literal from generate, got %T", expr)
@@ -130,11 +180,11 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 
 	// Add schema version metadata and definitions.
 	fields := []ast.Decl{makeField("$schema", ast.NewString(cfg.Version.String()))}
-	if len(g.defs) != 0 {
-		defFields := make([]ast.Decl, 0, len(g.defs))
-		for _, name := range slices.Sorted(maps.Keys(g.defs)) {
-			def := optimize(g.defs[name], g.unique)
-			defFields = append(defFields, makeField(name, def.Value().generate(g)))
+	if len(defKeys) > 0 {
+		defFields := make([]ast.Decl, 0, len(defKeys))
+		for _, k := range defKeys {
+			def := optimize(g.defs.At(k), g.unique)
+			defFields = append(defFields, makeField(k.Name, def.Value().generate(g)))
 		}
 		fields = append(fields, makeField("$defs", &ast.StructLit{Elts: defFields}))
 	}
@@ -186,10 +236,6 @@ func itemConjuncts(it internItem) iter.Seq[internItem] {
 		}
 		yieldSiblings(it1, yield)
 	}
-}
-
-type elementsItem interface {
-	elements() []internItem
 }
 
 func siblings[T elementsItem](it T) iter.Seq[internItem] {
@@ -252,12 +298,19 @@ type generator struct {
 	err errors.Error
 
 	// defs holds any definitions made during the course of generation,
-	// indexed by the entry name within the `$defs` field.
-	defs map[string]internItem
+	// indexed by the CUE reference package/path.
+	defs *anyhash.Map[*CUERef, internItem]
 
 	// unique ensures that all items are comparable with
 	// simple equality.
 	unique *uniqueItems
+}
+
+// Note this type definition is defined further away from [siblings]
+// than it ideally would be because of https://go.dev/issue/78296
+// TODO when that issue is fixed, move it back again.
+type elementsItem interface {
+	elements() []internItem
 }
 
 func (g *generator) addError(pos cue.Value, err error) {
@@ -305,31 +358,30 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 			return it
 		}
 		// It's a reference: generate a definition for it.
-		// TODO Not all references need or should have a definition.
-		if name := g.cfg.NameFunc(pkg, path); name != "" {
-			// Lookup path directly rather than following v
-			// so that we get to see the reference in isolation
-			// and can follow its value even if it's a reference itself.
-			v1 := pkg.LookupPath(path)
-			if !v1.Exists() {
-				g.addErrorf(v, "reference %v not found", path)
-			}
-			v = v1
-			ref := &itemRef{
-				defName: name,
-			}
-			if _, ok := g.defs[name]; ok {
-				// Already defined.
-				return ref
-			}
-			g.defs[name] = internItem{} // Prevent infinite loops on cycles.
-			defMode := open
-			if isDefinition(path) {
-				defMode = closedRecursively
-			}
-			g.defs[name] = g.makeItem(v, defMode)
-			return ref
+		// TODO Not all references need or should have a definition; we
+		// could add a Config.NeedsDefinition function to determine that.
+		// Lookup path directly rather than following v
+		// so that we get to see the reference in isolation
+		// and can follow its value even if it's a reference itself.
+		v1 := pkg.LookupPath(path)
+		if !v1.Exists() {
+			g.addErrorf(v, "reference %v not found", path)
 		}
+		v = v1
+		ref := &CUERef{
+			Inst: pkg,
+			Path: path,
+		}
+		if actualRef, _, ok := g.defs.Get2(ref); ok {
+			return actualRef
+		}
+		g.defs.Set(ref, internItem{}) // Prevent infinite loops on cycles.
+		defMode := open
+		if isDefinition(path) {
+			defMode = closedRecursively
+		}
+		g.defs.Set(ref, g.makeItem(v, defMode))
+		return ref
 	case cue.AndOp:
 		if v.Kind() == cue.StructKind {
 			// It's a conjunction of structs: we want to see all the
@@ -1237,14 +1289,109 @@ func isConcreteScalar(v cue.Value) bool {
 	return (v.Kind() & (cue.StructKind | cue.ListKind)) == 0
 }
 
+// DefaultNameFunc holds the default function used by [Generate]
+// to generate a JSON Schema definition name from a reference path
+// within the value inst, where inst is usually a CUE package value.
+//
+// Deprecated: use [DefaultNamesFunc] instead.
+func DefaultNameFunc(inst cue.Value, ref cue.Path) string {
+	var buf strings.Builder
+	for i, sel := range ref.Selectors() {
+		if i > 0 {
+			buf.WriteByte('.')
+		}
+		buf.WriteString(sel.String())
+	}
+	return buf.String()
+}
+
+// DefaultNamesFunc holds the default function used by [Generate]
+// to generate JSON Schema definition names from references.
+// See [GenerateConfig.NamesFunc] for more information.
+//
+// It uses the shortest unique suffix of each reference path,
+// stripping '#' from definition selectors where possible.
+// When stripping '#' would cause a clash (e.g. both #Foo and Foo
+// are referenced), the '#' is preserved for the definition.
+func DefaultNamesFunc(refs []*CUERef) {
+	if len(refs) == 0 {
+		return
+	}
+	type refState struct {
+		sels  []cue.Selector
+		depth int
+		raw   bool
+	}
+	states := make([]refState, len(refs))
+	for i, ref := range refs {
+		sels := ref.Path.Selectors()
+		states[i] = refState{sels: sels, depth: 1}
+		ref.Name = defName(sels, 1, false)
+	}
+	for {
+		groups := make(map[string][]int)
+		for i, ref := range refs {
+			groups[ref.Name] = append(groups[ref.Name], i)
+		}
+		allUnique := true
+		changed := false
+		for _, indices := range groups {
+			if len(indices) <= 1 {
+				continue
+			}
+			allUnique = false
+			anyDepthIncreased := false
+			for _, idx := range indices {
+				if s := &states[idx]; s.depth < len(s.sels) {
+					s.depth++
+					refs[idx].Name = defName(s.sels, s.depth, s.raw)
+					changed = true
+					anyDepthIncreased = true
+				}
+			}
+			if anyDepthIncreased {
+				continue
+			}
+			for _, idx := range indices {
+				if s := &states[idx]; !s.raw {
+					s.raw = true
+					refs[idx].Name = defName(s.sels, s.depth, true)
+					changed = true
+				}
+			}
+		}
+		if allUnique || !changed {
+			break
+		}
+	}
+}
+
+// defName builds a definition name from the last depth selectors of sels.
+// When raw is false, '#' is stripped from definition selectors.
+func defName(sels []cue.Selector, depth int, raw bool) string {
+	start := max(len(sels)-depth, 0)
+	var b strings.Builder
+	for i, sel := range sels[start:] {
+		if i > 0 {
+			b.WriteByte('.')
+		}
+		s := sel.String()
+		if !raw && (sel.LabelType() == cue.DefinitionLabel || sel.LabelType() == cue.HiddenDefinitionLabel) {
+			s = strings.TrimPrefix(s, "_")
+			s = strings.TrimPrefix(s, "#")
+		}
+		b.WriteString(s)
+	}
+	return b.String()
+}
+
 func docString(v cue.Value) string {
 	docs := v.Doc()
-	var txt string
 	switch len(docs) {
 	case 0:
 		return ""
 	case 1:
-		txt = strings.TrimSpace(docs[0].Text())
+		return strings.TrimSpace(docs[0].Text())
 	default:
 		var b strings.Builder
 		for i, d := range docs {
@@ -1253,24 +1400,25 @@ func docString(v cue.Value) string {
 			}
 			b.WriteString(strings.TrimSpace(d.Text()))
 		}
-		txt = b.String()
+		return b.String()
 	}
-	return txt
 }
 
-// DefaultNameFunc holds the default function used by [Generate]
-// to generate a JSON Schema definition name from a reference path
-// within the value inst, where inst is usually a CUE package value.
-func DefaultNameFunc(inst cue.Value, ref cue.Path) string {
-	var buf strings.Builder
-	for i, sel := range ref.Selectors() {
-		if i > 0 {
-			buf.WriteByte('.')
-		}
-		// TODO what should this do when it's not a valid identifier?
-		buf.WriteString(sel.String())
-	}
-	return buf.String()
+// cueRefHasher implements [anyunique.Hasher] for the [CUERef] type.
+//
+// The [CUERef.Name] field is not included in the hash or equality
+// because it's set after the map is populated.
+type cueRefHasher struct{}
+
+func (cueRefHasher) Hash(h *maphash.Hash, r *CUERef) {
+	maphash.WriteComparable(h, r.Inst)
+	// TODO consider adding a Hash method to cue.Path to avoid the
+	// allocation from String.
+	h.WriteString(r.Path.String())
+}
+
+func (cueRefHasher) Equal(x, y *CUERef) bool {
+	return x.Inst == y.Inst && x.Path.Compare(y.Path) == 0
 }
 
 // mapSlice returns a slice of f(x) for each x in xs.
@@ -1281,6 +1429,7 @@ func mapSlice[T1, T2 any](xs []T1, f func(T1) T2) []T2 {
 	}
 	return xs1
 }
+
 func valueConjuncts(v cue.Value) iter.Seq[cue.Value] {
 	return func(yield func(cue.Value) bool) {
 		yieldValueConjuncts(v, yield)

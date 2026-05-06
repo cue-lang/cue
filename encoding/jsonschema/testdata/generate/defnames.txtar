@@ -1,0 +1,81 @@
+# Test that definition names are generated cleanly:
+# - '#' is stripped from definition names when there are no clashes
+# - when a definition and a non-definition have the same base name,
+#   the '#' is preserved for the definition to avoid clashes
+# - nested definitions with the same leaf name use deeper path
+#   suffixes to disambiguate (the common suffix rule)
+-- test.cue --
+package test
+
+a?: #Bar
+b?: Bar
+c?: #x.#Baz
+d?: #y.#Baz
+#Bar: x?: int
+Bar: y?: int
+#x: #Baz: z?: int
+#y: #Baz: w?: int
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		"#Bar": {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				x: {
+					type: "integer"
+				}
+			}
+		}
+		Bar: {
+			type: "object"
+			properties: {
+				y: {
+					type: "integer"
+				}
+			}
+		}
+		"x.Baz": {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				z: {
+					type: "integer"
+				}
+			}
+		}
+		"y.Baz": {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				w: {
+					type: "integer"
+				}
+			}
+		}
+	}
+	type: "object"
+	properties: {
+		Bar: {
+			type: "object"
+			properties: {
+				y: {
+					type: "integer"
+				}
+			}
+		}
+		a: {
+			$ref: "#/$defs/%23Bar"
+		}
+		b: {
+			$ref: "#/$defs/Bar"
+		}
+		c: {
+			$ref: "#/$defs/x.Baz"
+		}
+		d: {
+			$ref: "#/$defs/y.Baz"
+		}
+	}
+}

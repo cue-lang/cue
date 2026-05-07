@@ -515,6 +515,116 @@ func TestPathAppend(t *testing.T) {
 	}
 }
 
+func TestSelectorCompare(t *testing.T) {
+	// ordered is a list of selectors in expected sorted order.
+	// Selectors on the same line (separated by the test logic below)
+	// are expected to compare as equal.
+	ordered := []cue.Selector{
+		// String selectors, alphabetical; then optional, then required.
+		cue.Str("a"),
+		cue.Str("b"),
+		cue.Str("z"),
+		cue.Str("a").Optional(),
+		cue.Str("a").Required(),
+		// Definition selectors, alphabetical; then optional.
+		cue.Def("A"),
+		cue.Def("B"),
+		cue.Def("B").Optional(),
+		// Hidden selectors, by name then package.
+		cue.Hid("_a", "p"),
+		cue.Hid("_a", "q"),
+		cue.Hid("_b", "p"),
+		// Index selectors, numerical.
+		cue.Index(0),
+		cue.Index(1),
+		cue.Index(100),
+		// Any selectors.
+		cue.AnyString,
+		cue.AnyIndex,
+	}
+
+	for i, a := range ordered {
+		if got := a.Compare(a); got != 0 {
+			t.Errorf("Compare(%v, %v) = %d, want 0", a, a, got)
+		}
+		for _, b := range ordered[i+1:] {
+			if got := a.Compare(b); got != -1 {
+				t.Errorf("Compare(%v, %v) = %d, want -1", a, b, got)
+			}
+			if got := b.Compare(a); got != 1 {
+				t.Errorf("Compare(%v, %v) = %d, want 1", b, a, got)
+			}
+		}
+	}
+}
+
+func TestSelectorCompareNoAllocs(t *testing.T) {
+	pairs := [][2]cue.Selector{
+		{cue.Str("a"), cue.Str("b")},
+		{cue.Def("X"), cue.Def("Y")},
+		{cue.Index(0), cue.Index(1)},
+		{cue.Hid("_a", "p"), cue.Hid("_b", "q")},
+		{cue.Str("a"), cue.Def("X")},
+		{cue.Str("a").Optional(), cue.Str("a").Required()},
+		{cue.AnyString, cue.AnyIndex},
+	}
+	allocs := testing.AllocsPerRun(100, func() {
+		for _, p := range pairs {
+			p[0].Compare(p[1])
+		}
+	})
+	if allocs != 0 {
+		t.Errorf("Selector.Compare allocated %v times, want 0", allocs)
+	}
+}
+
+func TestPathCompareNoAllocs(t *testing.T) {
+	pairs := [][2]cue.Path{
+		{cue.MakePath(cue.Str("a"), cue.Str("b")), cue.MakePath(cue.Str("a"), cue.Str("c"))},
+		{cue.MakePath(cue.Str("a")), cue.MakePath(cue.Str("a"), cue.Str("b"))},
+		{cue.MakePath(cue.Index(0)), cue.MakePath(cue.Def("X"))},
+	}
+	allocs := testing.AllocsPerRun(100, func() {
+		for _, p := range pairs {
+			p[0].Compare(p[1])
+		}
+	})
+	if allocs != 0 {
+		t.Errorf("Path.Compare allocated %v times, want 0", allocs)
+	}
+}
+
+func TestPathCompare(t *testing.T) {
+	ordered := []cue.Path{
+		cue.MakePath(),
+		cue.MakePath(cue.Str("a")),
+		cue.MakePath(cue.Str("a"), cue.Str("a")),
+		cue.MakePath(cue.Str("a"), cue.Str("b")),
+		cue.MakePath(cue.Str("a"), cue.Def("X")),
+		cue.MakePath(cue.Str("a"), cue.Index(0)),
+		cue.MakePath(cue.Str("b")),
+		cue.MakePath(cue.Def("X")),
+		cue.MakePath(cue.Def("X"), cue.Str("a")),
+		cue.MakePath(cue.Index(0)),
+		cue.MakePath(cue.Index(0), cue.Str("a")),
+		cue.MakePath(cue.Index(1)),
+	}
+
+	for i, a := range ordered {
+		if got := a.Compare(a); got != 0 {
+			t.Errorf("Compare(%v, %v) = %d, want 0", a, a, got)
+		}
+		for _, b := range ordered[i+1:] {
+			if got := a.Compare(b); got != -1 {
+				t.Errorf("Compare(%v, %v) = %d, want -1", a, b, got)
+			}
+			if got := b.Compare(a); got != 1 {
+				t.Errorf("Compare(%v, %v) = %d, want 1", b, a, got)
+			}
+		}
+	}
+}
+
 func checkPanic(t *testing.T, wantPanicStr string, f func()) {
 	gotPanicStr := ""
 	func() {

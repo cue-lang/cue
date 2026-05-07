@@ -15,6 +15,7 @@
 package cue
 
 import (
+	"cmp"
 	"fmt"
 	"math/bits"
 	"strconv"
@@ -214,6 +215,17 @@ func (sel Selector) ConstraintType() SelectorType {
 	return sel.sel.constraintType()
 }
 
+// Compare reports the relative ordering of two selectors.
+// It returns -1 if sel sorts before other, 0 if they are equal,
+// and +1 if sel sorts after other.
+//
+// Selectors are ordered first by their [SelectorType.LabelType],
+// then by their [SelectorType.ConstraintType],
+// then by the value within the same [Selector.Type].
+func (sel Selector) Compare(other Selector) int {
+	return compareSel(sel.sel, other.sel)
+}
+
 // PkgPath reports the package path associated with a hidden label or "" if
 // this is not a hidden label.
 func (sel Selector) PkgPath() string {
@@ -297,6 +309,19 @@ func pathToStrings(p Path) (a []string) {
 		a = append(a, sel.String())
 	}
 	return a
+}
+
+// Compare reports the relative ordering of two paths using
+// lexicographic comparison of their selectors.
+// It returns -1 if p sorts before other, 0 if they are equal,
+// and +1 if p sorts after other.
+func (p Path) Compare(other Path) int {
+	for i := range min(len(p.path), len(other.path)) {
+		if c := p.path[i].Compare(other.path[i]); c != 0 {
+			return c
+		}
+	}
+	return cmp.Compare(len(p.path), len(other.path))
 }
 
 // Append adds sel as a path component to p.
@@ -753,6 +778,67 @@ func featureToSel(f adt.Feature, r adt.Runtime) Selector {
 	return Selector{pathError{
 		errors.Newf(token.NoPos, "unexpected feature type %v", f.Typ()),
 	}}
+}
+
+func compareSel(a, b selector) int {
+	var ac, bc SelectorType
+	if c, ok := a.(constraintSelector); ok {
+		ac = c.constraint
+		a = c.selector
+	}
+	if c, ok := b.(constraintSelector); ok {
+		bc = c.constraint
+		b = c.selector
+	}
+	if c := cmp.Compare(selectorOrd(a), selectorOrd(b)); c != 0 {
+		return c
+	}
+	if c := cmp.Compare(ac, bc); c != 0 {
+		return c
+	}
+	// Both selectors have the same type, so the type assertions on b below cannot panic.
+	switch a := a.(type) {
+	case stringSelector:
+		return cmp.Compare(string(a), string(b.(stringSelector)))
+	case definitionSelector:
+		return cmp.Compare(string(a), string(b.(definitionSelector)))
+	case scopedSelector:
+		bs := b.(scopedSelector)
+		return cmp.Or(cmp.Compare(a.name, bs.name), cmp.Compare(a.pkg, bs.pkg))
+	case indexSelector:
+		return cmp.Compare(adt.Feature(a).Index(), adt.Feature(b.(indexSelector)).Index())
+	case anySelector:
+		return cmp.Compare(adt.Feature(a), adt.Feature(b.(anySelector)))
+	case patternSelector:
+		return cmp.Compare(a._labelType, b.(patternSelector)._labelType)
+	case pathError:
+		return 0
+	}
+	return 0
+}
+
+// selectorOrd maps a selector to its sort position by label type.
+// The ordering follows Selector.String: regular fields, then definitions,
+// then hidden fields, then indices, then pattern-like selectors.
+func selectorOrd(s selector) int {
+	switch s.(type) {
+	case stringSelector:
+		return 0
+	case definitionSelector:
+		return 1
+	case scopedSelector:
+		return 2
+	case indexSelector:
+		return 3
+	case anySelector:
+		return 4
+	case patternSelector:
+		return 5
+	case pathError:
+		return 6
+	default:
+		return 7
+	}
 }
 
 func featureToSelType(f adt.Feature, at adt.ArcType) (st SelectorType) {

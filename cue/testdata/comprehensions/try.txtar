@@ -541,6 +541,134 @@ assignmentForm: {
 }
 
 // =============================================================================
+// Nested try clauses: an empty inner try in the outer try body should be a
+// no-op and must not interfere with the outer try's detection of failed
+// optional references. https://cuelang.org/issue/4347
+// =============================================================================
+
+// Outer try has a failed optional reference (foo?). The empty inner try {}
+// is a no-op and must not interfere with the outer's detection of the
+// failure. The selector on the struct literal forces concrete evaluation,
+// which is needed to trigger the bug.
+nestedTry: emptyInnerInBody: {
+	foo?: foo2: int
+	bar: {
+		try {
+			foo?.foo2 & { try {} }
+		}
+	}
+}.bar @test(err, code=incomplete, path=nestedTry.emptyInnerInBody, contains="cannot reference optional field: %s", args=[foo], pos=[4:4]) @test(eq:todo, {})
+
+nestedTry: emptyInnerWithElse: {
+	foo?: foo2: int
+	bar: {
+		try {
+			foo?.foo2 & { try {} }
+		} else {
+			fallback: -1
+		}
+	}
+}.bar @test(err, code=incomplete, path=nestedTry.emptyInnerWithElse, contains="cannot reference optional field: %s", args=[foo], pos=[4:4]) @test(eq:todo, {fallback: -1})
+
+// Sibling form: the empty inner try {} is in a sibling field, not in a
+// conjunction with the failing optional reference.
+nestedTry: emptyInnerSibling: {
+	foo?: foo2: int
+	bar: {
+		try {
+			x: foo?.foo2
+			y: { try {} }
+		} else {
+			fallback: -1
+		}
+	}
+}.bar @test(eq, {fallback: -1})
+
+// Parent and child try clauses both reference the same optional field.
+// Undefined: both should fail and the outer's else should run.
+nestedTry: sameFieldUndefined: {
+	try {
+		x: c?
+		try { y: c? }
+	} else {
+		fallback: -1
+	}
+} @test(eq, {fallback: -1})
+
+// Parent and child try clauses both reference the same optional field.
+// Defined: both succeed; the outer yields the merged body.
+nestedTry: sameFieldDefined: {
+	foo: 99
+	try {
+		x: foo?
+		try { y: foo? }
+	} else {
+		fallback: -1
+	}
+} @test(eq, {foo: 99, x: 99, y: 99})
+
+// Two sibling try clauses referencing the same optional field.
+// Undefined: both fail and yield nothing.
+siblingTries: sameFieldUndefined: {
+	try { x: c? }
+	try { y: c? }
+} @test(eq, {})
+
+// Two sibling try clauses referencing the same optional field.
+// Defined: both succeed and contribute their body.
+siblingTries: sameFieldDefined: {
+	foo: 99
+	try { x: foo? }
+	try { y: foo? }
+} @test(eq, {foo: 99, x: 99, y: 99})
+
+// Variants of emptyInnerInBody where the inner try body itself contains a
+// ?-marked reference, so the inner try is no longer ?-free and still saves and
+// restores c.skipTry. These cases show that the ?-free fix does not extend to
+// them: the inner try's restore still erases the outer foo? failure signal, so
+// the outer try wrongly yields. The eq:todo values record the correct results.
+
+// Inner body references a defined optional; the outer foo? should fail, so the
+// whole outer try should yield nothing. It instead yields the inner body.
+nestedTry: optionalInnerDefined: {
+	foo?: foo2: int
+	bar: 7
+	out: {
+		try {
+			foo?.foo2 & { try { z: bar? } }
+		}
+	}
+}.out @test(eq, {z: 7}) @test(eq:todo, {})
+
+// As above but with an else clause, which should run because the outer foo?
+// fails. It instead yields the inner body and the else never runs.
+nestedTry: optionalInnerDefinedWithElse: {
+	foo?: foo2: int
+	bar: 7
+	out: {
+		try {
+			foo?.foo2 & { try { z: bar? } }
+		} else {
+			fallback: -1
+		}
+	}
+}.out @test(eq, {z: 7}) @test(eq:todo, {fallback: -1})
+
+// Inner body references an undefined optional; the inner try fails on its own
+// and the outer foo? also fails, so the else clause should run. It instead
+// surfaces the outer optional-reference error.
+nestedTry: optionalInnerUndefined: {
+	foo?: foo2: int
+	out: {
+		try {
+			foo?.foo2 & { try { z: c? } }
+		} else {
+			fallback: -1
+		}
+	}
+}.out @test(err, code=incomplete, path=nestedTry.optionalInnerUndefined, contains="cannot reference optional field: %s", args=[foo], pos=[4:4]) @test(eq:todo, {fallback: -1})
+
+// =============================================================================
 // Original recursive tests
 // =============================================================================
 
@@ -589,6 +717,16 @@ recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}  @test(eq, {z: 23})
     ./in.cue:492:16
 [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
     ./in.cue:518:11
+[incomplete] nestedTry.emptyInnerInBody: cannot reference optional field: foo:
+    ./in.cue:556:4
+[incomplete] nestedTry.emptyInnerWithElse: cannot reference optional field: foo:
+    ./in.cue:565:4
+[incomplete] nestedTry.optionalInnerDefined: cannot reference optional field: foo:
+    ./in.cue:637:4
+[incomplete] nestedTry.optionalInnerDefinedWithElse: cannot reference optional field: foo:
+    ./in.cue:649:4
+[incomplete] nestedTry.optionalInnerUndefined: cannot reference optional field: foo:
+    ./in.cue:663:4
 -- out/todo.txt --
 In v2, the try mechanism does not exist and many operations that succeed in v3
 produce errors in v2 (type errors, index out of range on open lists, etc.).

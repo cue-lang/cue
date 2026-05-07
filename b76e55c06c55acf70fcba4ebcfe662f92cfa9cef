@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "833d00e8_dce29652",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "Overall SGTM but I don\u0027t think we can make the breaking change right away",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51996c3c_136f9a06",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "`jsonschema.Generate` including `NameFunc` were added back in November 2025 and shipped with CUE v0.15.0, two releases ago. I think it\u0027s too late to think that we can swap it out without breaking our compatibility promise, even if it\u0027s just best-effort for v0.\n\nI would deprecate this func but keep it working for another release or two, and add the new signature as e.g. `NamesFunc` or `NameRefs`. I think a new name makes sense anyway, because the new signature needs a plural name.\n\nThis applies to DefaultNameFunc as well.",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c77f64d9_06343d4d",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "I wonder if we should have a compare method on paths, because stringifying paths to sort them feels unfortunate. This can just be a TODO for now.",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee2d22b8_ca94c2bc",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "you\u0027re sorting by name. can you not check if the first name is empty after sorting, for `hasEmpty`?",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea933bd5_f4f7befe",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "nit: invert and early continue to unindent",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39b39e0b_f1a4199b",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1339,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "use `max(len(sels) - depth, 0)`?",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7044b076_86d1f63a",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1379,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "these godoc lines are way too short; this fits in two or three lines.",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e5b15c1_8d43e5f5",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1386,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "why not write the entire path string? it feels to me like writing the selectors without separators is dangerous, e.g. `foo.barbaz` and `foobar.baz` would hash the same if we don\u0027t include any separator.\n\nalso, is there some sort of hasher interface we could add to the path or selector types, so that they can write their contents to a hasher without the stringify step?",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "649f3c55_68e4f4b8",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1390,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "ditto with the other TODO, needing to stringify here is unfortunate",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01e203b4_84ada728",
+        "filename": "encoding/jsonschema/testdata/generate/defnames.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T14:02:14Z",
+      "side": 1,
+      "message": "I feel like we need more test cases here, for example, something that exercises the common suffix rule described in the commit message. because if all that this test checks is that we can strip `#` without collisions, we can implement that rule in much less code and complexity.",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

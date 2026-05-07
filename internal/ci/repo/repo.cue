@@ -32,9 +32,9 @@ linuxMachine: base.linuxLargeMachine
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-pinnedReleaseGo: "1.26.0"
+pinnedReleaseGo: "1.26.2"
 
-goreleaserVersion: "v2.13.3"
+goreleaserVersion: "v2.15.4"
 
 // zeroReleaseTagSuffix is the suffix used to identify all "zero" releases.
 // When we create a release branch for v0.$X.0, it's likely that commits on the

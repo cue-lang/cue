@@ -449,6 +449,175 @@ assignmentForm: {
 }
 
 // =============================================================================
+// Nested try clauses: an empty inner try in the outer try body should be a
+// no-op and must not interfere with the outer try's detection of failed
+// optional references. https://cuelang.org/issue/4347
+// =============================================================================
+
+// Outer try has a failed optional reference (foo?). The empty inner try {}
+// is a no-op and must not interfere with the outer's detection of the
+// failure. The selector on the struct literal forces concrete evaluation,
+// which is needed to trigger the bug.
+nestedTry: emptyInnerInBody: {
+	foo?: foo2: int
+	bar: {
+		try {
+			foo?.foo2 & { try {}}
+		}
+	}
+}.bar
+
+nestedTry: emptyInnerWithElse: {
+	foo?: foo2: int
+	bar: {
+		try {
+			foo?.foo2 & { try {}}
+		} else {
+			fallback: -1
+		}
+	}
+}.bar
+
+// Sibling form: the empty inner try {} is in a sibling field, not in a
+// conjunction with the failing optional reference.
+nestedTry: emptyInnerSibling: {
+	foo?: foo2: int
+	bar: {
+		try {
+			x: foo?.foo2
+			y: { try {}}
+		} else {
+			fallback: -1
+		}
+	}
+}.bar
+
+// Parent and child try clauses both reference the same optional field.
+// Undefined: both should fail and the outer's else should run.
+nestedTry: sameFieldUndefined: {
+	try {
+		x: c?
+		try {y: c?}
+	} else {
+		fallback: -1
+	}
+}
+
+// Parent and child try clauses both reference the same optional field.
+// Defined: both succeed; the outer yields the merged body.
+nestedTry: sameFieldDefined: {
+	foo: 99
+	try {
+		x: foo?
+		try {y: foo?}
+	} else {
+		fallback: -1
+	}
+}
+
+// Two sibling try clauses referencing the same optional field.
+// Undefined: both fail and yield nothing.
+siblingTries: sameFieldUndefined: {
+	try {x: c?}
+	try {y: c?}
+}
+
+// Two sibling try clauses referencing the same optional field.
+// Defined: both succeed and contribute their body.
+siblingTries: sameFieldDefined: {
+	foo: 99
+	try {x: foo?}
+	try {y: foo?}
+}
+
+// Variants of emptyInnerInBody where the inner try body itself contains a
+// ?-marked reference, so the inner try is no longer ?-free and still saves and
+// restores c.skipTry. These cases show that the ?-free fix does not extend to
+// them: the inner try's restore still erases the outer foo? failure signal, so
+// the outer try wrongly yields. The eq:todo values record the correct results.
+
+// Inner body references a defined optional; the outer foo? should fail, so the
+// whole outer try should yield nothing. It instead yields the inner body.
+nestedTry: optionalInnerDefined: {
+	foo?: foo2: int
+	bar: 7
+	out: {
+		try {
+			foo?.foo2 & { try {z: bar?}}
+		}
+	}
+}.out
+
+// As above but with an else clause, which should run because the outer foo?
+// fails. It instead yields the inner body and the else never runs.
+nestedTry: optionalInnerDefinedWithElse: {
+	foo?: foo2: int
+	bar: 7
+	out: {
+		try {
+			foo?.foo2 & { try {z: bar?}}
+		} else {
+			fallback: -1
+		}
+	}
+}.out
+
+// Inner body references an undefined optional; the inner try fails on its own
+// and the outer foo? also fails, so the else clause should run. It instead
+// surfaces the outer optional-reference error.
+nestedTry: optionalInnerUndefined: {
+	foo?: foo2: int
+	out: {
+		try {
+			foo?.foo2 & { try {z: c?}}
+		} else {
+			fallback: -1
+		}
+	}
+}.out
+
+// =============================================================================
+// Try bodies containing disjunctions. Evaluating a disjunction clones the
+// node context, so attribution of a failed ?-marked reference must survive
+// cloning. https://cuelang.org/issue/4347
+// =============================================================================
+
+// Disjunction as a sibling field within the try body. The optional resolves,
+// so the try yields its body, including the unresolved disjunction.
+nestedTry: disjSiblingDefined: {
+	foo: 7
+	try {
+		pick: *1 | 2
+		v:    foo?
+	} else {fallback: -1}
+}
+
+// As above but the optional is undefined, so the try is discarded and the
+// else runs. The sibling disjunction never materializes.
+nestedTry: disjSiblingUndefined: {
+	foo?: int
+	try {
+		pick: *1 | 2
+		v:    foo?
+	} else {fallback: -1}
+}
+
+// The try body root is itself a disjunction. The optional resolves in the
+// first branch, so the try yields the whole disjunction.
+nestedTry: disjBodyDefined: {
+	foo: 9
+	try {{x: foo?} | {x: 0}} else {fallback: -1}
+}
+
+// The try body root is a disjunction and its first branch references an
+// undefined optional. A failed ?-reference in any branch discards the whole
+// try, so the else runs even though the second branch is self-consistent.
+nestedTry: disjBodyUndefined: {
+	foo?: int
+	try {{x: foo?} | {x: 0}} else {fallback: -1}
+}
+
+// =============================================================================
 // Original recursive tests
 // =============================================================================
 
@@ -967,6 +1136,203 @@ recursive: t3: { try {{x: b?, y: c?}} else {z: 23}}
     withLet: {
       try x = 〈2;a〉? let y = (〈0;x〉 * 2) {
         doubled: 〈1;y〉
+      }
+    }
+  }
+  nestedTry: {
+    emptyInnerInBody: {
+      foo?: {
+        foo2: int
+      }
+      bar: {
+        try {
+          (〈2;foo〉?.foo2 & {
+            try {}
+          })
+        }
+      }
+    }.bar
+  }
+  nestedTry: {
+    emptyInnerWithElse: {
+      foo?: {
+        foo2: int
+      }
+      bar: {
+        try {
+          (〈2;foo〉?.foo2 & {
+            try {}
+          })
+        } else {
+          fallback: -1
+        }
+      }
+    }.bar
+  }
+  nestedTry: {
+    emptyInnerSibling: {
+      foo?: {
+        foo2: int
+      }
+      bar: {
+        try {
+          x: 〈2;foo〉?.foo2
+          y: {
+            try {}
+          }
+        } else {
+          fallback: -1
+        }
+      }
+    }.bar
+  }
+  nestedTry: {
+    sameFieldUndefined: {
+      try {
+        x: 〈3;c〉?
+        try {
+          y: 〈4;c〉?
+        }
+      } else {
+        fallback: -1
+      }
+    }
+  }
+  nestedTry: {
+    sameFieldDefined: {
+      foo: 99
+      try {
+        x: 〈1;foo〉?
+        try {
+          y: 〈2;foo〉?
+        }
+      } else {
+        fallback: -1
+      }
+    }
+  }
+  siblingTries: {
+    sameFieldUndefined: {
+      try {
+        x: 〈3;c〉?
+      }
+      try {
+        y: 〈3;c〉?
+      }
+    }
+  }
+  siblingTries: {
+    sameFieldDefined: {
+      foo: 99
+      try {
+        x: 〈1;foo〉?
+      }
+      try {
+        y: 〈1;foo〉?
+      }
+    }
+  }
+  nestedTry: {
+    optionalInnerDefined: {
+      foo?: {
+        foo2: int
+      }
+      bar: 7
+      out: {
+        try {
+          (〈2;foo〉?.foo2 & {
+            try {
+              z: 〈4;bar〉?
+            }
+          })
+        }
+      }
+    }.out
+  }
+  nestedTry: {
+    optionalInnerDefinedWithElse: {
+      foo?: {
+        foo2: int
+      }
+      bar: 7
+      out: {
+        try {
+          (〈2;foo〉?.foo2 & {
+            try {
+              z: 〈4;bar〉?
+            }
+          })
+        } else {
+          fallback: -1
+        }
+      }
+    }.out
+  }
+  nestedTry: {
+    optionalInnerUndefined: {
+      foo?: {
+        foo2: int
+      }
+      out: {
+        try {
+          (〈2;foo〉?.foo2 & {
+            try {
+              z: 〈6;c〉?
+            }
+          })
+        } else {
+          fallback: -1
+        }
+      }
+    }.out
+  }
+  nestedTry: {
+    disjSiblingDefined: {
+      foo: 7
+      try {
+        pick: (*1|2)
+        v: 〈1;foo〉?
+      } else {
+        fallback: -1
+      }
+    }
+  }
+  nestedTry: {
+    disjSiblingUndefined: {
+      foo?: int
+      try {
+        pick: (*1|2)
+        v: 〈1;foo〉?
+      } else {
+        fallback: -1
+      }
+    }
+  }
+  nestedTry: {
+    disjBodyDefined: {
+      foo: 9
+      try {
+        ({
+          x: 〈2;foo〉?
+        }|{
+          x: 0
+        })
+      } else {
+        fallback: -1
+      }
+    }
+  }
+  nestedTry: {
+    disjBodyUndefined: {
+      foo?: int
+      try {
+        ({
+          x: 〈2;foo〉?
+        }|{
+          x: 0
+        })
+      } else {
+        fallback: -1
       }
     }
   }

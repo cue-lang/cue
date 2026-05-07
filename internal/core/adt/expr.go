@@ -2252,6 +2252,13 @@ type TryClause struct {
 	Label Feature // identifier for assignment form (InvalidLabel for struct form)
 	Expr  Expr    // expression for assignment form (nil for struct form)
 	// Struct form: body is in Comprehension.Value
+
+	// BodyHasOptional reports whether the body lexically contains a
+	// ?-marked reference. When false, yield need not save/restore
+	// c.skipTry: an empty or ?-free body cannot fail, so leaving the
+	// flag untouched avoids erasing a signal set by a sibling failing
+	// reference whose evaluation interleaves with the body's Finalize.
+	BodyHasOptional bool
 }
 
 func (x *TryClause) Source() ast.Node {
@@ -2272,10 +2279,15 @@ func (x *TryClause) yield(s *compState) {
 	// Final (non-incomplete) errors are reported immediately as an optimization,
 	// since they would be encountered during re-evaluation anyway.
 
-	// Save state
-	savedSkipTry := c.skipTry
-	c.skipTry = false
-	defer func() { c.skipTry = savedSkipTry }()
+	// Save and reset c.skipTry only when the body could fail. A body
+	// without ?-marked references is a no-op for skipTry; touching the
+	// flag would erase a signal set by a sibling ?-reference whose
+	// evaluation interleaves with this body's Finalize (issue #4347).
+	if x.BodyHasOptional {
+		savedSkipTry := c.skipTry
+		c.skipTry = false
+		defer func() { c.skipTry = savedSkipTry }()
+	}
 
 	// TODO(perf): we could capture "final" errors and bail out processing of
 	// the try expression early.

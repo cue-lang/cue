@@ -164,6 +164,11 @@ type Vertex struct {
 	// TODO: move to nodeContext.
 	overlay *Vertex
 
+	// trySkip, when non-nil, marks this Vertex as a try clause body currently
+	// being finalized; a failed ?-marked reference sets *trySkip via
+	// [OpContext.markSkipTry]. See [TryClause.yield].
+	trySkip *bool
+
 	// Label is the feature leading to this vertex.
 	Label Feature
 

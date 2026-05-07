@@ -548,8 +548,7 @@ assignmentForm: {
 
 // Outer try has a failed optional reference (foo?). The empty inner try {}
 // is a no-op and must not interfere with the outer's detection of the
-// failure. The selector on the struct literal forces concrete evaluation,
-// which is needed to trigger the bug.
+// failure. The selector on the struct literal forces concrete evaluation.
 nestedTry: emptyInnerInBody: {
 	foo?: foo2: int
 	bar: {
@@ -557,7 +556,7 @@ nestedTry: emptyInnerInBody: {
 			foo?.foo2 & { try {} }
 		}
 	}
-}.bar @test(err, code=incomplete, path=nestedTry.emptyInnerInBody, contains="cannot reference optional field: %s", args=[foo], pos=[4:4]) @test(eq:todo, {})
+}.bar @test(eq, {})
 
 nestedTry: emptyInnerWithElse: {
 	foo?: foo2: int
@@ -568,7 +567,7 @@ nestedTry: emptyInnerWithElse: {
 			fallback: -1
 		}
 	}
-}.bar @test(err, code=incomplete, path=nestedTry.emptyInnerWithElse, contains="cannot reference optional field: %s", args=[foo], pos=[4:4]) @test(eq:todo, {fallback: -1})
+}.bar @test(eq, {fallback: -1})
 
 // Sibling form: the empty inner try {} is in a sibling field, not in a
 // conjunction with the failing optional reference.
@@ -623,13 +622,12 @@ siblingTries: sameFieldDefined: {
 } @test(eq, {foo: 99, x: 99, y: 99})
 
 // Variants of emptyInnerInBody where the inner try body itself contains a
-// ?-marked reference, so the inner try is no longer ?-free and still saves and
-// restores c.skipTry. These cases show that the ?-free fix does not extend to
-// them: the inner try's restore still erases the outer foo? failure signal, so
-// the outer try wrongly yields. The eq:todo values record the correct results.
+// ?-marked reference. The inner try therefore registers its own body, but the
+// outer foo? failure is attributed to the outer body by structural ancestry,
+// so the inner try does not erase it and the outer try still discards.
 
-// Inner body references a defined optional; the outer foo? should fail, so the
-// whole outer try should yield nothing. It instead yields the inner body.
+// Inner body references a defined optional; the outer foo? fails, so the whole
+// outer try yields nothing.
 nestedTry: optionalInnerDefined: {
 	foo?: foo2: int
 	bar: 7
@@ -638,10 +636,9 @@ nestedTry: optionalInnerDefined: {
 			foo?.foo2 & { try { z: bar? } }
 		}
 	}
-}.out @test(eq, {z: 7}) @test(eq:todo, {})
+}.out @test(eq, {})
 
-// As above but with an else clause, which should run because the outer foo?
-// fails. It instead yields the inner body and the else never runs.
+// As above but with an else clause, which runs because the outer foo? fails.
 nestedTry: optionalInnerDefinedWithElse: {
 	foo?: foo2: int
 	bar: 7
@@ -652,11 +649,10 @@ nestedTry: optionalInnerDefinedWithElse: {
 			fallback: -1
 		}
 	}
-}.out @test(eq, {z: 7}) @test(eq:todo, {fallback: -1})
+}.out @test(eq, {fallback: -1})
 
 // Inner body references an undefined optional; the inner try fails on its own
-// and the outer foo? also fails, so the else clause should run. It instead
-// surfaces the outer optional-reference error.
+// and the outer foo? also fails, so the else clause runs.
 nestedTry: optionalInnerUndefined: {
 	foo?: foo2: int
 	out: {
@@ -666,7 +662,7 @@ nestedTry: optionalInnerUndefined: {
 			fallback: -1
 		}
 	}
-}.out @test(err, code=incomplete, path=nestedTry.optionalInnerUndefined, contains="cannot reference optional field: %s", args=[foo], pos=[4:4]) @test(eq:todo, {fallback: -1})
+}.out @test(eq, {fallback: -1})
 
 // =============================================================================
 // Try bodies containing disjunctions. Evaluating a disjunction clones the
@@ -758,16 +754,6 @@ recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}  @test(eq, {z: 23})
     ./in.cue:492:16
 [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
     ./in.cue:518:11
-[incomplete] nestedTry.emptyInnerInBody: cannot reference optional field: foo:
-    ./in.cue:556:4
-[incomplete] nestedTry.emptyInnerWithElse: cannot reference optional field: foo:
-    ./in.cue:565:4
-[incomplete] nestedTry.optionalInnerDefined: cannot reference optional field: foo:
-    ./in.cue:637:4
-[incomplete] nestedTry.optionalInnerDefinedWithElse: cannot reference optional field: foo:
-    ./in.cue:649:4
-[incomplete] nestedTry.optionalInnerUndefined: cannot reference optional field: foo:
-    ./in.cue:663:4
 -- out/todo.txt --
 In v2, the try mechanism does not exist and many operations that succeed in v3
 produce errors in v2 (type errors, index out of range on open lists, etc.).

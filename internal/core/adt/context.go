@@ -165,7 +165,13 @@ type OpContext struct {
 
 	errs      *Bottom
 	positions []Node // keep track of error positions
-	skipTry   bool   // set when an option reference is not present
+
+	// tryFrames is a stack of try clause bodies currently being finalized,
+	// each paired with whether a ?-marked reference belonging to that body
+	// failed to resolve because its optional field is not present. A failure
+	// is attributed to the nearest enclosing body by structural ancestry; see
+	// [OpContext.markSkipTry].
+	tryFrames []tryFrame
 
 	// vertex is used to determine the path location in case of error. Turning
 	// this into a stack could also allow determining the cyclic path for
@@ -245,6 +251,14 @@ type OpContext struct {
 	// necessary to get the right path for incomplete errors in the presence of
 	// structure sharing.
 	altPath []*Vertex // stack of selectors
+}
+
+// tryFrame records a try clause body that is currently being finalized and
+// whether a ?-marked reference belonging to it failed to resolve. See
+// [OpContext.markSkipTry] and the struct-form try in [TryClause.yield].
+type tryFrame struct {
+	body *Vertex
+	skip bool
 }
 
 func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }

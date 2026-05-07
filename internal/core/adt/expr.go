@@ -584,10 +584,33 @@ func (c *OpContext) checkSkipTry(optional bool, arc *Vertex) *Vertex {
 	}
 
 	if optional && c.errs != nil && c.errs.IsIncomplete() {
-		c.skipTry = true
+		c.markSkipTry()
 	}
 
 	return nil
+}
+
+// markSkipTry records that a ?-marked reference failed to resolve because its
+// optional field is not present. The failure is attributed to the nearest
+// enclosing try clause body by walking up the parent chain from the vertex
+// currently being evaluated until it reaches a body registered in c.tryFrames.
+//
+// A single shared flag cannot distinguish which try a failed reference belongs
+// to when try bodies nest or their finalizations interleave: an inner body's
+// finalization may be in progress on the call stack while a sibling reference
+// belonging to an outer body fails (e.g. `foo? & { try {...} }`). The vertex
+// owning the failing reference, tracked by the scheduler in c.vertex, is not
+// affected by this interleaving, so resolving the owner by structural ancestry
+// rather than by stack order attributes the failure correctly (issue #4347).
+func (c *OpContext) markSkipTry() {
+	for v := c.vertex; v != nil; v = v.Parent {
+		for i := range c.tryFrames {
+			if c.tryFrames[i].body == v {
+				c.tryFrames[i].skip = true
+				return
+			}
+		}
+	}
 }
 
 // A ValueReference represents a lexical reference to a value.
@@ -2272,11 +2295,6 @@ func (x *TryClause) yield(s *compState) {
 	// Final (non-incomplete) errors are reported immediately as an optimization,
 	// since they would be encountered during re-evaluation anyway.
 
-	// Save state
-	savedSkipTry := c.skipTry
-	c.skipTry = false
-	defer func() { c.skipTry = savedSkipTry }()
-
 	// TODO(perf): we could capture "final" errors and bail out processing of
 	// the try expression early.
 
@@ -2289,11 +2307,18 @@ func (x *TryClause) yield(s *compState) {
 	}
 
 	v := c.newInlineVertex(env.DerefVertex(c), nil, Conjunct{env, expr, c.ci})
-	v.Finalize(c)
 
-	// If any ?-marked reference failed, don't yield - else clause runs.
-	// Check for OptionalUndefined - set by ?-marked references that fail.
-	if c.skipTry {
+	// Register this body so that a ?-marked reference that fails while
+	// finalizing it (or one of its descendants) is attributed to this try
+	// rather than to an enclosing or interleaving one. See markSkipTry.
+	c.tryFrames = append(c.tryFrames, tryFrame{body: v})
+	v.Finalize(c)
+	skip := c.tryFrames[len(c.tryFrames)-1].skip
+	c.tryFrames = c.tryFrames[:len(c.tryFrames)-1]
+
+	// If any ?-marked reference belonging to this body failed, don't yield -
+	// the else clause (if present) runs instead.
+	if skip {
 		return
 	}
 

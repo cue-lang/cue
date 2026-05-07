@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5fc14bf_0de7e32b",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51996c3c_136f9a06",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c77f64d9_06343d4d",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-07T14:02:14Z",
       "side": 1,
       "message": "I wonder if we should have a compare method on paths, because stringifying paths to sort them feels unfortunate. This can just be a TODO for now.",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f242a8cb_f01ef096",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c77f64d9_06343d4d",
       "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9aae0b6_0898765b",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "Good point, done.",
+      "parentUuid": "ee2d22b8_ca94c2bc",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea933bd5_f4f7befe",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-05-07T14:02:14Z",
       "side": 1,
       "message": "nit: invert and early continue to unindent",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d008624_e81827ad",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea933bd5_f4f7befe",
       "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "43307487_ede4a920",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1339,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39b39e0b_f1a4199b",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7044b076_86d1f63a",
@@ -116,6 +206,24 @@
       "writtenOn": "2026-05-07T14:02:14Z",
       "side": 1,
       "message": "these godoc lines are way too short; this fits in two or three lines.",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff20fc59_461cd86f",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1379,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7044b076_86d1f63a",
       "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91c3b884_b522d043",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1386,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "It\u0027s not dangerous as such, because these aren\u0027t secure hashes, but it might result in less collisions in the hash table, so probably worth doing anyway, hence done.",
+      "parentUuid": "7e5b15c1_8d43e5f5",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "649f3c55_68e4f4b8",
@@ -154,6 +280,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fa7d69e_ea82b14a",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1390,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "649f3c55_68e4f4b8",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "01e203b4_84ada728",
@@ -167,6 +311,24 @@
       "writtenOn": "2026-05-07T14:02:14Z",
       "side": 1,
       "message": "I feel like we need more test cases here, for example, something that exercises the common suffix rule described in the commit message. because if all that this test checks is that we can strip `#` without collisions, we can implement that rule in much less code and complexity.",
+      "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2878e5e0_77b742d4",
+        "filename": "encoding/jsonschema/testdata/generate/defnames.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T14:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01e203b4_84ada728",
       "revId": "b76e55c06c55acf70fcba4ebcfe662f92cfa9cef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

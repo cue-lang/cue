@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82713343_5e8f10ba",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T16:40:37Z",
+      "side": 1,
+      "message": "I think this should be written in terms of the API concepts we already have. For example:\n\n\u003e Selectors are ordered first by their [SelectorType.LabelType],\n\u003e then by the value within the same label type,\n\u003e then by [SelectorType.ConstraintType].\n\nI also wonder to myself why the constraint type is at the very end of that logic. Naively I would have assumed that we should order first by SelectorType (the bits of LabelType and ConstraintByte combined), then by inner value within the same SelectorType.",
+      "revId": "ee3b3894989b81186a7388201541235bfaf96296",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e32b198b_c674ff66",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 793,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T16:40:37Z",
+      "side": 1,
+      "message": "these vars are only used once; I\u0027d inline them so that we don\u0027t have so many one and two letter variables in scope. it\u0027s hard to keep track of them all.",
+      "revId": "ee3b3894989b81186a7388201541235bfaf96296",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d459c64a_9f1d84c0",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 798,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T16:40:37Z",
+      "side": 1,
+      "message": "I\u0027d note above this type switch that at this point we know for sure that the two selectors are of the same type, so the type assertions on `b` below cannot panic.",
+      "revId": "ee3b3894989b81186a7388201541235bfaf96296",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ccb1caa_73124c63",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T16:40:37Z",
+      "side": 1,
+      "message": "I would document the reasoning behind this ordering. for example, does it mostly follow how `selector.String()` would sort? or is it more about a certain logic of what goes first?",
+      "revId": "ee3b3894989b81186a7388201541235bfaf96296",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

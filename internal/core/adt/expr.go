@@ -566,10 +566,12 @@ func (x *NodeLink) resolve(c *OpContext, state Flags) *Vertex {
 //
 //	a
 type FieldReference struct {
-	Src      *ast.Ident
-	UpCount  int32
-	Label    Feature
-	Optional bool // true if this is a ?-marked reference (e.g., a?)
+	Src     *ast.Ident
+	UpCount int32
+	Label   Feature
+	// OptionalTry is the lexically enclosing try clause for a ?-marked
+	// reference (e.g. a?), or nil if not optional.
+	OptionalTry *TryClause
 }
 
 func (x *FieldReference) Source() ast.Node {
@@ -591,16 +593,23 @@ func (x *FieldReference) resolve(c *OpContext, state Flags) *Vertex {
 
 	v := c.lookup(n, pos, x.Label, state)
 
-	return c.checkSkipTry(x.Optional, v)
+	return c.checkSkipTry(x.OptionalTry, v)
 }
 
-func (c *OpContext) checkSkipTry(optional bool, arc *Vertex) *Vertex {
+// checkSkipTry attributes a failed lookup to its lexically enclosing try
+// clause, if any. Non-optional callers pass try as nil.
+func (c *OpContext) checkSkipTry(try *TryClause, arc *Vertex) *Vertex {
 	if arc != nil {
 		return arc
 	}
 
-	if optional && c.errs != nil && c.errs.IsIncomplete() {
-		c.skipTry = true
+	if try != nil && c.errs != nil && c.errs.IsIncomplete() {
+		for i := len(c.tryStack) - 1; i >= 0; i-- {
+			if c.tryStack[i].try == try {
+				c.tryStack[i].failed = true
+				break
+			}
+		}
 	}
 
 	return nil
@@ -886,10 +895,12 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 //	a.sel
 //	a.sel? (optional - returns OptionalUndefined if field doesn't exist)
 type SelectorExpr struct {
-	Src      *ast.SelectorExpr
-	X        Expr
-	Sel      Feature
-	Optional bool // true if selector has ? suffix (e.g., foo.bar?)
+	Src *ast.SelectorExpr
+	X   Expr
+	Sel Feature
+	// OptionalTry is the lexically enclosing try clause for a ?-suffixed
+	// selector (e.g. foo.bar?), or nil if not optional.
+	OptionalTry *TryClause
 }
 
 func (x *SelectorExpr) Source() ast.Node {
@@ -921,7 +932,7 @@ func (x *SelectorExpr) resolve(c *OpContext, state Flags) *Vertex {
 	pos := x.Src.Sel.Pos()
 	result := c.lookup(n, pos, x.Sel, state)
 
-	return c.checkSkipTry(x.Optional, result)
+	return c.checkSkipTry(x.OptionalTry, result)
 }
 
 // IndexExpr is like a selector, but selects an index.
@@ -929,10 +940,12 @@ func (x *SelectorExpr) resolve(c *OpContext, state Flags) *Vertex {
 //	a[index]
 //	a[index]? (optional - returns OptionalUndefined if index doesn't exist)
 type IndexExpr struct {
-	Src      *ast.IndexExpr
-	X        Expr
-	Index    Expr
-	Optional bool // true if index has ? suffix (e.g., foo[0]?)
+	Src   *ast.IndexExpr
+	X     Expr
+	Index Expr
+	// OptionalTry is the lexically enclosing try clause for a ?-suffixed
+	// index (e.g. foo[0]?), or nil if not optional.
+	OptionalTry *TryClause
 }
 
 func (x *IndexExpr) Source() ast.Node {
@@ -982,7 +995,7 @@ func (x *IndexExpr) resolve(ctx *OpContext, state Flags) *Vertex {
 	pos := x.Src.Index.Pos()
 	result := ctx.lookup(n, pos, f, state)
 
-	return ctx.checkSkipTry(x.Optional, result)
+	return ctx.checkSkipTry(x.OptionalTry, result)
 }
 
 // A SliceExpr represents a slice operation. (Not currently in spec.)
@@ -2271,6 +2284,18 @@ type TryClause struct {
 	// Struct form: body is in Comprehension.Value
 }
 
+// OrphanTryClause is a sentinel for a ?-marked reference with no lexically
+// enclosing try clause. The compile error halts evaluation, so it's only
+// used to keep OptionalTry non-nil for debug/export rendering.
+var OrphanTryClause = &TryClause{}
+
+// tryStackEntry tracks whether a ?-marked reference enclosed by the
+// given TryClause has failed during pre-evaluation of its body.
+type tryStackEntry struct {
+	try    *TryClause
+	failed bool
+}
+
 func (x *TryClause) Source() ast.Node {
 	if x.Src == nil {
 		return nil
@@ -2289,10 +2314,11 @@ func (x *TryClause) yield(s *compState) {
 	// Final (non-incomplete) errors are reported immediately as an optimization,
 	// since they would be encountered during re-evaluation anyway.
 
-	// Save state
-	savedSkipTry := c.skipTry
-	c.skipTry = false
-	defer func() { c.skipTry = savedSkipTry }()
+	// Push an entry on the try-yield stack so failures of lexically
+	// enclosed ?-marked references attribute to this TryClause without
+	// disturbing siblings or ancestors.
+	c.tryStack = append(c.tryStack, tryStackEntry{try: x})
+	defer func() { c.tryStack = c.tryStack[:len(c.tryStack)-1] }()
 
 	// TODO(perf): we could capture "final" errors and bail out processing of
 	// the try expression early.
@@ -2308,9 +2334,9 @@ func (x *TryClause) yield(s *compState) {
 	v := c.newInlineVertex(env.DerefVertex(c), nil, Conjunct{env, expr, c.ci})
 	v.Finalize(c)
 
-	// If any ?-marked reference failed, don't yield - else clause runs.
-	// Check for OptionalUndefined - set by ?-marked references that fail.
-	if c.skipTry {
+	// If any ?-marked reference lexically inside this try failed, don't yield;
+	// else clause (if any) runs.
+	if c.tryStack[len(c.tryStack)-1].failed {
 		return
 	}
 

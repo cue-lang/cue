@@ -165,7 +165,11 @@ type OpContext struct {
 
 	errs      *Bottom
 	positions []Node // keep track of error positions
-	skipTry   bool   // set when an option reference is not present
+	// tryStack mirrors the dynamic chain of TryClause.yield calls in
+	// progress. Each entry records whether a lexically enclosed ?-marked
+	// reference has failed, so failures are attributed to the right try
+	// rather than via a single global flag.
+	tryStack []tryStackEntry
 
 	// vertex is used to determine the path location in case of error. Turning
 	// this into a stack could also allow determining the cyclic path for

@@ -424,7 +424,7 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 					ident := ast.NewIdent(aliasFromLabel(f))
 					ident.Node = entry.field
 					ident.Scope = entry.scope
-					return wrapIfOptional(ident, x.Optional)
+					return wrapIfOptional(ident, x.OptionalTry != nil)
 				}
 			}
 		}
@@ -451,7 +451,7 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 			}
 		}
 
-		return wrapIfOptional(ident, x.Optional)
+		return wrapIfOptional(ident, x.OptionalTry != nil)
 
 	case *adt.ValueReference:
 		name := x.Label.IdentString(e.ctx)
@@ -523,14 +523,14 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 			X:   e.innerExpr(env, x.X),
 			Sel: e.stringLabel(x.Sel),
 		}
-		return wrapIfOptional(sel, x.Optional)
+		return wrapIfOptional(sel, x.OptionalTry != nil)
 
 	case *adt.IndexExpr:
 		idx := &ast.IndexExpr{
 			X:     e.innerExpr(env, x.X),
 			Index: e.innerExpr(env, x.Index),
 		}
-		return wrapIfOptional(idx, x.Optional)
+		return wrapIfOptional(idx, x.OptionalTry != nil)
 	}
 	panic("unreachable")
 }

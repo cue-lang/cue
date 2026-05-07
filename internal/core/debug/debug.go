@@ -567,7 +567,7 @@ func (w *printer) node(n adt.Node) {
 		w.string(";")
 		w.label(x.Label)
 		w.string(closeTuple)
-		if x.Optional {
+		if x.OptionalTry != nil {
 			w.string("?")
 		}
 
@@ -610,7 +610,7 @@ func (w *printer) node(n adt.Node) {
 		w.node(x.X)
 		w.string(".")
 		w.label(x.Sel)
-		if x.Optional {
+		if x.OptionalTry != nil {
 			w.string("?")
 		}
 
@@ -619,7 +619,7 @@ func (w *printer) node(n adt.Node) {
 		w.string("[")
 		w.node(x.Index)
 		w.string("]")
-		if x.Optional {
+		if x.OptionalTry != nil {
 			w.string("?")
 		}
 

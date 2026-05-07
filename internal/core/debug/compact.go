@@ -210,7 +210,7 @@ func (w *printer) compactNode(n adt.Node) {
 
 	case *adt.FieldReference:
 		w.label(x.Label)
-		if x.Optional {
+		if x.OptionalTry != nil {
 			w.string("?")
 		}
 
@@ -237,7 +237,7 @@ func (w *printer) compactNode(n adt.Node) {
 		w.node(x.X)
 		w.string(".")
 		w.label(x.Sel)
-		if x.Optional {
+		if x.OptionalTry != nil {
 			w.string("?")
 		}
 
@@ -246,7 +246,7 @@ func (w *printer) compactNode(n adt.Node) {
 		w.string("[")
 		w.node(x.Index)
 		w.string("]")
-		if x.Optional {
+		if x.OptionalTry != nil {
 			w.string("?")
 		}
 

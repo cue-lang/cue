@@ -136,6 +136,11 @@ type compiler struct {
 	// also be set by other contexts like exists() builtins or query contexts.
 	inTryContext int
 
+	// tryClauses is the stack of TryClauses currently being compiled.
+	// A ?-marked reference captures the top entry as its lexically
+	// enclosing try.
+	tryClauses []*adt.TryClause
+
 	fileScope map[adt.Feature]bool
 
 	num literal.NumInfo
@@ -981,7 +986,9 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 
 				// Enable try context for the expression
 				c.inTryContext++
+				c.tryClauses = append(c.tryClauses, y)
 				expr := c.expr(x.Expr)
+				c.tryClauses = c.tryClauses[:len(c.tryClauses)-1]
 				c.inTryContext--
 
 				refsCompVar := c.refersToForVariable
@@ -1023,9 +1030,11 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 	// Enable try context for struct form try clause body
 	if hasTry {
 		c.inTryContext++
+		c.tryClauses = append(c.tryClauses, a[len(a)-1].(*adt.TryClause))
 	}
 	y := c.expr(x.Value)
 	if hasTry {
+		c.tryClauses = c.tryClauses[:len(c.tryClauses)-1]
 		c.inTryContext--
 	}
 
@@ -1318,15 +1327,21 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			// Compile the inner expression first, then validate.
 			// This gives better error output by showing the reference.
 			x := c.expr(n.X)
+			// Outside any try, the compile error above halts evaluation;
+			// use a sentinel so OptionalTry stays non-nil for rendering.
+			enc := adt.OrphanTryClause
+			if len(c.tryClauses) > 0 {
+				enc = c.tryClauses[len(c.tryClauses)-1]
+			}
 			switch r := x.(type) {
 			case *adt.FieldReference:
-				r.Optional = true
+				r.OptionalTry = enc
 				return r
 			case *adt.SelectorExpr:
-				r.Optional = true
+				r.OptionalTry = enc
 				return r
 			case *adt.IndexExpr:
-				r.Optional = true
+				r.OptionalTry = enc
 				return r
 			case *adt.Bottom:
 				return r

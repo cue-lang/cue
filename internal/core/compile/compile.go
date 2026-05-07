@@ -136,6 +136,11 @@ type compiler struct {
 	// also be set by other contexts like exists() builtins or query contexts.
 	inTryContext int
 
+	// optionalRefs counts ?-marked references compiled so far. Each
+	// TryClause snapshots this before compiling its body and after, so
+	// it can record whether the body lexically contains any ?-ref.
+	optionalRefs int
+
 	fileScope map[adt.Feature]bool
 
 	num literal.NumInfo
@@ -981,7 +986,9 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 
 				// Enable try context for the expression
 				c.inTryContext++
+				before := c.optionalRefs
 				expr := c.expr(x.Expr)
+				y.BodyHasOptional = c.optionalRefs > before
 				c.inTryContext--
 
 				refsCompVar := c.refersToForVariable
@@ -1021,11 +1028,14 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 	}
 
 	// Enable try context for struct form try clause body
+	var tryBefore int
 	if hasTry {
 		c.inTryContext++
+		tryBefore = c.optionalRefs
 	}
 	y := c.expr(x.Value)
 	if hasTry {
+		a[len(a)-1].(*adt.TryClause).BodyHasOptional = c.optionalRefs > tryBefore
 		c.inTryContext--
 	}
 
@@ -1321,12 +1331,15 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			switch r := x.(type) {
 			case *adt.FieldReference:
 				r.Optional = true
+				c.optionalRefs++
 				return r
 			case *adt.SelectorExpr:
 				r.Optional = true
+				c.optionalRefs++
 				return r
 			case *adt.IndexExpr:
 				r.Optional = true
+				c.optionalRefs++
 				return r
 			case *adt.Bottom:
 				return r

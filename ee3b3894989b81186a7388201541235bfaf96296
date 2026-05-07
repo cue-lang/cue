@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbac0181_bd74e24b",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T16:52:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82713343_5e8f10ba",
+      "revId": "ee3b3894989b81186a7388201541235bfaf96296",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e32b198b_c674ff66",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-07T16:40:37Z",
       "side": 1,
       "message": "these vars are only used once; I\u0027d inline them so that we don\u0027t have so many one and two letter variables in scope. it\u0027s hard to keep track of them all.",
+      "revId": "ee3b3894989b81186a7388201541235bfaf96296",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "514d50ec_93137407",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 793,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T16:52:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e32b198b_c674ff66",
       "revId": "ee3b3894989b81186a7388201541235bfaf96296",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50ee60dc_a44012dc",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 798,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T16:52:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d459c64a_9f1d84c0",
+      "revId": "ee3b3894989b81186a7388201541235bfaf96296",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ccb1caa_73124c63",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-07T16:40:37Z",
       "side": 1,
       "message": "I would document the reasoning behind this ordering. for example, does it mostly follow how `selector.String()` would sort? or is it more about a certain logic of what goes first?",
+      "revId": "ee3b3894989b81186a7388201541235bfaf96296",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b53afbb_3f8c4b3f",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-07T16:52:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ccb1caa_73124c63",
       "revId": "ee3b3894989b81186a7388201541235bfaf96296",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

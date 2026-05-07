@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1f79795_c32a610b",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-07T16:43:33Z",
+      "side": 1,
+      "message": "nit: move this above Deprecated, otherwise it can be understood as part of the deprecation notice.",
+      "revId": "2c2e6068e1e67352197979eb1336dcf57bb939a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

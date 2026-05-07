@@ -541,6 +541,50 @@ assignmentForm: {
 }
 
 // =============================================================================
+// Nested try clauses: an empty inner try in the outer try body should be a
+// no-op and must not interfere with the outer try's detection of failed
+// optional references. https://cuelang.org/issue/4347
+// =============================================================================
+
+// Outer try has a failed optional reference (foo?). The empty inner try {}
+// is a no-op and must not interfere with the outer's detection of the
+// failure. The selector on the struct literal forces concrete evaluation,
+// which is needed to trigger the bug.
+nestedTry: emptyInnerInBody: {
+	foo?: foo2: int
+	bar: {
+		try {
+			foo?.foo2 & { try {} }
+		}
+	}
+}.bar @test(err, code=incomplete, path=nestedTry.emptyInnerInBody, contains="cannot reference optional field: %s", args=[foo], pos=[4:4])
+
+nestedTry: emptyInnerWithElse: {
+	foo?: foo2: int
+	bar: {
+		try {
+			foo?.foo2 & { try {} }
+		} else {
+			fallback: -1
+		}
+	}
+}.bar @test(err, code=incomplete, path=nestedTry.emptyInnerWithElse, contains="cannot reference optional field: %s", args=[foo], pos=[4:4])
+
+// Sibling form: the empty inner try {} is in a sibling field, not in a
+// conjunction with the failing optional reference.
+nestedTry: emptyInnerSibling: {
+	foo?: foo2: int
+	bar: {
+		try {
+			x: foo?.foo2
+			y: { try {} }
+		} else {
+			fallback: -1
+		}
+	}
+}.bar @test(eq, {fallback: -1})
+
+// =============================================================================
 // Original recursive tests
 // =============================================================================
 
@@ -589,6 +633,10 @@ recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}  @test(eq, {z: 23})
     ./in.cue:492:16
 [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
     ./in.cue:518:11
+[incomplete] nestedTry.emptyInnerInBody: cannot reference optional field: foo:
+    ./in.cue:556:4
+[incomplete] nestedTry.emptyInnerWithElse: cannot reference optional field: foo:
+    ./in.cue:565:4
 -- out/todo.txt --
 In v2, the try mechanism does not exist and many operations that succeed in v3
 produce errors in v2 (type errors, index out of range on open lists, etc.).
@@ -1119,6 +1167,53 @@ NumCloseIDs: 173
         doubled: 〈1;y〉
       }
     }
+  }
+  nestedTry: {
+    emptyInnerInBody: {
+      foo?: {
+        foo2: int
+      }
+      bar: {
+        try {
+          (〈2;foo〉?.foo2 & {
+            try {}
+          })
+        }
+      }
+    }.bar
+  }
+  nestedTry: {
+    emptyInnerWithElse: {
+      foo?: {
+        foo2: int
+      }
+      bar: {
+        try {
+          (〈2;foo〉?.foo2 & {
+            try {}
+          })
+        } else {
+          fallback: -1
+        }
+      }
+    }.bar
+  }
+  nestedTry: {
+    emptyInnerSibling: {
+      foo?: {
+        foo2: int
+      }
+      bar: {
+        try {
+          x: 〈2;foo〉?.foo2
+          y: {
+            try {}
+          }
+        } else {
+          fallback: -1
+        }
+      }
+    }.bar
   }
   recursive: {
     t1: {

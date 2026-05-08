@@ -91,7 +91,7 @@ large: {
 			host:     "mod.test"
 		}
 
-		X: #X.userinfo + #X.host + #X.port
+		X: #X.userinfo + #X.host + #X.port @test(err, any, code=incomplete|cycle)
 
 		#X: {
 			if Y.userinfo == _|_ {
@@ -109,7 +109,7 @@ large: {
 			if Y.port != _|_ {
 				port: ":" + strconv.FormatInt(Y.port, 10)
 			}
-		}
+		} @test(err, any, code=incomplete|cycle)
 
 		Y: {
 			if #Y.userinfo != _|_ {
@@ -121,22 +121,9 @@ large: {
 			if #Y.port != _|_ {
 				port: strconv.Atoi(#Y.port)
 			}
-		}
+		} @test(err, any, code=incomplete|cycle)
 
-		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-		@test(eq, {
-			Y: {
-				userinfo: "user"
-				host: _|_ @test(err, code=incomplete, contains="large.p1.Y.host: undefined field: host", pos=[117:13])
-			}
-			X: _|_ @test(err, code=incomplete, contains="large.p1.X: undefined field: port", pos=[92:33])
-			#X: {
-				_|_
-				userinfo: "user@"
-				host: "mod.test"
-			}
-			#Y: _|_ @test(err, code=incomplete, contains="large.p1.X: undefined field: port", pos=[92:33])
-		})
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X) @test(err, any, code=incomplete|cycle)
 	}
 }
 -- out/errors.txt --

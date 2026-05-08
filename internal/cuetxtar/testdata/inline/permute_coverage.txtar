@@ -1,0 +1,23 @@
+# Tests that the field-coverage checker still catches uncovered fields
+# inside a @test(permute) struct.
+#
+# A permute test asserts order-independence; it does not by itself assert
+# any concrete value, so on its own a permute attribute should not satisfy
+# coverage for the fields it permutes — those fields still need a value
+# directive (@test(eq, ...) or similar) somewhere reachable. Field "c"
+# below has no @test directive and is not referenced from a tested
+# sibling, so it must be flagged as uncovered.
+#
+# count=2 is pre-filled so CUE_UPDATE produces no source change; the test
+# stays focused on the coverage assertion.
+-- in/test.cue --
+myStruct: {
+	a: 1 @test(permute, count=2)
+	b: 2 @test(permute)
+	c: 3
+}
+-- out/run/errors.txt --
+test.cue:4: field myStruct.c is not covered: add a @test directive or reference it from a tested field
+-- out/status.txt --
+update: identical to input
+force:  identical to update

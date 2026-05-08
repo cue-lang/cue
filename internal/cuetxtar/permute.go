@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/cuetest"
-	"cuelang.org/go/internal/diff"
 )
 
 // runInlinePermutes processes @test(permute) attributes within an inline-form
@@ -96,7 +95,7 @@ func (r *inlineRunner) runInlinePermutes(t testing.TB, rootPath cue.Path, record
 	}
 
 	for _, group := range permuteGroups {
-		groupPerms := r.runPermuteAssertion(t, group.parentPath, group.fields)
+		groupPerms := r.runPermuteAssertion(t, group.parentPath, group.fields, records, version)
 		if groupPerms > 0 && group.hasPA {
 			r.checkPermuteCount(t, group.parentPath, group.permutePA, groupPerms)
 		}
@@ -173,7 +172,7 @@ func buildPermuteAttr(pa parsedTestAttr, count int) string {
 // Uses Heap's algorithm to enumerate permutations without allocating N! slices.
 // Returns the total number of permutations evaluated (N!), or 0 if skipped
 // (fewer than 2 permutable fields).
-func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fieldNames []string) int {
+func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fieldNames []string, records []attrRecord, version string) int {
 	t.Helper()
 	if r.cueFiles == nil {
 		return 0
@@ -241,8 +240,24 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 				return
 			}
 			permVal := permAll.LookupPath(structPath)
-			kind, _ := diff.Diff(baseline, permVal)
-			if kind != diff.Identity {
+			cap := &failCapture{TB: t}
+			for _, rec := range records {
+				if !pathHasPrefix(rec.path, structPath) {
+					continue
+				}
+				for _, pa := range selectActiveDirectives(records, rec.path, version) {
+					if pa.directive == "permute" {
+						continue // avoid recursion
+					}
+					r.runDirective(cap, rec.path, permAll.LookupPath(rec.path), pa)
+				}
+			}
+			// Filter out pos= related failures: pos= specs use absolute
+			// source line numbers that necessarily shift when fields are
+			// reordered. The remaining failures are order-independent
+			// directive checks (code=, contains=, eq, etc.).
+			msgs := stripPosFailureLines(cap.msgs.String())
+			if msgs != "" {
 				reported = true
 				permNames := make([]string, n)
 				for i, p := range perm {
@@ -252,8 +267,9 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 						permNames[i] = fmt.Sprintf("[%d]", p)
 					}
 				}
-				t.Errorf("path %s: @test(permute): ordering [%s] produces a different result\ngot:  %s\nwant: %s",
+				t.Errorf("path %s: @test(permute): ordering [%s] fails directive checks:\n%s\ngot:  %s\nwant: %s",
 					structPath, strings.Join(permNames, ", "),
+					msgs,
 					r.formatValue(permVal, ""), r.formatValue(baseline, ""))
 			}
 			return
@@ -271,6 +287,24 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	generate(n)
 	t.Logf("path %s: @test(permute): evaluated %d permutations of %d fields", structPath, permNum, n)
 	return permNum
+}
+
+// stripPosFailureLines drops failure lines that report position mismatches
+// (any line mentioning "pos=" or "position"). Permutation reorders
+// declarations and therefore shifts absolute source positions, so position
+// checks are intentionally order-sensitive and not meaningful here.
+func stripPosFailureLines(s string) string {
+	var keep []string
+	for _, line := range strings.Split(s, "\n") {
+		if strings.Contains(line, "pos=") || strings.Contains(line, "position") {
+			continue
+		}
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		keep = append(keep, line)
+	}
+	return strings.Join(keep, "\n")
 }
 
 // findPermFieldsAtPath walks file following structPath and returns the

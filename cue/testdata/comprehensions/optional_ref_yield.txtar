@@ -1,0 +1,94 @@
+# Tests that the yield-on-running heuristic in OpContext.evalState (expr.go)
+# fires uniformly for any IncompleteError whose target node is currently
+# being evaluated, regardless of whether the missing field is an
+# ArcPending placeholder created by a pushed-down comprehension or an
+# ArcOptional declaration that may yet be upgraded to a member.
+#
+# To exercise the yield, the reference must resolve while the target
+# vertex itself is still mid-evaluation. The constructions below place
+# the reference *inside* the target struct so its task fires before
+# the sibling comprehension/declaration that produces the field.
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- in.cue --
+// Test A: a self-reference picks up an optional field that gets upgraded to
+// a member by a sibling comprehension. The reference (bar) fires before the
+// comp body has run, so bar's lookup of x.foo initially returns ArcOptional
+// (IncompleteError). The yield-on-running heuristic must fire so that bar
+// re-resolves once foo is materialized as a member.
+optionalUpgradesViaSiblingComp: {
+	x: {
+		bar:  x.foo
+		foo?: int
+		if true {
+			foo: 5
+		}
+	}
+	x: bar: int @test(eq, 5)
+}
+
+// Test B: a self-reference to an optional field that stays optional
+// permanently. The yield is harmless: after waiting for x's valueKnown the
+// field is still optional and the result is the same incomplete error.
+optionalStaysOptional: {
+	x: {
+		bar:  x.foo
+		foo?: int
+	}
+	x: bar: _ @test(err, code=incomplete, contains="cannot reference optional field")
+}
+
+// Test C: regression for the original ArcPending case — a self-reference
+// to a member produced by a pushed-down comprehension. This is what the
+// yield-on-running heuristic was originally introduced for.
+pendingBecomesMember: {
+	x: {
+		bar: x.foo
+		if true {
+			foo: 5
+		}
+	}
+	x: bar: int @test(eq, 5)
+}
+-- out/errors.txt --
+[incomplete] optionalStaysOptional.x.bar: cannot reference optional field: foo:
+    ./in.cue:22:11
+-- out/compile --
+--- in.cue
+{
+  optionalUpgradesViaSiblingComp: {
+    x: {
+      bar: 〈1;x〉.foo
+      foo?: int
+      if true {
+        foo: 5
+      }
+    }
+    x: {
+      bar: int
+    }
+  }
+  optionalStaysOptional: {
+    x: {
+      bar: 〈1;x〉.foo
+      foo?: int
+    }
+    x: {
+      bar: _
+    }
+  }
+  pendingBecomesMember: {
+    x: {
+      bar: 〈1;x〉.foo
+      if true {
+        foo: 5
+      }
+    }
+    x: {
+      bar: int
+    }
+  }
+}

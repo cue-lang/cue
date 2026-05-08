@@ -1373,6 +1373,44 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			return nil
 
 		case IncompleteError:
+			// Check whether the node that produced the error is currently being
+			// processed (somewhere up our call stack) and still has pending
+			// value-producing tasks (valueKnown not yet met). If so, the error
+			// is potentially transient: the field may appear once those tasks
+			// complete. Yield the current task so it waits for the referenced
+			// node's value to become known and then re-evaluates with a
+			// complete view of the dependency.
+			//
+			// We require ns.state == schedRUNNING (rather than schedREADY) so
+			// we only yield when the dependency is actively being computed. If
+			// it is merely scheduled but not started, yielding could cause a
+			// deadlock: we'd wait for a task that nobody else will trigger,
+			// while the dependency itself depends on this comprehension's
+			// output (a genuine cycle).
+			//
+			// We yield uniformly regardless of why the field was reported
+			// incomplete (ArcPending placeholder vs. ArcOptional reference).
+			// For ArcPending the yield is load-bearing: the comp body will fire
+			// and turn the arc into a member. For ArcOptional the yield is
+			// usually a no-op (the field stays optional and the error remains
+			// incomplete after the wait), but it remains correct because
+			// optional arcs can also be upgraded to members by sibling
+			// declarations or comprehensions before valueKnown is reached.
+			if v.Node != nil {
+				ns := v.Node.state
+				if ns != nil && ns.state == schedRUNNING &&
+					!ns.meets(valueKnown) &&
+					ns.provided&valueKnown != 0 {
+					if t := c.current(); t != nil {
+						c.PopState(s)
+						sched := &ns.scheduler
+						t.waitFor(sched, valueKnown)
+						sched.yield()
+						// unreachable — yield panics
+					}
+				}
+			}
+
 			c.evalState(x, Flags{
 				status:    finalized,
 				condition: allKnown,

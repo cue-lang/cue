@@ -1,0 +1,40 @@
+# Tests that @test(err, any, code=...) inside an @test(eq, {...}) body is
+# satisfied when any descendant of the value carries a matching error,
+# even when the field itself is not a direct error and its cumulative
+# error code differs from what `any` is asking for.
+#
+# Without the cmpErr `any` branch, validateErrProperties is run directly
+# against val and matches the *combined* error code, so a search for
+# `code=eval` on a struct whose first error is a cycle would
+# incorrectly fail.
+-- in/test.cue --
+// top.y has two children with distinct error codes: `c` is a cycle,
+// `e` is an eval-time conflict. The any= form must succeed at locating
+// `e` as a descendant matching code=eval.
+top: {
+	y: {
+		c: top.y.c
+		e: 1 & 2
+	}
+} @test(eq, {
+	y: _|_ @test(err, any, code=eval, contains="conflicting values")
+})
+-- out/status.txt --
+update: output passes run
+force:  identical to update
+-- out/update/out/errors.txt --
+[eval] top.y.e: conflicting values 2 and 1:
+    ./test.cue:7:6
+    ./test.cue:7:10
+-- out/update/test.cue --
+// top.y has two children with distinct error codes: `c` is a cycle,
+// `e` is an eval-time conflict. The any= form must succeed at locating
+// `e` as a descendant matching code=eval.
+top: {
+	y: {
+		c: top.y.c
+		e: 1 & 2
+	}
+} @test(eq, {
+	y: _|_ @test(err, any, code=eval, contains="conflicting values")
+})

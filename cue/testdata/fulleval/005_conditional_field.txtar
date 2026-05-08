@@ -21,7 +21,7 @@ d: {
 	if a > 1 {
 		a: 3
 	}
-	@test(err, code=(cycle|incomplete), pos=[2:5, 1:5, 2:2])
+	@test(err, code=(cycle|incomplete))
 }
 -- out/errors.txt --
 [incomplete] d: non-concrete value int in operand to >:

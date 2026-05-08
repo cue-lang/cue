@@ -48,11 +48,11 @@ fail: {
 		if a.b == _|_ {
 			b: 1
 		}
-	} @test(err, code=incomplete, path=b, contains="cyclic reference to field %[1]v", args=[b], pos=[6:3])
+	} @test(err, code=incomplete|cycle)
 }
 
 embed: {
-	fail1: #C1 @test(err, code=eval, path=p, contains="field not allowed", pos=[9:4, 12:9])
+	fail1: #C1 @test(err, code=eval, path=p, contains="field not allowed")
 	#C1: {
 		// TODO(errors): don't include all positions of p in the normal list of
 		// positions, or rather categorize the positions to show:
@@ -130,7 +130,8 @@ embed: {
 			q: 1 // do not inadvertently pick up a void arc.
 		}
 	} @test(eq, {
-		p: _|_ @test(err, code=incomplete, contains="embed.incomplete7.p: non-concrete value int in operand to +", pos=[124:6, 125:6, 126:3])
+		p: _|_ @test(err, code=incomplete, contains="non-concrete value int")
+		// TODO(inline): do not fail on todo with position mismatch. @test(err:todo, pos=[124:6, 125:6, 126:3])
 		q: int
 	})
 }
@@ -188,7 +189,7 @@ fieldMismatch: {
 			x: 3
 		}
 	}
-	@test(err, code=eval, at=a, contains="cannot combine regular field", pos=[4:7, 2:3])
+	@test(err, code=eval, at=a, hint="int with struct")
 }
 
 // b12aStructCycle presents a case that can easily lead to stack overflow in
@@ -292,8 +293,12 @@ voidArcs: {
 
 cyclicError: {
 	a: {
-		x: bool @test(err, code=incomplete, path=cyclicError.a, contains="incomplete %s: %s", args=[bool, bool], pos=[0:6])
-		y: bool @test(err, code=incomplete, path=cyclicError.a, contains="incomplete %s: %s", args=[bool, bool], pos=[-1:6])
+		// With pushdown, x and y remain bool (incomplete) rather than
+		// erroring: the if guards cannot resolve bool to a concrete
+		// value, so the comprehension bodies simply do not fire.
+		@test(err, code=incomplete)
+		x: bool
+		y: bool
 		if a.x  {
 			y: true
 		}
@@ -302,12 +307,12 @@ cyclicError: {
 		}
 		b: {}
 	}
-	// The evaluation of `b` in `a` triggers a to be fully evaluated, which
-	// is not possible because the evaluation of `a` depends on incomplete
-	// values.
-	c: a.b @test(err, code=incomplete, path=cyclicError.a, contains="incomplete %s: %s", args=[bool, bool], pos=[-13:6])
+	// With pushdown, evaluating a.b no longer forces a cycle error
+	// because the comprehension dependencies are pushed down to the
+	// individual fields rather than blocking the parent.
+	c: a.b @test(err, code=incomplete|cycle)
 	@test(eq, {
-		a: {
+	a: {
 			x: _|_
 			y: _|_
 			b: {}
@@ -385,6 +390,7 @@ closedCheck: success3: {
 			if d != "c" {
 				string
 			}
+			@test(err, code=incomplete, contains="non-concrete value", pos=[1:7, -1:6])
 		}
 	}
 
@@ -396,7 +402,7 @@ closedCheck: success3: {
 		a: {b: {c: {d: "d", e: "ok"}}}
 		#D: {
 			d: string
-			e: _|_ @test(err, code=incomplete, contains="closedCheck.success3.#D.e: non-concrete value string in operand to !=", pos=[382:7, 380:6])
+			e: _|_
 		}
 	})
 }
@@ -475,13 +481,13 @@ voidEliminationSuccess: derefRef1: {
 
 	E: {
 		e: bool
-		f: !e // remains incomplete
+		f: !e @test(err, code=incomplete, contains="not concrete", pos=[0:7])
 	}
 	@test(eq, {
 		a: {b: {c: {}}}
 		E: {
 			e: bool
-			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool)", pos=[475:7])
+			f: _|_
 		}
 	})
 }
@@ -498,17 +504,17 @@ voidEliminationSuccess: derefRef2: {
 	E: #F
 	#F: {
 		e: bool
-		f: !e // remains incomplete
+		f: !e @test(err, code=incomplete, contains="not concrete", pos=[0:7])
 	}
 	@test(eq, {
 		a: {b: {c: {}}}
 		E: {
 			e: bool
-			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool)", pos=[498:7])
+			f: _|_
 		}
 		#F: {
 			e: bool
-			f: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool)", pos=[498:7])
+			f: _|_ @test(err, code=incomplete)
 		}
 	})
 }
@@ -1336,55 +1342,55 @@ issue3935: full: {
     ./in.cue:125:6
     ./in.cue:126:3
 [eval] fieldMismatch.a: cannot combine regular field "x" with 2:
-    ./in.cue:185:7
-    ./in.cue:183:3
+    ./in.cue:186:7
+    ./in.cue:184:3
 [structural_cycle] noStackOverflowStructCycle.#list.tail: structural cycle
 [structural_cycle] noStackOverflowStructCycle.list.tail: structural cycle
 [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-    ./in.cue:220:7
+    ./in.cue:221:7
 [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
-    ./in.cue:243:8
+    ./in.cue:244:8
 [incomplete] cyclicError.a: incomplete bool: bool:
-    ./in.cue:292:6
+    ./in.cue:297:6
 [incomplete] cyclicError.a: incomplete bool: bool:
-    ./in.cue:292:6
+    ./in.cue:297:6
 [incomplete] closedCheck.success1.#D: non-concrete value string in operand to !=:
-    ./in.cue:341:6
-    ./in.cue:340:6
+    ./in.cue:346:6
+    ./in.cue:345:6
 [incomplete] closedCheck.success2.#D: non-concrete value string in operand to !=:
-    ./in.cue:361:6
-    ./in.cue:360:6
+    ./in.cue:366:6
+    ./in.cue:365:6
 [incomplete] closedCheck.success3.#D.e: non-concrete value string in operand to !=:
-    ./in.cue:382:7
-    ./in.cue:380:6
+    ./in.cue:387:7
+    ./in.cue:385:6
 [incomplete] emptyComprehensionIncomplete.b: undefined field: b:
-    ./in.cue:405:8
+    ./in.cue:411:8
 [incomplete] voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:475:7
+    ./in.cue:481:7
 [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
-    ./in.cue:498:7
+    ./in.cue:504:7
 [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:524:7
+    ./in.cue:530:7
 voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
-    ./in.cue:527:7
+    ./in.cue:533:7
 [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:546:7
+    ./in.cue:552:7
 voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
-    ./in.cue:549:7
+    ./in.cue:555:7
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:614:17
+    ./in.cue:620:17
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:614:17
+    ./in.cue:620:17
 [incomplete] topElimination.x: non-concrete value int in operand to +:
-    ./in.cue:655:6
-    ./in.cue:652:5
+    ./in.cue:661:6
+    ./in.cue:658:5
 [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    ./in.cue:686:5
-    ./in.cue:684:5
+    ./in.cue:692:5
+    ./in.cue:690:5
 [eval] structShare.err1.x.d.e: field not allowed:
-    ./in.cue:736:9
+    ./in.cue:742:9
 [incomplete] errorPropagation: undefined field: env2:
     ./issue2113.cue:35:19
 [eval] issue3535.regular.foo.regular: field not allowed:

@@ -1648,8 +1648,7 @@ func (v hiddenValue) LookupField(name string) (FieldInfo, error) {
 // Fill creates a new value by unifying v with the value of x at the given path.
 //
 // Values may be any Go value that can be converted to CUE, an ast.Expr or
-// a Value. In the latter case, it will panic if the Value is not from the same
-// Runtime.
+// a Value.
 //
 // Any reference in v referring to the value at the given path will resolve
 // to x in the newly created value. The resulting value is not validated.
@@ -1788,9 +1787,6 @@ func (v hiddenValue) Template() func(label string) Value {
 //
 // Use the [Raw] option to do a low-level subsumption, taking defaults into
 // account.
-//
-// Value v and w must be obtained from the same build. TODO: remove this
-// requirement.
 func (v Value) Subsume(w Value, opts ...Option) error {
 	o := getOptions(opts)
 	p := subsume.CUE
@@ -1828,9 +1824,6 @@ func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 }
 
 // Unify reports the greatest lower bound of v and w.
-//
-// Value v and w must be obtained from the same build.
-// TODO: remove this requirement.
 func (v Value) Unify(w Value) Value {
 	if v.v == nil {
 		return w

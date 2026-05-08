@@ -307,7 +307,11 @@ issue3836: hidden: {
 		out: [if bar != _|_ {"bar is set"}]
 	}
 	_Value.out
-	@test(eq, {_Value: {foo?: _, bar?: {}, out: []}, []})
+	@test(eq, {_Value: {foo?: _, bar?: {}, out: []}, []}, incorrect)
+	@test(eq:todo, {
+		_Value: {foo?: _, bar: type: "bar", out: ["bar is set"]}
+		["bar is set"]
+	})
 }
 issue3836: exposed: {
 	foo?: _
@@ -368,7 +372,7 @@ issue3838: {
 [incomplete] issue3836.hidden._Value.bar.type: cyclic reference to field type:
     ./issue3836.cue:9:3
 [cycle] issue3836.exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
-    ./issue3836.cue:20:6
+    ./issue3836.cue:24:6
 [incomplete] issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct):
     ./issue3838.cue:26:12
 [incomplete] mutual.mutualCycleFail.b.foo: cyclic reference to field foo:

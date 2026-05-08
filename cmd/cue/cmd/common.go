@@ -607,6 +607,11 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 				"-d/--schema flag specified without a schema")
 		}
 
+		if p.schema != nil && len(values) == 0 {
+			return nil, errors.Newf(token.NoPos,
+				"-d/--schema flag requires non-CUE input files")
+		}
+
 		switch {
 		default:
 			fallthrough

@@ -6,8 +6,8 @@ cmp stdout def.stdout
 exec cue def -e '#Schema' in.cue
 cmp stdout def-e.stdout
 
-exec cue def -d '#Schema' in.cue
-cmp stdout def-d.stdout
+! exec cue def -d '#Schema' in.cue
+cmp stderr def-d.stderr
 
 -- in.cue --
 #Schema: {
@@ -26,8 +26,5 @@ _#def: {
 	a?: string
 	b?: b2?: string
 }
--- def-d.stdout --
-#Schema: {
-	a?: string
-	b?: b2?: string
-}
+-- def-d.stderr --
+-d/--schema flag requires non-CUE input files

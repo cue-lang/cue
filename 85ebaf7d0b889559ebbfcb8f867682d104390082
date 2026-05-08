@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a5c86d4_0e1e6d64",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-08T11:31:56Z",
+      "side": 1,
+      "message": "FTR: this issue seems to be specifically an artifact of a \"nested\" try mapping to the same field. The following, for instance, does not result in the same error:\n\n```\n@experiment(try)\nnestedTry: emptyInnerInBody: {\n\t#foo?: foo2: int\n\tbar: {\n\t\ttry {\n\t\t\t#foo?.foo2\n\t\t\ty: { try {} }\n\t\t}\n\t}\n}.bar\n```\n\nThis seems to suggest to me that the implementation could be simplified.\nNeeds further investigation, but I figured I record this finding so far.",
+      "revId": "85ebaf7d0b889559ebbfcb8f867682d104390082",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "019df86c_a10059a4",
+        "filename": "cue/testdata/comprehensions/try.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-08T11:31:56Z",
+      "side": 1,
+      "message": "Although this shouldn\u0027t matter, I would like to see some test cases where both child and parent try clauses reference the same optional field, and also where two sibling try clauses reference the same field.",
+      "revId": "85ebaf7d0b889559ebbfcb8f867682d104390082",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa08657e_406bfff3",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-08T11:31:56Z",
+      "side": 1,
+      "message": "add newline",
+      "revId": "85ebaf7d0b889559ebbfcb8f867682d104390082",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

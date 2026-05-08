@@ -1373,6 +1373,29 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			return nil
 
 		case IncompleteError:
+			// The referenced node is actively being computed and still has
+			// value-producing tasks pending; yield until valueKnown is met.
+			// schedRUNNING (not schedREADY) avoids deadlocking on a task that
+			// nobody else will trigger — a genuine cycle. The same yield
+			// serves both ArcPending (load-bearing: the comp body will fire
+			// and materialize the arc) and ArcOptional (usually a no-op, but
+			// the arc may still be upgraded to a member by sibling decls
+			// before valueKnown).
+			if v.Node != nil {
+				ns := v.Node.state
+				if ns != nil && ns.state == schedRUNNING &&
+					!ns.meets(valueKnown) &&
+					ns.provided&valueKnown != 0 {
+					if t := c.current(); t != nil {
+						c.PopState(s)
+						sched := &ns.scheduler
+						t.waitFor(sched, valueKnown)
+						sched.yield()
+						panic("unreachable")
+					}
+				}
+			}
+
 			c.evalState(x, Flags{
 				status:    finalized,
 				condition: allKnown,

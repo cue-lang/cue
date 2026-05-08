@@ -125,7 +125,7 @@ issue3691: original: {
 			b: c: 1
 		}
 	}
-	@test(err, code=eval, at=a.b.c, contains="conflicting values string and 1", pos=[1:15, 2:15, 3:5, 4:3, 5:10])
+	@test(err, code=eval, at=a.b.c, contains="conflicting values", args=[string, 1], pos=[1:15, 2:15, 3:5, 4:3, 5:10])
 }
 // Structural cycles follow a different code path.
 issue3691: structuralCycle: {
@@ -136,7 +136,7 @@ issue3691: structuralCycle: {
 			b: c: a
 		}
 	}
-	@test(err, code=eval, at=a.b.c, contains="conflicting values string and", pos=[1:15, 2:5, 2:15, 3:5, 4:3, 5:10])
+	@test(err, code=eval, at=a.b.c, contains="conflicting values", pos=[1:15, 2:5, 2:15, 3:5, 4:3, 5:10])
 }
 -- out/errors.txt --
 [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):

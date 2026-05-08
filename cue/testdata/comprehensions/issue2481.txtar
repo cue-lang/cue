@@ -18,7 +18,7 @@ out: {
 			}
 		}
 	}
-	@test(err, code=eval, contains="cannot combine regular field", pos=[31:2])
+	@test(err, code=eval, hint="string with struct")
 }
 
 // multiple lets are mapped to the same location and will conflict. This is

@@ -3,16 +3,31 @@ package jsonschema
 import (
 	_ "embed"
 	"fmt"
+	"sync"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 //go:generate go tool cue exp gengotypes .
 
 //go:embed crd.cue
 var crdCUE []byte
+
+// crdSchema compiles the CRD schema once on first use and caches it.
+// Since Values from different contexts can be combined, the cached value
+// can be reused regardless of the caller's context, so it is compiled in
+// a dedicated context here.
+var crdSchema = sync.OnceValue(func() cue.Value {
+	ctx := (*cue.Context)(runtime.New())
+	v := ctx.CompileBytes(crdCUE)
+	if err := v.Err(); err != nil {
+		panic(err)
+	}
+	return v
+})
 
 // CRDConfig holds configuration for [ExtractCRDs].
 // Although this empty currently, it allows configuration
@@ -128,18 +143,11 @@ func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 // It returns both the (partially) decoded CRDs and the values
 // they were decoded from.
 func decodeCRDSpecs(v cue.Value) ([]*CRDSpec, []cue.Value, error) {
-	ctx := v.Context()
-
 	// Check against the CUE version of the schema which can
 	// do more detailed checks, including checking required fields,
 	// before decoding into the Go struct.
-
-	// TODO it would be nice to avoid compiling crdCUE every time, but
-	// that's not possible given the restrictions on combining cue.Values
-	// derived from different contexts.
-	crdSchema := ctx.CompileBytes(crdCUE)
-	crdSchema = crdSchema.FillPath(cue.MakePath(cue.Str("input")), v)
-	specsv := crdSchema.LookupPath(cue.MakePath(cue.Str("specs")))
+	filled := crdSchema().FillPath(cue.MakePath(cue.Str("input")), v)
+	specsv := filled.LookupPath(cue.MakePath(cue.Str("specs")))
 	if err := specsv.Err(); err != nil {
 		return nil, nil, err
 	}

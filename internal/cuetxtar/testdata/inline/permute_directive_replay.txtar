@@ -1,0 +1,85 @@
+# Tests that @test(permute) re-runs the source's order-independent
+# directives — @test(eq, ...) and @test(err, code=..., contains=...) —
+# against each permutation, instead of structurally diffing the
+# permuted value against the baseline.
+#
+# Each case below has a permute over fields whose final value is fully
+# constrained by an @test(eq, ...) and/or @test(err, ...). All N!
+# orderings must satisfy the same set of directives.
+-- in/test.cue --
+// @test(eq, ...) drives equivalence: every ordering of a, b, c must
+// produce the same struct value.
+basicEq: {
+	@test(permute, count=6)
+	a: b + 1
+	b: c + 1
+	c: 1
+	@test(eq, {a: 3, b: 2, c: 1})
+}
+
+// @test(err, ...) on an erroring field is order-independent: regardless
+// of which order a and b are declared in, the resolved value of bad must
+// be a cycle error containing the substring below.
+errReplay: {
+	a: b + 1
+	b: a + 1
+	@test(permute, count=2)
+}
+
+// Mix of value and any-error fields: the value of ok is fixed by
+// @test(eq), and broken is asserted to carry an error in its subtree
+// via @test(err, any, ...) — both must hold across all orderings.
+mixedAnyErr: {
+	ok:     1
+	broken: 1 & 2
+	@test(permute, count=2)
+	ok:     int @test(eq, 1)
+	broken: int @test(err, any, code=eval)
+}
+-- out/status.txt --
+update: output passes run
+force:  identical to update
+-- out/update/test.cue --
+// @test(eq, ...) drives equivalence: every ordering of a, b, c must
+// produce the same struct value.
+basicEq: {
+	@test(permute, count=6)
+	a: b + 1
+	b: c + 1
+	c: 1
+	@test(eq, {a: 3, b: 2, c: 1})
+}
+
+// @test(err, ...) on an erroring field is order-independent: regardless
+// of which order a and b are declared in, the resolved value of bad must
+// be a cycle error containing the substring below.
+errReplay: {
+	a: b + 1
+	b: a + 1
+	@test(permute, count=2)
+}
+
+// Mix of value and any-error fields: the value of ok is fixed by
+// @test(eq), and broken is asserted to carry an error in its subtree
+// via @test(err, any, ...) — both must hold across all orderings.
+mixedAnyErr: {
+	ok:     1
+	broken: 1 & 2
+	@test(permute, count=24)
+	ok:     int @test(eq, 1)
+	broken: int @test(err, any, code=eval)
+}
+-- out/run/errors.txt --
+path mixedAnyErr: @test(permute, count=...): got 24 permutations, want 2
+-- out/update/out/errors.txt --
+[cycle] errReplay.a: cycle with field: b:
+    ./test.cue:15:5
+errReplay.b: cycle with field: a:
+    ./test.cue:16:5
+[cycle] errReplay.a: cycle with field: b:
+    ./test.cue:15:5
+errReplay.b: cycle with field: a:
+    ./test.cue:16:5
+[eval] mixedAnyErr.broken: conflicting values 2 and 1:
+    ./test.cue:25:10
+    ./test.cue:25:14

@@ -146,17 +146,10 @@ issue3940: reduced1: {
 		}
 	}
 
+	// The eq:todo value is now the correct result: the pushdown fix
+	// properly handles chained comprehension clauses, unifying a.b
+	// into a single struct.
 	@test(eq, {
-		a: {
-			b: {
-				a: {b: {y: {a: {}, objects: {}}}}
-				objects: _|_ @test(err, code=incomplete, contains="issue3940.reduced1.a.b.objects: undefined field: objects", pos=[15:22])
-			}
-		}
-		X: {a: {}, objects: {}}
-		objects: _|_ @test(err, code=incomplete, contains="objects: undefined field: objects", pos=[15:22])
-	})
-	@test(eq:todo, {
 		a: b: {
 			a: {b: {y: {a: {}, objects: {}}}}
 			objects: {}
@@ -182,19 +175,10 @@ issue3940: reduced2: {
 			}
 		}
 	}
-	@test(err, incorrect, at=a.b.objects, code=incomplete, contains="undefined field: objects", pos=[11:22])
-	@test(err, incorrect, at=objects, code=incomplete, contains="undefined field: objects", pos=[11:22])
+	// The pushdown fix resolves the spurious "undefined field" error
+	// on objects: reduced2 is structurally identical to reduced1 and
+	// should produce the same result.
 	@test(eq, {
-		a: {
-			b: {
-				a: {b: {y: {a: {}, objects: {}}}}
-				objects: _|_
-			}
-		}
-		X: {a: {}, objects: {}}
-		objects: _|_
-	})
-	@test(eq:todo, {
 		a: {
 			b: {
 				a: {b: {y: {a: {}, objects: {}}}}
@@ -204,7 +188,6 @@ issue3940: reduced2: {
 		X: {a: {}, objects: {}}
 		objects: {}
 	})
-
 }
 issue3940: reduced3: {
 	a: E
@@ -476,63 +459,62 @@ issue3990: {
 -- out/errors.txt --
 [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
     ./issue3940.cue:15:22
-[incomplete] objects: undefined field: objects:
-    ./issue3940.cue:15:22
 [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
-    ./issue3940.cue:52:22
-[incomplete] objects: undefined field: objects:
-    ./issue3940.cue:52:22
+    ./issue3940.cue:45:22
 [incomplete] issue3940.let.a.b.objects: undefined field: objects:
-    ./issue3940.cue:146:15
-[incomplete] objects: undefined field: objects:
-    ./issue3940.cue:146:15
+    ./issue3940.cue:129:15
 [incomplete] issue3940.full.out._imports.0.objects.branch.region: undefined field: global:
-    ./issue3940.cue:160:18
+    ./issue3940.cue:143:18
 [incomplete] issue3940.full.out._imports.0.imports.0.objects.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full.out._imports.0.imports.0.#export._objects.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full.out._imports.0.imports.0.#export.objects.0.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full.out._imports.0.#export._objects.branch.region: undefined field: global:
-    ./issue3940.cue:160:18
+    ./issue3940.cue:143:18
 [incomplete] issue3940.full.out._imports.0.#export._imports.0.objects.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export._objects.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full.out._imports.0.#export.objects.0.branch.region: undefined field: global:
-    ./issue3940.cue:160:18
+    ./issue3940.cue:143:18
 [incomplete] issue3940.full.out._imports.0.#export.objects.1.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full._branch.objects.branch.region: undefined field: global:
-    ./issue3940.cue:160:18
+    ./issue3940.cue:143:18
 [incomplete] issue3940.full._branch.#export._objects.branch.region: undefined field: global:
-    ./issue3940.cue:160:18
+    ./issue3940.cue:143:18
 [incomplete] issue3940.full._branch.#export._imports.0.objects.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full._branch.#export._imports.0.#export._objects.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full._branch.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full._branch.#export.objects.0.branch.region: undefined field: global:
-    ./issue3940.cue:160:18
+    ./issue3940.cue:143:18
 [incomplete] issue3940.full._branch.#export.objects.1.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full._leaf.objects.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full._leaf.#export._objects.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
+    ./issue3940.cue:154:18
 [incomplete] issue3940.full._leaf.#export.objects.0.leaf.region: undefined field: global:
-    ./issue3940.cue:171:18
-[incomplete] issue3990._Deployment._names: undefined field: volumes:
-    ./issue3990.cue:24:21
+    ./issue3940.cue:154:18
+[incomplete] issue3990._Deployment._names: cannot range over this.volumes (incomplete):
+    ./issue3990.cue:24:16
 -- out/todo.txt --
 v3 uses structure sharing (~) for several fields in issue3940 and issue3990,
 showing them as shared references rather than expanded inline values.
 In particular issue3940.reduced1/2/let show y: ~(X), issue3990 shows _imports
 elements as shared references.
+
+issue3940.reduced1/2: With pushdown, `objects` resolves to `{}` instead of
+an "undefined field: objects" error. The comprehension cycle is handled by
+dependency tracking rather than field pushdown, so the inner for-clause
+yields zero values and `objects` remains an empty struct.
 -- out/eval/stats --
 Leaks:  16
 Freed:  414
@@ -540,8 +522,8 @@ Reused: 354
 Allocs: 76
 Retain: 0
 
-Unifications: 373
-Conjuncts:    712
+Unifications: 364
+Conjuncts:    688
 Disjuncts:    0
 Notifications: 5
 

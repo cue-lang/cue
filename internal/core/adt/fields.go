@@ -179,7 +179,7 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 		anonymous: v.anonymous || v.Label.IsLet(),
 		Conjuncts: alloc.conjuncts[:0],
 	}
-	if n.scheduler.frozen&fieldSetKnown != 0 {
+	if n.scheduler.frozen&fieldSetKnown != 0 && !v.HasEllipsis {
 		b := n.ctx.NewErrf("adding field %v not allowed as field set was already referenced", f)
 		n.ctx.AddBottom(b)
 		// This may panic for list arithmetic. Safer to leave out for now.
@@ -273,18 +273,23 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 
 	defer n.ctx.PopArc(n.ctx.PushArc(v))
 
-	// TODO: reporting the cycle error here results in better error paths.
-	// However, it causes the reference counting mechanism to be faulty.
-	// Reevaluate once the new evaluator is done.
-	// if v.ArcType == ArcNotPresent {
-	// 	// It was already determined before that this arc may not be present.
-	// 	// This case can only manifest itself if we have a cycle.
-	// 	n.node.reportFieldCycleError(n.ctx, pos(c.x), f)
-	// 	return v
-	// }
-
 	_, added := v.insertConjunct(n.ctx, c, id, mode, check, true)
-	if !added || !insertedArc {
+	if !added {
+		return v
+	}
+	if !insertedArc {
+		// The arc already existed (e.g., pre-created by pushDownDeps). If a
+		// new conjunct was successfully added, still apply pattern constraints:
+		// the arc may have been created before the pattern constraint task ran.
+		if pcs := n.node.PatternConstraints; pcs != nil {
+			for _, pc := range pcs.Pairs {
+				if matchPattern(n.ctx, pc.Pattern, f) {
+					for _, c := range pc.Constraint.Conjuncts {
+						n.addConstraint(v, mode, c, check)
+					}
+				}
+			}
+		}
 		return v
 	}
 
@@ -336,16 +341,11 @@ func (n *nodeContext) insertPattern(pattern Value, c Conjunct) {
 	// equality as well as inserting new arcs down the line as they are
 	// inserted.
 	if n.insertConstraint(pattern, c) {
-		// Match against full set of arcs from root, but insert in current vertex.
-		// Hypothesis: this may not be necessary. Maybe for closedness.
-		// TODO: may need to replicate the closedContext for patterns.
-		// Also: Conjuncts for matching other arcs in this node may be different
-		// for matching arcs using v.foo?, if we need to ensure that conjuncts
-		// from arcs and patterns are grouped under the same vertex.
-		// TODO: verify. See test Pattern 1b
 		for _, a := range n.node.Arcs {
+			if a.ArcType == ArcPending {
+				continue
+			}
 			if matchPattern(n.ctx, pattern, a.Label) {
-				// TODO: is it necessary to check for uniqueness here?
 				n.addConstraint(a, a.ArcType, c, true)
 			}
 		}
@@ -399,7 +399,8 @@ func (ctx *OpContext) notAllowedError(arc *Vertex) *Bottom {
 
 	// TODO: use the arcType from the closeContext.
 	if arc.ArcType == ArcPending {
-		// arc.ArcType = ArcNotPresent
+		arc.updateArcType(ArcNotPresent)
+		arc.ArcType = ArcNotPresent
 		// We do not know yet whether the arc will be present or not. Checking
 		// this will be deferred until this is known, after the comprehension
 		// has been evaluated.

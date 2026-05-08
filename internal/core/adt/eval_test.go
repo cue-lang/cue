@@ -179,8 +179,8 @@ func TestX(t *testing.T) {
 	// adt.OpenGraphs = true
 
 	flags := cuedebug.Config{
-		Sharing: true, // Uncomment to turn sharing off.
-		LogEval: 1,    // Uncomment to turn logging off
+		// Sharing: true, // Uncomment to turn sharing off.
+		// LogEval: 1,
 	}
 	cueexperiment.Init()
 	exps := cueexperiment.Flags
@@ -188,11 +188,6 @@ func TestX(t *testing.T) {
 	version := internal.EvalV3
 
 	in := `
--- cue.mod/module.cue --
-module: "mod.test"
-
-language: version: "v0.15.0"
-
 -- in.cue --
 	`
 

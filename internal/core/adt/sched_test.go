@@ -89,6 +89,7 @@ func TestScheduler(t *testing.T) {
 		}
 
 		n := &nodeContext{scheduler: scheduler{ctx: ctx}, refCount: nodeID}
+		n.scheduler.node = n
 		nodeID++
 		nodes = append(nodes, n)
 		return n

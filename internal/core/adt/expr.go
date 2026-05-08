@@ -1987,47 +1987,11 @@ type Comprehension struct {
 	// a Field if this is a computed Comprehension. Value holds a Field,
 	// rather than an Expr, in the latter case to preserve as much position
 	// information as possible.
-	Value Node
+	Value *StructLit
 
 	// Fallback is the optional else clause that is yielded when the comprehension
 	// produces zero values.
 	Fallback *StructLit
-
-	// The type of field as which the comprehension is added.
-	arcType ArcType
-
-	// Kind indicates the possible kind of Value.
-	kind Kind
-
-	// Only used for partial comprehensions.
-	comp   *envComprehension
-	parent *Comprehension // comprehension from which this one was derived, if any
-	arc    *Vertex        // arc to which this comprehension was added.
-}
-
-// Nest returns the nesting level of void arcs of this comprehension.
-func (c *Comprehension) Nest() int {
-	count := 0
-	for ; c.parent != nil; c = c.parent {
-		count++
-	}
-	return count
-}
-
-// Envs returns all Environments yielded from an evaluated comprehension.
-// Together with the Comprehension value, each Environment represents a
-// result value of the comprehension.
-func (c *Comprehension) Envs() []*Environment {
-	if c.comp == nil {
-		return nil
-	}
-	return c.comp.envs
-}
-
-// DidResolve reports whether a comprehension was processed and resulted in at
-// least one yielded value.
-func (x *Comprehension) DidResolve() bool {
-	return x.comp.done && len(x.comp.envs) > 0
 }
 
 func (x *Comprehension) Source() ast.Node {
@@ -2340,7 +2304,7 @@ func (x *TryClause) yield(s *compState) {
 		expr = x.Expr
 	} else {
 		// Struct form: body is in Comprehension.Value
-		expr = s.comp.Value.(Expr)
+		expr = s.comp.Value
 	}
 
 	v := c.newInlineVertex(env.DerefVertex(c), nil, Conjunct{env, expr, c.ci})

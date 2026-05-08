@@ -238,6 +238,11 @@ const (
 	fieldConjunctsKnownIdx = 4
 )
 
+// allTasksCompletedIdx is the bit index of allTasksCompleted in the counters
+// array, matching the iota position of allTasksCompleted in the condition
+// constants.
+const allTasksCompletedIdx = 6
+
 // schedConfig configures a taskContext with the states needed for the
 // CUE evaluator. It is used in OpContext.New as a template for creating
 // new taskContexts.
@@ -266,6 +271,9 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 		return // Some tests do not set node.
 	}
 	v := n.node
+	if v == nil {
+		return // Some tests do not set vertex.
+	}
 
 	if n.meets(allAncestorsProcessed) {
 		return true
@@ -339,7 +347,19 @@ func stateCompletions(s *scheduler) condition {
 	case v.ArcType == ArcMember, v.ArcType == ArcNotPresent:
 		x |= arcTypeKnown
 	case x&arcTypeKnown != 0 && v.ArcType == ArcPending:
-		v.ArcType = ArcNotPresent
+		// Do not prematurely convert a pending arc to ArcNotPresent if a
+		// parent task (e.g. a comprehension) is still running that might
+		// yet add this arc.
+		hasActiveParent := false
+		for _, pt := range s.parentTasks {
+			if pt.state < taskSUCCESS {
+				hasActiveParent = true
+				break
+			}
+		}
+		if !hasActiveParent {
+			v.ArcType = ArcNotPresent
+		}
 	}
 
 	if x.meets(valueKnown) {
@@ -352,6 +372,14 @@ func stateCompletions(s *scheduler) condition {
 	}
 
 	if x.meets(needFieldConjunctsKnown | needTasksDone) {
+		// Even if allTasksCompleted and fieldConjunctsKnown bits are set in
+		// s.completed (from when their counters first reached 0), new tasks
+		// may have been added since then, incrementing those counters again.
+		// Check actual counter values before treating these conditions as met.
+		const fieldConjunctsKnownIdx = 4
+		if s.counters[allTasksCompletedIdx] > 0 || s.counters[fieldConjunctsKnownIdx] > 0 {
+			return x
+		}
 		switch {
 		case x.meets(subFieldsProcessed):
 			x |= fieldSetKnown
@@ -380,6 +408,35 @@ func (v *Vertex) allChildConjunctsKnown(ctx *OpContext) bool {
 		return true
 	}
 	return n.meets(fieldConjunctsKnown | allAncestorsProcessed)
+}
+
+// completeNodeTasks advances the scheduler for this node, processing any
+// outstanding tasks up to the given mode. It is called after a task completes
+// when toComplete was set, indicating the node had an in-progress scheduler
+// that needs further processing. The isCompleting guard prevents re-entrant
+// calls.
+func (n *nodeContext) completeNodeTasks(mode runMode) {
+	if mode != attemptOnly {
+		n.assertInitialized()
+	} else if n.node != nil && !n.node.isInitialized() {
+		return
+	}
+
+	if n.isCompleting > 0 {
+		return
+	}
+	n.isCompleting++
+	defer func() { n.isCompleting-- }()
+
+	v := n.node
+	if v.IsDynamic || v.Label.IsLet() || v.Parent.allChildConjunctsKnown(n.ctx) {
+		n.signal(allAncestorsProcessed)
+	}
+
+	if !allTasksStarted(n) {
+		n.process(valueKnown|fieldConjunctsKnown, mode)
+		n.updateScalar()
+	}
 }
 
 func (n *nodeContext) scheduleTask(r *runner, env *Environment, x Node, ci CloseInfo) *task {

@@ -78,16 +78,16 @@ graph TD
 	stdout:        "foo"
 }
 -- out/run-v3/t1/stats --
-Leaks:  2
-Freed:  45
-Reused: 27
-Allocs: 20
+Leaks:  3
+Freed:  44
+Reused: 26
+Allocs: 21
 Retain: 0
 
 Unifications: 35
-Conjuncts:    78
+Conjuncts:    76
 Disjuncts:    12
-ResolveDep:   27
+ResolveDep:   12
 
 NumCloseIDs: 12
 -- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
@@ -108,16 +108,16 @@ diff old new
 -MisalignedConjunct: 2
 -
 -NumCloseIDs: 3
-+Leaks:  2
-+Freed:  45
-+Reused: 27
-+Allocs: 20
++Leaks:  3
++Freed:  44
++Reused: 26
++Allocs: 21
 +Retain: 0
 +
 +Unifications: 35
-+Conjuncts:    78
++Conjuncts:    76
 +Disjuncts:    12
-+ResolveDep:   27
++ResolveDep:   12
 +
 +NumCloseIDs: 12
 -- out/run/t1/stats --
@@ -159,16 +159,16 @@ graph TD
 	stdout: "foo"
 }
 -- out/run-v3/t2/stats --
-Leaks:  2
-Freed:  46
-Reused: 45
-Allocs: 3
+Leaks:  3
+Freed:  45
+Reused: 44
+Allocs: 4
 Retain: 0
 
 Unifications: 36
-Conjuncts:    84
+Conjuncts:    82
 Disjuncts:    12
-ResolveDep:   51
+ResolveDep:   21
 
 NumCloseIDs: 12
 -- diff/-out/run-v3/t2/stats<==>+out/run/t2/stats --
@@ -189,16 +189,16 @@ diff old new
 -MisalignedConjunct: 2
 -
 -NumCloseIDs: 3
-+Leaks:  2
-+Freed:  46
-+Reused: 45
-+Allocs: 3
++Leaks:  3
++Freed:  45
++Reused: 44
++Allocs: 4
 +Retain: 0
 +
 +Unifications: 36
-+Conjuncts:    84
++Conjuncts:    82
 +Disjuncts:    12
-+ResolveDep:   51
++ResolveDep:   21
 +
 +NumCloseIDs: 12
 -- out/run/t2/stats --
@@ -216,16 +216,16 @@ MisalignedConjunct: 2
 
 NumCloseIDs: 3
 -- out/run-v3/stats/totals --
-Leaks:  4
-Freed:  91
-Reused: 72
-Allocs: 23
+Leaks:  6
+Freed:  89
+Reused: 70
+Allocs: 25
 Retain: 0
 
 Unifications: 71
-Conjuncts:    162
+Conjuncts:    158
 Disjuncts:    24
-ResolveDep:   78
+ResolveDep:   33
 
 NumCloseIDs: 24
 -- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
@@ -246,16 +246,16 @@ diff old new
 -MisalignedConjunct: 4
 -
 -NumCloseIDs: 6
-+Leaks:  4
-+Freed:  91
-+Reused: 72
-+Allocs: 23
++Leaks:  6
++Freed:  89
++Reused: 70
++Allocs: 25
 +Retain: 0
 +
 +Unifications: 71
-+Conjuncts:    162
++Conjuncts:    158
 +Disjuncts:    24
-+ResolveDep:   78
++ResolveDep:   33
 +
 +NumCloseIDs: 24
 -- out/run/stats/totals --

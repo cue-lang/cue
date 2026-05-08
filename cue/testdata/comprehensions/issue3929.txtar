@@ -67,8 +67,8 @@ reduced: {
 		out: {
 			_in$main: {name: "foobar"}
 			def2: {
-				_in$main: {name: "foobar", age: "one" | "two"}
-				def3: "one" | "two"
+				_in$main: {name: "foobar", age: "one"}
+				def3: "one"
 			}
 		}
 	})
@@ -194,7 +194,7 @@ full: {
 			}
 			spec: containers: [{
 				_config$main:    _ @test(ignore)
-				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+				imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
 			}]
 		}
 	})
@@ -203,15 +203,19 @@ full: {
 
 }
 -- out/todo.txt --
-reduced.out.def2._in.age and reduced.out.def2.def3: v3 shows disjunction
-"one"|"two" where v2 resolves to "one". Also, reduced.out._in is a (#struct)
-in v3 vs (struct) in v2.
 reduced.#def3._in: v3 shows ~(reduced.#Input) (structure sharing) where v2
 expands the full struct.
 full._#cronjob, full._#pod, full._#container: v3 uses structure sharing for
 _config fields where v2 expands them.
-full.objects.cronjob.foobar: v3 shows (#struct) type where v2 shows plain
-(struct); inner imagePullPolicy defaults differ between evaluators.
+reduced.out.def2._in.age, reduced.out.def2.def3: pushdown resolves the
+comprehension condition "if name != _|_" when name is concrete ("foobar"),
+correctly collapsing age from "one" | "two" to "one". Previously this was
+left unresolved.
+full.objects.cronjob.foobar...imagePullPolicy: pushdown resolves the
+comprehension condition "if image != _|_" when image is "foobar:latest",
+correctly applying the default *"Always". Previously left without a default.
+full.cronjob.foobar.imagePullPolicy: same as above — default now propagates
+to the cronjob field itself.
 -- out/eval/stats --
 Leaks:  0
 Freed:  153
@@ -220,14 +224,14 @@ Allocs: 36
 Retain: 0
 
 Unifications: 96
-Conjuncts:    278
+Conjuncts:    275
 Disjuncts:    62
 
 NumCloseIDs: 102
 
-ConjunctInfos:       161
-MaxConjunctInfos:    7
-MaxReqSets:          14
+ConjunctInfos:       166
+MaxConjunctInfos:    8
+MaxReqSets:          15
 MaxRedirect:         3
 -- out/compile --
 --- in.cue

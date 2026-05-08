@@ -273,14 +273,14 @@ issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
     ./optionalerror.cue:30:16
 -- out/eval/stats --
 Leaks:  31
-Freed:  207
-Reused: 187
+Freed:  201
+Reused: 181
 Allocs: 51
 Retain: 0
 
 Unifications: 116
-Conjuncts:    281
-Disjuncts:    74
+Conjuncts:    264
+Disjuncts:    72
 Notifications: 2
 
 NumCloseIDs: 51

@@ -58,17 +58,21 @@ func init() {
 	handleComprehension = &runner{
 		name:      "Comprehension",
 		f:         processComprehension,
-		completes: valueKnown | allTasksCompleted | fieldConjunctsKnown | pendingKnown,
+		completes: allTasksCompleted | fieldConjunctsKnown | valueKnown,
 	}
 	handleListLit = &runner{
-		name:      "ListLit",
-		f:         processListLit,
-		completes: fieldConjunct,
+		name: "ListLit",
+		f:    processListLit,
+		completes: allTasksCompleted |
+			valueKnown |
+			fieldConjunctsKnown,
 	}
 	handleListVertex = &runner{
-		name:      "ListVertex",
-		f:         processListVertex,
-		completes: fieldConjunct,
+		name: "ListVertex",
+		f:    processListVertex,
+		completes: allTasksCompleted |
+			valueKnown |
+			fieldConjunctsKnown,
 	}
 	handleDisjunctions = &runner{
 		name:      "Disjunctions",
@@ -226,19 +230,16 @@ func processPatternConstraint(ctx *OpContext, t *task, mode runMode) {
 func processComprehension(ctx *OpContext, t *task, mode runMode) {
 	n := t.node
 
+	c := t.x.(*Comprehension)
+
 	y := &envYield{
-		envComprehension: t.comp,
-		leaf:             t.leaf,
-		env:              t.env,
-		id:               t.id,
-		expr:             t.x,
+		comp: c,
+		env:  t.env,
+		id:   t.id,
 	}
 
 	err := n.processComprehension(y, 0)
 	t.err = CombineErrors(nil, t.err, err)
-	if t.comp.vertex.state != nil {
-		t.comp.vertex.state.addBottom(err)
-	}
 }
 
 func processDisjunctions(c *OpContext, t *task, mode runMode) {

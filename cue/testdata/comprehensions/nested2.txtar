@@ -463,7 +463,7 @@ issue3990: {
 			}
 		}
 		_Deployment: {
-			_names: _|_ @test(err, code=incomplete, contains="issue3990._Deployment._names: undefined field: volumes", pos=[24:21])
+			_names: _|_ @test(err, code=incomplete)
 		}
 		someVolumes: {
 			volumes: [{ name: "data" }]

@@ -128,7 +128,16 @@ full: {
 	for k, v in cronjob {
 		objects: cronjob: "\(k)": (_#cronjob & {_config: v}).out
 	}
-	@test(eq, {
+	@test(eq:todo, {
+			_config$main: {
+				image: "foobar:latest"
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}
+			imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
+		},
+		at=objects.cronjob.foobar.spec.jobTemplate.spec.template.spec.containers[0]
+	)
+	@test(eq, hint="update this once todo is fixed", {
 		cronjob: foobar: {
 			image:           "foobar:latest"
 			imagePullPolicy: *"Always" | "IfNotPresent" | "Never"

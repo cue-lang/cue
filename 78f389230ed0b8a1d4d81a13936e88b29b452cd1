@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d339339_62016d83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-08T14:14:23Z",
+      "side": 1,
+      "message": "Hmm. This introduces a race, so perhaps FillPath is not actually safe for concurrent use. I\u0027ll need to dig deeper.",
+      "revId": "78f389230ed0b8a1d4d81a13936e88b29b452cd1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

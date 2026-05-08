@@ -1,0 +1,29 @@
+# Recursive closedness of the root value should propagate to nested
+# structs; see cuelang.org/issue/4349.
+#path: #Schema
+-- test.cue --
+package test
+
+#Schema: {
+	a?: string
+	b?: b2?: string
+}
+-- out/generate-v3/schema --
+{
+	$schema:              "https://json-schema.org/draft/2020-12/schema"
+	type:                 "object"
+	additionalProperties: false
+	properties: {
+		a: {
+			type: "string"
+		}
+		b: {
+			type: "object"
+			properties: {
+				b2: {
+					type: "string"
+				}
+			}
+		}
+	}
+}

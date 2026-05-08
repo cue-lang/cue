@@ -1,0 +1,33 @@
+# Issue 4350: -d/--schema with only CUE input should report an error.
+
+exec cue def in.cue
+cmp stdout def.stdout
+
+exec cue def -e '#Schema' in.cue
+cmp stdout def-e.stdout
+
+exec cue def -d '#Schema' in.cue
+cmp stdout def-d.stdout
+
+-- in.cue --
+#Schema: {
+	a?: string
+	b?: b2?: string
+}
+-- def.stdout --
+#Schema: {
+	a?: string
+	b?: b2?: string
+}
+-- def-e.stdout --
+
+_#def
+_#def: {
+	a?: string
+	b?: b2?: string
+}
+-- def-d.stdout --
+#Schema: {
+	a?: string
+	b?: b2?: string
+}

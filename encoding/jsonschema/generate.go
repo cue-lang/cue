@@ -125,10 +125,10 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	}
 	mode := open
 	switch {
-	case v.IsClosed():
-		mode = closed
 	case v.IsClosedRecursively():
 		mode = closedRecursively
+	case v.IsClosed():
+		mode = closed
 	}
 
 	// Phase 1: build the item tree, collecting all references.

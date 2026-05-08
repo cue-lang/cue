@@ -18,7 +18,8 @@ package test
 			type: "string"
 		}
 		b: {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: {
 				b2: {
 					type: "string"

@@ -465,7 +465,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 			t.Errorf("path %s: @test(err, any, pos=...): pos= is not supported with any", path)
 			return
 		}
-		found := r.findDescendantError(val, ea)
+		found := findDescendantError(val, ea)
 		if !found {
 			t.Errorf("path %s: expected a descendant error with code=%v, none found", path, ea.codes)
 			logHint(t, pa.hint)
@@ -1058,8 +1058,11 @@ func checkMsgArgs(t testing.TB, path cue.Path, e cueerrors.Error, expected []str
 }
 
 // findDescendantError walks val looking for any descendant with an error
-// matching ea (code=, contains=, args=). Returns true if found.
-func (r *inlineRunner) findDescendantError(val cue.Value, ea *errArgs) bool {
+// matching ea (code=, contains=, args=). Returns true if found. The check
+// is independent of any inlineRunner state, so it is exposed as a free
+// function shared by runErrAssertion (top-level @test(err, any, …)) and
+// cmpErr (nested @test(err, any, …) inside @test(eq, {...}) bodies).
+func findDescendantError(val cue.Value, ea *errArgs) bool {
 	if checkIsErr(val) == nil &&
 		ea.validateErrProperties(val) == nil &&
 		msgArgsMatch(val.Err(), ea.msgArgs) {
@@ -1071,7 +1074,7 @@ func (r *inlineRunner) findDescendantError(val cue.Value, ea *errArgs) bool {
 		return false
 	}
 	for iter.Next() {
-		if r.findDescendantError(iter.Value(), ea) {
+		if findDescendantError(iter.Value(), ea) {
 			return true
 		}
 	}

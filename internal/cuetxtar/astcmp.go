@@ -712,6 +712,20 @@ func cmpFieldAttrs(path cue.Path, expected []*ast.Attribute, child cue.Value) er
 // Position specs use absolute line numbers (not deltas) since nested @test(err)
 // attributes have no source line to be relative to.
 func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
+	if ea.any {
+		// @test(err, any, ...): val itself need not carry the error
+		// directly; the assertion holds when any descendant matches
+		// the supplied properties (code=, contains=, args=). pos=
+		// is not supported with any= because positions describe a
+		// specific source location, not a property of the subtree.
+		if ea.posSet {
+			return pathErr(path, "@test(err, any, pos=...): pos= is not supported with any")
+		}
+		if !findDescendantError(val, ea) {
+			return pathErr(path, "expected a descendant error matching code=%v contains=%q, none found", ea.codes, ea.contains)
+		}
+		return nil
+	}
 	if err := checkIsErr(val); err != nil {
 		return pathErr(path, "%v", err)
 	}

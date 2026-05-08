@@ -6,8 +6,13 @@ language: version: "v0.17.0"
 -- in.cue --
 // Without @experiment(shortcircuit), both operands are always evaluated.
 // Errors on the right side propagate even when left would short-circuit.
-noExpAnd: false && _|_  @test(err)
-noExpOr:  true  || _|_  @test(err)
+noExpAnd: false && _|_  @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[0:20])
+noExpOr:  true  || _|_  @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[0:20])
+-- out/errors.txt --
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:3:20
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:4:20
 -- out/compile --
 --- in.cue
 {

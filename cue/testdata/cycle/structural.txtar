@@ -870,7 +870,6 @@ resolveToAncestor: {
     ./in.cue:120:6
 [structural_cycle] b7.a.0: structural cycle
 [structural_cycle] b12b.#list.tail: structural cycle
-[structural_cycle] b12b.#list.tail: structural cycle
 [structural_cycle] b13.root.a.0.0: structural cycle
 [structural_cycle] b14.root.b.1.1: structural cycle
 [structural_cycle] p2.#T.a.b.link: structural cycle

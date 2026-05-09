@@ -295,7 +295,7 @@ issue3981: matchWithClose: {
     ./in.cue:59:24
 [eval] callOfCallToValidator.e: cannot call previously called validator b:
     ./in.cue:109:5
-[incomplete] issue2098.incomplete1: index out of range [0] with length 1:
+[incomplete] issue2098.incomplete1: index out of range [0] with length 0:
     ./in.cue:132:5
 [eval] issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
     ./issue3418.cue:4:24

@@ -1,0 +1,22 @@
+# Tests that @test(eq:todo, X) auto-promotes to @test(eq, X) when the
+# todo now passes, but only under CUE_UPDATE. Plain `go test` runs are
+# silent (todo failures are not test errors and a now-passing todo emits
+# only a -v log line). The signal that "this todo can be retired" lives
+# in the source diff produced by CUE_UPDATE rather than in test output —
+# this keeps normal runs clean and avoids tripping up developers (or AI
+# tooling) that scan for failures.
+-- in/test.cue --
+// passing: this todo now matches; CUE_UPDATE must drop :todo.
+passing: 42 @test(eq:todo, 42)
+
+// stillFailing: the todo does not match and remains as-is.
+stillFailing: 1 @test(eq:todo, 2)
+-- out/status.txt --
+update: output passes run
+force:  identical to update
+-- out/update/test.cue --
+// passing: this todo now matches; CUE_UPDATE must drop :todo.
+passing: 42 @test(eq, 42)
+
+// stillFailing: the todo does not match and remains as-is.
+stillFailing: 1 @test(eq:todo, 2)

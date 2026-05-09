@@ -69,9 +69,7 @@ issue3581: reduced: {
 		suberr=(code=incomplete, contains="invalid interpolation: non-concrete value", pos=[0:9]),
 	)
 	c: _
-	// TODO(inline): generator doesn't recognize the error here and prints
-	// the list with value. Probably because the erroneous node has fields.
-	@test(eq:todo, {list: _|_, c: _})
+	@test(eq, {list: _|_, c: _})
 }
 -- issue3576.cue --
 // evalv3: disjunct of definitions with identical optional fields results in

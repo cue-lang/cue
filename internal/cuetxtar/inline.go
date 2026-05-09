@@ -891,7 +891,12 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	}
 
 	// @test(eq:todo, X) — expected-to-fail form.
-	// Failures are logged but not reported as test errors; a match emits a warning.
+	// Failures are logged but not reported as test errors. A match emits a
+	// warning and, under CUE_UPDATE=1 / CUE_UPDATE=force, auto-promotes the
+	// directive by stripping the :todo qualifier so the source diff shows
+	// the promotion. The signal lives in the diff (which CI / AI tooling
+	// already inspects) rather than in test output that would risk being
+	// mistaken for a failure.
 	if pa.isTodo {
 		if exprStr == "" {
 			return
@@ -904,6 +909,9 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		cmpErr := (&cmpCtx{baseLine: pa.baseLine}).astCmp(cue.Path{}, expr, val)
 		if cmpErr == nil {
 			t.Logf("WARNING: path %s: TODO eq:todo now passes — consider upgrading to @test(eq, %s)", path, exprStr)
+			if cuetest.UpdateGoldenFiles || cuetest.ForceUpdateGoldenFiles {
+				r.enqueueInlineFill(pa, promoteTodoAttr(pa))
+			}
 		} else {
 			t.Logf("path %s: TODO eq:todo still failing: %v", path, cmpErr)
 		}
@@ -1106,6 +1114,18 @@ func attrHasSkip(raw *internal.Attr) (ver string, ok bool) {
 		}
 	}
 	return "", false
+}
+
+// promoteTodoAttr returns the replacement text for an @test(eq:todo, ...)
+// attribute that now passes: the :todo qualifier is stripped from the
+// directive name, leaving the rest of pa.srcAttr.Text untouched. Replacing
+// the FIRST literal "eq:todo" is safe because parseTestAttr already
+// verified the attribute starts with that directive.
+func promoteTodoAttr(pa parsedTestAttr) string {
+	if pa.srcAttr == nil {
+		return ""
+	}
+	return strings.Replace(pa.srcAttr.Text, "eq:todo", "eq", 1)
 }
 
 // enqueueInlineFill appends a byte-level replacement for pa's @test attribute.

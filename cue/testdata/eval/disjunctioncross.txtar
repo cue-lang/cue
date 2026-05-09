@@ -178,14 +178,13 @@ issue3967: {
 -- out/errors.txt --
 [cycle] issue3967.error.nested.out: undefined field: kind:
     ./in.cue:131:17
-[cycle] issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
-    ./in.cue:150:10
-issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
-    ./in.cue:155:8
+[cycle] issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
+    ./in.cue:148:8
 issue3967.error.local.out.oneOrTwo.two: field not allowed:
-    ./in.cue:155:8
+    ./in.cue:148:8
     ./in.cue:144:14
-    ./in.cue:149:6
+issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
+    ./in.cue:150:10
 -- out/eval/stats --
 Leaks:  16
 Freed:  278

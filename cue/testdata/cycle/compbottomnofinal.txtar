@@ -68,7 +68,7 @@ medium: {
 			if #Y.port != _|_ {
 				port: strconv.Atoi(#Y.port)
 			}
-		} @test(err:todo, code=incomplete|cycle)
+		} @test(err, code=incomplete|cycle)
 
 		#X: {
 			// Can never determine whether Y.port exists as its resolution
@@ -134,25 +134,39 @@ large: {
 	}
 }
 -- out/errors.txt --
-[incomplete] minimal.a.port: cyclic reference to field port:
-    ./in.cue:12:3
-[incomplete] minimal.b.port: cyclic reference to field port:
-    ./in.cue:20:3
-[incomplete] small.p1.#Y: undefined field: port:
+[cycle] minimal.a: cyclic reference to field port:
+    ./in.cue:12:8
+[cycle] minimal.b: undefined field: port:
+    ./in.cue:20:8
+[cycle] small.p1.#Y: cyclic reference to field port:
     ./in.cue:33:50
-[incomplete] small.p1.#X.port: cyclic reference to field port:
-    ./in.cue:36:4
-[incomplete] medium.p1.#Y: undefined field: port:
+[cycle] small.p1.#X: undefined field: port:
+    ./in.cue:36:10
+small.p1.#X: undefined field: port:
+    ./in.cue:39:10
+[cycle] medium.p1.#Y: undefined field: port:
     ./in.cue:59:50
-[incomplete] medium.p1.#X.port: cyclic reference to field port:
-    ./in.cue:75:4
-[incomplete] large.p1.Y.host: undefined field: host:
-    ./in.cue:124:13
-[incomplete] large.p1.X: undefined field: port:
+[cycle] medium.p1.Y: undefined field: port:
+    ./in.cue:66:10
+[cycle] medium.p1.#X: cyclic reference to field port:
+    ./in.cue:75:9
+medium.p1.#X: cyclic reference to field port:
+    ./in.cue:78:9
+[cycle] large.p1.Y: undefined field: userinfo:
+    ./in.cue:120:10
+large.p1.Y: undefined field: port:
+    ./in.cue:126:10
+[cycle] large.p1.X: undefined field: port:
     ./in.cue:99:33
-[incomplete] large.p1.#X.port: cyclic reference to field port:
-    ./in.cue:111:4
-[incomplete] large.p1.X: undefined field: port:
+[cycle] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+    ./in.cue:102:7
+large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+    ./in.cue:105:7
+large.p1.#X: cyclic reference to field port:
+    ./in.cue:111:9
+large.p1.#X: cyclic reference to field port:
+    ./in.cue:114:9
+[cycle] large.p1.X: undefined field: port:
     ./in.cue:99:33
 -- out/todo.txt --
 minimal.a/b: pushdown reports cycle error (matching v2) instead of incomplete (v3).

@@ -124,13 +124,14 @@ reference: {
 -- out/eval/stats --
 Leaks:  6
 Freed:  74
-Reused: 60
-Allocs: 20
+Reused: 55
+Allocs: 25
 Retain: 0
 
 Unifications: 71
-Conjuncts:    107
+Conjuncts:    101
 Disjuncts:    0
+Notifications: 8
 
 NumCloseIDs: 25
 -- out/compile --

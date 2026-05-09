@@ -34,7 +34,7 @@ disallowed: {
 	}
 
 	vErr: #D & {d: 5}
-	@test(err, code=eval, at=vErr.d, contains="field not allowed", pos=[3:4, 7:14])
+	@test(err, code=eval, at=vErr.d, contains="field not allowed", pos=[7:14])
 }
 
 // Interpret comprehensions as embeddings.
@@ -145,14 +145,13 @@ issue3486: {
 }
 -- out/errors.txt --
 [eval] disallowed.vErr.d: field not allowed:
-    ./in.cue:31:4
     ./in.cue:35:14
 [eval] noEraseDefinition.a.0.b: field not allowed:
     ./in.cue:64:17
 [incomplete] issue1956.#Thing: unresolved disjunction "KindA" | "KindB" (type string):
     ./in.cue:78:6
-[incomplete] dedupTodo.#sub: c.n undefined as c is incomplete (type _):
-    ./in.cue:98:6
+[incomplete] dedupTodo.#sub: undefined field: n:
+    ./in.cue:98:8
 -- out/eval/stats --
 Leaks:  4
 Freed:  77

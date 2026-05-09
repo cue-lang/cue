@@ -362,6 +362,8 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 		}
 
 	case *adt.Comprehension:
+		// Not used, but may be in the future, so we leave it for defensive
+		// purposes.
 		c.markComprehension(env, x)
 	}
 }
@@ -671,27 +673,6 @@ func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) 
 
 	env = c.markClauses(env, y.Clauses)
 
-	// Use "live" environments if we have them. This is important if
-	// dependencies are computed on a partially evaluated value where a pushed
-	// down comprehension is defined outside the root of the dependency
-	// analysis. For instance, when analyzing dependencies at path a.b in:
-	//
-	//  a: {
-	//      for value in { test: 1 } {
-	//          b: bar: value
-	//      }
-	//  }
-	//
-	if envs := y.Envs(); len(envs) > 0 {
-		// We use the Environment to get access to the parent chain. It
-		// suffices to take any Environment (in this case the first), as all
-		// will have the same parent chain.
-		env = envs[0]
-	}
-	for i := y.Nest(); i > 0; i-- {
-		env = &adt.Environment{Up: env, Vertex: empty}
-	}
-	// TODO: consider using adt.EnvExpr and remove the above loop.
 	c.markExpr(env, adt.ToExpr(y.Value))
 
 	// Mark else clause in outer environment.

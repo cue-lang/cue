@@ -139,7 +139,7 @@ issue3691: structuralCycle: {
 	@test(err, code=eval, at=a.b.c, contains="conflicting values", pos=[1:15, 2:5, 2:15, 3:5, 4:3, 5:10])
 }
 -- out/errors.txt --
-[eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
+[eval] issue3691.original.a.b.c: conflicting values 1 and string (mismatched types int and string):
     ./issue3691.cue:7:15
     ./issue3691.cue:8:15
     ./issue3691.cue:9:5

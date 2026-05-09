@@ -18,6 +18,80 @@ a: {
 	}
 	b: {}
 }
+-- out/self-v3/default --
+k2: "test"
+v2: 1
+k1: "test"
+v1: 1
+k4: "test"
+v4: 1
+k3: "test"
+v3: 1
+-- diff/-out/self-v3/default<==>+out/self/default --
+diff old new
+--- old
++++ new
+@@ -1,15 +1,8 @@
+-
+-{
+-	k2: "test"
+-} & {
+-	v2: 1
+-} & {
+-	k4: "test"
+-} & {
+-	v4: 1
+-} & {
+-	k1: "test"
+-	v1: 1
+-	k3: "test"
+-	v3: 1
+-}
++k2: "test"
++v2: 1
++k1: "test"
++v1: 1
++k4: "test"
++v4: 1
++k3: "test"
++v3: 1
+-- out/self-v3-noshare/default --
+k2: "test"
+v2: 1
+k1: "test"
+v1: 1
+k4: "test"
+v4: 1
+k3: "test"
+v3: 1
+-- diff/-out/self-v3-noshare/default<==>+out/self/default --
+diff old new
+--- old
++++ new
+@@ -1,15 +1,8 @@
+-
+-{
+-	k2: "test"
+-} & {
+-	v2: 1
+-} & {
+-	k4: "test"
+-} & {
+-	v4: 1
+-} & {
+-	k1: "test"
+-	v1: 1
+-	k3: "test"
+-	v3: 1
+-}
++k2: "test"
++v2: 1
++k1: "test"
++v1: 1
++k4: "test"
++v4: 1
++k3: "test"
++v3: 1
 -- out/self/default --
 
 {

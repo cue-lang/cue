@@ -81,9 +81,6 @@ func (e *exporter) expr(env *adt.Environment, v adt.Elem) (result ast.Expr) {
 
 		a := []conjunct{}
 		for c := range x.LeafConjuncts() {
-			if c, ok := c.Elem().(*adt.Comprehension); ok && !c.DidResolve() {
-				continue
-			}
 			a = append(a, conjunct{c, 0})
 		}
 

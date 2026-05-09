@@ -58,7 +58,7 @@ func init() {
 	handleComprehension = &runner{
 		name:      "Comprehension",
 		f:         processComprehension,
-		completes: valueKnown | allTasksCompleted | fieldConjunctsKnown | pendingKnown,
+		completes: fieldConjunct,
 	}
 	handleListLit = &runner{
 		name:      "ListLit",
@@ -125,7 +125,6 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	if ctx.LogEval > 0 {
 		ctx.Logf(t.node.node, "RESOLVED %v to %v %v", r, arc.Label, fmt.Sprintf("%p", arc))
 	}
-	// TODO: consider moving after markCycle or removing.
 	d := arc.DerefDisjunct()
 
 	// A reference that points to itself indicates equality. In that case
@@ -229,19 +228,16 @@ func processPatternConstraint(ctx *OpContext, t *task, mode runMode) {
 func processComprehension(ctx *OpContext, t *task, mode runMode) {
 	n := t.node
 
+	c := t.x.(*Comprehension)
+
 	y := &envYield{
-		envComprehension: t.comp,
-		leaf:             t.leaf,
-		env:              t.env,
-		id:               t.id,
-		expr:             t.x,
+		comp: c,
+		env:  t.env,
+		id:   t.id,
 	}
 
 	err := n.processComprehension(y, 0)
 	t.err = CombineErrors(nil, t.err, err)
-	if t.comp.vertex.state != nil {
-		t.comp.vertex.state.addBottom(err)
-	}
 }
 
 func processDisjunctions(c *OpContext, t *task, mode runMode) {

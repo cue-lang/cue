@@ -22,12 +22,12 @@ out: {
 [out]
 [out top]
 [out top A1]
-[out top B1]
 [out top A2]
+[out top B1]
 [out top B2]
 [out top C3]
-[out top D3]
 [out top C4]
+[out top D3]
 [out top D4]
 -- out/value-v3 --
 == Simplified

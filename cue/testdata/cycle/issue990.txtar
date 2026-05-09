@@ -195,14 +195,14 @@ Reused: 646
 Allocs: 224
 Retain: 0
 
-Unifications: 338
-Conjuncts:    1388
+Unifications: 336
+Conjuncts:    1385
 Disjuncts:    106
 
 NumCloseIDs: 434
 
-ConjunctInfos:       1007
-MaxConjunctInfos:    5
+ConjunctInfos:       1021
+MaxConjunctInfos:    6
 MaxReqSets:          19
 MaxRedirect:         4
 -- out/compile --

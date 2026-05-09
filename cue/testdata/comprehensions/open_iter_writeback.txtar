@@ -1,0 +1,77 @@
+# Regression coverage for the original bug behind deferFieldSetKnown
+# (commit f1f0c649f, "adt: fix premature fieldSetKnown freeze for open
+# structs"). The motivating pattern: a comprehension iterates an open
+# struct (HasEllipsis=true) and the comprehension body adds arcs back
+# to that struct.
+#
+# Two cases:
+#  - openIter: a sibling comprehension iterates the same open struct
+#    that another for-clause is writing into. The for-loop must observe
+#    the source's full final field set, not a snapshot frozen mid-
+#    evaluation.
+#  - defOpen: an external conjunct (`inst: #T & { b: 2 }`) adds a field
+#    to an open definition whose own body conditionally adds another;
+#    a [for] over `inst` must see both arcs.
+-- in.cue --
+openIter: {
+	src: {
+		a: 1
+		b: 2
+		...
+		if true { c: 3 }
+	}
+	keys: [for k, _ in src { k }]
+	@test(eq, {
+		src: {a: 1, b: 2, c: 3, ...}
+		keys: ["a", "b", "c"]
+	})
+}
+
+defOpen: {
+	#T: {
+		[string]: int
+		if true { a: 1 }
+	}
+	inst: #T & { b: 2 }
+	keys: [for k, _ in inst { k }]
+	@test(eq, {
+		#T: {[string]: int, a: 1}
+		inst: {a: 1, b: 2}
+		keys: ["b", "a"]
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  openIter: {
+    src: {
+      a: 1
+      b: 2
+      ...
+      if true {
+        c: 3
+      }
+    }
+    keys: [
+      for k, _ in 〈1;src〉 {
+        〈1;k〉
+      },
+    ]
+  }
+  defOpen: {
+    #T: {
+      [string]: int
+      if true {
+        a: 1
+      }
+    }
+    inst: (〈0;#T〉 & {
+      b: 2
+    })
+    keys: [
+      for k, _ in 〈1;inst〉 {
+        〈1;k〉
+      },
+    ]
+  }
+}

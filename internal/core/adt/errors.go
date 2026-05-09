@@ -279,6 +279,13 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 	// If v is an error, we need to adopt the worst error.
 	if b := v.Bottom(); b != nil && !isCyclePlaceholder(b) {
 		code = b.Code
+	} else if s := v.state; s != nil && s.errs != nil && s.errs.Code == CycleError {
+		// Also check cycle errors in the state (e.g. from failed
+		// comprehension tasks) that have not yet been promoted to BaseValue.
+		// This ensures that when a comp fails due to a mutual cycle, lookups
+		// of fields on the same vertex report CycleError instead of
+		// IncompleteError, allowing validate to propagate the cycle.
+		code = s.errs.Code
 	} else if !v.Accept(c, f) {
 		code = EvalError
 	}

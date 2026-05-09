@@ -176,7 +176,7 @@ issue3967: {
 	})
 }
 -- out/errors.txt --
-[incomplete] issue3967.error.nested.out: undefined field: kind:
+[cycle] issue3967.error.nested.out: undefined field: kind:
     ./in.cue:131:17
 [cycle] issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
     ./in.cue:150:10

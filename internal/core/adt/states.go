@@ -157,10 +157,6 @@ const (
 	//
 	subFieldsProcessed
 
-	// pendingKnown means that this task is relevant for resolving whether an
-	// arc is present or not. This implies actTypeKnown.
-	pendingKnown
-
 	// disjunctionTask indicates that this task is a disjunction. This is
 	// used to trigger finalization of disjunctions.
 	disjunctionTask
@@ -177,10 +173,6 @@ const (
 		valueKnown |
 		fieldConjunctsKnown |
 		allTasksCompleted |
-		// TODO: not adding this improves error message for issue3691 in
-		// eval/comprehensions.txtar. But without this, TestVisit of dep
-		// panics. Investigate.
-		pendingKnown |
 		disjunctionTask
 
 	// The xConjunct condition sets indicate a conjunct MAY contribute the to
@@ -236,6 +228,11 @@ const (
 	// fieldConjunctsKnown, for use as a scheduler.counters index.
 	// It must equal bits.TrailingZeros16(uint16(fieldConjunctsKnown)).
 	fieldConjunctsKnownIdx = 4
+
+	// allTasksCompletedIdx is the bit index of allTasksCompleted in the
+	// counters array, matching the iota position of allTasksCompleted in the
+	// condition constants.
+	allTasksCompletedIdx = 6
 )
 
 // schedConfig configures a taskContext with the states needed for the
@@ -266,6 +263,9 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 		return // Some tests do not set node.
 	}
 	v := n.node
+	if v == nil {
+		return // Some tests do not set vertex.
+	}
 
 	if n.meets(allAncestorsProcessed) {
 		return true
@@ -278,11 +278,8 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 		n := p.state
 		// p.state is nil when the parent vertex exists but has not yet
 		// entered evaluation (no nodeContext has been created for it).
-		// Two known trigger paths:
-		//   1. completePending → lookup → process → handleParents: a
-		//      SelectorExpr inside an IfClause fires in a comprehension
-		//      while its parent struct is still lazy.
-		//   2. unifyNode passes arcTypeKnown|fieldSetKnown to process,
+		// Two known trigger path:
+		//      unifyNode passes arcTypeKnown|fieldSetKnown to process,
 		//      so handleParents no longer returns early once arcTypeKnown
 		//      is met, reaching processAncestors for nodes whose parents
 		//      were never unified. (Reproducer: TestScript/cmd_typocheck)
@@ -339,7 +336,19 @@ func stateCompletions(s *scheduler) condition {
 	case v.ArcType == ArcMember, v.ArcType == ArcNotPresent:
 		x |= arcTypeKnown
 	case x&arcTypeKnown != 0 && v.ArcType == ArcPending:
-		v.ArcType = ArcNotPresent
+		// Do not prematurely convert a pending arc to ArcNotPresent if a
+		// parent task (e.g. a comprehension) is still running that might
+		// yet add this arc.
+		hasActiveParent := false
+		for _, pt := range s.parentTasks {
+			if pt.state < taskSUCCESS {
+				hasActiveParent = true
+				break
+			}
+		}
+		if !hasActiveParent {
+			v.ArcType = ArcNotPresent
+		}
 	}
 
 	if x.meets(valueKnown) {
@@ -352,6 +361,13 @@ func stateCompletions(s *scheduler) condition {
 	}
 
 	if x.meets(needFieldConjunctsKnown | needTasksDone) {
+		// Even if allTasksCompleted and fieldConjunctsKnown bits are set in
+		// s.completed (from when their counters first reached 0), new tasks
+		// may have been added since then, incrementing those counters again.
+		// Check actual counter values before treating these conditions as met.
+		if s.counters[allTasksCompletedIdx] > 0 || s.counters[fieldConjunctsKnownIdx] > 0 {
+			return x
+		}
 		switch {
 		case x.meets(subFieldsProcessed):
 			x |= fieldSetKnown

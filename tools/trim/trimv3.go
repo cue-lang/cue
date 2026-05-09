@@ -775,6 +775,21 @@ func (t *trimmerV3) findRedundancies(v *adt.Vertex, keepAll bool) {
 				}
 				t.linkResolvers(conj, true)
 			}
+		} else if sl, ok := elem.(*adt.StructLit); ok {
+			// In the current evaluator, comprehensions are decls inside a
+			// StructLit leaf conjunct rather than direct leaf conjuncts. We
+			// detect them here and establish the same dependency links that
+			// would have been established if the comprehension were a direct
+			// leaf conjunct.
+			childEnv := &adt.Environment{
+				Up:     c.Env,
+				Vertex: v,
+			}
+			for _, decl := range sl.Decls {
+				if compr, ok := decl.(*adt.Comprehension); ok {
+					t.linkStructComprehension(childEnv, compr, c.CloseInfo)
+				}
+			}
 		}
 
 		t.linkResolvers(c, false)
@@ -856,7 +871,14 @@ func (t *trimmerV3) linkResolvers(c adt.Conjunct, addInverse bool) {
 	if src := c.Field().Source(); src != nil {
 		origNm = t.getNodeMeta(src)
 	}
+	t.linkResolversOrig(c, addInverse, origNm)
+}
 
+// linkResolversOrig is like linkResolvers but uses an explicit origNm instead
+// of deriving it from c.Field(). This allows callers to supply a different
+// origin node, e.g. the comprehension body, when the conjunct only contains a
+// clause condition expression.
+func (t *trimmerV3) linkResolversOrig(c adt.Conjunct, addInverse bool, origNm *nodeMeta) {
 	t.resolveElemAll(c, func(resolver adt.Resolver, resolvedTo *adt.Vertex) {
 		for resolvedToC := range resolvedTo.LeafConjuncts() {
 			src := resolvedToC.Source()
@@ -899,6 +921,45 @@ func (t *trimmerV3) linkResolvers(c adt.Conjunct, addInverse bool) {
 			}
 		}
 	})
+}
+
+// linkStructComprehension establishes dependency links for a comprehension
+// that appears as a decl inside a StructLit leaf conjunct. This handles the
+// case where the evaluator processes comprehensions inline (pushing down their
+// field values), so they don't appear as direct leaf conjuncts.
+//
+// The key dependency established is: if the comprehension is required (because
+// one of its body fields survives), then any outer variables referenced in the
+// comprehension's clauses must also survive. We use the comprehension's AST
+// node as origNm so that only outer variables (those whose parent scope
+// contains the comprehension) are required, not inner variables within the
+// comprehension body.
+func (t *trimmerV3) linkStructComprehension(childEnv *adt.Environment, compr *adt.Comprehension, ci adt.CloseInfo) {
+	// Use the comprehension's own AST node as origin. This ensures:
+	// - outer variables (e.g. x: 5 at the same level as the comprehension)
+	//   get addRequiredBy(comprNm) because their parent scope contains the
+	//   comprehension.
+	// - inner variables (those inside the comprehension body) do NOT get this
+	//   dependency because the body is not an ancestor of the comprehension.
+	var comprNm *nodeMeta
+	if src := compr.Source(); src != nil {
+		comprNm = t.getNodeMeta(src)
+	}
+
+	for _, clause := range compr.Clauses {
+		var condConj adt.Conjunct
+		switch cl := clause.(type) {
+		case *adt.IfClause:
+			condConj = adt.MakeConjunct(childEnv, cl.Condition, ci)
+		case *adt.ForClause:
+			condConj = adt.MakeConjunct(childEnv, cl.Src, ci)
+		case *adt.LetClause:
+			condConj = adt.MakeConjunct(childEnv, cl.Expr, ci)
+		default:
+			continue
+		}
+		t.linkResolversOrig(condConj, false, comprNm)
+	}
 }
 
 func (t *trimmerV3) resolveElemAll(c adt.Conjunct, f func(adt.Resolver, *adt.Vertex)) {

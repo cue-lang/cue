@@ -277,40 +277,6 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		}
 		return ast.NewBinExpr(token.AND, a...)
 
-	case *adt.Comprehension:
-		if !x.DidResolve() {
-			return dummyTop
-		}
-		for _, c := range x.Clauses {
-			switch c := c.(type) {
-			case *adt.ForClause:
-				env = &adt.Environment{Up: env, Vertex: empty}
-			case *adt.IfClause:
-			case *adt.LetClause:
-				env = &adt.Environment{Up: env, Vertex: empty}
-			case *adt.TryClause:
-				if c.Expr != nil {
-					// Assignment form: needs new environment for binding
-					env = &adt.Environment{Up: env, Vertex: empty}
-				}
-				// Struct form: no new environment needed (like IfClause)
-			case *adt.ValueClause:
-				// Can occur in nested comprehenions.
-				env = &adt.Environment{Up: env, Vertex: empty}
-			default:
-				panic("unreachable")
-			}
-		}
-
-		// If this is an "unwrapped" comprehension, we need to also
-		// account for the curly braces of the original comprehension.
-		if x.Nest() > 0 {
-			env = &adt.Environment{Up: env, Vertex: empty}
-		}
-
-		// TODO: consider using adt.EnvExpr.
-		return e.adt(env, adt.ToExpr(x.Value))
-
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
 	}
@@ -822,12 +788,6 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 		}
 	}
 	e.copyMeta(c, comp.Syntax)
-
-	// If this is an "unwrapped" comprehension, we need to also
-	// account for the curly braces of the original comprehension.
-	if comp.Nest() > 0 {
-		env = &adt.Environment{Up: env, Vertex: empty}
-	}
 
 	// TODO: consider using adt.EnvExpr.
 	v := e.expr(env, adt.ToExpr(comp.Value))

@@ -138,8 +138,8 @@ argocd.app.apps: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:
 -- out/eval/stats --
 Leaks:  1
 Freed:  187
-Reused: 128
-Allocs: 60
+Reused: 127
+Allocs: 61
 Retain: 0
 
 Unifications: 100

@@ -188,12 +188,12 @@ issue3591: missing: {
 -- out/eval/stats --
 Leaks:  54
 Freed:  139
-Reused: 124
-Allocs: 69
+Reused: 118
+Allocs: 57
 Retain: 0
 
 Unifications: 124
-Conjuncts:    328
+Conjuncts:    326
 Disjuncts:    32
 
 NumCloseIDs: 87

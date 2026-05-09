@@ -412,6 +412,21 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 			return pathErr(path, "value has embedded %v but expected struct has no embedded expression",
 				scalar)
 		}
+		// Reject when val itself is a leaf error (BaseValue=*adt.Bottom
+		// with no surviving child arcs). An expected struct without an
+		// embedded _|_ is asserting a struct shape; matching it against
+		// a leaf-erroneous value would silently pass when the expected
+		// field set is empty (Fields() yields nothing on a Bottom). A
+		// struct-shaped value that carries errored descendants but
+		// retains its arcs falls through here — the field loop below
+		// finds the error at the child path. The lenient hasEmbedBottom
+		// path is the explicit way to opt into accepting an error here.
+		if vx := val.Core().V; vx != nil {
+			deref := vx.DerefValue()
+			if b, ok := deref.BaseValue.(*adt.Bottom); ok && len(deref.Arcs) == 0 {
+				return pathErr(path, "value is an error (%v) but expected struct has no embedded _|_; use {_|_, ...} to assert error", b.Err)
+			}
+		}
 	}
 
 	// Compare regular fields (including definitions, optional, required, hidden).
@@ -897,7 +912,7 @@ func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value)
 		// We could be comparing a struct and a struct and a validator.
 		return pathErr(path, "expected conjunction (&), got %v", op)
 	}
-	if len(args) != len(astParts) && len(args) != len(astParts)-1 {
+	if len(args) != len(astParts) {
 		return pathErr(path, "conjunction: expected %d conjunct(s), got %d",
 			len(astParts), len(args))
 	}
@@ -922,12 +937,6 @@ func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value)
 			}
 		}
 		if !found {
-			// If the value has one fewer conjunct than expected, a validator
-			// was consumed during evaluation. Accept the unmatched non-struct
-			// conjunct — it documents the constraint that was applied.
-			if len(args) < len(astParts) {
-				continue
-			}
 			return pathErr(path, "%s: no matching conjunct expr %s", pos(ae), toStr(ae))
 		}
 	}

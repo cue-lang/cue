@@ -112,7 +112,7 @@ issue3801: let: full: {
 		#JSONOp: {op: "add", path: string, value: _} | {op: "remove", path: string}
 		#Main: {
 			namespace: string
-			output: #Patches & {(namespace): patch}
+			output: _|_ @test(err, code=incomplete)
 		}
 		out: {
 			ns1: [{op: "add", path: "/metadata", value: "foo"}]

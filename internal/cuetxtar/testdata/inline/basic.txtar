@@ -24,7 +24,7 @@ kindIntFail: int @test(kind=string)
 closedStruct: close({a: 1}) @test(closed)
 
 // eq: builtin validator call expression
-maxFields: struct.MaxFields(2) & {} @test(eq, struct.MaxFields(2) & {})
+minFields: struct.MinFields(0) & {} @test(eq, {})
 
 // eq: selector reference (math.Pi)
 piField: math.Pi @test(eq, math.Pi)
@@ -60,7 +60,7 @@ kindIntFail: int @test(kind=string)
 closedStruct: close({a: 1}) @test(closed)
 
 // eq: builtin validator call expression
-maxFields: struct.MaxFields(2) & {} @test(eq, struct.MaxFields(2) & {})
+minFields: struct.MinFields(0) & {} @test(eq, {})
 
 // eq: selector reference (math.Pi)
 piField: math.Pi @test(eq, math.Pi)

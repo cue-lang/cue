@@ -1,0 +1,96 @@
+# Tests cmpStruct's leaf-error rejection: an expected struct without an
+# embedded _|_, matched against a value whose BaseValue is *adt.Bottom
+# with no surviving child arcs, must fail rather than silently pass via
+# the empty-Fields() iteration.
+#
+# Three cases:
+#  - case1: rejection — `bad: {}` against `bad: 1 & 2` (leaf Bottom).
+#    The runner emits the new error message; out/run/errors.txt
+#    asserts that.
+#  - case2: explicit opt-in — `bad: _|_ @test(err, …)` against the
+#    same leaf Bottom. Passes via the field-level errCheck path.
+#  - case3: errored-struct-with-arcs — wrapper has BaseValue=Bottom
+#    but retains its child arcs; the field loop descends and finds
+#    the error at the child path. No top-level rejection fires.
+-- in/test.cue --
+case1: {
+	bad: 1 & 2
+} @test(eq, {
+	bad: {}
+})
+
+case2: {
+	bad: 1 & 2
+} @test(eq, {
+	bad: _|_ @test(err, code=eval, contains="conflicting values 2 and 1")
+})
+
+case3: {
+	ok:  1
+	bad: 1 & 2
+} @test(eq, {
+	ok:  1
+	bad: _|_ @test(err, code=eval, contains="conflicting values 2 and 1")
+})
+-- out/run/errors.txt --
+path case1: bad: value is an error (case1.bad: conflicting values 2 and 1) but expected struct has no embedded _|_; use {_|_, ...} to assert error
+-- out/status.txt --
+update: output passes run
+-- out/update/out/errors.txt --
+[eval] case1.bad: conflicting values 2 and 1:
+    ./test.cue:2:7
+    ./test.cue:2:11
+[eval] case2.bad: conflicting values 2 and 1:
+    ./test.cue:8:7
+    ./test.cue:8:11
+[eval] case3.bad: conflicting values 2 and 1:
+    ./test.cue:15:7
+    ./test.cue:15:11
+-- out/update/test.cue --
+case1: {
+	bad: 1 & 2
+} @test(eq, {
+	bad: {}
+})
+
+case2: {
+	bad: 1 & 2
+} @test(eq, {
+	bad: _|_ @test(err, code=eval, contains="conflicting values 2 and 1")
+})
+
+case3: {
+	ok:  1
+	bad: 1 & 2
+} @test(eq, {
+	ok:  1
+	bad: _|_ @test(err, code=eval, contains="conflicting values 2 and 1")
+})
+-- out/force/test.cue --
+case1: {
+	bad: 1 & 2
+} @test(err)
+
+case2: {
+	bad: 1 & 2
+} @test(eq, {
+	bad: _|_ @test(err, code=eval, contains="conflicting values 2 and 1")
+})
+
+case3: {
+	ok:  1
+	bad: 1 & 2
+} @test(eq, {
+	ok:  1
+	bad: _|_ @test(err, code=eval, contains="conflicting values 2 and 1")
+})
+-- out/force/out/errors.txt --
+[eval] case1.bad: conflicting values 2 and 1:
+    ./test.cue:2:7
+    ./test.cue:2:11
+[eval] case2.bad: conflicting values 2 and 1:
+    ./test.cue:8:7
+    ./test.cue:8:11
+[eval] case3.bad: conflicting values 2 and 1:
+    ./test.cue:15:7
+    ./test.cue:15:11

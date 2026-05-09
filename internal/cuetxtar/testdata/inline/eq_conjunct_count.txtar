@@ -1,0 +1,42 @@
+# Tests cmpConjunction's strict conjunct-count requirement.
+#
+# When the expected expression in @test(eq, ...) is a conjunction (a & b),
+# the actual value must contain the same number of conjuncts. Previously
+# the comparator accepted len(args) == len(astParts)-1 on the rationale
+# that a "validator was consumed during evaluation" — e.g. an assertion
+# of `struct.MaxFields(2) & {}` would silently pass against a value that
+# evaluated down to plain `{}`. The asserted validator was never
+# verified to have actually applied, the rendered output of such values
+# lost the validator entirely, and the eq:todo auto-promote could
+# silently retire todos whose actual value no longer matched.
+#
+# Cases:
+#  - case1: rejection — `MaxFields(2) & {}` (2 conjuncts) against a
+#    value that reduced to `{}` (1 conjunct).
+#  - case2: positive control — same shape on both sides.
+-- in/test.cue --
+import "struct"
+
+// CASE 1: validator collapses during eval. Expected has 2 conjuncts;
+// actual has 1. cmpConjunction must reject.
+case1: {a: struct.MinFields(0) & {}}.a @test(eq, struct.MinFields(0) & {})
+
+// CASE 2: positive control — equal conjunct counts. Bound conjunctions
+// survive evaluation (`>=0 & <=10` does not reduce to a single value),
+// so the comparator sees 2 conjuncts on both sides.
+case2: >=0 & <=10 @test(eq, >=0 & <=10)
+-- out/run/errors.txt --
+path case1: conjunction: expected 2 conjunct(s), got 1
+-- out/status.txt --
+update: identical to input
+-- out/force/test.cue --
+import "struct"
+
+// CASE 1: validator collapses during eval. Expected has 2 conjuncts;
+// actual has 1. cmpConjunction must reject.
+case1: {a: struct.MinFields(0) & {}}.a @test(eq, {})
+
+// CASE 2: positive control — equal conjunct counts. Bound conjunctions
+// survive evaluation (`>=0 & <=10` does not reduce to a single value),
+// so the comparator sees 2 conjuncts on both sides.
+case2: >=0 & <=10 @test(eq, >=0 & <=10)

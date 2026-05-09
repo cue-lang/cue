@@ -230,14 +230,15 @@ v3 shows structure sharing (~(...)) for several definition references
 where v2 expanded them out.
 -- out/eval/stats --
 Leaks:  9
-Freed:  87
-Reused: 53
-Allocs: 43
+Freed:  86
+Reused: 54
+Allocs: 41
 Retain: 0
 
-Unifications: 82
-Conjuncts:    160
+Unifications: 81
+Conjuncts:    153
 Disjuncts:    6
+Notifications: 1
 
 NumCloseIDs: 38
 -- out/compile --

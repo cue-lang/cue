@@ -302,14 +302,10 @@ func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct
 
 // updateArcType updates v.ArcType if t is more restrictive.
 func (v *Vertex) updateArcType(t ArcType) {
-	if t >= v.ArcType {
-		return
-	}
-	if v.ArcType == ArcNotPresent {
-		return
-	}
+
 	s := v.state
-	if s != nil && v.isFinal() {
+	if v.ArcType == ArcPending && s != nil {
+		// NOTE: this condition does not occur in V2.
 		c := s.ctx
 		if s.scheduler.frozen.meets(arcTypeKnown) {
 			p := token.NoPos
@@ -320,6 +316,9 @@ func (v *Vertex) updateArcType(t ArcType) {
 			parent.reportFieldCycleError(c, p, v.Label)
 			return
 		}
+	}
+	if t >= v.ArcType || v.ArcType == ArcNotPresent {
+		return
 	}
 	if v.Parent != nil && v.Parent.ArcType == ArcPending && v.Parent.state != nil {
 		// TODO: check that state is always non-nil.
@@ -1541,7 +1540,6 @@ func EnvExpr(env *Environment, elem Elem) (*Environment, Expr) {
 				continue
 			}
 		case *Comprehension:
-			env = linkChildren(env, x)
 			c := MakeConjunct(env, x.Value, CloseInfo{})
 			elem = c.Elem()
 			continue

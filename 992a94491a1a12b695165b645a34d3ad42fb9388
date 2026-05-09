@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d74c65c4_898dbfd9",
+        "filename": "cue/testdata/comprehensions/optional_ref_yield.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-09T12:15:24Z",
+      "side": 1,
+      "message": "nit: it would have been nice to add these tests in a separate commit first, so that we can see how the fix affects the evaluator output.",
+      "revId": "992a94491a1a12b695165b645a34d3ad42fb9388",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d85d312_5aeb937f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1398,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-09T12:15:24Z",
+      "side": 1,
+      "message": "I feel like this is an instance of the AI leaving an overly verbose comment. Having information for future reference is good, but I feel like twenty lines of dense text is probably overkill. I would ask the AI to reduce this by about half.",
+      "revId": "992a94491a1a12b695165b645a34d3ad42fb9388",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7ee93b5_bc0d2f79",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1409,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-09T12:15:24Z",
+      "side": 1,
+      "message": "typically this is done via `panic(\"unreachable\") // explain why...`, which is a stronger assertion given that it tells static analysis tools what\u0027s happening, and also panics if we violate the rule at run-time.",
+      "revId": "992a94491a1a12b695165b645a34d3ad42fb9388",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

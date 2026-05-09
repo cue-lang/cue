@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e3a5b75_a5258160",
+        "filename": "cue/testdata/comprehensions/issue3929.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-09T12:27:15Z",
+      "side": 1,
+      "message": "agreed. it looks like the test framework rewrite in https://cue.gerrithub.io/c/cue-lang/cue/+/1235397 messed this up.",
+      "revId": "3c40ffa22d2fb80b878b3847d21710324f5f37b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4987b4b6_de489bee",
+        "filename": "cue/testdata/comprehensions/issue3929.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-09T12:27:15Z",
+      "side": 1,
+      "message": "again agreed.",
+      "revId": "3c40ffa22d2fb80b878b3847d21710324f5f37b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fd976d9_4b0b2cac",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-09T12:27:15Z",
+      "side": 1,
+      "message": "agreed. the fix that resolved 3836 did not actually result in the correct output here, and we both missed that.",
+      "revId": "3c40ffa22d2fb80b878b3847d21710324f5f37b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

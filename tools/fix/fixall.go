@@ -15,8 +15,6 @@
 package fix
 
 import (
-	"os"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
@@ -28,24 +26,16 @@ import (
 // Instances modifies all files contained in the given build instances at once.
 //
 // It also applies the fixes from [File].
-func Instances(a []*build.Instance, o ...Option) errors.Error {
-	cwd, _ := os.Getwd()
-
+func Instances(insts []*build.Instance, o ...Option) errors.Error {
 	// Parse options to check for upgrade
 	opts := options{}
 	for _, fn := range o {
 		fn(&opts)
 	}
 
-	// Collect all
-	p := processor{
-		instances: a,
-		cwd:       cwd,
-	}
-
 	done := map[*ast.File]bool{}
 
-	for _, b := range p.instances {
+	for _, b := range insts {
 		var version string
 
 		if b.ModuleFile != nil && b.ModuleFile.Language != nil {
@@ -82,13 +72,5 @@ func Instances(a []*build.Instance, o ...Option) errors.Error {
 			return errors.Wrapf(err, token.NoPos, "fix: sanitize failed")
 		}
 	}
-
-	return p.err
-}
-
-type processor struct {
-	instances []*build.Instance
-	cwd       string
-
-	err errors.Error
+	return nil
 }

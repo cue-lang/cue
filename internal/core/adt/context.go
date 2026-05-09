@@ -759,8 +759,6 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 		// DerefValue seems to work too.
 		arc = arc.DerefNonShared()
 
-		// TODO: consider moving this after markCycle, depending on how we
-		// implement markCycle, or whether we need it at all.
 		// TODO: is this indirect necessary?
 		// arc = arc.Indirect()
 		if s := arc.getState(c); s != nil {
@@ -908,8 +906,6 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 	}
 	v = v.DerefValue()
 
-	// TODO: consider moving this after markCycle, depending on how we
-	// implement markCycle, or whether we need it at all.
 	// TODO: is this indirect necessary?
 	// v = v.Indirect()
 

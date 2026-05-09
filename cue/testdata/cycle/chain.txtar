@@ -322,20 +322,8 @@ issue2052: full: {
 	}
 
 	d: #Depth & {#in: tree}
-	@test(eq:todo, at #RecurseN, {
-		#maxiter: *4 | >=0 & int
-		#funcFactory: {#next: _, #func: _}
-		#funcs: {
-			"4": null
-			"0": _
-			"1": _
-			"2": _
-			"3": _
-		}
-	}, hint="remove the top in main test to fix once this passes")
-	@test(eq, hint="top in #RecurseN is incorrect", {
+	@test(eq, {
 		#RecurseN: {
-			_
 			#maxiter: *4 | >=0 & int
 			#funcFactory: {#next: _, #func: _}
 			#funcs: {
@@ -518,10 +506,10 @@ Reused: 2921
 Allocs: 206
 Retain: 0
 
-Unifications: 924
-Conjuncts:    4994
-Disjuncts:    1615
-Notifications: 15
+Unifications: 489
+Conjuncts:    2229
+Disjuncts:    729
+Notifications: 3
 
 NumCloseIDs: 1501
 -- out/compile --

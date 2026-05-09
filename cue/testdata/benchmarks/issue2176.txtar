@@ -72,13 +72,13 @@ Reused: 369
 Allocs: 435
 Retain: 0
 
-Unifications: 476
-Conjuncts:    1573
+Unifications: 472
+Conjuncts:    1505
 Disjuncts:    8
 
-NumCloseIDs: 648
+NumCloseIDs: 586
 
-ConjunctInfos:       950
+ConjunctInfos:       919
 MaxConjunctInfos:    28
 MaxReqSets:          26
 -- out/compile --

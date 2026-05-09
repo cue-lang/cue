@@ -70,45 +70,12 @@ package adt
 // initialized, which is only done when at least one result is added.
 //
 
-// envComprehension caches the result of a single comprehension.
-type envComprehension struct {
-	comp   *Comprehension
-	vertex *Vertex // The Vertex from which the comprehension originates.
-
-	// runtime-related fields
-
-	// envs holds all the environments that define a single "yield" result in
-	// combination with the comprehension struct.
-	envs []*Environment // nil: unprocessed, non-nil: done.
-	done bool           // true once the comprehension has been evaluated
-
-	// StructLits to Init (activate for closedness check)
-	// when at least one value is yielded.
-	structs []*StructLit
-}
-
-// addEnv is used as a [YieldFunc] so that we don't need to create a new func
-// value for each comprehension.
-func (e *envComprehension) addEnv(env *Environment) {
-	e.envs = append(e.envs, env)
-}
-
 // envYield defines a comprehension for a specific field within a comprehension
-// value. Multiple envYields can be associated with a single envComprehension.
-// An envComprehension only needs to be evaluated once for multiple envYields.
+// value.
 type envYield struct {
-	*envComprehension                // The original comprehension.
-	leaf              *Comprehension // The leaf Comprehension
-
-	// Values specific to the field corresponding to this envYield
-
-	// This envYield was successfully executed and the resulting conjuncts were
-	// added.
-	inserted bool
-
-	env  *Environment // The adjusted Environment.
-	id   CloseInfo    // CloseInfo for the field.
-	expr Node         // The adjusted expression.
+	comp *Comprehension // The comprehension being evaluated.
+	env  *Environment   // The adjusted Environment.
+	id   CloseInfo      // CloseInfo for the field.
 }
 
 // ValueClause represents a wrapper Environment in a chained clause list
@@ -122,7 +89,7 @@ type ValueClause struct {
 }
 
 func (v *ValueClause) yield(s *compState) {
-	s.yield(s.ctx.spawn(v.arc))
+	// s.yield(s.ctx.spawn(v.arc))
 }
 
 // insertComprehension registers a comprehension with a node, possibly pushing
@@ -133,155 +100,8 @@ func (n *nodeContext) insertComprehension(
 	c *Comprehension,
 	ci CloseInfo,
 ) {
-	// TODO(perf): this implementation causes the parent's clauses
-	// to be evaluated for each nested comprehension. It would be
-	// possible to simply store the envComprehension of the parent's
-	// result and have each subcomprehension reuse those. This would
-	// also avoid the below allocation and would probably allow us
-	// to get rid of the ValueClause type.
-
-	ec := c.comp
-	if ec == nil {
-		ec = &envComprehension{
-			comp:   c,
-			vertex: n.node,
-		}
-	}
-
-	x := c.Value
-
-	node := n.node.DerefDisjunct()
-
-	var decls []Decl
-	switch v := ToExpr(x).(type) {
-	case *StructLit:
-		ci = n.splitStruct(v, ci)
-
-		kind := TopKind
-		numFixed := 0
-		var fields []Decl
-		for _, d := range v.Decls {
-			switch f := d.(type) {
-			case *Field:
-				numFixed++
-
-				if f.Label.IsInt() {
-					kind &= ListKind
-				} else if f.Label.IsString() {
-					kind &= StructKind
-				}
-
-				// Create partial comprehension
-				partialComp := &Comprehension{
-					Syntax:  c.Syntax,
-					Clauses: c.Clauses,
-					Value:   f,
-					arcType: f.ArcType, // TODO: can be derived, remove this field.
-
-					comp:   ec,
-					parent: c,
-					arc:    node,
-				}
-
-				conjunct := MakeConjunct(env, partialComp, ci)
-				n.assertInitialized()
-				n.insertArc(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
-
-				fields = append(fields, f)
-
-			case *LetField:
-				// TODO: consider merging this case with the LetField case.
-
-				numFixed++
-
-				// Create partial comprehension
-				partialComp := &Comprehension{
-					Syntax:  c.Syntax,
-					Clauses: c.Clauses,
-					Value:   f,
-
-					comp:   ec,
-					parent: c,
-					arc:    node,
-				}
-
-				conjunct := MakeConjunct(env, partialComp, ci)
-				n.assertInitialized()
-				arc := n.insertFieldUnchecked(f.Label, ArcMember, conjunct)
-				arc.MultiLet = true // NOTE: v2 was f.IsMulti
-
-				fields = append(fields, f)
-
-			default:
-				decls = append(decls, d)
-			}
-		}
-
-		if len(fields) > 0 {
-			// Create a stripped struct that only includes fixed fields.
-			// TODO(perf): this StructLit may be inserted more than once in
-			// the same vertex: once taking the StructLit of the referred node
-			// and once for inserting the Conjunct of the original node.
-			// Is this necessary (given closedness rules), and is this posing
-			// a performance problem?
-			st := v
-			if len(fields) < len(v.Decls) {
-				st = &StructLit{
-					Src:             v.Src,
-					Decls:           fields,
-					isComprehension: true,
-				}
-			}
-			node.AddStruct(st)
-			switch {
-			case !ec.done:
-				ec.structs = append(ec.structs, st)
-			case len(ec.envs) > 0:
-				st.Init(n.ctx)
-				if kind == StructKind || kind == ListKind {
-					n.updateNodeType(kind, st, ci)
-				}
-			}
-		}
-
-		c.kind = kind
-
-		switch numFixed {
-		case 0:
-			// Add comprehension as is.
-
-		case len(v.Decls):
-			// No comprehension to add at this level.
-			// The should be considered a struct if it has only non-regular
-			// fields (like definitions), and no embeddings.
-			if kind == TopKind {
-				c.kind = StructKind
-			}
-			// If there's an else clause, we still need to schedule a task
-			// to handle the fallback case when comprehension yields zero values.
-			if c.Fallback == nil {
-				return
-			}
-			// Use an empty struct as the main value since all fields were
-			// handled at field level. The else clause will be embedded if
-			// the comprehension yields zero values.
-			x = &StructLit{
-				isComprehension: true,
-			}
-
-		default:
-			// Create a new StructLit with only the fields that need to be
-			// added at this level.
-			x = &StructLit{
-				Decls:           decls,
-				isComprehension: true,
-			}
-		}
-	}
-
-	t := n.scheduleTask(handleComprehension, env, x, ci)
-	t.comp = ec
-	t.leaf = c
+	// ci.setOptionalV3(nil)
+	n.scheduleTask(handleComprehension, env, c, ci)
 }
 
 type compState struct {
@@ -348,70 +168,23 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	ctx := n.ctx
 
 	// Compute environments, if needed.
-	if !d.done {
-		if err := ctx.yield(d.vertex, d.env, d.comp, Flags{
-			status:    state,
-			condition: allKnown,
-			mode:      ignore,
-		}, d.addEnv); err != nil {
-			if err.IsIncomplete() {
-				return err
-			}
-
-			// continue to collect other errors.
-			d.done = true
-			d.inserted = true
-			if d.vertex != nil {
-				d.vertex.state.addBottom(err)
-				ctx.PopArc(d.vertex)
-			}
-			return nil
-		}
-
-		if len(d.envs) > 0 {
-			for _, s := range d.structs {
-				s.Init(n.ctx)
-			}
-		}
-		d.structs = nil
-		d.done = true
+	var envs []*Environment
+	f := func(env *Environment) {
+		envs = append(envs, env)
 	}
 
-	d.inserted = true
-
-	if len(d.envs) == 0 {
-		// If there's an else clause, use it instead of marking arc as not present.
-		if d.leaf.Fallback != nil {
-			// Evaluate the else clause in the outer environment.
-			// We use linkChildren to properly chain the environment, similar to
-			// normal comprehension yield processing.
-			env := linkChildren(d.env, d.leaf)
-			n.scheduleConjunct(Conjunct{env, d.leaf.Fallback, d.id}, d.id)
-			return nil
+	if err := ctx.yield(n.node, d.env, d.comp, Flags{
+		status:    state,
+		condition: allKnown,
+		mode:      ignore,
+	}, f); err != nil {
+		if err.IsIncomplete() {
+			return err
 		}
-		n.node.updateArcType(ArcNotPresent)
+
+		// continue to collect other errors.
+		n.node.state.addBottom(err)
 		return nil
-	}
-
-	v := n.node
-	for c := d.leaf; c.parent != nil; c = c.parent {
-		v = n.ctx.deref(v)
-		v.updateArcType(c.arcType)
-		if v.ArcType == ArcNotPresent {
-			parent := v.Parent
-			b := parent.reportFieldCycleError(ctx, d.comp.Syntax.Pos(), v.Label)
-			d.envComprehension.vertex.state.addBottom(b)
-			ctx.current().err = b
-			ctx.current().state = taskFAILED
-			return nil
-		}
-		if k := c.kind; k == StructKind || k == ListKind {
-			v := v.DerefDisjunct()
-			if s := v.getBareState(n.ctx); s != nil {
-				s.updateNodeType(k, ToExpr(c.Value), d.id)
-			}
-		}
-		v = c.arc
 	}
 
 	id := d.id
@@ -419,28 +192,103 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	// It seems so, but it causes some hangs.
 	// id.setOptional(nil)
 
-	for _, env := range d.envs {
-		if n.node.ArcType == ArcNotPresent {
-			b := n.node.reportFieldCycleError(ctx, d.comp.Syntax.Pos(), n.node.Label)
-			ctx.current().err = b
-			n.yield()
-			return nil
-		}
+	if len(envs) == 0 && d.comp.Fallback != nil {
+		n.scheduleConjunct(Conjunct{d.env, d.comp.Fallback, id}, id)
+		return nil
+	}
 
-		env = linkChildren(env, d.leaf)
-
-		n.scheduleConjunct(Conjunct{env, d.expr, id}, id)
+	for _, env := range envs {
+		n.scheduleConjunct(Conjunct{env, d.comp.Value, id}, id)
 	}
 
 	return nil
 }
 
-// linkChildren adds environments for the chain of vertices to a result
-// environment.
-func linkChildren(env *Environment, c *Comprehension) *Environment {
-	if c.parent != nil {
-		env = linkChildren(env, c.parent)
-		env = spawn(env, c.arc)
+// pushDownDeps does a static analysis of the processed values and adjusts
+// dependencies and types.
+// Normally, a task of a current node is a requirement of that node to complete.
+// However, if we have a comprehension, we may push that dependency down to
+// the literal fields of that comprehension. This allows for more fine-grained
+// dependency analysis and can help breaking cycles that should be naturally
+// broken to the user.
+func pushDownDeps(n *nodeContext, t *task, x Node) condition {
+	kind := allKinds
+
+	var completes condition
+
+	switch x := x.(type) {
+	case *Comprehension:
+		completes = pushDownDeps(n, t, x.Value)
+
+	case *StructLit:
+		// StructLits are mostly handled when they are a value of a
+		// comprehension, as literal structs are usually directly inserted
+		// without creating a task.
+
+		for _, d := range x.Decls {
+			switch x := d.(type) {
+			case *Field:
+				// Push the field's completion dependency down to the
+				// child arc rather than blocking the parent's
+				// fieldConjunctsKnown. The parent does not need to wait
+				// for this comprehension to know its own field conjuncts;
+				// only the child arc does, because the comprehension may
+				// add sub-fields to the child. Resolver tasks on the
+				// parent are skipped while the comprehension is running
+				// (see hasRunningComp in process) to prevent them from
+				// observing the child before the comprehension fires.
+
+				arc, _ := n.getArc(x.Label, ArcPending)
+				arcState := arc.getBareState(n.ctx)
+				arcState.parentTasks = append(arcState.parentTasks, t)
+
+				// get arc.
+				pushDownDeps(arcState, t, x.Value)
+
+				if x.Label.IsString() {
+					kind &= StructKind
+				}
+				if x.Label.IsInt() {
+					kind &= ListKind
+				}
+
+			case *BulkOptionalField, *Ellipsis:
+				completes |= fieldConjunctsKnown
+				// Does not add files, but may add field conjuncts. Relevant?
+				kind &= StructKind | ListKind
+
+			case *LetField:
+				completes |= fieldConjunctsKnown
+
+				// getArc
+				n.node.MultiLet = true
+				// A let within a comprehension can only be referred to within
+				// the comprehension. There is therefore no need to track its
+				// own dependencies.
+				// pushDownDeps(n, x.Value, )
+
+			case *DynamicField:
+				// Depending on arc type, may not contribute to concrete value.
+				completes |= fieldConjunctsKnown
+				kind &= StructKind | ListKind
+
+			case Value:
+				completes |= valueKnown
+				kind &= x.Kind()
+
+			default:
+				// Embeddings, other comprehensions.
+				completes |= pushDownDeps(n, t, d)
+			}
+		}
+
+		// TODO: handle lists? Theoretically we could iterate over fixed,
+		// non-comprehension elements and adjust those dependencies as well.
+		// Note that this was not done for evalv3.
+
+	default:
+		completes |= valueKnown | fieldConjunctsKnown
 	}
-	return env
+
+	return completes | allTasksCompleted
 }

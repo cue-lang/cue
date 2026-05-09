@@ -204,7 +204,7 @@ const (
 
 	// a fieldConjunct is on that only adds a new field to the struct.
 	fieldConjunct = allTasksCompleted |
-		fieldConjunctsKnown
+		fieldConjunctsKnown | valueKnown
 
 	// a scalarConjunct is one that is guaranteed to result in a scalar or
 	// list value.

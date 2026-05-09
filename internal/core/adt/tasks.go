@@ -53,7 +53,7 @@ func init() {
 	handlePatternConstraint = &runner{
 		name:      "PatternConstraint",
 		f:         processPatternConstraint,
-		completes: allTasksCompleted | fieldConjunctsKnown,
+		completes: fieldConjunct,
 	}
 	handleComprehension = &runner{
 		name:      "Comprehension",

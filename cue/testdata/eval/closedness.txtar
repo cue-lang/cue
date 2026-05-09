@@ -1067,6 +1067,8 @@ issue3332: {
     ./in.cue:15:3
 [eval] issue852.a.Foo: field not allowed:
     ./in.cue:31:5
+[eval] issue852.a.Foo: field not allowed:
+    ./in.cue:31:5
 [eval] indirect.closed.err1.Y.a.e: field not allowed:
     ./reroot.cue:122:7
 [eval] nested.err1.x.b.f: field not allowed:
@@ -1088,9 +1090,10 @@ Reused: 777
 Allocs: 49
 Retain: 0
 
-Unifications: 789
-Conjuncts:    1940
+Unifications: 790
+Conjuncts:    1942
 Disjuncts:    6
+Notifications: 1
 
 NumCloseIDs: 585
 -- out/compile --

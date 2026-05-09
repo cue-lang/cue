@@ -301,12 +301,12 @@ and reduced.Bar.out.minBar; evalv3 evaluates both correctly without errors.
 -- out/eval/stats --
 Leaks:  92
 Freed:  910
-Reused: 841
+Reused: 853
 Allocs: 161
 Retain: 0
 
-Unifications: 146
-Conjuncts:    989
+Unifications: 158
+Conjuncts:    952
 Disjuncts:    610
 
 NumCloseIDs: 96

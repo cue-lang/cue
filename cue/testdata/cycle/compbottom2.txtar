@@ -311,8 +311,10 @@ issue3836: hidden: {
 		out: [if bar != _|_ {"bar is set"}]
 	}
 	_Value.out
-	@test(eq, {_Value: {foo?: _, bar?: {}, out: []}, []}, incorrect)
-	@test(eq:todo, {
+	// Pushdown improvement: the comprehension guard (foo|bar) == _|_ now
+	// correctly fires and sets bar, where previously (without pushdown) the
+	// guard saw a spurious non-bottom value and did not fire.
+	@test(eq, {
 		_Value: {foo?: _, bar: type: "bar", out: ["bar is set"]}
 		["bar is set"]
 	})
@@ -369,38 +371,36 @@ issue3838: {
 	})
 }
 -- out/errors.txt --
-[incomplete] self.fail.a.b: cyclic reference to field b:
-    ./in.cue:6:4
+[cycle] self.fail.a: cyclic reference to field b:
+    ./in.cue:6:9
 [cycle] self.isConcreteFail.t2.a: circular dependency in evaluation of conditionals: a.b changed after evaluation:
     ./in.cue:27:7
-[incomplete] issue3836.hidden._Value.bar.type: cyclic reference to field type:
-    ./issue3836.cue:9:3
+[cycle] issue3836.hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+    ./issue3836.cue:9:7
 [cycle] issue3836.exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
-    ./issue3836.cue:24:6
+    ./issue3836.cue:26:6
 [incomplete] issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct):
     ./issue3838.cue:26:12
-[incomplete] mutual.mutualCycleFail.b.foo: cyclic reference to field foo:
-    ./mutual.cue:10:4
-[incomplete] mutual.mutualCycleFail.a.bar: cyclic reference to field bar:
-    ./mutual.cue:14:4
+[cycle] mutual.mutualCycleFail.b: cyclic reference to field bar:
+    ./mutual.cue:10:9
+[cycle] mutual.mutualCycleFail.a: undefined field: foo:
+    ./mutual.cue:14:9
 [cycle] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
     ./mutualsamestruct.cue:28:6
 [cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
     ./mutualsamestruct.cue:40:6
-[cycle] sameStruct.cycleFail.t2.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
-    ./mutualsamestruct.cue:63:6
-[cycle] sameStruct.cycleFail.t2.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
-    ./mutualsamestruct.cue:78:6
-[cycle] sameStruct.cycleFail.t3.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
-    ./mutualsamestruct.cue:94:6
-[cycle] sameStruct.cycleFail.t3.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
-    ./mutualsamestruct.cue:108:6
-[incomplete] nestedChain.cycleFail.#E.x: cyclic reference to field x:
-    ./nestedchain.cue:7:3
-[incomplete] nestedChain.doubleAddfail.#E.y: cyclic reference to field y:
-    ./nestedchain.cue:27:3
-nestedChain.doubleAddfail.#E.x: cyclic reference to field x:
-    ./nestedchain.cue:30:3
+[incomplete] sameStruct.cycleFail.t2.p1.ret: cyclic reference to field a:
+    ./mutualsamestruct.cue:67:6
+[incomplete] sameStruct.cycleFail.t2.p2.raises: cyclic reference to field a:
+    ./mutualsamestruct.cue:82:6
+[incomplete] sameStruct.cycleFail.t3.p1.ret: cyclic reference to field a:
+    ./mutualsamestruct.cue:98:6
+[incomplete] sameStruct.cycleFail.t3.p2.raises: cyclic reference to field a:
+    ./mutualsamestruct.cue:112:6
+[cycle] nestedChain.cycleFail: cyclic reference to field x:
+    ./nestedchain.cue:4:9
+[cycle] nestedChain.doubleAddfail: cyclic reference to field x:
+    ./nestedchain.cue:27:9
 -- out/todo.txt --
 self.fail.a: different error code in v2 (cycle) and v3 (incomplete).
 self.isConcreteFail.t1.a: error in v2 (cycle) but success (b: 1) in v3.
@@ -411,8 +411,8 @@ Reused: 189
 Allocs: 43
 Retain: 0
 
-Unifications: 206
-Conjuncts:    343
+Unifications: 214
+Conjuncts:    318
 Disjuncts:    16
 Notifications: 2
 

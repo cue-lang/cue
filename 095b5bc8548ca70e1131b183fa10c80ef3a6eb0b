@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d279ab8f_62707986",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-09T12:18:02Z",
+      "side": 1,
+      "message": "remind the AI to use https://cuelang.org/cl/NNN to refer to past commits, instead of commit hashes or just titles, which aren\u0027t linkified and harder to trace. also note that this is in the latest cueckoo guidance.",
+      "revId": "095b5bc8548ca70e1131b183fa10c80ef3a6eb0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec17a811_32f959dc",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-09T12:18:02Z",
+      "side": 1,
+      "message": "again I feel like this comment is overly verbose. perhaps deduplicate the docs a bit with the func godoc itself, too.",
+      "revId": "095b5bc8548ca70e1131b183fa10c80ef3a6eb0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

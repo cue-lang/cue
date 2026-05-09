@@ -1163,10 +1163,10 @@ Reused: 2524
 Allocs: 257
 Retain: 0
 
-Unifications: 667
-Conjuncts:    2771
-Disjuncts:    1302
-Notifications: 4
+Unifications: 665
+Conjuncts:    2726
+Disjuncts:    1298
+Notifications: 8
 
 NumCloseIDs: 323
 -- out/todo.txt --

@@ -69,6 +69,17 @@ func fromArcType(t adt.ArcType) SelectorType {
 		return OptionalConstraint
 	case adt.ArcRequired:
 		return RequiredConstraint
+	case adt.ArcPending, adt.ArcNotPresent:
+		// Neither corresponds to a user-visible constraint kind:
+		// ArcPending is a placeholder for a field that a
+		// still-running comprehension may yet add; ArcNotPresent is
+		// its resolved-absent counterpart. Return SelectorType(0) so
+		// Path-level walks see a neutral type rather than panicking
+		// when they encounter an arc whose final type is undecided
+		// or has been resolved as absent.
+		//
+		// TODO: change code so that this doesn't happen.
+		return 0
 	default:
 		panic("arc type not supported")
 	}

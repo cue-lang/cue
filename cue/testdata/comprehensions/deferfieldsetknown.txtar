@@ -12,7 +12,10 @@ result: resources: {
 out: ({
     cfg: resources: _
     out: {for n, _ in cfg.resources {(n): "x"}}
-} & {cfg: result}).out @test(eq, {x: "x"})
+} & {cfg: result}).out @test(eq:todo, {x: "x"}) @test(err, code=eval, path=cfg.resources.x, contains="adding field %v not allowed as field set was already referenced", args=[y], pos=[-5:13])
+-- out/errors.txt --
+[eval] cfg.resources.x: adding field y not allowed as field set was already referenced:
+    ./in.cue:6:13
 -- out/compile --
 --- in.cue
 {

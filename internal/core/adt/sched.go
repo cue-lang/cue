@@ -282,6 +282,13 @@ type scheduler struct {
 	// TODO: rename to queue and taskPos to nextQueueIndex.
 	tasks []*task
 
+	// parentTasks are tasks that originate on a parent node but contribute
+	// fields to this node (e.g. a pushed-down comprehension on the parent
+	// whose body materializes arcs here). They must complete before this
+	// scheduler's own tasks can rely on the parent having finished adding
+	// fields to this node.
+	parentTasks []*task
+
 	// blocking is a list of tasks that are blocked on the completion of
 	// the indicate conditions. This can hold tasks from other nodes or tasks
 	// originating from this node itself.
@@ -315,9 +322,11 @@ func (s *scheduler) clear() {
 	}
 
 	*s = scheduler{
-		ctx:      s.ctx,
-		tasks:    s.tasks[:0],
-		blocking: s.blocking[:0],
+		ctx:         s.ctx,
+		tasks:       s.tasks[:0],
+		parentTasks: s.parentTasks[:0],
+		blocking:    s.blocking[:0],
+		deferred:    s.deferred[:0],
 	}
 }
 
@@ -430,11 +439,63 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 		}
 	}
 
+	ranParent := false
+	for _, t := range s.parentTasks {
+		if t.state == taskREADY {
+			runTask(t, mode)
+			ranParent = true
+		}
+	}
+
+	// If a parent task ran (e.g. a comprehension that pushes fields into
+	// this node via its parent), re-process ancestors so the parent
+	// scheduler picks up the newly queued conjuncts and propagates them
+	// down to this node.
+	if ranParent {
+		s.handleParents(needs, mode)
+	}
+
+	if s.node != nil && s.node.node != nil && s.node.node.ArcType == ArcPending && mode == finalize {
+		s.tasks = s.tasks[:0]
+	}
+
 	// hasRunning := false
 	s.state = schedRUNNING
 	// Use variable instead of range, because s.tasks may grow during processes.
 
 	taskPos := 0
+
+	selectTasks := needs
+	if needs&concreteKnown != 0 {
+		selectTasks |= valueKnown
+	}
+	if needs&fieldSetKnown != 0 {
+		selectTasks |= fieldConjunctsKnown
+	}
+
+	// Check if any comprehension is currently running on this scheduler.
+	// If so, skip other comprehensions to prevent ordering issues where a
+	// later comprehension iterates over fields that an earlier (currently
+	// running) comprehension has not yet populated.
+	hasRunningComp := false
+	// Check if a disjunction is still pending (READY) on this scheduler.
+	// If so, defer pushed-down comprehension tasks until disjunction
+	// expansion has cloned the parent into disjuncts. Pushdown turns the
+	// comp's body into pre-created arcs and counters on the parent;
+	// running the comp before disjunction expansion would leave its
+	// pending counters on every disjunct, blocking finalization. By
+	// running disjunctions first, the comp is still taskREADY at clone
+	// time, so each disjunct gets its own clone that runs in the
+	// disjunct's context.
+	hasPendingDisjunction := false
+	for _, t := range s.tasks {
+		if t.state == taskRUNNING && t.run == handleComprehension {
+			hasRunningComp = true
+		}
+		if t.state == taskREADY && t.run == handleDisjunctions {
+			hasPendingDisjunction = true
+		}
+	}
 
 processNextTask:
 	for taskPos < len(s.tasks) {
@@ -453,6 +514,30 @@ processNextTask:
 			// TODO(perf): Figure out how it is possible to reach this and if we
 			// should optimize.
 			// panic("task not READY")
+		case t.completes&selectTasks == 0:
+			continue
+		case hasRunningComp && t.run == handleComprehension:
+			// Do not start a new comprehension while another is running
+			// on the same node. The running comprehension may add fields
+			// that this one depends on.
+			continue
+		case hasRunningComp && t.run == handleResolver:
+			// Do not start a resolver while a comprehension is running
+			// on the same node. The resolver (e.g. an embedding like
+			// funcs["0"]) may depend on fields that the running
+			// comprehension has not yet added.
+			continue
+		case hasPendingDisjunction && t.run == handleComprehension &&
+			t.completes == allTasksCompleted:
+			// Defer pushed-down comprehensions until pending
+			// disjunctions have expanded the parent into disjuncts.
+			// Only comps whose body was fully pushed down (after
+			// pushDownDeps, completes == allTasksCompleted) are
+			// delayed: such comps need to run inside each disjunct
+			// so the pushed-down arcs see that disjunct's view.
+			// Comps with broader completes (e.g. for-comps over a
+			// list) are not delayed.
+			continue
 		default:
 			runTask(t, mode)
 		}
@@ -654,10 +739,6 @@ type task struct {
 	env *Environment
 	id  CloseInfo
 	x   Node // The conjunct Expression or Value.
-
-	// For Comprehensions:
-	comp *envComprehension
-	leaf *Comprehension
 }
 
 func (s *scheduler) insertTask(t *task) {
@@ -665,6 +746,9 @@ func (s *scheduler) insertTask(t *task) {
 		panic("task with no completes")
 	}
 	completes := t.run.completes
+	if t.run == handleComprehension {
+		completes = pushDownDeps(s.node, t, t.x)
+	}
 
 	s.provided |= completes
 
@@ -686,9 +770,7 @@ func (s *scheduler) insertTask(t *task) {
 
 func runTask(t *task, mode runMode) {
 	if t.defunct {
-		if t.state != taskCANCELLED {
-			t.state = taskCANCELLED
-		}
+		t.state = taskCANCELLED
 		return
 	}
 	ctx := t.node.ctx
@@ -740,9 +822,12 @@ func runTask(t *task, mode runMode) {
 		case *scheduler:
 			// Task must be WAITING.
 			if t.state == taskRUNNING {
-				t.state = taskSUCCESS // XXX: something else? Do we known the dependency?
 				if t.err != nil {
 					t.state = taskFAILED
+				} else {
+					// TODO: something else? Do we know the dependency?
+					// Either way, this code seems to never be reached.
+					t.state = taskSUCCESS
 				}
 			}
 		default:

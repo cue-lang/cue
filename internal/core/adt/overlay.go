@@ -73,10 +73,6 @@ type overlayContext struct {
 	// This is used to update the Vertex values in Environment values.
 	// The overlay for a vertex v can be obtained by looking up v.overlay.
 	vertexMap vertexMap
-
-	// confMap maps envComprehension values to the ones copied for this
-	// overlayContext.
-	compMap map[*envComprehension]*envComprehension
 }
 
 type vertexMap map[*Vertex]*Vertex
@@ -191,7 +187,7 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 		}
 
 		for _, t := range n.tasks {
-			ctx.rewriteComprehension(t)
+			// ctx.rewriteComprehension(t)
 
 			t.node = ctx.vertexMap.deref(t.node.node).state
 
@@ -391,57 +387,6 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 	d.x = t.x
 	d.id = id
 	d.node = dst.node
-	// These are rewritten after everything is cloned when all vertices are
-	// known.
-	d.comp = t.comp
-	d.leaf = t.leaf
 
 	return d
-}
-
-func (ctx *overlayContext) rewriteComprehension(t *task) {
-	if t.comp != nil {
-		t.comp = ctx.mapComprehensionContext(t.comp)
-	}
-
-	t.leaf = ctx.mapComprehension(t.leaf)
-}
-
-func (ctx *overlayContext) mapComprehension(c *Comprehension) *Comprehension {
-	if c == nil {
-		return nil
-	}
-	cc := *c
-	cc.comp = ctx.mapComprehensionContext(cc.comp)
-	cc.arc = ctx.ctx.deref(cc.arc)
-	cc.parent = ctx.mapComprehension(cc.parent)
-	return &cc
-}
-
-func (ctx *overlayContext) mapComprehensionContext(ec *envComprehension) *envComprehension {
-	if ec == nil {
-		return nil
-	}
-
-	if ctx.compMap == nil {
-		ctx.compMap = make(map[*envComprehension]*envComprehension)
-	}
-
-	if ctx.compMap[ec] == nil {
-		vertex := ctx.vertexMap.deref(ec.vertex)
-		// Report the error at the root of the disjunction if otherwise the
-		// error would be reported outside of the disjunction.
-		if vertex == ec.vertex {
-			vertex = ctx.root
-		}
-		x := &envComprehension{
-			comp:    ec.comp,
-			structs: ec.structs,
-			vertex:  vertex,
-		}
-		ctx.compMap[ec] = x
-		ec = x
-	}
-
-	return ec
 }

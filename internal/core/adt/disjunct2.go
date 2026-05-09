@@ -233,6 +233,32 @@ func initArcs(ctx *OpContext, v *Vertex) bool {
 	return true
 }
 
+// hasDeferredCompAncestor reports whether v has a disjunct ancestor whose
+// scheduler holds a still-pending pushed-down comprehension task. Such a
+// comp task was deferred (see process()'s hasPendingDisjunction path) so
+// that disjunction expansion clones it into each disjunct; once the
+// disjunct is being unified, the cloned comp depends on sibling fields
+// resolving via their own disjunctions even when the outer cross-product
+// iteration is in attemptOnly.
+func hasDeferredCompAncestor(v *Vertex) bool {
+	for p := v; p != nil; p = p.Parent {
+		if !p.IsDisjunct {
+			continue
+		}
+		if p.state == nil {
+			return false
+		}
+		for _, t := range p.state.tasks {
+			if t.run == handleComprehension &&
+				t.completes == allTasksCompleted {
+				return true
+			}
+		}
+		return false
+	}
+	return false
+}
+
 func (n *nodeContext) processDisjunctions() *Bottom {
 	ID := n.pushDisjunctionTask()
 	defer ID.pop()
@@ -300,6 +326,11 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 			mode = outerRunMode
 			if i < len(a)-1 {
 				mode = attemptOnly
+			} else if outerRunMode == attemptOnly && hasDeferredCompAncestor(n.node) {
+				// Force-finalize when a disjunct ancestor has a
+				// pushed-down comprehension awaiting cloning, so the
+				// clone's sibling lookup sees the disjunct's view.
+				mode = finalize
 			}
 		case i == len(a)-1:
 			mode = finalize

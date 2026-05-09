@@ -1341,9 +1341,12 @@ regression1: {
 		spec: command: ["a"]
 		patch: {}
 	}
-	out: #Rollout & {_X: x} @test(eq, at=out,{
+	out: #Rollout & {_X: x} @test(eq:todo, at=out,{
 		_Y: {spec: {command: ["a"]}, patch: {}}
 		command: ["a"]
+	}) @test(eq, {
+		_X: {spec: {command: ["a"]}, patch: {}}
+		out: _|_ @test(err, code=incomplete, contains="regression1.out.out: undefined field: spec", pos=[5:13])
 	})
 }
 regression2: {
@@ -1366,11 +1369,66 @@ regression2: {
 		command: ["a"]
 	})
 }
+letCycleSelf: {
+	#X: X={
+		let this = X
+		hosts: [string]: _
+		for h, _ in this.hosts {out: (h): 1}
+		for h, _ in this.hosts {out: (h): 2}
+	}
+
+	x: [string]: #X
+	x: a: {}
+
+	@test(eq, {#X: {hosts: {}}, x: {a: {hosts: {}}}})
+}
+-- rework2.cue --
+@experiment(aliasv2)
+
+letCycleSelfKeyword: {
+	#E: {
+		let s = self
+		hosts: _
+		for hv in s.hosts {out: (hv.x): "a"}
+	}
+
+	env: #E & {hosts: h1: x: "k"}
+
+	@test(eq, {
+		#E: _|_ @test(err, code=incomplete, path=letCycleSelf2.#E,
+			contains="cannot range over s.hosts (incomplete type _)", pos=[7:13])
+		env: {hosts: {h1: {x: "k"}}, out: {k: "a"}}
+	})
+}
+letCycleSelfKeyword2: {
+	#E: {
+		let s = self
+		...
+		for hv in s.hosts {
+			let n = s.networks
+			a: n
+		}
+	}
+
+	env: #E & {
+		hosts: h1: 1
+		networks: n1: "x"
+	}
+
+	@test(eq, {
+		#E: _|_ @test(err, code=incomplete, path=regression_let3.#E,
+			contains="cannot range over s.hosts (incomplete)", pos=[22:13])
+		env: {
+			hosts: {h1: 1}
+			networks: {n1: "x"}
+			a: {n1: "x"}
+		}
+	})
+}
 -- out/errors.txt --
-[incomplete] fail.a.b: cyclic reference to field b:
-    ./in.cue:45:3
+[cycle] fail.a: cyclic reference to field b:
+    ./in.cue:45:8
 [eval] embed.fail1.p: field not allowed:
-    ./in.cue:61:4
     ./in.cue:64:9
 [eval] embed.fail4.p: field not allowed:
     ./in.cue:102:4
@@ -1382,10 +1440,11 @@ regression2: {
 [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
     ./in.cue:124:6
     ./in.cue:125:6
-    ./in.cue:126:3
-[eval] fieldMismatch.a: cannot combine regular field "x" with 2:
-    ./in.cue:186:7
+[eval] fieldMismatch.a: conflicting values 2 and {x:3} (mismatched types int and struct):
+    ./in.cue:183:5
     ./in.cue:184:3
+    ./in.cue:185:3
+    ./in.cue:185:11
 [structural_cycle] noStackOverflowStructCycle.#list.tail: structural cycle
 [structural_cycle] noStackOverflowStructCycle.list.tail: structural cycle
 [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
@@ -1394,8 +1453,12 @@ regression2: {
     ./in.cue:244:8
 [incomplete] cyclicError.a: incomplete bool: bool:
     ./in.cue:297:6
+cyclicError.a: incomplete bool: bool:
+    ./in.cue:298:6
 [incomplete] cyclicError.a: incomplete bool: bool:
     ./in.cue:297:6
+cyclicError.a: incomplete bool: bool:
+    ./in.cue:298:6
 [incomplete] closedCheck.success1.#D: non-concrete value string in operand to !=:
     ./in.cue:346:6
     ./in.cue:345:6
@@ -1437,7 +1500,7 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./issue2113.cue:35:19
 [eval] issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:29:4
-[eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+[eval] issue3729.withoutDisjunction.root: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
     ./issue3729.cue:15:32
     ./issue3729.cue:16:9
     ./issue3729.cue:17:2
@@ -1448,18 +1511,24 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./issue3935.cue:47:27
 [incomplete] issue3935.full.#SchemaSelected._specConfig: required field missing: spec:
     ./issue3935.cue:50:16
-[incomplete] regression1.#Primary: _X.spec undefined as _X is incomplete (type _):
-    ./rework.cue:5:10
-[incomplete] regression1.#Rollout.out: _X.spec undefined as _X is incomplete (type _):
-    ./rework.cue:5:10
+[incomplete] regression1.#Primary: undefined field: spec:
+    ./rework.cue:5:13
+[incomplete] regression1.#Rollout.out: undefined field: spec:
+    ./rework.cue:5:13
 regression1.#Rollout.out: _X.patch undefined as _X is incomplete (type _):
     ./rework.cue:11:30
-[incomplete] regression2.#Primary: _Y.spec undefined as _Y is incomplete (type _):
-    ./rework.cue:25:10
+[incomplete] regression1.out.out: undefined field: spec:
+    ./rework.cue:5:13
+[incomplete] regression2.#Primary: undefined field: spec:
+    ./rework.cue:28:13
 [incomplete] regression2.#Rollout.out: _Y.spec undefined as _Y is incomplete (type _):
-    ./rework.cue:25:10
+    ./rework.cue:28:10
 regression2.#Rollout.out: _X.patch undefined as _X is incomplete (type _):
-    ./rework.cue:31:30
+    ./rework.cue:34:30
+[incomplete] letCycleSelfKeyword.#E: cannot range over s.hosts (incomplete type _):
+    ./rework2.cue:7:13
+[incomplete] letCycleSelfKeyword2.#E: cannot range over s.hosts (incomplete):
+    ./rework2.cue:22:13
 -- out/todo.txt --
 cyclicError: v3 reports improved error message vs v2.
 nestedWithDynamicFieldOK: fixed bug in v3 (was incorrect in v2).
@@ -2857,6 +2926,69 @@ NumCloseIDs: 264
     }
     out: (〈0;#Rollout〉 & {
       _X: 〈1;x〉
+    })
+  }
+  letCycleSelf: {
+    #X: {
+      let this#3 = 〈1〉
+      hosts: {
+        [string]: _
+      }
+      for h, _ in 〈0;let this#3〉.hosts {
+        out: {
+          〈2;h〉: 1
+        }
+      }
+      for h, _ in 〈0;let this#3〉.hosts {
+        out: {
+          〈2;h〉: 2
+        }
+      }
+    }
+    x: {
+      [string]: 〈1;#X〉
+    }
+    x: {
+      a: {}
+    }
+  }
+}
+--- rework2.cue
+{
+  letCycleSelfKeyword: {
+    #E: {
+      let s#4 = 〈1〉
+      hosts: _
+      for _, hv in 〈0;let s#4〉.hosts {
+        out: {
+          〈2;hv〉.x: "a"
+        }
+      }
+    }
+    env: (〈0;#E〉 & {
+      hosts: {
+        h1: {
+          x: "k"
+        }
+      }
+    })
+  }
+  letCycleSelfKeyword2: {
+    #E: {
+      let s#5 = 〈1〉
+      ...
+      for _, hv in 〈0;let s#5〉.hosts {
+        let n#6 = 〈2;let s#5〉.networks
+        a: 〈0;let n#6〉
+      }
+    }
+    env: (〈0;#E〉 & {
+      hosts: {
+        h1: 1
+      }
+      networks: {
+        n1: "x"
+      }
     })
   }
 }

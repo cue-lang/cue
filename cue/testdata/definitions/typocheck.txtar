@@ -998,13 +998,13 @@ Allocs: 125
 Retain: 0
 
 Unifications: 767
-Conjuncts:    1532
+Conjuncts:    1530
 Disjuncts:    84
 Notifications: 7
 
 NumCloseIDs: 441
 
-ConjunctInfos:       1118
+ConjunctInfos:       1120
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2

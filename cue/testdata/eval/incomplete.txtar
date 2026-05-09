@@ -76,10 +76,10 @@ issue1837: {
 Leaks:  0
 Freed:  28
 Reused: 10
-Allocs: 18
+Allocs: 21
 Retain: 0
 
-Unifications: 28
+Unifications: 31
 Conjuncts:    40
 Disjuncts:    0
 

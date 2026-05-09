@@ -51,22 +51,26 @@ r1:     "r1"
 [r]
 [r1]
 [y]
-["s-q"]
-["s-r"]
 ["s-q1"]
 ["s-q1" r1]
+["s-r"]
+["s-q"]
 -- diff/-out/doc-v3<==>+out/doc --
 diff old new
 --- old
 +++ new
-@@ -8,7 +8,6 @@
+@@ -8,9 +8,8 @@
  [q1]
  [r]
  [r1]
 -[_]
  [y]
- ["s-q"]
- ["s-r"]
+-["s-q"]
+-["s-r"]
+ ["s-q1"]
+ ["s-q1" r1]
++["s-r"]
++["s-q"]
 -- diff/out/todo/p3 --
 One missing entry is the result of the new evaluator not generating a
 bogus field for a failed dynamic field.

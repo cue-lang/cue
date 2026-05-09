@@ -235,20 +235,6 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 
 	defer n.unmarkDepth(n.markDepth())
 
-	if n.node.ArcType == ArcPending {
-		// forcefully do an early recursive evaluation to decide the state
-		// of the arc. See https://cuelang.org/issue/3621.
-		n.process(pendingKnown, attemptOnly)
-		if n.node.ArcType == ArcPending {
-			for _, a := range n.node.Arcs {
-				a.unify(c, Flags{condition: needs, mode: attemptOnly, checkTypos: checkTypos})
-			}
-		}
-		// TODO(evalv3): do we need this? Error messages are slightly better,
-		// but adding leads to Issue #3941.
-		// n.completePending(yield)
-	}
-
 	n.process(nodeOnlyNeeds, mode)
 
 	if n.node.ArcType != ArcPending &&
@@ -502,24 +488,11 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	return n.meets(needs)
 }
 
-// Once returning, all arcs plus conjuncts that can be known are known.
-//
-// Proof:
-//   - if there is a cycle, all completeNodeConjuncts will be called
-//     repeatedly for all nodes in this cycle, and all tasks on the cycle
-//     will have run at least once.
-//   - any tasks that were blocking on values on this circle to be completed
-//     will thus have to be completed at some point in time if they can.
-//   - any tasks that were blocking on values outside of this ring will have
-//     initiated its own execution, which is either not cyclic, and thus
-//     completes, or is on a different cycle, in which case it completes as
-//     well.
-//
-// Goal:
-// - complete notifications
-// - decrement reference counts for root and notify.
-// NOT:
-// - complete value. That is reserved for Unify.
+// completeNodeTasks advances the scheduler for this node, processing any
+// outstanding tasks up to the given mode. It is called after a task completes
+// when toComplete was set, indicating the node had an in-progress scheduler
+// that needs further processing. The isCompleting guard prevents re-entrant
+// calls.
 func (n *nodeContext) completeNodeTasks(mode runMode) {
 	if n.ctx.LogEval > 0 {
 		defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
@@ -586,10 +559,10 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		// n.underlying.status = status }()
 	}
 
-	// TODO: this should only be done if n is not currently running tasks.
-	// Investigate how to work around this.
-	// TODO(pushdown): probably okay to remove.
-	// n.completeNodeTasks(finalize)
+	// Ensure remaining tasks (e.g., comprehensions that add arcs) run before
+	// visiting arcs. Without this, arcs from comprehensions may be missing
+	// when completeAllArcs iterates over them.
+	n.completeNodeTasks(finalize)
 
 	n.incDepth()
 	defer n.decDepth()
@@ -618,7 +591,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 			// TODO: cancel tasks?
 			// TODO: is this ever run? Investigate once new evaluator work is
 			// complete.
-			a.ArcType = ArcNotPresent
+			a.updateArcType(ArcNotPresent)
 			continue
 		}
 
@@ -722,39 +695,6 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 	return success
 }
 
-// completePending determines if n is pending. In order to do so, it must
-// recursively find any descendents with unresolved comprehensions. Note that
-// it is currently possible for arcs with unresolved comprehensions to not be
-// marked as pending. Consider this example (from issue 3708):
-//
-//	out: people.bob.kind
-//	people: [string]: {
-//		kind:  "person"
-//		name?: string
-//	}
-//	if true {
-//		people: bob: name: "Bob"
-//	}
-//
-// In this case, the pattern constraint inserts fields into 'bob', which then
-// marks 'name' as not pending. However, for 'people' to become non-pending,
-// the comprehension associated with field 'name' still needs to be evaluated.
-//
-// For this reason, this method does not check whether 'n' is pending.
-//
-// TODO(evalv4): consider making pending not an arc state, but rather a
-// separate mode. This will allow us to descend with more precision to only
-// visit arcs that still need to be resolved.
-func (n *nodeContext) completePending(mode runMode) {
-	for _, a := range n.node.Arcs {
-		state := a.getState(n.ctx)
-		if state != nil {
-			state.completePending(mode)
-		}
-	}
-	n.process(pendingKnown, mode)
-}
-
 func (n *nodeContext) evalArcTypes(mode runMode) {
 	for _, a := range n.node.Arcs {
 		if a.ArcType != ArcPending {
@@ -764,7 +704,7 @@ func (n *nodeContext) evalArcTypes(mode runMode) {
 		// Ensure the arc is processed up to the desired level
 		if a.ArcType == ArcPending {
 			// TODO: cancel tasks?
-			a.ArcType = ArcNotPresent
+			a.updateArcType(ArcNotPresent)
 		}
 	}
 }
@@ -808,12 +748,18 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 		// hangs. Investigate.
 		// state.hasNonCycle = true
 
-		// TODO: ideally this should not be run at this point. Consider under
-		// which circumstances this is still necessary, and at least ensure
-		// this will not be run if node v currently has a running task.
-		state.completeNodeTasks(attemptOnly)
-		// TODO(pushdown): consider this once transitioned.
-		// state.process(needFieldSetKnown, flags.runMode)
+		v := state.node
+		if v.IsDynamic || v.Label.IsLet() || v.Parent.allChildConjunctsKnown(c) {
+			state.signal(allAncestorsProcessed)
+		}
+
+		// Drive the lookup target forward when its scheduler has not yet
+		// started everything; the !allTasksStarted guard keeps us out of
+		// nodes that are already mid-execution.
+		if !allTasksStarted(state) {
+			state.process(valueKnown|fieldConjunctsKnown|allTasksCompleted, attemptOnly)
+			state.updateScalar()
+		}
 	}
 
 	// TODO: verify lookup types.
@@ -847,16 +793,25 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 		return nil
 
 	default:
+		// If the vertex is known to be closed and does not accept the field,
+		// the field can never exist. Report a hard error immediately rather
+		// than creating a phantom pending arc, which would only produce an
+		// incomplete error later. This handles the case of a lookup in a
+		// closed struct (e.g., via the close() builtin) where the struct is
+		// already known to be closed but its ancestor evaluation is still
+		// pending.
+		if !v.IsOpenStruct() && !v.Accept(c, f) {
+			v.reportFieldIndexError(c, pos, f)
+			return nil
+		}
 		arc = &Vertex{Parent: state.node, Label: f, ArcType: ArcPending}
-		v.Arcs = append(v.Arcs, arc)
+		if runMode != finalize && runMode != ignore {
+			v.Arcs = append(v.Arcs, arc)
+		}
 		arcState = arc.getState(c) // TODO: consider using getBareState.
 	}
 
 	if arcState != nil && (!arcState.meets(needTasksDone) || !arcState.meets(arcTypeKnown)) {
-		arcState.completePending(attemptOnly)
-
-		arcState.completeNodeTasks(yield)
-
 		needs |= arcTypeKnown
 
 		switch runMode {
@@ -866,7 +821,46 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 			// Revisit once we have the structural cycle detection in place.
 
 			if arc.ArcType == ArcPending {
-				return arcReturn
+				// In ignore mode (used for comprehension clause evaluation),
+				// always return the pending arc optimistically to avoid
+				// prematurely blocking comprehension expansion.
+				if runMode == ignore {
+					return arcReturn
+				}
+
+				// In attemptOnly mode, return the pending arc if the container
+				// vertex still has work that may produce this field:
+				//
+				//   - it has an active parent task (e.g., a comprehension that
+				//     may dynamically add this field), OR
+				//   - it has registered tasks for allTasksCompleted that have
+				//     not yet all completed (e.g., a builtin function whose
+				//     result may include this field).
+				//
+				// If neither condition holds, the field can never become a
+				// member, so treat it as ArcNotPresent. This ensures lookups
+				// of truly absent fields produce an incomplete error rather
+				// than returning _.
+				if state != nil {
+					for _, pt := range state.parentTasks {
+						if pt.state < taskSUCCESS {
+							return arcReturn
+						}
+					}
+					if state.provided&allTasksCompleted != 0 &&
+						state.counters[allTasksCompletedIdx] > 0 {
+						return arcReturn
+					}
+				}
+				// Check the arc's own parent tasks (e.g.,
+				// comprehensions pushed down by pushDownDeps) — they
+				// may still produce this field.
+				for _, pt := range arcState.parentTasks {
+					if pt.state < taskSUCCESS {
+						return arcReturn
+					}
+				}
+				arc.ArcType = ArcNotPresent
 			}
 
 		case yield:
@@ -880,18 +874,76 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 			// not normally finalized (they may be cached) and as such might
 			// not trigger the usual unblocking. Force unblocking may cause
 			// some values to be remain unevaluated.
+
+			// If this arc is pending or optional and a parent task that may
+			// create or upgrade it is active, check whether the current task
+			// is that parent. If not (i.e. we are a different comprehension
+			// depending on a field another comprehension may produce), yield
+			// and wait for the arc type to be resolved. This avoids a
+			// spurious CycleError: without this, the lookup would return an
+			// IncompleteError for an optional arc, causing
+			// verifyNonMonotonicResult to add a postCheck expecting the field
+			// to remain absent. But the field becomes present once the parent
+			// task finishes, triggering the postCheck as a false cycle.
+			//
+			// This applies to both ArcPending and ArcOptional because:
+			// - ArcPending: a comprehension may yet create this arc as a
+			//   member.
+			// - ArcOptional: a comprehension (in parentTasks) may upgrade the
+			//   optional arc to a member arc (e.g. `if raises == _|_ { ret:
+			//   a: 1 }` upgrades `ret?: {}` to a regular member).
+			if arc.ArcType == ArcPending || arc.ArcType == ArcOptional {
+				cur := c.current()
+				shouldYield := false
+				for _, pt := range arcState.parentTasks {
+					if pt.state == taskRUNNING && pt != cur {
+						shouldYield = true
+						break
+					}
+				}
+				if shouldYield {
+					// A parent task is actively running in the current call
+					// chain (triggered via processAncestors), but is not our
+					// own task. Yield and wait for the arc type to be
+					// determined. This prevents a spurious CycleError that
+					// would otherwise be stored when arc.unify below sets
+					// arc.status = evaluating while the arc's type is unknown.
+					arcState.process(arcTypeKnown, yield)
+					break
+				}
+			}
+
 			switch {
 			case needs == arcTypeKnown|fieldSetKnown:
 				arc.unify(c, Flags{condition: needs, mode: finalize, checkTypos: false})
 			default:
 				// Now we can't finalize, at least try to get as far as we
 				// can and only yield if we really have to.
+				needs := needs | arcTypeKnown
 				if !arc.unify(c, Flags{condition: needs, mode: attemptOnly, checkTypos: false}) {
-					arcState.process(needs, yield)
+					arcState.process(needs, attemptOnly)
 				}
 			}
 			if arc.ArcType == ArcPending {
-				arc.ArcType = ArcNotPresent
+				// Only mark arc as not present if no parent task is still
+				// running. If a parent task (e.g. a comprehension) is still
+				// in progress, it may yet add this arc.
+				hasActiveParent := false
+				for _, pt := range arcState.parentTasks {
+					if pt.state < taskSUCCESS {
+						hasActiveParent = true
+						break
+					}
+				}
+				if !hasActiveParent {
+					// updateArcType is the normal path, but for an arc
+					// currently at ArcPending it returns early without
+					// assigning because ArcNotPresent is "more restrictive"
+					// than ArcPending in the enum (see updateArcType). We
+					// force the transition here because no parent task is
+					// going to materialize this arc.
+					arc.ArcType = ArcNotPresent
+				}
 			}
 		}
 	}
@@ -936,8 +988,33 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 		return nil
 
 	case ArcPending:
-		// should not happen.
-		panic("unreachable")
+		// The arc is still pending after finalization. If a parent task
+		// (comprehension) is still active (RUNNING, WAITING) or failed
+		// (e.g. due to a cycle error in a mutual comprehension
+		// dependency), report as CycleError so that bottom comparisons
+		// propagate the cycle rather than treating the field as absent.
+		//
+		// arcState may be nil here: the if block above only ran when
+		// arcState was non-nil, so a finalized arc whose ArcType remained
+		// ArcPending (e.g. left over from a sibling traversal) reaches this
+		// point without state. With no parent tasks to inspect, fall
+		// through to the generic absent-field error.
+		if arcState != nil {
+			for _, pt := range arcState.parentTasks {
+				if pt.state == taskRUNNING || pt.state == taskWAITING || pt.state == taskFAILED {
+					label := f.SelectorString(c.Runtime)
+					b := &Bottom{
+						Code: CycleError,
+						Err:  c.NewPosf(pos, "cyclic reference to field %s", label),
+						Node: v,
+					}
+					c.AddBottom(b)
+					return nil
+				}
+			}
+		}
+		v.reportFieldIndexError(c, pos, f)
+		return nil
 	}
 
 	v.reportFieldIndexError(c, pos, f)

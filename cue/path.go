@@ -69,6 +69,8 @@ func fromArcType(t adt.ArcType) SelectorType {
 		return OptionalConstraint
 	case adt.ArcRequired:
 		return RequiredConstraint
+	case adt.ArcPending, adt.ArcNotPresent:
+		return 0
 	default:
 		panic("arc type not supported")
 	}

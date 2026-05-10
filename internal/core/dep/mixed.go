@@ -133,6 +133,26 @@ func (m marked) markExpr(x adt.Expr) {
 }
 
 func (m marked) markComprehension(y *adt.Comprehension) {
+	// Walk the clause expressions: their references are dependencies of the
+	// comprehension. Pre-pushdown the cascading rewrite distributed comp
+	// clauses across individual fields, so the clause exprs were reached via
+	// other paths; without that rewrite the comp keeps its clauses and we
+	// must walk them here.
+	for _, y := range y.Clauses {
+		switch x := y.(type) {
+		case *adt.ForClause:
+			m.markExpr(x.Src)
+		case *adt.LetClause:
+			m.markExpr(x.Expr)
+		case *adt.IfClause:
+			m.markExpr(x.Condition)
+		case *adt.TryClause:
+			if x.Expr != nil {
+				m.markExpr(x.Expr)
+			}
+		}
+	}
+
 	m.markExpr(adt.ToExpr(y.Value))
 	if y.Fallback != nil {
 		m.markExpr(y.Fallback)

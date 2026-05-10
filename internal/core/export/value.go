@@ -114,9 +114,24 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		// are not associated with a position) are deterministic.
 		a := slices.SortedStableFunc(n.LeafConjuncts(), cmpConjuncts)
 
+		// Dedup conjuncts that share the same body AST. After comprehension
+		// pushdown, a `for x in xs { … }` over N items lands on the target
+		// vertex as N conjuncts of the same body (one per yielded env). The
+		// envs differ — each yield runs under its own env to materialize
+		// per-iteration arcs — but symbolic rendering ignores env, so all N
+		// would render to identical text. Without this guard the fallback
+		// produces `X & X & …`. The pre-pushdown evaluator avoided this by
+		// keeping the `for`-comp as a single Comprehension conjunct that
+		// export rendered once; pushdown dissolves that wrapping.
+		seen := map[adt.Elem]bool{}
 		exprs := make([]ast.Expr, 0, len(a))
 		for _, c := range a {
-			if x := e.expr(c.Env, c.Elem()); x != dummyTop {
+			elem := c.Elem()
+			if seen[elem] {
+				continue
+			}
+			seen[elem] = true
+			if x := e.expr(c.Env, elem); x != dummyTop {
 				exprs = append(exprs, x)
 			}
 		}

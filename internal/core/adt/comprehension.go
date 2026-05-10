@@ -239,11 +239,16 @@ func pushDownDeps(n *nodeContext, t *task, x Node) condition {
 				// observing the child before the comprehension fires.
 
 				arc, _ := n.getArc(x.Label, ArcPending)
-				arcState := arc.getBareState(n.ctx)
-				arcState.parentTasks = append(arcState.parentTasks, t)
-
-				// get arc.
-				pushDownDeps(arcState, t, x.Value)
+				// If an arc with the same label already exists and has been
+				// finalized in a prior evaluation, getBareState returns nil:
+				// there is no scheduler to attach parentTasks to and no body
+				// to recurse into. The comp's effects on this arc are
+				// already captured via the existing finalized result, so
+				// pushdown bookkeeping has nothing to do here.
+				if arcState := arc.getBareState(n.ctx); arcState != nil {
+					arcState.parentTasks = append(arcState.parentTasks, t)
+					pushDownDeps(arcState, t, x.Value)
+				}
 
 				if x.Label.IsString() {
 					kind &= StructKind

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c29613f_1de5a385",
+        "filename": "internal/cuetxtar/astcmp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-10T08:38:00Z",
+      "side": 1,
+      "message": "Done. Both occurrences in this file (the top-level @test(err) handling and the per-field one) now use `embedErrCheck :\u003d cmp.Or(pa.errArgs, \u0026errArgs{})` and `errCk :\u003d cmp.Or(pa.errArgs, \u0026errArgs{})`. Added `cmp` to the imports.",
+      "parentUuid": "2b4a0c27_2e3f3977",
+      "revId": "8760c6ee249d31259ef2d34cb686ee30eb4f68ba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4300cb4_8918abca",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-09T11:12:08Z",
       "side": 1,
       "message": "perhaps I\u0027m missing something, but it makes no sense for the parser to sometimes emit `_|_` as a BottomLit, and sometimes as an Ident. Surely it uses just one of those consistently?",
+      "revId": "8760c6ee249d31259ef2d34cb686ee30eb4f68ba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f842bf1a_4bf71807",
+        "filename": "internal/cuetxtar/astcmp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1098,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-10T08:38:00Z",
+      "side": 1,
+      "message": "Right. removed entirely.",
+      "parentUuid": "f4300cb4_8918abca",
       "revId": "8760c6ee249d31259ef2d34cb686ee30eb4f68ba",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

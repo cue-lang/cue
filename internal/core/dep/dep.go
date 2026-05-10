@@ -360,11 +360,6 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 		for _, e := range x.Decls {
 			c.markDecl(env, e)
 		}
-
-	case *adt.Comprehension:
-		// Not used, but may be in the future, so we leave it for defensive
-		// purposes.
-		c.markComprehension(env, x)
 	}
 }
 

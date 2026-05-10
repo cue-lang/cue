@@ -114,9 +114,20 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		// are not associated with a position) are deterministic.
 		a := slices.SortedStableFunc(n.LeafConjuncts(), cmpConjuncts)
 
+		// Dedup conjuncts that share the same body AST. Pushdown lands a
+		// `for x in xs { … }` over N items as N body conjuncts on the
+		// target, one per yielded env. The envs differ but symbolic
+		// rendering ignores them, so without dedup the fallback produces
+		// `X & X & …`.
+		seen := map[adt.Elem]bool{}
 		exprs := make([]ast.Expr, 0, len(a))
 		for _, c := range a {
-			if x := e.expr(c.Env, c.Elem()); x != dummyTop {
+			elem := c.Elem()
+			if seen[elem] {
+				continue
+			}
+			seen[elem] = true
+			if x := e.expr(c.Env, elem); x != dummyTop {
 				exprs = append(exprs, x)
 			}
 		}

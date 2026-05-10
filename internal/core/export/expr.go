@@ -148,9 +148,19 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 	hasAlias := len(s.Elts) > 0
 
+	// Dedup conjuncts that share the same body AST. Pushdown lands a
+	// `for x in xs { … }` over N items as N body conjuncts on the target,
+	// one per yielded env. The envs differ but symbolic rendering ignores
+	// them, so without dedup the output is `X & X & …`, one factor per
+	// yield.
+	seen := map[adt.Elem]bool{}
 	for _, c := range a {
 		e.top().upCount = c.up
 		x := c.c.Elem()
+		if seen[x] {
+			continue
+		}
+		seen[x] = true
 		e.addExpr(c.c.Env, src, x, false)
 	}
 

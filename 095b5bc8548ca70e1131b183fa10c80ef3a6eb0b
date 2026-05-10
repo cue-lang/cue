@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18dc4a8a_d4114b29",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-10T08:29:12Z",
+      "side": 1,
+      "message": "done.",
+      "parentUuid": "d279ab8f_62707986",
+      "revId": "095b5bc8548ca70e1131b183fa10c80ef3a6eb0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec17a811_32f959dc",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-09T12:18:02Z",
       "side": 1,
       "message": "again I feel like this comment is overly verbose. perhaps deduplicate the docs a bit with the func godoc itself, too.",
+      "revId": "095b5bc8548ca70e1131b183fa10c80ef3a6eb0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbd027c7_70a47e4d",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-10T08:29:12Z",
+      "side": 1,
+      "message": "Done. Trimmed the inline comment to 4 lines covering only the load-bearing point at this site: report the cycle on n (the sharing vertex / disjunct\u0027s view of w) instead of letting w.unify lock in a structural cycle on w. Pushed the trigger description down to `sharedTargetHasInProgressCycle`\u0027s godoc, with a \"see X\" pointer at the call site. Removed the redundant explanation of the depth-cycle condition and the self-referential or() example, both of which are documented either in that helper\u0027s godoc or the commit message.",
+      "parentUuid": "ec17a811_32f959dc",
       "revId": "095b5bc8548ca70e1131b183fa10c80ef3a6eb0b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

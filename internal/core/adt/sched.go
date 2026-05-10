@@ -648,13 +648,14 @@ func (s *scheduler) blockOn(cond condition) {
 func (s *scheduler) signal(completed condition) {
 	was := s.completed
 	s.completed |= completed
+	toFreeze := s.deferFieldSetKnown(completed)
 	if was == s.completed {
-		s.frozen |= completed
+		s.frozen |= toFreeze
 		return
 	}
 
 	s.completed |= s.ctx.complete(s)
-	s.frozen |= completed
+	s.frozen |= toFreeze
 
 	// TODO: this could benefit from a linked list where tasks are removed
 	// from the list before being run.
@@ -672,10 +673,39 @@ func (s *scheduler) signal(completed condition) {
 // freeze indicates no more tasks satisfying the given condition may be added.
 // It is also used to freeze certain elements of the task.
 func (s *scheduler) freeze(c condition) {
-	s.frozen |= c
+	s.frozen |= s.deferFieldSetKnown(c)
 	s.completed |= c
 	s.ctx.complete(s)
 	s.isFrozen = true
+}
+
+// deferFieldSetKnown filters fieldSetKnown out of c when this scheduler still
+// has a parent task that is not the currently-running one and has not
+// completed. Such a parent task may yet add fields to this node (typically a
+// pushed-down comprehension that has not finished yielding), so freezing the
+// field set on its behalf would lock in an incomplete view of the node and
+// produce spurious "field set was already referenced" errors when the
+// comprehension later tries to insert its body.
+//
+// The current task is excluded from the check: a task can call freeze for
+// fieldSetKnown for the very node it is the parent task of (e.g. a
+// comprehension iterating over its own source node) without deferring on
+// itself.
+func (s *scheduler) deferFieldSetKnown(c condition) condition {
+	if c&fieldSetKnown == 0 {
+		return c
+	}
+	cur := s.ctx.current()
+	for _, pt := range s.parentTasks {
+		switch pt.state {
+		case taskSUCCESS, taskFAILED, taskCANCELLED:
+			continue
+		}
+		if pt != cur {
+			return c &^ fieldSetKnown
+		}
+	}
+	return c
 }
 
 // signalDoneAdding signals that no more tasks will be added to this scheduler.

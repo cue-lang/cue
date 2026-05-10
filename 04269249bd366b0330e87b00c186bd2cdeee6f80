@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea24925a_4260326b",
+        "filename": "cue/path.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-10T17:04:23Z",
+      "side": 1,
+      "message": "nit: I would add a brief comment summarizing the logic in the commit message.",
+      "revId": "04269249bd366b0330e87b00c186bd2cdeee6f80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

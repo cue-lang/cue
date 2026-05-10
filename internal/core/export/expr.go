@@ -145,9 +145,26 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 	hasAlias := len(s.Elts) > 0
 
+	// Dedup conjuncts that share the same body AST. After comprehension
+	// pushdown, a `for x in xs { … }` over N items inserts the body N times
+	// on the target arc (one per yielded environment). The envs differ —
+	// each yield must run under its own env to materialize per-iteration
+	// arcs (e.g. dynamic field labels) — but the body AST is the same
+	// pointer, and export's symbolic rendering does not look at env, so all
+	// N renders produce identical text. Without this guard the rendered
+	// output is `X & X & …`, one factor per yield. The pre-pushdown
+	// evaluator avoided this in a different way: it kept the `for`-comp as
+	// a single Comprehension conjunct that export rendered once via a
+	// dedicated `case *adt.Comprehension` arm; pushdown dissolves that
+	// wrapping and leaves only the body conjuncts visible here.
+	seen := map[adt.Elem]bool{}
 	for _, c := range a {
 		e.top().upCount = c.up
 		x := c.c.Elem()
+		if seen[x] {
+			continue
+		}
+		seen[x] = true
 		e.addExpr(c.c.Env, src, x, false)
 	}
 

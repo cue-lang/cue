@@ -508,10 +508,6 @@ diff old new
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
-	} & {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
-		}
 	}
 	incomplete: {
 		a: {
@@ -607,10 +603,6 @@ diff old new
 		}
 	}
 	files: {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
-		}
-	} & {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
@@ -812,10 +804,6 @@ diff old new
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
-	} & {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
-		}
 	}
 	incomplete: {
 		a: {
@@ -935,10 +923,6 @@ diff old new
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
-	} & {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
-		}
 	}
 	incomplete: {
 		a: {
@@ -1023,29 +1007,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -29,6 +29,10 @@
- 		"\("kind-\(cfg.name)")": {
- 			patches: cfg
- 		}
-+	} & {
-+		"\("kind-\(cfg.name)")": {
-+			patches: cfg
-+		}
- 	}
- 	incomplete: {
- 		a: {
-@@ -127,6 +131,10 @@
- 		"\("kind-\(cfg.name)")": {
- 			patches: cfg
- 		}
-+	} & {
-+		"\("kind-\(cfg.name)")": {
-+			patches: cfg
-+		}
- 	}
- 	incomplete: {
- 		a: {
-@@ -231,8 +239,8 @@
+@@ -231,8 +231,8 @@
  			a: "foo"
  		}
  	}
@@ -1056,28 +1018,6 @@ diff old new
  	incomplete: {
  		a: {
  			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
-@@ -325,6 +333,10 @@
- 		"\("kind-\(cfg.name)")": {
- 			patches: cfg
- 		}
-+	} & {
-+		"\("kind-\(cfg.name)")": {
-+			patches: cfg
-+		}
- 	}
- 	incomplete: {
- 		a: {
-@@ -444,6 +456,10 @@
- 		"\("kind-\(cfg.name)")": {
- 			patches: cfg
- 		}
-+	} & {
-+		"\("kind-\(cfg.name)")": {
-+			patches: cfg
-+		}
- 	}
- 	incomplete: {
- 		a: {
 -- diff/value/explanation --
 Improved error messages.
 -- out/value --

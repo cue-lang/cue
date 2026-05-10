@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d1dc89b_31834daa",
+        "filename": "cue/testdata/comprehensions/optional_ref_yield.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-10T08:27:14Z",
+      "side": 1,
+      "message": "In this case that doesn\u0027t help. The issue only comes up after the pushdown implementation. See added (first) paragraph in commit message.",
+      "parentUuid": "d74c65c4_898dbfd9",
+      "revId": "992a94491a1a12b695165b645a34d3ad42fb9388",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d85d312_5aeb937f",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51f7c2bf_3d5075e3",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1398,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-10T08:27:14Z",
+      "side": 1,
+      "message": "Done. Trimmed to ~8 lines covering the three load-bearing points: (1) the dependency is actively being computed so we yield until valueKnown, (2) schedRUNNING (not schedREADY) is required to avoid deadlock with genuine cycles, (3) the same yield handles both the ArcPending and ArcOptional reasons for the incomplete error.",
+      "parentUuid": "4d85d312_5aeb937f",
+      "revId": "992a94491a1a12b695165b645a34d3ad42fb9388",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7ee93b5_bc0d2f79",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-05-09T12:15:24Z",
       "side": 1,
       "message": "typically this is done via `panic(\"unreachable\") // explain why...`, which is a stronger assertion given that it tells static analysis tools what\u0027s happening, and also panics if we violate the rule at run-time.",
+      "revId": "992a94491a1a12b695165b645a34d3ad42fb9388",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75187ad2_4b8841ea",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1409,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-10T08:27:14Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "f7ee93b5_bc0d2f79",
       "revId": "992a94491a1a12b695165b645a34d3ad42fb9388",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

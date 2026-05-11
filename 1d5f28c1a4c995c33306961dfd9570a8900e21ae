@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05b3d4ce_c5ac08ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-11T09:13:18Z",
+      "side": 1,
+      "message": "fwiw, I wouldn\u0027t consider this invalid CUE. Yes, it fails to evaluate without error, but it\u0027s not invalid, at least as I hold it.\nIn that regard, I would be perfectly happy with an approach here that just injects the correct Pos into the AST and then waits for the evaluator to spot the problem. In some ways, by spotting the issue in the decoder, we\u0027re duplicating work.",
+      "range": {
+        "startLine": 18,
+        "startChar": 48,
+        "endLine": 18,
+        "endChar": 55
+      },
+      "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "245a1221_0cecf669",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-11T09:13:18Z",
+      "side": 1,
+      "message": "I don\u0027t mind +2\u0027ing this, but I guess I don\u0027t fully agree with the direction taken here. Can always revisit later.",
+      "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b0a932d_7e1856a8",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-11T09:13:18Z",
+      "side": 1,
+      "message": "Oh this one\u0027s much more interesting then (I realise this is not new code) - CUE would happily let this through and unify this. But I guess in the INI spec you\u0027re not allowed duplicates?",
+      "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "881165e1_e7248721",
+        "filename": "encoding/ini/decode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-05-11T09:13:18Z",
+      "side": 1,
+      "message": "It is kinda unfortunate that reversing the order changes the error, and that we only get one position indicated.",
+      "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

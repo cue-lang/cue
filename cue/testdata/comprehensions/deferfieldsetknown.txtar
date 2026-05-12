@@ -1,0 +1,46 @@
+-- in.cue --
+package x
+
+#PDB: {y: int}
+
+result: resources: {
+    if true {
+        x: #PDB & {y: 1}
+    }
+}
+
+out: ({
+    cfg: resources: _
+    out: {for n, _ in cfg.resources {(n): "x"}}
+} & {cfg: result}).out @test(err, code=eval, path=cfg.resources.x, contains="adding field %v not allowed as field set was already referenced", args=[y])
+-- out/errors.txt --
+[eval] cfg.resources.x: adding field y not allowed as field set was already referenced:
+    ./in.cue:6:13
+-- out/compile --
+--- in.cue
+{
+  #PDB: {
+    y: int
+  }
+  result: {
+    resources: {
+      if true {
+        x: (〈3;#PDB〉 & {
+          y: 1
+        })
+      }
+    }
+  }
+  out: ({
+    cfg: {
+      resources: _
+    }
+    out: {
+      for n, _ in 〈1;cfg〉.resources {
+        〈1;n〉: "x"
+      }
+    }
+  } & {
+    cfg: 〈1;result〉
+  }).out
+}

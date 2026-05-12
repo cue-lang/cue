@@ -1,0 +1,475 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee4ada17_5c3abee4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "WIP CL so here are some WIP review comments 🙂",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8e4268a_658127db",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "nit: put the `: rendering\u0027 on the same line to match the \"In scope\" paragraph.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e56523fb_21bdcc7f",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "```suggestion\n\t// node and the RelPos node that is eligible for\n```\n\nand other occurrences.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50bd75e7_8a08b7bd",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "```suggestion\n\t// relPosInChildren which propagates up the tree to the very root,\n```",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdac2438_dd1c1a11",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "nit: US spelling is conventional in Go source.\n\n```suggestion\nfunc (c *converter) analyze(root ast.Node) {\n```",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1875b59_31e08cf1",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "Maybe a comment saying what we\u0027re doing here?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ec1f62b_47c36c0d",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I\u0027ve seen this pattern at least three times in this package. Maybe consider factoring out a little helper type?\n\n```\ntype stack[T any] []T\n\nfunc (s *stack[T]) push(items ...T) {\n\t*s \u003d append(*s, items...)\n}\n\nfunc (s *stack[T]) pop() (T, bool) {\n\tn :\u003d len(*s)\n\tif n \u003d\u003d 0 {\n\t\treturn *new(T), false\n\t}\n\tx :\u003d (*s)[n-1]\n\t*s \u003d (*s)[:n-1]\n\treturn x\n}\n```",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67fb4edd_8e562205",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I\u0027d be inclined to put these self-contained helper functions towards the end of the file, after the `converter` methods.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83a00e60_23af8ba6",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I\u0027m not sure you need the headerPrefix function.\n\n```suggestion\n\theaderEnd :\u003d len(f.Preamble())\n```\n\n\u003d",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e839d6ba_11a63537",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I don\u0027t understand when this can happen. AIUI, Elided positions are just used for commas that were newlines, but can those turn into actual declaration nodes?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bee5d1c_eb984b9d",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "Similar thoughts about Elided.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afaa207a_d1ee0a4a",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1160,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "It\u0027s very likely to happen for programmatically constructed ASTs AFAICS.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b458248_cfbd6ed3",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1168,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "As mentioned elsewhere, I don\u0027t think declarations can be Elided in practice, so this could be simplified.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e4d8954_d3abddc0",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1228,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "hmm, I was looking for a Nest type but only found `docNest`. Maybe use `docNest` as the noun here, or use a verb form for Nest like \"whether e\u0027s rendering\nNests its own broken inner content\" or something?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcb4cace_a3318e6e",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1248,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I think this should always return true. We could probably do with some tests that test programmatically constructed list ASTs.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "156b87f3_7282fca1",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1389,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "Any particular reason for these fields to be exported?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79e26cfc_6d982d24",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1884,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I might be inclined to make up some constants for these levels and then use them in the code rather than the rather opaque \"6\" and \"7\" etc.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e045ae9c_2a6a77ea",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 2960,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "This is somewhat foundational, so I might put it near the top of the file.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dfedbb1_fab81d25",
+        "filename": "internal/pretty/doc.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "Maybe just clarify exactly what the word \"flat\" signifies here? It\u0027s not immediately clear to me.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "904437fd_aa8bbe58",
+        "filename": "internal/pretty/doc.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I\u0027m wondering if any of this needs to be exported. I think I\u0027d either separate the Doc and Render functionality into its own package, with exported types, with the AST-\u003eDoc stuff layered on top; or unexport all of these types that don\u0027t really have reason to be used externally AFAICS. Unless I\u0027m missing something!",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6148950f_67865e7d",
+        "filename": "internal/pretty/doc.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "ISTM that this will count combining characters as extra columns, so for example the string \"e\\u0301\", representing e-acute, will count as two columns when it will only render as one. I wonder what the convention is here. Perhaps at least add a TODO to consider graphemes rather than lexemes?",
+      "range": {
+        "startLine": 145,
+        "startChar": 37,
+        "endLine": 145,
+        "endChar": 62
+      },
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53cad57d_4c319d22",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "Maybe explicitly section the fields below into into mutable vs constant members?\n(My initial thought it that all fields up to and including buf will remain unchanged after init but I might well be wrong).",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d077ea22_79202304",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I\u0027m not sure this temp var adds much value over just using `f.mode` directly.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bee3e37_311affad",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "What does \"raw\" mean in this context?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c43f7cc_a3edc2bf",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 794,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "I _think_ that it doesn\u0027t matter which one gets processed first because it doesn\u0027t matter which way we add widths together. But maybe I\u0027m missing something?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfad52ec_194dd4d3",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 828,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "Again, does it actually matter if we go forwards or backwards?\nISTM we could fold these two loops together and it wouldn\u0027t make any difference.\n\nBut maybe it\u0027s nice to have isomorphism between this logic and the core rendering logic?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfb48919_408318c2",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 862,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-12T15:03:34Z",
+      "side": 1,
+      "message": "Same concern here as with StringLit about graphemes vs lexemes, although I guess that\u0027s much less likely to be an issue with a prefix string which is almost certainly white space.",
+      "range": {
+        "startLine": 862,
+        "startChar": 9,
+        "endLine": 862,
+        "endChar": 43
+      },
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

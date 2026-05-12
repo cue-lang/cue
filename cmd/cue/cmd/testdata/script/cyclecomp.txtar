@@ -1,0 +1,32 @@
+# Regression: in https://cue.gerrithub.io/c/cue-lang/cue/+/1236923 (cue-mpvl)
+# the following module emits a spurious cycle error, whereas master accepts it.
+#
+# Minimal trigger:
+#   1) a definition #A in one package, self-aliased (`X=`), with a field
+#      typed as another *named definition* (#S) and an `if X.field != null`
+#      guarded sub-field;
+#   2) #A instantiated from a *different* package via import.
+# Inlining #S, or instantiating in the same package, makes the cycle go away.
+
+exec cue vet -c ./use
+
+-- cue.mod/module.cue --
+module: "example.com/r"
+language: version: "v0.8.0"
+-- kit/app.cue --
+package kit
+
+#S: {}
+
+#A: X={
+    t: #S
+    if X.t != null {
+        out: 1
+    }
+}
+-- use/main.cue --
+package use
+
+import "example.com/r/kit"
+
+x: kit.#A & {}

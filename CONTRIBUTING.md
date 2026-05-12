@@ -63,9 +63,6 @@ effort, and ensures that the idea fits inside the goals for the language and
 tools.  It also checks that the design is sound before code is written; the code
 review tool is not the place for high-level discussions.
 
-Sensitive security-related issues should be reported to <a
-href="mailto:security@cuelang.org">security@cuelang.org</a>.
-
 ## Becoming a code contributor
 
 The code contribution process used by the CUE project is a little different from

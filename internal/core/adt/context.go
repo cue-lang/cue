@@ -803,6 +803,22 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 				hasCycleBreakingValue := s.hasFieldValue ||
 					!isCyclePlaceholder(arc.BaseValue)
 
+				// The arc's scheduler may have FROZEN scalarKnown
+				// (meaning its value transition completed at the scheduler
+				// level) yet arc.BaseValue is still the cycle sentinel.
+				// That happens for the inline vertex created by
+				// cross-package import unification of a definition whose
+				// body has a comprehension reading a sibling field: the
+				// scheduler is done with the arc but the BaseValue
+				// transition did not propagate. A real cycle leaves
+				// scalarKnown un-frozen because evaluation never settled,
+				// so this is a safe distinguisher.
+				if evaluating && !hasCycleBreakingValue &&
+					s.frozen&scalarKnown != 0 && allTasksFinished(s) {
+					arc.Finalize(c)
+					hasCycleBreakingValue = !isCyclePlaceholder(arc.BaseValue)
+				}
+
 				if evaluating && !hasCycleBreakingValue {
 					err := c.Newf("cycle with field: %v", x)
 					b := &Bottom{Code: CycleError, Err: err}

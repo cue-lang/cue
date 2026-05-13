@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdc43d8f_98adbd53",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 611,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-13T08:26:08Z",
+      "side": 1,
+      "message": "I think this is reasonable with respect to current behaviour, but I think we should seriously consider making `-d` work with CUE files too. For example, it would be nice to be able to easily validate a standalone CUE file (e.g. `cue.mod/module.cue`) against a chosen schema.",
+      "revId": "b352341c026777ab2ed98e46e3e271dca54b7b82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

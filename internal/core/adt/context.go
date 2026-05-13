@@ -206,6 +206,12 @@ type OpContext struct {
 	// disjunct to be made when processing disjunctions.
 	holeID int
 
+	// nextCompID counts per-firing comprehension identifiers. Each call to
+	// [nodeContext.processComprehension] allocates one ID and stamps it on
+	// every per-yield Environment so toposort can group sibling body decls
+	// (see [Environment.CompID]). 0 is reserved for "not from a comprehension".
+	nextCompID uint32
+
 	// inDetached indicates that inline structs evaluated in the current context
 	// should never be shared. This is the case, for instance, with the source
 	// for the for clause in a comprehension.

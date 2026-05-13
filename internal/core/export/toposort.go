@@ -35,7 +35,7 @@ func extractFeatures(in []adt.StructInfo) (a [][]adt.Feature) {
 	totalEntries := 0
 	for _, s := range in {
 		if len(s.Decls) > 0 {
-			totalEntries += 1 + s.Repeats
+			totalEntries += int(1 + s.Repeats)
 		}
 	}
 	a = make([][]adt.Feature, 0, totalEntries)

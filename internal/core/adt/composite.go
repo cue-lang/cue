@@ -97,6 +97,14 @@ type Environment struct {
 	// constraint. It is used to resolve label references.
 	DynamicLabel Feature
 
+	// CompID identifies the comprehension firing whose body produced the
+	// conjuncts scheduled under this Environment, or 0 for non-comprehension
+	// envs. Toposort uses it to group sibling decls inserted per yield by the
+	// same comprehension so their dynamic-field labels drain in iteration
+	// order. Allocated from [OpContext.nextCompID]; placed next to
+	// DynamicLabel so the two uint32 fields share an 8-byte slot.
+	CompID uint32
+
 	// TODO(perf): make the following public fields a shareable struct as it
 	// mostly is going to be the same for child nodes.
 
@@ -478,9 +486,17 @@ func (v *Vertex) Clone() *Vertex {
 type StructInfo struct {
 	*StructLit
 
-	// Repeats tracks how many additional times this struct appeared via [Vertex.AddStruct].
-	// This is used by toposort to give proper weight to repeated structs.
-	Repeats int
+	// Repeats tracks how many additional times this struct appeared via
+	// [Vertex.AddStruct]. This is used by toposort to give proper weight to
+	// repeated structs.
+	Repeats uint32
+
+	// CompID identifies the comprehension firing whose body produced this
+	// struct, or 0 if the struct does not originate from a comprehension
+	// body. Toposort groups sibling decls inserted per yield by the same
+	// comprehension so their dynamic-field labels drain in iteration order.
+	// Paired with Repeats so both uint32 fields share an 8-byte slot.
+	CompID uint32
 
 	// Embed indicates the struct in which this struct is embedded (originally),
 	// or nil if this is a root structure.
@@ -1411,7 +1427,7 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	v.Conjuncts = append(v.Conjuncts, c)
 }
 
-func (v *Vertex) AddStruct(s *StructLit) {
+func (v *Vertex) AddStruct(s *StructLit, compID uint32) {
 	for i, t := range v.Structs {
 		if t.StructLit == s {
 			v.Structs[i].Repeats++
@@ -1420,6 +1436,7 @@ func (v *Vertex) AddStruct(s *StructLit) {
 	}
 	info := StructInfo{
 		StructLit: s,
+		CompID:    compID,
 	}
 	v.Structs = append(v.Structs, info)
 }

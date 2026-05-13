@@ -232,7 +232,14 @@ func (n *nodeContext) insertComprehension(
 					isComprehension: true,
 				}
 			}
-			node.AddStruct(st)
+			// CompID 0: this AddStruct runs at comp registration time, before
+			// any firing has been allocated a CompID. The body StructLit's
+			// firing-tagged AddStruct happens later via scheduleStruct on
+			// yield; dedup by StructLit pointer keeps the registration entry,
+			// so this body-level entry stays untagged. The per-decl inner
+			// StructLits inserted on child arcs (which is where toposort needs
+			// the grouping) get their CompID through scheduleStruct's env walk.
+			node.AddStruct(st, 0)
 			switch {
 			case !ec.done:
 				ec.structs = append(ec.structs, st)
@@ -285,11 +292,26 @@ func (n *nodeContext) insertComprehension(
 }
 
 type compState struct {
-	ctx   *OpContext
-	comp  *Comprehension
-	i     int
-	f     YieldFunc
-	state vertexStatus
+	ctx *OpContext
+	// compID identifies this comprehension firing. Yielders that create
+	// fresh Environments stamp it on them so toposort can group sibling
+	// body decls (see [StructInfo.CompID]). Yielders that propagate an
+	// existing env (e.g. [IfClause]) leave its CompID untouched: when
+	// inherited from an upstream for/let it propagates naturally; when
+	// no upstream set it (e.g. an if-only comp), no grouping is needed.
+	compID uint32
+	comp   *Comprehension
+	i      int
+	f      YieldFunc
+	state  vertexStatus
+}
+
+// spawn creates a fresh Environment for the next clause in this firing,
+// tagged with the firing's CompID.
+func (s *compState) spawn(n *Vertex) *Environment {
+	e := s.ctx.spawn(n)
+	e.CompID = s.compID
+	return e
 }
 
 // yield evaluates a Comprehension within the given Environment and calls
@@ -301,11 +323,16 @@ func (c *OpContext) yield(
 	state Flags,
 	f YieldFunc, // called for every result
 ) *Bottom {
+	// Allocate a fresh CompID for this firing. Yielders set it on every
+	// fresh Environment they construct so toposort can group sibling body
+	// decls inserted per yield (see [Environment.CompID]).
+	c.nextCompID++
 	s := &compState{
-		ctx:   c,
-		comp:  comp,
-		f:     f,
-		state: state.status,
+		ctx:    c,
+		compID: c.nextCompID,
+		comp:   comp,
+		f:      f,
+		state:  state.status,
 	}
 	y := comp.Clauses[0]
 

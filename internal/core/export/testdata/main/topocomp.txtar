@@ -15,13 +15,13 @@ view: {
 [out]
 [out top]
 [out top A1]
-[out top B1]
 [out top A2]
+[out top B1]
 [out top B2]
 [view]
 [view A1]
-[view B1]
 [view A2]
+[view B1]
 [view B2]
 -- out/value-v3 --
 == Simplified
@@ -29,15 +29,15 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
 	view: {
 		A1: "A1"
-		B1: "B1"
 		A2: "A2"
+		B1: "B1"
 		B2: "B2"
 	}
 }
@@ -46,15 +46,15 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
 	view: {
 		A1: "A1"
-		B1: "B1"
 		A2: "A2"
+		B1: "B1"
 		B2: "B2"
 	}
 }
@@ -63,15 +63,15 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
 	view: {
 		A1: "A1"
-		B1: "B1"
 		A2: "A2"
+		B1: "B1"
 		B2: "B2"
 	}
 }
@@ -80,15 +80,15 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
 	view: {
 		A1: "A1"
-		B1: "B1"
 		A2: "A2"
+		B1: "B1"
 		B2: "B2"
 	}
 }
@@ -97,15 +97,15 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
 	view: {
 		A1: "A1"
-		B1: "B1"
 		A2: "A2"
+		B1: "B1"
 		B2: "B2"
 	}
 }

@@ -35,12 +35,12 @@ out: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 			C3: true
-			D3: true
 			C4: true
+			D3: true
 			D4: true
 		}
 	}
@@ -50,12 +50,12 @@ out: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 			C3: true
-			D3: true
 			C4: true
+			D3: true
 			D4: true
 		}
 	}
@@ -65,12 +65,12 @@ out: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 			C3: true
-			D3: true
 			C4: true
+			D3: true
 			D4: true
 		}
 	}
@@ -80,12 +80,12 @@ out: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 			C3: true
-			D3: true
 			C4: true
+			D3: true
 			D4: true
 		}
 	}
@@ -95,12 +95,12 @@ out: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 			C3: true
-			D3: true
 			C4: true
+			D3: true
 			D4: true
 		}
 	}

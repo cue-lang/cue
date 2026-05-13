@@ -29,8 +29,8 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
@@ -46,8 +46,8 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
@@ -63,8 +63,8 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
@@ -80,8 +80,8 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}
@@ -97,8 +97,8 @@ view: {
 	out: {
 		top: {
 			A1: true
-			B1: true
 			A2: true
+			B1: true
 			B2: true
 		}
 	}

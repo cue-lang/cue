@@ -110,7 +110,7 @@ checkoutCode: [...githubactions.#Step] & {
 			// This doesn't affect builds by other events like "push",
 			// since github.event.pull_request is unset so ref remains empty.
 			with: {
-				ref:           "${{ github.event.pull_request.head.sha }}"
+				ref:           *"${{ github.event.pull_request.head.sha }}" | string
 				"fetch-depth": 0 // see the docs below
 
 				// Default persist-credentials to false. Limiting the use of
@@ -147,21 +147,21 @@ checkoutCode: [...githubactions.#Step] & {
 			name: "Try to extract \(dispatchTrailer)"
 			id:   dispatchTrailerStepID
 			run:  """
-			x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
-			if [[ "$x" == "" ]]
-			then
-			   # Some steps rely on the presence or otherwise of the Dispatch-Trailer.
-			   # We know that we don't have a Dispatch-Trailer in this situation,
-			   # hence we use the JSON value null in order to represent that state.
-			   # This means that GitHub expressions can determine whether a Dispatch-Trailer
-			   # is present or not by checking whether the fromJSON() result of the
-			   # output from this step is the JSON value null or not.
-			   x=null
-			fi
-			echo "\(_dispatchTrailerDecodeStepOutputVar)<<EOD" >> $GITHUB_OUTPUT
-			echo "$x" >> $GITHUB_OUTPUT
-			echo "EOD" >> $GITHUB_OUTPUT
-			"""
+				x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
+				if [[ "$x" == "" ]]
+				then
+				   # Some steps rely on the presence or otherwise of the Dispatch-Trailer.
+				   # We know that we don't have a Dispatch-Trailer in this situation,
+				   # hence we use the JSON value null in order to represent that state.
+				   # This means that GitHub expressions can determine whether a Dispatch-Trailer
+				   # is present or not by checking whether the fromJSON() result of the
+				   # output from this step is the JSON value null or not.
+				   x=null
+				fi
+				echo "\(_dispatchTrailerDecodeStepOutputVar)<<EOD" >> $GITHUB_OUTPUT
+				echo "$x" >> $GITHUB_OUTPUT
+				echo "EOD" >> $GITHUB_OUTPUT
+				"""
 		},
 
 		// Safety nets to flag if we ever have a Dispatch-Trailer slip through the
@@ -170,9 +170,9 @@ checkoutCode: [...githubactions.#Step] & {
 			name: "Check we don't have \(dispatchTrailer) on a protected branch"
 			if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
 			run:  """
-			echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer) but we are on a protected branch"
-			false
-			"""
+				echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer) but we are on a protected branch"
+				false
+				"""
 		},
 	]
 }
@@ -186,8 +186,8 @@ curlGitHubAPI: {
 	#tokenSecretsKey: *botGitHubUserTokenSecretsKey | string
 
 	#"""
-	curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.\#(#tokenSecretsKey) }}" -H "X-GitHub-Api-Version: 2022-11-28"
-	"""#
+		curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.\#(#tokenSecretsKey) }}" -H "X-GitHub-Api-Version: 2022-11-28"
+		"""#
 }
 
 // setupCaches sets up a cache volume for the rest of the job.
@@ -301,8 +301,8 @@ repositoryDispatch: githubactions.#Step & {
 
 	name: string
 	run:  #"""
-			\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(json.Marshal(#arg))) https://api.github.com/repos/\#(#githubRepositoryPath)/dispatches
-			"""#
+		\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(json.Marshal(#arg))) https://api.github.com/repos/\#(#githubRepositoryPath)/dispatches
+		"""#
 }
 
 workflowDispatch: githubactions.#Step & {
@@ -319,8 +319,8 @@ workflowDispatch: githubactions.#Step & {
 
 	name: string
 	run:  #"""
-			\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(json.Marshal(#params))) https://api.github.com/repos/\#(#githubRepositoryPath)/actions/workflows/\#(#workflowID)/dispatches
-			"""#
+		\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(json.Marshal(#params))) https://api.github.com/repos/\#(#githubRepositoryPath)/actions/workflows/\#(#workflowID)/dispatches
+		"""#
 }
 
 // dispatchTrailer is the trailer that we use to pass information in a commit
@@ -368,8 +368,8 @@ containsDispatchTrailer: {
 	// TODO(mvdan): using a struct embedding a string here doesn't work. why?
 	let _typeCheck = [if #type != _|_ {#type + "\""} else {""}][0]
 	"""
-	(contains(\(_dispatchTrailerVariable), '\n\(dispatchTrailer): {"type":"\(_typeCheck)'))
-	"""
+		(contains(\(_dispatchTrailerVariable), '\n\(dispatchTrailer): {"type":"\(_typeCheck)'))
+		"""
 }
 
 containsTrybotTrailer: containsDispatchTrailer & {

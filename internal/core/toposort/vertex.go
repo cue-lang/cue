@@ -403,17 +403,55 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 
 	var batches structMetaBatches
 	var batch structMetaBatch
-	for i := range roots {
-		root := &roots[i]
-		for range 1 + root.structInfo.Repeats {
-			if len(batch) == 0 ||
-				(batch[0].pos == root.pos && !root.hasDynamic(dynFieldsMap)) {
-				batch = append(batch, root)
-			} else {
-				batches.appendBatch(batch)
-				batch = structMetaBatch{root}
+	// Interleave repeats across roots when consecutive roots share a
+	// Repeats count > 0: this signals "sibling occurrences" — typically
+	// StructInfos produced by per-yield insertions of multiple decls in
+	// the same comprehension body. Without interleaving, dynamic-field
+	// labels are drained from dynFieldsMap in "all of dynField_x first,
+	// then all of dynField_y" order, scrambling the natural iteration
+	// order (e.g. [A1, A2, B1, B2] from `for x in ["A","B"] { (x)1, (x)2 }`
+	// would render as A1, B1, A2, B2). Roots with Repeats=0 or whose
+	// Repeats differ from their neighbors fall back to the sequential
+	// expansion.
+	i := 0
+	for i < len(roots) {
+		// Find a contiguous run of roots sharing the same Repeats > 0.
+		runEnd := i + 1
+		if roots[i].structInfo.Repeats > 0 {
+			for runEnd < len(roots) &&
+				roots[runEnd].structInfo.Repeats == roots[i].structInfo.Repeats {
+				runEnd++
 			}
 		}
+		if runEnd-i > 1 {
+			// Interleave: round-major iteration across siblings.
+			occs := 1 + roots[i].structInfo.Repeats
+			for round := 0; round < occs; round++ {
+				for j := i; j < runEnd; j++ {
+					root := &roots[j]
+					if len(batch) == 0 ||
+						(batch[0].pos == root.pos && !root.hasDynamic(dynFieldsMap)) {
+						batch = append(batch, root)
+					} else {
+						batches.appendBatch(batch)
+						batch = structMetaBatch{root}
+					}
+				}
+			}
+		} else {
+			// Single root: expand its repeats sequentially.
+			root := &roots[i]
+			for range 1 + root.structInfo.Repeats {
+				if len(batch) == 0 ||
+					(batch[0].pos == root.pos && !root.hasDynamic(dynFieldsMap)) {
+					batch = append(batch, root)
+				} else {
+					batches.appendBatch(batch)
+					batch = structMetaBatch{root}
+				}
+			}
+		}
+		i = runEnd
 	}
 	batches.appendBatch(batch)
 	debug("batches: %v\n", batches)

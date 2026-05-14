@@ -1324,6 +1324,48 @@ issue3935: full: {
 		}
 	})
 }
+-- rework.cue --
+regression1: {
+	#Primary: {
+		_Y: _
+		let _X = _Y
+		if len(_X.spec.command) > 0 {
+			command: _X.spec.command
+		}
+	}
+	#Rollout: {
+		_X: _
+		out: #Primary & {_Y: _X} & _X.patch
+	}
+	x: {
+		spec: command: ["a"]
+		patch: {}
+	}
+	out: #Rollout & {_X: x} @test(eq, at=out,{
+		_Y: {spec: {command: ["a"]}, patch: {}}
+		command: ["a"]
+	})
+}
+regression2: {
+	#Primary: {
+		_Y: _
+		if len(_Y.spec.command) > 0 {
+			command: _Y.spec.command
+		}
+	}
+	#Rollout: {
+		_X: _
+		out: #Primary & {_Y: _X} & _X.patch
+	}
+	x: {
+		spec: command: ["a"]
+		patch: {}
+	}
+	out: #Rollout & {_X: x} @test(eq, at=out,{
+		_Y: {spec: {command: ["a"]}, patch: {}}
+		command: ["a"]
+	})
+}
 -- out/errors.txt --
 [incomplete] fail.a.b: cyclic reference to field b:
     ./in.cue:45:3
@@ -1406,6 +1448,18 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./issue3935.cue:47:27
 [incomplete] issue3935.full.#SchemaSelected._specConfig: required field missing: spec:
     ./issue3935.cue:50:16
+[incomplete] regression1.#Primary: _X.spec undefined as _X is incomplete (type _):
+    ./rework.cue:5:10
+[incomplete] regression1.#Rollout.out: _X.spec undefined as _X is incomplete (type _):
+    ./rework.cue:5:10
+regression1.#Rollout.out: _X.patch undefined as _X is incomplete (type _):
+    ./rework.cue:11:30
+[incomplete] regression2.#Primary: _Y.spec undefined as _Y is incomplete (type _):
+    ./rework.cue:25:10
+[incomplete] regression2.#Rollout.out: _Y.spec undefined as _Y is incomplete (type _):
+    ./rework.cue:25:10
+regression2.#Rollout.out: _X.patch undefined as _X is incomplete (type _):
+    ./rework.cue:31:30
 -- out/todo.txt --
 cyclicError: v3 reports improved error message vs v2.
 nestedWithDynamicFieldOK: fixed bug in v3 (was incorrect in v2).
@@ -1420,9 +1474,9 @@ Reused: 566
 Allocs: 121
 Retain: 0
 
-Unifications: 577
-Conjuncts:    1017
-Disjuncts:    48
+Unifications: 566
+Conjuncts:    904
+Disjuncts:    44
 
 NumCloseIDs: 264
 -- out/compile --
@@ -2750,5 +2804,59 @@ NumCloseIDs: 264
         }
       }
     }
+  }
+}
+--- rework.cue
+{
+  regression1: {
+    #Primary: {
+      _Y: _
+      let _X#2 = 〈0;_Y〉
+      if (len(〈0;let _X#2〉.spec.command) > 0) {
+        command: 〈1;let _X#2〉.spec.command
+      }
+    }
+    #Rollout: {
+      _X: _
+      out: ((〈1;#Primary〉 & {
+        _Y: 〈1;_X〉
+      }) & 〈0;_X〉.patch)
+    }
+    x: {
+      spec: {
+        command: [
+          "a",
+        ]
+      }
+      patch: {}
+    }
+    out: (〈0;#Rollout〉 & {
+      _X: 〈1;x〉
+    })
+  }
+  regression2: {
+    #Primary: {
+      _Y: _
+      if (len(〈0;_Y〉.spec.command) > 0) {
+        command: 〈1;_Y〉.spec.command
+      }
+    }
+    #Rollout: {
+      _X: _
+      out: ((〈1;#Primary〉 & {
+        _Y: 〈1;_X〉
+      }) & 〈0;_X〉.patch)
+    }
+    x: {
+      spec: {
+        command: [
+          "a",
+        ]
+      }
+      patch: {}
+    }
+    out: (〈0;#Rollout〉 & {
+      _X: 〈1;x〉
+    })
   }
 }

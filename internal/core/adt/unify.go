@@ -762,6 +762,13 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 			state.updateScalar()
 		}
 	}
+	// Re-deref v: state.process may have caused v to share with another
+	// vertex (e.g. via scheduleVertexConjuncts in a resolver task), so
+	// further lookup must follow the new BaseValue.
+	if v2 := v.DerefValue(); v2 != v {
+		v = v2
+		state = v.getState(c)
+	}
 
 	// TODO: verify lookup types.
 

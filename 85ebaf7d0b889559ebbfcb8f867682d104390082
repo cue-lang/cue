@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d6f4909_20bcba1e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-14T11:26:29Z",
+      "side": 1,
+      "message": "Good catch — pursued this and rewrote the fix to be much simpler. The bug only manifests when a TryClause.yield\u0027s save/reset/restore of `c.skipTry` brackets the evaluation of a sibling failing ?-reference (the restore erases the signal). When the inner try body lexically contains no ?-marked references, it cannot itself fail, so the save/restore is pure overhead — and the only thing that can erase outer signals.\n\nNew approach: track `BodyHasOptional bool` on TryClause at compile time (via a counter snapshot on the compiler), and gate the save/reset/restore on it. The per-reference TryClause pointer, runtime tryStack, OrphanTryClause sentinel, and compile-time TryClause stack are all gone. Net diff vs the pre-fix state is +33/-4 across 2 files (was +87/-47 across 7).\n\nPTAL.",
+      "parentUuid": "6a5c86d4_0e1e6d64",
+      "revId": "85ebaf7d0b889559ebbfcb8f867682d104390082",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "019df86c_a10059a4",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9826529_0ce3c557",
+        "filename": "cue/testdata/comprehensions/try.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-14T11:26:29Z",
+      "side": 1,
+      "message": "Done. Added four cases to the regression test commit: parent and child try referencing the same optional field (undefined and defined variants), and two sibling try clauses referencing the same field (undefined and defined variants). All pass with the new fix.",
+      "parentUuid": "019df86c_a10059a4",
+      "revId": "85ebaf7d0b889559ebbfcb8f867682d104390082",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa08657e_406bfff3",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-05-08T11:31:56Z",
       "side": 1,
       "message": "add newline",
+      "revId": "85ebaf7d0b889559ebbfcb8f867682d104390082",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fe416e4_532c12cd",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-14T11:26:29Z",
+      "side": 1,
+      "message": "Moot — the simpler fix no longer touches `context.go`.",
+      "parentUuid": "aa08657e_406bfff3",
       "revId": "85ebaf7d0b889559ebbfcb8f867682d104390082",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

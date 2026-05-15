@@ -22,6 +22,10 @@ func removeAll(path string) error {
 	return os.RemoveAll(path)
 }
 
+func writeFile(filename string, data []byte, perm os.FileMode) error {
+	return os.WriteFile(filename, data, perm)
+}
+
 func isEphemeralError(err error) bool {
 	return false
 }

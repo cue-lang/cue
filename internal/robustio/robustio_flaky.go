@@ -89,3 +89,11 @@ func removeAll(path string) error {
 		return err, isEphemeralError(err)
 	})
 }
+
+// writeFile is like os.WriteFile, but retries ephemeral errors.
+func writeFile(filename string, data []byte, perm os.FileMode) error {
+	return retry(func() (err error, mayRetry bool) {
+		err = os.WriteFile(filename, data, perm)
+		return err, isEphemeralError(err)
+	})
+}

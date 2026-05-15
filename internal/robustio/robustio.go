@@ -14,7 +14,10 @@
 // but substantially reduce their rate of occurrence in practice.
 package robustio
 
-import "time"
+import (
+	"os"
+	"time"
+)
 
 // Rename is like os.Rename, but on Windows retries errors that may occur if the
 // file is concurrently read or overwritten.
@@ -38,6 +41,13 @@ func ReadFile(filename string) ([]byte, error) {
 // (See golang.org/issue/19491.)
 func RemoveAll(path string) error {
 	return removeAll(path)
+}
+
+// WriteFile is like os.WriteFile, but on Windows retries errors that may occur
+// if the file or its parent directory is briefly inaccessible due to antivirus
+// scanning or pending-delete state.
+func WriteFile(filename string, data []byte, perm os.FileMode) error {
+	return writeFile(filename, data, perm)
 }
 
 // IsEphemeralError reports whether err is one of the errors that the functions

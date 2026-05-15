@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dfd654d_217cc0cd",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 2301,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-15T10:10:12Z",
+      "side": 1,
+      "message": "Seems questionable that this will work. There should at least be a test to show what happens if the now-working cases also refer to optional fields within their body.",
+      "revId": "88ec126f7143bf1d9cceb40d7962470c8dfb8d5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

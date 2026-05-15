@@ -59,7 +59,7 @@ import (
 
 func newGoCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "go [packages]",
+		Use:   "go [flags] [packages]",
 		Short: "add Go dependencies to the current module",
 		Long: `go converts Go types into CUE definitions
 

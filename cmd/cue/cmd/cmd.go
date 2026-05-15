@@ -25,7 +25,7 @@ import (
 
 func newCmdCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cmd <name> [inputs]",
+		Use:   "cmd [flags] <name> [inputs]",
 		Short: "run a user-defined workflow command",
 		Long: `cmd executes the named workflow command for each of the named instances.
 

@@ -38,7 +38,7 @@ Run "cue help commands" for more details on authoring tasks and
 workflow commands.
 
 Usage:
-  cue cmd <name> [inputs] [flags]
+  cue cmd [flags] <name> [inputs]
   cue cmd [command]
 
 Available Commands:

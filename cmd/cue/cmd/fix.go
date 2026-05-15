@@ -32,7 +32,7 @@ import (
 
 func newFixCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "fix [packages]",
+		Use:   "fix [flags] [packages]",
 		Short: "rewrite packages to latest standards",
 		Long: `Fix finds CUE programs that use old syntax and old APIs and rewrites them to use newer ones.
 After you update to a new CUE release, fix helps make the necessary changes

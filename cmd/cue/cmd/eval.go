@@ -30,11 +30,14 @@ import (
 // newEvalCmd creates a new eval command
 func newEvalCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "eval",
+		Use:   "eval [flags] [inputs]",
 		Short: "evaluate and print a configuration",
 		Long: `eval evaluates, validates, and prints a configuration.
 
 Printing is skipped if validation fails.
+
+Input arguments can be CUE packages, CUE files, non-CUE files, or some
+combinations of those. See "cue help inputs" for more detail.
 
 The --expression flag is used to evaluate an expression within the
 configuration file, instead of the entire configuration file itself.

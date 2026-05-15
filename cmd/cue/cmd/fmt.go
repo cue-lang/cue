@@ -39,7 +39,7 @@ import (
 
 func newFmtCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "fmt",
+		Use:   "fmt [flags] [inputs]",
 		Short: "formats CUE configuration files",
 		Long: `
 fmt rewrites CUE files in the standard format.

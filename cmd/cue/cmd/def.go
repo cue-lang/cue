@@ -24,11 +24,14 @@ import (
 // newDefCmd creates a new eval command
 func newDefCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "def",
+		Use:   "def [flags] [inputs]",
 		Short: "print consolidated definitions",
 		Long: `def prints consolidated configuration as a single file.
 
 Printing is skipped if validation fails.
+
+Input arguments can be CUE packages, CUE files, non-CUE files, or some
+combinations of those. See "cue help inputs" for more detail.
 
 The --expression flag is used to only print parts of a configuration.
 `,

@@ -24,7 +24,7 @@ import (
 // newExportCmd creates and export command
 func newExportCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "export",
+		Use:   "export [flags] [inputs]",
 		Short: "output data in a standard format",
 		Long: `
 The export command evaluates a configuration and emits the value of one or more

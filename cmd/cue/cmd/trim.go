@@ -34,7 +34,7 @@ import (
 // newTrimCmd creates a trim command
 func newTrimCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "trim",
+		Use:   "trim [flags] [inputs]",
 		Short: "remove superfluous fields",
 		Long: `trim removes fields from structs that can be inferred from constraints
 

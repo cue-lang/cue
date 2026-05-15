@@ -25,6 +25,9 @@ import (
 const vetDoc = `The vet command validates CUE and other data files.
 The command is silent when it succeeds; otherwise it reports any errors found.
 
+Input arguments can be CUE packages, CUE files, non-CUE files, or some
+combinations of those. See "cue help inputs" for more detail.
+
 By default, vet ensures that the result of validation is concrete
 by reporting an error if any resulting regular fields have non-concrete values.
 Use -c=false to not require concreteness, or -c to show these error messages.
@@ -59,7 +62,7 @@ The -d flag can be repeated to validate against multiple schemas at once.
 
 func newVetCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "vet",
+		Use:   "vet [flags] [inputs]",
 		Short: "validate data",
 		Long:  vetDoc,
 		RunE:  mkRunE(c, doVet),

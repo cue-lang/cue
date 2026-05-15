@@ -42,7 +42,7 @@ import (
 
 func newImportCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "import [mode] [inputs]",
+		Use:   "import [flags] [mode] [inputs]",
 		Short: "convert other formats to CUE files",
 		Long: `import converts other formats, like JSON and YAML to CUE files
 

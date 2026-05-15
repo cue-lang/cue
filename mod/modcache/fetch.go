@@ -147,7 +147,12 @@ func (c *Cache) Fetch(ctx context.Context, mv module.Version) (module.SourceLoc,
 	if err := os.MkdirAll(parentDir, 0777); err != nil {
 		return module.SourceLoc{}, err
 	}
-	if err := os.WriteFile(partialPath, nil, 0666); err != nil {
+	// Upstream Go's modfetch uses a plain os.WriteFile here, but we hit
+	// transient Windows ERROR_ACCESS_DENIED on this path more often, likely
+	// because each testscript test starts with a cold module cache on an
+	// antivirus-scanned drive. Retry via robustio to absorb those.
+	// See https://cuelang.org/issue/3413.
+	if err := robustio.WriteFile(partialPath, nil, 0666); err != nil {
 		return module.SourceLoc{}, err
 	}
 	if err := modzip.Unzip(dir, mv, zipfile); err != nil {

@@ -764,6 +764,15 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 
 	// TODO: verify lookup types.
 
+	// Re-deref v: state.process may have caused v to share with another
+	// vertex (e.g. via scheduleVertexConjuncts in a resolver task), so
+	// further lookup must follow the new BaseValue.
+	if v2 := v.DerefValue(); v2 != v {
+		v = v2
+		// TODO: might result in better error message if not set.
+		state = v.getState(c)
+	}
+
 	arc := v.LookupRaw(f)
 	// We leave further dereferencing to the caller, but we do dereference for
 	// the remainder of this function to be able to check the status.

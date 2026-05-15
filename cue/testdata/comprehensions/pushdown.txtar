@@ -1341,12 +1341,9 @@ regression1: {
 		spec: command: ["a"]
 		patch: {}
 	}
-	out: #Rollout & {_X: x} @test(eq:todo, at=out,{
+	out: #Rollout & {_X: x} @test(eq, at=out,{
 		_Y: {spec: {command: ["a"]}, patch: {}}
 		command: ["a"]
-	}) @test(eq, {
-		_X: {spec: {command: ["a"]}, patch: {}}
-		out: _|_ @test(err, code=incomplete, contains="regression1.out.out: undefined field: spec", pos=[5:13])
 	})
 }
 regression2: {
@@ -1461,14 +1458,12 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./rework.cue:5:13
 regression1.#Rollout.out: _X.patch undefined as _X is incomplete (type _):
     ./rework.cue:11:30
-[incomplete] regression1.out.out: undefined field: spec:
-    ./rework.cue:5:13
 [incomplete] regression2.#Primary: undefined field: spec:
-    ./rework.cue:28:13
+    ./rework.cue:25:13
 [incomplete] regression2.#Rollout.out: _Y.spec undefined as _Y is incomplete (type _):
-    ./rework.cue:28:10
+    ./rework.cue:25:10
 regression2.#Rollout.out: _X.patch undefined as _X is incomplete (type _):
-    ./rework.cue:34:30
+    ./rework.cue:31:30
 -- out/todo.txt --
 cyclicError: v3 reports improved error message vs v2.
 nestedWithDynamicFieldOK: fixed bug in v3 (was incorrect in v2).

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8df3297_3dd5f821",
+        "filename": "cue/testdata/comprehensions/try.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-15T09:58:24Z",
+      "side": 1,
+      "message": "Ideally, from now on, if we know a test is wrong, we should add the eq:todo variant to indicate that. That makes it easier to understand intent of the test.",
+      "revId": "b0f2b4252acdceb04a8e066a74d971c494092be6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

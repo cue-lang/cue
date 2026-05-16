@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "529d271f_7dc417e4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-16T14:55:46Z",
+      "side": 1,
+      "message": "can you rebase the stack so that the toposort fix is right after this commit? not only is that clearer, but it also shows that the fix is unrelated to the comprehension rework, which is nice.",
+      "range": {
+        "startLine": 21,
+        "startChar": 36,
+        "endLine": 22,
+        "endChar": 8
+      },
+      "revId": "8bddb16f84e4b416702404e142a300ed83062206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

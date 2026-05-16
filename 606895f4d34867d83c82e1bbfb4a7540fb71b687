@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34896a6e_8c63ecfa",
+        "filename": "internal/core/export/expr.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-16T14:53:47Z",
+      "side": 1,
+      "message": "again this feels overly verbose; it feels like this information can be summarized in 3-4 lines with a simple example.",
+      "revId": "606895f4d34867d83c82e1bbfb4a7540fb71b687",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b11adc1e_a30589a6",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-16T14:53:47Z",
+      "side": 1,
+      "message": "ditto, this is too long",
+      "revId": "606895f4d34867d83c82e1bbfb4a7540fb71b687",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

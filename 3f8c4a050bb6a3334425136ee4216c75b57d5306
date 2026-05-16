@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e148c17b_30bb97f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-16T14:48:59Z",
+      "side": 1,
+      "message": "nit: \"regression test cases\" given that it\u0027s regression1 and regression2",
+      "revId": "3f8c4a050bb6a3334425136ee4216c75b57d5306",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2345a363_cc7b723e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-16T14:48:59Z",
+      "side": 1,
+      "message": "I imagine that this commit message was written when the regression showed broken behavior, i.e. on top of the broken comprehension rework. now that it\u0027s below the rework, and it shows the correct behavior, please reword the commit message for clarity, along the lines of: \"lock in the correct behavior, which used to cause a regression in the upcoming comprehension rework\".",
+      "range": {
+        "startLine": 28,
+        "startChar": 12,
+        "endLine": 28,
+        "endChar": 44
+      },
+      "revId": "3f8c4a050bb6a3334425136ee4216c75b57d5306",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

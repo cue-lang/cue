@@ -46,6 +46,30 @@
       },
       "revId": "8bddb16f84e4b416702404e142a300ed83062206",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbfb41d2_ad0c1acb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-17T08:56:32Z",
+      "side": 1,
+      "message": "Hmm, I tried this before and it failed, but now it works.",
+      "parentUuid": "05593847_0413c722",
+      "range": {
+        "startLine": 21,
+        "startChar": 36,
+        "endLine": 22,
+        "endChar": 8
+      },
+      "revId": "8bddb16f84e4b416702404e142a300ed83062206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

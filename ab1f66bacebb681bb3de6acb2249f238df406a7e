@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdef6640_5b37949c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-17T09:09:34Z",
+      "side": 1,
+      "message": "Done. Title now reads \"add regression test cases to comprehensions/pushdown\".",
+      "parentUuid": "e148c17b_30bb97f0",
+      "revId": "ab1f66bacebb681bb3de6acb2249f238df406a7e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74d164b6_9e9d20a1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-17T09:09:34Z",
+      "side": 1,
+      "message": "Done. Reworded along the lines you suggested: the body now opens with \"Lock in the correct behavior of two pushdown-related shapes that the upcoming comprehension rework would otherwise regress.\"",
+      "parentUuid": "2345a363_cc7b723e",
+      "revId": "ab1f66bacebb681bb3de6acb2249f238df406a7e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

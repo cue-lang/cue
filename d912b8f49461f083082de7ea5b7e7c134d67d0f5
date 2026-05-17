@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe2ecc5d_f18bd731",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-17T09:10:03Z",
+      "side": 1,
+      "message": "Done. Reworded the message to spell out that the test locks in the correct behavior that the upcoming comprehension rework would otherwise regress, and fixed the \"repreducer\" typo in the title.",
+      "parentUuid": "02c0383e_ad262ad0",
+      "revId": "d912b8f49461f083082de7ea5b7e7c134d67d0f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

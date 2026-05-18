@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9230c3d1_1ef93cd2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-18T10:13:39Z",
+      "side": 1,
+      "message": "this is outdated, you\u0027re just adjusting the test output.",
+      "revId": "374ce4128f70967668a9050abccaf815c4372285",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b79a58c6_6ebfa1f2",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-18T10:13:39Z",
+      "side": 1,
+      "message": "I\u0027m not actually convinced that this is correct. The fact that a sequence of roots has the same number of repeats doesn\u0027t necessarily mean that they belong to the same comprehension and should be interleaved like this.\n\nI\u0027ll approve this solution because it doesn\u0027t seem to affect any existing tests, and it slightly improves the new test, but it seems to me more like a heuristic rather than a precise solution. This is just me thinking through this though, not the AI, so I don\u0027t have a particular suggestion here other than \"it feels like there is a better and more precise solution to be had\".",
+      "revId": "374ce4128f70967668a9050abccaf815c4372285",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

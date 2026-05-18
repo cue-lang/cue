@@ -12,4 +12,48 @@ message FullReferenceNestedMsg {
   }
 
   istio.io.api.other.full_references.FullReferenceNestedMsg.FullReferenceDoubleNestedMsg nested_msg = 1;
+
+  message InnerContainer {
+    enum InnerEnum {
+      INNER_ENUM_VALUE_1 = 0;
+      INNER_ENUM_VALUE_2 = 1;
+    }
+  }
+
+  // This is a reference to a nested enum within the InnerContainer message,
+  // and should resolve correctly to the InnerEnum type via the relative dotted path.
+  InnerContainer.InnerEnum relative_reference = 2;
+
+  // AmbiguousMsg is a message that is ambiguous between a top-level message and a nested message.
+  message AmbiguousMsg {
+
+    message Inner { 
+      // nested_field is a field that distinguishes this Inner from the in the top-level AmbiguousMsg message.
+      string nested_field = 1;
+    }
+  }
+
+  // This is a fully-qualified reference to the top-level AmbiguousMsg message.
+  // This does not actually work correctly.
+  // TODO: Disambiguate this reference in generated CUE once aliasv2 is non-experimental
+	// and we can define something like `let <package> = self` without requiring experiment opt-in.
+  .AmbiguousMsg absolute_outer = 3;
+  // This is a fully-qualified reference to the nested Inner message of the top-level AmbiguousMsg message.
+  // This does not actually work correctly.
+  // TODO: Disambiguate this reference in generated CUE once aliasv2 is non-experimental
+	// and we can define something like `let <package> = self` without requiring experiment opt-in.
+  .AmbiguousMsg.Inner absolute_inner = 4;
+  // This is a relative reference to the nested AmbiguousMsg message.
+  AmbiguousMsg relative_outer = 5;
+  // This is a relative reference to the nested Inner message of the nested AmbiguousMsg message.
+  AmbiguousMsg.Inner relative_inner = 6;
+}
+
+// AmbiguousMsg is a message that is ambiguous between a top-level message and a nested message.
+message AmbiguousMsg {
+
+  message Inner {
+    // top_level_inner is a field that distinguishes this Inner from the one nested in FullReferenceMsg.
+    string top_level_inner = 1;
+  }
 }

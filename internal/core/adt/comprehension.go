@@ -197,8 +197,15 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 		return nil
 	}
 
+	// Allocate one ID per comprehension firing so every per-yield env
+	// produced here carries the same identity. Toposort groups sibling body
+	// decls by this ID (see [StructInfo.CompID]).
+	ctx.nextCompID++
+	compID := ctx.nextCompID
 	for _, env := range envs {
-		n.scheduleConjunct(Conjunct{env, d.comp.Value, id}, id)
+		tagged := *env
+		tagged.CompID = compID
+		n.scheduleConjunct(Conjunct{&tagged, d.comp.Value, id}, id)
 	}
 
 	return nil

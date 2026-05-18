@@ -413,17 +413,16 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 		}
 	}
 
-	// Consecutive roots with the same Repeats > 0 are sibling occurrences
-	// — typically peer decls from one comprehension body inserted per
-	// yield. Emit them round-major so the dynamic-field label queue
-	// drains in natural iteration order; e.g. `for x in ["A","B"] {
-	// (x)1, (x)2 }` produces [A1, A2, B1, B2] rather than the
-	// label-queue-draining order [A1, B1, A2, B2].
+	// Consecutive roots produced by the same comprehension firing are peer
+	// decls inserted per yield. Emit them round-major so the dynamic-field
+	// label queue drains in natural iteration order; e.g.
+	// `for x in ["A","B"] { (x)1, (x)2 }` produces [A1, A2, B1, B2] rather
+	// than the label-queue-draining order [A1, B1, A2, B2].
 	for i := 0; i < len(roots); {
 		runEnd := i + 1
-		if roots[i].structInfo.Repeats > 0 {
+		if compID := roots[i].structInfo.CompID; compID != 0 {
 			for runEnd < len(roots) &&
-				roots[runEnd].structInfo.Repeats == roots[i].structInfo.Repeats {
+				roots[runEnd].structInfo.CompID == compID {
 				runEnd++
 			}
 		}

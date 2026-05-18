@@ -198,7 +198,13 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	}
 
 	for _, env := range envs {
-		n.scheduleConjunct(Conjunct{env, d.comp.Value, id}, id)
+		// Tag the per-yield env with the comprehension so that StructLits
+		// produced from this body — including those reaching child arcs via
+		// pushdown — can be grouped by toposort as siblings of one body.
+		// See [StructInfo.Comp].
+		tagged := *env
+		tagged.Comp = d.comp
+		n.scheduleConjunct(Conjunct{&tagged, d.comp.Value, id}, id)
 	}
 
 	return nil

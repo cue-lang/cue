@@ -260,8 +260,18 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 
 	s.Init(n.ctx)
 
+	// Walk the env chain to find the comprehension whose body produced this
+	// struct, if any. Toposort uses this to group sibling decls inserted by
+	// the same comprehension body (see [StructInfo.Comp]).
+	var comp *Comprehension
+	for e := env; e != nil; e = e.Up {
+		if e.Comp != nil {
+			comp = e.Comp
+			break
+		}
+	}
 	// TODO: do we still need to AddStruct?
-	n.node.AddStruct(s)
+	n.node.AddStruct(s, comp)
 
 	// TODO(perf): precompile whether struct has embedding.
 loop1:

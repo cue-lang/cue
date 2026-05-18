@@ -2176,6 +2176,7 @@ func (x *ForClause) yield(s *compState) {
 		*sub = Environment{
 			Up:     env,
 			Vertex: n,
+			CompID: s.compID,
 		}
 		if !s.yield(sub) {
 			break
@@ -2237,7 +2238,7 @@ func (x *LetClause) yield(s *compState) {
 		},
 	}}
 
-	s.yield(c.spawn(n))
+	s.yield(s.spawn(n))
 }
 
 // A TryClause represents a try clause in a comprehension.
@@ -2309,7 +2310,7 @@ func (x *TryClause) yield(s *compState) {
 			anonymous: true,
 			Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}},
 		}}}
-		s.yield(c.spawn(n))
+		s.yield(s.spawn(n))
 	} else {
 		s.yield(env)
 	}

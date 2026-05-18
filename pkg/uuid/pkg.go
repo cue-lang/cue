@@ -27,6 +27,42 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "ValidV3",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.BottomKind,
+		Func: func(c *pkg.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret = ValidV3(s)
+			}
+		},
+	}, {
+		Name: "ValidV4",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.BottomKind,
+		Func: func(c *pkg.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret = ValidV4(s)
+			}
+		},
+	}, {
+		Name: "ValidV5",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.BottomKind,
+		Func: func(c *pkg.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret = ValidV5(s)
+			}
+		},
+	}, {
 		Name: "Parse",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

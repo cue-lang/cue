@@ -15,6 +15,7 @@
 package jsonschema
 
 import (
+	"fmt"
 	"sync"
 
 	"cuelang.org/go/cue"
@@ -73,10 +74,10 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"uri":           {allVersions | openAPI | k8s, formatURI},
 		"uri-reference": {vfrom(VersionDraft6), formatURIReference},
 		"uri-template":  {vfrom(VersionDraft6), formatTODO},
-		"uuid":          {vfrom(VersionDraft2019_09) | k8s, formatTODO},
-		"uuid3":         {k8s, formatTODO},
-		"uuid4":         {k8s, formatTODO},
-		"uuid5":         {k8s, formatTODO},
+		"uuid":          {vfrom(VersionDraft2019_09) | k8s, formatUUID},
+		"uuid3":         {k8s, formatUUIDv(3)},
+		"uuid4":         {k8s, formatUUIDv(4)},
+		"uuid5":         {k8s, formatUUIDv(5)},
 	}
 })
 
@@ -152,6 +153,19 @@ func formatUint32(n cue.Value, s *state) {
 
 func formatUint64(n cue.Value, s *state) {
 	s.add(n, numType, ast.NewIdent("uint64"))
+}
+
+func formatUUID(n cue.Value, s *state) {
+	s.add(n, stringType, ast.NewSel(s.addImport(n, "uuid"), "Valid"))
+}
+
+// formatUUIDv returns a format func that constrains the value to a UUID of
+// the given version using the uuid.ValidV<N> stdlib builtin.
+func formatUUIDv(version int) func(cue.Value, *state) {
+	name := fmt.Sprintf("ValidV%d", version)
+	return func(n cue.Value, s *state) {
+		s.add(n, stringType, ast.NewSel(s.addImport(n, "uuid"), name))
+	}
 }
 
 func formatTODO(n cue.Value, s *state) {}

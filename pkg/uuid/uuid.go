@@ -18,6 +18,7 @@
 package uuid
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/google/uuid"
@@ -26,6 +27,29 @@ import (
 // Valid ensures that s is a valid UUID which would be accepted by Parse.
 func Valid(s string) error {
 	return uuid.Validate(s)
+}
+
+// ValidV3 ensures that s is a valid version 3 UUID.
+// Prefer the v3.Valid spelling.
+func ValidV3(s string) error { return validVersion(s, 3) }
+
+// ValidV4 ensures that s is a valid version 4 UUID.
+// Prefer the v4.Valid spelling.
+func ValidV4(s string) error { return validVersion(s, 4) }
+
+// ValidV5 ensures that s is a valid version 5 UUID.
+// Prefer the v5.Valid spelling.
+func ValidV5(s string) error { return validVersion(s, 5) }
+
+func validVersion(s string, want int) error {
+	u, err := uuid.Parse(s)
+	if err != nil {
+		return err
+	}
+	if got := int(u.Version()); got != want {
+		return fmt.Errorf("UUID is version %d, want %d", got, want)
+	}
+	return nil
 }
 
 // Parse decodes s into a UUID or returns an error. Both the standard UUID forms

@@ -1,10 +1,6 @@
 # Tests for non-definition reference closedness.
 # When a definition's body is solely a reference to a non-definition,
 # the definition should still be closed.
-#
-# BUG: WrapsHidden and WrapsShared should have additionalProperties: false
-# because they're definitions. Currently they're just a $ref to the
-# open non-definition, losing closedness.
 -- test.cue --
 package test
 
@@ -35,12 +31,9 @@ package datatest
 hiddenValid: {
 	data: {t01: {h: 1}}
 }
-// BUG: this should not be accepted. #WrapsHidden is a definition
-// wrapping an open non-definition. The definition should be closed,
-// but the generated schema just uses $ref to the open non-definition,
-// losing closedness.
 hiddenExtra: {
-	data: {t01: {h: 1, extra: true}}
+	data:  {t01: {h: 1, extra: true}}
+	error: true
 }
 sharedOpenExtra: {
 	data: {t02open: {v: 1, extra: true}}
@@ -48,18 +41,15 @@ sharedOpenExtra: {
 sharedClosedValid: {
 	data: {t02closed: {v: 1}}
 }
-// BUG: this should not be accepted (same issue as hiddenExtra).
 sharedClosedExtra: {
-	data: {t02closed: {v: 1, extra: true}}
+	data:  {t02closed: {v: 1, extra: true}}
+	error: true
 }
 conjunctionOpenExtra: {
 	data: {t03open: {h: 1, v: 1, extra: true}}
 }
-// BUG: this correctly rejects extra properties, but the generated schema
-// is structurally wrong: additionalProperties: false sits alongside $ref
-// with no local properties, rejecting all fields rather than only extra ones.
 conjunctionClosedExtra: {
-	data:  {t03closed: {h: 1, v: 1, extra: true}}
+	data: {t03closed: {h: 1, v: 1, extra: true}}
 	error: true
 }
 conjunctionOfDisjunctionsOpenExtra: {
@@ -78,13 +68,16 @@ conjunctionOfDisjunctionsClosedExtra: {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	$defs: {
 		WrapsConjunction: {
-			allOf: [{
-				$ref: "#/$defs/_hidden"
-			}, {
-				type:                 "object"
-				additionalProperties: false
-				$ref:                 "#/$defs/_shared"
-			}]
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				h: {
+					type: "integer"
+				}
+				v: {
+					type: "integer"
+				}
+			}
 		}
 		WrapsConjunctionOfDisjunctions: {
 			allOf: [{
@@ -112,10 +105,22 @@ conjunctionOfDisjunctionsClosedExtra: {
 			}]
 		}
 		WrapsHidden: {
-			$ref: "#/$defs/_hidden"
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				h: {
+					type: "integer"
+				}
+			}
 		}
 		WrapsShared: {
-			$ref: "#/$defs/_shared"
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				v: {
+					type: "integer"
+				}
+			}
 		}
 		"_hidden": {
 			type: "object"
@@ -188,24 +193,16 @@ conjunctionOfDisjunctionsClosedExtra: {
 }
 -- out/generate-v3/hiddenValid --
 -- out/generate-v3/hiddenExtra --
+hiddenExtra.data.t01.extra: field not allowed:
+    ./datatest/testdata.cue:6:22
 -- out/generate-v3/sharedOpenExtra --
 -- out/generate-v3/sharedClosedValid --
 -- out/generate-v3/sharedClosedExtra --
+sharedClosedExtra.data.t02closed.extra: field not allowed:
+    ./datatest/testdata.cue:16:28
 -- out/generate-v3/conjunctionClosedExtra --
-conjunctionClosedExtra.data.t03closed: invalid value {h:1,v:1,extra:true} (does not satisfy matchN): 1 matched, expected 2:
-    1:88
-    ./datatest/testdata.cue:29:21
-    1:792
 conjunctionClosedExtra.data.t03closed.extra: field not allowed:
-    1:88
-    ./datatest/testdata.cue:29:41
-conjunctionClosedExtra.data.t03closed.h: field not allowed:
-    1:88
-    ./datatest/testdata.cue:29:25
-conjunctionClosedExtra.data.t03closed.v: field not allowed:
-    1:88
-    ./datatest/testdata.cue:29:31
-    1:592
+    ./datatest/testdata.cue:23:33
 -- out/generate-v3/conjunctionOpenExtra --
 -- out/generate-v3/conjunctionOfDisjunctionsClosedExtra --
 -- out/generate-v3/conjunctionOfDisjunctionsOpenExtra --

@@ -1,11 +1,6 @@
 # Tests for root-level definition reference with required fields.
 #
 # Issue 4356: same as closedness_root but with required fields.
-#
-# BUG(4356): the type and additionalProperties keywords should
-# not be present at the root; the root should be solely a $ref.
-#
-#brokenRoundTrip
 -- test.cue --
 package test
 
@@ -33,7 +28,6 @@ package test
 			required: ["a", "b"]
 		}
 	}
-	type:                 "object"
-	additionalProperties: false
-	$ref:                 "#/$defs/T"
+	type: "object"
+	$ref: "#/$defs/T"
 }

@@ -1,0 +1,151 @@
+# Tests for closedness with the explicitopen experiment.
+# With explicitopen, spread (#T...) opens a definition,
+# while plain embedding (#T) keeps it closed.
+-- test.cue --
+@experiment(explicitopen)
+package test
+
+#WithSpread: {
+	#Inner...
+	y?: string
+}
+
+#Inner: {
+	x?: int
+}
+
+#MixedRef: {
+	#Inner...
+	child?: #Inner
+	z?: string
+}
+_foo: {
+	#Inner...
+	y?: int
+}
+_bar: {
+	#Inner
+	y?: int
+}
+
+t01?: #WithSpread
+t02?: #Inner
+t03?: #MixedRef
+t04?: _foo
+t05?: _bar
+
+-- datatest/testdata.cue --
+package datatest
+spreadValid: {
+	data: {t01: {x: 1, y: "hello"}}
+}
+spreadExtra: {
+	data: {t01: {x: 1, y: "hello", extra: true}}
+	error: true
+}
+innerValid: {
+	data: {t02: {x: 1}}
+}
+innerExtra: {
+	data: {t02: {x: 1, extra: true}}
+	error: true
+}
+mixedValid: {
+	data: {t03: {x: 1, child: {x: 2}, z: "hi"}}
+}
+mixedChildExtra: {
+	data: {t03: {x: 1, child: {x: 2, extra: true}, z: "hi"}}
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		Inner: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				x: {
+					type: "integer"
+				}
+			}
+		}
+		MixedRef: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				child: {
+					$ref: "#/$defs/Inner"
+				}
+				x: {
+					type: "integer"
+				}
+				z: {
+					type: "string"
+				}
+			}
+		}
+		WithSpread: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				x: {
+					type: "integer"
+				}
+				y: {
+					type: "string"
+				}
+			}
+		}
+		"_bar": {
+			type: "object"
+			properties: {
+				y: {
+					type: "integer"
+				}
+			}
+			$ref: "#/$defs/Inner"
+		}
+		"_foo": {
+			type: "object"
+			properties: {
+				x: {
+					type: "integer"
+				}
+				y: {
+					type: "integer"
+				}
+			}
+		}
+	}
+	type: "object"
+	properties: {
+		t01: {
+			$ref: "#/$defs/WithSpread"
+		}
+		t02: {
+			$ref: "#/$defs/Inner"
+		}
+		t03: {
+			$ref: "#/$defs/MixedRef"
+		}
+		t04: {
+			$ref: "#/$defs/_foo"
+		}
+		t05: {
+			$ref: "#/$defs/_bar"
+		}
+	}
+}
+-- out/generate-v3/spreadValid --
+-- out/generate-v3/spreadExtra --
+spreadExtra.data.t01.extra: field not allowed:
+    ./datatest/testdata.cue:6:33
+-- out/generate-v3/innerValid --
+-- out/generate-v3/innerExtra --
+innerExtra.data.t02.extra: field not allowed:
+    ./datatest/testdata.cue:13:21
+-- out/generate-v3/mixedValid --
+-- out/generate-v3/mixedChildExtra --
+mixedChildExtra.data.t03.child.extra: field not allowed:
+    ./datatest/testdata.cue:20:35

@@ -400,7 +400,7 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		}
 	case cue.OrOp:
 		return &itemAnyOf{
-			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, open) }),
+			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, mode) }),
 		}
 	case cue.RegexMatchOp,
 		cue.NotRegexMatchOp:

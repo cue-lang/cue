@@ -1,8 +1,5 @@
 # Tests for closedness with recursive references.
 #
-# BUG(4352): the struct element of the anyOf for Expr should have
-# additionalProperties: false.
-#
 # BUG: WrapsNode should have additionalProperties: false because
 # it's a definition. Currently it's just a $ref to the open
 # non-definition.
@@ -83,11 +80,9 @@ mutualDeepExtra: {
 exprValid: {
 	data: {t03: {op: "+", left: 1, right: 2}}
 }
-// BUG(4352): this should not be accepted because the struct disjunct
-// of #Expr is closed, but the generated schema is missing
-// additionalProperties: false.
 exprExtra: {
 	data: {t03: {op: "+", left: 1, right: 2, extra: true}}
+	error: true
 }
 nodeValid: {
 	data: {t04: {value: 1, next: {value: 2}}}
@@ -158,7 +153,8 @@ closedLeftRightLeftExtra: {
 			anyOf: [{
 				type: "integer"
 			}, {
-				type: "object"
+				type:                 "object"
+				additionalProperties: false
 				properties: {
 					left: {
 						$ref: "#/$defs/Expr"
@@ -262,6 +258,17 @@ mutualDeepExtra.data.t02.b.extra: field not allowed:
     ./datatest/testdata.cue:21:37
 -- out/generate-v3/exprValid --
 -- out/generate-v3/exprExtra --
+exprExtra.data.t03: conflicting values {op:"+",left:1,right:2,extra:true} and int (mismatched types struct and int):
+    ./datatest/testdata.cue:28:14
+    1:351
+    1:1109
+exprExtra.data.t03: invalid value {op:"+",left:1,right:2,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
+    1:341
+    ./datatest/testdata.cue:28:14
+    1:1109
+exprExtra.data.t03.extra: field not allowed:
+    1:341
+    ./datatest/testdata.cue:28:50
 -- out/generate-v3/nodeValid --
 -- out/generate-v3/nodeExtra --
 -- out/generate-v3/wrapsNodeValid --

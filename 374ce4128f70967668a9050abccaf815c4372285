@@ -87,6 +87,24 @@
       "parentUuid": "b79a58c6_6ebfa1f2",
       "revId": "374ce4128f70967668a9050abccaf815c4372285",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3267f7a_4316799c",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-19T14:57:34Z",
+      "side": 1,
+      "message": "LGTM",
+      "parentUuid": "8428ad65_450ba769",
+      "revId": "374ce4128f70967668a9050abccaf815c4372285",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

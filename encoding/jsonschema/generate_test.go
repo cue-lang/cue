@@ -55,23 +55,24 @@ func TestGenerate(t *testing.T) {
 		t.Writer("schema").Write(data)
 		t.Logf("generated schema: %q", data)
 
-		// Round-trip test: convert generated JSON Schema back to CUE to validate
-		// First compile the AST to a CUE value, then marshal to JSON
+		// Round-trip test: convert generated JSON Schema back to CUE to validate.
 		schemaValue := ctx.BuildExpr(r)
 		qt.Assert(t, qt.IsNil(schemaValue.Err()), qt.Commentf("schema data: %q", data))
 
 		schemaBytes, err := schemaValue.MarshalJSON()
 		qt.Assert(t, qt.IsNil(err))
 
-		// Parse the JSON back to a CUE value for extraction
 		schemaValue = ctx.CompileBytes(schemaBytes)
 		qt.Assert(t, qt.IsNil(schemaValue.Err()))
 
-		// Extract back to CUE with strict validation
 		extractedSchemaFile, err := jsonschema.Extract(schemaValue, &jsonschema.Config{
 			StrictFeatures: true,
 			StrictKeywords: true,
 		})
+		if t.HasTag("brokenRoundTrip") {
+			t.Skipf("round-trip extraction skipped (brokenRoundTrip)")
+			return
+		}
 		qt.Assert(t, qt.IsNil(err), qt.Commentf("generated JSON Schema should round-trip cleanly via Extract"))
 		extractedSchemaValue := ctx.BuildFile(extractedSchemaFile)
 		t.Logf("extracted schema: %#v", extractedSchemaValue)

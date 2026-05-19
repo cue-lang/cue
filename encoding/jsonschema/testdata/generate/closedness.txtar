@@ -1,0 +1,152 @@
+# Tests for closedness-related issues in JSON Schema generation.
+#
+# Issue 4352: closedness lost in disjunctions.
+#
+# BUG(4352): the struct elements inside the anyOf for Disj, NestedDisj,
+# and TwoStructDisj should have additionalProperties: false but don't
+# because the OrOp handler discards the closedness mode.
+-- test.cue --
+package test
+
+#Disj: int | {
+	a?: int
+}
+
+#Simple: {
+	a?: int
+	b?: string
+}
+
+#NestedDisj: {
+	x?: string | {
+		y?: int
+	}
+}
+
+#TwoStructDisj: {a?: int} | {b?: string}
+
+t01?: #Disj
+t02?: #Simple
+t03?: #NestedDisj
+t04?: #TwoStructDisj
+
+-- datatest/testdata.cue --
+package datatest
+disjInt: {
+	data: {t01: 42}
+}
+disjStruct: {
+	data: {t01: {a: 1}}
+}
+// BUG(4352): this should not be accepted because the struct disjunct of #Disj
+// is closed, but the generated schema is missing additionalProperties: false
+// on the struct disjunct.
+disjStructExtra: {
+	data: {t01: {a: 1, extra: true}}
+}
+simple: {
+	data: {t02: {a: 1, b: "hello"}}
+}
+simpleExtra: {
+	data: {t02: {a: 1, extra: true}}
+	error: true
+}
+// BUG(4352): this should not be accepted because the inner struct disjunct
+// of x is missing additionalProperties: false.
+nestedDisjStructExtra: {
+	data: {t03: {x: {y: 1, extra: true}}}
+}
+// BUG(4352): this should not be accepted because both struct disjuncts
+// should be closed.
+twoStructDisjExtra: {
+	data: {t04: {a: 1, extra: true}}
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		Disj: {
+			anyOf: [{
+				type: "integer"
+			}, {
+				type: "object"
+				properties: {
+					a: {
+						type: "integer"
+					}
+				}
+			}]
+		}
+		NestedDisj: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				x: {
+					anyOf: [{
+						type: "string"
+					}, {
+						type: "object"
+						properties: {
+							y: {
+								type: "integer"
+							}
+						}
+					}]
+				}
+			}
+		}
+		Simple: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				a: {
+					type: "integer"
+				}
+				b: {
+					type: "string"
+				}
+			}
+		}
+		TwoStructDisj: {
+			anyOf: [{
+				type: "object"
+				properties: {
+					a: {
+						type: "integer"
+					}
+				}
+			}, {
+				type: "object"
+				properties: {
+					b: {
+						type: "string"
+					}
+				}
+			}]
+		}
+	}
+	type: "object"
+	properties: {
+		t01: {
+			$ref: "#/$defs/Disj"
+		}
+		t02: {
+			$ref: "#/$defs/Simple"
+		}
+		t03: {
+			$ref: "#/$defs/NestedDisj"
+		}
+		t04: {
+			$ref: "#/$defs/TwoStructDisj"
+		}
+	}
+}
+-- out/generate-v3/disjInt --
+-- out/generate-v3/disjStruct --
+-- out/generate-v3/disjStructExtra --
+-- out/generate-v3/simple --
+-- out/generate-v3/simpleExtra --
+simpleExtra.data.t02.extra: field not allowed:
+    ./datatest/testdata.cue:18:21
+-- out/generate-v3/nestedDisjStructExtra --
+-- out/generate-v3/twoStructDisjExtra --

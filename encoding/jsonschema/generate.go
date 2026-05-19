@@ -395,12 +395,24 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 				},
 			}
 		}
+		// TODO technically the closedness mode should be passed down
+		// through conjunctions, but we don't do that because have the
+		// case above for passing it down for struct kinds, and when the
+		// kind isn't a struct kind, closedness either doesn't matter
+		// (it's a scalar) or it's some kind of disjunction, in which
+		// case passing it down actually makes things worse because
+		// we'll push the `additionalProperties: false` down into
+		// individual arms of the conjunction, resulting in rejection of
+		// valid data. Better to be overly lax than too strict.
+		// To fix this properly, we'd probably need to lift all the fields from
+		// within the arms of the conjunction to the top level so that
+		// we can apply additionalProperties to them all at once.
 		return &itemAllOf{
 			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, open) }),
 		}
 	case cue.OrOp:
 		return &itemAnyOf{
-			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, open) }),
+			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, mode) }),
 		}
 	case cue.RegexMatchOp,
 		cue.NotRegexMatchOp:

@@ -65,9 +65,13 @@ conjunctionClosedExtra: {
 conjunctionOfDisjunctionsOpenExtra: {
 	data: {t04open: {h: 1, v: 1, extra: true}}
 }
-// BUG: this should reject the extra property.
+// BUG: this incorrectly allows extra fields, but fixing that requires
+// a deeper fix: lifting properties to the top level so they're all in one place.
 conjunctionOfDisjunctionsClosedExtra: {
-	data: {t04open: {h: 1, v: 1, extra: true}}
+	data: {t04closed: {h: 1, v: 1, extra: true}}
+}
+conjunctionOfDisjunctionsClosedExtra: {
+	data: {t04closed: {h: 1, v: 1}}
 }
 -- out/generate-v3/schema --
 {

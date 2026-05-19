@@ -1,0 +1,40 @@
+# Tests for root-level definition reference closedness.
+#
+# Issue 4356: when the root value is solely a reference to a definition,
+# additionalProperties: false and type: "object" should not appear at
+# the root because they conflict with the $ref (additionalProperties
+# only considers properties in the same schema object, and the root
+# has none).
+#
+# BUG(4356): the type and additionalProperties keywords should
+# not be present at the root; the root should be solely a $ref.
+-- test.cue --
+package test
+
+#T
+
+#T: {
+	a?: int
+	b?: string
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		T: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				a: {
+					type: "integer"
+				}
+				b: {
+					type: "string"
+				}
+			}
+		}
+	}
+	type:                 "object"
+	additionalProperties: false
+	$ref:                 "#/$defs/T"
+}

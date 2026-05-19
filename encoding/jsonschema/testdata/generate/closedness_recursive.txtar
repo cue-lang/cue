@@ -1,0 +1,273 @@
+# Tests for closedness with recursive references.
+#
+# BUG(4352): the struct element of the anyOf for Expr should have
+# additionalProperties: false.
+#
+# BUG: WrapsNode should have additionalProperties: false because
+# it's a definition. Currently it's just a $ref to the open
+# non-definition.
+-- test.cue --
+package test
+
+t01?: #Tree
+t02?: #A
+t03?: #Expr
+t04?: _node
+t05?: #WrapsNode
+t06?: #ClosedLeft
+
+#Tree: {
+	value?: int
+	children?: [...#Tree]
+}
+
+#A: {
+	x?: int
+	b?: #B
+}
+
+#B: {
+	y?: string
+	a?: #A
+}
+
+#Expr: int | {
+	op?: string
+	left?: #Expr
+	right?: #Expr
+}
+
+_node: {
+	value?: int
+	next?: _node
+}
+
+#WrapsNode: _node
+
+_left: {
+	value?: int
+	right?: _right
+}
+
+_right: {
+	value?: string
+	left?: _left
+}
+
+#ClosedLeft: _left
+
+-- datatest/testdata.cue --
+package datatest
+treeValid: {
+	data: {t01: {value: 1, children: [{value: 2}]}}
+}
+treeExtra: {
+	data: {t01: {value: 1, extra: true}}
+	error: true
+}
+treeNestedExtra: {
+	data: {t01: {value: 1, children: [{value: 2, extra: true}]}}
+	error: true
+}
+mutualValid: {
+	data: {t02: {x: 1, b: {y: "hello", a: {x: 2}}}}
+}
+mutualExtra: {
+	data: {t02: {x: 1, extra: true}}
+	error: true
+}
+mutualDeepExtra: {
+	data: {t02: {x: 1, b: {y: "hello", extra: true}}}
+	error: true
+}
+exprValid: {
+	data: {t03: {op: "+", left: 1, right: 2}}
+}
+// BUG(4352): this should not be accepted because the struct disjunct
+// of #Expr is closed, but the generated schema is missing
+// additionalProperties: false.
+exprExtra: {
+	data: {t03: {op: "+", left: 1, right: 2, extra: true}}
+}
+nodeValid: {
+	data: {t04: {value: 1, next: {value: 2}}}
+}
+nodeExtra: {
+	data: {t04: {value: 1, extra: true}}
+}
+wrapsNodeValid: {
+	data: {t05: {value: 1, next: {value: 2}}}
+}
+// BUG: this should not be accepted. #WrapsNode is a definition
+// wrapping an open recursive non-definition. The definition should
+// be closed.
+wrapsNodeExtra: {
+	data: {t05: {value: 1, extra: true}}
+}
+// BUG: this should not be accepted because #WrapsNode is a definition
+// wrapping a recursive non-definition, and nested values should be closed.
+wrapsNodeNextExtra: {
+	data: {t05: {value: 1, next: {value: 2, extra: true}}}
+}
+closedLeftValid: {
+	data: {t06: {value: 1, right: {value: "hello", left: {value: 2}}}}
+}
+// BUG: these should not be accepted. #ClosedLeft is a definition
+// wrapping open mutually-recursive non-definitions.
+closedLeftExtra: {
+	data: {t06: {value: 1, extra: true}}
+}
+closedLeftRightExtra: {
+	data: {t06: {value: 1, right: {value: "hello", extra: true}}}
+}
+closedLeftRightLeftExtra: {
+	data: {t06: {value: 1, right: {value: "hello", left: {value: 2, extra: true}}}}
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		A: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				b: {
+					$ref: "#/$defs/B"
+				}
+				x: {
+					type: "integer"
+				}
+			}
+		}
+		B: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				a: {
+					$ref: "#/$defs/A"
+				}
+				y: {
+					type: "string"
+				}
+			}
+		}
+		ClosedLeft: {
+			$ref: "#/$defs/_left"
+		}
+		Expr: {
+			anyOf: [{
+				type: "integer"
+			}, {
+				type: "object"
+				properties: {
+					left: {
+						$ref: "#/$defs/Expr"
+					}
+					op: {
+						type: "string"
+					}
+					right: {
+						$ref: "#/$defs/Expr"
+					}
+				}
+			}]
+		}
+		Tree: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				children: {
+					type: "array"
+					items: {
+						$ref: "#/$defs/Tree"
+					}
+				}
+				value: {
+					type: "integer"
+				}
+			}
+		}
+		WrapsNode: {
+			$ref: "#/$defs/_node"
+		}
+		"_left": {
+			type: "object"
+			properties: {
+				right: {
+					$ref: "#/$defs/_right"
+				}
+				value: {
+					type: "integer"
+				}
+			}
+		}
+		"_node": {
+			type: "object"
+			properties: {
+				next: {
+					$ref: "#/$defs/_node"
+				}
+				value: {
+					type: "integer"
+				}
+			}
+		}
+		"_right": {
+			type: "object"
+			properties: {
+				left: {
+					$ref: "#/$defs/_left"
+				}
+				value: {
+					type: "string"
+				}
+			}
+		}
+	}
+	type: "object"
+	properties: {
+		t01: {
+			$ref: "#/$defs/Tree"
+		}
+		t02: {
+			$ref: "#/$defs/A"
+		}
+		t03: {
+			$ref: "#/$defs/Expr"
+		}
+		t04: {
+			$ref: "#/$defs/_node"
+		}
+		t05: {
+			$ref: "#/$defs/WrapsNode"
+		}
+		t06: {
+			$ref: "#/$defs/ClosedLeft"
+		}
+	}
+}
+-- out/generate-v3/treeValid --
+-- out/generate-v3/treeExtra --
+treeExtra.data.t01.extra: field not allowed:
+    ./datatest/testdata.cue:6:25
+-- out/generate-v3/treeNestedExtra --
+treeNestedExtra.data.t01.children.0.extra: field not allowed:
+    ./datatest/testdata.cue:10:47
+-- out/generate-v3/mutualValid --
+-- out/generate-v3/mutualExtra --
+mutualExtra.data.t02.extra: field not allowed:
+    ./datatest/testdata.cue:17:21
+-- out/generate-v3/mutualDeepExtra --
+mutualDeepExtra.data.t02.b.extra: field not allowed:
+    ./datatest/testdata.cue:21:37
+-- out/generate-v3/exprValid --
+-- out/generate-v3/exprExtra --
+-- out/generate-v3/nodeValid --
+-- out/generate-v3/nodeExtra --
+-- out/generate-v3/wrapsNodeValid --
+-- out/generate-v3/wrapsNodeExtra --
+-- out/generate-v3/closedLeftExtra --
+-- out/generate-v3/closedLeftRightExtra --
+-- out/generate-v3/closedLeftRightLeftExtra --
+-- out/generate-v3/closedLeftValid --
+-- out/generate-v3/wrapsNodeNextExtra --

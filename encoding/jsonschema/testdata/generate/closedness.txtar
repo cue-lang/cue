@@ -1,10 +1,6 @@
 # Tests for closedness-related issues in JSON Schema generation.
 #
 # Issue 4352: closedness lost in disjunctions.
-#
-# BUG(4352): the struct elements inside the anyOf for Disj, NestedDisj,
-# and TwoStructDisj should have additionalProperties: false but don't
-# because the OrOp handler discards the closedness mode.
 -- test.cue --
 package test
 
@@ -38,11 +34,9 @@ disjInt: {
 disjStruct: {
 	data: {t01: {a: 1}}
 }
-// BUG(4352): this should not be accepted because the struct disjunct of #Disj
-// is closed, but the generated schema is missing additionalProperties: false
-// on the struct disjunct.
 disjStructExtra: {
 	data: {t01: {a: 1, extra: true}}
+	error: true
 }
 simple: {
 	data: {t02: {a: 1, b: "hello"}}
@@ -51,15 +45,13 @@ simpleExtra: {
 	data: {t02: {a: 1, extra: true}}
 	error: true
 }
-// BUG(4352): this should not be accepted because the inner struct disjunct
-// of x is missing additionalProperties: false.
 nestedDisjStructExtra: {
 	data: {t03: {x: {y: 1, extra: true}}}
+	error: true
 }
-// BUG(4352): this should not be accepted because both struct disjuncts
-// should be closed.
 twoStructDisjExtra: {
 	data: {t04: {a: 1, extra: true}}
+	error: true
 }
 -- out/generate-v3/schema --
 {
@@ -69,7 +61,8 @@ twoStructDisjExtra: {
 			anyOf: [{
 				type: "integer"
 			}, {
-				type: "object"
+				type:                 "object"
+				additionalProperties: false
 				properties: {
 					a: {
 						type: "integer"
@@ -85,7 +78,8 @@ twoStructDisjExtra: {
 					anyOf: [{
 						type: "string"
 					}, {
-						type: "object"
+						type:                 "object"
+						additionalProperties: false
 						properties: {
 							y: {
 								type: "integer"
@@ -109,14 +103,16 @@ twoStructDisjExtra: {
 		}
 		TwoStructDisj: {
 			anyOf: [{
-				type: "object"
+				type:                 "object"
+				additionalProperties: false
 				properties: {
 					a: {
 						type: "integer"
 					}
 				}
 			}, {
-				type: "object"
+				type:                 "object"
+				additionalProperties: false
 				properties: {
 					b: {
 						type: "string"
@@ -144,9 +140,40 @@ twoStructDisjExtra: {
 -- out/generate-v3/disjInt --
 -- out/generate-v3/disjStruct --
 -- out/generate-v3/disjStructExtra --
+disjStructExtra.data.t01: conflicting values {a:1,extra:true} and int (mismatched types struct and int):
+    ./datatest/testdata.cue:9:14
+    1:86
+    1:736
+disjStructExtra.data.t01: invalid value {a:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
+    1:76
+    ./datatest/testdata.cue:9:14
+    1:736
+disjStructExtra.data.t01.extra: field not allowed:
+    1:76
+    ./datatest/testdata.cue:9:28
 -- out/generate-v3/simple --
 -- out/generate-v3/simpleExtra --
 simpleExtra.data.t02.extra: field not allowed:
-    ./datatest/testdata.cue:18:21
+    ./datatest/testdata.cue:16:21
 -- out/generate-v3/nestedDisjStructExtra --
+nestedDisjStructExtra.data.t03.x: conflicting values {y:1,extra:true} and string (mismatched types struct and string):
+    ./datatest/testdata.cue:20:18
+    1:269
+    1:798
+nestedDisjStructExtra.data.t03.x: invalid value {y:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
+    1:269
+    ./datatest/testdata.cue:20:18
+nestedDisjStructExtra.data.t03.x.extra: field not allowed:
+    1:269
+    ./datatest/testdata.cue:20:32
 -- out/generate-v3/twoStructDisjExtra --
+twoStructDisjExtra.data.t04: invalid value {a:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
+    1:518
+    ./datatest/testdata.cue:24:14
+    1:834
+twoStructDisjExtra.data.t04.a: field not allowed:
+    1:518
+    ./datatest/testdata.cue:24:18
+twoStructDisjExtra.data.t04.extra: field not allowed:
+    1:518
+    ./datatest/testdata.cue:24:28

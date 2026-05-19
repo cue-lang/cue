@@ -304,6 +304,21 @@ type generator struct {
 	// unique ensures that all items are comparable with
 	// simple equality.
 	unique *uniqueItems
+
+	// redirectFrom and redirectTo are set temporarily when inlining
+	// a non-definition into a closed definition. References to
+	// redirectFrom are resolved as redirectTo instead, so that
+	// recursive self-references within the inlined body generate
+	// $ref to the enclosing definition rather than the open
+	// non-definition.
+	//
+	// When a redirect is active, other non-definitions encountered
+	// in a closed context are also inlined at the property level
+	// (handling mutual recursion). inliningNonDef prevents unbounded
+	// recursion by limiting property-level inlining to one level deep.
+	redirectFrom   *CUERef
+	redirectTo     *CUERef
+	inliningNonDef bool
 }
 
 // Note this type definition is defined further away from [siblings]
@@ -373,6 +388,17 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 			Path: path,
 		}
 		if actualRef, _, ok := g.defs.Get2(ref); ok {
+			if g.redirectFrom != nil && mode != open {
+				if (cueRefHasher{}).Equal(ref, g.redirectFrom) {
+					return g.redirectTo
+				}
+				if !isDefinition(path) && !g.inliningNonDef {
+					g.inliningNonDef = true
+					result := g.makeItem0(v, mode)
+					g.inliningNonDef = false
+					return result
+				}
+			}
 			return actualRef
 		}
 		g.defs.Set(ref, internItem{}) // Prevent infinite loops on cycles.
@@ -380,7 +406,23 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		if isDefinition(path) {
 			defMode = closedRecursively
 		}
-		g.defs.Set(ref, g.makeItem(v, defMode))
+		defItem := g.makeItem(v, defMode)
+		if defMode != open {
+			if innerRef, ok := defItem.Value().(*CUERef); ok && !isDefinition(innerRef.Path) {
+				savedFrom, savedTo := g.redirectFrom, g.redirectTo
+				g.redirectFrom = innerRef
+				g.redirectTo = ref
+				defItem = g.makeItem(innerRef.Inst.LookupPath(innerRef.Path), defMode)
+				g.redirectFrom, g.redirectTo = savedFrom, savedTo
+			}
+		}
+		g.defs.Set(ref, defItem)
+		if g.redirectFrom != nil && mode != open && !isDefinition(path) && !g.inliningNonDef {
+			g.inliningNonDef = true
+			result := g.makeItem0(v, mode)
+			g.inliningNonDef = false
+			return result
+		}
 		return ref
 	case cue.AndOp:
 		if v.Kind() == cue.StructKind {
@@ -402,6 +444,11 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		return &itemAnyOf{
 			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, mode) }),
 		}
+	case cue.SpreadOp:
+		// SpreadOp opens its operand (e.g. #T...). The struct processing
+		// below handles it correctly by iterating the spread's fields.
+		// Note: the reason this works is because this causes the logic
+		// to ignore whether the spread value is a reference or not.
 	case cue.RegexMatchOp,
 		cue.NotRegexMatchOp:
 		re, err := args[0].String()
@@ -954,8 +1001,12 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 	}
 	hasUniversalConstraint := false
 	for v := range valueConjuncts(v) {
-		pkg, _ := v.ReferencePath()
-		if pkg.Exists() || v.Kind() != cue.StructKind {
+		pkg, path := v.ReferencePath()
+		if pkg.Exists() && mode != open && !isDefinition(path) && v.Kind() == cue.StructKind {
+			// In a closed context, inline non-definition references so
+			// their properties become local to additionalProperties.
+			v = pkg.LookupPath(path)
+		} else if pkg.Exists() || v.Kind() != cue.StructKind {
 			// This conjunct is a reference or some other non-struct literal.
 			// Let's keep it as such.
 			allOf.elems = append(allOf.elems, g.makeItem(v, open))
@@ -1084,7 +1135,9 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 		delete(props.patternProperties, "")
 	}
 	if mode != open && !g.cfg.ExplicitOpen && props.additionalProperties.Value() == nil {
-		props.additionalProperties = g.unique.intern(&itemFalse{})
+		if len(props.properties) > 0 || len(allOf.elems) == 0 {
+			props.additionalProperties = g.unique.intern(&itemFalse{})
+		}
 	}
 	props.required = slices.Sorted(maps.Keys(required))
 	hasObjectConstraints :=

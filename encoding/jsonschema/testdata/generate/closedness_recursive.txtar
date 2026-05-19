@@ -1,8 +1,4 @@
 # Tests for closedness with recursive references.
-#
-# BUG: WrapsNode should have additionalProperties: false because
-# it's a definition. Currently it's just a $ref to the open
-# non-definition.
 -- test.cue --
 package test
 
@@ -93,30 +89,28 @@ nodeExtra: {
 wrapsNodeValid: {
 	data: {t05: {value: 1, next: {value: 2}}}
 }
-// BUG: this should not be accepted. #WrapsNode is a definition
-// wrapping an open recursive non-definition. The definition should
-// be closed.
 wrapsNodeExtra: {
-	data: {t05: {value: 1, extra: true}}
+	data:  {t05: {value: 1, extra: true}}
+	error: true
 }
-// BUG: this should not be accepted because #WrapsNode is a definition
-// wrapping a recursive non-definition, and nested values should be closed.
 wrapsNodeNextExtra: {
 	data: {t05: {value: 1, next: {value: 2, extra: true}}}
+	error: true
 }
 closedLeftValid: {
 	data: {t06: {value: 1, right: {value: "hello", left: {value: 2}}}}
 }
-// BUG: these should not be accepted. #ClosedLeft is a definition
-// wrapping open mutually-recursive non-definitions.
 closedLeftExtra: {
 	data: {t06: {value: 1, extra: true}}
+	error: true
 }
 closedLeftRightExtra: {
 	data: {t06: {value: 1, right: {value: "hello", extra: true}}}
+	error: true
 }
 closedLeftRightLeftExtra: {
 	data: {t06: {value: 1, right: {value: "hello", left: {value: 2, extra: true}}}}
+	error: true
 }
 -- out/generate-v3/schema --
 {
@@ -147,7 +141,25 @@ closedLeftRightLeftExtra: {
 			}
 		}
 		ClosedLeft: {
-			$ref: "#/$defs/_left"
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				right: {
+					type:                 "object"
+					additionalProperties: false
+					properties: {
+						left: {
+							$ref: "#/$defs/ClosedLeft"
+						}
+						value: {
+							type: "string"
+						}
+					}
+				}
+				value: {
+					type: "integer"
+				}
+			}
 		}
 		Expr: {
 			anyOf: [{
@@ -184,7 +196,16 @@ closedLeftRightLeftExtra: {
 			}
 		}
 		WrapsNode: {
-			$ref: "#/$defs/_node"
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				next: {
+					$ref: "#/$defs/WrapsNode"
+				}
+				value: {
+					type: "integer"
+				}
+			}
 		}
 		"_left": {
 			type: "object"
@@ -260,21 +281,31 @@ mutualDeepExtra.data.t02.b.extra: field not allowed:
 -- out/generate-v3/exprExtra --
 exprExtra.data.t03: conflicting values {op:"+",left:1,right:2,extra:true} and int (mismatched types struct and int):
     ./datatest/testdata.cue:28:14
-    1:351
-    1:1109
+    1:548
+    1:1406
 exprExtra.data.t03: invalid value {op:"+",left:1,right:2,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
-    1:341
+    1:538
     ./datatest/testdata.cue:28:14
-    1:1109
+    1:1406
 exprExtra.data.t03.extra: field not allowed:
-    1:341
+    1:538
     ./datatest/testdata.cue:28:50
 -- out/generate-v3/nodeValid --
 -- out/generate-v3/nodeExtra --
 -- out/generate-v3/wrapsNodeValid --
 -- out/generate-v3/wrapsNodeExtra --
--- out/generate-v3/closedLeftExtra --
--- out/generate-v3/closedLeftRightExtra --
--- out/generate-v3/closedLeftRightLeftExtra --
--- out/generate-v3/closedLeftValid --
+wrapsNodeExtra.data.t05.extra: field not allowed:
+    ./datatest/testdata.cue:41:26
 -- out/generate-v3/wrapsNodeNextExtra --
+wrapsNodeNextExtra.data.t05.next.extra: field not allowed:
+    ./datatest/testdata.cue:45:42
+-- out/generate-v3/closedLeftExtra --
+closedLeftExtra.data.t06.extra: field not allowed:
+    ./datatest/testdata.cue:52:25
+-- out/generate-v3/closedLeftRightExtra --
+closedLeftRightExtra.data.t06.right.extra: field not allowed:
+    ./datatest/testdata.cue:56:49
+-- out/generate-v3/closedLeftRightLeftExtra --
+closedLeftRightLeftExtra.data.t06.right.left.extra: field not allowed:
+    ./datatest/testdata.cue:60:66
+-- out/generate-v3/closedLeftValid --

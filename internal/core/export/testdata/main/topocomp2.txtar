@@ -1,0 +1,153 @@
+# Two unrelated comprehensions yield body decls into the same target
+# struct, each with the same per-yield count. The Repeats-equality
+# heuristic in toposort groups all four StructInfo entries together,
+# mis-interleaving the renderings of one comprehension with the other.
+# Expected order: each comprehension's per-yield natural order in
+# succession — A1, A2, B1, B2 from the first comp, then C3, C4, D3,
+# D4 from the second.
+
+-- in.cue --
+out: {
+	for x in ["A", "B"] {
+		top: "\(x)1": true
+		top: "\(x)2": true
+	}
+	for y in ["C", "D"] {
+		top: "\(y)3": true
+		top: "\(y)4": true
+	}
+}
+-- out/doc-v3 --
+[]
+[out]
+[out top]
+[out top A1]
+[out top B1]
+[out top A2]
+[out top B2]
+[out top C3]
+[out top D3]
+[out top C4]
+[out top D4]
+-- out/value-v3 --
+== Simplified
+{
+	out: {
+		top: {
+			A1: true
+			B1: true
+			A2: true
+			B2: true
+			C3: true
+			D3: true
+			C4: true
+			D4: true
+		}
+	}
+}
+== Raw
+{
+	out: {
+		top: {
+			A1: true
+			B1: true
+			A2: true
+			B2: true
+			C3: true
+			D3: true
+			C4: true
+			D4: true
+		}
+	}
+}
+== Final
+{
+	out: {
+		top: {
+			A1: true
+			B1: true
+			A2: true
+			B2: true
+			C3: true
+			D3: true
+			C4: true
+			D4: true
+		}
+	}
+}
+== All
+{
+	out: {
+		top: {
+			A1: true
+			B1: true
+			A2: true
+			B2: true
+			C3: true
+			D3: true
+			C4: true
+			D4: true
+		}
+	}
+}
+== Eval
+{
+	out: {
+		top: {
+			A1: true
+			B1: true
+			A2: true
+			B2: true
+			C3: true
+			D3: true
+			C4: true
+			D4: true
+		}
+	}
+}
+-- out/definition-v3 --
+out: {
+	for x in ["A", "B"] {
+		top: {
+			{
+				"\(x)1": true
+			}
+			{
+				"\(x)2": true
+			}
+		}
+	}
+	for y in ["C", "D"] {
+		top: {
+			{
+				"\(y)3": true
+			}
+			{
+				"\(y)4": true
+			}
+		}
+	}
+}
+-- out/definition-v3-noshare --
+out: {
+	for x in ["A", "B"] {
+		top: {
+			{
+				"\(x)1": true
+			}
+			{
+				"\(x)2": true
+			}
+		}
+	}
+	for y in ["C", "D"] {
+		top: {
+			{
+				"\(y)3": true
+			}
+			{
+				"\(y)4": true
+			}
+		}
+	}
+}

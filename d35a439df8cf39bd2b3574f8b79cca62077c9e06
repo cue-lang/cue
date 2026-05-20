@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34cb8cfd_ba20bb87",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:18:05Z",
+      "side": 1,
+      "message": "you probably don\u0027t want to be giving the full repo name. you can say Judson or YMeadows; I\u0027ve typically mentioned Judson\u0027s name in past performance commits.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 22
+      },
+      "revId": "d35a439df8cf39bd2b3574f8b79cca62077c9e06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

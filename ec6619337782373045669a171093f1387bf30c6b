@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cd43fb6_49d57aa8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:21:21Z",
+      "side": 1,
+      "message": "Given that this test seems to show the correct behavior, I imagine this commit message needs something like...\n\n```\nThe issue in question is already resolved by the new comprehension algorithm;\nhere we add a regression test to lock in the correct behavior.\n\nCloses #4058.\n```",
+      "revId": "ec6619337782373045669a171093f1387bf30c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

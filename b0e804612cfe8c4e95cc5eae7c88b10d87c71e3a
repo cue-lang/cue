@@ -69,6 +69,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "91bc2e6c_8a48b6ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:15:55Z",
+      "side": 1,
+      "message": "I misremembered. at least two unity projects are broken by this, and fixed by later commits. so we can only submit this when the rest of the stack is ready as well.",
+      "parentUuid": "a5919257_96ab27d3",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "d6f3ea49_36c51790",

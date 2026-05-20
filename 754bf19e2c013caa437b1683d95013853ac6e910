@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9f2f659_5ec6fc4a",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T20:48:33Z",
+      "side": 1,
+      "message": "should this \"open\" also be \"mode\"?",
+      "range": {
+        "startLine": 399,
+        "startChar": 77,
+        "endLine": 399,
+        "endChar": 81
+      },
+      "revId": "754bf19e2c013caa437b1683d95013853ac6e910",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,310 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f649c4b3_3f9b350d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "this seems to say that you\u0027re replacing (removing) the pushdown algorithm, but AFAICT we\u0027re also calling the new algorithm pushdown. perhaps reword to clarify?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0be100c_705c5232",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "please explain in a bit more detail why you had to change the trim code; I would initially assume that no changes would be necessary.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a6b91ae_0a60f109",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "I do not see these changes in this commit. is this commit message outdated? please review it.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5919257_96ab27d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "As usual, I can\u0027t say I\u0027ve fully understood every line of code, but broadly it makes sense, the test changes look good, and I don\u0027t spot any obvious errors.\n\nWe\u0027ll need to coordinate when you want to submit this due to the Unity output changes.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f3ea49_36c51790",
+        "filename": "cue/testdata/builtins/validators.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "nice fix!",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d15b804f_6ff42f4f",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "if you mean evalv2, I\u0027d say that to be clear. but also, if that\u0027s indeed what you mean then I don\u0027t follow, because evalv2 is not around anymore for us to check this.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6467b14f_6967df4c",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "ValueClause.yield is now an empty body with a commented-out single line. If ValueClause is no longer reachable through this code path, please remove the type entirely; if it\u0027s still needed, the call should not be commented out. Same comment applies to `// ci.setOptionalV3(nil)` on line 103 — either drop or restore with rationale.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a99c01bd_f52ef645",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "does this need a TODO of some sort?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9520ce38_94b02e64",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "should this last question be a TODO?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff549f22_21b61e64",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "do we need a TODO here?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75984f67_7cd0f52e",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "I stil get the feeling like AI is being overly verbose with these sorts of inline comments. I would personally cut most of these to about half of their current length, unless you think that all of this info is useful.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4be25cfe_df7da6d5",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 1975,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "The type was narrowed from `Node` to `*StructLit`, but the doc comment above (\"Value can be either a StructLit ... or a Field ...\") still describes the old polymorphic shape and the rationale for it. Please update the comment to match the new invariant, and verify there are no remaining `ToExpr(c.Value)` / `.(Expr)` call sites that assumed the broader type.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9545af1f_c76c60bd",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "TODO or delete entirely?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "185c1559_af1d1381",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "the double use of \"this\" confuses me a bit, can you reword to be clearer? what is \"this\" in the context here? because the containing struct is a scheduler, not a task.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebbbdc4b_261ee16f",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "what happened here? should we end up with two bullet points, still?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba6b217e_7cba3ad2",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "this change seems unnecessary?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9de48b52_b7c59726",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "given that you rewrote the code below, is this TODO still relevant?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "820f1a7d_3d3b58d2",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 1,
+      "message": "`updateArcType(ArcNotPresent)` followed by `arc.ArcType \u003d ArcNotPresent` — why both? Looks like one is redundant, or `updateArcType` is silently no-op\u0027ing here.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

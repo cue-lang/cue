@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32154eaa_1a5e8220",
+        "filename": "cue/testdata/fulleval/005_conditional_field.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 0,
+      "message": "this change seems correct, but I wonder why it\u0027s happening.",
+      "revId": "00349c26d426524b8a1754aa67986c6979414be6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20e35577_fb3e67c7",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:13:29Z",
+      "side": 0,
+      "message": "please note that addEnv was a method rather than a func literal on purpose, to avoid allocating a closure function. perhaps this allocation doesn\u0027t matter as much in the new algorithm, but I worry that the AI is so easy to simplify code and undo optimizations which were measured to help.",
+      "revId": "00349c26d426524b8a1754aa67986c6979414be6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

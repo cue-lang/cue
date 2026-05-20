@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2fa1bdc_6aadaae6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T21:00:57Z",
+      "side": 1,
+      "message": "these paragraphs appear to be broken somehow. they both have `(e.g.` but I don\u0027t see how the sentence ends or where the parenthesis is closed.",
+      "revId": "f84b12f7d70b3766793dd7c98f79f06a04a18aa3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad110e8f_1be85117",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T21:00:57Z",
+      "side": 1,
+      "message": "nit: use a godoc link like `[this]` to point to the method you mean, because \"below\" is not particularly clear unless it\u0027s right underneath this comment.",
+      "range": {
+        "startLine": 449,
+        "startChar": 5,
+        "endLine": 449,
+        "endChar": 10
+      },
+      "revId": "f84b12f7d70b3766793dd7c98f79f06a04a18aa3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0660df0d_e1ba37b1",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1138,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T21:00:57Z",
+      "side": 1,
+      "message": "I\u0027d add a very short comment like what you have in the commit message, explaining that additionalProperties is lexical.",
+      "revId": "f84b12f7d70b3766793dd7c98f79f06a04a18aa3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

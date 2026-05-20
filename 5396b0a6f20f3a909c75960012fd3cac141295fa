@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa4e0264_cbec5f80",
+        "filename": "cmd/cue/cmd/testdata/script/cyclecomp.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:23:56Z",
+      "side": 1,
+      "message": "shorten this to just explain what error this used to show.",
+      "revId": "5396b0a6f20f3a909c75960012fd3cac141295fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0ade72c_92fccfba",
+        "filename": "cmd/cue/cmd/testdata/script/cyclecomp.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-20T22:23:56Z",
+      "side": 1,
+      "message": "you need `! exec`, plus some sort of `cmp stderr ...`, to actually make the tests pass before the fix.",
+      "revId": "5396b0a6f20f3a909c75960012fd3cac141295fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

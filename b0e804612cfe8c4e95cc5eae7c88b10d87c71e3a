@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9920199_e92e32bb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Will reword. The \"field pushdown\" terminology was for the old scheme that pushed _fields_ down into child arcs eagerly; the new scheme also keeps the \"pushdown\" name but pushes _dependencies_ (ArcPending placeholders) instead. Proposed reword for the opening paragraph: \"Switch the comprehension pushdown algorithm from field pushdown — eagerly materializing the body\u0027s fields on child arcs — to dependency pushdown: pre-create the arcs as ArcPending placeholders, run the comp eagerly when its guard fields are concrete, and let ArcPending propagate into the rest of the evaluator instead of materializing fields ahead of time.\" Will apply on the next amend (not amending here per the user\u0027s instructions).",
+      "parentUuid": "f649c4b3_3f9b350d",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0be100c_705c5232",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6de82eae_73785e58",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Will expand the explanation. The reason for the trim change: comprehensions used to appear as direct leaf conjuncts (`*adt.Comprehension`), so `trimv3.linkResolvers` matched them directly and walked their `Clauses` to install dependency links. With pushdown they no longer reach trim as leaf `*adt.Comprehension`s — they appear as `*Comprehension` decls inside a `*StructLit` leaf conjunct (the body wrapper). The patch detects this shape, walks the StructLit decls, and re-establishes the same per-clause links via `linkStructComprehension` so trim\u0027s reachability analysis is unchanged in outcome. Will add this paragraph to the commit message on next amend.",
+      "parentUuid": "e0be100c_705c5232",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a6b91ae_0a60f109",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-05-20T22:13:29Z",
       "side": 1,
       "message": "I do not see these changes in this commit. is this commit message outdated? please review it.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b165c82f_a84fa64d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Confirmed outdated. `cue/path.go` and `cue/types_test.go` are not in this commit — those changes landed in a separate later commit (\"cue: handle ArcPending and ArcNotPresent in fromArcType\"). Will drop the line from the message on next amend.",
+      "parentUuid": "8a6b91ae_0a60f109",
       "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -89,6 +143,42 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2b4a66c3_9e5efc08",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Acknowledged on coordination. The follow-up commits (defer fieldSetKnown / re-deref-in-lookup / cycle-on-cross-package-imports) sit on top of this one and address the unity regressions — happy to wait on the whole stack landing together.",
+      "parentUuid": "91bc2e6c_8a48b6ef",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce2b52e3_265b3b81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "91bc2e6c_8a48b6ef",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "d6f3ea49_36c51790",
         "filename": "cue/testdata/builtins/validators.txtar",
         "patchSetId": 15
@@ -100,6 +190,24 @@
       "writtenOn": "2026-05-20T22:13:29Z",
       "side": 1,
       "message": "nice fix!",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3df63e16_c9935d6a",
+        "filename": "cue/testdata/fulleval/005_conditional_field.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "The removed position is `./in.cue:20:2`, which previously pointed at the start of the `if` keyword of `if a \u003e 1`. Under field pushdown, the if-clause itself participated in dependency tracking and so its position was attached to the incomplete error alongside the field positions. With dependency pushdown the if-clause no longer surfaces as an independent dependency node — what we report incomplete on is the pending field `a` it depends on, and the positions in errors.txt now reflect only the dependent field (20:5) and its declaration (19:5). The change is correct.",
+      "parentUuid": "32154eaa_1a5e8220",
       "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -121,6 +229,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08bc20c4_e5d90d38",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Done — the NOTE was an evalv2 reference and is no longer load-bearing now that v2 is gone. Removed the comment in place.",
+      "parentUuid": "d15b804f_6ff42f4f",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50b06326_00547ddb",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Good catch — restored. Added `envs []*Environment` to `envYield` and reinstated the `addEnv` method so we don\u0027t allocate a closure per firing. `processComprehension` now passes `d.addEnv` directly and reads `d.envs`. Edited in place.",
+      "parentUuid": "20e35577_fb3e67c7",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6467b14f_6967df4c",
@@ -134,6 +278,24 @@
       "writtenOn": "2026-05-20T22:13:29Z",
       "side": 1,
       "message": "ValueClause.yield is now an empty body with a commented-out single line. If ValueClause is no longer reachable through this code path, please remove the type entirely; if it\u0027s still needed, the call should not be commented out. Same comment applies to `// ci.setOptionalV3(nil)` on line 103 — either drop or restore with rationale.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "171408a3_c15f25e9",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "`ValueClause` is still referenced in walk/dep/export/debug/compact for type-switching over Yielders, so removing the type entirely breaks those packages. Updated in place: replaced the commented-out one-liner with an empty body and a doc comment explaining that the yield path is unreachable in the dependency-tracking flow (clauses are walked statically, so a ValueClause never appears in a Comprehension.Clauses chain) and instructing future contributors to restore `s.yield(s.ctx.spawn(v.arc))` if dynamic chaining is reintroduced.",
+      "parentUuid": "6467b14f_6967df4c",
       "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -155,6 +317,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cda67bb5_41493c13",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Dropped the dead `// ci.setOptionalV3(nil)` line — the v3 marker no longer exists, so there\u0027s no TODO to keep. Edited in place.",
+      "parentUuid": "a99c01bd_f52ef645",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9520ce38_94b02e64",
@@ -168,6 +348,24 @@
       "writtenOn": "2026-05-20T22:13:29Z",
       "side": 1,
       "message": "should this last question be a TODO?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e445ee3f_a47dfc79",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Done — promoted the \"Relevant?\" to a proper TODO: \"does not add fields, but may add field conjuncts; confirm whether tracking dependencies here would yield any additional precision.\" Edited in place.",
+      "parentUuid": "9520ce38_94b02e64",
       "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -189,6 +387,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b3e97f0_0a805040",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "No — removed the commented-out `pushDownDeps(n, x.Value, )` call and rewrote the existing comment to make the intent explicit: \"A let within a comprehension can only be referred to within the comprehension. There is therefore no need to track its own dependencies. Intentionally no pushDownDeps call here.\" Edited in place.",
+      "parentUuid": "ff549f22_21b61e64",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75984f67_7cd0f52e",
@@ -202,6 +418,24 @@
       "writtenOn": "2026-05-20T22:13:29Z",
       "side": 1,
       "message": "I stil get the feeling like AI is being overly verbose with these sorts of inline comments. I would personally cut most of these to about half of their current length, unless you think that all of this info is useful.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1667ef3_15854f7c",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Agreed — trimmed to roughly half. The new comment: \"Force-finalize when a disjunct ancestor has a pushed-down comprehension awaiting cloning, so the clone\u0027s sibling lookup sees the disjunct\u0027s view.\" The deeper \"Nested disjunctions do not receive more conjuncts from later outer iterations\" justification didn\u0027t earn its space here. Edited in place.",
+      "parentUuid": "75984f67_7cd0f52e",
       "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -223,6 +457,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3522dc1e_77fb7d9e",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 1975,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Done — rewrote the doc comment to match the narrowed type: \"Value is the body struct yielded once per evaluation of the comprehension\u0027s clauses. With dependency-tracking pushdown, the compiler always lowers the body to a `*StructLit` (Fields and other declarations live inside it as decls), so this is no longer the polymorphic Node it once was.\" Also grepped for surviving `ToExpr(c.Value)` / `.(Expr)` call sites on `Comprehension.Value` and found none — every consumer reads it as `*StructLit` directly or via `.Value.Decls`. Edited in place.",
+      "parentUuid": "4be25cfe_df7da6d5",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9545af1f_c76c60bd",
@@ -236,6 +488,24 @@
       "writtenOn": "2026-05-20T22:13:29Z",
       "side": 1,
       "message": "TODO or delete entirely?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4438e99_5a5ec445",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Deleted — `ctx.rewriteComprehension(t)` no longer exists (removed in the pushdown refactor); the call was commented out as a leftover, not a TODO. Edited in place.",
+      "parentUuid": "9545af1f_c76c60bd",
       "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -257,6 +527,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a848c70e_6b2c5294",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Reworded. The first \"this\" was the task and the second \"this\" was the scheduler (i.e. the containing scheduler\u0027s node). New text: \"parentTasks are tasks that originate on a parent node but contribute fields to this node (e.g. a pushed-down comprehension on the parent whose body materializes arcs here). They must complete before this scheduler\u0027s own tasks can rely on the parent having finished adding fields to this node.\" Edited in place.",
+      "parentUuid": "185c1559_af1d1381",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ebbbdc4b_261ee16f",
@@ -270,6 +558,24 @@
       "writtenOn": "2026-05-20T22:13:29Z",
       "side": 1,
       "message": "what happened here? should we end up with two bullet points, still?",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61974fe0_0121b173",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "The first bullet (the completePending → lookup → process → handleParents path) is no longer reachable because completePending and pendingKnown were both removed in this CL. So only one trigger path remains. Rewrote as a single paragraph rather than a \"Two known trigger paths:\" list with one entry. Edited in place.",
+      "parentUuid": "ebbbdc4b_261ee16f",
       "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -291,6 +597,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d5b932a_4c03b50c",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Agreed — reverted to the original inline form `switch _, isError :\u003d v.(*Bottom); {`. The split was a stylistic regression with no semantic value. Edited in place.",
+      "parentUuid": "ba6b217e_7cba3ad2",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9de48b52_b7c59726",
@@ -308,6 +632,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c86e27c_e4f142dc",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Mostly stale — dropped the \"ensure not run if currently has a running task\" wording since the `!allTasksStarted(state)` guard already covers it. Replaced the TODO with a short comment explaining the intent of the guard: \"Drive the lookup target forward when its scheduler has not yet started everything; the !allTasksStarted guard keeps us out of nodes that are already mid-execution.\" Edited in place.",
+      "parentUuid": "9de48b52_b7c59726",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "820f1a7d_3d3b58d2",
@@ -321,6 +663,24 @@
       "writtenOn": "2026-05-20T22:13:29Z",
       "side": 1,
       "message": "`updateArcType(ArcNotPresent)` followed by `arc.ArcType \u003d ArcNotPresent` — why both? Looks like one is redundant, or `updateArcType` is silently no-op\u0027ing here.",
+      "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ba2628b_b59be807",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-21T15:06:14Z",
+      "side": 1,
+      "message": "Diagnosis: `updateArcType` is the silently no-op in this case. With `arc.ArcType \u003d\u003d ArcPending` (already checked above) and `t \u003d ArcNotPresent`, the function returns early at `if t \u003e\u003d v.ArcType` because ArcNotPresent\u0027s enum value (4) is greater than ArcPending\u0027s (3), i.e. ArcNotPresent is \"more restrictive\" per the enum order — so updateArcType refuses to widen back. The direct assignment was the actual change. Removed the no-op call and added a comment explaining why we have to bypass updateArcType here (no parent task is going to materialize this arc, so we force the transition). Edited in place.",
+      "parentUuid": "820f1a7d_3d3b58d2",
       "revId": "b0e804612cfe8c4e95cc5eae7c88b10d87c71e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -20,12 +20,15 @@ _shared: {
 
 #WrapsShared: _shared
 #WrapsConjunction: _shared & _hidden
+#WrapsConjunctionOfDisjunctions: ({h?: int} | int) & ({v?: int} | int)
 
 t01?: #WrapsHidden
 t02open?: _shared
 t02closed?: #WrapsShared
 t03closed?: #WrapsConjunction
 t03open?: _shared & _hidden
+t04closed?: #WrapsConjunctionOfDisjunctions
+t04open?: ({h?: int} | int) & ({v?: int} | int)
 
 -- datatest/testdata.cue --
 package datatest
@@ -59,6 +62,13 @@ conjunctionClosedExtra: {
 	data:  {t03closed: {h: 1, v: 1, extra: true}}
 	error: true
 }
+conjunctionOfDisjunctionsOpenExtra: {
+	data: {t04open: {h: 1, v: 1, extra: true}}
+}
+// BUG: this should reject the extra property.
+conjunctionOfDisjunctionsClosedExtra: {
+	data: {t04open: {h: 1, v: 1, extra: true}}
+}
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
@@ -70,6 +80,31 @@ conjunctionClosedExtra: {
 				type:                 "object"
 				additionalProperties: false
 				$ref:                 "#/$defs/_shared"
+			}]
+		}
+		WrapsConjunctionOfDisjunctions: {
+			allOf: [{
+				anyOf: [{
+					type: "object"
+					properties: {
+						v: {
+							type: "integer"
+						}
+					}
+				}, {
+					type: "integer"
+				}]
+			}, {
+				anyOf: [{
+					type: "object"
+					properties: {
+						h: {
+							type: "integer"
+						}
+					}
+				}, {
+					type: "integer"
+				}]
 			}]
 		}
 		WrapsHidden: {
@@ -117,6 +152,34 @@ conjunctionClosedExtra: {
 				$ref: "#/$defs/_shared"
 			}]
 		}
+		t04closed: {
+			$ref: "#/$defs/WrapsConjunctionOfDisjunctions"
+		}
+		t04open: {
+			allOf: [{
+				anyOf: [{
+					type: "object"
+					properties: {
+						v: {
+							type: "integer"
+						}
+					}
+				}, {
+					type: "integer"
+				}]
+			}, {
+				anyOf: [{
+					type: "object"
+					properties: {
+						h: {
+							type: "integer"
+						}
+					}
+				}, {
+					type: "integer"
+				}]
+			}]
+		}
 	}
 }
 -- out/generate-v3/hiddenValid --
@@ -128,7 +191,7 @@ conjunctionClosedExtra: {
 conjunctionClosedExtra.data.t03closed: invalid value {h:1,v:1,extra:true} (does not satisfy matchN): 1 matched, expected 2:
     1:88
     ./datatest/testdata.cue:29:21
-    1:573
+    1:792
 conjunctionClosedExtra.data.t03closed.extra: field not allowed:
     1:88
     ./datatest/testdata.cue:29:41
@@ -138,5 +201,7 @@ conjunctionClosedExtra.data.t03closed.h: field not allowed:
 conjunctionClosedExtra.data.t03closed.v: field not allowed:
     1:88
     ./datatest/testdata.cue:29:31
-    1:373
+    1:592
 -- out/generate-v3/conjunctionOpenExtra --
+-- out/generate-v3/conjunctionOfDisjunctionsClosedExtra --
+-- out/generate-v3/conjunctionOfDisjunctionsOpenExtra --

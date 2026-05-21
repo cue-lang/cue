@@ -22,6 +22,30 @@
       },
       "revId": "754bf19e2c013caa437b1683d95013853ac6e910",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e0b039a_670adb23",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-21T17:59:27Z",
+      "side": 1,
+      "message": "Technically yes, but I tried it and it makes things worse. I added a note to the commit message and to the code about this.",
+      "parentUuid": "a9f2f659_5ec6fc4a",
+      "range": {
+        "startLine": 399,
+        "startChar": 77,
+        "endLine": 399,
+        "endChar": 81
+      },
+      "revId": "754bf19e2c013caa437b1683d95013853ac6e910",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

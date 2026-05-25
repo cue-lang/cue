@@ -911,10 +911,10 @@ func (p *parser) parseField() (decl ast.Decl) {
 		if expr == nil {
 			expr = p.parseRHS()
 		}
-		if a, ok := expr.(*ast.Alias); ok {
-			p.errf(a.Pos(), `pre-v0.2 alias; use "let X = expr" instead`)
+		if _, isAlias := expr.(*ast.Alias); isAlias {
+			p.errorExpected(p.pos, "label or ':'")
 			p.consumeDeclComma()
-			return a
+			return &ast.BadDecl{From: pos, To: p.pos}
 		}
 		e := &ast.EmbedDecl{Expr: expr}
 		p.consumeDeclComma()
@@ -951,17 +951,15 @@ func (p *parser) parseField() (decl ast.Decl) {
 		fallthrough
 
 	case token.RBRACE, token.EOF:
-		if a, ok := expr.(*ast.Alias); ok {
-			p.errf(a.Pos(), `pre-v0.2 alias; use "let X = expr" instead`)
-			return a
-		}
-		switch tok {
-		case token.IDENT, token.LBRACK, token.LPAREN,
-			token.STRING, token.INTERPOLATION,
-			token.NULL, token.TRUE, token.FALSE,
-			token.FOR, token.IF, token.LET, token.IN,
-			token.TRY, token.ELSE, token.FALLBACK, token.OTHERWISE:
-			return &ast.EmbedDecl{Expr: expr}
+		if _, isAlias := expr.(*ast.Alias); !isAlias {
+			switch tok {
+			case token.IDENT, token.LBRACK, token.LPAREN,
+				token.STRING, token.INTERPOLATION,
+				token.NULL, token.TRUE, token.FALSE,
+				token.FOR, token.IF, token.LET, token.IN,
+				token.TRY, token.ELSE, token.FALLBACK, token.OTHERWISE:
+				return &ast.EmbedDecl{Expr: expr}
+			}
 		}
 		fallthrough
 

@@ -1313,12 +1313,12 @@ bar: 2
 		{
 			desc: "pre-v0.2 alias at top level",
 			in:   `X=3`,
-			out:  "X=3\npre-v0.2 alias; use \"let X = expr\" instead",
+			out:  "<*ast.BadDecl>\nexpected label or ':', found 'EOF'",
 		},
 		{
 			desc: "pre-v0.2 alias in struct",
 			in:   `a: { X={} }`,
-			out:  "a: {X={}}\npre-v0.2 alias; use \"let X = expr\" instead",
+			out:  "a: {<*ast.BadDecl>}\nexpected label or ':', found '}'",
 		},
 		{
 			desc: "postfix alias with experiment",

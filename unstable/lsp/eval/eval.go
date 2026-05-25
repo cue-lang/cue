@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// WARNING: THIS PACKAGE IS EXPERIMENTAL.
+// ITS API MAY CHANGE AT ANY TIME.
+//
 // Evaluator performs light-weight evaluation of CUE ASTs. It is used
 // in the LSP for "jump-to-definition" functionality, amongst
 // others. A path is either an [ast.Ident], or a CUE expression

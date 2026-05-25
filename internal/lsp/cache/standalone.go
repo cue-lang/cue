@@ -20,7 +20,7 @@ import (
 
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/eval"
+	"cuelang.org/go/unstable/lsp/eval"
 )
 
 // Standalone models cue files which cannot be placed within a

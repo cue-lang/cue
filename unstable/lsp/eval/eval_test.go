@@ -27,8 +27,8 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/eval"
 	"cuelang.org/go/internal/lsp/rangeset"
+	"cuelang.org/go/unstable/lsp/eval"
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )

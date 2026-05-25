@@ -26,7 +26,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/eval"
+	"cuelang.org/go/unstable/lsp/eval"
 )
 
 // Definition attempts to resolve the given position, within the file

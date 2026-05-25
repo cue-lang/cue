@@ -1311,6 +1311,16 @@ bar: 2
 			out: "\nparsing experiments for version \"v0.14.0\": cannot set experiment \"explicitopen\" before version v0.15.0",
 		},
 		{
+			desc: "pre-v0.2 alias at top level",
+			in:   `X=3`,
+			out:  "X=3\npre-v0.2 alias; use \"let X = expr\" instead",
+		},
+		{
+			desc: "pre-v0.2 alias in struct",
+			in:   `a: { X={} }`,
+			out:  "a: {X={}}\npre-v0.2 alias; use \"let X = expr\" instead",
+		},
+		{
 			desc: "postfix alias with experiment",
 			in: `@experiment(aliasv2)
 	a~X: {foo: 1}

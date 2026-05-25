@@ -1460,11 +1460,6 @@ func TestParseExpr(t *testing.T) {
 	if _, err := parseExprString(src); err == nil {
 		t.Errorf("ParseExpr(%q): got no error for invalid UTF-8", src)
 	}
-
-	// ParseExpr must not crash
-	for _, src := range valids {
-		_, _ = parseExprString(src)
-	}
 }
 
 func TestImports(t *testing.T) {

@@ -21,7 +21,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/eval"
+	"cuelang.org/go/unstable/lsp/eval"
 )
 
 // Rename implements the LSP Rename functionality.

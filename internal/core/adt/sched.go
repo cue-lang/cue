@@ -803,16 +803,30 @@ func runTask(t *task, mode runMode) {
 		t.state = taskCANCELLED
 		return
 	}
-	// Skip Comprehension tasks that were inherited onto an arc whose
-	// resolver already pointed back to an ancestor — see
-	// [nodeContext.hasAncestorCycle]. The comprehension is a duplicate of
-	// one running (or already run) at the ancestor it cycles back to;
-	// firing it here would re-enter the ancestor through that cyclic
-	// reference and recurse without bound. The structural cycle is still
-	// reported through [nodeContext.detectCycle].
-	if _, isComp := t.x.(*Comprehension); isComp && t.node.hasAncestorCycle {
-		t.state = taskSUCCESS
-		return
+	// Skip tasks whose evaluation must not cross an ancestor-cycle
+	// reference on this arc (see [nodeContext.hasAncestorCycle]):
+	//
+	//   - Comprehensions: a comprehension inherited onto a cycle arc
+	//     would re-enter the ancestor via the cyclic reference (its
+	//     for/if clauses look up children that themselves cycle back),
+	//     recursing without bound.
+	//   - Disjunctions: evaluating a disjunction here would resolve the
+	//     disjunct through the cyclic reference back into the same
+	//     disjunction's evaluation — the cross-disjunct cycle err1/err2
+	//     in [cue/testdata/disjunctions/edge.txtar] documents that this
+	//     must surface as an unresolved-disjunction error per the spec,
+	//     not as a successful resolution via the back-edge.
+	//
+	// Other task kinds (Resolver, StructLit body, Field, ListLit, etc.)
+	// contribute bounded structure or constraints that downstream lookups
+	// (e.g. `_self.foo`) need; they must still fire. The structural cycle
+	// is still reported through [nodeContext.detectCycle].
+	if t.node.hasAncestorCycle {
+		switch t.run {
+		case handleComprehension, handleDisjunctions:
+			t.state = taskSUCCESS
+			return
+		}
 	}
 	ctx := t.node.ctx
 	if ctx.LogEval > 0 {

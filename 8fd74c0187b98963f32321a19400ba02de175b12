@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2704e52_c0db10f2",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2026-05-26T13:38:20Z",
+      "side": 1,
+      "message": "`docComments` seems to be unused.",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 26,
+        "endChar": 12
+      },
+      "revId": "8fd74c0187b98963f32321a19400ba02de175b12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab9f605b_e45a14a8",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2026-05-26T13:38:20Z",
+      "side": 1,
+      "message": "Sometimes package comments are duplicated in each source file, especially in generated files.\nWe probably want to deduplicate those.",
+      "revId": "8fd74c0187b98963f32321a19400ba02de175b12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

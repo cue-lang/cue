@@ -41,21 +41,16 @@ nestedCross: open: {
 	D: {id: string} | {[string]: D}
 } @test(eq, {D: {id: string} | {}})
 
-// TODO(perf): support this case.  This is currently highly exponential.
-// The old evaluator solved this performance issue by simply ignoring equality
-// for patterns. This led to duplicate disjunctions and incorrect results.
+// TODO(perf): support this case.  This is currently exponential, although the
+// tight bound on the detection of structural cycles mitigates the situation.
 //
-// The new evaluator computes the correct result, but is highly exponential.
-// The solution is probably to limit structural cycle depth.
-//
-// An alternative would be to stop processing disjunctions if we see there are
-// more than two solutions. This might still result in exponential behavior,
-// but will limit it considerably.
+// An additional improvement would be to stop processing disjunctions if we see
+// there are more than two solutions.
 nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 	D: {id: {}} | {[string]: D}
 	D: {id: {}} | {[string]: D}
-} @test(eq, {D: {id: {}} | {id: {id: {}} | {}} | {}})
+} @test(eq, {D: {id: {}} | {}})
 -- out/eval/stats --
 Leaks:  13915
 Freed:  11162

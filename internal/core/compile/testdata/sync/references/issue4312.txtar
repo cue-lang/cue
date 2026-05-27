@@ -7,9 +7,20 @@ package p
 
 A=foo: "foo value"
 
-one_alias: A   @test(eq, "foo value")
-one_field: foo @test(eq, "foo value")
+one_alias: A
+one_field: foo
 -- two.cue --
 package p
 
-two_field: foo @test(eq, "foo value")
+two_field: foo
+-- out/compile --
+--- one.cue
+{
+  foo: "foo value"
+  one_alias: 〈0;foo〉
+  one_field: 〈0;foo〉
+}
+--- two.cue
+{
+  two_field: 〈0;foo〉
+}

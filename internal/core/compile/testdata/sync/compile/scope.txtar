@@ -1,0 +1,91 @@
+-- in.cue --
+a: {
+	{{
+		b
+		c
+		d: b
+		e: c
+	}}
+	c: {}
+} @test(eq, {d: {}, e: {}, c: {}})
+b: {}    @test(eq, {})
+s: "foo" @test(eq, "foo")
+c: s     @test(eq, "foo")
+
+// s is technically in a new struct here so it will have a one higher count than
+// the one before.
+d: [s]: 3 @test(eq, {["foo"]: 3})
+
+e: {} @test(eq, {}, hint="not the worst if this is not allowed")
+
+e & {
+	e: {}
+}
+
+p: {
+	{X=["foo"]: b: X | null}
+	{[Y="bar"]: b: Y}
+
+	@test(eq, {
+		["foo"]: b: null @test(final)
+		["bar"]: b: string
+	}, incorrect)
+	@test(eq:todo, {
+		["foo"]: b: null @test(final)
+		["bar"]: b: "bar"
+	})
+}
+
+let B = {open: int}
+f: B @test(eq, {open: int})
+
+schema: {
+	next: _schema_1 @test(err, code=structural_cycle)
+}
+
+let _schema_1 = schema
+-- out/compile --
+--- in.cue
+{
+  a: {
+    {
+      {
+        〈3;b〉
+        〈2;c〉
+        d: 〈3;b〉
+        e: 〈2;c〉
+      }
+    }
+    c: {}
+  }
+  b: {}
+  s: "foo"
+  c: 〈0;s〉
+  d: {
+    [〈1;s〉]: 3
+  }
+  e: {}
+  (〈0;e〉 & {
+    e: {}
+  })
+  p: {
+    {
+      ["foo"]: {
+        b: (〈1;(〈0;-〉)〉|null)
+      }
+    }
+    {
+      ["bar"]: {
+        b: 〈1;-〉
+      }
+    }
+  }
+  let B#1 = {
+    open: int
+  }
+  f: 〈0;let B#1〉
+  schema: {
+    next: 〈1;let _schema_1#2〉
+  }
+  let _schema_1#2 = 〈0;schema〉
+}

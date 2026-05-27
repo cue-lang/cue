@@ -1,0 +1,351 @@
+# Tests comprehensions with definitions that use incomplete boolean conditions,
+# including nested definition references and cross-struct comprehensions.
+# Issue #1732: comprehension with abstract bool condition in definitions causes
+# "incomplete bool" error propagation through nested structs.
+-- in.cue --
+package config
+
+networkingv1: {
+	metav1: {
+		#LabelSelector: {
+			matchLabels: {[string]: string}
+		}
+	}
+
+	#NetworkPolicy: {
+		spec: #NetworkPolicySpec
+	}
+
+	#NetworkPolicySpec: {
+		ingress: [...#NetworkPolicyIngressRule]
+		egress: [...#NetworkPolicyEgressRule]
+	}
+
+	#NetworkPolicyIngressRule: {
+		from: [...#NetworkPolicyPeer]
+	}
+
+	#NetworkPolicyEgressRule: {
+		to: [...#NetworkPolicyPeer]
+	}
+
+	#NetworkPolicyPeer: {
+		namespaceSelector: null | metav1.#LabelSelector
+	}
+}
+
+global_config: {
+	#GlobalConfig: {
+		auth0: {
+			enabled: bool
+		}
+	}
+}
+common: {
+	#SomeConfig: {
+		enabled: bool
+		if enabled {
+			foo: string
+		}
+		@test(err, code=incomplete, contains="incomplete bool", pos=[1:12])
+	}
+}
+
+foo: {
+	#Values: {
+		global: global_config.#GlobalConfig
+	}
+}
+
+#Config: R={
+	tenant: id: string
+
+	auth0: common.#SomeConfig & {
+		enabled: bool
+		if (enabled) {
+			foo: "\(tenant.id)-value"
+		}
+	}
+
+	charts: {
+		"foo": foo.#Values & {
+			global: R.global
+		}
+	}
+
+	global: global_config.#GlobalConfig & {
+		auth0: enabled: R.auth0.enabled
+	}
+}
+
+#NetworkPolicy: networkingv1.#NetworkPolicy
+
+#Flux: R={
+	#Config
+
+	charts: _
+
+	formatOutput: {...}
+
+	_outputs: {...}
+
+	for _chartName, _chartValues in charts {
+		_outputs: "\(_chartName)": {}
+	}
+
+	_outputs: {
+		for ns in ["ns"] {
+			"\(ns)/network": #NetworkPolicy & {
+				spec: {
+					ingress: [
+						{
+							from: [{
+								namespaceSelector: matchLabels: {
+									tenant: R.tenant.id
+								}
+							}]
+						},
+					]
+					egress: [
+						{
+							to: [{
+								namespaceSelector: matchLabels: {
+									tenant: R.tenant.id
+								}
+							}]
+						},
+					]
+				}
+			}
+		}
+	}
+
+	for ns in ["ns"] {
+		for k, v in _outputs {
+			formatOutput: "\(k)": v
+		}
+	}
+}
+@test(eq, {
+	networkingv1: {
+		metav1: {#LabelSelector: {matchLabels: {}}}
+		#NetworkPolicy: {spec: {ingress: [], egress: []}}
+		#NetworkPolicySpec: {ingress: [], egress: []}
+		#NetworkPolicyIngressRule: {from: []}
+		#NetworkPolicyEgressRule: {to: []}
+		#NetworkPolicyPeer: {
+			namespaceSelector: null | {matchLabels: {}}
+		}
+	}
+	global_config: {
+		#GlobalConfig: {auth0: {enabled: bool}}
+	}
+	common: {#SomeConfig: {_|_, enabled: bool}}
+	foo: {
+		#Values: {global: {auth0: {enabled: bool}}}
+	}
+	#Config: {
+		tenant: {id: string}
+		auth0: {_|_, enabled: bool}
+		charts: {
+			foo: {
+				global: {
+					auth0: {
+						enabled: _|_ @test(err, code=incomplete, contains="#Config.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+					}
+				}
+			}
+		}
+		global: {
+			auth0: {
+				enabled: _|_ @test(err, code=incomplete, contains="#Config.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+			}
+		}
+	}
+	#NetworkPolicy: {spec: {ingress: [], egress: []}}
+	#Flux: {
+		charts: {
+			foo: {global: {auth0: {enabled: bool}}}
+		}
+		formatOutput: {
+			foo: {}
+			"ns/network": {
+				spec: {
+					ingress: [{
+						from: [{
+							namespaceSelector: {matchLabels: {tenant: string}}
+						}]
+					}]
+					egress: [{
+						to: [{
+							namespaceSelector: {matchLabels: {tenant: string}}
+						}]
+					}]
+				}
+			}
+		}
+		_outputs$config: {
+			foo: {}
+			"ns/network": {
+				spec: {
+					ingress: [{
+						from: [{
+							namespaceSelector: {matchLabels: {tenant: string}}
+						}]
+					}]
+					egress: [{
+						to: [{
+							namespaceSelector: {matchLabels: {tenant: string}}
+						}]
+					}]
+				}
+			}
+		}
+		tenant: {id: string}
+		auth0: {_|_, enabled: bool}
+		global: {
+			auth0: {
+				enabled: _|_ @test(err, code=incomplete, contains="#Flux.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+			}
+		}
+	}
+})
+-- out/compile --
+--- in.cue
+{
+  networkingv1: {
+    metav1: {
+      #LabelSelector: {
+        matchLabels: {
+          [string]: string
+        }
+      }
+    }
+    #NetworkPolicy: {
+      spec: 〈1;#NetworkPolicySpec〉
+    }
+    #NetworkPolicySpec: {
+      ingress: [
+        ...〈2;#NetworkPolicyIngressRule〉,
+      ]
+      egress: [
+        ...〈2;#NetworkPolicyEgressRule〉,
+      ]
+    }
+    #NetworkPolicyIngressRule: {
+      from: [
+        ...〈2;#NetworkPolicyPeer〉,
+      ]
+    }
+    #NetworkPolicyEgressRule: {
+      to: [
+        ...〈2;#NetworkPolicyPeer〉,
+      ]
+    }
+    #NetworkPolicyPeer: {
+      namespaceSelector: (null|〈1;metav1〉.#LabelSelector)
+    }
+  }
+  global_config: {
+    #GlobalConfig: {
+      auth0: {
+        enabled: bool
+      }
+    }
+  }
+  common: {
+    #SomeConfig: {
+      enabled: bool
+      if 〈0;enabled〉 {
+        foo: string
+      }
+    }
+  }
+  foo: {
+    #Values: {
+      global: 〈2;global_config〉.#GlobalConfig
+    }
+  }
+  #Config: {
+    tenant: {
+      id: string
+    }
+    auth0: (〈1;common〉.#SomeConfig & {
+      enabled: bool
+      if 〈0;enabled〉 {
+        foo: "\(〈2;tenant〉.id)-value"
+      }
+    })
+    charts: {
+      foo: (〈2;foo〉.#Values & {
+        global: 〈3〉.global
+      })
+    }
+    global: (〈1;global_config〉.#GlobalConfig & {
+      auth0: {
+        enabled: 〈3〉.auth0.enabled
+      }
+    })
+  }
+  #NetworkPolicy: 〈0;networkingv1〉.#NetworkPolicy
+  #Flux: {
+    〈1;#Config〉
+    charts: _
+    formatOutput: {
+      ...
+    }
+    _outputs(:config): {
+      ...
+    }
+    for _chartName, _chartValues in 〈0;charts〉 {
+      _outputs(:config): {
+        "\(〈2;_chartName(:config)〉)": {}
+      }
+    }
+    _outputs(:config): {
+      for _, ns in [
+        "ns",
+      ] {
+        "\(〈1;ns〉)/network": (〈4;#NetworkPolicy〉 & {
+          spec: {
+            ingress: [
+              {
+                from: [
+                  {
+                    namespaceSelector: {
+                      matchLabels: {
+                        tenant: 〈12〉.tenant.id
+                      }
+                    }
+                  },
+                ]
+              },
+            ]
+            egress: [
+              {
+                to: [
+                  {
+                    namespaceSelector: {
+                      matchLabels: {
+                        tenant: 〈12〉.tenant.id
+                      }
+                    }
+                  },
+                ]
+              },
+            ]
+          }
+        })
+      }
+    }
+    for _, ns in [
+      "ns",
+    ] {
+      for k, v in 〈2;_outputs(:config)〉 {
+        formatOutput: {
+          "\(〈2;k〉)": 〈2;v〉
+        }
+      }
+    }
+  }
+}

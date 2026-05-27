@@ -13,17 +13,6 @@ explicit error (_|_ literal) in source:
     ./in.cue:1:10
 [user] explicit error (_|_ literal) in source:
     ./in.cue:2:11
--- out/compile --
---- in.cue
-{
-  a: (_|_(explicit error (_|_ literal) in source) & _|_(explicit error (_|_ literal) in source))
-  b: (null & _|_(explicit error (_|_ literal) in source))
-  c: (〈0;b〉.a == _|_(explicit error (_|_ literal) in source))
-  d: (_|_(explicit error (_|_ literal) in source) != 〈0;b〉.a)
-  e: (_|_(explicit error (_|_ literal) in source) == _|_(explicit error (_|_ literal) in source))
-  f: (({} & false) == _|_(explicit error (_|_ literal) in source))
-  g: (_|_(explicit error (_|_ literal) in source) != ({} & false))
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  10

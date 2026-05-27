@@ -13,9 +13,3 @@ noExpOr:  true  || _|_  @test(err, code=user, contains="explicit error (_|_ lite
     ./in.cue:3:20
 [user] explicit error (_|_ literal) in source:
     ./in.cue:4:20
--- out/compile --
---- in.cue
-{
-  noExpAnd: (false && _|_(explicit error (_|_ literal) in source))
-  noExpOr: (true || _|_(explicit error (_|_ literal) in source))
-}

@@ -6,19 +6,6 @@ raw: true
 		{a: 1} | {b: 1}
 	}
 }
--- out/compile --
---- in.cue
-{
-  {
-    if false {
-      ({
-        a: 1
-      }|{
-        b: 1
-      })
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  1

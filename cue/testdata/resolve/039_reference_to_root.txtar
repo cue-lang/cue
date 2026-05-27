@@ -34,34 +34,6 @@ wp: v & {b: 100}   @test(eq, {b: 100, c: _|_})
 [incomplete] wp.c: non-concrete value int in operand to +:
     ./in.cue:15:5
     ./in.cue:14:5
--- out/compile --
---- in.cue
-{
-  a: {
-    b: int
-  }
-  c: (〈0;a〉 & {
-    b: 100
-    d: (〈1;a〉.b + 3)
-  })
-  x: {
-    b: int
-    c: (〈0;b〉 + 5)
-  }
-  y: (〈0;x〉 & {
-    b: 100
-  })
-  v: {
-    b: int
-    c: (〈1;v〉.b + 5)
-  }
-  w: (〈0;v〉 & {
-    b: 100
-  })
-  wp: (〈0;v〉 & {
-    b: 100
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  21

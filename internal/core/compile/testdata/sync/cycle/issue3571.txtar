@@ -1,0 +1,106 @@
+# evalv3 incorrectly reports a structural cycle error for a CUE definition that
+# validates correctly under evalv2, representing a regression in cycle detection.
+# https://cuelang.org/issue/3571
+-- in.cue --
+// These tests should NOT have structural cycles.
+simplified: {
+	#T
+	in: _
+	x: #T
+	x: x: #T
+
+	#T: {
+		in: x
+		x: _
+	}
+
+	@test(eq, {
+		in: {x: {in: _, x: _}, in: {in: _, x: _}}
+		x: {x: {in: _, x: _}, in: {in: _, x: _}}
+		#T: {in: _, x: _}
+	})
+}
+
+issue3571: {
+	a: #T
+	a: in: f: true
+	a: #in: {
+		g: #T
+		g: #in: f: #T
+		g: #in: f: #in: x: true
+		f?: _
+	}
+
+	#T: {
+		in:  #in
+		#in: _
+	}
+
+	@test(eq, {
+		a: {
+			in: {
+				f: true
+				g: {
+					#in: {f: {#in: {x: true}, in: {x: true}}}
+					in: {f: {#in: {x: true}, in: {x: true}}}
+				}
+			}
+			#in: {
+				g: {
+					#in: {f: {#in: {x: true}, in: {x: true}}}
+					in: {f: {#in: {x: true}, in: {x: true}}}
+				}
+				f?: _
+			}
+		}
+		#T: {in: _, #in: _}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  simplified: {
+    〈0;#T〉
+    in: _
+    x: 〈0;#T〉
+    x: {
+      x: 〈1;#T〉
+    }
+    #T: {
+      in: 〈0;x〉
+      x: _
+    }
+  }
+  issue3571: {
+    a: 〈0;#T〉
+    a: {
+      in: {
+        f: true
+      }
+    }
+    a: {
+      #in: {
+        g: 〈2;#T〉
+        g: {
+          #in: {
+            f: 〈4;#T〉
+          }
+        }
+        g: {
+          #in: {
+            f: {
+              #in: {
+                x: true
+              }
+            }
+          }
+        }
+        f?: _
+      }
+    }
+    #T: {
+      in: 〈0;#in〉
+      #in: _
+    }
+  }
+}

@@ -1,0 +1,30 @@
+# Tests that a default disjunct which embeds a struct referencing a sibling
+# field, combined with an if-comprehension gated on a default boolean, does
+# not panic. See: https://cuelang.org/issue/4339
+-- in.cue --
+_withExtra: extra: out.one
+
+out: {
+	*_withExtra | {}
+
+	one: 1
+
+	enable: *true | false
+	if enable {}
+} @test(eq,
+	// TODO: we should be able to use @test(final) here, avoiding the defaults.
+	*{one: 1, enable: *true | false, extra: 1} | {one: 1, enable: *true | false},
+)
+-- out/compile --
+--- in.cue
+{
+  _withExtra: {
+    extra: 〈1;out〉.one
+  }
+  out: {
+    (*〈1;_withExtra〉|{})
+    one: 1
+    enable: (*true|false)
+    if 〈0;enable〉 {}
+  }
+}

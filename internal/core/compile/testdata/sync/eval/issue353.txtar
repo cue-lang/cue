@@ -1,0 +1,36 @@
+# Tests that unifying a value with a definition that embeds a disjunction
+# correctly retains both disjunction branches after concretizing some fields.
+# Issue: after setting e.a = "hello" the two-branch disjunction (one with
+# value?, one with externalValue?) should survive intact.
+# https://cuelang.org/issue/353
+-- in.cue --
+e: #Example
+e: {
+	a: "hello"
+	@test(eq, {a: "hello", value?: string} | {a: "hello", externalValue?: string})
+}
+
+#Example: {
+	a: string
+	{
+		value?: string
+	} | {
+		externalValue?: string
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  e: 〈0;#Example〉
+  e: {
+    a: "hello"
+  }
+  #Example: {
+    a: string
+    ({
+      value?: string
+    }|{
+      externalValue?: string
+    })
+  }
+}

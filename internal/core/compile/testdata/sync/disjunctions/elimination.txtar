@@ -1,0 +1,2480 @@
+// Ensure that disjunction elimination is not done prematurely.
+
+// Issue #651
+-- in.cue --
+import "struct"
+
+// Closedness checks should not be triggered too early, or with an improper
+// subset of StructInfos. Blindly finalizing partial disjuncts will end up
+// doing a closedness check with not all embeddings present, which can lead to
+// a field being rejected prematurely.
+//
+// It should be recursively disabled.
+disambiguateClosed: {
+	b: #Def & a
+	a: #Def
+	#Def: {{x: true} | {y: true}}
+	@test(eq, {
+		b: {x: true} | {y: true}
+		a: {x: true} | {y: true}
+		#Def: {x: true} | {y: true}
+	})
+}
+
+// Checks should never be disabled for field matching.
+alwaysCheckMatchers1: {
+	b: {[=~"^xxxx$"]: int} | null
+	b: {c:            string} | null
+	b: c: "yyyyy"
+	@test(eq, {b: {c: "yyyyy"}})
+}
+
+alwaysCheckPatterns2: {
+	a: #X
+	a: b
+
+	b: #X
+	b: c: "yyyyy"
+
+	#X: string | {
+		c: string
+		{[=~"^xxxx$"]: int}
+	}
+	@test(eq, {
+		a: {c: "yyyyy"}
+		b: {c: "yyyyy"}
+		#X: string | {c: string}
+	})
+}
+
+nestedNonMonotonic: resolved: n1: {
+	x: {a:    struct.MinFields(2)} | null
+	x: {a: c: 1} | null
+	x: {a: d: 1} | null
+	@test(eq, {x: {a: {c: 1, d: 1}} | null})
+}
+
+nestedNonMonotonic: resolved: n2: {
+	x: {a: b:    struct.MinFields(2)} | null
+	x: {a: b: c: 1} | null
+	x: {a: b: d: 1} | null
+	@test(eq, {x: {a: {b: {c: 1, d: 1}}} | null})
+}
+
+nestedNonMonotonic: eliminated: n1: p1: {
+	x: {a:    struct.MaxFields(1)} | null
+	x: {a: c: 1} | null
+	x: {a: d: 1} | null
+	@test(eq, {x: null})
+}
+
+nestedNonMonotonic: eliminated: n1: p2: {
+	x: {a: c: 1} | null
+	x: {a:    struct.MaxFields(1)} | null
+	x: {a: d: 1} | null
+	@test(eq, {x: null})
+}
+
+nestedNonMonotonic: eliminated: n1: p2: {
+	x: {a: c: 1} | null
+	x: {a: d: 1} | null
+	x: {a:    struct.MaxFields(1)} | null
+	// TODO: Should be p3, fix.
+}
+
+nestedNonMonotonic: eliminated: n2: p1: {
+	x: {a: b:    struct.MaxFields(1)} | null
+	x: {a: b: c: 1} | null
+	x: {a: b: d: 1} | null
+	@test(eq, {x: null})
+}
+
+nestedNonMonotonic: eliminated: n2: p2: {
+	x: {a: b: c: 1} | null
+	x: {a: b:    struct.MaxFields(1)} | null
+	x: {a: b: d: 1} | null
+	@test(eq, {x: null})
+}
+
+nestedNonMonotonic: eliminated: n2: p2: {
+	x: {a: b: c: 1} | null
+	x: {a: b: d: 1} | null
+	x: {a: b:    struct.MaxFields(1)} | null
+	// TODO: should be p3
+}
+
+// TODO: should be incomplete.
+nestedNonMonotonic: incomplete: a: n1: p1: {
+	x: {a:    struct.MinFields(2)} | null
+	x: {a: c: 1} | null
+	@test(eq, {x: null})
+	@test(eq:todo, {x: {a: {c: 1} & struct.MinFields(2)} | null})
+}
+
+// TODO: should be incomplete.
+nestedNonMonotonic: incomplete: a: n1: p2: {
+	x: {a: c: 1} | null
+	x: {a:    struct.MinFields(2)} | null
+	@test(eq, {x: null})
+	@test(eq:todo, {x: {a: {c: 1} & struct.MinFields(2)} | null})
+}
+
+nestedNonMonotonic: incomplete: a: n2: p1: {
+	x: {a: b:    struct.MinFields(2)} | null
+	x: {a: b: c: 1} | null
+	@test(eq, {x: {a: {b: {c: 1}}} | null})
+}
+
+nestedNonMonotonic: incomplete: a: n2: p2: {
+	x: {a: b: c: 1} | null
+	x: {a: b:    struct.MinFields(2)} | null
+	@test(eq, {x: {a: {b: {c: 1}}} | null})
+}
+
+nestedNonMonotonic: incomplete: b: n1: p1: {
+	x: {a:    struct.MinFields(3)} | null
+	x: {a: c: 1} | null
+	x: {a: d: 1} | null
+	@test(eq, {x: null})
+}
+
+nestedNonMonotonic: incomplete: b: n1: p2: {
+	x: {a: c: 1} | null
+	x: {a:    struct.MinFields(3)} | null
+	x: {a: d: 1} | null
+	@test(eq, {x: null})
+}
+
+nestedNonMonotonic: incomplete: b: n1: p3: {
+	x: {a: c: 1} | null
+	x: {a: d: 1} | null
+	x: {a:    struct.MinFields(3)} | null
+	@test(eq, {x: null})
+}
+
+nestedNonMonotonic: incomplete: b: n2: p1: {
+	x: {a: b:    struct.MinFields(3)} | null
+	x: {a: b: c: 1} | null
+	x: {a: b: d: 1} | null
+	@test(eq, {x: {a: {b: {c: 1, d: 1}}} | null})
+}
+
+nestedNonMonotonic: incomplete: b: n2: p1: {
+	x: {a: b: c: 1} | null
+	x: {a: b:    struct.MinFields(3)} | null
+	x: {a: b: d: 1} | null
+	@test(eq) // TODO: rename to p2
+}
+
+nestedNonMonotonic: incomplete: b: n2: p1: {
+	x: {a: b: c: 1} | null
+	x: {a: b: d: 1} | null
+	x: {a: b:    struct.MinFields(3)} | null
+	@test(eq, {x: {a: {b: {c: 1, d: 1}}} | null}) // TODO: rename to p3
+}
+
+preserveClosedness: small: p1: {
+	#A: #B & {a: string}
+	#B: {
+		*{} | {a: string}
+		*{} | {b: int}
+	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, b: int}
+		#B: *{} | {b: int} | {a: string} | {a: string, b: int}
+	})
+}
+
+preserveClosedness: small: p2: {
+	#A: #B & {a: string}
+	#B: {
+		{a: string} | *{}
+		*{} | {b: int}
+	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, b: int}
+		#B: *{} | {a: string, b: int} | {a: string} | {b: int}
+	})
+}
+
+preserveClosedness: medium: p1: {
+	#A: #B & {a: string}
+	#B: {
+		*{} | {a: string} | {b: string}
+		*{} | {c: int} | {d: string}
+	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, c: int} | {a: string, d: string}
+		#B: *{} | {c: int} | {d: string} | {a: string} | {a: string, c: int} | {a: string, d: string} | {b: string} | {b: string, c: int} | {b: string, d: string}
+	})
+}
+
+preserveClosedness: medium: p2: {
+	#A: #B & {a: string}
+	#B: {
+		{a: string} | *{} | {b: string}
+		*{} | {c: int} | {d: string}
+	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, c: int} | {a: string, d: string}
+		#B: *{} | {a: string, c: int} | {a: string, d: string} | {a: string} | {c: int} | {d: string} | {b: string} | {b: string, c: int} | {b: string, d: string}
+	})
+}
+
+preserveClosedness: medium: p3: {
+	#A: #B & {a: string}
+	#B: {
+		{a: string} | {b: string} | *{}
+		*{} | {c: int} | {d: string}
+	}
+	@test(eq, {
+		#A: *{a: string} | {a: string, c: int} | {a: string, d: string}
+		#B: *{} | {a: string, c: int} | {a: string, d: string} | {b: string} | {b: string, c: int} | {b: string, d: string} | {a: string} | {c: int} | {d: string}
+	})
+}
+
+// If an error occurred in the last disjunction, it may sometimes be propagated
+// to parent nodes. This, in turn, could lead to references to such field
+// to fail with that error.
+noChildError: _
+noChildError: issue1608: {
+	myValue: #type & {fieldName: "some string"}
+	#type: fieldName: #subtype
+
+	#subtype: string | {foo: string} | {bar: #subtype}
+	@test(eq, {
+		myValue: {fieldName: "some string"}
+		#type: {fieldName: string | {foo: string}}
+		#subtype: string | {foo: string}
+	})
+}
+
+noChildError: t1: {
+	#D: {b: string} | {c: #D }
+	o: #D & {b: "test"}
+	@test(eq, {#D: {b: string}, o: {b: "test"}})
+}
+
+noChildError: t2: {
+	o: #D & {b: "test"}
+	#D: {b: string} | {c: #D }
+	@test(eq, {o: {b: "test"}, #D: {b: string}})
+}
+
+noChildError: t3: {
+	#D: {a: null} | {b: string} | {c: #D }
+	o: #D & {b: "test"}
+	@test(eq, {
+		#D: {a: null} | {b: string}
+		o: {b: "test"}
+	})
+}
+
+noChildError: t4: {
+	o: #D & {b: "test"}
+	#D: {a: null} | {b: string} | {c: #D }
+	@test(eq, {
+		o: {b: "test"}
+		#D: {a: null} | {b: string}
+	})
+}
+
+
+issue1924: t1: {
+	m: a: 2
+	x: *[m.b] | 2
+	@test(eq, {m: {a: 2}, x: 2})
+}
+issue1924: t2: {
+	m: a: 2
+	x: *{v: m.b} | 3
+	@test(eq, {m: {a: 2}, x: 3})
+}
+issue1924: t3: {
+	m: a: 2
+	x: *m.b | 1
+	@test(eq, {m: {a: 2}, x: 1})
+}
+
+// should eliminate erroneous comprehension and pass
+issue1838: t1: {
+	p?: []
+	a: [for k in p {k}] | null
+	@test(eq, {p?: [], a: null})
+}
+issue1838: t2: {
+	p?: []
+	a: null | [for k in p {k}]
+	@test(eq, {p?: [], a: null})
+}
+
+noHang: {
+	// This should terminate.
+	#T: ["a", #T] | ["d", ...#T]
+
+	x: #T
+
+	#X: x
+	#X: #T
+	@test(eq, {#T: ["d"], x: ["d"], #X: ["d"]})
+}
+
+issue1940: {
+	#T: ["a", #T] | ["b", #T] | ["c", #T] | ["d", [...#T]]
+
+	#A: type: #T
+
+	#B: [string]: #A
+
+	#C: #B & {
+		x: #A
+	}
+	@test(eq, {
+		#T: ["d", []]
+		#A: {type: ["d", []]}
+		#B: {}
+		#C: {x: {type: ["d", []]}}
+	})
+}
+
+-- issue2209full.cue --
+// Evaluator 0.5 regression where disjunctions combined with comprehensions
+// produced incorrect results or spurious errors.
+// https://cuelang.org/issue/2209
+// TODO: fix
+
+issue2209: simplified: t1: {
+	#SpecFoo: foo: min: 1
+	#SpecBar: bar: min: 1
+	spec: bar: {}
+	spec:  #SpecFoo | #SpecBar
+	out: {
+		{nullFoo: null} | {nullBar: null}
+		{minFoo: int} | {minBar: int}
+		if X.bar != _|_ {
+			minBar: X.bar.min
+		}
+		X: spec
+	}
+	@test(eq, {
+		#SpecFoo: {foo: {min: 1}}
+		#SpecBar: {bar: {min: 1}}
+		spec: {bar: {min: 1}}
+		out: {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullFoo: null
+			minFoo: int
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullFoo: null
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullBar: null,
+			minFoo: int
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullBar: null
+		}
+	})
+}
+
+issue2209: simplified: t2: {
+	#SpecFoo: foo: {}
+	#SpecBar: bar: x: 1
+	spec: bar: {}
+	spec: *#SpecFoo | #SpecBar
+	if spec.bar != _|_ {
+		BAZ: spec.bar.x
+	}
+	{f1: int} | {b2: int}
+	{f2: int} | {b2: int}
+	@test(eq, {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		f1: int
+		f2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		f1: int
+		b2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		b2: int
+		f2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		b2: int
+	})
+}
+
+// This test fails for 0.4 and 0.5.
+issue2209: simplified: t3: {
+	#A: v: 1
+	{f1: int} | {b2: int}
+	{f2: int} | {b2: int}
+	BAZ: S.y
+	S: *#A | #B
+	#B: {x: 1, y: 1}
+	S: x: 1
+	@test(eq, {
+		#A: {v: 1}
+		BAZ: 1
+		S: {x: 1, y: 1}
+		#B: {x: 1, y: 1}
+		f1: int
+		f2: int
+	} | {
+		#A: {v: 1}
+		BAZ: 1
+		S: {x: 1, y: 1}
+		#B: {x: 1, y: 1}
+		f1: int
+		b2: int
+	} | {
+		#A: {v: 1}
+		BAZ: 1
+		S: {x: 1, y: 1}
+		#B: {x: 1, y: 1}
+		b2: int
+		f2: int
+	} | {
+		#A: {v: 1}
+		BAZ: 1
+		S: {x: 1, y: 1}
+		#B: {x: 1, y: 1}
+		b2: int
+	})
+}
+
+issue2209: full: {
+	Foo: #Abstract & {spec: foo: {}}
+	@test(shareID=FooSpec, at=Foo.spec)
+	@test(shareID=FooSpec, at=Foo.resource._X.spec)
+	@test(eq, at=Foo, {
+		spec: {foo: {min: *10 | int, max: *20 | int}}
+		resource: {
+			_X: spec: {foo: {min: *10 | int, max: *20 | int}}
+			spec: *{
+				minFoo: *10 | int
+				maxFoo: *20 | int
+				minBar?: null
+				maxBar?: null
+				hoge?: null | bool
+				fuga?: null
+			} | {
+				minFoo: *10 | int
+				maxFoo: *20 | int
+				minBar?: null
+				maxBar?: null
+				hoge?: null
+				fuga?: null | bool
+			}
+		}
+	})
+
+	Bar: #Abstract & {spec: bar: {}}
+	@test(shareID=BarSpec, at=Bar.spec)
+	@test(shareID=BarSpec, at=Bar.resource._X.spec)
+
+	#Abstract: X={
+		spec: _#Spec
+
+		resource: _Thing & {_X: spec: X.spec}
+	}
+
+	_#Spec: *_#SpecFoo | _#SpecBar
+
+	_#SpecFoo: {
+		foo: {
+			min: int | *10
+			max: int | *20
+		}
+	}
+
+	_#SpecBar: {
+		bar: {
+			min: int | *30
+			max: int | *40
+		}
+	}
+
+	_Thing: #Constrained & {
+		_X: _
+
+		spec: {
+			if _X.spec.foo != _|_ {
+				minFoo: _X.spec.foo.min
+				maxFoo: _X.spec.foo.max
+			}
+
+			if _X.spec.bar != _|_ {
+				minBar: _X.spec.bar.min
+				maxBar: _X.spec.bar.max
+			}
+		}
+	}
+
+	#Constrained: #Base & {
+		spec: {
+			minFoo:  int | *10
+			maxFoo:  int | *20
+			minBar?: null
+			maxBar?: null
+		} | {
+			minBar:  int | *30
+			maxBar:  int | *40
+			minFoo?: null
+			maxFoo?: null
+		}
+
+		spec: *{
+			fuga?: null
+		} | {
+			hoge?: null
+		}
+	}
+
+	#Base: {
+		spec: {
+			minFoo?: null | int
+			maxFoo?: null | int
+			minBar?: null | int
+			maxBar?: null | int
+
+			hoge?: null | bool
+			fuga?: null | bool
+		}
+	}
+
+	@test(eq, at=Bar, {
+		spec: {bar: {min: *30 | int, max: *40 | int}}
+		resource: {
+			_X: spec: {bar: {min: *30 | int, max: *40 | int}}
+			spec: *{
+				minFoo?: null
+				maxFoo?: null
+				minBar: *30 | int
+				maxBar: *40 | int
+				hoge?: null | bool
+				fuga?: null
+			} | {
+				minFoo?: null
+				maxFoo?: null
+				minBar: *30 | int
+				maxBar: *40 | int
+				hoge?: null
+				fuga?: null | bool
+			}
+		}
+	})
+	// 	#Abstract: {
+	// 		spec: *{
+	// 			foo: {min: *10 | int, max: *20 | int}
+	// 		} | {
+	// 			bar: {min: *30 | int, max: *40 | int}
+	// 		}
+	// 		resource: {
+	// 			_X: {
+	// 				spec: *{
+	// 					foo: {min: *10 | int, max: *20 | int}
+	// 					} | {
+	// 						bar: {min: *30 | int, max: *40 | int}
+	// 					}
+	// 			}
+	// 			spec: *{
+	// 				minFoo: *10 | int
+	// 				maxFoo: *20 | int
+	// 				minBar?: null
+	// 				maxBar?: null
+	// 				hoge?: null | bool
+	// 				fuga?: null
+	// 			} | {
+	// 				minFoo: *10 | int
+	// 				maxFoo: *20 | int
+	// 				minBar?: null
+	// 				maxBar?: null
+	// 				hoge?: null
+	// 				fuga?: null | bool
+	// 			}
+	// 		}
+	// 	}
+	// 	_#Spec: *{
+	// 		foo: {min: *10 | int, max: *20 | int}
+	// 	} | {
+	// 		bar: {min: *30 | int, max: *40 | int}
+	// 	}
+	// 	_#SpecFoo: {foo: {min: *10 | int, max: *20 | int}}
+	// 	_#SpecBar: {bar: {min: *30 | int, max: *40 | int}}
+	// 	_Thing: {
+	// 		_X: _
+	// 		spec: *{
+	// 			minFoo: *10 | int
+	// 			maxFoo: *20 | int
+	// 			minBar?: null
+	// 			maxBar?: null
+	// 			hoge?: null | bool
+	// 			fuga?: null
+	// 		} | *{
+	// 			minFoo?: null
+	// 			maxFoo?: null
+	// 			minBar: *30 | int
+	// 			maxBar: *40 | int
+	// 			hoge?: null | bool
+	// 			fuga?: null
+	// 		} | {
+	// 			minFoo: *10 | int
+	// 			maxFoo: *20 | int
+	// 			minBar?: null
+	// 			maxBar?: null
+	// 			hoge?: null
+	// 			fuga?: null | bool
+	// 		} | {
+	// 			minFoo?: null
+	// 			maxFoo?: null
+	// 			minBar: *30 | int
+	// 			maxBar: *40 | int
+	// 			hoge?: null
+	// 			fuga?: null | bool}
+	// 	}
+	// 	#Constrained: {
+	// 		spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | *{minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null | bool, fuga?: null
+	// 		} | {
+	// 			minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool
+	// 		} | {
+	// 			minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null, fuga?: null | bool}
+	// 	}
+	// 	#Base: {
+	// 		spec: {
+	// 			minFoo?: null | int
+	// 			maxFoo?: null | int
+	// 			minBar?: null | int
+	// 			maxBar?: null | int
+	// 			hoge?: null | bool
+	// 			fuga?: null | bool
+	// 		}
+	// 	}
+	// })
+}
+
+
+-- issue2246.cue --
+// Evaluator regression where repeated use of an embedded disjunction resulted
+// in spurious "field not allowed" errors.
+// https://cuelang.org/issue/2246
+issue2246: simplified: {
+	#FormFoo: fooID: string
+	#FormBar: barID: string
+	#Form: { #FormFoo | #FormBar }
+
+	data: {fooID: "123"}
+	out1: #Form & data
+	out2: #Form & out1
+	@test(eq, {
+		#FormFoo: {fooID: string}
+		#FormBar: {barID: string}
+		#Form: {fooID: string} | {barID: string}
+		data: {fooID: "123"}
+		out1: {fooID: "123"}
+		out2: {fooID: "123"}
+	})
+}
+issue2246: full: {
+	data: forms: [{
+		fooID: "00-0000001"
+	}]
+
+	form1040: (#compute & {in: data}).out
+
+	#K1: {
+		#_base: common: 3
+		#FormFoo: {
+			#_base
+			fooID: string
+		}
+		#FormBar: {
+			#_base
+			barID: string
+		}
+		#Form: {
+			#FormFoo | #FormBar
+		}
+	}
+
+	#Input: {
+		forms: [...#K1.#Form]
+	}
+
+	#summarizeReturn: {
+		in:  #Input
+		out: [for k in in.forms { k.common }]
+	}
+
+	#compute: {
+		in:  #Input
+		out: (#summarizeReturn & {"in": in}).out
+	}
+	@test(eq, {
+		data: {forms: [{
+		fooID: "00-0000001"
+	}]}
+		form1040: [3]
+		#K1: {
+			#_base: {common: 3}
+			#FormFoo: {fooID: string, common: 3}
+			#FormBar: {barID: string, common: 3}
+			#Form: {fooID: string, common: 3} | {barID: string, common: 3}
+		}
+		#Input: {forms: []}
+		#summarizeReturn: {in: {forms: []}, out: []}
+		#compute: {in: {forms: []}, out: []}
+	})
+}
+
+-- issue2263.cue --
+// Disjunction regression in v0.5.0-beta.5 where multiple embedded disjunctions
+// in a definition were not evaluated correctly.
+// https://cuelang.org/issue/2263
+issue2263: simplified: {
+	metrics: #Metric
+	#Metric: {
+		#IDSource | {}
+		#TargetAverage | {}
+	}
+
+	metrics: {
+		id:  "foo"
+		avg: 60
+	}
+
+	#IDSource: id: string
+	#TargetAverage: avg: number
+	@test(eq, {
+		metrics: {id: "foo", avg: 60}
+		#Metric: {id: string, avg: number} | {id: string} | {avg: number} | {}
+		#IDSource: {id: string}
+		#TargetAverage: {avg: number}
+	})
+}
+issue2263: full: {
+	metrics: [...#Metric]
+
+	metrics: [{
+		id:  "foo"
+		avg: 60
+	}, {
+		id:    "bar"
+		value: 80
+	}, {
+		uri: "baz"
+		avg: 70
+	}, {
+		uri:   "qux"
+		value: 90
+	}]
+
+	#Metric: {
+		#Source
+		#Target
+	}
+
+	#Source:
+		#IDSource |
+		#URISource
+
+	#Target:
+		#TargetAverage |
+		#TargetValue
+
+	#IDSource: {
+		id: string
+	}
+
+	#URISource: {
+		uri: string
+	}
+
+	#TargetAverage: {
+		avg: number
+	}
+
+	#TargetValue: {
+		value: number
+	}
+	@test(eq, {
+		metrics: [{
+		avg: 60
+		id:  "foo"
+	}, {
+		id:    "bar"
+		value: 80
+	}, {
+		avg: 70
+		uri: "baz"
+	}, {
+		uri:   "qux"
+		value: 90
+	}]
+		#Metric: {id: string, avg: number} | {id: string, value: number} | {uri: string, avg: number} | {uri: string, value: number}
+		#Source: {id: string} | {uri: string}
+		#Target: {avg: number} | {value: number}
+		#IDSource: {id: string}
+		#URISource: {uri: string}
+		#TargetAverage: {avg: number}
+		#TargetValue: {value: number}
+	})
+}
+-- issue1417.cue --
+// Regression where disjuncts sometimes behaved like conjuncts, causing
+// incorrect unification of disjunction members.
+// https://cuelang.org/issue/1417
+issue1417: {
+	#ID: !~"^a" | =~"^ab$" | =~"^aB$"
+	#ID: =~"^a" | !~"[A-Z]"
+	ids: [...#ID] & ["xyz", "ab", "aB"]
+	@test(eq, {
+		#ID: !~"^a" & =~"^a" | !~"^a" & !~"[A-Z]" | =~"^ab$" & =~"^a" | =~"^ab$" & !~"[A-Z]" | =~"^aB$" & =~"^a" | =~"^aB$" & !~"[A-Z]"
+		ids: ["xyz", "ab", "aB"]
+	})
+}
+-- issue3149.cue --
+// Evaluator regression where unifying disjunctions incorrectly failed to
+// validate a fixed value that satisfied the constraint.
+// https://cuelang.org/issue/3149
+issue3149: {
+	#valid: {
+		name!: ( (=~"^Foo") | "an exception") & ( (=~"Foo$") | "an exception")
+	}
+	list: [...#valid]
+	list: [
+		{name: "FooBarFoo"},
+		{name: "FooBazFoo"},
+		{name: "FooQuuxFoo"},
+		{name: "an exception"},
+	]
+	@test(eq, {
+		#valid: {
+			name!: =~"^Foo" & =~"Foo$" | "an exception"
+		}
+		list: [{
+		name: "FooBarFoo"
+	}, {
+		name: "FooBazFoo"
+	}, {
+		name: "FooQuuxFoo"
+	}, {
+		name: "an exception"
+	}]
+	})
+}
+-- issue770.cue --
+// Default value resolution issue where chained pattern constraints with default
+// disjunctions did not propagate defaults correctly.
+// https://cuelang.org/issue/770
+issue770: {
+	#A: {
+		v: "a" | "b" | "c"
+	}
+	h: [string]: #A
+	h: a: {
+		v: *"a" | string
+	}
+	h: [=~"^b"]: {
+		v: *h.a.v | string
+	}
+	h: [=~"^c"]: {
+		v: *h.b.v | string
+	}
+	h: b:   _
+	h: boo: _
+	h: c:   _
+	h: coo: _
+	@test(eq, {
+		#A: {v: "a" | "b" | "c"}
+		h: {
+			a: {v: *"a" | "b" | "c"}
+			b: {v: *"a" | "b" | "c"}
+			boo: {v: *"a" | "b" | "c"}
+			c: {v: *"a" | "b" | "c"}
+			coo: {v: *"a" | "b" | "c"}
+		}
+	})
+}
+-- issue3528.cue --
+// evalv3 "incDependent: already closed" panic with repeated disjunctions
+// and definitions in workflow container schemas.
+// https://cuelang.org/issue/3528
+issue3528: original: {
+	workflows: [...#Workflow]
+	workflows: [test]
+
+	test: #Workflow & {}
+
+	#Workflow: {
+		container: [string]: string | #container
+		#container: string | {volumes?: [...string]}
+	}
+	@test(eq, {
+		workflows: [
+			{container: {}, #container: string | {volumes?: []}},
+		]
+		test: {
+			container: {}
+			#container: string | {volumes?: []}
+		}
+		#Workflow: {
+			container: {}
+			#container: string | {volumes?: []}
+		}
+	})
+}
+issue3528: reduced: {
+	a?: #A
+	a:  #A & {}
+	#A: {
+		A: [string]: 1 | #a
+		#a: 2 | {v: 1}
+	}
+	@test(eq, {
+		a: {A: {}, #a: 2 | {v: 1}}
+		#A: {A: {}, #a: 2 | {v: 1}}
+	})
+}
+issue3528: counter: {
+	@test(eq, {})
+}
+issue3528: nested: t1: {
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+	@test(eq, {v: 1} | {
+		2
+		@test(eq)
+	} | {
+		3
+		@test(eq)
+	})
+}
+issue3528: nested: t2: {
+	{v: 1} | 2
+	{v: 1} | (2 | 3)
+	{v: 1} | 2
+	{v: 1} | 2
+	@test(eq, {v: 1} | {
+		2
+		@test(eq)
+	})
+}
+-- issue3784.cue --
+// evalv3 regressions with "conflicting values" and "field not allowed" errors
+// when evaluating schemas similar to the GitHub Terraform provider schema.
+// https://cuelang.org/issue/3784
+issue3784: reduced: {
+	#Schema: a: {
+		kind: "A"
+		b: c?: string
+		b: {}
+	} | {
+		kind: "B"
+	}
+
+	out: #Schema
+	out: a: {
+		kind: "A"
+		b: c: "x"
+	}
+	@test(eq, {
+		#Schema: {
+			a: {kind: "A", b: {c?: string}} | {kind: "B"}
+		}
+		out: {a: {kind: "A", b: {c: "x"}}}
+	})
+}
+issue3784: full: {
+	#Schema: {
+		pages?: {
+			build_type?: "legacy" | "workflow"
+			source?: {
+				branch?: string
+				path?:   string
+			}
+			cname?: string
+		}
+		pages?: {
+			build_type!: "legacy"
+			source!: {
+				branch!: _
+			}
+		} | close({
+			build_type!: "workflow"
+			cname?:      _
+		})
+	}
+	out: #Schema & {
+		pages: {
+			cname:      "foo.com"
+			build_type: "legacy"
+			source: {
+				branch: "main"
+				path:   "/"
+			}
+		}
+	}
+	@test(eq, {
+		#Schema: {
+			pages?: {build_type!: "legacy", source!: {branch!: string, path?: string}, cname?: string} | {build_type!: "workflow", source?: {branch?: string, path?: string}, cname?: string}
+		}
+		out: {
+			pages: {
+				cname: "foo.com"
+				build_type: "legacy"
+				source: {branch: "main", path: "/"}
+			}
+		}
+	})
+}
+issue3784: variant1: {
+	#Schema: {
+		pages: {
+			build_type?: "legacy" | "workflow"
+			source: {
+				branch?: string
+				path?:   string
+			}
+			cname?: string
+		}
+		pages?: {
+			build_type!: "legacy"
+			source!: {
+				branch!: _
+			}
+		} | close({
+			build_type!: "workflow"
+			cname?:      _
+		})
+	}
+	@test(eq, {
+		#Schema: {
+			pages: {
+				build_type!: "legacy"
+				source: {branch!: string, path?: string}
+				cname?: string
+			}
+		}
+	})
+}
+issue3784: variant2: {
+	#Schema: {
+		build_type!: "legacy"
+		source!: {
+			branch!: _
+		}
+	} | close({
+		build_type!: "workflow"
+		cname?:      _
+	})
+	a: #Schema
+	a: {
+		build_type?: "legacy" | "workflow"
+		source: {
+			branch?: string
+			path?:   string
+		}
+		cname?: string
+	}
+	@test(eq, {
+		#Schema: {build_type!: "legacy", source!: {branch!: _}} | {build_type!: "workflow", cname?: _}
+		a: {
+			build_type!: "legacy"
+			source: {
+				branch!: string
+				path?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.source.path: field not allowed", pos=[113:4])
+			}
+			cname?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.cname: field not allowed", pos=[115:3])
+		}
+	})
+}
+-- issue3958.cue --
+// evalv3 regression where unifying an odd number of default disjunctions no
+// longer produced an error as expected.
+// https://cuelang.org/issue/3958
+issue3958: t1: {
+	#schema: int | *1
+	#schema: int | *3
+
+	test1: #schema & {int | *2}
+	test2: #schema & {int | *4}
+	@test(eq, {
+		#schema: int | 3 | 1
+		test1: int | 3 | 1 | 2
+		test2: int | 3 | 1 | 4
+	})
+}
+issue3958: t2: {
+ 	a: (int | *4) & (int | *1) & (int | *3) & (int | *8)
+	b: (int | *4) & (int | *1) & (int | *3)
+	@test(eq, {
+		a: int | 8 | 3 | 1 | 4
+		b: int | 3 | 1 | 4
+	})
+}
+-- issue2685.cue --
+// Nested definition with a default value incorrectly took the default value
+// even when a concrete value was provided via unification.
+// https://cuelang.org/issue/2685
+issue2685: {
+	#Foo: {
+		bar: int
+		opt?: int
+	} | *{
+		opt: int
+	}
+
+	foo: #Foo
+	foo: bar: 0
+
+	{
+		foo: #Foo
+	}
+	@test(eq, {
+		#Foo: *{opt: int} | {bar: int, opt?: int}
+		foo: {bar: 0, opt?: int}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  disambiguateClosed: {
+    b: (〈0;#Def〉 & 〈0;a〉)
+    a: 〈0;#Def〉
+    #Def: {
+      ({
+        x: true
+      }|{
+        y: true
+      })
+    }
+  }
+  alwaysCheckMatchers1: {
+    b: ({
+      [=~"^xxxx$"]: int
+    }|null)
+    b: ({
+      c: string
+    }|null)
+    b: {
+      c: "yyyyy"
+    }
+  }
+  alwaysCheckPatterns2: {
+    a: 〈0;#X〉
+    a: 〈0;b〉
+    b: 〈0;#X〉
+    b: {
+      c: "yyyyy"
+    }
+    #X: (string|{
+      c: string
+      {
+        [=~"^xxxx$"]: int
+      }
+    })
+  }
+  nestedNonMonotonic: {
+    resolved: {
+      n1: {
+        x: ({
+          a: 〈import;struct〉.MinFields(2)
+        }|null)
+        x: ({
+          a: {
+            c: 1
+          }
+        }|null)
+        x: ({
+          a: {
+            d: 1
+          }
+        }|null)
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    resolved: {
+      n2: {
+        x: ({
+          a: {
+            b: 〈import;struct〉.MinFields(2)
+          }
+        }|null)
+        x: ({
+          a: {
+            b: {
+              c: 1
+            }
+          }
+        }|null)
+        x: ({
+          a: {
+            b: {
+              d: 1
+            }
+          }
+        }|null)
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n1: {
+        p1: {
+          x: ({
+            a: 〈import;struct〉.MaxFields(1)
+          }|null)
+          x: ({
+            a: {
+              c: 1
+            }
+          }|null)
+          x: ({
+            a: {
+              d: 1
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n1: {
+        p2: {
+          x: ({
+            a: {
+              c: 1
+            }
+          }|null)
+          x: ({
+            a: 〈import;struct〉.MaxFields(1)
+          }|null)
+          x: ({
+            a: {
+              d: 1
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n1: {
+        p2: {
+          x: ({
+            a: {
+              c: 1
+            }
+          }|null)
+          x: ({
+            a: {
+              d: 1
+            }
+          }|null)
+          x: ({
+            a: 〈import;struct〉.MaxFields(1)
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n2: {
+        p1: {
+          x: ({
+            a: {
+              b: 〈import;struct〉.MaxFields(1)
+            }
+          }|null)
+          x: ({
+            a: {
+              b: {
+                c: 1
+              }
+            }
+          }|null)
+          x: ({
+            a: {
+              b: {
+                d: 1
+              }
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n2: {
+        p2: {
+          x: ({
+            a: {
+              b: {
+                c: 1
+              }
+            }
+          }|null)
+          x: ({
+            a: {
+              b: 〈import;struct〉.MaxFields(1)
+            }
+          }|null)
+          x: ({
+            a: {
+              b: {
+                d: 1
+              }
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n2: {
+        p2: {
+          x: ({
+            a: {
+              b: {
+                c: 1
+              }
+            }
+          }|null)
+          x: ({
+            a: {
+              b: {
+                d: 1
+              }
+            }
+          }|null)
+          x: ({
+            a: {
+              b: 〈import;struct〉.MaxFields(1)
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      a: {
+        n1: {
+          p1: {
+            x: ({
+              a: 〈import;struct〉.MinFields(2)
+            }|null)
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      a: {
+        n1: {
+          p2: {
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+            x: ({
+              a: 〈import;struct〉.MinFields(2)
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      a: {
+        n2: {
+          p1: {
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(2)
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      a: {
+        n2: {
+          p2: {
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(2)
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n1: {
+          p1: {
+            x: ({
+              a: 〈import;struct〉.MinFields(3)
+            }|null)
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+            x: ({
+              a: {
+                d: 1
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n1: {
+          p2: {
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+            x: ({
+              a: 〈import;struct〉.MinFields(3)
+            }|null)
+            x: ({
+              a: {
+                d: 1
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n1: {
+          p3: {
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+            x: ({
+              a: {
+                d: 1
+              }
+            }|null)
+            x: ({
+              a: 〈import;struct〉.MinFields(3)
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n2: {
+          p1: {
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(3)
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  d: 1
+                }
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n2: {
+          p1: {
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(3)
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  d: 1
+                }
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n2: {
+          p1: {
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  d: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(3)
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    small: {
+      p1: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          (*{}|{
+            a: string
+          })
+          (*{}|{
+            b: int
+          })
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    small: {
+      p2: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          ({
+            a: string
+          }|*{})
+          (*{}|{
+            b: int
+          })
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    medium: {
+      p1: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          (*{}|{
+            a: string
+          }|{
+            b: string
+          })
+          (*{}|{
+            c: int
+          }|{
+            d: string
+          })
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    medium: {
+      p2: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          ({
+            a: string
+          }|*{}|{
+            b: string
+          })
+          (*{}|{
+            c: int
+          }|{
+            d: string
+          })
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    medium: {
+      p3: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          ({
+            a: string
+          }|{
+            b: string
+          }|*{})
+          (*{}|{
+            c: int
+          }|{
+            d: string
+          })
+        }
+      }
+    }
+  }
+  noChildError: _
+  noChildError: {
+    issue1608: {
+      myValue: (〈0;#type〉 & {
+        fieldName: "some string"
+      })
+      #type: {
+        fieldName: 〈1;#subtype〉
+      }
+      #subtype: (string|{
+        foo: string
+      }|{
+        bar: 〈1;#subtype〉
+      })
+    }
+  }
+  noChildError: {
+    t1: {
+      #D: ({
+        b: string
+      }|{
+        c: 〈1;#D〉
+      })
+      o: (〈0;#D〉 & {
+        b: "test"
+      })
+    }
+  }
+  noChildError: {
+    t2: {
+      o: (〈0;#D〉 & {
+        b: "test"
+      })
+      #D: ({
+        b: string
+      }|{
+        c: 〈1;#D〉
+      })
+    }
+  }
+  noChildError: {
+    t3: {
+      #D: ({
+        a: null
+      }|{
+        b: string
+      }|{
+        c: 〈1;#D〉
+      })
+      o: (〈0;#D〉 & {
+        b: "test"
+      })
+    }
+  }
+  noChildError: {
+    t4: {
+      o: (〈0;#D〉 & {
+        b: "test"
+      })
+      #D: ({
+        a: null
+      }|{
+        b: string
+      }|{
+        c: 〈1;#D〉
+      })
+    }
+  }
+  issue1924: {
+    t1: {
+      m: {
+        a: 2
+      }
+      x: (*[
+        〈1;m〉.b,
+      ]|2)
+    }
+  }
+  issue1924: {
+    t2: {
+      m: {
+        a: 2
+      }
+      x: (*{
+        v: 〈1;m〉.b
+      }|3)
+    }
+  }
+  issue1924: {
+    t3: {
+      m: {
+        a: 2
+      }
+      x: (*〈0;m〉.b|1)
+    }
+  }
+  issue1838: {
+    t1: {
+      p?: []
+      a: ([
+        for _, k in 〈1;p〉 {
+          〈1;k〉
+        },
+      ]|null)
+    }
+  }
+  issue1838: {
+    t2: {
+      p?: []
+      a: (null|[
+        for _, k in 〈1;p〉 {
+          〈1;k〉
+        },
+      ])
+    }
+  }
+  noHang: {
+    #T: ([
+      "a",
+      〈1;#T〉,
+    ]|[
+      "d",
+      ...〈1;#T〉,
+    ])
+    x: 〈0;#T〉
+    #X: 〈0;x〉
+    #X: 〈0;#T〉
+  }
+  issue1940: {
+    #T: ([
+      "a",
+      〈1;#T〉,
+    ]|[
+      "b",
+      〈1;#T〉,
+    ]|[
+      "c",
+      〈1;#T〉,
+    ]|[
+      "d",
+      [
+        ...〈2;#T〉,
+      ],
+    ])
+    #A: {
+      type: 〈1;#T〉
+    }
+    #B: {
+      [string]: 〈1;#A〉
+    }
+    #C: (〈0;#B〉 & {
+      x: 〈1;#A〉
+    })
+  }
+}
+--- issue1417.cue
+{
+  issue1417: {
+    #ID: (!~"^a"|=~"^ab$"|=~"^aB$")
+    #ID: (=~"^a"|!~"[A-Z]")
+    ids: ([
+      ...〈1;#ID〉,
+    ] & [
+      "xyz",
+      "ab",
+      "aB",
+    ])
+  }
+}
+--- issue2209full.cue
+{
+  issue2209: {
+    simplified: {
+      t1: {
+        #SpecFoo: {
+          foo: {
+            min: 1
+          }
+        }
+        #SpecBar: {
+          bar: {
+            min: 1
+          }
+        }
+        spec: {
+          bar: {}
+        }
+        spec: (〈0;#SpecFoo〉|〈0;#SpecBar〉)
+        out: {
+          ({
+            nullFoo: null
+          }|{
+            nullBar: null
+          })
+          ({
+            minFoo: int
+          }|{
+            minBar: int
+          })
+          if (〈0;X〉.bar != _|_(explicit error (_|_ literal) in source)) {
+            minBar: 〈1;X〉.bar.min
+          }
+          X: 〈1;spec〉
+        }
+      }
+    }
+  }
+  issue2209: {
+    simplified: {
+      t2: {
+        #SpecFoo: {
+          foo: {}
+        }
+        #SpecBar: {
+          bar: {
+            x: 1
+          }
+        }
+        spec: {
+          bar: {}
+        }
+        spec: (*〈0;#SpecFoo〉|〈0;#SpecBar〉)
+        if (〈0;spec〉.bar != _|_(explicit error (_|_ literal) in source)) {
+          BAZ: 〈1;spec〉.bar.x
+        }
+        ({
+          f1: int
+        }|{
+          b2: int
+        })
+        ({
+          f2: int
+        }|{
+          b2: int
+        })
+      }
+    }
+  }
+  issue2209: {
+    simplified: {
+      t3: {
+        #A: {
+          v: 1
+        }
+        ({
+          f1: int
+        }|{
+          b2: int
+        })
+        ({
+          f2: int
+        }|{
+          b2: int
+        })
+        BAZ: 〈0;S〉.y
+        S: (*〈0;#A〉|〈0;#B〉)
+        #B: {
+          x: 1
+          y: 1
+        }
+        S: {
+          x: 1
+        }
+      }
+    }
+  }
+  issue2209: {
+    full: {
+      Foo: (〈0;#Abstract〉 & {
+        spec: {
+          foo: {}
+        }
+      })
+      Bar: (〈0;#Abstract〉 & {
+        spec: {
+          bar: {}
+        }
+      })
+      #Abstract: {
+        spec: 〈1;_#Spec〉
+        resource: (〈1;_Thing〉 & {
+          _X: {
+            spec: 〈3〉.spec
+          }
+        })
+      }
+      _#Spec: (*〈0;_#SpecFoo〉|〈0;_#SpecBar〉)
+      _#SpecFoo: {
+        foo: {
+          min: (int|*10)
+          max: (int|*20)
+        }
+      }
+      _#SpecBar: {
+        bar: {
+          min: (int|*30)
+          max: (int|*40)
+        }
+      }
+      _Thing: (〈0;#Constrained〉 & {
+        _X: _
+        spec: {
+          if (〈1;_X〉.spec.foo != _|_(explicit error (_|_ literal) in source)) {
+            minFoo: 〈2;_X〉.spec.foo.min
+            maxFoo: 〈2;_X〉.spec.foo.max
+          }
+          if (〈1;_X〉.spec.bar != _|_(explicit error (_|_ literal) in source)) {
+            minBar: 〈2;_X〉.spec.bar.min
+            maxBar: 〈2;_X〉.spec.bar.max
+          }
+        }
+      })
+      #Constrained: (〈0;#Base〉 & {
+        spec: ({
+          minFoo: (int|*10)
+          maxFoo: (int|*20)
+          minBar?: null
+          maxBar?: null
+        }|{
+          minBar: (int|*30)
+          maxBar: (int|*40)
+          minFoo?: null
+          maxFoo?: null
+        })
+        spec: (*{
+          fuga?: null
+        }|{
+          hoge?: null
+        })
+      })
+      #Base: {
+        spec: {
+          minFoo?: (null|int)
+          maxFoo?: (null|int)
+          minBar?: (null|int)
+          maxBar?: (null|int)
+          hoge?: (null|bool)
+          fuga?: (null|bool)
+        }
+      }
+    }
+  }
+}
+--- issue2246.cue
+{
+  issue2246: {
+    simplified: {
+      #FormFoo: {
+        fooID: string
+      }
+      #FormBar: {
+        barID: string
+      }
+      #Form: {
+        (〈1;#FormFoo〉|〈1;#FormBar〉)
+      }
+      data: {
+        fooID: "123"
+      }
+      out1: (〈0;#Form〉 & 〈0;data〉)
+      out2: (〈0;#Form〉 & 〈0;out1〉)
+    }
+  }
+  issue2246: {
+    full: {
+      data: {
+        forms: [
+          {
+            fooID: "00-0000001"
+          },
+        ]
+      }
+      form1040: (〈0;#compute〉 & {
+        in: 〈1;data〉
+      }).out
+      #K1: {
+        #_base: {
+          common: 3
+        }
+        #FormFoo: {
+          〈1;#_base〉
+          fooID: string
+        }
+        #FormBar: {
+          〈1;#_base〉
+          barID: string
+        }
+        #Form: {
+          (〈1;#FormFoo〉|〈1;#FormBar〉)
+        }
+      }
+      #Input: {
+        forms: [
+          ...〈2;#K1〉.#Form,
+        ]
+      }
+      #summarizeReturn: {
+        in: 〈1;#Input〉
+        out: [
+          for _, k in 〈1;in〉.forms {
+            〈1;k〉.common
+          },
+        ]
+      }
+      #compute: {
+        in: 〈1;#Input〉
+        out: (〈1;#summarizeReturn〉 & {
+          in: 〈1;in〉
+        }).out
+      }
+    }
+  }
+}
+--- issue2263.cue
+{
+  issue2263: {
+    simplified: {
+      metrics: 〈0;#Metric〉
+      #Metric: {
+        (〈1;#IDSource〉|{})
+        (〈1;#TargetAverage〉|{})
+      }
+      metrics: {
+        id: "foo"
+        avg: 60
+      }
+      #IDSource: {
+        id: string
+      }
+      #TargetAverage: {
+        avg: number
+      }
+    }
+  }
+  issue2263: {
+    full: {
+      metrics: [
+        ...〈1;#Metric〉,
+      ]
+      metrics: [
+        {
+          id: "foo"
+          avg: 60
+        },
+        {
+          id: "bar"
+          value: 80
+        },
+        {
+          uri: "baz"
+          avg: 70
+        },
+        {
+          uri: "qux"
+          value: 90
+        },
+      ]
+      #Metric: {
+        〈1;#Source〉
+        〈1;#Target〉
+      }
+      #Source: (〈0;#IDSource〉|〈0;#URISource〉)
+      #Target: (〈0;#TargetAverage〉|〈0;#TargetValue〉)
+      #IDSource: {
+        id: string
+      }
+      #URISource: {
+        uri: string
+      }
+      #TargetAverage: {
+        avg: number
+      }
+      #TargetValue: {
+        value: number
+      }
+    }
+  }
+}
+--- issue2685.cue
+{
+  issue2685: {
+    #Foo: ({
+      bar: int
+      opt?: int
+    }|*{
+      opt: int
+    })
+    foo: 〈0;#Foo〉
+    foo: {
+      bar: 0
+    }
+    {
+      foo: 〈1;#Foo〉
+    }
+  }
+}
+--- issue3149.cue
+{
+  issue3149: {
+    #valid: {
+      name!: ((=~"^Foo"|"an exception") & (=~"Foo$"|"an exception"))
+    }
+    list: [
+      ...〈1;#valid〉,
+    ]
+    list: [
+      {
+        name: "FooBarFoo"
+      },
+      {
+        name: "FooBazFoo"
+      },
+      {
+        name: "FooQuuxFoo"
+      },
+      {
+        name: "an exception"
+      },
+    ]
+  }
+}
+--- issue3528.cue
+{
+  issue3528: {
+    original: {
+      workflows: [
+        ...〈1;#Workflow〉,
+      ]
+      workflows: [
+        〈1;test〉,
+      ]
+      test: (〈0;#Workflow〉 & {})
+      #Workflow: {
+        container: {
+          [string]: (string|〈1;#container〉)
+        }
+        #container: (string|{
+          volumes?: [
+            ...string,
+          ]
+        })
+      }
+    }
+  }
+  issue3528: {
+    reduced: {
+      a?: 〈0;#A〉
+      a: (〈0;#A〉 & {})
+      #A: {
+        A: {
+          [string]: (1|〈1;#a〉)
+        }
+        #a: (2|{
+          v: 1
+        })
+      }
+    }
+  }
+  issue3528: {
+    counter: {}
+  }
+  issue3528: {
+    nested: {
+      t1: {
+        ({
+          v: 1
+        }|(2|3))
+        ({
+          v: 1
+        }|(2|3))
+        ({
+          v: 1
+        }|(2|3))
+        ({
+          v: 1
+        }|(2|3))
+      }
+    }
+  }
+  issue3528: {
+    nested: {
+      t2: {
+        ({
+          v: 1
+        }|2)
+        ({
+          v: 1
+        }|(2|3))
+        ({
+          v: 1
+        }|2)
+        ({
+          v: 1
+        }|2)
+      }
+    }
+  }
+}
+--- issue3784.cue
+{
+  issue3784: {
+    reduced: {
+      #Schema: {
+        a: ({
+          kind: "A"
+          b: {
+            c?: string
+          }
+          b: {}
+        }|{
+          kind: "B"
+        })
+      }
+      out: 〈0;#Schema〉
+      out: {
+        a: {
+          kind: "A"
+          b: {
+            c: "x"
+          }
+        }
+      }
+    }
+  }
+  issue3784: {
+    full: {
+      #Schema: {
+        pages?: {
+          build_type?: ("legacy"|"workflow")
+          source?: {
+            branch?: string
+            path?: string
+          }
+          cname?: string
+        }
+        pages?: ({
+          build_type!: "legacy"
+          source!: {
+            branch!: _
+          }
+        }|close({
+          build_type!: "workflow"
+          cname?: _
+        }))
+      }
+      out: (〈0;#Schema〉 & {
+        pages: {
+          cname: "foo.com"
+          build_type: "legacy"
+          source: {
+            branch: "main"
+            path: "/"
+          }
+        }
+      })
+    }
+  }
+  issue3784: {
+    variant1: {
+      #Schema: {
+        pages: {
+          build_type?: ("legacy"|"workflow")
+          source: {
+            branch?: string
+            path?: string
+          }
+          cname?: string
+        }
+        pages?: ({
+          build_type!: "legacy"
+          source!: {
+            branch!: _
+          }
+        }|close({
+          build_type!: "workflow"
+          cname?: _
+        }))
+      }
+    }
+  }
+  issue3784: {
+    variant2: {
+      #Schema: ({
+        build_type!: "legacy"
+        source!: {
+          branch!: _
+        }
+      }|close({
+        build_type!: "workflow"
+        cname?: _
+      }))
+      a: 〈0;#Schema〉
+      a: {
+        build_type?: ("legacy"|"workflow")
+        source: {
+          branch?: string
+          path?: string
+        }
+        cname?: string
+      }
+    }
+  }
+}
+--- issue3958.cue
+{
+  issue3958: {
+    t1: {
+      #schema: (int|*1)
+      #schema: (int|*3)
+      test1: (〈0;#schema〉 & {
+        (int|*2)
+      })
+      test2: (〈0;#schema〉 & {
+        (int|*4)
+      })
+    }
+  }
+  issue3958: {
+    t2: {
+      a: ((((int|*4) & (int|*1)) & (int|*3)) & (int|*8))
+      b: (((int|*4) & (int|*1)) & (int|*3))
+    }
+  }
+}
+--- issue770.cue
+{
+  issue770: {
+    #A: {
+      v: ("a"|"b"|"c")
+    }
+    h: {
+      [string]: 〈1;#A〉
+    }
+    h: {
+      a: {
+        v: (*"a"|string)
+      }
+    }
+    h: {
+      [=~"^b"]: {
+        v: (*〈2;h〉.a.v|string)
+      }
+    }
+    h: {
+      [=~"^c"]: {
+        v: (*〈2;h〉.b.v|string)
+      }
+    }
+    h: {
+      b: _
+    }
+    h: {
+      boo: _
+    }
+    h: {
+      c: _
+    }
+    h: {
+      coo: _
+    }
+  }
+}

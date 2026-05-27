@@ -1,0 +1,208 @@
+-- in.cue --
+import (
+	"list"
+	"strings"
+	"text/template"
+)
+
+list1: {
+	// Note that Top is not incomplete, only its first element is.
+	// We allow FlattenN to proceed and pass on the incomplete values.
+	Out1: list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	Out2: [...] & list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	Out3: list.FlattenN(Top, 1) & [...] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+
+	// This evaluates to a list with an incomplete element.
+	Top: [
+		[for _, F in _Sub {F}],
+	] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+
+	_Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	a: {} // b does not
+}
+
+list2: {
+	Out1: list.FlattenN(_Top, 1)         @test(err, code=incomplete, contains="undefined field: b", pos=[9:10])
+	Out2: [...] & list.FlattenN(_Top, 1) @test(err, code=incomplete, contains="undefined field: b", pos=[8:10])
+	Out3: list.FlattenN(_Top, 1) & [...] @test(err, code=incomplete, contains="undefined field: b", pos=[7:10])
+
+	// This evaluates to a list with an incomplete element.
+	_Top: [
+		for _, F in #Sub {F},
+	] @test(err, code=incomplete, contains="undefined field: b", pos=[4:10])
+
+	#Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:10])
+
+	a: {} // b does not
+}
+
+value1: {
+	a: len('sf' | 'dd') @test(err, code=incomplete|eval,
+		hint="this can never be resolve so could be a permanent error"
+		contains="unresolved disjunction", pos=[0:5]) @test(err:todo, code=eval)
+}
+
+value2: {
+	len('sf' | 'dd')
+
+	@test(err, code=incomplete|eval,
+		hint="this can never be resolve so could be a permanent error"
+		contains="unresolved disjunction")
+	@test(err:todo, code=eval)
+}
+
+incompleteArgDecimalList: {
+	a: #a & {param: 123} @test(eq, {param: 123, transformed: 123, max: 123})
+	#a: {
+		param:       int
+		transformed: +param @test(err, code=incomplete, contains="operand param of '+' not concrete", pos=[0:17])
+		max:         list.Max([transformed]) @test(err, code=incomplete, contains="operand param of '+' not concrete", pos=[0:16, -1:17])
+	}
+}
+
+incompleteArgStringList: {
+	a: #a & {param: "123"} @test(eq, {param: "123", transformed: "123", joined: "123"})
+	#a: {
+		param:       string
+		transformed: param + "" @test(err, code=incomplete, contains="non-concrete value string in operand to +", pos=[0:16, -1:16])
+		joined:      strings.Join([transformed], "-") @test(err, code=incomplete, contains="non-concrete value string in operand to +", pos=[0:16, -2:16, -1:16])
+	}
+}
+
+incompleteList: {
+	x:       _
+	decimal: list.Max(x) @test(err, code=incomplete, contains="non-concrete list for argument 0", pos=[0:11])
+	str:     strings.Join(x, "") @test(err, code=incomplete, contains="non-concrete list for argument 0", pos=[0:11])
+}
+
+// TODO: add better error positions.
+incompleteListError: {
+	x:       y + [] @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[0:11, 1:11])
+	y:       _
+	decimal: list.Max(x) @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[-2:11, -1:11])
+	str:     strings.Join(x, "") @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[-3:11, -2:11])
+}
+
+badListType: {
+	x:       2
+	decimal: list.Max(x) @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-1:11])
+	str:     strings.Join(x, "") @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-2:11])
+}
+
+badListError: {
+	x:       2 + y @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[0:11, 1:11])
+	y:       "foo"
+	decimal: list.Max(x) @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[-2:11, -1:11])
+	str:     strings.Join(x, "") @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[-3:11, -2:11])
+}
+
+// Issue #1095
+// Preserve combined error severity for multiple errors.
+multipleErrors: {
+	#T: {
+		params: {
+			x: string
+			y: string
+		}
+		out: template.Execute("{{.x}} {{.y}}", params) @test(err, code=incomplete, contains="cannot convert non-concrete value string", pos=[0:8, -3:4])
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  list1: {
+    Out1: 〈import;list〉.FlattenN(〈0;Top〉, 1)
+    Out2: ([
+      ...,
+    ] & 〈import;list〉.FlattenN(〈0;Top〉, 1))
+    Out3: (〈import;list〉.FlattenN(〈0;Top〉, 1) & [
+      ...,
+    ])
+    Top: [
+      [
+        for _, F in 〈2;_Sub〉 {
+          〈1;F〉
+        },
+      ],
+    ]
+    _Sub: 〈0;a〉.b
+    a: {}
+  }
+  list2: {
+    Out1: 〈import;list〉.FlattenN(〈0;_Top〉, 1)
+    Out2: ([
+      ...,
+    ] & 〈import;list〉.FlattenN(〈0;_Top〉, 1))
+    Out3: (〈import;list〉.FlattenN(〈0;_Top〉, 1) & [
+      ...,
+    ])
+    _Top: [
+      for _, F in 〈1;#Sub〉 {
+        〈1;F〉
+      },
+    ]
+    #Sub: 〈0;a〉.b
+    a: {}
+  }
+  value1: {
+    a: len(('sf'|'dd'))
+  }
+  value2: {
+    len(('sf'|'dd'))
+  }
+  incompleteArgDecimalList: {
+    a: (〈0;#a〉 & {
+      param: 123
+    })
+    #a: {
+      param: int
+      transformed: +〈0;param〉
+      max: 〈import;list〉.Max([
+        〈1;transformed〉,
+      ])
+    }
+  }
+  incompleteArgStringList: {
+    a: (〈0;#a〉 & {
+      param: "123"
+    })
+    #a: {
+      param: string
+      transformed: (〈0;param〉 + "")
+      joined: 〈import;strings〉.Join([
+        〈1;transformed〉,
+      ], "-")
+    }
+  }
+  incompleteList: {
+    x: _
+    decimal: 〈import;list〉.Max(〈0;x〉)
+    str: 〈import;strings〉.Join(〈0;x〉, "")
+  }
+  incompleteListError: {
+    x: (〈0;y〉 + [])
+    y: _
+    decimal: 〈import;list〉.Max(〈0;x〉)
+    str: 〈import;strings〉.Join(〈0;x〉, "")
+  }
+  badListType: {
+    x: 2
+    decimal: 〈import;list〉.Max(〈0;x〉)
+    str: 〈import;strings〉.Join(〈0;x〉, "")
+  }
+  badListError: {
+    x: (2 + 〈0;y〉)
+    y: "foo"
+    decimal: 〈import;list〉.Max(〈0;x〉)
+    str: 〈import;strings〉.Join(〈0;x〉, "")
+  }
+  multipleErrors: {
+    #T: {
+      params: {
+        x: string
+        y: string
+      }
+      out: 〈import;"text/template"〉.Execute("{{.x}} {{.y}}", 〈0;params〉)
+    }
+  }
+}

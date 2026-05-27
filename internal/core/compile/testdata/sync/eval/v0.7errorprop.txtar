@@ -1,0 +1,17 @@
+// NOTE: do not add more tests to this file, as it may obfuscate the test case.
+-- in.cue --
+a: #A
+a: c: 1 @test(err, code=eval,
+		contains="field not allowed",
+		pos=[in.cue:2:4],
+		hint="more positions may be allowed, see out/todo.txt for details")
+#A: {} @test(eq, {})
+-- out/compile --
+--- in.cue
+{
+  a: 〈0;#A〉
+  a: {
+    c: 1
+  }
+  #A: {}
+}

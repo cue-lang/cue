@@ -71,39 +71,3 @@ Conjuncts:    36
 Disjuncts:    0
 
 NumCloseIDs: 14
--- out/compile --
---- in.cue
-{
-  simplified: {
-    x: {
-      d: {
-        ".*"
-        [
-          (〈2〉 + ""),
-        ][0]
-      }
-    }
-    out: 〈import;"encoding/yaml"〉.Marshal(〈0;x〉)
-  }
-  original: {
-    #testableRegexp: {
-      string
-      #test: close({
-        in: string
-        out: 〈import;regexp〉.FindSubmatch((("^" + 〈2〉) + "$"), 〈0;in〉)[1]
-      })
-    }
-    rule: {
-      #patterns: {
-        bar: (〈2;#testableRegexp〉 & {
-          "(.*)"
-          #test: {
-            in: "testcontent"
-            out: "testcontent"
-          }
-        })
-      }
-    }
-    out: 〈import;"encoding/yaml"〉.Marshal(〈0;rule〉)
-  }
-}

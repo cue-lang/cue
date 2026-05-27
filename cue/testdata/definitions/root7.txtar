@@ -16,17 +16,3 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 3
--- out/compile --
---- in.cue
-{
-  root: {
-    input: {
-      #deps: {
-        root: {}
-      }
-    }
-  }
-  {
-    〈1;root〉.input.#deps
-  }
-}

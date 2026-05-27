@@ -45,42 +45,6 @@ a.b.c.s: non-concrete value string in operand to +:
     ./in.cue:15:14
     ./in.cue:20:23
     ./in.cue:21:13
--- out/compile --
---- in.cue
-{
-  r1: (〈0;f1〉 & {
-    y: "c"
-  })
-  f1: {
-    y: string
-    res: (〈1;a〉.b.c & {
-      d: 〈1;y〉
-    })
-  }
-  a: {
-    b: {
-      c: {
-        d: string
-        s: ("a" + 〈0;d〉)
-      }
-    }
-  }
-  a: {
-    b: {
-      [string]: {
-        d: string
-        s: ("a" + 〈0;d〉)
-      }
-    }
-  }
-  a: {
-    b: {
-      c: {
-        d: string
-      }
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  16

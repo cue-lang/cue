@@ -24,19 +24,3 @@ Conjuncts:    7
 Disjuncts:    7
 
 NumCloseIDs: 1
--- out/compile --
---- in.cue
-{
-  cond: bool
-  src: {}
-  top: _
-  a: [
-    if 〈1;cond〉 {},
-  ]
-  b: [
-    for _, x in 〈1;src〉.foo {},
-  ]
-  c: {
-    for _, x in 〈1;top〉 {}
-  }
-}

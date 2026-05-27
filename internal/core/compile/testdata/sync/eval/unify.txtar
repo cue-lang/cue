@@ -1,0 +1,39 @@
+-- in.cue --
+a: d: {
+	#base
+	#info: {...}
+	Y: #info.X @test(eq, "foo") @test(closed)
+}  @test(closed)
+
+#base: {
+	#info: {...}
+} @test(closed)
+
+a: [Name=string]: {#info: {
+	X: "foo"
+}} @test(closed=false)
+-- out/compile --
+--- in.cue
+{
+  a: {
+    d: {
+      〈2;#base〉
+      #info: {
+        ...
+      }
+      Y: 〈0;#info〉.X
+    }
+  }
+  #base: {
+    #info: {
+      ...
+    }
+  }
+  a: {
+    [string]: {
+      #info: {
+        X: "foo"
+      }
+    }
+  }
+}

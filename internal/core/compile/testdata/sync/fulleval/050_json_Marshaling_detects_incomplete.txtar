@@ -1,0 +1,24 @@
+#name: json Marshaling detects incomplete
+#evalFull
+-- in.cue --
+import "encoding/json"
+
+a: json.Marshal({a: string}) @test(err, code=incomplete)
+
+foo: {
+	a: 3     @test(eq, 3)
+	b: foo.c @test(err, code=incomplete)
+}
+b: json.Marshal(foo) @test(err, code=incomplete)
+-- out/compile --
+--- in.cue
+{
+  a: 〈import;"encoding/json"〉.Marshal({
+    a: string
+  })
+  foo: {
+    a: 3
+    b: 〈1;foo〉.c
+  }
+  b: 〈import;"encoding/json"〉.Marshal(〈0;foo〉)
+}

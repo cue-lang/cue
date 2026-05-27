@@ -1,0 +1,297 @@
+# Tests that complex configurations with disjunctions and comprehensions evaluate
+# correctly. A regression in v0.5.0 caused "empty disjunction" errors for code
+# involving nested definitions with spec disjunctions and if-guard comprehensions.
+# https://cuelang.org/issue/2209
+-- input.cue --
+full: {
+	Foo: #Abstract & {spec: foo: {}}
+	Bar: #Abstract & {spec: bar: {}}
+
+	#Abstract: X={
+		spec: _#Spec
+
+		resource: _Thing & {_X: spec: X.spec}
+	}
+
+	_#Spec: *_#SpecFoo | _#SpecBar
+
+	_#SpecFoo: {
+		foo: {
+			min: int | *10
+			max: int | *20
+		}
+	}
+
+	_#SpecBar: {
+		bar: {
+			min: int | *30
+			max: int | *40
+		}
+	}
+
+	_Thing: #Constrained & {
+		_X: _
+
+		spec: {
+			if _X.spec.foo != _|_ {
+				minFoo: _X.spec.foo.min
+				maxFoo: _X.spec.foo.max
+			}
+
+			if _X.spec.bar != _|_ {
+				minBar: _X.spec.bar.min
+				maxBar: _X.spec.bar.max
+			}
+		}
+	}
+
+	#Constrained: #Base & {
+		spec: {
+			minFoo:  int | *10
+			maxFoo:  int | *20
+			minBar?: null
+			maxBar?: null
+		} | {
+			minBar:  int | *30
+			maxBar:  int | *40
+			minFoo?: null
+			maxFoo?: null
+		}
+
+		spec: *{
+			fuga?: null
+		} | {
+			hoge?: null
+		}
+	}
+
+	#Base: {
+		spec: {
+			minFoo?: null | int
+			maxFoo?: null | int
+			minBar?: null | int
+			maxBar?: null | int
+
+			hoge?: null | bool
+			fuga?: null | bool
+		}
+	}
+	@test(eq, {
+		Foo: {
+			spec: {foo: {min: *10 | int, max: *20 | int}}
+			resource: {
+				_X: {
+					spec: {foo: {min: *10 | int, max: *20 | int}}
+				}
+				spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | {minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool}
+			}
+		}
+		Bar: {
+			spec: {bar: {min: *30 | int, max: *40 | int}}
+			resource: {
+				_X: {
+					spec: {bar: {min: *30 | int, max: *40 | int}}
+				}
+				spec: *{minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null | bool, fuga?: null} | {minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null, fuga?: null | bool}
+			}
+		}
+		#Abstract: {
+			spec: *{foo: {min: *10 | int, max: *20 | int}} | {bar: {min: *30 | int, max: *40 | int}}
+			resource: {
+				_X: {
+					spec: *{foo: {min: *10 | int, max: *20 | int}} | {bar: {min: *30 | int, max: *40 | int}}
+				}
+				spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | {minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool}
+			}
+		}
+		_#Spec: *{foo: {min: *10 | int, max: *20 | int}} | {bar: {min: *30 | int, max: *40 | int}}
+		_#SpecFoo: {foo: {min: *10 | int, max: *20 | int}}
+		_#SpecBar: {bar: {min: *30 | int, max: *40 | int}}
+		_Thing: {
+			_X: _
+			spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | *{minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null | bool, fuga?: null} | {minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool} | {minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null, fuga?: null | bool}
+		}
+		#Constrained: {
+			spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | *{minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null | bool, fuga?: null} | {minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool} | {minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null, fuga?: null | bool}
+		}
+		#Base: {
+			spec: {
+				minFoo?: null | int
+				maxFoo?: null | int
+				minBar?: null | int
+				maxBar?: null | int
+				hoge?: null | bool
+				fuga?: null | bool
+			}
+		}
+	})
+}
+
+reduced: {
+	Foo: #Obj & {spec: foo: {}}
+	Bar: #Obj & {spec: bar: {}}
+
+	#Obj: X={
+		spec: *#SpecFoo | #SpecBar
+
+		out: #Out & {
+			_Xspec: X.spec
+			if _Xspec.foo != _|_ {
+				minFoo: _Xspec.foo.min
+			}
+			if _Xspec.bar != _|_ {
+				minBar: _Xspec.bar.min
+			}
+		}
+	}
+
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	#Out: {
+		{minFoo: int} | {minBar: int}
+
+		*{nullFoo: null} | {nullBar: null}
+	}
+	@test(eq, {
+		Foo: {
+			spec: {foo: {min: *10 | int}}
+			out: *{_Xspec: {foo: {min: *10 | int}}, minFoo: *10 | int, nullFoo: null} | {_Xspec: {foo: {min: *10 | int}}, minFoo: *10 | int, nullBar: null}
+		}
+		Bar: {
+			spec: {bar: {min: *20 | int}}
+			out: *{_Xspec: {bar: {min: *20 | int}}, minBar: *20 | int, nullFoo: null} | {_Xspec: {bar: {min: *20 | int}}, minBar: *20 | int, nullBar: null}
+		}
+		#Obj: {
+			spec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}
+			out: *{_Xspec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}, minFoo: *10 | int, nullFoo: null} | {_Xspec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}, minFoo: *10 | int, nullBar: null}
+		}
+		#SpecFoo: {foo: {min: *10 | int}}
+		#SpecBar: {bar: {min: *20 | int}}
+		#Out: *{minFoo: int, nullFoo: null} | *{minBar: int, nullFoo: null} | {minFoo: int, nullBar: null} | {minBar: int, nullBar: null}
+	})
+}
+-- out/compile --
+--- input.cue
+{
+  full: {
+    Foo: (〈0;#Abstract〉 & {
+      spec: {
+        foo: {}
+      }
+    })
+    Bar: (〈0;#Abstract〉 & {
+      spec: {
+        bar: {}
+      }
+    })
+    #Abstract: {
+      spec: 〈1;_#Spec〉
+      resource: (〈1;_Thing〉 & {
+        _X: {
+          spec: 〈3〉.spec
+        }
+      })
+    }
+    _#Spec: (*〈0;_#SpecFoo〉|〈0;_#SpecBar〉)
+    _#SpecFoo: {
+      foo: {
+        min: (int|*10)
+        max: (int|*20)
+      }
+    }
+    _#SpecBar: {
+      bar: {
+        min: (int|*30)
+        max: (int|*40)
+      }
+    }
+    _Thing: (〈0;#Constrained〉 & {
+      _X: _
+      spec: {
+        if (〈1;_X〉.spec.foo != _|_(explicit error (_|_ literal) in source)) {
+          minFoo: 〈2;_X〉.spec.foo.min
+          maxFoo: 〈2;_X〉.spec.foo.max
+        }
+        if (〈1;_X〉.spec.bar != _|_(explicit error (_|_ literal) in source)) {
+          minBar: 〈2;_X〉.spec.bar.min
+          maxBar: 〈2;_X〉.spec.bar.max
+        }
+      }
+    })
+    #Constrained: (〈0;#Base〉 & {
+      spec: ({
+        minFoo: (int|*10)
+        maxFoo: (int|*20)
+        minBar?: null
+        maxBar?: null
+      }|{
+        minBar: (int|*30)
+        maxBar: (int|*40)
+        minFoo?: null
+        maxFoo?: null
+      })
+      spec: (*{
+        fuga?: null
+      }|{
+        hoge?: null
+      })
+    })
+    #Base: {
+      spec: {
+        minFoo?: (null|int)
+        maxFoo?: (null|int)
+        minBar?: (null|int)
+        maxBar?: (null|int)
+        hoge?: (null|bool)
+        fuga?: (null|bool)
+      }
+    }
+  }
+  reduced: {
+    Foo: (〈0;#Obj〉 & {
+      spec: {
+        foo: {}
+      }
+    })
+    Bar: (〈0;#Obj〉 & {
+      spec: {
+        bar: {}
+      }
+    })
+    #Obj: {
+      spec: (*〈1;#SpecFoo〉|〈1;#SpecBar〉)
+      out: (〈1;#Out〉 & {
+        _Xspec: 〈2〉.spec
+        if (〈0;_Xspec〉.foo != _|_(explicit error (_|_ literal) in source)) {
+          minFoo: 〈1;_Xspec〉.foo.min
+        }
+        if (〈0;_Xspec〉.bar != _|_(explicit error (_|_ literal) in source)) {
+          minBar: 〈1;_Xspec〉.bar.min
+        }
+      })
+    }
+    #SpecFoo: {
+      foo: {
+        min: (int|*10)
+      }
+    }
+    #SpecBar: {
+      bar: {
+        min: (int|*20)
+      }
+    }
+    #Out: {
+      ({
+        minFoo: int
+      }|{
+        minBar: int
+      })
+      (*{
+        nullFoo: null
+      }|{
+        nullBar: null
+      })
+    }
+  }
+}

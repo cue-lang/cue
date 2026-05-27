@@ -15,28 +15,6 @@ a: {
 	}
 })
 a: b: c: d: "bar"
--- out/compile --
---- in.cue
-{
-  num: 1
-  a: {
-    if (〈1;num〉 < 5) {
-      [string]: {
-        [string]: {
-          name: 〈2;-〉
-          kind: 〈1;-〉
-        }
-      }
-    }
-  }
-  a: {
-    b: {
-      c: {
-        d: "bar"
-      }
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  8

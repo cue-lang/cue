@@ -1,0 +1,54 @@
+raw: true
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{
+	#emb: {
+		a: 1
+
+		sub: {
+			f: 3
+		}
+	}
+	#def: {
+		#emb
+
+		b: 2
+	}
+	#f: a: 10
+	#e: {
+		#f
+
+		b: int
+		{[_]: <100}
+		{[_]: <300}
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    #emb: {
+      a: 1
+      sub: {
+        f: 3
+      }
+    }
+    #def: {
+      〈1;#emb〉
+      b: 2
+    }
+    #f: {
+      a: 10
+    }
+    #e: {
+      〈1;#f〉
+      b: int
+      {
+        [_]: <100
+      }
+      {
+        [_]: <300
+      }
+    }
+  }
+}

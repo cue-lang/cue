@@ -1,0 +1,36 @@
+# Tests that a large comprehension-generated struct (1500 entries) evaluates
+# in linear time rather than exhibiting quadratic or worse blowup from
+# repeated unification of the accumulating result.
+# https://cuelang.org/issue/572
+-- in.cue --
+package p
+
+import "list"
+
+_entries: [for i in list.Range(1, 1500, 1) {i}]
+unified: {
+	for entry in _entries {
+		"\(entry)": true
+	}
+}
+
+// TODO(inline): _entries$p and [0] don't work here.
+// @test(eq, at=_entries$p[0],  1)
+// @test(eq, at=_entries$[1498], 1499)
+@test(eq, at=unified."1",    true)
+@test(eq, at=unified."1499", true)
+
+-- out/compile --
+--- in.cue
+{
+  _entries(:p): [
+    for _, i in 〈import;list〉.Range(1, 1500, 1) {
+      〈1;i〉
+    },
+  ]
+  unified: {
+    for _, entry in 〈1;_entries(:p)〉 {
+      "\(〈1;entry〉)": true
+    }
+  }
+}

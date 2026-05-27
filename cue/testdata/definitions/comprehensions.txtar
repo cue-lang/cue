@@ -29,18 +29,3 @@ Conjuncts:    7
 Disjuncts:    0
 
 NumCloseIDs: 2
--- out/compile --
---- in.cue
-{
-  issue595: {
-    #cfgs: [
-      {
-        name: "foo"
-      },
-    ]
-    _name: 〈0;#cfgs〉[0].name
-    for _, cfg in 〈0;#cfgs〉 {
-      files: 〈1;cfg〉.nam
-    }
-  }
-}

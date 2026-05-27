@@ -4,16 +4,6 @@ a="a": 3
 b:     a        @test(eq, 3)
 o: {"a\nb": 2}  @test(eq, {"a\nb": 2})
 c: o["a\nb"]    @test(eq, 2)
--- out/compile --
---- in.cue
-{
-  a: 3
-  b: 〈0;a〉
-  o: {
-    "a\nb": 2
-  }
-  c: 〈0;o〉["a\nb"]
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  6

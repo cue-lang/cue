@@ -15,29 +15,6 @@ t: [X=string]: {
 }
 t: x: {b: str: "DDDD"} @test(eq, {b: {str: "DDDD"}, a: "XDDDD", c: "X"})
 
--- out/compile --
---- in.cue
-{
-  res: [
-    〈1;t〉,
-  ]
-  t: {
-    [string]: {
-      a: (〈0;c〉 + 〈0;b〉.str)
-      b: {
-        str: string
-      }
-      c: "X"
-    }
-  }
-  t: {
-    x: {
-      b: {
-        str: "DDDD"
-      }
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

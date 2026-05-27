@@ -22,16 +22,3 @@ Retain: 0
 Unifications: 9
 Conjuncts:    16
 Disjuncts:    9
--- out/compile --
---- in.cue
-{
-  a: 1
-  b: (〈0;a〉 + 1)
-  d: {
-    x: _
-    y: (〈1;b〉 + 〈0;x〉)
-  }
-  e: (〈0;d〉 & {
-    x: 5
-  })
-}

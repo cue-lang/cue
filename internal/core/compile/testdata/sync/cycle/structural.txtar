@@ -1,0 +1,1679 @@
+-- in.cue --
+import "list"
+
+a1: {
+	f: [f]
+	@test(err, code=structural_cycle, path=f.0, contains="structural cycle", pos=[])
+}
+
+a2: {
+	f: f
+	@test(eq, {f: _})
+}
+
+a3: {
+	f: {g: f}
+	@test(err, code=structural_cycle, path=f.g, contains="structural cycle", pos=[])
+}
+
+a4: {
+	a: [a | int]
+	@test(eq, {a: [int]})
+}
+
+a5: {
+	a: b: a | int
+	@test(eq, {a: {b: int}})
+}
+
+a6: {
+	a: a | int
+	@test(eq, {a: _ | int})
+}
+
+a7: {
+	a: c.x
+	b: {
+		x: c
+		y: "foo"
+	}
+	c: {
+		x: b.y
+		y: 3
+	}
+	@test(eq, {
+		a: "foo"
+		b: {x: {x: "foo", y: 3}, y: "foo"}
+		c: {x: "foo", y: 3}
+	})
+}
+
+b1: {
+	b: a & [1]
+	a: [a | int]
+	@test(eq, {b: [1], a: [int]})
+}
+
+b2: {
+	a: [a | int]
+	b: a & [1]
+	@test(eq, {a: [int], b: [1]})
+}
+
+b3: {
+	x: a: [a | int]
+	b: x & {a: [1]}
+	@test(eq, {x: {a: [int]}, b: {a: [1]}})
+}
+
+b4: {
+	b: x.y & [1]
+	x: y: [y]
+	@test(err, code=eval, path=b.0, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[1, [y], int, list], pos=[1:5, 1:12, 2:8, 2:9])
+}
+
+// Ensure that the cycle error is not blindly copied to a referring field,
+// as the cycle may not persist.
+b4: cond1: {
+	b: x.y & { _z: false, [1] }
+	x: y: {
+		_z: *true | bool
+		if _z {
+			[y]
+		}
+	}
+	@test(err, code=structural_cycle, path=x.y.0, contains="structural cycle", pos=[])
+}
+
+// This reports a structural cycle at b4.cond2.b, because the value it refers
+// has a structural cycle. Technically, this is incorrect, as the cycle
+// really only occurs in b4.cond2.x.y. But since structural cycles are
+// permanent, the entire configuration is invalidated, so the spurious
+// additional cycle is merely cosmetic. By most logical standards, one can prove
+// any fact from a contradiction. So assuming that, this is not incorrect.
+// TODO: fix this cosmetic blemish.
+b4: cond2: {
+	x: y: {
+		_z: *true | bool
+		if _z {
+			[y]
+		}
+	}
+	b: x.y & { _z: false, [1] }
+	@test(err, code=structural_cycle, path=x.y.0, contains="structural cycle", pos=[])
+}
+
+b5: {
+	b: x.y & {a: [1]}
+	x: y: a: [a | int]
+	@test(eq, {b: {a: [1]}, x: {y: {a: [int]}}})
+}
+
+b6: {
+	b: x & {a: [1]}
+	x: a: [a]
+	@test(err, code=eval, path=b.a.0, contains="conflicting values %s and %s (mismatched types %s and %s)",
+		args=[1, [1], int, list], pos=[1:5, 1:13, 1:14, 2:9])
+}
+
+b7: {
+	b: a & [[1]]
+	a: [a]
+	@test(err, code=eval, path=b.0.0, contains="conflicting values %s and %s (mismatched types %s and %s)",
+		args=[1, [a], int, list], pos=[1:5, 1:11, 2:5, 2:6])
+}
+
+// Issue #555
+b8: {
+	x: a
+	a: f: b
+	b: a | string
+	@test(eq, {
+		x: {f: string}
+		a: {f: string}
+		b: string
+	})
+}
+
+// Issue #555
+b9: {
+	#a: string | #b | #ref
+	#b: {
+		c: [#a, #a, #a]
+	}
+	#ref: ref: string
+	x: #b | #ref
+	@test(eq, {
+		#a: string | {ref: string}
+		#b: {
+			c: [string | {ref: string},
+			string | {ref: string},
+			string | {ref: string}]
+		}
+		#ref: {ref: string}
+		x: {c: [string | {ref: string},
+	string | {ref: string},
+	string | {ref: string}]} | {ref: string}
+	})
+}
+
+// Issue #534
+// TODO: the resolution here is arguably incorrect: c should be
+// 		d: string | { b: string }
+// However, this is not the end of the world, as the disjunction is preserved
+// under the hood and still unifies with extended structure.
+b10: {
+	a: close({
+		b: string | a | c
+	})
+	c: close({
+		d: string | a
+	})
+
+	d: d: b: string
+	@test(eq, {
+		a: {b: string | {d: string}}
+		c: {
+			d: string | {b: string | {b: string | {b: string}}}
+		}
+		d: {d: {b: string}}
+	})
+}
+
+// Issue #509 -- with comprehension
+b11: {
+	#list: {
+		tail: #list | *null
+		if tail != null {
+		}
+	}
+	@test(eq, {#list: {tail: null}})
+}
+
+// Issue #509 -- with comprehension
+b12: {
+	#list: {
+		V=value: int
+		T=tail:  #list | *null
+		if T != null {
+			sum: V + T.sum
+		}
+		if T == null {
+			sum: V
+		}
+	}
+
+	list1: #list
+	list1: {
+		value: 1
+		tail: {
+			value: 2
+			tail: {
+				value: 3
+				tail: {
+					value: 4
+				}
+			}
+		}
+	}
+	@test(eq, {
+		#list: {value: int, tail: null, sum: int}
+		list1: {
+			value: 1
+			tail: {
+				value: 2
+				tail: {
+					value: 3
+					tail: {
+						value: 4
+						tail: *null | {value: int, tail: null, sum: int}
+						sum: 4
+					}
+					sum: 7
+				}
+				sum: 9
+			}
+			sum: 10
+		}
+	})
+}
+
+// More trigger happy on stack overflows.
+b12b: {
+	#list: {
+		tail: #list
+
+		if tail != null {
+			sum: tail.sum
+		}
+	} @test(err, code=structural_cycle, path=tail, contains="structural cycle", pos=[])
+
+	list1: #list  @test(err, code=structural_cycle, path=b12b.#list.tail, contains="structural cycle", pos=[])
+	list1: {
+		tail: {
+			tail: {
+			}
+		}
+	}
+}
+
+// Issue #587
+b13: {
+	root: a: [for x in root {x}]
+	@test(err, code=structural_cycle, path=root.a.0.0, contains="structural cycle", pos=[])
+}
+
+// Issue #587
+// TODO: this should probably be okay if we allow shallow evaluation of
+// comprehension sources. See #1881.
+b14: {
+	root: {
+		a: [...int]
+
+		for x in a {
+			"\(x)": {}
+		}
+
+		b: [for x in root {x}]
+	}
+	@test(err, code=structural_cycle, path=root.b.1.1, contains="structural cycle", pos=[])
+}
+
+// This is okay
+// Issue #587
+b15: {
+	root: a: {for x in root {x}}
+	@test(eq, {root: {a: {}}})
+}
+
+// Issue #502 -- unused bulk constraints are not cyclic
+p1: {
+	#T: {
+		a: [string]: link: #T
+	}
+
+	a: #T & {
+		a: one: link: a: two: {}
+	}
+	@test(eq, {
+		#T: {a: {}}
+		a: {
+			a: {
+				one: {link: {a: {two: {link: {a: {}}}}}}
+			}
+		}
+	})
+}
+
+// Issue #502 -- but they are if it is invoked within the struct.
+p2: {
+	#T: {
+		a: [string]: link: #T
+		a: b: {}
+	}
+
+	a: #T & {
+		a: one: link: a: two: {}
+	}
+	@test(eq, {one: {link: {a: {two: {}}}}}, at=a.a)
+	@test(err, code=structural_cycle, path=#T.a.b.link, contains="structural cycle", pos=[])
+}
+
+// Issue #502 -- or added later.
+p3: {
+	#S: #T: {
+		a: [string]: link: #T
+	}
+
+	#U: {
+		#S
+		#T: a: b: {}
+	} @test(err, code=structural_cycle, path=#T.a.b.link, contains="structural cycle", pos=[])
+
+	a: #U.#T & {
+		a: one: link: a: two: {}
+	} @test(err, code=structural_cycle, path=p3.#U.#T.a.b.link, contains="structural cycle", pos=[])
+}
+
+// Issue #502 -- unused bulk constraints are not cyclic
+p4: {
+	#T: {
+		a: [...{link: #T}]
+	}
+
+	a: #T & {
+		a: [{link: a: [{}]}]
+	}
+	@test(eq, {
+		#T: {a: []}
+		a: {a: [{link: {a: [{link: {a: []}}]}}]}
+	})
+}
+
+// Issue #502 -- but they are if it is invoked within the struct.
+p5: {
+	#T: {
+		a: [...{link: #T}]
+		a: [{}]
+	}
+
+	a: #T & {
+		a: [{link: a: [{}]}]
+	}
+	@test(err, code=structural_cycle, path=#T.a.0.link, contains="structural cycle", pos=[])
+	@test(eq, [{link: {a: [{}]}}], at=a.a)
+}
+
+// Issue #502 -- or added later.
+p6: {
+	#S: #T: {
+		a: [...{link: #T}]
+	}
+
+	#U: {
+		#S
+		#T: a: [{}]
+	} @test(err, code=structural_cycle, path=#T.a.0.link, contains="structural cycle", pos=[])
+
+	a: #U.#T & {
+		a: [{link: a: [{}]}]
+	} @test(err, code=structural_cycle, path=p6.#U.#T.a.0.link, contains="structural cycle", pos=[])
+}
+
+c1: {
+	a: {
+		b: {}
+		c: a & b
+	}
+	@test(err, code=structural_cycle, path=a.c.c, contains="structural cycle", pos=[])
+}
+
+// indirection
+d1: {
+	a: b: c: d: {h: int, t: r}
+	@test(err, at=a.b.c.d.t, code=structural_cycle, path=d1.r, contains="structural cycle", pos=[])
+
+	r: a.b @test(err, code=structural_cycle, contains="structural cycle", pos=[])
+
+	x: a.b.c
+
+}
+
+d2: {
+	x: a.b.c @test(shareID=X)
+	@test(shareID=X, at=a.b.c)
+
+	r: a.b @test(shareID=R)
+	@test(shareID=R, at=a.b)
+
+	a: b: c: d: {h: int, t: r}
+}
+
+d3: {
+	config: {
+		a: b: c: indirect
+		indirect: [a.b, null][i]
+		i:        int | *1
+	}
+	x: config & {i: 0}
+	@test(err, at=x.indirect, code=structural_cycle, contains="structural cycle", pos=[])
+	@test(err, at=x.a.b.c, code=structural_cycle, contains="structural cycle", pos=[])
+	@test(eq, at=config, {
+		a: {b: {c: null}}
+		indirect: null
+		i: *1 | int
+	})
+}
+
+// Ensure that the cycles here fail early.
+// TODO: they can still be shorter.
+shortPathFail: _
+
+shortPathFail: doubleRef: {
+	// Avoid this: the first #List reference is different from the second, so
+	// the second #List reference counts as a first occurrence, causing the
+	// result to be longer than perhaps expected.
+	a: #List
+	#List: Next: #List | *null
+	@test(eq, {a: {Next: null}, #List: {Next: null}})
+}
+
+shortPathFail: elipsis: {
+	// Avoid this: the elipsis causes `_` to be mixed in with the #Foo
+	// reference, causing the first cycle to be discounted.
+	t1: {
+		#Foo: ref:  null | #Foo
+		#Foo: { ... }
+		@test(eq, {#Foo: {ref: null}})
+	}
+	t2: {
+		Foo: ref:  Foo
+		Foo: {...}
+		@test(err, code=structural_cycle, at=Foo.ref, contains="structural cycle", pos=[])
+	}
+}
+
+// Issue #2374: a pattern constraint with an alias referring back to itself
+// (e.g., `r=[string]: {b: r}`) should be detected as a structural cycle,
+// but the evaluator instead emitted output with a renamed alias.
+// https://cuelang.org/issue/2374
+patternFail: issue2374: {
+	r=[string]: {b: r}
+	a: {r: 0}
+	@test(err, code=structural_cycle, at=a.b, contains="structural cycle", pos=[])
+}
+
+shortPathFail: comprehension: {
+	#list: {
+		tail: #list | *null
+		if tail != null {
+		}
+	}
+	@test(eq, {#list: {tail: null}})
+}
+
+withLetFail: {
+	schema: next:  _schema_1
+	let _schema_1 = schema
+	@test(err, code=structural_cycle, at=schema.next, contains="structural cycle", pos=[])
+}
+
+// Issue #3310: `list.Sum` called with a comprehension iterating over the
+// enclosing struct causes a structural cycle because `total` is included in
+// its own computation. The cycle error is correct; evalv2 incorrectly produced
+// a wrong numeric result instead of erroring.
+// https://cuelang.org/issue/3310
+fieldsSumInfinite: issue3310: {
+	cheeseburger: 3.00
+	fries:        2.00
+	sprite:       1.00
+
+	total: list.Sum([for _, v in issue3310 {v}])
+	@test(err, code=structural_cycle, at=total, contains="error in call to %s", args=[list.Sum], pos=[5:9])
+}
+
+listOptOK: {
+	list: {
+		head: int
+		tail?: list
+	}
+	a: list & {head: 3, tail: head: 2}
+	@test(eq, {
+		list: {
+			head: int
+			tail?: _|_ @test(err, code=structural_cycle, contains="list.tail: structural cycle", pos=[])
+		}
+		a: {
+			head: 3
+			tail: {
+				head: 2
+				tail?: {
+					head: int
+					tail?: _|_ @test(err, code=structural_cycle, contains="list.tail: structural cycle", pos=[])
+				}
+			}
+		}
+	})
+}
+
+// The cyclic definitions below used to work OK on old versions of evalv2,
+// and broke around the release of CUE v0.6.0. evalv3 fixes this again.
+// It should succeed, given that the optional field breaks the cycle.
+issue2545: {
+	#A: {
+		B?: #B
+	}
+	#B: {
+		A: #A
+	}
+	@test(err, code=structural_cycle,
+		hint="the comment says this should succeed since the optional field breaks the cycle, but it still errors in both v2 and v3")
+	@test(eq:todo, {
+		#A: {B?: _ @test(ignore)}
+		#B: {A: {B?: _|_}}
+	})
+}
+
+// combining structural with reference cycles
+e1: {
+	a: a
+	a: c: a
+
+	b: c: b
+	b: b
+	@test(err, code=structural_cycle, at=a.c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=b.c, contains="structural cycle", pos=[])
+}
+
+e2: {
+	a: {a}
+	a: c: a
+
+	b: c: b
+	b: {b}
+	@test(err, code=structural_cycle, at=a.c, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, at=b.c, contains="structural cycle", pos=[])
+}
+
+e3: {
+	a: [a]  @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[[a], {c:a}, list, struct], pos=[0:5, 1:5])
+	a: c: a @test(err, code=structural_cycle, contains="structural cycle", pos=[])
+
+	b: [b] @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[[b], {c:b}, list, struct], pos=[0:5, 1:5])
+	b: c: b
+}
+
+e4: {
+	a: [a | {}]
+	a: [[{c: 1}]]
+
+	b: [[{c: 1}]]
+	b: [b | {}]
+	@test(err, code=eval,
+		suberr=(code=eval, path=a.0, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[[{c:1}], {}, list, struct], pos=[1:10, 2:6]),
+		suberr=(code=eval, path=a.0.0, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{c:1}, [{c:1}], struct, list], pos=[1:6, 2:6, 2:7]))
+}
+
+e5: {
+	a: c: a | int
+	a: a | int
+
+	b: b | int
+	b: c: b | int
+	@test(eq, {a: {c: int}, b: {c: int}})
+}
+
+// validating values
+nestedList: {
+	v1e: {
+		x: [x | int, 1]
+		y: x & [[[2], 1], 1]
+		@test(err, code=eval,
+			suberr=(code=eval, path=y.0, contains="conflicting values %s and %s (mismatched types %s and %s)", pos=[1:11, 2:6, 2:11]),
+			suberr=(code=eval, path=y.0.0, contains="%d errors in empty disjunction:", args=[2], pos=[]),
+			suberr=(code=eval, path=y.0.0, contains="conflicting values %s and %s (mismatched types %s and %s)", pos=[1:7, 1:11, 2:6, 2:12]),
+			suberr=(code=eval, path=y.0.0, contains="incompatible list lengths (%d and %d)", args=[1, 2], pos=[1:6]))
+	}
+
+	v2e: {
+		y: x & [[[2], 1], 1]
+		x: [x | int, 1]
+		@test(err, code=eval,
+			suberr=(code=eval, path=y.0, contains="conflicting values %s and %s (mismatched types %s and %s)", pos=[1:6, 1:11, 2:11]),
+			suberr=(code=eval, path=y.0.0, contains="%d errors in empty disjunction:", args=[2], pos=[]),
+			suberr=(code=eval, path=y.0.0, contains="conflicting values %s and %s (mismatched types %s and %s)", pos=[1:6, 1:12, 2:7, 2:11]),
+			suberr=(code=eval, path=y.0.0, contains="incompatible list lengths (%d and %d)", args=[1, 2], pos=[2:6]))
+	}
+
+	v1: {
+		x: [x | int, 1]
+		y: x & [[[2, 1], 1], 1]
+		@test(eq, {x: [int, 1], y: [[[2, 1], 1], 1]})
+	}
+
+	v2: {
+		y: x & [[[2, 1], 1], 1]
+		x: [x | int, 1]
+		@test(eq, {y: [[[2, 1], 1], 1], x: [int, 1]})
+	}
+}
+
+v3: {
+	list: {
+		head: int
+		tail: list | null
+	}
+
+	myList: list
+	myList: {
+		head: 2
+		tail: {
+			head: 3
+			tail: {
+				head: 4
+			}
+		}
+	}
+	@test(eq, {
+		list: {head: int, tail: null}
+		myList: {
+			head: 2
+			tail: {
+				head: 3
+				tail: {
+					head: 4
+					tail: {head: int, tail: null} | null
+				}
+			}
+		}
+	})
+}
+
+v4: {
+	list: {
+		head: int
+		tail: list | 1
+	}
+
+	myList: list
+	myList: {
+		head: 2
+		tail: head: 3
+	}
+	@test(eq, {
+		list: {head: int, tail: 1}
+		myList: {
+			head: 2
+			tail: {
+				head: 3
+				tail: {head: int, tail: 1} | 1
+			}
+		}
+	})
+}
+
+v5: {
+	list: {
+		head: int
+		tail: list | {}
+	}
+
+	myList: list
+	myList: {
+		head: 2
+		tail: head: 3
+	}
+	@test(eq, {
+		list: {head: int, tail: {}}
+		myList: {
+			head: 2
+			tail: {head: 3, tail: {head: int, tail: {}} | {}} | {head: 3}
+		}
+	})
+}
+
+// Example from "The Logic of Type Feature Structures" (Bob Carpenter)/
+z1: {
+	y: {
+		f: h: g
+		g: _
+	}
+	x: {
+		f: _
+		g: f
+	}
+	z: x & y
+	@test(err, code=structural_cycle, path=z.g, contains="structural cycle", pos=[])
+}
+
+// Cross references. Here there is no cycle, but the repeated instantiations
+// of T will cause, in turn, cause repeated resolution of `x`. The algorithm
+// should not identify these as cyclic references. Instead, it should be
+// noted that the reference is each time referring to new content.
+// Issue #754
+crossRefNoCycle: t1: {
+	T: {
+		x: _
+		y: x
+	}
+	C: { x: T } & T
+	@test(eq, {
+		T: {x: _, y: _}
+		C: {x: {x: _, y: _}, y: {x: _, y: _}}
+	})
+}
+
+crossRefNoCycle: t2: {
+	T: {
+		x: _
+		y: x
+	}
+	C: T & { x: T }
+	@test(eq, {
+		T: {x: _, y: _}
+		C: {x: {x: _, y: _}, y: {x: _, y: _}}
+	})
+}
+
+crossRefNoCycle: t3: {
+	T: {
+		x: _
+		y: x
+		z: y
+	}
+	C: T & { x: T }
+	@test(eq, {
+		T: {x: _, y: _, z: _}
+		C: {
+			x: {x: _, y: _, z: _}
+			y: {x: _, y: _, z: _}
+			z: {x: _, y: _, z: _}
+		}
+	})
+}
+
+crossRefNoCycle: t4: {
+	T: {
+		x: _
+		y: x
+		z: y
+	}
+	C: T & { x: T & { x: T } }
+	@test(eq, {
+		T: {x: _, y: _, z: _}
+		C: {
+			x: {
+				x: {x: _, y: _, z: _}
+				y: {x: _, y: _, z: _}
+				z: {x: _, y: _, z: _}
+			}
+			y: {
+				x: {x: _, y: _, z: _}
+				y: {x: _, y: _, z: _}
+				z: {x: _, y: _, z: _}
+			}
+			z: {
+				x: {x: _, y: _, z: _}
+				y: {x: _, y: _, z: _}
+				z: {x: _, y: _, z: _}
+			}
+		}
+	})
+}
+
+crossRefNoCycle: t5: {
+	T: X={
+		y: X.x
+	}
+	C: T & { x: T  }
+	@test(eq, {
+		T: {
+			y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+		}
+		C: {
+			x: {
+				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+			}
+			y: {
+				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+			}
+		}
+	})
+}
+
+// Ensure these are NOT treated as structural errors.
+
+n1: {
+	a: b: int
+	@test(eq, {a: {b: int}})
+}
+n2: {
+	n1
+	a: n1
+	@test(eq, {a: {b: int, a: {b: int}}})
+}
+n3: {
+	n1
+	@test(eq, {a: {b: int}})
+}
+n4: {
+	n1
+	x: {
+		n1
+		y: {
+			n1
+			z: int
+		}
+	}
+	@test(eq, {
+		x: {y: {z: int, a: {b: int}}, a: {b: int}}
+		a: {b: int}
+	})
+}
+-- edge.cue --
+// TODO(eval): notice the difference, not a huge deal, but still.
+resolveToAncestor: {
+	t1: X: {
+		a: b.a   @test(eq, _) @test(err:todo, code=structural_cycle)
+		b: X     @test(err, code=structural_cycle, contains="structural cycle", pos=[])
+	}
+	t2: X: {
+		b: X    @test(err, code=structural_cycle, contains="structural cycle", pos=[])
+		a: b.a  @test(err, code=structural_cycle, path=resolveToAncestor.t2.X.b, contains="structural cycle", pos=[])
+	}
+}
+-- out/compile --
+--- edge.cue
+{
+  resolveToAncestor: {
+    t1: {
+      X: {
+        a: 〈0;b〉.a
+        b: 〈1;X〉
+      }
+    }
+    t2: {
+      X: {
+        b: 〈1;X〉
+        a: 〈0;b〉.a
+      }
+    }
+  }
+}
+--- in.cue
+{
+  a1: {
+    f: [
+      〈1;f〉,
+    ]
+  }
+  a2: {
+    f: 〈0;f〉
+  }
+  a3: {
+    f: {
+      g: 〈1;f〉
+    }
+  }
+  a4: {
+    a: [
+      (〈1;a〉|int),
+    ]
+  }
+  a5: {
+    a: {
+      b: (〈1;a〉|int)
+    }
+  }
+  a6: {
+    a: (〈0;a〉|int)
+  }
+  a7: {
+    a: 〈0;c〉.x
+    b: {
+      x: 〈1;c〉
+      y: "foo"
+    }
+    c: {
+      x: 〈1;b〉.y
+      y: 3
+    }
+  }
+  b1: {
+    b: (〈0;a〉 & [
+      1,
+    ])
+    a: [
+      (〈1;a〉|int),
+    ]
+  }
+  b2: {
+    a: [
+      (〈1;a〉|int),
+    ]
+    b: (〈0;a〉 & [
+      1,
+    ])
+  }
+  b3: {
+    x: {
+      a: [
+        (〈1;a〉|int),
+      ]
+    }
+    b: (〈0;x〉 & {
+      a: [
+        1,
+      ]
+    })
+  }
+  b4: {
+    b: (〈0;x〉.y & [
+      1,
+    ])
+    x: {
+      y: [
+        〈1;y〉,
+      ]
+    }
+  }
+  b4: {
+    cond1: {
+      b: (〈0;x〉.y & {
+        _z: false
+        [
+          1,
+        ]
+      })
+      x: {
+        y: {
+          _z: (*true|bool)
+          if 〈0;_z〉 {
+            [
+              〈3;y〉,
+            ]
+          }
+        }
+      }
+    }
+  }
+  b4: {
+    cond2: {
+      x: {
+        y: {
+          _z: (*true|bool)
+          if 〈0;_z〉 {
+            [
+              〈3;y〉,
+            ]
+          }
+        }
+      }
+      b: (〈0;x〉.y & {
+        _z: false
+        [
+          1,
+        ]
+      })
+    }
+  }
+  b5: {
+    b: (〈0;x〉.y & {
+      a: [
+        1,
+      ]
+    })
+    x: {
+      y: {
+        a: [
+          (〈1;a〉|int),
+        ]
+      }
+    }
+  }
+  b6: {
+    b: (〈0;x〉 & {
+      a: [
+        1,
+      ]
+    })
+    x: {
+      a: [
+        〈1;a〉,
+      ]
+    }
+  }
+  b7: {
+    b: (〈0;a〉 & [
+      [
+        1,
+      ],
+    ])
+    a: [
+      〈1;a〉,
+    ]
+  }
+  b8: {
+    x: 〈0;a〉
+    a: {
+      f: 〈1;b〉
+    }
+    b: (〈0;a〉|string)
+  }
+  b9: {
+    #a: (string|〈0;#b〉|〈0;#ref〉)
+    #b: {
+      c: [
+        〈2;#a〉,
+        〈2;#a〉,
+        〈2;#a〉,
+      ]
+    }
+    #ref: {
+      ref: string
+    }
+    x: (〈0;#b〉|〈0;#ref〉)
+  }
+  b10: {
+    a: close({
+      b: (string|〈1;a〉|〈1;c〉)
+    })
+    c: close({
+      d: (string|〈1;a〉)
+    })
+    d: {
+      d: {
+        b: string
+      }
+    }
+  }
+  b11: {
+    #list: {
+      tail: (〈1;#list〉|*null)
+      if (〈0;tail〉 != null) {}
+    }
+  }
+  b12: {
+    #list: {
+      value: int
+      tail: (〈1;#list〉|*null)
+      if (〈0;tail〉 != null) {
+        sum: (〈1;value〉 + 〈1;tail〉.sum)
+      }
+      if (〈0;tail〉 == null) {
+        sum: 〈1;value〉
+      }
+    }
+    list1: 〈0;#list〉
+    list1: {
+      value: 1
+      tail: {
+        value: 2
+        tail: {
+          value: 3
+          tail: {
+            value: 4
+          }
+        }
+      }
+    }
+  }
+  b12b: {
+    #list: {
+      tail: 〈1;#list〉
+      if (〈0;tail〉 != null) {
+        sum: 〈1;tail〉.sum
+      }
+    }
+    list1: 〈0;#list〉
+    list1: {
+      tail: {
+        tail: {}
+      }
+    }
+  }
+  b13: {
+    root: {
+      a: [
+        for _, x in 〈2;root〉 {
+          〈1;x〉
+        },
+      ]
+    }
+  }
+  b14: {
+    root: {
+      a: [
+        ...int,
+      ]
+      for _, x in 〈0;a〉 {
+        "\(〈1;x〉)": {}
+      }
+      b: [
+        for _, x in 〈2;root〉 {
+          〈1;x〉
+        },
+      ]
+    }
+  }
+  b15: {
+    root: {
+      a: {
+        for _, x in 〈2;root〉 {
+          〈1;x〉
+        }
+      }
+    }
+  }
+  p1: {
+    #T: {
+      a: {
+        [string]: {
+          link: 〈3;#T〉
+        }
+      }
+    }
+    a: (〈0;#T〉 & {
+      a: {
+        one: {
+          link: {
+            a: {
+              two: {}
+            }
+          }
+        }
+      }
+    })
+  }
+  p2: {
+    #T: {
+      a: {
+        [string]: {
+          link: 〈3;#T〉
+        }
+      }
+      a: {
+        b: {}
+      }
+    }
+    a: (〈0;#T〉 & {
+      a: {
+        one: {
+          link: {
+            a: {
+              two: {}
+            }
+          }
+        }
+      }
+    })
+  }
+  p3: {
+    #S: {
+      #T: {
+        a: {
+          [string]: {
+            link: 〈3;#T〉
+          }
+        }
+      }
+    }
+    #U: {
+      〈1;#S〉
+      #T: {
+        a: {
+          b: {}
+        }
+      }
+    }
+    a: (〈0;#U〉.#T & {
+      a: {
+        one: {
+          link: {
+            a: {
+              two: {}
+            }
+          }
+        }
+      }
+    })
+  }
+  p4: {
+    #T: {
+      a: [
+        ...{
+          link: 〈3;#T〉
+        },
+      ]
+    }
+    a: (〈0;#T〉 & {
+      a: [
+        {
+          link: {
+            a: [
+              {},
+            ]
+          }
+        },
+      ]
+    })
+  }
+  p5: {
+    #T: {
+      a: [
+        ...{
+          link: 〈3;#T〉
+        },
+      ]
+      a: [
+        {},
+      ]
+    }
+    a: (〈0;#T〉 & {
+      a: [
+        {
+          link: {
+            a: [
+              {},
+            ]
+          }
+        },
+      ]
+    })
+  }
+  p6: {
+    #S: {
+      #T: {
+        a: [
+          ...{
+            link: 〈3;#T〉
+          },
+        ]
+      }
+    }
+    #U: {
+      〈1;#S〉
+      #T: {
+        a: [
+          {},
+        ]
+      }
+    }
+    a: (〈0;#U〉.#T & {
+      a: [
+        {
+          link: {
+            a: [
+              {},
+            ]
+          }
+        },
+      ]
+    })
+  }
+  c1: {
+    a: {
+      b: {}
+      c: (〈1;a〉 & 〈0;b〉)
+    }
+  }
+  d1: {
+    a: {
+      b: {
+        c: {
+          d: {
+            h: int
+            t: 〈4;r〉
+          }
+        }
+      }
+    }
+    r: 〈0;a〉.b
+    x: 〈0;a〉.b.c
+  }
+  d2: {
+    x: 〈0;a〉.b.c
+    r: 〈0;a〉.b
+    a: {
+      b: {
+        c: {
+          d: {
+            h: int
+            t: 〈4;r〉
+          }
+        }
+      }
+    }
+  }
+  d3: {
+    config: {
+      a: {
+        b: {
+          c: 〈2;indirect〉
+        }
+      }
+      indirect: [
+        〈1;a〉.b,
+        null,
+      ][〈0;i〉]
+      i: (int|*1)
+    }
+    x: (〈0;config〉 & {
+      i: 0
+    })
+  }
+  shortPathFail: _
+  shortPathFail: {
+    doubleRef: {
+      a: 〈0;#List〉
+      #List: {
+        Next: (〈1;#List〉|*null)
+      }
+    }
+  }
+  shortPathFail: {
+    elipsis: {
+      t1: {
+        #Foo: {
+          ref: (null|〈1;#Foo〉)
+        }
+        #Foo: {
+          ...
+        }
+      }
+      t2: {
+        Foo: {
+          ref: 〈1;Foo〉
+        }
+        Foo: {
+          ...
+        }
+      }
+    }
+  }
+  patternFail: {
+    issue2374: {
+      [string]: {
+        b: 〈1;(〈0;-〉)〉
+      }
+      a: {
+        r: 0
+      }
+    }
+  }
+  shortPathFail: {
+    comprehension: {
+      #list: {
+        tail: (〈1;#list〉|*null)
+        if (〈0;tail〉 != null) {}
+      }
+    }
+  }
+  withLetFail: {
+    schema: {
+      next: 〈1;let _schema_1#1〉
+    }
+    let _schema_1#1 = 〈0;schema〉
+  }
+  fieldsSumInfinite: {
+    issue3310: {
+      cheeseburger: 3.00
+      fries: 2.00
+      sprite: 1.00
+      total: 〈import;list〉.Sum([
+        for _, v in 〈2;issue3310〉 {
+          〈1;v〉
+        },
+      ])
+    }
+  }
+  listOptOK: {
+    list: {
+      head: int
+      tail?: 〈1;list〉
+    }
+    a: (〈0;list〉 & {
+      head: 3
+      tail: {
+        head: 2
+      }
+    })
+  }
+  issue2545: {
+    #A: {
+      B?: 〈1;#B〉
+    }
+    #B: {
+      A: 〈1;#A〉
+    }
+  }
+  e1: {
+    a: 〈0;a〉
+    a: {
+      c: 〈1;a〉
+    }
+    b: {
+      c: 〈1;b〉
+    }
+    b: 〈0;b〉
+  }
+  e2: {
+    a: {
+      〈1;a〉
+    }
+    a: {
+      c: 〈1;a〉
+    }
+    b: {
+      c: 〈1;b〉
+    }
+    b: {
+      〈1;b〉
+    }
+  }
+  e3: {
+    a: [
+      〈1;a〉,
+    ]
+    a: {
+      c: 〈1;a〉
+    }
+    b: [
+      〈1;b〉,
+    ]
+    b: {
+      c: 〈1;b〉
+    }
+  }
+  e4: {
+    a: [
+      (〈1;a〉|{}),
+    ]
+    a: [
+      [
+        {
+          c: 1
+        },
+      ],
+    ]
+    b: [
+      [
+        {
+          c: 1
+        },
+      ],
+    ]
+    b: [
+      (〈1;b〉|{}),
+    ]
+  }
+  e5: {
+    a: {
+      c: (〈1;a〉|int)
+    }
+    a: (〈0;a〉|int)
+    b: (〈0;b〉|int)
+    b: {
+      c: (〈1;b〉|int)
+    }
+  }
+  nestedList: {
+    v1e: {
+      x: [
+        (〈1;x〉|int),
+        1,
+      ]
+      y: (〈0;x〉 & [
+        [
+          [
+            2,
+          ],
+          1,
+        ],
+        1,
+      ])
+    }
+    v2e: {
+      y: (〈0;x〉 & [
+        [
+          [
+            2,
+          ],
+          1,
+        ],
+        1,
+      ])
+      x: [
+        (〈1;x〉|int),
+        1,
+      ]
+    }
+    v1: {
+      x: [
+        (〈1;x〉|int),
+        1,
+      ]
+      y: (〈0;x〉 & [
+        [
+          [
+            2,
+            1,
+          ],
+          1,
+        ],
+        1,
+      ])
+    }
+    v2: {
+      y: (〈0;x〉 & [
+        [
+          [
+            2,
+            1,
+          ],
+          1,
+        ],
+        1,
+      ])
+      x: [
+        (〈1;x〉|int),
+        1,
+      ]
+    }
+  }
+  v3: {
+    list: {
+      head: int
+      tail: (〈1;list〉|null)
+    }
+    myList: 〈0;list〉
+    myList: {
+      head: 2
+      tail: {
+        head: 3
+        tail: {
+          head: 4
+        }
+      }
+    }
+  }
+  v4: {
+    list: {
+      head: int
+      tail: (〈1;list〉|1)
+    }
+    myList: 〈0;list〉
+    myList: {
+      head: 2
+      tail: {
+        head: 3
+      }
+    }
+  }
+  v5: {
+    list: {
+      head: int
+      tail: (〈1;list〉|{})
+    }
+    myList: 〈0;list〉
+    myList: {
+      head: 2
+      tail: {
+        head: 3
+      }
+    }
+  }
+  z1: {
+    y: {
+      f: {
+        h: 〈1;g〉
+      }
+      g: _
+    }
+    x: {
+      f: _
+      g: 〈0;f〉
+    }
+    z: (〈0;x〉 & 〈0;y〉)
+  }
+  crossRefNoCycle: {
+    t1: {
+      T: {
+        x: _
+        y: 〈0;x〉
+      }
+      C: ({
+        x: 〈1;T〉
+      } & 〈0;T〉)
+    }
+  }
+  crossRefNoCycle: {
+    t2: {
+      T: {
+        x: _
+        y: 〈0;x〉
+      }
+      C: (〈0;T〉 & {
+        x: 〈1;T〉
+      })
+    }
+  }
+  crossRefNoCycle: {
+    t3: {
+      T: {
+        x: _
+        y: 〈0;x〉
+        z: 〈0;y〉
+      }
+      C: (〈0;T〉 & {
+        x: 〈1;T〉
+      })
+    }
+  }
+  crossRefNoCycle: {
+    t4: {
+      T: {
+        x: _
+        y: 〈0;x〉
+        z: 〈0;y〉
+      }
+      C: (〈0;T〉 & {
+        x: (〈1;T〉 & {
+          x: 〈2;T〉
+        })
+      })
+    }
+  }
+  crossRefNoCycle: {
+    t5: {
+      T: {
+        y: 〈1〉.x
+      }
+      C: (〈0;T〉 & {
+        x: 〈1;T〉
+      })
+    }
+  }
+  n1: {
+    a: {
+      b: int
+    }
+  }
+  n2: {
+    〈1;n1〉
+    a: 〈1;n1〉
+  }
+  n3: {
+    〈1;n1〉
+  }
+  n4: {
+    〈1;n1〉
+    x: {
+      〈2;n1〉
+      y: {
+        〈3;n1〉
+        z: int
+      }
+    }
+  }
+}

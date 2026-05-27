@@ -20,33 +20,6 @@ for k, v in {#def: 1, opt?: 2, _hid: 3, reg: 4} {
   reg: 4
 })
 
--- out/compile --
---- in.cue
-{
-  obj: {
-    foo: {
-      a: "bar"
-    }
-  }
-  obj: {
-    [string]: {
-      a: (*"dummy"|string)
-      if true {
-        sub: {
-          as: 〈2;a〉
-        }
-      }
-    }
-  }
-  for k, v in {
-    #def: 1
-    opt?: 2
-    _hid: 3
-    reg: 4
-  } {
-    "\(〈1;k〉)": 〈1;v〉
-  }
-}
 -- out/eval/stats --
 Leaks:  2
 Freed:  12

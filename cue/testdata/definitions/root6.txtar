@@ -39,29 +39,3 @@ ConjunctInfos:       29
 MaxConjunctInfos:    3
 MaxReqSets:          7
 MaxRedirect:         2
--- out/compile --
---- in.cue
-{
-  c: "foo"
-  a: {
-    b: int
-  }
-  〈0;#Schema〉
-  #Schema: close({
-    a: {
-      b: int
-    }
-  })
-  x: {
-    c: "foo"
-    a: {
-      b: int
-    }
-    〈0;#Schema〉
-    #Schema: close({
-      a: {
-        b: int
-      }
-    })
-  }
-}

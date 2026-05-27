@@ -1,0 +1,1511 @@
+-- in.cue --
+import (
+	"list"
+	"strings"
+)
+
+// Allow lookup in partially evaluated struct as long as the end result is
+// concrete.
+A: {
+	a: {
+		parent: ""
+		children: [for k, v in A if v.parent == k {k}]
+	} @test(eq, {parent: "", children: []})
+	b: {
+		parent: "a"
+		children: [for k, v in A if v.parent == k {k}]
+	} @test(eq, {parent: "a", children: []})
+}
+
+// This should result in an incomplete error (a reference cycle error classifies
+// as incomplete).
+B: {
+	a: {
+		parent: ""
+		children: [for k, v in B for _, w in v.children {k}]
+	} @test(eq, {
+		parent: ""
+		children: _|_ @test(err, code=incomplete, contains="B.a.children: cannot range over v.children (incomplete type list)", pos=[24:40])
+	})
+}
+
+// Issue #486: stack overflow in v0.3.0 when evaluating parametric fields with
+// conditional comprehensions; the same code worked correctly in v0.2.0.
+// https://cuelang.org/issue/486
+Issue486: {
+	A: {
+		a: {
+			parent: ""
+			children: [...string]
+		}
+		b: {
+			parent: "a"
+			children: [...string]
+		}
+		c: {
+			parent: "b"
+			children: [...string]
+		}
+	}
+
+	A: [Name=string]: {
+		children: [
+			for k, v in A
+			if v.parent == Name {
+				k
+			},
+		]
+	}
+	@test(eq, {
+		A: {
+			a: {parent: "", children: ["b"]}
+			b: {parent: "a", children: ["c"]}
+			c: {parent: "b", children: []}
+		}
+	})
+}
+
+// Issue #1666: evaluator hangs indefinitely when combining disjunctions with
+// for comprehensions iterating over mapped fields.
+// https://cuelang.org/issue/1666
+issue1666: {
+	#E: {
+		f1: [string]: #E | [...#E]
+		f2: [string]: t: #E
+	}
+
+	_e: #E
+	_e: f2: a: _
+
+	e: _e & {
+		f1: {
+			for fk, s in _e.f2 {
+				(fk): s.t
+			}
+		}
+	}
+	@test(eq, {
+		#E: {f1: {}, f2: {}}
+		_e: {f2: {a: {t: {f1: {}, f2: {}}}}, f1: {}}
+		e: {
+			f1: {a: {f1: {}, f2: {}}}
+			f2: {a: {t: {f1: {}, f2: {}}}}
+		}
+	})
+}
+
+// Issue #779: for comprehension incorrectly rejected valid bidirectional
+// projection patterns, reporting a cycle error even when no true cycle exists.
+// Should be allowed as long as the set of fields is not modified as a result
+// of a comprehension.
+// https://cuelang.org/issue/779
+issue779: {
+	X: Y.message
+	STATE: {
+		for k, v in Y {
+			if k != "message" {
+				"\(k)": v
+			}
+		}
+	}
+	Y: STATE & { message: X }
+	X: "test"
+	STATE: { code: 101 }
+	@test(eq, {
+		X: "test"
+		STATE: {code: 101}
+		Y: {message: "test", code: 101}
+	})
+}
+
+// Issue #1934: regression in v0.4.1 where nested comprehensions referencing
+// fields within the same struct were incorrectly reported as cycles.
+// Comprehension ends up inserting in the same arcs over which it
+// is iterating. This is fine as long as the set is not altered.
+// https://cuelang.org/issue/1934
+selfReferential: T1: {
+	S: d: "bar"
+
+	T: e: S: a: "foo"
+
+	for s, v in S for t, _ in T {
+		T: (t): S: (s): v
+	}
+	@test(eq, {
+		S: {d: "bar"}
+		T: {e: {S: {a: "foo", d: "bar"}}}
+	})
+}
+
+// selfReferential comprehension for list.
+// https://cuelang.org/issue/1934
+selfReferential: list: {
+	panels: [
+		for i, _ in panels {
+			id: i
+		}
+	]
+	panels: [{}, {}, {}]
+	@test(eq, {panels: [{id: 0}, {id: 1}, {id: 2}]})
+}
+
+selfReferential: insertionError: {
+	A: {
+		foo: 1
+		for x in A {
+			// May not insert foo3. Use dynamic references to force the
+			// comprehension to be evaluated in the struct in which it is
+			// defined.
+			("foo3"): 1
+		}
+		@test(err, code=eval, contains="adding field foo3 not allowed as field set was already referenced", pos=[6:14])
+	}
+}
+
+// A comprehension should not recursively evaluated arcs, so that a
+// structural cycle can be avoided when unnecessary.
+selfReferential: acrossOr: t1: p1: {
+	o: #Output & { retry: reject: "ok" }
+
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: #Output
+	}
+
+	#Output: or([for name, config in #AllOutputs {
+		(name): config
+	}])
+	@test(eq, {
+		o: {retry: {reject: "ok"}}
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {reject: string} | {resource: string}
+		}
+		#Output: {reject: string} | {resource: string}
+	})
+}
+
+selfReferential: acrossOr: t1: p2: {
+	#Output: or([for name, config in #AllOutputs {
+		(name): config
+	}])
+
+	o: #Output & { retry: reject: "ok" }
+
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: #Output
+	}
+	@test(eq, {
+		#Output: {reject: string} | {resource: string}
+		o: {retry: {reject: "ok"}}
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {reject: string} | {resource: string}
+		}
+	})
+}
+
+selfReferential: acrossOr: t1: p3: {
+	#Output: or([for name, config in #AllOutputs {
+		(name): config
+	}])
+
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: #Output
+	}
+
+	o: #Output & { retry: reject: "ok" }
+	@test(eq, {
+		#Output: {reject: string} | {resource: string}
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {reject: string} | {resource: string}
+		}
+		o: {retry: {reject: "ok"}}
+	})
+}
+
+selfReferential: acrossOr: t2: p1: {
+	d: or([for x, y in #A { y }])
+	o: d & { b: 2 }
+	#A: {
+		d1: int
+		d2: string
+		d3: b: d
+	}
+	@test(eq, {
+		d: int | string
+		o: {b: 2}
+		#A: {
+			d1: int
+			d2: string
+			d3: {b: int | string}
+		}
+	})
+}
+
+selfReferential: acrossOr: t2: p2: {
+	o: d & { b: 2 }
+	d: or([for x, y in #A { y }])
+	#A: {
+		d1: int
+		d2: string
+		d3: b: d
+	}
+	@test(eq, {
+		o: {b: 2}
+		d: int | string
+		#A: {
+			d1: int
+			d2: string
+			d3: {b: int | string}
+		}
+	})
+}
+
+selfReferential: acrossOr: t2: p3: {
+	o: d & { b: 2 }
+	#A: {
+		d1: int
+		d2: string
+		d3: b: d
+	}
+	d: or([for x, y in #A { y }])
+	@test(eq, {
+		o: {b: 2}
+		#A: {
+			d1: int
+			d2: string
+			d3: {b: int | string}
+		}
+		d: int | string
+	})
+}
+
+// Issue #1881: evaluator required the source of a for comprehension to be
+// fully evaluated before iterating, causing false structural cycle errors.
+// https://cuelang.org/issue/1881
+issue1881: p1: {
+	o: #Output & { retry: output: reject: "ok" }
+
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: output: #Output
+	}
+
+	#Output: or([for name, config in #AllOutputs {
+		(name): config
+	}])
+	@test(eq, {
+		o: {retry: {output: {reject: "ok"}}}
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {
+				output: {reject: string} | {resource: string}
+			}
+		}
+		#Output: {reject: string} | {resource: string}
+	})
+}
+
+issue1881: p2: {
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: output: #Output
+	}
+
+	o: #Output & { retry: output: reject: "ok" }
+
+	#Output: or([for name, config in #AllOutputs {
+		(name): config
+	}])
+	@test(eq, {
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {
+				output: {reject: string} | {resource: string}
+			}
+		}
+		o: {retry: {output: {reject: "ok"}}}
+		#Output: {reject: string} | {resource: string}
+	})
+}
+
+issue1881: p3: {
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: output: #Output
+	}
+
+	#Output: or([for name, config in #AllOutputs {
+		(name): config
+	}])
+
+	o: #Output & { retry: output: reject: "ok" }
+	@test(eq, {
+		#AllOutputs: {
+			reject: string
+			resource: string
+			retry: {
+				output: {reject: string} | {resource: string}
+			}
+		}
+		#Output: {reject: string} | {resource: string}
+		o: {retry: {output: {reject: "ok"}}}
+	})
+}
+
+siblingInsertion: t1: p1: {
+	D: "logging": _
+	deployment: _
+
+	for k, v in deployment
+	for k1, v2 in v.env2 {
+		deployment: (k): env: (k1): v2
+	}
+
+	for id, v in D {
+		deployment: (id): env2: ENV: "True"
+	}
+	@test(eq, {
+		D: {logging: _}
+		deployment: {
+			logging: {
+				env2: {ENV: "True"}
+				env: {ENV: "True"}
+			}
+		}
+	})
+}
+
+siblingInsertion: t1: p2: {
+	D: "logging": _
+	deployment: _
+
+	for id, v in D {
+		deployment: (id): env2: ENV: "True"
+	}
+
+	for k, v in deployment
+	for k1, v2 in v.env2 {
+		deployment: (k): env: (k1): v2
+	}
+	@test(eq, {
+		D: {logging: _}
+		deployment: {
+			logging: {
+				env2: {ENV: "True"}
+				env: {ENV: "True"}
+			}
+		}
+	})
+}
+
+siblingInsertion: t2: p1: {
+	D: "logging": _
+	deployment: _
+
+	for k, v in deployment {
+		for k1, v2 in v.env2 {
+			deployment: (k): env: (k1): v2
+		}
+	}
+
+	for id, v in D {
+		deployment: (id): env2: ENV: "True"
+	}
+	@test(eq, {
+		D: {logging: _}
+		deployment: {
+			logging: {
+				env2: {ENV: "True"}
+				env: {ENV: "True"}
+			}
+		}
+	})
+}
+
+siblingInsertion: t2: p2: {
+	D: "logging": _
+	deployment: _
+
+	for k, v in deployment {
+		for k1, v2 in v.env2 {
+			deployment: (k): env: (k1): v2
+		}
+	}
+
+	for id, v in D {
+		deployment: (id): env2: ENV: "True"
+	}
+	@test(eq, {
+		D: {logging: _}
+		deployment: {
+			logging: {
+				env2: {ENV: "True"}
+				env: {ENV: "True"}
+			}
+		}
+	})
+}
+
+// Issue #1407: cue export produced a misleading, location-free "cycle error"
+// for incomplete values; the actual problem was an incomplete value, not a
+// true cycle. Ensure there is a useful error message.
+// https://cuelang.org/issue/1407
+selfReferential: fail: {
+	a: {}
+	b: a.x != ""
+	if b {
+	}
+	@test(err, code=incomplete, contains="undefined field: x", pos=[2:7])
+}
+
+// Issue #2367: stack overflow triggered by a comprehension that inserts into
+// the same field it iterates over; the evaluator recurses infinitely instead
+// of returning an error.
+// https://cuelang.org/issue/2367
+issue2367: {
+	a: _
+	for x in [a] {a: x}
+	@test(eq, {a: _})
+}
+
+// Issue #2310: evalv2 incorrectly reported a structural cycle when a
+// comprehension contained three or more identical substitutions, despite the
+// same pattern working with two substitutions.
+// https://cuelang.org/issue/2310
+issue2310: original: {
+	#s: {#_1: string, #_2: string, #_3: string, strings.Replace(#_1, #_2, #_3, -1)}
+
+	#sub: {
+		#a: string
+
+		// We can't use X=[#a, ...] yet because that is still disallowed
+		_#X: [#a, for i in list.Range(0, len(#subs), 1) {#subs[i] & {#_1: _#X[i], _}}]
+
+		// Embedding would not be necessary if the X=[] form was allowed
+		_#X[len(_#X)-1]
+	}
+
+	res: #sub & {#a: "aaa", _}
+
+	// subs is a series of string substitutions we want to apply
+	#subs: [
+		#s & {#_2: "a", #_3: "b", _},
+		#s & {#_2: "c", #_3: "d", _},
+		#s & {#_2: "e", #_3: "f", _},
+	]
+	@test(eq, {
+		#s: {
+			_|_
+			#_1: string
+			#_2: string
+			#_3: string
+		}
+		#sub: {
+			_|_
+			#a: string
+			_#X: [string,
+			{_|_, #_1: string, #_2: "a", #_3: "b"},
+			{
+				_|_
+				#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
+				#_2: "c"
+				#_3: "d"
+			},
+			{
+				_|_
+				#_1: {
+					_|_
+					#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
+					#_2: "c"
+					#_3: "d"
+				}
+				#_2: "e"
+				#_3: "f"
+			}]
+			#_1: {
+				_|_
+				#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
+				#_2: "c"
+				#_3: "d"
+			}
+			#_2: "e"
+			#_3: "f"
+		}
+		res: {
+			"bbb"
+			#a: "aaa"
+			_#X: ["aaa",
+			{"bbb", #_1: "aaa", #_2: "a", #_3: "b"},
+			{
+				"bbb"
+				#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
+				#_2: "c"
+				#_3: "d"
+			},
+			{
+				"bbb"
+				#_1: {
+					"bbb"
+					#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
+					#_2: "c"
+					#_3: "d"
+				}
+				#_2: "e"
+				#_3: "f"
+			}]
+			#_1: {
+				"bbb"
+				#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
+				#_2: "c"
+				#_3: "d"
+			}
+			#_2: "e"
+			#_3: "f"
+		}
+		#subs: [{_|_, #_2: "a", #_3: "b", #_1: string},
+		{_|_, #_2: "c", #_3: "d", #_1: string},
+		{_|_, #_2: "e", #_3: "f", #_1: string}]
+	})
+}
+issue2310: reduced: {
+	res: {
+		#X[3] // Must be at least 3 to cause structural cycle.
+
+		// expanding comprehension eliminates cycle.
+		#X: ["X", for i, _ in #subs {#s, #str: #X[i]}]
+	}
+
+	#s: {#str: string, #str + "a"}
+	#subs: [0, 1, 2]
+	@test(eq, {
+		res: {
+			"Xaaa"
+			#X: ["X",
+			{"Xa", #str: "X"},
+			{"Xaa", #str: {"Xa", #str: "X"}},
+			{
+				"Xaaa"
+				#str: {"Xaa", #str: {"Xa", #str: "X"}}
+			}]
+			#str: {"Xaa", #str: {"Xa", #str: "X"}}
+		}
+		#s: {_|_, #str: string}
+		#subs: [0, 1, 2]
+	})
+}
+
+-- issue3903.cue --
+// evalv3 structural cycle regression: a schema with `_deps` and comprehensions
+// over those deps triggered a spurious structural cycle error that exported
+// successfully under evalv2.
+// https://cuelang.org/issue/3903
+issue3903: reduced: {
+	s1: #Schema
+	s1: _deps: [#Schema]
+	#Schema: {
+		_deps: [...]
+
+		objs: [
+			for dep in _deps
+			for obj in (dep & {}).objs {
+				obj
+			}
+		]
+	}
+	@test(eq, {
+		s1: {
+			_deps: [{_deps: [], objs: []}]
+			objs: []
+		}
+		#Schema: {_deps: [], objs: []}
+	})
+}
+issue3903: full: {
+	s1: #Schema & {
+		_deps: [s2]
+		_local: ["s1 local"]
+	}
+	s2: #Schema & {
+		_local: ["s2 local"]
+	}
+
+	#Schema: {
+		_local: [...string]
+		_deps: [...]
+
+		objs: [
+			for obj in _local { obj },
+
+			for dep in _deps
+			for obj in (dep & {}).objs {
+				obj
+			},
+		]
+	}
+	@test(eq, {
+		s1: {
+			_deps: [{
+				_local: ["s2 local"]
+				_deps: []
+				objs: ["s2 local"]
+			}]
+			_local: ["s1 local"]
+			objs: ["s1 local", "s2 local"]
+		}
+		s2: {
+			_local: ["s2 local"]
+			_deps: []
+			objs: ["s2 local"]
+		}
+		#Schema: {_local: [], _deps: [], objs: []}
+	})
+}
+-- issue2405.cue --
+// A recursive disjunction type (`#Copy` with struct/list/scalar alternatives)
+// was rejected as a structural cycle even though the structure is bounded and
+// should evaluate successfully.
+// https://cuelang.org/issue/2405
+issue2405: {
+	#Copy: {
+		param: {...}
+		result: {
+			for k, v in param {
+				(k): (#Copy & {param: v}).result
+			}
+		}
+	} | {
+		param: [...]
+		result: [
+			for v in param {
+				(#Copy & {param: v}).result
+			},
+		]
+	} | {
+		param:  number
+		result: param
+	}
+
+	foo: #Copy
+	foo: param: a: [{b: 134}]
+	@test(eq, {
+		#Copy: {param: {}, result: {}} | {param: [], result: []} | {param: number, result: number}
+		foo: {
+			param: {a: [{b: 134}]}
+			result: {a: [{b: 134}]}
+		}
+	})
+}
+-- issue3941.cue --
+// evalv3 regression: a comprehension iterating over a pattern-constrained field
+// (`resource: [string]: [string]: #Resource`) produced a spurious "field set was
+// already referenced" error that evalv2 did not emit.
+// https://cuelang.org/issue/3941
+issue3941: full: {
+	#Metadata: name: string
+	#Resource: metadata: #Metadata
+
+	out: {
+		_metadata: name: "foo"
+		resource: [string]: [string]: #Resource
+
+		_names: [_metadata.name]
+
+		for name in _names {
+			resource: level1: (name): {
+				metadata: _metadata
+			}
+		}
+	}
+	@test(eq, {
+		#Metadata: {name: string}
+		#Resource: {metadata: {name: string}}
+		out: {
+			_metadata: {name: "foo"}
+			resource: {
+				level1: {foo: {metadata: {name: "foo"}}}
+			}
+			_names: ["foo"]
+		}
+	})
+}
+-- issue2229.cue --
+// A list comprehension whose result was unified back into the same list caused
+// an endless recursion and panic rather than being caught as a structural cycle.
+// https://cuelang.org/issue/2229
+issue2229: full_ok: X={
+	build: bool | *true
+	test:  bool | *true
+
+	make: [ for k, v in X if (v & true) != _|_ { k } ]
+} @test(eq, {
+	build: *true | bool
+	test: *true | bool
+	make: ["build", "test"]
+})
+issue2229: reduced_fail: X={
+	x: true
+	y: [ for _, v in X if v & true { _ } ]
+} @test(err, code=eval,
+	suberr=(code=eval, contains="conflicting values", pos=[2:5, 2:24, 2:28]),
+	suberr=(code=eval, contains="conflicting values", pos=[2:5, 2:24, 2:28]),
+	suberr=(code=eval, contains="structural cycle", pos=[2:24]),
+)
+-- issue4100.cue --
+// Segmentation fault in `adt.(*OpContext).freeNodeContext` in v0.14.1,
+// triggered by a let binding inside a conditional that feeds into a for loop.
+// https://cuelang.org/issue/4100
+issue4100: {
+	a: {
+		let l = [0]
+		if l != _|_ {
+			l[:]
+		}
+	}
+	for _ in a {}
+	@test(eq, {a: [0]})
+}
+-- out/compile --
+--- in.cue
+{
+  A: {
+    a: {
+      parent: ""
+      children: [
+        for k, v in 〈3;A〉 if (〈0;v〉.parent == 〈0;k〉) {
+          〈1;k〉
+        },
+      ]
+    }
+    b: {
+      parent: "a"
+      children: [
+        for k, v in 〈3;A〉 if (〈0;v〉.parent == 〈0;k〉) {
+          〈1;k〉
+        },
+      ]
+    }
+  }
+  B: {
+    a: {
+      parent: ""
+      children: [
+        for k, v in 〈3;B〉 for _, w in 〈0;v〉.children {
+          〈2;k〉
+        },
+      ]
+    }
+  }
+  Issue486: {
+    A: {
+      a: {
+        parent: ""
+        children: [
+          ...string,
+        ]
+      }
+      b: {
+        parent: "a"
+        children: [
+          ...string,
+        ]
+      }
+      c: {
+        parent: "b"
+        children: [
+          ...string,
+        ]
+      }
+    }
+    A: {
+      [string]: {
+        children: [
+          for k, v in 〈3;A〉 if (〈0;v〉.parent == 〈3;-〉) {
+            〈1;k〉
+          },
+        ]
+      }
+    }
+  }
+  issue1666: {
+    #E: {
+      f1: {
+        [string]: (〈2;#E〉|[
+          ...〈3;#E〉,
+        ])
+      }
+      f2: {
+        [string]: {
+          t: 〈3;#E〉
+        }
+      }
+    }
+    _e: 〈0;#E〉
+    _e: {
+      f2: {
+        a: _
+      }
+    }
+    e: (〈0;_e〉 & {
+      f1: {
+        for fk, s in 〈2;_e〉.f2 {
+          〈1;fk〉: 〈1;s〉.t
+        }
+      }
+    })
+  }
+  issue779: {
+    X: 〈0;Y〉.message
+    STATE: {
+      for k, v in 〈1;Y〉 {
+        if (〈1;k〉 != "message") {
+          "\(〈2;k〉)": 〈2;v〉
+        }
+      }
+    }
+    Y: (〈0;STATE〉 & {
+      message: 〈1;X〉
+    })
+    X: "test"
+    STATE: {
+      code: 101
+    }
+  }
+  selfReferential: {
+    T1: {
+      S: {
+        d: "bar"
+      }
+      T: {
+        e: {
+          S: {
+            a: "foo"
+          }
+        }
+      }
+      for s, v in 〈0;S〉 for t, _ in 〈1;T〉 {
+        T: {
+          〈2;t〉: {
+            S: {
+              〈5;s〉: 〈5;v〉
+            }
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    list: {
+      panels: [
+        for i, _ in 〈1;panels〉 {
+          id: 〈1;i〉
+        },
+      ]
+      panels: [
+        {},
+        {},
+        {},
+      ]
+    }
+  }
+  selfReferential: {
+    insertionError: {
+      A: {
+        foo: 1
+        for _, x in 〈1;A〉 {
+          "foo3": 1
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t1: {
+        p1: {
+          o: (〈0;#Output〉 & {
+            retry: {
+              reject: "ok"
+            }
+          })
+          #AllOutputs: {
+            reject: string
+            resource: string
+            retry: 〈1;#Output〉
+          }
+          #Output: or([
+            for name, config in 〈1;#AllOutputs〉 {
+              〈1;name〉: 〈1;config〉
+            },
+          ])
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t1: {
+        p2: {
+          #Output: or([
+            for name, config in 〈1;#AllOutputs〉 {
+              〈1;name〉: 〈1;config〉
+            },
+          ])
+          o: (〈0;#Output〉 & {
+            retry: {
+              reject: "ok"
+            }
+          })
+          #AllOutputs: {
+            reject: string
+            resource: string
+            retry: 〈1;#Output〉
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t1: {
+        p3: {
+          #Output: or([
+            for name, config in 〈1;#AllOutputs〉 {
+              〈1;name〉: 〈1;config〉
+            },
+          ])
+          #AllOutputs: {
+            reject: string
+            resource: string
+            retry: 〈1;#Output〉
+          }
+          o: (〈0;#Output〉 & {
+            retry: {
+              reject: "ok"
+            }
+          })
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t2: {
+        p1: {
+          d: or([
+            for x, y in 〈1;#A〉 {
+              〈1;y〉
+            },
+          ])
+          o: (〈0;d〉 & {
+            b: 2
+          })
+          #A: {
+            d1: int
+            d2: string
+            d3: {
+              b: 〈2;d〉
+            }
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t2: {
+        p2: {
+          o: (〈0;d〉 & {
+            b: 2
+          })
+          d: or([
+            for x, y in 〈1;#A〉 {
+              〈1;y〉
+            },
+          ])
+          #A: {
+            d1: int
+            d2: string
+            d3: {
+              b: 〈2;d〉
+            }
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t2: {
+        p3: {
+          o: (〈0;d〉 & {
+            b: 2
+          })
+          #A: {
+            d1: int
+            d2: string
+            d3: {
+              b: 〈2;d〉
+            }
+          }
+          d: or([
+            for x, y in 〈1;#A〉 {
+              〈1;y〉
+            },
+          ])
+        }
+      }
+    }
+  }
+  issue1881: {
+    p1: {
+      o: (〈0;#Output〉 & {
+        retry: {
+          output: {
+            reject: "ok"
+          }
+        }
+      })
+      #AllOutputs: {
+        reject: string
+        resource: string
+        retry: {
+          output: 〈2;#Output〉
+        }
+      }
+      #Output: or([
+        for name, config in 〈1;#AllOutputs〉 {
+          〈1;name〉: 〈1;config〉
+        },
+      ])
+    }
+  }
+  issue1881: {
+    p2: {
+      #AllOutputs: {
+        reject: string
+        resource: string
+        retry: {
+          output: 〈2;#Output〉
+        }
+      }
+      o: (〈0;#Output〉 & {
+        retry: {
+          output: {
+            reject: "ok"
+          }
+        }
+      })
+      #Output: or([
+        for name, config in 〈1;#AllOutputs〉 {
+          〈1;name〉: 〈1;config〉
+        },
+      ])
+    }
+  }
+  issue1881: {
+    p3: {
+      #AllOutputs: {
+        reject: string
+        resource: string
+        retry: {
+          output: 〈2;#Output〉
+        }
+      }
+      #Output: or([
+        for name, config in 〈1;#AllOutputs〉 {
+          〈1;name〉: 〈1;config〉
+        },
+      ])
+      o: (〈0;#Output〉 & {
+        retry: {
+          output: {
+            reject: "ok"
+          }
+        }
+      })
+    }
+  }
+  siblingInsertion: {
+    t1: {
+      p1: {
+        D: {
+          logging: _
+        }
+        deployment: _
+        for k, v in 〈0;deployment〉 for k1, v2 in 〈0;v〉.env2 {
+          deployment: {
+            〈3;k〉: {
+              env: {
+                〈4;k1〉: 〈4;v2〉
+              }
+            }
+          }
+        }
+        for id, v in 〈0;D〉 {
+          deployment: {
+            〈2;id〉: {
+              env2: {
+                ENV: "True"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  siblingInsertion: {
+    t1: {
+      p2: {
+        D: {
+          logging: _
+        }
+        deployment: _
+        for id, v in 〈0;D〉 {
+          deployment: {
+            〈2;id〉: {
+              env2: {
+                ENV: "True"
+              }
+            }
+          }
+        }
+        for k, v in 〈0;deployment〉 for k1, v2 in 〈0;v〉.env2 {
+          deployment: {
+            〈3;k〉: {
+              env: {
+                〈4;k1〉: 〈4;v2〉
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  siblingInsertion: {
+    t2: {
+      p1: {
+        D: {
+          logging: _
+        }
+        deployment: _
+        for k, v in 〈0;deployment〉 {
+          for k1, v2 in 〈1;v〉.env2 {
+            deployment: {
+              〈4;k〉: {
+                env: {
+                  〈4;k1〉: 〈4;v2〉
+                }
+              }
+            }
+          }
+        }
+        for id, v in 〈0;D〉 {
+          deployment: {
+            〈2;id〉: {
+              env2: {
+                ENV: "True"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  siblingInsertion: {
+    t2: {
+      p2: {
+        D: {
+          logging: _
+        }
+        deployment: _
+        for k, v in 〈0;deployment〉 {
+          for k1, v2 in 〈1;v〉.env2 {
+            deployment: {
+              〈4;k〉: {
+                env: {
+                  〈4;k1〉: 〈4;v2〉
+                }
+              }
+            }
+          }
+        }
+        for id, v in 〈0;D〉 {
+          deployment: {
+            〈2;id〉: {
+              env2: {
+                ENV: "True"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    fail: {
+      a: {}
+      b: (〈0;a〉.x != "")
+      if 〈0;b〉 {}
+    }
+  }
+  issue2367: {
+    a: _
+    for _, x in [
+      〈1;a〉,
+    ] {
+      a: 〈1;x〉
+    }
+  }
+  issue2310: {
+    original: {
+      #s: {
+        #_1: string
+        #_2: string
+        #_3: string
+        〈import;strings〉.Replace(〈0;#_1〉, 〈0;#_2〉, 〈0;#_3〉, -1)
+      }
+      #sub: {
+        #a: string
+        _#X: [
+          〈1;#a〉,
+          for _, i in 〈import;list〉.Range(0, len(〈2;#subs〉), 1) {
+            (〈4;#subs〉[〈1;i〉] & {
+              #_1: 〈4;_#X〉[〈2;i〉]
+              _
+            })
+          },
+        ]
+        〈0;_#X〉[(len(〈0;_#X〉) - 1)]
+      }
+      res: (〈0;#sub〉 & {
+        #a: "aaa"
+        _
+      })
+      #subs: [
+        (〈1;#s〉 & {
+          #_2: "a"
+          #_3: "b"
+          _
+        }),
+        (〈1;#s〉 & {
+          #_2: "c"
+          #_3: "d"
+          _
+        }),
+        (〈1;#s〉 & {
+          #_2: "e"
+          #_3: "f"
+          _
+        }),
+      ]
+    }
+  }
+  issue2310: {
+    reduced: {
+      res: {
+        〈0;#X〉[3]
+        #X: [
+          "X",
+          for i, _ in 〈2;#subs〉 {
+            〈4;#s〉
+            #str: 〈3;#X〉[〈1;i〉]
+          },
+        ]
+      }
+      #s: {
+        #str: string
+        (〈0;#str〉 + "a")
+      }
+      #subs: [
+        0,
+        1,
+        2,
+      ]
+    }
+  }
+}
+--- issue2229.cue
+{
+  issue2229: {
+    full_ok: {
+      build: (bool|*true)
+      test: (bool|*true)
+      make: [
+        for k, v in 〈2〉 if ((〈0;v〉 & true) != _|_(explicit error (_|_ literal) in source)) {
+          〈1;k〉
+        },
+      ]
+    }
+  }
+  issue2229: {
+    reduced_fail: {
+      x: true
+      y: [
+        for _, v in 〈2〉 if (〈0;v〉 & true) {
+          _
+        },
+      ]
+    }
+  }
+}
+--- issue2405.cue
+{
+  issue2405: {
+    #Copy: ({
+      param: {
+        ...
+      }
+      result: {
+        for k, v in 〈1;param〉 {
+          〈1;k〉: (〈4;#Copy〉 & {
+            param: 〈2;v〉
+          }).result
+        }
+      }
+    }|{
+      param: [
+        ...,
+      ]
+      result: [
+        for _, v in 〈1;param〉 {
+          (〈4;#Copy〉 & {
+            param: 〈2;v〉
+          }).result
+        },
+      ]
+    }|{
+      param: number
+      result: 〈0;param〉
+    })
+    foo: 〈0;#Copy〉
+    foo: {
+      param: {
+        a: [
+          {
+            b: 134
+          },
+        ]
+      }
+    }
+  }
+}
+--- issue3903.cue
+{
+  issue3903: {
+    reduced: {
+      s1: 〈0;#Schema〉
+      s1: {
+        _deps: [
+          〈2;#Schema〉,
+        ]
+      }
+      #Schema: {
+        _deps: [
+          ...,
+        ]
+        objs: [
+          for _, dep in 〈1;_deps〉 for _, obj in (〈0;dep〉 & {}).objs {
+            〈1;obj〉
+          },
+        ]
+      }
+    }
+  }
+  issue3903: {
+    full: {
+      s1: (〈0;#Schema〉 & {
+        _deps: [
+          〈2;s2〉,
+        ]
+        _local: [
+          "s1 local",
+        ]
+      })
+      s2: (〈0;#Schema〉 & {
+        _local: [
+          "s2 local",
+        ]
+      })
+      #Schema: {
+        _local: [
+          ...string,
+        ]
+        _deps: [
+          ...,
+        ]
+        objs: [
+          for _, obj in 〈1;_local〉 {
+            〈1;obj〉
+          },
+          for _, dep in 〈1;_deps〉 for _, obj in (〈0;dep〉 & {}).objs {
+            〈1;obj〉
+          },
+        ]
+      }
+    }
+  }
+}
+--- issue3941.cue
+{
+  issue3941: {
+    full: {
+      #Metadata: {
+        name: string
+      }
+      #Resource: {
+        metadata: 〈1;#Metadata〉
+      }
+      out: {
+        _metadata: {
+          name: "foo"
+        }
+        resource: {
+          [string]: {
+            [string]: 〈3;#Resource〉
+          }
+        }
+        _names: [
+          〈1;_metadata〉.name,
+        ]
+        for _, name in 〈0;_names〉 {
+          resource: {
+            level1: {
+              〈3;name〉: {
+                metadata: 〈5;_metadata〉
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+--- issue4100.cue
+{
+  issue4100: {
+    a: {
+      let l#1 = [
+        0,
+      ]
+      if (〈0;let l#1〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let l#1〉[:]
+      }
+    }
+    for _, _ in 〈0;a〉 {}
+  }
+}

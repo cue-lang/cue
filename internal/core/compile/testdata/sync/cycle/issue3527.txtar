@@ -1,0 +1,73 @@
+# evalv3 panics with nil pointer dereference on a reduced real-world CUE file
+# involving `let` bindings and mutual references between definitions, whereas
+# evalv2 handles it correctly.
+# https://cuelang.org/issue/3527
+-- in.cue --
+package p
+
+_taxPayer: self: {}
+
+let sam = {taxPayer: _taxPayer}
+assert: {
+	invoke: sam
+	invoke: _
+	res: subject & {in: invoke}
+}
+
+subject: {
+	in: #ReturnData
+	_computed: (#computeF1040 & {"in": in})
+}
+#computeF1040: in:      #ReturnData
+#ReturnData: taxPayer?: #TaxPayer
+#TaxPayer: self?:       _
+
+@test(eq, {
+	_taxPayer$p: {self: {}}
+	assert: {
+		invoke: {taxPayer: {self: {}}}
+		res: {
+			in: {taxPayer: {self: {}}}
+			_computed$p: {in: {taxPayer: {self: {}}}}
+		}
+	}
+	subject: {
+		in: {taxPayer?: {self?: _}}
+		_computed$p: {in: {taxPayer?: {self?: _}}}
+	}
+	#computeF1040: {in: {taxPayer?: {self?: _}}}
+	#ReturnData: {taxPayer?: {self?: _}}
+	#TaxPayer: {self?: _}
+})
+-- out/compile --
+--- in.cue
+{
+  _taxPayer(:p): {
+    self: {}
+  }
+  let sam#1 = {
+    taxPayer: 〈1;_taxPayer(:p)〉
+  }
+  assert: {
+    invoke: 〈1;let sam#1〉
+    invoke: _
+    res: (〈1;subject〉 & {
+      in: 〈1;invoke〉
+    })
+  }
+  subject: {
+    in: 〈1;#ReturnData〉
+    _computed(:p): (〈1;#computeF1040〉 & {
+      in: 〈1;in〉
+    })
+  }
+  #computeF1040: {
+    in: 〈1;#ReturnData〉
+  }
+  #ReturnData: {
+    taxPayer?: 〈1;#TaxPayer〉
+  }
+  #TaxPayer: {
+    self?: _
+  }
+}

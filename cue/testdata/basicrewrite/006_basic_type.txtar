@@ -11,18 +11,6 @@ f: bool
 [eval] d: conflicting values int and float (mismatched types int and float):
     ./in.cue:5:4
     ./in.cue:5:10
--- out/compile --
---- in.cue
-{
-  a: (1 & int)
-  b: (number & 1)
-  c: 1.0
-  c: float
-  d: (int & float)
-  e: ("4" & string)
-  f: true
-  f: bool
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

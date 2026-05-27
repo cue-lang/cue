@@ -30,19 +30,3 @@ orTrueTrue:       true || true            @test(eq, true)
 // No short-circuit: || falls through when left is false.
 orFalseFalse: false || false @test(eq, false)
 orFalseTrue:  false || true  @test(eq, true)
--- out/compile --
---- in.cue
-{
-  incompleteInt: int
-  incompleteBool: bool
-  andFalseBottom: (false && _|_(explicit error (_|_ literal) in source))
-  andFalseIncomplete: (false && 〈0;incompleteInt〉)
-  andFalseTrue: (false && true)
-  andTrueTrue: (true && true)
-  andTrueFalse: (true && false)
-  orTrueBottom: (true || _|_(explicit error (_|_ literal) in source))
-  orTrueIncomplete: (true || 〈0;incompleteBool〉)
-  orTrueTrue: (true || true)
-  orFalseFalse: (false || false)
-  orFalseTrue: (false || true)
-}

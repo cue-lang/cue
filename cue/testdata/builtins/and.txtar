@@ -48,37 +48,3 @@ NumCloseIDs: 10
     ./in.cue:11:28
 [incomplete] issue3719._filledLater: undefined field: foo:
     ./in.cue:11:28
--- out/compile --
---- in.cue
-{
-  merge: and([
-    1,
-    1,
-  ])
-  embed: and([
-    {
-      2
-      #x: 1
-    },
-    {
-      2
-      #x: 2
-    },
-  ])
-  issue3719: {
-    #openStruct: {
-      ...
-    }
-    _filledLater: 〈0;#openStruct〉.foo
-    withoutAnd: {
-      for k, v in 〈1;_filledLater〉.bar {
-        〈1;k〉: 〈1;v〉
-      }
-    }
-    withAnd: and([
-      for k, v in 〈1;_filledLater〉.bar {
-        〈1;k〉: 〈1;v〉
-      },
-    ])
-  }
-}

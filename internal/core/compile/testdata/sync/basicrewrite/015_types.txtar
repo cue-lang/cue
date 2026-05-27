@@ -1,0 +1,23 @@
+-- in.cue --
+i:  int          @test(eq, int)
+j:  int & 3      @test(eq, 3)
+s:  string       @test(eq, string)
+t:  "s" & string @test(eq, "s")
+e:  int & string @test(err, code=eval, contains="conflicting values")
+e2: 1 & string   @test(err, code=eval, contains="conflicting values")
+b:  !int         @test(err, code=eval, pos=[0:6], contains="invalid operand")
+p:  +true        @test(err, code=eval, pos=[0:5], contains="invalid operation")
+m:  -false       @test(err, code=eval, pos=[0:5], contains="invalid operation")
+-- out/compile --
+--- in.cue
+{
+  i: int
+  j: (int & 3)
+  s: string
+  t: ("s" & string)
+  e: (int & string)
+  e2: (1 & string)
+  b: !int
+  p: +true
+  m: -false
+}

@@ -1,0 +1,24 @@
+# Tests a comprehension with a disjunction of close({}) and a pattern
+# constraint. Issue: https://cuelang.org/issue/312 — the default selection
+# and closing behavior of a disjunction inside a comprehension should work
+# correctly.
+#name: issue312
+#evalFull
+-- in.cue --
+
+for x in [1] {
+	*close({}) | {[_]: null}
+}
+
+@test(eq, *{} | {})
+-- out/compile --
+--- in.cue
+{
+  for _, x in [
+    1,
+  ] {
+    (*close({})|{
+      [_]: null
+    })
+  }
+}

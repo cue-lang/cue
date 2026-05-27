@@ -19,11 +19,3 @@ NumCloseIDs: 1
   a: (string){ "" }
   b: (int){ 0 }
 }
--- out/compile --
---- in.cue
-{
-  {
-    a: ""
-    b: len(〈0;a〉)
-  }
-}

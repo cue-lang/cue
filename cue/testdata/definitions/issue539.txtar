@@ -30,17 +30,3 @@ Conjuncts:    17
 Disjuncts:    4
 
 NumCloseIDs: 2
--- out/compile --
---- in.cue
-{
-  #Schema: {
-    ...
-  }
-  Component: {
-    hostname: (string|*"localhost")
-    _#foo: {
-      hello: "world"
-    }
-  }
-  hello: (〈0;#Schema〉 & 〈0;Component〉)
-}

@@ -12,15 +12,6 @@ on: __test_experiment("on") @test(eq, "on")
 -- out/errors.txt --
 [eval] off: error in call to testExperiment: testing experiment disabled:
     ./off.cue:1:6
--- out/compile --
---- off.cue
-{
-  off: testExperiment("off")
-}
---- on.cue
-{
-  on: testExperiment("on")
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  3

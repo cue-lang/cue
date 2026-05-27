@@ -15,29 +15,6 @@ service: baz: {name: "foobar"} @test(eq, {
     name: "foobar"
     port: *7080 | int
 })
--- out/compile --
---- in.cue
-{
-  service: {
-    [string]: {
-      name: (string|*〈1;-〉)
-      port: (int|*7080)
-    }
-  }
-  service: {
-    foo: _
-  }
-  service: {
-    bar: {
-      port: 8000
-    }
-  }
-  service: {
-    baz: {
-      name: "foobar"
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  23

@@ -1,0 +1,134 @@
+# Tests that mixing struct fields and embedded scalars in a comprehension body
+# correctly reports an error. Issue #2481: nested for/if/let comprehensions
+# triggered a spurious "circular dependency" error in the evaluator.
+# https://cuelang.org/issue/2481
+// Mixing struct fields and embedded scalars should error. Using comprehensions
+// this follows a different path which may miss the error.
+// TODO: fix
+-- in.cue --
+// Mixing struct fields and embedded scalars should error. Using comprehensions
+// this follows a different path which may miss the error.
+// TODO: fix
+out: {
+	for k in keys {
+		if values[k] != _|_  {
+			val: k
+			if val != _|_ {
+				k
+			}
+		}
+	}
+	@test(err, code=eval, hint="string with struct")
+}
+
+// multiple lets are mapped to the same location and will conflict. This is
+// fine, though, as lets do not represent a single data field. This should
+// therefore not error.
+// TODO: fix
+multiLets: {
+	for k in keys {
+		if values[k] != _|_  {
+			let val = k
+			if val != _|_ {
+				k
+			}
+		}
+	}
+	@test(eq, "b")
+}
+
+keys: [
+	// order matters
+	"a",
+	"b",
+] @test(eq, ["a", "b"])
+
+values: {
+	// order does not matter
+	"b": "member"
+	"c": "foo"
+	@test(eq, {b: "member", c: "foo"})
+}
+
+full: {
+	out: {
+
+		// changing this to a list of the keys "fixes" things, i.e. this comprehension is required
+		for k, _ in #github_team_membership {
+
+			// Remove this comprehension to trigger a different type of cycle error
+			if ( values[k] != _|_ ) {
+
+				// This let is also required
+				let val = values[k]
+
+				if val != null && ((val & string) != _|_) {
+					(k): val
+				}
+			}
+		}
+	}
+
+	#github_team_membership: {
+		team_id: string
+		role:    string
+	}
+
+	values: {
+		"role":     "member"
+		"username": "foo"
+	}
+	@test(eq, {out: {role: "member"}, #github_team_membership: {team_id: string, role: string}, values: {role: "member", username: "foo"}})
+}
+-- out/compile --
+--- in.cue
+{
+  out: {
+    for _, k in 〈1;keys〉 {
+      if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
+        val: 〈2;k〉
+        if (〈0;val〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈3;k〉
+        }
+      }
+    }
+  }
+  multiLets: {
+    for _, k in 〈1;keys〉 {
+      if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
+        let val#1multi = 〈2;k〉
+        if (〈0;let val#1〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈3;k〉
+        }
+      }
+    }
+  }
+  keys: [
+    "a",
+    "b",
+  ]
+  values: {
+    b: "member"
+    c: "foo"
+  }
+  full: {
+    out: {
+      for k, _ in 〈1;#github_team_membership〉 {
+        if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
+          let val#2multi = 〈4;values〉[〈2;k〉]
+          if ((〈0;let val#2〉 != null) && ((〈0;let val#2〉 & string) != _|_(explicit error (_|_ literal) in source))) {
+            〈3;k〉: 〈1;let val#2〉
+          }
+        }
+      }
+    }
+    #github_team_membership: {
+      team_id: string
+      role: string
+    }
+    values: {
+      role: "member"
+      username: "foo"
+    }
+  }
+}

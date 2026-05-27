@@ -1,0 +1,49 @@
+-- in.cue --
+a: [A=string]: b: [B=string]: {
+	name: A
+	kind: B
+}
+a: "A": b: "B": _    @test(eq, {name: "A", kind: "B"})
+a: "C": b: "D": _    @test(eq, {name: "C", kind: "D"})
+a: "EE": b: "FF": {c: "bar"} @test(eq, {
+	c:    "bar"
+	name: "EE"
+	kind: "FF"
+})
+-- out/compile --
+--- in.cue
+{
+  a: {
+    [string]: {
+      b: {
+        [string]: {
+          name: 〈3;-〉
+          kind: 〈1;-〉
+        }
+      }
+    }
+  }
+  a: {
+    A: {
+      b: {
+        B: _
+      }
+    }
+  }
+  a: {
+    C: {
+      b: {
+        D: _
+      }
+    }
+  }
+  a: {
+    EE: {
+      b: {
+        FF: {
+          c: "bar"
+        }
+      }
+    }
+  }
+}

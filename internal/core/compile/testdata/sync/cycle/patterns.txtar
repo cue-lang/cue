@@ -1,0 +1,61 @@
+// Lots of cycle-reference goodness.
+# Tests that pattern constraints on cyclically-referenced fields do not
+# cause infinite evaluation. Also tests issue3326 (cyclic pattern constraints).
+-- in.cue --
+[!~"^[.]"]: c
+a:          b
+b: [string]: int
+c: a:        int
+[string]: c
+a:        b      @test(eq, {a: int})
+b: [string]: int
+c: a:        int @test(eq, int)
+
+-- issue3326.cue --
+// https://cuelang.org/issue/3326
+issue3326: {
+	// This issue triggered a cyclic evaluation in pattern constraints.
+	//
+	// It seems like there is still an issue as the evaluation of `x` in
+	// `and` may trigger a cyclic evaluation of `and`. However, `and` only
+	// does a shallow evaluation, and inserting `x`'s conjuncts into itself
+	// is identified as idempotent and thus further evaluation is skipped.
+	_self: x: [...and(x)]
+	_self
+	x: [1]
+	@test(eq, {_self: {x: []}, x: [1], a: int})
+}
+-- out/compile --
+--- in.cue
+{
+  [!~"^[.]"]: 〈0;c〉
+  a: 〈0;b〉
+  b: {
+    [string]: int
+  }
+  c: {
+    a: int
+  }
+  [string]: 〈0;c〉
+  a: 〈0;b〉
+  b: {
+    [string]: int
+  }
+  c: {
+    a: int
+  }
+}
+--- issue3326.cue
+{
+  issue3326: {
+    _self: {
+      x: [
+        ...and(〈1;x〉),
+      ]
+    }
+    〈0;_self〉
+    x: [
+      1,
+    ]
+  }
+}

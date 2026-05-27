@@ -29,28 +29,3 @@ forSourceBottom: {
     ./in.cue:15:14
 [user] explicit error (_|_ literal) in source:
     ./in.cue:21:11
--- out/compile --
---- in.cue
-{
-  forSourceError: {
-    for _, x in "not-a-list" {
-      "\(〈1;x〉)": 〈1;x〉
-    } else {
-      fallbackField: true
-    }
-  }
-  ifConditionError: {
-    if ("not" + 1) {
-      a: 1
-    } else {
-      b: 2
-    }
-  }
-  forSourceBottom: {
-    for _, x in _|_(explicit error (_|_ literal) in source) {
-      "\(〈1;x〉)": 〈1;x〉
-    } else {
-      fallbackField: true
-    }
-  }
-}

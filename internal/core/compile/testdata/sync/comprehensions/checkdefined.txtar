@@ -1,0 +1,316 @@
+
+Issue #1969
+# Tests that undefined field comparisons with _|_ work correctly in
+# comprehension conditions, including with close(), for loops, and let bindings.
+# Issue #1969 and #2245.
+-- in.cue --
+import "list"
+
+// All tests here should pass and the result of the okcN tests should be
+// identical to those of the okoN tests.
+
+xc: close({field: {}})
+xo: field: {}
+
+okc0: {
+	if xc.undefined == _|_ {a: 1}
+	@test(eq, {a: 1})
+}
+oko0: {
+	if xo.undefined == _|_ {a: 1}
+	@test(eq, {a: 1})
+}
+
+okc1: {
+	if xc.undefined != _|_ {a: 1}
+	@test(eq, {})
+}
+oko1: {
+	if xo.undefined != _|_ {a: 1}
+	@test(eq, {})
+}
+
+okc2: {
+	if ({} & {s: [for y in xc.undefined {}]}) != _|_ {a: 1}
+	@test(eq, {})
+}
+
+oko2: {
+	if ({} & {s: [for y in xo.undefined {}]}) != _|_ {a: 1}
+	@test(eq, {a: 1})
+}
+
+okc3: {
+	if ({s: [for y in xc.undefined {}]}) != _|_ {a: 1}
+	@test(eq, {})
+}
+
+oko3: {
+	if ({s: [for y in xo.undefined {}]}) != _|_ {a: 1}
+	@test(eq, {a: 1})
+}
+
+// Should Field s exist in okc or not? Depends on whether comparison to bottom
+// is recursive or not. It probably should not.
+// TODO: fix for new evaluator. But possibly address this with new builtins.
+// issue1969: Tests that comparing let-bound expressions involving undefined
+// fields to _|_ works correctly with list comprehensions.
+// https://cuelang.org/issue/1969
+issue1969: okc: {
+	let X = xc.undefined
+	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
+
+	if Y != _|_ {Y}
+	@test(eq, {})
+}
+
+issue1969: oko: {
+	let X = xo.undefined
+	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
+
+	if Y != _|_ {Y}
+	@test(eq, {
+		s: _|_ @test(err, code=incomplete, contains="issue1969.oko.X: undefined field: undefined", pos=[62:13])
+	})
+}
+-- issue2245.cue --
+// Evaluator regression where comparing an incomplete struct to bottom in a
+// comprehension condition produced incorrect results.
+// https://cuelang.org/issue/2245
+yo: {
+	f: int
+	g: f < 10
+	@test(eq, {
+		f: int
+		g: _|_ @test(err, code=incomplete, contains="yo.g: non-concrete value int in operand to <", pos=[6:5, 5:5])
+	})
+}
+okyo: {
+	if yo != _|_ {a: 1}
+	@test(eq, {a: 1})
+}
+okyog: {
+	if yo.g != _|_ {a: 1}
+	@test(eq, {})
+}
+
+-- incomplete.cue --
+// Comparing to string is not an error. But for legacy reasons we want to still
+// support this. We intend to have more clean and precise behavior with the
+// builtins isdefined, isvalid, and isconcrete.
+checkIncomplete: t1: {
+	f: [string]: {
+		if a != _|_ {
+			b: "d\(a)"
+		}
+		a: string
+	}
+	f: blah: {}
+	@test(eq, {f: {blah: {a: string}}})
+}
+
+-- structs.cue --
+structs: {
+	bare: t1: ({y: 2} & {x: 3}) != _|_        @test(eq, true)
+	bare: f2: ({y: 2} & {x: 3}) == _|_        @test(eq, false)
+	bare: f3: ({x: 1, y: 2} & {x: 3}) != _|_  @test(eq, false)
+	bare: t4: ({x: 1, y: 2} & {x: 3}) == _|_  @test(eq, true)
+
+	select: t1: ({y: 2} & {x: 3}).y != _|_        @test(eq, true)
+	select: f2: ({y: 2} & {x: 3}).y == _|_        @test(eq, false)
+	select: f3: ({x: 1, y: 2} & {x: 3}).y != _|_  @test(eq, false)
+	select: t4: ({x: 1, y: 2} & {x: 3}).y == _|_  @test(eq, true)
+}
+
+-- out/compile --
+--- in.cue
+{
+  xc: close({
+    field: {}
+  })
+  xo: {
+    field: {}
+  }
+  okc0: {
+    if (〈1;xc〉.undefined == _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  oko0: {
+    if (〈1;xo〉.undefined == _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  okc1: {
+    if (〈1;xc〉.undefined != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  oko1: {
+    if (〈1;xo〉.undefined != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  okc2: {
+    if (({} & {
+      s: [
+        for _, y in 〈3;xc〉.undefined {},
+      ]
+    }) != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  oko2: {
+    if (({} & {
+      s: [
+        for _, y in 〈3;xo〉.undefined {},
+      ]
+    }) != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  okc3: {
+    if ({
+      s: [
+        for _, y in 〈3;xc〉.undefined {},
+      ]
+    } != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  oko3: {
+    if ({
+      s: [
+        for _, y in 〈3;xo〉.undefined {},
+      ]
+    } != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  issue1969: {
+    okc: {
+      let X#1 = 〈2;xc〉.undefined
+      let Y#2 = ({} & {
+        s: [
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+        ]
+      })
+      if (〈0;let Y#2〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#2〉
+      }
+    }
+  }
+  issue1969: {
+    oko: {
+      let X#3 = 〈2;xo〉.undefined
+      let Y#4 = ({} & {
+        s: [
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#3〉, 1) {},
+        ]
+      })
+      if (〈0;let Y#4〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#4〉
+      }
+    }
+  }
+}
+--- incomplete.cue
+{
+  checkIncomplete: {
+    t1: {
+      f: {
+        [string]: {
+          if (〈0;a〉 != _|_(explicit error (_|_ literal) in source)) {
+            b: "d\(〈1;a〉)"
+          }
+          a: string
+        }
+      }
+      f: {
+        blah: {}
+      }
+    }
+  }
+}
+--- issue2245.cue
+{
+  yo: {
+    f: int
+    g: (〈0;f〉 < 10)
+  }
+  okyo: {
+    if (〈1;yo〉 != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  okyog: {
+    if (〈1;yo〉.g != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+}
+--- structs.cue
+{
+  structs: {
+    bare: {
+      t1: (({
+        y: 2
+      } & {
+        x: 3
+      }) != _|_(explicit error (_|_ literal) in source))
+    }
+    bare: {
+      f2: (({
+        y: 2
+      } & {
+        x: 3
+      }) == _|_(explicit error (_|_ literal) in source))
+    }
+    bare: {
+      f3: (({
+        x: 1
+        y: 2
+      } & {
+        x: 3
+      }) != _|_(explicit error (_|_ literal) in source))
+    }
+    bare: {
+      t4: (({
+        x: 1
+        y: 2
+      } & {
+        x: 3
+      }) == _|_(explicit error (_|_ literal) in source))
+    }
+    select: {
+      t1: (({
+        y: 2
+      } & {
+        x: 3
+      }).y != _|_(explicit error (_|_ literal) in source))
+    }
+    select: {
+      f2: (({
+        y: 2
+      } & {
+        x: 3
+      }).y == _|_(explicit error (_|_ literal) in source))
+    }
+    select: {
+      f3: (({
+        x: 1
+        y: 2
+      } & {
+        x: 3
+      }).y != _|_(explicit error (_|_ literal) in source))
+    }
+    select: {
+      t4: (({
+        x: 1
+        y: 2
+      } & {
+        x: 3
+      }).y == _|_(explicit error (_|_ literal) in source))
+    }
+  }
+}

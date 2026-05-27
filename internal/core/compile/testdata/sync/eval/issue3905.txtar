@@ -1,0 +1,149 @@
+# Tests that dynamic field keys with disjunctive default values evaluate correctly.
+# The v3 evaluator incorrectly reported a cycle error for `(parameters.gatewayNamespace)`
+# when the value was a disjunction like `string | *"foo"`, working fine in evalv2.
+# https://cuelang.org/issue/3905
+-- in.cue --
+issue3905: reduced: {
+	#Schema: {
+		params: name: string | *"foo"
+
+		result: (params.name): "bar"
+	}
+
+	(#Schema).result
+	@test(eq, {
+		#Schema: {
+			params: {name: *"foo" | string}
+			result: {foo: "bar"}
+		}
+		foo: "bar"
+	})
+}
+issue3905: full: {
+	#ReferenceGrantBuilder: {
+		parameters: {
+			namespace:        string
+			gatewayNamespace: string | *"foo"
+		}
+
+		referenceGrant: (parameters.gatewayNamespace): #ReferenceGrant & {
+			metadata: name:      parameters.gatewayNamespace
+			metadata: namespace: parameters.namespace
+		}
+	}
+
+	(#ReferenceGrantBuilder & {
+		parameters: namespace: "foo"
+	}).referenceGrant
+
+	#ReferenceGrant: {
+		apiVersion: "gateway.networking.k8s.io/v1beta1"
+		kind: "ReferenceGrant"
+		metadata!: {
+			name!: string
+			namespace!: string
+			labels?: {
+				[string]: string
+			}
+			annotations?: {
+				[string]: string
+			}
+		}
+	}
+	@test(eq, {
+		#ReferenceGrantBuilder: {
+			parameters: {
+				namespace: string
+				gatewayNamespace: *"foo" | string
+			}
+			referenceGrant: {
+				foo: {
+					metadata: {
+						name: *"foo" | string
+						namespace: string
+						labels?: {}
+						annotations?: {}
+					}
+					apiVersion: "gateway.networking.k8s.io/v1beta1"
+					kind: "ReferenceGrant"
+				}
+			}
+		}
+		#ReferenceGrant: {
+			apiVersion: "gateway.networking.k8s.io/v1beta1"
+			kind: "ReferenceGrant"
+			metadata!: {
+				name!: string
+				namespace!: string
+				labels?: {}
+				annotations?: {}
+			}
+		}
+		foo: {
+			metadata: {
+				name: *"foo" | string
+				namespace: "foo"
+				labels?: {}
+				annotations?: {}
+			}
+			apiVersion: "gateway.networking.k8s.io/v1beta1"
+			kind: "ReferenceGrant"
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  issue3905: {
+    reduced: {
+      #Schema: {
+        params: {
+          name: (string|*"foo")
+        }
+        result: {
+          〈1;params〉.name: "bar"
+        }
+      }
+      〈0;#Schema〉.result
+    }
+  }
+  issue3905: {
+    full: {
+      #ReferenceGrantBuilder: {
+        parameters: {
+          namespace: string
+          gatewayNamespace: (string|*"foo")
+        }
+        referenceGrant: {
+          〈1;parameters〉.gatewayNamespace: (〈2;#ReferenceGrant〉 & {
+            metadata: {
+              name: 〈3;parameters〉.gatewayNamespace
+            }
+            metadata: {
+              namespace: 〈3;parameters〉.namespace
+            }
+          })
+        }
+      }
+      (〈0;#ReferenceGrantBuilder〉 & {
+        parameters: {
+          namespace: "foo"
+        }
+      }).referenceGrant
+      #ReferenceGrant: {
+        apiVersion: "gateway.networking.k8s.io/v1beta1"
+        kind: "ReferenceGrant"
+        metadata!: {
+          name!: string
+          namespace!: string
+          labels?: {
+            [string]: string
+          }
+          annotations?: {
+            [string]: string
+          }
+        }
+      }
+    }
+  }
+}

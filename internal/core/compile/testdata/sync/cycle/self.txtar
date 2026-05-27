@@ -1,0 +1,846 @@
+-- in.cue --
+@experiment(aliasv2)
+
+import "list"
+
+expr: error1: {
+	a: 3
+	a: a + 1
+	@test(err, code=eval, path=a, contains="conflicting values %s and %s", args=[4, 3], pos=[1:5, 2:5])
+}
+expr: error2: {
+	a: a + 1
+	a: 3
+	@test(err, code=eval, path=a, contains="conflicting values %s and %s", args=[4, 3], pos=[1:5, 2:5])
+}
+listConcat: error1: {
+	a: ["1", "2"]
+	a: list.Concat([a, ["3"]])
+	@test(err, code=structural_cycle, path=a, contains="error in call to %s", args=[list.Concat], pos=[2:5])
+}
+
+listConcat: error2: {
+	a: list.Concat([["3"], a])
+	a: ["1", "2"]
+	@test(err, code=structural_cycle, path=a, contains="error in call to %s", args=[list.Concat], pos=[1:5])
+}
+
+selfEmbed: ok1: {
+	a: x
+	Y: x
+	x: {Y}
+	@test(eq, {a: {}, Y: {}, x: {}})
+}
+
+selfEmbed: ok2: {
+	Y: x.b
+	a: x
+	x: b: {Y}
+	@test(eq, {Y: {}, a: {b: {}}, x: {b: {}}})
+}
+
+selfEmbed: ok3: {
+	Y: x
+	a: x
+	x: {Y}
+	@test(eq, {Y: {}, a: {}, x: {}})
+}
+
+selfEmbed: ok4: {
+	a: x
+	x: {Y}
+	Y: x
+	@test(eq, {a: {}, x: {}, Y: {}})
+}
+
+selfEmbed: ok5: {
+	x: {Y}
+	a: x
+	Y: x
+	@test(eq, {x: {}, a: {}, Y: {}})
+}
+
+selfEmbed: ok6: {
+	x: b: {Y}
+	Y: x.b
+	a: x
+	@test(eq, {x: {b: {}}, Y: {}, a: {b: {}}})
+}
+
+
+disjSelf: ok1: {
+	#A: string | #A
+	x: #A
+	@test(eq, {#A: string | _, x: string | _})
+}
+
+disjSelf: ok2: {
+	x: #A
+	#A: string | #A
+	@test(eq, {x: string | _, #A: string | _})
+}
+
+disjSelf: ok3: {
+	#A: #A | string
+	x: #A
+	@test(eq, {#A: _ | string, x: _ | string})
+}
+
+disjSelf: ok4: {
+	x: #A
+	#A: #A | string
+	@test(eq, {x: _ | string, #A: _ | string})
+}
+
+disjEmbed: ok1: {
+	#A: string | {#A}
+	x: #A
+	@test(eq, {#A: string | {}, x: string | {}})
+}
+
+disjEmbed: ok2: {
+	x: #A
+	#A: string | {#A}
+	@test(eq, {x: string | {}, #A: string | {}})
+}
+
+disjEmbed: ok3: {
+	#A: {#A} | string
+	x: #A
+	@test(eq, {#A: {} | string, x: {} | string})
+}
+
+disjEmbed: ok4: {
+	x: #A
+	#A: {#A} | string
+	@test(eq, {x: {} | string, #A: {} | string})
+}
+
+// x and #A should yield the same result.
+disjList: _
+disjList: ok1: {
+	#A: string | [#A]
+	x: #A
+
+	y: x
+	y: [[[[string]]]]
+	@test(eq, {
+		#A: string
+		x: string
+		y: [[[[string]]]]
+	})
+}
+
+disjList: ok2: {
+	x: #A
+	#A: string | [#A]
+	@test(eq, {x: string, #A: string})
+}
+
+disjList: ok3: {
+	#A: [#A] | string
+	x: #A
+	@test(eq, {#A: string, x: string})
+}
+
+disjList: ok4: {
+	x: #A
+	#A: [#A] | string
+	@test(eq, {x: string, #A: string})
+}
+
+-- old.cue --
+name: "foo"
+dynamicSelf: ok1: {
+	X=(name): string | X
+	x: X
+	@test(eq, {x: string | _, foo: string | _})
+}
+
+dynamicSelf: ok2: {
+	x: X
+	X=(name): string | X
+	@test(eq, {x: string | _, foo: string | _})
+}
+
+dynamicSelf: ok3: {
+	X=(name): X | string
+	x: X
+	@test(eq, {x: _ | string, foo: _ | string})
+}
+
+dynamicSelf: ok4: {
+	x: X
+	X=(name): X | string
+	@test(eq, {x: _ | string, foo: _ | string})
+}
+
+dynamicEmbed: ok1: {
+	X=(name): string | {X}
+	x: X
+	@test(eq, {x: string | {}, foo: string | {}})
+}
+
+dynamicEmbed: ok2: {
+	x: X
+	X=(name): string | {X}
+	@test(eq, {x: string | {}, foo: string | {}})
+}
+
+dynamicEmbed: ok3: {
+	X=(name): {X} | string
+	x: X
+	@test(eq, {x: {} | string, foo: {} | string})
+}
+
+dynamicEmbed: ok4: {
+	x: X
+	X=(name): {X} | string
+	@test(eq, {x: {} | string, foo: {} | string})
+}
+
+dynamicList: _
+dynamicList: ok1: {
+	X=(name): string | [X]
+	x: X
+
+	y: x
+	y: [[[[string]]]]
+	@test(eq, {
+		x: string
+		y: [[[[string]]]]
+		foo: string
+	})
+}
+
+dynamicList: ok2: {
+	x: X
+	X=(name): string | [X]
+	@test(eq, {x: string, foo: string})
+}
+
+dynamicList: ok3: {
+	X=(name): [X] | string
+	x: X
+	@test(eq, {x: string, foo: string})
+}
+
+dynamicList: ok4: {
+	x: X
+	X=(name): [X] | string
+	@test(eq, {x: string, foo: string})
+}
+
+dynamicPatternSelf: ok1: {
+	X=[string]: string | X
+	@test(eq, {})
+}
+dynamicPatternSelf: ok2: {
+	X=[string]: X | string
+	@test(eq, {})
+}
+dynamicPatternEmbed: ok1: {
+	X=[string]: string | {X}
+	@test(eq, {})
+}
+dynamicPatternEmbed: ok2: {
+	X=[string]: {X} | string
+	@test(eq, {})
+}
+dynamicPatternList: ok1: {
+	X=[string]: string | [X]
+	@test(eq, {})
+}
+dynamicPatternList: ok2: {
+	X=[string]: [X] | string
+	@test(eq, {})
+}
+
+valueSelf: ok1: {
+	y: X={string | X}
+	x: y
+	@test(eq, {y: string | {}, x: string | {}})
+}
+
+valueSelf: ok2: {
+	x: y
+	y: X={string | X}
+	@test(eq, {x: string | {}, y: string | {}})
+}
+
+valueSelf: ok3: {
+	y: X={X | string}
+	x: y
+	@test(eq, {y: {} | string, x: {} | string})
+}
+
+valueSelf: ok4: {
+	x: y
+	y: X={X | string}
+	@test(eq, {x: {} | string, y: {} | string})
+}
+
+valueEmbed: ok1: {
+	y: X={string | {X}}
+	x: y
+	@test(eq, {y: string | {}, x: string | {}})
+}
+
+valueEmbed: ok2: {
+	x: y
+	y: X={string | {X}}
+	@test(eq, {x: string | {}, y: string | {}})
+}
+
+valueEmbed: ok3: {
+	y: X={{X} | string}
+	x: y
+	@test(eq, {y: {} | string, x: {} | string})
+}
+
+valueEmbed: ok4: {
+	x: y
+	y: X={{X} | string}
+	@test(eq, {x: {} | string, y: {} | string})
+}
+
+valueList: ok1: {
+	y: X={string | [X]}
+	x: y
+	@test(eq, {y: string, x: string})
+}
+
+valueList: ok2: {
+	x: y
+	y: X={string | [X]}
+	@test(eq, {x: string, y: string})
+}
+
+valueList: ok3: {
+	y: X={[X] | string}
+	x: y
+	@test(eq, {y: string, x: string})
+}
+
+valueList: ok4: {
+	x: y
+	y: X={[X] | string}
+	@test(eq, {x: string, y: string})
+}
+
+// Issue #1729
+issue1729: t1: {
+	#x: { #x | {} }
+	x: #x & {}
+	@test(eq, {#x: {}, x: {}})
+}
+
+issue1729: t2: {
+	x: #x & {}
+	#x: { #x | {} }
+	@test(eq, {x: {}, #x: {}})
+}
+
+-- selfnew.cue --
+@experiment(aliasv2)
+
+issue4125: t1_self: {
+	let Root = self
+	a: Root.a
+	@test(eq, {a: _})
+}
+-- selfold.cue --
+issue4125: t2_alias: X={
+	let Y = X
+	b: Y.b
+	@test(eq, {b: _})
+}
+
+-- out/compile --
+--- in.cue
+{
+  expr: {
+    error1: {
+      a: 3
+      a: (〈0;a〉 + 1)
+    }
+  }
+  expr: {
+    error2: {
+      a: (〈0;a〉 + 1)
+      a: 3
+    }
+  }
+  listConcat: {
+    error1: {
+      a: [
+        "1",
+        "2",
+      ]
+      a: 〈import;list〉.Concat([
+        〈1;a〉,
+        [
+          "3",
+        ],
+      ])
+    }
+  }
+  listConcat: {
+    error2: {
+      a: 〈import;list〉.Concat([
+        [
+          "3",
+        ],
+        〈1;a〉,
+      ])
+      a: [
+        "1",
+        "2",
+      ]
+    }
+  }
+  selfEmbed: {
+    ok1: {
+      a: 〈0;x〉
+      Y: 〈0;x〉
+      x: {
+        〈1;Y〉
+      }
+    }
+  }
+  selfEmbed: {
+    ok2: {
+      Y: 〈0;x〉.b
+      a: 〈0;x〉
+      x: {
+        b: {
+          〈2;Y〉
+        }
+      }
+    }
+  }
+  selfEmbed: {
+    ok3: {
+      Y: 〈0;x〉
+      a: 〈0;x〉
+      x: {
+        〈1;Y〉
+      }
+    }
+  }
+  selfEmbed: {
+    ok4: {
+      a: 〈0;x〉
+      x: {
+        〈1;Y〉
+      }
+      Y: 〈0;x〉
+    }
+  }
+  selfEmbed: {
+    ok5: {
+      x: {
+        〈1;Y〉
+      }
+      a: 〈0;x〉
+      Y: 〈0;x〉
+    }
+  }
+  selfEmbed: {
+    ok6: {
+      x: {
+        b: {
+          〈2;Y〉
+        }
+      }
+      Y: 〈0;x〉.b
+      a: 〈0;x〉
+    }
+  }
+  disjSelf: {
+    ok1: {
+      #A: (string|〈0;#A〉)
+      x: 〈0;#A〉
+    }
+  }
+  disjSelf: {
+    ok2: {
+      x: 〈0;#A〉
+      #A: (string|〈0;#A〉)
+    }
+  }
+  disjSelf: {
+    ok3: {
+      #A: (〈0;#A〉|string)
+      x: 〈0;#A〉
+    }
+  }
+  disjSelf: {
+    ok4: {
+      x: 〈0;#A〉
+      #A: (〈0;#A〉|string)
+    }
+  }
+  disjEmbed: {
+    ok1: {
+      #A: (string|{
+        〈1;#A〉
+      })
+      x: 〈0;#A〉
+    }
+  }
+  disjEmbed: {
+    ok2: {
+      x: 〈0;#A〉
+      #A: (string|{
+        〈1;#A〉
+      })
+    }
+  }
+  disjEmbed: {
+    ok3: {
+      #A: ({
+        〈1;#A〉
+      }|string)
+      x: 〈0;#A〉
+    }
+  }
+  disjEmbed: {
+    ok4: {
+      x: 〈0;#A〉
+      #A: ({
+        〈1;#A〉
+      }|string)
+    }
+  }
+  disjList: _
+  disjList: {
+    ok1: {
+      #A: (string|[
+        〈1;#A〉,
+      ])
+      x: 〈0;#A〉
+      y: 〈0;x〉
+      y: [
+        [
+          [
+            [
+              string,
+            ],
+          ],
+        ],
+      ]
+    }
+  }
+  disjList: {
+    ok2: {
+      x: 〈0;#A〉
+      #A: (string|[
+        〈1;#A〉,
+      ])
+    }
+  }
+  disjList: {
+    ok3: {
+      #A: ([
+        〈1;#A〉,
+      ]|string)
+      x: 〈0;#A〉
+    }
+  }
+  disjList: {
+    ok4: {
+      x: 〈0;#A〉
+      #A: ([
+        〈1;#A〉,
+      ]|string)
+    }
+  }
+}
+--- old.cue
+{
+  name: "foo"
+  dynamicSelf: {
+    ok1: {
+      〈2;name〉: (string|〈0;(〈2;name〉)〉)
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicSelf: {
+    ok2: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: (string|〈0;(〈2;name〉)〉)
+    }
+  }
+  dynamicSelf: {
+    ok3: {
+      〈2;name〉: (〈0;(〈2;name〉)〉|string)
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicSelf: {
+    ok4: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: (〈0;(〈2;name〉)〉|string)
+    }
+  }
+  dynamicEmbed: {
+    ok1: {
+      〈2;name〉: (string|{
+        〈1;(〈2;name〉)〉
+      })
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicEmbed: {
+    ok2: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: (string|{
+        〈1;(〈2;name〉)〉
+      })
+    }
+  }
+  dynamicEmbed: {
+    ok3: {
+      〈2;name〉: ({
+        〈1;(〈2;name〉)〉
+      }|string)
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicEmbed: {
+    ok4: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: ({
+        〈1;(〈2;name〉)〉
+      }|string)
+    }
+  }
+  dynamicList: _
+  dynamicList: {
+    ok1: {
+      〈2;name〉: (string|[
+        〈1;(〈2;name〉)〉,
+      ])
+      x: 〈0;(〈2;name〉)〉
+      y: 〈0;x〉
+      y: [
+        [
+          [
+            [
+              string,
+            ],
+          ],
+        ],
+      ]
+    }
+  }
+  dynamicList: {
+    ok2: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: (string|[
+        〈1;(〈2;name〉)〉,
+      ])
+    }
+  }
+  dynamicList: {
+    ok3: {
+      〈2;name〉: ([
+        〈1;(〈2;name〉)〉,
+      ]|string)
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicList: {
+    ok4: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: ([
+        〈1;(〈2;name〉)〉,
+      ]|string)
+    }
+  }
+  dynamicPatternSelf: {
+    ok1: {
+      [string]: (string|〈0;(〈0;-〉)〉)
+    }
+  }
+  dynamicPatternSelf: {
+    ok2: {
+      [string]: (〈0;(〈0;-〉)〉|string)
+    }
+  }
+  dynamicPatternEmbed: {
+    ok1: {
+      [string]: (string|{
+        〈1;(〈0;-〉)〉
+      })
+    }
+  }
+  dynamicPatternEmbed: {
+    ok2: {
+      [string]: ({
+        〈1;(〈0;-〉)〉
+      }|string)
+    }
+  }
+  dynamicPatternList: {
+    ok1: {
+      [string]: (string|[
+        〈1;(〈0;-〉)〉,
+      ])
+    }
+  }
+  dynamicPatternList: {
+    ok2: {
+      [string]: ([
+        〈1;(〈0;-〉)〉,
+      ]|string)
+    }
+  }
+  valueSelf: {
+    ok1: {
+      y: {
+        (string|〈1〉)
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueSelf: {
+    ok2: {
+      x: 〈0;y〉
+      y: {
+        (string|〈1〉)
+      }
+    }
+  }
+  valueSelf: {
+    ok3: {
+      y: {
+        (〈1〉|string)
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueSelf: {
+    ok4: {
+      x: 〈0;y〉
+      y: {
+        (〈1〉|string)
+      }
+    }
+  }
+  valueEmbed: {
+    ok1: {
+      y: {
+        (string|{
+          〈2〉
+        })
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueEmbed: {
+    ok2: {
+      x: 〈0;y〉
+      y: {
+        (string|{
+          〈2〉
+        })
+      }
+    }
+  }
+  valueEmbed: {
+    ok3: {
+      y: {
+        ({
+          〈2〉
+        }|string)
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueEmbed: {
+    ok4: {
+      x: 〈0;y〉
+      y: {
+        ({
+          〈2〉
+        }|string)
+      }
+    }
+  }
+  valueList: {
+    ok1: {
+      y: {
+        (string|[
+          〈2〉,
+        ])
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueList: {
+    ok2: {
+      x: 〈0;y〉
+      y: {
+        (string|[
+          〈2〉,
+        ])
+      }
+    }
+  }
+  valueList: {
+    ok3: {
+      y: {
+        ([
+          〈2〉,
+        ]|string)
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueList: {
+    ok4: {
+      x: 〈0;y〉
+      y: {
+        ([
+          〈2〉,
+        ]|string)
+      }
+    }
+  }
+  issue1729: {
+    t1: {
+      #x: {
+        (〈1;#x〉|{})
+      }
+      x: (〈0;#x〉 & {})
+    }
+  }
+  issue1729: {
+    t2: {
+      x: (〈0;#x〉 & {})
+      #x: {
+        (〈1;#x〉|{})
+      }
+    }
+  }
+}
+--- selfnew.cue
+{
+  issue4125: {
+    t1_self: {
+      let Root#1 = 〈1〉
+      a: 〈0;let Root#1〉.a
+    }
+  }
+}
+--- selfold.cue
+{
+  issue4125: {
+    t2_alias: {
+      let Y#2 = 〈1〉
+      b: 〈0;let Y#2〉.b
+    }
+  }
+}

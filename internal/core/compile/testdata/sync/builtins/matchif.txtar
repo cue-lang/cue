@@ -1,0 +1,60 @@
+-- in.cue --
+regularFields: {
+	[_]: matchIf({x!: >2}, {y!: 5}, {y!: 1})
+	ok1: {x: 10, y: 5} @test(eq, {x: 10, y: 5})
+	ok2: {x: 11, y: 5} @test(eq, {x: 11, y: 5})
+	ok3: {x: 2,  y: 1} @test(eq, {x: 2,  y: 1})
+	ok4: {x: 1,  y: 1} @test(eq, {x: 1,  y: 1})
+
+	// TODO: allow unwrapping errors so that we can test args in wrapped errors,
+	// without having to match the other arguments.
+	err1: {x: 10, y: 6} @test(err, code=eval, contains="conflicting values 5 and 6", pos=[in.cue:2:7, in.cue:2:30, 0:8, 0:19])
+	err2: {x: 11, y: 6} @test(err, code=eval, contains="conflicting values 5 and 6", pos=[in.cue:2:7, in.cue:2:30, 0:8, 0:19])
+	err3: {x: 2, y: 5}  @test(err, code=eval, contains="conflicting values 1 and 5", pos=[in.cue:2:7, in.cue:2:39, 0:8, 0:18])
+	err4: {x: 1, y: 2}  @test(err, code=eval, contains="conflicting values 1 and 2", pos=[in.cue:2:7, in.cue:2:39, 0:8, 0:18])
+}
+-- out/compile --
+--- in.cue
+{
+  regularFields: {
+    [_]: matchIf({
+      x!: >2
+    }, {
+      y!: 5
+    }, {
+      y!: 1
+    })
+    ok1: {
+      x: 10
+      y: 5
+    }
+    ok2: {
+      x: 11
+      y: 5
+    }
+    ok3: {
+      x: 2
+      y: 1
+    }
+    ok4: {
+      x: 1
+      y: 1
+    }
+    err1: {
+      x: 10
+      y: 6
+    }
+    err2: {
+      x: 11
+      y: 6
+    }
+    err3: {
+      x: 2
+      y: 5
+    }
+    err4: {
+      x: 1
+      y: 2
+    }
+  }
+}

@@ -4,14 +4,6 @@
 	[string]: _
 	foo:      3
 }
--- out/compile --
---- in.cue
-{
-  {
-    [string]: _
-    foo: 3
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  2

@@ -1,0 +1,214 @@
+-- in.cue --
+t1: a: {
+	a1: a0 + 2 @test(eq, 7.0)
+	b1: a1 - 2 @test(eq, 5.0)
+	a0: X      @test(eq, 5.0)
+	X:  b1     @test(eq, 5.0)
+	X:  5.0
+}
+
+t1: b: {
+	X:  5.0    @test(eq, 5.0)
+	a1: a0 + 2 @test(eq, 7.0)
+	b1: a1 - 2 @test(eq, 5.0)
+	a0: X      @test(eq, 5.0)
+	X:  b1
+	@test(eq, {X: 5.0, a1: 7.0, b1: 5.0, a0: 5.0})
+}
+
+// TODO: did we really mean to have 3 times c?
+t1: c: {
+	a1: a0 + 2 @test(eq, 7.0)
+	b1: a1 - 2 @test(eq, 5.0)
+	X:  5.0    @test(eq, 5.0)
+	a0: X      @test(eq, 5.0)
+	X:  b1
+}
+
+t1: c: {
+	b1: a1 - 2
+	a1: a0 + 2
+	X:  5.0
+	a0: X
+	X:  b1
+}
+
+t1: c: {
+	b1: a1 - 2
+	X:  5.0
+	a1: a0 + 2
+	a0: X
+	X:  b1
+	@test(eq, {a1: 7.0, b1: 5.0, X: 5.0, a0: 5.0})
+}
+
+t1total: {
+	for _, v in t1 {v}
+	@test(eq, {a1: 7.0, b1: 5.0, a0: 5.0, X: 5.0})
+}
+
+// Issue #622
+// `cue export` errors on a solvable mutual cycle: `X = b1 = b0/2 = Y/2 = a1/2 = a0 = X`
+// with a concrete value `X: 5.0` should resolve, but instead reports a cycle error.
+// https://cuelang.org/issue/622
+//
+// TODO: are these meant to be permutations? If so use @test(permute)
+t2: a: {
+	a0: X       @test(eq, 5.0)
+	a1: a0 * 2  @test(eq, 10.0)
+	Y:  a1      @test(eq, 10.0)
+
+	b0: Y       @test(eq, 10.0)
+	b1: b0 / 2  @test(eq, 5.0)
+	X:  b1      @test(eq, 5.0)
+
+	X: 5.0
+	@test(eq, {a0: 5.0, a1: 10.0, Y: 10.0, b0: 10.0, b1: 5.0, X: 5.0})
+}
+
+t2: b: {
+	b0: Y 	    @test(eq, 10.0)
+	b1: b0 / 2  @test(eq, 5.0)
+	X:  b1      @test(eq, 5.0)
+
+	a0: X       @test(eq, 5.0)
+	a1: a0 * 2  @test(eq, 10.0)
+	Y:  a1      @test(eq, 10.0)
+
+	X: 5.0
+	@test(eq, {b0: 10.0, b1: 5.0, X: 5.0, a0: 5.0, a1: 10.0, Y: 10.0})
+}
+
+t2: c: {
+	b0: Y       @test(eq, 10.0)
+	b1: b0 / 2  @test(eq, 5.0)
+	X:  b1      @test(eq, 5.0)
+
+	X: 5.0      @test(eq, 5.0)
+
+	a0: X       @test(eq, 5.0)
+	a1: a0 * 2  @test(eq, 10.0)
+	Y:  a1      @test(eq, 10.0)
+	@test(eq, {b0: 10.0, b1: 5.0, X: 5.0, a0: 5.0, a1: 10.0, Y: 10.0})
+}
+
+t2: d: {
+	b0: Y       @test(eq, 10.0)
+	b1: b0 / 2  @test(eq, 5.0)
+	X:  b1      @test(eq, 5.0)
+
+	a0: X       @test(eq, 5.0)
+	a1: a0 * 2  @test(eq, 10.0)
+	Y:  a1      @test(eq, 10.0)
+
+	X: 5.0
+	@test(eq, {b0: 10.0, b1: 5.0, X: 5.0, a0: 5.0, a1: 10.0, Y: 10.0})
+}
+
+t2total: {
+	for _, v in t2 {v}
+	@test(eq, {a0: 5.0, a1: 10.0, Y: 10.0, b0: 10.0, b1: 5.0, X: 5.0})
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    a: {
+      a1: (〈0;a0〉 + 2)
+      b1: (〈0;a1〉 - 2)
+      a0: 〈0;X〉
+      X: 〈0;b1〉
+      X: 5.0
+    }
+  }
+  t1: {
+    b: {
+      X: 5.0
+      a1: (〈0;a0〉 + 2)
+      b1: (〈0;a1〉 - 2)
+      a0: 〈0;X〉
+      X: 〈0;b1〉
+    }
+  }
+  t1: {
+    c: {
+      a1: (〈0;a0〉 + 2)
+      b1: (〈0;a1〉 - 2)
+      X: 5.0
+      a0: 〈0;X〉
+      X: 〈0;b1〉
+    }
+  }
+  t1: {
+    c: {
+      b1: (〈0;a1〉 - 2)
+      a1: (〈0;a0〉 + 2)
+      X: 5.0
+      a0: 〈0;X〉
+      X: 〈0;b1〉
+    }
+  }
+  t1: {
+    c: {
+      b1: (〈0;a1〉 - 2)
+      X: 5.0
+      a1: (〈0;a0〉 + 2)
+      a0: 〈0;X〉
+      X: 〈0;b1〉
+    }
+  }
+  t1total: {
+    for _, v in 〈1;t1〉 {
+      〈1;v〉
+    }
+  }
+  t2: {
+    a: {
+      a0: 〈0;X〉
+      a1: (〈0;a0〉 * 2)
+      Y: 〈0;a1〉
+      b0: 〈0;Y〉
+      b1: (〈0;b0〉 / 2)
+      X: 〈0;b1〉
+      X: 5.0
+    }
+  }
+  t2: {
+    b: {
+      b0: 〈0;Y〉
+      b1: (〈0;b0〉 / 2)
+      X: 〈0;b1〉
+      a0: 〈0;X〉
+      a1: (〈0;a0〉 * 2)
+      Y: 〈0;a1〉
+      X: 5.0
+    }
+  }
+  t2: {
+    c: {
+      b0: 〈0;Y〉
+      b1: (〈0;b0〉 / 2)
+      X: 〈0;b1〉
+      X: 5.0
+      a0: 〈0;X〉
+      a1: (〈0;a0〉 * 2)
+      Y: 〈0;a1〉
+    }
+  }
+  t2: {
+    d: {
+      b0: 〈0;Y〉
+      b1: (〈0;b0〉 / 2)
+      X: 〈0;b1〉
+      a0: 〈0;X〉
+      a1: (〈0;a0〉 * 2)
+      Y: 〈0;a1〉
+      X: 5.0
+    }
+  }
+  t2total: {
+    for _, v in 〈1;t2〉 {
+      〈1;v〉
+    }
+  }
+}

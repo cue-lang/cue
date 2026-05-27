@@ -10,24 +10,6 @@ eval: true
 	b: a: b: 4
 	a: b: 3
 }
--- out/compile --
---- in.cue
-{
-  {
-    b: {
-      idx: 〈1;a〉[〈0;str〉]
-      str: string
-    }
-    b: {
-      a: {
-        b: 4
-      }
-    }
-    a: {
-      b: 3
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  8

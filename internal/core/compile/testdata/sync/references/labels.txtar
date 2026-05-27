@@ -1,0 +1,273 @@
+-- in.cue --
+// Label aliases
+
+// direct
+a: [X=string]: X
+a: bar:        _
+@test(eq, {bar: "bar"}, at=a)
+
+// in struct
+b: [X=string]: {X}
+b: bar: _
+@test(eq, {bar: "bar"}, at=b)
+
+// in structs
+c: [X=string]: X
+c: [Y=string]: {{{Y}}}
+c: bar: _
+@test(eq, {bar: "bar"}, at=c)
+
+// in sub field
+d: [X=string]: name: X
+d: bar: {}
+@test(eq, {bar: {name: "bar"}}, at=d)
+
+// nested
+e: [X=string]: [Y=string]: X + Y
+e: foo: bar:               _
+@test(eq, {foo: {bar: "foobar"}}, at=e)
+
+patternField: t1: {
+	r=[string]: {b: r | null}
+	a: {r: 0}
+	@test(eq, {a: {r: 0, b: null}})
+}
+
+patternField: t2: {
+	a: {r: 0}
+	x=[string]: {z: 1, b: x.z}
+	@test(eq, {a: {r: 0, z: 1, b: 1}})
+}
+
+// Field aliases
+
+bar: 3
+f1: C="foo\(bar)": {
+	name: "xx"
+	foo:  C.name
+}
+@test(eq, {
+	foo3: {
+		name: "xx"
+		foo: "xx"
+		foo3baz: {name: "xx", a: "xx", b: "xx"}
+	}
+}, at=f1)
+
+// nested
+f1: D="foo\(bar)": E="foo\(bar)baz": {
+	name: "xx"
+	a:    D["foo\(bar)baz"].name
+	b:    E.name
+}
+
+// Combo
+
+c1: C="foo\(bar)": [D=string]: {
+	name: D
+	foo:  C.x.name
+}
+c1: foo3: x: _
+@test(eq, {foo3: {x: {name: "x", foo: "x"}}}, at=c1)
+
+
+emptyLabel: {
+	"": 1
+	a:  emptyLabel[""]
+	@test(eq, {"": 1, a: 1})
+}
+
+underscore: a: {
+	// Issue #1454
+	foo: #Foo
+	foo: "_":     "bar"
+	#Foo: [=~""]: string
+	@test(eq, {foo: {"_": "bar"}, #Foo: {}})
+}
+
+underscore: c: {
+	foo: "_":    "any"
+	foo: [=~""]: string
+	@test(eq, {foo: {"_": "any"}})
+}
+
+underscore: d: {
+	bar: "_":       "any"
+	#bar: [string]: string
+	bar: #bar
+	@test(eq, {bar: {"_": "any"}, #bar: {}})
+}
+
+underscore: e: {
+	baz: "_h":     "any"
+	#baz: [=~"_"]: string
+	baz: #baz
+	@test(eq, {baz: {"_h": "any"}, #baz: {}})
+}
+
+// TODO: support. Also not yet supported in old implementation.
+// c10: {
+//  C=[string]: {
+//   name: "x"
+//   foo: C.name
+//  }
+// }
+// c2: c1 & { x: _ }
+
+invalidPattern: {
+	[=~"BAD)" & =~"x"]: string
+	y: 123
+	@test(err, code=eval, contains="invalid regexp", pos=[1:22])
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    [string]: 〈0;-〉
+  }
+  a: {
+    bar: _
+  }
+  b: {
+    [string]: {
+      〈1;-〉
+    }
+  }
+  b: {
+    bar: _
+  }
+  c: {
+    [string]: 〈0;-〉
+  }
+  c: {
+    [string]: {
+      {
+        {
+          〈3;-〉
+        }
+      }
+    }
+  }
+  c: {
+    bar: _
+  }
+  d: {
+    [string]: {
+      name: 〈1;-〉
+    }
+  }
+  d: {
+    bar: {}
+  }
+  e: {
+    [string]: {
+      [string]: (〈1;-〉 + 〈0;-〉)
+    }
+  }
+  e: {
+    foo: {
+      bar: _
+    }
+  }
+  patternField: {
+    t1: {
+      [string]: {
+        b: (〈1;(〈0;-〉)〉|null)
+      }
+      a: {
+        r: 0
+      }
+    }
+  }
+  patternField: {
+    t2: {
+      a: {
+        r: 0
+      }
+      [string]: {
+        z: 1
+        b: 〈1;(〈0;-〉)〉.z
+      }
+    }
+  }
+  bar: 3
+  f1: {
+    "foo\(〈1;bar〉)": {
+      name: "xx"
+      foo: 〈1;("foo\(〈1;bar〉)")〉.name
+    }
+  }
+  f1: {
+    "foo\(〈1;bar〉)": {
+      "foo\(〈2;bar〉)baz": {
+        name: "xx"
+        a: 〈2;("foo\(〈1;bar〉)")〉["foo\(〈3;bar〉)baz"].name
+        b: 〈1;("foo\(〈2;bar〉)baz")〉.name
+      }
+    }
+  }
+  c1: {
+    "foo\(〈1;bar〉)": {
+      [string]: {
+        name: 〈1;-〉
+        foo: 〈2;("foo\(〈1;bar〉)")〉.x.name
+      }
+    }
+  }
+  c1: {
+    foo3: {
+      x: _
+    }
+  }
+  emptyLabel: {
+    "": 1
+    a: 〈1;emptyLabel〉[""]
+  }
+  underscore: {
+    a: {
+      foo: 〈0;#Foo〉
+      foo: {
+        "_": "bar"
+      }
+      #Foo: {
+        [=~""]: string
+      }
+    }
+  }
+  underscore: {
+    c: {
+      foo: {
+        "_": "any"
+      }
+      foo: {
+        [=~""]: string
+      }
+    }
+  }
+  underscore: {
+    d: {
+      bar: {
+        "_": "any"
+      }
+      #bar: {
+        [string]: string
+      }
+      bar: 〈0;#bar〉
+    }
+  }
+  underscore: {
+    e: {
+      baz: {
+        "_h": "any"
+      }
+      #baz: {
+        [=~"_"]: string
+      }
+      baz: 〈0;#baz〉
+    }
+  }
+  invalidPattern: {
+    [(=~"BAD)" & =~"x")]: string
+    y: 123
+  }
+}

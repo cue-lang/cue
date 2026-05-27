@@ -8,22 +8,6 @@ eval: true
 	}
 	a: [...string]
 }
--- out/compile --
---- in.cue
-{
-  {
-    #FindInMap: {
-      #: {
-        "Fn::FindInMap": [
-          (string|〈3;#FindInMap〉),
-        ]
-      }
-    }
-    a: [
-      ...string,
-    ]
-  }
-}
 -- out/eval/stats --
 Leaks:  1
 Freed:  7

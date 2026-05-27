@@ -25,33 +25,6 @@ e7: [2][:"9"]  @test(err, code=eval, contains="cannot use \"9\"", pos=[0:5, 0:10
 [eval] e7: cannot use "9" (type string) as type int in slice index:
     ./in.cue:9:5
     ./in.cue:9:10
--- out/compile --
---- in.cue
-{
-  a: [
-    2,
-  ][0:0]
-  b: [
-    0,
-  ][1:1]
-  e1: [][1:1]
-  e2: [
-    0,
-  ][-1:0]
-  e3: [
-    0,
-  ][1:0]
-  e4: [
-    0,
-  ][1:2]
-  e5: 4[1:2]
-  e6: [
-    2,
-  ]["":]
-  e7: [
-    2,
-  ][:"9"]
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  25

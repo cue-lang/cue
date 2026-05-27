@@ -17,34 +17,3 @@ Retain: 6
 Unifications: 15
 Conjuncts:    29
 Disjuncts:    13
--- out/compile --
---- in.cue
-{
-  a: [
-    ...int,
-  ]
-  a: [
-    1,
-    2,
-    3,
-    5,
-  ]
-  a: [
-    1,
-    2,
-    3,
-    〈1;d〉,
-  ]
-  b: 〈0;a〉[3]
-  d: 5
-  c: [
-    for _, x in [
-      [
-        1,
-        2,
-      ],
-    ][0] {
-      (〈1;x〉 + 〈3;d〉)
-    },
-  ]
-}

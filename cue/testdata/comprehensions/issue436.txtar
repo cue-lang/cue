@@ -36,24 +36,3 @@ Conjuncts:    47
 Disjuncts:    12
 
 NumCloseIDs: 11
--- out/compile --
---- in.cue
-{
-  #a: {
-    val: string
-    result: string
-  }
-  a: (〈0;#a〉 & {
-    val: (*"default"|string)
-    result: (*"not-matched"|string)
-    if (〈0;val〉 == "match") {
-      result: "matched"
-    }
-  })
-  match: (〈0;a〉 & {
-    val: "match"
-  })
-  not: (〈0;a〉 & {
-    val: "other"
-  })
-}

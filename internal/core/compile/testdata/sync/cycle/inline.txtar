@@ -1,0 +1,462 @@
+-- x.cue --
+// variants of fib
+
+inline: small: {
+	f: {
+		n: int
+		out: (f & {"n": n - 1}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[0:9])
+	}
+}
+
+inline: medium: {
+	f2:  (f & {n: 2}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[1:24])
+	fRec: {nn: int, out: (f & {n: nn}).out}
+	@test(err, at=fRec.out, code=structural_cycle, contains="structural cycle", pos=[6:9])
+	f: {
+		n: int
+		out: (fRec & {nn: n - 1}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[0:9])
+	}
+}
+
+inline: patterns: {
+	f: n: (f & {n: {}}).n
+	f: n: {}  @test(err, code=structural_cycle, contains="structural cycle", pos=[-1:9])
+	[string]: {n: {}}
+	f: [string]: {}
+	f: {}
+}
+
+inline: acrossFields: fail1: {
+	f: {
+		in:  number
+		out: in + 1
+	}
+	k00: 0
+	k10: (f & {in: k00}).out
+	k20: (f & {in: k10}).out
+	k30: (f & {in: k20}).out
+
+	// invalid recursion is here.
+	k10: (f & {in: k30}).out
+	@test(eq, {
+		f: {
+			in: number
+			out: _|_ @test(err, code=incomplete, contains="inline.acrossFields.fail1.f.out: non-concrete value number in operand to +", pos=[31:8, 30:8])
+		}
+		k00: 0
+		k10: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 36:17])
+		k20: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 39:17])
+		k30: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 35:17])
+	})
+}
+
+// Issue #2163
+inline: acrossFields: ok1: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: (f & {in: k00}).out
+	k20: (f & {in: k10}).out
+	k30: (f & {in: k20}).out
+
+	// TODO: what is correct behavior here.
+	// This is borderline okay.
+	k10: (f & {in: k30}).out
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	}, hint="might be okay to fail")
+}
+-- inlineexpand.cue --
+inlined: {
+	X: {
+		input: a: _
+		output: input.a
+	}
+	root: a: (X & {input: root}).output
+	@test(eq, {
+		X: {input: {a: _}, output: _}
+		root: {a: _}
+	})
+}
+expanded1: hasCycle: {
+	X: {
+		input: a: _
+		output: input.a
+	}
+	root: {
+		a: _a.output
+		_a: X & {input: root}
+	}
+	@test(err, code=structural_cycle, at=root._a.input._a.input, contains="structural cycle", pos=[])
+}
+expanded2: noCycle: {
+	X: {
+		input: a: _
+		output: input.a
+	}
+	root: a: _a.output
+	_a: X & {input: root}
+	@test(eq, {
+		X: {input: {a: _}, output: _}
+		root: {a: _}
+		_a: {input: {a: _}, output: _}
+	})
+}
+issue3731: reduced: {
+	#lookup: {
+		input: {...}
+		output: [
+			for _, v in input if v.show != _|_ { v },
+		]
+	}
+
+	root: {
+		self: show: true
+		others: (#lookup & {input: root}).output
+	}
+	@test(eq, {
+		#lookup: {input: {}, output: []}
+		root: {
+			self: {show: true}
+			others: [{show: true}]
+		}
+	})
+}
+issue3731: expanded: {
+	#lookup: {
+		input: {...}
+		output: [
+			for _, v in input if v.show != _|_ { v },
+		]
+	}
+
+	root: {
+		self: show: true
+		others: _others.output
+		_others: #lookup & {input: root}
+	}
+	@test(err, code=structural_cycle, at=root._others.input._others.input, contains="structural cycle", pos=[])
+}
+issue3731: full: {
+	#Workspace: {
+		workspaceA?: {}
+		workspaceB?: {}
+	}
+
+	#AccountConfig: {
+		workspaces: #Workspace
+		siblings?: [...string]
+	}
+
+	#AccountConfigSub1: {
+		#AccountConfig
+		workspaces: "workspaceA": {}
+	}
+	
+	#AccountConfigSub2: {
+		#AccountConfig
+		workspaces: "workspaceB": {}
+	}
+	
+	tree: env1: {
+		"region1": {
+			"env1-r1-account-sub1": #AccountConfigSub1
+			"env1-r1-account-sub2-1": #AccountConfigSub2
+		}
+	}
+	
+	#lookupSiblings: {
+		envtree: {...}
+		out: [
+			for region, v in envtree
+			for account, config in v
+			if config.workspaces."workspaceB" != _|_ { account },
+		]
+	}
+	
+	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
+		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
+	}
+	@test(eq, {
+		#Workspace: {workspaceA?: {}, workspaceB?: {}}
+		#AccountConfig: {
+			workspaces: {workspaceA?: {}, workspaceB?: {}}
+			siblings?: []
+		}
+		#AccountConfigSub1: {
+			workspaces: {workspaceA: {}, workspaceB?: {}}
+			siblings?: []
+		}
+		#AccountConfigSub2: {
+			workspaces: {workspaceB: {}, workspaceA?: {}}
+			siblings?: []
+		}
+		tree: {
+			env1: {
+				region1: {
+					"env1-r1-account-sub1": {
+						siblings: ["env1-r1-account-sub2-1"]
+						workspaces: {workspaceA: {}, workspaceB?: {}}
+					}
+					"env1-r1-account-sub2-1": {
+						siblings: ["env1-r1-account-sub2-1"]
+						workspaces: {workspaceB: {}, workspaceA?: {}}
+					}
+				}
+			}
+		}
+		#lookupSiblings: {envtree: {}, out: []}
+	})
+}
+-- out/compile --
+--- inlineexpand.cue
+{
+  inlined: {
+    X: {
+      input: {
+        a: _
+      }
+      output: 〈0;input〉.a
+    }
+    root: {
+      a: (〈1;X〉 & {
+        input: 〈2;root〉
+      }).output
+    }
+  }
+  expanded1: {
+    hasCycle: {
+      X: {
+        input: {
+          a: _
+        }
+        output: 〈0;input〉.a
+      }
+      root: {
+        a: 〈0;_a〉.output
+        _a: (〈1;X〉 & {
+          input: 〈2;root〉
+        })
+      }
+    }
+  }
+  expanded2: {
+    noCycle: {
+      X: {
+        input: {
+          a: _
+        }
+        output: 〈0;input〉.a
+      }
+      root: {
+        a: 〈1;_a〉.output
+      }
+      _a: (〈0;X〉 & {
+        input: 〈1;root〉
+      })
+    }
+  }
+  issue3731: {
+    reduced: {
+      #lookup: {
+        input: {
+          ...
+        }
+        output: [
+          for _, v in 〈1;input〉 if (〈0;v〉.show != _|_(explicit error (_|_ literal) in source)) {
+            〈1;v〉
+          },
+        ]
+      }
+      root: {
+        self: {
+          show: true
+        }
+        others: (〈1;#lookup〉 & {
+          input: 〈2;root〉
+        }).output
+      }
+    }
+  }
+  issue3731: {
+    expanded: {
+      #lookup: {
+        input: {
+          ...
+        }
+        output: [
+          for _, v in 〈1;input〉 if (〈0;v〉.show != _|_(explicit error (_|_ literal) in source)) {
+            〈1;v〉
+          },
+        ]
+      }
+      root: {
+        self: {
+          show: true
+        }
+        others: 〈0;_others〉.output
+        _others: (〈1;#lookup〉 & {
+          input: 〈2;root〉
+        })
+      }
+    }
+  }
+  issue3731: {
+    full: {
+      #Workspace: {
+        workspaceA?: {}
+        workspaceB?: {}
+      }
+      #AccountConfig: {
+        workspaces: 〈1;#Workspace〉
+        siblings?: [
+          ...string,
+        ]
+      }
+      #AccountConfigSub1: {
+        〈1;#AccountConfig〉
+        workspaces: {
+          workspaceA: {}
+        }
+      }
+      #AccountConfigSub2: {
+        〈1;#AccountConfig〉
+        workspaces: {
+          workspaceB: {}
+        }
+      }
+      tree: {
+        env1: {
+          region1: {
+            "env1-r1-account-sub1": 〈3;#AccountConfigSub1〉
+            "env1-r1-account-sub2-1": 〈3;#AccountConfigSub2〉
+          }
+        }
+      }
+      #lookupSiblings: {
+        envtree: {
+          ...
+        }
+        out: [
+          for region, v in 〈1;envtree〉 for account, config in 〈0;v〉 if (〈0;config〉.workspaces.workspaceB != _|_(explicit error (_|_ literal) in source)) {
+            〈1;account〉
+          },
+        ]
+      }
+      tree: {
+        env1: {
+          [_]: {
+            [_]: (〈3;#AccountConfig〉 & {
+              siblings: (〈4;#lookupSiblings〉 & {
+                envtree: 〈4;env1〉
+              }).out
+            })
+          }
+        }
+      }
+    }
+  }
+}
+--- x.cue
+{
+  inline: {
+    small: {
+      f: {
+        n: int
+        out: (〈1;f〉 & {
+          n: (〈1;n〉 - 1)
+        }).out
+      }
+    }
+  }
+  inline: {
+    medium: {
+      f2: (〈0;f〉 & {
+        n: 2
+      }).out
+      fRec: {
+        nn: int
+        out: (〈1;f〉 & {
+          n: 〈1;nn〉
+        }).out
+      }
+      f: {
+        n: int
+        out: (〈1;fRec〉 & {
+          nn: (〈1;n〉 - 1)
+        }).out
+      }
+    }
+  }
+  inline: {
+    patterns: {
+      f: {
+        n: (〈1;f〉 & {
+          n: {}
+        }).n
+      }
+      f: {
+        n: {}
+      }
+      [string]: {
+        n: {}
+      }
+      f: {
+        [string]: {}
+      }
+      f: {}
+    }
+  }
+  inline: {
+    acrossFields: {
+      fail1: {
+        f: {
+          in: number
+          out: (〈0;in〉 + 1)
+        }
+        k00: 0
+        k10: (〈0;f〉 & {
+          in: 〈1;k00〉
+        }).out
+        k20: (〈0;f〉 & {
+          in: 〈1;k10〉
+        }).out
+        k30: (〈0;f〉 & {
+          in: 〈1;k20〉
+        }).out
+        k10: (〈0;f〉 & {
+          in: 〈1;k30〉
+        }).out
+      }
+    }
+  }
+  inline: {
+    acrossFields: {
+      ok1: {
+        f: {
+          in: number
+          out: 〈0;in〉
+        }
+        k00: 0
+        k10: (〈0;f〉 & {
+          in: 〈1;k00〉
+        }).out
+        k20: (〈0;f〉 & {
+          in: 〈1;k10〉
+        }).out
+        k30: (〈0;f〉 & {
+          in: 〈1;k20〉
+        }).out
+        k10: (〈0;f〉 & {
+          in: 〈1;k30〉
+        }).out
+      }
+    }
+  }
+}

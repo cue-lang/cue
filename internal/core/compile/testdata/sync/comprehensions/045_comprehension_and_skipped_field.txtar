@@ -1,0 +1,33 @@
+#name: comprehension and skipped field
+#bug: true
+#evalFull
+# Tests that a comprehension iterating over a struct whose values contain
+# a hidden field (_p) correctly skips that hidden field and still evaluates
+# the visible result field using a disjunction with a comprehension body.
+-- in.cue --
+
+for key, value in {x: v: 1} {
+	"\(key)": {
+		v:  *{for pod, _ in value.v {}} | {"\(value.v)": 2}
+		_p: 3
+	}
+}
+@test(eq, {x: {v: {"1": 2}, _p: 3}})
+-- out/compile --
+--- in.cue
+{
+  for key, value in {
+    x: {
+      v: 1
+    }
+  } {
+    "\(〈1;key〉)": {
+      v: (*{
+        for pod, _ in 〈3;value〉.v {}
+      }|{
+        "\(〈3;value〉.v)": 2
+      })
+      _p: 3
+    }
+  }
+}

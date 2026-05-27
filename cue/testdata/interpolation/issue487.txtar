@@ -36,25 +36,3 @@ Retain: 0
 Unifications: 15
 Conjuncts:    29
 Disjuncts:    15
--- out/compile --
---- in.cue
-{
-  t1: {
-    #R: {
-      pos: &(int, >=0)
-      name: "hello_\(〈0;pos〉)"
-    }
-    a: (〈0;#R〉 & {
-      pos: 67
-    })
-  }
-  t2: {
-    #R: {
-      pos: string
-      name: "hello_\(〈0;pos〉)"
-    }
-    a: (〈0;#R〉 & {
-      pos: "a"
-    })
-  }
-}

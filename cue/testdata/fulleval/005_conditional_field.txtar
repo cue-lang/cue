@@ -27,28 +27,6 @@ d: {
 [incomplete] d: non-concrete value int in operand to >:
     ./in.cue:20:5
     ./in.cue:19:5
--- out/compile --
---- in.cue
-{
-  a: {
-    if 〈0;b〉 {
-      a: "foo"
-    }
-    b: true
-  }
-  c: {
-    a: 3
-    if (〈0;a〉 > 1) {
-      a: 3
-    }
-  }
-  d: {
-    a: int
-    if (〈0;a〉 > 1) {
-      a: 3
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

@@ -29,23 +29,3 @@ Retain: 0
 Unifications: 10
 Conjuncts:    23
 Disjuncts:    10
--- out/compile --
---- in.cue
-{
-  #TopLevel: {
-    [string]: {
-      path: string
-      content: string
-    }
-  }
-  #Mid: (〈0;#TopLevel〉 & {
-    myoutput: {
-      path: "/output"
-    }
-  })
-  val: ((〈0;#Mid〉 & {}) & {
-    myoutput: {
-      content: "foo"
-    }
-  })
-}

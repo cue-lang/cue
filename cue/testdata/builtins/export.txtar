@@ -37,36 +37,3 @@ Conjuncts:    18
 Disjuncts:    0
 
 NumCloseIDs: 5
--- out/compile --
---- in.cue
-{
-  issue3972: {
-    output: {
-      out0: "static"
-    }
-    input: {
-      inputStatic: "static"
-    }
-    if false {
-      input: {
-        inputNever: "never"
-      }
-    }
-    derived: {
-      derivedStatic: "static"
-    }
-    if false {
-      derived: {
-        derivedNever: 〈2;input〉.inputNever
-      }
-    }
-    _out1: [
-      for svc, _ in 〈1;derived〉 {
-        〈1;svc〉
-      },
-    ]
-    output: {
-      out1: 〈import;"encoding/yaml"〉.Marshal(〈1;_out1〉)
-    }
-  }
-}

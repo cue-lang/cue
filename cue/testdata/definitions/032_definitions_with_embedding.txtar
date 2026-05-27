@@ -33,32 +33,6 @@ Conjuncts:    36
 Disjuncts:    0
 
 NumCloseIDs: 11
--- out/compile --
---- in.cue
-{
-  #E: {
-    a: {
-      b: int
-    }
-  }
-  #S: {
-    〈1;#E〉
-    a: {
-      c: int
-    }
-    b: 3
-  }
-  #e1: (〈0;#S〉 & {
-    a: {
-      d: 4
-    }
-  })
-  #v1: (〈0;#S〉 & {
-    a: {
-      c: 4
-    }
-  })
-}
 -- out/diff-v2-v3.txt --
 Reordering / missing positions.
 Verdict: worsening -- v3 reports fewer error positions; field reordering.

@@ -44,34 +44,6 @@ m4: """
 	4)
 
 		""" @test(eq, "\n4\n")
--- out/compile --
---- in.cue
-{
-  a1: "before
-  \(4)
-  after"
-  a2: "before
-  \(4)
-  "
-  a3: "
-  \(4)
-  after"
-  a4: "
-  \(4)
-  "
-  m1: "before
-  \(4)
-  after"
-  m2: "before
-  \(4)
-  "
-  m3: "
-  \(4)
-  after"
-  m4: "
-  \(4)
-  "
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

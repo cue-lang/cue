@@ -35,25 +35,6 @@ Conjuncts:    16
 Disjuncts:    0
 
 NumCloseIDs: 6
--- out/compile --
---- in.cue
-{
-  a: {
-    〈1;#A〉
-  }
-  a: {
-    c: 1
-  }
-  #A: {
-    b: 1
-  }
-  b: {
-    〈1;#A〉
-    leaf: "leaf value"
-    interpolation: "more \(〈0;leaf_ref〉)"
-    leaf_ref: 〈0;leaf〉
-  }
-}
 -- out/diff-v2-v3.txt --
 Positions: v3 reports fewer positions than v2 for the "field not allowed" error.
 Reordering.

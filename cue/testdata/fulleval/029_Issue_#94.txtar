@@ -48,33 +48,3 @@ Disjuncts:    22
 MisalignedConjunct: 1
 
 NumCloseIDs: 1
--- out/compile --
---- in.cue
-{
-  foo: {
-    opt?: 1
-    txt: 2
-    #def: 3
-    regular: 4
-    _hidden: 5
-  }
-  comp: {
-    for k, v in 〈1;foo〉 {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-  }
-  select: {
-    opt: 〈1;foo〉.opt
-    txt: 〈1;foo〉.txt
-    #def: 〈1;foo〉.#def
-    regular: 〈1;foo〉.regular
-    _hidden: 〈1;foo〉._hidden
-  }
-  index: {
-    opt: 〈1;foo〉["opt"]
-    txt: 〈1;foo〉["txt"]
-    #def: 〈1;foo〉["#def"]
-    regular: 〈1;foo〉["regular"]
-    _hidden: 〈1;foo〉["_hidden"]
-  }
-}

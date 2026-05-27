@@ -1,0 +1,8 @@
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+"hello"
+-- out/compile --
+--- in.cue
+{
+  "hello"
+}

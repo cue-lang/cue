@@ -1,0 +1,26 @@
+raw: true
+eval: true
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{
+	#FindInMap: {
+		#: "Fn::FindInMap": [string | #FindInMap]
+	}
+	a: [...string]
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    #FindInMap: {
+      #: {
+        "Fn::FindInMap": [
+          (string|〈3;#FindInMap〉),
+        ]
+      }
+    }
+    a: [
+      ...string,
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+
+# Tests that a struct combining an open pattern constraint with close() correctly
+# rejects fields not allowed by the close() constraint when unified with a value.
+# https://cuelang.org/issue/271
+-- in.cue --
+#T: [_]: _
+#T: close({"a": string})
+x:  #T
+x: {
+	a: "hello" @test(eq, "hello")
+	b: "foo"   @test(err, code=eval, contains="field not allowed", pos=[-5:5, 0:2])
+}
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    [_]: _
+  }
+  #T: close({
+    a: string
+  })
+  x: 〈0;#T〉
+  x: {
+    a: "hello"
+    b: "foo"
+  }
+}

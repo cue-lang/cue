@@ -39,27 +39,5 @@ Conjuncts:    29
 Disjuncts:    0
 
 NumCloseIDs: 14
--- out/compile --
---- in.cue
-{
-  #A: {
-    [=~"^[a-s]*$"]: int
-  }
-  #B: {
-    [=~"^[m-z]*$"]: int
-  }
-  #C: (〈0;#A〉 & 〈0;#B〉)
-  c: 〈0;#C〉
-  c: {
-    aaa: 3
-  }
-  #D: {
-    (〈1;#A〉 & 〈1;#B〉)
-  }
-  d: 〈0;#D〉
-  d: {
-    aaa: 3
-  }
-}
 -- out/diff-v2-v3.txt --
 Missing positions: v3 reports fewer positions than v2 for the "field not allowed" errors.

@@ -15,17 +15,6 @@ e: "\([])"   @test(err, code=eval, contains="invalid interpolation: cannot use [
 [eval] e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):
     ./in.cue:7:4
     ./in.cue:7:7
--- out/compile --
---- in.cue
-{
-  a: "\(4)"
-  b: "one \(〈0;a〉) two \((〈0;a〉 + 〈0;c〉))"
-  c: "one"
-  d: "\(〈0;r〉)"
-  u: "\(_)"
-  r: _
-  e: "\([])"
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

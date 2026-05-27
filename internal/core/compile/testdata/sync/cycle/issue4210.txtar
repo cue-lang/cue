@@ -1,0 +1,67 @@
+# CUE hangs indefinitely when a structural cycle reference is wrapped in braces
+# before a field selector, e.g. `a: b: c: {a}.b`. Without braces (`a: b: c:
+# a.b`) the cycle is correctly detected and reported as an error. The braces
+# prevent cycle detection, causing CUE to loop forever instead of reporting an
+# error. Affects all variants: `{a & _}.b`, `{a.b}.c`, nested structs, etc.
+# https://cuelang.org/issue/4210
+-- in.cue --
+t1: {
+	a: b: c: {a}.b
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+}
+t2: {
+	a: b: c: {a & _}.b
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+}
+t3: {
+	a: b: c: d: {a.b}.c
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+}
+t4: {
+	x: y: z: {a}.y
+	a: x
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    a: {
+      b: {
+        c: {
+          〈3;a〉
+        }.b
+      }
+    }
+  }
+  t2: {
+    a: {
+      b: {
+        c: {
+          (〈3;a〉 & _)
+        }.b
+      }
+    }
+  }
+  t3: {
+    a: {
+      b: {
+        c: {
+          d: {
+            〈4;a〉.b
+          }.c
+        }
+      }
+    }
+  }
+  t4: {
+    x: {
+      y: {
+        z: {
+          〈3;a〉
+        }.y
+      }
+    }
+    a: 〈0;x〉
+  }
+}

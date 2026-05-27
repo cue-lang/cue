@@ -1,0 +1,89 @@
+-- in.cue --
+issue4011: full: {
+	let _hugoEnvironments = {
+		default:    "_default"
+		production: "production"
+	}
+
+	site: cls: _
+	site: [_]: {
+		fs: {
+			Create: {
+				for envID, envName in _hugoEnvironments
+				let envConfig = hugo[envID]
+				if envConfig != _|_ {
+					config: Contents: envConfig
+				}
+			}
+		}
+
+		hugo: _
+	}
+
+	site: [_]: hugo: production: {}
+	@test(eq, {site: cls: {
+		fs: Create: config: Contents: {}
+		hugo: production: {}
+	}})
+}
+issue4011: reduced: {
+	@test(eq, {result: foo: true, envs: foo: {}})
+	result: {
+		for envName in ["foo"]
+		let env = envs[envName]
+		if env != _|_ {
+			(envName): true
+		}
+	}
+	envs: foo: {}
+}
+-- out/compile --
+--- in.cue
+{
+  issue4011: {
+    full: {
+      let _hugoEnvironments#1 = {
+        default: "_default"
+        production: "production"
+      }
+      site: {
+        cls: _
+      }
+      site: {
+        [_]: {
+          fs: {
+            Create: {
+              for envID, envName in 〈4;let _hugoEnvironments#1〉 let envConfig = 〈3;hugo〉[〈0;envID〉] if (〈0;envConfig〉 != _|_(explicit error (_|_ literal) in source)) {
+                config: {
+                  Contents: 〈2;envConfig〉
+                }
+              }
+            }
+          }
+          hugo: _
+        }
+      }
+      site: {
+        [_]: {
+          hugo: {
+            production: {}
+          }
+        }
+      }
+    }
+  }
+  issue4011: {
+    reduced: {
+      result: {
+        for _, envName in [
+          "foo",
+        ] let env = 〈2;envs〉[〈0;envName〉] if (〈0;env〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈2;envName〉: true
+        }
+      }
+      envs: {
+        foo: {}
+      }
+    }
+  }
+}

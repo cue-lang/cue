@@ -1,0 +1,238 @@
+# Tests that comprehensions over intersections of hidden fields work correctly.
+# Issue #3762: for comprehensions over _a & _b where both have patterns.
+-- in.cue --
+full: {
+	kube: node: n1: {
+		_CL: "l"
+		_cs: (_CL): _a[(_CL)]
+		_cs: (_CL): {
+			opts: {}
+		}
+	}
+
+	_a: "l": {
+		_ba?: string
+		opts: {
+			if _ba != _|_ {b: (_ba)}
+		}
+	}
+
+	for k, _ in _a & _b {
+		x: 5
+	}
+
+	_a: [ID=_]: vms: [{ name: "hello" }]
+	_b: [ID=_]: vms: [{ name: "again" }]
+	@test(eq, {
+		kube: node: n1: {
+			_CL: "l"
+			_cs: l: {
+				opts: {}
+				_ba?: string
+				vms: [{
+					name: "hello"
+				}]
+			}
+		}
+		_a: l: {
+			_ba?: string
+			opts: {}
+			vms: [{
+				name: "hello"
+			}]
+		}
+		x: 5
+		_b: {}
+	})
+}
+reduced: p1: {
+	_cs: _a.l & {
+		opts: {}
+	}
+
+	_a: l: {
+		_ba?: string
+		opts: {
+			if _ba != _|_ {
+				b: _ba
+			}
+		}
+		vms: "hello"
+	}
+
+	_b: l: vms: "again"
+
+	for k, _ in _a & _b {
+		x: 5
+	}
+	@test(eq, {
+		_cs: {opts: {}, _ba?: string, vms: "hello"}
+		_a: {
+			l: {_ba?: string, opts: {}, vms: "hello"}
+		}
+		_b: {l: {vms: "again"}}
+		x: 5
+	})
+}
+reduced: p2: {
+	for k, _ in _a & _b {
+		x: 5
+	}
+
+	_cs: _a.l & {
+		opts: {}
+	}
+
+	_a: l: {
+		_ba?: string
+		opts: {
+			if _ba != _|_ {
+				b: _ba
+			}
+		}
+		vms: "hello"
+	}
+
+	_b: l: vms: "again"
+	@test(eq, {
+		x: 5
+		_cs: {opts: {}, _ba?: string, vms: "hello"}
+		_a: {
+			l: {_ba?: string, opts: {}, vms: "hello"}
+		}
+		_b: {l: {vms: "again"}}
+	})
+}
+reference: {
+	_x: {
+		f: true
+	}
+
+	_y: {
+		f: false
+	}
+
+	for k, _ in _x & _y {
+		ok: true
+	}
+	@test(eq, {
+		_x: {f: true}
+		_y: {f: false}
+		ok: true
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  full: {
+    kube: {
+      node: {
+        n1: {
+          _CL: "l"
+          _cs: {
+            〈1;_CL〉: 〈4;_a〉[〈1;_CL〉]
+          }
+          _cs: {
+            〈1;_CL〉: {
+              opts: {}
+            }
+          }
+        }
+      }
+    }
+    _a: {
+      l: {
+        _ba?: string
+        opts: {
+          if (〈1;_ba〉 != _|_(explicit error (_|_ literal) in source)) {
+            b: 〈2;_ba〉
+          }
+        }
+      }
+    }
+    for k, _ in (〈0;_a〉 & 〈0;_b〉) {
+      x: 5
+    }
+    _a: {
+      [_]: {
+        vms: [
+          {
+            name: "hello"
+          },
+        ]
+      }
+    }
+    _b: {
+      [_]: {
+        vms: [
+          {
+            name: "again"
+          },
+        ]
+      }
+    }
+  }
+  reduced: {
+    p1: {
+      _cs: (〈0;_a〉.l & {
+        opts: {}
+      })
+      _a: {
+        l: {
+          _ba?: string
+          opts: {
+            if (〈1;_ba〉 != _|_(explicit error (_|_ literal) in source)) {
+              b: 〈2;_ba〉
+            }
+          }
+          vms: "hello"
+        }
+      }
+      _b: {
+        l: {
+          vms: "again"
+        }
+      }
+      for k, _ in (〈0;_a〉 & 〈0;_b〉) {
+        x: 5
+      }
+    }
+  }
+  reduced: {
+    p2: {
+      for k, _ in (〈0;_a〉 & 〈0;_b〉) {
+        x: 5
+      }
+      _cs: (〈0;_a〉.l & {
+        opts: {}
+      })
+      _a: {
+        l: {
+          _ba?: string
+          opts: {
+            if (〈1;_ba〉 != _|_(explicit error (_|_ literal) in source)) {
+              b: 〈2;_ba〉
+            }
+          }
+          vms: "hello"
+        }
+      }
+      _b: {
+        l: {
+          vms: "again"
+        }
+      }
+    }
+  }
+  reference: {
+    _x: {
+      f: true
+    }
+    _y: {
+      f: false
+    }
+    for k, _ in (〈0;_x〉 & 〈0;_y〉) {
+      ok: true
+    }
+  }
+}

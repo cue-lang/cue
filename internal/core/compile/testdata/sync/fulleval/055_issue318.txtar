@@ -1,0 +1,29 @@
+# Tests that string interpolation consistently detects references to
+# non-existent fields. Issue: an interpolation with both a valid and an invalid
+# field reference (e.g. "\(arg.x) \(arg.y)") silently swallowed the error for
+# the invalid field, while a single invalid reference was correctly reported.
+# https://cuelang.org/issue/318
+#
+-- in.cue --
+#T: {
+	arg: x: string
+	out1: "\(arg.x) \(arg.y)" @test(err, code=eval)
+	// TODO: is this really an eval error if it is referred to within a
+	// definitions?
+	out2: "\(arg.y)"           @test(err, code=eval)
+	vx:   arg.x                @test(kind=string)
+	vy:   arg.y                @test(err, code=eval)
+}
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    arg: {
+      x: string
+    }
+    out1: "\(〈0;arg〉.x) \(〈0;arg〉.y)"
+    out2: "\(〈0;arg〉.y)"
+    vx: 〈0;arg〉.x
+    vy: 〈0;arg〉.y
+  }
+}

@@ -1,0 +1,73 @@
+-- in.cue --
+t1: close({b: {}})
+t1: _    @test(closed)
+t1: b: _ @test(closed=false)
+t1: _ @test(allows, "b")
+t1: _ @test(allows=false, foo)
+
+#X: {[=~"^Q*$"]: int}
+
+#X: _ @test(closed)
+#X: _ @test(allows, Q)
+#X: _ @test(allows=false, X)
+#X: _ @test(allows=false, string)
+
+t2: #X
+t2: _ @test(closed)
+t2: _ @test(allows, Q)
+t2: _ @test(allows=false, X)
+t2: _ @test(allows=false, string)
+
+#Y: {...}
+
+t3: #Y
+t3: _ @test(closed)
+t3: _ @test(allows, Q)
+t3: _ @test(allows, X)
+t3: _ @test(allows, string)
+
+// t4: "string" (quoted) targets the literal field named string;
+// string (unquoted) targets the any-string pattern constraint.
+t4: close({"string": 1})
+t4: _ @test(closed)
+t4: _ @test(allows, "string")      // quoted: literal field named string
+t4: _ @test(allows=false, string)  // unquoted: any-string pattern not present
+-- out/compile --
+--- in.cue
+{
+  t1: close({
+    b: {}
+  })
+  t1: _
+  t1: {
+    b: _
+  }
+  t1: _
+  t1: _
+  #X: {
+    [=~"^Q*$"]: int
+  }
+  #X: _
+  #X: _
+  #X: _
+  #X: _
+  t2: 〈0;#X〉
+  t2: _
+  t2: _
+  t2: _
+  t2: _
+  #Y: {
+    ...
+  }
+  t3: 〈0;#Y〉
+  t3: _
+  t3: _
+  t3: _
+  t3: _
+  t4: close({
+    string: 1
+  })
+  t4: _
+  t4: _
+  t4: _
+}

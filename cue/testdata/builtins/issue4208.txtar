@@ -38,19 +38,3 @@ invalid: foo: {} @test(err, code=eval, contains="field not allowed", incorrect) 
 -- out/errors.txt --
 [eval] invalid.foo: field not allowed:
     ./in.cue:10:10
--- out/compile --
---- in.cue
-{
-  #Environment: ("sbx"|"stg"|"pro"|error("Must specify a valid environment"))
-  #Envs: {
-    [〈1;#Environment〉]: {}
-  }
-  valid: 〈0;#Envs〉
-  valid: {
-    sbx: {}
-  }
-  invalid: 〈0;#Envs〉
-  invalid: {
-    foo: {}
-  }
-}

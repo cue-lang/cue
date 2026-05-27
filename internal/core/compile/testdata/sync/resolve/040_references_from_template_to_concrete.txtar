@@ -1,0 +1,40 @@
+-- in.cue --
+res: [t] @test(eq, [{
+	x: {
+		a: "XDDDD"
+		b: str: "DDDD"
+		c: "X"
+	}
+}])
+@test(shareID=T, at=res[0])
+@test(shareID=T, at=t)
+t: [X=string]: {
+	a: c + b.str
+	b: str: string
+	c: "X"
+}
+t: x: {b: str: "DDDD"} @test(eq, {b: {str: "DDDD"}, a: "XDDDD", c: "X"})
+
+-- out/compile --
+--- in.cue
+{
+  res: [
+    〈1;t〉,
+  ]
+  t: {
+    [string]: {
+      a: (〈0;c〉 + 〈0;b〉.str)
+      b: {
+        str: string
+      }
+      c: "X"
+    }
+  }
+  t: {
+    x: {
+      b: {
+        str: "DDDD"
+      }
+    }
+  }
+}

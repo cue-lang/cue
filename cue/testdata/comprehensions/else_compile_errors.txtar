@@ -38,33 +38,3 @@ forVarInElse.bad: reference "i" not found:
     ./in.cue:5:49
 letVarInElse.bad: reference "y" not found:
     ./in.cue:10:61
--- out/compile --
-forVarInElse.bad: reference "i" not found:
-    ./in.cue:5:49
-letVarInElse.bad: reference "y" not found:
-    ./in.cue:10:61
---- in.cue
-{
-  forVarInElse: {
-    for _, i in [
-      1,
-      2,
-      3,
-    ] {
-      "\(〈1;i〉)": 〈1;i〉
-    } else {
-      bad: _|_(reference "i" not found)
-    }
-  }
-  letVarInElse: {
-    for _, x in [
-      1,
-      2,
-      3,
-    ] let y = (〈0;x〉 * 2) {
-      "\(〈2;x〉)": 〈1;y〉
-    } else {
-      bad: _|_(reference "y" not found)
-    }
-  }
-}

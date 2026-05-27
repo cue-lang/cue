@@ -1,0 +1,55 @@
+// Issue #729
+-- in.cue --
+ifScalar: {
+	_#cond: true
+
+	if _#cond {5}
+	@test(eq, {
+		5
+		_#cond: true
+	})
+}
+
+ifScalarConflict: {
+	_#cond: true
+
+	if _#cond {5}
+
+	"soo"
+	@test(err, code=eval, contains="conflicting values", args=["soo", 5, string, int], pos=[0:19, 3:2, 3:13, 5:2])
+}
+
+ifScalarNested: {
+	_#cond: true
+
+	if _#cond {{{5}}}
+
+	@test(eq, {5, _#cond: true})
+}
+-- out/compile --
+--- in.cue
+{
+  ifScalar: {
+    _#cond: true
+    if 〈0;_#cond〉 {
+      5
+    }
+  }
+  ifScalarConflict: {
+    _#cond: true
+    if 〈0;_#cond〉 {
+      5
+    }
+    "soo"
+  }
+  ifScalarNested: {
+    _#cond: true
+    if 〈0;_#cond〉 {
+      {
+        {
+          5
+        }
+      }
+    }
+  }
+}

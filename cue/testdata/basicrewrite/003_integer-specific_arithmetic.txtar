@@ -43,34 +43,6 @@ me2: mod(2, 1.0) @test(err, code=eval, pos=[0:13], contains="cannot use")
     ./in.cue:26:10
 [eval] me2: cannot use 1.0 (type float) as int in argument 2 to mod:
     ./in.cue:27:13
--- out/compile --
---- in.cue
-{
-  q1: quo(5, 2)
-  q2: quo(5, -2)
-  q3: quo(-5, 2)
-  q4: quo(-5, -2)
-  qe1: quo(2.0, 1)
-  qe2: quo(2, 1.0)
-  r1: rem(5, 2)
-  r2: rem(5, -2)
-  r3: rem(-5, 2)
-  r4: rem(-5, -2)
-  re1: rem(2.0, 1)
-  re2: rem(2, 1.0)
-  d1: div(5, 2)
-  d2: div(5, -2)
-  d3: div(-5, 2)
-  d4: div(-5, -2)
-  de1: div(2.0, 1)
-  de2: div(2, 1.0)
-  m1: mod(5, 2)
-  m2: mod(5, -2)
-  m3: mod(-5, 2)
-  m4: mod(-5, -2)
-  me1: mod(2.0, 1)
-  me2: mod(2, 1.0)
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  25

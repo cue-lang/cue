@@ -7,20 +7,6 @@ t1: {
       b: {e: 3, f: 3}
     })
 }
--- out/compile --
---- in.cue
-{
-  t1: {
-    a: {
-      c: 〈1;b〉.e
-      d: 〈1;b〉.f
-    }
-    b: {
-      e: 3
-      f: 〈1;a〉.c
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

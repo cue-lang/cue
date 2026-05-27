@@ -1,0 +1,19 @@
+#name: self-reference cycles conflicts with strings
+#evalPartial
+-- in.cue --
+a: {
+	x: y + "?"
+	y: x + "!" @test(eq, "hey!")
+}
+a: x: "hey" @test(err, code=eval, contains="conflicting values", pos=[-3:5, 0:7])
+-- out/compile --
+--- in.cue
+{
+  a: {
+    x: (〈0;y〉 + "?")
+    y: (〈0;x〉 + "!")
+  }
+  a: {
+    x: "hey"
+  }
+}

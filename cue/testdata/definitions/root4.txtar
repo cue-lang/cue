@@ -34,19 +34,6 @@ Disjuncts:    0
 Notifications: 2
 
 NumCloseIDs: 3
--- out/compile --
---- in.cue
-{
-  #schema: {
-    a!: bool
-  }
-  (〈0;_hidden〉 & 〈0;#schema〉)
-  _hidden: {
-    a: true
-    notAllowed: true
-  }
-  allowed: true
-}
 -- out/diff-v2-v3.txt --
 Positions: v3 reports fewer positions than v2 for the "field not allowed" error.
 Reordering.

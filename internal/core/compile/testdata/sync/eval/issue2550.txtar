@@ -1,0 +1,24 @@
+# Tests that accessing an undefined field (bar.missing) on a closed empty struct
+# (bar: close({})) inside a comprehension guard correctly reports "undefined
+# field" rather than panicking or producing a wrong result. The let binding
+# (let _bar = bar) inside the comprehension body verifies that let bindings in
+# comprehensions interacting with closed structs do not affect the error behavior.
+-- in.cue --
+foo: string    @test(eq, string)
+bar: close({}) @test(eq, {}) @test(closed)
+
+if bar.missing == "x" {
+	let _bar = bar
+	foo: _bar
+}
+@test(err, code=eval, contains="undefined field", args=[missing], pos=[in.cue:4:8])
+-- out/compile --
+--- in.cue
+{
+  foo: string
+  bar: close({})
+  if (〈0;bar〉.missing == "x") {
+    let _bar#1 = 〈1;bar〉
+    foo: 〈0;let _bar#1〉
+  }
+}

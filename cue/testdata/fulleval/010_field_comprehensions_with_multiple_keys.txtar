@@ -26,50 +26,6 @@ for x in [
 	C: D: {a: "C", b: "D"}
 	E: F: {a: "E", b: "F"}
 })
--- out/compile --
---- in.cue
-{
-  for _, x in [
-    {
-      a: "A"
-      b: "B"
-    },
-    {
-      a: "C"
-      b: "D"
-    },
-    {
-      a: "E"
-      b: "F"
-    },
-  ] {
-    a: {
-      "\(〈2;x〉.a)": {
-        b: {
-          "\(〈4;x〉.b)": 〈4;x〉
-        }
-      }
-    }
-  }
-  for _, x in [
-    {
-      a: "A"
-      b: "B"
-    },
-    {
-      a: "C"
-      b: "D"
-    },
-    {
-      a: "E"
-      b: "F"
-    },
-  ] {
-    "\(〈1;x〉.a)": {
-      "\(〈2;x〉.b)": 〈2;x〉
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  20
 Freed:  29

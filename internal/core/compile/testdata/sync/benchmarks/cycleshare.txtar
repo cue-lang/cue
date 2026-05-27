@@ -1,0 +1,107 @@
+#inlinetest:exclude skip — we need to represent structure sharing across disjunctions
+# properly to encode this test. We probably need to auto-insert shareIDs as well.
+# TODO(inline): implement structure sharing checks across disjunctions.
+-- in.cue --
+// Test that cyclic references do not break structure sharing. This was the
+// underlying problem of Issue #3587. Note that this is not a problem related
+// to disjunctions.
+
+// These definitions represent a large tree of disjunctions.
+#D1: {a: #D2} | {b: #D2} | {c: #D2}
+#D2: {a: #D3} | {b: #D3} | {c: #D3}
+#D3: {
+    one: {a: int} | {b: int} | {c: int}
+    two: {a: string} | {b: string} | {c: string}
+    three: {a: bool} | {b: bool} | {c: bool}
+}
+
+root: y: #D1 | [#D1] | {x: #D1} // Expensive path
+root: x: empty: {}
+
+root: "0": data: root_0.x.empty
+root: "1": data: root_1.x.empty
+root: "2": data: root_2.x.empty
+root: "3": data: root_3.x.empty
+
+ // We want root to be shared in all of these cases.
+let root_0 = root
+let root_1 = root
+root_2: root
+root_3: root
+-- out/compile --
+--- in.cue
+{
+  #D1: ({
+    a: 〈1;#D2〉
+  }|{
+    b: 〈1;#D2〉
+  }|{
+    c: 〈1;#D2〉
+  })
+  #D2: ({
+    a: 〈1;#D3〉
+  }|{
+    b: 〈1;#D3〉
+  }|{
+    c: 〈1;#D3〉
+  })
+  #D3: {
+    one: ({
+      a: int
+    }|{
+      b: int
+    }|{
+      c: int
+    })
+    two: ({
+      a: string
+    }|{
+      b: string
+    }|{
+      c: string
+    })
+    three: ({
+      a: bool
+    }|{
+      b: bool
+    }|{
+      c: bool
+    })
+  }
+  root: {
+    y: (〈1;#D1〉|[
+      〈2;#D1〉,
+    ]|{
+      x: 〈2;#D1〉
+    })
+  }
+  root: {
+    x: {
+      empty: {}
+    }
+  }
+  root: {
+    "0": {
+      data: 〈2;let root_0#1〉.x.empty
+    }
+  }
+  root: {
+    "1": {
+      data: 〈2;let root_1#2〉.x.empty
+    }
+  }
+  root: {
+    "2": {
+      data: 〈2;root_2〉.x.empty
+    }
+  }
+  root: {
+    "3": {
+      data: 〈2;root_3〉.x.empty
+    }
+  }
+  let root_0#1 = 〈0;root〉
+  let root_1#2 = 〈0;root〉
+  root_2: 〈0;root〉
+  root_3: 〈0;root〉
+}

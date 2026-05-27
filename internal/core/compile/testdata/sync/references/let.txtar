@@ -1,0 +1,304 @@
+-- in.cue --
+import "list"
+
+a1list: [{1}]
+let A1 = a1list
+a1: 100*A1[0] + A1[0] @test(eq, 101)
+
+a2list: [{2}]
+let A2 = a2list
+a2: b: 100*A2[0] + A2[0] @test(eq, 202)
+
+a3list: [{3}]
+let A3 = a3list
+a3: b: c: 100*A3[0] + A3[0] @test(eq, 303)
+
+a4list: [{4}]
+let A4 = a4list
+a4: [for x in A4 {v: 404}] @test(eq, [{v: 404}])
+
+a5list: [{5}]
+let A5 = a5list
+a5: b: [for x in A5 {v: 505}] @test(eq, [{v: 505}])
+
+a6list: [{6}]
+let A6 = a6list
+a6: b: c: [for x in A6 {v: 606}] @test(eq, [{v: 606}])
+
+a7list: [{7}]
+let A7 = a7list
+a7: {for x in A7 {v: 707}} @test(eq, {v: 707})
+
+a8list: [{8}]
+let A8 = a8list
+a8: b: {for x in A8 {v: 808}} @test(eq, {v: 808})
+
+a9list: [{9}]
+let A9 = a9list
+a9: b: c: {for x in A9 {v: 909}} @test(eq, {v: 909})
+
+// Issue #609:
+// When a let value resolved to an incomplete value, it should pass this
+// incomplete status to the expression in which it used. But 609 reported
+// a gobbling of this incomplete status. The problem seemed to be not
+// exclusive to the use of let, though.
+incompleteLet: {
+	input: [1, 2, 3, 4, 5]
+
+	last: {
+		min: list.Min(input)
+		max: list.Max(input)
+	}
+
+	bar: {
+		let mn = last.min
+		let mx = list.max
+
+		min: mn
+		max: mx @test(err, code=incomplete, contains="undefined field: max", pos=[-3:17])
+	}
+
+	x: {
+		if list.max < 0 {
+		}
+	}
+	@test(eq, {
+		input: [1, 2, 3, 4, 5]
+		last: {min: 1, max: 5}
+		bar: {
+			min: 1
+			max: _|_ @test(err, code=incomplete, contains="incompleteLet.bar.max: undefined field: max", pos=[54:17])
+		}
+		x: _|_ @test(err, code=incomplete, contains="incompleteLet.x: undefined field: max", pos=[61:11])
+	})
+}
+
+// Let references should also work inside embedded scalars.
+// Issue #1955
+scalarReference: {
+	inScalar: p0: {
+		5
+		let x = 6
+		#b: x
+		@test(eq, {5, #b: 6})
+	}
+	inScalar: p1: {
+		#b: x
+		let x = 6
+		5
+		@test(eq, {5, #b: 6})
+	}
+	inList: p0: {
+		let x = { a: 1 }
+		[ x ]
+		@test(eq, [{a: 1}])
+	}
+	inList: p1: {
+		[ x ]
+		let x = { a: 1 }
+		@test(eq, [{a: 1}])
+	}
+}
+
+// Strange let declaration behavior: accessing the last element of a list via
+// a let-bound variable failed when the let appeared before the list definition.
+// https://cuelang.org/issue/1116
+issue1116: {
+	a: {
+		#a: ["a", "b"]
+		let List = #a
+		List[len(List)-1]
+		@test(eq, {"b", #a: ["a", "b"]})
+	}
+	b: {
+		let List = #a
+		List[len(List)-1]
+		#a: ["a", "b"]
+		@test(eq, {"b", #a: ["a", "b"]})
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  a1list: [
+    {
+      1
+    },
+  ]
+  let A1#1 = 〈0;a1list〉
+  a1: ((100 * 〈0;let A1#1〉[0]) + 〈0;let A1#1〉[0])
+  a2list: [
+    {
+      2
+    },
+  ]
+  let A2#2 = 〈0;a2list〉
+  a2: {
+    b: ((100 * 〈1;let A2#2〉[0]) + 〈1;let A2#2〉[0])
+  }
+  a3list: [
+    {
+      3
+    },
+  ]
+  let A3#3 = 〈0;a3list〉
+  a3: {
+    b: {
+      c: ((100 * 〈2;let A3#3〉[0]) + 〈2;let A3#3〉[0])
+    }
+  }
+  a4list: [
+    {
+      4
+    },
+  ]
+  let A4#4 = 〈0;a4list〉
+  a4: [
+    for _, x in 〈1;let A4#4〉 {
+      v: 404
+    },
+  ]
+  a5list: [
+    {
+      5
+    },
+  ]
+  let A5#5 = 〈0;a5list〉
+  a5: {
+    b: [
+      for _, x in 〈2;let A5#5〉 {
+        v: 505
+      },
+    ]
+  }
+  a6list: [
+    {
+      6
+    },
+  ]
+  let A6#6 = 〈0;a6list〉
+  a6: {
+    b: {
+      c: [
+        for _, x in 〈3;let A6#6〉 {
+          v: 606
+        },
+      ]
+    }
+  }
+  a7list: [
+    {
+      7
+    },
+  ]
+  let A7#7 = 〈0;a7list〉
+  a7: {
+    for _, x in 〈1;let A7#7〉 {
+      v: 707
+    }
+  }
+  a8list: [
+    {
+      8
+    },
+  ]
+  let A8#8 = 〈0;a8list〉
+  a8: {
+    b: {
+      for _, x in 〈2;let A8#8〉 {
+        v: 808
+      }
+    }
+  }
+  a9list: [
+    {
+      9
+    },
+  ]
+  let A9#9 = 〈0;a9list〉
+  a9: {
+    b: {
+      c: {
+        for _, x in 〈3;let A9#9〉 {
+          v: 909
+        }
+      }
+    }
+  }
+  incompleteLet: {
+    input: [
+      1,
+      2,
+      3,
+      4,
+      5,
+    ]
+    last: {
+      min: 〈import;list〉.Min(〈1;input〉)
+      max: 〈import;list〉.Max(〈1;input〉)
+    }
+    bar: {
+      let mn#A = 〈1;last〉.min
+      let mx#B = 〈import;list〉.max
+      min: 〈0;let mn#A〉
+      max: 〈0;let mx#B〉
+    }
+    x: {
+      if (〈import;list〉.max < 0) {}
+    }
+  }
+  scalarReference: {
+    inScalar: {
+      p0: {
+        5
+        let x#C = 6
+        #b: 〈0;let x#C〉
+      }
+    }
+    inScalar: {
+      p1: {
+        #b: 〈0;let x#D〉
+        let x#D = 6
+        5
+      }
+    }
+    inList: {
+      p0: {
+        let x#E = {
+          a: 1
+        }
+        [
+          〈1;let x#E〉,
+        ]
+      }
+    }
+    inList: {
+      p1: {
+        [
+          〈1;let x#F〉,
+        ]
+        let x#F = {
+          a: 1
+        }
+      }
+    }
+  }
+  issue1116: {
+    a: {
+      #a: [
+        "a",
+        "b",
+      ]
+      let List#10 = 〈0;#a〉
+      〈0;let List#10〉[(len(〈0;let List#10〉) - 1)]
+    }
+    b: {
+      let List#11 = 〈0;#a〉
+      〈0;let List#11〉[(len(〈0;let List#11〉) - 1)]
+      #a: [
+        "a",
+        "b",
+      ]
+    }
+  }
+}

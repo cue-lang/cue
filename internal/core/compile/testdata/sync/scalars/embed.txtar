@@ -1,0 +1,349 @@
+-- in.cue --
+// Issue #739: Tests that scalar values (integers, lists, strings) embedded in
+// structs participate correctly in arithmetic, indexing, and built-in function
+// calls (list.Concat, strings.Join). Also covers definitions and optional fields
+// used alongside embedded scalars, and comprehensions gated on optional presence.
+//
+// Issue #794: Tests that a hidden field used as a list element inside an embedded
+// struct resolves to its concrete value (hidden.issue794: _foo embedded as [_foo]).
+import "strings"
+import "list"
+
+intEmbed: {
+	a1: {
+		2
+		@test(eq, 2)
+	}
+	a2: {
+		v: {
+			3
+			#foo: a2.v + 1
+		}
+		w: v
+		x: v.#foo
+		@test(eq, {
+			v: {3, #foo: 4} @test(shareID=a2vw)
+			w: {3, #foo: 4} @test(shareID=a2vw)
+			x: 4
+		})
+	}
+	a3: a1 + a2.v @test(eq, 5)
+}
+
+listEmbed: {
+	a1: {
+		2
+		@test(eq, 2)
+	}
+	b3: {
+		[1, 2]
+		#foo: 1
+		@test(eq, {[1, 2], #foo: 1})
+	}
+	b4: list.Concat([b3, b3]) @test(eq, [1, 2, 1, 2])
+	b5: b3[1]  @test(eq, 2)
+	b6: b3[5]  @test(err, code=eval, contains="index out of range [5] with length 2", pos=[0:9])
+	b7: b4[a1] @test(eq, 1)
+}
+
+stringEmbed: {
+	s1: {
+		"foo"
+		#bar: "bar"
+		@test(eq, {"foo", #bar: "bar"})
+	}
+	s2: [ s1, {s1.#bar, #baz: 4}] @test(eq, [
+		{"foo", #bar: "bar"},
+		{"bar", #baz: 4},
+	])
+	s3: strings.Join(s2, "--") @test(eq, "foo--bar")
+}
+
+outPattern: {
+	sum: {
+		out: #a + #b
+		#a:  int
+		#b:  int
+	}
+	used: {
+		sum & {#a: 1, #b: 3}
+		@test(eq, {
+			out: 4
+			#a: 1
+			#b: 3
+		})
+	}
+}
+
+arithmetic: {
+	sum: {
+		#a + #b
+		#a: int
+		#b: int
+	}
+	a1: (sum & {_, #a:          1, #b: 3}) + 2 @test(eq, 6)
+	a2: 2 + (sum & {_, #a:      1, #b: 3})     @test(eq, 6)
+	a3: 2 + (2 + (sum & {_, #a: 1, #b: 3}))    @test(eq, 8)
+}
+
+defCheck: {
+	a: {
+		#def: 1
+		@test(eq, {#def: 1})
+	}
+	b: a.#def @test(eq, 1)
+}
+
+optionalExists: {
+	string | {
+		value?: string
+
+		if value != _|_ {
+			other: int
+		}
+	}
+	@test(eq, { string } | {value?: string})
+}
+
+optionalCheck: {
+	thing: string | {
+		value?: string
+
+		if value != _|_ {
+			other: int
+		}
+	}
+
+	thing: {
+		value: "some string"
+		other: 3
+	} @test(eq, {
+		value: "some string"
+		other: 3
+	})
+}
+
+hidden: {
+	issue794: {
+		_foo: "foo"
+		[_foo]
+		@test(eq, {
+			_foo: "foo"
+			["foo"]
+		})
+	}
+}
+
+-- issue2113.cue --
+// Issue #2113: Tests that embedded scalars inside a definition function (#fn with
+// an embedded bare value) resolve correctly when the definition is specialized,
+// regardless of which field is declared first. The @test(permute) exercises all
+// declaration orders to confirm order-independence.
+merged: t1: {
+	@test(permute, count=6)
+
+	#fn: { #in2: _, _ }
+	#fn: { #in2: c1: string, #in2.c1 }
+	x: #fn & {#in2: {c1: "V 1"}, _}
+	@test(eq, {
+		#fn: { string, #in2: c1: string }
+		x: {
+			"V 1"
+			#in2: {c1: "V 1"}
+		}
+	})
+}
+
+-- issue2163.cue --
+// Issue #2163: Tests that a self-referencing embedded expression — a definition
+// that embeds (#Func & {_foo: #in, "buzz"}) + "fiz", where the embedded result
+// depends on an inner field — does not panic or produce a spurious error.
+selfRefInEmbed: t1: {
+	#Func: {
+		#in: _
+		_
+	}
+	#fn: #Func
+	#fn: {
+		#in: _
+
+		(#Func & {
+			_foo: #in
+			"buzz"
+		}) + "fiz"
+	}
+
+	@test(eq, {
+		#Func: {
+			_
+			#in: _
+		}
+		#fn: {
+			"buzzfiz"
+			#in: _
+		}
+	})
+}
+
+-- out/compile --
+--- in.cue
+{
+  intEmbed: {
+    a1: {
+      2
+    }
+    a2: {
+      v: {
+        3
+        #foo: (〈2;a2〉.v + 1)
+      }
+      w: 〈0;v〉
+      x: 〈0;v〉.#foo
+    }
+    a3: (〈0;a1〉 + 〈0;a2〉.v)
+  }
+  listEmbed: {
+    a1: {
+      2
+    }
+    b3: {
+      [
+        1,
+        2,
+      ]
+      #foo: 1
+    }
+    b4: 〈import;list〉.Concat([
+      〈1;b3〉,
+      〈1;b3〉,
+    ])
+    b5: 〈0;b3〉[1]
+    b6: 〈0;b3〉[5]
+    b7: 〈0;b4〉[〈0;a1〉]
+  }
+  stringEmbed: {
+    s1: {
+      "foo"
+      #bar: "bar"
+    }
+    s2: [
+      〈1;s1〉,
+      {
+        〈2;s1〉.#bar
+        #baz: 4
+      },
+    ]
+    s3: 〈import;strings〉.Join(〈0;s2〉, "--")
+  }
+  outPattern: {
+    sum: {
+      out: (〈0;#a〉 + 〈0;#b〉)
+      #a: int
+      #b: int
+    }
+    used: {
+      (〈1;sum〉 & {
+        #a: 1
+        #b: 3
+      })
+    }
+  }
+  arithmetic: {
+    sum: {
+      (〈0;#a〉 + 〈0;#b〉)
+      #a: int
+      #b: int
+    }
+    a1: ((〈0;sum〉 & {
+      _
+      #a: 1
+      #b: 3
+    }) + 2)
+    a2: (2 + (〈0;sum〉 & {
+      _
+      #a: 1
+      #b: 3
+    }))
+    a3: (2 + (2 + (〈0;sum〉 & {
+      _
+      #a: 1
+      #b: 3
+    })))
+  }
+  defCheck: {
+    a: {
+      #def: 1
+    }
+    b: 〈0;a〉.#def
+  }
+  optionalExists: {
+    (string|{
+      value?: string
+      if (〈0;value〉 != _|_(explicit error (_|_ literal) in source)) {
+        other: int
+      }
+    })
+  }
+  optionalCheck: {
+    thing: (string|{
+      value?: string
+      if (〈0;value〉 != _|_(explicit error (_|_ literal) in source)) {
+        other: int
+      }
+    })
+    thing: {
+      value: "some string"
+      other: 3
+    }
+  }
+  hidden: {
+    issue794: {
+      _foo: "foo"
+      [
+        〈1;_foo〉,
+      ]
+    }
+  }
+}
+--- issue2113.cue
+{
+  merged: {
+    t1: {
+      #fn: {
+        #in2: _
+        _
+      }
+      #fn: {
+        #in2: {
+          c1: string
+        }
+        〈0;#in2〉.c1
+      }
+      x: (〈0;#fn〉 & {
+        #in2: {
+          c1: "V 1"
+        }
+        _
+      })
+    }
+  }
+}
+--- issue2163.cue
+{
+  selfRefInEmbed: {
+    t1: {
+      #Func: {
+        #in: _
+        _
+      }
+      #fn: 〈0;#Func〉
+      #fn: {
+        #in: _
+        ((〈1;#Func〉 & {
+          _foo: 〈1;#in〉
+          "buzz"
+        }) + "fiz")
+      }
+    }
+  }
+}

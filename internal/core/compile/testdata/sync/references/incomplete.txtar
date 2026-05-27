@@ -1,0 +1,64 @@
+-- in.cue --
+comprehensions: {
+	a: {}
+	b: {
+		if a.b {
+		}
+	} @test(err, code=incomplete, contains="undefined field: b", pos=[1:8])
+	c: {
+		for x in a.b {x}
+	} @test(err, code=incomplete, contains="comprehensions.c: undefined field: b", pos=[1:14])
+}
+
+openStruct: {
+	a: {}
+	b: a.c @test(err, code=incomplete, contains="openStruct.b: undefined field: c", pos=[0:7])
+}
+
+selectFromTop: {
+	top: _
+	a:   top.foo @test(err, code=incomplete, contains="top.foo undefined as top is incomplete", pos=[0:7])
+}
+
+indexOnTop: {
+	top: _
+	a:   top[2] @test(err, code=incomplete, contains="top[2] undefined as top is incomplete", pos=[0:7])
+}
+
+incompleteIndex: {
+	top: _
+	a:   [1][top] @test(err, code=eval, contains="invalid index top (invalid type _)", pos=[0:7, 0:11])
+}
+-- out/compile --
+--- in.cue
+{
+  comprehensions: {
+    a: {}
+    b: {
+      if 〈1;a〉.b {}
+    }
+    c: {
+      for _, x in 〈1;a〉.b {
+        〈1;x〉
+      }
+    }
+  }
+  openStruct: {
+    a: {}
+    b: 〈0;a〉.c
+  }
+  selectFromTop: {
+    top: _
+    a: 〈0;top〉.foo
+  }
+  indexOnTop: {
+    top: _
+    a: 〈0;top〉[2]
+  }
+  incompleteIndex: {
+    top: _
+    a: [
+      1,
+    ][〈0;top〉]
+  }
+}

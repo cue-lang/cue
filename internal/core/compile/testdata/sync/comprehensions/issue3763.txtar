@@ -1,0 +1,189 @@
+# Tests that nested comprehensions with let bindings across multiple files work.
+# Issue #3763: for comprehension with multi-level let bindings and pattern constraints.
+-- reduced.cue --
+reduced: {
+	A: x1: y?: int // needs to be optional
+	A: x2: y?: int
+	A: x3: y?: int
+
+	if true {
+		let Z = [for _, x in A {x}]
+		B: [for z in Z if z.y != _|_ { b: 1 }]
+	}
+	@test(eq, {
+		A: {
+			x1: {y?: int}
+			x2: {y?: int}
+			x3: {y?: int}
+		}
+		B: []
+	})
+}
+-- full.cue --
+full: {
+	_core_v1: {
+		#cp: {
+			hostPort?: int32
+			cp:        int32
+		}
+	}
+
+	@test(shareID=L, at=k.n.n1._cs.l)
+	k: n: n1: {
+		_CL: "l"
+	}
+
+	let nc = {
+		_ports: [ID=_]: _core_v1.#cp
+	}
+
+	_cl: [ID=_]: nc & {
+		_ports: {
+			"1": {}
+			"2": {}
+			"3": {}
+		}
+	}
+
+	k: n: [ID=_]: {
+		_CL: string
+		_cs: (_CL): _cl[(_CL)]
+	}
+
+	for _, n in k.n {
+		let cps = [for _, c in n._cs for _, cps in c._ports {cps}]
+		ports: [for cp in cps if cp.hostPort != _|_ {
+			port: "\(cp.hostPort)"
+		}]
+	}
+
+	_cl: l: {} @test(shareID=L)
+	@test(eq, {
+		_core_v1: #cp: {
+			hostPort?: >=-2147483648 & <=2147483647 & int
+			cp:        >=-2147483648 & <=2147483647 & int
+		}
+		k: n: n1: {
+			_CL: "l"
+			_cs: l: _ports: {
+				"1": {
+					hostPort?: >=-2147483648 & <=2147483647 & int
+					cp:        >=-2147483648 & <=2147483647 & int
+				}
+				"2": {
+					hostPort?: >=-2147483648 & <=2147483647 & int
+					cp:        >=-2147483648 & <=2147483647 & int
+				}
+				"3": {
+					hostPort?: >=-2147483648 & <=2147483647 & int
+					cp:        >=-2147483648 & <=2147483647 & int
+				}
+			}
+		}
+		_cl: l: _ports: {
+			"1": {
+				hostPort?: >=-2147483648 & <=2147483647 & int
+				cp:        >=-2147483648 & <=2147483647 & int
+			}
+			"2": {
+				hostPort?: >=-2147483648 & <=2147483647 & int
+				cp:        >=-2147483648 & <=2147483647 & int
+			}
+			"3": {
+				hostPort?: >=-2147483648 & <=2147483647 & int
+				cp:        >=-2147483648 & <=2147483647 & int
+			}
+		}
+		ports: []
+	})
+}
+-- out/compile --
+--- full.cue
+{
+  full: {
+    _core_v1: {
+      #cp: {
+        hostPort?: &(int, >=-2147483648, <=2147483647)
+        cp: &(int, >=-2147483648, <=2147483647)
+      }
+    }
+    k: {
+      n: {
+        n1: {
+          _CL: "l"
+        }
+      }
+    }
+    let nc#1 = {
+      _ports: {
+        [_]: 〈2;_core_v1〉.#cp
+      }
+    }
+    _cl: {
+      [_]: (〈1;let nc#1〉 & {
+        _ports: {
+          "1": {}
+          "2": {}
+          "3": {}
+        }
+      })
+    }
+    k: {
+      n: {
+        [_]: {
+          _CL: string
+          _cs: {
+            〈1;_CL〉: 〈4;_cl〉[〈1;_CL〉]
+          }
+        }
+      }
+    }
+    for _, n in 〈0;k〉.n {
+      let cps#2multi = [
+        for _, c in 〈2;n〉._cs for _, cps in 〈0;c〉._ports {
+          〈1;cps〉
+        },
+      ]
+      ports: [
+        for _, cp in 〈1;let cps#2〉 if (〈0;cp〉.hostPort != _|_(explicit error (_|_ literal) in source)) {
+          port: "\(〈1;cp〉.hostPort)"
+        },
+      ]
+    }
+    _cl: {
+      l: {}
+    }
+  }
+}
+--- reduced.cue
+{
+  reduced: {
+    A: {
+      x1: {
+        y?: int
+      }
+    }
+    A: {
+      x2: {
+        y?: int
+      }
+    }
+    A: {
+      x3: {
+        y?: int
+      }
+    }
+    if true {
+      let Z#3 = [
+        for _, x in 〈2;A〉 {
+          〈1;x〉
+        },
+      ]
+      B: [
+        for _, z in 〈1;let Z#3〉 if (〈0;z〉.y != _|_(explicit error (_|_ literal) in source)) {
+          b: 1
+        },
+      ]
+    }
+  }
+}

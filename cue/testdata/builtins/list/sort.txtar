@@ -14,17 +14,3 @@ Conjuncts:    20
 Disjuncts:    0
 
 NumCloseIDs: 5
--- out/compile --
---- in.cue
-{
-  a: 〈import;list〉.Sort([
-    2,
-    3,
-    1,
-    4,
-  ], {
-    x: _
-    y: _
-    less: (〈0;x〉 < 〈0;y〉)
-  })
-}

@@ -17,18 +17,6 @@ e1: 'b' + "c" @test(err, code=eval)
 [eval] e1: invalid operands 'b' and "c" to '+' (type bytes and string):
     ./in.cue:11:5
     ./in.cue:11:11
--- out/compile --
---- in.cue
-{
-  s0: ("foo" + "bar")
-  s1: (3 * "abc")
-  s2: ("abc" * 2)
-  b0: ('foo' + 'bar')
-  b1: (3 * 'abc')
-  b2: ('abc' * 2)
-  e0: ("a" + '')
-  e1: ('b' + "c")
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

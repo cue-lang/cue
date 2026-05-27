@@ -10,25 +10,6 @@ e: {
 	"g\(2)"?: 2
 	@test(eq, {g1: 1, g2?: 2})
 }
--- out/compile --
---- in.cue
-{
-  a: {
-    foo?: string
-  }
-  b: {
-    foo: "foo"
-  }
-  c: (〈0;a〉 & 〈0;b〉)
-  d: (〈0;a〉 & {
-    foo?: "bar"
-  })
-  e: {
-    g1: 1
-    "g\(1)"?: 1
-    "g\(2)"?: 2
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  11

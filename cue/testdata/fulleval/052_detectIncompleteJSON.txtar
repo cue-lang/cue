@@ -41,24 +41,3 @@ Retain: 0
 Unifications: 17
 Conjuncts:    32
 Disjuncts:    17
--- out/compile --
---- in.cue
-{
-  #Spec: {
-    _vars(:foobar): {
-      something: string
-    }
-    data: {
-      #foo: {
-        use: 〈2;_vars(:foobar)〉.something
-      }
-      baz: 〈import;"encoding/json"〉.Marshal(〈1;_vars(:foobar)〉.something)
-      foobar: 〈import;"encoding/json"〉.Marshal(〈0;#foo〉)
-    }
-  }
-  Val: (〈0;#Spec〉 & {
-    _vars(:foobar): {
-      something: "var-string"
-    }
-  })
-}

@@ -1,0 +1,825 @@
+// Tests fields.go
+-- in.cue --
+// TODO: reorganize ordered on what is tested by name. E.g.
+// insertion: longPath: ok: p1: {
+//     a: .... @fail()
+// }
+
+ok: t1: {
+	c: #R
+	c: [{b: int}] @test(allows=false, int)
+	#R: [...]     @test(allows, int)
+
+	@test(eq, {
+		c: [{b: int}]
+		#R: []
+	})
+}
+
+ok: t2: {
+	#A: _
+	l: #A
+	l: f: "hi"
+
+	@test(eq, {
+		#A: _
+		l: f: "hi"
+	})
+}
+
+ok: t3: {
+	#A: f: {...}
+	#A1: { #A }
+	s: [string]: #A1
+	s: foo: f: d: foo: 1
+
+	@test(eq, {
+		#A: f: {}
+		#A1: f: {}
+		s: foo: f: d: foo: 1
+	})
+}
+
+ok: t4: {
+	#T: { a: b: 1 }
+	W: {
+		{#T}
+		b: c: 2
+	}
+
+	@test(eq, {
+		#T: a: b: 1
+		W: {
+			a: b: 1
+			b: c: 2
+		}
+	})
+}
+
+ok: t5: {
+	// TODO: move to err
+	#A: {
+		Common
+		_
+	}
+	Common: { }
+	x: #A
+	x: c: int @test(err, code=eval,
+		hint="not sure if this is actually correct",
+		contains="field not allowed", pos=[0:5])
+}
+
+ok: t6: {
+	#A: {
+		Common
+		...
+	}
+	Common: { }
+	x: #A  @test(allows, string)
+	x: c: int
+
+	@test(eq, {
+		#A: {}
+		Common: {}
+		x: c: int
+	})
+}
+
+ok: t7: {
+	a: {#A, #B}
+	#A: b: f: 1
+	#B: b: g: 1
+
+	@test(eq, {
+		a: b: {
+			f: 1
+			g: 1
+		}
+		#A: b: f: 1
+		#B: b: g: 1
+	})
+}
+
+ok: t8: {
+	// TODO: this should pass
+	foo: #X @test(shareID=ok_t8_foox)
+	#X: {
+		@test(shareID=ok_t8_foox)
+
+		a: b: c: C: 1
+		for k, _ in a {
+			// dynamic field causes insertion one level higher. This causes
+			// b to be inserted in a, after it has been referenced.
+			a: (k): c: D: 2
+		}
+	}
+
+	@test(eq, {
+		foo: a: b: c: {
+			C: 1
+			D: 2
+		}
+		#X: a: b: c: {
+			C: 1
+			D: 2
+		}
+	})
+}
+
+ok: t9: {
+	c: #R
+	c: [{b: int}]
+	#R: [...]
+
+	@test(eq, {
+		c: [{
+			b: int
+		}]
+		#R: []
+	})
+}
+
+ok: t10: {
+	#A: _ // top should allow everything
+	l: #A
+	l: f: "hi"
+
+	@test(eq, {
+		#A: _
+		l: f: "hi"
+	})
+}
+
+ok: t11: {
+	// indirections
+	#A: f: {...}
+	#A1: { #A }
+	s: [string]: #A1
+	s: foo: f: d: foo: "bar" // should pass
+
+	@test(eq, {
+		#A: f: {}
+		#A1: f: {}
+		s: foo: f: d: foo: "bar"
+	})
+}
+
+ok: t12: {
+	// nested embedding
+	#T: { a: b: 1 }
+	W: {
+		{#T}
+		b: c: 2
+	}
+
+	@test(eq, {
+		#T: { a: b: 1 }
+		W: {
+			a: b: 1
+			b: c: 2
+		}
+	})
+}
+
+ok: t13: {
+	// TODO: move to err
+
+	// top DOES NOT open up
+	#A: {
+		Common
+		_
+	}
+	Common: { }
+	x: #A
+	x: c: int @test(err, code=eval, contains="field not allowed", pos=[0:5])
+
+	@test(eq, {
+		#A: {}
+		Common: {}
+		x: c: _|_
+	})
+}
+
+ok: t14: {
+	// ellipsis opens up
+	#A: {
+		Common
+		...
+	}
+	Common: { }
+	x: #A
+	x: c: int
+
+	@test(eq, {
+		#A: {}
+		Common: {}
+		x: c: int
+	})
+}
+
+// TODO: move this test to "ok": _ means any and implicitly defines all fields
+// to be present as optional fields with _, recursively (as long as the type
+// has not been picked to be non-struct).
+// This was not observed in V2, but is now observed in V3. We should probably
+// either allow for an error variant that only "allows" all fields but does not
+// define them as optional top, or rethink the closedness model altogether.
+err: t1: {
+	@test(permute, count=6)
+	#D: _ & {a: 2}
+	a: #D
+	a: disallowed: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
+}
+
+err: t2: {
+	@test(permute)
+	#S: { { c: d: 1 } }
+	V: #S
+	V: { c: e: 1 @test(err, code=eval, contains="field not allowed", pos=[0:10]) }
+}
+
+err: t3: {
+	@test(permute)
+	#D: {}
+	a: #D
+	a: c: "C" @test(err, code=eval, contains="field not allowed", pos=[0:5])
+}
+
+err: t4: {
+	@test(permute)
+	a: #A
+	#A: b: f: 1
+	a: b: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:8])
+}
+
+err: t5: {
+	@test(permute)
+	// TODO: this should fail
+	a: {#A, #B}
+	#A: b: f: 1
+	#B: b: g: 1
+	b: a
+	b: b: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:8])
+}
+
+err: t6: {
+	@test(permute)
+	// TODO: this should fail
+	a: {#A, #B}
+	#A: b: c: d: e: f: 1
+	#B: b: c: d: e: g: 1
+	b: a
+	b: b: c: d: e: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:17])
+}
+
+// TODO: move this test to "ok": _ means any and implicitly defines all fields
+// to be present as optional fields with _, recursively (as long as the type
+// has not been picked to be non-struct).
+// This was not observed in V2, but is now observed in V3. We should probably
+// either allow for an error variant that only "allows" all fields but does not
+// define them as optional top, or rethink the closedness model altogether.
+err: t7: {
+	@test(permute)
+	#D: _ & {a: 2}
+	a: #D
+	a: b: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
+}
+
+err: t8: {
+	@test(permute)
+	// nested embedding
+	#S: { { c: d: 1 } }
+	V: #S
+	V: { c: e: 1 @test(err, code=eval, contains="field not allowed", pos=[0:10]) }
+}
+-- validators.cue --
+import "struct"
+
+// Validators represent top, but in the case of some validators, we should not
+// allow a struct to "close" it. Basically, we any validator that takes a
+// schema as argument (is marked as NonConcrete) will open up the struct.
+//
+// TODO: we should aim to eliminate this discrepancy in the closedness redesign.
+validator: open: {
+	#Schema: {
+		matchN(1, [#x])
+		#x: trailingComma?: "all"
+	}
+	data: trailingComma: "all"
+	data: #Schema
+
+	@test(eq, {
+		#Schema: {
+			matchN(1, [{trailingComma: "all"}])
+			#x: trailingComma?: "all"
+		}
+		data: {
+			// TODO: why is the matchN dropped here?
+			trailingComma: "all"
+			#x: trailingComma?: "all"
+		}
+	})
+}
+
+validator: keepClosed: {
+	#X: {
+		struct.MaxFields(1)
+		a?: int
+		b?: int
+	}
+	x: #X
+	x: c: 1 @test(err, code=eval, contains="field not allowed", pos=[-5:3, 0:5])
+}
+-- issue1830.cue --
+// Closedness was not applied when accessing optional fields through a selector;
+// extra fields should still be rejected by the definition.
+// https://cuelang.org/issue/1830
+issue1830: {
+	#x: {
+		y: {
+			z?: {
+				name: string
+			}
+		}
+	}
+
+	egs: {
+		x1: (#x & {y: z: _}).y.z & {
+			name: "blah"
+			age1: 5
+		} @test(closed) @test(eq, { name: "blah", age1: 5 }, incorrect)
+		x2: (#x.y & {z: _}).z & {
+			name: "blah"
+			age2: 5
+		} @test(closed) @test(eq, { name: "blah", age2: 5 }, incorrect)
+
+		@test(err:todo, at=x1.age1, code=eval, contains="field not allowed")
+		@test(err:todo, at=x2.age2, code=eval, contains="field not allowed")
+	}
+}
+-- issue3491.cue --
+// evalv3 regression: "field not allowed" when unifying a definition with an
+// optional field against a value that adds a regular field of the same name.
+// https://cuelang.org/issue/3491
+issue3491: {
+	#Schema: field?: {}
+
+	a: #Schema & {
+	  field: {}
+	}
+
+	a: b
+	b: #Extra: {}
+
+	@test(eq, {
+		#Schema: field?: {}
+		a: {
+			field: {}
+			#Extra: {}
+		}
+		b: #Extra: {}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  ok: {
+    t1: {
+      c: 〈0;#R〉
+      c: [
+        {
+          b: int
+        },
+      ]
+      #R: [
+        ...,
+      ]
+    }
+  }
+  ok: {
+    t2: {
+      #A: _
+      l: 〈0;#A〉
+      l: {
+        f: "hi"
+      }
+    }
+  }
+  ok: {
+    t3: {
+      #A: {
+        f: {
+          ...
+        }
+      }
+      #A1: {
+        〈1;#A〉
+      }
+      s: {
+        [string]: 〈1;#A1〉
+      }
+      s: {
+        foo: {
+          f: {
+            d: {
+              foo: 1
+            }
+          }
+        }
+      }
+    }
+  }
+  ok: {
+    t4: {
+      #T: {
+        a: {
+          b: 1
+        }
+      }
+      W: {
+        {
+          〈2;#T〉
+        }
+        b: {
+          c: 2
+        }
+      }
+    }
+  }
+  ok: {
+    t5: {
+      #A: {
+        〈1;Common〉
+        _
+      }
+      Common: {}
+      x: 〈0;#A〉
+      x: {
+        c: int
+      }
+    }
+  }
+  ok: {
+    t6: {
+      #A: {
+        〈1;Common〉
+        ...
+      }
+      Common: {}
+      x: 〈0;#A〉
+      x: {
+        c: int
+      }
+    }
+  }
+  ok: {
+    t7: {
+      a: {
+        〈1;#A〉
+        〈1;#B〉
+      }
+      #A: {
+        b: {
+          f: 1
+        }
+      }
+      #B: {
+        b: {
+          g: 1
+        }
+      }
+    }
+  }
+  ok: {
+    t8: {
+      foo: 〈0;#X〉
+      #X: {
+        a: {
+          b: {
+            c: {
+              C: 1
+            }
+          }
+        }
+        for k, _ in 〈0;a〉 {
+          a: {
+            〈2;k〉: {
+              c: {
+                D: 2
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ok: {
+    t9: {
+      c: 〈0;#R〉
+      c: [
+        {
+          b: int
+        },
+      ]
+      #R: [
+        ...,
+      ]
+    }
+  }
+  ok: {
+    t10: {
+      #A: _
+      l: 〈0;#A〉
+      l: {
+        f: "hi"
+      }
+    }
+  }
+  ok: {
+    t11: {
+      #A: {
+        f: {
+          ...
+        }
+      }
+      #A1: {
+        〈1;#A〉
+      }
+      s: {
+        [string]: 〈1;#A1〉
+      }
+      s: {
+        foo: {
+          f: {
+            d: {
+              foo: "bar"
+            }
+          }
+        }
+      }
+    }
+  }
+  ok: {
+    t12: {
+      #T: {
+        a: {
+          b: 1
+        }
+      }
+      W: {
+        {
+          〈2;#T〉
+        }
+        b: {
+          c: 2
+        }
+      }
+    }
+  }
+  ok: {
+    t13: {
+      #A: {
+        〈1;Common〉
+        _
+      }
+      Common: {}
+      x: 〈0;#A〉
+      x: {
+        c: int
+      }
+    }
+  }
+  ok: {
+    t14: {
+      #A: {
+        〈1;Common〉
+        ...
+      }
+      Common: {}
+      x: 〈0;#A〉
+      x: {
+        c: int
+      }
+    }
+  }
+  err: {
+    t1: {
+      #D: (_ & {
+        a: 2
+      })
+      a: 〈0;#D〉
+      a: {
+        disallowed: 1
+      }
+    }
+  }
+  err: {
+    t2: {
+      #S: {
+        {
+          c: {
+            d: 1
+          }
+        }
+      }
+      V: 〈0;#S〉
+      V: {
+        c: {
+          e: 1
+        }
+      }
+    }
+  }
+  err: {
+    t3: {
+      #D: {}
+      a: 〈0;#D〉
+      a: {
+        c: "C"
+      }
+    }
+  }
+  err: {
+    t4: {
+      a: 〈0;#A〉
+      #A: {
+        b: {
+          f: 1
+        }
+      }
+      a: {
+        b: {
+          h: 1
+        }
+      }
+    }
+  }
+  err: {
+    t5: {
+      a: {
+        〈1;#A〉
+        〈1;#B〉
+      }
+      #A: {
+        b: {
+          f: 1
+        }
+      }
+      #B: {
+        b: {
+          g: 1
+        }
+      }
+      b: 〈0;a〉
+      b: {
+        b: {
+          h: 1
+        }
+      }
+    }
+  }
+  err: {
+    t6: {
+      a: {
+        〈1;#A〉
+        〈1;#B〉
+      }
+      #A: {
+        b: {
+          c: {
+            d: {
+              e: {
+                f: 1
+              }
+            }
+          }
+        }
+      }
+      #B: {
+        b: {
+          c: {
+            d: {
+              e: {
+                g: 1
+              }
+            }
+          }
+        }
+      }
+      b: 〈0;a〉
+      b: {
+        b: {
+          c: {
+            d: {
+              e: {
+                h: 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  err: {
+    t7: {
+      #D: (_ & {
+        a: 2
+      })
+      a: 〈0;#D〉
+      a: {
+        b: 1
+      }
+    }
+  }
+  err: {
+    t8: {
+      #S: {
+        {
+          c: {
+            d: 1
+          }
+        }
+      }
+      V: 〈0;#S〉
+      V: {
+        c: {
+          e: 1
+        }
+      }
+    }
+  }
+}
+--- issue1830.cue
+{
+  issue1830: {
+    #x: {
+      y: {
+        z?: {
+          name: string
+        }
+      }
+    }
+    egs: {
+      x1: ((〈1;#x〉 & {
+        y: {
+          z: _
+        }
+      }).y.z & {
+        name: "blah"
+        age1: 5
+      })
+      x2: ((〈1;#x〉.y & {
+        z: _
+      }).z & {
+        name: "blah"
+        age2: 5
+      })
+    }
+  }
+}
+--- issue3491.cue
+{
+  issue3491: {
+    #Schema: {
+      field?: {}
+    }
+    a: (〈0;#Schema〉 & {
+      field: {}
+    })
+    a: 〈0;b〉
+    b: {
+      #Extra: {}
+    }
+  }
+}
+--- validators.cue
+{
+  validator: {
+    open: {
+      #Schema: {
+        matchN(1, [
+          〈1;#x〉,
+        ])
+        #x: {
+          trailingComma?: "all"
+        }
+      }
+      data: {
+        trailingComma: "all"
+      }
+      data: 〈0;#Schema〉
+    }
+  }
+  validator: {
+    keepClosed: {
+      #X: {
+        〈import;struct〉.MaxFields(1)
+        a?: int
+        b?: int
+      }
+      x: 〈0;#X〉
+      x: {
+        c: 1
+      }
+    }
+  }
+}

@@ -31,25 +31,3 @@ hiddenDefInBoth: {
 // No hidden fields on either side: passes trivially.
 noHidden: {a: 1, b: 2} @test(eq, {a: 1, b: 2})
 
--- out/compile --
---- in.cue
-{
-  hiddenInBoth: {
-    _secret(:foo): 42
-    a: (〈0;_secret(:foo)〉 + 1)
-  }
-  hiddenDeclForm: {
-    _secret(:foo): "x"
-    b: (〈0;_secret(:foo)〉 + 〈0;_secret(:foo)〉)
-  }
-  hiddenDefInBoth: {
-    _#Meta(:foo): {
-      info: "internal"
-    }
-    a: 1
-  }
-  noHidden: {
-    a: 1
-    b: 2
-  }
-}

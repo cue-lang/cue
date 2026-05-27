@@ -1,0 +1,48 @@
+#name: detectIncompleteYAML
+#evalFull
+-- in.cue --
+package foobar
+
+import yaml "encoding/yaml"
+
+#Spec: {
+	_vars: {something: string}
+	data: {
+		#foo: {
+			use: _vars.something
+		}
+		baz:    yaml.Marshal(_vars.something) @test(err, code=incomplete, pos=[0:11])
+		foobar: yaml.Marshal(#foo)            @test(err, code=incomplete, pos=[0:11, -6:21, -3:9])
+	}
+}
+Val: #Spec & {
+	_vars: something: "var-string"
+} @test(eq, {
+	_vars$foobar: something: "var-string"
+	data: {
+		#foo: use:    "var-string"
+		baz:   "var-string\n"
+		foobar: "use: var-string\n"
+	}
+})
+-- out/compile --
+--- in.cue
+{
+  #Spec: {
+    _vars(:foobar): {
+      something: string
+    }
+    data: {
+      #foo: {
+        use: 〈2;_vars(:foobar)〉.something
+      }
+      baz: 〈import;"encoding/yaml"〉.Marshal(〈1;_vars(:foobar)〉.something)
+      foobar: 〈import;"encoding/yaml"〉.Marshal(〈0;#foo〉)
+    }
+  }
+  Val: (〈0;#Spec〉 & {
+    _vars(:foobar): {
+      something: "var-string"
+    }
+  })
+}

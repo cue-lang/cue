@@ -35,21 +35,3 @@ fn: _ @test(eq, _)
     ./with_experiment.cue:11:8
 [incomplete] d: cannot call non-concrete value fn (type _):
     ./with_experiment.cue:17:4
--- out/compile --
---- with_experiment.cue
-{
-  #Base: {
-    x: int
-  }
-  a: 〈0;#Base〉...
-  b: 〈0;foo〉.bar...
-  c: (〈0;x〉 & 〈0;y〉)...
-  d: 〈0;fn〉()...
-  e: (〈0;#Base〉... & {
-    y: int
-  })
-  foo: {}
-  x: _
-  y: _
-  fn: _
-}

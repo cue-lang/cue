@@ -1,0 +1,20 @@
+-- in.cue --
+// Test embedding at root of file
+root1: 1
+#Root1: x: {}
+#Root1 & { }
+
+@test(eq, {
+	root1: 1
+	#Root1: x: {}
+	x: {}
+})
+-- out/compile --
+--- in.cue
+{
+  root1: 1
+  #Root1: {
+    x: {}
+  }
+  (〈0;#Root1〉 & {})
+}

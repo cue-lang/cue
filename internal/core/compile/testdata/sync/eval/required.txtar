@@ -1,0 +1,231 @@
+-- in.cue --
+self: t1: {
+	a?: int
+	@test(eq, {a?: int})
+}
+
+self: t2: {
+	a!: int
+	a!: int
+	@test(eq, {a!: int})
+}
+
+unify: t1: {
+	@test(permute, count=2)
+	a!: int
+	a: int
+	@test(eq, {a: int})
+}
+
+unify: t2: {
+	@test(permute)
+	a!: int
+	a?: int
+	@test(eq, {a!: int})
+}
+
+#Def: t1: {
+	a!: int
+	@test(eq, {a!: int})
+}
+
+// Required fields do not cause vet to fail with definitions: a required field
+// in one definition should block a disallowed field from another definition.
+// https://cuelang.org/issue/2306
+allowed: {
+	issue2306: {
+		#A: a!: int
+		#A: #B @test(err, code=eval, path=a, contains="field not allowed", pos=[-1:7])
+
+		#B: b!: int
+	}
+}
+
+reference: {
+	toWithinDefinition: {
+		@test(permute, count=2)
+		#Foo: a!: int
+		b: #Foo.a @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:11])
+	}
+	toFieldFromDefinition: {
+		@test(permute, count=6)
+		#Foo: a!: int
+		b: #Foo
+		c: b.a @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:8])
+	}
+	toNonDefinition: {
+		@test(permute, count=2)
+		x: y!: _
+		b: x.y @test(err, code=incomplete, contains="required field missing: %s", args=[y], pos=[0:8])
+	}
+	toConcrete: {
+		@test(permute, count=2)
+		a!: 1
+		b: a + 1 @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:6])
+	}
+}
+-- issue3918.cue --
+import "strings"
+
+// Required fields do not work on the function pattern: a required field used
+// as an input to a definition-based function was not satisfied at the call site.
+// https://cuelang.org/issue/3918
+issue3918: {
+	reduced: {
+		#disjuncts: {
+			in!: [...string]
+			out: strings.Join(in, "|") @test(err, code=incomplete, contains="required field missing: %s", args=[in], pos=[0:22])
+		}
+
+		x: (#disjuncts & {
+			in: ["foo", "bar"]
+		}).out
+		@test(eq, {
+			#disjuncts: {
+				in!: []
+				out: _|_
+			}
+			x: "foo|bar"
+		})
+	}
+	noFunction: {
+		#disjuncts: {
+			in!: [...string]
+			out: in @test(err, code=incomplete, contains="required field missing: %s", args=[in], pos=[0:9])
+		}
+		_foo: #disjuncts & {} @test(err, at=out, code=incomplete, contains="required field missing: %s", args=[in], pos=[-2:9])
+		x: _foo.out @test(err, code=incomplete, path=_foo.out, contains="required field missing: %s", args=[in], pos=[-3:9])
+		@test(eq, {
+			#disjuncts: {
+				in!: []
+				out: _|_
+			}
+			_foo: {
+				in!: []
+				out: _|_
+			}
+			x: _|_
+		})
+	}
+}
+// A required field error is incomplete error. Ensure that setting a vertex
+// to this error does not escalate it to an evaluation error.
+doNotEscalateError: {
+	a: {
+		in:  _
+		out: in.self @test(err, code=incomplete, contains="%s undefined as %s is incomplete (type %s)", args=[in.self, in, _], pos=[0:8])
+	}
+	b: {
+		required!: _
+		pass:    (a & {in: required}).out @test(err, code=incomplete, contains="undefined field: %s", args=[self], pos=[-4:11])
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  self: {
+    t1: {
+      a?: int
+    }
+  }
+  self: {
+    t2: {
+      a!: int
+      a!: int
+    }
+  }
+  unify: {
+    t1: {
+      a!: int
+      a: int
+    }
+  }
+  unify: {
+    t2: {
+      a!: int
+      a?: int
+    }
+  }
+  #Def: {
+    t1: {
+      a!: int
+    }
+  }
+  allowed: {
+    issue2306: {
+      #A: {
+        a!: int
+      }
+      #A: 〈0;#B〉
+      #B: {
+        b!: int
+      }
+    }
+  }
+  reference: {
+    toWithinDefinition: {
+      #Foo: {
+        a!: int
+      }
+      b: 〈0;#Foo〉.a
+    }
+    toFieldFromDefinition: {
+      #Foo: {
+        a!: int
+      }
+      b: 〈0;#Foo〉
+      c: 〈0;b〉.a
+    }
+    toNonDefinition: {
+      x: {
+        y!: _
+      }
+      b: 〈0;x〉.y
+    }
+    toConcrete: {
+      a!: 1
+      b: (〈0;a〉 + 1)
+    }
+  }
+}
+--- issue3918.cue
+{
+  issue3918: {
+    reduced: {
+      #disjuncts: {
+        in!: [
+          ...string,
+        ]
+        out: 〈import;strings〉.Join(〈0;in〉, "|")
+      }
+      x: (〈0;#disjuncts〉 & {
+        in: [
+          "foo",
+          "bar",
+        ]
+      }).out
+    }
+    noFunction: {
+      #disjuncts: {
+        in!: [
+          ...string,
+        ]
+        out: 〈0;in〉
+      }
+      _foo: (〈0;#disjuncts〉 & {})
+      x: 〈0;_foo〉.out
+    }
+  }
+  doNotEscalateError: {
+    a: {
+      in: _
+      out: 〈0;in〉.self
+    }
+    b: {
+      required!: _
+      pass: (〈1;a〉 & {
+        in: 〈1;required〉
+      }).out
+    }
+  }
+}

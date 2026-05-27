@@ -2,21 +2,6 @@ raw: true
 #inlinetest:exclude skip — tests export format, not evaluator semantics
 -- in.cue --
 {a: [1, 2], b: [for k, v in a {v}]}
--- out/compile --
---- in.cue
-{
-  {
-    a: [
-      1,
-      2,
-    ]
-    b: [
-      for k, v in 〈1;a〉 {
-        〈1;v〉
-      },
-    ]
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

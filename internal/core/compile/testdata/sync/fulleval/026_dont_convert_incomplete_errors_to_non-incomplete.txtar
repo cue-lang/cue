@@ -1,0 +1,46 @@
+#name: dont convert incomplete errors to non-incomplete
+#evalFull
+-- in.cue --
+import "strings"
+
+n1: {min: <max, max: >min} @test(eq, {
+	min: _|_ @test(err, code=cycle, contains="n1.max: cycle with field: min (and 1 more errors)", pos=[3:23])
+	max: _|_ @test(err, code=cycle, contains="n1.max: cycle with field: min (and 1 more errors)", pos=[3:23])
+})
+n2: -num      @test(err, code=incomplete, contains="operand num of '-' not concrete", pos=[0:6])
+n3: +num      @test(err, code=incomplete, contains="operand num of '+' not concrete", pos=[0:6])
+n4: num + num @test(err, code=incomplete, contains="non-concrete value <4 in operand to +", pos=[0:5, 12:6])
+n5: num - num @test(err, code=incomplete, contains="non-concrete value <4 in operand to -", pos=[0:5, 11:6])
+n6: num * num @test(err, code=incomplete, contains="non-concrete value <4 in operand to *", pos=[0:5, 10:6])
+n7: num / num @test(err, code=incomplete, contains="non-concrete value <4 in operand to /", pos=[0:5, 9:6])
+
+b1: !is @test(err, code=incomplete, contains="operand is of '!' not concrete", pos=[0:6])
+
+s1: "\(str)"                       @test(err, code=incomplete, contains="non-concrete value string", pos=[0:5, 4:6])
+s2: strings.ContainsAny("dd")      @test(kind=string)
+s3: strings.ContainsAny(str, "dd") @test(err, code=incomplete, contains="non-concrete value string", pos=[0:5, 2:6])
+
+str: string @test(eq, string)
+num: <4     @test(eq, <4)
+is:  bool   @test(eq, bool)
+-- out/compile --
+--- in.cue
+{
+  n1: {
+    min: <〈0;max〉
+    max: >〈0;min〉
+  }
+  n2: -〈0;num〉
+  n3: +〈0;num〉
+  n4: (〈0;num〉 + 〈0;num〉)
+  n5: (〈0;num〉 - 〈0;num〉)
+  n6: (〈0;num〉 * 〈0;num〉)
+  n7: (〈0;num〉 / 〈0;num〉)
+  b1: !〈0;is〉
+  s1: "\(〈0;str〉)"
+  s2: 〈import;strings〉.ContainsAny("dd")
+  s3: 〈import;strings〉.ContainsAny(〈0;str〉, "dd")
+  str: string
+  num: <4
+  is: bool
+}

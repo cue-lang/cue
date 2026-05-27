@@ -237,35 +237,3 @@ diff old new
     self?: (_){ _ }
   }
 }
--- out/compile --
---- in.cue
-{
-  _taxPayer(:p): {
-    self: {}
-  }
-  let sam#1 = {
-    taxPayer: 〈1;_taxPayer(:p)〉
-  }
-  assert: {
-    invoke: 〈1;let sam#1〉
-    invoke: _
-    res: (〈1;subject〉 & {
-      in: 〈1;invoke〉
-    })
-  }
-  subject: {
-    in: 〈1;#ReturnData〉
-    _computed(:p): (〈1;#computeF1040〉 & {
-      in: 〈1;in〉
-    })
-  }
-  #computeF1040: {
-    in: 〈1;#ReturnData〉
-  }
-  #ReturnData: {
-    taxPayer?: 〈1;#TaxPayer〉
-  }
-  #TaxPayer: {
-    self?: _
-  }
-}

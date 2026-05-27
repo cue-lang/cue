@@ -1,0 +1,32 @@
+-- in.cue --
+// res is a list containing t; res[0] shares t's vertex.
+res: [t] @test(eq, [{x: {a: "XDDDD", b: str: "DDDD", c: "X"}}]) @test(shareID=T, at=0)
+t: {
+	[X=string]: {
+		a: c + b.str
+		b: str: string
+		c: "X"
+	}
+	x: {b: str: "DDDD"} @test(eq, {a: "XDDDD", b: str: "DDDD", c: "X"})
+} @test(shareID=T)
+-- out/compile --
+--- in.cue
+{
+  res: [
+    〈1;t〉,
+  ]
+  t: {
+    [string]: {
+      a: (〈0;c〉 + 〈0;b〉.str)
+      b: {
+        str: string
+      }
+      c: "X"
+    }
+    x: {
+      b: {
+        str: "DDDD"
+      }
+    }
+  }
+}

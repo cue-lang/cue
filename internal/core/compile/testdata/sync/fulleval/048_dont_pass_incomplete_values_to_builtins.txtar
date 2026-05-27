@@ -1,0 +1,13 @@
+#name: dont pass incomplete values to builtins
+#evalFull
+-- in.cue --
+import "encoding/json"
+
+input: string              @test(kind=string)
+foo:   json.Marshal(input) @test(err, code=incomplete)
+-- out/compile --
+--- in.cue
+{
+  input: string
+  foo: 〈import;"encoding/json"〉.Marshal(〈0;input〉)
+}

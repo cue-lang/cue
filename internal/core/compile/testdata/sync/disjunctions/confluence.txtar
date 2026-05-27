@@ -1,0 +1,53 @@
+-- in.cue --
+import (
+	"net"
+	"strings"
+)
+// evalv3 regression: disjunctions with conditionals depending on the
+// disjunction's own value were left unresolved.
+// https://cuelang.org/issue/3993
+issue3993: reduced: {
+	x: net.IPv4 | =~"fail"
+	x: { if net.IPv4(x) {=~"^10\\." } }
+	x: "10.10.10.10"
+	@test(eq, {x: "10.10.10.10"})
+}
+
+issue3993: full: {
+	addr!: string & (net.IPv4 | net.IPv6)
+	if net.IPv4(addr) {
+		addr: strings.HasPrefix("10.")
+	}
+	if net.IPv6(addr) {
+		addr: strings.HasPrefix("2a02:")
+	}
+	addr: "10.10.10.10"
+	@test(eq, {addr: "10.10.10.10"})
+}
+-- out/compile --
+--- in.cue
+{
+  issue3993: {
+    reduced: {
+      x: (〈import;net〉.IPv4|=~"fail")
+      x: {
+        if 〈import;net〉.IPv4(〈1;x〉) {
+          =~"^10\\."
+        }
+      }
+      x: "10.10.10.10"
+    }
+  }
+  issue3993: {
+    full: {
+      addr!: (string & (〈import;net〉.IPv4|〈import;net〉.IPv6))
+      if 〈import;net〉.IPv4(〈0;addr〉) {
+        addr: 〈import;strings〉.HasPrefix("10.")
+      }
+      if 〈import;net〉.IPv6(〈0;addr〉) {
+        addr: 〈import;strings〉.HasPrefix("2a02:")
+      }
+      addr: "10.10.10.10"
+    }
+  }
+}

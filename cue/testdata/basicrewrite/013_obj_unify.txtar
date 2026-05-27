@@ -12,48 +12,6 @@ e: {a: 3}
 [eval] e: conflicting values 1 and {a:3} (mismatched types int and struct):
     ./in.cue:8:4
     ./in.cue:9:4
--- out/compile --
---- in.cue
-{
-  o1: ({
-    a: 1
-  } & {
-    b: 2
-  })
-  o2: ({
-    a: 1
-    b: 2
-  } & {
-    b: 2
-  })
-  o3: ({
-    a: 1
-  } & {
-    a: 1
-    b: 2
-  })
-  o4: ({
-    a: 1
-  } & {
-    b: 2
-  })
-  o4: ({
-    a: 1
-    b: 2
-  } & {
-    b: 2
-  })
-  o4: ({
-    a: 1
-  } & {
-    a: 1
-    b: 2
-  })
-  e: 1
-  e: {
-    a: 3
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  15

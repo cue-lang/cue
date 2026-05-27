@@ -1,0 +1,315 @@
+# Tests that inline unification patterns like `(#mkDef & {}).#Type` evaluate
+# correctly in the v3 evaluator. The issue caused evalv3 to include unwanted
+# disjunction alternatives, making orgSyntax compute the wrong branch result.
+# https://cuelang.org/issue/3672
+-- x.cue --
+import "strings"
+
+import "encoding/json"
+
+#FinDefSetElemType: {
+	#Type!: _
+}
+#FinDefSetDefinition: {
+	#Elem!: #FinDefSetElemType
+	#Alternatives: {
+		allBut: {
+			AllBut: [...#Elem.#Type]
+		}
+		only: {
+			Only: [...#Elem.#Type]
+		}
+	}
+}
+
+#mkFinDefSet: {
+	#Definition!: #FinDefSetDefinition
+	#Type: or([for _, v in #Definition.#Alternatives {v}])
+}
+
+#FinDefSetElemType: {
+	#Type: _
+	toString!: {
+		_input:  #Type
+		_output: string
+	}
+}
+
+#FinDefSetDefinition: {
+	#Elem!: #FinDefSetElemType
+	#Alternatives: {
+		allBut: {
+			AllBut: [...#Elem.#Type]
+			let xs = [for x in AllBut {(#Elem.toString & {_input: x})._output}]
+			let str = strings.Join(xs, "\",\"")
+			orgSyntax: "AllBut [\(str)]"
+		}
+		only: {
+			Only: [...#Elem.#Type]
+			let xs = [for x in Only {(#Elem.toString & {_input: x})._output}]
+			let str = strings.Join(xs, "\",\"")
+			orgSyntax: "Only [\(str)]"
+		}
+	}
+}
+
+#ConfigText: string | {UseSectionName: true}
+
+#ConfigTextRule: #ConfigText | {Append: #ConfigText} | {Prepend: #ConfigText}
+
+#ConfigTextRules: #ConfigTextRule | [#ConfigTextRule, #ConfigTextRule, ...#ConfigTextRule]
+
+#FinDefSetConfigTextElem: #FinDefSetElemType
+#FinDefSetConfigTextElem: {
+	#Type: #ConfigTextRules
+}
+
+#FinDefSetOfConfigText: (
+	#mkFinDefSet & {
+		#Definition: {#Elem: #FinDefSetConfigTextElem}
+	}).#Type
+
+#FinDefSetConfigTextElem: {
+	toString: {
+		_input: #ConfigTextRules
+		_output: (#orgForConfigTextRules & {source: _input}).orgSyntax
+	}
+}
+
+#orgForConfigText: {
+	IN=source: #ConfigText
+	orgSyntax: {
+		let INS = IN & string
+		let INO = IN & {UseSectionName: _}
+		[
+			if INS != _|_ {
+				json.Marshal(INS)
+			},
+			if INO != _|_ {
+				"UseSectionName"
+			},
+			"Impossible",
+		][0]
+	}
+}
+
+#orgForConfigTextRule: {
+	IN=source: #ConfigTextRule
+	orgSyntax: {
+		let INA = IN & {Append: _}
+		let INP = IN & {Prepend: _}
+		[
+			if INA != _|_ {
+				"Append " + (#orgForConfigText & {source: INA.Append}).orgSyntax
+			},
+			if INP != _|_ {
+				"Prepend " + (#orgForConfigText & {source: INP.Prepend}).orgSyntax
+			},
+			(#orgForConfigText & {source: IN}).orgSyntax,
+		][0]
+	}
+}
+
+#orgForConfigTextRules: {
+	IN=source: #ConfigTextRules
+	orgSyntax: {
+		let INL = IN & [...]
+		[
+			if INL != _|_ {
+				let elems = [for x in IN {(#orgForConfigTextRule & {source: x}).orgSyntax}]
+				let result = strings.Join(elems, "\",\"")
+				"[\(result)]"
+			},
+			(#orgForConfigTextRule & {source: IN}).orgSyntax,
+		][0]
+	}
+}
+
+value0: #FinDefSetOfConfigText
+value0: Only: [{UseSectionName: true}]
+@test(eq, {
+	Only: [{ UseSectionName: true }]
+	orgSyntax: "Only [UseSectionName]"
+}, at=value0)
+
+@test(err, at=#mkFinDefSet.#Type, code=incomplete, contains="error in call to %s", args=[or], pos=[-108:9, -108:25])
+// TODO(inline): test wrapped errors
+@test(err, at=#orgForConfigTextRules.orgSyntax, code=incomplete, path=elems, contains="invalid interpolation", pos=[-16:5, -18:18])
+@test(err, at=#FinDefSetConfigTextElem.toString._output, code=incomplete, path=elems, contains="invalid interpolation", pos=[-17:5, -19:18])
+
+-- out/compile --
+--- x.cue
+{
+  #FinDefSetElemType: {
+    #Type!: _
+  }
+  #FinDefSetDefinition: {
+    #Elem!: 〈1;#FinDefSetElemType〉
+    #Alternatives: {
+      allBut: {
+        AllBut: [
+          ...〈3;#Elem〉.#Type,
+        ]
+      }
+      only: {
+        Only: [
+          ...〈3;#Elem〉.#Type,
+        ]
+      }
+    }
+  }
+  #mkFinDefSet: {
+    #Definition!: 〈1;#FinDefSetDefinition〉
+    #Type: or([
+      for _, v in 〈1;#Definition〉.#Alternatives {
+        〈1;v〉
+      },
+    ])
+  }
+  #FinDefSetElemType: {
+    #Type: _
+    toString!: {
+      _input: 〈1;#Type〉
+      _output: string
+    }
+  }
+  #FinDefSetDefinition: {
+    #Elem!: 〈1;#FinDefSetElemType〉
+    #Alternatives: {
+      allBut: {
+        AllBut: [
+          ...〈3;#Elem〉.#Type,
+        ]
+        let xs#1 = [
+          for _, x in 〈1;AllBut〉 {
+            (〈5;#Elem〉.toString & {
+              _input: 〈2;x〉
+            })._output
+          },
+        ]
+        let str#2 = 〈import;strings〉.Join(〈0;let xs#1〉, "\",\"")
+        orgSyntax: "AllBut [\(〈0;let str#2〉)]"
+      }
+      only: {
+        Only: [
+          ...〈3;#Elem〉.#Type,
+        ]
+        let xs#3 = [
+          for _, x in 〈1;Only〉 {
+            (〈5;#Elem〉.toString & {
+              _input: 〈2;x〉
+            })._output
+          },
+        ]
+        let str#4 = 〈import;strings〉.Join(〈0;let xs#3〉, "\",\"")
+        orgSyntax: "Only [\(〈0;let str#4〉)]"
+      }
+    }
+  }
+  #ConfigText: (string|{
+    UseSectionName: true
+  })
+  #ConfigTextRule: (〈0;#ConfigText〉|{
+    Append: 〈1;#ConfigText〉
+  }|{
+    Prepend: 〈1;#ConfigText〉
+  })
+  #ConfigTextRules: (〈0;#ConfigTextRule〉|[
+    〈1;#ConfigTextRule〉,
+    〈1;#ConfigTextRule〉,
+    ...〈1;#ConfigTextRule〉,
+  ])
+  #FinDefSetConfigTextElem: 〈0;#FinDefSetElemType〉
+  #FinDefSetConfigTextElem: {
+    #Type: 〈1;#ConfigTextRules〉
+  }
+  #FinDefSetOfConfigText: (〈0;#mkFinDefSet〉 & {
+    #Definition: {
+      #Elem: 〈2;#FinDefSetConfigTextElem〉
+    }
+  }).#Type
+  #FinDefSetConfigTextElem: {
+    toString: {
+      _input: 〈2;#ConfigTextRules〉
+      _output: (〈2;#orgForConfigTextRules〉 & {
+        source: 〈1;_input〉
+      }).orgSyntax
+    }
+  }
+  #orgForConfigText: {
+    source: 〈1;#ConfigText〉
+    orgSyntax: {
+      let INS#5 = (〈1;source〉 & string)
+      let INO#6 = (〈1;source〉 & {
+        UseSectionName: _
+      })
+      [
+        if (〈1;let INS#5〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈import;"encoding/json"〉.Marshal(〈2;let INS#5〉)
+        },
+        if (〈1;let INO#6〉 != _|_(explicit error (_|_ literal) in source)) {
+          "UseSectionName"
+        },
+        "Impossible",
+      ][0]
+    }
+  }
+  #orgForConfigTextRule: {
+    source: 〈1;#ConfigTextRule〉
+    orgSyntax: {
+      let INA#7 = (〈1;source〉 & {
+        Append: _
+      })
+      let INP#8 = (〈1;source〉 & {
+        Prepend: _
+      })
+      [
+        if (〈1;let INA#7〉 != _|_(explicit error (_|_ literal) in source)) {
+          ("Append " + (〈4;#orgForConfigText〉 & {
+            source: 〈3;let INA#7〉.Append
+          }).orgSyntax)
+        },
+        if (〈1;let INP#8〉 != _|_(explicit error (_|_ literal) in source)) {
+          ("Prepend " + (〈4;#orgForConfigText〉 & {
+            source: 〈3;let INP#8〉.Prepend
+          }).orgSyntax)
+        },
+        (〈3;#orgForConfigText〉 & {
+          source: 〈3;source〉
+        }).orgSyntax,
+      ][0]
+    }
+  }
+  #orgForConfigTextRules: {
+    source: 〈1;#ConfigTextRules〉
+    orgSyntax: {
+      let INL#9 = (〈1;source〉 & [
+        ...,
+      ])
+      [
+        if (〈1;let INL#9〉 != _|_(explicit error (_|_ literal) in source)) {
+          let elems#A = [
+            for _, x in 〈4;source〉 {
+              (〈7;#orgForConfigTextRule〉 & {
+                source: 〈2;x〉
+              }).orgSyntax
+            },
+          ]
+          let result#B = 〈import;strings〉.Join(〈0;let elems#A〉, "\",\"")
+          "[\(〈0;let result#B〉)]"
+        },
+        (〈3;#orgForConfigTextRule〉 & {
+          source: 〈3;source〉
+        }).orgSyntax,
+      ][0]
+    }
+  }
+  value0: 〈0;#FinDefSetOfConfigText〉
+  value0: {
+    Only: [
+      {
+        UseSectionName: true
+      },
+    ]
+  }
+}

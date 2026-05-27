@@ -53,25 +53,3 @@ Conjuncts:    23
 Disjuncts:    15
 -- out/todo.txt --
 v3 reports the argument order differently (string/int vs int/string in v2) and includes an additional error position (5:5) for the assignment in t0.v.
--- out/compile --
---- in.cue
-{
-  i: int
-  s: string
-  t0: {
-    v: (〈1;i〉 & 〈1;s〉)
-  }
-  t1: {
-    #d1: {
-      a: {
-        b: 3
-      }
-    }
-    #d2: {
-      a: {
-        b: 4
-      }
-    }
-    x: (〈0;#d1〉 & 〈0;#d2〉)
-  }
-}

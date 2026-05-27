@@ -1,0 +1,53 @@
+#inlinetest:exclude CUE source contains compile-time errors (out-of-scope references)
+# which prevent the inline test runner from compiling the source.
+-- in.cue --
+@experiment(try)
+
+// else cannot access for variable
+forVarInElse: {
+	for i in [1,2,3] { "\(i)": i } fallback { bad: i }
+}
+
+// else cannot access let variable from comprehension
+letVarInElse: {
+	for x in [1,2,3] let y = x*2 { "\(x)": y } fallback { bad: y }
+}
+
+// Note: Multiple clause cases with else are caught at parse time, not compile time:
+// - if + let with else: if cond let x = val { ... } else { ... }
+// - Two if clauses with else: if cond1 if cond2 { x } else { y }
+// - Chained try with else: try x = a? try y = b? { ... } else { ... }
+// - Mixed if/try with else: if cond try { x } else { y }
+// - if + for with else: if cond for x in [] { x } else { y }
+// These all produce parser error: "else clause only allowed with single 'if' or 'try' clause"
+// or "use 'otherwise' with 'for' clauses"
+-- out/compile --
+forVarInElse.bad: reference "i" not found:
+    ./in.cue:5:49
+letVarInElse.bad: reference "y" not found:
+    ./in.cue:10:61
+--- in.cue
+{
+  forVarInElse: {
+    for _, i in [
+      1,
+      2,
+      3,
+    ] {
+      "\(〈1;i〉)": 〈1;i〉
+    } else {
+      bad: _|_(reference "i" not found)
+    }
+  }
+  letVarInElse: {
+    for _, x in [
+      1,
+      2,
+      3,
+    ] let y = (〈0;x〉 * 2) {
+      "\(〈2;x〉)": 〈1;y〉
+    } else {
+      bad: _|_(reference "y" not found)
+    }
+  }
+}

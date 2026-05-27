@@ -1,0 +1,64 @@
+-- in.cue --
+result: [for _, v in service {v}] @test(eq, [{
+	name: *"foo" | string
+	type: "service"
+	port: *7080 | int
+}, {
+	port: 8000
+	name: *"bar" | string
+	type: "service"
+}, {
+	name: "foobar"
+	type: "service"
+	port: *7080 | int
+}])
+
+service: [Name=string]: {
+	name: *Name | string
+	type: "service"
+	port: *7080 | int
+}
+service: foo: {} @test(eq, {
+	name: *"foo" | string
+	type: "service"
+	port: *7080 | int
+})
+service: bar: {port: 8000} @test(eq, {
+	port: 8000
+	name: *"bar" | string
+	type: "service"
+})
+service: baz: {name: "foobar"} @test(eq, {
+	name: "foobar"
+	type: "service"
+	port: *7080 | int
+})
+-- out/compile --
+--- in.cue
+{
+  result: [
+    for _, v in 〈1;service〉 {
+      〈1;v〉
+    },
+  ]
+  service: {
+    [string]: {
+      name: (*〈1;-〉|string)
+      type: "service"
+      port: (*7080|int)
+    }
+  }
+  service: {
+    foo: {}
+  }
+  service: {
+    bar: {
+      port: 8000
+    }
+  }
+  service: {
+    baz: {
+      name: "foobar"
+    }
+  }
+}

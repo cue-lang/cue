@@ -30,34 +30,6 @@ issue3779: {
 		#Bar: {fieldFoo: _, fieldBar: *_ | string}
 	})
 }
--- out/compile --
---- in.cue
-{
-  passToSingleValue: {
-    p1: (_|*((_|*"x") & "y"))
-  }
-  passToSingleValue: {
-    p2: (_|*((*"x"|_) & "y"))
-  }
-  passToSingleValue: {
-    p3: (*((_|*"x") & "y")|_)
-  }
-  passToSingleValue: {
-    p4: (*((*"x"|_) & "y")|_)
-  }
-  issue3779: {
-    out: (〈0;#Foo〉 & {
-      fieldFoo: "foo"
-    })
-    #Foo: (〈0;#Bar〉 & {
-      fieldFoo: (string|*"foo-default")
-    })
-    #Bar: {
-      fieldFoo: _
-      fieldBar: (string|*〈0;fieldFoo〉)
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  7
 Freed:  39

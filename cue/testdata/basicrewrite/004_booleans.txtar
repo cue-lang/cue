@@ -9,16 +9,6 @@ e: !true
 [eval] e: conflicting values false and true:
     ./in.cue:5:4
     ./in.cue:6:4
--- out/compile --
---- in.cue
-{
-  t: true
-  t: !false
-  f: false
-  f: !〈0;t〉
-  e: true
-  e: !true
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  4

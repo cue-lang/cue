@@ -14,13 +14,3 @@ Retain: 0
 Unifications: 3
 Conjuncts:    5
 Disjuncts:    3
--- out/compile --
---- in.cue
-{
-  {
-    [string]: {
-      baz: 〈1;-〉
-    }
-  }
-  bar: {}
-}

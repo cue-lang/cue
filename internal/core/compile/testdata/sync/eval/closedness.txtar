@@ -1,0 +1,2290 @@
+// Issue #852
+-- in.cue --
+#E: {
+	c: int
+}
+#A: {
+	b: int
+	q: {
+		#E
+		d: int
+	}
+}
+a: #A & {
+	b: 3
+	q: {
+		c: 2
+		e: 43
+	}
+} @test(err, code=eval, contains="field not allowed", pos=[4:3])
+
+// A constraint validation error fails to trigger when a field violating a
+// regex pattern constraint is duplicated via a for-loop comprehension.
+// https://cuelang.org/issue/852
+// `a` is evaluated through the comprehension first. Ensure that
+// this does not bypass closedness checks.
+issue852: {
+	#A: {
+		[=~"^a-z$"]: string
+	}
+
+	a: #A
+
+	a: Foo: "foo"
+
+	for k, v in a {
+		b: "\(k)": v
+	}
+} @test(err, code=eval, contains="field not allowed", pos=[7:5])
+
+dynamic: {
+	#D: {
+		key:   "foo"
+		(key): int
+	}
+	d: #D & {foo: 3}
+	@test(eq, {
+		#D: {key: "foo", foo: int}
+		d: {foo: 3, key: "foo"}
+	})
+}
+
+// Closedness appeared to be lost when using a comprehension: CUE incorrectly
+// produced "incomplete value" errors for disjunctions inside if/for blocks.
+// https://cuelang.org/issue/4180
+// The `if true` comprehension would lead to ambiguity in out.iter.FooOrBar,
+// even though {foo: "is foo"} does not unify with `#Bar & {...}`.
+issue4180: {
+	out: {
+	    if true {
+			iter: #Schema & {
+				FooOrBar: foo: "is foo"
+			}
+		}
+	}
+
+	#Foo: foo: string
+	#Bar: bar: string
+	#Schema: {
+		FooOrBar: {...}
+		FooOrBar: #Foo | #Bar
+	}
+	@test(eq, {
+		out: {iter: {FooOrBar: {foo: "is foo"}}}
+		#Foo: {foo: string}
+		#Bar: {bar: string}
+		#Schema: {
+			FooOrBar: {foo: string} | {bar: string}
+		}
+	})
+}
+-- embed.cue --
+// evalv3: ordering of embedded structs affects template definition evaluation,
+// causing validation errors that shouldn't occur when structs are reordered.
+// https://cuelang.org/issue/3325
+issue3325: ok: {
+	#Items: [Name=string]: {
+		name: Name
+	}
+
+	#Base: {
+		name: "base"
+		type: string
+
+		items: #Items
+	}
+
+	#Extended: #Base & {
+		type: "extended"
+		items: "my-item": {}
+	}
+
+	broken: {
+		#Base
+		#Extended
+	}
+
+	works: {
+		#Extended
+		#Base
+	}
+	@test(eq, {
+		#Items: {}
+		#Base: {name: "base", type: string, items: {}}
+		#Extended: {
+			type: "extended"
+			items: {"my-item": {name: "my-item"}}
+			name: "base"
+		}
+		broken: {
+			name: "base"
+			type: "extended"
+			items: {"my-item": {name: "my-item"}}
+		}
+		works: {
+			type: "extended"
+			items: {"my-item": {name: "my-item"}}
+			name: "base"
+		}
+	})
+}
+
+patterns: shallow: {
+	#a: [>="k"]: int
+	#b: [<="m"]: int
+	#c: [>="w"]: int
+	#d: [<="y"]: int
+
+	single: {
+		X: #a // "k" <= x
+		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[1:8])
+		err: j: 3
+
+		ok: X @test(eq, {k: 3})
+		ok: k: 3
+	}
+
+	and: p1: {
+		X: #a & #b // "k" <= x && x <= "m"
+
+		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[-16:6, 1:8])
+		err: j: 3
+
+		ok: X @test(eq, {k: 3})
+		ok: k: 3
+	}
+
+	and: p2: {
+		X: #b & #a // "k" <= x && x <= "m"
+		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[-25:6, 1:8])
+		err: j: 3
+
+		ok: X @test(eq, {k: 3})
+		ok: k: 3
+	}
+
+	andEmbed: p1: {
+		X: { #a & #b } // "k" <= x && x <= "m"
+
+		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[-35:6, 1:8])
+		err: j: 3
+
+		ok: X @test(eq, {k: 3})
+		ok: k: 3
+	}
+
+	andEmbed: p2: {
+		X: { #b & #a } // "k" <= x && x <= "m"
+		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[-44:6, 1:8])
+		err: j: 3
+
+		ok: X @test(eq, {k: 3})
+		ok: k: 3
+	}
+
+	orEmbed: p1: {
+		X: { #a, #b } // "k" <= x && x <= "m"
+
+		ok1: X @test(eq, {j: 3})
+		ok1: j: 3
+
+		ok2: X @test(eq, {k: 3})
+		ok2: k: 3
+	}
+
+	orEmbed: p2: {
+		X: { #b, #a } // "k" <= x && x <= "m"
+		ok1: X @test(eq, {j: 3})
+		ok1: j: 3
+
+		ok2: X @test(eq, {k: 3})
+		ok2: k: 3
+	}
+
+	andOrEmbed: t1: p1: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y")
+		X: {
+			#a & #b
+			#c & #d
+		}
+		err1: X @test(eq, {j: 3})
+		err1: j: 3
+
+		ok1: X @test(eq, {k: 3})
+		ok1: k: 3
+	}
+
+	andOrEmbed: t1: p2: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y")
+		X: {
+			#c & #d
+			#a & #b
+		}
+		err1: X @test(eq, {j: 3})
+		err1: j: 3
+
+		ok1: X @test(eq, {k: 3})
+		ok1: k: 3
+	}
+
+	andOrEmbed: t2: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y") || x == "p"
+		X: {
+			#a & #b
+			#c & #d
+			["p"]: int
+		}
+		err1: X @test(eq, {j: 3})
+		err1: j: 3
+
+		ok1: X @test(eq, {k: 3})
+		ok1: k: 3
+
+		ok2: X @test(eq, {p: 3})
+		ok2: p: 3
+	}
+
+	// The last indirection is not a definition.
+	indirect: {
+		a: [>="k"]: int
+		#a: a
+
+		p1: { // XXX // link to code
+			X: #a
+			err1: X @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err1: j: 3
+
+			err2: X & __no_sharing
+			err2: j: 3 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+
+			ok: X
+			ok:k: 3 @test(eq, 3)
+		}
+
+		p2: {
+			#a: a & __no_sharing
+			X: #a
+
+			err1: X
+			err1: j: 3 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+
+			err2: X & __no_sharing @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err2: j: 3
+
+			ok: X @test(eq, {k: 3})
+			ok: k: 3
+		}
+
+		p3: {
+			X: #a & __no_sharing
+
+			err1: X @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err1: j: 3 
+
+			err2: X & __no_sharing @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err2: j: 3 
+
+			ok: X @test(eq, {k: 3})
+			ok: k: 3 
+		}
+
+		p4: {
+			#a: a & __no_sharing
+			X: #a
+			X: #a & __no_sharing
+
+			err1: X @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err1: j: 3
+
+			err2: X & __no_sharing @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err2: j: 3
+
+			ok: X @test(eq, {k: 3})
+			ok: k: 3
+		}
+	}
+}
+
+patterns: nested: {
+	#a: x: y: [>="k"]: int
+	#b: x: y: [<="m"]: int
+	#c: x: y: [>="w"]: int
+	#d: x: y: [<="y"]: int
+
+	single: {
+		X: #a // "k" <= x
+		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:14])
+		err: x: y: j: 3
+
+		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: x: y: k: 3
+	}
+
+	and: p1: {
+		X: #a & #b // "k" <= x && x <= "m"
+
+		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[-16:12, 1:14])
+		err: x: y: j: 3
+
+		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: x: y: k: 3
+	}
+
+	and: p2: {
+		X: #b & #a // "k" <= x && x <= "m"
+		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[-25:12, 1:14])
+		err: x: y: j: 3
+
+		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: x: y: k: 3
+	}
+
+	andEmbed: p1: {
+		X: { #a & #b } // "k" <= x && x <= "m"
+
+		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[-35:12, 1:14])
+		err: x: y: j: 3
+
+		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: x: y: k: 3
+	}
+
+	andEmbed: p2: {
+		X: { #b & #a } // "k" <= x && x <= "m"
+		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[-44:12, 1:14])
+		err: x: y: j: 3
+
+		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: x: y: k: 3
+	}
+
+	orEmbed: p1: {
+		X: { #a, #b } // "k" <= x && x <= "m"
+
+		ok1: X @test(eq, {x: {y: {j: 3}}})
+		ok1: x: y: j: 3
+
+		ok2: X @test(eq, {x: {y: {k: 3}}})
+		ok2: x: y: k: 3
+	}
+
+	orEmbed: p2: {
+		X: { #b, #a } // "k" <= x && x <= "m"
+		ok1: X @test(eq, {x: {y: {j: 3}}})
+		ok1: x: y: j: 3
+
+		ok2: X @test(eq, {x: {y: {k: 3}}})
+		ok2: x: y: k: 3
+	}
+
+	andOrEmbed: t1: p1: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y")
+		X: {
+			#a & #b
+			#c & #d
+		}
+		err1: X @test(eq, {x: {y: {j: 3}}})
+		err1: x: y: j: 3
+
+		ok1: X @test(eq, {x: {y: {k: 3}}})
+		ok1: x: y: k: 3
+	}
+
+	andOrEmbed: t1: p2: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y")
+		X: {
+			#c & #d
+			#a & #b
+		}
+		err1: X @test(eq, {x: {y: {j: 3}}})
+		err1: x: y: j: 3
+
+		ok1: X @test(eq, {x: {y: {k: 3}}})
+		ok1: x: y: k: 3
+	}
+
+	andOrEmbed: t2: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y") || x == "p"
+		X: {
+			#a & #b
+			#c & #d
+			["p"]: int
+		}
+		err1: X @test(eq, {x: {y: {j: 3}}})
+		err1: x: y: j: 3
+
+		ok1: X @test(eq, {x: {y: {k: 3}}})
+		ok1: x: y: k: 3
+
+		ok2: X @test(eq, {x: {y: {p: 3}}})
+		ok2: x: y: p: 3
+	}
+
+	// The last indirection is not a definition.
+	indirect: {
+		a: x: y: [>="k"]: int
+		#a: a
+
+		p1: {
+			X: #a
+			err1: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err1: x: y: j: 3
+
+			err2: X & __no_sharing @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err2: x: y: j: 3
+
+			ok: X @test(eq, {x: {y: {k: 3}}})
+			ok: x: y: k: 3
+		}
+
+		p2: {
+			#a: a & __no_sharing
+			X: #a
+
+			err1: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err1: x: y: j: 3
+
+			err2: X & __no_sharing @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err2: x: y: j: 3
+
+			ok: X @test(eq, {x: {y: {k: 3}}})
+			ok: x: y: k: 3
+		}
+
+		p3: {
+			X: #a & __no_sharing
+
+			err1: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err1: x: y: j: 3
+
+			err2: X & __no_sharing @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err2: x: y: j: 3
+
+			ok: X @test(eq, {x: {y: {k: 3}}})
+			ok: x: y: k: 3
+		}
+
+		p4: {
+			#a: a & __no_sharing
+			X: #a
+			X: #a & __no_sharing
+
+			err1: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err1: x: y: j: 3
+
+			err2: X & __no_sharing @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err2: x: y: j: 3
+
+			ok: X @test(eq, {x: {y: {k: 3}}})
+			ok: x: y: k: 3
+		}
+	}
+} @test(err, code=eval, contains="field not allowed", pos=[168:16])
+
+// Embedding a definition doesn't recursively close the embedder: closedness
+// is not propagated correctly when a definition is embedded in an open struct.
+// https://cuelang.org/issue/2241
+issue2241: {
+	#close: {}
+
+	a: {
+	    x: q: 2
+	    #close
+	}
+
+	b: a
+	b: x: r: 4
+} @test(err, code=eval, path=b.x.r, contains="field not allowed", pos=[9:8])
+
+-- ellipsis.cue --
+// evalv3 regression: unification with {...} allowed extra fields where evalv2
+// correctly rejected them as "field not allowed".
+// https://cuelang.org/issue/3778
+issue3778: full: {
+	#x: a?: string
+	#y: #x & { ... }
+	z: #y & {
+		a: "ok"
+		b: "something"
+	}
+	@test(err, code=eval, path=z.b, contains="field not allowed", pos=[5:3])
+}
+issue3778: {
+	keepOpen: {
+		#x: { a?: string, ... }
+		#y: #x & { ... }
+		z: #y & {
+			a: "ok"
+			b: "something"
+		}
+		@test(eq, {
+			#x: {a?: string}
+			#y: {a?: string}
+			z: {a: "ok", b: "something"}
+		})
+	}
+}
+
+// Unification of a closed struct in a subfield does not close it: the evaluator
+// incorrectly allows adding fields to a closed struct unified with ellipsis.
+// https://cuelang.org/issue/1867
+// All three reproducers below should fail with "field not allowed".
+issue1867: one: {
+	#T: close({})
+	#T: {...}
+	x: #T
+	x: foo: "foo"
+	@test(err, code=eval, path=x.foo, contains="field not allowed", pos=[4:5])
+}
+issue1867: two: {
+	#S: {}
+	#T: s: #S
+	#T: s: {...}
+	x: #T.s
+	x: foo: "foo"
+	@test(err, code=eval, path=x.foo, contains="field not allowed", pos=[5:5])
+}
+// This third version used to not fail as expected on evalv2.
+issue1867: three: {
+	#T: s: close({})
+	#T: s: {...}
+	x: #T.s
+	x: foo: "foo"
+	@test(err, code=eval, contains="field not allowed", pos=[4:5])
+}
+// evalv3 regression in detecting closedness: "field not allowed" errors were
+// incorrectly suppressed when validating nested structures with closedness constraints.
+// https://cuelang.org/issue/3924
+issue3924: one: {
+	#Schema: {
+		...
+		{[string]: #SchemaInner}
+	}
+	#SchemaInner: allowed?: string
+
+	out: #Schema & {foo: disallowed: "foo"} // should fail
+	@test(err, code=eval, path=out.foo.disallowed, contains="field not allowed", pos=[7:23])
+}
+issue3924: two: {
+	#Schema: {
+		{[string]: #job}
+
+		#job: matchN(1, [{
+			other?: string
+			...
+		}]) & close({
+			allowed?: string
+		})
+	}
+	out: #Schema & {foo: disallowed: "bar"} // should fail
+	@test(err, code=eval, path=out.foo.disallowed, contains="field not allowed", pos=[4:9, 11:23])
+}
+issue3924: three: t1: {
+	{foo: #job & {disallowed: "bar"}}
+	#job: { other?: string }
+	#job: #def
+	#def: allowed?: string
+	@test(err, code=eval, path=foo.disallowed, contains="field not allowed", pos=[1:16])
+}
+issue3924: three: t2: {
+	{foo: #job & {disallowed: "bar"}}
+	#job: { other?: string, ... }
+	#job: #def
+	#def: allowed?: string
+	@test(err, code=eval, path=foo.disallowed, contains="field not allowed", pos=[1:16])
+}
+issue3924: three: t3: {
+	#job: { ... }
+	#job: #def
+	#def: {}
+	foo: #job & {disallowed: "bar"}
+	@test(err, code=eval, path=foo.disallowed, contains="field not allowed", pos=[4:15])
+}
+issue3924: four: {
+	A: { {foo: #B} }
+	#B: allowed?: string
+	out: A & {foo: disallowed: "foo"} // should fail
+	@test(err, code=eval, contains="field not allowed", pos=[3:17])
+}
+-- reroot.cue --
+import "list"
+
+// evalv3 panic "unexpected uninitialized node" while processing certain
+// config files using list.Concat with definitions.
+// https://cuelang.org/issue/3330
+issue3330: {
+	let: ok: {
+		#struct: {
+			let empty = {}
+
+			field: null | { n: int }
+			field: empty & { n: 3 }
+		}
+
+		out: list.Concat([[#struct]])
+		@test(eq, {
+			#struct: {field: {n: 3}}
+			out: [{
+				field: n: 3
+			}]
+		})
+	}
+	matthew: ok1: {
+		#struct: {
+			field: { n: 3 } & g
+			g: {}
+		}
+
+		out: #struct & {}
+		@test(eq, {
+			#struct: {field: {n: 3}, g: {}}
+			out: {field: {n: 3}, g: {}}
+		})
+	}
+	matthew: ok2: {
+		#struct: {
+			field: { n: 3 } & g
+			g: {}
+		}
+
+		out: #struct
+		out2: out & {}
+		@test(eq, {
+			#struct: {field: {n: 3}, g: {}}
+			out: {field: {n: 3}, g: {}}
+			out2: {field: {n: 3}, g: {}}
+		})
+	}
+}
+// evalv3 "field not allowed" regression: a valid struct with a let binding and
+// field unification incorrectly produces "field not allowed".
+// https://cuelang.org/issue/3331
+issue3331: {
+	original: ok: {
+		#A: {
+			let b = {}
+			c: b & {
+				d: 1
+			}
+		}
+		list.Concat([[#A]])
+		@test(eq, {
+			#A: {c: {d: 1}}
+			[{c: {d: 1}}]
+		})
+	}
+	variant1: ok: {
+		#A: {
+			let b = {}
+			c: b & {
+				d: 1
+			}
+		}
+		[[#A]]
+		@test(eq, {
+			#A: {c: {d: 1}}
+			[[{c: {d: 1}}]]
+		})
+	}
+	@test(eq, {
+		original: {ok: {
+			#A: {c: {d: 1}}
+			[{c: {d: 1}}]
+		}}
+		variant1: {ok: {
+			#A: {c: {d: 1}}
+			[[{c: {d: 1}}]]
+		}}
+	})
+}
+
+// indirect tests cases where a reference indirectly crosses a node that
+// references a definition, thereby indirectly referencing it.
+indirect: {
+	embed: err1: {
+		#A: {
+			x: {#x, #y}
+			zx: x.a
+		}
+
+		#x: {a: b: 1}
+		#y: {a: c: 2}
+
+		b: #A
+
+		b1: b.zx
+		b1: d: 1 // This should fail as b.zx crosses a reference to definition.
+		@test(err:todo)
+		@test(eq, {
+			#A: {x: {a: {b: 1, c: 2}}, zx: {b: 1, c: 2}}
+			#x: {a: {b: 1}}
+			#y: {a: {c: 2}}
+			b: {x: {a: {b: 1, c: 2}}, zx: {b: 1, c: 2}}
+			b1: {d: 1, b: 1, c: 2}
+		})
+	}
+	closed: err1: {
+		X: {
+			// refer to a value that will be closed after unification in another struct.
+			a: b
+			b: {}
+			a: e: 1
+		}
+		Y: X
+		Y: {
+			b: c
+			c: #X
+		}
+		#X: {}
+		@test(err, at=Y.a.e, code=eval, contains="field not allowed", pos=[5:7])
+	}
+}
+// nested.a
+nested: ok1: {
+	#A: {
+	b: {}
+
+	#B: {
+		c: b & {
+			d: 1
+			}
+		}
+	}
+	x: #A
+	@test(eq, {
+		#A: {b: {}, #B: {c: {d: 1}}}
+		x: {b: {}, #B: {c: {d: 1}}}
+	})
+}
+nested: embed: ok: {
+	x: #A
+	#A: {
+		k
+	}
+	k: {
+		d: b & {e: int}
+		b: {}
+	}
+	@test(eq, {
+		x:  {d: {e: int}, b: {}}
+		#A: {d: {e: int}, b: {}}
+		k:  {d: {e: int}, b: {}}
+	})
+}
+// nested.b tests insertion of a field (b) that has a conjunct rooted within
+// the tree it is referred in as well as a conjunct outside of it that refers
+// to a definition.
+nested: err1: {
+	x: #A
+	#A: {
+		b: f: 1
+		v: #V
+		#V: {
+			c: b & { // Fails as #B is not compatible.
+				d: 1
+			}
+		}
+	}
+	x: b: #B
+	#B: g: 1
+	@test(err, at=x.#V.c.d, code=eval, contains="field not allowed", pos=[7:5])
+}
+
+nested: err2: {
+	#A: {
+		b: {} // error only reported here.
+		c: b & {
+			// error (g not allowed) not reported here, as it would be okay if b
+			// were valid. Instead, it is reported at b only. This is conform
+			// the spec.
+			d: 1
+		}
+	}
+	x: #A
+	x: b: g: 1
+	@test(err, at=x.b.g, code=eval, contains="field not allowed", pos=[11:8])
+}
+
+inline: {
+	#x: y: z?: name: string
+
+	// TODO: not an error!?
+	err1: (#x & {y: z: _}).y.z & {
+		name: "a"
+		age1: 5 // not allowed
+	} @test(err:todo, code=eval, contains="field not allowed")
+	err2: (#x.y & {z: _}).z & {
+		name: "a"
+		age2: 5 // not allowed
+	} @test(err:todo, code=eval, contains="field not allowed")
+	@test(eq, {
+		#x: {y: {z?: {name: string}}}
+		err1: {name: "a", age1: 5}
+		err2: {name: "a", age2: 5}
+	})
+}
+
+// minInDef defines examples where a definition is mixed into an open struct,
+// where then this struct refers to a field that is closed by the definition.
+mixInDef: {
+	refInside: {
+		#x: b: c: {d: {}, e: f: {} }
+		a: #x
+		a: b: c: d: {}
+		a: b: c: e: c.d
+		@test(eq, {
+			#x: {b: {c: {d: {}, e: {f: {}}}}}
+			a: {b: {c: {d: {}, e: {f: {}}}}}
+		})
+	}
+	refEdge: {
+		#x: c: {d: {}, e: f: {} }
+		a: #x
+		a: c: d: {}
+		a: c: e: c.d
+		@test(eq, {
+			#x: {c: {d: {}, e: {f: {}}}}
+			a: {c: {d: {}, e: {f: {}}}}
+		})
+	}
+	refOutside: {
+		#x: c: {d: {}, e: f: {} }
+		a: #x
+		a: c: d: {}
+		a: c: e: a.c.d // crosses definition
+		@test(eq, {
+			#x: {c: {d: {}, e: {f: {}}}}
+			a: {c: {d: {}, e: {f: {}}}}
+		})
+	}
+}
+
+// evalv3 "field not allowed" regression: out.foo.final.version incorrectly
+// rejected when embedding a definition's output through a transformed struct.
+// https://cuelang.org/issue/3601
+issue3601: original: {
+	out: {
+		#Transform.output
+	}
+	#Transform: output: (#Patch & {}).output
+	#Patch: {
+		target: {}
+		output: foo: {
+			final: target
+			final: version: "v1"
+		}
+	}
+	@test(eq, {
+		out: {foo: {final: {version: "v1"}}}
+		#Transform: {
+			output: {foo: {final: {version: "v1"}}}
+		}
+		#Patch: {
+			target: {}
+			output: {foo: {final: {version: "v1"}}}
+		}
+	})
+}
+issue3601: originalNoShare: {
+	// Like the original, but with explicit no sharing.
+	out: {
+		#Transform.output
+	}
+	#Transform: output: (#Patch & __no_sharing).output
+	#Patch: {
+		target: {}
+		output: foo: {
+			final: target
+			final: version: "v1"
+		}
+	}
+	@test(eq, {
+		out: {foo: {final: {version: "v1"}}}
+		#Transform: {
+			output: {foo: {final: {version: "v1"}}}
+		}
+		#Patch: {
+			target: {}
+			output: {foo: {final: {version: "v1"}}}
+		}
+	})
+}
+issue3601: reduced: {
+	#X: {
+		a: b: c: "v1"
+		a: b: empty
+		empty: {}
+	}
+
+	original: {
+		Y: (#X & __no_sharing).a
+		out: Y & __no_sharing
+	}
+	moreInlining: {
+		out: (#X & {}).a & {}
+	}
+	noInline: {
+		Y: #X & __no_sharing
+		Z: Y & __no_sharing
+		out: Z.a & __no_sharing
+	}
+	moreNesting: {
+		#X: {
+			a: b: c: d: "v1"
+			a: b: c: empty
+			empty: {}
+		}
+		Y: (#X.a & __no_sharing).b
+		Z: Y & __no_sharing
+	}
+	@test(eq, {
+		#X: {a: {b: {c: "v1"}}, empty: {}}
+		original: {Y: {b: {c: "v1"}}, out: {b: {c: "v1"}}}
+		moreInlining: {out: {b: {c: "v1"}}}
+		noInline: {
+			Y: {a: {b: {c: "v1"}}, empty: {}}
+			Z: {a: {b: {c: "v1"}}, empty: {}}
+			out: {b: {c: "v1"}}
+		}
+		moreNesting: {
+			#X: {a: {b: {c: {d: "v1"}}}, empty: {}}
+			Y: {c: {d: "v1"}}
+			Z: {c: {d: "v1"}}
+		}
+	})
+}
+
+-- validation.cue --
+import "list"
+
+// evalv3: struct with only list.MinItems does not allow a valid list field to
+// exist, reporting "field not allowed" instead of accepting it.
+// https://cuelang.org/issue/3332
+issue3332: {
+	#def: field: list.MinItems(1)
+	use: #def & {
+	  field: ["value"]
+	}
+	@test(eq, {
+		#def: {field: list.MinItems(1)}
+		use: {field: ["value"]}
+	})
+}
+
+-- out/compile --
+--- ellipsis.cue
+{
+  issue3778: {
+    full: {
+      #x: {
+        a?: string
+      }
+      #y: (〈0;#x〉 & {
+        ...
+      })
+      z: (〈0;#y〉 & {
+        a: "ok"
+        b: "something"
+      })
+    }
+  }
+  issue3778: {
+    keepOpen: {
+      #x: {
+        a?: string
+        ...
+      }
+      #y: (〈0;#x〉 & {
+        ...
+      })
+      z: (〈0;#y〉 & {
+        a: "ok"
+        b: "something"
+      })
+    }
+  }
+  issue1867: {
+    one: {
+      #T: close({})
+      #T: {
+        ...
+      }
+      x: 〈0;#T〉
+      x: {
+        foo: "foo"
+      }
+    }
+  }
+  issue1867: {
+    two: {
+      #S: {}
+      #T: {
+        s: 〈1;#S〉
+      }
+      #T: {
+        s: {
+          ...
+        }
+      }
+      x: 〈0;#T〉.s
+      x: {
+        foo: "foo"
+      }
+    }
+  }
+  issue1867: {
+    three: {
+      #T: {
+        s: close({})
+      }
+      #T: {
+        s: {
+          ...
+        }
+      }
+      x: 〈0;#T〉.s
+      x: {
+        foo: "foo"
+      }
+    }
+  }
+  issue3924: {
+    one: {
+      #Schema: {
+        ...
+        {
+          [string]: 〈2;#SchemaInner〉
+        }
+      }
+      #SchemaInner: {
+        allowed?: string
+      }
+      out: (〈0;#Schema〉 & {
+        foo: {
+          disallowed: "foo"
+        }
+      })
+    }
+  }
+  issue3924: {
+    two: {
+      #Schema: {
+        {
+          [string]: 〈1;#job〉
+        }
+        #job: (matchN(1, [
+          {
+            other?: string
+            ...
+          },
+        ]) & close({
+          allowed?: string
+        }))
+      }
+      out: (〈0;#Schema〉 & {
+        foo: {
+          disallowed: "bar"
+        }
+      })
+    }
+  }
+  issue3924: {
+    three: {
+      t1: {
+        {
+          foo: (〈1;#job〉 & {
+            disallowed: "bar"
+          })
+        }
+        #job: {
+          other?: string
+        }
+        #job: 〈0;#def〉
+        #def: {
+          allowed?: string
+        }
+      }
+    }
+  }
+  issue3924: {
+    three: {
+      t2: {
+        {
+          foo: (〈1;#job〉 & {
+            disallowed: "bar"
+          })
+        }
+        #job: {
+          other?: string
+          ...
+        }
+        #job: 〈0;#def〉
+        #def: {
+          allowed?: string
+        }
+      }
+    }
+  }
+  issue3924: {
+    three: {
+      t3: {
+        #job: {
+          ...
+        }
+        #job: 〈0;#def〉
+        #def: {}
+        foo: (〈0;#job〉 & {
+          disallowed: "bar"
+        })
+      }
+    }
+  }
+  issue3924: {
+    four: {
+      A: {
+        {
+          foo: 〈2;#B〉
+        }
+      }
+      #B: {
+        allowed?: string
+      }
+      out: (〈0;A〉 & {
+        foo: {
+          disallowed: "foo"
+        }
+      })
+    }
+  }
+}
+--- embed.cue
+{
+  issue3325: {
+    ok: {
+      #Items: {
+        [string]: {
+          name: 〈1;-〉
+        }
+      }
+      #Base: {
+        name: "base"
+        type: string
+        items: 〈1;#Items〉
+      }
+      #Extended: (〈0;#Base〉 & {
+        type: "extended"
+        items: {
+          "my-item": {}
+        }
+      })
+      broken: {
+        〈1;#Base〉
+        〈1;#Extended〉
+      }
+      works: {
+        〈1;#Extended〉
+        〈1;#Base〉
+      }
+    }
+  }
+  patterns: {
+    shallow: {
+      #a: {
+        [>="k"]: int
+      }
+      #b: {
+        [<="m"]: int
+      }
+      #c: {
+        [>="w"]: int
+      }
+      #d: {
+        [<="y"]: int
+      }
+      single: {
+        X: 〈1;#a〉
+        err: 〈0;X〉
+        err: {
+          j: 3
+        }
+        ok: 〈0;X〉
+        ok: {
+          k: 3
+        }
+      }
+      and: {
+        p1: {
+          X: (〈2;#a〉 & 〈2;#b〉)
+          err: 〈0;X〉
+          err: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+      and: {
+        p2: {
+          X: (〈2;#b〉 & 〈2;#a〉)
+          err: 〈0;X〉
+          err: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+      andEmbed: {
+        p1: {
+          X: {
+            (〈3;#a〉 & 〈3;#b〉)
+          }
+          err: 〈0;X〉
+          err: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+      andEmbed: {
+        p2: {
+          X: {
+            (〈3;#b〉 & 〈3;#a〉)
+          }
+          err: 〈0;X〉
+          err: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+      orEmbed: {
+        p1: {
+          X: {
+            〈3;#a〉
+            〈3;#b〉
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            j: 3
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            k: 3
+          }
+        }
+      }
+      orEmbed: {
+        p2: {
+          X: {
+            〈3;#b〉
+            〈3;#a〉
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            j: 3
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            k: 3
+          }
+        }
+      }
+      andOrEmbed: {
+        t1: {
+          p1: {
+            X: {
+              (〈4;#a〉 & 〈4;#b〉)
+              (〈4;#c〉 & 〈4;#d〉)
+            }
+            err1: 〈0;X〉
+            err1: {
+              j: 3
+            }
+            ok1: 〈0;X〉
+            ok1: {
+              k: 3
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t1: {
+          p2: {
+            X: {
+              (〈4;#c〉 & 〈4;#d〉)
+              (〈4;#a〉 & 〈4;#b〉)
+            }
+            err1: 〈0;X〉
+            err1: {
+              j: 3
+            }
+            ok1: 〈0;X〉
+            ok1: {
+              k: 3
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t2: {
+          X: {
+            (〈3;#a〉 & 〈3;#b〉)
+            (〈3;#c〉 & 〈3;#d〉)
+            ["p"]: int
+          }
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            k: 3
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            p: 3
+          }
+        }
+      }
+      indirect: {
+        a: {
+          [>="k"]: int
+        }
+        #a: 〈0;a〉
+        p1: {
+          X: 〈1;#a〉
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+        p2: {
+          #a: (〈1;a〉 & _|_(no sharing))
+          X: 〈0;#a〉
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+        p3: {
+          X: (〈1;#a〉 & _|_(no sharing))
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+        p4: {
+          #a: (〈1;a〉 & _|_(no sharing))
+          X: 〈0;#a〉
+          X: (〈0;#a〉 & _|_(no sharing))
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+    }
+  }
+  patterns: {
+    nested: {
+      #a: {
+        x: {
+          y: {
+            [>="k"]: int
+          }
+        }
+      }
+      #b: {
+        x: {
+          y: {
+            [<="m"]: int
+          }
+        }
+      }
+      #c: {
+        x: {
+          y: {
+            [>="w"]: int
+          }
+        }
+      }
+      #d: {
+        x: {
+          y: {
+            [<="y"]: int
+          }
+        }
+      }
+      single: {
+        X: 〈1;#a〉
+        err: 〈0;X〉
+        err: {
+          x: {
+            y: {
+              j: 3
+            }
+          }
+        }
+        ok: 〈0;X〉
+        ok: {
+          x: {
+            y: {
+              k: 3
+            }
+          }
+        }
+      }
+      and: {
+        p1: {
+          X: (〈2;#a〉 & 〈2;#b〉)
+          err: 〈0;X〉
+          err: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      and: {
+        p2: {
+          X: (〈2;#b〉 & 〈2;#a〉)
+          err: 〈0;X〉
+          err: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      andEmbed: {
+        p1: {
+          X: {
+            (〈3;#a〉 & 〈3;#b〉)
+          }
+          err: 〈0;X〉
+          err: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      andEmbed: {
+        p2: {
+          X: {
+            (〈3;#b〉 & 〈3;#a〉)
+          }
+          err: 〈0;X〉
+          err: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      orEmbed: {
+        p1: {
+          X: {
+            〈3;#a〉
+            〈3;#b〉
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      orEmbed: {
+        p2: {
+          X: {
+            〈3;#b〉
+            〈3;#a〉
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t1: {
+          p1: {
+            X: {
+              (〈4;#a〉 & 〈4;#b〉)
+              (〈4;#c〉 & 〈4;#d〉)
+            }
+            err1: 〈0;X〉
+            err1: {
+              x: {
+                y: {
+                  j: 3
+                }
+              }
+            }
+            ok1: 〈0;X〉
+            ok1: {
+              x: {
+                y: {
+                  k: 3
+                }
+              }
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t1: {
+          p2: {
+            X: {
+              (〈4;#c〉 & 〈4;#d〉)
+              (〈4;#a〉 & 〈4;#b〉)
+            }
+            err1: 〈0;X〉
+            err1: {
+              x: {
+                y: {
+                  j: 3
+                }
+              }
+            }
+            ok1: 〈0;X〉
+            ok1: {
+              x: {
+                y: {
+                  k: 3
+                }
+              }
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t2: {
+          X: {
+            (〈3;#a〉 & 〈3;#b〉)
+            (〈3;#c〉 & 〈3;#d〉)
+            ["p"]: int
+          }
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            x: {
+              y: {
+                p: 3
+              }
+            }
+          }
+        }
+      }
+      indirect: {
+        a: {
+          x: {
+            y: {
+              [>="k"]: int
+            }
+          }
+        }
+        #a: 〈0;a〉
+        p1: {
+          X: 〈1;#a〉
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+        p2: {
+          #a: (〈1;a〉 & _|_(no sharing))
+          X: 〈0;#a〉
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+        p3: {
+          X: (〈1;#a〉 & _|_(no sharing))
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+        p4: {
+          #a: (〈1;a〉 & _|_(no sharing))
+          X: 〈0;#a〉
+          X: (〈0;#a〉 & _|_(no sharing))
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  issue2241: {
+    #close: {}
+    a: {
+      x: {
+        q: 2
+      }
+      〈1;#close〉
+    }
+    b: 〈0;a〉
+    b: {
+      x: {
+        r: 4
+      }
+    }
+  }
+}
+--- in.cue
+{
+  #E: {
+    c: int
+  }
+  #A: {
+    b: int
+    q: {
+      〈2;#E〉
+      d: int
+    }
+  }
+  a: (〈0;#A〉 & {
+    b: 3
+    q: {
+      c: 2
+      e: 43
+    }
+  })
+  issue852: {
+    #A: {
+      [=~"^a-z$"]: string
+    }
+    a: 〈0;#A〉
+    a: {
+      Foo: "foo"
+    }
+    for k, v in 〈0;a〉 {
+      b: {
+        "\(〈2;k〉)": 〈2;v〉
+      }
+    }
+  }
+  dynamic: {
+    #D: {
+      key: "foo"
+      〈0;key〉: int
+    }
+    d: (〈0;#D〉 & {
+      foo: 3
+    })
+  }
+  issue4180: {
+    out: {
+      if true {
+        iter: (〈2;#Schema〉 & {
+          FooOrBar: {
+            foo: "is foo"
+          }
+        })
+      }
+    }
+    #Foo: {
+      foo: string
+    }
+    #Bar: {
+      bar: string
+    }
+    #Schema: {
+      FooOrBar: {
+        ...
+      }
+      FooOrBar: (〈1;#Foo〉|〈1;#Bar〉)
+    }
+  }
+}
+--- reroot.cue
+{
+  issue3330: {
+    let: {
+      ok: {
+        #struct: {
+          let empty#1 = {}
+          field: (null|{
+            n: int
+          })
+          field: (〈0;let empty#1〉 & {
+            n: 3
+          })
+        }
+        out: 〈import;list〉.Concat([
+          [
+            〈2;#struct〉,
+          ],
+        ])
+      }
+    }
+    matthew: {
+      ok1: {
+        #struct: {
+          field: ({
+            n: 3
+          } & 〈0;g〉)
+          g: {}
+        }
+        out: (〈0;#struct〉 & {})
+      }
+    }
+    matthew: {
+      ok2: {
+        #struct: {
+          field: ({
+            n: 3
+          } & 〈0;g〉)
+          g: {}
+        }
+        out: 〈0;#struct〉
+        out2: (〈0;out〉 & {})
+      }
+    }
+  }
+  issue3331: {
+    original: {
+      ok: {
+        #A: {
+          let b#2 = {}
+          c: (〈0;let b#2〉 & {
+            d: 1
+          })
+        }
+        〈import;list〉.Concat([
+          [
+            〈2;#A〉,
+          ],
+        ])
+      }
+    }
+    variant1: {
+      ok: {
+        #A: {
+          let b#3 = {}
+          c: (〈0;let b#3〉 & {
+            d: 1
+          })
+        }
+        [
+          [
+            〈2;#A〉,
+          ],
+        ]
+      }
+    }
+  }
+  indirect: {
+    embed: {
+      err1: {
+        #A: {
+          x: {
+            〈2;#x〉
+            〈2;#y〉
+          }
+          zx: 〈0;x〉.a
+        }
+        #x: {
+          a: {
+            b: 1
+          }
+        }
+        #y: {
+          a: {
+            c: 2
+          }
+        }
+        b: 〈0;#A〉
+        b1: 〈0;b〉.zx
+        b1: {
+          d: 1
+        }
+      }
+    }
+    closed: {
+      err1: {
+        X: {
+          a: 〈0;b〉
+          b: {}
+          a: {
+            e: 1
+          }
+        }
+        Y: 〈0;X〉
+        Y: {
+          b: 〈0;c〉
+          c: 〈1;#X〉
+        }
+        #X: {}
+      }
+    }
+  }
+  nested: {
+    ok1: {
+      #A: {
+        b: {}
+        #B: {
+          c: (〈1;b〉 & {
+            d: 1
+          })
+        }
+      }
+      x: 〈0;#A〉
+    }
+  }
+  nested: {
+    embed: {
+      ok: {
+        x: 〈0;#A〉
+        #A: {
+          〈1;k〉
+        }
+        k: {
+          d: (〈0;b〉 & {
+            e: int
+          })
+          b: {}
+        }
+      }
+    }
+  }
+  nested: {
+    err1: {
+      x: 〈0;#A〉
+      #A: {
+        b: {
+          f: 1
+        }
+        v: 〈0;#V〉
+        #V: {
+          c: (〈1;b〉 & {
+            d: 1
+          })
+        }
+      }
+      x: {
+        b: 〈1;#B〉
+      }
+      #B: {
+        g: 1
+      }
+    }
+  }
+  nested: {
+    err2: {
+      #A: {
+        b: {}
+        c: (〈0;b〉 & {
+          d: 1
+        })
+      }
+      x: 〈0;#A〉
+      x: {
+        b: {
+          g: 1
+        }
+      }
+    }
+  }
+  inline: {
+    #x: {
+      y: {
+        z?: {
+          name: string
+        }
+      }
+    }
+    err1: ((〈0;#x〉 & {
+      y: {
+        z: _
+      }
+    }).y.z & {
+      name: "a"
+      age1: 5
+    })
+    err2: ((〈0;#x〉.y & {
+      z: _
+    }).z & {
+      name: "a"
+      age2: 5
+    })
+  }
+  mixInDef: {
+    refInside: {
+      #x: {
+        b: {
+          c: {
+            d: {}
+            e: {
+              f: {}
+            }
+          }
+        }
+      }
+      a: 〈0;#x〉
+      a: {
+        b: {
+          c: {
+            d: {}
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            e: 〈1;c〉.d
+          }
+        }
+      }
+    }
+    refEdge: {
+      #x: {
+        c: {
+          d: {}
+          e: {
+            f: {}
+          }
+        }
+      }
+      a: 〈0;#x〉
+      a: {
+        c: {
+          d: {}
+        }
+      }
+      a: {
+        c: {
+          e: 〈1;c〉.d
+        }
+      }
+    }
+    refOutside: {
+      #x: {
+        c: {
+          d: {}
+          e: {
+            f: {}
+          }
+        }
+      }
+      a: 〈0;#x〉
+      a: {
+        c: {
+          d: {}
+        }
+      }
+      a: {
+        c: {
+          e: 〈2;a〉.c.d
+        }
+      }
+    }
+  }
+  issue3601: {
+    original: {
+      out: {
+        〈1;#Transform〉.output
+      }
+      #Transform: {
+        output: (〈1;#Patch〉 & {}).output
+      }
+      #Patch: {
+        target: {}
+        output: {
+          foo: {
+            final: 〈2;target〉
+            final: {
+              version: "v1"
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3601: {
+    originalNoShare: {
+      out: {
+        〈1;#Transform〉.output
+      }
+      #Transform: {
+        output: (〈1;#Patch〉 & _|_(no sharing)).output
+      }
+      #Patch: {
+        target: {}
+        output: {
+          foo: {
+            final: 〈2;target〉
+            final: {
+              version: "v1"
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3601: {
+    reduced: {
+      #X: {
+        a: {
+          b: {
+            c: "v1"
+          }
+        }
+        a: {
+          b: 〈1;empty〉
+        }
+        empty: {}
+      }
+      original: {
+        Y: (〈1;#X〉 & _|_(no sharing)).a
+        out: (〈0;Y〉 & _|_(no sharing))
+      }
+      moreInlining: {
+        out: ((〈1;#X〉 & {}).a & {})
+      }
+      noInline: {
+        Y: (〈1;#X〉 & _|_(no sharing))
+        Z: (〈0;Y〉 & _|_(no sharing))
+        out: (〈0;Z〉.a & _|_(no sharing))
+      }
+      moreNesting: {
+        #X: {
+          a: {
+            b: {
+              c: {
+                d: "v1"
+              }
+            }
+          }
+          a: {
+            b: {
+              c: 〈2;empty〉
+            }
+          }
+          empty: {}
+        }
+        Y: (〈0;#X〉.a & _|_(no sharing)).b
+        Z: (〈0;Y〉 & _|_(no sharing))
+      }
+    }
+  }
+}
+--- validation.cue
+{
+  issue3332: {
+    #def: {
+      field: 〈import;list〉.MinItems(1)
+    }
+    use: (〈0;#def〉 & {
+      field: [
+        "value",
+      ]
+    })
+  }
+}

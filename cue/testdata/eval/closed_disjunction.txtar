@@ -34,27 +34,5 @@ Conjuncts:    39
 Disjuncts:    12
 
 NumCloseIDs: 8
--- out/compile --
---- in.cue
-{
-  #A: {
-    b?: int
-    (*{}|{
-      c?: int
-    }|{
-      d?: int
-    }|{
-      e?: int
-    })
-  }
-  a: (〈0;#A〉 & {
-    b: 3
-    c: 3
-  })
-  b: (〈0;#A〉 & {
-    c: 3
-    d: 4
-  })
-}
 -- out/todo.txt --
 v3 drops e? from b's error result and only shows the two sub-errors without extra positions; v2 showed e? and more error positions including compile-time locations.

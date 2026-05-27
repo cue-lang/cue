@@ -48,14 +48,3 @@ NumCloseIDs: 3
 positions
 Reordering
 Verdict: worsening -- v3 reports different error positions; field reordering.
--- out/compile --
---- test.cue
-{
-  A: close({
-    a: 1
-    b: 2
-  })
-  B: (〈0;A〉 & {
-    c: 3
-  })
-}

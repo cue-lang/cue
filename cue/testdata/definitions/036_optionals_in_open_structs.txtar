@@ -11,22 +11,6 @@ c: #C & {aaa: 3} @test(eq, {
 	[=~"^[m-z]*$"]: int
 	aaa: 3
 })
--- out/compile --
---- in.cue
-{
-  A: {
-    [=~"^[a-s]*$"]: int
-  }
-  B: {
-    [=~"^[m-z]*$"]: int
-  }
-  #C: {
-    (〈1;A〉 & 〈1;B〉)
-  }
-  c: (〈0;#C〉 & {
-    aaa: 3
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  6

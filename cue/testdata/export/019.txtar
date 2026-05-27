@@ -2,14 +2,6 @@ raw: true
 #inlinetest:exclude skip — tests export format, not evaluator semantics
 -- in.cue --
 {a: >=0 & <=10, b: "Count: \(a) times"}
--- out/compile --
---- in.cue
-{
-  {
-    a: (>=0 & <=10)
-    b: "Count: \(〈0;a〉) times"
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  3

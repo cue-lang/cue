@@ -1,0 +1,33 @@
+-- in.cue --
+#schema: a!: bool
+_hidden & #schema // must fail here, but not elsewhere
+_hidden: {
+	"a": true,
+	notAllowed: true
+}
+allowed: true
+
+@test(eq, {
+	a: true
+	#schema: a!: bool
+	_hidden: {
+		a: true
+		notAllowed: true
+	}
+	allowed: true
+	notAllowed: _|_
+})
+@test(err, code=eval, contains="field not allowed", pos=[in.cue:5:2])
+-- out/compile --
+--- in.cue
+{
+  #schema: {
+    a!: bool
+  }
+  (〈0;_hidden〉 & 〈0;#schema〉)
+  _hidden: {
+    a: true
+    notAllowed: true
+  }
+  allowed: true
+}

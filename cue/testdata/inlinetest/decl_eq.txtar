@@ -17,13 +17,3 @@ c: {
 		y: 2
 	}
 })
--- out/compile --
---- in.cue
-{
-  a: 1
-  b: (〈0;a〉 + 1)
-  c: {
-    x: "hello"
-    y: 〈1;b〉
-  }
-}

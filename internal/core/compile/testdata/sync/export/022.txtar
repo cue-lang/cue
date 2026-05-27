@@ -1,0 +1,43 @@
+raw: true
+eval: true
+noOpt: true
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{
+	job: [Name=_]: {
+		name:     Name
+		replicas: uint | *1 @protobuf(10)
+		command:  string
+	}
+
+	job: list: command: "ls"
+
+	job: nginx: {
+		command:  "nginx"
+		replicas: 2
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    job: {
+      [_]: {
+        name: 〈1;-〉
+        replicas: (&(int, >=0)|*1)
+        command: string
+      }
+    }
+    job: {
+      list: {
+        command: "ls"
+      }
+    }
+    job: {
+      nginx: {
+        command: "nginx"
+        replicas: 2
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+# Tests that a definition used as a list element type correctly propagates default
+# values and does not incorrectly reject fields like Pattern when unified.
+# https://cuelang.org/issue/491
+-- in.cue --
+package x
+
+#Prestep: {
+	Args: *null | _
+}
+
+#PrestepNewUser: #Prestep & {
+	Args: #NewUser
+}
+
+#NewUser: {
+	Repos: [...#Repo]
+}
+
+#Repo: {
+	Var:     string
+	Pattern: *"*" | string
+}
+
+x: [...#Repo]
+x: [{
+	Var: "REPO1"
+}]  @test(eq, [{Var: "REPO1", Pattern: *"*" | string}])
+
+y: #Repo & {
+	Var: "REPO1"
+} @test(eq, {Var: "REPO1", Pattern: *"*" | string})
+
+z: #PrestepNewUser & {
+	Args: {
+		Repos: [{
+			Var: "REPO1"
+		}]
+	}
+} @test(eq, {Args: {Repos: [{Var: "REPO1", Pattern: *"*" | string}]}})
+-- out/compile --
+--- in.cue
+{
+  #Prestep: {
+    Args: (*null|_)
+  }
+  #PrestepNewUser: (〈0;#Prestep〉 & {
+    Args: 〈1;#NewUser〉
+  })
+  #NewUser: {
+    Repos: [
+      ...〈2;#Repo〉,
+    ]
+  }
+  #Repo: {
+    Var: string
+    Pattern: (*"*"|string)
+  }
+  x: [
+    ...〈1;#Repo〉,
+  ]
+  x: [
+    {
+      Var: "REPO1"
+    },
+  ]
+  y: (〈0;#Repo〉 & {
+    Var: "REPO1"
+  })
+  z: (〈0;#PrestepNewUser〉 & {
+    Args: {
+      Repos: [
+        {
+          Var: "REPO1"
+        },
+      ]
+    }
+  })
+}

@@ -1,0 +1,30 @@
+# Issue #946: Tests that a for comprehension variable that shadows the source
+# name (for a in a) compiles correctly and resolves scoping at the right depth.
+# https://cuelang.org/issue/946
+-- in.cue --
+package repro
+
+a: [] @test(eq, [])
+-- out.cue --
+package repro
+
+x: {for a in a {}}   @test(eq, {})
+y: {{{for a in a {}}}} @test(eq, {})
+-- out/compile --
+--- in.cue
+{
+  a: []
+}
+--- out.cue
+{
+  x: {
+    for _, a in 〈1;a〉 {}
+  }
+  y: {
+    {
+      {
+        for _, a in 〈3;a〉 {}
+      }
+    }
+  }
+}

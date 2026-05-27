@@ -15,23 +15,6 @@ intField: {
     ./in.cue:4:18
 [eval] intField: integer fields not supported:
     ./in.cue:9:3
--- out/compile --
---- in.cue
-{
-  bulkToSelf: {
-    a: {
-      foo: {
-        [string]: int
-      }
-      foo: {
-        bar: "3"
-      }
-    }
-  }
-  intField: {
-    2: string
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

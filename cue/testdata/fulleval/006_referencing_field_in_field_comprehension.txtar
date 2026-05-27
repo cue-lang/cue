@@ -7,23 +7,6 @@ a: {
 		"\(k)": v
 	}
 }
--- out/compile --
---- in.cue
-{
-  a: {
-    b: {
-      c: 4
-    }
-  }
-  a: {
-    b: {
-      d: 5
-    }
-    for k, v in 〈0;b〉 {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

@@ -1,0 +1,299 @@
+# evalv3 regression: nested if-comprehensions inside a definition accessed via
+# a for-comprehension over a pattern-constrained struct incorrectly produced an
+# "incomplete value" error. The if-comprehensions (e.g. strings.HasSuffix
+# guards) failed to evaluate when the definition was reached through multiple
+# layers of embedding (_#cronjob → _#pod → _#container). evalv2 (v0.12.1)
+# accepted the code correctly.
+# https://cuelang.org/issue/3929
+-- in.cue --
+package main
+
+import "strings"
+
+reduced: {
+	#Input: {
+		@test(shareID=reducedInput)
+		name:  string
+		age:   "one" | "two"
+		if name != _|_ {
+			if true {
+				age: "one"
+			}
+		}
+	}
+
+	#def1: {
+		IN=_in: _
+		def1: #def2 & {_in: IN}
+	}
+
+	#def2: {
+		IN=_in: _
+		def2: #def3 & {_in: IN}
+	}
+
+	#def3: {
+		_in: #Input @test(shareID=reducedInput)
+		def3: _in.age
+	}
+
+	in: name: "foobar"
+
+	out: (#def1 & {_in: in}).def1
+	@test(eq, {
+		#Input: {name: string, age: "one" | "two"}
+		#def1: {
+			_in$main: _
+			def1: {
+				_in$main: _
+				def2: {
+					_in$main: {name: string, age: "one" | "two"}
+					def3: "one" | "two"
+				}
+			}
+		}
+		#def2: {
+			_in$main: _
+			def2: {
+				_in$main: {name: string, age: "one" | "two"}
+				def3: "one" | "two"
+			}
+		}
+		#def3: {
+			_in$main: {name: string, age: "one" | "two"}
+			def3: "one" | "two"
+		}
+		in: {name: "foobar"}
+		out: {
+			_in$main: {name: "foobar"}
+			def2: {
+				_in$main: {name: "foobar", age: "one"}
+				def3: "one"
+			}
+		}
+	})
+}
+
+full: {
+	cronjob: [string]: #CronjobConfig
+
+	#CronjobConfig: {
+		@test(shareID=cronjobConfig)
+		#PodConfig
+	}
+
+	#PodConfig: {
+		@test(shareID=podConfig)
+		#ContainerConfig
+	}
+
+	#ContainerConfig: {
+		@test(shareID=containerConfig)
+		image:           string
+		imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		if image != _|_ {
+			if strings.HasSuffix(image, ":latest") == true {
+				imagePullPolicy: "IfNotPresent" | *"Always" | "Never"
+			}
+			if strings.HasSuffix(image, ":latest") != true {
+				imagePullPolicy: *"IfNotPresent" | "Always" | "Never"
+			}
+		}
+	}
+
+	_#cronjob: {
+		c=_config: #CronjobConfig @test(shareID=cronjobConfig)
+
+		out: spec: jobTemplate: spec: template: _#pod & {_config: c}
+	}
+
+	_#pod: {
+		c=_config: #PodConfig @test(shareID=podConfig)
+
+		spec: containers: [{
+			_#container & {
+				_config: c
+			}
+		}]
+	}
+
+	_#container: {
+		c=_config: #ContainerConfig @test(shareID=containerConfig)
+
+		imagePullPolicy: c.imagePullPolicy
+	}
+
+	cronjob: "foobar": image: "foobar:latest"
+
+	for k, v in cronjob {
+		objects: cronjob: "\(k)": (_#cronjob & {_config: v}).out
+	}
+	@test(eq, hint="update this once todo is fixed", {
+		cronjob: foobar: {
+			image:           "foobar:latest"
+			imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
+		}
+		#CronjobConfig: {
+			image:           string
+			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		}
+		#PodConfig: {
+			image:           string
+			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		}
+		#ContainerConfig: {
+			image:           string
+			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		}
+		_#cronjob$main: {
+			_config$main: {
+				image:           string
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}
+			out: spec: jobTemplate: spec: template: {
+				_config$main: {
+					image:           string
+					imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+				}
+				spec: containers: [{
+					_config$main:    _ @test(ignore)
+					imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+				}]
+			}
+		}
+		_#pod$main: {
+			_config$main: {
+				image:           string
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}
+			spec: containers: [{
+				_config$main:    _ @test(ignore)
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}]
+		}
+		_#container$main: {
+			_config$main: {
+				image:           string
+				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+			}
+			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+		}
+		objects: cronjob: foobar: spec: jobTemplate: spec: template: {
+			_config$main: {
+				image:           "foobar:latest"
+				imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
+			}
+			spec: containers: [{
+				_config$main:    _ @test(ignore)
+				imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
+			}]
+		}
+	})
+	// TODO(inline) support at for closed.
+	// @test(closed, at=full.objects.cronjob.foobar)
+
+}
+-- out/compile --
+--- in.cue
+{
+  reduced: {
+    #Input: {
+      name: string
+      age: ("one"|"two")
+      if (〈0;name〉 != _|_(explicit error (_|_ literal) in source)) {
+        if true {
+          age: "one"
+        }
+      }
+    }
+    #def1: {
+      _in(:main): _
+      def1: (〈1;#def2〉 & {
+        _in(:main): 〈1;_in(:main)〉
+      })
+    }
+    #def2: {
+      _in(:main): _
+      def2: (〈1;#def3〉 & {
+        _in(:main): 〈1;_in(:main)〉
+      })
+    }
+    #def3: {
+      _in(:main): 〈1;#Input〉
+      def3: 〈0;_in(:main)〉.age
+    }
+    in: {
+      name: "foobar"
+    }
+    out: (〈0;#def1〉 & {
+      _in(:main): 〈1;in〉
+    }).def1
+  }
+  full: {
+    cronjob: {
+      [string]: 〈1;#CronjobConfig〉
+    }
+    #CronjobConfig: {
+      〈1;#PodConfig〉
+    }
+    #PodConfig: {
+      〈1;#ContainerConfig〉
+    }
+    #ContainerConfig: {
+      image: string
+      imagePullPolicy: ("IfNotPresent"|"Always"|"Never")
+      if (〈0;image〉 != _|_(explicit error (_|_ literal) in source)) {
+        if (〈import;strings〉.HasSuffix(〈1;image〉, ":latest") == true) {
+          imagePullPolicy: ("IfNotPresent"|*"Always"|"Never")
+        }
+        if (〈import;strings〉.HasSuffix(〈1;image〉, ":latest") != true) {
+          imagePullPolicy: (*"IfNotPresent"|"Always"|"Never")
+        }
+      }
+    }
+    _#cronjob(:main): {
+      _config(:main): 〈1;#CronjobConfig〉
+      out: {
+        spec: {
+          jobTemplate: {
+            spec: {
+              template: (〈5;_#pod(:main)〉 & {
+                _config(:main): 〈5;_config(:main)〉
+              })
+            }
+          }
+        }
+      }
+    }
+    _#pod(:main): {
+      _config(:main): 〈1;#PodConfig〉
+      spec: {
+        containers: [
+          {
+            (〈4;_#container(:main)〉 & {
+              _config(:main): 〈4;_config(:main)〉
+            })
+          },
+        ]
+      }
+    }
+    _#container(:main): {
+      _config(:main): 〈1;#ContainerConfig〉
+      imagePullPolicy: 〈0;_config(:main)〉.imagePullPolicy
+    }
+    cronjob: {
+      foobar: {
+        image: "foobar:latest"
+      }
+    }
+    for k, v in 〈0;cronjob〉 {
+      objects: {
+        cronjob: {
+          "\(〈3;k〉)": (〈4;_#cronjob(:main)〉 & {
+            _config(:main): 〈4;v〉
+          }).out
+        }
+      }
+    }
+  }
+}

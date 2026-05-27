@@ -92,7 +92,6 @@ type Bottom struct {
 	ChildError   bool // Err is the error of the child
 	NotExists    bool // This error originated from a failed lookup.
 	CloseCheck   bool // This error resulted from a close check.
-	ForCycle     bool // this is a for cycle
 	// Value holds the computed value so far in case
 	Value Value
 

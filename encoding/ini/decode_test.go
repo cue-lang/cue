@@ -109,7 +109,21 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name: "NestedSections",
+		name: "FlatSectionsByDefault/DottedSectionNameIsLiteral",
+		input: `
+			[database.pool]
+			min = 5
+			max = 20
+			`,
+		wantCUE: `
+			"database.pool": {
+				min: "5"
+				max: "20"
+			}
+			`,
+	}, {
+		name:   "NestedSections",
+		config: &ini.Config{SectionNameNesting: ini.SectionNamesNested},
 		input: `
 			[database.pool]
 			min = 5
@@ -228,7 +242,8 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name: "DeeplyNestedSections",
+		name:   "DeeplyNestedSections",
+		config: &ini.Config{SectionNameNesting: ini.SectionNamesNested},
 		input: `
 			[a.b.c]
 			key = value
@@ -237,7 +252,8 @@ func TestDecoder(t *testing.T) {
 			a: b: c: key: "value"
 			`,
 	}, {
-		name: "SectionWithSiblingAndNestedSection",
+		name:   "SectionWithSiblingAndNestedSection",
+		config: &ini.Config{SectionNameNesting: ini.SectionNamesNested},
 		input: `
 			[server]
 			host = localhost
@@ -256,7 +272,8 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name: "FullExample",
+		name:   "FullExample",
+		config: &ini.Config{SectionNameNesting: ini.SectionNamesNested},
 		input: `
 			; Application configuration
 			app_name = MyWebApp
@@ -425,7 +442,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "CaseInsensitive/LowercasesNestedSections",
-		config: &ini.Config{CaseSensitivity: ini.CaseLower},
+		config: &ini.Config{CaseSensitivity: ini.CaseLower, SectionNameNesting: ini.SectionNamesNested},
 		input: `
 			[Server.TLS]
 			Cert = /path/to/cert

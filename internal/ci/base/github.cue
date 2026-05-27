@@ -87,6 +87,10 @@ installGo: {
 				arm64) go env -w GOARM64=v8.6 ;; # Apple M2 and later
 				esac
 
+				# Otherwise `go test -race` sleeps for 1s on every package;
+				# see https://go.dev/issues/20364.
+				echo "GORACE=atexit_sleep_ms=10" >> $GITHUB_ENV
+
 				# Dump env for good measure
 				go env
 				"""

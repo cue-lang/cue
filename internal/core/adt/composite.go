@@ -500,6 +500,10 @@ type StructInfo struct {
 	// or nil if this is a root structure.
 	// Embed   *StructInfo
 	// Context *RefInfo // the location from which this struct originates.
+
+	// initialized records whether this StructInfo was scheduled in the
+	// containing Vertex.
+	initialized bool
 }
 
 // vertexStatus indicates the evaluation progress of a Vertex.
@@ -1429,12 +1433,14 @@ func (v *Vertex) AddStruct(s *StructLit, compID uint32) {
 	for i, t := range v.Structs {
 		if t.StructLit == s {
 			v.Structs[i].Repeats++
+			v.Structs[i].initialized = true
 			return
 		}
 	}
 	info := StructInfo{
-		StructLit: s,
-		CompID:    compID,
+		StructLit:   s,
+		CompID:      compID,
+		initialized: true,
 	}
 	v.Structs = append(v.Structs, info)
 }

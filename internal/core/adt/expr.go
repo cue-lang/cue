@@ -48,9 +48,6 @@ type StructLit struct {
 	// IsOpen is kept as it's used by ListMarker and some validations
 	IsOpen bool // has a ...
 
-	// initialized is kept as it's used in the Init method and unify.go
-	initialized bool
-
 	// isComprehension is kept as it's used in comprehension.go and conjunct.go
 	isComprehension bool
 }
@@ -93,13 +90,6 @@ func (x *StructLit) evaluate(c *OpContext, state Flags) Value {
 
 	v.CompleteArcsOnly(c)
 	return v
-}
-
-func (o *StructLit) Init(ctx *OpContext) {
-	if o.initialized {
-		return
-	}
-	o.initialized = true
 }
 
 // FIELDS

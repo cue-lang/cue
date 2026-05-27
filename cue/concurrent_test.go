@@ -280,6 +280,30 @@ func TestConcurrentFillPath(t *testing.T) {
 
 }
 
+// TestConcurrentFillPathComprehension is a regression test for
+// https://cuelang.org/issue/4351: concurrent FillPath on a
+// schema that contains a comprehension referencing the filled path.
+func TestConcurrentFillPathComprehension(t *testing.T) {
+	ctx := cuecontext.New()
+	v := ctx.CompileString(`
+		input!: _
+		out: [for x in input { x }]
+	`)
+	if err := v.Err(); err != nil {
+		t.Fatal(err)
+	}
+	in := ctx.CompileString(`[1, 2, 3]`)
+	inputPath := cue.MakePath(cue.Str("input"))
+	outPath := cue.MakePath(cue.Str("out"))
+
+	runConcurrent(t, func() {
+		filled := v.FillPath(inputPath, in)
+		if err := filled.LookupPath(outPath).Validate(); err != nil {
+			t.Error(err)
+		}
+	})
+}
+
 // TestConcurrentFillPathCrossContext tests FillPath using values from
 // different contexts.
 func TestConcurrentFillPathCrossContext(t *testing.T) {

@@ -258,8 +258,6 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 	// TODO: do we still need this?
 	// shouldClose := ci.cc.isDef || ci.cc.isClosedOnce
 
-	s.Init(n.ctx)
-
 	// Walk the env chain to find the comprehension firing whose body produced
 	// this struct, if any. Toposort uses this to group sibling decls inserted
 	// by the same comprehension body (see [StructInfo.CompID]).

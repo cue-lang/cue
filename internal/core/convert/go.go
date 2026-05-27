@@ -370,7 +370,6 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			Src:   src,
 			Decls: make([]adt.Decl, 0, numFields),
 		}
-		sl.Init(ctx)
 		v := &adt.Vertex{
 			Arcs: make([]*adt.Vertex, 0, numFields),
 		}
@@ -425,7 +424,6 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 
 	case reflect.Map:
 		obj := &adt.StructLit{Src: src}
-		obj.Init(ctx)
 		v := &adt.Vertex{}
 
 		switch key := typ.Key(); key.Kind() {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "47dd65ba_b972bc52",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-05-27T23:10:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b4e30c6c_f9ff496e",
+      "revId": "f4c93ad66a273f6a346fbf7adc65b3ab8224351a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24f116da_e4528a49",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-27T13:24:57Z",
       "side": 1,
       "message": "```suggestion\n//   - Section nesting is configured via [Config.SectionNameNesting].\n```",
+      "revId": "f4c93ad66a273f6a346fbf7adc65b3ab8224351a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ecdffd6_b9403d4e",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-05-27T23:10:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "24f116da_e4528a49",
       "revId": "f4c93ad66a273f6a346fbf7adc65b3ab8224351a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "41ca8c99_c1ede00b",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-05-27T23:10:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0aaca07c_d4dd058d",
+      "revId": "f4c93ad66a273f6a346fbf7adc65b3ab8224351a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5000e05_fb554ff0",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-27T13:24:57Z",
       "side": 1,
       "message": "we will likely need to support the `[foo \"bar\"]` git subsection syntax too, so we need a name more specific than \"nested\" here. Perhaps `SectionNamesDotted`.",
+      "revId": "f4c93ad66a273f6a346fbf7adc65b3ab8224351a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e9619be_08182964",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-05-27T23:10:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d5000e05_fb554ff0",
       "revId": "f4c93ad66a273f6a346fbf7adc65b3ab8224351a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,24 @@
       "message": "This is still relevant, no? Or is this now tested elsewhere. A comment would be useful.",
       "revId": "dfc376ffcbbf6ccfe24436342060fed7c8d5d313",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67914da4_60c55829",
+        "filename": "cue/parser/parser_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1464,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-27T11:09:47Z",
+      "side": 0,
+      "message": "the four trivial test cases are already covered elsewhere, as I mention in the commit message.",
+      "parentUuid": "2f248b71_8127fb84",
+      "revId": "dfc376ffcbbf6ccfe24436342060fed7c8d5d313",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

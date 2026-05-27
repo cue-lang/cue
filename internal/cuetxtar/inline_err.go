@@ -1136,8 +1136,8 @@ func relativePathTo(epath, fieldPath string) string {
 	if epath == fieldPath {
 		return ""
 	}
-	if strings.HasPrefix(epath, fieldPath+".") {
-		return epath[len(fieldPath)+1:]
+	if rest, ok := strings.CutPrefix(epath, fieldPath+"."); ok {
+		return rest
 	}
 	return epath
 }

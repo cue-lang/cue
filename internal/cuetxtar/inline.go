@@ -664,8 +664,8 @@ func (r *inlineRunner) subpath() string {
 	prefix := []byte("#subpath:")
 	for line := range strings.SplitSeq(string(r.archive.Comment), "\n") {
 		b := []byte(strings.TrimSpace(line))
-		if strings.HasPrefix(string(b), string(prefix)) {
-			return strings.TrimSpace(string(b[len(prefix):]))
+		if rest, ok := bytes.CutPrefix(b, prefix); ok {
+			return strings.TrimSpace(string(rest))
 		}
 	}
 	return ""

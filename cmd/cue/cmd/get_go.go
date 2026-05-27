@@ -1498,7 +1498,8 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		if t := tags.Get("protobuf"); t != "" {
 			split := strings.Split(t, ",")
 			split = slices.DeleteFunc(split, func(s string) bool {
-				return strings.HasPrefix(s, "name=") && s[len("name="):] == name
+				rest, ok := strings.CutPrefix(s, "name=")
+				return ok && rest == name
 			})
 
 			// Put tag first, as type could potentially be elided and is

@@ -202,8 +202,8 @@ func (t *Test) Value(key string) (value string, ok bool) {
 	s := bufio.NewScanner(bytes.NewReader(t.Archive.Comment))
 	for s.Scan() {
 		b := s.Bytes()
-		if bytes.HasPrefix(b, prefix) {
-			return string(bytes.TrimSpace(b[len(prefix):])), true
+		if rest, ok := bytes.CutPrefix(b, prefix); ok {
+			return string(bytes.TrimSpace(rest)), true
 		}
 	}
 	return "", false

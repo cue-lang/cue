@@ -113,8 +113,8 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 		txt := docs[0].Text()
 		short, txt = splitLine(txt)
 		short = lookupString(o, "short", short)
-		if strings.HasPrefix(txt, "Usage:") {
-			usage, txt = splitLine(txt[len("Usage:"):])
+		if rest, ok := strings.CutPrefix(txt, "Usage:"); ok {
+			usage, txt = splitLine(rest)
 		}
 		usage = lookupString(o, "usage", usage)
 		usage = lookupString(o, "$usage", usage)

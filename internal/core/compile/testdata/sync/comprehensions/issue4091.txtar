@@ -1,0 +1,71 @@
+# evalv3 incorrectly reported a "cyclic reference to field" error when a
+# comprehension-based field (_volumes) was conditionally exposed (volumes)
+# and then referenced through a generator pattern that re-binds the struct
+# via {_input: _obj}.
+# https://cuelang.org/issue/4091
+-- in.cue --
+output: (_Generator & {_input: _obj})._output @test(eq, {
+	genID: "id1"
+	_id: "id1"
+	volumeMounts: [{name: "mount1"}]
+	_volumes: {mount1: {name: "mount1"}}
+	volumes: {mount1: {name: "mount1"}}
+})
+
+_obj: spec: {
+	_id: "id1"
+	volumeMounts: [{name: "mount1"}]
+	_volumes: {
+		for _, vm in spec.volumeMounts {
+			(vm.name): name: vm.name
+		}
+	}
+	if len(_volumes) > 0 {
+		volumes: _volumes
+	}
+}
+_Generator: {
+	_input: {...}
+	_output: _input.spec
+	if _input.spec._id != _|_ {
+		_output: genID: (_input.spec._id)
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  output: (〈0;_Generator〉 & {
+    _input: 〈1;_obj〉
+  })._output
+  _obj: {
+    spec: {
+      _id: "id1"
+      volumeMounts: [
+        {
+          name: "mount1"
+        },
+      ]
+      _volumes: {
+        for _, vm in 〈2;spec〉.volumeMounts {
+          〈1;vm〉.name: {
+            name: 〈2;vm〉.name
+          }
+        }
+      }
+      if (len(〈0;_volumes〉) > 0) {
+        volumes: 〈1;_volumes〉
+      }
+    }
+  }
+  _Generator: {
+    _input: {
+      ...
+    }
+    _output: 〈0;_input〉.spec
+    if (〈0;_input〉.spec._id != _|_(explicit error (_|_ literal) in source)) {
+      _output: {
+        genID: 〈2;_input〉.spec._id
+      }
+    }
+  }
+}

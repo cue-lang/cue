@@ -1,0 +1,35 @@
+# A field behind an `if false` comprehension was unexpectedly inserted when
+# another `if true` comprehension defined the same field with a pattern
+# constraint that referenced a hidden field by name.
+# https://cuelang.org/issue/4174
+-- in.cue --
+if true {
+	a: [_]: {
+		_embed
+	}
+	_embed: {}
+}
+
+if false {
+	a: neverAdded: {}
+}
+
+a: _ @test(eq, {})
+-- out/compile --
+--- in.cue
+{
+  if true {
+    a: {
+      [_]: {
+        〈2;_embed〉
+      }
+    }
+    _embed: {}
+  }
+  if false {
+    a: {
+      neverAdded: {}
+    }
+  }
+  a: _
+}

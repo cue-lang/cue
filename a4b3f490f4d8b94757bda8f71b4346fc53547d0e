@@ -33,6 +33,24 @@
       "message": "Might another reasonable alternative be to mark the `env` field as optional?",
       "revId": "a4b3f490f4d8b94757bda8f71b4346fc53547d0e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48eba985_1148b0b8",
+        "filename": "pkg/tool/exec/exec.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-27T15:23:01Z",
+      "side": 1,
+      "message": "in a clean design probably, but given that we already use defaults with regular fields below, I think it makes more sense to be consistent with what\u0027s already there. when we do v2 we\u0027ll likely want an entirely new design with required fields etc.",
+      "parentUuid": "200f719d_6023cfd7",
+      "revId": "a4b3f490f4d8b94757bda8f71b4346fc53547d0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

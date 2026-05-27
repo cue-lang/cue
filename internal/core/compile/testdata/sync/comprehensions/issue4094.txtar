@@ -1,0 +1,153 @@
+# evalv3 incorrectly reported "operand of '!' not concrete" for a generator
+# pattern where a dynamic field key depends on a unified struct, and a
+# comprehension over a non-existent list field is reachable only via an
+# indirect unification. The bug only reproduced with a builtin call
+# (strings.HasPrefix) feeding the '!' operator, and required the extra
+# {extra: unused: "unused"} unification to trigger.
+# https://cuelang.org/issue/4094
+-- in.cue --
+import "strings"
+
+_libexport: {
+	_OBJECTS: {...}
+	_IMPORTS: [...]
+	_GENERATORS: [...]
+
+	_generated_objects: [
+		for _, obj in _OBJECTS
+		for _, gen in _GENERATORS
+		for _, o in (gen & {_input: obj})._output {o},
+	]
+
+	_imported_objects: [
+		for _, import in _IMPORTS
+		for _, obj in ({extra: unused: "unused"} & import).export.objects {obj},
+	]
+
+	objects: [
+		for _, obj in _OBJECTS {obj},
+		for _, obj in _generated_objects {obj},
+		for _, obj in _imported_objects {obj},
+	]
+}
+export: _libexport & {
+	_IMPORTS: [_imported]
+} @test(eq, at=objects, [
+	{_neverTrue: false, alwaysSet: "foo", name: "name1", spec: {image: "image1"}},
+	{generated: true},
+])
+
+_imported: {
+	export: _libexport & {
+		_OBJECTS: objects
+		_GENERATORS: [_Service]
+	}
+
+	objects: [KIND=string]: {
+		_neverTrue: strings.HasPrefix(KIND, "NEVER")
+		if !_neverTrue {
+			alwaysSet: "foo"
+		}
+	}
+	objects: deployment: {
+		name: "name1"
+		spec: image: "image1"
+	}
+}
+_Service: {
+	_input: {...}
+
+	for _, image in [_input.spec.image] {}
+
+	_service: (_input.name): generated: true
+	_output: [for _, svc in _service {svc}]
+}
+-- out/compile --
+--- in.cue
+{
+  _libexport: {
+    _OBJECTS: {
+      ...
+    }
+    _IMPORTS: [
+      ...,
+    ]
+    _GENERATORS: [
+      ...,
+    ]
+    _generated_objects: [
+      for _, obj in 〈1;_OBJECTS〉 for _, gen in 〈2;_GENERATORS〉 for _, o in (〈0;gen〉 & {
+        _input: 〈2;obj〉
+      })._output {
+        〈1;o〉
+      },
+    ]
+    _imported_objects: [
+      for _, import in 〈1;_IMPORTS〉 for _, obj in ({
+        extra: {
+          unused: "unused"
+        }
+      } & 〈0;import〉).export.objects {
+        〈1;obj〉
+      },
+    ]
+    objects: [
+      for _, obj in 〈1;_OBJECTS〉 {
+        〈1;obj〉
+      },
+      for _, obj in 〈1;_generated_objects〉 {
+        〈1;obj〉
+      },
+      for _, obj in 〈1;_imported_objects〉 {
+        〈1;obj〉
+      },
+    ]
+  }
+  export: (〈0;_libexport〉 & {
+    _IMPORTS: [
+      〈2;_imported〉,
+    ]
+  })
+  _imported: {
+    export: (〈1;_libexport〉 & {
+      _OBJECTS: 〈1;objects〉
+      _GENERATORS: [
+        〈3;_Service〉,
+      ]
+    })
+    objects: {
+      [string]: {
+        _neverTrue: 〈import;strings〉.HasPrefix(〈1;-〉, "NEVER")
+        if !〈0;_neverTrue〉 {
+          alwaysSet: "foo"
+        }
+      }
+    }
+    objects: {
+      deployment: {
+        name: "name1"
+        spec: {
+          image: "image1"
+        }
+      }
+    }
+  }
+  _Service: {
+    _input: {
+      ...
+    }
+    for _, image in [
+      〈1;_input〉.spec.image,
+    ] {}
+    _service: {
+      〈1;_input〉.name: {
+        generated: true
+      }
+    }
+    _output: [
+      for _, svc in 〈1;_service〉 {
+        〈1;svc〉
+      },
+    ]
+  }
+}

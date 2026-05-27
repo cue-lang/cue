@@ -23,24 +23,6 @@ foo: #Task & {"op": "pull"} @test(eq, {
 	tagExpr: "latestdd"
 	tagInString: "latest"
 })
--- out/compile --
---- in.cue
-{
-  #Task: {
-    ({
-      op: "pull"
-      tag: (*"latest"|string)
-      refToTag: 〈0;tag〉
-      tagExpr: (〈0;tag〉 + "dd")
-      tagInString: "\(〈0;tag〉)"
-    }|{
-      op: "scratch"
-    })
-  }
-  foo: (〈0;#Task〉 & {
-    op: "pull"
-  })
-}
 -- out/eval/stats --
 Leaks:  8
 Freed:  16

@@ -21,24 +21,6 @@ c2: #C2 & {
 	c1
 	age: 5
 } @test(eq, {age: 5, name: "cueckoo"})
--- out/compile --
---- x.cue
-{
-  #C1: {
-    name: string
-  }
-  #C2: {
-    〈1;#C1〉
-    age: int
-  }
-  c1: (〈0;#C1〉 & {
-    name: "cueckoo"
-  })
-  c2: (〈0;#C2〉 & {
-    〈1;c1〉
-    age: 5
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  11

@@ -24,28 +24,3 @@ x: {
 
 	gateway: whoami2: {}
 } @test(eq, at=gateway.whoami2, {foo: 1, k8s: {foo: 1}})
--- out/compile --
---- in.cue
-{
-  x: {
-    #tmpl: {
-      let _self#1 = 〈1〉
-      foo: 1
-      k8s: {
-        foo: 〈1;let _self#1〉.foo
-      }
-    }
-    #allowed: =~"^[a-z0-9]+$"
-    [string]: {
-      [string]: {
-        〈2;#tmpl〉
-        if ((〈2;#allowed〉 & 〈1;-〉) == _|_(explicit error (_|_ literal) in source)) {
-          error("bad: \(〈2;-〉)")
-        }
-      }
-    }
-    gateway: {
-      whoami2: {}
-    }
-  }
-}

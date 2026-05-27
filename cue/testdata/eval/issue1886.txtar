@@ -86,28 +86,3 @@ cycle.b: cycle with field: a:
 [incomplete] incompleteTwo._t: invalid interpolation: non-concrete value string (type string):
     ./in.cue:54:3
     ./in.cue:53:7
--- out/compile --
---- in.cue
-{
-  cycle: {
-    x: 200
-    x: (〈0;y〉 + 100)
-    y: (〈0;x〉 - 100)
-    a: (〈0;b〉 + 100)
-    b: (〈0;a〉 - 100)
-  }
-  incompleteOne: {
-    _t: {
-      #p: string
-      "hello \(〈0;#p〉)"
-    }
-    r: "\(〈0;_t〉)"
-  }
-  incompleteTwo: {
-    r: "\(〈0;_t〉)"
-    _t: {
-      #p: string
-      "hello \(〈0;#p〉)"
-    }
-  }
-}

@@ -16,25 +16,6 @@ t1: {
 		}
 	})
 }
--- out/compile --
---- in.cue
-{
-  t1: {
-    fn: {
-      arg: ([
-        ...int,
-      ] & [
-        1,
-      ])
-      out: 〈0;arg〉[1:]
-    }
-    fn1: (〈0;fn〉 & {
-      arg: [
-        1,
-      ]
-    })
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

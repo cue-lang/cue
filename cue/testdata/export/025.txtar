@@ -12,24 +12,6 @@ eval: true
 	a: int
 	c: *1 | 2
 }
--- out/compile --
---- in.cue
-{
-  {
-    b: [
-      {
-        {
-          [_]: int
-        }
-        if (〈2;a〉 > 4) {
-          f: 4
-        }
-      },
-    ][〈0;a〉]
-    a: int
-    c: (*1|2)
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  8

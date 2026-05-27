@@ -10,33 +10,6 @@ import "list"
 	e: [1, 2, ...]
 	f: [1, 2, ...]
 }
--- out/compile --
---- in.cue
-{
-  {
-    a: 〈import;list〉.Repeat([
-      int,
-    ], 5)
-    a: [
-      1,
-      2,
-      ...,
-    ]
-    e: [
-      ...int,
-    ]
-    e: [
-      1,
-      2,
-      ...,
-    ]
-    f: [
-      1,
-      2,
-      ...,
-    ]
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  15

@@ -99,44 +99,5 @@ Disjuncts:    736
 Notifications: 5
 
 NumCloseIDs: 241
--- out/compile --
---- in.cue
-{
-  t1: {
-    〈0;a〉
-    a: {
-      a: (2|1)
-    }
-  }
-  t2: {
-    d: 〈0;d〉.a
-    d: {
-      a: {
-        a: (2|1)
-      }
-    }
-  }
-  t3: {
-    b: 〈0;a〉
-    b: ((1|2)|2)
-    a: (1|2)
-  }
-}
---- issue3437.cue
-{
-  issue3437: {
-    r: 〈0〉.a
-    d: {
-      a: {
-        a: {
-          a: ({
-            b: 4
-          }|〈3;d〉)
-        }
-      }
-    }
-    out: (〈0;r〉 & 〈0;d〉)
-  }
-}
 -- out/todo.txt --
 v3 reports error messages with different operand ordering ("conflicting values {a,...} and 1" vs v2's "conflicting values 1 and {a:(2|1)}").

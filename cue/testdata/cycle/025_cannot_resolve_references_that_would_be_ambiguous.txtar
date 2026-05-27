@@ -25,27 +25,6 @@ a1: 2 errors in empty disjunction::
     ./in.cue:4:10
 a2: unresolved disjunction: a1:
     ./in.cue:4:10
--- out/compile --
---- in.cue
-{
-  a1: (*0|1)
-  a1: (〈0;a3〉 - 〈0;a2〉)
-  a2: (*0|1)
-  a2: (〈0;a3〉 - 〈0;a1〉)
-  a3: 1
-  b1: ((*0|1) & 〈0;b2〉)
-  b2: ((0|*1) & 〈0;b1〉)
-  c1: ((*{
-    a: 1
-  }|{
-    b: 1
-  }) & 〈0;c2〉)
-  c2: ((*{
-    a: 2
-  }|{
-    b: 2
-  }) & 〈0;c1〉)
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  52

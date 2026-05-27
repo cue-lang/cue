@@ -1,0 +1,792 @@
+# Tests that chaining existing fields through comprehensions and builtins does
+# not trigger spurious cycle detection errors.
+-- in.cue --
+import "list"
+
+// The following just chains existing fields and should NOT trigger a cycle
+// detection error.
+
+
+chain: t1: {
+	#maxiter: 2
+
+	// Trigger lookup of a.x0 before the "regular" evaluation of a.
+	x: a.x0
+
+	a: {
+		for k, _ in [0, 1] {
+			"x\(k)": (#DepthF & {#in: a["x\(k+1)"]}).#out
+		}
+	}
+
+	a: x2: null
+
+
+	#DepthF: {
+		#in: _
+		#out: {}
+	}
+	@test(eq, {
+		#maxiter: 2
+		x: {}
+		a: {x2: null, x0: {}, x1: {}}
+		#DepthF: {#in: _, #out: {}}
+	})
+}
+
+chain: t2: p1: {
+	X: 1
+
+	// Reference X through x.x0 before X is inserted.
+	for v in list.Concat([[0, X], []]) {
+		x: "x\(v)": {}
+	}
+
+	x: _
+
+	x.x0
+	@test(eq, {X: 1, x: {x0: {}, x1: {}}})
+}
+
+chain: t2: p2: {
+	// Reference X through x.x0 before X is inserted.
+	for v in list.Concat([[0, X], []]) {
+		x: "x\(v)": {}
+	}
+
+	x: _
+
+	x.x0
+
+	X: 1
+	@test(eq, {x: {x0: {}, x1: {}}, X: 1})
+}
+
+chain: t3: p1: {
+	X: 1
+
+	for v in list.Range(0, X, 1) {
+		x: "x\(v)": {}
+	}
+
+	x: _
+
+	x.x0
+}
+
+chain: t3: p1: {
+	for v in list.Range(0, X, 1) {
+		x: "x\(v)": {}
+	}
+
+	x: _
+
+	x.x0
+
+	X: 1
+	@test(eq, {X: 1, x: {x0: {}}})
+}
+
+-- issue2052.cue --
+// Bounded recursion regression: a pattern that evaluated correctly in v0.4.3
+// began failing in v0.5.0-alpha.1 with spurious unbounded recursion errors.
+// https://cuelang.org/issue/2052
+import (
+	"list"
+	"math"
+)
+issue2052: reduced: t1: {
+	A: a: _
+	Depth: {
+		#maxiter: 1
+		if math.Abs(#maxiter) == 1 {
+			funcs: "\(0)": A
+		}
+		funcs: {}
+		funcs["0"]
+	}
+	@test(eq, {
+		A: {a: _}
+		Depth: {
+			#maxiter: 1
+			funcs: {"0": {a: _}}
+			a: _
+		}
+	})
+}
+issue2052: reduced: t2: {
+	A: a: _
+	Depth: {
+		maxiter: 1
+		for k, v in list.Range(0, maxiter, 1) {
+			funcs: "\(0)": A
+		}
+		funcs: {}
+		funcs["0"]
+	}
+	@test(eq, {
+		A: {a: _}
+		Depth: {maxiter: 1, funcs: {"0": {a: _}}, a: _}
+	})
+}
+issue2052: medium: t1: {
+	#Depth: {
+		#maxiter: 4
+
+		for k, v in list.Range(0, #maxiter, 1) {
+			#funcs: "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+		}
+
+		#funcs: "\(#maxiter)": null
+
+		#funcs["0"]
+	}
+
+	#DepthF: {
+		#next: _
+		#func: {
+			#in:    _
+			#basic: string | null
+			out: {
+				if (#in & #basic) != _|_ {1}
+				if (#in & #basic) == _|_ {
+					list.Max([for k, v in #in {(#next & {#in: v}).out}]) + 1
+				}
+			}
+		}
+	}
+
+	tree: "bar"
+
+	d: #Depth & {#in: tree}
+
+	@test(eq, {
+		#Depth: {
+			#maxiter: 4
+			#funcs: {
+				"4": null
+				"0": {#in: _, #basic: string | null, out: 1}
+				"1": {#in: _, #basic: string | null, out: 1}
+				"2": {#in: _, #basic: string | null, out: 1}
+				"3": {#in: _, #basic: string | null, out: 1}
+			}
+			#in: _
+			#basic: string | null
+			out: 1
+		}
+		#DepthF: {
+			#next: _
+			#func: {#in: _, #basic: string | null, out: 1}
+		}
+		tree: "bar"
+		d: {
+			#in: "bar"
+			#maxiter: 4
+			#funcs: {
+				"4": null
+				"0": {#in: _, #basic: string | null, out: 1}
+				"1": {#in: _, #basic: string | null, out: 1}
+				"2": {#in: _, #basic: string | null, out: 1}
+				"3": {#in: _, #basic: string | null, out: 1}
+			}
+			#basic: string | null
+			out: 1
+		}
+	})
+}
+
+issue2052: medium: t2: {
+	#Depth: {
+		#maxiter: 4
+
+		for k, v in list.Range(0, #maxiter, 1) {
+			#funcs: "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+		}
+
+		#funcs:{
+			for k, v in list.Range(0, #maxiter, 1) {
+				 "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+			}
+		}
+
+		#funcs: "\(#maxiter)": null
+
+		#funcs["0"]
+	}
+
+	#DepthF: {
+		#next: _
+		#func: {
+			#in:    _
+			#basic: string | null
+			out: {
+				if (#in & #basic) != _|_ {1}
+				if (#in & #basic) == _|_ {
+					list.Max([for k, v in #in {(#next & {#in: v}).out}]) + 1
+				}
+			}
+		}
+	}
+
+	tree: "bar"
+
+	d: #Depth & {#in: tree}
+	@test(eq, {
+		#Depth: {
+			#maxiter: 4
+			#funcs: {
+				"4": null
+				"0": {#in: _, #basic: string | null, out: 1}
+				"1": {#in: _, #basic: string | null, out: 1}
+				"2": {#in: _, #basic: string | null, out: 1}
+				"3": {#in: _, #basic: string | null, out: 1}
+			}
+			#in: _
+			#basic: string | null
+			out: 1
+		}
+		#DepthF: {
+			#next: _
+			#func: {#in: _, #basic: string | null, out: 1}
+		}
+		tree: "bar"
+		d: {
+			#in: "bar"
+			#maxiter: 4
+			#funcs: {
+				"4": null
+				"0": {#in: _, #basic: string | null, out: 1}
+				"1": {#in: _, #basic: string | null, out: 1}
+				"2": {#in: _, #basic: string | null, out: 1}
+				"3": {#in: _, #basic: string | null, out: 1}
+			}
+			#basic: string | null
+			out: 1
+		}
+	})
+}
+
+issue2052: full: {
+	#RecurseN: {
+		// this is the bound on our recursion
+		#maxiter: uint | *4
+
+		// This is the function list element
+		// we generate this to simulate recursion
+		#funcFactory: {
+			#next: _
+			#func: _
+		}
+
+		// this is our "recursion unrolling"
+		for k, v in list.Range(0, #maxiter, 1) {
+			// this is where we build up our indexed functions and the references between them
+			#funcs: "\(k)": (#funcFactory & {#next: #funcs["\(k+1)"]}).#func
+		}
+
+		// our final value needs to be null
+		#funcs: "\(#maxiter)": null
+
+		// we embed the head of the list so that the values
+		// we write this into can be used like other CUE "functions"
+		#funcs["0"]
+	}
+
+	#DepthF: {
+		#next: _
+		#func: {
+			#in:    _
+			#basic: int | number | string | bytes | null
+			out: {
+				// if we have a basic type, we are at a leaf, depth is 1
+				if (#in & #basic) != _|_ {1}
+
+				// if we are not a basic type, then we are 1 + the max of children
+				if (#in & #basic) == _|_ {
+					// this is our "recursion" for each child
+					let depths = [for k, v in #in {(#next & {#in: v}).out}]
+					list.Max(depths) + 1
+				}
+			}
+		}
+	}
+
+	#Depth: #RecurseN & {#maxiter: 11, #funcFactory: #DepthF}
+
+	tree: {
+		a: {
+			foo: "bar"
+			a: b: c: "d"
+		}
+		cow: "moo"
+	}
+
+	d: #Depth & {#in: tree}
+	@test(eq, {
+		#RecurseN: {
+			#maxiter: *4 | >=0 & int
+			#funcFactory: {#next: _, #func: _}
+			#funcs: {
+				"4": null
+				"0": _
+				"1": _
+				"2": _
+				"3": _
+			}
+		}
+		#DepthF: {
+			#next: _
+			#func: {
+				#in: _
+				#basic: int | number | string | bytes | null
+				out: {1}
+			}
+		}
+		#Depth: {
+			#maxiter: 11
+			#funcFactory: {
+				#next: _
+				#func: {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+			}
+			#funcs: {
+				"11": null
+				"0": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"1": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"2": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"3": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"4": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"5": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"6": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"7": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"8": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"9": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"10": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+			}
+			#in: _
+			#basic: int | number | string | bytes | null
+			out: {1}
+		}
+		tree: {
+			a: {foo: "bar", a: {b: {c: "d"}}}
+			cow: "moo"
+		}
+		d: {
+			#in: {
+				a: {foo: "bar", a: {b: {c: "d"}}}
+				cow: "moo"
+			}
+			#maxiter: 11
+			#funcFactory: {
+				#next: _
+				#func: {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+			}
+			#funcs: {
+				"11": null
+				"0": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"1": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"2": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"3": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"4": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"5": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"6": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"7": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"8": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"9": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+				"10": {
+					#in: _
+					#basic: int | number | string | bytes | null
+					out: {1}
+				}
+			}
+			#basic: int | number | string | bytes | null
+			out: {5}
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  chain: {
+    t1: {
+      #maxiter: 2
+      x: 〈0;a〉.x0
+      a: {
+        for k, _ in [
+          0,
+          1,
+        ] {
+          "x\(〈1;k〉)": (〈3;#DepthF〉 & {
+            #in: 〈4;a〉["x\((〈2;k〉 + 1))"]
+          }).#out
+        }
+      }
+      a: {
+        x2: null
+      }
+      #DepthF: {
+        #in: _
+        #out: {}
+      }
+    }
+  }
+  chain: {
+    t2: {
+      p1: {
+        X: 1
+        for _, v in 〈import;list〉.Concat([
+          [
+            0,
+            〈2;X〉,
+          ],
+          [],
+        ]) {
+          x: {
+            "x\(〈2;v〉)": {}
+          }
+        }
+        x: _
+        〈0;x〉.x0
+      }
+    }
+  }
+  chain: {
+    t2: {
+      p2: {
+        for _, v in 〈import;list〉.Concat([
+          [
+            0,
+            〈2;X〉,
+          ],
+          [],
+        ]) {
+          x: {
+            "x\(〈2;v〉)": {}
+          }
+        }
+        x: _
+        〈0;x〉.x0
+        X: 1
+      }
+    }
+  }
+  chain: {
+    t3: {
+      p1: {
+        X: 1
+        for _, v in 〈import;list〉.Range(0, 〈0;X〉, 1) {
+          x: {
+            "x\(〈2;v〉)": {}
+          }
+        }
+        x: _
+        〈0;x〉.x0
+      }
+    }
+  }
+  chain: {
+    t3: {
+      p1: {
+        for _, v in 〈import;list〉.Range(0, 〈0;X〉, 1) {
+          x: {
+            "x\(〈2;v〉)": {}
+          }
+        }
+        x: _
+        〈0;x〉.x0
+        X: 1
+      }
+    }
+  }
+}
+--- issue2052.cue
+{
+  issue2052: {
+    reduced: {
+      t1: {
+        A: {
+          a: _
+        }
+        Depth: {
+          #maxiter: 1
+          if (〈import;math〉.Abs(〈0;#maxiter〉) == 1) {
+            funcs: {
+              "\(0)": 〈3;A〉
+            }
+          }
+          funcs: {}
+          〈0;funcs〉["0"]
+        }
+      }
+    }
+  }
+  issue2052: {
+    reduced: {
+      t2: {
+        A: {
+          a: _
+        }
+        Depth: {
+          maxiter: 1
+          for k, v in 〈import;list〉.Range(0, 〈0;maxiter〉, 1) {
+            funcs: {
+              "\(0)": 〈4;A〉
+            }
+          }
+          funcs: {}
+          〈0;funcs〉["0"]
+        }
+      }
+    }
+  }
+  issue2052: {
+    medium: {
+      t1: {
+        #Depth: {
+          #maxiter: 4
+          for k, v in 〈import;list〉.Range(0, 〈0;#maxiter〉, 1) {
+            #funcs: {
+              "\(〈2;k〉)": (〈4;#DepthF〉 & {
+                #next: 〈2;#funcs〉["\((〈3;k〉 + 1))"]
+              }).#func
+            }
+          }
+          #funcs: {
+            "\(〈1;#maxiter〉)": null
+          }
+          〈0;#funcs〉["0"]
+        }
+        #DepthF: {
+          #next: _
+          #func: {
+            #in: _
+            #basic: (string|null)
+            out: {
+              if ((〈1;#in〉 & 〈1;#basic〉) != _|_(explicit error (_|_ literal) in source)) {
+                1
+              }
+              if ((〈1;#in〉 & 〈1;#basic〉) == _|_(explicit error (_|_ literal) in source)) {
+                (〈import;list〉.Max([
+                  for k, v in 〈3;#in〉 {
+                    (〈6;#next〉 & {
+                      #in: 〈2;v〉
+                    }).out
+                  },
+                ]) + 1)
+              }
+            }
+          }
+        }
+        tree: "bar"
+        d: (〈0;#Depth〉 & {
+          #in: 〈1;tree〉
+        })
+      }
+    }
+  }
+  issue2052: {
+    medium: {
+      t2: {
+        #Depth: {
+          #maxiter: 4
+          for k, v in 〈import;list〉.Range(0, 〈0;#maxiter〉, 1) {
+            #funcs: {
+              "\(〈2;k〉)": (〈4;#DepthF〉 & {
+                #next: 〈2;#funcs〉["\((〈3;k〉 + 1))"]
+              }).#func
+            }
+          }
+          #funcs: {
+            for k, v in 〈import;list〉.Range(0, 〈1;#maxiter〉, 1) {
+              "\(〈1;k〉)": (〈4;#DepthF〉 & {
+                #next: 〈4;#funcs〉["\((〈2;k〉 + 1))"]
+              }).#func
+            }
+          }
+          #funcs: {
+            "\(〈1;#maxiter〉)": null
+          }
+          〈0;#funcs〉["0"]
+        }
+        #DepthF: {
+          #next: _
+          #func: {
+            #in: _
+            #basic: (string|null)
+            out: {
+              if ((〈1;#in〉 & 〈1;#basic〉) != _|_(explicit error (_|_ literal) in source)) {
+                1
+              }
+              if ((〈1;#in〉 & 〈1;#basic〉) == _|_(explicit error (_|_ literal) in source)) {
+                (〈import;list〉.Max([
+                  for k, v in 〈3;#in〉 {
+                    (〈6;#next〉 & {
+                      #in: 〈2;v〉
+                    }).out
+                  },
+                ]) + 1)
+              }
+            }
+          }
+        }
+        tree: "bar"
+        d: (〈0;#Depth〉 & {
+          #in: 〈1;tree〉
+        })
+      }
+    }
+  }
+  issue2052: {
+    full: {
+      #RecurseN: {
+        #maxiter: (&(int, >=0)|*4)
+        #funcFactory: {
+          #next: _
+          #func: _
+        }
+        for k, v in 〈import;list〉.Range(0, 〈0;#maxiter〉, 1) {
+          #funcs: {
+            "\(〈2;k〉)": (〈3;#funcFactory〉 & {
+              #next: 〈2;#funcs〉["\((〈3;k〉 + 1))"]
+            }).#func
+          }
+        }
+        #funcs: {
+          "\(〈1;#maxiter〉)": null
+        }
+        〈0;#funcs〉["0"]
+      }
+      #DepthF: {
+        #next: _
+        #func: {
+          #in: _
+          #basic: (int|number|string|bytes|null)
+          out: {
+            if ((〈1;#in〉 & 〈1;#basic〉) != _|_(explicit error (_|_ literal) in source)) {
+              1
+            }
+            if ((〈1;#in〉 & 〈1;#basic〉) == _|_(explicit error (_|_ literal) in source)) {
+              let depths#1 = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
+              (〈import;list〉.Max(〈0;let depths#1〉) + 1)
+            }
+          }
+        }
+      }
+      #Depth: (〈0;#RecurseN〉 & {
+        #maxiter: 11
+        #funcFactory: 〈1;#DepthF〉
+      })
+      tree: {
+        a: {
+          foo: "bar"
+          a: {
+            b: {
+              c: "d"
+            }
+          }
+        }
+        cow: "moo"
+      }
+      d: (〈0;#Depth〉 & {
+        #in: 〈1;tree〉
+      })
+    }
+  }
+}

@@ -2,14 +2,6 @@ raw: true
 #inlinetest:exclude skip — tests export format, not evaluator semantics
 -- in.cue --
 {a: *"foo" | *"bar" | *string | int, b: a[2:3]}
--- out/compile --
---- in.cue
-{
-  {
-    a: (*"foo"|*"bar"|*string|int)
-    b: 〈0;a〉[2:3]
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

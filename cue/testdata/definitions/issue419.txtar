@@ -36,22 +36,3 @@ Conjuncts:    24
 Disjuncts:    4
 
 NumCloseIDs: 5
--- out/compile --
---- in.cue
-{
-  #A: {
-    a: string
-  }
-  #B: {
-    b: string
-  }
-  #X: (〈0;#A〉|〈0;#B〉)
-  l: [
-    ...〈1;#X〉,
-  ]
-  l: [
-    {
-      b: "bar"
-    },
-  ]
-}

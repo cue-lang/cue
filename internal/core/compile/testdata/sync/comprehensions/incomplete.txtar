@@ -1,0 +1,23 @@
+-- in.cue --
+cond: bool
+src: {}
+top: _
+a: [ if cond {}]         @test(err, code=incomplete, pos=[-3:7], contains="incomplete bool")
+b: [for x in src.foo {}] @test(err, code=incomplete, pos=[0:18], contains="undefined field")
+c: {for x in top {}}     @test(err, code=incomplete, pos=[0:14], contains="cannot range")
+-- out/compile --
+--- in.cue
+{
+  cond: bool
+  src: {}
+  top: _
+  a: [
+    if 〈1;cond〉 {},
+  ]
+  b: [
+    for _, x in 〈1;src〉.foo {},
+  ]
+  c: {
+    for _, x in 〈1;top〉 {}
+  }
+}

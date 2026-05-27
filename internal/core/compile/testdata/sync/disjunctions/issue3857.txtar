@@ -1,0 +1,175 @@
+# Tests that disjunctions combined with comprehensions and pattern constraints
+# do not cause panics in the v3 evaluator. The issue reported crashes in
+# Vertex.DerefValue and Environment.up for code that worked correctly in evalv2.
+# https://cuelang.org/issue/3857
+-- in.cue --
+reduced: t1: {
+	S: { if true { a: U } }
+	x: S
+	x: {
+	["a"]: b: 1 | T
+	d: b: x.a
+	}
+	T: 1
+	U: b: 1 | 1
+	@test(eq, {
+		S: {a: {b: 1}}
+		x: {d: {b: {b: 1}}, a: {b: 1}}
+		T: 1
+		U: {b: 1}
+	})
+}
+// issue3851: evalv3 incorrectly rejects a let field nested under multiple
+// disjunctions with "field not allowed", a regression not present in evalv2.
+// https://cuelang.org/issue/3851
+issue3851: t1: {
+	#Top: _
+	#Config: {
+	disj: _ | *"default"
+	shared: _
+	}
+
+	#Schema: {
+	[string]: #Config
+	if true {
+		one: shared: "foo"
+	}
+	}
+
+	out: #Schema
+	out: {
+	["one"]: disj: _ | #Top
+	two: shared: out.one.shared
+	}
+	@test(eq, {
+		#Top: _
+		#Config: {disj: *"default" | _, shared: _}
+		#Schema: {
+			one: {shared: "foo", disj: *"default" | _}
+		}
+		out: {
+			two: {shared: "foo", disj: *"default" | _}
+			one: {shared: "foo", disj: *"default" | _}
+		}
+	})
+}
+issue3851: t2: {
+	#Top: _
+	#Config: {
+	disj: _ | *{}
+	shared: _
+	}
+
+	#Env: {
+	conf: [string]: #Config
+	if true {
+		conf: one: shared: "foo"
+	}
+	}
+
+	env1: #Env
+
+	[string]: {
+	conf: ["one"]: disj: {} | #Top
+	conf: two: shared: conf.one.shared
+	}
+	@test(eq, {
+		#Top: _
+		#Config: {disj: *{} | _, shared: _}
+		#Env: {
+			conf: {one: {shared: "foo", disj: *{} | _}}
+		}
+		env1: {
+			conf: {
+				two: {shared: "foo", disj: *{} | _}
+				one: {shared: "foo", disj: *{} | _}
+			}
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  reduced: {
+    t1: {
+      S: {
+        if true {
+          a: 〈2;U〉
+        }
+      }
+      x: 〈0;S〉
+      x: {
+        ["a"]: {
+          b: (1|〈2;T〉)
+        }
+        d: {
+          b: 〈2;x〉.a
+        }
+      }
+      T: 1
+      U: {
+        b: (1|1)
+      }
+    }
+  }
+  issue3851: {
+    t1: {
+      #Top: _
+      #Config: {
+        disj: (_|*"default")
+        shared: _
+      }
+      #Schema: {
+        [string]: 〈1;#Config〉
+        if true {
+          one: {
+            shared: "foo"
+          }
+        }
+      }
+      out: 〈0;#Schema〉
+      out: {
+        ["one"]: {
+          disj: (_|〈2;#Top〉)
+        }
+        two: {
+          shared: 〈2;out〉.one.shared
+        }
+      }
+    }
+  }
+  issue3851: {
+    t2: {
+      #Top: _
+      #Config: {
+        disj: (_|*{})
+        shared: _
+      }
+      #Env: {
+        conf: {
+          [string]: 〈2;#Config〉
+        }
+        if true {
+          conf: {
+            one: {
+              shared: "foo"
+            }
+          }
+        }
+      }
+      env1: 〈0;#Env〉
+      [string]: {
+        conf: {
+          ["one"]: {
+            disj: ({}|〈3;#Top〉)
+          }
+        }
+        conf: {
+          two: {
+            shared: 〈2;conf〉.one.shared
+          }
+        }
+      }
+    }
+  }
+}

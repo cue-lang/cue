@@ -1,0 +1,42 @@
+# Tests that close() correctly rejects fields not present in the closed struct
+# when the closed value is later unified with an open struct adding new fields.
+# https://cuelang.org/issue/490
+-- test.cue --
+A: close({
+	a: 1
+	b: 2
+}) @test(eq, {a: 1, b: 2})
+
+B: A & {
+	c: 3
+} @test(err, code=eval, at=c, contains="field not allowed", pos=[1:2])
+
+@test(debugCheck, """
+	(_|_){
+	  // [eval]
+	  A: (#struct){
+	    a: (int){ 1 }
+	    b: (int){ 2 }
+	  }
+	  B: (_|_){
+	    // [eval]
+	    c: (_|_){
+	      // [eval] B.c: field not allowed:
+	      //     test.cue:7:2
+	    }
+	    a: (int){ 1 }
+	    b: (int){ 2 }
+	  }
+	}
+	""")
+-- out/compile --
+--- test.cue
+{
+  A: close({
+    a: 1
+    b: 2
+  })
+  B: (〈0;A〉 & {
+    c: 3
+  })
+}

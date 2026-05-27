@@ -1,0 +1,306 @@
+-- in.cue --
+#OneOrTwo: #One | #Two
+#One: {
+	kind: "one"
+	one: oneField: "value"
+}
+#Two: {
+	kind: "two"
+	two: optional?: string
+}
+_appDefaults: two: two: optional: *"optional set" | string
+
+// Use a discriminator field to disambiguation additional per-disjunct
+// information.
+valueDiscriminator: crossing: {
+	out: #Application & { oneOrTwo: kind: "two" }
+	#Application: {
+		oneOrTwo: #OneOrTwo
+		// oneOrTwo.kind resolves will resolve to "two" regardless of whether
+		// it resolves to the original oneOrTwo or the disjunct that is being
+		// processed.
+		oneOrTwo: *_appDefaults[oneOrTwo.kind] | _
+	}
+	@test(eq, {
+		out: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "two", two: {optional?: string}}
+		}
+		#Application: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "one", one: {oneField: "value"}} |
+				 {kind: "two", two: {optional?: string}}
+		}
+	})
+}
+
+valueDiscriminator: local: {
+	out: #Application & { oneOrTwo: kind: "two" }
+	#Application: {
+		oneOrTwo: #OneOrTwo
+		// oneOrTwo.kind always resolves to the value of the disjunct.
+		// Alternative writing for future features based on various proposals:
+		// oneOrTwo~X: *_appDefaults[X.kind] | _
+		// oneOrTwo: *_appDefaults[self.kind] | _
+		// try { oneOrTwo: _appDefaults.(self.kind)? }
+		oneOrTwo: X={ *_appDefaults[X.kind] | _ }
+	}
+	@test(eq, {
+		out: oneOrTwo:
+			*{kind: "two", two: {optional: *"optional set" | string}} |
+				{kind: "two", two: {optional?: string}}
+		#Application: oneOrTwo:
+			*{kind: "two", two: {optional: *"optional set" | string}} |
+				{kind: "one", one: {oneField: "value"}} |
+				{kind: "two", two: {optional?: string}}
+	})
+}
+
+// Use a value that is available AFTER a disjunction is resolved to augment
+// values. We may not want to support this in perpetuity, as this relies on
+// closedness to discrimnate the disjuncts. But for now, as there is no
+// alternative to discriminating based on fields, we will support it.
+fieldDiscriminator: crossing:{
+	out: #Application & { oneOrTwo: two: {} }
+	#Application: {
+		oneOrTwo: #OneOrTwo
+		// The value of oneOrTwo.kind depends on whether oneOrTwo resolves
+		// to the disjunct currently being processed, the original before
+		// a disjunct has been selected, or a disjunct after it has been
+		// selected.
+		oneOrTwo: *_appDefaults[oneOrTwo.kind] | _
+	}
+	@test(eq, {
+		out: oneOrTwo:
+			*{two: {optional: *"optional set" | string}, kind: "two"} |
+				{two: {optional?: string}, kind: "two"}
+		#Application: oneOrTwo:
+			*{kind: "two", two: {optional: *"optional set" | string}} |
+				{kind: "one", one: {oneField: "value"}} |
+				{kind: "two", two: {optional?: string}}
+	})
+}
+
+fieldDiscriminator: local:{
+	out: #Application & { oneOrTwo: two: {} }
+	#Application: {
+		oneOrTwo: #OneOrTwo
+		// oneOrTwo.kind always resolves to the value of the disjunct.
+		oneOrTwo: X={ *_appDefaults[X.kind] | _ }
+	}
+	@test(eq, {
+		out: {
+			oneOrTwo:
+				*{two: {optional: *"optional set" | string}, kind: "two"} |
+				 {two: {optional?: string}, kind: "two"}
+		}
+		#Application: {
+			oneOrTwo:
+				*{kind: "two", two: {optional: *"optional set" | string}} |
+				 {kind: "one", one: {oneField: "value"}} |
+				 {kind: "two", two: {optional?: string}}
+		}
+	})
+}
+
+// Do not hide error messages. Here, the inner failure of both disjuncts means
+// that an enclosing field cannot be resolved as it needs to look up a value
+// inside the disjunction. The failure to do this lookup is not the underlying
+// cause, though: the inner failure is. For this reason, we should report all
+// errors.
+// evalv3 regression: misleading "undefined field" error instead of the expected
+// circular dependency error when processing disjunctions with cyclic conditionals.
+// https://cuelang.org/issue/3967
+issue3967: error: nested: {
+	out: #Application & {
+		oneOrTwo: two: {}
+	}
+	#Application: X={
+		oneOrTwo: #OneOrTwo & {
+			if X.oneOrTwo.kind == "two" {
+				two: {
+					if X.oneOrTwo.two.optional == _|_ {
+						optional: "optional set"
+					}
+				}
+			}
+			if X.oneOrTwo.kind == "never" {
+			}
+		}
+		if X.oneOrTwo.kind == "never" {
+		}
+	}
+	@test(eq, {
+		out: {oneOrTwo: {two: {}}}
+		#Application: {
+			oneOrTwo: {kind: "one", one: {oneField: "value"}}
+		}
+	})
+}
+issue3967: {
+	error: local: {
+		out: #Application & {
+			oneOrTwo: two: {}
+		}
+		#Application: {
+			oneOrTwo: X= { #OneOrTwo & {
+				if X.kind == "two" {
+					two: {
+						if X.two.optional == _|_ {
+							optional: "optional set"
+						}
+					}
+				}
+				if X.kind == "never" {
+				}
+			}}
+		}
+	}
+	@test(eq, {
+		error: {
+			nested: {
+				out: {oneOrTwo: {two: {}}}
+				#Application: {
+					oneOrTwo: {kind: "one", one: {oneField: "value"}}
+				}
+			}
+			local: {
+				out: {oneOrTwo: {two: {}}}
+				#Application: {
+					oneOrTwo: {kind: "one", one: {oneField: "value"}}
+				}
+			}
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  #OneOrTwo: (〈0;#One〉|〈0;#Two〉)
+  #One: {
+    kind: "one"
+    one: {
+      oneField: "value"
+    }
+  }
+  #Two: {
+    kind: "two"
+    two: {
+      optional?: string
+    }
+  }
+  _appDefaults: {
+    two: {
+      two: {
+        optional: (*"optional set"|string)
+      }
+    }
+  }
+  valueDiscriminator: {
+    crossing: {
+      out: (〈0;#Application〉 & {
+        oneOrTwo: {
+          kind: "two"
+        }
+      })
+      #Application: {
+        oneOrTwo: 〈3;#OneOrTwo〉
+        oneOrTwo: (*〈3;_appDefaults〉[〈0;oneOrTwo〉.kind]|_)
+      }
+    }
+  }
+  valueDiscriminator: {
+    local: {
+      out: (〈0;#Application〉 & {
+        oneOrTwo: {
+          kind: "two"
+        }
+      })
+      #Application: {
+        oneOrTwo: 〈3;#OneOrTwo〉
+        oneOrTwo: {
+          (*〈4;_appDefaults〉[〈1〉.kind]|_)
+        }
+      }
+    }
+  }
+  fieldDiscriminator: {
+    crossing: {
+      out: (〈0;#Application〉 & {
+        oneOrTwo: {
+          two: {}
+        }
+      })
+      #Application: {
+        oneOrTwo: 〈3;#OneOrTwo〉
+        oneOrTwo: (*〈3;_appDefaults〉[〈0;oneOrTwo〉.kind]|_)
+      }
+    }
+  }
+  fieldDiscriminator: {
+    local: {
+      out: (〈0;#Application〉 & {
+        oneOrTwo: {
+          two: {}
+        }
+      })
+      #Application: {
+        oneOrTwo: 〈3;#OneOrTwo〉
+        oneOrTwo: {
+          (*〈4;_appDefaults〉[〈1〉.kind]|_)
+        }
+      }
+    }
+  }
+  issue3967: {
+    error: {
+      nested: {
+        out: (〈0;#Application〉 & {
+          oneOrTwo: {
+            two: {}
+          }
+        })
+        #Application: {
+          oneOrTwo: (〈4;#OneOrTwo〉 & {
+            if (〈2〉.oneOrTwo.kind == "two") {
+              two: {
+                if (〈4〉.oneOrTwo.two.optional == _|_(explicit error (_|_ literal) in source)) {
+                  optional: "optional set"
+                }
+              }
+            }
+            if (〈2〉.oneOrTwo.kind == "never") {}
+          })
+          if (〈1〉.oneOrTwo.kind == "never") {}
+        }
+      }
+    }
+  }
+  issue3967: {
+    error: {
+      local: {
+        out: (〈0;#Application〉 & {
+          oneOrTwo: {
+            two: {}
+          }
+        })
+        #Application: {
+          oneOrTwo: {
+            (〈5;#OneOrTwo〉 & {
+              if (〈2〉.kind == "two") {
+                two: {
+                  if (〈4〉.two.optional == _|_(explicit error (_|_ literal) in source)) {
+                    optional: "optional set"
+                  }
+                }
+              }
+              if (〈2〉.kind == "never") {}
+            })
+          }
+        }
+      }
+    }
+  }
+}

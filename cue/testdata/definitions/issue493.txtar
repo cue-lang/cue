@@ -13,22 +13,6 @@
 #Both: #App | #Atom
 
 t1: #Both & {body: 3} @test(eq, {body: 3, other: {}})
--- out/compile --
---- in.cue
-{
-  #Artifact: {
-    body: _
-    other: {
-      [string]: int
-    }
-  }
-  #App: 〈0;#Artifact〉
-  #Atom: 〈0;#Artifact〉
-  #Both: (〈0;#App〉|〈0;#Atom〉)
-  t1: (〈0;#Both〉 & {
-    body: 3
-  })
-}
 -- out/eval/stats --
 Leaks:  6
 Freed:  15

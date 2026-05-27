@@ -1,0 +1,37 @@
+# Tests that list.FlattenN does not spuriously report an "incomplete value"
+# error when its input list is derived from a definition field passed through
+# a conjunction. Previously FlattenN failed when the list element was abstract.
+# https://cuelang.org/issue/332
+-- in.cue --
+import "list"
+
+#d: {
+	#x: string
+	result: [#x]
+}
+#foo: {
+	X=#x: _
+	y:    list.FlattenN((#d & {#x: X}).result, 1)
+}
+r: #foo & {
+	#x: "hello"
+} @test(eq, {#x: "hello", y: ["hello"]})
+-- out/compile --
+--- in.cue
+{
+  #d: {
+    #x: string
+    result: [
+      〈1;#x〉,
+    ]
+  }
+  #foo: {
+    #x: _
+    y: 〈import;list〉.FlattenN((〈1;#d〉 & {
+      #x: 〈1;#x〉
+    }).result, 1)
+  }
+  r: (〈0;#foo〉 & {
+    #x: "hello"
+  })
+}

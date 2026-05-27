@@ -15,8 +15,11 @@
 package compile_test
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -25,7 +28,9 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"golang.org/x/tools/txtar"
 )
 
 var (
@@ -33,8 +38,12 @@ var (
 )
 
 func TestCompile(t *testing.T) {
+	if cuetest.UpdateGoldenFiles {
+		syncCompileTestdata(t)
+	}
+
 	test := cuetxtar.TxTarTest{
-		Root: "../../../cue/testdata/",
+		Root: "testdata",
 		Name: "compile",
 	}
 
@@ -69,6 +78,49 @@ func TestCompile(t *testing.T) {
 			}))
 		}
 	})
+}
+
+func syncCompileTestdata(t *testing.T) {
+	t.Helper()
+
+	const srcRoot = "../../../cue/testdata"
+	const dstRoot = "testdata/sync"
+
+	if err := os.RemoveAll(dstRoot); err != nil {
+		t.Fatal(err)
+	}
+
+	err := filepath.WalkDir(srcRoot, func(srcPath string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() || filepath.Ext(srcPath) != ".txtar" {
+			return nil
+		}
+		srcArchive, err := txtar.ParseFile(srcPath)
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(srcRoot, srcPath)
+		if err != nil {
+			return err
+		}
+		dstPath := filepath.Join(dstRoot, rel)
+
+		archive := &txtar.Archive{Comment: bytes.Clone(srcArchive.Comment)}
+		for _, f := range srcArchive.Files {
+			if strings.HasSuffix(f.Name, ".cue") {
+				archive.Files = append(archive.Files, txtar.File{Name: f.Name, Data: bytes.Clone(f.Data)})
+			}
+		}
+		if err := os.MkdirAll(filepath.Dir(dstPath), 0777); err != nil {
+			return err
+		}
+		return os.WriteFile(dstPath, txtar.Format(archive), 0666)
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // TestX is for debugging. Do not delete.

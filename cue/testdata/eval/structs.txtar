@@ -12,10 +12,3 @@ Retain: 2
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
--- out/compile --
---- in.cue
-{
-  v: {
-    a: (〈import;struct〉.MaxFields(2) & {})
-  }.a
-}

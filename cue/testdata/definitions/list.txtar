@@ -5,24 +5,6 @@ c: #R & {
 #R: {
 	w: [{}, ...]
 }
--- out/compile --
---- in.cue
-{
-  c: (〈0;#R〉 & {
-    w: [
-      {},
-      {
-        b: int
-      },
-    ]
-  })
-  #R: {
-    w: [
-      {},
-      ...,
-    ]
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

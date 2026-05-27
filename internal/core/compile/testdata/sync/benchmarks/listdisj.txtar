@@ -1,0 +1,47 @@
+# Tests that a recursive list-typed disjunction (#T) shared across multiple
+# fields does not cause exponential blowup. x and y both reference #T and
+# should share the same vertex rather than being independently expanded.
+# https://cuelang.org/issue/1940
+-- in.cue --
+#T:
+	["a", #T] |
+	["b", #T] |
+	["c", #T] |
+	["d", ...#T] @test(shareID=T)
+
+x: #T @test(shareID=T)
+y: #T @test(shareID=T)
+z: #T @test(shareID=T)
+v: #T @test(shareID=T)
+
+#X: x @test(shareID=T)
+#X: y
+#X: z
+#X: v
+#X: #T
+-- out/compile --
+--- in.cue
+{
+  #T: ([
+    "a",
+    〈1;#T〉,
+  ]|[
+    "b",
+    〈1;#T〉,
+  ]|[
+    "c",
+    〈1;#T〉,
+  ]|[
+    "d",
+    ...〈1;#T〉,
+  ])
+  x: 〈0;#T〉
+  y: 〈0;#T〉
+  z: 〈0;#T〉
+  v: 〈0;#T〉
+  #X: 〈0;x〉
+  #X: 〈0;y〉
+  #X: 〈0;z〉
+  #X: 〈0;v〉
+  #X: 〈0;#T〉
+}

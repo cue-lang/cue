@@ -1,0 +1,72 @@
+-- in.cue --
+quo1: quo(5, 2)   @test(eq, 2)
+quo2: quo(5, -2)  @test(eq, -2)
+quo3: quo(-5, 2)  @test(eq, -2)
+quo4: quo(-5, -2) @test(eq, 2)
+
+quoDivByZero: quo(2, 0) @test(err, code=eval, contains="division by zero", pos=[0:15])
+
+quoTypeError1: quo(2.0, 1) @test(err, code=eval, contains="cannot use 2.0 (type float) as int in argument 1 to quo", pos=[0:20])
+quoTypeError2: quo(2, 1.0) @test(err, code=eval, contains="cannot use 1.0 (type float) as int in argument 2 to quo", pos=[0:23])
+
+rem1: rem(5, 2)   @test(eq, 1)
+rem2: rem(5, -2)  @test(eq, 1)
+rem3: rem(-5, 2)  @test(eq, -1)
+rem4: rem(-5, -2) @test(eq, -1)
+
+remDivByZero: rem(2, 0) @test(err, code=eval, contains="division by zero", pos=[0:15])
+
+remTypeError1: rem(2.0, 1) @test(err, code=eval, contains="cannot use 2.0 (type float) as int in argument 1 to rem", pos=[0:20])
+remTypeError2: rem(2, 1.0) @test(err, code=eval, contains="cannot use 1.0 (type float) as int in argument 2 to rem", pos=[0:23])
+
+div1: div(5, 2)   @test(eq, 2)
+div2: div(5, -2)  @test(eq, -2)
+div3: div(-5, 2)  @test(eq, -3)
+div4: div(-5, -2) @test(eq, 3)
+
+divDivByZero: div(2, 0) @test(err, code=eval, contains="division by zero", pos=[0:15])
+
+divTypeError1: div(2.0, 1) @test(err, code=eval, contains="cannot use 2.0 (type float) as int in argument 1 to div", pos=[0:20])
+divTypeError2: div(2, 1.0) @test(err, code=eval, contains="cannot use 1.0 (type float) as int in argument 2 to div", pos=[0:23])
+
+mod1: mod(5, 2)   @test(eq, 1)
+mod2: mod(5, -2)  @test(eq, 1)
+mod3: mod(-5, 2)  @test(eq, 1)
+mod4: mod(-5, -2) @test(eq, 1)
+
+modDivByZero: mod(2, 0) @test(err, code=eval, contains="division by zero", pos=[0:15])
+
+modTypeError1: mod(2.0, 1) @test(err, code=eval, contains="cannot use 2.0 (type float) as int in argument 1 to mod", pos=[0:20])
+modTypeError2: mod(2, 1.0) @test(err, code=eval, contains="cannot use 1.0 (type float) as int in argument 2 to mod", pos=[0:23])
+-- out/compile --
+--- in.cue
+{
+  quo1: quo(5, 2)
+  quo2: quo(5, -2)
+  quo3: quo(-5, 2)
+  quo4: quo(-5, -2)
+  quoDivByZero: quo(2, 0)
+  quoTypeError1: quo(2.0, 1)
+  quoTypeError2: quo(2, 1.0)
+  rem1: rem(5, 2)
+  rem2: rem(5, -2)
+  rem3: rem(-5, 2)
+  rem4: rem(-5, -2)
+  remDivByZero: rem(2, 0)
+  remTypeError1: rem(2.0, 1)
+  remTypeError2: rem(2, 1.0)
+  div1: div(5, 2)
+  div2: div(5, -2)
+  div3: div(-5, 2)
+  div4: div(-5, -2)
+  divDivByZero: div(2, 0)
+  divTypeError1: div(2.0, 1)
+  divTypeError2: div(2, 1.0)
+  mod1: mod(5, 2)
+  mod2: mod(5, -2)
+  mod3: mod(-5, 2)
+  mod4: mod(-5, -2)
+  modDivByZero: mod(2, 0)
+  modTypeError1: mod(2.0, 1)
+  modTypeError2: mod(2, 1.0)
+}

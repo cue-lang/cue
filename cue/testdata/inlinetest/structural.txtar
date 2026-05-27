@@ -50,31 +50,3 @@ mixedInline: 42 @test(eq, 42)
 [eval] errWithCode: conflicting values string and 1 (mismatched types string and int):
     ./in.cue:7:14
     ./in.cue:7:23
--- out/compile --
---- in.cue
-{
-  errOnly: (1 & 2)
-  errWithCode: (string & 1)
-  eqBasic: {
-    a: 1
-    b: 2
-  }
-  eqComputed: {
-    x: 10
-    y: (〈0;x〉 * 2)
-  }
-  skippedTest: {
-    a: 1
-  }
-  descTest: {
-    v: "ok"
-  }
-  versionOverride: {
-    x: 1
-  }
-  plainFixture: {
-    x: 42
-  }
-  refsFixture: 〈0;plainFixture〉.x
-  mixedInline: 42
-}

@@ -17,23 +17,6 @@ ti: t & {c: int}   @test(eq, {
     ./in.cue:5:5
     ./in.cue:4:5
     ./in.cue:7:13
--- out/compile --
---- in.cue
-{
-  a: (〈0;t〉 & {
-    c: 5
-  })
-  b: (〈0;ti〉 & {
-    c: 7
-  })
-  t: {
-    c: number
-    d: (〈0;c〉 * 3)
-  }
-  ti: (〈0;t〉 & {
-    c: int
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  13

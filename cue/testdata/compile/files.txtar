@@ -10,24 +10,6 @@ package repro
 
 x: {for a in a {}}   @test(eq, {})
 y: {{{for a in a {}}}} @test(eq, {})
--- out/compile --
---- in.cue
-{
-  a: []
-}
---- out.cue
-{
-  x: {
-    for _, a in 〈1;a〉 {}
-  }
-  y: {
-    {
-      {
-        for _, a in 〈3;a〉 {}
-      }
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  4

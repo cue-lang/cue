@@ -1,0 +1,182 @@
+# Tests that closedness is correctly tracked when combining schemas through
+# inheritance and embedding using the & operator. The issue caused CUE to reject
+# fields that should be permitted under the merged schema definitions.
+# https://cuelang.org/issue/599
+-- in.cue --
+package deps
+
+a: {
+	#A: {
+		n: string
+		depends_on: [...#AnyA]
+	}
+
+	#AnyA: {
+		n: string
+		depends_on: [...#AnyA]
+		...
+	}
+
+	#A1: {
+		#A
+		x: int
+		y: z: string // Comment to avoid error
+	}
+
+	#A2: {
+		#A
+		i: string
+	}
+
+	s: [Name=string]: #AnyA & {n: Name}
+
+	s: foo: #A1 & {
+		x: 10
+		y: z: "z" // Comment to avoid error
+	}
+
+	s: bar: #A2 & {
+		i: "hello bar"
+		depends_on: [s.foo]
+	}
+	@test(eq, {
+		#A: {n: string, depends_on: []}
+		#AnyA: {n: string, depends_on: []}
+		#A1: {
+			x: int
+			y: {z: string}
+			n: string
+			depends_on: []
+		}
+		#A2: {
+			i: string
+			n: string
+			depends_on: []
+		}
+		s: {
+			foo: {
+				x: 10
+				y: {z: "z"}
+				n: "foo"
+				depends_on: []
+			}
+			bar: {
+				i: "hello bar"
+				depends_on: [{
+					x: 10
+					y: {z: "z"}
+					n: "foo"
+					depends_on: []
+				}]
+				n: "bar"
+			}
+		}
+	})
+}
+
+b: {
+	#A: {
+		f: {...}
+	}
+
+	#A1: {
+		#A
+		// f: {...} // Uncomment to fix
+	}
+
+	#C: {
+		d: {...}
+	}
+
+	s: [string]: #A1
+
+	s: foo: {
+		f: #C & {
+			d: foo: "bar"
+		}
+	}
+	@test(eq, {
+		#A: {f: {}}
+		#A1: {f: {}}
+		#C: {d: {}}
+		s: {foo: {f: {d: {foo: "bar"}}}}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    #A: {
+      n: string
+      depends_on: [
+        ...〈2;#AnyA〉,
+      ]
+    }
+    #AnyA: {
+      n: string
+      depends_on: [
+        ...〈2;#AnyA〉,
+      ]
+      ...
+    }
+    #A1: {
+      〈1;#A〉
+      x: int
+      y: {
+        z: string
+      }
+    }
+    #A2: {
+      〈1;#A〉
+      i: string
+    }
+    s: {
+      [string]: (〈1;#AnyA〉 & {
+        n: 〈1;-〉
+      })
+    }
+    s: {
+      foo: (〈1;#A1〉 & {
+        x: 10
+        y: {
+          z: "z"
+        }
+      })
+    }
+    s: {
+      bar: (〈1;#A2〉 & {
+        i: "hello bar"
+        depends_on: [
+          〈3;s〉.foo,
+        ]
+      })
+    }
+  }
+  b: {
+    #A: {
+      f: {
+        ...
+      }
+    }
+    #A1: {
+      〈1;#A〉
+    }
+    #C: {
+      d: {
+        ...
+      }
+    }
+    s: {
+      [string]: 〈1;#A1〉
+    }
+    s: {
+      foo: {
+        f: (〈2;#C〉 & {
+          d: {
+            foo: "bar"
+          }
+        })
+      }
+    }
+  }
+}

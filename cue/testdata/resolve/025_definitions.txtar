@@ -44,51 +44,6 @@ mixedRec: {Mixed: string} @test(eq, {#Mixed: string, Mixed: string})
     ./in.cue:16:7
 [eval] foo1.recursive.feild: field not allowed:
     ./in.cue:22:3
--- out/compile --
---- in.cue
-{
-  #Foo: {
-    field: int
-    recursive: {
-      field: string
-    }
-  }
-  #Foo1: {
-    field: int
-  }
-  #Foo1: {
-    field2: string
-  }
-  foo: 〈0;#Foo〉
-  foo: {
-    feild: 2
-  }
-  foo1: 〈0;#Foo〉
-  foo1: {
-    field: 2
-    recursive: {
-      feild: 2
-    }
-  }
-  #Bar: {
-    field: int
-    {
-      [_]: int
-    }
-  }
-  bar: 〈0;#Bar〉
-  bar: {
-    feild: 2
-  }
-  #Mixed: string
-  Mixed: string
-  mixedRec: {
-    #Mixed: string
-  }
-  mixedRec: {
-    Mixed: string
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  28

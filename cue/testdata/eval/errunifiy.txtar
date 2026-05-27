@@ -20,11 +20,3 @@ Retain: 0
 Unifications: 4
 Conjuncts:    6
 Disjuncts:    0
--- out/compile --
---- in.cue
-{
-  a: or([])
-  a: "t"
-  b: _|_(explicit error (_|_ literal) in source)
-  b: "t"
-}

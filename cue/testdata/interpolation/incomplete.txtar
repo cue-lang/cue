@@ -28,19 +28,3 @@ Retain: 0
 Unifications: 7
 Conjuncts:    11
 Disjuncts:    7
--- out/compile --
---- in.cue
-{
-  a: "foo"
-  b: "boo"
-  commands: {
-    #c: {
-      help: "help!"
-    }
-  }
-  out: "a is \(〈0;a〉)
-  b is \(〈0;b〉)
-  
-  c is \(〈0;commands〉.#c.help)
-  d is \(〈0;commands〉.#d.help)"
-}

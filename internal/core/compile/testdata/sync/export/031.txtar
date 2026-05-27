@@ -1,0 +1,22 @@
+raw: true
+eval: true
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{
+	A: [uint]
+	B: A & ([10] | [192])
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    A: [
+      &(int, >=0),
+    ]
+    B: (〈0;A〉 & ([
+      10,
+    ]|[
+      192,
+    ]))
+  }
+}

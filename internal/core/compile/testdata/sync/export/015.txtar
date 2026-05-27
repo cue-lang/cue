@@ -1,0 +1,18 @@
+raw: true
+eval: true
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{
+	a: (*1 | 2) & (1 | *2)
+	b: [(*1 | 2) & (1 | *2)]
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    a: ((*1|2) & (1|*2))
+    b: [
+      ((*1|2) & (1|*2)),
+    ]
+  }
+}

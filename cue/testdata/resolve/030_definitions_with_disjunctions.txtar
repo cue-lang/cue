@@ -17,30 +17,6 @@ baz: {b: 2} @test(eq, {b: 2, field: int})
 -- out/errors.txt --
 [eval] bar.c: field not allowed:
     ./in.cue:12:7
--- out/compile --
---- in.cue
-{
-  #Foo: {
-    field: int
-    ({
-      a: 1
-    }|{
-      b: 2
-    })
-  }
-  foo: 〈0;#Foo〉
-  foo: {
-    a: 1
-  }
-  bar: 〈0;#Foo〉
-  bar: {
-    c: 2
-  }
-  baz: 〈0;#Foo〉
-  baz: {
-    b: 2
-  }
-}
 -- out/eval/stats --
 Leaks:  6
 Freed:  34

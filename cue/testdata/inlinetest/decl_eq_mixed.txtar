@@ -6,9 +6,3 @@
 x: 1 @test(eq, 1)
 y: x + 1
 @test(eq, {x: 1, y: 2})
--- out/compile --
---- in.cue
-{
-  x: 1
-  y: (〈0;x〉 + 1)
-}

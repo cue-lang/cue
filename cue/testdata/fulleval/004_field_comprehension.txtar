@@ -21,26 +21,6 @@ c: {
 	}
 	@test(eq, {b: 2, c: 3})
 }
--- out/compile --
---- in.cue
-{
-  a: {
-    for k, v in 〈1;b〉 if (〈0;k〉 < "d") if (〈0;v〉 > 〈2;b〉.a) {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-  }
-  b: {
-    a: 1
-    b: 2
-    c: 3
-    d: 4
-  }
-  c: {
-    for k, v in 〈1;b〉 if (〈0;k〉 < "d") if (〈0;v〉 > 〈2;b〉.a) {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  12

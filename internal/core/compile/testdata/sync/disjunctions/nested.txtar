@@ -1,0 +1,156 @@
+-- issue3635.cue --
+import "list"
+// evalv3: `incDependent: already closed` panic with a builtin and a disjunction;
+// using list.Concat to satisfy a disjunction of map or list should not crash.
+// https://cuelang.org/issue/3635
+issue3635: case1: {
+	Run: {
+		env: *{[string]: string} | [...string]
+	}
+
+	command: Run & {
+		env: list.Concat([["foo"], ["bar"]])
+	}
+	@test(eq, {
+		Run: {env: *{} | []}
+		command: {env: ["foo", "bar"]}
+	})
+}
+
+issue3635: case2: {
+	out: [...#Schema]
+	out: [#Schema & {
+		name: "x"
+	}]
+
+	#Schema: {
+		name?: string
+		container?: [string]: string | #container
+
+		#container: string | {
+			env?: #env
+		}
+
+		#env: [string]: bool | string
+	}
+	@test(eq, {
+		out: [{
+			name: "x"
+			container?: {}
+			#container: string | {env?: {}}
+			#env: [string]: bool | string
+		}]
+		#Schema: {
+			name?: string
+			container?: {}
+			#container: string | {env?: {}}
+			#env: [string]: bool | string
+
+		}
+	})
+}
+
+issue3635: reduced: {
+	out: {X} & X
+	X: {
+		b: int | c
+		c: int | { e: d }
+	}
+	d: 1
+	@test(eq, {
+		out: {b: int | {e: 1}, c: int | {e: 1}}
+		X: {b: int | {e: 1}, c: int | {e: 1}}
+		d: 1
+	})
+}
+
+issue3635: reduced_noshare: {
+	out: {X} & X
+	X: {
+		b: int | c
+		c: int | { e: d & __no_sharing }
+	}
+	d: 1
+	@test(eq, {
+		out: {b: int | {e: 1}, c: int | {e: 1}}
+		X: {b: int | {e: 1}, c: int | {e: 1}}
+		d: 1
+	})
+}
+-- out/compile --
+--- issue3635.cue
+{
+  issue3635: {
+    case1: {
+      Run: {
+        env: (*{
+          [string]: string
+        }|[
+          ...string,
+        ])
+      }
+      command: (〈0;Run〉 & {
+        env: 〈import;list〉.Concat([
+          [
+            "foo",
+          ],
+          [
+            "bar",
+          ],
+        ])
+      })
+    }
+  }
+  issue3635: {
+    case2: {
+      out: [
+        ...〈1;#Schema〉,
+      ]
+      out: [
+        (〈1;#Schema〉 & {
+          name: "x"
+        }),
+      ]
+      #Schema: {
+        name?: string
+        container?: {
+          [string]: (string|〈1;#container〉)
+        }
+        #container: (string|{
+          env?: 〈1;#env〉
+        })
+        #env: {
+          [string]: (bool|string)
+        }
+      }
+    }
+  }
+  issue3635: {
+    reduced: {
+      out: ({
+        〈1;X〉
+      } & 〈0;X〉)
+      X: {
+        b: (int|〈0;c〉)
+        c: (int|{
+          e: 〈2;d〉
+        })
+      }
+      d: 1
+    }
+  }
+  issue3635: {
+    reduced_noshare: {
+      out: ({
+        〈1;X〉
+      } & 〈0;X〉)
+      X: {
+        b: (int|〈0;c〉)
+        c: (int|{
+          e: (〈2;d〉 & _|_(no sharing))
+        })
+      }
+      d: 1
+    }
+  }
+}

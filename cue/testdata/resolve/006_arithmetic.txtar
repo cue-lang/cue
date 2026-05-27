@@ -11,16 +11,6 @@ e2: int & 4.0/2.0   @test(err, code=eval, contains="conflicting values int and 2
 [eval] e2: conflicting values int and 2.0 (mismatched types int and float):
     ./in.cue:6:5
     ./in.cue:6:11
--- out/compile --
---- in.cue
-{
-  v1: (1000000000000 / 2.0)
-  v2: (2.0 == 2)
-  n1: 1
-  v5: (2.0 / 〈0;n1〉)
-  v6: (1.0 / 1.0)
-  e2: (int & (4.0 / 2.0))
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

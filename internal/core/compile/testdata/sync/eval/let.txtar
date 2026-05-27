@@ -1,0 +1,430 @@
+-- in.cue --
+ let A = 3 * 3
+let B = A + A
+let C = B + B
+let D = C + C
+let E = D + D
+let F = E + E
+b: {
+	let G = F + F
+	let H = G + G
+	let I = H + H
+	let J = I + I
+	let K = J + J
+	let L = K + K
+	let M = L + L
+	let N = M + M
+	let O = N + N
+	let P = O + O
+	let Q = P + P
+	let R = Q + Q
+	let S = R + R
+	let T = S + S
+
+	a: T
+	b: F
+} @test(eq, {a: 4718592, b: 288})
+
+// Nil pointer in *core/adt.Environment.evalCached caused by a let binding
+// that references a list comprehension over another let-bound list.
+// https://cuelang.org/issue/1828
+issue1828: {
+	volumes: L3
+
+	let L3 = {
+		for v2 in [for v1 in L2 {}] {}
+	}
+
+	let L2 = L1
+	let L1 = []
+
+	@test(eq, {volumes: {}})
+}
+ignoreErrorInLet: {
+	let X = 1 & 2
+	disjunction: *X | 3
+
+	@test(eq, {disjunction: 3})
+}
+-- incomprehension.cue --
+// for comprehensions in list do not have to split the let as each instance
+// is already associated with a separate environment.
+list: {
+	l: [ 1, 2, 3 ]
+	c: [
+		for v in l {
+			let X = v*4 // can share
+			X
+		}
+	]
+	@test(eq, {l: [1, 2, 3], c: [{4}, {8}, {12}]})
+}
+
+referencesForDirectly: {
+	l: [ 1, 2, 3 ]
+	for k, v in l {
+		let Y = v*4 // multi
+		"\(k)": Y
+	}
+	@test(eq, {
+		l: [1, 2, 3]
+		"0": 4
+		"1": 8
+		"2": 12
+	})
+}
+
+referencesForViaLet: {
+	l: [ 1, 2, 3 ]
+	for k, v in l let X = v*4 {
+		let Y = X // multi
+		"\(k)": Y
+	}
+	@test(eq, {
+		l: [1, 2, 3]
+		"0": 4
+		"1": 8
+		"2": 12
+	})
+}
+
+letClauseReferencesInert: {
+	x: 2
+	l: [ 1, 2, 3 ]
+	for k, v in l let X = x {
+		let Y = X // can share
+		"\(k)": Y
+	}
+	@test(eq, {
+		x: 2
+		l: [1, 2, 3]
+		"0": 2
+		"1": 2
+		"2": 2
+	})
+}
+
+// for indirect references, it is okay to not "split" a let clause, as the
+// it will only fail as a result of not splitting if the referred values
+// would fail as well.
+indirectReference: {
+	l: [ 1, 2, 3 ]
+	for k, v in l {
+		y: v // fails if v differs for each y.
+		let X = y*4 // can share, as y fails if let fails.
+		"\(k)": X
+	}
+	@test(err, code=eval,
+		suberr=(code=eval, path=y, contains="conflicting values %s and %s", args=[2, 1], pos=[0:20, 1:7, 1:10, 2:2, 3:6]),
+		suberr=(code=eval, path=y, contains="conflicting values %s and %s", args=[3, 1], pos=[0:20, 1:7, 1:13, 2:2, 3:6]))
+
+} @test(err, code=eval,
+	suberr=(code=eval, path=y, contains="conflicting values %s and %s", args=[2, 1], pos=[0:20, 1:7, 1:10, 2:2, 3:6]),
+	suberr=(code=eval, path=y, contains="conflicting values %s and %s", args=[3, 1], pos=[0:20, 1:7, 1:13, 2:2, 3:6]))
+
+nestedFor: {
+	for k, y in [ 4, 5 ] {
+		let X = {
+			for x in [ 1, 2 ] {
+				let X = x
+				"\(X)": X
+			}
+		}
+		"\(k)": X
+	}
+	@test(eq, {
+		"0": {"1": 1, "2": 2}
+		"1": {"1": 1, "2": 2}
+	})
+}
+-- issue2166.cue --
+// Using a let clause inside a field comprehension to create a dynamic key
+// caused an "invalid interpolation: conflicting values" error.
+// https://cuelang.org/issue/2166
+letWithDynamicInComprehension: {
+	_i: {
+		a: "d"
+		b: "e"
+	}
+
+	for k, v in _i {
+		let T = v
+		(T): "1"
+	}
+	@test(eq, {_i: {a: "d", b: "e"}, e: "1", d: "1"})
+}
+-- issue2218.cue --
+// Earlier let evaluation results in the wrong value: a let inside a for
+// comprehension picked up an outer binding instead of the loop variable.
+// https://cuelang.org/issue/2218
+_parent_configs: {
+	PARENT: true
+} @test(eq)
+_configs: {
+	CHILD1: {
+		property: true
+	}
+	CHILD2: {
+		property: true
+		parent:      "PARENT"
+	}
+} @test(ignore)
+disabled_parent_test: {
+	for k, v in _configs {
+		let parent_config = (*_parent_configs[v.parent] | false)
+		"\(k)": {
+			"parent_config": parent_config
+		}
+	}
+	@test(eq, {
+		CHILD1: {parent_config: false}
+		CHILD2: {parent_config: *true | false}
+	})
+}
+
+-- issue2063.cue --
+import (
+	"encoding/yaml"
+	"strings"
+)
+
+// Issue #2063
+// tools/flow: unsupported node import "list" in yaml.Marshal; let bindings
+// inside a struct referencing an undefined field must not block descending.
+// https://cuelang.org/issue/2063
+keepDescending: t1: {
+	ec: {}
+	bs: {
+		let m = ec.b
+		if m == _|_ { }
+		x: y: ""
+	}
+	@test(eq, {ec: {}, bs: {x: {y: ""}}})
+}
+
+keepDescending: t2: {
+	x: yaml.Marshal(bs)
+
+	ec: {}
+	bs: {
+		let m = ec.b
+		if m.b == _|_ { }
+		X: Y: strings.Join([], "")
+	}
+	@test(eq, {
+		x: "X:\n  \"Y\": \"\"\n"
+		ec: {}
+		bs: {X: {Y: ""}}
+	})
+}
+-- interpolation.cue --
+// evalv3 closedness regression with disjunctions and ellipses where a let
+// binding shadowed a loop variable inside a for comprehension.
+// https://cuelang.org/issue/4022
+issue4022: full: {
+	envScript: [ for v in _env let v = _env["KEY"] {"\(v)"} ]
+	_env: {
+		KEY: *"" | _
+	}
+	@test(eq, {envScript: [""], _env: {KEY: *"" | _}})
+}
+-- out/compile --
+--- in.cue
+{
+  let A#1 = (3 * 3)
+  let B#2 = (〈0;let A#1〉 + 〈0;let A#1〉)
+  let C#3 = (〈0;let B#2〉 + 〈0;let B#2〉)
+  let D#4 = (〈0;let C#3〉 + 〈0;let C#3〉)
+  let E#5 = (〈0;let D#4〉 + 〈0;let D#4〉)
+  let F#6 = (〈0;let E#5〉 + 〈0;let E#5〉)
+  b: {
+    let G#7 = (〈1;let F#6〉 + 〈1;let F#6〉)
+    let H#8 = (〈0;let G#7〉 + 〈0;let G#7〉)
+    let I#9 = (〈0;let H#8〉 + 〈0;let H#8〉)
+    let J#A = (〈0;let I#9〉 + 〈0;let I#9〉)
+    let K#B = (〈0;let J#A〉 + 〈0;let J#A〉)
+    let L#C = (〈0;let K#B〉 + 〈0;let K#B〉)
+    let M#D = (〈0;let L#C〉 + 〈0;let L#C〉)
+    let N#E = (〈0;let M#D〉 + 〈0;let M#D〉)
+    let O#F = (〈0;let N#E〉 + 〈0;let N#E〉)
+    let P#10 = (〈0;let O#F〉 + 〈0;let O#F〉)
+    let Q#11 = (〈0;let P#10〉 + 〈0;let P#10〉)
+    let R#12 = (〈0;let Q#11〉 + 〈0;let Q#11〉)
+    let S#13 = (〈0;let R#12〉 + 〈0;let R#12〉)
+    let T#14 = (〈0;let S#13〉 + 〈0;let S#13〉)
+    a: 〈0;let T#14〉
+    b: 〈1;let F#6〉
+  }
+  issue1828: {
+    volumes: 〈0;let L3#15〉
+    let L3#15 = {
+      for _, v2 in [
+        for _, v1 in 〈2;let L2#16〉 {},
+      ] {}
+    }
+    let L2#16 = 〈0;let L1#17〉
+    let L1#17 = []
+  }
+  ignoreErrorInLet: {
+    let X#18 = (1 & 2)
+    disjunction: (*〈0;let X#18〉|3)
+  }
+}
+--- incomprehension.cue
+{
+  list: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    c: [
+      for _, v in 〈1;l〉 {
+        let X#19 = (〈1;v〉 * 4)
+        〈0;let X#19〉
+      },
+    ]
+  }
+  referencesForDirectly: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    for k, v in 〈0;l〉 {
+      let Y#1Amulti = (〈1;v〉 * 4)
+      "\(〈1;k〉)": 〈0;let Y#1A〉
+    }
+  }
+  referencesForViaLet: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    for k, v in 〈0;l〉 let X = (〈0;v〉 * 4) {
+      let Y#1Bmulti = 〈1;X〉
+      "\(〈2;k〉)": 〈0;let Y#1B〉
+    }
+  }
+  letClauseReferencesInert: {
+    x: 2
+    l: [
+      1,
+      2,
+      3,
+    ]
+    for k, v in 〈0;l〉 let X = 〈1;x〉 {
+      let Y#1C = 〈1;X〉
+      "\(〈2;k〉)": 〈0;let Y#1C〉
+    }
+  }
+  indirectReference: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    for k, v in 〈0;l〉 {
+      y: 〈1;v〉
+      let X#1D = (〈0;y〉 * 4)
+      "\(〈1;k〉)": 〈0;let X#1D〉
+    }
+  }
+  nestedFor: {
+    for k, y in [
+      4,
+      5,
+    ] {
+      let X#1Emulti = {
+        for _, x in [
+          1,
+          2,
+        ] {
+          let X#1Fmulti = 〈1;x〉
+          "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+        }
+      }
+      "\(〈1;k〉)": 〈0;let X#1E〉
+    }
+  }
+}
+--- interpolation.cue
+{
+  issue4022: {
+    full: {
+      envScript: [
+        for _, v in 〈1;_env〉 let v = 〈2;_env〉["KEY"] {
+          "\(〈1;v〉)"
+        },
+      ]
+      _env: {
+        KEY: (*""|_)
+      }
+    }
+  }
+}
+--- issue2063.cue
+{
+  keepDescending: {
+    t1: {
+      ec: {}
+      bs: {
+        let m#21 = 〈1;ec〉.b
+        if (〈0;let m#21〉 == _|_(explicit error (_|_ literal) in source)) {}
+        x: {
+          y: ""
+        }
+      }
+    }
+  }
+  keepDescending: {
+    t2: {
+      x: 〈import;"encoding/yaml"〉.Marshal(〈0;bs〉)
+      ec: {}
+      bs: {
+        let m#22 = 〈1;ec〉.b
+        if (〈0;let m#22〉.b == _|_(explicit error (_|_ literal) in source)) {}
+        X: {
+          Y: 〈import;strings〉.Join([], "")
+        }
+      }
+    }
+  }
+}
+--- issue2166.cue
+{
+  letWithDynamicInComprehension: {
+    _i: {
+      a: "d"
+      b: "e"
+    }
+    for k, v in 〈0;_i〉 {
+      let T#23multi = 〈1;v〉
+      〈0;let T#23〉: "1"
+    }
+  }
+}
+--- issue2218.cue
+{
+  _parent_configs: {
+    PARENT: true
+  }
+  _configs: {
+    CHILD1: {
+      property: true
+    }
+    CHILD2: {
+      property: true
+      parent: "PARENT"
+    }
+  }
+  disabled_parent_test: {
+    for k, v in 〈1;_configs〉 {
+      let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+      "\(〈1;k〉)": {
+        parent_config: 〈1;let parent_config#24〉
+      }
+    }
+  }
+}

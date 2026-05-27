@@ -1,0 +1,38 @@
+-- in.cue --
+A: {
+	for v in src {
+		"\(v)": v
+	}
+	src: _
+	if true {
+		baz: "baz"
+	}
+	@test(err, code=incomplete, contains="cannot range over src", pos=[1:11])
+}
+B: A & {
+	src: ["foo", "bar"]
+}   @test(eq, {
+	src: ["foo", "bar"]
+	baz: "baz"
+	foo: "foo"
+	bar: "bar"
+})
+-- out/compile --
+--- in.cue
+{
+  A: {
+    for _, v in 〈0;src〉 {
+      "\(〈1;v〉)": 〈1;v〉
+    }
+    src: _
+    if true {
+      baz: "baz"
+    }
+  }
+  B: (〈0;A〉 & {
+    src: [
+      "foo",
+      "bar",
+    ]
+  })
+}

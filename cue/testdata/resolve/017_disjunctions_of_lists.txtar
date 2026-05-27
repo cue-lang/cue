@@ -3,25 +3,6 @@ l: [ int, int] | [ string, string] @test(eq, [int, int] | [string, string])
 
 l1: ["a", "b"]      @test(eq, ["a", "b"])
 l2: l & ["c", "d"]  @test(eq, ["c", "d"])
--- out/compile --
---- in.cue
-{
-  l: ([
-    int,
-    int,
-  ]|[
-    string,
-    string,
-  ])
-  l1: [
-    "a",
-    "b",
-  ]
-  l2: (〈0;l〉 & [
-    "c",
-    "d",
-  ])
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  18

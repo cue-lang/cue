@@ -32,33 +32,6 @@ ifScalarNested: {
     ./in.cue:14:2
     ./in.cue:14:13
     ./in.cue:16:2
--- out/compile --
---- in.cue
-{
-  ifScalar: {
-    _#cond: true
-    if 〈0;_#cond〉 {
-      5
-    }
-  }
-  ifScalarConflict: {
-    _#cond: true
-    if 〈0;_#cond〉 {
-      5
-    }
-    "soo"
-  }
-  ifScalarNested: {
-    _#cond: true
-    if 〈0;_#cond〉 {
-      {
-        {
-          5
-        }
-      }
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

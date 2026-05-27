@@ -48,55 +48,6 @@ e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:
     ./in.cue:15:16
 [incomplete] e10: undefined field: b:
     ./in.cue:21:10
--- out/compile --
---- in.cue
-{
-  a: [
-    2,
-  ][0]
-  b: {
-    foo: "bar"
-  }["foo"]
-  c: (*〈0;l〉|{
-    "3": 3
-  })["3"]
-  d: (*[]|[
-    1,
-  ])[0]
-  l: []
-  e1: [
-    2,
-  ][""]
-  e2: 2[2]
-  e3: [][true]
-  e4: [
-    1,
-    2,
-    3,
-  ][3]
-  e5: [
-    1,
-    2,
-    3,
-  ][-1]
-  e6: (*[]|{})[1]
-  e7: [
-    1,
-    2,
-    3,
-  ][3]
-  e8: [
-    1,
-    2,
-    3,
-  ][-1]
-  e9: (*[]|{})[1]
-  def: {
-    a: 1
-    #b: 3
-  }
-  e10: 〈0;def〉["b"]
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  55

@@ -1,0 +1,192 @@
+# Tests that struct fields referencing hidden variables inside disjunctions
+# evaluate correctly. A regression in evalv3 caused incomplete fields and
+# panics when combining disjunctions with hidden-field lookups and definitions.
+# https://cuelang.org/issue/3850
+-- issue3850.cue --
+issue3850: full: {
+	global: glb1: glb2: "123"
+	out: {foo?: _} | {}
+	out: {foo?: _} | {}
+	out: #WithFoo
+
+	#WithFoo: {
+		_global: global
+		foo: _global.glb1.glb2
+	}
+	@test(eq, {
+		global: {glb1: {glb2: "123"}}
+		out: {
+			_global: {glb1: {glb2: "123"}}
+			foo: "123"
+		}
+		#WithFoo: {
+			_global: {glb1: {glb2: "123"}}
+			foo: "123"
+		}
+	})
+}
+issue3850: incomplete: {
+	global: glb1: glb2: "123"
+	out: {foo?: _} | {}
+	out: {foo?: _} | {}
+	out: #WithFoo
+
+	#WithFoo: {
+		_global: global
+		foo: _global.glb1.glb2
+		...
+	}
+	@test(eq, {
+		global: {glb1: {glb2: "123"}}
+		out: {
+			_global: {glb1: {glb2: "123"}}
+			foo: "123"
+		}
+		#WithFoo: {
+			_global: {glb1: {glb2: "123"}}
+			foo: "123"
+		}
+	})
+}
+issue3850: p2p: {
+	out: *{} | _
+	out: *{} | _
+	out: {
+		reg: #def
+		#def: foo: _global
+		@test(eq, {
+			reg: {foo: "global value"}
+			#def: {foo: "global value"}
+		})
+	}
+
+	_global: "global value"
+}
+-- issue3875.cue --
+issue3875: full: {
+	_global: name: "foo"
+
+	out: desc: {
+		_hidden: _global.name
+		name: _hidden
+	}
+	out: #Schema | "never"
+
+	#Schema: desc: {...}
+	@test(eq, {
+		_global: {name: "foo"}
+		out: {desc: {_hidden: "foo", name: "foo"}}
+		#Schema: {desc: {}}
+	})
+}
+issue3875: reduced: {
+	global: a: "foo"
+
+	out: desc: {
+		a: b
+		b: global.a
+	}
+	out: S | null
+
+	S: {}
+	@test(eq, {
+		global: {a: "foo"}
+		out: {desc: {a: "foo", b: "foo"}}
+		S: {}
+	})
+}
+-- out/compile --
+--- issue3850.cue
+{
+  issue3850: {
+    full: {
+      global: {
+        glb1: {
+          glb2: "123"
+        }
+      }
+      out: ({
+        foo?: _
+      }|{})
+      out: ({
+        foo?: _
+      }|{})
+      out: 〈0;#WithFoo〉
+      #WithFoo: {
+        _global: 〈1;global〉
+        foo: 〈0;_global〉.glb1.glb2
+      }
+    }
+  }
+  issue3850: {
+    incomplete: {
+      global: {
+        glb1: {
+          glb2: "123"
+        }
+      }
+      out: ({
+        foo?: _
+      }|{})
+      out: ({
+        foo?: _
+      }|{})
+      out: 〈0;#WithFoo〉
+      #WithFoo: {
+        _global: 〈1;global〉
+        foo: 〈0;_global〉.glb1.glb2
+        ...
+      }
+    }
+  }
+  issue3850: {
+    p2p: {
+      out: (*{}|_)
+      out: (*{}|_)
+      out: {
+        reg: 〈0;#def〉
+        #def: {
+          foo: 〈2;_global〉
+        }
+      }
+      _global: "global value"
+    }
+  }
+}
+--- issue3875.cue
+{
+  issue3875: {
+    full: {
+      _global: {
+        name: "foo"
+      }
+      out: {
+        desc: {
+          _hidden: 〈2;_global〉.name
+          name: 〈0;_hidden〉
+        }
+      }
+      out: (〈0;#Schema〉|"never")
+      #Schema: {
+        desc: {
+          ...
+        }
+      }
+    }
+  }
+  issue3875: {
+    reduced: {
+      global: {
+        a: "foo"
+      }
+      out: {
+        desc: {
+          a: 〈0;b〉
+          b: 〈2;global〉.a
+        }
+      }
+      out: (〈0;S〉|null)
+      S: {}
+    }
+  }
+}

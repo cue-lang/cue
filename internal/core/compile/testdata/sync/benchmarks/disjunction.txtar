@@ -1,0 +1,139 @@
+// Triggering recomputation of disjunctions on each branch results
+// in exponential run time. Ensure this does not happen.
+-- in.cue --
+x: a0: {}
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+x: [_]: f: *1 | int
+
+x: {
+	a0: {}
+	@test(eq, {a0: {f: *1 | int}})
+}
+-- out/compile --
+--- in.cue
+{
+  x: {
+    a0: {}
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    [_]: {
+      f: (*1|int)
+    }
+  }
+  x: {
+    a0: {}
+  }
+}

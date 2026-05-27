@@ -11,19 +11,6 @@
 } @test(shareID=lN) @test(eq, {f: {j: {n: "hi"}}})
 
 l: #N @test(shareID=lN)
--- out/compile --
---- in.cue
-{
-  #A: _
-  #N: (〈0;#A〉 & {
-    f: {
-      j: {
-        n: "hi"
-      }
-    }
-  })
-  l: 〈0;#N〉
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

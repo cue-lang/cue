@@ -1,0 +1,39 @@
+-- in.cue --
+num: 1
+a: {
+	if num < 5 {
+		[A=string]: [B=string]: {
+			name: A
+			kind: B
+		}
+	}
+} @test(eq, {
+	b: c: {
+		d:    "bar"
+		name: "b"
+		kind: "c"
+	}
+})
+a: b: c: d: "bar"
+-- out/compile --
+--- in.cue
+{
+  num: 1
+  a: {
+    if (〈1;num〉 < 5) {
+      [string]: {
+        [string]: {
+          name: 〈2;-〉
+          kind: 〈1;-〉
+        }
+      }
+    }
+  }
+  a: {
+    b: {
+      c: {
+        d: "bar"
+      }
+    }
+  }
+}

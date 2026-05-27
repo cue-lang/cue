@@ -1,0 +1,12 @@
+raw: true
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{a: "", b: len(a)}
+-- out/compile --
+--- in.cue
+{
+  {
+    a: ""
+    b: len(〈0;a〉)
+  }
+}

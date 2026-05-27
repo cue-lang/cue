@@ -16,29 +16,6 @@ noOpt: true
 	}
 	val2: #def2
 }
--- out/compile --
---- in.cue
-{
-  {
-    reg: {
-      foo: 1
-      bar: {
-        baz: 3
-      }
-    }
-    #def: {
-      a: 1
-      sub: 〈1;reg〉
-    }
-    val: 〈0;#def〉
-    #def2: {
-      a: {
-        b: int
-      }
-    }
-    val2: 〈0;#def2〉
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  16

@@ -1,0 +1,137 @@
+Issue #560
+# Issue #560: Tests that for comprehensions correctly iterate over struct fields,
+# skipping optionals, and that missing required fields produce errors.
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.9.0"
+-- in.cue --
+import "strings"
+
+dynamic: {
+	for _, s in ["foo"] {
+		(s):       1
+		"\(s)bar": 2
+	}
+	@test(eq, {foo: 1, foobar: 2})
+}
+
+ignoreOptional: {
+	#x: {
+		a?: string
+		b?: string
+		c:  string
+	}
+
+	y: {
+		for k,v in #x {
+			(k): "exists"
+		}
+	}
+	@test(eq, {
+		#x: {a?: string, b?: string, c: string}
+		y: {c: "exists"}
+	})
+}
+
+missingRequiredError:  {
+	// Issue #2369
+	#x: {
+		a!: string
+		b?: string
+		c:  string
+	}
+
+	y: {
+		for k,v in #x {
+			(k): "exists"
+		}
+	}
+	@test(err, code=incomplete, at=y, contains="missing required field", pos=[9:3, 3:3, 9:14])
+}
+
+// issue560: Tests that for comprehensions over definitions with interpolated
+// field names correctly produce all expected output fields.
+// https://cuelang.org/issue/560
+issue560: {
+	#User: {
+		tags_str: string
+		tags_map: {
+			for k, v in strings.Split(tags_str, " ") {
+				"\(v)": string
+			}
+			"{a}": string
+		} @test(err, code=incomplete,
+			contains="error in call to %s", args=[strings.Split],
+			pos=[1:16, -1:13])
+	}
+
+	user: {
+		#User
+		tags_str: "b {c}"
+	}
+	@test(eq, {
+		#User: {
+			tags_str: string
+			tags_map: {"{a}": string}
+		}
+		user: {
+			tags_str: "b {c}"
+			tags_map: {
+				"{a}": string
+				b: string
+				"{c}": string
+			}
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  dynamic: {
+    for _, s in [
+      "foo",
+    ] {
+      〈1;s〉: 1
+      "\(〈1;s〉)bar": 2
+    }
+  }
+  ignoreOptional: {
+    #x: {
+      a?: string
+      b?: string
+      c: string
+    }
+    y: {
+      for k, v in 〈1;#x〉 {
+        〈1;k〉: "exists"
+      }
+    }
+  }
+  missingRequiredError: {
+    #x: {
+      a!: string
+      b?: string
+      c: string
+    }
+    y: {
+      for k, v in 〈1;#x〉 {
+        〈1;k〉: "exists"
+      }
+    }
+  }
+  issue560: {
+    #User: {
+      tags_str: string
+      tags_map: {
+        for k, v in 〈import;strings〉.Split(〈1;tags_str〉, " ") {
+          "\(〈1;v〉)": string
+        }
+        "{a}": string
+      }
+    }
+    user: {
+      〈1;#User〉
+      tags_str: "b {c}"
+    }
+  }
+}

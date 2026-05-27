@@ -1,0 +1,24 @@
+# Tests that hidden fields within a definition unified with #A: _ are correctly
+# handled and do not cause spurious "field not allowed" errors.
+# https://cuelang.org/issue/496
+-- in.cue --
+#A: _
+
+#N: #A & {
+	_E: {
+		name: "hello"
+	}
+} @test(shareID=lN)
+
+l: #N @test(shareID=lN)
+-- out/compile --
+--- in.cue
+{
+  #A: _
+  #N: (〈0;#A〉 & {
+    _E: {
+      name: "hello"
+    }
+  })
+  l: 〈0;#N〉
+}

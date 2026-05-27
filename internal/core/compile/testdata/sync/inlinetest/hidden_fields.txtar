@@ -1,0 +1,55 @@
+-- in.cue --
+// Tests that hidden fields in @test(eq, {...}) must be fully specified.
+// A hidden field present in the value but absent from the expected struct
+// causes a test failure. A hidden field in the expected struct that is absent
+// from the value also causes a failure.
+
+package foo
+
+// -- hidden field present in both value and expected --
+// Field-attribute form: hidden field in both value and expected passes.
+hiddenInBoth: {
+	_secret: 42
+	a: _secret + 1
+} @test(eq, {_secret$foo: 42, a: 43})
+
+// Decl-attribute form.
+hiddenDeclForm: {
+	@test(eq, {_secret$foo: "x", b: "xx"})
+	_secret: "x"
+	b: _secret + _secret
+}
+
+// Hidden definition field in both value and expected.
+hiddenDefInBoth: {
+	_#Meta: {info: "internal"}
+	a: 1
+} @test(eq, {_#Meta$foo: {info: "internal"}, a: 1})
+
+// -- no hidden fields --
+
+// No hidden fields on either side: passes trivially.
+noHidden: {a: 1, b: 2} @test(eq, {a: 1, b: 2})
+
+-- out/compile --
+--- in.cue
+{
+  hiddenInBoth: {
+    _secret(:foo): 42
+    a: (〈0;_secret(:foo)〉 + 1)
+  }
+  hiddenDeclForm: {
+    _secret(:foo): "x"
+    b: (〈0;_secret(:foo)〉 + 〈0;_secret(:foo)〉)
+  }
+  hiddenDefInBoth: {
+    _#Meta(:foo): {
+      info: "internal"
+    }
+    a: 1
+  }
+  noHidden: {
+    a: 1
+    b: 2
+  }
+}

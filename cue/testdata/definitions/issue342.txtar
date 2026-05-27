@@ -38,30 +38,6 @@ X: {
 }
 
 Z: X.test_3_bar.ref @test(eq, "FOO")
--- out/compile --
---- in.cue
-{
-  X: {
-    #Simple: {
-      ref: string
-    }
-    #Complex: {
-      ({
-        ref: string
-      }|{
-        local: string
-      })
-    }
-    var: "bar"
-    test_1: 〈0;#Complex〉
-    "test_2_\(〈0;var〉)": 〈0;#Simple〉
-    "test_3_\(〈0;var〉)": 〈0;#Complex〉
-    test_3_bar: {
-      ref: "FOO"
-    }
-  }
-  Z: 〈0;X〉.test_3_bar.ref
-}
 -- out/eval/stats --
 Leaks:  2
 Freed:  18

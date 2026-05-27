@@ -2,13 +2,6 @@
 # an open struct without any concrete fields.
 -- in.cue --
 a: {[_]: _}   @test(eq, {})
--- out/compile --
---- in.cue
-{
-  a: {
-    [_]: _
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  2

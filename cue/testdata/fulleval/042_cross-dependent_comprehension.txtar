@@ -26,19 +26,3 @@ Conjuncts:    18
 Disjuncts:    12
 
 NumCloseIDs: 3
--- out/compile --
---- in.cue
-{
-  #a: {
-    if 〈0;b〉 {
-      c: 4
-    }
-    b: bool
-  }
-  x: ((〈0;#a〉 & {
-    b: true
-  }) & {
-    c: 4
-  })
-  y: 〈0;x〉
-}

@@ -1,0 +1,10 @@
+-- in.cue --
+Foo: {} @test(eq, {})
+
+Foo
+-- out/compile --
+--- in.cue
+{
+  Foo: {}
+  〈0;Foo〉
+}

@@ -9,15 +9,6 @@ r: {
     ./in.cue:3:6
 [incomplete] r.c: cannot reference optional field: a:
     ./in.cue:4:8
--- out/compile --
---- in.cue
-{
-  r: {
-    a?: 3
-    b: 〈0;a〉
-    c: 〈1;r〉["a"]
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  5

@@ -31,54 +31,6 @@ d1: #D1 & {env: c: "C" } @test(err, at=env.c, code=eval, contains="field not all
     ./in.cue:8:17
 [eval] #D4.env.b: field not allowed:
     ./in.cue:23:7
--- out/compile --
---- in.cue
-{
-  #D1: {
-    env: {
-      a: "A"
-    }
-    env: {
-      b: "B"
-    }
-    #def: {
-      a: "A"
-    }
-    #def: {
-      b: "B"
-    }
-  }
-  d1: (〈0;#D1〉 & {
-    env: {
-      c: "C"
-    }
-  })
-  #D2: {
-    a: int
-  }
-  #D2: {
-    b: int
-  }
-  #D3: {
-    env: {
-      a: "A"
-    }
-  }
-  #D3: {
-    env: {
-      b: "B"
-    }
-  }
-  #D4: {
-    env: 〈1;#DC〉
-    env: {
-      b: int
-    }
-  }
-  #DC: {
-    a: int
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  29

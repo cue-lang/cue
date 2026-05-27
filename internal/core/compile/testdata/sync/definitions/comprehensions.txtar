@@ -1,0 +1,31 @@
+-- in.cue --
+// Closedness should not be silently swallowed when propagated through
+// comprehensions; fields added via comprehensions should still be checked.
+// https://cuelang.org/issue/595
+issue595: {
+	// NOTE: this should eval with an EVAL error, not
+	// an incomplete error. See Issue #595.
+	#cfgs: [{
+		name: "foo"
+	}]
+	_name: #cfgs[0].name
+	for cfg in #cfgs {
+		files: cfg.nam
+	}
+	@test(err, code=eval, at=files, contains="undefined field: nam", pos=[8:14])
+}
+-- out/compile --
+--- in.cue
+{
+  issue595: {
+    #cfgs: [
+      {
+        name: "foo"
+      },
+    ]
+    _name: 〈0;#cfgs〉[0].name
+    for _, cfg in 〈0;#cfgs〉 {
+      files: 〈1;cfg〉.nam
+    }
+  }
+}

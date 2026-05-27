@@ -10,17 +10,6 @@ a: x: "hey" @test(err, code=eval, contains="conflicting values", pos=[-3:5, 0:7]
 [eval] a.x: conflicting values "hey!?" and "hey":
     ./in.cue:2:5
     ./in.cue:5:7
--- out/compile --
---- in.cue
-{
-  a: {
-    x: (〈0;y〉 + "?")
-    y: (〈0;x〉 + "!")
-  }
-  a: {
-    x: "hey"
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  4

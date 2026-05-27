@@ -1,0 +1,195 @@
+// Tests that unifying a struct with an embedded scalar and definition fields
+// against a definition (or disjunction of definitions) works correctly.
+// The `ellipsis`, `bulk`, and `optional` groups cover open definitions with
+// `...`, bulk constraints, and optional fields respectively. The `issue783`
+// group covers the original bug: unifying such a struct against a disjunction
+// of definitions (`{...} | {string, ...}`) was incorrectly failing or dropping
+// disjunction branches.
+// https://cuelang.org/issue/783
+-- in.cue --
+elipsis: {
+	test1: {
+		string
+		#foo: "bar"
+	}
+
+	#Def: {
+		...
+		#foo: string
+		_
+	}
+	check: test1 & #Def
+
+	@test(eq, {
+		test1: {
+			string
+			#foo: "bar"
+		}
+		#Def: {
+			#foo: string
+			_
+		}
+		check: {
+			string
+			#foo: "bar"
+		}
+	})
+}
+
+bulk: {
+	test1: {
+		string
+		#foo: "bar"
+	}
+
+	#Def: {
+		[string]: int
+		#foo:     string
+		_
+	}
+	check: test1 & #Def @test(eq, {
+		[string]: int
+		#foo:     "bar"
+		string
+	}) @test(closed, hint="could be either")
+}
+
+optional: {
+	test1: {
+		string
+		#foo: "bar"
+	}
+
+	#Def: {
+		bar?: int
+		#foo: string
+		_
+	}
+	check: test1 & #Def  @test(eq, {
+		string
+		bar?: int
+		#foo: "bar"
+	})
+}
+
+// Tests that unifying a struct with an embedded scalar and definition fields
+// against a definition (or disjunction of definitions) works correctly.
+// The `ellipsis`, `bulk`, and `optional` groups cover open definitions with
+// `...`, bulk constraints, and optional fields respectively. The `issue783`
+// group covers the original bug: unifying such a struct against a disjunction
+// of definitions (`{...} | {string, ...}`) was incorrectly failing or dropping
+// disjunction branches.
+// https://cuelang.org/issue/783
+issue783: {
+	test1: {
+		string
+		#foo: "bar"
+	}
+
+	test2: {
+		hello: "world"
+		#foo:  "bar"
+	}
+
+	#Def1: {
+		...
+		#foo: string
+	} | {
+		string
+		#foo: string
+	} @test(eq, {
+		#foo: string
+	} | {
+		string
+		#foo: string
+	})
+
+	check1a: test1 & #Def1 @test(eq, {
+		string
+		#foo: "bar"
+	})
+	check1b: test2 & #Def1 @test(eq, {
+		hello: "world"
+		#foo:  "bar"
+	})
+
+	#Def2: {
+		...
+		#foo: string
+		_
+	}
+	check2a: test1 & #Def2 @test(eq, {
+		string
+		#foo: "bar"
+	})
+	check2b: test2 & #Def2 @test(eq, {
+		hello: "world"
+		#foo:  "bar"
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  elipsis: {
+    test1: {
+      string
+      #foo: "bar"
+    }
+    #Def: {
+      ...
+      #foo: string
+      _
+    }
+    check: (〈0;test1〉 & 〈0;#Def〉)
+  }
+  bulk: {
+    test1: {
+      string
+      #foo: "bar"
+    }
+    #Def: {
+      [string]: int
+      #foo: string
+      _
+    }
+    check: (〈0;test1〉 & 〈0;#Def〉)
+  }
+  optional: {
+    test1: {
+      string
+      #foo: "bar"
+    }
+    #Def: {
+      bar?: int
+      #foo: string
+      _
+    }
+    check: (〈0;test1〉 & 〈0;#Def〉)
+  }
+  issue783: {
+    test1: {
+      string
+      #foo: "bar"
+    }
+    test2: {
+      hello: "world"
+      #foo: "bar"
+    }
+    #Def1: ({
+      ...
+      #foo: string
+    }|{
+      string
+      #foo: string
+    })
+    check1a: (〈0;test1〉 & 〈0;#Def1〉)
+    check1b: (〈0;test2〉 & 〈0;#Def1〉)
+    #Def2: {
+      ...
+      #foo: string
+      _
+    }
+    check2a: (〈0;test1〉 & 〈0;#Def2〉)
+    check2b: (〈0;test2〉 & 〈0;#Def2〉)
+  }
+}

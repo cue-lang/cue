@@ -1,0 +1,175 @@
+# A recursive configuration using `_link: #T` in a map's entry struct is
+# incorrectly rejected as a structural cycle in v0.3.0+, but worked in v0.2.2.
+# The user expects config values to propagate through linked chains (e.g. nested
+# `mas: one: { mas: two: { ... } }`) but gets "structural cycle" errors for
+# `#a.mas.one._link.mas.two.link` etc. Shallow nesting (one level) works fine.
+# https://cuelang.org/issue/502
+-- in.cue --
+#T: {
+	config: _
+	body:   _
+	mas: [string]: {
+		cfg:   _
+		_link: #T
+		link:  _link & {config: cfg}
+	}
+}
+
+#a: #T & {
+	config: a: int
+	body: config.a
+	mas: one: {
+		cfg: b: config.a
+		_link: {
+			config: b: int
+			body: config.b
+			mas: two: {
+				cfg: c: config.b
+				_link: {
+					config: c: int
+					body: config.c
+				}
+			}
+		}
+	}
+}
+
+a: #a & {config: a: 34} @test(eq, {
+	config: {a: 34}
+	body: 34
+	mas: one: {
+		cfg: {b: 34}
+		_link: {
+			config: {b: int}
+			body: int
+			mas: two: {
+				cfg: {c: int}
+				_link: {config: {c: int}, body: int, mas: {}}
+				link: {config: {c: int}, body: int, mas: {}}
+			}
+		}
+		link: {
+			config: {b: 34}
+			body: 34
+			mas: two: {
+				cfg: {c: 34}
+				_link: {config: {c: int}, body: int, mas: {}}
+				link: {config: {c: 34}, body: 34, mas: {}}
+			}
+		}
+	}
+})
+-- reduced.cue --
+reduced: t1: {
+	#T: x: y?: {
+		V: _
+		z: #T & V & {}
+	}
+	a: #T
+	a: x: y: V: x: y: V: {}
+
+	@test(eq, {
+		#T: x: y?: {
+			V: _
+			z: x: y?: {
+				_|_
+				V: _
+				z: _|_ @test(err, code=structural_cycle, contains="reduced.t1.#T.x.y.z.x.y.z: structural cycle", pos=[])
+			}
+		}
+		a: x: y: {
+			V: x: y: V: {}
+			z: x: y: {
+				V: {}
+				z: x: y?: {
+					_|_
+					V: _
+					z: _|_ @test(err, code=structural_cycle, contains="reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle", pos=[])
+				}
+			}
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    config: _
+    body: _
+    mas: {
+      [string]: {
+        cfg: _
+        _link: 〈3;#T〉
+        link: (〈0;_link〉 & {
+          config: 〈1;cfg〉
+        })
+      }
+    }
+  }
+  #a: (〈0;#T〉 & {
+    config: {
+      a: int
+    }
+    body: 〈0;config〉.a
+    mas: {
+      one: {
+        cfg: {
+          b: 〈3;config〉.a
+        }
+        _link: {
+          config: {
+            b: int
+          }
+          body: 〈0;config〉.b
+          mas: {
+            two: {
+              cfg: {
+                c: 〈3;config〉.b
+              }
+              _link: {
+                config: {
+                  c: int
+                }
+                body: 〈0;config〉.c
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  a: (〈0;#a〉 & {
+    config: {
+      a: 34
+    }
+  })
+}
+--- reduced.cue
+{
+  reduced: {
+    t1: {
+      #T: {
+        x: {
+          y?: {
+            V: _
+            z: ((〈3;#T〉 & 〈0;V〉) & {})
+          }
+        }
+      }
+      a: 〈0;#T〉
+      a: {
+        x: {
+          y: {
+            V: {
+              x: {
+                y: {
+                  V: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

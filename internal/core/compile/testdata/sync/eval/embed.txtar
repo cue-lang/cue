@@ -1,0 +1,354 @@
+// Tests struct embedding behavior including comprehension-based embeddings and
+// closedness enforcement. Verifies that "field not allowed" errors are correctly
+// raised when embedding adds fields disallowed by a closed definition, and that
+// closedness inversion with open fields works correctly.
+-- in.cue --
+#A: {
+	Common
+	...
+}
+
+Common: {
+	a: int
+	b: int
+}
+
+x: #A
+x: {
+	c: int
+	@test(eq, {c: int, a: int, b: int})
+}
+
+#B: {
+	if true {
+		a: int
+	}
+	...
+}
+
+y: #B
+y: {
+	c: int
+	@test(eq, {c: int, a: int})
+}
+-- noclose.cue --
+double: {
+	a: b?: c: d: "c"
+	a: {{
+		b: {{
+				c: e: "member"
+		}}
+	}}
+	@test(eq, {a: {b: {c: {d: "c", e: "member"}}}})
+}
+doubleAsComprehension: {
+	a: b?: c: d: "c"
+	a: {
+		if true {
+			b: {
+				if true {
+					c: e: "member"
+				}
+			}
+		}
+	}
+	@test(eq, {a: {b: {c: {d: "c", e: "member"}}}})
+}
+fieldNotAllowed: {
+	// This was not correctly enforced in evalv2.
+	t1: {
+		#X: {
+			objs: {
+				extra: unused: "foo"
+				...
+			}
+			...
+		}
+		#Y: unused: {}
+		addTwo: #X & {
+			#Y
+			objs: name: "Two"
+		}
+		@test(err, at=addTwo.objs.extra, code=eval, contains="field not allowed", pos=[3:5])
+	}
+	t2: {
+		#AddObjsExtra: {
+			objs: [string]: {
+				extra: unused: "foo"
+				...
+			}
+			...
+		}
+		#EmbedUnused: unused: {}
+		#AddTwo: #AddObjsExtra & {
+			#EmbedUnused
+			objs: two: {
+				name: "Two"
+				labels: app: objs.one.name
+			}
+		}
+		out: #AddTwo & {
+			objs: one: {
+				name: "One"
+			}
+		}
+		@test(err, at=#AddTwo.objs.two.labels.app, code=incomplete, contains="undefined field: one", pos=[13:23])
+
+		@test(err, at=#AddTwo.objs.two.extra,        code=eval, contains="field not allowed", pos=[3:5])
+		@test(err, at=#AddTwo.objs.two.extra.unused, code=eval, contains="field not allowed", pos=[3:12])
+		@test(err, at=out.objs.one.extra.unused,     code=eval, contains="field not allowed", pos=[3:12])
+		@test(err, at=out.objs.one.extra,            code=eval, contains="field not allowed", pos=[3:5])
+		@test(err, at=out.objs.one.name,             code=eval, contains="field not allowed", pos=[18:5])
+		@test(err, at=out.objs.two.extra.unused,     code=eval, contains="field not allowed", pos=[3:12])
+
+		// This error is perculated up.
+		@test(err, code=eval,
+			hint="the error chosen here is somewhat arbitrary, okay to ignore as long as the others are good",
+			suberr=(code=eval, path=out.objs.one.name, contains="field not allowed", pos=[18:5]),
+			suberr=(code=eval, path=out.objs.one.extra, contains="field not allowed", pos=[3:5]))
+	}
+	t3: {
+		x: #X
+		#X: y: {
+			z: {
+				a: [string]: string
+				b: E: "1"
+			}
+			...
+		}
+
+		@test(shareID=YY, at=#Y)
+		@test(shareID=YY, at=x1.y)
+		x1: y: #Y
+		#Y: port?: string
+
+		x: y: {
+			z: b: E: string
+			port: z.b.E
+			z: a: c?: string
+		} @test(eq, {
+			z: {b: E: "1", a: c?: string}
+			port: "1"
+		})
+
+		if true {
+			w: x & {
+				y: x1.y
+			}
+		}
+		@test(err, at=w.y.z.b.E, code=eval, contains="field not allowed", pos=[5:8, 16:10])
+		@test(err, at=w.y.z.a,   code=eval, contains="field not allowed", pos=[4:5, 18:7])
+		@test(err, at=w.y.z.b,   code=eval, contains="field not allowed", pos=[5:5, 16:7])
+		@test(err, code=eval,
+			suberr=(code=eval, path=w.y.z.b, contains="field not allowed", pos=[5:5, 16:7]),
+			suberr=(code=eval, path=w.y.z.a, contains="field not allowed", pos=[4:5, 18:7]))
+	}
+}
+closednessInversion: {
+	base: #X
+	base: x: #Y
+	#X: x: {...}
+	#Y: y: string | *"default"
+	out: {
+		base.x
+		a: b: c: "d"
+	}
+	@test(eq, {
+		base: {x: {y: *"default" | string}}
+		#X: {x: {}}
+		#Y: {y: *"default" | string}
+		out: {
+			a: {b: {c: "d"}}
+			y: *"default" | string
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  #A: {
+    〈1;Common〉
+    ...
+  }
+  Common: {
+    a: int
+    b: int
+  }
+  x: 〈0;#A〉
+  x: {
+    c: int
+  }
+  #B: {
+    if true {
+      a: int
+    }
+    ...
+  }
+  y: 〈0;#B〉
+  y: {
+    c: int
+  }
+}
+--- noclose.cue
+{
+  double: {
+    a: {
+      b?: {
+        c: {
+          d: "c"
+        }
+      }
+    }
+    a: {
+      {
+        b: {
+          {
+            c: {
+              e: "member"
+            }
+          }
+        }
+      }
+    }
+  }
+  doubleAsComprehension: {
+    a: {
+      b?: {
+        c: {
+          d: "c"
+        }
+      }
+    }
+    a: {
+      if true {
+        b: {
+          if true {
+            c: {
+              e: "member"
+            }
+          }
+        }
+      }
+    }
+  }
+  fieldNotAllowed: {
+    t1: {
+      #X: {
+        objs: {
+          extra: {
+            unused: "foo"
+          }
+          ...
+        }
+        ...
+      }
+      #Y: {
+        unused: {}
+      }
+      addTwo: (〈0;#X〉 & {
+        〈1;#Y〉
+        objs: {
+          name: "Two"
+        }
+      })
+    }
+    t2: {
+      #AddObjsExtra: {
+        objs: {
+          [string]: {
+            extra: {
+              unused: "foo"
+            }
+            ...
+          }
+        }
+        ...
+      }
+      #EmbedUnused: {
+        unused: {}
+      }
+      #AddTwo: (〈0;#AddObjsExtra〉 & {
+        〈1;#EmbedUnused〉
+        objs: {
+          two: {
+            name: "Two"
+            labels: {
+              app: 〈3;objs〉.one.name
+            }
+          }
+        }
+      })
+      out: (〈0;#AddTwo〉 & {
+        objs: {
+          one: {
+            name: "One"
+          }
+        }
+      })
+    }
+    t3: {
+      x: 〈0;#X〉
+      #X: {
+        y: {
+          z: {
+            a: {
+              [string]: string
+            }
+            b: {
+              E: "1"
+            }
+          }
+          ...
+        }
+      }
+      x1: {
+        y: 〈1;#Y〉
+      }
+      #Y: {
+        port?: string
+      }
+      x: {
+        y: {
+          z: {
+            b: {
+              E: string
+            }
+          }
+          port: 〈0;z〉.b.E
+          z: {
+            a: {
+              c?: string
+            }
+          }
+        }
+      }
+      if true {
+        w: (〈1;x〉 & {
+          y: 〈2;x1〉.y
+        })
+      }
+    }
+  }
+  closednessInversion: {
+    base: 〈0;#X〉
+    base: {
+      x: 〈1;#Y〉
+    }
+    #X: {
+      x: {
+        ...
+      }
+    }
+    #Y: {
+      y: (string|*"default")
+    }
+    out: {
+      〈1;base〉.x
+      a: {
+        b: {
+          c: "d"
+        }
+      }
+    }
+  }
+}

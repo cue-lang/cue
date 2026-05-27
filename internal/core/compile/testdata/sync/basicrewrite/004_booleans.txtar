@@ -1,0 +1,17 @@
+-- in.cue --
+t: true @test(eq, true)
+t: !false
+f: false @test(eq, false)
+f: !t
+e: true @test(err, code=eval, pos=[0:4, 1:4], contains="conflicting values")
+e: !true
+-- out/compile --
+--- in.cue
+{
+  t: true
+  t: !false
+  f: false
+  f: !〈0;t〉
+  e: true
+  e: !true
+}

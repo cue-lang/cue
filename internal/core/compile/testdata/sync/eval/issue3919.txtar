@@ -1,0 +1,234 @@
+# Tests that builtin function calls with arguments depending on later-defined
+# default values evaluate correctly in evalv3. The issue caused math.Abs to fail
+# with "non-concrete value" when the port field had a default defined after the call.
+# https://cuelang.org/issue/3919
+-- in.cue --
+import "math"
+
+full: {
+	out: {
+		env: {
+			if true {
+				PORT: math.Abs(out.port)
+			}
+		}
+		if true {
+			port: int | *30080
+		}
+	}
+	@test(eq, {
+		out: {env: {PORT: 30080}, port: *30080 | int}
+	})
+}
+reduced: {
+	if true {
+		a: math.Abs(port)
+	}
+	port: int | *30080
+	@test(eq, {a: 30080, port: *30080 | int})
+}
+-- secondary.cue --
+related: {
+	[string]: {
+		if true {
+			shared: all_total: foo.fooData.total
+		}
+	}
+	foo: fooData: {
+		total: tags: _hidden
+		_hidden: extra: {}
+	}
+	#Tags: [string]: {}
+	bar: {
+		shared: {
+			[string]: tags: #Tags
+			bar_total: foo.fooData.total
+		}
+	}
+	@test(eq, {
+		foo: {
+			fooData: {
+				total: {tags: {extra: {}}}
+				_hidden: {extra: {}}
+			}
+			shared: {all_total: {tags: {extra: {}}}}
+		}
+		#Tags: {}
+		bar: {
+			shared: {
+				bar_total: {tags: {extra: {}}}
+				all_total: {tags: {extra: {}}}
+			}
+		}
+	})
+}
+-- let.cue --
+// issue3931: evalv3 raises "field set was already referenced" when processing
+// optional field specs with let bindings that evalv2 accepts without error.
+// https://cuelang.org/issue/3931
+issue3931: full: {
+	bar: [string]: spec?: Spec
+	if true {
+		foo: label: "foo"
+		bar: bar1: spec: selector: foo
+	}
+	let Spec = {
+		selector?: Selector
+	}
+	let Selector = {
+		label?: string
+		expr?: [...string]
+	}
+	@test(eq, {
+		bar: {
+			bar1: {
+				spec: {selector: {label: "foo", expr?: []}}
+			}
+		}
+		foo: {label: "foo"}
+	})
+}
+-- issue3946.cue --
+// issue3946: evalv3 regression reporting a cyclic reference error when a field
+// is inserted and then referenced within a comprehension expression.
+// https://cuelang.org/issue/3946
+issue3946: reduced:{
+	out: [for _, v in _inputs { v }]
+	_inputs: [_]: {
+		doExtra?: bool
+		if doExtra != _|_ {
+			if true {
+				extra: "yes"
+			}
+		}
+	}
+	if true {
+		_inputs: input1: name: "input1"
+	}
+	@test(eq, {
+		out: [{
+			doExtra?: bool
+			name:     "input1"
+		}]
+		_inputs: {
+			input1: {name: "input1", doExtra?: bool}
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  full: {
+    out: {
+      env: {
+        if true {
+          PORT: 〈import;math〉.Abs(〈3;out〉.port)
+        }
+      }
+      if true {
+        port: (int|*30080)
+      }
+    }
+  }
+  reduced: {
+    if true {
+      a: 〈import;math〉.Abs(〈1;port〉)
+    }
+    port: (int|*30080)
+  }
+}
+--- issue3946.cue
+{
+  issue3946: {
+    reduced: {
+      out: [
+        for _, v in 〈1;_inputs〉 {
+          〈1;v〉
+        },
+      ]
+      _inputs: {
+        [_]: {
+          doExtra?: bool
+          if (〈0;doExtra〉 != _|_(explicit error (_|_ literal) in source)) {
+            if true {
+              extra: "yes"
+            }
+          }
+        }
+      }
+      if true {
+        _inputs: {
+          input1: {
+            name: "input1"
+          }
+        }
+      }
+    }
+  }
+}
+--- let.cue
+{
+  issue3931: {
+    full: {
+      bar: {
+        [string]: {
+          spec?: 〈2;let Spec#1〉
+        }
+      }
+      if true {
+        foo: {
+          label: "foo"
+        }
+        bar: {
+          bar1: {
+            spec: {
+              selector: 〈3;foo〉
+            }
+          }
+        }
+      }
+      let Spec#1 = {
+        selector?: 〈1;let Selector#2〉
+      }
+      let Selector#2 = {
+        label?: string
+        expr?: [
+          ...string,
+        ]
+      }
+    }
+  }
+}
+--- secondary.cue
+{
+  related: {
+    [string]: {
+      if true {
+        shared: {
+          all_total: 〈3;foo〉.fooData.total
+        }
+      }
+    }
+    foo: {
+      fooData: {
+        total: {
+          tags: 〈1;_hidden〉
+        }
+        _hidden: {
+          extra: {}
+        }
+      }
+    }
+    #Tags: {
+      [string]: {}
+    }
+    bar: {
+      shared: {
+        [string]: {
+          tags: 〈3;#Tags〉
+        }
+        bar_total: 〈2;foo〉.fooData.total
+      }
+    }
+  }
+}

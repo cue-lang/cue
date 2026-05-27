@@ -1,0 +1,76 @@
+// NOTE: the performance of Sort is not measured by counters. The issues
+// of https://cuelang.org/issues/745 were mostly related to poor memory
+// management.
+-- in.cue --
+import "list"
+
+_a: [{name: 1}, {name: 3}, {name: 4}, {name: 5}, {name: 6}, {name: 7}, {name: 8}, {name: 9}, {name: 0}]
+_b: [_a, _a, _a, _a, _a, _a, _a, _a, _a, _a]
+_c: [_b, _b, _b, _b, _b, _b, _b, _b, _b, _b]
+
+out: list.Sort(list.FlattenN(_c, 4), {x: _, y: _, less: x.name < y.name})
+
+@test(eq, at=out.0, {name: 0})
+@test(eq, at=out.899, {name: 9})
+-- out/compile --
+--- in.cue
+{
+  _a: [
+    {
+      name: 1
+    },
+    {
+      name: 3
+    },
+    {
+      name: 4
+    },
+    {
+      name: 5
+    },
+    {
+      name: 6
+    },
+    {
+      name: 7
+    },
+    {
+      name: 8
+    },
+    {
+      name: 9
+    },
+    {
+      name: 0
+    },
+  ]
+  _b: [
+    〈1;_a〉,
+    〈1;_a〉,
+    〈1;_a〉,
+    〈1;_a〉,
+    〈1;_a〉,
+    〈1;_a〉,
+    〈1;_a〉,
+    〈1;_a〉,
+    〈1;_a〉,
+    〈1;_a〉,
+  ]
+  _c: [
+    〈1;_b〉,
+    〈1;_b〉,
+    〈1;_b〉,
+    〈1;_b〉,
+    〈1;_b〉,
+    〈1;_b〉,
+    〈1;_b〉,
+    〈1;_b〉,
+    〈1;_b〉,
+    〈1;_b〉,
+  ]
+  out: 〈import;list〉.Sort(〈import;list〉.FlattenN(〈0;_c〉, 4), {
+    x: _
+    y: _
+    less: (〈0;x〉.name < 〈0;y〉.name)
+  })
+}

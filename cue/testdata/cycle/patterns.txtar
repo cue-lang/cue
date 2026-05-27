@@ -40,37 +40,3 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 7
--- out/compile --
---- in.cue
-{
-  [!~"^[.]"]: 〈0;c〉
-  a: 〈0;b〉
-  b: {
-    [string]: int
-  }
-  c: {
-    a: int
-  }
-  [string]: 〈0;c〉
-  a: 〈0;b〉
-  b: {
-    [string]: int
-  }
-  c: {
-    a: int
-  }
-}
---- issue3326.cue
-{
-  issue3326: {
-    _self: {
-      x: [
-        ...and(〈1;x〉),
-      ]
-    }
-    〈0;_self〉
-    x: [
-      1,
-    ]
-  }
-}

@@ -16,37 +16,6 @@ a: b: c: d: string
     ./in.cue:4:34
     ./in.cue:4:23
     ./in.cue:5:13
--- out/compile --
---- in.cue
-{
-  res: [
-    for _, x in 〈1;a〉 for _, y in 〈0;x〉 {
-      (〈1;y〉 & {
-        d: "b"
-      })
-    },
-  ]
-  res: [
-    (〈1;a〉.b.c & {
-      d: "b"
-    }),
-  ]
-  a: {
-    b: {
-      [string]: {
-        d: string
-        s: ("a" + 〈0;d〉)
-      }
-    }
-  }
-  a: {
-    b: {
-      c: {
-        d: string
-      }
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  10

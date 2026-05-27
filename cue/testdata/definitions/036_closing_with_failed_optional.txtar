@@ -53,39 +53,3 @@ Conjuncts:    41
 Disjuncts:    4
 
 NumCloseIDs: 3
--- out/compile --
---- in.cue
-{
-  #k1: ({
-    a: int
-    b?: int
-  } & 〈0;#A〉)
-  #k2: (〈0;#A〉 & {
-    a: int
-    b?: int
-  })
-  o1: ({
-    a?: 3
-  } & {
-    a?: 4
-  })
-  #o2: ({
-    a?: 3
-  } & {
-    a?: 4
-  })
-  #d1: ({
-    a?: 2
-    b: 4
-  }|{
-    a?: 3
-    c: 5
-  })
-  v1: (〈0;#d1〉 & {
-    a?: 3
-    b: 4
-  })
-  #A: {
-    a: int
-  }
-}

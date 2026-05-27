@@ -18,20 +18,6 @@ t1: {
 	let b = 3
 	d: 3
 })
--- out/compile --
---- in.cue
-{
-  t0: {
-    _a: _
-    let _b#1 = 〈0;_a〉
-    _out: 〈0;let _b#1〉
-  }
-  t1: {
-    _a: 〈0;let b#2〉
-    let b#2 = 〈0;d〉
-    d: 3
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

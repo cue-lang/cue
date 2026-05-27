@@ -1,0 +1,65 @@
+#name: reentrance
+#evalFull
+-- in.cue --
+// This indirection is needed to avoid binding references to fib
+// within fib to the instantiated version.
+fibRec: {
+	nn:  int
+	out: (fib & {n: nn}).out
+	@test(err, code=incomplete, at=out)
+}
+fib: {
+	n: int
+
+	if n >= 2 {
+		out: (fibRec & {nn: n - 2}).out + (fibRec & {nn: n - 1}).out
+	}
+	if n < 2 {
+		out: n
+	}
+	@test(err, code=incomplete)
+}
+fib1:  (fib & {n: 1}).out  @test(eq, 1) // MAY NOT be an error
+fib2:  (fib & {n: 2}).out  @test(eq, 1) // MAY be an error
+fib3:  (fib & {n: 3}).out  @test(err, code=structural_cycle) // SHOULD be an error
+fib7:  (fib & {n: 7}).out  @test(err, code=structural_cycle) // Error
+fib12: (fib & {n: 12}).out @test(err, code=structural_cycle) // Error
+
+-- out/compile --
+--- in.cue
+{
+  fibRec: {
+    nn: int
+    out: (〈1;fib〉 & {
+      n: 〈1;nn〉
+    }).out
+  }
+  fib: {
+    n: int
+    if (〈0;n〉 >= 2) {
+      out: ((〈2;fibRec〉 & {
+        nn: (〈2;n〉 - 2)
+      }).out + (〈2;fibRec〉 & {
+        nn: (〈2;n〉 - 1)
+      }).out)
+    }
+    if (〈0;n〉 < 2) {
+      out: 〈1;n〉
+    }
+  }
+  fib1: (〈0;fib〉 & {
+    n: 1
+  }).out
+  fib2: (〈0;fib〉 & {
+    n: 2
+  }).out
+  fib3: (〈0;fib〉 & {
+    n: 3
+  }).out
+  fib7: (〈0;fib〉 & {
+    n: 7
+  }).out
+  fib12: (〈0;fib〉 & {
+    n: 12
+  }).out
+}

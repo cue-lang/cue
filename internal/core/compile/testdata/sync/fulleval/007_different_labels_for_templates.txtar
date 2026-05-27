@@ -1,0 +1,21 @@
+-- in.cue --
+a: [X=string]: {name: X}
+a: [Name=string]: {name: Name}
+a: foo: {} @test(eq, {name: "foo"})
+-- out/compile --
+--- in.cue
+{
+  a: {
+    [string]: {
+      name: 〈1;-〉
+    }
+  }
+  a: {
+    [string]: {
+      name: 〈1;-〉
+    }
+  }
+  a: {
+    foo: {}
+  }
+}

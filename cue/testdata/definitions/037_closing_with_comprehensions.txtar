@@ -38,51 +38,6 @@ for k, v in {f3: int} {
     ./in.cue:4:11
 [eval] #E.f3: field not allowed:
     ./in.cue:30:3
--- out/compile --
---- in.cue
-{
-  #A: {
-    f1: int
-    f2: int
-  }
-  for k, v in {
-    f3: int
-  } {
-    a: (〈2;#A〉 & {
-      "\(〈2;k〉)": 〈2;v〉
-    })
-  }
-  #B: {
-    for k, v in {
-      f1: int
-    } {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-  }
-  #C: {
-    f1: _
-    for k, v in {
-      f1: int
-    } {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-  }
-  #D: {
-    for k, v in {
-      f1: int
-    } {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-    ...
-  }
-  #E: (〈0;#A〉 & {
-    for k, v in {
-      f3: int
-    } {
-      "\(〈1;k〉)": 〈1;v〉
-    }
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  28

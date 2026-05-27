@@ -9,16 +9,6 @@ f: true & false   @test(err, code=eval, pos=[0:4, 0:11])
 [eval] f: conflicting values false and true:
     ./in.cue:6:4
     ./in.cue:6:11
--- out/compile --
---- in.cue
-{
-  a: (true && true)
-  b: (true || false)
-  c: (false == true)
-  d: (false != true)
-  e: (true & true)
-  f: (true & false)
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

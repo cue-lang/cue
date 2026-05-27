@@ -36,30 +36,3 @@ Conjuncts:    28
 Disjuncts:    4
 
 NumCloseIDs: 1
--- out/compile --
---- in.cue
-{
-  #Value: ({
-    type: "float"
-  }|{
-    type: "string"
-  })
-  foo: {
-    type: "string"
-  }
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-  foo: 〈0;#Value〉
-}

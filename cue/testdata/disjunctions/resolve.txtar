@@ -24,37 +24,3 @@ Conjuncts:    33
 Disjuncts:    12
 
 NumCloseIDs: 6
--- out/compile --
---- in.cue
-{
-  resolveAcrossDisjunct: {
-    t1: {
-      ({}|{
-        #B: 1
-      })
-      ({
-        d: 〈1;#B〉
-      }|{})
-      #B: int
-    }
-  }
-  resolveAcrossDisjunct: {
-    nested: {
-      ({}|{
-        a: {
-          b: {
-            #B: 1
-          }
-        }
-      })
-      ({
-        d: 〈1;a〉.b.#B
-      }|{})
-      a: {
-        b: {
-          #B: int
-        }
-      }
-    }
-  }
-}

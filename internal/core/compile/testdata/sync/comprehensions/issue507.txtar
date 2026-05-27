@@ -1,0 +1,59 @@
+# Tests that list comprehensions work correctly when iterating over lists with
+# default values (disjunctions using *). Issue #507: comprehensions over
+# [...T] | *[elem] lists failed with "invalid operand" errors.
+# https://cuelang.org/issue/507
+-- in.cue --
+package x
+
+somelist: [...string] | *[]
+// Works just fine
+foo: [
+	for e in somelist {
+		"hello foo: \(e)"
+	},
+] @test(eq, [])
+
+otherlist: ["something"] @test(eq, ["something"])
+// Works fine as well
+z: [
+	for e in otherlist {
+		"hello z: \(e)"
+	},
+] @test(eq, ["hello z: something"])
+
+extlist: [...string] | *["something"]
+bar: [
+	for e in extlist {
+		"hello bar: \(e)"
+	},
+] @test(eq, ["hello bar: something"])
+-- out/compile --
+--- in.cue
+{
+  somelist: ([
+    ...string,
+  ]|*[])
+  foo: [
+    for _, e in 〈1;somelist〉 {
+      "hello foo: \(〈1;e〉)"
+    },
+  ]
+  otherlist: [
+    "something",
+  ]
+  z: [
+    for _, e in 〈1;otherlist〉 {
+      "hello z: \(〈1;e〉)"
+    },
+  ]
+  extlist: ([
+    ...string,
+  ]|*[
+    "something",
+  ])
+  bar: [
+    for _, e in 〈1;extlist〉 {
+      "hello bar: \(〈1;e〉)"
+    },
+  ]
+}

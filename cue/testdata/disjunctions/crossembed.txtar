@@ -38,13 +38,3 @@ Conjuncts:    18
 Disjuncts:    2
 
 NumCloseIDs: 4
--- out/compile --
---- in.cue
-{
-  out: 〈import;"foo.test/main/imported"〉
-  out: {
-    either: {
-      foo: "world"
-    }
-  }
-}

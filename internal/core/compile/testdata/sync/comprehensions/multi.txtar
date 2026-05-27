@@ -1,0 +1,78 @@
+-- in.cue --
+list: [2, 3] @test(eq, [2, 3])
+a: [ 3, for x in list {x}, for x in list {x}] @test(eq, [3, 2, 3, 2, 3])
+b: [ 3, if true {3}, for x in list if x > 2 {x}] @test(eq, [3, 3, 3])
+
+// issue574: Tests that if and for comprehensions inside list literals
+// correctly include or exclude elements based on conditions.
+// https://cuelang.org/issue/574
+issue574: {
+	greet: true
+	bye:   true
+
+	message1: [
+		if greet {"hello"},
+		"how are you doing?",
+		"bye",
+	]
+
+	message2: [
+		if !greet {"hello"},
+		"how are you doing?",
+		if bye {
+			"bye"
+		},
+	]
+	@test(eq, {
+		greet: true
+		bye: true
+		message1: ["hello", "how are you doing?", "bye"]
+		message2: ["how are you doing?", "bye"]
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  list: [
+    2,
+    3,
+  ]
+  a: [
+    3,
+    for _, x in 〈1;list〉 {
+      〈1;x〉
+    },
+    for _, x in 〈1;list〉 {
+      〈1;x〉
+    },
+  ]
+  b: [
+    3,
+    if true {
+      3
+    },
+    for _, x in 〈1;list〉 if (〈0;x〉 > 2) {
+      〈1;x〉
+    },
+  ]
+  issue574: {
+    greet: true
+    bye: true
+    message1: [
+      if 〈1;greet〉 {
+        "hello"
+      },
+      "how are you doing?",
+      "bye",
+    ]
+    message2: [
+      if !〈1;greet〉 {
+        "hello"
+      },
+      "how are you doing?",
+      if 〈1;bye〉 {
+        "bye"
+      },
+    ]
+  }
+}

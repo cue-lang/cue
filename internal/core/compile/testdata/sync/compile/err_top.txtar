@@ -1,0 +1,69 @@
+#inlinetest:exclude skip — compile errors.
+-- in.cue --
+disallowTopAsAlias: {
+	_=X: 1
+}
+
+disallowTopAsLet: {
+	let _ = 1
+}
+
+disallowTopAsLabel: {
+	_: 1
+	a: _ // Should not compile to a reference.
+}
+
+// TODO: disallow dollar as label? This is according to the spec, but it
+// will be a breaking change and $ was reserved for referring to the root of
+// a file, which we very likely will never implement.
+// disallowDollarAsLabel: {
+//   $: 1
+// }
+
+// When printing errors with paths from the compiler or evaluator,
+// ensure that odd string labels get quoted correctly.
+nested: "_": _: 1
+nested: "_foo": _: 1
+nested: "#foo": _: 1
+
+-- out/compile --
+disallowTopAsAlias: cannot use _ as alias or let clause:
+    ./in.cue:2:2
+disallowTopAsLet: cannot use _ as alias or let clause:
+    ./in.cue:6:6
+disallowTopAsLabel: cannot use _ as label:
+    ./in.cue:10:2
+nested."_": cannot use _ as label:
+    ./in.cue:23:14
+nested."_foo": cannot use _ as label:
+    ./in.cue:24:17
+nested."#foo": cannot use _ as label:
+    ./in.cue:25:17
+--- in.cue
+{
+  disallowTopAsAlias: {
+    X: 1
+  }
+  disallowTopAsLet: {
+    let _ = 1
+  }
+  disallowTopAsLabel: {
+    _|_(cannot use _ as label)
+    a: _
+  }
+  nested: {
+    "_": {
+      _|_(cannot use _ as label)
+    }
+  }
+  nested: {
+    "_foo": {
+      _|_(cannot use _ as label)
+    }
+  }
+  nested: {
+    "#foo": {
+      _|_(cannot use _ as label)
+    }
+  }
+}

@@ -11,26 +11,6 @@ noOpt: true
 		#: "Fn::And": [_]
 	}
 }
--- out/compile --
---- in.cue
-{
-  {
-    #And: {
-      #: {
-        "Fn::And": [
-          ...(3|〈3;#And〉),
-        ]
-      }
-    }
-    #Ands: (〈0;#And〉 & {
-      #: {
-        "Fn::And": [
-          _,
-        ]
-      }
-    })
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  12

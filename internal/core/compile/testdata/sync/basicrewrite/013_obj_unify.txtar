@@ -1,0 +1,52 @@
+-- in.cue --
+o1: {a: 1} & {b: 2}          @test(eq, {a: 1, b: 2})
+o2: {a: 1, b: 2} & {b: 2}    @test(eq, {a: 1, b: 2})
+o3: {a: 1} & {a: 1, b: 2}    @test(eq, {a: 1, b: 2})
+o4: {a: 1} & {b: 2}
+o4: {a: 1, b: 2} & {b: 2}
+o4: {a: 1} & {a: 1, b: 2}    @test(eq, {a: 1, b: 2})
+
+e: 1      @test(err, code=eval, pos=[0:4, 1:4], contains="conflicting values")
+e: {a: 3}
+-- out/compile --
+--- in.cue
+{
+  o1: ({
+    a: 1
+  } & {
+    b: 2
+  })
+  o2: ({
+    a: 1
+    b: 2
+  } & {
+    b: 2
+  })
+  o3: ({
+    a: 1
+  } & {
+    a: 1
+    b: 2
+  })
+  o4: ({
+    a: 1
+  } & {
+    b: 2
+  })
+  o4: ({
+    a: 1
+    b: 2
+  } & {
+    b: 2
+  })
+  o4: ({
+    a: 1
+  } & {
+    a: 1
+    b: 2
+  })
+  e: 1
+  e: {
+    a: 3
+  }
+}

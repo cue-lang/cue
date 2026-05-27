@@ -1,0 +1,41 @@
+# Tests that hidden definitions (_#x) enforce closedness the same way regular
+# definitions (#x) do, rejecting extra fields not declared in the definition.
+# https://cuelang.org/issue/533
+-- in.cue --
+package x
+
+#x: {
+	Name: string
+}
+
+_#x: {
+	Name: string
+}
+
+x1: #x & {
+	Name: "hello"
+	Age:  50
+} @test(err, code=eval, at=Age, contains="field not allowed", pos=[2:2])
+
+x2: _#x & {
+	Name: "hello"
+	Age:  50
+} @test(err, code=eval, at=Age, contains="field not allowed", pos=[2:2])
+-- out/compile --
+--- in.cue
+{
+  #x: {
+    Name: string
+  }
+  _#x(:x): {
+    Name: string
+  }
+  x1: (〈0;#x〉 & {
+    Name: "hello"
+    Age: 50
+  })
+  x2: (〈0;_#x(:x)〉 & {
+    Name: "hello"
+    Age: 50
+  })
+}

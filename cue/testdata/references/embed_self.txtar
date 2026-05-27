@@ -12,9 +12,3 @@ Retain: 1
 Unifications: 2
 Conjuncts:    4
 Disjuncts:    3
--- out/compile --
---- in.cue
-{
-  Foo: {}
-  〈0;Foo〉
-}

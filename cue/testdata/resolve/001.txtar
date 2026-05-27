@@ -3,22 +3,6 @@ a: b.c.d        @test(eq, 3)
 b: {c: {d: 3}}
 c: {c: d.d}     @test(eq, {c: 2})
 d: {d: 2}
--- out/compile --
---- in.cue
-{
-  a: 〈0;b〉.c.d
-  b: {
-    c: {
-      d: 3
-    }
-  }
-  c: {
-    c: 〈1;d〉.d
-  }
-  d: {
-    d: 2
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

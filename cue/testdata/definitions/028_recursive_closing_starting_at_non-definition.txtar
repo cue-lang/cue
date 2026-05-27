@@ -9,31 +9,6 @@ z: a: {
 	}
 }
 A: z & {a: {#B: {c: e: 2}}} @test(eq, {a: #B: c: {e: 2, d: 1, f: 1}})
--- out/compile --
---- in.cue
-{
-  z: {
-    a: {
-      #B: {
-        c: {
-          d: 1
-        }
-        c: {
-          f: 1
-        }
-      }
-    }
-  }
-  A: (〈0;z〉 & {
-    a: {
-      #B: {
-        c: {
-          e: 2
-        }
-      }
-    }
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  14

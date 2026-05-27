@@ -30,21 +30,6 @@ Unifications: 7
 Conjuncts:    14
 Disjuncts:    0
 NumCloseIDs: 7
--- out/compile --
---- in.cue
-{
-  #Foo: {
-    x: string
-    〈1;#More〉
-  }
-  #More: {
-    [=~"^x-"]: _
-  }
-  foo: (〈0;#Foo〉 & {
-    x: "hello"
-    y: "goodbye"
-  })
-}
 -- out/diff-v2-v3.txt --
 Positions: v3 reports fewer positions than v2 for the "field not allowed" error.
 Verdict: worsening -- v3 reports fewer error positions than v2.

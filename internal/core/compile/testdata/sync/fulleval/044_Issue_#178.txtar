@@ -1,0 +1,25 @@
+# Tests that encoding built-in functions called with non-concrete arguments
+# correctly return an "incomplete" error rather than panicking. Issue: calling
+# csv.Decode or hex.EncodedLen with abstract (non-concrete) values caused a
+# nil pointer dereference panic instead of a proper incomplete error.
+# https://cuelang.org/issue/178
+#name: Issue #178
+#evalFull
+-- in.cue --
+import "encoding/csv"
+
+import "encoding/hex"
+
+foo:  csv.Decode(data) @test(err, code=incomplete)
+data: bytes            @test(kind=bytes)
+
+len: int                 @test(kind=int)
+bar: hex.EncodedLen(len) @test(err, code=incomplete)
+-- out/compile --
+--- in.cue
+{
+  foo: 〈import;"encoding/csv"〉.Decode(〈0;data〉)
+  data: bytes
+  len: int
+  bar: 〈import;"encoding/hex"〉.EncodedLen(〈0;len〉)
+}

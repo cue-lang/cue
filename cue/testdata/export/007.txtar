@@ -7,20 +7,6 @@
 	d: #a["d"]
 	e: #a.t[2:3]
 }
--- out/compile --
---- in.cue
-{
-  {
-    #a: {
-      b: 2.0
-      s: "abc"
-    }
-    b: 〈0;#a〉.b
-    c: 〈0;#a〉.c
-    d: 〈0;#a〉["d"]
-    e: 〈0;#a〉.t[2:3]
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  8

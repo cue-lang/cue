@@ -1,0 +1,98 @@
+# Tests that #fun1 with a hidden field _in: #TypeA (where #TypeA: string |
+# {foo: int}) correctly computes out using comprehensions that select based on
+# whether _in is a string or has field foo. evalv2 had closedness bugs where eg2
+# (input {foo: 5}) failed to select "foo" and eg3 (input {foo: 5, bar: "test"})
+# failed to fall through to "impossible". evalv3 fixed these bugs.
+-- x.cue --
+package x
+
+#TypeA: string | {foo: int}
+
+#fun1: {
+	_in: #TypeA
+	out: [
+		// either `in` is a string
+		if (_in & string) != _|_ {
+			_in
+		},
+		// or `in` is has field `foo`
+		if _in.foo != _|_ {
+			"foo"
+		},
+		"impossible", // in & #TypeA != _|_ !!
+	][0]
+}
+
+examples: [string]: {
+	in: _
+	res: (#fun1 & {_in: in, _}).out
+}
+
+examples: eg1: {
+	in: "test"
+	@test(eq, {in: "test", res: "test"})
+}
+examples: eg2: {
+	in: {
+		foo: 5
+	}
+	@test(eq, {in: {foo: 5}, res: "foo"})
+}
+examples: eg3: {
+	in: {
+		foo: 5
+		bar: "test"
+	}
+	@test(eq, {
+		in: {foo: 5, bar: "test"}
+		res: "impossible"
+	})
+}
+-- out/compile --
+--- x.cue
+{
+  #TypeA: (string|{
+    foo: int
+  })
+  #fun1: {
+    _in(:x): 〈1;#TypeA〉
+    out: [
+      if ((〈1;_in(:x)〉 & string) != _|_(explicit error (_|_ literal) in source)) {
+        〈2;_in(:x)〉
+      },
+      if (〈1;_in(:x)〉.foo != _|_(explicit error (_|_ literal) in source)) {
+        "foo"
+      },
+      "impossible",
+    ][0]
+  }
+  examples: {
+    [string]: {
+      in: _
+      res: (〈2;#fun1〉 & {
+        _in(:x): 〈1;in〉
+        _
+      }).out
+    }
+  }
+  examples: {
+    eg1: {
+      in: "test"
+    }
+  }
+  examples: {
+    eg2: {
+      in: {
+        foo: 5
+      }
+    }
+  }
+  examples: {
+    eg3: {
+      in: {
+        foo: 5
+        bar: "test"
+      }
+    }
+  }
+}

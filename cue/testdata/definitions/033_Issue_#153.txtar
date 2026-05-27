@@ -45,30 +45,6 @@ Conjuncts:    22
 Disjuncts:    4
 Notifications: 1
 NumCloseIDs: 5
--- out/compile --
---- in.cue
-{
-  Foo: {
-    listOfCloseds: [
-      ...〈2;#Closed〉,
-    ]
-  }
-  #Closed: {
-    a: (int|*0)
-  }
-  Junk: {
-    b: 2
-  }
-  (〈0;Foo〉 & {
-    listOfCloseds: [
-      {
-        for k, v in 〈3;Junk〉 {
-          "\(〈1;k〉)": 〈1;v〉
-        }
-      },
-    ]
-  })
-}
 -- out/diff-v2-v3.txt --
 missing error positions: v3 reports fewer positions than v2.
 listOfCloseds.0.b: field not allowed:

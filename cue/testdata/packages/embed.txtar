@@ -38,9 +38,3 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 9
--- out/compile --
---- in.cue
-{
-  〈import;"mod.test/pkg:bar"〉
-  z: 3
-}

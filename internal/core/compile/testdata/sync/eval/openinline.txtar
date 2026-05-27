@@ -1,0 +1,191 @@
+# This test is important in locking in the closedness behavior
+# of evalv2, where inline structs cause some closedness errors
+# to be ignored. evalv3 mimics this behavior for the sake of
+# backwards compatibility and not breaking existing users.
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.9.0"
+-- in.cue --
+import (
+	pkg "foo.com/example"
+)
+
+// This test tests that closeness errors are eliminated that occur within an
+// inline struct.
+inlineErr: {
+	#D: {a: 1}
+
+	// Allow a closedness error that occurs within an inline struct.
+	def: x: (#D & {b: 2}).b
+	@test(eq, {#D: {a: 1}, def: {x: 2}})
+}
+
+// These tests test that selecting into an inlined struct recursively opens this
+// struct in OpenInline.
+outerErr: {
+	_inToOut: {
+		in: _
+		out: in.foo
+	}
+
+	// evalv3 regression: when a definition with extra fields allowed (...)
+	// is unified with the output of an inline function that returns a closed
+	// definition, evalv3 spuriously reported "field not allowed" where evalv2
+	// correctly accepted the value. The closedness of #Inner must be opened
+	// when used in OpenInline mode so the outer open struct can accept its fields.
+	// https://cuelang.org/issue/3534
+	issue3534: {
+		#Inner: foo: minor: 2
+		#Outer: version: { major: 1, ... }
+
+		t1: #Outer
+		t1: version: (_inToOut & {in: #Inner}).out
+		@test(eq, {
+			#Inner: {foo: {minor: 2}}
+			#Outer: {version: {major: 1}}
+			t1: {version: {major: 1, minor: 2}}
+		})
+	}
+
+	// Test that the same principle works with the close builtin.
+	usingClose: {
+		// Same as above, but with an additional level of nesting.
+		#Inner:  foo: close({minor: 2})
+		#Outer: version: { major: 1, ... }
+
+		t1: #Outer
+		t1: version: (_inToOut & {in: #Inner}).out
+		@test(err, code=eval, at=t1.version.major, contains="field not allowed", pos=[3:22])
+	}
+
+	// Test that the mechanism still works with extra nesting: the closedness of
+	// #Inner should be opened recursively in OpenInline mode.
+	extraNesting: {
+		// Same as above, but with an additional level of nesting.
+		#Inner: foo: x: minor: 2
+		#Outer: version: x: { major: 1, ... }
+
+		t1: #Outer
+		t1: version: (_inToOut & {in: #Inner}).out
+		@test(eq, {
+			#Inner: {foo: {x: {minor: 2}}}
+			#Outer: {version: {x: {major: 1}}}
+			t1: {version: {x: {major: 1, minor: 2}}}
+		})
+	}
+}
+
+// Here OpenInline does _not_ erase the error, as the error is already present
+// in the referred definitions.
+
+// faulty struct referenced from package
+refFromPkg: (pkg.#E).b @test(eq, 1)
+
+refFromLet: {
+	let X = {
+		#D: a: 2
+		#E: #D & {b: 1}
+	}
+	x: (X.#E).b
+	@test(eq, {x: 1})
+}
+
+-- cue.mod/pkg/foo.com/example/example.cue --
+package example
+
+#D: a: 1
+#E: #D & {b: 1}
+
+-- out/compile --
+--- in.cue
+{
+  inlineErr: {
+    #D: {
+      a: 1
+    }
+    def: {
+      x: (〈1;#D〉 & {
+        b: 2
+      }).b
+    }
+  }
+  outerErr: {
+    _inToOut: {
+      in: _
+      out: 〈0;in〉.foo
+    }
+    issue3534: {
+      #Inner: {
+        foo: {
+          minor: 2
+        }
+      }
+      #Outer: {
+        version: {
+          major: 1
+          ...
+        }
+      }
+      t1: 〈0;#Outer〉
+      t1: {
+        version: (〈2;_inToOut〉 & {
+          in: 〈2;#Inner〉
+        }).out
+      }
+    }
+    usingClose: {
+      #Inner: {
+        foo: close({
+          minor: 2
+        })
+      }
+      #Outer: {
+        version: {
+          major: 1
+          ...
+        }
+      }
+      t1: 〈0;#Outer〉
+      t1: {
+        version: (〈2;_inToOut〉 & {
+          in: 〈2;#Inner〉
+        }).out
+      }
+    }
+    extraNesting: {
+      #Inner: {
+        foo: {
+          x: {
+            minor: 2
+          }
+        }
+      }
+      #Outer: {
+        version: {
+          x: {
+            major: 1
+            ...
+          }
+        }
+      }
+      t1: 〈0;#Outer〉
+      t1: {
+        version: (〈2;_inToOut〉 & {
+          in: 〈2;#Inner〉
+        }).out
+      }
+    }
+  }
+  refFromPkg: 〈import;"foo.com/example"〉.#E.b
+  refFromLet: {
+    let X#1 = {
+      #D: {
+        a: 2
+      }
+      #E: (〈0;#D〉 & {
+        b: 1
+      })
+    }
+    x: 〈0;let X#1〉.#E.b
+  }
+}

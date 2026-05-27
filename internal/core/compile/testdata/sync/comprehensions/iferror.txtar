@@ -1,0 +1,217 @@
+-- in.cue --
+a: {b: 2, c: int}
+
+wrongConcreteType: {
+	if a.b {
+		2
+	}
+	@test(err, code=eval, contains="cannot use 2 (type int) as type bool", pos=[1:2, -2:8])
+}
+
+wrongType: {
+	if a.c {
+		2
+	}
+	@test(err, code=eval, contains="cannot use int (type int) as type bool", pos=[1:2, -9:14])
+}
+
+incomplete: err1: {
+	if a.d {
+		2
+	}
+	@test(err, code=incomplete, contains="undefined field: d", pos=[1:7])
+}
+incomplete: err2: {
+	list: [1, 2, 3]
+	for x in list if a.d {
+		x
+	}
+	@test(err, code=incomplete, contains="undefined field: d", pos=[2:21])
+}
+
+// issue809: Tests that comprehension guards using `!= _|_` work correctly
+// when the guarded field has a default value. In both cases below the field
+// being tested is non-bottom (it carries a default), so the guard should
+// pass and the comprehension should yield the entry.
+// https://cuelang.org/issue/809
+useDefault: {
+	a: {
+		x: *"foo" | string
+		if x != _|_ {
+			y: x
+		}
+	}
+
+	issue809: {
+		#A: {
+			a: string
+			b: *a | string
+		}
+
+		s: [Name=string]: #A & {a: Name}
+		s: bar:           _
+
+		foo: [
+			for _, a in s if a.b != _|_ {a},
+		]
+
+		@test(eq, {
+			#A: {
+				a: string
+				b: string
+			}
+			s: bar: {
+				a: "bar"
+				b: *"bar" | string
+			}
+			foo: [{
+				a: "bar"
+				b: *"bar" | string
+			}]
+		})
+	}
+}
+
+// issue1972: Tests that mixing a list value with struct fields in a
+// comprehension correctly produces a conflict error rather than a panic.
+// https://cuelang.org/issue/1972
+issue1972: {
+	err1: {
+		#patchs: []
+		#patchs
+
+		#someCondition: _
+		if #someCondition {
+		}
+	}
+	err1: {
+		someCondition: _
+		patchs: [...{}]
+		patchs
+		if someCondition {
+			patchs: _
+		}
+	} @test(err, code=eval,
+		contains="conflicting values %s and %s (mismatched types %s and %s)",
+		pos=[0:8, 2:11, 3:3]
+	)
+	err2: {
+		#patchs: []
+		#patchs
+
+		#someCondition: _
+		if #someCondition {
+		}
+	} @test(err, code=incomplete, contains="incomplete %s: %s", args=[bool, _], pos=[])
+	err3: {
+		someCondition: _
+		patchs: [...{}]
+		patchs
+		if someCondition {
+			patchs: _
+		}
+
+		// TODO(inline): support commas in arguments
+		@test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)",
+			pos=[0:8, 2:11, 3:3]
+		)
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    b: 2
+    c: int
+  }
+  wrongConcreteType: {
+    if 〈1;a〉.b {
+      2
+    }
+  }
+  wrongType: {
+    if 〈1;a〉.c {
+      2
+    }
+  }
+  incomplete: {
+    err1: {
+      if 〈2;a〉.d {
+        2
+      }
+    }
+  }
+  incomplete: {
+    err2: {
+      list: [
+        1,
+        2,
+        3,
+      ]
+      for _, x in 〈0;list〉 if 〈3;a〉.d {
+        〈1;x〉
+      }
+    }
+  }
+  useDefault: {
+    a: {
+      x: (*"foo"|string)
+      if (〈0;x〉 != _|_(explicit error (_|_ literal) in source)) {
+        y: 〈1;x〉
+      }
+    }
+    issue809: {
+      #A: {
+        a: string
+        b: (*〈0;a〉|string)
+      }
+      s: {
+        [string]: (〈1;#A〉 & {
+          a: 〈1;-〉
+        })
+      }
+      s: {
+        bar: _
+      }
+      foo: [
+        for _, a in 〈1;s〉 if (〈0;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+          〈1;a〉
+        },
+      ]
+    }
+  }
+  issue1972: {
+    err1: {
+      #patchs: []
+      〈0;#patchs〉
+      #someCondition: _
+      if 〈0;#someCondition〉 {}
+    }
+    err1: {
+      someCondition: _
+      patchs: [
+        ...{},
+      ]
+      〈0;patchs〉
+      if 〈0;someCondition〉 {
+        patchs: _
+      }
+    }
+    err2: {
+      #patchs: []
+      〈0;#patchs〉
+      #someCondition: _
+      if 〈0;#someCondition〉 {}
+    }
+    err3: {
+      someCondition: _
+      patchs: [
+        ...{},
+      ]
+      〈0;patchs〉
+      if 〈0;someCondition〉 {
+        patchs: _
+      }
+    }
+  }
+}

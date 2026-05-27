@@ -1,0 +1,18 @@
+# CUE panics/crashes instead of reporting a clean error when evaluating
+# values with cyclic field dependencies.
+# https://cuelang.org/issue/306
+-- in.cue --
+a: 12 @test(eq, 12)
+#Controller: settings: {
+	controller: #Controller
+} @test(err, code=structural_cycle, path=controller, contains="structural cycle", pos=[])
+-- out/compile --
+--- in.cue
+{
+  a: 12
+  #Controller: {
+    settings: {
+      controller: 〈2;#Controller〉
+    }
+  }
+}

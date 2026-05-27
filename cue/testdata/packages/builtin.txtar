@@ -9,10 +9,3 @@ foo: [
 -- out/evalalpha --
 builtin package "x/y" undefined:
     ./x.cue:1:8
--- out/compile --
---- x.cue
-{
-  foo: [
-    〈import;"x/y"〉,
-  ]
-}

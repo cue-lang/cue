@@ -1,0 +1,319 @@
+# Tests that a single top-level disjunction (null | Schema) applied to a deeply
+# nested struct does not cause exponential evaluation. Schema is a recursive
+# JSON-Schema-like definition with many optional disjunctive fields.
+# https://cuelang.org/issue/3334
+-- in.cue --
+// Single disjunction at the top.
+x?: null | Schema
+x: properties: {
+	disableSelfServiceScrape: {}
+	dnsConfig: {
+		properties: {
+			nameservers: {}
+		}
+	}
+	podDisruptionBudget: {
+		properties: {
+			maxUnavailable: {}
+			minAvailable: {
+				anyOf: [{}, {}]
+			}
+			labels: {}
+		}
+	}
+}
+
+Schema: {
+	title?: string
+	$ref?: null | string
+	enum?: [...]
+	required?: [...string]
+	items?: null | _
+	anyOf?: [...Schema]
+	allOf?: [...Schema]
+	oneOf?: [...Schema]
+	not?: null | Schema
+	properties?: [string]: Schema
+	additionalProperties?: null | _
+	patternProperties?: [string]: Schema
+	dependencies?: [string]:      _
+	additionalItems?: null | _
+	definitions?: [string]: _
+	externalDocs?: null | {
+		description?: string
+		url?:         string
+	}
+	example?:  null | _
+	nullable?: bool
+}
+
+@test(eq, at=x, {
+	properties: {
+		disableSelfServiceScrape: {
+			title?: string
+			$ref?: null | string
+			enum?: []
+			required?: []
+			items?: null | _
+			anyOf?: []
+			allOf?: []
+			oneOf?: []
+			not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+			properties?: {}
+			additionalProperties?: null | _
+			patternProperties?: {}
+			dependencies?: {}
+			additionalItems?: null | _
+			definitions?: {}
+			externalDocs?: null | {description?: string, url?: string}
+			example?: null | _
+			nullable?: bool
+		}
+		dnsConfig: {
+			properties: {
+				nameservers: {
+					title?: string
+					$ref?: null | string
+					enum?: []
+					required?: []
+					items?: null | _
+					anyOf?: []
+					allOf?: []
+					oneOf?: []
+					not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+					properties?: {}
+					additionalProperties?: null | _
+					patternProperties?: {}
+					dependencies?: {}
+					additionalItems?: null | _
+					definitions?: {}
+					externalDocs?: null | {description?: string, url?: string}
+					example?: null | _
+					nullable?: bool
+				}
+			}
+			title?: string
+			$ref?: null | string
+			enum?: []
+			required?: []
+			items?: null | _
+			anyOf?: []
+			allOf?: []
+			oneOf?: []
+			not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+			additionalProperties?: null | _
+			patternProperties?: {}
+			dependencies?: {}
+			additionalItems?: null | _
+			definitions?: {}
+			externalDocs?: null | {description?: string, url?: string}
+			example?: null | _
+			nullable?: bool
+		}
+		podDisruptionBudget: {
+			properties: {
+				maxUnavailable: {
+					title?: string
+					$ref?: null | string
+					enum?: []
+					required?: []
+					items?: null | _
+					anyOf?: []
+					allOf?: []
+					oneOf?: []
+					not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+					properties?: {}
+					additionalProperties?: null | _
+					patternProperties?: {}
+					dependencies?: {}
+					additionalItems?: null | _
+					definitions?: {}
+					externalDocs?: null | {description?: string, url?: string}
+					example?: null | _
+					nullable?: bool
+				}
+				minAvailable: {
+					anyOf: [{
+						title?: string
+						$ref?: null | string
+						enum?: []
+						required?: []
+						items?: null | _
+						anyOf?: []
+						allOf?: []
+						oneOf?: []
+						not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+						properties?: {}
+						additionalProperties?: null | _
+						patternProperties?: {}
+						dependencies?: {}
+						additionalItems?: null | _
+						definitions?: {}
+						externalDocs?: null | {description?: string, url?: string}
+						example?: null | _
+						nullable?: bool
+					},
+					{
+						title?: string
+						$ref?: null | string
+						enum?: []
+						required?: []
+						items?: null | _
+						anyOf?: []
+						allOf?: []
+						oneOf?: []
+						not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+						properties?: {}
+						additionalProperties?: null | _
+						patternProperties?: {}
+						dependencies?: {}
+						additionalItems?: null | _
+						definitions?: {}
+						externalDocs?: null | {description?: string, url?: string}
+						example?: null | _
+						nullable?: bool
+					}]
+					title?: string
+					$ref?: null | string
+					enum?: []
+					required?: []
+					items?: null | _
+					allOf?: []
+					oneOf?: []
+					not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+					properties?: {}
+					additionalProperties?: null | _
+					patternProperties?: {}
+					dependencies?: {}
+					additionalItems?: null | _
+					definitions?: {}
+					externalDocs?: null | {description?: string, url?: string}
+					example?: null | _
+					nullable?: bool
+				}
+				labels: {
+					title?: string
+					$ref?: null | string
+					enum?: []
+					required?: []
+					items?: null | _
+					anyOf?: []
+					allOf?: []
+					oneOf?: []
+					not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+					properties?: {}
+					additionalProperties?: null | _
+					patternProperties?: {}
+					dependencies?: {}
+					additionalItems?: null | _
+					definitions?: {}
+					externalDocs?: null | {description?: string, url?: string}
+					example?: null | _
+					nullable?: bool
+				}
+			}
+			title?: string
+			$ref?: null | string
+			enum?: []
+			required?: []
+			items?: null | _
+			anyOf?: []
+			allOf?: []
+			oneOf?: []
+			not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+			additionalProperties?: null | _
+			patternProperties?: {}
+			dependencies?: {}
+			additionalItems?: null | _
+			definitions?: {}
+			externalDocs?: null | {description?: string, url?: string}
+			example?: null | _
+			nullable?: bool
+		}
+	}
+	title?: string
+	$ref?: null | string
+	enum?: []
+	required?: []
+	items?: null | _
+	anyOf?: []
+	allOf?: []
+	oneOf?: []
+	not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null | {title?: string, $ref?: null | string, enum?: [], required?: [], items?: null | _, anyOf?: [], allOf?: [], oneOf?: [], not?: null, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}, properties?: {}, additionalProperties?: null | _, patternProperties?: {}, dependencies?: {}, additionalItems?: null | _, definitions?: {}, externalDocs?: null | {description?: string, url?: string}, example?: null | _, nullable?: bool}
+	additionalProperties?: null | _
+	patternProperties?: {}
+	dependencies?: {}
+	additionalItems?: null | _
+	definitions?: {}
+	externalDocs?: null | {description?: string, url?: string}
+	example?: null | _
+	nullable?: bool
+})
+-- out/compile --
+--- in.cue
+{
+  x?: (null|〈0;Schema〉)
+  x: {
+    properties: {
+      disableSelfServiceScrape: {}
+      dnsConfig: {
+        properties: {
+          nameservers: {}
+        }
+      }
+      podDisruptionBudget: {
+        properties: {
+          maxUnavailable: {}
+          minAvailable: {
+            anyOf: [
+              {},
+              {},
+            ]
+          }
+          labels: {}
+        }
+      }
+    }
+  }
+  Schema: {
+    title?: string
+    $ref?: (null|string)
+    enum?: [
+      ...,
+    ]
+    required?: [
+      ...string,
+    ]
+    items?: (null|_)
+    anyOf?: [
+      ...〈2;Schema〉,
+    ]
+    allOf?: [
+      ...〈2;Schema〉,
+    ]
+    oneOf?: [
+      ...〈2;Schema〉,
+    ]
+    not?: (null|〈1;Schema〉)
+    properties?: {
+      [string]: 〈2;Schema〉
+    }
+    additionalProperties?: (null|_)
+    patternProperties?: {
+      [string]: 〈2;Schema〉
+    }
+    dependencies?: {
+      [string]: _
+    }
+    additionalItems?: (null|_)
+    definitions?: {
+      [string]: _
+    }
+    externalDocs?: (null|{
+      description?: string
+      url?: string
+    })
+    example?: (null|_)
+    nullable?: bool
+  }
+}

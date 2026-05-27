@@ -1,0 +1,33 @@
+#name: optional expanded before lookup
+#evalFull
+-- in.cue --
+test: [ID=_]: {
+	name: ID
+}
+
+test: A: {
+	field1: "1"
+	field2: "2"
+}
+
+B: test.A & {} @test(eq, {
+	field1: "1"
+	field2: "2"
+	name: "A"
+})
+-- out/compile --
+--- in.cue
+{
+  test: {
+    [_]: {
+      name: 〈1;-〉
+    }
+  }
+  test: {
+    A: {
+      field1: "1"
+      field2: "2"
+    }
+  }
+  B: (〈0;test〉.A & {})
+}

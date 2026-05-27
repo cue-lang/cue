@@ -5,15 +5,6 @@ y: {
 	"x": 2
 	z:   x @test(eq, 1)
 }
--- out/compile --
---- in.cue
-{
-  x: 1
-  y: {
-    x: 2
-    z: 〈1;x〉
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  5

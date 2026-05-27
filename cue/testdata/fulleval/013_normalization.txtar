@@ -6,13 +6,6 @@ The redundancy that remains from not normalizing can be useful.
 a: string | string @test(eq, string)
 b: *1 | *int       @test(eq, *1 | *int)
 c: *1.0 | *float   @test(eq, *1.0 | *float)
--- out/compile --
---- in.cue
-{
-  a: (string|string)
-  b: (*1|*int)
-  c: (*1.0|*float)
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  10

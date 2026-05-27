@@ -48,23 +48,3 @@ case2: #schema & {
 [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
     ./in.cue:8:12
     ./in.cue:5:22
--- out/compile --
---- in.cue
-{
-  #schema: {
-    let splits#1 = 〈import;strings〉.Split(〈0;id〉, "_never_")
-    let prefix#2 = 〈0;let splits#1〉[0]
-    #ID: =~"^\(〈0;let prefix#2〉)$"
-    #SubID: =~"^\(〈0;let prefix#2〉):sub$"
-    id: 〈0;#ID〉
-    subid: 〈0;#SubID〉
-  }
-  case1: (〈0;#schema〉 & {
-    id: "foo"
-    subid: "foo:sub"
-  })
-  case2: (〈0;#schema〉 & {
-    subid: "foo:sub"
-    id: "foo"
-  })
-}

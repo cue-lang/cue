@@ -45,24 +45,3 @@ Conjuncts:    30
 Disjuncts:    2
 
 NumCloseIDs: 4
--- out/compile --
---- in.cue
-{
-  #a: ((〈0;#c〉|〈0;#d〉) & {
-    name: string
-  })
-  #a1: (〈0;#c〉 & {
-    name: string
-  })
-  #a2: (〈0;#d〉 & {
-    name: string
-  })
-  #c: {
-    name: string
-    age: int
-  }
-  #d: {
-    name: string
-    address: string
-  }
-}

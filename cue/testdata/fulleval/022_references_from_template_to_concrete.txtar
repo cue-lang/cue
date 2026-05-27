@@ -19,24 +19,3 @@ Retain: 3
 Unifications: 14
 Conjuncts:    21
 Disjuncts:    15
--- out/compile --
---- in.cue
-{
-  res: [
-    〈1;t〉,
-  ]
-  t: {
-    [string]: {
-      a: (〈0;c〉 + 〈0;b〉.str)
-      b: {
-        str: string
-      }
-      c: "X"
-    }
-    x: {
-      b: {
-        str: "DDDD"
-      }
-    }
-  }
-}

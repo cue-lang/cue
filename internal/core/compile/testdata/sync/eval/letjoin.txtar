@@ -1,0 +1,339 @@
+-- in.cue --
+// Test that an error in a let that is merged with itself from two different
+// origins does not result in an error as long as the error is not referenced
+// outside the let.
+t1: {
+	x: {
+		a: int
+		y: {
+			let X = {
+				b: a
+				c: 1
+			}
+			v: X.c
+		}
+	}
+
+	x1: x
+	x1: a: 1
+
+	x2: x
+	x2: a: 2
+
+	xy: x1.y & x2.y
+	@test(eq, {
+		x: {a: int, y: {v: 1}}
+		x1: {a: 1, y: {v: 1}}
+		x2: {a: 2, y: {v: 1}}
+		xy: {v: 1}
+	})
+}
+
+t2: {
+	x: {
+		a: {}
+		y: {
+			let X = {
+				b: a
+				c: 1
+			}
+			v: X.c
+		}
+	}
+
+	x1: x
+	x1: a: q: 1
+
+	x2: x
+	x2: a: r: 2
+
+	xy: x1 & x2
+	@test(eq, {
+		x: {a: {}, y: {v: 1}}
+		x1: {a: {q: 1}, y: {v: 1}}
+		x2: {a: {r: 2}, y: {v: 1}}
+		xy: {a: {q: 1, r: 2}, y: {v: 1}}
+	})
+}
+-- issue3590.cue --
+// Conflicting values in for loop with let expressions: two chained let bindings
+// inside a for comprehension incorrectly caused a conflict error.
+// https://cuelang.org/issue/3590
+issue3590: reduced: {
+	result: [_]: [string]: string
+
+	_input: {
+		A: p: "A"
+		B: p: "B"
+	}
+
+	for _, v in _input {
+		let Var1 = v.p
+
+		// Second let variable required here; just using Var1 with Items not
+		// sufficient
+		let Var2 = Var1
+
+		let Items = {
+			item: Var2
+		}
+
+		result: "conflicting-\(v.p)": Items
+	}
+	@test(eq, {
+		result: {
+			"conflicting-A": {item: "A"}
+			"conflicting-B": {item: "B"}
+		}
+		_input: {A: {p: "A"}, B: {p: "B"}}
+	})
+}
+issue3590: {
+	full: {
+		#Result: [_]: {[string]: string}
+
+		result: #Result
+
+		#Input: {
+			p: "A" | "B"
+		}
+
+		_input: [Parm=_]: #Input & {
+			p: Parm
+		}
+
+		_input: {
+			A: {}
+			B: {}
+		}
+
+		for _, v in _input {
+			let Var1 = v.p
+			let Var2 = Var1
+
+			let Items = {
+				"item": Var2
+			}
+
+			result: "conflicting-\(v.p)": Items
+		}
+	}
+	@test(eq, {
+		reduced: {
+			result: {
+				"conflicting-A": {item: "A"}
+				"conflicting-B": {item: "B"}
+			}
+			_input: {A: {p: "A"}, B: {p: "B"}}
+		}
+		full: {
+			#Result: {}
+			result: {
+				"conflicting-A": {item: "A"}
+				"conflicting-B": {item: "B"}
+			}
+			#Input: {p: "A" | "B"}
+			_input: {A: {p: "A"}, B: {p: "B"}}
+		}
+	})
+}
+// Issue #3591 is related
+// Missing items in for loop with let expressions: items produced inside a
+// for comprehension via let were dropped from the output.
+// https://cuelang.org/issue/3591
+issue3591: missing: {
+	#Result: [_]: {[string]: string}
+
+	result: #Result
+
+	#Input: {
+		p: "A" | "B"
+	}
+
+	_input: [Parm=_]: #Input & {
+		p: Parm
+	}
+
+	_input: {
+		A: {}
+		B: {}
+	}
+
+	for _, v in _input {
+		let Var1 = v.p
+		let Var2 = Var1
+
+		let Items = {
+			"item": {
+				key1: Var2
+			}
+		}
+
+		result: "missing-items-\(v.p)": {
+			for s, attr in Items {
+				if attr.key1 != _|_ {(s): attr.key1}
+			}
+		}
+	}
+	@test(eq, {
+		#Result: {}
+		result: {
+			"missing-items-A": {item: "A"}
+			"missing-items-B": {item: "B"}
+		}
+		#Input: {p: "A" | "B"}
+		_input: {A: {p: "A"}, B: {p: "B"}}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    x: {
+      a: int
+      y: {
+        let X#1 = {
+          b: 〈2;a〉
+          c: 1
+        }
+        v: 〈0;let X#1〉.c
+      }
+    }
+    x1: 〈0;x〉
+    x1: {
+      a: 1
+    }
+    x2: 〈0;x〉
+    x2: {
+      a: 2
+    }
+    xy: (〈0;x1〉.y & 〈0;x2〉.y)
+  }
+  t2: {
+    x: {
+      a: {}
+      y: {
+        let X#2 = {
+          b: 〈2;a〉
+          c: 1
+        }
+        v: 〈0;let X#2〉.c
+      }
+    }
+    x1: 〈0;x〉
+    x1: {
+      a: {
+        q: 1
+      }
+    }
+    x2: 〈0;x〉
+    x2: {
+      a: {
+        r: 2
+      }
+    }
+    xy: (〈0;x1〉 & 〈0;x2〉)
+  }
+}
+--- issue3590.cue
+{
+  issue3590: {
+    reduced: {
+      result: {
+        [_]: {
+          [string]: string
+        }
+      }
+      _input: {
+        A: {
+          p: "A"
+        }
+        B: {
+          p: "B"
+        }
+      }
+      for _, v in 〈0;_input〉 {
+        let Var1#3multi = 〈1;v〉.p
+        let Var2#4multi = 〈0;let Var1#3〉
+        let Items#5 = {
+          item: 〈1;let Var2#4〉
+        }
+        result: {
+          "conflicting-\(〈2;v〉.p)": 〈1;let Items#5〉
+        }
+      }
+    }
+  }
+  issue3590: {
+    full: {
+      #Result: {
+        [_]: {
+          [string]: string
+        }
+      }
+      result: 〈0;#Result〉
+      #Input: {
+        p: ("A"|"B")
+      }
+      _input: {
+        [_]: (〈1;#Input〉 & {
+          p: 〈1;-〉
+        })
+      }
+      _input: {
+        A: {}
+        B: {}
+      }
+      for _, v in 〈0;_input〉 {
+        let Var1#6multi = 〈1;v〉.p
+        let Var2#7multi = 〈0;let Var1#6〉
+        let Items#8 = {
+          item: 〈1;let Var2#7〉
+        }
+        result: {
+          "conflicting-\(〈2;v〉.p)": 〈1;let Items#8〉
+        }
+      }
+    }
+  }
+  issue3591: {
+    missing: {
+      #Result: {
+        [_]: {
+          [string]: string
+        }
+      }
+      result: 〈0;#Result〉
+      #Input: {
+        p: ("A"|"B")
+      }
+      _input: {
+        [_]: (〈1;#Input〉 & {
+          p: 〈1;-〉
+        })
+      }
+      _input: {
+        A: {}
+        B: {}
+      }
+      for _, v in 〈0;_input〉 {
+        let Var1#9multi = 〈1;v〉.p
+        let Var2#Amulti = 〈0;let Var1#9〉
+        let Items#B = {
+          item: {
+            key1: 〈2;let Var2#A〉
+          }
+        }
+        result: {
+          "missing-items-\(〈2;v〉.p)": {
+            for s, attr in 〈2;let Items#B〉 {
+              if (〈1;attr〉.key1 != _|_(explicit error (_|_ literal) in source)) {
+                〈2;s〉: 〈2;attr〉.key1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

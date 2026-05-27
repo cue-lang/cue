@@ -1,0 +1,56 @@
+-- in.cue --
+i1: 1 & int  @test(eq, 1)
+i2: 2 & int  @test(eq, 2)
+
+sum:     -1 + +2     @test(eq, 1)
+div1:    2.0 / 3 * 6 @test(eq, 4.0) @test(kind=float)
+div2:    2 / 3 * 6   @test(eq, 4.0) @test(kind=float,
+		hint="we may consider this to be int in the future")
+div3:    1.00 / 1.00 @test(eq, 1.0) @test(kind=float)
+divZero: 1.0 / 0     @test(err, code=eval, contains="division by zero", pos=[0:10])
+div00:   0 / 0       @test(err, code=eval, contains="division undefined", pos=[0:10])
+b:       1 != 4      @test(eq, true)
+add:     div1 + 1.0  @test(eq, 5.0)
+
+idiv00: div(0, 0) @test(err, code=eval, contains="division by zero", pos=[0:9])
+imod00: mod(0, 0) @test(err, code=eval, contains="division by zero", pos=[0:9])
+iquo00: quo(0, 0) @test(err, code=eval, contains="division by zero", pos=[0:9])
+irem00: rem(0, 0) @test(err, code=eval, contains="division by zero", pos=[0:9])
+
+v1: 1.0T / 2.0  @test(eq, 5.0E+11)
+v2: 2.0 == 2    @test(eq, true)
+v3: 2.0 / 3.0   @test(eq, 0.6666666666666666666666666666666667)
+v5: div(i1, i2) @test(eq, 0)
+
+e0: 2 + "a"     @test(err, code=eval, contains="invalid operands", pos=[0:5, 0:9])
+e5: div(1.0, 2) @test(err, code=eval, contains="cannot use", pos=[0:9])
+e6: rem(2, 2.0) @test(err, code=eval, contains="cannot use", pos=[0:12])
+e7: quo(2, 2.0) @test(err, code=eval, contains="cannot use", pos=[0:12])
+e8: mod(1.0, 1) @test(err, code=eval, contains="cannot use", pos=[0:9])
+-- out/compile --
+--- in.cue
+{
+  i1: (1 & int)
+  i2: (2 & int)
+  sum: (-1 + +2)
+  div1: ((2.0 / 3) * 6)
+  div2: ((2 / 3) * 6)
+  div3: (1.00 / 1.00)
+  divZero: (1.0 / 0)
+  div00: (0 / 0)
+  b: (1 != 4)
+  add: (〈0;div1〉 + 1.0)
+  idiv00: div(0, 0)
+  imod00: mod(0, 0)
+  iquo00: quo(0, 0)
+  irem00: rem(0, 0)
+  v1: (1000000000000 / 2.0)
+  v2: (2.0 == 2)
+  v3: (2.0 / 3.0)
+  v5: div(〈0;i1〉, 〈0;i2〉)
+  e0: (2 + "a")
+  e5: div(1.0, 2)
+  e6: rem(2, 2.0)
+  e7: quo(2, 2.0)
+  e8: mod(1.0, 1)
+}

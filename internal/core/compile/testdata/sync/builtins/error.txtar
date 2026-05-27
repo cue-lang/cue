@@ -1,0 +1,163 @@
+-- cue.mod/module.cue --
+module: "cuelang.org/error"
+language: version: "v0.15.0"
+-- in.cue --
+selection: {
+	dropError: 1 | error("drop me") @test(eq, 1)
+
+	useCustomError: 1&2 | error("use me") @test(err, code=eval, contains="use me", pos=[0:24, 0:18, 0:20])
+
+	twoCustomErrors: 1&2 | error("error one") | error("error two") @test(err, code=eval, contains="empty disjunction",
+		suberr=(code=eval, contains="error one", pos=[0:25]),
+		suberr=(code=eval, contains="error two", pos=[0:46]),
+	)
+
+	x: int
+	dropIncomplete: x + 1 | error("user msg: x + 1 failed") @test(err, code=incomplete, contains="user msg: x + 1 failed", pos=[0:26, -1:5])
+}
+
+interpolation: {
+	a: {b: int}
+	world: "world" @test(eq, "world")
+
+	substituteAll: a.notExist | error("hello \(world)") @test(err, code=incomplete, contains="hello world", pos=[0:30])
+
+	substituteFail: a.b + 1 | a.notExist | error("reference failed: \(a.b) | \(a.notExist)") @test(err, code=incomplete, contains="reference failed:", pos=[0:41, -5:9, 0:77])
+
+	// When the error() message itself contains an error,
+	// the custom error should not be thrown away.
+	// For comparison, without interpolation:
+	errorNoInterpolation: "a" | "b" | error("custom")
+	errorNoInterpolation: "c" @test(err, code=eval, contains="custom", pos=[-1:36, -1:24, 0:24])
+
+	// When the struct interpolation fails, the custom error should
+	// still be shown rather than being replaced by the interpolation error.
+	errorStructInterpolation: "a" | "b" | error("custom: \({x: 1})")
+	errorStructInterpolation: "c" @test(err, code=eval, contains="custom: {x:1}", pos=[-1:40, -1:28, -1:57, 0:28])
+
+	// When the interpolation always results in an error, the custom
+	// error should still be shown.
+	errorBottomInterpolation: "a" | "b" | error("custom: \(1 & 2)")
+	errorBottomInterpolation: "c" @test(err, code=eval, contains="custom: (1 & 2)", pos=[-1:40, -1:28, -1:57, 0:28])
+}
+indirect: {
+	x: error    @test(eq, error)
+	y: x("msg") @test(err, code=user, contains="msg", pos=[0:5])
+}
+-- incomplete.cue --
+import "struct"
+
+// The custom error should not alter the type of error.
+minFields: struct.MinFields(2) | error("should remain incomplete") @test(eq, struct.MinFields(2))
+maxFields: a: 1 @test(eq, 1)
+
+multi: struct.MinFields(2) | error("should remain incomplete") | error("second") @test(err, code=incomplete,
+	pos=[0:8, 0:25, 4:8],
+	suberr=(code=eval, contains="should remain incomplete", pos=[0:30]),
+	suberr=(code=eval, contains="second", pos=[0:66]))
+multi: a: 1
+
+-- self.cue --
+@experiment(aliasv2)
+
+// When error() interpolates "self" which is the enclosing struct
+// containing the error value itself (a cycle), the custom error
+// should still be shown.
+errorSelf: {
+	v: "x" | "y" | error("bad: \(self)")
+	v: "z"
+	@test(err, code=eval, contains="bad:", pos=[1:17, 0:12, 1:5, 2:5])
+}
+-- issues.cue --
+// issue4001: Tests that error() text is shown correctly when the message uses
+// string concatenation with interpolation. https://cuelang.org/issue/4001
+issue4001: {
+	a: "b"
+	a: int | error("error: "+"a='\(a)'") @test(err, code=eval, contains="error: a='b'", pos=[0:11, -1:5, 0:5])
+}
+// issue3983: Tests that multiple error() disjunctions aggregate all user-defined
+// error messages correctly. https://cuelang.org/issue/3983
+issue3983: {
+	x: int | error("I wanted an integer")
+	x: >10 | error("I wanted more than 10")
+	x: <20 | error("I wanted less than 20")
+
+	x: 3
+	@test(err, code=eval, contains="2 errors in empty disjunction", pos=[2:5, 5:5],
+		suberr=(code=eval, contains="I wanted an integer", hint="this could be dropped"),
+		suberr=(code=eval, contains="I wanted more than 10"),
+		hint="we could also include the third condition, if we want to be consistent.",
+	)
+}
+// issue3984: Tests that error() shows all relevant source locations when the
+// error builtin is used in a disjunction. https://cuelang.org/issue/3984
+issue3984: {
+	v: "a" | error("must be a")
+	v: "b" @test(err, code=eval, contains="must be a", pos=[-1:11, -1:5, 0:5])
+}
+-- out/compile --
+--- in.cue
+{
+  selection: {
+    dropError: (1|error("drop me"))
+    useCustomError: ((1 & 2)|error("use me"))
+    twoCustomErrors: ((1 & 2)|error("error one")|error("error two"))
+    x: int
+    dropIncomplete: ((〈0;x〉 + 1)|error("user msg: x + 1 failed"))
+  }
+  interpolation: {
+    a: {
+      b: int
+    }
+    world: "world"
+    substituteAll: (〈0;a〉.notExist|error("hello \(〈0;world〉)"))
+    substituteFail: ((〈0;a〉.b + 1)|〈0;a〉.notExist|error("reference failed: \(〈0;a〉.b) | \(〈0;a〉.notExist)"))
+    errorNoInterpolation: ("a"|"b"|error("custom"))
+    errorNoInterpolation: "c"
+    errorStructInterpolation: ("a"|"b"|error("custom: \({
+      x: 1
+    })"))
+    errorStructInterpolation: "c"
+    errorBottomInterpolation: ("a"|"b"|error("custom: \((1 & 2))"))
+    errorBottomInterpolation: "c"
+  }
+  indirect: {
+    x: error
+    y: 〈0;x〉("msg")
+  }
+}
+--- incomplete.cue
+{
+  minFields: (〈import;struct〉.MinFields(2)|error("should remain incomplete"))
+  maxFields: {
+    a: 1
+  }
+  multi: (〈import;struct〉.MinFields(2)|error("should remain incomplete")|error("second"))
+  multi: {
+    a: 1
+  }
+}
+--- issues.cue
+{
+  issue4001: {
+    a: "b"
+    a: (int|error(("error: " + "a='\(〈0;a〉)'")))
+  }
+  issue3983: {
+    x: (int|error("I wanted an integer"))
+    x: (>10|error("I wanted more than 10"))
+    x: (<20|error("I wanted less than 20"))
+    x: 3
+  }
+  issue3984: {
+    v: ("a"|error("must be a"))
+    v: "b"
+  }
+}
+--- self.cue
+{
+  errorSelf: {
+    v: ("x"|"y"|error("bad: \(〈1〉)"))
+    v: "z"
+  }
+}

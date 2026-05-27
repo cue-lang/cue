@@ -34,17 +34,3 @@ Retain: 0
 Unifications: 10
 Conjuncts:    10
 Disjuncts:    10
--- out/compile --
---- in.cue
-{
-  ex: {
-    aaa: "aaa"
-    list: "list"
-    zzz: "zzz"
-    AAA: "AAA"
-    html: "html"
-    HTML: "html"
-    ZZZ: "ZZZ"
-    Html: "html"
-  }
-}

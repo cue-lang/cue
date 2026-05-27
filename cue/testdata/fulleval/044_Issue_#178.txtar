@@ -32,11 +32,3 @@ Retain: 5
 Unifications: 5
 Conjuncts:    13
 Disjuncts:    10
--- out/compile --
---- in.cue
-{
-  foo: 〈import;"encoding/csv"〉.Decode(〈0;data〉)
-  data: bytes
-  len: int
-  bar: 〈import;"encoding/hex"〉.EncodedLen(〈0;len〉)
-}

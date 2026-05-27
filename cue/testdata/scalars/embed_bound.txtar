@@ -14,15 +14,3 @@ c: {
 	!=null
 	x: 1
 } @test(eq, {x: 1})
--- out/compile --
---- in.cue
-{
-  a: {
-    !=null
-  }
-  b: !=null
-  c: {
-    !=null
-    x: 1
-  }
-}

@@ -15,22 +15,6 @@ B: test.A & {} @test(eq, {
 	field2: "2"
 	name: "A"
 })
--- out/compile --
---- in.cue
-{
-  test: {
-    [_]: {
-      name: 〈1;-〉
-    }
-  }
-  test: {
-    A: {
-      field1: "1"
-      field2: "2"
-    }
-  }
-  B: (〈0;test〉.A & {})
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  10

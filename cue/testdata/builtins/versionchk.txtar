@@ -9,10 +9,3 @@ a: error("msg")
 -- out/evalalpha --
 a: builtin "error" is not available in version v0.8.0; it was added in version "v0.14.0":
     ./in.cue:2:4
--- out/compile --
-a: builtin "error" is not available in version v0.8.0; it was added in version "v0.14.0":
-    ./in.cue:2:4
---- in.cue
-{
-  a: _|_(builtin "error" is not available in version v0.8.0; it was added in version "v0.14.0")("msg")
-}

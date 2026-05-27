@@ -19,7 +19,6 @@
 // standard for INI files, this package supports a common subset:
 //
 //   - Sections are declared with [name] headers.
-//   - Nested sections use dot-separated names like [parent.child].
 //   - Properties use "key = value" syntax.
 //   - Comments are allowed and start with ; or # and span to the end of the line.
 //   - Multi-word values do not require quoting; leading/trailing
@@ -27,6 +26,7 @@
 //   - Blank lines are ignored.
 //   - Duplicate keys within the same section are an error.
 //   - Key and section name case sensitivity is configured via [Config.CaseSensitivity].
+//   - Section name nesting is configured via [Config.SectionNameNesting].
 //   - Value type parsing is configured via [Config.ValueTypes].
 //
 // The following features found in some INI variants are out of scope:
@@ -36,7 +36,6 @@
 //
 // Properties defined before any section header are placed at the
 // top level of the resulting CUE struct. Section names become nested
-// CUE struct fields.
 //
 // WARNING: THIS PACKAGE IS EXPERIMENTAL.
 // ITS API MAY CHANGE AT ANY TIME.
@@ -73,12 +72,27 @@ const (
 	// quoted values are unquoted and always treated as strings
 )
 
+// SectionNameNestingStrategy controls how the decoder interprets dots in section names.
+type SectionNameNestingStrategy int
+
+const (
+	sectionNamesUnset  SectionNameNestingStrategy = iota // default zero value; equal to [SectionNamesFlat] for now
+	SectionNamesFlat                                     // dots are treated as regular characters in section names
+	SectionNamesDotted                                   // dots are treated as nested section separators
+)
+
 // Config configures the behavior of the INI decoder.
 type Config struct {
 	// CaseSensitivity controls how keys and section names are cased.
 	// By default the original case is preserved ([CaseSensitive]).
 	// Set to [CaseLower] to lowercase all keys and section names.
 	CaseSensitivity CaseSensitivityStrategy
+
+	// SectionNameNesting controls how dots in section names are interpreted.
+	// By default dots are treated as regular characters ([SectionNamesFlat]),
+	// so all sections are flat.
+	// Set to [SectionNamesDotted] to treat dots as nested section separators.
+	SectionNameNesting SectionNameNestingStrategy
 
 	// ValueTypes controls how INI values are interpreted.
 	// By default all values are raw CUE strings ([ValuesRawStrings]).
@@ -168,8 +182,11 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 				return nil, d.posErrf(lineNum, "duplicate section: %s", sectionName)
 			}
 
-			// Build nested structs for dot-separated section names.
-			parts := strings.Split(sectionName, ".")
+			parts := []string{sectionName}
+			if d.cfg.SectionNameNesting == SectionNamesDotted {
+				// Explicitly opt-in to splitting section names by dots.
+				parts = strings.Split(sectionName, ".")
+			}
 			cur = &section{
 				struct_: d.buildNestedSection(topLevel, parts, lineNum),
 				keys:    make(map[string]bool),

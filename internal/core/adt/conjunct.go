@@ -282,7 +282,7 @@ loop1:
 	}
 
 	// When inserting a replace that is a definition, flip the ignore.
-	if hasEmbed && !s.isComprehension { // only if more than one decl.
+	if hasEmbed { // only if more than one decl.
 		ci = n.splitStruct(s, ci)
 	}
 

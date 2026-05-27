@@ -44,9 +44,6 @@ type StructLit struct {
 	Decls []Decl
 
 	// TODO: record the merge order somewhere.
-
-	// isComprehension is kept as it's used in comprehension.go and conjunct.go
-	isComprehension bool
 }
 
 func (o *StructLit) IsFile() bool {

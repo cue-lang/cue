@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dd5c698_fad5f27e",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-27T15:24:24Z",
+      "side": 1,
+      "message": "I don\u0027t understand what this field does. It doesn\u0027t seem to be referenced anywhere.",
+      "revId": "1b21037bf82d08ae3ff7552b7c35139c3c4a9dca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

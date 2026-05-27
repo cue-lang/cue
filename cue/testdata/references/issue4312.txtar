@@ -2,18 +2,14 @@
 # visibility from other files in the same package. The label alias form
 # `A=foo: ...` should leave `foo` reachable from other files in package p.
 # https://cuelang.org/issue/4312
-#inlinetest:exclude compile error blocks inline @test evaluation
 -- one.cue --
 package p
 
 A=foo: "foo value"
 
-one_alias: A
-one_field: foo
+one_alias: A   @test(eq, "foo value")
+one_field: foo @test(eq, "foo value")
 -- two.cue --
 package p
 
-two_field: foo
--- out/evalalpha --
-two_field: reference "foo" not found:
-    ./two.cue:3:12
+two_field: foo @test(eq, "foo value")

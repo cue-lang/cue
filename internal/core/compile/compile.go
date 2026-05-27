@@ -302,7 +302,11 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 
 		for _, d := range f.Decls {
 			if f, ok := d.(*ast.Field); ok {
-				if id, ok := f.Label.(*ast.Ident); ok {
+				label := f.Label
+				if a, ok := label.(*ast.Alias); ok {
+					label, _ = a.Expr.(ast.Label)
+				}
+				if id, ok := label.(*ast.Ident); ok {
 					c.fileScope[c.label(id)] = true
 				}
 			}

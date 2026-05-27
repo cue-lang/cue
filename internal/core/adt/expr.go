@@ -45,9 +45,6 @@ type StructLit struct {
 
 	// TODO: record the merge order somewhere.
 
-	// IsOpen is kept as it's used by ListMarker and some validations
-	IsOpen bool // has a ...
-
 	// isComprehension is kept as it's used in comprehension.go and conjunct.go
 	isComprehension bool
 }

@@ -373,9 +373,8 @@ type nodeContextState struct {
 	hasNonCyclic         bool // has non-cyclic conjuncts at start of field processing
 
 	// These simulate the old closeContext logic. TODO: perhaps remove.
-	hasStruct        bool // this node has a struct conjunct
-	hasOpenValidator bool // this node has an open validator
-	isDef            bool // this node is a definition
+	hasStruct bool // this node has a struct conjunct
+	isDef     bool // this node is a definition
 
 	dropParentRequirements bool // used for typo checking
 	computedCloseInfo      bool // used for typo checking

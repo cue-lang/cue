@@ -461,9 +461,6 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	if n.hasStruct {
 		blockClose = false
 	}
-	if n.hasOpenValidator {
-		blockClose = true
-	}
 	if n.isDef && !blockClose {
 		n.node.ClosedRecursive = true
 	}

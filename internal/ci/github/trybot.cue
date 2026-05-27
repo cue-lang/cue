@@ -191,8 +191,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// to not slow down CI unnecessarily.
 		if:   _repo.isLatestGoLinux
 		name: "Test with -race"
-		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
-		run: "go test -race ./..."
+		run:  "go test -race ./..."
 	}
 
 	_goTest32bit: githubactions.#Step & {

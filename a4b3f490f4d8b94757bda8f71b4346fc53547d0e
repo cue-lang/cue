@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d03057d_52ff8c58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-27T15:21:23Z",
+      "side": 1,
+      "message": "LGTM with one thought in passing.",
+      "revId": "a4b3f490f4d8b94757bda8f71b4346fc53547d0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "200f719d_6023cfd7",
+        "filename": "pkg/tool/exec/exec.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-27T15:21:23Z",
+      "side": 1,
+      "message": "Might another reasonable alternative be to mark the `env` field as optional?",
+      "revId": "a4b3f490f4d8b94757bda8f71b4346fc53547d0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

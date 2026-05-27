@@ -103,7 +103,7 @@ graph TD
 {
 	$id: "tool/exec.Run"
 	cmd: "cue-fake import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
-	env: {} | []
+	env: {}
 	stderr:      null
 	stdin:       GET.response.body & (*null | string | bytes)
 	stdout:      "foo"

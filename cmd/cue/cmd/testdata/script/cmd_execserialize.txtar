@@ -1,16 +1,12 @@
-! exec cue cmd printTask
-cmp stderr stderr.golden
+exec cue cmd printTask
+cmp stdout stdout.golden
 
 -- cue.mod/module.cue --
 module: "example.com"
 language: version: "v0.9.0"
 
--- stderr.golden --
-command.printTask.print.text: invalid string argument: error in call to encoding/json.Marshal: cannot convert incomplete value "|((struct){\n}, (list){\n})" to JSON:
-    ./foo_tool.cue:14:2
-    ./foo_tool.cue:15:3
-    ./foo_tool.cue:15:9
-    tool/cli:5:3
+-- stdout.golden --
+{"$id":"tool/exec.Run","cmd":["true"],"env":{},"stdout":"","stderr":null,"stdin":null,"success":true,"mustSucceed":true}
 -- foo_tool.cue --
 package foo
 

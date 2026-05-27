@@ -1,0 +1,18 @@
+-- in.cue --
+import "list"
+
+a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y}) @test(eq, [1, 2, 3, 4])
+-- out/compile --
+--- in.cue
+{
+  a: 〈import;list〉.Sort([
+    2,
+    3,
+    1,
+    4,
+  ], {
+    x: _
+    y: _
+    less: (〈0;x〉 < 〈0;y〉)
+  })
+}

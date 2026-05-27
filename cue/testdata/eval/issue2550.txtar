@@ -15,16 +15,6 @@ if bar.missing == "x" {
 -- out/errors.txt --
 [eval] undefined field: missing:
     ./in.cue:4:8
--- out/compile --
---- in.cue
-{
-  foo: string
-  bar: close({})
-  if (〈0;bar〉.missing == "x") {
-    let _bar#1 = 〈1;bar〉
-    foo: 〈0;let _bar#1〉
-  }
-}
 -- out/eval/stats --
 Leaks:  1
 Freed:  4

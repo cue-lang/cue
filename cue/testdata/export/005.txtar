@@ -1,18 +1,6 @@
 #inlinetest:exclude skip — tests export format, not evaluator semantics
 -- in.cue --
 {a: 1, b: a + 2, c: null, d: true, e: _, f: string}
--- out/compile --
---- in.cue
-{
-  {
-    a: 1
-    b: (〈0;a〉 + 2)
-    c: null
-    d: true
-    e: _
-    f: string
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

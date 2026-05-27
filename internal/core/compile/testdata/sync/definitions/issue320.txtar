@@ -1,0 +1,34 @@
+
+# Tests that "field not allowed" errors in closed structs include sufficient
+# diagnostic information about the source of the restriction.
+# https://cuelang.org/issue/320
+-- in.cue --
+#Foo: {
+	x: string
+	#More
+}
+
+#More: [=~"^x-"]: _
+
+foo: #Foo & {
+	x: "hello"
+	y: "goodbye"
+} @test(err, at=y, code=eval,
+	hint="could use more positions, like in v2",
+	contains="field not allowed",
+	pos=[in.cue:10:2])
+-- out/compile --
+--- in.cue
+{
+  #Foo: {
+    x: string
+    〈1;#More〉
+  }
+  #More: {
+    [=~"^x-"]: _
+  }
+  foo: (〈0;#Foo〉 & {
+    x: "hello"
+    y: "goodbye"
+  })
+}

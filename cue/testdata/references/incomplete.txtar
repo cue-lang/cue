@@ -55,36 +55,3 @@ Conjuncts:    18
 Disjuncts:    0
 
 NumCloseIDs: 4
--- out/compile --
---- in.cue
-{
-  comprehensions: {
-    a: {}
-    b: {
-      if 〈1;a〉.b {}
-    }
-    c: {
-      for _, x in 〈1;a〉.b {
-        〈1;x〉
-      }
-    }
-  }
-  openStruct: {
-    a: {}
-    b: 〈0;a〉.c
-  }
-  selectFromTop: {
-    top: _
-    a: 〈0;top〉.foo
-  }
-  indexOnTop: {
-    top: _
-    a: 〈0;top〉[2]
-  }
-  incompleteIndex: {
-    top: _
-    a: [
-      1,
-    ][〈0;top〉]
-  }
-}

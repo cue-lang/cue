@@ -56,44 +56,6 @@ issue2473: two: {
 [eval] simple.x: conflicting values "foo" and "x":
     ./in.cue:4:7
     ./in.cue:9:7
--- out/compile --
---- in.cue
-{
-  simple: {
-    x: "x"
-    〈0;x〉: "foo"
-  }
-  issue2473: {
-    one: {
-      c: {
-        env: "prod"
-        env: ("dev"|"prod")
-        env2: 〈0;env〉
-      }
-      if (〈0;c〉.env2 == "prod") {
-        {
-          c: {
-            env2: string
-          }
-          example: 〈0;c〉.env2
-        }
-      }
-    }
-  }
-  issue2473: {
-    two: {
-      env: "prod"
-      env: ("dev"|"prod")
-      env2: 〈0;env〉
-      if (〈0;env2〉 == "prod") {
-        {
-          env2: string
-          example: 〈0;env2〉
-        }
-      }
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  2
 Freed:  19

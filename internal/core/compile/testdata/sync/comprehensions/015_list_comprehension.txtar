@@ -1,0 +1,41 @@
+-- in.cue --
+b: {
+	a: 1
+	b: 2
+	c: 3
+	d: 4
+}
+
+a: [for k, v in b if k < "d" if v > b.a {k}] @test(eq, ["b", "c"])
+c: {
+	[for _, x in b for _, y in b if x < y {x}]
+	@test(eq, [1, 1, 1, 2, 2, 3])
+}
+d: [for x, _ in a {x}] @test(eq, [0, 1])
+-- out/compile --
+--- in.cue
+{
+  b: {
+    a: 1
+    b: 2
+    c: 3
+    d: 4
+  }
+  a: [
+    for k, v in 〈1;b〉 if (〈0;k〉 < "d") if (〈0;v〉 > 〈2;b〉.a) {
+      〈1;k〉
+    },
+  ]
+  c: {
+    [
+      for _, x in 〈2;b〉 for _, y in 〈3;b〉 if (〈1;x〉 < 〈0;y〉) {
+        〈2;x〉
+      },
+    ]
+  }
+  d: [
+    for x, _ in 〈1;a〉 {
+      〈1;x〉
+    },
+  ]
+}

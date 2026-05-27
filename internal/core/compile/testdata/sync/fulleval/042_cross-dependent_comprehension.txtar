@@ -1,0 +1,29 @@
+# Tests that comprehension conditions referencing fields resolve correctly when the
+# condition is cross-dependent. x unifies #a with b:true and c:4, resolving the
+# comprehension. y is an alias of x with the same value.
+-- in.cue --
+#a: {
+	if b {
+		c: 4
+	}
+	b: bool
+	@test(err, code=incomplete, args=[bool], pos=[in.cue:5:5])
+}
+x: (#a & {b: true}) & {c: 4} @test(eq, {b: true, c: 4}) @test(shareID=xy)
+y: x                         @test(eq, {b: true, c: 4}) @test(shareID=xy)
+-- out/compile --
+--- in.cue
+{
+  #a: {
+    if 〈0;b〉 {
+      c: 4
+    }
+    b: bool
+  }
+  x: ((〈0;#a〉 & {
+    b: true
+  }) & {
+    c: 4
+  })
+  y: 〈0;x〉
+}

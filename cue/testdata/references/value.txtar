@@ -65,32 +65,3 @@ NumCloseIDs: 2
     2: (int){ 1 }
   }
 }
--- out/compile --
---- err.cue
-{
-  cycleErr: {
-    err3: ==(〈1〉 + 1)
-    err3: 4
-  }
-}
---- in.cue
-{
-  structShorthand: {
-    b: 3
-    c: 〈1〉.b
-  }
-  fieldAndValue: {
-    foo: {
-      3
-      #sum: (〈1;foo〉 + 〈1〉)
-    }
-  }
-  valueCycle: {
-    b: (3 + 〈0〉)
-  }
-  listValueAlias: [
-    1,
-    2,
-    〈1〉[0],
-  ]
-}

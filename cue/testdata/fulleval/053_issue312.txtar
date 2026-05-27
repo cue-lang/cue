@@ -11,17 +11,6 @@ for x in [1] {
 }
 
 @test(eq, *{} | {})
--- out/compile --
---- in.cue
-{
-  for _, x in [
-    1,
-  ] {
-    (*close({})|{
-      [_]: null
-    })
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

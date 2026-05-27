@@ -85,32 +85,5 @@ Disjuncts:    16
 Notifications: 3
 
 NumCloseIDs: 22
--- out/compile --
---- in.cue
-{
-  t1: {
-    #Test: {
-      #HTTP: =~"^http://"
-      #SSH: !~"^ssh://"
-      #USER: 〈import;strings〉.MinRunes(3)
-      source: (〈0;#HTTP〉|〈0;#SSH〉|〈0;#USER〉|〈1;#Test〉)
-    }
-    foo: (〈0;#Test〉 & {
-      source: "http://blablabla"
-    })
-    bar: (〈0;#Test〉 & {
-      source: 〈1;foo〉
-    })
-  }
-  t2: {
-    str: "foo"
-    a: =~〈0;str〉
-    b: =~"foo"
-    c: (((〈0;a〉 & 〈0;b〉) & 〈0;a〉) & 〈0;b〉)
-    d: 〈import;time〉.Time
-    e: 〈import;time〉.Time()
-    f: (((〈0;d〉 & 〈0;e〉) & 〈0;d〉) & 〈0;e〉)
-  }
-}
 -- out/todo.txt --
 Reordering of fields in t1.foo and t1.bar between v2 and v3 (source field order differs).

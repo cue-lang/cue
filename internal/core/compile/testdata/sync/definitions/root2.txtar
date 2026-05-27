@@ -1,0 +1,16 @@
+-- in.cue --
+root2: 1
+#Root2: {}
+#Root2
+
+@test(eq, {
+	root2: 1
+	#Root2: {}
+})
+-- out/compile --
+--- in.cue
+{
+  root2: 1
+  #Root2: {}
+  〈0;#Root2〉
+}

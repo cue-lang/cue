@@ -11,13 +11,3 @@ rawMin: struct.MinFields(3) @test(eq, struct.MinFields(3))
 
 intMixDirect: int & <=1  @test(eq, <=1 & int)
 intMixEmbed: {int & <=1}  @test(eq, {<=1 & int})
--- out/compile --
---- in.cue
-{
-  rawMax: 〈import;struct〉.MaxFields(2)
-  rawMin: 〈import;struct〉.MinFields(3)
-  intMixDirect: (int & <=1)
-  intMixEmbed: {
-    (int & <=1)
-  }
-}

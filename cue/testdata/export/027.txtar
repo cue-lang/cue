@@ -11,15 +11,6 @@ eval: true
 		#Bar: #Foo | string
 	}
 }
--- out/compile --
---- in.cue
-{
-  {
-    #Foo: {
-      #Bar: (〈1;#Foo〉|string)
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  1
 Freed:  4

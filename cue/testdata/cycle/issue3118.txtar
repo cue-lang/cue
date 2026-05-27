@@ -112,35 +112,3 @@ Conjuncts:    47
 Disjuncts:    0
 
 NumCloseIDs: 3
--- out/compile --
---- in.cue
-{
-  #TimeSpan: {
-    start: float
-    duration: float
-    end: float
-    start: (〈0;end〉 - 〈0;duration〉)
-    duration: (〈0;end〉 - 〈0;start〉)
-    end: (〈0;start〉 + 〈0;duration〉)
-    start: <=〈0;end〉
-  }
-  examples: {
-    [string]: 〈1;#TimeSpan〉
-  }
-  examples: {
-    eg1: {
-      start: 10.0
-      duration: 2.1
-    }
-  }
-  examples: {
-    eg2: {
-      start: 10.0
-    }
-  }
-  examples: {
-    eg3: {
-      end: 10.0
-    }
-  }
-}

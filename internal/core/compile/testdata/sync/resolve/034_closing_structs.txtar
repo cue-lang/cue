@@ -1,0 +1,50 @@
+-- in.cue --
+op: {x: int}             @test(eq, {x: int}) // {x: int}
+ot: {x: int, ...}        @test(eq, {x: int}) // {x: int, ...}
+cp: close({x: int})      @test(eq, {x: int}) @test(closed) // closed({x: int})
+ct: close({x: int, ...}) @test(eq, {x: int}) @test(closed) @test(shareID=ctct) @test(allows, string)
+
+opot: op & ot @test(eq, {x: int}) // {x: int, ...}
+otop: ot & op @test(eq, {x: int}) // {x: int, ...}
+opcp: op & cp @test(eq, {x: int}) @test(closed) @test(allows=false, string)
+cpop: cp & op @test(eq, {x: int}) @test(closed) @test(allows=false, string)
+opct: op & ct @test(eq, {x: int}) @test(closed) @test(allows, string)
+ctop: ct & op @test(eq, {x: int}) @test(closed) @test(allows, string)
+otcp: ot & cp @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
+cpot: cp & ot @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
+otct: ot & ct @test(eq, {x: int}) @test(closed) @test(allows, string)
+ctot: ct & ot @test(eq, {x: int}) @test(closed) @test(allows, string)
+cpct: cp & ct @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
+ctcp: ct & cp @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
+ctct: ct & ct @test(eq, {x: int}) @test(closed) @test(shareID=ctct) @test(allows, string)
+-- out/compile --
+--- in.cue
+{
+  op: {
+    x: int
+  }
+  ot: {
+    x: int
+    ...
+  }
+  cp: close({
+    x: int
+  })
+  ct: close({
+    x: int
+    ...
+  })
+  opot: (〈0;op〉 & 〈0;ot〉)
+  otop: (〈0;ot〉 & 〈0;op〉)
+  opcp: (〈0;op〉 & 〈0;cp〉)
+  cpop: (〈0;cp〉 & 〈0;op〉)
+  opct: (〈0;op〉 & 〈0;ct〉)
+  ctop: (〈0;ct〉 & 〈0;op〉)
+  otcp: (〈0;ot〉 & 〈0;cp〉)
+  cpot: (〈0;cp〉 & 〈0;ot〉)
+  otct: (〈0;ot〉 & 〈0;ct〉)
+  ctot: (〈0;ct〉 & 〈0;ot〉)
+  cpct: (〈0;cp〉 & 〈0;ct〉)
+  ctcp: (〈0;ct〉 & 〈0;cp〉)
+  ctct: (〈0;ct〉 & 〈0;ct〉)
+}

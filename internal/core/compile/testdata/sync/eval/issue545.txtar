@@ -1,0 +1,101 @@
+# Tests that recursive definitions using disjunctions of validators and self-references
+# do not produce duplicate constraints. A regression caused nested applications to
+# accumulate redundant conjunctions instead of preserving the recursive structure.
+# https://cuelang.org/issue/545
+title: Simplification of validators.
+-- in.cue --
+package main
+
+import (
+	"strings"
+	"time"
+)
+
+t1: {
+	#Test: {
+		#HTTP:  =~"^http://"
+		#SSH:   !~"^ssh://"
+		#USER:  strings.MinRunes(3)
+		source: #HTTP | #SSH | #USER | #Test
+	}
+
+	foo: #Test & {
+		source: "http://blablabla"
+	}
+
+	bar: #Test & {
+		source: foo
+	}
+	@test(eq, {
+		#Test: {
+			#HTTP: =~"^http://"
+			#SSH: !~"^ssh://"
+			#USER: strings.MinRunes(3)
+			source: =~"^http://" | !~"^ssh://" | strings.MinRunes(3)
+		}
+		foo: {
+			source: "http://blablabla"
+			#HTTP: =~"^http://"
+			#SSH: !~"^ssh://"
+			#USER: strings.MinRunes(3)
+		}
+		bar: {
+			source: {
+				source: "http://blablabla"
+				#HTTP: =~"^http://"
+				#SSH: !~"^ssh://"
+				#USER: strings.MinRunes(3)
+			}
+			#HTTP: =~"^http://"
+			#SSH: !~"^ssh://"
+			#USER: strings.MinRunes(3)
+		}
+	})
+}
+
+t2: {
+	str: "foo"
+	a:   =~str
+	b:   =~"foo"
+	c:   a & b & a & b
+
+	d: time.Time
+	e: time.Time()
+	f: d & e & d & e
+	@test(eq, {
+		str: "foo"
+		a: =~"foo"
+		b: =~"foo"
+		c: =~"foo"
+		d: time.Time()
+		e: time.Time()
+		f: time.Time()
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    #Test: {
+      #HTTP: =~"^http://"
+      #SSH: !~"^ssh://"
+      #USER: 〈import;strings〉.MinRunes(3)
+      source: (〈0;#HTTP〉|〈0;#SSH〉|〈0;#USER〉|〈1;#Test〉)
+    }
+    foo: (〈0;#Test〉 & {
+      source: "http://blablabla"
+    })
+    bar: (〈0;#Test〉 & {
+      source: 〈1;foo〉
+    })
+  }
+  t2: {
+    str: "foo"
+    a: =~〈0;str〉
+    b: =~"foo"
+    c: (((〈0;a〉 & 〈0;b〉) & 〈0;a〉) & 〈0;b〉)
+    d: 〈import;time〉.Time
+    e: 〈import;time〉.Time()
+    f: (((〈0;d〉 & 〈0;e〉) & 〈0;d〉) & 〈0;e〉)
+  }
+}

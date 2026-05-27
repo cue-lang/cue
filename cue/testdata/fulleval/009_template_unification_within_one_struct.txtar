@@ -12,33 +12,6 @@ a: "E": {c: "bar"} @test(eq, {
 	name: "E"
 	kind: "E"
 })
--- out/compile --
---- in.cue
-{
-  a: {
-    {
-      [string]: {
-        name: 〈1;-〉
-      }
-    }
-    {
-      [string]: {
-        kind: 〈1;-〉
-      }
-    }
-  }
-  a: {
-    A: _
-  }
-  a: {
-    C: _
-  }
-  a: {
-    E: {
-      c: "bar"
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  12

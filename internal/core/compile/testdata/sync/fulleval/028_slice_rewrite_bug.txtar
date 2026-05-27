@@ -1,0 +1,37 @@
+-- in.cue --
+t1: {
+	fn: {
+		arg: [...int] & [1]
+		out: arg[1:]
+	}
+	fn1: fn & {arg: [1]}
+	@test(eq, {
+		fn: {
+			arg: [1]
+			out: []
+		}
+		fn1: {
+			arg: [1]
+			out: []
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    fn: {
+      arg: ([
+        ...int,
+      ] & [
+        1,
+      ])
+      out: 〈0;arg〉[1:]
+    }
+    fn1: (〈0;fn〉 & {
+      arg: [
+        1,
+      ]
+    })
+  }
+}

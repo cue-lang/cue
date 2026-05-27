@@ -10,19 +10,6 @@ c: d & {b?: 4} @test(eq, {
 } | {
 	b?: 4, a: 2
 })
--- out/compile --
---- in.cue
-{
-  d: ({
-    a: 1
-    b?: 3
-  }|{
-    a: 2
-  })
-  c: (〈0;d〉 & {
-    b?: 4
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  15

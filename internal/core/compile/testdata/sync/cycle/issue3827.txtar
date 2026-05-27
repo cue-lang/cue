@@ -1,0 +1,77 @@
+# evalv3 incorrectly produces a "field not allowed" error when unifying against
+# a definition that succeeds without error under evalv2, regressing on a
+# real-world GitHub Actions schema.
+# https://cuelang.org/issue/3827
+-- in.cue --
+reduced: {
+	A: b: (A.c & {}).x
+	A: null | { c: x: 1 }
+	@test(eq, {A: {b: 1, c: {x: 1}}})
+}
+
+full: {
+	out: #Workflow.#Step & {
+		uses: "actions/upload-artifact@v3"
+		with: {
+			name: "foo"
+			path: "bar"
+		}
+	}
+
+	Y=#Workflow: #Step: (Y.steps & {x: {}}).x
+
+	#Workflow: null | {
+		steps: [string]: {
+			uses?: string
+			with?: [string]: string
+		}
+	}
+	@test(eq, {
+		out: {
+			uses: "actions/upload-artifact@v3"
+			with: {name: "foo", path: "bar"}
+		}
+		#Workflow: {
+			#Step: {uses?: string, with?: {}}
+			steps: {}
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  reduced: {
+    A: {
+      b: (〈1;A〉.c & {}).x
+    }
+    A: (null|{
+      c: {
+        x: 1
+      }
+    })
+  }
+  full: {
+    out: (〈0;#Workflow〉.#Step & {
+      uses: "actions/upload-artifact@v3"
+      with: {
+        name: "foo"
+        path: "bar"
+      }
+    })
+    #Workflow: {
+      #Step: (〈1;#Workflow〉.steps & {
+        x: {}
+      }).x
+    }
+    #Workflow: (null|{
+      steps: {
+        [string]: {
+          uses?: string
+          with?: {
+            [string]: string
+          }
+        }
+      }
+    })
+  }
+}

@@ -1,0 +1,23 @@
+-- in.cue --
+t1: {
+    a: {c: b.e, d: b.f}
+    b: {e: 3, f: a.c}
+    @test(eq, {
+      a: {c: 3, d: 3}
+      b: {e: 3, f: 3}
+    })
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    a: {
+      c: 〈1;b〉.e
+      d: 〈1;b〉.f
+    }
+    b: {
+      e: 3
+      f: 〈1;a〉.c
+    }
+  }
+}

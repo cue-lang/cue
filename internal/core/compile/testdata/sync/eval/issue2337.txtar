@@ -1,0 +1,92 @@
+# evalv2 reported "x: was already used" instead of "conflicting values" for the
+# simple.x case. The issue2473 cases test that comprehension guards do not prevent
+# fields referenced in the guard from being further constrained in the outer scope
+# — env2 should remain "prod" even after being used as a comprehension condition.
+# The "one" variant broke on v0.6.0; the "two" variant also failed on v0.5.0.
+-- in.cue --
+// evalv2 failed with the confusing error "x: was already used"
+// rather than a friendlier "conflicting values" error.
+simple: {
+	x:   "x" @test(err, code=eval,
+			contains="conflicting values",
+			args=["foo", "x"],
+			pos=[0:7, 5:7])
+
+	(x): "foo"
+}
+// Worked on CUE v0.5.0, broke on v0.6.0 with "was already used".
+// Should succeed, as the comprehension does not change env2.
+issue2473: one: {
+	c: {
+		env:  "prod"
+		env:  "dev" | "prod"
+		env2: env
+	}
+
+	if c.env2 == "prod" {
+		{
+			c: env2: string
+			example: c.env2
+		}
+	}
+	@test(eq, {
+		c: {env: "prod", env2: "prod"},
+		example: "prod"}
+	)
+}
+// A variant of the above which failed on v0.5.0 as well.
+issue2473: two: {
+	env:  "prod"
+	env:  "dev" | "prod"
+	env2: env
+
+	if env2 == "prod" {
+		{
+			env2:    string
+			example: env2
+		}
+	}
+	@test(eq, {
+		env:     "prod"
+		env2:    "prod"
+		example: "prod"
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  simple: {
+    x: "x"
+    〈0;x〉: "foo"
+  }
+  issue2473: {
+    one: {
+      c: {
+        env: "prod"
+        env: ("dev"|"prod")
+        env2: 〈0;env〉
+      }
+      if (〈0;c〉.env2 == "prod") {
+        {
+          c: {
+            env2: string
+          }
+          example: 〈0;c〉.env2
+        }
+      }
+    }
+  }
+  issue2473: {
+    two: {
+      env: "prod"
+      env: ("dev"|"prod")
+      env2: 〈0;env〉
+      if (〈0;env2〉 == "prod") {
+        {
+          env2: string
+          example: 〈0;env2〉
+        }
+      }
+    }
+  }
+}

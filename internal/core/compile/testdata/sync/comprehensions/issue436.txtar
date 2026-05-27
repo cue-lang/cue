@@ -1,0 +1,47 @@
+# Tests that if-comprehensions inside a definition correctly match default
+# values when the condition is satisfied. Issue #436: conditional in a definition
+# unified with a concrete value was not evaluating the condition correctly.
+# https://cuelang.org/issue/436
+-- in.cue --
+#a: {
+	val:    string
+	result: string
+	@test(closed)
+}
+
+a: #a & {
+	val:    *"default" | string
+	result: *"not-matched" | string
+	if (val == "match") {
+		result: "matched"
+	}
+} @test(eq, {val: *"default" | string, result: *"not-matched" | string}) @test(closed)
+
+match: a & {
+	val: "match"
+} @test(eq, {val: "match", result: "matched"}) @test(closed)
+
+not: a & {
+	val: "other"
+} @test(eq, {val: "other", result: *"not-matched" | string}) @test(closed)
+-- out/compile --
+--- in.cue
+{
+  #a: {
+    val: string
+    result: string
+  }
+  a: (〈0;#a〉 & {
+    val: (*"default"|string)
+    result: (*"not-matched"|string)
+    if (〈0;val〉 == "match") {
+      result: "matched"
+    }
+  })
+  match: (〈0;a〉 & {
+    val: "match"
+  })
+  not: (〈0;a〉 & {
+    val: "other"
+  })
+}

@@ -1,0 +1,22 @@
+# Tests that list.UniqueItems correctly rejects lists with duplicate
+# values, which were silently passed through instead of producing an error.
+# https://cuelang.org/issue/299
+-- in.cue --
+import "list"
+
+x: list.UniqueItems
+x: [string, ...string]
+x: ["x", "x"] @test(err, code=eval, contains="does not satisfy list.UniqueItems", pos=[-2:4, -1:4, 0:4])
+-- out/compile --
+--- in.cue
+{
+  x: 〈import;list〉.UniqueItems
+  x: [
+    string,
+    ...string,
+  ]
+  x: [
+    "x",
+    "x",
+  ]
+}

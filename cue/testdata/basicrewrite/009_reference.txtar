@@ -17,24 +17,6 @@ e: {
 		v: e.v
 	}
 }
--- out/compile --
---- in.cue
-{
-  a: 〈0;b〉
-  b: 2
-  d: {
-    d: 3
-    e: 〈0;d〉
-  }
-  e: {
-    e: {
-      v: 1
-    }
-    f: {
-      v: 〈1;e〉.v
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  11

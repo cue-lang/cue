@@ -30,31 +30,6 @@ Disjuncts:    14
 Notifications: 2
 
 NumCloseIDs: 5
--- out/compile --
---- in.cue
-{
-  #App: {
-    name?: string
-    sub1?: {
-      sub2?: (null|_)
-    }
-  }
-  #Output: (null|〈0;#App〉)
-  out: (〈0;#Output〉 & {
-    name: "foo"
-    sub1: {
-      sub2: ({}|_)
-    }
-    sub1: {
-      sub2: {
-        sub3: {
-          let _let#1 = "bar"
-          foo: 〈0;let _let#1〉
-        }
-      }
-    }
-  })
-}
 -- out/diff-v2-v3.txt --
 Disjunctions with defaults: needs @test(final) for default field selection
 v3: sub2 is (#struct); v2: sub2 is (struct)

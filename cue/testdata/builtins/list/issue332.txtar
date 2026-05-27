@@ -28,22 +28,3 @@ Conjuncts:    44
 Disjuncts:    0
 
 NumCloseIDs: 15
--- out/compile --
---- in.cue
-{
-  #d: {
-    #x: string
-    result: [
-      〈1;#x〉,
-    ]
-  }
-  #foo: {
-    #x: _
-    y: 〈import;list〉.FlattenN((〈1;#d〉 & {
-      #x: 〈1;#x〉
-    }).result, 1)
-  }
-  r: (〈0;#foo〉 & {
-    #x: "hello"
-  })
-}

@@ -1,0 +1,16 @@
+TODO: add matching when bulk optional fields are allowed
+alongside other fields.
+-- in.cue --
+{[X=string]: baz: X}
+bar: {}
+@test(eq, {bar: baz: "bar"})
+-- out/compile --
+--- in.cue
+{
+  {
+    [string]: {
+      baz: 〈1;-〉
+    }
+  }
+  bar: {}
+}

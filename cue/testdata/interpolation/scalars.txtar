@@ -28,21 +28,6 @@ Retain: 0
 Unifications: 11
 Conjuncts:    12
 Disjuncts:    0
--- out/compile --
---- in.cue
-{
-  bool1: "1+1=2:  \(true)"
-  bool1: "1+1=2:  \(true)"
-  bool2: "1+1=1:  \(false)"
-  b1: 'a\xed\x95a'
-  bytes1s: "\(〈0;b1〉)"
-  bytes1b: '\(〈0;b1〉)'
-  b2: 'a\x80\x95a'
-  bytes2s: "\(〈0;b2〉)"
-  bytes2b: '\(〈0;b2〉)'
-  n1: "\(1) \(2.00)"
-  n2: "\(1E+2)"
-}
 -- out/diff-v2-v3.txt --
 v2 produces two replacement characters for bytes2s ("a\uFFFD\uFFFDa"); v3
 produces one ("a\uFFFDa"). Reason: V2 implements Go conversions standard, which

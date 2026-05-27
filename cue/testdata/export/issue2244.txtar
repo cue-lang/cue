@@ -65,27 +65,3 @@ and not allow #pattern in #step
 [incomplete] error in call to strings.HasSuffix: non-concrete value string:
     ./in.cue:11:6
     ./in.cue:8:12
--- out/compile --
---- in.cue
-{
-  _#matchPattern(:x): {
-    #pattern: string
-    [
-      if 〈import;strings〉.HasSuffix(〈1;#pattern〉, "*") {
-        let prefix#1 = 〈import;strings〉.TrimSuffix(〈2;#pattern〉, "*")
-        〈0;let prefix#1〉
-      },
-      "'\(〈1;#pattern〉)'",
-    ][0]
-  }
-  _#isReleaseTag(:x): (〈0;_#matchPattern(:x)〉 & {
-    #pattern: "refs/tags/v*"
-    _
-  })
-  #step: {
-    if: (number|string)
-  }
-  m: (〈0;#step〉 & {
-    if: 〈1;_#isReleaseTag(:x)〉
-  })
-}

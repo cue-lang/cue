@@ -48,19 +48,3 @@ debugCheckVersioned: {
 		""")
 	z: 99
 }
--- out/compile --
---- in.cue
-{
-  debugCheckScalar: 42
-  debugCheckStruct: {
-    a: 1
-    b: 2
-  }
-  debugCheckComputed: {
-    x: 10
-    y: (〈0;x〉 * 2)
-  }
-  debugCheckVersioned: {
-    z: 99
-  }
-}

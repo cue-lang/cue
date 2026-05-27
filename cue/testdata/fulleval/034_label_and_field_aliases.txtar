@@ -27,25 +27,6 @@ c:           C       @test(eq, 5)
 	  str: (int){ 5 }
 	}
 	""")
--- out/compile --
---- in.cue
-{
-  p: {
-    [string]: {
-      name: 〈1;-〉
-    }
-  }
-  p: {
-    q: _
-  }
-  "foo=bar": "str"
-  a: 〈0;"foo=bar"〉
-  bb: 4
-  b1: 〈0;bb〉
-  b1: 〈0;bb〉
-  "\(〈0;a〉)": 5
-  c: 〈0;("\(〈0;a〉)")〉
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  8

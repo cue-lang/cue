@@ -29,31 +29,5 @@ Disjuncts:    2
 Notifications: 1
 
 NumCloseIDs: 3
--- out/compile --
---- in.cue
-{
-  root: {
-    input: {
-      foo: {
-        metadata: {
-          name: (*"foo"|string)
-        }
-        id: "id-\(〈0;metadata〉.name)"
-        #deps: {
-          [string]: _
-        }
-        #deps: {
-          root: {}
-        }
-        spec: {
-          replicas: 1
-        }
-      }
-    }
-  }
-  {
-    〈1;root〉.input.foo.#deps
-  }
-}
 -- out/diff-v2-v3.txt --
 Disjunctions with defaults: needs @test(final) for default field selection

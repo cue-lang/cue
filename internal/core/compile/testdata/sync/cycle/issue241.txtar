@@ -1,0 +1,64 @@
+# `!=` applied to a disjunction before structural cycle is concrete:
+# CUE incorrectly reports an empty disjunction error instead of handling
+# the abstract `!=` constraint between fields sharing a disjunction type.
+# https://cuelang.org/issue/241
+-- in.cue --
+#Value: 0 | 1
+
+foo: #Value  @test(err, code=cycle|incomplete, args=[bar], pos=[-2:13, 2:6, 3:6])
+foo: !=bar
+bar: #Value  @test(eq, 0 | 1)
+bar: !=foo   @test(err:todo, code=cycle|incomplete)
+
+#Value: 0 | 1
+
+Foo: #Value  @test(eq, 1)
+Foo: !=Bar
+Bar: #Value  @test(eq, 0)
+Bar: !=Foo
+Bar: 0
+
+cell: a: 0 | 1
+cell: a: !=cell.b
+cell: b: 0 | 1
+cell: b: !=cell.a
+cell: a: 0   @test(eq, 0)
+cell: b: _   @test(eq, 1)
+
+a: cell.a  @test(eq, 0)
+b: cell.b  @test(eq, 1)
+-- out/compile --
+--- in.cue
+{
+  #Value: (0|1)
+  foo: 〈0;#Value〉
+  foo: !=〈0;bar〉
+  bar: 〈0;#Value〉
+  bar: !=〈0;foo〉
+  #Value: (0|1)
+  Foo: 〈0;#Value〉
+  Foo: !=〈0;Bar〉
+  Bar: 〈0;#Value〉
+  Bar: !=〈0;Foo〉
+  Bar: 0
+  cell: {
+    a: (0|1)
+  }
+  cell: {
+    a: !=〈1;cell〉.b
+  }
+  cell: {
+    b: (0|1)
+  }
+  cell: {
+    b: !=〈1;cell〉.a
+  }
+  cell: {
+    a: 0
+  }
+  cell: {
+    b: _
+  }
+  a: 〈0;cell〉.a
+  b: 〈0;cell〉.b
+}

@@ -1,0 +1,813 @@
+-- in.cue --
+self: {
+	// This is an incomplete error, as it may succeed when the user
+	// explicitly specifies a value for fail.a.b.
+	fail: {
+		a: {
+			if a.b == _|_ {
+				b: 1
+			}
+			@test(err, code=incomplete|cycle)
+		}
+	}
+
+	// This is an incomplete error, as it may succeed when the user
+	// explicitly specifies a value for a.b.
+	isConcreteFail: t1:{
+		a: {
+			if a.b == _|_ {
+				b: 1
+			}
+			b: int
+			@test(eq, {b: 1})
+		}
+	}
+
+	isConcreteFail: t2:{
+		a: {
+			if a.b == _|_ {
+				b: 1
+			}
+			b?: int
+			@test(err, code=cycle,
+				contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[a.b], pos=[1:7])
+		}
+	}
+
+	// This is an incomplete error, as it may succeed when the user
+	// explicitly specifies a value for a.b.
+	// TODO: new builtin semantics.
+	//     if isconcrete(a.b)  -->> cyclic error evaluating isconcrete.
+	//     if isdefined(a.b)   -->> evaluate to true as a.b is int, result is 1
+	//     if !isdefined(a.b)  -->> evaluate to false, a.b remains int
+	isNotConcrete: t1: {
+		a: {
+			if a.b != _|_ {
+				b: 1
+			}
+			b: int
+			@test(eq, {b: int})
+		}
+	}
+	isNotConcrete: t2: {
+		a: {
+			if a.b != _|_ {
+				b: 1
+			}
+			b?: int
+			@test(eq, {b?: int})
+		}
+	}
+
+}
+
+-- mutual.cue --
+mutual: {
+	noConflicts: {
+		a: {if b.foo == _|_ {new: ""}}
+		b: {if a.bar == _|_ {new: ""}}
+		@test(eq, {a: {new: ""}, b: {new: ""}})
+	}
+
+	mutualCycleFail: {
+		b: {
+			if a.bar == _|_ {foo: ""}
+			@test(err, code=incomplete|cycle)
+		}
+		a: {
+			if b.foo == _|_ {bar: ""}
+			@test(err, code=incomplete|cycle)
+		}
+	}
+
+	brokenCycleSuccess: {
+		a: { if b.foo == _|_ { foo: "" } }
+		b: { if a.bar == _|_ { bar: "" } }
+		a: bar: ""
+		@test(eq, {a: {foo: "", bar: ""}, b: {}})
+	}
+
+	allowOneDirectionalDependency: {
+		p1: {
+			a: { if b.foo == _|_ { bar: "" } } // added
+			b: { if a.bar == _|_ { new: "" } } // not added
+			@test(eq, {a: {bar: ""}, b: {}})
+		}
+		p2: {
+			a: { if b.foo == _|_ { new: "" } }
+			b: { if a.bar == _|_ { foo: "" } }
+			@test(eq, {a: {}, b: {foo: ""}})
+		}
+	}
+
+	oneDirectionalBrokenConflictSuccess: {
+		@test(permute, count=6)
+		b: foo: ""
+		a: { if b.foo == _|_ { bar: "" } }
+		b: { if a.bar == _|_ { new: "" } }
+		@test(eq, {b: {foo: "", new: ""}, a: {}})
+	}
+}
+
+-- mutualsamestruct.cue --
+sameStruct: {
+	chainSuccess: a: {
+		raises?: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret?: {}
+		if ret != _|_ {
+			foo: a: 1
+		}
+		@test(eq, {raises?: {}, ret: {a: 1}, foo: {a: 1}})
+	}
+
+	chainSuccess: b: {
+		if ret != _|_ {
+			foo: a: 1
+		}
+		raises?: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret?: {}
+		@test(eq, {foo: {a: 1}, raises?: {}, ret: {a: 1}})
+	}
+
+	cycleFail: t1: p1: {
+		raises?: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret?: {}
+		if ret != _|_ {
+			raises: a: 1
+		}
+		@test(err, code=cycle|incomplete, any, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[raises])
+	}
+
+	cycleFail: t1: p2: {
+		ret?: {}
+		if ret != _|_ {
+			raises: a: 1
+		}
+		raises?: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		@test(err, code=cycle, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[ret], pos=[2:6])
+	}
+
+	// This test should fail with a cycle error. Even though raises and ret are
+	// both known to be defined, comparison against bottom requires that the
+	// structs be recursively checked for errors. We disallow that here, because
+	// the structs mutually depend on each other.
+	// TODO: consider allowing a specific postCheck for determining if an arc
+	// is erroneous.
+	// Pushdown improvement: raises and ret are both defined as {} (not
+	// optional), so their bottom checks resolve eagerly without a cycle.
+	// raises == _|_ is false (raises is {}), so ret: a: 1 is NOT added.
+	// ret != _|_ is true (ret is {}), so raises: a: 1 IS added.
+	// ret still has a sub-field cyclic reference error.
+	cycleFail: t2: p1: {
+		raises: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret: {}
+		if ret != _|_ {
+			raises: a: 1
+		}
+		@test(err, any, code=cycle|incomplete)
+	}
+
+	// Pushdown improvement: with this ordering, ret != _|_ fires first
+	// (ret is {}), so raises: a: 1 is added. But raises has a sub-field
+	// cyclic reference error. Result is ordering-dependent (compare p1).
+	cycleFail: t2: p2: {
+		ret: {}
+		if ret != _|_ {
+			raises: a: 1
+		}
+		raises: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		@test(err, any, code=cycle|incomplete)
+	}
+
+	// Pushdown improvement: raises is _ (top), raises == _|_ is false,
+	// so ret: a: 1 is NOT added. ret is _ (top), ret != _|_ is true,
+	// so raises: a: 1 IS added. ret has a sub-field cyclic reference.
+	// Result is ordering-dependent (compare with p2 below).
+	cycleFail: t3: p1: {
+		raises: _
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret: _
+		if ret != _|_ {
+			raises: a: 1
+		}
+		@test(err, any, code=cycle|incomplete)
+	}
+
+	// Pushdown improvement: different ordering gives different result.
+	// Only raises has a sub-field cyclic reference error.
+	cycleFail: t3: p2: {
+		ret: _
+		if ret != _|_ {
+			raises: a: 1
+		}
+		raises: _
+		if raises == _|_ {
+			ret: a: 1
+		}
+		@test(err, any, code=cycle|incomplete)
+	}
+
+	defCloseSuccess: {
+		#Example: {
+			raises?: {
+				runtime?: string
+			}
+
+			if raises == _|_ {
+				ret?: _
+			}
+		}
+
+		expr: #Example & {
+			ret: 2
+		}
+		@test(eq, {
+			#Example: {raises?: {runtime?: string}, ret?: _}
+			expr: {ret: 2, raises?: {runtime?: string}}
+		})
+	}
+}
+
+-- nestedchain.cue --
+// Issue
+nestedChain: {
+	cycleFail: {
+		if #E.x != _|_ {
+			#E: y: true
+		}
+		if #E.y == _|_ {
+			#E: x: true
+		}
+		@test(err, code=incomplete|cycle)
+		#E: [_]: bool
+	}
+
+	brokenCycleSuccess: {
+		if #E.x != _|_ {
+			#E: y: true
+		}
+		if #E.y == _|_ {
+			#E: x: true
+		}
+		#E: [_]: bool
+		#E: x:   true
+		@test(eq, {#E: {y: true, x: true}})
+	}
+
+	doubleAddfail: {
+		if #E.x == _|_ {
+			#E: y: true
+		}
+		if #E.y == _|_ {
+			#E: x: true
+		}
+		#E: [_]: bool
+		@test(err, code=incomplete|cycle)
+	}
+
+	trippleSuccess: {
+		if #E.x != _|_ {
+			#E: y: true
+		}
+		if #E.y != _|_ {
+			z: true
+		}
+		#E: x: true
+		@test(eq, {#E: {y: true, x: true}, z: true})
+	}
+}
+-- issue3836.cue --
+// evalv3 regression: a conditional checking `(foo | bar) == _|_` (comparison
+// to bottom) stopped working; the branch that fires when no optional field is
+// set no longer triggers correctly.
+// https://cuelang.org/issue/3836
+issue3836: hidden: {
+	_Value: {
+		foo?: _
+		bar?: _
+		if (foo | bar) == _|_ {
+			bar: type: "bar"
+		}
+		out: [if bar != _|_ {"bar is set"}]
+	}
+	_Value.out
+	// Pushdown improvement: the comprehension guard (foo|bar) == _|_ now
+	// correctly fires and sets bar, where previously (without pushdown) the
+	// guard saw a spurious non-bottom value and did not fire.
+	@test(eq, {
+		_Value: {foo?: _, bar: type: "bar", out: ["bar is set"]}
+		["bar is set"]
+	})
+}
+issue3836: exposed: {
+	foo?: _
+	bar?: _
+	if (foo | bar) == _|_ {
+		bar: type: "bar"
+	}
+	out: [if bar != _|_ {"bar is set"}]
+	@test(err, code=cycle, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[(foo|bar)], pos=[3:6])
+}
+-- issue3838.cue --
+// evalv3 regression: `if in.opt != _|_` inside a list expression stopped
+// evaluating correctly; evalv2 exported cleanly but evalv3 produced wrong output.
+// https://cuelang.org/issue/3838
+issue3838: {
+	#T: {
+		subject: {
+			in: opt?: foo: int
+			out: [
+				if in.opt != _|_ {in.opt.foo},
+				0,
+			][0]
+		}
+		_test: {
+			assert: {
+				pass: bool
+			}
+			assert: {
+				notOk: _
+				pass:  false
+			} | {
+				invoke: _
+				res:    subject.out
+				pass:   true
+			}
+		}
+		results: _test.assert.pass
+	}
+	(#T & {
+		_test: assert: invoke: "foo"
+	}).results
+	@test(eq, {
+		true
+		#T: {
+			subject: {in: {opt?: {foo: int}}, out: 0}
+			_test: {
+				assert: {pass: false, notOk: _} | {pass: true, invoke: _, res: 0}
+			}
+			results: _|_ @test(err, code=incomplete, contains="issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct)", pos=[26:12])
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  self: {
+    fail: {
+      a: {
+        if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+          b: 1
+        }
+      }
+    }
+    isConcreteFail: {
+      t1: {
+        a: {
+          if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+            b: 1
+          }
+          b: int
+        }
+      }
+    }
+    isConcreteFail: {
+      t2: {
+        a: {
+          if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+            b: 1
+          }
+          b?: int
+        }
+      }
+    }
+    isNotConcrete: {
+      t1: {
+        a: {
+          if (〈1;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+            b: 1
+          }
+          b: int
+        }
+      }
+    }
+    isNotConcrete: {
+      t2: {
+        a: {
+          if (〈1;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+            b: 1
+          }
+          b?: int
+        }
+      }
+    }
+  }
+}
+--- issue3836.cue
+{
+  issue3836: {
+    hidden: {
+      _Value: {
+        foo?: _
+        bar?: _
+        if ((〈0;foo〉|〈0;bar〉) == _|_(explicit error (_|_ literal) in source)) {
+          bar: {
+            type: "bar"
+          }
+        }
+        out: [
+          if (〈1;bar〉 != _|_(explicit error (_|_ literal) in source)) {
+            "bar is set"
+          },
+        ]
+      }
+      〈0;_Value〉.out
+    }
+  }
+  issue3836: {
+    exposed: {
+      foo?: _
+      bar?: _
+      if ((〈0;foo〉|〈0;bar〉) == _|_(explicit error (_|_ literal) in source)) {
+        bar: {
+          type: "bar"
+        }
+      }
+      out: [
+        if (〈1;bar〉 != _|_(explicit error (_|_ literal) in source)) {
+          "bar is set"
+        },
+      ]
+    }
+  }
+}
+--- issue3838.cue
+{
+  issue3838: {
+    #T: {
+      subject: {
+        in: {
+          opt?: {
+            foo: int
+          }
+        }
+        out: [
+          if (〈1;in〉.opt != _|_(explicit error (_|_ literal) in source)) {
+            〈2;in〉.opt.foo
+          },
+          0,
+        ][0]
+      }
+      _test: {
+        assert: {
+          pass: bool
+        }
+        assert: ({
+          notOk: _
+          pass: false
+        }|{
+          invoke: _
+          res: 〈2;subject〉.out
+          pass: true
+        })
+      }
+      results: 〈0;_test〉.assert.pass
+    }
+    (〈0;#T〉 & {
+      _test: {
+        assert: {
+          invoke: "foo"
+        }
+      }
+    }).results
+  }
+}
+--- mutual.cue
+{
+  mutual: {
+    noConflicts: {
+      a: {
+        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+          new: ""
+        }
+      }
+      b: {
+        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+          new: ""
+        }
+      }
+    }
+    mutualCycleFail: {
+      b: {
+        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+          foo: ""
+        }
+      }
+      a: {
+        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+          bar: ""
+        }
+      }
+    }
+    brokenCycleSuccess: {
+      a: {
+        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+          foo: ""
+        }
+      }
+      b: {
+        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+          bar: ""
+        }
+      }
+      a: {
+        bar: ""
+      }
+    }
+    allowOneDirectionalDependency: {
+      p1: {
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            bar: ""
+          }
+        }
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
+        }
+      }
+      p2: {
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
+        }
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            foo: ""
+          }
+        }
+      }
+    }
+    oneDirectionalBrokenConflictSuccess: {
+      b: {
+        foo: ""
+      }
+      a: {
+        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+          bar: ""
+        }
+      }
+      b: {
+        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+          new: ""
+        }
+      }
+    }
+  }
+}
+--- mutualsamestruct.cue
+{
+  sameStruct: {
+    chainSuccess: {
+      a: {
+        raises?: {}
+        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+          ret: {
+            a: 1
+          }
+        }
+        ret?: {}
+        if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+          foo: {
+            a: 1
+          }
+        }
+      }
+    }
+    chainSuccess: {
+      b: {
+        if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+          foo: {
+            a: 1
+          }
+        }
+        raises?: {}
+        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+          ret: {
+            a: 1
+          }
+        }
+        ret?: {}
+      }
+    }
+    cycleFail: {
+      t1: {
+        p1: {
+          raises?: {}
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+          ret?: {}
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    cycleFail: {
+      t1: {
+        p2: {
+          ret?: {}
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+          raises?: {}
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    cycleFail: {
+      t2: {
+        p1: {
+          raises: {}
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+          ret: {}
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    cycleFail: {
+      t2: {
+        p2: {
+          ret: {}
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+          raises: {}
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    cycleFail: {
+      t3: {
+        p1: {
+          raises: _
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+          ret: _
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    cycleFail: {
+      t3: {
+        p2: {
+          ret: _
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+          raises: _
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    defCloseSuccess: {
+      #Example: {
+        raises?: {
+          runtime?: string
+        }
+        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+          ret?: _
+        }
+      }
+      expr: (〈0;#Example〉 & {
+        ret: 2
+      })
+    }
+  }
+}
+--- nestedchain.cue
+{
+  nestedChain: {
+    cycleFail: {
+      if (〈0;#E〉.x != _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          y: true
+        }
+      }
+      if (〈0;#E〉.y == _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          x: true
+        }
+      }
+      #E: {
+        [_]: bool
+      }
+    }
+    brokenCycleSuccess: {
+      if (〈0;#E〉.x != _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          y: true
+        }
+      }
+      if (〈0;#E〉.y == _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          x: true
+        }
+      }
+      #E: {
+        [_]: bool
+      }
+      #E: {
+        x: true
+      }
+    }
+    doubleAddfail: {
+      if (〈0;#E〉.x == _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          y: true
+        }
+      }
+      if (〈0;#E〉.y == _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          x: true
+        }
+      }
+      #E: {
+        [_]: bool
+      }
+    }
+    trippleSuccess: {
+      if (〈0;#E〉.x != _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          y: true
+        }
+      }
+      if (〈0;#E〉.y != _|_(explicit error (_|_ literal) in source)) {
+        z: true
+      }
+      #E: {
+        x: true
+      }
+    }
+  }
+}

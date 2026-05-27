@@ -1,0 +1,157 @@
+# Tests that errors in definitions with complex reference chains are reported
+# correctly, specifically undefined field errors via let bindings. Issue #837.
+-- in.cue --
+#DeploymentManifest: #Manifest & {ref: kind: "deployment"}
+
+#Manifest: {
+	ref:         #ManifestRef
+	description: #KumoriKinds[ref.kind] @test(err, code=incomplete,
+		contains="unresolved disjunction %v (type %s)",
+		args=["service" | "deployment", string], pos=[0:15])
+}
+
+#ManifestRef: kind: #KindsNames
+
+#KindsNames: "service" | "deployment"
+
+#KumoriKinds: deployment: #Deployment
+#KumoriKinds: [string]: {...}
+
+#DoDeploy: {
+	_params: manifest: #DeploymentManifest
+	deployment: {
+		description: {
+			let dep = _params.manifest.description
+			service: (#Configure & {
+				_params: hsize: dep.hsize
+			}).service
+			@test(err, at=service.description.role, code=incomplete,
+				contains="undefined field: %s", args=[role], pos=[24:19])
+		}
+	}
+}
+
+#Configure: {
+	$p=_params: {
+		hsize: [string]: #RoleSize
+	}
+	service: {
+		description: {
+			let configed = (#RelabelService & {
+				_params: {
+					hsize: $p.hsize
+				}
+				role: "admin"
+			}).out
+
+			role: configed.role @test(err, code=incomplete,
+				contains="undefined field: %s", args=[role], pos=[0:19])
+		}
+	}
+}
+
+#RelabelService: {
+	$p=_params: {
+		hsize: #RoleSize
+	}
+
+	out: {
+		labstr: $p.label @test(err, code=eval,
+			contains="undefined field: %s", args=[label], pos=[0:14])
+
+	}
+} @test(err, code=eval)
+
+#RoleSize: {
+	$_instances: >=0 | *1
+}
+
+#Deployment: {
+	service: #ServiceManifest
+	hsize: [service.description.#roles]: #RoleSize
+}
+
+#ServiceManifest: #Manifest & {ref: kind: "service"}
+@test(err, at=#ServiceManifest.description, code=incomplete,
+	contains="undefined field: %s", args=[service], pos=[-67:28])
+
+-- out/compile --
+--- in.cue
+{
+  #DeploymentManifest: (〈0;#Manifest〉 & {
+    ref: {
+      kind: "deployment"
+    }
+  })
+  #Manifest: {
+    ref: 〈1;#ManifestRef〉
+    description: 〈1;#KumoriKinds〉[〈0;ref〉.kind]
+  }
+  #ManifestRef: {
+    kind: 〈1;#KindsNames〉
+  }
+  #KindsNames: ("service"|"deployment")
+  #KumoriKinds: {
+    deployment: 〈1;#Deployment〉
+  }
+  #KumoriKinds: {
+    [string]: {
+      ...
+    }
+  }
+  #DoDeploy: {
+    _params: {
+      manifest: 〈2;#DeploymentManifest〉
+    }
+    deployment: {
+      description: {
+        let dep#1 = 〈2;_params〉.manifest.description
+        service: (〈3;#Configure〉 & {
+          _params: {
+            hsize: 〈2;let dep#1〉.hsize
+          }
+        }).service
+      }
+    }
+  }
+  #Configure: {
+    _params: {
+      hsize: {
+        [string]: 〈3;#RoleSize〉
+      }
+    }
+    service: {
+      description: {
+        let configed#2 = (〈3;#RelabelService〉 & {
+          _params: {
+            hsize: 〈4;_params〉.hsize
+          }
+          role: "admin"
+        }).out
+        role: 〈0;let configed#2〉.role
+      }
+    }
+  }
+  #RelabelService: {
+    _params: {
+      hsize: 〈2;#RoleSize〉
+    }
+    out: {
+      labstr: 〈1;_params〉.label
+    }
+  }
+  #RoleSize: {
+    $_instances: (>=0|*1)
+  }
+  #Deployment: {
+    service: 〈1;#ServiceManifest〉
+    hsize: {
+      [〈1;service〉.description.#roles]: 〈2;#RoleSize〉
+    }
+  }
+  #ServiceManifest: (〈0;#Manifest〉 & {
+    ref: {
+      kind: "service"
+    }
+  })
+}

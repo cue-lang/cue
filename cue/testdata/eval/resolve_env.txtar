@@ -26,30 +26,3 @@ Retain: 0
 Unifications: 15
 Conjuncts:    22
 Disjuncts:    15
--- out/compile --
---- in.cue
-{
-  a: {
-    d: int
-    b: {
-      c: 〈1;d〉
-    }
-  }
-  x: {
-    d: 2
-    b: 〈1;a〉.b.c
-  }
-  a1: {
-    y: 5
-  }
-  a1: {
-    a2: {
-      a3: {
-        a4: {
-          a5: 〈4;a1〉.y
-        }
-      }
-    }
-  }
-  b: 〈0;a1〉.a2.a3.a4.a5
-}

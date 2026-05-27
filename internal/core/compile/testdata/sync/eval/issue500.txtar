@@ -1,0 +1,64 @@
+-- in.cue --
+package x
+
+import "strings"
+import "list"
+
+a: strings.Join(strings.Split("test", "")[1:], "") @test(eq, "est")
+
+b: strings.Join(["t", "e", "s", "t"][1:], "") @test(eq, "est")
+
+c: ["t", "e", "s", "t"][1:] @test(eq, ["e", "s", "t"])
+d: strings.Join(c, "")      @test(eq, "est")
+
+e: strings.Join(list.Concat([["a"], ["b"]]), "") @test(eq, "ab")
+
+f: list.Concat([["a"], ["b"]]) @test(eq, ["a", "b"])
+g: strings.Join(f, "")         @test(eq, "ab")
+
+h: strings.Join(list.Repeat(["a"], 3), "") @test(eq, "aaa")
+
+i: list.Repeat(["b"], 3) @test(eq, ["b", "b", "b"])
+j: strings.Join(i, "")   @test(eq, "bbb")
+-- out/compile --
+--- in.cue
+{
+  a: 〈import;strings〉.Join(〈import;strings〉.Split("test", "")[1:], "")
+  b: 〈import;strings〉.Join([
+    "t",
+    "e",
+    "s",
+    "t",
+  ][1:], "")
+  c: [
+    "t",
+    "e",
+    "s",
+    "t",
+  ][1:]
+  d: 〈import;strings〉.Join(〈0;c〉, "")
+  e: 〈import;strings〉.Join(〈import;list〉.Concat([
+    [
+      "a",
+    ],
+    [
+      "b",
+    ],
+  ]), "")
+  f: 〈import;list〉.Concat([
+    [
+      "a",
+    ],
+    [
+      "b",
+    ],
+  ])
+  g: 〈import;strings〉.Join(〈0;f〉, "")
+  h: 〈import;strings〉.Join(〈import;list〉.Repeat([
+    "a",
+  ], 3), "")
+  i: 〈import;list〉.Repeat([
+    "b",
+  ], 3)
+  j: 〈import;strings〉.Join(〈0;i〉, "")
+}

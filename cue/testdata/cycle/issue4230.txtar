@@ -21,28 +21,3 @@ x: X={
 	regions: ["west"]
 	app: {region: "west"}
 })
--- out/compile --
---- in.cue
-{
-  #transform: {
-    _input: {
-      ...
-    }
-    _output: [
-      if (〈1;_input〉.app != _|_(explicit error (_|_ literal) in source)) {
-        〈2;_input〉.app.region
-      },
-    ]
-  }
-  x: {
-    regions: (〈1;#transform〉 & {
-      _input: 〈2〉
-    })._output
-    app: {
-      region: (or([
-        "west",
-        "east",
-      ]) & "west")
-    }
-  }
-}

@@ -18,13 +18,6 @@ package imported
 
 #Foo: bar?: #Bar
 #Bar: foo?: #Foo
--- out/compile --
---- input.cue
-{
-  out: {
-    [string]: 〈import;"foo.test/bar/imported"〉.#Foo
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  2

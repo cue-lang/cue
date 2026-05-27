@@ -58,27 +58,6 @@ n1.max: cycle with field: min:
     ./in.cue:20:6
 -- out/todo.txt --
 n1.min and n1.max: v2 reports "cycle error" without position details; v3 reports the full cycle with positions.
--- out/compile --
---- in.cue
-{
-  n1: {
-    min: <〈0;max〉
-    max: >〈0;min〉
-  }
-  n2: -〈0;num〉
-  n3: +〈0;num〉
-  n4: (〈0;num〉 + 〈0;num〉)
-  n5: (〈0;num〉 - 〈0;num〉)
-  n6: (〈0;num〉 * 〈0;num〉)
-  n7: (〈0;num〉 / 〈0;num〉)
-  b1: !〈0;is〉
-  s1: "\(〈0;str〉)"
-  s2: 〈import;strings〉.ContainsAny("dd")
-  s3: 〈import;strings〉.ContainsAny(〈0;str〉, "dd")
-  str: string
-  num: <4
-  is: bool
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  17

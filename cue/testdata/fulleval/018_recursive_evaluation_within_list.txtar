@@ -17,30 +17,6 @@ b1: {
 [incomplete] b1.d: non-concrete value string in operand to +:
     ./in.cue:10:5
     ./in.cue:11:5
--- out/compile --
---- in.cue
-{
-  l: [
-    〈1;a〉,
-  ]
-  a: (〈0;b〉 & {
-    c: "t"
-  })
-  b: {
-    d: 〈0;c〉
-    c: string
-  }
-  l1: [
-    〈1;a1〉,
-  ]
-  a1: (〈0;b1〉 & {
-    c: "t"
-  })
-  b1: {
-    d: ("s" + 〈0;c〉)
-    c: string
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  21

@@ -123,51 +123,6 @@ er3.min: conflicting values 1 and 5:
 er3.min: invalid value 5 (out of bound <5):
     ./in.cue:46:7
     ./in.cue:64:7
--- out/compile --
---- in.cue
-{
-  #Size: {
-    res: (&(int, >=0)|*0)
-    min: (>〈0;res〉|*(1 + 〈0;res〉))
-    max: (>〈0;min〉|*〈0;min〉)
-  }
-  s0: (〈0;#Size〉 & {
-    res: 1
-  })
-  s1: (〈0;#Size〉 & {
-    min: 5
-  })
-  s2: (〈0;#Size〉 & {
-    max: 5
-  })
-  s3: (〈0;#Size〉 & {
-    min: 5
-    max: 10
-  })
-  es3: (〈0;#Size〉 & {
-    min: 10
-    max: 5
-  })
-  #nonEmptyRange: {
-    min: (*1|int)
-    min: <〈0;max〉
-    max: >〈0;min〉
-  }
-  r1: (〈0;#nonEmptyRange〉 & {
-    min: 3
-  })
-  r2: (〈0;#nonEmptyRange〉 & {
-    max: 5
-  })
-  r3: (〈0;#nonEmptyRange〉 & {
-    min: 3
-    max: 6
-  })
-  er3: (〈0;#nonEmptyRange〉 & {
-    min: 5
-    max: 5
-  })
-}
 -- out/eval/stats --
 Leaks:  23
 Freed:  75

@@ -1,0 +1,48 @@
+# The new evaluator (v3) produces empty output for `or(["eu-west-1", "us-east-1"])`
+# when used inside a self-referential struct, while the old evaluator produces the
+# correct result. Replacing `or([...])` with a plain disjunction `"a" | "b"` works
+# correctly. The root cause: calls with only literal arguments were incorrectly
+# deferred when evaluated from within a cyclic context, resulting in empty output.
+# https://cuelang.org/issue/4230
+-- in.cue --
+#transform: {
+	_input: {...}
+	_output: [
+		if _input.app != _|_ {
+			_input.app.region
+		},
+	]
+}
+
+x: X={
+	regions: (#transform & {_input: X})._output
+	app: region: or(["west", "east"]) & "west"
+} @test(eq, {
+	regions: ["west"]
+	app: {region: "west"}
+})
+-- out/compile --
+--- in.cue
+{
+  #transform: {
+    _input: {
+      ...
+    }
+    _output: [
+      if (〈1;_input〉.app != _|_(explicit error (_|_ literal) in source)) {
+        〈2;_input〉.app.region
+      },
+    ]
+  }
+  x: {
+    regions: (〈1;#transform〉 & {
+      _input: 〈2〉
+    })._output
+    app: {
+      region: (or([
+        "west",
+        "east",
+      ]) & "west")
+    }
+  }
+}

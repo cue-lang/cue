@@ -6,20 +6,6 @@ x: {
     a: 2
     y: *1 | { a: 2 }
 })
--- out/compile --
---- in.cue
-{
-  x: {
-    y: (*1|{
-      a: 2
-    })
-    for _, x in [
-      1,
-    ] {
-      〈2;y〉
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  1
 Freed:  8

@@ -24,19 +24,3 @@ Retain: 1
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    10
--- out/compile --
---- in.cue
-{
-  t1: {
-    a: {
-      foo?: int
-      b: 〈0;foo〉
-    }
-  }
-  t2: {
-    a: {
-      b: 〈0;foo〉
-      foo?: int
-    }
-  }
-}

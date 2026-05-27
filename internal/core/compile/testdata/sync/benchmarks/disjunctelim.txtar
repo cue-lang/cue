@@ -1,0 +1,178 @@
+// TODO: make special benchmark test that tests repeated lines more accurately
+// and and automatically.
+-- in.cue --
+// Should linearly increase with each repeated line.
+// automatically.
+pat: {[string]: 1} | {a: 2} // 9   conjuncts
+pat: {[string]: 1} | {a: 2} // 23  conjuncts (+14)
+pat: {[string]: 1} | {a: 2} // 34  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 45  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 56  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 67  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 78  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 89  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 100 conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 111 conjuncts (+11)
+@test(eq, {} | {a: 2}, at=pat)
+
+// This also should grow linearly per repeated line.
+// Indicated
+list: [1] | [2] | [3] | [4] // 19  conjuncts; 4   disjuncts
+list: [1] | [2] | [3] | [4] // 52  conjuncts; 20  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 85  conjuncts; 36  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 118 conjuncts; 52  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 151 conjuncts; 68  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 184 conjuncts; 84  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16)
+@test(eq, [1] | [2] | [3] | [4], at=list)
+
+issue3610: {
+	// Ensure disjuncts are disambiguated. The string field here is a reference
+	// and causes a task to be added. Ensure that, for instance, disjuncts
+	// >"b" and (>"b" & string) get equated when at least the task has
+	// completed.
+	#a
+	#a: <"a" | >"b" | string
+	#a: <"a" | >"b" | string // conjuncts 127  disjuncts 120
+	#a: <"a" | >"b" | string // conjuncts 219  disjuncts 210 (+92; +90)
+	#a: <"a" | >"b" | string // conjuncts 311  disjuncts 300 (+92; +90)
+	#a: <"a" | >"b" | string // conjuncts 403  disjuncts 390 (+92; +90)
+	#a: <"a" | >"b" | string // conjuncts 495  disjuncts 480 (+92; +90)
+}
+@test(eq, at=issue3610, {
+	<"a"
+	#a: <"a" | >"b" | string
+} | {
+	>"b"
+	#a: <"a" | >"b" | string
+} | {
+	string
+	#a: <"a" | >"b" | string
+})
+
+-- out/compile --
+--- in.cue
+{
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  issue3610: {
+    〈0;#a〉
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+  }
+}

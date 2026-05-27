@@ -1,0 +1,60 @@
+-- in.cue --
+merge: and([1, 1]) @test(eq, 1)
+
+// ensure definitions along embedded scalars are preserved.
+embed: and([{2, #x: 1}, {2, #x: 2}]) @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[0:13, 0:21, 0:25, 0:33])
+
+// issue3719: and() with a comprehension over an incomplete field failed in
+// evalv3 while the equivalent expression without and() worked correctly.
+// https://cuelang.org/issue/3719
+issue3719: {
+    #openStruct: {...}
+	_filledLater: #openStruct.foo @test(err, code=incomplete, contains="undefined field: foo", pos=[0:28])
+
+	// The comprehension below should work regardless of whether it's wrapped in "and".
+
+	withoutAnd: {
+		for k, v in _filledLater.bar {
+			(k): v
+		}
+	} @test(err, code=incomplete, contains="undefined field: foo", pos=[in.cue:11:28])
+	withAnd: and([
+		for k, v in _filledLater.bar {
+			(k): v
+		}
+	]) @test(err, code=incomplete, contains="undefined field: foo", pos=[in.cue:11:28])
+}
+-- out/compile --
+--- in.cue
+{
+  merge: and([
+    1,
+    1,
+  ])
+  embed: and([
+    {
+      2
+      #x: 1
+    },
+    {
+      2
+      #x: 2
+    },
+  ])
+  issue3719: {
+    #openStruct: {
+      ...
+    }
+    _filledLater: 〈0;#openStruct〉.foo
+    withoutAnd: {
+      for k, v in 〈1;_filledLater〉.bar {
+        〈1;k〉: 〈1;v〉
+      }
+    }
+    withAnd: and([
+      for k, v in 〈1;_filledLater〉.bar {
+        〈1;k〉: 〈1;v〉
+      },
+    ])
+  }
+}

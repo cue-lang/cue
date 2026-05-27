@@ -1,0 +1,57 @@
+// Issue #3881
+-- in.cue --
+import "list"
+
+out: #Output & {#input: _input}
+
+_input: {
+	for n in list.Range(1, 100, 1) {
+		"A\(n)": "B\(n)": name: "name\(n)"
+	}
+}
+#Embed: [string]: string
+#Output: {
+	#Embed
+	#input: _
+
+	for _, lvlA in #input {
+		for nameB, lvlB in lvlA {
+			(nameB): lvlB.name
+		}
+	}
+}
+
+_checkB1:  out.B1  @test(eq, "name1")
+_checkB50: out.B50 @test(eq, "name50")
+_checkB99: out.B99 @test(eq, "name99")
+-- out/compile --
+--- in.cue
+{
+  out: (〈0;#Output〉 & {
+    #input: 〈1;_input〉
+  })
+  _input: {
+    for _, n in 〈import;list〉.Range(1, 100, 1) {
+      "A\(〈1;n〉)": {
+        "B\(〈2;n〉)": {
+          name: "name\(〈3;n〉)"
+        }
+      }
+    }
+  }
+  #Embed: {
+    [string]: string
+  }
+  #Output: {
+    〈1;#Embed〉
+    #input: _
+    for _, lvlA in 〈0;#input〉 {
+      for nameB, lvlB in 〈1;lvlA〉 {
+        〈1;nameB〉: 〈1;lvlB〉.name
+      }
+    }
+  }
+  _checkB1: 〈0;out〉.B1
+  _checkB50: 〈0;out〉.B50
+  _checkB99: 〈0;out〉.B99
+}

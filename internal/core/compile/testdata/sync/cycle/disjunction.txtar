@@ -1,0 +1,156 @@
+-- in.cue --
+// cycle is a structural cycle
+cycle: a: cycle  @test(err, code=structural_cycle, pos=[])
+
+// reference to outside structural cycle
+r1a: cycle | int  @test(eq, int)
+r1b: int | cycle  @test(eq, int)
+
+r2a: cycle | 1  @test(eq, 1)
+r2b: 1 | cycle  @test(eq, 1)
+
+r3a: cycle | null  @test(eq, null)
+r3b: null | cycle  @test(eq, null)
+
+r4a: cycle | {}  @test(eq, {})
+r4b: {} | cycle  @test(eq, {})
+
+r5a: cycle | []  @test(eq, [])
+r5b: [] | cycle  @test(eq, [])
+
+// reference to ancestor node
+s1a: {
+	x: s1a | int
+	@test(eq, {x: int})
+}
+s1b: {
+	x: int | s1b
+	@test(eq, {x: int})
+}
+
+s2a: {
+	x: s2a | 1
+	@test(eq, {x: 1})
+}
+s2b: {
+	x: 1 | s2b
+	@test(eq, {x: 1})
+}
+
+s3a: {
+	x: s3a | null
+	@test(eq, {x: null})
+}
+s3b: {
+	x: null | s3b
+	@test(eq, {x: null})
+}
+
+s4a: {
+	x: s4a | {}
+	@test(eq, {x: {}})
+}
+s4b: {
+	x: {} | s4b
+	@test(eq, {x: {}})
+}
+
+s5a: {
+	x: s5a | []
+	@test(eq, {x: []})
+}
+s5b: {
+	x: [] | s5b
+	@test(eq, {x: []})
+}
+
+-- issue3042.cue --
+// Array element validation not being enforced for elements nested inside
+// a struct: invalid values passed validation without error.
+// https://cuelang.org/issue/3042
+issue3042: {
+	// Recursively, any field named "name" should begin with "foo".
+	// The data value below should then fail.
+	#foo: =~"^foo"
+	#nesting: string | {name?: #foo, [string]: #nesting} | [...#nesting]
+
+	data: #nesting & {
+		secret: {
+			infra: [
+				{name: "bar1"}
+			]
+		}
+	}
+	@test(err, code=eval,
+		suberr=(code=eval, path=data, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{secret:{infra:[{name:"bar1"}]}}, [...#nesting], struct, list], pos=[4:57, 6:8, 6:19]),
+		suberr=(code=eval, path=data, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{secret:{infra:[{name:"bar1"}]}}, string, struct, string], pos=[4:12, 6:8, 6:19]),
+	)
+}
+-- out/compile --
+--- in.cue
+{
+  cycle: {
+    a: 〈1;cycle〉
+  }
+  r1a: (〈0;cycle〉|int)
+  r1b: (int|〈0;cycle〉)
+  r2a: (〈0;cycle〉|1)
+  r2b: (1|〈0;cycle〉)
+  r3a: (〈0;cycle〉|null)
+  r3b: (null|〈0;cycle〉)
+  r4a: (〈0;cycle〉|{})
+  r4b: ({}|〈0;cycle〉)
+  r5a: (〈0;cycle〉|[])
+  r5b: ([]|〈0;cycle〉)
+  s1a: {
+    x: (〈1;s1a〉|int)
+  }
+  s1b: {
+    x: (int|〈1;s1b〉)
+  }
+  s2a: {
+    x: (〈1;s2a〉|1)
+  }
+  s2b: {
+    x: (1|〈1;s2b〉)
+  }
+  s3a: {
+    x: (〈1;s3a〉|null)
+  }
+  s3b: {
+    x: (null|〈1;s3b〉)
+  }
+  s4a: {
+    x: (〈1;s4a〉|{})
+  }
+  s4b: {
+    x: ({}|〈1;s4b〉)
+  }
+  s5a: {
+    x: (〈1;s5a〉|[])
+  }
+  s5b: {
+    x: ([]|〈1;s5b〉)
+  }
+}
+--- issue3042.cue
+{
+  issue3042: {
+    #foo: =~"^foo"
+    #nesting: (string|{
+      name?: 〈1;#foo〉
+      [string]: 〈1;#nesting〉
+    }|[
+      ...〈1;#nesting〉,
+    ])
+    data: (〈0;#nesting〉 & {
+      secret: {
+        infra: [
+          {
+            name: "bar1"
+          },
+        ]
+      }
+    })
+  }
+}

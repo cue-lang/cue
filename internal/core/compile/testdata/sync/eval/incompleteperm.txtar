@@ -1,0 +1,60 @@
+#inlinetest:exclude source contains compile-time error expressions (abstract arithmetic,
+# bound comparisons) which prevent the inline runner from compiling the source.
+// Issue #742
+// Issue #405
+-- in.cue --
+// Issue #129
+permanentlyIncompleteOperands: {
+	a: string + ":" + string
+	a: "golang/go:1.13.5"
+}
+
+permanentlyIncompleteOperandsNested: {
+	a: (int + 1) + (int + 1)
+}
+
+permanentlyIncompleteOperandsDisjunct: {
+	a: (int + 1) | (int + 1)
+}
+
+// Wrong result for `meet`: multiplying a bound by a concrete value should
+// yield an error when the result contradicts the bound.
+// https://cuelang.org/issue/680
+issue680: (>10 * 2) & 0
+
+// In a definition, 'size: >=100 <=200' should be a compile error since
+// applying <= to a bound (>=100) is not valid arithmetic.
+// https://cuelang.org/issue/405
+issue405: >=100 <= 200
+-- out/compile --
+permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
+    ./in.cue:3:5
+permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
+    ./in.cue:3:20
+permanentlyIncompleteOperandsNested.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:8:6
+permanentlyIncompleteOperandsNested.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:8:18
+permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:12:6
+permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:12:18
+issue680: invalid operand >10 ('*' requires concrete value):
+    ./in.cue:18:12
+issue405: invalid operand >=100 ('<=' requires concrete value):
+    ./in.cue:23:11
+--- in.cue
+{
+  permanentlyIncompleteOperands: {
+    a: ((string + ":") + string)
+    a: "golang/go:1.13.5"
+  }
+  permanentlyIncompleteOperandsNested: {
+    a: ((int + 1) + (int + 1))
+  }
+  permanentlyIncompleteOperandsDisjunct: {
+    a: ((int + 1)|(int + 1))
+  }
+  issue680: ((>10 * 2) & 0)
+  issue405: (>=100 <= 200)
+}

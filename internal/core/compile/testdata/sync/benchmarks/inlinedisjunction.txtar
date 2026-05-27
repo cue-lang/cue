@@ -1,0 +1,60 @@
+-- in.cue --
+#def: {
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {a: string}
+}
+x: #def
+x: c: "foo"
+
+@test(eq, {
+	#def: {} | {a: string} | {c: string} | {c: string, a: string}
+	x: {c: "foo"} | {c: "foo", a: string}
+})
+-- out/compile --
+--- in.cue
+{
+  #def: {
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      a: string
+    })
+  }
+  x: 〈0;#def〉
+  x: {
+    c: "foo"
+  }
+}

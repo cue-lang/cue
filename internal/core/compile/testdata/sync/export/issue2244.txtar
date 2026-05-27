@@ -1,0 +1,71 @@
+-- in.cue --
+package x
+
+import (
+	"strings"
+)
+
+_#matchPattern: {
+	#pattern: string
+	[
+		// can't remove this builtin call
+		if strings.HasSuffix(#pattern, "*") {
+
+			// this let is required _within_ the if block
+			// i.e. it can't be "inlined" with the if that
+			// currently contains it
+			let prefix = strings.TrimSuffix(#pattern, "*")
+
+			prefix
+		},
+		"'\(#pattern)'",
+	][0]
+}
+
+_#isReleaseTag: _#matchPattern & {#pattern: "refs/tags/v*", _}
+
+#step: {
+	if: number | string
+}
+
+m: #step & {
+	if: _#isReleaseTag
+}
+@test(eq, {
+	_#matchPattern$x: {_|_, #pattern: string}
+	_#isReleaseTag$x: {
+		"refs/tags/v"
+		#pattern: "refs/tags/v*"
+	}
+	#step: {if: number | string}
+	m: {
+		if: {
+			"refs/tags/v"
+			#pattern: "refs/tags/v*"
+		}
+	}
+})
+-- out/compile --
+--- in.cue
+{
+  _#matchPattern(:x): {
+    #pattern: string
+    [
+      if 〈import;strings〉.HasSuffix(〈1;#pattern〉, "*") {
+        let prefix#1 = 〈import;strings〉.TrimSuffix(〈2;#pattern〉, "*")
+        〈0;let prefix#1〉
+      },
+      "'\(〈1;#pattern〉)'",
+    ][0]
+  }
+  _#isReleaseTag(:x): (〈0;_#matchPattern(:x)〉 & {
+    #pattern: "refs/tags/v*"
+    _
+  })
+  #step: {
+    if: (number|string)
+  }
+  m: (〈0;#step〉 & {
+    if: 〈1;_#isReleaseTag(:x)〉
+  })
+}

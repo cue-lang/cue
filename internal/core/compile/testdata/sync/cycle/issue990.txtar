@@ -1,0 +1,285 @@
+# CUE incorrectly reports a structural cycle error for a valid CUE expression
+# that does not actually contain a cycle, producing a false positive.
+# https://cuelang.org/issue/990
+-- in.cue --
+// A simple discriminated element
+#AC: {
+	k: "simple"
+	d: #C
+}
+
+// A recursive discriminated element
+#AS: {
+	k: "complex"
+	d: #S
+}
+
+#R: {
+	a: #AC | #AS
+}
+
+// The structure of the recursive element
+#S: {
+	n: string
+	r: [string]: #R
+}
+
+// The structure of the simple element
+#C: {
+	n: string
+}
+
+#sub: {
+	$p=#p: #AS
+	dict: [string]: _
+
+	for rn, rd in $p.d.r if rd.a.k == "complex" {
+		let subs = #sub & {#p: rd.a}
+		for sn, sd in subs.dict {
+			dict: "\(rn)_\(sn)": sd
+		}
+	}
+	for rn, rd in $p.d.r if rd.a.k == "simple" {
+		dict: "\(rn)": rd
+	}
+}
+
+// Data
+_test: {
+	c1: #AC
+	c1: d: {
+		n: "c1"
+	}
+
+
+	s3: #AS
+	s3: d: {
+		n: "s3"
+		r: r1: a:c1
+	}
+
+	s2: #AS
+	s2: d: {
+		n: "s2"
+		r: {
+			r1: a: c1
+			r2: a: s3
+		}
+	}
+
+	s1: #AS
+	s1: d: {
+		n: "s1"
+		r: {
+			r1: a: c1
+			r2: a: s2
+		}
+	}
+}
+
+//  Test
+
+out: #sub & {#p: _test.s1}
+
+// TODO(fmt): can we improve this?
+@test(eq, {
+	#AC: {k: "simple", d: {n: string}}
+	#AS: {k: "complex", d: {n: string, r: {}}}
+	#R: {
+		a: {k: "simple", d: {n: string}} | {k: "complex", d: {n: string, r: {}}}
+	}
+	#S: {n: string, r: {}}
+	#C: {n: string}
+	#sub: {
+		#p: {k: "complex", d: {n: string, r: {}}}
+		dict: {}
+	}
+	_test: {
+		c1: {d: {n: "c1"}, k: "simple"}
+		s3: {
+			d: {
+				n: "s3"
+				r: {r1: {a: {d: {n: "c1"}, k: "simple"}}}
+			}
+			k: "complex"
+		}
+		s2: {
+			d: {
+				n: "s2"
+				r: {
+					r1: {a: {d: {n: "c1"}, k: "simple"}}
+					r2: {
+						a: {
+							d: {
+								n: "s3"
+								r: {r1: {a: {d: {n: "c1"}, k: "simple"}}}
+							}
+							k: "complex"
+						}
+					}
+				}
+			}
+			k: "complex"
+		}
+		s1: {
+			d: {
+				n: "s1"
+				r: {
+					r1: {a: {d: {n: "c1"}, k: "simple"}}
+					r2: {
+						a: {
+							d: {
+								n: "s2"
+								r: {
+									r1: {a: {d: {n: "c1"}, k: "simple"}}
+									r2: {
+										a: {
+											d: {
+												n: "s3"
+												r: {r1: {a: {d: {n: "c1"}, k: "simple"}}}
+											}
+											k: "complex"
+										}
+									}
+								}
+							}
+							k: "complex"
+						}
+					}
+				}
+			}
+			k: "complex"
+		}
+	}
+	out: {
+		#p: {
+			d: {
+				n: "s1"
+				r: {
+					r1: {a: {d: {n: "c1"}, k: "simple"}}
+					r2: {
+						a: {
+							d: {
+								n: "s2"
+								r: {
+									r1: {a: {d: {n: "c1"}, k: "simple"}}
+									r2: {
+										a: {
+											d: {
+												n: "s3"
+												r: {r1: {a: {d: {n: "c1"}, k: "simple"}}}
+											}
+											k: "complex"
+										}
+									}
+								}
+							}
+							k: "complex"
+						}
+					}
+				}
+			}
+			k: "complex"
+		}
+		dict: {
+			r1: {a: {d: {n: "c1"}, k: "simple"}}
+			r2_r1: {a: {d: {n: "c1"}, k: "simple"}}
+			r2_r2_r1: {a: {d: {n: "c1"}, k: "simple"}}
+		}
+	}
+})
+-- out/compile --
+--- in.cue
+{
+  #AC: {
+    k: "simple"
+    d: 〈1;#C〉
+  }
+  #AS: {
+    k: "complex"
+    d: 〈1;#S〉
+  }
+  #R: {
+    a: (〈1;#AC〉|〈1;#AS〉)
+  }
+  #S: {
+    n: string
+    r: {
+      [string]: 〈2;#R〉
+    }
+  }
+  #C: {
+    n: string
+  }
+  #sub: {
+    #p: 〈1;#AS〉
+    dict: {
+      [string]: _
+    }
+    for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "complex") {
+      let subs#1multi = (〈3;#sub〉 & {
+        #p: 〈2;rd〉.a
+      })
+      for sn, sd in 〈0;let subs#1〉.dict {
+        dict: {
+          "\(〈4;rn〉)_\(〈2;sn〉)": 〈2;sd〉
+        }
+      }
+    }
+    for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "simple") {
+      dict: {
+        "\(〈2;rn〉)": 〈2;rd〉
+      }
+    }
+  }
+  _test: {
+    c1: 〈1;#AC〉
+    c1: {
+      d: {
+        n: "c1"
+      }
+    }
+    s3: 〈1;#AS〉
+    s3: {
+      d: {
+        n: "s3"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+        }
+      }
+    }
+    s2: 〈1;#AS〉
+    s2: {
+      d: {
+        n: "s2"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+          r2: {
+            a: 〈4;s3〉
+          }
+        }
+      }
+    }
+    s1: 〈1;#AS〉
+    s1: {
+      d: {
+        n: "s1"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+          r2: {
+            a: 〈4;s2〉
+          }
+        }
+      }
+    }
+  }
+  out: (〈0;#sub〉 & {
+    #p: 〈1;_test〉.s1
+  })
+}

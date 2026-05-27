@@ -10,12 +10,3 @@ x: {
 @test(err, code=structural_cycle, path=x.y, contains="structural cycle", pos=[])
 -- out/errors.txt --
 [structural_cycle] x.y: structural cycle
--- out/compile --
---- in.cue
-{
-  〈0;x〉
-  x: {
-    〈0;y〉
-    y: 〈1;x〉
-  }
-}

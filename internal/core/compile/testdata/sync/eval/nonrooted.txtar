@@ -1,0 +1,125 @@
+# Tests non-rooted inline expressions and let bindings where the inline
+# expression conflicts with a definition constraint. The evaluation should
+# use the local context (overriding the definition's value), even when
+# that creates a conflict detectable from the root.
+# https://cuelang.org/issue/3977
+-- in.cue --
+issue3977: inlineExpr: {
+	#NetworkID: 1
+	#fn: {
+		x:   #NetworkID
+		out: x + 1
+	}
+
+	err: (#fn & {x: 2}).out @test(err, code=eval,
+		contains="conflicting values", args=[1, 2])
+}
+issue3977: inlineDisj1: {
+	#NetworkID: "2" | "3" | "4"
+	#fn: {
+		x:   #NetworkID
+		out: "value=\(x)"
+	}
+
+	err: (#fn & {x: "invalid"}).out @test(err, code=eval,
+		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["2", "invalid"], pos=[-6:14, -4:8, 0:8, 0:18]),
+		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["3", "invalid"], pos=[-6:20, -4:8, 0:8, 0:18]),
+		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["4", "invalid"], pos=[-6:26, -4:8, 0:8, 0:18]),
+	)
+}
+issue3977: inlineDisj2: {
+	#NetworkID: 1
+	#fn: {
+		x:   #NetworkID
+		out: x + 10
+	}
+
+	err: (#fn & {x: *2 | 4}).out @test(err, code=eval,
+		suberr=(contains="conflicting values", args=[1, 2]),
+		suberr=(contains="conflicting values", args=[4, 1]))
+}
+issue3977: inlineDisj3: {
+	#NetworkID: 1
+	#fn: {
+		x:   #NetworkID
+		out: x + 10
+	}
+
+	ok: (#fn & {x: *2 | int}).out @test(eq, 11)
+}
+issue3977: inlineLet: {
+	#NetworkID: 1
+	let p = {
+		x:   #NetworkID
+		out: x + 10
+	} & {
+		x: 2
+	}
+
+	err: p.out @test(eq, 12, incorrect) @test(err:todo, p=1, code=eval,
+		contains="conflicting values", args=[1, 2])
+}
+-- out/compile --
+--- in.cue
+{
+  issue3977: {
+    inlineExpr: {
+      #NetworkID: 1
+      #fn: {
+        x: 〈1;#NetworkID〉
+        out: (〈0;x〉 + 1)
+      }
+      err: (〈0;#fn〉 & {
+        x: 2
+      }).out
+    }
+  }
+  issue3977: {
+    inlineDisj1: {
+      #NetworkID: ("2"|"3"|"4")
+      #fn: {
+        x: 〈1;#NetworkID〉
+        out: "value=\(〈0;x〉)"
+      }
+      err: (〈0;#fn〉 & {
+        x: "invalid"
+      }).out
+    }
+  }
+  issue3977: {
+    inlineDisj2: {
+      #NetworkID: 1
+      #fn: {
+        x: 〈1;#NetworkID〉
+        out: (〈0;x〉 + 10)
+      }
+      err: (〈0;#fn〉 & {
+        x: (*2|4)
+      }).out
+    }
+  }
+  issue3977: {
+    inlineDisj3: {
+      #NetworkID: 1
+      #fn: {
+        x: 〈1;#NetworkID〉
+        out: (〈0;x〉 + 10)
+      }
+      ok: (〈0;#fn〉 & {
+        x: (*2|int)
+      }).out
+    }
+  }
+  issue3977: {
+    inlineLet: {
+      #NetworkID: 1
+      let p#1 = ({
+        x: 〈1;#NetworkID〉
+        out: (〈0;x〉 + 10)
+      } & {
+        x: 2
+      })
+      err: 〈0;let p#1〉.out
+    }
+  }
+}

@@ -1,0 +1,60 @@
+-- in.cue --
+passToSingleValue: p1: _ | *((_ | *"x") & "y") @test(eq, *"y" | _)
+passToSingleValue: p2: _ | *((*"x" | _) & "y") @test(eq, *"y" | _)
+passToSingleValue: p3: *((_ | *"x") & "y") | _ @test(eq, *"y" | _)
+passToSingleValue: p4: *((*"x" | _) & "y") | _ @test(eq, *"y" | _)
+
+// eval: "incomplete value" regression with defaults involving multiple
+// definitions; default values that depend on other fields should resolve.
+// https://cuelang.org/issue/3779
+issue3779: {
+	out: #Foo & {
+		fieldFoo: "foo"
+	}
+	#Foo: #Bar & {
+		fieldFoo: string | *"foo-default"
+	}
+	#Bar: {
+		fieldFoo: _
+		fieldBar: string | *fieldFoo
+	}
+	@test(eq, {
+		out: {
+			fieldFoo: "foo"
+			fieldBar: *"foo" | string
+		}
+		#Foo: {
+			fieldFoo: *"foo-default" | string
+			fieldBar: *"foo-default" | string
+		}
+		#Bar: {fieldFoo: _, fieldBar: *_ | string}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  passToSingleValue: {
+    p1: (_|*((_|*"x") & "y"))
+  }
+  passToSingleValue: {
+    p2: (_|*((*"x"|_) & "y"))
+  }
+  passToSingleValue: {
+    p3: (*((_|*"x") & "y")|_)
+  }
+  passToSingleValue: {
+    p4: (*((*"x"|_) & "y")|_)
+  }
+  issue3779: {
+    out: (〈0;#Foo〉 & {
+      fieldFoo: "foo"
+    })
+    #Foo: (〈0;#Bar〉 & {
+      fieldFoo: (string|*"foo-default")
+    })
+    #Bar: {
+      fieldFoo: _
+      fieldBar: (string|*〈0;fieldFoo〉)
+    }
+  }
+}

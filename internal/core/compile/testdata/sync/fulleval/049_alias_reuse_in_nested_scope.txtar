@@ -1,0 +1,58 @@
+# Tests that let bindings in nested scopes are correctly scoped and can be reused.
+# #Foo uses a let alias pointing to an empty or disjunction (error); #A and #B use
+# let aliases tied to foo, which become dynamic field keys. b instantiates #B.
+-- in.cue --
+#Foo: {
+	let X = or([for k, _ in {} {k}])
+	connection: [X]: X @test(err, code=incomplete, pos=[0:11], contains="in call", args=[or])
+	@test(eq, {
+		connection: _|_ @test(err, code=incomplete, contains="#Foo.X: error in call to or: empty list in call to or", pos=[2:10])
+	})
+}
+#A: {
+	foo: "key"
+	let X = foo
+	a: foo: [X]: X
+	@test(eq, {foo: "key", a: {foo: {["key"]: "key"}}})
+}
+#B: {
+	foo: string
+	let X = foo
+	a: foo: [X]: X
+}
+b: #B & {foo: "key"} @test(eq, {foo: "key", a: {foo: {}}})
+-- out/compile --
+--- in.cue
+{
+  #Foo: {
+    let X#1 = or([
+      for k, _ in {} {
+        〈1;k〉
+      },
+    ])
+    connection: {
+      [〈1;let X#1〉]: 〈1;let X#1〉
+    }
+  }
+  #A: {
+    foo: "key"
+    let X#2 = 〈0;foo〉
+    a: {
+      foo: {
+        [〈2;let X#2〉]: 〈2;let X#2〉
+      }
+    }
+  }
+  #B: {
+    foo: string
+    let X#3 = 〈0;foo〉
+    a: {
+      foo: {
+        [〈2;let X#3〉]: 〈2;let X#3〉
+      }
+    }
+  }
+  b: (〈0;#B〉 & {
+    foo: "key"
+  })
+}

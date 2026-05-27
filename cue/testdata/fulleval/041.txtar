@@ -24,16 +24,3 @@ Disjuncts:    11
 MisalignedConjunct: 1
 
 NumCloseIDs: 2
--- out/compile --
---- in.cue
-{
-  t: {
-    #ok: (*true|bool)
-    if 〈0;#ok〉 {
-      x: int
-    }
-  }
-  s: (〈0;t〉 & {
-    #ok: false
-  })
-}

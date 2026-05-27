@@ -20,10 +20,3 @@ Disjuncts:    0
 Notifications: 1
 
 NumCloseIDs: 2
--- out/compile --
---- in.cue
-{
-  root2: 1
-  #Root2: {}
-  〈0;#Root2〉
-}

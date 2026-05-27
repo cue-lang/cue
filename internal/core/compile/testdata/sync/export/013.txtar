@@ -1,0 +1,12 @@
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{
+	a: >=0 & <=10 & !=1
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    a: ((>=0 & <=10) & !=1)
+  }
+}

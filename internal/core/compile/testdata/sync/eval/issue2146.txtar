@@ -1,0 +1,114 @@
+# Tests that let expressions within disjunctions are uniqued per arc, not just
+# per Environment. Without the fix, incorrect results were cached and shared
+# across arcs, causing the `all` list to evaluate incorrectly under unification.
+# https://cuelang.org/issue/2146
+// Issue #2146
+//
+// Ensure that let expressions are uniqued not only per Environment, but also
+// per arc. This is relevant for disjunctions. Without it, an incorrect
+// result may be cached for an arbitrary Environment.
+-- in.cue --
+p1: {
+	#A: {
+		x?: int
+		y?: int
+
+		let list = [x, y]
+		all:  [for v in list if v != _|_ {v}]
+
+		*{
+			x?: _|_
+			y:  1
+		} | _
+	}
+
+	a: #A & { x: 3 }
+	b: #A & a
+	@test(eq, {
+		#A: *{
+			y: 1, all: [1], x?: _|_ @test(err, code=user, contains="explicit error", pos=[10:8])
+		} | {
+			x?: int, y?: int, all: []
+		}
+		a: {x: 3, y?: int, all: [3]}
+		b: {x: 3, y?: int, all: [3]}
+	})
+}
+p2: {
+	#A: {
+		x?: int
+		y?: int
+
+		let list = [x, y]
+		all:  [for v in list if v != _|_ {v}]
+
+		_ | *{
+			x?: _|_
+			y:  1
+		}
+	}
+
+	a: #A & { x: 3, y: 2 }
+	b: #A & a
+	@test(eq, {
+		#A: *{
+			y: 1, all: [1], x?: _|_ @test(err, code=user, contains="explicit error")
+		} | {
+			x?: int, y?: int, all: []
+		}
+		a: {x: 3, y: 2, all: [3, 2]}
+		b: {x: 3, y: 2, all: [3, 2]}
+	})
+}
+
+-- out/compile --
+--- in.cue
+{
+  p1: {
+    #A: {
+      x?: int
+      y?: int
+      let list#1 = [
+        〈1;x〉,
+        〈1;y〉,
+      ]
+      all: [
+        for _, v in 〈1;let list#1〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈1;v〉
+        },
+      ]
+      (*{
+        x?: _|_(explicit error (_|_ literal) in source)
+        y: 1
+      }|_)
+    }
+    a: (〈0;#A〉 & {
+      x: 3
+    })
+    b: (〈0;#A〉 & 〈0;a〉)
+  }
+  p2: {
+    #A: {
+      x?: int
+      y?: int
+      let list#2 = [
+        〈1;x〉,
+        〈1;y〉,
+      ]
+      all: [
+        for _, v in 〈1;let list#2〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈1;v〉
+        },
+      ]
+      (_|*{
+        x?: _|_(explicit error (_|_ literal) in source)
+        y: 1
+      })
+    }
+    a: (〈0;#A〉 & {
+      x: 3
+      y: 2
+    })
+    b: (〈0;#A〉 & 〈0;a〉)
+  }
+}

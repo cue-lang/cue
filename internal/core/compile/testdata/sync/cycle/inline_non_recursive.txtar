@@ -1,0 +1,341 @@
+-- in.cue --
+// All these should pass. These look like recursive inlined calls, but they are
+// not.
+
+ok1: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: (f & {in: k00}).out
+	k20: (f & {in: k10}).out
+	k30: (f & {in: k20}).out
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	})
+}
+
+ok2: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: {(f & {in: k00}).out}
+	k20: {(f & {in: k10}).out}
+	k30: {(f & {in: k20}).out}
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	})
+}
+
+ok3: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: {close((f & {in: k00})).out}
+	k20: {close((f & {in: k10})).out}
+	k30: {close((f & {in: k20})).out}
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	})
+}
+
+ok4: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: {out: {(f & {in: k00}).out}}.out
+	k20: {out: {(f & {in: k10}).out}}.out
+	k30: {out: {(f & {in: k20}).out}}.out
+	@test(eq, {
+		f: {in: number, out: number}
+		k00: 0
+		k10: 0
+		k20: 0
+		k30: 0
+	})
+}
+
+// Issue #1708: nested indirect selectors on a definition instantiated more than
+// twice cause a false structural cycle. Concrete conjuncts like `{in: kN}` are
+// not recognized as cycle-breakers, so successive `(#add10 & {in: k}).out`
+// chains are incorrectly treated as self-recursive.
+// https://cuelang.org/issue/1708
+issue1708: {
+	#add10: {
+		in: number
+		a10: { i: in, o: i + 10 }
+		out: a10.o
+	}
+	k00: 0
+	k10: (#add10 & {in: k00}).out
+	k20: (#add10 & {in: k10}).out
+	k30: (#add10 & {in: k20}).out
+
+	// TODO(inline): the generation of this value is broken, had to hand-adjust.
+	// TODO(inline): file positions are absolute instead of relative to the definition.
+	@test(eq, {
+		#add10: {
+			in: number
+			a10: {
+				i: number
+				o: _|_ @test(err, code=incomplete, contains="non-concrete value number in operand to +", pos=[84:20, 83:7])
+			}
+			out: _|_ @test(err)
+		}
+		k00: 0
+		k10: 10
+		k20: 20
+		k30: _|_ @test(err, code=incomplete, contains="undefined field: out", pos=[88:28])
+	})
+}
+-- issue3182.cue --
+// evalv3 regression: references under projections (e.g. `{ a: x }.a`) were
+// not resolved correctly, producing errors or wrong output that evalv2 handled.
+// https://cuelang.org/issue/3182
+issue3182: {
+	first: t1: {
+		x: { a: x }.a
+		@test(eq, {x: _})
+	}
+	first: t2: {
+		x: { a: b: x }.a
+		@test(err, code=structural_cycle)
+	}
+	second: {
+		{ t: x }.t.y
+		x: y: x: y: a: 1
+		@test(eq, {x: {y: {x: {y: {a: 1}}, a: 1}}, a: 1})
+	}
+	third: {
+		{
+			p: {
+			  x: p
+			  y: 1
+			}
+		}.p.x.y
+		@test(eq, 1)
+	}
+}
+-- select.cue --
+// The value of #Step should be consistent between these test cases.
+select: direct: {
+	#Step: (#Job & {opt: _}).opt
+	#Job: matchN(1, [#NormalJob])
+	// TODO(inline): broken generation: retains reference.
+	@test(eq, {
+		#Step: _
+		#Job: matchN(1, [{req!: int, opt?: {run?: string}}])
+	})
+}
+select: indirect: {
+	#Step: #Job.opt
+	#Job: matchN(1, [#NormalJob]) & {opt: _}
+	@test(eq, {#Step: _, #Job: {_|_, opt: _}})
+}
+#NormalJob: {
+	req!: int
+	opt?: run?: string
+}
+-- out/compile --
+--- in.cue
+{
+  ok1: {
+    f: {
+      in: number
+      out: 〈0;in〉
+    }
+    k00: 0
+    k10: (〈0;f〉 & {
+      in: 〈1;k00〉
+    }).out
+    k20: (〈0;f〉 & {
+      in: 〈1;k10〉
+    }).out
+    k30: (〈0;f〉 & {
+      in: 〈1;k20〉
+    }).out
+  }
+  ok2: {
+    f: {
+      in: number
+      out: 〈0;in〉
+    }
+    k00: 0
+    k10: {
+      (〈1;f〉 & {
+        in: 〈2;k00〉
+      }).out
+    }
+    k20: {
+      (〈1;f〉 & {
+        in: 〈2;k10〉
+      }).out
+    }
+    k30: {
+      (〈1;f〉 & {
+        in: 〈2;k20〉
+      }).out
+    }
+  }
+  ok3: {
+    f: {
+      in: number
+      out: 〈0;in〉
+    }
+    k00: 0
+    k10: {
+      close((〈1;f〉 & {
+        in: 〈2;k00〉
+      })).out
+    }
+    k20: {
+      close((〈1;f〉 & {
+        in: 〈2;k10〉
+      })).out
+    }
+    k30: {
+      close((〈1;f〉 & {
+        in: 〈2;k20〉
+      })).out
+    }
+  }
+  ok4: {
+    f: {
+      in: number
+      out: 〈0;in〉
+    }
+    k00: 0
+    k10: {
+      out: {
+        (〈2;f〉 & {
+          in: 〈3;k00〉
+        }).out
+      }
+    }.out
+    k20: {
+      out: {
+        (〈2;f〉 & {
+          in: 〈3;k10〉
+        }).out
+      }
+    }.out
+    k30: {
+      out: {
+        (〈2;f〉 & {
+          in: 〈3;k20〉
+        }).out
+      }
+    }.out
+  }
+  issue1708: {
+    #add10: {
+      in: number
+      a10: {
+        i: 〈1;in〉
+        o: (〈0;i〉 + 10)
+      }
+      out: 〈0;a10〉.o
+    }
+    k00: 0
+    k10: (〈0;#add10〉 & {
+      in: 〈1;k00〉
+    }).out
+    k20: (〈0;#add10〉 & {
+      in: 〈1;k10〉
+    }).out
+    k30: (〈0;#add10〉 & {
+      in: 〈1;k20〉
+    }).out
+  }
+}
+--- issue3182.cue
+{
+  issue3182: {
+    first: {
+      t1: {
+        x: {
+          a: 〈1;x〉
+        }.a
+      }
+    }
+    first: {
+      t2: {
+        x: {
+          a: {
+            b: 〈2;x〉
+          }
+        }.a
+      }
+    }
+    second: {
+      {
+        t: 〈1;x〉
+      }.t.y
+      x: {
+        y: {
+          x: {
+            y: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    third: {
+      {
+        p: {
+          x: 〈1;p〉
+          y: 1
+        }
+      }.p.x.y
+    }
+  }
+}
+--- select.cue
+{
+  select: {
+    direct: {
+      #Step: (〈0;#Job〉 & {
+        opt: _
+      }).opt
+      #Job: matchN(1, [
+        〈3;#NormalJob〉,
+      ])
+    }
+  }
+  select: {
+    indirect: {
+      #Step: 〈0;#Job〉.opt
+      #Job: (matchN(1, [
+        〈3;#NormalJob〉,
+      ]) & {
+        opt: _
+      })
+    }
+  }
+  #NormalJob: {
+    req!: int
+    opt?: {
+      run?: string
+    }
+  }
+}

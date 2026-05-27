@@ -17,31 +17,6 @@ a: d: {
 a: [Name=string]: {#info: {
 	X: "foo"
 }}
--- out/compile --
---- in.cue
-{
-  a: {
-    d: {
-      〈2;#base〉
-      #info: {
-        ...
-      }
-      Y: 〈0;#info〉.X
-    }
-  }
-  #base: {
-    #info: {
-      ...
-    }
-  }
-  a: {
-    [string]: {
-      #info: {
-        X: "foo"
-      }
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  8

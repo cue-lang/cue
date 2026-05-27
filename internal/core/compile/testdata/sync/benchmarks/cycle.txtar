@@ -1,0 +1,42 @@
+-- in.cue --
+sameValues: SmustBeF: {
+	T: string | F
+	F: {
+		x: T
+		@test(eq, {x: string})
+		@test(shareID=SF)
+	}
+	S: F @test(eq, {x: string}) @test(shareID=SF)
+}
+
+sameValues: CmustBeA: {
+	A: {
+		x: [ string | A ]
+		@test(eq, {x: [string]})
+		@test(shareID=CA)
+	}
+	C: A @test(eq, {x: [string]}) @test(shareID=CA)
+}
+-- out/compile --
+--- in.cue
+{
+  sameValues: {
+    SmustBeF: {
+      T: (string|〈0;F〉)
+      F: {
+        x: 〈1;T〉
+      }
+      S: 〈0;F〉
+    }
+  }
+  sameValues: {
+    CmustBeA: {
+      A: {
+        x: [
+          (string|〈2;A〉),
+        ]
+      }
+      C: 〈0;A〉
+    }
+  }
+}

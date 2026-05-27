@@ -2,16 +2,6 @@
 import "strings"
 a: strings.Join( [ strings.Join(["1"]), "2" ], "\n") @test(err, code=eval, contains="not enough arguments in call to strings.Join", pos=[0:4, 0:20])
 
--- out/compile --
---- in.cue
-{
-  a: 〈import;strings〉.Join([
-    〈import;strings〉.Join([
-      "1",
-    ]),
-    "2",
-  ], "\n")
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

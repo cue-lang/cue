@@ -1,0 +1,28 @@
+-- in.cue --
+// Embedding !=null at file scope should preserve the constraint,
+// not collapse to (struct){}.
+
+a: {
+	!=null
+} @test(eq, !=null)
+
+// As a field value, !=null is preserved. Verify parity.
+b: !=null @test(eq, !=null)
+
+// !=null as embedding combined with a regular field.
+c: {
+	!=null
+	x: 1
+} @test(eq, {x: 1})
+-- out/compile --
+--- in.cue
+{
+  a: {
+    !=null
+  }
+  b: !=null
+  c: {
+    !=null
+    x: 1
+  }
+}

@@ -1,0 +1,88 @@
+-- in.cue --
+intIndex:    [2][0] @test(eq, 2)
+stringIndex: {foo: "bar"}["foo"] @test(eq, "bar")
+
+stringOfNumberIndex: {"3": 3}["3"] @test(eq, 3)
+
+indexToDefault:         (*[0] | {})[0] @test(eq, 0)
+outOfBoundsDisjunction: (*[] | {})[1] @test(err, code=eval, contains="index out of range [1] with length 0", pos=[0:36])
+
+// Ensure these are errors.
+indexDoesNotDistribute: (*[] | [1])[0] @test(err, code=eval, contains="index out of range [0] with length 0", pos=[0:37])
+doesNotDistributeType: {
+	l: []
+	a: (*l | {"3": 3})["3"] @test(err, code=eval, contains="undefined field", pos=[0:21])
+}
+
+stringIndexToList: [2][""] @test(err, code=eval, contains="undefined field", pos=[0:24])
+indexOutOfBounds2: 2[2] @test(err, code=eval, contains="invalid operand 2 (found int, want list or struct)", pos=[0:20])
+booleanIndex:      [][true] @test(err, code=eval, contains="invalid index true (invalid type bool)", pos=[0:20, 0:23])
+indexOutOfBounds3: [1, 2, 3][4] @test(err, code=eval, contains="index out of range [4] with length 3", pos=[0:30])
+negativeIndex:     [1, 2, 3][-1] @test(err, code=eval, contains="invalid index -1 (index must be non-negative)", pos=[0:20, 0:30])
+
+varIndexTooLarge: {
+	n: 3
+	a: [1, 2, 3][n] @test(err, code=eval, contains="index out of range [3] with length 3", pos=[0:15])
+}
+
+varNegativeIndex: {
+	n: -1
+	a: [1, 2, 3][n] @test(err, code=eval, contains="index n out of range [-1]", pos=[0:5, -1:5, 0:15])
+}
+-- out/compile --
+--- in.cue
+{
+  intIndex: [
+    2,
+  ][0]
+  stringIndex: {
+    foo: "bar"
+  }["foo"]
+  stringOfNumberIndex: {
+    "3": 3
+  }["3"]
+  indexToDefault: (*[
+    0,
+  ]|{})[0]
+  outOfBoundsDisjunction: (*[]|{})[1]
+  indexDoesNotDistribute: (*[]|[
+    1,
+  ])[0]
+  doesNotDistributeType: {
+    l: []
+    a: (*〈0;l〉|{
+      "3": 3
+    })["3"]
+  }
+  stringIndexToList: [
+    2,
+  ][""]
+  indexOutOfBounds2: 2[2]
+  booleanIndex: [][true]
+  indexOutOfBounds3: [
+    1,
+    2,
+    3,
+  ][4]
+  negativeIndex: [
+    1,
+    2,
+    3,
+  ][-1]
+  varIndexTooLarge: {
+    n: 3
+    a: [
+      1,
+      2,
+      3,
+    ][〈0;n〉]
+  }
+  varNegativeIndex: {
+    n: -1
+    a: [
+      1,
+      2,
+      3,
+    ][〈0;n〉]
+  }
+}

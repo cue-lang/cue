@@ -20,25 +20,6 @@ B: A & {
 -- out/errors.txt --
 [incomplete] A: cannot range over src (incomplete type _):
     ./in.cue:2:11
--- out/compile --
---- in.cue
-{
-  A: {
-    for _, v in 〈0;src〉 {
-      "\(〈1;v〉)": 〈1;v〉
-    }
-    src: _
-    if true {
-      baz: "baz"
-    }
-  }
-  B: (〈0;A〉 & {
-    src: [
-      "foo",
-      "bar",
-    ]
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  11

@@ -34,38 +34,3 @@ Retain: 10
 Unifications: 29
 Conjuncts:    40
 Disjuncts:    29
--- out/compile --
---- in.cue
-{
-  #Foo: {
-    let X#1 = or([
-      for k, _ in {} {
-        〈1;k〉
-      },
-    ])
-    connection: {
-      [〈1;let X#1〉]: 〈1;let X#1〉
-    }
-  }
-  #A: {
-    foo: "key"
-    let X#2 = 〈0;foo〉
-    a: {
-      foo: {
-        [〈2;let X#2〉]: 〈2;let X#2〉
-      }
-    }
-  }
-  #B: {
-    foo: string
-    let X#3 = 〈0;foo〉
-    a: {
-      foo: {
-        [〈2;let X#3〉]: 〈2;let X#3〉
-      }
-    }
-  }
-  b: (〈0;#B〉 & {
-    foo: "key"
-  })
-}

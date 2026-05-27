@@ -18,13 +18,3 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    0
--- out/compile --
---- in.cue
-{
-  a: 12
-  #Controller: {
-    settings: {
-      controller: 〈2;#Controller〉
-    }
-  }
-}

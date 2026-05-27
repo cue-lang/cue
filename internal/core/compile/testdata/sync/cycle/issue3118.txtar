@@ -1,0 +1,73 @@
+# Cycle errors report no source position information, making it impossible
+# to locate the offending code.
+# https://cuelang.org/issue/3118
+-- in.cue --
+#TimeSpan: {
+	start:    float
+	duration: float
+	end:      float
+
+	start:    end - duration
+	duration: end - start
+	end:      start + duration
+
+	start: <=end
+}
+
+examples: [string]: #TimeSpan
+
+examples: eg1: {
+    start: 10.0
+    duration: 2.1
+    @test(eq, {start: 10.0, duration: 2.1, end: 12.1})
+}
+
+examples: eg2: {
+    start: 10.0
+    @test(eq, {
+	start: _|_    @test(err, code=incomplete, pos=[6:12, 4:12, 8:12])
+	duration: _|_ @test(err, code=incomplete, pos=[7:12, 4:12, 8:12])
+	end: _|_      @test(err, code=incomplete, pos=[7:12, 4:12, 8:12])
+})
+}
+
+examples: eg3: {
+    end: 10.0
+    @test(eq, {
+	end: _|_      @test(err, code=incomplete, pos=[8:12, 2:12, 6:12, 10:9])
+	start: _|_    @test(err, code=incomplete, pos=[7:12, 2:12, 6:12, 10:9])
+	duration: _|_ @test(err, code=incomplete, pos=[7:12, 2:12, 6:12, 10:9])
+})
+}
+-- out/compile --
+--- in.cue
+{
+  #TimeSpan: {
+    start: float
+    duration: float
+    end: float
+    start: (〈0;end〉 - 〈0;duration〉)
+    duration: (〈0;end〉 - 〈0;start〉)
+    end: (〈0;start〉 + 〈0;duration〉)
+    start: <=〈0;end〉
+  }
+  examples: {
+    [string]: 〈1;#TimeSpan〉
+  }
+  examples: {
+    eg1: {
+      start: 10.0
+      duration: 2.1
+    }
+  }
+  examples: {
+    eg2: {
+      start: 10.0
+    }
+  }
+  examples: {
+    eg3: {
+      end: 10.0
+    }
+  }
+}

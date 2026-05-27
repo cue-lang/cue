@@ -1,0 +1,704 @@
+-- in.cue --
+// evalv3 "incDependent: already closed" panic on valid CUE involving
+// structure sharing between definitions and regular fields.
+// https://cuelang.org/issue/3062
+issue3062: ok1: {
+	#S: "a"
+	#o: x: #S
+	o: #o
+	o: X
+	X: x: A
+	A: "a"
+
+	@test(eq, {
+		#S: "a"
+		#o: {x: "a"}
+		o: {x: "a"}
+		X: {x: "a"}
+		A: "a"
+	})
+}
+
+// evalv3 "field not allowed" regression from v2 involving structure sharing
+// when a field is unified with a shared vertex that has a self-referential path.
+// https://cuelang.org/issue/3601
+issue3601: ok1: {
+	Y: (X & __no_sharing).a
+	X: a: b: a.b
+	out: Y & __no_sharing
+
+	@test(eq, {Y: {b: _}, X: {a: {b: _}}, out: {b: _}})
+}
+
+// Test debug facilities to turn of sharing.
+debug: {
+	sharingOn: {
+		a: b @test(shareID=sharingOn_ab)
+		b: {c: 1} @test(shareID=sharingOn_ab)
+		@test(eq, {a: {c: 1}, b: {c: 1}})
+	}
+	sharingOff: t1: {
+		a: b & __no_sharing
+		b: c: 1
+		@test(eq, {a: {c: 1}, b: {c: 1}})
+	}
+	sharingOff: t2: {
+		a: b
+		a: __no_sharing
+		b: c: 1
+		@test(eq, {a: {c: 1}, b: {c: 1}})
+	}
+	sharingOff: t3: {
+		a: __no_sharing
+		a: b
+		b: c: 1
+		@test(eq, {a: {c: 1}, b: {c: 1}})
+	}
+}
+-- dupshare.cue --
+// This file contains tests where unifying the same field multiple times into
+// a field with different "closedness" history should compute closedness
+// correctly.
+
+// "field not allowed" regression in evalv3 when the same definition is
+// unified into a field multiple times with different closedness histories.
+// https://cuelang.org/issue/3641
+issue3641: simplified: t1: {
+	#Context1: {ctx: {}} @test(shareID=t1ctx1)
+	Context2: {ctx: {}} @test(shareID=t1ctx2)
+
+	// Must both refer to #Context1
+	#Config1: {cfg: #Context1 @test(shareID=t1ctx1)}
+	#Config3: {cfg: #Context1 @test(shareID=t1ctx1)}
+
+	Config2: {cfg: Context2 @test(shareID=t1ctx2)}
+
+	Config: #Config1 & Config2
+
+	// order matters
+	out: Config // Indirection necessary.
+	out: #Config3
+
+	@test(eq, {
+		#Context1: {ctx: {}}
+		Context2: {ctx: {}}
+		#Config1: {cfg: {ctx: {}}}
+		#Config3: {cfg: {ctx: {}}}
+		Config2: {cfg: {ctx: {}}}
+		Config: {cfg: {ctx: {}}}
+		out: {cfg: {ctx: {}}}
+	})
+}
+issue3641: simplified: t2: {
+	#Context1: {ctx: {}} @test(shareID=t2ctx1)
+	Context2: {ctx: {}} @test(shareID=t2ctx2)
+
+	// Must both refer to #Context1
+	#Config1: {cfg: #Context1 @test(shareID=t2ctx1)}
+	#Config3: {cfg: #Context1 @test(shareID=t2ctx1)}
+
+	Config2: {cfg: Context2 @test(shareID=t2ctx2)}
+
+	Config: #Config1 & Config2
+
+	// order matters
+	out: Config // Indirection necessary.
+	out: #Config3
+
+	@test(eq, {
+		#Context1: {ctx: {}}
+		Context2: {ctx: {}}
+		#Config1: {cfg: {ctx: {}}}
+		#Config3: {cfg: {ctx: {}}}
+		Config2: {cfg: {ctx: {}}}
+		Config: {cfg: {ctx: {}}}
+		out: {cfg: {ctx: {}}}
+	})
+}
+// Variant where sharing is explicitly disabled.
+issue3641: simplified: t3: {
+	#Context1: {ctx: {}} @test(shareID=t3ctx1)
+	Context2: {ctx: {}} @test(shareID=t3ctx2)
+
+	// Must both refer to #Context1
+	#Config1: {cfg: #Context1 @test(shareID=t3ctx1)}
+	#Config3: {cfg: #Context1 @test(shareID=t3ctx1)}
+
+	Config2: {cfg: Context2 @test(shareID=t3ctx2)}
+
+	Config: #Config1 & Config2
+
+	// order matters
+	out: __no_sharing
+	out: Config // Indirection necessary.
+	out: #Config3
+
+	@test(eq, {
+		#Context1: {ctx: {}}
+		Context2: {ctx: {}}
+		#Config1: {cfg: {ctx: {}}}
+		#Config3: {cfg: {ctx: {}}}
+		Config2: {cfg: {ctx: {}}}
+		Config: {cfg: {ctx: {}}}
+		out: {cfg: {ctx: {}}}
+	})
+}
+issue3641: full: {
+	#Context1: {ctx: {}} @test(shareID=fullctx1)
+	#Context2: {ctx: {}} @test(shareID=fullctx2)
+
+	#Config1: {cfg: #Context1 @test(shareID=fullctx1)} @test(shareID=fullcfg1)
+	#Config2: {cfg: #Context2 @test(shareID=fullctx2)}
+
+	#Schema: {sch: #Config1 @test(shareID=fullcfg1)}
+
+	#Config: #Config1 & #Config2
+
+	let config = #Config
+	out: #Schema & {
+		sch: config
+	}
+
+	@test(eq, {
+		#Context1: {ctx: {}}
+		#Context2: {ctx: {}}
+		#Config1: {cfg: {ctx: {}}}
+		#Config2: {cfg: {ctx: {}}}
+		#Schema: {sch: {cfg: {ctx: {}}}}
+		#Config: {cfg: {ctx: {}}}
+		out: {sch: {cfg: {ctx: {}}}}
+	})
+}
+// "field not allowed" evalv3 regression with lists: a list value shared from
+// a definition constraint was incorrectly rejected in a regular field.
+// https://cuelang.org/issue/3546
+issue3546: reduced: {
+	all: ["a"]
+	#all: all
+
+	#Network: list: #List
+	#List: [...string]
+
+	val: #Network
+	val: list: #all
+
+	out: #Network
+	out: val
+
+	@test(eq, {
+		all: ["a"]
+		#all: ["a"]
+		#Network: {list: []}
+		#List: []
+		val: {list: ["a"]}
+		out: {list: ["a"]}
+	})
+}
+-- sharecycle.cue --
+shareCycle: t1: {
+	#X: {}
+	Y: {
+		x: #X & Y
+	}
+	@test(err, code=structural_cycle, path=Y.x.x, contains="structural cycle", pos=[])
+}
+shareCycle: t2: {
+	#X: int
+	Y: {
+		x: #X & Y
+	}
+	@test(err, code=eval, path=Y.x,
+		contains="conflicting values %s and %s (mismatched types %s and %s)",
+		args=[int, {x:(#X & Y)}, int, struct], pos=[1:6, 2:5, 3:6, 3:11])
+}
+shareCycle: t3: {
+	#X: {}
+	Y: {
+		x: Y & #X
+	}
+	@test(err, code=structural_cycle, at=Y.x.x, contains="structural cycle", pos=[])
+}
+-- acrossdisjunction.cue --
+import "list"
+
+// evalv3 incomplete value regression involving builtin calls: list.Repeat
+// result shared across a disjunction boundary was not properly unshared.
+// https://cuelang.org/issue/3679
+issue3679: {
+	// The result of list.Repeat is structure shared in env. This needs to be
+	// "unshared" within the disjunction. Ensure that unsharing a shared Vertex
+	// works arcross disjunction boundaries.
+	b: null | [string]
+	b: list.Repeat([for k, v in [0] { "bar" }], 1)
+
+	@test(eq, {b: ["bar"]})
+}
+-- issue3835.cue --
+// evalv3 regression with "cycle with field" error involving a comprehension
+// with a let that references a top-level field via a pattern constraint.
+// https://cuelang.org/issue/3835
+issue3835: {
+	foo: {}
+
+	_global: "global value"
+
+	[string]: {
+		if true let orgBotUser = _global {
+			out: "prefix: " + orgBotUser
+		}
+	}
+
+	@test(eq, {
+		foo: {out: "prefix: global value"}
+		_global: "global value"
+	})
+}
+-- pendingarcs.cue --
+pending: t1: {
+	a: X
+	if true {
+		a: b: c: e: 1
+	}
+	X: {b: Y @test(shareID=pendXbY)}
+	Y: {c: d: int} @test(shareID=pendXbY)
+
+	@test(eq, {
+		a: {b: {c: {e: 1, d: int}}}
+		X: {b: {c: {d: int}}}
+		Y: {c: {d: int}}
+	})
+}
+// evalv3 "field not allowed" regression with a comprehension that conditionally
+// sets a field inside a definition with an optional nested definition.
+// https://cuelang.org/issue/3849
+issue3849: {
+	dep: #Deployment & {}
+	if true {
+		dep: metadata: name: app: "mysql"
+	}
+	#Deployment: metadata?: #ObjectMeta
+	#ObjectMeta: name?: [string]: string
+
+	// TODO(inline): investigate why these do not match. Optionals?
+	// @test(shareID=Meta, at=#Deployment.metadata)
+	// @test(shareID=Meta, at=#ObjectMeta)
+
+	@test(eq, {
+		dep: {metadata: {name: {app: "mysql"}}}
+		#Deployment: {metadata?: {name?: {}}}
+		#ObjectMeta: {name?: {}}
+	})
+}
+-- let.cue --
+import "list"
+
+// evalv3 structural cycle regression vs evalv2 when a let binding holds a
+// flattened list that is iterated and used to populate a dynamic field.
+// https://cuelang.org/issue/3903
+issue3903: full: {
+	_input: null | *{name: "foo"}
+
+	let _inputList = list.FlattenN([_input], 0)
+
+	_inputByName: {
+		for input in _inputList {
+			(input.name): input
+		}
+	}
+
+	for name, _input in _inputByName {
+		(name): _template & {
+			input: _input
+		}
+	}
+	_template: {
+		input: name: string
+		result: "result-\(input.name)" @test(err, code=incomplete,
+			contains="non-concrete value string (type string)",
+			pos=[0:11, -1:16])
+	}
+	@test(eq, {
+		_input: *{name: "foo"} | null
+		_inputByName: {foo: {name: "foo"}}
+		_template: {
+			input: {name: string}
+			result: _|_
+		}
+		foo: {
+			input: {name: "foo"}
+			result: "result-foo"
+		}
+	})
+}
+issue3903: noshare: {
+	_input: null | *{name: "foo"}
+
+	let _inputList = list.FlattenN([_input], 0)
+
+	_inputByName: {
+		for input in (_inputList & __no_sharing) {
+			(input.name): input
+		}
+	}
+	for name, _input in _inputByName {
+		(name): _template & {
+			input: _input
+		}
+	}
+	_template: {
+		input:  name: string
+		result: "result-\(input.name)" @test(err, code=incomplete,
+			contains="non-concrete value string (type string)",
+			pos=[0:11, -1:17])
+	}
+	@test(eq, {
+		_input: *{name: "foo"} | null
+		_inputByName: {foo: {name: "foo"}}
+		_template: {
+			input: {name: string}
+			result: _|_
+		}
+		foo: {
+			input: {name: string}
+			result: _|_ @test(err, code=incomplete,
+				contains="non-concrete value string (type string)")
+		}
+	})
+}
+-- out/compile --
+--- acrossdisjunction.cue
+{
+  issue3679: {
+    b: (null|[
+      string,
+    ])
+    b: 〈import;list〉.Repeat([
+      for k, v in [
+        0,
+      ] {
+        "bar"
+      },
+    ], 1)
+  }
+}
+--- dupshare.cue
+{
+  issue3641: {
+    simplified: {
+      t1: {
+        #Context1: {
+          ctx: {}
+        }
+        Context2: {
+          ctx: {}
+        }
+        #Config1: {
+          cfg: 〈1;#Context1〉
+        }
+        #Config3: {
+          cfg: 〈1;#Context1〉
+        }
+        Config2: {
+          cfg: 〈1;Context2〉
+        }
+        Config: (〈0;#Config1〉 & 〈0;Config2〉)
+        out: 〈0;Config〉
+        out: 〈0;#Config3〉
+      }
+    }
+  }
+  issue3641: {
+    simplified: {
+      t2: {
+        #Context1: {
+          ctx: {}
+        }
+        Context2: {
+          ctx: {}
+        }
+        #Config1: {
+          cfg: 〈1;#Context1〉
+        }
+        #Config3: {
+          cfg: 〈1;#Context1〉
+        }
+        Config2: {
+          cfg: 〈1;Context2〉
+        }
+        Config: (〈0;#Config1〉 & 〈0;Config2〉)
+        out: 〈0;Config〉
+        out: 〈0;#Config3〉
+      }
+    }
+  }
+  issue3641: {
+    simplified: {
+      t3: {
+        #Context1: {
+          ctx: {}
+        }
+        Context2: {
+          ctx: {}
+        }
+        #Config1: {
+          cfg: 〈1;#Context1〉
+        }
+        #Config3: {
+          cfg: 〈1;#Context1〉
+        }
+        Config2: {
+          cfg: 〈1;Context2〉
+        }
+        Config: (〈0;#Config1〉 & 〈0;Config2〉)
+        out: _|_(no sharing)
+        out: 〈0;Config〉
+        out: 〈0;#Config3〉
+      }
+    }
+  }
+  issue3641: {
+    full: {
+      #Context1: {
+        ctx: {}
+      }
+      #Context2: {
+        ctx: {}
+      }
+      #Config1: {
+        cfg: 〈1;#Context1〉
+      }
+      #Config2: {
+        cfg: 〈1;#Context2〉
+      }
+      #Schema: {
+        sch: 〈1;#Config1〉
+      }
+      #Config: (〈0;#Config1〉 & 〈0;#Config2〉)
+      let config#1 = 〈0;#Config〉
+      out: (〈0;#Schema〉 & {
+        sch: 〈1;let config#1〉
+      })
+    }
+  }
+  issue3546: {
+    reduced: {
+      all: [
+        "a",
+      ]
+      #all: 〈0;all〉
+      #Network: {
+        list: 〈1;#List〉
+      }
+      #List: [
+        ...string,
+      ]
+      val: 〈0;#Network〉
+      val: {
+        list: 〈1;#all〉
+      }
+      out: 〈0;#Network〉
+      out: 〈0;val〉
+    }
+  }
+}
+--- in.cue
+{
+  issue3062: {
+    ok1: {
+      #S: "a"
+      #o: {
+        x: 〈1;#S〉
+      }
+      o: 〈0;#o〉
+      o: 〈0;X〉
+      X: {
+        x: 〈1;A〉
+      }
+      A: "a"
+    }
+  }
+  issue3601: {
+    ok1: {
+      Y: (〈0;X〉 & _|_(no sharing)).a
+      X: {
+        a: {
+          b: 〈1;a〉.b
+        }
+      }
+      out: (〈0;Y〉 & _|_(no sharing))
+    }
+  }
+  debug: {
+    sharingOn: {
+      a: 〈0;b〉
+      b: {
+        c: 1
+      }
+    }
+    sharingOff: {
+      t1: {
+        a: (〈0;b〉 & _|_(no sharing))
+        b: {
+          c: 1
+        }
+      }
+    }
+    sharingOff: {
+      t2: {
+        a: 〈0;b〉
+        a: _|_(no sharing)
+        b: {
+          c: 1
+        }
+      }
+    }
+    sharingOff: {
+      t3: {
+        a: _|_(no sharing)
+        a: 〈0;b〉
+        b: {
+          c: 1
+        }
+      }
+    }
+  }
+}
+--- issue3835.cue
+{
+  issue3835: {
+    foo: {}
+    _global: "global value"
+    [string]: {
+      if true let orgBotUser = 〈1;_global〉 {
+        out: ("prefix: " + 〈1;orgBotUser〉)
+      }
+    }
+  }
+}
+--- let.cue
+{
+  issue3903: {
+    full: {
+      _input: (null|*{
+        name: "foo"
+      })
+      let _inputList#2 = 〈import;list〉.FlattenN([
+        〈1;_input〉,
+      ], 0)
+      _inputByName: {
+        for _, input in 〈1;let _inputList#2〉 {
+          〈1;input〉.name: 〈1;input〉
+        }
+      }
+      for name, _input in 〈0;_inputByName〉 {
+        〈1;name〉: (〈2;_template〉 & {
+          input: 〈2;_input〉
+        })
+      }
+      _template: {
+        input: {
+          name: string
+        }
+        result: "result-\(〈0;input〉.name)"
+      }
+    }
+  }
+  issue3903: {
+    noshare: {
+      _input: (null|*{
+        name: "foo"
+      })
+      let _inputList#3 = 〈import;list〉.FlattenN([
+        〈1;_input〉,
+      ], 0)
+      _inputByName: {
+        for _, input in (〈1;let _inputList#3〉 & _|_(no sharing)) {
+          〈1;input〉.name: 〈1;input〉
+        }
+      }
+      for name, _input in 〈0;_inputByName〉 {
+        〈1;name〉: (〈2;_template〉 & {
+          input: 〈2;_input〉
+        })
+      }
+      _template: {
+        input: {
+          name: string
+        }
+        result: "result-\(〈0;input〉.name)"
+      }
+    }
+  }
+}
+--- pendingarcs.cue
+{
+  pending: {
+    t1: {
+      a: 〈0;X〉
+      if true {
+        a: {
+          b: {
+            c: {
+              e: 1
+            }
+          }
+        }
+      }
+      X: {
+        b: 〈1;Y〉
+      }
+      Y: {
+        c: {
+          d: int
+        }
+      }
+    }
+  }
+  issue3849: {
+    dep: (〈0;#Deployment〉 & {})
+    if true {
+      dep: {
+        metadata: {
+          name: {
+            app: "mysql"
+          }
+        }
+      }
+    }
+    #Deployment: {
+      metadata?: 〈1;#ObjectMeta〉
+    }
+    #ObjectMeta: {
+      name?: {
+        [string]: string
+      }
+    }
+  }
+}
+--- sharecycle.cue
+{
+  shareCycle: {
+    t1: {
+      #X: {}
+      Y: {
+        x: (〈1;#X〉 & 〈1;Y〉)
+      }
+    }
+  }
+  shareCycle: {
+    t2: {
+      #X: int
+      Y: {
+        x: (〈1;#X〉 & 〈1;Y〉)
+      }
+    }
+  }
+  shareCycle: {
+    t3: {
+      #X: {}
+      Y: {
+        x: (〈1;Y〉 & 〈1;#X〉)
+      }
+    }
+  }
+}

@@ -3,12 +3,6 @@ a: "foo\nbar" @test(eq, "foo\nbar")
 b: a          @test(eq, "foo\nbar")
 
 // TODO: mimic http://exploringjs.com/es6/ch_template-literals.html#sec_introduction-template-literals
--- out/compile --
---- in.cue
-{
-  a: "foo\nbar"
-  b: 〈0;a〉
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  3

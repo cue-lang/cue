@@ -11,17 +11,6 @@
 } @test(shareID=lN)
 
 l: #N @test(shareID=lN)
--- out/compile --
---- in.cue
-{
-  #A: _
-  #N: (〈0;#A〉 & {
-    _E: {
-      name: "hello"
-    }
-  })
-  l: 〈0;#N〉
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  6

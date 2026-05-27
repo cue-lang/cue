@@ -14,30 +14,6 @@ instance: #Type & {
 	alpha?: bravo?: charlie?: bool
 }
 #Root: {...}
--- out/compile --
---- in.cue
-{
-  out: {
-    〈1;instance〉
-  }
-  instance: (〈0;#Type〉 & {
-    alpha: {
-      bravo: {
-        charlie: true
-      }
-    }
-  })
-  #Type: (〈0;#Root〉 & {
-    alpha?: {
-      bravo?: {
-        charlie?: bool
-      }
-    }
-  })
-  #Root: {
-    ...
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  14

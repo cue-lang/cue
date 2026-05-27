@@ -1,0 +1,845 @@
+-- in.cue --
+given: {
+	INC: USD: 2.0
+	USD: GBP: 3.0
+	@test(eq, {INC: {USD: 2.0}, USD: {GBP: 3.0}})
+}
+hydrated: {
+	for k, v in given {
+		for k1, r in v {
+			"\(k)": "\(k)":   1.0
+			"\(k1)": "\(k1)": 1.0
+			"\(k)": "\(k1)":  r
+			"\(k1)": "\(k)":  number
+		}
+	}
+	@test(eq, {
+		INC: {INC: 1.0, USD: 2.0}
+		USD: {USD: 1.0, INC: number, GBP: 3.0}
+		GBP: {GBP: 1.0, USD: number}
+	})
+}
+
+foo: {
+	a: 10
+	if a < 20 {
+		if a < 50 {
+			b: 20
+		}
+	}
+	@test(eq, {a: 10, b: 20})
+}
+
+indirectlyNested: {
+	a: true // must be declared outside of the nested comprehensions for test.
+	if true {
+		b: {
+			if a {
+				a
+			}
+		}
+	}
+	@test(eq, {a: true, b: true})
+}
+
+directlyNestedEmpty: {
+	a: true
+	if true {
+		if a {
+		}
+	}
+	@test(eq, {a: true})
+}
+
+directlyDoublyNestedEmpty: {
+	a: true
+	if true {
+		if a {
+		}
+	}
+	@test(eq, {a: true})
+}
+
+indirectlyDoublyNestedEmpty: {
+	a: true
+	b: {
+		if true {
+			if a {
+				if a {
+					a
+				}
+			}
+			if a {
+				a
+			}
+		}
+	}
+	@test(eq, {a: true, b: true})
+}
+
+indirectlyDoublyNested: {
+	a: true
+	if true {
+		if a {
+			if a {
+				b: 1
+			}
+		}
+		if a {
+			c: 1
+		}
+	}
+	@test(eq, {a: true, c: 1, b: 1})
+}
+
+// This case used to trigger an over-aggressive deduplication.
+// issue1974: Tests that two-level nested for comprehensions do not lose keys
+// due to over-aggressive deduplication. https://cuelang.org/issue/1974
+issue1974: {
+	X: {
+		foo: {
+			bar: ""
+			baz: ""
+		}
+	}
+	out: {
+		for k, v in X for vk, vv in v {
+			"\(k)": "\(vk)": vv
+		}
+	}
+	@test(eq, {
+		X: {foo: {bar: "", baz: ""}}
+		out: {foo: {bar: "", baz: ""}}
+	})
+}
+-- pending.cue --
+// Trigger notification while an arc is still pending.
+T: int @test(eq, 1)
+for C in Y {
+	let X = C.M
+	T:  X.V
+}
+Y: x: {
+	M: V: 1
+	for _ in M {
+		if true { M: {} }
+	}
+	@test(eq, {M: {V: 1}})
+}
+-- issue3940.cue --
+// issue3940: Tests that chained comprehension clauses do not trigger spurious
+// structural cycle errors in evalv3. https://cuelang.org/issue/3940
+// Test chained comprehension clauses (without braces)
+issue3940: reduced1: {
+	X
+	a: b: X
+	a: b: a: b: {y: X @test(shareID=reduced1X)}
+
+	X: {
+		@test(shareID=reduced1X)
+		a: {}
+
+		objects: {
+			for v in a
+			for _ in ({} & v).objects {
+			}
+		}
+	}
+
+	// The eq:todo value is now the correct result: the pushdown fix
+	// properly handles chained comprehension clauses, unifying a.b
+	// into a single struct.
+	@test(eq, {
+		a: {
+			b: {
+				a: {b: {y: {a: {}, objects: {}}}}
+				objects: _|_ @test(err, code=incomplete, contains="issue3940.reduced1.a.b.objects: undefined field: objects", pos=[15:22])
+			}
+		}
+		X: {a: {}, objects: {}}
+		objects: {}
+	})
+	@test(eq:todo, {
+		a: b: {
+			a: {b: {y: {a: {}, objects: {}}}}
+			objects: {}
+		}
+		X: {a: {}, objects: {}}
+		objects: {}
+	})
+}
+
+// Test nested comprehensions (with braces) - should work as before
+issue3940: reduced2: {
+	X
+	a: b: X
+	a: b: a: b: {y: X @test(shareID=reduced2X)}
+
+	X: {
+		@test(shareID=reduced2X)
+		a: {}
+
+		objects: {
+			for v in a
+			for _ in ({} & v).objects {
+			}
+		}
+	}
+	// The pushdown fix resolves the spurious "undefined field" error
+	// on objects: reduced2 is structurally identical to reduced1 and
+	// should produce the same result.
+	@test(eq, {
+		a: {
+			b: {
+				a: {b: {y: {a: {}, objects: {}}}}
+				objects: _|_
+			}
+		}
+		X: {a: {}, objects: {}}
+		objects: {}
+	})
+	@test(eq:todo, {
+		a: {
+			b: {
+				a: {b: {y: {a: {}, objects: {}}}}
+				objects: {}
+			}
+		}
+		X: {a: {}, objects: {}}
+		objects: {}
+	})
+}
+issue3940: reduced3: {
+	a: E
+	a: i: x: E
+	a: i: x: i: x: E
+	E: {
+		i: {}
+		o: [for m in i for v in ({} & m).o {}]
+	}
+	@test(eq, {
+		a: {
+			i: {x: {i: {x: {i: {}, o: []}}, o: []}}
+			o: []
+		}
+		E: {i: {}, o: []}
+	})
+
+}
+issue3940: reduced4: {
+	out: Exporter & {
+		_imports: [{
+			objects: {...}
+			#export: Exporter & {
+				_imports: [{ #export: Exporter }]
+			}
+		}]
+	}
+
+	Exporter: {
+		_imports: [...]
+		objects: [
+			for v in _imports for obj in ({} & v.#export).objects {
+				obj
+			},
+		]
+	}
+	@test(eq, {
+		out: {
+			_imports: [{
+				objects: {}
+				#export: {
+					_imports: [{
+						#export: {
+							_imports: []
+							objects: []
+						}
+					}]
+					objects: []
+				}
+			}]
+			objects: []
+		}
+		Exporter: {_imports: [], objects: []}
+	})
+}
+issue3940: let: {
+	X
+	a: b: X
+	a: b: a: b: {y: X @test(shareID=letX)}
+
+	X: {
+		@test(shareID=letX)
+		a: {}
+
+		objects: {
+			for v in a
+			let x = ({} & v)
+			for _ in x.objects {
+			}
+		}
+	}
+}
+issue3940: full: {
+	out: #Exporter & {
+		_imports: [_branch]
+		#conf: global: region: "Europe"
+	}
+
+	_branch: {
+		objects: branch: {
+			#conf: {...}
+			region: #conf.global.region
+		}
+		imports: [_leaf]
+		#export: #Exporter & {
+			_objects: objects
+			_imports: imports
+		}
+	}
+	_leaf: {
+		objects: leaf: {
+			#conf: {...}
+			region: #conf.global.region
+		}
+		#export: #Exporter & {
+			_objects: objects
+		}
+	}
+	#Exporter: {
+		CONF=#conf: {...}
+		_objects: {...}
+		_imports: [...]
+
+		objects: [
+			// local objects
+			for name, obj in _objects & {[string]: #conf: CONF} {
+				(name): obj
+			},
+
+			// transitively imported objects
+			for import in _imports
+			for obj in ({#conf: CONF} & import.#export).objects {
+				obj
+			},
+		]
+	}
+	@test(eq, at=out, {
+		_imports: [{
+			objects: branch: {
+				#conf: _ @test(ignore)
+				region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+			}
+			imports: [{
+				objects: leaf: {
+					#conf: _ @test(ignore)
+					region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+				}
+				#export: {
+					_objects: leaf: {
+						#conf: _ @test(ignore)
+						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+					}
+					#conf: _ @test(ignore)
+					_imports: []
+					objects: [{
+						leaf: {
+							#conf: _ @test(ignore)
+							region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+						}
+					}]
+				}
+			}]
+			#export: {
+				_objects: branch: {
+					#conf: _ @test(ignore)
+					region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+				}
+				_imports: [{
+					objects: leaf: {
+						#conf: _ @test(ignore)
+						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+					}
+					#export: {
+						_objects: leaf: {
+							#conf: _ @test(ignore)
+							region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+						}
+						#conf: _ @test(ignore)
+						_imports: []
+						objects: [{
+							leaf: {
+								#conf: _ @test(ignore)
+								region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+							}
+						}]
+					}
+				}]
+				#conf: _ @test(ignore)
+				objects: [{
+					branch: {
+						#conf: _ @test(ignore)
+						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+					}
+				}, {
+					leaf: {
+						#conf: _ @test(ignore)
+						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
+					}
+				}]
+			}
+		}]
+		#conf: {global: {region: "Europe"}}
+		_objects: {}
+		objects: [{
+			branch: {
+				#conf: {global: {region: "Europe"}}
+				region: "Europe"
+			}
+		}, {
+			leaf: {
+				#conf: {global: {region: "Europe"}}
+				region: "Europe"
+			}
+		}]
+	})
+}
+-- issue3990.cue --
+// issue3990: Tests that nested comprehensions within struct definitions do not
+// trigger "field set was already referenced" errors in evalv3.
+// https://cuelang.org/issue/3990
+issue3990: {
+	_imports: [_noVolumes, _someVolumes]
+	_noVolumes: {
+		name: "noVolumes"
+		exportObjs: deployment: _Deployment & {
+			volumes: []
+		}
+	}
+	_someVolumes: {
+		name: "someVolumes"
+		exportObjs: deployment: _Deployment & {
+			volumes: [{name: "data"}]
+		}
+	}
+
+	for import in _imports
+	for _, obj in ({extra: "unused"} & import).exportObjs {(import.name): obj},
+
+	_Deployment: this={
+		_names: {
+			for _, v in this.volumes {
+				(v.name): v.name
+			}
+		}
+		// skip volumeNames if empty
+		if len(_names) > 0 {
+			volumeNames: [for _, v in _names {v}]
+		}
+	}
+	@test(eq, {
+		_imports: [{
+			name: "noVolumes"
+			exportObjs: deployment: {volumes: [], _names: {}}
+		}, {
+			name: "someVolumes"
+			exportObjs: deployment: {
+				_names: {data: "data"}
+				volumeNames: ["data"]
+				volumes: [{
+					name: "data"
+				}]
+			}
+		}]
+		_noVolumes: {
+			name: "noVolumes"
+			exportObjs: {deployment: {volumes: [], _names: {}}}
+		}
+		_someVolumes: {
+			name: "someVolumes"
+			exportObjs: {
+				deployment: {
+					volumes: [{ name: "data" }]
+					_names: {data: "data"}
+					volumeNames: ["data"]
+				}
+			}
+		}
+		_Deployment: {
+			_names: _|_ @test(err, code=incomplete)
+		}
+		someVolumes: {
+			volumes: [{ name: "data" }]
+			_names: {data: "data"}
+			volumeNames: ["data"]
+		}
+		noVolumes: {volumes: [], _names: {}}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  given: {
+    INC: {
+      USD: 2.0
+    }
+    USD: {
+      GBP: 3.0
+    }
+  }
+  hydrated: {
+    for k, v in 〈1;given〉 {
+      for k1, r in 〈1;v〉 {
+        "\(〈3;k〉)": {
+          "\(〈4;k〉)": 1.0
+        }
+        "\(〈1;k1〉)": {
+          "\(〈2;k1〉)": 1.0
+        }
+        "\(〈3;k〉)": {
+          "\(〈2;k1〉)": 〈2;r〉
+        }
+        "\(〈1;k1〉)": {
+          "\(〈4;k〉)": number
+        }
+      }
+    }
+  }
+  foo: {
+    a: 10
+    if (〈0;a〉 < 20) {
+      if (〈1;a〉 < 50) {
+        b: 20
+      }
+    }
+  }
+  indirectlyNested: {
+    a: true
+    if true {
+      b: {
+        if 〈2;a〉 {
+          〈3;a〉
+        }
+      }
+    }
+  }
+  directlyNestedEmpty: {
+    a: true
+    if true {
+      if 〈1;a〉 {}
+    }
+  }
+  directlyDoublyNestedEmpty: {
+    a: true
+    if true {
+      if 〈1;a〉 {}
+    }
+  }
+  indirectlyDoublyNestedEmpty: {
+    a: true
+    b: {
+      if true {
+        if 〈2;a〉 {
+          if 〈3;a〉 {
+            〈4;a〉
+          }
+        }
+        if 〈2;a〉 {
+          〈3;a〉
+        }
+      }
+    }
+  }
+  indirectlyDoublyNested: {
+    a: true
+    if true {
+      if 〈1;a〉 {
+        if 〈2;a〉 {
+          b: 1
+        }
+      }
+      if 〈1;a〉 {
+        c: 1
+      }
+    }
+  }
+  issue1974: {
+    X: {
+      foo: {
+        bar: ""
+        baz: ""
+      }
+    }
+    out: {
+      for k, v in 〈1;X〉 for vk, vv in 〈0;v〉 {
+        "\(〈2;k〉)": {
+          "\(〈2;vk〉)": 〈2;vv〉
+        }
+      }
+    }
+  }
+}
+--- issue3940.cue
+{
+  issue3940: {
+    reduced1: {
+      〈0;X〉
+      a: {
+        b: 〈1;X〉
+      }
+      a: {
+        b: {
+          a: {
+            b: {
+              y: 〈4;X〉
+            }
+          }
+        }
+      }
+      X: {
+        a: {}
+        objects: {
+          for _, v in 〈1;a〉 for _, _ in ({} & 〈0;v〉).objects {}
+        }
+      }
+    }
+  }
+  issue3940: {
+    reduced2: {
+      〈0;X〉
+      a: {
+        b: 〈1;X〉
+      }
+      a: {
+        b: {
+          a: {
+            b: {
+              y: 〈4;X〉
+            }
+          }
+        }
+      }
+      X: {
+        a: {}
+        objects: {
+          for _, v in 〈1;a〉 for _, _ in ({} & 〈0;v〉).objects {}
+        }
+      }
+    }
+  }
+  issue3940: {
+    reduced3: {
+      a: 〈0;E〉
+      a: {
+        i: {
+          x: 〈2;E〉
+        }
+      }
+      a: {
+        i: {
+          x: {
+            i: {
+              x: 〈4;E〉
+            }
+          }
+        }
+      }
+      E: {
+        i: {}
+        o: [
+          for _, m in 〈1;i〉 for _, v in ({} & 〈0;m〉).o {},
+        ]
+      }
+    }
+  }
+  issue3940: {
+    reduced4: {
+      out: (〈0;Exporter〉 & {
+        _imports: [
+          {
+            objects: {
+              ...
+            }
+            #export: (〈3;Exporter〉 & {
+              _imports: [
+                {
+                  #export: 〈6;Exporter〉
+                },
+              ]
+            })
+          },
+        ]
+      })
+      Exporter: {
+        _imports: [
+          ...,
+        ]
+        objects: [
+          for _, v in 〈1;_imports〉 for _, obj in ({} & 〈0;v〉.#export).objects {
+            〈1;obj〉
+          },
+        ]
+      }
+    }
+  }
+  issue3940: {
+    let: {
+      〈0;X〉
+      a: {
+        b: 〈1;X〉
+      }
+      a: {
+        b: {
+          a: {
+            b: {
+              y: 〈4;X〉
+            }
+          }
+        }
+      }
+      X: {
+        a: {}
+        objects: {
+          for _, v in 〈1;a〉 let x = ({} & 〈0;v〉) for _, _ in 〈0;x〉.objects {}
+        }
+      }
+    }
+  }
+  issue3940: {
+    full: {
+      out: (〈0;#Exporter〉 & {
+        _imports: [
+          〈2;_branch〉,
+        ]
+        #conf: {
+          global: {
+            region: "Europe"
+          }
+        }
+      })
+      _branch: {
+        objects: {
+          branch: {
+            #conf: {
+              ...
+            }
+            region: 〈0;#conf〉.global.region
+          }
+        }
+        imports: [
+          〈2;_leaf〉,
+        ]
+        #export: (〈1;#Exporter〉 & {
+          _objects: 〈1;objects〉
+          _imports: 〈1;imports〉
+        })
+      }
+      _leaf: {
+        objects: {
+          leaf: {
+            #conf: {
+              ...
+            }
+            region: 〈0;#conf〉.global.region
+          }
+        }
+        #export: (〈1;#Exporter〉 & {
+          _objects: 〈1;objects〉
+        })
+      }
+      #Exporter: {
+        #conf: {
+          ...
+        }
+        _objects: {
+          ...
+        }
+        _imports: [
+          ...,
+        ]
+        objects: [
+          for name, obj in (〈1;_objects〉 & {
+            [string]: {
+              #conf: 〈3;#conf〉
+            }
+          }) {
+            〈1;name〉: 〈1;obj〉
+          },
+          for _, import in 〈1;_imports〉 for _, obj in ({
+            #conf: 〈3;#conf〉
+          } & 〈0;import〉.#export).objects {
+            〈1;obj〉
+          },
+        ]
+      }
+    }
+  }
+}
+--- issue3990.cue
+{
+  issue3990: {
+    _imports: [
+      〈1;_noVolumes〉,
+      〈1;_someVolumes〉,
+    ]
+    _noVolumes: {
+      name: "noVolumes"
+      exportObjs: {
+        deployment: (〈2;_Deployment〉 & {
+          volumes: []
+        })
+      }
+    }
+    _someVolumes: {
+      name: "someVolumes"
+      exportObjs: {
+        deployment: (〈2;_Deployment〉 & {
+          volumes: [
+            {
+              name: "data"
+            },
+          ]
+        })
+      }
+    }
+    for _, import in 〈0;_imports〉 for _, obj in ({
+      extra: "unused"
+    } & 〈0;import〉).exportObjs {
+      〈2;import〉.name: 〈1;obj〉
+    }
+    _Deployment: {
+      _names: {
+        for _, v in 〈2〉.volumes {
+          〈1;v〉.name: 〈1;v〉.name
+        }
+      }
+      if (len(〈0;_names〉) > 0) {
+        volumeNames: [
+          for _, v in 〈2;_names〉 {
+            〈1;v〉
+          },
+        ]
+      }
+    }
+  }
+}
+--- pending.cue
+{
+  T: int
+  for _, C in 〈0;Y〉 {
+    let X#1multi = 〈1;C〉.M
+    T: 〈0;let X#1〉.V
+  }
+  Y: {
+    x: {
+      M: {
+        V: 1
+      }
+      for _, _ in 〈0;M〉 {
+        if true {
+          M: {}
+        }
+      }
+    }
+  }
+}

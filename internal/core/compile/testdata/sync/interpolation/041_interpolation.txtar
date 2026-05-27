@@ -1,0 +1,19 @@
+-- in.cue --
+a: "\(4)"    @test(eq, "4")
+b: "one \(a) two \( a+c )" @test(eq, "one 4 two 4one")
+c: "one"     @test(eq, "one")
+d: "\(r)"    @test(err, code=incomplete, contains="invalid interpolation: non-concrete value _", pos=[0:4], hint="position of r itself would be nice")
+u: "\(_)"    @test(err, code=incomplete|eval, contains="invalid interpolation: non-concrete value _", pos=[0:4, 0:7]) @test(err:todo, code=eval) // literal _ can never resolve.
+r: _
+e: "\([])"   @test(err, code=eval, contains="invalid interpolation: cannot use [] (type list)", pos=[0:4, 0:7])
+-- out/compile --
+--- in.cue
+{
+  a: "\(4)"
+  b: "one \(〈0;a〉) two \((〈0;a〉 + 〈0;c〉))"
+  c: "one"
+  d: "\(〈0;r〉)"
+  u: "\(_)"
+  r: _
+  e: "\([])"
+}

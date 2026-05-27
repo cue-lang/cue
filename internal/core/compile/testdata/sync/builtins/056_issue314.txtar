@@ -1,0 +1,62 @@
+# Tests that builtin encoding/template functions (text/template.Execute,
+# encoding/json.Marshal, encoding/yaml.Marshal) correctly produce [incomplete]
+# errors rather than panicking when called with abstract (non-concrete) values.
+# https://cuelang.org/issue/314
+-- in.cue --
+import (
+	"text/template"
+	"encoding/yaml"
+	"encoding/json"
+)
+
+x: {
+	s: "myname"
+	#T
+	@test(eq, {s: "myname", out: "myname"})
+}
+
+#T: {
+	s:   string
+	out: template.Execute("{{.s}}", {
+		"s": s
+	}) @test(err, code=incomplete,
+		contains="error in call to text/template.Execute: cannot convert non-concrete value string", pos=[0:7, -1:2])
+}
+
+#V: {
+	s:   string
+	out: json.Marshal({"s": s}) @test(err, code=incomplete,
+		contains="cannot convert incomplete value", pos=[0:7, -1:7])
+}
+
+#U: {
+	s:   string
+	out: yaml.Marshal({"s": s}) @test(err, code=incomplete,
+		contains="incomplete value string", pos=[0:7, -1:7, 0:26])
+}
+-- out/compile --
+--- in.cue
+{
+  x: {
+    s: "myname"
+    〈1;#T〉
+  }
+  #T: {
+    s: string
+    out: 〈import;"text/template"〉.Execute("{{.s}}", {
+      s: 〈1;s〉
+    })
+  }
+  #V: {
+    s: string
+    out: 〈import;"encoding/json"〉.Marshal({
+      s: 〈1;s〉
+    })
+  }
+  #U: {
+    s: string
+    out: 〈import;"encoding/yaml"〉.Marshal({
+      s: 〈1;s〉
+    })
+  }
+}

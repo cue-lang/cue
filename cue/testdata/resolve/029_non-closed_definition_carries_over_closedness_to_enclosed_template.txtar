@@ -29,50 +29,6 @@ c: #R & {
     ./in.cue:11:6
 [eval] c.w.0.d: field not allowed:
     ./in.cue:22:7
--- out/compile --
---- in.cue
-{
-  #S: {
-    [string]: {
-      a: int
-    }
-  }
-  a: (〈0;#S〉 & {
-    v: {
-      b: int
-    }
-  })
-  #Q: {
-    [string]: ({
-      a: int
-    }|{
-      b: int
-    })
-  }
-  b: (〈0;#Q〉 & {
-    w: {
-      c: int
-    }
-  })
-  #R: {
-    [string]: [
-      {
-        a: int
-      },
-      {
-        b: int
-      },
-    ]
-  }
-  c: (〈0;#R〉 & {
-    w: [
-      {
-        d: int
-      },
-      ...,
-    ]
-  })
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  24

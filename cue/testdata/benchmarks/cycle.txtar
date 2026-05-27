@@ -20,29 +20,6 @@ sameValues: CmustBeA: {
 -- out/todo.txt --
 v2 expanded S and C into independent copies; v3 uses structure sharing
 (S: ~(sameValues.SmustBeF.F), C: ~(sameValues.CmustBeA.A)).
--- out/compile --
---- in.cue
-{
-  sameValues: {
-    SmustBeF: {
-      T: (string|〈0;F〉)
-      F: {
-        x: 〈1;T〉
-      }
-      S: 〈0;F〉
-    }
-  }
-  sameValues: {
-    CmustBeA: {
-      A: {
-        x: [
-          (string|〈2;A〉),
-        ]
-      }
-      C: 〈0;A〉
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  2
 Freed:  15

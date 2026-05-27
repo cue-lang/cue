@@ -1,0 +1,35 @@
+-- in.cue --
+bool1: "1+1=2:  \(true)" @test(eq, "1+1=2:  true")
+bool1: "1+1=2:  \(true)"
+bool2: "1+1=1:  \(false)" @test(eq, "1+1=1:  false")
+
+// one replacement character
+b1:      'a\xED\x95a'   @test(eq, 'a\xed\x95a')
+bytes1s: "\(b1)"        @test(eq, "a\uFFFDa")
+bytes1b: '\(b1)'        @test(eq, 'a\xed\x95a')
+
+// two replacement characters
+b2:      'a\x80\x95a'   @test(eq, 'a\x80\x95a')
+bytes2s: "\(b2)" @test(eq, "a�a")
+bytes2b: '\(b2)'        @test(eq, 'a\x80\x95a')
+
+// preserve precision
+n1: "\(1) \(2.00)"      @test(eq, "1 2.00")
+
+// but normalize representation
+n2: "\(1e2)"            @test(eq, "1E+2")
+-- out/compile --
+--- in.cue
+{
+  bool1: "1+1=2:  \(true)"
+  bool1: "1+1=2:  \(true)"
+  bool2: "1+1=1:  \(false)"
+  b1: 'a\xed\x95a'
+  bytes1s: "\(〈0;b1〉)"
+  bytes1b: '\(〈0;b1〉)'
+  b2: 'a\x80\x95a'
+  bytes2s: "\(〈0;b2〉)"
+  bytes2b: '\(〈0;b2〉)'
+  n1: "\(1) \(2.00)"
+  n2: "\(1E+2)"
+}

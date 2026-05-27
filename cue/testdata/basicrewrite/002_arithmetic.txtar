@@ -61,30 +61,3 @@ Retain: 0
 Unifications: 24
 Conjuncts:    26
 Disjuncts:    24
--- out/compile --
---- in.cue
-{
-  i1: (1 & int)
-  i2: (2 & int)
-  sum: (-1 + +2)
-  div1: ((2.0 / 3) * 6)
-  div2: ((2 / 3) * 6)
-  div3: (1.00 / 1.00)
-  divZero: (1.0 / 0)
-  div00: (0 / 0)
-  b: (1 != 4)
-  add: (〈0;div1〉 + 1.0)
-  idiv00: div(0, 0)
-  imod00: mod(0, 0)
-  iquo00: quo(0, 0)
-  irem00: rem(0, 0)
-  v1: (1000000000000 / 2.0)
-  v2: (2.0 == 2)
-  v3: (2.0 / 3.0)
-  v5: div(〈0;i1〉, 〈0;i2〉)
-  e0: (2 + "a")
-  e5: div(1.0, 2)
-  e6: rem(2, 2.0)
-  e7: quo(2, 2.0)
-  e8: mod(1.0, 1)
-}

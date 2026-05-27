@@ -35,32 +35,3 @@ Conjuncts:    22
 Disjuncts:    0
 
 NumCloseIDs: 6
--- out/compile --
---- in.cue
-{
-  DeleteThis: [
-    "this",
-    "that",
-  ]
-  useful_infra: {
-    gcp: {
-      cluters: 10
-    }
-    aws: {
-      clusters: 20
-    }
-    this: {
-      clusters: 1
-    }
-    that: {
-      clusters: 2
-    }
-  }
-  New_infra: {
-    for k, v in 〈1;useful_infra〉 {
-      if !〈import;list〉.Contains(〈3;DeleteThis〉, 〈1;k〉) {
-        "\(〈2;k〉)": 〈2;v〉
-      }
-    }
-  }
-}

@@ -1,0 +1,21 @@
+-- in.cue --
+import "strings"
+
+a: strings.ContainsAny("ab")
+a: "after" @test(eq, "after")
+
+b: strings.ContainsAny("c")
+b: "dog" @test(err, code=eval, contains="invalid value \"dog\"", pos=[-1:4, -1:24, 0:4])
+
+c: strings.ContainsAny("d") & strings.ContainsAny("g")
+c: "dog" @test(eq, "dog")
+-- out/compile --
+--- in.cue
+{
+  a: 〈import;strings〉.ContainsAny("ab")
+  a: "after"
+  b: 〈import;strings〉.ContainsAny("c")
+  b: "dog"
+  c: (〈import;strings〉.ContainsAny("d") & 〈import;strings〉.ContainsAny("g"))
+  c: "dog"
+}

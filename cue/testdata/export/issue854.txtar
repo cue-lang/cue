@@ -22,11 +22,6 @@ package c
 -- out/errors.txt --
 [incomplete] b: undefined field: c:
     ./b/b.cue:5:6
--- out/compile --
---- a.cue
-{
-  theb: 〈import;"mod.test/b"〉.name
-}
 -- out/eval/stats --
 Leaks:  5
 Freed:  2

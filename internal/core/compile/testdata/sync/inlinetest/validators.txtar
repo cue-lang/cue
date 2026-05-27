@@ -1,0 +1,23 @@
+-- in.cue --
+import "struct"
+
+// Validator equality: a value produced by applying a builtin validator
+// can be compared with @test(eq, <validator-expr>).
+
+// Standalone validator: BaseValue of the vertex is the BuiltinValidator
+// itself, so equalTerminal is called directly with two BuiltinValidators.
+rawMax: struct.MaxFields(2) @test(eq, struct.MaxFields(2))
+rawMin: struct.MinFields(3) @test(eq, struct.MinFields(3))
+
+intMixDirect: int & <=1  @test(eq, <=1 & int)
+intMixEmbed: {int & <=1}  @test(eq, {<=1 & int})
+-- out/compile --
+--- in.cue
+{
+  rawMax: 〈import;struct〉.MaxFields(2)
+  rawMin: 〈import;struct〉.MinFields(3)
+  intMixDirect: (int & <=1)
+  intMixEmbed: {
+    (int & <=1)
+  }
+}

@@ -18,37 +18,6 @@ h:      [3].b                     @test(err, code=eval, pos=[0:13])
 -- todo.txt --
 Some error messages could use improvement. Address after query
 extension is implemented.
--- out/compile --
---- in.cue
-{
-  obj: {
-    a: 1
-    b: 2
-  }
-  index: {
-    a: 1
-    b: 2
-  }["b"]
-  mulidx: {
-    a: 1
-    b: {
-      a: 1
-      b: 3
-    }
-  }["b"]["b"]
-  e: {
-    a: 1
-  }[4]
-  f: {
-    a: 1
-  }.b
-  g: {
-    a: 1
-  }["b"]
-  h: [
-    3,
-  ].b
-}
 -- out/eval/stats --
 Leaks:  9
 Freed:  10

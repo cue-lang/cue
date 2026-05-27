@@ -1,0 +1,44 @@
+-- in.cue --
+res: [for x in a for y in x {y & {d: "b"}}]
+res: [ a.b.c & {d: "b"}]
+
+a: b: [C=string]: {d: string, s: "a" + d}
+a: b: c: d: string
+@test(eq, {
+	res: [ {d: "b", s: "ab"} ]
+	a: b: c: {
+		d: string
+		s: _|_ @test(err, code=incomplete, pos=[4:34, 4:23, 5:13])
+	}
+})
+-- out/compile --
+--- in.cue
+{
+  res: [
+    for _, x in 〈1;a〉 for _, y in 〈0;x〉 {
+      (〈1;y〉 & {
+        d: "b"
+      })
+    },
+  ]
+  res: [
+    (〈1;a〉.b.c & {
+      d: "b"
+    }),
+  ]
+  a: {
+    b: {
+      [string]: {
+        d: string
+        s: ("a" + 〈0;d〉)
+      }
+    }
+  }
+  a: {
+    b: {
+      c: {
+        d: string
+      }
+    }
+  }
+}

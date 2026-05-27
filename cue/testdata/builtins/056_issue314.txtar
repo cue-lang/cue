@@ -60,29 +60,3 @@ NumCloseIDs: 3
 -- out/diff-v2-v3.txt --
 positions: v3 reports different position for some errors
 Verdict: worsening -- v3 reports different error positions.
--- out/compile --
---- in.cue
-{
-  x: {
-    s: "myname"
-    〈1;#T〉
-  }
-  #T: {
-    s: string
-    out: 〈import;"text/template"〉.Execute("{{.s}}", {
-      s: 〈1;s〉
-    })
-  }
-  #V: {
-    s: string
-    out: 〈import;"encoding/json"〉.Marshal({
-      s: 〈1;s〉
-    })
-  }
-  #U: {
-    s: string
-    out: 〈import;"encoding/yaml"〉.Marshal({
-      s: 〈1;s〉
-    })
-  }
-}

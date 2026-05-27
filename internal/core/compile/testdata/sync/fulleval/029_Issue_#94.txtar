@@ -1,0 +1,57 @@
+# Tests field visibility and comprehension iteration: comprehensions only iterate
+# regular (non-optional, non-hidden, non-definition) fields; select and index access
+# have different rules for optional, hidden, and definition fields. Issue #94.
+-- in.cue --
+foo: {
+	opt?:    1
+	"txt":   2
+	#def:    3
+	regular: 4
+	_hidden: 5
+	@test(eq, {opt?: 1, txt: 2, #def: 3, regular: 4, _hidden: 5})
+}
+comp: { for k, v in foo {"\(k)": v} } @test(eq, {txt: 2, regular: 4})
+select: {
+	opt:     foo.opt     @test(err, code=incomplete, contains="cannot reference optional field", pos=[0:15])
+	"txt":   foo.txt     @test(eq, 2)
+	#def:    foo.#def    @test(eq, 3)
+	regular: foo.regular @test(eq, 4)
+	_hidden: foo._hidden @test(eq, 5)
+}
+index: {
+	opt:     foo["opt"]     @test(err, code=incomplete, contains="cannot reference optional field", pos=[0:15])
+	"txt":   foo["txt"]     @test(eq, 2)
+	#def:    foo["#def"]    @test(err, code=incomplete, contains="undefined field", pos=[0:15])
+	regular: foo["regular"] @test(eq, 4)
+	_hidden: foo["_hidden"] @test(err, code=incomplete, contains="undefined field", pos=[0:15])
+}
+-- out/compile --
+--- in.cue
+{
+  foo: {
+    opt?: 1
+    txt: 2
+    #def: 3
+    regular: 4
+    _hidden: 5
+  }
+  comp: {
+    for k, v in 〈1;foo〉 {
+      "\(〈1;k〉)": 〈1;v〉
+    }
+  }
+  select: {
+    opt: 〈1;foo〉.opt
+    txt: 〈1;foo〉.txt
+    #def: 〈1;foo〉.#def
+    regular: 〈1;foo〉.regular
+    _hidden: 〈1;foo〉._hidden
+  }
+  index: {
+    opt: 〈1;foo〉["opt"]
+    txt: 〈1;foo〉["txt"]
+    #def: 〈1;foo〉["#def"]
+    regular: 〈1;foo〉["regular"]
+    _hidden: 〈1;foo〉["_hidden"]
+  }
+}

@@ -1,0 +1,77 @@
+-- in.cue --
+fatalArg: {
+	x: len("eee" + 'eee') @test(err, code=eval,
+		contains="invalid operands",
+		args= ["eee", 'eee', string, bytes], pos=[0:9, 0:17])
+}
+
+// don't call builtin for a permanent error of a child node
+fatalChild: {
+	#b: {}
+	x: and([{a: #b.c}]) @test(err, at=a, code=eval, contains="undefined field: c", pos=[0:17])
+}
+
+// allow incomplete child values. The error will persist after `and` is
+// evaluated down the line. This allows the and-ing of templates that may
+// complete later.
+okIncompleteChild: {
+	b: {}
+	x: and([{a: b.c}, {b: 1}]) @test(eq, {
+		a: _|_ @test(err, code=incomplete, contains="undefined field: c")
+		b: 1
+	})
+}
+-- issue3412.cue --
+// Tests that using and() in a pattern constraint with a definition
+// reference defined after its use does not crash (nil pointer
+// dereference in matchPatternValue). Issue: evalv3 panicked when
+// #constraints appeared after its usage in the pattern key.
+// https://cuelang.org/issue/3412
+andInPattern: {
+	out: {
+		[and(#constraints)]: _
+		someKey: {}
+	} @test(eq, {
+		[=~"^.*$"]: _
+		someKey: {}
+	})
+	#constraints: [=~"^.*$"] @test(eq, [=~"^.*$"])
+}
+-- out/compile --
+--- in.cue
+{
+  fatalArg: {
+    x: len(("eee" + 'eee'))
+  }
+  fatalChild: {
+    #b: {}
+    x: and([
+      {
+        a: 〈2;#b〉.c
+      },
+    ])
+  }
+  okIncompleteChild: {
+    b: {}
+    x: and([
+      {
+        a: 〈2;b〉.c
+      },
+      {
+        b: 1
+      },
+    ])
+  }
+}
+--- issue3412.cue
+{
+  andInPattern: {
+    out: {
+      [and(〈1;#constraints〉)]: _
+      someKey: {}
+    }
+    #constraints: [
+      =~"^.*$",
+    ]
+  }
+}

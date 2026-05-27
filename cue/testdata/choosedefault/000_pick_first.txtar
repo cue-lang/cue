@@ -5,18 +5,6 @@ b: c: *{
 } | {
 	a: 3
 } @test(eq, *{a: 2} | {a: 3})
--- out/compile --
---- in.cue
-{
-  a: (*5|"a"|true)
-  b: {
-    c: (*{
-      a: 2
-    }|{
-      a: 3
-    })
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  11

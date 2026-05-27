@@ -17,18 +17,3 @@ Retain: 3
 Unifications: 12
 Conjuncts:    24
 Disjuncts:    15
--- out/compile --
---- in.cue
-{
-  a: (〈0;b〉 + 100)
-  b: (〈0;a〉 - 100)
-  a: 200
-  c: (〈0;d〉 & {
-    b: 2
-  })
-  d: 〈0;e〉
-  e: {
-    a: 1
-  }
-  e: 〈0;c〉
-}

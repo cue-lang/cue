@@ -1,0 +1,15 @@
+raw: true
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{a: {b: []}, c: a.b, d: a["b"]}
+-- out/compile --
+--- in.cue
+{
+  {
+    a: {
+      b: []
+    }
+    c: 〈0;a〉.b
+    d: 〈0;a〉["b"]
+  }
+}

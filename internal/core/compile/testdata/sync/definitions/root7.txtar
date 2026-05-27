@@ -1,0 +1,19 @@
+-- in.cue --
+root: input: #deps: root: {}
+{root.input.#deps}
+
+@test(eq, { root: input: #deps: root: {} })
+-- out/compile --
+--- in.cue
+{
+  root: {
+    input: {
+      #deps: {
+        root: {}
+      }
+    }
+  }
+  {
+    〈1;root〉.input.#deps
+  }
+}

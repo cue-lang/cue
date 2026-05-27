@@ -69,33 +69,3 @@ concretePermute: {
 		}
 	})
 }
--- out/compile --
---- in.cue
-{
-  threeFieldPermute: {
-    a: (〈0;b〉 + 〈0;c〉)
-    b: 1
-    c: 2
-  }
-  twoFieldPermute: {
-    x: (〈0;y〉 + 1)
-    y: 5
-  }
-  inDeclPermute: {
-    p: (〈0;q〉 + 〈0;r〉)
-    q: 3
-    r: 7
-  }
-  concretePermute: {
-    x: {
-      alpha: 1
-      beta: 2
-      gamma: 3
-    }
-    y: {
-      alpha: 1
-      beta: 2
-      gamma: 3
-    }
-  }
-}

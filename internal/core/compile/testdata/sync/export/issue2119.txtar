@@ -1,0 +1,92 @@
+-- in.cue --
+import (
+	"encoding/yaml"
+	"regexp"
+)
+
+simplified: {
+	x: d: R={
+		".*"
+		[R+""][0]
+	}
+	out: yaml.Marshal(x)
+	@test(eq, {x: {d: ".*"}, out: "d: .*\n"})
+}
+
+original: {
+	#testableRegexp: R={
+		string
+
+		#test: close({
+			in:  string
+			out: regexp.FindSubmatch("^"+R+"$", in)[1]
+		})
+	}
+
+	rule: {
+		#patterns: {
+			bar: #testableRegexp & {
+				"(.*)"
+				#test: {in: "testcontent", out: "testcontent"}
+			}
+		}
+	}
+	out: yaml.Marshal(rule)
+	@test(eq, {
+		#testableRegexp: {
+			string
+			#test: {
+				in: string
+				out: _|_ @test(err, code=incomplete, contains="original.#testableRegexp.#test.out: non-concrete value string in operand to +", pos=[21:29, 16:21, 17:3])
+			}
+		}
+		rule: {
+			#patterns: {
+				bar: {
+					"(.*)"
+					#test: {in: "testcontent", out: "testcontent"}
+				}
+			}
+		}
+		out: """
+		{}
+
+		"""
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  simplified: {
+    x: {
+      d: {
+        ".*"
+        [
+          (〈2〉 + ""),
+        ][0]
+      }
+    }
+    out: 〈import;"encoding/yaml"〉.Marshal(〈0;x〉)
+  }
+  original: {
+    #testableRegexp: {
+      string
+      #test: close({
+        in: string
+        out: 〈import;regexp〉.FindSubmatch((("^" + 〈2〉) + "$"), 〈0;in〉)[1]
+      })
+    }
+    rule: {
+      #patterns: {
+        bar: (〈2;#testableRegexp〉 & {
+          "(.*)"
+          #test: {
+            in: "testcontent"
+            out: "testcontent"
+          }
+        })
+      }
+    }
+    out: 〈import;"encoding/yaml"〉.Marshal(〈0;rule〉)
+  }
+}

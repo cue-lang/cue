@@ -1,0 +1,174 @@
+#inlinetest:exclude t2 contains an unreferenced-alias compile-time error, preventing
+# full inline conversion.
+# Tests let-alias cycles and comprehension cycles in deeply nested structs; t1
+# uses a let alias referencing an enclosing comprehension variable; t3 exercises
+# recursive definitions with computed-field access through a let and comprehension.
+-- issue1960.cue --
+// evalv3 regression: a spurious structural cycle error was reported for a
+// pattern that had previously evaluated correctly, causing valid CUE to fail.
+// https://cuelang.org/issue/1960
+t1: {
+	z: blah: s: [for z in z {}]
+	z: hello: {
+		for x in p {}
+		let q = z.blah
+		p: q.r // Incomplete error should not cause cycle.
+		p: t: 1
+	}
+}
+
+t2: {
+	z: blah: s: [for z in z {}]
+	z: hello: {
+		for x in p {}
+		let q = z.blah
+		p: t: 1
+	}
+}
+
+t3: {
+	#z: {
+		n: string
+		p: t: "e"
+		s: [...string]
+		_p: {
+			n: string
+			e: p: {}
+		}
+		r: (_p )[p.t]
+		for _, pl in r.p {
+			if pl.blah {
+			}
+		}
+	}
+
+	#i: {
+		#z
+		t: "i"
+		r: e: {}
+	}
+
+	#c: {
+		#z
+		t: "c"
+		n: string
+	}
+
+	z: [N= =~"^b"]: #i & {
+		s: [
+			for n, z in z
+			if z.t == "c"
+			if z.n == N {n},
+		]
+	}
+
+	z: [N= =~"^h"]: #c & {
+		n: string
+		// Causes a structural cycle on its own, but not when referenced below.
+		let q = z[n]
+		p: q.r.e
+	}
+
+	z: {
+		"blah": {}
+		"hello": n: "blah"
+	}
+}
+-- out/compile --
+t2.z.hello: unreferenced alias or let clause q:
+    ./issue1960.cue:18:3
+--- issue1960.cue
+{
+  t1: {
+    z: {
+      blah: {
+        s: [
+          for _, z in 〈3;z〉 {},
+        ]
+      }
+    }
+    z: {
+      hello: {
+        for _, x in 〈0;p〉 {}
+        let q#1 = 〈2;z〉.blah
+        p: 〈0;let q#1〉.r
+        p: {
+          t: 1
+        }
+      }
+    }
+  }
+  t2: {
+    z: {
+      blah: {
+        s: [
+          for _, z in 〈3;z〉 {},
+        ]
+      }
+    }
+    z: {
+      hello: {
+        for _, x in 〈0;p〉 {}
+        let q#2 = 〈2;z〉.blah
+        p: {
+          t: 1
+        }
+      }
+    }
+  }
+  t3: {
+    #z: {
+      n: string
+      p: {
+        t: "e"
+      }
+      s: [
+        ...string,
+      ]
+      _p: {
+        n: string
+        e: {
+          p: {}
+        }
+      }
+      r: 〈0;_p〉[〈0;p〉.t]
+      for _, pl in 〈0;r〉.p {
+        if 〈1;pl〉.blah {}
+      }
+    }
+    #i: {
+      〈1;#z〉
+      t: "i"
+      r: {
+        e: {}
+      }
+    }
+    #c: {
+      〈1;#z〉
+      t: "c"
+      n: string
+    }
+    z: {
+      [=~"^b"]: (〈1;#i〉 & {
+        s: [
+          for n, z in 〈3;z〉 if (〈0;z〉.t == "c") if (〈0;z〉.n == 〈3;-〉) {
+            〈1;n〉
+          },
+        ]
+      })
+    }
+    z: {
+      [=~"^h"]: (〈1;#c〉 & {
+        n: string
+        let q#3 = 〈2;z〉[〈0;n〉]
+        p: 〈0;let q#3〉.r.e
+      })
+    }
+    z: {
+      blah: {}
+      hello: {
+        n: "blah"
+      }
+    }
+  }
+}

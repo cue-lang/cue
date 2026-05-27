@@ -22,28 +22,3 @@ Retain: 1
 Unifications: 8
 Conjuncts:    19
 Disjuncts:    9
--- out/compile --
---- in.cue
-{
-  a: {
-    d: {
-      〈2;#base〉
-      #info: {
-        ...
-      }
-      Y: 〈0;#info〉.X
-    }
-  }
-  #base: {
-    #info: {
-      ...
-    }
-  }
-  a: {
-    [string]: {
-      #info: {
-        X: "foo"
-      }
-    }
-  }
-}

@@ -1,0 +1,82 @@
+# Issue #1969: Tests that comparing fields to _|_ (checking if defined) works
+# correctly for both closed and open structs, including edge cases with
+# comprehensions and let clauses.
+-- in.cue --
+#T: {
+	if true {
+		// We'd like to restrict the possible members of x in this case,
+		// but this doesn't work.
+		x: close({
+			f1: int
+		})
+	}
+	x: _
+// All tests here should pass and the result of the okcN tests should be
+// identical to those of the okoN tests.
+// Should Field s exist in okc or not? Depends on whether comparison to bottom
+// is recursive or not. It probably should not.
+// TODO: fix for new evaluator. But possibly address this with new builtins.
+}
+z: #T & {
+	x: {
+		f1: 99
+		f2: "i want to disallow this"
+	}
+} @test(err, code=eval, at=x.f2, contains="field not allowed", pos=[3:3])
+
+
+t: #C @test(eq, {p: "foo"})
+#C: {
+	if true {
+		p: _
+// Comparing to string is not an error. But for legacy reasons we want to still
+// support this. We intend to have more clean and precise behavior with the
+// builtins isdefined, isvalid, and isconcrete.
+	}
+}
+t: p: "foo"
+
+-- variant1.cue --
+#V1: {
+	x: close({ f1: int })
+	x: f2: 2 @test(err, code=eval, contains="field not allowed", pos=[0:5])
+}
+
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    if true {
+      x: close({
+        f1: int
+      })
+    }
+    x: _
+  }
+  z: (〈0;#T〉 & {
+    x: {
+      f1: 99
+      f2: "i want to disallow this"
+    }
+  })
+  t: 〈0;#C〉
+  #C: {
+    if true {
+      p: _
+    }
+  }
+  t: {
+    p: "foo"
+  }
+}
+--- variant1.cue
+{
+  #V1: {
+    x: close({
+      f1: int
+    })
+    x: {
+      f2: 2
+    }
+  }
+}

@@ -38,24 +38,6 @@ Conjuncts:    17
 Disjuncts:    0
 
 NumCloseIDs: 2
--- out/compile --
---- in.cue
-{
-  #x: {
-    Name: string
-  }
-  _#x(:x): {
-    Name: string
-  }
-  x1: (〈0;#x〉 & {
-    Name: "hello"
-    Age: 50
-  })
-  x2: (〈0;_#x(:x)〉 & {
-    Name: "hello"
-    Age: 50
-  })
-}
 -- out/diff-v2-v3.txt --
 Positions: v3 reports fewer positions than v2 for the "field not allowed" errors.
 Verdict: worsening -- v3 reports fewer error positions than v2.

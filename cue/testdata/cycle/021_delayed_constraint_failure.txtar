@@ -16,15 +16,6 @@ x: x + 1 @test(err, code=eval, pos=[-1:4, 0:4])
 [eval] x: conflicting values 101 and 100:
     ./in.cue:5:4
     ./in.cue:6:4
--- out/compile --
---- in.cue
-{
-  a: (〈0;b〉 - 100)
-  b: (〈0;a〉 + 110)
-  b: 200
-  x: 100
-  x: (〈0;x〉 + 1)
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  4

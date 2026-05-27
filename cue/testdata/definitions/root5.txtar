@@ -72,34 +72,6 @@ Disjuncts:    0
 Notifications: 4
 
 NumCloseIDs: 7
--- out/compile --
---- in.cue
-{
-  〈0;_schema〉
-  _schema: 〈0;#Schema〉
-  #Schema: {
-    a?: {
-      b?: string
-    }
-  }
-  a: {
-    b: "foo"
-  }
-  c: "foo"
-  x: {
-    〈0;_schema〉
-    _schema: 〈0;#Schema〉
-    #Schema: {
-      a?: {
-        b?: string
-      }
-    }
-    a: {
-      b: "foo"
-    }
-    c: "foo"
-  }
-}
 -- out/diff-v2-v3.txt --
 Reordering
 Verdict: cosmetic -- Field reordering only. No semantic change.

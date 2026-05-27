@@ -1,0 +1,115 @@
+# Tests incomplete-error reporting for various expressions: string arithmetic,
+# non-concrete bounds, self-referential bounds, mutual dependencies, and
+# undefined-field lookups. All produce [incomplete] errors except e2 which
+# succeeds because "bar" is concrete. issue1837 checks that incomplete errors
+# are correctly preferred over cycle errors in conditional comprehensions.
+-- in.cue --
+s: string
+
+e1:  s + s  @test(err, code=incomplete,
+	suberr=(code=incomplete, contains="non-concrete value %v in operand to %s", args=[string, +], pos=[0:6, -2:4]),
+	suberr=(code=incomplete, contains="non-concrete value %v in operand to %s", args=[string, +], pos=[0:6, -2:4]),
+)
+e2:  >"bar" & s @test(eq, >"bar") // okay: "bar" is concrete, result is a valid bound
+e3:  >s & "foo" @test(err, code=incomplete, contains="non-concrete value s for bound >", pos=[0:7])
+e3b: >s @test(err, code=incomplete, contains="non-concrete value s for bound >", pos=[0:7])
+
+e4: >e1 & s @test(err, code=incomplete, pos=[-8:6, -10:4])
+e5: <e5 & s @test(err, code=incomplete|cycle, pos=[0:6])
+
+E: {
+	a: c - b @test(err, code=incomplete, pos=[0:5, 2:5, 2:11])
+	b: c - a @test(err, code=incomplete, pos=[0:5, 1:5, 1:11])
+	c: a+b & >=5 @test(err, code=incomplete, pos=[-1:5, 0:5, 0:11])
+}
+
+a:    int @test(eq, int)
+okay: (>10 & <a) + 3 @test(err, code=incomplete, contains="non-concrete value a for bound <", pos=[0:15])
+
+// No output or "cycle error" when checking existence of non-existing fields;
+// an incomplete error should be reported instead of a cycle error.
+// https://cuelang.org/issue/1837
+issue1837: {
+	// x is properly recognized as erroneous and the "message" field is added
+	// with the value "a", instead of as a cycle error.
+
+	// TODO(inline): use permute, but ensure comprehensions are permuted too first.
+	// @test(permute)
+	p1: {
+		context: {}
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		if x == _|_ {
+			message: "a"
+		}
+		@test(eq, {
+			context: {}
+			x: _|_
+			message: "a"
+		})
+	}
+	p2: {
+		if x == _|_ {
+			message: "a"
+		}
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		context: {}
+		@test(eq, {
+			message: "a"
+			x: _|_
+			context: {}
+		})
+	}
+	p3: {
+		if x == _|_ {
+			message: "a"
+		}
+		context: {}
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		@test(eq, {
+			message: "a"
+			context: {}
+			x: _|_
+		})
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  s: string
+  e1: (〈0;s〉 + 〈0;s〉)
+  e2: (>"bar" & 〈0;s〉)
+  e3: (>〈0;s〉 & "foo")
+  e3b: >〈0;s〉
+  e4: (>〈0;e1〉 & 〈0;s〉)
+  e5: (<〈0;e5〉 & 〈0;s〉)
+  E: {
+    a: (〈0;c〉 - 〈0;b〉)
+    b: (〈0;c〉 - 〈0;a〉)
+    c: ((〈0;a〉 + 〈0;b〉) & >=5)
+  }
+  a: int
+  okay: ((>10 & <〈0;a〉) + 3)
+  issue1837: {
+    p1: {
+      context: {}
+      x: 〈0;context〉.b
+      if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
+        message: "a"
+      }
+    }
+    p2: {
+      if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
+        message: "a"
+      }
+      x: 〈0;context〉.b
+      context: {}
+    }
+    p3: {
+      if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
+        message: "a"
+      }
+      context: {}
+      x: 〈0;context〉.b
+    }
+  }
+}

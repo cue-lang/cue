@@ -14,16 +14,6 @@ c: "dog" @test(eq, "dog")
     ./in.cue:6:4
     ./in.cue:6:24
     ./in.cue:7:4
--- out/compile --
---- in.cue
-{
-  a: 〈import;strings〉.ContainsAny("ab")
-  a: "after"
-  b: 〈import;strings〉.ContainsAny("c")
-  b: "dog"
-  c: (〈import;strings〉.ContainsAny("d") & 〈import;strings〉.ContainsAny("g"))
-  c: "dog"
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  4

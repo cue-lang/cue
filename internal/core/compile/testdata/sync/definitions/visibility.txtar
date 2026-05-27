@@ -1,0 +1,28 @@
+-- in.cue --
+#foo: {
+	name: string
+}
+foo: #foo & {
+	// These should all be allowed.
+	_name:  "foo"
+	_#name: "bar"
+
+	#name: "baz"
+} @test(closed) @test(eq, {
+	_name: "foo"
+	_#name: "bar"
+	#name: "baz"
+	name: string
+})
+-- out/compile --
+--- in.cue
+{
+  #foo: {
+    name: string
+  }
+  foo: (〈0;#foo〉 & {
+    _name: "foo"
+    _#name: "bar"
+    #name: "baz"
+  })
+}

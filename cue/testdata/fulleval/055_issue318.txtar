@@ -23,19 +23,6 @@
     ./in.cue:6:15
 [eval] #T.vy: undefined field: y:
     ./in.cue:8:12
--- out/compile --
---- in.cue
-{
-  #T: {
-    arg: {
-      x: string
-    }
-    out1: "\(〈0;arg〉.x) \(〈0;arg〉.y)"
-    out2: "\(〈0;arg〉.y)"
-    vx: 〈0;arg〉.x
-    vy: 〈0;arg〉.y
-  }
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  8

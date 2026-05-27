@@ -1,0 +1,44 @@
+# Issue #721: Tests that front-style (leading) commas are allowed in CUE source.
+# https://cuelang.org/issue/721
+#noformat
+-- in.cue --
+// allow front-style commas
+a
+: { "key": "value"
+, "key2"
+: "value2"
+}
+
+, b: [
+    0
+,   1
+,       2
+        ,3,
+    4
+
+    , 5
+]
+
+@test(eq, {
+	a: {
+		key:  "value"
+		key2: "value2"
+	}
+	b: [0, 1, 2, 3, 4, 5]
+})
+-- out/compile --
+--- in.cue
+{
+  a: {
+    key: "value"
+    key2: "value2"
+  }
+  b: [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+  ]
+}

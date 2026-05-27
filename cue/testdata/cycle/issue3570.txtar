@@ -16,12 +16,3 @@ conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 44 (mismatched types stru
     ./in.cue:2:1
 2 errors in empty disjunction::
     ./in.cue:3:6
--- out/compile --
---- in.cue
-{
-  foo: {
-    foo: (25|44)
-  }
-  〈0;foo〉
-  foo: 〈0;foo〉
-}

@@ -5,11 +5,6 @@ a: "a" & 1   @test(err, code=eval, contains="conflicting values",
 [eval] a: conflicting values "a" and 1 (mismatched types string and int):
     ./in.cue:1:4
     ./in.cue:1:10
--- out/compile --
---- in.cue
-{
-  a: ("a" & 1)
-}
 -- out/eval/stats --
 Leaks:  0
 Freed:  2

@@ -24,16 +24,3 @@ NumCloseIDs: 1
     ./in.cue:3:4
     ./in.cue:4:4
     ./in.cue:5:4
--- out/compile --
---- in.cue
-{
-  x: 〈import;list〉.UniqueItems
-  x: [
-    string,
-    ...string,
-  ]
-  x: [
-    "x",
-    "x",
-  ]
-}

@@ -38,9 +38,3 @@ Disjuncts:    0
 NumCloseIDs: 4
 -- out/todo.txt --
 Reordering
--- out/compile --
---- foo.cue
-{
-  〈import;"mod.test/pkg:bar"〉
-  zz: 3
-}

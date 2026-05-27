@@ -42,28 +42,3 @@ Conjuncts:    25
 Disjuncts:    18
 
 NumCloseIDs: 2
--- out/compile --
---- in.cue
-{
-  object: (〈0;#Leaf〉 & {})
-  #Base: {
-    extra?: {
-      ...
-    }
-  }
-  #Mid: {
-    〈1;#Base〉
-  }
-  #Leaf: {
-    〈1;#Mid〉
-    extra?: {
-      ...
-    }
-    more?: int
-    if (〈0;extra〉.foo != _|_(explicit error (_|_ literal) in source)) {
-      if (〈1;more〉 != _|_(explicit error (_|_ literal) in source)) {
-        foo: "bar"
-      }
-    }
-  }
-}

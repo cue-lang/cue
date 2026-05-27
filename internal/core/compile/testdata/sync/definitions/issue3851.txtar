@@ -1,0 +1,44 @@
+# Tests that a nested optional field structure combined with let bindings and
+# disjunctions (#Output: null | #App) evaluates correctly without false errors.
+# https://cuelang.org/issue/3851
+-- in.cue --
+#App: {
+	name?: string
+	sub1?: sub2?: null | _
+}
+#Output: null | #App @test(eq, null | {name?: string, sub1?: {sub2?: null | _}})
+out: #Output & {
+	name: "foo"
+	sub1: sub2: {} | _
+	sub1: sub2: {
+		sub3: {
+			let _let = "bar"
+			foo: _let
+		}
+	}
+} @test(eq, {name: "foo", sub1: {sub2: {sub3: {foo: "bar"}}}})
+-- out/compile --
+--- in.cue
+{
+  #App: {
+    name?: string
+    sub1?: {
+      sub2?: (null|_)
+    }
+  }
+  #Output: (null|〈0;#App〉)
+  out: (〈0;#Output〉 & {
+    name: "foo"
+    sub1: {
+      sub2: ({}|_)
+    }
+    sub1: {
+      sub2: {
+        sub3: {
+          let _let#1 = "bar"
+          foo: 〈0;let _let#1〉
+        }
+      }
+    }
+  })
+}

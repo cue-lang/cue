@@ -20,20 +20,6 @@ Conjuncts:    9
 Disjuncts:    0
 
 NumCloseIDs: 1
--- out/compile --
---- in.cue
-{
-  #S: {
-    [string]: {
-      a: int
-    }
-  }
-  a: (〈0;#S〉 & {
-    v: {
-      b: int
-    }
-  })
-}
 -- out/diff-v2-v3.txt --
 Missing positions: v3 reports fewer positions than v2 for the "field not allowed" error.
  a.v.b: field not allowed:

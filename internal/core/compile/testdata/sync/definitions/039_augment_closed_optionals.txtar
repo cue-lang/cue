@@ -1,0 +1,44 @@
+-- in.cue --
+#A: {
+	[=~"^[a-s]*$"]: int
+}
+#B: {
+	[=~"^[m-z]*?"]: int
+}
+#C: {
+	#A & #B
+	{[=~"^Q*$"]: int}
+} @test(allows, moo) @test(allows, Qoo) @test(allows=false, string)
+// TODO: What should this be? @test(allows=false, zoo)
+c: #C & {QQ: 3} @test(eq, {QQ: 3})
+#D: {
+	#A
+	#B
+}
+d: #D & {aaa: 4} @test(eq, {aaa: 4})
+-- out/compile --
+--- in.cue
+{
+  #A: {
+    [=~"^[a-s]*$"]: int
+  }
+  #B: {
+    [=~"^[m-z]*?"]: int
+  }
+  #C: {
+    (〈1;#A〉 & 〈1;#B〉)
+    {
+      [=~"^Q*$"]: int
+    }
+  }
+  c: (〈0;#C〉 & {
+    QQ: 3
+  })
+  #D: {
+    〈1;#A〉
+    〈1;#B〉
+  }
+  d: (〈0;#D〉 & {
+    aaa: 4
+  })
+}

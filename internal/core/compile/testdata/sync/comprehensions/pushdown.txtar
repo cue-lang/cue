@@ -1,0 +1,2868 @@
+# Working set of tests that unit test specifics of the aspect of the
+# comprehension algorithm that pushes down evaluation to the arcs.
+-- in.cue --
+linkChildren: {
+	w: 1
+	v: {
+		x: 1
+		if true {
+			y: 1
+			if true {
+				z: 1
+
+				rw: w
+				rx: x
+				ry: y
+				rz: z
+
+				n1a: na: [w, x, y, z]
+				n2a: n1a: na: [w, x, y, z]
+				n2z: n1z: nz: z
+			}
+		}
+	}
+	@test(eq, {
+		w: 1
+		v: {
+			x: 1
+			y: 1
+			z: 1
+			rw: 1
+			rx: 1
+			ry: 1
+			rz: 1
+			n1a: {na: [1, 1, 1, 1]}
+			n2a: {n1a: {na: [1, 1, 1, 1]}}
+			n2z: {n1z: {nz: 1}}
+		}
+	})
+}
+
+fail: {
+	a: {
+		// Condition of comprehensions must still hold after its evaluation.
+		//
+		// `b` is not defined, causing this if comprehension to evaluate to
+		// true. However, after inserting the corresponding result in curly
+		// braces, the condition would be true. This is not allowed.
+		if a.b == _|_ {
+			b: 1
+		}
+	} @test(err, code=incomplete|cycle)
+}
+
+embed: {
+	fail1: #C1 @test(err, code=eval, path=p, contains="field not allowed")
+	#C1: {
+		// TODO(errors): don't include all positions of p in the normal list of
+		// positions, or rather categorize the positions to show:
+		// 1) position of denied fields
+		// 2) position of structs that deny them
+		// 3) points at which those structs where mixed in (perhaps as tree)
+		// 4) conditionals that could enable allowing a field.
+		if false {
+			p: _
+		}
+	}
+	fail1: p: "foo" // this should fail, as p is not present.
+
+
+	success2: #C2 @test(eq, {p: "foo"})
+	#C2: {
+		if true {
+			p: _
+		}
+	}
+	success2: p: "foo" // this succeeds as p is present.
+
+	success3: #C3 @test(eq, {})
+	#C3: {}
+	success3: {
+		if false {
+			// p does not exist in success3, but it is okay, as it is not added.
+			p: q: 1
+		}
+	}
+
+	success4: {
+		#X: y: string
+		x: y: string
+		x: {
+			for _ in ["iter-once"] {
+				#X
+				if false {
+					y: "foo"
+				}
+			}
+		}
+	} @test(eq, {#X: {y: string}, x: {y: string}})
+
+	fail4: #C4
+	#C4: {}
+	fail4: {
+		if true {
+			// error as p is not allowed in fail4
+			p: q: 1
+		}
+	} @test(err, code=eval, path=p, contains="field not allowed", pos=[3:4])
+
+	incomplete5: {
+		a: bool
+		if a {
+			p: q: 1
+		}
+	} @test(err, code=incomplete, contains="incomplete %s: %s", args=[bool, bool], pos=[1:6])
+
+	incomplete6: {
+		if false {
+			p: 1
+		}
+		p: q + 1
+		q: int
+	} @test(eq, {
+		p: _|_ @test(err, code=incomplete, contains="embed.incomplete6.p: non-concrete value int in operand to +", pos=[117:6, 118:6])
+		q: int
+	})
+	incomplete7: {
+		p: q + 1
+		q: int
+		if false {
+			q: 1 // do not inadvertently pick up a void arc.
+		}
+	} @test(eq, {
+		p: _|_ @test(err, code=incomplete, contains="non-concrete value int")
+		// TODO(inline): do not fail on todo with position mismatch. @test(err:todo, pos=[124:6, 125:6, 126:3])
+		q: int
+	})
+}
+
+// Mix of both dynamic and static fields.
+mixedFieldsSuccess: {
+	a: {
+		for _, s in ["foo"] {
+			"\(s)": 1
+			X: 1
+		}
+	}
+
+	b: #Def: {
+		for _, s in ["foo"] {
+			"\(s)": 1
+			X: 1
+		}
+	}
+	b: x: b.#Def
+	b: x: X: _
+	b: x: foo: _
+
+
+	c: #Def: {
+		X:   int
+		foo: int
+	}
+	c: x: c.#Def
+	c: x: {
+		for _, s in ["foo"] {
+			"\(s)": 1
+			X: 1
+		}
+	}
+	@test(eq, {
+		a: {X: 1, foo: 1}
+		b: {
+			#Def: {X: 1, foo: 1}
+			x: {X: 1, foo: 1}
+		}
+		c: {
+			#Def: {X: int, foo: int}
+			x: {X: 1, foo: 1}
+		}
+	})
+}
+
+// fieldMismatch tests that an embedded scalar cannot be mixed with regular
+// fields, even if they are added by a comprehension.
+fieldMismatch: {
+	a: {
+		2
+		if true {
+			x: 3
+		}
+	}
+	@test(err, code=eval, at=a, hint="int with struct")
+}
+
+// b12aStructCycle presents a case that can easily lead to stack overflow in
+// a naive implementation. It corresponds to test b12a in structural.txtar.
+noStackOverflowStructCycle: {
+	#list: {
+		tail: #list
+
+		if tail != null {
+			sum: tail.sum
+		}
+	}
+
+	list: {
+		tail: list
+
+		if tail != null {
+			sum: tail.sum
+		}
+	}
+	@test(err, code=structural_cycle, at="#list.tail", contains="structural cycle", pos=[])
+}
+
+
+// #a is incomplete, but the missing values are provided by x.
+provideIncompleteSuccess: {
+	t1: {
+		#a: {
+			if b {
+				c: 4
+			}
+			b: bool
+		}
+		x: (#a & {b: true}) & {c: 4}
+		y: x
+		@test(eq, {
+			#a: {_|_, b: bool}
+			x: {b: true, c: 4}
+			y: {b: true, c: 4}
+		})
+	}
+
+	t2: {
+		// c should be allowed
+		#a: {
+			if b {
+				c: 4
+			}
+			b: true
+		} @test(eq, {c: 4, b: true})
+
+		#c: {}
+		a: {
+			if b {
+				c: d: 4
+			}
+			b: true
+			// d is disallowed, even though it is added by embedding.
+			// TODO: this seems right, but it may be good to clarify why.
+			c: #c @test(err, code=eval, at=d, contains="field not allowed", pos=[-5:8])
+		}
+	}
+}
+
+// voidArcs tests that fields are dropped and reference up counts are adjusted
+// appropriately under various rewrite scenario.
+voidArcs: {
+	scopes: {
+		x: 1
+		a: {
+			y: 2
+			if true {
+				b: x
+				c: d: x
+				e: y
+				f: g: y
+			}
+		}
+	}
+
+	drop: {
+		x: 1
+		a: {
+			y: 2
+			if false {
+				b: x
+				c: d: x
+				e: y
+				f: g: y
+			}
+		}
+	}
+	@test(eq, {
+		scopes: {
+			x: 1
+			a: {y: 2, b: 1, c: {d: 1}, e: 2, f: {g: 2}}
+		}
+		drop: {x: 1, a: {y: 2}}
+	})
+}
+
+cyclicError: {
+	a: {
+		// With pushdown, x and y remain bool (incomplete) rather than
+		// erroring: the if guards cannot resolve bool to a concrete
+		// value, so the comprehension bodies simply do not fire.
+		@test(err, code=incomplete)
+		x: bool
+		y: bool
+		if a.x  {
+			y: true
+		}
+		if a.y {
+			x: true
+		}
+		b: {}
+	}
+	// With pushdown, evaluating a.b no longer forces a cycle error
+	// because the comprehension dependencies are pushed down to the
+	// individual fields rather than blocking the parent.
+	c: a.b @test(err, code=incomplete|cycle)
+	@test(eq, {
+	a: {
+			x: _|_
+			y: _|_
+			b: {}
+		}
+		c: _|_
+	})
+}
+
+midwayReferences: {
+	a: {
+		for i, j in {a: 1, b: 2} {
+			x: y: z: (i): j
+		}
+		x: y: {}
+	}
+	b: a.x
+	c: a.x.y
+	d: a.x.y.z
+	@test(eq, {
+		a: {x: {y: {z: {a: 1, b: 2}}}}
+		b: {y: {z: {a: 1, b: 2}}}
+		c: {z: {a: 1, b: 2}}
+		d: {a: 1, b: 2}
+	})
+}
+
+// Ensure first closedness check is done after evaluation of
+// comprehensions.
+closedCheck: success1: {
+	a: b: [string]: #D
+
+	#D: {
+		d: string
+		if d != "c" {
+			e: string
+		}
+	}
+
+	a: b: c: {
+		d: "d"
+		e: "ok"
+	}
+	@test(eq, {
+		a: {b: {c: {d: "d", e: "ok"}}}
+		#D: {d: string}
+	})
+}
+
+closedCheck: success2: {
+	a: b: [string]: #D
+
+	#D: {
+		d: string
+		if d != "c" {
+			("foo"+"bar"): string
+		}
+	}
+
+	a: b: c: {
+		d:      "d"
+		foobar: "ok"
+	}
+	@test(eq, {
+		a: {b: {c: {d: "d", foobar: "ok"}}}
+		#D: {d: string}
+	})
+}
+
+closedCheck: success3: {
+	a: b: [string]: #D
+
+	#D: {
+		d: string
+		e: {
+			if d != "c" {
+				string
+			}
+			@test(err, code=incomplete, contains="non-concrete value", pos=[1:7, -1:6])
+		}
+	}
+
+	a: b: c: {
+		d: "d"
+		e: "ok"
+	}
+	@test(eq, {
+		a: {b: {c: {d: "d", e: "ok"}}}
+		#D: {
+			d: string
+			e: _|_
+		}
+	})
+}
+
+emptyComprehensionIncomplete: {
+	a: {}
+	b: {
+		// b should be an incomplete error
+		if a.b {
+		}
+	} @test(err, code=incomplete, contains="undefined field: %s", args=[b], pos=[2:8])
+	@test(eq, {
+		a: {}
+		b: _|_
+	})
+}
+
+// voidEliminationSuccess tests that "conditional" or "void" arcs are eliminated
+// if their expression does not yield any result.
+voidEliminationSuccess: t1: {
+	[string]: {
+		b: bool
+		if !b {}
+	}
+	if false {
+		a: b: true
+	}
+	@test(eq, {})
+}
+
+voidEliminationSuccess: t2: {
+	components: {
+		sinks: [string]: #C & {
+			kind: string
+			configuration: {
+				if kind != "source" {
+					inputs: {
+						required: true
+					}
+				}
+			}
+		}
+
+		#C: {
+			kind: string
+			configuration: [string]: {
+				required: bool
+				if !required {
+					common: bool
+				}
+			}
+		}
+	}
+
+	components: sinks: blah: {
+		kind: "source"
+	}
+	@test(eq, {
+		components: {
+			sinks: {
+				blah: {kind: "source", configuration: {}}
+			}
+			#C: {kind: string, configuration: {}}
+		}
+	})
+}
+
+voidEliminationSuccess: derefRef1: {
+	a: [string]: c: [string]: E
+
+	a: b: c: {
+		if false {
+			d: e: true // resolves
+		}
+	}
+
+	E: {
+		e: bool
+		f: !e @test(err, code=incomplete, contains="not concrete", pos=[0:7])
+	}
+	@test(eq, {
+		a: {b: {c: {}}}
+		E: {
+			e: bool
+			f: _|_
+		}
+	})
+}
+
+voidEliminationSuccess: derefRef2: {
+	a: [string]: c: [string]: E
+
+	a: b: c: {
+		if false {
+			d: e: true // resolves
+		}
+	}
+
+	E: #F
+	#F: {
+		e: bool
+		f: !e @test(err, code=incomplete, contains="not concrete", pos=[0:7])
+	}
+	@test(eq, {
+		a: {b: {c: {}}}
+		E: {
+			e: bool
+			f: _|_
+		}
+		#F: {
+			e: bool
+			f: _|_ @test(err, code=incomplete)
+		}
+	})
+}
+
+voidEliminationSuccess: derefDisj1: {
+	a: [string]: c: [string]: E
+
+	a: b: c: {
+		if false {
+			d: e: true
+		}
+	}
+
+	E: {
+		e: bool
+		f: !e
+	} | {
+		g: bool
+		h: !g
+	}
+	@test(eq, {
+		a: {b: {c: {}}}
+		E: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction: (and 2 more errors)", pos=[])
+	})
+}
+
+voidEliminationSuccess: derefDisj2: {
+	a: [string]: c: [string]: E & E
+
+	a: b: c: {
+		if false {
+			d: e: true
+		}
+	}
+
+	E: {
+		e: bool
+		f: !e
+	} | {
+		g: bool
+		h: !g
+	}
+	@test(eq, {
+		a: {b: {c: {}}}
+		E: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction: (and 2 more errors)", pos=[])
+	})
+}
+
+voidEliminationSuccess: bulk1: {
+	a: b: {}
+	a: [string]: {
+		c: {
+			e: string
+			if false {
+				e: ""
+			}
+		}
+		d: c.e
+	}
+	@test(eq, {a: {b: {c: {e: string}, d: string}}})
+}
+
+voidEliminationSuccess: opt1: {
+	a: b: {}
+	a: b?: {
+		c: {
+			e: string
+			if false {
+				e: ""
+			}
+		}
+		d: c.e
+	}
+	@test(eq, {a: {b: {c: {e: string}, d: string}}})
+}
+
+voidEliminationSuccess: noCycle1: {
+	_x: a.b
+	a: {
+		c: h: "stream"
+		b: {
+			if c.g != _|_ {}
+		}
+		c: {
+			if false {g: _}
+		}
+	}
+	@test(eq, {_x: {}, a: {c: {h: "stream"}, b: {}}})
+}
+
+voidEliminationSuccess: noCycle2: {
+	a: {
+		c: h: "stream"
+		b: {
+			if c.g != _|_ {}
+		}
+		c: {
+			if false {g: _}
+		}
+	}
+	_x: a.b
+	@test(eq, {a: {c: {h: "stream"}, b: {}}, _x: {}})
+}
+
+voidLookup: {
+	a: x: z: a.y.z.void
+
+	a: y: {
+		c: _
+		z: {}
+	}
+
+	a: [string]: {
+		c: {
+			for k, v in z {
+				(k): null  // don't add this arc anywhere
+			}
+		}
+		z: {
+			if false {
+				err: {}
+			}
+		}
+	}
+	@test(eq, {
+		a: {
+			x: {
+				z: _|_
+				c: _|_
+			}
+			y: {c: _, z: {}}
+		}
+	})
+	@test(err, at=a.x.z, code=incomplete,
+		contains="undefined field: %s", args=[void], pos=[1:17])
+	@test(err, at=a.x.c, code=incomplete,
+		path=voidLookup.a.x.z, contains="undefined field: %s", args=[void], pos=[1:17])
+}
+
+
+// Eliminate the top value even if there is an error (especially incomplete
+// errors).
+topElimination: {
+	a: int
+	_
+	if true {
+		x: a+1
+	}
+	@test(eq, {
+		a: int
+		x: _|_
+	})
+	@test(err, at=x, code=incomplete, contains="non-concrete value %v in operand to %s", args=[int, +], pos=[4:6, 1:5])
+}
+
+voidEliminationSuccess: drop1: {
+	// Do not include x in s.
+	t: {
+		#ok: *true | bool
+		if #ok {
+			x: int
+		}
+	}
+	s: t & {
+		#ok: false
+	}
+	@test(eq, {
+		t: {#ok: *true | bool, x: int}
+		s: {#ok: false}
+	})
+}
+
+// should be error
+// issue #465
+explicitDefaultError: {
+	a: string | *_|_
+
+	if a != "" {
+	}
+	@test(err, code=incomplete, contains="non-concrete value string", pos=[3:5, 1:5])
+}
+
+// Remove arcs for with no for comprehension results.
+allArcsSuccess: p1: {
+	x: {
+		for k, _ in y {
+			(k): null
+		}
+	}
+	y: {
+		if false {
+			x: {}
+		}
+	}
+	@test(eq, {x: {}, y: {}})
+}
+
+allArcsSuccess: p2: {
+	y: {
+		if false {
+			x: {}
+		}
+	}
+	x: {
+		for k, _ in y {
+			(k): null
+		}
+	}
+	@test(eq, {y: {}, x: {}})
+}
+
+structShare: ok1: {
+	a: [string]: E
+	E: {}
+
+	a: {
+		if true {
+			d: e: true // resolves
+		}
+	}
+	@test(eq, {a: {d: {e: true}}, E: {}})
+}
+
+structShare: err1: {
+	x: [string]: x.#E
+	x: #E: {}
+	if true {
+		x: d: e: true
+	}
+	@test(err, code=eval, at=x.d.e, contains="field not allowed", pos=[4:9])
+}
+
+-- issue2208.cue --
+// Regression where definitions that compiled correctly with 0.4.3 failed to
+// compile with 0.5.0-beta.2 due to incorrect handling of void errors.
+// https://cuelang.org/issue/2208
+voidErrorIncomplete: {
+	#Schema: [string]: {
+		required: bool
+		if !required {
+		}
+	}
+
+	root: #Schema
+	root: {
+		if false {
+			child: required: false
+		}
+	}
+	@test(eq, {#Schema: {}, root: {}})
+}
+
+// TODO: should these always be errors, or only for cue vet?
+// voidErrorFatal: pattern: {
+// 	#Schema: [string]: {
+// 		if "str" + 3 {
+// 		}
+// 	}
+//
+// 	root: #Schema
+// 	root: {
+// 		if false {
+// 			child: required: false
+// 		}
+// 	}
+// }
+//
+// voidErrorFatal: field: {
+// 	root: {
+// 		if false {
+// 			child: 2 + "str"
+// 		}
+// 	}
+// }
+
+
+-- issue1759.cue --
+// Tests that len() and comprehensions correctly see the full struct/list value.
+// https://cuelang.org/issue/1759
+// Tests derived from Unity.
+unity: success1: {
+	#Config: {
+		name: string
+		type: string
+	}
+
+	#AnyConfig: {
+		#Config
+		...
+	}
+
+	#Env: {
+		name: string
+		configurations: [string]: #AnyConfig
+	}
+
+	envs: "e1": #Env & {
+		configurations: c1:  #Config
+	}
+
+	envs: [string]: configurations: [string]: {
+		type: "foo"
+		if type == "terraform" {
+			backend: {
+				type: "s3"
+			}
+		}
+	}
+	@test(eq, {
+		#Config: {name: string, type: string}
+		#AnyConfig: {name: string, type: string}
+		#Env: {name: string, configurations: {}}
+		envs: {
+			e1: {
+				configurations: {c1: {type: "foo", name: string}}
+				name: string
+			}
+		}
+	})
+}
+
+// issue1759: Tests that len() correctly sees the full struct value when
+// used as a comprehension condition. https://cuelang.org/issue/1759
+issue1759: {
+	_ports_map: {}
+	if len(_ports_map) > 0 {
+		port: _ports_map.a.port
+	}
+	if true {
+		_ports_map: a: {port: "80"}
+	}
+	@test(eq, {
+		_ports_map: {a: {port: "80"}}
+		port: "80"
+	})
+}
+
+arcAlignment: t1: {
+	[string]:  {
+		if true { }
+	}
+	if false {
+		c: _
+	}
+	@test(eq, {})
+}
+
+-- issue2111.cue --
+// Evaluator regression where circular dependency in evaluation of conditionals
+// caused incorrect results. All arc types, not just regular fields, should be pushed down.
+// https://cuelang.org/issue/2111
+letPushdown: {
+	_c: y: 1
+
+	a: {
+		for k, v in _c {
+			let x = v
+			if x != _|_ {
+			}
+		}
+	}
+	@test(eq, {_c: {y: 1}, a: {}})
+}
+
+-- issue2113.cue --
+// Evaluator regression where a nested comprehension caused "was already used"
+// errors when the enclosing value was not yet fully evaluated.
+// https://cuelang.org/issue/2113
+// Ensure that an enclosing Value clause of a nested comprehension is evaluated
+// before the nested comprehension itself is evaluated.
+nestedWithEmbeddingOK: {
+	c: [1]
+	a: {
+		for k, v in c {
+			{x: 1}
+			if a.x != _|_ {
+			}
+		}
+	}
+	@test(eq, {c: [1], a: {x: 1}})
+}
+
+nestedWithDynamicFieldOK: {
+	_c: y: 1
+
+	a: {
+		for k, v in _c {
+			if x != _|_ {
+			}
+			x="\(k)": 1
+		}
+	}
+	@test(eq, {_c: {y: 1}, a: {y: 1}})
+}
+
+// Errors in nested comprehensions should also be reported.
+errorPropagation: {
+	deployment: _
+	for k, v in deployment {
+		for k1, v2 in v.env2 { // Report this error.
+			deployment: (k): x1: 1
+		}
+	}
+	for id in ["elem"] { deployment: (id): x2: 2 }
+	@test(err, code=incomplete, contains="undefined field: env2", pos=[3:19])
+}
+
+-- issue2131.cue --
+// issue2131: Tests that chained for comprehensions correctly produce output
+// fields when iterating over nested structs. https://cuelang.org/issue/2131
+issue2131: tests: {
+	windows: {
+		eg1: in: #"c:\d"#
+		eg2: in: #"c:\test"#
+		eg3: in: #"c:\test\d"#
+	}
+
+	for os, examples in tests for k, v in examples {
+		(os): (k): out: "test"
+	}
+	@test(eq, {
+		windows: {
+			eg1: {in: "c:\\d", out: "test"}
+			eg2: {in: "c:\\test", out: "test"}
+			eg3: {in: "c:\\test\\d", out: "test"}
+		}
+	})
+}
+-- issue3533.cue --
+// issue3533: Tests that fields under two levels of comprehensions are not
+// incorrectly rejected as "field not allowed" in evalv3.
+// https://cuelang.org/issue/3533
+issue3533: {
+	#ObjectMeta: namespace?: string
+	out: {
+		for i, _ in ["iter-once"] {
+			metadata: #ObjectMeta
+			if false {
+				metadata: namespace: "foo"
+			}
+		}
+	}
+	out: metadata: namespace: *"default" | string
+	@test(eq, {
+		#ObjectMeta: {namespace?: string}
+		out: {
+			metadata: {namespace: *"default" | string}
+		}
+	})
+}
+-- issue3535.cue --
+// issue3535: Tests that hidden fields inside if comprehensions do not
+// trigger "field not allowed" errors in evalv3.
+// https://cuelang.org/issue/3535
+issue3535: hidden: {
+	#X: {
+		kind: string
+		output: {}
+	}
+	foo: #X & {
+		kind: string
+		if kind == "foo" {
+			_hidden: {}
+		}
+	}
+	foo: kind: "foo"
+	@test(eq, {
+		#X: {kind: string, output: {}}
+		foo: {kind: "foo", _hidden: {}, output: {}}
+	})
+}
+issue3535: regular: {
+	#X: {
+		kind: string
+		output: {}
+	}
+	foo: #X & {
+		kind: string
+		if kind == "foo" {
+			regular: {}
+		}
+	}
+	foo: kind: "foo"
+	@test(err, code=eval, at=foo.regular, contains="field not allowed", pos=[8:4])
+}
+issue3535: def: {
+	#X: {
+		kind: string
+		output: {}
+	}
+	foo: #X & {
+		kind: string
+		if kind == "foo" {
+			#def: {}
+		}
+	}
+	foo: kind: "foo"
+	@test(eq, {
+		#X: {kind: string, output: {}}
+		foo: {kind: "foo", #def: {}, output: {}}
+	})
+}
+-- reflect.cue --
+import "encoding/json"
+
+
+unifyDynamicReflectSuccess: {
+	for _, s in ["foo"] {
+		X: {...}
+		"\(s)": {
+			X: {...} // cannot be _
+			Y: json.Marshal(X) // cannot be yaml, X cannot be literal
+		}
+	}
+
+	[string]: X: {
+		if true {// must be there
+			x: y: {} // at least 2 nestings needed to expose problem
+		}
+	}
+	@test(eq, {
+		X: {X: {x: {y: {}}}}
+		foo: {
+			X: {x: {y: {}}}
+			Y: "{\"x\":{\"y\":{}}}"
+		}
+	})
+}
+-- issue3621.cue --
+// issue3621: evalv3 regression producing false "cyclic reference" errors for
+// comprehensions with nested field definitions and references that evalv2 handles correctly.
+// https://cuelang.org/issue/3621
+issue3621: reduced: t1: {
+	// This test ensures that when a reference is made within a comprehension,
+	// with vertices marked as "pending", that these are not completed the
+	// respective pushed-down comprehension is evaluated as well.
+	if true {
+		a: b1.b2.b3
+		b1: b2: b3: "Foo"
+	}
+	@test(eq, {a: "Foo", b1: {b2: {b3: "Foo"}}})
+}
+issue3621: reduced: t2: {
+	outer: {}
+	if true {
+		inner: inner2: name: "Foo"
+		outer: b: inner.inner2.name
+	}
+	@test(eq, {
+		outer: {b: "Foo"}
+		inner: {inner2: {name: "Foo"}}
+	})
+}
+issue3621: full: {
+	hello: "world"
+	outer: [Name=string]: name: Name
+	if true {
+		inner: inner2: {
+			name:           "Employees"
+			description:    "All employees"
+			privacy:        "secret"
+			create_default: false
+		}
+		outer: outer2: {
+			bar: (inner.inner2.name)
+		}
+	}
+	@test(eq, {
+		hello: "world"
+		outer: {
+			outer2: {bar: "Employees", name: "outer2"}
+		}
+		inner: {
+			inner2: {
+				name: "Employees"
+				description: "All employees"
+				privacy: "secret"
+				create_default: false
+			}
+		}
+	})
+}
+-- issue3708.cue --
+// issue3708: evalv3 regression reporting a cyclic reference error when fields are
+// accessed inside a comprehension using optional field patterns with if conditionals.
+// https://cuelang.org/issue/3708
+issue3708: {
+	out: people.bob.kind
+
+	// pattern constraint marks 'name' as member, which should not preclude name
+	// from being futher evaluated to determine whether 'people' is pending.
+	people: [string]: {
+		kind:  "person"
+		name?: string
+	}
+
+	if true {
+		people: bob: name: "Bob"
+	}
+	@test(eq, {
+		out: "person"
+		people: {bob: {name: "Bob", kind: "person"}}
+	})
+}
+-- issue3729.cue --
+// issue3729: evalv3 incorrectly reports "incomplete value null" for fields typed
+// as a disjunction containing null (e.g. null | #T) inside if comprehensions.
+// https://cuelang.org/issue/3729
+issue3729: withDisjunction: {
+	#Root: sub1?: #sub2?: bool
+	root?: null | #Root
+	if true {
+		root: sub1?: #sub2: true
+	}
+	@test(eq, {
+		#Root: {sub1?: {#sub2?: bool}}
+		root: {sub1?: {#sub2: true}}
+	})
+}
+issue3729: withoutDisjunction: {
+	root?: null
+	if true {
+		root: #sub1?: #sub2: true
+	}
+	@test(err, code=eval, contains="conflicting values null", pos=[0:32, 1:9, 2:2, 3:9])
+}
+issue3729: withoutDisjunctionWithEmbed: {
+	root?: null
+	if true {
+		root: {_, #sub1?: #sub2: true}
+	}
+	@test(eq, {root: {null, #sub1?: {#sub2: true}}})
+}
+issue3729: definitionsOnly: {
+	#Root: #sub1?: #sub2?: bool
+	root?: null | #Root
+	if true {
+		root: #sub1?: #sub2: true
+	}
+	@test(eq, {
+		#Root: {#sub1?: {#sub2?: bool}}
+		root: {#sub1?: {#sub2: true}}
+	})
+}
+issue3729: withEmbed: incomplete: {
+	#Root: #sub1?: #sub2?: bool
+	root?: null | #Root
+	if true {
+		root: {_, #sub1?: #sub2: true}
+	}
+	@test(eq, {
+		#Root: {#sub1?: {#sub2?: bool}}
+		root: {null, #sub1?: {#sub2: true}} | {#sub1?: {#sub2: true}}
+	})
+}
+issue3729: full: {
+	#Application: spec: #ApplicationSpec
+	#ApplicationSpec: syncPolicy?: null | #SyncPolicy
+	#SyncPolicy: automated?: null | #SyncPolicyAutomated
+	#SyncPolicyAutomated: {
+		prune?:    bool
+		selfHeal?: bool
+	}
+	argoApp: #Application & {
+		spec: {
+			if true {
+				syncPolicy: automated: {
+					prune:    true
+					selfHeal: true
+				}
+			}
+		}
+	}
+	argoApp: spec: _syncpolicy: "selfhealprune"
+	@test(eq, {
+		#Application: {
+			spec: {
+				syncPolicy?: null | {automated?: null | {prune?: bool, selfHeal?: bool}}
+			}
+		}
+		#ApplicationSpec: {
+			syncPolicy?: null | {automated?: null | {prune?: bool, selfHeal?: bool}}
+		}
+		#SyncPolicy: {
+			automated?: null | {prune?: bool, selfHeal?: bool}
+		}
+		#SyncPolicyAutomated: {prune?: bool, selfHeal?: bool}
+		argoApp: {
+			spec: {
+				syncPolicy: {
+					automated: {prune: true, selfHeal: true}
+				}
+				_syncpolicy: "selfhealprune"
+			}
+		}
+	})
+}
+-- pending.cue --
+// resolving comprehensions arcs across disjunctions.
+arcTypeAcrossTwo: {
+	a?: b?: {
+		c?: null | {}
+	} | null
+	if true {
+		a: b: c: d: true
+	}
+	@test(eq, {a: {b: {c: {d: true}}}})
+}
+// issue3894: evalv3 regression where an if comprehension affecting an optional
+// field with a disjunction returns an incorrect result instead of the properly
+// constrained value. https://cuelang.org/issue/3894
+issue3894: reduced: p1: {
+	{a: string} | {b: value: string}
+	if true { b: value: "true" }
+	@test(eq, {b: {value: "true"}, a: string} | {b: {value: "true"}})
+}
+issue3894: reduced: p2: {
+	{b: value: string} | {a: string}
+	if true { b: value: "true" }
+	@test(eq, {b: {value: "true"}} | {b: {value: "true"}, a: string})
+}
+issue3894: full: {
+	#Output: {a?: string} | {b?: {value: string}}
+	out: #Output
+	out: {
+		if true == true {
+			b: {value: "true"}
+		}
+	}
+	@test(eq, {
+		#Output: {a?: string} | {b?: {value: string}}
+		out: {b: {value: "true"}}
+	})
+}
+-- issue3935.cue --
+// issue3935: evalv3 incorrectly reports "field not allowed" when a schema defined
+// with a disjunction is intersected with additional constraints.
+// https://cuelang.org/issue/3935
+issue3935: reduced: {
+	out: #A | #B
+	out: #B & {
+		y: x: "bar"
+	}
+	#A: y: other: int
+	#B: {
+		if true {
+			x: y.x
+		}
+		y!: x!: _
+	}
+	@test(eq, {
+		out: {y: {x: "bar"}, x: "bar"}
+		#A: {y: {other: int}}
+		#B: {
+			x: _|_ @test(err, code=incomplete, contains="issue3935.reduced.#B.x: required field missing: y", pos=[12:7])
+			y!: {x!: _}
+		}
+	})
+}
+issue3935: full: {
+	out: #SchemaOther | #SchemaSelected
+	out: #SchemaSelected & {
+		spec: {
+			name: "foo"
+			config: namespace: "bar"
+		}
+	}
+	#SchemaOther: {
+		spec: {
+			otherOptional?: int
+			otherRegular:   int
+			otherRequired!: int
+		}
+	}
+	#SchemaSelected: {
+		spec!: {
+			name!: string
+			config!: _
+		}
+
+		if true {
+			namespace: _specConfig.namespace
+		}
+
+		_specConfig: spec.config
+	}
+	@test(eq, {
+		out: {
+			spec: {
+				name: "foo"
+				config: {namespace: "bar"}
+			}
+			namespace: "bar"
+			_specConfig: {namespace: "bar"}
+		}
+		#SchemaOther: {
+			spec: {
+				otherOptional?: int
+				otherRegular: int
+				otherRequired!: int
+			}
+		}
+		#SchemaSelected: {
+			spec!: {name!: string, config!: _}
+			namespace: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected.namespace: undefined field: namespace", pos=[47:27])
+			_specConfig: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected._specConfig: required field missing: spec", pos=[50:16])
+		}
+	})
+}
+-- rework.cue --
+regression1: {
+	#Primary: {
+		_Y: _
+		let _X = _Y
+		if len(_X.spec.command) > 0 {
+			command: _X.spec.command
+		}
+	}
+	#Rollout: {
+		_X: _
+		out: #Primary & {_Y: _X} & _X.patch
+	}
+	x: {
+		spec: command: ["a"]
+		patch: {}
+	}
+	out: #Rollout & {_X: x} @test(eq, at=out,{
+		_Y: {spec: {command: ["a"]}, patch: {}}
+		command: ["a"]
+	})
+}
+regression2: {
+	#Primary: {
+		_Y: _
+		if len(_Y.spec.command) > 0 {
+			command: _Y.spec.command
+		}
+	}
+	#Rollout: {
+		_X: _
+		out: #Primary & {_Y: _X} & _X.patch
+	}
+	x: {
+		spec: command: ["a"]
+		patch: {}
+	}
+	out: #Rollout & {_X: x} @test(eq, at=out,{
+		_Y: {spec: {command: ["a"]}, patch: {}}
+		command: ["a"]
+	})
+}
+letCycleSelf: {
+	#X: X={
+		let this = X
+		hosts: [string]: _
+		for h, _ in this.hosts {out: (h): 1}
+		for h, _ in this.hosts {out: (h): 2}
+	}
+
+	x: [string]: #X
+	x: a: {}
+
+	@test(eq, {#X: {hosts: {}}, x: {a: {hosts: {}}}})
+}
+-- rework2.cue --
+@experiment(aliasv2)
+
+letCycleSelfKeyword: {
+	#E: {
+		let s = self
+		hosts: _
+		for hv in s.hosts {out: (hv.x): "a"}
+	}
+
+	env: #E & {hosts: h1: x: "k"}
+
+	@test(eq, {
+		#E: _|_ @test(err, code=incomplete, path=letCycleSelf2.#E,
+			contains="cannot range over s.hosts (incomplete type _)", pos=[7:13])
+		env: {hosts: {h1: {x: "k"}}, out: {k: "a"}}
+	})
+}
+letCycleSelfKeyword2: {
+	#E: {
+		let s = self
+		...
+		for hv in s.hosts {
+			let n = s.networks
+			a: n
+		}
+	}
+
+	env: #E & {
+		hosts: h1: 1
+		networks: n1: "x"
+	}
+
+	@test(eq, {
+		#E: _|_ @test(err, code=incomplete, path=regression_let3.#E,
+			contains="cannot range over s.hosts (incomplete)", pos=[22:13])
+		env: {
+			hosts: {h1: 1}
+			networks: {n1: "x"}
+			a: {n1: "x"}
+		}
+	})
+}
+-- out/compile --
+--- in.cue
+{
+  linkChildren: {
+    w: 1
+    v: {
+      x: 1
+      if true {
+        y: 1
+        if true {
+          z: 1
+          rw: 〈3;w〉
+          rx: 〈2;x〉
+          ry: 〈1;y〉
+          rz: 〈0;z〉
+          n1a: {
+            na: [
+              〈5;w〉,
+              〈4;x〉,
+              〈3;y〉,
+              〈2;z〉,
+            ]
+          }
+          n2a: {
+            n1a: {
+              na: [
+                〈6;w〉,
+                〈5;x〉,
+                〈4;y〉,
+                〈3;z〉,
+              ]
+            }
+          }
+          n2z: {
+            n1z: {
+              nz: 〈2;z〉
+            }
+          }
+        }
+      }
+    }
+  }
+  fail: {
+    a: {
+      if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+        b: 1
+      }
+    }
+  }
+  embed: {
+    fail1: 〈0;#C1〉
+    #C1: {
+      if false {
+        p: _
+      }
+    }
+    fail1: {
+      p: "foo"
+    }
+    success2: 〈0;#C2〉
+    #C2: {
+      if true {
+        p: _
+      }
+    }
+    success2: {
+      p: "foo"
+    }
+    success3: 〈0;#C3〉
+    #C3: {}
+    success3: {
+      if false {
+        p: {
+          q: 1
+        }
+      }
+    }
+    success4: {
+      #X: {
+        y: string
+      }
+      x: {
+        y: string
+      }
+      x: {
+        for _, _ in [
+          "iter-once",
+        ] {
+          〈3;#X〉
+          if false {
+            y: "foo"
+          }
+        }
+      }
+    }
+    fail4: 〈0;#C4〉
+    #C4: {}
+    fail4: {
+      if true {
+        p: {
+          q: 1
+        }
+      }
+    }
+    incomplete5: {
+      a: bool
+      if 〈0;a〉 {
+        p: {
+          q: 1
+        }
+      }
+    }
+    incomplete6: {
+      if false {
+        p: 1
+      }
+      p: (〈0;q〉 + 1)
+      q: int
+    }
+    incomplete7: {
+      p: (〈0;q〉 + 1)
+      q: int
+      if false {
+        q: 1
+      }
+    }
+  }
+  mixedFieldsSuccess: {
+    a: {
+      for _, s in [
+        "foo",
+      ] {
+        "\(〈1;s〉)": 1
+        X: 1
+      }
+    }
+    b: {
+      #Def: {
+        for _, s in [
+          "foo",
+        ] {
+          "\(〈1;s〉)": 1
+          X: 1
+        }
+      }
+    }
+    b: {
+      x: 〈1;b〉.#Def
+    }
+    b: {
+      x: {
+        X: _
+      }
+    }
+    b: {
+      x: {
+        foo: _
+      }
+    }
+    c: {
+      #Def: {
+        X: int
+        foo: int
+      }
+    }
+    c: {
+      x: 〈1;c〉.#Def
+    }
+    c: {
+      x: {
+        for _, s in [
+          "foo",
+        ] {
+          "\(〈1;s〉)": 1
+          X: 1
+        }
+      }
+    }
+  }
+  fieldMismatch: {
+    a: {
+      2
+      if true {
+        x: 3
+      }
+    }
+  }
+  noStackOverflowStructCycle: {
+    #list: {
+      tail: 〈1;#list〉
+      if (〈0;tail〉 != null) {
+        sum: 〈1;tail〉.sum
+      }
+    }
+    list: {
+      tail: 〈1;list〉
+      if (〈0;tail〉 != null) {
+        sum: 〈1;tail〉.sum
+      }
+    }
+  }
+  provideIncompleteSuccess: {
+    t1: {
+      #a: {
+        if 〈0;b〉 {
+          c: 4
+        }
+        b: bool
+      }
+      x: ((〈0;#a〉 & {
+        b: true
+      }) & {
+        c: 4
+      })
+      y: 〈0;x〉
+    }
+    t2: {
+      #a: {
+        if 〈0;b〉 {
+          c: 4
+        }
+        b: true
+      }
+      #c: {}
+      a: {
+        if 〈0;b〉 {
+          c: {
+            d: 4
+          }
+        }
+        b: true
+        c: 〈1;#c〉
+      }
+    }
+  }
+  voidArcs: {
+    scopes: {
+      x: 1
+      a: {
+        y: 2
+        if true {
+          b: 〈2;x〉
+          c: {
+            d: 〈3;x〉
+          }
+          e: 〈1;y〉
+          f: {
+            g: 〈2;y〉
+          }
+        }
+      }
+    }
+    drop: {
+      x: 1
+      a: {
+        y: 2
+        if false {
+          b: 〈2;x〉
+          c: {
+            d: 〈3;x〉
+          }
+          e: 〈1;y〉
+          f: {
+            g: 〈2;y〉
+          }
+        }
+      }
+    }
+  }
+  cyclicError: {
+    a: {
+      x: bool
+      y: bool
+      if 〈1;a〉.x {
+        y: true
+      }
+      if 〈1;a〉.y {
+        x: true
+      }
+      b: {}
+    }
+    c: 〈0;a〉.b
+  }
+  midwayReferences: {
+    a: {
+      for i, j in {
+        a: 1
+        b: 2
+      } {
+        x: {
+          y: {
+            z: {
+              〈4;i〉: 〈4;j〉
+            }
+          }
+        }
+      }
+      x: {
+        y: {}
+      }
+    }
+    b: 〈0;a〉.x
+    c: 〈0;a〉.x.y
+    d: 〈0;a〉.x.y.z
+  }
+  closedCheck: {
+    success1: {
+      a: {
+        b: {
+          [string]: 〈2;#D〉
+        }
+      }
+      #D: {
+        d: string
+        if (〈0;d〉 != "c") {
+          e: string
+        }
+      }
+      a: {
+        b: {
+          c: {
+            d: "d"
+            e: "ok"
+          }
+        }
+      }
+    }
+  }
+  closedCheck: {
+    success2: {
+      a: {
+        b: {
+          [string]: 〈2;#D〉
+        }
+      }
+      #D: {
+        d: string
+        if (〈0;d〉 != "c") {
+          ("foo" + "bar"): string
+        }
+      }
+      a: {
+        b: {
+          c: {
+            d: "d"
+            foobar: "ok"
+          }
+        }
+      }
+    }
+  }
+  closedCheck: {
+    success3: {
+      a: {
+        b: {
+          [string]: 〈2;#D〉
+        }
+      }
+      #D: {
+        d: string
+        e: {
+          if (〈1;d〉 != "c") {
+            string
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            d: "d"
+            e: "ok"
+          }
+        }
+      }
+    }
+  }
+  emptyComprehensionIncomplete: {
+    a: {}
+    b: {
+      if 〈1;a〉.b {}
+    }
+  }
+  voidEliminationSuccess: {
+    t1: {
+      [string]: {
+        b: bool
+        if !〈0;b〉 {}
+      }
+      if false {
+        a: {
+          b: true
+        }
+      }
+    }
+  }
+  voidEliminationSuccess: {
+    t2: {
+      components: {
+        sinks: {
+          [string]: (〈1;#C〉 & {
+            kind: string
+            configuration: {
+              if (〈1;kind〉 != "source") {
+                inputs: {
+                  required: true
+                }
+              }
+            }
+          })
+        }
+        #C: {
+          kind: string
+          configuration: {
+            [string]: {
+              required: bool
+              if !〈0;required〉 {
+                common: bool
+              }
+            }
+          }
+        }
+      }
+      components: {
+        sinks: {
+          blah: {
+            kind: "source"
+          }
+        }
+      }
+    }
+  }
+  voidEliminationSuccess: {
+    derefRef1: {
+      a: {
+        [string]: {
+          c: {
+            [string]: 〈3;E〉
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: {
+        e: bool
+        f: !〈0;e〉
+      }
+    }
+  }
+  voidEliminationSuccess: {
+    derefRef2: {
+      a: {
+        [string]: {
+          c: {
+            [string]: 〈3;E〉
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: 〈0;#F〉
+      #F: {
+        e: bool
+        f: !〈0;e〉
+      }
+    }
+  }
+  voidEliminationSuccess: {
+    derefDisj1: {
+      a: {
+        [string]: {
+          c: {
+            [string]: 〈3;E〉
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: ({
+        e: bool
+        f: !〈0;e〉
+      }|{
+        g: bool
+        h: !〈0;g〉
+      })
+    }
+  }
+  voidEliminationSuccess: {
+    derefDisj2: {
+      a: {
+        [string]: {
+          c: {
+            [string]: (〈3;E〉 & 〈3;E〉)
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: ({
+        e: bool
+        f: !〈0;e〉
+      }|{
+        g: bool
+        h: !〈0;g〉
+      })
+    }
+  }
+  voidEliminationSuccess: {
+    bulk1: {
+      a: {
+        b: {}
+      }
+      a: {
+        [string]: {
+          c: {
+            e: string
+            if false {
+              e: ""
+            }
+          }
+          d: 〈0;c〉.e
+        }
+      }
+    }
+  }
+  voidEliminationSuccess: {
+    opt1: {
+      a: {
+        b: {}
+      }
+      a: {
+        b?: {
+          c: {
+            e: string
+            if false {
+              e: ""
+            }
+          }
+          d: 〈0;c〉.e
+        }
+      }
+    }
+  }
+  voidEliminationSuccess: {
+    noCycle1: {
+      _x: 〈0;a〉.b
+      a: {
+        c: {
+          h: "stream"
+        }
+        b: {
+          if (〈1;c〉.g != _|_(explicit error (_|_ literal) in source)) {}
+        }
+        c: {
+          if false {
+            g: _
+          }
+        }
+      }
+    }
+  }
+  voidEliminationSuccess: {
+    noCycle2: {
+      a: {
+        c: {
+          h: "stream"
+        }
+        b: {
+          if (〈1;c〉.g != _|_(explicit error (_|_ literal) in source)) {}
+        }
+        c: {
+          if false {
+            g: _
+          }
+        }
+      }
+      _x: 〈0;a〉.b
+    }
+  }
+  voidLookup: {
+    a: {
+      x: {
+        z: 〈2;a〉.y.z.void
+      }
+    }
+    a: {
+      y: {
+        c: _
+        z: {}
+      }
+    }
+    a: {
+      [string]: {
+        c: {
+          for k, v in 〈1;z〉 {
+            〈1;k〉: null
+          }
+        }
+        z: {
+          if false {
+            err: {}
+          }
+        }
+      }
+    }
+  }
+  topElimination: {
+    a: int
+    _
+    if true {
+      x: (〈1;a〉 + 1)
+    }
+  }
+  voidEliminationSuccess: {
+    drop1: {
+      t: {
+        #ok: (*true|bool)
+        if 〈0;#ok〉 {
+          x: int
+        }
+      }
+      s: (〈0;t〉 & {
+        #ok: false
+      })
+    }
+  }
+  explicitDefaultError: {
+    a: (string|*_|_(explicit error (_|_ literal) in source))
+    if (〈0;a〉 != "") {}
+  }
+  allArcsSuccess: {
+    p1: {
+      x: {
+        for k, _ in 〈1;y〉 {
+          〈1;k〉: null
+        }
+      }
+      y: {
+        if false {
+          x: {}
+        }
+      }
+    }
+  }
+  allArcsSuccess: {
+    p2: {
+      y: {
+        if false {
+          x: {}
+        }
+      }
+      x: {
+        for k, _ in 〈1;y〉 {
+          〈1;k〉: null
+        }
+      }
+    }
+  }
+  structShare: {
+    ok1: {
+      a: {
+        [string]: 〈1;E〉
+      }
+      E: {}
+      a: {
+        if true {
+          d: {
+            e: true
+          }
+        }
+      }
+    }
+  }
+  structShare: {
+    err1: {
+      x: {
+        [string]: 〈1;x〉.#E
+      }
+      x: {
+        #E: {}
+      }
+      if true {
+        x: {
+          d: {
+            e: true
+          }
+        }
+      }
+    }
+  }
+}
+--- issue1759.cue
+{
+  unity: {
+    success1: {
+      #Config: {
+        name: string
+        type: string
+      }
+      #AnyConfig: {
+        〈1;#Config〉
+        ...
+      }
+      #Env: {
+        name: string
+        configurations: {
+          [string]: 〈2;#AnyConfig〉
+        }
+      }
+      envs: {
+        e1: (〈1;#Env〉 & {
+          configurations: {
+            c1: 〈3;#Config〉
+          }
+        })
+      }
+      envs: {
+        [string]: {
+          configurations: {
+            [string]: {
+              type: "foo"
+              if (〈0;type〉 == "terraform") {
+                backend: {
+                  type: "s3"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  issue1759: {
+    _ports_map: {}
+    if (len(〈0;_ports_map〉) > 0) {
+      port: 〈1;_ports_map〉.a.port
+    }
+    if true {
+      _ports_map: {
+        a: {
+          port: "80"
+        }
+      }
+    }
+  }
+  arcAlignment: {
+    t1: {
+      [string]: {
+        if true {}
+      }
+      if false {
+        c: _
+      }
+    }
+  }
+}
+--- issue2111.cue
+{
+  letPushdown: {
+    _c: {
+      y: 1
+    }
+    a: {
+      for k, v in 〈1;_c〉 {
+        let x#1multi = 〈1;v〉
+        if (〈0;let x#1〉 != _|_(explicit error (_|_ literal) in source)) {}
+      }
+    }
+  }
+}
+--- issue2113.cue
+{
+  nestedWithEmbeddingOK: {
+    c: [
+      1,
+    ]
+    a: {
+      for k, v in 〈1;c〉 {
+        {
+          x: 1
+        }
+        if (〈3;a〉.x != _|_(explicit error (_|_ literal) in source)) {}
+      }
+    }
+  }
+  nestedWithDynamicFieldOK: {
+    _c: {
+      y: 1
+    }
+    a: {
+      for k, v in 〈1;_c〉 {
+        if (〈0;("\(〈1;k〉)")〉 != _|_(explicit error (_|_ literal) in source)) {}
+        "\(〈1;k〉)": 1
+      }
+    }
+  }
+  errorPropagation: {
+    deployment: _
+    for k, v in 〈0;deployment〉 {
+      for k1, v2 in 〈1;v〉.env2 {
+        deployment: {
+          〈4;k〉: {
+            x1: 1
+          }
+        }
+      }
+    }
+    for _, id in [
+      "elem",
+    ] {
+      deployment: {
+        〈2;id〉: {
+          x2: 2
+        }
+      }
+    }
+  }
+}
+--- issue2131.cue
+{
+  issue2131: {
+    tests: {
+      windows: {
+        eg1: {
+          in: "c:\\d"
+        }
+        eg2: {
+          in: "c:\\test"
+        }
+        eg3: {
+          in: "c:\\test\\d"
+        }
+      }
+      for os, examples in 〈1;tests〉 for k, v in 〈0;examples〉 {
+        〈2;os〉: {
+          〈2;k〉: {
+            out: "test"
+          }
+        }
+      }
+    }
+  }
+}
+--- issue2208.cue
+{
+  voidErrorIncomplete: {
+    #Schema: {
+      [string]: {
+        required: bool
+        if !〈0;required〉 {}
+      }
+    }
+    root: 〈0;#Schema〉
+    root: {
+      if false {
+        child: {
+          required: false
+        }
+      }
+    }
+  }
+}
+--- issue3533.cue
+{
+  issue3533: {
+    #ObjectMeta: {
+      namespace?: string
+    }
+    out: {
+      for i, _ in [
+        "iter-once",
+      ] {
+        metadata: 〈3;#ObjectMeta〉
+        if false {
+          metadata: {
+            namespace: "foo"
+          }
+        }
+      }
+    }
+    out: {
+      metadata: {
+        namespace: (*"default"|string)
+      }
+    }
+  }
+}
+--- issue3535.cue
+{
+  issue3535: {
+    hidden: {
+      #X: {
+        kind: string
+        output: {}
+      }
+      foo: (〈0;#X〉 & {
+        kind: string
+        if (〈0;kind〉 == "foo") {
+          _hidden: {}
+        }
+      })
+      foo: {
+        kind: "foo"
+      }
+    }
+  }
+  issue3535: {
+    regular: {
+      #X: {
+        kind: string
+        output: {}
+      }
+      foo: (〈0;#X〉 & {
+        kind: string
+        if (〈0;kind〉 == "foo") {
+          regular: {}
+        }
+      })
+      foo: {
+        kind: "foo"
+      }
+    }
+  }
+  issue3535: {
+    def: {
+      #X: {
+        kind: string
+        output: {}
+      }
+      foo: (〈0;#X〉 & {
+        kind: string
+        if (〈0;kind〉 == "foo") {
+          #def: {}
+        }
+      })
+      foo: {
+        kind: "foo"
+      }
+    }
+  }
+}
+--- issue3621.cue
+{
+  issue3621: {
+    reduced: {
+      t1: {
+        if true {
+          a: 〈0;b1〉.b2.b3
+          b1: {
+            b2: {
+              b3: "Foo"
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3621: {
+    reduced: {
+      t2: {
+        outer: {}
+        if true {
+          inner: {
+            inner2: {
+              name: "Foo"
+            }
+          }
+          outer: {
+            b: 〈1;inner〉.inner2.name
+          }
+        }
+      }
+    }
+  }
+  issue3621: {
+    full: {
+      hello: "world"
+      outer: {
+        [string]: {
+          name: 〈1;-〉
+        }
+      }
+      if true {
+        inner: {
+          inner2: {
+            name: "Employees"
+            description: "All employees"
+            privacy: "secret"
+            create_default: false
+          }
+        }
+        outer: {
+          outer2: {
+            bar: 〈2;inner〉.inner2.name
+          }
+        }
+      }
+    }
+  }
+}
+--- issue3708.cue
+{
+  issue3708: {
+    out: 〈0;people〉.bob.kind
+    people: {
+      [string]: {
+        kind: "person"
+        name?: string
+      }
+    }
+    if true {
+      people: {
+        bob: {
+          name: "Bob"
+        }
+      }
+    }
+  }
+}
+--- issue3729.cue
+{
+  issue3729: {
+    withDisjunction: {
+      #Root: {
+        sub1?: {
+          #sub2?: bool
+        }
+      }
+      root?: (null|〈0;#Root〉)
+      if true {
+        root: {
+          sub1?: {
+            #sub2: true
+          }
+        }
+      }
+    }
+  }
+  issue3729: {
+    withoutDisjunction: {
+      root?: null
+      if true {
+        root: {
+          #sub1?: {
+            #sub2: true
+          }
+        }
+      }
+    }
+  }
+  issue3729: {
+    withoutDisjunctionWithEmbed: {
+      root?: null
+      if true {
+        root: {
+          _
+          #sub1?: {
+            #sub2: true
+          }
+        }
+      }
+    }
+  }
+  issue3729: {
+    definitionsOnly: {
+      #Root: {
+        #sub1?: {
+          #sub2?: bool
+        }
+      }
+      root?: (null|〈0;#Root〉)
+      if true {
+        root: {
+          #sub1?: {
+            #sub2: true
+          }
+        }
+      }
+    }
+  }
+  issue3729: {
+    withEmbed: {
+      incomplete: {
+        #Root: {
+          #sub1?: {
+            #sub2?: bool
+          }
+        }
+        root?: (null|〈0;#Root〉)
+        if true {
+          root: {
+            _
+            #sub1?: {
+              #sub2: true
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3729: {
+    full: {
+      #Application: {
+        spec: 〈1;#ApplicationSpec〉
+      }
+      #ApplicationSpec: {
+        syncPolicy?: (null|〈1;#SyncPolicy〉)
+      }
+      #SyncPolicy: {
+        automated?: (null|〈1;#SyncPolicyAutomated〉)
+      }
+      #SyncPolicyAutomated: {
+        prune?: bool
+        selfHeal?: bool
+      }
+      argoApp: (〈0;#Application〉 & {
+        spec: {
+          if true {
+            syncPolicy: {
+              automated: {
+                prune: true
+                selfHeal: true
+              }
+            }
+          }
+        }
+      })
+      argoApp: {
+        spec: {
+          _syncpolicy: "selfhealprune"
+        }
+      }
+    }
+  }
+}
+--- issue3935.cue
+{
+  issue3935: {
+    reduced: {
+      out: (〈0;#A〉|〈0;#B〉)
+      out: (〈0;#B〉 & {
+        y: {
+          x: "bar"
+        }
+      })
+      #A: {
+        y: {
+          other: int
+        }
+      }
+      #B: {
+        if true {
+          x: 〈1;y〉.x
+        }
+        y!: {
+          x!: _
+        }
+      }
+    }
+  }
+  issue3935: {
+    full: {
+      out: (〈0;#SchemaOther〉|〈0;#SchemaSelected〉)
+      out: (〈0;#SchemaSelected〉 & {
+        spec: {
+          name: "foo"
+          config: {
+            namespace: "bar"
+          }
+        }
+      })
+      #SchemaOther: {
+        spec: {
+          otherOptional?: int
+          otherRegular: int
+          otherRequired!: int
+        }
+      }
+      #SchemaSelected: {
+        spec!: {
+          name!: string
+          config!: _
+        }
+        if true {
+          namespace: 〈1;_specConfig〉.namespace
+        }
+        _specConfig: 〈0;spec〉.config
+      }
+    }
+  }
+}
+--- pending.cue
+{
+  arcTypeAcrossTwo: {
+    a?: {
+      b?: ({
+        c?: (null|{})
+      }|null)
+    }
+    if true {
+      a: {
+        b: {
+          c: {
+            d: true
+          }
+        }
+      }
+    }
+  }
+  issue3894: {
+    reduced: {
+      p1: {
+        ({
+          a: string
+        }|{
+          b: {
+            value: string
+          }
+        })
+        if true {
+          b: {
+            value: "true"
+          }
+        }
+      }
+    }
+  }
+  issue3894: {
+    reduced: {
+      p2: {
+        ({
+          b: {
+            value: string
+          }
+        }|{
+          a: string
+        })
+        if true {
+          b: {
+            value: "true"
+          }
+        }
+      }
+    }
+  }
+  issue3894: {
+    full: {
+      #Output: ({
+        a?: string
+      }|{
+        b?: {
+          value: string
+        }
+      })
+      out: 〈0;#Output〉
+      out: {
+        if (true == true) {
+          b: {
+            value: "true"
+          }
+        }
+      }
+    }
+  }
+}
+--- reflect.cue
+{
+  unifyDynamicReflectSuccess: {
+    for _, s in [
+      "foo",
+    ] {
+      X: {
+        ...
+      }
+      "\(〈1;s〉)": {
+        X: {
+          ...
+        }
+        Y: 〈import;"encoding/json"〉.Marshal(〈0;X〉)
+      }
+    }
+    [string]: {
+      X: {
+        if true {
+          x: {
+            y: {}
+          }
+        }
+      }
+    }
+  }
+}
+--- rework.cue
+{
+  regression1: {
+    #Primary: {
+      _Y: _
+      let _X#2 = 〈0;_Y〉
+      if (len(〈0;let _X#2〉.spec.command) > 0) {
+        command: 〈1;let _X#2〉.spec.command
+      }
+    }
+    #Rollout: {
+      _X: _
+      out: ((〈1;#Primary〉 & {
+        _Y: 〈1;_X〉
+      }) & 〈0;_X〉.patch)
+    }
+    x: {
+      spec: {
+        command: [
+          "a",
+        ]
+      }
+      patch: {}
+    }
+    out: (〈0;#Rollout〉 & {
+      _X: 〈1;x〉
+    })
+  }
+  regression2: {
+    #Primary: {
+      _Y: _
+      if (len(〈0;_Y〉.spec.command) > 0) {
+        command: 〈1;_Y〉.spec.command
+      }
+    }
+    #Rollout: {
+      _X: _
+      out: ((〈1;#Primary〉 & {
+        _Y: 〈1;_X〉
+      }) & 〈0;_X〉.patch)
+    }
+    x: {
+      spec: {
+        command: [
+          "a",
+        ]
+      }
+      patch: {}
+    }
+    out: (〈0;#Rollout〉 & {
+      _X: 〈1;x〉
+    })
+  }
+  letCycleSelf: {
+    #X: {
+      let this#3 = 〈1〉
+      hosts: {
+        [string]: _
+      }
+      for h, _ in 〈0;let this#3〉.hosts {
+        out: {
+          〈2;h〉: 1
+        }
+      }
+      for h, _ in 〈0;let this#3〉.hosts {
+        out: {
+          〈2;h〉: 2
+        }
+      }
+    }
+    x: {
+      [string]: 〈1;#X〉
+    }
+    x: {
+      a: {}
+    }
+  }
+}
+--- rework2.cue
+{
+  letCycleSelfKeyword: {
+    #E: {
+      let s#4 = 〈1〉
+      hosts: _
+      for _, hv in 〈0;let s#4〉.hosts {
+        out: {
+          〈2;hv〉.x: "a"
+        }
+      }
+    }
+    env: (〈0;#E〉 & {
+      hosts: {
+        h1: {
+          x: "k"
+        }
+      }
+    })
+  }
+  letCycleSelfKeyword2: {
+    #E: {
+      let s#5 = 〈1〉
+      ...
+      for _, hv in 〈0;let s#5〉.hosts {
+        let n#6 = 〈2;let s#5〉.networks
+        a: 〈0;let n#6〉
+      }
+    }
+    env: (〈0;#E〉 & {
+      hosts: {
+        h1: 1
+      }
+      networks: {
+        n1: "x"
+      }
+    })
+  }
+}

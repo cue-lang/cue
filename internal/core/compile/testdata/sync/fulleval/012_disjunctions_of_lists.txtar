@@ -1,0 +1,24 @@
+-- in.cue --
+l: *[int, int] | [string, string]
+
+t1: {
+	l & ["c", "d"]
+	@test(eq, ["c", "d"])
+}
+-- out/compile --
+--- in.cue
+{
+  l: (*[
+    int,
+    int,
+  ]|[
+    string,
+    string,
+  ])
+  t1: {
+    (〈1;l〉 & [
+      "c",
+      "d",
+    ])
+  }
+}

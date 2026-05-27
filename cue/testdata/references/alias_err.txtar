@@ -38,36 +38,3 @@ issue2094: unreferenced alias or let clause Y:
     ./old.cue:9:2
 issue2094: cyclic reference in field alias:
     ./old.cue:9:5
--- out/compile --
-issue2527: cyclic reference in field alias:
-    ./new.cue:6:3
-issue2094: cyclic reference in field alias:
-    ./new.cue:11:3
-issue2094: unreferenced alias or let clause Y:
-    ./new.cue:11:5
-issue2527: cyclic reference in field alias:
-    ./old.cue:4:5
-issue2094: unreferenced alias or let clause Y:
-    ./old.cue:9:2
-issue2094: cyclic reference in field alias:
-    ./old.cue:9:5
---- new.cue
-{
-  issue2527: {
-    〈0;(_|_(cyclic reference in field alias))〉: 3
-  }
-  issue2094: {
-    〈0;("foo")〉: string
-    "foo": "bar"
-  }
-}
---- old.cue
-{
-  issue2527: {
-    〈0;(_|_(cyclic reference in field alias))〉: 3
-  }
-  issue2094: {
-    〈0;("foo")〉: string
-    "foo": "bar"
-  }
-}

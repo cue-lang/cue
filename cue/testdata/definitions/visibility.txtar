@@ -26,17 +26,5 @@ Conjuncts:    10
 Disjuncts:    0
 
 NumCloseIDs: 1
--- out/compile --
---- in.cue
-{
-  #foo: {
-    name: string
-  }
-  foo: (〈0;#foo〉 & {
-    _name: "foo"
-    _#name: "bar"
-    #name: "baz"
-  })
-}
 -- out/diff-v2-v3.txt --
 Reordering: v3 outputs fields in different order than v2 (name appears after hidden fields in v3).

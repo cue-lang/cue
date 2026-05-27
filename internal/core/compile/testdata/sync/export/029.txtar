@@ -1,0 +1,33 @@
+raw: true
+eval: true
+noOpt: true
+#inlinetest:exclude skip — tests export format, not evaluator semantics
+-- in.cue --
+{
+	#And: {
+		#: "Fn::And": [...(3 | #And)]
+	}
+	#Ands: #And & {
+		#: "Fn::And": [_]
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    #And: {
+      #: {
+        "Fn::And": [
+          ...(3|〈3;#And〉),
+        ]
+      }
+    }
+    #Ands: (〈0;#And〉 & {
+      #: {
+        "Fn::And": [
+          _,
+        ]
+      }
+    })
+  }
+}

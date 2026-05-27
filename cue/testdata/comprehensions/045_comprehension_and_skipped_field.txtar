@@ -13,24 +13,6 @@ for key, value in {x: v: 1} {
 	}
 }
 @test(eq, {x: {v: {"1": 2}, _p: 3}})
--- out/compile --
---- in.cue
-{
-  for key, value in {
-    x: {
-      v: 1
-    }
-  } {
-    "\(〈1;key〉)": {
-      v: (*{
-        for pod, _ in 〈3;value〉.v {}
-      }|{
-        "\(〈3;value〉.v)": 2
-      })
-      _p: 3
-    }
-  }
-}
 -- out/eval/stats --
 Leaks:  2
 Freed:  8

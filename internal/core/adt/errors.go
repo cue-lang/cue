@@ -83,11 +83,7 @@ type Bottom struct {
 	Src ast.Node
 	Err errors.Error
 
-	Code ErrorCode
-	// Permanent indicates whether an incomplete error can be
-	// resolved later without making the configuration more specific.
-	// This may happen when an arc isn't fully resolved yet.
-	Permanent    bool
+	Code         ErrorCode
 	HasRecursive bool
 	ChildError   bool // Err is the error of the child
 	NotExists    bool // This error originated from a failed lookup.

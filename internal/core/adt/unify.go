@@ -253,6 +253,12 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		// 	c.CloseInfo.outerID = 0
 		// }
 		c.stats.GenerationMismatch++
+
+		// A different OpContext is finalizing this vertex (e.g.
+		// json.Marshal re-entering via [value.Make] mid-evaluation).
+		// Arc conjunctInfo defIDs belong to the original context, so
+		// the typo check would falsely reject sanctioned fields here.
+		checkTypos = false
 	}
 
 	// Note that the state of a node can be removed before the node is.

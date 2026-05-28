@@ -18,6 +18,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b557478_eecad2f3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-28T12:11:23Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "fc61b929_46b785fc",
+      "revId": "ea5bd0b819541c11b001f83eb0ede1f9582f96c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d702c6f_2f75b07c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-28T12:11:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc61b929_46b785fc",
+      "revId": "ea5bd0b819541c11b001f83eb0ede1f9582f96c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ebd76f24_80df0bea",
@@ -35,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a100798_75fddb3d",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-28T12:11:23Z",
+      "side": 1,
+      "message": "Shortened. Dropped the regression history and the inline-conjunction example; kept the essence of the problem (what the deferment is, and why the node would otherwise stay at _).",
+      "parentUuid": "ebd76f24_80df0bea",
+      "revId": "ea5bd0b819541c11b001f83eb0ede1f9582f96c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3c86049_27550060",
@@ -48,6 +102,24 @@
       "writtenOn": "2026-05-28T10:54:09Z",
       "side": 1,
       "message": "shorten these three inline comments a bit?",
+      "revId": "ea5bd0b819541c11b001f83eb0ede1f9582f96c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a18f3c0a_dc4fd139",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-28T12:11:23Z",
+      "side": 1,
+      "message": "Shortened all three.",
+      "parentUuid": "b3c86049_27550060",
       "revId": "ea5bd0b819541c11b001f83eb0ede1f9582f96c1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,100 @@
+# Commands that rewrite source files in place should not touch a file's
+# modification time when the rewrite produces no change. This matters for
+# build systems and editors that key off mtimes.
+#
+# Each command below is invoked once on input that is already in its
+# canonical form, so the run is effectively a no-op. cue fmt, cue mod tidy,
+# cue mod fix, cue mod edit, and cue mod get already get this right and so
+# the test asserts that the mtime is preserved. cue fix and cue trim
+# currently rewrite the file unconditionally, so the test pins that buggy
+# behavior with ! cmp for now; a follow-up change makes them match cue fmt
+# and flips the assertions.
+#
+# Issue: cue-lang/cue#3884
+
+# cue fmt does not touch already-formatted files.
+mod-time fmt.cue
+cp stdout mod-time-fmt
+exec cue fmt fmt.cue
+mod-time fmt.cue
+cmp stdout mod-time-fmt
+
+# cue mod tidy does not touch an already-tidy module.cue.
+mod-time cue.mod/module.cue
+cp stdout mod-time-modtidy
+exec cue mod tidy
+mod-time cue.mod/module.cue
+cmp stdout mod-time-modtidy
+
+# cue mod fix does not touch a module.cue that is already in the new format.
+mod-time cue.mod/module.cue
+cp stdout mod-time-modfix
+exec cue mod fix
+mod-time cue.mod/module.cue
+cmp stdout mod-time-modfix
+
+# cue mod edit with no edits does not touch module.cue.
+mod-time cue.mod/module.cue
+cp stdout mod-time-modedit
+exec cue mod edit
+mod-time cue.mod/module.cue
+cmp stdout mod-time-modedit
+
+# cue mod get with a dependency already pinned at the requested version
+# does not touch module.cue.
+mod-time cue.mod/module.cue
+cp stdout mod-time-modget
+exec cue mod get foo.org/bar@v1.0.0
+mod-time cue.mod/module.cue
+cmp stdout mod-time-modget
+
+# cue fix rewrites a file with no fixes needed, bumping its mtime.
+mod-time nofix.cue
+cp stdout mod-time-fix
+exec cue fix nofix.cue
+mod-time nofix.cue
+! cmp stdout mod-time-fix
+
+# cue trim rewrites a file with nothing to trim, bumping its mtime.
+mod-time trimmed/x.cue
+cp stdout mod-time-trim
+exec cue trim ./trimmed
+mod-time trimmed/x.cue
+! cmp stdout mod-time-trim
+
+-- fmt.cue --
+package fmt
+
+a: 1
+-- nofix.cue --
+package nofix
+
+x: 1
+-- trimmed/x.cue --
+package trimmed
+
+foo: 1
+-- main.cue --
+package main
+
+import "foo.org/bar"
+
+bar
+-- cue.mod/module.cue --
+module: "test.example@v0"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"foo.org/bar@v1": {
+		v: "v1.0.0"
+	}
+}
+-- _registry/foo.org_bar_v1.0.0/cue.mod/module.cue --
+module: "foo.org/bar@v1"
+language: version: "v0.9.0"
+
+-- _registry/foo.org_bar_v1.0.0/bar.cue --
+package bar
+
+x: 1

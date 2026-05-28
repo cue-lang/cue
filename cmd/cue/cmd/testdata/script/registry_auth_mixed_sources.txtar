@@ -1,15 +1,15 @@
 # Test that credentials are merged across multiple Docker/Podman auth files
 # on disk. $DOCKER_CONFIG/config.json holds credentials for an unrelated host,
 # and the Podman auth file at $XDG_RUNTIME_DIR/containers/auth.json holds the
-# credentials for the target registry. Authentication relies on entries from
-# both files being honored.
+# credentials for the target registry. Entries from both files must be
+# honored for authentication to succeed.
 
 env DOCKER_CONFIG=$WORK/dockerconfig
 env-fill dockerconfig/config.json
 env XDG_RUNTIME_DIR=$WORK/xdgrun
 env-fill xdgrun/containers/auth.json
-! exec cue export .
-stderr 'import failed: cannot find package "example.com/e": cannot fetch example.com/e@v0.0.1: module example.com/e@v0.0.1: 401 Unauthorized: unauthorized: authentication required: no credentials'
+exec cue export .
+cmp stdout expect-stdout
 
 -- dockerconfig/config.json --
 {

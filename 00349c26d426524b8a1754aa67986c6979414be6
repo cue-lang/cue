@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f307faf_386315da",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T08:51:47Z",
+      "side": 0,
+      "message": "not sure what happened here, but now you\u0027re deleting part of a sentence?",
+      "revId": "00349c26d426524b8a1754aa67986c6979414be6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

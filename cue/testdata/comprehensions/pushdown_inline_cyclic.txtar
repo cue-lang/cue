@@ -33,12 +33,4 @@ _fake: x: #Foo & {
 
 export: #Foo & {A: {}, IMP: _fake}
 
-result: export.out @test(eq:todo, ["false"])
-
--- out/errors.txt --
-[incomplete] #Foo.out: cannot range over A (incomplete type _):
-    ./in.cue:12:17
-[incomplete] x.A.obj.n: invalid interpolation: non-concrete value _ (type _):
-    ./in.cue:5:7
-sm: key value of dynamic field must be concrete, found _|_(x.A.obj.n: invalid interpolation: non-concrete value _ (type _)):
-    ./in.cue:13:28
+result: export.out @test(eq, ["false"])

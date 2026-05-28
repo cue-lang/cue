@@ -1,0 +1,87 @@
+# A comprehension whose iterator passes through an inline-conjunction vertex
+# (e.g. `({} & IMP).x.out`) propagated the surrounding context's cyclic
+# flag to innocent pattern-body CallExprs (such as
+# `list.Contains(["sm"], KIND)` whose only resolver argument is a
+# LabelReference). The CallExprs were deferred for cycle-break and never
+# rescheduled because no non-cyclic conjunct arrived on those leaf nodes,
+# leaving `mon` as _ and the dynamic key `(obj.n)` as _|_.
+#
+# Label-only-resolver CallExprs trapped in a cyclic deferment
+# are flushed when the node has no other path to a value.
+-- in.cue --
+import "list"
+
+#NS: [KIND=string]: [string]: {
+	mon: list.Contains(["sm"], KIND)
+	n: "\(mon)"
+}
+
+#Foo: {
+	A:   _
+	IMP: _
+	out: [
+		for _, obj in A
+		for a, _ in (#NS & {sm: (obj.n): {}}).sm {a},
+		for _, obj in ({} & IMP).x.out {obj},
+	]
+}
+
+_fake: x: #Foo & {
+	A: obj: (#NS & {dep: obj: {}}).dep.obj
+	IMP: x: out: []
+}
+
+export: #Foo & {A: {}, IMP: _fake}
+
+result: export.out
+-- out/compile --
+--- in.cue
+{
+  #NS: {
+    [string]: {
+      [string]: {
+        mon: 〈import;list〉.Contains([
+          "sm",
+        ], 〈2;-〉)
+        n: "\(〈0;mon〉)"
+      }
+    }
+  }
+  #Foo: {
+    A: _
+    IMP: _
+    out: [
+      for _, obj in 〈1;A〉 for a, _ in (〈3;#NS〉 & {
+        sm: {
+          〈2;obj〉.n: {}
+        }
+      }).sm {
+        〈1;a〉
+      },
+      for _, obj in ({} & 〈1;IMP〉).x.out {
+        〈1;obj〉
+      },
+    ]
+  }
+  _fake: {
+    x: (〈1;#Foo〉 & {
+      A: {
+        obj: (〈3;#NS〉 & {
+          dep: {
+            obj: {}
+          }
+        }).dep.obj
+      }
+      IMP: {
+        x: {
+          out: []
+        }
+      }
+    })
+  }
+  export: (〈0;#Foo〉 & {
+    A: {}
+    IMP: 〈1;_fake〉
+  })
+  result: 〈0;export〉.out
+}

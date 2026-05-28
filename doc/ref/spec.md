@@ -2067,7 +2067,7 @@ PrimaryExpr =
 	PrimaryExpr Arguments .
 
 Selector       = "." (identifier | simple_string_lit) .
-Index          = "[" Expression "]" .
+Index          = "[" Expression [ "," ] "]" .
 Argument       = Expression .
 Arguments      = "(" [ ( Argument { "," Argument } ) [ "," ] ] ")" .
 ```

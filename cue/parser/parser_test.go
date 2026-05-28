@@ -701,6 +701,18 @@ missing ',' in struct literal (and 1 more errors)`,
 			out: `@experiment(try), {a: {try {x: list[0]?}}}`,
 		},
 		{
+			desc: "index expression with trailing comma",
+			in:   `a: b["x",]`,
+			out:  `a: b["x"]`,
+		},
+		{
+			desc: "index expression with newline before closing bracket",
+			in: `a: b[
+				"x"
+			]`,
+			out: `a: b["x"]`,
+		},
+		{
 			desc:    "multiple else clauses error",
 			version: "v0.16.0",
 			in: `@experiment(try)

@@ -16,6 +16,24 @@
       "message": "not sure what happened here, but now you\u0027re deleting part of a sentence?",
       "revId": "00349c26d426524b8a1754aa67986c6979414be6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a32c5aa_1d21ba49",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1039294
+      },
+      "writtenOn": "2026-05-28T11:07:05Z",
+      "side": 0,
+      "message": "Oops, reverted the change",
+      "parentUuid": "7f307faf_386315da",
+      "revId": "00349c26d426524b8a1754aa67986c6979414be6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4561156f_086589e4",
+        "filename": "cmd/cue/cmd/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T17:25:04Z",
+      "side": 1,
+      "message": "Done. Documented the index-parallel relationship on build.Instance.Files, and simplified the comment in fix.go to point at it.",
+      "parentUuid": "2318b987_cc0ec7e1",
+      "revId": "16548fb266eb83aa1178d3cda6fb06834f3adc8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "150f7002_cf906f86",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-28T17:12:02Z",
       "side": 1,
       "message": "I guess this is potentially racy if the caller is using the same `*build.File` concurrently in several `NewDecoder` calls. Is there any other place where this data structure is mutated? A brief scan of usage doesn\u0027t find any immediately obvious candidates that might be affect. Maybe document that NewDecoder can modify it, as it at first glance looks like a read-only argument?",
+      "revId": "16548fb266eb83aa1178d3cda6fb06834f3adc8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "612ab633_0e079ab7",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T17:25:04Z",
+      "side": 1,
+      "message": "Done. Reworded the NewDecoder doc to call out that f.Source may be set and that f must not be used concurrently.\n\nThere are several other places that mutate build.File.Source (cue/load, cue/inject/embed, internal/lsp/fscache, cmd/cue mod*), but none of them run concurrently with NewDecoder on the same *build.File in current usage. I didn\u0027t try to document the field itself as mutable; that\u0027d be a wider change worth doing separately.",
+      "parentUuid": "150f7002_cf906f86",
       "revId": "16548fb266eb83aa1178d3cda6fb06834f3adc8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

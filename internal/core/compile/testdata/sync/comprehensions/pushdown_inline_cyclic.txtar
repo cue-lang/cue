@@ -33,8 +33,7 @@ _fake: x: #Foo & {
 
 export: #Foo & {A: {}, IMP: _fake}
 
-result: export.out @test(eq:todo, ["false"])
-
+result: export.out @test(eq, ["false"])
 -- out/compile --
 --- in.cue
 {

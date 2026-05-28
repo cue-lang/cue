@@ -116,6 +116,121 @@ func (n *nodeContext) scheduleConjuncts() {
 	}
 }
 
+// flushDeferredCyclicConjuncts schedules any conjuncts that
+// [nodeContext.scheduleConjunct] deferred via the CallExpr-with-resolver-args
+// path, but only when the deferred conjunct cannot itself produce an
+// infinite recursion — namely when every resolver in its argument list is
+// a [LabelReference], which only reads a [Environment.DynamicLabel] from
+// the surrounding pattern match and never re-enters another vertex's
+// evaluation.
+//
+// The deferment is a conservative cycle break that waits for a non-cyclic
+// conjunct to arrive as proof that the node can terminate. When no such
+// conjunct will arrive on a node — e.g. a node whose only conjunct is a
+// single CallExpr from a pattern body that was scheduled in a cyclic
+// context — the deferred conjuncts otherwise sit in
+// [nodeContext.cyclicConjuncts] forever and the node resolves to _.
+//
+// This regressed with dependency-tracking pushdown: when a comprehension
+// on an inline conjunction vertex (e.g. `({} & IMP).x.<comp-field>`)
+// re-evaluates a sibling subtree whose dynamic field reads (`obj.n`)
+// reach pattern-body CallExprs that only read pattern labels (KIND), the
+// surrounding context's cyclic flag is propagated by
+// [OpContext.combineCycleInfo] to those innocent CallExprs and they are
+// deferred forever. Restricting the flush to label-only resolver
+// arguments preserves the cycle break for genuine reference cycles while
+// rescuing this safe class.
+func (n *nodeContext) flushDeferredCyclicConjuncts() {
+	if len(n.cyclicConjuncts) == 0 || len(n.scheduler.tasks) > 0 {
+		return
+	}
+
+	// Suppress further CallExpr deferment on this node while we dispatch
+	// safe entries.  [scheduleConjunct] defers only when both
+	// n.hasNonCycle and n.hasNonCyclic are false, so setting either is
+	// enough; n.hasNonCyclic is the one with no side effects elsewhere.
+	// In combination with passing CycleType=NoCycle to each dispatched
+	// conjunct below, this guarantees the dispatch will not append back
+	// into n.cyclicConjuncts and the in-place compaction below is safe.
+	n.hasNonCyclic = true
+
+	// Two-pointer in-place compaction: walk n.cyclicConjuncts; dispatch
+	// safe entries inline, retain unsafe entries at the front of the
+	// slice.  Allocation-free and tolerant of incidental re-entry — any
+	// new cyclic conjunct appended during a dispatch lands at len(...)
+	// and is processed in the same pass.
+	write := 0
+	for read := 0; read < len(n.cyclicConjuncts); read++ {
+		cc := n.cyclicConjuncts[read]
+		if !isSafeToFlushCyclic(cc.c.Elem()) {
+			if write != read {
+				n.cyclicConjuncts[write] = cc
+			}
+			write++
+			continue
+		}
+		ci := cc.c.CloseInfo
+		ci.CycleType = NoCycle
+		if cc.arc != nil {
+			// Defensive: isSafeToFlushCyclic only returns true for
+			// label-only Evaluator shapes (CallExpr/BinaryExpr/...),
+			// never for the Resolver shape that produces a non-nil
+			// arc, so this branch is unreachable today.  Kept so
+			// future broadenings of the safe set don't silently
+			// skip arc-bearing entries.
+			n.scheduleVertexConjuncts(cc.c, cc.arc, ci)
+		} else {
+			c := cc.c
+			c.CloseInfo = ci
+			n.scheduleConjunct(c, ci)
+		}
+	}
+	n.cyclicConjuncts = n.cyclicConjuncts[:write]
+}
+
+// isSafeToFlushCyclic reports whether a conjunct's expression contains
+// only resolvers that cannot trigger a vertex re-entry — currently just
+// [LabelReference], which reads a label from the surrounding env. Other
+// resolvers (FieldReference, SelectorExpr, etc.) may indirectly re-enter
+// the same vertex being evaluated and so must remain deferred.
+func isSafeToFlushCyclic(x Elem) bool {
+	switch v := x.(type) {
+	case *LabelReference:
+		return true
+	case Value:
+		return true
+	case *BinaryExpr:
+		return isSafeToFlushCyclic(v.X) && isSafeToFlushCyclic(v.Y)
+	case *UnaryExpr:
+		return isSafeToFlushCyclic(v.X)
+	case *CallExpr:
+		for _, a := range v.Args {
+			if !isSafeToFlushCyclic(a) {
+				return false
+			}
+		}
+		return true
+	case *ListLit:
+		for _, e := range v.Elems {
+			if expr, ok := e.(Expr); ok && !isSafeToFlushCyclic(expr) {
+				return false
+			}
+		}
+		return true
+	case *Interpolation:
+		for _, p := range v.Parts {
+			if !isSafeToFlushCyclic(p) {
+				return false
+			}
+		}
+		return true
+	default:
+		// Conservatively assume anything else (Resolver, embeddings,
+		// comprehensions, etc.) may re-enter.
+		return false
+	}
+}
+
 // TODO(evalv3): consider not returning a result at all.
 //
 //	func (v *Vertex) unify@(c *OpContext, needs condition, mode runMode) bool {
@@ -234,6 +349,10 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	v.status = evaluating
 
 	defer n.unmarkDepth(n.markDepth())
+
+	// Recover from over-conservative CallExpr deferment that would otherwise
+	// leave the node's value unresolved.
+	n.flushDeferredCyclicConjuncts()
 
 	n.process(nodeOnlyNeeds, mode)
 

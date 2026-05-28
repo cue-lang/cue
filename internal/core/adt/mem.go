@@ -141,6 +141,14 @@ func (c *OpContext) reclaimTempBuffers(v *Vertex) {
 func (r reclaimer) reclaim(v *Vertex) bool {
 	n := v.state
 	if n != nil {
+		// Skip in-flight nodes (refCount > 0): freeing one mid-unify
+		// would null n.node under a live stack frame. Applies on both
+		// r.guard paths because n.toFree subtrees can carry in-progress
+		// descendants on cyclic inline vertices.
+		if n.refCount > 0 {
+			goto skipRoot
+		}
+
 		for _, v := range n.toFree {
 			r.ctx.reclaimRecursive(v)
 		}
@@ -153,10 +161,6 @@ func (r reclaimer) reclaim(v *Vertex) bool {
 			// of a disjunct it is reclaimed later as part of [freeDisjunct].
 			return false
 		} else {
-			if n.refCount > 0 {
-				goto skipRoot
-			}
-
 			r.reclaimBaseValueBuffers(v)
 
 			if v.Parent != nil && !v.Label.IsLet() {

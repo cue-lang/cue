@@ -1,0 +1,40 @@
+#inlinetest:exclude golden-file pushdown/reclaim regression
+# A vertex actively being unified could be freed by an ancestor's reclaim
+# path when the ancestor reached n.toFree items via reclaimRecursive, which
+# bypassed the refCount > 0 check. Under dependency-tracking pushdown the
+# inline-conjunction iterator `({} & r).e` drags an inline vertex through a
+# cycle (json.Marshal(_in) used by _in itself), so a descendant of that
+# inline vertex was still on the unify stack when reclaim of its ancestor
+# fired. nulling n.node and then panicking at the next n.node access in
+# Vertex.unify. A symptom of the same root cause was a wrong-answer
+# "conflicting values" report in the related cross-package shape.
+#
+# After the fix the in-progress vertex is left alone (refCount > 0), and
+# unify completes normally.
+-- in.cue --
+import "encoding/json"
+
+r: {
+	h: out: ""
+	_in: x: (h & {j: json.Marshal(_in)}).out
+	e: [if _in.x != _|_ {_in.x}]
+}
+
+x: ({} & r).e
+-- out/evalalpha --
+(struct){
+  r: (struct){
+    h: (struct){
+      out: (string){ "" }
+    }
+    _in: (struct){
+      x: (string){ "" }
+    }
+    e: (#list){
+      0: (string){ "" }
+    }
+  }
+  x: (#list){
+    0: (string){ "" }
+  }
+}

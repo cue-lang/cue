@@ -16,6 +16,24 @@
       "message": "We may consider making this a compile-only test, though.",
       "revId": "047c46b8f1bf3fb33e9315219f76c6c7a1301e61",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab3eca05_9abb9c14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-28T09:23:11Z",
+      "side": 1,
+      "message": "Oh, never mind.",
+      "parentUuid": "ff9ce132_3587d2f2",
+      "revId": "047c46b8f1bf3fb33e9315219f76c6c7a1301e61",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

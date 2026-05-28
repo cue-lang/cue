@@ -245,6 +245,10 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 			i.err = err
 			break
 		}
+		// Stash the raw bytes back on the build.File so callers (such as
+		// cue fix or cue trim) can compare a re-formatted file against its
+		// original contents without reading the file from disk again.
+		f.Source = b
 		if cfg.ParseFile == nil {
 			i.file, i.err = parser.ParseFile(path, b, cfg.ParserConfig)
 		} else {

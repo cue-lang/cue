@@ -1,0 +1,55 @@
+# Test that credentials are merged across multiple Docker/Podman auth files
+# on disk. $DOCKER_CONFIG/config.json holds credentials for an unrelated host,
+# and the Podman auth file at $XDG_RUNTIME_DIR/containers/auth.json holds the
+# credentials for the target registry. Authentication relies on entries from
+# both files being honored.
+
+env DOCKER_CONFIG=$WORK/dockerconfig
+env-fill dockerconfig/config.json
+env XDG_RUNTIME_DIR=$WORK/xdgrun
+env-fill xdgrun/containers/auth.json
+! exec cue export .
+stderr 'import failed: cannot find package "example.com/e": cannot fetch example.com/e@v0.0.1: module example.com/e@v0.0.1: 401 Unauthorized: unauthorized: authentication required: no credentials'
+
+-- dockerconfig/config.json --
+{
+	"auths": {
+		"unrelated.example.com": {
+			"username": "someone",
+			"password": "something"
+		}
+	}
+}
+-- xdgrun/containers/auth.json --
+{
+	"auths": {
+		"${DEBUG_REGISTRY_HOST}": {
+			"username": "someone",
+			"password": "something"
+		}
+	}
+}
+-- main.cue --
+package main
+import "example.com/e"
+
+e.foo
+
+-- expect-stdout --
+"ok"
+-- cue.mod/module.cue --
+module: "test.org"
+language: version: "v0.8.0"
+deps: "example.com/e": v: "v0.0.1"
+-- _registry/auth.json --
+{"username": "someone", "password": "something"}
+-- _registry_prefix --
+somewhere/other
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+package e
+
+foo: "ok"

@@ -1,17 +1,21 @@
+# Note that the reported offsets change with Go 1.27 due to GOEXPERIMENT=jsonv2;
+# the new offsets are better, as json v1 was off by one byte.
+# TODO(mvdan): drop the old offsets once we require Go 1.27 or later.
+
 ! exec cue export x1.json
-stderr 'x1*.json:4:3'
+stderr 'x1*.json:4:(3|2)$'
 
 ! exec cue export x2.json
-stderr 'x2.json:1:6'
+stderr 'x2.json:1:(6|5)$'
 
 ! exec cue export x3.json
-stderr 'x3.json:1:1'
+stderr 'x3.json:1:1$'
 
 ! exec cue export x4.json
-stderr 'x4.json:1:1'
+stderr 'x4.json:1:1$'
 
 ! exec cue export x5.jsonl
-stderr 'x5.jsonl:8:12'
+stderr 'x5.jsonl:8:(12|11)$'
 
 -- x1.json --
 {

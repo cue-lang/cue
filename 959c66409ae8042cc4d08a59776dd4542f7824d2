@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aee8bf0f_2e80c4bc",
+        "filename": "cue/testdata/cycle/issue4365.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-28T18:24:32Z",
+      "side": 1,
+      "message": "Shortened to a 4-line header describing the shape; dropped the fixed-behavior description and the field-level \"pre-fix\" comment since `@test(eq, ...)` already pins the expected output.",
+      "parentUuid": "5d42540e_9d17a9c8",
+      "revId": "959c66409ae8042cc4d08a59776dd4542f7824d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd6a4660_d6b58c64",
+        "filename": "cue/testdata/cycle/pushdown_reclaim_inflight.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-28T18:24:32Z",
+      "side": 1,
+      "message": "Cut from 13 lines to 2; dropped the history of the reclaim path and the cross-package symptom, kept only what the shape is.",
+      "parentUuid": "16f8f4b4_620d3acc",
+      "revId": "959c66409ae8042cc4d08a59776dd4542f7824d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

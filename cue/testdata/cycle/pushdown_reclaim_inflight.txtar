@@ -1,0 +1,30 @@
+#inlinetest:exclude golden-file pushdown/reclaim regression
+# Inline-conjunction iterator over a self-referential body
+# (`json.Marshal(_in)` inside `_in`); used to panic during reclaim.
+-- in.cue --
+import "encoding/json"
+
+r: {
+	h: out: ""
+	_in: x: (h & {j: json.Marshal(_in)}).out
+	e: [if _in.x != _|_ {_in.x}]
+}
+
+x: ({} & r).e
+-- out/evalalpha --
+(struct){
+  r: (struct){
+    h: (struct){
+      out: (string){ "" }
+    }
+    _in: (struct){
+      x: (string){ "" }
+    }
+    e: (#list){
+      0: (string){ "" }
+    }
+  }
+  x: (#list){
+    0: (string){ "" }
+  }
+}

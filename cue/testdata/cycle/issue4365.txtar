@@ -1,0 +1,46 @@
+# Cross-package shape where a comprehension iterator passes through an
+# inline conjunction (`({shared: _} & imported)`) and the body cycles
+# through `json.Marshal(this)`.
+#
+# https://cuelang.org/issue/4365
+-- cue.mod/module.cue --
+module: "m.test"
+language: version: "v0.15.0"
+-- main.cue --
+package main
+
+import "m.test/imported"
+
+result: ({shared: _} & imported).export @test(eq, [
+	{name: "foo-", x: [{ref: "foo-"}]},
+	{name: "foo-", x: [{ref: "foo-"}]},
+])
+-- imported/imported.cue --
+package imported
+
+import "encoding/json"
+
+shared: prefix: string | *""
+shared: prefix: "foo-"
+
+#Name: this={
+	name: shared.prefix + (#h & {in: json.Marshal(this)}).out
+	...
+}
+
+#h: {
+	in:  string
+	out: ""
+}
+
+_in: #Name & {x: [{ref: _in.name}]}
+
+_g: {
+	IN: _in
+	OUT: [
+		if IN.x != _|_
+		for _ in IN.x {_in},
+	]
+}
+
+export: [_in, for o in _g.OUT {o}]

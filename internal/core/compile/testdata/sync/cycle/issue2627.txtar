@@ -1,0 +1,102 @@
+# Self-referential expressions broken by a concrete value should resolve,
+# regardless of which builtin sits between the field and its self-reference.
+# Earlier evaluators rejected some such cycles with bogus errors like
+# "cannot add field N: was already used" or "cycle error", even though
+# similar cases with other builtins resolved fine.
+# https://cuelang.org/issue/2627
+-- in.cue --
+import (
+	"list"
+	"math"
+	"encoding/json"
+)
+
+mutualArith: {
+	x: y + 1
+	y: x - 1
+	x: 5
+}
+
+selfArith: {
+	x: x + 1 - 1
+	x: 5
+}
+
+selfMathRound: {
+	x: math.Round(x)
+	x: 5
+}
+
+selfListFlattenN: {
+	x: list.FlattenN(x, -1)
+	x: [1, 2, 3]
+}
+
+selfJSONMarshalUnmarshalScalar: {
+	x: json.Marshal(json.Unmarshal(x))
+	x: "5"
+}
+
+selfJSONMarshalUnmarshalObject: {
+	x: json.Marshal(json.Unmarshal(x))
+	x: #"{"a":5}"#
+}
+
+selfJSONUnmarshalMarshal: {
+	x: json.Unmarshal(json.Marshal(x))
+	x: a: 5
+}
+
+mutualJSON: {
+	x: json.Unmarshal(y)
+	y: json.Marshal(x)
+	y: #"{"a":5}"#
+	x: a: 5
+}
+-- out/compile --
+--- in.cue
+{
+  mutualArith: {
+    x: (〈0;y〉 + 1)
+    y: (〈0;x〉 - 1)
+    x: 5
+  }
+  selfArith: {
+    x: ((〈0;x〉 + 1) - 1)
+    x: 5
+  }
+  selfMathRound: {
+    x: 〈import;math〉.Round(〈0;x〉)
+    x: 5
+  }
+  selfListFlattenN: {
+    x: 〈import;list〉.FlattenN(〈0;x〉, -1)
+    x: [
+      1,
+      2,
+      3,
+    ]
+  }
+  selfJSONMarshalUnmarshalScalar: {
+    x: 〈import;"encoding/json"〉.Marshal(〈import;"encoding/json"〉.Unmarshal(〈0;x〉))
+    x: "5"
+  }
+  selfJSONMarshalUnmarshalObject: {
+    x: 〈import;"encoding/json"〉.Marshal(〈import;"encoding/json"〉.Unmarshal(〈0;x〉))
+    x: "{\"a\":5}"
+  }
+  selfJSONUnmarshalMarshal: {
+    x: 〈import;"encoding/json"〉.Unmarshal(〈import;"encoding/json"〉.Marshal(〈0;x〉))
+    x: {
+      a: 5
+    }
+  }
+  mutualJSON: {
+    x: 〈import;"encoding/json"〉.Unmarshal(〈0;y〉)
+    y: 〈import;"encoding/json"〉.Marshal(〈0;x〉)
+    y: "{\"a\":5}"
+    x: {
+      a: 5
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc61b929_46b785fc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T10:54:09Z",
+      "side": 1,
+      "message": "needs a `Fixes #4364`",
+      "revId": "ea5bd0b819541c11b001f83eb0ede1f9582f96c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebd76f24_80df0bea",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T10:54:09Z",
+      "side": 1,
+      "message": "this godoc needs to be much shorter. it even includes mentions of the historic regression, which don\u0027t belong in the code at all.",
+      "revId": "ea5bd0b819541c11b001f83eb0ede1f9582f96c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3c86049_27550060",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T10:54:09Z",
+      "side": 1,
+      "message": "shorten these three inline comments a bit?",
+      "revId": "ea5bd0b819541c11b001f83eb0ede1f9582f96c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

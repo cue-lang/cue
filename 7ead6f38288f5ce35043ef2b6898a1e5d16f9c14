@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb3e3a6a_a5c7c283",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T10:50:50Z",
+      "side": 1,
+      "message": "needs `Updates #4364`",
+      "revId": "7ead6f38288f5ce35043ef2b6898a1e5d16f9c14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

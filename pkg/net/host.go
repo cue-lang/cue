@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 	"unicode/utf8"
 
 	"golang.org/x/net/idna"
@@ -103,6 +104,8 @@ func FQDN(s string) bool {
 			return false
 		}
 	}
+	// Strip the canonical trailing root dot; idna rejects it under VerifyDNSLength.
+	s = strings.TrimSuffix(s, ".")
 	_, err := idnaProfile.ToASCII(s)
 	return err == nil
 }

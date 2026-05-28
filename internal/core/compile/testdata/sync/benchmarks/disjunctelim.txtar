@@ -13,7 +13,6 @@ pat: {[string]: 1} | {a: 2} // 78  conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 89  conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 100 conjuncts (+11)
 pat: {[string]: 1} | {a: 2} // 111 conjuncts (+11)
-@test(eq, {} | {a: 2}, at=pat)
 
 // This also should grow linearly per repeated line.
 // Indicated
@@ -24,7 +23,6 @@ list: [1] | [2] | [3] | [4] // 118 conjuncts; 52  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 151 conjuncts; 68  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 184 conjuncts; 84  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16)
-@test(eq, [1] | [2] | [3] | [4], at=list)
 
 issue3610: {
 	// Ensure disjuncts are disambiguated. The string field here is a reference
@@ -39,17 +37,6 @@ issue3610: {
 	#a: <"a" | >"b" | string // conjuncts 403  disjuncts 390 (+92; +90)
 	#a: <"a" | >"b" | string // conjuncts 495  disjuncts 480 (+92; +90)
 }
-@test(eq, at=issue3610, {
-	<"a"
-	#a: <"a" | >"b" | string
-} | {
-	>"b"
-	#a: <"a" | >"b" | string
-} | {
-	string
-	#a: <"a" | >"b" | string
-})
-
 -- out/compile --
 --- in.cue
 {

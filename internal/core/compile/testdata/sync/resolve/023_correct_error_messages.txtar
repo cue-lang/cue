@@ -1,6 +1,5 @@
 -- in.cue --
-a: "a" & 1   @test(err, code=eval, contains="conflicting values",
-	args=["a", 1], pos=[0:4, 0:10])
+a: "a" & 1
 -- out/compile --
 --- in.cue
 {

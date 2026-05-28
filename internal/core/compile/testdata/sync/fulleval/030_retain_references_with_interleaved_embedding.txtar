@@ -5,14 +5,11 @@ a: d: {
 	#base
 	#info: {...}
 	Y: #info.X
-} @test(eq, {
-	#info: {X: "foo"}
-	Y: "foo"
-}) @test(closed)
+}
 
 #base: {
-	#info: {...} @test(closed)
-} @test(eq, { #info: {} })
+	#info: {...}
+}
 
 a: [Name=string]: {#info: {
 	X: "foo"

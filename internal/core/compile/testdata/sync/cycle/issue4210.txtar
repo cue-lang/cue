@@ -7,20 +7,16 @@
 -- in.cue --
 t1: {
 	a: b: c: {a}.b
-	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
 }
 t2: {
 	a: b: c: {a & _}.b
-	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
 }
 t3: {
 	a: b: c: d: {a.b}.c
-	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
 }
 t4: {
 	x: y: z: {a}.y
 	a: x
-	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
 }
 -- out/compile --
 --- in.cue

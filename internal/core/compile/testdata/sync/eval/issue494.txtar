@@ -2,18 +2,18 @@
 _Q: [{pos: 0}, {pos: 1}]
 
 a: [rn=string]: _Q[0:len(a[rn])]
-a: ben: [{}] @test(eq, [{pos: 0}])
+a: ben: [{}]
 
 b: [rn=string]: _Q[0:1]
-b: ben: [{}] @test(eq, [{pos: 0}])
+b: ben: [{}]
 
 c: [rn=string]: [...{l: len(a[rn])}]
-c: ben: [{}] @test(eq, [{l: 1}])
+c: ben: [{}]
 
-#d: {[rn=string]: [...{pos: uint}] & _Q[0:len(#d[rn])]} @test(shareID=D)
-#d: ben: [{}] @test(eq, [{pos: 0}])
+#d: {[rn=string]: [...{pos: uint}] & _Q[0:len(#d[rn])]}
+#d: ben: [{}]
 
-d: #d @test(shareID=D)
+d: #d
 -- out/compile --
 --- in.cue
 {

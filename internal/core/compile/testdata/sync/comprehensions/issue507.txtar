@@ -11,22 +11,22 @@ foo: [
 	for e in somelist {
 		"hello foo: \(e)"
 	},
-] @test(eq, [])
+]
 
-otherlist: ["something"] @test(eq, ["something"])
+otherlist: ["something"]
 // Works fine as well
 z: [
 	for e in otherlist {
 		"hello z: \(e)"
 	},
-] @test(eq, ["hello z: something"])
+]
 
 extlist: [...string] | *["something"]
 bar: [
 	for e in extlist {
 		"hello bar: \(e)"
 	},
-] @test(eq, ["hello bar: something"])
+]
 -- out/compile --
 --- in.cue
 {

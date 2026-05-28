@@ -3,63 +3,52 @@ Test various self reference cases.
 @experiment(aliasv2)
 
 // Basic self usage - top level
-a: self.b  @test(eq, "hello")
+a: self.b
 b: "hello"
 
 // Nested self usage - should refer to x struct
 x: {
-    y: self.z
-    z: "world"
-}  @test(eq, {y: "world", z: "world"})
+	y: self.z
+	z: "world"
+}
 
 // Shorthand notation - self should refer to foo struct
-foo: bar: self.baz    @test(eq, "greeting")
-foo: baz: "greeting"  @test(eq, "greeting") // TODO(inline): reference marking does not work with "self"
+foo: bar: self.baz
+foo: baz: "greeting" // TODO(inline): reference marking does not work with "self"
 
 // Multiple levels of nesting
 nested: {
-    level1: {
-        field: self.value
-        value: "level1 value"
-    }
-}  @test(eq, {
 	level1: {
-		field: "level1 value"
+		field: self.value
 		value: "level1 value"
 	}
-})
+}
 
 // Self in list context
 listTest: {
-    items: [1, 2, self[0], self[1]]
-    first: 1
-    second: 2
-}  @test(eq, {
-	items: [1, 2, 1, 2]
-	first: 1
+	items: [1, 2, self[0], self[1]]
+	first:  1
 	second: 2
-})
+}
 
 // Self with computed selectors
 computed: {
-    key: "test"
-    value: self["key"]
-}  @test(eq, {key: "test", value: "test"})
+	key:   "test"
+	value: self["key"]
+}
 
 // Cyclic reference detection
-cycle: self.cycle  @test(eq, _)
-
+cycle: self.cycle
 -- list.cue --
 @experiment(aliasv2)
 import "list"
 
 #IntStrings: {list.Repeat([int, string], div(len(self), 2))}
 listCheck: ok1: #IntStrings
-listCheck: ok1: [1, "foo", 2, "bar"] @test(eq, [1, "foo", 2, "bar"])
+listCheck: ok1: [1, "foo", 2, "bar"]
 
 listCheck: err: #IntStrings
-listCheck: err: [1, "foo", "bar", 2] @test(err, code=eval, path=2, contains="conflicting values %s and %s (mismatched types %s and %s)", args=["bar", int, string, int], pos=[-5:14, -5:15, -5:28, -1:17, 0:28])
-
+listCheck: err: [1, "foo", "bar", 2]
 -- withlet.cue --
 @experiment(aliasv2)
 
@@ -70,33 +59,23 @@ withLet: {
 	bar: {
 		baz: X.foo
 	}
-} @test(eq, {foo: 1, bar: {baz: 1}})
+}
 -- validator.cue --
 @experiment(structcmp)
 @experiment(aliasv2)
 
 validator: {
-	err1: {{{{== (self + 1)}}}}  @test(err, code=eval,
-		contains="invalid value %v (out of bound %s)", args=[2, ==3],
-		pos=[0:12, 0:8, 4:8]
-	)
+	err1: {{{{==(self + 1)}}}}
 	err1: 2
 
-	err2: {== (self + 1)}  @test(err, code=eval,
-		contains="invalid value %v (out of bound %s)", args=[2, ==3],
-		pos=[0:9, 0:8, 4:8]
-	)
+	err2: {==(self + 1)}
 	err2: 2
 }
 
 cyclicErr: {
-	err3: == (self + 1)  @test(err, code=eval,
-		contains="invalid operands %s and %s to '%s' (type %s and %s)",
-		pos=[0:12, -1:12, 0:19]
-	)
+	err3: ==(self + 1)
 	err3: 4
 }
-
 -- experiment_test.cue --
 // Test self usage without experiment enabled (should fail)
 

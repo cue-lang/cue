@@ -11,10 +11,7 @@ out: {
 
 	enable: *true | false
 	if enable {}
-} @test(eq,
-	// TODO: we should be able to use @test(final) here, avoiding the defaults.
-	*{one: 1, enable: *true | false, extra: 1} | {one: 1, enable: *true | false},
-)
+}
 -- out/compile --
 --- in.cue
 {

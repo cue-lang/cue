@@ -16,7 +16,6 @@ Common: {
 x: #A
 x: {
 	c: int
-	@test(eq, {c: int, a: int, b: int})
 }
 
 #B: {
@@ -29,17 +28,15 @@ x: {
 y: #B
 y: {
 	c: int
-	@test(eq, {c: int, a: int})
 }
 -- noclose.cue --
 double: {
 	a: b?: c: d: "c"
 	a: {{
 		b: {{
-				c: e: "member"
+			c: e: "member"
 		}}
 	}}
-	@test(eq, {a: {b: {c: {d: "c", e: "member"}}}})
 }
 doubleAsComprehension: {
 	a: b?: c: d: "c"
@@ -52,7 +49,6 @@ doubleAsComprehension: {
 			}
 		}
 	}
-	@test(eq, {a: {b: {c: {d: "c", e: "member"}}}})
 }
 fieldNotAllowed: {
 	// This was not correctly enforced in evalv2.
@@ -69,7 +65,6 @@ fieldNotAllowed: {
 			#Y
 			objs: name: "Two"
 		}
-		@test(err, at=addTwo.objs.extra, code=eval, contains="field not allowed", pos=[3:5])
 	}
 	t2: {
 		#AddObjsExtra: {
@@ -92,56 +87,30 @@ fieldNotAllowed: {
 				name: "One"
 			}
 		}
-		@test(err, at=#AddTwo.objs.two.labels.app, code=incomplete, contains="undefined field: one", pos=[13:23])
-
-		@test(err, at=#AddTwo.objs.two.extra,        code=eval, contains="field not allowed", pos=[3:5])
-		@test(err, at=#AddTwo.objs.two.extra.unused, code=eval, contains="field not allowed", pos=[3:12])
-		@test(err, at=out.objs.one.extra.unused,     code=eval, contains="field not allowed", pos=[3:12])
-		@test(err, at=out.objs.one.extra,            code=eval, contains="field not allowed", pos=[3:5])
-		@test(err, at=out.objs.one.name,             code=eval, contains="field not allowed", pos=[18:5])
-		@test(err, at=out.objs.two.extra.unused,     code=eval, contains="field not allowed", pos=[3:12])
-
-		// This error is perculated up.
-		@test(err, code=eval,
-			hint="the error chosen here is somewhat arbitrary, okay to ignore as long as the others are good",
-			suberr=(code=eval, path=out.objs.one.name, contains="field not allowed", pos=[18:5]),
-			suberr=(code=eval, path=out.objs.one.extra, contains="field not allowed", pos=[3:5]))
 	}
 	t3: {
 		x: #X
 		#X: y: {
 			z: {
 				a: [string]: string
-				b: E: "1"
+				b: E:        "1"
 			}
 			...
 		}
-
-		@test(shareID=YY, at=#Y)
-		@test(shareID=YY, at=x1.y)
-		x1: y: #Y
+		x1: y:     #Y
 		#Y: port?: string
 
 		x: y: {
 			z: b: E: string
 			port: z.b.E
 			z: a: c?: string
-		} @test(eq, {
-			z: {b: E: "1", a: c?: string}
-			port: "1"
-		})
+		}
 
 		if true {
 			w: x & {
 				y: x1.y
 			}
 		}
-		@test(err, at=w.y.z.b.E, code=eval, contains="field not allowed", pos=[5:8, 16:10])
-		@test(err, at=w.y.z.a,   code=eval, contains="field not allowed", pos=[4:5, 18:7])
-		@test(err, at=w.y.z.b,   code=eval, contains="field not allowed", pos=[5:5, 16:7])
-		@test(err, code=eval,
-			suberr=(code=eval, path=w.y.z.b, contains="field not allowed", pos=[5:5, 16:7]),
-			suberr=(code=eval, path=w.y.z.a, contains="field not allowed", pos=[4:5, 18:7]))
 	}
 }
 closednessInversion: {
@@ -153,15 +122,6 @@ closednessInversion: {
 		base.x
 		a: b: c: "d"
 	}
-	@test(eq, {
-		base: {x: {y: *"default" | string}}
-		#X: {x: {}}
-		#Y: {y: *"default" | string}
-		out: {
-			a: {b: {c: "d"}}
-			y: *"default" | string
-		}
-	})
 }
 -- out/compile --
 --- in.cue

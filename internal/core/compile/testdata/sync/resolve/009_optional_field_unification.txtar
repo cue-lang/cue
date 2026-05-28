@@ -1,14 +1,13 @@
 -- in.cue --
-a: {foo?: string}      @test(eq, {foo?: string})
-b: {foo: "foo"}        @test(eq, {foo: "foo"})
-c: a & b               @test(eq, {foo: "foo"})
-d: a & {"foo"?: "bar"} @test(eq, {foo?: "bar"})
+a: {foo?: string}
+b: {foo: "foo"}
+c: a & b
+d: a & {"foo"?: "bar"}
 
 e: {
-	g1: 1
+	g1:       1
 	"g\(1)"?: 1
 	"g\(2)"?: 2
-	@test(eq, {g1: 1, g2?: 2})
 }
 -- out/compile --
 --- in.cue

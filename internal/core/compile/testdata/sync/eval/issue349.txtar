@@ -5,16 +5,6 @@
 # https://cuelang.org/issue/349
 -- in.cue --
 ex: {
-	@test(eq, {
-		aaa:  "aaa"
-		list: "list"
-		zzz:  "zzz"
-		AAA:  "AAA"
-		html: "html"
-		HTML: "html"
-		ZZZ:  "ZZZ"
-		Html: "html"
-	})
 	"aaa":  "aaa"
 	"list": "list"
 	"zzz":  "zzz"

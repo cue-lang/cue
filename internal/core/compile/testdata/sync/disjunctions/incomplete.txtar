@@ -8,37 +8,26 @@ issue700: {
 	a: y: "y"
 	test1: *a.x | 1
 	test2: *a.y | 1
-	@test(eq, {a: {y: "y"}, test1: 1, test2: *"y" | 1})
 }
 
 lookup: {
 	x: {
 		name: "Hello"
 	}
-	y:        x.a       @test(err, code=incomplete, contains="undefined field: a", pos=[0:14])
-	ok1:      *x.a | x  @test(eq, {name: "Hello"})
-	ok2:      x | *x.a  @test(eq, {name: "Hello"})
-	ok3:      x.a | *x  @test(eq, {name: "Hello"})
-	ok4:      *x | x.a  @test(eq, {name: "Hello"})
-	ok5:      x | x.a   @test(eq)
-	ok5:      x.a | x   @test(eq, {name: "Hello"})
-	allFail1: x.a | x.b @test(err, code=incomplete, contains="2 errors in empty disjunction",
-		suberr=(code=incomplete, contains="undefined field: a", pos=[0:14]),
-		suberr=(code=incomplete, contains="undefined field: b", pos=[0:20]),
-	)
-	allFail2: x.a | x.b @test(err, code=incomplete, contains="2 errors in empty disjunction",
-		suberr=(code=incomplete, contains="undefined field: a", pos=[0:14]),
-		suberr=(code=incomplete, contains="undefined field: b", pos=[0:20]),
-	)
+	y:        x.a
+	ok1:      *x.a | x
+	ok2:      x | *x.a
+	ok3:      x.a | *x
+	ok4:      *x | x.a
+	ok5:      x | x.a
+	ok5:      x.a | x
+	allFail1: x.a | x.b
+	allFail2: x.a | x.b
 }
 
 func: {
 	s:   string
-	ok1: yaml.MarshalStream(s) | yaml.Marshal(s) @test(err, code=incomplete,
-		contains="2 errors in empty disjunction",
-		suberr=(code=incomplete, contains="non-concrete argument 0", pos=[0:7]),
-		suberr=(code=incomplete, contains="non-concrete argument 0", pos=[0:31]),
-	)
+	ok1: yaml.MarshalStream(s) | yaml.Marshal(s)
 }
 
 // Default mark on interpolated string; a concrete override should suppress
@@ -49,37 +38,21 @@ issue782: {
 		inner:         string
 		interpolation: *"\(inner)" | string
 		interpolation: "override"
-		@test(eq, {
-			inner: string
-			interpolation: "override"
-		})
 	}
 	b: {
 		inner:         string
 		interpolation: string | *"\(inner)"
 		interpolation: "override"
-		@test(eq, {
-			inner: string
-			interpolation: "override"
-		})
 	}
 	c: {
 		inner:         string
 		interpolation: "\(inner)" | string
 		interpolation: "override"
-		@test(eq, {
-			inner: string
-			interpolation: "override"
-		})
 	}
 	d: {
 		inner:         string
 		interpolation: string | "\(inner)"
 		interpolation: "override"
-		@test(eq, {
-			inner: string
-			interpolation: "override"
-		})
 	}
 }
 -- issue3680.cue --
@@ -92,15 +65,13 @@ issue3680: t1: {
 		b?: _|_
 	}
 	{} | {}
-	@test(eq, {} | {a?: _|_, b?: _|_})
 }
 issue3680: t2: {
-	x:	{} | {
+	x: {} | {
 		a?: _|_
 		b?: _|_
 	}
-	x:	{} | {}
-	@test(eq, {x: {} | {a?: _|_, b?: _|_}})
+	x: {} | {}
 }
 -- out/compile --
 --- in.cue

@@ -1,8 +1,8 @@
 // TODO(perf): reduce number of Conjunctions
 -- in.cue --
-f1: string @test(eq, string)
-f2: f1
-f3: f2
+f1:    string
+f2:    f1
+f3:    f2
 f4:    f3
 f5:    f4
 f6:    f5
@@ -499,7 +499,7 @@ f496:  f495
 f497:  f496
 f498:  f497
 f499:  f498
-f500:  f499 @test(eq, string)
+f500:  f499
 f501:  f500
 f502:  f501
 f503:  f502
@@ -999,7 +999,7 @@ f996:  f995
 f997:  f996
 f998:  f997
 f999:  f998
-f1000: f999 @test(eq, string)
+f1000: f999
 -- out/compile --
 --- in.cue
 {

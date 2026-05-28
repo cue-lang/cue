@@ -7,10 +7,6 @@ safeCycle: simple2: {
 	y: [string]: b: c: y
 	x: y
 	x: c: y
-	@test(eq, {
-		y: {}
-		x: {c: {b: {c: {}, b: {c: {}}}}}
-	})
 }
 
 // Not a cycle: the structure in x (c) only triggers one further
@@ -19,10 +15,6 @@ safeCycle: long1: {
 	y: [string]: b: y
 	x: y
 	x: c: b: e: b: c: _
-	@test(eq, {
-		y: {}
-		x: {c: {b: {e: {b: {c: {b: {}}}}}}}
-	})
 }
 
 // Not a cycle: the structure in x (c) only triggers one further
@@ -31,10 +23,6 @@ safeCycle: long2: {
 	a: [string]: b: a
 	x: a
 	x: c: b: c: b: c: {}
-	@test(eq, {
-		a: {}
-		x: {c: {b: {c: {b: {c: {b: {}}}}}}}
-	})
 }
 
 // noCyclePattern is similar to the above cases, but involving more patterns
@@ -46,7 +34,6 @@ noCyclePattern: t1: {
 	a: {}
 	[string]: #D
 	[string]: b: c: {}
-	@test(eq, {#D: {}, a: {b: {c: {}}}})
 }
 
 noCyclePattern: t2: {
@@ -54,20 +41,14 @@ noCyclePattern: t2: {
 	a: {}
 	[string]: #D
 	[string]: b: x: c: {}
-	@test(eq, {#D: {}, a: {b: {x: {c: {x: {}}}}}})
 }
 
 noCyclePattern: t3: {
 	_D: [string]: _T
-	_T: x: _D
+	_T: x:        _D
 	[string]: _D
 	[string]: b: x: c: {}
 	a: {}
-	@test(eq, {
-		_D: {}
-		_T: {x: {}}
-		a: {b: {x: {c: {x: {}}}}}
-	})
 }
 
 noCyclePattern: t4: {
@@ -76,11 +57,6 @@ noCyclePattern: t4: {
 	[string]: _D
 	[string]: b: x: {}
 	a: {}
-	@test(eq, {
-		_D: {}
-		_T: {y: {}}
-		a: {b: {x: {y: {}}}}
-	})
 }
 
 noCyclePattern: t5: {
@@ -89,11 +65,6 @@ noCyclePattern: t5: {
 	[string]: _D
 	[string]: b: x: y: c: x: {}
 	a: {}
-	@test(eq, {
-		_D: {}
-		_T: {y: {}}
-		a: {b: {x: {y: {c: {x: {y: {}}}}}}}
-	})
 }
 
 // This example also has an embedding, in which case it should still behave
@@ -104,29 +75,13 @@ noCyclePattern: t6: {
 	#E: t: #T
 
 	#T: {
-		{ object: #S }
+		{object: #S}
 	}
 
-	#S: y: #D
+	#S: y:       #D
 	[string]: x: #D
-	[string]: x: r: t: object: y: foo: t: object: {
-	}
+	[string]: x: r: t: object: y: foo: t: object: {}
 	bar: {}
-	@test(eq, {
-		#D: {}
-		#E: {t: {object: {y: {}}}}
-		#T: {object: {y: {}}}
-		#S: {y: {}}
-		bar: {
-			x: {
-				r: {
-					t: {
-						object: {y: {foo: {t: {object: {y: {}}}}}}
-					}
-				}
-			}
-		}
-	})
 }
 
 // Cycle: x cyclic. The pattern constraint should not be seen as
@@ -134,10 +89,8 @@ noCyclePattern: t6: {
 noCancelSelfInvoke: t1: {
 	y: [string]: b: y
 	x: y
-	x: c: x @test(err, at=b.b, code=structural_cycle) @test(err, at=c, code=structural_cycle)
-	@test(err, code=structural_cycle)
+	x: c: x
 }
-
 
 // Even though these cycles cross pattern boundaries, they are still structural
 // cycles as the reference includes a field that triggers the pattern.
@@ -147,11 +100,11 @@ selfTriggerCycle: _
 // However, upon investigation this error is present in the tree. Either way,
 // the error only needs to be reported once, so this is not a huge problem.
 selfTriggerCycle: t1: {
-	a: #T @test(shareID=T)
+	a: #T
 	#T: {
 		[string]: #T
-		b: {} @test(err, at=b, code=structural_cycle)
-	} @test(shareID=T)
+		b: {}
+	}
 }
 
 selfTriggerCycle: t2: {
@@ -159,16 +112,15 @@ selfTriggerCycle: t2: {
 		a: X
 	}
 	b: #T
-	b: c: {} @test(err, at=a, code=structural_cycle)
+	b: c: {}
 }
 
 selfTriggerCycle: long1: {
 	// The long string of nested fields will initially exempt the structural
 	// cycle, but they will eventually run out, causing the cycle to be
 	// triggered.
-	a: [string]: b: a     // -> record conjunct from pattern per field.
-	a: c: b: c: b: c: {}  // -> track if any of the fields is not a cycle.
-	@test(err, at=a.c.b.c.b.c.b, code=structural_cycle)
+	a: [string]: b: a // -> record conjunct from pattern per field.
+	a: c: b: c: b: c: {} // -> track if any of the fields is not a cycle.
 }
 
 // TODO: see comment at selfTriggerCycle.t1
@@ -180,10 +132,6 @@ selfTriggerCycle: issue1503: {
 		a: [string]: link: #T
 		a: b: {}
 	}
-	@test(err, at=#T.a.b.link, code=structural_cycle)
-	@test(err, at=a.a.b.link, code=structural_cycle)
-	@test(err, at=a.a.one.link.a.b.link, code=structural_cycle)
-	@test(err, at=a.a.one.link.a.two.link, code=structural_cycle)
 }
 
 mutuallyTriggeringCycle: t1: {
@@ -193,7 +141,6 @@ mutuallyTriggeringCycle: t1: {
 	y: [string]: b: y
 	x: y
 	x: c: y
-	@test(err, at=x.c.b.b.b.b.b, code=structural_cycle)
 }
 -- ring.cue --
 brokenRing: t1: {
@@ -203,48 +150,29 @@ brokenRing: t1: {
 	// TODO: it would be nicer, though, if the representation were consistent.
 	p1: {
 		D: a?: T
-		T: b: D
-		@test(err, code=structural_cycle)
-	 	// @test(debug)
+		T: b:  D
 	}
 	p2: {
 		// TODO(eval): fix permute or eval: error messages differ based on path in the two cases.
 		// @test(permute, count=2)
-		T: b: D
+		T: b:  D
 		D: a?: T
-		@test(eq, {
-			T: {
-				b: {
-					a?: _|_ @test(err, code=structural_cycle, contains="structural cycle", pos=[])
-				}
-			}
-			D: {
-				a?: _|_ @test(err, code=structural_cycle, contains="structural cycle", pos=[])
-			}
-		})
 	}
 }
 
 brokenRing: t2: p1: {
 	D: [string]: T
-	T: b: D
-	@test(eq, {D: {}, T: {b: {}}})
+	T: b:        D
 }
 
 brokenRing: t2: p2: {
-	T: b: D
+	T: b:        D
 	D: [string]: T
-	@test(eq, {T: {b: {}}, D: {}})
 }
 
 cyclicRing: t1: {
 	D: a: T
 	T: b: D
-	@test(err, at=T.b, code=structural_cycle)
-	@test(err, at=D.a.b, code=structural_cycle)
-	// TODO(inline): fix shareID here.
-	// @test(shareID=T, at=D.a)
-	// @test(shareID=T, at=T)
 }
 -- issue3476.cue --
 // `cue def -e '#a'` causes a stack overflow. The definition #a selects a
@@ -253,12 +181,11 @@ cyclicRing: t1: {
 // exporter to recurse infinitely instead of detecting the cycle.
 // https://cuelang.org/issue/3476
 issue3476: {
-	#a:  (#b & {x: _}).x
+	#a: (#b & {x: _}).x
 	#b: {
 		x?: #c
 		#c: [string]: #c
 	}
-	@test(eq, {#a: {}, #b: {x?: {}, #c: {}}})
 }
 -- issue3509.cue --
 // evalv3 causes infinite work and OOM panic where evalv2 is fast. A
@@ -277,16 +204,6 @@ issue3509: {
 		#matrixConfig: [...#matrixConfig] | string
 		matrix?: [string]: [...#matrixConfig]
 	}
-
-	@test(eq, {
-		out: "foo"
-		#job: {step: string}
-		#Workflow: {
-			job: {step: string}
-			#matrixConfig: [] | string
-			matrix?: {}
-		}
-	})
 }
 -- out/compile --
 --- in.cue

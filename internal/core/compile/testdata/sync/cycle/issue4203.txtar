@@ -26,29 +26,6 @@ if true {
 
 	output: _input[0].variable
 }
-@test(eq, {
-	_listBuilder: {
-		kind: "kind1"
-		_deps: []
-		_kindJoin: {_objs: [], _out: ""}
-		_depKinds: ""
-		variable: "{}"
-	}
-	output: "{kind1}"
-	_input: [{
-		_deps: [{
-			kind: "kind1"
-			_deps: []
-			_kindJoin: {_objs: [], _out: ""}
-			_depKinds: ""
-			variable: "{}"
-		}]
-		kind: "kind1"
-		_kindJoin: {_objs: [], _out: ""}
-		_depKinds: "kind1"
-		variable: "{kind1}"
-	}]
-})
 -- out/compile --
 --- in.cue
 {

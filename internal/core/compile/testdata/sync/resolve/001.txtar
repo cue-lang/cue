@@ -1,7 +1,7 @@
 -- in.cue --
-a: b.c.d        @test(eq, 3)
+a: b.c.d
 b: {c: {d: 3}}
-c: {c: d.d}     @test(eq, {c: 2})
+c: {c: d.d}
 d: {d: 2}
 -- out/compile --
 --- in.cue

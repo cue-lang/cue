@@ -13,7 +13,7 @@ Foo: {
 }
 
 Junk: {
-	b: 2 @test(eq, 2)
+	b: 2
 }
 
 Foo & {
@@ -23,14 +23,6 @@ Foo & {
 		}
 	}]
 }
-@test(eq, {
-	Foo: listOfCloseds: []
-	#Closed: a: int | *0
-	Junk: b: 2
-	listOfCloseds: _|_ @test(err, at=0.b, code=eval,
-		hint="considerably more positions could be useful",
-		contains="field not allowed", pos=[16:4])
-})
 -- out/compile --
 --- in.cue
 {

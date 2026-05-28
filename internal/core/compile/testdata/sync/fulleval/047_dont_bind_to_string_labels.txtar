@@ -1,9 +1,8 @@
 -- in.cue --
-
 x: 1
 y: {
 	"x": 2
-	z:   x @test(eq, 1)
+	z:   x
 }
 -- out/compile --
 --- in.cue

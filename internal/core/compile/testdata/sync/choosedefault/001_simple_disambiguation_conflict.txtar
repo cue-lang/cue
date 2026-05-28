@@ -1,7 +1,7 @@
 -- in.cue --
-a: *"a" | "b" @test(eq, *"a" | "b")
-b: *"b" | "a" @test(eq, *"b" | "a")
-c: a & b      @test(eq, "a" | "b")
+a: *"a" | "b"
+b: *"b" | "a"
+c: a & b
 -- out/compile --
 --- in.cue
 {

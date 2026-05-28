@@ -5,8 +5,7 @@
 -- in.cue --
 reduced: {
 	A: b: (A.c & {}).x
-	A: null | { c: x: 1 }
-	@test(eq, {A: {b: 1, c: {x: 1}}})
+	A: null | {c: x: 1}
 }
 
 full: {
@@ -26,16 +25,6 @@ full: {
 			with?: [string]: string
 		}
 	}
-	@test(eq, {
-		out: {
-			uses: "actions/upload-artifact@v3"
-			with: {name: "foo", path: "bar"}
-		}
-		#Workflow: {
-			#Step: {uses?: string, with?: {}}
-			steps: {}
-		}
-	})
 }
 -- out/compile --
 --- in.cue

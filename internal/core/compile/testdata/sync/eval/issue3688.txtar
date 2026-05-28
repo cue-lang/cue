@@ -30,23 +30,17 @@ examples: [string]: {
 
 examples: eg1: {
 	in: "test"
-	@test(eq, {in: "test", res: "test"})
 }
 examples: eg2: {
 	in: {
 		foo: 5
 	}
-	@test(eq, {in: {foo: 5}, res: "foo"})
 }
 examples: eg3: {
 	in: {
 		foo: 5
 		bar: "test"
 	}
-	@test(eq, {
-		in: {foo: 5, bar: "test"}
-		res: "impossible"
-	})
 }
 -- out/compile --
 --- x.cue

@@ -8,33 +8,31 @@ issue3330: {
 
 		// Reference to empty is within the definition that defines it. Closedness
 		// thus does not trigger.
-		field: null | { n: int }
-		field: empty & { n: 3 }
-	} @test(eq, {field: {n: 3}}) @test(shareID=A)
+		field: null | {n: int}
+		field: empty & {n: 3}
+	}
 
-	out: list.Concat([[#A]]) @test(eq, [{field: {n: 3}}]) @test(shareID=A, at=0)
+	out: list.Concat([[#A]])
 }
 
 // eliminated: ensures a definition used only for the empty struct triggers the
 // disjunct-elimination code path that caused the original panic in issue3330.
 eliminated: {
 	#empty: {}
-	x: null | { n: 3 }
-	x: #empty & { n: 3 } @test(err, code=eval, contains="empty disjunction",
-		suberr=(pos=[-1:5, 0:5, 0:14], contains="conflicting values", args=[struct, null]),
-		suberr=(pos=[-1:14, 0:16], contains="not allowed"))
-	out: len(x) @test(err, code=eval)
+	x: null | {n: 3}
+	x: #empty & {n: 3}
+	out: len(x)
 }
 
 // simplified: different take showing the bug is triggered after a definition
 // is referenced.
 simplified: {
 	#struct: {
-		field: { n: 3 } & g
+		field: {n: 3} & g
 		g: {}
-	} @test(eq, {field: {n: 3}, g: {}})
+	}
 
-	out: #struct & {} @test(eq, {field: {n: 3}, g: {}})
+	out: #struct & {}
 }
 -- out/compile --
 --- in.cue

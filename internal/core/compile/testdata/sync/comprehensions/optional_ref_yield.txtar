@@ -27,7 +27,7 @@ optionalUpgradesViaSiblingComp: {
 			foo: 5
 		}
 	}
-	x: bar: int @test(eq, 5)
+	x: bar: int
 }
 
 // Test B: a self-reference to an optional field that stays optional
@@ -38,7 +38,7 @@ optionalStaysOptional: {
 		bar:  x.foo
 		foo?: int
 	}
-	x: bar: _ @test(err, code=incomplete, contains="cannot reference optional field")
+	x: bar: _
 }
 
 // Test C: regression for the original ArcPending case — a self-reference
@@ -51,7 +51,7 @@ pendingBecomesMember: {
 			foo: 5
 		}
 	}
-	x: bar: int @test(eq, 5)
+	x: bar: int
 }
 -- out/compile --
 --- in.cue

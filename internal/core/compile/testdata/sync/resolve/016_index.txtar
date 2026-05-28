@@ -1,25 +1,25 @@
 -- in.cue --
-a: [2][0]               @test(eq, 2)
-b: {foo: "bar"}["foo"]  @test(eq, "bar")
-c: (*l | {"3": 3})["3"] @test(err, code=eval, contains="undefined field", pos=[0:20])
-d: (*[] | [1])[0]       @test(err, code=eval, contains="index out of range [0]", pos=[0:16])
-l: []                   @test(eq, [])
+a: [2][0]
+b: {foo: "bar"}["foo"]
+c: (*l | {"3": 3})["3"]
+d: (*[] | [1])[0]
+l: []
 
-e1: [2][""]       @test(err, code=eval, contains="undefined field", pos=[0:9])
-e2: 2[2]          @test(err, code=eval, contains="invalid operand 2", pos=[0:5])
-e3: [][true]      @test(err, code=eval, contains="invalid index true", pos=[0:5, 0:8])
-e4: [1, 2, 3][3]  @test(err, code=eval, contains="index out of range [3]", pos=[0:15])
-e5: [1, 2, 3][-1] @test(err, code=eval, contains="invalid index -1", pos=[0:5, 0:15])
-e6: (*[] | {})[1] @test(err, code=eval, contains="index out of range [1]", pos=[0:16])
-e7: [1, 2, 3][3]  @test(err, code=eval, contains="index out of range [3]", pos=[0:15])
-e8: [1, 2, 3][-1] @test(err, code=eval, contains="invalid index -1", pos=[0:5, 0:15])
-e9: (*[] | {})[1] @test(err, code=eval, contains="index out of range [1]", pos=[0:16])
+e1: [2][""]
+e2: 2[2]
+e3: [][true]
+e4: [1, 2, 3][3]
+e5: [1, 2, 3][-1]
+e6: (*[] | {})[1]
+e7: [1, 2, 3][3]
+e8: [1, 2, 3][-1]
+e9: (*[] | {})[1]
 
 def: {
 	a:  1
 	#b: 3
-} @test(eq, {a: 1, #b: 3})
-e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:10])
+}
+e10: def["b"]
 -- out/compile --
 --- in.cue
 {

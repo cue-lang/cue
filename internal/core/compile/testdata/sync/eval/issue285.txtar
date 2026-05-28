@@ -12,13 +12,9 @@
 
 #Mid: #TopLevel & {
 	myoutput: path: "/output"
-} @test(closed) @test(eq, {
-	myoutput: {path: "/output", content: string}
-})
+}
 
-val: #Mid & {} & {myoutput: {content: "foo"}} @test(closed) @test(eq, {
-	myoutput: {content: "foo", path: "/output"}
-}) // Should work.
+val: #Mid & {} & {myoutput: {content: "foo"}} // Should work.
 -- out/compile --
 --- in.cue
 {

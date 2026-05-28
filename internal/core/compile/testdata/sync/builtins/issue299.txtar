@@ -6,7 +6,7 @@ import "list"
 
 x: list.UniqueItems
 x: [string, ...string]
-x: ["x", "x"] @test(err, code=eval, contains="does not satisfy list.UniqueItems", pos=[-2:4, -1:4, 0:4])
+x: ["x", "x"]
 -- out/compile --
 --- in.cue
 {

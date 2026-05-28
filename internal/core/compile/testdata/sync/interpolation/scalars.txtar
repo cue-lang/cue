@@ -1,23 +1,23 @@
 -- in.cue --
-bool1: "1+1=2:  \(true)" @test(eq, "1+1=2:  true")
 bool1: "1+1=2:  \(true)"
-bool2: "1+1=1:  \(false)" @test(eq, "1+1=1:  false")
+bool1: "1+1=2:  \(true)"
+bool2: "1+1=1:  \(false)"
 
 // one replacement character
-b1:      'a\xED\x95a'   @test(eq, 'a\xed\x95a')
-bytes1s: "\(b1)"        @test(eq, "a\uFFFDa")
-bytes1b: '\(b1)'        @test(eq, 'a\xed\x95a')
+b1:      'a\xED\x95a'
+bytes1s: "\(b1)"
+bytes1b: '\(b1)'
 
 // two replacement characters
-b2:      'a\x80\x95a'   @test(eq, 'a\x80\x95a')
-bytes2s: "\(b2)" @test(eq, "a�a")
-bytes2b: '\(b2)'        @test(eq, 'a\x80\x95a')
+b2:      'a\x80\x95a'
+bytes2s: "\(b2)"
+bytes2b: '\(b2)'
 
 // preserve precision
-n1: "\(1) \(2.00)"      @test(eq, "1 2.00")
+n1: "\(1) \(2.00)"
 
 // but normalize representation
-n2: "\(1e2)"            @test(eq, "1E+2")
+n2: "\(1e2)"
 -- out/compile --
 --- in.cue
 {

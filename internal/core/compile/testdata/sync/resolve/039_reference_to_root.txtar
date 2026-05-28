@@ -1,23 +1,20 @@
 -- in.cue --
-a: {b: int}   @test(eq, {b: int})
+a: {b: int}
 c: a & {
 	b: 100
 	d: a.b + 3 // do not resolve as c != a.
-} @test(eq, {b: 100, d: _|_ @test(err,
-	code=incomplete, contains="non-concrete value int in operand to +", pos=[4:5, 1:8])})
+}
 x: {
 	b: int
-	c: b + 5   @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[0:5, -1:5])
-	@test(eq, {b: int, c: _|_})
+	c: b + 5
 }
-y: x & {b: 100}   @test(eq, {b: 100, c: 105}) // c should resolve to 105
+y: x & {b: 100} // c should resolve to 105
 v: {
 	b: int
-	c: v.b + 5   @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[0:5, -1:5]) // reference starting from copied node.
-	@test(eq, {b: int, c: _|_})
+	c: v.b + 5 // reference starting from copied node.
 }
-w:  v & {b: 100}   @test(eq, {b: 100, c: _|_})
-wp: v & {b: 100}   @test(eq, {b: 100, c: _|_})
+w: v & {b: 100}
+wp: v & {b: 100}
 -- out/compile --
 --- in.cue
 {

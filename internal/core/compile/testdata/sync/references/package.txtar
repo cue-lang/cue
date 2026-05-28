@@ -11,10 +11,6 @@ import (
 a: 1
 
 incomplete: pkg.Settings
-@test(eq, {
-	a: 1
-	incomplete: {}
-})
 -- cue.mod/pkg/foo.com/example/example.cue --
 package example
 

@@ -1,67 +1,67 @@
 -- in.cue --
-eq0: [] == []           @test(eq, true)
-eq1: [...] == []        @test(eq, true)
-eq2: [] == [...]        @test(eq, true)
-eq3: [...] == [...]     @test(eq, true)
+eq0: [] == []
+eq1: [...] == []
+eq2: [] == [...]
+eq3: [...] == [...]
 
-eq4: [1] == [1]           @test(eq, true)
-eq5: [1, ...] == [1]      @test(eq, true)
-eq6: [1] == [1, ...]      @test(eq, true)
-eq7: [1, ...] == [1, ...] @test(eq, true)
+eq4: [1] == [1]
+eq5: [1, ...] == [1]
+eq6: [1] == [1, ...]
+eq7: [1, ...] == [1, ...]
 
-eq8:  [1, 2] == [1, 2]           @test(eq, true)
-eq9:  [1, 2, ...] == [1, 2]      @test(eq, true)
-eq10: [1, 2] == [1, 2, ...]      @test(eq, true)
-eq11: [1, 2, ...] == [1, 2, ...] @test(eq, true)
+eq8: [1, 2] == [1, 2]
+eq9: [1, 2, ...] == [1, 2]
+eq10: [1, 2] == [1, 2, ...]
+eq11: [1, 2, ...] == [1, 2, ...]
 
-ne0: [] != []           @test(eq, false)
-ne1: [...] != []        @test(eq, false)
-ne2: [] != [...]        @test(eq, false)
-ne3: [...] != [...]     @test(eq, false)
+ne0: [] != []
+ne1: [...] != []
+ne2: [] != [...]
+ne3: [...] != [...]
 
-ne4: [1] != [1]           @test(eq, false)
-ne5: [1, ...] != [1]      @test(eq, false)
-ne6: [1] != [1, ...]      @test(eq, false)
-ne7: [1, ...] != [1, ...] @test(eq, false)
+ne4: [1] != [1]
+ne5: [1, ...] != [1]
+ne6: [1] != [1, ...]
+ne7: [1, ...] != [1, ...]
 
-ne8:  [1, 2] != [1, 2]           @test(eq, false)
-ne9:  [1, 2, ...] != [1, 2]      @test(eq, false)
-ne10: [1, 2] != [1, 2, ...]      @test(eq, false)
-ne11: [1, 2, ...] != [1, 2, ...] @test(eq, false)
+ne8: [1, 2] != [1, 2]
+ne9: [1, 2, ...] != [1, 2]
+ne10: [1, 2] != [1, 2, ...]
+ne11: [1, 2, ...] != [1, 2, ...]
 
-feq0: [] == [1]          @test(eq, false)
-feq1: [...] == [1]       @test(eq, false)
-feq2: [] == [1, ...]     @test(eq, false)
-feq3: [...] == [1, ...]  @test(eq, false)
+feq0: [] == [1]
+feq1: [...] == [1]
+feq2: [] == [1, ...]
+feq3: [...] == [1, ...]
 
-feq4: [1] == []         @test(eq, false)
-feq5: [1, ...] == []    @test(eq, false)
-feq6: [1] == [...]      @test(eq, false)
-feq7: [1, ...] == [...] @test(eq, false)
+feq4: [1] == []
+feq5: [1, ...] == []
+feq6: [1] == [...]
+feq7: [1, ...] == [...]
 
-feq8:  [1, 2] == [1]           @test(eq, false)
-feq9:  [1, ...] == [1, 2]      @test(eq, false)
-feq10: [1, 2] == [1, ...]      @test(eq, false)
-feq11: [1, ...] == [1, 2, ...] @test(eq, false)
+feq8: [1, 2] == [1]
+feq9: [1, ...] == [1, 2]
+feq10: [1, 2] == [1, ...]
+feq11: [1, ...] == [1, 2, ...]
 
-fne0: [] != [1]            @test(eq, true)
-fne1: [...] != [1]         @test(eq, true)
-fne2: [] != [1, ...]       @test(eq, true)
-fne3: [1, ...] != [1, ...] @test(eq, false)
+fne0: [] != [1]
+fne1: [...] != [1]
+fne2: [] != [1, ...]
+fne3: [1, ...] != [1, ...]
 
-fne4: [1] != []         @test(eq, true)
-fne5: [1, ...] != []    @test(eq, true)
-fne6: [1] != [...]      @test(eq, true)
-fne7: [1, ...] != [...] @test(eq, true)
+fne4: [1] != []
+fne5: [1, ...] != []
+fne6: [1] != [...]
+fne7: [1, ...] != [...]
 
-fne8:  [1, 2] != [1]           @test(eq, true)
-fne9:  [1, ...] != [1, 2]      @test(eq, true)
-fne10: [1, 2] != [1, ...]      @test(eq, true)
-fne11: [1, ...] != [1, 2, ...] @test(eq, true)
+fne8: [1, 2] != [1]
+fne9: [1, ...] != [1, 2]
+fne10: [1, 2] != [1, ...]
+fne11: [1, ...] != [1, 2, ...]
 
-eqIncomplete1: [1] == [string]  @test(err, code=incomplete, contains="invalid right-hand value to '=='", pos=[0:16])
+eqIncomplete1: [1] == [string]
 
-neIncomplete1: [1] != [string]  @test(err, code=incomplete, contains="invalid right-hand value to '!='", pos=[0:16])
+neIncomplete1: [1] != [string]
 -- out/compile --
 --- in.cue
 {

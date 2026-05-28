@@ -4,39 +4,32 @@
 // direct
 a: [X=string]: X
 a: bar:        _
-@test(eq, {bar: "bar"}, at=a)
 
 // in struct
 b: [X=string]: {X}
 b: bar: _
-@test(eq, {bar: "bar"}, at=b)
 
 // in structs
 c: [X=string]: X
 c: [Y=string]: {{{Y}}}
 c: bar: _
-@test(eq, {bar: "bar"}, at=c)
 
 // in sub field
 d: [X=string]: name: X
 d: bar: {}
-@test(eq, {bar: {name: "bar"}}, at=d)
 
 // nested
 e: [X=string]: [Y=string]: X + Y
 e: foo: bar:               _
-@test(eq, {foo: {bar: "foobar"}}, at=e)
 
 patternField: t1: {
 	r=[string]: {b: r | null}
 	a: {r: 0}
-	@test(eq, {a: {r: 0, b: null}})
 }
 
 patternField: t2: {
 	a: {r: 0}
 	x=[string]: {z: 1, b: x.z}
-	@test(eq, {a: {r: 0, z: 1, b: 1}})
 }
 
 // Field aliases
@@ -46,13 +39,6 @@ f1: C="foo\(bar)": {
 	name: "xx"
 	foo:  C.name
 }
-@test(eq, {
-	foo3: {
-		name: "xx"
-		foo: "xx"
-		foo3baz: {name: "xx", a: "xx", b: "xx"}
-	}
-}, at=f1)
 
 // nested
 f1: D="foo\(bar)": E="foo\(bar)baz": {
@@ -68,13 +54,10 @@ c1: C="foo\(bar)": [D=string]: {
 	foo:  C.x.name
 }
 c1: foo3: x: _
-@test(eq, {foo3: {x: {name: "x", foo: "x"}}}, at=c1)
-
 
 emptyLabel: {
 	"": 1
 	a:  emptyLabel[""]
-	@test(eq, {"": 1, a: 1})
 }
 
 underscore: a: {
@@ -82,27 +65,23 @@ underscore: a: {
 	foo: #Foo
 	foo: "_":     "bar"
 	#Foo: [=~""]: string
-	@test(eq, {foo: {"_": "bar"}, #Foo: {}})
 }
 
 underscore: c: {
 	foo: "_":    "any"
 	foo: [=~""]: string
-	@test(eq, {foo: {"_": "any"}})
 }
 
 underscore: d: {
 	bar: "_":       "any"
 	#bar: [string]: string
 	bar: #bar
-	@test(eq, {bar: {"_": "any"}, #bar: {}})
 }
 
 underscore: e: {
 	baz: "_h":     "any"
 	#baz: [=~"_"]: string
 	baz: #baz
-	@test(eq, {baz: {"_h": "any"}, #baz: {}})
 }
 
 // TODO: support. Also not yet supported in old implementation.
@@ -116,8 +95,7 @@ underscore: e: {
 
 invalidPattern: {
 	[=~"BAD)" & =~"x"]: string
-	y: 123
-	@test(err, code=eval, contains="invalid regexp", pos=[1:22])
+	y:                  123
 }
 -- out/compile --
 --- in.cue

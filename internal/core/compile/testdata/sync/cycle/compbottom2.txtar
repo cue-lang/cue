@@ -7,30 +7,26 @@ self: {
 			if a.b == _|_ {
 				b: 1
 			}
-			@test(err, code=incomplete|cycle)
 		}
 	}
 
 	// This is an incomplete error, as it may succeed when the user
 	// explicitly specifies a value for a.b.
-	isConcreteFail: t1:{
+	isConcreteFail: t1: {
 		a: {
 			if a.b == _|_ {
 				b: 1
 			}
 			b: int
-			@test(eq, {b: 1})
 		}
 	}
 
-	isConcreteFail: t2:{
+	isConcreteFail: t2: {
 		a: {
 			if a.b == _|_ {
 				b: 1
 			}
 			b?: int
-			@test(err, code=cycle,
-				contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[a.b], pos=[1:7])
 		}
 	}
 
@@ -46,7 +42,6 @@ self: {
 				b: 1
 			}
 			b: int
-			@test(eq, {b: int})
 		}
 	}
 	isNotConcrete: t2: {
@@ -55,60 +50,49 @@ self: {
 				b: 1
 			}
 			b?: int
-			@test(eq, {b?: int})
 		}
 	}
 
 }
-
 -- mutual.cue --
 mutual: {
 	noConflicts: {
 		a: {if b.foo == _|_ {new: ""}}
 		b: {if a.bar == _|_ {new: ""}}
-		@test(eq, {a: {new: ""}, b: {new: ""}})
 	}
 
 	mutualCycleFail: {
 		b: {
 			if a.bar == _|_ {foo: ""}
-			@test(err, code=incomplete|cycle)
 		}
 		a: {
 			if b.foo == _|_ {bar: ""}
-			@test(err, code=incomplete|cycle)
 		}
 	}
 
 	brokenCycleSuccess: {
-		a: { if b.foo == _|_ { foo: "" } }
-		b: { if a.bar == _|_ { bar: "" } }
+		a: {if b.foo == _|_ {foo: ""}}
+		b: {if a.bar == _|_ {bar: ""}}
 		a: bar: ""
-		@test(eq, {a: {foo: "", bar: ""}, b: {}})
 	}
 
 	allowOneDirectionalDependency: {
 		p1: {
-			a: { if b.foo == _|_ { bar: "" } } // added
-			b: { if a.bar == _|_ { new: "" } } // not added
-			@test(eq, {a: {bar: ""}, b: {}})
+			a: {if b.foo == _|_ {bar: ""}} // added
+			b: {if a.bar == _|_ {new: ""}} // not added
 		}
 		p2: {
-			a: { if b.foo == _|_ { new: "" } }
-			b: { if a.bar == _|_ { foo: "" } }
-			@test(eq, {a: {}, b: {foo: ""}})
+			a: {if b.foo == _|_ {new: ""}}
+			b: {if a.bar == _|_ {foo: ""}}
 		}
 	}
 
 	oneDirectionalBrokenConflictSuccess: {
-		@test(permute, count=6)
 		b: foo: ""
-		a: { if b.foo == _|_ { bar: "" } }
-		b: { if a.bar == _|_ { new: "" } }
-		@test(eq, {b: {foo: "", new: ""}, a: {}})
+		a: {if b.foo == _|_ {bar: ""}}
+		b: {if a.bar == _|_ {new: ""}}
 	}
 }
-
 -- mutualsamestruct.cue --
 sameStruct: {
 	chainSuccess: a: {
@@ -120,7 +104,6 @@ sameStruct: {
 		if ret != _|_ {
 			foo: a: 1
 		}
-		@test(eq, {raises?: {}, ret: {a: 1}, foo: {a: 1}})
 	}
 
 	chainSuccess: b: {
@@ -132,7 +115,6 @@ sameStruct: {
 			ret: a: 1
 		}
 		ret?: {}
-		@test(eq, {foo: {a: 1}, raises?: {}, ret: {a: 1}})
 	}
 
 	cycleFail: t1: p1: {
@@ -144,7 +126,6 @@ sameStruct: {
 		if ret != _|_ {
 			raises: a: 1
 		}
-		@test(err, code=cycle|incomplete, any, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[raises])
 	}
 
 	cycleFail: t1: p2: {
@@ -156,7 +137,6 @@ sameStruct: {
 		if raises == _|_ {
 			ret: a: 1
 		}
-		@test(err, code=cycle, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[ret], pos=[2:6])
 	}
 
 	// This test should fail with a cycle error. Even though raises and ret are
@@ -179,7 +159,6 @@ sameStruct: {
 		if ret != _|_ {
 			raises: a: 1
 		}
-		@test(err, any, code=cycle|incomplete)
 	}
 
 	// Pushdown improvement: with this ordering, ret != _|_ fires first
@@ -194,7 +173,6 @@ sameStruct: {
 		if raises == _|_ {
 			ret: a: 1
 		}
-		@test(err, any, code=cycle|incomplete)
 	}
 
 	// Pushdown improvement: raises is _ (top), raises == _|_ is false,
@@ -210,7 +188,6 @@ sameStruct: {
 		if ret != _|_ {
 			raises: a: 1
 		}
-		@test(err, any, code=cycle|incomplete)
 	}
 
 	// Pushdown improvement: different ordering gives different result.
@@ -224,7 +201,6 @@ sameStruct: {
 		if raises == _|_ {
 			ret: a: 1
 		}
-		@test(err, any, code=cycle|incomplete)
 	}
 
 	defCloseSuccess: {
@@ -241,13 +217,8 @@ sameStruct: {
 		expr: #Example & {
 			ret: 2
 		}
-		@test(eq, {
-			#Example: {raises?: {runtime?: string}, ret?: _}
-			expr: {ret: 2, raises?: {runtime?: string}}
-		})
 	}
 }
-
 -- nestedchain.cue --
 // Issue
 nestedChain: {
@@ -258,7 +229,6 @@ nestedChain: {
 		if #E.y == _|_ {
 			#E: x: true
 		}
-		@test(err, code=incomplete|cycle)
 		#E: [_]: bool
 	}
 
@@ -271,7 +241,6 @@ nestedChain: {
 		}
 		#E: [_]: bool
 		#E: x:   true
-		@test(eq, {#E: {y: true, x: true}})
 	}
 
 	doubleAddfail: {
@@ -282,7 +251,6 @@ nestedChain: {
 			#E: x: true
 		}
 		#E: [_]: bool
-		@test(err, code=incomplete|cycle)
 	}
 
 	trippleSuccess: {
@@ -293,7 +261,6 @@ nestedChain: {
 			z: true
 		}
 		#E: x: true
-		@test(eq, {#E: {y: true, x: true}, z: true})
 	}
 }
 -- issue3836.cue --
@@ -311,13 +278,6 @@ issue3836: hidden: {
 		out: [if bar != _|_ {"bar is set"}]
 	}
 	_Value.out
-	// Pushdown improvement: the comprehension guard (foo|bar) == _|_ now
-	// correctly fires and sets bar, where previously (without pushdown) the
-	// guard saw a spurious non-bottom value and did not fire.
-	@test(eq, {
-		_Value: {foo?: _, bar: type: "bar", out: ["bar is set"]}
-		["bar is set"]
-	})
 }
 issue3836: exposed: {
 	foo?: _
@@ -326,7 +286,6 @@ issue3836: exposed: {
 		bar: type: "bar"
 	}
 	out: [if bar != _|_ {"bar is set"}]
-	@test(err, code=cycle, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[(foo|bar)], pos=[3:6])
 }
 -- issue3838.cue --
 // evalv3 regression: `if in.opt != _|_` inside a list expression stopped
@@ -359,16 +318,6 @@ issue3838: {
 	(#T & {
 		_test: assert: invoke: "foo"
 	}).results
-	@test(eq, {
-		true
-		#T: {
-			subject: {in: {opt?: {foo: int}}, out: 0}
-			_test: {
-				assert: {pass: false, notOk: _} | {pass: true, invoke: _, res: 0}
-			}
-			results: _|_ @test(err, code=incomplete, contains="issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct)", pos=[26:12])
-		}
-	})
 }
 -- out/compile --
 --- in.cue

@@ -11,9 +11,6 @@ issue4119: reduced: {
 			f: i.f
 		}
 	]
-	@test(eq, {x: *[{
-		f: 123
-	}] | []})
 }
 // This test is added to test the memory management bug isn't triggered
 // one level deeper. This test is expected to fail, as it now triggers
@@ -27,7 +24,6 @@ issue4119: reducedNested: {
 			f: i.f
 		}
 	]}
-	@test(err, code=eval, path=x.y.0.f, contains="undefined field: %s", args=[f], pos=[5:9])
 }
 issue4119: full: {
 	_img: img={
@@ -63,17 +59,6 @@ issue4119: full: {
 	art: images: ko: {
 		val: "test"
 	}
-	@test(eq, {
-		_img: {
-			val: string
-			accounts: {groups: [{ gid: 65532 }]}
-		}
-		art: images: ko: {
-			val: "test"
-			accounts: {groups: *[{ gid: 65532 }] | []}
-		}
-		#Image: {val: string, accounts?: groups?: []}
-	})
 }
 -- out/compile --
 --- comprehensions.cue

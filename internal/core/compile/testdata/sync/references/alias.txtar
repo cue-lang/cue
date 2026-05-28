@@ -2,48 +2,47 @@
 @experiment(aliasv2)
 
 // Basic postfix alias - simple form
-a1~X1: {
+a1~(X1): {
 	foo: 1
 }
-b1: X1.foo + 2 @test(eq, 3)
+b1: X1.foo + 2
 
 a1p~(X1p): {
 	foo: 1
 }
-b1p: X1p.foo + 2 @test(eq, 3)
-
+b1p: X1p.foo + 2
 
 // Basic postfix alias - dual form
 a2~(K2,V2): {
 	name: K2
-	val: V2.foo
+	val:  V2.foo
 }
-a2: {foo: 42}  @test(eq, {name: "a2", val: 42, foo: 42})
+a2: {foo: 42}
 
 // Postfix alias with _ for field
 a3~(K3,_): {
 	foo: 1
 }
-b3: K3  @test(eq, "a3")
+b3: K3
 
 // Postfix alias with _ for label
 a4~(_,V4): {
 	foo: 1
 }
-b4: V4.foo + 2  @test(eq, 3)
+b4: V4.foo + 2
 
 // Dynamic field with postfix alias
-("dyn")~X5: {
+("dyn")~(X5): {
 	foo: 1
 }
-b5: X5.foo + 10 @test(eq, 11)
+b5: X5.foo + 10
 
 // Dynamic field with dual form
 ("dyn2")~(K6,V6): {
 	name: K6
-	val: V6.foo
+	val:  V6.foo
 }
-dyn2: {foo: 100}  @test(eq, {foo: 100, name: "dyn2", val: 100})
+dyn2: {foo: 100}
 
 // Pattern constraint with postfix alias - scoped to value only
 // The field alias should create a recursive reference
@@ -52,7 +51,6 @@ pattern: {
 		labelRef: LabelAlias
 	}
 	foo: {}
-	@test(eq, {foo: {labelRef: "foo"}})
 }
 
 // Pattern constraint with dual form
@@ -63,10 +61,6 @@ pattern2: {
 	}
 	foo: {data: 1}
 	bar: {data: 2}
-	 @test(eq, {
-		foo: {data: 1, labelVal: "foo", fieldVal: 1}
-		bar: {data: 2, labelVal: "bar", fieldVal: 2}
-	})
 }
 
 // Pattern constraint - field alias creates recursive reference
@@ -80,63 +74,56 @@ pattern2: {
 // }
 
 // Nested structs with postfix aliases
-nested~X7: {
-	inner~Y7: {
+nested~(X7): {
+	inner~(Y7): {
 		a: 1
 	}
 	b: Y7.a + X7.inner.a
 }
-result1: nested.b  @test(eq, 2)
+result1: nested.b
 
 // Multiple fields with aliases referencing each other
 multi: {
-	a~A8: 1
-	b~B8: A8 + 2
-	c: B8 + 3
-	@test(eq, {a: 1, b: 3, c: 6})
+	a~(A8): 1
+	b~(B8): A8 + 2
+	c:      B8 + 3
 }
 
 // Postfix alias in comprehension
 comp: {
 	items: [1, 2, 3]
 	for i, v in items {
-		"\(i)"~X9: {
-			index: i
-			value: v
+		"\(i)"~(X9): {
+			index:  i
+			value:  v
 			double: X9.value * 2
 		}
 	}
-	@test(eq, {
-		items: [1, 2, 3]
-		"0": {index: 0, value: 1, double: 2}
-		"1": {index: 1, value: 2, double: 4}
-		"2": {index: 2, value: 3, double: 6}
-	})
 }
 
 // Postfix alias with constraints
-constrained~X10?: {
+constrained~(X10)?: {
 	required: true
 }
-test1: X10.required @test(err, code=incomplete, contains="cannot reference optional field: constrained", pos=[0:8])  @test(err, code=incomplete, contains="cannot reference optional field: %s", args=[constrained], pos=[0:8])
+test1: X10.required
 
 // Interpolation with postfix alias
-"\("inter")"~X11: {
+"\("inter")"~(X11): {
 	foo: 1
 }
-b6: X11.foo + 5  @test(eq, 6)
+b6: X11.foo + 5
 
 // Postfix alias with optional and default
-opt~X12?: {
+opt~(X12)?: {
 	a: 1
-	b: X12 @test(err, code=incomplete, contains="field not found: opt", pos=[])
-}  @test(err, code=incomplete, contains="field not found: %v", args=[opt], pos=[])
+	b: X12
+}
 
 // TODO: seemingly wrong semantics, but matches old behavior.
-def~Y13: {
+def~(Y13): {
 	b: 2
 	c: Y13.b
-} | {b: 3}  @test(eq, {b: 2, c: 2} | {b: 3})
+} | {b: 3}
 
 // Pattern with blank identifier - label only visible in value
 pattern3: {
@@ -144,8 +131,6 @@ pattern3: {
 		labelName: LN14
 	}
 	test: {}
-
-	@test(eq, {test: {labelName: "test"}})
 }
 
 // Pattern with blank identifier - field only visible in value
@@ -154,39 +139,36 @@ pattern4: {
 		fieldRef: FR15.x
 	}
 	test: {x: 99}
-	@test(eq, {test: {x: 99, fieldRef: 99}})
 }
 
 // Multiple aliases in same scope
 same: {
-	a~A16: 1
-	b~B16: 2
-	c: A16 + B16
-
-	@test(eq, {a: 1, b: 2, c: 3})
+	a~(A16): 1
+	b~(B16): 2
+	c:       A16 + B16
 }
 
 // Alias referencing earlier alias
-chain~X17: {
+chain~(X17): {
 	a: 1
-} @test(eq, {a: 1})
-chain2~Y18: {
+}
+chain2~(Y18): {
 	ref: X17.a
-} @test(eq, {ref: 1})
-result2: Y18.ref  @test(eq, 1)
+}
+result2: Y18.ref
 
 // Postfix alias with list value
-list~X19: [1, 2, 3]
-b7: X19[0] + X19[1]  @test(eq, 3)
+list~(X19): [1, 2, 3]
+b7: X19[0] + X19[1]
 
 // Postfix alias with disjunction
-disj~X20: 1 | 2 | 3
-b8: X20  @test(eq, 1 | 2 | 3)
+disj~(X20): 1 | 2 | 3
+b8:         X20
 
 // Nested pattern constraints with aliases
 deep: {
 	[string]~(OuterLabel,_): {
-		[string]~(InnerLabel, InnerField): {
+		[string]~(InnerLabel,InnerField): {
 			outer: OuterLabel
 			inner: InnerLabel
 			value: InnerField.x
@@ -194,23 +176,13 @@ deep: {
 		foo: {x: 1}
 	}
 	bar: {}
-	@test(eq, {
-		bar: {
-			foo: {
-				x: 1
-				outer: "bar"
-				inner: "foo"
-				value: 1
-			}
-		}
-	})
 }
 
 // Alias with definition
-#Def~X21: {
+#Def~(X21): {
 	field: 42
 }
-usedef: X21.field  @test(eq, 42)
+usedef: X21.field
 -- out/compile --
 --- in.cue
 {

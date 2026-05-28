@@ -8,9 +8,9 @@
 	_E: {
 		name: "hello"
 	}
-} @test(shareID=lN)
+}
 
-l: #N @test(shareID=lN)
+l: #N
 -- out/compile --
 --- in.cue
 {

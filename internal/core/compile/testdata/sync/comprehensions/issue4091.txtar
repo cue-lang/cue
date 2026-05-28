@@ -4,13 +4,7 @@
 # via {_input: _obj}.
 # https://cuelang.org/issue/4091
 -- in.cue --
-output: (_Generator & {_input: _obj})._output @test(eq, {
-	genID: "id1"
-	_id: "id1"
-	volumeMounts: [{name: "mount1"}]
-	_volumes: {mount1: {name: "mount1"}}
-	volumes: {mount1: {name: "mount1"}}
-})
+output: (_Generator & {_input: _obj})._output
 
 _obj: spec: {
 	_id: "id1"

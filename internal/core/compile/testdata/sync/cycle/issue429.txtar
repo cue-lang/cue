@@ -14,39 +14,23 @@
 	max: >min | *min
 }
 
-s0: #Size & {res: 1} @test(eq, {
-	res: 1
-	min: *2 | >1
-	max: *2 | >1 | >2
-})
+s0: #Size & {res: 1}
 
 // This discards the default for max. This is correct, but unfortunate.
 // TODO: is there a tweak to the default mechanism possible that would fix that?
 //       Tread very carefully, though! Perhaps we could have a builtin that
 //       discards any default, so that we can at least manually override this
 //       behavior.
-s1: #Size & {min: 5}  @test(eq, {
-	min: 5
-	res: *0 | >=0 & int
-	max: *5 | >5
-})
-s2: #Size & {max: 5}  @test(eq, {
-	max: 5
-	res: *0 | >=0 & int
-	min: *1 | >0
-})
+s1: #Size & {min: 5}
+s2: #Size & {max: 5}
 s3: #Size & {
 	min: 5
 	max: 10
-} @test(eq, {min: 5, max: 10, res: *0 | >=0 & int})
+}
 es3: #Size & {
 	min: 10
 	max: 5
-} @test(err, code=eval,
-	suberr=(code=eval, path=max, contains="%d errors in empty disjunction:", args=[2], pos=[]),
-	suberr=(code=eval, path=max, contains="conflicting values %s and %s", args=[1, 5], pos=[-29:16, -28:15, 0:6, 2:7]),
-	suberr=(code=eval, path=max, contains="conflicting values %s and %s", args=[10, 5], pos=[-28:15, 0:6, 1:7, 2:7]),
-	suberr=(code=eval, path=max, contains="invalid value %v (out of bound %s)", args=[5, >10], pos=[-28:7, 2:7]))
+}
 
 // Disjunctions with cycles
 // TODO: improve error message here. Logic is correct, though.
@@ -57,25 +41,19 @@ es3: #Size & {
 }
 r1: #nonEmptyRange & {
 	min: 3
-} @test(eq, {
-	min: _|_ @test(err, code=incomplete, contains="r1.min: non-concrete value max for bound < (and 2 more errors)", pos=[46:8])
-	max: >3
-})
+}
 r2: #nonEmptyRange & {
 	max: 5
-} @test(eq, {max: 5, min: *1 | <5 & int})
+}
 r3: #nonEmptyRange & {
 	min: 3
 	max: 6
-} @test(eq, {min: 3, max: 6})
+}
 
 er3: #nonEmptyRange & {
 	min: 5
 	max: 5
-} @test(err, code=eval,
-	suberr=(code=eval, path=min, contains="conflicting values %s and %s", args=[1, 5], pos=[-18:8, 0:6, 1:7]),
-	suberr=(code=eval, path=min, contains="invalid value %v (out of bound %s)", args=[5, <5], pos=[-17:7, 1:7]),
-	suberr=(code=eval, path=min, contains="invalid value %v (out of bound %s)", args=[5, <5], pos=[-17:7, 1:7]))
+}
 -- out/compile --
 --- in.cue
 {

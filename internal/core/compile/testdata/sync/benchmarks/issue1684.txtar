@@ -23,23 +23,19 @@ out: #secrets & {
 out: #secrets & {
 	FOO: $secret: _id: "100"
 	ONE: TWO: THREE: $secret: _id: "123"
-} @test(eq, {
-	FOO: $secret:             {id: "100", _id: "100"}
-	ONE: TWO: THREE: $secret: {id: "123", _id: "123"}
-})
-
+}
 -- perf.cue --
 nestedCross: closed: {
 	#D: {id: string} | {[string]: #D}
 	#D: {id: string} | {[string]: #D}
 	#D: {id: string} | {[string]: #D}
-} @test(eq, {#D: {id: string} | {}})
+}
 
 nestedCross: open: {
 	D: {id: string} | {[string]: D}
 	D: {id: string} | {[string]: D}
 	D: {id: string} | {[string]: D}
-} @test(eq, {D: {id: string} | {}})
+}
 
 // TODO(perf): support this case.  This is currently exponential, although the
 // tight bound on the detection of structural cycles mitigates the situation.
@@ -50,7 +46,7 @@ nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 	D: {id: {}} | {[string]: D}
 	D: {id: {}} | {[string]: D}
-} @test(eq, {D: {id: {}} | {}})
+}
 -- out/compile --
 --- in.cue
 {

@@ -4,16 +4,16 @@
 
 a: {
 	!=null
-} @test(eq, !=null)
+}
 
 // As a field value, !=null is preserved. Verify parity.
-b: !=null @test(eq, !=null)
+b: !=null
 
 // !=null as embedding combined with a regular field.
 c: {
 	!=null
 	x: 1
-} @test(eq, {x: 1})
+}
 -- out/compile --
 --- in.cue
 {

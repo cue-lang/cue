@@ -8,12 +8,7 @@ foo: #foo & {
 	_#name: "bar"
 
 	#name: "baz"
-} @test(closed) @test(eq, {
-	_name: "foo"
-	_#name: "bar"
-	#name: "baz"
-	name: string
-})
+}
 -- out/compile --
 --- in.cue
 {

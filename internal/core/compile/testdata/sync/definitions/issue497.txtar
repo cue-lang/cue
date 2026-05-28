@@ -8,9 +8,9 @@
 	f: j: {
 		n: "hi"
 	}
-} @test(shareID=lN) @test(eq, {f: {j: {n: "hi"}}})
+}
 
-l: #N @test(shareID=lN)
+l: #N
 -- out/compile --
 --- in.cue
 {

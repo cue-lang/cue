@@ -16,7 +16,7 @@ a: #A & {
 		c: 2
 		e: 43
 	}
-} @test(err, code=eval, contains="field not allowed", pos=[4:3])
+}
 
 // A constraint validation error fails to trigger when a field violating a
 // regex pattern constraint is duplicated via a for-loop comprehension.
@@ -35,7 +35,7 @@ issue852: {
 	for k, v in a {
 		b: "\(k)": v
 	}
-} @test(err, code=eval, contains="field not allowed", pos=[7:5])
+}
 
 dynamic: {
 	#D: {
@@ -43,10 +43,6 @@ dynamic: {
 		(key): int
 	}
 	d: #D & {foo: 3}
-	@test(eq, {
-		#D: {key: "foo", foo: int}
-		d: {foo: 3, key: "foo"}
-	})
 }
 
 // Closedness appeared to be lost when using a comprehension: CUE incorrectly
@@ -56,7 +52,7 @@ dynamic: {
 // even though {foo: "is foo"} does not unify with `#Bar & {...}`.
 issue4180: {
 	out: {
-	    if true {
+		if true {
 			iter: #Schema & {
 				FooOrBar: foo: "is foo"
 			}
@@ -69,14 +65,6 @@ issue4180: {
 		FooOrBar: {...}
 		FooOrBar: #Foo | #Bar
 	}
-	@test(eq, {
-		out: {iter: {FooOrBar: {foo: "is foo"}}}
-		#Foo: {foo: string}
-		#Bar: {bar: string}
-		#Schema: {
-			FooOrBar: {foo: string} | {bar: string}
-		}
-	})
 }
 -- embed.cue --
 // evalv3: ordering of embedded structs affects template definition evaluation,
@@ -108,25 +96,6 @@ issue3325: ok: {
 		#Extended
 		#Base
 	}
-	@test(eq, {
-		#Items: {}
-		#Base: {name: "base", type: string, items: {}}
-		#Extended: {
-			type: "extended"
-			items: {"my-item": {name: "my-item"}}
-			name: "base"
-		}
-		broken: {
-			name: "base"
-			type: "extended"
-			items: {"my-item": {name: "my-item"}}
-		}
-		works: {
-			type: "extended"
-			items: {"my-item": {name: "my-item"}}
-			name: "base"
-		}
-	})
 }
 
 patterns: shallow: {
@@ -136,68 +105,68 @@ patterns: shallow: {
 	#d: [<="y"]: int
 
 	single: {
-		X: #a // "k" <= x
-		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[1:8])
+		X:   #a // "k" <= x
+		err: X
 		err: j: 3
 
-		ok: X @test(eq, {k: 3})
+		ok: X
 		ok: k: 3
 	}
 
 	and: p1: {
 		X: #a & #b // "k" <= x && x <= "m"
 
-		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[-16:6, 1:8])
+		err: X
 		err: j: 3
 
-		ok: X @test(eq, {k: 3})
+		ok: X
 		ok: k: 3
 	}
 
 	and: p2: {
-		X: #b & #a // "k" <= x && x <= "m"
-		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[-25:6, 1:8])
+		X:   #b & #a // "k" <= x && x <= "m"
+		err: X
 		err: j: 3
 
-		ok: X @test(eq, {k: 3})
+		ok: X
 		ok: k: 3
 	}
 
 	andEmbed: p1: {
-		X: { #a & #b } // "k" <= x && x <= "m"
+		X: {#a & #b} // "k" <= x && x <= "m"
 
-		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[-35:6, 1:8])
+		err: X
 		err: j: 3
 
-		ok: X @test(eq, {k: 3})
+		ok: X
 		ok: k: 3
 	}
 
 	andEmbed: p2: {
-		X: { #b & #a } // "k" <= x && x <= "m"
-		err: X @test(err, code=eval, path=j, contains="field not allowed", pos=[-44:6, 1:8])
+		X: {#b & #a} // "k" <= x && x <= "m"
+		err:         X
 		err: j: 3
 
-		ok: X @test(eq, {k: 3})
+		ok: X
 		ok: k: 3
 	}
 
 	orEmbed: p1: {
-		X: { #a, #b } // "k" <= x && x <= "m"
+		X: {#a, #b} // "k" <= x && x <= "m"
 
-		ok1: X @test(eq, {j: 3})
+		ok1: X
 		ok1: j: 3
 
-		ok2: X @test(eq, {k: 3})
+		ok2: X
 		ok2: k: 3
 	}
 
 	orEmbed: p2: {
-		X: { #b, #a } // "k" <= x && x <= "m"
-		ok1: X @test(eq, {j: 3})
+		X: {#b, #a} // "k" <= x && x <= "m"
+		ok1: X
 		ok1: j: 3
 
-		ok2: X @test(eq, {k: 3})
+		ok2: X
 		ok2: k: 3
 	}
 
@@ -207,10 +176,10 @@ patterns: shallow: {
 			#a & #b
 			#c & #d
 		}
-		err1: X @test(eq, {j: 3})
+		err1: X
 		err1: j: 3
 
-		ok1: X @test(eq, {k: 3})
+		ok1: X
 		ok1: k: 3
 	}
 
@@ -220,10 +189,10 @@ patterns: shallow: {
 			#c & #d
 			#a & #b
 		}
-		err1: X @test(eq, {j: 3})
+		err1: X
 		err1: j: 3
 
-		ok1: X @test(eq, {k: 3})
+		ok1: X
 		ok1: k: 3
 	}
 
@@ -234,13 +203,13 @@ patterns: shallow: {
 			#c & #d
 			["p"]: int
 		}
-		err1: X @test(eq, {j: 3})
+		err1: X
 		err1: j: 3
 
-		ok1: X @test(eq, {k: 3})
+		ok1: X
 		ok1: k: 3
 
-		ok2: X @test(eq, {p: 3})
+		ok2: X
 		ok2: p: 3
 	}
 
@@ -249,57 +218,57 @@ patterns: shallow: {
 		a: [>="k"]: int
 		#a: a
 
-		p1: { // XXX // link to code
-			X: #a
-			err1: X @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+		p1: {// XXX // link to code
+			X:    #a
+			err1: X
 			err1: j: 3
 
 			err2: X & __no_sharing
-			err2: j: 3 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+			err2: j: 3
 
 			ok: X
-			ok:k: 3 @test(eq, 3)
+			ok: k: 3
 		}
 
 		p2: {
 			#a: a & __no_sharing
-			X: #a
+			X:  #a
 
 			err1: X
-			err1: j: 3 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+			err1: j: 3
 
-			err2: X & __no_sharing @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err2: X & __no_sharing
 			err2: j: 3
 
-			ok: X @test(eq, {k: 3})
+			ok: X
 			ok: k: 3
 		}
 
 		p3: {
 			X: #a & __no_sharing
 
-			err1: X @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
-			err1: j: 3 
+			err1: X
+			err1: j: 3
 
-			err2: X & __no_sharing @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
-			err2: j: 3 
+			err2: X & __no_sharing
+			err2: j: 3
 
-			ok: X @test(eq, {k: 3})
-			ok: k: 3 
+			ok: X
+			ok: k: 3
 		}
 
 		p4: {
 			#a: a & __no_sharing
-			X: #a
-			X: #a & __no_sharing
+			X:  #a
+			X:  #a & __no_sharing
 
-			err1: X @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err1: X
 			err1: j: 3
 
-			err2: X & __no_sharing @test(err, code=eval, path=j, contains="field not allowed", pos=[1:10])
+			err2: X & __no_sharing
 			err2: j: 3
 
-			ok: X @test(eq, {k: 3})
+			ok: X
 			ok: k: 3
 		}
 	}
@@ -312,68 +281,68 @@ patterns: nested: {
 	#d: x: y: [<="y"]: int
 
 	single: {
-		X: #a // "k" <= x
-		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:14])
+		X:   #a // "k" <= x
+		err: X
 		err: x: y: j: 3
 
-		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: X
 		ok: x: y: k: 3
 	}
 
 	and: p1: {
 		X: #a & #b // "k" <= x && x <= "m"
 
-		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[-16:12, 1:14])
+		err: X
 		err: x: y: j: 3
 
-		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: X
 		ok: x: y: k: 3
 	}
 
 	and: p2: {
-		X: #b & #a // "k" <= x && x <= "m"
-		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[-25:12, 1:14])
+		X:   #b & #a // "k" <= x && x <= "m"
+		err: X
 		err: x: y: j: 3
 
-		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: X
 		ok: x: y: k: 3
 	}
 
 	andEmbed: p1: {
-		X: { #a & #b } // "k" <= x && x <= "m"
+		X: {#a & #b} // "k" <= x && x <= "m"
 
-		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[-35:12, 1:14])
+		err: X
 		err: x: y: j: 3
 
-		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: X
 		ok: x: y: k: 3
 	}
 
 	andEmbed: p2: {
-		X: { #b & #a } // "k" <= x && x <= "m"
-		err: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[-44:12, 1:14])
+		X: {#b & #a} // "k" <= x && x <= "m"
+		err:         X
 		err: x: y: j: 3
 
-		ok: X @test(eq, {x: {y: {k: 3}}})
+		ok: X
 		ok: x: y: k: 3
 	}
 
 	orEmbed: p1: {
-		X: { #a, #b } // "k" <= x && x <= "m"
+		X: {#a, #b} // "k" <= x && x <= "m"
 
-		ok1: X @test(eq, {x: {y: {j: 3}}})
+		ok1: X
 		ok1: x: y: j: 3
 
-		ok2: X @test(eq, {x: {y: {k: 3}}})
+		ok2: X
 		ok2: x: y: k: 3
 	}
 
 	orEmbed: p2: {
-		X: { #b, #a } // "k" <= x && x <= "m"
-		ok1: X @test(eq, {x: {y: {j: 3}}})
+		X: {#b, #a} // "k" <= x && x <= "m"
+		ok1: X
 		ok1: x: y: j: 3
 
-		ok2: X @test(eq, {x: {y: {k: 3}}})
+		ok2: X
 		ok2: x: y: k: 3
 	}
 
@@ -383,10 +352,10 @@ patterns: nested: {
 			#a & #b
 			#c & #d
 		}
-		err1: X @test(eq, {x: {y: {j: 3}}})
+		err1: X
 		err1: x: y: j: 3
 
-		ok1: X @test(eq, {x: {y: {k: 3}}})
+		ok1: X
 		ok1: x: y: k: 3
 	}
 
@@ -396,10 +365,10 @@ patterns: nested: {
 			#c & #d
 			#a & #b
 		}
-		err1: X @test(eq, {x: {y: {j: 3}}})
+		err1: X
 		err1: x: y: j: 3
 
-		ok1: X @test(eq, {x: {y: {k: 3}}})
+		ok1: X
 		ok1: x: y: k: 3
 	}
 
@@ -410,13 +379,13 @@ patterns: nested: {
 			#c & #d
 			["p"]: int
 		}
-		err1: X @test(eq, {x: {y: {j: 3}}})
+		err1: X
 		err1: x: y: j: 3
 
-		ok1: X @test(eq, {x: {y: {k: 3}}})
+		ok1: X
 		ok1: x: y: k: 3
 
-		ok2: X @test(eq, {x: {y: {p: 3}}})
+		ok2: X
 		ok2: x: y: p: 3
 	}
 
@@ -426,60 +395,60 @@ patterns: nested: {
 		#a: a
 
 		p1: {
-			X: #a
-			err1: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			X:    #a
+			err1: X
 			err1: x: y: j: 3
 
-			err2: X & __no_sharing @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err2: X & __no_sharing
 			err2: x: y: j: 3
 
-			ok: X @test(eq, {x: {y: {k: 3}}})
+			ok: X
 			ok: x: y: k: 3
 		}
 
 		p2: {
 			#a: a & __no_sharing
-			X: #a
+			X:  #a
 
-			err1: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err1: X
 			err1: x: y: j: 3
 
-			err2: X & __no_sharing @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err2: X & __no_sharing
 			err2: x: y: j: 3
 
-			ok: X @test(eq, {x: {y: {k: 3}}})
+			ok: X
 			ok: x: y: k: 3
 		}
 
 		p3: {
 			X: #a & __no_sharing
 
-			err1: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err1: X
 			err1: x: y: j: 3
 
-			err2: X & __no_sharing @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err2: X & __no_sharing
 			err2: x: y: j: 3
 
-			ok: X @test(eq, {x: {y: {k: 3}}})
+			ok: X
 			ok: x: y: k: 3
 		}
 
 		p4: {
 			#a: a & __no_sharing
-			X: #a
-			X: #a & __no_sharing
+			X:  #a
+			X:  #a & __no_sharing
 
-			err1: X @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err1: X
 			err1: x: y: j: 3
 
-			err2: X & __no_sharing @test(err, code=eval, path=x.y.j, contains="field not allowed", pos=[1:16])
+			err2: X & __no_sharing
 			err2: x: y: j: 3
 
-			ok: X @test(eq, {x: {y: {k: 3}}})
+			ok: X
 			ok: x: y: k: 3
 		}
 	}
-} @test(err, code=eval, contains="field not allowed", pos=[168:16])
+}
 
 // Embedding a definition doesn't recursively close the embedder: closedness
 // is not propagated correctly when a definition is embedded in an open struct.
@@ -488,40 +457,33 @@ issue2241: {
 	#close: {}
 
 	a: {
-	    x: q: 2
-	    #close
+		x: q: 2
+		#close
 	}
 
 	b: a
 	b: x: r: 4
-} @test(err, code=eval, path=b.x.r, contains="field not allowed", pos=[9:8])
-
+}
 -- ellipsis.cue --
 // evalv3 regression: unification with {...} allowed extra fields where evalv2
 // correctly rejected them as "field not allowed".
 // https://cuelang.org/issue/3778
 issue3778: full: {
 	#x: a?: string
-	#y: #x & { ... }
+	#y: #x & {...}
 	z: #y & {
 		a: "ok"
 		b: "something"
 	}
-	@test(err, code=eval, path=z.b, contains="field not allowed", pos=[5:3])
 }
 issue3778: {
 	keepOpen: {
-		#x: { a?: string, ... }
-		#y: #x & { ... }
+		#x: {a?: string, ...}
+		#y: #x & {...}
 		z: #y & {
 			a: "ok"
 			b: "something"
 		}
-		@test(eq, {
-			#x: {a?: string}
-			#y: {a?: string}
-			z: {a: "ok", b: "something"}
-		})
 	}
 }
 
@@ -534,7 +496,6 @@ issue1867: one: {
 	#T: {...}
 	x: #T
 	x: foo: "foo"
-	@test(err, code=eval, path=x.foo, contains="field not allowed", pos=[4:5])
 }
 issue1867: two: {
 	#S: {}
@@ -542,7 +503,6 @@ issue1867: two: {
 	#T: s: {...}
 	x: #T.s
 	x: foo: "foo"
-	@test(err, code=eval, path=x.foo, contains="field not allowed", pos=[5:5])
 }
 // This third version used to not fail as expected on evalv2.
 issue1867: three: {
@@ -550,7 +510,6 @@ issue1867: three: {
 	#T: s: {...}
 	x: #T.s
 	x: foo: "foo"
-	@test(err, code=eval, contains="field not allowed", pos=[4:5])
 }
 // evalv3 regression in detecting closedness: "field not allowed" errors were
 // incorrectly suppressed when validating nested structures with closedness constraints.
@@ -563,7 +522,6 @@ issue3924: one: {
 	#SchemaInner: allowed?: string
 
 	out: #Schema & {foo: disallowed: "foo"} // should fail
-	@test(err, code=eval, path=out.foo.disallowed, contains="field not allowed", pos=[7:23])
 }
 issue3924: two: {
 	#Schema: {
@@ -577,34 +535,29 @@ issue3924: two: {
 		})
 	}
 	out: #Schema & {foo: disallowed: "bar"} // should fail
-	@test(err, code=eval, path=out.foo.disallowed, contains="field not allowed", pos=[4:9, 11:23])
 }
 issue3924: three: t1: {
 	{foo: #job & {disallowed: "bar"}}
-	#job: { other?: string }
+	#job: {other?: string}
 	#job: #def
 	#def: allowed?: string
-	@test(err, code=eval, path=foo.disallowed, contains="field not allowed", pos=[1:16])
 }
 issue3924: three: t2: {
 	{foo: #job & {disallowed: "bar"}}
-	#job: { other?: string, ... }
+	#job: {other?: string, ...}
 	#job: #def
 	#def: allowed?: string
-	@test(err, code=eval, path=foo.disallowed, contains="field not allowed", pos=[1:16])
 }
 issue3924: three: t3: {
-	#job: { ... }
+	#job: {...}
 	#job: #def
 	#def: {}
 	foo: #job & {disallowed: "bar"}
-	@test(err, code=eval, path=foo.disallowed, contains="field not allowed", pos=[4:15])
 }
 issue3924: four: {
-	A: { {foo: #B} }
+	A: {{foo: #B}}
 	#B: allowed?: string
 	out: A & {foo: disallowed: "foo"} // should fail
-	@test(err, code=eval, contains="field not allowed", pos=[3:17])
 }
 -- reroot.cue --
 import "list"
@@ -617,43 +570,28 @@ issue3330: {
 		#struct: {
 			let empty = {}
 
-			field: null | { n: int }
-			field: empty & { n: 3 }
+			field: null | {n: int}
+			field: empty & {n: 3}
 		}
 
 		out: list.Concat([[#struct]])
-		@test(eq, {
-			#struct: {field: {n: 3}}
-			out: [{
-				field: n: 3
-			}]
-		})
 	}
 	matthew: ok1: {
 		#struct: {
-			field: { n: 3 } & g
+			field: {n: 3} & g
 			g: {}
 		}
 
 		out: #struct & {}
-		@test(eq, {
-			#struct: {field: {n: 3}, g: {}}
-			out: {field: {n: 3}, g: {}}
-		})
 	}
 	matthew: ok2: {
 		#struct: {
-			field: { n: 3 } & g
+			field: {n: 3} & g
 			g: {}
 		}
 
 		out: #struct
 		out2: out & {}
-		@test(eq, {
-			#struct: {field: {n: 3}, g: {}}
-			out: {field: {n: 3}, g: {}}
-			out2: {field: {n: 3}, g: {}}
-		})
 	}
 }
 // evalv3 "field not allowed" regression: a valid struct with a let binding and
@@ -668,10 +606,6 @@ issue3331: {
 			}
 		}
 		list.Concat([[#A]])
-		@test(eq, {
-			#A: {c: {d: 1}}
-			[{c: {d: 1}}]
-		})
 	}
 	variant1: ok: {
 		#A: {
@@ -681,21 +615,7 @@ issue3331: {
 			}
 		}
 		[[#A]]
-		@test(eq, {
-			#A: {c: {d: 1}}
-			[[{c: {d: 1}}]]
-		})
 	}
-	@test(eq, {
-		original: {ok: {
-			#A: {c: {d: 1}}
-			[{c: {d: 1}}]
-		}}
-		variant1: {ok: {
-			#A: {c: {d: 1}}
-			[[{c: {d: 1}}]]
-		}}
-	})
 }
 
 // indirect tests cases where a reference indirectly crosses a node that
@@ -714,14 +634,6 @@ indirect: {
 
 		b1: b.zx
 		b1: d: 1 // This should fail as b.zx crosses a reference to definition.
-		@test(err:todo)
-		@test(eq, {
-			#A: {x: {a: {b: 1, c: 2}}, zx: {b: 1, c: 2}}
-			#x: {a: {b: 1}}
-			#y: {a: {c: 2}}
-			b: {x: {a: {b: 1, c: 2}}, zx: {b: 1, c: 2}}
-			b1: {d: 1, b: 1, c: 2}
-		})
 	}
 	closed: err1: {
 		X: {
@@ -736,25 +648,20 @@ indirect: {
 			c: #X
 		}
 		#X: {}
-		@test(err, at=Y.a.e, code=eval, contains="field not allowed", pos=[5:7])
 	}
 }
 // nested.a
 nested: ok1: {
 	#A: {
-	b: {}
+		b: {}
 
-	#B: {
-		c: b & {
-			d: 1
+		#B: {
+			c: b & {
+				d: 1
 			}
 		}
 	}
 	x: #A
-	@test(eq, {
-		#A: {b: {}, #B: {c: {d: 1}}}
-		x: {b: {}, #B: {c: {d: 1}}}
-	})
 }
 nested: embed: ok: {
 	x: #A
@@ -765,11 +672,6 @@ nested: embed: ok: {
 		d: b & {e: int}
 		b: {}
 	}
-	@test(eq, {
-		x:  {d: {e: int}, b: {}}
-		#A: {d: {e: int}, b: {}}
-		k:  {d: {e: int}, b: {}}
-	})
 }
 // nested.b tests insertion of a field (b) that has a conjunct rooted within
 // the tree it is referred in as well as a conjunct outside of it that refers
@@ -780,14 +682,13 @@ nested: err1: {
 		b: f: 1
 		v: #V
 		#V: {
-			c: b & { // Fails as #B is not compatible.
+			c: b & {// Fails as #B is not compatible.
 				d: 1
 			}
 		}
 	}
-	x: b: #B
+	x: b:  #B
 	#B: g: 1
-	@test(err, at=x.#V.c.d, code=eval, contains="field not allowed", pos=[7:5])
 }
 
 nested: err2: {
@@ -802,7 +703,6 @@ nested: err2: {
 	}
 	x: #A
 	x: b: g: 1
-	@test(err, at=x.b.g, code=eval, contains="field not allowed", pos=[11:8])
 }
 
 inline: {
@@ -812,50 +712,33 @@ inline: {
 	err1: (#x & {y: z: _}).y.z & {
 		name: "a"
 		age1: 5 // not allowed
-	} @test(err:todo, code=eval, contains="field not allowed")
+	}
 	err2: (#x.y & {z: _}).z & {
 		name: "a"
 		age2: 5 // not allowed
-	} @test(err:todo, code=eval, contains="field not allowed")
-	@test(eq, {
-		#x: {y: {z?: {name: string}}}
-		err1: {name: "a", age1: 5}
-		err2: {name: "a", age2: 5}
-	})
+	}
 }
 
 // minInDef defines examples where a definition is mixed into an open struct,
 // where then this struct refers to a field that is closed by the definition.
 mixInDef: {
 	refInside: {
-		#x: b: c: {d: {}, e: f: {} }
+		#x: b: c: {d: {}, e: f: {}}
 		a: #x
 		a: b: c: d: {}
 		a: b: c: e: c.d
-		@test(eq, {
-			#x: {b: {c: {d: {}, e: {f: {}}}}}
-			a: {b: {c: {d: {}, e: {f: {}}}}}
-		})
 	}
 	refEdge: {
-		#x: c: {d: {}, e: f: {} }
+		#x: c: {d: {}, e: f: {}}
 		a: #x
 		a: c: d: {}
 		a: c: e: c.d
-		@test(eq, {
-			#x: {c: {d: {}, e: {f: {}}}}
-			a: {c: {d: {}, e: {f: {}}}}
-		})
 	}
 	refOutside: {
-		#x: c: {d: {}, e: f: {} }
+		#x: c: {d: {}, e: f: {}}
 		a: #x
 		a: c: d: {}
 		a: c: e: a.c.d // crosses definition
-		@test(eq, {
-			#x: {c: {d: {}, e: {f: {}}}}
-			a: {c: {d: {}, e: {f: {}}}}
-		})
 	}
 }
 
@@ -874,16 +757,6 @@ issue3601: original: {
 			final: version: "v1"
 		}
 	}
-	@test(eq, {
-		out: {foo: {final: {version: "v1"}}}
-		#Transform: {
-			output: {foo: {final: {version: "v1"}}}
-		}
-		#Patch: {
-			target: {}
-			output: {foo: {final: {version: "v1"}}}
-		}
-	})
 }
 issue3601: originalNoShare: {
 	// Like the original, but with explicit no sharing.
@@ -898,16 +771,6 @@ issue3601: originalNoShare: {
 			final: version: "v1"
 		}
 	}
-	@test(eq, {
-		out: {foo: {final: {version: "v1"}}}
-		#Transform: {
-			output: {foo: {final: {version: "v1"}}}
-		}
-		#Patch: {
-			target: {}
-			output: {foo: {final: {version: "v1"}}}
-		}
-	})
 }
 issue3601: reduced: {
 	#X: {
@@ -917,15 +780,15 @@ issue3601: reduced: {
 	}
 
 	original: {
-		Y: (#X & __no_sharing).a
+		Y:   (#X & __no_sharing).a
 		out: Y & __no_sharing
 	}
 	moreInlining: {
 		out: (#X & {}).a & {}
 	}
 	noInline: {
-		Y: #X & __no_sharing
-		Z: Y & __no_sharing
+		Y:   #X & __no_sharing
+		Z:   Y & __no_sharing
 		out: Z.a & __no_sharing
 	}
 	moreNesting: {
@@ -937,23 +800,7 @@ issue3601: reduced: {
 		Y: (#X.a & __no_sharing).b
 		Z: Y & __no_sharing
 	}
-	@test(eq, {
-		#X: {a: {b: {c: "v1"}}, empty: {}}
-		original: {Y: {b: {c: "v1"}}, out: {b: {c: "v1"}}}
-		moreInlining: {out: {b: {c: "v1"}}}
-		noInline: {
-			Y: {a: {b: {c: "v1"}}, empty: {}}
-			Z: {a: {b: {c: "v1"}}, empty: {}}
-			out: {b: {c: "v1"}}
-		}
-		moreNesting: {
-			#X: {a: {b: {c: {d: "v1"}}}, empty: {}}
-			Y: {c: {d: "v1"}}
-			Z: {c: {d: "v1"}}
-		}
-	})
 }
-
 -- validation.cue --
 import "list"
 
@@ -963,14 +810,9 @@ import "list"
 issue3332: {
 	#def: field: list.MinItems(1)
 	use: #def & {
-	  field: ["value"]
+		field: ["value"]
 	}
-	@test(eq, {
-		#def: {field: list.MinItems(1)}
-		use: {field: ["value"]}
-	})
 }
-
 -- out/compile --
 --- ellipsis.cue
 {

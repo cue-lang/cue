@@ -9,7 +9,7 @@ A: #Task
 B: #steps: #Script & {mount: [A]}
 C: #steps: #Script & {mount: [B]}
 
-#Script: {mount: [...#Task]} @test(eq, {mount: []})
+#Script: {mount: [...#Task]}
 
 #Task: {
 	// Without the proper constructs, repeating the below results
@@ -22,106 +22,7 @@ C: #steps: #Script & {mount: [B]}
 	...
 }
 
-#ref: {a: 1} | {b: 2} @test(eq, {a: 1} | {b: 2})
-
-@test(eq, {
-	A: {#steps: {mount: []}, a: 1} | {#steps: {mount: []}, b: 2}
-	B: {
-		#steps: {
-			mount: [{#steps: {mount: []}, a: 1} | {#steps: {mount: []}, b: 2}]
-		}
-	}
-	C: {
-		#steps: {
-			mount: [{#steps: {
-	mount: [{#steps: {mount: []}, a: 1} | {#steps: {mount: []}, b: 2}]
-}, a: 1} | {#steps: {
-	mount: [{#steps: {mount: []}, a: 1} | {#steps: {mount: []}, b: 2}]
-}, b: 2}]
-		}
-	}
-	#Script: {mount: []}
-	#Task: {#steps: {mount: []}, a: 1} | {#steps: {mount: []}, b: 2}
-	#ref: {a: 1} | {b: 2}
-})
-// TODO(inline): replace @test(debug) with @test(shareID=...) once the
-// framework supports asserting sharing inside disjunction members. All
-// ~(#Script) occurrences here are inside disjunct arms (A, #Task,
-// B.#steps.mount[0]) — the CUE API creates a fresh vertex when projecting
-// a field through a disjunction boundary, so pointer-identity checks fail.
-@test(debug, """
-	(struct){
-	  A: (#struct){ |((#struct){
-	      #steps: ~(#Script)
-	      a: (int){ 1 }
-	    }, (#struct){
-	      #steps: ~(#Script)
-	      b: (int){ 2 }
-	    }) }
-	  B: (struct){
-	    #steps: (#struct){
-	      mount: (#list){
-	        0: (#struct){ |((#struct){
-	            #steps: ~(#Script)
-	            a: (int){ 1 }
-	          }, (#struct){
-	            #steps: ~(#Script)
-	            b: (int){ 2 }
-	          }) }
-	      }
-	    }
-	  }
-	  C: (struct){
-	    #steps: (#struct){
-	      mount: (#list){
-	        0: (#struct){ |((#struct){
-	            #steps: (#struct){
-	              mount: (#list){
-	                0: (#struct){ |((#struct){
-	                    #steps: ~(#Script)
-	                    a: (int){ 1 }
-	                  }, (#struct){
-	                    #steps: ~(#Script)
-	                    b: (int){ 2 }
-	                  }) }
-	              }
-	            }
-	            a: (int){ 1 }
-	          }, (#struct){
-	            #steps: (#struct){
-	              mount: (#list){
-	                0: (#struct){ |((#struct){
-	                    #steps: ~(#Script)
-	                    a: (int){ 1 }
-	                  }, (#struct){
-	                    #steps: ~(#Script)
-	                    b: (int){ 2 }
-	                  }) }
-	              }
-	            }
-	            b: (int){ 2 }
-	          }) }
-	      }
-	    }
-	  }
-	  #Script: (#struct){
-	    mount: (list){
-	    }
-	  }
-	  #Task: (#struct){ |((#struct){
-	      #steps: ~(#Script)
-	      a: (int){ 1 }
-	    }, (#struct){
-	      #steps: ~(#Script)
-	      b: (int){ 2 }
-	    }) }
-	  #ref: (#struct){ |((#struct){
-	      a: (int){ 1 }
-	    }, (#struct){
-	      b: (int){ 2 }
-	    }) }
-	}
-	""")
+#ref: {a: 1} | {b: 2}
 -- out/compile --
 --- in.cue
 {

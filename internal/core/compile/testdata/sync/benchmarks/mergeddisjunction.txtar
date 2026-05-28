@@ -28,7 +28,7 @@ b: {
 	for x in a {
 		"\(x.text)": {text: x.text}
 	}
-} @test(eq, {default: {text: *"default" | string}})
+}
 -- out/compile --
 --- in.cue
 {

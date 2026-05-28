@@ -12,7 +12,6 @@ issue595: {
 	for cfg in #cfgs {
 		files: cfg.nam
 	}
-	@test(err, code=eval, at=files, contains="undefined field: nam", pos=[8:14])
 }
 -- out/compile --
 --- in.cue

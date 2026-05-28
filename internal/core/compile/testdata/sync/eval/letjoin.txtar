@@ -21,12 +21,6 @@ t1: {
 	x2: a: 2
 
 	xy: x1.y & x2.y
-	@test(eq, {
-		x: {a: int, y: {v: 1}}
-		x1: {a: 1, y: {v: 1}}
-		x2: {a: 2, y: {v: 1}}
-		xy: {v: 1}
-	})
 }
 
 t2: {
@@ -48,12 +42,6 @@ t2: {
 	x2: a: r: 2
 
 	xy: x1 & x2
-	@test(eq, {
-		x: {a: {}, y: {v: 1}}
-		x1: {a: {q: 1}, y: {v: 1}}
-		x2: {a: {r: 2}, y: {v: 1}}
-		xy: {a: {q: 1, r: 2}, y: {v: 1}}
-	})
 }
 -- issue3590.cue --
 // Conflicting values in for loop with let expressions: two chained let bindings
@@ -80,13 +68,6 @@ issue3590: reduced: {
 
 		result: "conflicting-\(v.p)": Items
 	}
-	@test(eq, {
-		result: {
-			"conflicting-A": {item: "A"}
-			"conflicting-B": {item: "B"}
-		}
-		_input: {A: {p: "A"}, B: {p: "B"}}
-	})
 }
 issue3590: {
 	full: {
@@ -118,24 +99,6 @@ issue3590: {
 			result: "conflicting-\(v.p)": Items
 		}
 	}
-	@test(eq, {
-		reduced: {
-			result: {
-				"conflicting-A": {item: "A"}
-				"conflicting-B": {item: "B"}
-			}
-			_input: {A: {p: "A"}, B: {p: "B"}}
-		}
-		full: {
-			#Result: {}
-			result: {
-				"conflicting-A": {item: "A"}
-				"conflicting-B": {item: "B"}
-			}
-			#Input: {p: "A" | "B"}
-			_input: {A: {p: "A"}, B: {p: "B"}}
-		}
-	})
 }
 // Issue #3591 is related
 // Missing items in for loop with let expressions: items produced inside a
@@ -175,15 +138,6 @@ issue3591: missing: {
 			}
 		}
 	}
-	@test(eq, {
-		#Result: {}
-		result: {
-			"missing-items-A": {item: "A"}
-			"missing-items-B": {item: "B"}
-		}
-		#Input: {p: "A" | "B"}
-		_input: {A: {p: "A"}, B: {p: "B"}}
-	})
 }
 -- out/compile --
 --- in.cue

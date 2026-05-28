@@ -7,13 +7,7 @@ a: {
 			kind: B
 		}
 	}
-} @test(eq, {
-	b: c: {
-		d:    "bar"
-		name: "b"
-		kind: "c"
-	}
-})
+}
 a: b: c: d: "bar"
 -- out/compile --
 --- in.cue

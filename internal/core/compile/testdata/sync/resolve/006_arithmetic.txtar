@@ -1,12 +1,12 @@
 # Tests arithmetic operations including division producing floats and
 # conflicting types (int & float).
 -- in.cue --
-v1: 1.0T / 2.0   @test(eq, 5.0e+11)
-v2: 2.0 == 2     @test(eq, true)
-n1: 1            @test(eq, 1) @test(kind=int)
-v5: 2.0 / n1     @test(eq, 2.0)
-v6: 1.0 / 1.0   @test(eq, 1.0) @test(kind:todo=int, hint="may consider this")
-e2: int & 4.0/2.0   @test(err, code=eval, contains="conflicting values int and 2.0", pos=[0:5, 0:11])
+v1: 1.0T / 2.0
+v2: 2.0 == 2
+n1: 1
+v5: 2.0 / n1
+v6: 1.0 / 1.0
+e2: int & 4.0/2.0
 -- out/compile --
 --- in.cue
 {

@@ -13,23 +13,23 @@ incompleteBool: bool
 
 // Short-circuit && : false && anything = false.
 // Right operand not evaluated; errors/incomplete values suppressed.
-andFalseBottom:     false && _|_           @test(eq, false)
-andFalseIncomplete: false && incompleteInt  @test(eq, false)
-andFalseTrue:       false && true           @test(eq, false)
+andFalseBottom:     false && _|_
+andFalseIncomplete: false && incompleteInt
+andFalseTrue:       false && true
 
 // No short-circuit: && falls through when left is true.
-andTrueTrue:  true && true  @test(eq, true)
-andTrueFalse: true && false @test(eq, false)
+andTrueTrue:  true && true
+andTrueFalse: true && false
 
 // Short-circuit || : true || anything = true.
 // Right operand not evaluated; errors/incomplete values suppressed.
-orTrueBottom:     true || _|_            @test(eq, true)
-orTrueIncomplete: true || incompleteBool  @test(eq, true)
-orTrueTrue:       true || true            @test(eq, true)
+orTrueBottom:     true || _|_
+orTrueIncomplete: true || incompleteBool
+orTrueTrue:       true || true
 
 // No short-circuit: || falls through when left is false.
-orFalseFalse: false || false @test(eq, false)
-orFalseTrue:  false || true  @test(eq, true)
+orFalseFalse: false || false
+orFalseTrue:  false || true
 -- out/compile --
 --- in.cue
 {

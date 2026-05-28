@@ -8,14 +8,15 @@
 #C: {
 	#A & #B
 	{[=~"^Q*$"]: int}
-} @test(allows, moo) @test(allows, Qoo) @test(allows=false, string)
+}
+
 // TODO: What should this be? @test(allows=false, zoo)
-c: #C & {QQ: 3} @test(eq, {QQ: 3})
+c: #C & {QQ: 3}
 #D: {
 	#A
 	#B
 }
-d: #D & {aaa: 4} @test(eq, {aaa: 4})
+d: #D & {aaa: 4}
 -- out/compile --
 --- in.cue
 {

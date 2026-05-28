@@ -4,11 +4,11 @@
 -- in.cue --
 out: {
 	instance
-} @test(eq, {alpha: bravo: charlie: true})
+}
 
 instance: #Type & {
 	alpha: bravo: charlie: true
-} @test(eq, {alpha: bravo: charlie: true})
+}
 
 #Type: #Root & {
 	alpha?: bravo?: charlie?: bool

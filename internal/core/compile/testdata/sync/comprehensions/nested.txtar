@@ -23,17 +23,6 @@ deployment: "node-exporter": {
 			}]
 		}
 	}
-	@test(eq, {
-		spec: template: spec: containers: [{
-			ports: [{
-				_export$kube: _ @test(ignore)
-				containerPort: 9100
-				name:          "scrape"
-			}]
-			name: string
-		}]
-		_name$kube: string
-	})
 }
 service: [ID=string]: {
 	spec: {
@@ -71,36 +60,6 @@ for k, v in deployment {
 		]
 	}
 }
-@test(eq, {
-	service: "node-exporter": spec: {
-		ports: [{
-			name:       "metrics"
-			port:       9100
-			protocol:   "TCP"
-			targetPort: *9100 | int
-		}]
-		selector: _|_ @test(err, code=incomplete, contains="service.\"node-exporter\".spec.selector: undefined field: metadata", pos=[59:35])
-	}
-	deployment: "node-exporter": {
-		spec: template: spec: containers: [{
-			ports: [{
-				containerPort: 9100
-				name:          "scrape"
-				_export$kube:  *true | false
-			}]
-			name: string
-		}]
-		_name$kube: string
-	}
-	_spec$kube: {
-		_name$kube: string
-		spec: template: spec: containers: [{
-			name: string
-			ports: []
-		}]
-	}
-})
-
 -- out/compile --
 --- in.cue
 {

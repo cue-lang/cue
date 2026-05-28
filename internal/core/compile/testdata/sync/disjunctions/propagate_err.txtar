@@ -12,7 +12,6 @@ issue4056: full: {
 	if strings.HasPrefix(a, "foo") {
 		a: _ | error("error message 2")
 	}
-	@test(eq, {a: "foo-bar"})
 }
 issue4056: reduced: {
 	a: "x"
@@ -20,7 +19,6 @@ issue4056: reduced: {
 	if len(a) > 0 {
 		a: _ | error("b")
 	}
-	@test(eq, {a: "x"})
 }
 variant: {
 	a: "x"
@@ -28,14 +26,12 @@ variant: {
 	if len(a) > 0 {
 		a: _
 	}
-	@test(eq, {a: "x"})
 }
 -- pending.cue --
 // Be sure to emit errors for uncompleted pending arcs.
 err: {
 	A: "forty two"
 	if A < 100 {B: true}
-	@test(err, code=eval, contains="invalid operands", pos=[2:5, 1:5, 2:9])
 }
 -- out/compile --
 --- issue4056.cue

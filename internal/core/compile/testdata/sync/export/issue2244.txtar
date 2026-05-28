@@ -31,20 +31,6 @@ _#isReleaseTag: _#matchPattern & {#pattern: "refs/tags/v*", _}
 m: #step & {
 	if: _#isReleaseTag
 }
-@test(eq, {
-	_#matchPattern$x: {_|_, #pattern: string}
-	_#isReleaseTag$x: {
-		"refs/tags/v"
-		#pattern: "refs/tags/v*"
-	}
-	#step: {if: number | string}
-	m: {
-		if: {
-			"refs/tags/v"
-			#pattern: "refs/tags/v*"
-		}
-	}
-})
 -- out/compile --
 --- in.cue
 {

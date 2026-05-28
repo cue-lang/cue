@@ -1,11 +1,9 @@
 -- in.cue --
 dynamic: {
-	@test(permute, count=6)
 
 	X=(a): 1
-	x: X
-	a: "name"
-	@test(eq, {x: 1, a: "name", name: 1})
+	x:     X
+	a:     "name"
 }
 -- out/compile --
 --- in.cue

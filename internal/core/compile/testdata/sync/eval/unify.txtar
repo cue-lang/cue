@@ -2,16 +2,16 @@
 a: d: {
 	#base
 	#info: {...}
-	Y: #info.X @test(eq, "foo") @test(closed)
-}  @test(closed)
+	Y: #info.X
+}
 
 #base: {
 	#info: {...}
-} @test(closed)
+}
 
 a: [Name=string]: {#info: {
 	X: "foo"
-}} @test(closed=false)
+}}
 -- out/compile --
 --- in.cue
 {

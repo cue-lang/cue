@@ -2,9 +2,9 @@
 cond: bool
 src: {}
 top: _
-a: [ if cond {}]         @test(err, code=incomplete, pos=[-3:7], contains="incomplete bool")
-b: [for x in src.foo {}] @test(err, code=incomplete, pos=[0:18], contains="undefined field")
-c: {for x in top {}}     @test(err, code=incomplete, pos=[0:14], contains="cannot range")
+a: [if cond {}]
+b: [for x in src.foo {}]
+c: {for x in top {}}
 -- out/compile --
 --- in.cue
 {

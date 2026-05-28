@@ -3,11 +3,6 @@ deployment: [string]: #Deployment
 
 deployment: foo: spec: replicas: 1
 
-@test(eq, {
-	[string]: spec: replicas: int
-	foo: spec: replicas: 1
-}, at=deployment)
-
 #Deployment: {
 	#TypeMeta
 
@@ -20,7 +15,7 @@ deployment: foo: spec: replicas: 1
 
 recloseSimple: {
 	#foo: {}
-	a: {#foo} & {b: int} @test(err, at=b, code=eval, contains="field not allowed", pos=[0:15])
+	a: {#foo} & {b: int}
 }
 
 // Reclosing
@@ -37,7 +32,7 @@ reclose1: {
 	}
 
 	z: #a.b
-	z: d: 3 @test(err, code=eval, contains="field not allowed", pos=[0:5])
+	z: d: 3
 }
 
 reclose2: {
@@ -52,7 +47,7 @@ reclose2: {
 		}
 	}
 
-	z: a.b @test(eq, { c: int, d: 3 })
+	z: a.b
 	z: d: 3
 }
 
@@ -76,7 +71,7 @@ reclose3: {
 	x: #A & {
 		Name:      "a"
 		Something: 4
-	} @test(eq, {Name: "a", Something: 4})
+	}
 }
 -- out/compile --
 --- in.cue

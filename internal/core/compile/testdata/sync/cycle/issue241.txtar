@@ -5,16 +5,16 @@
 -- in.cue --
 #Value: 0 | 1
 
-foo: #Value  @test(err, code=cycle|incomplete, args=[bar], pos=[-2:13, 2:6, 3:6])
+foo: #Value
 foo: !=bar
-bar: #Value  @test(eq, 0 | 1)
-bar: !=foo   @test(err:todo, code=cycle|incomplete)
+bar: #Value
+bar: !=foo
 
 #Value: 0 | 1
 
-Foo: #Value  @test(eq, 1)
+Foo: #Value
 Foo: !=Bar
-Bar: #Value  @test(eq, 0)
+Bar: #Value
 Bar: !=Foo
 Bar: 0
 
@@ -22,11 +22,11 @@ cell: a: 0 | 1
 cell: a: !=cell.b
 cell: b: 0 | 1
 cell: b: !=cell.a
-cell: a: 0   @test(eq, 0)
-cell: b: _   @test(eq, 1)
+cell: a: 0
+cell: b: _
 
-a: cell.a  @test(eq, 0)
-b: cell.b  @test(eq, 1)
+a: cell.a
+b: cell.b
 -- out/compile --
 --- in.cue
 {

@@ -11,27 +11,22 @@ package foo
 dark: #theme & {
 	color:   "dark"
 	ctermbg: "239"
-} @test(eq, {color: "dark", ctermbg: "239"})
+}
 
 light: #theme & {
 	color:   "light"
 	ctermbg: "254"
-} @test(eq, {color: "light", ctermbg: "254"})
+}
 
 #Config: {
 	console: dark | *light
-} @test(eq, {
-	console: *{color: "light", ctermbg: "254"} | {color: "dark", ctermbg: "239"}
-})
+}
 -- box.cue --
 package foo
 
 #Config & {
 	console: dark
 }
-
-@test(eq, {color: "dark", ctermbg: "239"}, at=console)
-
 -- out/compile --
 --- box.cue
 {

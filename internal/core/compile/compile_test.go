@@ -109,9 +109,19 @@ func syncTestdataInputsCUE(t *testing.T) {
 
 		archive := &txtar.Archive{Comment: bytes.Clone(srcArchive.Comment)}
 		for _, f := range srcArchive.Files {
-			if strings.HasSuffix(f.Name, ".cue") {
-				archive.Files = append(archive.Files, txtar.File{Name: f.Name, Data: bytes.Clone(f.Data)})
+			if !strings.HasSuffix(f.Name, ".cue") {
+				continue
 			}
+			// Strip @test attributes from the source before mirroring it.
+			// They are inline-test assertions for the evalalpha runner and
+			// have no effect on compile output, but leaving them in causes
+			// the compile goldens to churn whenever a @test directive is
+			// added, updated, or removed.
+			data, err := cuetxtar.StripTestAttrs(f.Data)
+			if err != nil {
+				return err
+			}
+			archive.Files = append(archive.Files, txtar.File{Name: f.Name, Data: data})
 		}
 		if err := os.MkdirAll(filepath.Dir(dstPath), 0777); err != nil {
 			return err

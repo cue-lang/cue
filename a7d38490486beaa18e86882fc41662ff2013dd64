@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d42540e_9d17a9c8",
+        "filename": "cue/testdata/cycle/issue4365.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T18:11:56Z",
+      "side": 1,
+      "message": "shorten these comments, e.g. it doesn\u0027t need to explain in detail what the fixed behavior is because we\u0027re asserting it below via `@test`",
+      "revId": "a7d38490486beaa18e86882fc41662ff2013dd64",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16f8f4b4_620d3acc",
+        "filename": "cue/testdata/cycle/pushdown_reclaim_inflight.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T18:11:56Z",
+      "side": 1,
+      "message": "ditto, this should be much shorter and not give as much historical context",
+      "revId": "a7d38490486beaa18e86882fc41662ff2013dd64",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

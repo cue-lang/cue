@@ -130,7 +130,9 @@ func fixInstances(cmd *Command, args []string, force bool, opts ...fix.Option) (
 	done := map[*ast.File]bool{}
 
 	for _, i := range instances {
-		for _, f := range i.Files {
+		// Files is index-parallel with BuildFiles (see [build.Instance]),
+		// so BuildFiles[fi].Source holds the raw bytes for Files[fi].
+		for fi, f := range i.Files {
 			if done[f] || (f.Filename != "-" && !strings.HasSuffix(f.Filename, ".cue")) {
 				continue
 			}
@@ -146,7 +148,8 @@ func fixInstances(cmd *Command, args []string, force bool, opts ...fix.Option) (
 					return nil, errors.Promote(err, "format")
 				}
 			} else {
-				if err := os.WriteFile(f.Filename, b, 0666); err != nil {
+				oldData, _ := i.BuildFiles[fi].Source.([]byte)
+				if err := writeFileIfChanged(f.Filename, oldData, b, 0666); err != nil {
 					errs = errors.Append(errs, errors.Promote(err, "write"))
 				}
 			}

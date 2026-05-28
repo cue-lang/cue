@@ -48,6 +48,9 @@ type Instance struct {
 	User bool // True if package was created from individual files.
 
 	// Files contains the AST for all files part of this instance.
+	// When populated via [cuelang.org/go/cue/load.Instances], Files is
+	// index-parallel with BuildFiles: Files[i] holds the parsed AST for
+	// BuildFiles[i].
 	// TODO: the intent is to deprecate this in favor of BuildFiles.
 	Files []*ast.File
 

@@ -173,7 +173,7 @@ func (fsys *fsIOFS) ReadCUEFile(p string, cfg parser.Config) (*ast.File, error) 
 	if err != nil {
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
-		cache.entries[key] = fileCacheEntry{nil, err}
+		cache.entries[key] = fileCacheEntry{nil, err, nil}
 		return nil, err
 	}
 	if fsys.languageVersion != "" {

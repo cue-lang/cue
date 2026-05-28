@@ -439,7 +439,7 @@ func (fs *overlayIOFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, e
 		if err != nil {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
-			cache.entries[key] = fileCacheEntry{nil, err}
+			cache.entries[key] = fileCacheEntry{nil, err, nil}
 			return nil, err
 		}
 	}
@@ -537,6 +537,9 @@ func (fc *fileCache) getCUESyntax(bf *build.File, cfg parser.Config) (*ast.File,
 	useCache := bf.Form == "" && bf.Interpretation == ""
 	if useCache {
 		if syntax, ok := fc.entries[key]; ok {
+			// Repopulate bf.Source so subsequent cache hits still surface
+			// the file's raw bytes to callers, just like a cache miss does.
+			bf.Source = syntax.src
 			return syntax.file, syntax.err
 		}
 	}
@@ -547,7 +550,8 @@ func (fc *fileCache) getCUESyntax(bf *build.File, cfg parser.Config) (*ast.File,
 	// Note: CUE files can never have multiple file parts.
 	f, err := d.File(), d.Err()
 	if useCache {
-		fc.entries[key] = fileCacheEntry{f, err}
+		src, _ := bf.Source.([]byte)
+		fc.entries[key] = fileCacheEntry{f, err, src}
 	}
 	return f, err
 }
@@ -565,4 +569,8 @@ type fileCacheEntry struct {
 	// multiple different build instances in the same directory hierarchy.
 	file *ast.File
 	err  error
+	// src caches the raw on-disk bytes of the file, as read once by
+	// [encoding.NewDecoder]. It is mirrored back onto bf.Source on a
+	// cache hit so callers see the same value either way.
+	src []byte
 }

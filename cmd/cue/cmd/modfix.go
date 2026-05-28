@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -64,11 +63,5 @@ func runModFix(cmd *Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
 	}
-	if bytes.Equal(newData, data) {
-		return nil
-	}
-	if err := os.WriteFile(modPath, newData, 0o666); err != nil {
-		return err
-	}
-	return nil
+	return writeFileIfChanged(modPath, data, newData, 0o666)
 }

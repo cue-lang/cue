@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"bytes"
 	"cmp"
 	"os"
 	"path/filepath"
@@ -377,6 +378,17 @@ func newBuildPlan(cmd *Command, cfg *config) (p *buildPlan, err error) {
 
 func (p *buildPlan) matchFile(file string) bool {
 	return p.cfg.reFile.MatchString(file)
+}
+
+// writeFileIfChanged behaves like [os.WriteFile] but skips the write when the
+// new bytes match the previously-read bytes from the same file. This preserves
+// the file's modification time for in-place rewriters that run as a no-op, so
+// tools and build systems that key off mtime are not disturbed unnecessarily.
+func writeFileIfChanged(filename string, oldData, newData []byte, perm os.FileMode) error {
+	if bytes.Equal(oldData, newData) {
+		return nil
+	}
+	return os.WriteFile(filename, newData, perm)
 }
 
 func setTags(cfg *load.Config, flags *pflag.FlagSet) {

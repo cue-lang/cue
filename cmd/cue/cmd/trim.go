@@ -159,7 +159,10 @@ func runTrim(cmd *Command, args []string) error {
 	}
 
 	for _, inst := range binst {
-		for _, f := range inst.Files {
+		// load.Instances populates Files in lockstep with BuildFiles, so the
+		// two slices are index-parallel: Files[fi] holds the parsed AST for
+		// BuildFiles[fi], and BuildFiles[fi].Source holds its raw bytes.
+		for fi, f := range inst.Files {
 			filename := f.Filename
 
 			opts := []format.Option{}
@@ -178,11 +181,13 @@ func runTrim(cmd *Command, args []string) error {
 					return err
 				}
 				continue
-			} else if dst != "" {
-				filename = dst
 			}
-
-			err = os.WriteFile(filename, b, 0666)
+			oldData, _ := inst.BuildFiles[fi].Source.([]byte)
+			if dst != "" {
+				filename = dst
+				oldData = nil
+			}
+			err = writeFileIfChanged(filename, oldData, b, 0666)
 			if err != nil {
 				return err
 			}

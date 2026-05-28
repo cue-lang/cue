@@ -6,7 +6,7 @@ package a
 
 import "mod.test/b"
 
-theb: b.name @test(err, code=incomplete, path=b, contains="undefined field: %s", args=[c], pos=[b/b.cue:5:6])
+theb: b.name
 -- b/b.cue --
 package b
 

@@ -7,10 +7,9 @@ import (
 simplified: {
 	x: d: R={
 		".*"
-		[R+""][0]
+		[R + ""][0]
 	}
 	out: yaml.Marshal(x)
-	@test(eq, {x: {d: ".*"}, out: "d: .*\n"})
 }
 
 original: {
@@ -32,27 +31,6 @@ original: {
 		}
 	}
 	out: yaml.Marshal(rule)
-	@test(eq, {
-		#testableRegexp: {
-			string
-			#test: {
-				in: string
-				out: _|_ @test(err, code=incomplete, contains="original.#testableRegexp.#test.out: non-concrete value string in operand to +", pos=[21:29, 16:21, 17:3])
-			}
-		}
-		rule: {
-			#patterns: {
-				bar: {
-					"(.*)"
-					#test: {in: "testcontent", out: "testcontent"}
-				}
-			}
-		}
-		out: """
-		{}
-
-		"""
-	})
 }
 -- out/compile --
 --- in.cue

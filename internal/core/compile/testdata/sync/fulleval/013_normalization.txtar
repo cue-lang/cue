@@ -3,9 +3,9 @@ It needs to be determined under which circumstances is desirable.
 The redundancy that remains from not normalizing can be useful.
 
 -- in.cue --
-a: string | string @test(eq, string)
-b: *1 | *int       @test(eq, *1 | *int)
-c: *1.0 | *float   @test(eq, *1.0 | *float)
+a: string | string
+b: *1 | *int
+c: *1.0 | *float
 -- out/compile --
 --- in.cue
 {

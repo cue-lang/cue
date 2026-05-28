@@ -9,14 +9,6 @@ c: {
 	x: "hello"
 	y: b
 }
-@test(eq, {
-	a: 1
-	b: 2
-	c: {
-		x: "hello"
-		y: 2
-	}
-})
 -- out/compile --
 --- in.cue
 {

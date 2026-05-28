@@ -11,14 +11,13 @@
 // TODO: fix
 out: {
 	for k in keys {
-		if values[k] != _|_  {
+		if values[k] != _|_ {
 			val: k
 			if val != _|_ {
 				k
 			}
 		}
 	}
-	@test(err, code=eval, hint="string with struct")
 }
 
 // multiple lets are mapped to the same location and will conflict. This is
@@ -27,27 +26,25 @@ out: {
 // TODO: fix
 multiLets: {
 	for k in keys {
-		if values[k] != _|_  {
+		if values[k] != _|_ {
 			let val = k
 			if val != _|_ {
 				k
 			}
 		}
 	}
-	@test(eq, "b")
 }
 
 keys: [
 	// order matters
 	"a",
 	"b",
-] @test(eq, ["a", "b"])
+]
 
 values: {
 	// order does not matter
 	"b": "member"
 	"c": "foo"
-	@test(eq, {b: "member", c: "foo"})
 }
 
 full: {
@@ -78,7 +75,6 @@ full: {
 		"role":     "member"
 		"username": "foo"
 	}
-	@test(eq, {out: {role: "member"}, #github_team_membership: {team_id: string, role: string}, values: {role: "member", username: "foo"}})
 }
 -- out/compile --
 --- in.cue

@@ -1,15 +1,11 @@
 -- in.cue --
-a: b @test(eq, 2)
+a: b
 b: 2
 d: {
 	d: 3
-	e: d @test(eq, 3)
-} @test(eq, {d: 3, e: 3})
+	e: d
+}
 e: {
-	@test(eq, {
-		e: {v: 1}
-		f: {v: 1}
-	})
 	e: {
 		v: 1
 	}

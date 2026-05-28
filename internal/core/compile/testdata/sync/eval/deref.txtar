@@ -21,13 +21,8 @@ issue4011: full: {
 	}
 
 	site: [_]: hugo: production: {}
-	@test(eq, {site: cls: {
-		fs: Create: config: Contents: {}
-		hugo: production: {}
-	}})
 }
 issue4011: reduced: {
-	@test(eq, {result: foo: true, envs: foo: {}})
 	result: {
 		for envName in ["foo"]
 		let env = envs[envName]

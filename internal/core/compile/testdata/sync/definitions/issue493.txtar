@@ -5,14 +5,14 @@
 #Artifact: {
 	body: _
 	other: [string]: int
-} @test(shareID=appAtom)
+}
 
-#App:  #Artifact @test(shareID=appAtom)
-#Atom: #Artifact @test(shareID=appAtom)
+#App:  #Artifact
+#Atom: #Artifact
 
 #Both: #App | #Atom
 
-t1: #Both & {body: 3} @test(eq, {body: 3, other: {}})
+t1: #Both & {body: 3}
 -- out/compile --
 --- in.cue
 {

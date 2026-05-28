@@ -1,16 +1,16 @@
 #name: recursive evaluation within list
 #evalFull
 -- in.cue --
-l: [a]          @test(eq, [{c: "t", d: "t"}]) @test(shareID=L, at=0)
-a: b & {c: "t"} @test(eq, {c: "t", d: "t"})  @test(shareID=L)
+l: [a]
+a: b & {c: "t"}
 b: {
 	d: c
 	c: string
-} @test(eq, {d: string, c: string})
-l1: [a1] @test(eq, [{c: "t", d: "st"}]) @test(shareID=L1, at=0)
-a1: b1 & {c: "t"} @test(eq, {c: "t", d: "st"}) @test(shareID=L1)
+}
+l1: [a1]
+a1: b1 & {c: "t"}
 b1: {
-	d: "s" + c @test(err, code=incomplete)
+	d: "s" + c
 	c: string
 }
 -- out/compile --

@@ -2,13 +2,13 @@
 import "strings"
 
 a: strings.ContainsAny("ab")
-a: "after" @test(eq, "after")
+a: "after"
 
 b: strings.ContainsAny("c")
-b: "dog" @test(err, code=eval, contains="invalid value \"dog\"", pos=[-1:4, -1:24, 0:4])
+b: "dog"
 
 c: strings.ContainsAny("d") & strings.ContainsAny("g")
-c: "dog" @test(eq, "dog")
+c: "dog"
 -- out/compile --
 --- in.cue
 {

@@ -11,7 +11,7 @@
 	mas: [string]: {
 		cfg:   _
 		_link: #T
-		link:  _link & {config: cfg}
+		link: _link & {config: cfg}
 	}
 }
 
@@ -34,31 +34,7 @@
 	}
 }
 
-a: #a & {config: a: 34} @test(eq, {
-	config: {a: 34}
-	body: 34
-	mas: one: {
-		cfg: {b: 34}
-		_link: {
-			config: {b: int}
-			body: int
-			mas: two: {
-				cfg: {c: int}
-				_link: {config: {c: int}, body: int, mas: {}}
-				link: {config: {c: int}, body: int, mas: {}}
-			}
-		}
-		link: {
-			config: {b: 34}
-			body: 34
-			mas: two: {
-				cfg: {c: 34}
-				_link: {config: {c: int}, body: int, mas: {}}
-				link: {config: {c: 34}, body: 34, mas: {}}
-			}
-		}
-	}
-})
+a: #a & {config: a: 34}
 -- reduced.cue --
 reduced: t1: {
 	#T: x: y?: {
@@ -67,28 +43,6 @@ reduced: t1: {
 	}
 	a: #T
 	a: x: y: V: x: y: V: {}
-
-	@test(eq, {
-		#T: x: y?: {
-			V: _
-			z: x: y?: {
-				_|_
-				V: _
-				z: _|_ @test(err, code=structural_cycle, contains="reduced.t1.#T.x.y.z.x.y.z: structural cycle", pos=[])
-			}
-		}
-		a: x: y: {
-			V: x: y: V: {}
-			z: x: y: {
-				V: {}
-				z: x: y?: {
-					_|_
-					V: _
-					z: _|_ @test(err, code=structural_cycle, contains="reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle", pos=[])
-				}
-			}
-		}
-	})
 }
 -- out/compile --
 --- in.cue

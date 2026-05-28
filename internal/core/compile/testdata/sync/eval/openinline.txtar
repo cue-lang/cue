@@ -17,14 +17,13 @@ inlineErr: {
 
 	// Allow a closedness error that occurs within an inline struct.
 	def: x: (#D & {b: 2}).b
-	@test(eq, {#D: {a: 1}, def: {x: 2}})
 }
 
 // These tests test that selecting into an inlined struct recursively opens this
 // struct in OpenInline.
 outerErr: {
 	_inToOut: {
-		in: _
+		in:  _
 		out: in.foo
 	}
 
@@ -36,26 +35,20 @@ outerErr: {
 	// https://cuelang.org/issue/3534
 	issue3534: {
 		#Inner: foo: minor: 2
-		#Outer: version: { major: 1, ... }
+		#Outer: version: {major: 1, ...}
 
 		t1: #Outer
 		t1: version: (_inToOut & {in: #Inner}).out
-		@test(eq, {
-			#Inner: {foo: {minor: 2}}
-			#Outer: {version: {major: 1}}
-			t1: {version: {major: 1, minor: 2}}
-		})
 	}
 
 	// Test that the same principle works with the close builtin.
 	usingClose: {
 		// Same as above, but with an additional level of nesting.
-		#Inner:  foo: close({minor: 2})
-		#Outer: version: { major: 1, ... }
+		#Inner: foo: close({minor: 2})
+		#Outer: version: {major: 1, ...}
 
 		t1: #Outer
 		t1: version: (_inToOut & {in: #Inner}).out
-		@test(err, code=eval, at=t1.version.major, contains="field not allowed", pos=[3:22])
 	}
 
 	// Test that the mechanism still works with extra nesting: the closedness of
@@ -63,15 +56,10 @@ outerErr: {
 	extraNesting: {
 		// Same as above, but with an additional level of nesting.
 		#Inner: foo: x: minor: 2
-		#Outer: version: x: { major: 1, ... }
+		#Outer: version: x: {major: 1, ...}
 
 		t1: #Outer
 		t1: version: (_inToOut & {in: #Inner}).out
-		@test(eq, {
-			#Inner: {foo: {x: {minor: 2}}}
-			#Outer: {version: {x: {major: 1}}}
-			t1: {version: {x: {major: 1, minor: 2}}}
-		})
 	}
 }
 
@@ -79,7 +67,7 @@ outerErr: {
 // in the referred definitions.
 
 // faulty struct referenced from package
-refFromPkg: (pkg.#E).b @test(eq, 1)
+refFromPkg: (pkg.#E).b
 
 refFromLet: {
 	let X = {
@@ -87,9 +75,7 @@ refFromLet: {
 		#E: #D & {b: 1}
 	}
 	x: (X.#E).b
-	@test(eq, {x: 1})
 }
-
 -- cue.mod/pkg/foo.com/example/example.cue --
 package example
 

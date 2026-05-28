@@ -51,11 +51,10 @@ _test: {
 		n: "c1"
 	}
 
-
 	s3: #AS
 	s3: d: {
 		n: "s3"
-		r: r1: a:c1
+		r: r1: a: c1
 	}
 
 	s2: #AS
@@ -80,114 +79,6 @@ _test: {
 //  Test
 
 out: #sub & {#p: _test.s1}
-
-// TODO(fmt): can we improve this?
-@test(eq, {
-	#AC: {k: "simple", d: {n: string}}
-	#AS: {k: "complex", d: {n: string, r: {}}}
-	#R: {
-		a: {k: "simple", d: {n: string}} | {k: "complex", d: {n: string, r: {}}}
-	}
-	#S: {n: string, r: {}}
-	#C: {n: string}
-	#sub: {
-		#p: {k: "complex", d: {n: string, r: {}}}
-		dict: {}
-	}
-	_test: {
-		c1: {d: {n: "c1"}, k: "simple"}
-		s3: {
-			d: {
-				n: "s3"
-				r: {r1: {a: {d: {n: "c1"}, k: "simple"}}}
-			}
-			k: "complex"
-		}
-		s2: {
-			d: {
-				n: "s2"
-				r: {
-					r1: {a: {d: {n: "c1"}, k: "simple"}}
-					r2: {
-						a: {
-							d: {
-								n: "s3"
-								r: {r1: {a: {d: {n: "c1"}, k: "simple"}}}
-							}
-							k: "complex"
-						}
-					}
-				}
-			}
-			k: "complex"
-		}
-		s1: {
-			d: {
-				n: "s1"
-				r: {
-					r1: {a: {d: {n: "c1"}, k: "simple"}}
-					r2: {
-						a: {
-							d: {
-								n: "s2"
-								r: {
-									r1: {a: {d: {n: "c1"}, k: "simple"}}
-									r2: {
-										a: {
-											d: {
-												n: "s3"
-												r: {r1: {a: {d: {n: "c1"}, k: "simple"}}}
-											}
-											k: "complex"
-										}
-									}
-								}
-							}
-							k: "complex"
-						}
-					}
-				}
-			}
-			k: "complex"
-		}
-	}
-	out: {
-		#p: {
-			d: {
-				n: "s1"
-				r: {
-					r1: {a: {d: {n: "c1"}, k: "simple"}}
-					r2: {
-						a: {
-							d: {
-								n: "s2"
-								r: {
-									r1: {a: {d: {n: "c1"}, k: "simple"}}
-									r2: {
-										a: {
-											d: {
-												n: "s3"
-												r: {r1: {a: {d: {n: "c1"}, k: "simple"}}}
-											}
-											k: "complex"
-										}
-									}
-								}
-							}
-							k: "complex"
-						}
-					}
-				}
-			}
-			k: "complex"
-		}
-		dict: {
-			r1: {a: {d: {n: "c1"}, k: "simple"}}
-			r2_r1: {a: {d: {n: "c1"}, k: "simple"}}
-			r2_r2_r1: {a: {d: {n: "c1"}, k: "simple"}}
-		}
-	}
-})
 -- out/compile --
 --- in.cue
 {

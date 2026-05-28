@@ -7,14 +7,14 @@
 	["a", #T] |
 	["b", #T] |
 	["c", #T] |
-	["d", ...#T] @test(shareID=T)
+	["d", ...#T]
 
-x: #T @test(shareID=T)
-y: #T @test(shareID=T)
-z: #T @test(shareID=T)
-v: #T @test(shareID=T)
+x: #T
+y: #T
+z: #T
+v: #T
 
-#X: x @test(shareID=T)
+#X: x
 #X: y
 #X: z
 #X: v

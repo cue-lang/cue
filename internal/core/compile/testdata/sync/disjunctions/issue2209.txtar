@@ -76,55 +76,6 @@ full: {
 			fuga?: null | bool
 		}
 	}
-	@test(eq, {
-		Foo: {
-			spec: {foo: {min: *10 | int, max: *20 | int}}
-			resource: {
-				_X: {
-					spec: {foo: {min: *10 | int, max: *20 | int}}
-				}
-				spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | {minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool}
-			}
-		}
-		Bar: {
-			spec: {bar: {min: *30 | int, max: *40 | int}}
-			resource: {
-				_X: {
-					spec: {bar: {min: *30 | int, max: *40 | int}}
-				}
-				spec: *{minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null | bool, fuga?: null} | {minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null, fuga?: null | bool}
-			}
-		}
-		#Abstract: {
-			spec: *{foo: {min: *10 | int, max: *20 | int}} | {bar: {min: *30 | int, max: *40 | int}}
-			resource: {
-				_X: {
-					spec: *{foo: {min: *10 | int, max: *20 | int}} | {bar: {min: *30 | int, max: *40 | int}}
-				}
-				spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | {minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool}
-			}
-		}
-		_#Spec: *{foo: {min: *10 | int, max: *20 | int}} | {bar: {min: *30 | int, max: *40 | int}}
-		_#SpecFoo: {foo: {min: *10 | int, max: *20 | int}}
-		_#SpecBar: {bar: {min: *30 | int, max: *40 | int}}
-		_Thing: {
-			_X: _
-			spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | *{minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null | bool, fuga?: null} | {minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool} | {minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null, fuga?: null | bool}
-		}
-		#Constrained: {
-			spec: *{minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null | bool, fuga?: null} | *{minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null | bool, fuga?: null} | {minFoo: *10 | int, maxFoo: *20 | int, minBar?: null, maxBar?: null, hoge?: null, fuga?: null | bool} | {minFoo?: null, maxFoo?: null, minBar: *30 | int, maxBar: *40 | int, hoge?: null, fuga?: null | bool}
-		}
-		#Base: {
-			spec: {
-				minFoo?: null | int
-				maxFoo?: null | int
-				minBar?: null | int
-				maxBar?: null | int
-				hoge?: null | bool
-				fuga?: null | bool
-			}
-		}
-	})
 }
 
 reduced: {
@@ -153,23 +104,6 @@ reduced: {
 
 		*{nullFoo: null} | {nullBar: null}
 	}
-	@test(eq, {
-		Foo: {
-			spec: {foo: {min: *10 | int}}
-			out: *{_Xspec: {foo: {min: *10 | int}}, minFoo: *10 | int, nullFoo: null} | {_Xspec: {foo: {min: *10 | int}}, minFoo: *10 | int, nullBar: null}
-		}
-		Bar: {
-			spec: {bar: {min: *20 | int}}
-			out: *{_Xspec: {bar: {min: *20 | int}}, minBar: *20 | int, nullFoo: null} | {_Xspec: {bar: {min: *20 | int}}, minBar: *20 | int, nullBar: null}
-		}
-		#Obj: {
-			spec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}
-			out: *{_Xspec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}, minFoo: *10 | int, nullFoo: null} | {_Xspec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}, minFoo: *10 | int, nullBar: null}
-		}
-		#SpecFoo: {foo: {min: *10 | int}}
-		#SpecBar: {bar: {min: *20 | int}}
-		#Out: *{minFoo: int, nullFoo: null} | *{minBar: int, nullFoo: null} | {minFoo: int, nullBar: null} | {minBar: int, nullBar: null}
-	})
 }
 -- out/compile --
 --- input.cue

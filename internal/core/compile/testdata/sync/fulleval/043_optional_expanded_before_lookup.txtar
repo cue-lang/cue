@@ -10,11 +10,7 @@ test: A: {
 	field2: "2"
 }
 
-B: test.A & {} @test(eq, {
-	field1: "1"
-	field2: "2"
-	name: "A"
-})
+B: test.A & {}
 -- out/compile --
 --- in.cue
 {

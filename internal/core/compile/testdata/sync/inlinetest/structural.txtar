@@ -3,33 +3,30 @@
 
 // ── error-only ─────────────────────────
 
-errOnly: 1 & 2 @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:10, 0:14])
+errOnly: 1 & 2
 
-errWithCode: string & 1 @test(err, code=eval,
-	contains="conflicting values %s and %s (mismatched types %s and %s)",
-	args=[string, 1, string, int], pos=[0:14, 0:23])
+errWithCode: string & 1
 
 // ── eq: computed struct ────────────────
 
-eqBasic: {a: 1, b: 2} @test(eq, {a: 1, b: 2})
+eqBasic: {a: 1, b: 2}
 
 eqComputed: {
-	@test(eq, {x: 10, y: 20})
 	x: 10
 	y: x * 2
 }
 
 // ── skip ──────────────────────────────
 
-skippedTest: {a: 1} @test(skip, why="demonstrating skip")
+skippedTest: {a: 1}
 
 // ── desc ──────────────────────────────
 
-descTest: {v: "ok"} @test(desc="description") @test(eq, {v: "ok"})
+descTest: {v: "ok"}
 
 // ── version-specific ──────────────────
 
-versionOverride: {x: 1} @test(eq, {x: 1}) @test(eq:unknown, {x: 3})
+versionOverride: {x: 1}
 
 // ── plain fixture field + references ──────────────────
 
@@ -38,11 +35,11 @@ plainFixture: {
 	x: 42
 }
 
-refsFixture: plainFixture.x @test(eq, 42)
+refsFixture: plainFixture.x
 
 // ── mixed inline ──────────────────────
 
-mixedInline: 42 @test(eq, 42)
+mixedInline: 42
 -- out/compile --
 --- in.cue
 {

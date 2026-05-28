@@ -12,7 +12,6 @@ import "mod.test/pkg:bar"
 
 bar
 zz: 3
-@test(eq, {zz: 3, yy: 2, xx: 1})
 -- pkg/bar.cue --
 package bar
 

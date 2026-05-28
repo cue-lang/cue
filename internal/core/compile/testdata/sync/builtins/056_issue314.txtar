@@ -12,27 +12,23 @@ import (
 x: {
 	s: "myname"
 	#T
-	@test(eq, {s: "myname", out: "myname"})
 }
 
 #T: {
-	s:   string
+	s: string
 	out: template.Execute("{{.s}}", {
 		"s": s
-	}) @test(err, code=incomplete,
-		contains="error in call to text/template.Execute: cannot convert non-concrete value string", pos=[0:7, -1:2])
+	})
 }
 
 #V: {
-	s:   string
-	out: json.Marshal({"s": s}) @test(err, code=incomplete,
-		contains="cannot convert incomplete value", pos=[0:7, -1:7])
+	s: string
+	out: json.Marshal({"s": s})
 }
 
 #U: {
-	s:   string
-	out: yaml.Marshal({"s": s}) @test(err, code=incomplete,
-		contains="incomplete value string", pos=[0:7, -1:7, 0:26])
+	s: string
+	out: yaml.Marshal({"s": s})
 }
 -- out/compile --
 --- in.cue

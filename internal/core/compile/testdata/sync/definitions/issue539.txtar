@@ -14,10 +14,7 @@ Component: {
 	}
 }
 
-hello: #Schema & Component @test(closed) @test(eq, {
-	hostname: *"localhost" | string
-	_#foo: {hello: "world"}
-})
+hello: #Schema & Component
 -- out/compile --
 --- in.cue
 {

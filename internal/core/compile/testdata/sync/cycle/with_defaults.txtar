@@ -4,18 +4,15 @@ range1: {
 	min:   *1 | int
 	range: >min
 	range: 8
-	@test(eq, {min: *1 | int, range: 8})
 }
 range2: {
 	min: *1 | int
 	max: int & >min
-	@test(eq, {min: *1 | int, max: >1 & int})
 }
 rg: range2
 rg: {
 	//   min: 1
 	max: 8
-	@test(eq, {max: 8, min: *1 | int})
 }
 -- out/compile --
 --- in.cue

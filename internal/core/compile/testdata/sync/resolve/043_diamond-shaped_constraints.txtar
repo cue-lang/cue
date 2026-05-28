@@ -6,7 +6,6 @@ S: {
 	B: A & {
 		b: 2
 	}
-	@test(eq, {A: {a: 1}, B: {b: 2, a: 1}})
 }
 T: S & {// S == { A: { a:1 }, B: { a:1, b:2 } }
 	A: {
@@ -15,7 +14,7 @@ T: S & {// S == { A: { a:1 }, B: { a:1, b:2 } }
 	B: {
 		d: 4 // Combines constraints S.A, S.B, T.A, and T.B // S.B & A
 	}
-} @test(eq, {A: {c: 3, a: 1}, B: {d: 4, b: 2, c: 3, a: 1}})
+}
 -- out/compile --
 --- in.cue
 {

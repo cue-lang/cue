@@ -32,10 +32,7 @@ _libexport: {
 }
 export: _libexport & {
 	_IMPORTS: [_imported]
-} @test(eq, at=objects, [
-	{_neverTrue: false, alwaysSet: "foo", name: "name1", spec: {image: "image1"}},
-	{generated: true},
-])
+}
 
 _imported: {
 	export: _libexport & {

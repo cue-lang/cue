@@ -10,7 +10,7 @@ issue3972: {
 	// was not used in the computation of the test result. That seems correct.
 	// But maybe this test is then not testing what it is supposed to do.
 	// Investigate against the original issue.
-	output: out0: "static" @test(eq, "static") // has to go first
+	output: out0: "static" // has to go first
 
 	input: inputStatic: "static"
 	if false {
@@ -23,7 +23,7 @@ issue3972: {
 	}
 
 	_out1: [for svc, _ in derived {svc}]
-	output: out1: yaml.Marshal(_out1) @test(eq, "- derivedStatic\n")
+	output: out1: yaml.Marshal(_out1)
 }
 -- out/compile --
 --- in.cue

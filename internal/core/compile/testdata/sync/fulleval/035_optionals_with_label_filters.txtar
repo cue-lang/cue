@@ -12,7 +12,7 @@
 #Jobs: {
 	{[#JobID]: #Job}
 
-	{[=~"Test$"]: name: =~"^test"}// Must work without ...
+	{[=~"Test$"]: name: =~"^test"} // Must work without ...
 }
 
 jobs: foo: name: "allGood"
@@ -20,17 +20,13 @@ jobs: foo: name: "allGood"
 
 jobs1:          #Jobs
 jobs1: foo1: {} // faulty
-@test(err, code=eval, at=jobs1.foo1, contains="field not allowed", pos=[-1:8])
 
 jobs2: #Jobs
 jobs2: fooTest: name: "badName" // faulty
-@test(err, code=eval, at=jobs2.fooTest.name, contains="invalid value", pos=[-12:22, -18:8, -1:23])
 
 jobs3: #Jobs
 jobs3: [string]: #Job
 jobs3: fooTest1: name: "badName" // faulty
-@test(err, code=eval, at=jobs3.fooTest1, contains="field not allowed", pos=[-2:8, -1:8])
-
 -- out/compile --
 --- in.cue
 {

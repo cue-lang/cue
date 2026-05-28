@@ -5,16 +5,11 @@
 # with a definition.
 # https://cuelang.org/issue/3813
 -- x.cue --
-x: {[string]: _} @test(closed) @test(eq, {
-	f: _
-	[string]: _
-})
+x: {[string]: _}
 x: #d
 #d: f: _
 
 y: {
-	@test(eq, {f: true})
-	@test(closed)
 	x
 }
 y: f: true

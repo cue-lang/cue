@@ -9,36 +9,25 @@ noKind: {
 		#Def: {<10, _hidden: "field"} | >200 | string
 
 		// The data is an int, but the struct embeds a matching scalar kind too.
-		out: #Def & 123 @test(err,
-			suberr=(code=eval, contains="conflicting values", args=[123, string]),
-			suberr=(code=eval, contains="invalid value", args=[123, <10]),
-			suberr=(code=eval, contains="invalid value", args=[123, >200]),
-			pos=[])
+		out: #Def & 123
 	}
 	manyStructsEmpty: {
 		#Def: {f1!: int} | {f2!: int} | string
 
 		// The data is a struct, which matches multiple disjunct struct kinds.
-		out: #Def & {} @test(eq, {f1!: int} | {f2!: int})
+		out: #Def & {}
 	}
 	manyScalars: {
 		#Def: 1 | 2 | 3
 
 		// The data is an int, which matches all of the disjunct kinds.
-		out: #Def & 123 @test(err,
-			suberr=(code=eval, contains="conflicting values", args=[1, 123], pos=[-3:9, 0:8, 0:15]),
-			suberr=(code=eval, contains="conflicting values", args=[2, 123], pos=[-3:13, 0:8, 0:15]),
-			suberr=(code=eval, contains="conflicting values", args=[3, 123], pos=[-3:17, 0:8, 0:15]))
+		out: #Def & 123
 	}
 	zeroScalars: {
 		#Def: int | string | null
 
 		// The data is a bool, which matches none of the disjunct scalar kinds.
-		out: #Def & true @test(err,
-			suberr=(code=eval, contains="conflicting values", args=[true, int]),
-			suberr=(code=eval, contains="conflicting values", args=[true, null]),
-			suberr=(code=eval, contains="conflicting values", args=[true, string]),
-			pos=[])
+		out: #Def & true
 	}
 }
 
@@ -51,15 +40,7 @@ byKind: {
 		#Def3: {f3: null | int}
 
 		// The data is a struct, not a null.
-		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval,
-			contains="6 errors in empty disjunction",
-			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:15, 0:8, 0:21]),
-			suberr=(code=eval, contains="4 errors in empty disjunction"),
-			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:22, -4:15, 0:8, 0:25]),
-			suberr=(code=eval, contains="2 errors in empty disjunction"),
-			suberr=(code=eval, contains="conflicting values", args=["not an int", int], pos=[-5:22, -4:22, -3:22, 0:8, 0:29]),
-			suberr=(code=eval, contains="conflicting values", args=["not an int", null], pos=[-5:22, -4:22, -3:15, 0:8, 0:29]),
-			pos=[])
+		out: #Def1 & {f1: f2: f3: "not an int"}
 	}
 
 	nullableStructRequired: {
@@ -68,15 +49,7 @@ byKind: {
 		#Def3: {f3!: null | int}
 
 		// The data is a struct, not a null.
-		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval,
-			contains="6 errors in empty disjunction",
-			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:16, 0:8, 0:21]),
-			suberr=(code=eval, contains="4 errors in empty disjunction"),
-			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:23, -4:16, 0:8, 0:25]),
-			suberr=(code=eval, contains="2 errors in empty disjunction"),
-			suberr=(code=eval, contains="conflicting values", args=["not an int", int], pos=[-5:23, -4:23, -3:23, 0:8, 0:29]),
-			suberr=(code=eval, contains="conflicting values", args=["not an int", null], pos=[-5:23, -4:23, -3:16, 0:8, 0:29]),
-			pos=[])
+		out: #Def1 & {f1: f2: f3: "not an int"}
 	}
 
 	nullableStructOptional: {
@@ -85,15 +58,7 @@ byKind: {
 		#Def3: {f3?: null | int}
 
 		// The data is a struct, not a null.
-		out: #Def1 & {f1: f2: f3: "not an int"} @test(err, code=eval,
-			contains="6 errors in empty disjunction",
-			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:16, 0:8, 0:21]),
-			suberr=(code=eval, contains="4 errors in empty disjunction"),
-			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:23, -4:16, 0:8, 0:25]),
-			suberr=(code=eval, contains="2 errors in empty disjunction"),
-			suberr=(code=eval, contains="conflicting values", args=["not an int", int], pos=[-5:23, -4:23, -3:23, 0:8, 0:29]),
-			suberr=(code=eval, contains="conflicting values", args=["not an int", null], pos=[-5:23, -4:23, -3:16, 0:8, 0:29]),
-			pos=[])
+		out: #Def1 & {f1: f2: f3: "not an int"}
 	}
 
 	nullableList: {
@@ -102,27 +67,14 @@ byKind: {
 		#Def3: [...null | int]
 
 		// The data is a list, not a null.
-		out: #Def1 & [[["not an int"]]] @test(err, code=eval,
-			contains="6 errors in empty disjunction",
-			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:14, 0:8, 0:17]),
-			suberr=(code=eval, contains="4 errors in empty disjunction"),
-			suberr=(code=eval, contains="conflicting values", args=[null], pos=[-5:21, -4:14, 0:8, 0:18]),
-			suberr=(code=eval, contains="2 errors in empty disjunction"),
-			suberr=(code=eval, contains="conflicting values", args=["not an int", int], pos=[-5:21, -4:21, -3:21, 0:8, 0:19]),
-			suberr=(code=eval, contains="conflicting values", args=["not an int", null], pos=[-5:21, -4:21, -3:14, 0:8, 0:19]),
-			pos=[])
+		out: #Def1 & [[["not an int"]]]
 	}
 
 	scalarConstraints: {
 		#Def: >10 | "" | null | false
 
 		// The data is an integer, not any other scalar type.
-		out: #Def & 5 @test(err,
-			suberr=(code=eval, contains="conflicting values", args=[5, ""]),
-			suberr=(code=eval, contains="conflicting values", args=[5, false]),
-			suberr=(code=eval, contains="conflicting values", args=[5, null]),
-			suberr=(code=eval, contains="invalid value", args=[5, >10]),
-			pos=[])
+		out: #Def & 5
 	}
 }
 -- out/compile --

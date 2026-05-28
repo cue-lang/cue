@@ -4,23 +4,22 @@
 inline: small: {
 	f: {
 		n: int
-		out: (f & {"n": n - 1}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[0:9])
+		out: (f & {"n": n - 1}).out
 	}
 }
 
 inline: medium: {
-	f2:  (f & {n: 2}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[1:24])
+	f2: (f & {n: 2}).out
 	fRec: {nn: int, out: (f & {n: nn}).out}
-	@test(err, at=fRec.out, code=structural_cycle, contains="structural cycle", pos=[6:9])
 	f: {
 		n: int
-		out: (fRec & {nn: n - 1}).out @test(err, code=structural_cycle, contains="structural cycle", pos=[0:9])
+		out: (fRec & {nn: n - 1}).out
 	}
 }
 
 inline: patterns: {
 	f: n: (f & {n: {}}).n
-	f: n: {}  @test(err, code=structural_cycle, contains="structural cycle", pos=[-1:9])
+	f: n: {}
 	[string]: {n: {}}
 	f: [string]: {}
 	f: {}
@@ -38,16 +37,6 @@ inline: acrossFields: fail1: {
 
 	// invalid recursion is here.
 	k10: (f & {in: k30}).out
-	@test(eq, {
-		f: {
-			in: number
-			out: _|_ @test(err, code=incomplete, contains="inline.acrossFields.fail1.f.out: non-concrete value number in operand to +", pos=[31:8, 30:8])
-		}
-		k00: 0
-		k10: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 36:17])
-		k20: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 39:17])
-		k30: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 35:17])
-	})
 }
 
 // Issue #2163
@@ -64,13 +53,6 @@ inline: acrossFields: ok1: {
 	// TODO: what is correct behavior here.
 	// This is borderline okay.
 	k10: (f & {in: k30}).out
-	@test(eq, {
-		f: {in: number, out: number}
-		k00: 0
-		k10: 0
-		k20: 0
-		k30: 0
-	}, hint="might be okay to fail")
 }
 -- inlineexpand.cue --
 inlined: {
@@ -79,10 +61,6 @@ inlined: {
 		output: input.a
 	}
 	root: a: (X & {input: root}).output
-	@test(eq, {
-		X: {input: {a: _}, output: _}
-		root: {a: _}
-	})
 }
 expanded1: hasCycle: {
 	X: {
@@ -93,7 +71,6 @@ expanded1: hasCycle: {
 		a: _a.output
 		_a: X & {input: root}
 	}
-	@test(err, code=structural_cycle, at=root._a.input._a.input, contains="structural cycle", pos=[])
 }
 expanded2: noCycle: {
 	X: {
@@ -102,17 +79,12 @@ expanded2: noCycle: {
 	}
 	root: a: _a.output
 	_a: X & {input: root}
-	@test(eq, {
-		X: {input: {a: _}, output: _}
-		root: {a: _}
-		_a: {input: {a: _}, output: _}
-	})
 }
 issue3731: reduced: {
 	#lookup: {
 		input: {...}
 		output: [
-			for _, v in input if v.show != _|_ { v },
+			for _, v in input if v.show != _|_ {v},
 		]
 	}
 
@@ -120,19 +92,12 @@ issue3731: reduced: {
 		self: show: true
 		others: (#lookup & {input: root}).output
 	}
-	@test(eq, {
-		#lookup: {input: {}, output: []}
-		root: {
-			self: {show: true}
-			others: [{show: true}]
-		}
-	})
 }
 issue3731: expanded: {
 	#lookup: {
 		input: {...}
 		output: [
-			for _, v in input if v.show != _|_ { v },
+			for _, v in input if v.show != _|_ {v},
 		]
 	}
 
@@ -141,7 +106,6 @@ issue3731: expanded: {
 		others: _others.output
 		_others: #lookup & {input: root}
 	}
-	@test(err, code=structural_cycle, at=root._others.input._others.input, contains="structural cycle", pos=[])
 }
 issue3731: full: {
 	#Workspace: {
@@ -158,61 +122,31 @@ issue3731: full: {
 		#AccountConfig
 		workspaces: "workspaceA": {}
 	}
-	
+
 	#AccountConfigSub2: {
 		#AccountConfig
 		workspaces: "workspaceB": {}
 	}
-	
+
 	tree: env1: {
 		"region1": {
-			"env1-r1-account-sub1": #AccountConfigSub1
+			"env1-r1-account-sub1":   #AccountConfigSub1
 			"env1-r1-account-sub2-1": #AccountConfigSub2
 		}
 	}
-	
+
 	#lookupSiblings: {
 		envtree: {...}
 		out: [
 			for region, v in envtree
 			for account, config in v
-			if config.workspaces."workspaceB" != _|_ { account },
+			if config.workspaces."workspaceB" != _|_ {account},
 		]
 	}
-	
+
 	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
 		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
 	}
-	@test(eq, {
-		#Workspace: {workspaceA?: {}, workspaceB?: {}}
-		#AccountConfig: {
-			workspaces: {workspaceA?: {}, workspaceB?: {}}
-			siblings?: []
-		}
-		#AccountConfigSub1: {
-			workspaces: {workspaceA: {}, workspaceB?: {}}
-			siblings?: []
-		}
-		#AccountConfigSub2: {
-			workspaces: {workspaceB: {}, workspaceA?: {}}
-			siblings?: []
-		}
-		tree: {
-			env1: {
-				region1: {
-					"env1-r1-account-sub1": {
-						siblings: ["env1-r1-account-sub2-1"]
-						workspaces: {workspaceA: {}, workspaceB?: {}}
-					}
-					"env1-r1-account-sub2-1": {
-						siblings: ["env1-r1-account-sub2-1"]
-						workspaces: {workspaceB: {}, workspaceA?: {}}
-					}
-				}
-			}
-		}
-		#lookupSiblings: {envtree: {}, out: []}
-	})
 }
 -- out/compile --
 --- inlineexpand.cue

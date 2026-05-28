@@ -9,8 +9,6 @@
 for x in [1] {
 	*close({}) | {[_]: null}
 }
-
-@test(eq, *{} | {})
 -- out/compile --
 --- in.cue
 {

@@ -1,11 +1,11 @@
 -- in.cue --
-obj:    {a: 1, b: 2}              @test(eq, {a: 1, b: 2})
-index:  {a: 1, b:     2}["b"]     @test(eq, 2)
-mulidx: {a: 1, b: {a: 1, b: 3}}["b"]["b"] @test(eq, 3)
-e:      {a: 1}[4]                 @test(err, code=eval, pos=[0:16])
-f:      {a: 1}.b                  @test(err, code=incomplete, pos=[0:16])
-g:      {a: 1}["b"]               @test(err, code=incomplete, pos=[0:16])
-h:      [3].b                     @test(err, code=eval, pos=[0:13])
+obj: {a: 1, b: 2}
+index: {a: 1, b: 2}["b"]
+mulidx: {a: 1, b: {a: 1, b: 3}}["b"]["b"]
+e: {a: 1}[4]
+f: {a: 1}.b
+g: {a: 1}["b"]
+h: [3].b
 -- out/compile --
 --- in.cue
 {

@@ -2,13 +2,11 @@
 module: "x.test"
 language: version: "v0.13.0"
 -- off.cue --
-off: __test_experiment("off") @test(err, code=eval, contains="testing experiment disabled", pos=[0:6])
-
+off: __test_experiment("off")
 -- on.cue --
 @experiment(testing)
 
-on: __test_experiment("on") @test(eq, "on")
-
+on: __test_experiment("on")
 -- out/compile --
 --- off.cue
 {

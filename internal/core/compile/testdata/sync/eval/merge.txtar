@@ -1,7 +1,7 @@
 # TODO: image field is not pre-evaluated (not a huge deal)
 # TODO: allow dynamic fields
 -- in.cue --
-key: "app01" @test(eq, "app01")
+key: "app01"
 manifests: [
 	{
 		deployment: #map: [string]: {name: string, image: string, desc: string}
@@ -9,14 +9,12 @@ manifests: [
 	},
 	{
 		deployment: #map: app01: image: "image01"
-		// TODO: allow
-		// deployment: #map: "\("app03")": image: "image01"
 	},
+	// TODO: allow
+	// deployment: #map: "\("app03")": image: "image01"
 ]
 // unify
-results: _ @test(eq, {deployment: #map: {
-	app01: {image: "image01", name: "app01", desc: string}
-}})
+results: _
 for _, manifest in manifests {
 	results: manifest
 }

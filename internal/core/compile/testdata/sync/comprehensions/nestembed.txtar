@@ -4,13 +4,12 @@ Issue #556
 -- in.cue --
 import "list"
 
-DeleteThis: ["this", "that"] @test(eq, ["this", "that"])
+DeleteThis: ["this", "that"]
 useful_infra: {
 	gcp: cluters:   10
 	aws: clusters:  20
 	this: clusters: 1
 	that: clusters: 2
-	@test(eq, {gcp: {cluters: 10}, aws: {clusters: 20}, this: {clusters: 1}, that: {clusters: 2}})
 }
 New_infra: {
 	for k, v in useful_infra {
@@ -18,7 +17,6 @@ New_infra: {
 			"\(k)": v
 		}
 	}
-	@test(eq, {gcp: {cluters: 10}, aws: {clusters: 20}})
 }
 -- out/compile --
 --- in.cue

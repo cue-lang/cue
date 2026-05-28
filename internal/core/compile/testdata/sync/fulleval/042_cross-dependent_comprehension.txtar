@@ -7,10 +7,9 @@
 		c: 4
 	}
 	b: bool
-	@test(err, code=incomplete, args=[bool], pos=[in.cue:5:5])
 }
-x: (#a & {b: true}) & {c: 4} @test(eq, {b: true, c: 4}) @test(shareID=xy)
-y: x                         @test(eq, {b: true, c: 4}) @test(shareID=xy)
+x: (#a & {b: true}) & {c: 4}
+y: x
 -- out/compile --
 --- in.cue
 {

@@ -1,7 +1,7 @@
 -- in.cue --
 import "struct"
 
-v: {a: struct.MaxFields(2) & {}}.a @test(eq, {}) @test(eq:todo, struct.MaxFields(2) & {})
+v: {a: struct.MaxFields(2) & {}}.a
 -- out/compile --
 --- in.cue
 {

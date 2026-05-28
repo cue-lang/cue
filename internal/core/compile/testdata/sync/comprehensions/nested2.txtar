@@ -2,7 +2,6 @@
 given: {
 	INC: USD: 2.0
 	USD: GBP: 3.0
-	@test(eq, {INC: {USD: 2.0}, USD: {GBP: 3.0}})
 }
 hydrated: {
 	for k, v in given {
@@ -13,11 +12,6 @@ hydrated: {
 			"\(k1)": "\(k)":  number
 		}
 	}
-	@test(eq, {
-		INC: {INC: 1.0, USD: 2.0}
-		USD: {USD: 1.0, INC: number, GBP: 3.0}
-		GBP: {GBP: 1.0, USD: number}
-	})
 }
 
 foo: {
@@ -27,7 +21,6 @@ foo: {
 			b: 20
 		}
 	}
-	@test(eq, {a: 10, b: 20})
 }
 
 indirectlyNested: {
@@ -39,25 +32,20 @@ indirectlyNested: {
 			}
 		}
 	}
-	@test(eq, {a: true, b: true})
 }
 
 directlyNestedEmpty: {
 	a: true
 	if true {
-		if a {
-		}
+		if a {}
 	}
-	@test(eq, {a: true})
 }
 
 directlyDoublyNestedEmpty: {
 	a: true
 	if true {
-		if a {
-		}
+		if a {}
 	}
-	@test(eq, {a: true})
 }
 
 indirectlyDoublyNestedEmpty: {
@@ -74,7 +62,6 @@ indirectlyDoublyNestedEmpty: {
 			}
 		}
 	}
-	@test(eq, {a: true, b: true})
 }
 
 indirectlyDoublyNested: {
@@ -89,7 +76,6 @@ indirectlyDoublyNested: {
 			c: 1
 		}
 	}
-	@test(eq, {a: true, c: 1, b: 1})
 }
 
 // This case used to trigger an over-aggressive deduplication.
@@ -107,24 +93,19 @@ issue1974: {
 			"\(k)": "\(vk)": vv
 		}
 	}
-	@test(eq, {
-		X: {foo: {bar: "", baz: ""}}
-		out: {foo: {bar: "", baz: ""}}
-	})
 }
 -- pending.cue --
 // Trigger notification while an arc is still pending.
-T: int @test(eq, 1)
+T: int
 for C in Y {
 	let X = C.M
-	T:  X.V
+	T: X.V
 }
 Y: x: {
 	M: V: 1
 	for _ in M {
-		if true { M: {} }
+		if true {M: {}}
 	}
-	@test(eq, {M: {V: 1}})
 }
 -- issue3940.cue --
 // issue3940: Tests that chained comprehension clauses do not trigger spurious
@@ -133,81 +114,32 @@ Y: x: {
 issue3940: reduced1: {
 	X
 	a: b: X
-	a: b: a: b: {y: X @test(shareID=reduced1X)}
+	a: b: a: b: {y: X}
 
 	X: {
-		@test(shareID=reduced1X)
 		a: {}
 
 		objects: {
 			for v in a
-			for _ in ({} & v).objects {
-			}
+			for _ in ({} & v).objects {}
 		}
 	}
-
-	// The eq:todo value is now the correct result: the pushdown fix
-	// properly handles chained comprehension clauses, unifying a.b
-	// into a single struct.
-	@test(eq, {
-		a: {
-			b: {
-				a: {b: {y: {a: {}, objects: {}}}}
-				objects: _|_ @test(err, code=incomplete, contains="issue3940.reduced1.a.b.objects: undefined field: objects", pos=[15:22])
-			}
-		}
-		X: {a: {}, objects: {}}
-		objects: {}
-	})
-	@test(eq:todo, {
-		a: b: {
-			a: {b: {y: {a: {}, objects: {}}}}
-			objects: {}
-		}
-		X: {a: {}, objects: {}}
-		objects: {}
-	})
 }
 
 // Test nested comprehensions (with braces) - should work as before
 issue3940: reduced2: {
 	X
 	a: b: X
-	a: b: a: b: {y: X @test(shareID=reduced2X)}
+	a: b: a: b: {y: X}
 
 	X: {
-		@test(shareID=reduced2X)
 		a: {}
 
 		objects: {
 			for v in a
-			for _ in ({} & v).objects {
-			}
+			for _ in ({} & v).objects {}
 		}
 	}
-	// The pushdown fix resolves the spurious "undefined field" error
-	// on objects: reduced2 is structurally identical to reduced1 and
-	// should produce the same result.
-	@test(eq, {
-		a: {
-			b: {
-				a: {b: {y: {a: {}, objects: {}}}}
-				objects: _|_
-			}
-		}
-		X: {a: {}, objects: {}}
-		objects: {}
-	})
-	@test(eq:todo, {
-		a: {
-			b: {
-				a: {b: {y: {a: {}, objects: {}}}}
-				objects: {}
-			}
-		}
-		X: {a: {}, objects: {}}
-		objects: {}
-	})
 }
 issue3940: reduced3: {
 	a: E
@@ -217,13 +149,6 @@ issue3940: reduced3: {
 		i: {}
 		o: [for m in i for v in ({} & m).o {}]
 	}
-	@test(eq, {
-		a: {
-			i: {x: {i: {x: {i: {}, o: []}}, o: []}}
-			o: []
-		}
-		E: {i: {}, o: []}
-	})
 
 }
 issue3940: reduced4: {
@@ -231,7 +156,7 @@ issue3940: reduced4: {
 		_imports: [{
 			objects: {...}
 			#export: Exporter & {
-				_imports: [{ #export: Exporter }]
+				_imports: [{#export: Exporter}]
 			}
 		}]
 	}
@@ -244,39 +169,19 @@ issue3940: reduced4: {
 			},
 		]
 	}
-	@test(eq, {
-		out: {
-			_imports: [{
-				objects: {}
-				#export: {
-					_imports: [{
-						#export: {
-							_imports: []
-							objects: []
-						}
-					}]
-					objects: []
-				}
-			}]
-			objects: []
-		}
-		Exporter: {_imports: [], objects: []}
-	})
 }
 issue3940: let: {
 	X
 	a: b: X
-	a: b: a: b: {y: X @test(shareID=letX)}
+	a: b: a: b: {y: X}
 
 	X: {
-		@test(shareID=letX)
 		a: {}
 
 		objects: {
 			for v in a
 			let x = ({} & v)
-			for _ in x.objects {
-			}
+			for _ in x.objects {}
 		}
 	}
 }
@@ -324,85 +229,6 @@ issue3940: full: {
 			},
 		]
 	}
-	@test(eq, at=out, {
-		_imports: [{
-			objects: branch: {
-				#conf: _ @test(ignore)
-				region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-			}
-			imports: [{
-				objects: leaf: {
-					#conf: _ @test(ignore)
-					region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-				}
-				#export: {
-					_objects: leaf: {
-						#conf: _ @test(ignore)
-						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-					}
-					#conf: _ @test(ignore)
-					_imports: []
-					objects: [{
-						leaf: {
-							#conf: _ @test(ignore)
-							region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-						}
-					}]
-				}
-			}]
-			#export: {
-				_objects: branch: {
-					#conf: _ @test(ignore)
-					region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-				}
-				_imports: [{
-					objects: leaf: {
-						#conf: _ @test(ignore)
-						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-					}
-					#export: {
-						_objects: leaf: {
-							#conf: _ @test(ignore)
-							region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-						}
-						#conf: _ @test(ignore)
-						_imports: []
-						objects: [{
-							leaf: {
-								#conf: _ @test(ignore)
-								region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-							}
-						}]
-					}
-				}]
-				#conf: _ @test(ignore)
-				objects: [{
-					branch: {
-						#conf: _ @test(ignore)
-						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-					}
-				}, {
-					leaf: {
-						#conf: _ @test(ignore)
-						region: _|_ @test(err, code=incomplete, contains="undefined field: global")
-					}
-				}]
-			}
-		}]
-		#conf: {global: {region: "Europe"}}
-		_objects: {}
-		objects: [{
-			branch: {
-				#conf: {global: {region: "Europe"}}
-				region: "Europe"
-			}
-		}, {
-			leaf: {
-				#conf: {global: {region: "Europe"}}
-				region: "Europe"
-			}
-		}]
-	})
 }
 -- issue3990.cue --
 // issue3990: Tests that nested comprehensions within struct definitions do not
@@ -424,7 +250,7 @@ issue3990: {
 	}
 
 	for import in _imports
-	for _, obj in ({extra: "unused"} & import).exportObjs {(import.name): obj},
+	for _, obj in ({extra: "unused"} & import).exportObjs {(import.name): obj}
 
 	_Deployment: this={
 		_names: {
@@ -437,44 +263,6 @@ issue3990: {
 			volumeNames: [for _, v in _names {v}]
 		}
 	}
-	@test(eq, {
-		_imports: [{
-			name: "noVolumes"
-			exportObjs: deployment: {volumes: [], _names: {}}
-		}, {
-			name: "someVolumes"
-			exportObjs: deployment: {
-				_names: {data: "data"}
-				volumeNames: ["data"]
-				volumes: [{
-					name: "data"
-				}]
-			}
-		}]
-		_noVolumes: {
-			name: "noVolumes"
-			exportObjs: {deployment: {volumes: [], _names: {}}}
-		}
-		_someVolumes: {
-			name: "someVolumes"
-			exportObjs: {
-				deployment: {
-					volumes: [{ name: "data" }]
-					_names: {data: "data"}
-					volumeNames: ["data"]
-				}
-			}
-		}
-		_Deployment: {
-			_names: _|_ @test(err, code=incomplete)
-		}
-		someVolumes: {
-			volumes: [{ name: "data" }]
-			_names: {data: "data"}
-			volumeNames: ["data"]
-		}
-		noVolumes: {volumes: [], _names: {}}
-	})
 }
 -- out/compile --
 --- in.cue

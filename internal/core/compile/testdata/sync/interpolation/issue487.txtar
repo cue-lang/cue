@@ -9,16 +9,16 @@
 t1: {
 	#R: {
 		pos:  uint
-		name: "hello_\(pos)" @test(err, code=incomplete)
+		name: "hello_\(pos)"
 	}
-	a: #R & {pos: 67} @test(eq, {pos: 67, name: "hello_67"}) @test(closed)
+	a: #R & {pos: 67}
 }
 t2: {
 	#R: {
 		pos:  string
-		name: "hello_\(pos)" @test(err, code=incomplete)
+		name: "hello_\(pos)"
 	}
-	a: #R & {pos: "a"} @test(eq, {pos: "a", name: "hello_a"}) @test(closed)
+	a: #R & {pos: "a"}
 }
 -- out/compile --
 --- in.cue

@@ -1,14 +1,14 @@
 -- in.cue --
-list:  [1, 2, 3]              @test(eq, [1, 2, 3])
-index: [1, 2, 3][1]           @test(eq, 2)
-unify: [1, 2, 3] & [_, 2, 3]  @test(eq, [1, 2, 3])
-e:     [] & 4                  @test(err, code=eval, pos=[0:8, 0:13], contains="conflicting values", args=[list, int])
+list: [1, 2, 3]
+index: [1, 2, 3][1]
+unify: [1, 2, 3] & [_, 2, 3]
+e: [] & 4
 
 // No "contains" as message may vary by implementation.
-e2:    [3]["d"]                @test(err, code=eval, pos=[0:12])
-e3:    [3][-1]                 @test(err, code=eval, pos=[0:8, 0:12], contains="invalid index", args=[-1])
-e4:    [1, 2, ...>=4 & <=5] & [1, 2, 4, 8] @test(err, code=eval, pos=[0:24, 0:41], contains="invalid value", args=[8, <=5])
-e5:    [1, 2, 4, 8] & [1, 2, ...>=4 & <=5] @test(err, code=eval, pos=[0:39, 0:18], contains="invalid value", args=[8, <=5])
+e2: [3]["d"]
+e3: [3][-1]
+e4: [1, 2, ...>=4 & <=5] & [1, 2, 4, 8]
+e5: [1, 2, 4, 8] & [1, 2, ...>=4 & <=5]
 -- out/compile --
 --- in.cue
 {

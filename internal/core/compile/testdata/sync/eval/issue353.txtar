@@ -7,7 +7,6 @@
 e: #Example
 e: {
 	a: "hello"
-	@test(eq, {a: "hello", value?: string} | {a: "hello", externalValue?: string})
 }
 
 #Example: {

@@ -3,18 +3,9 @@ service: [Name=string]: {
 	name: string | *Name
 	port: int | *7080
 }
-service: foo: _    @test(eq, {
-    name: *"foo" | string
-    port: *7080 | int
-})
-service: bar: {port: 8000} @test(eq, {
-    port: 8000
-    name: *"bar" | string
-})
-service: baz: {name: "foobar"} @test(eq, {
-    name: "foobar"
-    port: *7080 | int
-})
+service: foo: _
+service: bar: {port: 8000}
+service: baz: {name: "foobar"}
 -- out/compile --
 --- in.cue
 {

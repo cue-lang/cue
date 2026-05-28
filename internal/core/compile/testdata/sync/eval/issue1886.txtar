@@ -6,22 +6,15 @@
 # hidden template field _t appears before or after its usage site.
 -- in.cue --
 cycle: {
-	x: 200             @test(eq, 200)
+	x: 200
 	x: y + 100
-	y: x - 100         @test(eq, 100)
+	y: x - 100
 
-	a: b + 100  @test(err, code=cycle,
-		suberr=(pos=[0:5], args=[b]),
-		suberr=(pos=[4:5], args=[a]),
-	)
-	b: a - 100  @test(err, code=cycle,
-		suberr=(pos=[-4:5], args=[b]),
-		suberr=(pos=[0:5], args=[a]),
-	)
+	a: b + 100
+	b: a - 100
 }
 
 incompleteOne: {
-	@test(err, code=incomplete, pos=[9:5, 3:7, 4:3], at=r)
 	_t: {
 		#p: string
 		"""
@@ -32,29 +25,12 @@ incompleteOne: {
 	r: """
 		\(_t)
 		"""
-	// TODO: we cannot check for errors on hidden fields yet.
-	@test(debugCheck, """
-		(struct){
-		  _t: (_|_){
-		    // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
-		    //     in.cue:20:3
-		    //     in.cue:19:7
-		    #p: (string){ string }
-		  }
-		  r: (_|_){
-		    // [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-		    //     in.cue:25:5
-		    //     in.cue:19:7
-		    //     in.cue:20:3
-		  }
-		}
-		""")
 }
 
 incompleteTwo: {
 	r: """
 		\(_t)
-		""" @test(err, code=incomplete)
+		"""
 
 	_t: {
 		#p: string

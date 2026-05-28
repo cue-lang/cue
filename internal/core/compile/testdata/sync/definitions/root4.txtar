@@ -2,22 +2,10 @@
 #schema: a!: bool
 _hidden & #schema // must fail here, but not elsewhere
 _hidden: {
-	"a": true,
+	"a":        true
 	notAllowed: true
 }
 allowed: true
-
-@test(eq, {
-	a: true
-	#schema: a!: bool
-	_hidden: {
-		a: true
-		notAllowed: true
-	}
-	allowed: true
-	notAllowed: _|_
-})
-@test(err, code=eval, contains="field not allowed", pos=[in.cue:5:2])
 -- out/compile --
 --- in.cue
 {

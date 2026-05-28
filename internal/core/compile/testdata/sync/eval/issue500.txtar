@@ -2,24 +2,25 @@
 package x
 
 import "strings"
+
 import "list"
 
-a: strings.Join(strings.Split("test", "")[1:], "") @test(eq, "est")
+a: strings.Join(strings.Split("test", "")[1:], "")
 
-b: strings.Join(["t", "e", "s", "t"][1:], "") @test(eq, "est")
+b: strings.Join(["t", "e", "s", "t"][1:], "")
 
-c: ["t", "e", "s", "t"][1:] @test(eq, ["e", "s", "t"])
-d: strings.Join(c, "")      @test(eq, "est")
+c: ["t", "e", "s", "t"][1:]
+d: strings.Join(c, "")
 
-e: strings.Join(list.Concat([["a"], ["b"]]), "") @test(eq, "ab")
+e: strings.Join(list.Concat([["a"], ["b"]]), "")
 
-f: list.Concat([["a"], ["b"]]) @test(eq, ["a", "b"])
-g: strings.Join(f, "")         @test(eq, "ab")
+f: list.Concat([["a"], ["b"]])
+g: strings.Join(f, "")
 
-h: strings.Join(list.Repeat(["a"], 3), "") @test(eq, "aaa")
+h: strings.Join(list.Repeat(["a"], 3), "")
 
-i: list.Repeat(["b"], 3) @test(eq, ["b", "b", "b"])
-j: strings.Join(i, "")   @test(eq, "bbb")
+i: list.Repeat(["b"], 3)
+j: strings.Join(i, "")
 -- out/compile --
 --- in.cue
 {

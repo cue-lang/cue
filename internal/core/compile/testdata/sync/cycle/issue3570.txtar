@@ -4,7 +4,7 @@
 -- in.cue --
 foo: foo: 25 | 44
 foo
-foo: foo @test(eq, {foo: _})
+foo: foo
 -- out/compile --
 --- in.cue
 {

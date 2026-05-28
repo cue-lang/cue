@@ -1,6 +1,6 @@
 -- in.cue --
-a: {l: ["foo", v], v: l[1]}   @test(eq, {l: ["foo", _], v: _})
-b: a & {l: [_, "bar"]}   @test(eq, {l: ["foo", "bar"], v: "bar"})
+a: {l: ["foo", v], v: l[1]}
+b: a & {l: [_, "bar"]}
 -- out/compile --
 --- in.cue
 {

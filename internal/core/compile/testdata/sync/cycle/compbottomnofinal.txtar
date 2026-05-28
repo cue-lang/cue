@@ -14,16 +14,12 @@ minimal: {
 		if b.port == _|_ {
 			port: ""
 		}
-		// Pushdown produces cycle error instead of incomplete.
-		@test(err, code=cycle|incomplete)
 	}
 
 	b: {
 		if a.port == _|_ {
 			port: ""
 		}
-		// Pushdown produces cycle error instead of incomplete.
-		@test(err, code=cycle|incomplete)
 	}
 }
 
@@ -31,7 +27,6 @@ small: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
 	p1: {
-		@test(permute, count=2)
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
 		#X: {
@@ -42,13 +37,6 @@ small: {
 				port: ":" + strconv.FormatInt(#Y.port, 10)
 			}
 		}
-		// Yield-on-running heuristic: the comp's referenced node
-		// #Y is not currently being processed (only scheduled), so
-		// the comp does not yield and instead reports a cycle error.
-		@test(eq, {
-			#Y: _|_ @test(err, code=cycle|incomplete)
-			#X: _|_ @test(err, code=cycle|incomplete)
-		})
 	}
 }
 
@@ -56,9 +44,8 @@ medium: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
 	p1: {
-		@test(permute, count=6)
 
-		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port) @test(err, code=incomplete|cycle)
+		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
 		// Yield-on-running heuristic: the comp's referenced node Y
 		// is not currently being processed, so the comp does not
@@ -68,7 +55,7 @@ medium: {
 			if #Y.port != _|_ {
 				port: strconv.Atoi(#Y.port)
 			}
-		} @test(err, code=incomplete|cycle)
+		}
 
 		#X: {
 			// Can never determine whether Y.port exists as its resolution
@@ -80,7 +67,7 @@ medium: {
 			if Y.port != _|_ {
 				port: ":" + strconv.FormatInt(Y.port, 10)
 			}
-		} @test(err, code=incomplete|cycle)
+		}
 	}
 }
 
@@ -88,17 +75,13 @@ large: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\d+))?$"#
 
 	p1: {
-		@test(permute, count=120)
-		// Pushdown improvement: #Y, #X, and X now resolve successfully.
-		// Y gets a cycle error because #Y.port changed after evaluation.
-		// Permute disabled: pushdown introduces ordering sensitivity.
 
 		Y: {
 			userinfo: "user"
 			host:     "mod.test"
 		}
 
-		X: #X.userinfo + #X.host + #X.port @test(err, any, code=incomplete|cycle)
+		X: #X.userinfo + #X.host + #X.port
 
 		#X: {
 			if Y.userinfo == _|_ {
@@ -116,7 +99,7 @@ large: {
 			if Y.port != _|_ {
 				port: ":" + strconv.FormatInt(Y.port, 10)
 			}
-		} @test(err, any, code=incomplete|cycle)
+		}
 
 		Y: {
 			if #Y.userinfo != _|_ {
@@ -128,9 +111,9 @@ large: {
 			if #Y.port != _|_ {
 				port: strconv.Atoi(#Y.port)
 			}
-		} @test(err, any, code=incomplete|cycle)
+		}
 
-		#Y: regexp.FindNamedSubmatch(#userHostPort, X) @test(err, any, code=incomplete|cycle)
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
 	}
 }
 -- out/compile --

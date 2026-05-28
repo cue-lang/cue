@@ -1,38 +1,37 @@
 #name: closing with comprehensions
 #evalPartial
 -- in.cue --
-#A: {f1: int, f2: int} @test(eq, {f1: int, f2: int}) @test(closed)
+#A: {f1: int, f2: int}
 
 for k, v in {f3: int} {
 	a: #A & {"\(k)": v}
 }
-@test(err, at=a.f3, code=eval, contains="field not allowed", pos=[-2:11])
 
 #B: {
 	for k, v in {f1: int} {
 		"\(k)": v
 	}
-} @test(eq, { f1: int })
+}
 
 #C: {
 	f1: _
 	for k, v in {f1: int} {
 		"\(k)": v
 	}
-} @test(eq, { f1: int }) @test(closed) @test(allows=false, string)
+}
 
 #D: {
 	for k, v in {f1: int} {
 		"\(k)": v
 	}
 	...
-} @test(eq, { f1: int }) @test(closed) @test(allows, string)
+}
 
 #E: #A & {
 	for k, v in {f3: int} {
 		"\(k)": v
 	}
-} @test(err, at=f3, code=eval, contains="field not allowed", pos=[2:3])
+}
 -- out/compile --
 --- in.cue
 {

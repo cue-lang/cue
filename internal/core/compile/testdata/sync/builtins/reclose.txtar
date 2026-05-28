@@ -8,15 +8,11 @@ noClose: {
 	})
 
 	t1: ok: a & {b: 1}
-	@test(eq, {
-		foo: {a: int}
-		a: {a: int}
-		t1: {ok: {b: 1, a: int}}
-	})
 }
 
 recursive: {
-	#x: { foo: int}
+	#x: {foo: int}
+
 	// Basic usage of __reclose - makes structs recursively closed
 	a: __reclose({
 		#x...
@@ -24,26 +20,24 @@ recursive: {
 	})
 
 	// Test that extra fields are not allowed (should error)
-	t1: err: a & {extra: "not allowed"} @test(err, code=eval, path=extra, contains="field not allowed", pos=[0:16])
+	t1: err: a & {extra: "not allowed"}
 
-	t2: ok: a & {nested: field2: 5} @test(eq, {nested: {field2: 5}, foo: int})
-	t3: ok: a & {foo: 5}  @test(eq, {foo: 5, nested: {field2: int}})
-
+	t2: ok: a & {nested: field2: 5}
+	t3: ok: a & {foo: 5}
 
 	// Test that nested extra fields are not allowed (should error)
 	t4: err: a & {
 		nested: {
 			field2: 1
-			extra: "not allowed"
+			extra:  "not allowed"
 		}
-	} @test(err, code=eval, path=nested.extra, contains="field not allowed", pos=[3:4])
+	}
 
 	// Test with empty struct
 	// TODO(eval): is this correct?
 	e: __reclose({})
-	t5: err: e & {extra: "not allowed"} @test(eq, {extra: "not allowed"})
+	t5: err: e & {extra: "not allowed"}
 }
-
 
 nonRecursive: {
 	x: __reclose({
@@ -51,8 +45,8 @@ nonRecursive: {
 		c: int
 		d: e: int
 	})
-	y: err: x & {f: int}   @test(err, code=eval, path=f, contains="field not allowed", pos=[0:15])
-	z: ok: x & {d: f: int} @test(eq, {d: {f: int, e: int}, c: int, b: int})
+	y: err: x & {f: int}
+	z: ok: x & {d: f: int}
 }
 
 // Test that __reclose detects and restores non-recursive closing from
@@ -63,9 +57,9 @@ nonRecursiveDetect: {
 		foo...
 	})
 	// Top-level field not allowed: non-recursive close restored by __reclose.
-	t1: err: a & {f: int} @test(err, code=eval, path=f, contains="field not allowed", pos=[0:16])
+	t1: err: a & {f: int}
 	// Nested field allowed: close was non-recursive, so b is still open.
-	t2: ok: a & {b: c: 1} @test(eq, {b: {c: 1}})
+	t2: ok: a & {b: c: 1}
 }
 
 // Test that __reclose handles both recursive and non-recursive closing
@@ -83,9 +77,9 @@ mixedClose: {
 		foo...
 	})
 	// Top-level extra field not allowed.
-	t1: err: a & {f: int} @test(err, code=eval, path=f, contains="field not allowed", pos=[0:16])
+	t1: err: a & {f: int}
 	// Allowed fields work.
-	t2: ok: a & {x: y: 5, b: c: 1} @test(eq, {x: {y: 5}, b: {c: 1}})
+	t2: ok: a & {x: y: 5, b: c: 1}
 }
 
 // Test that __reclose can wrap a close() call and conditionally add
@@ -97,20 +91,19 @@ recloseWrapsClose: {
 		#def...
 	}))
 	// Top-level extra field not allowed (close provides non-recursive).
-	t1: err: a & {f: int} @test(err, code=eval, path=f, contains="field not allowed", pos=[0:16])
+	t1: err: a & {f: int}
 	// Nested extra field not allowed (__reclose detects recursive from #def).
-	t2: err: a & {a: c: 1} @test(err, code=eval, path=a.c, contains="field not allowed", pos=[0:19])
+	t2: err: a & {a: c: 1}
 	// Allowed nested field works.
-	t3: ok: a & {a: b: 5} @test(eq, {a: {b: 5}})
+	t3: ok: a & {a: b: 5}
 }
 
 nonStructLiterals: {
 	// Test with non-struct should error
-	t1: err: __reclose("not a struct") @test(err, code=eval, contains="error in call to %s", args=[__reclose], pos=[0:11])
+	t1: err: __reclose("not a struct")
 
-
-	#A: a: int
-	t4: err: __reclose(#A) @test(err, code=eval, contains="error in call to %s", args=[__reclose], pos=[0:11])
+	#A: a:   int
+	t4: err: __reclose(#A)
 }
 
 nonStructDefinitions: {
@@ -120,20 +113,16 @@ nonStructDefinitions: {
 		#Def...
 	})
 
-	t1: ok: a & 1  @test(eq, 1)
+	t1: ok: a & 1
 
 	// errors because of regular field + embedded scalar
-	t2: err: a & {b: 1}  @test(err, code=eval,
-		contains="conflicting values %s and %s (mismatched types %s and %s)",
-		args=[{b:1}, 1, struct, int], pos=[-9:8, 0:11, 0:15])
+	t2: err: a & {b: 1}
 }
-
 -- old.cue --
 retro: {
 	// May not be used if explicitopen is not set.
-	t1: err: __reclose({}) @test(err, code=eval, contains="error in call to %s", args=[__reclose], pos=[0:11])
+	t1: err: __reclose({})
 }
-
 -- out/compile --
 --- in.cue
 {

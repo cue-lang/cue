@@ -1,11 +1,8 @@
 -- in.cue --
 x: {
-    y: *1 | {a: 2}
-    for x in [1] {y}
-} @test(eq, {
-    a: 2
-    y: *1 | { a: 2 }
-})
+	y: *1 | {a: 2}
+	for x in [1] {y}
+}
 -- out/compile --
 --- in.cue
 {

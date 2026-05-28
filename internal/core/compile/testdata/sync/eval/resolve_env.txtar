@@ -4,18 +4,14 @@ a: {
 	b: {
 		c: d
 	}
-	@test(eq, {
-		d: int
-		b: c: int
-	})
 }
 x: {
-	d: 2 @test(eq, 2)
-	b: a.b.c @test(eq, int)
+	d: 2
+	b: a.b.c
 }
 a1: y: 5
 a1: a2: a3: a4: a5: a1.y
-b: a1.a2.a3.a4.a5 @test(eq, 5)
+b: a1.a2.a3.a4.a5
 -- out/compile --
 --- in.cue
 {

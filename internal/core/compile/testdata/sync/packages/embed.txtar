@@ -9,8 +9,6 @@ import "mod.test/pkg:bar"
 
 bar
 z: 3
-
-@test(eq, {z: 3, foo: {y: 2, x: 1}, y: 2, x: 1})
 -- pkg/bar.cue --
 package bar
 

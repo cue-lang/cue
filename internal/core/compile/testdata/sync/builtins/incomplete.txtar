@@ -8,92 +8,85 @@ import (
 list1: {
 	// Note that Top is not incomplete, only its first element is.
 	// We allow FlattenN to proceed and pass on the incomplete values.
-	Out1: list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
-	Out2: [...] & list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
-	Out3: list.FlattenN(Top, 1) & [...] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	Out1: list.FlattenN(Top, 1)
+	Out2: [...] & list.FlattenN(Top, 1)
+	Out3: list.FlattenN(Top, 1) & [...]
 
 	// This evaluates to a list with an incomplete element.
 	Top: [
 		[for _, F in _Sub {F}],
-	] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	]
 
-	_Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	_Sub: a.b
 	a: {} // b does not
 }
 
 list2: {
-	Out1: list.FlattenN(_Top, 1)         @test(err, code=incomplete, contains="undefined field: b", pos=[9:10])
-	Out2: [...] & list.FlattenN(_Top, 1) @test(err, code=incomplete, contains="undefined field: b", pos=[8:10])
-	Out3: list.FlattenN(_Top, 1) & [...] @test(err, code=incomplete, contains="undefined field: b", pos=[7:10])
+	Out1: list.FlattenN(_Top, 1)
+	Out2: [...] & list.FlattenN(_Top, 1)
+	Out3: list.FlattenN(_Top, 1) & [...]
 
 	// This evaluates to a list with an incomplete element.
 	_Top: [
 		for _, F in #Sub {F},
-	] @test(err, code=incomplete, contains="undefined field: b", pos=[4:10])
+	]
 
-	#Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:10])
+	#Sub: a.b
 
 	a: {} // b does not
 }
 
 value1: {
-	a: len('sf' | 'dd') @test(err, code=incomplete|eval,
-		hint="this can never be resolve so could be a permanent error"
-		contains="unresolved disjunction", pos=[0:5]) @test(err:todo, code=eval)
+	a: len('sf' | 'dd')
 }
 
 value2: {
 	len('sf' | 'dd')
-
-	@test(err, code=incomplete|eval,
-		hint="this can never be resolve so could be a permanent error"
-		contains="unresolved disjunction")
-	@test(err:todo, code=eval)
 }
 
 incompleteArgDecimalList: {
-	a: #a & {param: 123} @test(eq, {param: 123, transformed: 123, max: 123})
+	a: #a & {param: 123}
 	#a: {
 		param:       int
-		transformed: +param @test(err, code=incomplete, contains="operand param of '+' not concrete", pos=[0:17])
-		max:         list.Max([transformed]) @test(err, code=incomplete, contains="operand param of '+' not concrete", pos=[0:16, -1:17])
+		transformed: +param
+		max: list.Max([transformed])
 	}
 }
 
 incompleteArgStringList: {
-	a: #a & {param: "123"} @test(eq, {param: "123", transformed: "123", joined: "123"})
+	a: #a & {param: "123"}
 	#a: {
 		param:       string
-		transformed: param + "" @test(err, code=incomplete, contains="non-concrete value string in operand to +", pos=[0:16, -1:16])
-		joined:      strings.Join([transformed], "-") @test(err, code=incomplete, contains="non-concrete value string in operand to +", pos=[0:16, -2:16, -1:16])
+		transformed: param + ""
+		joined: strings.Join([transformed], "-")
 	}
 }
 
 incompleteList: {
 	x:       _
-	decimal: list.Max(x) @test(err, code=incomplete, contains="non-concrete list for argument 0", pos=[0:11])
-	str:     strings.Join(x, "") @test(err, code=incomplete, contains="non-concrete list for argument 0", pos=[0:11])
+	decimal: list.Max(x)
+	str:     strings.Join(x, "")
 }
 
 // TODO: add better error positions.
 incompleteListError: {
-	x:       y + [] @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[0:11, 1:11])
+	x: y + []
 	y:       _
-	decimal: list.Max(x) @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[-2:11, -1:11])
-	str:     strings.Join(x, "") @test(err, code=incomplete, contains="non-concrete value _ in operand to +", pos=[-3:11, -2:11])
+	decimal: list.Max(x)
+	str:     strings.Join(x, "")
 }
 
 badListType: {
 	x:       2
-	decimal: list.Max(x) @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-1:11])
-	str:     strings.Join(x, "") @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-2:11])
+	decimal: list.Max(x)
+	str:     strings.Join(x, "")
 }
 
 badListError: {
-	x:       2 + y @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[0:11, 1:11])
+	x:       2 + y
 	y:       "foo"
-	decimal: list.Max(x) @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[-2:11, -1:11])
-	str:     strings.Join(x, "") @test(err, code=eval, contains="invalid operands 2 and \"foo\" to '+'", pos=[-3:11, -2:11])
+	decimal: list.Max(x)
+	str:     strings.Join(x, "")
 }
 
 // Issue #1095
@@ -104,7 +97,7 @@ multipleErrors: {
 			x: string
 			y: string
 		}
-		out: template.Execute("{{.x}} {{.y}}", params) @test(err, code=incomplete, contains="cannot convert non-concrete value string", pos=[0:8, -3:4])
+		out: template.Execute("{{.x}} {{.y}}", params)
 	}
 }
 -- out/compile --

@@ -5,19 +5,17 @@ a: [for c in foo.bar.baz {
 	c
 }]
 
-a: [{name: "http"}] @test(eq, [{name: "http", port: 8080}])
+a: [{name: "http"}]
 
 foo: {
 	x.D
 
 	bar: baz: [{port: 8080}]
-	@test(eq, {bar: {baz: [{port: 8080}]}})
 }
 
 x: {
 	D: bar: DSpec
 	DSpec: {}
-	@test(eq, {D: bar: {}, DSpec: {}})
 }
 -- out/compile --
 --- in.cue

@@ -6,12 +6,11 @@ b: {
 	d: 4
 }
 
-a: [for k, v in b if k < "d" if v > b.a {k}] @test(eq, ["b", "c"])
+a: [for k, v in b if k < "d" if v > b.a {k}]
 c: {
 	[for _, x in b for _, y in b if x < y {x}]
-	@test(eq, [1, 1, 1, 2, 2, 3])
 }
-d: [for x, _ in a {x}] @test(eq, [0, 1])
+d: [for x, _ in a {x}]
 -- out/compile --
 --- in.cue
 {

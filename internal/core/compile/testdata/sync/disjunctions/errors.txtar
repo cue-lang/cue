@@ -16,7 +16,6 @@ issue570: {
 		result?: [... string]
 		...
 	}
-	@test(err, code=eval, at=results.result, contains="conflicting values", args=["hello", [...string]], pos=[1:11, 2:19, 11:12])
 }
 
 // Clarify when an error resulted from a failed disjunction; error messages
@@ -29,16 +28,13 @@ issue516: {
 
 	x: #Def
 	x: match: metrics: "foo": {}
-	@test(err, code=eval, at=x, contains="2 errors in empty disjunction", pos=[])
 }
 
 // issue #465
 explicitDefaultError: {
 	a: string | *_|_
 
-	if a != "" {
-	}
-	@test(err, code=incomplete, contains="non-concrete value string in operand to !=", pos=[3:5, 1:5])
+	if a != "" {}
 }
 
 // evaluator: export as YAML vs JSON emits different templated data when
@@ -48,7 +44,6 @@ issue2916: {
 	b: _
 	[_]: c:      uint | *1
 	[string]: c: >=3 | *3
-	@test(eq, {b: {c: *3 | >=3 & int}})
 }
 // evaluator: inconsistent export output for different formats based on which
 // default is selected when multiple defaults are unified.
@@ -56,7 +51,6 @@ issue2916: {
 issue3157: {
 	foo: *42 | _
 	foo: *43 | bool
-	@test(eq, {foo: *43 | bool})
 }
 -- issue3581.cue --
 // evalv3: tools/flow unexpected error when a flow task result field is used as
@@ -64,12 +58,8 @@ issue3157: {
 // https://cuelang.org/issue/3581
 issue3581: reduced: {
 	list: [...] | *[]
-	list: ["\(c)" ] @test(err, code=incomplete, contains="2 errors in empty disjunction",
-		suberr=(code=incomplete, contains="incompatible list lengths", args=[0, 1], pos=[-1:17]),
-		suberr=(code=incomplete, contains="invalid interpolation: non-concrete value", pos=[0:9]),
-	)
+	list: ["\(c)"]
 	c: _
-	@test(eq, {list: _|_, c: _})
 }
 -- issue3576.cue --
 // evalv3: disjunct of definitions with identical optional fields results in
@@ -84,11 +74,6 @@ issue3576: reduced: {
 	}
 	foo: #B | #A
 	foo: a: "1"
-	@test(eq, {
-		#A: {a!: string}
-		#B: {}
-		foo: {a: "1"}
-	})
 }
 issue3576: full: {
 	#Run: {
@@ -106,17 +91,11 @@ issue3576: full: {
 			optionsValue: options
 		}
 	}
-	
+
 	#Option: {}
-	
+
 	foo: #Run | #Copy
 	foo: run: "make"
-	@test(eq, {
-		#Run: {run!: string, options?: {} | [{}]}
-		#Copy: {copy!: string, options?: {} | [{}]}
-		#Option: {}
-		foo: {run: "make", options?: {} | [{}]}
-	})
 }
 -- issue3599.cue --
 // evalv3: "explicit error in source" regression when using bottom (_|_) in
@@ -133,7 +112,7 @@ issue3599: full: {
 			read?:  _|_
 		}
 	}
-	
+
 	#Minio: {
 		container: #Action & {
 			action: {
@@ -147,41 +126,22 @@ issue3599: full: {
 		doWrite: bool | *true
 		container: action: defaultAction
 		defaultAction: {
-			if doWrite { write: "somefile.txt" }
-			if !doWrite { read: "somefile.txt" }
+			if doWrite {write: "somefile.txt"}
+			if !doWrite {read: "somefile.txt"}
 		}
 	}
-	@test(skip, hint="somehow this test doesn't work. Fix it.")
-	@test(eq:todo, {
-		#Action: {
-			action: {read!: string, write?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[])} | {write!: string, read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[])}
-		}
-		#Minio: {
-			container: {
-				action: {
-					write: "somefile.txt"
-					read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source (and 1 more errors)", pos=[23:13])
-				}
-			}
-			doWrite: *true | bool
-			defaultAction: {write: "somefile.txt"}
-		}
-	})
 }
 issue3599: reduced: p1: {
-	{ a?:  1&2 } | { a:  string, b?: 1&2 }
-	{  } | {  }
-	@test(eq, {a?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[49:25, 50:2, 50:9, 50:11])} | {a: string, b?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[49:25, 50:2, 50:35, 50:37])})
+	{a?: 1 & 2} | {a: string, b?: 1 & 2}
+	{} | {}
 }
 issue3599: reduced: p2: {
-	{  } | {  }
-	{ a?:  1&2 } | { a:  string, b?: 1&2 }
-	@test(eq, {a?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[54:25, 56:2, 56:9, 56:11])} | {a: string, b?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[54:25, 56:2, 56:35, 56:37])})
+	{} | {}
+	{a?: 1 & 2} | {a: string, b?: 1 & 2}
 }
 issue3599: let: {
-	{ } | { a:  B | 1, let B = 1&2 }
-	{  } | {  }
-	@test(eq, {} | {a: 1})
+	{} | {a: B | 1, let B = 1 & 2, }
+	{} | {}
 }
 -- optionalerror.cue --
 // evalv3 closedness regression with disjunctions and ellipses; a definition
@@ -190,24 +150,9 @@ issue3599: let: {
 issue4022: reduced: {
 	#NonNamespaced: metadata: namespace?: _|_
 	#NullOrNonNamespaced: int | #NonNamespaced
-	out: #NullOrNonNamespaced
-	out: #NonNamespaced
+	out:                  #NullOrNonNamespaced
+	out:                  #NonNamespaced
 	out: metadata: {}
-	@test(eq, {
-		#NonNamespaced: {
-			metadata: {
-				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[5:40])
-			}
-		}
-		#NullOrNonNamespaced: int | {metadata: {
-		namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[5:40])
-	}}
-		out: {
-			metadata: {
-				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[5:40])
-			}
-		}
-	})
 }
 issue4022: full: {
 	#NonNamespaced: {
@@ -227,25 +172,6 @@ issue4022: full: {
 		metadata: name: "foo"
 		apiVersion: "v1"
 	}
-	@test(eq, {
-		#NonNamespaced: {
-			metadata: {
-				name!: string
-				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[30:16])
-			}
-		}
-		#NullOrNonNamespaced: null | {metadata: {
-		name!: string
-		namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[30:16])
-	}}
-		out: {
-			metadata: {
-				name: "foo"
-				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[30:16])
-			}
-			apiVersion: "v1"
-		}
-	})
 }
 -- out/compile --
 --- in.cue

@@ -2,10 +2,10 @@
 t1: a: {
 	foo?: int
 
-	b: foo @test(err, code=incomplete)
+	b: foo
 }
 t2: a: {
-	b: foo @test(err, code=incomplete)
+	b: foo
 
 	foo?: int
 }

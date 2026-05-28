@@ -24,11 +24,11 @@ package x
 x: [...#Repo]
 x: [{
 	Var: "REPO1"
-}]  @test(eq, [{Var: "REPO1", Pattern: *"*" | string}])
+}]
 
 y: #Repo & {
 	Var: "REPO1"
-} @test(eq, {Var: "REPO1", Pattern: *"*" | string})
+}
 
 z: #PrestepNewUser & {
 	Args: {
@@ -36,7 +36,7 @@ z: #PrestepNewUser & {
 			Var: "REPO1"
 		}]
 	}
-} @test(eq, {Args: {Repos: [{Var: "REPO1", Pattern: *"*" | string}]}})
+}
 -- out/compile --
 --- in.cue
 {

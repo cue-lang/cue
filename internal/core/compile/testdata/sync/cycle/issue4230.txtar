@@ -17,10 +17,7 @@
 x: X={
 	regions: (#transform & {_input: X})._output
 	app: region: or(["west", "east"]) & "west"
-} @test(eq, {
-	regions: ["west"]
-	app: {region: "west"}
-})
+}
 -- out/compile --
 --- in.cue
 {

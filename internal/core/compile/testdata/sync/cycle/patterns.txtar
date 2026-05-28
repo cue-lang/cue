@@ -7,10 +7,9 @@ a:          b
 b: [string]: int
 c: a:        int
 [string]: c
-a:        b      @test(eq, {a: int})
+a:        b
 b: [string]: int
-c: a:        int @test(eq, int)
-
+c: a:        int
 -- issue3326.cue --
 // https://cuelang.org/issue/3326
 issue3326: {
@@ -23,7 +22,6 @@ issue3326: {
 	_self: x: [...and(x)]
 	_self
 	x: [1]
-	@test(eq, {_self: {x: []}, x: [1], a: int})
 }
 -- out/compile --
 --- in.cue

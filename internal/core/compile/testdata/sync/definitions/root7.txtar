@@ -1,8 +1,6 @@
 -- in.cue --
 root: input: #deps: root: {}
 {root.input.#deps}
-
-@test(eq, { root: input: #deps: root: {} })
 -- out/compile --
 --- in.cue
 {

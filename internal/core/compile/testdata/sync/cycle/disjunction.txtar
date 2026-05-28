@@ -1,69 +1,58 @@
 -- in.cue --
 // cycle is a structural cycle
-cycle: a: cycle  @test(err, code=structural_cycle, pos=[])
+cycle: a: cycle
 
 // reference to outside structural cycle
-r1a: cycle | int  @test(eq, int)
-r1b: int | cycle  @test(eq, int)
+r1a: cycle | int
+r1b: int | cycle
 
-r2a: cycle | 1  @test(eq, 1)
-r2b: 1 | cycle  @test(eq, 1)
+r2a: cycle | 1
+r2b: 1 | cycle
 
-r3a: cycle | null  @test(eq, null)
-r3b: null | cycle  @test(eq, null)
+r3a: cycle | null
+r3b: null | cycle
 
-r4a: cycle | {}  @test(eq, {})
-r4b: {} | cycle  @test(eq, {})
+r4a: cycle | {}
+r4b: {} | cycle
 
-r5a: cycle | []  @test(eq, [])
-r5b: [] | cycle  @test(eq, [])
+r5a: cycle | []
+r5b: [] | cycle
 
 // reference to ancestor node
 s1a: {
 	x: s1a | int
-	@test(eq, {x: int})
 }
 s1b: {
 	x: int | s1b
-	@test(eq, {x: int})
 }
 
 s2a: {
 	x: s2a | 1
-	@test(eq, {x: 1})
 }
 s2b: {
 	x: 1 | s2b
-	@test(eq, {x: 1})
 }
 
 s3a: {
 	x: s3a | null
-	@test(eq, {x: null})
 }
 s3b: {
 	x: null | s3b
-	@test(eq, {x: null})
 }
 
 s4a: {
 	x: s4a | {}
-	@test(eq, {x: {}})
 }
 s4b: {
 	x: {} | s4b
-	@test(eq, {x: {}})
 }
 
 s5a: {
 	x: s5a | []
-	@test(eq, {x: []})
 }
 s5b: {
 	x: [] | s5b
-	@test(eq, {x: []})
 }
-
 -- issue3042.cue --
 // Array element validation not being enforced for elements nested inside
 // a struct: invalid values passed validation without error.
@@ -81,10 +70,6 @@ issue3042: {
 			]
 		}
 	}
-	@test(err, code=eval,
-		suberr=(code=eval, path=data, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{secret:{infra:[{name:"bar1"}]}}, [...#nesting], struct, list], pos=[4:57, 6:8, 6:19]),
-		suberr=(code=eval, path=data, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{secret:{infra:[{name:"bar1"}]}}, string, struct, string], pos=[4:12, 6:8, 6:19]),
-	)
 }
 -- out/compile --
 --- in.cue

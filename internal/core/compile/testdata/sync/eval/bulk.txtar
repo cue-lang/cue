@@ -10,44 +10,32 @@ a: {
 		b:    1
 		name: X
 	}
-
-	@test(eq, {
-		[=~"foo"]: { b: 1, name: string }
-		foo: {a: 1, b: 1, name: "foo"}
-	})
-	@test(allows, foo)
-	@test(allows, foobar)
-	@test(allows, string)
-	// TODO(eval): struct isn't closed, so this should be true.
-	@test(allows:todo=false, bar)
 }
 d: a & {
 	"foobar": {
 		c: 2
 	}
-} @test(eq, {
-	foobar: {c: 2, b: 1, name: "foobar"}
-	foo:    {a: 1, b: 1, name: "foo"}
-})
+}
 
 t1: {
 	#a: {
 		[>"e" & <"z"]: int
 	}
+
 	// TODO(inline): support allow on fields.
-	b: #a & {f: 4} @test(eq, {f: 4}) @test(allows, f) @test(allows=false, a) @test(allows=false, string)
-	c: #a & {z: 4} @test(err, code=eval, at=z, contains="field not allowed", pos=[0:11])
+	b: #a & {f: 4}
+	c: #a & {z: 4}
 }
 
 t2: {
 	#a: {
 		["x" | "y"]: int
 	}
-	// TODO(inline): support allow on fields.
-	b: #a & {x: 4} @test(eq, {x: 4}) @test(allows, x) @test(allows=false, z) @test(allows=false, string)
-	c: #a & {z: 4} @test(err, code=eval, at=z, contains="field not allowed", pos=[0:11])
-}
 
+	// TODO(inline): support allow on fields.
+	b: #a & {x: 4}
+	c: #a & {z: 4}
+}
 -- issue2109.cue --
 // Detect cycle:
 // The pattern constraint of FlagsURLS is applied to countries (because
@@ -63,58 +51,33 @@ patternCycle: issue2109: p1: {
 	countries: ["US", "GB", "AU"]
 	FlagsURLs: {[or(countries)]: string}
 	FlagsURLs
-	@test(eq, {
-		countries: ["US", "GB", "AU"]
-		FlagsURLs: {}
-	})
 }
 patternCycle: issue2109: p2: {
 	FlagsURLs: {[or(countries)]: string}
 	FlagsURLs
 	countries: ["US", "GB", "AU"]
-	@test(eq, {
-		FlagsURLs: {}
-		countries: ["US", "GB", "AU"]
-	})
 }
 patternCycle: issue2109: p3: {
 	FlagsURLs
 	FlagsURLs: {[or(countries)]: string}
 	countries: ["US", "GB", "AU"]
-	@test(eq, {
-		FlagsURLs: {}
-		countries: ["US", "GB", "AU"]
-	})
 }
 
 patternCycle: t1: p1: {
 	countries: "US" | "GB" | "AU"
 	FlagsURLs: {[countries]: string}
 	FlagsURLs
-	@test(eq, {
-		countries: "US" | "GB" | "AU"
-		FlagsURLs: {}
-	})
 }
 patternCycle: t1: p2: {
 	FlagsURLs
 	countries: "US" | "GB" | "AU"
 	FlagsURLs: {[countries]: string}
-	@test(eq, {
-		countries: "US" | "GB" | "AU"
-		FlagsURLs: {}
-	})
 }
 patternCycle: t1: p3: {
 	FlagsURLs
 	FlagsURLs: {[countries]: string}
 	countries: "US" | "GB" | "AU"
-	@test(eq, {
-		FlagsURLs: {}
-		countries: "US" | "GB" | "AU"
-	})
 }
-
 -- intpattern.cue --
 // evalv3 regression: a pattern constraint definition with int key incorrectly
 // allowed a non-matching (non-int) field.
@@ -122,20 +85,17 @@ patternCycle: t1: p3: {
 issue3670: {
 	#X: [int]: string
 	a: #X
-	a: "not_int": "c" @test(err, code=eval, contains="field not allowed", pos=[0:5])
+	a: "not_int": "c"
 }
 dual: {
 	_
+
 	// As long as it is undecided whether this is a struct or list, this should
 	// not be a conflict. Note that the spec does not allow int patterns, but
 	// both v2 and v3 allow it, and we soon will, so it seems gratuitous to
 	// break it now.
 	[string]: _
-	[int]: _
-
-	@test(eq, {_, [int]: _, [string]: _})
-
-	// TODO: test allows once we know what it means in this case.
+	[int]:    _
 }
 -- multi.cue --
 // evalv3 regression: closedness values and default markers were incorrectly
@@ -151,7 +111,7 @@ issue3638: full: {
 	}]
 	#Fields: {
 		input: _
-		output: [for x in input { x }] @test(err, code=incomplete, contains="cannot range over input (incomplete type _)", pos=[0:21])
+		output: [for x in input {x}]
 		...
 	}
 	#Kubernetes: {
@@ -175,40 +135,15 @@ issue3638: full: {
 	used: #Kubernetes & {
 		Routes: route: routes
 	}
-	@test(eq, {
-		routes: default: {spec: [{ refs: ["default"] }]}
-		#Fields: {
-			input:  _
-			output: _|_
-		}
-		#Kubernetes: {
-			Routes: route:      {}
-			input: res1: route: {}
-			output:             [{ route: {} }]
-		}
-		entrypoint: [{ route: default: spec: [{ refs: ["default"] }] }]
-		used: {
-			Routes: route: default: spec:      [{ refs: ["default"] }]
-			input: res1: route: default: spec: [{ refs: ["default"] }]
-			output: [{
-				route: default: spec: [{ refs: ["default"] }]
-			}]
-		}
-	})
 }
 issue3638: reduced: {
 	input: k1: [string]: a: 1
 	input: k1: foo: #x
 	out: {
-		for x in input { x }
-		for x in input { x }
+		for x in input {x}
+		for x in input {x}
 	}
-	#x: { a: int } | *{ b: 2 }
-	@test(eq, {
-		input: k1: foo: {a: 1}
-		out: foo: a: 1
-		#x: *{b: 2} | {a: int}
-	})
+	#x: {a: int} | *{b: 2}
 }
 // We expect that changing the pattern constraint into a field should give
 // not materially change the outcome.
@@ -216,15 +151,10 @@ issue3638: compare: {
 	input: k1: foo: a: 1
 	input: k1: foo: #x
 	out: {
-		for x in input { x }
-		for x in input { x }
+		for x in input {x}
+		for x in input {x}
 	}
-	#x: { a: int } | *{ b: 2 }
-	@test(eq, {
-		input: k1: foo: {a: 1}
-		out: foo: a: 1
-		#x: *{b: 2} | {a: int}
-	})
+	#x: {a: int} | *{b: 2}
 }
 -- out/compile --
 --- in.cue

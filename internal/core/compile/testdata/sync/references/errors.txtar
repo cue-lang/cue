@@ -1,34 +1,34 @@
 -- references.cue --
 missingField: {
 	a: {}
-	r: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:7])
+	r: a.b
 }
 
 missingFieldClosed: {
 	#a: {}
-	r: #a.b @test(err, code=eval, contains="undefined field: b", pos=[0:8])
+	r: #a.b
 }
 
 missingFieldNested: {
 	a: {}
 	// Must refer to `b` in error
-	r: a.b.c @test(err, code=incomplete, contains="undefined field: b", pos=[0:7])
+	r: a.b.c
 }
 
 missingFieldNestedClosed: {
 	#a: {}
 
 	// Must refer to `d` in error
-	r: #a.d.c @test(err, code=eval, contains="undefined field: d", pos=[0:8])
+	r: #a.d.c
 }
 
 missingFieldNestedInInterpolation: {
 	a: {}
 	// Must refer to `b` in error
-	r1: "\(a.b.c)" @test(err, code=incomplete, contains="invalid interpolation: undefined field: b", pos=[0:6, 0:11])
+	r1: "\(a.b.c)"
 	// Must refer to `d` in error: in case only one error is shown for a
 	// a location, ensure it doesn't alphabetically sort and pick `c` instead.
-	r2: "\(a.d.c)" @test(err, code=incomplete, contains="invalid interpolation: undefined field: d", pos=[0:6, 0:11])
+	r2: "\(a.d.c)"
 }
 -- out/compile --
 --- references.cue

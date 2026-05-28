@@ -6,39 +6,33 @@
 default: {
 	y: *1 | {a: 2}
 	y
-	@test(eq, {y: *1 | {a: 2}, a: 2})
 }
 
 unambiguous: {
 	y: 1 | {a: 2}
 	y
-	@test(eq, {y: 1 | {a: 2}, a: 2})
 }
 
 forDefault: {
 	y: *1 | {a: 2}
 	for x in [1] {y}
-	@test(eq, {y: *1 | {a: 2}, a: 2})
 }
 
 // Carry over default to first disjunct.
 openDefault: {
 	#y: *1 | {a: 2}
 	#y
-	@test(eq, *{1, #y: *1 | {a: 2}} | {#y: *1 | {a: 2}, a: 2})
 }
 
 openAmbiguous: {
 	#y: 1 | {a: 2}
 	#y
-	@test(eq, {1, #y: 1 | {a: 2}} | {#y: 1 | {a: 2}, a: 2})
 }
 
 forceStruct: {
 	#y: 1 | {a: 2}
 	#y
 	{}
-	@test(eq, {#y: 1 | {a: 2}, a: 2})
 }
 
 defaultsMulti: {
@@ -60,22 +54,11 @@ defaultsMulti: {
 
 		a: #def & {a: "foo", e: "bar"}
 	}
-	@test(eq, {
-		a: {
-			#def: *{} | {c: string} | {d: string} | {a: string} | {a: string, c: string} | {a: string, d: string} | {b: string} | {b: string, c: string} | {b: string, d: string}
-			a: *{a: "foo"} | {a: "foo", c: string} | {a: "foo", d: string}
-		}
-		b: {
-			#def: *{} | {d: string} | {e: string} | {c: string} | {c: string, d: string} | {c: string, e: string} | {d: string, e: string} | {a: string} | {a: string, d: string} | {a: string, e: string} | {a: string, c: string} | {a: string, c: string, d: string} | {a: string, c: string, e: string} | {a: string, d: string, e: string} | {b: string} | {b: string, d: string} | {b: string, e: string} | {b: string, c: string} | {b: string, c: string, d: string} | {b: string, c: string, e: string} | {b: string, d: string, e: string}
-			a: *{a: "foo", e: "bar"} | {a: "foo", e: "bar", c: string} | {a: "foo", e: "bar", d: string}
-		}
-	})
 }
 
 nested: {
 	a: 1 | 2 | *(
 		(3 | 4 | *( 5 | 6 | *7)) & ( 3 | 4 | ( *7 | 8 )))
-	@test(eq, {a: *7 | 2 | 3 | 4 | 1})
 }
 -- issue3415.cue --
 // evalv3: calculated embedded scalars with a default value disagree with v2
@@ -84,18 +67,14 @@ nested: {
 issue3415: full: {
 	A: #A & {
 		i: {
-		  _a + _b
-		  _a: 1
-		  _b: 10
+			_a + _b
+			_a: 1
+			_b: 10
 		}
 	}
 	#A: {
 		i: *0 | number
 	}
-	@test(eq, {
-		A: {i: {11, _a: 1, _b: 10}}
-		#A: {i: *0 | number}
-	})
 }
 issue3415: reduced: {
 	a: {
@@ -103,7 +82,6 @@ issue3415: reduced: {
 		#b: 10
 	}
 	a: *0 | number
-	@test(eq, {a: {11, #b: 10}})
 }
 -- out/compile --
 --- in.cue

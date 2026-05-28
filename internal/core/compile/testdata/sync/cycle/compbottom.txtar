@@ -30,7 +30,6 @@ simple: {
 	#message: #"^(message: (?P<message>.*))?$"#
 
 	p1: {
-		@test(permute, count=24)
 
 		X: "message: hello"
 		#aux: {
@@ -44,11 +43,6 @@ simple: {
 
 		Y: regexp.FindNamedSubmatch(#message, X)
 		X: #aux.message
-		@test(eq, {
-			X: "message: hello"
-			#aux: {message: "message: hello"}
-			Y: {message: "hello"}
-		})
 	}
 }
 
@@ -56,7 +50,6 @@ medium: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"#
 
 	p1: {
-		@test(permute, count=120)
 
 		Y: {
 			userinfo: "user"
@@ -92,12 +85,6 @@ medium: {
 		}
 
 		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
-		@test(eq, {
-			Y: {userinfo: "user", host: "mod.test"}
-			X: "user@mod.test"
-			#X: {userinfo: "user@", host: "mod.test"}
-			#Y: {host: "mod.test", userinfo: "user"}
-		})
 	}
 }
 -- out/compile --

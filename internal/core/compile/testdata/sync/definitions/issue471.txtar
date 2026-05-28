@@ -25,14 +25,6 @@ package x
 	name:    string
 	address: string
 }
-
-@test(eq, {
-	#a: {name: string, age: int} | {name: string, address: string}
-	#a1: {name: string, age: int}
-	#a2: {name: string, address: string}
-	#c: {name: string, age: int}
-	#d: {name: string, address: string}
-})
 -- out/compile --
 --- in.cue
 {

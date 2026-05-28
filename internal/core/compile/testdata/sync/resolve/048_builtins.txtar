@@ -8,60 +8,46 @@ a1: {
 	a: and([b, c])
 	b: =~"oo"
 	c: =~"fo"
-} @test(eq, {
-	a: =~"oo" & =~"fo"
-	b: =~"oo"
-	c: =~"fo"
-})
-a2: a1 & {a: "foo"} @test(eq, {a: "foo", b: =~"oo", c: =~"fo"})
-a3: a1 & {a: "bar"} @test(err, code=eval,
-	suberr=(code=eval, contains="invalid value", args=["bar", =~"oo"], pos=[-8:5, -9:5, 0:14]),
-	suberr=(code=eval, contains="invalid value", args=["bar", =~"fo"], pos=[-7:5, -9:5, 0:14]))
+}
+a2: a1 & {a: "foo"}
+a3: a1 & {a: "bar"}
 
 o1: {
 	a: or([b, c])
 	b: string
 	c: "bar"
-} @test(eq, {a: string | "bar", b: string, c: "bar"})
-o2: o1 & {a: "foo"}           @test(eq, {a: "foo", b: string, c: "bar"})
-o3: o1 & {a: "foo", b: "baz"} @test(err, code=eval,
-	suberr=(code=eval, contains="conflicting values", args=["bar", "foo"], pos=[-5:12, -3:5, 0:5, 0:14]),
-	suberr=(code=eval, contains="conflicting values", args=["baz", "foo"], pos=[-5:9, 0:5, 0:14, 0:24]))
+}
+o2: o1 & {a: "foo"}
+o3: o1 & {a: "foo", b: "baz"}
 
 // Issue #585
 stringListErrors: {
 	a: {
 		x: [string, ...string]
-		result: strings.Join(x, " ") @test(err, code=incomplete,
-			contains="non-concrete value string for element", pos=[0:11, -1:7])
+		result: strings.Join(x, " ")
 	}
 
 	b: {
 		x: [int, ...string]
-		result: strings.Join(x, " ") @test(err, code=eval,
-			contains="cannot use value int (int) as string", pos=[0:11, -1:7])
+		result: strings.Join(x, " ")
 	}
 
 	c: {
 		x: []
-		result: strings.Join(x, int) @test(err, code=eval,
-			contains="cannot use int (type int) as string in argument 2 to strings.Join",
-			pos=[0:27])
+		result: strings.Join(x, int)
 	}
 }
 
 decimalListErrors: {
 	a: {
 		x: [string]
-		result: list.Avg(x) @test(err, code=eval,
-			contains="invalid list element", pos=[0:11, -1:7])
-			// TODO: allow checking wrapped errors: args=[string, number],
+		result: list.Avg(x)
+		// TODO: allow checking wrapped errors: args=[string, number],
 	}
 
 	b: {
 		x: [int, ...string]
-		result: list.Avg(x) @test(err, code=incomplete,
-			contains="non-concrete value int for element 0 of number list argument 0", pos=[0:11, -1:7])
+		result: list.Avg(x)
 	}
 }
 -- issue3648.cue --
@@ -78,8 +64,6 @@ issue3648: reduced: {
 		b: [{}]
 	}
 	foo: {}
-
-	@test(eq, {foo: {a: [{}], b: [{}]}})
 }
 issue3648: full: {
 	#Redirect: path?: string
@@ -87,18 +71,9 @@ issue3648: full: {
 	[string]: {
 		// Note that this bug disappears if the order of the fields below is swapped.
 		allRedirects: list.Concat([redirects])
-		redirects:    [...#Redirect]
+		redirects: [...#Redirect]
 	}
 	foo: {}
-
-	@test(eq, {
-		#Redirect: {path?: string}
-		[string]: {
-			allRedirects: list.Concat([[]])
-			redirects:    []
-		}
-		foo: {allRedirects: [], redirects: []}
-	})
 }
 -- out/compile --
 --- in.cue

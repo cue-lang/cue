@@ -3,7 +3,7 @@
 # must differ from its neighbors).
 # https://cuelang.org/issue/242
 -- in.cue --
-#size:     2
+#size:      2
 #CellValue: 0 | 1 | 2 | 3
 cell: "0": "0": #CellValue
 cell: "0": "0": !=cell["0"]["1"]
@@ -29,10 +29,6 @@ cell: "0": "0": 0
 cell: "0": "1": 1
 cell: "1": "0": 2
 cell: "1": "1": 3
-@test(eq, {
-	"0": {"0": 0, "1": 1}
-	"1": {"0": 2, "1": 3}
-}, at=cell)
 
 cell2: a: 0 | 1
 cell2: a: !=cell2.b
@@ -42,7 +38,6 @@ cell2: b: !=cell2.a
 
 cell2: a: _
 cell2: b: 1
-@test(eq, {a: 0, b: 1}, at=cell2)
 
 cell3: a: 0 | 1
 cell3: a: !=cell3.b
@@ -52,7 +47,6 @@ cell3: b: !=cell3.a
 
 cell3: a: 0
 cell3: b: _
-@test(eq, {a: 0, b: 1}, at=cell3)
 
 cell4: a: 0 | 1
 cell4: a: !=cell4.b

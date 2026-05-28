@@ -4,31 +4,25 @@
 # if comprehensions inside #Leaf reference optional fields without triggering
 # spurious closedness errors.
 -- in.cue --
-object: #Leaf & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
+object: #Leaf & {}
 
 #Base: {
 	extra?: {...}
-	@test(eq, {extra?: {}})
-	@test(closed)
 }
 
 #Mid: {
 	#Base
-	@test(eq, {extra?: {}})
-	@test(closed)
 }
 
 #Leaf: {
 	#Mid
-	extra?:  {...}
+	extra?: {...}
 	more?: int
 	if extra.foo != _|_ {
 		if more != _|_ {
 			foo: "bar"
 		}
 	}
-	@test(eq, {extra?: {}, more?: int})
-	@test(closed)
 }
 -- out/compile --
 --- in.cue

@@ -1,5 +1,5 @@
 -- in.cue --
-Foo: {} @test(eq, {})
+Foo: {}
 
 Foo
 -- out/compile --

@@ -1,8 +1,8 @@
 -- in.cue --
 r: {
 	a?: 3
-	b:  a      @test(err, code=incomplete, contains="cannot reference optional field: a", pos=[0:6])
-	c:  r["a"] @test(err, code=incomplete, contains="cannot reference optional field: a", pos=[0:8])
+	b:  a
+	c:  r["a"]
 }
 -- out/compile --
 --- in.cue

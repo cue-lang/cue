@@ -8,16 +8,8 @@ reduced: {
 
 	if true {
 		let Z = [for _, x in A {x}]
-		B: [for z in Z if z.y != _|_ { b: 1 }]
+		B: [for z in Z if z.y != _|_ {b: 1}]
 	}
-	@test(eq, {
-		A: {
-			x1: {y?: int}
-			x2: {y?: int}
-			x3: {y?: int}
-		}
-		B: []
-	})
 }
 -- full.cue --
 full: {
@@ -27,8 +19,6 @@ full: {
 			cp:        int32
 		}
 	}
-
-	@test(shareID=L, at=k.n.n1._cs.l)
 	k: n: n1: {
 		_CL: "l"
 	}
@@ -57,45 +47,7 @@ full: {
 		}]
 	}
 
-	_cl: l: {} @test(shareID=L)
-	@test(eq, {
-		_core_v1: #cp: {
-			hostPort?: >=-2147483648 & <=2147483647 & int
-			cp:        >=-2147483648 & <=2147483647 & int
-		}
-		k: n: n1: {
-			_CL: "l"
-			_cs: l: _ports: {
-				"1": {
-					hostPort?: >=-2147483648 & <=2147483647 & int
-					cp:        >=-2147483648 & <=2147483647 & int
-				}
-				"2": {
-					hostPort?: >=-2147483648 & <=2147483647 & int
-					cp:        >=-2147483648 & <=2147483647 & int
-				}
-				"3": {
-					hostPort?: >=-2147483648 & <=2147483647 & int
-					cp:        >=-2147483648 & <=2147483647 & int
-				}
-			}
-		}
-		_cl: l: _ports: {
-			"1": {
-				hostPort?: >=-2147483648 & <=2147483647 & int
-				cp:        >=-2147483648 & <=2147483647 & int
-			}
-			"2": {
-				hostPort?: >=-2147483648 & <=2147483647 & int
-				cp:        >=-2147483648 & <=2147483647 & int
-			}
-			"3": {
-				hostPort?: >=-2147483648 & <=2147483647 & int
-				cp:        >=-2147483648 & <=2147483647 & int
-			}
-		}
-		ports: []
-	})
+	_cl: l: {}
 }
 -- out/compile --
 --- full.cue

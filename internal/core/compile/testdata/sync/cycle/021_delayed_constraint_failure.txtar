@@ -3,12 +3,12 @@
 # Tests that cycles resolved by defaults produce correct values, while
 # conflicting constraints on the same field produce errors.
 -- in.cue --
-a: b - 100 @test(eq, 100) // Okay to have no error here, as long as there is an error with b.
+a: b - 100 // Okay to have no error here, as long as there is an error with b.
 b: a + 110
-b: 200 @test(err, code=eval, pos=[-1:4, 0:4])
+b: 200
 
 x: 100
-x: x + 1 @test(err, code=eval, pos=[-1:4, 0:4])
+x: x + 1
 -- out/compile --
 --- in.cue
 {

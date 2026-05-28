@@ -11,14 +11,6 @@ import "foo.test/main/imported"
 
 out: imported
 out: either: foo: "world"
-
-@test(eq, {
-	out: {
-		either: {foo: "world"}
-		#Foo: {foo: _}
-		#Bar: {bar: _}
-	}
-})
 -- imported/imported.cue --
 package imported
 

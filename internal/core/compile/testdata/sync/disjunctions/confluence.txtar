@@ -3,14 +3,14 @@ import (
 	"net"
 	"strings"
 )
+
 // evalv3 regression: disjunctions with conditionals depending on the
 // disjunction's own value were left unresolved.
 // https://cuelang.org/issue/3993
 issue3993: reduced: {
 	x: net.IPv4 | =~"fail"
-	x: { if net.IPv4(x) {=~"^10\\." } }
+	x: {if net.IPv4(x) {=~"^10\\."}}
 	x: "10.10.10.10"
-	@test(eq, {x: "10.10.10.10"})
 }
 
 issue3993: full: {
@@ -22,7 +22,6 @@ issue3993: full: {
 		addr: strings.HasPrefix("2a02:")
 	}
 	addr: "10.10.10.10"
-	@test(eq, {addr: "10.10.10.10"})
 }
 -- out/compile --
 --- in.cue

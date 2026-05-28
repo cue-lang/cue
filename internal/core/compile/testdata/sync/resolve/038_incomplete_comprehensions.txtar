@@ -7,16 +7,10 @@ A: {
 	if true {
 		baz: "baz"
 	}
-	@test(err, code=incomplete, contains="cannot range over src", pos=[1:11])
 }
 B: A & {
 	src: ["foo", "bar"]
-}   @test(eq, {
-	src: ["foo", "bar"]
-	baz: "baz"
-	foo: "foo"
-	bar: "bar"
-})
+}
 -- out/compile --
 --- in.cue
 {

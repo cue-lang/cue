@@ -13,13 +13,6 @@ import "list"
 			"as": list.Concat([["go"], as])
 		},
 	]
-	@test(eq, {
-		as: []
-		#c: [{
-		do: "f1"
-		as: ["go"]
-	}]
-	})
 }
 
 #d2: {
@@ -32,27 +25,12 @@ import "list"
 			}
 		},
 	]
-	// TODO(inline): generatign this value is broken: hand-spun.
-	@test(eq, {
-		p: *"." | string
-		#c: [{
-			do: "f2"
-			from: {
-				as: [*"."| string]
-				#c: [{
-					do: "f1"
-					as: ["go", *"."| string]
-				}]
-			}
-		}]
-	})
 }
 
 #c1: {
 	#c: [...#o]
 	_
 	...
-	@test(eq, {_, #c: []})
 }
 
 #o: #f1 | #f2
@@ -60,15 +38,10 @@ import "list"
 #f1: {
 	do: "f1"
 	as: [...string]
-	@test(eq, {do: "f1", as: []})
 }
-
-@test(shareID=C1, at=#c1)
-@test(shareID=C1, at=#f2.from)
 #f2: {
 	do:   "f2"
 	from: #c1
-	@test(eq, {do: "f2", from: {_, #c: []}})
 }
 -- out/compile --
 --- in.cue

@@ -6,11 +6,11 @@ import "struct"
 
 // Standalone validator: BaseValue of the vertex is the BuiltinValidator
 // itself, so equalTerminal is called directly with two BuiltinValidators.
-rawMax: struct.MaxFields(2) @test(eq, struct.MaxFields(2))
-rawMin: struct.MinFields(3) @test(eq, struct.MinFields(3))
+rawMax: struct.MaxFields(2)
+rawMin: struct.MinFields(3)
 
-intMixDirect: int & <=1  @test(eq, <=1 & int)
-intMixEmbed: {int & <=1}  @test(eq, {<=1 & int})
+intMixDirect: int & <=1
+intMixEmbed: {int & <=1}
 -- out/compile --
 --- in.cue
 {

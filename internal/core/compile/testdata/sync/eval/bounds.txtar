@@ -7,272 +7,266 @@
 module: "x.test"
 language: version: "v0.14.0"
 -- in.cue --
-x0: 5       @test(eq, 5)
-x1: b5 & 30 @test(eq, 30)
+x0: 5
+x1: b5 & 30
 
-b0: <x0 & >0        @test(eq, >0 & <5)
-b1: b0 & int        @test(eq, >0 & <5 & int)
-b2: int & <5.5      @test(eq, <5.5 & int)
-b3: <10 & <=5       @test(eq, <=5)
-b4: >=20 & >20      @test(eq, >20)
-b5: >=21 & >20      @test(eq, >=21)
-b6: int & >5 & <=6  @test(eq, >5 & <=6 & int)
+b0: <x0 & >0
+b1: b0 & int
+b2: int & <5.5
+b3: <10 & <=5
+b4: >=20 & >20
+b5: >=21 & >20
+b6: int & >5 & <=6
 
 simplifyExpr: {
 	// TODO: fill out later.
-	less1: <(<3)   @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:11])
-	less2: <(<=3)  @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:11])
-	less3: <=(<3)  @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:12])
-	less4: <=(<=3) @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:12])
-	less5: <(!=3)  @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:11])
-	less6: <=(!=3) @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:12])
+	less1: <(<3)
+	less2: <(<=3)
+	less3: <=(<3)
+	less4: <=(<=3)
+	less5: <(!=3)
+	less6: <=(!=3)
 
-	gtr1: >(>3)   @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:10])
-	gtr2: >(>=3)  @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:10])
-	gtr3: >=(>3)  @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:11])
-	gtr4: >=(>=3) @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:11])
-	gtr5: >(!=3)  @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:10])
-	gtr6: >=(!=3) @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:11])
+	gtr1: >(>3)
+	gtr2: >(>=3)
+	gtr3: >=(>3)
+	gtr4: >=(>=3)
+	gtr5: >(!=3)
+	gtr6: >=(!=3)
 
-	lg1: <(>3)   @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:9])
-	lg2: <(>=3)  @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:9])
-	lg3: <=(>3)  @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:10])
-	lg4: <=(>=3) @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:10])
+	lg1: <(>3)
+	lg2: <(>=3)
+	lg3: <=(>3)
+	lg4: <=(>=3)
 
-	gl1: >(<3)   @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:9])
-	gl2: >(<=3)  @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:9])
-	gl3: >=(<3)  @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:10])
-	gl4: >=(<=3) @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:10])
+	gl1: >(<3)
+	gl2: >(<=3)
+	gl3: >=(<3)
+	gl4: >=(<=3)
 
-	ne1: !=(!=3) @test(err, code=incomplete, contains="non-concrete value !=3", pos=[0:10])
-	ne2: !=(<3)  @test(err, code=incomplete, contains="non-concrete value <3", pos=[0:10])
-	ne3: !=(<=3) @test(err, code=incomplete, contains="non-concrete value <=3", pos=[0:10])
-	ne4: !=(>3)  @test(err, code=incomplete, contains="non-concrete value >3", pos=[0:10])
-	ne5: !=(>=3) @test(err, code=incomplete, contains="non-concrete value >=3", pos=[0:10])
+	ne1: !=(!=3)
+	ne2: !=(<3)
+	ne3: !=(<=3)
+	ne4: !=(>3)
+	ne5: !=(>=3)
 
 	s:      string
 	n:      number
 	i:      int
 	f:      float
 	b:      bytes
-	basic1: <(i)  @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[i, <], pos=[0:12])
-	basic2: >(n)  @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[n, >], pos=[0:12])
-	basic3: >=(s) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[s, >=], pos=[0:13])
-	basic4: <=(f) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[f, <=], pos=[0:13])
-	basic5: <=(b) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[b, <=], pos=[0:13])
+	basic1: <(i)
+	basic2: >(n)
+	basic3: >=(s)
+	basic4: <=(f)
+	basic5: <=(b)
 
 	// Do NOT interpret this the same as `!= type`.
-	bne1: !=(s) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[s, !=], pos=[0:11])
-	bne2: !=(n) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[n, !=], pos=[0:11])
-	bne3: !=(n) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[n, !=], pos=[0:11])
-	bne4: !=(i) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[i, !=], pos=[0:11])
-	bne5: !=(b) @test(err, code=incomplete, contains="non-concrete value %s for bound %s", args=[b, !=], pos=[0:11])
+	bne1: !=(s)
+	bne2: !=(n)
+	bne3: !=(n)
+	bne4: !=(i)
+	bne5: !=(b)
 
-	e1: <(=~"foo") @test(err, code=incomplete, contains="non-concrete value =~", pos=[0:8])
-	e2: >(null)    @test(err, code=eval, contains="cannot use null for bound", pos=[0:8])
+	e1: <(=~"foo")
+	e2: >(null)
 }
 -- binarystring.cue --
 simplifyBinary: strings: {
-  err1: {
-    p1: <"a" & >"b" @test(err, code=eval, contains="incompatible string bounds", pos=[0:16, 0:9])
-    p2: >"b" & <"a" @test(err, code=eval, contains="incompatible string bounds", pos=[0:16, 0:9])
-  }
-  err2: {
-    p1: >"b" & <="a" @test(err, code=eval, contains="incompatible string bounds", pos=[0:16, 0:9])
-    p2: <="a" & >"b" @test(err, code=eval, contains="incompatible string bounds", pos=[0:17, 0:9])
-  }
-  err3: {
-    p1: >="b" & <"b" @test(err, code=eval, contains="incompatible string bounds", pos=[0:17, 0:9])
-    p2: <"b" & >="b" @test(err, code=eval, contains="incompatible string bounds", pos=[0:16, 0:9])
-    p3: >"b" & <="b" @test(err, code=eval, contains="incompatible string bounds", pos=[0:16, 0:9])
-    p4: <="b" & >"b" @test(err, code=eval, contains="incompatible string bounds", pos=[0:17, 0:9])
-  }
-  ok1: {
-    p1: >"a" & <"b"  @test(eq, >"a" & <"b")
-    p2: <"b" & >"a"  @test(eq, >"a" & <"b")
-  }
-  ok2: {
-    p1: >"a" & <="b"  @test(eq, >"a" & <="b")
-    p2: <="b" & >"a"  @test(eq, >"a" & <="b")
-    p3: >="a" & <"b"  @test(eq, >="a" & <"b")
-    p4: <"b" & >="a"  @test(eq, >="a" & <"b")
-  }
-  ok3: {
-    p1: >="b" & <="c"  @test(eq, >="b" & <="c")
-    p2: <="c" & >="b"  @test(eq, >="b" & <="c")
-  }
-  ok4: {
-    p1: >="b" & <="b"  @test(eq, >="b" & <="b")
-  }
+	err1: {
+		p1: <"a" & >"b"
+		p2: >"b" & <"a"
+	}
+	err2: {
+		p1: >"b" & <="a"
+		p2: <="a" & >"b"
+	}
+	err3: {
+		p1: >="b" & <"b"
+		p2: <"b" & >="b"
+		p3: >"b" & <="b"
+		p4: <="b" & >"b"
+	}
+	ok1: {
+		p1: >"a" & <"b"
+		p2: <"b" & >"a"
+	}
+	ok2: {
+		p1: >"a" & <="b"
+		p2: <="b" & >"a"
+		p3: >="a" & <"b"
+		p4: <"b" & >="a"
+	}
+	ok3: {
+		p1: >="b" & <="c"
+		p2: <="c" & >="b"
+	}
+	ok4: {
+		p1: >="b" & <="b"
+	}
 }
 simplifyBinary: byte: {
-  err1: {
-    p1: <'a' & >'b' @test(err, code=eval, contains="incompatible bytes bounds", pos=[0:16, 0:9])
-    p2: >'b' & <'a' @test(err, code=eval, contains="incompatible bytes bounds", pos=[0:16, 0:9])
-  }
-  err2: {
-    p1: >'b' & <='a' @test(err, code=eval, contains="incompatible bytes bounds", pos=[0:16, 0:9])
-    p2: <='a' & >'b' @test(err, code=eval, contains="incompatible bytes bounds", pos=[0:17, 0:9])
-  }
-  err3: {
-    p1: >='b' & <'b' @test(err, code=eval, contains="incompatible bytes bounds", pos=[0:17, 0:9])
-    p2: <'b' & >='b' @test(err, code=eval, contains="incompatible bytes bounds", pos=[0:16, 0:9])
-    p3: >'b' & <='b' @test(err, code=eval, contains="incompatible bytes bounds", pos=[0:16, 0:9])
-    p4: <='b' & >'b' @test(err, code=eval, contains="incompatible bytes bounds", pos=[0:17, 0:9])
-  }
-  ok1: {
-    p1: >'a' & <'b'  @test(eq, >'a' & <'b')
-    p2: <'b' & >'a'  @test(eq, >'a' & <'b')
-  }
-  ok2: {
-    p1: >'a' & <='b'  @test(eq, >'a' & <='b')
-    p2: <='b' & >'a'  @test(eq, >'a' & <='b')
-    p3: >='a' & <'b'  @test(eq, >='a' & <'b')
-    p4: <'b' & >='a'  @test(eq, >='a' & <'b')
-  }
-  ok3: {
-    p1: >='b' & <='c'  @test(eq, >='b' & <='c')
-    p2: <='c' & >='b'  @test(eq, >='b' & <='c')
-  }
-  ok4: {
-    p1: >='b' & <='b'  @test(eq, >='b' & <='b')
-  }
+	err1: {
+		p1: <'a' & >'b'
+		p2: >'b' & <'a'
+	}
+	err2: {
+		p1: >'b' & <='a'
+		p2: <='a' & >'b'
+	}
+	err3: {
+		p1: >='b' & <'b'
+		p2: <'b' & >='b'
+		p3: >'b' & <='b'
+		p4: <='b' & >'b'
+	}
+	ok1: {
+		p1: >'a' & <'b'
+		p2: <'b' & >'a'
+	}
+	ok2: {
+		p1: >'a' & <='b'
+		p2: <='b' & >'a'
+		p3: >='a' & <'b'
+		p4: <'b' & >='a'
+	}
+	ok3: {
+		p1: >='b' & <='c'
+		p2: <='c' & >='b'
+	}
+	ok4: {
+		p1: >='b' & <='b'
+	}
 }
 -- binary.cue --
 simplifyBinary: float: {
-  err1: {
-    p1: <1 & >2 @test(err, code=eval, contains="incompatible number bounds", pos=[0:14, 0:9])
-    p2: >2 & <1 @test(err, code=eval, contains="incompatible number bounds", pos=[0:14, 0:9])
-  }
-  err2: {
-    p1: >2 & <=1 @test(err, code=eval, contains="incompatible number bounds", pos=[0:14, 0:9])
-    p2: <=1 & >2 @test(err, code=eval, contains="incompatible number bounds", pos=[0:15, 0:9])
-  }
-  err3: {
-    p1: >=2 & <2 @test(err, code=eval, contains="incompatible number bounds", pos=[0:15, 0:9])
-    p2: <2 & >=2 @test(err, code=eval, contains="incompatible number bounds", pos=[0:14, 0:9])
-    p3: >2 & <=2 @test(err, code=eval, contains="incompatible number bounds", pos=[0:14, 0:9])
-    p4: <=2 & >2 @test(err, code=eval, contains="incompatible number bounds", pos=[0:15, 0:9])
-  }
-  ok1: {
-    p1: >1 & <2  @test(eq, >1 & <2)
-    p2: <2 & >1  @test(eq, >1 & <2)
-  }
-  ok2: {
-    p1: >=2 & <=2 @test(eq, >=2 & <=2)
-    p2: <=2 & >=2 @test(eq, >=2 & <=2)
-  }
+	err1: {
+		p1: <1 & >2
+		p2: >2 & <1
+	}
+	err2: {
+		p1: >2 & <=1
+		p2: <=1 & >2
+	}
+	err3: {
+		p1: >=2 & <2
+		p2: <2 & >=2
+		p3: >2 & <=2
+		p4: <=2 & >2
+	}
+	ok1: {
+		p1: >1 & <2
+		p2: <2 & >1
+	}
+	ok2: {
+		p1: >=2 & <=2
+		p2: <=2 & >=2
+	}
 }
 
 simplifyBinary: integer: {
-  [_]: [_]: int
-  err1: {
-    p1: <1 & >2 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:14, 0:9])
-    p2: >2 & <1 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:14, 0:9])
-  }
-  err2: {
-    p1: >2 & <=1 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:14, 0:9])
-    p2: <=1 & >2 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:15, 0:9])
-  }
-  err3: {
-    p1: >=2 & <2 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:15, 0:9])
-    p2: <2 & >=2 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:14, 0:9])
-    p3: >2 & <=2 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:14, 0:9])
-    p4: <=2 & >2 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:15, 0:9])
-  }
-  err4: {
-    p1: >1 & <2 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:14, 0:9])
-    p2: <2 & >1 @test(err, code=eval, contains="incompatible integer bounds", pos=[0:14, 0:9])
-  }
-  ok1: {
-    p1: >=2 & <=3 @test(eq, >=2 & <=3 & int)
-    p2: <=3 & >=2 @test(eq, >=2 & <=3 & int)
-  }
-  ok2: {
-    p1: >=2 & <=2 @test(eq, >=2 & <=2 & int)
-    p2: <=2 & >=2 @test(eq, >=2 & <=2 & int)
-  }
-  ok3: {
-    p1: >=2 & <3 @test(eq, >=2 & <3 & int)
-    p2: >2 & <=3 @test(eq, >2 & <=3 & int)
-    p3: <3 & >=2 @test(eq, >=2 & <3 & int)
-    p4: <=3 & >2 @test(eq, >2 & <=3 & int)
-  }
+	[_]: [_]: int
+	err1: {
+		p1: <1 & >2
+		p2: >2 & <1
+	}
+	err2: {
+		p1: >2 & <=1
+		p2: <=1 & >2
+	}
+	err3: {
+		p1: >=2 & <2
+		p2: <2 & >=2
+		p3: >2 & <=2
+		p4: <=2 & >2
+	}
+	err4: {
+		p1: >1 & <2
+		p2: <2 & >1
+	}
+	ok1: {
+		p1: >=2 & <=3
+		p2: <=3 & >=2
+	}
+	ok2: {
+		p1: >=2 & <=2
+		p2: <=2 & >=2
+	}
+	ok3: {
+		p1: >=2 & <3
+		p2: >2 & <=3
+		p3: <3 & >=2
+		p4: <=3 & >2
+	}
 }
 -- equals.cue --
 @experiment(structcmp)
 
 equalScalar: {
-	ok1: ==1  @test(eq, 1)
+	ok1: ==1
 	ok1: 1
 
 	ok2: [1, 2]
-	ok2: ==[1, 2] @test(eq, [1, 2])
+	ok2: ==[1, 2]
 
 	err1: ==1
-	err1: 2    @test(err, code=eval, contains="out of bound ==1", pos=[-1:8, 0:8])
+	err1: 2
 
 	err2: [1, 2]
-	err2: !=[1, 2] @test(err, code=eval, contains="out of bound !=", pos=[0:8, -1:8])
+	err2: !=[1, 2]
 }
 equalStruct: {
-	ok1: =={} @test(eq, {})
+	ok1: =={}
 	ok1: {}
 
 	ok2: {a: 1, b: 2}
-	ok2: =={a: 1, b: 2} @test(eq, {a: 1, b: 2})
+	ok2: =={a: 1, b: 2}
 
 	err1: =={}
-	err1: {a: 1, b: 2} @test(err, code=eval, contains="out of bound ==", pos=[-1:8, 0:8])
+	err1: {a: 1, b: 2}
 
 	err2: {a: 1, b: 2}
-	err2: !={a: 1, b: 2} @test(err, code=eval, contains="out of bound !=", pos=[0:8, -1:8])
+	err2: !={a: 1, b: 2}
 }
 nonConcrete: {
-	ok0: =="foo" @test(eq, =="foo")
+	ok0: =="foo"
 
 	_int: int
 
-	iErr1: ==_int @test(err, code=incomplete, contains="non-concrete value", pos=[0:11])
+	iErr1: ==_int
 
-	iErr2: !=_int @test(err, code=incomplete, contains="non-concrete value", pos=[0:11])
+	iErr2: !=_int
 
 	iErr3: ==_int
-	iErr3: == 1 @test(err, code=incomplete, contains="non-concrete value", pos=[-1:11])
+	iErr3: ==1
 
 	ok4: ==1
-	ok4: _int @test(eq, ==1 & int) // v3: ==1 & int is not an error
+	ok4: _int // v3: ==1 & int is not an error
 
 	eErr5: =="foo"
-	eErr5: _int @test(err, code=eval, contains="conflicting values", pos=[-13:8, -1:9, 0:9])
+	eErr5: _int
 
 	eErr6: ==_int
-	eErr6: "foo" @test(err, code=incomplete|eval,
-		hint="incompatible types, so this SHOULD be a permanent error",
-		contains="non-concrete value", pos=[-1:11]) @test(err:todo, code=eval)
+	eErr6: "foo"
 }
 -- issue4142.cue --
 @experiment(structcmp)
 
 inDefinitions: ok1: {
-	#X: =={ name: "X" }
-	x: #X & { name: "X" }
-	@test(eq, {#X: {=={ name: "X" }}, x: {name: "X"}})
+	#X: =={name: "X"}
+	x: #X & {name: "X"}
 }
 inDefinitions: ok2: {
-	x: #X & { name: "Y" }
-	#X: !={ name: "X" }
-	@test(eq, {x: {name: "Y"}, #X: {!={name: "X"}}})
+	x: #X & {name: "Y"}
+	#X: !={name: "X"}
 }
 inDefinitions: err1: {
-	#X: =={ name: "X" }
-	x: #X & { name: "Y" }
-	@test(err, code=eval, at=x, contains="out of bound ==", pos=[1:6, 2:5])
+	#X: =={name: "X"}
+	x: #X & {name: "Y"}
 }
 inDefinitions: err2: {
-	#X: !={ name: "X" }
-	x: #X & { name: "X" }
-	@test(err, code=eval, at=x, contains="out of bound !=", pos=[1:6, 2:5])
+	#X: !={name: "X"}
+	x: #X & {name: "X"}
 }
 -- issue4251-panic.cue --
 @experiment(structcmp)
@@ -283,13 +277,13 @@ inDefinitions: err2: {
 // Regression: SimplifyBounds panicked on == bounds combined with other bound types.
 // https://cuelang.org/issue/4251
 issue4251: ok: {
-	a: !="c" & =="a" & "a" @test(eq, "a")
-	b: =="b" & !="c" & "b" @test(eq, "b")
-	c: =="x" & >="a" & "x" @test(eq, "x")
-	d: <="z" & =="y" & "y" @test(eq, "y")
+	a: !="c" & =="a" & "a"
+	b: =="b" & !="c" & "b"
+	c: =="x" & >="a" & "x"
+	d: <="z" & =="y" & "y"
 }
 issue4251: fail: {
-	b: =="b" & !="b" & "b" @test(err, code=eval, contains="out of bound !=", pos=[0:13, 0:5, 0:21])
+	b: =="b" & !="b" & "b"
 }
 -- out/compile --
 --- binary.cue

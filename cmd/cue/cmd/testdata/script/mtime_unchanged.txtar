@@ -3,12 +3,7 @@
 # build systems and editors that key off mtimes.
 #
 # Each command below is invoked once on input that is already in its
-# canonical form, so the run is effectively a no-op. cue fmt, cue mod tidy,
-# cue mod fix, cue mod edit, and cue mod get already get this right and so
-# the test asserts that the mtime is preserved. cue fix and cue trim
-# currently rewrite the file unconditionally, so the test pins that buggy
-# behavior with ! cmp for now; a follow-up change makes them match cue fmt
-# and flips the assertions.
+# canonical form, so the run is effectively a no-op.
 #
 # Issue: cue-lang/cue#3884
 
@@ -48,19 +43,19 @@ exec cue mod get foo.org/bar@v1.0.0
 mod-time cue.mod/module.cue
 cmp stdout mod-time-modget
 
-# cue fix rewrites a file with no fixes needed, bumping its mtime.
+# cue fix does not touch a file with nothing to fix.
 mod-time nofix.cue
 cp stdout mod-time-fix
 exec cue fix nofix.cue
 mod-time nofix.cue
-! cmp stdout mod-time-fix
+cmp stdout mod-time-fix
 
-# cue trim rewrites a file with nothing to trim, bumping its mtime.
+# cue trim does not touch a file with nothing to trim.
 mod-time trimmed/x.cue
 cp stdout mod-time-trim
 exec cue trim ./trimmed
 mod-time trimmed/x.cue
-! cmp stdout mod-time-trim
+cmp stdout mod-time-trim
 
 -- fmt.cue --
 package fmt

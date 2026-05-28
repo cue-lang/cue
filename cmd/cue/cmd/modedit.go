@@ -15,9 +15,7 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
-	"os"
 	"strconv"
 
 	"cuelang.org/go/internal/cueversion"
@@ -81,13 +79,7 @@ func (c *modEditCmd) run(cmd *Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("invalid resulting module.cue file after edits: %v", err)
 	}
-	if bytes.Equal(newData, data) {
-		return nil
-	}
-	if err := os.WriteFile(modPath, newData, 0o666); err != nil {
-		return err
-	}
-	return nil
+	return writeFileIfChanged(modPath, data, newData, 0o666)
 }
 
 func (c *modEditCmd) addEdit(f func(*modfile.File) error) {

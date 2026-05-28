@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -80,13 +79,7 @@ func runModTidy(cmd *Command, args []string) error {
 		// if it can't load the module file.
 		return err
 	}
-	if bytes.Equal(data, oldData) {
-		return nil
-	}
-	if err := os.WriteFile(modPath, data, 0o666); err != nil {
-		return err
-	}
-	return nil
+	return writeFileIfChanged(modPath, oldData, data, 0o666)
 }
 
 // suggestModCommand rewrites a non-nil error to suggest to the user

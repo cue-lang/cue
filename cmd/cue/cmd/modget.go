@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -86,13 +85,7 @@ func runModGet(cmd *Command, args []string) error {
 		// if it can't load the module file.
 		return err
 	}
-	if bytes.Equal(data, oldData) {
-		return nil
-	}
-	if err := os.WriteFile(modPath, data, 0o666); err != nil {
-		return err
-	}
-	return nil
+	return writeFileIfChanged(modPath, oldData, data, 0o666)
 }
 
 func readModuleFile() (string, *modfile.File, []byte, error) {

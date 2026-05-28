@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43fc97c3_4b677268",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-28T17:12:02Z",
+      "side": 1,
+      "message": "LGTM with a couple of minor thoughts, thanks!",
+      "revId": "16548fb266eb83aa1178d3cda6fb06834f3adc8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2318b987_cc0ec7e1",
+        "filename": "cmd/cue/cmd/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-28T17:12:02Z",
+      "side": 1,
+      "message": "It would be nice to document this invariant (len(Instance.Files) \u003d\u003d len(Instance.BuildFiles)) in that type, as it\u0027s not immediately clear when reading the docs for build.Instance.",
+      "revId": "16548fb266eb83aa1178d3cda6fb06834f3adc8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "150f7002_cf906f86",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-05-28T17:12:02Z",
+      "side": 1,
+      "message": "I guess this is potentially racy if the caller is using the same `*build.File` concurrently in several `NewDecoder` calls. Is there any other place where this data structure is mutated? A brief scan of usage doesn\u0027t find any immediately obvious candidates that might be affect. Maybe document that NewDecoder can modify it, as it at first glance looks like a read-only argument?",
+      "revId": "16548fb266eb83aa1178d3cda6fb06834f3adc8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

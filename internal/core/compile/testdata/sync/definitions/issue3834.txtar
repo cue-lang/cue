@@ -9,25 +9,9 @@ X: {
 	_a: _ | close({y!: z?: _})
 	_b: _a & {y: {}}
 	concrete: _b.y
-	isTrue: concrete != _|_ @test(eq, true)
+	isTrue:   concrete != _|_
 }
 {X}
-
-@test(eq, {
-	X: {
-		_a: {foo: true}
-		_b: {y: {}, foo: true}
-		concrete: {}
-		isTrue: true
-	}
-	_a: {foo: true}
-	_b: {y: {}, foo: true}
-	concrete: {}
-	isTrue: true
-
-	sub: _ @test(ignore)
-	full: _ @test(ignore)
-})
 
 sub: t1: {
 	X: {
@@ -37,91 +21,33 @@ sub: t1: {
 		concrete: _b.y
 	}
 	{X}
-
-	@test(eq, {
-		X: {
-			_a: {foo: true}
-			_b: {y: {}, foo: true}
-			concrete: {}
-		}
-		_a: {foo: true}
-		_b: {y: {}, foo: true}
-		concrete: {}
-	})
 }
 sub: t2: {
 	X: {
 		_a: foo: true
 		_a: _ | close({y!: z?: _})
 		_b: _a & {y: {}}
-		concrete: _b.y @test(eq, {})
+		concrete: _b.y
 	}
 	X
-
-	@test(eq, {
-		X: {
-			_a: {foo: true}
-			_b: {y: {}, foo: true}
-			concrete: {}
-		}
-		_a: {foo: true}
-		_b: {y: {}, foo: true}
-		concrete: {}
-	})
 }
 sub: t3: {
 	#X: {
 		_a: foo: true
 		_a: _ | close({y!: z?: _})
 		_b: _a & {y: {}}
-		concrete: _b.y @test(eq, {})
+		concrete: _b.y
 	}
 	{#X}
-
-	@test(eq, {
-		#X: {
-			_a: {foo: true}
-			_b: {y: {}, foo: true}
-			concrete: {}
-		}
-		_a: {foo: true}
-		_b: {y: {}, foo: true}
-		concrete: {}
-	})
 }
 sub: t4: {
 	#X: {
 		_a: foo: true
 		_a: _ | close({y!: z?: _})
 		_b: _a & {y: {}}
-		concrete: _b.y @test(eq, {})
-		@test(debug, """
-			(#struct){
-			  _a: (#struct){
-			    foo: (bool){ true }
-			  }
-			  _b: (#struct){
-			    y: (#struct){
-			    }
-			    foo: (bool){ true }
-			  }
-			  concrete: (#struct){
-			  }
-			}
-			""")
+		concrete: _b.y
 	}
 	#X
-
-	@test(eq, {
-		#X: {
-			_a: {foo: true}
-			_b: {y: {}, foo: true}
-			concrete: {}
-		}
-		_a: {foo: true}
-		_b: {y: {}, foo: true}
-		concrete: {}
-	})
 }
 
 full: {
@@ -131,21 +57,10 @@ full: {
 
 		_dataWithExtra: _data & {Extra: {}}
 
-		out: _dataWithExtra.Extra != _|_ @test(eq, true)
+		out: _dataWithExtra.Extra != _|_
 	}
 
 	{#Foo}
-
-	@test(eq, {
-		#Foo: {
-			_data: {Foo: true}
-			_dataWithExtra: {Extra: {}, Foo: true}
-			out: true
-		}
-		_data: {Foo: true}
-		_dataWithExtra: {Extra: {}, Foo: true}
-		out: true
-	})
 }
 -- out/compile --
 --- in.cue

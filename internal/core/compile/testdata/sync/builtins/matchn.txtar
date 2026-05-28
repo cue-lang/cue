@@ -7,17 +7,15 @@ import "math"
 
 match: {
 	[=~"^single"]: matchN(1, [#Foo])
-	singleOK: {a: 2} @test(eq, {a: 2})
+	singleOK: {a: 2}
 	singleErr: {
 		a: "foo"
-		@test(err, code=eval, contains="does not satisfy matchN", pos=[-2:17, -2:24, 0:13])
 	}
 
 	[=~"^incomplete"]: matchN(1, [#Foo])
-	incompleteOK: {a: int} @test(eq, {a: int})
+	incompleteOK: {a: int}
 	incompleteErr: {
 		a: string
-		@test(err, code=eval, contains="does not satisfy matchN", pos=[-2:21, -2:28, 0:17])
 	}
 
 	#A: {
@@ -35,36 +33,24 @@ match: {
 		// issue if the schema matched against is not concrete.
 		[=~"^pickTop"]: matchN(1, [2])
 		// TODO(inline): this matches the debug output, but it nonetheless doesn't pass.
-		pickTopOK1: *2 | int  @test(eq:todo, *2 | matchN(1, [2]) & int)
-		pickTopOK2: int       @test(eq, matchN(1, [2]) & int)
-		pickTopErr: *3 | int  @test(eq:todo,
-			hint="or should this be an error? Depends on when value is finalized.",
-			matchN(1, [2]) & int) @test(debugCheck, """
-			(int){ &(matchN(1, (#list){
-			    0: (int){ 2 }
-			  }), int) }
-			""")
+		pickTopOK1: *2 | int
+		pickTopOK2: int
+		pickTopErr: *3 | int
 
 		// Nested default values will be evaluated and may not be overridden by
 		// values in the validator.
 		[=~"^pickNested1"]: matchN(1, [{a: 2}])
-		pickNested1OK1: {a: *2 | int} @test(eq, {a: *2 | int})
-		pickNested1OK2: {a: int}      @test(eq, {a: int})
+		pickNested1OK1: {a: *2 | int}
+		pickNested1OK2: {a: int}
 		pickNested1Err: {
 			a: *3 | int
-			@test(err, code=eval,
-				hint="should this be an incomplete error, as a may still change and pass?",
-				contains="does not satisfy matchN", pos=[-3:23, -3:30, 0:19])
 		}
 
 		[=~"^pickNested2"]: matchN(1, [{a: <=2}])
-		pickNested2OK1: {a: *2 | int} @test(eq, {a: *2 | int})
-		pickNested2OK2: {a: int}      @test(eq, {a: int})
+		pickNested2OK1: {a: *2 | int}
+		pickNested2OK2: {a: int}
 		pickNested2Err: {
 			a: *3 | int
-			@test(err, code=eval,
-				hint="should this be an incomplete error, as a may still change and pass?",
-				contains="does not satisfy matchN", pos=[-3:23, -3:30, 0:19])
 		}
 	}
 
@@ -75,14 +61,12 @@ match: {
 		a: 2
 		b: {
 			matchN(4, [#A, #A, #A, #A])
-	
+
 			a: 3
 			b: matchN(4, [#A, #A, #A, #A])
 			b: {a: 4}
 			c: matchN(4, [#A, #A, #A, #A])
 			c: {a: 5}
-
-			@test(eq, {a: 3, b: {a: 4}, c: {a: 5}})
 		}
 		c: {
 			matchN(4, [#A, #A, #A, #A])
@@ -92,96 +76,71 @@ match: {
 			b: {a: 4}
 			c: matchN(4, [#A, #A, #A, #A])
 			c: {a: 5}
-
-			@test(eq, {a: 3, b: {a: 4}, c: {a: 5}})
 		}
 	}
 }
 
 not: {
 	[=~"^single"]: matchN(0, [#Foo])
-	singleOK: {a: "foo"} @test(eq, {a: "foo"})
+	singleOK: {a: "foo"}
 	singleErr: {
 		a: 2
-		@test(err, code=eval, contains="does not satisfy matchN", pos=[-2:17, -2:24, 0:13])
 	}
 
 	[=~"^double"]: matchN(0, [matchN(0, [#Foo])])
-	doubleOK: {a: 2} @test(eq, {a: 2})
+	doubleOK: {a: 2}
 	doubleErr: {
 		a: "foo"
-		@test(err, code=eval, contains="does not satisfy matchN", pos=[-2:17, -2:24, 0:13])
 	}
 }
 
 oneOf: {
 	[=~"^multiple1"]: matchN(1, [math.MultipleOf(3), math.MultipleOf(5)])
 
-	multiple1Err1: 1 @test(err, code=eval, contains="does not satisfy matchN", pos=[-2:20, -2:27, 0:17])
+	multiple1Err1: 1
 
-	multiple1OK1: 3 @test(eq, 3)
-	multiple1OK2: 5 @test(eq, 5)
+	multiple1OK1: 3
+	multiple1OK2: 5
 
-	multiple1Err2: 15 @test(err, code=eval, contains="does not satisfy matchN", pos=[-7:20, -7:27, 0:17])
+	multiple1Err2: 15
 }
 
 anyOf: {
 	[=~"^multiple1"]: matchN(>0, [math.MultipleOf(3), math.MultipleOf(5)])
 
-	multiple1Err1: 1 @test(err, code=eval, contains="does not satisfy matchN", pos=[-2:20, -2:27, 0:17])
+	multiple1Err1: 1
 
-	multiple1OK1: 3  @test(eq, 3)
-	multiple1OK2: 5  @test(eq, 5)
-	multiple1OK3: 15 @test(eq, 15)
+	multiple1OK1: 3
+	multiple1OK2: 5
+	multiple1OK3: 15
 }
-
 
 allOf: {
 	[=~"^multiple1"]: matchN(2, [math.MultipleOf(3), math.MultipleOf(5)])
 
-	multiple1Err1: 1 @test(err, code=eval, contains="does not satisfy matchN", pos=[-2:20, -2:27, 0:17])
-	multiple1Err2: 3 @test(err, code=eval, contains="does not satisfy matchN", pos=[-3:20, -3:27, 0:17])
-	multiple1Err3: 5 @test(err, code=eval, contains="does not satisfy matchN", pos=[-4:20, -4:27, 0:17])
+	multiple1Err1: 1
+	multiple1Err2: 3
+	multiple1Err3: 5
 
-	multiple1OK1: 15 @test(eq, 15)
+	multiple1OK1: 15
 }
 
 bare: {
 	embed: t1: {
 		a: {matchN(1, [>10])}
 		b: {a}
-
-		@test(eq, {
-			a: matchN(1, [>10])
-			b: matchN(1, [>10])
-		})
 	}
 	embed: t2: {
 		b: {a}
 		a: {matchN(1, [>10])}
-
-		@test(eq, {
-			b: matchN(1, [>10])
-			a: matchN(1, [>10])
-		})
 	}
 	direct: t1: {
 		a: matchN(1, [>10])
 		b: a
-
-		@test(eq, {
-			a: matchN(1, [>10])
-			b: matchN(1, [>10])
-		})
 	}
 	direct: t2: {
 		b: a
 		a: matchN(1, [>10])
-
-		@test(eq, {
-			b: matchN(1, [>10])
-			a: matchN(1, [>10])
-		})
 	}
 }
 
@@ -189,17 +148,14 @@ required: {
 	ok1: {
 		x: matchN(0, [{foo!: string}])
 		x: bar: 2
-		@test(eq, {x: {bar: 2}})
 	}
 	ok2: {
 		x: matchN(0, [{foo!: string}])
-		@test(eq, {x: matchN(0, [{ foo!: string }])})
 	}
 	// not matching for different reasons
 	ok3: {
 		x: matchN(0, [{bar!: string}])
 		x: bar: 2
-		@test(eq, {x: {bar: 2}})
 	}
 }
 
@@ -214,7 +170,6 @@ issue3575: {
 		])
 		x: #x
 		x: [{a: 1}]
-		@test(eq, {#x: matchN(1, [[{}]]), x: [{ a: 1 }]})
 	}
 	test2: {
 		#x: matchN(1, [
@@ -222,10 +177,8 @@ issue3575: {
 		])
 		x: #x
 		x: {a: 1}
-		@test(eq, {#x: matchN(1, [{}]), x: {a: 1}})
 	}
 }
-
 -- incomplete.cue --
 import "math"
 
@@ -235,85 +188,54 @@ incomplete: {
 	incomplete1: {
 		x: matchN(1, [{foo!: string}])
 		x: bar: 2
-		@test(err, code=incomplete, at=x,
-			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:18]))
 	}
 	// foo could still be provided later.
 	incomplete2: {
 		x: matchN(1, [{foo!: string}])
-		@test(eq, {x: matchN(1, [{
-			foo!: string
-		}])})
 	}
 	// in case of doubt, we should mark an error as incomplete to be safe.
 	incomplete3: {
 		x: matchN(math.MultipleOf(2), [{bar!: int}, {foo!: int}])
 		x: bar: 2
-		@test(eq, {x: {bar: 2}})
-		@test(err, code=incomplete, at=x,
-			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:48]))
 	}
 	incomplete4: {
 		x: matchN(math.MultipleOf(2), [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
-		@test(eq, {x: {bar: 2}})
-		@test(err, code=incomplete, at=x,
-			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:61]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:48]))
-
 	}
 	incomplete5: {
 		x: matchN(>1 & <=3, [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
-		@test(eq, {x: {bar: 2}})
-		@test(err, code=incomplete, at=x,
-			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:38]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:51]))
 	}
 	incomplete6: {
-		x: matchN(2|3, [{bar!: int}, {foo!: int}, {baz!: int}])
+		x: matchN(2 | 3, [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
-		@test(eq, {x: {bar: 2}})
-		@test(err, code=incomplete, at=x,
-			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:33]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:46]))
 	}
 
 	// incorrect type cannot be corrected
 	err1: {
 		x: matchN(1, [{bar!: string}])
 		x: bar: 2
-		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 	// additional incomplete matches should not be counted if they can otherwise
 	// not satisfy the constraint.
 	err2: {
 		x: matchN(0, [{bar!: int}, {foo!: int}])
 		x: bar: 2
-		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 	// additional incomplete matches should not be counted if they can otherwise
 	// not satisfy the constraint.
 	err3: {
 		x: matchN(2, [{bar!: string}, {foo!: string}])
 		x: bar: 2
-		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 	// one additional potential match cannot make up to satisfy the bound.
 	err4: {
 		x: matchN(>1, [{bar!: string}, {foo!: string}])
 		x: bar: 2
-		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 	err5: {
 		x: matchN(<1, [{bar!: int}, {foo!: int}])
 		x: bar: 2
-		@test(err, code=eval, at=x, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6])
 	}
 }
 // issue3389: Tests that matchN only reports schema errors of lesser severity,
@@ -323,21 +245,6 @@ issue3389: {
 	// TODO(inline): issue converting to tests. Documented later.
 	x: bar: 2
 	x: matchN(1, [{bar: 3}, {bar: 2, foo!: int}])
-
-	@test(debug, """
-		(struct){
-		  x: (_|_){
-		    // [incomplete] issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
-		    //     incomplete.cue:96:5
-		    //     incomplete.cue:95:5
-		    //     incomplete.cue:96:12
-		    // issue3389.x.foo: field is required but not present:
-		    //     incomplete.cue:96:5
-		    //     incomplete.cue:96:35
-		    bar: (int){ 2 }
-		  }
-		}
-		""")
 }
 -- closedness.cue --
 ellipsis: ok: {
@@ -346,18 +253,8 @@ ellipsis: ok: {
 	}
 	#Schema: {
 		field?: #anything
-		#anything: matchN(1, [{ ... }])
+		#anything: matchN(1, [{...}])
 	}
-	@test(eq, {
-		out: {
-			field: {shouldBeAllowed: 123}
-			#anything: matchN(1, [{ ... }])
-		}
-		#Schema: {
-			field?: matchN(1, [{ ... }])
-			#anything: matchN(1, [{ ... }])
-		}
-	})
 }
 // Arguments to function are not closed by enclosing definition.
 openArguments: ok1: {
@@ -367,25 +264,18 @@ openArguments: ok1: {
 	out: #Schema & {
 		a: baz: "allowed"
 	}
-	@test(eq, {
-		#Schema: {a: matchN(1, ["all", {
-		foo: "bar"
-	}])}
-		out: {a: {baz: "allowed"}}
-	})
 }
 openArguments: err2: {
 	#Schema: {{
-        a?: matchN(1, [ //fails
-				null, // fail
-				{ [string]: string }, // pass
-				{b: {...}}, // pass
-			])
+		a?: matchN(1, [//fails
+			null,               // fail
+			{[string]: string}, // pass
+			{b: {...}},         // pass
+		])
 	}}
 	out: #Schema & {
 		a: allowed: "once"
 	}
-	@test(err, code=eval, at=out.a, contains="does not satisfy matchN", pos=[2:13, 2:20, 9:6])
 }
 explicitClose: err1: {
 	#Schema: {{
@@ -394,25 +284,24 @@ explicitClose: err1: {
 	out: #Schema & {
 		a: baz: "notAllowed"
 	}
-	@test(err, code=eval, at=out.a, contains="does not satisfy matchN", pos=[2:6, 2:13, 5:6])
 }
 explicitClose: ok2: {
 	#Schema: {{
-        a?: matchN(1, [
-				null, // fail
-				close({ [string]: string }), // pass
-				close({b: {...}}), // fail
-			])
+		a?: matchN(1, [
+			null,                      // fail
+			close({[string]: string}), // pass
+			close({b: {...}}),         // fail
+		])
 	}}
 	out: #Schema & {
 		a: allowed: "once"
-	} @test(eq, {a: {allowed: "once"}})
+	}
 }
 mixed: ok3: {
 	#Schema: {
 		exports?: matchN(1, [
-			close({ never?: _ }), // fail
-			#exportsObject,       // pass
+			close({never?: _}), // fail
+			#exportsObject,     // pass
 		])
 
 		#exports: matchN(1, [string, #exportsObject])
@@ -422,26 +311,6 @@ mixed: ok3: {
 	out: #Schema & {
 		exports: exp1: "./main-module.js"
 	}
-	// TODO(inline): the errors here are legal structural cycles. We need to
-	// be able to print those.
-	@test(eq, {
-		#Schema: {
-			exports?: matchN(1, [close({
-				never?: _
-			}), _|_])
-			#exports: matchN(1, [string, _|_])
-			#exportsObject: {
-				exp1?: matchN(1, [string, _|_])
-			}
-		}
-		out: {
-			exports: {exp1: "./main-module.js"}
-			#exports: matchN(1, [string, _|_])
-			#exportsObject: {
-				exp1?: matchN(1, [string, _|_])
-			}
-		}
-	})
 }
 
 closedByDefinition: ok4: {
@@ -454,24 +323,6 @@ closedByDefinition: ok4: {
 	out: #Schema & {
 		exports: exp1: "./main-module.js"
 	}
-	// TODO(inline): the errors here are legal structural cycles. We need to
-	// be able to print those.
-	@test(eq, {
-		#Schema: {
-			exports?: matchN(1, [string, _|_])
-			#exports: matchN(1, [string, _|_])
-			#exportsObject: {
-				exp1?: matchN(1, [string, _|_])
-			}
-		}
-		out: {
-			exports: {exp1: "./main-module.js"}
-			#exports: matchN(1, [string, _|_])
-			#exportsObject: {
-				exp1?: matchN(1, [string, _|_])
-			}
-		}
-	})
 }
 closedByDefinition: err5: {
 	#Schema: {
@@ -483,9 +334,7 @@ closedByDefinition: err5: {
 	out: #Schema & {
 		exports: exp1: "./main-module.js"
 	}
-	@test(err, code=eval, at=out.exports, contains="does not satisfy matchN", pos=[2:13, 2:20, 8:12])
 }
-
 -- issue3694.cue --
 // issue3694: Tests that matchN combined with close() correctly validates schemas
 // requiring one of several required fields. https://cuelang.org/issue/3694
@@ -505,10 +354,6 @@ issue3694: full: {
 	s: #step & {
 		run: "echo hello world"
 	}
-	@test(eq, {
-		#step: {uses?: string, run?: string}
-		s: {run: "echo hello world", uses?: string}
-	})
 }
 issue3694: simple: {
 	#step: matchN(1, [{
@@ -517,10 +362,7 @@ issue3694: simple: {
 	#step: close({
 		uses?: string
 	})
-	@test(eq, {#step: {uses?: string}})
 }
-@test(err, code=incomplete, at=issue3694.full.#step, contains="does not satisfy matchN", pos=[-29:9, -29:16, -22:9])
-@test(err, code=incomplete, at=issue3694.simple.#step, contains="does not satisfy matchN", pos=[-9:9, -9:16, -6:9])
 -- out/compile --
 --- closedness.cue
 {

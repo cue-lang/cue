@@ -6,7 +6,6 @@ import "list"
 // The following just chains existing fields and should NOT trigger a cycle
 // detection error.
 
-
 chain: t1: {
 	#maxiter: 2
 
@@ -21,17 +20,10 @@ chain: t1: {
 
 	a: x2: null
 
-
 	#DepthF: {
 		#in: _
 		#out: {}
 	}
-	@test(eq, {
-		#maxiter: 2
-		x: {}
-		a: {x2: null, x0: {}, x1: {}}
-		#DepthF: {#in: _, #out: {}}
-	})
 }
 
 chain: t2: p1: {
@@ -45,7 +37,6 @@ chain: t2: p1: {
 	x: _
 
 	x.x0
-	@test(eq, {X: 1, x: {x0: {}, x1: {}}})
 }
 
 chain: t2: p2: {
@@ -59,7 +50,6 @@ chain: t2: p2: {
 	x.x0
 
 	X: 1
-	@test(eq, {x: {x0: {}, x1: {}}, X: 1})
 }
 
 chain: t3: p1: {
@@ -84,9 +74,7 @@ chain: t3: p1: {
 	x.x0
 
 	X: 1
-	@test(eq, {X: 1, x: {x0: {}}})
 }
-
 -- issue2052.cue --
 // Bounded recursion regression: a pattern that evaluated correctly in v0.4.3
 // began failing in v0.5.0-alpha.1 with spurious unbounded recursion errors.
@@ -95,6 +83,7 @@ import (
 	"list"
 	"math"
 )
+
 issue2052: reduced: t1: {
 	A: a: _
 	Depth: {
@@ -105,14 +94,6 @@ issue2052: reduced: t1: {
 		funcs: {}
 		funcs["0"]
 	}
-	@test(eq, {
-		A: {a: _}
-		Depth: {
-			#maxiter: 1
-			funcs: {"0": {a: _}}
-			a: _
-		}
-	})
 }
 issue2052: reduced: t2: {
 	A: a: _
@@ -124,10 +105,6 @@ issue2052: reduced: t2: {
 		funcs: {}
 		funcs["0"]
 	}
-	@test(eq, {
-		A: {a: _}
-		Depth: {maxiter: 1, funcs: {"0": {a: _}}, a: _}
-	})
 }
 issue2052: medium: t1: {
 	#Depth: {
@@ -159,40 +136,6 @@ issue2052: medium: t1: {
 	tree: "bar"
 
 	d: #Depth & {#in: tree}
-
-	@test(eq, {
-		#Depth: {
-			#maxiter: 4
-			#funcs: {
-				"4": null
-				"0": {#in: _, #basic: string | null, out: 1}
-				"1": {#in: _, #basic: string | null, out: 1}
-				"2": {#in: _, #basic: string | null, out: 1}
-				"3": {#in: _, #basic: string | null, out: 1}
-			}
-			#in: _
-			#basic: string | null
-			out: 1
-		}
-		#DepthF: {
-			#next: _
-			#func: {#in: _, #basic: string | null, out: 1}
-		}
-		tree: "bar"
-		d: {
-			#in: "bar"
-			#maxiter: 4
-			#funcs: {
-				"4": null
-				"0": {#in: _, #basic: string | null, out: 1}
-				"1": {#in: _, #basic: string | null, out: 1}
-				"2": {#in: _, #basic: string | null, out: 1}
-				"3": {#in: _, #basic: string | null, out: 1}
-			}
-			#basic: string | null
-			out: 1
-		}
-	})
 }
 
 issue2052: medium: t2: {
@@ -203,9 +146,9 @@ issue2052: medium: t2: {
 			#funcs: "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
 		}
 
-		#funcs:{
+		#funcs: {
 			for k, v in list.Range(0, #maxiter, 1) {
-				 "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+				"\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
 			}
 		}
 
@@ -231,39 +174,6 @@ issue2052: medium: t2: {
 	tree: "bar"
 
 	d: #Depth & {#in: tree}
-	@test(eq, {
-		#Depth: {
-			#maxiter: 4
-			#funcs: {
-				"4": null
-				"0": {#in: _, #basic: string | null, out: 1}
-				"1": {#in: _, #basic: string | null, out: 1}
-				"2": {#in: _, #basic: string | null, out: 1}
-				"3": {#in: _, #basic: string | null, out: 1}
-			}
-			#in: _
-			#basic: string | null
-			out: 1
-		}
-		#DepthF: {
-			#next: _
-			#func: {#in: _, #basic: string | null, out: 1}
-		}
-		tree: "bar"
-		d: {
-			#in: "bar"
-			#maxiter: 4
-			#funcs: {
-				"4": null
-				"0": {#in: _, #basic: string | null, out: 1}
-				"1": {#in: _, #basic: string | null, out: 1}
-				"2": {#in: _, #basic: string | null, out: 1}
-				"3": {#in: _, #basic: string | null, out: 1}
-			}
-			#basic: string | null
-			out: 1
-		}
-	})
 }
 
 issue2052: full: {
@@ -322,178 +232,6 @@ issue2052: full: {
 	}
 
 	d: #Depth & {#in: tree}
-	@test(eq, {
-		#RecurseN: {
-			#maxiter: *4 | >=0 & int
-			#funcFactory: {#next: _, #func: _}
-			#funcs: {
-				"4": null
-				"0": _
-				"1": _
-				"2": _
-				"3": _
-			}
-		}
-		#DepthF: {
-			#next: _
-			#func: {
-				#in: _
-				#basic: int | number | string | bytes | null
-				out: {1}
-			}
-		}
-		#Depth: {
-			#maxiter: 11
-			#funcFactory: {
-				#next: _
-				#func: {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-			}
-			#funcs: {
-				"11": null
-				"0": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"1": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"2": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"3": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"4": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"5": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"6": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"7": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"8": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"9": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"10": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-			}
-			#in: _
-			#basic: int | number | string | bytes | null
-			out: {1}
-		}
-		tree: {
-			a: {foo: "bar", a: {b: {c: "d"}}}
-			cow: "moo"
-		}
-		d: {
-			#in: {
-				a: {foo: "bar", a: {b: {c: "d"}}}
-				cow: "moo"
-			}
-			#maxiter: 11
-			#funcFactory: {
-				#next: _
-				#func: {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-			}
-			#funcs: {
-				"11": null
-				"0": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"1": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"2": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"3": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"4": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"5": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"6": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"7": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"8": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"9": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-				"10": {
-					#in: _
-					#basic: int | number | string | bytes | null
-					out: {1}
-				}
-			}
-			#basic: int | number | string | bytes | null
-			out: {5}
-		}
-	})
 }
 -- out/compile --
 --- in.cue

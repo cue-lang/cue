@@ -7,55 +7,28 @@ x: {
 	m1: (1 | (*2 | 3)) & (>=2 & <=3)
 	m2: (1 | (*2 | 3)) & (2 | 3)
 	m3: (*1 | *(*2 | 3)) & (2 | 3)
-	@test(eq, {m1: *2 | 3, m2: *2 | 3, m3: *2 | 3})
 }
 y1: x & {
 	{m4: x.m1 + x.m2 + x.m3}
-} @test(eq, {
-	m4: 6
-	m1: *2 | 3
-	m2: *2 | 3
-	m3: *2 | 3
-})
+}
 y2: {
 	x
 	{m4: y2.m1 + y2.m2 + y2.m3}
-	@test(eq, {
-		m4: 6
-		m1: *2 | 3
-		m2: *2 | 3
-		m3: *2 | 3
-	})
 }
 Y=y3: {
 	x
 	{m4: Y.m1 + Y.m2 + Y.m3}
 }
-@test(eq, {
-	m4: 6
-	m1: *2 | 3
-	m2: *2 | 3
-	m3: *2 | 3
-}, at=y3)
 
 y4: x & {
 	{m4: y4.m1 + y4.m2 + y4.m3}
-} @test(eq, {
-	m4: 6
-	m1: *2 | 3
-	m2: *2 | 3
-	m3: *2 | 3
-})
+}
 
 // Second disjunct in embedding is not possible because of previous declaration
 // of `b`, so it should be resolved to {a: 1}.
 z: {
 	b: (*"a" | "b") | "c"
 	{a: b} | {b: int}
-	@test(eq, {
-		b: *"a" | "b" | "c"
-		a: *"a" | "b" | "c"
-	})
 }
 -- out/compile --
 --- in.cue

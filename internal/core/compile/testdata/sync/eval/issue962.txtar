@@ -8,10 +8,10 @@ import "encoding/yaml"
 
 foo: bar: "something"
 
-text:  yaml.Marshal(_obj) @test(err, code=incomplete, pos=[2:8], contains="invalid non-ground value")
+text: yaml.Marshal(_obj)
 
 _what: string
-_obj:  foo[_what] @test(err, code=incomplete, pos=[-1:8], contains="invalid non-ground value")
+_obj:  foo[_what]
 -- out/compile --
 --- in.cue
 {

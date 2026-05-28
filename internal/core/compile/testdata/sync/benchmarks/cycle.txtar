@@ -3,19 +3,15 @@ sameValues: SmustBeF: {
 	T: string | F
 	F: {
 		x: T
-		@test(eq, {x: string})
-		@test(shareID=SF)
 	}
-	S: F @test(eq, {x: string}) @test(shareID=SF)
+	S: F
 }
 
 sameValues: CmustBeA: {
 	A: {
-		x: [ string | A ]
-		@test(eq, {x: [string]})
-		@test(shareID=CA)
+		x: [string | A]
 	}
-	C: A @test(eq, {x: [string]}) @test(shareID=CA)
+	C: A
 }
 -- out/compile --
 --- in.cue

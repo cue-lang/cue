@@ -15,7 +15,6 @@ t1: {
 			x: y: a: {}
 		}
 	}
-	@test(eq, {params: {a: {}}, x: {y: {a: {}}}})
 }
 
 t2: {
@@ -27,7 +26,6 @@ t2: {
 			m: x: y: z: {}
 		}
 	}
-	@test(eq, {out: {z: {}}, m: {x: {y: {z: {}}}}})
 }
 
 t3: {
@@ -40,9 +38,7 @@ t3: {
 			foo: (name): _
 		}
 	}
-	@test(eq, {out: {}, foo: {bar: {}}})
 }
-
 -- issue2235.cue --
 package kubecluster
 
@@ -66,7 +62,7 @@ clusters: [CLUSTER=string]: #Cluster & {
 
 #Cluster: {
 	globalIngressControllers: [string]: #GlobalIngressController
-	globalIngressControllers: admin:    #GlobalIngressController & {
+	globalIngressControllers: admin: #GlobalIngressController & {
 		class: "admin"
 	}
 	for _, c in globalIngressControllers {
@@ -105,35 +101,6 @@ for clusterName, cluster in clusters {
 }
 
 clusters: foo: {}
-
-@test(eq, {
-	foo: {
-		clusterName: "foo"
-		shorewallPrefix: "KUBERNETES_FOO"
-		globalIngressControllers: admin: {
-			class: "admin"
-			objects: namespaced: ingress: Service: {
-				"admin-nginx-ingress-controller": {
-					spec: {externalIPs: ["127.0.0.1"]}
-					metadata: labels: {
-						"ingress-class": "admin"
-						stack: "ingress"
-					}
-				}
-			}
-		}
-		objects: namespaced: ingress: {
-			Service: "admin-nginx-ingress-controller": {
-				spec: {externalIPs: ["127.0.0.1"]}
-				metadata: labels: {
-					"ingress-class": "admin"
-					stack: "ingress"
-				}
-			}
-		}
-	}
-}, at=clusters)
-
 -- out/compile --
 --- issue2235.cue
 {

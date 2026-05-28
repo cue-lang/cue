@@ -19,11 +19,6 @@ foo: #Value
 foo: #Value
 foo: #Value
 foo: #Value
-
-@test(eq, {
-	#Value: {type: "float"} | {type: "string"}
-	foo: {type: "string"}
-})
 -- out/compile --
 --- in.cue
 {

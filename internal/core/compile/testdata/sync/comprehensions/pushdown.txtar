@@ -21,21 +21,6 @@ linkChildren: {
 			}
 		}
 	}
-	@test(eq, {
-		w: 1
-		v: {
-			x: 1
-			y: 1
-			z: 1
-			rw: 1
-			rx: 1
-			ry: 1
-			rz: 1
-			n1a: {na: [1, 1, 1, 1]}
-			n2a: {n1a: {na: [1, 1, 1, 1]}}
-			n2z: {n1z: {nz: 1}}
-		}
-	})
 }
 
 fail: {
@@ -48,11 +33,11 @@ fail: {
 		if a.b == _|_ {
 			b: 1
 		}
-	} @test(err, code=incomplete|cycle)
+	}
 }
 
 embed: {
-	fail1: #C1 @test(err, code=eval, path=p, contains="field not allowed")
+	fail1: #C1
 	#C1: {
 		// TODO(errors): don't include all positions of p in the normal list of
 		// positions, or rather categorize the positions to show:
@@ -66,8 +51,7 @@ embed: {
 	}
 	fail1: p: "foo" // this should fail, as p is not present.
 
-
-	success2: #C2 @test(eq, {p: "foo"})
+	success2: #C2
 	#C2: {
 		if true {
 			p: _
@@ -75,7 +59,7 @@ embed: {
 	}
 	success2: p: "foo" // this succeeds as p is present.
 
-	success3: #C3 @test(eq, {})
+	success3: #C3
 	#C3: {}
 	success3: {
 		if false {
@@ -86,7 +70,7 @@ embed: {
 
 	success4: {
 		#X: y: string
-		x: y: string
+		x: y:  string
 		x: {
 			for _ in ["iter-once"] {
 				#X
@@ -95,7 +79,7 @@ embed: {
 				}
 			}
 		}
-	} @test(eq, {#X: {y: string}, x: {y: string}})
+	}
 
 	fail4: #C4
 	#C4: {}
@@ -104,14 +88,14 @@ embed: {
 			// error as p is not allowed in fail4
 			p: q: 1
 		}
-	} @test(err, code=eval, path=p, contains="field not allowed", pos=[3:4])
+	}
 
 	incomplete5: {
 		a: bool
 		if a {
 			p: q: 1
 		}
-	} @test(err, code=incomplete, contains="incomplete %s: %s", args=[bool, bool], pos=[1:6])
+	}
 
 	incomplete6: {
 		if false {
@@ -119,21 +103,14 @@ embed: {
 		}
 		p: q + 1
 		q: int
-	} @test(eq, {
-		p: _|_ @test(err, code=incomplete, contains="embed.incomplete6.p: non-concrete value int in operand to +", pos=[117:6, 118:6])
-		q: int
-	})
+	}
 	incomplete7: {
 		p: q + 1
 		q: int
 		if false {
 			q: 1 // do not inadvertently pick up a void arc.
 		}
-	} @test(eq, {
-		p: _|_ @test(err, code=incomplete, contains="non-concrete value int")
-		// TODO(inline): do not fail on todo with position mismatch. @test(err:todo, pos=[124:6, 125:6, 126:3])
-		q: int
-	})
+	}
 }
 
 // Mix of both dynamic and static fields.
@@ -141,20 +118,19 @@ mixedFieldsSuccess: {
 	a: {
 		for _, s in ["foo"] {
 			"\(s)": 1
-			X: 1
+			X:      1
 		}
 	}
 
 	b: #Def: {
 		for _, s in ["foo"] {
 			"\(s)": 1
-			X: 1
+			X:      1
 		}
 	}
 	b: x: b.#Def
-	b: x: X: _
+	b: x: X:   _
 	b: x: foo: _
-
 
 	c: #Def: {
 		X:   int
@@ -164,20 +140,9 @@ mixedFieldsSuccess: {
 	c: x: {
 		for _, s in ["foo"] {
 			"\(s)": 1
-			X: 1
+			X:      1
 		}
 	}
-	@test(eq, {
-		a: {X: 1, foo: 1}
-		b: {
-			#Def: {X: 1, foo: 1}
-			x: {X: 1, foo: 1}
-		}
-		c: {
-			#Def: {X: int, foo: int}
-			x: {X: 1, foo: 1}
-		}
-	})
 }
 
 // fieldMismatch tests that an embedded scalar cannot be mixed with regular
@@ -189,7 +154,6 @@ fieldMismatch: {
 			x: 3
 		}
 	}
-	@test(err, code=eval, at=a, hint="int with struct")
 }
 
 // b12aStructCycle presents a case that can easily lead to stack overflow in
@@ -210,9 +174,7 @@ noStackOverflowStructCycle: {
 			sum: tail.sum
 		}
 	}
-	@test(err, code=structural_cycle, at="#list.tail", contains="structural cycle", pos=[])
 }
-
 
 // #a is incomplete, but the missing values are provided by x.
 provideIncompleteSuccess: {
@@ -225,11 +187,6 @@ provideIncompleteSuccess: {
 		}
 		x: (#a & {b: true}) & {c: 4}
 		y: x
-		@test(eq, {
-			#a: {_|_, b: bool}
-			x: {b: true, c: 4}
-			y: {b: true, c: 4}
-		})
 	}
 
 	t2: {
@@ -239,7 +196,7 @@ provideIncompleteSuccess: {
 				c: 4
 			}
 			b: true
-		} @test(eq, {c: 4, b: true})
+		}
 
 		#c: {}
 		a: {
@@ -249,7 +206,7 @@ provideIncompleteSuccess: {
 			b: true
 			// d is disallowed, even though it is added by embedding.
 			// TODO: this seems right, but it may be good to clarify why.
-			c: #c @test(err, code=eval, at=d, contains="field not allowed", pos=[-5:8])
+			c: #c
 		}
 	}
 }
@@ -282,24 +239,13 @@ voidArcs: {
 			}
 		}
 	}
-	@test(eq, {
-		scopes: {
-			x: 1
-			a: {y: 2, b: 1, c: {d: 1}, e: 2, f: {g: 2}}
-		}
-		drop: {x: 1, a: {y: 2}}
-	})
 }
 
 cyclicError: {
 	a: {
-		// With pushdown, x and y remain bool (incomplete) rather than
-		// erroring: the if guards cannot resolve bool to a concrete
-		// value, so the comprehension bodies simply do not fire.
-		@test(err, code=incomplete)
 		x: bool
 		y: bool
-		if a.x  {
+		if a.x {
 			y: true
 		}
 		if a.y {
@@ -310,15 +256,7 @@ cyclicError: {
 	// With pushdown, evaluating a.b no longer forces a cycle error
 	// because the comprehension dependencies are pushed down to the
 	// individual fields rather than blocking the parent.
-	c: a.b @test(err, code=incomplete|cycle)
-	@test(eq, {
-	a: {
-			x: _|_
-			y: _|_
-			b: {}
-		}
-		c: _|_
-	})
+	c: a.b
 }
 
 midwayReferences: {
@@ -331,12 +269,6 @@ midwayReferences: {
 	b: a.x
 	c: a.x.y
 	d: a.x.y.z
-	@test(eq, {
-		a: {x: {y: {z: {a: 1, b: 2}}}}
-		b: {y: {z: {a: 1, b: 2}}}
-		c: {z: {a: 1, b: 2}}
-		d: {a: 1, b: 2}
-	})
 }
 
 // Ensure first closedness check is done after evaluation of
@@ -355,10 +287,6 @@ closedCheck: success1: {
 		d: "d"
 		e: "ok"
 	}
-	@test(eq, {
-		a: {b: {c: {d: "d", e: "ok"}}}
-		#D: {d: string}
-	})
 }
 
 closedCheck: success2: {
@@ -367,7 +295,7 @@ closedCheck: success2: {
 	#D: {
 		d: string
 		if d != "c" {
-			("foo"+"bar"): string
+			("foo" + "bar"): string
 		}
 	}
 
@@ -375,10 +303,6 @@ closedCheck: success2: {
 		d:      "d"
 		foobar: "ok"
 	}
-	@test(eq, {
-		a: {b: {c: {d: "d", foobar: "ok"}}}
-		#D: {d: string}
-	})
 }
 
 closedCheck: success3: {
@@ -390,7 +314,6 @@ closedCheck: success3: {
 			if d != "c" {
 				string
 			}
-			@test(err, code=incomplete, contains="non-concrete value", pos=[1:7, -1:6])
 		}
 	}
 
@@ -398,26 +321,14 @@ closedCheck: success3: {
 		d: "d"
 		e: "ok"
 	}
-	@test(eq, {
-		a: {b: {c: {d: "d", e: "ok"}}}
-		#D: {
-			d: string
-			e: _|_
-		}
-	})
 }
 
 emptyComprehensionIncomplete: {
 	a: {}
 	b: {
 		// b should be an incomplete error
-		if a.b {
-		}
-	} @test(err, code=incomplete, contains="undefined field: %s", args=[b], pos=[2:8])
-	@test(eq, {
-		a: {}
-		b: _|_
-	})
+		if a.b {}
+	}
 }
 
 // voidEliminationSuccess tests that "conditional" or "void" arcs are eliminated
@@ -430,7 +341,6 @@ voidEliminationSuccess: t1: {
 	if false {
 		a: b: true
 	}
-	@test(eq, {})
 }
 
 voidEliminationSuccess: t2: {
@@ -460,14 +370,6 @@ voidEliminationSuccess: t2: {
 	components: sinks: blah: {
 		kind: "source"
 	}
-	@test(eq, {
-		components: {
-			sinks: {
-				blah: {kind: "source", configuration: {}}
-			}
-			#C: {kind: string, configuration: {}}
-		}
-	})
 }
 
 voidEliminationSuccess: derefRef1: {
@@ -481,15 +383,8 @@ voidEliminationSuccess: derefRef1: {
 
 	E: {
 		e: bool
-		f: !e @test(err, code=incomplete, contains="not concrete", pos=[0:7])
+		f: !e
 	}
-	@test(eq, {
-		a: {b: {c: {}}}
-		E: {
-			e: bool
-			f: _|_
-		}
-	})
 }
 
 voidEliminationSuccess: derefRef2: {
@@ -504,19 +399,8 @@ voidEliminationSuccess: derefRef2: {
 	E: #F
 	#F: {
 		e: bool
-		f: !e @test(err, code=incomplete, contains="not concrete", pos=[0:7])
+		f: !e
 	}
-	@test(eq, {
-		a: {b: {c: {}}}
-		E: {
-			e: bool
-			f: _|_
-		}
-		#F: {
-			e: bool
-			f: _|_ @test(err, code=incomplete)
-		}
-	})
 }
 
 voidEliminationSuccess: derefDisj1: {
@@ -535,10 +419,6 @@ voidEliminationSuccess: derefDisj1: {
 		g: bool
 		h: !g
 	}
-	@test(eq, {
-		a: {b: {c: {}}}
-		E: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction: (and 2 more errors)", pos=[])
-	})
 }
 
 voidEliminationSuccess: derefDisj2: {
@@ -557,10 +437,6 @@ voidEliminationSuccess: derefDisj2: {
 		g: bool
 		h: !g
 	}
-	@test(eq, {
-		a: {b: {c: {}}}
-		E: _|_ @test(err, code=incomplete, contains="voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction: (and 2 more errors)", pos=[])
-	})
 }
 
 voidEliminationSuccess: bulk1: {
@@ -574,7 +450,6 @@ voidEliminationSuccess: bulk1: {
 		}
 		d: c.e
 	}
-	@test(eq, {a: {b: {c: {e: string}, d: string}}})
 }
 
 voidEliminationSuccess: opt1: {
@@ -588,7 +463,6 @@ voidEliminationSuccess: opt1: {
 		}
 		d: c.e
 	}
-	@test(eq, {a: {b: {c: {e: string}, d: string}}})
 }
 
 voidEliminationSuccess: noCycle1: {
@@ -602,7 +476,6 @@ voidEliminationSuccess: noCycle1: {
 			if false {g: _}
 		}
 	}
-	@test(eq, {_x: {}, a: {c: {h: "stream"}, b: {}}})
 }
 
 voidEliminationSuccess: noCycle2: {
@@ -616,7 +489,6 @@ voidEliminationSuccess: noCycle2: {
 		}
 	}
 	_x: a.b
-	@test(eq, {a: {c: {h: "stream"}, b: {}}, _x: {}})
 }
 
 voidLookup: {
@@ -630,7 +502,7 @@ voidLookup: {
 	a: [string]: {
 		c: {
 			for k, v in z {
-				(k): null  // don't add this arc anywhere
+				(k): null // don't add this arc anywhere
 			}
 		}
 		z: {
@@ -639,21 +511,7 @@ voidLookup: {
 			}
 		}
 	}
-	@test(eq, {
-		a: {
-			x: {
-				z: _|_
-				c: _|_
-			}
-			y: {c: _, z: {}}
-		}
-	})
-	@test(err, at=a.x.z, code=incomplete,
-		contains="undefined field: %s", args=[void], pos=[1:17])
-	@test(err, at=a.x.c, code=incomplete,
-		path=voidLookup.a.x.z, contains="undefined field: %s", args=[void], pos=[1:17])
 }
-
 
 // Eliminate the top value even if there is an error (especially incomplete
 // errors).
@@ -661,13 +519,8 @@ topElimination: {
 	a: int
 	_
 	if true {
-		x: a+1
+		x: a + 1
 	}
-	@test(eq, {
-		a: int
-		x: _|_
-	})
-	@test(err, at=x, code=incomplete, contains="non-concrete value %v in operand to %s", args=[int, +], pos=[4:6, 1:5])
 }
 
 voidEliminationSuccess: drop1: {
@@ -681,10 +534,6 @@ voidEliminationSuccess: drop1: {
 	s: t & {
 		#ok: false
 	}
-	@test(eq, {
-		t: {#ok: *true | bool, x: int}
-		s: {#ok: false}
-	})
 }
 
 // should be error
@@ -692,9 +541,7 @@ voidEliminationSuccess: drop1: {
 explicitDefaultError: {
 	a: string | *_|_
 
-	if a != "" {
-	}
-	@test(err, code=incomplete, contains="non-concrete value string", pos=[3:5, 1:5])
+	if a != "" {}
 }
 
 // Remove arcs for with no for comprehension results.
@@ -709,7 +556,6 @@ allArcsSuccess: p1: {
 			x: {}
 		}
 	}
-	@test(eq, {x: {}, y: {}})
 }
 
 allArcsSuccess: p2: {
@@ -723,7 +569,6 @@ allArcsSuccess: p2: {
 			(k): null
 		}
 	}
-	@test(eq, {y: {}, x: {}})
 }
 
 structShare: ok1: {
@@ -735,7 +580,6 @@ structShare: ok1: {
 			d: e: true // resolves
 		}
 	}
-	@test(eq, {a: {d: {e: true}}, E: {}})
 }
 
 structShare: err1: {
@@ -744,9 +588,7 @@ structShare: err1: {
 	if true {
 		x: d: e: true
 	}
-	@test(err, code=eval, at=x.d.e, contains="field not allowed", pos=[4:9])
 }
-
 -- issue2208.cue --
 // Regression where definitions that compiled correctly with 0.4.3 failed to
 // compile with 0.5.0-beta.2 due to incorrect handling of void errors.
@@ -754,8 +596,7 @@ structShare: err1: {
 voidErrorIncomplete: {
 	#Schema: [string]: {
 		required: bool
-		if !required {
-		}
+		if !required {}
 	}
 
 	root: #Schema
@@ -764,7 +605,6 @@ voidErrorIncomplete: {
 			child: required: false
 		}
 	}
-	@test(eq, {#Schema: {}, root: {}})
 }
 
 // TODO: should these always be errors, or only for cue vet?
@@ -789,8 +629,6 @@ voidErrorIncomplete: {
 // 		}
 // 	}
 // }
-
-
 -- issue1759.cue --
 // Tests that len() and comprehensions correctly see the full struct/list value.
 // https://cuelang.org/issue/1759
@@ -812,7 +650,7 @@ unity: success1: {
 	}
 
 	envs: "e1": #Env & {
-		configurations: c1:  #Config
+		configurations: c1: #Config
 	}
 
 	envs: [string]: configurations: [string]: {
@@ -823,17 +661,6 @@ unity: success1: {
 			}
 		}
 	}
-	@test(eq, {
-		#Config: {name: string, type: string}
-		#AnyConfig: {name: string, type: string}
-		#Env: {name: string, configurations: {}}
-		envs: {
-			e1: {
-				configurations: {c1: {type: "foo", name: string}}
-				name: string
-			}
-		}
-	})
 }
 
 // issue1759: Tests that len() correctly sees the full struct value when
@@ -846,22 +673,16 @@ issue1759: {
 	if true {
 		_ports_map: a: {port: "80"}
 	}
-	@test(eq, {
-		_ports_map: {a: {port: "80"}}
-		port: "80"
-	})
 }
 
 arcAlignment: t1: {
-	[string]:  {
-		if true { }
+	[string]: {
+		if true {}
 	}
 	if false {
 		c: _
 	}
-	@test(eq, {})
 }
-
 -- issue2111.cue --
 // Evaluator regression where circular dependency in evaluation of conditionals
 // caused incorrect results. All arc types, not just regular fields, should be pushed down.
@@ -872,13 +693,10 @@ letPushdown: {
 	a: {
 		for k, v in _c {
 			let x = v
-			if x != _|_ {
-			}
+			if x != _|_ {}
 		}
 	}
-	@test(eq, {_c: {y: 1}, a: {}})
 }
-
 -- issue2113.cue --
 // Evaluator regression where a nested comprehension caused "was already used"
 // errors when the enclosing value was not yet fully evaluated.
@@ -890,11 +708,9 @@ nestedWithEmbeddingOK: {
 	a: {
 		for k, v in c {
 			{x: 1}
-			if a.x != _|_ {
-			}
+			if a.x != _|_ {}
 		}
 	}
-	@test(eq, {c: [1], a: {x: 1}})
 }
 
 nestedWithDynamicFieldOK: {
@@ -902,26 +718,22 @@ nestedWithDynamicFieldOK: {
 
 	a: {
 		for k, v in _c {
-			if x != _|_ {
-			}
+			if x != _|_ {}
 			x="\(k)": 1
 		}
 	}
-	@test(eq, {_c: {y: 1}, a: {y: 1}})
 }
 
 // Errors in nested comprehensions should also be reported.
 errorPropagation: {
 	deployment: _
 	for k, v in deployment {
-		for k1, v2 in v.env2 { // Report this error.
-			deployment: (k): x1: 1
+		for k1, v2 in v.env2 {
+			deployment: (k): x1: 1 // Report this error.
 		}
 	}
-	for id in ["elem"] { deployment: (id): x2: 2 }
-	@test(err, code=incomplete, contains="undefined field: env2", pos=[3:19])
+	for id in ["elem"] {deployment: (id): x2: 2}
 }
-
 -- issue2131.cue --
 // issue2131: Tests that chained for comprehensions correctly produce output
 // fields when iterating over nested structs. https://cuelang.org/issue/2131
@@ -935,13 +747,6 @@ issue2131: tests: {
 	for os, examples in tests for k, v in examples {
 		(os): (k): out: "test"
 	}
-	@test(eq, {
-		windows: {
-			eg1: {in: "c:\\d", out: "test"}
-			eg2: {in: "c:\\test", out: "test"}
-			eg3: {in: "c:\\test\\d", out: "test"}
-		}
-	})
 }
 -- issue3533.cue --
 // issue3533: Tests that fields under two levels of comprehensions are not
@@ -958,12 +763,6 @@ issue3533: {
 		}
 	}
 	out: metadata: namespace: *"default" | string
-	@test(eq, {
-		#ObjectMeta: {namespace?: string}
-		out: {
-			metadata: {namespace: *"default" | string}
-		}
-	})
 }
 -- issue3535.cue --
 // issue3535: Tests that hidden fields inside if comprehensions do not
@@ -981,10 +780,6 @@ issue3535: hidden: {
 		}
 	}
 	foo: kind: "foo"
-	@test(eq, {
-		#X: {kind: string, output: {}}
-		foo: {kind: "foo", _hidden: {}, output: {}}
-	})
 }
 issue3535: regular: {
 	#X: {
@@ -998,7 +793,6 @@ issue3535: regular: {
 		}
 	}
 	foo: kind: "foo"
-	@test(err, code=eval, at=foo.regular, contains="field not allowed", pos=[8:4])
 }
 issue3535: def: {
 	#X: {
@@ -1012,36 +806,25 @@ issue3535: def: {
 		}
 	}
 	foo: kind: "foo"
-	@test(eq, {
-		#X: {kind: string, output: {}}
-		foo: {kind: "foo", #def: {}, output: {}}
-	})
 }
 -- reflect.cue --
 import "encoding/json"
-
 
 unifyDynamicReflectSuccess: {
 	for _, s in ["foo"] {
 		X: {...}
 		"\(s)": {
 			X: {...} // cannot be _
-			Y: json.Marshal(X) // cannot be yaml, X cannot be literal
+			Y:       json.Marshal(X) // cannot be yaml, X cannot be literal
 		}
 	}
 
 	[string]: X: {
-		if true {// must be there
+		if true {
 			x: y: {} // at least 2 nestings needed to expose problem
+			// must be there
 		}
 	}
-	@test(eq, {
-		X: {X: {x: {y: {}}}}
-		foo: {
-			X: {x: {y: {}}}
-			Y: "{\"x\":{\"y\":{}}}"
-		}
-	})
 }
 -- issue3621.cue --
 // issue3621: evalv3 regression producing false "cyclic reference" errors for
@@ -1055,7 +838,6 @@ issue3621: reduced: t1: {
 		a: b1.b2.b3
 		b1: b2: b3: "Foo"
 	}
-	@test(eq, {a: "Foo", b1: {b2: {b3: "Foo"}}})
 }
 issue3621: reduced: t2: {
 	outer: {}
@@ -1063,10 +845,6 @@ issue3621: reduced: t2: {
 		inner: inner2: name: "Foo"
 		outer: b: inner.inner2.name
 	}
-	@test(eq, {
-		outer: {b: "Foo"}
-		inner: {inner2: {name: "Foo"}}
-	})
 }
 issue3621: full: {
 	hello: "world"
@@ -1082,20 +860,6 @@ issue3621: full: {
 			bar: (inner.inner2.name)
 		}
 	}
-	@test(eq, {
-		hello: "world"
-		outer: {
-			outer2: {bar: "Employees", name: "outer2"}
-		}
-		inner: {
-			inner2: {
-				name: "Employees"
-				description: "All employees"
-				privacy: "secret"
-				create_default: false
-			}
-		}
-	})
 }
 -- issue3708.cue --
 // issue3708: evalv3 regression reporting a cyclic reference error when fields are
@@ -1114,10 +878,6 @@ issue3708: {
 	if true {
 		people: bob: name: "Bob"
 	}
-	@test(eq, {
-		out: "person"
-		people: {bob: {name: "Bob", kind: "person"}}
-	})
 }
 -- issue3729.cue --
 // issue3729: evalv3 incorrectly reports "incomplete value null" for fields typed
@@ -1129,24 +889,18 @@ issue3729: withDisjunction: {
 	if true {
 		root: sub1?: #sub2: true
 	}
-	@test(eq, {
-		#Root: {sub1?: {#sub2?: bool}}
-		root: {sub1?: {#sub2: true}}
-	})
 }
 issue3729: withoutDisjunction: {
 	root?: null
 	if true {
 		root: #sub1?: #sub2: true
 	}
-	@test(err, code=eval, contains="conflicting values null", pos=[0:32, 1:9, 2:2, 3:9])
 }
 issue3729: withoutDisjunctionWithEmbed: {
 	root?: null
 	if true {
 		root: {_, #sub1?: #sub2: true}
 	}
-	@test(eq, {root: {null, #sub1?: {#sub2: true}}})
 }
 issue3729: definitionsOnly: {
 	#Root: #sub1?: #sub2?: bool
@@ -1154,10 +908,6 @@ issue3729: definitionsOnly: {
 	if true {
 		root: #sub1?: #sub2: true
 	}
-	@test(eq, {
-		#Root: {#sub1?: {#sub2?: bool}}
-		root: {#sub1?: {#sub2: true}}
-	})
 }
 issue3729: withEmbed: incomplete: {
 	#Root: #sub1?: #sub2?: bool
@@ -1165,15 +915,11 @@ issue3729: withEmbed: incomplete: {
 	if true {
 		root: {_, #sub1?: #sub2: true}
 	}
-	@test(eq, {
-		#Root: {#sub1?: {#sub2?: bool}}
-		root: {null, #sub1?: {#sub2: true}} | {#sub1?: {#sub2: true}}
-	})
 }
 issue3729: full: {
-	#Application: spec: #ApplicationSpec
+	#Application: spec:            #ApplicationSpec
 	#ApplicationSpec: syncPolicy?: null | #SyncPolicy
-	#SyncPolicy: automated?: null | #SyncPolicyAutomated
+	#SyncPolicy: automated?:       null | #SyncPolicyAutomated
 	#SyncPolicyAutomated: {
 		prune?:    bool
 		selfHeal?: bool
@@ -1189,28 +935,6 @@ issue3729: full: {
 		}
 	}
 	argoApp: spec: _syncpolicy: "selfhealprune"
-	@test(eq, {
-		#Application: {
-			spec: {
-				syncPolicy?: null | {automated?: null | {prune?: bool, selfHeal?: bool}}
-			}
-		}
-		#ApplicationSpec: {
-			syncPolicy?: null | {automated?: null | {prune?: bool, selfHeal?: bool}}
-		}
-		#SyncPolicy: {
-			automated?: null | {prune?: bool, selfHeal?: bool}
-		}
-		#SyncPolicyAutomated: {prune?: bool, selfHeal?: bool}
-		argoApp: {
-			spec: {
-				syncPolicy: {
-					automated: {prune: true, selfHeal: true}
-				}
-				_syncpolicy: "selfhealprune"
-			}
-		}
-	})
 }
 -- pending.cue --
 // resolving comprehensions arcs across disjunctions.
@@ -1221,20 +945,17 @@ arcTypeAcrossTwo: {
 	if true {
 		a: b: c: d: true
 	}
-	@test(eq, {a: {b: {c: {d: true}}}})
 }
 // issue3894: evalv3 regression where an if comprehension affecting an optional
 // field with a disjunction returns an incorrect result instead of the properly
 // constrained value. https://cuelang.org/issue/3894
 issue3894: reduced: p1: {
 	{a: string} | {b: value: string}
-	if true { b: value: "true" }
-	@test(eq, {b: {value: "true"}, a: string} | {b: {value: "true"}})
+	if true {b: value: "true"}
 }
 issue3894: reduced: p2: {
 	{b: value: string} | {a: string}
-	if true { b: value: "true" }
-	@test(eq, {b: {value: "true"}} | {b: {value: "true"}, a: string})
+	if true {b: value: "true"}
 }
 issue3894: full: {
 	#Output: {a?: string} | {b?: {value: string}}
@@ -1244,10 +965,6 @@ issue3894: full: {
 			b: {value: "true"}
 		}
 	}
-	@test(eq, {
-		#Output: {a?: string} | {b?: {value: string}}
-		out: {b: {value: "true"}}
-	})
 }
 -- issue3935.cue --
 // issue3935: evalv3 incorrectly reports "field not allowed" when a schema defined
@@ -1265,14 +982,6 @@ issue3935: reduced: {
 		}
 		y!: x!: _
 	}
-	@test(eq, {
-		out: {y: {x: "bar"}, x: "bar"}
-		#A: {y: {other: int}}
-		#B: {
-			x: _|_ @test(err, code=incomplete, contains="issue3935.reduced.#B.x: required field missing: y", pos=[12:7])
-			y!: {x!: _}
-		}
-	})
 }
 issue3935: full: {
 	out: #SchemaOther | #SchemaSelected
@@ -1291,7 +1000,7 @@ issue3935: full: {
 	}
 	#SchemaSelected: {
 		spec!: {
-			name!: string
+			name!:   string
 			config!: _
 		}
 
@@ -1301,28 +1010,6 @@ issue3935: full: {
 
 		_specConfig: spec.config
 	}
-	@test(eq, {
-		out: {
-			spec: {
-				name: "foo"
-				config: {namespace: "bar"}
-			}
-			namespace: "bar"
-			_specConfig: {namespace: "bar"}
-		}
-		#SchemaOther: {
-			spec: {
-				otherOptional?: int
-				otherRegular: int
-				otherRequired!: int
-			}
-		}
-		#SchemaSelected: {
-			spec!: {name!: string, config!: _}
-			namespace: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected.namespace: undefined field: namespace", pos=[47:27])
-			_specConfig: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected._specConfig: required field missing: spec", pos=[50:16])
-		}
-	})
 }
 -- rework.cue --
 regression1: {
@@ -1341,10 +1028,7 @@ regression1: {
 		spec: command: ["a"]
 		patch: {}
 	}
-	out: #Rollout & {_X: x} @test(eq, at=out,{
-		_Y: {spec: {command: ["a"]}, patch: {}}
-		command: ["a"]
-	})
+	out: #Rollout & {_X: x}
 }
 regression2: {
 	#Primary: {
@@ -1361,10 +1045,7 @@ regression2: {
 		spec: command: ["a"]
 		patch: {}
 	}
-	out: #Rollout & {_X: x} @test(eq, at=out,{
-		_Y: {spec: {command: ["a"]}, patch: {}}
-		command: ["a"]
-	})
+	out: #Rollout & {_X: x}
 }
 letCycleSelf: {
 	#X: X={
@@ -1376,8 +1057,6 @@ letCycleSelf: {
 
 	x: [string]: #X
 	x: a: {}
-
-	@test(eq, {#X: {hosts: {}}, x: {a: {hosts: {}}}})
 }
 -- rework2.cue --
 @experiment(aliasv2)
@@ -1390,12 +1069,6 @@ letCycleSelfKeyword: {
 	}
 
 	env: #E & {hosts: h1: x: "k"}
-
-	@test(eq, {
-		#E: _|_ @test(err, code=incomplete, path=letCycleSelf2.#E,
-			contains="cannot range over s.hosts (incomplete type _)", pos=[7:13])
-		env: {hosts: {h1: {x: "k"}}, out: {k: "a"}}
-	})
 }
 letCycleSelfKeyword2: {
 	#E: {
@@ -1408,19 +1081,9 @@ letCycleSelfKeyword2: {
 	}
 
 	env: #E & {
-		hosts: h1: 1
+		hosts: h1:    1
 		networks: n1: "x"
 	}
-
-	@test(eq, {
-		#E: _|_ @test(err, code=incomplete, path=regression_let3.#E,
-			contains="cannot range over s.hosts (incomplete)", pos=[22:13])
-		env: {
-			hosts: {h1: 1}
-			networks: {n1: "x"}
-			a: {n1: "x"}
-		}
-	})
 }
 -- out/compile --
 --- in.cue

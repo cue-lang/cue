@@ -11,8 +11,7 @@ issue3977: inlineExpr: {
 		out: x + 1
 	}
 
-	err: (#fn & {x: 2}).out @test(err, code=eval,
-		contains="conflicting values", args=[1, 2])
+	err: (#fn & {x: 2}).out
 }
 issue3977: inlineDisj1: {
 	#NetworkID: "2" | "3" | "4"
@@ -21,11 +20,7 @@ issue3977: inlineDisj1: {
 		out: "value=\(x)"
 	}
 
-	err: (#fn & {x: "invalid"}).out @test(err, code=eval,
-		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["2", "invalid"], pos=[-6:14, -4:8, 0:8, 0:18]),
-		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["3", "invalid"], pos=[-6:20, -4:8, 0:8, 0:18]),
-		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["4", "invalid"], pos=[-6:26, -4:8, 0:8, 0:18]),
-	)
+	err: (#fn & {x: "invalid"}).out
 }
 issue3977: inlineDisj2: {
 	#NetworkID: 1
@@ -34,9 +29,7 @@ issue3977: inlineDisj2: {
 		out: x + 10
 	}
 
-	err: (#fn & {x: *2 | 4}).out @test(err, code=eval,
-		suberr=(contains="conflicting values", args=[1, 2]),
-		suberr=(contains="conflicting values", args=[4, 1]))
+	err: (#fn & {x: *2 | 4}).out
 }
 issue3977: inlineDisj3: {
 	#NetworkID: 1
@@ -45,7 +38,7 @@ issue3977: inlineDisj3: {
 		out: x + 10
 	}
 
-	ok: (#fn & {x: *2 | int}).out @test(eq, 11)
+	ok: (#fn & {x: *2 | int}).out
 }
 issue3977: inlineLet: {
 	#NetworkID: 1
@@ -56,8 +49,7 @@ issue3977: inlineLet: {
 		x: 2
 	}
 
-	err: p.out @test(eq, 12, incorrect) @test(err:todo, p=1, code=eval,
-		contains="conflicting values", args=[1, 2])
+	err: p.out
 }
 -- out/compile --
 --- in.cue

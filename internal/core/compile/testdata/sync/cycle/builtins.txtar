@@ -10,7 +10,6 @@ import "regexp"
 // by a builtin, effectively the entire struct needs to be evaluated and special
 // care should be taking to not evaluate too early.
 builtinCyclePerm: {
-	@test(permute, count=6)
 	X: "mod.test"
 
 	Y: {
@@ -19,14 +18,6 @@ builtinCyclePerm: {
 	}
 
 	X: Y.host
-
-	@test(eq, {
-		X: "mod.test"
-		Y: {
-			#components: {host: "mod.test"}
-			host: "mod.test"
-		}
-	})
 }
 -- matchn.cue --
 // This should not be a structural cycle, as the list type is "optional".
@@ -35,21 +26,12 @@ issue3410: {
 	_s: {
 		#x: matchN(1, [_s, [..._s]])
 	}
-	// TODO(inline): inline test outputs references in calls. This was crafted
-	// by hand.
-	@test(eq, {
-		_s: {#x: matchN(1, [_|_, []])}
-		#x: matchN(1, [_|_, []])
-	})
 }
 issue3420: {
 	matches1: {
 		#S: matchN(1, [_, _|_])
 		s: 2
 	}
-	@test(eq, {
-		matches1: {#S: matchN(1, [_, _|_]), s: 2}
-	})
 }
 issue3443: {
 	matchIf: {
@@ -94,13 +76,12 @@ issue3443: {
 		// cycle1.cycle.
 		fail: #S: matchN(1, [{n: #S}]) & {n: n: n: _}
 	}
-	@test(err, pos=[2:7])
 }
 issue3633: final: {
 	// With nested matchNs as below, the schema will become an incomplete error
 	// as a value of the root vertex. Make sure this edge case is properly
 	// handled.
-	data: {} & #s @test(err, code=incomplete, pos=[1:6, 0:8, 1:13])
+	data: {} & #s
 	#s: matchN(1, [matchN(1, [{a!: _}])])
 }
 issue3842: reduced: {
@@ -109,7 +90,6 @@ issue3842: reduced: {
 	}, #recursive, _) & {
 		source?: string
 	}]
-	@test(eq, {#recursive: []})
 }
 -- cycle.cue --
 import "strconv"
@@ -118,9 +98,8 @@ noCycle: t1: {
 	_s
 	_s: {
 		#x: matchN(1, [_s])
-        #x: {} // insert concrete value to trigger application of validator.
+		#x: {} // insert concrete value to trigger application of validator.
 	}
-	@test(err, pos=[3:7, 3:14, 4:13])
 }
 issue3649: noCycle: t1: {
 	data: #c
@@ -130,25 +109,6 @@ issue3649: noCycle: t1: {
 		b?: string
 		a?: matchN(1, [#c])
 	}
-	// Cannot use @test(eq) with self-referential #c in expected value.
-	@test(eq, "foo", at=data.a.b)
-	@test(debug, """
-		(struct){
-		  data: (#struct){
-		    a: (#struct){
-		      b: (string){ "foo" }
-		    }
-		    b?: (string){ string }
-		  }
-		  #c: (#struct){
-		    b?: (string){ string }
-		    a?: (_){ matchN(1, (#list){
-		        0: (_|_){// 〈2;#c〉
-		        }
-		      }) }
-		  }
-		}
-		""")
 }
 // Same as above, but with longer paths.
 issue3649: noCycle: t2: {
@@ -158,33 +118,6 @@ issue3649: noCycle: t2: {
 		b?: string
 		y: a?: matchN(1, [{d: c}])
 	}
-	// Cannot use @test(eq) with self-referential c in expected value.
-	@test(eq, {a: {d: {b: "foo"}}}, at=x.y)
-	@test(debug, """
-		(struct){
-		  x: (struct){
-		    y: (struct){
-		      a: (struct){
-		        d: (struct){
-		          b: (string){ "foo" }
-		        }
-		      }
-		    }
-		    b?: (string){ string }
-		  }
-		  c: (struct){
-		    b?: (string){ string }
-		    y: (struct){
-		      a?: (_){ matchN(1, (#list){
-		          0: (_|_){// {
-		            //   d: 〈4;c〉
-		            // }
-		          }
-		        }) }
-		    }
-		  }
-		}
-		""")
 }
 issue3649: cycle: t1: {
 	data: #c
@@ -193,14 +126,12 @@ issue3649: cycle: t1: {
 		b: string
 		a: matchN(1, [#c])
 	}
-	@test(err, pos=[5:6, 2:11, 5:13])
 }
 
 // This used to cause a stack overflow.
 issue4037: cycle: {
 	_intlike: x=matchN(1, [strconv.Atoi(x)])
-	f: "1233" & _intlike
-	@test(err, pos=[1:14, 1:21, 2:5])
+	f:        "1233" & _intlike
 }
 -- yamlcycle.cue --
 import "encoding/yaml"
@@ -208,39 +139,26 @@ import "encoding/yaml"
 yamlNoCycle: {
 	// the validator is invoked recursively and also unifies with a concrete
 	// value. This should nonetheless not result in a cycle error.
-    #c: {
-        b?: string
-        a?: yaml.Validate(#c)
-    }
-    data: #c
-    data: a: #"{a: "b: foo"}"#
-	@test(eq, {
-		#c: {
-			b?: string
-			a?: yaml.Validate({
+	#c: {
 		b?: string
-		a?: _
-	})
-		}
-		data: {a: "{a: \"b: foo\"}", b?: string}
-	})
+		a?: yaml.Validate(#c)
+	}
+	data: #c
+	data: a: #"{a: "b: foo"}"#
 }
 selfCycle: t1: {
 	c: matchN(1, [{d: c}])
 	c: d: {}
-	@test(err, pos=[1:5, 1:12, 2:5])
 }
 selfCycle: t2: {
 	// Even though only part of the path is unified with concrete data, this
 	// should still result in a cycle error.
 	c: matchN(1, [{d: c}])
 	c: {}
-	@test(eq, {c: {}})
 }
 selfCycle: yamlVal: t1: {
 	x: y: yaml.Validate(x)
 	x: y: "{}"
-	@test(err, pos=[1:8, 2:8])
 }
 selfCycle: yamlVal: t2: {
 	// Duplicating validators can cause some tricky code paths, like finalizing
@@ -249,22 +167,18 @@ selfCycle: yamlVal: t2: {
 	x: y: "{}"
 	x: y: yaml.Validate(x)
 	x: y: "{}"
-	@test(err, pos=[3:8, 4:8, 5:8, 6:8])
 }
-selfCycle: yamlFun: t1:{
+selfCycle: yamlFun: t1: {
 	x: y?: yaml.Validate("{}", x)
-	@test(eq, {x: {y?: true}})
 }
 selfCycle: yamlFun: t2: {
 	z: x & __no_sharing
 	z: y: "{}"
 	x: y: yaml.Validate("{}", x)
-	@test(err, pos=[3:8])
 }
 selfCycle: yamlValidatePartial: {
 	x: y: yaml.ValidatePartial(x)
 	x: y: "{}"
-	@test(err, pos=[1:8, 2:8])
 }
 -- jsoncycle.cue --
 import "encoding/json"
@@ -272,7 +186,6 @@ import "encoding/json"
 jsonCycle: t1: {
 	x: y: json.Validate(x)
 	x: y: "{}"
-	@test(err, pos=[1:8, 2:8])
 }
 -- listmatchncycle.cue --
 import "list"
@@ -280,27 +193,11 @@ import "list"
 listMatchN: structCycle: {
 	x: y: list.MatchN(1, x)
 	x: y: [{}]
-	@test(err, pos=[1:8, 1:5, 1:20, 2:5, 2:8])
 }
 listMatchN: ok: {
 	x: y?: list.MatchN(1, x)
-    z: x
+	z: x
 	z: y: [{}]
-	// x.y? is non-concrete (list.MatchN validator); only check z.y which is concrete.
-	@test(eq, [{}], at=z.y)
-	@test(debug, """
-		(struct){
-		  x: (struct){
-		    y?: (list){ list.MatchN(1, listMatchN.ok.x) }
-		  }
-		  z: (struct){
-		    y: (#list){
-		      0: (struct){
-		      }
-		    }
-		  }
-		}
-		""")
 }
 -- issue3634.cue --
 // evalv3 structural cycle regression: using `len(...)` with a `#Schema`
@@ -319,26 +216,13 @@ issue3634: full: {
 		#Schema // removing this fixes the bug!
 		properties: foo: required: ["bar", "baz"]
 	}], 3))
-
-	@test(eq, {
-		#Schema: {required?: [], properties?: {}}
-		out: 3
-	})
 }
 issue3634: reduced: {
 	#D: {
 		b?: int
 		a?: #D
 	}
-	out: len(#D & list.Repeat([#D & { a: b: 1 }], 1)[0])
-
-	@test(eq, {
-		#D: {
-			b?: int
-			a?: _|_ @test(err, code=structural_cycle, contains="issue3634.reduced.#D.a: structural cycle", pos=[])
-		}
-		out: 1
-	})
+	out: len(#D & list.Repeat([#D & {a: b: 1}], 1)[0])
 }
 -- issue3743.cue --
 // Passing a cyclic value to `yaml.MarshalStream` caused a stack overflow
@@ -348,21 +232,15 @@ import "encoding/yaml"
 
 issue3743: {
 	#transform: {
-	    in: _
-	    out: [
-	        if false {out}, // note that this is a cycle
-	        in,
-	    ]
+		in: _
+		out: [
+			if false {out}, // note that this is a cycle
+			in,
+		]
 	}
 
-	docs: [ (#transform & {in: "x"}).out ]
+	docs: [(#transform & {in: "x"}).out]
 	out: yaml.MarshalStream(docs)
-
-	@test(eq, {
-		#transform: {in: _, out: [_]}
-		docs: [["x"]]
-		out: "- x\n"
-	})
 }
 -- out/compile --
 --- cycle.cue

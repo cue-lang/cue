@@ -1,6 +1,6 @@
 -- in.cue --
-a:  *1 | int       @test(eq, *1 | int)
-aa: *1 | *2 | int  @test(eq, *1 | *2 | int)
+a:  *1 | int
+aa: *1 | *2 | int
 
 b: {
 	name: "int"
@@ -8,56 +8,47 @@ b: {
 } | {
 	name: "str"
 	val:  string
-} @test(eq, {name: "int", val: int} | {name: "str", val: string})
+}
 
-d: b & {val:  3}             @test(eq, {val: 3, name: "int"})
-c: b & {name: "int", val: 3} @test(eq, {name: "int", val: 3})
-e: b & {val:  "foo"}         @test(eq, {val: "foo", name: "str"})
-f: b & {name: "str", val: 3} @test(err,
-	suberr=(code=eval, contains="conflicting values", pos=[-10:8, 0:4, 0:15]),
-	suberr=(code=eval, contains="conflicting values", pos=[-6:8, 0:4, 0:27]))
+d: b & {val: 3}
+c: b & {name: "int", val: 3}
+e: b & {val: "foo"}
+f: b & {name: "str", val: 3}
 
 // Disjunct elimination based on type.
 e1: {
 	a: null | {bar: 2}
 	b: (a & {}).bar
-	@test(eq, {a: null | {bar: 2}, b: 2})
 }
 
 d1: {
-	a: (null | {c:      1}) & {}
+	a: (null | {c: 1}) & {}
 	b: {} & (null | {c: 1})
-	@test(eq, {a: {c: 1}, b: {c: 1}})
 }
 
 d2: {
-	a: ([...] | {c:      1}) & {}
+	a: ([...] | {c: 1}) & {}
 	b: {} & ([...] | {c: 1})
-	@test(eq, {a: {c: 1}, b: {c: 1}})
 }
 
 d3: {
-	a: (string | {c:      1}) & {}
+	a: (string | {c: 1}) & {}
 	b: {} & (string | {c: 1})
-	@test(eq, {a: {c: 1}, b: {c: 1}})
 }
 
 d4: {
-	a: (string | {c:      1}) & {}
+	a: (string | {c: 1}) & {}
 	b: {} & (string | {c: 1})
-	@test(eq, {a: {c: 1}, b: {c: 1}})
 }
 
 d5: {
-	a: (number | {c:      1}) & {}
+	a: (number | {c: 1}) & {}
 	b: {} & (number | {c: 1})
-	@test(eq, {a: {c: 1}, b: {c: 1}})
 }
 
 d6: {
-	a: (int | {c:      1}) & {}
+	a: (int | {c: 1}) & {}
 	b: {} & (int | {c: 1})
-	@test(eq, {a: {c: 1}, b: {c: 1}})
 }
 
 t10: p1: {
@@ -68,11 +59,6 @@ t10: p1: {
 
 	test: name: "Test"
 	test: #A
-	@test(eq, {
-		schema: {name: "Test"}
-		#A: string | {name: string}
-		test: {name: "Test"}
-	})
 }
 
 t10: p2: {
@@ -82,11 +68,6 @@ t10: p2: {
 
 	test: name: "Test"
 	test: #A
-	@test(eq, {
-		schema: {name: "Test"}
-		#A: string | {name: string}
-		test: {name: "Test"}
-	})
 }
 
 t10: p3: {
@@ -97,43 +78,27 @@ t10: p3: {
 
 	schema: string | {name: string}
 	schema: test
-	@test(eq, {
-		#A: string | {name: string}
-		test: {name: "Test"}
-		schema: {name: "Test"}
-	})
 }
 
 t11: p1: {
 	a: #A
 	a: b
 
-	b:  #A & ["b"]
+	b: #A & ["b"]
 	#A: ["a" | "b"] | {}
-	@test(eq, {
-		a: ["b"]
-		b: ["b"]
-		#A: ["a" | "b"] | {}
-	})
 }
 
 t11: p2: {
-	b:  #A & ["b"]
+	b: #A & ["b"]
 	#A: ["a" | "b"] | {}
 
 	a: b
 	a: #A
-	@test(eq, {
-		b: ["b"]
-		#A: ["a" | "b"] | {}
-		a: ["b"]
-	})
 }
 
 cross: {
 	a: *"word" | string
 	a: string | *"word"
-	@test(eq, {a: *"word" | string})
 }
 
 d100: {
@@ -141,10 +106,6 @@ d100: {
 	// This would be a spec change. Disallow for now.
 	i: null | {bar: 2}
 	j: i.bar
-	@test(eq, {
-		i: null | {bar: 2}
-		j: _|_ @test(err, code=incomplete, contains="d100.j: unresolved disjunction null | {bar:2} (type (null|struct))", pos=[142:5])
-	})
 }
 
 // Regression test for empty disjunction with combined definitions and
@@ -174,27 +135,15 @@ issue641: {
 			x: "foobar"
 		}
 	}
-	@test(eq, {
-		#A: {type: "a", x: ""}
-		#B: {type: "b", x: string}
-		#C: {
-			b: {type: "a", x: ""} | {type: "b", x: string}
-		}
-		e: {foobar: {b: {x: "foobar", type: "b"}}}
-	})
 }
 -- issue3406.cue --
 // evalv3 panic with inconsistent state when unifying a struct with itself
 // embedded via a disjunction field.
 // https://cuelang.org/issue/3406
 issue3406: {
-	out: d & { d }
+	out: d & {d}
 	d: kind: "foo" | "bar"
-	d: { kind: "foo" } | { kind: "bar" }
-	@test(eq, {
-		out: {kind: "foo"} | {kind: "bar"}
-		d: {kind: "foo"} | {kind: "bar"}
-	})
+	d: {kind: "foo"} | {kind: "bar"}
 }
 -- issue3411.cue --
 // evalv3 nil pointer dereference when unifying optional fields with defaults.
@@ -202,32 +151,17 @@ issue3406: {
 issue3411: {
 	x: y?: [...string]
 	x: {y: ["foo"]} | *{y: ["bar"]}
-	@test(eq, {x: *{y: ["bar"]} | {y: ["foo"]}})
 }
 -- issue3490.cue --
 // evalv3 "incDependent: already closed" panic regression involving disjunctions.
 // https://cuelang.org/issue/3490
 issue3490: nested: p1: {
-	("a"|"b") | "b"
-	"a"|"b"
-	@test(eq, {
-		"a"
-		@test(eq)
-	} | {
-		"b"
-		@test(eq)
-	})
+	("a" | "b") | "b"
+	"a" | "b"
 }
 issue3490: nested: p2: {
-	"a"|"b"
-	("a"|"b") | "b"
-	@test(eq, {
-		"a"
-		@test(eq)
-	} | {
-		"b"
-		@test(eq)
-	})
+	"a" | "b"
+	("a" | "b") | "b"
 }
 issue3490: full: {
 	data: [...#Schema]
@@ -237,18 +171,6 @@ issue3490: full: {
 		#D1: "d1"
 		#D2: "d2"
 	}
-	@test(eq, {
-		data: [{
-			runs?: "foo" | ["d1"] | ["d1", "d2"]
-			#D1: "d1"
-			#D2: "d2"
-		}]
-		#Schema: {
-			runs?: "foo" | ["d1"] | ["d1", "d2"]
-			#D1: "d1"
-			#D2: "d2"
-		}
-	})
 }
 -- issue3434.cue --
 // evalv3 panic "unexpected overlay in next" with disjunctions inside definitions.
@@ -257,7 +179,6 @@ issue3434: t1: {
 	({} | {})
 	{["x"]: 1}
 	{["y"]: 2}
-	@test(eq, {["x"]: 1, ["y"]: 2})
 }
 issue3434: full: {
 	out: #Schema & {
@@ -271,18 +192,6 @@ issue3434: full: {
 			{[=~"^bar"]: [...#matrixConfig] | string}
 		}
 	}
-	@test(eq, {
-		out: {
-			steps: [{ run: "example" }]
-			#matrixConfig: string | []
-			matrix?: {}
-		}
-		#Schema: {
-			steps: []
-			#matrixConfig: string | []
-			matrix?: {}
-		}
-	})
 }
 -- issue3597.cue --
 // evalv3 index out of range panic in overlayContext.allocCC with let inside
@@ -302,11 +211,6 @@ issue3597: t1: {
 
 	foo: bar
 	bar: {}
-	@test(eq, {
-		#Schema: {_ok: bool} | {_ok: true} | {_ok: true, x: true}
-		foo: {_ok: bool} | {_ok: true} | {_ok: true, x: true}
-		bar: {_ok: bool} | {_ok: true} | {_ok: true, x: true}
-	})
 }
 issue3597: t2: {
 	ok: true
@@ -315,11 +219,6 @@ issue3597: t2: {
 		_ | {x: Ok}
 	}
 	foo: X & {X}
-	@test(eq, {
-		ok: true
-		X: _ | _ | {x: true}
-		foo: _ | _ | {x: true}
-	})
 }
 -- dependencies.cue --
 // evalv3 incorrectly allowed a field inside a struct disjunction that should
@@ -331,11 +230,6 @@ issue3606: {
 	} & #S
 
 	#S: string | {}
-
-	@test(err, code=eval,
-		suberr=(code=eval, path=data, contains="conflicting values %s and %s (mismatched types %s and %s)",
-			args=[{notAllowed:true}, string, struct, string], pos=[1:8, 3:6, 5:6]),
-		suberr=(code=eval, path=data.notAllowed, contains="field not allowed", pos=[2:3]))
 }
 
 // evalv3 gives a different result vs evalv2 when openinline is enabled; list
@@ -352,21 +246,9 @@ issue3672: {
 
 	// The unification inline appears to be critical
 	#def: (#fn & {}).#out
-	
+
 	v: #def
 	v: x: [{y: true}] // Should be one element
-	@test(eq, {
-		#A: string | {y: true}
-		#B: string | {y: true} | {a: "append"} | {b: "prepend"}
-		#fn: {
-			#C: string | {y: true} | {a: "append"} | {b: "prepend"}
-			#out: {x: []}
-		}
-		#def: {x: []}
-		v: {x: [{
-		y: true
-	}]}
-	})
 }
 // Regression giving "non-concrete value _ (type _)" error when interpolating
 // a string default from a disjunction via a definition alias.
@@ -376,35 +258,27 @@ issue3681: {
 	out: one: #strDefaultDef
 	out: two: "\(strDefault)"
 
-	strDefault: *"fallback" | string
+	strDefault:     *"fallback" | string
 	#strDefaultDef: strDefault
-	@test(eq, {
-		out: {
-			one: *"fallback" | string
-			two: "fallback"
-		}
-		strDefault: *"fallback" | string
-		#strDefaultDef: *"fallback" | string
-	})
 }
 // evalv3 "undefined field" regression when a comprehension condition references
 // a field whose default is provided by a disjunction.
 // https://cuelang.org/issue/3699
 issue3699: {
 	reduced: p1: {
-		y: { if x.z { 1 } }
+		y: {if x.z {1}}
 		x: *{z: true} | {}
 	}
 	reduced: p2: {
-		y: { if x.z { 1 } }
+		y: {if x.z {1}}
 		x: *{z: true} | {}
 	}
 	reduced: full: {
 		_res: {
 			_fooTrue: {} | *{foo: true}
 			_msgSwitch: [
-				if _fooTrue.foo { msg: "foo" },
-				{ msg: "bar" },
+				if _fooTrue.foo {msg: "foo"},
+				{msg: "bar"},
 			][0]
 			out: _msgSwitch.msg
 		}
@@ -413,28 +287,14 @@ issue3699: {
 		}
 		out: res.out
 	}
-	@test(eq, {
-		reduced: {
-			p1: {y: 1, x: *{z: true} | {}}
-			p2: {y: 1, x: *{z: true} | {}}
-			full: {
-				_res: {
-					_fooTrue: *{foo: true} | {}
-					_msgSwitch: {msg: "foo"}
-					out: "foo"
-				}
-				out: "foo"
-			}
-		}
-	})
 }
 -- indexelim.cue --
 import "math/bits"
 
 indexElimination: {
-	inStruct: x: { a: *x[0] | 0 }.a @test(eq, 0)
-	inList1: x: [x[0]][0]           @test(eq, _)
-	inList2: x: [*x[0] | 0][0]      @test(eq, 0)
+	inStruct: x: {a: *x[0] | 0}.a
+	inList1: x: [x[0]][0]
+	inList2: x: [*x[0] | 0][0]
 	// evalv3 strange behavior with chaining of list comprehensions,
 	// incorrect results when indexing the output of a for loop.
 	// https://cuelang.org/issue/3124
@@ -443,11 +303,6 @@ indexElimination: {
 		x: [true, false, true, true]
 		y: [for _, v in x {[if v {1}, 0][0]}]
 		z: [for i, v in y {bits.Set(*z[i-1] | 0, len(y)-i-1, v)}][3]
-		@test(eq, {
-			x: [true, false, true, true]
-			y: [1, 0, 1, 1]
-			z: 1
-		})
 	}
 }
 -- issue3899.cue --
@@ -455,38 +310,20 @@ indexElimination: {
 // a string interpolation references an optional field inside a disjunction.
 // https://cuelang.org/issue/3899
 issue3899: reduced: {
-	@test(permute, count=2)
-	b: c + "" | string
+	b:  c+"" | string
 	c?: string
-	@test(eq, {b: string, c?: string})
 }
 issue3899: full: {
 	out: #Schema & {
 		name: "foo"
-   }
-   #Schema: {
-	   _versions: foo: "123"
-	   spec: limits: true
-	   name!: string
-	   spec: image: string | *"\(name)"
-	   deployImage: _versions[spec.image] @test(err, code=incomplete,
-			contains="invalid non-ground value %s (must be concrete %s)",
-			args=[string, string], pos=[-1:18])
-   }
-	@test(eq, {
-		out: {
-			name: "foo"
-			_versions: {foo: "123"}
-			spec: {limits: true, image: *"foo" | string}
-			deployImage: "123"
-		}
-		#Schema: {
-			_versions: {foo: "123"}
-			spec: {limits: true, image: string}
-			name!: string
-			deployImage: _|_
-		}
-	})
+	}
+	#Schema: {
+		_versions: foo: "123"
+		spec: limits:   true
+		name!: string
+		spec: image: string | *"\(name)"
+		deployImage: _versions[spec.image]
+	}
 }
 -- issue3891.cue --
 // evalv3 "incomplete value" regression with repeated disjunctions where a
@@ -496,10 +333,8 @@ issue3891: reduced: {
 	{x: _} | null
 	{x: _} | null
 	x: *a.y | _
-	a: b @test(shareID=r3891ab)
-	@test(shareID=r3891ab, at=b)
+	a: b
 	b: y: 1
-	@test(eq, {x: *1 | _, a: {y: 1}, b: {y: 1}})
 }
 issue3891: full: {
 	out: #Foo | "never"
@@ -508,23 +343,14 @@ issue3891: full: {
 		_input: (_transform & {in: sub1: sub2: "bar"}).out
 	}
 	_transform: {
-		in: _
+		in:  _
 		out: in
 	}
 	#Foo: foo?: _
 	_fooTemplate: {
 		_input: _
-		foo: *_input.sub1.sub2 | _
+		foo:    *_input.sub1.sub2 | _
 	}
-	@test(eq, {
-		out: {
-			_input: {sub1: {sub2: "bar"}}
-			foo: *"bar" | _
-		}
-		_transform: {in: _, out: _}
-		#Foo: {foo?: _}
-		_fooTemplate: {_input: _, foo: _}
-	})
 }
 -- out/compile --
 --- dependencies.cue

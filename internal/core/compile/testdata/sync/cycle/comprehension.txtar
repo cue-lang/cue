@@ -10,11 +10,11 @@ A: {
 	a: {
 		parent: ""
 		children: [for k, v in A if v.parent == k {k}]
-	} @test(eq, {parent: "", children: []})
+	}
 	b: {
 		parent: "a"
 		children: [for k, v in A if v.parent == k {k}]
-	} @test(eq, {parent: "a", children: []})
+	}
 }
 
 // This should result in an incomplete error (a reference cycle error classifies
@@ -23,10 +23,7 @@ B: {
 	a: {
 		parent: ""
 		children: [for k, v in B for _, w in v.children {k}]
-	} @test(eq, {
-		parent: ""
-		children: _|_ @test(err, code=incomplete, contains="B.a.children: cannot range over v.children (incomplete type list)", pos=[24:40])
-	})
+	}
 }
 
 // Issue #486: stack overflow in v0.3.0 when evaluating parametric fields with
@@ -56,13 +53,6 @@ Issue486: {
 			},
 		]
 	}
-	@test(eq, {
-		A: {
-			a: {parent: "", children: ["b"]}
-			b: {parent: "a", children: ["c"]}
-			c: {parent: "b", children: []}
-		}
-	})
 }
 
 // Issue #1666: evaluator hangs indefinitely when combining disjunctions with
@@ -84,14 +74,6 @@ issue1666: {
 			}
 		}
 	}
-	@test(eq, {
-		#E: {f1: {}, f2: {}}
-		_e: {f2: {a: {t: {f1: {}, f2: {}}}}, f1: {}}
-		e: {
-			f1: {a: {f1: {}, f2: {}}}
-			f2: {a: {t: {f1: {}, f2: {}}}}
-		}
-	})
 }
 
 // Issue #779: for comprehension incorrectly rejected valid bidirectional
@@ -108,14 +90,9 @@ issue779: {
 			}
 		}
 	}
-	Y: STATE & { message: X }
+	Y: STATE & {message: X}
 	X: "test"
-	STATE: { code: 101 }
-	@test(eq, {
-		X: "test"
-		STATE: {code: 101}
-		Y: {message: "test", code: 101}
-	})
+	STATE: {code: 101}
 }
 
 // Issue #1934: regression in v0.4.1 where nested comprehensions referencing
@@ -131,10 +108,6 @@ selfReferential: T1: {
 	for s, v in S for t, _ in T {
 		T: (t): S: (s): v
 	}
-	@test(eq, {
-		S: {d: "bar"}
-		T: {e: {S: {a: "foo", d: "bar"}}}
-	})
 }
 
 // selfReferential comprehension for list.
@@ -146,7 +119,6 @@ selfReferential: list: {
 		}
 	]
 	panels: [{}, {}, {}]
-	@test(eq, {panels: [{id: 0}, {id: 1}, {id: 2}]})
 }
 
 selfReferential: insertionError: {
@@ -158,33 +130,23 @@ selfReferential: insertionError: {
 			// defined.
 			("foo3"): 1
 		}
-		@test(err, code=eval, contains="adding field foo3 not allowed as field set was already referenced", pos=[6:14])
 	}
 }
 
 // A comprehension should not recursively evaluated arcs, so that a
 // structural cycle can be avoided when unnecessary.
 selfReferential: acrossOr: t1: p1: {
-	o: #Output & { retry: reject: "ok" }
+	o: #Output & {retry: reject: "ok"}
 
 	#AllOutputs: {
 		reject:   string
 		resource: string
-		retry: #Output
+		retry:    #Output
 	}
 
 	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
-	@test(eq, {
-		o: {retry: {reject: "ok"}}
-		#AllOutputs: {
-			reject: string
-			resource: string
-			retry: {reject: string} | {resource: string}
-		}
-		#Output: {reject: string} | {resource: string}
-	})
 }
 
 selfReferential: acrossOr: t1: p2: {
@@ -192,22 +154,13 @@ selfReferential: acrossOr: t1: p2: {
 		(name): config
 	}])
 
-	o: #Output & { retry: reject: "ok" }
+	o: #Output & {retry: reject: "ok"}
 
 	#AllOutputs: {
 		reject:   string
 		resource: string
-		retry: #Output
+		retry:    #Output
 	}
-	@test(eq, {
-		#Output: {reject: string} | {resource: string}
-		o: {retry: {reject: "ok"}}
-		#AllOutputs: {
-			reject: string
-			resource: string
-			retry: {reject: string} | {resource: string}
-		}
-	})
 }
 
 selfReferential: acrossOr: t1: p3: {
@@ -218,83 +171,47 @@ selfReferential: acrossOr: t1: p3: {
 	#AllOutputs: {
 		reject:   string
 		resource: string
-		retry: #Output
+		retry:    #Output
 	}
 
-	o: #Output & { retry: reject: "ok" }
-	@test(eq, {
-		#Output: {reject: string} | {resource: string}
-		#AllOutputs: {
-			reject: string
-			resource: string
-			retry: {reject: string} | {resource: string}
-		}
-		o: {retry: {reject: "ok"}}
-	})
+	o: #Output & {retry: reject: "ok"}
 }
 
 selfReferential: acrossOr: t2: p1: {
-	d: or([for x, y in #A { y }])
-	o: d & { b: 2 }
+	d: or([for x, y in #A {y}])
+	o: d & {b: 2}
 	#A: {
 		d1: int
 		d2: string
 		d3: b: d
 	}
-	@test(eq, {
-		d: int | string
-		o: {b: 2}
-		#A: {
-			d1: int
-			d2: string
-			d3: {b: int | string}
-		}
-	})
 }
 
 selfReferential: acrossOr: t2: p2: {
-	o: d & { b: 2 }
-	d: or([for x, y in #A { y }])
+	o: d & {b: 2}
+	d: or([for x, y in #A {y}])
 	#A: {
 		d1: int
 		d2: string
 		d3: b: d
 	}
-	@test(eq, {
-		o: {b: 2}
-		d: int | string
-		#A: {
-			d1: int
-			d2: string
-			d3: {b: int | string}
-		}
-	})
 }
 
 selfReferential: acrossOr: t2: p3: {
-	o: d & { b: 2 }
+	o: d & {b: 2}
 	#A: {
 		d1: int
 		d2: string
 		d3: b: d
 	}
-	d: or([for x, y in #A { y }])
-	@test(eq, {
-		o: {b: 2}
-		#A: {
-			d1: int
-			d2: string
-			d3: {b: int | string}
-		}
-		d: int | string
-	})
+	d: or([for x, y in #A {y}])
 }
 
 // Issue #1881: evaluator required the source of a for comprehension to be
 // fully evaluated before iterating, causing false structural cycle errors.
 // https://cuelang.org/issue/1881
 issue1881: p1: {
-	o: #Output & { retry: output: reject: "ok" }
+	o: #Output & {retry: output: reject: "ok"}
 
 	#AllOutputs: {
 		reject:   string
@@ -305,17 +222,6 @@ issue1881: p1: {
 	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
-	@test(eq, {
-		o: {retry: {output: {reject: "ok"}}}
-		#AllOutputs: {
-			reject: string
-			resource: string
-			retry: {
-				output: {reject: string} | {resource: string}
-			}
-		}
-		#Output: {reject: string} | {resource: string}
-	})
 }
 
 issue1881: p2: {
@@ -325,22 +231,11 @@ issue1881: p2: {
 		retry: output: #Output
 	}
 
-	o: #Output & { retry: output: reject: "ok" }
+	o: #Output & {retry: output: reject: "ok"}
 
 	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
-	@test(eq, {
-		#AllOutputs: {
-			reject: string
-			resource: string
-			retry: {
-				output: {reject: string} | {resource: string}
-			}
-		}
-		o: {retry: {output: {reject: "ok"}}}
-		#Output: {reject: string} | {resource: string}
-	})
 }
 
 issue1881: p3: {
@@ -354,18 +249,7 @@ issue1881: p3: {
 		(name): config
 	}])
 
-	o: #Output & { retry: output: reject: "ok" }
-	@test(eq, {
-		#AllOutputs: {
-			reject: string
-			resource: string
-			retry: {
-				output: {reject: string} | {resource: string}
-			}
-		}
-		#Output: {reject: string} | {resource: string}
-		o: {retry: {output: {reject: "ok"}}}
-	})
+	o: #Output & {retry: output: reject: "ok"}
 }
 
 siblingInsertion: t1: p1: {
@@ -380,15 +264,6 @@ siblingInsertion: t1: p1: {
 	for id, v in D {
 		deployment: (id): env2: ENV: "True"
 	}
-	@test(eq, {
-		D: {logging: _}
-		deployment: {
-			logging: {
-				env2: {ENV: "True"}
-				env: {ENV: "True"}
-			}
-		}
-	})
 }
 
 siblingInsertion: t1: p2: {
@@ -403,15 +278,6 @@ siblingInsertion: t1: p2: {
 	for k1, v2 in v.env2 {
 		deployment: (k): env: (k1): v2
 	}
-	@test(eq, {
-		D: {logging: _}
-		deployment: {
-			logging: {
-				env2: {ENV: "True"}
-				env: {ENV: "True"}
-			}
-		}
-	})
 }
 
 siblingInsertion: t2: p1: {
@@ -427,15 +293,6 @@ siblingInsertion: t2: p1: {
 	for id, v in D {
 		deployment: (id): env2: ENV: "True"
 	}
-	@test(eq, {
-		D: {logging: _}
-		deployment: {
-			logging: {
-				env2: {ENV: "True"}
-				env: {ENV: "True"}
-			}
-		}
-	})
 }
 
 siblingInsertion: t2: p2: {
@@ -451,15 +308,6 @@ siblingInsertion: t2: p2: {
 	for id, v in D {
 		deployment: (id): env2: ENV: "True"
 	}
-	@test(eq, {
-		D: {logging: _}
-		deployment: {
-			logging: {
-				env2: {ENV: "True"}
-				env: {ENV: "True"}
-			}
-		}
-	})
 }
 
 // Issue #1407: cue export produced a misleading, location-free "cycle error"
@@ -469,9 +317,7 @@ siblingInsertion: t2: p2: {
 selfReferential: fail: {
 	a: {}
 	b: a.x != ""
-	if b {
-	}
-	@test(err, code=incomplete, contains="undefined field: x", pos=[2:7])
+	if b {}
 }
 
 // Issue #2367: stack overflow triggered by a comprehension that inserts into
@@ -481,7 +327,6 @@ selfReferential: fail: {
 issue2367: {
 	a: _
 	for x in [a] {a: x}
-	@test(eq, {a: _})
 }
 
 // Issue #2310: evalv2 incorrectly reported a structural cycle when a
@@ -509,79 +354,6 @@ issue2310: original: {
 		#s & {#_2: "c", #_3: "d", _},
 		#s & {#_2: "e", #_3: "f", _},
 	]
-	@test(eq, {
-		#s: {
-			_|_
-			#_1: string
-			#_2: string
-			#_3: string
-		}
-		#sub: {
-			_|_
-			#a: string
-			_#X: [string,
-			{_|_, #_1: string, #_2: "a", #_3: "b"},
-			{
-				_|_
-				#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
-				#_2: "c"
-				#_3: "d"
-			},
-			{
-				_|_
-				#_1: {
-					_|_
-					#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
-					#_2: "c"
-					#_3: "d"
-				}
-				#_2: "e"
-				#_3: "f"
-			}]
-			#_1: {
-				_|_
-				#_1: {_|_, #_1: string, #_2: "a", #_3: "b"}
-				#_2: "c"
-				#_3: "d"
-			}
-			#_2: "e"
-			#_3: "f"
-		}
-		res: {
-			"bbb"
-			#a: "aaa"
-			_#X: ["aaa",
-			{"bbb", #_1: "aaa", #_2: "a", #_3: "b"},
-			{
-				"bbb"
-				#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
-				#_2: "c"
-				#_3: "d"
-			},
-			{
-				"bbb"
-				#_1: {
-					"bbb"
-					#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
-					#_2: "c"
-					#_3: "d"
-				}
-				#_2: "e"
-				#_3: "f"
-			}]
-			#_1: {
-				"bbb"
-				#_1: {"bbb", #_1: "aaa", #_2: "a", #_3: "b"}
-				#_2: "c"
-				#_3: "d"
-			}
-			#_2: "e"
-			#_3: "f"
-		}
-		#subs: [{_|_, #_2: "a", #_3: "b", #_1: string},
-		{_|_, #_2: "c", #_3: "d", #_1: string},
-		{_|_, #_2: "e", #_3: "f", #_1: string}]
-	})
 }
 issue2310: reduced: {
 	res: {
@@ -593,23 +365,7 @@ issue2310: reduced: {
 
 	#s: {#str: string, #str + "a"}
 	#subs: [0, 1, 2]
-	@test(eq, {
-		res: {
-			"Xaaa"
-			#X: ["X",
-			{"Xa", #str: "X"},
-			{"Xaa", #str: {"Xa", #str: "X"}},
-			{
-				"Xaaa"
-				#str: {"Xaa", #str: {"Xa", #str: "X"}}
-			}]
-			#str: {"Xaa", #str: {"Xa", #str: "X"}}
-		}
-		#s: {_|_, #str: string}
-		#subs: [0, 1, 2]
-	})
 }
-
 -- issue3903.cue --
 // evalv3 structural cycle regression: a schema with `_deps` and comprehensions
 // over those deps triggered a spurious structural cycle error that exported
@@ -628,13 +384,6 @@ issue3903: reduced: {
 			}
 		]
 	}
-	@test(eq, {
-		s1: {
-			_deps: [{_deps: [], objs: []}]
-			objs: []
-		}
-		#Schema: {_deps: [], objs: []}
-	})
 }
 issue3903: full: {
 	s1: #Schema & {
@@ -650,7 +399,7 @@ issue3903: full: {
 		_deps: [...]
 
 		objs: [
-			for obj in _local { obj },
+			for obj in _local {obj},
 
 			for dep in _deps
 			for obj in (dep & {}).objs {
@@ -658,23 +407,6 @@ issue3903: full: {
 			},
 		]
 	}
-	@test(eq, {
-		s1: {
-			_deps: [{
-				_local: ["s2 local"]
-				_deps: []
-				objs: ["s2 local"]
-			}]
-			_local: ["s1 local"]
-			objs: ["s1 local", "s2 local"]
-		}
-		s2: {
-			_local: ["s2 local"]
-			_deps: []
-			objs: ["s2 local"]
-		}
-		#Schema: {_local: [], _deps: [], objs: []}
-	})
 }
 -- issue2405.cue --
 // A recursive disjunction type (`#Copy` with struct/list/scalar alternatives)
@@ -703,13 +435,6 @@ issue2405: {
 
 	foo: #Copy
 	foo: param: a: [{b: 134}]
-	@test(eq, {
-		#Copy: {param: {}, result: {}} | {param: [], result: []} | {param: number, result: number}
-		foo: {
-			param: {a: [{b: 134}]}
-			result: {a: [{b: 134}]}
-		}
-	})
 }
 -- issue3941.cue --
 // evalv3 regression: a comprehension iterating over a pattern-constrained field
@@ -717,7 +442,7 @@ issue2405: {
 // already referenced" error that evalv2 did not emit.
 // https://cuelang.org/issue/3941
 issue3941: full: {
-	#Metadata: name: string
+	#Metadata: name:     string
 	#Resource: metadata: #Metadata
 
 	out: {
@@ -732,17 +457,6 @@ issue3941: full: {
 			}
 		}
 	}
-	@test(eq, {
-		#Metadata: {name: string}
-		#Resource: {metadata: {name: string}}
-		out: {
-			_metadata: {name: "foo"}
-			resource: {
-				level1: {foo: {metadata: {name: "foo"}}}
-			}
-			_names: ["foo"]
-		}
-	})
 }
 -- issue2229.cue --
 // A list comprehension whose result was unified back into the same list caused
@@ -752,20 +466,12 @@ issue2229: full_ok: X={
 	build: bool | *true
 	test:  bool | *true
 
-	make: [ for k, v in X if (v & true) != _|_ { k } ]
-} @test(eq, {
-	build: *true | bool
-	test: *true | bool
-	make: ["build", "test"]
-})
+	make: [for k, v in X if (v & true) != _|_ {k}]
+}
 issue2229: reduced_fail: X={
 	x: true
-	y: [ for _, v in X if v & true { _ } ]
-} @test(err, code=eval,
-	suberr=(code=eval, contains="conflicting values", pos=[2:5, 2:24, 2:28]),
-	suberr=(code=eval, contains="conflicting values", pos=[2:5, 2:24, 2:28]),
-	suberr=(code=eval, contains="structural cycle", pos=[2:24]),
-)
+	y: [for _, v in X if v & true {_}]
+}
 -- issue4100.cue --
 // Segmentation fault in `adt.(*OpContext).freeNodeContext` in v0.14.1,
 // triggered by a let binding inside a conditional that feeds into a for loop.
@@ -778,7 +484,6 @@ issue4100: {
 		}
 	}
 	for _ in a {}
-	@test(eq, {a: [0]})
 }
 -- out/compile --
 --- in.cue

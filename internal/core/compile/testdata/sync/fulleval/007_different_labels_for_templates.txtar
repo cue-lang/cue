@@ -1,7 +1,7 @@
 -- in.cue --
 a: [X=string]: {name: X}
 a: [Name=string]: {name: Name}
-a: foo: {} @test(eq, {name: "foo"})
+a: foo: {}
 -- out/compile --
 --- in.cue
 {

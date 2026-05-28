@@ -16,13 +16,7 @@
 	}
 }
 
-foo: #Task & {"op": "pull"} @test(eq, {
-	op: "pull"
-	tag: *"latest" | string
-	refToTag: *"latest" | string
-	tagExpr: "latestdd"
-	tagInString: "latest"
-})
+foo: #Task & {"op": "pull"}
 -- out/compile --
 --- in.cue
 {

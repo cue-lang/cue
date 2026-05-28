@@ -3,9 +3,9 @@
 -- in.cue --
 a: {
 	x: y + "?"
-	y: x + "!" @test(eq, "hey!")
+	y: x + "!"
 }
-a: x: "hey" @test(err, code=eval, contains="conflicting values", pos=[-3:5, 0:7])
+a: x: "hey"
 -- out/compile --
 --- in.cue
 {

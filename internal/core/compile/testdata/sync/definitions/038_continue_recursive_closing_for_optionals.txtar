@@ -4,7 +4,7 @@
 }
 a: #S & {
 	v: {b: int}
-} @test(err, at=v.b, code=eval, contains="field not allowed", pos=[1:6])
+}
 -- out/compile --
 --- in.cue
 {

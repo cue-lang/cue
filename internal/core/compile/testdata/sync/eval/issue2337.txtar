@@ -7,10 +7,7 @@
 // evalv2 failed with the confusing error "x: was already used"
 // rather than a friendlier "conflicting values" error.
 simple: {
-	x:   "x" @test(err, code=eval,
-			contains="conflicting values",
-			args=["foo", "x"],
-			pos=[0:7, 5:7])
+	x: "x"
 
 	(x): "foo"
 }
@@ -29,10 +26,6 @@ issue2473: one: {
 			example: c.env2
 		}
 	}
-	@test(eq, {
-		c: {env: "prod", env2: "prod"},
-		example: "prod"}
-	)
 }
 // A variant of the above which failed on v0.5.0 as well.
 issue2473: two: {
@@ -46,11 +39,6 @@ issue2473: two: {
 			example: env2
 		}
 	}
-	@test(eq, {
-		env:     "prod"
-		env2:    "prod"
-		example: "prod"
-	})
 }
 -- out/compile --
 --- in.cue

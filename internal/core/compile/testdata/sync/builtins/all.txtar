@@ -1,14 +1,12 @@
 -- in.cue --
 fatalArg: {
-	x: len("eee" + 'eee') @test(err, code=eval,
-		contains="invalid operands",
-		args= ["eee", 'eee', string, bytes], pos=[0:9, 0:17])
+	x: len("eee" + 'eee')
 }
 
 // don't call builtin for a permanent error of a child node
 fatalChild: {
 	#b: {}
-	x: and([{a: #b.c}]) @test(err, at=a, code=eval, contains="undefined field: c", pos=[0:17])
+	x: and([{a: #b.c}])
 }
 
 // allow incomplete child values. The error will persist after `and` is
@@ -16,10 +14,7 @@ fatalChild: {
 // complete later.
 okIncompleteChild: {
 	b: {}
-	x: and([{a: b.c}, {b: 1}]) @test(eq, {
-		a: _|_ @test(err, code=incomplete, contains="undefined field: c")
-		b: 1
-	})
+	x: and([{a: b.c}, {b: 1}])
 }
 -- issue3412.cue --
 // Tests that using and() in a pattern constraint with a definition
@@ -31,11 +26,8 @@ andInPattern: {
 	out: {
 		[and(#constraints)]: _
 		someKey: {}
-	} @test(eq, {
-		[=~"^.*$"]: _
-		someKey: {}
-	})
-	#constraints: [=~"^.*$"] @test(eq, [=~"^.*$"])
+	}
+	#constraints: [=~"^.*$"]
 }
 -- out/compile --
 --- in.cue

@@ -3,39 +3,39 @@ import "list"
 
 a1list: [{1}]
 let A1 = a1list
-a1: 100*A1[0] + A1[0] @test(eq, 101)
+a1: 100*A1[0] + A1[0]
 
 a2list: [{2}]
 let A2 = a2list
-a2: b: 100*A2[0] + A2[0] @test(eq, 202)
+a2: b: 100*A2[0] + A2[0]
 
 a3list: [{3}]
 let A3 = a3list
-a3: b: c: 100*A3[0] + A3[0] @test(eq, 303)
+a3: b: c: 100*A3[0] + A3[0]
 
 a4list: [{4}]
 let A4 = a4list
-a4: [for x in A4 {v: 404}] @test(eq, [{v: 404}])
+a4: [for x in A4 {v: 404}]
 
 a5list: [{5}]
 let A5 = a5list
-a5: b: [for x in A5 {v: 505}] @test(eq, [{v: 505}])
+a5: b: [for x in A5 {v: 505}]
 
 a6list: [{6}]
 let A6 = a6list
-a6: b: c: [for x in A6 {v: 606}] @test(eq, [{v: 606}])
+a6: b: c: [for x in A6 {v: 606}]
 
 a7list: [{7}]
 let A7 = a7list
-a7: {for x in A7 {v: 707}} @test(eq, {v: 707})
+a7: {for x in A7 {v: 707}}
 
 a8list: [{8}]
 let A8 = a8list
-a8: b: {for x in A8 {v: 808}} @test(eq, {v: 808})
+a8: b: {for x in A8 {v: 808}}
 
 a9list: [{9}]
 let A9 = a9list
-a9: b: c: {for x in A9 {v: 909}} @test(eq, {v: 909})
+a9: b: c: {for x in A9 {v: 909}}
 
 // Issue #609:
 // When a let value resolved to an incomplete value, it should pass this
@@ -55,22 +55,12 @@ incompleteLet: {
 		let mx = list.max
 
 		min: mn
-		max: mx @test(err, code=incomplete, contains="undefined field: max", pos=[-3:17])
+		max: mx
 	}
 
 	x: {
-		if list.max < 0 {
-		}
+		if list.max < 0 {}
 	}
-	@test(eq, {
-		input: [1, 2, 3, 4, 5]
-		last: {min: 1, max: 5}
-		bar: {
-			min: 1
-			max: _|_ @test(err, code=incomplete, contains="incompleteLet.bar.max: undefined field: max", pos=[54:17])
-		}
-		x: _|_ @test(err, code=incomplete, contains="incompleteLet.x: undefined field: max", pos=[61:11])
-	})
 }
 
 // Let references should also work inside embedded scalars.
@@ -80,23 +70,19 @@ scalarReference: {
 		5
 		let x = 6
 		#b: x
-		@test(eq, {5, #b: 6})
 	}
 	inScalar: p1: {
 		#b: x
 		let x = 6
 		5
-		@test(eq, {5, #b: 6})
 	}
 	inList: p0: {
-		let x = { a: 1 }
-		[ x ]
-		@test(eq, [{a: 1}])
+		let x = {a: 1}
+		[x]
 	}
 	inList: p1: {
-		[ x ]
-		let x = { a: 1 }
-		@test(eq, [{a: 1}])
+		[x]
+		let x = {a: 1}
 	}
 }
 
@@ -108,13 +94,11 @@ issue1116: {
 		#a: ["a", "b"]
 		let List = #a
 		List[len(List)-1]
-		@test(eq, {"b", #a: ["a", "b"]})
 	}
 	b: {
 		let List = #a
 		List[len(List)-1]
 		#a: ["a", "b"]
-		@test(eq, {"b", #a: ["a", "b"]})
 	}
 }
 -- out/compile --

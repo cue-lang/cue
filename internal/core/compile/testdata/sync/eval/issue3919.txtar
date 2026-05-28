@@ -16,16 +16,12 @@ full: {
 			port: int | *30080
 		}
 	}
-	@test(eq, {
-		out: {env: {PORT: 30080}, port: *30080 | int}
-	})
 }
 reduced: {
 	if true {
 		a: math.Abs(port)
 	}
 	port: int | *30080
-	@test(eq, {a: 30080, port: *30080 | int})
 }
 -- secondary.cue --
 related: {
@@ -45,22 +41,6 @@ related: {
 			bar_total: foo.fooData.total
 		}
 	}
-	@test(eq, {
-		foo: {
-			fooData: {
-				total: {tags: {extra: {}}}
-				_hidden: {extra: {}}
-			}
-			shared: {all_total: {tags: {extra: {}}}}
-		}
-		#Tags: {}
-		bar: {
-			shared: {
-				bar_total: {tags: {extra: {}}}
-				all_total: {tags: {extra: {}}}
-			}
-		}
-	})
 }
 -- let.cue --
 // issue3931: evalv3 raises "field set was already referenced" when processing
@@ -79,21 +59,13 @@ issue3931: full: {
 		label?: string
 		expr?: [...string]
 	}
-	@test(eq, {
-		bar: {
-			bar1: {
-				spec: {selector: {label: "foo", expr?: []}}
-			}
-		}
-		foo: {label: "foo"}
-	})
 }
 -- issue3946.cue --
 // issue3946: evalv3 regression reporting a cyclic reference error when a field
 // is inserted and then referenced within a comprehension expression.
 // https://cuelang.org/issue/3946
-issue3946: reduced:{
-	out: [for _, v in _inputs { v }]
+issue3946: reduced: {
+	out: [for _, v in _inputs {v}]
 	_inputs: [_]: {
 		doExtra?: bool
 		if doExtra != _|_ {
@@ -105,15 +77,6 @@ issue3946: reduced:{
 	if true {
 		_inputs: input1: name: "input1"
 	}
-	@test(eq, {
-		out: [{
-			doExtra?: bool
-			name:     "input1"
-		}]
-		_inputs: {
-			input1: {name: "input1", doExtra?: bool}
-		}
-	})
 }
 -- out/compile --
 --- in.cue

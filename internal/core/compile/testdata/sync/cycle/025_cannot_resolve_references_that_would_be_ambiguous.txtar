@@ -2,16 +2,16 @@
 #evalFull
 -- in.cue --
 a1: *0 | 1
-a1: a3 - a2 @test(err, code=cycle, pos=[2:10])
+a1: a3 - a2
 a2: *0 | 1
-a2: a3 - a1 @test(err, code=cycle, pos=[0:10])
-a3: 1 @test(eq, 1)
+a2: a3 - a1
+a3: 1
 
-b1: (*0 | 1) & b2 @test(eq, 0|1)
-b2: (0 | *1) & b1 @test(eq, 0|1)
+b1: (*0 | 1) & b2
+b2: (0 | *1) & b1
 
-c1: (*{a: 1} | {b: 1}) & c2 @test(eq, {a: 1, b: 2} | {b: 1, a: 2})
-c2: (*{a: 2} | {b: 2}) & c1 @test(eq, {a: 2, b: 1} | {b: 2, a: 1})
+c1: (*{a: 1} | {b: 1}) & c2
+c2: (*{a: 2} | {b: 2}) & c1
 -- out/compile --
 --- in.cue
 {

@@ -8,22 +8,22 @@
 	#def: {a: "A"}
 	#def: {b: "B"}
 }
-d1: #D1 & {env: c: "C" } @test(err, at=env.c, code=eval, contains="field not allowed", pos=[0:17])
+d1: #D1 & {env: c: "C"}
 #D2: {
 	a: int
 }
 #D2: {
 	b: int
-} @test(eq, {a: int, b: int})
+}
 #D3: {
 	env: a: "A"
 }
 #D3: {
 	env: b: "B"
-} @test(eq, { env: { a: "A", b: "B" } })
+}
 #D4: {
 	env: #DC
-	env: b: int @test(err, code=eval, contains="field not allowed", pos=[0:7])
+	env: b: int
 }
 #DC: {a: int}
 -- out/compile --

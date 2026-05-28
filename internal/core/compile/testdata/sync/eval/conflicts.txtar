@@ -3,18 +3,10 @@ i: int
 s: string
 
 t0: {
-	@test(err, code=eval, at=v,
-		contains="conflicting values",
-		args=[int, string],
-		pos=[-3:4, -2:4, 5:5, 5:9])
 	v: i & s
 }
 
 t1: {
-	@test(err, code=eval, at=x.a.b,
-		contains="conflicting values",
-		args=[3, 4],
-		pos=[6:9, 10:9, 13:5, 13:11])
 	#d1: {
 		a: b: 3
 	}
@@ -24,11 +16,6 @@ t1: {
 	}
 
 	x: #d1 & #d2
-	@test(eq, {
-		#d1: a: b: 3
-		#d2: a: b: 4
-		x: a: b: _|_
-	})
 }
 -- out/compile --
 --- in.cue

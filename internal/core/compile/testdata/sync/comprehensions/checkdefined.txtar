@@ -14,40 +14,32 @@ xo: field: {}
 
 okc0: {
 	if xc.undefined == _|_ {a: 1}
-	@test(eq, {a: 1})
 }
 oko0: {
 	if xo.undefined == _|_ {a: 1}
-	@test(eq, {a: 1})
 }
 
 okc1: {
 	if xc.undefined != _|_ {a: 1}
-	@test(eq, {})
 }
 oko1: {
 	if xo.undefined != _|_ {a: 1}
-	@test(eq, {})
 }
 
 okc2: {
 	if ({} & {s: [for y in xc.undefined {}]}) != _|_ {a: 1}
-	@test(eq, {})
 }
 
 oko2: {
 	if ({} & {s: [for y in xo.undefined {}]}) != _|_ {a: 1}
-	@test(eq, {a: 1})
 }
 
 okc3: {
 	if ({s: [for y in xc.undefined {}]}) != _|_ {a: 1}
-	@test(eq, {})
 }
 
 oko3: {
 	if ({s: [for y in xo.undefined {}]}) != _|_ {a: 1}
-	@test(eq, {a: 1})
 }
 
 // Should Field s exist in okc or not? Depends on whether comparison to bottom
@@ -61,7 +53,6 @@ issue1969: okc: {
 	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
 
 	if Y != _|_ {Y}
-	@test(eq, {})
 }
 
 issue1969: oko: {
@@ -69,9 +60,6 @@ issue1969: oko: {
 	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
 
 	if Y != _|_ {Y}
-	@test(eq, {
-		s: _|_ @test(err, code=incomplete, contains="issue1969.oko.X: undefined field: undefined", pos=[62:13])
-	})
 }
 -- issue2245.cue --
 // Evaluator regression where comparing an incomplete struct to bottom in a
@@ -80,20 +68,13 @@ issue1969: oko: {
 yo: {
 	f: int
 	g: f < 10
-	@test(eq, {
-		f: int
-		g: _|_ @test(err, code=incomplete, contains="yo.g: non-concrete value int in operand to <", pos=[6:5, 5:5])
-	})
 }
 okyo: {
 	if yo != _|_ {a: 1}
-	@test(eq, {a: 1})
 }
 okyog: {
 	if yo.g != _|_ {a: 1}
-	@test(eq, {})
 }
-
 -- incomplete.cue --
 // Comparing to string is not an error. But for legacy reasons we want to still
 // support this. We intend to have more clean and precise behavior with the
@@ -106,22 +87,19 @@ checkIncomplete: t1: {
 		a: string
 	}
 	f: blah: {}
-	@test(eq, {f: {blah: {a: string}}})
 }
-
 -- structs.cue --
 structs: {
-	bare: t1: ({y: 2} & {x: 3}) != _|_        @test(eq, true)
-	bare: f2: ({y: 2} & {x: 3}) == _|_        @test(eq, false)
-	bare: f3: ({x: 1, y: 2} & {x: 3}) != _|_  @test(eq, false)
-	bare: t4: ({x: 1, y: 2} & {x: 3}) == _|_  @test(eq, true)
+	bare: t1: ({y: 2} & {x: 3}) != _|_
+	bare: f2: ({y: 2} & {x: 3}) == _|_
+	bare: f3: ({x: 1, y: 2} & {x: 3}) != _|_
+	bare: t4: ({x: 1, y: 2} & {x: 3}) == _|_
 
-	select: t1: ({y: 2} & {x: 3}).y != _|_        @test(eq, true)
-	select: f2: ({y: 2} & {x: 3}).y == _|_        @test(eq, false)
-	select: f3: ({x: 1, y: 2} & {x: 3}).y != _|_  @test(eq, false)
-	select: t4: ({x: 1, y: 2} & {x: 3}).y == _|_  @test(eq, true)
+	select: t1: ({y: 2} & {x: 3}).y != _|_
+	select: f2: ({y: 2} & {x: 3}).y == _|_
+	select: f3: ({x: 1, y: 2} & {x: 3}).y != _|_
+	select: t4: ({x: 1, y: 2} & {x: 3}).y == _|_
 }
-
 -- out/compile --
 --- in.cue
 {

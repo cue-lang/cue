@@ -15,12 +15,12 @@ _#x: {
 x1: #x & {
 	Name: "hello"
 	Age:  50
-} @test(err, code=eval, at=Age, contains="field not allowed", pos=[2:2])
+}
 
 x2: _#x & {
 	Name: "hello"
 	Age:  50
-} @test(err, code=eval, at=Age, contains="field not allowed", pos=[2:2])
+}
 -- out/compile --
 --- in.cue
 {

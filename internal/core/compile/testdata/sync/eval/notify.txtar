@@ -1,29 +1,16 @@
 -- in.cue --
 t1: {
-	@test(permute)
 	a
-	a: a: 2|1
-	// TODO(inline): fix args passing: match brackets
-	@test(err, code=eval, contains="empty disjunction",
-		suberr=(code=eval, contains="conflicting values", pos=[0:5, 2:2, 3:10]),
-		suberr=(code=eval, contains="conflicting values", pos=[0:5, 2:2, 3:8]),
-	)
+	a: a: 2 | 1
 }
 t2: {
-	@test(permute, count=2)
 	d: d.a
-	d: a: a: 2|1
-	@test(err, code=eval, contains="empty disjunction",
-		suberr=(code=eval, contains="conflicting values", pos=[2:5, 3:5, 3:13]),
-		suberr=(code=eval, contains="conflicting values", pos=[2:5, 3:5, 3:11]),
-	)
+	d: a: a: 2 | 1
 }
 t3: {
-	@test(permute, count=6)
 	b: a
-	b: (1|2) | 2
+	b: (1 | 2) | 2
 	a: 1 | 2
-	@test(eq, {b: 1 | 2, a: 1 | 2})
 }
 -- issue3437.cue --
 // Panic with a structurally recursive disjunction where a field aliases to
@@ -31,39 +18,8 @@ t3: {
 // https://cuelang.org/issue/3437
 issue3437: {
 	r: L=L.a
-	d: a: a: a: {b: 4}|d
-	out: r&d
-	// TODO(perf): either use structure sharing or stronger pruning. This seems
-	// disproportional.
-	@test(eq, {
-		r: _|_ @test(err, code=incomplete, contains="issue3437.r: undefined field: a", pos=[5:9])
-		d: {a: {a: {a: {b: 4}}}}
-		out: {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}, b: 4} | {a: {a: {
-		a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}
-	}, b: 4} | {a: {
-		a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}, b: 4} | {a: {
-		a: {a: {b: 4}, b: 4} | {a: {a: {a: {b: 4}}, b: 4}}
-	}}}
-	}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}, b: 4} | {a: {
-		a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}}}}
-	}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}, b: 4} | {a: {
-		a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}}}}
-	}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}, b: 4} | {a: {
-		a: {a: {b: 4}, b: 4} | {a: {a: {a: {b: 4}}, b: 4}}
-	}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}, b: 4} | {a: {a: {a: {b: 4}}, b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}, b: 4} | {a: {a: {a: {b: 4}, b: 4}, b: 4}}}}}}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}, b: 4} | {a: {a: {
-		a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}
-	}, b: 4} | {a: {
-		a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}, b: 4} | {a: {
-		a: {a: {b: 4}, b: 4} | {a: {a: {a: {b: 4}}, b: 4}}
-	}}}
-	}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}, b: 4} | {a: {
-		a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}}}}
-	}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}, b: 4} | {a: {
-		a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}}}}
-	}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}, b: 4} | {a: {
-		a: {a: {b: 4}, b: 4} | {a: {a: {a: {b: 4}}, b: 4}}
-	}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}}}}, b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}}}}, b: 4} | {a: {a: {a: {b: 4}, b: 4} | {a: {a: {a: {b: 4}}, b: 4}}, b: 4} | {a: {a: {a: {b: 4}, b: 4}, b: 4} | {a: {a: {a: {b: 4}, b: 4}, b: 4}}}}}}}}}}
-	})
+	d: a: a: a: {b: 4} | d
+	out: r & d
 }
 -- out/compile --
 --- in.cue

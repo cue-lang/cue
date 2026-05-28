@@ -9,32 +9,22 @@ import "strings"
 	let splits = strings.Split(id, "_never_")
 	let prefix = splits[0]
 
-	#ID:    =~"^\(prefix)$" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:12, -2:22])
-	#SubID: =~"^\(prefix):sub$" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:12, -3:22])
+	#ID:    =~"^\(prefix)$"
+	#SubID: =~"^\(prefix):sub$"
 
-	id:    #ID @test(err, code=incomplete, contains="invalid interpolation", pos=[-3:12, -5:22])
-	subid: #SubID @test(err, code=incomplete, contains="invalid interpolation", pos=[-3:12, -6:22])
+	id:    #ID
+	subid: #SubID
 }
 
 case1: #schema & {
 	id:    "foo"
 	subid: "foo:sub"
-} @test(eq, {
-	id: "foo"
-	subid: "foo:sub"
-	#ID: =~"^foo$"
-	#SubID: =~"^foo:sub$"
-})
+}
 
 case2: #schema & {
 	subid: "foo:sub"
 	id:    "foo"
-} @test(eq, {
-	subid: "foo:sub"
-	id: "foo"
-	#ID: =~"^foo$"
-	#SubID: =~"^foo:sub$"
-})
+}
 -- out/compile --
 --- in.cue
 {

@@ -8,22 +8,21 @@ foo: {
 	#def:    3
 	regular: 4
 	_hidden: 5
-	@test(eq, {opt?: 1, txt: 2, #def: 3, regular: 4, _hidden: 5})
 }
-comp: { for k, v in foo {"\(k)": v} } @test(eq, {txt: 2, regular: 4})
+comp: {for k, v in foo {"\(k)": v}}
 select: {
-	opt:     foo.opt     @test(err, code=incomplete, contains="cannot reference optional field", pos=[0:15])
-	"txt":   foo.txt     @test(eq, 2)
-	#def:    foo.#def    @test(eq, 3)
-	regular: foo.regular @test(eq, 4)
-	_hidden: foo._hidden @test(eq, 5)
+	opt:     foo.opt
+	"txt":   foo.txt
+	#def:    foo.#def
+	regular: foo.regular
+	_hidden: foo._hidden
 }
 index: {
-	opt:     foo["opt"]     @test(err, code=incomplete, contains="cannot reference optional field", pos=[0:15])
-	"txt":   foo["txt"]     @test(eq, 2)
-	#def:    foo["#def"]    @test(err, code=incomplete, contains="undefined field", pos=[0:15])
-	regular: foo["regular"] @test(eq, 4)
-	_hidden: foo["_hidden"] @test(err, code=incomplete, contains="undefined field", pos=[0:15])
+	opt:     foo["opt"]
+	"txt":   foo["txt"]
+	#def:    foo["#def"]
+	regular: foo["regular"]
+	_hidden: foo["_hidden"]
 }
 -- out/compile --
 --- in.cue

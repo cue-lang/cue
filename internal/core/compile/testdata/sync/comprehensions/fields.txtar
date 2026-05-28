@@ -12,7 +12,6 @@ dynamic: {
 		(s):       1
 		"\(s)bar": 2
 	}
-	@test(eq, {foo: 1, foobar: 2})
 }
 
 ignoreOptional: {
@@ -23,17 +22,13 @@ ignoreOptional: {
 	}
 
 	y: {
-		for k,v in #x {
+		for k, v in #x {
 			(k): "exists"
 		}
 	}
-	@test(eq, {
-		#x: {a?: string, b?: string, c: string}
-		y: {c: "exists"}
-	})
 }
 
-missingRequiredError:  {
+missingRequiredError: {
 	// Issue #2369
 	#x: {
 		a!: string
@@ -42,11 +37,10 @@ missingRequiredError:  {
 	}
 
 	y: {
-		for k,v in #x {
+		for k, v in #x {
 			(k): "exists"
 		}
 	}
-	@test(err, code=incomplete, at=y, contains="missing required field", pos=[9:3, 3:3, 9:14])
 }
 
 // issue560: Tests that for comprehensions over definitions with interpolated
@@ -60,29 +54,13 @@ issue560: {
 				"\(v)": string
 			}
 			"{a}": string
-		} @test(err, code=incomplete,
-			contains="error in call to %s", args=[strings.Split],
-			pos=[1:16, -1:13])
+		}
 	}
 
 	user: {
 		#User
 		tags_str: "b {c}"
 	}
-	@test(eq, {
-		#User: {
-			tags_str: string
-			tags_map: {"{a}": string}
-		}
-		user: {
-			tags_str: "b {c}"
-			tags_map: {
-				"{a}": string
-				b: string
-				"{c}": string
-			}
-		}
-	})
 }
 -- out/compile --
 --- in.cue

@@ -4,12 +4,8 @@ t: {
 	if #ok {
 		x: int
 	}
-	@test(eq, {
-		#ok: *true | bool
-		x:   int
-	})
 }
-s: t & {#ok: false} @test(eq, {#ok: false})
+s: t & {#ok: false}
 -- out/compile --
 --- in.cue
 {

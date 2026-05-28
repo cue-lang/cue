@@ -3,21 +3,12 @@ t0: {
 	a=_a: _
 	let _b = a
 	_out: _b
-	@test(eq, {
-		_a: _
-		let _b = _
-		_out: _
-	})
 }
 t1: {
 	_a: b
 	let b = c
 	c=d: 3
-} @test(eq, {
-	_a: 3
-	let b = 3
-	d: 3
-})
+}
 -- out/compile --
 --- in.cue
 {

@@ -19,21 +19,6 @@ elipsis: {
 		_
 	}
 	check: test1 & #Def
-
-	@test(eq, {
-		test1: {
-			string
-			#foo: "bar"
-		}
-		#Def: {
-			#foo: string
-			_
-		}
-		check: {
-			string
-			#foo: "bar"
-		}
-	})
 }
 
 bulk: {
@@ -47,11 +32,7 @@ bulk: {
 		#foo:     string
 		_
 	}
-	check: test1 & #Def @test(eq, {
-		[string]: int
-		#foo:     "bar"
-		string
-	}) @test(closed, hint="could be either")
+	check: test1 & #Def
 }
 
 optional: {
@@ -65,11 +46,7 @@ optional: {
 		#foo: string
 		_
 	}
-	check: test1 & #Def  @test(eq, {
-		string
-		bar?: int
-		#foo: "bar"
-	})
+	check: test1 & #Def
 }
 
 // Tests that unifying a struct with an embedded scalar and definition fields
@@ -97,35 +74,18 @@ issue783: {
 	} | {
 		string
 		#foo: string
-	} @test(eq, {
-		#foo: string
-	} | {
-		string
-		#foo: string
-	})
+	}
 
-	check1a: test1 & #Def1 @test(eq, {
-		string
-		#foo: "bar"
-	})
-	check1b: test2 & #Def1 @test(eq, {
-		hello: "world"
-		#foo:  "bar"
-	})
+	check1a: test1 & #Def1
+	check1b: test2 & #Def1
 
 	#Def2: {
 		...
 		#foo: string
 		_
 	}
-	check2a: test1 & #Def2 @test(eq, {
-		string
-		#foo: "bar"
-	})
-	check2b: test2 & #Def2 @test(eq, {
-		hello: "world"
-		#foo:  "bar"
-	})
+	check2a: test1 & #Def2
+	check2b: test2 & #Def2
 }
 -- out/compile --
 --- in.cue

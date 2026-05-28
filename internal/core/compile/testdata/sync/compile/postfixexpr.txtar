@@ -7,29 +7,28 @@ language: version: "v0.15.0"
 
 #Base: {
 	x: int
-} @test(shareID=Base)
+}
 
 // Test postfix ... operator with struct
-a: #Base... @test(shareID=Base)
+a: #Base...
 
 // Test with selector
-b: foo.bar... @test(err, code=incomplete, contains="undefined field: bar", pos=[0:8])
+b: foo.bar...
 
 // Test with parentheses
-c: (x & y)... @test(eq, _)
+c: (x & y)...
 
 // Test with function call
-d: fn()... @test(err, code=incomplete, contains="cannot call non-concrete value fn", pos=[0:4])
+d: fn()...
 
 // As an expression
-e: #Base... & {y: int} @test(eq, {y: int, x: int})
+e: #Base... & {y: int}
 
-foo: {} @test(eq, {})
+foo: {}
 
-x:  _ @test(eq, _)
-y:  _ @test(eq, _)
-fn: _ @test(eq, _)
-
+x:  _
+y:  _
+fn: _
 -- out/compile --
 --- with_experiment.cue
 {

@@ -17,16 +17,7 @@ s: #T & {
 		foo: otherField: string
 	}
 	concrete: foo: otherField: "hello"
-} @test(closed) @test(eq, {
-	#Schema: foo: {
-		fieldWithDefault: *0 | int
-		otherField:       string
-	}
-	concrete: foo: {
-		fieldWithDefault: *0 | int
-		otherField:       "hello"
-	}
-})
+}
 #Container: {
 	Env: [Name=string]: {
 		name:  string
@@ -44,20 +35,7 @@ Something: {
 		"a thing": Env: foobar: value: "foo"
 	}
 }
-x: Something & #Deployment @test(closed) @test(eq, {
-	#Containers: {
-		"a thing": Env: foobar: {
-			value: "foo"
-			name:  string
-		}
-	}
-	containers: [{
-		Env: foobar: {
-			name:  string
-			value: "foo"
-		}
-	}]
-})
+x: Something & #Deployment
 -- out/compile --
 --- in.cue
 {

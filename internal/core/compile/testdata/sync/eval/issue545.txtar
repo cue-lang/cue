@@ -26,31 +26,6 @@ t1: {
 	bar: #Test & {
 		source: foo
 	}
-	@test(eq, {
-		#Test: {
-			#HTTP: =~"^http://"
-			#SSH: !~"^ssh://"
-			#USER: strings.MinRunes(3)
-			source: =~"^http://" | !~"^ssh://" | strings.MinRunes(3)
-		}
-		foo: {
-			source: "http://blablabla"
-			#HTTP: =~"^http://"
-			#SSH: !~"^ssh://"
-			#USER: strings.MinRunes(3)
-		}
-		bar: {
-			source: {
-				source: "http://blablabla"
-				#HTTP: =~"^http://"
-				#SSH: !~"^ssh://"
-				#USER: strings.MinRunes(3)
-			}
-			#HTTP: =~"^http://"
-			#SSH: !~"^ssh://"
-			#USER: strings.MinRunes(3)
-		}
-	})
 }
 
 t2: {
@@ -62,15 +37,6 @@ t2: {
 	d: time.Time
 	e: time.Time()
 	f: d & e & d & e
-	@test(eq, {
-		str: "foo"
-		a: =~"foo"
-		b: =~"foo"
-		c: =~"foo"
-		d: time.Time()
-		e: time.Time()
-		f: time.Time()
-	})
 }
 -- out/compile --
 --- in.cue

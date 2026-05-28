@@ -2,9 +2,7 @@
 # an empty disjunction error. Issue #23.
 -- in.cue --
 x: {a: 1} | {a: 2}
-y: x & {a: 3} @test(err, code=eval,
-	suberr=(code=eval, contains="conflicting values", args=[1, 3], pos=[in.cue:1:8, in.cue:2:4, in.cue:2:12]),
-	suberr=(code=eval, contains="conflicting values", args=[2, 3], pos=[in.cue:1:17, in.cue:2:4, in.cue:2:12]))
+y: x & {a: 3}
 -- out/compile --
 --- in.cue
 {

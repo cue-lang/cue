@@ -2,11 +2,10 @@
 bulkToSelf: {
 	a: {
 		foo: [string]: int
-		foo: bar:      "3" @test(err, any, code=eval, contains="conflicting values")
+		foo: bar:      "3"
 	}
 }
 intField: {
-	@test(err, code=eval, contains="integer fields not supported", pos=[2:3])
 	(2): string
 }
 -- out/compile --

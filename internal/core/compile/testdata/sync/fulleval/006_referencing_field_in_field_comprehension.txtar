@@ -1,7 +1,6 @@
 -- in.cue --
 a: {b: c: 4}
 a: {
-	@test(eq, {b: {c: 4, d: 5}, c: 4, d: 5})
 	b: d: 5
 	for k, v in b {
 		"\(k)": v

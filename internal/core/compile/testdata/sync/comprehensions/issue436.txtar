@@ -6,7 +6,6 @@
 #a: {
 	val:    string
 	result: string
-	@test(closed)
 }
 
 a: #a & {
@@ -15,15 +14,15 @@ a: #a & {
 	if (val == "match") {
 		result: "matched"
 	}
-} @test(eq, {val: *"default" | string, result: *"not-matched" | string}) @test(closed)
+}
 
 match: a & {
 	val: "match"
-} @test(eq, {val: "match", result: "matched"}) @test(closed)
+}
 
 not: a & {
 	val: "other"
-} @test(eq, {val: "other", result: *"not-matched" | string}) @test(closed)
+}
 -- out/compile --
 --- in.cue
 {

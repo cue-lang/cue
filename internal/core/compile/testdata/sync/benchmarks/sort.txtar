@@ -9,9 +9,6 @@ _b: [_a, _a, _a, _a, _a, _a, _a, _a, _a, _a]
 _c: [_b, _b, _b, _b, _b, _b, _b, _b, _b, _b]
 
 out: list.Sort(list.FlattenN(_c, 4), {x: _, y: _, less: x.name < y.name})
-
-@test(eq, at=out.0, {name: 0})
-@test(eq, at=out.899, {name: 9})
 -- out/compile --
 --- in.cue
 {

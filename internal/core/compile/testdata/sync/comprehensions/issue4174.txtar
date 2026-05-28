@@ -14,7 +14,7 @@ if false {
 	a: neverAdded: {}
 }
 
-a: _ @test(eq, {})
+a: _
 -- out/compile --
 --- in.cue
 {

@@ -7,8 +7,8 @@ if #E["y"] != _|_ {
 }
 #E: [_]: bool
 #E: x:   true
-#E: _ @test(eq, {y: true, x: true})
-z: _ @test(eq, true)
+#E: _
+z:  _
 -- out/compile --
 --- in.cue
 {

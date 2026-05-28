@@ -1,9 +1,9 @@
 See https://en.wikipedia.org/wiki/Billion_lauHs_attack.
 -- in.cue --
-f: [g, g, g, g, g, g, g]                  @test(shareID=G, at=0) @test(shareID=G, at=3) @test(shareID=G, at=6)
-g: [h, h, h, h, h, h, h] @test(shareID=G) @test(shareID=H, at=0) @test(shareID=H, at=3) @test(shareID=H, at=6)
-h: [i, i, i, i, i, i, i] @test(shareID=H) @test(shareID=I, at=0) @test(shareID=I, at=3) @test(shareID=I, at=6)
-i: [j, j, j, j, j, j, j] @test(shareID=I)
+f: [g, g, g, g, g, g, g]
+g: [h, h, h, h, h, h, h]
+h: [i, i, i, i, i, i, i]
+i: [j, j, j, j, j, j, j]
 j: 1
 -- out/compile --
 --- in.cue

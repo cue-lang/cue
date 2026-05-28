@@ -6,35 +6,30 @@
 freezing: t1: ok: {
 	#a: x: "a"
 	len(#a) // 1
-	@test(eq, {1, #a: {x: "a"}})
 }
-
 -- comprehension.cue --
 // This should be an incomplete error, as z is inserted in x, over which the
 // comprehension loops. Adding a field z to x would fix this.
 // This test would fail in the old evaluator, depending on ordering.
 comprehension: t1: _
-comprehension: t1: ok:{
-	@test(permute, count=)
+comprehension: t1: ok: {
 
 	x: y: {}
 	// order of comprehensions matter in old evaluator.
 	for _ in x {
-		if true { x: z: a: {} }
+		if true {x: z: a: {}}
 	}
 	if true {
-		if true { x: z: a: {} }
+		if true {x: z: a: {}}
 	}
-	@test(eq, {x: {y: {}, z: {a: {}}}})
 }
 
 comprehension: t2: err: {
 	a: {
 		x: 1
 		for k, v in a {
-			(k+"q"): v // This increases the set of fields in a.
+			(k + "q"): v // This increases the set of fields in a.
 		}
-		@test(err, code=eval, contains="adding field %v not allowed as field set was already referenced", args=[xq], pos=[3:13])
 	}
 }
 
@@ -44,17 +39,13 @@ comprehension: t3: err: {
 	b: y: 1
 	a: {
 		for k, v in b {
-			(k+"q"): v
+			(k + "q"): v
 		}
-		@test(err, code=eval,
-			suberr=(code=eval, contains="adding field %v not allowed as field set was already referenced", args=[yq], pos=[2:13]),
-			suberr=(code=eval, contains="adding field %v not allowed as field set was already referenced", args=[xq], pos=[2:13]))
 	}
 	b: {
 		for k, v in a {
 			(k): v
 		}
-		@test(eq, {y: 1, x: 1})
 	}
 }
 
@@ -62,9 +53,8 @@ comprehension: t4: ok: {
 	// It is okay to make x more specific as long as no fields are added.
 	x: y: {}
 	for _ in x {
-		if true { x: y: a: {} }
+		if true {x: y: a: {}}
 	}
-	@test(eq, {x: {y: {a: {}}}})
 }
 
 comprehension: moreSpecific: ok: {
@@ -73,7 +63,6 @@ comprehension: moreSpecific: ok: {
 		for k, v in a {
 			(k): 1
 		}
-		@test(eq, {x: 1})
 	}
 }
 
@@ -84,8 +73,6 @@ comprehension: moreSpecific: err: {
 		for k, v in a if len(v) > 0 {
 			(k): {z: 1}
 		}
-		@test(err, code=eval, path=x,
-			contains="adding field %v not allowed as field set was already referenced", args=[z], pos=[4:9])
 	}
 }
 -- issue3178.cue --
@@ -97,14 +84,12 @@ issue3178: {
 	// - second comprehension runs
 	// - in order to satisfy, first comprehension must run
 	// - first comprehension runs and completes
-	input: [ "Value" ]
+	input: ["Value"]
 	output: {...}
 	for name in input {
-			output: "\(name)": true
+		output: "\(name)": true
 	}
-	for name, v in output {
-	}
-	@test(eq, {input: ["Value"], output: {Value: true}})
+	for name, v in output {}
 }
 -- out/compile --
 --- comprehension.cue

@@ -1,13 +1,13 @@
 -- in.cue --
-a: 1     @test(eq, 1)
-b: a + 1 @test(eq, 2)
+a: 1
+b: a + 1
 d: {
 	x: _
-	y: b + x @test(err, code=incomplete, contains="non-concrete value", pos=[0:5, -1:5])
+	y: b + x
 }
 e: d & {
 	x: 5
-} @test(eq, {x: 5, y: 7})
+}
 -- out/compile --
 --- in.cue
 {

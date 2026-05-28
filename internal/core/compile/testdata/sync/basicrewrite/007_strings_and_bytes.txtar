@@ -1,15 +1,15 @@
 -- in.cue --
-s0: "foo" + "bar" @test(eq, "foobar")
-s1: 3 * "abc"     @test(eq, "abcabcabc")
-s2: "abc" * 2     @test(eq, "abcabc")
+s0: "foo" + "bar"
+s1: 3 * "abc"
+s2: "abc" * 2
 
-b0: 'foo' + 'bar' @test(eq, 'foobar')
-b1: 3 * 'abc'     @test(eq, 'abcabcabc')
-b2: 'abc' * 2     @test(eq, 'abcabc')
+b0: 'foo' + 'bar'
+b1: 3 * 'abc'
+b2: 'abc' * 2
 
 // TODO: consider the semantics of this and perhaps allow this.
-e0: "a" + ''  @test(err, code=eval)
-e1: 'b' + "c" @test(err, code=eval)
+e0: "a" + ''
+e1: 'b' + "c"
 -- out/compile --
 --- in.cue
 {

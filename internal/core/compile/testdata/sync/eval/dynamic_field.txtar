@@ -5,41 +5,32 @@
 -- in.cue --
 a: "foo"
 "\(a)": b: c: d: e
-e: 2 @test(eq, 2)
+e: 2
 
 b: "bar"
 X="\(b)": {
 	a: 1
 }
-c: X @test(eq, {a: 1})
+c: X
 
 withError: {
 	// Panic when running cue eval with a struct used in a string interpolation.
 	// https://cuelang.org/issue/799
 	issue799: {key: int32} & {"\(1 & 2)": 123}
-	// TODO(inline): access _wrapped_ error somehow: underlying error is
-	// "conflicting values 2 and 1".
-	@test(err, code=eval, contains="invalid interpolation", pos=[3:28, 3:31, 3:35])
 }
 
 parenExprRefParent: {
 	a: (x): {}
 	x: "foo"
-	@test(eq, {a: {foo: {}}, x: "foo"})
 }
 parenExprRefEqual: {
 	(x): {}
 	x: "foo"
-	@test(eq, {x: "foo", foo: {}})
 }
 chainedResolution: x: {
-	@test(permute, count=6)
 	(x.baz): "bar"
 	(x.foo): "baz"
-	baz: "foo"
-	@test(eq, {
-		baz: "foo", foo: "bar", bar: "baz"
-	})
+	baz:     "foo"
 }
 
 // A dynamic field key that references an incomplete value (string interpolation
@@ -52,30 +43,12 @@ noCycleError: {
 	}
 	foo: bar: entries: (foo.baz.#ID): true
 	foo: baz: {}
-	@test(err, at=foo.bar.entries, code=incomplete,
-		suberr=(code=incomplete, contains="dynamic field must be concrete", pos=[4:22]),
-		suberr=(code=incomplete, contains="non-concrete value string", pos=[2:8, 2:11]),
-	)
-	@test(err, at=foo.bar.#ID, code=incomplete, contains="non-concrete value string", pos=[2:8, 2:11])
-	@test(err, at=foo.baz.#ID, code=incomplete, contains="non-concrete value string", pos=[2:8, 2:11])
-
-	@test(eq, {
-		foo: {
-			bar: {
-				entries: _|_
-				#ID: _|_
-			}
-			baz: { #ID: _|_ }
-		}
-	})
 }
-
 -- constraints.cue --
 constraints: {
 	t1: "foo"
 	t2: "bar"
 	(t1)?: (t2)!: 3
-	@test(eq, {t1: "foo", t2: "bar", foo?: {bar!: 3}})
 }
 -- issue3828.cue --
 // evalv3 regression: a let inside a comprehension with a dynamic field key
@@ -84,12 +57,11 @@ constraints: {
 issue3828: reduced: {
 	a: b: {}
 	a: [_]: {
-		if true let x=str {
+		if true let x = str {
 			(x): true
 		}
 	}
 	str: "foobot1"
-	@test(eq, {a: {b: {foobot1: true}}, str: "foobot1"})
 }
 issue3828: full: {
 	orgs: org1: {
@@ -102,13 +74,6 @@ issue3828: full: {
 			collaborators: (repo_name): (orgBotUser): true
 		}
 	}
-	@test(eq, {
-		orgs: org1: {
-			repos: {repo1: {}}
-			collaborators: {repo1: {bot1: true}}
-		}
-		botUser: "bot1"
-	})
 }
 -- out/compile --
 --- constraints.cue

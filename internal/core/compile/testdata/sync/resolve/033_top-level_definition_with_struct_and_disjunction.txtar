@@ -11,7 +11,7 @@
 } | {
 	Type: "A"
 	Size: 1
-} @test(eq, {Type: "B", Text: string, Size: 0} | {Type: "A", Text: string, Size: 1})
+}
 -- out/compile --
 --- in.cue
 {

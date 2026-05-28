@@ -2,24 +2,18 @@
 a: {
 	{[name=_]: int}
 	k: 1
-} @test(eq, {k: 1})
+}
 b: {
 	{[X=_]: {x: 0, y: *1 | int}}
 	v: {}
 	w: {x: 0}
 }
-b: {[y=_]: {}} @test(eq, {
-	v: {x: 0, y: *1 | int}
-	w: {x: 0, y: *1 | int}
-})
+b: {[y=_]: {}}
 c: {
 	{[Name=_]: {name: Name, y: 1}}
 	foo: {}
 	bar: _
-} @test(eq, {
-	foo: {name: "foo", y: 1}
-	bar: {name: "bar", y: 1}
-})
+}
 -- out/compile --
 --- in.cue
 {

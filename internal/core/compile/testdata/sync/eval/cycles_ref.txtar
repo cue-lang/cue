@@ -1,11 +1,11 @@
 -- in.cue --
-a: b + 100 @test(eq, 200)
-b: a - 100 @test(eq, 100)
+a: b + 100
+b: a - 100
 a: 200
 
-c: d & {b: 2} @test(eq, {a: 1, b: 2})
-d: e          @test(eq, {a: 1, b: 2})
-e: {a: 1}     @test(eq, {a: 1, b: 2})
+c: d & {b: 2}
+d: e
+e: {a: 1}
 e: c
 -- out/compile --
 --- in.cue

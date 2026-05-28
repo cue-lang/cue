@@ -17,13 +17,6 @@ l: [...#X]
 l: [
 	{b: "bar"},
 ]
-
-@test(eq, {
-	#A: {a: string}
-	#B: {b: string}
-	#X: {a: string} | {b: string}
-	l: [{ b: "bar" }]
-})
 -- out/compile --
 --- in.cue
 {

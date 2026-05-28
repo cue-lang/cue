@@ -4,12 +4,12 @@
 -- in.cue --
 package repro
 
-a: [] @test(eq, [])
+a: []
 -- out.cue --
 package repro
 
-x: {for a in a {}}   @test(eq, {})
-y: {{{for a in a {}}}} @test(eq, {})
+x: {for a in a {}}
+y: {{{for a in a {}}}}
 -- out/compile --
 --- in.cue
 {

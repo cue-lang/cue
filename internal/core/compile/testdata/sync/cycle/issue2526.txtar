@@ -7,7 +7,6 @@ x: {
 	y
 	y: x
 }
-@test(err, code=structural_cycle, path=x.y, contains="structural cycle", pos=[])
 -- out/compile --
 --- in.cue
 {

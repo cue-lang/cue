@@ -6,19 +6,13 @@
 simplified: {
 	#T
 	in: _
-	x: #T
+	x:  #T
 	x: x: #T
 
 	#T: {
 		in: x
-		x: _
+		x:  _
 	}
-
-	@test(eq, {
-		in: {x: {in: _, x: _}, in: {in: _, x: _}}
-		x: {x: {in: _, x: _}, in: {in: _, x: _}}
-		#T: {in: _, x: _}
-	})
 }
 
 issue3571: {
@@ -35,26 +29,6 @@ issue3571: {
 		in:  #in
 		#in: _
 	}
-
-	@test(eq, {
-		a: {
-			in: {
-				f: true
-				g: {
-					#in: {f: {#in: {x: true}, in: {x: true}}}
-					in: {f: {#in: {x: true}, in: {x: true}}}
-				}
-			}
-			#in: {
-				g: {
-					#in: {f: {#in: {x: true}, in: {x: true}}}
-					in: {f: {#in: {x: true}, in: {x: true}}}
-				}
-				f?: _
-			}
-		}
-		#T: {in: _, #in: _}
-	})
 }
 -- out/compile --
 --- in.cue

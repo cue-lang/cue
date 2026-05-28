@@ -2,20 +2,14 @@
 circularIf: {
 	#list: {
 		tail: #list | *null
-		if tail != null {
-		}
-		@test(eq, {tail: null})
+		if tail != null {}
 	}
 }
 
 circularFor: {
 	#list: {
 		tail: #list | *null
-		for x in tail != null {
-		}
-		@test(err, code=eval,
-			contains="cannot range over %s (found %s, want list or struct)",
-			args=[tail != null, bool], pos=[2:12])
+		for x in tail != null {}
 	}
 }
 
@@ -23,17 +17,13 @@ circularFor: {
 // Issue #465
 userError: {
 	a: string | *_|_
-	if a != "" {
-	}
-	@test(err, code=incomplete, contains="non-concrete value string", pos=[2:5, 1:5])
+	if a != "" {}
 }
 
 intField: {
 	for i, _ in [1, 2] {
-		(i): {
-		}
+		(i): {}
 	}
-	@test(err, code=eval, contains="integer fields not supported", pos=[2:4])
 }
 
 // Issue #2403
@@ -48,10 +38,6 @@ conflictRangingOverSelf: {
 			(k): k
 		}
 	}
-	@test(err, code=eval, at=x.age,
-		contains="conflicting values %s and %s (mismatched types %s and %s)",
-		args=[int, "age", int, string],
-		pos=[3:9, 6:5, 7:3, 8:9])
 }
 -- out/compile --
 --- in.cue

@@ -7,53 +7,29 @@
 
 ok: t1: {
 	c: #R
-	c: [{b: int}] @test(allows=false, int)
-	#R: [...]     @test(allows, int)
-
-	@test(eq, {
-		c: [{b: int}]
-		#R: []
-	})
+	c: [{b: int}]
+	#R: [...]
 }
 
 ok: t2: {
 	#A: _
-	l: #A
+	l:  #A
 	l: f: "hi"
-
-	@test(eq, {
-		#A: _
-		l: f: "hi"
-	})
 }
 
 ok: t3: {
 	#A: f: {...}
-	#A1: { #A }
+	#A1: {#A}
 	s: [string]: #A1
 	s: foo: f: d: foo: 1
-
-	@test(eq, {
-		#A: f: {}
-		#A1: f: {}
-		s: foo: f: d: foo: 1
-	})
 }
 
 ok: t4: {
-	#T: { a: b: 1 }
+	#T: {a: b: 1}
 	W: {
 		{#T}
 		b: c: 2
 	}
-
-	@test(eq, {
-		#T: a: b: 1
-		W: {
-			a: b: 1
-			b: c: 2
-		}
-	})
 }
 
 ok: t5: {
@@ -62,11 +38,9 @@ ok: t5: {
 		Common
 		_
 	}
-	Common: { }
+	Common: {}
 	x: #A
-	x: c: int @test(err, code=eval,
-		hint="not sure if this is actually correct",
-		contains="field not allowed", pos=[0:5])
+	x: c: int
 }
 
 ok: t6: {
@@ -74,37 +48,21 @@ ok: t6: {
 		Common
 		...
 	}
-	Common: { }
-	x: #A  @test(allows, string)
+	Common: {}
+	x: #A
 	x: c: int
-
-	@test(eq, {
-		#A: {}
-		Common: {}
-		x: c: int
-	})
 }
 
 ok: t7: {
 	a: {#A, #B}
 	#A: b: f: 1
 	#B: b: g: 1
-
-	@test(eq, {
-		a: b: {
-			f: 1
-			g: 1
-		}
-		#A: b: f: 1
-		#B: b: g: 1
-	})
 }
 
 ok: t8: {
 	// TODO: this should pass
-	foo: #X @test(shareID=ok_t8_foox)
+	foo: #X
 	#X: {
-		@test(shareID=ok_t8_foox)
 
 		a: b: c: C: 1
 		for k, _ in a {
@@ -113,72 +71,35 @@ ok: t8: {
 			a: (k): c: D: 2
 		}
 	}
-
-	@test(eq, {
-		foo: a: b: c: {
-			C: 1
-			D: 2
-		}
-		#X: a: b: c: {
-			C: 1
-			D: 2
-		}
-	})
 }
 
 ok: t9: {
 	c: #R
 	c: [{b: int}]
 	#R: [...]
-
-	@test(eq, {
-		c: [{
-			b: int
-		}]
-		#R: []
-	})
 }
 
 ok: t10: {
 	#A: _ // top should allow everything
-	l: #A
+	l:  #A
 	l: f: "hi"
-
-	@test(eq, {
-		#A: _
-		l: f: "hi"
-	})
 }
 
 ok: t11: {
 	// indirections
 	#A: f: {...}
-	#A1: { #A }
+	#A1: {#A}
 	s: [string]: #A1
 	s: foo: f: d: foo: "bar" // should pass
-
-	@test(eq, {
-		#A: f: {}
-		#A1: f: {}
-		s: foo: f: d: foo: "bar"
-	})
 }
 
 ok: t12: {
 	// nested embedding
-	#T: { a: b: 1 }
+	#T: {a: b: 1}
 	W: {
 		{#T}
 		b: c: 2
 	}
-
-	@test(eq, {
-		#T: { a: b: 1 }
-		W: {
-			a: b: 1
-			b: c: 2
-		}
-	})
 }
 
 ok: t13: {
@@ -189,15 +110,9 @@ ok: t13: {
 		Common
 		_
 	}
-	Common: { }
+	Common: {}
 	x: #A
-	x: c: int @test(err, code=eval, contains="field not allowed", pos=[0:5])
-
-	@test(eq, {
-		#A: {}
-		Common: {}
-		x: c: _|_
-	})
+	x: c: int
 }
 
 ok: t14: {
@@ -206,15 +121,9 @@ ok: t14: {
 		Common
 		...
 	}
-	Common: { }
+	Common: {}
 	x: #A
 	x: c: int
-
-	@test(eq, {
-		#A: {}
-		Common: {}
-		x: c: int
-	})
 }
 
 // TODO: move this test to "ok": _ means any and implicitly defines all fields
@@ -224,51 +133,45 @@ ok: t14: {
 // either allow for an error variant that only "allows" all fields but does not
 // define them as optional top, or rethink the closedness model altogether.
 err: t1: {
-	@test(permute, count=6)
 	#D: _ & {a: 2}
 	a: #D
-	a: disallowed: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
+	a: disallowed: 1
 }
 
 err: t2: {
-	@test(permute)
-	#S: { { c: d: 1 } }
+	#S: {{c: d: 1}}
 	V: #S
-	V: { c: e: 1 @test(err, code=eval, contains="field not allowed", pos=[0:10]) }
+	V: {c: e: 1}
 }
 
 err: t3: {
-	@test(permute)
 	#D: {}
 	a: #D
-	a: c: "C" @test(err, code=eval, contains="field not allowed", pos=[0:5])
+	a: c: "C"
 }
 
 err: t4: {
-	@test(permute)
 	a: #A
 	#A: b: f: 1
-	a: b: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:8])
+	a: b: h:  1
 }
 
 err: t5: {
-	@test(permute)
 	// TODO: this should fail
 	a: {#A, #B}
 	#A: b: f: 1
 	#B: b: g: 1
 	b: a
-	b: b: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:8])
+	b: b: h: 1
 }
 
 err: t6: {
-	@test(permute)
 	// TODO: this should fail
 	a: {#A, #B}
 	#A: b: c: d: e: f: 1
 	#B: b: c: d: e: g: 1
 	b: a
-	b: b: c: d: e: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:17])
+	b: b: c: d: e: h: 1
 }
 
 // TODO: move this test to "ok": _ means any and implicitly defines all fields
@@ -278,18 +181,16 @@ err: t6: {
 // either allow for an error variant that only "allows" all fields but does not
 // define them as optional top, or rethink the closedness model altogether.
 err: t7: {
-	@test(permute)
 	#D: _ & {a: 2}
 	a: #D
-	a: b: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
+	a: b: 1
 }
 
 err: t8: {
-	@test(permute)
 	// nested embedding
-	#S: { { c: d: 1 } }
+	#S: {{c: d: 1}}
 	V: #S
-	V: { c: e: 1 @test(err, code=eval, contains="field not allowed", pos=[0:10]) }
+	V: {c: e: 1}
 }
 -- validators.cue --
 import "struct"
@@ -306,18 +207,6 @@ validator: open: {
 	}
 	data: trailingComma: "all"
 	data: #Schema
-
-	@test(eq, {
-		#Schema: {
-			matchN(1, [{trailingComma: "all"}])
-			#x: trailingComma?: "all"
-		}
-		data: {
-			// TODO: why is the matchN dropped here?
-			trailingComma: "all"
-			#x: trailingComma?: "all"
-		}
-	})
 }
 
 validator: keepClosed: {
@@ -327,7 +216,7 @@ validator: keepClosed: {
 		b?: int
 	}
 	x: #X
-	x: c: 1 @test(err, code=eval, contains="field not allowed", pos=[-5:3, 0:5])
+	x: c: 1
 }
 -- issue1830.cue --
 // Closedness was not applied when accessing optional fields through a selector;
@@ -346,14 +235,11 @@ issue1830: {
 		x1: (#x & {y: z: _}).y.z & {
 			name: "blah"
 			age1: 5
-		} @test(closed) @test(eq, { name: "blah", age1: 5 }, incorrect)
+		}
 		x2: (#x.y & {z: _}).z & {
 			name: "blah"
 			age2: 5
-		} @test(closed) @test(eq, { name: "blah", age2: 5 }, incorrect)
-
-		@test(err:todo, at=x1.age1, code=eval, contains="field not allowed")
-		@test(err:todo, at=x2.age2, code=eval, contains="field not allowed")
+		}
 	}
 }
 -- issue3491.cue --
@@ -364,20 +250,11 @@ issue3491: {
 	#Schema: field?: {}
 
 	a: #Schema & {
-	  field: {}
+		field: {}
 	}
 
 	a: b
 	b: #Extra: {}
-
-	@test(eq, {
-		#Schema: field?: {}
-		a: {
-			field: {}
-			#Extra: {}
-		}
-		b: #Extra: {}
-	})
 }
 -- out/compile --
 --- in.cue

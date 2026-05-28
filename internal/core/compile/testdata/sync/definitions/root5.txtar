@@ -1,64 +1,21 @@
 -- in.cue --
 _schema // embed schema through indirections
-_schema: #Schema @test(shareID=topSchema)
+_schema: #Schema
 #Schema: {
-	@test(shareID=topSchema)
 	a?: b?: string
 }
 a: b: "foo"
 c: "foo"
 
-
 x: {
 	_schema // embed schema through indirections
-	_schema: #Schema @test(shareID=xSchema)
+	_schema: #Schema
 	#Schema: {
-		@test(shareID=xSchema)
 		a?: b?: string
 	}
 	a: b: "foo"
 	c: "foo"
 }
-
-@test(eq, {
-	a: b: "foo"
-	_schema: a?: b?: string
-	#Schema: a?: b?: string
-	c: "foo"
-	x: {
-		a: b: "foo"
-		_schema: a?: b?: string
-		#Schema: a?: b?: string
-		c: "foo"
-	}
-})
-// TODO(inline): fix sharing detection across hidden fields.
-@test(debug, """
-	(#struct){
-	  _schema: ~(#Schema)
-	  #Schema: (#struct){
-	    a?: (#struct){
-	      b?: (string){ string }
-	    }
-	  }
-	  a: (#struct){
-	    b: (string){ "foo" }
-	  }
-	  c: (string){ "foo" }
-	  x: (#struct){
-	    _schema: ~(x.#Schema)
-	    #Schema: (#struct){
-	      a?: (#struct){
-	        b?: (string){ string }
-	      }
-	    }
-	    a: (#struct){
-	      b: (string){ "foo" }
-	    }
-	    c: (string){ "foo" }
-	  }
-	}
-	""")
 -- out/compile --
 --- in.cue
 {

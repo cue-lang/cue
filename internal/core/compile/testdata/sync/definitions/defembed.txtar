@@ -3,22 +3,15 @@ a: {
 	#A
 }
 
-a: c: 1 @test(err, code=eval, contains="field not allowed", pos=[0:4])
+a: c: 1
 
 #A: b: 1
 
 b: {
 	#A
-    leaf: "leaf value"
-    interpolation: "more \(leaf_ref)"
-    leaf_ref: leaf
-
-    @test(eq, {
-		b:             1
-		leaf:          "leaf value"
-		interpolation: "more leaf value"
-		leaf_ref:      "leaf value"
-	})
+	leaf:          "leaf value"
+	interpolation: "more \(leaf_ref)"
+	leaf_ref:      leaf
 }
 -- out/compile --
 --- in.cue

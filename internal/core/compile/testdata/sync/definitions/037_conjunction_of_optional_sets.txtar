@@ -6,20 +6,13 @@
 	[=~"^[m-z]*$"]: int
 }
 
-#C: #A & #B  @test(allows, moo) @test(allows=false, QQQ) @test(eq, {
-	[=~"^[a-s]*$"]: int
-	[=~"^[m-z]*$"]: int
-})
-c: #C
-c: {aaa: 3 } @test(err, code=eval, at=aaa,
-	hint="positions missing",
-	contains="field not allowed", pos=[in.cue:2:2, 0:5])
+#C: #A & #B
+c:  #C
+c: {aaa: 3}
 
 #D: {#A & #B}
 d: #D
-d: {aaa: 3 } @test(err, code=eval, at=aaa,
-	hint="positions missing",
-	contains="field not allowed", pos=[in.cue:2:2, 0:5])
+d: {aaa: 3}
 -- out/compile --
 --- in.cue
 {

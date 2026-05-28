@@ -6,7 +6,7 @@
 	name?: string
 	sub1?: sub2?: null | _
 }
-#Output: null | #App @test(eq, null | {name?: string, sub1?: {sub2?: null | _}})
+#Output: null | #App
 out: #Output & {
 	name: "foo"
 	sub1: sub2: {} | _
@@ -16,7 +16,7 @@ out: #Output & {
 			foo: _let
 		}
 	}
-} @test(eq, {name: "foo", sub1: {sub2: {sub3: {foo: "bar"}}}})
+}
 -- out/compile --
 --- in.cue
 {

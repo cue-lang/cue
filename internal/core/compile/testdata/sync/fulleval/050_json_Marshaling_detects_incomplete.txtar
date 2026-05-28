@@ -3,13 +3,13 @@
 -- in.cue --
 import "encoding/json"
 
-a: json.Marshal({a: string}) @test(err, code=incomplete)
+a: json.Marshal({a: string})
 
 foo: {
-	a: 3     @test(eq, 3)
-	b: foo.c @test(err, code=incomplete)
+	a: 3
+	b: foo.c
 }
-b: json.Marshal(foo) @test(err, code=incomplete)
+b: json.Marshal(foo)
 -- out/compile --
 --- in.cue
 {

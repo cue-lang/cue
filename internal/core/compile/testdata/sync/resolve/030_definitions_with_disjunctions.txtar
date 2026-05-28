@@ -4,16 +4,16 @@
 
 	{a: 1} |
 	{b: 2}
-} @test(eq, {field: int, a: 1} | {field: int, b: 2})
+}
 
 foo: #Foo
-foo: {a: 1} @test(eq, {a: 1, field: int})
+foo: {a: 1}
 
 bar: #Foo
-bar: {c: 2} @test(err, code=eval, contains="field not allowed", pos=[0:7])
+bar: {c: 2}
 
 baz: #Foo
-baz: {b: 2} @test(eq, {b: 2, field: int})
+baz: {b: 2}
 -- out/compile --
 --- in.cue
 {

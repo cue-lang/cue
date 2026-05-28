@@ -5,7 +5,7 @@
 X: {
 	#Simple: {
 		ref: string
-	} @test(shareID=SIMPLE)
+	}
 
 	#Complex: {
 		{
@@ -13,31 +13,23 @@ X: {
 		} | {
 			local: string
 		}
-	} @test(eq, {ref: string} | {local: string}) @test(shareID=COMPLEX)
-
+	}
 
 	var: "bar"
 
 	// Validate(concrete) after Fill() on Complex.ref from a "static" key will succeed
-	"test_1": #Complex @test(shareID=COMPLEX) @test(eq, {
-			ref: string
-		} | {
-			local: string
-		})
+	"test_1": #Complex
 
 	// Validate(concrete) after Fill() on "#Simple.ref" from a "dynamic" key will succeed
 	"test_2_\(var)": #Simple
-	@test(shareID=SIMPLE, at=test_2_bar)
-	@test(eq, at=test_2_bar, { ref: string })
 
 	// Validate(concrete) after Fill() on Complex.ref from a "dynamic" key will fail
 	"test_3_\(var)": #Complex
 
 	test_3_bar: ref: "FOO"
-	@test(eq, at=test_3_bar, { ref: "FOO" })
 }
 
-Z: X.test_3_bar.ref @test(eq, "FOO")
+Z: X.test_3_bar.ref
 -- out/compile --
 --- in.cue
 {

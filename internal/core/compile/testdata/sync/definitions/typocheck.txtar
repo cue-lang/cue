@@ -1,62 +1,43 @@
 -- in.cue --
 embed: simple: {
 	#A: b: 1
-	a: { #A }
-	a: err: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
+	a: {#A}
+	a: err: 1
 }
 embed: andInStruct: {
 	#Foo: a: int
-	a: { #Foo & { err: 2 } }
-
-	@test(err, at=a.err, code=eval, contains="field not allowed", pos=[2:16])
+	a: {#Foo & {err: 2}}
 }
 embed: embedDefWithEmbedding: {
 	#Foo: {{a: int}}
-	a: { #Foo & { err: 2 } } // not allowed
-
-	@test(err, at=a.err, code=eval, contains="field not allowed", pos=[2:16])
+	a: {#Foo & {err: 2}} // not allowed
 }
 embed: embedComprehension: {
 	#Foo: {if true {a: int}}
-	a: { #Foo & { err: 2 } } // not allowed
-
-	@test(err, at=a.err, code=eval, contains="field not allowed", pos=[2:16])
+	a: {#Foo & {err: 2}} // not allowed
 }
 embed: fieldWithAnd: {
 	#A: {}
-	{ a: #A & {err: 3 } }
-
-	@test(err, at=a.err, code=eval, contains="field not allowed", pos=[2:13])
+	{a: #A & {err: 3}}
 }
 embed: embedAndRecursive: {
 	#A: a: int
-	B: x: #A
-	B & { x: err: 2 }
-
-	@test(err, at=x.err, code=eval, contains="field not allowed", pos=[3:11])
+	B: x:  #A
+	B & {x: err: 2}
 }
 embed: andEmbed: {
 	#A: b: int
 	#B: b: int
 	#D: {#A & #B}
 	d: #D & {err: 3}
-
-	@test(err, at=d.err, code=eval, contains="field not allowed", pos=[4:11])
 }
 and: transitive: ok: {
-	Z: {a: string} @test(shareID:todo=Z)
-	#Y: Z          @test(shareID:todo=Z)
+	Z: {a: string}
+	#Y: Z
 	#X: #Y & Z
 	out: #X & {
 		a: "foo"
 	}
-
-	@test(eq, {
-		Z: {a: string}
-		#Y: {a: string}
-		#X: {a: string}
-		out: {a: "foo"}
-	})
 }
 and: transitive: err: {
 	Z: a: string
@@ -64,7 +45,7 @@ and: transitive: err: {
 	#X: #Y & Z
 	out: #X & {
 		err: "foo"
-	} @test(err, at=err, code=eval, contains="field not allowed", pos=[1:3])
+	}
 }
 and: transitiveWithEmbed: ok: {
 	Z: a: string
@@ -73,13 +54,6 @@ and: transitiveWithEmbed: ok: {
 	out: #X & {
 		a: "foo"
 	}
-
-	@test(eq, {
-		Z: {a: string}
-		#X: {a: string}
-		#Y: {a: string}
-		out: {a: "foo"}
-	})
 }
 and: transitiveWithEmbed: err: {
 	Z: a: string
@@ -88,47 +62,30 @@ and: transitiveWithEmbed: err: {
 	out: #X & {
 		err: "foo"
 	}
-
-	@test(err, at=out.err, code=eval, contains="field not allowed", pos=[5:3])
 }
 embed: nonDef: t1: {
 	X: a: string
 	#Y: #Z & X
 	#Z: {
 		X
-		b?:    string
+		b?: string
 	}
-
-	@test(eq, {
-		X: {a: string}
-		#Y: {b?: string, a: string}
-		#Z: {b?: string, a: string}
-	})
 }
 embed: defAndHidden: full: {
 	_stepCommon: Name: string
 	#Step: #Command & _stepCommon
 	#Command: {
 		_stepCommon
-		Path?:    string
+		Path?: string
 	}
 	out: #Step & {
 		Name: "foo"
 	}
-
-	@test(eq, {
-		_stepCommon: {Name: string}
-		#Step: {Path?: string, Name: string}
-		#Command: {Path?: string, Name: string}
-		out: {Name: "foo", Path?: string}
-	})
 }
 embed: withIndirect: {
 	A: #B
 	#B: b: int
-	A & { err: 2 } // not allowed
-
-	@test(err, at=err, code=eval, contains="field not allowed", pos=[3:8])
+	A & {err: 2} // not allowed
 }
 -- validators.cue --
 import (
@@ -143,7 +100,7 @@ embed: normalValidator: {
 		b?: int
 	}
 	x: #X
-	x: err: 1 @test(err, code=eval, contains="field not allowed", pos=[-5:3, 0:5])
+	x: err: 1
 }
 embed: openValidator: t1: {
 	#X: {
@@ -153,19 +110,12 @@ embed: openValidator: t1: {
 	}
 	x: #X
 	x: err: 1
-
-	@test(eq, {
-		#X: {matchN(0, []), a?: int, b?: int}
-		x: {err: 1, a?: int, b?: int}
-	})
 }
 embed: openValidator: t2: {
 	Y: matchN(1, [X])
 	X: b?: Y
 	a: X
-	a: b: 1 @test(err, suberr=(code=eval, contains="conflicting values"),
-		suberr=(code=eval, contains="does not satisfy matchN", pos=[-3:5, -3:12, -2:9, 0:8]),
-	)
+	a: b: 1
 }
 disjunction: withErr: t1: {
 	params: {}
@@ -174,13 +124,6 @@ disjunction: withErr: t1: {
 	}
 	#Schema1: b1?: null | #Schema2
 	#Schema2: b2?: null | {b3?: string}
-
-	@test(eq, {
-		params: {}
-		out: {b1: {b2: {b3: _}}}
-		#Schema1: {b1?: null | {b2?: null | {b3?: string}}}
-		#Schema2: {b2?: null | {b3?: string}}
-	})
 }
 embed: nestedValidator: {
 	#types: z?: list.UniqueItems
@@ -190,30 +133,19 @@ embed: nestedValidator: {
 		y?: #types
 	}
 	#def: {}
-
-	@test(eq, {
-		#types: _ @test(ignore)
-		x: {y: {z: [1]}}
-		#def: {}
-	})
 }
 -- inline.cue --
 embedInline: {
 	#Schema: {
 		a: "hello"
 		// do not close outer struct of 'b', as inlined value is not a schema.
-		b: { {x: c: "foo"}.x }
+		b: {{x: c: "foo"}.x}
 		b: {
 			c: string
 			d: "never printed"
 		}
 	}
 	out: #Schema & __no_sharing
-
-	@test(eq, {
-		#Schema: {a: "hello", b: {c: "foo", d: "never printed"}}
-		out: {a: "hello", b: {c: "foo", d: "never printed"}}
-	})
 }
 // evalv3 "field not allowed" regression involving embeddings and selectors;
 // accessing a field via selector on an embedded definition should stay open.
@@ -222,18 +154,13 @@ issue3853: {
 	#Schema: {
 		a: "hello"
 		// do not close outer struct of 'b', as inlined value is not a schema.
-		b: { {x: c: "foo"}.x }
+		b: {{x: c: "foo"}.x}
 		b: {
 			c: string
 			d: "never printed"
 		}
 	}
 	out: {x: (#Schema & {}).a}.x
-
-	@test(eq, {
-		#Schema: {a: "hello", b: {c: "foo", d: "never printed"}}
-		out: "hello"
-	})
 }
 -- disjunction.cue --
 import "list"
@@ -242,9 +169,9 @@ import "list"
 // are present; disallowed fields in a default disjunct should still be caught.
 // https://cuelang.org/issue/3947
 issue3947: full: {
-	#Schema: allowed?: string
+	#Schema: allowed?:     string
 	_defaults: disallowed: _ | *"default value"
-	out: #Schema & _defaults @test(err, code=eval, at=disallowed, contains="field not allowed", pos=[-1:13])
+	out: #Schema & _defaults
 }
 // evalv3 regression: #oneOf pattern disjunction; unifying a closed definition
 // disjunction with a default string field caused incorrect field-not-allowed errors.
@@ -253,18 +180,11 @@ issue3957: reduced: {
 	c: a: "bar"
 	c: #B & {a: string | *"foo"}
 	#B: b?: string
-
-	@test(err, at=c.a, code=eval, contains="field not allowed", pos=[1:5, 2:11])
 }
 issue3957: full: {
 	#oneof: {a: string} | {b?: [...string]}
 	c: #oneof & {a: string | *"foo"}
 	c: a: "bar"
-
-	@test(eq, {
-		#oneof: {a: string} | {b?: []}
-		c: {a: "bar"}
-	})
 }
 issue3957: derived: t1: {
 	#Schema: {
@@ -272,11 +192,6 @@ issue3957: derived: t1: {
 		out: list.FlattenN([in], 1)
 	}
 	x: #Schema & {in: "foo"}
-
-	@test(eq, {
-		#Schema: {in: string | [], out: [string | []]}
-		x: {in: "foo", out: ["foo"]}
-	})
 }
 issue3957: derived: t2: {
 	#Schema: {
@@ -285,18 +200,13 @@ issue3957: derived: t2: {
 		out: _flat
 	}
 	out: #Schema & {in: "foo"}
-
-	@test(eq, {
-		#Schema: {in: string | [], out: [string | []]}
-		out: {in: "foo", out: ["foo"]}
-	})
 }
 -- issue3833.cue --
 // evalv3 "field not allowed" regression with embeddings; combining a definition
 // that has an open field with another definition via embedding should be allowed.
 // https://cuelang.org/issue/3833
 issue3833: ok: {
-	out: { #A & { a: #B } }
+	out: {#A & {a: #B}}
 	#A: {
 		a: {b: string, ...}
 		...
@@ -306,16 +216,9 @@ issue3833: ok: {
 		#C & {c: "foo"}
 		b: "foo"
 	}
-
-	@test(eq, {
-		out: {a: {b: "foo", c: "foo"}}
-		#A: {a: {b: string}}
-		#C: {c: string}
-		#B: {c: "foo", b: "foo"}
-	})
 }
-issue3833: evalv2Issue:{
-	out: { #A & { a: #B } }
+issue3833: evalv2Issue: {
+	out: {#A & {a: #B}}
 	#A: {
 		a: b: string
 		...
@@ -325,11 +228,6 @@ issue3833: evalv2Issue:{
 		#C & {c: "foo"}
 		b: "foo"
 	}
-
-	@test(err, at=out.a.c, code=eval,
-		contains="field not allowed", pos=[6:6, 8:9],
-		hint="key positions are missing",
-	)
 }
 -- issue3837.cue --
 // evalv3 regression with embeddings, disjunctions, and extra fields; a struct
@@ -340,14 +238,8 @@ issue3837: reduced: {
 		#Embed
 		extra: "foo"
 	}
-	out: {{ x: A & __no_sharing }}
+	out: {{x: A & __no_sharing}}
 	#Embed: {}
-
-	@test(eq, {
-		A: {extra: "foo"}
-		out: {x: {extra: "foo"}}
-		#Embed: {}
-	})
 }
 issue3837: full: {
 	#Embed: {}
@@ -363,14 +255,6 @@ issue3837: full: {
 			#def: (#A & __no_sharing)
 		}
 	}
-
-	@test(eq, {
-		#Embed: {}
-		#A: {extra: "foo"}
-		#B: {bar: string} | {}
-		#C: {bar: string}
-		out: {bar: "baz", #def: {extra: "foo"}}
-	})
 }
 -- issue3832.cue --
 // evalv3 "field not allowed" regression with a disjunction and a let field;
@@ -381,7 +265,7 @@ issue3832: {
 
 	#T: {
 		_subject: {
-			in:  _
+			in: _
 			out: {
 				let self = in.self
 				outFirstName: self.firstName
@@ -395,47 +279,26 @@ issue3832: {
 			invoke!: _
 			// TODO: here, the let from _subject.out gets converted to a
 			// permanent error,instead of incomplete.
-			pass:    (_subject & {in: invoke}).out
+			pass: (_subject & {in: invoke}).out
 		}
 		results: _assert.pass
 	}
 	#T & {
 		_assert: invoke: _person
 	}
-
-	@test(eq, {
-		_person: {self: {firstName: "Sam"}}
-		#T: _ @test(ignore)
-		_assert: {
-			invoke: {self: {firstName: "Sam"}}
-			pass: {outFirstName: "Sam"}
-		}
-		_subject: _ @test(ignore)
-		results: {outFirstName: "Sam"}
-	})
 }
 -- issue3839.cue --
 // evalv3 closedness regression with embeddings and definitions; embedding a
 // definition with an ellipsis inside a non-definition should remain open.
 // https://cuelang.org/issue/3839
 issue3839: reduced: {
-	x: { A & __no_sharing }
+	x: {A & __no_sharing}
 	x: y: 1
-	#B: {
-		// Note: true with both old semantics and explicitopen
-		@test(closed)
-		@test(allows=false, string)
-	}
+	#B: {}
 	A: {
 		#B
 		...
-
-		// Note: true with both old semantics and explicitopen
-		@test(closed)
-		@test(allows, string)
 	}
-
-	@test(eq, {x: {y: 1}, #B: {}, A: {}})
 }
 issue3839: full: {
 	_globals: glb: globalField: ""
@@ -463,15 +326,6 @@ issue3839: full: {
 		#Embed
 		...
 	}
-
-	@test(eq, {
-		_globals: {glb: {globalField: ""}}
-		#GlobalContext: {globalField: string}
-		#Context: {glb: {globalField: string}, out: {globalField: string}}
-		out: {ingress: {#def: {globalField: ""}, foo: 1234, bar: "http"}}
-		#Embed: {#def: {}}
-		#Ingress: {#def: {}}
-	})
 }
 -- chaineddef.cue --
 // evalv3 "field not allowed" regression when embedding a chain of definitions;
@@ -485,25 +339,15 @@ issue3920: {
 	}
 	#A: a?: #B
 	#B: c?: string
-
-	@test(eq, {
-		out: {a: {b: "out", c?: string}}
-		#A: {a?: {c?: string}}
-		#B: {c?: string}
-	})
 }
 onlyCloseDirectStruct: {
 	#foo: {}
 	x: {y: {{a: #foo}}}
 	x: y: b: 1
-
-	@test(eq, {#foo: {}, x: {y: {a: {}, b: 1}}})
 }
 closeInEmbed: {
 	x: {close({{["d"]: f: int}})}
 	x: d: e: 1
-
-	@test(eq, {x: {d: {e: 1, f: int}}})
 }
 -- embedelim.cue --
 // evalv3 "field not allowed" regression with nested definitions; eliminating
@@ -514,20 +358,12 @@ issue3921: top: {
 	#A: b: string
 	#B: _
 	a: {#A & {}}
-
-	@test(eq, {#A: {b: string}, #B: _, a: {b: string}})
 }
 issue3921: hidden: {
 	#A: #B
 	#A: _hidden: b: string
 	#B: {}
-	a: { #A & { _hidden: {} }}
-
-	@test(eq, {
-		#A: {_hidden: {b: string}}
-		#B: {}
-		a: {_hidden: {b: string}}
-	})
+	a: {#A & {_hidden: {}}}
 }
 issue3921: full: {
 	out: #templateList & #defineMap
@@ -544,35 +380,9 @@ issue3921: full: {
 	}
 	#Step: #StepInner & {
 		image: string
-		#config: version:   string
+		#config: version: string
 	}
 	#StepInner: image: string
-
-	@test(eq, {
-		out: {
-			#stepMap: {foo: {
-				image: "bar"
-				#config: {version: string}
-			}}
-			stepList: [{
-				image: "bar"
-				#config: {version: string}
-			}]
-		}
-		#templateList: {#stepMap: {}, stepList: []}
-		#defineMap: {
-			#stepMap: {foo: {
-				image: "bar"
-				#config: {version: string}}
-			}
-			stepList: _
-		}
-		#Step: {
-			image: string
-			#config: {version: string}
-		}
-		#StepInner: {image: string}
-	})
 }
 -- issue3843.cue --
 // evalv3 "field not allowed" regression when a definition is reused at
@@ -585,14 +395,8 @@ dedupPattern: t1: p1: {
 		x: #Z
 		x: y: z: 1
 	}
-	B: A & __no_sharing
+	B:   A & __no_sharing
 	out: A.#Z & B.x
-
-	@test(eq, {
-		A: {#Z: {}, x: {y: {z: 1}}}
-		B: {#Z: {}, x: {y: {z: 1}}}
-		out: {y: {z: 1}}
-	})
 }
 dedupPattern: t1: p2: {
 	A: {
@@ -600,14 +404,8 @@ dedupPattern: t1: p2: {
 		x: #Z
 		x: y: z: 1
 	}
-	B: A & __no_sharing
+	B:   A & __no_sharing
 	out: B.x & A.#Z
-
-	@test(eq, {
-		A: {#Z: {}, x: {y: {z: 1}}}
-		B: {#Z: {}, x: {y: {z: 1}}}
-		out: {y: {z: 1}}
-	})
 }
 -- issue3858.cue --
 // evalv3 "field not allowed" regression with embeddings where a definition
@@ -624,54 +422,34 @@ orig: t1: {
 	#Job: {
 		image: string
 		vcs:   "git"
-		args:  [...string]
-		env:   [string]: string
+		args: [...string]
+		env: [string]: string
 	}
 
 	#Output: {
-		_in:  _
-		out:  (_in & {})
+		_in: _
+		out: (_in & {})
 	}
 	#Output & {
 		_in: (#JobConfig & {}).job
 	}
-
-	@test(eq, {
-		#Image: {embed: {image: "foo:v1"}}
-		#JobConfig: {
-			image: {embed: {image: "foo:v1"}}
-			job: {image: "foo:v1", vcs: "git", args: [], env: {}}
-		}
-		#Job: {image: string, vcs: "git", args: [], env: {}}
-		#Output: {_in: _, out: {}}
-		_in: {image: "foo:v1", vcs: "git", args: [], env: {}}
-		out: {image: "foo:v1", vcs: "git", args: [], env: {}}
-	})
 }
 reduced: t1: {
 	Y: {
 		a: e: "foo"
-		b: X & { a }
+		b: X & {a}
 	}
 	X: {
 		e: string
 		f: 1 // fails in `out`
 	}
 	#Z: {
-		_in:  _
-		out:  _in & __no_sharing
+		_in: _
+		out: _in & __no_sharing
 	}
 	#Z & {
 		_in: Y
 	}
-
-	@test(eq, {
-		Y: {a: {e: "foo"}, b: {e: "foo", f: 1}}
-		X: {e: string, f: 1}
-		#Z: {_in: _, out: _}
-		_in: {a: {e: "foo"}, b: {e: "foo", f: 1}}
-		out: {a: {e: "foo"}, b: {e: "foo", f: 1}}
-	})
 }
 orig: t2: {
 	#JobConfig: {
@@ -691,45 +469,21 @@ orig: t2: {
 	out: #Output & {
 		in: input: (#JobConfig & {}).job
 	}
-
-	@test(eq, {
-		#JobConfig: {
-			image: {spec: {image: "someimage"}}
-			job: {image: "someimage", env: "FOO"}
-		}
-		#Job: {image: string, env: "FOO"}
-		#Output: {
-			in: _
-			out: _ @test(ignore)
-		}
-		out: {
-			in: {input: {image: "someimage", env: "FOO"}}
-			out: {image: "someimage", env: "FOO"}
-		}
-	})
 }
 reduced: t2: {
 	Y: {
 		a: e: "foo"
-		b: X & { a }
+		b: X & {a}
 	}
 	X: {
 		e: string
 		f: 1 // fails
 	}
 	#Z: {
-		_in:  _
-		out:  _in
+		_in: _
+		out: _in
 	}
-	#Z & { _in: Y }
-
-	@test(eq, {
-		Y: {a: {e: "foo"}, b: {e: "foo", f: 1}}
-		X: {e: string, f: 1}
-		#Z: {_in: _, out: _}
-		_in: {a: {e: "foo"}, b: {e: "foo", f: 1}}
-		out: {a: {e: "foo"}, b: {e: "foo", f: 1}}
-	})
+	#Z & {_in: Y}
 }
 -- issue3934.cue --
 // evalv3 "field not allowed" regression with disjunctions and a comprehension;
@@ -745,15 +499,9 @@ issue3934: {
 	}
 	#Foo: foo?: null | #Bar | *{bar: 3}
 	#Bar: {
-		bar?:   int
+		bar?: int
 		extra?: null | {...}
 	}
-
-	@test(eq, {
-		out: {foo: *{bar: 3} | {extra?: null | {}, bar?: int} | null}
-		#Foo: {foo?: *{bar: 3} | {bar?: int, extra?: null | {}} | null}
-		#Bar: {bar?: int, extra?: null | {}}
-	})
 }
 -- large.cue --
 full: {
@@ -802,26 +550,15 @@ full: {
 		}
 	}
 	out: (#Main & {namespace: "ns1"}).output
-
-	@test(eq, {
-		#Resource: _ @test(ignore)
-		#Patches: _ @test(ignore)
-		#JSONPatch: _ @test(ignore)
-		#JSONOp: _ @test(ignore)
-		#Main: _ @test(ignore)
-		out: {ns1: [{op: "add", path: "/metadata", value: "foo"}]}
-	})
 }
 -- ellipsis.cue --
 nestedEllipsis: minimal: {
-	out: #Schema & { extra: "foo" }
+	out: #Schema & {extra: "foo"}
 	#Schema: {
 		#meta
 		...
 	}
 	#meta: {}
-
-	@test(eq, {out: {extra: "foo"}, #Schema: {}, #meta: {}})
 }
 nestedEllipsis: nestedWithPatterns: {
 	out: #Schema & {
@@ -835,39 +572,29 @@ nestedEllipsis: nestedWithPatterns: {
 		#meta: name?: int
 		objs?: _
 	}
-
-	@test(eq, {
-		out: {
-			objs: {obj1: {extra: "foo", name?: int}}
-			#meta: {name?: int}
-		}
-		#Schema: {#meta: {name?: int}, objs?: {}}
-	})
 }
 // evalv3 "field not allowed" regression with ellipses since v0.13.0; embedding
 // a schema with `...` alongside additional fields should not close the struct.
 // https://cuelang.org/issue/4015
 issue4015: reduced: {
-	#X: { ... }
+	#X: {...}
 	out: {
 		// Embedded schema allows `a: _`. Adding `a` below should not change that.
 		#X
 		a: b: string
-	} @test(allows, string) @test(closed)
+	}
 	out: {
 		a: {
 			c: "h"
 			b: "x"
 		}
 	}
-
-	@test(eq, {#X: {}, out: {a: {b: "x", c: "h"}}})
 }
 issue4015: nested: {
-	#X: { foo: {...} }
+	#X: {foo: {...}}
 	out: {
 		#X
-		foo: {a: b: string} @test(allows, string) @test(closed)
+		foo: {a: b: string}
 	}
 	out: {
 		foo: a: {
@@ -875,14 +602,12 @@ issue4015: nested: {
 			b: "x"
 		}
 	}
-
-	@test(eq, {#X: {foo: {}}, out: {foo: {a: {b: "x", c: "h"}}}})
 }
 issue4015: full: {
 	#Schema: {
 		cfg: {
 			foo: {
-				enabled:    bool | *false
+				enabled:  bool | *false
 				fooField: string
 			}
 			bar: barField: string
@@ -905,70 +630,33 @@ issue4015: full: {
 			foo: fooField: "h"
 			bar: barField: "x"
 		}
-
-		// This one is rather confusing, but true. Note that this should no
-		// longer hold if this is converted to the explicitopen semantics, in
-		// which case #Schema applies "monotonically" limiting to its fields.
-		@test(allows, string)
-		@test(allows:todo=false, string, hint="for explicit open")
-		@test(closed)
 	}
-
-	@test(eq, {
-		#Schema: {
-			cfg: {
-				foo: {enabled: *false | bool, fooField: string}
-				bar: {barField: string}
-			}
-			capacity: *3 | int
-		}
-		#MoreCapacity: {capacity: 30}
-		out: {
-			cfg: {foo: {enabled: true, fooField: "h"}, bar: {barField: "x"}}
-			capacity: 30
-		}
-	})
 }
 -- issue3964.cue --
 // evalv3 closedness regression since v0.13.1; a definition that embeds another
 // definition containing a disjunction should correctly allow matching fields.
 // https://cuelang.org/issue/3964
 issue3964: reduced: {
-	#Output: { #Embedded }
+	#Output: {#Embedded}
 	#Embedded: {
 		name: string
 		#Unused | #Used
 	}
 	#Unused: {}
 	#Used: {}
-
-	@test(eq, {
-		#Output: {name: string}
-		#Embedded: {name: string}
-		#Unused: {}
-		#Used: {}
-	})
 }
 issue3964: full: {
 	out: #Output & {
 		name: "oauth2"
 		used: "bar"
 	}
-	#Output: { #Embedded }
+	#Output: {#Embedded}
 	#Embedded: {
 		name: string
 		#Unused | #Used
 	}
 	#Unused: unused: string
-	#Used: used: string
-
-	@test(eq, {
-		out: {name: "oauth2", used: "bar"}
-		#Output: {name: string, unused: string} | {name: string, used: string}
-		#Embedded: {name: string, unused: string} | {name: string, used: string}
-		#Unused: {unused: string}
-		#Used: {used: string}
-	})
+	#Used: used:     string
 }
 -- cycle.cue --
 // evalv3 stack overflow due to latest closedness changes; mutually recursive
@@ -979,16 +667,9 @@ issue4006: {
 		#B
 		fieldA: string
 	}
-	#B: { #A }
+	#B: {#A}
 	#C: #A & {}
 	out: #C & #B
-
-	@test(eq, {
-		#A: {fieldA: string}
-		#B: {fieldA: string}
-		#C: {fieldA: string}
-		out: {fieldA: string}
-	})
 }
 -- out/compile --
 --- chaineddef.cue

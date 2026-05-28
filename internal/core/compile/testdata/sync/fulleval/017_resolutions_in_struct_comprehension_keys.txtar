@@ -1,5 +1,5 @@
 -- in.cue --
-a: {for _, b in ["c"] {"\(b+".")": "a"}} @test(eq, {"c.": "a"})
+a: {for _, b in ["c"] {"\(b+".")": "a"}}
 -- out/compile --
 --- in.cue
 {

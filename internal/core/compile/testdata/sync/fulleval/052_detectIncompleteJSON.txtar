@@ -11,20 +11,13 @@ import "encoding/json"
 		#foo: {
 			use: _vars.something
 		}
-		baz:    json.Marshal(_vars.something) @test(err, code=incomplete)
-		foobar: json.Marshal(#foo)            @test(err, code=incomplete)
+		baz:    json.Marshal(_vars.something)
+		foobar: json.Marshal(#foo)
 	}
 }
 Val: #Spec & {
 	_vars: something: "var-string"
-} @test(eq, {
-	_vars$foobar: something: "var-string"
-	data: {
-		#foo: use:    "var-string"
-		baz:   "\"var-string\""
-		foobar: "{\"use\":\"var-string\"}"
-	}
-})
+}
 -- out/compile --
 --- in.cue
 {

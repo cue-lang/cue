@@ -1,7 +1,7 @@
 -- in.cue --
 a: _
-b: a @test(eq, {d: 1}) @test(shareID=ba)
-a: {d: 1, d: _} @test(eq, {d: 1}) @test(shareID=ba)
+b: a
+a: {d: 1, d: _}
 b: _
 -- out/compile --
 --- in.cue

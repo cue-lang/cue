@@ -5,10 +5,10 @@
 -- in.cue --
 #T: [_]: _
 #T: close({"a": string})
-x:  #T
+x: #T
 x: {
-	a: "hello" @test(eq, "hello")
-	b: "foo"   @test(err, code=eval, contains="field not allowed", pos=[-5:5, 0:2])
+	a: "hello"
+	b: "foo"
 }
 -- out/compile --
 --- in.cue

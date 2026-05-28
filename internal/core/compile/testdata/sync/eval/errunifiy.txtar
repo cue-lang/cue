@@ -1,9 +1,9 @@
 Incomplete errors should not unify with values.
 -- in.cue --
-a: or([]) @test(err, code=incomplete, contains="empty list", pos=[0:4])
+a: or([])
 a: "t"
 
-b: _|_ @test(err, code=user, contains="explicit error", pos=[0:4])
+b: _|_
 b: "t"
 -- out/compile --
 --- in.cue

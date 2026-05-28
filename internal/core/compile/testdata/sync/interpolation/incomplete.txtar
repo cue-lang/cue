@@ -1,19 +1,19 @@
 Issue #553
 -- in.cue --
-a: "foo" @test(eq, "foo")
-b: "boo" @test(eq, "boo")
+a: "foo"
+b: "boo"
 commands: {
 	#c: {
 		help: "help!"
 	}
 }
 out: """
-    a is \(a)
-    b is \(b)
+	a is \(a)
+	b is \(b)
 
-    c is \(commands.#c.help)
-    d is \(commands.#d.help)
-    """ @test(err, code=incomplete)
+	c is \(commands.#c.help)
+	d is \(commands.#d.help)
+	"""
 -- out/compile --
 --- in.cue
 {

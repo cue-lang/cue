@@ -12,9 +12,8 @@ import "strings"
 
 reduced: {
 	#Input: {
-		@test(shareID=reducedInput)
-		name:  string
-		age:   "one" | "two"
+		name: string
+		age:  "one" | "two"
 		if name != _|_ {
 			if true {
 				age: "one"
@@ -33,62 +32,27 @@ reduced: {
 	}
 
 	#def3: {
-		_in: #Input @test(shareID=reducedInput)
+		_in:  #Input
 		def3: _in.age
 	}
 
 	in: name: "foobar"
 
 	out: (#def1 & {_in: in}).def1
-	@test(eq, {
-		#Input: {name: string, age: "one" | "two"}
-		#def1: {
-			_in$main: _
-			def1: {
-				_in$main: _
-				def2: {
-					_in$main: {name: string, age: "one" | "two"}
-					def3: "one" | "two"
-				}
-			}
-		}
-		#def2: {
-			_in$main: _
-			def2: {
-				_in$main: {name: string, age: "one" | "two"}
-				def3: "one" | "two"
-			}
-		}
-		#def3: {
-			_in$main: {name: string, age: "one" | "two"}
-			def3: "one" | "two"
-		}
-		in: {name: "foobar"}
-		out: {
-			_in$main: {name: "foobar"}
-			def2: {
-				_in$main: {name: "foobar", age: "one"}
-				def3: "one"
-			}
-		}
-	})
 }
 
 full: {
 	cronjob: [string]: #CronjobConfig
 
 	#CronjobConfig: {
-		@test(shareID=cronjobConfig)
 		#PodConfig
 	}
 
 	#PodConfig: {
-		@test(shareID=podConfig)
 		#ContainerConfig
 	}
 
 	#ContainerConfig: {
-		@test(shareID=containerConfig)
 		image:           string
 		imagePullPolicy: "IfNotPresent" | "Always" | "Never"
 		if image != _|_ {
@@ -102,13 +66,13 @@ full: {
 	}
 
 	_#cronjob: {
-		c=_config: #CronjobConfig @test(shareID=cronjobConfig)
+		c=_config: #CronjobConfig
 
 		out: spec: jobTemplate: spec: template: _#pod & {_config: c}
 	}
 
 	_#pod: {
-		c=_config: #PodConfig @test(shareID=podConfig)
+		c=_config: #PodConfig
 
 		spec: containers: [{
 			_#container & {
@@ -118,7 +82,7 @@ full: {
 	}
 
 	_#container: {
-		c=_config: #ContainerConfig @test(shareID=containerConfig)
+		c=_config: #ContainerConfig
 
 		imagePullPolicy: c.imagePullPolicy
 	}
@@ -128,69 +92,6 @@ full: {
 	for k, v in cronjob {
 		objects: cronjob: "\(k)": (_#cronjob & {_config: v}).out
 	}
-	@test(eq, hint="update this once todo is fixed", {
-		cronjob: foobar: {
-			image:           "foobar:latest"
-			imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
-		}
-		#CronjobConfig: {
-			image:           string
-			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-		}
-		#PodConfig: {
-			image:           string
-			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-		}
-		#ContainerConfig: {
-			image:           string
-			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-		}
-		_#cronjob$main: {
-			_config$main: {
-				image:           string
-				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-			}
-			out: spec: jobTemplate: spec: template: {
-				_config$main: {
-					image:           string
-					imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-				}
-				spec: containers: [{
-					_config$main:    _ @test(ignore)
-					imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-				}]
-			}
-		}
-		_#pod$main: {
-			_config$main: {
-				image:           string
-				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-			}
-			spec: containers: [{
-				_config$main:    _ @test(ignore)
-				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-			}]
-		}
-		_#container$main: {
-			_config$main: {
-				image:           string
-				imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-			}
-			imagePullPolicy: "IfNotPresent" | "Always" | "Never"
-		}
-		objects: cronjob: foobar: spec: jobTemplate: spec: template: {
-			_config$main: {
-				image:           "foobar:latest"
-				imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
-			}
-			spec: containers: [{
-				_config$main:    _ @test(ignore)
-				imagePullPolicy: *"Always" | "IfNotPresent" | "Never"
-			}]
-		}
-	})
-	// TODO(inline) support at for closed.
-	// @test(closed, at=full.objects.cronjob.foobar)
 
 }
 -- out/compile --

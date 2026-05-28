@@ -2,25 +2,14 @@
 c: "foo"
 a: b: int
 #Schema
-#Schema: close({ a: b: int}) @test(closed)
+#Schema: close({a: b: int})
 
 x: {
 	c: "foo"
 	a: b: int
 	#Schema
-	#Schema: close({ a: b: int})
-} @test(closed)
-
-@test(eq, {
-	a: b: int
-	c: "foo"
-	#Schema: { a: b: int }
-	x: {
-		a: b: int
-		c: "foo"
-		#Schema: a: b: int
-	}
-})
+	#Schema: close({a: b: int})
+}
 -- out/compile --
 --- in.cue
 {

@@ -7,12 +7,12 @@
 -- in.cue --
 #T: {
 	arg: x: string
-	out1: "\(arg.x) \(arg.y)" @test(err, code=eval)
+	out1: "\(arg.x) \(arg.y)"
 	// TODO: is this really an eval error if it is referred to within a
 	// definitions?
-	out2: "\(arg.y)"           @test(err, code=eval)
-	vx:   arg.x                @test(kind=string)
-	vy:   arg.y                @test(err, code=eval)
+	out2: "\(arg.y)"
+	vx:   arg.x
+	vy:   arg.y
 }
 -- out/compile --
 --- in.cue

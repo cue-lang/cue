@@ -6,68 +6,37 @@
 // ── Container-level @test(permute): permutes all fields of `in` ──
 
 threeFieldPermute: {
-	@test(permute, count=6)
 	a: b + c
 	b: 1
 	c: 2
-	@test(eq, {
-		a: 3
-		b: 1
-		c: 2
-	})
 }
 
 twoFieldPermute: {
-	@test(permute, count=2)
 	x: y + 1
 	y: 5
-	@test(eq, {
-		x: 6
-		y: 5
-	})
 }
 
 // ── Decl attr on `in` directly: equivalent syntax ──
 
 inDeclPermute: {
-	@test(permute, count=6)
 	p: q + r
 	q: 3
 	r: 7
-	@test(eq, {
-		p: 10
-		q: 3
-		r: 7
-	})
 }
 
 // ── Self-contained concrete struct: trivially order-invariant ──
 
 concretePermute: {
 	x: {
-		@test(permute, count=6)
 		alpha: 1
 		beta:  2
 		gamma: 3
 	}
 	y: {
-		@test(permute, count=6)
 		alpha: 1
 		beta:  2
 		gamma: 3
 	}
-	@test(eq, {
-		x: {
-			alpha: 1
-			beta:  2
-			gamma: 3
-		}
-		y: {
-			alpha: 1
-			beta:  2
-			gamma: 3
-		}
-	})
 }
 -- out/compile --
 --- in.cue

@@ -3,17 +3,11 @@
 
 // ── scalar value ─────────────────────────
 
-debugCheckScalar: 42 @test(debugCheck, "(int){ 42 }")
+debugCheckScalar: 42
 
 // ── struct value ─────────────────────────
 
 debugCheckStruct: {
-	@test(debugCheck, """
-		(struct){
-		  a: (int){ 1 }
-		  b: (int){ 2 }
-		}
-		""")
 	a: 1
 	b: 2
 }
@@ -21,12 +15,6 @@ debugCheckStruct: {
 // ── computed struct ───────────────────────
 
 debugCheckComputed: {
-	@test(debugCheck, """
-		(struct){
-		  x: (int){ 10 }
-		  y: (int){ 20 }
-		}
-		""")
 	x: 10
 	y: x * 2
 }
@@ -36,16 +24,6 @@ debugCheckComputed: {
 // verifying that versioned attrs are accepted and applied correctly.
 
 debugCheckVersioned: {
-	@test(debugCheck, """
-		(struct){
-		  z: (int){ 99 }
-		}
-		""")
-	@test(debugCheck:v3, """
-		(struct){
-		  z: (int){ 99 }
-		}
-		""")
 	z: 99
 }
 -- out/compile --

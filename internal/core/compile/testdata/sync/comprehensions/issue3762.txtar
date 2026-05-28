@@ -21,29 +21,8 @@ full: {
 		x: 5
 	}
 
-	_a: [ID=_]: vms: [{ name: "hello" }]
-	_b: [ID=_]: vms: [{ name: "again" }]
-	@test(eq, {
-		kube: node: n1: {
-			_CL: "l"
-			_cs: l: {
-				opts: {}
-				_ba?: string
-				vms: [{
-					name: "hello"
-				}]
-			}
-		}
-		_a: l: {
-			_ba?: string
-			opts: {}
-			vms: [{
-				name: "hello"
-			}]
-		}
-		x: 5
-		_b: {}
-	})
+	_a: [ID=_]: vms: [{name: "hello"}]
+	_b: [ID=_]: vms: [{name: "again"}]
 }
 reduced: p1: {
 	_cs: _a.l & {
@@ -65,14 +44,6 @@ reduced: p1: {
 	for k, _ in _a & _b {
 		x: 5
 	}
-	@test(eq, {
-		_cs: {opts: {}, _ba?: string, vms: "hello"}
-		_a: {
-			l: {_ba?: string, opts: {}, vms: "hello"}
-		}
-		_b: {l: {vms: "again"}}
-		x: 5
-	})
 }
 reduced: p2: {
 	for k, _ in _a & _b {
@@ -94,14 +65,6 @@ reduced: p2: {
 	}
 
 	_b: l: vms: "again"
-	@test(eq, {
-		x: 5
-		_cs: {opts: {}, _ba?: string, vms: "hello"}
-		_a: {
-			l: {_ba?: string, opts: {}, vms: "hello"}
-		}
-		_b: {l: {vms: "again"}}
-	})
 }
 reference: {
 	_x: {
@@ -115,11 +78,6 @@ reference: {
 	for k, _ in _x & _y {
 		ok: true
 	}
-	@test(eq, {
-		_x: {f: true}
-		_y: {f: false}
-		ok: true
-	})
 }
 -- out/compile --
 --- in.cue

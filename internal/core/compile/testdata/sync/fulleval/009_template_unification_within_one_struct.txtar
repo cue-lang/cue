@@ -5,13 +5,9 @@ a: {
 	// TODO: allow duplicate alias here
 	{[X=string]: {kind: X}}
 }
-a: "A": _  @test(eq, {name: "A", kind: "A"})
-a: "C": _  @test(eq, {name: "C", kind: "C"})
-a: "E": {c: "bar"} @test(eq, {
-	c: "bar"
-	name: "E"
-	kind: "E"
-})
+a: "A": _
+a: "C": _
+a: "E": {c: "bar"}
 -- out/compile --
 --- in.cue
 {

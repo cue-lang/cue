@@ -15,12 +15,12 @@ package x
 
 c1: #C1 & {
 	name: "cueckoo"
-} @test(eq, {name: "cueckoo"})
+}
 
 c2: #C2 & {
 	c1
 	age: 5
-} @test(eq, {age: 5, name: "cueckoo"})
+}
 -- out/compile --
 --- x.cue
 {

@@ -1,7 +1,7 @@
 -- in.cue --
 import "list"
 
-a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y}) @test(eq, [1, 2, 3, 4])
+a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y})
 -- out/compile --
 --- in.cue
 {

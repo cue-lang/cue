@@ -11,13 +11,6 @@ issue3905: reduced: {
 	}
 
 	(#Schema).result
-	@test(eq, {
-		#Schema: {
-			params: {name: *"foo" | string}
-			result: {foo: "bar"}
-		}
-		foo: "bar"
-	})
 }
 issue3905: full: {
 	#ReferenceGrantBuilder: {
@@ -38,9 +31,9 @@ issue3905: full: {
 
 	#ReferenceGrant: {
 		apiVersion: "gateway.networking.k8s.io/v1beta1"
-		kind: "ReferenceGrant"
+		kind:       "ReferenceGrant"
 		metadata!: {
-			name!: string
+			name!:      string
 			namespace!: string
 			labels?: {
 				[string]: string
@@ -50,46 +43,6 @@ issue3905: full: {
 			}
 		}
 	}
-	@test(eq, {
-		#ReferenceGrantBuilder: {
-			parameters: {
-				namespace: string
-				gatewayNamespace: *"foo" | string
-			}
-			referenceGrant: {
-				foo: {
-					metadata: {
-						name: *"foo" | string
-						namespace: string
-						labels?: {}
-						annotations?: {}
-					}
-					apiVersion: "gateway.networking.k8s.io/v1beta1"
-					kind: "ReferenceGrant"
-				}
-			}
-		}
-		#ReferenceGrant: {
-			apiVersion: "gateway.networking.k8s.io/v1beta1"
-			kind: "ReferenceGrant"
-			metadata!: {
-				name!: string
-				namespace!: string
-				labels?: {}
-				annotations?: {}
-			}
-		}
-		foo: {
-			metadata: {
-				name: *"foo" | string
-				namespace: "foo"
-				labels?: {}
-				annotations?: {}
-			}
-			apiVersion: "gateway.networking.k8s.io/v1beta1"
-			kind: "ReferenceGrant"
-		}
-	})
 }
 -- out/compile --
 --- in.cue

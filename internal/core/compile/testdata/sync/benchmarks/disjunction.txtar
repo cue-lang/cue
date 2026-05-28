@@ -25,7 +25,6 @@ x: [_]: f: *1 | int
 
 x: {
 	a0: {}
-	@test(eq, {a0: {f: *1 | int}})
 }
 -- out/compile --
 --- in.cue

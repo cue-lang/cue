@@ -14,7 +14,7 @@ reduced: {
 		f?: null | bool | string | int | #Schema
 	}
 
-	out: #Schema & { #Schema }
+	out: #Schema & {#Schema}
 }
 full: {
 	#Schema: {
@@ -48,69 +48,6 @@ full: {
 		properties: foo: required: ["bar", "baz"]
 	}]
 }
-
-// TODO(inline):
-//  1) format better
-//  2) identify repeated elements
-//  3) leave at= flag at begginning when generating.
-@test(eq, at=full.out, [{
-	properties: {
-		foo: {
-			required: ["bar", "baz"]
-			properties?: {}
-			foo00?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo01?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo02?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo03?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo04?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo05?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo06?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo07?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo08?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo09?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo10?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo11?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo12?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo13?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo14?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo15?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo16?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo17?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo18?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-			foo19?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-		}
-	}
-	required?: []
-	foo00?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo01?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo02?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo03?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo04?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo05?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo06?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo07?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo08?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo09?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo10?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo11?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo12?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo13?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo14?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo15?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo16?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo17?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo18?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-	foo19?: null | bool | string | [] | {string: >=-2147483648 & <=2147483647 & int}
-}])
-@test(eq, {
-	a?: null | bool | string | int | {a?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, b?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, c?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, d?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, e?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, f?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}}
-	b?: null | bool | string | int | {a?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, b?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, c?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, d?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, e?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, f?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}}
-	c?: null | bool | string | int | {a?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, b?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, c?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, d?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, e?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, f?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}}
-	d?: null | bool | string | int | {a?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, b?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, c?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, d?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, e?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, f?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}}
-	e?: null | bool | string | int | {a?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, b?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, c?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, d?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, e?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, f?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}}
-	f?: null | bool | string | int | {a?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, b?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, c?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, d?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, e?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}, f?: null | bool | string | int | {a?: null | bool | string | int, b?: null | bool | string | int, c?: null | bool | string | int, d?: null | bool | string | int, e?: null | bool | string | int, f?: null | bool | string | int}}
-}, at=reduced.out)
-
 -- out/compile --
 --- in.cue
 {

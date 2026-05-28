@@ -23,7 +23,7 @@ x: {
 	}
 
 	gateway: whoami2: {}
-} @test(eq, at=gateway.whoami2, {foo: 1, k8s: {foo: 1}})
+}
 -- out/compile --
 --- in.cue
 {

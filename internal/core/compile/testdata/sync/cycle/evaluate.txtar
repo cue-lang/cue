@@ -14,7 +14,6 @@ letCycleOK: t1: {
 	b: c
 	let X = b
 	c: X
-	@test(eq, {b: _, c: _})
 }
 
 // The let has structural cycle, but it is only used in a way that the
@@ -25,7 +24,6 @@ letCycleOK: t2: {
 		let X = a
 		c: X.b
 	}
-	@test(eq, {a: {b: 1, c: 1}})
 }
 
 // Ensure that the cycle exemption algorithm does not bypass actual structural
@@ -36,7 +34,6 @@ letCycleFail: t1: {
 		let X = a
 		c: X
 	}
-	@test(err, code=structural_cycle, path=a.c, contains="structural cycle", pos=[])
 }
 
 // Cycles should also be detected in evaluation paths that descend into
@@ -44,88 +41,62 @@ letCycleFail: t1: {
 letCycleFail: t2: {
 	a: {
 		let X = a
-		if X == _|_ { }
+		if X == _|_ {}
 		x: y: ""
 	}
-	@test(eq, {a: {x: {y: ""}}})
-	// TODO(eval): not sure if it really should fail here, so this may be okay.
-	@test(debug, """
-		(struct){
-		  a: (struct){
-		    let X#4 = (_|_){
-		      // [structural_cycle] letCycleFail.t2.a.X: structural cycle
-		    }
-		    x: (struct){
-		      y: (string){ "" }
-		    }
-		  }
-		}
-		""")
 }
 
 listCycleOK: {
 	a: b
 	b: and([c])
 	c: a
-	@test(eq, {a: _, b: _, c: _})
 }
 
 disjunctionCycle: {
 	a: b
 	b: and(1 | c)
 	c: a
-	@test(err, code=eval, path=b,
-		hint="This probably should be a totally different error message.",
-		contains="cannot use %s (type %s) as %s in argument %d to %v",
-		args=[1, int, list, 1, and], pos=[2:9])
 }
 
 forCycle: {
 	#A: a: #B // TODO(errors): Correct error position, or at all.
-	#B: or([for x in #A { b: x }])
-	@test(err, code=structural_cycle, path=#B.b, contains="structural cycle", pos=[])
+	#B: or([for x in #A {b: x}])
 }
 
 letCycleWithAnd: {
 	a: d: b
-	b: and([for x in a let y = x { y }])
+	b: and([for x in a let y = x {y}])
 	c: a
-	@test(eq, {a: {d: {}}, b: {}, c: {d: {}}})
 }
 
 closeCycle: {
 	a: b
 	b: close({d: c})
 	c: a
-	@test(err, code=structural_cycle, path=c, contains="structural cycle", pos=[])
 }
 
 structCycle: {
 	a: b
 	b: and([{d: c}])
 	c: a
-	@test(err, code=structural_cycle, path=c, contains="structural cycle", pos=[])
 }
 
 embedCycle: {
 	a: b
 	b: close({c})
 	c: a
-	@test(eq, {a: {}, b: {}, c: {}})
 }
 
 listAddCycle: {
 	a: b
 	b: list.Concat([[c], [c]])
 	c: a
-	@test(err, code=structural_cycle, path=b, contains="error in call to %s", args=[list.Concat], pos=[2:5])
 }
 
 listMulCycle: {
 	a: b
 	b: list.Repeat([{a: b: c}], 3)
 	c: a
-	@test(err, code=structural_cycle, path=b, contains="error in call to %s", args=[list.Repeat], pos=[2:5])
 }
 
 // consult the correct closeness info in the face of it being passed down
@@ -133,26 +104,21 @@ listMulCycle: {
 closeFail: {
 	#T: [_]: _
 	#T: close({"a": string})
-	x:  #T
+	x: #T
 	x: b: "foo"
-	@test(err, code=eval, path=x.b, contains="field not allowed", pos=[1:6, 4:5])
 }
 
 printCycle: {
 	a: {
 		X: a
-		if X {
-		}
+		if X {}
 	}
-	@test(err, code=structural_cycle, path=a.X, contains="structural cycle", pos=[])
 }
 -- self.cue --
 issue3978: {
 	a: self={
-		if self.missing != _|_ {
-		}
+		if self.missing != _|_ {}
 	}
-	@test(eq, {a: {}})
 }
 -- out/compile --
 --- in.cue

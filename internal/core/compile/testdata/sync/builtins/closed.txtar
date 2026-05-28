@@ -3,8 +3,8 @@ a: close({
 	a: b: int
 })
 
-b: a & {x: int} @test(err, code=eval, at=x, contains="field not allowed", pos=[0:9]) // err
-c: a & {a: c: int} @test(eq, {a: {c: int, b: int}}) // okay (non-recursive close)
+b: a & {x: int}    // err
+c: a & {a: c: int} // okay (non-recursive close)
 
 inDisjunctions: {
 	x: [string]: #Def
@@ -16,35 +16,6 @@ inDisjunctions: {
 	x: socket: string: {}
 	x: syslog: x.socket
 	x: syslog: xxx: {}
-
-	@test(eq, {
-		x: {
-			socket: string: {
-				a: b: true
-				uint: a: b: true
-			} | {
-				a: b: true
-				string: a: b: true
-			}
-			syslog: {
-				string: {
-					a: b: true
-					uint: a: b: true
-				} | {
-					a: b: true
-					string: a: b: true
-				}
-				xxx: {
-					a: b: true
-					uint: a: b: true
-				} | {
-					a: b: true
-					string: a: b: true
-				}
-			}
-		}
-		#Def: {}
-	})
 }
 
 // issue642: Tests that close() with merged struct patterns (concrete fields and
@@ -55,24 +26,10 @@ issue642: {
 		b: x: _
 	} & {
 		[string]: y: _
-	}) @test(closed)
+	})
 
 	test: a: x: _
 	test: b: x: _
-
-	@test(eq, {
-		test: {
-			[string]: y: _
-			a: {
-				y: _
-				x: _
-			}
-			b: {
-				x: _
-				y: _
-			}
-		}
-	})
 }
 
 // Issue 642
@@ -85,30 +42,16 @@ withSubfields: {
 
 	test: a: x: _
 	test: b: x: _
-
-	@test(eq, {
-		test: {
-			[string]: y: _
-			a: {
-				y: _
-				x: _
-			}
-			b: {
-				x: _
-				y: _
-			}
-		}
-	})
 }
 
 // issue3572: Tests that close({...}) allows additional fields when unified
 // with an open struct. https://cuelang.org/issue/3572
 issue3572: {
-  t1: close({...}) & {a: 5} @test(eq, {a: 5}) @test(closed)
+	t1: close({...}) & {a: 5}
 
-  e: close({...}) @test(closed) // TODO: @test(allows=expr)
+	e: close({...}) // TODO: @test(allows=expr)
 
-  t2: e & {a: 5} @test(eq, {a: 5}) @test(closed)
+	t2: e & {a: 5}
 }
 
 // issue3580: Tests that close() does not panic when a field inside the closed
@@ -117,49 +60,43 @@ issue3580: {
 	x: close({
 		a: _
 		b: x.a
-	}) @test(closed)
+	})
 }
 -- embed.cue --
 nestedEmbedded: base: {
-	close({ foo?: close({ foo?: _ }) })
+	close({foo?: close({foo?: _})})
 	foo: allowed: 5
-
-	@test(eq, { foo: { allowed: 5, foo?: _ } })
 }
 nestedEmbedded: t1: {
-	{ close({ foo?: close({ foo?: _ }) }) }
+	{close({foo?: close({foo?: _})})}
 	foo: allowed: 5
-
-	@test(eq, { foo: { allowed: 5, foo?: _ } })
 }
 nestedEmbedded: t2: {
-	{{ close({ foo?: close({ foo?: _ }) }) }}
+	{{close({foo?: close({foo?: _})})}}
 	foo: allowed: 5
-
-	@test(eq, { foo: { allowed: 5, foo?: _ } })
 }
 unified: base: {
-	x: close({ foo?: close({ foo?: _ }) })
-	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+	x: close({foo?: close({foo?: _})})
+	x: foo: disallowed: 5
 }
 unified: t1: {
-	x: { close({ foo?: close({ foo?: _ }) }) }
-	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+	x: {close({foo?: close({foo?: _})})}
+	x: foo: disallowed: 5
 }
 unified: t2: {
-	x: {{ close({ foo?: close({ foo?: _ }) }) }}
-	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+	x: {{close({foo?: close({foo?: _})})}}
+	x: foo: disallowed: 5
 }
 nestedWithSelfReference: t1: {
 	_schema: close({
 		foo?: _schema
-	}) @test(shareID=S)
+	})
 	// TODO(inline): make work for hidden fields.
 	// @test(err, at=_schema.foo, code=structural_cycle)
 	// @test(shareID=S, at=x.foo.foo)
 
 	x: {_schema}
-	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+	x: foo: disallowed: 5
 }
 nestedWithSelfReference: t2: {
 	_schema: close({
@@ -168,7 +105,7 @@ nestedWithSelfReference: t2: {
 	// TODO(inline): make work for hidden fields.
 	// @test(err, at=foo, code=structural_cycle)
 	x: {{_schema}}
-	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
+	x: foo: disallowed: 5
 }
 -- out/compile --
 --- embed.cue

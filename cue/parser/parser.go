@@ -717,6 +717,9 @@ func (p *parser) parseIndexOrSlice(x ast.Expr) (expr ast.Expr) {
 			index[nColons] = p.parseRHS()
 		}
 	}
+	if nColons == 0 && p.tok == token.COMMA {
+		p.next()
+	}
 	p.exprLev--
 	rbrack := p.expect(token.RBRACK)
 

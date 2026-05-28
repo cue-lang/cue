@@ -282,6 +282,20 @@ import "list"
     r: b & [1, 2, {a: 4}]
     s: [string]: [string]: a
     s: [string]: {s: string}
+
+    // Index expressions, including multi-line forms allowed via the
+    // optional trailing comma — see cuelang.org/issue/2738.
+    idx1: bar["baz"]
+    idx2: bar["baz",]
+    idx3: bar[
+        "baz"
+    ]
+    idx4: bar[
+        "baz",
+    ]
+    idx5: bar[foo[
+        "baz"
+    ]]
 }
 -- out/format/expressions.golden --
 package expressions
@@ -564,6 +578,20 @@ import "list"
 	r: b & [1, 2, {a: 4}]
 	s: [string]: [string]: a
 	s: [string]: {s: string}
+
+	// Index expressions, including multi-line forms allowed via the
+	// optional trailing comma — see cuelang.org/issue/2738.
+	idx1: bar["baz"]
+	idx2: bar["baz"]
+	idx3: bar[
+			"baz"
+			]
+	idx4: bar[
+			"baz"
+			]
+	idx5: bar[foo[
+			"baz"
+			]]
 }
 -- issue2496.input --
 machine_type: [

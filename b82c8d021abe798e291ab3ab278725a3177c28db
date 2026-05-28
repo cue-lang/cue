@@ -16,6 +16,24 @@
       "message": "How about just ignoring the column numbers here? After all, we already accept extra digits/text e.g. `x1.json:4:30`, and I doubt anyone is actually checking that the offsets are correct.\n\n```suggestion\nstderr \u0027x1*.json:4:\u0027\n```",
       "revId": "b82c8d021abe798e291ab3ab278725a3177c28db",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c43e6bb4_63d65552",
+        "filename": "cmd/cue/cmd/testdata/script/json_syntax_error.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-28T12:01:14Z",
+      "side": 1,
+      "message": "ah, accepting extra digits is just a mistake. fixed. matching the columns is intended though, because we really do want to double check that both line and column numbers are being rendered correctly.",
+      "parentUuid": "685d3c01_ef6c6a71",
+      "revId": "b82c8d021abe798e291ab3ab278725a3177c28db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

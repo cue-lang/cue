@@ -65,6 +65,5 @@ checkCfg: OUT.IMPORTS[0].cfg @test(eq, "sub-")
     ./main.cue:11:17
 [cycle] OUT.IMPORTS.0.export.OBJECTS.b.name: cycle with field: a.spec:
     ./main.cue:5:20
-[incomplete] IN.spec: non-concrete value _ in operand to +:
-    ./main.cue:5:14
-    ./main.cue:6:14
+[cycle] IN.spec: cycle with field: a.spec:
+    ./main.cue:5:20

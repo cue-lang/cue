@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f650ff7_00f05014",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2026-05-29T10:36:30Z",
+      "side": 1,
+      "message": "approving on behalf of @mvdan@mvdan.cc as this was already reviewed by him on GitHub",
+      "revId": "62a4773b38fa0f21aeb41bf9302ab762e2c630b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

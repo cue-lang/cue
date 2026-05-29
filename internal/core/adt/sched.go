@@ -910,6 +910,9 @@ func runTask(t *task, mode runMode) {
 
 	t.run.f(ctx, t, mode)
 
+	// Clear context error so that it does not leak into deferred tasks.
+	errs := ctx.Err()
+
 	for _, d := range t.node.deferred {
 		d.node.CompleteArcsOnly(ctx)
 		if b, ok := d.node.BaseValue.(*Bottom); ok {
@@ -923,7 +926,7 @@ func runTask(t *task, mode runMode) {
 
 		// TODO: always reporting errors in the current task would avoid us
 		// having to collect and assign errors here.
-		t.err = CombineErrors(nil, t.err, ctx.Err())
+		t.err = CombineErrors(nil, t.err, errs)
 		if t.err == nil {
 			t.state = taskSUCCESS
 		} else {

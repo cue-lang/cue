@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca439b5e_5326e696",
+        "filename": "CLAUDE.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-29T07:10:38Z",
+      "side": 1,
+      "message": "should we not recommend `cueckoo version update` here, much like the hook? this way you also ensure you\u0027re installing the very latest version of the guidance.",
+      "revId": "6bffaf76263632fbc2e10150af90bffbf5347a39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -331,7 +331,7 @@ field: value
 			}
 			want := strings.TrimSpace(tc.out)
 			if got != want {
-				t.Error(cmp.Diff(got, want))
+				t.Error(cmp.Diff(want, got))
 			}
 		})
 	}
@@ -392,7 +392,7 @@ true
 			got := strings.TrimSpace(string(b))
 			want := strings.TrimSpace(tc.out)
 			if got != want {
-				t.Error(cmp.Diff(got, want))
+				t.Error(cmp.Diff(want, got))
 			}
 		})
 	}

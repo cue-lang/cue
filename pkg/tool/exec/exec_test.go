@@ -87,7 +87,7 @@ func TestEnv(t *testing.T) {
 				t.Fatalf("mkCommand error = %v", err)
 			}
 
-			if diff := cmp.Diff(cmd.Env, tc.env); diff != "" {
+			if diff := cmp.Diff(tc.env, cmd.Env); diff != "" {
 				t.Error(diff)
 			}
 		})

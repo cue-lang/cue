@@ -1244,7 +1244,7 @@ func TestFill(t *testing.T) {
 
 		w := mustCompile(t, ctx, tc.out)
 
-		if diff := cmp.Diff(goValue(v), goValue(w)); diff != "" {
+		if diff := cmp.Diff(goValue(w), goValue(v)); diff != "" {
 			t.Error(diff)
 			t.Errorf("\ngot:  %s\nwant: %s", v, w)
 		}
@@ -1516,9 +1516,9 @@ func TestFillPath(t *testing.T) {
 
 				w := mustCompile(t, ctx, tc.out)
 
-				if diff := cmp.Diff(goValue(v), goValue(w)); diff != "" {
+				if diff := cmp.Diff(goValue(w), goValue(v)); diff != "" {
 					t.Error(diff)
-					t.Error(cmp.Diff(goValue(v), goValue(w)))
+					t.Error(cmp.Diff(goValue(w), goValue(v)))
 					t.Errorf("\ngot:  %s\nwant: %s", v, w)
 				}
 			})

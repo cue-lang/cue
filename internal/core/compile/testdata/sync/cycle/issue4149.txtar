@@ -1,0 +1,88 @@
+# The or() builtin used to give a "structural cycle" error in a case where
+# the equivalent disjunction operator | did not. Here #X embeds itself into
+# #A and #B, and is then constrained by a disjunction of #A and #B. Using
+# or([#A, #B]) triggered the spurious cycle, whereas #A | #B did not. The two
+# forms must behave identically. https://cuelang.org/issue/4149
+-- in.cue --
+op: {
+	#X: {
+		type!: string
+		...
+	}
+
+	#X: #A | #B
+
+	#A: {
+		#X
+		type!: "a"
+		x?:    int
+	}
+
+	#B: {
+		#X
+		type!: "b"
+		y!:    int
+	}
+}
+
+builtin: {
+	#X: {
+		type!: string
+		...
+	}
+
+	#X: or([#A, #B])
+
+	#A: {
+		#X
+		type!: "a"
+		x?:    int
+	}
+
+	#B: {
+		#X
+		type!: "b"
+		y!:    int
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  op: {
+    #X: {
+      type!: string
+      ...
+    }
+    #X: (〈0;#A〉|〈0;#B〉)
+    #A: {
+      〈1;#X〉
+      type!: "a"
+      x?: int
+    }
+    #B: {
+      〈1;#X〉
+      type!: "b"
+      y!: int
+    }
+  }
+  builtin: {
+    #X: {
+      type!: string
+      ...
+    }
+    #X: or([
+      〈1;#A〉,
+      〈1;#B〉,
+    ])
+    #A: {
+      〈1;#X〉
+      type!: "a"
+      x?: int
+    }
+    #B: {
+      〈1;#X〉
+      type!: "b"
+      y!: int
+    }
+  }
+}

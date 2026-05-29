@@ -16,6 +16,24 @@
       "message": "shorten this a bit?",
       "revId": "ea6bac87db52a2950bc5730bdf9cc869ad32c990",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4647f504_506c673c",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-29T15:58:14Z",
+      "side": 1,
+      "message": "Done. Shortened from 13 to 7 lines.",
+      "parentUuid": "cc4332a9_3af21a18",
+      "revId": "ea6bac87db52a2950bc5730bdf9cc869ad32c990",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

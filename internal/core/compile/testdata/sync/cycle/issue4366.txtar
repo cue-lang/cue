@@ -1,0 +1,57 @@
+# Embedding a closed definition through `({} & schema).export` caused
+# `json.Marshal(this)` inside `#Name` to re-enter Finalize on the
+# in-flight vertex with a fresh OpContext. The typo check then ran
+# against arc conjunctInfo from the original context and falsely
+# reported `field not allowed` for sanctioned fields like `name`.
+#
+# https://cuelang.org/issue/4366
+-- in.cue --
+import "encoding/json"
+
+schema: {
+	$val: prefix: string | *""
+	$val: prefix: "redis-"
+
+	#Name: this={
+		name: $val.prefix + (#shortHash & {in: json.Marshal(this)}).out
+	}
+	#shortHash: {in: string, out: ""}
+
+	_in: #Name
+
+	export: [
+		_in,
+		if _in.name != _|_ {_in},
+	]
+}
+
+result: ({} & schema).export
+-- out/compile --
+--- in.cue
+{
+  schema: {
+    $val: {
+      prefix: (string|*"")
+    }
+    $val: {
+      prefix: "redis-"
+    }
+    #Name: {
+      name: (〈1;$val〉.prefix + (〈1;#shortHash〉 & {
+        in: 〈import;"encoding/json"〉.Marshal(〈2〉)
+      }).out)
+    }
+    #shortHash: {
+      in: string
+      out: ""
+    }
+    _in: 〈0;#Name〉
+    export: [
+      〈1;_in〉,
+      if (〈1;_in〉.name != _|_(explicit error (_|_ literal) in source)) {
+        〈2;_in〉
+      },
+    ]
+  }
+  result: ({} & 〈0;schema〉).export
+}

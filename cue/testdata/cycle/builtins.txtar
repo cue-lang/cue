@@ -462,7 +462,7 @@ selfCycle.t1.c.d.d.d: structural cycle:
     ./yamlcycle.cue:44:8
     ./yamlcycle.cue:45:8
     ./yamlcycle.cue:46:8
-[structural_cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
+[structural_cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:56:8
 [structural_cycle] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:56:8

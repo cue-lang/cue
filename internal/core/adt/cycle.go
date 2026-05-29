@@ -497,6 +497,23 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 				return ci, false
 			}
 
+			// This Refs entry for arc was recorded while evaluating r.Node.
+			// If r.Node is itself still being evaluated (it is on the
+			// evaluation stack) yet is not a structural ancestor of the node
+			// we are now building, then n.node lives in an independent branch
+			// of r.Node's subtree — typically reached through data, e.g. a
+			// comprehension iterating an imported value that re-instantiates
+			// the same definition (`{cfg: _} & imp).export` in #4367). The
+			// reoccurrence of arc is then structure sharing of a definition
+			// body across two independent instantiations, not a self-feeding
+			// structural cycle, so it must not be marked cyclic.
+			//
+			// A same-reference reoccurrence (r.Ref == x) is genuine
+			// self-expansion of one reference and is left to markCyclicPath.
+			if r.Ref != x && n.hasAncestor(r.Node) && !isStructuralAncestor(r.Node, n.node) {
+				continue
+			}
+
 			return n.markCyclicPath(arc, env, x, ci)
 		}
 		if r.Ref == x && arc.nonRooted {
@@ -624,6 +641,17 @@ func sharedTargetHasInProgressCycle(c *OpContext, w *Vertex) bool {
 			continue
 		}
 		if c.hasDepthCycle(arc.DerefNonDisjunct()) {
+			return true
+		}
+	}
+	return false
+}
+
+// isStructuralAncestor reports whether anc is equal to v or one of its
+// structural parents (following the Parent chain).
+func isStructuralAncestor(anc, v *Vertex) bool {
+	for p := v; p != nil; p = p.Parent {
+		if equalDeref(p, anc) {
 			return true
 		}
 	}

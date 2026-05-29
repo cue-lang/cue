@@ -26,7 +26,7 @@ _export: lib.template & {
 	GENERATORS: []
 }
 
-result: _export.objects @test(eq:todo, [
+result: _export.objects @test(eq, [
 	{spec: {ref: "sub-h"}, kind: "plain", metadata: {}},
 	{data: {foo: "bar"}, kind: "hashed", metadata: {name: "sub-h"}},
 	{metadata: {}},

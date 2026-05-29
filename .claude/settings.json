@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "printf 'Current cueckoo guidance-hash: %s\\n' \"$(cueckoo guidance --hash)\""
+            "command": "cueckoo version update"
           }
         ]
       }

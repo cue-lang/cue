@@ -1,0 +1,25 @@
+# Structural recursion that used to loop forever now reports a structural cycle.
+# https://cuelang.org/issue/3364
+-- in.cue --
+out: _t3.out
+_t3: {
+	repeater: L={L.a}
+	data:     M={a: a: M}
+	out:      repeater & data
+}
+-- out/compile --
+--- in.cue
+{
+  out: 〈0;_t3〉.out
+  _t3: {
+    repeater: {
+      〈1〉.a
+    }
+    data: {
+      a: {
+        a: 〈2〉
+      }
+    }
+    out: (〈0;repeater〉 & 〈0;data〉)
+  }
+}

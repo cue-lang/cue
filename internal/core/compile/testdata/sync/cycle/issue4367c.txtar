@@ -1,0 +1,115 @@
+# Single-package reduction of #4367 where a sibling field genuinely
+# participates in a reference cycle. OUT instantiates TEMPLATE, whose body
+# re-instantiates the same template through a comprehension over the IMPORTS
+# data (`({cfg: _} & imp).export.objects`). The export's OBJECTS contain a
+# genuine reference cycle: a.spec -> b.name (b.name: cfg + a.spec) -> a.spec.
+#
+# cfg is only an operand of b.name; it is not itself part of the cycle, so
+# the shared cfg disjunction (string | *"") & "sub-" must resolve to "sub-".
+# Before the fix, the cycle error produced while evaluating the template body
+# leaked through the shared evaluation context onto cfg's disjunct (a deferred
+# completion), dropping the "sub-" disjunct and wrongly producing
+# `cfg: conflicting values "" and "sub-"`.
+#
+# OUT must stay top-level: nesting it deeper shifts the evaluation depth and
+# masks the bug.
+#
+# https://cuelang.org/issue/4367
+-- cue.mod/module.cue --
+module: "example.com/m@v0"
+language: version: "v0.12.0"
+-- main.cue --
+OUT: TEMPLATE & {
+	IMPORTS: [{
+		export: TEMPLATE & {
+			OBJECTS: {
+				b: name: cfg + a.spec
+				a: spec: b.name
+				b: spec: "hashed"
+			}
+			GENERATORS: [{
+				IN: {}
+				OUT: [if IN.spec != "" {}]
+			}]
+		}
+		cfg: "sub-"
+		cfg: string | *""
+	}]
+}
+
+TEMPLATE: {
+	OBJECTS: {}
+	IMPORTS: [...]
+	GENERATORS: [...]
+
+	objects: [
+		for _, obj in OBJECTS
+		for _, o in (GENERATORS[0] & {IN: obj}).OUT {o},
+	]
+	_importedObjects: [
+		for _, imp in IMPORTS
+		for _, obj in ({cfg: _} & imp).export.objects {obj},
+	]
+}
+
+// cfg is not on the a.spec cycle, so it must resolve to "sub-". Before the
+// fix the cycle leaked onto cfg via the shared evaluation context and it
+// reported `cfg: conflicting values "" and "sub-"`.
+checkCfg: OUT.IMPORTS[0].cfg
+-- out/compile --
+--- main.cue
+{
+  OUT: (〈0;TEMPLATE〉 & {
+    IMPORTS: [
+      {
+        export: (〈3;TEMPLATE〉 & {
+          OBJECTS: {
+            b: {
+              name: (〈3;cfg〉 + 〈1;a〉.spec)
+            }
+            a: {
+              spec: 〈1;b〉.name
+            }
+            b: {
+              spec: "hashed"
+            }
+          }
+          GENERATORS: [
+            {
+              IN: {}
+              OUT: [
+                if (〈1;IN〉.spec != "") {},
+              ]
+            },
+          ]
+        })
+        cfg: "sub-"
+        cfg: (string|*"")
+      },
+    ]
+  })
+  TEMPLATE: {
+    OBJECTS: {}
+    IMPORTS: [
+      ...,
+    ]
+    GENERATORS: [
+      ...,
+    ]
+    objects: [
+      for _, obj in 〈1;OBJECTS〉 for _, o in (〈2;GENERATORS〉[0] & {
+        IN: 〈1;obj〉
+      }).OUT {
+        〈1;o〉
+      },
+    ]
+    _importedObjects: [
+      for _, imp in 〈1;IMPORTS〉 for _, obj in ({
+        cfg: _
+      } & 〈0;imp〉).export.objects {
+        〈1;obj〉
+      },
+    ]
+  }
+  checkCfg: 〈0;OUT〉.IMPORTS[0].cfg
+}

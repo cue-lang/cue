@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "166df617_12c42dda",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-29T12:54:26Z",
+      "side": 1,
+      "message": "true, although I think it\u0027s best to keep a quicktest refactor as a separate change, as it\u0027s orthogonal",
+      "parentUuid": "8c8ef8cc_40db6b12",
+      "revId": "aaf5c0d356ba4f63fd93a195b06d2077413aa45f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ab33334_b4d6aeaa",

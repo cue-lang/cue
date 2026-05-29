@@ -103,7 +103,7 @@ func TestGetenv(t *testing.T) {
 			}),
 		}
 
-		if diff := cmp.Diff(got, want, opts...); diff != "" {
+		if diff := cmp.Diff(want, got, opts...); diff != "" {
 			t.Error(diff)
 		}
 

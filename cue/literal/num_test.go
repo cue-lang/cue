@@ -100,7 +100,7 @@ func TestNumbers(t *testing.T) {
 			n.src = ""
 			n.p = 0
 			n.ch = 0
-			if diff := cmp.Diff(n, tc.n, diffOpts...); diff != "" {
+			if diff := cmp.Diff(tc.n, n, diffOpts...); diff != "" {
 				t.Error(diff)
 				t.Errorf("%#v, %#v\n", n, tc.n)
 			}

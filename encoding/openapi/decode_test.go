@@ -143,7 +143,7 @@ func TestDecode(t *testing.T) {
 						}
 						return
 					}
-					t.Error(cmp.Diff(string(out), string(b)))
+					t.Error(cmp.Diff(string(b), string(out)))
 				}
 			}
 		})

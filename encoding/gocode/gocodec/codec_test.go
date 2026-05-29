@@ -216,7 +216,7 @@ func TestEncode(t *testing.T) {
 			}
 
 			got := reflect.ValueOf(tc.dst).Elem().Interface()
-			if diff := cmp.Diff(got, tc.want); diff != "" {
+			if diff := cmp.Diff(tc.want, got); diff != "" {
 				t.Error(diff)
 			}
 		})

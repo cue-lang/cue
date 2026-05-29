@@ -67,7 +67,7 @@ func TestImportInfo(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if diff := cmp.Diff(got, tc.want); diff != "" {
+			if diff := cmp.Diff(tc.want, got); diff != "" {
 				t.Error(diff)
 			}
 		})

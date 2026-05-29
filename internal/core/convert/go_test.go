@@ -294,7 +294,7 @@ func TestConvert(t *testing.T) {
 			}
 			got := debug.NodeString(ctx, n, nil)
 			if got != tc.want {
-				t.Error(cmp.Diff(got, tc.want))
+				t.Error(cmp.Diff(tc.want, got))
 			}
 		})
 	}

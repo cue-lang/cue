@@ -158,14 +158,10 @@ large.p1.Y: undefined field: port:
     ./in.cue:126:10
 [cycle] large.p1.X: undefined field: port:
     ./in.cue:99:33
-[cycle] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+[incomplete] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
     ./in.cue:102:7
 large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
     ./in.cue:105:7
-large.p1.#X: cyclic reference to field port:
-    ./in.cue:111:9
-large.p1.#X: cyclic reference to field port:
-    ./in.cue:114:9
 [cycle] large.p1.X: undefined field: port:
     ./in.cue:99:33
 -- out/todo.txt --

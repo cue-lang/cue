@@ -71,16 +71,8 @@ TEMPLATE: {
 }
 
 // Before the fix these reported `cfg: conflicting values "" and "sub-"`.
-checkCfg: OUT.IMPORTS[0].cfg @test(eq:todo, "sub-")
-checkName: OUT.IMPORTS[0].objects.plain.b.metadata.name @test(eq:todo, "sub-HASHED")
+checkCfg: OUT.IMPORTS[0].cfg @test(eq, "sub-")
+checkName: OUT.IMPORTS[0].objects.plain.b.metadata.name @test(eq, "sub-HASHED")
 -- out/errors.txt --
 [incomplete] OUT.IMPORTS.0.export.GENERATORS.0.OUT: undefined field: spec:
     ./main.cue:9:17
-[structural_cycle] IN.spec: invalid right-hand value to '+' (type string): structural cycle:
-    ./main.cue:18:20
-[structural_cycle] IN.spec: invalid right-hand value to '+' (type string): structural cycle:
-    ./main.cue:18:20
-[structural_cycle] IN.spec: invalid right-hand value to '+' (type string): structural cycle:
-    ./main.cue:18:20
-[structural_cycle] IN.spec: invalid right-hand value to '+' (type string): structural cycle:
-    ./main.cue:18:20

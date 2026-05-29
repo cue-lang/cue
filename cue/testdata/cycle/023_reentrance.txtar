@@ -44,8 +44,16 @@ fib: non-concrete value int in operand to <:
     ./in.cue:5:8
 [structural_cycle] structural cycle:
     ./in.cue:5:8
+structural cycle:
+    ./in.cue:12:9
+structural cycle:
+    ./in.cue:12:38
 [structural_cycle] structural cycle:
     ./in.cue:5:8
+structural cycle:
+    ./in.cue:12:9
+structural cycle:
+    ./in.cue:12:38
 -- out/todo.txt --
 Structural cycle error positions differ between v2 and v3: v2 includes an
 extra structural cycle at ./in.cue:3:25 (fibRec reference) for fib3/fib7/fib12;

@@ -1,0 +1,167 @@
+# Single-package reduction of #4367. A top-level field OUT instantiates a
+# template TEMPLATE, whose body re-instantiates that same template through a
+# comprehension over the IMPORTS data: `({cfg: _} & imp).export.objects`.
+#
+# Before the fix, OUT and the nested `export` both reference the shared
+# TEMPLATE, and the cycle detector recorded OUT's resolution of TEMPLATE in
+# the conjunct's Refs history. When `export` (reached via the IMPORTS data,
+# a sibling branch of OUT, not a descendant) re-resolved TEMPLATE, the stale
+# Refs entry made the detector report a spurious structural cycle. That cycle
+# tainted the `cfg: string | *""` disjunction so its default reappeared as a
+# concrete branch, yielding `cfg: conflicting values "" and "sub-"`.
+#
+# The fix recognizes that the recording node (OUT) is being evaluated
+# concurrently and is not a structural ancestor of `export`, so the
+# reoccurrence is structure sharing, not recursion. OUT must stay top-level:
+# nesting it deeper shifts the evaluation depth and the existing depth-based
+# escape masks the bug.
+#
+# https://cuelang.org/issue/4367
+-- cue.mod/module.cue --
+module: "example.com/m@v0"
+language: version: "v0.12.0"
+-- main.cue --
+import "strings"
+
+OUT: TEMPLATE & {
+	IMPORTS: [{
+		export: TEMPLATE & {
+			OBJECTS: objects
+			GENERATORS: [{
+				IN: {}
+				OUT: [if IN.spec != "" {}]
+			}]
+		}
+
+		cfg: string | *""
+		cfg: "sub-"
+
+		objects: [string]: [string]: {
+			spec: _
+			metadata: name: cfg + {strings.ToUpper(spec)}
+		}
+		objects: plain: a: spec: objects.plain.b.metadata.name
+		objects: plain: b: spec: "hashed"
+	}]
+}
+
+TEMPLATE: {
+	OBJECTS: {...}
+	IMPORTS: [...]
+	GENERATORS: [...]
+
+	_localObjects: [
+		for _, objs in OBJECTS
+		for _, obj in objs {obj},
+	]
+	_generatedObjects: [
+		for _, obj in _localObjects
+		for _, gen in GENERATORS
+		for _, o in (gen & {IN: obj}).OUT {o},
+	]
+	_importedObjects: [
+		for _, imp in IMPORTS
+		for _, obj in ({cfg: _} & imp).export.objects {obj},
+	]
+	objects: [
+		for _, obj in _localObjects {obj},
+		for _, obj in _generatedObjects {obj},
+		for _, obj in _importedObjects {obj},
+	]
+}
+
+// Before the fix these reported `cfg: conflicting values "" and "sub-"`.
+checkCfg:  OUT.IMPORTS[0].cfg
+checkName: OUT.IMPORTS[0].objects.plain.b.metadata.name
+-- out/compile --
+--- main.cue
+{
+  OUT: (〈0;TEMPLATE〉 & {
+    IMPORTS: [
+      {
+        export: (〈3;TEMPLATE〉 & {
+          OBJECTS: 〈1;objects〉
+          GENERATORS: [
+            {
+              IN: {}
+              OUT: [
+                if (〈1;IN〉.spec != "") {},
+              ]
+            },
+          ]
+        })
+        cfg: (string|*"")
+        cfg: "sub-"
+        objects: {
+          [string]: {
+            [string]: {
+              spec: _
+              metadata: {
+                name: (〈4;cfg〉 + {
+                  〈import;strings〉.ToUpper(〈2;spec〉)
+                })
+              }
+            }
+          }
+        }
+        objects: {
+          plain: {
+            a: {
+              spec: 〈3;objects〉.plain.b.metadata.name
+            }
+          }
+        }
+        objects: {
+          plain: {
+            b: {
+              spec: "hashed"
+            }
+          }
+        }
+      },
+    ]
+  })
+  TEMPLATE: {
+    OBJECTS: {
+      ...
+    }
+    IMPORTS: [
+      ...,
+    ]
+    GENERATORS: [
+      ...,
+    ]
+    _localObjects: [
+      for _, objs in 〈1;OBJECTS〉 for _, obj in 〈0;objs〉 {
+        〈1;obj〉
+      },
+    ]
+    _generatedObjects: [
+      for _, obj in 〈1;_localObjects〉 for _, gen in 〈2;GENERATORS〉 for _, o in (〈0;gen〉 & {
+        IN: 〈2;obj〉
+      }).OUT {
+        〈1;o〉
+      },
+    ]
+    _importedObjects: [
+      for _, imp in 〈1;IMPORTS〉 for _, obj in ({
+        cfg: _
+      } & 〈0;imp〉).export.objects {
+        〈1;obj〉
+      },
+    ]
+    objects: [
+      for _, obj in 〈1;_localObjects〉 {
+        〈1;obj〉
+      },
+      for _, obj in 〈1;_generatedObjects〉 {
+        〈1;obj〉
+      },
+      for _, obj in 〈1;_importedObjects〉 {
+        〈1;obj〉
+      },
+    ]
+  }
+  checkCfg: 〈0;OUT〉.IMPORTS[0].cfg
+  checkName: 〈0;OUT〉.IMPORTS[0].objects.plain.b.metadata.name
+}

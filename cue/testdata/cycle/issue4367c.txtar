@@ -1,0 +1,76 @@
+# Single-package reduction of #4367 where a sibling field genuinely
+# participates in a reference cycle. OUT instantiates TEMPLATE, whose body
+# re-instantiates the same template through a comprehension over the IMPORTS
+# data (`({cfg: _} & imp).export.objects`). The export's OBJECTS contain a
+# genuine reference cycle: a.spec -> b.name (b.name: cfg + a.spec) -> a.spec.
+#
+# cfg is only an operand of b.name; it is not itself part of the cycle, so
+# the shared cfg disjunction (string | *"") & "sub-" must resolve to "sub-".
+# Before the fix, the cycle error produced while evaluating the template body
+# leaked through the shared evaluation context onto cfg's disjunct (a deferred
+# completion), dropping the "sub-" disjunct and wrongly producing
+# `cfg: conflicting values "" and "sub-"`.
+#
+# OUT must stay top-level: nesting it deeper shifts the evaluation depth and
+# masks the bug.
+#
+# https://cuelang.org/issue/4367
+-- cue.mod/module.cue --
+module: "example.com/m@v0"
+language: version: "v0.12.0"
+-- main.cue --
+OUT: TEMPLATE & {
+	IMPORTS: [{
+		export: TEMPLATE & {
+			OBJECTS: {
+				b: name: cfg + a.spec
+				a: spec: b.name
+				b: spec: "hashed"
+			}
+			GENERATORS: [{
+				IN: {}
+				OUT: [if IN.spec != "" {}]
+			}]
+		}
+		cfg: "sub-"
+		cfg: string | *""
+	}]
+}
+
+TEMPLATE: {
+	OBJECTS: {}
+	IMPORTS: [...]
+	GENERATORS: [...]
+
+	objects: [
+		for _, obj in OBJECTS
+		for _, o in (GENERATORS[0] & {IN: obj}).OUT {o},
+	]
+	_importedObjects: [
+		for _, imp in IMPORTS
+		for _, obj in ({cfg: _} & imp).export.objects {obj},
+	]
+}
+
+// cfg is not on the a.spec cycle, so it must resolve to "sub-". Before the
+// fix the cycle leaked onto cfg via the shared evaluation context and it
+// reported `cfg: conflicting values "" and "sub-"`.
+checkCfg: OUT.IMPORTS[0].cfg @test(eq, "sub-")
+-- out/errors.txt --
+[cycle] OUT.IMPORTS.0.export.OBJECTS.b.name: cycle with field: a.spec:
+    ./main.cue:5:20
+[cycle] OUT.IMPORTS.0.export.OBJECTS.b.name: cycle with field: a.spec:
+    ./main.cue:5:20
+[incomplete] OUT.IMPORTS.0.export.GENERATORS.0.OUT: undefined field: spec:
+    ./main.cue:11:17
+[cycle] OUT.IMPORTS.0.export.OBJECTS.b.name: cycle with field: a.spec:
+    ./main.cue:5:20
+[incomplete] cfg: conflicting values "" and "sub-":
+    ./main.cue:14:8
+    ./main.cue:15:18
+    ./main.cue:30:29
+IN.spec: non-concrete value _ in operand to +:
+    ./main.cue:5:14
+    ./main.cue:6:14
+cfg: 2 errors in empty disjunction::
+    ./main.cue:5:14

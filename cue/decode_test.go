@@ -339,7 +339,7 @@ func TestDecode(t *testing.T) {
 			checkFatal(t, err, tc.err, "init")
 
 			got := reflect.ValueOf(tc.dst).Elem().Interface()
-			if diff := cmp.Diff(got, tc.want, cmp.Comparer(func(a, b *big.Int) bool {
+			if diff := cmp.Diff(tc.want, got, cmp.Comparer(func(a, b *big.Int) bool {
 				return a.Cmp(b) == 0
 			}), cmp.Comparer(func(a, b *big.Float) bool {
 				return a.Cmp(b) == 0

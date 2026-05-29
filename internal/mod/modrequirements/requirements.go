@@ -50,6 +50,8 @@ type Requirements struct {
 // Registry holds the contents of a registry. It's expected that this will
 // cache any results that it returns.
 type Registry interface {
+	// Requirements returns a list of the modules required by the given module
+	// version.
 	Requirements(ctx context.Context, m module.Version) ([]module.Version, error)
 }
 

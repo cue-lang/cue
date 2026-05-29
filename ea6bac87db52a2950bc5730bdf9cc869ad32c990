@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc4332a9_3af21a18",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-29T15:52:10Z",
+      "side": 1,
+      "message": "shorten this a bit?",
+      "revId": "ea6bac87db52a2950bc5730bdf9cc869ad32c990",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

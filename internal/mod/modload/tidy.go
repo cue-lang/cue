@@ -410,7 +410,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 		slices.SortFunc(roots, module.Version.Compare)
 	}
 
-	// "Each root appears only once, at the selected version of its path ….”
+	// “Each root appears only once, at the selected version of its path ….”
 	for {
 		var mg *modrequirements.ModuleGraph
 		if rootsUpgraded {

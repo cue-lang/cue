@@ -16,6 +16,24 @@
       "message": "should we not recommend `cueckoo version update` here, much like the hook? this way you also ensure you\u0027re installing the very latest version of the guidance.",
       "revId": "6bffaf76263632fbc2e10150af90bffbf5347a39",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e22939e_a1f416d9",
+        "filename": "CLAUDE.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-05-29T11:51:45Z",
+      "side": 1,
+      "message": "Yes, that does make sense. We still need `cueckoo guidance --install` because when an upgrade happens, that\u0027s how the then \"old\" running binary tells the new one to install the updated guidance as required.\n\nI\u0027ll leave this unresolved here and fix in contrib-tools first.",
+      "parentUuid": "ca439b5e_5326e696",
+      "revId": "6bffaf76263632fbc2e10150af90bffbf5347a39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

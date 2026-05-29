@@ -16,6 +16,24 @@
       "message": "does this mean we can remove the guidance hash feature once we\u0027ve finished this transition?",
       "revId": "489f4a906f84e2991972ea753831916b3137b927",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a1c24eb_9af52854",
+        "filename": ".claude/settings.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-05-29T11:51:45Z",
+      "side": 0,
+      "message": "Probably, yes.",
+      "parentUuid": "782a0815_6942800f",
+      "revId": "489f4a906f84e2991972ea753831916b3137b927",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

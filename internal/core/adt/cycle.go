@@ -497,6 +497,19 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 				return ci, false
 			}
 
+			// A Refs entry recorded against r.Node may have come from a
+			// different top-level (package) vertex than the one currently
+			// being evaluated. Two distinct package vertices share no cycle
+			// — the apparent reuse of an arc is structure sharing of a
+			// definition body across independent evaluations (e.g.
+			// `lib.template` referenced from both `main` and `sub`).
+			if r.Node != n.node &&
+				r.Node.Parent != nil && r.Node.Parent.Parent == nil &&
+				n.node.Parent != nil && n.node.Parent.Parent == nil &&
+				r.Node.Label != n.node.Label {
+				continue
+			}
+
 			return n.markCyclicPath(arc, env, x, ci)
 		}
 		if r.Ref == x && arc.nonRooted {

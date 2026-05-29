@@ -1,0 +1,106 @@
+# Three-package shape (#4365 / #4366 follow-up) where lib.template is
+# instantiated independently in two importing packages (sub and main).
+# When lib's _importedObjects re-unifies sub via {cfg: {}} & imp, the
+# *"" disjunction default on cfg.prefix incorrectly reappears as a
+# concrete branch alongside the "sub-" value, producing a spurious
+# conflict and a structural cycle.
+#
+# Collapsing to two packages makes it evaluate cleanly; the third
+# package boundary is what triggers the regression.
+#
+# https://cuelang.org/issue/4367
+-- cue.mod/module.cue --
+module: "example.com/m@v0"
+language: version: "v0.15.0"
+-- main.cue --
+package main
+
+import (
+	"example.com/m/lib"
+	"example.com/m/sub"
+)
+
+_export: lib.template & {
+	OBJECTS: {}
+	IMPORTS: [sub]
+	GENERATORS: []
+}
+
+result: _export.objects @test(eq, [
+	{spec: {ref: "sub-h"}, kind: "plain", metadata: {}},
+	{data: {foo: "bar"}, kind: "hashed", metadata: {name: "sub-h"}},
+	{metadata: {}},
+])
+-- lib/lib.cue --
+package lib
+
+import "list"
+
+template: {
+	OBJECTS: {...}
+	IMPORTS: [...]
+	GENERATORS: [...]
+
+	_localObjects: [
+		for _, objs in OBJECTS
+		for _, obj in objs {obj},
+	]
+	_generatedObjects: [
+		for _, obj in _localObjects
+		for _, gen in GENERATORS
+		if list.Contains(gen.forKind, obj.kind)
+		for _, o in (gen & {IN: obj}).OUT {o},
+	]
+	_importedObjects: [
+		for _, imp in IMPORTS
+		for _, obj in ({cfg: {}} & imp).export.objects {obj},
+	]
+	objects: [
+		for _, obj in _localObjects {obj},
+		for _, obj in _generatedObjects {obj},
+		for _, obj in _importedObjects {obj},
+	]
+}
+-- sub/sub.cue --
+package sub
+
+import (
+	"example.com/m/lib"
+	"encoding/json"
+)
+
+export: lib.template & {
+	OBJECTS: objects
+	IMPORTS: []
+	GENERATORS: [#gen]
+}
+
+cfg: prefix: string | *""
+cfg: prefix: "sub-"
+
+#withName: [KIND=string]: [ID=string]: this={
+	metadata: {
+		if KIND == "hashed" {
+			name: cfg.prefix + (#hash & {in: json.Marshal(this.data)}).out
+		}
+		...
+	}
+	...
+}
+#hash: {in: string, out: "h"}
+
+#gen: {
+	forKind: ["plain"]
+	IN: {...}
+	OUT: [
+		if IN.spec.ref != _|_ {
+			(#withName & {extra: gen: {}}).extra.gen
+		},
+	]
+}
+
+objects: #withName
+objects: plain: [ID=string]: {kind:  "plain", ...}
+objects: hashed: [ID=string]: {kind: "hashed", ...}
+objects: plain: a: spec: ref:        objects.hashed.b.metadata.name
+objects: hashed: b: data: foo:       "bar"

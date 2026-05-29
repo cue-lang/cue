@@ -76,35 +76,11 @@ checkName: OUT.IMPORTS[0].objects.plain.b.metadata.name @test(eq:todo, "sub-HASH
 -- out/errors.txt --
 [incomplete] OUT.IMPORTS.0.export.GENERATORS.0.OUT: undefined field: spec:
     ./main.cue:9:17
-[structural_cycle] cfg: conflicting values "" and "sub-":
-    ./main.cue:13:18
-    ./main.cue:14:8
-    ./main.cue:41:29
-IN.spec: invalid right-hand value to '+' (type string): structural cycle:
+[structural_cycle] IN.spec: invalid right-hand value to '+' (type string): structural cycle:
     ./main.cue:18:20
-cfg: 2 errors in empty disjunction::
+[structural_cycle] IN.spec: invalid right-hand value to '+' (type string): structural cycle:
     ./main.cue:18:20
-[structural_cycle] cfg: conflicting values "" and "sub-":
-    ./main.cue:13:18
-    ./main.cue:14:8
-    ./main.cue:41:29
-IN.spec: invalid right-hand value to '+' (type string): structural cycle:
+[structural_cycle] IN.spec: invalid right-hand value to '+' (type string): structural cycle:
     ./main.cue:18:20
-cfg: 2 errors in empty disjunction::
-    ./main.cue:18:20
-[structural_cycle] cfg: conflicting values "" and "sub-":
-    ./main.cue:13:18
-    ./main.cue:14:8
-    ./main.cue:41:29
-IN.spec: invalid right-hand value to '+' (type string): structural cycle:
-    ./main.cue:18:20
-cfg: 2 errors in empty disjunction::
-    ./main.cue:18:20
-[structural_cycle] cfg: conflicting values "" and "sub-":
-    ./main.cue:13:18
-    ./main.cue:14:8
-    ./main.cue:41:29
-IN.spec: invalid right-hand value to '+' (type string): structural cycle:
-    ./main.cue:18:20
-cfg: 2 errors in empty disjunction::
+[structural_cycle] IN.spec: invalid right-hand value to '+' (type string): structural cycle:
     ./main.cue:18:20

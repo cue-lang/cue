@@ -104,36 +104,3 @@ objects: plain: [ID=string]: {kind:  "plain", ...}
 objects: hashed: [ID=string]: {kind: "hashed", ...}
 objects: plain: a: spec: ref:        objects.hashed.b.metadata.name
 objects: hashed: b: data: foo:       "bar"
--- out/errors.txt --
-[structural_cycle] cfg.prefix: conflicting values "" and "sub-":
-    ./lib/lib.cue:22:30
-    ./sub/sub.cue:14:24
-    ./sub/sub.cue:15:14
-cfg.prefix: 2 errors in empty disjunction::
-    ./sub/sub.cue:20:10
-in: structural cycle:
-    ./sub/sub.cue:20:24
-[structural_cycle] cfg.prefix: conflicting values "" and "sub-":
-    ./lib/lib.cue:22:30
-    ./sub/sub.cue:14:24
-    ./sub/sub.cue:15:14
-cfg.prefix: 2 errors in empty disjunction::
-    ./sub/sub.cue:20:10
-in: structural cycle:
-    ./sub/sub.cue:20:24
-[structural_cycle] cfg.prefix: conflicting values "" and "sub-":
-    ./lib/lib.cue:22:30
-    ./sub/sub.cue:14:24
-    ./sub/sub.cue:15:14
-cfg.prefix: 2 errors in empty disjunction::
-    ./sub/sub.cue:20:10
-in: structural cycle:
-    ./sub/sub.cue:20:24
-[structural_cycle] cfg.prefix: conflicting values "" and "sub-":
-    ./lib/lib.cue:22:30
-    ./sub/sub.cue:14:24
-    ./sub/sub.cue:15:14
-cfg.prefix: 2 errors in empty disjunction::
-    ./sub/sub.cue:20:10
-in: structural cycle:
-    ./sub/sub.cue:20:24

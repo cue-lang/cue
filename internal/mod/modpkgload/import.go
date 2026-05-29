@@ -62,6 +62,17 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (
 
 	// Check each module on the build list.
 	var locs []PackageLoc
+	localPkgLocs, err := pkgs.findLocalPackage(pkgPathOnly)
+	if err != nil {
+		return fail(err)
+	}
+	if len(localPkgLocs) > 0 {
+		locs = append(locs, PackageLoc{
+			Module:     module.MustNewVersion("local", ""),
+			ModuleRoot: pkgs.mainModuleLoc,
+			Locs:       localPkgLocs,
+		})
+	}
 	var mg *modrequirements.ModuleGraph
 	versionForModule := func(ctx context.Context, prefix string) (module.Version, error) {
 		var (
@@ -92,17 +103,6 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (
 			return module.Version{}, nil
 		}
 		return m, nil
-	}
-	localPkgLocs, err := pkgs.findLocalPackage(pkgPathOnly)
-	if err != nil {
-		return fail(err)
-	}
-	if len(localPkgLocs) > 0 {
-		locs = append(locs, PackageLoc{
-			Module:     module.MustNewVersion("local", ""),
-			ModuleRoot: pkgs.mainModuleLoc,
-			Locs:       localPkgLocs,
-		})
 	}
 
 	// Iterate over possible modules for the path, not all selected modules.
@@ -168,7 +168,7 @@ type PackageLoc struct {
 	ModuleRoot module.SourceLoc
 	// Locs holds the source locations of the package. There is always
 	// at least one element; there can be more than one when the
-	// module path is "local" (for exampe packages inside cue.mod/pkg).
+	// module path is "local" (for example packages inside cue.mod/pkg).
 	Locs []module.SourceLoc
 }
 

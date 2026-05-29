@@ -34,6 +34,24 @@
       "parentUuid": "ca439b5e_5326e696",
       "revId": "6bffaf76263632fbc2e10150af90bffbf5347a39",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1e2de68_0a2b0eef",
+        "filename": "CLAUDE.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-05-29T15:01:04Z",
+      "side": 1,
+      "message": "Now done.",
+      "parentUuid": "3e22939e_a1f416d9",
+      "revId": "6bffaf76263632fbc2e10150af90bffbf5347a39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

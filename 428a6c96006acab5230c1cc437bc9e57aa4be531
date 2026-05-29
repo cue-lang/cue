@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "413b59f4_6c3cb95c",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-29T07:37:13Z",
+      "side": 1,
+      "message": "can this not occur when `Parent.Parent !\u003d nil` too? i.e. I worry that this fix is a bit narrow and only fixes the issue for package-level values, but nested package values may still have the same bug left.\n\nis there no better way to check that the two values/nodes come from different packages?",
+      "revId": "428a6c96006acab5230c1cc437bc9e57aa4be531",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

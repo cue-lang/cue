@@ -33,6 +33,24 @@
       "message": "This seems like an error: we\u0027re printing exactly the same diff twice AFAICS.",
       "revId": "aaf5c0d356ba4f63fd93a195b06d2077413aa45f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45397032_c786d8ab",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1521,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-29T12:49:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ab33334_b4d6aeaa",
+      "revId": "aaf5c0d356ba4f63fd93a195b06d2077413aa45f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

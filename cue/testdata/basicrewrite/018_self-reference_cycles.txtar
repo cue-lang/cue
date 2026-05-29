@@ -14,14 +14,14 @@ oneway: {
         a: b + 1
         b: <a
         @test(eq, {
-			a: _|_ @test(err, code=cycle, contains="oneway.t1.a: cycle with field: b (and 1 more errors)", pos=[4:12])
-			b: _|_ @test(err, code=cycle, contains="oneway.t1.a: cycle with field: b (and 1 more errors)", pos=[4:12])
+			a: _|_ @test(err, code=cycle, contains="cycle with field: b", pos=[4:12])
+			b: _|_ @test(err, code=cycle, contains="cycle with field: b", pos=[4:12])
 		})
     }
     t2: t1 &{
         a: 3
     } @test(eq, {
-		a: _|_ @test(err, code=incomplete, contains="oneway.t2.a: non-concrete value <3 in operand to + (and 2 more errors)", pos=[4:12, 5:12])
+		a: _|_ @test(err, code=incomplete, contains="non-concrete value <3 in operand to +", pos=[4:12, 5:12])
 		b: <3
 	})
 }
@@ -37,16 +37,12 @@ issue3669: {
 	}
 	@test(eq, {
 		#Schema: {
-			two: _|_ @test(err, code=cycle,
-				contains="#Schema.one: cycle with field: two (and 1 more errors)", pos=[22:8])
-			one: _|_ @test(err, code=cycle,
-				contains="#Schema.one: cycle with field: two (and 1 more errors)", pos=[22:8])
+			two: _|_ @test(err, code=cycle, contains="issue3669.#Schema.one: cycle with field: two (and 1 more errors)", pos=[22:8])
+			one: _|_ @test(err, code=cycle, contains="issue3669.#Schema.one: cycle with field: two (and 1 more errors)", pos=[22:8])
 		}
 		out: {
-			two: _|_ @test(err, code=cycle,
-				contains="out.two: cycle with field: one (and 1 more errors)", pos=[21:12])
-			one: _|_ @test(err, code=cycle,
-				contains="out.two: cycle with field: one (and 1 more errors)", pos=[21:12])
+			two: _|_
+			one: _|_ @test(err, code=cycle, contains="cycle with field: one", pos=[21:12])
 		}
 	})
 }

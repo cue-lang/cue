@@ -9,21 +9,10 @@ xa3: 6 & xa1-2 @test(eq, 6)
 xa4: xa2 + 2 @test(eq, 10)
 
 // TODO(inline): make positions work here.
-xb1: *(xb2 & 8) | (xb4 & 9) @test(err, code=cycle, pos=[],
-	suberr=(code=cycle, path=xb2, contains="unresolved disjunction: %v", args=[xb3]),
-	suberr=(code=cycle, path=xb3, contains="%d errors in empty disjunction:", args=[3]),
-	suberr=(code=cycle, path=xb3, contains="unresolved disjunction: %v", args=[xb1],),
-	suberr=(code=cycle, path=xb3, contains="cycle with field: %v", args=[xb2]))
-xb2: xb3 + 2 @test(err, code=cycle,
-	suberr=(code=cycle, contains="unresolved disjunction: %v", args=[xb3]),
-	suberr=(code=cycle, path=xb3, contains="cycle with field: %v", args=[xb2]))
-xb3: *(6 & (xb1 - 2)) | (xb4 & 9) @test(err, code=cycle,
-	suberr=(code=cycle, path=xb2, contains="unresolved disjunction: %v", args=[xb3]),
-	suberr=(code=cycle, contains="unresolved disjunction: %v", args=[xb1]),
-	suberr=(code=cycle, contains="cycle with field: %v", args=[xb2]))
-xb4: xb2 + 2 @test(err, code=cycle,
-	suberr=(code=cycle, path=xb2, contains="unresolved disjunction: %v", args=[xb3]),
-	suberr=(code=cycle, path=xb3, contains="cycle with field: %v", args=[xb2]))
+xb1: *(xb2 & 8) | (xb4 & 9)       @test(err, code=cycle|incomplete)
+xb2: xb3 + 2                      @test(err, code=cycle|incomplete)
+xb3: *(6 & (xb1 - 2)) | (xb4 & 9) @test(err, code=cycle|incomplete)
+xb4: xb2 + 2                      @test(err, code=cycle|incomplete)
 
 // Another variant with more disjunctions. xc1 remains with two
 // possibilities. Technically, only the first value is valid.
@@ -31,10 +20,10 @@ xb4: xb2 + 2 @test(err, code=cycle,
 // disjunction will have to be evaluated algebraically, which is
 // not done.
 xc1: *(xc2 & 8) | (xc4 & 9) | (xc5 & 9) @test(eq, *8|9)
-xc2: xc3 + 2 @test(eq, 8)
+xc2: xc3 + 2   @test(eq, 8)
 xc3: 6 & xc1-2 @test(eq, 6)
-xc4: xc2 + 1 @test(eq, 9)
-xc5: xc2 + 2 @test(eq, 10)
+xc4: xc2 + 1   @test(eq, 9)
+xc5: xc2 + 2   @test(eq, 10)
 
 // The above is resolved by setting xd1 explicitly.
 xd1: *(xd2 & 8) | xd4 & 9 | xd5 & 9 @test(eq, *8|9)
@@ -59,32 +48,32 @@ z3: 8 @test(eq, 8)
 -- out/errors.txt --
 [cycle] xb1: 4 errors in empty disjunction:
 xb2: unresolved disjunction: xb3:
-    ./in.cue:14:6
+    ./in.cue:10:6
 xb3: 3 errors in empty disjunction::
-    ./in.cue:14:6
+    ./in.cue:10:6
 xb3: unresolved disjunction: xb1:
-    ./in.cue:17:13
+    ./in.cue:11:13
 xb3: cycle with field: xb2:
-    ./in.cue:21:6
+    ./in.cue:12:6
 [cycle] xb2: unresolved disjunction: xb3:
-    ./in.cue:14:6
+    ./in.cue:10:6
 xb3: cycle with field: xb2:
-    ./in.cue:21:6
+    ./in.cue:12:6
 [cycle] xb2: unresolved disjunction: xb3:
-    ./in.cue:14:6
+    ./in.cue:10:6
 xb3: 3 errors in empty disjunction::
-    ./in.cue:14:6
+    ./in.cue:10:6
 xb3: unresolved disjunction: xb1:
-    ./in.cue:17:13
+    ./in.cue:11:13
 xb3: cycle with field: xb2:
-    ./in.cue:21:6
+    ./in.cue:12:6
 [cycle] xb2: unresolved disjunction: xb3:
-    ./in.cue:14:6
+    ./in.cue:10:6
 xb3: cycle with field: xb2:
-    ./in.cue:21:6
+    ./in.cue:12:6
 [eval] xe3: conflicting values 7 and 6:
-    ./in.cue:47:6
-    ./in.cue:47:10
+    ./in.cue:36:6
+    ./in.cue:36:10
 -- out/todo.txt --
 xb* cycles: v2 evaluator resolves xb1=8, xb2=8, xb3=*(6|9), xb4=10; v3
 correctly identifies cycle errors in xb1-xb4.

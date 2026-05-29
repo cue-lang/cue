@@ -29,7 +29,7 @@ self: {
 				b: 1
 			}
 			b?: int
-			@test(err, code=cycle,
+			@test(err, code=incomplete,
 				contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[a.b], pos=[1:7])
 		}
 	}
@@ -156,7 +156,7 @@ sameStruct: {
 		if raises == _|_ {
 			ret: a: 1
 		}
-		@test(err, code=cycle, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[ret], pos=[2:6])
+		@test(err, code=incomplete, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[ret], pos=[2:6])
 	}
 
 	// This test should fail with a cycle error. Even though raises and ret are
@@ -326,7 +326,7 @@ issue3836: exposed: {
 		bar: type: "bar"
 	}
 	out: [if bar != _|_ {"bar is set"}]
-	@test(err, code=cycle, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[(foo|bar)], pos=[3:6])
+	@test(err, code=incomplete, contains="circular dependency in evaluation of conditionals: %v changed after evaluation", args=[(foo|bar)], pos=[3:6])
 }
 -- issue3838.cue --
 // evalv3 regression: `if in.opt != _|_` inside a list expression stopped
@@ -373,11 +373,11 @@ issue3838: {
 -- out/errors.txt --
 [cycle] self.fail.a: cyclic reference to field b:
     ./in.cue:6:9
-[cycle] self.isConcreteFail.t2.a: circular dependency in evaluation of conditionals: a.b changed after evaluation:
+[incomplete] self.isConcreteFail.t2.a: circular dependency in evaluation of conditionals: a.b changed after evaluation:
     ./in.cue:27:7
-[cycle] issue3836.hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+[incomplete] issue3836.hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
     ./issue3836.cue:9:7
-[cycle] issue3836.exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+[incomplete] issue3836.exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
     ./issue3836.cue:26:6
 [incomplete] issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct):
     ./issue3838.cue:26:12
@@ -385,9 +385,9 @@ issue3838: {
     ./mutual.cue:10:9
 [cycle] mutual.mutualCycleFail.a: undefined field: foo:
     ./mutual.cue:14:9
-[cycle] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+[incomplete] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
     ./mutualsamestruct.cue:28:6
-[cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+[incomplete] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
     ./mutualsamestruct.cue:40:6
 [incomplete] sameStruct.cycleFail.t2.p1.ret: cyclic reference to field a:
     ./mutualsamestruct.cue:67:6

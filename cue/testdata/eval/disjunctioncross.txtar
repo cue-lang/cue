@@ -176,9 +176,9 @@ issue3967: {
 	})
 }
 -- out/errors.txt --
-[cycle] issue3967.error.nested.out: undefined field: kind:
+[incomplete] issue3967.error.nested.out: undefined field: kind:
     ./in.cue:131:17
-[cycle] issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
+[incomplete] issue3967.error.local.out.oneOrTwo: 2 errors in empty disjunction::
     ./in.cue:148:8
 issue3967.error.local.out.oneOrTwo.two: field not allowed:
     ./in.cue:148:8

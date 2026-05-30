@@ -497,23 +497,19 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 				return ci, false
 			}
 
-			// A reoccurring arc recorded by a node that is still being
-			// evaluated but is not a structural ancestor of n.node is
-			// structure sharing of a definition body across independent
-			// instantiations (e.g. through ({cfg: _} & imp).export in #4367),
-			// not a self-feeding cycle, so it is not marked cyclic. A
-			// same-reference reoccurrence (r.Ref == x) is genuine
-			// self-expansion and is left to markCyclicPath.
-			//
-			// The skip only applies when n still has non-cyclic conjuncts:
-			// structure sharing instantiates a definition body that carries
-			// real, non-cyclic content. A node whose only conjuncts are
-			// cyclic is genuine self-recursion (e.g. the self-referential
-			// disjunct `(t & {a: a[0]}).out` of #4373); skipping it there
-			// would remove the bound and recurse forever, so it is left to
-			// markCyclicPath.
-			if r.Ref != x && n.hasNonCycle && n.hasNonCyclic &&
-				n.hasAncestor(r.Node) && !isStructuralAncestor(r.Node, n.node) {
+			// Skip a reoccurring arc that is structure sharing rather than
+			// a cycle: a different reference (r.Ref != x) reaching a node
+			// that still has non-cyclic conjuncts is a definition body
+			// re-instantiated elsewhere (e.g. ({cfg: _} & imp).export of
+			// #4367, or the chained template of #1708), not self-feeding.
+			// The other cases fall through to markCyclicPath, which bounds
+			// them: a same-reference reoccurrence (r.Ref == x) is genuine
+			// self-expansion, and a node with only cyclic conjuncts is
+			// unbounded self-recursion (e.g. (t & {a: a[0]}).out of #4373).
+			// This is safe: a source has finitely many references, so any
+			// unbounded cycle eventually repeats one and is caught by the
+			// r.Ref == x case.
+			if r.Ref != x && n.hasNonCycle && n.hasNonCyclic {
 				continue
 			}
 
@@ -644,17 +640,6 @@ func sharedTargetHasInProgressCycle(c *OpContext, w *Vertex) bool {
 			continue
 		}
 		if c.hasDepthCycle(arc.DerefNonDisjunct()) {
-			return true
-		}
-	}
-	return false
-}
-
-// isStructuralAncestor reports whether anc is equal to v or one of its
-// structural parents (following the Parent chain).
-func isStructuralAncestor(anc, v *Vertex) bool {
-	for p := v; p != nil; p = p.Parent {
-		if equalDeref(p, anc) {
 			return true
 		}
 	}

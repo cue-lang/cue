@@ -10,11 +10,12 @@
 # tainted the `cfg: string | *""` disjunction so its default reappeared as a
 # concrete branch, yielding `cfg: conflicting values "" and "sub-"`.
 #
-# The fix recognizes that the recording node (OUT) is being evaluated
-# concurrently and is not a structural ancestor of `export`, so the
-# reoccurrence is structure sharing, not recursion. OUT must stay top-level:
-# nesting it deeper shifts the evaluation depth and the existing depth-based
-# escape masks the bug.
+# The fix recognizes the reoccurrence as structure sharing rather than
+# recursion: `export` is reached through a distinct reference and still has
+# non-cyclic conjuncts (a real definition body), so it is not a self-feeding
+# cycle and is not marked cyclic. OUT must stay top-level: nesting it deeper
+# shifts the evaluation depth and the existing depth-based escape masks the
+# bug.
 #
 # https://cuelang.org/issue/4367
 -- cue.mod/module.cue --

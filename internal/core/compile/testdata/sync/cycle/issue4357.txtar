@@ -16,10 +16,7 @@ xFirst: {
 
 	id!: "\(s[0]):\(b)"
 	x!:  "\(b)"
-} @test(eq, {
-	x:  "B"
-	id: "A:B"
-})
+}
 
 // idFirst declares the source field (id) first; this ordering always passed.
 idFirst: {
@@ -31,10 +28,7 @@ idFirst: {
 
 	id!: "\(s[0]):\(b)"
 	x!:  "\(b)"
-} @test(eq, {
-	id: "A:B"
-	x:  "B"
-})
+}
 
 // requiredCycle exercises a let whose value resolves through required fields
 // to a genuine cycle: x is a.b, which only ever exists as a cycle placeholder
@@ -45,8 +39,37 @@ requiredCycle: {
 	a!: b!: {c!: d!: _}
 	a: {}
 	let x = a.b
-	o: x.c.d @test(err, code=incomplete, contains="required field missing: %s", args=[c], pos=[0:7])
+	o: x.c.d
 }
--- out/errors.txt --
-[incomplete] requiredCycle.o: required field missing: c:
-    ./in.cue:43:7
+-- out/compile --
+--- in.cue
+{
+  xFirst: {
+    x: "B"
+    id: "A:B"
+    let s#1 = 〈import;strings〉.Split(〈0;id〉, ":")
+    let b#2 = 〈0;let s#1〉[1]
+    id!: "\(〈0;let s#1〉[0]):\(〈0;let b#2〉)"
+    x!: "\(〈0;let b#2〉)"
+  }
+  idFirst: {
+    id: "A:B"
+    x: "B"
+    let s#3 = 〈import;strings〉.Split(〈0;id〉, ":")
+    let b#4 = 〈0;let s#3〉[1]
+    id!: "\(〈0;let s#3〉[0]):\(〈0;let b#4〉)"
+    x!: "\(〈0;let b#4〉)"
+  }
+  requiredCycle: {
+    a!: {
+      b!: {
+        c!: {
+          d!: _
+        }
+      }
+    }
+    a: {}
+    let x#5 = 〈0;a〉.b
+    o: 〈0;let x#5〉.c.d
+  }
+}

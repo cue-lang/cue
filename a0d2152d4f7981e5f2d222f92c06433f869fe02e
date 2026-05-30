@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "096ee9de_7c65619a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-30T10:43:22Z",
+      "side": 1,
+      "message": "seems to cause a hang in Unity",
+      "revId": "a0d2152d4f7981e5f2d222f92c06433f869fe02e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

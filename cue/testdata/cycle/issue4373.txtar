@@ -1,0 +1,19 @@
+# Tests that a self-referential disjunct does not hang the evaluator. The
+# disjunct `out: (t & {a: a[0]}).out` re-instantiates t unconditionally, so
+# without a bound it expands forever. Structural cycle detection must bound
+# it: the recursing disjuncts collapse to a cycle and only the non-recursing
+# disjunct {a: 0, out: 1} survives, giving out: 1.
+#
+# Before the fix the structure-sharing skip in cycle detection also fired for
+# nodes whose only conjuncts are cyclic, removing the bound and looping
+# forever. https://cuelang.org/issue/4373
+-- in.cue --
+t: {a: 0, out: 1} | {
+	a: [_]
+	out: (t & {a: a[0]}).out
+} | {
+	a: [_]
+	out: (t & {a: a[0]}).out
+}
+
+out: (t & {a: 0}).out @test(eq, 1)

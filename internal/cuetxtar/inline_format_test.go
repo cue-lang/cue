@@ -64,7 +64,7 @@ func TestFormatStructLevelError(t *testing.T) {
 	}
 
 	r := &inlineRunner{}
-	got := r.formatValue(tv, "")
+	got := r.formatValue(tv, "", 0)
 
 	// Output must be a bare error, not a struct literal containing the
 	// embedded _|_ alongside foo and bar.
@@ -114,7 +114,7 @@ container: {
 	}
 
 	r := &inlineRunner{}
-	got := r.formatValue(c, "")
+	got := r.formatValue(c, "", 0)
 
 	if strings.Contains(got, "{") {
 		t.Errorf("expected container collapsed to bare _|_; got brace in:\n%s", got)

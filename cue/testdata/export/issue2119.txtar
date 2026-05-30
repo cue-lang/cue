@@ -37,7 +37,7 @@ original: {
 			string
 			#test: {
 				in: string
-				out: _|_ @test(err, code=incomplete, contains="original.#testableRegexp.#test.out: non-concrete value string in operand to +", pos=[21:29, 16:21, 17:3])
+				out: _|_ @test(err, code=incomplete, contains="original.#testableRegexp.#test.out: non-concrete value string in operand to +", pos=[6:29, 1:21, 2:3])
 			}
 		}
 		rule: {

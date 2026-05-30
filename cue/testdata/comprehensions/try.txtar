@@ -84,7 +84,7 @@ requiredUnfilled: {
 	try { x: a? } else { fallback: 23 }
 	@test(eq, {
 		a!: _
-		x: _|_ @test(err, code=incomplete, contains="requiredUnfilled.x: required field missing: a", pos=[83:11])
+		x: _|_ @test(err, code=incomplete, contains="requiredUnfilled.x: required field missing: a", pos=[2:11])
 	})
 }
 
@@ -102,7 +102,7 @@ requiredWithType: {
 	try { x: a? } else { fallback: 23 }
 	@test(eq, {
 		a!: int
-		x: _|_ @test(err, code=incomplete, contains="requiredWithType.x: required field missing: a", pos=[101:11])
+		x: _|_ @test(err, code=incomplete, contains="requiredWithType.x: required field missing: a", pos=[2:11])
 	})
 }
 
@@ -360,13 +360,13 @@ refIntoTry: {
 	failedRef1: {
 		try { v: mixedSource.foo } else { missing: true }
 		@test(eq, {
-			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef1.v: undefined field: foo", pos=[360:24])
+			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef1.v: undefined field: foo", pos=[1:24])
 		})
 	}
 	failedRef2: {
 		try { v: mixedSource.foo } else { missing: true }
 		@test(eq, {
-			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef2.v: undefined field: foo", pos=[366:24])
+			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef2.v: undefined field: foo", pos=[1:24])
 		})
 	}
 	successRef: {

@@ -151,14 +151,14 @@ foo: {
 			foo: {
 				global: {
 					auth0: {
-						enabled: _|_ @test(err, code=incomplete, contains="#Config.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+						enabled: _|_ @test(err, code=incomplete, contains="#Config.auth0: incomplete bool: bool (and 1 more errors)", pos=[-65:12])
 					}
 				}
 			}
 		}
 		global: {
 			auth0: {
-				enabled: _|_ @test(err, code=incomplete, contains="#Config.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+				enabled: _|_ @test(err, code=incomplete, contains="#Config.auth0: incomplete bool: bool (and 1 more errors)", pos=[-65:12])
 			}
 		}
 	}
@@ -205,7 +205,7 @@ foo: {
 		auth0: {_|_, enabled: bool}
 		global: {
 			auth0: {
-				enabled: _|_ @test(err, code=incomplete, contains="#Flux.auth0: incomplete bool: bool (and 1 more errors)", pos=[59:12])
+				enabled: _|_ @test(err, code=incomplete, contains="#Flux.auth0: incomplete bool: bool (and 1 more errors)", pos=[-65:12])
 			}
 		}
 	}

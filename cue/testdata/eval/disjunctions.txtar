@@ -143,7 +143,7 @@ d100: {
 	j: i.bar
 	@test(eq, {
 		i: null | {bar: 2}
-		j: _|_ @test(err, code=incomplete, contains="d100.j: unresolved disjunction null | {bar:2} (type (null|struct))", pos=[142:5])
+		j: _|_ @test(err, code=incomplete, contains="d100.j: unresolved disjunction null | {bar:2} (type (null|struct))", pos=[4:5])
 	})
 }
 

@@ -680,9 +680,9 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 // formatPosSpec converts a single token.Pos to a position spec string.
 // Positions in the same file are written as deltaLine:col (relative to
 // baseLine); positions in other files are written as filename:absLine:col.
-// Pass pa.baseLine and pa.srcFileName for top-level @test(err) directives
-// (relative delta form).  Pass 0 for baseLine to produce absolute line
-// numbers (used for nested @test(err) inside @test(eq) bodies).
+// Pass the directive's baseLine and srcFileName to keep same-file positions
+// relative to the enclosing assertion. Use baseLine=0 only when absolute line
+// numbers are explicitly required.
 func (r *inlineRunner) formatPosSpec(p token.Pos, baseLine int, srcFileName string) string {
 	if p.Filename() == "" || r.relFilename(p.Filename()) == srcFileName {
 		return fmt.Sprintf("%d:%d", p.Line()-baseLine, p.Column())
@@ -716,6 +716,9 @@ func replacePosSpec(text string, offset int, newContent string) (string, bool) {
 // to the same evolving text, rather than each independently overwriting the
 // original. applyInlineFillWritebacks drains nestedPosFills into pendingPosWrites.
 func (r *inlineRunner) enqueueNestedPosWrite(outerPa parsedTestAttr, innerAttrText string, positions []token.Pos) {
+	if r.suppressWritebacks {
+		return
+	}
 	outerOffset := outerPa.srcAttr.Pos().Offset()
 
 	// Look up or create the accumulator entry for this outer attribute.
@@ -739,10 +742,10 @@ func (r *inlineRunner) enqueueNestedPosWrite(outerPa parsedTestAttr, innerAttrTe
 	if innerIdx < 0 {
 		return // inner attr not found — skip
 	}
-	// Use baseLine=0: nested pos= specs use absolute line numbers.
+	// Keep nested pos= specs relative to the enclosing @test(eq, ...) baseline.
 	parts := make([]string, len(positions))
 	for i, p := range positions {
-		parts[i] = r.formatPosSpec(p, 0, outerPa.srcFileName)
+		parts[i] = r.formatPosSpec(p, outerPa.baseLine, outerPa.srcFileName)
 	}
 	newText, replaced := replacePosSpec(entry.currentText, innerIdx, strings.Join(parts, ", "))
 	if !replaced {
@@ -752,6 +755,9 @@ func (r *inlineRunner) enqueueNestedPosWrite(outerPa parsedTestAttr, innerAttrTe
 }
 
 func (r *inlineRunner) enqueueSubErrPosWrites(pa parsedTestAttr, updates []posUpdate) {
+	if r.suppressWritebacks {
+		return
+	}
 	newAttrText := pa.srcAttr.Text
 	// Apply updates from highest expIdx to lowest so earlier indices stay valid.
 	slices.SortFunc(updates, func(a, b posUpdate) int {
@@ -980,6 +986,9 @@ func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Va
 // (relative to pa.baseLine).  Positions in a different file are written as
 // filename:absLine:col (absolute).
 func (r *inlineRunner) enqueuePosWrite(pa parsedTestAttr, positions []token.Pos) {
+	if r.suppressWritebacks {
+		return
+	}
 	parts := make([]string, len(positions))
 	for i, p := range positions {
 		parts[i] = r.formatPosSpec(p, pa.baseLine, pa.srcFileName)

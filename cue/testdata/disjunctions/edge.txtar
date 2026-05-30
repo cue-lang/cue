@@ -61,7 +61,7 @@ cyclicalInsertInDisjunction: {
 		c: d: 1 | 2 | x
 		c: {d: 1, e: 2} | {d : 2, e: 3}
 		@test(eq, {
-			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction", pos=[54:6])
+			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction", pos=[4:6])
 			c: {d: 1, e: 2} | {d: 2, e: 3}
 		})
 	}
@@ -71,7 +71,7 @@ cyclicalInsertInDisjunction: {
 		err1: {x: 2, c: {d: 2, e: 2}}
 		err2: {x: 1, c: {d: 1, e: 2}}
 		err3: {
-			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct)", pos=[54:6])
+			x: _|_ @test(err, code=incomplete, contains="unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct)", pos=[53:6])
 			c: {d: 1, e: 2} | {d: 2, e: 3}
 		}
 	})

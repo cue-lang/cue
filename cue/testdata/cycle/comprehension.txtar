@@ -25,7 +25,7 @@ B: {
 		children: [for k, v in B for _, w in v.children {k}]
 	} @test(eq, {
 		parent: ""
-		children: _|_ @test(err, code=incomplete, contains="B.a.children: cannot range over v.children (incomplete type list)", pos=[24:40])
+		children: _|_ @test(err, code=incomplete, contains="B.a.children: cannot range over v.children (incomplete type list)", pos=[2:40])
 	})
 }
 

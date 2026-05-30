@@ -70,7 +70,7 @@ issue1969: oko: {
 
 	if Y != _|_ {Y}
 	@test(eq, {
-		s: _|_ @test(err, code=incomplete, contains="issue1969.oko.X: undefined field: undefined", pos=[62:13])
+		s: _|_ @test(err, code=incomplete, contains="issue1969.oko.X: undefined field: undefined", pos=[1:13])
 	})
 }
 -- issue2245.cue --
@@ -82,7 +82,7 @@ yo: {
 	g: f < 10
 	@test(eq, {
 		f: int
-		g: _|_ @test(err, code=incomplete, contains="yo.g: non-concrete value int in operand to <", pos=[6:5, 5:5])
+		g: _|_ @test(err, code=incomplete, contains="yo.g: non-concrete value int in operand to <", pos=[2:5, 1:5])
 	})
 }
 okyo: {

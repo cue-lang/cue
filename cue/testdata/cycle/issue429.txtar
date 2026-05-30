@@ -58,7 +58,7 @@ es3: #Size & {
 r1: #nonEmptyRange & {
 	min: 3
 } @test(eq, {
-	min: _|_ @test(err, code=incomplete, contains="r1.min: non-concrete value max for bound < (and 2 more errors)", pos=[46:8])
+	min: _|_ @test(err, code=incomplete, contains="r1.min: non-concrete value max for bound < (and 2 more errors)", pos=[-3:8])
 	max: >3
 })
 r2: #nonEmptyRange & {

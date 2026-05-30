@@ -25,18 +25,18 @@ examples: eg1: {
 examples: eg2: {
     start: 10.0
     @test(eq, {
-	start: _|_    @test(err, code=incomplete, pos=[6:12, 4:12, 8:12])
-	duration: _|_ @test(err, code=incomplete, pos=[7:12, 4:12, 8:12])
-	end: _|_      @test(err, code=incomplete, pos=[7:12, 4:12, 8:12])
+	start: _|_    @test(err, code=incomplete, pos=[-15:12, -17:12, -13:12])
+	duration: _|_ @test(err, code=incomplete, pos=[-14:12, -17:12, -13:12])
+	end: _|_      @test(err, code=incomplete, pos=[-14:12, -17:12, -13:12])
 })
 }
 
 examples: eg3: {
     end: 10.0
     @test(eq, {
-	end: _|_      @test(err, code=incomplete, pos=[8:12, 2:12, 6:12, 10:9])
-	start: _|_    @test(err, code=incomplete, pos=[7:12, 2:12, 6:12, 10:9])
-	duration: _|_ @test(err, code=incomplete, pos=[7:12, 2:12, 6:12, 10:9])
+	end: _|_      @test(err, code=incomplete, pos=[-22:12, -28:12, -24:12, -20:9])
+	start: _|_    @test(err, code=incomplete, pos=[-23:12, -28:12, -24:12, -20:9])
+	duration: _|_ @test(err, code=incomplete, pos=[-23:12, -28:12, -24:12, -20:9])
 })
 }
 -- out/errors.txt --

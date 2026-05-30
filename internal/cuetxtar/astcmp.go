@@ -34,10 +34,10 @@ import (
 // cmpCtx carries comparison options through the recursive astCmp calls.
 type cmpCtx struct {
 	// baseLine resolves pos= specs in nested @test(err) directives:
-	// wantLine = baseLine + deltaLine.  runEqInline keeps it 0, so deltaLine
-	// values in nested pos= specs are absolute 1-indexed line numbers.  This
-	// differs from top-level @test(err) where pa.baseLine makes deltaLine a
-	// relative offset; changing it here would break existing specs.
+	// wantLine = baseLine + deltaLine. Nested @test(err) directives inside
+	// @test(eq, ...) use the outer attribute's base line so force/update
+	// writebacks stay relative to the surrounding assertion instead of baking
+	// in absolute source lines.
 	baseLine int
 	// posWriteback, when non-nil, is called by cmpErr when it encounters a
 	// pos=[] placeholder inside an @test(eq, {...}) body.  The runner uses it

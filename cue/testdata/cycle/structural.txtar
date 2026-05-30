@@ -788,14 +788,14 @@ crossRefNoCycle: t5: {
 	C: T & { x: T  }
 	@test(eq, {
 		T: {
-			y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+			y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[2:8])
 		}
 		C: {
 			x: {
-				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[2:8])
 			}
 			y: {
-				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[785:8])
+				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[2:8])
 			}
 		}
 	})

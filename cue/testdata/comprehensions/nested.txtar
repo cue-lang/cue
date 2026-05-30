@@ -79,7 +79,7 @@ for k, v in deployment {
 			protocol:   "TCP"
 			targetPort: *9100 | int
 		}]
-		selector: _|_ @test(err, code=incomplete, contains="service.\"node-exporter\".spec.selector: undefined field: metadata", pos=[59:35])
+		selector: _|_ @test(err, code=incomplete, contains="service.\"node-exporter\".spec.selector: undefined field: metadata", pos=[-12:35])
 	}
 	deployment: "node-exporter": {
 		spec: template: spec: containers: [{

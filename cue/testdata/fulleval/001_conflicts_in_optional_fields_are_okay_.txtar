@@ -5,7 +5,7 @@ d: {a: 1, b?: 3} | {a: 2} @test(eq, {a: 1, b?: 3} | {a: 2})
 
 // the following conjunction should not eliminate any disjuncts
 c: d & {b?: 4} @test(eq, {
-	b?: _|_ @test(err, code=eval, contains="conflicting values", args=[3, 4], pos=[1:15, 4:4, 4:13])
+	b?: _|_ @test(err, code=eval, contains="conflicting values", args=[3, 4], pos=[-3:15, 0:4, 0:13])
 	a: 1
 } | {
 	b?: 4, a: 2

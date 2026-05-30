@@ -120,7 +120,7 @@ embed: {
 		p: q + 1
 		q: int
 	} @test(eq, {
-		p: _|_ @test(err, code=incomplete, contains="embed.incomplete6.p: non-concrete value int in operand to +", pos=[117:6, 118:6])
+		p: _|_ @test(err, code=incomplete, contains="embed.incomplete6.p: non-concrete value int in operand to +", pos=[4:6, 5:6])
 		q: int
 	})
 	incomplete7: {
@@ -1269,7 +1269,7 @@ issue3935: reduced: {
 		out: {y: {x: "bar"}, x: "bar"}
 		#A: {y: {other: int}}
 		#B: {
-			x: _|_ @test(err, code=incomplete, contains="issue3935.reduced.#B.x: required field missing: y", pos=[12:7])
+			x: _|_ @test(err, code=incomplete, contains="issue3935.reduced.#B.x: required field missing: y", pos=[8:7])
 			y!: {x!: _}
 		}
 	})
@@ -1319,8 +1319,8 @@ issue3935: full: {
 		}
 		#SchemaSelected: {
 			spec!: {name!: string, config!: _}
-			namespace: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected.namespace: undefined field: namespace", pos=[47:27])
-			_specConfig: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected._specConfig: required field missing: spec", pos=[50:16])
+			namespace: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected.namespace: undefined field: namespace", pos=[22:27])
+			_specConfig: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected._specConfig: required field missing: spec", pos=[25:16])
 		}
 	})
 }
@@ -1393,7 +1393,7 @@ letCycleSelfKeyword: {
 
 	@test(eq, {
 		#E: _|_ @test(err, code=incomplete, path=letCycleSelf2.#E,
-			contains="cannot range over s.hosts (incomplete type _)", pos=[7:13])
+			contains="cannot range over s.hosts (incomplete type _)", pos=[4:13])
 		env: {hosts: {h1: {x: "k"}}, out: {k: "a"}}
 	})
 }
@@ -1414,7 +1414,7 @@ letCycleSelfKeyword2: {
 
 	@test(eq, {
 		#E: _|_ @test(err, code=incomplete, path=regression_let3.#E,
-			contains="cannot range over s.hosts (incomplete)", pos=[22:13])
+			contains="cannot range over s.hosts (incomplete)", pos=[4:13])
 		env: {
 			hosts: {h1: 1}
 			networks: {n1: "x"}

@@ -107,7 +107,7 @@ issue3801: let: full: {
 		#JSONPatch: {
 			namespace?: string
 			patch: []
-			output: _|_ @test(err, code=incomplete, contains="key value of dynamic field must be concrete", pos=[72:24])
+			output: _|_ @test(err, code=incomplete, contains="key value of dynamic field must be concrete", pos=[20:24])
 		}
 		#JSONOp: {op: "add", path: string, value: _} | {op: "remove", path: string}
 		#Main: {

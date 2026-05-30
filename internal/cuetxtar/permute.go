@@ -241,6 +241,8 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 			}
 			permVal := permAll.LookupPath(structPath)
 			cap := &failCapture{TB: t}
+			prevSuppress := r.suppressWritebacks
+			r.suppressWritebacks = true
 			for _, rec := range records {
 				if !pathHasPrefix(rec.path, structPath) {
 					continue
@@ -252,6 +254,7 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 					r.runDirective(cap, rec.path, permAll.LookupPath(rec.path), pa)
 				}
 			}
+			r.suppressWritebacks = prevSuppress
 			// Filter out pos= related failures: pos= specs use absolute
 			// source line numbers that necessarily shift when fields are
 			// reordered. The remaining failures are order-independent
@@ -270,7 +273,7 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 				t.Errorf("path %s: @test(permute): ordering [%s] fails directive checks:\n%s\ngot:  %s\nwant: %s",
 					structPath, strings.Join(permNames, ", "),
 					msgs,
-					r.formatValue(permVal, ""), r.formatValue(baseline, ""))
+					r.formatValue(permVal, "", 0), r.formatValue(baseline, "", 0))
 			}
 			return
 		}

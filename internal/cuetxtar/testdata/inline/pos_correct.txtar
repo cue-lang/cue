@@ -14,7 +14,7 @@ z: {
 
 	@test(eq, {
 		b: int
-		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:9])
+			c: _|_ @test(err, code=eval, pos=[1:5, 2:5, 2:9])
 	})
 }
 
@@ -26,8 +26,8 @@ w: {
 	b: 100 & 200
 
 	@test(eq, {
-		a: _|_ @test(err, code=eval, pos=[21:5, 21:11])
-		b: _|_ @test(err, code=eval, pos=[22:5, 22:11])
+			a: _|_ @test(err, code=eval, pos=[1:5, 1:11])
+			b: _|_ @test(err, code=eval, pos=[2:5, 2:11])
 	})
 }
 -- out/status.txt --
@@ -46,7 +46,7 @@ z: {
 
 	@test(eq, {
 		b: int
-		c: _|_ @test(err, code=eval, pos=[8:5, 9:5, 9:9])
+			c: _|_ @test(err, code=eval, pos=[1:5, 2:5, 2:9])
 	})
 }
 
@@ -58,8 +58,8 @@ w: {
 	b: 100 & 200
 
 	@test(eq, {
-		a: _|_ @test(err, code=eval, pos=[21:5, 21:11])
-		b: _|_ @test(err, code=eval, pos=[22:5, 22:11])
+			a: _|_ @test(err, code=eval, pos=[1:5, 1:11])
+			b: _|_ @test(err, code=eval, pos=[2:5, 2:11])
 	})
 }
 -- out/update/out/errors.txt --

@@ -1,0 +1,37 @@
+# A let chain derived from a value with a circular self-reference resolved
+# incorrectly depending on the order of the concrete data fields. The result
+# must not depend on field ordering.
+# https://cuelang.org/issue/4357
+-- in.cue --
+import "strings"
+
+// xFirst declares the field referencing the shared let (x) before the source
+// field (id); this is the ordering that used to fail.
+xFirst: {
+	x:  "B"
+	id: "A:B"
+
+	let s = strings.Split(id, ":")
+	let b = s[1]
+
+	id!: "\(s[0]):\(b)"
+	x!:  "\(b)"
+} @test(eq:todo, {
+	x:  "B"
+	id: "A:B"
+})
+
+// idFirst declares the source field (id) first; this ordering always passed.
+idFirst: {
+	id: "A:B"
+	x:  "B"
+
+	let s = strings.Split(id, ":")
+	let b = s[1]
+
+	id!: "\(s[0]):\(b)"
+	x!:  "\(b)"
+} @test(eq, {
+	id: "A:B"
+	x:  "B"
+})

@@ -90,8 +90,6 @@ issue1708: {
 	k20: (#add10 & {in: k10}).out
 	k30: (#add10 & {in: k20}).out
 
-	// TODO(inline): the generation of this value is broken, had to hand-adjust.
-	// TODO(inline): file positions are absolute instead of relative to the definition.
 	@test(eq, {
 		#add10: {
 			in: number
@@ -99,12 +97,12 @@ issue1708: {
 				i: number
 				o: _|_ @test(err, code=incomplete, contains="non-concrete value number in operand to +", pos=[84:20, 83:7])
 			}
-			out: _|_ @test(err)
+			out: _|_
 		}
 		k00: 0
 		k10: 10
 		k20: 20
-		k30: _|_ @test(err, code=incomplete, contains="undefined field: out", pos=[88:28])
+		k30: 30
 	})
 }
 -- issue3182.cue --
@@ -162,8 +160,6 @@ select: indirect: {
 [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
     ./in.cue:84:20
     ./in.cue:83:7
-[incomplete] a10.i: undefined field: out:
-    ./in.cue:88:28
 [structural_cycle] issue3182.first.t2.x.b: structural cycle
 [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
     ./select.cue:13:8

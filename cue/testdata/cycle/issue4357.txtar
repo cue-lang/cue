@@ -16,7 +16,7 @@ xFirst: {
 
 	id!: "\(s[0]):\(b)"
 	x!:  "\(b)"
-} @test(eq:todo, {
+} @test(eq, {
 	x:  "B"
 	id: "A:B"
 })

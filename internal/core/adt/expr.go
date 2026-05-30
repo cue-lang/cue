@@ -815,6 +815,15 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	// TODO(mem): add counter for let cache usage.
 	key := cacheKey{expr, arc}
 	v, ok := e.cache[key]
+	if ok {
+		// A cached let result that is still a cycle placeholder is
+		// provisional: it was computed before a value it depends on had
+		// settled. Recompute it, as the dependency may now have a concrete
+		// value; the recomputed result replaces the cache entry below.
+		if cv := v.(*Vertex); isCyclePlaceholder(cv.BaseValue) {
+			ok = false
+		}
+	}
 	if !ok {
 		// Link in the right environment to ensure comprehension context is not
 		// lost. Use a Vertex to piggyback on cycle processing.

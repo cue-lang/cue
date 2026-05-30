@@ -16,6 +16,24 @@
       "message": "https://github.com/cue-lang/cue/issues/1708 is already long fixed though?",
       "revId": "5b1f0be5c6219953938e42763116cbf72d496678",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47583885_6a05a119",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-05-30T10:13:06Z",
+      "side": 1,
+      "message": "Yeah, although that was incorrect or it regressed unnoticed. It now is really fixed.",
+      "parentUuid": "b0b8f4ec_6758bb85",
+      "revId": "5b1f0be5c6219953938e42763116cbf72d496678",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

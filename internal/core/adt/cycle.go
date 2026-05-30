@@ -504,7 +504,16 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 			// not a self-feeding cycle, so it is not marked cyclic. A
 			// same-reference reoccurrence (r.Ref == x) is genuine
 			// self-expansion and is left to markCyclicPath.
-			if r.Ref != x && n.hasAncestor(r.Node) && !isStructuralAncestor(r.Node, n.node) {
+			//
+			// The skip only applies when n still has non-cyclic conjuncts:
+			// structure sharing instantiates a definition body that carries
+			// real, non-cyclic content. A node whose only conjuncts are
+			// cyclic is genuine self-recursion (e.g. the self-referential
+			// disjunct `(t & {a: a[0]}).out` of #4373); skipping it there
+			// would remove the bound and recurse forever, so it is left to
+			// markCyclicPath.
+			if r.Ref != x && n.hasNonCycle && n.hasNonCyclic &&
+				n.hasAncestor(r.Node) && !isStructuralAncestor(r.Node, n.node) {
 				continue
 			}
 

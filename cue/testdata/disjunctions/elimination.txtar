@@ -1103,9 +1103,9 @@ issue3784: variant2: {
 			build_type!: "legacy"
 			source: {
 				branch!: string
-				path?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.source.path: field not allowed", pos=[113:4])
+				path?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.source.path: field not allowed", pos=[15:4])
 			}
-			cname?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.cname: field not allowed", pos=[115:3])
+			cname?: _|_ @test(err, code=eval, contains="issue3784.variant2.a.cname: field not allowed", pos=[17:3])
 		}
 	})
 }

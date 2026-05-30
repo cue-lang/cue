@@ -196,15 +196,15 @@ issue4022: reduced: {
 	@test(eq, {
 		#NonNamespaced: {
 			metadata: {
-				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[5:40])
+				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[1:40])
 			}
 		}
 		#NullOrNonNamespaced: int | {metadata: {
-		namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[5:40])
+		namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[1:40])
 	}}
 		out: {
 			metadata: {
-				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[5:40])
+				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[1:40])
 			}
 		}
 	})
@@ -231,17 +231,17 @@ issue4022: full: {
 		#NonNamespaced: {
 			metadata: {
 				name!: string
-				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[30:16])
+				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[4:16])
 			}
 		}
 		#NullOrNonNamespaced: null | {metadata: {
 		name!: string
-		namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[30:16])
+		namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[4:16])
 	}}
 		out: {
 			metadata: {
 				name: "foo"
-				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[30:16])
+				namespace?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[4:16])
 			}
 			apiVersion: "v1"
 		}

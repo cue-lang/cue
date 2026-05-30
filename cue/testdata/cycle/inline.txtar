@@ -41,12 +41,12 @@ inline: acrossFields: fail1: {
 	@test(eq, {
 		f: {
 			in: number
-			out: _|_ @test(err, code=incomplete, contains="inline.acrossFields.fail1.f.out: non-concrete value number in operand to +", pos=[31:8, 30:8])
+			out: _|_ @test(err, code=incomplete, contains="inline.acrossFields.fail1.f.out: non-concrete value number in operand to +", pos=[3:8, 2:8])
 		}
 		k00: 0
-		k10: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 36:17])
-		k20: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 39:17])
-		k30: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[31:8, 30:8, 35:17])
+		k10: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[3:8, 2:8, 8:17])
+		k20: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[3:8, 2:8, 11:17])
+		k30: _|_ @test(err, code=incomplete, contains="in: non-concrete value number in operand to +", pos=[3:8, 2:8, 7:17])
 	})
 }
 

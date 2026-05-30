@@ -44,11 +44,12 @@ import (
 type eqWriter struct {
 	r           *inlineRunner
 	srcFileName string
+	baseLine    int
 	opCtx       *adt.OpContext
 }
 
 func (w *eqWriter) formatPos(p token.Pos) string {
-	return w.r.formatPosSpec(p, 0, w.srcFileName)
+	return w.r.formatPosSpec(p, w.baseLine, w.srcFileName)
 }
 
 // eqFillAttr builds an @test(eq, <value>[, at=<atStr>]) attribute for fill/force-update.
@@ -56,7 +57,7 @@ func (r *inlineRunner) eqFillAttr(v cue.Value, atStr string, pa parsedTestAttr) 
 	if r.isError(v) {
 		return "@test(err)"
 	}
-	return r.eqFillAttrStr(r.formatValue(v, pa.srcFileName), atStr, pa)
+	return r.eqFillAttrStr(r.formatValue(v, pa.srcFileName, pa.baseLine), atStr, pa)
 }
 
 // eqFillAttrStr builds @test(eq, <exprStr>[, at=<atStr>]).
@@ -125,9 +126,9 @@ const eqCompactThreshold = 40
 // form exceeds eqCompactThreshold are returned in multi-line form with
 // recursive indentation; eqFillAttrStr handles re-indentation relative to the
 // source attribute line.
-func (r *inlineRunner) formatValue(v cue.Value, srcFileName string) string {
+func (r *inlineRunner) formatValue(v cue.Value, srcFileName string, baseLine int) string {
 	var b strings.Builder
-	w := &eqWriter{r: r, srcFileName: srcFileName, opCtx: value.OpContext(v)}
+	w := &eqWriter{r: r, srcFileName: srcFileName, baseLine: baseLine, opCtx: value.OpContext(v)}
 	w.writeValue(&b, v, "\t")
 	// When the root value itself collapses to a bare _|_ (e.g. a struct
 	// whose BaseValue is *adt.Bottom), there is no enclosing writeStruct

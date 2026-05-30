@@ -29,7 +29,7 @@ Foo & {
 	Junk: b: 2
 	listOfCloseds: _|_ @test(err, at=0.b, code=eval,
 		hint="considerably more positions could be useful",
-		contains="field not allowed", pos=[16:4])
+		contains="field not allowed", pos=[-4:4])
 })
 -- out/errors.txt --
 [eval] listOfCloseds.0.b: field not allowed:

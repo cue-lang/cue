@@ -67,9 +67,9 @@ incompleteLet: {
 		last: {min: 1, max: 5}
 		bar: {
 			min: 1
-			max: _|_ @test(err, code=incomplete, contains="incompleteLet.bar.max: undefined field: max", pos=[54:17])
+			max: _|_ @test(err, code=incomplete, contains="incompleteLet.bar.max: undefined field: max", pos=[10:17])
 		}
-		x: _|_ @test(err, code=incomplete, contains="incompleteLet.x: undefined field: max", pos=[61:11])
+		x: _|_ @test(err, code=incomplete, contains="incompleteLet.x: undefined field: max", pos=[17:11])
 	})
 }
 

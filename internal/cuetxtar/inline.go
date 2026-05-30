@@ -170,6 +170,11 @@ type inlineRunner struct {
 	// (fill, force overwrite, regression guard, stale-skip cleanup) to apply
 	// after all subtests have run (CUE_UPDATE mode only).
 	pendingInlineFillWrites []inlineFillWrite
+
+	// suppressWritebacks disables enqueueing source rewrites during checks that
+	// intentionally evaluate non-source-order variants, such as @test(permute)
+	// validation runs.
+	suppressWritebacks bool
 }
 
 // sinkOrSub returns the errSink if set, otherwise the given sub-test t.
@@ -939,11 +944,11 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	_, hasSkip := attrHasSkip(pa.raw)
 
 	ctx := &cmpCtx{
-		baseLine: 0, // nested pos= specs use absolute line numbers (deltaLine == absLine)
+		baseLine: pa.baseLine,
 		posWriteback: func(innerAttrText string, positions []token.Pos) {
 			r.enqueueNestedPosWrite(pa, innerAttrText, positions)
 		},
-		formatPos: func(p token.Pos) string { return r.formatPosSpec(p, 0, pa.srcFileName) },
+		formatPos: func(p token.Pos) string { return r.formatPosSpec(p, pa.baseLine, pa.srcFileName) },
 	}
 	cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {
@@ -1133,6 +1138,9 @@ func promoteTodoAttr(pa parsedTestAttr) string {
 // It is a no-op when pa.srcAttr is nil (e.g. in unit tests that construct
 // parsedTestAttr directly without a source attribute).
 func (r *inlineRunner) enqueueInlineFill(pa parsedTestAttr, newAttrText string) {
+	if r.suppressWritebacks {
+		return
+	}
 	if pa.srcAttr == nil {
 		return
 	}

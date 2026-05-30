@@ -366,7 +366,7 @@ issue3838: {
 			_test: {
 				assert: {pass: false, notOk: _} | {pass: true, invoke: _, res: 0}
 			}
-			results: _|_ @test(err, code=incomplete, contains="issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct)", pos=[26:12])
+			results: _|_ @test(err, code=incomplete, contains="issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct)", pos=[22:12])
 		}
 	})
 }

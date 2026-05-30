@@ -12,7 +12,7 @@ x: {
 	b: a + 3
 } @test(eq, {
 	a: int
-	b: _|_ @test(err, code=incomplete, contains="x.b: non-concrete value int in operand to +", pos=[3:5, 2:5])
+	b: _|_ @test(err, code=incomplete, contains="x.b: non-concrete value int in operand to +", pos=[2:5, 1:5])
 })
 -- out/status.txt --
 update: output passes run

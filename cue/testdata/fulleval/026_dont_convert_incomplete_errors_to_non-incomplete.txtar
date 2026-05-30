@@ -4,8 +4,8 @@
 import "strings"
 
 n1: {min: <max, max: >min} @test(eq, {
-	min: _|_ @test(err, code=cycle, contains="n1.max: cycle with field: min (and 1 more errors)", pos=[3:23])
-	max: _|_ @test(err, code=cycle, contains="n1.max: cycle with field: min (and 1 more errors)", pos=[3:23])
+	min: _|_ @test(err, code=cycle, contains="n1.max: cycle with field: min (and 1 more errors)", pos=[0:23])
+	max: _|_ @test(err, code=cycle, contains="n1.max: cycle with field: min (and 1 more errors)", pos=[0:23])
 })
 n2: -num      @test(err, code=incomplete, contains="operand num of '-' not concrete", pos=[0:6])
 n3: +num      @test(err, code=incomplete, contains="operand num of '+' not concrete", pos=[0:6])

@@ -95,7 +95,7 @@ issue1708: {
 			in: number
 			a10: {
 				i: number
-				o: _|_ @test(err, code=incomplete, contains="non-concrete value number in operand to +", pos=[84:20, 83:7])
+				o: _|_ @test(err, code=incomplete, contains="non-concrete value number in operand to +", pos=[3:20, 2:7])
 			}
 			out: _|_
 		}

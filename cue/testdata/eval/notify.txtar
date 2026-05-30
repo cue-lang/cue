@@ -36,7 +36,7 @@ issue3437: {
 	// TODO(perf): either use structure sharing or stronger pruning. This seems
 	// disproportional.
 	@test(eq, {
-		r: _|_ @test(err, code=incomplete, contains="issue3437.r: undefined field: a", pos=[5:9])
+		r: _|_ @test(err, code=incomplete, contains="issue3437.r: undefined field: a", pos=[1:9])
 		d: {a: {a: {a: {b: 4}}}}
 		out: {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}, b: 4} | {a: {a: {
 		a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}

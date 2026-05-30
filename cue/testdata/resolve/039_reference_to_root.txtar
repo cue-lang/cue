@@ -4,7 +4,7 @@ c: a & {
 	b: 100
 	d: a.b + 3 // do not resolve as c != a.
 } @test(eq, {b: 100, d: _|_ @test(err,
-	code=incomplete, contains="non-concrete value int in operand to +", pos=[4:5, 1:8])})
+	code=incomplete, contains="non-concrete value int in operand to +", pos=[2:5, -1:8])})
 x: {
 	b: int
 	c: b + 5   @test(err, code=incomplete, contains="non-concrete value int in operand to +", pos=[0:5, -1:5])

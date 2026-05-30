@@ -1,0 +1,10 @@
+# A disjunct that refers back to its own field through an inline
+# conjunction (`(t & {}).b`) used to hang the evaluator: each `t & {}`
+# is a fresh nonRooted vertex, so the cycle detector never saw the tree
+# depth advance and failed to detect the structural cycle. The second
+# disjunct must be eliminated, leaving `t: {a: 1}`.
+#
+# https://cuelang.org/issue/4374
+-- in.cue --
+t: {a: 1} | {b: (t & {}).b} @test(eq, {a: 1})
+out: t & {a: 1} @test(eq, {a: 1})

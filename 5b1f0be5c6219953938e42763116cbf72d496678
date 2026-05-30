@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0b8f4ec_6758bb85",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-05-30T10:11:40Z",
+      "side": 1,
+      "message": "https://github.com/cue-lang/cue/issues/1708 is already long fixed though?",
+      "revId": "5b1f0be5c6219953938e42763116cbf72d496678",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

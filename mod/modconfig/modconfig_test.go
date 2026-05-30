@@ -88,7 +88,9 @@ package x
 	qt.Assert(t, qt.IsNil(err))
 
 	dir := t.TempDir()
-	t.Setenv("DOCKER_CONFIG", dir)
+	dockerConfigDir := filepath.Join(dir, "docker")
+	err = os.MkdirAll(dockerConfigDir, 0o777)
+	qt.Assert(t, qt.IsNil(err))
 	dockerCfg, err := json.Marshal(dockerConfig{
 		Auths: map[string]authConfig{
 			r2.Host(): {
@@ -98,22 +100,32 @@ package x
 		},
 	})
 	qt.Assert(t, qt.IsNil(err))
-	err = os.WriteFile(filepath.Join(dir, "config.json"), dockerCfg, 0o666)
+	err = os.WriteFile(filepath.Join(dockerConfigDir, "config.json"), dockerCfg, 0o666)
 	qt.Assert(t, qt.IsNil(err))
 
-	t.Setenv("CUE_REGISTRY",
-		fmt.Sprintf("foo.example=%s+insecure,%s+insecure",
-			r1.Host(),
-			r2.Host(),
-		))
+	registryConf := fmt.Sprintf("foo.example=%s+insecure,%s+insecure",
+		r1.Host(),
+		r2.Host(),
+	)
 	cacheDir := filepath.Join(dir, "cache")
-	t.Setenv("CUE_CACHE_DIR", cacheDir)
 	t.Cleanup(func() {
 		modcache.RemoveAll(cacheDir)
 	})
 
 	var transportInvoked atomic.Bool
+	cfg := &Config{
+		Env: []string{
+			"CUE_REGISTRY=" + registryConf,
+			"CUE_CACHE_DIR=" + cacheDir,
+			"CUE_CONFIG_DIR=" + filepath.Join(dir, "cueconfig"),
+			"DOCKER_CONFIG=" + dockerConfigDir,
+			"DOCKER_AUTH_CONFIG=",
+			"XDG_RUNTIME_DIR=",
+			"HOME=",
+		},
+	}
 	r, err := NewRegistry(&Config{
+		Env: cfg.Env,
 		Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
 			transportInvoked.Store(true)
 			return http.DefaultTransport.RoundTrip(req)
@@ -134,7 +146,7 @@ package x
 	qt.Assert(t, qt.Equals(string(data), "package x\n"))
 
 	// Check that we can make a Resolver with the same configuration.
-	resolver, err := NewResolver(nil)
+	resolver, err := NewResolver(cfg)
 	qt.Assert(t, qt.IsNil(err))
 	gotAllHosts := resolver.AllHosts()
 	wantAllHosts := []Host{{Name: r1.Host(), Insecure: true}, {Name: r2.Host(), Insecure: true}}

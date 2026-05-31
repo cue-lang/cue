@@ -106,10 +106,10 @@ fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisf
 fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:45:11
-fail.withHidden: invalid value [int,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
+fail.withHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:57:14
-fail.withLet: invalid value [3,3,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 1 and 2:
+fail.withLet: invalid value [3,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 1 and 2:
     ./in.cue:3:21
     ./in.cue:61:11
 
@@ -208,8 +208,8 @@ fail: {
 	// A list embedded alongside a hidden field or let binding shares a single
 	// vertex with those non-element arcs. The error message must only print the
 	// integer-indexed list elements, not the hidden field or let binding.
-	withHidden: _|_ // fail.withHidden: invalid value [int,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
-	withLet:    _|_ // fail.withLet: invalid value [3,3,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 1 and 2
+	withHidden: _|_ // fail.withHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
+	withLet:    _|_ // fail.withLet: invalid value [3,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 1 and 2
 
 	// Struct field order is irrelevant. We simulate finalising
 	// these values here via close(), which gives the same behaviour
@@ -239,10 +239,10 @@ diff old new
 +fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
      ./in.cue:3:21
      ./in.cue:45:11
-+fail.withHidden: invalid value [int,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
++fail.withHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
 +    ./in.cue:3:21
 +    ./in.cue:57:14
-+fail.withLet: invalid value [3,3,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 1 and 2:
++fail.withLet: invalid value [3,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 1 and 2:
 +    ./in.cue:3:21
 +    ./in.cue:61:11
  
@@ -267,8 +267,8 @@ diff old new
 +	// A list embedded alongside a hidden field or let binding shares a single
 +	// vertex with those non-element arcs. The error message must only print the
 +	// integer-indexed list elements, not the hidden field or let binding.
-+	withHidden: _|_ // fail.withHidden: invalid value [int,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
-+	withLet:    _|_ // fail.withLet: invalid value [3,3,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 1 and 2
++	withHidden: _|_ // fail.withHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
++	withLet:    _|_ // fail.withLet: invalid value [3,1,1] (does not satisfy list.UniqueItems): equal value (1) at position 1 and 2
  
  	// Struct field order is irrelevant. We simulate finalising
  	// these values here via close(), which gives the same behaviour

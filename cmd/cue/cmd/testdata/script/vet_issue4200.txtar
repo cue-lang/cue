@@ -1,0 +1,26 @@
+# A schema selected via -d may reference a hidden field. Hidden fields are
+# qualified by their declaring package, so the schema expression must be
+# compiled in the scope of that package for the reference to resolve.
+# Issue: https://cuelang.org/issue/4200
+
+exec cue vet . data.json -d 'A'
+exec cue vet . data.json -d '#A'
+
+# BUG: the hidden field cannot be referenced directly.
+! exec cue vet . data.json -d '_A'
+cmp stderr expect-stderr
+
+-- expect-stderr --
+reference "_A" not found:
+    --schema:1:1
+-- cue.mod/module.cue --
+module: "mod.com"
+language: version: "v0.15.0"
+-- file.cue --
+package p
+
+_A: x!: int
+#A: _A
+A: _A
+-- data.json --
+{ "x": 42 }

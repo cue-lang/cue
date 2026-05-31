@@ -58,6 +58,17 @@ issue3157: {
 	foo: *43 | bool
 	@test(eq, {foo: *43 | bool})
 }
+
+// cmd/cue: every error in an empty disjunction should be reported, not just
+// the first. Both disjuncts of `1 | 2` fail against the bound `>10`, but error
+// deduplication collapses the two "invalid value" errors because they share
+// the same primary position (the bound's location), so only the first is
+// shown below. This captures the current, incorrect behavior.
+// https://cuelang.org/issue/4043
+issue4043: {
+	B: >10
+	B: 1 | 2 @test(err, code=eval, contains="invalid value 1 (out of bound >10)", pos=[-1:5, 0:5])
+}
 -- issue3581.cue --
 // evalv3: tools/flow unexpected error when a flow task result field is used as
 // a list item; string interpolation in a list element caused a spurious error.
@@ -260,6 +271,9 @@ issue516.x.match.metrics.foo: field not allowed:
 [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
     ./in.cue:38:5
     ./in.cue:36:5
+[eval] issue4043.B: invalid value 1 (out of bound >10):
+    ./in.cue:68:5
+    ./in.cue:69:5
 [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
 issue3581.reduced.list: incompatible list lengths (0 and 1):
     ./issue3581.cue:5:17

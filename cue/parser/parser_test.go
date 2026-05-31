@@ -541,7 +541,7 @@ missing ',' in struct literal (and 1 more errors)`,
 				2
 			]
 		}`,
-			out: "{a: [1, <*ast.BadExpr>]}\nmissing ',' before newline in list literal (and 2 more errors)",
+			out: "{a: [1, <*ast.BadExpr>]}\nmissing ',' before newline in list literal (and 4 more errors)",
 		},
 		{
 			desc: "list types",

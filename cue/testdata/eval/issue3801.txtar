@@ -171,6 +171,8 @@ issue3801: nonRooted: full: {
     ./nested.cue:54:12
 [incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
     ./nested.cue:72:24
+issue3801.let.full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace):
+    ./nested.cue:72:24
 [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
     ./nested.cue:72:24
     ./nested.cue:70:15
@@ -178,6 +180,8 @@ issue3801: nonRooted: full: {
     ./nested.cue:138:12
     ./nested.cue:135:15
 [incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
+    ./nested.cue:138:12
+issue3801.nonRooted.full.#SubOutput.output: key value of dynamic field must be concrete, found _|_(issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace):
     ./nested.cue:138:12
 -- out/eval/stats --
 Leaks:  40

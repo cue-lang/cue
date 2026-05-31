@@ -14,6 +14,10 @@ out: error in call to encoding/yaml.Marshal: conflicting values 2 and 1:
     ./in.cue:3:6
     ./in.cue:3:23
     ./in.cue:3:27
+out: error in call to encoding/yaml.Marshal: conflicting values 4 and 3:
+    ./in.cue:3:6
+    ./in.cue:3:33
+    ./in.cue:3:37
 
 Result:
 out: _|_ // out: error in call to encoding/yaml.Marshal: a: conflicting values 2 and 1 (and 1 more errors)

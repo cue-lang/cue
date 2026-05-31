@@ -141,6 +141,9 @@ clusters: foo: {}
     ./issue2235.cue:14:33
 [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string)):
     ./issue2235.cue:43:12
+#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
+    ./issue2235.cue:43:12
+    ./issue2235.cue:40:9
 -- out/eval/stats --
 Leaks:  2
 Freed:  68

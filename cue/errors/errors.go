@@ -424,7 +424,12 @@ func approximateEqual(a, b Error) bool {
 	if !aPos.IsValid() || !bPos.IsValid() {
 		return a.Error() == b.Error()
 	}
-	return aPos.Compare(bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0
+	// Two errors at the same position and path are only duplicates if they
+	// also carry the same message; distinct errors are common when several
+	// are anchored at one position, such as a failed disjunction's disjuncts
+	// or multiple errors surfaced through a builtin call.
+	return aPos.Compare(bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0 &&
+		a.Error() == b.Error()
 }
 
 // A list implements the error interface by returning the

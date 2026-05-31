@@ -52,6 +52,16 @@ issue3157: {
 	foo: *42 | _
 	foo: *43 | bool
 }
+
+// cmd/cue: every error in an empty disjunction should be reported, not just
+// the first. Both disjuncts of `1 | 2` fail against the bound `>10`, and both
+// "invalid value" errors are now reported even though they share the same
+// primary position (the bound's location).
+// https://cuelang.org/issue/4043
+issue4043: {
+	B: >10
+	B: 1 | 2
+}
 -- issue3581.cue --
 // evalv3: tools/flow unexpected error when a flow task result field is used as
 // a list item; string interpolation in a list element caused a spurious error.
@@ -226,6 +236,10 @@ issue4022: full: {
   issue3157: {
     foo: (*42|_)
     foo: (*43|bool)
+  }
+  issue4043: {
+    B: >10
+    B: (1|2)
   }
 }
 --- issue3576.cue

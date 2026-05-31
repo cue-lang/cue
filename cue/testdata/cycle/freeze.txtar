@@ -111,6 +111,8 @@ issue3178: {
     ./comprehension.cue:23:13
 [eval] comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
     ./comprehension.cue:35:13
+comprehension.t3.err.a: adding field yq not allowed as field set was already referenced:
+    ./comprehension.cue:35:13
 [eval] comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
     ./comprehension.cue:73:9
 -- out/eval/stats --

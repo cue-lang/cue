@@ -40,6 +40,14 @@ validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate):
     ./in.cue:7:16
 invalidDisjuntion: error in call to encoding/yaml.Validate: 2 errors in empty disjunction::
     ./in.cue:33:20
+invalidDisjuntion: error in call to encoding/yaml.Validate: conflicting values 1 and 3:
+    ./in.cue:33:20
+    ./in.cue:33:46
+    yaml.Validate:1:4
+invalidDisjuntion: error in call to encoding/yaml.Validate: conflicting values 2 and 3:
+    ./in.cue:33:20
+    ./in.cue:33:50
+    yaml.Validate:1:4
 
 Result:
 import "encoding/yaml"

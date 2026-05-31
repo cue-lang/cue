@@ -16,6 +16,8 @@ list: 123
 -- named.stderr --
 builtin package "notinstd" undefined:
     ./named.cue:3:8
+imported and not used: "notinstd":
+    ./named.cue:3:8
 list redeclared as imported package name
 	previous declaration at ./named.cue:6:1:
     ./named.cue:4:8
@@ -26,6 +28,8 @@ import "list"
 list: 123
 -- missing.stderr --
 builtin package "notinstd" undefined:
+    ./missing.cue:1:8
+imported and not used: "notinstd":
     ./missing.cue:1:8
 list redeclared as imported package name
 	previous declaration at ./missing.cue:4:1:

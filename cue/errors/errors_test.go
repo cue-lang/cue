@@ -67,13 +67,13 @@ func TestRemoveMultiplesRenders(t *testing.T) {
 		{newErr(pos(15), "unique with a multi-element path", "a", "b"), true, 0},
 		{newErr(pos(20), "shares position 20 but has a different path", "z"), true, 0},
 		{newErr(pos(20), "shares position 20 but has a longer path", "b", "x"), true, 0},
-		{newErr(pos(20), "distinct at position 20 path b (first by message)", "b"), true, 1},
-		{newErr(pos(20), "distinct at position 20 path b (second by message)", "b"), false, 1},
-		{newErr(pos(30), "identical errors at position 30 path c", "c"), true, 1},
-		{newErr(pos(30), "identical errors at position 30 path c", "c"), false, 1},
-		{newErr(pos(40), "one of three distinct at position 40 path d (first)", "d"), true, 2},
-		{newErr(pos(40), "one of three distinct at position 40 path d (second)", "d"), false, 2},
-		{newErr(pos(40), "one of three distinct at position 40 path d (third)", "d"), false, 2},
+		{newErr(pos(20), "distinct at position 20 path b (first by message)", "b"), true, 2},
+		{newErr(pos(20), "distinct at position 20 path b (second by message)", "b"), true, 2},
+		{newErr(pos(30), "identical errors at position 30 path c", "c"), true, 2},
+		{newErr(pos(30), "identical errors at position 30 path c", "c"), false, 2},
+		{newErr(pos(40), "one of three distinct at position 40 path d (first)", "d"), true, 3},
+		{newErr(pos(40), "one of three distinct at position 40 path d (second)", "d"), true, 4},
+		{newErr(pos(40), "one of three distinct at position 40 path d (third)", "d"), true, 3},
 		{newErr(token.NoPos, "invalid position, grouped regardless of path (first)"), true, 3},
 		{newErr(token.NoPos, "invalid position, grouped regardless of path (second)"), true, 4},
 		{newErr(token.NoPos, "invalid position, grouped regardless of path (third)"), true, 4},
@@ -96,9 +96,8 @@ func TestRemoveMultiplesRenders(t *testing.T) {
 		}
 	}
 
-	// The surviving errors are sorted by position, then path, then message.
-	// At this point distinct errors sharing a position and path are dropped,
-	// keeping only the first; only the next commit reports them all.
+	// The surviving errors must be sorted by position, then path, then
+	// message, with the lone duplicate collapsed.
 	want := `invalid position, grouped regardless of path (first)
 invalid position, grouped regardless of path (second)
 invalid position, grouped regardless of path (third)
@@ -108,6 +107,8 @@ a.b: unique with a multi-element path:
     test:1:16
 b: distinct at position 20 path b (first by message):
     test:1:21
+b: distinct at position 20 path b (second by message):
+    test:1:21
 b.x: shares position 20 but has a longer path:
     test:1:21
 z: shares position 20 but has a different path:
@@ -115,6 +116,10 @@ z: shares position 20 but has a different path:
 c: identical errors at position 30 path c:
     test:1:31
 d: one of three distinct at position 40 path d (first):
+    test:1:41
+d: one of three distinct at position 40 path d (second):
+    test:1:41
+d: one of three distinct at position 40 path d (third):
     test:1:41
 `
 	if got := Details(l, nil); got != want {

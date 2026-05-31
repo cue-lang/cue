@@ -1064,6 +1064,8 @@ embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched
     ./large.cue:3:12
 [incomplete] full.#JSONPatch.output: cannot reference optional field: namespace:
     ./large.cue:21:24
+full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(full.#JSONPatch.output: cannot reference optional field: namespace):
+    ./large.cue:21:24
 [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
     ./large.cue:21:24
     ./large.cue:19:15

@@ -369,6 +369,8 @@ issue3743: {
     ./cycle.cue:6:7
     ./cycle.cue:6:14
     ./cycle.cue:7:13
+noCycle.t1._s.#x: structural cycle:
+    ./cycle.cue:6:7
 [eval] noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:6:7
     ./cycle.cue:6:14

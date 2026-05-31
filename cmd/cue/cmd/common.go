@@ -606,7 +606,11 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			if p.schema != nil {
 				v := cmd.ctx.BuildExpr(p.schema,
 					cue.InferBuiltins(true),
-					cue.Scope(inst.Value()))
+					cue.Scope(inst.Value()),
+					// Use the schema package's import path so that references
+					// to hidden fields, which are qualified by package, resolve
+					// against the schema's scope.
+					cue.ImportPath(inst.id))
 				// Note that we don't check v.Err as we don't care about
 				// incomplete errors.
 				if err := v.Validate(); err != nil {

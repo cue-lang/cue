@@ -2859,21 +2859,36 @@ func TestPath(t *testing.T) {
 			{c: 2},
 		]
 	}
+	let x = c
+	c: 5
+	d: x
 	`
-	mkpath := func(p ...string) []string { return p }
-	testCases := [][]string{
-		mkpath("a", "b", "c"),
-		mkpath("b", "l", "1", "c"),
-		mkpath("b", `"b 3"`),
-		mkpath("b", `"4b"`),
-	}
+	testCases := []struct {
+		path []string
+		// deref dereferences the looked-up value before taking its path.
+		deref bool
+		// wantErr asserts that Path reports an error rather than a valid path.
+		wantErr bool
+	}{{
+		path: []string{"a", "b", "c"},
+	}, {
+		path: []string{"b", "l", "1", "c"},
+	}, {
+		path: []string{"b", `"b 3"`},
+	}, {
+		path: []string{"b", `"4b"`},
+	}, {
+		path:    []string{"d"},
+		deref:   true,
+		wantErr: true,
+	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, strings.Join(tc, "."), func(t *testing.T, m *cuetdtest.M) {
+		cuetdtest.FullMatrix.Run(t, strings.Join(tc.path, "."), func(t *testing.T, m *cuetdtest.M) {
 			ctx := m.CueContext()
 			val := mustCompile(t, ctx, config)
 
-			v := val.Lookup(tc[0])
-			for _, e := range tc[1:] {
+			v := val.Lookup(tc.path[0])
+			for _, e := range tc.path[1:] {
 				if '0' <= e[0] && e[0] <= '9' {
 					i, err := strconv.Atoi(e)
 					if err != nil {
@@ -2895,9 +2910,19 @@ func TestPath(t *testing.T) {
 					v = v.Lookup(e)
 				}
 			}
-			got := cue.PathToStrings(v.Path())
-			if !reflect.DeepEqual(got, tc) {
-				t.Errorf("got %v; want %v", got, tc)
+			if tc.deref {
+				v = cue.Dereference(v)
+			}
+			p := v.Path()
+			if tc.wantErr {
+				if p.Err() == nil {
+					t.Errorf("got valid path %q; want an error path", p)
+				}
+				return
+			}
+			got := cue.PathToStrings(p)
+			if !reflect.DeepEqual(got, tc.path) {
+				t.Errorf("got %v; want %v", got, tc.path)
 			}
 		})
 	}

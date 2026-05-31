@@ -1586,6 +1586,13 @@ func appendPath(a []Selector, v Value) []Selector {
 	case adt.StringLabel:
 		sel = stringSelector(f.StringValue(v.idx))
 
+	case adt.LetLabel:
+		// A let binding is not addressable as a path, so emit a path error
+		// selector rather than panicking. Dereference may yield a let vertex.
+		sel = pathError{
+			errors.Newf(token.NoPos, "let binding %q is not addressable", f.IdentString(v.idx)),
+		}
+
 	default:
 		panic(fmt.Sprintf("unsupported label type %v", t))
 	}

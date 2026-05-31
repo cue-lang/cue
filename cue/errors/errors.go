@@ -398,38 +398,64 @@ func (p list) sanitize() list {
 	return a
 }
 
-// sort sorts a list. *posError entries are sorted by position,
-// other errors are sorted by error message, and before any *posError entry.
-func (p list) sort() {
-	slices.SortFunc(p, func(a, b Error) int {
-		if c := comparePosWithNoPosFirst(a.Position(), b.Position()); c != 0 {
-			return c
-		}
-		if c := slices.Compare(a.Path(), b.Path()); c != 0 {
-			return c
-		}
-		return cmp.Compare(a.Error(), b.Error())
-	})
-}
-
-// removeMultiples sorts a list and removes all but the first error per line.
+// removeMultiples sorts the list and removes duplicate errors, namely those
+// that share a position, path, and message.
+//
+// Messages are rendered only to disambiguate errors that share a position and
+// path, and each such error is rendered exactly once; errors with a unique
+// position and path, the common case, are never rendered. This matters because
+// rendering fully formats the message and can be expensive.
 func (p *list) removeMultiples() {
-	p.sort()
-	*p = slices.CompactFunc(*p, approximateEqual)
-}
-
-func approximateEqual(a, b Error) bool {
-	aPos := a.Position()
-	bPos := b.Position()
-	if !aPos.IsValid() || !bPos.IsValid() {
-		return a.Error() == b.Error()
+	a := *p
+	if len(a) <= 1 {
+		return
 	}
-	// Two errors at the same position and path are only duplicates if they
-	// also carry the same message; distinct errors are common when several
-	// are anchored at one position, such as a failed disjunction's disjuncts
-	// or multiple errors surfaced through a builtin call.
-	return aPos.Compare(bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0 &&
-		a.Error() == b.Error()
+	// Sort by position and path alone, with no rendering, so that any potential
+	// duplicates end up adjacent.
+	slices.SortFunc(a, func(x, y Error) int {
+		if c := comparePosWithNoPosFirst(x.Position(), y.Position()); c != 0 {
+			return c
+		}
+		return slices.Compare(x.Path(), y.Path())
+	})
+
+	// rendered pairs an error with its message so that a group can be ordered
+	// and deduplicated by message after rendering each member just once.
+	type rendered struct {
+		err Error
+		msg string
+	}
+	out := make(list, 0, len(a))
+	for i := 0; i < len(a); {
+		// Find the group sharing a position and path with a[i].
+		j := i + 1
+		for j < len(a) && a[i].Position() == a[j].Position() &&
+			slices.Equal(a[i].Path(), a[j].Path()) {
+			j++
+		}
+		if j-i == 1 {
+			// A lone error is kept without rendering it.
+			out = append(out, a[i])
+			i = j
+			continue
+		}
+		// Render each message once, then order and deduplicate by it.
+		group := make([]rendered, j-i)
+		for k, e := range a[i:j] {
+			group[k] = rendered{e, e.Error()}
+		}
+		slices.SortFunc(group, func(x, y rendered) int {
+			return cmp.Compare(x.msg, y.msg)
+		})
+		group = slices.CompactFunc(group, func(x, y rendered) bool {
+			return x.msg == y.msg
+		})
+		for _, r := range group {
+			out = append(out, r.err)
+		}
+		i = j
+	}
+	*p = out
 }
 
 // A list implements the error interface by returning the

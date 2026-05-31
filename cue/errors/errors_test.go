@@ -47,10 +47,8 @@ func (e *countingError) Error() string {
 // message, so the counts are worth pinning: later commits that change how
 // errors are deduplicated or rendered show their effect as updates here.
 //
-// The exact render count of an error within a group reflects how many
-// comparisons it takes part in while the group is sorted and compacted by
-// message, so it depends on the standard library's sort; it is deterministic
-// but not otherwise significant.
+// Each error sharing a position and path with another is now rendered exactly
+// once, and errors with a unique position and path are never rendered.
 func TestRemoveMultiplesRenders(t *testing.T) {
 	f := token.NewFile("test", 0, 100)
 	pos := func(offset int) token.Pos { return f.Pos(offset, token.NoRelPos) }
@@ -63,20 +61,20 @@ func TestRemoveMultiplesRenders(t *testing.T) {
 		wantKept    bool // whether the error survives deduplication
 		wantRenders int  // expected number of Error calls
 	}{
-		{newErr(pos(10), "unique position and path", "a"), true, 1},
+		{newErr(pos(10), "unique position and path", "a"), true, 0},
 		{newErr(pos(15), "unique with a multi-element path", "a", "b"), true, 0},
 		{newErr(pos(20), "shares position 20 but has a different path", "z"), true, 0},
 		{newErr(pos(20), "shares position 20 but has a longer path", "b", "x"), true, 0},
-		{newErr(pos(20), "distinct at position 20 path b (first by message)", "b"), true, 2},
-		{newErr(pos(20), "distinct at position 20 path b (second by message)", "b"), true, 2},
-		{newErr(pos(30), "identical errors at position 30 path c", "c"), true, 2},
-		{newErr(pos(30), "identical errors at position 30 path c", "c"), false, 2},
-		{newErr(pos(40), "one of three distinct at position 40 path d (first)", "d"), true, 3},
-		{newErr(pos(40), "one of three distinct at position 40 path d (second)", "d"), true, 4},
-		{newErr(pos(40), "one of three distinct at position 40 path d (third)", "d"), true, 3},
-		{newErr(token.NoPos, "invalid position, grouped regardless of path (first)"), true, 3},
-		{newErr(token.NoPos, "invalid position, grouped regardless of path (second)"), true, 4},
-		{newErr(token.NoPos, "invalid position, grouped regardless of path (third)"), true, 4},
+		{newErr(pos(20), "distinct at position 20 path b (first by message)", "b"), true, 1},
+		{newErr(pos(20), "distinct at position 20 path b (second by message)", "b"), true, 1},
+		{newErr(pos(30), "identical errors at position 30 path c", "c"), true, 1},
+		{newErr(pos(30), "identical errors at position 30 path c", "c"), false, 1},
+		{newErr(pos(40), "one of three distinct at position 40 path d (first)", "d"), true, 1},
+		{newErr(pos(40), "one of three distinct at position 40 path d (second)", "d"), true, 1},
+		{newErr(pos(40), "one of three distinct at position 40 path d (third)", "d"), true, 1},
+		{newErr(token.NoPos, "invalid position, grouped regardless of path (first)"), true, 1},
+		{newErr(token.NoPos, "invalid position, grouped regardless of path (second)"), true, 1},
+		{newErr(token.NoPos, "invalid position, grouped regardless of path (third)"), true, 1},
 	}
 
 	l := make(list, len(tests))

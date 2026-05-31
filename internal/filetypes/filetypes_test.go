@@ -554,7 +554,7 @@ func TestParseArgs(t *testing.T) {
 		},
 	}, {
 		in:  `json:D:\foo.json`,
-		out: `cannot combine scope with file`,
+		out: `cannot combine file type and file name; did you mean "json: D:\\foo.json"?`,
 	}, {
 		in:  "json: json+schema: bar.schema",
 		out: `scoped qualifier "json:" without file`,
@@ -566,10 +566,15 @@ func TestParseArgs(t *testing.T) {
 		out: `empty filetype prefix in ":file.json"`,
 	}, {
 		in:  "json:foo:bar.yaml",
-		out: `cannot combine scope with file`,
+		out: `cannot combine file type and file name; did you mean "json: foo:bar.yaml"?`,
 	}, {
 		in:  "data:foo.cue",
-		out: `cannot combine scope with file`,
+		out: `cannot combine file type and file name; did you mean "data: foo.cue"?`,
+	}, {
+		// Regression test for https://cuelang.org/issue/3952: a missing
+		// space after the file type qualifier should yield a helpful hint.
+		in:  "json:-",
+		out: `cannot combine file type and file name; did you mean "json: -"?`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.in, func(t *testing.T) {

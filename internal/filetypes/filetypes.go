@@ -92,7 +92,9 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 		case scope == "":
 			return nil, errors.Newf(token.NoPos, "empty filetype prefix in %q", s)
 		case file != "":
-			return nil, errors.Newf(token.NoPos, "cannot combine scope with file")
+			return nil, errors.Newf(token.NoPos,
+				"cannot combine file type and file name; did you mean %q?",
+				scope+": "+file)
 
 		default: // just a scope, like "json:"
 			switch {

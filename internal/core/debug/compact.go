@@ -82,10 +82,18 @@ func (w *printer) compactNode(n adt.Node) {
 			defer w.popVertex()
 
 			w.string("[")
-			for i, a := range x.Arcs {
-				if i > 0 {
+			// Only the integer-labeled arcs are list elements; a list vertex
+			// may also carry hidden fields and let bindings, which must not be
+			// printed as elements. See [adt.Vertex.Elems].
+			first := true
+			for _, a := range x.Arcs {
+				if !a.Label.IsInt() {
+					continue
+				}
+				if !first {
 					w.string(",")
 				}
+				first = false
 				w.node(a)
 			}
 			w.string("]")

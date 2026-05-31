@@ -1,0 +1,39 @@
+# Older versions of CUE used to either succeed here,
+# or report incorrect error messages like "non-concrete value bool".
+
+! exec cue cmd info
+stderr 'Version: .*mismatched types'
+cmp stderr stderr.golden
+
+-- a_tool.cue --
+package example
+
+import (
+	"encoding/json"
+	"tool/file"
+	"tool/cli"
+)
+
+command: info: {
+	read: file.Read & {
+		filename: "data.json"
+		contents: _
+	}
+	display: cli.Print & {
+		let _data = #Schema & json.Unmarshal(read.contents)
+		text: "version: \(_data.Version)"
+	}
+}
+
+#Schema: {
+	Version!: bool
+	...
+}
+-- data.json --
+{"Version":"v0.8.2"}
+-- stderr.golden --
+command.info.display._data.Version: invalid interpolation: conflicting values bool and "v0.8.2" (mismatched types bool and string):
+    ./a_tool.cue:16:9
+    ./a_tool.cue:15:15
+    ./a_tool.cue:21:12
+    json:1:12

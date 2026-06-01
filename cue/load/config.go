@@ -625,7 +625,7 @@ type errorRegistry struct {
 	err error
 }
 
-func (r errorRegistry) Requirements(ctx context.Context, m module.Version) ([]module.Version, error) {
+func (r errorRegistry) ModFile(ctx context.Context, mv module.Version) (*modfile.File, error) {
 	return nil, r.err
 }
 

@@ -125,9 +125,9 @@ package x
 	})
 	qt.Assert(t, qt.IsNil(err))
 	ctx := context.Background()
-	gotRequirements, err := r.Requirements(ctx, module.MustNewVersion("foo.example@v0", "v0.0.1"))
+	mf, err := r.ModFile(ctx, module.MustNewVersion("foo.example@v0", "v0.0.1"))
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.DeepEquals(gotRequirements, []module.Version{
+	qt.Assert(t, qt.DeepEquals(mf.DepVersions(), []module.Version{
 		module.MustNewVersion("bar.example@v0", "v0.0.1"),
 	}))
 
@@ -191,9 +191,9 @@ package x
 
 	r, err := NewRegistry(nil)
 	qt.Assert(t, qt.IsNil(err))
-	gotRequirements, err := r.Requirements(ctx, module.MustNewVersion("bar.example@v0", "v0.0.1"))
+	mf2, err := r.ModFile(ctx, module.MustNewVersion("bar.example@v0", "v0.0.1"))
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.HasLen(gotRequirements, 0))
+	qt.Assert(t, qt.HasLen(mf2.DepVersions(), 0))
 
 	qt.Assert(t, qt.IsTrue(checked))
 }

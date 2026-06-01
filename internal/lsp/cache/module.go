@@ -352,7 +352,7 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	// Determinism in log messages:
 	slices.Sort(pkgPaths)
 	w.debugLogf("%v Loading packages %v", m, pkgPaths)
-	loadedPkgs := modpkgload.LoadPackages(ctx, modPath, loc, reqs, w.registry, pkgPaths, nil)
+	loadedPkgs := modpkgload.LoadPackages(ctx, modPath, loc, reqs, w.registry, nil, pkgPaths, nil)
 
 	return loadedPkgs, nil
 }

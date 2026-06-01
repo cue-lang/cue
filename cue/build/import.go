@@ -64,6 +64,7 @@ func (inst *Instance) complete() errors.Error {
 						"%s: parser returned invalid quoted string: <%s>",
 						f.Filename, quoted))
 			}
+			path = inst.canonicalImportPath(path)
 			imported[path] = append(imported[path], spec.Pos())
 		}
 	}

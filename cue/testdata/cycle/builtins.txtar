@@ -456,17 +456,17 @@ selfCycle.t1.c.d.d: invalid value {d:{}} (does not satisfy matchN): 0 matched, e
     ./yamlcycle.cue:25:8
 selfCycle.t1.c.d.d.d: structural cycle:
     ./yamlcycle.cue:24:5
-[structural_cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
+[eval] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
     ./yamlcycle.cue:36:8
     ./yamlcycle.cue:37:8
-[structural_cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
+[eval] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
     ./yamlcycle.cue:43:8
     ./yamlcycle.cue:44:8
     ./yamlcycle.cue:45:8
     ./yamlcycle.cue:46:8
-[structural_cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: error in call to encoding/yaml.Validate: structural cycle:
+[eval] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:56:8
-[structural_cycle] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
+[eval] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:56:8
 [structural_cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
     ./yamlcycle.cue:60:8

@@ -57,10 +57,18 @@ multiConflict: error in call to encoding/yaml.Validate: conflicting values "bad1
     ./in.cue:37:23
     ./in.cue:37:84
     yaml.Validate:1:10
+multiConflict: error in call to encoding/yaml.Validate: conflicting values "bad2" and int (mismatched types string and int):
+    ./in.cue:37:23
+    ./in.cue:37:97
+    yaml.Validate:1:26
 multiConflictPartial: error in call to encoding/yaml.ValidatePartial: conflicting values "bad1" and int (mismatched types string and int):
     ./in.cue:38:23
     ./in.cue:38:91
     yaml.ValidatePartial:1:10
+multiConflictPartial: error in call to encoding/yaml.ValidatePartial: conflicting values "bad2" and int (mismatched types string and int):
+    ./in.cue:38:23
+    ./in.cue:38:104
+    yaml.ValidatePartial:1:26
 
 Result:
 import "encoding/yaml"
@@ -140,5 +148,5 @@ invalidDisjuntion: _|_ // invalidDisjuntion: error in call to encoding/yaml.Vali
 
 // Both Validate and ValidatePartial must report every conflict, not just the
 // first one. Regression test for https://cuelang.org/issue/2079.
-multiConflict:        _|_ // multiConflict: error in call to encoding/yaml.Validate: multiConflict.field1: conflicting values "bad1" and int (mismatched types string and int)
-multiConflictPartial: _|_ // multiConflictPartial: error in call to encoding/yaml.ValidatePartial: multiConflictPartial.field1: conflicting values "bad1" and int (mismatched types string and int)
+multiConflict:        _|_ // multiConflict: error in call to encoding/yaml.Validate: multiConflict.field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)
+multiConflictPartial: _|_ // multiConflictPartial: error in call to encoding/yaml.ValidatePartial: multiConflictPartial.field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)

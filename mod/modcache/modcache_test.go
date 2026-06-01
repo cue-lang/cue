@@ -46,19 +46,19 @@ deps: {
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
-		summary, err := cr.Requirements(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
+		mf, err := cr.ModFile(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
-		if !qt.Check(t, qt.DeepEquals(summary, wantRequirements)) {
+		if !qt.Check(t, qt.DeepEquals(mf.DepVersions(), wantRequirements)) {
 			return
 		}
 		// Fetch again so that we test the in-memory cache-hit path.
-		summary, err = cr.Requirements(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
+		mf, err = cr.ModFile(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
-		if !qt.Check(t, qt.DeepEquals(summary, wantRequirements)) {
+		if !qt.Check(t, qt.DeepEquals(mf.DepVersions(), wantRequirements)) {
 			return
 		}
 	}

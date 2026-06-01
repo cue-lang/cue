@@ -24,15 +24,16 @@ import (
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modresolve"
 	"cuelang.org/go/mod/modcache"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
 )
 
 // Registry is used to access CUE modules from external sources.
 type Registry interface {
-	// Requirements returns a list of the modules required by the given module
-	// version.
-	Requirements(ctx context.Context, m module.Version) ([]module.Version, error)
+	// ModFile returns the module file for the given module version.
+	// The caller must not mutate the returned value.
+	ModFile(ctx context.Context, mv module.Version) (*modfile.File, error)
 
 	// Fetch returns the location of the contents for the given module
 	// version, downloading it if necessary.

@@ -176,7 +176,7 @@ type registryImpl struct {
 
 var _ Registry = (*registryImpl)(nil)
 
-func (r *registryImpl) Requirements(ctx context.Context, mv module.Version) ([]module.Version, error) {
+func (r *registryImpl) ModFile(ctx context.Context, mv module.Version) (*modfile.File, error) {
 	m, err := r.reg.GetModule(ctx, mv)
 	if err != nil {
 		return nil, err
@@ -189,7 +189,7 @@ func (r *registryImpl) Requirements(ctx context.Context, mv module.Version) ([]m
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse module file from %v: %v", m, err)
 	}
-	return mf.DepVersions(), nil
+	return mf, nil
 }
 
 func versions(vs ...string) []module.Version {

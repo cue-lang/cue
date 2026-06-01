@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -343,6 +344,8 @@ type Config struct {
 
 	fileSystem fileSystem
 	pathOS     pkgpath.OS
+
+	replacements *modpkgload.Replacements
 }
 
 func (c *Config) stdin() io.Reader {
@@ -569,7 +572,38 @@ func (c *Config) loadModule() error {
 	c.Module = mf.QualifiedModule()
 	// Set the default version for CUE files without a module.
 	c.parserConfig = c.parserConfig.Apply(parser.Version(c.modFile.Language.Version))
+
+	repls, err := c.buildReplacements(mf)
+	if err != nil {
+		return err
+	}
+	if repls != nil {
+		c.replacements = repls
+		c.Registry = newReplacingRegistry(c.Registry, repls, nil)
+	}
 	return nil
+}
+
+func (c *Config) buildReplacements(mf *modfile.File) (*modpkgload.Replacements, error) {
+	replMap := make(map[string]modpkgload.Replacement)
+	for mpath, dep := range mf.Deps {
+		if dep.Replace == "" {
+			continue
+		}
+		repl, err := modpkgload.ParseReplaceValue(dep.Replace)
+		if err != nil {
+			return nil, fmt.Errorf("invalid replace value for %s: %v", mpath, err)
+		}
+		mv, err := module.NewVersion(mpath, dep.Version)
+		if err != nil {
+			return nil, fmt.Errorf("cannot make version from module %q, version %q: %v", mpath, dep.Version, err)
+		}
+		replMap[mv.BasePath()] = repl
+	}
+	if len(replMap) == 0 {
+		return nil, nil
+	}
+	return modpkgload.NewReplacements(replMap), nil
 }
 
 func (c Config) isModRoot(dir string) bool {

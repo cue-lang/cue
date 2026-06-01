@@ -64,6 +64,7 @@ func TestLoadPackages(t *testing.T) {
 					module.SourceLoc{FS: tfs, Dir: "."},
 					initialRequirements,
 					reg,
+					nil,
 					rootPackages,
 					func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
 						return true

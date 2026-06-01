@@ -31,7 +31,7 @@ import (
 	"cuelang.org/go/mod/module"
 )
 
-func init() {
+func TestMain(m *testing.M) {
 	// Tests that use ociauth must not fall back to the platform credential
 	// helper (e.g. docker-credential-desktop on macOS), which can hang when
 	// Docker Desktop is not running. Set DOCKER_CONFIG to an empty config
@@ -45,6 +45,10 @@ func init() {
 		panic(err)
 	}
 	os.Setenv("DOCKER_CONFIG", dir)
+	// Remove it when we're done.
+	defer os.RemoveAll(dir)
+
+	m.Run()
 }
 
 // TODO: the test below acts as a smoke test for the functionality here,

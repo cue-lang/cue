@@ -22,6 +22,13 @@ validate: enforceRequired: {
 	schema: {x!: int}
 }
 
+// Validate must report every conflict, not just the first one.
+// Regression test for https://cuelang.org/issue/2079.
+validate: multiConflict: {
+	str:    #"{"field1": "bad1", "field2": "bad2"}"#
+	schema: {field1: int, field2: int}
+}
+
 issue3932: {
 	f: json.Validate({name!: string})
 	f: json.Marshal({name: "foo"})
@@ -110,14 +117,19 @@ validate.invalidDisjuntion.result: error in call to encoding/json.Validate: conf
     ./in.cue:14:46
     json.Validate:1:1
     json.Validate:1:6
+validate.multiConflict.result: error in call to encoding/json.Validate: conflicting values "bad1" and int (mismatched types string and int):
+    ./in.cue:6:10
+    ./in.cue:26:19
+    json.Validate:1:1
+    json.Validate:1:12
 validate.t2.result: error in call to encoding/json.Validate: invalid value 10 (out of bound <3):
     ./in.cue:6:10
     ./in.cue:9:27
     json.Validate:1:6
 unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:49:11
+    ./in.cue:56:11
 unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:49:11
+    ./in.cue:56:11
 
 Result:
 import "encoding/json"
@@ -170,6 +182,17 @@ validate: {
 			x!: int
 		}
 		result: json.Validate(str, schema)
+	}
+
+	// Validate must report every conflict, not just the first one.
+	// Regression test for https://cuelang.org/issue/2079.
+	multiConflict: {
+		str: "{\"field1\": \"bad1\", \"field2\": \"bad2\"}"
+		schema: {
+			field1: int
+			field2: int
+		}
+		result: _|_ // validate.multiConflict.result: error in call to encoding/json.Validate: validate.multiConflict.result.field1: conflicting values "bad1" and int (mismatched types string and int)
 	}
 }
 issue3932: {

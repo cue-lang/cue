@@ -523,12 +523,19 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 }
 
 func (l *loader) absPathForSourceLoc(loc module.SourceLoc, os pkgpath.OS, fromModule module.Version) (string, error) {
-	if l.cfg.FS != nil && l.cfg.modFile != nil && fromModule.Path() == l.cfg.modFile.QualifiedModule() {
-		// It's a path in the main module and files are coming from [Config.FS].
-		// Join with ModuleRoot to make the path absolute within the FS namespace.
-		// Note: FromFSPath is not applied here because this path is used for
-		// FS lookups, not for display purposes.
-		return pkgpath.Join([]string{l.cfg.ModuleRoot, loc.Dir}, os), nil
+	if l.cfg.FS != nil {
+		if l.cfg.modFile != nil && fromModule.Path() == l.cfg.modFile.QualifiedModule() {
+			// It's a path in the main module and files are coming from [Config.FS].
+			// Join with ModuleRoot to make the path absolute within the FS namespace.
+			// Note: FromFSPath is not applied here because this path is used for
+			// FS lookups, not for display purposes.
+			return pkgpath.Join([]string{l.cfg.ModuleRoot, loc.Dir}, os), nil
+		}
+		if repl, ok := l.cfg.replacements.Lookup(fromModule.BasePath()); ok && repl.Dir != "" {
+			// It's a directory replacement within [Config.FS].
+			// The replacement directory path is absolute within the FS namespace.
+			return pkgpath.Join([]string{repl.Dir, loc.Dir}, os), nil
+		}
 	}
 	osfs, ok := loc.FS.(module.OSRootFS)
 	if !ok {
@@ -541,18 +548,36 @@ func (l *loader) absPathForSourceLoc(loc module.SourceLoc, os pkgpath.OS, fromMo
 	return pkgpath.Join([]string{osPath, loc.Dir}, os), nil
 }
 
-// setCanonicalImportPath sets a CanonicalImportPath function on the build instance
-// if it's from an external module. This ensures the build system's
-// path-based deduplication does not incorrectly conflate different
-// major version resolutions.
+// setCanonicalImportPath sets a CanonicalImportPath function on the build instance.
+// This handles two kinds of canonicalization:
+//   - For external module packages, rewriting unversioned imports to include
+//     the correct major version based on the importing module's defaults.
+//   - For all packages, rewriting imports that reference a replacement module's
+//     namespace back to the original module's namespace.
 func (l *loader) setCanonicalImportPath(p *build.Instance) {
 	if l.pkgs == nil {
 		return
 	}
 	parts := ast.ParseImportPath(p.ImportPath)
 	mpkg := l.pkgs.Pkg(parts.Canonical().String())
+
+	var externalCanonical func(string) string
 	if mpkg != nil && mpkg.FromExternalModule() {
-		p.CanonicalImportPath = mpkg.CanonicalImportPath
+		externalCanonical = mpkg.CanonicalImportPath
+	}
+	repls := l.cfg.replacements
+
+	if externalCanonical == nil && repls == nil {
+		return
+	}
+	p.CanonicalImportPath = func(importPath string) string {
+		if repls != nil {
+			importPath = repls.CanonicalImportPath(importPath)
+		}
+		if externalCanonical != nil {
+			importPath = externalCanonical(importPath)
+		}
+		return importPath
 	}
 }
 

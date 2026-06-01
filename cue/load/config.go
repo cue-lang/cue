@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -343,6 +344,8 @@ type Config struct {
 
 	fileSystem fileSystem
 	pathOS     pkgpath.OS
+
+	replacements *modpkgload.Replacements
 }
 
 func (c *Config) stdin() io.Reader {
@@ -569,6 +572,84 @@ func (c *Config) loadModule() error {
 	c.Module = mf.QualifiedModule()
 	// Set the default version for CUE files without a module.
 	c.parserConfig = c.parserConfig.Apply(parser.Version(c.modFile.Language.Version))
+
+	repls, err := c.buildReplacements(mf)
+	if err != nil {
+		return err
+	}
+	if repls != nil {
+		c.replacements = repls
+		c.Registry = newReplacingRegistry(c.Registry, repls, c.openDirFunc())
+	}
+	return nil
+}
+
+// openDirFunc returns an openDir function appropriate for the current
+// configuration. When Config.FS is set, the returned function opens
+// directories within that filesystem; otherwise it returns nil,
+// causing the default OS filesystem behavior.
+func (c *Config) openDirFunc() func(string) (fs.FS, error) {
+	if c.FS == nil {
+		return nil
+	}
+	return func(p string) (fs.FS, error) {
+		// Strip the leading "/" from the absolute path to get an
+		// fs.FS-relative path, since fs.FS paths must not start with "/".
+		fsPath := strings.TrimPrefix(p, "/")
+		return fs.Sub(c.FS, fsPath)
+	}
+}
+
+func (c *Config) buildReplacements(mf *modfile.File) (*modpkgload.Replacements, error) {
+	replMap := make(map[string]modpkgload.Replacement)
+	for mpath, dep := range mf.Deps {
+		if dep.Replace == "" {
+			continue
+		}
+		repl, err := modpkgload.ParseReplaceValue(dep.Replace)
+		if err != nil {
+			return nil, fmt.Errorf("invalid replace value for %s: %v", mpath, err)
+		}
+		if repl.Dir != "" && !pkgpath.IsAbs(repl.Dir, c.pathOS) {
+			repl.Dir = pkgpath.Join([]string{c.ModuleRoot, repl.Dir}, c.pathOS)
+		}
+		if repl.Dir != "" {
+			if err := c.checkReplaceDirModulePath(mpath, repl.Dir); err != nil {
+				return nil, err
+			}
+		}
+		mv, err := module.NewVersion(mpath, dep.Version)
+		if err != nil {
+			return nil, fmt.Errorf("cannot make version from module %q, version %q: %v", mpath, dep.Version, err)
+		}
+		replMap[mv.BasePath()] = repl
+	}
+	if len(replMap) == 0 {
+		return nil, nil
+	}
+	return modpkgload.NewReplacements(replMap), nil
+}
+
+// checkReplaceDirModulePath verifies that the module.cue in a replacement
+// directory declares the same module path as the module being replaced.
+func (c *Config) checkReplaceDirModulePath(wantPath string, dir string) error {
+	modFilePath := pkgpath.Join([]string{dir, "cue.mod", "module.cue"}, c.pathOS)
+	rc, cerr := c.fileSystem.openFile(modFilePath)
+	if cerr != nil {
+		return nil
+	}
+	data, err := io.ReadAll(rc)
+	rc.Close()
+	if err != nil {
+		return nil
+	}
+	replMF, err := modfile.ParseNonStrict(data, modFilePath)
+	if err != nil {
+		return nil
+	}
+	if got := replMF.QualifiedModule(); got != "" && got != wantPath {
+		return fmt.Errorf("replacement directory %s has module path %q, want %q", dir, got, wantPath)
+	}
 	return nil
 }
 

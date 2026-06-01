@@ -350,13 +350,19 @@ func isDirWithCUEFiles(loc module.SourceLoc) (bool, error) {
 // and returns its location.
 //
 // The isLocal return value reports whether the replacement,
-// if any, is within the local main module.
+// if any, is within the local main module or a directory replacement.
 func (pkgs *Packages) fetch(ctx context.Context, mod module.Version) (loc module.SourceLoc, isLocal bool, err error) {
 	if mod == pkgs.mainModuleVersion {
 		return pkgs.mainModuleLoc, true, nil
 	}
 	loc, err = pkgs.registry.Fetch(ctx, mod)
-	return loc, false, err
+	if err != nil {
+		return loc, false, err
+	}
+	if repl, ok := pkgs.replacements.Lookup(mod.BasePath()); ok && repl.Dir != "" {
+		return loc, true, nil
+	}
+	return loc, false, nil
 }
 
 // pathAncestors returns an iterator over all the ancestors

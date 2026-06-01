@@ -629,6 +629,10 @@ func (r errorRegistry) Requirements(ctx context.Context, m module.Version) ([]mo
 	return nil, r.err
 }
 
+func (r errorRegistry) DefaultMajorVersions(ctx context.Context, m module.Version) (map[string]string, error) {
+	return nil, r.err
+}
+
 func (r errorRegistry) Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error) {
 	return module.SourceLoc{}, r.err
 }

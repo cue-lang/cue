@@ -54,6 +54,14 @@ type Instance struct {
 	loadFunc LoadFunc
 	done     bool
 
+	// RewriteImport, if non-nil, is called for each import path
+	// extracted from the instance's source files before it is
+	// resolved. This allows the caller to rewrite import paths
+	// to canonical forms — for example, adding a major version
+	// qualifier to an unversioned import based on the importing
+	// module's own defaults.
+	RewriteImport func(importPath string) string
+
 	// PkgName is the name specified in the package clause.
 	PkgName string
 	hasName bool
@@ -220,6 +228,11 @@ func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {
 // LookupImport defines a mapping from an ImportSpec's ImportPath to Instance.
 func (inst *Instance) LookupImport(path string) *Instance {
 	path = inst.expandPath(path)
+	if inst.RewriteImport != nil {
+		if rewritten := inst.RewriteImport(path); rewritten != "" {
+			path = rewritten
+		}
+	}
 	for _, inst := range inst.Imports {
 		if inst.ImportPath == path {
 			return inst

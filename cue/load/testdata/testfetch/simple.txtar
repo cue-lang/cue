@@ -119,7 +119,7 @@ package baz
 -- out/modfetch/instance-info --
 main.org@v0:main module=main.org@v0 version=v0.9.0-main
 	example.com@v0:main module=example.com@v0 version=v0.9.0-example.v0.0.1
-		foo.com/bar/hello module=foo.com/bar/hello@v0 version=v0.9.0-foo.com.bar.hello.v0.2.3
+		foo.com/bar/hello@v0 module=foo.com/bar/hello@v0 version=v0.9.0-foo.com.bar.hello.v0.2.3
 			bar.com/bar@v0 module=bar.com@v0 version=v0.9.0-bar.com.v0.5.0
 				baz.org@v0:baz module=baz.org@v0 version=v0.9.0-baz.org.v0.10.1
 			baz.org@v0:baz module=baz.org@v0 version=v0.9.0-baz.org.v0.10.1

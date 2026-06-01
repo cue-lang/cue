@@ -688,14 +688,12 @@ func (ld *loader) spotCheckRoots(ctx context.Context, rs *modrequirements.Requir
 			if ctx.Err() != nil {
 				return
 			}
-
-			require, err := ld.registry.Requirements(ctx, m)
+			mf, err := ld.registry.ModFile(ctx, m)
 			if err != nil {
 				cancel()
 				return
 			}
-
-			for _, r := range require {
+			for _, r := range mf.DepVersions() {
 				if v, ok := rs.RootSelected(r.Path()); ok && semver.Compare(v, r.Version()) < 0 {
 					cancel()
 					return

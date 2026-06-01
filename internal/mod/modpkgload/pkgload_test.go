@@ -197,7 +197,7 @@ func (r testRegistry) Fetch(ctx context.Context, m module.Version) (module.Sourc
 	}, nil
 }
 
-func (r testRegistry) Requirements(ctx context.Context, m module.Version) ([]module.Version, error) {
+func (r testRegistry) ModFile(_ context.Context, m module.Version) (*modfile.File, error) {
 	mpath := path.Join(r.modpath(m), "cue.mod/module.cue")
 	data, err := fs.ReadFile(r.fs, mpath)
 	if err != nil {
@@ -207,7 +207,7 @@ func (r testRegistry) Requirements(ctx context.Context, m module.Version) ([]mod
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse module file from %v: %v", m, err)
 	}
-	return mf.DepVersions(), nil
+	return mf, nil
 }
 
 func (r testRegistry) modpath(m module.Version) string {

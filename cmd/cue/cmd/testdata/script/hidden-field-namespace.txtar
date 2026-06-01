@@ -1,7 +1,6 @@
 # Test that hidden fields are placed into the same namespace
 # regardless of how the same package is imported.
 
-# FAIL: the output should not look like this.
 # See https://github.com/cue-lang/cue/issues/4370
 exec cue export .
 cmp stdout want-eval.txt
@@ -58,9 +57,9 @@ package subpkg
         "result": 11
     },
     "test2": {
-        "result": -1
+        "result": 12
     },
     "test3": {
-        "result": -1
+        "result": 13
     }
 }

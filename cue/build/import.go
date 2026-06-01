@@ -64,6 +64,11 @@ func (inst *Instance) complete() errors.Error {
 						"%s: parser returned invalid quoted string: <%s>",
 						f.Filename, quoted))
 			}
+			if inst.RewriteImport != nil {
+				if rewritten := inst.RewriteImport(path); rewritten != "" {
+					path = rewritten
+				}
+			}
 			imported[path] = append(imported[path], spec.Pos())
 		}
 	}

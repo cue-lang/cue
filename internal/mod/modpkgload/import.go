@@ -31,7 +31,7 @@ import (
 // If the package is present in exactly one module, importFromModules will
 // return the module, its root directory, and a list of other modules that
 // lexically could have provided the package but did not.
-func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (
+func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string, defaultMajorVersion func(string) (string, modrequirements.MajorVersionDefaultStatus)) (
 	m module.Version,
 	mroot module.SourceLoc,
 	pkgLocs []module.SourceLoc,
@@ -81,7 +81,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (
 		)
 		pkgVersion := pathParts.Version
 		if pkgVersion == "" {
-			if pkgVersion, _ = pkgs.requirements.DefaultMajorVersion(prefix); pkgVersion == "" {
+			if pkgVersion, _ = defaultMajorVersion(prefix); pkgVersion == "" {
 				return module.Version{}, nil
 			}
 		}

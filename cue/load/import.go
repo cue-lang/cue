@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/module"
 	pkgpath "cuelang.org/go/pkg/path"
 )
@@ -436,6 +437,11 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.ModuleVersion = mv
 	i.ModuleFile = mf
 	setFSLoc(l.cfg, i)
+
+	if parts.Version == "" && !mv.IsLocal() {
+		parts.Version = semver.Major(mv.Version())
+	}
+	i.CanonicalID = parts.Canonical().String()
 
 	return i
 }

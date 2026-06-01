@@ -1927,6 +1927,11 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 // ReferencePath returns the value and path referred to by this value such that
 // [Value.LookupPath](path) resolves to the same value, or no path if this value
 // is not a reference.
+//
+// The path is absolute from root and reflects where the reference resolves,
+// not its syntax: scope-relative and absolute references may report the same
+// path despite unifying differently. To tell them apart, inspect the conjunct
+// syntax via [Value.Expr] or [Value.Split].
 func (v Value) ReferencePath() (root Value, p Path) {
 	// TODO: don't include references to hidden fields.
 	c, count := v.v.SingleConjunct()

@@ -1,0 +1,60 @@
+# Test that module replace directives are specific to a major version.
+# A replacement for one major version of a module must not apply to a
+# different major version of the same module.
+#
+# Here example.com/foo@v0 is replaced by example.com/bar, but
+# example.com/foo@v1 is left unreplaced and must resolve to the real
+# foo@v1 module from the registry.
+
+exec cue export .
+cmp stdout want-export.txt
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+
+deps: {
+	"example.com/foo@v0": {
+		v: "v0.1.0"
+		replace: "example.com/bar@v0.1.0"
+	}
+	"example.com/foo@v1": {
+		v: "v1.0.0"
+	}
+}
+-- main.cue --
+package main
+
+import (
+	foov0 "example.com/foo@v0:foo"
+	foov1 "example.com/foo@v1:foo"
+)
+
+v0: foov0.value
+v1: foov1.value
+-- _registry/example.com_bar_v0.1.0/cue.mod/module.cue --
+module: "example.com/bar@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_bar_v0.1.0/foo.cue --
+package foo
+
+value: "from bar (replacement for foo v0)"
+-- _registry/example.com_foo_v0.1.0/cue.mod/module.cue --
+module: "example.com/foo@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_foo_v0.1.0/foo.cue --
+package foo
+
+value: "from foo v0 (should not see this)"
+-- _registry/example.com_foo_v1.0.0/cue.mod/module.cue --
+module: "example.com/foo@v1"
+language: version: "v0.9.0"
+-- _registry/example.com_foo_v1.0.0/foo.cue --
+package foo
+
+value: "from foo v1"
+-- want-export.txt --
+{
+    "v0": "from bar (replacement for foo v0)",
+    "v1": "from foo v1"
+}

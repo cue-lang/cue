@@ -43,14 +43,29 @@ versions: "v0.8.0-alpha.0": {
 	// Define this version in terms of the later versions
 	// rather than the other way around, so that
 	// the latest version is clearest.
-	versions["v0.9.0-alpha.0"]
+	versions["v0.17.0"]
 
 	// The source field was added in v0.9.0, so "remove"
 	// it here by marking it as an error when used.
 	#File: source?: _errorSourceFieldRequiredVersion
+
+	// The replace field was added in v0.17.0, so "remove"
+	// it here by marking it as an error when used.
+	#File: #Dep: replace?: _errorReplaceFieldRequiredVersion
 }
 
 versions: "v0.9.0-alpha.0": {
+	// Define this version in terms of the later version
+	// rather than the other way around, so that
+	// the latest version is clearest.
+	versions["v0.17.0"]
+
+	// The replace field was added in v0.17.0, so "remove"
+	// it here by marking it as an error when used.
+	#File: #Dep: replace?: _errorReplaceFieldRequiredVersion
+}
+
+versions: "v0.17.0": {
 	#File: {
 		// module indicates the module's path.
 		module?: #Module | ""
@@ -90,6 +105,13 @@ versions: "v0.9.0-alpha.0": {
 			// there is more than one major version for that path and default is
 			// not set for exactly one of them.
 			default?: bool
+
+			// replace specifies a replacement for this dependency.
+			// A value starting with "." or "/", or matching a Windows
+			// absolute path (e.g. "C:\..." or "C:/..."), is a directory
+			// path; otherwise it is a module path with version
+			// (e.g. "example.com/bar@v0.1.0").
+			replace?: string
 		}
 
 		// #Module constrains a module path. The major version indicator is
@@ -112,8 +134,13 @@ versions: "v0.9.0-alpha.0": {
 		// The module declaration is required.
 		module!: #Module
 
-		// No null versions, because no replacements yet.
-		#Dep: v!: #Semver
+		// No null versions in strict mode.
+		#Dep: {
+			v!: #Semver
+
+			// Replacements are not permitted in published modules.
+			replace?: _errorReplaceNotPermittedInStrict
+		}
 	}
 
 	// #Source describes a source of truth for a module's content.
@@ -145,3 +172,9 @@ versions: "v0.9.0-alpha.0": {
 
 //error: source field is not allowed at this language version; need at least v0.9.0-alpha.0
 let _errorSourceFieldRequiredVersion = 1 & 2
+
+//error: replace field is not allowed at this language version; need at least v0.17.0
+let _errorReplaceFieldRequiredVersion = 1 & 2
+
+//error: replace directives are not allowed in published modules
+let _errorReplaceNotPermittedInStrict = 1 & 2

@@ -204,7 +204,7 @@ func (ld *loader) shouldIncludePkgFile(pkgPath string, mod module.Version, fsys 
 func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string, rs *modrequirements.Requirements) (*modrequirements.Requirements, *modpkgload.Packages, error) {
 	for {
 		logf("---- LOADING from requirements %q", rs.RootModules())
-		pkgs := modpkgload.LoadPackages(ctx, ld.mainModule.Path(), ld.mainModuleLoc, rs, ld.registry, rootPkgPaths, ld.shouldIncludePkgFile)
+		pkgs := modpkgload.LoadPackages(ctx, ld.mainModule.Path(), ld.mainModuleLoc, rs, ld.registry, nil, rootPkgPaths, ld.shouldIncludePkgFile)
 		if ld.checkTidy {
 			for _, pkg := range pkgs.All() {
 				err := pkg.Error()

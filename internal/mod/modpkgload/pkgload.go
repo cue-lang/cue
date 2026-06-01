@@ -102,6 +102,7 @@ type Packages struct {
 	work                 *par.Queue
 	requirements         *modrequirements.Requirements
 	registry             Registry
+	replacements         *Replacements
 }
 
 type Package struct {
@@ -203,6 +204,7 @@ func LoadPackages(
 	mainModuleLoc module.SourceLoc,
 	rs *modrequirements.Requirements,
 	reg Registry,
+	replacements *Replacements,
 	rootPkgPaths []string,
 	shouldIncludePkgFile func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool,
 ) *Packages {
@@ -215,6 +217,7 @@ func LoadPackages(
 		shouldIncludePkgFile: shouldIncludePkgFile,
 		requirements:         rs,
 		registry:             reg,
+		replacements:         replacements,
 		work:                 par.NewQueue(runtime.GOMAXPROCS(0)),
 	}
 	inRoots := map[*Package]bool{}
@@ -364,6 +367,20 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	pkg.files = files
 	// Make the algorithm deterministic for tests.
 	imports := slices.Sorted(maps.Keys(importsMap))
+
+	// Rewrite imports that reference a replacement module's namespace
+	// to the original module's namespace. This ensures that the same
+	// package always has the same identity regardless of whether it's
+	// imported via the original or replacement path, which is critical
+	// for hidden-field namespace correctness.
+	if pkgs.replacements != nil {
+		for i, imp := range imports {
+			if resolved := pkgs.replacements.CanonicalImportPath(imp); resolved != imp {
+				pkg.resolvedImports[imp] = resolved
+				imports[i] = resolved
+			}
+		}
+	}
 
 	if pkg.fromExternal {
 		// This package is from an external module: resolve unversioned

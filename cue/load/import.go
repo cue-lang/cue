@@ -21,6 +21,7 @@ import (
 	"io/fs"
 	pathpkg "path"
 	"slices"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -217,6 +218,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		}
 
 		l.addFiles(p)
+		l.rewriteExternalImports(p)
 		_ = p.Complete()
 	}
 	slices.SortFunc(all, func(a, b *build.Instance) int {
@@ -532,6 +534,33 @@ func (l *loader) absPathForSourceLoc(loc module.SourceLoc, os pkgpath.OS, fromMo
 		return "", fmt.Errorf("cannot get absolute path for FS of type %T", loc.FS)
 	}
 	return pkgpath.Join([]string{osPath, loc.Dir}, os), nil
+}
+
+// rewriteExternalImports rewrites import paths in AST files of external
+// module packages to use the resolved versioned paths. This is needed
+// because the build system deduplicates imports by raw path, but
+// different modules may resolve the same unversioned path to different
+// major versions.
+func (l *loader) rewriteExternalImports(p *build.Instance) {
+	if l.pkgs == nil {
+		return
+	}
+	parts := ast.ParseImportPath(p.ImportPath)
+	mpkg := l.pkgs.Pkg(parts.Canonical().String())
+	if mpkg == nil || !mpkg.FromExternalModule() {
+		return
+	}
+	for _, f := range p.Files {
+		for imp := range f.ImportSpecs() {
+			impPath, err := strconv.Unquote(imp.Path.Value)
+			if err != nil {
+				continue
+			}
+			if resolved := mpkg.ResolvedImport(impPath); resolved != "" {
+				imp.Path.Value = strconv.Quote(resolved)
+			}
+		}
+	}
 }
 
 // genPath returns the directory for generated files within a module root.

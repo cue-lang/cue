@@ -1,0 +1,91 @@
+# Test directory-based module replace directives.
+# A module dependency can be replaced with a local directory.
+#
+# This test verifies that:
+# 1. The replacement module's content is used from the local directory
+#    instead of the registry.
+# 2. Hidden fields unify correctly across the replacement boundary,
+#    including when the replacement module's own code imports its
+#    subpackage using the original module path.
+
+exec cue export .
+cmp stdout want-export.txt
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+
+deps: {
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+		replace: "./local_dep"
+	}
+}
+-- main.cue --
+package main
+
+import (
+	"example.com/dep@v0:lib"
+	"example.com/dep/subpkg@v0"
+)
+
+// test1 exercises hidden field unification within a single import:
+// both #withx and #foo come from subpkg (via the original path),
+// so _x is in the same namespace.
+test1: (subpkg.#withx & {in: 1}).out & subpkg.#foo
+
+// test2 exercises hidden field unification across the replacement boundary:
+// #withx comes from subpkg, and lib.#foo comes from the replacement
+// module's root package, which internally imports subpkg using the
+// same module path. The directory replacement must ensure both resolve
+// to the same package identity so that _x unifies correctly.
+test2: (subpkg.#withx & {in: 2}).out & lib.#foo
+
+output: [lib.value, subpkg.#id]
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+import "example.com/dep/subpkg@v0"
+
+#foo: subpkg.#foo
+
+value: "from local directory"
+-- local_dep/subpkg/p.cue --
+package subpkg
+
+#id: "local-dep-subpkg"
+
+#foo: {
+	_x?: int
+	result: *(_x + 10) | -1
+}
+
+#withx: {
+	in!: int
+	out: {
+		_x: in
+	}
+}
+-- _registry/example.com_dep_v0.1.0/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_dep_v0.1.0/lib.cue --
+package lib
+
+value: "from registry (should not see this)"
+-- want-export.txt --
+{
+    "test1": {
+        "result": 11
+    },
+    "test2": {
+        "result": 12
+    },
+    "output": [
+        "from local directory",
+        "local-dep-subpkg"
+    ]
+}

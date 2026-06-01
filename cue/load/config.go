@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -342,6 +343,8 @@ type Config struct {
 
 	fileSystem fileSystem
 	pathOS     pkgpath.OS
+
+	replacements *modpkgload.Replacements
 }
 
 func (c *Config) stdin() io.Reader {
@@ -565,6 +568,55 @@ func (c *Config) loadModule() error {
 	c.Module = mf.QualifiedModule()
 	// Set the default version for CUE files without a module.
 	c.parserConfig = c.parserConfig.Apply(parser.Version(c.modFile.Language.Version))
+
+	repls, err := modpkgload.NewReplacements(c.modFile)
+	if err != nil {
+		return err
+	}
+	if repls != nil {
+		for replaced, r := range repls.All() {
+			if r.Dir != "" {
+				if err := c.checkReplaceDirModulePath(replaced, r.Dir); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	if repls != nil {
+		c.replacements = repls
+		c.Registry = modpkgload.NewReplacingRegistry(c.Registry, repls, func(dir string) (module.SourceLoc, error) {
+			if !pkgpath.IsAbs(dir, c.pathOS) {
+				dir = pkgpath.Join([]string{c.ModuleRoot, dir}, c.pathOS)
+			}
+			return module.SourceLoc{
+				FS:  c.fileSystem.ioFS(dir, c.languageVersion()),
+				Dir: ".",
+			}, nil
+		})
+	}
+	return nil
+}
+
+// checkReplaceDirModulePath verifies that the module.cue in a replacement
+// directory declares the same module path as the module being replaced.
+func (c *Config) checkReplaceDirModulePath(wantPath string, dir string) error {
+	modFilePath := pkgpath.Join([]string{dir, "cue.mod", "module.cue"}, c.pathOS)
+	rc, cerr := c.fileSystem.openFile(modFilePath)
+	if cerr != nil {
+		return nil
+	}
+	data, err := io.ReadAll(rc)
+	rc.Close()
+	if err != nil {
+		return nil
+	}
+	replMF, err := modfile.ParseNonStrict(data, modFilePath)
+	if err != nil {
+		return nil
+	}
+	if got := replMF.QualifiedModule(); got != "" && got != wantPath {
+		return fmt.Errorf("replacement directory %s has module path %q, want %q", dir, got, wantPath)
+	}
 	return nil
 }
 

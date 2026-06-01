@@ -180,6 +180,18 @@ source: kind: "git"
 `,
 	wantError: `invalid module file: source field is not allowed at this language version; need at least v0.9.0-alpha.0`,
 }, {
+	testName: "WithEarlierVersionAndReplace",
+	parse:    Parse,
+	data: `
+module: "foo.com/bar@v0"
+language: version: "v0.16.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+	replace: "./local_dep"
+}
+`,
+	wantError: `invalid module file: replace field is not allowed at this language version; need at least v0.17.0`,
+}, {
 	testName: "AmbiguousDefaults",
 	parse:    Parse,
 	data: `

@@ -9,6 +9,7 @@ import (
 	"testing/fstest"
 
 	"github.com/go-quicktest/qt"
+	"golang.org/x/tools/txtar"
 )
 
 func TestIOFS(t *testing.T) {
@@ -171,6 +172,111 @@ a: 1
 	qt.Assert(t, qt.HasLen(insts[0].BuildFiles, 1))
 	qt.Assert(t, qt.IsFalse(insts[0].BuildFiles[0].FilenameLoc.IsZero()))
 	qt.Assert(t, qt.Equals(insts[0].BuildFiles[0].FilenameLoc.String(), insts[0].BuildFiles[0].Filename))
+}
+
+func TestLoadFromFSWithDirectoryReplace(t *testing.T) {
+	// A directory replacement value may be relative (starting with "./" or
+	// "../") or absolute (starting with "/"). Relative paths are resolved
+	// against the module root; absolute paths are absolute within the
+	// [io/fs.FS] namespace, whose root is "/".
+	tests := []struct {
+		testName string
+		dir      string
+		files    string
+	}{{
+		// Relative replacement, module at the FS root.
+		testName: "RelativeAtRoot",
+		files: `
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+	replace: "./local_dep"
+}
+-- main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+value: "from local directory"
+`,
+	}, {
+		// Absolute replacement (absolute within the FS namespace), module
+		// at the FS root.
+		testName: "AbsoluteAtRoot",
+		files: `
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+	replace: "/local_dep"
+}
+-- main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+value: "from local directory"
+`,
+	}, {
+		// Module root is a subdirectory of the FS and the relative
+		// replacement points outside the module root ("../local_dep"),
+		// resolving to "/local_dep" within the FS namespace.
+		testName: "RelativeOutsideModuleRoot",
+		dir:      "/mymod",
+		files: `
+-- mymod/cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+	replace: "../local_dep"
+}
+-- mymod/main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+value: "from local directory"
+`,
+	}}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			fsys, err := txtar.FS(txtar.Parse([]byte(test.files)))
+			qt.Assert(t, qt.IsNil(err))
+			cfg := &Config{
+				FS:  fsys,
+				Dir: test.dir,
+			}
+			insts := Instances([]string{"."}, cfg)
+			qt.Assert(t, qt.HasLen(insts, 1))
+			qt.Assert(t, qt.IsNil(insts[0].Err))
+			qt.Assert(t, qt.Equals(insts[0].PkgName, "main"))
+		})
+	}
 }
 
 func writeFile(t *testing.T, fpath string, content string) {

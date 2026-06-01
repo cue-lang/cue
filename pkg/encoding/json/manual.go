@@ -149,10 +149,10 @@ func validate(c *adt.OpContext, b []byte, v pkg.Schema) (bool, error) {
 
 	vx := adt.Unify(c, value.Vertex(v2), value.Vertex(v))
 	v = value.Make(c, vx)
-	if err := v.Err(); err != nil {
-		return false, err
-	}
 
+	// Note that we do not return early on v.Err here: doing so would only
+	// report the single top-level error, whereas Validate descends into all
+	// arcs and reports every conflict.
 	if err := v.Validate(cue.Final()); err != nil {
 		return false, err
 	}

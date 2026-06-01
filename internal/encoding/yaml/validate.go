@@ -19,6 +19,7 @@ import (
 	"io"
 
 	"cuelang.org/go/cue"
+	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/value"
@@ -58,17 +59,24 @@ func Validate(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 		// }
 		vx := adt.Unify(c, value.Vertex(x), value.Vertex(v))
 		x = value.Make(c, vx)
-		if err := x.Err(); err != nil {
-			return false, err
-		}
 
+		// Note that we do not return early on x.Err here: doing so would only
+		// report the single top-level error, whereas Validate descends into all
+		// arcs and reports every conflict.
 		if err := x.Validate(cue.Concrete(true)); err != nil {
 			// Strip error codes: incomplete errors are terminal in this case.
-			var b pkg.Bottomer
-			if errors.As(err, &b) {
-				err = b.Bottom().Err
+			// Validate may report several conflicts as a list of errors, so
+			// strip each one individually rather than collapsing the whole list
+			// down to a single error.
+			var errs cueerrors.Error
+			for _, e := range cueerrors.Errors(err) {
+				var b pkg.Bottomer
+				if errors.As(e, &b) {
+					e = b.Bottom().Err
+				}
+				errs = cueerrors.Append(errs, e)
 			}
-			return false, err
+			return false, errs
 		}
 	}
 }
@@ -96,7 +104,11 @@ func ValidatePartial(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 
 		vx := adt.Unify(c, value.Vertex(x), value.Vertex(v))
 		x = value.Make(c, vx)
-		if err := x.Err(); err != nil {
+
+		// Use Validate rather than Err so that every conflict is reported, not
+		// just the single top-level error. No options are passed as partial
+		// validation must not require values to be concrete.
+		if err := x.Validate(); err != nil {
 			return false, err
 		}
 	}

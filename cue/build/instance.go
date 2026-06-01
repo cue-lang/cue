@@ -54,6 +54,14 @@ type Instance struct {
 	loadFunc LoadFunc
 	done     bool
 
+	// CanonicalImportPath, if non-nil, is called for each import path
+	// extracted from the instance's source files before it is resolved
+	// to determine its canonical form. This allows the caller to
+	// rewrite import paths to canonical forms — for example, adding a
+	// major version qualifier to an unversioned import based on the
+	// importing module's own defaults.
+	CanonicalImportPath func(importPath string) string
+
 	// PkgName is the name specified in the package clause.
 	PkgName string
 	hasName bool
@@ -219,13 +227,20 @@ func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {
 
 // LookupImport defines a mapping from an ImportSpec's ImportPath to Instance.
 func (inst *Instance) LookupImport(path string) *Instance {
-	path = inst.expandPath(path)
+	path = inst.canonicalImportPath(inst.expandPath(path))
 	for _, inst := range inst.Imports {
 		if inst.ImportPath == path {
 			return inst
 		}
 	}
 	return nil
+}
+
+func (inst *Instance) canonicalImportPath(path string) string {
+	if inst.CanonicalImportPath == nil {
+		return path
+	}
+	return inst.CanonicalImportPath(path)
 }
 
 func (inst *Instance) addImport(imp *Instance) {

@@ -1,0 +1,66 @@
+# Test that hidden fields are placed into the same namespace
+# regardless of how the same package is imported.
+
+# FAIL: the output should not look like this.
+# See https://github.com/cue-lang/cue/issues/4370
+exec cue export .
+cmp stdout want-eval.txt
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+
+deps: {
+	"example.com/mod@v0": {
+		default: true
+		v: "v0.1.0"
+	}
+}
+-- main.cue --
+package main
+
+import (
+	p1 "example.com/mod/subpkg"
+	p2 "example.com/mod/subpkg:subpkg"
+	p3 "example.com/mod:lib"
+)
+test1: (p1.#withx & {in: 1}).out & p1.#foo
+test2: (p1.#withx & {in: 2}).out & p2.#foo
+test3: (p1.#withx & {in: 3}).out & p3.#foo
+
+-- _registry/example.com_mod_v0.1.0/cue.mod/module.cue --
+module: "example.com/mod@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_mod_v0.1.0/lib.cue --
+package lib
+import "example.com/mod/subpkg@v0"
+
+#foo: subpkg.#foo
+
+value: "from mod module"
+-- _registry/example.com_mod_v0.1.0/subpkg/p.cue --
+package subpkg
+
+#foo: {
+	_x?: int
+	result: *(_x + 10) | -1
+}
+
+#withx: {
+	in!: int
+	out: {
+		_x: in
+	}
+}
+-- want-eval.txt --
+{
+    "test1": {
+        "result": 11
+    },
+    "test2": {
+        "result": -1
+    },
+    "test3": {
+        "result": -1
+    }
+}

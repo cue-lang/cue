@@ -1,6 +1,3 @@
-# FAIL: we should use the default major version in its own
-# module, not from the main module.
-# See cuelang.org/issue/4371
 exec cue export .
 cmp stdout want-eval.txt
 
@@ -66,5 +63,5 @@ value: mod.value
 -- want-eval.txt --
 {
     "mod": "v0",
-    "other": "v0"
+    "other": "v1"
 }

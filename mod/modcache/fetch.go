@@ -65,6 +65,18 @@ func (c *Cache) Requirements(ctx context.Context, mv module.Version) ([]module.V
 	return mf.DepVersions(), nil
 }
 
+func (c *Cache) DefaultMajorVersions(ctx context.Context, mv module.Version) (map[string]string, error) {
+	data, err := c.downloadModFile(ctx, mv)
+	if err != nil {
+		return nil, err
+	}
+	mf, err := modfile.Parse(data, mv.String())
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse module file from %v: %v", mv, err)
+	}
+	return mf.DefaultMajorVersions(), nil
+}
+
 // FetchFromCache implements [cuelang.org/go/mod/modconfig.CachedRegistry].
 func (c *Cache) FetchFromCache(mv module.Version) (module.SourceLoc, error) {
 	dir, err := c.downloadDir(mv)

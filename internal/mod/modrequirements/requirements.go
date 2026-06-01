@@ -45,6 +45,8 @@ type Requirements struct {
 
 	graphOnce sync.Once // guards writes to (but not reads from) graph
 	graph     atomic.Pointer[cachedGraph]
+
+	depReqsCache par.ErrCache[module.Version, *Requirements]
 }
 
 // Registry holds the contents of a registry. It's expected that this will
@@ -53,6 +55,11 @@ type Registry interface {
 	// Requirements returns a list of the modules required by the given module
 	// version.
 	Requirements(ctx context.Context, m module.Version) ([]module.Version, error)
+
+	// DefaultMajorVersions returns the explicit default major versions
+	// declared in the given module's module.cue file. The returned map
+	// is keyed by module base path (without major version).
+	DefaultMajorVersions(ctx context.Context, m module.Version) (map[string]string, error)
 }
 
 // A cachedGraph is a non-nil *ModuleGraph, together with any error discovered
@@ -275,6 +282,23 @@ func (rs *Requirements) cueModSummary(ctx context.Context, m module.Version) (*m
 type modFileSummary struct {
 	module  module.Version
 	require []module.Version
+}
+
+// DependencyRequirements returns a Requirements for the given dependency
+// module, including both its explicit and implicit default major versions.
+// Results are cached.
+func (rs *Requirements) DependencyRequirements(ctx context.Context, m module.Version) (*Requirements, error) {
+	return rs.depReqsCache.Do(m, func() (*Requirements, error) {
+		reqs, err := rs.registry.Requirements(ctx, m)
+		if err != nil {
+			return nil, err
+		}
+		defaults, err := rs.registry.DefaultMajorVersions(ctx, m)
+		if err != nil {
+			return nil, err
+		}
+		return NewRequirements(m.Path(), nil, reqs, defaults), nil
+	})
 }
 
 // readModGraph reads and returns the module dependency graph starting at the

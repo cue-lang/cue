@@ -34,6 +34,11 @@ type Registry interface {
 	// version.
 	Requirements(ctx context.Context, m module.Version) ([]module.Version, error)
 
+	// DefaultMajorVersions returns the explicit default major versions
+	// declared in the given module's module.cue file. The returned map
+	// is keyed by module base path (without major version).
+	DefaultMajorVersions(ctx context.Context, m module.Version) (map[string]string, error)
+
 	// Fetch returns the location of the contents for the given module
 	// version, downloading it if necessary.
 	Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error)

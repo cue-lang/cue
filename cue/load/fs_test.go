@@ -173,6 +173,46 @@ a: 1
 	qt.Assert(t, qt.Equals(insts[0].BuildFiles[0].FilenameLoc.String(), insts[0].BuildFiles[0].Filename))
 }
 
+func TestLoadFromFSWithDirectoryReplace(t *testing.T) {
+	mapFS := fstest.MapFS{
+		"cue.mod/module.cue": &fstest.MapFile{
+			Data: []byte(`module: "example.com/main@v0"
+language: version: "v0.9.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+	replace: "./local_dep"
+}
+`),
+		},
+		"main.cue": &fstest.MapFile{
+			Data: []byte(`package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+`),
+		},
+		"local_dep/cue.mod/module.cue": &fstest.MapFile{
+			Data: []byte(`module: "example.com/dep@v0"
+language: version: "v0.9.0"
+`),
+		},
+		"local_dep/lib.cue": &fstest.MapFile{
+			Data: []byte(`package lib
+
+value: "from local directory"
+`),
+		},
+	}
+	cfg := &Config{
+		FS: mapFS,
+	}
+	insts := Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.HasLen(insts, 1))
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+	qt.Assert(t, qt.Equals(insts[0].PkgName, "main"))
+}
+
 func writeFile(t *testing.T, fpath string, content string) {
 	err := os.MkdirAll(filepath.Dir(fpath), 0o777)
 	qt.Assert(t, qt.IsNil(err))

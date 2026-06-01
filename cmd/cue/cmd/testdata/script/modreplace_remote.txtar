@@ -1,0 +1,114 @@
+# Test remote module replace directives.
+# A module dependency can be replaced with a different module from the registry.
+#
+# This test verifies that:
+# 1. The replacement module's content is used instead of the original.
+# 2. Hidden fields unify correctly across the replacement boundary,
+#    even when the replacement module's own code imports its subpackage
+#    using the replacement module path rather than the original module path.
+# 3. Import rewriting works when the replacement module's code imports
+#    its own root package via the versioned path (e.g. example.com/replacement@v0:lib).
+
+exec cue export .
+cmp stdout want-export.txt
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+
+deps: {
+	"example.com/original@v0": {
+		v: "v0.1.0"
+		replace: "example.com/replacement@v0.1.0"
+	}
+}
+-- main.cue --
+package main
+
+import (
+	"example.com/original@v0:lib"
+	"example.com/original/subpkg@v0"
+	"example.com/original/other@v0"
+)
+
+// test1 exercises hidden field unification within a single import:
+// both #withx and #foo come from subpkg (via the original path),
+// so _x is in the same namespace.
+test1: (subpkg.#withx & {in: 1}).out & subpkg.#foo
+
+// test2 exercises hidden field unification across the replacement boundary:
+// #withx comes from subpkg (via the original path), and lib.#foo
+// comes from the replacement module's root package, which internally
+// imports subpkg via the replacement path (example.com/replacement/subpkg).
+// The replace import rewriting must ensure both resolve to the same
+// package identity so that _x unifies correctly.
+test2: (subpkg.#withx & {in: 2}).out & lib.#foo
+
+// test3 exercises import rewriting when the replacement module's code
+// imports the root package using a versioned path. The "other" subpackage
+// imports the root via "example.com/replacement@v0:lib" — the @v0 is on
+// the module path component, which requires version-aware prefix matching
+// in CanonicalImportPath.
+test3: (subpkg.#withx & {in: 3}).out & other.#foo
+
+output: [lib.value, subpkg.#id]
+-- _registry/example.com_original_v0.1.0/cue.mod/module.cue --
+module: "example.com/original@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_original_v0.1.0/lib.cue --
+package lib
+
+value: "from original (should not see this)"
+-- _registry/example.com_replacement_v0.1.0/cue.mod/module.cue --
+module: "example.com/replacement@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_replacement_v0.1.0/lib.cue --
+package lib
+
+import "example.com/replacement/subpkg@v0"
+
+#foo: subpkg.#foo
+
+value: "from replacement module"
+-- _registry/example.com_replacement_v0.1.0/subpkg/p.cue --
+package subpkg
+
+#id: "replacement-subpkg"
+
+#foo: {
+	_x?: int
+	result: *(_x + 10) | -1
+}
+
+#withx: {
+	in!: int
+	out: {
+		_x: in
+	}
+}
+-- _registry/example.com_replacement_v0.1.0/other/p.cue --
+package other
+
+// Import the root package via the versioned replacement path.
+// The @v0 is on the module path component ("replacement@v0"),
+// not a subpackage segment, which exercises version-aware
+// rewriting in CanonicalImportPath.
+import "example.com/replacement@v0:lib"
+
+#foo: lib.#foo
+-- want-export.txt --
+{
+    "test1": {
+        "result": 11
+    },
+    "test2": {
+        "result": 12
+    },
+    "test3": {
+        "result": 13
+    },
+    "output": [
+        "from replacement module",
+        "replacement-subpkg"
+    ]
+}

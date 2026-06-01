@@ -324,6 +324,7 @@ func loadPackages(
 		mainModLoc,
 		reqs,
 		cfg.Registry,
+		cfg.replacements,
 		pkgPaths,
 		func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
 			if !cfg.Tools && strings.HasSuffix(mf.FilePath, "_tool.cue") {

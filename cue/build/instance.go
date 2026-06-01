@@ -74,6 +74,12 @@ type Instance struct {
 	// Instances created with [Context.NewInstance] do not have an import path.
 	ImportPath string
 
+	// CanonicalID, if non-empty, holds the canonical identifier used for
+	// hidden-field namespaces. It normalizes version and qualifier differences
+	// so that the same package always gets the same hidden-field namespace
+	// regardless of how it was imported.
+	CanonicalID string
+
 	// Imports lists the instances of all direct imports of this instance.
 	Imports []*Instance
 
@@ -158,6 +164,9 @@ func (inst *Instance) RelPath(f *File) string {
 
 // ID returns the package ID unique for this module.
 func (inst *Instance) ID() string {
+	if s := inst.CanonicalID; s != "" {
+		return s
+	}
 	if s := inst.ImportPath; s != "" {
 		return s
 	}

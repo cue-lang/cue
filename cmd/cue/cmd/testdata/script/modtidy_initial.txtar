@@ -34,8 +34,7 @@ deps: {
 		v: "v0.0.1"
 	}
 	"foo.com/bar/hello@v0": {
-		v:       "v0.2.3"
-		default: true
+		v: "v0.2.3"
 	}
 }
 -- want-stdout --
@@ -55,7 +54,7 @@ deps: "unused.com@v0": v: "v0.2.4"
 
 -- main.cue --
 package main
-import "example.com@v0:main"
+import "example.com:main"
 
 main
 

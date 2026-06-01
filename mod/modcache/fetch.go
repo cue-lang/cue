@@ -50,19 +50,23 @@ type Cache struct {
 	dir              string // typically ${CUE_CACHE_DIR}/mod
 	reg              *modregistry.Client
 	downloadZipCache par.ErrCache[module.Version, string]
-	modFileCache     par.ErrCache[string, []byte]
+	modFileCache     par.ErrCache[module.Version, *modfile.File]
 }
 
-func (c *Cache) Requirements(ctx context.Context, mv module.Version) ([]module.Version, error) {
-	data, err := c.downloadModFile(ctx, mv)
-	if err != nil {
-		return nil, err
-	}
-	mf, err := modfile.Parse(data, mv.String())
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse module file from %v: %v", mv, err)
-	}
-	return mf.DepVersions(), nil
+// ModFile returns the parsed module file for the given module version,
+// downloading it if necessary. Results are cached.
+func (c *Cache) ModFile(ctx context.Context, mv module.Version) (*modfile.File, error) {
+	return c.modFileCache.Do(mv, func() (*modfile.File, error) {
+		data, err := c.fetchModFileData(ctx, mv)
+		if err != nil {
+			return nil, err
+		}
+		mf, err := modfile.Parse(data, mv.String())
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse module file from %v: %v", mv, err)
+		}
+		return mf, nil
+	})
 }
 
 // FetchFromCache implements [cuelang.org/go/mod/modconfig.CachedRegistry].
@@ -261,26 +265,24 @@ func (c *Cache) downloadZip1(ctx context.Context, mod module.Version, zipfile st
 	return nil
 }
 
-func (c *Cache) downloadModFile(ctx context.Context, mod module.Version) ([]byte, error) {
-	return c.modFileCache.Do(mod.String(), func() ([]byte, error) {
-		modfile, data, err := c.readDiskModFile(mod)
-		if err == nil {
-			return data, nil
-		}
-		logf("cue: downloading %s", mod)
-		unlock, err := c.lockVersion(mod)
-		if err != nil {
-			return nil, err
-		}
-		defer unlock()
-		// Double-check that the file hasn't been created while we were
-		// acquiring the lock.
-		_, data, err = c.readDiskModFile(mod)
-		if err == nil {
-			return data, nil
-		}
-		return c.downloadModFile1(ctx, mod, modfile)
-	})
+func (c *Cache) fetchModFileData(ctx context.Context, mod module.Version) ([]byte, error) {
+	modfile, data, err := c.readDiskModFile(mod)
+	if err == nil {
+		return data, nil
+	}
+	logf("cue: downloading %s", mod)
+	unlock, err := c.lockVersion(mod)
+	if err != nil {
+		return nil, err
+	}
+	defer unlock()
+	// Double-check that the file hasn't been created while we were
+	// acquiring the lock.
+	_, data, err = c.readDiskModFile(mod)
+	if err == nil {
+		return data, nil
+	}
+	return c.downloadModFile1(ctx, mod, modfile)
 }
 
 func (c *Cache) downloadModFile1(ctx context.Context, mod module.Version, modfile string) ([]byte, error) {

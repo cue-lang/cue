@@ -217,6 +217,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		}
 
 		l.addFiles(p)
+		l.setImportRewriter(p)
 		_ = p.Complete()
 	}
 	slices.SortFunc(all, func(a, b *build.Instance) int {
@@ -532,6 +533,23 @@ func (l *loader) absPathForSourceLoc(loc module.SourceLoc, os pkgpath.OS, fromMo
 		return "", fmt.Errorf("cannot get absolute path for FS of type %T", loc.FS)
 	}
 	return pkgpath.Join([]string{osPath, loc.Dir}, os), nil
+}
+
+// setImportRewriter sets a RewriteImport function on the build instance
+// if it's from an external module with resolved imports that differ
+// from the main module's defaults. This ensures the build system's
+// path-based deduplication does not incorrectly conflate different
+// major version resolutions.
+func (l *loader) setImportRewriter(p *build.Instance) {
+	if l.pkgs == nil {
+		return
+	}
+	parts := ast.ParseImportPath(p.ImportPath)
+	mpkg := l.pkgs.Pkg(parts.Canonical().String())
+	if mpkg == nil || !mpkg.FromExternalModule() {
+		return
+	}
+	p.RewriteImport = mpkg.ResolvedImport
 }
 
 // genPath returns the directory for generated files within a module root.

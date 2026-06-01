@@ -45,6 +45,8 @@ type Requirements struct {
 
 	graphOnce sync.Once // guards writes to (but not reads from) graph
 	graph     atomic.Pointer[cachedGraph]
+
+	modSummaryCache par.ErrCache[module.Version, *modFileSummary]
 }
 
 // Registry holds the contents of a registry. It's expected that this will
@@ -53,6 +55,11 @@ type Registry interface {
 	// Requirements returns a list of the modules required by the given module
 	// version.
 	Requirements(ctx context.Context, m module.Version) ([]module.Version, error)
+
+	// DefaultMajorVersions returns the explicit default major versions
+	// declared in the given module's module.cue file. The returned map
+	// is keyed by module base path (without major version).
+	DefaultMajorVersions(ctx context.Context, m module.Version) (map[string]string, error)
 }
 
 // A cachedGraph is a non-nil *ModuleGraph, together with any error discovered
@@ -261,20 +268,63 @@ type ModuleGraph struct {
 //
 // The caller must not modify the returned summary.
 func (rs *Requirements) cueModSummary(ctx context.Context, m module.Version) (*modFileSummary, error) {
-	require, err := rs.registry.Requirements(ctx, m)
-	if err != nil {
-		return nil, err
-	}
-	// TODO account for replacements, exclusions, etc.
-	return &modFileSummary{
-		module:  m,
-		require: require,
-	}, nil
+	return rs.modSummaryCache.Do(m, func() (*modFileSummary, error) {
+		require, err := rs.registry.Requirements(ctx, m)
+		if err != nil {
+			return nil, err
+		}
+		defaults, err := rs.registry.DefaultMajorVersions(ctx, m)
+		if err != nil {
+			return nil, err
+		}
+		// TODO account for replacements, exclusions, etc.
+		return &modFileSummary{
+			module:               m,
+			require:              require,
+			defaultMajorVersions: defaults,
+		}, nil
+	})
 }
 
 type modFileSummary struct {
-	module  module.Version
-	require []module.Version
+	module               module.Version
+	require              []module.Version
+	defaultMajorVersions map[string]string
+}
+
+// DependencyDefaultMajorVersion returns the effective default major version
+// for the given import prefix within the given dependency module m.
+// It considers both explicit defaults and implicit defaults (when a module
+// base path has only one major version in the dependency's requirements).
+func (rs *Requirements) DependencyDefaultMajorVersion(ctx context.Context, m module.Version, prefix string) (string, MajorVersionDefaultStatus, error) {
+	if m.IsLocal() {
+		return "", NoDefault, nil
+	}
+	summary, err := rs.cueModSummary(ctx, m)
+	if err != nil {
+		return "", NoDefault, err
+	}
+	if v, ok := summary.defaultMajorVersions[prefix]; ok {
+		return v, ExplicitDefault, nil
+	}
+	var found string
+	for _, req := range summary.require {
+		if req.IsLocal() {
+			continue
+		}
+		if req.BasePath() == prefix {
+			mv := semver.Major(req.Version())
+			if found == "" {
+				found = mv
+			} else if found != mv {
+				return "", AmbiguousDefault, nil
+			}
+		}
+	}
+	if found != "" {
+		return found, NonExplicitDefault, nil
+	}
+	return "", NoDefault, nil
 }
 
 // readModGraph reads and returns the module dependency graph starting at the
@@ -295,25 +345,22 @@ func (rs *Requirements) readModGraph(ctx context.Context) (*ModuleGraph, error) 
 	var (
 		loadQueue = par.NewQueue(runtime.GOMAXPROCS(0))
 		loading   sync.Map // module.Version → nil; the set of modules that have been or are being loaded
-		loadCache par.ErrCache[module.Version, *modFileSummary]
 	)
 
 	// loadOne synchronously loads the explicit requirements for module m.
 	// It does not load the transitive requirements of m.
 	loadOne := func(m module.Version) (*modFileSummary, error) {
-		return loadCache.Do(m, func() (*modFileSummary, error) {
-			summary, err := rs.cueModSummary(ctx, m)
+		summary, err := rs.cueModSummary(ctx, m)
 
-			mu.Lock()
-			if err == nil {
-				mg.g.Require(m, summary.require)
-			} else {
-				hasError = true
-			}
-			mu.Unlock()
+		mu.Lock()
+		if err == nil {
+			mg.g.Require(m, summary.require)
+		} else {
+			hasError = true
+		}
+		mu.Unlock()
 
-			return summary, err
-		})
+		return summary, err
 	}
 
 	for _, m := range rs.rootModules {
@@ -339,7 +386,7 @@ func (rs *Requirements) readModGraph(ctx context.Context) (*ModuleGraph, error) 
 	<-loadQueue.Idle()
 
 	if hasError {
-		return mg, mg.findError(&loadCache)
+		return mg, mg.findError(&rs.modSummaryCache)
 	}
 	return mg, nil
 }

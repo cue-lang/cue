@@ -325,11 +325,6 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			c := MakeConjunct(t.env, x, id)
 			n.insertArc(label, ArcMember, c, id, true)
 		}
-
-		if max := n.maxListLen; n.listIsClosed && int(index) > max {
-			n.invalidListLength(max, len(l.Elems), n.maxNode, l)
-			return
-		}
 	}
 
 	isClosed := ellipsis == nil
@@ -341,8 +336,20 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			return
 		}
 
-	case int(index) > max,
-		isClosed && !n.listIsClosed,
+	case int(index) > max:
+		// This list is longer than an earlier one. If that earlier list
+		// was closed, the lengths are incompatible. Note that index
+		// reflects the fully expanded length, including any comprehensions,
+		// so the reported lengths are accurate.
+		if n.listIsClosed {
+			n.invalidListLength(max, int(index), n.maxNode, l)
+			return
+		}
+		n.maxListLen = int(index)
+		n.maxNode = l
+		n.listIsClosed = isClosed
+
+	case isClosed && !n.listIsClosed,
 		(isClosed == n.listIsClosed) && !hasComprehension:
 		n.maxListLen = int(index)
 		n.maxNode = l

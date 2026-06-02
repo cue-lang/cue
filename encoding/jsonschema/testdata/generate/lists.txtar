@@ -107,9 +107,9 @@ badStringList.data.stringList.1: conflicting values 2 and string (mismatched typ
 badStringList.data.stringList.2: conflicting values 3 and string (mismatched types int and string):
     ./datatest/tests.cue:14:27
 -- out/generate-v3/badTupleLength --
-badTupleLength.data.tuple: incompatible list lengths (1 and 3):
+badTupleLength.data.tuple: incompatible list lengths (1 and 2):
     1:639
-badTupleLength.data.tuple: incompatible list lengths (1 and 3):
+badTupleLength.data.tuple: incompatible list lengths (1 and 2):
     1:705
 -- out/generate-v3/badTupleType --
 badTupleType.data.tuple.0: conflicting values 1 and string (mismatched types int and string):

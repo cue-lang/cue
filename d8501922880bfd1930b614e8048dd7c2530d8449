@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4b57fe5_0adff174",
+        "filename": "cue/load/config.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 607,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-02T15:40:02Z",
+      "side": 1,
+      "message": "OSRoot is inappropriate in openDirFunc: \"OSRoot\" is only supposed to work\nwhen there is an actual OS filesystem path under the hood.\nCurrently absPathForSourceLoc has a special case for files inside the module\nroot: I think this case needs expanding to cover files returned from the function\npassed to newReplacingRegistry, somehow.",
+      "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcb1ee40_71dddcd5",
+        "filename": "cue/load/replace.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-02T15:40:02Z",
+      "side": 1,
+      "message": "cue/load doesn\u0027t quite seem like the right place for replacingRegistry.\nI\u0027m not quite sure where it should live though. mod/modregistry seems a bit\ntoo low level: although it knows about module files, it doesn\u0027t seem like it\nshould be implementing the replacement strategy.\n\nIn general, calling this thing a \"registry\" doesn\u0027t seem right, as a registry implies a straightforward\nvalue store without associated logic.\n\nMaybe the right abstraction is something like a MainModule which is instantiated\nwith an underlying registry and a module file, and can be used to resolve import\npaths and load modules.\n\nNot entirely sure yet of the best place for it to live though.",
+      "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0caac0d9_383d35c9",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-02T15:40:02Z",
+      "side": 1,
+      "message": "What about when there\u0027s a directory replace and the replacement module\nin that directory has a different module path? Do we allow that?\nIf not, do we check that the replacement does in fact have the same path?\n\nThis needs a decent test case before fixing.",
+      "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bc8ead6_e7f2995c",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-02T15:40:02Z",
+      "side": 1,
+      "message": "It seems to me that this isn\u0027t catering for the fact that import paths can have major version suffixes: it\u0027s just checking the prefix but the major version is important too.\n\nThis needs a decent test case before fixing.",
+      "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

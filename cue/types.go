@@ -1929,6 +1929,12 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 // is not a reference.
 func (v Value) ReferencePath() (root Value, p Path) {
 	// TODO: don't include references to hidden fields.
+	if v.v == nil || v.v.IsData() {
+		// A value in data mode, such as the result of [Value.Eval], has had
+		// its references resolved, so it is no longer a reference to another
+		// value regardless of whether structure sharing is enabled.
+		return Value{}, Path{}
+	}
 	c, count := v.v.SingleConjunct()
 	if count != 1 {
 		return Value{}, Path{}

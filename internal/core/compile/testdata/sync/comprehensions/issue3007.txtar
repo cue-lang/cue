@@ -1,0 +1,53 @@
+# Tests that a list-length mismatch involving comprehensions reports the
+# true expanded element count, not the number of syntactic list elements.
+# https://cuelang.org/issue/3007
+-- in.cue --
+// A comprehension yields more values than the closed list allows.
+x: [int]
+x: [for v in [1, 2, 3] {v}]
+
+// Multiple comprehensions are tallied together.
+a: [0, 1, 2]
+b: [3, 4, 5]
+c: [int, int, int, int]
+c: [for e in a {e}, for e in b {e}]
+-- out/compile --
+--- in.cue
+{
+  x: [
+    int,
+  ]
+  x: [
+    for _, v in [
+      1,
+      2,
+      3,
+    ] {
+      〈1;v〉
+    },
+  ]
+  a: [
+    0,
+    1,
+    2,
+  ]
+  b: [
+    3,
+    4,
+    5,
+  ]
+  c: [
+    int,
+    int,
+    int,
+    int,
+  ]
+  c: [
+    for _, e in 〈1;a〉 {
+      〈1;e〉
+    },
+    for _, e in 〈1;b〉 {
+      〈1;e〉
+    },
+  ]
+}

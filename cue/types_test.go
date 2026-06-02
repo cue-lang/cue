@@ -3602,6 +3602,13 @@ func TestReferencePath(t *testing.T) {
 					t.Errorf("path resolved to %s; want %s", v, want)
 				}
 			}
+
+			// Eval resolves references, so the result is no longer one.
+			ev := v.Eval()
+			if root, path := ev.ReferencePath(); root.Exists() || path.String() != "" {
+				t.Errorf("after eval: got reference root exists=%v, path %q; want none",
+					root.Exists(), path)
+			}
 		})
 	}
 }

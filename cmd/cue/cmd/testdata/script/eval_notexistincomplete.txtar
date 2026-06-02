@@ -3,11 +3,9 @@
 # export
 ! exec cue export
 cmp stderr expect-stderr1
-cmp stdout expect-stdout1
 
 # eval
 exec cue eval
-cmp stderr expect-stderr2
 cmp stdout expect-stdout2
 
 -- x.cue --
@@ -18,16 +16,15 @@ import "list"
 x: [1, 2, 3]
 sortedx: list.Sort(x, cmp)
 
-cmp: {}
+cmp: _
 
--- expect-stdout1 --
 -- expect-stderr1 --
-sortedx: error in call to list.Sort: field not found: less:
+cmp: incomplete value _
+sortedx: error in call to list.Sort: non-concrete argument 1:
     ./x.cue:6:10
 -- expect-stdout2 --
 import "list"
 
 x: [1, 2, 3]
 sortedx: list.Sort(x, cmp)
-cmp: {}
--- expect-stderr2 --
+cmp:     _

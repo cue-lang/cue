@@ -23,6 +23,8 @@ import (
 	"sort"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
 )
@@ -104,7 +106,9 @@ var less = cue.ParsePath("less")
 
 func makeValueSorter(list []cue.Value, cmp cue.Value) (s valueSorter) {
 	if v := cmp.LookupPath(less); !v.Exists() {
-		return valueSorter{err: v.Err()}
+		// The comparator is already concrete here, so a missing "less" field is
+		// fatal rather than incomplete.
+		return valueSorter{err: errors.Newf(token.NoPos, "field not found: less")}
 	}
 
 	v := cmp.Core()

@@ -4,15 +4,15 @@
 -- in.cue --
 // A comprehension yields more values than the closed list allows.
 x: [int]
-x: [for v in [1, 2, 3] {v}] @test(err, code=eval, contains="incompatible list lengths (1 and 1)", pos=[0:4])
+x: [for v in [1, 2, 3] {v}] @test(err, code=eval, contains="incompatible list lengths (1 and 3)", pos=[0:4])
 
 // Multiple comprehensions are tallied together.
 a: [0, 1, 2]
 b: [3, 4, 5]
 c: [int, int, int, int]
-c: [for e in a {e}, for e in b {e}] @test(err, code=eval, contains="incompatible list lengths (4 and 2)", pos=[0:4])
+c: [for e in a {e}, for e in b {e}] @test(err, code=eval, contains="incompatible list lengths (4 and 6)", pos=[0:4])
 -- out/errors.txt --
-[eval] x: incompatible list lengths (1 and 1):
+[eval] x: incompatible list lengths (1 and 3):
     ./in.cue:3:4
-[eval] c: incompatible list lengths (4 and 2):
+[eval] c: incompatible list lengths (4 and 6):
     ./in.cue:9:4

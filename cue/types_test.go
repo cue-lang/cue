@@ -4224,6 +4224,32 @@ func TestExpr(t *testing.T) {
 	}
 }
 
+// TestExprCallFuncFormat checks the formatting of the function operand of a
+// builtin call returned by Value.Expr, across builtins with different result
+// kinds. The bottom-result error builtin once formatted as "error()" while
+// len, close, and div formatted as bare references. Issue #4133.
+func TestExprCallFuncFormat(t *testing.T) {
+	testCases := []struct {
+		input string
+		want  string
+	}{
+		{input: `len([1, 2])`, want: "len"},
+		{input: `error("x")`, want: "error()"},
+		{input: `close({})`, want: "close"},
+		{input: `div(2, 1)`, want: "div"},
+	}
+	for _, tc := range testCases {
+		cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, tc.input)
+			_, args := v.Expr()
+			got := fmt.Sprintf("%v", args[0])
+			if got != tc.want {
+				t.Errorf("Expr() func operand for %q:\n got %q;\nwant %q", tc.input, got, tc.want)
+			}
+		})
+	}
+}
+
 func exprStr(v cue.Value) string {
 	op, operands := v.Expr()
 	if op == cue.NoOp {

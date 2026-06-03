@@ -84,6 +84,10 @@ selfRefConcrete: {
 	// than causing the evaluator to loop forever.
 	_x1: matchN(2, [_x1, _x1])
 	x: 3 & _x1
+
+	// matchIf is subject to the same kind of self-referential cycle.
+	_y1: matchIf(_y1, _y1, _y1)
+	y:   3 & _y1
 }
 issue3633: final: {
 	// With nested matchNs as below, the schema will become an incomplete error
@@ -545,6 +549,8 @@ issue3743: {
       〈1;_x1〉,
     ])
     x: (3 & 〈0;_x1〉)
+    _y1: matchIf(〈0;_y1〉, 〈0;_y1〉, 〈0;_y1〉)
+    y: (3 & 〈0;_y1〉)
   }
   issue3633: {
     final: {

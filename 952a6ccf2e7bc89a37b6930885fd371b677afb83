@@ -16,6 +16,24 @@
       "message": "It is a bit concerning that the machinery doesn\u0027t catch this without this intervention, but these builtins are quite special, so not the worst. Fix seems good.",
       "revId": "952a6ccf2e7bc89a37b6930885fd371b677afb83",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d74140c5_8b3d9a69",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-03T13:47:30Z",
+      "side": 1,
+      "message": "agreed. there\u0027s probably some cleanup or deduplication to be done here in the future, but I think having the regression tests and fixing the hang is a good step regardless.",
+      "parentUuid": "912182ac_1952df41",
+      "revId": "952a6ccf2e7bc89a37b6930885fd371b677afb83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

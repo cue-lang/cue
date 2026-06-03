@@ -4253,7 +4253,7 @@ func TestExprCallFuncFormat(t *testing.T) {
 		want  string
 	}{
 		{input: `len([1, 2])`, want: "len"},
-		{input: `error("x")`, want: "error()"},
+		{input: `error("x")`, want: "error"},
 		{input: `close({})`, want: "close"},
 		{input: `div(2, 1)`, want: "div"},
 	}

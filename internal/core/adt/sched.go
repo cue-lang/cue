@@ -806,10 +806,11 @@ func runTask(t *task, mode runMode) {
 	// Skip tasks whose evaluation must not cross an ancestor-cycle
 	// reference on this arc (see [nodeContext.hasAncestorCycle]):
 	//
-	//   - Comprehensions: a comprehension inherited onto a cycle arc
-	//     would re-enter the ancestor via the cyclic reference (its
-	//     for/if clauses look up children that themselves cycle back),
-	//     recursing without bound.
+	//   - Comprehensions: a comprehension inherited onto a cycle arc may
+	//     re-enter the ancestor via the cyclic reference (its for/if
+	//     clauses look up children that themselves cycle back), recursing
+	//     without bound. This only applies when the node has no non-cyclic
+	//     conjuncts of its own (see below).
 	//   - Disjunctions: evaluating a disjunction here would resolve the
 	//     disjunct through the cyclic reference back into the same
 	//     disjunction's evaluation — the cross-disjunct cycle err1/err2
@@ -823,7 +824,17 @@ func runTask(t *task, mode runMode) {
 	// is still reported through [nodeContext.detectCycle].
 	if t.node.hasAncestorCycle {
 		switch t.run {
-		case handleComprehension, handleDisjunctions:
+		case handleComprehension:
+			// Only skip if the node is a pure back-reference to its
+			// ancestor. If it has independent non-cyclic conjuncts (e.g. a
+			// `let X = self` whose conjuncts were copied into this vertex),
+			// the comprehension must still fire to materialize its fields
+			// here.
+			if t.node.hasOnlyCyclicConjuncts() {
+				t.state = taskSUCCESS
+				return
+			}
+		case handleDisjunctions:
 			t.state = taskSUCCESS
 			return
 		}

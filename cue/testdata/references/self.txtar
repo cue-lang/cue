@@ -91,7 +91,7 @@ withLetComprehension: {
 	seeIf:     X.viaIf
 	seeFor:    X.viaFor
 	seeTry:    X.viaTry
-} @test(eq:todo, {
+} @test(eq, {
 	direct:    "a"
 	viaIf:     "b"
 	viaFor:    "c"
@@ -287,9 +287,3 @@ a: {
     ./validator.cue:19:12
     ./validator.cue:18:12
     ./validator.cue:19:19
-[incomplete] withLetComprehension.seeIf: undefined field: viaIf:
-    ./withlet.cue:28:15
-[incomplete] withLetComprehension.seeFor: undefined field: viaFor:
-    ./withlet.cue:29:15
-[incomplete] withLetComprehension.seeTry: undefined field: viaTry:
-    ./withlet.cue:30:15

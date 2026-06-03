@@ -89,27 +89,25 @@ func TestPaths(t *testing.T) {
 		str:  `b[2]`,
 		out:  "6",
 	}, {
-		// Issue 3467: ParsePath does not accept an index as the first
-		// element of a path, so the output of Path.String does not
-		// round-trip through ParsePath. The expectations below capture
-		// the current (incorrect) behavior; the following commit fixes
-		// ParsePath and updates them to the resolved values.
+		// Issue 3467: ParsePath must accept an index as the first element
+		// of a path, so that the output of Path.String round-trips through
+		// ParsePath.
 		in:   `[4, 5, 6]`,
 		path: cue.ParsePath(`[2]`),
-		err:  true,
-		out:  `_|_ // invalid label [2] `,
+		str:  `[2]`,
+		out:  "6",
 	}, {
 		// Issue 3467: a leading index followed by a field selector.
 		in:   `[{foo: 7}]`,
 		path: cue.ParsePath(`[0].foo`),
-		err:  true,
-		out:  `_|_ // invalid label [0] `,
+		str:  `[0].foo`,
+		out:  "7",
 	}, {
 		// Issue 3467: consecutive leading indices.
 		in:   `[["a"], [10, 11]]`,
 		path: cue.ParsePath(`[1][0]`),
-		err:  true,
-		out:  `_|_ // invalid label [1] `,
+		str:  `[1][0]`,
+		out:  "10",
 	}, {
 		in:   `c: "#Foo": 7`,
 		path: cue.ParsePath(`c."#Foo"`),

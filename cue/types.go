@@ -2466,7 +2466,14 @@ process:
 			}
 			break
 		}
-		a = append(a, remakeValue(v, env, x.Fun))
+		if fn, ok := x.Fun.(*adt.Builtin); ok {
+			// Keep the builtin as a bare reference; remakeValue would
+			// re-finalize a bool- or bottom-result builtin (such as error)
+			// into a validator, rendering as "error()" rather than "error".
+			a = append(a, remakeFinal(v, fn))
+		} else {
+			a = append(a, remakeValue(v, env, x.Fun))
+		}
 		for _, arg := range x.Args {
 			a = append(a, remakeValue(v, env, arg))
 		}

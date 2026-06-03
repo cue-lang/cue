@@ -50,7 +50,7 @@ listCheck: ok1: [1, "foo", 2, "bar"]
 listCheck: err: #IntStrings
 listCheck: err: [1, "foo", "bar", 2]
 -- withlet.cue --
-@experiment(aliasv2)
+@experiment(try,aliasv2)
 
 withLet: {
 	let X = self
@@ -59,6 +59,27 @@ withLet: {
 	bar: {
 		baz: X.foo
 	}
+}
+
+// A let bound to self must capture fields produced by if/for/try
+// comprehensions, not only statically declared ones.
+// See https://cuelang.org/issue/4376.
+withLetComprehension: {
+	let X = self
+	direct: "a"
+	if true {
+		viaIf: "b"
+	}
+	for k, v in {viaFor: "c"} {
+		(k): v
+	}
+	try {
+		viaTry: "d"
+	}
+	seeDirect: X.direct
+	seeIf:     X.viaIf
+	seeFor:    X.viaFor
+	seeTry:    X.viaTry
 }
 -- validator.cue --
 @experiment(structcmp)
@@ -183,5 +204,24 @@ a: {
     bar: {
       baz: 〈1;let X#1〉.foo
     }
+  }
+  withLetComprehension: {
+    let X#2 = 〈1〉
+    direct: "a"
+    if true {
+      viaIf: "b"
+    }
+    for k, v in {
+      viaFor: "c"
+    } {
+      〈1;k〉: 〈1;v〉
+    }
+    try {
+      viaTry: "d"
+    }
+    seeDirect: 〈0;let X#2〉.direct
+    seeIf: 〈0;let X#2〉.viaIf
+    seeFor: 〈0;let X#2〉.viaFor
+    seeTry: 〈0;let X#2〉.viaTry
   }
 }

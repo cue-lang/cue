@@ -98,6 +98,9 @@ issue3416: sumSecond: {
 		list.Sum([for _, v in _c {v}])
 	}
 }
+
+// The default "yes" is selected, so the list contains "yes": expect true.
+issue3950: list.Contains(["no", "no"|*"yes"], "yes")
 -- out/list-v3 --
 Errors:
 issue3541: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (type int and struct):
@@ -168,6 +171,9 @@ issue3416: {
 		}
 	}
 }
+
+// The default "yes" is selected, so the list contains "yes": expect true.
+issue3950: true
 -- diff/-out/list-v3<==>+out/list --
 diff old new
 --- old
@@ -198,7 +204,7 @@ diff old new
  issue2594: {
  	sumFirst: {
  		#Def: {
-@@ -47,13 +45,18 @@
+@@ -47,20 +45,28 @@
  			0
  			#In: [...number]
  		}
@@ -213,12 +219,32 @@ diff old new
  	sumFirst: {
  		a: {
 -			b: _|_ // issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle (and 1 more errors)
+-		}
+-	}
+-	sumSecond: {
+-		a: {
+-			b: {
+-				111
+-			}
+-		}
+-	}
+-}
 +			b: {
 +				111
 +			}
- 		}
- 	}
- 	sumSecond: {
++		}
++	}
++	sumSecond: {
++		a: {
++			b: {
++				111
++			}
++		}
++	}
++}
++
++// The default "yes" is selected, so the list contains "yes": expect true.
++issue3950: true
 -- diff/explanation --
 issue3541: evalv3 correctly spots an invalid operand error which evalv2 drops on the floor.
 issue2594: evalv3 fixes an ordering issue present in evalv2.

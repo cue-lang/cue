@@ -431,11 +431,20 @@ func toSelectors(expr ast.Expr) []Selector {
 		a := toSelectors(x.X)
 		return appendSelector(a, Label(x.Sel))
 
-	default:
-		return []Selector{{pathError{
-			errors.Newf(token.NoPos, "invalid label %s ", astinternal.DebugStr(x)),
-		}}}
+	case *ast.ListLit:
+		// A list literal can only appear as the first element of a path,
+		// where it represents an index, e.g. "[2]" or "[2].foo". This is
+		// the inverse of how Path.String formats a leading index selector.
+		if len(x.Elts) == 1 {
+			if b, ok := x.Elts[0].(*ast.BasicLit); ok {
+				return []Selector{basicLitSelector(b)}
+			}
+		}
 	}
+
+	return []Selector{{pathError{
+		errors.Newf(token.NoPos, "invalid label %s ", astinternal.DebugStr(expr)),
+	}}}
 }
 
 // appendSelector is like append(a, sel), except that it collects errors

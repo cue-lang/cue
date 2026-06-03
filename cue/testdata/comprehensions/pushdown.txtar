@@ -747,6 +747,17 @@ structShare: err1: {
 	@test(err, code=eval, at=x.d.e, contains="field not allowed", pos=[4:9])
 }
 
+// An optional field referencing a value only a pushed-down comprehension
+// materializes must stay optional, not be upgraded to a regular member.
+optionalRefStaysOptional: s={
+	optionalRef?: string
+	optionalRef?: s.field
+	if true {
+		field: "value"
+	}
+	@test(eq, {optionalRef?: "value", field: "value"})
+}
+
 -- issue2208.cue --
 // Regression where definitions that compiled correctly with 0.4.3 failed to
 // compile with 0.5.0-beta.2 due to incorrect handling of void errors.

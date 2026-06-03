@@ -167,7 +167,10 @@ func (r reclaimer) reclaim(v *Vertex) bool {
 				goto skipRoot
 			}
 		}
-		if n.node != nil && n.ctx == r.ctx {
+		// Never free a nodeContext that is still actively being processed,
+		// even when forced. The processListLit closure (and others) capture
+		// the nodeContext via Go closure and would crash on a nil n.node.
+		if n.node != nil && n.ctx == r.ctx && n.refCount == 0 {
 			// TODO(mem): it should be fine to just release the nodeContext into
 			// c unconditionally. But the result is that it can result in
 			// negative values for 'Leaks'. This is because loading imports

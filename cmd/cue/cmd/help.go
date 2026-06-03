@@ -627,6 +627,9 @@ The --out flag specifies the output type using a qualifier
 (without the ':'). The -o flag specifies an output file
 possibly prefixed with a qualifier.
 
+Note that jsonschema is currently experimental as an output type: the
+form of generated schemas may change from release to release.
+
 Examples:
 
 # Interpret bar.cue and foo.yaml as OpenAPI data.

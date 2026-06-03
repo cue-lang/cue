@@ -90,7 +90,7 @@ func (p *protoConverter) mapBuiltinPackage(file string) (found bool) {
 		return true
 	case "google/protobuf/struct.proto":
 		p.setBuiltin("google.protobuf.Struct", func() ast.Expr {
-			return ast.NewStruct()
+			return ast.NewStruct(&ast.Ellipsis{})
 		}, nil)
 
 		p.setBuiltin("google.protobuf.Value", func() ast.Expr {

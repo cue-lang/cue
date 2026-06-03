@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11780a8f_5aa002ed",
+        "filename": "cue/testdata/comprehensions/try.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-03T14:06:47Z",
+      "side": 1,
+      "message": "Done. The known-wrong nested-try cases now carry an eq:todo annotation recording the value they should evaluate to once fixed: emptyInnerInBody (eq:todo {}), emptyInnerWithElse (eq:todo {fallback: -1}), and the new optionalInner* variants (see the reply on expr.go). The fix commit then promotes the two emptyInner cases from err + eq:todo to plain eq.",
+      "parentUuid": "a8df3297_3dd5f821",
+      "revId": "121d39e0e83ff5ab2bbad32737f25a13bdc27f6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

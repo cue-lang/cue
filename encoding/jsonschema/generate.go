@@ -89,6 +89,10 @@ func (m closedMode) descend() closedMode {
 //
 // The result is typically encoded as JSON, for example by obtaining a value via
 // [cue.Context.BuildExpr] and then encoding it via [encoding/json.Marshal].
+//
+// Note: this functionality is currently experimental. The form
+// of the generated schema may, and probably will, change
+// from release to release.
 func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if err := v.Validate(); err != nil {
 		return nil, err

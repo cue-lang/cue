@@ -96,6 +96,14 @@ issue3443: {
 	}
 	@test(err, pos=[2:7])
 }
+selfRefConcrete: {
+	// A matchN whose schema list refers back to the hidden field being
+	// validated makes no progress when that field is also unified with a
+	// concrete value. This must be reported as a structural cycle rather
+	// than causing the evaluator to loop forever.
+	_x1: matchN(2, [_x1, _x1])
+	x:   3 & _x1 @test(err, pos=[-1:7, -1:14, 0:7])
+}
 issue3633: final: {
 	// With nested matchNs as below, the schema will become an incomplete error
 	// as a value of the root vertex. Make sure this edge case is properly
@@ -406,13 +414,11 @@ issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, ex
     ./matchn.cue:44:14
     ./matchn.cue:56:7
     ./matchn.cue:57:7
-issue3443.cycle1.cycle.s.n: invalid value {n:_} (does not satisfy matchN): 0 matched, expected 1:
+issue3443.cycle1.cycle.s.n: invalid value {n:_} (does not satisfy matchN): structural cycle:
     ./matchn.cue:44:7
     ./matchn.cue:44:14
     ./matchn.cue:44:22
     ./matchn.cue:57:10
-issue3443.cycle1.cycle.s.n.n: structural cycle:
-    ./matchn.cue:44:7
 [eval] issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
     ./matchn.cue:64:13
     ./matchn.cue:64:20
@@ -421,25 +427,33 @@ issue3443.cycle2.fail.#S.n: invalid value {n:{n:{n:_}}} (does not satisfy matchN
     ./matchn.cue:64:20
     ./matchn.cue:64:28
     ./matchn.cue:64:40
-issue3443.cycle2.fail.#S.n.n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
+issue3443.cycle2.fail.#S.n.n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): structural cycle:
     ./matchn.cue:64:13
     ./matchn.cue:64:20
     ./matchn.cue:64:28
     ./matchn.cue:64:40
     ./matchn.cue:64:43
-issue3443.cycle2.fail.#S.n.n.n: structural cycle:
-    ./matchn.cue:64:13
+[eval] selfRefConcrete.x: invalid value 3 (does not satisfy matchN): 0 matched, expected 2:
+    ./matchn.cue:73:7
+    ./matchn.cue:73:14
+    ./matchn.cue:74:7
+selfRefConcrete.x: invalid value 3 (does not satisfy matchN): structural cycle:
+    ./matchn.cue:73:7
+    ./matchn.cue:73:14
+    ./matchn.cue:73:18
+    ./matchn.cue:73:23
+    ./matchn.cue:74:7
 [incomplete] issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:73:6
-    ./matchn.cue:72:8
-    ./matchn.cue:73:13
+    ./matchn.cue:81:6
+    ./matchn.cue:80:8
+    ./matchn.cue:81:13
 issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./matchn.cue:73:17
-    ./matchn.cue:72:8
-    ./matchn.cue:73:24
+    ./matchn.cue:81:17
+    ./matchn.cue:80:8
+    ./matchn.cue:81:24
 issue3633.final.data.a: field is required but not present:
-    ./matchn.cue:73:17
-    ./matchn.cue:73:29
+    ./matchn.cue:81:17
+    ./matchn.cue:81:29
 [eval] selfCycle.t1.c: invalid value {d:{}} (does not satisfy matchN): 0 matched, expected 1:
     ./yamlcycle.cue:24:5
     ./yamlcycle.cue:24:12
@@ -449,13 +463,11 @@ selfCycle.t1.c.d: invalid value {d:{}} (does not satisfy matchN): 0 matched, exp
     ./yamlcycle.cue:24:12
     ./yamlcycle.cue:24:20
     ./yamlcycle.cue:25:8
-selfCycle.t1.c.d.d: invalid value {d:{}} (does not satisfy matchN): 0 matched, expected 1:
+selfCycle.t1.c.d.d: invalid value {d:{}} (does not satisfy matchN): structural cycle:
     ./yamlcycle.cue:24:5
     ./yamlcycle.cue:24:12
     ./yamlcycle.cue:24:20
     ./yamlcycle.cue:25:8
-selfCycle.t1.c.d.d.d: structural cycle:
-    ./yamlcycle.cue:24:5
 [eval] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
     ./yamlcycle.cue:36:8
     ./yamlcycle.cue:37:8

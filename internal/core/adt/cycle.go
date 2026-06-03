@@ -589,6 +589,15 @@ func (n *nodeContext) markCyclicPath(arc *Vertex, env *Environment, x Resolver, 
 	return ci, false
 }
 
+// InStructuralCycle reports whether the cycle detection algorithm has marked
+// the current evaluation context as part of a structural cycle. Recursive
+// validators like matchN consult this to terminate a self-reference (e.g.
+// _x: matchN(2, [_x, _x])) that the usual checks miss because the concrete
+// value being validated always contributes a non-cyclic conjunct.
+func (c *OpContext) InStructuralCycle() bool {
+	return c.ci.CycleInfo.IsCyclic()
+}
+
 // combineCycleInfo merges the cycle information collected in the context into
 // the given CloseInfo. Note that it only merges the cycle information in its
 // entirety, if present, to avoid getting unrelated data.

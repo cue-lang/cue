@@ -41,6 +41,15 @@ var matchNBuiltin = &adt.Builtin{
 			return adt.StaticBoolFalse
 		}
 
+		// A self-referential matchN, e.g. _x: matchN(2, [_x, _x]), would loop
+		// forever; the cycle detector flags the re-entry, so report it.
+		if c.InStructuralCycle() {
+			return &adt.Bottom{
+				Code: adt.StructuralCycleError,
+				Err:  c.NewPosf(call.Pos(), "structural cycle"),
+			}
+		}
+
 		var errs []*adt.Bottom
 		var count, possibleCount int64
 		for check := range c.Elems(call.Value(2)) {

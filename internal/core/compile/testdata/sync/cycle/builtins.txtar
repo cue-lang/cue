@@ -77,6 +77,14 @@ issue3443: {
 		fail: #S: matchN(1, [{n: #S}]) & {n: n: n: _}
 	}
 }
+selfRefConcrete: {
+	// A matchN whose schema list refers back to the hidden field being
+	// validated makes no progress when that field is also unified with a
+	// concrete value. This must be reported as a structural cycle rather
+	// than causing the evaluator to loop forever.
+	_x1: matchN(2, [_x1, _x1])
+	x: 3 & _x1
+}
 issue3633: final: {
 	// With nested matchNs as below, the schema will become an incomplete error
 	// as a value of the root vertex. Make sure this edge case is properly
@@ -530,6 +538,13 @@ issue3743: {
         })
       }
     }
+  }
+  selfRefConcrete: {
+    _x1: matchN(2, [
+      〈1;_x1〉,
+      〈1;_x1〉,
+    ])
+    x: (3 & 〈0;_x1〉)
   }
   issue3633: {
     final: {

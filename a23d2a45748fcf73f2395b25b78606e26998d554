@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36d1bbd1_64c92e0c",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 2301,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-03T14:11:47Z",
+      "side": 1,
+      "message": "Good point — investigating it showed the original approach was incomplete, so I reworked the fix. Added three variants in the first commit (nestedTry.optionalInnerDefined, optionalInnerDefinedWithElse, optionalInnerUndefined) where the inner try body itself contains a ?-marked reference. These confirmed the concern: the ?-free gating did not help them, because such a body still saved/reset/restored the shared c.skipTry flag and so still erased the outer foo? signal.\n\nRather than extend the gating, this patch removes the shared flag entirely. OpContext now keeps a stack of the try bodies being finalized, and a failed ?-reference is attributed to the nearest enclosing body by walking up the parent chain from c.vertex (which the scheduler tracks correctly even when finalizations interleave). Attribution by structural ancestry rather than stack order handles nesting and interleaving uniformly, so all of these cases — including the new optional-in-inner-body variants — now evaluate correctly. The compile-time optionalRefs/BodyHasOptional tracking is no longer needed and has been reverted.",
+      "parentUuid": "0dfd654d_217cc0cd",
+      "revId": "a23d2a45748fcf73f2395b25b78606e26998d554",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

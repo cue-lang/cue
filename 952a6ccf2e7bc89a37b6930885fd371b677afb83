@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "912182ac_1952df41",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-03T13:44:51Z",
+      "side": 1,
+      "message": "It is a bit concerning that the machinery doesn\u0027t catch this without this intervention, but these builtins are quite special, so not the worst. Fix seems good.",
+      "revId": "952a6ccf2e7bc89a37b6930885fd371b677afb83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

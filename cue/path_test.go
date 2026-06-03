@@ -26,58 +26,70 @@ import (
 
 func TestPaths(t *testing.T) {
 	type testCase struct {
+		in   string
 		path cue.Path
 		out  string
 		str  string
 		err  bool
 	}
 	testCases := []testCase{{
+		in:   `list: [...int]`,
 		path: cue.MakePath(cue.Str("list"), cue.AnyIndex),
 		out:  "int",
 		str:  "list.[_]",
 	}, {
-
+		in:   `#Foo: a: b: 1`,
 		path: cue.MakePath(cue.Def("#Foo"), cue.Str("a"), cue.Str("b")),
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
+		in:   `#Foo: a: b: 1`,
 		path: cue.ParsePath(`#Foo.a.b`),
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
+		in:   `"#Foo": c: d: 2`,
 		path: cue.ParsePath(`"#Foo".c.d`),
 		out:  "2",
 		str:  `"#Foo".c.d`,
 	}, {
 		// fallback Def(Foo) -> Def(#Foo)
+		in:   `#Foo: a: b: 1`,
 		path: cue.MakePath(cue.Def("Foo"), cue.Str("a"), cue.Str("b")),
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
+		in:   `b: [4, 5, 6]`,
 		path: cue.MakePath(cue.Str("b"), cue.Index(2)),
 		out:  "6",
 		str:  "b[2]", // #Foo.b.2
 	}, {
+		in:   `c: "#Foo": 7`,
 		path: cue.MakePath(cue.Str("c"), cue.Str("#Foo")),
 		out:  "7",
 		str:  `c."#Foo"`,
 	}, {
+		in:   `_foo: b: 5`,
 		path: cue.MakePath(cue.Hid("_foo", "_"), cue.Str("b")),
 		out:  "5",
 		str:  `_foo.b`,
 	}, {
+		in:   `#Foo: a: b: 1`,
 		path: cue.ParsePath("#Foo.a.b"),
 		str:  "#Foo.a.b",
 		out:  "1",
 	}, {
+		in:   `#Foo: a: b: 1`,
 		path: cue.ParsePath("#Foo.a.c"),
 		str:  "#Foo.a.c",
 		out:  `_|_ // field not found: c`,
 	}, {
+		in:   `b: [4, 5, 6]`,
 		path: cue.ParsePath(`b[2]`),
 		str:  `b[2]`,
 		out:  "6",
 	}, {
+		in:   `c: "#Foo": 7`,
 		path: cue.ParsePath(`c."#Foo"`),
 		str:  `c."#Foo"`,
 		out:  "7",
@@ -112,28 +124,49 @@ func TestPaths(t *testing.T) {
 		err:  true,
 		out:  `_|_ // invalid literal 3.3`,
 	}, {
+		in:   `map: [string]: int`,
 		path: cue.MakePath(cue.Str("map"), cue.AnyString),
 		out:  "int",
 		str:  "map.[_]",
 	}, {
+		in:   `list: [...int]`,
 		path: cue.MakePath(cue.Str("list"), cue.AnyIndex),
 		out:  "int",
 		str:  "list.[_]",
 	}, {
+		// Issue 2060
+		in: `
+			let X = {a: b: 0}
+			x: y: X.a
+		`,
 		path: cue.ParsePath("x.y"),
 		out:  "{\n\tb: 0\n}",
 		str:  "x.y",
 	}, {
+		// Issue 2060
+		in: `
+			let X = {a: b: 0}
+			x: y: X.a
+		`,
 		path: cue.ParsePath("x.y.b"),
 		out:  "0",
 		str:  "x.y.b",
 	}, {
 		// Issue 3577
+		in: `
+			pkg: z
+			z: y: "hello"
+		`,
 		path: cue.ParsePath("pkg.y"),
 		out:  `"hello"`,
 		str:  "pkg.y", // show original path, not structure shared path.
 	}, {
 		// Issue 3922
+		in: `
+			out: #Output
+			#Output: name: _data.name
+			_data: name: "one"
+		`,
 		path: cue.ParsePath("out.name"),
 		out:  `"one"`,
 		str:  "out.name",
@@ -141,29 +174,7 @@ func TestPaths(t *testing.T) {
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
 		ctx := t.M.CueContext()
-		val := mustCompile(t, ctx, `
-			#Foo:   a: b: 1
-			"#Foo": c: d: 2
-			_foo: b: 5
-			a: 3
-			b: [4, 5, 6]
-			c: "#Foo": 7
-			map: [string]: int
-			list: [...int]
-
-			// Issue 2060
-			let X = {a: b: 0}
-			x: y: X.a
-
-			// Issue 3577
-			pkg: z
-			z: y: "hello"
-
-			// Issue 3922
-			out: #Output
-			#Output: name: _data.name
-			_data: name: "one"
-		`)
+		val := mustCompile(t, ctx, tc.in)
 
 		t.Equal(tc.path.Err() != nil, tc.err)
 

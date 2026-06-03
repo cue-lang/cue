@@ -1584,6 +1584,23 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 			}
 
 		case *Bottom:
+			// HACK / workaround: if we pass a cycle placeholder as error,
+			// the function may yield _. This is incorrect, but works when the
+			// value is a scalar, as the postCheck mechanism will catch and
+			// reevaluate the cycle.
+			// This, however, does not work for composite values. The right fix
+			// would be to "freeze" the composite struct and simply see if the
+			// returned value subsumes the result. For now, we simply error
+			// in these cases.
+			if v.IsIncomplete() && isCyclePlaceholder(v) &&
+				(builtin.Result == StructKind || builtin.Result == ListKind) {
+				v = &Bottom{
+					Src:  v.Src,
+					Err:  v.Err,
+					Code: v.Code,
+					Node: v.Node,
+				}
+			}
 			// TODO(errors): consider adding an argument index for this errors.
 			c.errs = CombineErrors(a.Source(), c.errs, v)
 

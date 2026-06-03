@@ -53,6 +53,18 @@ mutualJSON: {
 	y: #"{"a":5}"#
 	x: a: 5
 }
+
+toJSON: {
+	x: a: 5
+	y: json.Marshal(x)
+	x: json.Unmarshal(y)
+}
+
+fromJSON: {
+	x: json.Unmarshal(y)
+	y: json.Marshal(x)
+	y: #"{"a":5}"#
+}
 -- out/compile --
 --- in.cue
 {
@@ -98,5 +110,17 @@ mutualJSON: {
     x: {
       a: 5
     }
+  }
+  toJSON: {
+    x: {
+      a: 5
+    }
+    y: 〈import;"encoding/json"〉.Marshal(〈0;x〉)
+    x: 〈import;"encoding/json"〉.Unmarshal(〈0;y〉)
+  }
+  fromJSON: {
+    x: 〈import;"encoding/json"〉.Unmarshal(〈0;y〉)
+    y: 〈import;"encoding/json"〉.Marshal(〈0;x〉)
+    y: "{\"a\":5}"
   }
 }

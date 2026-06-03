@@ -61,3 +61,17 @@ mutualJSON: {
 	x: a: 5
 	@test(eq, {x: {a: 5}, y: #"{"a":5}"#})
 }
+
+toJSON: {
+	x: a: 5
+	y: json.Marshal(x)
+	x: json.Unmarshal(y)
+	@test(eq:todo, {x: {a: 5}, y: #"{"a":5}"#})
+}
+
+fromJSON: {
+	x: json.Unmarshal(y)
+	y: json.Marshal(x)
+	y: #"{"a":5}"#
+	@test(eq, {x: {a: 5}, y: #"{"a":5}"#})
+}

@@ -619,6 +619,49 @@ func TestEarliestClosedSchemaVersion(t *testing.T) {
 	qt.Assert(t, qt.Equals(EarliestClosedSchemaVersion(), "v0.8.0-alpha.0"))
 }
 
+func TestParseLocal(t *testing.T) {
+	base, err := Parse([]byte(`
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+`), "module.cue")
+	qt.Assert(t, qt.IsNil(err))
+
+	t.Run("InheritsIdentityFromBase", func(t *testing.T) {
+		// local-module.cue declares neither module nor language version;
+		// both are inherited from module.cue.
+		f, err := ParseLocal([]byte(`
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+	replace: "./local_dep"
+}
+`), "local-module.cue", base)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(f.QualifiedModule(), "example.com/main@v0"))
+		qt.Assert(t, qt.Equals(f.Language.Version, "v0.17.0"))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Version, "v0.1.0"))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Replace, "./local_dep"))
+		// Dependencies are initialized so that resolved versions are available.
+		qt.Assert(t, qt.DeepEquals(f.DepVersions(), parseVersions("example.com/dep@v0.1.0")))
+	})
+
+	t.Run("AcceptsMatchingModulePath", func(t *testing.T) {
+		f, err := ParseLocal([]byte(`
+module: "example.com/main@v0"
+deps: "example.com/dep@v0": v: "v0.1.0"
+`), "local-module.cue", base)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(f.QualifiedModule(), "example.com/main@v0"))
+	})
+
+	t.Run("RejectsMismatchedModulePath", func(t *testing.T) {
+		_, err := ParseLocal([]byte(`
+module: "example.com/other@v0"
+deps: "example.com/dep@v0": v: "v0.1.0"
+`), "local-module.cue", base)
+		qt.Assert(t, qt.ErrorMatches(err, `module path "example.com/other@v0" in local-module.cue does not match module path "example.com/main@v0" in module.cue`))
+	})
+}
+
 func parseVersions(vs ...string) []module.Version {
 	vvs := make([]module.Version, 0, len(vs))
 	for _, v := range vs {

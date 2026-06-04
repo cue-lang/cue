@@ -33,6 +33,24 @@
       "message": "If it is \"currently being finalized\" that means that state (nodeContext) is not nil. We normally put such operational fields in state to reduce the size of Vertex. \n\nI would say it belongs there.",
       "revId": "93936d074ffeed4eb0fb851fba09b66d3329d2e8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab4a8b21_414db7cf",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-04T11:20:31Z",
+      "side": 1,
+      "message": "Done. Moved the flag from Vertex to nodeContext (as nodeContextState.trySkip). TryClause.yield now sets it via v.getState(c).trySkip before Finalize, and markSkipTry walks the parent chain checking v.state !\u003d nil \u0026\u0026 v.state.trySkip. The Vertex no longer carries the field. All tests pass.",
+      "parentUuid": "ed5443d3_bc44d6db",
+      "revId": "93936d074ffeed4eb0fb851fba09b66d3329d2e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

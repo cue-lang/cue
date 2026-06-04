@@ -15,12 +15,113 @@
 package modpkgload
 
 import (
+	"context"
+	"fmt"
+	"io/fs"
+	"path"
 	"strings"
 	"unicode"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
+
+// FullRegistry is a [Registry] that can also report module files and the
+// available versions of a module. It is the set of registry operations
+// needed to serve replaced modules.
+type FullRegistry interface {
+	Registry
+
+	// ModFile returns the module file for the given module version.
+	// The caller must not mutate the returned value.
+	ModFile(ctx context.Context, mv module.Version) (*modfile.File, error)
+
+	// ModuleVersions returns all the versions for the module with the given
+	// path, sorted in semver order.
+	ModuleVersions(ctx context.Context, mpath string) ([]string, error)
+}
+
+// NewReplacingRegistry returns a registry that serves replaced modules from
+// their replacement sources (a local directory or a different module
+// version) and delegates everything else to reg. If repls is nil, reg is
+// returned unchanged.
+//
+// openDir opens the filesystem for a directory replacement; if it is nil,
+// [module.OSDirFS] is used.
+func NewReplacingRegistry(reg FullRegistry, repls *Replacements, openDir func(string) (fs.FS, error)) FullRegistry {
+	if repls == nil {
+		return reg
+	}
+	if openDir == nil {
+		openDir = func(p string) (fs.FS, error) {
+			return module.OSDirFS(p), nil
+		}
+	}
+	return &replacingRegistry{
+		underlying: reg,
+		repls:      repls,
+		openDir:    openDir,
+	}
+}
+
+// replacingRegistry wraps a [FullRegistry] so that replaced modules are
+// served from their replacement sources.
+type replacingRegistry struct {
+	underlying FullRegistry
+	repls      *Replacements
+	openDir    func(path string) (fs.FS, error)
+}
+
+func (r *replacingRegistry) replacement(m module.Version) (Replacement, bool) {
+	return r.repls.Lookup(m.BasePath())
+}
+
+func (r *replacingRegistry) Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error) {
+	repl, ok := r.replacement(m)
+	if !ok {
+		return r.underlying.Fetch(ctx, m)
+	}
+	if repl.Dir != "" {
+		fsys, err := r.openDir(repl.Dir)
+		if err != nil {
+			return module.SourceLoc{}, fmt.Errorf("cannot open replacement directory for %v: %v", m, err)
+		}
+		return module.SourceLoc{FS: fsys, Dir: "."}, nil
+	}
+	return r.underlying.Fetch(ctx, repl.Module)
+}
+
+func (r *replacingRegistry) ModFile(ctx context.Context, mv module.Version) (*modfile.File, error) {
+	repl, ok := r.replacement(mv)
+	if !ok {
+		return r.underlying.ModFile(ctx, mv)
+	}
+	if repl.Dir != "" {
+		return r.modFileFromDir(repl.Dir)
+	}
+	return r.underlying.ModFile(ctx, repl.Module)
+}
+
+func (r *replacingRegistry) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
+	return r.underlying.ModuleVersions(ctx, mpath)
+}
+
+func (r *replacingRegistry) modFileFromDir(dir string) (*modfile.File, error) {
+	fsys, err := r.openDir(dir)
+	if err != nil {
+		return nil, fmt.Errorf("cannot open replacement directory: %v", err)
+	}
+	data, err := fs.ReadFile(fsys, path.Join(".", "cue.mod/module.cue"))
+	if err != nil {
+		return nil, fmt.Errorf("cannot read module file in replacement directory: %v", err)
+	}
+	mf, err := modfile.ParseNonStrict(data, path.Join(dir, "cue.mod/module.cue"))
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse module file in replacement directory: %v", err)
+	}
+	return mf, nil
+}
 
 // Replacement describes a single replacement directive.
 type Replacement struct {

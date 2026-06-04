@@ -117,7 +117,16 @@ func runModUpload(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg); err != nil {
+	// The tidiness check is informed by cue.mod/local-module.cue even though
+	// that file is not part of the published module: publishing a module.cue
+	// that a full 'cue mod tidy' would update (for example because
+	// local-module.cue selects a higher dependency version) is rejected, so
+	// the published version cannot silently lag behind what the main module
+	// builds against.
+	opts := &modload.TidyOptions{
+		LocForPath: dirReplaceLoc(modRoot),
+	}
+	if err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg, opts); err != nil {
 		return suggestModCommand(err)
 	}
 
@@ -262,6 +271,17 @@ func runModUpload(cmd *Command, args []string) error {
 		if err := resolver.writeIndex(); err != nil {
 			return err
 		}
+	}
+
+	// The published module is built from cue.mod/module.cue alone; any
+	// development-time configuration in cue.mod/local-module.cue (such as
+	// replace directives) is not part of the published module. Warn if the
+	// file is present so that its absence from the published module is not a
+	// surprise.
+	if _, err := os.Stat(filepath.Join(modRoot, "cue.mod", "local-module.cue")); err == nil {
+		// Note: write via ErrOrStderr rather than Stderr so that this
+		// informational note does not set a non-zero exit code.
+		fmt.Fprintln(cmd.ErrOrStderr(), "note: cue.mod/local-module.cue is not published; it only affects local development")
 	}
 
 	// Do not output full OCI references by default without --json, as sources

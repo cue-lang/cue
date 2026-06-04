@@ -20,6 +20,10 @@
 // it must be named exactly that, not any other case. Directories or files named "cue.mod"
 // are not allowed in any other directory.
 //
+// • A cue.mod/local-module.cue file, if present, is always omitted. It holds
+// development-time configuration (such as replace directives) and is never
+// part of a published module.
+//
 // • The total size in bytes of a module zip file may be at most MaxZipFile
 // bytes (500 MiB). The total uncompressed size of the files within the
 // zip may also be at most MaxZipFile bytes.
@@ -179,6 +183,7 @@ var (
 	errSubmoduleFile = errors.New("file is in another module")
 	errSubmoduleDir  = errors.New("directory is in another module")
 	errHgArchivalTxt = errors.New("file is inserted by 'hg archive' and is always omitted")
+	errLocalModule   = errors.New("cue.mod/local-module.cue holds development-time configuration and is never part of a published module")
 	errSymlink       = errors.New("file is a symbolic link")
 	errNotRegular    = errors.New("not a regular file")
 
@@ -287,6 +292,12 @@ func checkFiles[F any](files []F, fio FileIO[F]) (cf CheckedFiles, validFiles []
 			// Inserted by hg archive.
 			// Drop this regardless of the VCS being used.
 			addError(p, true, errHgArchivalTxt)
+			continue
+		}
+		if p == "cue.mod/local-module.cue" {
+			// Development-time configuration (such as replace directives)
+			// that is never part of a published module.
+			addError(p, true, errLocalModule)
 			continue
 		}
 		// TODO check for CUE-specific module paths.

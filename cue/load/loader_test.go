@@ -75,13 +75,12 @@ module: conflicting values 123 and "" (mismatched types int and string):
 module: conflicting values 123 and string (mismatched types int and string):
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
     cuelang.org/go/mod/modfile/schema.cue:71:12
-    cuelang.org/go/mod/modfile/schema.cue:120:12
+    cuelang.org/go/mod/modfile/schema.cue:122:12
 path:   ""
 module: ""
 root:   ""
 dir:    ""
-display:""`,
-	}, {
+display:""`}, {
 		name: "DefaultPackage",
 		// Even though the directory is called testdata, the last path in
 		// the module is test. So "package test" is correctly the default

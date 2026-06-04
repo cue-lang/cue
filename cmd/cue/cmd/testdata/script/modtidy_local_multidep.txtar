@@ -1,0 +1,81 @@
+# cue mod tidy omits versions from local-module.cue whenever they are
+# redundant with module.cue, including for a non-replaced dependency that is
+# listed only to keep the main-module view complete. Such a dependency is
+# written with no fields at all; its version is restored from module.cue when
+# the file is read back.
+
+exec cue mod tidy
+cmp cue.mod/module.cue want-module
+cmp cue.mod/local-module.cue want-local
+
+# The build uses the local directory for the replaced module and the registry
+# for the other, reading the version-less local-module.cue entries.
+exec cue export .
+cmp stdout want-stdout
+
+# tidy is idempotent.
+exec cue mod tidy --check
+
+-- want-module --
+module: "main.org@v0"
+language: {
+	version: "v0.17.0"
+}
+deps: {
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+	}
+	"example.com/other@v0": {
+		v: "v0.2.0"
+	}
+}
+-- want-local --
+deps: {
+	"example.com/dep@v0": {
+		replace: "./local_dep"
+	}
+	"example.com/other@v0": {}
+}
+-- want-stdout --
+{
+    "dep": "from local directory",
+    "other": "from registry"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.17.0"
+deps: "example.com/dep@v0": {
+	v:       "v0.1.0"
+	replace: "./local_dep"
+}
+-- main.cue --
+package main
+
+import (
+	"example.com/dep@v0:lib"
+	"example.com/other@v0:lib2"
+)
+
+dep:   lib.value
+other: lib2.value
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+value: "from local directory"
+-- _registry/example.com_dep_v0.1.0/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_dep_v0.1.0/lib.cue --
+package lib
+
+value: "from registry"
+-- _registry/example.com_other_v0.2.0/cue.mod/module.cue --
+module: "example.com/other@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_other_v0.2.0/lib2.cue --
+package lib2
+
+value: "from registry"

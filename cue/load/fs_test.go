@@ -192,6 +192,10 @@ module: "example.com/main@v0"
 language: version: "v0.17.0"
 deps: "example.com/dep@v0": {
 	v: "v0.1.0"
+}
+-- cue.mod/local-module.cue --
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
 	replace: "./local_dep"
 }
 -- main.cue --
@@ -216,6 +220,10 @@ value: "from local directory"
 -- cue.mod/module.cue --
 module: "example.com/main@v0"
 language: version: "v0.17.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+}
+-- cue.mod/local-module.cue --
 deps: "example.com/dep@v0": {
 	v: "v0.1.0"
 	replace: "/local_dep"
@@ -244,6 +252,10 @@ value: "from local directory"
 -- mymod/cue.mod/module.cue --
 module: "example.com/main@v0"
 language: version: "v0.17.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+}
+-- mymod/cue.mod/local-module.cue --
 deps: "example.com/dep@v0": {
 	v: "v0.1.0"
 	replace: "../local_dep"

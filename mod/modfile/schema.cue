@@ -81,8 +81,10 @@ versions: "v0.9.0-alpha.0": {
 		#Dep: {
 			// v indicates the minimum required version of the module. This can
 			// be null if the version is unknown and the module entry is only
-			// present to be replaced.
-			v!: #Semver | null
+			// present to be replaced. In a cue.mod/local-module.cue file it may
+			// also be omitted entirely for a dependency that is also present in
+			// cue.mod/module.cue, in which case the version is taken from there.
+			v?: #Semver | null
 
 			// default indicates this module is used as a default in case more
 			// than one major version is specified for the same module path.

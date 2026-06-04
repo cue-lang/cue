@@ -117,7 +117,9 @@ func runModUpload(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg); err != nil {
+	// Publishing only concerns the published module.cue, so pass nil
+	// options: any cue.mod/local-module.cue is ignored.
+	if err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg, nil); err != nil {
 		return suggestModCommand(err)
 	}
 

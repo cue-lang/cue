@@ -1,0 +1,52 @@
+# cue mod tidy --local-only when the replaced module exists only as a
+# local directory (not in any registry). The published view cannot be
+# resolved, so --local-only tidies just cue.mod/local-module.cue and
+# leaves cue.mod/module.cue untouched.
+
+# Without --local-only the published resolution fails.
+! exec cue mod tidy
+stderr 'local-only'
+
+exec cue mod tidy --local-only
+cmp cue.mod/module.cue want-module
+cmp cue.mod/local-module.cue want-local
+
+# The build uses the local directory's content.
+exec cue export .
+cmp stdout want-stdout
+
+-- want-module --
+module: "main.org@v0"
+language: version: "v0.17.0"
+-- want-local --
+deps: {
+	"example.com/dep@v0": {
+		v:       "v0.1.0"
+		replace: "./local_dep"
+	}
+}
+-- want-stdout --
+{
+    "out": "from local directory"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.17.0"
+-- cue.mod/local-module.cue --
+deps: "example.com/dep@v0": {
+	v:       "v0.1.0"
+	replace: "./local_dep"
+}
+-- main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+out: lib.value
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+value: "from local directory"

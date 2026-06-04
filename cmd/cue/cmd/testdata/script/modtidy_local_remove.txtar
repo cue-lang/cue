@@ -1,0 +1,38 @@
+# cue mod tidy removes a cue.mod/local-module.cue file that has no replace
+# directives, since it then serves no purpose: the published module.cue is
+# the single source of truth.
+
+exec cue mod tidy
+cmp cue.mod/module.cue want-module
+! exists cue.mod/local-module.cue
+
+-- want-module --
+module: "main.org@v0"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+	}
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.9.0"
+-- cue.mod/local-module.cue --
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+}
+-- main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+out: lib.value
+-- _registry/example.com_dep_v0.1.0/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_dep_v0.1.0/lib.cue --
+package lib
+
+value: "from registry"

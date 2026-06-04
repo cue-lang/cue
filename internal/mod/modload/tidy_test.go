@@ -35,7 +35,7 @@ func TestTidy(t *testing.T) {
 			want, err := fs.ReadFile(tfs, "want")
 			qt.Assert(t, qt.IsNil(err))
 
-			err = CheckTidy(context.Background(), tfs, ".", reg)
+			err = CheckTidy(context.Background(), tfs, ".", reg, nil)
 			wantCheckTidyError := stringFromFile(tfs, "tidy-check-error")
 			if wantCheckTidyError == "" {
 				qt.Check(t, qt.IsNil(err))
@@ -45,11 +45,11 @@ func TestTidy(t *testing.T) {
 
 			var out strings.Builder
 			var tidyFile []byte
-			mf, err := Tidy(context.Background(), tfs, ".", reg)
+			res, err := Tidy(context.Background(), tfs, ".", reg, nil)
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {
-				tidyFile, err = modfile.Format(mf)
+				tidyFile, err = modfile.Format(res.Module)
 				qt.Assert(t, qt.IsNil(err))
 				out.Write(tidyFile)
 			}
@@ -69,7 +69,7 @@ func TestTidy(t *testing.T) {
 				}
 				tfs, err := txtar.FS(ar)
 				qt.Assert(t, qt.IsNil(err))
-				err = CheckTidy(context.Background(), tfs, ".", reg)
+				err = CheckTidy(context.Background(), tfs, ".", reg, nil)
 				qt.Check(t, qt.IsNil(err), qt.Commentf("CheckTidy after a successful Tidy should not fail"))
 			}
 		})

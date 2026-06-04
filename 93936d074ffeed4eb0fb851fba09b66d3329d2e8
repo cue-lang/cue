@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58955ab1_0b51a762",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-04T11:14:27Z",
+      "side": 1,
+      "message": "Getting there",
+      "revId": "93936d074ffeed4eb0fb851fba09b66d3329d2e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed5443d3_bc44d6db",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-04T11:14:27Z",
+      "side": 1,
+      "message": "If it is \"currently being finalized\" that means that state (nodeContext) is not nil. We normally put such operational fields in state to reduce the size of Vertex. \n\nI would say it belongs there.",
+      "revId": "93936d074ffeed4eb0fb851fba09b66d3329d2e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

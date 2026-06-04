@@ -638,6 +638,15 @@ missing ',' in struct literal (and 1 more errors)`,
 			out: `@experiment(try), {a: {try {x: val?}}}`,
 		},
 		{
+			desc:    "try struct form in list",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: [ try { val? } ]
+		}`,
+			out: `@experiment(try), {a: [try {val?}]}`,
+		},
+		{
 			desc:    "try with else",
 			version: "v0.16.0",
 			in: `@experiment(try)

@@ -1414,7 +1414,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 	defer func() { c.closeNode(p, expr) }()
 
 	switch p.tok {
-	case token.FOR, token.IF:
+	case token.FOR, token.IF, token.TRY:
 		tok := p.tok
 		pos := p.pos
 		clauses, fc := p.parseComprehensionClauses()

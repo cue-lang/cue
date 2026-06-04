@@ -1,6 +1,9 @@
 # Test directory-based module replace directives.
 # A module dependency can be replaced with a local directory.
 #
+# The replace directive lives in cue.mod/local-module.cue (the two-file
+# approach), not in cue.mod/module.cue.
+#
 # This test verifies that:
 # 1. The replacement module's content is used from the local directory
 #    instead of the registry.
@@ -15,6 +18,12 @@ cmp stdout want-export.txt
 module: "example.com/main@v0"
 language: version: "v0.9.0"
 
+deps: {
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+	}
+}
+-- cue.mod/local-module.cue --
 deps: {
 	"example.com/dep@v0": {
 		v: "v0.1.0"

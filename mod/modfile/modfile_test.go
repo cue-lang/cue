@@ -648,6 +648,89 @@ deps: "example.com/dep@v0": v: "v0.1.0"
 `), "local-module.cue", base)
 		qt.Assert(t, qt.ErrorMatches(err, `module path "example.com/other@v0" in local-module.cue does not match module path "example.com/main@v0" in module.cue`))
 	})
+
+	t.Run("OmitsVersionFilledFromBase", func(t *testing.T) {
+		// A dep that omits its version inherits it from the matching
+		// dependency in module.cue.
+		base, err := Parse([]byte(`
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+deps: "example.com/dep@v0": v: "v0.1.0"
+`), "module.cue")
+		qt.Assert(t, qt.IsNil(err))
+		f, err := ParseLocal([]byte(`
+deps: "example.com/dep@v0": replace: "./local_dep"
+`), "local-module.cue", base)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Version, "v0.1.0"))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Replace, "./local_dep"))
+		qt.Assert(t, qt.DeepEquals(f.DepVersions(), parseVersions("example.com/dep@v0.1.0")))
+	})
+
+	t.Run("OmitsVersionReplaceOnly", func(t *testing.T) {
+		// A dep that omits its version and is not in module.cue is allowed
+		// when it is a replace-only placeholder.
+		f, err := ParseLocal([]byte(`
+deps: "example.com/dep@v0": replace: "./local_dep"
+`), "local-module.cue", base)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Version, ""))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Replace, "./local_dep"))
+	})
+
+	t.Run("RejectsOmittedVersionWithoutReplace", func(t *testing.T) {
+		// A dep that omits its version, is not in module.cue and has no
+		// replace directive cannot be resolved.
+		_, err := ParseLocal([]byte(`
+deps: "example.com/dep@v0": {}
+`), "local-module.cue", base)
+		qt.Assert(t, qt.ErrorMatches(err, `dependency "example.com/dep@v0" in local-module.cue has no version and is not present in module.cue`))
+	})
+}
+
+func TestFormatLocal(t *testing.T) {
+	base, err := Parse([]byte(`
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+deps: {
+	"example.com/dep@v0": v:   "v0.1.0"
+	"example.com/other@v0": v: "v0.2.0"
+}
+`), "module.cue")
+	qt.Assert(t, qt.IsNil(err))
+
+	// dep is replaced and other is not; both share their versions with
+	// module.cue, so both versions are omitted. local has its own higher
+	// version of a third module, which is kept.
+	f := &File{
+		Module:   base.Module,
+		Language: base.Language,
+		Deps: map[string]*Dep{
+			"example.com/dep@v0":   {Version: "v0.1.0", Replace: "./local_dep"},
+			"example.com/other@v0": {Version: "v0.2.0"},
+			"example.com/extra@v0": {Version: "v0.3.0"},
+		},
+	}
+	data, err := FormatLocal(f, base)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(string(data), `deps: {
+	"example.com/dep@v0": {
+		replace: "./local_dep"
+	}
+	"example.com/extra@v0": {
+		v: "v0.3.0"
+	}
+	"example.com/other@v0": {}
+}
+`))
+
+	// Reading the result back against module.cue restores the omitted
+	// versions.
+	got, err := ParseLocal(data, "local-module.cue", base)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(got.Deps["example.com/dep@v0"].Version, "v0.1.0"))
+	qt.Assert(t, qt.Equals(got.Deps["example.com/other@v0"].Version, "v0.2.0"))
+	qt.Assert(t, qt.Equals(got.Deps["example.com/extra@v0"].Version, "v0.3.0"))
 }
 
 func parseVersions(vs ...string) []module.Version {

@@ -1,0 +1,30 @@
+# Replace directives are not allowed in cue.mod/module.cue; they belong in
+# cue.mod/local-module.cue (the two-file approach). A replace directive in
+# module.cue must be a hard error pointing the user at local-module.cue.
+
+! exec cue export .
+stderr 'replace directive for "example.com/dep@v0" is not allowed in module.cue; put it in cue.mod/local-module.cue'
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+
+deps: {
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+		replace: "./local_dep"
+	}
+}
+-- main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+value: "from local directory"

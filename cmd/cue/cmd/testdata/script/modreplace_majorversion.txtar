@@ -16,6 +16,15 @@ language: version: "v0.9.0"
 deps: {
 	"example.com/foo@v0": {
 		v: "v0.1.0"
+	}
+	"example.com/foo@v1": {
+		v: "v1.0.0"
+	}
+}
+-- cue.mod/local-module.cue --
+deps: {
+	"example.com/foo@v0": {
+		v: "v0.1.0"
 		replace: "example.com/bar@v0.1.0"
 	}
 	"example.com/foo@v1": {

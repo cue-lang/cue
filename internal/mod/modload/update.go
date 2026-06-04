@@ -37,9 +37,13 @@ import (
 //     version or $module@$majorVersion if it does, where $majorVersion is the
 //     default major version for $module.
 func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, versions []string) (*modfile.File, error) {
-	mainModuleVersion, mf, err := readModuleFile(fsys, modRoot)
+	mf, err := readPublishedModuleFile(fsys, modRoot)
 	if err != nil {
 		return nil, err
+	}
+	mainModuleVersion, err := module.NewVersion(mf.QualifiedModule(), "")
+	if err != nil {
+		return nil, fmt.Errorf("cue.mod/module.cue: invalid module path: %v", err)
 	}
 	rs := modrequirements.NewRequirements(mf.QualifiedModule(), reg, mf.DepVersions(), mf.DefaultMajorVersions())
 	mversions, err := resolveUpdateVersions(ctx, reg, rs, mainModuleVersion, versions)
@@ -100,7 +104,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 		}
 	}
 	rs = modrequirements.NewRequirements(mf.QualifiedModule(), reg, finalVersions, mf.DefaultMajorVersions())
-	return modfileFromRequirements(mf, rs), nil
+	return modfileFromRequirements(mf, rs, nil, rs.DefaultMajorVersions(), nil), nil
 }
 
 // ResolveAbsolutePackage resolves a package in a standalone fashion, irrespective

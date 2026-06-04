@@ -34,6 +34,24 @@
       "parentUuid": "ade27577_bf817a2a",
       "revId": "ae26440a02214bd9177784b1fb0b2d11e81c97ac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c2bf39d_d382839b",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-04T13:18:38Z",
+      "side": 1,
+      "message": "On placement: I put it in nodeContextState deliberately, so the pointer is copied into disjunct clones by cloneNodeContext\u0027s `d.nodeContextState \u003d n.nodeContextState`. That way a ?-failure recorded against any clone of the try body still flips the single bool yield reads. Directly in nodeContext it would be zeroed on cloning, which risks dropping the signal when the body\u0027s evaluation involves disjunctions.\n\nOn pointer vs two booleans: I agree splitting the two meanings is cleaner — right now trySkip !\u003d nil overloads \"this is a try body\" and *p \u003d\u003d true overloads \"a ?-ref failed\". Two bools (e.g. tryActive / trySkipped) would separate them and drop the indirection. The reason I reached for a pointer to a stack local is that it\u0027s independent of state lifetime: yield reads the local regardless of what happens to v.state. A read-back-from-state design works today only because freeing is disabled (the `defer n.free()` in unify is commented out, and freeNodeContext nils node.state), and the comment there says freeing will be reintroduced \"once we have the lifetime under control\" — at which point reading v.state back after Finalize would break.\n\nSo the pointer sidesteps both the freeing lifecycle and the disjunction-clone divergence by construction. I\u0027m happy to switch to two bools if we\u0027d rather not depend on the pointer, but I\u0027d want to add a try+disjunction regression test first to pin down the intended semantics, since there\u0027s currently no such case. Let me know which you prefer.",
+      "parentUuid": "ade27577_bf817a2a",
+      "revId": "ae26440a02214bd9177784b1fb0b2d11e81c97ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -33,6 +33,42 @@
       "message": "Why not use sync.OnceValue ?\nWe can make a context for the purpose, and I think it\u0027s reasonable to panic if the schema compilation fails.",
       "revId": "b51b45c83cda3ea94c053887c65d2eaf26143ab3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a50b230_611a551d",
+        "filename": "encoding/jsonschema/crd.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-04T17:05:10Z",
+      "side": 1,
+      "message": "Done. Switched to sync.OnceValue and now compile in a dedicated one-off context (created via runtime.New, since importing cue/cuecontext here would form an import cycle), panicking if compilation of the embedded schema fails.",
+      "parentUuid": "28cd6282_4c668783",
+      "revId": "b51b45c83cda3ea94c053887c65d2eaf26143ab3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7f0cfc1_613a612f",
+        "filename": "encoding/jsonschema/crd.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-04T17:05:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28cd6282_4c668783",
+      "revId": "b51b45c83cda3ea94c053887c65d2eaf26143ab3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

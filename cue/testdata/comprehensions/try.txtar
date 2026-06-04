@@ -713,6 +713,27 @@ recursive: t1: { try { for x in [b?] { x } } }           @test(eq, 2)
 recursive: t2: { try { {x: b?, y: c?} } }                @test(eq, {})
 recursive: t3: { try { {x: b?, y: c?} } else { z: 23 }}  @test(eq, {z: 23})
 
+// =============================================================================
+// Try clause as a list element
+// =============================================================================
+
+listElems: {
+	// Struct form yielding a value into the list when the reference resolves.
+	defined: [try { a? }] @test(eq, [1])
+
+	// Struct form discards its output when the optional reference fails.
+	undefined: [try { c? }] @test(eq, [])
+
+	// Binding form in a list element.
+	binding: [try v = a? { v + 1 }] @test(eq, [2])
+
+	// for clause followed by a try clause in a list element.
+	forTry: [for x in [a, b] try { x }] @test(eq, [1, 2])
+
+	// else clause when the optional reference fails.
+	withElse: [try { c? } else { -1 }] @test(eq, [-1])
+}
+
 -- out/errors.txt --
 [incomplete] requiredUnfilled.x: required field missing: a:
     ./in.cue:83:11

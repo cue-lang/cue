@@ -620,6 +620,27 @@ nestedTry: disjBodyUndefined: {
 recursive: t1: { try {for x in [b?] {x}}}
 recursive: t2: { try {{x: b?, y: c?}}}
 recursive: t3: { try {{x: b?, y: c?}} else {z: 23}}
+
+// =============================================================================
+// Try clause as a list element
+// =============================================================================
+
+listElems: {
+	// Struct form yielding a value into the list when the reference resolves.
+	defined: [ try {a?}]
+
+	// Struct form discards its output when the optional reference fails.
+	undefined: [ try {c?}]
+
+	// Binding form in a list element.
+	binding: [ try v = a? {v + 1}]
+
+	// for clause followed by a try clause in a list element.
+	forTry: [for x in [a, b] try {x}]
+
+	// else clause when the optional reference fails.
+	withElse: [ try {c?} else {-1}]
+}
 -- out/compile --
 --- in.cue
 {
@@ -1364,5 +1385,37 @@ recursive: t3: { try {{x: b?, y: c?}} else {z: 23}}
         z: 23
       }
     }
+  }
+  listElems: {
+    defined: [
+      try {
+        〈3;a〉?
+      },
+    ]
+    undefined: [
+      try {
+        〈3;c〉?
+      },
+    ]
+    binding: [
+      try v = 〈2;a〉? {
+        (〈1;v〉 + 1)
+      },
+    ]
+    forTry: [
+      for _, x in [
+        〈3;a〉,
+        〈3;b〉,
+      ] try {
+        〈1;x〉
+      },
+    ]
+    withElse: [
+      try {
+        〈3;c〉?
+      } else {
+        -1
+      },
+    ]
   }
 }

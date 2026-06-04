@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf55d374_83e68f9a",
+        "filename": "cue/load/config.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 607,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-04T07:49:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4b57fe5_0adff174",
+      "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fcb1ee40_71dddcd5",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9c38a84_3f745f6e",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-04T07:49:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0caac0d9_383d35c9",
+      "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bc8ead6_e7f2995c",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-06-02T15:40:02Z",
       "side": 1,
       "message": "It seems to me that this isn\u0027t catering for the fact that import paths can have major version suffixes: it\u0027s just checking the prefix but the major version is important too.\n\nThis needs a decent test case before fixing.",
+      "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6b6b954_d9788a3d",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-04T07:49:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8bc8ead6_e7f2995c",
       "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

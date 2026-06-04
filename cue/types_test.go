@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -1521,6 +1522,36 @@ func TestFillPath(t *testing.T) {
 					t.Errorf("\ngot:  %s\nwant: %s", v, w)
 				}
 			})
+		}
+	})
+}
+
+// TestFillPathOptional is a regression test for
+// https://cuelang.org/issue/2127: filling a path into a value used to
+// cause the filled fields to be exported as optional, even though they
+// are regular (required) fields.
+func TestFillPathOptional(t *testing.T) {
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
+		strType := ctx.CompileString(`string`)
+
+		w := ctx.CompileString(`{}`)
+		w = w.FillPath(cue.ParsePath("a"), strType)
+		w = w.FillPath(cue.ParsePath("#b"), strType)
+
+		b, err := format.Node(w.Syntax(cue.All()))
+		qt.Assert(t, qt.IsNil(err))
+		want := `{
+	a:  string
+	#b: string
+}`
+		qt.Assert(t, qt.Equals(string(b), want))
+
+		iter, err := w.Fields(cue.All())
+		qt.Assert(t, qt.IsNil(err))
+		for iter.Next() {
+			qt.Check(t, qt.IsFalse(iter.IsOptional()),
+				qt.Commentf("field %v unexpectedly optional", iter.Selector()))
 		}
 	})
 }

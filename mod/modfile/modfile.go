@@ -111,6 +111,60 @@ func Format(f *File) ([]byte, error) {
 	return data, err
 }
 
+// FormatLocal formats f as a cue.mod/local-module.cue file: a deps-only
+// document that omits the module path and language version, which a
+// local-module.cue file inherits from the accompanying module.cue file.
+//
+// base is the accompanying cue.mod/module.cue file (the published view). Its
+// language version is used to validate the formatted result via [ParseLocal],
+// and a dependency's version is omitted from the output whenever it is
+// identical to that module's version in base, since [ParseLocal] restores it
+// from base when reading the file back.
+func FormatLocal(f, base *File) ([]byte, error) {
+	// A deps-only representation whose version field is omitted when empty,
+	// so that versions redundant with module.cue need not be written.
+	type localDep struct {
+		Version string `json:"v,omitempty"`
+		Default bool   `json:"default,omitempty"`
+		Replace string `json:"replace,omitempty"`
+	}
+	deps := make(map[string]localDep, len(f.Deps))
+	for mpath, dep := range f.Deps {
+		version := dep.Version
+		if bdep, ok := base.Deps[mpath]; ok && bdep.Version == version {
+			version = ""
+		}
+		deps[mpath] = localDep{
+			Version: version,
+			Default: dep.Default,
+			Replace: dep.Replace,
+		}
+	}
+	// Encode only the deps so that the module path and language version
+	// are not written; those belong exclusively to module.cue.
+	depsOnly := struct {
+		Deps map[string]localDep `json:"deps,omitempty"`
+	}{
+		Deps: deps,
+	}
+	v := cuecontext.New().Encode(depsOnly)
+	if err := v.Validate(cue.Concrete(true)); err != nil {
+		return nil, err
+	}
+	n := v.Syntax(cue.Concrete(true)).(*ast.StructLit)
+	data, err := format.Node(&ast.File{
+		Decls: n.Elts,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot format: %v", err)
+	}
+	// Sanity check that the result parses against base's identity.
+	if _, err := ParseLocal(data, "-", base); err != nil {
+		return nil, fmt.Errorf("cannot parse result: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
+	}
+	return data, nil
+}
+
 type noDepsFile struct {
 	Module string `json:"module"`
 }
@@ -249,6 +303,22 @@ func ParseLocal(data []byte, filename string, base *File) (*File, error) {
 	}
 	if local.QualifiedModule() != "" && local.QualifiedModule() != base.QualifiedModule() {
 		return nil, fmt.Errorf("module path %q in %s does not match module path %q in module.cue", local.QualifiedModule(), filename, base.QualifiedModule())
+	}
+	// A dependency in local-module.cue may omit its version when the same
+	// module is also present in module.cue; in that case the version is
+	// taken from module.cue. A dependency that omits its version and is not
+	// in module.cue is only allowed as a replace-only placeholder.
+	for mpath, dep := range local.Deps {
+		if dep.Version != "" {
+			continue
+		}
+		if bdep, ok := base.Deps[mpath]; ok && bdep.Version != "" {
+			dep.Version = bdep.Version
+			continue
+		}
+		if dep.Replace == "" {
+			return nil, fmt.Errorf("dependency %q in %s has no version and is not present in module.cue", mpath, filename)
+		}
 	}
 	eff := &File{
 		Module:   base.Module,

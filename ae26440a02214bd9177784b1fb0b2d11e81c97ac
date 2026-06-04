@@ -52,6 +52,24 @@
       "parentUuid": "ade27577_bf817a2a",
       "revId": "ae26440a02214bd9177784b1fb0b2d11e81c97ac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1c3e54a_5a22d349",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-04T15:02:08Z",
+      "side": 1,
+      "message": "Update across both commits in this stack:\n\n- First commit: added try+disjunction regression tests (disjunction as a sibling field and as the try body root, defined and undefined variants), which pin down that attribution survives the node-context cloning that disjunctions trigger.\n\n- This commit: I tried the two-bool approach (tryActive + trySkipped in nodeContextState, reading trySkipped back after Finalize). It does not work — it broke nearly every try test, including basic non-disjunction ones. The inline try-body vertex\u0027s nodeContext is reclaimed during Finalize (reclaimTempBuffers nils node.state, so v.state \u003d\u003d nil afterward), so a flag recorded on the node during finalization is gone before yield reads it. This corrects my earlier \"lifetime is moot\" note: freeing via defer n.free() is disabled, but reclaimTempBuffers is a separate, active path. The pointer is load-bearing precisely because it stores the result in a caller-owned stack local that outlives the reclaim, so I kept it.",
+      "parentUuid": "ade27577_bf817a2a",
+      "revId": "ae26440a02214bd9177784b1fb0b2d11e81c97ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

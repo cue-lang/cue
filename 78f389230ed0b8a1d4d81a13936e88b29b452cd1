@@ -16,6 +16,24 @@
       "message": "Hmm. This introduces a race, so perhaps FillPath is not actually safe for concurrent use. I\u0027ll need to dig deeper.",
       "revId": "78f389230ed0b8a1d4d81a13936e88b29b452cd1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1231739_dcaf1f39",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-04T16:51:24Z",
+      "side": 1,
+      "message": "this is now resolved in master.",
+      "parentUuid": "1d339339_62016d83",
+      "revId": "78f389230ed0b8a1d4d81a13936e88b29b452cd1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

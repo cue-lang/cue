@@ -610,7 +610,7 @@ func (c *Config) loadModule() error {
 	}
 	if repls != nil {
 		c.replacements = repls
-		c.Registry = newReplacingRegistry(c.Registry, repls, c.openDirFunc())
+		c.Registry = modpkgload.NewReplacingRegistry(c.Registry, repls, c.openDirFunc())
 	}
 	return nil
 }
@@ -632,33 +632,15 @@ func (c *Config) openDirFunc() func(string) (fs.FS, error) {
 }
 
 func (c *Config) buildReplacements(mf *modfile.File) (*modpkgload.Replacements, error) {
-	replMap := make(map[string]modpkgload.Replacement)
-	for mpath, dep := range mf.Deps {
-		if dep.Replace == "" {
-			continue
+	return modpkgload.BuildReplacements(mf, func(mpath, dir string) (string, error) {
+		if !pkgpath.IsAbs(dir, c.pathOS) {
+			dir = pkgpath.Join([]string{c.ModuleRoot, dir}, c.pathOS)
 		}
-		repl, err := modpkgload.ParseReplaceValue(dep.Replace)
-		if err != nil {
-			return nil, fmt.Errorf("invalid replace value for %s: %v", mpath, err)
+		if err := c.checkReplaceDirModulePath(mpath, dir); err != nil {
+			return "", err
 		}
-		if repl.Dir != "" && !pkgpath.IsAbs(repl.Dir, c.pathOS) {
-			repl.Dir = pkgpath.Join([]string{c.ModuleRoot, repl.Dir}, c.pathOS)
-		}
-		if repl.Dir != "" {
-			if err := c.checkReplaceDirModulePath(mpath, repl.Dir); err != nil {
-				return nil, err
-			}
-		}
-		mv, err := module.NewVersion(mpath, dep.Version)
-		if err != nil {
-			return nil, fmt.Errorf("cannot make version from module %q, version %q: %v", mpath, dep.Version, err)
-		}
-		replMap[mv.BasePath()] = repl
-	}
-	if len(replMap) == 0 {
-		return nil, nil
-	}
-	return modpkgload.NewReplacements(replMap), nil
+		return dir, nil
+	})
 }
 
 // checkReplaceDirModulePath verifies that the module.cue in a replacement

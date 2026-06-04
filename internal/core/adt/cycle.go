@@ -448,6 +448,18 @@ const (
 	IsCyclic
 )
 
+// hasDisjunctConjunct reports whether any of v's conjuncts is a disjunction,
+// either as an unevaluated DisjunctionExpr or an already-built Disjunction.
+func hasDisjunctConjunct(v *Vertex) bool {
+	for c := range v.LeafConjuncts() {
+		switch c.Expr().(type) {
+		case *DisjunctionExpr, *Disjunction:
+			return true
+		}
+	}
+	return false
+}
+
 func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (_ CloseInfo, skip bool) {
 	n.assertInitialized()
 
@@ -514,7 +526,14 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 			// This is safe: a source has finitely many references, so any
 			// unbounded cycle eventually repeats one and is caught by the
 			// r.Ref == x case.
-			if r.Ref != x && n.hasNonCycle && n.hasNonCyclic {
+			//
+			// The skip must not fire, though, when a dynamic node re-enters a
+			// not-yet-finalized disjunction: that is self-feeding recursion
+			// reoccurring through a different reference per disjunct at the same
+			// depth, so the skip would let every disjunct re-expand the whole
+			// disjunction. markCyclicPath bounds it instead.
+			selfFeeding := n.node.IsDynamic && arc.Status() != finalized && hasDisjunctConjunct(arc)
+			if r.Ref != x && n.hasNonCycle && n.hasNonCyclic && !selfFeeding {
 				continue
 			}
 

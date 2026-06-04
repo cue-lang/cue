@@ -16,6 +16,7 @@ sub1/cue.mod/module.cue: file is in another module
 sub1/something.cue: file is in another module
 sub2/CUE.MOD/module.cue: file is in another module
 .hg_archival.txt: file is inserted by 'hg archive' and is always omitted
+cue.mod/local-module.cue: cue.mod/local-module.cue holds development-time configuration and is never part of a published module
 
 invalid:
 cue.mod/Module.cue: cue.mod/module.cue files must have lowercase names
@@ -40,6 +41,7 @@ valid.go: multiple entries for file "valid.go"
 -- sub1/something.cue --
 -- sub2/CUE.MOD/module.cue --
 -- .hg_archival.txt --
+-- cue.mod/local-module.cue --
 -- valid.go --
 duplicate
 -- valid.go --

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5df0364_71910f72",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-04T12:26:49Z",
+      "side": 1,
+      "message": "We can just omit this field, which amounts to the same thing.",
+      "revId": "d02bcbfda47d8a0651e35ab3efdc6698bb56b380",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

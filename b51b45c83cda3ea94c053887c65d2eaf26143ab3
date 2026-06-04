@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cec83076_e43e4fa4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-04T16:58:00Z",
+      "side": 1,
+      "message": "LGTM with a small simplifying suggestion.",
+      "revId": "b51b45c83cda3ea94c053887c65d2eaf26143ab3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28cd6282_4c668783",
+        "filename": "encoding/jsonschema/crd.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-04T16:58:00Z",
+      "side": 1,
+      "message": "Why not use sync.OnceValue ?\nWe can make a context for the purpose, and I think it\u0027s reasonable to panic if the schema compilation fails.",
+      "revId": "b51b45c83cda3ea94c053887c65d2eaf26143ab3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

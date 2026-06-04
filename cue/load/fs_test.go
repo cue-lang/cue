@@ -192,6 +192,12 @@ module: "example.com/main@v0"
 language: version: "v0.17.0"
 deps: "example.com/dep@v0": {
 	v: "v0.1.0"
+}
+`),
+		},
+		"cue.mod/local-module.cue": &fstest.MapFile{
+			Data: []byte(`deps: "example.com/dep@v0": {
+	v: "v0.1.0"
 	replace: "./local_dep"
 }
 -- main.cue --

@@ -37,9 +37,10 @@ import (
 )
 
 const (
-	cueSuffix  = ".cue"
-	modDir     = "cue.mod"
-	moduleFile = "module.cue"
+	cueSuffix       = ".cue"
+	modDir          = "cue.mod"
+	moduleFile      = "module.cue"
+	localModuleFile = "local-module.cue"
 )
 
 // FromArgsUsage is a partial usage message that applications calling
@@ -573,7 +574,37 @@ func (c *Config) loadModule() error {
 	// Set the default version for CUE files without a module.
 	c.parserConfig = c.parserConfig.Apply(parser.Version(c.modFile.Language.Version))
 
-	repls, err := c.buildReplacements(mf)
+	// Replace directives belong in cue.mod/local-module.cue, not in
+	// module.cue, so that published modules never carry them.
+	for mpath, dep := range mf.Deps {
+		if dep.Replace != "" {
+			return errors.Newf(token.NoPos, "replace directive for %q is not allowed in module.cue; put it in cue.mod/%s", mpath, localModuleFile)
+		}
+	}
+
+	// If a cue.mod/local-module.cue file is present, it holds the
+	// main-module view of the dependencies (with replace directives
+	// applied), taking precedence over module.cue's deps when loading.
+	localFile := pkgpath.Join([]string{modDir, localModuleFile}, c.pathOS)
+	if lf, cerr := c.fileSystem.openFile(localFile); cerr == nil {
+		data, err := io.ReadAll(lf)
+		lf.Close()
+		if err != nil {
+			return err
+		}
+		localMF, err := modfile.ParseLocal(data, localFile, mf)
+		if err != nil {
+			return err
+		}
+		c.modFile = localMF
+	} else if !errors.Is(cerr, fs.ErrNotExist) && runtime.GOOS != "windows" {
+		// On Windows we cannot reliably distinguish "does not exist" from
+		// "is not a directory" (see the module.cue handling above), so we
+		// treat any open failure there as an absent (optional) file.
+		return cerr
+	}
+
+	repls, err := c.buildReplacements(c.modFile)
 	if err != nil {
 		return err
 	}

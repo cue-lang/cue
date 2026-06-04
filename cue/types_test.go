@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -1522,6 +1523,24 @@ func TestFillPath(t *testing.T) {
 				}
 			})
 		}
+	})
+}
+
+// TestFillPathOptional is a regression test for
+// https://cuelang.org/issue/2127: FillPath used to export filled
+// fields as optional even though they are regular fields.
+func TestFillPathOptional(t *testing.T) {
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
+		strType := ctx.CompileString(`string`)
+
+		w := ctx.CompileString(`{}`).
+			FillPath(cue.ParsePath("a"), strType).
+			FillPath(cue.ParsePath("#b"), strType)
+
+		b, err := format.Node(w.Syntax(cue.All()))
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(string(b), "{\n\ta:  string\n\t#b: string\n}"))
 	})
 }
 

@@ -111,6 +111,38 @@ func Format(f *File) ([]byte, error) {
 	return data, err
 }
 
+// FormatLocal formats f as a cue.mod/local-module.cue file: a deps-only
+// document that omits the module path and language version, which a
+// local-module.cue file inherits from the accompanying module.cue file.
+//
+// f must carry a language version (typically taken from module.cue); it is
+// used to validate the formatted result via [ParseLocal].
+func FormatLocal(f *File) ([]byte, error) {
+	// Encode only the deps so that the module path and language version
+	// are not written; those belong exclusively to module.cue.
+	depsOnly := struct {
+		Deps map[string]*Dep `json:"deps,omitempty"`
+	}{
+		Deps: f.Deps,
+	}
+	v := cuecontext.New().Encode(depsOnly)
+	if err := v.Validate(cue.Concrete(true)); err != nil {
+		return nil, err
+	}
+	n := v.Syntax(cue.Concrete(true)).(*ast.StructLit)
+	data, err := format.Node(&ast.File{
+		Decls: n.Elts,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot format: %v", err)
+	}
+	// Sanity check that the result parses against f's identity.
+	if _, err := ParseLocal(data, "-", f); err != nil {
+		return nil, fmt.Errorf("cannot parse result: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
+	}
+	return data, nil
+}
+
 type noDepsFile struct {
 	Module string `json:"module"`
 }

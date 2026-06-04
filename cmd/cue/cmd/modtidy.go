@@ -17,6 +17,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -24,6 +25,7 @@ import (
 
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/module"
 )
 
 func newModTidyCmd(c *Command) *cobra.Command {
@@ -46,6 +48,7 @@ determine the modules registry.
 		Args: cobra.ExactArgs(0),
 	}
 	cmd.Flags().Bool(string(flagCheck), false, "check for tidiness after fetching dependencies; fail if module.cue would be updated")
+	cmd.Flags().Bool(string(flagLocalOnly), false, "only update cue.mod/local-module.cue, leaving cue.mod/module.cue unchanged")
 
 	return cmd
 }
@@ -60,26 +63,50 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	opts := &modload.TidyOptions{
+		ModuleRootDir: modRoot,
+		OpenDir: func(p string) (fs.FS, error) {
+			return module.OSDirFS(p), nil
+		},
+		LocalOnly: flagLocalOnly.Bool(cmd),
+	}
 	if flagCheck.Bool(cmd) {
-		err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg)
+		err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg, opts)
 		return suggestModCommand(err)
 	}
-	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg)
+	res, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, opts)
 	if err != nil {
 		return suggestModCommand(err)
 	}
-	data, err := modfile.Format(mf)
-	if err != nil {
-		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
+	if res.Module != nil {
+		if err := writeModuleFile(filepath.Join(modRoot, "cue.mod", "module.cue"), modfile.Format, res.Module); err != nil {
+			return err
+		}
 	}
-	modPath := filepath.Join(modRoot, "cue.mod", "module.cue")
-	oldData, err := os.ReadFile(modPath)
-	if err != nil {
-		// Shouldn't happen because modload.Load returns an error
-		// if it can't load the module file.
+	localPath := filepath.Join(modRoot, "cue.mod", "local-module.cue")
+	if res.Local != nil {
+		return writeModuleFile(localPath, modfile.FormatLocal, res.Local)
+	}
+	// No replace directives remain (or --local-only with none): the
+	// local-module.cue file serves no purpose, so remove it if present.
+	if err := os.Remove(localPath); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
-	return writeFileIfChanged(modPath, oldData, data, 0o666)
+	return nil
+}
+
+// writeModuleFile formats mf with the given formatter and writes it to
+// filename, skipping the write when the content is unchanged.
+func writeModuleFile(filename string, format func(*modfile.File) ([]byte, error), mf *modfile.File) error {
+	data, err := format(mf)
+	if err != nil {
+		return fmt.Errorf("internal error: invalid module file generated for %s: %v", filename, err)
+	}
+	oldData, err := os.ReadFile(filename)
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return err
+	}
+	return writeFileIfChanged(filename, oldData, data, 0o666)
 }
 
 // suggestModCommand rewrites a non-nil error to suggest to the user

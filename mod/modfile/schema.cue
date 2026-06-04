@@ -62,7 +62,12 @@ versions: "v0.9.0-alpha.0": {
 
 	// The replace field was added in v0.17.0, so "remove"
 	// it here by marking it as an error when used.
-	#File: #Dep: replace?: _errorReplaceFieldRequiredVersion
+	#File: #Dep: {
+		replace?: _errorReplaceFieldRequiredVersion
+		// versions were mandatory until v0.17.0 allowed
+		// them to be omitted within local-module.cue.
+		v!: _
+	}
 }
 
 versions: "v0.17.0": {
@@ -96,8 +101,10 @@ versions: "v0.17.0": {
 		#Dep: {
 			// v indicates the minimum required version of the module. This can
 			// be null if the version is unknown and the module entry is only
-			// present to be replaced.
-			v!: #Semver | null
+			// present to be replaced. In a cue.mod/local-module.cue file it may
+			// also be omitted entirely for a dependency that is also present in
+			// cue.mod/module.cue, in which case the version is taken from there.
+			v?: #Semver | null
 
 			// default indicates this module is used as a default in case more
 			// than one major version is specified for the same module path.

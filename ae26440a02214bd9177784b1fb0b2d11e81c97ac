@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ade27577_bf817a2a",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-04T11:25:13Z",
+      "side": 1,
+      "message": "I haven\u0027t reasoned through if this should be directly in nodeContex (get\u0027s zeroed out on cloning), or here (pointer survives cloning). Either could be fine. Give it a though.",
+      "revId": "ae26440a02214bd9177784b1fb0b2d11e81c97ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -61,7 +61,7 @@ listCheck: err: #IntStrings
 listCheck: err: [1, "foo", "bar", 2] @test(err, code=eval, path=2, contains="conflicting values %s and %s (mismatched types %s and %s)", args=["bar", int, string, int], pos=[-5:14, -5:15, -5:28, -1:17, 0:28])
 
 -- withlet.cue --
-@experiment(aliasv2)
+@experiment(try,aliasv2)
 
 withLet: {
 	let X = self
@@ -71,6 +71,36 @@ withLet: {
 		baz: X.foo
 	}
 } @test(eq, {foo: 1, bar: {baz: 1}})
+
+// A let bound to self must capture fields produced by if/for/try
+// comprehensions, not only statically declared ones.
+// See https://cuelang.org/issue/4376.
+withLetComprehension: {
+	let X = self
+	direct: "a"
+	if true {
+		viaIf: "b"
+	}
+	for k, v in {viaFor: "c"} {
+		(k): v
+	}
+	try {
+		viaTry: "d"
+	}
+	seeDirect: X.direct
+	seeIf:     X.viaIf
+	seeFor:    X.viaFor
+	seeTry:    X.viaTry
+} @test(eq:todo, {
+	direct:    "a"
+	viaIf:     "b"
+	viaFor:    "c"
+	viaTry:    "d"
+	seeDirect: "a"
+	seeIf:     "b"
+	seeFor:    "c"
+	seeTry:    "d"
+})
 -- validator.cue --
 @experiment(structcmp)
 @experiment(aliasv2)
@@ -257,3 +287,9 @@ a: {
     ./validator.cue:19:12
     ./validator.cue:18:12
     ./validator.cue:19:19
+[incomplete] withLetComprehension.seeIf: undefined field: viaIf:
+    ./withlet.cue:28:15
+[incomplete] withLetComprehension.seeFor: undefined field: viaFor:
+    ./withlet.cue:29:15
+[incomplete] withLetComprehension.seeTry: undefined field: viaTry:
+    ./withlet.cue:30:15

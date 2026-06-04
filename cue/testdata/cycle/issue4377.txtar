@@ -1,0 +1,161 @@
+# Tests that a recursive disjunction instantiated through inline expressions
+# does not cause a combinatorial blowup in cycle detection: each
+# (#fieldTransform & {#type: ...}) re-enters the unfinalized disjunction and was
+# mistaken for structure sharing, evaluating correctly but ~50x slower. The
+# stats below guard against a regression; they explode without the fix.
+# https://cuelang.org/issue/4377
+#inlinetest:exclude skip — perf regression guarded by out/eval/stats
+-- in.cue --
+out: {
+	for name, info in fields {
+		(name): (#fieldTransform & {#type: info.type}).out
+	}
+}
+
+#fieldTransform: F={
+	#type!: "string" | "bool"
+	out: {}
+} | {
+	#type!: ["list", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+} | {
+	#type!: ["a", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+} | {
+	#type!: ["b", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+} | {
+	#type!: ["c", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+} | {
+	#type!: ["d", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+}
+
+fields: {
+	s1: type: "string"
+	s2: type: "string"
+	b1: type: "bool"
+	b2: type: "bool"
+	l1: type: ["list", "string"]
+	l2: type: ["list", "string"]
+}
+-- out/eval/stats --
+Leaks:  49
+Freed:  469767
+Reused: 469696
+Allocs: 120
+Retain: 0
+
+Unifications: 281823
+Conjuncts:    490724
+Disjuncts:    83512
+
+NumCloseIDs: 10515
+-- out/evalalpha --
+(struct){
+  out: (struct){
+    s1: (#struct){
+    }
+    s2: (#struct){
+    }
+    b1: (#struct){
+    }
+    b2: (#struct){
+    }
+    l1: (#struct){
+      items: (#struct){
+      }
+    }
+    l2: (#struct){
+      items: (#struct){
+      }
+    }
+  }
+  #fieldTransform: (#struct){ |((#struct){
+      #type!: (string){ |((string){ "string" }, (string){ "bool" }) }
+      out: (#struct){
+      }
+    }, (#struct){
+      #type!: (#list){
+        0: (string){ "list" }
+        1: (_){ _ }
+      }
+      out: (#struct){
+        items: (_|_){
+          // [incomplete] #fieldTransform.out.items: undefined field: out:
+          //     ./in.cue:12:54
+        }
+      }
+    }, (#struct){
+      #type!: (#list){
+        0: (string){ "a" }
+        1: (_){ _ }
+      }
+      out: (#struct){
+        items: (_|_){
+          // [incomplete] #fieldTransform.out.items: undefined field: out:
+          //     ./in.cue:15:54
+        }
+      }
+    }, (#struct){
+      #type!: (#list){
+        0: (string){ "b" }
+        1: (_){ _ }
+      }
+      out: (#struct){
+        items: (_|_){
+          // [incomplete] #fieldTransform.out.items: undefined field: out:
+          //     ./in.cue:18:54
+        }
+      }
+    }, (#struct){
+      #type!: (#list){
+        0: (string){ "c" }
+        1: (_){ _ }
+      }
+      out: (#struct){
+        items: (_|_){
+          // [incomplete] #fieldTransform.out.items: undefined field: out:
+          //     ./in.cue:21:54
+        }
+      }
+    }, (#struct){
+      #type!: (#list){
+        0: (string){ "d" }
+        1: (_){ _ }
+      }
+      out: (#struct){
+        items: (_|_){
+          // [incomplete] #fieldTransform.out.items: undefined field: out:
+          //     ./in.cue:24:54
+        }
+      }
+    }) }
+  fields: (struct){
+    s1: (struct){
+      type: (string){ "string" }
+    }
+    s2: (struct){
+      type: (string){ "string" }
+    }
+    b1: (struct){
+      type: (string){ "bool" }
+    }
+    b2: (struct){
+      type: (string){ "bool" }
+    }
+    l1: (struct){
+      type: (#list){
+        0: (string){ "list" }
+        1: (string){ "string" }
+      }
+    }
+    l2: (struct){
+      type: (#list){
+        0: (string){ "list" }
+        1: (string){ "string" }
+      }
+    }
+  }
+}

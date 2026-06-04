@@ -1,0 +1,133 @@
+# Tests that a recursive disjunction instantiated through inline expressions
+# does not cause a combinatorial blowup in cycle detection: each
+# (#fieldTransform & {#type: ...}) re-enters the unfinalized disjunction and was
+# mistaken for structure sharing, evaluating correctly but ~50x slower. The
+# stats below guard against a regression; they explode without the fix.
+# https://cuelang.org/issue/4377
+#inlinetest:exclude skip — perf regression guarded by out/eval/stats
+-- in.cue --
+out: {
+	for name, info in fields {
+		(name): (#fieldTransform & {#type: info.type}).out
+	}
+}
+
+#fieldTransform: F={
+	#type!: "string" | "bool"
+	out: {}
+} | {
+	#type!: ["list", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+} | {
+	#type!: ["a", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+} | {
+	#type!: ["b", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+} | {
+	#type!: ["c", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+} | {
+	#type!: ["d", _]
+	out: items: (#fieldTransform & {#type: F.#type[1]}).out
+}
+
+fields: {
+	s1: type: "string"
+	s2: type: "string"
+	b1: type: "bool"
+	b2: type: "bool"
+	l1: type: ["list", "string"]
+	l2: type: ["list", "string"]
+}
+-- out/compile --
+--- in.cue
+{
+  out: {
+    for name, info in 〈1;fields〉 {
+      〈1;name〉: (〈3;#fieldTransform〉 & {
+        #type: 〈2;info〉.type
+      }).out
+    }
+  }
+  #fieldTransform: ({
+    #type!: ("string"|"bool")
+    out: {}
+  }|{
+    #type!: [
+      "list",
+      _,
+    ]
+    out: {
+      items: (〈2;#fieldTransform〉 & {
+        #type: 〈3〉.#type[1]
+      }).out
+    }
+  }|{
+    #type!: [
+      "a",
+      _,
+    ]
+    out: {
+      items: (〈2;#fieldTransform〉 & {
+        #type: 〈3〉.#type[1]
+      }).out
+    }
+  }|{
+    #type!: [
+      "b",
+      _,
+    ]
+    out: {
+      items: (〈2;#fieldTransform〉 & {
+        #type: 〈3〉.#type[1]
+      }).out
+    }
+  }|{
+    #type!: [
+      "c",
+      _,
+    ]
+    out: {
+      items: (〈2;#fieldTransform〉 & {
+        #type: 〈3〉.#type[1]
+      }).out
+    }
+  }|{
+    #type!: [
+      "d",
+      _,
+    ]
+    out: {
+      items: (〈2;#fieldTransform〉 & {
+        #type: 〈3〉.#type[1]
+      }).out
+    }
+  })
+  fields: {
+    s1: {
+      type: "string"
+    }
+    s2: {
+      type: "string"
+    }
+    b1: {
+      type: "bool"
+    }
+    b2: {
+      type: "bool"
+    }
+    l1: {
+      type: [
+        "list",
+        "string",
+      ]
+    }
+    l2: {
+      type: [
+        "list",
+        "string",
+      ]
+    }
+  }
+}

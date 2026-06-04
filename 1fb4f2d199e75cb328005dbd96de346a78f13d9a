@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80585dcd_34a2480a",
+        "filename": "cue/testdata/cycle/issue4377.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-04T14:16:10Z",
+      "side": 1,
+      "message": "Nice!",
+      "revId": "1fb4f2d199e75cb328005dbd96de346a78f13d9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

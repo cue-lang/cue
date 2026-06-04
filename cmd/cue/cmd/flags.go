@@ -49,6 +49,7 @@ const (
 	flagJSON            flagName = "json"
 	flagLanguageVersion flagName = "language-version"
 	flagList            flagName = "list"
+	flagLocalOnly       flagName = "local-only"
 	flagMerge           flagName = "merge"
 	flagMod             flagName = "mod"
 	flagNoDeps          flagName = "no-deps"

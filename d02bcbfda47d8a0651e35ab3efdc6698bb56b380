@@ -16,6 +16,24 @@
       "message": "We can just omit this field, which amounts to the same thing.",
       "revId": "d02bcbfda47d8a0651e35ab3efdc6698bb56b380",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9defe912_84a723e4",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-05T08:53:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d5df0364_71910f72",
+      "revId": "d02bcbfda47d8a0651e35ab3efdc6698bb56b380",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -35,7 +35,14 @@ import (
 // GenerateConfig configures JSON Schema generation from CUE values.
 type GenerateConfig struct {
 	// Version specifies the version of JSON Schema to generate.
-	// Currently only [VersionDraft2020_12] is supported.
+	// The supported versions are [VersionDraft2020_12] (the default),
+	// [VersionDraft7], and [VersionOpenAPI] (the JSON-Schema-like dialect
+	// used by OpenAPI 3.0).
+	//
+	// Because CUE is more expressive than any JSON Schema dialect,
+	// generation is best-effort: constraints that cannot be represented
+	// in the target dialect are rendered as permissively as possible
+	// rather than causing an error.
 	Version Version
 
 	// NameFunc is used to determine how a reference maps to a JSON Schema
@@ -84,6 +91,80 @@ func (m closedMode) descend() closedMode {
 	return open
 }
 
+// tupleStyle describes how a dialect renders heterogeneous (tuple) lists.
+type tupleStyle int
+
+const (
+	// tuplePrefixItems uses prefixItems for the known prefix and items
+	// for the rest (JSON Schema 2020-12 and later).
+	tuplePrefixItems tupleStyle = iota
+	// tupleItemsArray uses an array-valued items keyword for the known
+	// prefix and additionalItems for the rest (drafts up to and
+	// including draft-07).
+	tupleItemsArray
+	// tupleWiden has no tuple support: the prefix and rest schemas are
+	// widened into a single items schema (OpenAPI 3.0).
+	tupleWiden
+)
+
+// generateDialect describes how a particular schema version renders the
+// version-independent item tree built by [generator.makeItem]. All
+// version-specific divergence in the generated output is expressed here.
+type generateDialect struct {
+	version Version
+
+	// emitSchemaKeyword reports whether a top-level $schema keyword is
+	// emitted. OpenAPI schema objects do not carry $schema.
+	emitSchemaKeyword bool
+
+	// refPrefix holds the JSON Pointer tokens identifying where
+	// definitions live within the generated document, for example
+	// {"$defs"}, {"definitions"} or {"components", "schemas"}. It is
+	// used both to nest the definitions and to construct $ref pointers.
+	refPrefix []string
+
+	// allowTypeArray reports whether the type keyword may hold an array
+	// of type names. OpenAPI 3.0 requires a single type string.
+	allowTypeArray bool
+
+	// nullViaNullable reports whether nullability is expressed with a
+	// nullable: true keyword rather than including "null" in type.
+	nullViaNullable bool
+
+	// numericExclusive reports whether exclusiveMinimum/exclusiveMaximum
+	// hold numbers (draft-06 and later). When false they are booleans
+	// accompanying minimum/maximum (draft-04 and OpenAPI 3.0).
+	numericExclusive bool
+
+	// supportsConst reports whether the const keyword is available.
+	// When false a single-valued enum is emitted instead.
+	supportsConst bool
+
+	// tuples describes how heterogeneous lists are rendered.
+	tuples tupleStyle
+
+	// supportsContains reports whether the contains keyword is available.
+	supportsContains bool
+
+	// supportsMinMaxContains reports whether minContains/maxContains are
+	// available (2019-09 and later).
+	supportsMinMaxContains bool
+
+	// supportsPatternProperties reports whether patternProperties is
+	// available.
+	supportsPatternProperties bool
+
+	// supportsIfThenElse reports whether if/then/else are available
+	// (draft-07 and later).
+	supportsIfThenElse bool
+
+	// refComposesWithSiblings reports whether keywords adjacent to a
+	// $ref are honored. Before 2019-09 (so for draft-07 and OpenAPI 3.0)
+	// a $ref causes all sibling keywords to be ignored, so they must be
+	// kept out of any schema object that contains a $ref.
+	refComposesWithSiblings bool
+}
+
 // Generate generates a JSON Schema for the given CUE value,
 // with the returned AST representing the generated JSON result.
 //
@@ -118,14 +199,16 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if cfg.Version == VersionUnknown {
 		cfg.Version = VersionDraft2020_12
 	}
-	if cfg.Version != VersionDraft2020_12 {
-		return nil, fmt.Errorf("only version %v is supported for generating JSON Schema for now", VersionDraft2020_12)
+	d, err := newGenerateDialect(cfg.Version)
+	if err != nil {
+		return nil, err
 	}
 
 	g := &generator{
-		cfg:    cfg,
-		defs:   anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
-		unique: newUniqueItems(),
+		cfg:     cfg,
+		dialect: d,
+		defs:    anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
+		unique:  newUniqueItems(),
 	}
 	mode := open
 	switch {
@@ -183,21 +266,27 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	}
 
 	// Add schema version metadata and definitions.
-	fields := []ast.Decl{makeField("$schema", ast.NewString(cfg.Version.String()))}
+	var fields []ast.Decl
+	if g.dialect.emitSchemaKeyword {
+		fields = append(fields, makeField("$schema", ast.NewString(cfg.Version.String())))
+	}
 	if len(defKeys) > 0 {
 		defFields := make([]ast.Decl, 0, len(defKeys))
 		for _, k := range defKeys {
 			def := optimize(g.defs.At(k), g.unique)
 			defFields = append(defFields, makeField(k.Name, def.Value().generate(g)))
 		}
-		fields = append(fields, makeField("$defs", &ast.StructLit{Elts: defFields}))
+		fields = append(fields, makeNestedField(g.dialect.refPrefix, &ast.StructLit{Elts: defFields}))
 	}
 	fields = append(fields, st.Elts...)
 
 	if g.err != nil {
 		return nil, g.err
 	}
-	return makeSchemaStructLit(fields...), nil
+	// When the root schema is itself a $ref, keep it out of the same
+	// schema object as $schema and the definitions for dialects that
+	// would otherwise ignore those keywords.
+	return isolateRef(g, makeSchemaStructLit(fields...)), nil
 }
 
 func optimize(it internItem, u *uniqueItems) internItem {
@@ -297,6 +386,10 @@ func enumFromConst(it0 internItem, u *uniqueItems) internItem {
 
 type generator struct {
 	cfg *GenerateConfig
+
+	// dialect describes how the target schema version renders the
+	// item tree.
+	dialect generateDialect
 
 	// err holds any errors accumulated during translation.
 	err errors.Error
@@ -1241,6 +1334,61 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 		a.elems = append(a.elems, g.unique.intern(items))
 	}
 	return a
+}
+
+// newGenerateDialect returns the dialect used to generate the given version.
+func newGenerateDialect(v Version) (generateDialect, error) {
+	switch v {
+	case VersionDraft2020_12:
+		return generateDialect{
+			version:                   v,
+			emitSchemaKeyword:         true,
+			refPrefix:                 []string{"$defs"},
+			allowTypeArray:            true,
+			nullViaNullable:           false,
+			numericExclusive:          true,
+			supportsConst:             true,
+			tuples:                    tuplePrefixItems,
+			supportsContains:          true,
+			supportsMinMaxContains:    true,
+			supportsPatternProperties: true,
+			supportsIfThenElse:        true,
+			refComposesWithSiblings:   true,
+		}, nil
+	case VersionDraft7:
+		return generateDialect{
+			version:                   v,
+			emitSchemaKeyword:         true,
+			refPrefix:                 []string{"definitions"},
+			allowTypeArray:            true,
+			nullViaNullable:           false,
+			numericExclusive:          true,
+			supportsConst:             true,
+			tuples:                    tupleItemsArray,
+			supportsContains:          true,
+			supportsMinMaxContains:    false,
+			supportsPatternProperties: true,
+			supportsIfThenElse:        true,
+			refComposesWithSiblings:   false,
+		}, nil
+	case VersionOpenAPI:
+		return generateDialect{
+			version:                   v,
+			emitSchemaKeyword:         false,
+			refPrefix:                 []string{"components", "schemas"},
+			allowTypeArray:            false,
+			nullViaNullable:           true,
+			numericExclusive:          false,
+			supportsConst:             false,
+			tuples:                    tupleWiden,
+			supportsContains:          false,
+			supportsMinMaxContains:    false,
+			supportsPatternProperties: false,
+			supportsIfThenElse:        false,
+			refComposesWithSiblings:   false,
+		}, nil
+	}
+	return generateDialect{}, fmt.Errorf("version %v is not supported for generating JSON Schema", v)
 }
 
 func join(it1, it2 internItem, u *uniqueItems) internItem {

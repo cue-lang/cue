@@ -1,0 +1,126 @@
+# Generation of the JSON Schema draft-07 dialect. Exercises the
+# version-specific renderings: the draft-07 $schema URI, definitions (not
+# $defs) with #/definitions refs, and the array-valued items form for
+# tuples (plus additionalItems) rather than prefixItems. const and numeric
+# exclusive bounds are retained, matching draft-07. The score field also
+# checks that a reference combined with a constraint keeps the constraint in
+# effect: draft-07 ignores keywords adjacent to $ref, so the constraint must
+# be emitted as a sibling of an allOf rather than of the $ref itself.
+#version: draft7
+#path: root
+-- test.cue --
+package test
+
+#Foo: {
+	name?: string
+	age?:  int & >0 & <150
+	kind?: =="widget"
+	pair?: [string, int]
+}
+#Score: int
+root: {
+	foo?:   #Foo
+	score?: #Score & >0
+}
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: foo: {
+	name: "x"
+	age:  30
+	kind: "widget"
+	pair: ["a", 1]
+}
+errKind: {
+	data: foo: kind: "other"
+	error: true
+}
+errAgeTooBig: {
+	data: foo: age: 200
+	error: true
+}
+errPairOrder: {
+	data: foo: pair: [1, "a"]
+	error: true
+}
+okScore: data: score: 5
+errScore: {
+	data: score: 0
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "http://json-schema.org/draft-07/schema#"
+	definitions: {
+		Foo: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				age: {
+					allOf: [{
+						type: "number"
+					}, {
+						type:             "integer"
+						exclusiveMaximum: 150
+						exclusiveMinimum: 0
+					}]
+				}
+				kind: {
+					const: "widget"
+				}
+				name: {
+					type: "string"
+				}
+				pair: {
+					type: "array"
+					items: [{
+						type: "string"
+					}, {
+						type: "integer"
+					}]
+					maxItems: 2
+					minItems: 2
+				}
+			}
+		}
+		Score: {
+			type: "integer"
+		}
+	}
+	type: "object"
+	properties: {
+		foo: {
+			$ref: "#/definitions/Foo"
+		}
+		score: {
+			allOf: [{
+				$ref: "#/definitions/Score"
+			}, {
+				type:             "number"
+				exclusiveMinimum: 0
+			}]
+		}
+	}
+}
+-- out/generate-v3/errAgeTooBig --
+errAgeTooBig.data.foo.age: invalid value 200 (out of bound <150):
+    1:187
+    ./datatest/tests.cue:14:18
+-- out/generate-v3/errKind --
+errKind.data.foo.kind: conflicting values "widget" and "other":
+    ./datatest/tests.cue:10:19
+    1:242
+    1:449
+-- out/generate-v3/errPairOrder --
+errPairOrder.data.foo.pair.0: conflicting values 1 and string (mismatched types int and string):
+    ./datatest/tests.cue:18:20
+    1:449
+-- out/generate-v3/ok1 --
+-- out/generate-v3/errScore --
+errScore.data.score: invalid value 0 (does not satisfy matchN): 1 matched, expected 2:
+    1:486
+    ./datatest/tests.cue:23:15
+errScore.data.score: invalid value 0 (out of bound >0):
+    1:543
+    ./datatest/tests.cue:23:15
+-- out/generate-v3/okScore --

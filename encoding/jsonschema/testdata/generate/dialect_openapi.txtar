@@ -1,0 +1,140 @@
+# Generation of the OpenAPI 3.0 schema dialect. Exercises the
+# version-specific renderings: no $schema keyword, definitions under
+# components/schemas with #/components/schemas refs, const rendered as a
+# single-valued enum, exclusive bounds as boolean keywords accompanying
+# minimum/maximum, null rendered via enum, type unions widened to anyOf,
+# and tuples widened to a single items schema.
+#version: openapi
+#path: root
+-- test.cue --
+package test
+
+#Foo: {
+	name?:   string
+	age?:    int & >0 & <150
+	kind?:   =="widget"
+	nick?:   string | null
+	either?: int | string
+	pair?:   [string, int]
+}
+root: {
+	foo?: #Foo
+}
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: foo: {
+	name:   "x"
+	age:    30
+	kind:   "widget"
+	nick:   null
+	either: "s"
+	pair: ["a", 1]
+}
+ok2: data: foo: {
+	nick: "present"
+}
+errKind: {
+	data: foo: kind: "other"
+	error: true
+}
+errAgeTooBig: {
+	data: foo: age: 200
+	error: true
+}
+errAgeNotPositive: {
+	data: foo: age: 0
+	error: true
+}
+errEither: {
+	data: foo: either: true
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	components: {
+		schemas: {
+			Foo: {
+				type:                 "object"
+				additionalProperties: false
+				properties: {
+					age: {
+						allOf: [{
+							type: "number"
+						}, {
+							type:             "integer"
+							exclusiveMaximum: true
+							exclusiveMinimum: true
+							maximum:          150
+							minimum:          0
+						}]
+					}
+					either: {
+						anyOf: [{
+							type: "integer"
+						}, {
+							type: "string"
+						}]
+					}
+					kind: {
+						enum: ["widget"]
+					}
+					name: {
+						type: "string"
+					}
+					nick: {
+						anyOf: [{
+							type: "string"
+						}, {
+							enum: [null]
+						}]
+					}
+					pair: {
+						type: "array"
+						items: {
+							anyOf: [{
+								type: "string"
+							}, {
+								type: "integer"
+							}]
+						}
+						maxItems: 2
+						minItems: 2
+					}
+				}
+			}
+		}
+	}
+	type: "object"
+	properties: {
+		foo: {
+			$ref: "#/components/schemas/Foo"
+		}
+	}
+}
+-- out/generate-v3/errAgeNotPositive --
+errAgeNotPositive.data.foo.age: invalid value 0 (out of bound >0):
+    1:207
+    ./datatest/tests.cue:23:18
+-- out/generate-v3/errAgeTooBig --
+errAgeTooBig.data.foo.age: invalid value 200 (out of bound <150):
+    1:193
+    ./datatest/tests.cue:19:18
+-- out/generate-v3/errEither --
+errEither.data.foo.either: conflicting values true and int (mismatched types bool and int):
+    ./datatest/tests.cue:27:21
+    1:242
+    1:533
+errEither.data.foo.either: conflicting values true and string (mismatched types bool and string):
+    ./datatest/tests.cue:27:21
+    1:533
+errEither.data.foo.either: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
+    1:232
+    ./datatest/tests.cue:27:21
+-- out/generate-v3/errKind --
+errKind.data.foo.kind: conflicting values "widget" and "other":
+    ./datatest/tests.cue:15:19
+    1:288
+    1:533
+-- out/generate-v3/ok1 --
+-- out/generate-v3/ok2 --

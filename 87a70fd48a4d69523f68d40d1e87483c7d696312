@@ -16,6 +16,24 @@
       "message": "perhaps mention briefly whether we think that the new ModFile method will be enough for the foreseeable future, i.e. that we\u0027re trying to avoid further breakages with features we are likely to implement in modules over the coming years, like:\n* module-to-module replacements\n* \"ignore\" directive like Go\n* module dependency checksums\n* vendoring",
       "revId": "87a70fd48a4d69523f68d40d1e87483c7d696312",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dad9857f_5580efca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-05T16:57:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83013780_21093963",
+      "revId": "87a70fd48a4d69523f68d40d1e87483c7d696312",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d9968ef_1136c604",
+        "filename": "cue/load/replace.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-05T08:54:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fcb1ee40_71dddcd5",
+      "revId": "d8501922880bfd1930b614e8048dd7c2530d8449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0caac0d9_383d35c9",

@@ -1,6 +1,8 @@
 # Tests for isValid and validN builtins
 
 -- in.cue --
+@experiment(reflect)
+
 // isValid with concrete values
 validConcrete: {
 	a:      1
@@ -89,6 +91,8 @@ isValidExistingInvalid: {
 }
 
 -- existing.cue --
+@experiment(reflect)
+
 import "list"
 
 isValidIncomplete: {
@@ -126,182 +130,36 @@ isValidIncomplete: {
 }
 -- out/errors.txt --
 [eval] validErrors.a: conflicting values 2 and 1:
-    ./in.cue:17:10
-    ./in.cue:17:14
+    ./in.cue:19:10
+    ./in.cue:19:14
 [eval] validErrors.b: conflicting values int and string (mismatched types int and string):
-    ./in.cue:20:5
-    ./in.cue:20:11
+    ./in.cue:22:5
+    ./in.cue:22:11
 [eval] validErrors.c.a: conflicting values 2 and 1:
-    ./in.cue:23:9
-    ./in.cue:23:18
+    ./in.cue:25:9
+    ./in.cue:25:18
 [eval] validErrors.d.a.b.c.d: conflicting values int and string (mismatched types int and string):
-    ./in.cue:26:18
-    ./in.cue:26:38
+    ./in.cue:28:18
+    ./in.cue:28:38
 [eval] validNCount.c: conflicting values 2 and 1:
-    ./in.cue:31:14
-    ./in.cue:34:5
-    ./in.cue:34:9
+    ./in.cue:33:14
+    ./in.cue:36:5
+    ./in.cue:36:9
 [eval] validNBounds.c: conflicting values 2 and 1:
-    ./in.cue:53:5
-    ./in.cue:53:9
+    ./in.cue:55:5
+    ./in.cue:55:9
 [eval] validNFailure.c: conflicting values 2 and 1:
-    ./in.cue:62:5
-    ./in.cue:62:9
+    ./in.cue:64:5
+    ./in.cue:64:9
 [eval] validNFailure.t1: validN: 2 matched, expected 3:
-    ./in.cue:64:6
-    ./in.cue:64:13
+    ./in.cue:66:6
+    ./in.cue:66:13
 [eval] validNEmbedFail.c: conflicting values 2 and 1:
-    ./in.cue:71:5
-    ./in.cue:71:9
+    ./in.cue:73:5
+    ./in.cue:73:9
 [eval] validNEmbedFail.t1: validN: 2 matched, expected >=3:
-    ./in.cue:72:6
-    ./in.cue:72:13
+    ./in.cue:74:6
+    ./in.cue:74:13
 [eval] isValidExistingInvalid.a.x: conflicting values 1 and "foo" (mismatched types int and string):
-    ./in.cue:84:12
-    ./in.cue:84:16
--- out/compile --
---- existing.cue
-{
-  isValidIncomplete: {
-    xc: close({})
-    xo: {}
-    okc2: {
-      if isValid(({} & {
-        s: [
-          for _, y in 〈3;xc〉.undefined {},
-        ]
-      })) {
-        a: 1
-      }
-    }
-    oko2: {
-      if isValid(({} & {
-        s: [
-          for _, y in 〈3;xo〉.undefined {},
-        ]
-      })) {
-        a: 1
-      }
-    }
-    okc3: {
-      if isValid({
-        s: [
-          for _, y in 〈3;xc〉.undefined {},
-        ]
-      }) {
-        a: 1
-      }
-    }
-    oko3: {
-      if isValid({
-        s: [
-          for _, y in 〈3;xo〉.undefined {},
-        ]
-      }) {
-        a: 1
-      }
-    }
-    viaLet: {
-      okc: {
-        let X#1 = 〈2;xc〉.undefined
-        let Y#2 = ({} & {
-          s: [
-            for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
-          ]
-        })
-        if isValid(〈0;let Y#2〉) {
-          〈1;let Y#2〉
-        }
-      }
-    }
-  }
-}
---- in.cue
-{
-  validConcrete: {
-    a: 1
-    checkA: isValid(〈0;a〉)
-  }
-  validNonConcrete: {
-    a: int
-    checkA: isValid(〈0;a〉)
-    b: >0
-    checkB: isValid(〈0;b〉)
-  }
-  validErrors: {
-    a: (1 & 2)
-    checkA: isValid(〈0;a〉)
-    b: (int & string)
-    checkB: isValid(〈0;b〉)
-    c: ({
-      a: 1
-    } & {
-      a: 2
-    })
-    checkC: isValid(〈0;c〉)
-    d: ({
-      a: {
-        b: {
-          c: {
-            d: int
-          }
-        }
-      }
-    } & {
-      a: {
-        b: {
-          c: {
-            d: string
-          }
-        }
-      }
-    })
-    checkD: isValid(〈0;d〉)
-  }
-  validNCount: {
-    a: 1
-    b: 2
-    c: (1 & 2)
-    validN(2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
-  }
-  validLiteral: {
-    checkInt: isValid(42)
-    checkString: isValid("hello")
-  }
-  validComputation: {
-    checkAdd: isValid((1 + 2))
-  }
-  validNBounds: {
-    a: 1
-    b: 2
-    c: (1 & 2)
-    t1: validN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
-    t2: validN(<=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
-  }
-  validNFailure: {
-    a: 1
-    b: 2
-    c: (1 & 2)
-    t1: validN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
-  }
-  validNEmbedFail: {
-    a: 1
-    b: 2
-    c: (1 & 2)
-    t1: validN(>=3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
-  }
-  isValidMissingRef: {
-    a: {
-      b?: {
-        c: {}
-      }
-    }
-    check: isValid(〈0;a〉.b.c)
-  }
-  isValidExistingInvalid: {
-    a: {
-      x: (1 & "foo")
-    }
-    check: isValid(〈0;a〉.x)
-  }
-}
+    ./in.cue:86:12
+    ./in.cue:86:16

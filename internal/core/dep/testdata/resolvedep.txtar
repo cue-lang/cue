@@ -1,7 +1,9 @@
 // TODO: note that the output has various *non-rooted** entries. These should
 // probably be eliminated. In general, it seems that the number of dependencies
-// reported is still too large. 
+// reported is still too large.
 -- in.cue --
+@experiment(reflect)
+
 _input: disjs: [{start: 1}, {}, {}, {},]
 a: b: (_convert & {in: _input}).out
 
@@ -40,20 +42,20 @@ _convert: {
 }
 -- out/dependencies-v3/field --
 line  reference                        path of resulting vertex
-2:    (_convert & {in: _input}).out => _convert.out
+4:    (_convert & {in: _input}).out => _convert.out
 -- out/dependencies-v3/all --
 line  reference                                        path of resulting vertex
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => **non-rooted**
-33:   l2                                            => **non-rooted**
-34:   l3                                            => **non-rooted**
-8:    (#chainedCompute & {"in": _firstOne.out}).out => #chainedCompute.l4
-2:    (_convert & {in: _input}).out                 => _convert.out
+34:   l1                                            => #disjunction.start
+27:   (#selectFirst & {"in": in}).out               => #selectFirst.out
+33:   in.start                                      => #selectFirstOne.out.start
+34:   l1                                            => **non-rooted**
+35:   l2                                            => **non-rooted**
+36:   l3                                            => **non-rooted**
+10:   (#chainedCompute & {"in": _firstOne.out}).out => #chainedCompute.l4
+4:    (_convert & {in: _input}).out                 => _convert.out
 -- out/dependencies-v3/dynamic --
 line  reference                        path of resulting vertex
-2:    (_convert & {in: _input}).out => _convert.out
+4:    (_convert & {in: _input}).out => _convert.out
 -- out/dependencies-v3/stats/field --
 // COUNT: 2
 -- out/dependencies-v3/stats/all --

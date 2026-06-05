@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4663a679_bdcfebdd",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-05T14:45:09Z",
+      "side": 1,
+      "message": "did you consider making ImportPath always canonical, which presumably would also solve this without needing an extra field? that also possibly seems to me like a better solution in the long term, because a canonicalized build instance is the same regardless of what the original import path looked like.\n\nif there\u0027s a specific reason why you cannot do that, then I\u0027d explicitly mention that in the commit message and code comments.",
+      "revId": "4ab9f3ea5418d2cc9c23cf1635070b9146b0eef6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

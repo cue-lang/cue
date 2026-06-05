@@ -48,6 +48,14 @@ func (v *Vertex) getBareState(c *OpContext) *nodeContext {
 	if v.status == finalized { // TODO: use BaseValue != nil
 		return nil
 	}
+	if v.frozen {
+		// A frozen Vertex is a read-only template (e.g. an imported package
+		// root shared across the runtime). It must never get per-evaluation
+		// state allocated on it, so that concurrent resolutions into it do not
+		// race. Its arcs are already materialized and its conjuncts are copied
+		// into each using context. See https://cuelang.org/issue/4379.
+		return nil
+	}
 	if v.state == nil {
 		v.state = c.newNodeContext(v)
 		v.state.initBare()

@@ -140,8 +140,30 @@ func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec
 		return pkg.Err
 	}
 
-	if _, err := x.Build(cfg, pkg); err != nil {
-		return err
+	v, buildErr := x.Build(cfg, pkg)
+	if buildErr != nil {
+		return buildErr
+	}
+
+	// An imported package root is shared across the entire runtime: the same
+	// *Vertex is handed out for every reference to the package, and references
+	// may be resolved concurrently (e.g. many goroutines unifying values that
+	// reach into the same import, or whose import sits in a lazily-evaluated
+	// position such as a pattern-constraint value). Lazily allocating and
+	// mutating per-evaluation state on that shared root then races.
+	//
+	// Freeze the import here, while building is still single-threaded.
+	// buildSpec is driven by static import specs (not lazy evaluation), so it
+	// visits every transitive import. Freezing materializes the package's arcs
+	// (so references can be resolved and their conjuncts copied into each using
+	// context) without forcing the field values, and marks the root read-only
+	// so no per-evaluation state is ever allocated on it. This both removes the
+	// race and keeps evaluation correct: the package is never finalized
+	// standalone, so context-dependent values and closedness are still computed
+	// in each using context. See https://cuelang.org/issue/4379.
+	if v != nil {
+		ctx := adt.NewContext(x, v)
+		v.FreezeImport(ctx)
 	}
 
 	return nil

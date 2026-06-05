@@ -231,6 +231,17 @@ type Vertex struct {
 	// The debug printer, for instance, takes extra care not to print in a loop.
 	IsShared bool
 
+	// frozen marks a Vertex as a read-only template whose arcs have been
+	// materialized (so lookups and conjunct-copying work) but whose field
+	// values have intentionally not been forced. It is set on imported
+	// package roots and their arcs, which are shared across the runtime: a
+	// frozen Vertex never gets per-evaluation state allocated on it, so it is
+	// safe to resolve into concurrently and it is never finalized standalone
+	// (which would bake in context-dependent values or closedness). Each
+	// using context instead copies the frozen Vertex's conjuncts and evaluates
+	// them in its own context. See https://cuelang.org/issue/4379.
+	frozen bool
+
 	// ArcType indicates the level of optionality of this arc.
 	ArcType ArcType
 
@@ -1035,6 +1046,54 @@ func (v *Vertex) CompleteArcs(c *OpContext) {
 		mode:       finalize,
 		checkTypos: true,
 	})
+}
+
+// FreezeImport prepares a shared imported package root for safe concurrent
+// use. It materializes the root's arcs (so that references into the package
+// can be resolved and their conjuncts copied) without forcing or finalizing
+// the field values, then marks the root and its arcs as frozen. A frozen
+// Vertex is a read-only template: it never gets per-evaluation state
+// allocated on it (see [Vertex.getBareState]), so concurrent resolutions into
+// the package do not race, and it is never finalized standalone (which would
+// bake in context-dependent values or closedness). See
+// https://cuelang.org/issue/4379.
+func (v *Vertex) FreezeImport(c *OpContext) {
+	if v.frozen {
+		return
+	}
+	// Materialize the package's arcs (to "conjuncts" status) so that
+	// references into the package resolve and their conjuncts can be copied
+	// into each using context. The typo (closedness) check is skipped: it
+	// would apply the package's importing-agnostic standalone closedness,
+	// whereas closedness must be (re)checked in each importing context.
+	saved := c.errs
+	c.errs = nil
+	c.unify(v, Flags{
+		status:     conjuncts,
+		condition:  allKnown,
+		mode:       finalize,
+		checkTypos: false,
+	})
+	c.errs = saved
+
+	v.freezeRecursive()
+}
+
+func (v *Vertex) freezeRecursive() {
+	if v.frozen {
+		return
+	}
+	v.frozen = true
+	for _, a := range v.Arcs {
+		a.freezeRecursive()
+	}
+}
+
+// IsFrozen reports whether v is a frozen read-only template, such as a
+// materialized imported package root or one of its arcs. See
+// [Vertex.FreezeImport].
+func (v *Vertex) IsFrozen() bool {
+	return v.frozen
 }
 
 func (v *Vertex) CompleteArcsOnly(c *OpContext) {

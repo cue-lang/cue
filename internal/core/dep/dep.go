@@ -477,7 +477,16 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		if f := c.feature(x.env, x.ref); f != 0 {
 			w = v.Lookup(f)
 		}
-		if w == nil {
+		if w == nil || w.IsFrozen() {
+			// Stop descending into a frozen template (a materialized imported
+			// package, see [adt.Vertex.FreezeImport]). Selecting into its
+			// forced field would attribute the dependency to that field and
+			// inline its standalone value, which is wrong when the reference
+			// reaches it through a unification, e.g. (pkg.#Def & {…}).field.
+			// Keeping the dependency on the enclosing definition lets the
+			// self-contained export render the selection structurally, as it
+			// does when the field is still lazily unmaterialized.
+			// See https://cuelang.org/issue/4379.
 			break
 		}
 		altRef = x.ref

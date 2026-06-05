@@ -575,6 +575,37 @@ func (r *inlineRunner) buildValue(ctx *cue.Context, cueFiles []*cueFileResult) (
 	return r.buildFromArchive(ctx)
 }
 
+// fileExperimentPrefix returns the file-level @experiment(...) attribute lines
+// of the named archive file as a compilable source prefix, e.g.
+// "@experiment(reflect)\n". File-level attributes precede the package clause and
+// all other declarations, so scanning stops at the first line that is not blank,
+// a comment, or an @experiment attribute. Returns "" if the file declares none.
+//
+// The prefix lets @test(eq, ...) expected expressions be compiled with the same
+// experiments and language version as the file under test (see cmpCtx).
+func (r *inlineRunner) fileExperimentPrefix(name string) string {
+	var data []byte
+	for _, f := range r.archive.Files {
+		if f.Name == name {
+			data = f.Data
+			break
+		}
+	}
+	var b strings.Builder
+	for _, line := range strings.Split(string(data), "\n") {
+		switch t := strings.TrimSpace(line); {
+		case t == "" || strings.HasPrefix(t, "//"):
+			// Skip blank lines and comments preceding the attributes.
+		case strings.HasPrefix(t, "@experiment("):
+			b.WriteString(t)
+			b.WriteByte('\n')
+		default:
+			return b.String()
+		}
+	}
+	return b.String()
+}
+
 // relFilename converts an absolute filename to a relative one by stripping the
 // runner's directory prefix. Falls back to the basename if stripping fails.
 func (r *inlineRunner) relFilename(absPath string) string {
@@ -948,7 +979,8 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		posWriteback: func(innerAttrText string, positions []token.Pos) {
 			r.enqueueNestedPosWrite(pa, innerAttrText, positions)
 		},
-		formatPos: func(p token.Pos) string { return r.formatPosSpec(p, pa.baseLine, pa.srcFileName) },
+		formatPos:   func(p token.Pos) string { return r.formatPosSpec(p, pa.baseLine, pa.srcFileName) },
+		experiments: r.fileExperimentPrefix(pa.srcFileName),
 	}
 	cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {

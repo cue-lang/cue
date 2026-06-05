@@ -244,6 +244,12 @@ type OpContext struct {
 	// necessary to get the right path for incomplete errors in the presence of
 	// structure sharing.
 	altPath []*Vertex // stack of selectors
+
+	// importInstances memoizes a private, per-evaluation instance of each
+	// imported package root this context references, so concurrent evaluations
+	// do not share the runtime's mutable cached template.
+	// See [OpContext.importInstance].
+	importInstances map[*Vertex]*Vertex
 }
 
 func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }

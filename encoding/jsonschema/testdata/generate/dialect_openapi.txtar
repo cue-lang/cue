@@ -1,0 +1,220 @@
+# Generation of the OpenAPI 3.0 schema dialect. Exercises the
+# version-specific renderings: no $schema keyword, definitions under
+# components/schemas with #/components/schemas refs, const rendered as a
+# single-valued enum, exclusive bounds as boolean keywords accompanying
+# minimum/maximum, null rendered via enum, type unions widened to anyOf,
+# and tuples widened to a single items schema. The nick and fooOpt fields
+# check that `T | null` is folded into a nullable: true keyword on the sole
+# non-null arm (with the $ref isolated into an allOf for fooOpt), while the
+# maybe field checks that a disjunction with several non-null arms keeps an
+# explicit null arm (enum: [null]) rather than using nullable. The score
+# field also checks
+# that a reference combined with a constraint keeps the constraint in
+# effect: OpenAPI 3.0 ignores keywords adjacent to $ref, so the constraint
+# must be emitted as a sibling of an allOf rather than of the $ref itself.
+#version: openapi
+#path: root
+-- test.cue --
+package test
+
+#Foo: {
+	name?:   string
+	age?:    int & >0 & <150
+	kind?:   =="widget"
+	nick?:   string | null
+	either?: int | string
+	maybe?:  int | string | null
+	pair?:   [string, int]
+	// A bug in development was triggered by the following.
+	// Left in to check for regressions.
+	sharedNull1?: null | string
+	sharedNull2?: null | string
+}
+#Score: int
+root: {
+	foo?:    #Foo
+	score?:  #Score & >0
+	fooOpt?: #Foo | null
+}
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: foo: {
+	name:   "x"
+	age:    30
+	kind:   "widget"
+	nick:   null
+	either: "s"
+	maybe:  null
+	pair: ["a", 1]
+}
+ok2: data: foo: {
+	nick:  "present"
+	maybe: 3
+}
+okFooOptNull: data: fooOpt: null
+okFooOpt: data: fooOpt: name:     "x"
+errFooOpt: {
+	data: fooOpt: name: 1
+	error: true
+}
+errKind: {
+	data: foo: kind: "other"
+	error: true
+}
+errAgeTooBig: {
+	data: foo: age: 200
+	error: true
+}
+errAgeNotPositive: {
+	data: foo: age: 0
+	error: true
+}
+errEither: {
+	data: foo: either: true
+	error: true
+}
+okScore: data: score: 5
+errScore: {
+	data: score: 0
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	components: {
+		schemas: {
+			Foo: {
+				type:                 "object"
+				additionalProperties: false
+				properties: {
+					age: {
+						allOf: [{
+							type: "number"
+						}, {
+							type:             "integer"
+							exclusiveMaximum: true
+							exclusiveMinimum: true
+							maximum:          150
+							minimum:          0
+						}]
+					}
+					either: {
+						anyOf: [{
+							type: "integer"
+						}, {
+							type: "string"
+						}]
+					}
+					kind: {
+						enum: ["widget"]
+					}
+					maybe: {
+						anyOf: [{
+							type: "integer"
+						}, {
+							type: "string"
+						}, {
+							enum: [null]
+						}]
+					}
+					name: {
+						type: "string"
+					}
+					nick: {
+						nullable: true
+						type:     "string"
+					}
+					pair: {
+						type: "array"
+						items: {
+							anyOf: [{
+								type: "string"
+							}, {
+								type: "integer"
+							}]
+						}
+						maxItems: 2
+						minItems: 2
+					}
+					sharedNull1: {
+						nullable:    true
+						type:        "string"
+						description: "A bug in development was triggered by the following.\nLeft in to check for regressions."
+					}
+					sharedNull2: {
+						nullable: true
+						type:     "string"
+					}
+				}
+			}
+			Score: {
+				type: "integer"
+			}
+		}
+	}
+	type: "object"
+	properties: {
+		foo: {
+			$ref: "#/components/schemas/Foo"
+		}
+		fooOpt: {
+			nullable: true
+			allOf: [{
+				$ref: "#/components/schemas/Foo"
+			}]
+		}
+		score: {
+			allOf: [{
+				$ref: "#/components/schemas/Score"
+			}, {
+				type:             "number"
+				exclusiveMinimum: true
+				minimum:          0
+			}]
+		}
+	}
+}
+-- out/generate-v3/errAgeNotPositive --
+errAgeNotPositive.data.foo.age: invalid value 0 (out of bound >0):
+    1:207
+    ./datatest/tests.cue:31:18
+-- out/generate-v3/errAgeTooBig --
+errAgeTooBig.data.foo.age: invalid value 200 (out of bound <150):
+    1:193
+    ./datatest/tests.cue:27:18
+-- out/generate-v3/errEither --
+errEither.data.foo.either: conflicting values true and int (mismatched types bool and int):
+    ./datatest/tests.cue:35:21
+    1:242
+    1:821
+errEither.data.foo.either: conflicting values true and string (mismatched types bool and string):
+    ./datatest/tests.cue:35:21
+    1:821
+errEither.data.foo.either: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
+    1:232
+    ./datatest/tests.cue:35:21
+-- out/generate-v3/errKind --
+errKind.data.foo.kind: conflicting values "widget" and "other":
+    ./datatest/tests.cue:23:19
+    1:288
+    1:821
+-- out/generate-v3/ok1 --
+-- out/generate-v3/ok2 --
+-- out/generate-v3/errScore --
+errScore.data.score: invalid value 0 (does not satisfy matchN): 1 matched, expected 2:
+    1:938
+    ./datatest/tests.cue:40:15
+errScore.data.score: invalid value 0 (out of bound >0):
+    1:1026
+    ./datatest/tests.cue:40:15
+-- out/generate-v3/okScore --
+-- out/generate-v3/errFooOpt --
+errFooOpt.data.fooOpt: 2 errors in empty disjunction:
+errFooOpt.data.fooOpt: conflicting values {name:1} and null (mismatched types struct and null):
+    ./datatest/tests.cue:19:16
+    1:866
+errFooOpt.data.fooOpt.name: conflicting values 1 and string (mismatched types int and string):
+    ./datatest/tests.cue:19:22
+    1:882
+-- out/generate-v3/okFooOpt --
+-- out/generate-v3/okFooOptNull --

@@ -2,6 +2,8 @@
 # allowed on an object. Delegates to Vertex.Accept.
 
 -- in.cue --
+@experiment(reflect)
+
 // Open struct: any string label allowed.
 openStruct: {
 	s: {a: 1, b: 2}

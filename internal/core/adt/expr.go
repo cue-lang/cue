@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 var _ Elem = &ConjunctGroup{}
@@ -1749,6 +1750,12 @@ type Builtin struct {
 
 	// Added indicates as of which language version this builtin can be used.
 	Added string
+
+	// Experiment, if non-nil, names the per-file experiment that must be
+	// enabled for this builtin to resolve. The check is in addition to the
+	// [Builtin.Added] version check. Holding a pointer keeps the gate check
+	// allocation-free at compile time.
+	Experiment *cueexperiment.Experiment
 
 	Package Feature
 	Name    string

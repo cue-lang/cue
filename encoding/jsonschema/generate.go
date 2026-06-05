@@ -35,7 +35,14 @@ import (
 // GenerateConfig configures JSON Schema generation from CUE values.
 type GenerateConfig struct {
 	// Version specifies the version of JSON Schema to generate.
-	// Currently only [VersionDraft2020_12] is supported.
+	// The supported versions are [VersionDraft2020_12] (the default),
+	// [VersionDraft7] and [VersionOpenAPI] (the JSON-Schema-like dialect
+	// used by OpenAPI 3.0).
+	//
+	// Because CUE is more expressive than any JSON Schema dialect,
+	// generation is best-effort: constraints that cannot be represented
+	// in the target dialect are rendered as permissively as possible
+	// rather than causing an error.
 	Version Version
 
 	// NameFunc is used to determine how a reference maps to a JSON Schema
@@ -118,14 +125,16 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if cfg.Version == VersionUnknown {
 		cfg.Version = VersionDraft2020_12
 	}
-	if cfg.Version != VersionDraft2020_12 {
-		return nil, fmt.Errorf("only version %v is supported for generating JSON Schema for now", VersionDraft2020_12)
+	d := dialectFor(cfg.Version)
+	if d == nil {
+		return nil, fmt.Errorf("version %v is not supported for generating JSON Schema", cfg.Version)
 	}
 
 	g := &generator{
-		cfg:    cfg,
-		defs:   anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
-		unique: newUniqueItems(),
+		cfg:     cfg,
+		dialect: d,
+		defs:    anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
+		unique:  newUniqueItems(),
 	}
 	mode := open
 	switch {
@@ -183,14 +192,17 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	}
 
 	// Add schema version metadata and definitions.
-	fields := []ast.Decl{makeField("$schema", ast.NewString(cfg.Version.String()))}
+	var fields []ast.Decl
+	if g.dialect.emitSchemaKeyword {
+		fields = append(fields, makeField("$schema", ast.NewString(cfg.Version.String())))
+	}
 	if len(defKeys) > 0 {
 		defFields := make([]ast.Decl, 0, len(defKeys))
 		for _, k := range defKeys {
 			def := optimize(g.defs.At(k), g.unique)
 			defFields = append(defFields, makeField(k.Name, def.Value().generate(g)))
 		}
-		fields = append(fields, makeField("$defs", &ast.StructLit{Elts: defFields}))
+		fields = append(fields, makeNestedField(g.dialect.refPrefix, &ast.StructLit{Elts: defFields}))
 	}
 	fields = append(fields, st.Elts...)
 
@@ -297,6 +309,10 @@ func enumFromConst(it0 internItem, u *uniqueItems) internItem {
 
 type generator struct {
 	cfg *GenerateConfig
+
+	// dialect describes how the target schema version renders the
+	// item tree.
+	dialect *dialect
 
 	// err holds any errors accumulated during translation.
 	err errors.Error

@@ -46,7 +46,12 @@ func TestGenerate(t *testing.T) {
 		if p, ok := t.Value("path"); ok {
 			v = v.LookupPath(cue.ParsePath(p))
 		}
+		version := jsonschema.VersionDraft2020_12
+		if s, ok := t.Value("version"); ok {
+			version = testVersion(t, s)
+		}
 		r, err := jsonschema.Generate(v, &jsonschema.GenerateConfig{
+			Version:      version,
 			ExplicitOpen: t.HasTag("explicitOpen"),
 		})
 		qt.Assert(t, qt.IsNil(err))
@@ -65,10 +70,22 @@ func TestGenerate(t *testing.T) {
 		schemaValue = ctx.CompileBytes(schemaBytes)
 		qt.Assert(t, qt.IsNil(schemaValue.Err()))
 
-		extractedSchemaFile, err := jsonschema.Extract(schemaValue, &jsonschema.Config{
+		extractCfg := &jsonschema.Config{
 			StrictFeatures: true,
 			StrictKeywords: true,
-		})
+			DefaultVersion: version,
+		}
+		if version == jsonschema.VersionOpenAPI {
+			// The generated OpenAPI output is a document fragment rather
+			// than a pure JSON Schema: it carries a components section
+			// holding the shared schemas (referenced via
+			// #/components/schemas), which is not a JSON Schema keyword.
+			// Relax StrictKeywords so that extraction treats the root
+			// object as the entry schema while still resolving the
+			// in-document references.
+			extractCfg.StrictKeywords = false
+		}
+		extractedSchemaFile, err := jsonschema.Extract(schemaValue, extractCfg)
 		if t.HasTag("brokenRoundTrip") {
 			t.Skipf("round-trip extraction skipped (brokenRoundTrip)")
 			return
@@ -132,4 +149,19 @@ func TestGenerate(t *testing.T) {
 type generateDataTest struct {
 	Data  cue.Value `json:"data"`
 	Error bool      `json:"error"`
+}
+
+// testVersion maps a short version name used in the #version test tag
+// to a [jsonschema.Version].
+func testVersion(t *cuetxtar.Test, s string) jsonschema.Version {
+	switch s {
+	case "2020-12":
+		return jsonschema.VersionDraft2020_12
+	case "draft7", "draft-07":
+		return jsonschema.VersionDraft7
+	case "openapi":
+		return jsonschema.VersionOpenAPI
+	}
+	t.Fatalf("unknown #version tag %q", s)
+	return jsonschema.VersionUnknown
 }

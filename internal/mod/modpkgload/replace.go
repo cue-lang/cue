@@ -243,6 +243,13 @@ func (r *Replacements) CanonicalImportPath(importPath string) string {
 	return importPath
 }
 
+// ParseReplacement parses a replace directive value string into a Replacement.
+// The value is either a directory path (starting with ".", "/" or a Windows
+// drive letter) or a module path with version (e.g. "example.com/bar@v0.1.0").
+func ParseReplacement(s string) (Replacement, error) {
+	return parseReplaceValue(s)
+}
+
 // parseReplaceValue parses a replace directive value string into a Replacement.
 // The value is either a directory path or a module path with version
 // (e.g. "example.com/bar@v0.1.0").

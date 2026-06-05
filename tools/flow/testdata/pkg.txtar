@@ -85,43 +85,40 @@ graph TD
 	out: "foo subbar"
 }
 -- out/run-v3/t1/stats --
-Leaks:  0
+Leaks:  2
 Freed:  14
 Reused: 5
-Allocs: 9
+Allocs: 11
 Retain: 0
 
-Unifications: 14
-Conjuncts:    19
+Unifications: 16
+Conjuncts:    21
 Disjuncts:    0
 ResolveDep:   5
-
-GenerationMismatch: 2
 
 NumCloseIDs: 1
 -- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,14 @@
- Leaks:  0
+@@ -1,9 +1,12 @@
+-Leaks:  0
 -Freed:  17
 -Reused: 12
 -Allocs: 5
++Leaks:  2
 +Freed:  14
 +Reused: 5
-+Allocs: 9
++Allocs: 11
  Retain: 0
  
 -Unifications: 17
 -Conjuncts:    30
 -Disjuncts:    17
-+Unifications: 14
-+Conjuncts:    19
++Unifications: 16
++Conjuncts:    21
 +Disjuncts:    0
 +ResolveDep:   5
-+
-+GenerationMismatch: 2
 +
 +NumCloseIDs: 1
 -- out/run/t1/stats --
@@ -146,14 +143,12 @@ Conjuncts:    24
 Disjuncts:    0
 ResolveDep:   6
 
-GenerationMismatch: 2
-
 NumCloseIDs: 2
 -- diff/-out/run-v3/t2/stats<==>+out/run/t2/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,14 @@
+@@ -1,9 +1,12 @@
  Leaks:  0
 -Freed:  17
 -Reused: 17
@@ -169,8 +164,6 @@ diff old new
 +Conjuncts:    24
 +Disjuncts:    0
 +ResolveDep:   6
-+
-+GenerationMismatch: 2
 +
 +NumCloseIDs: 2
 -- out/run/t2/stats --
@@ -214,43 +207,40 @@ Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
 -- out/run-v3/stats/totals --
-Leaks:  0
+Leaks:  2
 Freed:  28
 Reused: 19
-Allocs: 9
+Allocs: 11
 Retain: 0
 
-Unifications: 28
-Conjuncts:    43
+Unifications: 30
+Conjuncts:    45
 Disjuncts:    0
 ResolveDep:   13
-
-GenerationMismatch: 4
 
 NumCloseIDs: 3
 -- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,14 @@
- Leaks:  0
+@@ -1,9 +1,12 @@
+-Leaks:  0
 -Freed:  34
 -Reused: 29
 -Allocs: 5
++Leaks:  2
 +Freed:  28
 +Reused: 19
-+Allocs: 9
++Allocs: 11
  Retain: 0
  
 -Unifications: 34
 -Conjuncts:    61
 -Disjuncts:    34
-+Unifications: 28
-+Conjuncts:    43
++Unifications: 30
++Conjuncts:    45
 +Disjuncts:    0
 +ResolveDep:   13
-+
-+GenerationMismatch: 4
 +
 +NumCloseIDs: 3
 -- out/run/stats/totals --

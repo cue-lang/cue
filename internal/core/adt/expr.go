@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"slices"
 	"strings"
 
 	"github.com/cockroachdb/apd/v3"
@@ -750,6 +751,9 @@ func (x *ImportReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	var v *Vertex
 	if x.Instance != nil {
 		v = ctx.Runtime.LoadInstance(x.Instance)
+		// Resolve to a per-evaluation instance rather than the runtime's
+		// shared cached root, which would race when evaluated in place.
+		v = ctx.importInstance(v)
 	} else {
 		v = ctx.Runtime.LoadBuiltin(x.ImportPath.StringValue(ctx))
 	}
@@ -757,6 +761,48 @@ func (x *ImportReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		ctx.addErrf(EvalError, x.Src.Pos(), "cannot find package %q",
 			x.ImportPath.StringValue(ctx))
 	}
+	return v
+}
+
+// importInstance returns a private, per-evaluation instance of an imported
+// package root. The runtime caches one shared, immutable compiled template per
+// package; evaluating it in place would race across goroutines, so each
+// evaluation gets its own instance sharing only the template's conjuncts.
+//
+// No environment rewriting is needed: a package root's conjuncts bind
+// references to the vertex being evaluated (see [nodeContext.scheduleStruct]),
+// not to a pointer stored in the template, so a fresh root reusing those
+// conjuncts resolves its internal references against itself.
+func (c *OpContext) importInstance(template *Vertex) *Vertex {
+	if template == nil {
+		return nil
+	}
+	if v, ok := c.importInstances[template]; ok {
+		return v
+	}
+	v := &Vertex{
+		Parent:             template.Parent,
+		Label:              template.Label,
+		ClosedRecursive:    template.ClosedRecursive,
+		ClosedNonRecursive: template.ClosedNonRecursive,
+		HasEllipsis:        template.HasEllipsis,
+		ArcType:            template.ArcType,
+		// Clip so appends during evaluation do not write into the shared
+		// template's backing array.
+		Conjuncts: slices.Clip(template.Conjuncts),
+	}
+	// A failed-to-compile instance is cached as a bottom vertex with no
+	// conjuncts; carry the error over.
+	if len(template.Conjuncts) == 0 {
+		if b, ok := template.BaseValue.(*Bottom); ok {
+			v.BaseValue = b
+			v.status = finalized
+		}
+	}
+	if c.importInstances == nil {
+		c.importInstances = map[*Vertex]*Vertex{}
+	}
+	c.importInstances[template] = v
 	return v
 }
 

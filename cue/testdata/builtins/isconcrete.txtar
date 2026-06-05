@@ -1,6 +1,8 @@
 # Tests for isConcrete and concreteN builtins
 
 -- in.cue --
+@experiment(predicates)
+
 // isConcrete with concrete values
 concreteConcrete: {
 	a:      1
@@ -101,11 +103,11 @@ concreteNFailure: {
 }
 -- out/errors.txt --
 [eval] concreteError.a: conflicting values 1 and "x" (mismatched types int and string):
-    ./in.cue:77:10
-    ./in.cue:77:14
+    ./in.cue:79:10
+    ./in.cue:79:14
 [incomplete] concreteNFailure: concreteN: concreteN: 2 matched, expected 3:
-    ./in.cue:96:2
-    ./in.cue:96:12
+    ./in.cue:98:2
+    ./in.cue:98:12
 -- out/compile --
 --- in.cue
 {

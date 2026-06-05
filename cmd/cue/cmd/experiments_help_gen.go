@@ -82,6 +82,14 @@ Available per-file experiments:
     Proposal:      https://cuelang.org/issue/4019
     Spec change:   https://cuelang.org/cl/1231444
 
+  predicates (preview: v0.17.0)
+    predicates enables the predeclared predicate builtins: exists, existsN,
+    allows, isValid, validN, isConcrete, and concreteN. They inspect
+    field presence and value validity without committing to a concrete
+    result, replacing the historical ` + "`" + `!= _|_` + "`" + ` pattern.
+    Proposal:      https://github.com/cue-lang/cue/discussions/4386
+    Spec change:   https://cuelang.org/cl/1238674
+
   shortcircuit (preview: v0.17.0)
     shortcircuit enables short-circuit evaluation for the logical operators
     && and ||. When the result is fully determined by the left operand alone

@@ -1,6 +1,8 @@
 # Tests for isConcrete and concreteN builtins
 
 -- in.cue --
+@experiment(predicates)
+
 // isConcrete with concrete scalar values
 concreteScalars: {
 	a:      42
@@ -160,17 +162,17 @@ concreteNOneOf: {
 }
 -- out/errors.txt --
 [incomplete] concreteNIncomplete: concreteN: concreteN: 2 matched, expected 3:
-    ./in.cue:119:2
-    ./in.cue:119:12
+    ./in.cue:121:2
+    ./in.cue:121:12
 [eval] concreteNImpossible4: concreteN: 2 matched, expected 4:
-    ./in.cue:128:2
-    ./in.cue:128:12
+    ./in.cue:130:2
+    ./in.cue:130:12
 [eval] concreteNImpossible1: concreteN: 2 matched, expected 1:
-    ./in.cue:137:2
-    ./in.cue:137:12
+    ./in.cue:139:2
+    ./in.cue:139:12
 [eval] concreteNImpossibleLt2: concreteN: 2 matched, expected <2:
-    ./in.cue:146:2
-    ./in.cue:146:12
+    ./in.cue:148:2
+    ./in.cue:148:12
 -- out/compile --
 --- in.cue
 {

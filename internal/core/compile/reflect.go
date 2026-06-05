@@ -16,6 +16,7 @@ package compile
 
 import (
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // allows reports whether label, a string field name or integer list index, is
@@ -23,8 +24,8 @@ import (
 // [adt.Vertex.Accept]. It answers the structural question "may this field exist
 // here", as opposed to [exists], which reports whether it is present now.
 var allows = &adt.Builtin{
-	Name:  "allows",
-	Added: "v0.17.0",
+	Name:       "allows",
+	Experiment: cueexperiment.Predicates,
 	Params: []adt.Param{
 		{Value: &adt.BasicType{K: adt.StructKind | adt.ListKind}},
 		{Value: &adt.BasicType{K: adt.StringKind | adt.IntKind}},
@@ -55,10 +56,10 @@ var allows = &adt.Builtin{
 // false; any non-reference argument is an error. The evaluator reports a cycle
 // when the answer would be order-dependent, as the legacy `!= _|_` pattern did.
 var exists = &adt.Builtin{
-	Name:   "exists",
-	Added:  "v0.17.0",
-	Params: []adt.Param{valueParam},
-	Result: adt.BoolKind,
+	Name:       "exists",
+	Experiment: cueexperiment.Predicates,
+	Params:     []adt.Param{valueParam},
+	Result:     adt.BoolKind,
 	RawFunc: func(call adt.BuiltinCallContext) adt.Value {
 		ctx := call.OpContext()
 		arg := call.Expr(0)
@@ -76,7 +77,7 @@ var exists = &adt.Builtin{
 // Unlike matchN, it tests presence without evaluating the references.
 var existsN = &adt.Builtin{
 	Name:            "existsN",
-	Added:           "v0.17.0",
+	Experiment:      cueexperiment.Predicates,
 	Params:          []adt.Param{intParam},
 	NonConcrete:     true,
 	VarArgs:         true,
@@ -124,10 +125,10 @@ var existsN = &adt.Builtin{
 // that does not exist yields an error rather than false, distinguishing "path
 // absent" from "path present but invalid".
 var isValid = &adt.Builtin{
-	Name:   "isValid",
-	Added:  "v0.17.0",
-	Params: []adt.Param{valueParam},
-	Result: adt.BoolKind,
+	Name:       "isValid",
+	Experiment: cueexperiment.Predicates,
+	Params:     []adt.Param{valueParam},
+	Result:     adt.BoolKind,
 	RawFunc: func(call adt.BuiltinCallContext) adt.Value {
 		ctx := call.OpContext()
 		arg := call.Expr(0)
@@ -144,7 +145,7 @@ var isValid = &adt.Builtin{
 // arguments satisfies the count constraint, without propagating their errors.
 var validN = &adt.Builtin{
 	Name:            "validN",
-	Added:           "v0.17.0",
+	Experiment:      cueexperiment.Predicates,
 	Params:          []adt.Param{intParam},
 	NonConcrete:     true,
 	VarArgs:         true,
@@ -191,10 +192,10 @@ var validN = &adt.Builtin{
 // isConcrete reports whether the expression evaluates to a concrete value.
 // It waits for finalization before returning a result.
 var isConcrete = &adt.Builtin{
-	Name:   "isConcrete",
-	Added:  "v0.17.0",
-	Params: []adt.Param{valueParam},
-	Result: adt.BoolKind,
+	Name:       "isConcrete",
+	Experiment: cueexperiment.Predicates,
+	Params:     []adt.Param{valueParam},
+	Result:     adt.BoolKind,
 	RawFunc: func(call adt.BuiltinCallContext) adt.Value {
 		ctx := call.OpContext()
 		arg := call.Expr(0)
@@ -208,7 +209,7 @@ var isConcrete = &adt.Builtin{
 // satisfies the count constraint.
 var concreteN = &adt.Builtin{
 	Name:            "concreteN",
-	Added:           "v0.17.0",
+	Experiment:      cueexperiment.Predicates,
 	Params:          []adt.Param{intParam},
 	NonConcrete:     true,
 	VarArgs:         true,

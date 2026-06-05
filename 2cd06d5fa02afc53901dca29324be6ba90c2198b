@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c180dec_20ae9c1e",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-05T12:05:40Z",
+      "side": 1,
+      "message": "Normally we use v.status \u003d\u003d finalized to \"freeze\" a Vertex. It seems more robust to have only one mechanism for it. If we cannot use one mechanism, that means that there is probably a bug in the existing mechanism that need fixing.",
+      "revId": "2cd06d5fa02afc53901dca29324be6ba90c2198b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

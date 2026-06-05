@@ -1,0 +1,24 @@
+# Tests that @test(eq, EXPR) expected expressions may reference builtins gated
+# behind a per-file @experiment(...) attribute. The expected expression is a
+# builtin call, so it is routed through cmpBuiltinExpr; that compiles it within
+# a synthetic file carrying the file's @experiment(reflect) prefix (and matching
+# language version), so a reflect validator such as validN compiles and compares
+# against the value.
+#
+# Without this, the expected expression would be compiled in a bare context and
+# the run would fail with:
+#   cannot compile expression validN(...): builtin "validN" requires
+#   @experiment(reflect)
+-- in/test.cue --
+@experiment(reflect)
+
+a: 1
+b: 2
+
+// The validator built from references equals the same builtin call written
+// with literal arguments. The expected expression compiles only because the
+// file enables @experiment(reflect).
+v: validN(>=1, a, b) @test(eq, validN(>=1, 1, 2))
+-- out/status.txt --
+update: identical to input
+force:  identical to update

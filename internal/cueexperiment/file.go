@@ -98,6 +98,34 @@ type File struct {
 	// is evaluated conditionally") and is consistent with all mainstream
 	// languages.
 	ShortCircuit bool `experiment:"preview:v0.17.0"`
+
+	// Reflect enables the predeclared reflect builtins: exists, existsN,
+	// allows, isValid, validN, isConcrete, and concreteN. They inspect
+	// field presence and value validity without committing to a concrete
+	// result, replacing the historical `!= _|_` pattern.
+	//
+	// Proposal: https://cuelang.org/issue/943
+	Reflect bool `experiment:"preview:v0.17.0"`
+}
+
+// An Experiment identifies a per-file experiment, providing its lower-case
+// name (as used in @experiment(...) annotations) and a function that reads
+// the corresponding boolean from a [File]. Callers that already know which
+// experiment they are checking should hold a *Experiment value and invoke
+// IsEnabled directly — no reflection or allocation occurs after init.
+type Experiment struct {
+	// Name is the lower-case name as it appears in @experiment(...).
+	Name string
+
+	// IsEnabled returns whether the experiment is enabled in f.
+	IsEnabled func(f *File) bool
+}
+
+// Reflect names the experiment that gates the reflect builtins
+// (exists, existsN, allows, isValid, validN, isConcrete, concreteN).
+var Reflect = &Experiment{
+	Name:      "reflect",
+	IsEnabled: func(f *File) bool { return f.Reflect },
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

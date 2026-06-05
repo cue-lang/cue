@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c6b49d6_31f629e5",
+        "filename": "cmd/cue/cmd/testdata/script/hidden-field-namespace.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-05T14:26:22Z",
+      "side": 1,
+      "message": "nit: in the future make these TODOs. not necessary for now, for the sake of not delaying the merges.",
+      "revId": "28fbf4a289f4f44a6d13335842dc9848d35d1968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

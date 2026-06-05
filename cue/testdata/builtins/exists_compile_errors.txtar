@@ -3,6 +3,8 @@
 # Compile-time errors for exists/existsN with ? markers
 
 -- in.cue --
+@experiment(predicates)
+
 // ? marker in exists path argument → compile error
 existsOptionalMarker: {
 	a: b?: c: 1
@@ -40,6 +42,6 @@ existsNOptionalMarker: optional marker (?) requires the try experiment (language
 }
 -- out/evalalpha --
 existsOptionalMarker.check: optional marker (?) requires the try experiment (language version v0.16.0 or later):
-    ./in.cue:4:16
+    ./in.cue:6:16
 existsNOptionalMarker: optional marker (?) requires the try experiment (language version v0.16.0 or later):
-    ./in.cue:10:13
+    ./in.cue:12:13

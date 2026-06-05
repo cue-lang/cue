@@ -174,7 +174,7 @@ func NewReplacements(mf *modfile.File) (*Replacements, error) {
 		if dep.Replace == "" {
 			continue
 		}
-		repl, err := parseReplaceValue(dep.Replace)
+		repl, err := ParseReplacement(dep.Replace)
 		if err != nil {
 			return nil, fmt.Errorf("invalid replace value for %s: %v", mpath, err)
 		}
@@ -243,10 +243,10 @@ func (r *Replacements) CanonicalImportPath(importPath string) string {
 	return importPath
 }
 
-// parseReplaceValue parses a replace directive value string into a Replacement.
-// The value is either a directory path or a module path with version
-// (e.g. "example.com/bar@v0.1.0").
-func parseReplaceValue(s string) (Replacement, error) {
+// ParseReplacement parses a replace directive value string into a Replacement.
+// The value is either a directory path (starting with ".", "/" or a Windows
+// drive letter) or a module path with version (e.g. "example.com/bar@v0.1.0").
+func ParseReplacement(s string) (Replacement, error) {
 	if isReplaceDirectoryPath(s) {
 		return Replacement{Dir: s}, nil
 	}

@@ -1,0 +1,114 @@
+# Test that "cue mod edit --replace" and "--drop-replace" add and remove
+# replace directives. Replace directives are not allowed in cue.mod/module.cue,
+# so they are written to cue.mod/local-module.cue instead. When that file does
+# not yet exist, it is created with the module's full set of dependencies so
+# that the main-module view stays complete.
+
+# Adding a replace creates local-module.cue with all dependencies, with the
+# replaced one carrying the replace directive. module.cue is left unchanged.
+exec cue mod edit --replace example.com/dep@v0=./local_dep
+cmp cue.mod/module.cue want-module
+cmp cue.mod/local-module.cue want-local-1
+
+# The build uses the local directory's content.
+exec cue export .
+cmp stdout want-stdout
+
+# A second replace updates the existing local-module.cue in place.
+exec cue mod edit --replace example.com/other@v0=example.com/replacement@v1.2.3
+cmp cue.mod/local-module.cue want-local-2
+
+# A replacement value must be a directory or a module path with version.
+! exec cue mod edit --replace example.com/dep@v0=not-a-valid-replacement
+stderr 'invalid replacement'
+
+# The module being replaced must carry a major version.
+! exec cue mod edit --replace example.com/dep=./local_dep
+stderr 'no major version'
+
+# Dropping one replace leaves the others, keeping the non-replaced dependency
+# listed so the view stays complete.
+exec cue mod edit --drop-replace example.com/other@v0
+cmp cue.mod/local-module.cue want-local-1
+
+# Dropping the last replace removes local-module.cue entirely.
+exec cue mod edit --drop-replace example.com/dep@v0
+! exists cue.mod/local-module.cue
+cmp cue.mod/module.cue want-module
+
+-- want-module --
+module: "main.org@v0"
+language: {
+	version: "v0.17.0"
+}
+deps: {
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+	}
+	"example.com/other@v0": {
+		v: "v0.2.0"
+	}
+}
+-- want-local-1 --
+deps: {
+	"example.com/dep@v0": {
+		replace: "./local_dep"
+	}
+	"example.com/other@v0": {}
+}
+-- want-local-2 --
+deps: {
+	"example.com/dep@v0": {
+		replace: "./local_dep"
+	}
+	"example.com/other@v0": {
+		replace: "example.com/replacement@v1.2.3"
+	}
+}
+-- want-stdout --
+{
+    "dep": "from local directory",
+    "other": "from registry"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.17.0"
+deps: {
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+	}
+	"example.com/other@v0": {
+		v: "v0.2.0"
+	}
+}
+-- main.cue --
+package main
+
+import (
+	"example.com/dep@v0:lib"
+	"example.com/other@v0:lib2"
+)
+
+dep:   lib.value
+other: lib2.value
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+value: "from local directory"
+-- _registry/example.com_dep_v0.1.0/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_dep_v0.1.0/lib.cue --
+package lib
+
+value: "from registry (should not see this)"
+-- _registry/example.com_other_v0.2.0/cue.mod/module.cue --
+module: "example.com/other@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_other_v0.2.0/lib2.cue --
+package lib2
+
+value: "from registry"

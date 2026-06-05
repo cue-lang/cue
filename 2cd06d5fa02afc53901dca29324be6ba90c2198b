@@ -16,6 +16,24 @@
       "message": "Normally we use v.status \u003d\u003d finalized to \"freeze\" a Vertex. It seems more robust to have only one mechanism for it. If we cannot use one mechanism, that means that there is probably a bug in the existing mechanism that need fixing.",
       "revId": "2cd06d5fa02afc53901dca29324be6ba90c2198b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3f0047a_2a777b9d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-05T12:23:30Z",
+      "side": 1,
+      "message": "Done. Removed the separate frozen flag and now use the existing status \u003d\u003d finalized mechanism. Imported package roots are finalized up front in buildSpec (Vertex.FinalizeImport), so getBareState returns nil via the existing status \u003d\u003d finalized check — no second freeze mechanism.\n\nTwo consequences follow from finalizing the import standalone (which, unlike the lazy path, computes its fields), and are handled as part of this:\n\n- FinalizeImport skips the typo (closedness) check. The package\u0027s standalone closedness is importing-agnostic; closedness is (re)checked in each importing context. Without this, e.g. (pkg.#E).b where #E: #D \u0026 {b:1} regressed to \"field not allowed\".\n\n- dep.reportDependency no longer descends through a finalized vertex that belongs to a different configuration tree (an import). Otherwise its pathStack expansion would attribute a reference like (pkg.#Def \u0026 {...}).field to the now-materialized field and the self-contained export would inline that field\u0027s standalone value instead of rendering the selection structurally.\n\ngo test ./... stays green and the new TestConcurrentUnifyImport still fails under -race without the change.",
+      "parentUuid": "7c180dec_20ae9c1e",
+      "revId": "2cd06d5fa02afc53901dca29324be6ba90c2198b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

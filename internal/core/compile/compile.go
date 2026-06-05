@@ -377,6 +377,10 @@ func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
 		return n
 
 	case *adt.Builtin:
+		if e := x.Experiment; e != nil && !e.IsEnabled(&c.experiments) {
+			return c.errf(src, "builtin %q requires @experiment(%s)",
+				x.Name, e.Name)
+		}
 		if x.Added == "" {
 			// No version check needed.
 			return n

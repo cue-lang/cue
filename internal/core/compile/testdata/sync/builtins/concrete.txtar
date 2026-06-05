@@ -1,6 +1,8 @@
 # Tests for isConcrete and concreteN builtins
 
 -- in.cue --
+@experiment(reflect)
+
 // isConcrete with concrete scalar values
 concreteScalars: {
 	a:      42

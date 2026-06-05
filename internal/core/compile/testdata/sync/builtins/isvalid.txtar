@@ -1,6 +1,8 @@
 # Tests for isValid and validN builtins
 
 -- in.cue --
+@experiment(reflect)
+
 // isValid with concrete values
 validConcrete: {
 	a:      1
@@ -88,6 +90,8 @@ isValidExistingInvalid: {
 	check: isValid(a.x)
 }
 -- existing.cue --
+@experiment(reflect)
+
 import "list"
 
 isValidIncomplete: {

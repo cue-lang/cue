@@ -1,6 +1,8 @@
 # Tests for exists and existsN builtins
 
 -- in.cue --
+@experiment(reflect)
+
 // Field references
 fieldRef: {
 	a:       1
@@ -184,6 +186,8 @@ existsNExactFail: {
 	existsN(2, a, b)
 }
 -- cycle.cue --
+@experiment(reflect)
+
 minimal: {
 	a: {
 		if !exists(b.port) {

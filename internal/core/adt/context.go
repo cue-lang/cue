@@ -244,6 +244,15 @@ type OpContext struct {
 	// necessary to get the right path for incomplete errors in the presence of
 	// structure sharing.
 	altPath []*Vertex // stack of selectors
+
+	// importInstances memoizes, per evaluation, a private instance of each
+	// imported package root that this context references. The cached package
+	// root in the runtime is a shared, immutable compiled template; evaluating
+	// it in place would race with other goroutines using the same runtime. By
+	// giving each evaluation its own instance (sharing only the immutable
+	// conjuncts), concurrent evaluations never share mutable evaluation state.
+	// See [OpContext.importInstance].
+	importInstances map[*Vertex]*Vertex
 }
 
 func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }

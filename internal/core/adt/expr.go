@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"slices"
 	"strings"
 
 	"github.com/cockroachdb/apd/v3"
@@ -750,6 +751,12 @@ func (x *ImportReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	var v *Vertex
 	if x.Instance != nil {
 		v = ctx.Runtime.LoadInstance(x.Instance)
+		// The runtime caches a single shared package root per build instance.
+		// Evaluating it in place would race with other goroutines that use the
+		// same runtime concurrently. Resolve the reference to a per-evaluation
+		// instance instead, so concurrent evaluations do not share mutable
+		// evaluation state. See [OpContext.importInstance].
+		v = ctx.importInstance(v)
 	} else {
 		v = ctx.Runtime.LoadBuiltin(x.ImportPath.StringValue(ctx))
 	}
@@ -757,6 +764,54 @@ func (x *ImportReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		ctx.addErrf(EvalError, x.Src.Pos(), "cannot find package %q",
 			x.ImportPath.StringValue(ctx))
 	}
+	return v
+}
+
+// importInstance returns a private, per-evaluation instance of the imported
+// package root template loaded from the runtime.
+//
+// The runtime caches one shared, immutable compiled template per build
+// instance (see [runtime.Runtime.AddInst]). CUE evaluates lazily, so a
+// reference into an imported package would otherwise drive that shared
+// template's evaluation state in place; when multiple goroutines use the same
+// runtime, those in-place mutations race. Instead, each evaluation gets its
+// own instance of the template that shares only the immutable conjuncts.
+//
+// No environment rewriting is needed: a package root's conjuncts bind their
+// references to the vertex being evaluated (the [Environment] established in
+// [nodeContext.scheduleStruct] uses n.node), not to a pointer stored in the
+// template, so a fresh root that reuses the same conjuncts resolves internal
+// references against itself.
+func (c *OpContext) importInstance(template *Vertex) *Vertex {
+	if template == nil {
+		return nil
+	}
+	if v, ok := c.importInstances[template]; ok {
+		return v
+	}
+	v := &Vertex{
+		Parent:             template.Parent,
+		Label:              template.Label,
+		ClosedRecursive:    template.ClosedRecursive,
+		ClosedNonRecursive: template.ClosedNonRecursive,
+		HasEllipsis:        template.HasEllipsis,
+		ArcType:            template.ArcType,
+		// Clip so that appends during evaluation of the instance do not write
+		// into the shared template's backing array.
+		Conjuncts: slices.Clip(template.Conjuncts),
+	}
+	// A build instance that failed to compile is cached as a bottom vertex
+	// with no conjuncts; carry that error over to the instance.
+	if len(template.Conjuncts) == 0 {
+		if b, ok := template.BaseValue.(*Bottom); ok {
+			v.BaseValue = b
+			v.status = finalized
+		}
+	}
+	if c.importInstances == nil {
+		c.importInstances = map[*Vertex]*Vertex{}
+	}
+	c.importInstances[template] = v
 	return v
 }
 

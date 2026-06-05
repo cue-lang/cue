@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
+	cueload "cuelang.org/go/cue/load"
 )
 
 // The tests in this file verify that cue.Value operations are safe for
@@ -1701,6 +1702,66 @@ func TestConcurrentScopeOption(t *testing.T) {
 		}
 	})
 
+}
+
+// TestConcurrentUnifyImportedSchema is a regression test for
+// https://github.com/cue-lang/cue/issues/4379. A schema loaded via cue/load
+// that references a definition in an imported package (here #Schema:
+// inner.#Item) is not fully finalized when handed to the caller: the
+// cross-package reference resolves to a package root that the runtime caches
+// and shares. Concurrently unifying such a value used to race while
+// evaluating that shared import in place.
+func TestConcurrentUnifyImportedSchema(t *testing.T) {
+	overlay := map[string]cueload.Source{
+		"/cue.mod/module.cue": cueload.FromString(`module: "example.com"
+language: version: "v0.16.0"
+`),
+		"/outer/schema.cue": cueload.FromString(`package outer
+
+import "example.com/inner"
+
+#Schema: inner.#Item
+`),
+		"/inner/schema.cue": cueload.FromString(`package inner
+
+#Item: {
+	level!: int
+	flag?:  bool
+}
+`),
+	}
+	insts := cueload.Instances([]string{"./outer"}, &cueload.Config{
+		Dir:     "/",
+		Overlay: overlay,
+	})
+	if err := insts[0].Err; err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := cuecontext.New()
+	v := ctx.BuildInstance(insts[0])
+	if err := v.Err(); err != nil {
+		t.Fatal(err)
+	}
+	schema := v.LookupPath(cue.MakePath(cue.Def("Schema")))
+	if err := schema.Err(); err != nil {
+		t.Fatal(err)
+	}
+	data := ctx.CompileString(`{level: 1, flag: true}`)
+	if err := data.Err(); err != nil {
+		t.Fatal(err)
+	}
+
+	runConcurrent(t, func() {
+		result := schema.Unify(data)
+		if err := result.Err(); err != nil {
+			t.Error(err)
+			return
+		}
+		if err := result.Validate(cue.Concrete(true)); err != nil {
+			t.Error(err)
+		}
+	})
 }
 
 // runConcurrent launches concurrentWorkers goroutines that each call fn concurrentIterations times.

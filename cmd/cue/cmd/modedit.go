@@ -15,10 +15,16 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/internal/cueversion"
+	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -44,6 +50,16 @@ mainly for tools that understand the module graph. Users should prefer
 'cue mod get path@version' which makes other cue.mod adjustments as
 needed to satisfy constraints imposed by other modules.
 
+The -replace=path@majorversion=replacement and
+-drop-replace=path@majorversion flags add and drop a replace directive for
+the given module path. A replacement is either a local directory (starting
+with ".", "/" or a Windows drive letter) or a module path with version
+(e.g. example.com/bar@v0.1.0). Because replace directives are not permitted
+in published modules, these edits are applied to cue.mod/local-module.cue
+rather than cue.mod/module.cue. When that file does not yet exist it is
+created with the main module's full set of dependencies, mirroring the
+behavior of 'cue mod tidy'.
+
 The --module flag changes the module's path (the module.cue file's module field).
 The --source flag changes the module's declared source.
 The --drop-source flag removes the source field.
@@ -57,16 +73,32 @@ The --drop-source flag removes the source field.
 	addFlagVar(cmd, flagFunc(editCmd.flagModule), "module", "set the module path")
 	addFlagVar(cmd, flagFunc(editCmd.flagRequire), "require", "add a required module@version")
 	addFlagVar(cmd, flagFunc(editCmd.flagDropRequire), "drop-require", "remove a requirement")
+	addFlagVar(cmd, flagFunc(editCmd.flagReplace), "replace", "add a replace directive (path@majorversion=replacement) to local-module.cue")
+	addFlagVar(cmd, flagFunc(editCmd.flagDropReplace), "drop-replace", "remove a replace directive from local-module.cue")
 
 	return cmd
 }
 
 type modEditCmd struct {
+	// edits holds operations applied to cue.mod/module.cue.
 	edits []func(*modfile.File) error
+
+	// localEdits holds operations applied to the main-module dependency view
+	// held in cue.mod/local-module.cue (replace directives).
+	localEdits []func(*modfile.File) error
 }
 
 func (c *modEditCmd) run(cmd *Command, args []string) error {
-	modPath, mf, data, err := readModuleFile()
+	modRoot, err := findModuleRoot()
+	if err != nil {
+		return err
+	}
+	modPath := filepath.Join(modRoot, "cue.mod", "module.cue")
+	data, err := os.ReadFile(modPath)
+	if err != nil {
+		return err
+	}
+	mf, err := modfile.ParseNonStrict(data, modPath)
 	if err != nil {
 		return err
 	}
@@ -79,11 +111,89 @@ func (c *modEditCmd) run(cmd *Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("invalid resulting module.cue file after edits: %v", err)
 	}
-	return writeFileIfChanged(modPath, data, newData, 0o666)
+	if err := writeFileIfChanged(modPath, data, newData, 0o666); err != nil {
+		return err
+	}
+	if len(c.localEdits) == 0 {
+		return nil
+	}
+	return c.runLocalEdits(modRoot, mf)
+}
+
+// runLocalEdits applies the replace edits to cue.mod/local-module.cue, using
+// base (the freshly edited cue.mod/module.cue) for the module's identity and to
+// supply versions for dependencies whose version is redundant with module.cue.
+func (c *modEditCmd) runLocalEdits(modRoot string, base *modfile.File) error {
+	localPath := filepath.Join(modRoot, "cue.mod", "local-module.cue")
+	oldData, err := os.ReadFile(localPath)
+	var local *modfile.File
+	switch {
+	case err == nil:
+		local, err = modfile.ParseLocal(oldData, localPath, base)
+		if err != nil {
+			return err
+		}
+	case errors.Is(err, fs.ErrNotExist):
+		oldData = nil
+		// The loader uses local-module.cue's dependency set verbatim in place
+		// of module.cue's, so the file must list every dependency. Seed it from
+		// the published deps so the main-module view stays complete.
+		local = localViewFromBase(base)
+	default:
+		return err
+	}
+	for _, edit := range c.localEdits {
+		if err := edit(local); err != nil {
+			return err
+		}
+	}
+	if !hasReplace(local) {
+		// No replace directives remain, so local-module.cue serves no purpose.
+		if err := os.Remove(localPath); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			return err
+		}
+		return nil
+	}
+	newData, err := modfile.FormatLocal(local, base)
+	if err != nil {
+		return fmt.Errorf("invalid resulting local-module.cue file after edits: %v", err)
+	}
+	return writeFileIfChanged(localPath, oldData, newData, 0o666)
+}
+
+// localViewFromBase returns a main-module view that mirrors base's dependencies
+// and identity, ready to have replace directives applied to it.
+func localViewFromBase(base *modfile.File) *modfile.File {
+	deps := make(map[string]*modfile.Dep, len(base.Deps))
+	for mpath, dep := range base.Deps {
+		d := *dep
+		deps[mpath] = &d
+	}
+	return &modfile.File{
+		Module:   base.Module,
+		Language: base.Language,
+		Source:   base.Source,
+		Custom:   base.Custom,
+		Deps:     deps,
+	}
+}
+
+// hasReplace reports whether any dependency in f carries a replace directive.
+func hasReplace(f *modfile.File) bool {
+	for _, dep := range f.Deps {
+		if dep.Replace != "" {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *modEditCmd) addEdit(f func(*modfile.File) error) {
 	c.edits = append(c.edits, f)
+}
+
+func (c *modEditCmd) addLocalEdit(f func(*modfile.File) error) {
+	c.localEdits = append(c.localEdits, f)
 }
 
 func (c *modEditCmd) flagSource(arg string) error {
@@ -186,6 +296,57 @@ func (c *modEditCmd) flagDropRequire(arg string) error {
 	// the major version - we can use the default field to disambiguate.
 	c.addEdit(func(f *modfile.File) error {
 		delete(f.Deps, arg)
+		return nil
+	})
+	return nil
+}
+
+func (c *modEditCmd) flagReplace(arg string) error {
+	old, repl, ok := strings.Cut(arg, "=")
+	if !ok {
+		return fmt.Errorf("invalid replace %q: missing '=' (want path@majorversion=replacement)", arg)
+	}
+	v, err := module.NewVersion(old, "")
+	if err != nil {
+		return err
+	}
+	if _, err := modpkgload.ParseReplacement(repl); err != nil {
+		return fmt.Errorf("invalid replacement %q: %v", repl, err)
+	}
+	mpath := v.Path()
+	c.addLocalEdit(func(f *modfile.File) error {
+		if f.Deps == nil {
+			f.Deps = make(map[string]*modfile.Dep)
+		}
+		dep := f.Deps[mpath]
+		if dep == nil {
+			dep = &modfile.Dep{}
+			f.Deps[mpath] = dep
+		}
+		dep.Replace = repl
+		return nil
+	})
+	return nil
+}
+
+func (c *modEditCmd) flagDropReplace(arg string) error {
+	v, err := module.NewVersion(arg, "")
+	if err != nil {
+		return err
+	}
+	mpath := v.Path()
+	c.addLocalEdit(func(f *modfile.File) error {
+		dep := f.Deps[mpath]
+		if dep == nil {
+			return nil
+		}
+		dep.Replace = ""
+		// A dependency listed only to carry a replace directive (a replace-only
+		// placeholder with no version) becomes meaningless once the replace is
+		// gone, so drop it entirely.
+		if dep.Version == "" {
+			delete(f.Deps, mpath)
+		}
 		return nil
 	})
 	return nil

@@ -48,6 +48,14 @@ type cmpCtx struct {
 	// formatPos, when non-nil, formats a token.Pos for error messages.
 	// When nil, positions are formatted as line:col.
 	formatPos func(token.Pos) string
+	// experiments, when non-empty, is a source prefix of file-level
+	// @experiment(...) attribute lines (e.g. "@experiment(predicates)\n") taken
+	// from the file under test. Expected expressions in @test(eq, ...) that are
+	// builtin calls or selectors are compiled with this prefix so they may
+	// reference experiment-gated builtins (such as reflect's validN) using the
+	// same language version and experiments as the file. Empty means the
+	// expression is compiled with a bare BuildExpr (the common case).
+	experiments string
 }
 
 func (c *cmpCtx) fmtPos(p token.Pos) string {
@@ -127,7 +135,7 @@ func (c *cmpCtx) astCmp(path cue.Path, expr ast.Expr, val cue.Value) error {
 		}
 		return nil
 	case *ast.CallExpr, *ast.SelectorExpr:
-		return cmpBuiltinExpr(path, expr, val)
+		return c.cmpBuiltinExpr(path, expr, val)
 	}
 	return pathErr(path, "unsupported AST node type %T", expr)
 }
@@ -1014,9 +1022,21 @@ func toStr(expr ast.Expr) string {
 // cmpBuiltinExpr compiles expr using InferBuiltins so that unresolved
 // package-qualified references (e.g. struct.MaxFields(2), math.Pi) resolve to
 // CUE builtin packages, then compares the resulting value against val.
-func cmpBuiltinExpr(path cue.Path, expr ast.Expr, val cue.Value) error {
+//
+// When the file under test declares per-file experiments (c.experiments), expr
+// is compiled as a field within a synthetic file carrying those @experiment(...)
+// attributes, so it may reference experiment-gated builtins (e.g. reflect's
+// validN). The synthetic file is compiled in val's context so the resulting
+// value is comparable to val.
+func (c *cmpCtx) cmpBuiltinExpr(path cue.Path, expr ast.Expr, val cue.Value) error {
 	ctx := val.Context()
-	expected := ctx.BuildExpr(expr, cue.InferBuiltins(true))
+	var expected cue.Value
+	if c.experiments != "" {
+		src := c.experiments + toStr(expr) + "\n"
+		expected = ctx.CompileString(src, cue.InferBuiltins(true))
+	} else {
+		expected = ctx.BuildExpr(expr, cue.InferBuiltins(true))
+	}
 	if err := expected.Err(); err != nil {
 		return pathErr(path, "cannot compile expression %s: %v", toStr(expr), err)
 	}

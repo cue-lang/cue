@@ -575,6 +575,40 @@ func (r *inlineRunner) buildValue(ctx *cue.Context, cueFiles []*cueFileResult) (
 	return r.buildFromArchive(ctx)
 }
 
+// fileExperimentPrefix returns the file-level @experiment(...) attributes of the
+// named archive file as a compilable source prefix, e.g. "@experiment(predicates)\n".
+// Returns "" if the file declares none.
+//
+// The prefix lets @test(eq, ...) expected expressions be compiled with the same
+// experiments and language version as the file under test (see cmpCtx).
+func (r *inlineRunner) fileExperimentPrefix(name string) string {
+	var data []byte
+	for _, f := range r.archive.Files {
+		if f.Name == name {
+			data = f.Data
+			break
+		}
+	}
+	// Parse leniently: even if the body fails to parse, the leading file-level
+	// attributes are still present in the partial AST.
+	f, _ := parser.ParseFile(name, data)
+	if f == nil {
+		return ""
+	}
+	var b strings.Builder
+	for _, d := range f.Decls {
+		// File-level attributes form the preamble before the package clause and
+		// all other declarations; stop at the first non-@experiment declaration.
+		a, ok := d.(*ast.Attribute)
+		if !ok || a.Name() != "experiment" {
+			break
+		}
+		b.WriteString(a.Text)
+		b.WriteByte('\n')
+	}
+	return b.String()
+}
+
 // relFilename converts an absolute filename to a relative one by stripping the
 // runner's directory prefix. Falls back to the basename if stripping fails.
 func (r *inlineRunner) relFilename(absPath string) string {
@@ -948,7 +982,8 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		posWriteback: func(innerAttrText string, positions []token.Pos) {
 			r.enqueueNestedPosWrite(pa, innerAttrText, positions)
 		},
-		formatPos: func(p token.Pos) string { return r.formatPosSpec(p, pa.baseLine, pa.srcFileName) },
+		formatPos:   func(p token.Pos) string { return r.formatPosSpec(p, pa.baseLine, pa.srcFileName) },
+		experiments: r.fileExperimentPrefix(pa.srcFileName),
 	}
 	cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {

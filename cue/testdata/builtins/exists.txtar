@@ -1,6 +1,8 @@
 # Tests for exists and existsN builtins
 
 -- in.cue --
+@experiment(predicates)
+
 // Field references
 fieldRef: {
 	a:       1
@@ -199,6 +201,8 @@ existsNExactFail: {
 }
 
 -- cycle.cue --
+@experiment(predicates)
+
 minimal: {
 	a: {
 		if !exists(b.port) {
@@ -217,30 +221,30 @@ minimal: {
 
 -- out/errors.txt --
 [cycle] minimal.a: cyclic reference to field port:
-    ./cycle.cue:3:16
+    ./cycle.cue:5:16
 [cycle] minimal.b: undefined field: port:
-    ./cycle.cue:10:16
+    ./cycle.cue:12:16
 [incomplete] selectorRequiredIntermediate.existsXYZ: cannot reference optional field: y:
-    ./in.cue:42:22
+    ./in.cue:44:22
 [eval] invalidValues.existsFoo: exists: argument must be a field reference, selector, or index expression:
-    ./in.cue:73:13
-[eval] invalidValues.existsBaz: exists: argument must be a field reference, selector, or index expression:
-    ./in.cue:74:13
-invalidValues.existsBaz: exists: argument must be a field reference, selector, or index expression:
     ./in.cue:75:13
-invalidValues.existsBaz: exists: cannot index non-struct/list value:
+[eval] invalidValues.existsBaz: exists: argument must be a field reference, selector, or index expression:
     ./in.cue:76:13
+invalidValues.existsBaz: exists: argument must be a field reference, selector, or index expression:
+    ./in.cue:77:13
+invalidValues.existsBaz: exists: cannot index non-struct/list value:
+    ./in.cue:78:13
 [incomplete] missingIntermediateRequired.existsABC: undefined field: b:
-    ./in.cue:148:22
+    ./in.cue:150:22
 [eval] oneOfViolation: existsN: 2 matched, expected <=1:
-    ./in.cue:177:2
-    ./in.cue:177:10
+    ./in.cue:179:2
+    ./in.cue:179:10
 [incomplete] existsNTooFew: existsN: existsN: 1 matched, expected >=2:
-    ./in.cue:186:2
-    ./in.cue:186:10
+    ./in.cue:188:2
+    ./in.cue:188:10
 [incomplete] existsNExactFail: existsN: existsN: 1 matched, expected 2:
-    ./in.cue:194:2
-    ./in.cue:194:10
+    ./in.cue:196:2
+    ./in.cue:196:10
 -- out/compile --
 --- cycle.cue
 {

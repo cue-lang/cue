@@ -1,6 +1,8 @@
 # Tests for isConcrete and concreteN builtins
 
 -- in.cue --
+@experiment(predicates)
+
 // isConcrete with concrete values
 concreteConcrete: {
 	a:      1

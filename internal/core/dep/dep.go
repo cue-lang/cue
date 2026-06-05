@@ -192,6 +192,7 @@ func Visit(cfg *Config, c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
 		ctxt:            c,
 		fn:              f,
 		pkg:             cfg.Pkg,
+		origin:          n,
 		recurse:         cfg.Descend,
 		all:             cfg.Descend,
 		top:             true,
@@ -250,8 +251,12 @@ type visitor struct {
 	ctxt *adt.OpContext
 	fn   VisitFunc
 	node *adt.Vertex
-	err  error
-	pkg  *adt.ImportReference
+	// origin is the root vertex the traversal started from. It is used to
+	// tell whether a resolved dependency lives in the same configuration tree
+	// or in a separate one such as an imported package.
+	origin *adt.Vertex
+	err    error
+	pkg    *adt.ImportReference
 
 	// recurse indicates whether, during static analysis, to process references
 	// that will be unified into different fields.
@@ -480,6 +485,19 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		if w == nil {
 			break
 		}
+		if w.IsFinalized() && rootOf(w) != rootOf(c.origin) {
+			// Stop descending into a finalized vertex that lives in a separate
+			// configuration tree, such as an imported package that was
+			// finalized up front (see [adt.Vertex.FinalizeImport]). Selecting
+			// into its field would attribute the dependency to that field and,
+			// for a reference reaching it through a unification such as
+			// (pkg.#Def & {…}).field, inline the field's standalone value.
+			// Keeping the dependency on the enclosing definition lets the
+			// self-contained export render the selection structurally, as it
+			// did when the imported package was still finalized lazily.
+			// See https://cuelang.org/issue/4379.
+			break
+		}
 		altRef = x.ref
 		if i == 0 && c.topRef != nil {
 			altRef = c.topRef
@@ -513,6 +531,15 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		c.err = err
 		panic(aborted)
 	}
+}
+
+// rootOf returns the topmost ancestor of v, i.e. the root of the
+// configuration tree v belongs to.
+func rootOf(v *adt.Vertex) *adt.Vertex {
+	for v != nil && v.Parent != nil {
+		v = v.Parent
+	}
+	return v
 }
 
 // isLocal reports whether a non-rooted struct is an internal node or not.

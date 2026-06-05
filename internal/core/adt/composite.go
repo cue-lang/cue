@@ -1037,6 +1037,39 @@ func (v *Vertex) CompleteArcs(c *OpContext) {
 	})
 }
 
+// FinalizeImport finalizes a shared imported package root so that it is safe
+// for concurrent use. An imported package root is shared across the entire
+// runtime: the same *Vertex is handed out for every reference to the package.
+// Finalizing it up front, while building is still single-threaded, makes it an
+// immutable value (status finalized), so that subsequent concurrent
+// resolutions into it do not allocate or mutate per-evaluation state on the
+// shared vertex (see [Vertex.getBareState]). Because CUE forbids import
+// cycles, the imported package can never refer back to its importer, so this
+// can never introduce a structural cycle.
+//
+// The typo (closedness) check is skipped: it would apply the package's
+// importing-agnostic standalone closedness, whereas closedness must be
+// (re)checked in each importing context. See https://cuelang.org/issue/4379.
+// IsFinalized reports whether v has been fully evaluated.
+func (v *Vertex) IsFinalized() bool {
+	return v.Status() == finalized
+}
+
+func (v *Vertex) FinalizeImport(c *OpContext) {
+	if v.status == finalized {
+		return
+	}
+	saved := c.errs
+	c.errs = nil
+	c.unify(v, Flags{
+		status:     finalized,
+		condition:  allKnown,
+		mode:       finalize,
+		checkTypos: false,
+	})
+	c.errs = saved
+}
+
 func (v *Vertex) CompleteArcsOnly(c *OpContext) {
 	c.unify(v, Flags{
 		status:     conjuncts,

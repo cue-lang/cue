@@ -19,10 +19,12 @@ import (
 	"math/big"
 	"sync"
 	"testing"
+	"testing/fstest"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
+	cueload "cuelang.org/go/cue/load"
 )
 
 // The tests in this file verify that cue.Value operations are safe for
@@ -445,6 +447,53 @@ func TestConcurrentUnifyCrossContext(t *testing.T) {
 		}
 	})
 
+}
+
+// TestConcurrentUnifyImport is a regression test for
+// https://cuelang.org/issue/4379: unifying a value that reaches into an
+// imported package concurrently used to race, because the shared imported
+// package root was finalized lazily and mutated in place by each goroutine.
+// It fails under "go test -race" without the fix.
+func TestConcurrentUnifyImport(t *testing.T) {
+	fsys := fstest.MapFS{
+		"cue.mod/module.cue": &fstest.MapFile{Data: []byte(`module: "example.com"
+language: version: "v0.16.0"
+`)},
+		"outer/outer.cue": &fstest.MapFile{Data: []byte(`package outer
+
+import "example.com/inner"
+
+#Schema: inner.#Item
+`)},
+		"inner/inner.cue": &fstest.MapFile{Data: []byte(`package inner
+
+#Item: int
+`)},
+	}
+	insts := cueload.Instances([]string{"./outer"}, &cueload.Config{FS: fsys})
+	if err := insts[0].Err; err != nil {
+		t.Fatal(err)
+	}
+	ctx := cuecontext.New()
+	v := ctx.BuildInstance(insts[0])
+	if err := v.Err(); err != nil {
+		t.Fatal(err)
+	}
+	schema := v.LookupPath(cue.MakePath(cue.Def("Schema")))
+	if err := schema.Err(); err != nil {
+		t.Fatal(err)
+	}
+	data := ctx.CompileString(`5`)
+	if err := data.Err(); err != nil {
+		t.Fatal(err)
+	}
+
+	runConcurrent(t, func() {
+		result := schema.Unify(data)
+		if err := result.Err(); err != nil {
+			t.Error(err)
+		}
+	})
 }
 
 // TestConcurrentMarshalJSON tests concurrent JSON marshaling.

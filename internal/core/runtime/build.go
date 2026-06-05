@@ -140,8 +140,27 @@ func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec
 		return pkg.Err
 	}
 
-	if _, err := x.Build(cfg, pkg); err != nil {
-		return err
+	v, buildErr := x.Build(cfg, pkg)
+	if buildErr != nil {
+		return buildErr
+	}
+
+	// An imported package root is shared across the entire runtime: the same
+	// *Vertex is handed out for every reference to the package, and references
+	// may be resolved concurrently (e.g. many goroutines unifying values that
+	// reach into the same import, or whose import sits in a lazily-evaluated
+	// position such as a pattern-constraint value). Lazily finalizing that
+	// shared root on first use then races.
+	//
+	// Finalize the import here, while building is still single-threaded.
+	// buildSpec is driven by static import specs (not lazy evaluation), so it
+	// visits every transitive import, finalizing them bottom-up. Once
+	// finalized the root is immutable, so concurrent resolutions into it no
+	// longer allocate or mutate per-evaluation state on it.
+	// See https://cuelang.org/issue/4379.
+	if v != nil {
+		ctx := adt.NewContext(x, v)
+		v.FinalizeImport(ctx)
 	}
 
 	return nil

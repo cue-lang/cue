@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd7e4b07_65f75ec9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2026-06-06T13:32:13Z",
+      "side": 1,
+      "message": "Does this impose an efficiency tax, then, on using a cue.Value for a schema to unify and validate with many other cue.Values loaded in different goroutines? If so, is the cost incurred once per cue.Context (multiplied by the fan-out coefficient of concurrent workers), or in every subsequent unification and validation?",
+      "revId": "86eb4f158a13fa593ae48fd8c95e2143e27f4f7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

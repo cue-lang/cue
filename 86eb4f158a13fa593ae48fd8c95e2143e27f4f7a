@@ -16,6 +16,24 @@
       "message": "Does this impose an efficiency tax, then, on using a cue.Value for a schema to unify and validate with many other cue.Values loaded in different goroutines? If so, is the cost incurred once per cue.Context (multiplied by the fan-out coefficient of concurrent workers), or in every subsequent unification and validation?",
       "revId": "86eb4f158a13fa593ae48fd8c95e2143e27f4f7a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "252a24d9_74cf6c54",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-06T13:35:08Z",
+      "side": 1,
+      "message": "this is once per OpContext, meaning once per high-level operation like Unify or Validate. we can probably optimize this later on, but it seems best to fix the correctness issue first, before we worry too much about performance. the performance is possibly OK given that the evaluator is lazy, so only the required parts of imports will be re-evaluated each time.",
+      "parentUuid": "cd7e4b07_65f75ec9",
+      "revId": "86eb4f158a13fa593ae48fd8c95e2143e27f4f7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

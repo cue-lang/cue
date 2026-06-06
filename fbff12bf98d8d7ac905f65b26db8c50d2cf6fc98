@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b407f7d_d4340fa8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-06T09:31:41Z",
+      "side": 1,
+      "message": "This seems correct to me. FTR, this means that the use parts of package are evaluated more than once. But that is probably fine, for now at least.",
+      "revId": "fbff12bf98d8d7ac905f65b26db8c50d2cf6fc98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

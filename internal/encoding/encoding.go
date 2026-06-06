@@ -117,6 +117,12 @@ func (i *Decoder) File() *ast.File {
 	return internal.ToFile(i.expr, false)
 }
 
+// SourceExpr returns the expression decoded from the source, before any
+// interpretation such as JSON Schema is applied.
+func (i *Decoder) SourceExpr() ast.Expr {
+	return i.expr
+}
+
 func (i *Decoder) Err() error {
 	if i.err == io.EOF {
 		return nil

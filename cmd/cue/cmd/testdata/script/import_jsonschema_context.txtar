@@ -7,10 +7,18 @@
 ! exec cue import -o - -l title jsonschema: input.json
 stderr 'error evaluating label title: reference "title" not found'
 
-# --with-context exposes the source as data, but data.title fails today.
-! exec cue import -o - --with-context -l data.title jsonschema: input.json
-stderr 'error evaluating label data.title: undefined field: title'
+# --with-context exposes the source as data, so data.title resolves and places
+# the schema under that name.
+exec cue import -o - --with-context -l data.title jsonschema: input.json
+cmp stdout expect-stdout
 
+-- expect-stdout --
+// Person
+Person: {
+	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+	@jsonschema(id="https://example.com/person.schema.json")
+	...
+}
 -- input.json --
 {
 	"$schema": "http://json-schema.org/draft-07/schema",

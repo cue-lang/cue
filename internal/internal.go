@@ -20,7 +20,6 @@ package internal
 // TODO: refactor packages as to make this package unnecessary.
 
 import (
-	"bufio"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -148,28 +147,40 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 		cg.Line = true
 		cg.Position = 10
 	}
-	scanner := bufio.NewScanner(strings.NewReader(s))
-	for scanner.Scan() {
-		scanner := bufio.NewScanner(strings.NewReader(scanner.Text()))
-		scanner.Split(bufio.ScanWords)
-		const maxRunesPerLine = 66
-		count := 2
-		buf := strings.Builder{}
-		buf.WriteString("//")
-		for scanner.Scan() {
-			s := scanner.Text()
-			n := utf8.RuneCountInString(s) + 1
-			if count+n > maxRunesPerLine && count > 3 {
-				cg.List = append(cg.List, &ast.Comment{Text: buf.String()})
-				count = 3
-				buf.Reset()
-				buf.WriteString("//")
+	addLine := func(text string) {
+		cg.List = append(cg.List, &ast.Comment{Text: text})
+	}
+	// We only wrap a source line whose comment form would exceed wrapTrigger,
+	// and then to wrapWidth; this leaves already sensibly wrapped text alone.
+	const wrapWidth = 80
+	const wrapTrigger = 100
+	for line := range strings.Lines(s) {
+		words := strings.Fields(line)
+		joined := strings.Join(words, " ")
+		switch {
+		case len(words) == 0:
+			addLine("//")
+		case utf8.RuneCountInString(joined)+len("// ") <= wrapTrigger:
+			addLine("// " + joined)
+		default:
+			// Too long; greedily wrap the words to wrapWidth.
+			count := len("//")
+			buf := strings.Builder{}
+			buf.WriteString("//")
+			for _, w := range words {
+				n := utf8.RuneCountInString(w) + 1
+				if count+n > wrapWidth && count > len("// ") {
+					addLine(buf.String())
+					buf.Reset()
+					buf.WriteString("//")
+					count = len("// ")
+				}
+				buf.WriteString(" ")
+				buf.WriteString(w)
+				count += n
 			}
-			buf.WriteString(" ")
-			buf.WriteString(s)
-			count += n
+			addLine(buf.String())
 		}
-		cg.List = append(cg.List, &ast.Comment{Text: buf.String()})
 	}
 	if last := len(cg.List) - 1; cg.List[last].Text == "//" {
 		cg.List = cg.List[:last]

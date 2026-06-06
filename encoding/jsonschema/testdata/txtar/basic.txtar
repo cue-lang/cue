@@ -70,15 +70,13 @@ person?: {
 	// where does this person live?
 	address?: #address
 
-	// A very large comment that will be wrapped after a certain line
-	// length. Let's keep on going and see what happens.
+	// A very large comment that will be wrapped after a certain line length. Let's
+	// keep on going and see what happens.
 	children?: [...string]
 	"home phone"?: #."phone number" @deprecated()
 
-	// AllConditions enable variable-based conditional rule execution.
-	// This is useful for
-	// finer control of when an rule is applied. A condition can
-	// reference object data
+	// AllConditions enable variable-based conditional rule execution. This is useful for
+	// finer control of when an rule is applied. A condition can reference object data
 	// using JMESPath notation.
 	// Here, all of the conditions need to pass.
 	bio?: string

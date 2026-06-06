@@ -34,6 +34,24 @@
       "parentUuid": "4663a679_bdcfebdd",
       "revId": "4ab9f3ea5418d2cc9c23cf1635070b9146b0eef6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80db1a0e_b0f0725d",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-06T09:52:03Z",
+      "side": 1,
+      "message": "Looked into it. Quite a bit of the trickiness comes from the fact that, with current semantics anyway, it\u0027s not possible to canonicalize an import path in general just by looking at the import path and the module file, because a package path can potentially be present in multiple modules with different major versions.\n\nConsider this, for example:\n\n```\ndeps: {\n\t\"foo.com/a@v0\": {\n\t\tdefault: true\n\t\tv: \"v0.0.0\"\n\t}\n\t\"foo.com/a/b@v1\": {\n\t\tdefault: true\n\t\tv: \"v1.0.0\"\n\t}\n}\n```\nIf the import path is \"foo.com/a/b/c\", we can\u0027t know which module it\u0027s in without looking to see if there are CUE files in the relevant directory in each module.\n\nMaybe we should somehow define that situation away, for example by making it invalid to have a submodule with a different major version and `default: true`.\n\nThere would still be the potential issue of breaking existing users that assume a 1-1 mapping between the import statement and `Instance.ImportPath` though.\n\nI think I\u0027ll leave this as is for now and leave a TODO to think about it.",
+      "parentUuid": "30dfc6dd_31a737b6",
+      "revId": "4ab9f3ea5418d2cc9c23cf1635070b9146b0eef6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

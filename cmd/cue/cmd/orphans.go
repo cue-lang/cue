@@ -99,12 +99,16 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 		d := di.dec(b)
 
 		var objs []*ast.File
+		// srcs holds each object's pre-interpretation source, aligned with
+		// objs; see placeOrphans.
+		var srcs []ast.Expr
 
 		// Filter only need to filter files that can stream:
 		for ; !d.Done(); d.Next() {
 			if f := d.File(); f != nil {
 				f.Filename = newName(d.Filename(), 0)
 				objs = append(objs, f)
+				srcs = append(srcs, d.SourceExpr())
 			}
 		}
 		if err := d.Err(); err != nil {
@@ -114,7 +118,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 
 		if b.perFile {
 			for i, obj := range objs {
-				f, err := placeOrphans(b, d, pkg, obj)
+				f, err := placeOrphans(b, d, pkg, srcs[i:i+1], obj)
 				if err != nil {
 					return err
 				}
@@ -141,7 +145,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 			}
 		} else {
 			// TODO: handle imports correctly, i.e. for proto.
-			f, err := placeOrphans(b, d, pkg, objs...)
+			f, err := placeOrphans(b, d, pkg, srcs, objs...)
 			if err != nil {
 				return err
 			}
@@ -184,7 +188,7 @@ func setPackage(f *ast.File, name string, overwrite bool) {
 	f.Decls = decls
 }
 
-func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.File) (*ast.File, error) {
+func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, srcs []ast.Expr, objs ...*ast.File) (*ast.File, error) {
 	f := &ast.File{}
 	filename := d.Filename()
 
@@ -207,8 +211,10 @@ objsLoop:
 			isNull := lit != nil && lit.Value == "null"
 			expr := expr
 			if b.useContext {
+				// data holds the original source data, so labels can
+				// reference source fields such as data.title.
 				expr = ast.NewStruct(
-					"data", expr,
+					"data", srcs[i],
 					"filename", ast.NewString(filename),
 					"index", ast.NewLit(token.INT, strconv.Itoa(i)),
 					"recordCount", ast.NewLit(token.INT, strconv.Itoa(len(objs))),

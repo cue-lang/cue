@@ -45,6 +45,10 @@
                 "home phone": {
                     "$ref": "#/$defs/phone number",
                     "deprecated": true
+                },
+                "bio": {
+                    "description": "AllConditions enable variable-based conditional rule execution. This is useful for\nfiner control of when an rule is applied. A condition can reference object data\nusing JMESPath notation.\nHere, all of the conditions need to pass.\n",
+                    "type": "string"
                 }
             }
         }
@@ -70,6 +74,14 @@ person?: {
 	// length. Let's keep on going and see what happens.
 	children?: [...string]
 	"home phone"?: #."phone number" @deprecated()
+
+	// AllConditions enable variable-based conditional rule execution.
+	// This is useful for
+	// finer control of when an rule is applied. A condition can
+	// reference object data
+	// using JMESPath notation.
+	// Here, all of the conditions need to pass.
+	bio?: string
 	...
 }
 

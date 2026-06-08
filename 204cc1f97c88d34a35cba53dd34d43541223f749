@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e12cb5fc_1e35a618",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T10:33:55Z",
+      "side": 1,
+      "message": "The way you say `starting with \".\"` sounds like e.g. `../foo` will work. if it shouldn\u0027t work, I would change the wording to say `./` instead, and add tests ensuring it fails. if it should work, I guess the wording is fine, but we\u0027d need tests to double check it actually works.",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a32cfc72_0570f0f8",
+        "filename": "cue/load/config.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T10:33:55Z",
+      "side": 1,
+      "message": "nit: join with the `repls !\u003d nil` block above",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2721da49_61d7aaa8",
+        "filename": "cue/load/import.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T10:33:55Z",
+      "side": 1,
+      "message": "so directory replacements are always absolute when using cue/load with an io/fs? I\u0027m a little confused as the commit message seems to imply the paths can generally begin with `./` or `/`, and only the latter is absolute. we should cover both of these with cue/load and io/fs in the tests; fs_test.go only seems to cover `./`",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e863e23_df4f42fe",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T10:33:55Z",
+      "side": 1,
+      "message": "nit: use https://pkg.go.dev/cuelang.org/go/pkg/path#VolumeName",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bf72f83_76ba2b57",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 12
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T10:33:55Z",
+      "side": 1,
+      "message": "nit: should we have a `let latestVersion \u003d \"v0.17.0\"` at the top level near where we declare the latest version schema, so we don\u0027t have to edit an increasing number of lines as we add more versions?",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6c327c8_bf920053",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 12
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T10:33:55Z",
+      "side": 1,
+      "message": "rather than saying this much about paths which feels a bit too specific, how about using OS concepts:\n\n\u003e Directory replaces use a relative path starting with \".\" or an absolute path;\n\u003e any other value is a module path with a version (e.g. \"example.com/bar@v0.1.0\").",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea603a33_68039a91",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 12
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T10:33:55Z",
+      "side": 1,
+      "message": "ah, we could make these use the new `error` built-in :) feel free to do this in a follow-up commit. it would be good to sanity check that we get equal or better errors in the UI with the change.",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

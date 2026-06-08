@@ -1,0 +1,30 @@
+# pkg/encoding: json.Validate does not expose enough error information. When
+# validating data against a closed schema, a "field not allowed" error does not
+# identify the offending field: the error is attributed to the call site (y)
+# rather than to the field within the validated data (y.Foo), so it is
+# impossible to tell which field was at fault. This captures the current,
+# incorrect behavior.
+# https://cuelang.org/issue/2782
+-- in.cue --
+import "encoding/json"
+
+y: json.Validate(x, #z)
+
+x: #"{ "a": 1, "b": "2", "Foo": 3 }"#
+#z: {
+	a!: >0
+	b!: string
+}
+-- out/json-v3 --
+Errors:
+y: error in call to encoding/json.Validate: field not allowed:
+    ./in.cue:3:4
+    json.Validate:1:21
+
+Result:
+y: _|_ // y: error in call to encoding/json.Validate: y.Foo: field not allowed
+x: "{ \"a\": 1, \"b\": \"2\", \"Foo\": 3 }"
+#z: {
+	a!: >0
+	b!: string
+}

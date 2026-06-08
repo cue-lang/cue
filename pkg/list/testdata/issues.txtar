@@ -103,7 +103,7 @@ issue3416: sumSecond: {
 issue3950: list.Contains(["no", "no"|*"yes"], "yes")
 -- out/list-v3 --
 Errors:
-issue3541: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (type int and struct):
+issue3541.0: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (type int and struct):
     ./in.cue:52:2
     ./in.cue:35:9
     ./in.cue:36:10
@@ -187,7 +187,7 @@ diff old new
 -    ./in.cue:75:6
 -issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle
 -issue3416.sumFirst.a.b: field z not allowed by earlier comprehension or reference cycle
-+issue3541: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (type int and struct):
++issue3541.0: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (type int and struct):
 +    ./in.cue:52:2
 +    ./in.cue:35:9
 +    ./in.cue:36:10

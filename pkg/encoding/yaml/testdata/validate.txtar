@@ -43,29 +43,29 @@ validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate):
     ./in.cue:8:11
     ./in.cue:6:9
     ./in.cue:7:16
-invalidDisjuntion: error in call to encoding/yaml.Validate: 2 errors in empty disjunction::
+invalidDisjuntion.a: error in call to encoding/yaml.Validate: 2 errors in empty disjunction::
     ./in.cue:33:20
-invalidDisjuntion: error in call to encoding/yaml.Validate: conflicting values 1 and 3:
+invalidDisjuntion.a: error in call to encoding/yaml.Validate: conflicting values 1 and 3:
     ./in.cue:33:20
     ./in.cue:33:46
     yaml.Validate:1:4
-invalidDisjuntion: error in call to encoding/yaml.Validate: conflicting values 2 and 3:
+invalidDisjuntion.a: error in call to encoding/yaml.Validate: conflicting values 2 and 3:
     ./in.cue:33:20
     ./in.cue:33:50
     yaml.Validate:1:4
-multiConflict: error in call to encoding/yaml.Validate: conflicting values "bad1" and int (mismatched types string and int):
+multiConflict.field1: error in call to encoding/yaml.Validate: conflicting values "bad1" and int (mismatched types string and int):
     ./in.cue:37:23
     ./in.cue:37:84
     yaml.Validate:1:10
-multiConflict: error in call to encoding/yaml.Validate: conflicting values "bad2" and int (mismatched types string and int):
+multiConflict.field2: error in call to encoding/yaml.Validate: conflicting values "bad2" and int (mismatched types string and int):
     ./in.cue:37:23
     ./in.cue:37:97
     yaml.Validate:1:26
-multiConflictPartial: error in call to encoding/yaml.ValidatePartial: conflicting values "bad1" and int (mismatched types string and int):
+multiConflictPartial.field1: error in call to encoding/yaml.ValidatePartial: conflicting values "bad1" and int (mismatched types string and int):
     ./in.cue:38:23
     ./in.cue:38:91
     yaml.ValidatePartial:1:10
-multiConflictPartial: error in call to encoding/yaml.ValidatePartial: conflicting values "bad2" and int (mismatched types string and int):
+multiConflictPartial.field2: error in call to encoding/yaml.ValidatePartial: conflicting values "bad2" and int (mismatched types string and int):
     ./in.cue:38:23
     ./in.cue:38:104
     yaml.ValidatePartial:1:26
@@ -108,7 +108,7 @@ validate: {
 	// TODO: fix this test: the second disjunct should be eliminated, so there
 	// should not be a concreteness error.
 	t1: {
-		ok1: _|_ // validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): validate.t1.ok1: incomplete value {a:2} | {a:2,b!:int}
+		ok1: _|_ // validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): incomplete value {a:2} | {a:2,b!:int}
 		ok2: "a: 2"
 		ok3: "a: 2"
 	}
@@ -144,9 +144,9 @@ validatePartial: {
 		ok2: "'foo'"
 	}
 }
-invalidDisjuntion: _|_ // invalidDisjuntion: error in call to encoding/yaml.Validate: invalidDisjuntion.a: 2 errors in empty disjunction: (and 2 more errors)
+invalidDisjuntion: _|_ // invalidDisjuntion: error in call to encoding/yaml.Validate: a: 2 errors in empty disjunction: (and 2 more errors)
 
 // Both Validate and ValidatePartial must report every conflict, not just the
 // first one. Regression test for https://cuelang.org/issue/2079.
-multiConflict:        _|_ // multiConflict: error in call to encoding/yaml.Validate: multiConflict.field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)
-multiConflictPartial: _|_ // multiConflictPartial: error in call to encoding/yaml.ValidatePartial: multiConflictPartial.field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)
+multiConflict:        _|_ // multiConflict: error in call to encoding/yaml.Validate: field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)
+multiConflictPartial: _|_ // multiConflictPartial: error in call to encoding/yaml.ValidatePartial: field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)

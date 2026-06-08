@@ -1690,9 +1690,16 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 		return nil
 	case *Bottom:
 		vErr := c.NewPosf(Pos(call), "error in call to %s", builtin.qualifiedName(c))
+		inner := result
+		// A structural cycle is reported at the cycle itself; relative to this
+		// call it has no sub-path. Drop its absolute path so it is not appended
+		// to the call's.
+		if result.Code == StructuralCycleError {
+			inner = result.WithoutPath()
+		}
 		return &Bottom{
 			Code: result.Code,
-			Err:  errors.Wrap(vErr, result.Err),
+			Err:  errors.Wrap(vErr, inner.Err),
 			Node: c.vertex,
 		}
 	}

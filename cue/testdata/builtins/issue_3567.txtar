@@ -13,6 +13,6 @@ Unifications: 6
 Conjuncts:    6
 Disjuncts:    0
 -- out/errors.txt --
-[eval] a: error in call to strings.Join: not enough arguments in call to strings.Join (have 1, want 2):
+[eval] a.0: error in call to strings.Join: not enough arguments in call to strings.Join (have 1, want 2):
     ./in.cue:2:4
     ./in.cue:2:20

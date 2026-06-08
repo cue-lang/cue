@@ -163,6 +163,64 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 	return nil
 }
 
+// resolveLabels evaluates the -l/--path flags into the labels and path they
+// describe, evaluating expression labels within scope. It is shared by
+// placeOrphans and wrapWithPath.
+func (b *buildPlan) resolveLabels(scope cue.Value) ([]ast.Label, cue.Path, error) {
+	ctx := b.cmd.ctx
+	var labels []ast.Label
+	for _, label := range b.path {
+		switch x := label.(type) {
+		case *ast.Ident, *ast.BasicLit:
+		case ast.Expr:
+			if p, ok := x.(*ast.ParenExpr); ok {
+				x = p.X // unwrap for better error messages
+			}
+			l := ctx.BuildExpr(x, cue.InferBuiltins(true), cue.Scope(scope))
+			switch l.Kind() {
+			case cue.StringKind, cue.IntKind:
+				syn, ok := l.Syntax().(ast.Label)
+				if !ok {
+					return nil, cue.Path{}, fmt.Errorf(
+						`expression is not a valid label: %v`, astinternal.DebugStr(x))
+				}
+				label = syn
+
+			default:
+				var arg any = l
+				if err := l.Err(); err != nil {
+					arg = err
+				}
+				return nil, cue.Path{}, fmt.Errorf(
+					`error evaluating label %v: %v`, astinternal.DebugStr(x), arg)
+			}
+		}
+		ast.SetPos(label, token.NoPos)
+		labels = append(labels, label)
+	}
+
+	sels := make([]cue.Selector, len(labels))
+	for i, label := range labels {
+		sels[i] = cue.Label(label)
+	}
+	return labels, cue.MakePath(sels...), nil
+}
+
+// wrapWithPath wraps v in the nested struct described by the -l/--path flags.
+// It is a no-op without -l, or when orphan files are present: there the flags
+// are already consumed by placeOrphans, so wrapping again would double-wrap.
+func (b *buildPlan) wrapWithPath(v cue.Value) (cue.Value, error) {
+	if len(b.path) == 0 || len(b.orphaned) > 0 || len(b.imported) > 0 {
+		return v, nil
+	}
+	_, path, err := b.resolveLabels(v)
+	if err != nil {
+		return v, err
+	}
+	wrapped := b.cmd.ctx.CompileString("{}").FillPath(path, v)
+	return wrapped, wrapped.Err()
+}
+
 func setPackage(f *ast.File, name string, overwrite bool) {
 	if pkg, _ := internal.Package(f); pkg != nil {
 		if !overwrite || pkg.Name.Name == name {
@@ -220,53 +278,20 @@ objsLoop:
 					"recordCount", ast.NewLit(token.INT, strconv.Itoa(len(objs))),
 				)
 			}
-			ctx := b.cmd.ctx
-			inst := ctx.BuildExpr(expr)
+			inst := b.cmd.ctx.BuildExpr(expr)
 			if err := inst.Err(); err != nil {
 				return nil, err
 			}
 
-			var a []cue.Selector
-
-			for _, label := range b.path {
-				switch x := label.(type) {
-				case *ast.Ident, *ast.BasicLit:
-				case ast.Expr:
-					if p, ok := x.(*ast.ParenExpr); ok {
-						x = p.X // unwrap for better error messages
-					}
-					l := ctx.BuildExpr(x,
-						cue.InferBuiltins(true),
-						cue.Scope(inst))
-					switch l.Kind() {
-					case cue.StringKind, cue.IntKind:
-						syn, ok := l.Syntax().(ast.Label)
-						if !ok {
-							return nil, fmt.Errorf(
-								`expression is not a valid label: %v`,
-								astinternal.DebugStr(x))
-						}
-						label = syn
-
-					default:
-						var arg interface{} = l
-						if err := l.Err(); err != nil {
-							if isNull {
-								continue objsLoop
-							}
-							arg = err
-						}
-						return nil, fmt.Errorf(
-							`error evaluating label %v: %v`,
-							astinternal.DebugStr(x), arg)
-					}
+			var err error
+			labels, path, err = b.resolveLabels(inst)
+			if err != nil {
+				// A null object has no fields for a label to reference; skip it.
+				if isNull {
+					continue objsLoop
 				}
-				ast.SetPos(label, token.NoPos)
-				a = append(a, cue.Label(label))
-				labels = append(labels, label)
+				return nil, err
 			}
-
-			path = cue.MakePath(a...)
 		}
 
 		switch d.Interpretation() {

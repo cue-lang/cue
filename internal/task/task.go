@@ -228,11 +228,12 @@ type taskError struct {
 
 var _ errors.Error = &taskError{}
 
-func (t *taskError) Path() (a []string) {
-	for _, x := range t.v.Path().Selectors() {
-		a = append(a, x.String())
-	}
-	return a
+// Path reports no path of its own: a taskError is a contextual wrapper whose
+// location comes from the error it wraps. As [errors.wrapped.Path] augments the
+// wrapping error's path with the wrapped one's, reporting a path here (the same
+// path the wrapped error already carries) would duplicate it.
+func (t *taskError) Path() []string {
+	return nil
 }
 
 func (t *taskError) Position() token.Pos {

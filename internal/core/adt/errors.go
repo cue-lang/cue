@@ -365,6 +365,22 @@ func (v *ValueError) AddPosition(n Node) {
 	v.AddPos(Pos(n))
 }
 
+// WithoutPath returns a copy of the error that reports no path of its own, so
+// that its location is taken from whatever error it is joined with rather than
+// reported on its own. The original is left unchanged, as it may be shared (for
+// example a node's cached error).
+//
+// Use it for contextual errors: ones that add a message and position to an
+// error that already locates the failure. Since [cuelang.org/go/cue/errors]
+// joins the paths of wrapped errors, a contextual error reporting the same path
+// as the error it wraps would otherwise have that path reported twice.
+func (v *ValueError) WithoutPath() *ValueError {
+	cp := *v
+	cp.v = nil
+	cp.altPath = nil
+	return &cp
+}
+
 func (c *OpContext) errNode() *Vertex {
 	return c.vertex
 }

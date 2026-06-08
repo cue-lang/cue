@@ -220,6 +220,26 @@ func Unix(sec int64, nsec int64) string {
 	return t.UTC().Format(time.RFC3339Nano)
 }
 
+// ToUnix returns the given time value as a Unix time in seconds
+// elapsed since January 1, 1970 UTC.
+func ToUnix(value string) (int64, error) {
+	t, err := time.Parse(time.RFC3339Nano, value)
+	if err != nil {
+		return 0, err
+	}
+	return t.Unix(), nil
+}
+
+// ToUnixNano returns the given time value as a Unix time in nanoseconds
+// elapsed since January 1, 1970 UTC.
+func ToUnixNano(value string) (int64, error) {
+	t, err := time.Parse(time.RFC3339Nano, value)
+	if err != nil {
+		return 0, err
+	}
+	return t.UnixNano(), nil
+}
+
 // Parts holds individual parts of a parsed time stamp.
 type Parts struct {
 	Year   int `json:"year"`

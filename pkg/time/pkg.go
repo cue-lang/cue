@@ -229,6 +229,30 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "ToUnix",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.IntKind,
+		Func: func(c *pkg.CallCtxt) {
+			value := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = ToUnix(value)
+			}
+		},
+	}, {
+		Name: "ToUnixNano",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.IntKind,
+		Func: func(c *pkg.CallCtxt) {
+			value := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = ToUnixNano(value)
+			}
+		},
+	}, {
 		Name: "Split",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

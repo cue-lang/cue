@@ -883,3 +883,55 @@ func TestIsInlineModeParsedError(t *testing.T) {
 		t.Error("isInlineMode returned false for archive with @test in parse-error file; want true")
 	}
 }
+
+// TestFileExperimentPrefix verifies that fileExperimentPrefix extracts the
+// file-level @experiment(...) attribute lines that precede the package clause
+// and other declarations. The prefix is used to compile @test(eq, ...) expected
+// expressions with the same experiments as the file under test.
+func TestFileExperimentPrefix(t *testing.T) {
+	testCases := []struct {
+		name string
+		data string
+		want string
+	}{{
+		name: "none",
+		data: "a: 1\n",
+		want: "",
+	}, {
+		name: "single",
+		data: "@experiment(reflect)\n\na: 1\n",
+		want: "@experiment(reflect)\n",
+	}, {
+		name: "after comment",
+		data: "// header comment\n@experiment(reflect)\n\na: 1\n",
+		want: "@experiment(reflect)\n",
+	}, {
+		name: "multiple",
+		data: "@experiment(reflect)\n@experiment(try)\n\na: 1\n",
+		want: "@experiment(reflect)\n@experiment(try)\n",
+	}, {
+		name: "stops at first declaration",
+		data: "@experiment(reflect)\nb: exists(a)\n@experiment(try)\n",
+		want: "@experiment(reflect)\n",
+	}, {
+		name: "stops at package clause",
+		data: "@experiment(reflect)\npackage p\n",
+		want: "@experiment(reflect)\n",
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			r := &inlineRunner{archive: &txtar.Archive{
+				Files: []txtar.File{{Name: "in.cue", Data: []byte(tc.data)}},
+			}}
+			if got := r.fileExperimentPrefix("in.cue"); got != tc.want {
+				t.Errorf("fileExperimentPrefix() = %q, want %q", got, tc.want)
+			}
+		})
+	}
+
+	// An unknown file name yields no prefix rather than panicking.
+	r := &inlineRunner{archive: &txtar.Archive{}}
+	if got := r.fileExperimentPrefix("missing.cue"); got != "" {
+		t.Errorf("fileExperimentPrefix(missing) = %q, want empty", got)
+	}
+}

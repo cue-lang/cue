@@ -365,6 +365,34 @@ func (v *ValueError) AddPosition(n Node) {
 	v.AddPos(Pos(n))
 }
 
+// WithoutPath returns a copy of the error that reports no path of its own, so
+// that its location comes from whatever error it is joined with. The original
+// is left unchanged, as it may be shared.
+//
+// Use it for contextual errors that add a message and position to an error
+// already locating the failure: since the paths of wrapped errors are joined,
+// reporting the same path here would report it twice.
+func (v *ValueError) WithoutPath() *ValueError {
+	cp := *v
+	cp.v = nil
+	cp.altPath = nil
+	return &cp
+}
+
+// WithoutPath returns a copy of b whose error reports no path of its own (see
+// [ValueError.WithoutPath]), so that its location comes from whatever error it
+// is joined with. If b's error carries no path, b is returned unchanged. The
+// original is left unchanged, as it may be shared.
+func (b *Bottom) WithoutPath() *Bottom {
+	ve, ok := b.Err.(*ValueError)
+	if !ok {
+		return b
+	}
+	cp := *b
+	cp.Err = ve.WithoutPath()
+	return &cp
+}
+
 func (c *OpContext) errNode() *Vertex {
 	return c.vertex
 }

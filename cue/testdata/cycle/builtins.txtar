@@ -402,7 +402,7 @@ issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, ex
     ./cycle.cue:87:21
     ./cycle.cue:88:5
 [structural_cycle] issue3634.reduced.#D.a: structural cycle
-[structural_cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
+[structural_cycle] jsonCycle.t1.x.y.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
     ./jsoncycle.cue:4:8
     ./jsoncycle.cue:5:8
 [eval] listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): {y:_|_(listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): value at path 'listMatchN.structCycle.x' matches 0 list items, want 1)} matches 0 list items, want 1:
@@ -476,18 +476,25 @@ selfCycle.t1.c.d.d: invalid value {d:{}} (does not satisfy matchN): structural c
     ./yamlcycle.cue:24:12
     ./yamlcycle.cue:24:20
     ./yamlcycle.cue:25:8
-[eval] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
+[eval] selfCycle.yamlVal.t1.x.y.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
     ./yamlcycle.cue:36:8
     ./yamlcycle.cue:37:8
-[eval] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
+[eval] selfCycle.yamlVal.t2.x.y.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): structural cycle:
     ./yamlcycle.cue:43:8
     ./yamlcycle.cue:44:8
     ./yamlcycle.cue:45:8
     ./yamlcycle.cue:46:8
-[eval] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: error in call to encoding/yaml.Validate: structural cycle:
+[eval] selfCycle.yamlFun.t2.z.y.selfCycle.yamlFun.t2.x.y.y: error in call to encoding/yaml.Validate: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:56:8
-[eval] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
+[eval] selfCycle.yamlFun.t2.x.y.y: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:56:8
-[structural_cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
+[structural_cycle] selfCycle.yamlValidatePartial.x.y.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): structural cycle:
     ./yamlcycle.cue:60:8
     ./yamlcycle.cue:61:8
+-- out/todo.txt --
+When a validator's argument overlaps the call's own path, relativizing
+the failure redundantly repeats a segment already in the call's path. A
+self-referential x: y: validate(x) yields x.y.y rather than x.y, and
+selfCycle.yamlFun.t2.z.y appends the foreign location
+selfCycle.yamlFun.t2.x.y.y because z references x.
+See #2782.

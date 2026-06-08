@@ -926,6 +926,17 @@ func (v *Vertex) Bottom() *Bottom {
 
 // func (v *Vertex) Evaluate()
 
+// Unroot detaches v from its parent so that errors found within it report
+// paths relative to v rather than absolute paths rooted at the call site.
+// appendPath stops at a nil parent, so cutting v loose makes such paths
+// relative.
+//
+// It must only be called on an unshared vertex, such as one freshly created by
+// [Unify], as it mutates the parent link.
+func (v *Vertex) Unroot() {
+	v.Parent = nil
+}
+
 // Unify unifies two values and returns the result.
 //
 // TODO: introduce: Open() wrapper that indicates closedness should be ignored.

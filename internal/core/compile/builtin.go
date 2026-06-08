@@ -162,16 +162,16 @@ var closeAllBuiltin = &adt.Builtin{
 		case *adt.StructLit, *adt.ListLit:
 			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
 				// Allow usage if explicit open is set
-				return c.NewErrf("__closeAll may only be used when explicitopen is enabled")
+				return c.NewContextErrf("__closeAll may only be used when explicitopen is enabled")
 			}
 		default:
-			return c.NewErrf("argument must be a struct or list literal")
+			return c.NewContextErrf("argument must be a struct or list literal")
 		}
 
 		// argument must be literal struct
 		s, ok := call.Value(0).(*adt.Vertex)
 		if !ok {
-			return c.NewErrf("struct argument must be concrete")
+			return c.NewContextErrf("struct argument must be concrete")
 		}
 
 		s.ClosedRecursive = true
@@ -192,19 +192,19 @@ var recloseBuiltin = &adt.Builtin{
 		case *adt.StructLit, *adt.ListLit:
 			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
 				// Allow usage if explicit open is set
-				return c.NewErrf("__reclose may only be used when explicitopen is enabled")
+				return c.NewContextErrf("__reclose may only be used when explicitopen is enabled")
 			}
 		case *adt.CallExpr:
 			// Allow __reclose(close(...)) so that __reclose can wrap
 			// a close() call and conditionally add recursive closing.
 			if b, ok := x.Fun.(*adt.Builtin); !ok || b.Name != "close" {
-				return c.NewErrf("argument must be a struct or list literal, or a close() call")
+				return c.NewContextErrf("argument must be a struct or list literal, or a close() call")
 			}
 			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
-				return c.NewErrf("__reclose may only be used when explicitopen is enabled")
+				return c.NewContextErrf("__reclose may only be used when explicitopen is enabled")
 			}
 		default:
-			return c.NewErrf("argument must be a struct or list literal")
+			return c.NewContextErrf("argument must be a struct or list literal")
 		}
 
 		// Note that we could have an embedded scalar here, so having a struct
@@ -338,7 +338,7 @@ var testExperiment = &adt.Builtin{
 		if call.Pos().Experiment().Testing {
 			return call.Value(0)
 		} else {
-			return call.OpContext().NewErrf("testing experiment disabled")
+			return call.OpContext().NewContextErrf("testing experiment disabled")
 		}
 	},
 }

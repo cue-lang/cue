@@ -888,7 +888,7 @@ resolveToAncestor: {
 [structural_cycle] shortPathFail.elipsis.t2.Foo.ref: structural cycle
 [structural_cycle] patternFail.issue2374.a.b: structural cycle
 [structural_cycle] withLetFail.schema.next: structural cycle
-[structural_cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
+[structural_cycle] fieldsSumInfinite.issue3310.total.3: error in call to list.Sum: error in call to list.Sum: structural cycle:
     ./in.cue:490:9
 [structural_cycle] listOptOK.list.tail: structural cycle
 [structural_cycle] issue2545.#B.A: structural cycle

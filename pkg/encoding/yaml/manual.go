@@ -28,6 +28,7 @@ import (
 
 // Marshal returns the YAML encoding of v.
 func Marshal(v cue.Value) (string, error) {
+	v = reroot(v)
 	if err := v.Validate(cue.Concrete(true)); err != nil {
 		return "", err
 	}
@@ -36,9 +37,22 @@ func Marshal(v cue.Value) (string, error) {
 	return string(b), err
 }
 
+// reroot returns a copy of v detached from its parent, so that a failure
+// within it reports a path relative to the marshal call rather than an
+// absolute one; the wrapping call error contributes the call's path. See
+// [adt.Vertex.Unroot]. The copy unifies to the same value, so it encodes
+// identically.
+func reroot(v cue.Value) cue.Value {
+	c := value.OpContext(v)
+	vx := adt.Unify(c, value.Vertex(v), &adt.Top{})
+	vx.Unroot()
+	return value.Make(c, vx)
+}
+
 // MarshalStream returns the YAML encoding of v.
 func MarshalStream(v cue.Value) (string, error) {
 	// TODO: return an io.Reader and allow asynchronous processing.
+	v = reroot(v)
 	iter, err := v.List()
 	if err != nil {
 		return "", err

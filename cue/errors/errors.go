@@ -243,10 +243,9 @@ func (e *wrapped) Msg() (format string, args []interface{}) {
 }
 
 func (e *wrapped) Path() []string {
-	if p := e.main.Path(); p != nil {
-		return p
-	}
-	return Path(e.wrap)
+	// Augment the main error's path with the wrapped error's: the main error
+	// locates the context, the wrapped error the failure within it.
+	return slices.Concat(e.main.Path(), Path(e.wrap))
 }
 
 func (e *wrapped) InputPositions() []token.Pos {

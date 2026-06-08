@@ -46,7 +46,10 @@ var matchNBuiltin = &adt.Builtin{
 		if c.InStructuralCycle() {
 			return &adt.Bottom{
 				Code: adt.StructuralCycleError,
-				Err:  c.NewPosf(call.Pos(), "structural cycle"),
+				// The cycle is reported about the validated value itself, not a
+				// sub-value within it, so it carries no path of its own; its
+				// location comes from the wrapping validator error.
+				Err: c.NewPosf(call.Pos(), "structural cycle").WithoutPath(),
 			}
 		}
 
@@ -114,7 +117,10 @@ var matchIfBuiltin = &adt.Builtin{
 		if c.InStructuralCycle() {
 			return &adt.Bottom{
 				Code: adt.StructuralCycleError,
-				Err:  c.NewPosf(call.Pos(), "structural cycle"),
+				// The cycle is reported about the validated value itself, not a
+				// sub-value within it, so it carries no path of its own; its
+				// location comes from the wrapping validator error.
+				Err: c.NewPosf(call.Pos(), "structural cycle").WithoutPath(),
 			}
 		}
 		ifSchema := schemaArg(c, call, 1)
@@ -128,6 +134,11 @@ var matchIfBuiltin = &adt.Builtin{
 			chosenSchema = elseSchema
 		}
 		v = adt.Unify(c, self, chosenSchema)
+		// Re-root the unified result so a failure within it reports a path
+		// relative to the matchIf call rather than an absolute one; the
+		// wrapping validator error contributes the call's path. Without this a
+		// self-referential matchIf repeats the call site once per nesting level.
+		v.Unroot()
 		err := adt.Validate(c, v, finalCfg)
 		if err == nil {
 			return adt.StaticBoolTrue
@@ -175,7 +186,9 @@ func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.B
 	n := unifyScalar(ctx, bound, cnt)
 	b, _ := n.BaseValue.(*adt.Bottom)
 	if b != nil {
-		b := ctx.NewErrf("%d matched, expected %v", count, bound)
+		// This error is wrapped by the validator's context error, which locates
+		// it at the validated value; a path here would duplicate that location.
+		b := ctx.NewErrf("%d matched, expected %v", count, bound).WithoutPath()
 
 		// By default we should mark the error as incomplete, but check if we
 		// know for sure it will fail.

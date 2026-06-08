@@ -14,22 +14,22 @@ regularFields: {
 	err4: {x: 1, y: 2}  @test(err, code=eval, contains="conflicting values 1 and 2", pos=[in.cue:2:7, in.cue:2:39, 0:8, 0:18])
 }
 -- out/errors.txt --
-[eval] regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
+[eval] regularFields.err1.y: invalid value {x:10,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
     ./in.cue:2:7
     ./in.cue:2:30
     ./in.cue:10:8
     ./in.cue:10:19
-[eval] regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
+[eval] regularFields.err2.y: invalid value {x:11,y:6} (does not satisfy matchIf): conflicting values 5 and 6:
     ./in.cue:2:7
     ./in.cue:2:30
     ./in.cue:11:8
     ./in.cue:11:19
-[eval] regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf): conflicting values 1 and 5:
+[eval] regularFields.err3.y: invalid value {x:2,y:5} (does not satisfy matchIf): conflicting values 1 and 5:
     ./in.cue:2:7
     ./in.cue:2:39
     ./in.cue:12:8
     ./in.cue:12:18
-[eval] regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf): conflicting values 1 and 2:
+[eval] regularFields.err4.y: invalid value {x:1,y:2} (does not satisfy matchIf): conflicting values 1 and 2:
     ./in.cue:2:7
     ./in.cue:2:39
     ./in.cue:13:8

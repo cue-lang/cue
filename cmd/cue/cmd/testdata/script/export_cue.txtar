@@ -64,7 +64,7 @@ foo: b: 1
 -- path.golden --
 package after
 
-foo: {
+newpath: foo: {
 	a: "a"
 	b: 1
 }

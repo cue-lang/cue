@@ -122,9 +122,11 @@ func runExport(cmd *Command, args []string) error {
 	iter := b.instances()
 	defer iter.close()
 	for iter.scan() {
-		v := iter.value()
-		err := enc.Encode(v)
+		v, err := b.placeValue(iter.value())
 		if err != nil {
+			return err
+		}
+		if err := enc.Encode(v); err != nil {
 			return err
 		}
 	}

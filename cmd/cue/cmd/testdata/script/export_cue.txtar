@@ -1,4 +1,4 @@
-# Verify that -p works when exporting as CUE.
+# Verify that -p and -l work when exporting as CUE.
 
 # Case 1: only non-CUE inputs
 exec cue export --out cue -p blah x.json y.json
@@ -18,6 +18,11 @@ cmp stdout stdout.golden
 # cause this export to succeed with the package clause 'blah' in the result.
 ! exec cue export --out cue -p blah diffpkg.cue x.json y.json
 cmp stderr stderr.golden
+
+# Case 5: -l places the exported CUE value at a path.
+# Regression test for https://cuelang.org/issue/1485
+exec cue export --out cue -p after -l 'newpath:' ./sub
+cmp stdout path.golden
 
 -- x.json --
 {
@@ -47,3 +52,19 @@ x: 5
 y: 4
 -- stderr.golden --
 "package" flag clashes with existing package name (blah vs other)
+-- sub/path.cue --
+package before
+
+#X: string | int
+
+foo: [string]: #X
+
+foo: a: "a"
+foo: b: 1
+-- path.golden --
+package after
+
+foo: {
+	a: "a"
+	b: 1
+}

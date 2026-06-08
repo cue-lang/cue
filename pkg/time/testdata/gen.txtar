@@ -24,11 +24,30 @@ parse: {
 split: {
 	t1: time.Split("2017-07-14T02:40:00.000123456Z")
 }
+
+toUnix: {
+	epoch:      time.ToUnix("1970-01-01T00:00:00Z")
+	epochNano:  time.ToUnixNano("1970-01-01T00:00:00Z")
+	frac:       time.ToUnix("2017-07-14T02:40:00.000123456Z")
+	fracNano:   time.ToUnixNano("2017-07-14T02:40:00.000123456Z")
+	offset:     time.ToUnix("2019-01-02T15:04:05-08:00")
+	offsetNano: time.ToUnixNano("2019-01-02T15:04:05-08:00")
+
+	missingZone: time.ToUnix("2019-01-02T15:04:05")
+	badSeconds:  time.ToUnix("2019-01-02T15:04:61Z")
+	garbage:     time.ToUnixNano("not a time")
+}
 -- out/time-v3 --
 Errors:
 t2: invalid value "no time" (does not satisfy time.Time): invalid time "no time":
     ./in.cue:4:5
     ./in.cue:4:17
+toUnix.missingZone: error in call to time.ToUnix: parsing time "2019-01-02T15:04:05" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "" as "Z07:00":
+    ./in.cue:33:15
+toUnix.badSeconds: error in call to time.ToUnix: parsing time "2019-01-02T15:04:61Z": second out of range:
+    ./in.cue:34:15
+toUnix.garbage: error in call to time.ToUnixNano: parsing time "not a time" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "not a time" as "2006":
+    ./in.cue:35:15
 
 Result:
 t1: "1937-01-01T12:00:27.87+00:20"
@@ -49,4 +68,15 @@ split: {
 		second:     0
 		nanosecond: 123456
 	}
+}
+toUnix: {
+	epoch:       0
+	epochNano:   0
+	frac:        1500000000
+	fracNano:    1500000000000123456
+	offset:      1546470245
+	offsetNano:  1546470245000000000
+	missingZone: _|_ // toUnix.missingZone: error in call to time.ToUnix: parsing time "2019-01-02T15:04:05" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "" as "Z07:00"
+	badSeconds:  _|_ // toUnix.badSeconds: error in call to time.ToUnix: parsing time "2019-01-02T15:04:61Z": second out of range
+	garbage:     _|_ // toUnix.garbage: error in call to time.ToUnixNano: parsing time "not a time" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "not a time" as "2006"
 }

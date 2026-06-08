@@ -144,13 +144,12 @@ disjStructExtra.data.t01: conflicting values {a:1,extra:true} and int (mismatche
     ./datatest/testdata.cue:9:14
     1:86
     1:736
+disjStructExtra.data.t01.extra: field not allowed:
+    ./datatest/testdata.cue:9:28
 disjStructExtra.data.t01: invalid value {a:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
     1:76
     ./datatest/testdata.cue:9:14
     1:736
-disjStructExtra.data.t01.extra: field not allowed:
-    1:76
-    ./datatest/testdata.cue:9:28
 -- out/generate-v3/simple --
 -- out/generate-v3/simpleExtra --
 simpleExtra.data.t02.extra: field not allowed:
@@ -160,20 +159,17 @@ nestedDisjStructExtra.data.t03.x: conflicting values {y:1,extra:true} and string
     ./datatest/testdata.cue:20:18
     1:269
     1:798
+nestedDisjStructExtra.data.t03.x.extra: field not allowed:
+    ./datatest/testdata.cue:20:32
 nestedDisjStructExtra.data.t03.x: invalid value {y:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
     1:269
     ./datatest/testdata.cue:20:18
-nestedDisjStructExtra.data.t03.x.extra: field not allowed:
-    1:269
-    ./datatest/testdata.cue:20:32
 -- out/generate-v3/twoStructDisjExtra --
+twoStructDisjExtra.data.t04.a: field not allowed:
+    ./datatest/testdata.cue:24:18
+twoStructDisjExtra.data.t04.extra: field not allowed:
+    ./datatest/testdata.cue:24:28
 twoStructDisjExtra.data.t04: invalid value {a:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
     1:518
     ./datatest/testdata.cue:24:14
     1:834
-twoStructDisjExtra.data.t04.a: field not allowed:
-    1:518
-    ./datatest/testdata.cue:24:18
-twoStructDisjExtra.data.t04.extra: field not allowed:
-    1:518
-    ./datatest/testdata.cue:24:28

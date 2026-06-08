@@ -327,7 +327,7 @@ validator: keepClosed: {
 		b?: int
 	}
 	x: #X
-	x: c: 1 @test(err, code=eval, contains="field not allowed", pos=[-5:3, 0:5])
+	x: c: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
 }
 -- issue1830.cue --
 // Closedness was not applied when accessing optional fields through a selector;
@@ -413,7 +413,6 @@ NumCloseIDs: 122
 [eval] err.t8.V.c.e: field not allowed:
     ./in.cue:290:10
 [eval] validator.keepClosed.x.c: field not allowed:
-    ./validators.cue:31:3
     ./validators.cue:36:5
 -- out/diff-v2-v3.txt --
 Error positions: v3 reports fewer positions than v2.

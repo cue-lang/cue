@@ -143,7 +143,7 @@ embed: normalValidator: {
 		b?: int
 	}
 	x: #X
-	x: err: 1 @test(err, code=eval, contains="field not allowed", pos=[-5:3, 0:5])
+	x: err: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
 }
 embed: openValidator: t1: {
 	#X: {
@@ -1031,7 +1031,6 @@ MaxRedirect:         2
 [eval] embed.withIndirect.err: field not allowed:
     ./in.cue:128:8
 [eval] embed.normalValidator.x.err: field not allowed:
-    ./validators.cue:8:3
     ./validators.cue:13:5
 [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
     ./validators.cue:30:16

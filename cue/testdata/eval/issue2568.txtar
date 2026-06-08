@@ -1,0 +1,61 @@
+# p1, p2, and p3 unify the closed definition #X & #Y, where #X embeds a field
+# that closed #Y does not allow. They are equivalent up to field order and
+# comprehension inlining, so "all" must fail with "field not allowed" on the
+# disallowed field x in all three. The "not_bottom" comprehension filters out
+# bottom list elements; whether it yields [] or propagates the error, and which
+# positions "all" reports the error at, both depend on field order. See
+# out/todo.txt.
+-- in.cue --
+// "all" evaluated before "not_bottom".
+p1: {
+	all: [#X & #Y] @test(err, code=eval, at=0.x, contains="field not allowed", pos=[3:4])
+	not_bottom: [for x in all if x != _|_ {x}] @test(err, code=eval, contains="field not allowed")
+	#X: {
+		{x: "r"}
+		...
+	}
+	#Y: k: "k"
+}
+
+// "not_bottom" evaluated before "all".
+p2: {
+	not_bottom: [for x in all if x != _|_ {x}] @test(eq, [])
+	all: [#X & #Y] @test(err, code=eval, at=0.x, contains="field not allowed", pos=[-1:31, 2:4])
+	#X: {
+		{x: "r"}
+		...
+	}
+	#Y: k: "k"
+}
+
+// "not_bottom" references the comprehension via a sibling field.
+p3: {
+	not_bottom: ref @test(eq, [])
+	ref: [for x in all if x != _|_ {x}]
+	all: [#X & #Y] @test(err, code=eval, at=0.x, contains="field not allowed", pos=[-1:24, 2:4])
+	#X: {
+		{x: "r"}
+		...
+	}
+	#Y: k: "k"
+}
+-- out/todo.txt --
+The results are not consistent across p1, p2, and p3, even though they differ
+only in field order. p1 evaluates "all" before "not_bottom", so the comprehension
+is not "forced" to run: the error is found directly on "all", which reports only
+the disallowed field, and "not_bottom" propagates the error. p2 and p3 evaluate
+the comprehension first, so it filters the failing element down to [] and also
+contributes its own position to the "all" error.
+Ideally, a future version of the evaluator would behave consistently regardless
+of field order.
+-- out/errors.txt --
+[eval] p1.all.0.x: field not allowed:
+    ./in.cue:6:4
+[eval] p1.all.0.x: field not allowed:
+    ./in.cue:6:4
+[eval] p2.all.0.x: field not allowed:
+    ./in.cue:14:31
+    ./in.cue:17:4
+[eval] p3.all.0.x: field not allowed:
+    ./in.cue:26:24
+    ./in.cue:29:4

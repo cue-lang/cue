@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d487773_522f5fb2",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T13:11:55Z",
+      "side": 1,
+      "message": "I wonder to myself whether we should force using something like `cue mod publish --without-local` so that users are really conscious about the local module settings not being published. but I imagine that would quickly get annoying. perhaps a note to stderr alongside \"module published\"?",
+      "revId": "a4044aac13ff941b6218d3e89ee5c32d49e72b4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c4ec454_dcb147ab",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T13:11:55Z",
+      "side": 1,
+      "message": "nit: you could consider e.g. `d.Version \u003d cmp.Or(d.Version, bdep.Version)`",
+      "revId": "a4044aac13ff941b6218d3e89ee5c32d49e72b4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "961bdd67_eee586ea",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T13:11:55Z",
+      "side": 1,
+      "message": "this feels like something that we should only do as part of a test or a fuzz function. it feels rather inefficient to do this always",
+      "revId": "a4044aac13ff941b6218d3e89ee5c32d49e72b4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

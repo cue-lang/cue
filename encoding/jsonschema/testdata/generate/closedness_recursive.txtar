@@ -283,13 +283,12 @@ exprExtra.data.t03: conflicting values {op:"+",left:1,right:2,extra:true} and in
     ./datatest/testdata.cue:28:14
     1:548
     1:1406
+exprExtra.data.t03.extra: field not allowed:
+    ./datatest/testdata.cue:28:50
 exprExtra.data.t03: invalid value {op:"+",left:1,right:2,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
     1:538
     ./datatest/testdata.cue:28:14
     1:1406
-exprExtra.data.t03.extra: field not allowed:
-    1:538
-    ./datatest/testdata.cue:28:50
 -- out/generate-v3/nodeValid --
 -- out/generate-v3/nodeExtra --
 -- out/generate-v3/wrapsNodeValid --

@@ -26,7 +26,7 @@ p2: {
 	}
 	#Y: k: "k"
 
-	@test(err, code=eval, at=all.0.x, contains="field not allowed", pos=[1:31, 4:4])
+	@test(err, code=eval, at=all.0.x, contains="field not allowed", pos=[4:4])
 }
 
 // "not_bottom" references the comprehension via a sibling field.
@@ -40,7 +40,7 @@ p3: {
 	}
 	#Y: k: "k"
 
-	@test(err, code=eval, at=all.0.x, contains="field not allowed", pos=[2:24, 5:4])
+	@test(err, code=eval, at=all.0.x, contains="field not allowed", pos=[5:4])
 }
 -- out/errors.txt --
 [eval] p1.all.0.x: field not allowed:
@@ -48,8 +48,6 @@ p3: {
 [eval] p1.all.0.x: field not allowed:
     ./in.cue:6:4
 [eval] p2.all.0.x: field not allowed:
-    ./in.cue:16:31
     ./in.cue:19:4
 [eval] p3.all.0.x: field not allowed:
-    ./in.cue:30:24
     ./in.cue:33:4

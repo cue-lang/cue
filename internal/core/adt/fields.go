@@ -14,6 +14,8 @@
 
 package adt
 
+import "cuelang.org/go/cue/token"
+
 // This file holds the logic for the insertion of fields and pattern
 // constraints, including tracking closedness.
 //
@@ -421,7 +423,17 @@ func (ctx *OpContext) notAllowedError(arc *Vertex) *Bottom {
 
 	// TODO: setting arc instead of n.node eliminates subfields. This may be
 	// desirable or not, but it differs, at least from <=v0.6 behavior.
-	err := ctx.NewErrf("field not allowed")
+	//
+	// Use token.NoPos rather than ctx.NewErrf's ctx.pos(): the latter is the
+	// incidental position of whatever expression forced evaluation (such as a
+	// comprehension), which makes it depend on evaluation order. The field's
+	// positions come from its conjuncts in ctx.positions above.
+	err := &Bottom{
+		Src:  ctx.src,
+		Err:  ctx.NewPosf(token.NoPos, "field not allowed"),
+		Code: EvalError,
+		Node: ctx.vertex,
+	}
 	err.CloseCheck = true
 	arc.SetValue(ctx, err)
 	if arc.state != nil {

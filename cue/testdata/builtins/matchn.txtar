@@ -557,13 +557,12 @@ openArguments.err2.out.a: invalid value {allowed:"once"} (does not satisfy match
     ./closedness.cue:50:17
     ./closedness.cue:52:7
     ./closedness.cue:53:6
+explicitClose.err1.out.a.baz: field not allowed:
+    ./closedness.cue:53:11
 explicitClose.err1.out.a: invalid value {baz:"notAllowed"} (does not satisfy matchN): 0 matched, expected 1:
     ./closedness.cue:50:6
     ./closedness.cue:50:13
     ./closedness.cue:53:6
-explicitClose.err1.out.a.baz: field not allowed:
-    ./closedness.cue:50:6
-    ./closedness.cue:53:11
 [eval] closedByDefinition.err5.out.exports: conflicting values {exp1:"./main-module.js"} and null (mismatched types struct and null):
     ./closedness.cue:136:13
     ./closedness.cue:136:24

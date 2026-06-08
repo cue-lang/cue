@@ -577,7 +577,7 @@ issue3924: two: {
 		})
 	}
 	out: #Schema & {foo: disallowed: "bar"} // should fail
-	@test(err, code=eval, path=out.foo.disallowed, contains="field not allowed", pos=[4:9, 11:23])
+	@test(err, code=eval, path=out.foo.disallowed, contains="field not allowed", pos=[11:23])
 }
 issue3924: three: t1: {
 	{foo: #job & {disallowed: "bar"}}
@@ -983,7 +983,6 @@ issue3332: {
 [eval] issue3924.one.out.foo.disallowed: field not allowed:
     ./ellipsis.cue:66:23
 [eval] issue3924.two.out.foo.disallowed: field not allowed:
-    ./ellipsis.cue:73:9
     ./ellipsis.cue:80:23
 [eval] issue3924.three.t1.foo.disallowed: field not allowed:
     ./ellipsis.cue:84:16

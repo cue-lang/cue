@@ -2,10 +2,10 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-phrases: invalid value "phrases:\n  # A quote from Mark Twain.\n  quote1:\n    lang: en\n    attribution: Mark Twain\n\n  # A Norwegian proverb.\n  proverb:\n    lang: no\n    text: Stemmen som sier at du ikke klarer det, lyver." (does not satisfy encoding/yaml.Validate): incomplete value !="":
-    ./yaml.cue:19:10
+phrasesYAML.phrases.quote1.text: invalid value "phrases:\n  # A quote from Mark Twain.\n  quote1:\n    lang: en\n    attribution: Mark Twain\n\n  # A Norwegian proverb.\n  proverb:\n    lang: no\n    text: Stemmen som sier at du ikke klarer det, lyver." (does not satisfy encoding/yaml.Validate): incomplete value !="":
+    ./yaml.cue:18:14
     ./yaml.cue:11:17
-    ./yaml.cue:21:10
+    ./yaml.cue:20:14
 -- yaml.cue --
 import "encoding/yaml"
 
@@ -23,11 +23,10 @@ import "encoding/yaml"
 	#LanguageTag: =~"^[a-zA-Z0-9-_]{2,}$" | false
 }
 
-// phrases is a YAML string with a field phrases that is a map of Phrase
-// objects.
-phrases: yaml.Validate(#Phrases)
+// phrasesYAML is a YAML string with a field phrases that is a map of Phrase objects.
+phrasesYAML: yaml.Validate(#Phrases)
 
-phrases: """
+phrasesYAML: """
     phrases:
       # A quote from Mark Twain.
       quote1:

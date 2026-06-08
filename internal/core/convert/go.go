@@ -317,7 +317,11 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 	if v, ok := typeAssert[error](val); ok {
 		errs, ok := v.(errors.Error)
 		if !ok {
-			errs = ctx.Newf("%s", v.Error())
+			// A plain Go error carries no location of its own; this only adds
+			// its message. Report no path, so that when a builtin returns such
+			// an error the call's context error locates it without the path
+			// being reported twice.
+			errs = ctx.Newf("%s", v.Error()).WithoutPath()
 		}
 		return &adt.Bottom{Err: errs}
 	}

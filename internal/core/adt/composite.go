@@ -926,6 +926,24 @@ func (v *Vertex) Bottom() *Bottom {
 
 // func (v *Vertex) Evaluate()
 
+// UnifyValidate is like [Unify], but the result is re-rooted so that errors
+// found within it report paths relative to the unification rather than absolute
+// paths rooted at the call site.
+//
+// Builtins such as json.Validate or encoding/yaml.Validate use this so that an
+// error within the validated value (say, a field "b") is reported relative to
+// the call ("b") rather than absolutely ("y.b" for a call at "y"). The call's
+// own context error then augments that with its location, yielding "y.b"
+// without duplicating the "y" prefix.
+func UnifyValidate(c *OpContext, a, b Value) *Vertex {
+	v := Unify(c, a, b)
+	// appendPath stops at a nil parent, so cutting the synthetic vertex loose
+	// from the call site makes the paths of errors found within it relative.
+	// The vertex is freshly created by Unify and not shared, so this is safe.
+	v.Parent = nil
+	return v
+}
+
 // Unify unifies two values and returns the result.
 //
 // TODO: introduce: Open() wrapper that indicates closedness should be ignored.

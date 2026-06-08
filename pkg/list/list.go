@@ -344,13 +344,16 @@ func matchN(c *adt.OpContext, list []cue.Value, n pkg.Schema, matchValue pkg.Sch
 	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: adt.EvalError,
+			// This error is wrapped by the validator's context error (see
+			// validateWithBuiltin), which locates it at the validated value;
+			// reporting a path here too would duplicate that location.
 			Err: c.NewPosf(
 				token.NoPos,
 				"%v matches %d list items, want %d",
 				matchVertex,
 				nmatch,
 				n,
-			),
+			).WithoutPath(),
 		}}
 	}
 

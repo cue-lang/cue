@@ -46,7 +46,7 @@ var matchNBuiltin = &adt.Builtin{
 		if c.InStructuralCycle() {
 			return &adt.Bottom{
 				Code: adt.StructuralCycleError,
-				Err:  c.NewPosf(call.Pos(), "structural cycle"),
+				Err:  c.NewPosf(call.Pos(), "structural cycle").WithoutPath(),
 			}
 		}
 
@@ -114,7 +114,7 @@ var matchIfBuiltin = &adt.Builtin{
 		if c.InStructuralCycle() {
 			return &adt.Bottom{
 				Code: adt.StructuralCycleError,
-				Err:  c.NewPosf(call.Pos(), "structural cycle"),
+				Err:  c.NewPosf(call.Pos(), "structural cycle").WithoutPath(),
 			}
 		}
 		ifSchema := schemaArg(c, call, 1)
@@ -127,7 +127,9 @@ var matchIfBuiltin = &adt.Builtin{
 		} else {
 			chosenSchema = elseSchema
 		}
-		v = adt.Unify(c, self, chosenSchema)
+		// The error of this unification is returned to be wrapped by the
+		// validator's context error, so report its paths relative to the call.
+		v = adt.UnifyValidate(c, self, chosenSchema)
 		err := adt.Validate(c, v, finalCfg)
 		if err == nil {
 			return adt.StaticBoolTrue
@@ -176,6 +178,12 @@ func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.B
 	b, _ := n.BaseValue.(*adt.Bottom)
 	if b != nil {
 		b := ctx.NewErrf("%d matched, expected %v", count, bound)
+		// This error is returned to be wrapped by the validator's context error
+		// (see validateWithBuiltin), which locates it at the validated value;
+		// reporting a path here too would duplicate that location.
+		if ve, ok := b.Err.(*adt.ValueError); ok {
+			b.Err = ve.WithoutPath()
+		}
 
 		// By default we should mark the error as incomplete, but check if we
 		// know for sure it will fail.

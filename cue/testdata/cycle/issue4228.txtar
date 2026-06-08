@@ -95,7 +95,7 @@ let _globalScope = self
 
 @test(err, code=eval)
 -- out/errors.txt --
-[eval] #manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:_|_(#entries.0.argocd.app.apps: <- invalid value at path '#entries.0.argocd.app.apps'),name:string}:
+[eval] #manifests.#entries.0.argocd.app.apps: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:_|_(#entries.0.argocd.app.apps: <- invalid value at path '#entries.0.argocd.app.apps'),name:string}:
     ./export.cue:18:14
     ./in.cue:15:38
     ./in.cue:16:8
@@ -135,6 +135,11 @@ argocd.app.apps: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:
 [eval] argocd.app.#template.k8s.metadata: field not allowed:
     ./in.cue:5:7
     ./in.cue:11:7
+-- out/todo.txt --
+The #manifests path redundantly appends the argument's own materialized
+location #entries.0.argocd.app.apps. MarshalStream surfaces an
+already-erroring argument; that path cannot be relativized or dropped
+without comparing it to the call's. Updates #2782.
 -- out/eval/stats --
 Leaks:  1
 Freed:  187

@@ -97,7 +97,7 @@ type intFunc func(z, x, y *apd.BigInt) *apd.BigInt
 
 func intDivOp(c *OpContext, fn intFunc, a, b *Num) Value {
 	if b.X.IsZero() {
-		return c.NewErrf("division by zero")
+		return c.NewContextErrf("division by zero")
 	}
 
 	var x, y apd.Decimal

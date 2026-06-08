@@ -387,6 +387,21 @@ func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
 	}
 }
 
+// NewContextErrf is like [OpContext.NewErrf] but for a contextual error that
+// describes a failure of the current operation rather than locating a
+// sub-value within it. The error carries no path of its own, so that when it is
+// wrapped its location comes from the wrapping error; see
+// [ValueError.WithoutPath]. Use it for builtin errors that report about the
+// call itself, such as a division by zero or an invalid argument, whose
+// location is supplied by the call's own context error.
+func (c *OpContext) NewContextErrf(format string, args ...interface{}) *Bottom {
+	b := c.NewErrf(format, args...)
+	if ve, ok := b.Err.(*ValueError); ok {
+		b.Err = ve.WithoutPath()
+	}
+	return b
+}
+
 // AddErrf records an error in OpContext. It returns errors collected so far.
 func (c *OpContext) AddErrf(format string, args ...interface{}) *Bottom {
 	return c.AddErr(c.Newf(format, args...))

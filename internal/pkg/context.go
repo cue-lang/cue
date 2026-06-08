@@ -89,7 +89,7 @@ func (c *CallCtxt) Struct(i int) Struct {
 	} else {
 		err := c.ctx.NewErrf("non-concrete struct for argument %d", i)
 		err.Code = adt.IncompleteError
-		c.Err = &callError{err}
+		c.setCallError(err)
 	}
 	return Struct{}
 }
@@ -320,6 +320,9 @@ func (c *CallCtxt) getList(i int) *adt.Vertex {
 	case ok && v.IsList():
 		v.Finalize(c.ctx)
 		if err := v.Bottom(); err != nil {
+			// This is the list value's own error, locating the failure within
+			// the list; keep its path rather than dropping it as setCallError
+			// would.
 			c.Err = &callError{err}
 			return nil
 		}
@@ -338,7 +341,7 @@ func (c *CallCtxt) getList(i int) *adt.Vertex {
 	} else {
 		err := c.ctx.NewErrf("non-concrete list for argument %d", i)
 		err.Code = adt.IncompleteError
-		c.Err = &callError{err}
+		c.setCallError(err)
 	}
 	return nil
 }
@@ -358,7 +361,10 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 
 		case *adt.Bottom:
 			if x.IsIncomplete() {
-				c.Err = x
+				// This is the element's own error, already located at the
+				// element; the call's context error locates the call, so drop
+				// the path here to avoid duplicating the element's location.
+				c.setCallError(x)
 				return nil
 			}
 
@@ -367,7 +373,7 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 				err := c.ctx.NewErrf(
 					"invalid list element %d in argument %d to call: cannot use value %v (%s) as number",
 					j, i, w, k)
-				c.Err = &callError{err}
+				c.setCallError(err)
 				return a
 			}
 
@@ -375,7 +381,7 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 				"non-concrete value %v for element %d of number list argument %d",
 				w, j, i)
 			err.Code = adt.IncompleteError
-			c.Err = &callError{err}
+			c.setCallError(err)
 			return nil
 		}
 		j++
@@ -398,7 +404,10 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 
 		case *adt.Bottom:
 			if x.IsIncomplete() {
-				c.Err = x
+				// This is the element's own error, already located at the
+				// element; the call's context error locates the call, so drop
+				// the path here to avoid duplicating the element's location.
+				c.setCallError(x)
 				return nil
 			}
 
@@ -407,7 +416,7 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 				err := c.ctx.NewErrf(
 					"invalid list element %d in argument %d to call: cannot use value %v (%s) as string",
 					j, i, w, k)
-				c.Err = &callError{err}
+				c.setCallError(err)
 				return a
 			}
 
@@ -415,7 +424,7 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 				"non-concrete value %v for element %d of string list argument %d",
 				w, j, i)
 			err.Code = adt.IncompleteError
-			c.Err = &callError{err}
+			c.setCallError(err)
 			return nil
 		}
 		j++

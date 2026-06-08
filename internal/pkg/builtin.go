@@ -205,7 +205,10 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	case *json.MarshalerError:
 		if err, ok := err.Err.(Bottomer); ok {
 			if b := err.Bottom(); b != nil {
-				ret = b
+				// This is the marshaled value's own error, located at that
+				// value; the call's context error locates the call, so drop the
+				// path here to avoid duplicating the value's location.
+				ret = withoutPath(b)
 			}
 		}
 	case Bottomer:

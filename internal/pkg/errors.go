@@ -34,6 +34,26 @@ func (e *callError) Error() string {
 	return fmt.Sprint(e.b)
 }
 
+// withoutPath returns a copy of b whose error reports no path of its own, so
+// that its location comes from whatever error wraps it. The original is left
+// unchanged, as it may be an argument value's error that is also reported at
+// its own location elsewhere.
+func withoutPath(b *adt.Bottom) *adt.Bottom {
+	if ve, ok := b.Err.(*adt.ValueError); ok {
+		cp := *b
+		cp.Err = ve.WithoutPath()
+		return &cp
+	}
+	return b
+}
+
+// setCallError records b as the call result, dropping the path it reports
+// about itself. Call errors are re-wrapped by the call's own context error,
+// which already locates them; a path here would duplicate it.
+func (c *CallCtxt) setCallError(b *adt.Bottom) {
+	c.Err = &callError{withoutPath(b)}
+}
+
 func (c *CallCtxt) errf(underlying error, format string, args ...interface{}) {
 	var errs errors.Error
 	var code adt.ErrorCode
@@ -48,14 +68,17 @@ func (c *CallCtxt) errf(underlying error, format string, args ...interface{}) {
 	case error:
 		errs = errors.Promote(x, "")
 	}
-	vErr := c.ctx.NewPosf(c.ctx.Pos(), format, args...)
+	// vErr only adds the builtin's message and position; the result is
+	// re-wrapped by the call's context error, which locates it. Drop the path
+	// here to avoid duplicating that location.
+	vErr := c.ctx.NewPosf(c.ctx.Pos(), format, args...).WithoutPath()
 	c.Err = &callError{&adt.Bottom{Code: code, Err: errors.Wrap(vErr, errs)}}
 }
 
 func (c *CallCtxt) errcf(code adt.ErrorCode, format string, args ...interface{}) {
 	err := c.ctx.NewErrf(format, args...)
 	err.Code = code
-	c.Err = &callError{err}
+	c.setCallError(err)
 }
 
 func (c *CallCtxt) invalidArgType(arg adt.Value, i int, typ string, err error) {

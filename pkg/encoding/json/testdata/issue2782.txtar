@@ -1,0 +1,26 @@
+# json.Validate should report the offending field (y.Foo) when data fails to
+# validate against a closed schema, not just the call site (y).
+# https://cuelang.org/issue/2782
+-- in.cue --
+import "encoding/json"
+
+y: json.Validate(x, #z)
+
+x: #"{ "a": 1, "b": "2", "Foo": 3 }"#
+#z: {
+	a!: >0
+	b!: string
+}
+-- out/json-v3 --
+Errors:
+y: error in call to encoding/json.Validate: field not allowed:
+    ./in.cue:3:4
+    json.Validate:1:21
+
+Result:
+y: _|_ // y: error in call to encoding/json.Validate: y.Foo: field not allowed
+x: "{ \"a\": 1, \"b\": \"2\", \"Foo\": 3 }"
+#z: {
+	a!: >0
+	b!: string
+}

@@ -13,12 +13,12 @@ x: #"{ "a": 1, "b": "2", "Foo": 3 }"#
 }
 -- out/json-v3 --
 Errors:
-y: error in call to encoding/json.Validate: field not allowed:
+y.Foo: error in call to encoding/json.Validate: field not allowed:
     ./in.cue:3:4
     json.Validate:1:21
 
 Result:
-y: _|_ // y: error in call to encoding/json.Validate: y.Foo: field not allowed
+y: _|_ // y: error in call to encoding/json.Validate: Foo: field not allowed
 x: "{ \"a\": 1, \"b\": \"2\", \"Foo\": 3 }"
 #z: {
 	a!: >0

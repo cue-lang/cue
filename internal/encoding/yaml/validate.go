@@ -58,6 +58,7 @@ func Validate(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 		// 	return false, err
 		// }
 		vx := adt.Unify(c, value.Vertex(x), value.Vertex(v))
+		vx.Unroot()
 		x = value.Make(c, vx)
 
 		// Note that we do not return early on x.Err here: doing so would only
@@ -103,6 +104,7 @@ func ValidatePartial(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 		}
 
 		vx := adt.Unify(c, value.Vertex(x), value.Vertex(v))
+		vx.Unroot()
 		x = value.Make(c, vx)
 
 		// Use Validate rather than Err so that every conflict is reported, not

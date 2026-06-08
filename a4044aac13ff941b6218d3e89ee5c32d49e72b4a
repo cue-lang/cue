@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ffaaab2b_a05b50bb",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T13:15:20Z",
+      "side": 1,
+      "message": "Also, to prevent mistakes, I think we should enforce that the full `cue mod tidy` is happy before a `cue mod publish` actually publishes; that is, I should not be allowed to publish with a stale `module.cue` when `local-module.cue` has higher dependency versions that `tidy` would apply to `module.cue`.",
+      "parentUuid": "0d487773_522f5fb2",
+      "revId": "a4044aac13ff941b6218d3e89ee5c32d49e72b4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3c4ec454_dcb147ab",
         "filename": "internal/mod/modload/tidy.go",
         "patchSetId": 13

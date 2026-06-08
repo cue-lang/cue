@@ -63,6 +63,14 @@ reference: {
 		a!: 1
 		b: a + 1 @test(err, code=incomplete, contains="required field missing: %s", args=[a], pos=[0:6])
 	}
+	// A reference to a required-but-missing field reports "required field
+	// missing", not "cannot reference optional field".
+	// https://cuelang.org/issue/2937
+	issue2937: {
+		min!: number
+		max!: number & >min @test(err, code=incomplete, contains="required field missing: %s", args=[min], pos=[0:19])
+		max:  10
+	}
 }
 -- issue3918.cue --
 import "strings"
@@ -131,6 +139,8 @@ doNotEscalateError: {
     ./in.cue:58:8
 [incomplete] reference.toConcrete.b: required field missing: a:
     ./in.cue:63:6
+[incomplete] reference.issue2937.max: required field missing: min:
+    ./in.cue:70:19
 [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
     ./issue3918.cue:10:22
 [incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:

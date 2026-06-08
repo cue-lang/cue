@@ -52,6 +52,14 @@ reference: {
 		a!: 1
 		b:  a + 1
 	}
+	// A reference to a required-but-missing field reports "required field
+	// missing", not "cannot reference optional field".
+	// https://cuelang.org/issue/2937
+	issue2937: {
+		min!: number
+		max!: number & >min
+		max:  10
+	}
 }
 -- issue3918.cue --
 import "strings"
@@ -156,6 +164,11 @@ doNotEscalateError: {
     toConcrete: {
       a!: 1
       b: (〈0;a〉 + 1)
+    }
+    issue2937: {
+      min!: number
+      max!: (number & >〈0;min〉)
+      max: 10
     }
   }
 }

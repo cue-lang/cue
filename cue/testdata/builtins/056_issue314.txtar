@@ -53,7 +53,7 @@ NumCloseIDs: 3
 [incomplete] #V.out: error in call to encoding/json.Marshal: cannot convert incomplete value "string" to JSON:
     ./in.cue:23:7
     ./in.cue:22:7
-[incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
+[incomplete] #U.out.s: error in call to encoding/yaml.Marshal: incomplete value string:
     ./in.cue:29:7
     ./in.cue:28:7
     ./in.cue:29:26

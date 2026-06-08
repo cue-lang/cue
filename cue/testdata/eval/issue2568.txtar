@@ -1,0 +1,55 @@
+# p1, p2, and p3 unify the closed definition #X & #Y, where #X embeds a field
+# that closed #Y does not allow. They are equivalent up to field order and
+# comprehension inlining, so all three must fail with "field not allowed" at
+# the same position: the disallowed field x in #X.
+-- in.cue --
+// "all" evaluated before "not_bottom".
+p1: {
+	all: [#X & #Y]
+	not_bottom: [for x in all if x != _|_ {x}]
+	#X: {
+		{x: "r"}
+		...
+	}
+	#Y: k: "k"
+
+	@test(err, code=eval, at=all.0.x, contains="field not allowed", pos=[4:4])
+}
+
+// "not_bottom" evaluated before "all".
+p2: {
+	not_bottom: [for x in all if x != _|_ {x}]
+	all: [#X & #Y]
+	#X: {
+		{x: "r"}
+		...
+	}
+	#Y: k: "k"
+
+	@test(err, code=eval, at=all.0.x, contains="field not allowed", pos=[1:31, 4:4])
+}
+
+// "not_bottom" references the comprehension via a sibling field.
+p3: {
+	not_bottom: ref
+	ref: [for x in all if x != _|_ {x}]
+	all: [#X & #Y]
+	#X: {
+		{x: "r"}
+		...
+	}
+	#Y: k: "k"
+
+	@test(err, code=eval, at=all.0.x, contains="field not allowed", pos=[2:24, 5:4])
+}
+-- out/errors.txt --
+[eval] p1.all.0.x: field not allowed:
+    ./in.cue:6:4
+[eval] p1.all.0.x: field not allowed:
+    ./in.cue:6:4
+[eval] p2.all.0.x: field not allowed:
+    ./in.cue:16:31
+    ./in.cue:19:4
+[eval] p3.all.0.x: field not allowed:
+    ./in.cue:30:24
+    ./in.cue:33:4

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84b951c3_a3e3ccca",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T13:20:17Z",
+      "side": 1,
+      "message": "nit: given that you\u0027re using the long flag names, use double dashes, like `--replace` and `--drop-replace`\n\nand the same with the earlier paragraph",
+      "revId": "d3644b9469699163a7bd58bc1b7d993132d1f14a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abc019d0_29d05b10",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T13:20:17Z",
+      "side": 1,
+      "message": "same as an earlier patch, I would simplify the text to not talk about Windows drive letters",
+      "revId": "d3644b9469699163a7bd58bc1b7d993132d1f14a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67d2d709_a3ad9aa2",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T13:20:17Z",
+      "side": 1,
+      "message": "FWIW I think this last part is unnecessary, because I think it goes without saying that `cue mod edit` should aim to leave `cue.mod` in a tidy state",
+      "revId": "d3644b9469699163a7bd58bc1b7d993132d1f14a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ad25696_e0fc34eb",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-08T13:20:17Z",
+      "side": 1,
+      "message": "export this directly rather than wrapping it in an exported func?",
+      "revId": "d3644b9469699163a7bd58bc1b7d993132d1f14a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

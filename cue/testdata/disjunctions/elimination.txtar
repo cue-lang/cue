@@ -338,12 +338,13 @@ issue1940: {
 }
 
 -- issue2209full.cue --
+@experiment(reflect)
 // Evaluator 0.5 regression where disjunctions combined with comprehensions
 // produced incorrect results or spurious errors.
 // https://cuelang.org/issue/2209
 // TODO: fix
 
-issue2209: simplified: t1: {
+issue2209: simplified: t1A: {
 	#SpecFoo: foo: min: 1
 	#SpecBar: bar: min: 1
 	spec: bar: {}
@@ -381,13 +382,90 @@ issue2209: simplified: t1: {
 		}
 	})
 }
+issue2209: simplified: t1B: {
+	#SpecFoo: foo: min: 1
+	#SpecBar: bar: min: 1
+	spec: bar: {}
+	spec:  #SpecFoo | #SpecBar
+	out: {
+		{nullFoo: null} | {nullBar: null}
+		{minFoo: int} | {minBar: int}
+		if exists(X.bar) {
+			minBar: X.bar.min
+		}
+		X: spec
+	}
+	@test(eq, {
+		#SpecFoo: {foo: {min: 1}}
+		#SpecBar: {bar: {min: 1}}
+		spec: {bar: {min: 1}}
+		out: {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullFoo: null
+			minFoo: int
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullFoo: null
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullBar: null,
+			minFoo: int
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullBar: null
+		}
+	})
+}
 
-issue2209: simplified: t2: {
+issue2209: simplified: t2A: {
 	#SpecFoo: foo: {}
 	#SpecBar: bar: x: 1
 	spec: bar: {}
 	spec: *#SpecFoo | #SpecBar
 	if spec.bar != _|_ {
+		BAZ: spec.bar.x
+	}
+	{f1: int} | {b2: int}
+	{f2: int} | {b2: int}
+	@test(eq, {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		f1: int
+		f2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		f1: int
+		b2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		b2: int
+		f2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		b2: int
+	})
+}
+issue2209: simplified: t2B: {
+	#SpecFoo: foo: {}
+	#SpecBar: bar: x: 1
+	spec: bar: {}
+	spec: *#SpecFoo | #SpecBar
+	if exists(spec.bar) {
 		BAZ: spec.bar.x
 	}
 	{f1: int} | {b2: int}

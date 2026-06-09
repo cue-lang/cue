@@ -3,13 +3,15 @@
 # with close({y!: ...}) correctly even when exposed via {X} or X.
 # Issue: https://cuelang.org/issue/3834
 -- in.cue --
+@experiment(reflect)
 // expose at top level
 X: {
 	_a: foo: true
 	_a: _ | close({y!: z?: _})
 	_b: _a & {y: {}}
 	concrete: _b.y
-	isTrue: concrete != _|_ @test(eq, true)
+	isTrueA: concrete != _|_ @test(eq, true)
+	isTrueB: isValid(concrete) @test(eq, true)
 }
 {X}
 
@@ -18,12 +20,14 @@ X: {
 		_a: {foo: true}
 		_b: {y: {}, foo: true}
 		concrete: {}
-		isTrue: true
+		isTrueA: true
+		isTrueB: true
 	}
 	_a: {foo: true}
 	_b: {y: {}, foo: true}
 	concrete: {}
-	isTrue: true
+	isTrueA: true
+	isTrueB: true
 
 	sub: _ @test(ignore)
 	full: _ @test(ignore)
@@ -131,7 +135,8 @@ full: {
 
 		_dataWithExtra: _data & {Extra: {}}
 
-		out: _dataWithExtra.Extra != _|_ @test(eq, true)
+		outA: _dataWithExtra.Extra != _|_ @test(eq, true)
+		outB: exists(_dataWithExtra.Extra) @test(eq, true)
 	}
 
 	{#Foo}
@@ -140,11 +145,13 @@ full: {
 		#Foo: {
 			_data: {Foo: true}
 			_dataWithExtra: {Extra: {}, Foo: true}
-			out: true
+			outA: true
+			outB: true
 		}
 		_data: {Foo: true}
 		_dataWithExtra: {Extra: {}, Foo: true}
-		out: true
+		outA: true
+		outB: true
 	})
 }
 -- out/eval/stats --

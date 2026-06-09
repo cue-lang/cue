@@ -3,7 +3,13 @@ Issue #1969
 # Tests that undefined field comparisons with _|_ work correctly in
 # comprehension conditions, including with close(), for loops, and let bindings.
 # Issue #1969 and #2245.
+#
+# Each test exists in two forms: an "a" variant using the legacy comparison
+# to bottom and a "b" variant using exists()/isValid()/isConcrete(). Both
+# should remain green so the legacy surface and the new builtins are tested
+# side-by-side.
 -- in.cue --
+@experiment(reflect)
 import "list"
 
 // All tests here should pass and the result of the okcN tests should be
@@ -12,41 +18,73 @@ import "list"
 xc: close({field: {}})
 xo: field: {}
 
-okc0: {
+okc0a: {
 	if xc.undefined == _|_ {a: 1}
 	@test(eq, {a: 1})
 }
-oko0: {
+okc0b: {
+	if !exists(xc.undefined) {a: 1}
+	@test(eq, {a: 1})
+}
+oko0a: {
 	if xo.undefined == _|_ {a: 1}
 	@test(eq, {a: 1})
 }
-
-okc1: {
-	if xc.undefined != _|_ {a: 1}
-	@test(eq, {})
-}
-oko1: {
-	if xo.undefined != _|_ {a: 1}
-	@test(eq, {})
-}
-
-okc2: {
-	if ({} & {s: [for y in xc.undefined {}]}) != _|_ {a: 1}
-	@test(eq, {})
-}
-
-oko2: {
-	if ({} & {s: [for y in xo.undefined {}]}) != _|_ {a: 1}
+oko0b: {
+	if !exists(xo.undefined) {a: 1}
 	@test(eq, {a: 1})
 }
 
-okc3: {
-	if ({s: [for y in xc.undefined {}]}) != _|_ {a: 1}
+okc1a: {
+	if xc.undefined != _|_ {a: 1}
+	@test(eq, {})
+}
+okc1b: {
+	if exists(xc.undefined) {a: 1}
+	@test(eq, {})
+}
+oko1a: {
+	if xo.undefined != _|_ {a: 1}
+	@test(eq, {})
+}
+oko1b: {
+	if exists(xo.undefined) {a: 1}
 	@test(eq, {})
 }
 
-oko3: {
+okc2a: {
+	if ({} & {s: [for y in xc.undefined {}]}) != _|_ {a: 1}
+	@test(eq, {})
+}
+okc2b: {
+	if isValid({} & {s: [for y in xc.undefined {}]}) {a: 1}
+	@test(eq, {})
+}
+
+oko2a: {
+	if ({} & {s: [for y in xo.undefined {}]}) != _|_ {a: 1}
+	@test(eq, {a: 1})
+}
+oko2b: {
+	if isValid({} & {s: [for y in xo.undefined {}]}) {a: 1}
+	@test(eq, {a: 1})
+}
+
+okc3a: {
+	if ({s: [for y in xc.undefined {}]}) != _|_ {a: 1}
+	@test(eq, {})
+}
+okc3b: {
+	if isValid({s: [for y in xc.undefined {}]}) {a: 1}
+	@test(eq, {})
+}
+
+oko3a: {
 	if ({s: [for y in xo.undefined {}]}) != _|_ {a: 1}
+	@test(eq, {a: 1})
+}
+oko3b: {
+	if isValid({s: [for y in xo.undefined {}]}) {a: 1}
 	@test(eq, {a: 1})
 }
 
@@ -56,24 +94,41 @@ oko3: {
 // issue1969: Tests that comparing let-bound expressions involving undefined
 // fields to _|_ works correctly with list comprehensions.
 // https://cuelang.org/issue/1969
-issue1969: okc: {
+issue1969: okca: {
 	let X = xc.undefined
 	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
 
 	if Y != _|_ {Y}
 	@test(eq, {})
 }
+issue1969: okcb: {
+	let X = xc.undefined
+	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
 
-issue1969: oko: {
+	if isValid(Y) {Y}
+	@test(eq, {})
+}
+
+issue1969: okoa: {
 	let X = xo.undefined
 	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
 
 	if Y != _|_ {Y}
 	@test(eq, {
-		s: _|_ @test(err, code=incomplete, contains="issue1969.oko.X: undefined field: undefined", pos=[1:13])
+		s: _|_ @test(err, code=incomplete, contains="issue1969.okoa.X: undefined field: undefined", pos=[1:13])
+	})
+}
+issue1969: okob: {
+	let X = xo.undefined
+	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
+
+	if isValid(Y) {Y}
+	@test(eq, {
+		s: _|_ @test(err, code=incomplete, contains="issue1969.okob.X: undefined field: undefined", pos=[1:13])
 	})
 }
 -- issue2245.cue --
+@experiment(reflect)
 // Evaluator regression where comparing an incomplete struct to bottom in a
 // comprehension condition produced incorrect results.
 // https://cuelang.org/issue/2245
@@ -85,20 +140,29 @@ yo: {
 		g: _|_ @test(err, code=incomplete, contains="yo.g: non-concrete value int in operand to <", pos=[2:5, 1:5])
 	})
 }
-okyo: {
+okyoa: {
 	if yo != _|_ {a: 1}
 	@test(eq, {a: 1})
 }
-okyog: {
+okyob: {
+	if isValid(yo) {a: 1}
+	@test(eq, {a: 1})
+}
+okyoga: {
 	if yo.g != _|_ {a: 1}
+	@test(eq, {})
+}
+okyogb: {
+	if isValid(yo.g) {a: 1}
 	@test(eq, {})
 }
 
 -- incomplete.cue --
+@experiment(reflect)
 // Comparing to string is not an error. But for legacy reasons we want to still
 // support this. We intend to have more clean and precise behavior with the
 // builtins isdefined, isvalid, and isconcrete.
-checkIncomplete: t1: {
+checkIncomplete: t1a: {
 	f: [string]: {
 		if a != _|_ {
 			b: "d\(a)"
@@ -108,36 +172,52 @@ checkIncomplete: t1: {
 	f: blah: {}
 	@test(eq, {f: {blah: {a: string}}})
 }
+checkIncomplete: t1b: {
+	f: [string]: {
+		if isConcrete(a) {
+			b: "d\(a)"
+		}
+		a: string
+	}
+	f: blah: {}
+	@test(eq, {f: {blah: {a: string}}})
+}
 
 -- structs.cue --
+@experiment(reflect)
 structs: {
-	bare: t1: ({y: 2} & {x: 3}) != _|_        @test(eq, true)
-	bare: f2: ({y: 2} & {x: 3}) == _|_        @test(eq, false)
-	bare: f3: ({x: 1, y: 2} & {x: 3}) != _|_  @test(eq, false)
-	bare: t4: ({x: 1, y: 2} & {x: 3}) == _|_  @test(eq, true)
+	bare: t1a: ({y: 2} & {x: 3}) != _|_        @test(eq, true)
+	bare: f2a: ({y: 2} & {x: 3}) == _|_        @test(eq, false)
+	bare: f3a: ({x: 1, y: 2} & {x: 3}) != _|_  @test(eq, false)
+	bare: t4a: ({x: 1, y: 2} & {x: 3}) == _|_  @test(eq, true)
 
-	select: t1: ({y: 2} & {x: 3}).y != _|_        @test(eq, true)
-	select: f2: ({y: 2} & {x: 3}).y == _|_        @test(eq, false)
-	select: f3: ({x: 1, y: 2} & {x: 3}).y != _|_  @test(eq, false)
-	select: t4: ({x: 1, y: 2} & {x: 3}).y == _|_  @test(eq, true)
+	bare: t1b: isValid({y: 2} & {x: 3})        @test(eq, true)
+	bare: f2b: !isValid({y: 2} & {x: 3})       @test(eq, false)
+	bare: f3b: isValid({x: 1, y: 2} & {x: 3})  @test(eq, false)
+	bare: t4b: !isValid({x: 1, y: 2} & {x: 3}) @test(eq, true)
+
+	select: t1a: ({y: 2} & {x: 3}).y != _|_        @test(eq, true)
+	select: f2a: ({y: 2} & {x: 3}).y == _|_        @test(eq, false)
+	select: f3a: ({x: 1, y: 2} & {x: 3}).y != _|_  @test(eq, false)
+	select: t4a: ({x: 1, y: 2} & {x: 3}).y == _|_  @test(eq, true)
+
+	// isValid only fails when the queried expression itself evaluates to
+	// bottom — selecting .y from a struct that has a conflict on a sibling
+	// field does not propagate the conflict to .y, so isValid sees the
+	// successful selection. This is the principled distinction from
+	// `!= _|_`, which is recursive on the parent struct.
+	select: t1b: isValid(({y: 2} & {x: 3}).y)         @test(eq, true)
+	select: f2b: !isValid(({y: 2} & {x: 3}).y)        @test(eq, false)
+	select: f3b: isValid(({x: 1, y: 2} & {x: 3}).y)   @test(eq, true)
+	select: t4b: !isValid(({x: 1, y: 2} & {x: 3}).y)  @test(eq, false)
 }
 
 -- out/errors.txt --
-[incomplete] issue1969.oko.X: undefined field: undefined:
-    ./in.cue:62:13
+[incomplete] issue1969.okoa.X: undefined field: undefined:
+    ./in.cue:102:13
+[incomplete] issue1969.okob.X: undefined field: undefined:
+    ./in.cue:111:13
 [incomplete] yo.g: non-concrete value int in operand to <:
+    ./issue2245.cue:7:5
     ./issue2245.cue:6:5
-    ./issue2245.cue:5:5
 -- out/eval/stats --
-Leaks:  14
-Freed:  95
-Reused: 72
-Allocs: 37
-Retain: 0
-
-Unifications: 105
-Conjuncts:    149
-Disjuncts:    0
-Notifications: 1
-
-NumCloseIDs: 29

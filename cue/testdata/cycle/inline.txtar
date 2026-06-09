@@ -73,6 +73,7 @@ inline: acrossFields: ok1: {
 	}, hint="might be okay to fail")
 }
 -- inlineexpand.cue --
+@experiment(reflect)
 inlined: {
 	X: {
 		input: a: _
@@ -108,7 +109,7 @@ expanded2: noCycle: {
 		_a: {input: {a: _}, output: _}
 	})
 }
-issue3731: reduced: {
+issue3731: reducedA: {
 	#lookup: {
 		input: {...}
 		output: [
@@ -128,7 +129,27 @@ issue3731: reduced: {
 		}
 	})
 }
-issue3731: expanded: {
+issue3731: reducedB: {
+	#lookup: {
+		input: {...}
+		output: [
+			for _, v in input if exists(v.show) { v },
+		]
+	}
+
+	root: {
+		self: show: true
+		others: (#lookup & {input: root}).output
+	}
+	@test(eq, {
+		#lookup: {input: {}, output: []}
+		root: {
+			self: {show: true}
+			others: [{show: true}]
+		}
+	})
+}
+issue3731: expandedA: {
 	#lookup: {
 		input: {...}
 		output: [
@@ -143,7 +164,22 @@ issue3731: expanded: {
 	}
 	@test(err, code=structural_cycle, at=root._others.input._others.input, contains="structural cycle", pos=[])
 }
-issue3731: full: {
+issue3731: expandedB: {
+	#lookup: {
+		input: {...}
+		output: [
+			for _, v in input if exists(v.show) { v },
+		]
+	}
+
+	root: {
+		self: show: true
+		others: _others.output
+		_others: #lookup & {input: root}
+	}
+	@test(err, code=structural_cycle, at=root._others.input._others.input, contains="structural cycle", pos=[])
+}
+issue3731: fullA: {
 	#Workspace: {
 		workspaceA?: {}
 		workspaceB?: {}
@@ -214,9 +250,81 @@ issue3731: full: {
 		#lookupSiblings: {envtree: {}, out: []}
 	})
 }
+issue3731: fullB: {
+	#Workspace: {
+		workspaceA?: {}
+		workspaceB?: {}
+	}
+
+	#AccountConfig: {
+		workspaces: #Workspace
+		siblings?: [...string]
+	}
+
+	#AccountConfigSub1: {
+		#AccountConfig
+		workspaces: "workspaceA": {}
+	}
+
+	#AccountConfigSub2: {
+		#AccountConfig
+		workspaces: "workspaceB": {}
+	}
+
+	tree: env1: {
+		"region1": {
+			"env1-r1-account-sub1": #AccountConfigSub1
+			"env1-r1-account-sub2-1": #AccountConfigSub2
+		}
+	}
+
+	#lookupSiblings: {
+		envtree: {...}
+		out: [
+			for region, v in envtree
+			for account, config in v
+			if exists(config.workspaces."workspaceB") { account },
+		]
+	}
+
+	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
+		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
+	}
+	@test(eq, {
+		#Workspace: {workspaceA?: {}, workspaceB?: {}}
+		#AccountConfig: {
+			workspaces: {workspaceA?: {}, workspaceB?: {}}
+			siblings?: []
+		}
+		#AccountConfigSub1: {
+			workspaces: {workspaceA: {}, workspaceB?: {}}
+			siblings?: []
+		}
+		#AccountConfigSub2: {
+			workspaces: {workspaceB: {}, workspaceA?: {}}
+			siblings?: []
+		}
+		tree: {
+			env1: {
+				region1: {
+					"env1-r1-account-sub1": {
+						siblings: ["env1-r1-account-sub2-1"]
+						workspaces: {workspaceA: {}, workspaceB?: {}}
+					}
+					"env1-r1-account-sub2-1": {
+						siblings: ["env1-r1-account-sub2-1"]
+						workspaces: {workspaceB: {}, workspaceA?: {}}
+					}
+				}
+			}
+		}
+		#lookupSiblings: {envtree: {}, out: []}
+	})
+}
 -- out/errors.txt --
 [structural_cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
-[structural_cycle] issue3731.expanded.root._others.input._others.input: structural cycle
+[structural_cycle] issue3731.expandedA.root._others.input._others.input: structural cycle
+[structural_cycle] issue3731.expandedB.root._others.input._others.input: structural cycle
 [structural_cycle] structural cycle:
     ./x.cue:6:9
 [structural_cycle] structural cycle:

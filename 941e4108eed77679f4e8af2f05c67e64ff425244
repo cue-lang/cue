@@ -33,6 +33,24 @@
       "message": "I think it would be nice to make it clear that the time format is RFC3339 here.\n\nThat\u0027s also true of Unix too.",
       "revId": "941e4108eed77679f4e8af2f05c67e64ff425244",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "311ecf0f_c06513c3",
+        "filename": "pkg/time/time.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T09:31:39Z",
+      "side": 1,
+      "message": "You\u0027re right, but this is already clarified at the top level package doc, so I don\u0027t think we should repeat it in every single API dealing with time strings.",
+      "parentUuid": "5510a248_99012970",
+      "revId": "941e4108eed77679f4e8af2f05c67e64ff425244",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -3,13 +3,16 @@
 # with close({y!: ...}) correctly even when exposed via {X} or X.
 # Issue: https://cuelang.org/issue/3834
 -- in.cue --
+@experiment(predicates)
+
 // expose at top level
 X: {
 	_a: foo: true
 	_a: _ | close({y!: z?: _})
 	_b: _a & {y: {}}
 	concrete: _b.y
-	isTrue:   concrete != _|_
+	isTrueA:  concrete != _|_
+	isTrueB:  isValid(concrete)
 }
 {X}
 
@@ -57,7 +60,8 @@ full: {
 
 		_dataWithExtra: _data & {Extra: {}}
 
-		out: _dataWithExtra.Extra != _|_
+		outA: _dataWithExtra.Extra != _|_
+		outB: exists(_dataWithExtra.Extra)
 	}
 
 	{#Foo}
@@ -78,7 +82,8 @@ full: {
       y: {}
     })
     concrete: 〈0;_b〉.y
-    isTrue: (〈0;concrete〉 != _|_(explicit error (_|_ literal) in source))
+    isTrueA: (〈0;concrete〉 != _|_(explicit error (_|_ literal) in source))
+    isTrueB: isValid(〈0;concrete〉)
   }
   {
     〈1;X〉
@@ -176,7 +181,8 @@ full: {
       _dataWithExtra: (〈0;_data〉 & {
         Extra: {}
       })
-      out: (〈0;_dataWithExtra〉.Extra != _|_(explicit error (_|_ literal) in source))
+      outA: (〈0;_dataWithExtra〉.Extra != _|_(explicit error (_|_ literal) in source))
+      outB: exists(〈0;_dataWithExtra〉.Extra)
     }
     {
       〈1;#Foo〉

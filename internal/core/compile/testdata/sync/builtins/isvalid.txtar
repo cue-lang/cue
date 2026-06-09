@@ -77,6 +77,16 @@ validNEmbedFail: {
 	t1: validN(>=3, a, b, c)
 }
 
+// validN with an exact count whose arguments reference the value being
+// validated counts 0 matches and fails, though int & bug is valid (1 match);
+// it should yield 42. The forms without the self-reference (a separate value,
+// or literal arguments) correctly yield 42.
+validNSelfRef: {
+	bug: 42 & validN(1, string & bug, int & bug, bool & bug)
+	y:   42
+	ok:  y & validN(1, string & y, int & y, bool & y)
+}
+
 // isValid on non-existent reference returns false (not error)
 // Missing field is an evaluation error, and isValid returns false for any error
 isValidMissingRef: {
@@ -252,6 +262,11 @@ isValidIncomplete: {
     b: 2
     c: (1 & 2)
     t1: validN(>=3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  validNSelfRef: {
+    bug: (42 & validN(1, (string & 〈0;bug〉), (int & 〈0;bug〉), (bool & 〈0;bug〉)))
+    y: 42
+    ok: (〈0;y〉 & validN(1, (string & 〈0;y〉), (int & 〈0;y〉), (bool & 〈0;y〉)))
   }
   isValidMissingRef: {
     a: {

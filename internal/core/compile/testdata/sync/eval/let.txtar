@@ -43,6 +43,8 @@ ignoreErrorInLet: {
 	disjunction: *X | 3
 }
 -- incomprehension.cue --
+@experiment(predicates)
+
 // for comprehensions in list do not have to split the let as each instance
 // is already associated with a separate environment.
 list: {
@@ -144,6 +146,7 @@ disabled_parent_test: {
 	}
 }
 -- issue2063.cue --
+@experiment(predicates)
 import (
 	"encoding/yaml"
 	"strings"
@@ -153,11 +156,19 @@ import (
 // tools/flow: unsupported node import "list" in yaml.Marshal; let bindings
 // inside a struct referencing an undefined field must not block descending.
 // https://cuelang.org/issue/2063
-keepDescending: t1: {
+keepDescending: t1A: {
 	ec: {}
 	bs: {
 		let m = ec.b
 		if m == _|_ {}
+		x: y: ""
+	}
+}
+keepDescending: t1B: {
+	ec: {}
+	bs: {
+		let m = ec.b
+		if !isValid(m) {}
 		x: y: ""
 	}
 }
@@ -321,7 +332,7 @@ issue4022: full: {
 --- issue2063.cue
 {
   keepDescending: {
-    t1: {
+    t1A: {
       ec: {}
       bs: {
         let m#21 = 〈1;ec〉.b
@@ -333,12 +344,24 @@ issue4022: full: {
     }
   }
   keepDescending: {
+    t1B: {
+      ec: {}
+      bs: {
+        let m#22 = 〈1;ec〉.b
+        if !isValid(〈0;let m#22〉) {}
+        x: {
+          y: ""
+        }
+      }
+    }
+  }
+  keepDescending: {
     t2: {
       x: 〈import;"encoding/yaml"〉.Marshal(〈0;bs〉)
       ec: {}
       bs: {
-        let m#22 = 〈1;ec〉.b
-        if (〈0;let m#22〉.b == _|_(explicit error (_|_ literal) in source)) {}
+        let m#23 = 〈1;ec〉.b
+        if (〈0;let m#23〉.b == _|_(explicit error (_|_ literal) in source)) {}
         X: {
           Y: 〈import;strings〉.Join([], "")
         }
@@ -354,8 +377,8 @@ issue4022: full: {
       b: "e"
     }
     for k, v in 〈0;_i〉 {
-      let T#23multi = 〈1;v〉
-      〈0;let T#23〉: "1"
+      let T#24multi = 〈1;v〉
+      〈0;let T#24〉: "1"
     }
   }
 }
@@ -375,9 +398,9 @@ issue4022: full: {
   }
   disabled_parent_test: {
     for k, v in 〈1;_configs〉 {
-      let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+      let parent_config#25multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
       "\(〈1;k〉)": {
-        parent_config: 〈1;let parent_config#24〉
+        parent_config: 〈1;let parent_config#25〉
       }
     }
   }

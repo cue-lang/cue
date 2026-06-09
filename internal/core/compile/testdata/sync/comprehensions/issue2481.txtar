@@ -2,18 +2,30 @@
 # correctly reports an error. Issue #2481: nested for/if/let comprehensions
 # triggered a spurious "circular dependency" error in the evaluator.
 # https://cuelang.org/issue/2481
-// Mixing struct fields and embedded scalars should error. Using comprehensions
-// this follows a different path which may miss the error.
-// TODO: fix
+//
+// Each test exists in two forms: an "A" variant using legacy `!= _|_` and
+// a "B" variant using exists()/isValid().
 -- in.cue --
+@experiment(predicates)
+
 // Mixing struct fields and embedded scalars should error. Using comprehensions
 // this follows a different path which may miss the error.
 // TODO: fix
-out: {
+outA: {
 	for k in keys {
 		if values[k] != _|_ {
 			val: k
 			if val != _|_ {
+				k
+			}
+		}
+	}
+}
+outB: {
+	for k in keys {
+		if exists(values[k]) {
+			val: k
+			if isConcrete(val) {
 				k
 			}
 		}
@@ -24,11 +36,21 @@ out: {
 // fine, though, as lets do not represent a single data field. This should
 // therefore not error.
 // TODO: fix
-multiLets: {
+multiLetsA: {
 	for k in keys {
 		if values[k] != _|_ {
 			let val = k
 			if val != _|_ {
+				k
+			}
+		}
+	}
+}
+multiLetsB: {
+	for k in keys {
+		if exists(values[k]) {
+			let val = k
+			if isValid(val) {
 				k
 			}
 		}
@@ -47,14 +69,14 @@ values: {
 	"c": "foo"
 }
 
-full: {
+fullA: {
 	out: {
 
 		// changing this to a list of the keys "fixes" things, i.e. this comprehension is required
 		for k, _ in #github_team_membership {
 
 			// Remove this comprehension to trigger a different type of cycle error
-			if ( values[k] != _|_ ) {
+			if values[k] != _|_ {
 
 				// This let is also required
 				let val = values[k]
@@ -76,10 +98,39 @@ full: {
 		"username": "foo"
 	}
 }
+fullB: {
+	out: {
+
+		// changing this to a list of the keys "fixes" things, i.e. this comprehension is required
+		for k, _ in #github_team_membership {
+
+			// Remove this comprehension to trigger a different type of cycle error
+			if exists(values[k]) {
+
+				// This let is also required
+				let val = values[k]
+
+				if val != null && isValid(val & string) {
+					(k): val
+				}
+			}
+		}
+	}
+
+	#github_team_membership: {
+		team_id: string
+		role:    string
+	}
+
+	values: {
+		"role":     "member"
+		"username": "foo"
+	}
+}
 -- out/compile --
 --- in.cue
 {
-  out: {
+  outA: {
     for _, k in 〈1;keys〉 {
       if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
         val: 〈2;k〉
@@ -89,11 +140,31 @@ full: {
       }
     }
   }
-  multiLets: {
+  outB: {
+    for _, k in 〈1;keys〉 {
+      if exists(〈3;values〉[〈1;k〉]) {
+        val: 〈2;k〉
+        if isConcrete(〈0;val〉) {
+          〈3;k〉
+        }
+      }
+    }
+  }
+  multiLetsA: {
     for _, k in 〈1;keys〉 {
       if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
         let val#1multi = 〈2;k〉
         if (〈0;let val#1〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈3;k〉
+        }
+      }
+    }
+  }
+  multiLetsB: {
+    for _, k in 〈1;keys〉 {
+      if exists(〈3;values〉[〈1;k〉]) {
+        let val#2multi = 〈2;k〉
+        if isValid(〈0;let val#2〉) {
           〈3;k〉
         }
       }
@@ -107,13 +178,33 @@ full: {
     b: "member"
     c: "foo"
   }
-  full: {
+  fullA: {
     out: {
       for k, _ in 〈1;#github_team_membership〉 {
         if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
-          let val#2multi = 〈4;values〉[〈2;k〉]
-          if ((〈0;let val#2〉 != null) && ((〈0;let val#2〉 & string) != _|_(explicit error (_|_ literal) in source))) {
-            〈3;k〉: 〈1;let val#2〉
+          let val#3multi = 〈4;values〉[〈2;k〉]
+          if ((〈0;let val#3〉 != null) && ((〈0;let val#3〉 & string) != _|_(explicit error (_|_ literal) in source))) {
+            〈3;k〉: 〈1;let val#3〉
+          }
+        }
+      }
+    }
+    #github_team_membership: {
+      team_id: string
+      role: string
+    }
+    values: {
+      role: "member"
+      username: "foo"
+    }
+  }
+  fullB: {
+    out: {
+      for k, _ in 〈1;#github_team_membership〉 {
+        if exists(〈3;values〉[〈1;k〉]) {
+          let val#4multi = 〈4;values〉[〈2;k〉]
+          if ((〈0;let val#4〉 != null) && isValid((〈0;let val#4〉 & string))) {
+            〈3;k〉: 〈1;let val#4〉
           }
         }
       }

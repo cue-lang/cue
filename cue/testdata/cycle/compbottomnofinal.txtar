@@ -1,5 +1,12 @@
 // Issues: #667, #695, #622
+//
+// Each top-level test exists in two forms:
+//   - <name>A uses the legacy `X != _|_` / `X == _|_` comparison.
+//   - <name>B uses the new exists() builtin.
+// Both forms exercise the same cycle scenarios and must reach the same
+// resolution outcomes so the new builtin keeps the historical behavior.
 -- in.cue --
+@experiment(predicates)
 import (
 	"strconv"
 	"regexp"
@@ -25,12 +32,26 @@ minimal: {
 		// Pushdown produces cycle error instead of incomplete.
 		@test(err, code=cycle|incomplete)
 	}
+
+	ra: {
+		if !exists(b.port) {
+			port: ""
+		}
+		@test(err, code=cycle|incomplete)
+	}
+
+	rb: {
+		if !exists(a.port) {
+			port: ""
+		}
+		@test(err, code=cycle|incomplete)
+	}
 }
 
-small: {
+smallA: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
-	p1: {
+	p1a: {
 		@test(permute, count=2)
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
@@ -50,12 +71,26 @@ small: {
 			#X: _|_ @test(err, code=cycle|incomplete)
 		})
 	}
+
+	p1b: {
+		@test(permute, count=2)
+		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port) @test(err, any, code=cycle|incomplete)
+
+		#X: {
+			if !exists(#Y.port) {
+				port: ""
+			}
+			if exists(#Y.port) {
+				port: ":" + strconv.FormatInt(#Y.port, 10)
+			}
+		} @test(err, any, code=cycle|incomplete)
+	}
 }
 
 medium: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
-	p1: {
+	p1a: {
 		@test(permute, count=6)
 
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port) @test(err, code=incomplete|cycle)
@@ -82,16 +117,34 @@ medium: {
 			}
 		} @test(err, code=incomplete|cycle)
 	}
+
+
+	p1b: {
+		@test(permute, count=6)
+		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port) @test(err, any, code=incomplete|cycle)
+
+		Y: {
+			if exists(#Y.port) {
+				port: strconv.Atoi(#Y.port)
+			}
+		} @test(err, any, code=incomplete|cycle)
+
+		#X: {
+			if !exists(Y.port) {
+				port: ""
+			}
+			if exists(Y.port) {
+				port: ":" + strconv.FormatInt(Y.port, 10)
+			}
+		} @test(err, any, code=incomplete|cycle)
+	}
 }
 
 large: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\d+))?$"#
 
-	p1: {
+	p1a: {
 		@test(permute, count=120)
-		// Pushdown improvement: #Y, #X, and X now resolve successfully.
-		// Y gets a cycle error because #Y.port changed after evaluation.
-		// Permute disabled: pushdown introduces ordering sensitivity.
 
 		Y: {
 			userinfo: "user"
@@ -132,42 +185,114 @@ large: {
 
 		#Y: regexp.FindNamedSubmatch(#userHostPort, X) @test(err, any, code=incomplete|cycle)
 	}
+
+	p1b: {
+		@test(permute, count=120)
+
+		Y: {
+			userinfo: "user"
+			host:     "mod.test"
+		}
+
+		X: #X.userinfo + #X.host + #X.port @test(err, any, code=incomplete|cycle)
+
+		#X: {
+			if !exists(Y.userinfo) {
+				userinfo: ""
+			}
+			if exists(Y.userinfo) {
+				userinfo: Y.userinfo + "@"
+			}
+
+			host: Y.host
+
+			if !exists(Y.port) {
+				port: ""
+			}
+			if exists(Y.port) {
+				port: ":" + strconv.FormatInt(Y.port, 10)
+			}
+		} @test(err, any, code=incomplete|cycle)
+
+		Y: {
+			if exists(#Y.userinfo) {
+				userinfo: #Y.userinfo
+			}
+
+			host: #Y.host
+
+			if exists(#Y.port) {
+				port: strconv.Atoi(#Y.port)
+			}
+		} @test(err, any, code=incomplete|cycle)
+
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X) @test(err, any, code=incomplete|cycle)
+	}
 }
 -- out/errors.txt --
 [cycle] minimal.a: cyclic reference to field port:
-    ./in.cue:12:8
+    ./in.cue:13:8
 [cycle] minimal.b: undefined field: port:
-    ./in.cue:20:8
-[cycle] small.p1.#Y: cyclic reference to field port:
-    ./in.cue:33:50
-[cycle] small.p1.#X: undefined field: port:
-    ./in.cue:36:10
-small.p1.#X: undefined field: port:
-    ./in.cue:39:10
-[cycle] medium.p1.#Y: undefined field: port:
-    ./in.cue:59:50
-[cycle] medium.p1.Y: undefined field: port:
-    ./in.cue:66:10
-[cycle] medium.p1.#X: cyclic reference to field port:
-    ./in.cue:75:9
-medium.p1.#X: cyclic reference to field port:
-    ./in.cue:78:9
-[cycle] large.p1.Y: undefined field: userinfo:
-    ./in.cue:120:10
-large.p1.Y: undefined field: port:
-    ./in.cue:126:10
-[cycle] large.p1.X: undefined field: port:
-    ./in.cue:99:33
-[cycle] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-    ./in.cue:102:7
-large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
-    ./in.cue:105:7
-large.p1.#X: cyclic reference to field port:
-    ./in.cue:111:9
-large.p1.#X: cyclic reference to field port:
-    ./in.cue:114:9
-[cycle] large.p1.X: undefined field: port:
-    ./in.cue:99:33
+    ./in.cue:21:8
+[cycle] minimal.b: undefined field: port:
+    ./in.cue:21:8
+[cycle] minimal.a: cyclic reference to field port:
+    ./in.cue:13:8
+[cycle] smallA.p1a.#Y: cyclic reference to field port:
+    ./in.cue:48:50
+[cycle] smallA.p1a.#X: undefined field: port:
+    ./in.cue:51:10
+smallA.p1a.#X: undefined field: port:
+    ./in.cue:54:10
+[incomplete] smallA.p1b.#Y: undefined field: port:
+    ./in.cue:69:50
+[incomplete] smallA.p1b.#X: undefined field: port:
+    ./in.cue:72:18
+smallA.p1b.#X: undefined field: port:
+    ./in.cue:75:17
+[cycle] medium.p1a.#Y: undefined field: port:
+    ./in.cue:88:50
+[cycle] medium.p1a.Y: undefined field: port:
+    ./in.cue:95:10
+[cycle] medium.p1a.#X: cyclic reference to field port:
+    ./in.cue:104:9
+medium.p1a.#X: cyclic reference to field port:
+    ./in.cue:107:9
+[incomplete] medium.p1b.#Y: undefined field: port:
+    ./in.cue:116:50
+[incomplete] medium.p1b.Y: undefined field: port:
+    ./in.cue:119:17
+[incomplete] medium.p1b.#X: undefined field: port:
+    ./in.cue:125:17
+medium.p1b.#X: undefined field: port:
+    ./in.cue:128:16
+[cycle] large.p1a.Y: undefined field: userinfo:
+    ./in.cue:167:10
+large.p1a.Y: undefined field: port:
+    ./in.cue:173:10
+[cycle] large.p1a.X: undefined field: port:
+    ./in.cue:146:33
+[cycle] large.p1a.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+    ./in.cue:149:7
+large.p1a.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+    ./in.cue:152:7
+large.p1a.#X: cyclic reference to field port:
+    ./in.cue:158:9
+large.p1a.#X: cyclic reference to field port:
+    ./in.cue:161:9
+[cycle] large.p1a.X: undefined field: port:
+    ./in.cue:146:33
+[incomplete] large.p1b.Y: undefined field: port:
+    ./in.cue:216:17
+[incomplete] large.p1b.X: undefined field: port:
+    ./in.cue:189:33
+large.p1b.#X.host: #Y.host undefined as #Y is incomplete (type _):
+    ./in.cue:214:10
+[incomplete] large.p1b.#X: undefined field: port:
+    ./in.cue:201:17
+large.p1b.#X: undefined field: port:
+    ./in.cue:204:16
+[cycle] cycle error
 -- out/todo.txt --
 minimal.a/b: pushdown reports cycle error (matching v2) instead of incomplete (v3).
 small.p1: pushdown resolves #Y to {port: ""} (matching v2); #X still has cycle error.

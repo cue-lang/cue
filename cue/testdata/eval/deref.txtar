@@ -1,5 +1,6 @@
 -- in.cue --
-issue4011: full: {
+@experiment(predicates)
+issue4011: fullA: {
 	let _hugoEnvironments = {
 		default:    "_default"
 		production: "production"
@@ -26,7 +27,34 @@ issue4011: full: {
 		hugo: production: {}
 	}})
 }
-issue4011: reduced: {
+issue4011: fullB: {
+	let _hugoEnvironments = {
+		default:    "_default"
+		production: "production"
+	}
+
+	site: cls: _
+	site: [_]: {
+		fs: {
+			Create: {
+				for envID, envName in _hugoEnvironments
+				let envConfig = hugo[envID]
+				if isValid(envConfig) {
+					config: Contents: envConfig
+				}
+			}
+		}
+
+		hugo: _
+	}
+
+	site: [_]: hugo: production: {}
+	@test(eq, {site: cls: {
+		fs: Create: config: Contents: {}
+		hugo: production: {}
+	}})
+}
+issue4011: reducedA: {
 	@test(eq, {result: foo: true, envs: foo: {}})
 	result: {
 		for envName in ["foo"]
@@ -37,17 +65,15 @@ issue4011: reduced: {
 	}
 	envs: foo: {}
 }
+issue4011: reducedB: {
+	@test(eq, {result: foo: true, envs: foo: {}})
+	result: {
+		for envName in ["foo"]
+		let env = envs[envName]
+		if isValid(env) {
+			(envName): true
+		}
+	}
+	envs: foo: {}
+}
 -- out/eval/stats --
-Leaks:  5
-Freed:  22
-Reused: 12
-Allocs: 15
-Retain: 17
-
-Unifications: 27
-Conjuncts:    33
-Disjuncts:    37
-
-MisalignedConjunct: 4
-
-NumCloseIDs: 2

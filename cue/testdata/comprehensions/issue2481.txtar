@@ -2,18 +2,30 @@
 # correctly reports an error. Issue #2481: nested for/if/let comprehensions
 # triggered a spurious "circular dependency" error in the evaluator.
 # https://cuelang.org/issue/2481
-// Mixing struct fields and embedded scalars should error. Using comprehensions
-// this follows a different path which may miss the error.
-// TODO: fix
+//
+// Each test exists in two forms: an "A" variant using legacy `!= _|_` and
+// a "B" variant using exists()/isValid().
 -- in.cue --
+@experiment(predicates)
 // Mixing struct fields and embedded scalars should error. Using comprehensions
 // this follows a different path which may miss the error.
 // TODO: fix
-out: {
+outA: {
 	for k in keys {
 		if values[k] != _|_  {
 			val: k
 			if val != _|_ {
+				k
+			}
+		}
+	}
+	@test(err, code=eval, hint="string with struct")
+}
+outB: {
+	for k in keys {
+		if exists(values[k])  {
+			val: k
+			if isConcrete(val) {
 				k
 			}
 		}
@@ -25,11 +37,22 @@ out: {
 // fine, though, as lets do not represent a single data field. This should
 // therefore not error.
 // TODO: fix
-multiLets: {
+multiLetsA: {
 	for k in keys {
 		if values[k] != _|_  {
 			let val = k
 			if val != _|_ {
+				k
+			}
+		}
+	}
+	@test(eq, "b")
+}
+multiLetsB: {
+	for k in keys {
+		if exists(values[k])  {
+			let val = k
+			if isValid(val) {
 				k
 			}
 		}
@@ -50,14 +73,14 @@ values: {
 	@test(eq, {b: "member", c: "foo"})
 }
 
-full: {
+fullA: {
 	out: {
 
 		// changing this to a list of the keys "fixes" things, i.e. this comprehension is required
 		for k, _ in #github_team_membership {
 
 			// Remove this comprehension to trigger a different type of cycle error
-			if ( values[k] != _|_ ) {
+			if values[k] != _|_ {
 
 				// This let is also required
 				let val = values[k]
@@ -80,24 +103,51 @@ full: {
 	}
 	@test(eq, {out: {role: "member"}, #github_team_membership: {team_id: string, role: string}, values: {role: "member", username: "foo"}})
 }
+fullB: {
+	out: {
+
+		// changing this to a list of the keys "fixes" things, i.e. this comprehension is required
+		for k, _ in #github_team_membership {
+
+			// Remove this comprehension to trigger a different type of cycle error
+			if exists(values[k]) {
+
+				// This let is also required
+				let val = values[k]
+
+				if val != null && isValid(val & string) {
+					(k): val
+				}
+			}
+		}
+	}
+
+	#github_team_membership: {
+		team_id: string
+		role:    string
+	}
+
+	values: {
+		"role":     "member"
+		"username": "foo"
+	}
+	@test(eq, {out: {role: "member"}, #github_team_membership: {team_id: string, role: string}, values: {role: "member", username: "foo"}})
+}
 -- out/errors.txt --
-[eval] out: conflicting values {val:k,if (val != _|_(explicit error (_|_ literal) in source)) {k}} and "b" (mismatched types struct and string):
-    ./in.cue:4:6
-    ./in.cue:5:2
-    ./in.cue:6:3
-    ./in.cue:6:24
-    ./in.cue:8:4
-    ./in.cue:9:5
-    ./in.cue:35:2
+[eval] outA: conflicting values {val:k,if (val != _|_(explicit error (_|_ literal) in source)) {k}} and "b" (mismatched types struct and string):
+    ./in.cue:5:7
+    ./in.cue:6:2
+    ./in.cue:7:3
+    ./in.cue:7:24
+    ./in.cue:9:4
+    ./in.cue:10:5
+    ./in.cue:58:2
+[eval] outB: conflicting values {val:k,if isConcrete(val) {k}} and "b" (mismatched types struct and string):
+    ./in.cue:16:7
+    ./in.cue:17:2
+    ./in.cue:18:3
+    ./in.cue:18:25
+    ./in.cue:20:4
+    ./in.cue:21:5
+    ./in.cue:58:2
 -- out/eval/stats --
-Leaks:  3
-Freed:  23
-Reused: 9
-Allocs: 17
-Retain: 0
-
-Unifications: 26
-Conjuncts:    54
-Disjuncts:    0
-
-NumCloseIDs: 22

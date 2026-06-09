@@ -8,7 +8,8 @@
 // per arc. This is relevant for disjunctions. Without it, an incorrect
 // result may be cached for an arbitrary Environment.
 -- in.cue --
-p1: {
+@experiment(predicates)
+p1A: {
 	#A: {
 		x?: int
 		y?: int
@@ -34,7 +35,33 @@ p1: {
 		b: {x: 3, y?: int, all: [3]}
 	})
 }
-p2: {
+p1B: {
+	#A: {
+		x?: int
+		y?: int
+
+		let list = [x, y]
+		all:  [for v in list if isValid(v) {v}]
+
+		*{
+			x?: _|_
+			y:  1
+		} | _
+	}
+
+	a: #A & { x: 3 }
+	b: #A & a
+	@test(eq, {
+		#A: *{
+			y: 1, all: [1], x?: _|_ @test(err, code=user, contains="explicit error", pos=[9:8])
+		} | {
+			x?: int, y?: int, all: []
+		}
+		a: {x: 3, y?: int, all: [3]}
+		b: {x: 3, y?: int, all: [3]}
+	})
+}
+p2A: {
 	#A: {
 		x?: int
 		y?: int
@@ -60,18 +87,31 @@ p2: {
 		b: {x: 3, y: 2, all: [3, 2]}
 	})
 }
+p2B: {
+	#A: {
+		x?: int
+		y?: int
+
+		let list = [x, y]
+		all:  [for v in list if isValid(v) {v}]
+
+		_ | *{
+			x?: _|_
+			y:  1
+		}
+	}
+
+	a: #A & { x: 3, y: 2 }
+	b: #A & a
+	@test(eq, {
+		#A: *{
+			y: 1, all: [1], x?: _|_ @test(err, code=user, contains="explicit error")
+		} | {
+			x?: int, y?: int, all: []
+		}
+		a: {x: 3, y: 2, all: [3, 2]}
+		b: {x: 3, y: 2, all: [3, 2]}
+	})
+}
 
 -- out/eval/stats --
-Leaks:  46
-Freed:  93
-Reused: 76
-Allocs: 63
-Retain: 0
-
-Unifications: 79
-Conjuncts:    157
-Disjuncts:    12
-
-NumCloseIDs: 38
--- out/todo.txt --
-p1.b and p2.b: v2 uses structure-shared let (list#1multi/list#2multi), v3 evaluates it per arc.

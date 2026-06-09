@@ -52,6 +52,24 @@
       "parentUuid": "30dfc6dd_31a737b6",
       "revId": "4ab9f3ea5418d2cc9c23cf1635070b9146b0eef6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "120780c6_15fc5439",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T12:21:13Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "80db1a0e_b0f0725d",
+      "revId": "4ab9f3ea5418d2cc9c23cf1635070b9146b0eef6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

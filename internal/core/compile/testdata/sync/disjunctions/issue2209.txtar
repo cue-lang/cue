@@ -3,6 +3,7 @@
 # involving nested definitions with spec disjunctions and if-guard comprehensions.
 # https://cuelang.org/issue/2209
 -- input.cue --
+@experiment(reflect)
 full: {
 	Foo: #Abstract & {spec: foo: {}}
 	Bar: #Abstract & {spec: bar: {}}
@@ -78,7 +79,7 @@ full: {
 	}
 }
 
-reduced: {
+reducedA: {
 	Foo: #Obj & {spec: foo: {}}
 	Bar: #Obj & {spec: bar: {}}
 
@@ -91,6 +92,33 @@ reduced: {
 				minFoo: _Xspec.foo.min
 			}
 			if _Xspec.bar != _|_ {
+				minBar: _Xspec.bar.min
+			}
+		}
+	}
+
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	#Out: {
+		{minFoo: int} | {minBar: int}
+
+		*{nullFoo: null} | {nullBar: null}
+	}
+}
+reducedB: {
+	Foo: #Obj & {spec: foo: {}}
+	Bar: #Obj & {spec: bar: {}}
+
+	#Obj: X={
+		spec: *#SpecFoo | #SpecBar
+
+		out: #Out & {
+			_Xspec: X.spec
+			if exists(_Xspec.foo) {
+				minFoo: _Xspec.foo.min
+			}
+			if exists(_Xspec.bar) {
 				minBar: _Xspec.bar.min
 			}
 		}
@@ -182,7 +210,7 @@ reduced: {
       }
     }
   }
-  reduced: {
+  reducedA: {
     Foo: (〈0;#Obj〉 & {
       spec: {
         foo: {}
@@ -201,6 +229,52 @@ reduced: {
           minFoo: 〈1;_Xspec〉.foo.min
         }
         if (〈0;_Xspec〉.bar != _|_(explicit error (_|_ literal) in source)) {
+          minBar: 〈1;_Xspec〉.bar.min
+        }
+      })
+    }
+    #SpecFoo: {
+      foo: {
+        min: (int|*10)
+      }
+    }
+    #SpecBar: {
+      bar: {
+        min: (int|*20)
+      }
+    }
+    #Out: {
+      ({
+        minFoo: int
+      }|{
+        minBar: int
+      })
+      (*{
+        nullFoo: null
+      }|{
+        nullBar: null
+      })
+    }
+  }
+  reducedB: {
+    Foo: (〈0;#Obj〉 & {
+      spec: {
+        foo: {}
+      }
+    })
+    Bar: (〈0;#Obj〉 & {
+      spec: {
+        bar: {}
+      }
+    })
+    #Obj: {
+      spec: (*〈1;#SpecFoo〉|〈1;#SpecBar〉)
+      out: (〈1;#Out〉 & {
+        _Xspec: 〈2〉.spec
+        if exists(〈0;_Xspec〉.foo) {
+          minFoo: 〈1;_Xspec〉.foo.min
+        }
+        if exists(〈0;_Xspec〉.bar) {
           minBar: 〈1;_Xspec〉.bar.min
         }
       })

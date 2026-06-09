@@ -4,7 +4,9 @@
 # if comprehensions inside #Leaf reference optional fields without triggering
 # spurious closedness errors.
 -- in.cue --
-object: #Leaf & {}
+@experiment(reflect)
+objectA: #LeafA & {}
+objectB: #LeafB & {}
 
 #Base: {
 	extra?: {...}
@@ -14,7 +16,7 @@ object: #Leaf & {}
 	#Base
 }
 
-#Leaf: {
+#LeafA: {
 	#Mid
 	extra?: {...}
 	more?: int
@@ -24,10 +26,22 @@ object: #Leaf & {}
 		}
 	}
 }
+
+#LeafB: {
+	#Mid
+	extra?: {...}
+	more?: int
+	if exists(extra.foo) {
+		if exists(more) {
+			foo: "bar"
+		}
+	}
+}
 -- out/compile --
 --- in.cue
 {
-  object: (〈0;#Leaf〉 & {})
+  objectA: (〈0;#LeafA〉 & {})
+  objectB: (〈0;#LeafB〉 & {})
   #Base: {
     extra?: {
       ...
@@ -36,7 +50,7 @@ object: #Leaf & {}
   #Mid: {
     〈1;#Base〉
   }
-  #Leaf: {
+  #LeafA: {
     〈1;#Mid〉
     extra?: {
       ...
@@ -44,6 +58,18 @@ object: #Leaf & {}
     more?: int
     if (〈0;extra〉.foo != _|_(explicit error (_|_ literal) in source)) {
       if (〈1;more〉 != _|_(explicit error (_|_ literal) in source)) {
+        foo: "bar"
+      }
+    }
+  }
+  #LeafB: {
+    〈1;#Mid〉
+    extra?: {
+      ...
+    }
+    more?: int
+    if exists(〈0;extra〉.foo) {
+      if exists(〈1;more〉) {
         foo: "bar"
       }
     }

@@ -1,4 +1,6 @@
 -- in.cue --
+@experiment(reflect)
+
 // Issue #739: Tests that scalar values (integers, lists, strings) embedded in
 // structs participate correctly in arithmetic, indexing, and built-in function
 // calls (list.Concat, strings.Join). Also covers definitions and optional fields
@@ -77,7 +79,7 @@ defCheck: {
 	b: a.#def
 }
 
-optionalExists: {
+optionalExistsA: {
 	string | {
 		value?: string
 
@@ -86,12 +88,35 @@ optionalExists: {
 		}
 	}
 }
+optionalExistsB: {
+	string | {
+		value?: string
 
-optionalCheck: {
+		if exists(value) {
+			other: int
+		}
+	}
+}
+
+optionalCheckA: {
 	thing: string | {
 		value?: string
 
 		if value != _|_ {
+			other: int
+		}
+	}
+
+	thing: {
+		value: "some string"
+		other: 3
+	}
+}
+optionalCheckB: {
+	thing: string | {
+		value?: string
+
+		if exists(value) {
 			other: int
 		}
 	}
@@ -229,7 +254,7 @@ selfRefInEmbed: t1: {
     }
     b: 〈0;a〉.#def
   }
-  optionalExists: {
+  optionalExistsA: {
     (string|{
       value?: string
       if (〈0;value〉 != _|_(explicit error (_|_ literal) in source)) {
@@ -237,10 +262,30 @@ selfRefInEmbed: t1: {
       }
     })
   }
-  optionalCheck: {
+  optionalExistsB: {
+    (string|{
+      value?: string
+      if exists(〈0;value〉) {
+        other: int
+      }
+    })
+  }
+  optionalCheckA: {
     thing: (string|{
       value?: string
       if (〈0;value〉 != _|_(explicit error (_|_ literal) in source)) {
+        other: int
+      }
+    })
+    thing: {
+      value: "some string"
+      other: 3
+    }
+  }
+  optionalCheckB: {
+    thing: (string|{
+      value?: string
+      if exists(〈0;value〉) {
         other: int
       }
     })

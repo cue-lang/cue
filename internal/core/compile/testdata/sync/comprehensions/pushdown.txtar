@@ -1,6 +1,7 @@
 # Working set of tests that unit test specifics of the aspect of the
 # comprehension algorithm that pushes down evaluation to the arcs.
 -- in.cue --
+@experiment(reflect)
 linkChildren: {
 	w: 1
 	v: {
@@ -31,6 +32,13 @@ fail: {
 		// true. However, after inserting the corresponding result in curly
 		// braces, the condition would be true. This is not allowed.
 		if a.b == _|_ {
+			b: 1
+		}
+	}
+}
+failB: {
+	a: {
+		if !exists(a.b) {
 			b: 1
 		}
 	}
@@ -465,7 +473,7 @@ voidEliminationSuccess: opt1: {
 	}
 }
 
-voidEliminationSuccess: noCycle1: {
+voidEliminationSuccess: noCycle1A: {
 	_x: a.b
 	a: {
 		c: h: "stream"
@@ -477,12 +485,36 @@ voidEliminationSuccess: noCycle1: {
 		}
 	}
 }
+voidEliminationSuccess: noCycle1B: {
+	_x: a.b
+	a: {
+		c: h: "stream"
+		b: {
+			if exists(c.g) {}
+		}
+		c: {
+			if false {g: _}
+		}
+	}
+}
 
-voidEliminationSuccess: noCycle2: {
+voidEliminationSuccess: noCycle2A: {
 	a: {
 		c: h: "stream"
 		b: {
 			if c.g != _|_ {}
+		}
+		c: {
+			if false {g: _}
+		}
+	}
+	_x: a.b
+}
+voidEliminationSuccess: noCycle2B: {
+	a: {
+		c: h: "stream"
+		b: {
+			if exists(c.g) {}
 		}
 		c: {
 			if false {g: _}
@@ -694,10 +726,12 @@ arcAlignment: t1: {
 	}
 }
 -- issue2111.cue --
+@experiment(reflect)
+
 // Evaluator regression where circular dependency in evaluation of conditionals
 // caused incorrect results. All arc types, not just regular fields, should be pushed down.
 // https://cuelang.org/issue/2111
-letPushdown: {
+letPushdownA: {
 	_c: y: 1
 
 	a: {
@@ -707,13 +741,25 @@ letPushdown: {
 		}
 	}
 }
+letPushdownB: {
+	_c: y: 1
+
+	a: {
+		for k, v in _c {
+			let x = v
+			if isValid(x) {}
+		}
+	}
+}
 -- issue2113.cue --
+@experiment(reflect)
+
 // Evaluator regression where a nested comprehension caused "was already used"
 // errors when the enclosing value was not yet fully evaluated.
 // https://cuelang.org/issue/2113
 // Ensure that an enclosing Value clause of a nested comprehension is evaluated
 // before the nested comprehension itself is evaluated.
-nestedWithEmbeddingOK: {
+nestedWithEmbeddingOKA: {
 	c: [1]
 	a: {
 		for k, v in c {
@@ -722,13 +768,32 @@ nestedWithEmbeddingOK: {
 		}
 	}
 }
+nestedWithEmbeddingOKB: {
+	c: [1]
+	a: {
+		for k, v in c {
+			{x: 1}
+			if exists(a.x) {}
+		}
+	}
+}
 
-nestedWithDynamicFieldOK: {
+nestedWithDynamicFieldOKA: {
 	_c: y: 1
 
 	a: {
 		for k, v in _c {
 			if x != _|_ {}
+			x="\(k)": 1
+		}
+	}
+}
+nestedWithDynamicFieldOKB: {
+	_c: y: 1
+
+	a: {
+		for k, v in _c {
+			if isValid(x) {}
 			x="\(k)": 1
 		}
 	}
@@ -1140,6 +1205,13 @@ letCycleSelfKeyword2: {
   fail: {
     a: {
       if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+        b: 1
+      }
+    }
+  }
+  failB: {
+    a: {
+      if !exists(〈1;a〉.b) {
         b: 1
       }
     }
@@ -1674,7 +1746,7 @@ letCycleSelfKeyword2: {
     }
   }
   voidEliminationSuccess: {
-    noCycle1: {
+    noCycle1A: {
       _x: 〈0;a〉.b
       a: {
         c: {
@@ -1692,13 +1764,49 @@ letCycleSelfKeyword2: {
     }
   }
   voidEliminationSuccess: {
-    noCycle2: {
+    noCycle1B: {
+      _x: 〈0;a〉.b
+      a: {
+        c: {
+          h: "stream"
+        }
+        b: {
+          if exists(〈1;c〉.g) {}
+        }
+        c: {
+          if false {
+            g: _
+          }
+        }
+      }
+    }
+  }
+  voidEliminationSuccess: {
+    noCycle2A: {
       a: {
         c: {
           h: "stream"
         }
         b: {
           if (〈1;c〉.g != _|_(explicit error (_|_ literal) in source)) {}
+        }
+        c: {
+          if false {
+            g: _
+          }
+        }
+      }
+      _x: 〈0;a〉.b
+    }
+  }
+  voidEliminationSuccess: {
+    noCycle2B: {
+      a: {
+        c: {
+          h: "stream"
+        }
+        b: {
+          if exists(〈1;c〉.g) {}
         }
         c: {
           if false {
@@ -1895,7 +2003,7 @@ letCycleSelfKeyword2: {
 }
 --- issue2111.cue
 {
-  letPushdown: {
+  letPushdownA: {
     _c: {
       y: 1
     }
@@ -1906,10 +2014,21 @@ letCycleSelfKeyword2: {
       }
     }
   }
+  letPushdownB: {
+    _c: {
+      y: 1
+    }
+    a: {
+      for k, v in 〈1;_c〉 {
+        let x#2multi = 〈1;v〉
+        if isValid(〈0;let x#2〉) {}
+      }
+    }
+  }
 }
 --- issue2113.cue
 {
-  nestedWithEmbeddingOK: {
+  nestedWithEmbeddingOKA: {
     c: [
       1,
     ]
@@ -1922,13 +2041,37 @@ letCycleSelfKeyword2: {
       }
     }
   }
-  nestedWithDynamicFieldOK: {
+  nestedWithEmbeddingOKB: {
+    c: [
+      1,
+    ]
+    a: {
+      for k, v in 〈1;c〉 {
+        {
+          x: 1
+        }
+        if exists(〈3;a〉.x) {}
+      }
+    }
+  }
+  nestedWithDynamicFieldOKA: {
     _c: {
       y: 1
     }
     a: {
       for k, v in 〈1;_c〉 {
         if (〈0;("\(〈1;k〉)")〉 != _|_(explicit error (_|_ literal) in source)) {}
+        "\(〈1;k〉)": 1
+      }
+    }
+  }
+  nestedWithDynamicFieldOKB: {
+    _c: {
+      y: 1
+    }
+    a: {
+      for k, v in 〈1;_c〉 {
+        if isValid(〈0;("\(〈1;k〉)")〉) {}
         "\(〈1;k〉)": 1
       }
     }
@@ -2434,9 +2577,9 @@ letCycleSelfKeyword2: {
   regression1: {
     #Primary: {
       _Y: _
-      let _X#2 = 〈0;_Y〉
-      if (len(〈0;let _X#2〉.spec.command) > 0) {
-        command: 〈1;let _X#2〉.spec.command
+      let _X#3 = 〈0;_Y〉
+      if (len(〈0;let _X#3〉.spec.command) > 0) {
+        command: 〈1;let _X#3〉.spec.command
       }
     }
     #Rollout: {
@@ -2484,16 +2627,16 @@ letCycleSelfKeyword2: {
   }
   letCycleSelf: {
     #X: {
-      let this#3 = 〈1〉
+      let this#4 = 〈1〉
       hosts: {
         [string]: _
       }
-      for h, _ in 〈0;let this#3〉.hosts {
+      for h, _ in 〈0;let this#4〉.hosts {
         out: {
           〈2;h〉: 1
         }
       }
-      for h, _ in 〈0;let this#3〉.hosts {
+      for h, _ in 〈0;let this#4〉.hosts {
         out: {
           〈2;h〉: 2
         }
@@ -2511,9 +2654,9 @@ letCycleSelfKeyword2: {
 {
   letCycleSelfKeyword: {
     #E: {
-      let s#4 = 〈1〉
+      let s#5 = 〈1〉
       hosts: _
-      for _, hv in 〈0;let s#4〉.hosts {
+      for _, hv in 〈0;let s#5〉.hosts {
         out: {
           〈2;hv〉.x: "a"
         }
@@ -2529,11 +2672,11 @@ letCycleSelfKeyword2: {
   }
   letCycleSelfKeyword2: {
     #E: {
-      let s#5 = 〈1〉
+      let s#6 = 〈1〉
       ...
-      for _, hv in 〈0;let s#5〉.hosts {
-        let n#6 = 〈2;let s#5〉.networks
-        a: 〈0;let n#6〉
+      for _, hv in 〈0;let s#6〉.hosts {
+        let n#7 = 〈2;let s#6〉.networks
+        a: 〈0;let n#7〉
       }
     }
     env: (〈0;#E〉 & {

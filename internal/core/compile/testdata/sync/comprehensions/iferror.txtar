@@ -1,4 +1,5 @@
 -- in.cue --
+@experiment(reflect)
 a: {b: 2, c: int}
 
 wrongConcreteType: {
@@ -38,7 +39,7 @@ useDefault: {
 		}
 	}
 
-	issue809: {
+	issue809a: {
 		#A: {
 			a: string
 			b: *a | string
@@ -49,6 +50,19 @@ useDefault: {
 
 		foo: [
 			for _, a in s if a.b != _|_ {a},
+		]
+	}
+	issue809b: {
+		#A: {
+			a: string
+			b: *a | string
+		}
+
+		s: [Name=string]: #A & {a: Name}
+		s: bar: _
+
+		foo: [
+			for _, a in s if exists(a.b) {a},
 		]
 	}
 }
@@ -131,7 +145,7 @@ issue1972: {
         y: 〈1;x〉
       }
     }
-    issue809: {
+    issue809a: {
       #A: {
         a: string
         b: (*〈0;a〉|string)
@@ -146,6 +160,25 @@ issue1972: {
       }
       foo: [
         for _, a in 〈1;s〉 if (〈0;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+          〈1;a〉
+        },
+      ]
+    }
+    issue809b: {
+      #A: {
+        a: string
+        b: (*〈0;a〉|string)
+      }
+      s: {
+        [string]: (〈1;#A〉 & {
+          a: 〈1;-〉
+        })
+      }
+      s: {
+        bar: _
+      }
+      foo: [
+        for _, a in 〈1;s〉 if exists(〈0;a〉.b) {
           〈1;a〉
         },
       ]

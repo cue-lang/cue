@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "567da562_ee205fe2",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T15:50:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c4ec454_dcb147ab",
+      "revId": "a4044aac13ff941b6218d3e89ee5c32d49e72b4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "961bdd67_eee586ea",
@@ -66,6 +84,24 @@
       "writtenOn": "2026-06-08T13:11:55Z",
       "side": 1,
       "message": "this feels like something that we should only do as part of a test or a fuzz function. it feels rather inefficient to do this always",
+      "revId": "a4044aac13ff941b6218d3e89ee5c32d49e72b4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "714a70a4_41ad482f",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T15:50:16Z",
+      "side": 1,
+      "message": "We\u0027ve done this in Format for a long time now and it\u0027s caught some useful things in the past. If this turns out to be a performance issue, we can remove it but for now I\u0027m inclined to leave it.",
+      "parentUuid": "961bdd67_eee586ea",
       "revId": "a4044aac13ff941b6218d3e89ee5c32d49e72b4a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

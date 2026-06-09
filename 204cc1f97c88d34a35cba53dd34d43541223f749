@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2eb36e1_a013b064",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T13:10:10Z",
+      "side": 1,
+      "message": "../ is fine. Adjusted the wording.",
+      "parentUuid": "e12cb5fc_1e35a618",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a32cfc72_0570f0f8",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-08T10:33:55Z",
       "side": 1,
       "message": "nit: join with the `repls !\u003d nil` block above",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "876476a4_696bd093",
+        "filename": "cue/load/config.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T13:10:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a32cfc72_0570f0f8",
       "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a17bdafc_a3af61a4",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 12
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T13:10:10Z",
+      "side": 1,
+      "message": "You\u0027re right to point it out, but the \"right\" solution here is still to define each version in terms of one newer than it, so there\u0027s only one version that\u0027s defined in terms of the latest version and hence only one to edit. Done that.",
+      "parentUuid": "7bf72f83_76ba2b57",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b6c327c8_bf920053",
@@ -103,6 +157,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75d19e80_bfe33782",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 12
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T13:10:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6c327c8_bf920053",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea603a33_68039a91",
@@ -116,6 +188,24 @@
       "writtenOn": "2026-06-08T10:33:55Z",
       "side": 1,
       "message": "ah, we could make these use the new `error` built-in :) feel free to do this in a follow-up commit. it would be good to sanity check that we get equal or better errors in the UI with the change.",
+      "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b98e2f9f_c6e696ac",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 12
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T13:10:10Z",
+      "side": 1,
+      "message": "Yeah, I tried that and decided to do it later on.",
+      "parentUuid": "ea603a33_68039a91",
       "revId": "204cc1f97c88d34a35cba53dd34d43541223f749",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,310 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73971edc_f8b59e13",
+        "filename": "cue/testdata/builtins/allows.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "empty stats?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "600bb457_6d069506",
+        "filename": "cue/testdata/builtins/concrete.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "surely you wanted to resolve the XXX before mailing?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5c976cc_c0ed577e",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "add a godoc?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7cd38a77_76aecc8c",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "I\u0027d avoid using examples in comments unless strictly necessary, as it adds quite a lot of verbosity",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48ef48a4_f070df71",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "don\u0027t use a switch for a single case?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f0d2a7a_a45b3c66",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "nit: join the `false, nil` returns",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f29a2699_24d9b5d1",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "remove?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3fa3058_6ef6c4fd",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 829,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "ditto shortening godocs",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4e76aa2_fe464f74",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "remove?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d693ca3c_cb1289ac",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "nit: you can remove this line",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2886301_3586b803",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1576,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "why are we adding custom validator code to the Builtin case rather than BuiltinValidator? something seems off, like we\u0027re using Builtin for these new validators when we should be using BuiltinValidator",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d63debb_0512b521",
+        "filename": "internal/core/compile/predeclared.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "this should be called `existsN` for consistency",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a6db0f5_a5d53bdc",
+        "filename": "internal/core/compile/reflect.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "the previous CL does not document `allows` at all in the spec",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4ae635a_2802a7d1",
+        "filename": "internal/core/compile/reflect.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "these godocs are way too long, please shorten them significantly",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "532097d9_efa7f46c",
+        "filename": "internal/core/compile/reflect.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "I\u0027d drop examples from godocs",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f9de6c9_fa44ce32",
+        "filename": "internal/core/compile/reflect.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "why doesn\u0027t this share the code that `cue.Value.Validate(cue.Concrete(true))` already uses?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3dd0ed0_6d92893b",
+        "filename": "internal/core/compile/testdata/sync/builtins/concrete.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "ditto about the XXX",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ab668da_1cf0bf09",
+        "filename": "internal/core/dep/testdata/resolvedep.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:58:11Z",
+      "side": 1,
+      "message": "revert?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

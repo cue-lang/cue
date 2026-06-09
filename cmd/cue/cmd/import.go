@@ -591,7 +591,7 @@ func tryParse(str string) (s ast.Expr, pkg string) {
 	// YAML because there's too much risk of false positives
 	// with regular-expressions or other such syntax.
 	// See issue 1443.
-	if bytes.IndexByte(b, '\n') == -1 {
+	if !bytes.ContainsRune(b, '\n') {
 		return nil, ""
 	}
 

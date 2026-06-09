@@ -138,9 +138,7 @@ func getName(f *reflect.StructField) string {
 	}
 	for _, s := range tagsWithNames {
 		if tag, ok := f.Tag.Lookup(s); ok {
-			if p := strings.IndexByte(tag, ','); p >= 0 {
-				tag = tag[:p]
-			}
+			tag, _, _ = strings.Cut(tag, ",")
 			if tag != "" {
 				name = tag
 				break

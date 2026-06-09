@@ -2846,6 +2846,85 @@ with `quo(x, y)` truncated towards zero.
 A zero divisor in either case results in bottom (an error).
 
 
+### `exists`
+
+The builtin function `exists` reports whether a referenced field exists as a
+regular member. It returns `true` if the field is defined, `false` otherwise.
+
+The argument must be a reference expression: a field reference, selector
+expression, or index expression. Using a non-reference expression results in
+an error.
+
+```cue rows
+Expression              Result
+a: {x: 1, y?: string}
+b?: {a: 1}
+#A: {c: 1}
+exists(a.x)             true
+exists(a.y)             false
+exists(a.z)             false
+exists(a["x"])          true
+exists(b.a)             _|_     // only tests the last reference
+exists(#A.nonExisting)  false   // #A does not define nonExisting
+```
+
+A field "exists" if it is defined with a value. Optional fields without values
+and fields that are not present do not exist. This distinguishes `exists` from
+validity checking—a field can exist but have an invalid value.
+
+
+### `isValid`
+
+The builtin function `isValid` reports whether an expression evaluates without
+error. More precisely, it return true if the expression can be made concrete
+by unifying it with some value, and `false` otherwise.
+
+Unlike `exists`, `isValid` fully evaluates its argument and returns `false` for
+any evaluation error, including errors caused by missing fields. This is
+consistent with the general semantics: `isValid(expr)` behaves equivalently to
+checking whether embedding `expr` in a struct would be valid.
+
+```cue rows
+Expression                      Result
+isValid(1 + 2)                  true
+isValid(1 / 0)                  false   // division by zero
+isValid("a" & 1)                false   // conflicting values
+isValid({a: 1}.a)               true
+isValid({a: 1}.b)               false   // field does not exist
+a: {b?: {c: {}}, x: 1 & "foo"}
+isValid(a.b.c)                  false   // b is optional, not defined
+isValid(a.x)                    false   // x has conflicting types
+b: {c?: {}, d: c}
+isValid(b)                      true    // can still be made valid
+```
+
+
+### `isConcrete`
+
+The builtin function `isConcrete` reports whether an expression evaluates to a
+concrete value. It returns `true` if the value is concrete, `false` otherwise.
+
+A value is concrete if it is a specific value rather than a type or constraint.
+For structs and lists, all regular fields and elements must be concrete for the
+container to be concrete.
+
+```cue rows
+Expression               Result
+isConcrete(1)            true
+isConcrete(int)          false   // int is a type
+isConcrete("hello")      true
+isConcrete(string)       false   // string is a type
+isConcrete({a: 1})       true
+isConcrete({a: int})     false   // a is not concrete
+isConcrete({a?: int})    true    // only regular fields are considered
+isConcrete([1, 2, 3])    true
+isConcrete([1, int, 3])  false   // element is not concrete
+isConcrete(1 & 2)        _|_     // conflict error is passed through
+a?: int
+isConcrete(a)            _|_     // an optional field cannot be referenced
+```
+
+
 ## Builtin Validators
 
 A validator validates the value at the position where it is defined.
@@ -2889,9 +2968,10 @@ value: 5 & matchN(>=1, [int, >10])  // true: int matches
 value: "test" & matchN(0, [int, >100])  // true: neither matches
 ```
 
-If the numeric constraint cannot be satisfied even with incomplete information,
-the error is marked as incomplete and will be reevaluated as more information
-becomes available.
+If the constraint cannot possibly be satisfied (for example, requiring 3 matches
+when only 2 schemas could ever match), validation fails immediately.
+If the constraint might still be satisfied as evaluation progresses,
+the result remains incomplete until a definitive answer can be determined.
 
 
 ### `matchIf`
@@ -2921,6 +3001,66 @@ x: {a: 1} & matchIf({a: int}, {a: int, b!: int}, {a: string}) // error; missing 
 y: 2 & matchIf(>5, <10, <3) // OK; 2 is <3
 ```
 
+
+### `existsN`
+
+The `existsN` builtin is a validator that checks if a specified number of
+referenced fields exist. It is typically embedded in a struct to constrain
+field presence.
+
+`existsN` takes a numeric constraint as its first argument, followed by any
+number of reference expressions.
+
+```cue rows
+Expression                       Result
+// Exactly one of a, b, c must exist (protobuf oneof pattern).
+#OneOf: {existsN(1, a, b, c), a?: int, b?: string, c?: bool}
+foo: #OneOf & {a: 1}             {a: 1, b?: string, c?: bool}
+
+// At most one of x, y can exist.
+#AtMostOne: {existsN(<=1, x, y), x?: int, y?: int}
+bar: #AtMostOne & {x: 1, y: 2}   _|_
+
+// At least two of the fields must exist.
+#AtLeastTwo: {existsN(>=2, a, b, c), a?: int, b?: int, c?: int}
+baz: #AtLeastTwo & {a: 1, c: 1}  {a: 1, b?: int, c: 1}
+qux: #AtLeastTwo & {a: 1}        _|_
+```
+
+If the constraint cannot possibly be satisfied (for example, requiring at
+most 2 fields to exist when 3 are defined), validation fails immediately.
+If the constraint might still be satisfied as evaluation progresses,
+the result remains incomplete until a definitive answer can be determined.
+
+
+### `validN`
+
+The `validN` builtin is a validator that checks if a specified number of
+expressions evaluate without error.
+
+`validN` takes a numeric constraint as its first argument, followed by any
+number of expressions to validate.
+
+```cue rows
+Expression                                                 Result
+// At least one of these type assertions must be valid.
+value: "hello" & validN(>=1, int & value, string & value)  "hello"
+```
+
+
+### `concreteN`
+
+The `concreteN` builtin is a validator that checks if a specified number of
+expressions evaluate to concrete values.
+
+`concreteN` takes a numeric constraint as its first argument, followed by any
+number of expressions to check for concreteness.
+
+```cue rows
+Expression                                                  Result
+// a and c are concrete; at least two are required.
+check: {a: 1, b: int, c: "hello", concreteN(>=2, a, b, c)}  {a: 1, b: int, c: "hello"}
+```
 
 ## Cycles
 

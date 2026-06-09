@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f252c03f_f60aaebd",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T16:28:39Z",
+      "side": 1,
+      "message": "Done. Switched to --replace and --drop-replace in the help text, and likewise updated the earlier --require/--drop-require paragraph.",
+      "parentUuid": "84b951c3_a3e3ccca",
+      "revId": "75f95a8d86d6724c392893c91364f3461b774874",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2152045e_d843b023",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T16:28:39Z",
+      "side": 1,
+      "message": "Done. The help text now just says \"a local directory or a module path with version\".",
+      "parentUuid": "abc019d0_29d05b10",
+      "revId": "75f95a8d86d6724c392893c91364f3461b774874",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e79d3f5f_3528fd03",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T16:28:39Z",
+      "side": 1,
+      "message": "Done. Removed that sentence from the help text.",
+      "parentUuid": "67d2d709_a3ad9aa2",
+      "revId": "75f95a8d86d6724c392893c91364f3461b774874",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66608b4f_4f7f69cd",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T16:28:39Z",
+      "side": 1,
+      "message": "Done. Exported parseReplaceValue directly as ParseReplacement and dropped the wrapper.",
+      "parentUuid": "6ad25696_e0fc34eb",
+      "revId": "75f95a8d86d6724c392893c91364f3461b774874",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+TryBot-Result+1: CUEcueckoo <cueckoo@cuelang.org>
+Code-Review+2: Paul Jolly <paul@myitcv.io>
+Unity-Result+1: CUE porcuepine <cue.porcuepine@gmail.com>
+Submitted-by: Daniel Martí <mvdan@mvdan.cc>
+Submitted-at: Tue, 09 Jun 2026 14:41:53 +0000
+Reviewed-on: https://cue.gerrithub.io/c/cue-lang/cue/+/1238661
+Project: cue-lang/cue
+Branch: refs/heads/master

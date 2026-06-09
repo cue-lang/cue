@@ -1,5 +1,12 @@
 // Issues: #667, #695, #622
+//
+// Each top-level test exists in two forms:
+//   - <name>A uses the legacy `X != _|_` / `X == _|_` comparison.
+//   - <name>B uses the new exists() builtin.
+// Both forms exercise the same cycle scenarios and must reach the same
+// resolution outcomes so the new builtin keeps the historical behavior.
 -- in.cue --
+@experiment(predicates)
 import (
 	"strconv"
 	"regexp"
@@ -21,12 +28,24 @@ minimal: {
 			port: ""
 		}
 	}
+
+	ra: {
+		if !exists(b.port) {
+			port: ""
+		}
+	}
+
+	rb: {
+		if !exists(a.port) {
+			port: ""
+		}
+	}
 }
 
-small: {
+smallA: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
-	p1: {
+	p1a: {
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
 		#X: {
@@ -38,12 +57,25 @@ small: {
 			}
 		}
 	}
+
+	p1b: {
+		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+
+		#X: {
+			if !exists(#Y.port) {
+				port: ""
+			}
+			if exists(#Y.port) {
+				port: ":" + strconv.FormatInt(#Y.port, 10)
+			}
+		}
+	}
 }
 
 medium: {
 	#userHostPort: #"^(:(?P<port>\d+))?$"#
 
-	p1: {
+	p1a: {
 
 		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
@@ -69,12 +101,31 @@ medium: {
 			}
 		}
 	}
+
+	p1b: {
+		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+
+		Y: {
+			if exists(#Y.port) {
+				port: strconv.Atoi(#Y.port)
+			}
+		}
+
+		#X: {
+			if !exists(Y.port) {
+				port: ""
+			}
+			if exists(Y.port) {
+				port: ":" + strconv.FormatInt(Y.port, 10)
+			}
+		}
+	}
 }
 
 large: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\d+))?$"#
 
-	p1: {
+	p1a: {
 
 		Y: {
 			userinfo: "user"
@@ -115,6 +166,48 @@ large: {
 
 		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
 	}
+
+	p1b: {
+
+		Y: {
+			userinfo: "user"
+			host:     "mod.test"
+		}
+
+		X: #X.userinfo + #X.host + #X.port
+
+		#X: {
+			if !exists(Y.userinfo) {
+				userinfo: ""
+			}
+			if exists(Y.userinfo) {
+				userinfo: Y.userinfo + "@"
+			}
+
+			host: Y.host
+
+			if !exists(Y.port) {
+				port: ""
+			}
+			if exists(Y.port) {
+				port: ":" + strconv.FormatInt(Y.port, 10)
+			}
+		}
+
+		Y: {
+			if exists(#Y.userinfo) {
+				userinfo: #Y.userinfo
+			}
+
+			host: #Y.host
+
+			if exists(#Y.port) {
+				port: strconv.Atoi(#Y.port)
+			}
+		}
+
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
+	}
 }
 -- out/compile --
 --- in.cue
@@ -130,10 +223,20 @@ large: {
         port: ""
       }
     }
+    ra: {
+      if !exists(〈1;b〉.port) {
+        port: ""
+      }
+    }
+    rb: {
+      if !exists(〈1;a〉.port) {
+        port: ""
+      }
+    }
   }
-  small: {
+  smallA: {
     #userHostPort: "^(:(?P<port>\\d+))?$"
-    p1: {
+    p1a: {
       #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
       #X: {
         if (〈1;#Y〉.port == _|_(explicit error (_|_ literal) in source)) {
@@ -144,10 +247,21 @@ large: {
         }
       }
     }
+    p1b: {
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+      #X: {
+        if !exists(〈1;#Y〉.port) {
+          port: ""
+        }
+        if exists(〈1;#Y〉.port) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;#Y〉.port, 10))
+        }
+      }
+    }
   }
   medium: {
     #userHostPort: "^(:(?P<port>\\d+))?$"
-    p1: {
+    p1a: {
       #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
       Y: {
         if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
@@ -163,10 +277,26 @@ large: {
         }
       }
     }
+    p1b: {
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+      Y: {
+        if exists(〈1;#Y〉.port) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #X: {
+        if !exists(〈1;Y〉.port) {
+          port: ""
+        }
+        if exists(〈1;Y〉.port) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+    }
   }
   large: {
     #userHostPort: "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$"
-    p1: {
+    p1a: {
       Y: {
         userinfo: "user"
         host: "mod.test"
@@ -193,6 +323,38 @@ large: {
         }
         host: 〈1;#Y〉.host
         if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p1b: {
+      Y: {
+        userinfo: "user"
+        host: "mod.test"
+      }
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      #X: {
+        if !exists(〈1;Y〉.userinfo) {
+          userinfo: ""
+        }
+        if exists(〈1;Y〉.userinfo) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if !exists(〈1;Y〉.port) {
+          port: ""
+        }
+        if exists(〈1;Y〉.port) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        if exists(〈1;#Y〉.userinfo) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if exists(〈1;#Y〉.port) {
           port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
         }
       }

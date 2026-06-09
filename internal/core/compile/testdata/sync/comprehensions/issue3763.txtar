@@ -1,7 +1,8 @@
 # Tests that nested comprehensions with let bindings across multiple files work.
 # Issue #3763: for comprehension with multi-level let bindings and pattern constraints.
 -- reduced.cue --
-reduced: {
+@experiment(predicates)
+reducedA: {
 	A: x1: y?: int // needs to be optional
 	A: x2: y?: int
 	A: x3: y?: int
@@ -11,7 +12,18 @@ reduced: {
 		B: [for z in Z if z.y != _|_ {b: 1}]
 	}
 }
+reducedB: {
+	A: x1: y?: int // needs to be optional
+	A: x2: y?: int
+	A: x3: y?: int
+
+	if true {
+		let Z = [for _, x in A {x}]
+		B: [for z in Z if exists(z.y) {b: 1}]
+	}
+}
 -- full.cue --
+@experiment(predicates)
 full: {
 	_core_v1: {
 		#cp: {
@@ -109,7 +121,7 @@ full: {
 }
 --- reduced.cue
 {
-  reduced: {
+  reducedA: {
     A: {
       x1: {
         y?: int
@@ -133,6 +145,35 @@ full: {
       ]
       B: [
         for _, z in 〈1;let Z#3〉 if (〈0;z〉.y != _|_(explicit error (_|_ literal) in source)) {
+          b: 1
+        },
+      ]
+    }
+  }
+  reducedB: {
+    A: {
+      x1: {
+        y?: int
+      }
+    }
+    A: {
+      x2: {
+        y?: int
+      }
+    }
+    A: {
+      x3: {
+        y?: int
+      }
+    }
+    if true {
+      let Z#4 = [
+        for _, x in 〈2;A〉 {
+          〈1;x〉
+        },
+      ]
+      B: [
+        for _, z in 〈1;let Z#4〉 if exists(〈0;z〉.y) {
           b: 1
         },
       ]

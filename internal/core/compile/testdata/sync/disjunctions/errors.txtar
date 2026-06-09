@@ -72,6 +72,8 @@ issue3581: reduced: {
 	c: _
 }
 -- issue3576.cue --
+@experiment(predicates)
+
 // evalv3: disjunct of definitions with identical optional fields results in
 // incomplete evaluation; the resolved disjunct should be fully evaluated.
 // https://cuelang.org/issue/3576
@@ -85,7 +87,7 @@ issue3576: reduced: {
 	foo: #B | #A
 	foo: a: "1"
 }
-issue3576: full: {
+issue3576: fullA: {
 	#Run: {
 		run!: string
 		options?: #Option | [#Option, ...]
@@ -101,7 +103,27 @@ issue3576: full: {
 			optionsValue: options
 		}
 	}
+	#Option: {}
 
+	foo: #Run | #Copy
+	foo: run: "make"
+}
+issue3576: fullB: {
+	#Run: {
+		run!: string
+		options?: #Option | [#Option, ...]
+		if exists(options) {
+			optionsValue: options
+		}
+	}
+
+	#Copy: {
+		copy!: string
+		options?: #Option | [#Option, ...]
+		if exists(options) {
+			optionsValue: options
+		}
+	}
 	#Option: {}
 
 	foo: #Run | #Copy
@@ -261,7 +283,7 @@ issue4022: full: {
     }
   }
   issue3576: {
-    full: {
+    fullA: {
       #Run: {
         run!: string
         options?: (〈1;#Option〉|[
@@ -279,6 +301,35 @@ issue4022: full: {
           ...,
         ])
         if (〈0;options〉 != _|_(explicit error (_|_ literal) in source)) {
+          optionsValue: 〈1;options〉
+        }
+      }
+      #Option: {}
+      foo: (〈0;#Run〉|〈0;#Copy〉)
+      foo: {
+        run: "make"
+      }
+    }
+  }
+  issue3576: {
+    fullB: {
+      #Run: {
+        run!: string
+        options?: (〈1;#Option〉|[
+          〈2;#Option〉,
+          ...,
+        ])
+        if exists(〈0;options〉) {
+          optionsValue: 〈1;options〉
+        }
+      }
+      #Copy: {
+        copy!: string
+        options?: (〈1;#Option〉|[
+          〈2;#Option〉,
+          ...,
+        ])
+        if exists(〈0;options〉) {
           optionsValue: 〈1;options〉
         }
       }

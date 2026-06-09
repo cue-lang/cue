@@ -8,7 +8,8 @@
 // per arc. This is relevant for disjunctions. Without it, an incorrect
 // result may be cached for an arbitrary Environment.
 -- in.cue --
-p1: {
+@experiment(predicates)
+p1A: {
 	#A: {
 		x?: int
 		y?: int
@@ -25,7 +26,24 @@ p1: {
 	a: #A & {x: 3}
 	b: #A & a
 }
-p2: {
+p1B: {
+	#A: {
+		x?: int
+		y?: int
+
+		let list = [x, y]
+		all: [for v in list if isValid(v) {v}]
+
+		*{
+			x?: _|_
+			y:  1
+		} | _
+	}
+
+	a: #A & {x: 3}
+	b: #A & a
+}
+p2A: {
 	#A: {
 		x?: int
 		y?: int
@@ -42,10 +60,27 @@ p2: {
 	a: #A & {x: 3, y: 2}
 	b: #A & a
 }
+p2B: {
+	#A: {
+		x?: int
+		y?: int
+
+		let list = [x, y]
+		all: [for v in list if isValid(v) {v}]
+
+		_ | *{
+			x?: _|_
+			y:  1
+		}
+	}
+
+	a: #A & {x: 3, y: 2}
+	b: #A & a
+}
 -- out/compile --
 --- in.cue
 {
-  p1: {
+  p1A: {
     #A: {
       x?: int
       y?: int
@@ -68,7 +103,7 @@ p2: {
     })
     b: (〈0;#A〉 & 〈0;a〉)
   }
-  p2: {
+  p1B: {
     #A: {
       x?: int
       y?: int
@@ -77,7 +112,54 @@ p2: {
         〈1;y〉,
       ]
       all: [
-        for _, v in 〈1;let list#2〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
+        for _, v in 〈1;let list#2〉 if isValid(〈0;v〉) {
+          〈1;v〉
+        },
+      ]
+      (*{
+        x?: _|_(explicit error (_|_ literal) in source)
+        y: 1
+      }|_)
+    }
+    a: (〈0;#A〉 & {
+      x: 3
+    })
+    b: (〈0;#A〉 & 〈0;a〉)
+  }
+  p2A: {
+    #A: {
+      x?: int
+      y?: int
+      let list#3 = [
+        〈1;x〉,
+        〈1;y〉,
+      ]
+      all: [
+        for _, v in 〈1;let list#3〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈1;v〉
+        },
+      ]
+      (_|*{
+        x?: _|_(explicit error (_|_ literal) in source)
+        y: 1
+      })
+    }
+    a: (〈0;#A〉 & {
+      x: 3
+      y: 2
+    })
+    b: (〈0;#A〉 & 〈0;a〉)
+  }
+  p2B: {
+    #A: {
+      x?: int
+      y?: int
+      let list#4 = [
+        〈1;x〉,
+        〈1;y〉,
+      ]
+      all: [
+        for _, v in 〈1;let list#4〉 if isValid(〈0;v〉) {
           〈1;v〉
         },
       ]

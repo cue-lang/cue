@@ -55,6 +55,7 @@ inline: acrossFields: ok1: {
 	k10: (f & {in: k30}).out
 }
 -- inlineexpand.cue --
+@experiment(predicates)
 inlined: {
 	X: {
 		input: a: _
@@ -80,7 +81,7 @@ expanded2: noCycle: {
 	root: a: _a.output
 	_a: X & {input: root}
 }
-issue3731: reduced: {
+issue3731: reducedA: {
 	#lookup: {
 		input: {...}
 		output: [
@@ -93,7 +94,20 @@ issue3731: reduced: {
 		others: (#lookup & {input: root}).output
 	}
 }
-issue3731: expanded: {
+issue3731: reducedB: {
+	#lookup: {
+		input: {...}
+		output: [
+			for _, v in input if exists(v.show) {v},
+		]
+	}
+
+	root: {
+		self: show: true
+		others: (#lookup & {input: root}).output
+	}
+}
+issue3731: expandedA: {
 	#lookup: {
 		input: {...}
 		output: [
@@ -107,7 +121,21 @@ issue3731: expanded: {
 		_others: #lookup & {input: root}
 	}
 }
-issue3731: full: {
+issue3731: expandedB: {
+	#lookup: {
+		input: {...}
+		output: [
+			for _, v in input if exists(v.show) {v},
+		]
+	}
+
+	root: {
+		self: show: true
+		others: _others.output
+		_others: #lookup & {input: root}
+	}
+}
+issue3731: fullA: {
 	#Workspace: {
 		workspaceA?: {}
 		workspaceB?: {}
@@ -141,6 +169,47 @@ issue3731: full: {
 			for region, v in envtree
 			for account, config in v
 			if config.workspaces."workspaceB" != _|_ {account},
+		]
+	}
+
+	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
+		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
+	}
+}
+issue3731: fullB: {
+	#Workspace: {
+		workspaceA?: {}
+		workspaceB?: {}
+	}
+
+	#AccountConfig: {
+		workspaces: #Workspace
+		siblings?: [...string]
+	}
+
+	#AccountConfigSub1: {
+		#AccountConfig
+		workspaces: "workspaceA": {}
+	}
+
+	#AccountConfigSub2: {
+		#AccountConfig
+		workspaces: "workspaceB": {}
+	}
+
+	tree: env1: {
+		"region1": {
+			"env1-r1-account-sub1":   #AccountConfigSub1
+			"env1-r1-account-sub2-1": #AccountConfigSub2
+		}
+	}
+
+	#lookupSiblings: {
+		envtree: {...}
+		out: [
+			for region, v in envtree
+			for account, config in v
+			if exists(config.workspaces."workspaceB") {account},
 		]
 	}
 
@@ -197,7 +266,7 @@ issue3731: full: {
     }
   }
   issue3731: {
-    reduced: {
+    reducedA: {
       #lookup: {
         input: {
           ...
@@ -219,7 +288,29 @@ issue3731: full: {
     }
   }
   issue3731: {
-    expanded: {
+    reducedB: {
+      #lookup: {
+        input: {
+          ...
+        }
+        output: [
+          for _, v in 〈1;input〉 if exists(〈0;v〉.show) {
+            〈1;v〉
+          },
+        ]
+      }
+      root: {
+        self: {
+          show: true
+        }
+        others: (〈1;#lookup〉 & {
+          input: 〈2;root〉
+        }).output
+      }
+    }
+  }
+  issue3731: {
+    expandedA: {
       #lookup: {
         input: {
           ...
@@ -242,7 +333,30 @@ issue3731: full: {
     }
   }
   issue3731: {
-    full: {
+    expandedB: {
+      #lookup: {
+        input: {
+          ...
+        }
+        output: [
+          for _, v in 〈1;input〉 if exists(〈0;v〉.show) {
+            〈1;v〉
+          },
+        ]
+      }
+      root: {
+        self: {
+          show: true
+        }
+        others: 〈0;_others〉.output
+        _others: (〈1;#lookup〉 & {
+          input: 〈2;root〉
+        })
+      }
+    }
+  }
+  issue3731: {
+    fullA: {
       #Workspace: {
         workspaceA?: {}
         workspaceB?: {}
@@ -279,6 +393,61 @@ issue3731: full: {
         }
         out: [
           for region, v in 〈1;envtree〉 for account, config in 〈0;v〉 if (〈0;config〉.workspaces.workspaceB != _|_(explicit error (_|_ literal) in source)) {
+            〈1;account〉
+          },
+        ]
+      }
+      tree: {
+        env1: {
+          [_]: {
+            [_]: (〈3;#AccountConfig〉 & {
+              siblings: (〈4;#lookupSiblings〉 & {
+                envtree: 〈4;env1〉
+              }).out
+            })
+          }
+        }
+      }
+    }
+  }
+  issue3731: {
+    fullB: {
+      #Workspace: {
+        workspaceA?: {}
+        workspaceB?: {}
+      }
+      #AccountConfig: {
+        workspaces: 〈1;#Workspace〉
+        siblings?: [
+          ...string,
+        ]
+      }
+      #AccountConfigSub1: {
+        〈1;#AccountConfig〉
+        workspaces: {
+          workspaceA: {}
+        }
+      }
+      #AccountConfigSub2: {
+        〈1;#AccountConfig〉
+        workspaces: {
+          workspaceB: {}
+        }
+      }
+      tree: {
+        env1: {
+          region1: {
+            "env1-r1-account-sub1": 〈3;#AccountConfigSub1〉
+            "env1-r1-account-sub2-1": 〈3;#AccountConfigSub2〉
+          }
+        }
+      }
+      #lookupSiblings: {
+        envtree: {
+          ...
+        }
+        out: [
+          for region, v in 〈1;envtree〉 for account, config in 〈0;v〉 if exists(〈0;config〉.workspaces.workspaceB) {
             〈1;account〉
           },
         ]

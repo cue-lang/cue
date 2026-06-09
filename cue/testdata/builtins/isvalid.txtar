@@ -77,6 +77,16 @@ validNEmbedFail: {
 	t1: validN(>=3, a, b, c) @test(err, code=eval, contains="%s: %d matched, expected %v", args=[validN, 2, >=3], pos=[0:6, 0:13])
 }
 
+// validN with an exact count whose arguments reference the value being
+// validated counts 0 matches and fails, though int & bug is valid (1 match);
+// it should yield 42. The forms without the self-reference (a separate value,
+// or literal arguments) correctly yield 42.
+validNSelfRef: {
+	bug: 42 & validN(1, string & bug, int & bug, bool & bug) @test(err, code=eval, contains="%s: %d matched, expected %v", args=[validN, 0, 1], pos=[0:12, 0:19]) @test(eq:todo, 42)
+	y:   42
+	ok:  y & validN(1, string & y, int & y, bool & y) @test(eq, 42)
+}
+
 // isValid on non-existent reference returns false (not error)
 // Missing field is an evaluation error, and isValid returns false for any error
 isValidMissingRef: {
@@ -160,6 +170,9 @@ isValidIncomplete: {
 [eval] validNEmbedFail.t1: validN: 2 matched, expected >=3:
     ./in.cue:74:6
     ./in.cue:74:13
+[eval] validNSelfRef.bug: validN: 0 matched, expected 1:
+    ./in.cue:82:12
+    ./in.cue:82:19
 [eval] isValidExistingInvalid.a.x: conflicting values 1 and "foo" (mismatched types int and string):
-    ./in.cue:86:12
-    ./in.cue:86:16
+    ./in.cue:96:12
+    ./in.cue:96:16

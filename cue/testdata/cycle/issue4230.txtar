@@ -5,7 +5,8 @@
 # deferred when evaluated from within a cyclic context, resulting in empty output.
 # https://cuelang.org/issue/4230
 -- in.cue --
-#transform: {
+@experiment(predicates)
+#transformA: {
 	_input: {...}
 	_output: [
 		if _input.app != _|_ {
@@ -14,8 +15,25 @@
 	]
 }
 
-x: X={
-	regions: (#transform & {_input: X})._output
+#transformB: {
+	_input: {...}
+	_output: [
+		if exists(_input.app) {
+			_input.app.region
+		},
+	]
+}
+
+xa: X={
+	regions: (#transformA & {_input: X})._output
+	app: region: or(["west", "east"]) & "west"
+} @test(eq, {
+	regions: ["west"]
+	app: {region: "west"}
+})
+
+xb: X={
+	regions: (#transformB & {_input: X})._output
 	app: region: or(["west", "east"]) & "west"
 } @test(eq, {
 	regions: ["west"]

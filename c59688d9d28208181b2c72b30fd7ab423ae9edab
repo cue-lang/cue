@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18c40a06_df31cdd3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-09T10:47:58Z",
+      "side": 1,
+      "message": "The code looks like that the AI tried several methods, then half cleaned up some when introducing others.\n\nIs all this code necessary? If so, it would be good to split this in CLs to see what is necessary for what.",
+      "revId": "c59688d9d28208181b2c72b30fd7ab423ae9edab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8365f4bd_57d5f966",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-09T10:47:58Z",
+      "side": 1,
+      "message": "This is a bit confusing name. I wonder, also, if it is not cleaner to have a Value.Unroot that strips the root of a result.\n\nOtherwise come up with a name that describes this better.",
+      "revId": "c59688d9d28208181b2c72b30fd7ab423ae9edab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

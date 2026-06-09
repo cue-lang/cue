@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bf13dd34_a3dcbf3a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2875,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-09T13:56:47Z",
+      "side": 1,
+      "message": "Why not? emdashes are great.",
+      "parentUuid": "c4bba21e_80e74392",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f70c7fff_cbe773e8",
         "filename": "doc/ref/spec.md",
         "patchSetId": 2
@@ -89,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4581b80e_21d2d9c3",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2903,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-09T13:56:47Z",
+      "side": 1,
+      "message": "Hmmm, validates seems wrong. Also not a fan of succeeds.\n\nIt reports whether cue is valid cue value of any kind, schema or exported. isConcrete checks whether it valid data. So that means it even succeeds if it has an incomplete value.\n\nisFinal would be an option, where we do not allow incomplete errors, so not quite isValid.\n\nisConsistent is isInert would be an alternative name for isValid, perhaps.",
+      "parentUuid": "a7b6ab3e_2285cb06",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b29408b_3460a25e",
         "filename": "doc/ref/spec.md",
         "patchSetId": 2
@@ -106,6 +142,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "09e75c70_44fff427",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2909,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-09T13:56:47Z",
+      "side": 1,
+      "message": "Good question, actually. I would have thought it is an incomplete error, but what you suggest may be more pragmatic. But at least, I would say, that unlike with exists, the field must exist, though.",
+      "parentUuid": "5b29408b_3460a25e",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e50f4015_9c9b7519",
         "filename": "doc/ref/spec.md",
         "patchSetId": 2
@@ -117,6 +171,30 @@
       "writtenOn": "2026-06-09T10:30:07Z",
       "side": 1,
       "message": "do we need to clarify _regular fields_ here?",
+      "range": {
+        "startLine": 2912,
+        "startChar": 27,
+        "endLine": 2912,
+        "endChar": 33
+      },
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93ccc755_5ffbad6a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2912,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-09T13:56:47Z",
+      "side": 1,
+      "message": "Good catch.",
+      "parentUuid": "e50f4015_9c9b7519",
       "range": {
         "startLine": 2912,
         "startChar": 27,

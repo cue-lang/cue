@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a7b6ab3e_2285cb06",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2903,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:35:13Z",
+      "side": 1,
+      "message": "I guess that `isValid` is, in a way, the \"isFoo\" version of `validates`. through that lens, I guess it\u0027s okay. but we need to very clearly document it.",
+      "parentUuid": "f70c7fff_cbe773e8",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b29408b_3460a25e",
         "filename": "doc/ref/spec.md",
         "patchSetId": 2

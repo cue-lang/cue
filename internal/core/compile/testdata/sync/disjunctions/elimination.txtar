@@ -260,12 +260,13 @@ issue1940: {
 	}
 }
 -- issue2209full.cue --
+@experiment(predicates)
 // Evaluator 0.5 regression where disjunctions combined with comprehensions
 // produced incorrect results or spurious errors.
 // https://cuelang.org/issue/2209
 // TODO: fix
 
-issue2209: simplified: t1: {
+issue2209: simplified: t1A: {
 	#SpecFoo: foo: min: 1
 	#SpecBar: bar: min: 1
 	spec: bar: {}
@@ -279,13 +280,38 @@ issue2209: simplified: t1: {
 		X: spec
 	}
 }
+issue2209: simplified: t1B: {
+	#SpecFoo: foo: min: 1
+	#SpecBar: bar: min: 1
+	spec: bar: {}
+	spec: #SpecFoo | #SpecBar
+	out: {
+		{nullFoo: null} | {nullBar: null}
+		{minFoo: int} | {minBar: int}
+		if exists(X.bar) {
+			minBar: X.bar.min
+		}
+		X: spec
+	}
+}
 
-issue2209: simplified: t2: {
+issue2209: simplified: t2A: {
 	#SpecFoo: foo: {}
 	#SpecBar: bar: x: 1
 	spec: bar: {}
 	spec: *#SpecFoo | #SpecBar
 	if spec.bar != _|_ {
+		BAZ: spec.bar.x
+	}
+	{f1: int} | {b2: int}
+	{f2: int} | {b2: int}
+}
+issue2209: simplified: t2B: {
+	#SpecFoo: foo: {}
+	#SpecBar: bar: x: 1
+	spec: bar: {}
+	spec: *#SpecFoo | #SpecBar
+	if exists(spec.bar) {
 		BAZ: spec.bar.x
 	}
 	{f1: int} | {b2: int}
@@ -1434,7 +1460,7 @@ issue2685: {
 {
   issue2209: {
     simplified: {
-      t1: {
+      t1A: {
         #SpecFoo: {
           foo: {
             min: 1
@@ -1470,7 +1496,43 @@ issue2685: {
   }
   issue2209: {
     simplified: {
-      t2: {
+      t1B: {
+        #SpecFoo: {
+          foo: {
+            min: 1
+          }
+        }
+        #SpecBar: {
+          bar: {
+            min: 1
+          }
+        }
+        spec: {
+          bar: {}
+        }
+        spec: (〈0;#SpecFoo〉|〈0;#SpecBar〉)
+        out: {
+          ({
+            nullFoo: null
+          }|{
+            nullBar: null
+          })
+          ({
+            minFoo: int
+          }|{
+            minBar: int
+          })
+          if exists(〈0;X〉.bar) {
+            minBar: 〈1;X〉.bar.min
+          }
+          X: 〈1;spec〉
+        }
+      }
+    }
+  }
+  issue2209: {
+    simplified: {
+      t2A: {
         #SpecFoo: {
           foo: {}
         }
@@ -1484,6 +1546,37 @@ issue2685: {
         }
         spec: (*〈0;#SpecFoo〉|〈0;#SpecBar〉)
         if (〈0;spec〉.bar != _|_(explicit error (_|_ literal) in source)) {
+          BAZ: 〈1;spec〉.bar.x
+        }
+        ({
+          f1: int
+        }|{
+          b2: int
+        })
+        ({
+          f2: int
+        }|{
+          b2: int
+        })
+      }
+    }
+  }
+  issue2209: {
+    simplified: {
+      t2B: {
+        #SpecFoo: {
+          foo: {}
+        }
+        #SpecBar: {
+          bar: {
+            x: 1
+          }
+        }
+        spec: {
+          bar: {}
+        }
+        spec: (*〈0;#SpecFoo〉|〈0;#SpecBar〉)
+        if exists(〈0;spec〉.bar) {
           BAZ: 〈1;spec〉.bar.x
         }
         ({

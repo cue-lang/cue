@@ -1,49 +1,116 @@
-# Tests for isConcrete and concreteN builtins
+# Tests for the isConcrete function and the concreteN validator.
 
 -- in.cue --
 @experiment(predicates)
 
-// isConcrete with concrete values
-concreteConcrete: {
-	a:      1
-	checkA: isConcrete(a)
+// isConcrete with concrete scalar values.
+concreteScalars: {
+	a:      42
 	b:      "hello"
+	c:      true
+	d:      3.14
+	checkA: isConcrete(a)
 	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+	checkD: isConcrete(d)
 }
 
-// isConcrete with types (non-concrete)
+// isConcrete on a reference to an optional field is incomplete: the field is
+// not a present regular member, so its concreteness cannot be judged. A struct
+// whose member references an absent optional field is likewise not concrete.
+concreteOptional: {
+	c?:     int
+	checkC: isConcrete(c)
+
+	d: {e: f, f?: int}
+	checkD: isConcrete(d)
+}
+
+// isConcrete with types (not concrete).
 concreteTypes: {
 	a:      int
-	checkA: isConcrete(a)
 	b:      string
+	c:      bool
+	checkA: isConcrete(a)
 	checkB: isConcrete(b)
+	checkC: isConcrete(c)
 }
 
-// isConcrete with constraints (non-concrete)
+// isConcrete with constraints (not concrete).
 concreteConstraints: {
-	a:      >0
+	a:      >10
+	b:      =~"pattern"
+	c:      int & >0
 	checkA: isConcrete(a)
-	b:      =~"hello"
 	checkB: isConcrete(b)
+	checkC: isConcrete(c)
 }
 
-// isConcrete with disjunctions
-concreteDisjunction: {
-	a:      1 | 2 // no default: not concrete
+// isConcrete with disjunctions: concrete only when finalization selects a
+// single default.
+concreteDisjunctions: {
+	a:      1 | 2        // no default: not concrete
+	b:      *1 | 2       // single default: concrete (finalization selects it)
+	c:      1 | *2       // single default (last): concrete
+	d:      string | int // no default: not concrete
 	checkA: isConcrete(a)
-	b:      1 | *2 // single default: concrete (finalization selects it)
 	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+	checkD: isConcrete(d)
 }
 
-// concreteN with count constraints (a and c are concrete, b is not)
-concreteNCount: {
+// isConcrete with structs and lists. Only regular fields count: optional,
+// hidden and definition fields do not affect concreteness.
+concreteStructs: {
+	full: {x: 1, y: "hello"}
+	checkFull: isConcrete(full)
+
+	partial: {x: 1, y: string}
+	checkPartial: isConcrete(partial)
+
+	withOptional: {a: 1, b?: int}
+	checkOptional: isConcrete(withOptional)
+
+	withHidden: {_a: int, #a: int}
+	checkHidden: isConcrete(withHidden)
+
+	list: [1, 2, 3]
+	checkList: isConcrete(list)
+
+	// open struct: concrete with respect to its concrete fields
+	open: {x: 1, ...}
+	checkOpen: isConcrete(open)
+
+	deep: {
+		a: x: y: a: 1
+		b: x: y: b: *1 | 2
+		c: x: y: c: int
+	}
+	checkDeep1: isConcrete(deep)
+	checkDeep2: isConcrete(deep.a)
+	checkDeep3: isConcrete(deep.b)
+	checkDeep4: isConcrete(deep.c)
+	checkDeep5: isConcrete({deep.a, deep.b})
+	checkDeep6: isConcrete({deep.b, deep.c})
+	checkDeep7: isConcrete({deep.a, deep.c})
+}
+
+// isConcrete propagates errors: a permanent (eval) error is reported as the
+// error itself, not as "not concrete".
+concreteError: {
+	a:      1 & "x"
+	checkA: isConcrete(a)
+}
+
+// concreteN: passing count constraints (a and c are concrete, b is not).
+concreteNExact2: {
 	a: 1
 	b: int
 	c: "hello"
 	concreteN(2, a, b, c)
 }
 
-// concreteN with all concrete
+// concreteN: all arguments concrete.
 concreteNAll: {
 	a: 1
 	b: 2
@@ -51,37 +118,23 @@ concreteNAll: {
 	concreteN(3, a, b, c)
 }
 
-// isConcrete with concrete struct
-concreteStruct: {
-	s: {a: 1, b: "x"}
-	checkS: isConcrete(s)
+// concreteN: at least 1 required, 2 currently concrete - passes.
+concreteNAtLeast1: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(>=1, a, b, c)
 }
 
-// isConcrete with concrete struct with optional field
-concreteStructWithOptional: {
-	s: {a: 1, b?: int}
-	checkS: isConcrete(s)
+// concreteN: at most 3 required, max possible is 3 - always passes.
+concreteNAtMost3: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(<=3, a, b, c)
 }
 
-// isConcrete with concrete list
-concreteList: {
-	l: [1, 2, 3]
-	checkL: isConcrete(l)
-}
-
-// isConcrete with struct containing non-concrete field
-concreteStructNonConcrete: {
-	s: {a: int}
-	checkS: isConcrete(s)
-}
-
-// isConcrete with errors returns false
-concreteError: {
-	a:      1 & "x"
-	checkA: isConcrete(a)
-}
-
-// concreteN with bound constraints (a and c are concrete, b is not)
+// concreteN: multiple bounds in one struct.
 concreteNBounds: {
 	a: 1
 	b: int
@@ -90,41 +143,169 @@ concreteNBounds: {
 	concreteN(<=2, a, b, c)
 }
 
-// concreteN failure - requires all 3 concrete but only 2 are
-concreteNFailure: {
+// concreteN: exactly 3 required but only 2 concrete - incomplete (b could
+// still become concrete).
+concreteNIncomplete: {
 	a: 1
-	b: int // not concrete
+	b: int
 	c: "hello"
 	concreteN(3, a, b, c)
+}
+
+// concreteN: impossible counts are eval errors.
+concreteNImpossible4: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(4, a, b, c)
+}
+
+concreteNImpossible1: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(1, a, b, c)
+}
+
+concreteNImpossibleLt2: {
+	a: 1
+	b: int
+	c: "hello"
+	concreteN(<2, a, b, c)
+}
+
+// concreteN embedded (protobuf-style: exactly one must be concrete).
+concreteNOneOf: {
+	a?: int
+	b?: string
+	a:  42
+	concreteN(1, a, b)
 }
 -- out/compile --
 --- in.cue
 {
-  concreteConcrete: {
-    a: 1
-    checkA: isConcrete(〈0;a〉)
+  concreteScalars: {
+    a: 42
     b: "hello"
+    c: true
+    d: 3.14
+    checkA: isConcrete(〈0;a〉)
     checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+    checkD: isConcrete(〈0;d〉)
+  }
+  concreteOptional: {
+    c?: int
+    checkC: isConcrete(〈0;c〉)
+    d: {
+      e: 〈0;f〉
+      f?: int
+    }
+    checkD: isConcrete(〈0;d〉)
   }
   concreteTypes: {
     a: int
-    checkA: isConcrete(〈0;a〉)
     b: string
+    c: bool
+    checkA: isConcrete(〈0;a〉)
     checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
   }
   concreteConstraints: {
-    a: >0
+    a: >10
+    b: =~"pattern"
+    c: (int & >0)
     checkA: isConcrete(〈0;a〉)
-    b: =~"hello"
     checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
   }
-  concreteDisjunction: {
+  concreteDisjunctions: {
     a: (1|2)
+    b: (*1|2)
+    c: (1|*2)
+    d: (string|int)
     checkA: isConcrete(〈0;a〉)
-    b: (1|*2)
     checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+    checkD: isConcrete(〈0;d〉)
   }
-  concreteNCount: {
+  concreteStructs: {
+    full: {
+      x: 1
+      y: "hello"
+    }
+    checkFull: isConcrete(〈0;full〉)
+    partial: {
+      x: 1
+      y: string
+    }
+    checkPartial: isConcrete(〈0;partial〉)
+    withOptional: {
+      a: 1
+      b?: int
+    }
+    checkOptional: isConcrete(〈0;withOptional〉)
+    withHidden: {
+      _a: int
+      #a: int
+    }
+    checkHidden: isConcrete(〈0;withHidden〉)
+    list: [
+      1,
+      2,
+      3,
+    ]
+    checkList: isConcrete(〈0;list〉)
+    open: {
+      x: 1
+      ...
+    }
+    checkOpen: isConcrete(〈0;open〉)
+    deep: {
+      a: {
+        x: {
+          y: {
+            a: 1
+          }
+        }
+      }
+      b: {
+        x: {
+          y: {
+            b: (*1|2)
+          }
+        }
+      }
+      c: {
+        x: {
+          y: {
+            c: int
+          }
+        }
+      }
+    }
+    checkDeep1: isConcrete(〈0;deep〉)
+    checkDeep2: isConcrete(〈0;deep〉.a)
+    checkDeep3: isConcrete(〈0;deep〉.b)
+    checkDeep4: isConcrete(〈0;deep〉.c)
+    checkDeep5: isConcrete({
+      〈1;deep〉.a
+      〈1;deep〉.b
+    })
+    checkDeep6: isConcrete({
+      〈1;deep〉.b
+      〈1;deep〉.c
+    })
+    checkDeep7: isConcrete({
+      〈1;deep〉.a
+      〈1;deep〉.c
+    })
+  }
+  concreteError: {
+    a: (1 & "x")
+    checkA: isConcrete(〈0;a〉)
+  }
+  concreteNExact2: {
     a: 1
     b: int
     c: "hello"
@@ -136,37 +317,17 @@ concreteNFailure: {
     c: 3
     concreteN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
   }
-  concreteStruct: {
-    s: {
-      a: 1
-      b: "x"
-    }
-    checkS: isConcrete(〈0;s〉)
+  concreteNAtLeast1: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
   }
-  concreteStructWithOptional: {
-    s: {
-      a: 1
-      b?: int
-    }
-    checkS: isConcrete(〈0;s〉)
-  }
-  concreteList: {
-    l: [
-      1,
-      2,
-      3,
-    ]
-    checkL: isConcrete(〈0;l〉)
-  }
-  concreteStructNonConcrete: {
-    s: {
-      a: int
-    }
-    checkS: isConcrete(〈0;s〉)
-  }
-  concreteError: {
-    a: (1 & "x")
-    checkA: isConcrete(〈0;a〉)
+  concreteNAtMost3: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(<=3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
   }
   concreteNBounds: {
     a: 1
@@ -175,10 +336,34 @@ concreteNFailure: {
     concreteN(>=1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
     concreteN(<=2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
   }
-  concreteNFailure: {
+  concreteNIncomplete: {
     a: 1
     b: int
     c: "hello"
     concreteN(3, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNImpossible4: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(4, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNImpossible1: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(1, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNImpossibleLt2: {
+    a: 1
+    b: int
+    c: "hello"
+    concreteN(<2, 〈0;a〉, 〈0;b〉, 〈0;c〉)
+  }
+  concreteNOneOf: {
+    a?: int
+    b?: string
+    a: 42
+    concreteN(1, 〈0;a〉, 〈0;b〉)
   }
 }

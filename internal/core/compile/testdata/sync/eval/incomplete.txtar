@@ -4,6 +4,7 @@
 # succeeds because "bar" is concrete. issue1837 checks that incomplete errors
 # are correctly preferred over cycle errors in conditional comprehensions.
 -- in.cue --
+@experiment(predicates)
 s: string
 
 e1:  s + s
@@ -32,22 +33,43 @@ issue1837: {
 
 	// TODO(inline): use permute, but ensure comprehensions are permuted too first.
 	// @test(permute)
-	p1: {
+	p1A: {
 		context: {}
 		x: context.b
 		if x == _|_ {
 			message: "a"
 		}
 	}
-	p2: {
+	p1B: {
+		context: {}
+		x: context.b
+		if !isValid(x) {
+			message: "a"
+		}
+	}
+	p2A: {
 		if x == _|_ {
 			message: "a"
 		}
 		x: context.b
 		context: {}
 	}
-	p3: {
+	p2B: {
+		if !isValid(x) {
+			message: "a"
+		}
+		x: context.b
+		context: {}
+	}
+	p3A: {
 		if x == _|_ {
+			message: "a"
+		}
+		context: {}
+		x: context.b
+	}
+	p3B: {
+		if !isValid(x) {
 			message: "a"
 		}
 		context: {}
@@ -72,22 +94,43 @@ issue1837: {
   a: int
   okay: ((>10 & <〈0;a〉) + 3)
   issue1837: {
-    p1: {
+    p1A: {
       context: {}
       x: 〈0;context〉.b
       if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
         message: "a"
       }
     }
-    p2: {
+    p1B: {
+      context: {}
+      x: 〈0;context〉.b
+      if !isValid(〈0;x〉) {
+        message: "a"
+      }
+    }
+    p2A: {
       if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
         message: "a"
       }
       x: 〈0;context〉.b
       context: {}
     }
-    p3: {
+    p2B: {
+      if !isValid(〈0;x〉) {
+        message: "a"
+      }
+      x: 〈0;context〉.b
+      context: {}
+    }
+    p3A: {
       if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
+        message: "a"
+      }
+      context: {}
+      x: 〈0;context〉.b
+    }
+    p3B: {
+      if !isValid(〈0;x〉) {
         message: "a"
       }
       context: {}

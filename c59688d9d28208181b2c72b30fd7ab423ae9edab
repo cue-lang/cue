@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14aee5db_d11ba09c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T14:34:33Z",
+      "side": 1,
+      "message": "as discussed, yes this is all necessary. I tried splitting, but that caused flip-flopping noise in the testdata outputs, so it\u0027s best to keep it in a single commit.",
+      "parentUuid": "18c40a06_df31cdd3",
+      "revId": "c59688d9d28208181b2c72b30fd7ab423ae9edab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8365f4bd_57d5f966",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-09T10:47:58Z",
       "side": 1,
       "message": "This is a bit confusing name. I wonder, also, if it is not cleaner to have a Value.Unroot that strips the root of a result.\n\nOtherwise come up with a name that describes this better.",
+      "revId": "c59688d9d28208181b2c72b30fd7ab423ae9edab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e4388ef_07229ee6",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T14:34:33Z",
+      "side": 1,
+      "message": "Done; we have Unroot now",
+      "parentUuid": "8365f4bd_57d5f966",
       "revId": "c59688d9d28208181b2c72b30fd7ab423ae9edab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee9f584b_27f5f488",
+        "filename": "cue/load/import.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T15:40:51Z",
+      "side": 1,
+      "message": "No, directory replacements can be relative too. I adjusted the test cases in fs_test.go",
+      "parentUuid": "2721da49_61d7aaa8",
+      "revId": "930afeba0aded6ae7c8adad9ce04ceeff663bb2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49f31b8c_b88b955c",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T15:40:51Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "5e863e23_df4f42fe",
+      "revId": "930afeba0aded6ae7c8adad9ce04ceeff663bb2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

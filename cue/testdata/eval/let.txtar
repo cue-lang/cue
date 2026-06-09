@@ -47,6 +47,7 @@ ignoreErrorInLet: {
 	@test(eq, {disjunction: 3})
 }
 -- incomprehension.cue --
+@experiment(predicates)
 // for comprehensions in list do not have to split the let as each instance
 // is already associated with a separate environment.
 list: {
@@ -183,6 +184,7 @@ disabled_parent_test: {
 }
 
 -- issue2063.cue --
+@experiment(predicates)
 import (
 	"encoding/yaml"
 	"strings"
@@ -192,11 +194,20 @@ import (
 // tools/flow: unsupported node import "list" in yaml.Marshal; let bindings
 // inside a struct referencing an undefined field must not block descending.
 // https://cuelang.org/issue/2063
-keepDescending: t1: {
+keepDescending: t1A: {
 	ec: {}
 	bs: {
 		let m = ec.b
 		if m == _|_ { }
+		x: y: ""
+	}
+	@test(eq, {ec: {}, bs: {x: {y: ""}}})
+}
+keepDescending: t1B: {
+	ec: {}
+	bs: {
+		let m = ec.b
+		if !isValid(m) { }
 		x: y: ""
 	}
 	@test(eq, {ec: {}, bs: {x: {y: ""}}})
@@ -230,53 +241,53 @@ issue4022: full: {
 }
 -- out/errors.txt --
 [eval] indirectReference.y: conflicting values 2 and 1:
-    ./incomprehension.cue:61:20
-    ./incomprehension.cue:62:7
-    ./incomprehension.cue:62:10
-    ./incomprehension.cue:63:2
-    ./incomprehension.cue:64:6
+    ./incomprehension.cue:62:20
+    ./incomprehension.cue:63:7
+    ./incomprehension.cue:63:10
+    ./incomprehension.cue:64:2
+    ./incomprehension.cue:65:6
 indirectReference.y: conflicting values 3 and 1:
-    ./incomprehension.cue:61:20
-    ./incomprehension.cue:62:7
-    ./incomprehension.cue:62:13
-    ./incomprehension.cue:63:2
-    ./incomprehension.cue:64:6
+    ./incomprehension.cue:62:20
+    ./incomprehension.cue:63:7
+    ./incomprehension.cue:63:13
+    ./incomprehension.cue:64:2
+    ./incomprehension.cue:65:6
 [eval] indirectReference.y: conflicting values 2 and 1:
-    ./incomprehension.cue:61:20
-    ./incomprehension.cue:62:7
-    ./incomprehension.cue:62:10
-    ./incomprehension.cue:63:2
-    ./incomprehension.cue:64:6
+    ./incomprehension.cue:62:20
+    ./incomprehension.cue:63:7
+    ./incomprehension.cue:63:10
+    ./incomprehension.cue:64:2
+    ./incomprehension.cue:65:6
 indirectReference.y: conflicting values 3 and 1:
-    ./incomprehension.cue:61:20
-    ./incomprehension.cue:62:7
-    ./incomprehension.cue:62:13
-    ./incomprehension.cue:63:2
-    ./incomprehension.cue:64:6
+    ./incomprehension.cue:62:20
+    ./incomprehension.cue:63:7
+    ./incomprehension.cue:63:13
+    ./incomprehension.cue:64:2
+    ./incomprehension.cue:65:6
 [eval] indirectReference.y: conflicting values 2 and 1:
-    ./incomprehension.cue:61:20
-    ./incomprehension.cue:62:7
-    ./incomprehension.cue:62:10
-    ./incomprehension.cue:63:2
-    ./incomprehension.cue:64:6
+    ./incomprehension.cue:62:20
+    ./incomprehension.cue:63:7
+    ./incomprehension.cue:63:10
+    ./incomprehension.cue:64:2
+    ./incomprehension.cue:65:6
 indirectReference.y: conflicting values 3 and 1:
-    ./incomprehension.cue:61:20
-    ./incomprehension.cue:62:7
-    ./incomprehension.cue:62:13
-    ./incomprehension.cue:63:2
-    ./incomprehension.cue:64:6
+    ./incomprehension.cue:62:20
+    ./incomprehension.cue:63:7
+    ./incomprehension.cue:63:13
+    ./incomprehension.cue:64:2
+    ./incomprehension.cue:65:6
 [eval] indirectReference.y: conflicting values 2 and 1:
-    ./incomprehension.cue:61:20
-    ./incomprehension.cue:62:7
-    ./incomprehension.cue:62:10
-    ./incomprehension.cue:63:2
-    ./incomprehension.cue:64:6
+    ./incomprehension.cue:62:20
+    ./incomprehension.cue:63:7
+    ./incomprehension.cue:63:10
+    ./incomprehension.cue:64:2
+    ./incomprehension.cue:65:6
 indirectReference.y: conflicting values 3 and 1:
-    ./incomprehension.cue:61:20
-    ./incomprehension.cue:62:7
-    ./incomprehension.cue:62:13
-    ./incomprehension.cue:63:2
-    ./incomprehension.cue:64:6
+    ./incomprehension.cue:62:20
+    ./incomprehension.cue:63:7
+    ./incomprehension.cue:63:13
+    ./incomprehension.cue:64:2
+    ./incomprehension.cue:65:6
 -- out/eval/stats --
 Leaks:  52
 Freed:  163

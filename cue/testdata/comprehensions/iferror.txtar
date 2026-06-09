@@ -1,4 +1,5 @@
 -- in.cue --
+@experiment(predicates)
 a: {b: 2, c: int}
 
 wrongConcreteType: {
@@ -42,7 +43,7 @@ useDefault: {
 		}
 	}
 
-	issue809: {
+	issue809a: {
 		#A: {
 			a: string
 			b: *a | string
@@ -53,6 +54,34 @@ useDefault: {
 
 		foo: [
 			for _, a in s if a.b != _|_ {a},
+		]
+
+		@test(eq, {
+			#A: {
+				a: string
+				b: string
+			}
+			s: bar: {
+				a: "bar"
+				b: *"bar" | string
+			}
+			foo: [{
+				a: "bar"
+				b: *"bar" | string
+			}]
+		})
+	}
+	issue809b: {
+		#A: {
+			a: string
+			b: *a | string
+		}
+
+		s: [Name=string]: #A & {a: Name}
+		s: bar:           _
+
+		foo: [
+			for _, a in s if exists(a.b) {a},
 		]
 
 		@test(eq, {
@@ -119,24 +148,24 @@ issue1972: {
 }
 -- out/errors.txt --
 [eval] wrongConcreteType: cannot use 2 (type int) as type bool:
-    ./in.cue:4:2
-    ./in.cue:1:8
+    ./in.cue:5:2
+    ./in.cue:2:8
 [eval] wrongType: cannot use int (type int) as type bool:
-    ./in.cue:11:2
-    ./in.cue:1:14
+    ./in.cue:12:2
+    ./in.cue:2:14
 [incomplete] incomplete.err1: undefined field: d:
-    ./in.cue:18:7
+    ./in.cue:19:7
 [incomplete] incomplete.err2: undefined field: d:
-    ./in.cue:25:21
+    ./in.cue:26:21
 [eval] issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-    ./in.cue:86:8
-    ./in.cue:88:11
-    ./in.cue:89:3
+    ./in.cue:115:8
+    ./in.cue:117:11
+    ./in.cue:118:3
 [incomplete] issue1972.err2: incomplete bool: _
 [eval] issue1972.err3: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
-    ./in.cue:105:8
-    ./in.cue:107:11
-    ./in.cue:108:3
+    ./in.cue:134:8
+    ./in.cue:136:11
+    ./in.cue:137:3
 -- out/eval/stats --
 Leaks:  1
 Freed:  40

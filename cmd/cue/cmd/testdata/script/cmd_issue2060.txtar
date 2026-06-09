@@ -26,6 +26,7 @@ a: b: X.c
 command: ts: cli.Print & {text: "foo", x: a}
 
 -- other.cue --
+@experiment(reflect)
 package tangle_sublime
 
 import (
@@ -97,8 +98,8 @@ buildSource: {
 
 	CommandBindings: [
 		for cmdIdx, cmdName in cmdNames
-		if keyzen.KeyZen.Strokes[StrokesName].StrokesMap[cmdName] != _|_ &&
-			editorCmds[cmdName] != _|_ {
+		if exists(keyzen.KeyZen.Strokes[StrokesName].StrokesMap[cmdName]) &&
+			exists(editorCmds[cmdName]) {
 			let cmdDetails = keyzen.KeyZen.Commands.CommandDetailsMap[cmdName]
 			let strokeDefs = keyzen.KeyZen.Strokes[StrokesName].StrokesMap[cmdName]
 			let editorCmd = editorCmds[cmdName]
@@ -110,8 +111,8 @@ buildSource: {
 			CmdHumanName: cmdDetails["Human"]
 
 			EditorCmdText: string
-			if editorCmdText == _|_ {EditorCmdText: editorCmdTextCommand}
-			if editorCmdText != _|_ {EditorCmdText: editorCmdTextCommand + ", \"args\": " + editorCmd.argsText}
+			if !isConcrete(editorCmdText) {EditorCmdText: editorCmdTextCommand}
+			if isConcrete(editorCmdText) {EditorCmdText: editorCmdTextCommand + ", \"args\": " + editorCmd.argsText}
 
 			BindingsCount: len(Bindings)
 			if BindingsCount == 0 {{BindingsMax: 0}}

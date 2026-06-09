@@ -224,15 +224,15 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 // It returns the trimmed key, trimmed value and whether the split succeeded.
 func parseKeyValue(line string) (key, value string, ok bool) {
 	// Find the first "=".
-	sepIdx := strings.IndexByte(line, '=')
-	if sepIdx < 0 {
+	key, value, ok = strings.Cut(line, "=")
+	if !ok {
 		return "", "", false
 	}
-	key = strings.TrimSpace(line[:sepIdx])
+	key = strings.TrimSpace(key)
 	if key == "" {
 		return "", "", false
 	}
-	value = strings.TrimSpace(line[sepIdx+1:])
+	value = strings.TrimSpace(value)
 
 	// Strip inline comments (only if preceded by whitespace).
 	// For quoted values, only comments after the closing quote are stripped.

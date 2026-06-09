@@ -230,16 +230,6 @@ func (g *CommentGroup) Comments() []*CommentGroup { return nil }
 func (g *CommentGroup) AddComment(*CommentGroup)  {}
 func (g *CommentGroup) commentInfo() *comments    { return nil }
 
-func isWhitespace(ch byte) bool { return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' }
-
-func stripTrailingWhitespace(s string) string {
-	i := len(s)
-	for i > 0 && isWhitespace(s[i-1]) {
-		i--
-	}
-	return s[0:i]
-}
-
 // Text returns the text of the comment.
 // Comment markers ("//"), the first space of a line comment, and
 // leading and trailing empty lines are removed. Multiple empty lines are
@@ -269,7 +259,7 @@ func (g *CommentGroup) Text() string {
 
 		// Walk lines, stripping trailing white space and adding to list.
 		for l := range cl {
-			lines = append(lines, stripTrailingWhitespace(l))
+			lines = append(lines, strings.TrimRight(l, " \t\n\r"))
 		}
 	}
 
@@ -310,11 +300,11 @@ func (a *Attribute) Name() string {
 
 func (a *Attribute) Split() (name, body string) {
 	s := a.Text
-	p := strings.IndexByte(s, '(')
-	if p < 0 || !strings.HasPrefix(s, "@") || !strings.HasSuffix(s, ")") {
+	name, body, ok := strings.Cut(s, "(")
+	if !ok || !strings.HasPrefix(s, "@") || !strings.HasSuffix(s, ")") {
 		return "", ""
 	}
-	return a.Text[1:p], a.Text[p+1 : len(s)-1]
+	return name[1:], body[:len(body)-1]
 }
 
 // A Field represents a field declaration in a struct.

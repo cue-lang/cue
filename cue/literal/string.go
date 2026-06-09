@@ -145,12 +145,7 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 			if !strings.HasPrefix(start[nStart:], q.whitespace) {
 				actual := start[nStart:]
 				// Trim to only the whitespace prefix of the first line.
-				for i, c := range actual {
-					if c != ' ' && c != '\t' {
-						actual = actual[:i]
-						break
-					}
-				}
+				actual = actual[:len(actual)-len(strings.TrimLeft(actual, " \t"))]
 				return q, 0, 0, invalidWhitespaceError(q.whitespace, actual)
 			}
 			nStart += len(q.whitespace)
@@ -287,10 +282,7 @@ func skipWhitespaceAfterNewline(s string, q QuoteInfo) (string, error) {
 		// in the non-multiline case, but be defensive.
 		fallthrough
 	default:
-		actual := s
-		if i := strings.IndexByte(actual, '\n'); i >= 0 {
-			actual = actual[:i]
-		}
+		actual, _, _ := strings.Cut(s, "\n")
 		// Trim to only the whitespace prefix.
 		actual = actual[:len(actual)-len(strings.TrimLeft(actual, " \t"))]
 		return "", invalidWhitespaceError(q.whitespace, actual)

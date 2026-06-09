@@ -93,9 +93,7 @@ func (f Feature) SelectorString(index StringIndexer) string {
 func (f Feature) IdentString(index StringIndexer) string {
 	s := index.IndexToString(f.safeIndex())
 	if f.IsHidden() || f.IsLet() {
-		if p := strings.IndexByte(s, '\x00'); p >= 0 {
-			s = s[:p]
-		}
+		s, _, _ = strings.Cut(s, "\x00")
 	}
 	return s
 }
@@ -108,8 +106,8 @@ func (f Feature) PkgID(index StringIndexer) string {
 		return ""
 	}
 	s := index.IndexToString(f.safeIndex())
-	if p := strings.IndexByte(s, '\x00'); p >= 0 {
-		s = s[p+1:]
+	if _, p, ok := strings.Cut(s, "\x00"); ok {
+		s = p
 	}
 	return s
 }

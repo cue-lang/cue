@@ -1,5 +1,6 @@
 -- in.cue --
-issue4011: full: {
+@experiment(predicates)
+issue4011: fullA: {
 	let _hugoEnvironments = {
 		default:    "_default"
 		production: "production"
@@ -22,7 +23,30 @@ issue4011: full: {
 
 	site: [_]: hugo: production: {}
 }
-issue4011: reduced: {
+issue4011: fullB: {
+	let _hugoEnvironments = {
+		default:    "_default"
+		production: "production"
+	}
+
+	site: cls: _
+	site: [_]: {
+		fs: {
+			Create: {
+				for envID, envName in _hugoEnvironments
+				let envConfig = hugo[envID]
+				if isValid(envConfig) {
+					config: Contents: envConfig
+				}
+			}
+		}
+
+		hugo: _
+	}
+
+	site: [_]: hugo: production: {}
+}
+issue4011: reducedA: {
 	result: {
 		for envName in ["foo"]
 		let env = envs[envName]
@@ -32,11 +56,21 @@ issue4011: reduced: {
 	}
 	envs: foo: {}
 }
+issue4011: reducedB: {
+	result: {
+		for envName in ["foo"]
+		let env = envs[envName]
+		if isValid(env) {
+			(envName): true
+		}
+	}
+	envs: foo: {}
+}
 -- out/compile --
 --- in.cue
 {
   issue4011: {
-    full: {
+    fullA: {
       let _hugoEnvironments#1 = {
         default: "_default"
         production: "production"
@@ -68,11 +102,57 @@ issue4011: reduced: {
     }
   }
   issue4011: {
-    reduced: {
+    fullB: {
+      let _hugoEnvironments#2 = {
+        default: "_default"
+        production: "production"
+      }
+      site: {
+        cls: _
+      }
+      site: {
+        [_]: {
+          fs: {
+            Create: {
+              for envID, envName in 〈4;let _hugoEnvironments#2〉 let envConfig = 〈3;hugo〉[〈0;envID〉] if isValid(〈0;envConfig〉) {
+                config: {
+                  Contents: 〈2;envConfig〉
+                }
+              }
+            }
+          }
+          hugo: _
+        }
+      }
+      site: {
+        [_]: {
+          hugo: {
+            production: {}
+          }
+        }
+      }
+    }
+  }
+  issue4011: {
+    reducedA: {
       result: {
         for _, envName in [
           "foo",
         ] let env = 〈2;envs〉[〈0;envName〉] if (〈0;env〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈2;envName〉: true
+        }
+      }
+      envs: {
+        foo: {}
+      }
+    }
+  }
+  issue4011: {
+    reducedB: {
+      result: {
+        for _, envName in [
+          "foo",
+        ] let env = 〈2;envs〉[〈0;envName〉] if isValid(〈0;env〉) {
           〈2;envName〉: true
         }
       }

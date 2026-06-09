@@ -85,6 +85,7 @@ issue3581: reduced: {
 	@test(eq, {list: _|_, c: _})
 }
 -- issue3576.cue --
+@experiment(predicates)
 // evalv3: disjunct of definitions with identical optional fields results in
 // incomplete evaluation; the resolved disjunct should be fully evaluated.
 // https://cuelang.org/issue/3576
@@ -103,7 +104,7 @@ issue3576: reduced: {
 		foo: {a: "1"}
 	})
 }
-issue3576: full: {
+issue3576: fullA: {
 	#Run: {
 		run!: string
 		options?: #Option | [#Option, ...]
@@ -119,9 +120,35 @@ issue3576: full: {
 			optionsValue: options
 		}
 	}
-	
 	#Option: {}
-	
+
+	foo: #Run | #Copy
+	foo: run: "make"
+	@test(eq, {
+		#Run: {run!: string, options?: {} | [{}]}
+		#Copy: {copy!: string, options?: {} | [{}]}
+		#Option: {}
+		foo: {run: "make", options?: {} | [{}]}
+	})
+}
+issue3576: fullB: {
+	#Run: {
+		run!: string
+		options?: #Option | [#Option, ...]
+		if exists(options) {
+			optionsValue: options
+		}
+	}
+
+	#Copy: {
+		copy!: string
+		options?: #Option | [#Option, ...]
+		if exists(options) {
+			optionsValue: options
+		}
+	}
+	#Option: {}
+
 	foo: #Run | #Copy
 	foo: run: "make"
 	@test(eq, {

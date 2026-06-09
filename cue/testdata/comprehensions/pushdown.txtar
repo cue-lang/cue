@@ -1,6 +1,7 @@
 # Working set of tests that unit test specifics of the aspect of the
 # comprehension algorithm that pushes down evaluation to the arcs.
 -- in.cue --
+@experiment(predicates)
 linkChildren: {
 	w: 1
 	v: {
@@ -46,6 +47,13 @@ fail: {
 		// true. However, after inserting the corresponding result in curly
 		// braces, the condition would be true. This is not allowed.
 		if a.b == _|_ {
+			b: 1
+		}
+	} @test(err, code=incomplete|cycle)
+}
+failB: {
+	a: {
+		if !exists(a.b) {
 			b: 1
 		}
 	} @test(err, code=incomplete|cycle)
@@ -591,7 +599,7 @@ voidEliminationSuccess: opt1: {
 	@test(eq, {a: {b: {c: {e: string}, d: string}}})
 }
 
-voidEliminationSuccess: noCycle1: {
+voidEliminationSuccess: noCycle1A: {
 	_x: a.b
 	a: {
 		c: h: "stream"
@@ -604,12 +612,38 @@ voidEliminationSuccess: noCycle1: {
 	}
 	@test(eq, {_x: {}, a: {c: {h: "stream"}, b: {}}})
 }
+voidEliminationSuccess: noCycle1B: {
+	_x: a.b
+	a: {
+		c: h: "stream"
+		b: {
+			if exists(c.g) {}
+		}
+		c: {
+			if false {g: _}
+		}
+	}
+	@test(eq, {_x: {}, a: {c: {h: "stream"}, b: {}}})
+}
 
-voidEliminationSuccess: noCycle2: {
+voidEliminationSuccess: noCycle2A: {
 	a: {
 		c: h: "stream"
 		b: {
 			if c.g != _|_ {}
+		}
+		c: {
+			if false {g: _}
+		}
+	}
+	_x: a.b
+	@test(eq, {a: {c: {h: "stream"}, b: {}}, _x: {}})
+}
+voidEliminationSuccess: noCycle2B: {
+	a: {
+		c: h: "stream"
+		b: {
+			if exists(c.g) {}
 		}
 		c: {
 			if false {g: _}
@@ -874,10 +908,11 @@ arcAlignment: t1: {
 }
 
 -- issue2111.cue --
+@experiment(predicates)
 // Evaluator regression where circular dependency in evaluation of conditionals
 // caused incorrect results. All arc types, not just regular fields, should be pushed down.
 // https://cuelang.org/issue/2111
-letPushdown: {
+letPushdownA: {
 	_c: y: 1
 
 	a: {
@@ -889,14 +924,27 @@ letPushdown: {
 	}
 	@test(eq, {_c: {y: 1}, a: {}})
 }
+letPushdownB: {
+	_c: y: 1
+
+	a: {
+		for k, v in _c {
+			let x = v
+			if isValid(x) {
+			}
+		}
+	}
+	@test(eq, {_c: {y: 1}, a: {}})
+}
 
 -- issue2113.cue --
+@experiment(predicates)
 // Evaluator regression where a nested comprehension caused "was already used"
 // errors when the enclosing value was not yet fully evaluated.
 // https://cuelang.org/issue/2113
 // Ensure that an enclosing Value clause of a nested comprehension is evaluated
 // before the nested comprehension itself is evaluated.
-nestedWithEmbeddingOK: {
+nestedWithEmbeddingOKA: {
 	c: [1]
 	a: {
 		for k, v in c {
@@ -907,13 +955,36 @@ nestedWithEmbeddingOK: {
 	}
 	@test(eq, {c: [1], a: {x: 1}})
 }
+nestedWithEmbeddingOKB: {
+	c: [1]
+	a: {
+		for k, v in c {
+			{x: 1}
+			if exists(a.x) {
+			}
+		}
+	}
+	@test(eq, {c: [1], a: {x: 1}})
+}
 
-nestedWithDynamicFieldOK: {
+nestedWithDynamicFieldOKA: {
 	_c: y: 1
 
 	a: {
 		for k, v in _c {
 			if x != _|_ {
+			}
+			x="\(k)": 1
+		}
+	}
+	@test(eq, {_c: {y: 1}, a: {y: 1}})
+}
+nestedWithDynamicFieldOKB: {
+	_c: y: 1
+
+	a: {
+		for k, v in _c {
+			if isValid(x) {
 			}
 			x="\(k)": 1
 		}
@@ -1435,77 +1506,79 @@ letCycleSelfKeyword2: {
 }
 -- out/errors.txt --
 [cycle] fail.a: cyclic reference to field b:
-    ./in.cue:45:8
+    ./in.cue:46:8
+[cycle] failB.a: cyclic reference to field b:
+    ./in.cue:53:16
 [eval] embed.fail1.p: field not allowed:
-    ./in.cue:64:9
+    ./in.cue:72:9
 [eval] embed.fail4.p: field not allowed:
-    ./in.cue:102:4
+    ./in.cue:110:4
 [incomplete] embed.incomplete5: incomplete bool: bool:
-    ./in.cue:107:6
+    ./in.cue:115:6
 [incomplete] embed.incomplete6.p: non-concrete value int in operand to +:
-    ./in.cue:117:6
-    ./in.cue:118:6
-[incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
-    ./in.cue:124:6
     ./in.cue:125:6
+    ./in.cue:126:6
+[incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
+    ./in.cue:132:6
+    ./in.cue:133:6
 [eval] fieldMismatch.a: conflicting values 2 and {x:3} (mismatched types int and struct):
-    ./in.cue:183:5
-    ./in.cue:184:3
-    ./in.cue:185:3
-    ./in.cue:185:11
+    ./in.cue:191:5
+    ./in.cue:192:3
+    ./in.cue:193:3
+    ./in.cue:193:11
 [structural_cycle] noStackOverflowStructCycle.#list.tail: structural cycle
 [structural_cycle] noStackOverflowStructCycle.list.tail: structural cycle
 [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-    ./in.cue:221:7
+    ./in.cue:229:7
 [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
-    ./in.cue:244:8
+    ./in.cue:252:8
 [incomplete] cyclicError.a: incomplete bool: bool:
-    ./in.cue:297:6
+    ./in.cue:305:6
 cyclicError.a: incomplete bool: bool:
-    ./in.cue:298:6
+    ./in.cue:306:6
 [incomplete] cyclicError.a: incomplete bool: bool:
-    ./in.cue:297:6
+    ./in.cue:305:6
 cyclicError.a: incomplete bool: bool:
-    ./in.cue:298:6
+    ./in.cue:306:6
 [incomplete] closedCheck.success1.#D: non-concrete value string in operand to !=:
-    ./in.cue:346:6
-    ./in.cue:345:6
+    ./in.cue:354:6
+    ./in.cue:353:6
 [incomplete] closedCheck.success2.#D: non-concrete value string in operand to !=:
-    ./in.cue:366:6
-    ./in.cue:365:6
+    ./in.cue:374:6
+    ./in.cue:373:6
 [incomplete] closedCheck.success3.#D.e: non-concrete value string in operand to !=:
-    ./in.cue:387:7
-    ./in.cue:385:6
+    ./in.cue:395:7
+    ./in.cue:393:6
 [incomplete] emptyComprehensionIncomplete.b: undefined field: b:
-    ./in.cue:411:8
+    ./in.cue:419:8
 [incomplete] voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:481:7
+    ./in.cue:489:7
 [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
-    ./in.cue:504:7
+    ./in.cue:512:7
 [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:530:7
+    ./in.cue:538:7
 voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
-    ./in.cue:533:7
+    ./in.cue:541:7
 [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
 voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-    ./in.cue:552:7
+    ./in.cue:560:7
 voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
-    ./in.cue:555:7
+    ./in.cue:563:7
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:620:17
+    ./in.cue:654:17
 [incomplete] voidLookup.a.x.z: undefined field: void:
-    ./in.cue:620:17
+    ./in.cue:654:17
 [incomplete] topElimination.x: non-concrete value int in operand to +:
-    ./in.cue:661:6
-    ./in.cue:658:5
-[incomplete] explicitDefaultError: non-concrete value string in operand to !=:
+    ./in.cue:695:6
     ./in.cue:692:5
-    ./in.cue:690:5
+[incomplete] explicitDefaultError: non-concrete value string in operand to !=:
+    ./in.cue:726:5
+    ./in.cue:724:5
 [eval] structShare.err1.x.d.e: field not allowed:
-    ./in.cue:742:9
+    ./in.cue:776:9
 [incomplete] errorPropagation: undefined field: env2:
-    ./issue2113.cue:35:19
+    ./issue2113.cue:59:19
 [eval] issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:29:4
 [eval] issue3729.withoutDisjunction.root: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):

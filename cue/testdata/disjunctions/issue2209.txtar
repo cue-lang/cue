@@ -3,6 +3,7 @@
 # involving nested definitions with spec disjunctions and if-guard comprehensions.
 # https://cuelang.org/issue/2209
 -- input.cue --
+@experiment(predicates)
 full: {
 	Foo: #Abstract & {spec: foo: {}}
 	Bar: #Abstract & {spec: bar: {}}
@@ -127,7 +128,7 @@ full: {
 	})
 }
 
-reduced: {
+reducedA: {
 	Foo: #Obj & {spec: foo: {}}
 	Bar: #Obj & {spec: bar: {}}
 
@@ -140,6 +141,50 @@ reduced: {
 				minFoo: _Xspec.foo.min
 			}
 			if _Xspec.bar != _|_ {
+				minBar: _Xspec.bar.min
+			}
+		}
+	}
+
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	#Out: {
+		{minFoo: int} | {minBar: int}
+
+		*{nullFoo: null} | {nullBar: null}
+	}
+	@test(eq, {
+		Foo: {
+			spec: {foo: {min: *10 | int}}
+			out: *{_Xspec: {foo: {min: *10 | int}}, minFoo: *10 | int, nullFoo: null} | {_Xspec: {foo: {min: *10 | int}}, minFoo: *10 | int, nullBar: null}
+		}
+		Bar: {
+			spec: {bar: {min: *20 | int}}
+			out: *{_Xspec: {bar: {min: *20 | int}}, minBar: *20 | int, nullFoo: null} | {_Xspec: {bar: {min: *20 | int}}, minBar: *20 | int, nullBar: null}
+		}
+		#Obj: {
+			spec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}
+			out: *{_Xspec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}, minFoo: *10 | int, nullFoo: null} | {_Xspec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}, minFoo: *10 | int, nullBar: null}
+		}
+		#SpecFoo: {foo: {min: *10 | int}}
+		#SpecBar: {bar: {min: *20 | int}}
+		#Out: *{minFoo: int, nullFoo: null} | *{minBar: int, nullFoo: null} | {minFoo: int, nullBar: null} | {minBar: int, nullBar: null}
+	})
+}
+reducedB: {
+	Foo: #Obj & {spec: foo: {}}
+	Bar: #Obj & {spec: bar: {}}
+
+	#Obj: X={
+		spec: *#SpecFoo | #SpecBar
+
+		out: #Out & {
+			_Xspec: X.spec
+			if exists(_Xspec.foo) {
+				minFoo: _Xspec.foo.min
+			}
+			if exists(_Xspec.bar) {
 				minBar: _Xspec.bar.min
 			}
 		}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55546cfd_655bd528",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T09:30:02Z",
+      "side": 1,
+      "message": "LGTM with one minor suggestion.",
+      "revId": "941e4108eed77679f4e8af2f05c67e64ff425244",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5510a248_99012970",
+        "filename": "pkg/time/time.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T09:30:02Z",
+      "side": 1,
+      "message": "I think it would be nice to make it clear that the time format is RFC3339 here.\n\nThat\u0027s also true of Unix too.",
+      "revId": "941e4108eed77679f4e8af2f05c67e64ff425244",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

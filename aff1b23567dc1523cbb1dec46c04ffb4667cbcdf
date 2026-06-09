@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1351c05c_95f06159",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-09T16:28:39Z",
+      "side": 1,
+      "message": "Done, both parts.\n\n1. cue mod publish now prints a note when cue.mod/local-module.cue is present:\n\n\tnote: cue.mod/local-module.cue is not published; it only affects local development\n\nI went with the note rather than a --without-local flag, which as you say would get annoying. To make the note literally true I also made modzip omit cue.mod/local-module.cue from the published zip (it was previously being packed verbatim, like any other file under cue.mod), alongside the existing .hg_archival.txt-style omissions.\n\n2. Publishing now enforces that a full tidy is happy first. cue mod publish runs the full two-file CheckTidy (informed by local-module.cue, with directory replaces resolved), so a stale module.cue is rejected with \"module is not tidy, use \u0027cue mod tidy\u0027\". To make that meaningful I had to strengthen CheckTidy itself: it previously only checked that each view was internally tidy, which missed exactly your case (module.cue advertising a lower version than local-module.cue selects). It now also checks that module.cue already carries the maximum version across both views, so cue mod tidy --check catches it too. New tests cover both the success and the stale-rejection paths.",
+      "parentUuid": "0d487773_522f5fb2",
+      "revId": "aff1b23567dc1523cbb1dec46c04ffb4667cbcdf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84244cea_dff8f227",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:30:07Z",
+      "side": 1,
+      "message": "SGTM in principle but I don\u0027t think we should release `isValid` with its current name. happy to discuss at tomorrow\u0027s call with @paul@myitcv.io",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "180a226f_9e32cf69",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2870,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:30:07Z",
+      "side": 1,
+      "message": "add an example with a required field too?\n\nalso, with so many one-letter names, it gets hard to track what\u0027s going on. try using more descriptive names, like `opt?:` rather than `y?:`.",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4bba21e_80e74392",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2875,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:30:07Z",
+      "side": 1,
+      "message": "```suggestion\nvalidity checking - a field can exist but have an invalid value.\n```\n\nwe typically don\u0027t use em-dashes and stick with ASCII",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f70c7fff_cbe773e8",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2903,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:30:07Z",
+      "side": 1,
+      "message": "IMHO we need to be clearer, in both the text and examples, that this function will return true for non-error yet incomplete values like `string`.\n\nI also still don\u0027t like this name. The spec doesn\u0027t define what a \"valid value\" is, and \"valid\" is a general term that can too easily be misunderstood. I see a few alternatives:\n\n1) `succeeds`, implying \"it evaluates without an error\"\n2) `validates`, like the previous option, but closer to `cue vet` and `cue.Value.Validate`\n3) with a negated result, `finalError` or `isError`, although I don\u0027t like the negated version as much\n\nI\u0027d personally go for option 2, or if not, option 1. I see either as better than \"is valid\".",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b29408b_3460a25e",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2909,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:30:07Z",
+      "side": 1,
+      "message": "I assume `isConcrete` will return `false` on any optional or required field. should we clarify that? like:\n\n```\na?: 123\nx: isConcrete(a)\n```",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e50f4015_9c9b7519",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2912,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-09T10:30:07Z",
+      "side": 1,
+      "message": "do we need to clarify _regular fields_ here?",
+      "range": {
+        "startLine": 2912,
+        "startChar": 27,
+        "endLine": 2912,
+        "endChar": 33
+      },
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

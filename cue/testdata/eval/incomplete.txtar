@@ -4,6 +4,7 @@
 # succeeds because "bar" is concrete. issue1837 checks that incomplete errors
 # are correctly preferred over cycle errors in conditional comprehensions.
 -- in.cue --
+@experiment(reflect)
 s: string
 
 e1:  s + s  @test(err, code=incomplete,
@@ -35,7 +36,7 @@ issue1837: {
 
 	// TODO(inline): use permute, but ensure comprehensions are permuted too first.
 	// @test(permute)
-	p1: {
+	p1A: {
 		context: {}
 		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
 		if x == _|_ {
@@ -47,7 +48,19 @@ issue1837: {
 			message: "a"
 		})
 	}
-	p2: {
+	p1B: {
+		context: {}
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		if !isValid(x) {
+			message: "a"
+		}
+		@test(eq, {
+			context: {}
+			x: _|_
+			message: "a"
+		})
+	}
+	p2A: {
 		if x == _|_ {
 			message: "a"
 		}
@@ -59,8 +72,32 @@ issue1837: {
 			context: {}
 		})
 	}
-	p3: {
+	p2B: {
+		if !isValid(x) {
+			message: "a"
+		}
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		context: {}
+		@test(eq, {
+			message: "a"
+			x: _|_
+			context: {}
+		})
+	}
+	p3A: {
 		if x == _|_ {
+			message: "a"
+		}
+		context: {}
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		@test(eq, {
+			message: "a"
+			context: {}
+			x: _|_
+		})
+	}
+	p3B: {
+		if !isValid(x) {
 			message: "a"
 		}
 		context: {}
@@ -86,38 +123,44 @@ Disjuncts:    0
 NumCloseIDs: 9
 -- out/errors.txt --
 [incomplete] e1: non-concrete value string in operand to +:
-    ./in.cue:3:6
-    ./in.cue:1:4
+    ./in.cue:4:6
+    ./in.cue:2:4
 [incomplete] e3: non-concrete value s for bound >:
-    ./in.cue:8:7
-[incomplete] e3b: non-concrete value s for bound >:
     ./in.cue:9:7
+[incomplete] e3b: non-concrete value s for bound >:
+    ./in.cue:10:7
 [incomplete] e1: non-concrete value string in operand to +:
-    ./in.cue:3:6
-    ./in.cue:1:4
+    ./in.cue:4:6
+    ./in.cue:2:4
 [incomplete] e5: non-concrete value e5 for bound <:
-    ./in.cue:12:6
+    ./in.cue:13:6
 [incomplete] E.a: non-concrete value >=5 in operand to -:
-    ./in.cue:15:5
-    ./in.cue:17:5
-    ./in.cue:17:11
+    ./in.cue:16:5
+    ./in.cue:18:5
+    ./in.cue:18:11
 E.b: non-concrete value >=5 in operand to -:
-    ./in.cue:16:5
     ./in.cue:17:5
-    ./in.cue:17:11
+    ./in.cue:18:5
+    ./in.cue:18:11
 [incomplete] E.b: non-concrete value >=5 in operand to -:
-    ./in.cue:16:5
     ./in.cue:17:5
-    ./in.cue:17:11
+    ./in.cue:18:5
+    ./in.cue:18:11
 [incomplete] E.b: non-concrete value >=5 in operand to -:
-    ./in.cue:16:5
     ./in.cue:17:5
-    ./in.cue:17:11
+    ./in.cue:18:5
+    ./in.cue:18:11
 [incomplete] non-concrete value a for bound <:
-    ./in.cue:21:15
-[incomplete] issue1837.p1.x: undefined field: b:
-    ./in.cue:34:14
-[incomplete] issue1837.p2.x: undefined field: b:
-    ./in.cue:48:14
-[incomplete] issue1837.p3.x: undefined field: b:
+    ./in.cue:22:15
+[incomplete] issue1837.p1A.x: undefined field: b:
+    ./in.cue:35:14
+[incomplete] issue1837.p1B.x: undefined field: b:
+    ./in.cue:47:14
+[incomplete] issue1837.p2A.x: undefined field: b:
     ./in.cue:61:14
+[incomplete] issue1837.p2B.x: undefined field: b:
+    ./in.cue:73:14
+[incomplete] issue1837.p3A.x: undefined field: b:
+    ./in.cue:86:14
+[incomplete] issue1837.p3B.x: undefined field: b:
+    ./in.cue:98:14

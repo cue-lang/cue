@@ -1,7 +1,12 @@
 # Tests that comprehensions over intersections of hidden fields work correctly.
 # Issue #3762: for comprehensions over _a & _b where both have patterns.
+#
+# Each test exists in two forms: an "A" variant using the legacy `!= _|_`
+# comparison and a "B" variant using the exists() builtin. Both should
+# produce identical results.
 -- in.cue --
-full: {
+@experiment(reflect)
+fullA: {
 	kube: node: n1: {
 		_CL: "l"
 		_cs: (_CL): _a[(_CL)]
@@ -45,7 +50,51 @@ full: {
 		_b: {}
 	})
 }
-reduced: p1: {
+fullB: {
+	kube: node: n1: {
+		_CL: "l"
+		_cs: (_CL): _a[(_CL)]
+		_cs: (_CL): {
+			opts: {}
+		}
+	}
+
+	_a: "l": {
+		_ba?: string
+		opts: {
+			if exists(_ba) {b: (_ba)}
+		}
+	}
+
+	for k, _ in _a & _b {
+		x: 5
+	}
+
+	_a: [ID=_]: vms: [{ name: "hello" }]
+	_b: [ID=_]: vms: [{ name: "again" }]
+	@test(eq, {
+		kube: node: n1: {
+			_CL: "l"
+			_cs: l: {
+				opts: {}
+				_ba?: string
+				vms: [{
+					name: "hello"
+				}]
+			}
+		}
+		_a: l: {
+			_ba?: string
+			opts: {}
+			vms: [{
+				name: "hello"
+			}]
+		}
+		x: 5
+		_b: {}
+	})
+}
+reduced: p1A: {
 	_cs: _a.l & {
 		opts: {}
 	}
@@ -74,7 +123,36 @@ reduced: p1: {
 		x: 5
 	})
 }
-reduced: p2: {
+reduced: p1B: {
+	_cs: _a.l & {
+		opts: {}
+	}
+
+	_a: l: {
+		_ba?: string
+		opts: {
+			if exists(_ba) {
+				b: _ba
+			}
+		}
+		vms: "hello"
+	}
+
+	_b: l: vms: "again"
+
+	for k, _ in _a & _b {
+		x: 5
+	}
+	@test(eq, {
+		_cs: {opts: {}, _ba?: string, vms: "hello"}
+		_a: {
+			l: {_ba?: string, opts: {}, vms: "hello"}
+		}
+		_b: {l: {vms: "again"}}
+		x: 5
+	})
+}
+reduced: p2A: {
 	for k, _ in _a & _b {
 		x: 5
 	}
@@ -87,6 +165,35 @@ reduced: p2: {
 		_ba?: string
 		opts: {
 			if _ba != _|_ {
+				b: _ba
+			}
+		}
+		vms: "hello"
+	}
+
+	_b: l: vms: "again"
+	@test(eq, {
+		x: 5
+		_cs: {opts: {}, _ba?: string, vms: "hello"}
+		_a: {
+			l: {_ba?: string, opts: {}, vms: "hello"}
+		}
+		_b: {l: {vms: "again"}}
+	})
+}
+reduced: p2B: {
+	for k, _ in _a & _b {
+		x: 5
+	}
+
+	_cs: _a.l & {
+		opts: {}
+	}
+
+	_a: l: {
+		_ba?: string
+		opts: {
+			if exists(_ba) {
 				b: _ba
 			}
 		}
@@ -122,15 +229,3 @@ reference: {
 	})
 }
 -- out/eval/stats --
-Leaks:  6
-Freed:  74
-Reused: 55
-Allocs: 25
-Retain: 0
-
-Unifications: 71
-Conjuncts:    101
-Disjuncts:    0
-Notifications: 8
-
-NumCloseIDs: 25

@@ -4,7 +4,9 @@
 # if comprehensions inside #Leaf reference optional fields without triggering
 # spurious closedness errors.
 -- in.cue --
-object: #Leaf & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
+@experiment(reflect)
+objectA: #LeafA & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
+objectB: #LeafB & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
 
 #Base: {
 	extra?: {...}
@@ -18,7 +20,7 @@ object: #Leaf & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
 	@test(closed)
 }
 
-#Leaf: {
+#LeafA: {
 	#Mid
 	extra?:  {...}
 	more?: int
@@ -30,15 +32,22 @@ object: #Leaf & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
 	@test(eq, {extra?: {}, more?: int})
 	@test(closed)
 }
+
+#LeafB: {
+	#Mid
+	extra?:  {...}
+	more?: int
+	if exists(extra.foo) {
+		if exists(more) {
+			foo: "bar"
+		}
+	}
+	@test(eq, {extra?: {}, more?: int})
+	@test(closed)
+}
+-- out/errors.txt --
+[incomplete] objectB: cannot reference optional field: extra:
+    ./in.cue:34:12
+[incomplete] #LeafB: cannot reference optional field: extra:
+    ./in.cue:34:12
 -- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 5
-Allocs: 6
-Retain: 7
-
-Unifications: 11
-Conjuncts:    25
-Disjuncts:    18
-
-NumCloseIDs: 2

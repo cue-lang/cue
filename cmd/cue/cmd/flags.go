@@ -106,7 +106,7 @@ func addGlobalFlags(cmd *cobra.Command) {
 func addOrphanFlags(cmd *cobra.Command) {
 	f := cmd.Flags()
 
-	f.StringP(string(flagPackage), "p", "", "package name for non-CUE files")
+	f.StringP(string(flagPackage), "p", "", "package name for non-CUE files and CUE output")
 	f.StringP(string(flagSchema), "d", "",
 		"expression to select schema for evaluating values in non-CUE files")
 	f.StringArrayP(string(flagPath), "l", nil, "CUE expression for single path component (see 'cue help flags' for details)")

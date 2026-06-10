@@ -29,11 +29,11 @@ cmp stdout path.golden
 exec cue export --out cue -p blah pkg.cue
 cmp stdout stdout.golden
 
-# Case 7: a single CUE file with a different package.
-# TODO(#3671): wrongly reports a clash; with no orphan data to merge,
-# --package should simply rename the output package.
-! exec cue export --out cue -p blah diffpkg.cue
-cmp stderr stderr.golden
+# Case 7: a single CUE file with a different package is renamed rather than
+# reported as a clash, since there is no orphan data to merge.
+# Regression test for https://cuelang.org/issue/3671
+exec cue export --out cue -p blah diffpkg.cue
+cmp stdout stdout.golden
 
 -- x.json --
 {

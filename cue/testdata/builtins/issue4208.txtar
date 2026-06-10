@@ -38,3 +38,15 @@ invalid: foo: {} @test(err, code=eval, contains="field not allowed", incorrect) 
 -- out/errors.txt --
 [eval] invalid.foo: field not allowed:
     ./in.cue:10:10
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 2
+Allocs: 9
+Retain: 0
+
+Unifications: 7
+Conjuncts:    16
+Disjuncts:    4
+
+NumCloseIDs: 2

@@ -28,3 +28,15 @@ x: ({} & r).e
     0: (string){ "" }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  27
+Reused: 15
+Allocs: 12
+Retain: 0
+
+Unifications: 19
+Conjuncts:    38
+Disjuncts:    0
+
+NumCloseIDs: 16

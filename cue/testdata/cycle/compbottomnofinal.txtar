@@ -174,15 +174,14 @@ small.p1: pushdown resolves #Y to {port: ""} (matching v2); #X still has cycle e
 medium.p1: pushdown resolves #Y and #X; Y gets cycle error.
 large.p1: pushdown resolves #Y, #X, X; Y gets cycle error. Ordering sensitive.
 -- out/eval/stats --
-Leaks:  44
-Freed:  76
-Reused: 58
-Allocs: 62
+Leaks:  13
+Freed:  26
+Reused: 11
+Allocs: 28
 Retain: 0
 
-Unifications: 154
-Conjuncts:    182
+Unifications: 39
+Conjuncts:    31
 Disjuncts:    0
-Notifications: 1
 
-NumCloseIDs: 76
+NumCloseIDs: 21

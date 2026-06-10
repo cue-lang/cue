@@ -50,3 +50,15 @@ requiredCycle: {
 -- out/errors.txt --
 [incomplete] requiredCycle.o: required field missing: c:
     ./in.cue:43:7
+-- out/eval/stats --
+Leaks:  14
+Freed:  24
+Reused: 17
+Allocs: 21
+Retain: 0
+
+Unifications: 35
+Conjuncts:    47
+Disjuncts:    0
+
+NumCloseIDs: 7

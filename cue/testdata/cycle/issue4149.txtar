@@ -45,3 +45,15 @@ builtin: {
 		y!: int
 	}
 }
+-- out/eval/stats --
+Leaks:  12
+Freed:  56
+Reused: 44
+Allocs: 24
+Retain: 0
+
+Unifications: 30
+Conjuncts:    90
+Disjuncts:    12
+
+NumCloseIDs: 38

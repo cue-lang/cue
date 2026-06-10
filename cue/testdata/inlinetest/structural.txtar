@@ -50,3 +50,13 @@ mixedInline: 42 @test(eq, 42)
 [eval] errWithCode: conflicting values string and 1 (mismatched types string and int):
     ./in.cue:7:14
     ./in.cue:7:23
+-- out/eval/stats --
+Leaks:  0
+Freed:  19
+Reused: 6
+Allocs: 13
+Retain: 0
+
+Unifications: 19
+Conjuncts:    21
+Disjuncts:    0

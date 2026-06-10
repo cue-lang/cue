@@ -56,3 +56,15 @@ pendingBecomesMember: {
 -- out/errors.txt --
 [incomplete] optionalStaysOptional.x.bar: cannot reference optional field: foo:
     ./in.cue:22:11
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 6
+Allocs: 15
+Retain: 0
+
+Unifications: 21
+Conjuncts:    33
+Disjuncts:    0
+
+NumCloseIDs: 6

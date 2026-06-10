@@ -63,3 +63,15 @@ h: {
     ./in.cue:44:7
 [eval] h.err: error in call to __closeAll: __closeAll may only be used when explicitopen is enabled:
     ./old.cue:3:7
+-- out/eval/stats --
+Leaks:  0
+Freed:  41
+Reused: 23
+Allocs: 18
+Retain: 0
+
+Unifications: 35
+Conjuncts:    50
+Disjuncts:    0
+
+NumCloseIDs: 8

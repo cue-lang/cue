@@ -69,3 +69,13 @@ concretePermute: {
 		}
 	})
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 11
+Allocs: 10
+Retain: 0
+
+Unifications: 21
+Conjuncts:    21
+Disjuncts:    0

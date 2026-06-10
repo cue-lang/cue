@@ -78,3 +78,15 @@ issue4119: full: {
 -- out/errors.txt --
 [eval] issue4119.reducedNested.x.y.0.f: undefined field: f:
     ./comprehensions.cue:25:9
+-- out/eval/stats --
+Leaks:  7
+Freed:  48
+Reused: 28
+Allocs: 27
+Retain: 0
+
+Unifications: 38
+Conjuncts:    88
+Disjuncts:    8
+
+NumCloseIDs: 9

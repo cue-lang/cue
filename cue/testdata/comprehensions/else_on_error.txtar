@@ -29,3 +29,15 @@ forSourceBottom: {
     ./in.cue:15:14
 [user] explicit error (_|_ literal) in source:
     ./in.cue:21:11
+-- out/eval/stats --
+Leaks:  1
+Freed:  4
+Reused: 0
+Allocs: 5
+Retain: 0
+
+Unifications: 5
+Conjuncts:    4
+Disjuncts:    0
+
+NumCloseIDs: 6

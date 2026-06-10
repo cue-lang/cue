@@ -104,3 +104,16 @@ objects: plain: [ID=string]: {kind:  "plain", ...}
 objects: hashed: [ID=string]: {kind: "hashed", ...}
 objects: plain: a: spec: ref:        objects.hashed.b.metadata.name
 objects: hashed: b: data: foo:       "bar"
+-- out/eval/stats --
+Leaks:  44
+Freed:  239
+Reused: 177
+Allocs: 106
+Retain: 0
+
+Unifications: 224
+Conjuncts:    476
+Disjuncts:    4
+Notifications: 10
+
+NumCloseIDs: 163

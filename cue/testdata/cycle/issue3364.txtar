@@ -12,3 +12,16 @@ _t3: {
     ./in.cue:3:17
 [structural_cycle] _t3.data.a.a: structural cycle
 [structural_cycle] _t3.out.a.a: structural cycle
+-- out/eval/stats --
+Leaks:  2
+Freed:  10
+Reused: 2
+Allocs: 10
+Retain: 0
+
+Unifications: 11
+Conjuncts:    30
+Disjuncts:    0
+Notifications: 2
+
+NumCloseIDs: 13

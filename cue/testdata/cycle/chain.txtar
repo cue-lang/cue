@@ -501,14 +501,14 @@ but succeeds in v3. issue2052.reduced.t1 and t2 show structure sharing
 (funcs."0" shared with A) in v3 where v2 expanded the struct.
 -- out/eval/stats --
 Leaks:  152
-Freed:  2975
-Reused: 2921
+Freed:  2927
+Reused: 2873
 Allocs: 206
 Retain: 0
 
-Unifications: 489
-Conjuncts:    2229
-Disjuncts:    729
-Notifications: 3
+Unifications: 876
+Conjuncts:    4968
+Disjuncts:    1615
+Notifications: 15
 
 NumCloseIDs: 1501

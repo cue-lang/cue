@@ -60,14 +60,14 @@ extra structural cycle at ./in.cue:3:25 (fibRec reference) for fib3/fib7/fib12;
 v3 reports positions at in.cue:8:9 and in.cue:8:38 only. Functionally both
 versions correctly report fib1=1, fib2=1, and fib3/fib7/fib12 as errors.
 -- out/eval/stats --
-Leaks:  11
-Freed:  99
-Reused: 81
-Allocs: 29
+Leaks:  14
+Freed:  135
+Reused: 112
+Allocs: 37
 Retain: 0
 
-Unifications: 100
-Conjuncts:    306
+Unifications: 131
+Conjuncts:    341
 Disjuncts:    0
 
-NumCloseIDs: 117
+NumCloseIDs: 137

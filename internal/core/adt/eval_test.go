@@ -78,10 +78,11 @@ func TestEvalV3(t *testing.T) {
 	// Fallback lets existing out/eval golden-file sections pass until
 	// out/evalalpha sections are generated with CUE_UPDATE=1.
 	test := cuetxtar.TxTarTest{
-		Root:     "../../../cue/testdata",
-		Name:     "evalalpha",
-		Fallback: "eval", // Allow eval golden files to pass these tests.
-		Inline:   true,   // Dispatch @test archives to inline runner.
+		Root:        "../../../cue/testdata",
+		Name:        "evalalpha",
+		Fallback:    "eval", // Allow eval golden files to pass these tests.
+		Inline:      true,   // Dispatch @test archives to inline runner.
+		RecordStats: true,   // Ensure inline runner generates stats in eval_test
 	}
 
 	cuedebug.Init()

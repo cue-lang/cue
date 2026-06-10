@@ -95,14 +95,14 @@ issue3851.t1.out.one.disj: evalv3 gives _ (top) while evalv2 gives
 issue3851.t2.env1.conf.one.disj: similar difference; v3 gives more disjuncts
 than v2 due to structural sharing differences.
 -- out/eval/stats --
-Leaks:  7
-Freed:  67
-Reused: 45
-Allocs: 29
+Leaks:  2
+Freed:  74
+Reused: 54
+Allocs: 22
 Retain: 0
 
 Unifications: 48
-Conjuncts:    119
-Disjuncts:    26
+Conjuncts:    123
+Disjuncts:    28
 
-NumCloseIDs: 25
+NumCloseIDs: 26

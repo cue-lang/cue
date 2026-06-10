@@ -44,3 +44,15 @@ _g: {
 }
 
 export: [_in, for o in _g.OUT {o}]
+-- out/eval/stats --
+Leaks:  2
+Freed:  69
+Reused: 24
+Allocs: 47
+Retain: 0
+
+Unifications: 60
+Conjuncts:    104
+Disjuncts:    2
+
+NumCloseIDs: 26

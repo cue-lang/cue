@@ -15,3 +15,15 @@ if false {
 }
 
 a: _ @test(eq, {})
+-- out/eval/stats --
+Leaks:  1
+Freed:  3
+Reused: 0
+Allocs: 4
+Retain: 0
+
+Unifications: 4
+Conjuncts:    5
+Disjuncts:    0
+
+NumCloseIDs: 2

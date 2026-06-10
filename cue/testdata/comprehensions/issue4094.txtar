@@ -71,3 +71,16 @@ _Service._service: undefined field: name:
     ./in.cue:54:13
 _Service._service: undefined field: name:
     ./in.cue:54:20
+-- out/eval/stats --
+Leaks:  15
+Freed:  115
+Reused: 76
+Allocs: 54
+Retain: 0
+
+Unifications: 110
+Conjuncts:    205
+Disjuncts:    0
+Notifications: 8
+
+NumCloseIDs: 85

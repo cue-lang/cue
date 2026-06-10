@@ -4,3 +4,13 @@ e1: 100_000   @test(err, code=eval, contains="invalid value 100000", pos=[0:5])
 -- out/errors.txt --
 [eval] e1: invalid value 100000 (out of bound <=32767):
     ./in.cue:2:5
+-- out/eval/stats --
+Leaks:  0
+Freed:  2
+Reused: 0
+Allocs: 2
+Retain: 0
+
+Unifications: 2
+Conjuncts:    3
+Disjuncts:    0

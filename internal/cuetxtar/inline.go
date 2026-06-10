@@ -52,8 +52,10 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 )
@@ -175,6 +177,9 @@ type inlineRunner struct {
 	// intentionally evaluate non-source-order variants, such as @test(permute)
 	// validation runs.
 	suppressWritebacks bool
+
+	// recordStats, if true, enables generation and tracking of evaluation stats.
+	recordStats bool
 }
 
 // sinkOrSub returns the errSink if set, otherwise the given sub-test t.
@@ -314,8 +319,10 @@ func (r *inlineRunner) runArchive() {
 	// Build and evaluate the stripped CUE.
 	// Note: val.Err() may be non-nil if sub-fields are erroneous; this is
 	// intentional for tests that assert errors. We only fatal on compile errors.
+	adt.ResetStats()
 	ctx := r.cueContext()
 	val, allRecords, compileErr := r.buildValue(ctx, nil)
+	evalStats := adt.TotalStats()
 	if compileErr != nil {
 		r.t.Fatalf("inline: CUE compile error:\n%s", cueerrors.Details(compileErr, nil))
 		return
@@ -420,6 +427,11 @@ func (r *inlineRunner) runArchive() {
 
 	// Update the optional out/errors.txt documentary section.
 	r.handleErrorsTxtSection(val)
+
+	if r.recordStats {
+		// Update the optional out/eval/stats documentary section.
+		r.handleStatsSection(evalStats)
+	}
 }
 
 // handleErrorsTxtSection manages the out/errors.txt documentary section.
@@ -512,6 +524,78 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 		out := txtar.Format(r.archive)
 		if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
 			r.t.Errorf("inline: errors.txt write-back to %s: %v", r.filePath, err)
+		}
+	}
+}
+
+// handleStatsSection manages the out/eval/stats documentary section.
+func (r *inlineRunner) handleStatsSection(counts stats.Counts) {
+	const sectionName = "out/eval/stats"
+
+	// Match the formatting of the old testing framework
+	result := fmt.Sprintf("%v\n", counts)
+	resultBytes := []byte(result)
+
+	// Find the section in the archive. Treat out/evalalpha/stats as the same section.
+	sectionIdx := -1
+	changed := false
+	for i, f := range r.archive.Files {
+		if f.Name == sectionName || f.Name == "out/evalalpha/stats" {
+			sectionIdx = i
+			if f.Name != sectionName {
+				r.archive.Files[i].Name = sectionName
+				changed = true
+			}
+			break
+		}
+	}
+
+	var existing []byte
+	if sectionIdx >= 0 {
+		existing = r.archive.Files[sectionIdx].Data
+	}
+
+	// No change needed only when section exists with matching content.
+	if sectionIdx >= 0 && bytes.Equal(existing, resultBytes) {
+		// fall through to write if renamed
+	} else if cuetest.DiffGoldenFiles {
+		r.t.Errorf("result for %s differs: (-want +got)\n%s",
+			sectionName, cmp.Diff(string(existing), result))
+	} else if cuetest.UpdateGoldenFiles {
+		updateContent := false
+		if sectionIdx >= 0 {
+			c := r.cueContext()
+			v := c.CompileBytes(existing)
+			var orig stats.Counts
+			v.Decode(&orig)
+
+			switch {
+			case cuetest.ForceUpdateGoldenFiles:
+				updateContent = true
+			case SignificantStatsChange(orig, counts):
+				// For now, we mainly care about disjuncts, but other thresholds apply.
+				// TODO: add triggers once the disjunction issues have been solved.
+				updateContent = true
+			}
+		} else {
+			updateContent = true
+		}
+
+		if updateContent {
+			if sectionIdx >= 0 {
+				r.archive.Files[sectionIdx].Data = resultBytes
+			} else {
+				// Section absent but should exist — append it to the archive.
+				r.archive.Files = append(r.archive.Files, txtar.File{Name: sectionName, Data: resultBytes})
+			}
+			changed = true
+		}
+	}
+
+	if changed && r.filePath != "" {
+		out := txtar.Format(r.archive)
+		if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
+			r.t.Errorf("inline: %s write-back to %s: %v", sectionName, r.filePath, err)
 		}
 	}
 }

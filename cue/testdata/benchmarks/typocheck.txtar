@@ -29,17 +29,17 @@ _checkB99: out.B99 @test(eq, "name99")
     ./in.cue:15:17
 -- out/eval/stats --
 Leaks:  0
-Freed:  700
+Freed:  703
 Reused: 298
-Allocs: 402
+Allocs: 405
 Retain: 0
 
-Unifications: 700
-Conjuncts:    1302
+Unifications: 703
+Conjuncts:    1305
 Disjuncts:    0
 
 NumCloseIDs: 212
 
-ConjunctInfos:       905
+ConjunctInfos:       908
 MaxConjunctInfos:    103
 MaxReqSets:          104

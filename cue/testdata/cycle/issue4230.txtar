@@ -21,3 +21,15 @@ x: X={
 	regions: ["west"]
 	app: {region: "west"}
 })
+-- out/eval/stats --
+Leaks:  3
+Freed:  27
+Reused: 13
+Allocs: 17
+Retain: 0
+
+Unifications: 16
+Conjuncts:    38
+Disjuncts:    6
+
+NumCloseIDs: 12

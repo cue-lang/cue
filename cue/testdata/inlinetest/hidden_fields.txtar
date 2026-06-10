@@ -31,3 +31,13 @@ hiddenDefInBoth: {
 // No hidden fields on either side: passes trivially.
 noHidden: {a: 1, b: 2} @test(eq, {a: 1, b: 2})
 
+-- out/eval/stats --
+Leaks:  0
+Freed:  14
+Reused: 6
+Allocs: 8
+Retain: 0
+
+Unifications: 14
+Conjuncts:    14
+Disjuncts:    0

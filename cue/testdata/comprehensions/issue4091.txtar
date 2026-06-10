@@ -34,3 +34,15 @@ _Generator: {
 -- out/errors.txt --
 [incomplete] _Generator._output: undefined field: spec:
     ./in.cue:23:18
+-- out/eval/stats --
+Leaks:  1
+Freed:  36
+Reused: 13
+Allocs: 24
+Retain: 0
+
+Unifications: 34
+Conjuncts:    49
+Disjuncts:    0
+
+NumCloseIDs: 19

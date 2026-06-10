@@ -8,3 +8,15 @@
 -- in.cue --
 t: {a: 1} | {b: (t & {}).b} @test(eq, {a: 1})
 out: t & {a: 1} @test(eq, {a: 1})
+-- out/eval/stats --
+Leaks:  9
+Freed:  17
+Reused: 3
+Allocs: 23
+Retain: 0
+
+Unifications: 16
+Conjuncts:    33
+Disjuncts:    8
+
+NumCloseIDs: 4

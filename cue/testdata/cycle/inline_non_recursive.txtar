@@ -173,14 +173,14 @@ issue1708.k30: evaluates to 30 in v2 but errors (incomplete: undefined field: ou
 issue1708 error positions differ between v2 and v3.
 -- out/eval/stats --
 Leaks:  1
-Freed:  226
-Reused: 198
-Allocs: 29
+Freed:  228
+Reused: 197
+Allocs: 32
 Retain: 0
 
-Unifications: 142
-Conjuncts:    376
+Unifications: 143
+Conjuncts:    383
 Disjuncts:    0
 Notifications: 1
 
-NumCloseIDs: 169
+NumCloseIDs: 174

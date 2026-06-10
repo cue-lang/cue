@@ -216,3 +216,15 @@ usedef: X21.field  @test(eq, 42)
     ./in.cue:120:8
 [incomplete] opt.b: cannot reference optional field: opt:
     ./in.cue:131:5
+-- out/eval/stats --
+Leaks:  0
+Freed:  113
+Reused: 67
+Allocs: 46
+Retain: 0
+
+Unifications: 108
+Conjuncts:    128
+Disjuncts:    5
+
+NumCloseIDs: 5

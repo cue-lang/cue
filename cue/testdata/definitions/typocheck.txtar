@@ -992,19 +992,19 @@ issue4006: {
 }
 -- out/eval/stats --
 Leaks:  77
-Freed:  863
-Reused: 815
+Freed:  860
+Reused: 812
 Allocs: 125
 Retain: 0
 
-Unifications: 767
-Conjuncts:    1530
+Unifications: 765
+Conjuncts:    1528
 Disjuncts:    84
 Notifications: 7
 
 NumCloseIDs: 441
 
-ConjunctInfos:       1120
+ConjunctInfos:       1118
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2

@@ -30,3 +30,13 @@ orTrueTrue:       true || true            @test(eq, true)
 // No short-circuit: || falls through when left is false.
 orFalseFalse: false || false @test(eq, false)
 orFalseTrue:  false || true  @test(eq, true)
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 0
+Allocs: 21
+Retain: 0
+
+Unifications: 21
+Conjuncts:    21
+Disjuncts:    0

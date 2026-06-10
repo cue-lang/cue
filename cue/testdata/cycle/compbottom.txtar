@@ -104,13 +104,13 @@ medium: {
 medium.p1-p4: field ordering of userinfo/host in #Y differs between v2 (host first) and v3 (userinfo first).
 -- out/eval/stats --
 Leaks:  0
-Freed:  85
-Reused: 67
-Allocs: 18
+Freed:  22
+Reused: 7
+Allocs: 15
 Retain: 0
 
-Unifications: 85
-Conjuncts:    177
+Unifications: 22
+Conjuncts:    38
 Disjuncts:    0
 
-NumCloseIDs: 72
+NumCloseIDs: 16

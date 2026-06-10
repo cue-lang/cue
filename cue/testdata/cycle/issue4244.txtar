@@ -48,3 +48,15 @@ case2: #schema & {
 [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
     ./in.cue:8:12
     ./in.cue:5:22
+-- out/eval/stats --
+Leaks:  8
+Freed:  24
+Reused: 13
+Allocs: 19
+Retain: 0
+
+Unifications: 32
+Conjuncts:    47
+Disjuncts:    0
+
+NumCloseIDs: 10

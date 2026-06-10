@@ -287,3 +287,15 @@ a: {
     ./validator.cue:19:12
     ./validator.cue:18:12
     ./validator.cue:19:19
+-- out/eval/stats --
+Leaks:  16
+Freed:  72
+Reused: 45
+Allocs: 43
+Retain: 0
+
+Unifications: 76
+Conjuncts:    132
+Disjuncts:    0
+
+NumCloseIDs: 42

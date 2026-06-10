@@ -123,12 +123,15 @@ embeddedFunctionalExpr: {
 	#fn
 } @test(eq, {"str", #fn: {"str", #in: "str"}, #in: "str"})
 -- out/eval/stats --
-Leaks:  8
-Freed:  59
-Reused: 54
-Allocs: 13
-Retain: 24
+Leaks:  0
+Freed:  67
+Reused: 45
+Allocs: 22
+Retain: 0
 
-Unifications: 67
-Conjuncts:    163
-Disjuncts:    73
+Unifications: 63
+Conjuncts:    155
+Disjuncts:    0
+Notifications: 13
+
+NumCloseIDs: 54

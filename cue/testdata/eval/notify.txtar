@@ -87,17 +87,17 @@ t2.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
 [incomplete] issue3437.r: undefined field: a:
     ./issue3437.cue:5:9
 -- out/eval/stats --
-Leaks:  473
-Freed:  1600
-Reused: 466
-Allocs: 1607
+Leaks:  472
+Freed:  1566
+Reused: 432
+Allocs: 1606
 Retain: 0
 
-Unifications: 767
-Conjuncts:    2012
-Disjuncts:    736
-Notifications: 5
+Unifications: 754
+Conjuncts:    1970
+Disjuncts:    722
+Notifications: 3
 
-NumCloseIDs: 241
+NumCloseIDs: 236
 -- out/todo.txt --
 v3 reports error messages with different operand ordering ("conflicting values {a,...} and 1" vs v2's "conflicting values 1 and {a:(2|1)}").

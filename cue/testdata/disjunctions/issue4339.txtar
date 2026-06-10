@@ -15,3 +15,15 @@ out: {
 	// TODO: we should be able to use @test(final) here, avoiding the defaults.
 	*{one: 1, enable: *true | false, extra: 1} | {one: 1, enable: *true | false},
 )
+-- out/eval/stats --
+Leaks:  11
+Freed:  6
+Reused: 0
+Allocs: 17
+Retain: 0
+
+Unifications: 7
+Conjuncts:    17
+Disjuncts:    6
+
+NumCloseIDs: 4

@@ -79,6 +79,13 @@ func (b *buildPlan) parsePlacementFlags() error {
 }
 
 func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
+	// With no orphan files to place, --package just renames the output package,
+	// which the encoder handles; skip the clash check below, which is only
+	// meaningful when orphan data is merged into the instance.
+	if len(a) == 0 {
+		return nil
+	}
+
 	pkg := b.encConfig.PkgName
 	if pkg == "" {
 		pkg = i.PkgName

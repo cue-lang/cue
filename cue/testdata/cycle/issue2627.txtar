@@ -75,3 +75,6 @@ fromJSON: {
 	y: #"{"a":5}"#
 	@test(eq, {x: {a: 5}, y: #"{"a":5}"#})
 }
+-- out/errors.txt --
+[incomplete] toJSON.x: error in call to encoding/json.Unmarshal: non-concrete value _:
+    ./in.cue:61:5

@@ -1,0 +1,24 @@
+# Issue 3384: a --path expression that evaluates to a non-string is not a
+# valid label; key a non-string field by wrapping it in string interpolation.
+exec cue export --path test x.json
+cmp stdout expect-stdout
+
+# Wrapping the value in string interpolation produces the intended string
+# label; this is the correct way to key by a non-string field.
+exec cue export -l '"\(test)"' x.json
+cmp stdout expect-interpolated
+
+-- x.json --
+{"test": 0}
+-- expect-stdout --
+{
+    "_": {
+        "test": 0
+    }
+}
+-- expect-interpolated --
+{
+    "0": {
+        "test": 0
+    }
+}

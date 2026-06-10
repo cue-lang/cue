@@ -178,7 +178,7 @@ func (b *buildPlan) resolveLabels(scope cue.Value) ([]ast.Label, cue.Path, error
 			}
 			l := ctx.BuildExpr(x, cue.InferBuiltins(true), cue.Scope(scope))
 			switch l.Kind() {
-			case cue.StringKind, cue.IntKind:
+			case cue.StringKind:
 				syn, ok := l.Syntax().(ast.Label)
 				if !ok {
 					return nil, cue.Path{}, fmt.Errorf(

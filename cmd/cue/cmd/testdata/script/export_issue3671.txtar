@@ -1,0 +1,36 @@
+# --package renames the output package; the file form should match the package form.
+# Issue: https://cuelang.org/issue/3671
+
+# A CUE package: works.
+exec cue export .:foo --out cue --package bar
+cmp stdout out
+
+# The same content as an individual CUE file: should also work.
+# TODO(#3671): wrongly reports a package clash.
+! exec cue export foo.cue --out cue --package bar
+stderr '"package" flag clashes with existing package name \(bar vs foo\)'
+
+# With orphan data to merge, a mismatching --package must clash unless --force.
+! exec cue export foo.cue data.yml --out cue --package bar
+stderr '"package" flag clashes with existing package name \(bar vs foo\)'
+exec cue export foo.cue data.yml --out cue --package bar --force
+cmp stdout out.merged
+
+-- cue.mod/module.cue --
+module: "mod.example"
+language: version: "v0.9.0"
+-- foo.cue --
+package foo
+
+x: 1
+-- data.yml --
+y: 2
+-- out --
+package bar
+
+x: 1
+-- out.merged --
+package bar
+
+x: 1
+y: 2

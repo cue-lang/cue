@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75a32758_89110df1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T13:21:41Z",
+      "side": 1,
+      "message": "Agreed — the trailing \"Also: compile @test(eq) exprs with experiments\" block was a leftover from squashing the inline-runner change into this commit. Proposed reworded message (also reflecting reflect -\u003e predicates):",
+      "parentUuid": "8e5ad2a0_54f1a025",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ea87fb1_b9a508a8",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-10T10:20:53Z",
       "side": 1,
       "message": "I\u0027m reluctant to reuse the very old issue 943 here, because:\n* it\u0027s very out of date. for example, it doesn\u0027t define `allows` nor `isValid`\n* it\u0027s too generic. it also includes other builtins like `must` or `range`\n* it already has unrelated discussion in it. so any proposal feedback would feel out of place\n\nSo I think we should create a new mini-proposal for these reflect builtins, reflecting the spec design that\u0027s in this stack. It may seem a little silly, but that way people can comment on it.\n\nAnd then I would close 943 in favor of this new proposal plus separate issues for any other builtins that we still think may be useful. For example, \"must\" already has its own separate issue in https://github.com/cue-lang/cue/issues/575.",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0450f8f1_49b9243d",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T13:21:41Z",
+      "side": 1,
+      "message": "Agreed — #943 is stale (predates allows/isValid), too broad (covers must/range/etc.), and carries unrelated discussion. A small dedicated proposal for these predicate builtins, matching the spec in this stack, makes sense, and we\u0027d then close #943 in favor of it plus separate issues for the others (must already has #575).\n\nThat needs a new issue to be filed; I\u0027ve left the #943 link in place for now and will swap it for the new proposal once it exists. Leaving open to track that.",
+      "parentUuid": "2ea87fb1_b9a508a8",
       "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3b97bcc_738821d4",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T13:21:41Z",
+      "side": 1,
+      "message": "The typed *Experiment bundles two things a data-driven, compile-time gate needs: the enablement check (the closure) and the name used in the \"requires @experiment(%s)\" error. The existing Pos().Experiment().X pattern (structcmp, shortcircuit, ...) works for hand-written eval-time checks, but a gated builtin is data — adt.Builtin carries the gate as a field and verifyVersion rejects the reference at compile time, which is better UX than failing during evaluation.\n\nThat said, I\u0027m happy to collapse it to a plain func(*File) bool field plus a name string on the Builtin if you\u0027d prefer to avoid the named type. Leaving open for your call.",
+      "parentUuid": "12d7a124_9c1287a1",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0415323_48bf3d7f",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd86afc1_b9da6a6e",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T13:21:41Z",
+      "side": 1,
+      "message": "Done. Renamed the experiment reflect -\u003e predicates. The builtins are boolean predicates over a value\u0027s state (present? valid? concrete? allowed?), which stays narrow and shouldn\u0027t clash with a future type/schema \"reflection\" feature.",
+      "parentUuid": "e0415323_48bf3d7f",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "148f7529_7f82cbad",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-06-10T10:20:53Z",
       "side": 1,
       "message": "why not reuse cue/parser or any of our other standard apis to locate the experiment attribute value?",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6e1d891_14b45219",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T13:21:41Z",
+      "side": 1,
+      "message": "Done. fileExperimentPrefix now parses the file with cue/parser and reads the file-level @experiment attributes from the AST (the leading *ast.Attribute decls, via Attribute.Name()), instead of text-scanning the source.\n\nDouble checked if there is a simpler variant, but can\u0027t really think of something that is easier.",
+      "parentUuid": "148f7529_7f82cbad",
       "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

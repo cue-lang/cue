@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2c52057a_17e9e2b6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T22:11:34Z",
+      "side": 1,
+      "message": "this doesn\u0027t seem done?",
+      "parentUuid": "75a32758_89110df1",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2ea87fb1_b9a508a8",
         "filename": "cmd/cue/cmd/experiments_help_gen.go",
         "patchSetId": 5
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "The typed *Experiment bundles two things a data-driven, compile-time gate needs: the enablement check (the closure) and the name used in the \"requires @experiment(%s)\" error. The existing Pos().Experiment().X pattern (structcmp, shortcircuit, ...) works for hand-written eval-time checks, but a gated builtin is data — adt.Builtin carries the gate as a field and verifyVersion rejects the reference at compile time, which is better UX than failing during evaluation.\n\nThat said, I\u0027m happy to collapse it to a plain func(*File) bool field plus a name string on the Builtin if you\u0027d prefer to avoid the named type. Leaving open for your call.",
       "parentUuid": "12d7a124_9c1287a1",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b5b9139_179e2e00",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T22:11:34Z",
+      "side": 1,
+      "message": "ah I see. I\u0027m fine with either approach then.",
+      "parentUuid": "e3b97bcc_738821d4",
       "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

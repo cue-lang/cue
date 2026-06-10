@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2aad7f7_fdae4eb8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T22:11:34Z",
+      "side": 1,
+      "message": "```suggestion\ninternal/core/compile: gate reflect builtins behind @experiment(predicates)\n```",
+      "revId": "1b8906f8f7f5b82b176dfd00afe29a93cf56347d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76487f33_08fd7d93",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T22:11:34Z",
+      "side": 1,
+      "message": "important: the issue link is also stale",
+      "revId": "1b8906f8f7f5b82b176dfd00afe29a93cf56347d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

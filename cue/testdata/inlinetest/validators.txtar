@@ -11,3 +11,15 @@ rawMin: struct.MinFields(3) @test(eq, struct.MinFields(3))
 
 intMixDirect: int & <=1  @test(eq, <=1 & int)
 intMixEmbed: {int & <=1}  @test(eq, {<=1 & int})
+-- out/eval/stats --
+Leaks:  0
+Freed:  5
+Reused: 0
+Allocs: 5
+Retain: 0
+
+Unifications: 5
+Conjuncts:    8
+Disjuncts:    0
+
+NumCloseIDs: 2

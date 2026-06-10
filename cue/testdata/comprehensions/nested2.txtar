@@ -536,10 +536,10 @@ an "undefined field: objects" error. The comprehension cycle is handled by
 dependency tracking rather than field pushdown, so the inner for-clause
 yields zero values and `objects` remains an empty struct.
 -- out/eval/stats --
-Leaks:  16
-Freed:  414
-Reused: 354
-Allocs: 76
+Leaks:  12
+Freed:  395
+Reused: 337
+Allocs: 70
 Retain: 0
 
 Unifications: 364
@@ -547,4 +547,4 @@ Conjuncts:    688
 Disjuncts:    0
 Notifications: 5
 
-NumCloseIDs: 217
+NumCloseIDs: 208

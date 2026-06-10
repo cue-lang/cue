@@ -42,10 +42,10 @@ _schema: {
 
 @test(eq, at=_data, { updates: [{schedule: {interval: "daily"}}] })
 -- out/eval/stats --
-Leaks:  27
+Leaks:  31
 Freed:  2431
-Reused: 1293
-Allocs: 1165
+Reused: 1295
+Allocs: 1167
 Retain: 0
 
 Unifications: 48

@@ -49,14 +49,14 @@ examples: eg3: {
 	})
 }
 -- out/eval/stats --
-Leaks:  8
-Freed:  82
-Reused: 63
-Allocs: 27
+Leaks:  10
+Freed:  88
+Reused: 69
+Allocs: 29
 Retain: 0
 
-Unifications: 41
-Conjuncts:    139
-Disjuncts:    22
+Unifications: 43
+Conjuncts:    149
+Disjuncts:    26
 
-NumCloseIDs: 43
+NumCloseIDs: 45

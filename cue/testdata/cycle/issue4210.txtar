@@ -27,3 +27,15 @@ t4: {
 [structural_cycle] t2.a.b.c.c: structural cycle
 [structural_cycle] t3.a.b.c.d.d: structural cycle
 [structural_cycle] t4.x.y.z.z: structural cycle
+-- out/eval/stats --
+Leaks:  0
+Freed:  39
+Reused: 25
+Allocs: 14
+Retain: 0
+
+Unifications: 31
+Conjuncts:    55
+Disjuncts:    0
+
+NumCloseIDs: 30

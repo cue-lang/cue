@@ -86,3 +86,15 @@ cycle.b: cycle with field: a:
 [incomplete] incompleteTwo._t: invalid interpolation: non-concrete value string (type string):
     ./in.cue:54:3
     ./in.cue:53:7
+-- out/eval/stats --
+Leaks:  0
+Freed:  14
+Reused: 6
+Allocs: 8
+Retain: 0
+
+Unifications: 14
+Conjuncts:    17
+Disjuncts:    0
+
+NumCloseIDs: 4

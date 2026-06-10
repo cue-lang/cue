@@ -16,3 +16,16 @@ conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 44 (mismatched types stru
     ./in.cue:2:1
 2 errors in empty disjunction::
     ./in.cue:3:6
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 3
+Allocs: 6
+Retain: 0
+
+Unifications: 3
+Conjuncts:    12
+Disjuncts:    2
+Notifications: 1
+
+NumCloseIDs: 2

@@ -10,3 +10,16 @@ x: {
 @test(err, code=structural_cycle, path=x.y, contains="structural cycle", pos=[])
 -- out/errors.txt --
 [structural_cycle] x.y: structural cycle
+-- out/eval/stats --
+Leaks:  0
+Freed:  4
+Reused: 0
+Allocs: 4
+Retain: 0
+
+Unifications: 4
+Conjuncts:    10
+Disjuncts:    0
+Notifications: 3
+
+NumCloseIDs: 7

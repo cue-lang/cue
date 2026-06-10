@@ -16,3 +16,15 @@ c: [for e in a {e}, for e in b {e}] @test(err, code=eval, contains="incompatible
     ./in.cue:3:4
 [eval] c: incompatible list lengths (4 and 6):
     ./in.cue:9:4
+-- out/eval/stats --
+Leaks:  0
+Freed:  24
+Reused: 12
+Allocs: 12
+Retain: 0
+
+Unifications: 24
+Conjuncts:    49
+Disjuncts:    0
+
+NumCloseIDs: 27

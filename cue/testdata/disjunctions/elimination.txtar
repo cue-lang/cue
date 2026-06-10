@@ -1157,17 +1157,17 @@ issue2685: {
 	})
 }
 -- out/eval/stats --
-Leaks:  218
-Freed:  2563
-Reused: 2524
-Allocs: 257
+Leaks:  212
+Freed:  2557
+Reused: 2518
+Allocs: 251
 Retain: 0
 
-Unifications: 665
-Conjuncts:    2726
+Unifications: 663
+Conjuncts:    2733
 Disjuncts:    1298
 Notifications: 8
 
-NumCloseIDs: 323
+NumCloseIDs: 319
 -- out/todo.txt --
 issue2685: only evaluated by v3 evaluator.

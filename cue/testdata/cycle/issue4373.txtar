@@ -17,3 +17,15 @@ t: {a: 0, out: 1} | {
 }
 
 out: (t & {a: 0}).out @test(eq, 1)
+-- out/eval/stats --
+Leaks:  20
+Freed:  167
+Reused: 141
+Allocs: 46
+Retain: 0
+
+Unifications: 102
+Conjuncts:    228
+Disjuncts:    36
+
+NumCloseIDs: 34

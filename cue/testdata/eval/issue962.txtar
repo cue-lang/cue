@@ -17,3 +17,13 @@ _obj:  foo[_what] @test(err, code=incomplete, pos=[-1:8], contains="invalid non-
     ./in.cue:7:8
 [incomplete] _obj: invalid non-ground value string (must be concrete string):
     ./in.cue:7:8
+-- out/eval/stats --
+Leaks:  0
+Freed:  6
+Reused: 0
+Allocs: 6
+Retain: 0
+
+Unifications: 6
+Conjuncts:    6
+Disjuncts:    0

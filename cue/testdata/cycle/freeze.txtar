@@ -117,13 +117,13 @@ comprehension.t3.err.a: adding field yq not allowed as field set was already ref
     ./comprehension.cue:73:9
 -- out/eval/stats --
 Leaks:  4
-Freed:  68
-Reused: 52
-Allocs: 20
+Freed:  42
+Reused: 28
+Allocs: 18
 Retain: 0
 
-Unifications: 72
-Conjuncts:    193
+Unifications: 46
+Conjuncts:    87
 Disjuncts:    0
 
-NumCloseIDs: 54
+NumCloseIDs: 24

@@ -49,3 +49,15 @@ if true {
 		variable: "{kind1}"
 	}]
 })
+-- out/eval/stats --
+Leaks:  0
+Freed:  49
+Reused: 20
+Allocs: 29
+Retain: 0
+
+Unifications: 41
+Conjuncts:    74
+Disjuncts:    0
+
+NumCloseIDs: 23

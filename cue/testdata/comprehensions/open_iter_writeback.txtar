@@ -40,3 +40,15 @@ defOpen: {
 		keys: ["b", "a"]
 	})
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  19
+Reused: 11
+Allocs: 8
+Retain: 0
+
+Unifications: 19
+Conjuncts:    37
+Disjuncts:    0
+
+NumCloseIDs: 22

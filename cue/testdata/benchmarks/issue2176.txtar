@@ -66,10 +66,10 @@ output: {
     ./in.cue:16:36
     ./in.cue:11:11
 -- out/eval/stats --
-Leaks:  389
-Freed:  415
-Reused: 369
-Allocs: 435
+Leaks:  162
+Freed:  413
+Reused: 367
+Allocs: 208
 Retain: 0
 
 Unifications: 472

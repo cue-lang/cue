@@ -256,8 +256,8 @@ Reused: 273
 Allocs: 43
 Retain: 0
 
-Unifications: 247
+Unifications: 248
 Conjuncts:    623
 Disjuncts:    0
 
-NumCloseIDs: 202
+NumCloseIDs: 201

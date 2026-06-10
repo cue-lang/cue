@@ -42,3 +42,15 @@ err: {
     ./pending.cue:4:5
     ./pending.cue:3:5
     ./pending.cue:4:9
+-- out/eval/stats --
+Leaks:  4
+Freed:  13
+Reused: 7
+Allocs: 10
+Retain: 0
+
+Unifications: 11
+Conjuncts:    24
+Disjuncts:    6
+
+NumCloseIDs: 8

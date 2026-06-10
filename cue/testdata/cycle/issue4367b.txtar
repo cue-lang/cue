@@ -77,3 +77,16 @@ checkName: OUT.IMPORTS[0].objects.plain.b.metadata.name @test(eq, "sub-HASHED")
 -- out/errors.txt --
 [incomplete] OUT.IMPORTS.0.export.GENERATORS.0.OUT: undefined field: spec:
     ./main.cue:9:17
+-- out/eval/stats --
+Leaks:  33
+Freed:  175
+Reused: 126
+Allocs: 82
+Retain: 0
+
+Unifications: 175
+Conjuncts:    398
+Disjuncts:    4
+Notifications: 14
+
+NumCloseIDs: 161

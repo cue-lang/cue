@@ -1084,15 +1084,14 @@ issue3332: {
 -- out/todo.txt --
 v3 reports fewer position references in "field not allowed" errors (e.g. a.q.e has 1 position vs v2's 5). v3 correctly handles issue1867.three (close({}) + {...}) while v2 did not. v3 reports issue2241.b.x.r error vs v2 which also reports it. issue3924.three.t1 and t2 have extra "field not allowed" errors for #job.other in v3. v3 shows issue3924.four.A.foo as ~(issue3924.four.#B) via structure sharing.
 -- out/eval/stats --
-Leaks:  7
-Freed:  819
-Reused: 777
+Leaks:  6
+Freed:  817
+Reused: 774
 Allocs: 49
 Retain: 0
 
-Unifications: 790
-Conjuncts:    1942
+Unifications: 788
+Conjuncts:    1940
 Disjuncts:    6
-Notifications: 1
 
 NumCloseIDs: 585

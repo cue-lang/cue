@@ -159,3 +159,15 @@ retro: {
     ./in.cue:125:15
 [eval] retro.t1.err: error in call to __reclose: __reclose may only be used when explicitopen is enabled:
     ./old.cue:3:11
+-- out/eval/stats --
+Leaks:  0
+Freed:  281
+Reused: 250
+Allocs: 31
+Retain: 0
+
+Unifications: 206
+Conjuncts:    445
+Disjuncts:    0
+
+NumCloseIDs: 102

@@ -522,19 +522,19 @@ issue3694: simple: {
 @test(err, code=incomplete, at=issue3694.full.#step, contains="does not satisfy matchN", pos=[-29:9, -29:16, -22:9])
 @test(err, code=incomplete, at=issue3694.simple.#step, contains="does not satisfy matchN", pos=[-9:9, -9:16, -6:9])
 -- out/eval/stats --
-Leaks:  130
-Freed:  1058
-Reused: 1028
-Allocs: 160
+Leaks:  126
+Freed:  874
+Reused: 844
+Allocs: 156
 Retain: 0
 
-Unifications: 971
-Conjuncts:    1551
+Unifications: 907
+Conjuncts:    1487
 Disjuncts:    16
 
 NumCloseIDs: 486
 
-ConjunctInfos:       1211
+ConjunctInfos:       1147
 MaxConjunctInfos:    3
 MaxReqSets:          4
 MaxRedirect:         2

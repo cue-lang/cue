@@ -89,6 +89,11 @@ type TxTarTest struct {
 	// golden-file comparison. Tests that should not be affected by @test
 	// attributes (e.g. TestCompile) must leave this false.
 	Inline bool
+
+	// RecordStats, if true, indicates that evaluation statistics should be
+	// captured and recorded in the golden files (e.g., out/eval/stats) as part
+	// of the test run.
+	RecordStats bool
 }
 
 // A Test represents a single test based on a .txtar file.
@@ -493,11 +498,12 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			// raw text sections).
 			if x.Inline && isInlineMode(a) {
 				runner := &inlineRunner{
-					t:        t,
-					m:        m,
-					archive:  a,
-					dir:      filepath.Dir(filepath.Join(dir, fullpath)),
-					filePath: filepath.Join(dir, fullpath),
+					t:           t,
+					m:           m,
+					archive:     a,
+					dir:         filepath.Dir(filepath.Join(dir, fullpath)),
+					filePath:    filepath.Join(dir, fullpath),
+					recordStats: x.RecordStats,
 				}
 				runner.runArchive()
 				return

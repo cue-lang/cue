@@ -231,14 +231,14 @@ lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflict
 lists.eIncompat: v3 reports "incomplete" (list element type is abstract) while v2 reports "eval" (permanent type mismatch [int] vs [string]).
 Verdict: worsening -- v3 does not yet promote the type mismatch to a permanent eval error.
 -- out/eval/stats --
-Leaks:  0
-Freed:  547
-Reused: 507
-Allocs: 40
+Leaks:  9
+Freed:  697
+Reused: 625
+Allocs: 81
 Retain: 0
 
-Unifications: 518
-Conjuncts:    577
-Disjuncts:    17
+Unifications: 630
+Conjuncts:    891
+Disjuncts:    59
 
-NumCloseIDs: 35
+NumCloseIDs: 85

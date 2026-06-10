@@ -29,3 +29,15 @@ result: ({} & schema).export @test(eq, [
 	{name: "redis-"},
 	{name: "redis-"},
 ])
+-- out/eval/stats --
+Leaks:  2
+Freed:  44
+Reused: 27
+Allocs: 19
+Retain: 0
+
+Unifications: 35
+Conjuncts:    65
+Disjuncts:    4
+
+NumCloseIDs: 17

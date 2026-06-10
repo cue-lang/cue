@@ -52,22 +52,22 @@ nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 } @test(eq, {D: {id: {}} | {}})
 -- out/eval/stats --
-Leaks:  13915
-Freed:  11162
-Reused: 11058
-Allocs: 14019
+Leaks:  13889
+Freed:  10906
+Reused: 10802
+Allocs: 13993
 Retain: 0
 
-Unifications: 3219
-Conjuncts:    22751
-Disjuncts:    6534
+Unifications: 3175
+Conjuncts:    22523
+Disjuncts:    6402
 
-NumCloseIDs: 4115
+NumCloseIDs: 4099
 
-ConjunctInfos:       7501
+ConjunctInfos:       7472
 MaxConjunctInfos:    4
 MaxReqSets:          12
-MaxRedirect:         5
+MaxRedirect:         6
 -- out/todo.txt --
 New algorithm is better at trimming recursive disjunctions.
 Note that the old closedness implementation of V3 was able to reduce this to

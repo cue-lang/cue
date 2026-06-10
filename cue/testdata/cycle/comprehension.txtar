@@ -781,20 +781,20 @@ issue4100: {
 	@test(eq, {a: [0]})
 }
 -- out/eval/stats --
-Leaks:  91
+Leaks:  90
 Freed:  821
 Reused: 789
-Allocs: 123
+Allocs: 122
 Retain: 0
 
-Unifications: 554
-Conjuncts:    1547
+Unifications: 553
+Conjuncts:    1549
 Disjuncts:    147
 Notifications: 14
 
-NumCloseIDs: 594
+NumCloseIDs: 597
 
-ConjunctInfos:       1048
+ConjunctInfos:       1060
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1

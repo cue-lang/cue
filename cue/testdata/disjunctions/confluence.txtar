@@ -24,3 +24,15 @@ issue3993: full: {
 	addr: "10.10.10.10"
 	@test(eq, {addr: "10.10.10.10"})
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  8
+Reused: 2
+Allocs: 8
+Retain: 0
+
+Unifications: 6
+Conjuncts:    25
+Disjuncts:    4
+
+NumCloseIDs: 11

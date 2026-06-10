@@ -13,3 +13,13 @@ one_field: foo @test(eq, "foo value")
 package p
 
 two_field: foo @test(eq, "foo value")
+-- out/eval/stats --
+Leaks:  0
+Freed:  5
+Reused: 0
+Allocs: 5
+Retain: 0
+
+Unifications: 5
+Conjuncts:    6
+Disjuncts:    0

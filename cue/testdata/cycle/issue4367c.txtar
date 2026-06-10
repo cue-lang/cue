@@ -67,3 +67,15 @@ checkCfg: OUT.IMPORTS[0].cfg @test(eq, "sub-")
     ./main.cue:5:20
 [cycle] IN.spec: cycle with field: a.spec:
     ./main.cue:5:20
+-- out/eval/stats --
+Leaks:  2
+Freed:  76
+Reused: 33
+Allocs: 45
+Retain: 0
+
+Unifications: 66
+Conjuncts:    117
+Disjuncts:    4
+
+NumCloseIDs: 17

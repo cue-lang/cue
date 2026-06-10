@@ -19,3 +19,13 @@ s4: uint
   s3: (number){ &(>=-340282346638528859811704183484516925440, <=340282346638528859811704183484516925440) }
   s4: (int){ &(>=0, int) }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  7
+Reused: 0
+Allocs: 7
+Retain: 0
+
+Unifications: 7
+Conjuncts:    9
+Disjuncts:    0

@@ -78,3 +78,15 @@ fromJSON: {
 -- out/errors.txt --
 [incomplete] toJSON.x: error in call to encoding/json.Unmarshal: non-concrete value _:
     ./in.cue:61:5
+-- out/eval/stats --
+Leaks:  0
+Freed:  40
+Reused: 24
+Allocs: 16
+Retain: 0
+
+Unifications: 37
+Conjuncts:    53
+Disjuncts:    0
+
+NumCloseIDs: 4

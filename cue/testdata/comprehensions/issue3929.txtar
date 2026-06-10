@@ -208,10 +208,10 @@ correctly applying the default *"Always". Previously left without a default.
 full.cronjob.foobar.imagePullPolicy: same as above — default now propagates
 to the cronjob field itself.
 -- out/eval/stats --
-Leaks:  0
-Freed:  153
-Reused: 117
-Allocs: 36
+Leaks:  1
+Freed:  161
+Reused: 127
+Allocs: 35
 Retain: 0
 
 Unifications: 96

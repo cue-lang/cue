@@ -123,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "621f898d_493ed360",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2903,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T13:16:41Z",
+      "side": 1,
+      "message": "as discussed.",
+      "parentUuid": "4581b80e_21d2d9c3",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b29408b_3460a25e",
@@ -154,6 +172,24 @@
       "side": 1,
       "message": "Good question, actually. I would have thought it is an incomplete error, but what you suggest may be more pragmatic. But at least, I would say, that unlike with exists, the field must exist, though.",
       "parentUuid": "5b29408b_3460a25e",
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c57044c_e58fb975",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2909,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T13:16:41Z",
+      "side": 1,
+      "message": "To add for discussion.",
+      "parentUuid": "09e75c70_44fff427",
       "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -195,6 +231,30 @@
       "side": 1,
       "message": "Good catch.",
       "parentUuid": "e50f4015_9c9b7519",
+      "range": {
+        "startLine": 2912,
+        "startChar": 27,
+        "endLine": 2912,
+        "endChar": 33
+      },
+      "revId": "7a20952ac04e48723f9ec03769eee632cc3f5be4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09b7a084_4385c588",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2912,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T13:16:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93ccc755_5ffbad6a",
       "range": {
         "startLine": 2912,
         "startChar": 27,

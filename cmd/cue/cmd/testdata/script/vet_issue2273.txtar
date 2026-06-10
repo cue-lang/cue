@@ -1,0 +1,30 @@
+# Packages and files may be given in any order; these commands are equivalent.
+# Issue: https://cuelang.org/issue/2273
+
+# Two CUE files, either order.
+exec cue vet schema.cue pass.yml
+exec cue vet pass.yml schema.cue
+
+# A package before the data file.
+exec cue vet cue.test:schema pass.yml
+
+# A package after the data file: should also work.
+# TODO(#2273): a package listed after a file is wrongly parsed as a file.
+! exec cue vet pass.yml cue.test:schema
+stderr 'cannot combine file type and file name'
+
+# A bare scope qualifier still applies to the file that follows it,
+# even when that file name looks like a package.
+exec cue vet cue.test:schema yaml: pass.yml
+
+-- cue.mod/module.cue --
+module: "cue.test"
+language: version: "v0.9.0"
+-- schema.cue --
+package schema
+
+a: int
+b: string
+-- pass.yml --
+a: 123
+b: "a string"

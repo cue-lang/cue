@@ -6,9 +6,8 @@ exec cue export .:foo --out cue --package bar
 cmp stdout out
 
 # The same content as an individual CUE file: should also work.
-# TODO(#3671): wrongly reports a package clash.
-! exec cue export foo.cue --out cue --package bar
-stderr '"package" flag clashes with existing package name \(bar vs foo\)'
+exec cue export foo.cue --out cue --package bar
+cmp stdout out
 
 # With orphan data to merge, a mismatching --package must clash unless --force.
 ! exec cue export foo.cue data.yml --out cue --package bar

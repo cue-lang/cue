@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d677c04f_3f20559e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T10:27:23Z",
+      "side": 1,
+      "message": "assuming we\u0027re creating a new proposal issue for the reflect builtins, the issue references in this stack should all be updated",
+      "revId": "2d623a82d1565930c1be12b39368cc462e28a7a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

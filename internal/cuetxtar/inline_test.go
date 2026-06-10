@@ -935,3 +935,31 @@ func TestFileExperimentPrefix(t *testing.T) {
 		t.Errorf("fileExperimentPrefix(missing) = %q, want empty", got)
 	}
 }
+
+// TestDropGatedTodoPromotes verifies that an @test(eq:todo) promotion is dropped
+// when its todo failed under some @test(permute) ordering, and kept otherwise.
+// This prevents promoting a value that matches in source order but is still
+// order-dependent.
+func TestDropGatedTodoPromotes(t *testing.T) {
+	r := &inlineRunner{
+		todoFailedUnderPermute: map[string]bool{"medium.p1": true},
+		pendingInlineFillWrites: []inlineFillWrite{
+			// Gated on a todo that failed under a permutation — dropped.
+			{newAttrText: "promote-unstable", gatePath: cue.ParsePath("medium.p1")},
+			// Gated on a todo that passed every permutation — kept.
+			{newAttrText: "promote-ok", gatePath: cue.ParsePath("other.p2")},
+			// Ungated (ordinary fill) — always kept.
+			{newAttrText: "ungated"},
+		},
+	}
+	r.dropGatedTodoPromotes()
+
+	var got []string
+	for _, w := range r.pendingInlineFillWrites {
+		got = append(got, w.newAttrText)
+	}
+	want := []string{"promote-ok", "ungated"}
+	if !slices.Equal(got, want) {
+		t.Errorf("after dropGatedTodoPromotes: got %v, want %v", got, want)
+	}
+}

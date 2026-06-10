@@ -12,17 +12,28 @@ cmp stdout stdout.golden
 exec cue export --out cue -p blah pkg.cue x.json y.json
 cmp stdout stdout.golden
 
-# Case 4: CUE input with mis-matched package (with JSON)
-#
-# TODO: in the future we could allow "repackaging" via --force which would
-# cause this export to succeed with the package clause 'blah' in the result.
+# Case 4: CUE input with mis-matched package (with JSON) clashes,
+# unless --force repackages the merged result.
 ! exec cue export --out cue -p blah diffpkg.cue x.json y.json
 cmp stderr stderr.golden
+exec cue export --out cue -p blah diffpkg.cue x.json y.json --force
+cmp stdout stdout.golden
 
 # Case 5: -l places the exported CUE value at a path.
 # Regression test for https://cuelang.org/issue/1485
 exec cue export --out cue -p after -l 'newpath:' ./sub
 cmp stdout path.golden
+
+# Case 6: a single CUE file whose package already matches --package.
+# Regression test for https://cuelang.org/issue/3671
+exec cue export --out cue -p blah pkg.cue
+cmp stdout stdout.golden
+
+# Case 7: a single CUE file with a different package.
+# TODO(#3671): wrongly reports a clash; with no orphan data to merge,
+# --package should simply rename the output package.
+! exec cue export --out cue -p blah diffpkg.cue
+cmp stderr stderr.golden
 
 -- x.json --
 {

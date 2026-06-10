@@ -175,6 +175,14 @@ type inlineRunner struct {
 	// intentionally evaluate non-source-order variants, such as @test(permute)
 	// validation runs.
 	suppressWritebacks bool
+
+	// todoFailedUnderPermute records, by path string, @test(eq:todo) directives
+	// that failed when re-evaluated under a non-source ordering by @test(permute).
+	// Such a todo is order-dependent — it matches in source order but not in
+	// others — so it must not be promoted (see dropGatedTodoPromotes). Promoting
+	// it would turn the silent per-ordering todo failures into hard @test(eq)
+	// failures, breaking the permute on re-run.
+	todoFailedUnderPermute map[string]bool
 }
 
 // sinkOrSub returns the errSink if set, otherwise the given sub-test t.
@@ -949,10 +957,19 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		if cmpErr == nil {
 			t.Logf("WARNING: path %s: TODO eq:todo now passes — consider upgrading to @test(eq, %s)", path, exprStr)
 			if cuetest.UpdateGoldenFiles || cuetest.ForceUpdateGoldenFiles {
-				r.enqueueInlineFill(pa, promoteTodoAttr(pa))
+				r.enqueueTodoPromote(pa, path)
 			}
 		} else {
 			t.Logf("path %s: TODO eq:todo still failing: %v", path, cmpErr)
+			if r.suppressWritebacks {
+				// Failing under a non-source ordering (we're inside a
+				// @test(permute) run): the todo is order-dependent, so block its
+				// promotion below.
+				if r.todoFailedUnderPermute == nil {
+					r.todoFailedUnderPermute = map[string]bool{}
+				}
+				r.todoFailedUnderPermute[path.String()] = true
+			}
 		}
 		return
 	}
@@ -1184,5 +1201,23 @@ func (r *inlineRunner) enqueueInlineFill(pa parsedTestAttr, newAttrText string) 
 		attrOffset:  pa.srcAttr.Pos().Offset(),
 		attrLen:     len(pa.srcAttr.Text),
 		newAttrText: newAttrText,
+	})
+}
+
+// enqueueTodoPromote enqueues the promotion of an @test(eq:todo, ...) at path to
+// @test(eq, ...). The rewrite carries path as its gate: if the todo failed under
+// some @test(permute) ordering, dropGatedTodoPromotes discards it so the :todo
+// survives. Without this, a value that matches in source order but is still
+// order-dependent would be promoted, producing a test that fails when re-run.
+func (r *inlineRunner) enqueueTodoPromote(pa parsedTestAttr, path cue.Path) {
+	if r.suppressWritebacks || pa.srcAttr == nil {
+		return
+	}
+	r.pendingInlineFillWrites = append(r.pendingInlineFillWrites, inlineFillWrite{
+		fileName:    pa.srcFileName,
+		attrOffset:  pa.srcAttr.Pos().Offset(),
+		attrLen:     len(pa.srcAttr.Text),
+		newAttrText: promoteTodoAttr(pa),
+		gatePath:    path,
 	})
 }

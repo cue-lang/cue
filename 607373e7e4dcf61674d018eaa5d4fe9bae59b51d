@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25e89acb_6018eaf6",
+        "filename": "cue/testdata/builtins/allows.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Removed the empty out/eval/stats section — this test produces no eval stats, matching the other reflect tests (exists/isvalid/etc.) which carry no stats section.",
+      "parentUuid": "73971edc_f8b59e13",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "600bb457_6d069506",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "surely you wanted to resolve the XXX before mailing?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b254330_1230390a",
+        "filename": "cue/testdata/builtins/concrete.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Removed the XXX — struct-with-disjunction coverage already exists via concreteStructs.deep.b (disjunction with a default) and concreteDisjunctions (no-default cases).",
+      "parentUuid": "600bb457_6d069506",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bf85c69_78cb50dd",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Added a godoc for ResolveExists.",
+      "parentUuid": "f5c976cc_c0ed577e",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7cd38a77_76aecc8c",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "I\u0027d avoid using examples in comments unless strictly necessary, as it adds quite a lot of verbosity",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7583c33a_67ce9823",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Dropped the inline example.",
+      "parentUuid": "7cd38a77_76aecc8c",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fc6e430_ee1205d0",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Replaced the single-case switch with an if.",
+      "parentUuid": "48ef48a4_f070df71",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f0d2a7a_a45b3c66",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "nit: join the `false, nil` returns",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee07ee2d_89cfe479",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. There\u0027s now a single trailing `return false, nil`.",
+      "parentUuid": "0f0d2a7a_a45b3c66",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f843d00_7ceffc27",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Removed the commented-out defer block.",
+      "parentUuid": "f29a2699_24d9b5d1",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3fa3058_6ef6c4fd",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "ditto shortening godocs",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93a04379_a95c0444",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 829,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Shortened the IsValidExpr godoc.",
+      "parentUuid": "d3fa3058_6ef6c4fd",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +298,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf20a457_9418bd06",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Removed the commented-out inValidator lines.",
+      "parentUuid": "e4e76aa2_fe464f74",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d693ca3c_cb1289ac",
@@ -167,6 +329,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "nit: you can remove this line",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2106afea_6597ed14",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Removed the redundant `valid \u003d false` (it\u0027s already the zero value).",
+      "parentUuid": "d693ca3c_cb1289ac",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -188,6 +368,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74864154_e1052eee",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1576,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "I tried moving this onto BuiltinValidator (a noSelfValidator constructor plus an evalEarly method on the validator), but it just spread the logic across three locations without making it clearer, so I\u0027ve kept the original.\n\nIt\u0027s consistent with how matchN/matchIf are modeled — those are also *adt.Builtin, and a *BuiltinValidator is the applied form. This block handles the first call of a no-self validator (existsN/validN/concreteN): there\u0027s no \"self\" argument, so we evaluate eagerly to surface a permanent error and otherwise return the BuiltinValidator that gets applied during validation.",
+      "parentUuid": "e2886301_3586b803",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d63debb_0512b521",
@@ -201,6 +399,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "this should be called `existsN` for consistency",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "609b2dd0_8c1839b8",
+        "filename": "internal/core/compile/predeclared.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Renamed the Go var `existN` to `existsN`.",
+      "parentUuid": "2d63debb_0512b521",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -222,6 +438,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0aaa0f03_e818eb6f",
+        "filename": "internal/core/compile/reflect.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Added an `allows` section to doc/ref/spec.md (alongside exists/isValid/isConcrete), in the doc CL.",
+      "parentUuid": "4a6db0f5_a5d53bdc",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4ae635a_2802a7d1",
@@ -235,6 +469,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "these godocs are way too long, please shorten them significantly",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6d92b11_124d819c",
+        "filename": "internal/core/compile/reflect.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Shortened all the builtin godocs significantly.",
+      "parentUuid": "d4ae635a_2802a7d1",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -256,6 +508,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b130d0b6_ee9d6807",
+        "filename": "internal/core/compile/reflect.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Dropped the examples from the godocs.",
+      "parentUuid": "532097d9_efa7f46c",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f9de6c9_fa44ce32",
@@ -269,6 +539,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "why doesn\u0027t this share the code that `cue.Value.Validate(cue.Concrete(true))` already uses?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8579b399_b3e65ac7",
+        "filename": "internal/core/compile/reflect.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. isFullyConcrete now reuses adt.Validate(..., \u0026ValidateConfig{Concrete: true}) — the same check behind cue.Value.Validate(cue.Concrete(true)) — instead of hand-rolling the recursion. Since Validate expects an already-evaluated value, the vertex is finalized first (CompleteArcsOnly wasn\u0027t enough: inline-struct arguments like isConcrete({a, b}) otherwise came back incomplete rather than false).",
+      "parentUuid": "3f9de6c9_fa44ce32",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -290,6 +578,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a60e927a_191630c8",
+        "filename": "internal/core/compile/testdata/sync/builtins/concrete.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done — removed at the source; the sync copy is regenerated from cue/testdata/builtins/concrete.txtar.",
+      "parentUuid": "a3dd0ed0_6d92893b",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ab668da_1cf0bf09",
@@ -303,6 +609,24 @@
       "writtenOn": "2026-06-09T10:58:11Z",
       "side": 1,
       "message": "revert?",
+      "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d32b4c4f_62a7c6f7",
+        "filename": "internal/core/dep/testdata/resolvedep.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-10T10:09:03Z",
+      "side": 1,
+      "message": "Done. Reverted resolvedep.txtar to its original — it uses `!\u003d _|_`, not a reflect builtin, so the `@experiment(reflect)` line and the whitespace edit were unintended.",
+      "parentUuid": "7ab668da_1cf0bf09",
       "revId": "607373e7e4dcf61674d018eaa5d4fe9bae59b51d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,16 @@
+# Regression test for a panic in encoding/yaml.Marshal: it re-roots its
+# argument under a fresh OpContext, and typo checking indexed that context's
+# containment table with a stale defID carried over from the original
+# evaluation, panicking with "index out of range".
+-- in.cue --
+import "encoding/yaml"
+
+#D: {
+	A=a: b: {...}
+	out: (A & {}).b
+}
+x: #D
+x: a: b: {
+	m:  yaml.Marshal(_v) @test(eq, "x: 1\n")
+	_v: {x: 1}
+}

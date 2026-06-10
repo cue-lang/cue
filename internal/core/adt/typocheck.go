@@ -1041,7 +1041,9 @@ outer:
 	}
 
 	var parentConjuncts []conjunctInfo
-	if p := v.Parent; p != nil && p.state != nil {
+	// As with parentReqs above, only consult parent conjuncts from the same
+	// OpContext, else a foreign defID indexes the containment table out of range.
+	if p := v.Parent; p != nil && p.state != nil && p.state.opID == n.opID {
 		parentConjuncts = p.state.conjunctInfo
 	}
 

@@ -82,9 +82,9 @@ invalidTable: {
 }
 valid: {
 	err: {
-		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): invalid UUID format
-		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): invalid UUID length: 30
-		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): invalid UUID length: 37
+		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): valid.err.a: invalid UUID format
+		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): valid.err.b: invalid UUID length: 30
+		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): valid.err.c: invalid UUID length: 37
 	}
 	ok: {
 		a: "052ef62d-7223-58b6-a551-c1deee46d401"
@@ -132,9 +132,9 @@ diff old new
  }
  valid: {
 +	err: {
-+		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): invalid UUID format
-+		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): invalid UUID length: 30
-+		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): invalid UUID length: 37
++		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): valid.err.a: invalid UUID format
++		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): valid.err.b: invalid UUID length: 30
++		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): valid.err.c: invalid UUID length: 37
 +	}
  	ok: {
  		a: "052ef62d-7223-58b6-a551-c1deee46d401"

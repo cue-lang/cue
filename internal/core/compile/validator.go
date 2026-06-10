@@ -176,11 +176,6 @@ func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.B
 	b, _ := n.BaseValue.(*adt.Bottom)
 	if b != nil {
 		b := ctx.NewErrf("%d matched, expected %v", count, bound)
-		// This error is wrapped by the validator's context error, which locates
-		// it at the validated value; a path here would duplicate that location.
-		if ve, ok := b.Err.(*adt.ValueError); ok {
-			b.Err = ve.WithoutPath()
-		}
 
 		// By default we should mark the error as incomplete, but check if we
 		// know for sure it will fail.

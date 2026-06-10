@@ -1,7 +1,8 @@
-# pkg/encoding: yaml.Marshal errors now identify the failing field. When a value
-# passed to yaml.Marshal contains conflicts, each is reported at its field within
-# the marshaled value (out.a, out.b) rather than all at the Marshal call site
-# (out), where sharing a position could collapse them and hide all but one.
+# pkg/encoding: yaml.Marshal hides errors. When a value passed to yaml.Marshal
+# contains multiple distinct errors, they are all reported at the same position
+# (the Marshal call site). Error deduplication then collapses them by position,
+# so only the first conflict is shown. This captures the current, incorrect
+# behavior: the "conflicting values 4 and 3" error below is missing.
 # https://cuelang.org/issue/2718
 -- in.cue --
 import "encoding/yaml"
@@ -9,11 +10,11 @@ import "encoding/yaml"
 out: yaml.Marshal({a: 1 & 2, b: 3 & 4})
 -- out/yaml-v3 --
 Errors:
-out.a: error in call to encoding/yaml.Marshal: conflicting values 2 and 1:
+out: error in call to encoding/yaml.Marshal: conflicting values 2 and 1:
     ./in.cue:3:6
     ./in.cue:3:23
     ./in.cue:3:27
-out.b: error in call to encoding/yaml.Marshal: conflicting values 4 and 3:
+out: error in call to encoding/yaml.Marshal: conflicting values 4 and 3:
     ./in.cue:3:6
     ./in.cue:3:33
     ./in.cue:3:37

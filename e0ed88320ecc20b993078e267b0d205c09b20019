@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e5ad2a0_54f1a025",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T10:20:53Z",
+      "side": 1,
+      "message": "this feels like an odd concatenation of commit messages. I would join them more naturally.",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ea87fb1_b9a508a8",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T10:20:53Z",
+      "side": 1,
+      "message": "I\u0027m reluctant to reuse the very old issue 943 here, because:\n* it\u0027s very out of date. for example, it doesn\u0027t define `allows` nor `isValid`\n* it\u0027s too generic. it also includes other builtins like `must` or `range`\n* it already has unrelated discussion in it. so any proposal feedback would feel out of place\n\nSo I think we should create a new mini-proposal for these reflect builtins, reflecting the spec design that\u0027s in this stack. It may seem a little silly, but that way people can comment on it.\n\nAnd then I would close 943 in favor of this new proposal plus separate issues for any other builtins that we still think may be useful. For example, \"must\" already has its own separate issue in https://github.com/cue-lang/cue/issues/575.",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12d7a124_9c1287a1",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T10:20:53Z",
+      "side": 1,
+      "message": "why are we declaring a new Experiment type? we haven\u0027t done this in the past, so this feels inconsistent and unnecessary.",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0415323_48bf3d7f",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T10:20:53Z",
+      "side": 1,
+      "message": "I think the name \"reflect\" may be a bit too generic. For example, if we want to add a language feature or builtins later on to inspect a value\u0027s optional and required fields, or to otherwise do any sort of type/schema reflection, then it would be difficult to add an experiment for it as we already had a \"reflect\" experiment.\n\nhow about any of these, to more clearly say \"the builtins that replace comparisons to bottom\":\n* `compbottom`\n* `bottombuiltins`\n* `reflectbuiltins` (though this one is not as precise)",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "148f7529_7f82cbad",
+        "filename": "internal/cuetxtar/inline.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-10T10:20:53Z",
+      "side": 1,
+      "message": "why not reuse cue/parser or any of our other standard apis to locate the experiment attribute value?",
+      "revId": "e0ed88320ecc20b993078e267b0d205c09b20019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -8,10 +8,8 @@ exec cue vet pass.yml schema.cue
 # A package before the data file.
 exec cue vet cue.test:schema pass.yml
 
-# A package after the data file: should also work.
-# TODO(#2273): a package listed after a file is wrongly parsed as a file.
-! exec cue vet pass.yml cue.test:schema
-stderr 'cannot combine file type and file name'
+# A package after the data file: also works.
+exec cue vet pass.yml cue.test:schema
 
 # A bare scope qualifier still applies to the file that follows it,
 # even when that file name looks like a package.

@@ -76,20 +76,17 @@ func Instances(args []string, c *Config) []*build.Instance {
 		args[i] = pkgpath.ToSlash(p, c.pathOS)
 	}
 
-	// TODO: This requires packages to be placed before files. At some point this
-	// could be relaxed.
-	i := 0
+	// Packages and files may be interspersed in any order; split them apart.
+	pkgArgs, otherArgs := filetypes.SplitArgs(args)
 	isAbsPkg := false
-	for ; i < len(args) && filetypes.IsPackage(args[i]); i++ {
-		if isAbsVersionPackage(args[i]) {
-			if i > 0 {
-				return []*build.Instance{c.newErrInstance(fmt.Errorf("only a single package with absolute version may be specified"))}
-			}
+	for _, arg := range pkgArgs {
+		if isAbsVersionPackage(arg) {
 			isAbsPkg = true
 		}
 	}
-	pkgArgs := args[:i]
-	otherArgs := args[i:]
+	if isAbsPkg && len(pkgArgs) > 1 {
+		return []*build.Instance{c.newErrInstance(fmt.Errorf("only a single package with absolute version may be specified"))}
+	}
 	otherFiles, err := filetypes.ParseArgs(otherArgs)
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}

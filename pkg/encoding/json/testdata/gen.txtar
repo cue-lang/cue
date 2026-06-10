@@ -105,29 +105,29 @@ unmarshalStream: {
 }
 -- out/json --
 Errors:
-validate.invalidDisjuntion.result.a: error in call to encoding/json.Validate: 2 errors in empty disjunction::
+validate.invalidDisjuntion.result: error in call to encoding/json.Validate: 2 errors in empty disjunction::
     ./in.cue:6:10
-validate.invalidDisjuntion.result.a: error in call to encoding/json.Validate: conflicting values 1 and 10:
+validate.invalidDisjuntion.result: error in call to encoding/json.Validate: conflicting values 1 and 10:
     ./in.cue:6:10
     ./in.cue:14:42
     json.Validate:1:1
     json.Validate:1:6
-validate.invalidDisjuntion.result.a: error in call to encoding/json.Validate: conflicting values 2 and 10:
+validate.invalidDisjuntion.result: error in call to encoding/json.Validate: conflicting values 2 and 10:
     ./in.cue:6:10
     ./in.cue:14:46
     json.Validate:1:1
     json.Validate:1:6
-validate.multiConflict.result.field1: error in call to encoding/json.Validate: conflicting values "bad1" and int (mismatched types string and int):
+validate.multiConflict.result: error in call to encoding/json.Validate: conflicting values "bad1" and int (mismatched types string and int):
     ./in.cue:6:10
     ./in.cue:26:19
     json.Validate:1:1
     json.Validate:1:12
-validate.multiConflict.result.field2: error in call to encoding/json.Validate: conflicting values "bad2" and int (mismatched types string and int):
+validate.multiConflict.result: error in call to encoding/json.Validate: conflicting values "bad2" and int (mismatched types string and int):
     ./in.cue:6:10
     ./in.cue:26:32
     json.Validate:1:1
     json.Validate:1:30
-validate.t2.result.a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3):
+validate.t2.result: error in call to encoding/json.Validate: invalid value 10 (out of bound <3):
     ./in.cue:6:10
     ./in.cue:9:27
     json.Validate:1:6
@@ -152,7 +152,7 @@ validate: {
 		schema: {
 			a: <3
 		}
-		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: a: invalid value 10 (out of bound <3)
+		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.result.a: invalid value 10 (out of bound <3)
 	}
 	disjunctionRequired: {
 		str: *"{\"a\":10}" | string
@@ -177,7 +177,7 @@ validate: {
 		schema: {
 			a: 1 | 2
 		}
-		result: _|_ // validate.invalidDisjuntion.result: error in call to encoding/json.Validate: a: 2 errors in empty disjunction: (and 2 more errors)
+		result: _|_ // validate.invalidDisjuntion.result: error in call to encoding/json.Validate: validate.invalidDisjuntion.result.a: 2 errors in empty disjunction: (and 2 more errors)
 	}
 
 	// Issue #2395
@@ -197,7 +197,7 @@ validate: {
 			field1: int
 			field2: int
 		}
-		result: _|_ // validate.multiConflict.result: error in call to encoding/json.Validate: field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)
+		result: _|_ // validate.multiConflict.result: error in call to encoding/json.Validate: validate.multiConflict.result.field1: conflicting values "bad1" and int (mismatched types string and int) (and 1 more errors)
 	}
 }
 issue3932: {

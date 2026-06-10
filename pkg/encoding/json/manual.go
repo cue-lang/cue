@@ -148,7 +148,6 @@ func validate(c *adt.OpContext, b []byte, v pkg.Schema) (bool, error) {
 	}
 
 	vx := adt.Unify(c, value.Vertex(v2), value.Vertex(v))
-	vx.Unroot()
 	v = value.Make(c, vx)
 
 	// Note that we do not return early on v.Err here: doing so would only

@@ -8,15 +8,11 @@ exec cue vet pass.yml schema.cue
 # A package before the data file.
 exec cue vet cue.test:schema pass.yml
 
-# A package after the data file: should also work.
-# TODO(#2273): a package listed after a file is wrongly parsed as a file.
-! exec cue vet pass.yml cue.test:schema
-stderr 'cannot combine file type and file name'
+# A package after the data file: also works.
+exec cue vet pass.yml cue.test:schema
 
-# A package interspersed between two data files: should also work.
-# TODO(#2273): a package listed after a file is wrongly parsed as a file.
-! exec cue vet pass.yml cue.test:schema pass2.yml
-stderr 'cannot combine file type and file name'
+# A package interspersed between two data files: also works.
+exec cue vet pass.yml cue.test:schema pass2.yml
 
 # A bare scope qualifier still applies to the file that follows it,
 # even when that file name looks like a package.
@@ -27,11 +23,10 @@ exec cue vet cue.test:schema yaml: pass.yml
 # extension, so on its own it is treated as a package (see below).
 exec cue vet schema.cue yaml: noext
 
-# Without the scope qualifier, "noext" is wrongly treated as a file with no
-# recognized encoding rather than as a package.
-# TODO(#2273): "noext" should be recognized as a package.
+# Without the scope qualifier, "noext" is treated as a package rather than a
+# file, and there is no such package to load.
 ! exec cue vet schema.cue noext
-stderr 'no encoding specified for file "noext"'
+stderr 'cannot be imported as a CUE package'
 
 -- cue.mod/module.cue --
 module: "cue.test"

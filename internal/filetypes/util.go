@@ -70,3 +70,32 @@ func IsPackage(s string) bool {
 	// the requirement that packages be dots if it is clear that the package
 	// name will not interfere with command names in all circumstances.
 }
+
+// SplitArgs partitions command-line arguments into package and file arguments,
+// preserving order within each group, so the two may be interspersed in any
+// order. A bare scope qualifier such as "json:" applies to the files after it,
+// so once seen the rest are files even if they look like packages (e.g.
+// "json: somefile"); the file arguments are returned verbatim for [ParseArgs].
+func SplitArgs(args []string) (pkgArgs, otherArgs []string) {
+	fileScope := false
+	for _, arg := range args {
+		switch {
+		case isScopeQualifier(arg):
+			fileScope = true
+			otherArgs = append(otherArgs, arg)
+		case !fileScope && IsPackage(arg):
+			pkgArgs = append(pkgArgs, arg)
+		default:
+			otherArgs = append(otherArgs, arg)
+		}
+	}
+	return pkgArgs, otherArgs
+}
+
+// isScopeQualifier reports whether a command-line argument is a bare file type
+// scope qualifier, such as "json:" or "cue+schema:", which carries no file name
+// of its own but applies to the files after it. Contrast [IsPackage].
+func isScopeQualifier(s string) bool {
+	scope, file, found := cutScope(s)
+	return found && scope != "" && file == ""
+}

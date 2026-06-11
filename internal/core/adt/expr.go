@@ -395,7 +395,7 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state Flags) Value {
 
 	switch k := v.Kind(); k {
 	case IntKind, FloatKind, NumberKind, StringKind, BytesKind:
-	case NullKind, StructKind, ListKind:
+	case NullKind, StructKind, ListKind, BoolKind:
 		if x.Op != NotEqualOp && x.Op != EqualOp {
 			err := ctx.NewPosf(Pos(x.Expr),
 				"cannot use %s for bound %s", k, x.Op)
@@ -407,7 +407,7 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state Flags) Value {
 	default:
 		mask := IntKind | FloatKind | NumberKind | StringKind | BytesKind
 		if x.Op == NotEqualOp || x.Op == EqualOp {
-			mask |= NullKind | StructKind | ListKind
+			mask |= NullKind | StructKind | ListKind | BoolKind
 		}
 		if k&mask != 0 {
 			ctx.addErrf(IncompleteError, token.NoPos, // TODO(errors): use ctx.pos()?
@@ -1556,7 +1556,12 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 		return nil
 	}
 	if builtin.IsValidator(len(args)) {
-		return &BuiltinValidator{call, builtin, args}
+		return &BuiltinValidator{
+			Src:     call,
+			Builtin: builtin,
+			Args:    args,
+			Env:     c.Env(0),
+		}
 	}
 	callCtx.args = args
 	result := builtin.call(callCtx)
@@ -1750,6 +1755,8 @@ type BuiltinValidator struct {
 	Src     *CallExpr
 	Builtin *Builtin
 	Args    []Value // any but the first value
+
+	Env *Environment
 }
 
 func (x *BuiltinValidator) Source() ast.Node {

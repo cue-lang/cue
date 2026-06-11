@@ -1,0 +1,12 @@
+path=example.com/localmod@v1
+version=v1.0.0
+-- want --
+valid:
+cue.mod/module.cue
+
+omitted:
+
+invalid:
+cue.mod/local-module.cue: cue.mod/local-module.cue holds development-time configuration and is never part of a published module
+-- cue.mod/module.cue --
+-- cue.mod/local-module.cue --

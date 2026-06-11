@@ -1209,6 +1209,11 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 	//
 	//     #a: b     // this node is currently not shared, but could be.
 	//     b: {c: 1}
+	//
+	// One exception: a close() result holds its non-recursive closedness on a
+	// wrapper vertex (see closeBuiltin); capture it before dereferencing,
+	// which would otherwise discard it.
+	closed := v.ClosedNonRecursive
 	v = v.DerefValue()
 	if x, ok := v.BaseValue.(*Disjunction); ok {
 		for _, v := range x.Values {
@@ -1241,7 +1246,7 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		}
 	}
 
-	if v.IsOpenStruct() || v.Lookup(f) != nil {
+	if (!closed && v.IsOpenStruct()) || v.Lookup(f) != nil {
 		return true
 	}
 

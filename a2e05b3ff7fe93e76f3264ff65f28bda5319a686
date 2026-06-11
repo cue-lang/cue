@@ -16,6 +16,24 @@
       "message": "Might be worth having a few more test cases that exercise some of the edge cases (e.g. having a scope qualifier followed by something that might otherwise be interpreted as a package) ?",
       "revId": "a2e05b3ff7fe93e76f3264ff65f28bda5319a686",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a549c217_9ded72fb",
+        "filename": "cmd/cue/cmd/testdata/script/vet_issue2273.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-11T20:55:26Z",
+      "side": 1,
+      "message": "Done. Added two more cases: a package interspersed between two data files (\"pass.yml cue.test:schema pass2.yml\"), and the scope-qualifier edge case you mention. For the latter, \"noext\" has no extension so on its own it is treated as a package, but \"yaml: noext\" forces it to be read as a file; a contrasting case asserts that \"schema.cue noext\" without the scope qualifier is parsed as a (non-existent) package.",
+      "parentUuid": "89c2f5a4_3208cbca",
+      "revId": "a2e05b3ff7fe93e76f3264ff65f28bda5319a686",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

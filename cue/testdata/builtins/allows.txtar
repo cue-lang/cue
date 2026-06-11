@@ -1,0 +1,44 @@
+# Tests for the allows builtin: reports whether a given selector is
+# allowed on an object. Delegates to Vertex.Accept.
+
+-- in.cue --
+@experiment(predicates)
+
+// Open struct: any string label allowed.
+openStruct: {
+	s: {a: 1, b: 2}
+	yesA:  allows(s, "a")    @test(eq, true)
+	yesNo: allows(s, "nope") @test(eq, true)
+}
+
+// Closed struct: only declared labels allowed.
+closedStruct: {
+	#Def: {a: int, b?: int}
+	yesA: allows(#Def, "a") @test(eq, true)
+	yesB: allows(#Def, "b") @test(eq, true)
+	noC:  allows(#Def, "c") @test(eq, false)
+
+	d: close({a: 1})
+	noD: allows(d, "b") @test(eq, false) // closed, "b" not allowed
+}
+
+// Open list: indices below length are valid, beyond are still allowed.
+openList: {
+	xs: [1, 2, 3, ...]
+	in0: allows(xs, 0) @test(eq, true)
+	in2: allows(xs, 2) @test(eq, true)
+	in5: allows(xs, 5) @test(eq, true)
+}
+
+// Closed list: indices below length valid, beyond rejected.
+closedList: {
+	xs: [1, 2, 3]
+	in0:  allows(xs, 0) @test(eq, true)
+	in2:  allows(xs, 2) @test(eq, true)
+	oob3: allows(xs, 3) @test(eq, false)
+}
+
+// Closing a struct inline as a builtin argument currently loses its
+// closedness, so this wrongly reports true; it should be false, just as the
+// field-bound form (closedStruct.noD above) reports.
+inlineClose: allows(close({a: 1}), "b") @test(eq, true) @test(eq:todo, false)

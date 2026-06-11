@@ -19,6 +19,36 @@ import (
 	"cuelang.org/go/internal/cueexperiment"
 )
 
+// allows reports whether label, a string field name or integer list index, is
+// permitted on the struct or list s, consulting closedness via
+// [adt.Vertex.Accept]. It answers the structural question "may this field exist
+// here", as opposed to [exists], which reports whether it is present now.
+var allows = &adt.Builtin{
+	Name:       "allows",
+	Experiment: cueexperiment.Predicates,
+	Params: []adt.Param{
+		{Value: &adt.BasicType{K: adt.StructKind | adt.ListKind}},
+		{Value: &adt.BasicType{K: adt.StringKind | adt.IntKind}},
+	},
+	Result: adt.BoolKind,
+	Func: func(call adt.BuiltinCallContext) adt.Expr {
+		c := call.OpContext()
+
+		v, ok := call.Value(0).(*adt.Vertex)
+		if !ok {
+			return c.NewErrf("allows: first argument must be a struct or list")
+		}
+
+		key := call.Value(1)
+		sel := c.Label(call.Expr(1), key)
+		if c.HasErr() {
+			return nil
+		}
+
+		return &adt.Bool{Src: call.Expr(0).Source(), B: v.Accept(c, sel)}
+	},
+}
+
 // exists reports whether its argument, which must be a field reference,
 // selector, or index expression, refers to a regular member that is present
 // when the call is evaluated. Optional or required-but-unset fields, fields not

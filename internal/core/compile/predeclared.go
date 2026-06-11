@@ -77,6 +77,8 @@ func predeclared(n *ast.Ident) adt.Expr {
 	case "__test_experiment":
 		return testExperiment
 
+	case "allows", "__allows":
+		return allows
 	case "exists", "__exists":
 		return exists
 	case "existsN", "__existsN":

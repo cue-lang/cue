@@ -115,6 +115,24 @@
       "message": "It is kinda unfortunate that reversing the order changes the error, and that we only get one position indicated.",
       "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9baec24_5ca6cd87",
+        "filename": "encoding/ini/decode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-11T08:53:39Z",
+      "side": 1,
+      "message": "The change in error and position is intended, because in the first test case it\u0027s a property that introduces the conflict, and in the second case it\u0027s a section. It\u0027s perhaps up for debate what the best error messages and positions for these would be, but for now I think this is an improvement in consistency.",
+      "parentUuid": "881165e1_e7248721",
+      "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

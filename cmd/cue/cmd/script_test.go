@@ -39,7 +39,6 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociref"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
-	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
@@ -480,8 +479,7 @@ func TestX(t *testing.T) {
 			continue
 		}
 
-		args, err := shlex.Split(cmd)
-		check(err)
+		args := splitArgs(cmd)
 
 		c, _ := cuecmd.New(args[1:])
 		b := &bytes.Buffer{}
@@ -492,6 +490,36 @@ func TestX(t *testing.T) {
 		return
 	}
 	t.Fatal("NO COMMAND FOUND")
+}
+
+// splitArgs splits a testscript command line into arguments: space-separated,
+// with single quotes grouping text. Unlike general shell splitting it ignores
+// double quotes, matching how testscript itself parses these lines.
+//
+// This is a simplified version of testscript's own parser; it omits the
+// doubled-quote literal escape and env expansion, as neither is needed to
+// replay the first "exec cue" command for debugging in TestX.
+func splitArgs(line string) []string {
+	var args []string
+	var cur []byte
+	inArg, quoted := false, false
+	for i := 0; i < len(line); i++ {
+		switch c := line[i]; {
+		case c == '\'':
+			quoted, inArg = !quoted, true
+		case !quoted && (c == ' ' || c == '\t'):
+			if inArg {
+				args = append(args, string(cur))
+				cur, inArg = cur[:0], false
+			}
+		default:
+			cur, inArg = append(cur, c), true
+		}
+	}
+	if inArg {
+		args = append(args, string(cur))
+	}
+	return args
 }
 
 func TestMain(m *testing.M) {

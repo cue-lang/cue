@@ -9,7 +9,6 @@ require (
 	github.com/emicklei/proto v1.14.3
 	github.com/go-quicktest/qt v1.102.0
 	github.com/google/go-cmp v0.7.0
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1

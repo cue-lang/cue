@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c5483f2_05c27375",
+        "filename": "cue/testdata/builtins/056_issue314.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-11T11:51:49Z",
+      "side": 1,
+      "message": "This is iffy. It is `s` within #U.out, but the given path does not exist as such. It should probably be a nested message.",
+      "revId": "4575273607805e9e4c25f1af366a01a0d105ad00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ce225df_c9bbce64",
+        "filename": "cue/testdata/builtins/issue_3567.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-11T11:51:49Z",
+      "side": 1,
+      "message": "This seems incorrect. What does 0 mean in this case?",
+      "revId": "4575273607805e9e4c25f1af366a01a0d105ad00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c588cfe_1a1154ff",
+        "filename": "cue/testdata/builtins/matchif.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-11T11:51:49Z",
+      "side": 1,
+      "message": "Maybe okay in practice, but technically not entirely correct. Would be acceptable, but should be provided with a footnote.",
+      "revId": "4575273607805e9e4c25f1af366a01a0d105ad00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

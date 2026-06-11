@@ -23,8 +23,20 @@ import (
 // use the init data directly without copying into
 // read-write memory.
 
-//go:embed fileinfo.dat
-var fileInfoDataBytes []byte
+// The toFile lookup is split across three tables to avoid embedding the
+// redundant full cross product of (mode, file extension, tag set). Results that
+// are the same for every extension are stored once in fileinfo_indep.dat, keyed
+// by (mode, tag set); the rest are in fileinfo_dep.dat, keyed per-extension.
+// Both reference a result by index into fileinfo_results.dat.
+
+//go:embed fileinfo_dep.dat
+var fileInfoDepBytes []byte
+
+//go:embed fileinfo_indep.dat
+var fileInfoIndepBytes []byte
+
+//go:embed fileinfo_results.dat
+var fileInfoResultsBytes []byte
 
 //go:embed fromfile.dat
 var fromFileDataBytes []byte
@@ -154,15 +166,26 @@ var (
 )
 
 func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors.Error) {
-	key := make([]byte, 5)
-	genstruct.PutSet(key, 2, 3, allTopLevelTags_rev, maps.Keys(sc.topLevel))
-	genstruct.PutEnum(key, 1, 1, allFileExts_rev, 17, fileExt(filename))
-	genstruct.PutUint64(key, 0, 1, uint64(mode))
-
-	data, ok := genstruct.FindRecord(fileInfoDataBytes, 5+6, key)
-	if !ok {
-		return nil, errors.Newf(token.NoPos, "invalid tag combination") // TODO what error would be best?
+	// Try the extension-dependent table first; a miss means the result does not
+	// depend on the extension, so fall back to the extension-independent table.
+	var resultIndex int
+	depKey := make([]byte, 5)
+	genstruct.PutSet(depKey, 2, 3, allTopLevelTags_rev, maps.Keys(sc.topLevel))
+	genstruct.PutEnum(depKey, 1, 1, allFileExts_rev, 17, fileExt(filename))
+	genstruct.PutUint64(depKey, 0, 1, uint64(mode))
+	if data, ok := genstruct.FindRecord(fileInfoDepBytes, 5+1, depKey); ok {
+		resultIndex = int(genstruct.GetUint64(data, 0, 1))
+	} else {
+		indepKey := make([]byte, 4)
+		genstruct.PutSet(indepKey, 1, 3, allTopLevelTags_rev, maps.Keys(sc.topLevel))
+		genstruct.PutUint64(indepKey, 0, 1, uint64(mode))
+		data, ok := genstruct.FindRecord(fileInfoIndepBytes, 4+1, indepKey)
+		if !ok {
+			return nil, errors.Newf(token.NoPos, "invalid tag combination") // TODO what error would be best?
+		}
+		resultIndex = int(genstruct.GetUint64(data, 0, 1))
 	}
+	data := fileInfoResultsBytes[resultIndex*6:]
 
 	switch e := internal.ErrorKind(genstruct.GetUint64(data, 3, 1)); e {
 	default:

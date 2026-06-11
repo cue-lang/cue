@@ -23,8 +23,20 @@ import (
 // use the init data directly without copying into
 // read-write memory.
 
-//go:embed fileinfo.dat
-var fileInfoDataBytes []byte
+// The toFile lookup is split across three tables to avoid embedding the
+// redundant full cross product of (mode, file extension, tag set). Results that
+// are the same for every extension are stored once in fileinfo_indep.dat, keyed
+// by (mode, tag set); the rest are in fileinfo_dep.dat, keyed per-extension.
+// Both reference a result by index into fileinfo_results.dat.
+
+//go:embed fileinfo_dep.dat
+var fileInfoDepBytes []byte
+
+//go:embed fileinfo_indep.dat
+var fileInfoIndepBytes []byte
+
+//go:embed fileinfo_results.dat
+var fileInfoResultsBytes []byte
 
 //go:embed fromfile.dat
 var fromFileDataBytes []byte
@@ -35,7 +47,9 @@ func init() {
 	}
 }
 
-{{.ToFileParams.GenInit .Generated}}
+{{.ToFileDepParams.GenInit .Generated}}
+
+{{.ToFileIndepParams.GenInit .Generated}}
 
 {{.ToFileResult.GenInit .Generated}}
 
@@ -44,15 +58,27 @@ func init() {
 {{.FromFileResult.GenInit .Generated}}
 
 func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors.Error) {
-	key := make([]byte, {{.ToFileParams.Size}})
-	{{.ToFileParams.Tags.GenPut "key" "maps.Keys(sc.topLevel)"}}
-	{{.ToFileParams.FileExt.GenPut "key" "fileExt(filename)"}}
-	{{.ToFileParams.Mode.GenPut "key" "mode"}}
-
-	data, ok := genstruct.FindRecord(fileInfoDataBytes, {{.ToFileParams.Size}}+{{.ToFileResult.Size}}, key)
-	if !ok {
-		return nil, errors.Newf(token.NoPos, "invalid tag combination")		// TODO what error would be best?
+	var resultIndex int
+	depKey := make([]byte, {{.ToFileDepParams.Size}})
+	{{.ToFileDepParams.Tags.GenPut "depKey" "maps.Keys(sc.topLevel)"}}
+	{{.ToFileDepParams.FileExt.GenPut "depKey" "fileExt(filename)"}}
+	{{.ToFileDepParams.Mode.GenPut "depKey" "mode"}}
+	if data, ok := genstruct.FindRecord(fileInfoDepBytes, {{.ToFileDepParams.Size}}+{{.ToFileResultIndex.Size}}, depKey); ok {
+		// The result is in the extension-dependent table.
+		resultIndex = {{.ToFileResultIndex.Index.GenGet "data"}}
+	} else {
+		// The result does not depend on the extension,
+		// so fall back to the extension-independent table.
+		indepKey := make([]byte, {{.ToFileIndepParams.Size}})
+		{{.ToFileIndepParams.Tags.GenPut "indepKey" "maps.Keys(sc.topLevel)"}}
+		{{.ToFileIndepParams.Mode.GenPut "indepKey" "mode"}}
+		data, ok := genstruct.FindRecord(fileInfoIndepBytes, {{.ToFileIndepParams.Size}}+{{.ToFileResultIndex.Size}}, indepKey)
+		if !ok {
+			return nil, errors.Newf(token.NoPos, "invalid tag combination")		// TODO what error would be best?
+		}
+		resultIndex = {{.ToFileResultIndex.Index.GenGet "data"}}
 	}
+	data := fileInfoResultsBytes[resultIndex*{{.ToFileResult.Size}}:]
 
 	switch e := {{.ToFileResult.Error.GenGet "data"}}; e {
 	default:

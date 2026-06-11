@@ -45,13 +45,14 @@ import (
 
 type tmplParams struct {
 	TagTypes                   map[string]filetypes.TagType
-	ToFileParams               *genToFileParams
+	ToFileDepParams            *genToFileDepParams
+	ToFileIndepParams          *genToFileIndepParams
 	ToFileResult               *genToFileResult
+	ToFileResultIndex          *genResultIndex
 	FromFileParams             *genFromFileParams
 	FromFileResult             *genFromFileResult
 	SubsidiaryBoolTagFuncCount int
 	SubsidiaryTagFuncCount     int
-	Data                       string
 	// Generated is used by the generation code to avoid
 	// generating the same global identifier twice.
 	Generated map[string]bool
@@ -93,36 +94,13 @@ type fileResult struct {
 	tags []string
 }
 
-func (r *fileResult) appendRecord(data []byte, paramsStruct *genToFileParams, resultStruct *genToFileResult) []byte {
-	recordSize := paramsStruct.Size() + resultStruct.Size()
-	data = slices.Grow(data, recordSize)
-	data = data[:len(data)+recordSize]
-	record := data[len(data)-recordSize:]
-
-	// Write the key part of the record.
-	param := slices.Clip(record[:paramsStruct.Size()])
-	paramsStruct.FileExt.Put(param, fileExt(r.filename))
-	paramsStruct.Tags.Put(param, genstruct.ElemsFromBits(r.bits, r.tags))
-	var mode filetypes.Mode
-	switch r.mode {
-	case "input":
-		mode = filetypes.Input
-	case "export":
-		mode = filetypes.Export
-	case "def":
-		mode = filetypes.Def
-	case "eval":
-		mode = filetypes.Eval
-	default:
-		panic(fmt.Errorf("unknown mode %q", r.mode))
-	}
-	paramsStruct.Mode.Put(param, mode)
-
-	result := slices.Clip(record[paramsStruct.Size():])
-	// Write the result part of the record.
+// resultBytes returns the encoded result record for r, as referenced by index
+// from the extension-dependent and extension-independent lookup tables.
+func (r *fileResult) resultBytes(resultStruct *genToFileResult) []byte {
+	result := make([]byte, resultStruct.Size())
 	if r.err != internal.ErrNoError {
 		resultStruct.Error.Put(result, r.err)
-		return data
+		return result
 	}
 	resultStruct.Encoding.Put(result, r.file.Encoding)
 	resultStruct.Interpretation.Put(result, r.file.Interpretation)
@@ -133,7 +111,23 @@ func (r *fileResult) appendRecord(data []byte, paramsStruct *genToFileParams, re
 	if r.subsidiaryTags.Exists() {
 		resultStruct.SubsidiaryTagFuncIndex.Put(result, r.subsidiaryTagFuncIndex+1)
 	}
-	return data
+	return result
+}
+
+// modeFromString converts a mode name as used in types.cue to its [filetypes.Mode] value.
+func modeFromString(s string) filetypes.Mode {
+	switch s {
+	case "input":
+		return filetypes.Input
+	case "export":
+		return filetypes.Export
+	case "def":
+		return filetypes.Def
+	case "eval":
+		return filetypes.Eval
+	default:
+		panic(fmt.Errorf("unknown mode %q", s))
+	}
 }
 
 func main() {
@@ -165,8 +159,10 @@ func generate() error {
 
 // toFileInfo holds the information needed to generate the toFile implementation code.
 type toFileInfo struct {
-	paramsStruct            *genToFileParams
+	depParams               *genToFileDepParams
+	indepParams             *genToFileIndepParams
 	resultStruct            *genToFileResult
+	resultIndex             *genResultIndex
 	tagTypes                map[string]filetypes.TagType
 	subsidiaryBoolTagsByCUE map[string]cueValue
 	subsidiaryTagsByCUE     map[string]cueValue
@@ -181,8 +177,6 @@ type fromFileInfo struct {
 }
 
 func generateToFile(rootVal cue.Value) (toFileInfo, error) {
-	count := 0
-	errCount := 0
 	tags, topLevelTags, _ := allTags(rootVal)
 
 	results := slices.Collect(allCombinations(rootVal, topLevelTags, tags))
@@ -200,13 +194,10 @@ func generateToFile(rootVal cue.Value) (toFileInfo, error) {
 	}
 	subsidiaryBoolTagKeys := slices.Sorted(maps.Keys(subsidiaryBoolTagKeysMap))
 	subsidiaryTagKeys := slices.Sorted(maps.Keys(subsidiaryTagKeysMap))
-	toFileParams := newToFileParamsStruct(
-		topLevelTags,
-		// Note: add ".unknown" as a proxy for any unknown file extension,
-		// and make sure that the empty file extension is also present
-		// even though it's not mentioned in the extensions struct.
-		append(allKeys[string](rootVal, "all", "extensions"), ".unknown", ""),
-	)
+	// Note: add ".unknown" as a proxy for any unknown file extension,
+	// and make sure that the empty file extension is also present
+	// even though it's not mentioned in the extensions struct.
+	fileExts := append(allKeys[string](rootVal, "all", "extensions"), ".unknown", "")
 	toFileResult := newToFileResultStruct(
 		append(allKeys[build.Encoding](rootVal, "all", "encodings"), ""),
 		append(allKeys[build.Interpretation](rootVal, "all", "interpretations"), ""),
@@ -215,27 +206,98 @@ func generateToFile(rootVal cue.Value) (toFileInfo, error) {
 		len(subsidiaryTagsByCUE),
 	)
 
+	// Intern the result records. The cross product of all combinations yields
+	// many thousands of records, but only a couple hundred distinct results, so
+	// we store each distinct result once and reference it by index.
+	var resultsData []byte
+	resultIndexByBytes := make(map[string]int)
+	resultIndexOf := func(r *fileResult) int {
+		b := r.resultBytes(toFileResult)
+		if i, ok := resultIndexByBytes[string(b)]; ok {
+			return i
+		}
+		i := len(resultIndexByBytes)
+		resultIndexByBytes[string(b)] = i
+		resultsData = append(resultsData, b...)
+		return i
+	}
+
+	// Group results by (mode, tag set). The file extension only affects the
+	// result when the tags do not already determine an encoding, so for most
+	// groups every extension yields the same result.
+	type groupKey struct {
+		mode filetypes.Mode
+		bits uint64
+	}
+	type extResult struct {
+		ext   string
+		index int
+	}
+	type groupInfo struct {
+		tags    []string
+		results []extResult
+	}
+	groups := make(map[groupKey]*groupInfo)
+	for i := range results {
+		r := &results[i]
+		gk := groupKey{mode: modeFromString(r.mode), bits: r.bits}
+		gi := groups[gk]
+		if gi == nil {
+			gi = &groupInfo{tags: r.tags}
+			groups[gk] = gi
+		}
+		gi.results = append(gi.results, extResult{ext: fileExt(r.filename), index: resultIndexOf(r)})
+	}
+
+	depParams := newToFileDepParamsStruct(topLevelTags, fileExts)
+	indepParams := newToFileIndepParamsStruct(topLevelTags)
+	resultIndex := newResultIndexStruct(len(resultIndexByBytes))
+
+	// Emit one record per group into the extension-independent table when every
+	// extension in the group shares the same result; otherwise emit one record
+	// per extension into the extension-dependent table.
+	// The emission order does not matter: SortRecords below imposes a total
+	// order on each table by its (distinct) key.
+	var depData, indepData []byte
+	for gk, gi := range groups {
+		extIndependent := true
+		for _, er := range gi.results[1:] {
+			if er.index != gi.results[0].index {
+				extIndependent = false
+				break
+			}
+		}
+		if extIndependent {
+			indepData = appendIndepRecord(indepData, indepParams, resultIndex, gk.mode, gi.tags, gk.bits, gi.results[0].index)
+		} else {
+			for _, er := range gi.results {
+				depData = appendDepRecord(depData, depParams, resultIndex, gk.mode, gi.tags, gk.bits, er.ext, er.index)
+			}
+		}
+	}
+
+	genstruct.SortRecords(depData, depParams.Size()+resultIndex.Size(), depParams.Size())
+	genstruct.SortRecords(indepData, indepParams.Size()+resultIndex.Size(), indepParams.Size())
+	if err := os.WriteFile("fileinfo_dep.dat", depData, 0o666); err != nil {
+		return toFileInfo{}, err
+	}
+	if err := os.WriteFile("fileinfo_indep.dat", indepData, 0o666); err != nil {
+		return toFileInfo{}, err
+	}
+	if err := os.WriteFile("fileinfo_results.dat", resultsData, 0o666); err != nil {
+		return toFileInfo{}, err
+	}
+
 	tagTypes := make(map[string]filetypes.TagType)
 	for name, info := range tags {
 		tagTypes[name] = info.typ
 	}
 
-	var recordData []byte
-	for _, r := range results {
-		count++
-		if r.err != internal.ErrNoError {
-			errCount++
-		}
-		recordData = r.appendRecord(recordData, toFileParams, toFileResult)
-	}
-	genstruct.SortRecords(recordData, toFileParams.Size()+toFileResult.Size(), toFileParams.Size())
-	if err := os.WriteFile("fileinfo.dat", recordData, 0o666); err != nil {
-		return toFileInfo{}, err
-	}
-
 	return toFileInfo{
-		paramsStruct:            toFileParams,
+		depParams:               depParams,
+		indepParams:             indepParams,
 		resultStruct:            toFileResult,
+		resultIndex:             resultIndex,
 		tagTypes:                tagTypes,
 		subsidiaryBoolTagsByCUE: subsidiaryBoolTagsByCUE,
 		subsidiaryTagsByCUE:     subsidiaryTagsByCUE,
@@ -244,17 +306,50 @@ func generateToFile(rootVal cue.Value) (toFileInfo, error) {
 	}, nil
 }
 
+// growRecord extends data by a record of keySize+valSize bytes and returns the
+// grown slice together with sub-slices addressing the new record's key and
+// value parts.
+func growRecord(data []byte, keySize, valSize int) (grown, key, val []byte) {
+	recordSize := keySize + valSize
+	data = slices.Grow(data, recordSize)
+	data = data[:len(data)+recordSize]
+	record := data[len(data)-recordSize:]
+	return data, slices.Clip(record[:keySize]), slices.Clip(record[keySize:])
+}
+
+// appendDepRecord appends an extension-dependent lookup record, keyed by
+// (mode, file extension, tag set), referencing the result at resultIdx.
+func appendDepRecord(data []byte, p *genToFileDepParams, idx *genResultIndex, mode filetypes.Mode, tags []string, bits uint64, ext string, resultIdx int) []byte {
+	data, key, val := growRecord(data, p.Size(), idx.Size())
+	p.Mode.Put(key, mode)
+	p.FileExt.Put(key, ext)
+	p.Tags.Put(key, genstruct.ElemsFromBits(bits, tags))
+	idx.Index.Put(val, resultIdx)
+	return data
+}
+
+// appendIndepRecord appends an extension-independent lookup record, keyed by
+// (mode, tag set), referencing the result at resultIdx.
+func appendIndepRecord(data []byte, p *genToFileIndepParams, idx *genResultIndex, mode filetypes.Mode, tags []string, bits uint64, resultIdx int) []byte {
+	data, key, val := growRecord(data, p.Size(), idx.Size())
+	p.Mode.Put(key, mode)
+	p.Tags.Put(key, genstruct.ElemsFromBits(bits, tags))
+	idx.Index.Put(val, resultIdx)
+	return data
+}
+
 func generateCode(
 	toFile toFileInfo,
 	fromFile fromFileInfo,
 ) error {
 	params := tmplParams{
-		ToFileParams:               toFile.paramsStruct,
+		ToFileDepParams:            toFile.depParams,
+		ToFileIndepParams:          toFile.indepParams,
 		ToFileResult:               toFile.resultStruct,
+		ToFileResultIndex:          toFile.resultIndex,
 		FromFileParams:             fromFile.paramsStruct,
 		FromFileResult:             fromFile.resultStruct,
 		TagTypes:                   toFile.tagTypes,
-		Data:                       "fileInfoDataBytes",
 		SubsidiaryBoolTagFuncCount: len(toFile.subsidiaryBoolTagsByCUE),
 		SubsidiaryTagFuncCount:     len(toFile.subsidiaryTagsByCUE),
 		Generated:                  make(map[string]bool),
@@ -656,8 +751,17 @@ func newFromFileResult(
 	return r
 }
 
-func newToFileParamsStruct(topLevelTags, fileExts []string) *genToFileParams {
-	r := &genToFileParams{}
+// genToFileDepParams is the key layout for the extension-dependent lookup
+// table: (mode, file extension, tag set).
+type genToFileDepParams struct {
+	genstruct.Struct
+	Mode    genstruct.Accessor[filetypes.Mode]
+	FileExt genstruct.Accessor[string]
+	Tags    genstruct.Accessor[iter.Seq[string]]
+}
+
+func newToFileDepParamsStruct(topLevelTags, fileExts []string) *genToFileDepParams {
+	r := &genToFileDepParams{}
 	r.Mode = genstruct.AddInt(&r.Struct, filetypes.NumModes, "Mode")
 	// Note: "" is a member of the set: we'll default to that if the extension isn't
 	// part of the known set.
@@ -666,11 +770,32 @@ func newToFileParamsStruct(topLevelTags, fileExts []string) *genToFileParams {
 	return r
 }
 
-type genToFileParams struct {
+// genToFileIndepParams is the key layout for the extension-independent lookup
+// table: (mode, tag set).
+type genToFileIndepParams struct {
 	genstruct.Struct
-	Tags    genstruct.Accessor[iter.Seq[string]]
-	FileExt genstruct.Accessor[string]
-	Mode    genstruct.Accessor[filetypes.Mode]
+	Mode genstruct.Accessor[filetypes.Mode]
+	Tags genstruct.Accessor[iter.Seq[string]]
+}
+
+func newToFileIndepParamsStruct(topLevelTags []string) *genToFileIndepParams {
+	r := &genToFileIndepParams{}
+	r.Mode = genstruct.AddInt(&r.Struct, filetypes.NumModes, "Mode")
+	r.Tags = genstruct.AddSet(&r.Struct, topLevelTags, "allTopLevelTags")
+	return r
+}
+
+// genResultIndex is the value layout for both lookup tables: an index into the
+// interned result records.
+type genResultIndex struct {
+	genstruct.Struct
+	Index genstruct.Accessor[int]
+}
+
+func newResultIndexStruct(numResults int) *genResultIndex {
+	r := &genResultIndex{}
+	r.Index = genstruct.AddInt(&r.Struct, numResults-1, "int")
+	return r
 }
 
 type genToFileResult struct {

@@ -21,6 +21,9 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
@@ -180,7 +183,7 @@ func checkBlock(t *testing.T, fcb *goldast.FencedCodeBlock, source []byte) (bloc
 	switch mode {
 	case "parse":
 	case "rows":
-		// TODO: parse and validate line by line
+		checkRows(t, fcb, source, blockPos)
 		return blockEdit{}, false
 	case "untested":
 		return blockEdit{}, false
@@ -221,4 +224,158 @@ func checkBlock(t *testing.T, fcb *goldast.FencedCodeBlock, source []byte) (bloc
 		oldLen: oldLen,
 		newStr: want,
 	}, true
+}
+
+// checkRows validates a ```cue rows block. Each row holds an expression (or
+// field declaration) in the first column and its expected result in the second,
+// separated by two or more spaces; `_|_` denotes an expected error. A row with
+// an empty result column is treated as shared context (a field declaration) and
+// accumulated for the rows that follow it, but is not itself checked. All
+// examples are evaluated with @experiment(predicates) enabled so the predicate
+// builtins resolve.
+func checkRows(t *testing.T, fcb *goldast.FencedCodeBlock, source []byte, blockPos string) {
+	// Validation currently covers the predicate-builtin example blocks. Other
+	// rows blocks (defaults, dynamic fields, the list builtins, multi-line
+	// entries) use forms this evaluator does not yet handle and remain
+	// illustrative; leave them untouched. Extending coverage is future work.
+	if !rowsUsePredicateBuiltin(fcb, source) {
+		return
+	}
+
+	cc := cuecontext.New()
+	const exp = "@experiment(predicates)\n"
+	var context strings.Builder
+
+	headerSeen := false
+	for i := 0; i < fcb.Lines().Len(); i++ {
+		seg := fcb.Lines().At(i)
+		line := strings.TrimRight(string(seg.Value(source)), "\r\n")
+		if t := strings.TrimSpace(line); t == "" || strings.HasPrefix(t, "//") {
+			continue // blank lines and pure-comment lines are ignored.
+		}
+		if !headerSeen {
+			headerSeen = true // skip the "Expression  Result" header.
+			continue
+		}
+
+		left, right := splitRow(line)
+		if left == "" {
+			continue
+		}
+
+		isField, label, err := rowKind(left)
+		if err != nil {
+			t.Errorf("%s: row %q failed to parse: %v", blockPos, left, err)
+			continue
+		}
+
+		if right == "" {
+			// Shared context: accumulate the declaration for later rows.
+			if !isField {
+				t.Errorf("%s: context row %q must be a field declaration", blockPos, left)
+				continue
+			}
+			context.WriteString(left)
+			context.WriteByte('\n')
+			continue
+		}
+
+		var got cue.Value
+		if isField {
+			v := cc.CompileString(exp + context.String() + left)
+			got = v.LookupPath(cue.ParsePath(label))
+		} else {
+			v := cc.CompileString(exp + context.String() + "out: (" + left + ")")
+			got = v.LookupPath(cue.ParsePath("out"))
+		}
+		checkRowResult(t, cc, blockPos, left, right, got)
+	}
+}
+
+// splitRow splits a rows line into its expression and result columns at the
+// first run of two or more spaces. A trailing `// comment` on the result is
+// dropped.
+func splitRow(line string) (left, right string) {
+	for i := 0; i+1 < len(line); i++ {
+		if line[i] == ' ' && line[i+1] == ' ' {
+			left = strings.TrimSpace(line[:i])
+			right = strings.TrimSpace(line[i:])
+			if ci := strings.Index(right, "//"); ci >= 0 {
+				right = strings.TrimSpace(right[:ci])
+			}
+			return left, right
+		}
+	}
+	return strings.TrimSpace(line), ""
+}
+
+// rowKind reports whether left is a field declaration (returning its label) or a
+// bare expression.
+func rowKind(left string) (isField bool, label string, err error) {
+	f, err := parser.ParseFile("row", left)
+	if err != nil {
+		return false, "", err
+	}
+	if len(f.Decls) != 1 {
+		return false, "", fmt.Errorf("expected a single declaration")
+	}
+	if field, ok := f.Decls[0].(*ast.Field); ok {
+		return true, labelName(field.Label), nil
+	}
+	return false, "", nil
+}
+
+func labelName(l ast.Label) string {
+	switch x := l.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.BasicLit:
+		return strings.Trim(x.Value, `"`)
+	}
+	return ""
+}
+
+// rowsUsePredicateBuiltin reports whether the block references any of the
+// predicate builtins, which is how checkRows decides a rows block is meant to
+// be validated rather than illustrative.
+func rowsUsePredicateBuiltin(fcb *goldast.FencedCodeBlock, source []byte) bool {
+	var b strings.Builder
+	for i := 0; i < fcb.Lines().Len(); i++ {
+		seg := fcb.Lines().At(i)
+		b.Write(seg.Value(source))
+	}
+	s := b.String()
+	for _, name := range []string{
+		"exists(", "existsN(", "allows(",
+		"isValid(", "validN(", "isConcrete(", "concreteN(",
+	} {
+		if strings.Contains(s, name) {
+			return true
+		}
+	}
+	return false
+}
+
+// checkRowResult compares the evaluated value against the expected result
+// column. `_|_` expects an error; otherwise the values must be equivalent
+// (mutually subsuming).
+func checkRowResult(t *testing.T, cc *cue.Context, blockPos, left, right string, got cue.Value) {
+	if right == "_|_" {
+		if got.Err() == nil {
+			t.Errorf("%s: %s => got %v, want error (_|_)", blockPos, left, got)
+		}
+		return
+	}
+	if err := got.Err(); err != nil {
+		t.Errorf("%s: %s => got error %v, want %s", blockPos, left, err, right)
+		return
+	}
+	want := cc.CompileString("out: (" + right + ")").LookupPath(cue.ParsePath("out"))
+	if err := want.Err(); err != nil {
+		t.Errorf("%s: result %q failed to compile: %v", blockPos, right, err)
+		return
+	}
+	if got.Subsume(want) != nil || want.Subsume(got) != nil {
+		t.Errorf("%s: %s => got %v, want %s", blockPos, left, got, right)
+	}
 }

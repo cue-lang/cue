@@ -1,0 +1,7 @@
+path=example.com/m@v1
+version=v1.0.0
+wantErr=cue.mod/local-module.cue holds development-time configuration and is never part of a published module
+-- cue.mod/module.cue --
+module: "example.com/m@v1"
+-- cue.mod/local-module.cue --
+deps: "example.com/dep@v0": replace: "./local"

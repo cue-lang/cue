@@ -1,0 +1,66 @@
+# Test what happens when a dependency in the registry contains
+# a local-module.cue file.
+
+# Used as a dependency of the main module: the replacement is ignored.
+exec cue export .
+cmp stdout want-main
+
+# Used directly as an absolute versioned module: the replacement is ignored
+# here too.
+exec cue export example.com/dep@v0.1.0:lib
+cmp stdout want-dep
+
+-- want-main --
+{
+    "out": "inner from registry"
+}
+-- want-dep --
+{
+    "value": "inner from registry"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.17.0"
+deps: {
+	"example.com/dep@v0": v: "v0.1.0"
+	"example.com/inner@v0": v: "v0.1.0"
+}
+-- main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+out: lib.value
+-- _registry/example.com_dep_v0.1.0/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+deps: {
+	"example.com/inner@v0": v: "v0.1.0"
+}
+-- _registry/example.com_dep_v0.1.0/cue.mod/local-module.cue --
+deps: {
+	"example.com/inner@v0": {
+		v:       "v0.1.0"
+		replace: "./local_inner"
+	}
+}
+-- _registry/example.com_dep_v0.1.0/lib.cue --
+package lib
+
+import "example.com/inner@v0:inner"
+
+value: inner.value
+-- _registry/example.com_dep_v0.1.0/local_inner/cue.mod/module.cue --
+module: "example.com/inner@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_dep_v0.1.0/local_inner/inner.cue --
+package inner
+
+value: "inner from local replacement"
+-- _registry/example.com_inner_v0.1.0/cue.mod/module.cue --
+module: "example.com/inner@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_inner_v0.1.0/inner.cue --
+package inner
+
+value: "inner from registry"

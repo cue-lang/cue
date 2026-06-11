@@ -2846,6 +2846,32 @@ with `quo(x, y)` truncated towards zero.
 A zero divisor in either case results in bottom (an error).
 
 
+### `allows`
+
+The builtin function `allows` reports whether a label is permitted on a struct
+or list. It returns `true` if the label may appear, `false` otherwise.
+
+The first argument is a struct or list; the second is a string field name or an
+integer list index. A closed struct rejects undeclared field names and a closed
+list rejects out-of-range indices, while open containers admit any label.
+
+Unlike `exists`, which reports whether a field is present now, `allows` reports
+whether it may ever appear. The two compose: `allows(s, "k") && exists(s.k)` is
+the strict "permitted and present" check.
+
+```cue rows
+Expression       Result
+s: {a: 1}
+allows(s, "a")   true
+allows(s, "b")   true    // s is open
+c: close({a: 1})
+allows(c, "b")   false   // closed, "b" not allowed
+xs: [1, 2, 3]
+allows(xs, 2)    true
+allows(xs, 3)    false   // index out of range
+```
+
+
 ### `exists`
 
 The builtin function `exists` reports whether a referenced field exists as a

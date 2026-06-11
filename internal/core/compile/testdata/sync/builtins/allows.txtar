@@ -1,0 +1,106 @@
+# Tests for the allows builtin: reports whether a given selector is
+# allowed on an object. Delegates to Vertex.Accept.
+
+-- in.cue --
+@experiment(predicates)
+
+// Open struct: any string label allowed.
+openStruct: {
+	s: {a: 1, b: 2}
+	yesA:  allows(s, "a")
+	yesNo: allows(s, "nope")
+}
+
+// Closed struct: only declared labels allowed.
+closedStruct: {
+	#Def: {a: int, b?: int}
+	yesA: allows(#Def, "a")
+	yesB: allows(#Def, "b")
+	noC:  allows(#Def, "c")
+
+	d: close({a: 1})
+	noD: allows(d, "b") // closed, "b" not allowed
+}
+
+// Open list: indices below length are valid, beyond are still allowed.
+openList: {
+	xs: [1, 2, 3, ...]
+	in0: allows(xs, 0)
+	in2: allows(xs, 2)
+	in5: allows(xs, 5)
+}
+
+// Closed list: indices below length valid, beyond rejected.
+closedList: {
+	xs: [1, 2, 3]
+	in0:  allows(xs, 0)
+	in2:  allows(xs, 2)
+	oob3: allows(xs, 3)
+}
+
+// Closing a struct inline as a builtin argument retains its closedness, just
+// as the field-bound form (closedStruct.noD above) does. Existing fields and
+// labels admitted by a pattern constraint are still allowed.
+inlineClose: {
+	noB: allows(close({a: 1}), "b")
+	yesA: allows(close({a: 1}), "a")
+	pattern: allows(close({a: 1, [string]: int}), "b")
+}
+-- out/compile --
+--- in.cue
+{
+  openStruct: {
+    s: {
+      a: 1
+      b: 2
+    }
+    yesA: allows(〈0;s〉, "a")
+    yesNo: allows(〈0;s〉, "nope")
+  }
+  closedStruct: {
+    #Def: {
+      a: int
+      b?: int
+    }
+    yesA: allows(〈0;#Def〉, "a")
+    yesB: allows(〈0;#Def〉, "b")
+    noC: allows(〈0;#Def〉, "c")
+    d: close({
+      a: 1
+    })
+    noD: allows(〈0;d〉, "b")
+  }
+  openList: {
+    xs: [
+      1,
+      2,
+      3,
+      ...,
+    ]
+    in0: allows(〈0;xs〉, 0)
+    in2: allows(〈0;xs〉, 2)
+    in5: allows(〈0;xs〉, 5)
+  }
+  closedList: {
+    xs: [
+      1,
+      2,
+      3,
+    ]
+    in0: allows(〈0;xs〉, 0)
+    in2: allows(〈0;xs〉, 2)
+    oob3: allows(〈0;xs〉, 3)
+  }
+  inlineClose: {
+    noB: allows(close({
+      a: 1
+    }), "b")
+    yesA: allows(close({
+      a: 1
+    }), "a")
+    pattern: allows(close({
+      a: 1
+      [string]: int
+    }), "b")
+  }
+}

@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "f249e440_09b5109a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-11T08:46:24Z",
+      "side": 1,
+      "message": "I\u0027ll reword to clarify that this is more about following INI than about trying to preempt the evaluator errors.",
+      "parentUuid": "05b3d4ce_c5ac08ca",
+      "range": {
+        "startLine": 18,
+        "startChar": 48,
+        "endLine": 18,
+        "endChar": 55
+      },
+      "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "245a1221_0cecf669",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -54,6 +78,24 @@
       "writtenOn": "2026-05-11T09:13:18Z",
       "side": 1,
       "message": "Oh this one\u0027s much more interesting then (I realise this is not new code) - CUE would happily let this through and unify this. But I guess in the INI spec you\u0027re not allowed duplicates?",
+      "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1133d53e_02b5d00b",
+        "filename": "encoding/ini/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-11T08:46:24Z",
+      "side": 1,
+      "message": "correct, this is intended to follow how INI generally behaves.",
+      "parentUuid": "3b0a932d_7e1856a8",
       "revId": "1d5f28c1a4c995c33306961dfd9570a8900e21ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

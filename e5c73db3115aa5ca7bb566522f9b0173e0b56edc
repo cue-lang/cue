@@ -210,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0928292b_514f0f0a",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:54:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ec1f62b_47c36c0d",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "67fb4edd_8e562205",
@@ -559,6 +577,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fcb5fac_391870d4",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 2960,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:54:37Z",
+      "side": 1,
+      "message": "It\u0027s not used before this point - there are no forward-references to it so I think it\u0027s probably ok where it is?",
+      "parentUuid": "e045ae9c_2a6a77ea",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7dfedbb1_fab81d25",
@@ -693,6 +729,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a2c94a1_780e00b7",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:54:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53cad57d_4c319d22",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d077ea22_79202304",
@@ -741,6 +795,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "What does \"raw\" mean in this context?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3b1025f_354b0a97",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:54:37Z",
+      "side": 1,
+      "message": "It means they\u0027re only set by doc rows with non-nil raw content. I\u0027ve improved the comment.",
+      "parentUuid": "0bee3e37_311affad",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

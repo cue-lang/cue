@@ -3,9 +3,10 @@
 
 exec cue mod tidy
 
-# TODO the target version ends up as v0.0.1 even though
-# there's a dependency at v0.0.2. We'd like it to end up
-# at v0.0.2.
+# The resulting dependencies end up with the larger
+# of the two versions and is present in the regular
+# dependencies. The version in the replacement is
+# canonicalized to the major version only.
 cmp cue.mod/module.cue want-module
 cmp cue.mod/local-module.cue want-local
 
@@ -25,12 +26,13 @@ deps: {
 -- want-local --
 deps: {
 	"example.com/dep@v0": {}
-	"example.com/orig@v0": replaceWith: "example.com/target@v0.0.1"
+	"example.com/orig@v0": replaceWith: "example.com/target@v0"
+	"example.com/target@v0": {}
 }
 -- want-stdout --
 {
-    "fromOrig": "target v0.0.1",
-    "fromDep": "target v0.0.1"
+    "fromOrig": "target v0.0.2",
+    "fromDep": "target v0.0.2"
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"

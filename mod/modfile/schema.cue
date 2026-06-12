@@ -112,8 +112,13 @@ versions: "v0.17.0": {
 			// replaceWith specifies a replacement for this dependency
 			// Directory replacements use a relative path starting "./"
 			// or "../" or an absolute path.
-			// Any other value is a module path with a version.
-			// (e.g. "example.com/bar@v0.1.0").
+			// Any other value is a module path with a major version
+			// (e.g. "example.com/bar@v0"); the concrete version is taken
+			// from the replacement module's own dependency entry, so the
+			// replacement is subject to minimum-version selection like any
+			// other dependency. A full version (e.g. "example.com/bar@v0.1.0")
+			// is accepted for convenience but is normalized to a bare major
+			// version by cue mod tidy.
 			replaceWith?: string
 		}
 

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b431fc6_e46fdbf8",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8e4268a_658127db",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e56523fb_21bdcc7f",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "```suggestion\n\t// node and the RelPos node that is eligible for\n```\n\nand other occurrences.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac06e235_cda6f401",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e56523fb_21bdcc7f",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0034155e_69c1ea75",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Wow, claude makes more spelling mistakes than I do! Done.",
+      "parentUuid": "50bd75e7_8a08b7bd",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdac2438_dd1c1a11",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88d0f7d3_6ebf2249",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdac2438_dd1c1a11",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1875b59_31e08cf1",
@@ -99,6 +171,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "Maybe a comment saying what we\u0027re doing here?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47aff265_2594e344",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1875b59_31e08cf1",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +227,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "990c19b5_cc657ce9",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "67fb4edd_8e562205",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83a00e60_23af8ba6",
@@ -167,6 +275,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "I don\u0027t understand when this can happen. AIUI, Elided positions are just used for commas that were newlines, but can those turn into actual declaration nodes?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5f7de0b_cd59d7e5",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "I was under the mistaken belief that you could mark any node in the AST as elided and it would be entirely removed from the output. That seems to not be the case, so I\u0027ve systematically simplified where the new printer anticipates Elided.",
+      "parentUuid": "e839d6ba_11a63537",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -205,6 +331,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee192376_c62b0cb7",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1160,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "afaa207a_d1ee0a4a",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b458248_cfbd6ed3",
@@ -218,6 +362,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "As mentioned elsewhere, I don\u0027t think declarations can be Elided in practice, so this could be simplified.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18bf19cf_004fbe05",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1168,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b458248_cfbd6ed3",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -256,6 +418,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2934591c_e8e3039b",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1248,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcb4cace_a3318e6e",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "156b87f3_7282fca1",
@@ -269,6 +449,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "Any particular reason for these fields to be exported?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "299a527f_78f69586",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1389,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "156b87f3_7282fca1",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -366,6 +564,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "72698f31_20df163d",
+        "filename": "internal/pretty/doc.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Yes, I am very unsure about what the right thing to do here is. I can well believe that the best thing is to revert back to a simple len. The fact is that we can\u0027t tell how many columns a char will actually render as.",
+      "parentUuid": "6148950f_67865e7d",
+      "range": {
+        "startLine": 145,
+        "startChar": 37,
+        "endLine": 145,
+        "endChar": 62
+      },
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "53cad57d_4c319d22",
         "filename": "internal/pretty/render.go",
         "patchSetId": 42
@@ -394,6 +616,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "I\u0027m not sure this temp var adds much value over just using `f.mode` directly.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f37473c9_16701efe",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d077ea22_79202304",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -432,6 +672,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2de0d32_2023a614",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 794,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Correct - it doesn\u0027t matter. The comment is gone in later versions.",
+      "parentUuid": "4c43f7cc_a3edc2bf",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cfad52ec_194dd4d3",
@@ -445,6 +703,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "Again, does it actually matter if we go forwards or backwards?\nISTM we could fold these two loops together and it wouldn\u0027t make any difference.\n\nBut maybe it\u0027s nice to have isomorphism between this logic and the core rendering logic?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a27cccc_ae0528b0",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 828,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T13:04:45Z",
+      "side": 1,
+      "message": "Yep - it doesn\u0027t matter. In previous versions of the code it made more sense to be consistent about going backwards, but that\u0027s gone now. Done.",
+      "parentUuid": "cfad52ec_194dd4d3",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

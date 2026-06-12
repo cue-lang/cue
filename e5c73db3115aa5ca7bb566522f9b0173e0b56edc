@@ -262,6 +262,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8466101_3b0d0129",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:16:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83a00e60_23af8ba6",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e839d6ba_11a63537",
@@ -310,6 +328,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "Similar thoughts about Elided.",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8734722f_3f50c4d9",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:16:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2bee5d1c_eb984b9d",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -397,6 +433,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "hmm, I was looking for a Nest type but only found `docNest`. Maybe use `docNest` as the noun here, or use a verb form for Nest like \"whether e\u0027s rendering\nNests its own broken inner content\" or something?",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eac7198_77ce12b7",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1228,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:16:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e4d8954_d3abddc0",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -522,6 +576,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9d9338d_304e78ff",
+        "filename": "internal/pretty/doc.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:16:25Z",
+      "side": 1,
+      "message": "I feel that this is explicitly explained in the para that follows:\n\n```\n// The mode is decided per-[docGroup] at render time by a flat-fit\n// test: the renderer measures what the child\u0027s flat shape would\n// look like (resolving [docLineBreakSoft] and [docSwitchMode] the\n// way flat-mode would) and picks flat-mode iff the result fits the\n// line budget and contains no hard breaks.\n```",
+      "parentUuid": "7dfedbb1_fab81d25",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "904437fd_aa8bbe58",
@@ -535,6 +607,24 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "I\u0027m wondering if any of this needs to be exported. I think I\u0027d either separate the Doc and Render functionality into its own package, with exported types, with the AST-\u003eDoc stuff layered on top; or unexport all of these types that don\u0027t really have reason to be used externally AFAICS. Unless I\u0027m missing something!",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fbfe702_fa5577a5",
+        "filename": "internal/pretty/doc.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-12T15:16:25Z",
+      "side": 1,
+      "message": "The tests in pretty_test (file name and pkg name) make use of these types. However, I can move those to their own test file in pkg pretty and thus avoid needing to export as much. Done.\n\nSome things do need to be exported because they\u0027re used by the subpackage style/",
+      "parentUuid": "904437fd_aa8bbe58",
       "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -1,27 +1,23 @@
 # Scenario: a replace directive points at example.com/target@v0.0.1, while
 # another dependency (example.com/dep@v0) transitively requires
 # example.com/target@v0.0.2. So the replacement target is also a regular
-# dependency at a higher version.
+# dependency.
 #
-# What we would hope: cue mod tidy upgrades the replace directive's target
-# to v0.0.2 so that a single, consistent version of example.com/target is
-# used throughout the build.
+# A module replace directive may name a full version for convenience, but cue
+# mod tidy normalizes it to a bare major version (example.com/target@v0) and
+# records the target as an ordinary dependency, so it participates in
+# minimum-version selection like any other dependency. A single, consistent
+# version of example.com/target (v0.0.2, the highest required) is therefore
+# used throughout the build:
 #
-# This is the "MVS replacement-upgrade" case noted as not-yet-handled when
-# the two-file tidy support was added. This test pins down the actual
-# (arguably wrong) behavior so the eventual fix has something to flip:
-#
-#   - local-module.cue keeps replace pinned at target@v0.0.1; tidy does NOT
-#     rewrite it to v0.0.2.
-#   - module.cue (the published view, computed without the replace) records
-#     target@v0.0.2, the version dep requires.
-#   - At build time the replace pins example.com/target to v0.0.1 for the
-#     whole build, so example.com/dep silently sees target v0.0.1 even
-#     though it requires v0.0.2 (see want-stdout: fromDep is "target
-#     v0.0.1", not "target v0.0.2").
-#   - cue mod tidy --check nonetheless considers this state tidy.
-#
-# TODO fix this
+#   - cue mod tidy normalizes the replace directive to example.com/target@v0
+#     and records example.com/target@v0 as an ordinary dependency at v0.0.2 in
+#     both module.cue (the published view) and, by inheritance,
+#     local-module.cue.
+#   - At build time the replacement is served at the selected version, so
+#     example.com/orig and example.com/dep both see target v0.0.2 (see
+#     want-stdout).
+#   - cue mod tidy --check considers this state tidy.
 
 exec cue mod tidy
 cmp cue.mod/module.cue want-module
@@ -52,20 +48,20 @@ deps: {
 deps: {
 	"example.com/dep@v0": {}
 	"example.com/orig@v0": {
-		replace: "example.com/target@v0.0.1"
+		replace: "example.com/target@v0"
 	}
+	"example.com/target@v0": {}
 }
 -- want-stdout --
 {
-    "fromOrig": "target v0.0.1",
-    "fromDep": "target v0.0.1"
+    "fromOrig": "target v0.0.2",
+    "fromDep": "target v0.0.2"
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: version: "v0.17.0"
 -- cue.mod/local-module.cue --
 deps: "example.com/orig@v0": {
-	v:       "v0.1.0"
 	replace: "example.com/target@v0.0.1"
 }
 -- main.cue --

@@ -1,0 +1,20 @@
+# Test that cue mod publish rejects a module path that does not conform
+# to the OCI repository name restrictions, such as one with an uppercase
+# letter. The mapping from a module path to an OCI repository name does no
+# lowercasing or encoding, so an invalid path must be rejected outright.
+#
+# CUE_REGISTRY points at a nonexistent server to ensure the path is rejected
+# by the client before any attempt to contact the registry.
+
+env CUE_REGISTRY=does.not.exist.invalid+insecure
+
+! exec cue mod publish v1.0.0
+cmp stderr want-stderr
+
+-- want-stderr --
+invalid module file cue.mod/module.cue: malformed module path "test.example/Foo@v1": invalid char 'F'
+-- cue.mod/module.cue --
+module: "test.example/Foo@v1"
+language: version: "v0.9.2"
+-- main.cue --
+package main

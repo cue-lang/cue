@@ -682,18 +682,24 @@ func (s *scheduler) freeze(c condition) {
 	s.isFrozen = true
 }
 
-// deferFieldSetKnown filters fieldSetKnown out of c when this scheduler still
-// has a parent task that is not the currently-running one and has not
-// completed. Such a parent task may yet add fields to this node (typically a
-// pushed-down comprehension that has not finished yielding), so freezing the
-// field set on its behalf would lock in an incomplete view of the node and
-// produce spurious "field set was already referenced" errors when the
-// comprehension later tries to insert its body.
+// deferFieldSetKnown filters fieldSetKnown out of c while a task other than
+// the currently-running one may still add fields to this node:
 //
-// The current task is excluded from the check: a task can call freeze for
-// fieldSetKnown for the very node it is the parent task of (e.g. a
-// comprehension iterating over its own source node) without deferring on
-// itself.
+//   - a parent task that has not completed (typically a pushed-down
+//     comprehension still yielding); or
+//   - one of this scheduler's own taskREADY field-adding tasks (those that
+//     complete fieldConjunctsKnown, e.g. a ListLit) that a parent
+//     comprehension's yield only materialized after the parent task itself
+//     reached taskSUCCESS.
+//
+// Freezing in either case would lock in an incomplete field set and produce
+// spurious "field set was already referenced" errors. Only taskREADY own tasks
+// count: a taskRUNNING or taskWAITING field-adding task is typically part of a
+// dependency cycle, where freezing is the deliberate cycle-breaker.
+//
+// The current task is excluded: it may freeze fieldSetKnown for the very node
+// it is the parent task of (e.g. a comprehension iterating over its own source
+// node) without deferring on itself.
 func (s *scheduler) deferFieldSetKnown(c condition) condition {
 	if c&fieldSetKnown == 0 {
 		return c
@@ -705,6 +711,11 @@ func (s *scheduler) deferFieldSetKnown(c condition) condition {
 			continue
 		}
 		if pt != cur {
+			return c &^ fieldSetKnown
+		}
+	}
+	for _, t := range s.tasks {
+		if t.state == taskREADY && t != cur && t.run.completes&fieldConjunctsKnown != 0 {
 			return c &^ fieldSetKnown
 		}
 	}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5acf003_b03225b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-12T09:03:48Z",
+      "side": 1,
+      "message": "Seems reasonable but I think we should improve the description of the `--package` flag. \"package name for non-CUE files\" does not seem adequate, given that we\u0027re specifically adjusting behaviour for CUE files here, so clearly the description isn\u0027t complete, at the very least.",
+      "revId": "95ab063468cb7cfad4cc89a5738d6eaa63695cb1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

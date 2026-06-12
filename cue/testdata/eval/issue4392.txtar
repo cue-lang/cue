@@ -1,0 +1,36 @@
+# A list field added inside an if-block of a let-bound struct, consumed by
+# encoding/json.Marshal within a unified-and-projected definition, regressed
+# in evalv3 with "adding field N not allowed as field set was already
+# referenced".
+-- in.cue --
+import "encoding/json"
+
+#W: {
+	let _obj = {
+		if true {
+			list: [1, 2]
+		}
+	}
+	out: json.Marshal(_obj)
+}
+
+result: (#W & {}).out @test(err, code=eval, contains="not allowed as field set was already referenced") @test(eq:todo, "{\"list\":[1,2]}")
+-- out/errors.txt --
+[eval] result: error in call to encoding/json.Marshal: adding field 0 not allowed as field set was already referenced:
+    ./in.cue:9:7
+    ./in.cue:6:10
+result: error in call to encoding/json.Marshal: adding field 1 not allowed as field set was already referenced:
+    ./in.cue:9:7
+    ./in.cue:6:10
+-- out/eval/stats --
+Leaks:  2
+Freed:  14
+Reused: 5
+Allocs: 11
+Retain: 0
+
+Unifications: 14
+Conjuncts:    19
+Disjuncts:    0
+
+NumCloseIDs: 8

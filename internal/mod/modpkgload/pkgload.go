@@ -370,16 +370,22 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	// Make the algorithm deterministic for tests.
 	imports := slices.Sorted(maps.Keys(importsMap))
 
-	// Rewrite imports that reference a replacement module's namespace
-	// to the original module's namespace. This ensures that the same
-	// package always has the same identity regardless of whether it's
-	// imported via the original or replacement path, which is critical
-	// for hidden-field namespace correctness.
+	// When this package is itself served via a module replacement (its
+	// module path is that of a replaced/original module), rewrite imports
+	// that reference the replacement module's own namespace back to the
+	// original module's namespace. This keeps the replacement module's
+	// internal self-references unified with the original's identity, which
+	// is critical for hidden-field namespace correctness. We deliberately do
+	// not rewrite imports in other modules (or the main module): a third
+	// party that depends on the replacement module directly should see it
+	// under its own path, not the original's.
 	if pkgs.replacements != nil {
-		for i, imp := range imports {
-			if resolved := pkgs.replacements.CanonicalImportPath(imp); resolved != imp {
-				pkg.resolvedImports[imp] = resolved
-				imports[i] = resolved
+		if _, replaced := pkgs.replacements.Lookup(pkg.mod.Path()); replaced {
+			for i, imp := range imports {
+				if resolved := pkgs.replacements.CanonicalImportPath(imp); resolved != imp {
+					pkg.resolvedImports[imp] = resolved
+					imports[i] = resolved
+				}
 			}
 		}
 	}

@@ -73,6 +73,11 @@ func Major(v string) string {
 	return v[:1+len(pv.major)]
 }
 
+// IsMajor reports whether v holds a major version only.
+func IsMajor(v string) bool {
+	return Major(v) == v
+}
+
 // MajorMinor returns the major.minor version prefix of the semantic version v.
 // For example, MajorMinor("v2.1.0") == "v2.1".
 // If v is an invalid semantic version string, MajorMinor returns the empty string.

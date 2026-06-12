@@ -14,11 +14,13 @@ cmp cue.mod/local-module.cue want-local-1
 exec cue export .
 cmp stdout want-stdout
 
-# A second replace updates the existing local-module.cue in place.
+# A second replace updates the existing local-module.cue in place. A module
+# replacement may name a full version; it is normalized to a bare major version
+# by cue mod tidy.
 exec cue mod edit --replace example.com/other@v0=example.com/replacement@v1.2.3
 cmp cue.mod/local-module.cue want-local-2
 
-# A replacement value must be a directory or a module path with version.
+# A replacement value must be a directory or a module path.
 ! exec cue mod edit --replace example.com/dep@v0=not-a-valid-replacement
 stderr 'invalid replacement'
 

@@ -307,7 +307,7 @@ func (c *modEditCmd) flagReplace(arg string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := modpkgload.ParseReplacement(repl); err != nil {
+	if _, _, _, err := modpkgload.ReplaceTarget(repl); err != nil {
 		return fmt.Errorf("invalid replacement %q: %v", repl, err)
 	}
 	mpath := v.Path()

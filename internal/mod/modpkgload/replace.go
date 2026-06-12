@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 	cuepath "cuelang.org/go/pkg/path"
@@ -158,13 +159,13 @@ type Replacements struct {
 // module file, keyed by original module base path. It returns nil if there
 // are no replace directives.
 //
-// For each directory replacement, resolveDir is called with the dep's
-// module path and the raw replacement directory from the file; it must
-// return the directory to use, typically resolved to an absolute path and
-// validated. It is only called for directory replacements (not
-// module-version replacements). Resolving directory paths is left to the
-// caller because the loader and cue mod tidy resolve them against the
-// filesystem differently.
+// A module-version replace directive names only the major version of the
+// replacement target (for example "example.com/bar@v0"); the concrete
+// version is taken from the target's own dependency entry in mf, so the
+// replacement is subject to the same minimum-version selection as any other
+// dependency. The target must therefore be listed as a dependency with a
+// version. A bare module path (no major version) is also accepted when mf
+// records a default major version for it.
 func NewReplacements(mf *modfile.File) (*Replacements, error) {
 	r := &Replacements{
 		forward: make(map[string]Replacement),
@@ -174,13 +175,13 @@ func NewReplacements(mf *modfile.File) (*Replacements, error) {
 		if dep.Replace == "" {
 			continue
 		}
-		repl, err := ParseReplacement(dep.Replace)
-		if err != nil {
-			return nil, fmt.Errorf("invalid replace value for %s: %v", mpath, err)
-		}
 		mv, err := module.NewVersion(mpath, dep.Version)
 		if err != nil {
 			return nil, fmt.Errorf("cannot make version from module %q, version %q: %v", mpath, dep.Version, err)
+		}
+		repl, err := resolveReplacement(dep.Replace, mf)
+		if err != nil {
+			return nil, fmt.Errorf("invalid replace value for %s: %v", mpath, err)
 		}
 		r.forward[mv.Path()] = repl
 		if repl.Module.IsValid() {
@@ -191,6 +192,43 @@ func NewReplacements(mf *modfile.File) (*Replacements, error) {
 		return nil, nil
 	}
 	return r, nil
+}
+
+// resolveReplacement turns a replace directive value into a Replacement,
+// resolving a module-version target to a concrete version. The version is
+// taken from the target's own dependency entry in mf (reflecting
+// minimum-version selection); if the target is not listed as a dependency but
+// the directive named a full version, that version is used. Directory
+// replacements are returned unchanged.
+func resolveReplacement(s string, mf *modfile.File) (Replacement, error) {
+	if isReplaceDirectoryPath(s) {
+		return Replacement{Dir: s}, nil
+	}
+	base, major, full, err := parseReplaceModule(s)
+	if err != nil {
+		return Replacement{}, err
+	}
+	if major == "" {
+		major = mf.DefaultMajorVersions()[base]
+		if major == "" {
+			return Replacement{}, fmt.Errorf("replacement %q has no major version and no default major version is set for it", s)
+		}
+	}
+	targetPath := base + "@" + major
+	version := full
+	if dep, ok := mf.Deps[targetPath]; ok && dep.Version != "" {
+		// The target's dependency entry reflects minimum-version selection,
+		// so prefer it over any version named in the directive itself.
+		version = dep.Version
+	}
+	if version == "" {
+		return Replacement{}, fmt.Errorf("replacement target %q must be listed as a dependency with a version", targetPath)
+	}
+	mv, err := module.NewVersion(targetPath, version)
+	if err != nil {
+		return Replacement{}, err
+	}
+	return Replacement{Module: mv}, nil
 }
 
 // All returns all the replacements as (modulePath, replacement) pairs
@@ -243,18 +281,106 @@ func (r *Replacements) CanonicalImportPath(importPath string) string {
 	return importPath
 }
 
-// ParseReplacement parses a replace directive value string into a Replacement.
-// The value is either a directory path (starting with ".", "/" or a Windows
-// drive letter) or a module path with version (e.g. "example.com/bar@v0.1.0").
+// ParseReplacement checks the syntax of a replace directive value. The value
+// is either a directory path (starting with ".", "/" or a Windows drive
+// letter) or a module path. The module path may be bare ("example.com/bar"),
+// carry a major version ("example.com/bar@v0") or carry a full version
+// ("example.com/bar@v0.1.0"); a full version is accepted but is normalized to
+// a bare major version by cue mod tidy. For a value that names a major
+// version it returns a Replacement holding the version-less target module.
 func ParseReplacement(s string) (Replacement, error) {
 	if isReplaceDirectoryPath(s) {
 		return Replacement{Dir: s}, nil
 	}
-	mv, err := module.ParseVersion(s)
+	base, major, _, err := parseReplaceModule(s)
+	if err != nil {
+		return Replacement{}, err
+	}
+	if major == "" {
+		// Bare path: valid syntactically; the major version is resolved later.
+		return Replacement{}, nil
+	}
+	mv, err := module.NewVersion(base+"@"+major, "")
 	if err != nil {
 		return Replacement{}, err
 	}
 	return Replacement{Module: mv}, nil
+}
+
+// ReplaceTarget reports the module target named by a replace directive value.
+// For a module-version replacement it returns the target's base path, its
+// major version (empty when the value omitted it, e.g. a bare module path) and
+// the full version it named (empty if it named only a major version); ok is
+// true. For a directory replacement ok is false.
+func ReplaceTarget(s string) (base, major, full string, ok bool, err error) {
+	if isReplaceDirectoryPath(s) {
+		return "", "", "", false, nil
+	}
+	base, major, full, err = parseReplaceModule(s)
+	if err != nil {
+		return "", "", "", false, err
+	}
+	return base, major, full, true, nil
+}
+
+// NormalizeReplace returns the canonical form of a replace directive value: a
+// directory path is returned unchanged, a module-version target that names a
+// full version is reduced to its bare major version (e.g.
+// "example.com/bar@v0.1.0" becomes "example.com/bar@v0"), and a value that
+// already names only a major version (or a bare path) is returned unchanged.
+func NormalizeReplace(s string) (string, error) {
+	if isReplaceDirectoryPath(s) {
+		return s, nil
+	}
+	base, major, full, err := parseReplaceModule(s)
+	if err != nil {
+		return "", err
+	}
+	if full != "" {
+		return base + "@" + major, nil
+	}
+	return s, nil
+}
+
+// parseReplaceModule parses the module form of a replace directive value into
+// the target's base path, its major version (if present) and its full version
+// (if the value named one). A value may be a bare module path
+// ("example.com/bar"), a path with a major version ("example.com/bar@v0"), or
+// a path with a full version ("example.com/bar@v0.1.0"). A full version is
+// accepted for convenience but is normalized to a bare major version by cue
+// mod tidy (see [NormalizeReplace]); the concrete version of the target is
+// taken from its dependency entry, subject to minimum-version selection.
+func parseReplaceModule(s string) (base, major, full string, err error) {
+	base, vers, ok := ast.SplitPackageVersion(s)
+	if !ok {
+		// No "@version" suffix: a bare module path whose major version is
+		// resolved from the default major version.
+		if err := module.CheckPathWithoutVersion(s); err != nil {
+			return "", "", "", fmt.Errorf("invalid replacement module path %q: %v", s, err)
+		}
+		return s, "", "", nil
+	}
+	if isMajorVersion(vers) {
+		return base, vers, "", nil
+	}
+	if !semver.IsValid(vers) || semver.Canonical(vers) != vers {
+		return "", "", "", fmt.Errorf("invalid version %q in replacement %q", vers, s)
+	}
+	return base, semver.Major(vers), vers, nil
+}
+
+// isMajorVersion reports whether v is a bare major version such as "v0" or
+// "v12" (as opposed to a full semantic version like "v0.1.0").
+func isMajorVersion(v string) bool {
+	if len(v) < 2 || v[0] != 'v' {
+		return false
+	}
+	for _, c := range v[1:] {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 // isReplaceDirectoryPath reports whether the given string looks like a

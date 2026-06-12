@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1831f19_cbd180fe",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_local_replace_upgrade.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-12T16:47:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f21a1399_f86e1b6e",
+      "revId": "4c4135a9f9889119cdb9210030a72a50ecd16c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e63c4a2_c02d6ca5",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-11T19:13:50Z",
       "side": 1,
       "message": "personally I would shorten the comments at the top of these testscripts; they\u0027re way too verbose.",
+      "revId": "4c4135a9f9889119cdb9210030a72a50ecd16c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d6cf56c_589d6f61",
+        "filename": "cmd/cue/cmd/testdata/script/registry_local_module_ignored.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-12T16:47:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e63c4a2_c02d6ca5",
       "revId": "4c4135a9f9889119cdb9210030a72a50ecd16c51",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

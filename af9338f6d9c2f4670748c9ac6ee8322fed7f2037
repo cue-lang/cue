@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7fbebc8_ea6df28f",
+        "filename": "internal/filetypes/types_gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-12T17:00:48Z",
+      "side": 1,
+      "message": "Maybe nicer to put the comment directly inside the relevant part of the if?\n\n\n```suggestion\n\tif data, ok :\u003d genstruct.FindRecord(fileInfoDepBytes, 5+1, depKey); ok {\n\t\t// The result is in the extension-dependent table.\n\t\tresultIndex \u003d int(genstruct.GetUint64(data, 0, 1))\n\t} else {\n\t\t// The result does not depend on the extension,\n\t\t// so fall back to the extension-independent table.\n\t\tindepKey :\u003d make([]byte, 4)\n\t\tgenstruct.PutSet(indepKey, 1, 3, allTopLevelTags_rev, maps.Keys(sc.topLevel))\n\t\tgenstruct.PutUint64(indepKey, 0, 1, uint64(mode))\n\t\tdata, ok :\u003d genstruct.FindRecord(fileInfoIndepBytes, 4+1, indepKey)\n\t\tif !ok {\n\t\t\treturn nil, errors.Newf(token.NoPos, \"invalid tag combination\") // TODO what error would be best?\n\t\t}\n\t\tresultIndex \u003d int(genstruct.GetUint64(data, 0, 1))\n\t}\n\tdata :\u003d fileInfoResultsBytes[resultIndex*6:]\n```",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 0
+      },
+      "revId": "af9338f6d9c2f4670748c9ac6ee8322fed7f2037",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+# A module replace directive may name a bare module path (without a major
+# version) when the replacement target has a default major version recorded
+# for it (default: true). The major version is resolved from that default and
+# the concrete version comes from the target's dependency entry.
+#
+# The replace directive lives in cue.mod/local-module.cue (the two-file
+# approach), not in cue.mod/module.cue.
+
+exec cue export .
+cmp stdout want-export.txt
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+
+deps: {
+	"example.com/foo@v0": {
+		v: "v0.1.0"
+	}
+}
+-- cue.mod/local-module.cue --
+deps: {
+	"example.com/foo@v0": {
+		v: "v0.1.0"
+		replaceWith: "example.com/bar"
+	}
+	"example.com/bar@v0": {
+		v:       "v0.1.0"
+		default: true
+	}
+}
+-- main.cue --
+package main
+
+import "example.com/foo@v0:foo"
+
+value: foo.value
+-- _registry/example.com_bar_v0.1.0/cue.mod/module.cue --
+module: "example.com/bar@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_bar_v0.1.0/foo.cue --
+package foo
+
+value: "from bar (bare-path replacement for foo)"
+-- _registry/example.com_foo_v0.1.0/cue.mod/module.cue --
+module: "example.com/foo@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_foo_v0.1.0/foo.cue --
+package foo
+
+value: "from foo v0 (should not see this)"
+-- want-export.txt --
+{
+    "value": "from bar (bare-path replacement for foo)"
+}

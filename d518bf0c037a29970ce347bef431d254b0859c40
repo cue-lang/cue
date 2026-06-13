@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82888ebc_1714b6b9",
+        "filename": "cue/testdata/eval/issue2568.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-06-13T09:05:07Z",
+      "side": 1,
+      "message": "Thi sis the principle test, so I would do a \n\nnot_bottom: ... @test(eq, []) \n\nhere, and \n\nall: [#X \u0026 #Y] @test(err, code\u003deval, at\u003d0.x, contains\u003d\"field not allowed\", pos\u003d[4:4])\n\nor something like that\n\n\nDitto elsewhere.",
+      "revId": "d518bf0c037a29970ce347bef431d254b0859c40",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

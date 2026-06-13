@@ -1847,11 +1847,19 @@ func (v Value) Unify(w Value) Value {
 	return makeValue(v.idx, n, v.parent_)
 }
 
-// UnifyAccept is like [Value.Unify](w), but will disregard the closedness rules for
-// v and w, and will, instead, only allow fields that are present in accept.
+// UnifyAccept is like [Value.Unify], but enforces the closedness rules of
+// accept rather than those of v and w. The unification of v and w is computed
+// as if both were open, so neither rejects fields contributed by the other; a
+// field is then allowed in the result only if accept permits it. The values and
+// constraints of accept are used solely for this check and are not otherwise
+// unified into the result.
 //
-// UnifyAccept is used to piecemeal unify individual conjuncts obtained from
-// accept without violating closedness rules.
+// This is used to unify the individual conjuncts of a closed schema one at a
+// time, where a single conjunct may be closed and reject fields contributed by
+// its siblings. Passing the whole schema as accept defers the closedness check
+// to the combined result.
+//
+// accept must be non-nil, or UnifyAccept panics.
 func (v Value) UnifyAccept(w Value, accept Value) Value {
 	if v.v == nil {
 		return w

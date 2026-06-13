@@ -1,0 +1,44 @@
+# A package inside a directory that is ignored by wildcard matching
+# (a directory starting with "_" or ".") can still be loaded when named
+# explicitly, and can import packages from the main module.
+
+exec cue export ./_examples/example1
+cmp stdout expect-stdout
+
+exec cue export ./.examples/example2
+cmp stdout expect-stdout
+
+# Wildcard matching still skips such directories, so this matches only
+# the main module package and not the examples.
+exec cue export ./...
+cmp stdout expect-root
+
+-- expect-stdout --
+{
+    "fooValue": "yes"
+}
+-- expect-root --
+{
+    "fooValue": "yes",
+    "rootOnly": true
+}
+-- cue.mod/module.cue --
+module: "my-module.example/foo"
+language: version: "v0.9.0"
+-- foo.cue --
+package foo
+
+fooValue: "yes"
+rootOnly: true
+-- _examples/example1/example1.cue --
+package example1
+
+import "my-module.example/foo"
+
+fooValue: foo.fooValue
+-- .examples/example2/example2.cue --
+package example2
+
+import "my-module.example/foo"
+
+fooValue: foo.fooValue

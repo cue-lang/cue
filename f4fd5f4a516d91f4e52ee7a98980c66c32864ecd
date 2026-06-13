@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f733d3c_6f578fe7",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-13T13:17:57Z",
+      "side": 1,
+      "message": "This resolves a bare-path target\u0027s major version only from the published view, but resolveReplacement (load time) resolves it from mf.DefaultMajorVersions(). So a bare-path replacement whose major comes from a local `default: true` entry loads/exports fine but `cue mod tidy` fails here with \"not a published dependency\". Reproduced with the modreplace_bare.txtar setup running `cue mod tidy` instead of `cue export`. Probably needs to also consult localMF.DefaultMajorVersions() — and a tidy test for the bare-path case.",
+      "revId": "f4fd5f4a516d91f4e52ee7a98980c66c32864ecd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d82419f9_d7b69777",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-13T13:17:57Z",
+      "side": 1,
+      "message": "duplicate err check",
+      "revId": "f4fd5f4a516d91f4e52ee7a98980c66c32864ecd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2cdb4e5_46628c37",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-13T13:17:57Z",
+      "side": 1,
+      "message": "nit: I\u0027d shorten this a little if you can, to keep the schema docs from being too verbose",
+      "revId": "f4fd5f4a516d91f4e52ee7a98980c66c32864ecd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

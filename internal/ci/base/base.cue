@@ -56,9 +56,6 @@ botGerritHubUser:                   *botGitHubUser | string
 botGerritHubUserPasswordSecretsKey: *(strings.ToUpper(botGitHubUser) + "_GERRITHUB_PASSWORD") | string
 botGerritHubUserEmail:              *botGitHubUserEmail | string
 
-unprivilegedBotGitHubUser:                               "not" + botGitHubUser
-unprivilegedBotGitHubUserCentralRegistryTokenSecretsKey: *(strings.ToUpper(unprivilegedBotGitHubUser) + "_CUE_TOKEN") | string
-
 // Most repositories will already be a Go module, so they can use a tool dependency.
 // Others can override this string with e.g. `cue` from the `setup-cue` action.
 cueCommand: *"go tool cue" | string

@@ -1,0 +1,43 @@
+# Combining a CUE package, a non-CUE schema file, and a non-CUE data file
+# works the same whether the package is referenced by explicit CUE files or
+# by a package qualifier.
+
+# Baselines: the package on its own, and combined with just the schema file.
+exec cue export .:a
+cmp stdout gold
+exec cue export .:a schema.json
+cmp stdout gold
+
+# The file form of "package + schema + data" works, for both matching and
+# conflicting data.
+exec cue export package.cue schema.json data.yml
+cmp stdout gold
+! exec cue export package.cue schema.json data-bad.yml
+stderr 'conflicting values "foo" and "bar"'
+
+# TODO(#3341): the package-qualifier form should behave identically, but it
+# currently fails before evaluating the data, regardless of whether the data
+# matches. This asserts the broken behavior.
+! exec cue export .:a schema.json data.yml
+stderr 'cannot combine packages with individual schema files'
+! exec cue export .:a schema.json data-bad.yml
+stderr 'cannot combine packages with individual schema files'
+
+-- cue.mod/module.cue --
+module: "mod.example"
+language: version: "v0.9.0"
+-- package.cue --
+package a
+
+x: "foo"
+-- schema.json --
+{ "$schema": "http://json-schema.org/draft-07/schema#", "type": "object",
+  "properties": { "x": { "type": "string", "minLength": 1 } } }
+-- data.yml --
+x: "foo"
+-- data-bad.yml --
+x: "bar"
+-- gold --
+{
+    "x": "foo"
+}

@@ -544,34 +544,20 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			values, schemas = schemas, values
 		}
 
-		for _, di := range schemas {
-			d := di.dec(p)
-			for ; !d.Done(); d.Next() {
-				if err := b.AddSyntax(d.File()); err != nil {
-					return nil, err
-				}
-			}
-			if err := d.Err(); err != nil {
-				return nil, err
-			}
-			d.Close()
-		}
-
 		if len(p.insts) > 1 && p.schema != nil {
 			return nil, errors.Newf(token.NoPos,
 				"cannot use --schema/-d with flag more than one schema")
 		}
 
+		// Determine the schema: the single loaded package if one is present, or
+		// else the orphan instance b. The decoded schema files are then added to
+		// it, so that the package and the schema files together form the schema.
 		var schema *build.Instance
 		switch n := len(p.insts); n {
 		default:
 			return nil, errors.Newf(token.NoPos,
 				"too many packages defined (%d) in combination with files", n)
 		case 1:
-			if len(schemas) > 0 {
-				return nil, errors.Newf(token.NoPos,
-					"cannot combine packages with individual schema files")
-			}
 			schema = p.insts[0]
 			p.insts = nil
 
@@ -580,6 +566,19 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			schema = &bb
 			b.BuildFiles = nil
 			b.Files = nil
+		}
+
+		for _, di := range schemas {
+			d := di.dec(p)
+			for ; !d.Done(); d.Next() {
+				if err := schema.AddSyntax(d.File()); err != nil {
+					return nil, err
+				}
+			}
+			if err := d.Err(); err != nil {
+				return nil, err
+			}
+			d.Close()
 		}
 
 		if schema != nil && len(schema.Files) > 0 {

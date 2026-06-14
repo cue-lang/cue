@@ -544,10 +544,18 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			values, schemas = schemas, values
 		}
 
+		// Decoded schema files become part of the schema. With exactly one
+		// loaded package, add them to that package so the package and the schema
+		// files together form the schema; otherwise the orphan instance b is the
+		// schema.
+		schemaDest := b
+		if len(p.insts) == 1 {
+			schemaDest = p.insts[0]
+		}
 		for _, di := range schemas {
 			d := di.dec(p)
 			for ; !d.Done(); d.Next() {
-				if err := b.AddSyntax(d.File()); err != nil {
+				if err := schemaDest.AddSyntax(d.File()); err != nil {
 					return nil, err
 				}
 			}
@@ -568,10 +576,6 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			return nil, errors.Newf(token.NoPos,
 				"too many packages defined (%d) in combination with files", n)
 		case 1:
-			if len(schemas) > 0 {
-				return nil, errors.Newf(token.NoPos,
-					"cannot combine packages with individual schema files")
-			}
 			schema = p.insts[0]
 			p.insts = nil
 

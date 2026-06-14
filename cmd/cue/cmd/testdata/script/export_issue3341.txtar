@@ -15,13 +15,12 @@ cmp stdout gold
 ! exec cue export package.cue schema.json data-bad.yml
 stderr 'conflicting values "foo" and "bar"'
 
-# TODO(#3341): the package-qualifier form should behave identically, but it
-# currently fails before evaluating the data, regardless of whether the data
-# matches. This asserts the broken behavior.
-! exec cue export .:a schema.json data.yml
-stderr 'cannot combine packages with individual schema files'
+# The package-qualifier form behaves identically, for both matching and
+# conflicting data.
+exec cue export .:a schema.json data.yml
+cmp stdout gold
 ! exec cue export .:a schema.json data-bad.yml
-stderr 'cannot combine packages with individual schema files'
+stderr 'conflicting values "foo" and "bar"'
 
 -- cue.mod/module.cue --
 module: "mod.example"

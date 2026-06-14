@@ -51,7 +51,6 @@ func init() {
 		"data":                 TagTopLevel,
 		"go":                   TagTopLevel,
 		"graph":                TagTopLevel,
-		"ini":                  TagTopLevel,
 		"json":                 TagTopLevel,
 		"jsonl":                TagTopLevel,
 		"jsonschema":           TagTopLevel,
@@ -78,7 +77,6 @@ var (
 		"-",
 		".cue",
 		".go",
-		".ini",
 		".json",
 		".jsonl",
 		".ldjson",
@@ -107,7 +105,6 @@ var (
 		"data",
 		"go",
 		"graph",
-		"ini",
 		"json",
 		"jsonl",
 		"jsonschema",
@@ -130,7 +127,6 @@ var (
 		"binarypb",
 		"code",
 		"cue",
-		"ini",
 		"json",
 		"jsonl",
 		"proto",
@@ -169,7 +165,7 @@ func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors
 	var resultIndex int
 	depKey := make([]byte, 5)
 	genstruct.PutSet(depKey, 2, 3, allTopLevelTags_rev, maps.Keys(sc.topLevel))
-	genstruct.PutEnum(depKey, 1, 1, allFileExts_rev, 17, fileExt(filename))
+	genstruct.PutEnum(depKey, 1, 1, allFileExts_rev, 16, fileExt(filename))
 	genstruct.PutUint64(depKey, 0, 1, uint64(mode))
 	if data, ok := genstruct.FindRecord(fileInfoDepBytes, 5+1, depKey); ok {
 		// The result is in the extension-dependent table.
@@ -242,7 +238,7 @@ func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors
 func fromFileGenerated(b *build.File, mode Mode) (*FileInfo, error) {
 	key := make([]byte, 4)
 	genstruct.PutUint64(key, 0, 1, uint64(mode))
-	genstruct.PutEnum(key, 1, 1, allEncodings_rev, 13, b.Encoding)
+	genstruct.PutEnum(key, 1, 1, allEncodings_rev, 12, b.Encoding)
 	genstruct.PutEnum(key, 2, 1, allInterpretations_rev, 4, b.Interpretation)
 	genstruct.PutEnum(key, 3, 1, allForms_rev, 5, b.Form)
 

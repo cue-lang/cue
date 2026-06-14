@@ -54,7 +54,6 @@ const (
 	JSON        Encoding = "json"
 	YAML        Encoding = "yaml"
 	TOML        Encoding = "toml"
-	INI         Encoding = "ini"
 	XML         Encoding = "xml"
 	JSONL       Encoding = "jsonl"
 	Text        Encoding = "text"

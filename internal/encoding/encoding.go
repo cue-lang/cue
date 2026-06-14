@@ -30,7 +30,6 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/encoding/ini"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/openapi"
@@ -286,9 +285,6 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		i.Next()
 	case build.TOML:
 		i.next = toml.NewDecoder(path, r).Decode
-		i.Next()
-	case build.INI:
-		i.next = ini.NewDecoder(path, r, nil).Decode
 		i.Next()
 	case build.XML:
 		switch {

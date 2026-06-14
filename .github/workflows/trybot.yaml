@@ -9,7 +9,7 @@ name: TryBot
       - release-branch.*
     tags-ignore:
       - v*
-  pull_request_target: {}
+  pull_request: {}
   schedule:
     - cron: 0 2 * * *
   workflow_dispatch: {}

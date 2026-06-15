@@ -190,7 +190,7 @@ deps: "example.com/dep@v0": {
 	replaceWith: "./local_dep"
 }
 `,
-	wantError: `invalid module file: replaceWith field is not allowed at this language version; need at least v0.17.0`,
+	wantError: `invalid module file: module replace is not allowed at this language version; need at least v0.17.0`,
 }, {
 	testName: "AmbiguousDefaults",
 	parse:    Parse,
@@ -715,7 +715,7 @@ deps: "example.com/dep@v0": replaceWith: "./local_dep"
 
 	t.Run("RejectsOmittedVersionWithoutReplace", func(t *testing.T) {
 		// A dep that omits its version, is not in module.cue and has no
-		// replace directive cannot be resolved.
+		// replaceWith field cannot be resolved.
 		_, err := ParseLocal([]byte(`
 deps: "example.com/dep@v0": {}
 `), "local-module.cue", base)

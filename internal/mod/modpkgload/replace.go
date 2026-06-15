@@ -51,7 +51,7 @@ type FullRegistry interface {
 //
 // locForPath returns the source location corresponding to a replacement directory
 // path in repls, relative to the given absolute directory relTo if it's not absolute.
-// If it's nil, directory replace directives are not supported.
+// If it's nil, directory replacements are not supported.
 func NewReplacingRegistry(
 	reg FullRegistry,
 	repls *Replacements,
@@ -62,7 +62,7 @@ func NewReplacingRegistry(
 	}
 	if locForPath == nil {
 		locForPath = func(path string) (module.SourceLoc, error) {
-			return module.SourceLoc{}, fmt.Errorf("directory replace directives not supported")
+			return module.SourceLoc{}, fmt.Errorf("directory replacements not supported")
 		}
 	}
 	return &replacingRegistry{
@@ -129,7 +129,7 @@ func (r *replacingRegistry) modFileFromDir(dir string) (*modfile.File, error) {
 	return mf, nil
 }
 
-// Replacement describes a single replacement directive.
+// Replacement describes a single replacement.
 type Replacement struct {
 	// Module holds the replacement module version.
 	// It is non-zero for module-version replacements.
@@ -140,7 +140,7 @@ type Replacement struct {
 	Dir string
 }
 
-// Replacements holds replacement directives and provides both forward
+// Replacements holds replacements and provides both forward
 // lookups (original module path → replacement) and reverse lookups
 // (replacement import path → canonical import path under the original module).
 type Replacements struct {
@@ -156,7 +156,7 @@ type Replacements struct {
 
 // NewReplacements builds the replacements described by the deps of a
 // module file, keyed by original module base path. It returns nil if there
-// are no replace directives.
+// are no replaceWith fields.
 //
 // For each directory replacement, resolveDir is called with the dep's
 // module path and the raw replacement directory from the file; it must
@@ -243,7 +243,7 @@ func (r *Replacements) CanonicalImportPath(importPath string) string {
 	return importPath
 }
 
-// ParseReplacement parses a replace directive value string into a Replacement.
+// ParseReplacement parses a replaceWith field value into a Replacement.
 // The value is either a directory path (starting with ".", "/" or a Windows
 // drive letter) or a module path with version (e.g. "example.com/bar@v0.1.0").
 func ParseReplacement(s string) (Replacement, error) {

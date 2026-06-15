@@ -1,7 +1,7 @@
 # cue mod tidy with a cue.mod/local-module.cue file present.
 # The main module imports a package provided by a module that is replaced
 # by a local directory. tidy must:
-#   - keep the replace directive in local-module.cue (with the dep set
+#   - keep the replaceWith field in local-module.cue (with the dep set
 #     resolved with the replacement applied), and
 #   - record the published dependency (resolved from the registry, without
 #     the replacement) in module.cue.

@@ -35,20 +35,20 @@ type loader struct {
 	mainModule    module.Version
 	mainModuleLoc module.SourceLoc
 	registry      Registry
-	// replacements holds the replace directives to apply when loading
+	// replacements holds the replacements to apply when loading
 	// packages, or nil when resolving the published (un-replaced) view.
 	replacements *modpkgload.Replacements
 	checkTidy    bool
 }
 
-// TidyOptions configures two-file tidying with replace directives. When it
+// TidyOptions configures two-file tidying with module replaces. When it
 // is nil, only cue.mod/module.cue (the published view) is considered, and
 // any cue.mod/local-module.cue file is ignored.
 type TidyOptions struct {
 	// LocForPath returns the location of a directory replacement,
-	// where path is exactly the replace directive's value, which
+	// where path is exactly the replaceWith field's value, which
 	// may be relative to the module's root directory.
-	// If nil, directory replace directives are not supported.
+	// If nil, directory replacements are not supported.
 	LocForPath func(path string) (module.SourceLoc, error)
 
 	// LocalOnly restricts tidying to cue.mod/local-module.cue, leaving
@@ -65,7 +65,7 @@ type TidyResult struct {
 	Module *modfile.File
 
 	// Local is the tidied cue.mod/local-module.cue (the main-module view),
-	// or nil if the file should not exist because no replace directives
+	// or nil if the file should not exist because no module replaces
 	// remain.
 	Local *modfile.File
 }
@@ -87,11 +87,11 @@ func CheckTidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, op
 // tidied module files.
 //
 // When opts is nil, only cue.mod/module.cue is considered (the published
-// view), exactly as if replace directives did not exist; any
+// view), exactly as if module replaces did not exist; any
 // cue.mod/local-module.cue file is ignored.
 //
-// When opts is non-nil and a cue.mod/local-module.cue file with replace
-// directives is present, Tidy additionally resolves the main-module view
+// When opts is non-nil and a cue.mod/local-module.cue file with replaceWith
+// fields is present, Tidy additionally resolves the main-module view
 // with replaces applied (returned in [TidyResult.Local]) and keeps the two
 // files in sync, taking the maximum version for any module present in both.
 func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, opts *TidyOptions) (*TidyResult, error) {
@@ -100,7 +100,7 @@ func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, opts *T
 
 func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, opts *TidyOptions, checkTidy bool) (*TidyResult, error) {
 	// A nil opts selects the published view alone: cue.mod/local-module.cue
-	// is ignored entirely, exactly as if replace directives did not exist.
+	// is ignored entirely, exactly as if module replaces did not exist.
 	ignoreLocal := opts == nil
 	if opts == nil {
 		opts = &TidyOptions{}
@@ -116,9 +116,9 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, opts *T
 	}
 	mainModuleLoc := module.SourceLoc{FS: fsys, Dir: modRoot}
 
-	// Read the optional local-module.cue file and fold in any replace
-	// directives from module.cue to form the effective main-module view.
-	// tidy tolerates a replace directive in module.cue and migrates it into
+	// Read the optional local-module.cue file and fold in any replaceWith
+	// fields from module.cue to form the effective main-module view.
+	// tidy tolerates a replaceWith field in module.cue and migrates it into
 	// local-module.cue (removing it from the published module.cue).
 	var (
 		localMF     *modfile.File
@@ -194,15 +194,15 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, opts *T
 	}
 
 	if checkTidy {
-		// Replace directives belong in local-module.cue, not module.cue;
+		// The replaceWith field belongs in local-module.cue, not module.cue;
 		// a tidy module has had them migrated out of the published file.
 		if hasReplace(baseMF) {
-			return nil, &ErrModuleNotTidy{Reason: "cue.mod/module.cue has a replace directive that should be moved to cue.mod/local-module.cue"}
+			return nil, &ErrModuleNotTidy{Reason: "cue.mod/module.cue has a module replace that should be moved to cue.mod/local-module.cue"}
 		}
-		// A local-module.cue with no replace directives serves no purpose
+		// A local-module.cue with no replaceWith fields serves no purpose
 		// and should have been removed.
 		if localExists && repls == nil {
-			return nil, &ErrModuleNotTidy{Reason: "cue.mod/local-module.cue has no replace directives and should be removed"}
+			return nil, &ErrModuleNotTidy{Reason: "cue.mod/local-module.cue has no module replaces and should be removed"}
 		}
 		// Each view being internally tidy is not enough: module.cue must also
 		// advertise the maximum version (and matching default major version)
@@ -287,7 +287,7 @@ func hasReplace(mf *modfile.File) bool {
 
 // sameDeps reports whether a and b declare the same dependencies: the same
 // set of module paths, each with the same version, default marker and
-// replace directive.
+// replaceWith field.
 func sameDeps(a, b *modfile.File) bool {
 	if len(a.Deps) != len(b.Deps) {
 		return false
@@ -302,12 +302,13 @@ func sameDeps(a, b *modfile.File) bool {
 }
 
 // mergeLocalReplaces builds the effective main-module view by folding any
-// replace directives from module.cue (base) into the local-module.cue view
+// replaceWith fields from module.cue (base) into the local-module.cue view
 // (local, which may be nil if there is no such file). The local view wins on
-// conflict; a replace from module.cue is carried over only when local does not
-// already replace that module, and supplies a version when local omits one.
+// conflict; a replaceWith field from module.cue is carried over only when local
+// does not already replace that module, and supplies a version when local omits
+// one.
 //
-// It returns nil when there are no replace directives in either file, in which
+// It returns nil when there are no replaceWith fields in either file, in which
 // case there is no main-module view distinct from the published one.
 func mergeLocalReplaces(base, local *modfile.File) (*modfile.File, error) {
 	deps := make(map[string]*modfile.Dep)
@@ -406,7 +407,7 @@ func readLocalModuleFile(fsys fs.FS, modRoot string, baseMF *modfile.File) (mf *
 // The module path, language version, source and custom data are taken from
 // old. For any module also present in maxVers at a higher version, that
 // version is used instead (keeping the two files in sync). When replSource
-// is non-nil, replace directives from it are reattached to the matching
+// is non-nil, replaceWith fields from it are reattached to the matching
 // deps (used when building local-module.cue).
 func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements, maxVers, defaults map[string]string, replSource *modfile.File) *modfile.File {
 	// TODO it would be nice to have some way of automatically including new
@@ -444,7 +445,7 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 	return mf
 }
 
-// replaceByPath maps a module file's deps that carry a replace directive
+// replaceByPath maps a module file's deps that carry a replaceWith field
 // from their full module path to the replace value.
 func replaceByPath(mf *modfile.File) map[string]string {
 	m := make(map[string]string)

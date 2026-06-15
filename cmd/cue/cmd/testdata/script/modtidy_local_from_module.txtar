@@ -1,5 +1,5 @@
-# cue mod tidy when a replace directive is present in cue.mod/module.cue.
-# Replace directives belong in cue.mod/local-module.cue, so tidy tolerates one
+# cue mod tidy when a replaceWith field is present in cue.mod/module.cue.
+# The replaceWith field belongs in cue.mod/local-module.cue, so tidy tolerates one
 # in module.cue and migrates it: it records the replace in local-module.cue
 # (creating the file) and removes it from the published module.cue.
 

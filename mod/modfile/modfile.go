@@ -286,7 +286,7 @@ func ParseNonStrict(modfile []byte, filename string) (*File, error) {
 }
 
 // ParseLocal parses a cue.mod/local-module.cue file, which holds the
-// main-module view of dependencies, including any replace directives.
+// main-module view of dependencies, including any module replaces.
 //
 // A local-module.cue file does not declare a module path or language
 // version of its own; these are inherited from base, the already-parsed

@@ -258,7 +258,7 @@ func locInModule(pkgPath, mpath string, mloc module.SourceLoc, isLocal bool) (lo
 	// Check that there aren't other modules in the way.
 	// This check is unnecessary inside the module cache.
 	// So we only check local module trees
-	// (the main module and, in the future, any directory trees pointed at by replace directives).
+	// (the main module and, in the future, any directory trees pointed at by replaceWith fields).
 	if isLocal {
 		// Normalize so that paths like "." and "", which path.Join collapses
 		// when joining with a sub-path, compare equal.

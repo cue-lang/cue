@@ -1,5 +1,5 @@
-# cue mod tidy removes a cue.mod/local-module.cue file that has no replace
-# directives, since it then serves no purpose: the published module.cue is
+# cue mod tidy removes a cue.mod/local-module.cue file that has no replaceWith
+# fields, since it then serves no purpose: the published module.cue is
 # the single source of truth.
 
 exec cue mod tidy

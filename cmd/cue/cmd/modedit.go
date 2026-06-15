@@ -51,9 +51,9 @@ mainly for tools that understand the module graph. Users should prefer
 needed to satisfy constraints imposed by other modules.
 
 The --replace=path@majorversion=replacement and
---drop-replace=path@majorversion flags add and drop a replace directive for
+--drop-replace=path@majorversion flags add and drop a module replace for
 the given module path. A replacement is either a local directory or a module
-path with version (e.g. example.com/bar@v0.1.0). Because replace directives
+path with version (e.g. example.com/bar@v0.1.0). Because module replaces
 are not permitted in published modules, these edits are applied to
 cue.mod/local-module.cue rather than cue.mod/module.cue.
 
@@ -70,8 +70,8 @@ The --drop-source flag removes the source field.
 	addFlagVar(cmd, flagFunc(editCmd.flagModule), "module", "set the module path")
 	addFlagVar(cmd, flagFunc(editCmd.flagRequire), "require", "add a required module@version")
 	addFlagVar(cmd, flagFunc(editCmd.flagDropRequire), "drop-require", "remove a requirement")
-	addFlagVar(cmd, flagFunc(editCmd.flagReplace), "replace", "add a replace directive (path@majorversion=replacement) to local-module.cue")
-	addFlagVar(cmd, flagFunc(editCmd.flagDropReplace), "drop-replace", "remove a replace directive from local-module.cue")
+	addFlagVar(cmd, flagFunc(editCmd.flagReplace), "replace", "add a module replace (path@majorversion=replacement) to local-module.cue")
+	addFlagVar(cmd, flagFunc(editCmd.flagDropReplace), "drop-replace", "remove a module replace from local-module.cue")
 
 	return cmd
 }
@@ -81,7 +81,7 @@ type modEditCmd struct {
 	edits []func(*modfile.File) error
 
 	// localEdits holds operations applied to the main-module dependency view
-	// held in cue.mod/local-module.cue (replace directives).
+	// held in cue.mod/local-module.cue (replaceWith fields).
 	localEdits []func(*modfile.File) error
 }
 
@@ -145,7 +145,7 @@ func (c *modEditCmd) runLocalEdits(modRoot string, base *modfile.File) error {
 		}
 	}
 	if !hasReplace(local) {
-		// No replace directives remain, so local-module.cue serves no purpose.
+		// No replaceWith fields remain, so local-module.cue serves no purpose.
 		if err := os.Remove(localPath); err != nil && !errors.Is(err, fs.ErrNotExist) {
 			return err
 		}
@@ -159,7 +159,7 @@ func (c *modEditCmd) runLocalEdits(modRoot string, base *modfile.File) error {
 }
 
 // localViewFromBase returns a main-module view that mirrors base's dependencies
-// and identity, ready to have replace directives applied to it.
+// and identity, ready to have replaceWith fields applied to it.
 func localViewFromBase(base *modfile.File) *modfile.File {
 	deps := make(map[string]*modfile.Dep, len(base.Deps))
 	for mpath, dep := range base.Deps {
@@ -175,7 +175,7 @@ func localViewFromBase(base *modfile.File) *modfile.File {
 	}
 }
 
-// hasReplace reports whether any dependency in f carries a replace directive.
+// hasReplace reports whether any dependency in f carries a replaceWith field.
 func hasReplace(f *modfile.File) bool {
 	for _, dep := range f.Deps {
 		if dep.ReplaceWith != "" {
@@ -338,7 +338,7 @@ func (c *modEditCmd) flagDropReplace(arg string) error {
 			return nil
 		}
 		dep.ReplaceWith = ""
-		// A dependency listed only to carry a replace directive (a replace-only
+		// A dependency listed only to carry a replaceWith field (a replace-only
 		// placeholder with no version) becomes meaningless once the replace is
 		// gone, so drop it entirely.
 		if dep.Version == "" {

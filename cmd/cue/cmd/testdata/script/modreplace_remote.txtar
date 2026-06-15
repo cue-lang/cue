@@ -1,7 +1,7 @@
-# Test remote module replace directives.
+# Test remote module replaces.
 # A module dependency can be replaced with a different module from the registry.
 #
-# The replace directive lives in cue.mod/local-module.cue (the two-file
+# The replaceWith field lives in cue.mod/local-module.cue (the two-file
 # approach), not in cue.mod/module.cue.
 #
 # This test verifies that:

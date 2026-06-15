@@ -176,8 +176,8 @@ versions: "v0.17.0": {
 //error: source field is not allowed at this language version; need at least v0.9.0-alpha.0
 let _errorSourceFieldRequiredVersion = 1 & 2
 
-//error: replaceWith field is not allowed at this language version; need at least v0.17.0
+//error: module replace is not allowed at this language version; need at least v0.17.0
 let _errorReplaceFieldRequiredVersion = 1 & 2
 
-//error: replace directives are not allowed in published modules
+//error: module replace is not allowed in published modules
 let _errorReplaceNotPermittedInStrict = 1 & 2

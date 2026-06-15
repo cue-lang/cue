@@ -16,6 +16,24 @@
       "message": "is this intended? perhaps do a pass on the whole patch with AI to see if you\u0027re removing any other txtar file entries. that seems dangerous, e.g. you might be removing test cases which added coverage.",
       "revId": "61bcbc9232e939ed496c62900d43b86d301aeab6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4311467_9c54aa15",
+        "filename": "encoding/jsonschema/testdata/txtar/list.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T14:06:15Z",
+      "side": 0,
+      "message": "Lol, that was a PEBKAC - manually tidying up txtars where the evalv2 problems were causing pain - looks like I was overly keen to delete stuff. Hilarious (if very understandable) that the test doesn\u0027t error with the files accidentally gone. Fix incoming.",
+      "parentUuid": "1f2c065d_3a96314f",
+      "revId": "61bcbc9232e939ed496c62900d43b86d301aeab6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

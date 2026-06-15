@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f2c065d_3a96314f",
+        "filename": "encoding/jsonschema/testdata/txtar/list.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 0,
+      "message": "is this intended? perhaps do a pass on the whole patch with AI to see if you\u0027re removing any other txtar file entries. that seems dangerous, e.g. you might be removing test cases which added coverage.",
+      "revId": "61bcbc9232e939ed496c62900d43b86d301aeab6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

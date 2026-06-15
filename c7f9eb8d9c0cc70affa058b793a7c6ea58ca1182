@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7b2a2e7_6dd2c138",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 66
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "Reviewed every fourth test file or so, to try to spot any more general issues rather than reading through every change line by line.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dc9217c_be04b9dc",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "nit: shorten this comment",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5c8abf3_47802882",
+        "filename": "cmd/cue/cmd/testdata/script/eval_ignore.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "interesting that we expand here. is this because of the comment on one of the elements? I fully agree that the new form is better FWIW.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7984b8c5_65ef1a40",
+        "filename": "cmd/cue/cmd/testdata/script/modget_initial.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "In a way, the collapsing is losing us the vertical alignment of the `v` fields. The collapsing would be a little nicer if we did something like https://github.com/cue-lang/cue/issues/675:\n\n```\ndeps: {\n\t\"bar.com@v0\":     v: \"v0.5.0\"\n\t\"baz.org@v0\":     v: \"v0.10.2\"\n\t\"example.com@v0\": v: \"v0.0.1\"\n```\n\nnot a huge deal though, but perhaps worth recording as a TODO or test case, linking to issue 675. Or if you think we\u0027ll probably never do something like this, then I\u0027m tempted to say that we should not collapse the `deps` table at all, because I find the old form easier to parse visually with the vertical alignment, even if it takes up a bunch more lines.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64ade021_a4abf4f0",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "FWIW, the more I look at these changes the more I think we shouldn\u0027t collapse `source`, because `\"v0.9.0\"` and `\"self\"` being aligned together doesn\u0027t make a lot of sense - they are entirely unrelated values. again not a blocker, but I think I\u0027m starting to lean against dropping any braces in `module.cue` other than the ones on `language`.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f1c7c1e_4966cef2",
+        "filename": "cue/format/format.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "I _seem to recall_ that there\u0027s actually no way to indent with spaces with the current `cue/format` API, so this branch may be entirely unnecessary.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af07c88e_49bf5831",
+        "filename": "encoding/jsonschema/testdata/generate/closedness.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "💌",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71a2ef45_95a8e75c",
+        "filename": "encoding/jsonschema/testdata/txtar/typeexcluded.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "interesting. my instinct is that the old format was a little better, but I see the appeal of adding at least one level of indentation to the list.\n\nhow about:\n\n```\nmatchN(\u003e\u003d1, [\n    true,\n    {\n        ...\n])\n```",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f2158cc_02090d3d",
+        "filename": "encoding/protobuf/testdata/istio.io/api/mixer/v1/attributes_proto_gen.cue",
+        "patchSetId": 66
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "💌",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c75a6d3c_a652ba83",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "if the AI has decided that `leadingDocComments` is a better name, fix all callers to call it directly; this extra indirection feels unnecessary",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0321a15c_cf2c21af",
+        "filename": "internal/core/export/testdata/main/topocomp2.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "out of curiosity, why are we collapsing the first but not the second? the collapsing seems fine, but AFAICT we should be consistent given that the input is consistent.\n\nthis can be left as a follow-up.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a114b02_4fe14b03",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "I\u0027d keep this simpler and just say \"cue fmt\" and \"cue/format\". I think it follows that any other commands and APIs which similarly format or emit CUE are similarly affected.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8423f09d_4f3afeef",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "I\u0027d remove the last sentence. it\u0027s already implied that the old formatter is used when this is disabled, and I\u0027m not even sure what is meant by \"fallback\". only one formatter is used at a time, we never have a system where one is used as a fallback to the other.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc1b8c97_90fb5900",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "I wonder: can we avoid declaring `preview` here given that `default` is exactly the same?",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de73b01f_c4ed664d",
+        "filename": "pkg/list/testdata/unique.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "very nice.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ff92778_d58b0c4e",
+        "filename": "pkg/path/testdata/os.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:27:53Z",
+      "side": 1,
+      "message": "💌",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

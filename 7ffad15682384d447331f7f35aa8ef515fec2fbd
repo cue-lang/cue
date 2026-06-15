@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aa79f31_3b799801",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T08:56:44Z",
+      "side": 1,
+      "message": "We\u0027ve just discussed this on a call; I find this very non-obvious code and I just wonder whether there\u0027s a way to reorder things here to make it all more obvious.",
+      "revId": "7ffad15682384d447331f7f35aa8ef515fec2fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

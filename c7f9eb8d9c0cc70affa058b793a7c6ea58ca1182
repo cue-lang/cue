@@ -173,6 +173,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "2554dfb5_bfe0d7fc",
+        "filename": "encoding/jsonschema/testdata/txtar/typeexcluded.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T12:51:54Z",
+      "side": 1,
+      "message": "ack. we know that matchN tends to be a short integer literal followed by a list; could we encourage the printer to put the number on the same line, perhaps by setting its RelPos? and then similarly for the `[` afterwards.\n\nthis might be a matchN-specific thing in the jsonschema decoder, but I\u0027d be fine with that.",
+      "parentUuid": "b47dfeb2_df829cad",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "9f2158cc_02090d3d",

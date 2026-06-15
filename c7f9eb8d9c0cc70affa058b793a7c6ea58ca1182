@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "158143a8_5ea353b1",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T16:19:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8dc9217c_be04b9dc",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5c8abf3_47802882",
@@ -243,6 +261,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9427ea53_67f38799",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T16:19:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c75a6d3c_a652ba83",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0321a15c_cf2c21af",
@@ -295,6 +331,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32282e42_e59cdbef",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T16:19:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a114b02_4fe14b03",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8423f09d_4f3afeef",
@@ -312,6 +366,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15af9fed_b90cb433",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T16:19:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8423f09d_4f3afeef",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc1b8c97_90fb5900",
@@ -325,6 +397,24 @@
       "writtenOn": "2026-06-15T12:27:53Z",
       "side": 1,
       "message": "I wonder: can we avoid declaring `preview` here given that `default` is exactly the same?",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1b584b0_16ee9bfd",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T16:19:33Z",
+      "side": 1,
+      "message": "We can. There is prior art though for having both even if the value is the same, eg\n```\n\tYAMLV3Decoder bool `experiment:\"preview:v0.9.0,default:v0.9.0,stable:v0.11.0\"`\n\n\tKeepValidators bool `experiment:\"preview:v0.14.0,default:v0.14.0,stable:v0.15.0\"`\n```\n\nYour call - lmk",
+      "parentUuid": "bc1b8c97_90fb5900",
       "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

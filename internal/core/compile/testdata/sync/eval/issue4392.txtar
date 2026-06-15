@@ -1,0 +1,33 @@
+# A list field added inside an if-block of a let-bound struct, consumed by
+# encoding/json.Marshal within a unified-and-projected definition, regressed
+# in evalv3 with "adding field N not allowed as field set was already
+# referenced".
+-- in.cue --
+import "encoding/json"
+
+#W: {
+	let _obj = {
+		if true {
+			list: [1, 2]
+		}
+	}
+	out: json.Marshal(_obj)
+}
+
+result: (#W & {}).out
+-- out/compile --
+--- in.cue
+{
+  #W: {
+    let _obj#1 = {
+      if true {
+        list: [
+          1,
+          2,
+        ]
+      }
+    }
+    out: 〈import;"encoding/json"〉.Marshal(〈0;let _obj#1〉)
+  }
+  result: (〈0;#W〉 & {}).out
+}

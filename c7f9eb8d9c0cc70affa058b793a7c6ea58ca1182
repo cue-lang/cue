@@ -242,6 +242,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34e02b98_ca3b49d5",
+        "filename": "internal/core/export/testdata/main/topocomp2.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T14:02:35Z",
+      "side": 1,
+      "message": "That\u0027s a bug. Fix incoming.",
+      "parentUuid": "0321a15c_cf2c21af",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a114b02_4fe14b03",

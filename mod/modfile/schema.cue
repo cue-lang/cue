@@ -56,10 +56,10 @@ versions: "v0.9.0-alpha.0": {
 	// the latest version is clearest.
 	versions["v0.17.0"]
 
-	// The replace field was added in v0.17.0, so "remove"
+	// The replaceWith field was added in v0.17.0, so "remove"
 	// it here by marking it as an error when used.
 	#File: #Dep: {
-		replace?: _errorReplaceFieldRequiredVersion
+		replaceWith?: _errorReplaceFieldRequiredVersion
 		// versions were mandatory until v0.17.0 allowed
 		// them to be omitted within local-module.cue.
 		v!: _
@@ -109,12 +109,12 @@ versions: "v0.17.0": {
 			// not set for exactly one of them.
 			default?: bool
 
-			// replace specifies a replacement for this dependency
+			// replaceWith specifies a replacement for this dependency
 			// Directory replacements use a relative path starting "./"
 			// or "../" or an absolute path.
 			// Any other value is a module path with a version.
 			// (e.g. "example.com/bar@v0.1.0").
-			replace?: string
+			replaceWith?: string
 		}
 
 		// #Module constrains a module path. The major version indicator is
@@ -142,7 +142,7 @@ versions: "v0.17.0": {
 			v!: #Semver
 
 			// Replacements are not permitted in published modules.
-			replace?: _errorReplaceNotPermittedInStrict
+			replaceWith?: _errorReplaceNotPermittedInStrict
 		}
 	}
 
@@ -176,7 +176,7 @@ versions: "v0.17.0": {
 //error: source field is not allowed at this language version; need at least v0.9.0-alpha.0
 let _errorSourceFieldRequiredVersion = 1 & 2
 
-//error: replace field is not allowed at this language version; need at least v0.17.0
+//error: replaceWith field is not allowed at this language version; need at least v0.17.0
 let _errorReplaceFieldRequiredVersion = 1 & 2
 
 //error: replace directives are not allowed in published modules

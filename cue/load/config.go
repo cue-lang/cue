@@ -573,7 +573,7 @@ func (c *Config) loadModule() error {
 	// Replace directives belong in cue.mod/local-module.cue, not in
 	// module.cue, so that published modules never carry them.
 	for mpath, dep := range mf.Deps {
-		if dep.Replace != "" {
+		if dep.ReplaceWith != "" {
 			return errors.Newf(token.NoPos, "replace directive for %q is not allowed in module.cue; put it in cue.mod/%s", mpath, localModuleFile)
 		}
 	}

@@ -278,7 +278,7 @@ func mergeRequirements(pub, local *modrequirements.Requirements) (maxVers, defau
 
 func hasReplace(mf *modfile.File) bool {
 	for _, dep := range mf.Deps {
-		if dep.Replace != "" {
+		if dep.ReplaceWith != "" {
 			return true
 		}
 	}
@@ -294,7 +294,7 @@ func sameDeps(a, b *modfile.File) bool {
 	}
 	for mpath, ad := range a.Deps {
 		bd, ok := b.Deps[mpath]
-		if !ok || ad.Version != bd.Version || ad.Default != bd.Default || ad.Replace != bd.Replace {
+		if !ok || ad.Version != bd.Version || ad.Default != bd.Default || ad.ReplaceWith != bd.ReplaceWith {
 			return false
 		}
 	}
@@ -318,11 +318,11 @@ func mergeLocalReplaces(base, local *modfile.File) (*modfile.File, error) {
 		}
 	}
 	for mpath, bdep := range base.Deps {
-		if bdep.Replace == "" {
+		if bdep.ReplaceWith == "" {
 			continue
 		}
 		if d, ok := deps[mpath]; ok {
-			d.Replace = cmp.Or(d.Replace, bdep.Replace)
+			d.ReplaceWith = cmp.Or(d.ReplaceWith, bdep.ReplaceWith)
 			d.Version = cmp.Or(d.Version, bdep.Version)
 			continue
 		}
@@ -437,7 +437,7 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 			Default: defaults[v.BasePath()] == semver.Major(version),
 		}
 		if r, ok := replByPath[v.Path()]; ok {
-			dep.Replace = r
+			dep.ReplaceWith = r
 		}
 		mf.Deps[v.Path()] = dep
 	}
@@ -449,13 +449,13 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 func replaceByPath(mf *modfile.File) map[string]string {
 	m := make(map[string]string)
 	for mpath, dep := range mf.Deps {
-		if dep.Replace == "" {
+		if dep.ReplaceWith == "" {
 			continue
 		}
 		if mv, err := module.NewVersion(mpath, dep.Version); err == nil {
-			m[mv.Path()] = dep.Replace
+			m[mv.Path()] = dep.ReplaceWith
 		} else {
-			m[mpath] = dep.Replace
+			m[mpath] = dep.ReplaceWith
 		}
 	}
 	return m

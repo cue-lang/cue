@@ -52,17 +52,17 @@ deps: {
 -- want-local-1 --
 deps: {
 	"example.com/dep@v0": {
-		replace: "./local_dep"
+		replaceWith: "./local_dep"
 	}
 	"example.com/other@v0": {}
 }
 -- want-local-2 --
 deps: {
 	"example.com/dep@v0": {
-		replace: "./local_dep"
+		replaceWith: "./local_dep"
 	}
 	"example.com/other@v0": {
-		replace: "example.com/replacement@v1.2.3"
+		replaceWith: "example.com/replacement@v1.2.3"
 	}
 }
 -- want-stdout --

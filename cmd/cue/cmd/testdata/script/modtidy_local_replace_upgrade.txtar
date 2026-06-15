@@ -34,7 +34,7 @@ deps: {
 deps: {
 	"example.com/dep@v0": {}
 	"example.com/orig@v0": {
-		replace: "example.com/target@v0.0.1"
+		replaceWith: "example.com/target@v0.0.1"
 	}
 }
 -- want-stdout --
@@ -48,7 +48,7 @@ language: version: "v0.17.0"
 -- cue.mod/local-module.cue --
 deps: "example.com/orig@v0": {
 	v:       "v0.1.0"
-	replace: "example.com/target@v0.0.1"
+	replaceWith: "example.com/target@v0.0.1"
 }
 -- main.cue --
 package main

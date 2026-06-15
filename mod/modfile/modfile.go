@@ -126,9 +126,9 @@ func FormatLocal(f, base *File) ([]byte, error) {
 	// when empty, so that information redundant with module.cue need not be
 	// written.
 	type localDep struct {
-		Version string `json:"v,omitempty"`
-		Default bool   `json:"default,omitempty"`
-		Replace string `json:"replace,omitempty"`
+		Version     string `json:"v,omitempty"`
+		Default     bool   `json:"default,omitempty"`
+		ReplaceWith string `json:"replaceWith,omitempty"`
 	}
 	deps := make(map[string]localDep, len(f.Deps))
 	for mpath, dep := range f.Deps {
@@ -143,9 +143,9 @@ func FormatLocal(f, base *File) ([]byte, error) {
 			}
 		}
 		deps[mpath] = localDep{
-			Version: version,
-			Default: def,
-			Replace: dep.Replace,
+			Version:     version,
+			Default:     def,
+			ReplaceWith: dep.ReplaceWith,
 		}
 	}
 	// Encode only the deps so that the module path and language version
@@ -331,7 +331,7 @@ func ParseLocal(data []byte, filename string, base *File) (*File, error) {
 			dep.Version = bdep.Version
 			continue
 		}
-		if dep.Replace == "" {
+		if dep.ReplaceWith == "" {
 			return nil, fmt.Errorf("dependency %q in %s has no version and is not present in module.cue", mpath, filename)
 		}
 	}

@@ -187,10 +187,10 @@ module: "foo.com/bar@v0"
 language: version: "v0.16.0"
 deps: "example.com/dep@v0": {
 	v: "v0.1.0"
-	replace: "./local_dep"
+	replaceWith: "./local_dep"
 }
 `,
-	wantError: `invalid module file: replace field is not allowed at this language version; need at least v0.17.0`,
+	wantError: `invalid module file: replaceWith field is not allowed at this language version; need at least v0.17.0`,
 }, {
 	testName: "AmbiguousDefaults",
 	parse:    Parse,
@@ -632,14 +632,14 @@ language: version: "v0.17.0"
 		f, err := ParseLocal([]byte(`
 deps: "example.com/dep@v0": {
 	v: "v0.1.0"
-	replace: "./local_dep"
+	replaceWith: "./local_dep"
 }
 `), "local-module.cue", base)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(f.QualifiedModule(), "example.com/main@v0"))
 		qt.Assert(t, qt.Equals(f.Language.Version, "v0.17.0"))
 		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Version, "v0.1.0"))
-		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Replace, "./local_dep"))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].ReplaceWith, "./local_dep"))
 		// Dependencies are initialized so that resolved versions are available.
 		qt.Assert(t, qt.DeepEquals(f.DepVersions(), parseVersions("example.com/dep@v0.1.0")))
 	})
@@ -671,11 +671,11 @@ deps: "example.com/dep@v0": v: "v0.1.0"
 `), "module.cue")
 		qt.Assert(t, qt.IsNil(err))
 		f, err := ParseLocal([]byte(`
-deps: "example.com/dep@v0": replace: "./local_dep"
+deps: "example.com/dep@v0": replaceWith: "./local_dep"
 `), "local-module.cue", base)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Version, "v0.1.0"))
-		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Replace, "./local_dep"))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].ReplaceWith, "./local_dep"))
 		qt.Assert(t, qt.DeepEquals(f.DepVersions(), parseVersions("example.com/dep@v0.1.0")))
 	})
 
@@ -692,7 +692,7 @@ deps: "example.com/dep@v0": {
 `), "module.cue")
 		qt.Assert(t, qt.IsNil(err))
 		f, err := ParseLocal([]byte(`
-deps: "example.com/dep@v0": replace: "./local_dep"
+deps: "example.com/dep@v0": replaceWith: "./local_dep"
 `), "local-module.cue", base)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.IsTrue(f.Deps["example.com/dep@v0"].Default))
@@ -706,11 +706,11 @@ deps: "example.com/dep@v0": replace: "./local_dep"
 		// A dep that omits its version and is not in module.cue is allowed
 		// when it is a replace-only placeholder.
 		f, err := ParseLocal([]byte(`
-deps: "example.com/dep@v0": replace: "./local_dep"
+deps: "example.com/dep@v0": replaceWith: "./local_dep"
 `), "local-module.cue", base)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Version, ""))
-		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].Replace, "./local_dep"))
+		qt.Assert(t, qt.Equals(f.Deps["example.com/dep@v0"].ReplaceWith, "./local_dep"))
 	})
 
 	t.Run("RejectsOmittedVersionWithoutReplace", func(t *testing.T) {
@@ -741,7 +741,7 @@ deps: {
 		Module:   base.Module,
 		Language: base.Language,
 		Deps: map[string]*Dep{
-			"example.com/dep@v0":   {Version: "v0.1.0", Replace: "./local_dep"},
+			"example.com/dep@v0":   {Version: "v0.1.0", ReplaceWith: "./local_dep"},
 			"example.com/other@v0": {Version: "v0.2.0"},
 			"example.com/extra@v0": {Version: "v0.3.0"},
 		},
@@ -750,7 +750,7 @@ deps: {
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(string(data), `deps: {
 	"example.com/dep@v0": {
-		replace: "./local_dep"
+		replaceWith: "./local_dep"
 	}
 	"example.com/extra@v0": {
 		v: "v0.3.0"
@@ -786,7 +786,7 @@ deps: "example.com/dep@v0": {
 		Module:   base.Module,
 		Language: base.Language,
 		Deps: map[string]*Dep{
-			"example.com/dep@v0":   {Version: "v0.1.0", Default: true, Replace: "./local_dep"},
+			"example.com/dep@v0":   {Version: "v0.1.0", Default: true, ReplaceWith: "./local_dep"},
 			"example.com/extra@v0": {Version: "v0.3.0", Default: true},
 		},
 	}
@@ -794,7 +794,7 @@ deps: "example.com/dep@v0": {
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(string(data), `deps: {
 	"example.com/dep@v0": {
-		replace: "./local_dep"
+		replaceWith: "./local_dep"
 	}
 	"example.com/extra@v0": {
 		v:       "v0.3.0"

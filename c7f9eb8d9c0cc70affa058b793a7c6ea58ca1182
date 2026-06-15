@@ -191,6 +191,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "851e20ef_25cc81e7",
+        "filename": "encoding/jsonschema/testdata/txtar/typeexcluded.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T16:01:50Z",
+      "side": 1,
+      "message": "Yes, I\u0027ve just tried this and in constraints_combinator.go, if you change the creations of the matchN call (there are 4 spots) to do this sort of thing:\n```\n\tconstraint :\u003d \u0026ast.BasicLit{\n\t\tKind:  token.INT,\n\t\tValue: \"0\",\n\t}\n\tast.SetRelPos(constraint, token.NoSpace)\n\ts.all.add(n, ast.NewCall(\n\t\tast.NewIdent(\"matchN\"),\n\t\tconstraint,\n\t\tast.NewList(subSchema),\n\t))\n```\nthen we get the behaviour you want - the constraint is kept with the call. In fact the opening bracket of the list is too - you get `e7?: matchN(\u003e\u003d1, [\\n`",
+      "parentUuid": "2554dfb5_bfe0d7fc",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "9f2158cc_02090d3d",

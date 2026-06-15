@@ -1,11 +1,11 @@
 # Test that "cue mod edit --replace" and "--drop-replace" add and remove
-# replace directives. Replace directives are not allowed in cue.mod/module.cue,
+# replaceWith fields. The replaceWith field is not allowed in cue.mod/module.cue,
 # so they are written to cue.mod/local-module.cue instead. When that file does
 # not yet exist, it is created with the module's full set of dependencies so
 # that the main-module view stays complete.
 
 # Adding a replace creates local-module.cue with all dependencies, with the
-# replaced one carrying the replace directive. module.cue is left unchanged.
+# replaced one carrying the replaceWith field. module.cue is left unchanged.
 exec cue mod edit --replace example.com/dep@v0=./local_dep
 cmp cue.mod/module.cue want-module
 cmp cue.mod/local-module.cue want-local-1

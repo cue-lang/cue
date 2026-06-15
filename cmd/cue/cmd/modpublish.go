@@ -275,7 +275,7 @@ func runModUpload(cmd *Command, args []string) error {
 
 	// The published module is built from cue.mod/module.cue alone; any
 	// development-time configuration in cue.mod/local-module.cue (such as
-	// replace directives) is not part of the published module. Warn if the
+	// module replaces) is not part of the published module. Warn if the
 	// file is present so that its absence from the published module is not a
 	// surprise.
 	if _, err := os.Stat(filepath.Join(modRoot, "cue.mod", "local-module.cue")); err == nil {

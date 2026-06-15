@@ -1,9 +1,9 @@
-# Replace directives are not allowed in cue.mod/module.cue; they belong in
-# cue.mod/local-module.cue (the two-file approach). A replace directive in
+# The replaceWith field is not allowed in cue.mod/module.cue; it belongs in
+# cue.mod/local-module.cue (the two-file approach). A replaceWith field in
 # module.cue must be a hard error pointing the user at local-module.cue.
 
 ! exec cue export .
-stderr 'replace directive for "example.com/dep@v0" is not allowed in module.cue; put it in cue.mod/local-module.cue'
+stderr 'module replace for "example.com/dep@v0" is not allowed in module.cue; put it in cue.mod/local-module.cue'
 
 -- cue.mod/module.cue --
 module: "example.com/main@v0"

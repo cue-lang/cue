@@ -1,7 +1,7 @@
-# Test directory-based module replace directives.
+# Test directory-based module replaces.
 # A module dependency can be replaced with a local directory.
 #
-# The replace directive lives in cue.mod/local-module.cue (the two-file
+# The replaceWith field lives in cue.mod/local-module.cue (the two-file
 # approach), not in cue.mod/module.cue.
 #
 # This test verifies that:

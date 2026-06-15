@@ -1,4 +1,4 @@
-# Test that module replace directives are specific to a major version.
+# Test that module replaces are specific to a major version.
 # A replacement for one major version of a module must not apply to a
 # different major version of the same module.
 #
@@ -6,7 +6,7 @@
 # example.com/foo@v1 is left unreplaced and must resolve to the real
 # foo@v1 module from the registry.
 #
-# The replace directive lives in cue.mod/local-module.cue (the two-file
+# The replaceWith field lives in cue.mod/local-module.cue (the two-file
 # approach), not in cue.mod/module.cue.
 
 exec cue export .

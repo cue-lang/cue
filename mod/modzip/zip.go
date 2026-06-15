@@ -21,7 +21,7 @@
 // are not allowed in any other directory.
 //
 // • A cue.mod/local-module.cue file holds development-time configuration
-// (such as replace directives) and is never part of a published module.
+// (such as module replaces) and is never part of a published module.
 // When building a zip it is always omitted; when checking an existing zip
 // (for example one downloaded from a registry) its presence is an error.
 //
@@ -296,7 +296,7 @@ func checkFiles[F any](files []F, fio FileIO[F]) (cf CheckedFiles, validFiles []
 			continue
 		}
 		if p == "cue.mod/local-module.cue" {
-			// Development-time configuration (such as replace directives)
+			// Development-time configuration (such as module replaces)
 			// that is never part of a published module.
 			addError(p, true, errLocalModule)
 			continue
@@ -468,7 +468,7 @@ func CheckZip(m module.Version, r io.ReaderAt, zipSize int64) (*zip.Reader, *zip
 			continue
 		}
 		if name == "cue.mod/local-module.cue" {
-			// Development-time configuration (such as replace directives)
+			// Development-time configuration (such as module replaces)
 			// is never part of a published module. Create omits it when
 			// building a zip, so a zip that still contains it (for example
 			// one downloaded from a registry) is rejected rather than

@@ -98,7 +98,7 @@ func runModTidy(cmd *Command, args []string) error {
 			return modfile.FormatLocal(mf, base)
 		}, res.Local)
 	}
-	// No replace directives remain (or --local-only with none): the
+	// No replaceWith fields remain (or --local-only with none): the
 	// local-module.cue file serves no purpose, so remove it if present.
 	if err := os.Remove(localPath); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err

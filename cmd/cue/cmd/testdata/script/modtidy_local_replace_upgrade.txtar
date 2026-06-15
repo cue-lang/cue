@@ -1,4 +1,4 @@
-# Test what happens when a replace directive points to a version
+# Test what happens when a replaceWith field points to a version
 # that's also required by another dependency at a different version.
 
 exec cue mod tidy

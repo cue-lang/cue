@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "925ed227_9f14d0cb",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 68
+      },
+      "lineNbr": 3502,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T16:20:40Z",
+      "side": 1,
+      "message": "general thought: ask the AI to reduce the verbosity on the godocs. it\u0027s a bit mental that it came up with four lines for what is essentially a one line type assertion helper. the very next function similarly has a super long godoc, if you ask me.",
+      "revId": "cf775dfb133d344b42c8258d42fe8379845a75ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dde961ad_98024942",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 68
+      },
+      "lineNbr": 3678,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T16:20:40Z",
+      "side": 1,
+      "message": "another example of an overly verbose godoc, I think. it\u0027s long enough where I\u0027m not even sure I have the patience to read it.",
+      "revId": "cf775dfb133d344b42c8258d42fe8379845a75ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8e762c9_a8e3e8ca",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 68
+      },
+      "lineNbr": 4111,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T16:20:40Z",
+      "side": 1,
+      "message": "how about replacing all of these `isFoo` type helpers with something like:\n\n```\nfunc nodeType[T ast.Node](node ast.Node) bool {\n    _, ok :\u003d e.(T)\n    return ok\n}\n```",
+      "revId": "cf775dfb133d344b42c8258d42fe8379845a75ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

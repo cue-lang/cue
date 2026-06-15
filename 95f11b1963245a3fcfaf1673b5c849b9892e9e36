@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fbacb6e_e833ed2c",
+        "filename": "cue/format/format.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T16:20:40Z",
+      "side": 1,
+      "message": "This appears to modify node in-place, which goes directly against \"Node does not modify node\" in the godoc above.\n\nThis does seem like a bad regression; it could lead to breakage for some users. I\u0027m not sure that a simple solution comes to mind here.\n\nAt least Source below doesn\u0027t have this issue, as it parses into a new node.",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8581b79_e6852b00",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 1226,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T16:20:40Z",
+      "side": 1,
+      "message": "This panics on a token.INT BasicLit ending in `.` like `5.`. The FLOAT branch below guards the trailing-dot case (p \u003d\u003d len(data)-1) but INT doesn\u0027t. This function exists to normalize exactly such programmatic literals (the doc cites cue get go), so it might be best to be consistent and avoid potential panics.",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61e628ff_2e929b9e",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 3418,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T16:20:40Z",
+      "side": 1,
+      "message": "FYI: headerPrefix appears unused - file() partitions via f.Preamble()",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea4251b6_2ef97330",
+        "filename": "internal/pretty/style/ellipsis.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-15T16:20:40Z",
+      "side": 1,
+      "message": "Minor: the merge replaces matched markers with a fresh `\u0026ast.Ellipsis{}`, dropping a typed ellipsis\u0027s `.Type`. Unreachable from valid input (`...int` isn\u0027t valid struct syntax, and the merge only runs over struct/file bodies), so defensive only - returning false here when `e.Type !\u003d nil` would make it robust.",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

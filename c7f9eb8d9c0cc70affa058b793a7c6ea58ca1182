@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "941fc305_5161e494",
+        "filename": "cmd/cue/cmd/testdata/script/eval_ignore.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T12:49:46Z",
+      "side": 1,
+      "message": "Yes, it is due to the comment. Assuming there\u0027s no RelPos, given there\u0027s enough space, would like to format it as a single line `[1, _|_]`. But the comment makes that impossible, and it always wants balanced brackets, so that\u0027s why it chooses this layout.",
+      "parentUuid": "a5c8abf3_47802882",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7984b8c5_65ef1a40",
@@ -133,6 +151,24 @@
       "writtenOn": "2026-06-15T12:27:53Z",
       "side": 1,
       "message": "interesting. my instinct is that the old format was a little better, but I see the appeal of adding at least one level of indentation to the list.\n\nhow about:\n\n```\nmatchN(\u003e\u003d1, [\n    true,\n    {\n        ...\n])\n```",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b47dfeb2_df829cad",
+        "filename": "encoding/jsonschema/testdata/txtar/typeexcluded.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T12:49:46Z",
+      "side": 1,
+      "message": "I\u0027ll check but I suspect this is line length: it figures out very early on that it can\u0027t fit all the args to matchN on one line, so it breaks sooner rather than later. That\u0027s just the nature of Wadler-Lindig.",
+      "parentUuid": "71a2ef45_95a8e75c",
       "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

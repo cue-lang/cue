@@ -41,7 +41,7 @@ deps: {
 deps: {
 	"example.com/inner@v0": {
 		v:       "v0.1.0"
-		replace: "./local_inner"
+		replaceWith: "./local_inner"
 	}
 }
 -- _registry/example.com_dep_v0.1.0/lib.cue --

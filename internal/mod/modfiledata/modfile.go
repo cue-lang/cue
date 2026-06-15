@@ -114,9 +114,9 @@ type Language struct {
 }
 
 type Dep struct {
-	Version string `json:"v"`
-	Default bool   `json:"default,omitempty"`
-	Replace string `json:"replace,omitempty"`
+	Version     string `json:"v"`
+	Default     bool   `json:"default,omitempty"`
+	ReplaceWith string `json:"replaceWith,omitempty"`
 }
 
 // Init initializes the private dependency-related fields of f from

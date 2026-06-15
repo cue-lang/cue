@@ -171,10 +171,10 @@ func NewReplacements(mf *modfile.File) (*Replacements, error) {
 		reverse: make(map[string]string),
 	}
 	for mpath, dep := range mf.Deps {
-		if dep.Replace == "" {
+		if dep.ReplaceWith == "" {
 			continue
 		}
-		repl, err := ParseReplacement(dep.Replace)
+		repl, err := ParseReplacement(dep.ReplaceWith)
 		if err != nil {
 			return nil, fmt.Errorf("invalid replace value for %s: %v", mpath, err)
 		}

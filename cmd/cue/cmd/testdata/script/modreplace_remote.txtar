@@ -28,7 +28,7 @@ deps: {
 deps: {
 	"example.com/original@v0": {
 		v: "v0.1.0"
-		replace: "example.com/replacement@v0.1.0"
+		replaceWith: "example.com/replacement@v0.1.0"
 	}
 }
 -- main.cue --

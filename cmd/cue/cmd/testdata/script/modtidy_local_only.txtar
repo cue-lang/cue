@@ -21,8 +21,8 @@ language: version: "v0.17.0"
 -- want-local --
 deps: {
 	"example.com/dep@v0": {
-		v:       "v0.1.0"
-		replace: "./local_dep"
+		v:           "v0.1.0"
+		replaceWith: "./local_dep"
 	}
 }
 -- want-stdout --
@@ -35,7 +35,7 @@ language: version: "v0.17.0"
 -- cue.mod/local-module.cue --
 deps: "example.com/dep@v0": {
 	v:       "v0.1.0"
-	replace: "./local_dep"
+	replaceWith: "./local_dep"
 }
 -- main.cue --
 package main

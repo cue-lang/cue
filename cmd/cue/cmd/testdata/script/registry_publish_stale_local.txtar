@@ -24,7 +24,7 @@ deps: {
 deps: {
 	"example.com/e@v0": {
 		v:       "v0.2.0"
-		replace: "./local_e"
+		replaceWith: "./local_e"
 	}
 }
 -- m/main.cue --

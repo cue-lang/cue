@@ -12,7 +12,7 @@ language: version: "v0.17.0"
 deps: {
 	"example.com/dep@v0": {
 		v: "v0.1.0"
-		replace: "./local_dep"
+		replaceWith: "./local_dep"
 	}
 }
 -- main.cue --

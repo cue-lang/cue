@@ -178,7 +178,7 @@ func localViewFromBase(base *modfile.File) *modfile.File {
 // hasReplace reports whether any dependency in f carries a replace directive.
 func hasReplace(f *modfile.File) bool {
 	for _, dep := range f.Deps {
-		if dep.Replace != "" {
+		if dep.ReplaceWith != "" {
 			return true
 		}
 	}
@@ -320,7 +320,7 @@ func (c *modEditCmd) flagReplace(arg string) error {
 			dep = &modfile.Dep{}
 			f.Deps[mpath] = dep
 		}
-		dep.Replace = repl
+		dep.ReplaceWith = repl
 		return nil
 	})
 	return nil
@@ -337,7 +337,7 @@ func (c *modEditCmd) flagDropReplace(arg string) error {
 		if dep == nil {
 			return nil
 		}
-		dep.Replace = ""
+		dep.ReplaceWith = ""
 		// A dependency listed only to carry a replace directive (a replace-only
 		// placeholder with no version) becomes meaningless once the replace is
 		// gone, so drop it entirely.

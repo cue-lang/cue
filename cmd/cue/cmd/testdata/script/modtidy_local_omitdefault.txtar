@@ -29,7 +29,7 @@ deps: {
 -- want-local --
 deps: {
 	"example.com/dep@v0": {
-		replace: "./local_dep"
+		replaceWith: "./local_dep"
 	}
 }
 -- want-stdout --
@@ -44,7 +44,7 @@ deps: "example.com/dep@v0": {
 	default: true
 }
 -- cue.mod/local-module.cue --
-deps: "example.com/dep@v0": replace: "./local_dep"
+deps: "example.com/dep@v0": replaceWith: "./local_dep"
 -- main.cue --
 package main
 

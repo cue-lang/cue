@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ff65e51_6b8c6b5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T10:56:02Z",
+      "side": 1,
+      "message": "FWIW, in general I think \"module replacement\" often reads better than \"module replace\".",
+      "revId": "6c0ef8b6d90e128084e3f5d8f6058817dc6faf58",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ee27a75_354d6869",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-15T10:56:02Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\treturn errors.Newf(token.NoPos, \"module replace for %q is not allowed in module.cue; move it to cue.mod/%s\", mpath, localModuleFile)\n```",
+      "range": {
+        "startLine": 577,
+        "startChar": 88,
+        "endLine": 577,
+        "endChar": 97
+      },
+      "revId": "6c0ef8b6d90e128084e3f5d8f6058817dc6faf58",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

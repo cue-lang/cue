@@ -37,6 +37,7 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
+	cuejson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/types"
 )
 
@@ -302,6 +303,9 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		if err != nil {
 			panic(err) // cannot happen
 		}
+		// Simplify like the json encoding package, e.g. rendering
+		// strings with newlines as multiline literals.
+		cuejson.PatchExpr(expr, nil)
 		return compileExpr(ctx, expr)
 	}
 	if v, ok := typeAssert[encoding.TextMarshaler](val); ok {

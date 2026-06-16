@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8580d4e_f52d1006",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 68
+      },
+      "lineNbr": 3502,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T08:52:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "925ed227_9f14d0cb",
+      "revId": "cf775dfb133d344b42c8258d42fe8379845a75ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dde961ad_98024942",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a81c85c_1c4f3c94",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 68
+      },
+      "lineNbr": 3678,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T08:52:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dde961ad_98024942",
+      "revId": "cf775dfb133d344b42c8258d42fe8379845a75ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8e762c9_a8e3e8ca",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-15T16:20:40Z",
       "side": 1,
       "message": "how about replacing all of these `isFoo` type helpers with something like:\n\n```\nfunc nodeType[T ast.Node](node ast.Node) bool {\n    _, ok :\u003d e.(T)\n    return ok\n}\n```",
+      "revId": "cf775dfb133d344b42c8258d42fe8379845a75ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20894d85_c820b709",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 68
+      },
+      "lineNbr": 4111,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T08:52:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8e762c9_a8e3e8ca",
       "revId": "cf775dfb133d344b42c8258d42fe8379845a75ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

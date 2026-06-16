@@ -1224,8 +1224,16 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentSt
 
 		case token.TRY:
 			c := p.openComments()
+			tryPos := p.expect(token.TRY)
+			if first {
+				switch p.tok {
+				case token.COLON, token.BIND, token.OPTION, token.NOT,
+					token.COMMA, token.EOF:
+					return nil, c
+				}
+			}
 
-			tc := &ast.TryClause{Try: p.expect(token.TRY)}
+			tc := &ast.TryClause{Try: tryPos}
 
 			// Check for assignment form: try x = expr
 			if p.tok == token.IDENT {

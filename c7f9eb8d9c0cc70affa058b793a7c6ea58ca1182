@@ -301,6 +301,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "77d5f55e_4d50af8d",
+        "filename": "encoding/jsonschema/testdata/txtar/typeexcluded.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T13:28:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c5f65e4_d090ddef",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9f2158cc_02090d3d",
         "filename": "encoding/protobuf/testdata/istio.io/api/mixer/v1/attributes_proto_gen.cue",
         "patchSetId": 66

@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b45fc1d7_13d2d3ef",
+        "filename": "cue/format/format.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T13:28:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87ac987a_8a73e8e2",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8581b79_e6852b00",

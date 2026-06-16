@@ -933,6 +933,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 	switch p.tok {
 	case token.OPTION, token.NOT:
+		p.rejectPatternConstraintMarker(m.Label)
 		m.Constraint = p.tok
 		p.next()
 	}
@@ -996,6 +997,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 		switch p.tok {
 		case token.OPTION, token.NOT:
+			p.rejectPatternConstraintMarker(m.Label)
 			m.Constraint = p.tok
 			p.next()
 		}
@@ -1011,6 +1013,20 @@ func (p *parser) parseField() (decl ast.Decl) {
 	p.consumeDeclComma()
 
 	return this
+}
+
+// rejectPatternConstraintMarker errors if the current ? or ! marker is on a
+// pattern constraint label such as [string], which is optional by construction.
+func (p *parser) rejectPatternConstraintMarker(label ast.Label) {
+	if _, ok := label.(*ast.ListLit); !ok {
+		return
+	}
+	switch p.tok {
+	case token.OPTION:
+		p.errf(p.pos, "pattern constraint cannot be marked optional")
+	case token.NOT:
+		p.errf(p.pos, "pattern constraint cannot be marked required")
+	}
 }
 
 func (p *parser) parseAttributes() (attrs []*ast.Attribute) {

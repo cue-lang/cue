@@ -578,6 +578,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a4b520e_3e9a5ae8",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1884,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T07:56:08Z",
+      "side": 1,
+      "message": "Agh, sorry, that\u0027s not true - `binaryCutoff` does return the opaque 6 and 7 consts. Ok, things could be improved if we used consts with names.",
+      "parentUuid": "de7a7a13_9710dd59",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e045ae9c_2a6a77ea",

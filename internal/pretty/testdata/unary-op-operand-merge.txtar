@@ -1,0 +1,21 @@
+# A unary operator hugs its operand, except where omitting the space
+# would merge the operator with the operand's leading token into a
+# different, longer token. The canonical case is `<` before a negative
+# operand: `< -5` must keep its space, since `<-` re-lexes as the ARROW
+# token and fails to parse. `>` and `<=` before `-` do not form a token
+# (`>-`, `<=-` lex as two tokens), so they hug. The `=~` (MAT) cases
+# need a space after `<` / `!` because `<=` / `!=` would form.
+-- in.cue --
+a: < -5
+b: > -15
+c: <= -3
+d: < =~"foo"
+e: ! =~"bar"
+-- out/relpos --
+a: < -5
+b: >-15
+c: <=-3
+d: < =~"foo"
+e: ! =~"bar"
+-- out/norelpos --
+a: < -5, b: >-15, c: <=-3, d: < =~"foo", e: ! =~"bar"

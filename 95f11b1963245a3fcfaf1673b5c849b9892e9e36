@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51038953_82549f57",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 1226,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T09:23:39Z",
+      "side": 1,
+      "message": "Yeah, this was copied from the old formatter. It doesn\u0027t make much sense to me. I\u0027ve tidied things up somewhat. The parser will not produce eg ints with trailing dots, so this is programmatic ASTs only.",
+      "parentUuid": "c8581b79_e6852b00",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61e628ff_2e929b9e",

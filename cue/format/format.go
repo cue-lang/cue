@@ -114,7 +114,7 @@ func Node(node ast.Node, opt ...Option) ([]byte, error) {
 
 	cfg := newConfig(opt)
 
-	if cueexperiment.Flags.FormatterV2 {
+	if cueexperiment.Flags.FormatV2 {
 		styleConfig(cfg).Annotate(node)
 		return configToV2(cfg).Node(node)
 	}
@@ -162,7 +162,7 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 		return nil, fmt.Errorf("parse: %s", err)
 	}
 
-	if cueexperiment.Flags.FormatterV2 {
+	if cueexperiment.Flags.FormatV2 {
 		styleConfig(cfg).Annotate(f)
 		return configToV2(cfg).Node(f)
 	}

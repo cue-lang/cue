@@ -15,12 +15,14 @@
 package cue_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
@@ -206,6 +208,45 @@ func TestEncodeType(t *testing.T) {
 		got := fmt.Sprint(astinternal.DebugStr(v.Syntax()))
 		t.Equal(got, tc.out)
 	})
+}
+
+func TestEncodeSyntax(t *testing.T) {
+	type testCase struct {
+		name string
+		x    any
+		out  string
+	}
+	testCases := []testCase{{
+		// A string with newlines formats as a multiline literal.
+		name: "StringStruct",
+		x: struct {
+			T string `json:"t"`
+		}{T: "foo\nbar\nbaz\n"},
+		out: `{
+	t: """
+		foo
+		bar
+		baz
+
+		"""
+}`,
+	}, {
+		// json.RawMessage goes through json.Marshaler; see #3578.
+		name: "StringJSONRawMessage",
+		x:    json.RawMessage(`{"t": "foo\nbar\nbaz\n"}`),
+		// TODO(#3578): should be multiline, like StringStruct above.
+		out: `{t: "foo\nbar\nbaz\n"}`,
+	}}
+	ctx := cuecontext.New()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			v := ctx.Encode(tc.x)
+			qt.Assert(t, qt.IsNil(v.Err()))
+			b, err := format.Node(v.Syntax())
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(string(b), tc.out))
+		})
+	}
 }
 
 func TestContextCheck(t *testing.T) {

@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f19c08d6_4db15bdf",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 3418,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T07:48:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "61e628ff_2e929b9e",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea4251b6_2ef97330",

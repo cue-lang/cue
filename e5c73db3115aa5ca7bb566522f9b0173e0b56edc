@@ -560,6 +560,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de7a7a13_9710dd59",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 1884,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T07:48:36Z",
+      "side": 1,
+      "message": "The problem is that these numbers are actually returned by `func (tok Token) Precedence() int` from token.go - nothing to do with me! I *believe* that in this ast.go you\u0027ll never find a literal number used as a precedence. Not against switching to names, but that\u0027d be in token.go and, I believe, wouldn\u0027t make any changes to ast.go (maybe wouldn\u0027t change anything, in fact). Also, naming is hard!",
+      "parentUuid": "79e26cfc_6d982d24",
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e045ae9c_2a6a77ea",
@@ -702,6 +720,30 @@
       "side": 1,
       "message": "Yes, I am very unsure about what the right thing to do here is. I can well believe that the best thing is to revert back to a simple len. The fact is that we can\u0027t tell how many columns a char will actually render as.",
       "parentUuid": "6148950f_67865e7d",
+      "range": {
+        "startLine": 145,
+        "startChar": 37,
+        "endLine": 145,
+        "endChar": 62
+      },
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1253fab5_af11c150",
+        "filename": "internal/pretty/doc.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T07:48:36Z",
+      "side": 1,
+      "message": "I\u0027ve raised https://github.com/cue-lang/cue/issues/4393 to cover this.",
+      "parentUuid": "72698f31_20df163d",
       "range": {
         "startLine": 145,
         "startChar": 37,
@@ -900,6 +942,30 @@
       "writtenOn": "2026-05-12T15:03:34Z",
       "side": 1,
       "message": "Same concern here as with StringLit about graphemes vs lexemes, although I guess that\u0027s much less likely to be an issue with a prefix string which is almost certainly white space.",
+      "range": {
+        "startLine": 862,
+        "startChar": 9,
+        "endLine": 862,
+        "endChar": 43
+      },
+      "revId": "e5c73db3115aa5ca7bb566522f9b0173e0b56edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dfd3ed0_335b9a90",
+        "filename": "internal/pretty/render.go",
+        "patchSetId": 42
+      },
+      "lineNbr": 862,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T07:48:36Z",
+      "side": 1,
+      "message": "I\u0027ve raised https://github.com/cue-lang/cue/issues/4393 to cover this.",
+      "parentUuid": "cfb48919_408318c2",
       "range": {
         "startLine": 862,
         "startChar": 9,

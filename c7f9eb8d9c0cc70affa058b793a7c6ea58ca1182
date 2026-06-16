@@ -281,6 +281,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c5f65e4_d090ddef",
+        "filename": "encoding/jsonschema/testdata/txtar/typeexcluded.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-16T13:16:13Z",
+      "side": 1,
+      "message": "Sounds good, can we do that? I know it\u0027s a jsonschema decoder change, but to avoid introducing too much indentation all at once, I\u0027d do this.",
+      "parentUuid": "851e20ef_25cc81e7",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "9f2158cc_02090d3d",
@@ -469,6 +487,24 @@
       "side": 1,
       "message": "We can. There is prior art though for having both even if the value is the same, eg\n```\n\tYAMLV3Decoder bool `experiment:\"preview:v0.9.0,default:v0.9.0,stable:v0.11.0\"`\n\n\tKeepValidators bool `experiment:\"preview:v0.14.0,default:v0.14.0,stable:v0.15.0\"`\n```\n\nYour call - lmk",
       "parentUuid": "bc1b8c97_90fb5900",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "effb46c5_5e786029",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-16T13:16:13Z",
+      "side": 1,
+      "message": "ack, keeping the consistency SGTM.",
+      "parentUuid": "d1b584b0_16ee9bfd",
       "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

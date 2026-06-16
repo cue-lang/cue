@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "87ac987a_8a73e8e2",
+        "filename": "cue/format/format.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-16T13:16:13Z",
+      "side": 1,
+      "message": "Understood. A nit: I\u0027d say \"mutated in place\" in the new docs to be clear.",
+      "parentUuid": "0152cd18_29dcc9dc",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c8581b79_e6852b00",
         "filename": "internal/pretty/ast.go",
         "patchSetId": 67

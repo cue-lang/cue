@@ -103,6 +103,24 @@
       "message": "Minor: the merge replaces matched markers with a fresh `\u0026ast.Ellipsis{}`, dropping a typed ellipsis\u0027s `.Type`. Unreachable from valid input (`...int` isn\u0027t valid struct syntax, and the merge only runs over struct/file bodies), so defensive only - returning false here when `e.Type !\u003d nil` would make it robust.",
       "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d945e4c_4def5aee",
+        "filename": "internal/pretty/style/ellipsis.go",
+        "patchSetId": 67
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T09:42:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea4251b6_2ef97330",
+      "revId": "95f11b1963245a3fcfaf1673b5c849b9892e9e36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

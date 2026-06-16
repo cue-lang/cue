@@ -105,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "10f3c876_0ca17c32",
+        "filename": "cmd/cue/cmd/testdata/script/modget_initial.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T09:42:29Z",
+      "side": 1,
+      "message": "Added note https://github.com/cue-lang/cue/issues/675",
+      "parentUuid": "7984b8c5_65ef1a40",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64ade021_a4abf4f0",
@@ -118,6 +136,24 @@
       "writtenOn": "2026-06-15T12:27:53Z",
       "side": 1,
       "message": "FWIW, the more I look at these changes the more I think we shouldn\u0027t collapse `source`, because `\"v0.9.0\"` and `\"self\"` being aligned together doesn\u0027t make a lot of sense - they are entirely unrelated values. again not a blocker, but I think I\u0027m starting to lean against dropping any braces in `module.cue` other than the ones on `language`.",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "650eb12b_11543145",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 66
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T09:42:29Z",
+      "side": 1,
+      "message": "If that is a concern then I\u0027m more in favour of applying it generally. Currently we \"flush the table\" (i.e. don\u0027t attempt to align columns) when the *number* of field names in column0 changes (this is why `\"main.example@v0\"` does *not* align with `\"v0.9.0\"`). We could pretty easily change this logic so that we flush the table whenever the actual field names don\u0027t match (maybe we want a more subtle rule: if col0 contains \u003e 1 field names then flush when rowN.col0.chain[len(self-2)] !\u003d rowM... I.e. the stem changes. Dunno - it\u0027s not obvious to me what the right thing is to do, so I suggest we revisit this if we come up with a rule that is simple that we all agree on.",
+      "parentUuid": "64ade021_a4abf4f0",
       "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -234,8 +234,14 @@ func TestEncodeSyntax(t *testing.T) {
 		// json.RawMessage goes through json.Marshaler; see #3578.
 		name: "StringJSONRawMessage",
 		x:    json.RawMessage(`{"t": "foo\nbar\nbaz\n"}`),
-		// TODO(#3578): should be multiline, like StringStruct above.
-		out: `{t: "foo\nbar\nbaz\n"}`,
+		out: `{
+	t: """
+		foo
+		bar
+		baz
+
+		"""
+}`,
 	}}
 	ctx := cuecontext.New()
 	for _, tc := range testCases {

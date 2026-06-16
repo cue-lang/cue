@@ -17,9 +17,9 @@ type Config struct {
 	// The flags in this first section describe active experiments.
 	// Sort from oldest to newest based on when they were introduced as a `preview`.
 
-	// FormatterV2 selects the Wadler-Lindig pretty-printer as the
+	// FormatV2 selects the Wadler-Lindig pretty-printer as the
 	// implementation behind "cue fmt" and "cue/format".
-	FormatterV2 bool `experiment:"default:v0.18.0"`
+	FormatV2 bool `experiment:"default:v0.18.0"`
 
 	// The flags in this second section describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.

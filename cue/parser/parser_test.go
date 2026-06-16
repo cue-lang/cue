@@ -166,16 +166,18 @@ func TestParse(t *testing.T) {
 			out: `@experiment(aliasv2), [string]~X: int, [=~"^a"]~(K,V): string`,
 		},
 		{
-			// Top-level pattern constraint marker; wrongly accepted for now.
+			// Top-level pattern constraint marker.
 			desc: "pattern constraint with optional marker",
 			in:   `[string]?: int`,
-			out:  `[string]?: int`,
+			out: `[string]?: int
+pattern constraint cannot be marked optional`,
 		},
 		{
-			// Nested pattern constraint marker; wrongly accepted for now.
+			// Nested pattern constraint marker.
 			desc: "pattern constraint with required marker",
 			in:   `x: [string]!: string`,
-			out:  `x: {[string]!: string}`,
+			out: `x: {[string]!: string}
+pattern constraint cannot be marked required`,
 		},
 		{
 			desc: "postfix alias with blank identifier",

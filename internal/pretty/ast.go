@@ -3696,23 +3696,39 @@ func listOmitsCommas(elems []ast.Expr, lbrack, rbrack token.Pos) bool {
 	return false
 }
 
-// unaryOpMergesWithOperand reports whether writing unary operator op
-// immediately before operand would lex as a different, longer
-// operator token, requiring a separating space. The only such case in
-// CUE is a `!`, `<`, or `>` directly followed by a `=~` (MAT)
-// operand, which would form `!=`, `<=`, or `>=` (e.g. `! =~"x"` would
-// re-lex as `!= ~"x"`). Operands of any other shape begin with a
-// digit, letter, quote, or bracket and never merge; a
-// binary-expression operand is parenthesised by [wrapForPrecedence]
-// and so begins with `(`.
+// unaryOpMergesWithOperand reports whether rendering unary operator
+// op immediately before operand would let the two re-lex as a single,
+// longer operator, so a separating space must be inserted. Unary
+// operators otherwise hug their operand (`-10`, `>=3`, `!a`); this is
+// the only case where we force a space.
+//
+// The hazard arises only when the operand starts with an operator
+// character, which happens only when the operand is itself a
+// UnaryExpr. All other operand begins with a digit, letter, quote, or
+// bracket (a binary operand is parenthesised by [wrapForPrecedence],
+// so it begins with `(`) and can never merge.
+//
+//   - op `<`, operand first byte `-`: forms `<-` (ARROW), e.g. `<-5`.
+//   - op `<`, operand first byte `=`: forms `<=` (LEQ), e.g. `<=~"x"`.
+//   - op `>`, operand first byte `=`: forms `>=` (GEQ), e.g. `>=~"x"`.
+//   - op `!`, operand first byte `=`: forms `!=` (NEQ), e.g. `!=~"x"`.
+//
+// Keying off tokenisation rather than RelPos means the space is emitted
+// by construction, even for programmatic ASTs that carry no RelPos.
 func unaryOpMergesWithOperand(op token.Token, operand ast.Expr) bool {
 	inner, ok := operand.(*ast.UnaryExpr)
-	if !ok || inner.Op != token.MAT {
+	if !ok {
+		return false
+	}
+	lead := inner.Op.String()
+	if lead == "" {
 		return false
 	}
 	switch op {
-	case token.NOT, token.LSS, token.GTR:
-		return true
+	case token.LSS:
+		return lead[0] == '-' || lead[0] == '='
+	case token.GTR, token.NOT:
+		return lead[0] == '='
 	}
 	return false
 }

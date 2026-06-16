@@ -177,6 +177,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2b58926c_8555a510",
+        "filename": "cue/format/format.go",
+        "patchSetId": 66
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-16T12:56:43Z",
+      "side": 1,
+      "message": "The default is tabIndent \u003d true, but the option is exported, so someone could set it to false. So the branch is needed.\n\nformat.go:67\n```\nfunc TabIndent(indent bool) Option {\n\treturn func(c *config) { c.tabIndent \u003d indent }\n}\n```",
+      "parentUuid": "4f1c7c1e_4966cef2",
+      "revId": "c7f9eb8d9c0cc70affa058b793a7c6ea58ca1182",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "af07c88e_49bf5831",
         "filename": "encoding/jsonschema/testdata/generate/closedness.txtar",
         "patchSetId": 66

@@ -91,25 +91,30 @@ func TestParse(t *testing.T) {
 			out: `true, false, null, for, in, if, let, if`,
 		},
 		{
+			// TODO: the "try" parts of the keyword cases assert broken output;
+			// they are corrected once https://cuelang.org/issue/4394 is fixed.
 			desc: "keywords as labels",
-			in: `if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6
-		for: if: func: let: 3
+			in: `if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, try: 7, else: 8, fallback: 9, otherwise: 10
+		for: if: func: let: try: else: 3
 		`,
-			out: `if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, for: {if: {func: {let: 3}}}`,
+			out: `if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, try {7, else: 8, fallback: 9, otherwise: 10, for: {if: {func: {let: {try: {else: 3}}}}}}
+expected '{', found ':' (and 2 more errors)`,
 		},
 		{
 			desc: "keywords as optional labels",
-			in: `if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6
-		for?: if?: func?: let?: 3
+			in: `if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6, try?: 7, else?: 8, fallback?: 9, otherwise?: 10
+		for?: if?: func?: let?: try?: else?: 3
 		`,
-			out: `if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6, for?: {if?: {func?: {let?: 3}}}`,
+			out: `if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6, try {<*ast.BadExpr>}
+expected '{', found '?' (and 3 more errors)`,
 		},
 		{
 			desc: "keywords as required labels",
-			in: `if!: 0, for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6
-		for!: if!: func!: let!: 3
+			in: `if!: 0, for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6, try!: 7, else!: 8, fallback!: 9, otherwise!: 10
+		for!: if!: func!: let!: try!: else!: 3
 		`,
-			out: `if!: 0, for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6, for!: {if!: {func!: {let!: 3}}}`,
+			out: `if!: 0, for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6, try {<*ast.BadExpr>}
+expected '{', found '!' (and 3 more errors)`,
 		},
 		{
 			desc: "keywords as alias",
@@ -117,8 +122,13 @@ func TestParse(t *testing.T) {
 		for=bar: 2
 		let=bar: 3
 		func=baz: 4
+		try=qux: 5
+		else=quux: 6
+		fallback=corge: 7
+		otherwise=grault: 8
 		`,
-			out: `if=foo: 0, for=bar: 2, let=bar: 3, func=baz: 4`,
+			out: `if=foo: 0, for=bar: 2, let=bar: 3, func=baz: 4, try {qux: 5, else=quux: 6, fallback=corge: 7, otherwise=grault: 8}
+expected '{', found '=' (and 2 more errors)`,
 		},
 		{
 			desc: "postfix alias simple form",
@@ -179,7 +189,11 @@ single postfix alias "_" field cannot be the blank identifier`,
 			quo: 5
 			func: 6
 			float: 7
-			null: if: func: let: 3
+			try: 8
+			else: 9
+			fallback: 10
+			otherwise: 11
+			null: if: func: let: try: else: 3
 		}, b: [
 			a.if,
 			a.for,
@@ -189,9 +203,14 @@ single postfix alias "_" field cannot be the blank identifier`,
 			a.quo,
 			a.func,
 			a.float,
-			a.null.if.func.let,
+			a.try,
+			a.else,
+			a.fallback,
+			a.otherwise,
+			a.null.if.func.let.try.else,
 		]`,
-			out: `a: {if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, float: 7, null: {if: {func: {let: 3}}}}, b: [a.if, a.for, a.in, a.where, a.div, a.quo, a.func, a.float, a.null.if.func.let]`,
+			out: `a: {if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, float: 7, try {8, else: 9, fallback: 10, otherwise: 11, null: {if: {func: {let: {try: {else: 3}}}}}}, b: [a.if, a.for, a.in, a.where, a.div, a.quo, a.func, a.float, a.try, a.else, a.fallback, a.otherwise, a.null.if.func.let.try.else]}
+expected '{', found ':' (and 1 more errors)`,
 		},
 		{
 			desc: "json",

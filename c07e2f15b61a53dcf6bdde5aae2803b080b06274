@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "762c9b79_4e82a40e",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3719,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-16T16:23:14Z",
+      "side": 1,
+      "message": "nit: can we shorten this godoc a little?",
+      "revId": "c07e2f15b61a53dcf6bdde5aae2803b080b06274",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

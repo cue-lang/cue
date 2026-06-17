@@ -1524,21 +1524,36 @@ func TestFillPath(t *testing.T) {
 	})
 }
 
-// TestFillPathOptional is a regression test for
-// https://cuelang.org/issue/2127: FillPath used to export filled
-// fields as optional even though they are regular fields.
-func TestFillPathOptional(t *testing.T) {
+// TestFillPathSyntax checks the syntactic output of FillPath for regression
+// scenarios where the rendered shape, rather than the evaluated value, matters.
+func TestFillPathSyntax(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		ctx := m.CueContext()
-		strType := ctx.CompileString(`string`)
 
-		w := ctx.CompileString(`{}`).
-			FillPath(cue.ParsePath("a"), strType).
-			FillPath(cue.ParsePath("#b"), strType)
+		testCases := []struct {
+			name  string
+			build func() cue.Value
+			out   string
+		}{{
+			// https://cuelang.org/issue/2127: FillPath used to export filled
+			// fields as optional even though they are regular fields.
+			name: "regularNotOptional",
+			build: func() cue.Value {
+				strType := ctx.CompileString(`string`)
+				return ctx.CompileString(`{}`).
+					FillPath(cue.ParsePath("a"), strType).
+					FillPath(cue.ParsePath("#b"), strType)
+			},
+			out: "{\n\ta:  string\n\t#b: string\n}",
+		}}
 
-		b, err := format.Node(w.Syntax(cue.All()))
-		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.Equals(string(b), "{\n\ta:  string\n\t#b: string\n}"))
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				b, err := format.Node(tc.build().Syntax(cue.All()))
+				qt.Assert(t, qt.IsNil(err))
+				qt.Assert(t, qt.Equals(string(b), tc.out))
+			})
+		}
 	})
 }
 

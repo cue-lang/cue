@@ -1,0 +1,32 @@
+# A pattern label using or() over a cyclic reference regressed with a spurious
+# "field set was already referenced" error: a for-comprehension froze cue's
+# field set while the close() conjunct that adds its fields was still running.
+-- in.cue --
+cue: {
+	[or(tags.cue.modules)]: y: {}
+}
+
+tags: "cue": [_]: [...or([for command, _ in cue {command}])]
+tags: cue: modules: ["login", "mod"]
+
+cue: close({
+	login: _
+	mod:   _
+})
+
+result: {"cue": cue, "tags": tags} @test(eq, {
+	cue: {login: {y: {}}, mod: {y: {}}}
+	tags: {cue: {modules: ["login", "mod"]}}
+})
+-- out/eval/stats --
+Leaks:  4
+Freed:  51
+Reused: 29
+Allocs: 26
+Retain: 0
+
+Unifications: 25
+Conjuncts:    108
+Disjuncts:    18
+
+NumCloseIDs: 71

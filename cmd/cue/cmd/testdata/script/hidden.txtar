@@ -7,6 +7,11 @@ cmp stdout expect-stdout
 exec cue eval file.cue -H
 cmp stdout expect-stdout
 
+# Issue #615: -H shows hidden fields in package-less files. In a subdirectory
+# so it is not merged into the default load above.
+exec cue eval sub/issue615.cue -H
+cmp stdout expect-stdout-615
+
 -- pkg.cue --
 package pkg
 
@@ -35,8 +40,19 @@ a: _h0: int
     _h2: string
 }
 
+-- sub/issue615.cue --
+A: {
+	_noshow: "hello"
+	isshown: "world"
+}
+
 -- expect-stdout --
 _top: 1
 a: _h0:    int
 #foo: _h1: string
 _h2: string
+-- expect-stdout-615 --
+A: {
+    _noshow: "hello"
+    isshown: "world"
+}

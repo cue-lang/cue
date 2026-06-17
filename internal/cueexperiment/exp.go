@@ -86,6 +86,11 @@ func initExperimentFlags() error {
 // mode to be one of error not panic, which would be the only option if
 // it was a top level init function.
 func Init() error {
+	// Read CUE_EXPERIMENT on every call so go test records it as a cache
+	// input. go test only notices an env var read via os.Getenv while a test
+	// runs; the once-guarded read below usually happens at package-init time
+	// (via runtime.New in a package-level var), too early to be seen.
+	os.Getenv("CUE_EXPERIMENT")
 	return initOnce()
 }
 

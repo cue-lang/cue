@@ -18,28 +18,27 @@ import (
 	"bytes"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
-	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 )
 
-// StripTestAttrs returns src reformatted with every @test(...) attribute
-// removed.  Both forms are stripped:
+// StripTestAttrs returns src with every @test(...) attribute removed.  Both
+// forms are stripped:
 //
 //   - field attributes: `field: expr @test(...)`
 //   - decl attributes inside a struct or file: `@test(...)` as a top-level
 //     declaration
 //
-// Other attributes are preserved.  Use this when an unrelated downstream
-// consumer (e.g. the compile golden tests) mirrors CUE source from
-// cue/testdata and would otherwise see incidental churn whenever a @test
-// directive is added, updated, or removed.
+// All other source bytes are preserved verbatim. We deliberately avoid
+// reformatting via cue/format so that any CUE syntax that matters for a test
+// is left untouched; the parser is used only to locate the @test attributes,
+// whose byte ranges (plus surrounding whitespace) are cut out. Use this when
+// an unrelated downstream consumer (e.g. the compile golden tests) mirrors
+// CUE source from cue/testdata and would otherwise see incidental churn
+// whenever a @test directive is added, updated, or removed.
 func StripTestAttrs(src []byte) ([]byte, error) {
-	// Fast path: a file with no @test substring cannot contain @test(...)
-	// attributes; skipping parse + format preserves the source bytes
-	// (including incidental whitespace) for files that have nothing to
-	// strip.  A false positive (e.g. "@test" inside a comment or string)
-	// only costs an extra round trip; it does not change correctness.
+	// Fast path: a file with no @test substring has nothing to strip. A false
+	// positive (e.g. "@test" in a comment or string) only costs an extra
+	// parse, since the walk below locates real attribute nodes only.
 	if !bytes.Contains(src, []byte("@test")) {
 		return src, nil
 	}
@@ -49,37 +48,28 @@ func StripTestAttrs(src []byte) ([]byte, error) {
 		return src, err
 	}
 
-	astutil.Apply(f, func(c astutil.Cursor) bool {
-		switch x := c.Node().(type) {
-		case *ast.Field:
-			// Field-level attributes are kept on the Field itself, not as
-			// list entries on the parent declsCursor, so we filter the slice
-			// in place rather than relying on Cursor.Delete.
-			x.Attrs = filterTestAttrs(x.Attrs)
-		case *ast.Attribute:
-			// Decl-level attributes (inside *ast.File or *ast.StructLit) can
-			// be removed via the cursor.  Attribute nodes encountered as part
-			// of a Field's Attrs walk were already filtered above.
-			switch c.Parent().Node().(type) {
-			case *ast.File, *ast.StructLit:
-				if name, _ := x.Split(); name == "test" {
-					c.Delete()
-				}
-			}
+	// ast.Walk visits both field-level attributes (Field.Attrs) and decl-level
+	// attributes (in *ast.File or *ast.StructLit), so one walk covers both.
+	var out []byte
+	prev := 0
+	ast.Walk(f, func(n ast.Node) bool {
+		a, ok := n.(*ast.Attribute)
+		if !ok || a.Name() != "test" {
+			return true
 		}
+		start, end := a.Pos().Offset(), a.End().Offset()
+		// Drop spaces and tabs before the attribute, so a field attribute
+		// `field: expr @test(...)` leaves `field: expr` with no trailing space.
+		start = prev + len(bytes.TrimRight(src[prev:start], " \t"))
+		// If the attribute then occupies its own line, drop the trailing
+		// newline too so a decl-level `@test(...)` line vanishes entirely.
+		if (start == 0 || src[start-1] == '\n') && end < len(src) && src[end] == '\n' {
+			end++
+		}
+		out = append(out, src[prev:start]...)
+		prev = end
 		return true
 	}, nil)
-
-	return format.Node(f)
-}
-
-func filterTestAttrs(attrs []*ast.Attribute) []*ast.Attribute {
-	out := attrs[:0]
-	for _, a := range attrs {
-		if name, _ := a.Split(); name == "test" {
-			continue
-		}
-		out = append(out, a)
-	}
-	return out
+	out = append(out, src[prev:]...)
+	return out, nil
 }

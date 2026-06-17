@@ -1530,6 +1530,14 @@ func TestFillPathSyntax(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		ctx := m.CueContext()
 
+		type inner struct {
+			X cue.Value `json:"x"`
+		}
+		type outer struct {
+			Name string `json:"Name"`
+			Val  inner  `json:"Val"`
+		}
+
 		testCases := []struct {
 			name  string
 			build func() cue.Value
@@ -1545,6 +1553,33 @@ func TestFillPathSyntax(t *testing.T) {
 					FillPath(cue.ParsePath("#b"), strType)
 			},
 			out: "{\n\ta:  string\n\t#b: string\n}",
+		}, {
+			// https://cuelang.org/issue/1733: a cue.Value referring to a
+			// definition is always inlined on FillPath, regardless of the Go
+			// container shape (a slice of structs used to differ from maps).
+			name: "inlineDefinitionReference",
+			build: func() cue.Value {
+				root := ctx.CompileString(`#Foo: string | int`)
+				foo := root.LookupPath(cue.ParsePath("#Foo"))
+				return root.
+					FillPath(cue.ParsePath("structf"), outer{Name: "hello", Val: inner{X: foo}}).
+					FillPath(cue.ParsePath("sliceOfStruct"), []outer{{Name: "hello", Val: inner{X: foo}}}).
+					FillPath(cue.ParsePath("sliceOfValue"), []inner{{X: foo}}).
+					FillPath(cue.ParsePath("mapOfValue"), map[string]inner{"hello": {X: foo}})
+			},
+			out: `{
+	#Foo: string | int
+	structf: {
+		Name: "hello"
+		Val: x: string | int
+	}
+	sliceOfStruct: [{
+		Name: "hello"
+		Val: x: string | int
+	}]
+	sliceOfValue: [{x: string | int}]
+	mapOfValue: hello: x: string | int
+}`,
 		}}
 
 		for _, tc := range testCases {

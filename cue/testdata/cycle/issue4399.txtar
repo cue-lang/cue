@@ -1,0 +1,39 @@
+# A pattern label using or() over a cyclic reference regressed with a spurious
+# "conflicting values" error when close() inserts a non-matching field (other)
+# first. Matching the pattern forces the cyclic chain while cue's field set is
+# not yet frozen, so the for-comprehension iterates a partial view and the
+# lazily-returned or() disjunction finalizes to a fatal conflict that never
+# re-evaluates once the field set completes. Residual of #4397.
+#
+# This commit records the broken behavior; the next applies the fix and flips
+# the test. The eq:todo result is the intended one.
+-- in.cue --
+cue: {
+	[or(tags.cue.modules)]: y: {}
+}
+
+tags: "cue": [_]: [...or([for command, _ in cue {command}])]
+tags: cue: modules: ["login", "mod"]
+
+cue: close({
+	other: {} // not a member of tags.cue.modules, positioned first
+	login: _
+	mod:   _
+})
+
+result: {"cue": cue, "tags": tags} @test(eq:todo, {
+	cue: {other: {}, login: {y: {}}, mod: {y: {}}}
+	tags: {cue: {modules: ["login", "mod"]}}
+})
+-- out/errors.txt --
+[eval] tags.cue.modules.0: conflicting values "other" and "login":
+    ./in.cue:5:27
+    ./in.cue:5:49
+    ./in.cue:5:50
+    ./in.cue:6:22
+[eval] tags.cue.modules.1: conflicting values "other" and "mod":
+    ./in.cue:5:27
+    ./in.cue:5:49
+    ./in.cue:5:50
+    ./in.cue:6:31
+-- out/eval/stats --

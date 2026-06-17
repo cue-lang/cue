@@ -16,6 +16,24 @@
       "message": "shorten this a bit? and the method above as well. I\u0027m fine with the testdata text though, because being a bit more specific in there can be a useful historical artifact.",
       "revId": "d129f2fee327b20396ead5f4406fda1123c45714",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e48defb1_8db7d14a",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3767,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-17T14:54:01Z",
+      "side": 1,
+      "message": "I actually really like both of these comments, and this is not the first version of these comments. I agree they\u0027re not short, but I think no words are wasted - my reading is it\u0027s not words for the sake of words.",
+      "parentUuid": "054cdbcf_159c4d2d",
+      "revId": "d129f2fee327b20396ead5f4406fda1123c45714",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

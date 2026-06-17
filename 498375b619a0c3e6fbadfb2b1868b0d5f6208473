@@ -16,6 +16,24 @@
       "message": "Looks to me like it should be fine no matter which formatter is used, but just wanted to check you\u0027re also sure it\u0027s fine either way?",
       "revId": "498375b619a0c3e6fbadfb2b1868b0d5f6208473",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "402cfbd7_3b870a32",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-17T11:04:15Z",
+      "side": 1,
+      "message": "yep, verified that the test passes with both the old and new formatters. this totally did not send me down a rabbit hole to fix test cache issues. lol.",
+      "parentUuid": "47338371_e6887722",
+      "revId": "498375b619a0c3e6fbadfb2b1868b0d5f6208473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1041,7 +1041,7 @@ func (c *converter) exprCore(x ast.Expr) doc {
 		// like [x=string]) aliases use tight "=" without surrounding
 		// spaces. Decl-position aliases are rendered by decl() with
 		// " = " instead.
-		return cats(stringLit(x.Ident.Name), equalsLit, c.expr(x.Expr))
+		return c.aliasExpr(x.Ident.Name, x.Expr)
 
 	default:
 		return stringLit("/* unknown expr */")
@@ -1084,10 +1084,24 @@ func (c *converter) label(l ast.Label) doc {
 	case *ast.ParenExpr:
 		return cats(lParenLit, c.expr(x.X), rParenLit)
 	case *ast.Alias:
-		return cats(stringLit(x.Ident.Name), equalsLit, c.expr(x.Expr))
+		return c.aliasExpr(x.Ident.Name, x.Expr)
 	default:
 		return c.expr(l.(ast.Expr))
 	}
+}
+
+// aliasExpr renders an expression-position alias as used in pattern
+// labels (`[x=string]`) and value-position aliases. The `=` hugs both
+// sides with no surrounding spaces, except where omitting the space
+// would merge it with expr's leading token into a longer
+// operator. Decl-position aliases are rendered by decl() with ` = `
+// instead.
+func (c *converter) aliasExpr(ident string, expr ast.Expr) doc {
+	bind := equalsLit
+	if aliasEqualsMergesWithExpr(expr) {
+		bind = cat(equalsLit, spaceLit)
+	}
+	return cats(stringLit(ident), bind, c.expr(expr))
 }
 
 // basicLit converts a BasicLit to a Doc.
@@ -3731,6 +3745,39 @@ func unaryOpMergesWithOperand(op token.Token, operand ast.Expr) bool {
 		return lead[0] == '='
 	}
 	return false
+}
+
+// aliasEqualsMergesWithExpr reports whether rendering an alias's `=`
+// immediately before expr would let the two re-lex as a single, longer
+// operator, so a separating space must be inserted. An alias's `=`
+// otherwise hugs its expression (`x=string`); this is the only case
+// where we force a space.
+//
+// The hazard arises only when expr starts with `=`, which happens only
+// when expr's leftmost leading token is a unary `==` or `=~`. All other
+// expressions begin with a digit, letter, quote, or bracket and can
+// never merge. We descend through BinaryExpr.X to reach that leftmost
+// token, since the head of a `|` / `&` chain (e.g. `=~"a" | =~"b"`)
+// supplies it; the descent mirrors [operatorsWouldMerge].
+//
+//   - op `=`, operand `==` (EQL): forms `==` (EQL), e.g. `===5`.
+//   - op `=`, operand `=~` (MAT): forms `==` (EQL), e.g. `==~"foo"`.
+//
+// Keying off tokenisation rather than RelPos means the space is emitted
+// by construction, even for programmatic ASTs that carry no RelPos.
+func aliasEqualsMergesWithExpr(expr ast.Expr) bool {
+	var lead token.Token
+	for {
+		switch x := expr.(type) {
+		case *ast.BinaryExpr:
+			expr = x.X
+			continue
+		case *ast.UnaryExpr:
+			lead = x.Op
+		}
+		break
+	}
+	return lead == token.EQL || lead == token.MAT
 }
 
 // allBracketArms reports whether every arm's expression is a

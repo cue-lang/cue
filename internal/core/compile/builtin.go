@@ -269,6 +269,29 @@ var orBuiltin = &adt.Builtin{
 		if len(values) == 1 {
 			return values[0]
 		}
+		// In a cyclic context, evaluate the disjunction eagerly instead of
+		// returning it lazily (the optimization of
+		// https://cuelang.org/cl/1234029). A lazily-returned disjunction is
+		// evaluated later by the caller, by which point an incremental
+		// re-evaluation of the cycle can have observed a partial state and
+		// collapsed the disjunction to a spurious conflict
+		// (https://cuelang.org/issue/4399). Evaluating it here keeps it part of
+		// the cycle's resolution. Non-cyclic calls stay lazy to keep the
+		// performance win.
+		//
+		// TODO: the deeper fix is for a for-comprehension over a not-yet-frozen
+		// source to yield an open result that is re-evaluated once the source's
+		// field set freezes, removing the need to special-case cyclic calls.
+		if c.CloseInfo().CycleType != adt.NoCycle {
+			d := make([]adt.Disjunct, len(values))
+			for i, v := range values {
+				d[i] = adt.Disjunct{Val: v, Default: false}
+			}
+			v := &adt.Vertex{}
+			v.AddConjunct(adt.MakeConjunct(nil, &adt.DisjunctionExpr{Values: d}, c.CloseInfo()))
+			v.CompleteArcs(c)
+			return v
+		}
 		return &adt.Disjunction{Values: values}
 	},
 }

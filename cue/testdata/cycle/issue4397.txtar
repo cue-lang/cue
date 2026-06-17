@@ -14,16 +14,19 @@ cue: close({
 	mod:   _
 })
 
-result: {"cue": cue, "tags": tags} @test(err, code=eval, contains="not allowed as field set was already referenced") @test(eq:todo, {
+result: {"cue": cue, "tags": tags} @test(eq, {
 	cue: {login: {y: {}}, mod: {y: {}}}
 	tags: {cue: {modules: ["login", "mod"]}}
 })
--- out/errors.txt --
-[eval] cue: adding field mod not allowed as field set was already referenced:
-    ./in.cue:8:6
-[eval] tags.cue.modules.1: conflicting values "login" and "mod":
-    ./in.cue:5:27
-    ./in.cue:5:49
-    ./in.cue:5:50
-    ./in.cue:6:31
 -- out/eval/stats --
+Leaks:  1
+Freed:  26
+Reused: 4
+Allocs: 23
+Retain: 0
+
+Unifications: 18
+Conjuncts:    38
+Disjuncts:    2
+
+NumCloseIDs: 13

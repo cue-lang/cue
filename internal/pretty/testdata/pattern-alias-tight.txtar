@@ -1,9 +1,22 @@
 # A pattern label's alias (e.g. [x=string]) must use tight "=" with
 # no surrounding spaces. The element inside the brackets is an
 # *ast.Alias expression, not a decl-level alias.
+#
+# The tight "=" gets a separating space only where it would otherwise
+# merge with the expression's leading token into a longer operator: an
+# alias bound to a unary "=~" (MAT) or "==" (EQL) would re-lex the two
+# "="s as "==", so `[Y= =~"foo"]` must keep its space or it re-parses as
+# `Y == ~"foo"`. The space is also needed when the leading "=~"/"==" sits
+# at the head of a | / & chain (e.g. `[W= =~"a" | =~"b"]`).
 -- in.cue --
 [x=string]: x
+[Y= =~"foo"]: 123
+[Z= ==5]: 123
+[W= =~"a" | =~"b"]: 123
 -- out/relpos --
-[x=string]: x
+[x=string]:         x
+[Y= =~"foo"]:       123
+[Z= ==5]:           123
+[W= =~"a" | =~"b"]: 123
 -- out/norelpos --
-[x=string]: x
+[x=string]: x, [Y= =~"foo"]: 123, [Z= ==5]: 123, [W= =~"a" | =~"b"]: 123

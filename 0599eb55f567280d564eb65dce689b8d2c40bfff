@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fc20c67_1d491ff2",
+        "filename": "internal/cuetxtar/stripattrs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-17T15:07:35Z",
+      "side": 1,
+      "message": "It doesn\u0027t matter, but this could actually be `return false` because you don\u0027t want to descend within the attr. That said, you can\u0027t descend within the attr because an attr has no children.",
+      "revId": "0599eb55f567280d564eb65dce689b8d2c40bfff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

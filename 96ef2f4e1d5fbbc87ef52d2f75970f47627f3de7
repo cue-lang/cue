@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96f97c8d_0d9be5d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-17T09:39:38Z",
+      "side": 1,
+      "message": "boo, you can\u0027t abstract out patterns:\n```\nx: [string]\ny: (x): _\n```",
+      "revId": "96ef2f4e1d5fbbc87ef52d2f75970f47627f3de7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

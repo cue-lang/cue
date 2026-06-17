@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47338371_e6887722",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-17T09:27:26Z",
+      "side": 1,
+      "message": "Looks to me like it should be fine no matter which formatter is used, but just wanted to check you\u0027re also sure it\u0027s fine either way?",
+      "revId": "498375b619a0c3e6fbadfb2b1868b0d5f6208473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

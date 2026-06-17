@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d7c821c_e3932582",
+        "filename": "cmd/cue/cmd/testdata/script/eval_e_hidden_nested.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-17T15:26:39Z",
+      "side": 1,
+      "message": "(assuming this is claude) I\u0027ve noticed claude doing this as well - referring to past stuff that\u0027s no longer valid. I don\u0027t exactly know what our preference is as a whole, but I personally prefer that we phrase things as they are today, rather than requiring understanding of issues from the past, since fixed. So I would prefer this to be rephrased to document the correct current behaviour only.",
+      "revId": "4d0b410a3bd1921749552ee640b8ba07fb3020f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

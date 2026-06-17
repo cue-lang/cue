@@ -24,6 +24,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "883c4755_f72cc1aa",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-17T10:39:14Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "1b015b96_b5cb7f26",
+      "revId": "b8b7c1d81f15399b1fca4b54f3a38eed18354350",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "929c0dd1_7400e11f",
@@ -37,6 +55,24 @@
       "writtenOn": "2026-06-17T09:36:34Z",
       "side": 1,
       "message": "nit: again, just to me, a rephrasing could simplify this. Maybe:\n```\n# --force only affects existing regular files;\n# it\u0027s a noop when exporting to a named pipe (FIFO).\n```",
+      "revId": "b8b7c1d81f15399b1fca4b54f3a38eed18354350",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c7d3753_9d0a8770",
+        "filename": "cmd/cue/cmd/testdata/script/export_force.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-17T10:39:14Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "929c0dd1_7400e11f",
       "revId": "b8b7c1d81f15399b1fca4b54f3a38eed18354350",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

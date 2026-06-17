@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/tdtest"
@@ -429,6 +430,36 @@ func TestSourceOptions(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		t.Equal(string(got), tc.want)
 	})
+}
+
+// TestFormatV2Smoke sanity-checks that the formatv2 experiment is on by
+// default, and that the pre-v2 formatter remains reachable by disabling it.
+//
+// The input formats differently between the two: v2 aligns the field values
+// even though one of them is a list, whereas v1 does not align in that case.
+func TestFormatV2Smoke(t *testing.T) {
+	const src = "a: 1\nbbbb: [1, 2, 3]\n"
+	const wantV2 = "a:    1\nbbbb: [1, 2, 3]\n"
+	const wantV1 = "a: 1\nbbbb: [1, 2, 3]\n"
+
+	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
+
+	// The experiment is on by default.
+	qt.Assert(t, qt.IsTrue(cueexperiment.Flags.FormatV2))
+
+	// Init is guarded by sync.Once, so overriding Flags directly here is not
+	// undone by the format functions calling cueexperiment.Init again.
+	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
+
+	cueexperiment.Flags.FormatV2 = true
+	got, err := format.Source([]byte(src))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Check(t, qt.Equals(string(got), wantV2))
+
+	cueexperiment.Flags.FormatV2 = false
+	got, err = format.Source([]byte(src))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Check(t, qt.Equals(string(got), wantV1))
 }
 
 // TextX is a skeleton test that can be filled in for debugging one-off cases.

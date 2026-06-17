@@ -41,9 +41,8 @@ exists conflict_force.yml
 [exec:mkfifo] exec cat named-pipe &
 [exec:mkfifo] exec cue export --out json -o named-pipe file.cue
 
-# Exporting to a named pipe (FIFO) should fail with --force,
-# because the flag should only allow overwriting regular files.
-# TODO: this should fail.
+# --force only affects existing regular files;
+# it's a noop when exporting to a named pipe (FIFO).
 [exec:mkfifo] exec cat named-pipe &
 [exec:mkfifo] exec cue export --out json -f -o named-pipe file.cue
 

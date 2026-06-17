@@ -84,7 +84,7 @@ func addOutFlags(cmd *cobra.Command) {
 	}
 	f.StringP(string(flagOutFile), "o", "",
 		`filename or - for stdout with optional file prefix (run 'cue help filetypes' for more info)`)
-	f.BoolP(string(flagForce), "f", false, "force overwriting existing files")
+	f.BoolP(string(flagForce), "f", false, "overwrite existing regular files")
 }
 
 func addGlobalFlags(cmd *cobra.Command) {

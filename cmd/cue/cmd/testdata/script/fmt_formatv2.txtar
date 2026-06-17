@@ -1,0 +1,33 @@
+# Smoke test that the formatv2 experiment is on by default, and that the
+# pre-v2 formatter remains reachable via CUE_EXPERIMENT=formatv2=0.
+#
+# The chosen input formats differently between the two: v2 aligns the field
+# values even though one of them is a list, whereas v1 does not align when a
+# list value is involved.
+
+# Default: formatv2 is on, so the values are aligned.
+cp in.cue default.cue
+exec cue fmt default.cue
+cmp default.cue golden-v2
+
+# Explicitly enabling formatv2 matches the default.
+env CUE_EXPERIMENT=formatv2=1
+cp in.cue on.cue
+exec cue fmt on.cue
+cmp on.cue golden-v2
+
+# Disabling formatv2 falls back to the pre-v2 formatter, which does not align.
+env CUE_EXPERIMENT=formatv2=0
+cp in.cue off.cue
+exec cue fmt off.cue
+cmp off.cue golden-v1
+
+-- in.cue --
+a: 1
+bbbb: [1, 2, 3]
+-- golden-v2 --
+a:    1
+bbbb: [1, 2, 3]
+-- golden-v1 --
+a: 1
+bbbb: [1, 2, 3]

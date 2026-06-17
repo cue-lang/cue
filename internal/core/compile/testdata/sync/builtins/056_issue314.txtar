@@ -15,19 +15,19 @@ x: {
 }
 
 #T: {
-	s: string
+	s:   string
 	out: template.Execute("{{.s}}", {
 		"s": s
 	})
 }
 
 #V: {
-	s: string
+	s:   string
 	out: json.Marshal({"s": s})
 }
 
 #U: {
-	s: string
+	s:   string
 	out: yaml.Marshal({"s": s})
 }
 -- out/compile --

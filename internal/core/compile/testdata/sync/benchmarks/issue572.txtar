@@ -13,6 +13,11 @@ unified: {
 		"\(entry)": true
 	}
 }
+
+// TODO(inline): _entries$p and [0] don't work here.
+// @test(eq, at=_entries$p[0],  1)
+// @test(eq, at=_entries$[1498], 1499)
+
 -- out/compile --
 --- in.cue
 {

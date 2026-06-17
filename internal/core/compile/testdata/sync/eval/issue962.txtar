@@ -8,7 +8,7 @@ import "encoding/yaml"
 
 foo: bar: "something"
 
-text: yaml.Marshal(_obj)
+text:  yaml.Marshal(_obj)
 
 _what: string
 _obj:  foo[_what]

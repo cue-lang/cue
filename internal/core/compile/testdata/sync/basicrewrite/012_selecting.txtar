@@ -1,11 +1,11 @@
 -- in.cue --
-obj: {a: 1, b: 2}
-index: {a: 1, b: 2}["b"]
+obj:    {a: 1, b: 2}
+index:  {a: 1, b:     2}["b"]
 mulidx: {a: 1, b: {a: 1, b: 3}}["b"]["b"]
-e: {a: 1}[4]
-f: {a: 1}.b
-g: {a: 1}["b"]
-h: [3].b
+e:      {a: 1}[4]
+f:      {a: 1}.b
+g:      {a: 1}["b"]
+h:      [3].b
 -- out/compile --
 --- in.cue
 {

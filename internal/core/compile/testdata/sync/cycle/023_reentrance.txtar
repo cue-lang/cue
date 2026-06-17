@@ -4,7 +4,7 @@
 // This indirection is needed to avoid binding references to fib
 // within fib to the instantiated version.
 fibRec: {
-	nn: int
+	nn:  int
 	out: (fib & {n: nn}).out
 }
 fib: {
@@ -17,11 +17,12 @@ fib: {
 		out: n
 	}
 }
-fib1: (fib & {n: 1}).out   // MAY NOT be an error
-fib2: (fib & {n: 2}).out   // MAY be an error
-fib3: (fib & {n: 3}).out   // SHOULD be an error
-fib7: (fib & {n: 7}).out   // Error
+fib1:  (fib & {n: 1}).out // MAY NOT be an error
+fib2:  (fib & {n: 2}).out // MAY be an error
+fib3:  (fib & {n: 3}).out // SHOULD be an error
+fib7:  (fib & {n: 7}).out // Error
 fib12: (fib & {n: 12}).out // Error
+
 -- out/compile --
 --- in.cue
 {

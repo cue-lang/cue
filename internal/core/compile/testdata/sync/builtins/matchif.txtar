@@ -3,8 +3,8 @@ regularFields: {
 	[_]: matchIf({x!: >2}, {y!: 5}, {y!: 1})
 	ok1: {x: 10, y: 5}
 	ok2: {x: 11, y: 5}
-	ok3: {x: 2, y: 1}
-	ok4: {x: 1, y: 1}
+	ok3: {x: 2,  y: 1}
+	ok4: {x: 1,  y: 1}
 
 	// TODO: allow unwrapping errors so that we can test args in wrapped errors,
 	// without having to match the other arguments.

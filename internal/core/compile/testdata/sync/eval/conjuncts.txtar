@@ -3,6 +3,7 @@
 // regression fixes for undefined field errors (issue 2351) and cycle errors
 // (issue 2355) in the v3 evaluator.
 -- in.cue --
+
 conjunct: t1: ({
 	#early: *"X" | string
 	#early
@@ -28,6 +29,7 @@ handleComprehensions: {
 	}
 	#sub2: 2
 }
+
 -- issue2351.cue --
 // Regression between v0.4.3 and v0.5.0: "undefined field" error when embedding
 // a for comprehension, caused by incorrect error reporting for let/hidden fields.
@@ -47,6 +49,7 @@ issue2351: hidden: {
 		out: [for x in in2 {x}]
 	}.out
 }
+
 -- issue2355.cue --
 // Regression v0.4.3→v0.5.0: cycle error when using let fields within nested
 // struct embeddings, breaking previously working code.
@@ -71,6 +74,7 @@ issue2355: {
 		}).out
 	}
 }
+
 -- out/compile --
 --- in.cue
 {

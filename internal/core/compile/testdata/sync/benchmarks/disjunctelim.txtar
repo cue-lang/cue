@@ -37,6 +37,7 @@ issue3610: {
 	#a: <"a" | >"b" | string // conjuncts 403  disjuncts 390 (+92; +90)
 	#a: <"a" | >"b" | string // conjuncts 495  disjuncts 480 (+92; +90)
 }
+
 -- out/compile --
 --- in.cue
 {

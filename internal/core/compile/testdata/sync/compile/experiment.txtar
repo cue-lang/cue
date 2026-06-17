@@ -3,10 +3,12 @@ module: "x.test"
 language: version: "v0.13.0"
 -- off.cue --
 off: __test_experiment("off")
+
 -- on.cue --
 @experiment(testing)
 
 on: __test_experiment("on")
+
 -- out/compile --
 --- off.cue
 {

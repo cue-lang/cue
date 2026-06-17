@@ -4,14 +4,14 @@ package x
 #PDB: {y: int}
 
 result: resources: {
-	if true {
-		x: #PDB & {y: 1}
-	}
+    if true {
+        x: #PDB & {y: 1}
+    }
 }
 
 out: ({
-	cfg: resources: _
-	out: {for n, _ in cfg.resources {(n): "x"}}
+    cfg: resources: _
+    out: {for n, _ in cfg.resources {(n): "x"}}
 } & {cfg: result}).out
 -- out/compile --
 --- in.cue

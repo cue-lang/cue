@@ -17,6 +17,7 @@ l: [...#X]
 l: [
 	{b: "bar"},
 ]
+
 -- out/compile --
 --- in.cue
 {

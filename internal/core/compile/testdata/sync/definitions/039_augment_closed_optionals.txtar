@@ -9,7 +9,6 @@
 	#A & #B
 	{[=~"^Q*$"]: int}
 }
-
 // TODO: What should this be? @test(allows=false, zoo)
 c: #C & {QQ: 3}
 #D: {

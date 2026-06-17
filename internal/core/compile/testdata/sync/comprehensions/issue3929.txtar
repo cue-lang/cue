@@ -12,8 +12,8 @@ import "strings"
 
 reduced: {
 	#Input: {
-		name: string
-		age:  "one" | "two"
+		name:  string
+		age:   "one" | "two"
 		if name != _|_ {
 			if true {
 				age: "one"
@@ -32,7 +32,7 @@ reduced: {
 	}
 
 	#def3: {
-		_in:  #Input
+		_in: #Input
 		def3: _in.age
 	}
 
@@ -92,6 +92,8 @@ full: {
 	for k, v in cronjob {
 		objects: cronjob: "\(k)": (_#cronjob & {_config: v}).out
 	}
+	// TODO(inline) support at for closed.
+	// @test(closed, at=full.objects.cronjob.foobar)
 
 }
 -- out/compile --

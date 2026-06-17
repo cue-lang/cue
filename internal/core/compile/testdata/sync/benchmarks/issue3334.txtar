@@ -25,7 +25,7 @@ x: properties: {
 
 Schema: {
 	title?: string
-	$ref?:  null | string
+	$ref?: null | string
 	enum?: [...]
 	required?: [...string]
 	items?: null | _
@@ -46,6 +46,7 @@ Schema: {
 	example?:  null | _
 	nullable?: bool
 }
+
 -- out/compile --
 --- in.cue
 {

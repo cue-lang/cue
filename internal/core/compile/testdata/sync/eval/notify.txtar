@@ -1,15 +1,16 @@
 -- in.cue --
 t1: {
 	a
-	a: a: 2 | 1
+	a: a: 2|1
+	// TODO(inline): fix args passing: match brackets
 }
 t2: {
 	d: d.a
-	d: a: a: 2 | 1
+	d: a: a: 2|1
 }
 t3: {
 	b: a
-	b: (1 | 2) | 2
+	b: (1|2) | 2
 	a: 1 | 2
 }
 -- issue3437.cue --
@@ -18,8 +19,10 @@ t3: {
 // https://cuelang.org/issue/3437
 issue3437: {
 	r: L=L.a
-	d: a: a: a: {b: 4} | d
-	out: r & d
+	d: a: a: a: {b: 4}|d
+	out: r&d
+	// TODO(perf): either use structure sharing or stronger pruning. This seems
+	// disproportional.
 }
 -- out/compile --
 --- in.cue

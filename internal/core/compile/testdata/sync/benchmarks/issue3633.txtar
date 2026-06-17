@@ -14,7 +14,7 @@ reduced: {
 		f?: null | bool | string | int | #Schema
 	}
 
-	out: #Schema & {#Schema}
+	out: #Schema & { #Schema }
 }
 full: {
 	#Schema: {
@@ -48,6 +48,12 @@ full: {
 		properties: foo: required: ["bar", "baz"]
 	}]
 }
+
+// TODO(inline):
+//  1) format better
+//  2) identify repeated elements
+//  3) leave at= flag at begginning when generating.
+
 -- out/compile --
 --- in.cue
 {

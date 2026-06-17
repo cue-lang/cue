@@ -5,12 +5,12 @@ language: version: "v0.15.0"
 selection: {
 	dropError: 1 | error("drop me")
 
-	useCustomError: 1 & 2 | error("use me")
+	useCustomError: 1&2 | error("use me")
 
-	twoCustomErrors: 1 & 2 | error("error one") | error("error two")
+	twoCustomErrors: 1&2 | error("error one") | error("error two")
 
-	x:              int
-	dropIncomplete: x+1 | error("user msg: x + 1 failed")
+	x: int
+	dropIncomplete: x + 1 | error("user msg: x + 1 failed")
 }
 
 interpolation: {
@@ -19,7 +19,7 @@ interpolation: {
 
 	substituteAll: a.notExist | error("hello \(world)")
 
-	substituteFail: a.b+1 | a.notExist | error("reference failed: \(a.b) | \(a.notExist)")
+	substituteFail: a.b + 1 | a.notExist | error("reference failed: \(a.b) | \(a.notExist)")
 
 	// When the error() message itself contains an error,
 	// the custom error should not be thrown away.
@@ -50,6 +50,7 @@ maxFields: a: 1
 
 multi: struct.MinFields(2) | error("should remain incomplete") | error("second")
 multi: a: 1
+
 -- self.cue --
 @experiment(aliasv2)
 

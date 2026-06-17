@@ -1,7 +1,7 @@
 -- in.cue --
 import "strings"
+a: strings.Join( [ strings.Join(["1"]), "2" ], "\n")
 
-a: strings.Join( [strings.Join(["1"]), "2"], "\n")
 -- out/compile --
 --- in.cue
 {

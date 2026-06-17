@@ -14,7 +14,7 @@ embeddingExpr: t1: ({
 	_
 } & {
 	#a: "s"
-	[#a][0]
+	[ #a ][0]
 })
 
 unifiedDirect: {
@@ -32,13 +32,14 @@ unifiedDirect: {
 	}
 }
 
+
 unifiedExpr: {
 	t1: {
 		#a: _
 		_
 	}
 	t1: {
-		[#a][0]
+		[ #a ][0]
 		#a: _
 	}
 	t1: {
@@ -61,6 +62,7 @@ cross: t1: {
 	a
 	b
 }
+
 -- complex.cue --
 // Multiple levels of insertion
 recursive: {
@@ -68,18 +70,18 @@ recursive: {
 		e: {}
 		c: d: e: f: 1
 		c.d
-		c: d: {
+		c: d:
 			// This part gets embedded within t1, which ends up adding new fields
 			// to here, when then again need to be embedded in t1, which then
 			// will add more fields to node e.
 			c: d: e: g: 1
-		}
 	}
 	t2: {
 		c
 		c: c: g: 1
 	}
 }
+
 -- issue2169.cue --
 // Evaluator regression where "cannot add field $X: was already used" errors
 // appeared incorrectly when a field was referenced before being defined.

@@ -10,13 +10,13 @@ language: version: "v0.14.0"
 // e: permanent error
 // i: incomplete error
 numbers: {
-	tLss:  1 < 2
-	tLeq:  1 <= 1.0
-	tLeq:  2.0 <= 3
-	tEql:  1 == 1.0
-	tNeq:  1.0 == 1
-	tGeq:  2.0 >= 2
-	tGtr:  !(2 > 3)
+	tLss: 1 < 2
+	tLeq: 1 <= 1.0
+	tLeq: 2.0 <= 3
+	tEql: 1 == 1.0
+	tNeq: 1.0 == 1
+	tGeq: 2.0 >= 2
+	tGtr: !(2 > 3)
 	tExpr: "a"+"b" == "ab"
 }
 -- lists.cue --
@@ -35,17 +35,18 @@ lists: {
 	// Non-equal lists
 	f1: [1, 2, 3] == [1, 2, 4]
 	f2: [1, 2, 3] == [1, 2]
-	f3: [1, 2, 3] == [1, 3, 2] // different order
+	f3: [1, 2, 3] == [1, 3, 2]  // different order
 	f4: [] == [1]
-	f5: [1, 2] == [1, "2"] // different types
+	f5: [1, 2] == [1, "2"]  // different types
 	f6: [*1 | 2 | 3] == [*2 | 3 | 4]
+
 
 	// TODO: types can never match. This could be a permanent error.
 	//       This was V2 behavior.
 	eIncompat: [int] == [string]
 
 	// Error cases
-	eErrPassthrough: [1 / 0] == [1]
+	eErrPassthrough: [1/0] == [1]
 
 	// incomplete passtrhough
 	_e3l: {}
@@ -65,13 +66,13 @@ structs: eq: {
 	// Equal structs
 	t1: {} == {}
 	t2: {a: 1, b: "foo"} == {a: 1, b: "foo"}
-	t3: {a: 1, b: 2} == {b: 2, a: 1}                              // different order
-	t4: {a: {x: 1, y: 2}} == {a: {x: 1, y: 2}}                    // nested structs
+	t3: {a: 1, b: 2} == {b: 2, a: 1} // different order
+	t4: {a: {x: 1, y: 2}} == {a: {x: 1, y: 2}} // nested structs
 	t5: ({a: 1, b: 2, c: 3} & {d: 4}) == {a: 1, b: 2, c: 3, d: 4} // unification
-	t6: {{{{a: 1}}}} == {{a: 1}}                                  // embedding
+	t6: {{{{a: 1}}}} == {{a: 1}} // embedding
 	t7: {[string]: int} == {[string]: string}
 	_t8l: *1 | 2 | 3
-	t8: {a: _t8l} == {a: 3 | *1}
+	t8: {a: _t8l} == {a: 3| *1}
 
 	// Non-equal structs
 	f1: {a: 1, b: "foo"} == {a: 2, b: "foo"}
@@ -80,9 +81,9 @@ structs: eq: {
 	f4: {a: 1, b: 2} == {a: 1}
 	f5: {} == {a: 1}
 	f6: {a: 1} == 1
-	f7: {a: 1, b?: 2} == {a: 1, b: 2}  // optional field does not exist
+	f7: {a: 1, b?: 2} == {a: 1, b: 2} // optional field does not exist
 	f8: {{{{a: 1}}}} == {{a: 1, b: 2}} // embedding
-	_f9r:                              *2 | 3 | 4
+	_f9r:  *2 | 3 | 4
 	f9: {a: *1 | 2 | 3} == {a: _f9r}
 
 	// Only test some versions of != recognizing the same code paths are
@@ -134,7 +135,7 @@ incomplete: {
 	iErr1: {a!: _int} == {a!: _int}
 	iErr2: {a!: _int} == {a!: 1}
 	eErr3: {a: _int} == {a: _string}
-	eErr4: {a: 1 / 0} == {a: 1} // Error passthrough
+	eErr4: {a: 1/0} == {a: 1}        // Error passthrough
 
 	eErr5: {a: 1} == {a: _int & _string} // Error passthrough
 	iErr6: {a!: 1} == {a: 1}
@@ -155,8 +156,8 @@ diffTypes: {
 	// true for !=) are permanent errors.
 
 	// Tests with different types.
-	fScalar1: 2 == "s"
-	fScalar2: "s" == 2
+	fScalar1:  2 == "s"
+	fScalar2:  "s" == 2
 	fScalar3: true == 2
 
 	fStruct1: {a: 1} == "s"

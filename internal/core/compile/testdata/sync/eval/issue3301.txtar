@@ -16,7 +16,7 @@ object: #Leaf & {}
 
 #Leaf: {
 	#Mid
-	extra?: {...}
+	extra?:  {...}
 	more?: int
 	if extra.foo != _|_ {
 		if more != _|_ {

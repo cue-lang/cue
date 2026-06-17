@@ -10,7 +10,7 @@ self: t2: {
 
 unify: t1: {
 	a!: int
-	a:  int
+	a: int
 }
 
 unify: t2: {
@@ -50,7 +50,7 @@ reference: {
 	}
 	toConcrete: {
 		a!: 1
-		b:  a + 1
+		b: a + 1
 	}
 	// A reference to a required-but-missing field reports "required field
 	// missing", not "cannot reference optional field".
@@ -96,7 +96,7 @@ doNotEscalateError: {
 	}
 	b: {
 		required!: _
-		pass: (a & {in: required}).out
+		pass:    (a & {in: required}).out
 	}
 }
 -- out/compile --

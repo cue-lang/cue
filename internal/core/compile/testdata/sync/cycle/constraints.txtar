@@ -45,7 +45,7 @@ noCyclePattern: t2: {
 
 noCyclePattern: t3: {
 	_D: [string]: _T
-	_T: x:        _D
+	_T: x: _D
 	[string]: _D
 	[string]: b: x: c: {}
 	a: {}
@@ -75,12 +75,13 @@ noCyclePattern: t6: {
 	#E: t: #T
 
 	#T: {
-		{object: #S}
+		{ object: #S }
 	}
 
-	#S: y:       #D
+	#S: y: #D
 	[string]: x: #D
-	[string]: x: r: t: object: y: foo: t: object: {}
+	[string]: x: r: t: object: y: foo: t: object: {
+	}
 	bar: {}
 }
 
@@ -91,6 +92,7 @@ noCancelSelfInvoke: t1: {
 	x: y
 	x: c: x
 }
+
 
 // Even though these cycles cross pattern boundaries, they are still structural
 // cycles as the reference includes a field that triggers the pattern.
@@ -119,8 +121,8 @@ selfTriggerCycle: long1: {
 	// The long string of nested fields will initially exempt the structural
 	// cycle, but they will eventually run out, causing the cycle to be
 	// triggered.
-	a: [string]: b: a // -> record conjunct from pattern per field.
-	a: c: b: c: b: c: {} // -> track if any of the fields is not a cycle.
+	a: [string]: b: a     // -> record conjunct from pattern per field.
+	a: c: b: c: b: c: {}  // -> track if any of the fields is not a cycle.
 }
 
 // TODO: see comment at selfTriggerCycle.t1
@@ -150,29 +152,33 @@ brokenRing: t1: {
 	// TODO: it would be nicer, though, if the representation were consistent.
 	p1: {
 		D: a?: T
-		T: b:  D
+		T: b: D
+	 	// @test(debug)
 	}
 	p2: {
 		// TODO(eval): fix permute or eval: error messages differ based on path in the two cases.
 		// @test(permute, count=2)
-		T: b:  D
+		T: b: D
 		D: a?: T
 	}
 }
 
 brokenRing: t2: p1: {
 	D: [string]: T
-	T: b:        D
+	T: b: D
 }
 
 brokenRing: t2: p2: {
-	T: b:        D
+	T: b: D
 	D: [string]: T
 }
 
 cyclicRing: t1: {
 	D: a: T
 	T: b: D
+	// TODO(inline): fix shareID here.
+	// @test(shareID=T, at=D.a)
+	// @test(shareID=T, at=T)
 }
 -- issue3476.cue --
 // `cue def -e '#a'` causes a stack overflow. The definition #a selects a
@@ -181,7 +187,7 @@ cyclicRing: t1: {
 // exporter to recurse infinitely instead of detecting the cycle.
 // https://cuelang.org/issue/3476
 issue3476: {
-	#a: (#b & {x: _}).x
+	#a:  (#b & {x: _}).x
 	#b: {
 		x?: #c
 		#c: [string]: #c
@@ -204,6 +210,7 @@ issue3509: {
 		#matrixConfig: [...#matrixConfig] | string
 		matrix?: [string]: [...#matrixConfig]
 	}
+
 }
 -- out/compile --
 --- in.cue

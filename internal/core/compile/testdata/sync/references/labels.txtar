@@ -55,6 +55,7 @@ c1: C="foo\(bar)": [D=string]: {
 }
 c1: foo3: x: _
 
+
 emptyLabel: {
 	"": 1
 	a:  emptyLabel[""]
@@ -95,7 +96,7 @@ underscore: e: {
 
 invalidPattern: {
 	[=~"BAD)" & =~"x"]: string
-	y:                  123
+	y: 123
 }
 -- out/compile --
 --- in.cue

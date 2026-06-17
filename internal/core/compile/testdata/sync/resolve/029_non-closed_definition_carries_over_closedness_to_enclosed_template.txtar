@@ -11,6 +11,9 @@ a: #S & {
 b: #Q & {
 	w: {c: int}
 }
+// NOTE: the above test is marked at w, not w.c, because it fails both
+// disjunctions. We probably want to record it at c, or at least give a better
+// error message.
 
 #R: {
 	[string]: [{a: int}, {b: int}]

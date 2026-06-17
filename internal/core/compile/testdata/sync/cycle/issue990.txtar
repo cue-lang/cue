@@ -51,10 +51,11 @@ _test: {
 		n: "c1"
 	}
 
+
 	s3: #AS
 	s3: d: {
 		n: "s3"
-		r: r1: a: c1
+		r: r1: a:c1
 	}
 
 	s2: #AS
@@ -79,6 +80,8 @@ _test: {
 //  Test
 
 out: #sub & {#p: _test.s1}
+
+// TODO(fmt): can we improve this?
 -- out/compile --
 --- in.cue
 {

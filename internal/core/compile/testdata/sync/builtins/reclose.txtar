@@ -11,8 +11,7 @@ noClose: {
 }
 
 recursive: {
-	#x: {foo: int}
-
+	#x: { foo: int}
 	// Basic usage of __reclose - makes structs recursively closed
 	a: __reclose({
 		#x...
@@ -25,11 +24,12 @@ recursive: {
 	t2: ok: a & {nested: field2: 5}
 	t3: ok: a & {foo: 5}
 
+
 	// Test that nested extra fields are not allowed (should error)
 	t4: err: a & {
 		nested: {
 			field2: 1
-			extra:  "not allowed"
+			extra: "not allowed"
 		}
 	}
 
@@ -38,6 +38,7 @@ recursive: {
 	e: __reclose({})
 	t5: err: e & {extra: "not allowed"}
 }
+
 
 nonRecursive: {
 	x: __reclose({
@@ -102,7 +103,8 @@ nonStructLiterals: {
 	// Test with non-struct should error
 	t1: err: __reclose("not a struct")
 
-	#A: a:   int
+
+	#A: a: int
 	t4: err: __reclose(#A)
 }
 
@@ -118,11 +120,13 @@ nonStructDefinitions: {
 	// errors because of regular field + embedded scalar
 	t2: err: a & {b: 1}
 }
+
 -- old.cue --
 retro: {
 	// May not be used if explicitopen is not set.
 	t1: err: __reclose({})
 }
+
 -- out/compile --
 --- in.cue
 {

@@ -25,6 +25,7 @@ e & {
 p: {
 	{X=["foo"]: b: X | null}
 	{[Y="bar"]: b: Y}
+
 }
 
 let B = {open: int}

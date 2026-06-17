@@ -9,9 +9,10 @@ a: c: 1
 
 b: {
 	#A
-	leaf:          "leaf value"
-	interpolation: "more \(leaf_ref)"
-	leaf_ref:      leaf
+    leaf: "leaf value"
+    interpolation: "more \(leaf_ref)"
+    leaf_ref: leaf
+
 }
 -- out/compile --
 --- in.cue

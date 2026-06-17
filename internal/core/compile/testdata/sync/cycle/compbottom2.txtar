@@ -12,7 +12,7 @@ self: {
 
 	// This is an incomplete error, as it may succeed when the user
 	// explicitly specifies a value for a.b.
-	isConcreteFail: t1: {
+	isConcreteFail: t1:{
 		a: {
 			if a.b == _|_ {
 				b: 1
@@ -21,7 +21,7 @@ self: {
 		}
 	}
 
-	isConcreteFail: t2: {
+	isConcreteFail: t2:{
 		a: {
 			if a.b == _|_ {
 				b: 1
@@ -54,6 +54,7 @@ self: {
 	}
 
 }
+
 -- mutual.cue --
 mutual: {
 	noConflicts: {
@@ -71,28 +72,29 @@ mutual: {
 	}
 
 	brokenCycleSuccess: {
-		a: {if b.foo == _|_ {foo: ""}}
-		b: {if a.bar == _|_ {bar: ""}}
+		a: { if b.foo == _|_ { foo: "" } }
+		b: { if a.bar == _|_ { bar: "" } }
 		a: bar: ""
 	}
 
 	allowOneDirectionalDependency: {
 		p1: {
-			a: {if b.foo == _|_ {bar: ""}} // added
-			b: {if a.bar == _|_ {new: ""}} // not added
+			a: { if b.foo == _|_ { bar: "" } } // added
+			b: { if a.bar == _|_ { new: "" } } // not added
 		}
 		p2: {
-			a: {if b.foo == _|_ {new: ""}}
-			b: {if a.bar == _|_ {foo: ""}}
+			a: { if b.foo == _|_ { new: "" } }
+			b: { if a.bar == _|_ { foo: "" } }
 		}
 	}
 
 	oneDirectionalBrokenConflictSuccess: {
 		b: foo: ""
-		a: {if b.foo == _|_ {bar: ""}}
-		b: {if a.bar == _|_ {new: ""}}
+		a: { if b.foo == _|_ { bar: "" } }
+		b: { if a.bar == _|_ { new: "" } }
 	}
 }
+
 -- mutualsamestruct.cue --
 sameStruct: {
 	chainSuccess: a: {
@@ -219,6 +221,7 @@ sameStruct: {
 		}
 	}
 }
+
 -- nestedchain.cue --
 // Issue
 nestedChain: {
@@ -278,6 +281,9 @@ issue3836: hidden: {
 		out: [if bar != _|_ {"bar is set"}]
 	}
 	_Value.out
+	// Pushdown improvement: the comprehension guard (foo|bar) == _|_ now
+	// correctly fires and sets bar, where previously (without pushdown) the
+	// guard saw a spurious non-bottom value and did not fire.
 }
 issue3836: exposed: {
 	foo?: _

@@ -42,7 +42,7 @@ decimalListErrors: {
 	a: {
 		x: [string]
 		result: list.Avg(x)
-		// TODO: allow checking wrapped errors: args=[string, number],
+			// TODO: allow checking wrapped errors: args=[string, number],
 	}
 
 	b: {
@@ -64,6 +64,7 @@ issue3648: reduced: {
 		b: [{}]
 	}
 	foo: {}
+
 }
 issue3648: full: {
 	#Redirect: path?: string
@@ -71,9 +72,10 @@ issue3648: full: {
 	[string]: {
 		// Note that this bug disappears if the order of the fields below is swapped.
 		allRedirects: list.Concat([redirects])
-		redirects: [...#Redirect]
+		redirects:    [...#Redirect]
 	}
 	foo: {}
+
 }
 -- out/compile --
 --- in.cue

@@ -1,18 +1,18 @@
 // TODO(lang): it would be nice to be able to have attributes on list elements.
 -- in.cue --
 out: [
-	123.45 + 987.65,
-	123.45 - 987.65,
-	123.45 * 987.65,
-	123.45 / 987.65,
+  123.45 + 987.65,
+  123.45 - 987.65,
+  123.45 * 987.65,
+  123.45 / 987.65,
 
-	// whole integers
-	2 + 3,
-	7 - 1,
-	5 * 10,
-	20 / 4,
+  // whole integers
+  2 + 3,
+  7 - 1,
+  5 * 10,
+  20 / 4,
 
-	1 / 3, // fill all digits
+  1 / 3, // fill all digits
 ]
 -- out/compile --
 --- in.cue

@@ -42,6 +42,7 @@ value1: {
 
 value2: {
 	len('sf' | 'dd')
+
 }
 
 incompleteArgDecimalList: {
@@ -49,7 +50,7 @@ incompleteArgDecimalList: {
 	#a: {
 		param:       int
 		transformed: +param
-		max: list.Max([transformed])
+		max:         list.Max([transformed])
 	}
 }
 
@@ -58,7 +59,7 @@ incompleteArgStringList: {
 	#a: {
 		param:       string
 		transformed: param + ""
-		joined: strings.Join([transformed], "-")
+		joined:      strings.Join([transformed], "-")
 	}
 }
 
@@ -70,7 +71,7 @@ incompleteList: {
 
 // TODO: add better error positions.
 incompleteListError: {
-	x: y + []
+	x:       y + []
 	y:       _
 	decimal: list.Max(x)
 	str:     strings.Join(x, "")

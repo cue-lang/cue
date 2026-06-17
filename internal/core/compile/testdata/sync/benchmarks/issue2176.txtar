@@ -52,6 +52,8 @@ output: {
 	"2": (datastream & {marker: length: 14}).marker.position
 }
 // NOTE: output contains lots of expanded lets. Use @test(debug) to view.
+
+
 -- out/compile --
 --- in.cue
 {

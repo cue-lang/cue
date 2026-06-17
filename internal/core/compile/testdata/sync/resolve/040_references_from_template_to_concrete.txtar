@@ -6,6 +6,7 @@ t: [X=string]: {
 	c: "X"
 }
 t: x: {b: str: "DDDD"}
+
 -- out/compile --
 --- in.cue
 {

@@ -19,29 +19,40 @@ cyclicalInsertInDisjunction: {
 		// disjunctions would _not_ case the reference to cross disjunction
 		// boundaries.
 		c: {d: e, e: _}
-		c: {d: 1, e: 2} | {d: 2, e: 2}
+		c: {d: 1, e: 2} | {d : 2, e: 2}
 	}
 	maybe1: {
 		// In this case, the reference c.e crosses a disjunction boundary.
 		// However, since the reference starts from within a disjunction, this
 		// could be allowed, if we define it to be.
 		c: d: c.e
-		c: {d: 1, e: 2} | {d: 2, e: 2}
+		c: {d: 1, e: 2} | {d : 2, e: 2}
 	}
 	err1: {
+		// This should be an error: to resolve x in c.d, we need to first
+		// resolve x to a concrete value. As `x` is defined outside the
+		// disjunction, and the disjunction cannot be resolved without it, `x`
+		// cannot be evaluated to a concrete value, resulting in an error.
 		x: c.e
 		c: d: x
-		c: {d: 1, e: 2} | {d: 2, e: 2}
+		c: {d: 1, e: 2} | {d : 2, e: 2}
 	}
 	err2: {
+		// This is a more obviously erroneous variant of err1. The div in x
+		// requires a concrete value for c.e. However, the disjunction can only
+		// be disambiguated as a result of computing x. This means c.e cannot
+		// be concrete at the time of evaluation.
+		// NOTE: not so obvious. It clearly works, and arguably it should.
 		x: div(c.e, 2)
 		c: d: x
-		c: {d: 1, e: 2} | {d: 2, e: 3}
+		c: {d: 1, e: 2} | {d : 2, e: 3}
 	}
 	err3: {
+		// Here it is clear that d will not disambiguate the disjunction at c.
+		// So c.e. cannot be resolved.
 		x: c.e
 		c: d: 1 | 2 | x
-		c: {d: 1, e: 2} | {d: 2, e: 3}
+		c: {d: 1, e: 2} | {d : 2, e: 3}
 	}
 }
 
@@ -51,7 +62,7 @@ preseveBottomSemantics: ok: {
 	// `a: _ | X`. As we do not simplify disjunctions, the result is `a: _ | X`.
 	// However, we could consider simplifying in this case to `a: _` if we can
 	// come up with a good general mechanism for subsumption.
-	#x: {#x | {}}
+	#x: { #x | {} }
 }
 
 eliminateOpenVariant: ok: {
@@ -101,7 +112,7 @@ issue4251_notB_reversed: {
 // This used to cause a panic with evalv3.
 panic1: {
 	#TypeFoo: {
-		name: "foo"
+		name:      "foo"
 		// Make foo_field here optional and master panics too!
 		foo_field: string
 	}

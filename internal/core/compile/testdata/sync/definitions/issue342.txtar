@@ -15,6 +15,7 @@ X: {
 		}
 	}
 
+
 	var: "bar"
 
 	// Validate(concrete) after Fill() on Complex.ref from a "static" key will succeed

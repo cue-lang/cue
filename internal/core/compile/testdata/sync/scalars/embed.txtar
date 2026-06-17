@@ -7,7 +7,6 @@
 // Issue #794: Tests that a hidden field used as a list element inside an embedded
 // struct resolves to its concrete value (hidden.issue794: _foo embedded as [_foo]).
 import "strings"
-
 import "list"
 
 intEmbed: {
@@ -44,7 +43,7 @@ stringEmbed: {
 		"foo"
 		#bar: "bar"
 	}
-	s2: [s1, {s1.#bar, #baz: 4}]
+	s2: [ s1, {s1.#bar, #baz: 4}]
 	s3: strings.Join(s2, "--")
 }
 
@@ -65,8 +64,8 @@ arithmetic: {
 		#a: int
 		#b: int
 	}
-	a1: (sum & {_, #a: 1, #b: 3}) + 2
-	a2: 2 + (sum & {_, #a: 1, #b: 3})
+	a1: (sum & {_, #a:          1, #b: 3}) + 2
+	a2: 2 + (sum & {_, #a:      1, #b: 3})
 	a3: 2 + (2 + (sum & {_, #a: 1, #b: 3}))
 }
 
@@ -108,6 +107,7 @@ hidden: {
 		[_foo]
 	}
 }
+
 -- issue2113.cue --
 // Issue #2113: Tests that embedded scalars inside a definition function (#fn with
 // an embedded bare value) resolve correctly when the definition is specialized,
@@ -115,10 +115,11 @@ hidden: {
 // declaration orders to confirm order-independence.
 merged: t1: {
 
-	#fn: {#in2: _, _}
-	#fn: {#in2: c1: string, #in2.c1}
+	#fn: { #in2: _, _ }
+	#fn: { #in2: c1: string, #in2.c1 }
 	x: #fn & {#in2: {c1: "V 1"}, _}
 }
+
 -- issue2163.cue --
 // Issue #2163: Tests that a self-referencing embedded expression — a definition
 // that embeds (#Func & {_foo: #in, "buzz"}) + "fiz", where the embedded result
@@ -137,7 +138,9 @@ selfRefInEmbed: t1: {
 			"buzz"
 		}) + "fiz"
 	}
+
 }
+
 -- out/compile --
 --- in.cue
 {

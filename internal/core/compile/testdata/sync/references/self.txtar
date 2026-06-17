@@ -8,8 +8,8 @@ b: "hello"
 
 // Nested self usage - should refer to x struct
 x: {
-	y: self.z
-	z: "world"
+    y: self.z
+    z: "world"
 }
 
 // Shorthand notation - self should refer to foo struct
@@ -18,27 +18,28 @@ foo: baz: "greeting" // TODO(inline): reference marking does not work with "self
 
 // Multiple levels of nesting
 nested: {
-	level1: {
-		field: self.value
-		value: "level1 value"
-	}
+    level1: {
+        field: self.value
+        value: "level1 value"
+    }
 }
 
 // Self in list context
 listTest: {
-	items: [1, 2, self[0], self[1]]
-	first:  1
-	second: 2
+    items: [1, 2, self[0], self[1]]
+    first: 1
+    second: 2
 }
 
 // Self with computed selectors
 computed: {
-	key:   "test"
-	value: self["key"]
+    key: "test"
+    value: self["key"]
 }
 
 // Cyclic reference detection
 cycle: self.cycle
+
 -- list.cue --
 @experiment(aliasv2)
 import "list"
@@ -49,6 +50,7 @@ listCheck: ok1: [1, "foo", 2, "bar"]
 
 listCheck: err: #IntStrings
 listCheck: err: [1, "foo", "bar", 2]
+
 -- withlet.cue --
 @experiment(try,aliasv2)
 
@@ -86,17 +88,18 @@ withLetComprehension: {
 @experiment(aliasv2)
 
 validator: {
-	err1: {{{{==(self + 1)}}}}
+	err1: {{{{== (self + 1)}}}}
 	err1: 2
 
-	err2: {==(self + 1)}
+	err2: {== (self + 1)}
 	err2: 2
 }
 
 cyclicErr: {
-	err3: ==(self + 1)
+	err3: == (self + 1)
 	err3: 4
 }
+
 -- experiment_test.cue --
 // Test self usage without experiment enabled (should fail)
 

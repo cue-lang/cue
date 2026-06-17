@@ -39,6 +39,7 @@ t3: {
 		}
 	}
 }
+
 -- issue2235.cue --
 package kubecluster
 
@@ -62,7 +63,7 @@ clusters: [CLUSTER=string]: #Cluster & {
 
 #Cluster: {
 	globalIngressControllers: [string]: #GlobalIngressController
-	globalIngressControllers: admin: #GlobalIngressController & {
+	globalIngressControllers: admin:    #GlobalIngressController & {
 		class: "admin"
 	}
 	for _, c in globalIngressControllers {
@@ -101,6 +102,8 @@ for clusterName, cluster in clusters {
 }
 
 clusters: foo: {}
+
+
 -- out/compile --
 --- issue2235.cue
 {

@@ -8,8 +8,8 @@ issue3330: {
 
 		// Reference to empty is within the definition that defines it. Closedness
 		// thus does not trigger.
-		field: null | {n: int}
-		field: empty & {n: 3}
+		field: null | { n: int }
+		field: empty & { n: 3 }
 	}
 
 	out: list.Concat([[#A]])
@@ -19,8 +19,8 @@ issue3330: {
 // disjunct-elimination code path that caused the original panic in issue3330.
 eliminated: {
 	#empty: {}
-	x: null | {n: 3}
-	x: #empty & {n: 3}
+	x: null | { n: 3 }
+	x: #empty & { n: 3 }
 	out: len(x)
 }
 
@@ -28,7 +28,7 @@ eliminated: {
 // is referenced.
 simplified: {
 	#struct: {
-		field: {n: 3} & g
+		field: { n: 3 } & g
 		g: {}
 	}
 

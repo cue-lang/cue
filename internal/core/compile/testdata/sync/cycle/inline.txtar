@@ -9,7 +9,7 @@ inline: small: {
 }
 
 inline: medium: {
-	f2: (f & {n: 2}).out
+	f2:  (f & {n: 2}).out
 	fRec: {nn: int, out: (f & {n: nn}).out}
 	f: {
 		n: int
@@ -84,7 +84,7 @@ issue3731: reduced: {
 	#lookup: {
 		input: {...}
 		output: [
-			for _, v in input if v.show != _|_ {v},
+			for _, v in input if v.show != _|_ { v },
 		]
 	}
 
@@ -97,7 +97,7 @@ issue3731: expanded: {
 	#lookup: {
 		input: {...}
 		output: [
-			for _, v in input if v.show != _|_ {v},
+			for _, v in input if v.show != _|_ { v },
 		]
 	}
 
@@ -122,28 +122,28 @@ issue3731: full: {
 		#AccountConfig
 		workspaces: "workspaceA": {}
 	}
-
+	
 	#AccountConfigSub2: {
 		#AccountConfig
 		workspaces: "workspaceB": {}
 	}
-
+	
 	tree: env1: {
 		"region1": {
-			"env1-r1-account-sub1":   #AccountConfigSub1
+			"env1-r1-account-sub1": #AccountConfigSub1
 			"env1-r1-account-sub2-1": #AccountConfigSub2
 		}
 	}
-
+	
 	#lookupSiblings: {
 		envtree: {...}
 		out: [
 			for region, v in envtree
 			for account, config in v
-			if config.workspaces."workspaceB" != _|_ {account},
+			if config.workspaces."workspaceB" != _|_ { account },
 		]
 	}
-
+	
 	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
 		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
 	}

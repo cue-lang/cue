@@ -2,7 +2,7 @@
 cond: bool
 src: {}
 top: _
-a: [if cond {}]
+a: [ if cond {}]
 b: [for x in src.foo {}]
 c: {for x in top {}}
 -- out/compile --

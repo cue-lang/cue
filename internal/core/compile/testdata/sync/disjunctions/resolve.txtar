@@ -1,12 +1,12 @@
 // Ensure that references are resolved on the boundaries of disjunctions.
 -- in.cue --
 resolveAcrossDisjunct: t1: {
-	{} | {#B: 1} // d resolves to 1 in the second case.
+	{} | { #B: 1} // d resolves to 1 in the second case.
 	{d: #B} | {}
 	#B: int
 }
 resolveAcrossDisjunct: nested: {
-	{} | {a: b: #B: 1} // d resolves to 1 in the second case.
+	{} | { a: b: #B: 1} // d resolves to 1 in the second case.
 	{d: a.b.#B} | {}
 	a: b: #B: int
 }

@@ -9,27 +9,31 @@ ok: t1: {
 	c: #R
 	c: [{b: int}]
 	#R: [...]
+
 }
 
 ok: t2: {
 	#A: _
-	l:  #A
+	l: #A
 	l: f: "hi"
+
 }
 
 ok: t3: {
 	#A: f: {...}
-	#A1: {#A}
+	#A1: { #A }
 	s: [string]: #A1
 	s: foo: f: d: foo: 1
+
 }
 
 ok: t4: {
-	#T: {a: b: 1}
+	#T: { a: b: 1 }
 	W: {
 		{#T}
 		b: c: 2
 	}
+
 }
 
 ok: t5: {
@@ -38,7 +42,7 @@ ok: t5: {
 		Common
 		_
 	}
-	Common: {}
+	Common: { }
 	x: #A
 	x: c: int
 }
@@ -48,15 +52,17 @@ ok: t6: {
 		Common
 		...
 	}
-	Common: {}
+	Common: { }
 	x: #A
 	x: c: int
+
 }
 
 ok: t7: {
 	a: {#A, #B}
 	#A: b: f: 1
 	#B: b: g: 1
+
 }
 
 ok: t8: {
@@ -71,35 +77,40 @@ ok: t8: {
 			a: (k): c: D: 2
 		}
 	}
+
 }
 
 ok: t9: {
 	c: #R
 	c: [{b: int}]
 	#R: [...]
+
 }
 
 ok: t10: {
 	#A: _ // top should allow everything
-	l:  #A
+	l: #A
 	l: f: "hi"
+
 }
 
 ok: t11: {
 	// indirections
 	#A: f: {...}
-	#A1: {#A}
+	#A1: { #A }
 	s: [string]: #A1
 	s: foo: f: d: foo: "bar" // should pass
+
 }
 
 ok: t12: {
 	// nested embedding
-	#T: {a: b: 1}
+	#T: { a: b: 1 }
 	W: {
 		{#T}
 		b: c: 2
 	}
+
 }
 
 ok: t13: {
@@ -110,9 +121,10 @@ ok: t13: {
 		Common
 		_
 	}
-	Common: {}
+	Common: { }
 	x: #A
 	x: c: int
+
 }
 
 ok: t14: {
@@ -121,9 +133,10 @@ ok: t14: {
 		Common
 		...
 	}
-	Common: {}
+	Common: { }
 	x: #A
 	x: c: int
+
 }
 
 // TODO: move this test to "ok": _ means any and implicitly defines all fields
@@ -139,9 +152,9 @@ err: t1: {
 }
 
 err: t2: {
-	#S: {{c: d: 1}}
+	#S: { { c: d: 1 } }
 	V: #S
-	V: {c: e: 1}
+	V: { c: e: 1 }
 }
 
 err: t3: {
@@ -153,7 +166,7 @@ err: t3: {
 err: t4: {
 	a: #A
 	#A: b: f: 1
-	a: b: h:  1
+	a: b: h: 1
 }
 
 err: t5: {
@@ -188,9 +201,9 @@ err: t7: {
 
 err: t8: {
 	// nested embedding
-	#S: {{c: d: 1}}
+	#S: { { c: d: 1 } }
 	V: #S
-	V: {c: e: 1}
+	V: { c: e: 1 }
 }
 -- validators.cue --
 import "struct"
@@ -207,6 +220,7 @@ validator: open: {
 	}
 	data: trailingComma: "all"
 	data: #Schema
+
 }
 
 validator: keepClosed: {
@@ -240,6 +254,7 @@ issue1830: {
 			name: "blah"
 			age2: 5
 		}
+
 	}
 }
 -- issue3491.cue --
@@ -250,11 +265,12 @@ issue3491: {
 	#Schema: field?: {}
 
 	a: #Schema & {
-		field: {}
+	  field: {}
 	}
 
 	a: b
 	b: #Extra: {}
+
 }
 -- out/compile --
 --- in.cue

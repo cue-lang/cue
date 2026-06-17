@@ -2,6 +2,7 @@
 root2: 1
 #Root2: {}
 #Root2
+
 -- out/compile --
 --- in.cue
 {

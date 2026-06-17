@@ -64,8 +64,8 @@ issue3931: full: {
 // issue3946: evalv3 regression reporting a cyclic reference error when a field
 // is inserted and then referenced within a comprehension expression.
 // https://cuelang.org/issue/3946
-issue3946: reduced: {
-	out: [for _, v in _inputs {v}]
+issue3946: reduced:{
+	out: [for _, v in _inputs { v }]
 	_inputs: [_]: {
 		doExtra?: bool
 		if doExtra != _|_ {

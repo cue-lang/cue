@@ -15,6 +15,7 @@ for x in [
 ] {
 	"\(x.a)": "\(x.b)": x
 }
+
 -- out/compile --
 --- in.cue
 {

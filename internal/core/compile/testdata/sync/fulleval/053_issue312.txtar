@@ -9,6 +9,7 @@
 for x in [1] {
 	*close({}) | {[_]: null}
 }
+
 -- out/compile --
 --- in.cue
 {

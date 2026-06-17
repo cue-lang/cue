@@ -9,15 +9,15 @@ d: rem(5, 3)
 
 // StructCmp examples - now that the experiment is accepted
 structComparison: {
-	equalStructs: {a: 1, b: 2} == {a: 1, b: 2}
-	differentStructs: {a: 1} == {a: 2}
-	emptyStructs: {} == {}
+    equalStructs:     {a: 1, b: 2} == {a: 1, b: 2}
+    differentStructs: {a: 1} == {a: 2}
+    emptyStructs:     {} == {}
 }
 
 mixedComparison: {
-	structVsNumber: {a: 1} == 1
-	listVsStruct: [1, 2] == {a: 1}
-	stringVsNumber: "hello" == 42
+    structVsNumber: {a: 1} == 1
+    listVsStruct:   [1, 2] == {a: 1}
+    stringVsNumber: "hello" == 42
 }
 -- out/compile --
 --- in.cue

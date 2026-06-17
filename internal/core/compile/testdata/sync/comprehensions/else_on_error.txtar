@@ -6,17 +6,17 @@
 
 // Error in for source - else should NOT trigger
 forSourceError: {
-	for x in "not-a-list" {"\(x)": x} otherwise {fallbackField: true}
+	for x in "not-a-list" { "\(x)": x } fallback { fallbackField: true }
 }
 
 // Error in if condition - else should NOT trigger
 ifConditionError: {
-	if ("not" + 1) {a: 1} else {b: 2}
+	if ("not" + 1) { a: 1 } else { b: 2 }
 }
 
 // Bottom value in for source - else should NOT trigger
 forSourceBottom: {
-	for x in _|_ {"\(x)": x} otherwise {fallbackField: true}
+	for x in _|_ { "\(x)": x } fallback { fallbackField: true }
 }
 -- out/compile --
 --- in.cue

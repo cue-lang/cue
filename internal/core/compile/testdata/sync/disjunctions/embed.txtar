@@ -67,9 +67,9 @@ nested: {
 issue3415: full: {
 	A: #A & {
 		i: {
-			_a + _b
-			_a: 1
-			_b: 10
+		  _a + _b
+		  _a: 1
+		  _b: 10
 		}
 	}
 	#A: {

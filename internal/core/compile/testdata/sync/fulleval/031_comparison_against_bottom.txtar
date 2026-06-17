@@ -1,12 +1,12 @@
 -- in.cue --
 a: _|_ == _|_
 b: err == 1 & 2 // not a literal error, so not allowed
-c: err == _|_   // allowed
-d: err != _|_   // allowed
+c: err == _|_  // allowed
+d: err != _|_ // allowed
 e: err != 1 & 3
 // z: err == err // TODO: should infer to be true?
-f: ({a: 1} & {a: 2}) == _|_
-g: ({a: 1} & {b: 2}) == _|_
+f: ({a:        1} & {a: 2}) == _|_
+g: ({a:        1} & {b: 2}) == _|_
 h: _|_ == ({a: 1} & {a: 2})
 i: _|_ == ({a: 1} & {b: 2})
 

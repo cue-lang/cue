@@ -31,9 +31,9 @@ issue3905: full: {
 
 	#ReferenceGrant: {
 		apiVersion: "gateway.networking.k8s.io/v1beta1"
-		kind:       "ReferenceGrant"
+		kind: "ReferenceGrant"
 		metadata!: {
-			name!:      string
+			name!: string
 			namespace!: string
 			labels?: {
 				[string]: string

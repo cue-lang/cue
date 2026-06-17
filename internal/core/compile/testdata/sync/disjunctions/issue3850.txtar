@@ -11,7 +11,7 @@ issue3850: full: {
 
 	#WithFoo: {
 		_global: global
-		foo:     _global.glb1.glb2
+		foo: _global.glb1.glb2
 	}
 }
 issue3850: incomplete: {
@@ -22,7 +22,7 @@ issue3850: incomplete: {
 
 	#WithFoo: {
 		_global: global
-		foo:     _global.glb1.glb2
+		foo: _global.glb1.glb2
 		...
 	}
 }
@@ -42,7 +42,7 @@ issue3875: full: {
 
 	out: desc: {
 		_hidden: _global.name
-		name:    _hidden
+		name: _hidden
 	}
 	out: #Schema | "never"
 

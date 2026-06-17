@@ -10,6 +10,7 @@ A: close({
 B: A & {
 	c: 3
 }
+
 -- out/compile --
 --- test.cue
 {

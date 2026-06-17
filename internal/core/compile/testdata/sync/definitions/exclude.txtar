@@ -3,36 +3,37 @@ package p
 
 excludeLet: {
 	// Two lets with the same name should not unify and checked by definition.
-	#D: { let X = {}, #foo: X, f: _}
+	#D: { let X = {}, #foo: X, f: _ }
 	a: #D
-	a: { let X = {a: 1}, f: X}
+	a: { let X = { a: 1 }, f: X }
+
 }
 
 definition: {
 	// Check a definition only if it s contained withing a definition.
 	err1: {
-		#D: {#foo: a: int}
+		#D: { #foo: a: int }
 		a: #D
-		a: {#foo: b: int}
+		a: { #foo: b: int }
 	}
 	ok1: {
 		#D: {}
 		a: #D
-		a: {#foo: b: int}
+		a: { #foo: b: int }
 	}
 }
 
 hidden: {
 	// Check a hidden field only if it s contained withing a definition.
 	err1: {
-		#D: {_foo: a: int}
+		#D: { _foo: a: int }
 		a: #D
-		a: {_foo: b: int}
+		a: { _foo: b: int }
 	}
 	ok1: {
 		#D: {}
 		a: #D
-		a: {_foo: b: int}
+		a: { _foo: b: int }
 	}
 }
 -- regress.cue --
@@ -42,7 +43,7 @@ import "encoding/json"
 
 definition: ok2: {
 	#Tree: {
-		#Leaf: leaf:      string
+		#Leaf: leaf: string
 		#Branch: branch?: #Leaf
 		root: #Branch
 	}
@@ -55,10 +56,12 @@ hidden: ok2: {
 			run: "foo bar"
 		}
 	}
-	#Workflow: {}
+	#Workflow: {
+	}
 	#step: matchN(1, [{
 		"run"!: _
 	}])
+
 }
 -- out/compile --
 --- in.cue

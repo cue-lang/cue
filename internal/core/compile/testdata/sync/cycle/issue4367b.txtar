@@ -72,7 +72,7 @@ TEMPLATE: {
 }
 
 // Before the fix these reported `cfg: conflicting values "" and "sub-"`.
-checkCfg:  OUT.IMPORTS[0].cfg
+checkCfg: OUT.IMPORTS[0].cfg
 checkName: OUT.IMPORTS[0].objects.plain.b.metadata.name
 -- out/compile --
 --- main.cue

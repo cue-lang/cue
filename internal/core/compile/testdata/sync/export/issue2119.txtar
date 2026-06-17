@@ -7,7 +7,7 @@ import (
 simplified: {
 	x: d: R={
 		".*"
-		[R + ""][0]
+		[R+""][0]
 	}
 	out: yaml.Marshal(x)
 }

@@ -4,11 +4,11 @@
 # https://cuelang.org/issue/3857
 -- in.cue --
 reduced: t1: {
-	S: {if true {a: U}}
+	S: { if true { a: U } }
 	x: S
 	x: {
-		["a"]: b: 1 | T
-		d: b:     x.a
+	["a"]: b: 1 | T
+	d: b: x.a
 	}
 	T: 1
 	U: b: 1 | 1
@@ -19,42 +19,42 @@ reduced: t1: {
 issue3851: t1: {
 	#Top: _
 	#Config: {
-		disj:   _ | *"default"
-		shared: _
+	disj: _ | *"default"
+	shared: _
 	}
 
 	#Schema: {
-		[string]: #Config
-		if true {
-			one: shared: "foo"
-		}
+	[string]: #Config
+	if true {
+		one: shared: "foo"
+	}
 	}
 
 	out: #Schema
 	out: {
-		["one"]: disj: _ | #Top
-		two: shared:   out.one.shared
+	["one"]: disj: _ | #Top
+	two: shared: out.one.shared
 	}
 }
 issue3851: t2: {
 	#Top: _
 	#Config: {
-		disj: _ | *{}
-		shared: _
+	disj: _ | *{}
+	shared: _
 	}
 
 	#Env: {
-		conf: [string]: #Config
-		if true {
-			conf: one: shared: "foo"
-		}
+	conf: [string]: #Config
+	if true {
+		conf: one: shared: "foo"
+	}
 	}
 
 	env1: #Env
 
 	[string]: {
-		conf: ["one"]: disj: {} | #Top
-		conf: two: shared: conf.one.shared
+	conf: ["one"]: disj: {} | #Top
+	conf: two: shared: conf.one.shared
 	}
 }
 -- out/compile --

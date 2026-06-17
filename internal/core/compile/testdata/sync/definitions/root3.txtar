@@ -1,7 +1,8 @@
 -- in.cue --
 x: _
 #D: b: x
-#D & {b: _}
+#D & { b: _ }
+
 -- out/compile --
 --- in.cue
 {

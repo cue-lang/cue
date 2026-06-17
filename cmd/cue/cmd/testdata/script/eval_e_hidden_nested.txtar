@@ -1,0 +1,28 @@
+# Issue #2577: focusing with -e on a path must still show hidden fields nested
+# under that path when --show-hidden is set. Evaluating an -e expression
+# produces a value with no directly associated package instance, so its hidden
+# fields, which belong to the package, are wrongly suppressed.
+
+# A hidden field nested under a hidden parent.
+# TODO(#2577): should show '_foo_field: 123'; the hidden field is suppressed.
+exec cue eval --show-hidden .:p -e _foo
+! stdout '_foo_field'
+
+# A hidden field nested under a regular parent.
+# TODO(#2577): should show '_bar_field: 123'; the hidden field is suppressed.
+exec cue eval --show-hidden .:p -e bar
+! stdout '_bar_field'
+
+# A regular field nested under a hidden parent is shown.
+exec cue eval --show-hidden .:p -e _baz
+stdout 'baz_field: 123'
+
+-- cue.mod/module.cue --
+module: "mod.test/x"
+language: version: "v0.9.0"
+-- file.cue --
+package p
+
+_foo: _foo_field: 123
+bar: _bar_field:  123
+_baz: baz_field:  123

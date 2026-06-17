@@ -687,14 +687,16 @@ func (s *scheduler) freeze(c condition) {
 //
 //   - a parent task that has not completed (typically a pushed-down
 //     comprehension still yielding); or
-//   - one of this scheduler's own taskREADY field-adding tasks (those that
-//     complete fieldConjunctsKnown, e.g. a ListLit) that a parent
-//     comprehension's yield only materialized after the parent task itself
-//     reached taskSUCCESS.
+//   - one of this scheduler's own field-adding tasks (those that complete
+//     fieldConjunctsKnown, e.g. a ListLit) that is taskREADY, or that is
+//     taskRUNNING and is not a comprehension.
 //
 // Freezing in either case would lock in an incomplete field set and produce
-// spurious "field set was already referenced" errors. Only taskREADY own tasks
-// count: a taskRUNNING or taskWAITING field-adding task is typically part of a
+// spurious "field set was already referenced" errors. A taskREADY own task has
+// not run yet; a taskRUNNING non-comprehension own task is an ancestor of the
+// current task on the evaluation stack that will resume and add the rest of its
+// bounded field set. A taskRUNNING or taskWAITING comprehension, by contrast,
+// derives fields by iterating other fields and is typically part of a
 // dependency cycle, where freezing is the deliberate cycle-breaker.
 //
 // The current task is excluded: it may freeze fieldSetKnown for the very node
@@ -715,8 +717,21 @@ func (s *scheduler) deferFieldSetKnown(c condition) condition {
 		}
 	}
 	for _, t := range s.tasks {
-		if t.state == taskREADY && t != cur && t.run.completes&fieldConjunctsKnown != 0 {
+		if t == cur || t.run.completes&fieldConjunctsKnown == 0 {
+			continue
+		}
+		switch t.state {
+		case taskREADY:
+			// A field-adding task that has not yet run.
 			return c &^ fieldSetKnown
+		case taskRUNNING:
+			// A still-running non-comprehension conjunct (e.g. close()) is an
+			// ancestor on the stack that will resume and add the rest of its
+			// bounded field set. A comprehension can grow the field set without
+			// bound, so for it freezing remains the deliberate cycle-breaker.
+			if t.run != handleComprehension {
+				return c &^ fieldSetKnown
+			}
 		}
 	}
 	return c

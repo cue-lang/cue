@@ -1,0 +1,29 @@
+# A & B narrows 1|2|3|4 to 1|2 before unifying with 3, so C.0 fails with exactly
+# the 1-and-3 and 2-and-3 conflicts, never the "4 and 3" term that v2 leaked.
+# permute asserts the conflicts do not depend on conjunct order.
+-- in.cue --
+A: 1 | 2 | 3 | 4
+B: 1 | 2
+
+reduced: {
+	C: [...A]
+	C: [...B]
+	C: [3]
+}
+-- out/compile --
+--- in.cue
+{
+  A: (1|2|3|4)
+  B: (1|2)
+  reduced: {
+    C: [
+      ...〈2;A〉,
+    ]
+    C: [
+      ...〈2;B〉,
+    ]
+    C: [
+      3,
+    ]
+  }
+}

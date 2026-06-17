@@ -1,0 +1,37 @@
+# A & B narrows 1|2|3|4 to 1|2 before unifying with 3, so C.0 fails with exactly
+# the 1-and-3 and 2-and-3 conflicts, never the "4 and 3" term that v2 leaked.
+# permute asserts the conflicts do not depend on conjunct order.
+-- in.cue --
+A: 1 | 2 | 3 | 4
+B: 1 | 2
+
+reduced: {
+	C: [...A]
+	C: [...B]
+	C: [3] @test(err, at=0, code=eval,
+		suberr=(contains="conflicting values 1 and 3", pos=[-5:4, -1:9, 0:6]),
+		suberr=(contains="conflicting values 2 and 3", pos=[-5:8, -1:9, 0:6]))
+	@test(permute, count=6)
+}
+-- out/errors.txt --
+[eval] reduced.C.0: 2 errors in empty disjunction:
+reduced.C.0: conflicting values 1 and 3:
+    ./in.cue:2:4
+    ./in.cue:6:9
+    ./in.cue:7:6
+reduced.C.0: conflicting values 2 and 3:
+    ./in.cue:2:8
+    ./in.cue:6:9
+    ./in.cue:7:6
+-- out/eval/stats --
+Leaks:  1
+Freed:  17
+Reused: 10
+Allocs: 8
+Retain: 0
+
+Unifications: 6
+Conjuncts:    24
+Disjuncts:    12
+
+NumCloseIDs: 2

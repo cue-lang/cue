@@ -16,6 +16,24 @@
       "message": "(assuming this is claude) I\u0027ve noticed claude doing this as well - referring to past stuff that\u0027s no longer valid. I don\u0027t exactly know what our preference is as a whole, but I personally prefer that we phrase things as they are today, rather than requiring understanding of issues from the past, since fixed. So I would prefer this to be rephrased to document the correct current behaviour only.",
       "revId": "4d0b410a3bd1921749552ee640b8ba07fb3020f2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01af8cd3_d3463007",
+        "filename": "cmd/cue/cmd/testdata/script/eval_e_hidden_nested.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-17T15:32:46Z",
+      "side": 1,
+      "message": "I\u0027ve gone back and forth on this.\n\nOn one hand I really dislike it when it writes a lot of words about what the previous behavior or the bug was. So I\u0027ve definitely told it off before.\n\nOn the other hand, this is a regression test for a specific issue, so I\u0027m fine with it using one sentence to summarize what aspect of this test caused a bug in the past. I\u0027d personally have been lazy and not included this, but since the AI did it, I\u0027m keeping it.\n\nSo overall I\u0027m fine with this case, but not with many others :)",
+      "parentUuid": "2d7c821c_e3932582",
+      "revId": "4d0b410a3bd1921749552ee640b8ba07fb3020f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

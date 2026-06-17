@@ -38,7 +38,7 @@ var (
 )
 
 func TestCompile(t *testing.T) {
-	if cuetest.UpdateGoldenFiles {
+	if cuetest.UpdateGoldenFiles() {
 		syncTestdataInputsCUE(t)
 	}
 

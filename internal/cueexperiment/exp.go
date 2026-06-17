@@ -90,6 +90,8 @@ func Init() error {
 	// input. go test only notices an env var read via os.Getenv while a test
 	// runs; the once-guarded read below usually happens at package-init time
 	// (via runtime.New in a package-level var), too early to be seen.
+	//
+	// TODO(mvdan): remove these workarounds if https://go.dev/issue/44625 is fixed
 	os.Getenv("CUE_EXPERIMENT")
 	return initOnce()
 }

@@ -338,7 +338,7 @@ func TestValidate(t *testing.T) {
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
-		t.Update(cuetest.UpdateGoldenFiles)
+		t.Update(cuetest.UpdateGoldenFiles())
 		if tc.skipNoShare {
 			t.M.TODO_NoSharing(t)
 		}

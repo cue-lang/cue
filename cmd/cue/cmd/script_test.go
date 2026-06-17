@@ -101,7 +101,7 @@ func TestLatest(t *testing.T) {
 func TestScript(t *testing.T) {
 	p := testscript.Params{
 		Dir:                 filepath.Join("testdata", "script"),
-		UpdateScripts:       cuetest.UpdateGoldenFiles,
+		UpdateScripts:       cuetest.UpdateGoldenFiles(),
 		RequireExplicitExec: true,
 		RequireUniqueNames:  true,
 		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){

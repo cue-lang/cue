@@ -1267,7 +1267,7 @@ func TestValues(t *testing.T) {
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *subsumeTest) {
-		t.Update(cuetest.UpdateGoldenFiles)
+		t.Update(cuetest.UpdateGoldenFiles())
 
 		if tc.in == "" {
 			t.Skip("empty test case")

@@ -57,7 +57,7 @@ func TestExtractDefinitions(t *testing.T) {
 			}
 
 			wantFile := filepath.Join("testdata", filepath.Base(file)+".out.cue")
-			if cuetest.UpdateGoldenFiles {
+			if cuetest.UpdateGoldenFiles() {
 				_ = os.WriteFile(wantFile, out.Bytes(), 0666)
 				return
 			}
@@ -97,7 +97,7 @@ func TestBuild(t *testing.T) {
 		t.Fatal(errors.Details(err, nil))
 	}
 
-	if cuetest.UpdateGoldenFiles {
+	if cuetest.UpdateGoldenFiles() {
 		for _, f := range files {
 			b, err := format.Node(f)
 			if err != nil {

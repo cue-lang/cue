@@ -597,7 +597,7 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 	name := pa.raw.Fields[0].Value() // preserves any :vN version suffix
 	if len(pa.raw.Fields) < 2 {
 		// Empty @test(debugCheck) — fill placeholder.
-		if cuetest.UpdateGoldenFiles {
+		if cuetest.UpdateGoldenFiles() {
 			actual := r.debugPrinterOutput(val)
 			r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		}
@@ -609,7 +609,7 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 	if match {
 		return
 	}
-	if cuetest.ForceUpdateGoldenFiles || cuetest.UpdateGoldenFiles {
+	if cuetest.ForceUpdateGoldenFiles() || cuetest.UpdateGoldenFiles() {
 		r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		return
 	}
@@ -627,7 +627,7 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 	actual := r.debugPrinterOutput(val)
 	if len(pa.raw.Fields) < 2 {
 		// Empty @test(debug) — fill placeholder.
-		if cuetest.UpdateGoldenFiles {
+		if cuetest.UpdateGoldenFiles() {
 			r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		}
 		return
@@ -638,7 +638,7 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 		return
 	}
 	// Always auto-update on mismatch (informational, not an assertion).
-	if cuetest.ForceUpdateGoldenFiles || cuetest.UpdateGoldenFiles {
+	if cuetest.ForceUpdateGoldenFiles() || cuetest.UpdateGoldenFiles() {
 		r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		return
 	}

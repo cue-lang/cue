@@ -104,7 +104,7 @@ I.a: invalid value 1000 (out of bound <100):
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
-		t.Update(cuetest.UpdateGoldenFiles)
+		t.Update(cuetest.UpdateGoldenFiles())
 
 		got := errStr(tc.value.Validate())
 		// The expected values in the test table have extra whitespace, but we trim both

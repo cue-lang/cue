@@ -134,7 +134,7 @@ func TestDecode(t *testing.T) {
 				out = bytes.TrimSpace(out)
 
 				if diff := cmp.Diff(b, out); diff != "" {
-					if cuetest.UpdateGoldenFiles {
+					if cuetest.UpdateGoldenFiles() {
 						a.Files[outIndex].Data = b
 						b = txtar.Format(a)
 						err = os.WriteFile(fullpath, b, 0666)

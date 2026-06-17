@@ -741,7 +741,7 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 		isPlaceholder := len(ea.pos) == 0
 		// pos=[] is a fill-in placeholder: update with CUE_UPDATE=1, same as
 		// the top-level @test(err, pos=[]) path in checkErrPositions.
-		if ((isPlaceholder && cuetest.UpdateGoldenFiles) || cuetest.ForceUpdateGoldenFiles) && c.posWriteback != nil && ea.srcAttrText != "" {
+		if ((isPlaceholder && cuetest.UpdateGoldenFiles()) || cuetest.ForceUpdateGoldenFiles()) && c.posWriteback != nil && ea.srcAttrText != "" {
 			c.posWriteback(ea.srcAttrText, positions)
 			return nil
 		}

@@ -59,7 +59,7 @@ func TestExe(t *testing.T) {
 	wasmFiles := filepath.Join(root, "cue")
 	p := testscript.Params{
 		Dir:                 "testdata/cue",
-		UpdateScripts:       cuetest.UpdateGoldenFiles,
+		UpdateScripts:       cuetest.UpdateGoldenFiles(),
 		RequireExplicitExec: true,
 		RequireUniqueNames:  true,
 		Setup: func(e *testscript.Env) error {
@@ -98,7 +98,7 @@ func copyFile(t *testing.T, dst, src string) {
 func check(t *testing.T, dir string, got string) {
 	golden := filepath.Join("testdata", dir) + ".golden"
 
-	if cuetest.UpdateGoldenFiles {
+	if cuetest.UpdateGoldenFiles() {
 		os.WriteFile(golden, []byte(got), 0666)
 	}
 

@@ -27,7 +27,7 @@ import (
 )
 
 func TestBuiltin(t *testing.T) {
-	if cuetest.UpdateGoldenFiles {
+	if cuetest.UpdateGoldenFiles() {
 		updateGoldenFiles(t)
 	}
 

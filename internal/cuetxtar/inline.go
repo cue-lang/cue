@@ -493,12 +493,12 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 	}
 
 	// Section needs to be added, removed, or updated.
-	if cuetest.DiffGoldenFiles {
+	if cuetest.DiffGoldenFiles() {
 		r.t.Errorf("result for %s differs: (-want +got)\n%s",
 			sectionName, cmp.Diff(string(existing), result))
 		return
 	}
-	if !cuetest.UpdateGoldenFiles {
+	if !cuetest.UpdateGoldenFiles() {
 		return // silently skip
 	}
 
@@ -558,10 +558,10 @@ func (r *inlineRunner) handleStatsSection(counts stats.Counts) {
 	// No change needed only when section exists with matching content.
 	if sectionIdx >= 0 && bytes.Equal(existing, resultBytes) {
 		// fall through to write if renamed
-	} else if cuetest.DiffGoldenFiles {
+	} else if cuetest.DiffGoldenFiles() {
 		r.t.Errorf("result for %s differs: (-want +got)\n%s",
 			sectionName, cmp.Diff(string(existing), result))
-	} else if cuetest.UpdateGoldenFiles {
+	} else if cuetest.UpdateGoldenFiles() {
 		updateContent := false
 		if sectionIdx >= 0 {
 			c := r.cueContext()
@@ -570,7 +570,7 @@ func (r *inlineRunner) handleStatsSection(counts stats.Counts) {
 			v.Decode(&orig)
 
 			switch {
-			case cuetest.ForceUpdateGoldenFiles:
+			case cuetest.ForceUpdateGoldenFiles():
 				updateContent = true
 			case SignificantStatsChange(orig, counts):
 				// For now, we mainly care about disjuncts, but other thresholds apply.
@@ -998,7 +998,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		cmpErr := (&cmpCtx{baseLine: pa.baseLine}).astCmp(cue.Path{}, expr, val)
 		if cmpErr == nil {
 			t.Logf("WARNING: path %s: TODO eq:todo now passes — consider upgrading to @test(eq, %s)", path, exprStr)
-			if cuetest.UpdateGoldenFiles || cuetest.ForceUpdateGoldenFiles {
+			if cuetest.UpdateGoldenFiles() || cuetest.ForceUpdateGoldenFiles() {
 				r.enqueueInlineFill(pa, promoteTodoAttr(pa))
 			}
 		} else {
@@ -1008,7 +1008,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	}
 	if exprStr == "" {
 		// Empty @test(eq) or @test(eq, at=N) — fill placeholder.
-		if cuetest.UpdateGoldenFiles {
+		if cuetest.UpdateGoldenFiles() {
 			r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr, pa))
 		}
 		return
@@ -1037,7 +1037,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {
 		// Assertion passes via AST comparison.
-		if hasSkip && cuetest.UpdateGoldenFiles {
+		if hasSkip && cuetest.UpdateGoldenFiles() {
 			// Stale-skip cleanup: the assertion now passes; strip the skip,
 			// restoring @test(eq, <expr>[, at=<sel>]).
 			r.enqueueInlineFill(pa, r.eqFillAttrStr(exprStr, atStr, pa))
@@ -1046,7 +1046,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	}
 
 	// Comparison failed — genuine mismatch.
-	if cuetest.ForceUpdateGoldenFiles {
+	if cuetest.ForceUpdateGoldenFiles() {
 		// CUE_UPDATE=force: overwrite the assertion with the actual value.
 		r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr, pa))
 		return

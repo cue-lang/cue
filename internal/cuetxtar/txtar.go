@@ -565,7 +565,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					if bytes.Equal(f.Data, ff) {
 						continue
 					}
-					if cuetest.FormatTxtar {
+					if cuetest.FormatTxtar() {
 						update = true
 						a.Files[i].Data = ff
 					}
@@ -622,17 +622,17 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 						// Only update file if anything changes.
 						if _, ok := index[sub.name]; ok {
 							delete(index, sub.name)
-							if !cuetest.UpdateGoldenFiles {
+							if !cuetest.UpdateGoldenFiles() {
 								t.Errorf("file %q exists but is equal to fallback", sub.name)
 							}
-							update = cuetest.UpdateGoldenFiles
+							update = cuetest.UpdateGoldenFiles()
 						}
 						if _, ok := index[diffName]; ok {
 							delete(index, diffName)
-							if !cuetest.UpdateGoldenFiles {
+							if !cuetest.UpdateGoldenFiles() {
 								t.Errorf("file %q exists but is empty", diffName)
 							}
-							update = cuetest.UpdateGoldenFiles
+							update = cuetest.UpdateGoldenFiles()
 						}
 					}
 				}
@@ -672,7 +672,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					}
 				}
 
-				if cuetest.UpdateGoldenFiles {
+				if cuetest.UpdateGoldenFiles() {
 					update = true
 					gold.Data = result
 					continue
@@ -685,7 +685,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				}
 
 				// Doc sections never fail unless CUE_UPDATE=diff.
-				if sub.doc && !cuetest.DiffGoldenFiles {
+				if sub.doc && !cuetest.DiffGoldenFiles() {
 					continue
 				}
 

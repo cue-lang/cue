@@ -43,7 +43,7 @@ func TestSpecCheck(t *testing.T) {
 	if bytes.Equal(source, updated) {
 		return
 	}
-	if cuetest.UpdateGoldenFiles {
+	if cuetest.UpdateGoldenFiles() {
 		if err := os.WriteFile("spec.md", updated, 0o666); err != nil {
 			t.Fatal(err)
 		}

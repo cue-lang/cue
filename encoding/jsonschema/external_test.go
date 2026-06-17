@@ -70,7 +70,7 @@ func TestExternal(t *testing.T) {
 			})
 		}
 	})
-	if !cuetest.UpdateGoldenFiles {
+	if !cuetest.UpdateGoldenFiles() {
 		return
 	}
 	if t.Failed() {
@@ -295,8 +295,8 @@ func testName(s string) string {
 // skip field pointed to by skipField if necessary.
 func testFailed(t *testing.T, m *cuetdtest.M, variant string, skipField *externaltest.Skip, p positioner, errStr string) {
 	name := skipName(m, variant)
-	if cuetest.UpdateGoldenFiles {
-		if (*skipField)[name] == "" && !cuetest.ForceUpdateGoldenFiles {
+	if cuetest.UpdateGoldenFiles() {
+		if (*skipField)[name] == "" && !cuetest.ForceUpdateGoldenFiles() {
 			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
 		}
 		if *skipField == nil {
@@ -316,7 +316,7 @@ func testFailed(t *testing.T, m *cuetdtest.M, variant string, skipField *externa
 // skip field pointed to by skipField if necessary.
 func testSucceeded(t *testing.T, m *cuetdtest.M, variant string, skipField *externaltest.Skip, p positioner) {
 	name := skipName(m, variant)
-	if cuetest.UpdateGoldenFiles {
+	if cuetest.UpdateGoldenFiles() {
 		delete(*skipField, name)
 		if len(*skipField) == 0 {
 			*skipField = nil

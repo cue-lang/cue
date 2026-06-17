@@ -64,23 +64,35 @@ var (
 //
 // The special value "diff" does not update files but shows a diff of the
 // changes that would be applied; see [DiffGoldenFiles].
-var UpdateGoldenFiles = os.Getenv(envUpdate) != "" && os.Getenv(envUpdate) != "diff"
+//
+// These flags are functions rather than variables so that the environment
+// is read while a test runs; see the comment on Init in internal/cueexperiment
+// for why that matters to the go test cache.
+func UpdateGoldenFiles() bool {
+	return os.Getenv(envUpdate) != "" && os.Getenv(envUpdate) != "diff"
+}
 
 // ForceUpdateGoldenFiles determines whether tests should update
 // expected output in test files even when they would not be updated
 // usually (for example when there are test regressions).
-var ForceUpdateGoldenFiles = os.Getenv(envUpdate) == "force"
+func ForceUpdateGoldenFiles() bool {
+	return os.Getenv(envUpdate) == "force"
+}
 
 // DiffGoldenFiles determines whether tests should display a diff of changes
 // that would be applied by CUE_UPDATE=1, without actually writing any files.
 // It is controlled by setting CUE_UPDATE=diff.
 // Documentary sections (e.g. out/errors.txt) are also checked in this mode.
-var DiffGoldenFiles = os.Getenv(envUpdate) == "diff"
+func DiffGoldenFiles() bool {
+	return os.Getenv(envUpdate) == "diff"
+}
 
 // FormatTxtar ensures that .cue files in txtar test archives are well
 // formatted, updating the archive as required prior to running a test.
 // It is controlled by setting CUE_FORMAT_TXTAR to a non-empty string like "true".
-var FormatTxtar = os.Getenv(envFormatTxtar) != ""
+func FormatTxtar() bool {
+	return os.Getenv(envFormatTxtar) != ""
+}
 
 // Condition adds support for CUE-specific testscript conditions within
 // testscript scripts. Supported conditions include:
@@ -107,6 +119,8 @@ func Condition(cond string) (bool, error) {
 type T = tdtest.T
 
 func init() {
+	// Assign the function value; tdtest calls it while a test runs so the
+	// CUE_UPDATE read is recorded by the go test cache.
 	tdtest.UpdateTests = UpdateGoldenFiles
 }
 

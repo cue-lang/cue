@@ -45,9 +45,12 @@ import (
 //   for that particular test case: ignore: tdtest.Ignore("want1", "want2")
 //
 
-// UpdateTests defines whether tests should be updated by default.
+// UpdateTests reports whether tests should be updated by default.
 // This can be overridden on an individual basis using T.Update.
-var UpdateTests = false
+// It is a function so that the value is computed while a test runs;
+// see the comment on Init in internal/cueexperiment for why that
+// matters to the go test cache.
+var UpdateTests = func() bool { return false }
 
 // set is the set of tests to run.
 type set[TC any] struct {
@@ -66,7 +69,7 @@ func Run[TC any](t *testing.T, table []TC, fn func(t *T, tc *TC)) {
 	s := &set[TC]{
 		t:             t,
 		table:         table,
-		updateEnabled: UpdateTests,
+		updateEnabled: UpdateTests(),
 	}
 	for i := range s.table {
 		name := fmt.Sprint(i)

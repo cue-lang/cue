@@ -119,14 +119,14 @@ func (r *inlineRunner) checkPermuteCount(t testing.TB, path cue.Path, pa parsedT
 	}
 	if !hasCount {
 		// No count= option yet — add it when updating.
-		if cuetest.UpdateGoldenFiles {
+		if cuetest.UpdateGoldenFiles() {
 			r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
 		}
 		return
 	}
 	if countVal == "" {
 		// Empty count= placeholder — fill with actual count.
-		if cuetest.UpdateGoldenFiles {
+		if cuetest.UpdateGoldenFiles() {
 			r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
 		}
 		return
@@ -139,7 +139,7 @@ func (r *inlineRunner) checkPermuteCount(t testing.TB, path cue.Path, pa parsedT
 	if expected == actualCount {
 		return // matches
 	}
-	if cuetest.UpdateGoldenFiles || cuetest.ForceUpdateGoldenFiles {
+	if cuetest.UpdateGoldenFiles() || cuetest.ForceUpdateGoldenFiles() {
 		r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
 		return
 	}

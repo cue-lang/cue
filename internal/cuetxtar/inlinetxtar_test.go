@@ -96,8 +96,8 @@ func runUpdateTest(t *testing.T, filePath string) {
 	// ctx holds the values that are constant across all applySection calls.
 	ctx := &sectionCtx{
 		t:           t,
-		outerForce:  cuetest.ForceUpdateGoldenFiles,
-		outerUpdate: cuetest.UpdateGoldenFiles,
+		outerForce:  cuetest.ForceUpdateGoldenFiles(),
+		outerUpdate: cuetest.UpdateGoldenFiles(),
 		outer:       outer,
 		filePath:    filePath,
 	}
@@ -293,17 +293,26 @@ func (ctx *sectionCtx) apply(s section) {
 	}
 }
 
-// withUpdateMode temporarily sets cuetest.UpdateGoldenFiles and
-// cuetest.ForceUpdateGoldenFiles for the duration of fn, then restores them.
+// withUpdateMode temporarily sets CUE_UPDATE so that cuetest.UpdateGoldenFiles
+// and cuetest.ForceUpdateGoldenFiles report the requested values for the
+// duration of fn, then restores it. A force update implies a plain update.
 func withUpdateMode(update, force bool, fn func()) {
-	origUpdate := cuetest.UpdateGoldenFiles
-	origForce := cuetest.ForceUpdateGoldenFiles
+	v := ""
+	switch {
+	case force:
+		v = "force"
+	case update:
+		v = "1"
+	}
+	orig, had := os.LookupEnv("CUE_UPDATE")
+	os.Setenv("CUE_UPDATE", v)
 	defer func() {
-		cuetest.UpdateGoldenFiles = origUpdate
-		cuetest.ForceUpdateGoldenFiles = origForce
+		if had {
+			os.Setenv("CUE_UPDATE", orig)
+		} else {
+			os.Unsetenv("CUE_UPDATE")
+		}
 	}()
-	cuetest.UpdateGoldenFiles = update
-	cuetest.ForceUpdateGoldenFiles = force
 	fn()
 }
 

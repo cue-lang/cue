@@ -65,7 +65,7 @@ func Benchmark(b *testing.B) {
 		ctx := e.NewContext(v)
 		v.Finalize(ctx)
 
-		if cuetest.UpdateGoldenFiles {
+		if cuetest.UpdateGoldenFiles() {
 			const statsFile = "stats.txt"
 			var stats txtar.File
 			var statsPos int

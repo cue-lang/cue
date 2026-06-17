@@ -424,7 +424,7 @@ func TestSourceOptions(t *testing.T) {
 `},
 	}
 	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
-		t.Update(cuetest.UpdateGoldenFiles)
+		t.Update(cuetest.UpdateGoldenFiles())
 		got, err := format.Source([]byte(src), tc.options...)
 		qt.Assert(t, qt.IsNil(err))
 		t.Equal(string(got), tc.want)

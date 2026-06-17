@@ -18,6 +18,7 @@ builtinCyclePerm: {
 	}
 
 	X: Y.host
+
 }
 -- matchn.cue --
 // This should not be a structural cycle, as the list type is "optional".
@@ -26,6 +27,8 @@ issue3410: {
 	_s: {
 		#x: matchN(1, [_s, [..._s]])
 	}
+	// TODO(inline): inline test outputs references in calls. This was crafted
+	// by hand.
 }
 issue3420: {
 	matches1: {
@@ -83,7 +86,7 @@ selfRefConcrete: {
 	// concrete value. This must be reported as a structural cycle rather
 	// than causing the evaluator to loop forever.
 	_x1: matchN(2, [_x1, _x1])
-	x: 3 & _x1
+	x:   3 & _x1
 
 	// matchIf is subject to the same kind of self-referential cycle.
 	_y1: matchIf(_y1, _y1, _y1)
@@ -110,7 +113,7 @@ noCycle: t1: {
 	_s
 	_s: {
 		#x: matchN(1, [_s])
-		#x: {} // insert concrete value to trigger application of validator.
+        #x: {} // insert concrete value to trigger application of validator.
 	}
 }
 issue3649: noCycle: t1: {
@@ -121,6 +124,7 @@ issue3649: noCycle: t1: {
 		b?: string
 		a?: matchN(1, [#c])
 	}
+	// Cannot use @test(eq) with self-referential #c in expected value.
 }
 // Same as above, but with longer paths.
 issue3649: noCycle: t2: {
@@ -130,6 +134,7 @@ issue3649: noCycle: t2: {
 		b?: string
 		y: a?: matchN(1, [{d: c}])
 	}
+	// Cannot use @test(eq) with self-referential c in expected value.
 }
 issue3649: cycle: t1: {
 	data: #c
@@ -143,7 +148,7 @@ issue3649: cycle: t1: {
 // This used to cause a stack overflow.
 issue4037: cycle: {
 	_intlike: x=matchN(1, [strconv.Atoi(x)])
-	f:        "1233" & _intlike
+	f: "1233" & _intlike
 }
 -- yamlcycle.cue --
 import "encoding/yaml"
@@ -151,12 +156,12 @@ import "encoding/yaml"
 yamlNoCycle: {
 	// the validator is invoked recursively and also unifies with a concrete
 	// value. This should nonetheless not result in a cycle error.
-	#c: {
-		b?: string
-		a?: yaml.Validate(#c)
-	}
-	data: #c
-	data: a: #"{a: "b: foo"}"#
+    #c: {
+        b?: string
+        a?: yaml.Validate(#c)
+    }
+    data: #c
+    data: a: #"{a: "b: foo"}"#
 }
 selfCycle: t1: {
 	c: matchN(1, [{d: c}])
@@ -180,7 +185,7 @@ selfCycle: yamlVal: t2: {
 	x: y: yaml.Validate(x)
 	x: y: "{}"
 }
-selfCycle: yamlFun: t1: {
+selfCycle: yamlFun: t1:{
 	x: y?: yaml.Validate("{}", x)
 }
 selfCycle: yamlFun: t2: {
@@ -208,8 +213,9 @@ listMatchN: structCycle: {
 }
 listMatchN: ok: {
 	x: y?: list.MatchN(1, x)
-	z: x
+    z: x
 	z: y: [{}]
+	// x.y? is non-concrete (list.MatchN validator); only check z.y which is concrete.
 }
 -- issue3634.cue --
 // evalv3 structural cycle regression: using `len(...)` with a `#Schema`
@@ -228,13 +234,15 @@ issue3634: full: {
 		#Schema // removing this fixes the bug!
 		properties: foo: required: ["bar", "baz"]
 	}], 3))
+
 }
 issue3634: reduced: {
 	#D: {
 		b?: int
 		a?: #D
 	}
-	out: len(#D & list.Repeat([#D & {a: b: 1}], 1)[0])
+	out: len(#D & list.Repeat([#D & { a: b: 1 }], 1)[0])
+
 }
 -- issue3743.cue --
 // Passing a cyclic value to `yaml.MarshalStream` caused a stack overflow
@@ -244,15 +252,16 @@ import "encoding/yaml"
 
 issue3743: {
 	#transform: {
-		in: _
-		out: [
-			if false {out}, // note that this is a cycle
-			in,
-		]
+	    in: _
+	    out: [
+	        if false {out}, // note that this is a cycle
+	        in,
+	    ]
 	}
 
-	docs: [(#transform & {in: "x"}).out]
+	docs: [ (#transform & {in: "x"}).out ]
 	out: yaml.MarshalStream(docs)
+
 }
 -- out/compile --
 --- cycle.cue

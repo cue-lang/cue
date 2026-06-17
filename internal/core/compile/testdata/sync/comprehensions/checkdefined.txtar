@@ -75,6 +75,7 @@ okyo: {
 okyog: {
 	if yo.g != _|_ {a: 1}
 }
+
 -- incomplete.cue --
 // Comparing to string is not an error. But for legacy reasons we want to still
 // support this. We intend to have more clean and precise behavior with the
@@ -88,6 +89,7 @@ checkIncomplete: t1: {
 	}
 	f: blah: {}
 }
+
 -- structs.cue --
 structs: {
 	bare: t1: ({y: 2} & {x: 3}) != _|_
@@ -100,6 +102,7 @@ structs: {
 	select: f3: ({x: 1, y: 2} & {x: 3}).y != _|_
 	select: t4: ({x: 1, y: 2} & {x: 3}).y == _|_
 }
+
 -- out/compile --
 --- in.cue
 {

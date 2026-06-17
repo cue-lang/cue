@@ -23,6 +23,12 @@ C: #steps: #Script & {mount: [B]}
 }
 
 #ref: {a: 1} | {b: 2}
+
+// TODO(inline): replace @test(debug) with @test(shareID=...) once the
+// framework supports asserting sharing inside disjunction members. All
+// ~(#Script) occurrences here are inside disjunct arms (A, #Task,
+// B.#steps.mount[0]) — the CUE API creates a fresh vertex when projecting
+// a field through a disjunction boundary, so pointer-identity checks fail.
 -- out/compile --
 --- in.cue
 {

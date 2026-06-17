@@ -8,7 +8,7 @@
 
 for key, value in {x: v: 1} {
 	"\(key)": {
-		v: *{for pod, _ in value.v {}} | {"\(value.v)": 2}
+		v:  *{for pod, _ in value.v {}} | {"\(value.v)": 2}
 		_p: 3
 	}
 }

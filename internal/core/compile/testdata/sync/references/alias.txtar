@@ -2,7 +2,7 @@
 @experiment(aliasv2)
 
 // Basic postfix alias - simple form
-a1~(X1): {
+a1~X1: {
 	foo: 1
 }
 b1: X1.foo + 2
@@ -12,10 +12,11 @@ a1p~(X1p): {
 }
 b1p: X1p.foo + 2
 
+
 // Basic postfix alias - dual form
 a2~(K2,V2): {
 	name: K2
-	val:  V2.foo
+	val: V2.foo
 }
 a2: {foo: 42}
 
@@ -32,7 +33,7 @@ a4~(_,V4): {
 b4: V4.foo + 2
 
 // Dynamic field with postfix alias
-("dyn")~(X5): {
+("dyn")~X5: {
 	foo: 1
 }
 b5: X5.foo + 10
@@ -40,7 +41,7 @@ b5: X5.foo + 10
 // Dynamic field with dual form
 ("dyn2")~(K6,V6): {
 	name: K6
-	val:  V6.foo
+	val: V6.foo
 }
 dyn2: {foo: 100}
 
@@ -74,8 +75,8 @@ pattern2: {
 // }
 
 // Nested structs with postfix aliases
-nested~(X7): {
-	inner~(Y7): {
+nested~X7: {
+	inner~Y7: {
 		a: 1
 	}
 	b: Y7.a + X7.inner.a
@@ -84,43 +85,43 @@ result1: nested.b
 
 // Multiple fields with aliases referencing each other
 multi: {
-	a~(A8): 1
-	b~(B8): A8 + 2
-	c:      B8 + 3
+	a~A8: 1
+	b~B8: A8 + 2
+	c: B8 + 3
 }
 
 // Postfix alias in comprehension
 comp: {
 	items: [1, 2, 3]
 	for i, v in items {
-		"\(i)"~(X9): {
-			index:  i
-			value:  v
+		"\(i)"~X9: {
+			index: i
+			value: v
 			double: X9.value * 2
 		}
 	}
 }
 
 // Postfix alias with constraints
-constrained~(X10)?: {
+constrained~X10?: {
 	required: true
 }
 test1: X10.required
 
 // Interpolation with postfix alias
-"\("inter")"~(X11): {
+"\("inter")"~X11: {
 	foo: 1
 }
 b6: X11.foo + 5
 
 // Postfix alias with optional and default
-opt~(X12)?: {
+opt~X12?: {
 	a: 1
 	b: X12
 }
 
 // TODO: seemingly wrong semantics, but matches old behavior.
-def~(Y13): {
+def~Y13: {
 	b: 2
 	c: Y13.b
 } | {b: 3}
@@ -131,6 +132,7 @@ pattern3: {
 		labelName: LN14
 	}
 	test: {}
+
 }
 
 // Pattern with blank identifier - field only visible in value
@@ -143,32 +145,33 @@ pattern4: {
 
 // Multiple aliases in same scope
 same: {
-	a~(A16): 1
-	b~(B16): 2
-	c:       A16 + B16
+	a~A16: 1
+	b~B16: 2
+	c: A16 + B16
+
 }
 
 // Alias referencing earlier alias
-chain~(X17): {
+chain~X17: {
 	a: 1
 }
-chain2~(Y18): {
+chain2~Y18: {
 	ref: X17.a
 }
 result2: Y18.ref
 
 // Postfix alias with list value
-list~(X19): [1, 2, 3]
+list~X19: [1, 2, 3]
 b7: X19[0] + X19[1]
 
 // Postfix alias with disjunction
-disj~(X20): 1 | 2 | 3
-b8:         X20
+disj~X20: 1 | 2 | 3
+b8: X20
 
 // Nested pattern constraints with aliases
 deep: {
 	[string]~(OuterLabel,_): {
-		[string]~(InnerLabel,InnerField): {
+		[string]~(InnerLabel, InnerField): {
 			outer: OuterLabel
 			inner: InnerLabel
 			value: InnerField.x
@@ -179,7 +182,7 @@ deep: {
 }
 
 // Alias with definition
-#Def~(X21): {
+#Def~X21: {
 	field: 42
 }
 usedef: X21.field

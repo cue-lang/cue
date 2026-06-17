@@ -9,9 +9,10 @@ X: {
 	_a: _ | close({y!: z?: _})
 	_b: _a & {y: {}}
 	concrete: _b.y
-	isTrue:   concrete != _|_
+	isTrue: concrete != _|_
 }
 {X}
+
 
 sub: t1: {
 	X: {
@@ -21,6 +22,7 @@ sub: t1: {
 		concrete: _b.y
 	}
 	{X}
+
 }
 sub: t2: {
 	X: {
@@ -30,6 +32,7 @@ sub: t2: {
 		concrete: _b.y
 	}
 	X
+
 }
 sub: t3: {
 	#X: {
@@ -39,6 +42,7 @@ sub: t3: {
 		concrete: _b.y
 	}
 	{#X}
+
 }
 sub: t4: {
 	#X: {
@@ -48,6 +52,7 @@ sub: t4: {
 		concrete: _b.y
 	}
 	#X
+
 }
 
 full: {
@@ -61,6 +66,7 @@ full: {
 	}
 
 	{#Foo}
+
 }
 -- out/compile --
 --- in.cue

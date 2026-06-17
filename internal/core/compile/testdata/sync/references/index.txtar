@@ -1,10 +1,10 @@
 -- in.cue --
-intIndex: [2][0]
+intIndex:    [2][0]
 stringIndex: {foo: "bar"}["foo"]
 
 stringOfNumberIndex: {"3": 3}["3"]
 
-indexToDefault: (*[0] | {})[0]
+indexToDefault:         (*[0] | {})[0]
 outOfBoundsDisjunction: (*[] | {})[1]
 
 // Ensure these are errors.
@@ -16,9 +16,9 @@ doesNotDistributeType: {
 
 stringIndexToList: [2][""]
 indexOutOfBounds2: 2[2]
-booleanIndex: [][true]
+booleanIndex:      [][true]
 indexOutOfBounds3: [1, 2, 3][4]
-negativeIndex: [1, 2, 3][-1]
+negativeIndex:     [1, 2, 3][-1]
 
 varIndexTooLarge: {
 	n: 3

@@ -1,6 +1,6 @@
 -- in.cue --
 res: [for x in a for y in x {y & {d: "b"}}]
-res: [a.b.c & {d: "b"}]
+res: [ a.b.c & {d: "b"}]
 
 a: b: [C=string]: {d: string, s: "a" + d}
 a: b: c: d: string

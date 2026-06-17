@@ -53,7 +53,7 @@ comprehensionIsEmbed: {
 // This comprehension is inside a definition and should still disallow b.
 noEraseDefinition: {
 	#Foo: [if true {a: int}]
-	a: {#Foo & [{b: 2}]} // Error
+	a: { #Foo & [{ b: 2 }] } // Error
 }
 
 // issue1956: Tests that conditional comprehensions correctly embed definitions
@@ -92,6 +92,7 @@ dedupTodo: {
 		c: n: string
 	}
 }
+
 -- v3issues.cue --
 // issue3483: Tests that a falsy if comprehension inside a definition does not
 // incorrectly produce "field not allowed" in evalv3.
@@ -113,7 +114,6 @@ issue3486: {
 	if true {
 		out: {
 			#schema
-
 			// This field should be allowed as #schema is embedded.
 			extra: "foo"
 		}

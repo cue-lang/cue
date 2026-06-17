@@ -7,38 +7,39 @@ import "list"
 
 _schema & _data
 _data: {
-	"updates": [
-		{
-			"schedule": {
-				"interval": "daily"
-			}
-		}
-	]
+  "updates": [
+    {
+      "schedule": {
+        "interval": "daily"
+      }
+    }
+  ],
 }
 
 _schema: {
-	matchIf(
-	null | bool | number | string | [...] | {"enable-beta-ecosystems"!: true},
-	_,
-	null | bool | number | string | [...] | {
-		"updates"?: null | bool | number | string | [...null | bool | number | string | [...] | {...}] | {...}
-		...
-	},
-	) & {
-		"updates"!: [...#update]
-	}
+    matchIf(
+        null | bool | number | string | [...] | {"enable-beta-ecosystems"!: true},
+        _,
+        null | bool | number | string | [...] | {
+            "updates"?: null | bool | number | string | [...null | bool | number | string | [...] | {...}] | {...}
+            ...
+        }
+    ) & {
+        "updates"!: [...#update]
+    }
 
-	#update: {
-		"schedule"!: {
-			"timezone"?: #timezone
-			...
-		}
-		...
-	}
+    #update: {
+        "schedule"!: {
+            "timezone"?: #timezone
+            ...
+        }
+        ...
+    }
 
-	// This was originally a list of 571 explicit time zones.
-	#timezone: or([for i in list.Range(0, 571, 1) {"\(i)"}])
+    // This was originally a list of 571 explicit time zones.
+    #timezone: or([for i in list.Range(0, 571, 1) {"\(i)"}])
 }
+
 -- out/compile --
 --- in.cue
 {

@@ -12,6 +12,7 @@ obj: [Name=string]: {
 for k, v in {#def: 1, opt?: 2, _hid: 3, reg: 4} {
 	"\(k)": v
 }
+
 -- out/compile --
 --- in.cue
 {

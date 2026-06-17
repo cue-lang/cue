@@ -3,7 +3,8 @@
 package x
 
 do: {
-	hello: {}
+	hello: {
+	}
 }
 
 for k, v in do {do: (k): v}

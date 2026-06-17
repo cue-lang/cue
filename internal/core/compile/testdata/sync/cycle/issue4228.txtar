@@ -23,10 +23,10 @@ _allValuesAreValidStructs: [_]: self={
 
 _setTypeMeta: self={
 	#apiVersion!: string
-	#kind!:       string
+	#kind!: string
 	#template: k8s: {
 		apiVersion: self.#apiVersion
-		kind:       self.#kind
+		kind: self.#kind
 	}
 }
 
@@ -53,7 +53,7 @@ _namespacedResourceKinds: {
 
 	app: {
 		#apiVersion: "argoproj.io/v1alpha1"
-		#kind:       "Application"
+		#kind: "Application"
 		#resourceSchema: {
 			spec?: revisionHistoryLimit?: int
 		}
@@ -69,6 +69,7 @@ _namespacedResourceKinds: {
 argocd: _namespacedResourceKinds & {
 	app: apps: {}
 }
+
 -- export.cue --
 @experiment(aliasv2)
 
@@ -91,6 +92,7 @@ let _globalScope = self
 }
 
 #manifests: {#export, #entries: [_globalScope]}.yamlStream
+
 -- out/compile --
 --- export.cue
 {

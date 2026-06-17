@@ -37,14 +37,16 @@ indirectlyNested: {
 directlyNestedEmpty: {
 	a: true
 	if true {
-		if a {}
+		if a {
+		}
 	}
 }
 
 directlyDoublyNestedEmpty: {
 	a: true
 	if true {
-		if a {}
+		if a {
+		}
 	}
 }
 
@@ -99,12 +101,12 @@ issue1974: {
 T: int
 for C in Y {
 	let X = C.M
-	T: X.V
+	T:  X.V
 }
 Y: x: {
 	M: V: 1
 	for _ in M {
-		if true {M: {}}
+		if true { M: {} }
 	}
 }
 -- issue3940.cue --
@@ -121,9 +123,14 @@ issue3940: reduced1: {
 
 		objects: {
 			for v in a
-			for _ in ({} & v).objects {}
+			for _ in ({} & v).objects {
+			}
 		}
 	}
+
+	// The eq:todo value is now the correct result: the pushdown fix
+	// properly handles chained comprehension clauses, unifying a.b
+	// into a single struct.
 }
 
 // Test nested comprehensions (with braces) - should work as before
@@ -137,9 +144,13 @@ issue3940: reduced2: {
 
 		objects: {
 			for v in a
-			for _ in ({} & v).objects {}
+			for _ in ({} & v).objects {
+			}
 		}
 	}
+	// The pushdown fix resolves the spurious "undefined field" error
+	// on objects: reduced2 is structurally identical to reduced1 and
+	// should produce the same result.
 }
 issue3940: reduced3: {
 	a: E
@@ -156,7 +167,7 @@ issue3940: reduced4: {
 		_imports: [{
 			objects: {...}
 			#export: Exporter & {
-				_imports: [{#export: Exporter}]
+				_imports: [{ #export: Exporter }]
 			}
 		}]
 	}
@@ -181,7 +192,8 @@ issue3940: let: {
 		objects: {
 			for v in a
 			let x = ({} & v)
-			for _ in x.objects {}
+			for _ in x.objects {
+			}
 		}
 	}
 }
@@ -250,7 +262,7 @@ issue3990: {
 	}
 
 	for import in _imports
-	for _, obj in ({extra: "unused"} & import).exportObjs {(import.name): obj}
+	for _, obj in ({extra: "unused"} & import).exportObjs {(import.name): obj},
 
 	_Deployment: this={
 		_names: {

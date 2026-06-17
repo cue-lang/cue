@@ -1,5 +1,5 @@
 -- in.cue --
-let A = 3 * 3
+ let A = 3 * 3
 let B = A + A
 let C = B + B
 let D = C + C
@@ -37,35 +37,37 @@ issue1828: {
 
 	let L2 = L1
 	let L1 = []
+
 }
 ignoreErrorInLet: {
 	let X = 1 & 2
 	disjunction: *X | 3
+
 }
 -- incomprehension.cue --
 // for comprehensions in list do not have to split the let as each instance
 // is already associated with a separate environment.
 list: {
-	l: [1, 2, 3]
+	l: [ 1, 2, 3 ]
 	c: [
 		for v in l {
-			let X = v * 4 // can share
+			let X = v*4 // can share
 			X
 		}
 	]
 }
 
 referencesForDirectly: {
-	l: [1, 2, 3]
+	l: [ 1, 2, 3 ]
 	for k, v in l {
-		let Y = v * 4 // multi
+		let Y = v*4 // multi
 		"\(k)": Y
 	}
 }
 
 referencesForViaLet: {
-	l: [1, 2, 3]
-	for k, v in l let X = v * 4 {
+	l: [ 1, 2, 3 ]
+	for k, v in l let X = v*4 {
 		let Y = X // multi
 		"\(k)": Y
 	}
@@ -73,7 +75,7 @@ referencesForViaLet: {
 
 letClauseReferencesInert: {
 	x: 2
-	l: [1, 2, 3]
+	l: [ 1, 2, 3 ]
 	for k, v in l let X = x {
 		let Y = X // can share
 		"\(k)": Y
@@ -84,19 +86,19 @@ letClauseReferencesInert: {
 // it will only fail as a result of not splitting if the referred values
 // would fail as well.
 indirectReference: {
-	l: [1, 2, 3]
+	l: [ 1, 2, 3 ]
 	for k, v in l {
 		y: v // fails if v differs for each y.
-		let X = y * 4 // can share, as y fails if let fails.
+		let X = y*4 // can share, as y fails if let fails.
 		"\(k)": X
 	}
 
 }
 
 nestedFor: {
-	for k, y in [4, 5] {
+	for k, y in [ 4, 5 ] {
 		let X = {
-			for x in [1, 2] {
+			for x in [ 1, 2 ] {
 				let X = x
 				"\(X)": X
 			}
@@ -132,7 +134,7 @@ _configs: {
 	}
 	CHILD2: {
 		property: true
-		parent:   "PARENT"
+		parent:      "PARENT"
 	}
 }
 disabled_parent_test: {
@@ -143,6 +145,7 @@ disabled_parent_test: {
 		}
 	}
 }
+
 -- issue2063.cue --
 import (
 	"encoding/yaml"
@@ -157,7 +160,7 @@ keepDescending: t1: {
 	ec: {}
 	bs: {
 		let m = ec.b
-		if m == _|_ {}
+		if m == _|_ { }
 		x: y: ""
 	}
 }
@@ -168,7 +171,7 @@ keepDescending: t2: {
 	ec: {}
 	bs: {
 		let m = ec.b
-		if m.b == _|_ {}
+		if m.b == _|_ { }
 		X: Y: strings.Join([], "")
 	}
 }
@@ -177,7 +180,7 @@ keepDescending: t2: {
 // binding shadowed a loop variable inside a for comprehension.
 // https://cuelang.org/issue/4022
 issue4022: full: {
-	envScript: [for v in _env let v = _env["KEY"] {"\(v)"}]
+	envScript: [ for v in _env let v = _env["KEY"] {"\(v)"} ]
 	_env: {
 		KEY: *"" | _
 	}

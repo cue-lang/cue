@@ -34,6 +34,7 @@ nodes: t3: {
 	s2: s3 & {b: 2}
 	s3: s1 & {c: 3}
 }
+
 -- out/compile --
 --- in.cue
 {

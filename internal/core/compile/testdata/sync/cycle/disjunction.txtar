@@ -53,6 +53,7 @@ s5a: {
 s5b: {
 	x: [] | s5b
 }
+
 -- issue3042.cue --
 // Array element validation not being enforced for elements nested inside
 // a struct: invalid values passed validation without error.

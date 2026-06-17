@@ -25,6 +25,7 @@ import "list"
 			}
 		},
 	]
+	// TODO(inline): generatign this value is broken: hand-spun.
 }
 
 #c1: {
@@ -39,6 +40,7 @@ import "list"
 	do: "f1"
 	as: [...string]
 }
+
 #f2: {
 	do:   "f2"
 	from: #c1

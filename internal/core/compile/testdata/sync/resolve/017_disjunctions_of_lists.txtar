@@ -1,5 +1,5 @@
 -- in.cue --
-l: [int, int] | [string, string]
+l: [ int, int] | [ string, string]
 
 l1: ["a", "b"]
 l2: l & ["c", "d"]

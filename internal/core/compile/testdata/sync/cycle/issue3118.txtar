@@ -17,16 +17,16 @@
 examples: [string]: #TimeSpan
 
 examples: eg1: {
-	start:    10.0
-	duration: 2.1
+    start: 10.0
+    duration: 2.1
 }
 
 examples: eg2: {
-	start: 10.0
+    start: 10.0
 }
 
 examples: eg3: {
-	end: 10.0
+    end: 10.0
 }
 -- out/compile --
 --- in.cue

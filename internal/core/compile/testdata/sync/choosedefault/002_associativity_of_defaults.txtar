@@ -13,8 +13,9 @@ s3: *1 | ((*2 | 3) & 3)
 s4: *1 | ((*2 | 3) & 2)
 s5: *1 | *(*2 | 3)
 
-e1: *(1 & 2) | (*"x" | string)
-e2: (*"x" | string) | *(1 & 2)
+e1: *(1&2) | (*"x" | string)
+e2: (*"x" | string) | *(1&2)
+
 -- complex.cue --
 // add some test cases suggested by an automated prover based on this pattern:
 // 1. ValK = (ValA & ValB_ND) & ValC_D \neq _|_ (the element we track must exist).
@@ -25,11 +26,11 @@ e2: (*"x" | string) | *(1 & 2)
 // component that causes ValC_D to conflict with (ValA & ValB_D),
 // but ValC_D must *not* conflict with ValB_D on its own.
 t1: {
-	va: {a: 1, b: 2}
+	va:  {a: 1, b: 2}
 	vb1: {c: 3}
 	vb2: {c: 4}
-	vc: {c: 4}
-	vd: string
+	vc : {c: 4}
+	vd:  string
 
 	A: va | vd
 	B: *vb1 | vb2 | vd
@@ -60,7 +61,7 @@ issue3908: reduced: {
 	string | *"str"
 }
 issue3908: full: {
-	out: #Schema & {field: string | *"dataDefault"}
+	out: #Schema & { field: string | *"dataDefault" }
 	#Schema: field: string | *null
 }
 -- out/compile --

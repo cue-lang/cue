@@ -14,7 +14,7 @@ p1: {
 		y?: int
 
 		let list = [x, y]
-		all: [for v in list if v != _|_ {v}]
+		all:  [for v in list if v != _|_ {v}]
 
 		*{
 			x?: _|_
@@ -22,7 +22,7 @@ p1: {
 		} | _
 	}
 
-	a: #A & {x: 3}
+	a: #A & { x: 3 }
 	b: #A & a
 }
 p2: {
@@ -31,7 +31,7 @@ p2: {
 		y?: int
 
 		let list = [x, y]
-		all: [for v in list if v != _|_ {v}]
+		all:  [for v in list if v != _|_ {v}]
 
 		_ | *{
 			x?: _|_
@@ -39,9 +39,10 @@ p2: {
 		}
 	}
 
-	a: #A & {x: 3, y: 2}
+	a: #A & { x: 3, y: 2 }
 	b: #A & a
 }
+
 -- out/compile --
 --- in.cue
 {

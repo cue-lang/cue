@@ -14,12 +14,14 @@ minimal: {
 		if b.port == _|_ {
 			port: ""
 		}
+		// Pushdown produces cycle error instead of incomplete.
 	}
 
 	b: {
 		if a.port == _|_ {
 			port: ""
 		}
+		// Pushdown produces cycle error instead of incomplete.
 	}
 }
 
@@ -37,6 +39,9 @@ small: {
 				port: ":" + strconv.FormatInt(#Y.port, 10)
 			}
 		}
+		// Yield-on-running heuristic: the comp's referenced node
+		// #Y is not currently being processed (only scheduled), so
+		// the comp does not yield and instead reports a cycle error.
 	}
 }
 
@@ -75,6 +80,9 @@ large: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\d+))?$"#
 
 	p1: {
+		// Pushdown improvement: #Y, #X, and X now resolve successfully.
+		// Y gets a cycle error because #Y.port changed after evaluation.
+		// Permute disabled: pushdown introduces ordering sensitivity.
 
 		Y: {
 			userinfo: "user"

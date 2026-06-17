@@ -29,6 +29,7 @@ foo: {}
 x:  _
 y:  _
 fn: _
+
 -- out/compile --
 --- with_experiment.cue
 {

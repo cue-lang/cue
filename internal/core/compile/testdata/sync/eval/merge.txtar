@@ -9,9 +9,9 @@ manifests: [
 	},
 	{
 		deployment: #map: app01: image: "image01"
+		// TODO: allow
+		// deployment: #map: "\("app03")": image: "image01"
 	},
-	// TODO: allow
-	// deployment: #map: "\("app03")": image: "image01"
 ]
 // unify
 results: _

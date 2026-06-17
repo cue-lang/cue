@@ -52,6 +52,7 @@
 
 	out: {
 		labstr: $p.label
+
 	}
 }
 
@@ -65,6 +66,7 @@
 }
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
+
 -- out/compile --
 --- in.cue
 {

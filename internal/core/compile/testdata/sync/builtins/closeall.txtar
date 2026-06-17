@@ -20,7 +20,7 @@ c: {
 		field1: 1
 		nested: {
 			field2: "hello"
-			extra:  "not allowed"
+			extra: "not allowed"
 		}
 	}
 }
@@ -33,8 +33,9 @@ d: {
 // Test with empty struct
 e: __closeAll({})
 f: {
-	err: e & {extra: "not allowed"} // should error
+	err: e & {extra: "not allowed"}  // should error
 }
+
 
 #A: a: int
 g: {
@@ -45,6 +46,7 @@ g: {
 h: {
 	err: __closeAll({})
 }
+
 -- out/compile --
 --- in.cue
 {

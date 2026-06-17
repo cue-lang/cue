@@ -1,9 +1,9 @@
 # This file tests disjunctions used as operands.
 -- in.cue --
-list: *[1] | [2]
+list:      *[1] | [2]
 condition: *true | false
 num:       *1 | 2
-object: *{a: 1} | {a: 2}
+object:    *{a: 1} | {a: 2}
 
 forLoop: [
 	for e in list {

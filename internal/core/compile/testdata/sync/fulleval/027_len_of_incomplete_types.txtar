@@ -1,15 +1,15 @@
 -- in.cue --
 args: *[] | [...string]
-v1: len(args)
-v2: len([])
-v3: len({})
-v4: len({a: 3})
-v5: len({a: 3} | {a: 4})
-v6: len('sf' | 'dd')
-v7: len([2] | *[1, 2])
-v8: len([2] | [1, 2])
-v9:  len("😂")
-v10: len("")
+v1:   len(args)
+v2:   len([])
+v3:   len({})
+v4:   len({a: 3})
+v5:   len({a: 3} | {a: 4})
+v6:   len('sf' | 'dd')
+v7:   len([2] | *[1, 2])
+v8:   len([2] | [1, 2])
+v9:   len("😂")
+v10:  len("")
 -- out/compile --
 --- in.cue
 {

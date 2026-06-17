@@ -18,18 +18,18 @@ openIter: {
 		a: 1
 		b: 2
 		...
-		if true {c: 3}
+		if true { c: 3 }
 	}
-	keys: [for k, _ in src {k}]
+	keys: [for k, _ in src { k }]
 }
 
 defOpen: {
 	#T: {
 		[string]: int
-		if true {a: 1}
+		if true { a: 1 }
 	}
-	inst: #T & {b: 2}
-	keys: [for k, _ in inst {k}]
+	inst: #T & { b: 2 }
+	keys: [for k, _ in inst { k }]
 }
 -- out/compile --
 --- in.cue

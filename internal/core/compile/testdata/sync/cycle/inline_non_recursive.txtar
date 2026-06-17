@@ -54,13 +54,14 @@ ok4: {
 issue1708: {
 	#add10: {
 		in: number
-		a10: {i: in, o: i + 10}
+		a10: { i: in, o: i + 10 }
 		out: a10.o
 	}
 	k00: 0
 	k10: (#add10 & {in: k00}).out
 	k20: (#add10 & {in: k10}).out
 	k30: (#add10 & {in: k20}).out
+
 }
 -- issue3182.cue --
 // evalv3 regression: references under projections (e.g. `{ a: x }.a`) were
@@ -68,20 +69,20 @@ issue1708: {
 // https://cuelang.org/issue/3182
 issue3182: {
 	first: t1: {
-		x: {a: x}.a
+		x: { a: x }.a
 	}
 	first: t2: {
-		x: {a: b: x}.a
+		x: { a: b: x }.a
 	}
 	second: {
-		{t: x}.t.y
+		{ t: x }.t.y
 		x: y: x: y: a: 1
 	}
 	third: {
 		{
 			p: {
-				x: p
-				y: 1
+			  x: p
+			  y: 1
 			}
 		}.p.x.y
 	}
@@ -91,6 +92,7 @@ issue3182: {
 select: direct: {
 	#Step: (#Job & {opt: _}).opt
 	#Job: matchN(1, [#NormalJob])
+	// TODO(inline): broken generation: retains reference.
 }
 select: indirect: {
 	#Step: #Job.opt

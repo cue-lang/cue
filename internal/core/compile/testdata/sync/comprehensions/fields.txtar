@@ -22,13 +22,13 @@ ignoreOptional: {
 	}
 
 	y: {
-		for k, v in #x {
+		for k,v in #x {
 			(k): "exists"
 		}
 	}
 }
 
-missingRequiredError: {
+missingRequiredError:  {
 	// Issue #2369
 	#x: {
 		a!: string
@@ -37,7 +37,7 @@ missingRequiredError: {
 	}
 
 	y: {
-		for k, v in #x {
+		for k,v in #x {
 			(k): "exists"
 		}
 	}

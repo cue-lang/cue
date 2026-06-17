@@ -12,7 +12,7 @@
 #Jobs: {
 	{[#JobID]: #Job}
 
-	{[=~"Test$"]: name: =~"^test"} // Must work without ...
+	{[=~"Test$"]: name: =~"^test"}// Must work without ...
 }
 
 jobs: foo: name: "allGood"
@@ -27,6 +27,7 @@ jobs2: fooTest: name: "badName" // faulty
 jobs3: #Jobs
 jobs3: [string]: #Job
 jobs3: fooTest1: name: "badName" // faulty
+
 -- out/compile --
 --- in.cue
 {

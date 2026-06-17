@@ -9,7 +9,7 @@ sameValues: SmustBeF: {
 
 sameValues: CmustBeA: {
 	A: {
-		x: [string | A]
+		x: [ string | A ]
 	}
 	C: A
 }

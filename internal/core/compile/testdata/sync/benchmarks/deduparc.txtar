@@ -19,6 +19,7 @@ foo: #Value
 foo: #Value
 foo: #Value
 foo: #Value
+
 -- out/compile --
 --- in.cue
 {

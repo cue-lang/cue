@@ -52,7 +52,7 @@ dynamic: {
 // even though {foo: "is foo"} does not unify with `#Bar & {...}`.
 issue4180: {
 	out: {
-		if true {
+	    if true {
 			iter: #Schema & {
 				FooOrBar: foo: "is foo"
 			}
@@ -105,7 +105,7 @@ patterns: shallow: {
 	#d: [<="y"]: int
 
 	single: {
-		X:   #a // "k" <= x
+		X: #a // "k" <= x
 		err: X
 		err: j: 3
 
@@ -124,7 +124,7 @@ patterns: shallow: {
 	}
 
 	and: p2: {
-		X:   #b & #a // "k" <= x && x <= "m"
+		X: #b & #a // "k" <= x && x <= "m"
 		err: X
 		err: j: 3
 
@@ -133,7 +133,7 @@ patterns: shallow: {
 	}
 
 	andEmbed: p1: {
-		X: {#a & #b} // "k" <= x && x <= "m"
+		X: { #a & #b } // "k" <= x && x <= "m"
 
 		err: X
 		err: j: 3
@@ -143,8 +143,8 @@ patterns: shallow: {
 	}
 
 	andEmbed: p2: {
-		X: {#b & #a} // "k" <= x && x <= "m"
-		err:         X
+		X: { #b & #a } // "k" <= x && x <= "m"
+		err: X
 		err: j: 3
 
 		ok: X
@@ -152,7 +152,7 @@ patterns: shallow: {
 	}
 
 	orEmbed: p1: {
-		X: {#a, #b} // "k" <= x && x <= "m"
+		X: { #a, #b } // "k" <= x && x <= "m"
 
 		ok1: X
 		ok1: j: 3
@@ -162,7 +162,7 @@ patterns: shallow: {
 	}
 
 	orEmbed: p2: {
-		X: {#b, #a} // "k" <= x && x <= "m"
+		X: { #b, #a } // "k" <= x && x <= "m"
 		ok1: X
 		ok1: j: 3
 
@@ -218,8 +218,8 @@ patterns: shallow: {
 		a: [>="k"]: int
 		#a: a
 
-		p1: {// XXX // link to code
-			X:    #a
+		p1: { // XXX // link to code
+			X: #a
 			err1: X
 			err1: j: 3
 
@@ -227,12 +227,12 @@ patterns: shallow: {
 			err2: j: 3
 
 			ok: X
-			ok: k: 3
+			ok:k: 3
 		}
 
 		p2: {
 			#a: a & __no_sharing
-			X:  #a
+			X: #a
 
 			err1: X
 			err1: j: 3
@@ -248,19 +248,19 @@ patterns: shallow: {
 			X: #a & __no_sharing
 
 			err1: X
-			err1: j: 3
+			err1: j: 3 
 
 			err2: X & __no_sharing
-			err2: j: 3
+			err2: j: 3 
 
 			ok: X
-			ok: k: 3
+			ok: k: 3 
 		}
 
 		p4: {
 			#a: a & __no_sharing
-			X:  #a
-			X:  #a & __no_sharing
+			X: #a
+			X: #a & __no_sharing
 
 			err1: X
 			err1: j: 3
@@ -281,7 +281,7 @@ patterns: nested: {
 	#d: x: y: [<="y"]: int
 
 	single: {
-		X:   #a // "k" <= x
+		X: #a // "k" <= x
 		err: X
 		err: x: y: j: 3
 
@@ -300,7 +300,7 @@ patterns: nested: {
 	}
 
 	and: p2: {
-		X:   #b & #a // "k" <= x && x <= "m"
+		X: #b & #a // "k" <= x && x <= "m"
 		err: X
 		err: x: y: j: 3
 
@@ -309,7 +309,7 @@ patterns: nested: {
 	}
 
 	andEmbed: p1: {
-		X: {#a & #b} // "k" <= x && x <= "m"
+		X: { #a & #b } // "k" <= x && x <= "m"
 
 		err: X
 		err: x: y: j: 3
@@ -319,8 +319,8 @@ patterns: nested: {
 	}
 
 	andEmbed: p2: {
-		X: {#b & #a} // "k" <= x && x <= "m"
-		err:         X
+		X: { #b & #a } // "k" <= x && x <= "m"
+		err: X
 		err: x: y: j: 3
 
 		ok: X
@@ -328,7 +328,7 @@ patterns: nested: {
 	}
 
 	orEmbed: p1: {
-		X: {#a, #b} // "k" <= x && x <= "m"
+		X: { #a, #b } // "k" <= x && x <= "m"
 
 		ok1: X
 		ok1: x: y: j: 3
@@ -338,7 +338,7 @@ patterns: nested: {
 	}
 
 	orEmbed: p2: {
-		X: {#b, #a} // "k" <= x && x <= "m"
+		X: { #b, #a } // "k" <= x && x <= "m"
 		ok1: X
 		ok1: x: y: j: 3
 
@@ -395,7 +395,7 @@ patterns: nested: {
 		#a: a
 
 		p1: {
-			X:    #a
+			X: #a
 			err1: X
 			err1: x: y: j: 3
 
@@ -408,7 +408,7 @@ patterns: nested: {
 
 		p2: {
 			#a: a & __no_sharing
-			X:  #a
+			X: #a
 
 			err1: X
 			err1: x: y: j: 3
@@ -435,8 +435,8 @@ patterns: nested: {
 
 		p4: {
 			#a: a & __no_sharing
-			X:  #a
-			X:  #a & __no_sharing
+			X: #a
+			X: #a & __no_sharing
 
 			err1: X
 			err1: x: y: j: 3
@@ -457,20 +457,21 @@ issue2241: {
 	#close: {}
 
 	a: {
-		x: q: 2
-		#close
+	    x: q: 2
+	    #close
 	}
 
 	b: a
 	b: x: r: 4
 }
+
 -- ellipsis.cue --
 // evalv3 regression: unification with {...} allowed extra fields where evalv2
 // correctly rejected them as "field not allowed".
 // https://cuelang.org/issue/3778
 issue3778: full: {
 	#x: a?: string
-	#y: #x & {...}
+	#y: #x & { ... }
 	z: #y & {
 		a: "ok"
 		b: "something"
@@ -478,8 +479,8 @@ issue3778: full: {
 }
 issue3778: {
 	keepOpen: {
-		#x: {a?: string, ...}
-		#y: #x & {...}
+		#x: { a?: string, ... }
+		#y: #x & { ... }
 		z: #y & {
 			a: "ok"
 			b: "something"
@@ -538,24 +539,24 @@ issue3924: two: {
 }
 issue3924: three: t1: {
 	{foo: #job & {disallowed: "bar"}}
-	#job: {other?: string}
+	#job: { other?: string }
 	#job: #def
 	#def: allowed?: string
 }
 issue3924: three: t2: {
 	{foo: #job & {disallowed: "bar"}}
-	#job: {other?: string, ...}
+	#job: { other?: string, ... }
 	#job: #def
 	#def: allowed?: string
 }
 issue3924: three: t3: {
-	#job: {...}
+	#job: { ... }
 	#job: #def
 	#def: {}
 	foo: #job & {disallowed: "bar"}
 }
 issue3924: four: {
-	A: {{foo: #B}}
+	A: { {foo: #B} }
 	#B: allowed?: string
 	out: A & {foo: disallowed: "foo"} // should fail
 }
@@ -570,15 +571,15 @@ issue3330: {
 		#struct: {
 			let empty = {}
 
-			field: null | {n: int}
-			field: empty & {n: 3}
+			field: null | { n: int }
+			field: empty & { n: 3 }
 		}
 
 		out: list.Concat([[#struct]])
 	}
 	matthew: ok1: {
 		#struct: {
-			field: {n: 3} & g
+			field: { n: 3 } & g
 			g: {}
 		}
 
@@ -586,7 +587,7 @@ issue3330: {
 	}
 	matthew: ok2: {
 		#struct: {
-			field: {n: 3} & g
+			field: { n: 3 } & g
 			g: {}
 		}
 
@@ -653,11 +654,11 @@ indirect: {
 // nested.a
 nested: ok1: {
 	#A: {
-		b: {}
+	b: {}
 
-		#B: {
-			c: b & {
-				d: 1
+	#B: {
+		c: b & {
+			d: 1
 			}
 		}
 	}
@@ -682,12 +683,12 @@ nested: err1: {
 		b: f: 1
 		v: #V
 		#V: {
-			c: b & {// Fails as #B is not compatible.
+			c: b & { // Fails as #B is not compatible.
 				d: 1
 			}
 		}
 	}
-	x: b:  #B
+	x: b: #B
 	#B: g: 1
 }
 
@@ -723,19 +724,19 @@ inline: {
 // where then this struct refers to a field that is closed by the definition.
 mixInDef: {
 	refInside: {
-		#x: b: c: {d: {}, e: f: {}}
+		#x: b: c: {d: {}, e: f: {} }
 		a: #x
 		a: b: c: d: {}
 		a: b: c: e: c.d
 	}
 	refEdge: {
-		#x: c: {d: {}, e: f: {}}
+		#x: c: {d: {}, e: f: {} }
 		a: #x
 		a: c: d: {}
 		a: c: e: c.d
 	}
 	refOutside: {
-		#x: c: {d: {}, e: f: {}}
+		#x: c: {d: {}, e: f: {} }
 		a: #x
 		a: c: d: {}
 		a: c: e: a.c.d // crosses definition
@@ -780,15 +781,15 @@ issue3601: reduced: {
 	}
 
 	original: {
-		Y:   (#X & __no_sharing).a
+		Y: (#X & __no_sharing).a
 		out: Y & __no_sharing
 	}
 	moreInlining: {
 		out: (#X & {}).a & {}
 	}
 	noInline: {
-		Y:   #X & __no_sharing
-		Z:   Y & __no_sharing
+		Y: #X & __no_sharing
+		Z: Y & __no_sharing
 		out: Z.a & __no_sharing
 	}
 	moreNesting: {
@@ -801,6 +802,7 @@ issue3601: reduced: {
 		Z: Y & __no_sharing
 	}
 }
+
 -- validation.cue --
 import "list"
 
@@ -810,9 +812,10 @@ import "list"
 issue3332: {
 	#def: field: list.MinItems(1)
 	use: #def & {
-		field: ["value"]
+	  field: ["value"]
 	}
 }
+
 -- out/compile --
 --- ellipsis.cue
 {

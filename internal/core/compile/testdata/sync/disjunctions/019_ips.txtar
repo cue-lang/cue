@@ -6,11 +6,11 @@ import "list"
 IP: list.Repeat([uint8], 4)
 
 Private:
-	*[192, 168, uint8, uint8] |
-	[10, uint8, uint8, uint8] |
-	[172, >=16 & <=32, uint8, uint8]
+	*[ 192, 168, uint8, uint8] |
+	[ 10, uint8, uint8, uint8] |
+	[ 172, >=16 & <=32, uint8, uint8]
 
-Inst: Private & [_, 10, ...]
+Inst: Private & [ _, 10, ...]
 
 MyIP: Inst & [_, _, 10, 10]
 -- out/compile --

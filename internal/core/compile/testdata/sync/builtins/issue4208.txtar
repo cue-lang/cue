@@ -13,6 +13,9 @@ valid: sbx: {}
 // Invalid key should show the custom error message.
 invalid: #Envs
 invalid: foo: {}
+
+
+
 -- out/compile --
 --- in.cue
 {

@@ -60,7 +60,7 @@ b4: {
 // Ensure that the cycle error is not blindly copied to a referring field,
 // as the cycle may not persist.
 b4: cond1: {
-	b: x.y & {_z: false, [1]}
+	b: x.y & { _z: false, [1] }
 	x: y: {
 		_z: *true | bool
 		if _z {
@@ -83,7 +83,7 @@ b4: cond2: {
 			[y]
 		}
 	}
-	b: x.y & {_z: false, [1]}
+	b: x.y & { _z: false, [1] }
 }
 
 b5: {
@@ -138,7 +138,8 @@ b10: {
 b11: {
 	#list: {
 		tail: #list | *null
-		if tail != null {}
+		if tail != null {
+		}
 	}
 }
 
@@ -183,7 +184,8 @@ b12b: {
 	list1: #list
 	list1: {
 		tail: {
-			tail: {}
+			tail: {
+			}
 		}
 	}
 }
@@ -306,6 +308,7 @@ d1: {
 	r: a.b
 
 	x: a.b.c
+
 }
 
 d2: {
@@ -320,7 +323,7 @@ d3: {
 	config: {
 		a: b: c: indirect
 		indirect: [a.b, null][i]
-		i: int | *1
+		i:        int | *1
 	}
 	x: config & {i: 0}
 }
@@ -341,11 +344,11 @@ shortPathFail: elipsis: {
 	// Avoid this: the elipsis causes `_` to be mixed in with the #Foo
 	// reference, causing the first cycle to be discounted.
 	t1: {
-		#Foo: ref: null | #Foo
-		#Foo: {...}
+		#Foo: ref:  null | #Foo
+		#Foo: { ... }
 	}
 	t2: {
-		Foo: ref: Foo
+		Foo: ref:  Foo
 		Foo: {...}
 	}
 }
@@ -362,12 +365,13 @@ patternFail: issue2374: {
 shortPathFail: comprehension: {
 	#list: {
 		tail: #list | *null
-		if tail != null {}
+		if tail != null {
+		}
 	}
 }
 
 withLetFail: {
-	schema: next: _schema_1
+	schema: next:  _schema_1
 	let _schema_1 = schema
 }
 
@@ -386,7 +390,7 @@ fieldsSumInfinite: issue3310: {
 
 listOptOK: {
 	list: {
-		head:  int
+		head: int
 		tail?: list
 	}
 	a: list & {head: 3, tail: head: 2}
@@ -535,7 +539,7 @@ crossRefNoCycle: t1: {
 		x: _
 		y: x
 	}
-	C: {x: T} & T
+	C: { x: T } & T
 }
 
 crossRefNoCycle: t2: {
@@ -543,7 +547,7 @@ crossRefNoCycle: t2: {
 		x: _
 		y: x
 	}
-	C: T & {x: T}
+	C: T & { x: T }
 }
 
 crossRefNoCycle: t3: {
@@ -552,7 +556,7 @@ crossRefNoCycle: t3: {
 		y: x
 		z: y
 	}
-	C: T & {x: T}
+	C: T & { x: T }
 }
 
 crossRefNoCycle: t4: {
@@ -561,14 +565,14 @@ crossRefNoCycle: t4: {
 		y: x
 		z: y
 	}
-	C: T & {x: T & {x: T}}
+	C: T & { x: T & { x: T } }
 }
 
 crossRefNoCycle: t5: {
 	T: X={
 		y: X.x
 	}
-	C: T & {x: T}
+	C: T & { x: T  }
 }
 
 // Ensure these are NOT treated as structural errors.

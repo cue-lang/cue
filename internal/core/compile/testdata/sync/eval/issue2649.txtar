@@ -3,7 +3,7 @@
 # of the float result caused incorrect Int64() reads and panics in Int().
 # https://cuelang.org/issue/2649
 -- in.cue --
-
+ // TODO: should this be a float, or can it also be an int?
 (4 + 8 + 12) / 3
 -- out/compile --
 --- in.cue

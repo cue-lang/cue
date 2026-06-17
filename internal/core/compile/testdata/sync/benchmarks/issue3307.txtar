@@ -3,27 +3,26 @@
 # guarded struct should not independently re-evaluate the condition.
 # https://cuelang.org/issue/3307
 -- in.cue --
-
 if _request.enabled {
-	r1: {
-		k1:  0
-		k2:  0
-		k3:  0
-		k4:  0
-		k5:  0
-		k6:  0
-		k7:  0
-		k8:  0
-		k9:  0
-		k10: 0
-		k11: 0
-		k12: 0
-		k13: 0
-		k14: 0
-		k15: 0
-		k16: 0
-		k17: 0
-	}
+    r1: {
+        k1: 0
+        k2: 0
+        k3: 0
+        k4: 0
+        k5: 0
+        k6: 0
+        k7: 0
+        k8: 0
+        k9: 0
+        k10: 0
+        k11: 0
+        k12: 0
+        k13: 0
+        k14: 0
+        k15: 0
+        k16: 0
+        k17: 0
+    }
 }
 
 _request: enabled: _

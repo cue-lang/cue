@@ -3,69 +3,69 @@
 
 // if-else: condition true - no else
 ifTrue: {
-	if true {a: 1} else {b: 2}
+	if true { a: 1 } else { b: 2 }
 }
 
 // if-else: condition false - else yields
 ifFalse: {
-	if false {a: 1} else {b: 2}
+	if false { a: 1 } else { b: 2 }
 }
 
 // for-else: non-empty source - no else
 forNonEmpty: {
-	for x in [1, 2] {"\(x)": x} otherwise {empty: true}
+	for x in [1, 2] { "\(x)": x } fallback { empty: true }
 }
 
 // for-else: empty source - else yields
 forEmpty: {
-	for x in [] {"\(x)": x} otherwise {empty: true}
+	for x in [] { "\(x)": x } fallback { empty: true }
 }
 
 // for-else with filter: filter removes all - else yields
 forFilteredAll: {
-	for x in [1, 2, 3] if x > 10 {"\(x)": x} otherwise {empty: true}
+	for x in [1, 2, 3] if x > 10 { "\(x)": x } fallback { empty: true }
 }
 
 // for-else with filter: filter keeps some - no else
 forFilteredSome: {
-	for x in [1, 2, 3] if x > 1 {"\(x)": x} otherwise {empty: true}
+	for x in [1, 2, 3] if x > 1 { "\(x)": x } fallback { empty: true }
 }
 
 // if-for-fallback: if true, for empty - fallback yields
 ifTrueForEmpty: {
-	if true for x in [] {"\(x)": x} otherwise {empty: true}
+	if true for x in [] { "\(x)": x } fallback { empty: true }
 }
 
 // if-for-fallback: if false, for non-empty - fallback yields (if blocks iteration)
 ifFalseForNonEmpty: {
-	if false for x in [1, 2] {"\(x)": x} otherwise {empty: true}
+	if false for x in [1, 2] { "\(x)": x } fallback { empty: true }
 }
 
 // if-for-fallback: if true, for non-empty - no fallback
 ifTrueForNonEmpty: {
-	if true for x in [1, 2] {"\(x)": x} otherwise {empty: true}
+	if true for x in [1, 2] { "\(x)": x } fallback { empty: true }
 }
 
 // if-if-fallback: both true - no fallback
 ifIfBothTrue: {
-	if true if true {a: 1} otherwise {b: 2}
+	if true if true { a: 1 } fallback { b: 2 }
 }
 
 // if-if-fallback: first false - fallback yields
 ifIfFirstFalse: {
-	if false if true {a: 1} otherwise {b: 2}
+	if false if true { a: 1 } fallback { b: 2 }
 }
 
 // if-if-fallback: second false - fallback yields
 ifIfSecondFalse: {
-	if true if false {a: 1} otherwise {b: 2}
+	if true if false { a: 1 } fallback { b: 2 }
 }
 
 // try-try-fallback: both succeed - no fallback
 tryTryBothSucceed: {
 	a: 1
 	b: 2
-	try x = a? try y = b? {result: x + y} otherwise {default: 0}
+	try x = a? try y = b? { result: x + y } fallback { default: 0 }
 }
 
 missing?: int
@@ -73,90 +73,90 @@ missing?: int
 // try-try-fallback: first fails - fallback yields
 tryTryFirstFails: {
 	b: 2
-	try x = missing? try y = b? {result: x + y} otherwise {default: -1}
+	try x = missing? try y = b? { result: x + y } fallback { default: -1 }
 }
 
 // try-try-fallback: second fails - fallback yields
 tryTrySecondFails: {
 	a: 1
-	try x = a? try y = missing? {result: x + y} otherwise {default: -2}
+	try x = a? try y = missing? { result: x + y } fallback { default: -2 }
 }
 
 // list if-else: true
 listIfTrue: [
-	if true {1} else {2}
+	if true { 1 } else { 2 }
 ]
 
 // list if-else: false
 listIfFalse: [
-	if false {1} else {2}
+	if false { 1 } else { 2 }
 ]
 
 // list for-else: empty
 listForEmpty: [
-	for x in [] {x} otherwise {0}
+	for x in [] { x } fallback { 0 }
 ]
 
 // list for-else: non-empty
 listForNonEmpty: [
-	for x in [1, 2] {x * 2} otherwise {0}
+	for x in [1, 2] { x * 2 } fallback { 0 }
 ]
 
 // else with multiple fields
 elseMultipleFields: {
-	if false {a: 1} else {b: 2, c: 3}
+	if false { a: 1 } else { b: 2, c: 3 }
 }
 
 // else embeds into existing struct
 elseEmbeds: {
 	existing: 1
-	if false {added: 2} else {fallback: 3}
+	if false { added: 2 } else { fallback: 3 }
 }
 
 // fallback with outer scope access
 outerScope: {
 	let threshold = 10
-	for x in [] {x} otherwise {fallbackField: threshold}
+	for x in [] { x } fallback { fallbackField: threshold }
 }
 
 // if-else: nested body fields - else yields once
 ifNestedBody: {
-	if false {a: b: 1} else {c: 2}
+	if false { a: b: 1 } else { c: 2 }
 }
 
 // if-else: nested else fields
 ifNestedElse: {
-	if false {a: 1} else {b: c: 2}
+	if false { a: 1 } else { b: c: 2 }
 }
 
 // if-else: nested fields in both
 ifNestedBoth: {
-	if false {a: b: 1} else {c: d: 2}
+	if false { a: b: 1 } else { c: d: 2 }
 }
 
 // if-else: deeply nested fields
 ifDeeplyNested: {
-	if false {a: b: c: 1} else {a: b: c: 2}
+	if false { a: b: c: 1 } else { a: b: c: 2 }
 }
 
 // for-fallback: nested body fields, empty source
 forNestedEmpty: {
-	for x in [] {a: b: (x): x} otherwise {a: b: none: true}
+	for x in [] { a: b: (x): x } fallback { a: b: none: true }
 }
 
 // for-fallback: nested body fields, non-empty source - no fallback
 forNestedNonEmpty: {
-	for x in [1] {a: b: "\(x)": x} otherwise {a: b: none: true}
+	for x in [1] { a: b: "\(x)": x } fallback { a: b: none: true }
 }
 
 // nested comprehensions - outer fallback triggers
 nestedOuterFallback: {
-	for x in [] {for y in [1] {y} otherwise {inner: true}} otherwise {outer: true}
+	for x in [] { for y in [1] { y } fallback { inner: true } } fallback { outer: true }
 }
 
 // nested comprehensions - inner fallback triggers
 nestedInnerFallback: {
-	for x in [1] {for y in [] {y} otherwise {inner: true}} otherwise {outer: true}
+	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
 }
 -- out/compile --
 --- in.cue

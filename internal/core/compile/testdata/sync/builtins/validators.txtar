@@ -115,24 +115,30 @@ issue2098: incomplete1: {
 	_a: list.MinItems(1)
 	_a[0]
 }
+
 -- issue3418.cue --
 // issue3418: Tests that matchN correctly reports validation failures when
 // combined with conflicting constraints, regardless of operand order.
 // https://cuelang.org/issue/3418
-issue3418: t1: "foo" & matchN(1, [1 & 2]) & matchN(1, [_])
+issue3418: t1: "foo" & matchN(1, [1&2]) & matchN(1, [_])
 
-issue3418: t2: "foo" & matchN(1, [_]) & matchN(1, [1 & 2])
+issue3418: t2: "foo" & matchN(1, [_]) & matchN(1, [1&2])
 
 issue3418: t3: {
 	x: "foo"
 	x: matchN(1, [_])
-	x: matchN(1, [1 & 2])
+	x: matchN(1, [1&2])
+
+
 }
 issue3418: t4: {
 	x: "foo"
-	x: matchN(1, [1 & 2])
+	x: matchN(1, [1&2])
 	x: matchN(1, [_])
+
 }
+
+
 -- issue3474.cue --
 import "struct"
 
@@ -168,6 +174,7 @@ issue3474: structValidator: failClosed: {
 	}
 }
 
+
 issue3474: topValidator: ok: {
 	A: matchN(1, [>10])
 	A: {
@@ -193,6 +200,7 @@ issue3474: topValidator: failType: {
 		if true {C: 1}
 	}
 }
+
 -- validator_is_top.cue --
 // issue3639: Tests that embedding a matchN validator struct alongside direct
 // application does not cause "field not allowed" errors. https://cuelang.org/issue/3639
@@ -204,9 +212,9 @@ issue3639: {
 // issue3661: Tests that matchN with a required field validator works when
 // applied via a pattern constraint. https://cuelang.org/issue/3661
 issue3661: {
-	#X: matchN(1, [{b!: int}])
+	#X: matchN(1, [{ b!: int }])
 	a: b: 1
-	a:     #X
+	a: #X
 	["a"]: #X
 }
 // issue3678: Tests that matchN with multiple required-field alternatives does not

@@ -10,11 +10,12 @@ valueCycle: b: X=3 + X
 
 // Issue #1003
 listValueAlias: X = [1, 2, X[0]]
+
 -- err.cue --
 @experiment(structcmp)
 
 cycleErr: X={
-	err3: ==(X + 1)
+	err3: == (X + 1)
 	err3: 4
 }
 -- out/compile --

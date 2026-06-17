@@ -2,7 +2,6 @@
 package x
 
 import "strings"
-
 import "list"
 
 a: strings.Join(strings.Split("test", "")[1:], "")

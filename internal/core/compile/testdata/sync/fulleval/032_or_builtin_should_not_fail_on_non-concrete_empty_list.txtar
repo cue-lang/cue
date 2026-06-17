@@ -7,14 +7,16 @@
 -- in.cue --
 #Workflow: {
 	jobs: {
-		[jobID=string]: {}
+		[jobID=string]: {
+		}
 	}
 	#JobID: or([for k, _ in jobs {k}])
 	// #JobID is incomplete when jobs has no entries — or([]) is not allowed.
 }
 
 foo: #Workflow & {
-	jobs: foo: {}
+	jobs: foo: {
+	}
 }
 -- out/compile --
 --- in.cue

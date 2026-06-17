@@ -6,8 +6,9 @@ e: *1 | *1
 c: a & b
 
 d: {
-	b & a
+  b & a
 }
+
 -- out/compile --
 --- in.cue
 {

@@ -13,7 +13,7 @@ _appDefaults: two: two: optional: *"optional set" | string
 // Use a discriminator field to disambiguation additional per-disjunct
 // information.
 valueDiscriminator: crossing: {
-	out: #Application & {oneOrTwo: kind: "two"}
+	out: #Application & { oneOrTwo: kind: "two" }
 	#Application: {
 		oneOrTwo: #OneOrTwo
 		// oneOrTwo.kind resolves will resolve to "two" regardless of whether
@@ -24,7 +24,7 @@ valueDiscriminator: crossing: {
 }
 
 valueDiscriminator: local: {
-	out: #Application & {oneOrTwo: kind: "two"}
+	out: #Application & { oneOrTwo: kind: "two" }
 	#Application: {
 		oneOrTwo: #OneOrTwo
 		// oneOrTwo.kind always resolves to the value of the disjunct.
@@ -32,7 +32,7 @@ valueDiscriminator: local: {
 		// oneOrTwo~X: *_appDefaults[X.kind] | _
 		// oneOrTwo: *_appDefaults[self.kind] | _
 		// try { oneOrTwo: _appDefaults.(self.kind)? }
-		oneOrTwo: X={*_appDefaults[X.kind] | _}
+		oneOrTwo: X={ *_appDefaults[X.kind] | _ }
 	}
 }
 
@@ -40,8 +40,8 @@ valueDiscriminator: local: {
 // values. We may not want to support this in perpetuity, as this relies on
 // closedness to discrimnate the disjuncts. But for now, as there is no
 // alternative to discriminating based on fields, we will support it.
-fieldDiscriminator: crossing: {
-	out: #Application & {oneOrTwo: two: {}}
+fieldDiscriminator: crossing:{
+	out: #Application & { oneOrTwo: two: {} }
 	#Application: {
 		oneOrTwo: #OneOrTwo
 		// The value of oneOrTwo.kind depends on whether oneOrTwo resolves
@@ -52,12 +52,12 @@ fieldDiscriminator: crossing: {
 	}
 }
 
-fieldDiscriminator: local: {
-	out: #Application & {oneOrTwo: two: {}}
+fieldDiscriminator: local:{
+	out: #Application & { oneOrTwo: two: {} }
 	#Application: {
 		oneOrTwo: #OneOrTwo
 		// oneOrTwo.kind always resolves to the value of the disjunct.
-		oneOrTwo: X={*_appDefaults[X.kind] | _}
+		oneOrTwo: X={ *_appDefaults[X.kind] | _ }
 	}
 }
 
@@ -82,9 +82,11 @@ issue3967: error: nested: {
 					}
 				}
 			}
-			if X.oneOrTwo.kind == "never" {}
+			if X.oneOrTwo.kind == "never" {
+			}
 		}
-		if X.oneOrTwo.kind == "never" {}
+		if X.oneOrTwo.kind == "never" {
+		}
 	}
 }
 issue3967: {
@@ -93,7 +95,7 @@ issue3967: {
 			oneOrTwo: two: {}
 		}
 		#Application: {
-			oneOrTwo: X= {#OneOrTwo & {
+			oneOrTwo: X= { #OneOrTwo & {
 				if X.kind == "two" {
 					two: {
 						if X.two.optional == _|_ {
@@ -101,7 +103,8 @@ issue3967: {
 						}
 					}
 				}
-				if X.kind == "never" {}
+				if X.kind == "never" {
+				}
 			}}
 		}
 	}

@@ -24,6 +24,7 @@ out: #secrets & {
 	FOO: $secret: _id: "100"
 	ONE: TWO: THREE: $secret: _id: "123"
 }
+
 -- perf.cue --
 nestedCross: closed: {
 	#D: {id: string} | {[string]: #D}

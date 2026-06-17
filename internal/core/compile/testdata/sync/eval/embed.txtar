@@ -34,7 +34,7 @@ double: {
 	a: b?: c: d: "c"
 	a: {{
 		b: {{
-			c: e: "member"
+				c: e: "member"
 		}}
 	}}
 }
@@ -87,17 +87,21 @@ fieldNotAllowed: {
 				name: "One"
 			}
 		}
+
+
+		// This error is perculated up.
 	}
 	t3: {
 		x: #X
 		#X: y: {
 			z: {
 				a: [string]: string
-				b: E:        "1"
+				b: E: "1"
 			}
 			...
 		}
-		x1: y:     #Y
+
+		x1: y: #Y
 		#Y: port?: string
 
 		x: y: {

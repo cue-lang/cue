@@ -61,12 +61,13 @@ match: {
 		a: 2
 		b: {
 			matchN(4, [#A, #A, #A, #A])
-
+	
 			a: 3
 			b: matchN(4, [#A, #A, #A, #A])
 			b: {a: 4}
 			c: matchN(4, [#A, #A, #A, #A])
 			c: {a: 5}
+
 		}
 		c: {
 			matchN(4, [#A, #A, #A, #A])
@@ -76,6 +77,7 @@ match: {
 			b: {a: 4}
 			c: matchN(4, [#A, #A, #A, #A])
 			c: {a: 5}
+
 		}
 	}
 }
@@ -115,6 +117,7 @@ anyOf: {
 	multiple1OK3: 15
 }
 
+
 allOf: {
 	[=~"^multiple1"]: matchN(2, [math.MultipleOf(3), math.MultipleOf(5)])
 
@@ -129,18 +132,22 @@ bare: {
 	embed: t1: {
 		a: {matchN(1, [>10])}
 		b: {a}
+
 	}
 	embed: t2: {
 		b: {a}
 		a: {matchN(1, [>10])}
+
 	}
 	direct: t1: {
 		a: matchN(1, [>10])
 		b: a
+
 	}
 	direct: t2: {
 		b: a
 		a: matchN(1, [>10])
+
 	}
 }
 
@@ -179,6 +186,7 @@ issue3575: {
 		x: {a: 1}
 	}
 }
+
 -- incomplete.cue --
 import "math"
 
@@ -201,13 +209,14 @@ incomplete: {
 	incomplete4: {
 		x: matchN(math.MultipleOf(2), [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
+
 	}
 	incomplete5: {
 		x: matchN(>1 & <=3, [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
 	}
 	incomplete6: {
-		x: matchN(2 | 3, [{bar!: int}, {foo!: int}, {baz!: int}])
+		x: matchN(2|3, [{bar!: int}, {foo!: int}, {baz!: int}])
 		x: bar: 2
 	}
 
@@ -245,6 +254,7 @@ issue3389: {
 	// TODO(inline): issue converting to tests. Documented later.
 	x: bar: 2
 	x: matchN(1, [{bar: 3}, {bar: 2, foo!: int}])
+
 }
 -- closedness.cue --
 ellipsis: ok: {
@@ -253,7 +263,7 @@ ellipsis: ok: {
 	}
 	#Schema: {
 		field?: #anything
-		#anything: matchN(1, [{...}])
+		#anything: matchN(1, [{ ... }])
 	}
 }
 // Arguments to function are not closed by enclosing definition.
@@ -267,11 +277,11 @@ openArguments: ok1: {
 }
 openArguments: err2: {
 	#Schema: {{
-		a?: matchN(1, [//fails
-			null,               // fail
-			{[string]: string}, // pass
-			{b: {...}},         // pass
-		])
+        a?: matchN(1, [ //fails
+				null, // fail
+				{ [string]: string }, // pass
+				{b: {...}}, // pass
+			])
 	}}
 	out: #Schema & {
 		a: allowed: "once"
@@ -287,11 +297,11 @@ explicitClose: err1: {
 }
 explicitClose: ok2: {
 	#Schema: {{
-		a?: matchN(1, [
-			null,                      // fail
-			close({[string]: string}), // pass
-			close({b: {...}}),         // fail
-		])
+        a?: matchN(1, [
+				null, // fail
+				close({ [string]: string }), // pass
+				close({b: {...}}), // fail
+			])
 	}}
 	out: #Schema & {
 		a: allowed: "once"
@@ -300,8 +310,8 @@ explicitClose: ok2: {
 mixed: ok3: {
 	#Schema: {
 		exports?: matchN(1, [
-			close({never?: _}), // fail
-			#exportsObject,     // pass
+			close({ never?: _ }), // fail
+			#exportsObject,       // pass
 		])
 
 		#exports: matchN(1, [string, #exportsObject])
@@ -311,6 +321,8 @@ mixed: ok3: {
 	out: #Schema & {
 		exports: exp1: "./main-module.js"
 	}
+	// TODO(inline): the errors here are legal structural cycles. We need to
+	// be able to print those.
 }
 
 closedByDefinition: ok4: {
@@ -323,6 +335,8 @@ closedByDefinition: ok4: {
 	out: #Schema & {
 		exports: exp1: "./main-module.js"
 	}
+	// TODO(inline): the errors here are legal structural cycles. We need to
+	// be able to print those.
 }
 closedByDefinition: err5: {
 	#Schema: {
@@ -335,6 +349,7 @@ closedByDefinition: err5: {
 		exports: exp1: "./main-module.js"
 	}
 }
+
 -- issue3694.cue --
 // issue3694: Tests that matchN combined with close() correctly validates schemas
 // requiring one of several required fields. https://cuelang.org/issue/3694

@@ -7,12 +7,12 @@
 }
 
 #C: #A & #B
-c:  #C
-c: {aaa: 3}
+c: #C
+c: {aaa: 3 }
 
 #D: {#A & #B}
 d: #D
-d: {aaa: 3}
+d: {aaa: 3 }
 -- out/compile --
 --- in.cue
 {

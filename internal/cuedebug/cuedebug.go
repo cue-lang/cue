@@ -1,6 +1,7 @@
 package cuedebug
 
 import (
+	"os"
 	"sync"
 
 	"cuelang.org/go/internal/envflag"
@@ -58,6 +59,9 @@ type Config struct {
 // mode to be one of error not panic, which would be the only option if
 // it was a top level init function.
 func Init() error {
+	// Read CUE_DEBUG on every call so go test records it as a cache input;
+	// see the matching note in internal/cueexperiment.
+	os.Getenv("CUE_DEBUG")
 	return initOnce()
 }
 

@@ -1,7 +1,7 @@
 -- in.cue --
 package lpcorpus
 
-#Value: {type: "int"} | {type: "float"} | {type: "string"}
+#Value:   {type: "int"} | {type: "float"} | {type: "string"}
 
 foo: [{type: "float"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]

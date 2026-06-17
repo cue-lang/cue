@@ -6,6 +6,7 @@ import "list"
 // The following just chains existing fields and should NOT trigger a cycle
 // detection error.
 
+
 chain: t1: {
 	#maxiter: 2
 
@@ -19,6 +20,7 @@ chain: t1: {
 	}
 
 	a: x2: null
+
 
 	#DepthF: {
 		#in: _
@@ -75,6 +77,7 @@ chain: t3: p1: {
 
 	X: 1
 }
+
 -- issue2052.cue --
 // Bounded recursion regression: a pattern that evaluated correctly in v0.4.3
 // began failing in v0.5.0-alpha.1 with spurious unbounded recursion errors.
@@ -83,7 +86,6 @@ import (
 	"list"
 	"math"
 )
-
 issue2052: reduced: t1: {
 	A: a: _
 	Depth: {
@@ -136,6 +138,7 @@ issue2052: medium: t1: {
 	tree: "bar"
 
 	d: #Depth & {#in: tree}
+
 }
 
 issue2052: medium: t2: {
@@ -146,9 +149,9 @@ issue2052: medium: t2: {
 			#funcs: "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
 		}
 
-		#funcs: {
+		#funcs:{
 			for k, v in list.Range(0, #maxiter, 1) {
-				"\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+				 "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
 			}
 		}
 

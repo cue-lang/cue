@@ -51,6 +51,7 @@ embed: {
 	}
 	fail1: p: "foo" // this should fail, as p is not present.
 
+
 	success2: #C2
 	#C2: {
 		if true {
@@ -70,7 +71,7 @@ embed: {
 
 	success4: {
 		#X: y: string
-		x: y:  string
+		x: y: string
 		x: {
 			for _ in ["iter-once"] {
 				#X
@@ -118,19 +119,20 @@ mixedFieldsSuccess: {
 	a: {
 		for _, s in ["foo"] {
 			"\(s)": 1
-			X:      1
+			X: 1
 		}
 	}
 
 	b: #Def: {
 		for _, s in ["foo"] {
 			"\(s)": 1
-			X:      1
+			X: 1
 		}
 	}
 	b: x: b.#Def
-	b: x: X:   _
+	b: x: X: _
 	b: x: foo: _
+
 
 	c: #Def: {
 		X:   int
@@ -140,7 +142,7 @@ mixedFieldsSuccess: {
 	c: x: {
 		for _, s in ["foo"] {
 			"\(s)": 1
-			X:      1
+			X: 1
 		}
 	}
 }
@@ -175,6 +177,7 @@ noStackOverflowStructCycle: {
 		}
 	}
 }
+
 
 // #a is incomplete, but the missing values are provided by x.
 provideIncompleteSuccess: {
@@ -243,9 +246,12 @@ voidArcs: {
 
 cyclicError: {
 	a: {
+		// With pushdown, x and y remain bool (incomplete) rather than
+		// erroring: the if guards cannot resolve bool to a concrete
+		// value, so the comprehension bodies simply do not fire.
 		x: bool
 		y: bool
-		if a.x {
+		if a.x  {
 			y: true
 		}
 		if a.y {
@@ -295,7 +301,7 @@ closedCheck: success2: {
 	#D: {
 		d: string
 		if d != "c" {
-			("foo" + "bar"): string
+			("foo"+"bar"): string
 		}
 	}
 
@@ -327,7 +333,8 @@ emptyComprehensionIncomplete: {
 	a: {}
 	b: {
 		// b should be an incomplete error
-		if a.b {}
+		if a.b {
+		}
 	}
 }
 
@@ -502,7 +509,7 @@ voidLookup: {
 	a: [string]: {
 		c: {
 			for k, v in z {
-				(k): null // don't add this arc anywhere
+				(k): null  // don't add this arc anywhere
 			}
 		}
 		z: {
@@ -513,13 +520,14 @@ voidLookup: {
 	}
 }
 
+
 // Eliminate the top value even if there is an error (especially incomplete
 // errors).
 topElimination: {
 	a: int
 	_
 	if true {
-		x: a + 1
+		x: a+1
 	}
 }
 
@@ -541,7 +549,8 @@ voidEliminationSuccess: drop1: {
 explicitDefaultError: {
 	a: string | *_|_
 
-	if a != "" {}
+	if a != "" {
+	}
 }
 
 // Remove arcs for with no for comprehension results.
@@ -599,6 +608,7 @@ optionalRefStaysOptional: s={
 		field: "value"
 	}
 }
+
 -- issue2208.cue --
 // Regression where definitions that compiled correctly with 0.4.3 failed to
 // compile with 0.5.0-beta.2 due to incorrect handling of void errors.
@@ -606,7 +616,8 @@ optionalRefStaysOptional: s={
 voidErrorIncomplete: {
 	#Schema: [string]: {
 		required: bool
-		if !required {}
+		if !required {
+		}
 	}
 
 	root: #Schema
@@ -639,6 +650,8 @@ voidErrorIncomplete: {
 // 		}
 // 	}
 // }
+
+
 -- issue1759.cue --
 // Tests that len() and comprehensions correctly see the full struct/list value.
 // https://cuelang.org/issue/1759
@@ -660,7 +673,7 @@ unity: success1: {
 	}
 
 	envs: "e1": #Env & {
-		configurations: c1: #Config
+		configurations: c1:  #Config
 	}
 
 	envs: [string]: configurations: [string]: {
@@ -686,13 +699,14 @@ issue1759: {
 }
 
 arcAlignment: t1: {
-	[string]: {
-		if true {}
+	[string]:  {
+		if true { }
 	}
 	if false {
 		c: _
 	}
 }
+
 -- issue2111.cue --
 // Evaluator regression where circular dependency in evaluation of conditionals
 // caused incorrect results. All arc types, not just regular fields, should be pushed down.
@@ -703,10 +717,12 @@ letPushdown: {
 	a: {
 		for k, v in _c {
 			let x = v
-			if x != _|_ {}
+			if x != _|_ {
+			}
 		}
 	}
 }
+
 -- issue2113.cue --
 // Evaluator regression where a nested comprehension caused "was already used"
 // errors when the enclosing value was not yet fully evaluated.
@@ -718,7 +734,8 @@ nestedWithEmbeddingOK: {
 	a: {
 		for k, v in c {
 			{x: 1}
-			if a.x != _|_ {}
+			if a.x != _|_ {
+			}
 		}
 	}
 }
@@ -728,7 +745,8 @@ nestedWithDynamicFieldOK: {
 
 	a: {
 		for k, v in _c {
-			if x != _|_ {}
+			if x != _|_ {
+			}
 			x="\(k)": 1
 		}
 	}
@@ -738,12 +756,13 @@ nestedWithDynamicFieldOK: {
 errorPropagation: {
 	deployment: _
 	for k, v in deployment {
-		for k1, v2 in v.env2 {
-			deployment: (k): x1: 1 // Report this error.
+		for k1, v2 in v.env2 { // Report this error.
+			deployment: (k): x1: 1
 		}
 	}
-	for id in ["elem"] {deployment: (id): x2: 2}
+	for id in ["elem"] { deployment: (id): x2: 2 }
 }
+
 -- issue2131.cue --
 // issue2131: Tests that chained for comprehensions correctly produce output
 // fields when iterating over nested structs. https://cuelang.org/issue/2131
@@ -820,19 +839,19 @@ issue3535: def: {
 -- reflect.cue --
 import "encoding/json"
 
+
 unifyDynamicReflectSuccess: {
 	for _, s in ["foo"] {
 		X: {...}
 		"\(s)": {
 			X: {...} // cannot be _
-			Y:       json.Marshal(X) // cannot be yaml, X cannot be literal
+			Y: json.Marshal(X) // cannot be yaml, X cannot be literal
 		}
 	}
 
 	[string]: X: {
-		if true {
+		if true {// must be there
 			x: y: {} // at least 2 nestings needed to expose problem
-			// must be there
 		}
 	}
 }
@@ -927,9 +946,9 @@ issue3729: withEmbed: incomplete: {
 	}
 }
 issue3729: full: {
-	#Application: spec:            #ApplicationSpec
+	#Application: spec: #ApplicationSpec
 	#ApplicationSpec: syncPolicy?: null | #SyncPolicy
-	#SyncPolicy: automated?:       null | #SyncPolicyAutomated
+	#SyncPolicy: automated?: null | #SyncPolicyAutomated
 	#SyncPolicyAutomated: {
 		prune?:    bool
 		selfHeal?: bool
@@ -961,11 +980,11 @@ arcTypeAcrossTwo: {
 // constrained value. https://cuelang.org/issue/3894
 issue3894: reduced: p1: {
 	{a: string} | {b: value: string}
-	if true {b: value: "true"}
+	if true { b: value: "true" }
 }
 issue3894: reduced: p2: {
 	{b: value: string} | {a: string}
-	if true {b: value: "true"}
+	if true { b: value: "true" }
 }
 issue3894: full: {
 	#Output: {a?: string} | {b?: {value: string}}
@@ -1010,7 +1029,7 @@ issue3935: full: {
 	}
 	#SchemaSelected: {
 		spec!: {
-			name!:   string
+			name!: string
 			config!: _
 		}
 
@@ -1067,6 +1086,7 @@ letCycleSelf: {
 
 	x: [string]: #X
 	x: a: {}
+
 }
 -- rework2.cue --
 @experiment(aliasv2)
@@ -1079,6 +1099,7 @@ letCycleSelfKeyword: {
 	}
 
 	env: #E & {hosts: h1: x: "k"}
+
 }
 letCycleSelfKeyword2: {
 	#E: {
@@ -1091,9 +1112,10 @@ letCycleSelfKeyword2: {
 	}
 
 	env: #E & {
-		hosts: h1:    1
+		hosts: h1: 1
 		networks: n1: "x"
 	}
+
 }
 -- out/compile --
 --- in.cue

@@ -57,23 +57,24 @@ selfEmbed: ok6: {
 	a: x
 }
 
+
 disjSelf: ok1: {
 	#A: string | #A
-	x:  #A
+	x: #A
 }
 
 disjSelf: ok2: {
-	x:  #A
+	x: #A
 	#A: string | #A
 }
 
 disjSelf: ok3: {
 	#A: #A | string
-	x:  #A
+	x: #A
 }
 
 disjSelf: ok4: {
-	x:  #A
+	x: #A
 	#A: #A | string
 }
 
@@ -121,25 +122,26 @@ disjList: ok4: {
 	x: #A
 	#A: [#A] | string
 }
+
 -- old.cue --
 name: "foo"
 dynamicSelf: ok1: {
 	X=(name): string | X
-	x:        X
+	x: X
 }
 
 dynamicSelf: ok2: {
-	x:        X
+	x: X
 	X=(name): string | X
 }
 
 dynamicSelf: ok3: {
 	X=(name): X | string
-	x:        X
+	x: X
 }
 
 dynamicSelf: ok4: {
-	x:        X
+	x: X
 	X=(name): X | string
 }
 
@@ -268,14 +270,15 @@ valueList: ok4: {
 
 // Issue #1729
 issue1729: t1: {
-	#x: {#x | {}}
+	#x: { #x | {} }
 	x: #x & {}
 }
 
 issue1729: t2: {
 	x: #x & {}
-	#x: {#x | {}}
+	#x: { #x | {} }
 }
+
 -- selfnew.cue --
 @experiment(aliasv2)
 
@@ -288,6 +291,7 @@ issue4125: t2_alias: X={
 	let Y = X
 	b: Y.b
 }
+
 -- out/compile --
 --- in.cue
 {

@@ -11,7 +11,7 @@
 	mas: [string]: {
 		cfg:   _
 		_link: #T
-		link: _link & {config: cfg}
+		link:  _link & {config: cfg}
 	}
 }
 
@@ -43,6 +43,7 @@ reduced: t1: {
 	}
 	a: #T
 	a: x: y: V: x: y: V: {}
+
 }
 -- out/compile --
 --- in.cue

@@ -21,8 +21,8 @@ full: {
 		x: 5
 	}
 
-	_a: [ID=_]: vms: [{name: "hello"}]
-	_b: [ID=_]: vms: [{name: "again"}]
+	_a: [ID=_]: vms: [{ name: "hello" }]
+	_b: [ID=_]: vms: [{ name: "again" }]
 }
 reduced: p1: {
 	_cs: _a.l & {

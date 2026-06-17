@@ -1,7 +1,7 @@
 -- in.cue --
 x: {
-	y: *1 | {a: 2}
-	for x in [1] {y}
+    y: *1 | {a: 2}
+    for x in [1] {y}
 }
 -- out/compile --
 --- in.cue

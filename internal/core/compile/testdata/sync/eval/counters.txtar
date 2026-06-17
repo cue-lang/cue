@@ -24,6 +24,7 @@ issue3750: original: {
 		}
 	}
 
+
 	#Bar: {
 		kind: "bar"
 		meta: strs: [...string]
@@ -31,7 +32,7 @@ issue3750: original: {
 }
 
 issue3750: reduced: {
-	out: Foo & {sub: Foo}
+	out: Foo & { sub: Foo }
 
 	Foo: {
 		sub: Foo | {a: b: _}
@@ -89,7 +90,7 @@ issue3770: task: {
 		}
 		x: b: 1
 	}
-	m: null | {}
+	m: null | {  }
 	out: m.x.a
 }
 -- issue3824.cue --
@@ -98,22 +99,22 @@ issue3770: task: {
 // https://cuelang.org/issue/3824
 issue3824: panic: {
 	thing: {
-		spec: name: string
-		outputField: string
+        spec: name: string
+        outputField: string
 	}
 
 	val: string
 	things: [_]: thing
 
 	things: [_]: {
-		spec: *{
-			name: "self-signed"
-		} | {...}
+			spec: *{
+					name: "self-signed"
+			} | {...}
 	}
 
 	if true {
-		things: "name": {}
-		val: things["name"].outputField
+			things: "name": {}
+			val: things["name"].outputField
 	}
 }
 -- out/compile --

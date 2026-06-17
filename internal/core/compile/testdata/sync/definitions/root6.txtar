@@ -2,14 +2,15 @@
 c: "foo"
 a: b: int
 #Schema
-#Schema: close({a: b: int})
+#Schema: close({ a: b: int})
 
 x: {
 	c: "foo"
 	a: b: int
 	#Schema
-	#Schema: close({a: b: int})
+	#Schema: close({ a: b: int})
 }
+
 -- out/compile --
 --- in.cue
 {

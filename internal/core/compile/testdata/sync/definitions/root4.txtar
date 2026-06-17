@@ -2,10 +2,11 @@
 #schema: a!: bool
 _hidden & #schema // must fail here, but not elsewhere
 _hidden: {
-	"a":        true
+	"a": true,
 	notAllowed: true
 }
 allowed: true
+
 -- out/compile --
 --- in.cue
 {

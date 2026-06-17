@@ -27,6 +27,8 @@ package foo
 #Config & {
 	console: dark
 }
+
+
 -- out/compile --
 --- box.cue
 {

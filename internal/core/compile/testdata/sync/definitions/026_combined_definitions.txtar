@@ -8,7 +8,7 @@
 	#def: {a: "A"}
 	#def: {b: "B"}
 }
-d1: #D1 & {env: c: "C"}
+d1: #D1 & {env: c: "C" }
 #D2: {
 	a: int
 }

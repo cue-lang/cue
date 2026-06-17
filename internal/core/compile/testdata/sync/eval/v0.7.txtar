@@ -14,11 +14,13 @@ mutualBuiltin: t2: ok: {
 	s5: s6
 	s6: "dd"
 }
+
 -- comprehensions.cue --
 comprehensions: t1: ok: {
 	src: ["foo"]
-	for v in src {"\(v)": v}
+	for v in src { "\(v)": v }
 }
+
 -- dynamic.cue --
 dynamic: t1: ok: {
 	[X=string]: {name: X}
@@ -35,6 +37,7 @@ dynamic: t2: ok: {
 		}
 	}
 }
+
 -- definition.cue --
 definition: t0: err: {
 	#D1: env: {}
@@ -54,7 +57,7 @@ definition: t2: ok: p1: {
 		...
 		{a: int}
 	}
-	x: #A & {c: int}
+	x: #A & { c: int }
 }
 
 definition: t2: ok: p2: {
@@ -62,11 +65,11 @@ definition: t2: ok: p2: {
 		{a: int}
 		...
 	}
-	x: #A & {c: int}
+	x: #A & { c: int }
 }
 
 definition: t2: ok: p3: {
-	x: #A & {c: int}
+	x: #A & { c: int }
 	#A: {
 		...
 		{a: int}
@@ -74,12 +77,13 @@ definition: t2: ok: p3: {
 }
 
 definition: t2: ok: p4: {
-	x: #A & {c: int}
+	x: #A & { c: int }
 	#A: {
 		{a: int}
 		...
 	}
 }
+
 -- expr.cue --
 expr: t1: ok: {
 	a: X
@@ -90,8 +94,8 @@ expr: t1: ok: {
 
 expr: t2: ok: {
 	A: X + 2
-	X: 5
-	X: A - 2
+	X: 5      
+	X: A - 2  
 }
 
 expr: t3: ok: p1: {
@@ -112,10 +116,11 @@ expr: t4: ok: {
 	b0: a1
 	a1: a0 + 2
 	b1: b0 - 2
-	a0: X // defined earlier
+	a0: X        // defined earlier
 	X:  b1
 	X:  5.0
 }
+
 -- in.cue --
 mutual: t0: ok: {
 	c: e & {b: 2}
@@ -197,6 +202,7 @@ mutual: t4: ok: {
 
 	check: p1 & p2 & p3 & p4 & p5
 }
+
 -- equality.cue --
 // evalv3 nil pointer dereference panic in equalTerminal with repeated
 // unifications of the same default disjunction inside a close() call.
@@ -205,10 +211,12 @@ issue3194: reduced: {
 	A: *0 | >10
 	A: *0 | >10
 	{
-		out: close({b: A})
+		out: close({ b: A })
 		out: b: A
 	}.out
+
 }
+
 -- chained.cue --
 import "encoding/yaml"
 
@@ -222,6 +230,7 @@ issue3925: reduced: {
 		a: "actual" | "other"
 		b: (a): c: "str"
 	}
+
 }
 issue3925: full: {
 	for name, _ in _inputs {
@@ -237,6 +246,7 @@ issue3925: full: {
 	for name, input in _inputs {
 		out: (name): lateYAML: yaml.Marshal(input.config[input.name])
 	}
+
 }
 -- out/compile --
 --- builtins.cue

@@ -8,7 +8,7 @@ embed: and([{2, #x: 1}, {2, #x: 2}])
 // evalv3 while the equivalent expression without and() worked correctly.
 // https://cuelang.org/issue/3719
 issue3719: {
-	#openStruct: {...}
+    #openStruct: {...}
 	_filledLater: #openStruct.foo
 
 	// The comprehension below should work regardless of whether it's wrapped in "and".

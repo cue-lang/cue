@@ -90,9 +90,9 @@ issue779: {
 			}
 		}
 	}
-	Y: STATE & {message: X}
+	Y: STATE & { message: X }
 	X: "test"
-	STATE: {code: 101}
+	STATE: { code: 101 }
 }
 
 // Issue #1934: regression in v0.4.1 where nested comprehensions referencing
@@ -136,12 +136,12 @@ selfReferential: insertionError: {
 // A comprehension should not recursively evaluated arcs, so that a
 // structural cycle can be avoided when unnecessary.
 selfReferential: acrossOr: t1: p1: {
-	o: #Output & {retry: reject: "ok"}
+	o: #Output & { retry: reject: "ok" }
 
 	#AllOutputs: {
 		reject:   string
 		resource: string
-		retry:    #Output
+		retry: #Output
 	}
 
 	#Output: or([for name, config in #AllOutputs {
@@ -154,12 +154,12 @@ selfReferential: acrossOr: t1: p2: {
 		(name): config
 	}])
 
-	o: #Output & {retry: reject: "ok"}
+	o: #Output & { retry: reject: "ok" }
 
 	#AllOutputs: {
 		reject:   string
 		resource: string
-		retry:    #Output
+		retry: #Output
 	}
 }
 
@@ -171,15 +171,15 @@ selfReferential: acrossOr: t1: p3: {
 	#AllOutputs: {
 		reject:   string
 		resource: string
-		retry:    #Output
+		retry: #Output
 	}
 
-	o: #Output & {retry: reject: "ok"}
+	o: #Output & { retry: reject: "ok" }
 }
 
 selfReferential: acrossOr: t2: p1: {
-	d: or([for x, y in #A {y}])
-	o: d & {b: 2}
+	d: or([for x, y in #A { y }])
+	o: d & { b: 2 }
 	#A: {
 		d1: int
 		d2: string
@@ -188,8 +188,8 @@ selfReferential: acrossOr: t2: p1: {
 }
 
 selfReferential: acrossOr: t2: p2: {
-	o: d & {b: 2}
-	d: or([for x, y in #A {y}])
+	o: d & { b: 2 }
+	d: or([for x, y in #A { y }])
 	#A: {
 		d1: int
 		d2: string
@@ -198,20 +198,20 @@ selfReferential: acrossOr: t2: p2: {
 }
 
 selfReferential: acrossOr: t2: p3: {
-	o: d & {b: 2}
+	o: d & { b: 2 }
 	#A: {
 		d1: int
 		d2: string
 		d3: b: d
 	}
-	d: or([for x, y in #A {y}])
+	d: or([for x, y in #A { y }])
 }
 
 // Issue #1881: evaluator required the source of a for comprehension to be
 // fully evaluated before iterating, causing false structural cycle errors.
 // https://cuelang.org/issue/1881
 issue1881: p1: {
-	o: #Output & {retry: output: reject: "ok"}
+	o: #Output & { retry: output: reject: "ok" }
 
 	#AllOutputs: {
 		reject:   string
@@ -231,7 +231,7 @@ issue1881: p2: {
 		retry: output: #Output
 	}
 
-	o: #Output & {retry: output: reject: "ok"}
+	o: #Output & { retry: output: reject: "ok" }
 
 	#Output: or([for name, config in #AllOutputs {
 		(name): config
@@ -249,7 +249,7 @@ issue1881: p3: {
 		(name): config
 	}])
 
-	o: #Output & {retry: output: reject: "ok"}
+	o: #Output & { retry: output: reject: "ok" }
 }
 
 siblingInsertion: t1: p1: {
@@ -317,7 +317,8 @@ siblingInsertion: t2: p2: {
 selfReferential: fail: {
 	a: {}
 	b: a.x != ""
-	if b {}
+	if b {
+	}
 }
 
 // Issue #2367: stack overflow triggered by a comprehension that inserts into
@@ -366,6 +367,7 @@ issue2310: reduced: {
 	#s: {#str: string, #str + "a"}
 	#subs: [0, 1, 2]
 }
+
 -- issue3903.cue --
 // evalv3 structural cycle regression: a schema with `_deps` and comprehensions
 // over those deps triggered a spurious structural cycle error that exported
@@ -399,7 +401,7 @@ issue3903: full: {
 		_deps: [...]
 
 		objs: [
-			for obj in _local {obj},
+			for obj in _local { obj },
 
 			for dep in _deps
 			for obj in (dep & {}).objs {
@@ -442,7 +444,7 @@ issue2405: {
 // already referenced" error that evalv2 did not emit.
 // https://cuelang.org/issue/3941
 issue3941: full: {
-	#Metadata: name:     string
+	#Metadata: name: string
 	#Resource: metadata: #Metadata
 
 	out: {
@@ -466,11 +468,11 @@ issue2229: full_ok: X={
 	build: bool | *true
 	test:  bool | *true
 
-	make: [for k, v in X if (v & true) != _|_ {k}]
+	make: [ for k, v in X if (v & true) != _|_ { k } ]
 }
 issue2229: reduced_fail: X={
 	x: true
-	y: [for _, v in X if v & true {_}]
+	y: [ for _, v in X if v & true { _ } ]
 }
 -- issue4100.cue --
 // Segmentation fault in `adt.(*OpContext).freeNodeContext` in v0.14.1,

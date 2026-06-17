@@ -11,6 +11,7 @@ import "foo.test/main/imported"
 
 out: imported
 out: either: foo: "world"
+
 -- imported/imported.cue --
 package imported
 

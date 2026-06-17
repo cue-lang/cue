@@ -34,7 +34,8 @@ issue516: {
 explicitDefaultError: {
 	a: string | *_|_
 
-	if a != "" {}
+	if a != "" {
+	}
 }
 
 // evaluator: export as YAML vs JSON emits different templated data when
@@ -68,7 +69,7 @@ issue4043: {
 // https://cuelang.org/issue/3581
 issue3581: reduced: {
 	list: [...] | *[]
-	list: ["\(c)"]
+	list: ["\(c)" ]
 	c: _
 }
 -- issue3576.cue --
@@ -101,9 +102,9 @@ issue3576: full: {
 			optionsValue: options
 		}
 	}
-
+	
 	#Option: {}
-
+	
 	foo: #Run | #Copy
 	foo: run: "make"
 }
@@ -122,7 +123,7 @@ issue3599: full: {
 			read?:  _|_
 		}
 	}
-
+	
 	#Minio: {
 		container: #Action & {
 			action: {
@@ -136,22 +137,22 @@ issue3599: full: {
 		doWrite: bool | *true
 		container: action: defaultAction
 		defaultAction: {
-			if doWrite {write: "somefile.txt"}
-			if !doWrite {read: "somefile.txt"}
+			if doWrite { write: "somefile.txt" }
+			if !doWrite { read: "somefile.txt" }
 		}
 	}
 }
 issue3599: reduced: p1: {
-	{a?: 1 & 2} | {a: string, b?: 1 & 2}
-	{} | {}
+	{ a?:  1&2 } | { a:  string, b?: 1&2 }
+	{  } | {  }
 }
 issue3599: reduced: p2: {
-	{} | {}
-	{a?: 1 & 2} | {a: string, b?: 1 & 2}
+	{  } | {  }
+	{ a?:  1&2 } | { a:  string, b?: 1&2 }
 }
 issue3599: let: {
-	{} | {a: B | 1, let B = 1 & 2, }
-	{} | {}
+	{ } | { a:  B | 1, let B = 1&2 }
+	{  } | {  }
 }
 -- optionalerror.cue --
 // evalv3 closedness regression with disjunctions and ellipses; a definition
@@ -160,8 +161,8 @@ issue3599: let: {
 issue4022: reduced: {
 	#NonNamespaced: metadata: namespace?: _|_
 	#NullOrNonNamespaced: int | #NonNamespaced
-	out:                  #NullOrNonNamespaced
-	out:                  #NonNamespaced
+	out: #NullOrNonNamespaced
+	out: #NonNamespaced
 	out: metadata: {}
 }
 issue4022: full: {

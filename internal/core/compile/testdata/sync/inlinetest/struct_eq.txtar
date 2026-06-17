@@ -1,7 +1,7 @@
 -- in.cue --
 myStruct: {
-	a: 1
-	b: a + 1
+    a: 1
+    b: a + 1
 }
 -- out/compile --
 --- in.cue

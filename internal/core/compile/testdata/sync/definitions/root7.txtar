@@ -1,6 +1,7 @@
 -- in.cue --
 root: input: #deps: root: {}
 {root.input.#deps}
+
 -- out/compile --
 --- in.cue
 {

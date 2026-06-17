@@ -7,6 +7,7 @@ _schema: #Schema
 a: b: "foo"
 c: "foo"
 
+
 x: {
 	_schema // embed schema through indirections
 	_schema: #Schema
@@ -16,6 +17,8 @@ x: {
 	a: b: "foo"
 	c: "foo"
 }
+
+// TODO(inline): fix sharing detection across hidden fields.
 -- out/compile --
 --- in.cue
 {

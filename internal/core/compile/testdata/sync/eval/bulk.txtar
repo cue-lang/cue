@@ -10,6 +10,8 @@ a: {
 		b:    1
 		name: X
 	}
+
+	// TODO(eval): struct isn't closed, so this should be true.
 }
 d: a & {
 	"foobar": {
@@ -21,7 +23,6 @@ t1: {
 	#a: {
 		[>"e" & <"z"]: int
 	}
-
 	// TODO(inline): support allow on fields.
 	b: #a & {f: 4}
 	c: #a & {z: 4}
@@ -31,11 +32,11 @@ t2: {
 	#a: {
 		["x" | "y"]: int
 	}
-
 	// TODO(inline): support allow on fields.
 	b: #a & {x: 4}
 	c: #a & {z: 4}
 }
+
 -- issue2109.cue --
 // Detect cycle:
 // The pattern constraint of FlagsURLS is applied to countries (because
@@ -78,6 +79,7 @@ patternCycle: t1: p3: {
 	FlagsURLs: {[countries]: string}
 	countries: "US" | "GB" | "AU"
 }
+
 -- intpattern.cue --
 // evalv3 regression: a pattern constraint definition with int key incorrectly
 // allowed a non-matching (non-int) field.
@@ -89,13 +91,15 @@ issue3670: {
 }
 dual: {
 	_
-
 	// As long as it is undecided whether this is a struct or list, this should
 	// not be a conflict. Note that the spec does not allow int patterns, but
 	// both v2 and v3 allow it, and we soon will, so it seems gratuitous to
 	// break it now.
 	[string]: _
-	[int]:    _
+	[int]: _
+
+
+	// TODO: test allows once we know what it means in this case.
 }
 -- multi.cue --
 // evalv3 regression: closedness values and default markers were incorrectly
@@ -111,7 +115,7 @@ issue3638: full: {
 	}]
 	#Fields: {
 		input: _
-		output: [for x in input {x}]
+		output: [for x in input { x }]
 		...
 	}
 	#Kubernetes: {
@@ -140,10 +144,10 @@ issue3638: reduced: {
 	input: k1: [string]: a: 1
 	input: k1: foo: #x
 	out: {
-		for x in input {x}
-		for x in input {x}
+		for x in input { x }
+		for x in input { x }
 	}
-	#x: {a: int} | *{b: 2}
+	#x: { a: int } | *{ b: 2 }
 }
 // We expect that changing the pattern constraint into a field should give
 // not materially change the outcome.
@@ -151,10 +155,10 @@ issue3638: compare: {
 	input: k1: foo: a: 1
 	input: k1: foo: #x
 	out: {
-		for x in input {x}
-		for x in input {x}
+		for x in input { x }
+		for x in input { x }
 	}
-	#x: {a: int} | *{b: 2}
+	#x: { a: int } | *{ b: 2 }
 }
 -- out/compile --
 --- in.cue

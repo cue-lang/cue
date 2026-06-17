@@ -3,6 +3,7 @@ deployment: [string]: #Deployment
 
 deployment: foo: spec: replicas: 1
 
+
 #Deployment: {
 	#TypeMeta
 

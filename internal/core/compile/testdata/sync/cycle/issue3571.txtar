@@ -6,13 +6,14 @@
 simplified: {
 	#T
 	in: _
-	x:  #T
+	x: #T
 	x: x: #T
 
 	#T: {
 		in: x
-		x:  _
+		x: _
 	}
+
 }
 
 issue3571: {
@@ -29,6 +30,7 @@ issue3571: {
 		in:  #in
 		#in: _
 	}
+
 }
 -- out/compile --
 --- in.cue

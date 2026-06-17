@@ -3,13 +3,14 @@
 -- in.cue --
 p: [ID=string]: {name: ID}
 p: q: _
-A="foo=bar": "str" // TODO(inline): make this work @test(eq, at="foo=bar", "str")
+A="foo=bar": "str"   // TODO(inline): make this work @test(eq, at="foo=bar", "str")
 a:           A
 B=bb:        4
 b1:          B
 b1:          bb
 C="\(a)":    5
 c:           C
+
 -- out/compile --
 --- in.cue
 {

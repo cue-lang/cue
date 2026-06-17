@@ -1,35 +1,41 @@
 -- in.cue --
 embed: simple: {
 	#A: b: 1
-	a: {#A}
+	a: { #A }
 	a: err: 1
 }
 embed: andInStruct: {
 	#Foo: a: int
-	a: {#Foo & {err: 2}}
+	a: { #Foo & { err: 2 } }
+
 }
 embed: embedDefWithEmbedding: {
 	#Foo: {{a: int}}
-	a: {#Foo & {err: 2}} // not allowed
+	a: { #Foo & { err: 2 } } // not allowed
+
 }
 embed: embedComprehension: {
 	#Foo: {if true {a: int}}
-	a: {#Foo & {err: 2}} // not allowed
+	a: { #Foo & { err: 2 } } // not allowed
+
 }
 embed: fieldWithAnd: {
 	#A: {}
-	{a: #A & {err: 3}}
+	{ a: #A & {err: 3 } }
+
 }
 embed: embedAndRecursive: {
 	#A: a: int
-	B: x:  #A
-	B & {x: err: 2}
+	B: x: #A
+	B & { x: err: 2 }
+
 }
 embed: andEmbed: {
 	#A: b: int
 	#B: b: int
 	#D: {#A & #B}
 	d: #D & {err: 3}
+
 }
 and: transitive: ok: {
 	Z: {a: string}
@@ -38,6 +44,7 @@ and: transitive: ok: {
 	out: #X & {
 		a: "foo"
 	}
+
 }
 and: transitive: err: {
 	Z: a: string
@@ -54,6 +61,7 @@ and: transitiveWithEmbed: ok: {
 	out: #X & {
 		a: "foo"
 	}
+
 }
 and: transitiveWithEmbed: err: {
 	Z: a: string
@@ -62,30 +70,34 @@ and: transitiveWithEmbed: err: {
 	out: #X & {
 		err: "foo"
 	}
+
 }
 embed: nonDef: t1: {
 	X: a: string
 	#Y: #Z & X
 	#Z: {
 		X
-		b?: string
+		b?:    string
 	}
+
 }
 embed: defAndHidden: full: {
 	_stepCommon: Name: string
 	#Step: #Command & _stepCommon
 	#Command: {
 		_stepCommon
-		Path?: string
+		Path?:    string
 	}
 	out: #Step & {
 		Name: "foo"
 	}
+
 }
 embed: withIndirect: {
 	A: #B
 	#B: b: int
-	A & {err: 2} // not allowed
+	A & { err: 2 } // not allowed
+
 }
 -- validators.cue --
 import (
@@ -110,6 +122,7 @@ embed: openValidator: t1: {
 	}
 	x: #X
 	x: err: 1
+
 }
 embed: openValidator: t2: {
 	Y: matchN(1, [X])
@@ -124,6 +137,7 @@ disjunction: withErr: t1: {
 	}
 	#Schema1: b1?: null | #Schema2
 	#Schema2: b2?: null | {b3?: string}
+
 }
 embed: nestedValidator: {
 	#types: z?: list.UniqueItems
@@ -133,19 +147,21 @@ embed: nestedValidator: {
 		y?: #types
 	}
 	#def: {}
+
 }
 -- inline.cue --
 embedInline: {
 	#Schema: {
 		a: "hello"
 		// do not close outer struct of 'b', as inlined value is not a schema.
-		b: {{x: c: "foo"}.x}
+		b: { {x: c: "foo"}.x }
 		b: {
 			c: string
 			d: "never printed"
 		}
 	}
 	out: #Schema & __no_sharing
+
 }
 // evalv3 "field not allowed" regression involving embeddings and selectors;
 // accessing a field via selector on an embedded definition should stay open.
@@ -154,13 +170,14 @@ issue3853: {
 	#Schema: {
 		a: "hello"
 		// do not close outer struct of 'b', as inlined value is not a schema.
-		b: {{x: c: "foo"}.x}
+		b: { {x: c: "foo"}.x }
 		b: {
 			c: string
 			d: "never printed"
 		}
 	}
 	out: {x: (#Schema & {}).a}.x
+
 }
 -- disjunction.cue --
 import "list"
@@ -169,7 +186,7 @@ import "list"
 // are present; disallowed fields in a default disjunct should still be caught.
 // https://cuelang.org/issue/3947
 issue3947: full: {
-	#Schema: allowed?:     string
+	#Schema: allowed?: string
 	_defaults: disallowed: _ | *"default value"
 	out: #Schema & _defaults
 }
@@ -180,11 +197,13 @@ issue3957: reduced: {
 	c: a: "bar"
 	c: #B & {a: string | *"foo"}
 	#B: b?: string
+
 }
 issue3957: full: {
 	#oneof: {a: string} | {b?: [...string]}
 	c: #oneof & {a: string | *"foo"}
 	c: a: "bar"
+
 }
 issue3957: derived: t1: {
 	#Schema: {
@@ -192,6 +211,7 @@ issue3957: derived: t1: {
 		out: list.FlattenN([in], 1)
 	}
 	x: #Schema & {in: "foo"}
+
 }
 issue3957: derived: t2: {
 	#Schema: {
@@ -200,13 +220,14 @@ issue3957: derived: t2: {
 		out: _flat
 	}
 	out: #Schema & {in: "foo"}
+
 }
 -- issue3833.cue --
 // evalv3 "field not allowed" regression with embeddings; combining a definition
 // that has an open field with another definition via embedding should be allowed.
 // https://cuelang.org/issue/3833
 issue3833: ok: {
-	out: {#A & {a: #B}}
+	out: { #A & { a: #B } }
 	#A: {
 		a: {b: string, ...}
 		...
@@ -216,9 +237,10 @@ issue3833: ok: {
 		#C & {c: "foo"}
 		b: "foo"
 	}
+
 }
-issue3833: evalv2Issue: {
-	out: {#A & {a: #B}}
+issue3833: evalv2Issue:{
+	out: { #A & { a: #B } }
 	#A: {
 		a: b: string
 		...
@@ -228,6 +250,7 @@ issue3833: evalv2Issue: {
 		#C & {c: "foo"}
 		b: "foo"
 	}
+
 }
 -- issue3837.cue --
 // evalv3 regression with embeddings, disjunctions, and extra fields; a struct
@@ -238,8 +261,9 @@ issue3837: reduced: {
 		#Embed
 		extra: "foo"
 	}
-	out: {{x: A & __no_sharing}}
+	out: {{ x: A & __no_sharing }}
 	#Embed: {}
+
 }
 issue3837: full: {
 	#Embed: {}
@@ -255,6 +279,7 @@ issue3837: full: {
 			#def: (#A & __no_sharing)
 		}
 	}
+
 }
 -- issue3832.cue --
 // evalv3 "field not allowed" regression with a disjunction and a let field;
@@ -265,7 +290,7 @@ issue3832: {
 
 	#T: {
 		_subject: {
-			in: _
+			in:  _
 			out: {
 				let self = in.self
 				outFirstName: self.firstName
@@ -279,26 +304,32 @@ issue3832: {
 			invoke!: _
 			// TODO: here, the let from _subject.out gets converted to a
 			// permanent error,instead of incomplete.
-			pass: (_subject & {in: invoke}).out
+			pass:    (_subject & {in: invoke}).out
 		}
 		results: _assert.pass
 	}
 	#T & {
 		_assert: invoke: _person
 	}
+
 }
 -- issue3839.cue --
 // evalv3 closedness regression with embeddings and definitions; embedding a
 // definition with an ellipsis inside a non-definition should remain open.
 // https://cuelang.org/issue/3839
 issue3839: reduced: {
-	x: {A & __no_sharing}
+	x: { A & __no_sharing }
 	x: y: 1
-	#B: {}
+	#B: {
+		// Note: true with both old semantics and explicitopen
+	}
 	A: {
 		#B
 		...
+
+		// Note: true with both old semantics and explicitopen
 	}
+
 }
 issue3839: full: {
 	_globals: glb: globalField: ""
@@ -326,6 +357,7 @@ issue3839: full: {
 		#Embed
 		...
 	}
+
 }
 -- chaineddef.cue --
 // evalv3 "field not allowed" regression when embedding a chain of definitions;
@@ -339,15 +371,18 @@ issue3920: {
 	}
 	#A: a?: #B
 	#B: c?: string
+
 }
 onlyCloseDirectStruct: {
 	#foo: {}
 	x: {y: {{a: #foo}}}
 	x: y: b: 1
+
 }
 closeInEmbed: {
 	x: {close({{["d"]: f: int}})}
 	x: d: e: 1
+
 }
 -- embedelim.cue --
 // evalv3 "field not allowed" regression with nested definitions; eliminating
@@ -358,12 +393,14 @@ issue3921: top: {
 	#A: b: string
 	#B: _
 	a: {#A & {}}
+
 }
 issue3921: hidden: {
 	#A: #B
 	#A: _hidden: b: string
 	#B: {}
-	a: {#A & {_hidden: {}}}
+	a: { #A & { _hidden: {} }}
+
 }
 issue3921: full: {
 	out: #templateList & #defineMap
@@ -380,9 +417,10 @@ issue3921: full: {
 	}
 	#Step: #StepInner & {
 		image: string
-		#config: version: string
+		#config: version:   string
 	}
 	#StepInner: image: string
+
 }
 -- issue3843.cue --
 // evalv3 "field not allowed" regression when a definition is reused at
@@ -395,8 +433,9 @@ dedupPattern: t1: p1: {
 		x: #Z
 		x: y: z: 1
 	}
-	B:   A & __no_sharing
+	B: A & __no_sharing
 	out: A.#Z & B.x
+
 }
 dedupPattern: t1: p2: {
 	A: {
@@ -404,8 +443,9 @@ dedupPattern: t1: p2: {
 		x: #Z
 		x: y: z: 1
 	}
-	B:   A & __no_sharing
+	B: A & __no_sharing
 	out: B.x & A.#Z
+
 }
 -- issue3858.cue --
 // evalv3 "field not allowed" regression with embeddings where a definition
@@ -422,34 +462,36 @@ orig: t1: {
 	#Job: {
 		image: string
 		vcs:   "git"
-		args: [...string]
-		env: [string]: string
+		args:  [...string]
+		env:   [string]: string
 	}
 
 	#Output: {
-		_in: _
-		out: (_in & {})
+		_in:  _
+		out:  (_in & {})
 	}
 	#Output & {
 		_in: (#JobConfig & {}).job
 	}
+
 }
 reduced: t1: {
 	Y: {
 		a: e: "foo"
-		b: X & {a}
+		b: X & { a }
 	}
 	X: {
 		e: string
 		f: 1 // fails in `out`
 	}
 	#Z: {
-		_in: _
-		out: _in & __no_sharing
+		_in:  _
+		out:  _in & __no_sharing
 	}
 	#Z & {
 		_in: Y
 	}
+
 }
 orig: t2: {
 	#JobConfig: {
@@ -469,21 +511,23 @@ orig: t2: {
 	out: #Output & {
 		in: input: (#JobConfig & {}).job
 	}
+
 }
 reduced: t2: {
 	Y: {
 		a: e: "foo"
-		b: X & {a}
+		b: X & { a }
 	}
 	X: {
 		e: string
 		f: 1 // fails
 	}
 	#Z: {
-		_in: _
-		out: _in
+		_in:  _
+		out:  _in
 	}
-	#Z & {_in: Y}
+	#Z & { _in: Y }
+
 }
 -- issue3934.cue --
 // evalv3 "field not allowed" regression with disjunctions and a comprehension;
@@ -499,9 +543,10 @@ issue3934: {
 	}
 	#Foo: foo?: null | #Bar | *{bar: 3}
 	#Bar: {
-		bar?: int
+		bar?:   int
 		extra?: null | {...}
 	}
+
 }
 -- large.cue --
 full: {
@@ -550,15 +595,17 @@ full: {
 		}
 	}
 	out: (#Main & {namespace: "ns1"}).output
+
 }
 -- ellipsis.cue --
 nestedEllipsis: minimal: {
-	out: #Schema & {extra: "foo"}
+	out: #Schema & { extra: "foo" }
 	#Schema: {
 		#meta
 		...
 	}
 	#meta: {}
+
 }
 nestedEllipsis: nestedWithPatterns: {
 	out: #Schema & {
@@ -572,12 +619,13 @@ nestedEllipsis: nestedWithPatterns: {
 		#meta: name?: int
 		objs?: _
 	}
+
 }
 // evalv3 "field not allowed" regression with ellipses since v0.13.0; embedding
 // a schema with `...` alongside additional fields should not close the struct.
 // https://cuelang.org/issue/4015
 issue4015: reduced: {
-	#X: {...}
+	#X: { ... }
 	out: {
 		// Embedded schema allows `a: _`. Adding `a` below should not change that.
 		#X
@@ -589,9 +637,10 @@ issue4015: reduced: {
 			b: "x"
 		}
 	}
+
 }
 issue4015: nested: {
-	#X: {foo: {...}}
+	#X: { foo: {...} }
 	out: {
 		#X
 		foo: {a: b: string}
@@ -602,12 +651,13 @@ issue4015: nested: {
 			b: "x"
 		}
 	}
+
 }
 issue4015: full: {
 	#Schema: {
 		cfg: {
 			foo: {
-				enabled:  bool | *false
+				enabled:    bool | *false
 				fooField: string
 			}
 			bar: barField: string
@@ -630,33 +680,40 @@ issue4015: full: {
 			foo: fooField: "h"
 			bar: barField: "x"
 		}
+
+		// This one is rather confusing, but true. Note that this should no
+		// longer hold if this is converted to the explicitopen semantics, in
+		// which case #Schema applies "monotonically" limiting to its fields.
 	}
+
 }
 -- issue3964.cue --
 // evalv3 closedness regression since v0.13.1; a definition that embeds another
 // definition containing a disjunction should correctly allow matching fields.
 // https://cuelang.org/issue/3964
 issue3964: reduced: {
-	#Output: {#Embedded}
+	#Output: { #Embedded }
 	#Embedded: {
 		name: string
 		#Unused | #Used
 	}
 	#Unused: {}
 	#Used: {}
+
 }
 issue3964: full: {
 	out: #Output & {
 		name: "oauth2"
 		used: "bar"
 	}
-	#Output: {#Embedded}
+	#Output: { #Embedded }
 	#Embedded: {
 		name: string
 		#Unused | #Used
 	}
 	#Unused: unused: string
-	#Used: used:     string
+	#Used: used: string
+
 }
 -- cycle.cue --
 // evalv3 stack overflow due to latest closedness changes; mutually recursive
@@ -667,9 +724,10 @@ issue4006: {
 		#B
 		fieldA: string
 	}
-	#B: {#A}
+	#B: { #A }
 	#C: #A & {}
 	out: #C & #B
+
 }
 -- out/compile --
 --- chaineddef.cue

@@ -2,14 +2,16 @@
 circularIf: {
 	#list: {
 		tail: #list | *null
-		if tail != null {}
+		if tail != null {
+		}
 	}
 }
 
 circularFor: {
 	#list: {
 		tail: #list | *null
-		for x in tail != null {}
+		for x in tail != null {
+		}
 	}
 }
 
@@ -17,12 +19,14 @@ circularFor: {
 // Issue #465
 userError: {
 	a: string | *_|_
-	if a != "" {}
+	if a != "" {
+	}
 }
 
 intField: {
 	for i, _ in [1, 2] {
-		(i): {}
+		(i): {
+		}
 	}
 }
 

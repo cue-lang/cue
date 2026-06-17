@@ -1,18 +1,19 @@
 -- in.cue --
 #def: {
-	{} | {c: string}
-	{} | {c: string}
-	{} | {c: string}
-	{} | {c: string}
-	{} | {c: string}
-	{} | {c: string}
-	{} | {c: string}
-	{} | {c: string}
-	{} | {c: string}
-	{} | {a: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {a: string}
 }
 x: #def
 x: c: "foo"
+
 -- out/compile --
 --- in.cue
 {

@@ -10,9 +10,9 @@ b: {
 	val:  string
 }
 
-d: b & {val: 3}
+d: b & {val:  3}
 c: b & {name: "int", val: 3}
-e: b & {val: "foo"}
+e: b & {val:  "foo"}
 f: b & {name: "str", val: 3}
 
 // Disjunct elimination based on type.
@@ -22,32 +22,32 @@ e1: {
 }
 
 d1: {
-	a: (null | {c: 1}) & {}
+	a: (null | {c:      1}) & {}
 	b: {} & (null | {c: 1})
 }
 
 d2: {
-	a: ([...] | {c: 1}) & {}
+	a: ([...] | {c:      1}) & {}
 	b: {} & ([...] | {c: 1})
 }
 
 d3: {
-	a: (string | {c: 1}) & {}
+	a: (string | {c:      1}) & {}
 	b: {} & (string | {c: 1})
 }
 
 d4: {
-	a: (string | {c: 1}) & {}
+	a: (string | {c:      1}) & {}
 	b: {} & (string | {c: 1})
 }
 
 d5: {
-	a: (number | {c: 1}) & {}
+	a: (number | {c:      1}) & {}
 	b: {} & (number | {c: 1})
 }
 
 d6: {
-	a: (int | {c: 1}) & {}
+	a: (int | {c:      1}) & {}
 	b: {} & (int | {c: 1})
 }
 
@@ -84,12 +84,12 @@ t11: p1: {
 	a: #A
 	a: b
 
-	b: #A & ["b"]
+	b:  #A & ["b"]
 	#A: ["a" | "b"] | {}
 }
 
 t11: p2: {
-	b: #A & ["b"]
+	b:  #A & ["b"]
 	#A: ["a" | "b"] | {}
 
 	a: b
@@ -141,9 +141,9 @@ issue641: {
 // embedded via a disjunction field.
 // https://cuelang.org/issue/3406
 issue3406: {
-	out: d & {d}
+	out: d & { d }
 	d: kind: "foo" | "bar"
-	d: {kind: "foo"} | {kind: "bar"}
+	d: { kind: "foo" } | { kind: "bar" }
 }
 -- issue3411.cue --
 // evalv3 nil pointer dereference when unifying optional fields with defaults.
@@ -156,12 +156,12 @@ issue3411: {
 // evalv3 "incDependent: already closed" panic regression involving disjunctions.
 // https://cuelang.org/issue/3490
 issue3490: nested: p1: {
-	("a" | "b") | "b"
-	"a" | "b"
+	("a"|"b") | "b"
+	"a"|"b"
 }
 issue3490: nested: p2: {
-	"a" | "b"
-	("a" | "b") | "b"
+	"a"|"b"
+	("a"|"b") | "b"
 }
 issue3490: full: {
 	data: [...#Schema]
@@ -230,6 +230,7 @@ issue3606: {
 	} & #S
 
 	#S: string | {}
+
 }
 
 // evalv3 gives a different result vs evalv2 when openinline is enabled; list
@@ -246,7 +247,7 @@ issue3672: {
 
 	// The unification inline appears to be critical
 	#def: (#fn & {}).#out
-
+	
 	v: #def
 	v: x: [{y: true}] // Should be one element
 }
@@ -258,7 +259,7 @@ issue3681: {
 	out: one: #strDefaultDef
 	out: two: "\(strDefault)"
 
-	strDefault:     *"fallback" | string
+	strDefault: *"fallback" | string
 	#strDefaultDef: strDefault
 }
 // evalv3 "undefined field" regression when a comprehension condition references
@@ -266,19 +267,19 @@ issue3681: {
 // https://cuelang.org/issue/3699
 issue3699: {
 	reduced: p1: {
-		y: {if x.z {1}}
+		y: { if x.z { 1 } }
 		x: *{z: true} | {}
 	}
 	reduced: p2: {
-		y: {if x.z {1}}
+		y: { if x.z { 1 } }
 		x: *{z: true} | {}
 	}
 	reduced: full: {
 		_res: {
 			_fooTrue: {} | *{foo: true}
 			_msgSwitch: [
-				if _fooTrue.foo {msg: "foo"},
-				{msg: "bar"},
+				if _fooTrue.foo { msg: "foo" },
+				{ msg: "bar" },
 			][0]
 			out: _msgSwitch.msg
 		}
@@ -292,7 +293,7 @@ issue3699: {
 import "math/bits"
 
 indexElimination: {
-	inStruct: x: {a: *x[0] | 0}.a
+	inStruct: x: { a: *x[0] | 0 }.a
 	inList1: x: [x[0]][0]
 	inList2: x: [*x[0] | 0][0]
 	// evalv3 strange behavior with chaining of list comprehensions,
@@ -310,20 +311,20 @@ indexElimination: {
 // a string interpolation references an optional field inside a disjunction.
 // https://cuelang.org/issue/3899
 issue3899: reduced: {
-	b:  c+"" | string
+	b: c + "" | string
 	c?: string
 }
 issue3899: full: {
 	out: #Schema & {
 		name: "foo"
-	}
-	#Schema: {
-		_versions: foo: "123"
-		spec: limits:   true
-		name!: string
-		spec: image: string | *"\(name)"
-		deployImage: _versions[spec.image]
-	}
+   }
+   #Schema: {
+	   _versions: foo: "123"
+	   spec: limits: true
+	   name!: string
+	   spec: image: string | *"\(name)"
+	   deployImage: _versions[spec.image]
+   }
 }
 -- issue3891.cue --
 // evalv3 "incomplete value" regression with repeated disjunctions where a
@@ -343,13 +344,13 @@ issue3891: full: {
 		_input: (_transform & {in: sub1: sub2: "bar"}).out
 	}
 	_transform: {
-		in:  _
+		in: _
 		out: in
 	}
 	#Foo: foo?: _
 	_fooTemplate: {
 		_input: _
-		foo:    *_input.sub1.sub2 | _
+		foo: *_input.sub1.sub2 | _
 	}
 }
 -- out/compile --

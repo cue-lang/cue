@@ -7,7 +7,7 @@ language: version: "v0.17.0"
 // Without @experiment(shortcircuit), both operands are always evaluated.
 // Errors on the right side propagate even when left would short-circuit.
 noExpAnd: false && _|_
-noExpOr:  true || _|_
+noExpOr:  true  || _|_
 -- out/compile --
 --- in.cue
 {

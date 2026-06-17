@@ -2,7 +2,8 @@
 comprehensions: {
 	a: {}
 	b: {
-		if a.b {}
+		if a.b {
+		}
 	}
 	c: {
 		for x in a.b {x}
@@ -26,7 +27,7 @@ indexOnTop: {
 
 incompleteIndex: {
 	top: _
-	a: [1][top]
+	a:   [1][top]
 }
 -- out/compile --
 --- in.cue

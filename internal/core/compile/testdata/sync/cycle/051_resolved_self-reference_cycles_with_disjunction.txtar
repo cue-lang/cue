@@ -47,7 +47,7 @@ xc4: xc2 + 1
 xc5: xc2 + 2
 
 // The below is resolved by setting xd1 explicitly.
-xd1: xd2 & 8 | xd4 & 9 | xd5 & 9 // 8 see below
+xd1: xd2 & 8 | xd4 & 9 | xd5 & 9  // 8 see below
 xd2: xd3 + 2
 xd3: 6 & xd1-2
 xd4: xd2 + 1

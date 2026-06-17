@@ -4,7 +4,7 @@ issue3801: let: reduced: {
 	let F = {
 		base: {
 			in: string
-			let X = {a: "\(in)"}.a
+			let X = {a: "\(in)" }.a
 			out: X
 		}
 		filled: base & {in: "foo"} // failure is here
@@ -88,6 +88,8 @@ issue3801: nonRooted: full: {
 
 		patch: _
 		output: (namespace): patch
+
+		// TODO(eval): our message is substituted as a string instead of being wrapped as an error.
 	}
 
 	#Base: {

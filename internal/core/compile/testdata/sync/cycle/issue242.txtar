@@ -3,7 +3,7 @@
 # must differ from its neighbors).
 # https://cuelang.org/issue/242
 -- in.cue --
-#size:      2
+#size:     2
 #CellValue: 0 | 1 | 2 | 3
 cell: "0": "0": #CellValue
 cell: "0": "0": !=cell["0"]["1"]

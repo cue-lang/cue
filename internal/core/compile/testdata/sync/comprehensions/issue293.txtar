@@ -11,11 +11,11 @@
 		})
 	}
 	x: _
-	// All tests here should pass and the result of the okcN tests should be
-	// identical to those of the okoN tests.
-	// Should Field s exist in okc or not? Depends on whether comparison to bottom
-	// is recursive or not. It probably should not.
-	// TODO: fix for new evaluator. But possibly address this with new builtins.
+// All tests here should pass and the result of the okcN tests should be
+// identical to those of the okoN tests.
+// Should Field s exist in okc or not? Depends on whether comparison to bottom
+// is recursive or not. It probably should not.
+// TODO: fix for new evaluator. But possibly address this with new builtins.
 }
 z: #T & {
 	x: {
@@ -24,21 +24,24 @@ z: #T & {
 	}
 }
 
+
 t: #C
 #C: {
 	if true {
 		p: _
-		// Comparing to string is not an error. But for legacy reasons we want to still
-		// support this. We intend to have more clean and precise behavior with the
-		// builtins isdefined, isvalid, and isconcrete.
+// Comparing to string is not an error. But for legacy reasons we want to still
+// support this. We intend to have more clean and precise behavior with the
+// builtins isdefined, isvalid, and isconcrete.
 	}
 }
 t: p: "foo"
+
 -- variant1.cue --
 #V1: {
-	x: close({f1: int})
+	x: close({ f1: int })
 	x: f2: 2
 }
+
 -- out/compile --
 --- in.cue
 {

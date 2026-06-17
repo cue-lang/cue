@@ -10,13 +10,13 @@ package foo
 // Field-attribute form: hidden field in both value and expected passes.
 hiddenInBoth: {
 	_secret: 42
-	a:       _secret + 1
+	a: _secret + 1
 }
 
 // Decl-attribute form.
 hiddenDeclForm: {
 	_secret: "x"
-	b:       _secret + _secret
+	b: _secret + _secret
 }
 
 // Hidden definition field in both value and expected.
@@ -29,6 +29,7 @@ hiddenDefInBoth: {
 
 // No hidden fields on either side: passes trivially.
 noHidden: {a: 1, b: 2}
+
 -- out/compile --
 --- in.cue
 {

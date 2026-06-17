@@ -26,12 +26,12 @@ Old1: {
 
 useNewClosed1: {
 	t1: err: NewClosed1 & {c: 3}
-	t2: ok: {NewClosed1, c: 3}
+	t2: ok:  {NewClosed1, c: 3}
 }
 
 useNewClosed2: {
 	t1: err: #NewClosed2 & {c: 3}
-	t2: ok: {#NewClosed2, c: 3}
+	t2: ok:  {#NewClosed2, c: 3}
 }
 
 useNewOpen1: {
@@ -56,8 +56,8 @@ combineold: {
 	b0: ok: Old1 & #NewClosed2
 	b1: ok: #Old2 & #NewClosed2
 
-	c1: ok: {#NewClosed2, Old1}
-	c2: ok: {#NewClosed2, #Old2}
+	c1: ok: {#NewClosed2,  Old1}
+	c2: ok: {#NewClosed2,  #Old2}
 
 	// {a: 1} and {a: 1, b: 2}
 	e0: err: #A & Old1
@@ -81,6 +81,7 @@ combineold: {
 	f7: ok: {NewClosed1, #NewClosed2}
 	f8: ok: {NewClosed1, NewOpen1}
 }
+
 -- new.cue --
 @experiment(explicitopen)
 
@@ -105,13 +106,13 @@ NewOpen2: #A...
 useOld1: {
 	t1: err: Old1 & {c: 3}
 	t2: err: {Old1, c: 3} // TODO
-	t3: ok: {Old1..., c: 3}
+	t3: ok:  {Old1..., c: 3}
 }
 
 useOld2: {
 	t1: err: #Old2 & {c: 3}
 	t2: err: {#Old2, c: 3}
-	t3: ok: {#Old2..., c: 3}
+	t3: ok:  {#Old2..., c: 3}
 }
 
 combinenew: {
@@ -133,24 +134,24 @@ combinenew: {
 	b2: ok: #NewClosed2 & Old1
 	b3: ok: #NewClosed2 & #Old2
 
-	c1: ok: {#NewClosed2, Old1}
-	c2: ok: {#NewClosed2, #Old2}
+	c1: ok: {#NewClosed2,  Old1}
+	c2: ok: {#NewClosed2,  #Old2}
 	c3: ok: {Old1, #NewClosed2}
 	c4: ok: {#Old2, #NewClosed2}
 
-	d0: ok: {#NewClosed2, Old1...}
-	d1: ok: {#NewClosed2, #Old2...}
-	d2: ok: {#NewClosed2..., Old1}
-	d3: ok: {#NewClosed2..., #Old2}
-	d4: ok: {#NewClosed2..., Old1...}
-	d5: ok: {#NewClosed2..., #Old2...}
+	d0: ok: {#NewClosed2,  Old1...}
+	d1: ok: {#NewClosed2,  #Old2...}
+	d2: ok: {#NewClosed2...,  Old1}
+	d3: ok: {#NewClosed2...,  #Old2}
+	d4: ok: {#NewClosed2...,  Old1...}
+	d5: ok: {#NewClosed2...,  #Old2...}
 
 	d6: ok: {Old1..., #NewClosed2}
 	d7: ok: {#Old2..., #NewClosed2}
-	d8: ok: {Old1, #NewClosed2...}
-	d9: ok: {#Old2, #NewClosed2...}
-	d10: ok: {Old1..., #NewClosed2...}
-	d11: ok: {#Old2..., #NewClosed2...}
+	d8: ok: {Old1, #NewClosed2...,}
+	d9: ok: {#Old2, #NewClosed2...,}
+	d10: ok: {Old1..., #NewClosed2...,}
+	d11: ok: {#Old2..., #NewClosed2...,}
 
 	// {a: 1} and {a: 1, b: 2}
 	e0: err: #A & Old1
@@ -172,7 +173,7 @@ combinenew: {
 	f1: err: NewClosed1 & #Old2
 	f2: err: NewClosed1 & #NewClosed2
 	f3: err: NewClosed1 & NewOpen1
-	f4: ok:  NewClosed1 & NewClosed1
+	f4: ok: NewClosed1 & NewClosed1
 
 	f5: err: {NewClosed1, Old1}
 	f6: err: {NewClosed1, #Old2}
@@ -180,7 +181,7 @@ combinenew: {
 	f8: err: {NewClosed1, NewOpen1}
 	f9: ok: {NewClosed1, NewClosed1}
 
-	f9: ok: {NewClosed1..., Old1}
+	f9: ok:  {NewClosed1..., Old1}
 	f10: ok: {NewClosed1..., #Old2}
 	f11: ok: {NewClosed1..., NewClosed1}
 	f12: ok: {NewClosed1..., #NewClosed2}
@@ -190,11 +191,10 @@ combinenew: {
 	f15: err: #Old2 & NewClosed1
 	f16: err: #NewClosed2 & NewClosed1
 	f17: err: NewOpen1 & NewClosed1
-	f18: ok:  NewClosed1 & NewClosed1
+	f18: ok: NewClosed1 & NewClosed1
 }
 -- issues.cue --
 @experiment(explicitopen)
-
 // explicitopen experiment: postfix `...` spread cannot directly combine with
 // `&`; tests open-struct spread behavior and non-struct operand tolerance.
 // https://cuelang.org/issue/4150
@@ -202,8 +202,8 @@ issue4150: {
 	#Def: a: int
 
 	x: #Def... & {
-		a: 42
-		b: 42
+			a: 42
+			b: 42
 	}
 
 	foo: {a: int}

@@ -17,6 +17,8 @@ withError: {
 	// Panic when running cue eval with a struct used in a string interpolation.
 	// https://cuelang.org/issue/799
 	issue799: {key: int32} & {"\(1 & 2)": 123}
+	// TODO(inline): access _wrapped_ error somehow: underlying error is
+	// "conflicting values 2 and 1".
 }
 
 parenExprRefParent: {
@@ -30,7 +32,7 @@ parenExprRefEqual: {
 chainedResolution: x: {
 	(x.baz): "bar"
 	(x.foo): "baz"
-	baz:     "foo"
+	baz: "foo"
 }
 
 // A dynamic field key that references an incomplete value (string interpolation
@@ -43,7 +45,9 @@ noCycleError: {
 	}
 	foo: bar: entries: (foo.baz.#ID): true
 	foo: baz: {}
+
 }
+
 -- constraints.cue --
 constraints: {
 	t1: "foo"
@@ -57,7 +61,7 @@ constraints: {
 issue3828: reduced: {
 	a: b: {}
 	a: [_]: {
-		if true let x = str {
+		if true let x=str {
 			(x): true
 		}
 	}

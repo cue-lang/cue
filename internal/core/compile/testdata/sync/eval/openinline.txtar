@@ -23,7 +23,7 @@ inlineErr: {
 // struct in OpenInline.
 outerErr: {
 	_inToOut: {
-		in:  _
+		in: _
 		out: in.foo
 	}
 
@@ -35,7 +35,7 @@ outerErr: {
 	// https://cuelang.org/issue/3534
 	issue3534: {
 		#Inner: foo: minor: 2
-		#Outer: version: {major: 1, ...}
+		#Outer: version: { major: 1, ... }
 
 		t1: #Outer
 		t1: version: (_inToOut & {in: #Inner}).out
@@ -44,8 +44,8 @@ outerErr: {
 	// Test that the same principle works with the close builtin.
 	usingClose: {
 		// Same as above, but with an additional level of nesting.
-		#Inner: foo: close({minor: 2})
-		#Outer: version: {major: 1, ...}
+		#Inner:  foo: close({minor: 2})
+		#Outer: version: { major: 1, ... }
 
 		t1: #Outer
 		t1: version: (_inToOut & {in: #Inner}).out
@@ -56,7 +56,7 @@ outerErr: {
 	extraNesting: {
 		// Same as above, but with an additional level of nesting.
 		#Inner: foo: x: minor: 2
-		#Outer: version: x: {major: 1, ...}
+		#Outer: version: x: { major: 1, ... }
 
 		t1: #Outer
 		t1: version: (_inToOut & {in: #Inner}).out
@@ -76,6 +76,7 @@ refFromLet: {
 	}
 	x: (X.#E).b
 }
+
 -- cue.mod/pkg/foo.com/example/example.cue --
 package example
 

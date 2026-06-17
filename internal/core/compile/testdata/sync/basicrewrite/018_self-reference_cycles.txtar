@@ -9,14 +9,14 @@ e: 1 + d
 e: *2 | 0
 -- disjunction.cue --
 oneway: {
-	t1: {
-		a: *1 | int
-		a: b + 1
-		b: <a
-	}
-	t2: t1 & {
-		a: 3
-	}
+    t1: {
+        a: *1 | int
+        a: b + 1
+        b: <a
+    }
+    t2: t1 &{
+        a: 3
+    }
 }
 // This should report a cycle error. TODO: this should also resolve.
 issue3669: {
@@ -34,31 +34,31 @@ issue3669: {
 // disjunction and a derived field value.
 // https://cuelang.org/issue/3737
 issue3737: reduced1: {
-	#A: {
-		a: b * 12
-		b: a / 12
-	}
+    #A: {
+        a: b * 12
+        b: a / 12
+    }
 
-	x: #A
-	x: b: 1000.0
+    x: #A
+    x: b: 1000.0
 
-	y: #A | *x
-	y: b: x.b * 0.7
+    y: #A | *x
+    y: b: x.b * 0.7
 }
 issue3737: reduced2: {
-	x: #TimeSpan & {
-		start: y.start
-		end:   1000.0
-	}
-	y: #TimeSpan & {
-		duration: 100.0
-		end:      x.end
-	}
-	#TimeSpan: {
-		start:    end - duration
-		duration: end - start
-		end:      start + duration
-	}
+    x: #TimeSpan & {
+        start: y.start
+        end: 1000.0
+    }
+    y: #TimeSpan & {
+        duration: 100.0
+        end: x.end
+    }
+    #TimeSpan: {
+        start:    end - duration
+        duration: end - start
+        end:      start + duration
+    }
 }
 -- out/compile --
 --- disjunction.cue

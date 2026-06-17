@@ -8,12 +8,12 @@ commands: {
 	}
 }
 out: """
-	a is \(a)
-	b is \(b)
+    a is \(a)
+    b is \(b)
 
-	c is \(commands.#c.help)
-	d is \(commands.#d.help)
-	"""
+    c is \(commands.#c.help)
+    d is \(commands.#d.help)
+    """
 -- out/compile --
 --- in.cue
 {

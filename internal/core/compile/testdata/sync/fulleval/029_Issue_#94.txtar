@@ -9,7 +9,7 @@ foo: {
 	regular: 4
 	_hidden: 5
 }
-comp: {for k, v in foo {"\(k)": v}}
+comp: { for k, v in foo {"\(k)": v} }
 select: {
 	opt:     foo.opt
 	"txt":   foo.txt

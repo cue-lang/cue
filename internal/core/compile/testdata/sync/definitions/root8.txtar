@@ -1,12 +1,13 @@
 -- in.cue --
 root: input: foo: {
-	metadata: name: *"foo" | string
-	id: "id-\(metadata.name)"
-	#deps: [string]: _
-	#deps: root: {}
-	spec: replicas: 1
+    metadata: name: *"foo" | string
+    id: "id-\(metadata.name)"
+    #deps: [string]: _
+    #deps: root: {}
+    spec: replicas: 1
 }
 {root.input.foo.#deps}
+
 -- out/compile --
 --- in.cue
 {

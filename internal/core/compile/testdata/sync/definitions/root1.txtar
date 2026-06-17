@@ -2,7 +2,8 @@
 // Test embedding at root of file
 root1: 1
 #Root1: x: {}
-#Root1 & {}
+#Root1 & { }
+
 -- out/compile --
 --- in.cue
 {

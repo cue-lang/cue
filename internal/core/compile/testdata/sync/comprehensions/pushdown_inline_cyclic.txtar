@@ -13,7 +13,7 @@ import "list"
 
 #NS: [KIND=string]: [string]: {
 	mon: list.Contains(["sm"], KIND)
-	n: "\(mon)"
+	n:   "\(mon)"
 }
 
 #Foo: {
@@ -27,7 +27,7 @@ import "list"
 }
 
 _fake: x: #Foo & {
-	A: obj: (#NS & {dep: obj: {}}).dep.obj
+	A:   obj: (#NS & {dep: obj: {}}).dep.obj
 	IMP: x: out: []
 }
 

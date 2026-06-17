@@ -3,7 +3,7 @@ a: close({
 	a: b: int
 })
 
-b: a & {x: int}    // err
+b: a & {x: int} // err
 c: a & {a: c: int} // okay (non-recursive close)
 
 inDisjunctions: {
@@ -16,6 +16,7 @@ inDisjunctions: {
 	x: socket: string: {}
 	x: syslog: x.socket
 	x: syslog: xxx: {}
+
 }
 
 // issue642: Tests that close() with merged struct patterns (concrete fields and
@@ -30,6 +31,7 @@ issue642: {
 
 	test: a: x: _
 	test: b: x: _
+
 }
 
 // Issue 642
@@ -42,16 +44,17 @@ withSubfields: {
 
 	test: a: x: _
 	test: b: x: _
+
 }
 
 // issue3572: Tests that close({...}) allows additional fields when unified
 // with an open struct. https://cuelang.org/issue/3572
 issue3572: {
-	t1: close({...}) & {a: 5}
+  t1: close({...}) & {a: 5}
 
-	e: close({...}) // TODO: @test(allows=expr)
+  e: close({...}) // TODO: @test(allows=expr)
 
-	t2: e & {a: 5}
+  t2: e & {a: 5}
 }
 
 // issue3580: Tests that close() does not panic when a field inside the closed
@@ -64,27 +67,30 @@ issue3580: {
 }
 -- embed.cue --
 nestedEmbedded: base: {
-	close({foo?: close({foo?: _})})
+	close({ foo?: close({ foo?: _ }) })
 	foo: allowed: 5
+
 }
 nestedEmbedded: t1: {
-	{close({foo?: close({foo?: _})})}
+	{ close({ foo?: close({ foo?: _ }) }) }
 	foo: allowed: 5
+
 }
 nestedEmbedded: t2: {
-	{{close({foo?: close({foo?: _})})}}
+	{{ close({ foo?: close({ foo?: _ }) }) }}
 	foo: allowed: 5
+
 }
 unified: base: {
-	x: close({foo?: close({foo?: _})})
+	x: close({ foo?: close({ foo?: _ }) })
 	x: foo: disallowed: 5
 }
 unified: t1: {
-	x: {close({foo?: close({foo?: _})})}
+	x: { close({ foo?: close({ foo?: _ }) }) }
 	x: foo: disallowed: 5
 }
 unified: t2: {
-	x: {{close({foo?: close({foo?: _})})}}
+	x: {{ close({ foo?: close({ foo?: _ }) }) }}
 	x: foo: disallowed: 5
 }
 nestedWithSelfReference: t1: {

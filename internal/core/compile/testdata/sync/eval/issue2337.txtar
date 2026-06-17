@@ -7,7 +7,7 @@
 // evalv2 failed with the confusing error "x: was already used"
 // rather than a friendlier "conflicting values" error.
 simple: {
-	x: "x"
+	x:   "x"
 
 	(x): "foo"
 }

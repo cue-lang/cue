@@ -9,6 +9,7 @@ issue3062: ok1: {
 	o: X
 	X: x: A
 	A: "a"
+
 }
 
 // evalv3 "field not allowed" regression from v2 involving structure sharing
@@ -18,6 +19,7 @@ issue3601: ok1: {
 	Y: (X & __no_sharing).a
 	X: a: b: a.b
 	out: Y & __no_sharing
+
 }
 
 // Test debug facilities to turn of sharing.
@@ -64,6 +66,7 @@ issue3641: simplified: t1: {
 	// order matters
 	out: Config // Indirection necessary.
 	out: #Config3
+
 }
 issue3641: simplified: t2: {
 	#Context1: {ctx: {}}
@@ -80,6 +83,7 @@ issue3641: simplified: t2: {
 	// order matters
 	out: Config // Indirection necessary.
 	out: #Config3
+
 }
 // Variant where sharing is explicitly disabled.
 issue3641: simplified: t3: {
@@ -98,6 +102,7 @@ issue3641: simplified: t3: {
 	out: __no_sharing
 	out: Config // Indirection necessary.
 	out: #Config3
+
 }
 issue3641: full: {
 	#Context1: {ctx: {}}
@@ -114,6 +119,7 @@ issue3641: full: {
 	out: #Schema & {
 		sch: config
 	}
+
 }
 // "field not allowed" evalv3 regression with lists: a list value shared from
 // a definition constraint was incorrectly rejected in a regular field.
@@ -130,6 +136,7 @@ issue3546: reduced: {
 
 	out: #Network
 	out: val
+
 }
 -- sharecycle.cue --
 shareCycle: t1: {
@@ -161,7 +168,8 @@ issue3679: {
 	// "unshared" within the disjunction. Ensure that unsharing a shared Vertex
 	// works arcross disjunction boundaries.
 	b: null | [string]
-	b: list.Repeat([for k, v in [0] {"bar"}], 1)
+	b: list.Repeat([for k, v in [0] { "bar" }], 1)
+
 }
 -- issue3835.cue --
 // evalv3 regression with "cycle with field" error involving a comprehension
@@ -177,6 +185,7 @@ issue3835: {
 			out: "prefix: " + orgBotUser
 		}
 	}
+
 }
 -- pendingarcs.cue --
 pending: t1: {
@@ -186,6 +195,7 @@ pending: t1: {
 	}
 	X: {b: Y}
 	Y: {c: d: int}
+
 }
 // evalv3 "field not allowed" regression with a comprehension that conditionally
 // sets a field inside a definition with an optional nested definition.
@@ -201,6 +211,7 @@ issue3849: {
 	// TODO(inline): investigate why these do not match. Optionals?
 	// @test(shareID=Meta, at=#Deployment.metadata)
 	// @test(shareID=Meta, at=#ObjectMeta)
+
 }
 -- let.cue --
 import "list"
@@ -245,7 +256,7 @@ issue3903: noshare: {
 		}
 	}
 	_template: {
-		input: name: string
+		input:  name: string
 		result: "result-\(input.name)"
 	}
 }

@@ -41,9 +41,10 @@ letCycleFail: t1: {
 letCycleFail: t2: {
 	a: {
 		let X = a
-		if X == _|_ {}
+		if X == _|_ { }
 		x: y: ""
 	}
+	// TODO(eval): not sure if it really should fail here, so this may be okay.
 }
 
 listCycleOK: {
@@ -60,12 +61,12 @@ disjunctionCycle: {
 
 forCycle: {
 	#A: a: #B // TODO(errors): Correct error position, or at all.
-	#B: or([for x in #A {b: x}])
+	#B: or([for x in #A { b: x }])
 }
 
 letCycleWithAnd: {
 	a: d: b
-	b: and([for x in a let y = x {y}])
+	b: and([for x in a let y = x { y }])
 	c: a
 }
 
@@ -104,20 +105,22 @@ listMulCycle: {
 closeFail: {
 	#T: [_]: _
 	#T: close({"a": string})
-	x: #T
+	x:  #T
 	x: b: "foo"
 }
 
 printCycle: {
 	a: {
 		X: a
-		if X {}
+		if X {
+		}
 	}
 }
 -- self.cue --
 issue3978: {
 	a: self={
-		if self.missing != _|_ {}
+		if self.missing != _|_ {
+		}
 	}
 }
 -- out/compile --

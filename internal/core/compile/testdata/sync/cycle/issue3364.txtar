@@ -4,8 +4,8 @@
 out: _t3.out
 _t3: {
 	repeater: L={L.a}
-	data:     M={a: a: M}
-	out:      repeater & data
+	data: M={a: a: M}
+	out: repeater & data
 }
 -- out/compile --
 --- in.cue

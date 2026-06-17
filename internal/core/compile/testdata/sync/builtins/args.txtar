@@ -8,9 +8,9 @@ import (
 // (e.g. *1 | 2) caused an "error in call" panic in evalv3.
 // https://cuelang.org/issue/3584
 issue3584: reduced: t1: {
-	ref:     out
+	ref: out
 	trigger: *1 | 2
-	out:     strings.SliceRunes("ABC", 0, trigger)
+	out: strings.SliceRunes("ABC", 0, trigger)
 }
 
 issue3584: reduced: t2: {

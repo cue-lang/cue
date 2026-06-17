@@ -4,6 +4,7 @@
 	recursive: {
 		field: string
 	}
+
 }
 
 // Allowed
@@ -24,6 +25,7 @@ foo1: {
 #Bar: {
 	field: int
 	{[A=_]: int}
+
 }
 bar: #Bar
 bar: {feild: 2}

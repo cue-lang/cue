@@ -2,6 +2,7 @@
 #A: {
 	a:      "foo"
 	"\(a)": 3
+
 }
 #B: a: b: {
 	c: string
@@ -9,18 +10,20 @@
 }
 
 #C: a: b: {
-	c:   *"d" | string
+	c: *"d" | string
 	(c): 2
 }
 
 x: #B & #C
+
 -- evalv3regress.cue --
 chained: x: {
 	// TODO: add this once the todo is fixed.
 	// @test(permute)
-	(a.b):     "foo"
+	(a.b): "foo"
 	(x.hello): "true"
 	a: b: "hello"
+
 }
 -- out/compile --
 --- evalv3regress.cue

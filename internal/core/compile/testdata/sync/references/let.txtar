@@ -59,7 +59,8 @@ incompleteLet: {
 	}
 
 	x: {
-		if list.max < 0 {}
+		if list.max < 0 {
+		}
 	}
 }
 
@@ -77,12 +78,12 @@ scalarReference: {
 		5
 	}
 	inList: p0: {
-		let x = {a: 1}
-		[x]
+		let x = { a: 1 }
+		[ x ]
 	}
 	inList: p1: {
-		[x]
-		let x = {a: 1}
+		[ x ]
+		let x = { a: 1 }
 	}
 }
 

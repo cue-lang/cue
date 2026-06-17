@@ -5,7 +5,7 @@
 -- in.cue --
 #T: [_]: _
 #T: close({"a": string})
-x: #T
+x:  #T
 x: {
 	a: "hello"
 	b: "foo"

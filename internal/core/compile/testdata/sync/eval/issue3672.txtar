@@ -127,6 +127,9 @@ import "encoding/json"
 
 value0: #FinDefSetOfConfigText
 value0: Only: [{UseSectionName: true}]
+
+// TODO(inline): test wrapped errors
+
 -- out/compile --
 --- x.cue
 {

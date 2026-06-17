@@ -1,7 +1,7 @@
 -- in.cue --
 t1: {
-	a: {c: b.e, d: b.f}
-	b: {e: 3, f: a.c}
+    a: {c: b.e, d: b.f}
+    b: {e: 3, f: a.c}
 }
 -- out/compile --
 --- in.cue

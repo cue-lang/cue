@@ -18,6 +18,7 @@ ifScalarNested: {
 	_#cond: true
 
 	if _#cond {{{5}}}
+
 }
 -- out/compile --
 --- in.cue

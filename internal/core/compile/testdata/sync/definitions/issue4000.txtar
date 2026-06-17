@@ -4,14 +4,16 @@
 import "list"
 
 items: list.Sort(#List.items, {
-	x: {}
-	y: {}
+	x:    {}
+	y:    {}
 	less: x.kind < y.kind
 })
 
 #List: items: list.Concat(_items)
 
 _items: [#VMRuleList]
+
+// This is an alternative way of writing sharing.
 
 #VMRuleList: [...null | #VMRule] & [{
 	spec: [{

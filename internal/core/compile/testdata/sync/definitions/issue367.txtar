@@ -1,7 +1,7 @@
 -- in.cue --
 #def1: l1: ["l2"]: {l3: int, l4: 26}
-#special1: #def1 & {l1: l2: l3: <100}
-instance: #special1 & {l1: l2: l3: 34}
+#special1: #def1 & {l1: l2: l3:     <100}
+instance:  #special1 & {l1: l2: l3: 34}
 -- out/compile --
 --- in.cue
 {

@@ -8,7 +8,7 @@ reduced: {
 
 	if true {
 		let Z = [for _, x in A {x}]
-		B: [for z in Z if z.y != _|_ {b: 1}]
+		B: [for z in Z if z.y != _|_ { b: 1 }]
 	}
 }
 -- full.cue --
@@ -19,6 +19,7 @@ full: {
 			cp:        int32
 		}
 	}
+
 	k: n: n1: {
 		_CL: "l"
 	}

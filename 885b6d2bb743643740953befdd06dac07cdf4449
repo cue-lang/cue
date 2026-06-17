@@ -16,6 +16,24 @@
       "message": "In both of these examples, I think it might be clearer if you rename `fooValue` to something else (e.g. `fooValue2`). That would then make it clear in your first two execs that `fooValue2` is being exported and comes from the explicitly indicated pkg, and not from the main module. Otherwise I stare at `expect-root` and worry that `\"fooValue\"` could be coming from the hidden pkgs.",
       "revId": "885b6d2bb743643740953befdd06dac07cdf4449",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "071f6f26_311dd7d4",
+        "filename": "cmd/cue/cmd/testdata/script/issue2966.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-17T15:46:24Z",
+      "side": 1,
+      "message": "Done. Renamed the field in both example packages to fooValue2 (and updated expect-stdout accordingly), so it is now clear that the exported value comes from the explicitly named package importing foo, not from the main module\u0027s fooValue.",
+      "parentUuid": "61f1bd33_ba27fbbd",
+      "revId": "885b6d2bb743643740953befdd06dac07cdf4449",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

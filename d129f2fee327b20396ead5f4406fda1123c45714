@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "054cdbcf_159c4d2d",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3767,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-17T14:50:12Z",
+      "side": 1,
+      "message": "shorten this a bit? and the method above as well. I\u0027m fine with the testdata text though, because being a bit more specific in there can be a useful historical artifact.",
+      "revId": "d129f2fee327b20396ead5f4406fda1123c45714",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

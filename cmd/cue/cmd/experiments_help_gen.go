@@ -120,6 +120,12 @@ Available global experiments:
     evalv3 enables the new CUE evaluator, addressing performance issues
     and bringing better algorithms for disjunctions, closedness, and cycles.
 
+  formatv2 (preview: v0.18.0)
+    formatv2 selects the Wadler-Lindig pretty-printer behind "cue fmt".
+    It only exists from v0.18.0 onwards; v0.17 knows about it solely so that
+    CUE_EXPERIMENT=formatv2=0 is accepted across both versions. Enabling it
+    is rejected, as the implementation is not present.
+
   keepvalidators (preview: v0.14.0, default: v0.14.0, stable: v0.15.0)
     keepvalidators prevents validators from simplifying into concrete values,
     even if their concrete value could be derived, such as '>=1 & <=1' to '1'.

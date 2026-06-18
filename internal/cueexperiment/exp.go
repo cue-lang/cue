@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 	"sync"
+
+	"cuelang.org/go/internal/cueversion"
 )
 
 // Flags holds the set of global CUE_EXPERIMENT flags. It is initialized by Init.
@@ -16,6 +18,13 @@ var Flags Config
 type Config struct {
 	// The flags in this first section describe active experiments.
 	// Sort from oldest to newest based on when they were introduced as a `preview`.
+
+	// FormatV2 selects the Wadler-Lindig pretty-printer as the
+	// implementation behind "cue fmt" and "cue/format".
+	// It only exists from v0.18.0 onwards; v0.17 knows about it solely so that
+	// CUE_EXPERIMENT=formatv2=0 is accepted across both versions. Enabling it
+	// is rejected, as the implementation is not present.
+	FormatV2 bool `experiment:"preview:v0.18.0"`
 
 	// The flags in this second section describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.
@@ -69,8 +78,10 @@ func initExperimentFlags() error {
 		return err
 	}
 
-	// First, set defaults based on experiment lifecycle
-	if err := parseConfig(&Flags, "", experiments); err != nil {
+	// Use this binary's language version rather than an empty version, which
+	// is treated as the newest version and would wrongly allow enabling
+	// experiments that only exist in later CUE versions.
+	if err := parseConfig(&Flags, cueversion.LanguageVersion(), experiments); err != nil {
 		return fmt.Errorf("error in CUE_EXPERIMENT: %w", err)
 	}
 	return nil

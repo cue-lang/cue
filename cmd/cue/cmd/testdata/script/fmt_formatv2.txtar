@@ -1,0 +1,38 @@
+# Smoke test that formatv2 is unavailable in this v0.17 release; it only exists
+# from v0.18.0 onwards. Disabling it is a no-op, so a single
+# CUE_EXPERIMENT=formatv2=0 setting works across v0.17 and v0.18, while enabling
+# it is rejected.
+#
+# v2 aligns the field values even though one is a list; v1 does not, so the
+# unaligned output confirms the pre-v2 formatter.
+#
+# TODO: v0.17 does not yet know about formatv2, so the cases below currently
+# fail as an unknown experiment.
+
+# Default: pre-v2 formatter, so the values are not aligned.
+cp in.cue default.cue
+exec cue fmt default.cue
+cmp default.cue golden-v1
+
+# Enabling formatv2 is rejected: not available before v0.18.0.
+env CUE_EXPERIMENT=formatv2=1
+cp in.cue on.cue
+! exec cue fmt on.cue
+cmp stderr enable.stderr
+
+# Disabling formatv2 is a no-op, using the pre-v2 formatter.
+env CUE_EXPERIMENT=formatv2=0
+cp in.cue off.cue
+! exec cue fmt off.cue
+cmp stderr disable.stderr
+
+-- in.cue --
+a: 1
+bbbb: [1, 2, 3]
+-- golden-v1 --
+a: 1
+bbbb: [1, 2, 3]
+-- enable.stderr --
+error in CUE_EXPERIMENT: unknown experiment "formatv2"
+-- disable.stderr --
+error in CUE_EXPERIMENT: unknown experiment "formatv2"

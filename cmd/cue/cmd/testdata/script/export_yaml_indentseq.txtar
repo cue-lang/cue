@@ -1,0 +1,34 @@
+# The yaml encoding's indentSeq bool tag controls whether sequence
+# elements are indented relative to their enclosing mapping key.
+# It defaults to true, matching the long-standing behavior.
+
+exec cue export --out yaml in.cue
+cmp stdout expect-indentseq
+
+exec cue export --out yaml+indentSeq in.cue
+cmp stdout expect-indentseq
+
+exec cue export --out yaml+indentSeq=false in.cue
+cmp stdout expect-noindentseq
+
+-- in.cue --
+seq: [1, 2, 3]
+nested: list: [{a: 1}, {b: 2}]
+-- expect-indentseq --
+seq:
+  - 1
+  - 2
+  - 3
+nested:
+  list:
+    - a: 1
+    - b: 2
+-- expect-noindentseq --
+seq:
+- 1
+- 2
+- 3
+nested:
+  list:
+  - a: 1
+  - b: 2

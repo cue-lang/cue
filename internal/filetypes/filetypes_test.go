@@ -532,6 +532,41 @@ func TestParseArgs(t *testing.T) {
 			},
 		},
 	}, {
+		// "false" turns a bool tag off explicitly.
+		in: "jsonschema+strict=false: bar.schema",
+		out: []*build.File{
+			{
+				Filename:       "bar.schema",
+				Encoding:       "json",
+				Interpretation: "jsonschema",
+				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":               false,
+					"strictFeatures":       false,
+					"strictKeywords":       false,
+					"openOnlyWhenExplicit": false,
+				},
+			},
+		},
+	}, {
+		// turn off a cascaded default, leaving strictKeywords inherited from strict.
+		// "0" is short for "false".
+		in: "jsonschema+strict+strictFeatures=0: bar.schema",
+		out: []*build.File{
+			{
+				Filename:       "bar.schema",
+				Encoding:       "json",
+				Interpretation: "jsonschema",
+				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":               true,
+					"strictFeatures":       false,
+					"strictKeywords":       true,
+					"openOnlyWhenExplicit": false,
+				},
+			},
+		},
+	}, {
 		in: `json: c:\foo.json c:\path\to\file.dat`,
 		out: []*build.File{
 			{Filename: `c:\foo.json`, Encoding: build.JSON},

@@ -8,14 +8,14 @@ Mod: mod(*5 | string, 2) @test(eq, 1)
 Quo: quo(*5 | string, 2) @test(eq, 2)
 Rem: rem(*5 | string, 2) @test(eq, 1)
 -- out/eval/stats --
-Leaks:  1
-Freed:  42
-Reused: 28
+Leaks:  2
+Freed:  44
+Reused: 31
 Allocs: 15
 Retain: 0
 
-Unifications: 25
-Conjuncts:    46
-Disjuncts:    18
+Unifications: 26
+Conjuncts:    52
+Disjuncts:    20
 
-NumCloseIDs: 4
+NumCloseIDs: 7

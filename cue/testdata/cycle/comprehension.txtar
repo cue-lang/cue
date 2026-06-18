@@ -782,19 +782,19 @@ issue4100: {
 }
 -- out/eval/stats --
 Leaks:  90
-Freed:  821
-Reused: 789
+Freed:  1007
+Reused: 975
 Allocs: 122
 Retain: 0
 
-Unifications: 553
-Conjuncts:    1549
-Disjuncts:    147
+Unifications: 649
+Conjuncts:    1925
+Disjuncts:    237
 Notifications: 14
 
-NumCloseIDs: 597
+NumCloseIDs: 814
 
-ConjunctInfos:       1060
+ConjunctInfos:       1272
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1

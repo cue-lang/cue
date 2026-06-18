@@ -43,14 +43,14 @@ _schema: {
 @test(eq, at=_data, { updates: [{schedule: {interval: "daily"}}] })
 -- out/eval/stats --
 Leaks:  31
-Freed:  2431
-Reused: 1295
-Allocs: 1167
+Freed:  3575
+Reused: 2438
+Allocs: 1168
 Retain: 0
 
-Unifications: 48
-Conjuncts:    3580
-Disjuncts:    1220
+Unifications: 50
+Conjuncts:    7010
+Disjuncts:    2362
 Notifications: 2
 
-NumCloseIDs: 2876
+NumCloseIDs: 5733

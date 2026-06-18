@@ -22,14 +22,14 @@ foo: #Workflow & {
 [incomplete] #Workflow.#JobID: error in call to or: empty list in call to or:
     ./in.cue:6:10
 -- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 4
-Allocs: 7
+Leaks:  2
+Freed:  12
+Reused: 5
+Allocs: 9
 Retain: 0
 
-Unifications: 10
-Conjuncts:    17
-Disjuncts:    0
+Unifications: 11
+Conjuncts:    24
+Disjuncts:    2
 
-NumCloseIDs: 5
+NumCloseIDs: 10

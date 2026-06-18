@@ -28,8 +28,12 @@ import (
 // This file contains the algorithm to contain a self-contained CUE file.
 
 // TODO:
-// - Handle below edge cases where a reference directly references the root
-//   of the exported main tree.
+// - References pointing directly at the root of the exported tree are
+//   rewritten to the wrapping _#def for closed structs (see Profile.Def and
+//   the "fragment with defaults" case in cue.TestSyntax). Roots that are not
+//   wrapped, such as a structural cycle like {self: #person} which has bottom
+//   kind, still leave such references dangling; dep.Visit (called from
+//   markDeps) does not report references back to the root vertex.
 // - Inline smallish structs that themselves do not have outside
 //   references.
 // - Overall better inlining.

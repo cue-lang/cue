@@ -219,12 +219,12 @@ if true {
 		`,
 		path:    "#person",
 		options: o(),
-		// TODO(mvdan): the default behavior is self-contained;
-		// why are we seeing a dangling reference to #person?
+		// The recursive #person reference resolves to the wrapping _#def,
+		// keeping the self-contained output free of dangling references.
 		out: `{
 	_#def
 	_#def: {
-		children: [...#person]
+		children: [..._#def]
 		age:      int32
 	}
 }`,
@@ -252,12 +252,12 @@ if true {
 		`,
 		path:    "#person",
 		options: o(cue.Simplify(false)),
-		// TODO(mvdan): the default behavior is self-contained;
-		// why are we seeing a dangling reference to #person?
+		// The recursive #person reference resolves to the wrapping _#def,
+		// keeping the self-contained output free of dangling references.
 		out: `{
 	_#def
 	_#def: {
-		children: [...#person]
+		children: [..._#def]
 		age:      int & >=-2147483648 & <=2147483647
 	}
 }`,

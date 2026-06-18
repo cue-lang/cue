@@ -154,9 +154,24 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (f *ast.File, 
 		// TODO: embed an empty definition instead once we verify that this
 		// preserves semantics.
 		if v.Kind() == adt.StructKind && !p.Fragment {
+			def := &ast.Field{
+				Label: ast.NewIdent("_#def"),
+				Value: expr,
+			}
+			// References back to the root, such as in a recursive definition
+			// like children: [...#person], would otherwise be left dangling,
+			// pointing at a name absent from the output. Rewrite them to the
+			// wrapping _#def so that the output stays self-contained.
+			if refs := e.references[v]; refs != nil {
+				for _, ident := range refs.references {
+					ident.Name = "_#def"
+					ident.Node = def.Value
+				}
+				refs.references = refs.references[:0]
+			}
 			expr = ast.NewStruct(
 				ast.Embed(ast.NewIdent("_#def")),
-				ast.NewIdent("_#def"), expr,
+				def,
 			)
 		}
 	}

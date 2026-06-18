@@ -355,9 +355,16 @@ tagInfo: {
 	cue: encoding:   "cue"
 	json: encoding:  "json"
 	jsonl: encoding: "jsonl"
-	yaml: encoding:  "yaml"
-	toml: encoding:  "toml"
-	ini: encoding:   "ini"
+	yaml: {
+		encoding: "yaml"
+		boolTags: {
+			// indentSeq controls whether sequence (list) elements are indented
+			// relative to their enclosing mapping key when encoding to YAML.
+			indentSeq: *true | bool
+		}
+	}
+	toml: encoding: "toml"
+	ini: encoding:  "ini"
 	xml: {
 		encoding: "xml"
 		boolTags: {

@@ -337,6 +337,62 @@ field: value
 	}
 }
 
+func TestEncodeIndentSequence(t *testing.T) {
+	const in = `
+	seq: [
+		1, 2, {a: 3},
+	]
+	`
+	testCases := []struct {
+		name string
+		opts []EncodeOption
+		out  string
+	}{{
+		name: "default",
+		out: `
+seq:
+  - 1
+  - 2
+  - {a: 3}
+`,
+	}, {
+		name: "true",
+		opts: []EncodeOption{IndentSequence(true)},
+		out: `
+seq:
+  - 1
+  - 2
+  - {a: 3}
+`,
+	}, {
+		name: "false",
+		opts: []EncodeOption{IndentSequence(false)},
+		out: `
+seq:
+- 1
+- 2
+- {a: 3}
+`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			f, err := parser.ParseFile(tc.name, in, parser.ParseComments)
+			if err != nil {
+				t.Fatal(err)
+			}
+			b, err := Encode(f, tc.opts...)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := strings.TrimSpace(string(b))
+			want := strings.TrimSpace(tc.out)
+			if got != want {
+				t.Error(cmp.Diff(want, got))
+			}
+		})
+	}
+}
+
 func TestEncodeAST(t *testing.T) {
 	comment := func(s string) *ast.CommentGroup {
 		return &ast.CommentGroup{List: []*ast.Comment{

@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5b5e645_c94d0b66",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2112,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-18T08:07:13Z",
+      "side": 1,
+      "message": "I ended up going with Simplify and SelfContained instead.\n\nSimplify maps directly to the underlying export.Profile.Simplify field (controlling int32 vs its expanded bounds), so the public and internal names now line up and there\u0027s no negation. PreserveSemantics felt misleading since the simplified form (int32) is semantically identical to its bounds, and Expand was a bit ambiguous and even misleading; the underlying logic is about collapsing/merging expressions, not expanding them.\n\nFor the other one I kept SelfContained: it\u0027s already the term used by the Fragment field\u0027s doc and accurately describes re-rooting references plus embedding closedness. ContextFree works too, but carries the \"context-free grammar\" connotation, so SelfContained reads clearer.",
+      "parentUuid": "2235fb19_020ce093",
+      "revId": "9a8312cdf2f0625103d6ea23d1ee09c7414550f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5a85ccb_2412861c",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-18T08:07:13Z",
+      "side": 1,
+      "message": "Left this for a follow-up rather than tackling it here. Updated the TODO on the Fragment field to capture your point: that the public SelfContained option maps to !Fragment (confusing given the separate SelfContained field), and that Fragment and SelfContained — or Fragment and InlineImports — likely want to be joined. Didn\u0027t want to risk changing behavior in this naming-focused change without first understanding why both exist.",
+      "parentUuid": "a0ff9e33_032881ac",
+      "revId": "9a8312cdf2f0625103d6ea23d1ee09c7414550f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

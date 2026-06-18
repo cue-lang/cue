@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ec827c8_0fe2df4d",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-18T15:34:15Z",
+      "side": 1,
+      "message": "complete nit, but it would be nice if the wording matched exactly what follows in 0.18:\n\n```\n\t// FormatV2 selects the Wadler-Lindig pretty-printer as the\n\t// implementation behind \"cue fmt\" and \"cue/format\".\n```\n\nand then the extra lines \"It only exists...\" follows on.",
+      "revId": "45ed8147309d57ce370ee32f94c34f3925abb5d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

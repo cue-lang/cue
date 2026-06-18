@@ -45,15 +45,20 @@ builtin: {
 		y!: int
 	}
 }
+-- out/errors.txt --
+[structural_cycle] structural cycle:
+    ./in.cue:28:6
+[structural_cycle] structural cycle:
+    ./in.cue:28:6
 -- out/eval/stats --
-Leaks:  12
-Freed:  56
-Reused: 44
-Allocs: 24
+Leaks:  16
+Freed:  177
+Reused: 145
+Allocs: 48
 Retain: 0
 
-Unifications: 30
-Conjuncts:    90
-Disjuncts:    12
+Unifications: 85
+Conjuncts:    286
+Disjuncts:    46
 
-NumCloseIDs: 38
+NumCloseIDs: 123

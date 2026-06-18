@@ -149,18 +149,18 @@ value0: Only: [{UseSectionName: true}]
     ./x.cue:114:18
 -- out/eval/stats --
 Leaks:  345
-Freed:  1738
-Reused: 1680
+Freed:  1760
+Reused: 1702
 Allocs: 403
 Retain: 0
 
-Unifications: 368
-Conjuncts:    2310
-Disjuncts:    572
+Unifications: 386
+Conjuncts:    2354
+Disjuncts:    576
 
-NumCloseIDs: 803
+NumCloseIDs: 821
 
-ConjunctInfos:       860
+ConjunctInfos:       886
 MaxConjunctInfos:    7
 MaxReqSets:          15
 MaxRedirect:         6

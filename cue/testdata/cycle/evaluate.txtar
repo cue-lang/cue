@@ -83,7 +83,7 @@ disjunctionCycle: {
 forCycle: {
 	#A: a: #B // TODO(errors): Correct error position, or at all.
 	#B: or([for x in #A { b: x }])
-	@test(err, code=structural_cycle, path=#B.b, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, path=b, contains="structural cycle", pos=[2:6])
 }
 
 letCycleWithAnd: {
@@ -162,7 +162,10 @@ issue3978: {
     ./in.cue:74:9
 [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:74:9
-[structural_cycle] forCycle.#B.b: structural cycle
+[structural_cycle] b: structural cycle:
+    ./in.cue:84:6
+[structural_cycle] b: structural cycle:
+    ./in.cue:84:6
 [structural_cycle] closeCycle.c: structural cycle
 [structural_cycle] closeCycle.c: structural cycle
 [structural_cycle] structCycle.c: structural cycle
@@ -191,14 +194,14 @@ forCycle.#A.a: v2 errors directly, v3 shows as ~(forCycle.#B).
 listAddCycle/listMulCycle: different error messages between v2 and v3.
 letCycleFail.t2: v2 X was a struct, v3 X is structural cycle error.
 -- out/eval/stats --
-Leaks:  10
-Freed:  114
-Reused: 91
+Leaks:  11
+Freed:  116
+Reused: 94
 Allocs: 33
 Retain: 0
 
-Unifications: 104
-Conjuncts:    150
-Disjuncts:    4
+Unifications: 106
+Conjuncts:    152
+Disjuncts:    5
 
 NumCloseIDs: 47

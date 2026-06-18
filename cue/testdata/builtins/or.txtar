@@ -10,14 +10,14 @@ unique2: or([{a: 1}, {a: 1}, {a: 2}]) @test(eq, {a: 1} | {a: 2})
 // do not unique embedded scalars with differing values for child definitions.
 embed1: or([{2, #x: 1}, {2, #x: 2}]) @test(eq, {2, #x: 1} | {2, #x: 2})
 -- out/eval/stats --
-Leaks:  1
-Freed:  37
-Reused: 22
-Allocs: 16
+Leaks:  2
+Freed:  57
+Reused: 41
+Allocs: 18
 Retain: 0
 
-Unifications: 14
-Conjuncts:    40
-Disjuncts:    12
+Unifications: 23
+Conjuncts:    79
+Disjuncts:    24
 
-NumCloseIDs: 16
+NumCloseIDs: 36

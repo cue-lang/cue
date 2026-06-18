@@ -136,13 +136,13 @@ o3.a: conflicting values "baz" and "foo":
     ./in.cue:61:7
 -- out/eval/stats --
 Leaks:  1
-Freed:  86
-Reused: 68
-Allocs: 19
+Freed:  95
+Reused: 76
+Allocs: 20
 Retain: 0
 
-Unifications: 69
-Conjuncts:    119
-Disjuncts:    6
+Unifications: 72
+Conjuncts:    144
+Disjuncts:    12
 
-NumCloseIDs: 30
+NumCloseIDs: 45

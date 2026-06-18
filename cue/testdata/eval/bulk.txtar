@@ -236,18 +236,18 @@ issue3638: compare: {
 [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
     ./multi.cue:14:21
 -- out/eval/stats --
-Leaks:  20
-Freed:  183
-Reused: 160
-Allocs: 43
+Leaks:  16
+Freed:  197
+Reused: 174
+Allocs: 39
 Retain: 0
 
-Unifications: 148
-Conjuncts:    329
-Disjuncts:    35
-Notifications: 6
+Unifications: 146
+Conjuncts:    344
+Disjuncts:    51
+Notifications: 15
 
-NumCloseIDs: 80
+NumCloseIDs: 92
 -- out/todo.txt --
 patternCycle.t1.{p1,p2,p3}: v2 had cyclic pattern constraint errors; v3 resolves correctly.
 issue3638.full.entrypoint and issue3638.full.#Kubernetes.input.res1: v3 uses structure sharing (~), v2 expands.

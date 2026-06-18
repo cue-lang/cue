@@ -5,9 +5,6 @@
 #
 # v2 aligns the field values even though one is a list; v1 does not, so the
 # unaligned output confirms the pre-v2 formatter.
-#
-# TODO: v0.17 does not yet know about formatv2, so the cases below currently
-# fail as an unknown experiment.
 
 # Default: pre-v2 formatter, so the values are not aligned.
 cp in.cue default.cue
@@ -23,8 +20,8 @@ cmp stderr enable.stderr
 # Disabling formatv2 is a no-op, using the pre-v2 formatter.
 env CUE_EXPERIMENT=formatv2=0
 cp in.cue off.cue
-! exec cue fmt off.cue
-cmp stderr disable.stderr
+exec cue fmt off.cue
+cmp off.cue golden-v1
 
 -- in.cue --
 a: 1
@@ -33,6 +30,4 @@ bbbb: [1, 2, 3]
 a: 1
 bbbb: [1, 2, 3]
 -- enable.stderr --
-error in CUE_EXPERIMENT: unknown experiment "formatv2"
--- disable.stderr --
-error in CUE_EXPERIMENT: unknown experiment "formatv2"
+error in CUE_EXPERIMENT: cannot set experiment "formatv2" before version v0.18.0

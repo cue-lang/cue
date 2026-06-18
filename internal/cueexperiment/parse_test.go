@@ -39,49 +39,53 @@ func TestParseConfig(t *testing.T) {
 		wantErr     bool
 		errSubstr   string
 	}{{
+		// An empty version defaults to the current language version, so
+		// Feature2 (stable at the future v1.0.0) is not yet stable.
 		name:        "empty_inputs",
 		version:     "",
 		experiments: "",
-		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
+		want:        testFlags{Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
-		name:        "enable_feature1",
+		name:        "enable_preview_feature1",
 		version:     "v0.1.0",
 		experiments: "feature1",
 		want:        testFlags{Feature1: true},
 		wantErr:     false,
 	}, {
-		name:        "enable_feature1_no_version",
+		// An empty version defaults to the current language version, so
+		// Feature2 (stable at the future v1.0.0) is not yet stable.
+		name:        "enable_preview_feature1_no_version",
 		experiments: "feature1",
-		want:        testFlags{Feature1: true, Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
+		want:        testFlags{Feature1: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
-		name:        "enable_accepted_feature2_no_version",
+		name:        "enable_preview_feature2_no_version",
 		experiments: "feature2",
 		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
-		name:        "enable_rejected_feature3_no_version",
+		name:        "enable_withdrawn_feature3_no_version",
 		experiments: "feature3",
 		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     true,
 		errSubstr:   `cannot set rejected experiment "feature3"`,
 	}, {
-		name:        "feature_not_available_yet",
+		name:        "enable_preview_feature1_before_version",
 		version:     "v0.0.9",
 		experiments: "feature1",
 		want:        testFlags{},
 		wantErr:     true,
 		errSubstr:   "cannot set experiment \"feature1\" before version v0.1.0",
 	}, {
-		name:        "rejected_feature",
+		name:        "enable_withdrawn_feature3_at_version",
 		version:     "v0.5.0",
 		experiments: "feature3",
 		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     true,
 		errSubstr:   "cannot set rejected experiment \"feature3\"",
 	}, {
-		name:        "accepted_feature_automatically_enabled",
+		name:        "stable_feature2_automatically_enabled",
 		version:     "v1.0.0",
 		experiments: "",
 		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},

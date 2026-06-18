@@ -355,9 +355,20 @@ tagInfo: {
 	cue: encoding:   "cue"
 	json: encoding:  "json"
 	jsonl: encoding: "jsonl"
-	yaml: encoding:  "yaml"
-	toml: encoding:  "toml"
-	ini: encoding:   "ini"
+	yaml: {
+		encoding: "yaml"
+		boolTags: {
+			// indentSeq controls whether sequence (list) elements are indented
+			// relative to their enclosing mapping key when encoding to YAML.
+			//
+			// TODO(mvdan): consider turning this to "false" by default in the future,
+			// as the YAML project maintainers say that go-yaml v4 and other libraries
+			// will stop indenting by default. See: https://cuelang.org/issue/4177
+			indentSeq: *true | bool
+		}
+	}
+	toml: encoding: "toml"
+	ini: encoding:  "ini"
 	xml: {
 		encoding: "xml"
 		boolTags: {

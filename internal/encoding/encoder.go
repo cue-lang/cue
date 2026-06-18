@@ -34,8 +34,8 @@ import (
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/encoding/toml"
-	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
+	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
 )
 
@@ -186,6 +186,7 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	case build.YAML:
 		e.concrete = true
 		streamed := false
+		indentSeq := f.BoolTags["indentSeq"]
 		// TODO(mvdan): use a NewEncoder API like in TOML below.
 		e.encValue = func(v cue.Value) error {
 			if streamed {
@@ -193,7 +194,9 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 			}
 			streamed = true
 
-			b, err := yaml.Encode(v)
+			// Note that we use [cue.Concrete] here, which expands all references.
+			n := v.Syntax(cue.Concrete(true))
+			b, err := cueyaml.Encode(n, cueyaml.IndentSequence(indentSeq))
 			if err != nil {
 				return err
 			}

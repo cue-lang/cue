@@ -47,7 +47,12 @@ import (
 //	CommentGroup
 //
 // TODO: support anchors through Ident.
-func Encode(n ast.Node) (b []byte, err error) {
+func Encode(n ast.Node, opts ...EncodeOption) (b []byte, err error) {
+	cfg := encodeConfig{indentSequence: true}
+	for _, o := range opts {
+		o(&cfg)
+	}
+
 	y, err := encode(n)
 	if err != nil {
 		return nil, err
@@ -56,10 +61,28 @@ func Encode(n ast.Node) (b []byte, err error) {
 	enc := yaml.NewEncoder(w)
 	// Use idiomatic indentation.
 	enc.SetIndent(2)
+	if cfg.indentSequence {
+		enc.DefaultSeqIndent()
+	} else {
+		enc.CompactSeqIndent()
+	}
 	if err = enc.Encode(y); err != nil {
 		return nil, err
 	}
 	return w.Bytes(), nil
+}
+
+// EncodeOption configures the behavior of [Encode].
+type EncodeOption func(*encodeConfig)
+
+type encodeConfig struct {
+	indentSequence bool
+}
+
+// IndentSequence controls whether sequence (list) elements are indented
+// relative to their enclosing mapping key. It defaults to true.
+func IndentSequence(indent bool) EncodeOption {
+	return func(c *encodeConfig) { c.indentSequence = indent }
 }
 
 func encode(n ast.Node) (y *yaml.Node, err error) {

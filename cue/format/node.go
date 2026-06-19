@@ -741,8 +741,6 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	case *ast.Interpolation:
 		f.before(nil)
-		// Reindent multiline interpolation string fragments directly.
-		search, replace := f.interpolationReindent(x)
 		// For multi-line string literals, enforce that the newlines
 		// surrounding each interpolation expression are either both
 		// present or both absent; if only one is present, force the
@@ -752,17 +750,6 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		for i, el := range x.Elts {
 			if i < len(forceNewline) && forceNewline[i] {
 				f.print(newline, nooverride)
-			}
-			// Only reindent even-indexed elements, which are the string
-			// fragments; odd-indexed elements are expressions like "bar"
-			// in \("bar") which may also be BasicLits.
-			if lit, ok := el.(*ast.BasicLit); ok && search != "" && i%2 == 0 {
-				f.print(lit.ValuePos, &ast.BasicLit{
-					ValuePos: lit.ValuePos,
-					Kind:     lit.Kind,
-					Value:    strings.ReplaceAll(lit.Value, search, replace),
-				})
-				continue
 			}
 			f.expr0(el, depth+1)
 		}
@@ -946,26 +933,6 @@ func interpolationNormalize(x *ast.Interpolation) []bool {
 		}
 	}
 	return force
-}
-
-// interpolationReindent returns a search/replace pair to reindent multiline
-// interpolation string fragments, or empty strings if no reindentation is needed.
-func (f *formatter) interpolationReindent(x *ast.Interpolation) (search, replace string) {
-	// TODO: only do this when simplifying, like the indent < 6
-	// check in the printer for token.STRING.
-	if f.indent >= 6 {
-		return "", ""
-	}
-	first, last := x.Quotes()
-	qi, _, _, err := literal.ParseQuotes(first.Value, last.Value)
-	if err != nil || !qi.IsMulti() {
-		return "", ""
-	}
-	indent := strings.Repeat("\t", f.cfg.indent+f.indent+1)
-	if qi.Whitespace() == indent {
-		return "", ""
-	}
-	return "\n" + qi.Whitespace(), "\n" + indent
 }
 
 func (f *formatter) clause(clause ast.Clause) {

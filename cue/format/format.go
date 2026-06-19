@@ -53,7 +53,8 @@ func Simplify() Option {
 // UseSpaces specifies that tabs should be converted to spaces and sets the
 // default tab width.
 //
-// This option is set to 4 by default.
+// When unset, the tab width defaults to 8 for the pre-v2 formatter and 4
+// for the formatv2 formatter.
 func UseSpaces(tabwidth int) Option {
 	return func(c *config) {
 		c.useSpaces = true
@@ -174,7 +175,7 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 type config struct {
 	useSpaces bool // default: true
 	tabIndent bool // default: true
-	tabWidth  int  // default: 4
+	tabWidth  int  // 0 means unset; the v1 formatter defaults to 8, v2 to 4
 	indent    int  // default: 0 (all code is indented at least by this much)
 
 	simplify        bool // default: false
@@ -184,7 +185,6 @@ type config struct {
 
 func newConfig(opt []Option) *config {
 	cfg := &config{
-		tabWidth:  4,
 		tabIndent: true,
 		useSpaces: true,
 	}
@@ -194,14 +194,26 @@ func newConfig(opt []Option) *config {
 	return cfg
 }
 
+// tabWidthOr returns the configured tab width, or def if it was left unset.
+// The pre-v2 and v2 formatters resolve different defaults so that the v1
+// formatter stays consistent with release-branch.v0.17 (8) without changing
+// the formatv2 default (4).
+func (cfg *config) tabWidthOr(def int) int {
+	if cfg.tabWidth == 0 {
+		return def
+	}
+	return cfg.tabWidth
+}
+
 func configToV2(cfg *config) *pretty.Config {
+	tabWidth := cfg.tabWidthOr(4)
 	cfgV2 := &pretty.Config{
-		IndentWidth: cfg.tabWidth,
+		IndentWidth: tabWidth,
 	}
 	if cfg.tabIndent {
 		cfgV2.Indent = "\t"
 	} else {
-		cfgV2.Indent = strings.Repeat(" ", cfg.tabWidth)
+		cfgV2.Indent = strings.Repeat(" ", tabWidth)
 	}
 	return cfgV2
 }
@@ -224,8 +236,9 @@ func (cfg *config) fprint(node any) (out []byte, err error) {
 		twmode |= tabwriter.TabIndent
 	}
 
+	tabWidth := cfg.tabWidthOr(8)
 	buf := &bytes.Buffer{}
-	tw := tabwriter.NewWriter(buf, 0, cfg.tabWidth, 1, padchar, twmode)
+	tw := tabwriter.NewWriter(buf, 0, tabWidth, 1, padchar, twmode)
 
 	// write printer result via tabwriter/trimmer to output
 	if _, err = tw.Write(p.output); err != nil {
@@ -239,7 +252,7 @@ func (cfg *config) fprint(node any) (out []byte, err error) {
 
 	b := buf.Bytes()
 	if !cfg.tabIndent {
-		b = bytes.ReplaceAll(b, []byte{'\t'}, bytes.Repeat([]byte{' '}, cfg.tabWidth))
+		b = bytes.ReplaceAll(b, []byte{'\t'}, bytes.Repeat([]byte{' '}, tabWidth))
 	}
 	return b, nil
 }

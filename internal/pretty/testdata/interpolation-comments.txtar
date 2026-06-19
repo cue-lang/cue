@@ -1,0 +1,61 @@
+# Comments inside a multi-line string's `\(...)` interpolation. The `\(`
+# and `)` delimiters live at the end and start of the surrounding string
+# parts, so the parser hangs a comment beside them on that string part:
+# after `\(` as a PosSuffix comment on the opening part, before `)` as a
+# PosPrefix comment on the closing part. Both are rendered in place; a
+# comment on the interpolated expression itself (e.g. the binary op
+# comment) is rendered by the expression formatter.
+#
+# Authored newlines around the interpolation are preserved (out/relpos).
+# With RelPos stripped (out/norelpos) the non-comment breaks collapse, but
+# a break is still forced wherever a `//` comment would otherwise run on
+# and swallow the following token.
+-- in.cue --
+expr: """
+	\(
+	1 // after the expr
+	)
+	"""
+open: """
+	\( // after the open
+	1
+	)
+	"""
+binary: """
+	\(
+		1 + // op comment
+		2 // operand comment
+	)
+	"""
+-- out/relpos --
+expr: """
+	\(
+	1 // after the expr
+	)
+	"""
+open: """
+	\( // after the open
+	1
+	)
+	"""
+binary: """
+	\(
+	1+ // op comment
+		2 // operand comment
+	)
+	"""
+-- out/norelpos --
+expr: """
+	\(1 // after the expr
+	)
+	"""
+open: """
+	\( // after the open
+	1)
+	"""
+binary: """
+	\(1+
+		// op comment
+		2 // operand comment
+	)
+	"""

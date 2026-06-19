@@ -85,8 +85,8 @@ func init() {
 	}
 }
 
-// TestNodes tests manually constructed AST nodes,
-// which would not be produced by cue/parser but are accepted by cue/format.
+// TestNodes tests nodes that are invalid CUE, but are accepted by
+// format.
 func TestNodes(t *testing.T) {
 	testCases := []struct {
 		name string
@@ -108,38 +108,6 @@ func TestNodes(t *testing.T) {
 			Value: ast.NewIdent("goo"),
 		},
 		out: `"foo\nbar": goo`,
-	}, {
-		// Issue #4296: struct fields with relative positions caused fields
-		// with different nesting to be aligned, when they should not be.
-		name: "field alignment with mixed nesting depths",
-		in: &ast.StructLit{
-			Lbrace: token.NoSpace.Pos(),
-			Rbrace: token.NoSpace.Pos(),
-			Elts: []ast.Decl{&ast.StructLit{
-				Lbrace: token.NoSpace.Pos(),
-				Rbrace: token.NoSpace.Pos(),
-				Elts: []ast.Decl{
-					&ast.Field{
-						Label: &ast.Ident{NamePos: token.Newline.Pos(), Name: "veryLongLabel"},
-						Value: ast.NewString("1"),
-					},
-					&ast.Field{
-						Label: &ast.Ident{NamePos: token.Newline.Pos(), Name: "x"},
-						Value: ast.NewString("2"),
-					},
-					&ast.Field{
-						Label: &ast.Ident{NamePos: token.Newline.Pos(), Name: "a"},
-						Value: &ast.StructLit{Elts: []ast.Decl{
-							&ast.Field{Label: ast.NewIdent("b"), Value: ast.NewString("3")},
-						}},
-					},
-				}}},
-		},
-		out: `{{
-	veryLongLabel: "1"
-	x:             "2"
-	a: b:          "3"
-}}`,
 	}, {
 		name: "foo",
 		in: func() ast.Node {

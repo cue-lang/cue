@@ -1019,10 +1019,7 @@ func (c *converter) exprCore(x ast.Expr) doc {
 		return c.postfixExpr(x)
 
 	case *ast.SelectorExpr:
-		// The receiver is a primary expression: `.sel` binds tighter
-		// than any binary operator, so a binary receiver needs parens
-		// to keep its grouping (e.g. `(a & b).c`, not `a & b.c`).
-		return cats(wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec), periodLit, c.label(x.Sel))
+		return c.selectorExpr(x)
 
 	case *ast.IndexExpr:
 		return c.indexExpr(x)
@@ -2007,46 +2004,43 @@ func flattenBinaryChain(x *ast.BinaryExpr) (arms []chainArm, hasTrailing bool) {
 	return arms, hasTrailing
 }
 
-// chainTableExpr formats a chain of same-operator BinaryExprs (| or
-// &) as a [docTable]: one row per arm, with an optional trailing-comment
-// cell that column-aligns across arms. fieldTrailing, when non-nil,
-// is an enclosing field's same-line trailing comment that should
-// align with the chain's arm comments in the same column.
-func (c *converter) chainTableExpr(x *ast.BinaryExpr, arms []chainArm, fieldTrailing doc) doc {
-	opStr := " " + x.Op.String()
-	outerPrec := x.Op.Precedence()
+// chainTableRow is one rendered row of a chain table: its cell content
+// (without the trailing connector) and the `//` comments on its line.
+type chainTableRow struct {
+	cell     doc
+	trailing []*ast.CommentGroup
+}
 
-	rows := make([]row, len(arms))
-	for i, arm := range arms {
+// chainTable lays out chain rows (| / & arms or selector segments) as a
+// [docTable] whose trailing comments column-align. connector is appended
+// to every cell but the last - the operator or period that glues to the
+// preceding line. fieldTrailing, when non-nil, folds onto the last row's
+// comment so it aligns with the rest. The head row renders Raw: its
+// connector stays glued and its comment, if any, is appended inline,
+// since there is no column to align to yet. The result is nest(table);
+// the caller applies the mode wrap.
+func (c *converter) chainTable(rows []chainTableRow, connector, fieldTrailing doc) doc {
+	out := make([]row, len(rows))
+	last := len(rows) - 1
+	for i, r := range rows {
 		var commentDoc doc
-		for _, cg := range arm.trailing {
+		for _, cg := range r.trailing {
 			commentDoc = joinLines(commentDoc, c.commentGroup(cg))
 		}
-		cell0 := c.armDoc(arm, outerPrec)
-
-		if i < len(arms)-1 {
-			cell0 = cat(cell0, stringLit(opStr))
+		cell0 := r.cell
+		if i < last {
+			cell0 = cat(cell0, connector)
 		} else if fieldTrailing != nil {
-			// Attach the enclosing field's trailing comment to the last
-			// arm's comment cell so it column-aligns with the chain's
-			// own trailing comments.
 			commentDoc = joinLines(commentDoc, fieldTrailing)
 		}
-
 		hasComment := commentDoc != nil
 
 		if i == 0 {
-			// First raw as Raw so its op suffix stays glued to the arm
-			// expression; its trailing comment is appended with a space
-			// since there's no column to align to yet.
 			raw := cell0
 			if hasComment {
 				raw = cats(raw, spaceLit, commentDoc)
 			}
-			rows[i] = row{
-				raw:        raw,
-				hasComment: hasComment,
-			}
+			out[i] = row{raw: raw, hasComment: hasComment}
 			continue
 		}
 
@@ -2054,14 +2048,26 @@ func (c *converter) chainTableExpr(x *ast.BinaryExpr, arms []chainArm, fieldTrai
 		if hasComment {
 			cells = append(cells, commentDoc)
 		}
-		rows[i] = row{
+		out[i] = row{
 			sep:        lineBreakHard,
 			cells:      cells,
 			hasComment: hasComment,
 		}
 	}
+	return nest(table(out))
+}
 
-	return c.maybeGroup(x, nest(table(rows)))
+// chainTableExpr renders a chain of same-operator BinaryExprs (| or &)
+// via [converter.chainTable], rendering each arm and joining with the
+// operator. fieldTrailing, when non-nil, is an enclosing field's
+// same-line trailing comment that aligns in the chain's comment column.
+func (c *converter) chainTableExpr(x *ast.BinaryExpr, arms []chainArm, fieldTrailing doc) doc {
+	outerPrec := x.Op.Precedence()
+	rows := make([]chainTableRow, len(arms))
+	for i, arm := range arms {
+		rows[i] = chainTableRow{cell: c.armDoc(arm, outerPrec), trailing: arm.trailing}
+	}
+	return c.maybeGroup(x, c.chainTable(rows, stringLit(" "+x.Op.String()), fieldTrailing))
 }
 
 // armDoc renders a single chainArm: its expression, with any interior
@@ -2265,6 +2271,91 @@ func (c *converter) binaryOperand(e ast.Expr, prec, depth int) doc {
 		return c.binaryExprPrec(bin, binaryCutoff(bin, depth), depth)
 	}
 	return wrapForPrecedence(c.expr(e), e, prec)
+}
+
+// selArm is one segment of a flattened selector chain (a.b.c).
+type selArm struct {
+	doc      doc                 // the rendered segment
+	rel      token.RelPos        // leading RelPos of the segment (NoRelPos for the head)
+	trailing []*ast.CommentGroup // `//` comments sharing this segment's line
+}
+
+// selectorExpr renders a selector chain (a.b.c). With a trailing
+// comment on any segment it builds a column-aligned [docTable];
+// otherwise it preserves authored line breaks and is otherwise flat.
+func (c *converter) selectorExpr(x *ast.SelectorExpr) doc {
+	arms, hasTrailing := c.flattenSelectorChain(x)
+	if hasTrailing {
+		return c.selectorTableExpr(arms, nil)
+	}
+	return c.selectorGroupArms(arms)
+}
+
+// flattenSelectorChain returns one selArm per segment of a selector
+// chain, head first. A period glues to the segment before it; a
+// SelectorExpr's PosSuffix comment trails (after the period,
+// e.g. `a. // c`). Comments belonging to the chain as a whole -
+// PosDoc and trailing (Position >= PosTrailingMin) on the outermost
+// node - are excluded. hasTrailing reports whether any returned
+// segment carries a trailing comment.
+func (c *converter) flattenSelectorChain(x *ast.SelectorExpr) (arms []selArm, hasTrailing bool) {
+	var walk func(e ast.Expr, outermost bool)
+	walk = func(e ast.Expr, outermost bool) {
+		sel, ok := e.(*ast.SelectorExpr)
+		if !ok {
+			// The head receiver is a primary expression: `.sel` binds
+			// tighter than any binary operator, so a binary head needs
+			// parens to keep its grouping (`(a & b).c`, not `a & b.c`).
+			arms = append(arms, selArm{doc: wrapForPrecedence(c.expr(e), e, token.HighestPrec)})
+			return
+		}
+		walk(sel.X, false)
+		var trailing []*ast.CommentGroup
+		for _, cg := range ast.Comments(sel) {
+			if outermost && (cg.Position == PosDoc || cg.Position >= PosTrailingMin) {
+				continue // chain-level, not a per-segment comment
+			}
+			trailing = append(trailing, cg)
+		}
+		hasTrailing = hasTrailing || len(trailing) > 0
+		prev := &arms[len(arms)-1]
+		prev.trailing = append(prev.trailing, trailing...)
+		arms = append(arms, selArm{doc: c.label(sel.Sel), rel: sel.Sel.Pos().RelPos()})
+	}
+	walk(x, true)
+	return arms, hasTrailing
+}
+
+// selectorGroupArms renders a comment-free selector chain. A segment
+// whose leading RelPos is Newline / NewSection breaks onto its own
+// indented line after the preceding period; otherwise it stays glued
+// (a.b.c). The chain never breaks on width: each separator is a hard
+// break or nothing, with no soft alternative.
+func (c *converter) selectorGroupArms(arms []selArm) doc {
+	first := cat(arms[0].doc, periodLit)
+	rest := arms[1:]
+	parts := make([]doc, 0, 2*len(rest))
+	lastIdx := len(rest) - 1
+	for i, arm := range rest {
+		parts = append(parts, relBreakOr(arm.rel, nil))
+		elem := arm.doc
+		if i < lastIdx {
+			elem = cat(elem, periodLit)
+		}
+		parts = append(parts, elem)
+	}
+	return cat(first, nest(cats(parts...)))
+}
+
+// selectorTableExpr renders a selector chain via [converter.chainTable],
+// one row per segment joined with the period. fieldTrailing, if non-nil,
+// folds onto the last row's comment so it aligns with the rest.
+func (c *converter) selectorTableExpr(arms []selArm, fieldTrailing doc) doc {
+	rows := make([]chainTableRow, len(arms))
+	for i, arm := range arms {
+		rows[i] = chainTableRow{cell: arm.doc, trailing: arm.trailing}
+	}
+	return group(c.chainTable(rows, periodLit, fieldTrailing))
 }
 
 // callExpr converts a CallExpr. Arguments are handled like list
@@ -2886,11 +2977,11 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	}
 	docComment := c.docCommentBlock(slots.doc, head.Pos().RelPos())
 
-	// If the value is a | or & chain AND the chain carries any
-	// trailing comments, hand the field's own trailing comment to
-	// chainTableExpr so it column-aligns with the chain's arm
-	// comments. Otherwise keep it as a separate cell in the field row
-	// (so it aligns with simple fields' trailing comments).
+	// If the value is a | or & chain or a selector chain (a.b.c) AND it
+	// carries any trailing comments, hand the field's own trailing comment
+	// to the chain table so it column-aligns with the chain's arm
+	// comments. Otherwise keep it as a separate cell in the field row (so
+	// it aligns with simple fields' trailing comments).
 	//
 	// Attributes: for the plain (non-chain) path, attrs get their own
 	// table cell (column 2) so they column-align across rows just like
@@ -2899,28 +2990,41 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	// is no well-defined column position for them in that case.
 	var valDoc doc
 	var attrsDoc doc
-	bin, isChain := leaf.Value.(*ast.BinaryExpr)
-	isChain = isChain && len(trailingCommentDocs) > 0 && (bin.Op == token.OR || bin.Op == token.AND)
+	bin, isBinChain := leaf.Value.(*ast.BinaryExpr)
+	isBinChain = isBinChain && len(trailingCommentDocs) > 0 && (bin.Op == token.OR || bin.Op == token.AND)
 	var binArms []chainArm
 	binHasTrailing := false
-	if isChain {
+	if isBinChain {
 		binArms, binHasTrailing = flattenBinaryChain(bin)
 	}
-	if isChain && binHasTrailing {
-		// chainTableExpr accepts a single Doc; join the trailing
-		// comments vertically (joinLines) before handing them in. The
-		// chain-table path renders the trailing column itself, so the
-		// standard trailing-cell column is unused here.
+	sel, isSelChain := leaf.Value.(*ast.SelectorExpr)
+	isSelChain = isSelChain && len(trailingCommentDocs) > 0
+	var selArms []selArm
+	selHasTrailing := false
+	if isSelChain {
+		selArms, selHasTrailing = c.flattenSelectorChain(sel)
+	}
+	// joinTrailing collapses the field's trailing comments into one Doc
+	// for a chain table's last row and clears trailingCommentDocs (the
+	// chain table renders that column itself, so the field's own
+	// trailing-cell column goes unused).
+	joinTrailing := func() doc {
 		var combined doc
 		for _, d := range trailingCommentDocs {
 			combined = joinLines(combined, d)
 		}
-		valDoc = appendAttrs(c.chainTableExpr(bin, binArms, combined), leaf.Attrs)
 		trailingCommentDocs = nil
-	} else if leafValueSlotsFiltered {
+		return combined
+	}
+	switch {
+	case isBinChain && binHasTrailing:
+		valDoc = appendAttrs(c.chainTableExpr(bin, binArms, joinTrailing()), leaf.Attrs)
+	case isSelChain && selHasTrailing:
+		valDoc = appendAttrs(c.selectorTableExpr(selArms, joinTrailing()), leaf.Attrs)
+	case leafValueSlotsFiltered:
 		valDoc = c.withCommentsSlots(leaf.Value, c.exprCore(leaf.Value), leafValueSlots)
 		attrsDoc = attrsSpaced(leaf.Attrs)
-	} else {
+	default:
 		valDoc = c.expr(leaf.Value)
 		attrsDoc = attrsSpaced(leaf.Attrs)
 	}
@@ -3348,7 +3452,7 @@ func attrsSpaced(attrs []*ast.Attribute) doc {
 // the prefix and suffix slots for these nodes to avoid double-rendering.
 func nodeManagesInteriorComments(n ast.Node) bool {
 	switch n.(type) {
-	case *ast.StructLit, *ast.ListLit, *ast.BinaryExpr:
+	case *ast.StructLit, *ast.ListLit, *ast.BinaryExpr, *ast.SelectorExpr:
 		return true
 	}
 	return false

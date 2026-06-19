@@ -953,7 +953,7 @@ func runTask(t *task, mode runMode) {
 	errs := ctx.Err()
 
 	for _, d := range t.node.deferred {
-		d.node.CompleteArcsOnly(ctx)
+		d.node.CompleteArcsShallow(ctx)
 		if b, ok := d.node.BaseValue.(*Bottom); ok {
 			t.node.addBottom(b)
 		}

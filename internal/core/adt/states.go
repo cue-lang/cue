@@ -31,7 +31,7 @@ package adt
 // - ctx.evalState (in validation of comparison against bottom)
 //
 // - arc.Finalize (finalized)
-// - CompleteArcs (conjuncts)
+// - CompleteArcsRecursive (conjuncts)
 //
 
 // lookup in p1

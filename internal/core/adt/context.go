@@ -1063,7 +1063,7 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state Flags) *Vertex {
 		// to a lookup in an unevaluated node, resulting in erroneously failing
 		// lookups.
 		if nv.nonRooted {
-			nv.CompleteArcsOnly(c)
+			nv.CompleteArcsShallow(c)
 		}
 	default:
 		if kind := v.Kind(); kind&StructKind != 0 {

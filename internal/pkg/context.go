@@ -74,7 +74,7 @@ func (c *CallCtxt) Struct(i int) Struct {
 	}
 	switch v, ok := x.(*adt.Vertex); {
 	case ok && !v.IsList():
-		v.CompleteArcs(c.ctx)
+		v.CompleteArcsRecursive(c.ctx)
 		return Struct{v}
 
 	case v != nil:

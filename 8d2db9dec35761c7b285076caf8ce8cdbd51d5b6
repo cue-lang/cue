@@ -16,6 +16,24 @@
       "message": "Unless I\u0027m very badly misreading, in the original, this if-block didn\u0027t exist. https://cue.gerrithub.io/c/cue-lang/cue/+/1233765/5/cue/format/node.go",
       "revId": "8d2db9dec35761c7b285076caf8ce8cdbd51d5b6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95d51be2_24595533",
+        "filename": "cue/format/node.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-19T10:28:49Z",
+      "side": 0,
+      "message": "(discussed on discord; apparently this is fine!)",
+      "parentUuid": "3375a0ad_1886d2cf",
+      "revId": "8d2db9dec35761c7b285076caf8ce8cdbd51d5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

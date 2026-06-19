@@ -241,39 +241,72 @@ func (w *walker) visit(n ast.Node) bool {
 		}
 	case *ast.Interpolation:
 		if w.cfg.RelPos {
-			w.collapseSingleLineInterpolation(n)
+			w.annotateInterpolation(n)
 		}
 	}
 	return true
 }
 
-// collapseSingleLineInterpolation removes any newline inside the
-// interpolation expressions of a single-line string, so the whole
-// string stays on one line (`"\(1 +\n\t2)"` -> `"\(1 + 2)"`). We clear
-// Newline/NewSection leading positions rather than inspecting source
-// line numbers.
+// annotateInterpolation applies the house style to a string
+// interpolation, treating it as multi-line when a literal fragment (the
+// `"""..."""` body) contains a newline.
 //
-// We leave a multi-line string untouched, detecting it by a newline in
-// one of its literal fragments (the `"""..."""` body): the newlines
-// that matter here live inside the `\(...)` expressions and never
-// appear in the fragments.
-func (w *walker) collapseSingleLineInterpolation(x *ast.Interpolation) {
+// In a single-line string, a newline inside the `\(...)` expressions is
+// removed so the string stays on one line (`"\(1 +\n\t2)"` -> `"\(1 + 2)"`).
+//
+// In a multi-line string, the newlines surrounding each `\(...)` are
+// balanced: if either the `\(` or the `)` sits on its own line, both do,
+// mirroring a struct's closing brace following an opener that broke (the
+// StructLit case in [walker.visit]). A newline inside the interpolated
+// expression is left untouched.
+func (w *walker) annotateInterpolation(x *ast.Interpolation) {
+	multiLine := false
 	for _, e := range x.Elts {
 		if lit, ok := e.(*ast.BasicLit); ok && lit.Kind == token.STRING &&
 			strings.Contains(lit.Value, "\n") {
-			return // multi-line string: leave its interpolations alone
+			multiLine = true
+			break
 		}
 	}
-	// The first element is the leading string fragment; its position is
-	// the string's own, so we clear only the elements after it.
-	for _, e := range x.Elts[1:] {
-		ast.Walk(e, func(n ast.Node) bool {
-			if n != nil && n.Pos().RelPos() >= token.Newline {
-				ast.SetRelPos(n, token.NoRelPos)
-				w.changed = true
-			}
-			return true
-		}, nil)
+
+	if !multiLine {
+		// Elts[0] is the leading fragment; its position is the string's
+		// own, so clear only the elements after it.
+		for _, e := range x.Elts[1:] {
+			ast.Walk(e, func(n ast.Node) bool {
+				if n != nil && n.Pos().RelPos() >= token.Newline {
+					ast.SetRelPos(n, token.NoRelPos)
+					w.changed = true
+				}
+				return true
+			}, nil)
+		}
+		return
+	}
+
+	// Elts alternate fragment, expression, fragment, ...: the expression at
+	// each odd index has the break after `\(` as its leading position, and
+	// the following fragment the break before `)`. If either breaks,
+	// promote both to at least Newline.
+	for i := 1; i < len(x.Elts); i += 2 {
+		expr := x.Elts[i]
+		var closer ast.Expr
+		if i+1 < len(x.Elts) {
+			closer = x.Elts[i+1]
+		}
+		exprBreaks := expr.Pos().RelPos() >= token.Newline
+		closerBreaks := closer != nil && closer.Pos().RelPos() >= token.Newline
+		if !exprBreaks && !closerBreaks {
+			continue
+		}
+		if !exprBreaks {
+			ast.SetRelPos(expr, token.Newline)
+			w.changed = true
+		}
+		if closer != nil && !closerBreaks {
+			ast.SetRelPos(closer, token.Newline)
+			w.changed = true
+		}
 	}
 }
 

@@ -17,7 +17,10 @@ singleTwo: "\(1) is \(
 	2)"
 
 // Multi-line strings: surrounding newlines around each interpolation are
-// balanced so they are either both present or both absent.
+// balanced so they are either both present or both absent. When the
+// expression lands on its own line below `\(` it indents one level
+// deeper, like a struct/list/call body; an expression hugging `\(`
+// (multiNeither, multiInner) is not indented.
 multiBoth: """
 	\(
 	1
@@ -50,15 +53,24 @@ singleBoth:     "\(1)"
 singleTwo:      "\(1) is \(2)"
 
 // Multi-line strings: surrounding newlines around each interpolation are
-// balanced so they are either both present or both absent.
+// balanced so they are either both present or both absent. When the
+// expression lands on its own line below `\(` it indents one level
+// deeper, like a struct/list/call body; an expression hugging `\(`
+// (multiNeither, multiInner) is not indented.
 multiBoth: """
-	\(1)
+	\(
+		1
+	)
 	"""
 multiLeading: """
-	\(1)
+	\(
+		1
+	)
 	"""
 multiTrailing: """
-	\(1)
+	\(
+		1
+	)
 	"""
 multiNeither: """
 	\(1)

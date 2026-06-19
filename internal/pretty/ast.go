@@ -2551,14 +2551,109 @@ func (c *converter) interpolation(x *ast.Interpolation) doc {
 // line. The embedded strip prefix is removed from each body line and
 // the renderer re-supplies the indentation at the actual render depth
 // via [docLineBreakHard].
+//
+// When an interpolated expression breaks onto its own line right after
+// `\(`, its content is wrapped in a [docNest] so it indents one level
+// deeper than the line holding `\(`, mirroring a struct/list/call body.
+//
+// An Elt whose leading RelPos is a Newline / NewSection breaks onto its
+// own body line, so a `\(...)` written across lines stays that way. The
+// `\(` and `)` delimiters end and start the surrounding string Elts, so a
+// comment beside one is a PosSuffix (after `\(`) or PosPrefix (before
+// `)`) comment on that Elt, rendered here in place.
 func (c *converter) multiLineInterpolation(x *ast.Interpolation) doc {
 	stripPrefix := stripPrefixFromInterp(x)
 
-	var opener, body []doc
+	var opener, body, interp []doc
 	inBody := false
+	// inInterp is true while we are between a `\(` and its matching
+	// `)`. interpLeadingBreak records whether the first thing emitted
+	// into interp was a line break - i.e. the expression starts on its
+	// own line below `\(` rather than hugging it.
+	inInterp := false
+	interpLeadingBreak := false
+	emit := func(d doc) {
+		switch {
+		case !inBody:
+			opener = append(opener, d)
+		case inInterp:
+			interp = append(interp, d)
+		default:
+			body = append(body, d)
+		}
+	}
+	emitBreak := func(br doc) {
+		inBody = true
+		if inInterp {
+			if len(interp) == 0 {
+				interpLeadingBreak = true
+			}
+			interp = append(interp, br)
+		} else {
+			body = append(body, br)
+		}
+	}
+	closeInterp := func() {
+		if !inInterp {
+			return
+		}
+		d := cats(interp...)
+		if interpLeadingBreak {
+			d = nest(d)
+		}
+		body = append(body, d)
+		interp = nil
+		inInterp = false
+		interpLeadingBreak = false
+	}
 
-	for _, e := range x.Elts {
-		if lit, ok := e.(*ast.BasicLit); ok && lit.Kind == token.STRING {
+	forceBreak := false // a `//` comment ended the previous Elt's line
+	for idx, e := range x.Elts {
+		lit, isStr := e.(*ast.BasicLit)
+		isStr = isStr && lit.Kind == token.STRING
+
+		// A string Elt's comments sit beside a delimiter: those at or before
+		// PosPrefix lead the `)` (trailing the previous line), the rest
+		// trail the `\(`. Expression Elts carry their own comments.
+		var before, after []*ast.CommentGroup
+		if isStr {
+			for _, cg := range ast.Comments(lit) {
+				if cg.Position <= PosPrefix {
+					before = append(before, cg)
+				} else {
+					after = append(after, cg)
+				}
+			}
+		}
+		// before comments lead the closing `)`, so they trail the
+		// interpolated expression's line and stay inside the open
+		// interpolation's nest.
+		for _, cg := range before {
+			emit(cat(spaceLit, c.commentGroup(cg)))
+		}
+
+		// A string Elt other than the first starts with the `)` that
+		// closes the open interpolation: fold its content into the nest
+		// before emitting the `)` line at the outer indent.
+		if isStr {
+			closeInterp()
+		}
+
+		// Break before this Elt's content: an authored Newline / NewSection
+		// RelPos, or a forced break when a `//` comment - the previous Elt's
+		// trailing one or this Elt's leading one - would otherwise swallow
+		// the content.
+		if idx > 0 {
+			br := relBreakOr(e.Pos().RelPos(), nil)
+			if br == nil && (forceBreak || len(before) > 0) {
+				br = lineBreakHard
+			}
+			if br != nil {
+				emitBreak(br)
+			}
+		}
+
+		if isStr {
 			for i, line := range strings.Split(lit.Value, "\n") {
 				if i > 0 {
 					// Line-break before this line. A line that starts with
@@ -2569,34 +2664,36 @@ func (c *converter) multiLineInterpolation(x *ast.Interpolation) doc {
 					// whitespace shorter than the prefix) uses
 					// [docLineBreakBare], a bare `\n` that adds no
 					// indentation, so it is rendered verbatim.
-					inBody = true
 					if rest, ok := strings.CutPrefix(line, stripPrefix); ok && stripPrefix != "" {
-						body = append(body, lineBreakHard)
+						emitBreak(lineBreakHard)
 						line = rest
 					} else {
-						body = append(body, lineBreakBare)
+						emitBreak(lineBreakBare)
 					}
 				}
 				if line == "" {
 					continue
 				}
-				if inBody {
-					body = append(body, stringLit(line))
-				} else {
-					opener = append(opener, stringLit(line))
-				}
+				emit(stringLit(line))
 			}
 		} else {
 			// Interpolation expressions render one level deeper (compact
 			// operators), as in the single-line case above.
 			c.subscript++
-			ed := c.expr(e)
+			emit(c.expr(e))
 			c.subscript--
-			if inBody {
-				body = append(body, ed)
-			} else {
-				opener = append(opener, ed)
-			}
+		}
+
+		for _, cg := range after {
+			emit(cat(spaceLit, c.commentGroup(cg)))
+		}
+		forceBreak = len(after) > 0
+
+		// A string Elt other than the last ends with the `\(` that opens
+		// the next interpolation: route the following content (the
+		// expression and any comment leading its `)`) into the nest.
+		if isStr && idx < len(x.Elts)-1 {
+			inInterp = true
 		}
 	}
 
@@ -2604,6 +2701,10 @@ func (c *converter) multiLineInterpolation(x *ast.Interpolation) doc {
 		// Defensive: shouldn't happen since multiLine was true.
 		return cats(opener...)
 	}
+
+	// A still-open interpolation would mean a malformed AST (no closing
+	// `)`); fold it defensively rather than drop its content.
+	closeInterp()
 
 	return cats(cats(opener...), nest(cats(body...)))
 }

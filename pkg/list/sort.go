@@ -119,7 +119,7 @@ func makeValueSorter(list []cue.Value, cmp cue.Value) (s valueSorter) {
 		Parent:    v.V.Parent,
 		Conjuncts: v.V.Conjuncts,
 	}
-	n.CompleteArcsRecursive(ctx)
+	n.CompleteArcsShallow(ctx)
 
 	s = valueSorter{
 		a:    list,

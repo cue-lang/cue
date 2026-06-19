@@ -16,6 +16,7 @@ package pretty
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -854,6 +855,11 @@ func (c *converter) withCommentsSlots(n ast.Node, body doc, slots commentSlots) 
 	if !skipInterior {
 		trailing = append(trailing, slots.prefix...)
 		trailing = append(trailing, slots.suffix...)
+	} else {
+		// Interior-managing nodes render prefix/suffix comments inside the
+		// node, except a prefix comment that is really trailing; emit that
+		// one here with the trailing comments. See [trailingPrefixComments].
+		trailing = append(trailing, trailingPrefixComments(n)...)
 	}
 	trailing = append(trailing, slots.trailing...)
 
@@ -1275,6 +1281,9 @@ func (c *converter) structLit(x *ast.StructLit) doc {
 	// body stay soft.
 
 	slots := classifyComments(x)
+	// Keep only genuinely interior prefix comments; a trailing one is
+	// rendered by the container, not inside the braces.
+	slots.prefix = nonTrailingPrefix(x, slots.prefix)
 	hasInterior := slots.hasInterior()
 
 	switch {
@@ -1341,6 +1350,9 @@ func (c *converter) listLit(x *ast.ListLit) doc {
 	// [finiteWidth] and the soft breaks inside the body stay soft.
 
 	slots := classifyComments(x)
+	// Keep only genuinely interior prefix comments; a trailing one is
+	// rendered by the container, not inside the brackets.
+	slots.prefix = nonTrailingPrefix(x, slots.prefix)
 	hasInterior := slots.hasInterior()
 
 	switch {
@@ -1724,6 +1736,12 @@ func (c *converter) listElemRow(e ast.Expr, last, trailing, omitCommas bool) (ro
 	for _, cg := range slots.trailing {
 		routeNonDoc(cg)
 	}
+	// Lift a PosPrefix comment the element's own renderer treats as
+	// interior into this row's trailing cell, so it column-aligns with
+	// sibling elements' trailing comments. See [trailingPrefixComments].
+	for _, cg := range trailingPrefixComments(e) {
+		routeNonDoc(cg)
+	}
 
 	cells := []doc{cat(core, comma)}
 	if trailingComment != nil {
@@ -1937,6 +1955,10 @@ func (c *converter) chainGroupArms(x *ast.BinaryExpr, arms []chainArm) doc {
 // comment of any kind (anything at Position >= PosSuffix, inline or
 // own-line).
 func flattenBinaryChain(x *ast.BinaryExpr) (arms []chainArm, hasTrailing bool) {
+	// Comments lifted to the chain's trailing column (only ever on the
+	// outermost node); skipped below. See [trailingPrefixComments].
+	lifted := trailingPrefixComments(x)
+
 	var pending []*ast.CommentGroup // interior comments pending for next arm
 	var walk func(e ast.Expr, outermost bool)
 	walk = func(e ast.Expr, outermost bool) {
@@ -1964,6 +1986,9 @@ func flattenBinaryChain(x *ast.BinaryExpr) (arms []chainArm, hasTrailing bool) {
 		var trailing, interior []*ast.CommentGroup
 		for _, cg := range ast.Comments(bin) {
 			switch {
+			case outermost && slices.Contains(lifted, cg):
+				// Lifted to the trailing column; not rendered as an
+				// interior comment before the last arm.
 			case cg.Position == PosPrefix:
 				interior = append(interior, cg)
 			case outermost && (cg.Position == PosDoc || cg.Position >= PosTrailingMin):
@@ -2174,7 +2199,10 @@ func (c *converter) binaryExprPrec(x *ast.BinaryExpr, co, depth int) doc {
 	// on the left's line (leading operator on a new line is not valid
 	// CUE because of auto-semicolon insertion).
 	slots := classifyComments(x)
-	interior := slots.prefix
+	// Exclude a prefix comment that is really trailing; the container
+	// lifts it, so it must not render between op and RHS. See
+	// [nonTrailingPrefix].
+	interior := nonTrailingPrefix(x, slots.prefix)
 	var opInline []doc               // PosSuffix on the op's line (cg.Line or Blank)
 	var midBlock []*ast.CommentGroup // PosSuffix on its own line
 	for _, cg := range slots.suffix {
@@ -3810,6 +3838,109 @@ func isBracketedInjectionTarget(e ast.Expr) bool {
 		return x.Lbrack.IsValid()
 	}
 	return false
+}
+
+// bracketClose returns the closing-bracket position of e, whether
+// that bracket is empty, and whether e is a bracketed injection
+// target at all.
+func bracketClose(e ast.Expr) (close token.Pos, empty, bracketed bool) {
+	switch x := e.(type) {
+	case *ast.StructLit:
+		if x.Lbrace.IsValid() {
+			return x.Rbrace, len(x.Elts) == 0, true
+		}
+	case *ast.ListLit:
+		if x.Lbrack.IsValid() {
+			return x.Rbrack, len(x.Elts) == 0, true
+		}
+	}
+	return token.NoPos, false, false
+}
+
+// commentTrailsBracket reports whether the PosPrefix comment cg
+// trails the brackets described by (close, empty, bracketed) rather
+// than sitting inside them.
+//
+//   - No bracket (bracketed == false, e.g. a bare `a + b` operand):
+//     the comment cannot be interior, so it trails.
+//   - Non-empty bracket: a genuine interior header attaches to the
+//     first element, not the bracket, so a comment on the bracket
+//     node itself trails.
+//   - Empty bracket: the trailing and interior forms collapse to the
+//     same node and RelPos (the parser has no inner element to anchor
+//     an interior comment to), so we compare source offsets. With no
+//     usable offsets (a programmatic AST that set cg.Line but no
+//     source positions) we cannot tell the two apart, and prefer the
+//     trailing form `a & {}, // c` over moving the comment inside the
+//     brackets.
+func commentTrailsBracket(cg *ast.CommentGroup, close token.Pos, empty, bracketed bool) bool {
+	if !bracketed || !empty {
+		return true
+	}
+	if len(cg.List) > 0 {
+		// This is the only place where we must look at the AbsPos.
+		if slash := cg.List[0].Slash; close.HasAbsPos() && slash.HasAbsPos() {
+			return slash.Offset() > close.Offset()
+		}
+	}
+	return true
+}
+
+// trailingPrefixComments returns the same-line `//` comments the parser
+// hangs at PosPrefix on a call argument's outermost node, which
+// logically trail the whole argument rather than sitting interior to
+// it. In the call-argument context the parser attaches an argument's
+// trailing comment at PosPrefix on the argument node, uniformly across
+// node types (unlike the list-element context, where it uses trailing
+// positions that route correctly on their own).
+//
+// We lift such a comment to the argument's trailing-comment column;
+// the node's own renderer skips it so it is not also rendered inside
+// the node. This is needed only for the node kinds whose renderer
+// would otherwise treat a PosPrefix comment as interior content - the
+// [nodeManagesInteriorComments] set: a BinaryExpr (the candidate
+// bracket is its final operand) or a StructLit / ListLit (the bracket
+// is the argument itself).
+func trailingPrefixComments(n ast.Node) []*ast.CommentGroup {
+	var close token.Pos
+	var empty, bracketed bool
+	switch n := n.(type) {
+	case *ast.BinaryExpr:
+		close, empty, bracketed = bracketClose(n.Y)
+	case *ast.StructLit:
+		close, empty, bracketed = bracketClose(n)
+	case *ast.ListLit:
+		close, empty, bracketed = bracketClose(n)
+	default:
+		return nil
+	}
+	var out []*ast.CommentGroup
+	for _, cg := range ast.Comments(n) {
+		if cg.Position == PosPrefix && cg.Line && commentTrailsBracket(cg, close, empty, bracketed) {
+			out = append(out, cg)
+		}
+	}
+	return out
+}
+
+// nonTrailingPrefix returns the PosPrefix comments on n that are
+// genuinely interior to it: prefix minus the comments
+// [trailingPrefixComments] lifts to the trailing column. A node's
+// renderer uses it so a lifted comment is not also rendered inside the
+// node. Returns prefix unchanged when nothing is lifted (the common
+// case), so it allocates only when a lift actually applies.
+func nonTrailingPrefix(n ast.Node, prefix []*ast.CommentGroup) []*ast.CommentGroup {
+	lifted := trailingPrefixComments(n)
+	if len(lifted) == 0 {
+		return prefix
+	}
+	out := make([]*ast.CommentGroup, 0, len(prefix))
+	for _, cg := range prefix {
+		if !slices.Contains(lifted, cg) {
+			out = append(out, cg)
+		}
+	}
+	return out
 }
 
 // isLeafLitValue reports whether v is a leaf-token expression: one

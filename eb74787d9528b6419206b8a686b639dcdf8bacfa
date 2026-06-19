@@ -3,6 +3,91 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b1ac6fad_e27b1ff2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-19T14:34:22Z",
+      "side": 1,
+      "message": "I\u0027d personally split these formatter fixes so that you first add the test with the old output, then the fix very clearly shows the improvement in the testdata file. Claude has been great at doing this split after a fix plus test are done, FWIW.\n\nUp to personal taste though, happy with whatever works best for you :)",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12916821_960f0aa3",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3883,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-19T14:34:22Z",
+      "side": 1,
+      "message": "nit: I would avoid using var names that shadow Go builtin names, like `close`",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55941172_6a22dd69",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3910,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-19T14:34:22Z",
+      "side": 1,
+      "message": "I\u0027d shorten these godocs personally, but I leave it to you in terms of what\u0027s useful to record in VCS",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5e5f8eb_884db482",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3912,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-19T14:34:22Z",
+      "side": 1,
+      "message": "ditto shadowing",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b3359fb_9b7a8644",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3946,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-19T14:34:22Z",
+      "side": 1,
+      "message": "should we worry that this is quadratic? naively I would assume that very few parts of the formatter should be quadratic or worse",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9209a140_4bc65832",
         "filename": "internal/pretty/testdata/comment-trailing-in-call.txtar",
         "patchSetId": 1
@@ -14,6 +99,24 @@
       "writtenOn": "2026-06-19T11:22:05Z",
       "side": 1,
       "message": "Note it is \"correct\" (or at least expected) that this comment doesn\u0027t align. Fixing this is a bigger change and maybe it\u0027s useful to have an indication that the comment is existing in a different scope?",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9853b779_ef0853ef",
+        "filename": "internal/pretty/testdata/comment-trailing-in-call.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-19T14:34:22Z",
+      "side": 1,
+      "message": "I could see arguments either way, perhaps leave as either a TODO somewhere or an issue to track it, as it feels unrelated to landing this fix",
+      "parentUuid": "9209a140_4bc65832",
       "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

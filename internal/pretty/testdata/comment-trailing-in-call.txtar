@@ -1,0 +1,84 @@
+# A same-line trailing `//` comment after a call argument. In the
+# call-argument context the parser attaches the comment at Position=1
+# (PosPrefix), Line=true on the argument's outermost node, uniformly for
+# every argument kind - unlike the list-element context, where it uses
+# trailing positions. For argument kinds whose renderer treats a
+# PosPrefix comment as interior content (the nodeManagesInteriorComments
+# set: BinaryExpr, StructLit, ListLit) this used to push the comment
+# mid-expression or inside the brackets. We lift it to the argument's
+# trailing-comment column instead, so it aligns with sibling arguments
+# and the argument stays on one line.
+#
+# This covers each affected renderer path: binaryExprPrec (a + b, x == y),
+# chainGroupArms (the multi-arm m | n | o disjunction - the shape of the
+# original issue 4403 report), StructLit / ListLit arguments, and a
+# conjunction with a non-empty bracket arm.
+#
+# An EMPTY `{}`/`[]` is the one case the parser cannot disambiguate: a
+# trailing comment (after `}`) and a header (after `{`) collapse to the
+# same node and RelPos, since there is no inner element to anchor a
+# header to. We tell them apart by comparing the comment's source offset
+# to the closing bracket: `t & {}` (comment after `}`) lifts, while
+# `u & { ... }` (comment after `{`) stays interior.
+#
+# The RelPos-stripped (programmatic) rendering keeps each comment on its
+# own line / inside the brackets: stripping clears the same-line (Line)
+# signal, so the comment is treated as own-line content rather than
+# lifted. (A genuinely programmatic AST that sets Line without source
+# offsets instead falls back to the lifted `t & {}, // c` form.)
+-- in --
+args: matchN(
+	a + b, // arithmetic
+	x == y, // comparison
+	m | n | o, // multi-arm disjunction chain
+	{aa: 1}, // struct arg
+	[1, 2, 3], // list arg
+	p & {q: 1}, // conj, non-empty struct arm
+	t & {}, // conj, EMPTY arm: trailing (comment after })
+	u & { // conj, EMPTY arm: interior (comment after {)
+	},
+)
+-- out/relpos --
+args: matchN(
+	a + b,      // arithmetic
+	x == y,     // comparison
+	m | n | o,  // multi-arm disjunction chain
+	{aa: 1},    // struct arg
+	[1, 2, 3],  // list arg
+	p & {q: 1}, // conj, non-empty struct arm
+	t & {},     // conj, EMPTY arm: trailing (comment after })
+	u & { // conj, EMPTY arm: interior (comment after {)
+	},
+)
+-- out/norelpos --
+args: matchN(
+	a +
+		// arithmetic
+		b,
+	x ==
+		// comparison
+		y,
+	m |
+		n |
+		// multi-arm disjunction chain
+		o,
+	{
+		// struct arg
+		aa: 1
+	}, [
+		// list arg
+		1,
+		2,
+		3,
+	],
+	p & {
+		// conj, non-empty struct arm
+		q: 1
+	},
+	t & {
+		// conj, EMPTY arm: trailing (comment after })
+	},
+	u & {
+		// conj, EMPTY arm: interior (comment after {)
+	},
+)

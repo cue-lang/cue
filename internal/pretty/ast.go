@@ -1819,33 +1819,67 @@ func (c *converter) postfixExpr(x *ast.PostfixExpr) doc {
 
 // binaryExpr converts a BinaryExpr, dispatching by shape:
 //
-//   - a | or & chain carrying any trailing // comment goes to
-//     [converter.chainTableExpr] so the trailing comments column-align;
-//   - a chain whose post-first arms are all bracketed
+//   - any same-operator chain carrying a trailing // comment goes to
+//     [converter.binaryChainTable] so the comments column-align;
+//   - a | or & chain whose post-first arms are all bracketed
 //     (struct/list/paren/call/index) goes to [converter.binaryExprPrec],
 //     keeping the operator inline as `} | {`;
 //   - any other | / & chain goes to [converter.chainGroupArms], which
 //     renders the arms inline when they fit and one-per-line when they
 //     don't;
-//   - a non-chain BinaryExpr (precedence-sensitive +, -, *, ==, ...)
-//     goes to [converter.binaryExprPrec].
+//   - any other BinaryExpr (precedence-sensitive +, -, *, ==, ...) goes
+//     to [converter.binaryExprPrec].
 func (c *converter) binaryExpr(x *ast.BinaryExpr) doc {
 	// The starting depth reflects how deeply the expression is nested
 	// inside index/slice subscripts: at the top of a value it is 1
 	// (normal spacing), inside `[...]` it is 2+ (compact spacing). The
 	// binary tree threads further +1 per operand level from here.
 	depth := 1 + c.subscript
+	arms, hasTrailing := flattenBinaryChain(x)
+	if hasTrailing && c.chainAligns(x, arms) {
+		return c.binaryChainTable(x, arms, nil)
+	}
 	if x.Op == token.OR || x.Op == token.AND {
-		arms, hasTrailing := flattenBinaryChain(x)
-		if hasTrailing {
-			return c.chainTableExpr(x, arms, nil)
-		}
 		if len(arms) > 1 && allBracketArms(arms[1:]) {
 			return c.binaryExprPrec(x, binaryCutoff(x, depth), depth)
 		}
 		return c.chainGroupArms(x, arms)
 	}
 	return c.binaryExprPrec(x, binaryCutoff(x, depth), depth)
+}
+
+// chainAligns reports whether a comment-bearing chain x should render as
+// a column-aligned [docTable] rather than via [converter.binaryExprPrec].
+// A | or & chain always does. For a precedence-sensitive operator we
+// require a top-level position (subscripts and interpolations stay
+// compact and inline) and that every arm's trailing comment is same-line
+// (Line): an own-line comment between operator and operand is not a
+// trailing comment of the arm and is left to binaryExprPrec, which gives
+// it its own line.
+func (c *converter) chainAligns(x *ast.BinaryExpr, arms []chainArm) bool {
+	if x.Op == token.OR || x.Op == token.AND {
+		return true
+	}
+	if c.subscript != 0 {
+		return false
+	}
+	for _, arm := range arms {
+		for _, cg := range arm.trailing {
+			if !cg.Line {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// binaryChainTable lays out a comment-bearing chain as a [docTable]
+// with the trailing comments column-aligned.
+func (c *converter) binaryChainTable(x *ast.BinaryExpr, arms []chainArm, fieldTrailing doc) doc {
+	if x.Op == token.OR || x.Op == token.AND {
+		return c.chainTableExpr(x, arms, fieldTrailing)
+	}
+	return c.arithChainTableExpr(x, arms, fieldTrailing)
 }
 
 // chainArm holds one operand of a flattened | or & chain together
@@ -2068,6 +2102,45 @@ func (c *converter) chainTableExpr(x *ast.BinaryExpr, arms []chainArm, fieldTrai
 		rows[i] = chainTableRow{cell: c.armDoc(arm, outerPrec), trailing: arm.trailing}
 	}
 	return c.maybeGroup(x, c.chainTable(rows, stringLit(" "+x.Op.String()), fieldTrailing))
+}
+
+// arithChainTableExpr renders a precedence-sensitive chain (+, -, *,
+// ==, ...) via [converter.chainTable] so the trailing comments
+// column-align.  Each arm is rendered through
+// [converter.binaryOperand] with the chain's precedence and depth,
+// matching [converter.binaryExprPrec]. This preserves spacing layout
+// that signals precedence.
+func (c *converter) arithChainTableExpr(x *ast.BinaryExpr, arms []chainArm, fieldTrailing doc) doc {
+	depth := 1 + c.subscript
+	co := binaryCutoff(x, depth)
+	prec := x.Op.Precedence()
+
+	rows := make([]chainTableRow, len(arms))
+	for i, arm := range arms {
+		var cell doc
+		if i == 0 {
+			cell = c.binaryOperand(arm.expr, prec, depth+binaryDiffPrec(arm.expr, prec))
+		} else {
+			cell = c.binaryOperand(arm.expr, prec+1, depth+1)
+		}
+		// Interior (Position==1) comments have no bracket to inject into on
+		// an arithmetic arm, so render them on their own line before it,
+		// matching [converter.armDoc]'s non-bracketed fallback.
+		if len(arm.interior) > 0 {
+			parts := make([]doc, 0, 2*len(arm.interior)+1)
+			for _, cg := range arm.interior {
+				parts = append(parts, c.commentGroup(cg), lineBreakHard)
+			}
+			cell = cats(append(parts, cell)...)
+		}
+		rows[i] = chainTableRow{cell: cell, trailing: arm.trailing}
+	}
+
+	connector := doc(stringLit(x.Op.String()))
+	if prec < co {
+		connector = cat(spaceLit, connector)
+	}
+	return c.maybeGroup(x, c.chainTable(rows, connector, fieldTrailing))
 }
 
 // armDoc renders a single chainArm: its expression, with any interior
@@ -3078,11 +3151,11 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	}
 	docComment := c.docCommentBlock(slots.doc, head.Pos().RelPos())
 
-	// If the value is a | or & chain or a selector chain (a.b.c) AND it
-	// carries any trailing comments, hand the field's own trailing comment
-	// to the chain table so it column-aligns with the chain's arm
-	// comments. Otherwise keep it as a separate cell in the field row (so
-	// it aligns with simple fields' trailing comments).
+	// If the value is a binary chain (any operator) or a selector chain
+	// (a.b.c) AND it carries any trailing comments, hand the field's own
+	// trailing comment to the chain table so it column-aligns with the
+	// chain's arm comments. Otherwise keep it as a separate cell in the
+	// field row (so it aligns with simple fields' trailing comments).
 	//
 	// Attributes: for the plain (non-chain) path, attrs get their own
 	// table cell (column 2) so they column-align across rows just like
@@ -3092,7 +3165,7 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	var valDoc doc
 	var attrsDoc doc
 	bin, isBinChain := leaf.Value.(*ast.BinaryExpr)
-	isBinChain = isBinChain && len(trailingCommentDocs) > 0 && (bin.Op == token.OR || bin.Op == token.AND)
+	isBinChain = isBinChain && len(trailingCommentDocs) > 0
 	var binArms []chainArm
 	binHasTrailing := false
 	if isBinChain {
@@ -3118,8 +3191,8 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 		return combined
 	}
 	switch {
-	case isBinChain && binHasTrailing:
-		valDoc = appendAttrs(c.chainTableExpr(bin, binArms, joinTrailing()), leaf.Attrs)
+	case isBinChain && binHasTrailing && c.chainAligns(bin, binArms):
+		valDoc = appendAttrs(c.binaryChainTable(bin, binArms, joinTrailing()), leaf.Attrs)
 	case isSelChain && selHasTrailing:
 		valDoc = appendAttrs(c.selectorTableExpr(selArms, joinTrailing()), leaf.Attrs)
 	case leafValueSlotsFiltered:

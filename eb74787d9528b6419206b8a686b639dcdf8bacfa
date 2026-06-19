@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9209a140_4bc65832",
+        "filename": "internal/pretty/testdata/comment-trailing-in-call.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-19T11:22:05Z",
+      "side": 1,
+      "message": "Note it is \"correct\" (or at least expected) that this comment doesn\u0027t align. Fixing this is a bigger change and maybe it\u0027s useful to have an indication that the comment is existing in a different scope?",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

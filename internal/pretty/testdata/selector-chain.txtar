@@ -1,0 +1,36 @@
+# A selector chain (a."foo-bar".b) written across multiple lines, with
+# the period at the end of each line. The renderer preserves authored
+# line breaks: a segment whose Sel carries a Newline RelPos breaks onto
+# its own indented line after the preceding period. Selectors never break
+# on width, so a chain with no authored breaks (and no comments) stays
+# flat - and a RelPos-stripped chain collapses (it has no layout intent).
+#
+# Trailing `//` comments on the segments (which the parser hangs at
+# PosSuffix on each SelectorExpr, after its period) render in an aligned
+# column via a docTable, matching | / & chains: the head segment's
+# comment stays inline, continuation segments' comments column-align, and
+# the field's own trailing comment (c3) is folded onto the last row so it
+# aligns too. The comments force the multi-line table even without RelPos,
+# since a `//` would otherwise swallow the following segment.
+-- in --
+plain: a.
+	"foo-bar".
+	b
+cmt: x. // c1
+	"y". // c2
+	z // c3
+flat: a.b.c
+-- out/relpos --
+plain: a.
+	"foo-bar".
+	b
+cmt: x. // c1
+	"y". // c2
+	z    // c3
+flat: a.b.c
+-- out/norelpos --
+plain: a."foo-bar".b
+cmt: x. // c1
+	"y". // c2
+	z    // c3
+flat: a.b.c

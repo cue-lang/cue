@@ -529,8 +529,11 @@ import "list"
 	a: "foo-bar": 3
 	b: a."foo-bar"
 	c: a."foo-bar".b
-	d: a."foo-bar"
-	e: a."foo-bar".b
+	d: a.
+		"foo-bar"
+	e: a.
+		"foo-bar".
+		b
 	f: 2
 
 	"contains		tabs": 123

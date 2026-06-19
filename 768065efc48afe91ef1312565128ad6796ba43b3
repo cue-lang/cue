@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49cb34a3_b64e55bd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-19T14:39:20Z",
+      "side": 1,
+      "message": "😬",
+      "revId": "768065efc48afe91ef1312565128ad6796ba43b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8caedc9_5b4c448f",
+        "filename": "internal/pretty/testdata/selector-chain.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-19T14:39:20Z",
+      "side": 1,
+      "message": "interesting that we don\u0027t align c1 with c2 and c3, naively I\u0027d think they should align. but as with the previous fix, happy for this to be a TODO or issue to look at later. and it feels like an unlikely edge case.",
+      "revId": "768065efc48afe91ef1312565128ad6796ba43b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

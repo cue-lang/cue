@@ -584,14 +584,14 @@ import "list"
 	idx1: bar["baz"]
 	idx2: bar["baz"]
 	idx3: bar[
-			"baz"
-			]
+		"baz"
+		]
 	idx4: bar[
-			"baz"
-			]
+		"baz"
+		]
 	idx5: bar[foo[
-			"baz"
-			]]
+		"baz"
+		]]
 }
 -- issue2496.input --
 machine_type: [

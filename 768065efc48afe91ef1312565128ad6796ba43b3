@@ -33,6 +33,24 @@
       "message": "interesting that we don\u0027t align c1 with c2 and c3, naively I\u0027d think they should align. but as with the previous fix, happy for this to be a TODO or issue to look at later. and it feels like an unlikely edge case.",
       "revId": "768065efc48afe91ef1312565128ad6796ba43b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca27cc97_51f17833",
+        "filename": "internal/pretty/testdata/selector-chain.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-19T15:16:00Z",
+      "side": 1,
+      "message": "This actually matches behaviour elsewhere. E.g.\n\n```\na: b \u0026 // c1\n    cxxx \u0026 // c2\n    d      // c3\n```\n\nThe first line is always problematic. It would be good to fix in general, but that\u0027s not this CL.",
+      "parentUuid": "f8caedc9_5b4c448f",
+      "revId": "768065efc48afe91ef1312565128ad6796ba43b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

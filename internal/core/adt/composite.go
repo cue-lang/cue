@@ -1027,8 +1027,11 @@ func (v *Vertex) Unify(c *OpContext, flags Flags) {
 	c.errs = err
 }
 
-// CompleteArcs ensures the set of arcs has been computed.
-func (v *Vertex) CompleteArcs(c *OpContext) {
+// CompleteArcsRecursive ensures the set of arcs of v has been computed and,
+// unlike [Vertex.CompleteArcsShallow], recursively processes the subfields of
+// each arc as well, including typo checking. It does everything [Vertex.Finalize]
+// does short of marking v as finalized.
+func (v *Vertex) CompleteArcsRecursive(c *OpContext) {
 	c.unify(v, Flags{
 		status:     conjuncts,
 		condition:  allKnown,
@@ -1037,7 +1040,13 @@ func (v *Vertex) CompleteArcs(c *OpContext) {
 	})
 }
 
-func (v *Vertex) CompleteArcsOnly(c *OpContext) {
+// CompleteArcsShallow ensures the set of arcs of v has been computed, without
+// recursively processing the subfields of those arcs and without typo checking.
+// Use it when only the direct arcs of v are needed; use
+// [Vertex.CompleteArcsRecursive] when the subfields must be processed too.
+//
+// If v is itself still a pending arc, it reports an incomplete error.
+func (v *Vertex) CompleteArcsShallow(c *OpContext) {
 	c.unify(v, Flags{
 		status:     conjuncts,
 		condition:  allKnown &^ subFieldsProcessed,

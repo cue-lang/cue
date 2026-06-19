@@ -83,7 +83,7 @@ func (x *StructLit) evaluate(c *OpContext, state Flags) Value {
 	//
 	// v.completeArcs(c, state)
 
-	v.CompleteArcsOnly(c)
+	v.CompleteArcsShallow(c)
 	return v
 }
 
@@ -205,7 +205,7 @@ func (x *ListLit) evaluate(c *OpContext, state Flags) Value {
 	e := c.Env(0)
 	// Pass conditions but at least set fieldSetKnown.
 	v := c.newInlineVertex(e.DerefVertex(c), nil, Conjunct{e, x, c.ci})
-	v.CompleteArcsOnly(c)
+	v.CompleteArcsShallow(c)
 
 	// TODO(evalv3): evaluating more aggressively yields some improvements, but
 	// breaks other tests. Consider using this approach, though.
@@ -1315,7 +1315,7 @@ func (x *BinaryExpr) evaluate(c *OpContext, state Flags) Value {
 		if (c.inDetached == 0 && envVertex != nil && envVertex.IsDynamic) || c.inValidator > 0 {
 			v.Finalize(c)
 		} else {
-			v.CompleteArcsOnly(c)
+			v.CompleteArcsShallow(c)
 		}
 
 		return v

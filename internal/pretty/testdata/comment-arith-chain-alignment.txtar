@@ -1,8 +1,17 @@
-# A same-operator arithmetic chain (+, -, *, ==, ...) carrying
-# same-line trailing comments SHOULD align those comments in a column,
-# like a | / & chain.
+# A same-operator arithmetic chain (+, -, *, ==, ...) carrying same-line
+# trailing comments aligns those comments in a column, like a | / & chain.
+# Unlike | / &, the arms are rendered through binaryExprPrec's operand
+# path so the precedence-aware spacing is preserved: in `mixed`, the
+# higher-precedence `f*g` stays compact while the chain's `+` is spaced,
+# even though the comments column-align. The head comment stays inline;
+# the field's own trailing comment (`third`/`gamma`) folds into the last
+# row so it aligns too.
 #
-# This test shows that this is not currently the case.
+# Alignment is gated on same-line (Line) comments at the top level. With
+# RelPos stripped (out/norelpos) the Line signal is gone, so the chain
+# falls back to binaryExprPrec, which places the comments on their own
+# lines - matching how any other own-line comment between operator and
+# operand renders.
 -- in --
 pure: bb + // first
 	c + // second
@@ -12,11 +21,11 @@ mixed: ee + // alpha
 	hhhh // gamma
 -- out/relpos --
 pure: bb + // first
-	c + // second
+	c +  // second
 	dddd // third
 mixed: ee + // alpha
 	f*g + // beta
-	hhhh // gamma
+	hhhh  // gamma
 -- out/norelpos --
 pure: bb +
 	// first

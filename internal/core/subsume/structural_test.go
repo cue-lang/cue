@@ -321,6 +321,13 @@ func TestStructural(t *testing.T) {
 		230: {subsumes: false, in: `a: !=5.0, b: 5.0`},
 		231: {subsumes: false, in: `a: !=5.0, b: 5`},
 
+		232: {subsumes: true, in: `a: !=true, b: false`},
+		233: {subsumes: false, in: `a: !=true, b: true`},
+		234: {subsumes: true, in: `a: !=false, b: true`},
+		235: {subsumes: false, in: `a: !=false, b: false`},
+		236: {subsumes: true, in: `a: ==true, b: true`},
+		237: {subsumes: false, in: `a: ==true, b: false`},
+
 		250: {subsumes: true, in: `a: =~ #"^\d{3}$"#, b: "123"`},
 		251: {subsumes: false, in: `a: =~ #"^\d{3}$"#, b: "1234"`},
 		252: {subsumes: true, in: `a: !~ #"^\d{3}$"#, b: "1234"`},

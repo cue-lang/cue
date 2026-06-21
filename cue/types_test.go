@@ -2234,6 +2234,39 @@ func TestSubsume(t *testing.T) {
 		pathA: a,
 		pathB: b,
 		want:  false,
+	}, {
+		value: `
+			import "list"
+			let h = "abc"
+			a: list.MatchN(>0, =~"\(h)")
+			b: ["abc"]
+			`,
+		pathA:   a,
+		pathB:   b,
+		options: []cue.Option{cue.Final()},
+		want:    true,
+	}, {
+		value: `
+			import "list"
+			let h = "abc"
+			a: list.MatchN(>0, =~"\(h)")
+			b: ["xyz"]
+			`,
+		pathA:   a,
+		pathB:   b,
+		options: []cue.Option{cue.Final()},
+		want:    false,
+	}, {
+		value: `
+			import "list"
+			_h: "abc"
+			a: list.MatchN(>0, =~"\(_h)")
+			b: ["abc"]
+			`,
+		pathA:   a,
+		pathB:   b,
+		options: []cue.Option{cue.Final()},
+		want:    true,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {

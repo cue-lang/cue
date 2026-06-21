@@ -1681,7 +1681,12 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 		return nil
 	}
 	if builtin.IsValidator(len(args)) {
-		return &BuiltinValidator{call, builtin, args}
+		return &BuiltinValidator{
+			Src:     call,
+			Builtin: builtin,
+			Args:    args,
+			Env:     c.Env(0),
+		}
 	}
 	callCtx.args = args
 	result := builtin.call(callCtx)
@@ -1875,6 +1880,8 @@ type BuiltinValidator struct {
 	Src     *CallExpr
 	Builtin *Builtin
 	Args    []Value // any but the first value
+
+	Env *Environment
 }
 
 func (x *BuiltinValidator) Source() ast.Node {

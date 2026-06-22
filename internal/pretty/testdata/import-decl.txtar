@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 import "strings"
 -- out/relpos --
 import "strings"

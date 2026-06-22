@@ -1,3 +1,5 @@
+#width: 10
+
 # Nested list-of-list-of-structs at a width too narrow for any
 # level to fit on a single line. [docBodyShape] picks the hug shape
 # at every level: each list's brackets hug the adjacent cells, the
@@ -6,9 +8,7 @@
 # modeBreak. The result is the "cascading hug" - one indent level
 # for each struct body, with all the brackets sharing the top-level
 # indent column.
--- config --
-width: 10
--- in.cue --
+-- in --
 x: [[{a: _}, {b: _}], {c: _}]
 -- out/relpos --
 x: [[{a: _}, {b: _}], {c: _}]

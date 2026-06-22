@@ -1,3 +1,5 @@
+#width: 40
+
 # When RelPos is stripped (programmatic AST), the contiguous-openers
 # rule applies: when `[{` would be contiguous and the content is too
 # wide to fit, the struct breaks internally rather than breaking
@@ -6,9 +8,7 @@
 #
 # Parsed input keeps the user's single-line layout: width-driven
 # breaks are only applied to programmatic ASTs (no RelPos).
--- config --
-width: 40
--- in.cue --
+-- in --
 x: [{aaaaaaaaa: 111111111, bbbbbbbbbb: 2222222222222222}]
 -- out/relpos --
 x: [{aaaaaaaaa: 111111111, bbbbbbbbbb: 2222222222222222}]

@@ -1,3 +1,5 @@
+#width: 12
+
 # [docBodyShape] also drives the layout of CallExpr argument lists
 # (via callExpr passing useBodyShape into elementRows). When every
 # argument is bracketed-no-relpos, the call's argument layout
@@ -9,9 +11,7 @@
 # and the indented body (14 chars) also doesn't fit at indent+1 (8
 # remaining), so the hug shape fires for the call: `f({`, struct1
 # multi-line, `}, {`, struct2 multi-line, `})`.
--- config --
-width: 12
--- in.cue --
+-- in --
 x: f({a: _}, {b: _})
 -- out/relpos --
 x: f({a: _}, {b: _})

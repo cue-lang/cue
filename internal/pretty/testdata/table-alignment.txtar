@@ -1,6 +1,5 @@
--- config --
-width: 20
--- in.cue --
+#width: 20
+-- in --
 {
 	foo: 1
 	barbaz: 2

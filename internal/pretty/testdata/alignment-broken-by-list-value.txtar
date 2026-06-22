@@ -1,10 +1,10 @@
+#width: 20
+
 # A list-valued field is interspersed among simple fields. The
 # list `[1, 2, 3]` fits on a single line, so its row shares the
 # alignment with `x` and `y`: all three keys pad to `items:`'s
 # width.
--- config --
-width: 20
--- in.cue --
+-- in --
 {
 x:       1
 	items: [1, 2, 3]

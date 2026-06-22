@@ -1,5 +1,5 @@
 # Multi-line input so Newline RelPos is honoured.
--- in.cue --
+-- in --
 {
 	foo?: 1
 }

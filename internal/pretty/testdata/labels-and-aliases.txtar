@@ -2,7 +2,7 @@
 # labels (`[expr]: ...`), parenthesised labels (`(expr): ...`), and
 # alias labels (`X=foo: ...`). Each hits a distinct case of the
 # label() switch.
--- in.cue --
+-- in --
 [string]: int
 (foo): 1
 X=bar: 2

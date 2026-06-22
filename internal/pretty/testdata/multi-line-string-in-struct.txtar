@@ -1,7 +1,7 @@
 # A multi-line string value introduces forced newlines (LitLine),
 # so it flushes the surrounding alignment table: `name` sits on its
 # own without being padded to `description:`'s key width.
--- in.cue --
+-- in --
 {
 	description: """
 		This is a long

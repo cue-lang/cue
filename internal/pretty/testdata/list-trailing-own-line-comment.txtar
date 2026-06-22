@@ -9,7 +9,7 @@
 # "post-element" comments and are inserted as their own Raw rows in
 # the list's table, so the comma stays glued to the value and the
 # comment renders on its own line(s).
--- in.cue --
+-- in --
 steps: [
 	a,
 	b,

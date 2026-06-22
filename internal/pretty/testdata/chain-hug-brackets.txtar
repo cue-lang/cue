@@ -5,7 +5,7 @@
 # onto a new indented line. The chain's own Nest is skipped too, so
 # the bracketed arms share the enclosing context's indent (their own
 # brackets provide visual grouping).
--- in.cue --
+-- in --
 x: {
 	pb: *{
 		encoding:       "binarypb"

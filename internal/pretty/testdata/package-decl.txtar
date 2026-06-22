@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 package foo
 -- out/relpos --
 package foo

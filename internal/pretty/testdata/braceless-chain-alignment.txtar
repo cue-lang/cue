@@ -11,7 +11,7 @@
 # fit does the renderer fall back to the merged chain+val Doc per
 # row, where partial breaks can land val on the chain's deepest
 # line at the cost of cross-row val alignment.
--- in.cue --
+-- in --
 extensions: "-": encoding: *"cue" | _
 extensions: ".json": interpretation: *"auto" | _
 extensions: ".yaml": interpretation: *"auto" | _

@@ -9,7 +9,7 @@
 # CUE syntax forbids a newline immediately before `)` (auto-comma
 # insertion triggers), so paren-as-inner cases ([(, ((, {() can only
 # appear with flat content - the rule applies trivially there.
--- in.cue --
+-- in --
 a1: [[
 	1
 ]]

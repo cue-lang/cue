@@ -3,7 +3,7 @@
 # must not be padded just to make room for the lone comment - the
 # comment should sit one space after the value, not at the
 # column-1 max-width position.
--- in.cue --
+-- in --
 #File: {
 	filename?:       string // only filled in FromFile, but not in ParseFile
 	encoding!:       #Encoding

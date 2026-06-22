@@ -11,7 +11,7 @@
 # so an empty line stays empty and a spaces-only line stays spaces-only. The
 # previous behaviour silently added the strip prefix to every body
 # line, turning a bare empty line into a tab-only line.
--- in.cue --
+-- in --
 x: """
 	first \(name)
 

@@ -3,7 +3,7 @@
 # so values only align within runs of same-shape keys. Here the first
 # two rows have two-level chains and align together; the third row has
 # a three-level chain and is rendered without joining that group.
--- in.cue --
+-- in --
 aa: bb: 1
 c: d: 2
 eee: f: g: 3

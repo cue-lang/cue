@@ -1,9 +1,9 @@
+#width: 20
+
 # Struct and list values that fit on a single line still participate
 # in column alignment: the `apple`/`ball` value columns line up
 # because neither value introduces a newline.
--- config --
-width: 20
--- in.cue --
+-- in --
 {
 	apple: {x: 1}
 ball:      [1, 2]

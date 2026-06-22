@@ -1,5 +1,5 @@
 # Trailing // comments on consecutive fields are vertically aligned.
--- in.cue --
+-- in --
 {
 	x: "hello"   // greeting
 	y: "goodbye"   // farewell

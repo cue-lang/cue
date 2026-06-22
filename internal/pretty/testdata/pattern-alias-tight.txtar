@@ -8,7 +8,7 @@
 # "="s as "==", so `[Y= =~"foo"]` must keep its space or it re-parses as
 # `Y == ~"foo"`. The space is also needed when the leading "=~"/"==" sits
 # at the head of a | / & chain (e.g. `[W= =~"a" | =~"b"]`).
--- in.cue --
+-- in --
 [x=string]: x
 [Y= =~"foo"]: 123
 [Z= ==5]: 123

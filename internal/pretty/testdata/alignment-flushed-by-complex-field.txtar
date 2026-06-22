@@ -10,7 +10,7 @@
 # (programmatic-source path) and the whole struct fits flat at
 # width 80, so it renders as a single comma-separated line with
 # no padding involved.
--- in.cue --
+-- in --
 foo: 1
 longname: 22
 deep:

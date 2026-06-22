@@ -5,7 +5,7 @@
 # token and fails to parse. `>` and `<=` before `-` do not form a token
 # (`>-`, `<=-` lex as two tokens), so they hug. The `=~` (MAT) cases
 # need a space after `<` / `!` because `<=` / `!=` would form.
--- in.cue --
+-- in --
 a: < -5
 b: > -15
 c: <= -3

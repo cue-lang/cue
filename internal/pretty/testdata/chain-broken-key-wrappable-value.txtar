@@ -1,3 +1,5 @@
+#width: 8
+
 # When a braceless chain key breaks across lines (e.g. `g:\n abcde:`)
 # and the leaf value is wrappable (struct, list, call, etc.), the value's
 # caller-indent must match the chain's deepest broken line - not the
@@ -9,9 +11,7 @@
 # r.lastIndent already tracks the most recent newline's level, so
 # renderTableSegment promotes cellIndent for cell 1 when it is deeper
 # than the row's indent.
--- config --
-width: 8
--- in.cue --
+-- in --
 g: abcde: {x}
 -- out/relpos --
 g: abcde: {x}

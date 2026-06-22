@@ -1,6 +1,6 @@
 # A non-same-line comment between the operator and the RHS of a
 # binary expression stays before the RHS, not after it.
--- in.cue --
+-- in --
 x: a + // xx
     // yy
 

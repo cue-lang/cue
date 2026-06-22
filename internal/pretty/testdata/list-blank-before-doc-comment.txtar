@@ -3,7 +3,7 @@
 # on the comment). elemBreak must honour that RelPos - the blank line
 # belongs between the previous element and the doc comment, not lost
 # or folded into the element break.
--- in.cue --
+-- in --
 x: [
 	1,
 

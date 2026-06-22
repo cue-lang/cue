@@ -5,7 +5,7 @@
 # single-element hug is reserved for value-leading elements that read
 # as adjacent openers: list elements ("[{"), call arguments ("f({"),
 # and struct embeds ("{ {").
--- in.cue --
+-- in --
 versions!: {a: {
 	name!: string
 	schema!: {openAPIV3Schema!: _ @go(,type="cuelang.org/go/cue".Value)}

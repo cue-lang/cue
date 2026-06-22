@@ -4,7 +4,7 @@
 # rows where the comma-joined keys still get padded out to the column
 # max width. Lists and call arguments are unaffected - this rule is
 # scoped to struct declarations (declSlice).
--- in.cue --
+-- in --
 {
 	token?: string
 	"replaces-base"?: bool, organization?: string, repo?: string, "auth-key"?: string, "public-key-fingerprint"?: string

@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 {
 // doc on list field
     x: [  1, 2, 3]

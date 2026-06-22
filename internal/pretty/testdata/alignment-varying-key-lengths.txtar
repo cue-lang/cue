@@ -1,7 +1,7 @@
+#width: 20
+
 # Fields with varying key lengths: values should be aligned.
--- config --
-width: 20
--- in.cue --
+-- in --
 {
 	a:   1
 bb: 2

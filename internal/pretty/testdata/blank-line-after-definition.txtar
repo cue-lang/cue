@@ -1,3 +1,5 @@
+#houseStyle: true
+
 # A doc-commented field after a definition always gets a blank
 # line before it, regardless of authored RelPos. Definitions are a
 # strong enough visual section break that the formatter fills in
@@ -9,10 +11,8 @@
 # intent was specified - but definitions don't.
 #
 # The blank line is supplied by style.Config.Annotate's A4 rule, so
-# this test enables the annotate pre-pass.
--- config --
-annotate: true
--- in.cue --
+# this test enables the house-style pre-pass (#houseStyle).
+-- in --
 {
 	#Foo: string
 	// doc comment

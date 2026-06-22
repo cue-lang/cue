@@ -1,5 +1,5 @@
 # Trailing // comments on list elements: comma comes before comment.
--- in.cue --
+-- in --
 [
 	1, // first
 	2 , // second

@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 {
 	x: !   true
 	y: ! =~"pat"

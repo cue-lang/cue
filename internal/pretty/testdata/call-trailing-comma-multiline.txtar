@@ -1,12 +1,12 @@
+#width: 30
+
 # When a function call's closing ')' lands on its own line, the last
 # argument gets a trailing comma - same rule as list literals (CUE's
 # parser accepts `f(a, b,)`). Single-line calls retain `f(a, b)`
 # without a trailing comma. The rule fires both when RelPos puts ')'
 # on its own line (parsed mode) and when a width-driven break does
 # so (programmatic mode).
--- config --
-width: 30
--- in.cue --
+-- in --
 {
 	flat: f(a, b, c)
 	source_broken: f(

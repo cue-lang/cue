@@ -4,7 +4,7 @@
 # it does for empty "{ ... }"; the renderer injects them back into the
 # bracket body so the output parses to the same attachment and
 # preserves the user's visual intent.
--- in.cue --
+-- in --
 package p
 
 foo: a & [

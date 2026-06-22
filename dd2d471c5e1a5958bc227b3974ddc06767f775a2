@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41693bda_567ae1f9",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-22T14:05:40Z",
+      "side": 1,
+      "message": "Good catch — done, and it surfaced a second, related bug.\n\ndefaultMajorForBase now consults localMF.DefaultMajorVersions() first (matching resolveReplacement at load time), falling back to the published view.\n\nBut fixing only that revealed that tidy still produced a broken local-module.cue: the replacement target is reached only through the replacement, so tidyRoots pruned it, leaving a replaceWith whose target was no longer recorded as a dependency (load then failed with \"must be listed as a dependency with a version\"). This affected the explicit-major case too, not just bare paths. tidyRoots now re-adds each replacement target as a root at its minimum-version-selected version, so the target is recorded as a dependency as the commit message promises.\n\nAdded cmd/cue/cmd/testdata/script/modtidy_bare_replace.txtar, which runs cue mod tidy on the bare-path setup, checks the rewritten module.cue/local-module.cue, exports, and runs cue mod tidy --check for round-trip stability. It fails without either fix.",
+      "parentUuid": "2f733d3c_6f578fe7",
+      "revId": "dd2d471c5e1a5958bc227b3974ddc06767f775a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+# A same-operator arithmetic chain (+, -, *, ==, ...) carrying
+# same-line trailing comments SHOULD align those comments in a column,
+# like a | / & chain.
+#
+# This test shows that this is not currently the case.
+-- in --
+pure: bb + // first
+	c + // second
+	dddd // third
+mixed: ee + // alpha
+	f * g + // beta
+	hhhh // gamma
+-- out/relpos --
+pure: bb + // first
+	c + // second
+	dddd // third
+mixed: ee + // alpha
+	f*g + // beta
+	hhhh // gamma
+-- out/norelpos --
+pure: bb +
+	// first
+	c +
+	// second
+	dddd // third
+mixed: ee +
+	// alpha
+	f*g +
+	// beta
+	hhhh // gamma

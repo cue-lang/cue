@@ -15,7 +15,9 @@
 package pretty_test
 
 import (
+	"bytes"
 	"math"
+	"os"
 	"path/filepath"
 	"reflect"
 	"strconv"
@@ -27,16 +29,26 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/pretty"
 	"cuelang.org/go/internal/pretty/style"
 )
 
-// TestTxtar runs the txtar-based pretty-printer tests in testdata/. Each
-// file holds an optional "config" section (width/indent settings), an
-// "in.cue" input, and the expected outputs "out/relpos" (RelPos honoured)
-// and "out/norelpos" (RelPos stripped). We check both outputs for
-// idempotency.
+// TestTxtar runs the txtar-based pretty-printer tests in
+// testdata/. Each file holds an optional "config" section
+// (width/indent settings), an "in.cue" input, and the expected
+// outputs "out/relpos" (RelPos honoured) and "out/norelpos" (RelPos
+// stripped). We check both outputs for idempotency.
+//
+// Setting CUE_UPDATE=1 regenerates the "out/relpos" and
+// "out/norelpos" sections in place from the current formatter output,
+// creating either section when it is absent. That lets a new test be
+// authored with just a "config" and "in.cue" section and have its
+// goldens filled in. The idempotency and comment-preservation checks
+// still run under CUE_UPDATE, so a regenerated golden that is itself
+// buggy is still reported rather than silently baked in.
 func TestTxtar(t *testing.T) {
+	update := cuetest.UpdateGoldenFiles()
 	files, err := filepath.Glob(filepath.Join("testdata", "*.txtar"))
 	if err != nil {
 		t.Fatal(err)
@@ -85,10 +97,10 @@ func TestTxtar(t *testing.T) {
 				}
 			}
 
-			// Get sections.
+			// Get the input section. The golden sections are read by
+			// [checkGolden], which tolerates their absence under
+			// CUE_UPDATE.
 			input := trimTrailingNewline(sectionData(t, ar, "in.cue"))
-			wantRelPos := trimTrailingNewline(sectionData(t, ar, "out/relpos"))
-			wantNoRelPos := trimTrailingNewline(sectionData(t, ar, "out/norelpos"))
 
 			cfg := &pretty.Config{Width: width, Indent: indent}
 			// Annotate is opt-in. Tests that exercise rules owned by
@@ -107,27 +119,77 @@ func TestTxtar(t *testing.T) {
 			styleCfg.Annotate(syntax)
 
 			gotRelPos := trimTrailingNewline(string(mustFormat(t, cfg, syntax)))
-			if gotRelPos != wantRelPos {
-				t.Errorf("with RelPos:\ngot:\n%s\nwant:\n%s", gotRelPos, wantRelPos)
-			} else {
-				checkIdempotent(t, gotRelPos, cfg)
-			}
 			// We run the preservation check on whatever the printer
 			// produced, even if it diverges from the golden. Losing a
 			// comment is a bug regardless of whether the layout matched.
 			checkCommentsPreserved(t, "with RelPos", input, gotRelPos)
+			checkGolden(t, ar, "out/relpos", "with RelPos", gotRelPos, cfg, update)
 
 			// Test without RelPos.
 			stripRelPos(syntax)
 			styleCfg.Annotate(syntax)
 			gotNoRelPos := trimTrailingNewline(string(mustFormat(t, cfg, syntax)))
-			if gotNoRelPos != wantNoRelPos {
-				t.Errorf("without RelPos:\ngot:\n%s\nwant:\n%s", gotNoRelPos, wantNoRelPos)
-			} else {
-				checkIdempotent(t, gotNoRelPos, cfg)
-			}
 			checkCommentsPreserved(t, "without RelPos", input, gotNoRelPos)
+			checkGolden(t, ar, "out/norelpos", "without RelPos", gotNoRelPos, cfg, update)
+
+			if update {
+				writeArchive(t, file, ar)
+			}
 		})
+	}
+}
+
+// checkGolden compares got against the named golden section of ar. In
+// update mode it overwrites the section (creating it when absent)
+// instead of failing on a mismatch; the caller is responsible for
+// flushing ar to disk afterwards via [writeArchive]. Whenever got is
+// the accepted output - always under CUE_UPDATE, or on a match
+// otherwise - we additionally assert that re-formatting it is a
+// no-op. label distinguishes the RelPos and no-RelPos passes in
+// failure messages.
+func checkGolden(t *testing.T, ar *txtar.Archive, section, label, got string, cfg *pretty.Config, update bool) {
+	t.Helper()
+	accepted := update
+	if update {
+		setSection(ar, section, got)
+	} else {
+		want := trimTrailingNewline(sectionData(t, ar, section))
+		if got == want {
+			accepted = true
+		} else {
+			t.Errorf("%s:\ngot:\n%s\nwant:\n%s", label, got, want)
+		}
+	}
+	if accepted {
+		checkIdempotent(t, got, cfg)
+	}
+}
+
+// setSection sets the named section's data, creating the section
+// (appended after the existing ones) when it does not yet
+// exist.
+func setSection(ar *txtar.Archive, name, data string) {
+	payload := []byte(data + "\n")
+	for i := range ar.Files {
+		if ar.Files[i].Name == name {
+			ar.Files[i].Data = payload
+			return
+		}
+	}
+	ar.Files = append(ar.Files, txtar.File{Name: name, Data: payload})
+}
+
+// writeArchive reformats ar and writes it back to file, but only when
+// the bytes actually changed, so a CUE_UPDATE=1 run leaves unchanged
+// files (and their modification times) untouched.
+func writeArchive(t *testing.T, file string, ar *txtar.Archive) {
+	t.Helper()
+	formatted := txtar.Format(ar)
+	if old, err := os.ReadFile(file); err == nil && bytes.Equal(old, formatted) {
+		return
+	}
+	if err := os.WriteFile(file, formatted, 0o666); err != nil {
+		t.Fatalf("writeback to %s: %v", file, err)
 	}
 }
 

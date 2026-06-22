@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79784c31_e56f423d",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:19:18Z",
+      "side": 1,
+      "message": "nit: oxford comma",
+      "revId": "ff956ffb814a7079b6eeee3ca99b4b7f0a1ff5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8d1a9d6_b5d337f4",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:19:18Z",
+      "side": 1,
+      "message": "I wonder if we should have a \"strict\" mode later on, so that we fail if the encoder cannot faithfully represent a schema. Or would that fail too often in practice?\n\nNot for this patch in any case, just thinking outloud.",
+      "revId": "ff956ffb814a7079b6eeee3ca99b4b7f0a1ff5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1d7265a_704c2239",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:19:18Z",
+      "side": 1,
+      "message": "nit: use links when referencing versions, like `[VersionDraft7]` here",
+      "revId": "ff956ffb814a7079b6eeee3ca99b4b7f0a1ff5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14689234_22ced9cd",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:19:18Z",
+      "side": 1,
+      "message": "this is consulted all over the place, and we add it in the constructor always, so I wonder if a pointer helps here.",
+      "revId": "ff956ffb814a7079b6eeee3ca99b4b7f0a1ff5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "246b0f89_40a9b769",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1392,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:19:18Z",
+      "side": 1,
+      "message": "should we panic as this is unreachable?",
+      "revId": "ff956ffb814a7079b6eeee3ca99b4b7f0a1ff5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "835b596d_5337c543",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:19:18Z",
+      "side": 1,
+      "message": "`kinds :\u003d i.kinds` aliases the backing array, so this `slices.Delete` mutates (and zeroes) `i.kinds` in place. Since items are interned, the same `*itemType` can be generated more than once, and the second call sees the corrupted slice. `generate` should be pure.\n\nRepro (OpenAPI):\n\n\t#A: null | string\n\t#B: null | string\n\ta: #A\n\tb: #B\n\nA renders correctly as `anyOf:[{enum:[null]},{type:\"string\"}]`, but B\u0027s null branch becomes `{type:\"\"}`. Fix: `slices.Delete(slices.Clone(kinds), j, j+1)`. Worth a fixture with two identical null-bearing defs to cover it.",
+      "revId": "ff956ffb814a7079b6eeee3ca99b4b7f0a1ff5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7719ace8_4afb6604",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:19:18Z",
+      "side": 1,
+      "message": "do we need a default/fallback case here?",
+      "revId": "ff956ffb814a7079b6eeee3ca99b4b7f0a1ff5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "664f31c8_e6def39a",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 999,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:19:18Z",
+      "side": 1,
+      "message": "nit: you don\u0027t set brace positions, so I wouldn\u0027t use braces in your example, e.g. `components: schemas: value`.",
+      "revId": "ff956ffb814a7079b6eeee3ca99b4b7f0a1ff5b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

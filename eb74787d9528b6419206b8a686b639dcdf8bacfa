@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc762e83_369cee11",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T10:54:31Z",
+      "side": 1,
+      "message": "I like this too; I\u0027ve just tried doing this. In this case, we can\u0027t, because the behaviour of the formatter is idempotent. The tests require that:\n\n```\nbytes1 \u003d format(inputAst)\nreparsedAst \u003d parse(bytes1)\nbytes2 \u003d format(reparsedAst)\nbytes1 \u003d\u003d\u003d bytes2\n```\n\nUnfortunately in this case, that doesn\u0027t hold. In general, when we find cases where comments are getting lost or moved to very much the wrong place, this idempotency property fails and we get in trouble.",
+      "parentUuid": "b1ac6fad_e27b1ff2",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12916821_960f0aa3",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-19T14:34:22Z",
       "side": 1,
       "message": "nit: I would avoid using var names that shadow Go builtin names, like `close`",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd38acfd_ce7f7f13",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3883,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T10:54:31Z",
+      "side": 1,
+      "message": "I don\u0027t disagree, but we have a lot of vars named close, and functions named bracketClose etc in this file. I can\u0027t stand inconsistency so I\u0027d want to rename everything. But I do think it\u0027s the correct most-meaningful name; I don\u0027t mind pun-names like `klose` in this case, but eg `end` is very much the wrong name; `right` could work if we change all `open`s to `left`. But in general I think if we do want to change that, it\u0027s a bigger change to do, and not this CL.",
+      "parentUuid": "12916821_960f0aa3",
       "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7481a48e_d5bf3d33",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3910,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T10:54:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55941172_6a22dd69",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5e5f8eb_884db482",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db891ba2_755b512d",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3912,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T10:54:31Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a5e5f8eb_884db482",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b3359fb_9b7a8644",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-06-19T14:34:22Z",
       "side": 1,
       "message": "should we worry that this is quadratic? naively I would assume that very few parts of the formatter should be quadratic or worse",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddf0170a_ec4eb00b",
+        "filename": "internal/pretty/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3946,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T10:54:31Z",
+      "side": 1,
+      "message": "I think we should worry only if it\u0027s ever realistic that a node has 1000 comment groups attached or more. Below that, IME, a slice is faster than a map.",
+      "parentUuid": "7b3359fb_9b7a8644",
       "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -117,6 +207,24 @@
       "side": 1,
       "message": "I could see arguments either way, perhaps leave as either a TODO somewhere or an issue to track it, as it feels unrelated to landing this fix",
       "parentUuid": "9209a140_4bc65832",
+      "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "878da405_b5184d0a",
+        "filename": "internal/pretty/testdata/comment-trailing-in-call.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T10:54:31Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9853b779_ef0853ef",
       "revId": "eb74787d9528b6419206b8a686b639dcdf8bacfa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

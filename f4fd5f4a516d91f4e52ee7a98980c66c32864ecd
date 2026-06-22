@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c43b291e_4537d257",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-22T13:54:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d82419f9_d7b69777",
+      "revId": "f4fd5f4a516d91f4e52ee7a98980c66c32864ecd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2cdb4e5_46628c37",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-06-13T13:17:57Z",
       "side": 1,
       "message": "nit: I\u0027d shorten this a little if you can, to keep the schema docs from being too verbose",
+      "revId": "f4fd5f4a516d91f4e52ee7a98980c66c32864ecd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d80d26ee_5dfc8fba",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-22T13:54:00Z",
+      "side": 1,
+      "message": "All the info seems relevant and useful to me. I think it\u0027s probably fine as is.",
+      "parentUuid": "f2cdb4e5_46628c37",
       "revId": "f4fd5f4a516d91f4e52ee7a98980c66c32864ecd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

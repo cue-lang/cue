@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dae263cd_90b31e68",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T11:52:00Z",
+      "side": 1,
+      "message": "SGTM, but is there a particular reason why you didn\u0027t use the cuetxtar package? it\u0027s meant for exactly this sort of thing. ideally we don\u0027t reimplement parts of it in multiple test packages. if there\u0027s a particular issue you ran into with it, I\u0027d note it in a TODO here, so we can come back later and clean this up.",
+      "revId": "9793a219b51e58ef78b6483403a660fc80a3aa3b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

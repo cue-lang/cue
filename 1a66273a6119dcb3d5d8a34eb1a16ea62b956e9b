@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "820cb755_316161a0",
+        "filename": "cue/format/testdata/interpolation.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T14:54:28Z",
+      "side": 1,
+      "message": "I ended up posting this indent idea in the other testdata, and forgot to discard this partial draft",
+      "parentUuid": "903882b3_8bf590e3",
+      "revId": "1a66273a6119dcb3d5d8a34eb1a16ea62b956e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5311b308_b579309d",

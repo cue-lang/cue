@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9547e288_fb233a9f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T07:20:16Z",
+      "side": 1,
+      "message": "The fix LGTM, but the tests are always skipped. And they don\u0027t really belong in the subsume package. Will fix this in a follow-up commit.",
+      "revId": "4f15a5a56546959267f452adcfd72c157fe202a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33f4c958_e95b2bf8",
+        "filename": "internal/mod/modpkgload/replace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-22T14:36:52Z",
+      "side": 1,
+      "message": "Ah, good catch. The change had been lost when fixing conflicts. Done now!",
+      "parentUuid": "280969c2_607134df",
+      "revId": "f4fd5f4a516d91f4e52ee7a98980c66c32864ecd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2cdb4e5_46628c37",

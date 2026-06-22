@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1497342_8905194e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T11:34:41Z",
+      "side": 1,
+      "message": "Done. Reworded to \"package name for non-CUE files and CUE output\", and noted the change in the commit message. (Scoped it to \"CUE output\" rather than \"the output\" since -p has no effect on non-CUE output such as the default JSON, and the encoder only adds the package name when the emitted CUE lacks one.)",
+      "parentUuid": "b5acf003_b03225b5",
+      "revId": "814daf899ed6e7cb52c79440d064b6b685a249b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b10ce2de_0f5e8896",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T11:34:41Z",
+      "side": 1,
+      "message": "Done. Updated the help text to \"package name to use for the output and for non-CUE files\", and noted the change in the commit message.",
+      "parentUuid": "b5acf003_b03225b5",
+      "revId": "814daf899ed6e7cb52c79440d064b6b685a249b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

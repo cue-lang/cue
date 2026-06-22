@@ -16,6 +16,24 @@
       "message": "SGTM, but is there a particular reason why you didn\u0027t use the cuetxtar package? it\u0027s meant for exactly this sort of thing. ideally we don\u0027t reimplement parts of it in multiple test packages. if there\u0027s a particular issue you ran into with it, I\u0027d note it in a TODO here, so we can come back later and clean this up.",
       "revId": "9793a219b51e58ef78b6483403a660fc80a3aa3b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7133460e_c12509aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T12:39:34Z",
+      "side": 1,
+      "message": "Sorry, you\u0027re completely right; for some reason I thought cuetxtar forced use of the load package and the evaluator matrix. It does not.\n\nAll the code has been reworked to use cuetxtar.",
+      "parentUuid": "dae263cd_90b31e68",
+      "revId": "9793a219b51e58ef78b6483403a660fc80a3aa3b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

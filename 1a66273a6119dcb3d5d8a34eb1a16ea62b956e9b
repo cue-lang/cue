@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "903882b3_8bf590e3",
+        "filename": "cue/format/testdata/interpolation.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T14:41:52Z",
+      "side": 1,
+      "message": "given that formatv2 is a good chance to",
+      "revId": "1a66273a6119dcb3d5d8a34eb1a16ea62b956e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5311b308_b579309d",
         "filename": "internal/pretty/testdata/interpolation-comments.txtar",
         "patchSetId": 4
@@ -14,6 +31,58 @@
       "writtenOn": "2026-06-22T14:06:59Z",
       "side": 1,
       "message": "This test can\u0027t appear prior to this CL because it fails a different invariant: the test framework checks that we don\u0027t lose any comments when comparing the original input AST with the AST from reparsing the formatted output. Unfortunately the bug that this CL fixes changes the position of a comment which means that the test will always fail the invariant.",
+      "revId": "1a66273a6119dcb3d5d8a34eb1a16ea62b956e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e94835b_72d889f7",
+        "filename": "internal/pretty/testdata/interpolation-comments.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T14:41:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5311b308_b579309d",
+      "revId": "1a66273a6119dcb3d5d8a34eb1a16ea62b956e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "115c633a_3cbb192a",
+        "filename": "internal/pretty/testdata/interpolation-comments.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T14:41:52Z",
+      "side": 1,
+      "message": "it would IMHO be nice if we indented expressions in multi-line interpolations; it reads better and it\u0027s consistent with how we bump the indentation level within func calls, parentheses, structs, lists, etc.",
+      "revId": "1a66273a6119dcb3d5d8a34eb1a16ea62b956e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd780397_e566ed5b",
+        "filename": "internal/pretty/testdata/interpolation-comments.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T14:41:52Z",
+      "side": 1,
+      "message": "shouldn\u0027t the \"house style\" enforce that these three in norelpos use a newline after the opening `\\(` too? otherwise we leave the format unbalanced.",
       "revId": "1a66273a6119dcb3d5d8a34eb1a16ea62b956e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

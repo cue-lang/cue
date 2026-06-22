@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9bba42e_41bd2ce4",
+        "filename": "internal/pretty/testdata/comment-arith-chain-alignment.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T14:57:18Z",
+      "side": 1,
+      "message": "ideally I\u0027d want alpha to be aligned with beta and gamma too, because conceptually all three comments are \"inline\" on the value. is there a reason that you prefer it not to be? or is that something that you\u0027re leaving for a future enhancement?\n\nthe change here is still an incremental improvement from my point of view, though.",
+      "revId": "de02c18de5429256b7649fee9e5ccaa2e1629ddc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

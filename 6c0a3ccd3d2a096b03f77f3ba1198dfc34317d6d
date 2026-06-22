@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "454e6e03_2513f7be",
+        "filename": "internal/pretty/testdata/selector-chain.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T13:58:20Z",
+      "side": 1,
+      "message": "fwiw, I checked, and this test also can\u0027t be added as a failing test ahead of time as it too violates the idempotency check.",
+      "revId": "6c0a3ccd3d2a096b03f77f3ba1198dfc34317d6d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

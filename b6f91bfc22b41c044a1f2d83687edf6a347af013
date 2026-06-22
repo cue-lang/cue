@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8572821b_b87a91ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T14:34:55Z",
+      "side": 1,
+      "message": "Still LGTM, but one of the previous comments appears not resolved",
+      "revId": "b6f91bfc22b41c044a1f2d83687edf6a347af013",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

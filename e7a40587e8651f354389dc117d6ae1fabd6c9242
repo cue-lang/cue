@@ -16,6 +16,24 @@
       "message": "rather than adding this, keep the original Reviewed-On trailer; note how the other cherry picks in this branch like https://review.gerrithub.io/c/cue-lang/cue/+/1239108 have two such trailers, reflecting that the change-id was reviewed twice - once for master, and once for the cherry-pick",
       "revId": "e7a40587e8651f354389dc117d6ae1fabd6c9242",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9d202f9_3e1ed7c0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-22T15:16:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc92625f_fbea698b",
+      "revId": "e7a40587e8651f354389dc117d6ae1fabd6c9242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

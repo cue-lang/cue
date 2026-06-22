@@ -81,97 +81,62 @@ errScore: {
 }
 -- out/generate-v3/schema --
 {
-	components: {
-		schemas: {
-			Foo: {
-				type:                 "object"
-				additionalProperties: false
-				properties: {
-					age: {
-						allOf: [{
-							type: "number"
-						}, {
-							type:             "integer"
-							exclusiveMaximum: true
-							exclusiveMinimum: true
-							maximum:          150
-							minimum:          0
-						}]
-					}
-					either: {
-						anyOf: [{
-							type: "integer"
-						}, {
-							type: "string"
-						}]
-					}
-					kind: {
-						enum: ["widget"]
-					}
-					maybe: {
-						anyOf: [{
-							type: "integer"
-						}, {
-							type: "string"
-						}, {
-							enum: [null]
-						}]
-					}
-					name: {
-						type: "string"
-					}
-					nick: {
-						nullable: true
-						type:     "string"
-					}
-					pair: {
-						type: "array"
-						items: {
-							anyOf: [{
-								type: "string"
-							}, {
-								type: "integer"
-							}]
-						}
-						maxItems: 2
-						minItems: 2
-					}
-					sharedNull1: {
-						nullable:    true
-						type:        "string"
-						description: "A bug in development was triggered by the following.\nLeft in to check for regressions."
-					}
-					sharedNull2: {
-						nullable: true
-						type:     "string"
-					}
+	components: schemas: {
+		Foo: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				age: allOf: [{
+					type: "number"
+				}, {
+					type:             "integer"
+					exclusiveMaximum: true
+					exclusiveMinimum: true
+					maximum:          150
+					minimum:          0
+				}]
+				either: anyOf: [{type: "integer"}, {type: "string"}]
+				kind: enum:    ["widget"]
+				maybe: anyOf:  [{type: "integer"}, {type: "string"}, {enum: [null]}]
+				name: type:    "string"
+				nick: {
+					nullable: true
+					type:     "string"
+				}
+				pair: {
+					type: "array"
+					items: anyOf: [{type: "string"}, {type: "integer"}]
+					maxItems: 2
+					minItems: 2
+				}
+				sharedNull1: {
+					nullable: true
+					type:     "string"
+					description:
+						"A bug in development was triggered by the following.\nLeft in to check for regressions."
+				}
+				sharedNull2: {
+					nullable: true
+					type:     "string"
 				}
 			}
-			Score: {
-				type: "integer"
-			}
 		}
+		Score: type: "integer"
 	}
 	type: "object"
 	properties: {
-		foo: {
-			$ref: "#/components/schemas/Foo"
-		}
+		foo: $ref: "#/components/schemas/Foo"
 		fooOpt: {
 			nullable: true
-			allOf: [{
-				$ref: "#/components/schemas/Foo"
-			}]
+			allOf:    [{$ref: "#/components/schemas/Foo"}]
 		}
-		score: {
-			allOf: [{
-				$ref: "#/components/schemas/Score"
-			}, {
-				type:             "number"
-				exclusiveMinimum: true
-				minimum:          0
-			}]
-		}
+		score: allOf: [{
+			$ref: "#/components/schemas/Score"
+		}, {
+			type:             "number"
+			exclusiveMinimum: true
+			minimum:          0
+		}]
 	}
 }
 -- out/generate-v3/errAgeNotPositive --

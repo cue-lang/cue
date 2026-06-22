@@ -56,50 +56,34 @@ errScore: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				age: {
-					allOf: [{
-						type: "number"
-					}, {
-						type:             "integer"
-						exclusiveMaximum: 150
-						exclusiveMinimum: 0
-					}]
-				}
-				kind: {
-					const: "widget"
-				}
-				name: {
-					type: "string"
-				}
+				age: allOf: [{
+					type: "number"
+				}, {
+					type:             "integer"
+					exclusiveMaximum: 150
+					exclusiveMinimum: 0
+				}]
+				kind: const: "widget"
+				name: type:  "string"
 				pair: {
-					type: "array"
-					items: [{
-						type: "string"
-					}, {
-						type: "integer"
-					}]
+					type:     "array"
+					items:    [{type: "string"}, {type: "integer"}]
 					maxItems: 2
 					minItems: 2
 				}
 			}
 		}
-		Score: {
-			type: "integer"
-		}
+		Score: type: "integer"
 	}
 	type: "object"
 	properties: {
-		foo: {
-			$ref: "#/definitions/Foo"
-		}
-		score: {
-			allOf: [{
-				$ref: "#/definitions/Score"
-			}, {
-				type:             "number"
-				exclusiveMinimum: 0
-			}]
-		}
+		foo: $ref: "#/definitions/Foo"
+		score: allOf: [{
+			$ref: "#/definitions/Score"
+		}, {
+			type:             "number"
+			exclusiveMinimum: 0
+		}]
 	}
 }
 -- out/generate-v3/errAgeTooBig --

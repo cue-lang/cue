@@ -3,6 +3,10 @@
 // arguments, and struct equality bounds (== / !=). Also covers issue 4142
 // (struct equality in definitions) and issue 4251 (SimplifyBounds panic on ==
 // bounds combined with other bound types).
+//
+// Issue 4388: == / != bounds are valid on bool, ordered bounds are not. The !=
+// and ordered cases are in bool.cue; the == cases need the structcmp
+// experiment to parse, so they are in equalScalar (equals.cue).
 -- cue.mod/module.cue --
 module: "x.test"
 language: version: "v0.14.0"
@@ -214,6 +218,13 @@ equalScalar: {
 
 	err2: [1, 2]
 	err2: !=[1, 2] @test(err, code=eval, contains="out of bound !=", pos=[0:8, -1:8])
+
+	// == bounds are valid on bool too (issue 4388).
+	ok3: ==true
+	ok3: true  @test(eq, true)
+
+	err3: ==true
+	err3: false @test(err, code=eval, contains="out of bound ==true", pos=[-1:8, 0:8])
 }
 equalStruct: {
 	ok1: =={} @test(eq, {})
@@ -290,6 +301,24 @@ issue4251: ok: {
 }
 issue4251: fail: {
 	b: =="b" & !="b" & "b" @test(err, code=eval, contains="out of bound !=", pos=[0:13, 0:5, 0:21])
+}
+-- bool.cue --
+boolBound: notEqual: {
+	ok1: !=true
+	ok1: false  @test(eq, false)
+
+	ok2: !=false
+	ok2: true   @test(eq, true)
+
+	err1: !=true
+	err1: true  @test(err, code=eval, contains="out of bound !=true", pos=[-1:8, 0:8])
+}
+// Ordered bounds are rejected on bool, as bool is not an ordered type.
+boolBound: ordered: {
+	gtr: >true   @test(err, code=eval, contains="cannot use bool for bound >", pos=[0:8])
+	geq: >=true  @test(err, code=eval, contains="cannot use bool for bound >=", pos=[0:9])
+	lss: <false  @test(err, code=eval, contains="cannot use bool for bound <", pos=[0:8])
+	leq: <=false @test(err, code=eval, contains="cannot use bool for bound <=", pos=[0:9])
 }
 -- out/errors.txt --
 [eval] simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
@@ -394,30 +423,44 @@ issue4251: fail: {
 [eval] simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
     ./binarystring.cue:47:17
     ./binarystring.cue:47:9
+[eval] boolBound.notEqual.err1: invalid value true (out of bound !=true):
+    ./bool.cue:8:8
+    ./bool.cue:9:8
+[eval] boolBound.ordered.gtr: cannot use bool for bound >:
+    ./bool.cue:13:8
+[eval] boolBound.ordered.geq: cannot use bool for bound >=:
+    ./bool.cue:14:9
+[eval] boolBound.ordered.lss: cannot use bool for bound <:
+    ./bool.cue:15:8
+[eval] boolBound.ordered.leq: cannot use bool for bound <=:
+    ./bool.cue:16:9
 [eval] equalScalar.err1: invalid value 2 (out of bound ==1):
     ./equals.cue:10:8
     ./equals.cue:11:8
 [eval] equalScalar.err2: invalid value [1,2] (out of bound !=[1,2]):
     ./equals.cue:14:8
     ./equals.cue:13:8
+[eval] equalScalar.err3: invalid value false (out of bound ==true):
+    ./equals.cue:20:8
+    ./equals.cue:21:8
 [eval] equalStruct.err1: invalid value {a:1,b:2} (out of bound =={}):
-    ./equals.cue:23:8
-    ./equals.cue:24:8
+    ./equals.cue:30:8
+    ./equals.cue:31:8
 [eval] equalStruct.err2: invalid value {a:1,b:2} (out of bound !={a:1,b:2}):
-    ./equals.cue:27:8
-    ./equals.cue:26:8
+    ./equals.cue:34:8
+    ./equals.cue:33:8
 [incomplete] nonConcrete.iErr1: non-concrete value _int for bound ==:
-    ./equals.cue:34:11
+    ./equals.cue:41:11
 [incomplete] nonConcrete.iErr2: non-concrete value _int for bound !=:
-    ./equals.cue:36:11
+    ./equals.cue:43:11
 [incomplete] nonConcrete.iErr3: non-concrete value _int for bound ==:
-    ./equals.cue:38:11
+    ./equals.cue:45:11
 [eval] nonConcrete.eErr5: conflicting values =="foo" and int (mismatched types string and int):
-    ./equals.cue:32:8
-    ./equals.cue:44:9
-    ./equals.cue:45:9
+    ./equals.cue:39:8
+    ./equals.cue:51:9
+    ./equals.cue:52:9
 [incomplete] nonConcrete.eErr6: non-concrete value _int for bound ==:
-    ./equals.cue:47:11
+    ./equals.cue:54:11
 [incomplete] simplifyExpr.less1: non-concrete value <3 for bound <:
     ./in.cue:14:11
 [incomplete] simplifyExpr.less2: non-concrete value <=3 for bound <:
@@ -503,14 +546,14 @@ issue4251: fail: {
     ./issue4251-panic.cue:15:5
     ./issue4251-panic.cue:15:21
 -- out/eval/stats --
-Leaks:  0
-Freed:  254
-Reused: 195
-Allocs: 59
+Leaks:  9
+Freed:  394
+Reused: 302
+Allocs: 101
 Retain: 0
 
-Unifications: 238
-Conjuncts:    422
-Disjuncts:    0
+Unifications: 352
+Conjuncts:    707
+Disjuncts:    42
 
-NumCloseIDs: 8
+NumCloseIDs: 58

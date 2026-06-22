@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42f9e6b1_11f5bbe3",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3671.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T11:34:41Z",
+      "side": 1,
+      "message": "The \":\" was the import-path:package qualifier syntax (\".:foo\"). That form is gone now that the cases live in export_cue.txtar and use plain file inputs (pkg.cue / diffpkg.cue), so the confusing notation no longer appears.",
+      "parentUuid": "887c9dcf_927f1b1e",
+      "revId": "79da4a13174f7215fe0603f584365db180842c34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12a65cd2_0553584c",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3671.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-22T11:34:41Z",
+      "side": 1,
+      "message": "Done. Moved these cases into export_cue.txtar (deleting the dedicated file) and added a matching-package case (Case 6) alongside the mismatching one (Case 7). Both carry the issue reference. Also kept coverage of repackaging merged orphan data via --force as Case 4.",
+      "parentUuid": "4eecf5b5_02074149",
+      "revId": "79da4a13174f7215fe0603f584365db180842c34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

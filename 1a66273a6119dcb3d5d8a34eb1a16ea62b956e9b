@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5311b308_b579309d",
+        "filename": "internal/pretty/testdata/interpolation-comments.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-22T14:06:59Z",
+      "side": 1,
+      "message": "This test can\u0027t appear prior to this CL because it fails a different invariant: the test framework checks that we don\u0027t lose any comments when comparing the original input AST with the AST from reparsing the formatted output. Unfortunately the bug that this CL fixes changes the position of a comment which means that the test will always fail the invariant.",
+      "revId": "1a66273a6119dcb3d5d8a34eb1a16ea62b956e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

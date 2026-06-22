@@ -5,7 +5,7 @@
 # and the formatter must not silently delete it. When the closing
 # ')' lands on its own line the last argument gets a trailing comma
 # (same rule as list literals).
--- in.cue --
+-- in --
 x: strings.Join(
 			a,
 	            ",",

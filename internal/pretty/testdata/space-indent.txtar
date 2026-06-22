@@ -1,9 +1,9 @@
+#width: 8
+#indent: "  "
+
 # Multi-line input: Newline RelPos honoured.
 # Without RelPos at width 8: doesn't fit, so breaks anyway.
--- config --
-width: 8
-indent: "  "
--- in.cue --
+-- in --
 {
   a: 1
   b: 2

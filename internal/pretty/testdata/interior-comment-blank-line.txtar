@@ -9,7 +9,7 @@
 # group, so the NewSection signal is gone and the two comments
 # collapse onto consecutive lines - the comments themselves still
 # render, just without the authored gap.
--- in.cue --
+-- in --
 x: {
 	// first
 

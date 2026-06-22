@@ -1,6 +1,6 @@
 # A comment at the end of a file, separated by a blank line,
 # is preserved with the blank line.
--- in.cue --
+-- in --
 x: true
 
 // a comment

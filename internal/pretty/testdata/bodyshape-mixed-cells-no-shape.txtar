@@ -1,3 +1,5 @@
+#width: 15
+
 # A list whose cells are not all bracketed-no-relpos falls back to
 # the standard bracketedLayout path - [docBodyShape] does not fire.
 # Here a BasicLit `1` sits next to a struct cell, so
@@ -9,9 +11,7 @@
 # This contrasts with the all-bracketed bodies covered by the
 # other bodyshape-* tests, where the hug shape's "brackets adjacent
 # to multi-line cells inline" pattern fires.
--- config --
-width: 15
--- in.cue --
+-- in --
 x: [1, {a: _, b: _}]
 -- out/relpos --
 x: [1, {a: _, b: _}]

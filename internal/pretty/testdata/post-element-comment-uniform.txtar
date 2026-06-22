@@ -5,7 +5,7 @@
 # same way for StructLit, ListLit, and BinaryExpr chains, sending
 # post-element comments to the postCommentRows path so they render as
 # separate rows after the element's row.
--- in.cue --
+-- in --
 x: [
 	{},
 	// a

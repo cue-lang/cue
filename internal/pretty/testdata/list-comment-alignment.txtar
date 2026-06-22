@@ -1,6 +1,6 @@
 # Trailing comments on list elements should align in a column,
 # just like trailing comments on struct fields.
--- in.cue --
+-- in --
 x: [
 	"apple", // pie
 	"banana",  // sunday

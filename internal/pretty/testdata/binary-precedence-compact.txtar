@@ -1,5 +1,5 @@
 # Compact mode (inside comparison): no spaces around arithmetic.
--- in.cue --
+-- in --
 x:     a + b ==   c+d
 -- out/relpos --
 x: a+b == c+d

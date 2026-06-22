@@ -1,6 +1,6 @@
 # Multi-line paren: RelPos Newline honoured on the inner expression.
 # No newline before ')' (auto-comma insertion would break it).
--- in.cue --
+-- in --
 x: (
 	1 + 2)
 -- out/relpos --

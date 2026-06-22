@@ -1,7 +1,7 @@
 # A doc comment on a field should not disable padding for that field.
 # The comment appears before the field, and the field still aligns.
 # The doc comment forces the struct to break (so it's not lost).
--- in.cue --
+-- in --
 {
 	// doc comment
 	x: 1

@@ -7,7 +7,7 @@
 # before the comment is emitted; the row's DocComment carries its own
 # trailing separator driven by the element's own RelPos, so the blank
 # between the comment and the body lands on the right side.
--- in.cue --
+-- in --
 x: [
 
 	// comment

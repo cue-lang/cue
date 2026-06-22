@@ -3,7 +3,7 @@
 # newline intent (its `]` is on the same line as the last element), so
 # no trailing comma should appear before the outer `]`. The inner list,
 # which the user wrote multi-line, keeps its own trailing comma.
--- in.cue --
+-- in --
 x: [[
 	"go",
 ], b]

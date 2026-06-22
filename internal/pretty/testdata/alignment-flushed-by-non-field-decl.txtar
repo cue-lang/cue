@@ -10,7 +10,7 @@
 # columns. With the flush, the rows above the non-field align only
 # amongst themselves (key column = `longname:`) and the rows below
 # align amongst themselves (key column = `bazinga:`).
--- in.cue --
+-- in --
 let_between: {
 	foo: 1
 	longname: 22

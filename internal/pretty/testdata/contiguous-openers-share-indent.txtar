@@ -8,7 +8,7 @@
 # break, but the list's brackets never inject a newline at those
 # boundaries. Consequently no trailing comma is added when `]` hugs
 # the last `}`.
--- in.cue --
+-- in --
 x: [{
 		a: _
 	},

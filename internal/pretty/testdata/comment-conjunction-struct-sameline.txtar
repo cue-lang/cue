@@ -5,7 +5,7 @@
 # back inside the braces. Because the user wrote the comment trailing
 # `{` on the same line, the formatter keeps it there (with a single
 # space, matching structLit's own Line=true prefix-comment handling).
--- in.cue --
+-- in --
 foo: #X & {//a: 5
 }
 -- out/relpos --

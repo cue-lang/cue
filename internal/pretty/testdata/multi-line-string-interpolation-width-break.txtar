@@ -1,3 +1,5 @@
+#width: 40
+
 # An interpolation `\(...)` inside a multi-line string carries an
 # expression that the formatter will width-break when no RelPos is
 # available - for example a CallExpr whose flat width exceeds the
@@ -7,9 +9,7 @@
 #
 # In the parsed (RelPos-kept) case the user's single-line layout is
 # preserved end to end: the call stays flat inside `\(...)`.
--- config --
-width: 40
--- in.cue --
+-- in --
 x: """
 	prefix \(someFunc(longArg1aaaaaaaaaa, longArg2bbbbbbbbbb, longArg3cccccccccc)) suffix
 	"""

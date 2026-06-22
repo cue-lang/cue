@@ -4,7 +4,7 @@
 # carries no break hints and collapses to compact `import ("a", "b")`
 # at the default width - the renderer treats the parentheses as a
 # Group that picks flat when the line fits.
--- in.cue --
+-- in --
 import (
 	"strings"
 	"list"

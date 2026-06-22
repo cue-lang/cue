@@ -4,7 +4,7 @@
 # The last comment ("fourth food") is a field-level trailing comment
 # that is passed into the chain table for alignment with the other
 # trailing comments.
--- in.cue --
+-- in --
 out: "Apple" | // first food
       "Banana" | // second food
     "Carrot" | // third food

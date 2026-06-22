@@ -4,7 +4,7 @@
 # chain falls through to field() which now honours a leading break on
 # a braceless-struct value: the value starts on its own indented
 # line, preserving the user's line structure.
--- in.cue --
+-- in --
 x:
 	y:
 		z: 1

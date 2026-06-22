@@ -3,7 +3,7 @@
 # the RHS is forced onto a new line regardless of RelPos.
 # The RHS is indented one level, matching | and & chains.
 # The // comment forces the struct to break.
--- in.cue --
+-- in --
 {
 	x: 1 + // trailing on plus
 2

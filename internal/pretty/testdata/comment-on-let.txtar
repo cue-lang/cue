@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 {
 	// doc on let
 	let   x = 1

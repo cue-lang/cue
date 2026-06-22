@@ -6,7 +6,7 @@
 # binaryExprPrec) now go through docCommentBlock, which picks
 # BlankLine when a group's RelPos is NewSection and HardLine
 # otherwise.
--- in.cue --
+-- in --
 a: {
 	// c1
 	// c2

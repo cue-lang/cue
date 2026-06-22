@@ -8,7 +8,7 @@
 # are not padded to align with the `// also` / `// here` comments on
 # the later simple arms. The last two arms, both single-line, still
 # share column alignment with each other.
--- in.cue --
+-- in --
 #X: {a?: int}
 foo: #X |        // comment
     {

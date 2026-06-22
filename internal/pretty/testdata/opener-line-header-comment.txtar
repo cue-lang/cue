@@ -14,7 +14,7 @@
 #
 # In the norelpos case stripRelPos clears the layout knobs, so the
 # header-on-opener-line shape collapses to the own-line shape.
--- in.cue --
+-- in --
 struct_with_content: { // header
 	x: _
 }

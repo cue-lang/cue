@@ -15,8 +15,9 @@
 package pretty_test
 
 import (
+	"fmt"
+	"io/fs"
 	"math"
-	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -27,131 +28,93 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/pretty"
 	"cuelang.org/go/internal/pretty/style"
 )
 
-// TestTxtar runs the txtar-based pretty-printer tests in testdata/. Each
-// file holds an optional "config" section (width/indent settings), an
-// "in.cue" input, and the expected outputs "out/relpos" (RelPos honoured)
-// and "out/norelpos" (RelPos stripped). We check both outputs for
-// idempotency.
+// TestTxtar runs the txtar-based pretty-printer tests in testdata/ via
+// the [cuetxtar] golden-file harness. Each file holds an "in" input
+// section and the expected outputs "out/relpos" (RelPos honoured) and
+// "out/norelpos" (RelPos stripped); we check both outputs for
+// idempotency and comment preservation. The width / indent / houseStyle
+// knobs are read from the archive comment as cuetxtar tags:
+//
+//	#width: 40
+//	#indent: "  "
+//	#houseStyle: true
+//
+// CUE_UPDATE=1 regenerates the out/* sections in place (and creates
+// either when absent, so a new test can be authored with just an "in"
+// section); CUE_UPDATE=diff shows the diff without writing. The
+// idempotency and comment-preservation checks run regardless, so a
+// regenerated golden that is itself buggy is still reported rather
+// than silently baked in.
 func TestTxtar(t *testing.T) {
-	files, err := filepath.Glob(filepath.Join("testdata", "*.txtar"))
-	if err != nil {
-		t.Fatal(err)
+	test := cuetxtar.TxTarTest{
+		Root: "testdata",
+		Name: "",
 	}
-	if len(files) == 0 {
-		t.Fatal("no txtar files found in testdata/")
-	}
-	for _, file := range files {
-		name := strings.TrimSuffix(filepath.Base(file), ".txtar")
-		t.Run(name, func(t *testing.T) {
-			ar, err := txtar.ParseFile(file)
+	test.Run(t, func(tc *cuetxtar.Test) {
+		// width / indent / houseStyle come from the archive comment tags.
+		width := 80
+		if v, ok := tc.Value("width"); ok {
+			n, err := strconv.Atoi(v)
 			if err != nil {
-				t.Fatal(err)
+				tc.Fatalf("bad #width: %v", err)
 			}
-
-			// Parse config.
-			width := 80
-			indent := "\t"
-			annotate := false
-			if sec := findSection(t, ar, "config"); sec != nil {
-				for line := range strings.SplitSeq(string(sec.Data), "\n") {
-					key, val, ok := strings.Cut(line, ":")
-					if !ok {
-						continue
-					}
-					key = strings.TrimSpace(key)
-					val = strings.TrimSpace(val)
-					switch key {
-					case "width":
-						n, err := strconv.Atoi(val)
-						if err != nil {
-							t.Fatalf("bad width: %v", err)
-						}
-						width = n
-					case "indent":
-						indent, err = strconv.Unquote(val)
-						if err != nil {
-							t.Fatalf("bad indent: %v", err)
-						}
-					case "annotate":
-						annotate, err = strconv.ParseBool(val)
-						if err != nil {
-							t.Fatalf("bad annotate: %v", err)
-						}
-					}
-				}
-			}
-
-			// Get sections.
-			input := trimTrailingNewline(sectionData(t, ar, "in.cue"))
-			wantRelPos := trimTrailingNewline(sectionData(t, ar, "out/relpos"))
-			wantNoRelPos := trimTrailingNewline(sectionData(t, ar, "out/norelpos"))
-
-			cfg := &pretty.Config{Width: width, Indent: indent}
-			// Annotate is opt-in. Tests that exercise rules owned by
-			// the style package (e.g. A4's blank-line-before-doc
-			// upgrades) set annotate: true in their config, so we run
-			// the pre-pass - mirroring how cue/format invokes pretty.
-			// Tests that target the pretty layer in isolation leave it
-			// off, so we exercise the renderer against the raw AST.
-			styleCfg := style.Config{RelPos: annotate}
-
-			// Test with RelPos from parser.
-			syntax, err := parser.ParseFile("in.cue", input, parser.ParseComments)
-			if err != nil {
-				t.Fatalf("parse error: %v", err)
-			}
-			styleCfg.Annotate(syntax)
-
-			gotRelPos := trimTrailingNewline(string(mustFormat(t, cfg, syntax)))
-			if gotRelPos != wantRelPos {
-				t.Errorf("with RelPos:\ngot:\n%s\nwant:\n%s", gotRelPos, wantRelPos)
-			} else {
-				checkIdempotent(t, gotRelPos, cfg)
-			}
-			// We run the preservation check on whatever the printer
-			// produced, even if it diverges from the golden. Losing a
-			// comment is a bug regardless of whether the layout matched.
-			checkCommentsPreserved(t, "with RelPos", input, gotRelPos)
-
-			// Test without RelPos.
-			stripRelPos(syntax)
-			styleCfg.Annotate(syntax)
-			gotNoRelPos := trimTrailingNewline(string(mustFormat(t, cfg, syntax)))
-			if gotNoRelPos != wantNoRelPos {
-				t.Errorf("without RelPos:\ngot:\n%s\nwant:\n%s", gotNoRelPos, wantNoRelPos)
-			} else {
-				checkIdempotent(t, gotNoRelPos, cfg)
-			}
-			checkCommentsPreserved(t, "without RelPos", input, gotNoRelPos)
-		})
-	}
-}
-
-// sectionData returns the data for the named section. We fatal if it is
-// not present.
-func sectionData(t *testing.T, ar *txtar.Archive, name string) string {
-	t.Helper()
-	sec := findSection(t, ar, name)
-	if sec == nil {
-		t.Fatalf("missing section %q", name)
-	}
-	return string(sec.Data)
-}
-
-// findSection returns the first archive file with the given name, or
-// nil.
-func findSection(t *testing.T, ar *txtar.Archive, name string) *txtar.File {
-	t.Helper()
-	for i := range ar.Files {
-		if ar.Files[i].Name == name {
-			return &ar.Files[i]
+			width = n
 		}
-	}
-	return nil
+		indent := "\t"
+		if v, ok := tc.Value("indent"); ok {
+			s, err := strconv.Unquote(v)
+			if err != nil {
+				tc.Fatalf("bad #indent: %v", err)
+			}
+			indent = s
+		}
+		// houseStyle is opt-in. Tests that exercise rules owned by the
+		// style package (e.g. A4's blank-line-before-doc upgrades) set
+		// #houseStyle: true, so we run the style pre-pass - mirroring how
+		// cue/format invokes pretty. Tests that target the pretty layer
+		// in isolation leave it off, exercising the renderer against the
+		// raw AST.
+		houseStyle := tc.Bool("houseStyle")
+
+		fsys, err := txtar.FS(tc.Archive)
+		if err != nil {
+			tc.Fatal(err)
+		}
+		data, err := fs.ReadFile(fsys, "in")
+		if err != nil {
+			tc.Fatal(err)
+		}
+		input := trimTrailingNewline(string(data))
+		cfg := &pretty.Config{Width: width, Indent: indent}
+		styleCfg := style.Config{RelPos: houseStyle}
+
+		// With RelPos from the parser.
+		syntax, err := parser.ParseFile("in", input, parser.ParseComments)
+		if err != nil {
+			tc.Fatalf("parse error: %v", err)
+		}
+		styleCfg.Annotate(syntax)
+		gotRelPos := trimTrailingNewline(string(mustFormat(tc, cfg, syntax)))
+		fmt.Fprintln(tc.Writer("relpos"), gotRelPos)
+		// We run the preservation check on whatever the printer
+		// produced, even if it diverges from the golden. Losing a
+		// comment is a bug regardless of whether the layout matched.
+		checkCommentsPreserved(tc.T, "with RelPos", input, gotRelPos)
+		checkIdempotent(tc.T, gotRelPos, cfg)
+
+		// Without RelPos.
+		stripRelPos(syntax)
+		styleCfg.Annotate(syntax)
+		gotNoRelPos := trimTrailingNewline(string(mustFormat(tc, cfg, syntax)))
+		fmt.Fprintln(tc.Writer("norelpos"), gotNoRelPos)
+		checkCommentsPreserved(tc.T, "without RelPos", input, gotNoRelPos)
+		checkIdempotent(tc.T, gotNoRelPos, cfg)
+	})
 }
 
 func trimTrailingNewline(s string) string {

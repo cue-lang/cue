@@ -4,7 +4,7 @@
 # parser normalises `fallback` to the AST node that the pretty-printer
 # emits as `otherwise` after a for-clause and as `else` after an
 # if/try-clause, per the keyword rule in fallbackClause.
--- in.cue --
+-- in --
 @experiment(try)
 a: {
 	if false {

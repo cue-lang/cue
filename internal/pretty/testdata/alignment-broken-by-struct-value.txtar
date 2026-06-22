@@ -1,9 +1,9 @@
+#width: 28
+
 # A single-line struct value `{inner: true}` participates in the
 # alignment table like any other value; its row's value column
 # lines up with the simple values on either side.
--- config --
-width: 28
--- in.cue --
+-- in --
 {
 	short: 1
 longname: 2

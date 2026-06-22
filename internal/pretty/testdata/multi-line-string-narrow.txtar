@@ -1,7 +1,7 @@
+#width: 10
+
 # Even at narrow width, multi-line string content is never reflowed.
--- config --
-width: 10
--- in.cue --
+-- in --
 {
         x: """
                 hello

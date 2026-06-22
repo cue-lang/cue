@@ -1,3 +1,5 @@
+#width: 20
+
 # Function calls get a trailing comma on the last argument when the
 # closing ')' lands on its own line - same rule as list literals.
 # Single-line calls keep `foo(a, b)` with no trailing comma. An
@@ -11,9 +13,7 @@
 # The norelpos variant exercises the width-driven multi-line call
 # layout, where the trailing comma fires because ')' lands on its
 # own line.
--- config --
-width: 20
--- in.cue --
+-- in --
 {
 	y: foo(a, b)
 	z: foo(aaaaa, bbbbb)

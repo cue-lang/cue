@@ -4,7 +4,7 @@
 # token of the spec), not the spec itself. importDecl uses leadingRel
 # so the blank line is preserved - without it, the spec's own RelPos
 # is just Newline and the blank gets silently dropped.
--- in.cue --
+-- in --
 package p
 
 import (

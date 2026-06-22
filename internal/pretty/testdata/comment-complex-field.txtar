@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 {
 // doc on struct field
 x: {

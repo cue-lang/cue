@@ -1,7 +1,7 @@
 # Ellipsis as a list element, both bare `...` and typed `...int`.
 # Exercises the typed branch of the ellipsis() converter that the
 # struct-only ellipsis.txtar didn't reach.
--- in.cue --
+-- in --
 open: [
 	1,
 	2,

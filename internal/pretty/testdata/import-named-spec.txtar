@@ -2,7 +2,7 @@
 # importSpec, which renders `name "path"`. Covers both the
 # single-import form (`import foo "..."`) and named specs inside an
 # import group.
--- in.cue --
+-- in --
 package p
 
 import foo "path/to/pkg"

@@ -6,7 +6,7 @@
 # blank line *after* the comment (between comment and `b`); the
 # pretty-printer must render the blank line on that side, not move it
 # to be between `{` and the comment.
--- in.cue --
+-- in --
 a: {
 	// comment
 

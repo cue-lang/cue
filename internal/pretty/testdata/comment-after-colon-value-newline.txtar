@@ -17,7 +17,7 @@
 # that fields with Position=2 comments are routed to field()
 # (not fieldRow) since their value can't share a line with the
 # comment in a table layout - see simpleFieldChain.
--- in.cue --
+-- in --
 d: // c
  1
 -- out/relpos --

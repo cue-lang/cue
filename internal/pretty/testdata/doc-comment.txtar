@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 // A comment.
   x: 1
 -- out/relpos --

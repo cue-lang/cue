@@ -3,7 +3,7 @@
 # already renders its own before/after comments, so listElem must
 # not re-wrap with withComments - doing so would duplicate the
 # comment.
--- in.cue --
+-- in --
 x: [
 	// comment
 	{},

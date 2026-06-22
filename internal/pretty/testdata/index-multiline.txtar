@@ -1,6 +1,6 @@
 # Multi-line index: RelPos Newline honoured on the index expression.
 # No newline before ']' (auto-comma insertion would break it).
--- in.cue --
+-- in --
 x: a[
 	0]
 -- out/relpos --

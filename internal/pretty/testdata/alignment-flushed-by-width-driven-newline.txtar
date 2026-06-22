@@ -1,3 +1,5 @@
+#width: 40
+
 # With RelPos (parsed source), table alignment is not influenced by
 # width: every contiguous run of simple fields shares one column
 # layout regardless of how wide any individual value is. Inner Groups
@@ -8,9 +10,7 @@
 #
 # Without RelPos (programmatic AST) width drives layout: the list
 # breaks on overflow and explodes its elements onto one-per-line.
--- config --
-width: 40
--- in.cue --
+-- in --
 a: 1
 bb: 22
 wide: [1000000, 2000000, 3000000, 4000000]

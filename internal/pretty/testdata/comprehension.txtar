@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 {
 for   k,   v   in   x  {   (k): v}
 }

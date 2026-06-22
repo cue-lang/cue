@@ -3,7 +3,7 @@
 # enclosing BinaryExpr (not the StructLit); the renderer injects them
 # back into the struct body so the output parses to the same
 # attachment and preserves the user's visual intent.
--- in.cue --
+-- in --
 package p
 
 #X: {a?: int}

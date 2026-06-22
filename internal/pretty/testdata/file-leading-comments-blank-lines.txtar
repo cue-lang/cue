@@ -10,7 +10,7 @@
 # comment, not just the decl's label, so a blank line between a file-
 # level leading comment and the first decl's doc comment is preserved
 # (case d: `// c1\n\n// c2\nfield`).
--- in.cue --
+-- in --
 // header 1
 
 

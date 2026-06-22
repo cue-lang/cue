@@ -1,5 +1,5 @@
 # Conjunction chain flattened and indented like disjunctions.
--- in.cue --
+-- in --
 x: int &
 >0 &
 <100

@@ -3,7 +3,7 @@
 ## fire and the parent's `[`/`{`/`(` adds its own level of indent on
 ## top of the inner opener's. The walk is left-to-right: a Newline
 ## on any element earlier than the opener also disables the rule.
--- in.cue --
+-- in --
 // Opener on its own line - list adds one indent, struct adds another.
 opener_on_new_line: [
 	1,

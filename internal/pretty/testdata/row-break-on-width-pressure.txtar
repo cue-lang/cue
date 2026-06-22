@@ -1,3 +1,5 @@
+#width: 30
+
 # Field rows can break before their value when their flat width
 # exceeds the available budget. longestAlignedPrefix isolates
 # overflowing AllowRowBreak rows into their own single-row segments
@@ -18,9 +20,7 @@
 # RelPos, so the body is wrapped in an infinite-width scope: Groups
 # never break on width, and width-only overflow adds no newlines. The
 # user must place a Newline RelPos to opt back into multi-line layout.
--- config --
-width: 30
--- in.cue --
+-- in --
 short: 1
 
 abcabcabcabcabcabcabcabcabcabcabc: 6

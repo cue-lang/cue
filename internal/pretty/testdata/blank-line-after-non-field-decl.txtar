@@ -1,3 +1,5 @@
+#houseStyle: true
+
 # A doc-commented field after a non-field decl (let, embed,
 # comprehension, attribute, ...) always gets a blank line before
 # it, regardless of authored RelPos. Non-field decls are visually
@@ -6,10 +8,8 @@
 # a single newline.
 #
 # The blank line is supplied by style.Config.Annotate's A4 rule, so
-# this test enables the annotate pre-pass.
--- config --
-annotate: true
--- in.cue --
+# this test enables the house-style pre-pass (#houseStyle).
+-- in --
 {
 	let X = 1
 	// doc comment

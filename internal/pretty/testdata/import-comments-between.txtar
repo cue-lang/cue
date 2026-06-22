@@ -2,7 +2,7 @@
 # The parser attaches these comments to the first ImportSpec with
 # Position=2, so importDecl has to wrap each spec with its comments for
 # them to render.
--- in.cue --
+-- in --
 package p1
 
 import "math"

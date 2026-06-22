@@ -1,5 +1,5 @@
 # A blank line before a doc comment block is preserved.
--- in.cue --
+-- in --
 x: 5
 
 // a comment

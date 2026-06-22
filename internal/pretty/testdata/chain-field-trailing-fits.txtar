@@ -4,7 +4,7 @@
 # the enclosing field row) with nothing after it for `//` to swallow,
 # so it does not force the chain's Table to break and flat rendering
 # is safe.
--- in.cue --
+-- in --
 #F: {
 	data:       *true | false // include/allow regular fields
 	references: *true | false // don't resolve/allow references

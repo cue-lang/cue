@@ -1,3 +1,5 @@
+#width: 6
+
 # When RelPos is stripped (programmatic AST) and a list/struct/call/
 # disjunction overflows the configured width, every subvalue lands on
 # its own line at +1 indent and the closing bracket returns to the
@@ -6,9 +8,7 @@
 #
 # Parsed source preserves the user's layout regardless of width: the
 # only newlines added are the ones the user wrote.
--- config --
-width: 6
--- in.cue --
+-- in --
 abc: [1, 2, 3, 4]
 -- out/relpos --
 abc: [1, 2, 3, 4]

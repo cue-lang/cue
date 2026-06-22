@@ -5,7 +5,7 @@
 # that position when rendered; the previous implementation treated
 # all non-doc non-trailing interior comments as "prefix" and
 # prepended them, moving the comment to the top of the struct.
--- in.cue --
+-- in --
 list1: [
 	{
 		key1: "value1"

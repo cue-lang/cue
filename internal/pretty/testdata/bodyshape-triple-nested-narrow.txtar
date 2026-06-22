@@ -1,3 +1,5 @@
+#width: 12
+
 # Three levels of nested all-bracketed lists, each at its own
 # narrow [docBodyShape] decision. The width is small enough that
 # every level commits to the hug shape: brackets hug at each level,
@@ -11,9 +13,7 @@
 # context. At a much wider width the same input renders the flat
 # shape throughout; at intermediate widths the inner lists can pick
 # the indented shape independently of their parents.
--- config --
-width: 12
--- in.cue --
+-- in --
 x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
 -- out/relpos --
 x: [[[{a: _}, {b: _}], {c: _}], {d: _}]

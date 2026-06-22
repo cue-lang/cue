@@ -1,5 +1,5 @@
 # Single precedence level in normal mode: spaces around all operators.
--- in.cue --
+-- in --
 x:a *  b  * c
 -- out/relpos --
 x: a * b * c

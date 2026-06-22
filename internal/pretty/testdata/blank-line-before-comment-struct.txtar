@@ -1,6 +1,6 @@
 # Blank line before a doc comment inside a struct.
 # The doc comment forces the struct to break.
--- in.cue --
+-- in --
 {
 	xylophone: 5
 

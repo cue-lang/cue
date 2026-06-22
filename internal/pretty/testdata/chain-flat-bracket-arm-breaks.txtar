@@ -12,7 +12,7 @@
 # carry Newline RelPos on arm separators, so chainGroupArms keeps
 # its Nest and the body lands at parent+2 (one deeper than `{`,
 # which sits at chain+1).
--- in.cue --
+-- in --
 two_arm_and: x: a & {
 	c: _
 }

@@ -1,5 +1,5 @@
 # A doc comment on a list element is preserved.
--- in.cue --
+-- in --
 [
 // doc on elem
    1,

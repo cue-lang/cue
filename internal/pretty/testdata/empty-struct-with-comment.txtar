@@ -19,7 +19,7 @@
 # In the norelpos case stripRelPos clears both knobs, so the open-
 # line shape is no longer distinguishable from the own-line shape:
 # both render with the comment on its own line.
--- in.cue --
+-- in --
 a: {
 	// own-line interior
 }

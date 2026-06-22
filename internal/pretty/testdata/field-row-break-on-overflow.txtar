@@ -1,3 +1,5 @@
+#width: 20
+
 # Regression: plain `key: value` fields whose flat width exceeds
 # the available budget break before the value, with the value
 # indented one level deeper than the key. AllowRowBreak gates this
@@ -13,9 +15,7 @@
 # the file is wrapped in an infinite-width scope (parsed-mode), and
 # rowFits's AllowRowBreak guard skips itself under infinite width so
 # the user's layout is preserved.
--- config --
-width: 20
--- in.cue --
+-- in --
 aaaaaaaaaaaaaaa: bbbbbbbbbbbbbbb
 aaaaaaaaaaaaaac: bbbbbbbbbbbbbbd
 -- out/relpos --

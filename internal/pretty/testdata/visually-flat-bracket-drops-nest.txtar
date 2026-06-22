@@ -10,7 +10,7 @@
 # inner list's body lands at outer-list-Nest + struct-Nest +
 # inner-list-Nest = +3, and `]` at +2. With the rule, the struct
 # drops its Nest (it's flat) and the body lands at +2 with `]` at +1.
--- in.cue --
+-- in --
 binaries: [
 	{merge: ["builder", "modules"]},
 	{sh: "go build -o /cowsayd", options: [

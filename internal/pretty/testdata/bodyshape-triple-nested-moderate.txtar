@@ -1,11 +1,11 @@
+#width: 26
+
 # Three levels of all-bracketed nesting at a moderate width (26).
 # Each level applies its own [docBodyShape] decision based on what
 # fits at its own indent column: the result is the hug shape at depths
 # 1 and 2 and the indented shape at depth 3, demonstrating that the
 # cascade is genuinely per-level rather than uniform.
--- config --
-width: 26
--- in.cue --
+-- in --
 x: [[[{a: _}, {b: _}], {c: _}], {d: _}]
 -- out/relpos --
 x: [[[{a: _}, {b: _}], {c: _}], {d: _}]

@@ -8,7 +8,7 @@
 # Body fields align amongst themselves with the header out of the
 # way: `foo`/`longname`/`y` are padded to `longname:`'s width, and
 # the import line above does not pad them to its longer text.
--- in.cue --
+-- in --
 package foo
 
 import "strings"

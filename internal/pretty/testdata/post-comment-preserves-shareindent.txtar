@@ -9,7 +9,7 @@
 # line and `//` would swallow the bracket. shareIndent keeps
 # closeBreak, so post-element comments render as their own rows
 # safely above the closer.
--- in.cue --
+-- in --
 c: [{
 	name: "n1"
 },

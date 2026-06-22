@@ -1,7 +1,7 @@
+#width: 20
+
 # Optional/required markers are part of the key column.
--- config --
-width: 20
--- in.cue --
+-- in --
 {
 	name: string
 age?:     int

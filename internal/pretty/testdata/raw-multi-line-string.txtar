@@ -1,4 +1,4 @@
--- in.cue --
+-- in --
 z:          #"""
 	a raw multi-line
 	string

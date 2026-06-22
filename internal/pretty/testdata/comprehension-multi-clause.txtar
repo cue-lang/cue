@@ -1,5 +1,5 @@
 # Clauses on separate lines: RelPos Newline between them is honoured.
--- in.cue --
+-- in --
 {
 for a in [1, 10]
 	let x = {

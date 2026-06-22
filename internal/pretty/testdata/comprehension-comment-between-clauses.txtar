@@ -2,7 +2,7 @@
 # parser attaches the comment to the clause it precedes (here the
 # LetClause); the comprehension converter must wrap each clause with
 # its own comments so the comment isn't silently dropped.
--- in.cue --
+-- in --
 for x in y
 // comment
 let z = x {

@@ -5,7 +5,7 @@
 # a "contiguous opener" (its rendering wraps inner content in a Nest)
 # so the enclosing construct can drop its own Nest and let the inner
 # Nest provide the single +1.
--- in.cue --
+-- in --
 strings.Join(list.SortStrings([
 	for k, v in _postgresParams {
 		"\(k)=\(v)"

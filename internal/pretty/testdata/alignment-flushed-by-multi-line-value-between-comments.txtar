@@ -7,7 +7,7 @@
 # table never spans a row whose value contains newlines, keeping
 # table semantics consistent between field-level and chain-level
 # tables.
--- in.cue --
+-- in --
 a: {
 	bb: _ // comment 1
 	ccc: {

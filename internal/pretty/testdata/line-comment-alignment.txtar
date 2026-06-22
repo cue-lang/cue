@@ -1,7 +1,7 @@
 # A line comment on a short-key field should not affect alignment.
 # The // comment forces the struct to break (even without RelPos)
 # because a line comment would swallow subsequent tokens in flat-mode.
--- in.cue --
+-- in --
 {
 	x: 1           // comment
 	longname: 2

@@ -1,3 +1,5 @@
+#width: 30
+
 # A | / & chain whose arms are all atomic (no struct/list/etc.) must
 # break on width when no RelPos is available. Each arm goes on its
 # own line, with the operator at the end of the previous arm and
@@ -5,9 +7,7 @@
 #
 # When parsed (RelPos kept) and the user wrote everything on one line,
 # the chain stays flat - width is advisory only for parsed source.
--- config --
-width: 30
--- in.cue --
+-- in --
 #enumDomain: #UnknownDomain | #Registry | #Unity
 -- out/relpos --
 #enumDomain: #UnknownDomain | #Registry | #Unity

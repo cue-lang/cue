@@ -1,6 +1,6 @@
 # A non-same-line comment between the operator and the next arm of
 # a chained expression stays before the arm, not after it.
--- in.cue --
+-- in --
 x: a | // xx
     // yy
 

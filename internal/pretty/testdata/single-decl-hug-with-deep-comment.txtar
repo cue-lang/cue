@@ -4,7 +4,7 @@
 # immediate child, or living deeper in an inner struct, all survive in
 # place. With RelPos stripped and the content narrow enough to fit, the
 # width-driven layout keeps it inline instead.
--- in.cue --
+-- in --
 direct: x: {a: int & {
 	b: _
 }}

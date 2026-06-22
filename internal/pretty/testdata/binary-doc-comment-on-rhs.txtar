@@ -2,7 +2,7 @@
 # internally by the binary expression formatter. It does not trigger
 # the field-level "value on its own line" behavior - the LHS stays
 # on the same line as the key.
--- in.cue --
+-- in --
 x: a + // xx
    // yy
 b

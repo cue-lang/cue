@@ -2,7 +2,7 @@
 # string introduces forced newlines, so it flushes the alignment -
 # every row becomes its own single-row segment with no cross-row
 # padding.
--- in.cue --
+-- in --
 {
 	apple: """
   first

@@ -3,6 +3,10 @@
 // arguments, and struct equality bounds (== / !=). Also covers issue 4142
 // (struct equality in definitions) and issue 4251 (SimplifyBounds panic on ==
 // bounds combined with other bound types).
+//
+// Issue 4388: == / != bounds are valid on bool, ordered bounds are not. The !=
+// and ordered cases are in bool.cue; the == cases need the structcmp
+// experiment to parse, so they are in equalScalar (equals.cue).
 -- cue.mod/module.cue --
 module: "x.test"
 language: version: "v0.14.0"
@@ -214,6 +218,13 @@ equalScalar: {
 
 	err2: [1, 2]
 	err2: !=[1, 2]
+
+	// == bounds are valid on bool too (issue 4388).
+	ok3: ==true
+	ok3: true
+
+	err3: ==true
+	err3: false
 }
 equalStruct: {
 	ok1: =={}
@@ -284,6 +295,24 @@ issue4251: ok: {
 }
 issue4251: fail: {
 	b: =="b" & !="b" & "b"
+}
+-- bool.cue --
+boolBound: notEqual: {
+	ok1: !=true
+	ok1: false
+
+	ok2: !=false
+	ok2: true
+
+	err1: !=true
+	err1: true
+}
+// Ordered bounds are rejected on bool, as bool is not an ordered type.
+boolBound: ordered: {
+	gtr: >true
+	geq: >=true
+	lss: <false
+	leq: <=false
 }
 -- out/compile --
 --- binary.cue
@@ -427,6 +456,27 @@ issue4251: fail: {
     }
   }
 }
+--- bool.cue
+{
+  boolBound: {
+    notEqual: {
+      ok1: !=true
+      ok1: false
+      ok2: !=false
+      ok2: true
+      err1: !=true
+      err1: true
+    }
+  }
+  boolBound: {
+    ordered: {
+      gtr: >true
+      geq: >=true
+      lss: <false
+      leq: <=false
+    }
+  }
+}
 --- equals.cue
 {
   equalScalar: {
@@ -450,6 +500,10 @@ issue4251: fail: {
       1,
       2,
     ]
+    ok3: ==true
+    ok3: true
+    err3: ==true
+    err3: false
   }
   equalStruct: {
     ok1: =={}

@@ -16,6 +16,24 @@
       "message": "ideally I\u0027d want alpha to be aligned with beta and gamma too, because conceptually all three comments are \"inline\" on the value. is there a reason that you prefer it not to be? or is that something that you\u0027re leaving for a future enhancement?\n\nthe change here is still an incremental improvement from my point of view, though.",
       "revId": "de02c18de5429256b7649fee9e5ccaa2e1629ddc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eff551bc_9508c873",
+        "filename": "internal/pretty/testdata/comment-arith-chain-alignment.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-23T12:41:37Z",
+      "side": 1,
+      "message": "Yes, I think I mentioned in another comment as part of this CL chain - that\u0027s known, and I do want to fix it, but it\u0027s a bigger change. In general, the first row, where it\u0027s taking over from an existing prefix on the same line, is a bit more tricky for the tables to figure out.",
+      "parentUuid": "d9bba42e_41bd2ce4",
+      "revId": "de02c18de5429256b7649fee9e5ccaa2e1629ddc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

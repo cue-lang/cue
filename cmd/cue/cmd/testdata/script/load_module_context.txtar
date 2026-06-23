@@ -35,16 +35,16 @@ stderr 'before newline in list literal'
 ! exec cue export ../other/foo.cue
 stderr 'before newline in list literal'
 
-# TODO(bug): @embed should work for a file within the module, but fails in all
-# three forms because command-line-arguments packages have no Module set (see
-# cue/load cueFilesPackage).
-! exec cue export emb.cue
-stderr 'cannot embed files when not in a module'
+# @embed works for a file within the module. It is rejected for a file outside
+# the module (https://cuelang.org/issue/4302) and from stdin, which has no
+# location within the module.
+exec cue export emb.cue
+cmp stdout $WORK/golden/emb
 stdin emb.cue
 ! exec cue export -
-stderr 'cannot embed files when not in a module'
+stderr 'cannot embed files from a file outside of the current module'
 ! exec cue export ../out_emb.cue
-stderr 'cannot embed files when not in a module'
+stderr 'cannot embed files from a file outside of the current module'
 
 # With the current directory outside of any module.
 cd ..
@@ -145,4 +145,10 @@ list: [
 -- golden/imp --
 {
     "out": 42
+}
+-- golden/emb --
+{
+    "embedded": {
+        "x": 1
+    }
 }

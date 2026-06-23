@@ -35,30 +35,30 @@ package pkg
 --- in.cue
 {
   #def: {
-    _name(:foo): {
+    _name(mod.test@v0:foo): {
       d: int
     }
   }
   d: (〈import;"mod.test/pkg"〉.#D & {
-    _name(:foo): {
+    _name(mod.test@v0:foo): {
       d: int
     }
-    _val(:foo): {
+    _val(mod.test@v0:foo): {
       f: 4
     }
   })
   e: ((〈import;"mod.test/pkg"〉.#D & 〈0;#def〉) & {
-    _name(:foo): {
+    _name(mod.test@v0:foo): {
       c: int
     }
-    _val(:foo): {
+    _val(mod.test@v0:foo): {
       g: int
     }
   })
   f: (〈import;"mod.test/pkg"〉.#D & {
-    _val(:foo): {
+    _val(mod.test@v0:foo): {
       f: 4
     }
   })
-  g: 〈0;f〉._val(:foo)
+  g: 〈0;f〉._val(mod.test@v0:foo)
 }

@@ -229,7 +229,7 @@ display:mod.test/test/hello:nonexist`,
 		cfg:  dirCfg,
 		args: []string{"./anon.cue", "./other/anon.cue"},
 		want: `path:   ""
-module: ""
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:command-line-arguments
@@ -242,7 +242,7 @@ files:
 		// Absolute file is normalized.
 		args: []string{filepath.Join(cwd, testdata("testmod", "anon.cue"))},
 		want: `path:   ""
-module: ""
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:command-line-arguments
@@ -253,7 +253,7 @@ files:
 		cfg:  dirCfg,
 		args: []string{"-"},
 		want: `path:   ""
-module: ""
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:command-line-arguments

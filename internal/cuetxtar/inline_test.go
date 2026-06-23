@@ -607,6 +607,24 @@ func TestAtDirective(t *testing.T) {
 			t.Error("expected isBareAt() false when path= is also set")
 		}
 	})
+
+	t.Run("splitAtSegments keeps dots inside parens", func(t *testing.T) {
+		got := splitAtSegments("a._name$(mod.test@v0:foo).c")
+		want := []string{"a", "_name$(mod.test@v0:foo)", "c"}
+		if !slices.Equal(got, want) {
+			t.Errorf("splitAtSegments = %q, want %q", got, want)
+		}
+	})
+
+	t.Run("atPkgQualifier", func(t *testing.T) {
+		if got := atPkgQualifier("p"); got != ":p" {
+			t.Errorf("atPkgQualifier(%q) = %q, want %q", "p", got, ":p")
+		}
+		in := "(mod.test@v0:foo)"
+		if got := atPkgQualifier(in); got != "mod.test@v0:foo" {
+			t.Errorf("atPkgQualifier(%q) = %q, want %q", in, got, "mod.test@v0:foo")
+		}
+	})
 }
 
 // makeTestPos creates a token.Pos at the given 1-indexed line and column in

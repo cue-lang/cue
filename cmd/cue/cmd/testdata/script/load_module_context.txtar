@@ -1,0 +1,148 @@
+# When loading CUE packages or files, we locate the current module based on
+# the working directory, and not where the CUE package or file is located.
+# Test a matrix of scenarios below, covering features which rely on the current
+# module context (language version, file embeds, dependency imports),
+# as well as crossing module boundaries (outside the module, sibling module).
+#
+# Also see https://cuelang.org/issue/3430, which asks for a way to load files
+# located outside of a module folder when the current directory is inside the module.
+
+# With the current directory inside our primary module.
+cd module
+
+# A file within the module: an import to a sibling package resolves.
+exec cue export imp.cue
+cmp stdout $WORK/golden/imp
+stdin imp.cue
+exec cue export -
+cmp stdout $WORK/golden/imp
+exec cue export ../out_imp.cue
+cmp stdout $WORK/golden/imp
+
+# The module's language version (v0.11.0, before automatic commas in list
+# literals) is applied, so these newline-separated lists are rejected.
+! exec cue export ver/ver.cue
+stderr 'before newline in list literal'
+stdin ver/ver.cue
+! exec cue export -
+stderr 'before newline in list literal'
+! exec cue export ../out_ver.cue
+stderr 'before newline in list literal'
+
+# Even a file that resides in a sibling module is governed by the working
+# directory's module, not its own: other.org allows newline-separated lists
+# (v0.17.0), but main.org's v0.11.0 applies, so this is still rejected.
+! exec cue export ../other/foo.cue
+stderr 'before newline in list literal'
+
+# TODO(bug): @embed should work for a file within the module, but fails in all
+# three forms because command-line-arguments packages have no Module set (see
+# cue/load cueFilesPackage).
+! exec cue export emb.cue
+stderr 'cannot embed files when not in a module'
+stdin emb.cue
+! exec cue export -
+stderr 'cannot embed files when not in a module'
+! exec cue export ../out_emb.cue
+stderr 'cannot embed files when not in a module'
+
+# With the current directory outside of any module.
+cd ..
+
+# Imports are unavailable because no module is found from the working directory.
+! exec cue export module/imp.cue
+stderr 'imports are unavailable'
+! exec cue export ./module:imp
+stderr 'imports are unavailable'
+
+# The latest language version applies because no module is found from the
+# working directory.
+exec cue export module/ver/ver.cue
+stdout '"list"'
+# TODO: arguably ./module/ver:ver should not work, as it selects a package
+# across a module boundary; the same applies to the other two cases, but is
+# clearest here where the load otherwise succeeds.
+exec cue export ./module/ver:ver
+stdout '"list"'
+
+# Embedding is unavailable because no module is found from the working directory.
+! exec cue export module/emb.cue
+stderr 'cannot embed files when not in a module'
+! exec cue export ./module:emb
+stderr 'cannot embed files when not in a module'
+
+-- module/cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.11.0"
+
+-- module/sub/sub.cue --
+package sub
+
+Value: 42
+
+-- module/imp.cue --
+package imp
+
+import "main.org/sub"
+
+out: sub.Value
+
+-- module/ver/ver.cue --
+package ver
+
+list: [
+	1
+	2
+]
+
+-- module/emb.cue --
+@extern(embed)
+
+package emb
+
+embedded: _ @embed(file="data.json")
+
+-- module/data.json --
+{ "x": 1 }
+
+-- out_imp.cue --
+package imp
+
+import "main.org/sub"
+
+out: sub.Value
+
+-- out_ver.cue --
+package ver
+
+list: [
+	1
+	2
+]
+
+-- out_emb.cue --
+@extern(embed)
+
+package emb
+
+embedded: _ @embed(file="out_data.json")
+
+-- out_data.json --
+{ "x": 2 }
+
+-- other/cue.mod/module.cue --
+module: "other.org@v0"
+language: version: "v0.17.0"
+
+-- other/foo.cue --
+package foo
+
+list: [
+	1
+	2
+]
+
+-- golden/imp --
+{
+    "out": 42
+}

@@ -1,0 +1,75 @@
+# Trailing comments on import specs in the same group column-align. Each
+# spec renders as a table row whose cell 0 is the whole spec (`name
+# "path"` or `"path"`) and cell 1 the comment, so the comments line up
+# regardless of differing spec widths and of whether a spec has a local
+# name.
+#
+# Alignment is confined to a contiguous block: a blank line (NewSection)
+# between specs starts a fresh alignment group, and a comment-less spec
+# does not stretch the comment column (its single cell contributes no
+# width). A doc comment above a spec also starts a fresh group, matching
+# how struct fields segment.
+#
+# With RelPos stripped (out/norelpos) the blank line and doc-comment
+# section breaks collapse, so the whole group aligns as one block; the
+# trailing comments stay in the comment column because they carry no
+# own-line break.
+-- in --
+package p
+
+import (
+	"fmt" // formatting
+	js "encoding/json" // json codec
+	"path/filepath" // file paths
+	"strings"
+)
+
+import (
+	"aaaa" // before blank
+
+	"b" // after blank
+)
+
+import (
+	// doc on x
+	x "xx" // trailing x
+	y "yyyy" // trailing y
+)
+-- out/relpos --
+package p
+
+import (
+	"fmt"              // formatting
+	js "encoding/json" // json codec
+	"path/filepath"    // file paths
+	"strings"
+)
+
+import (
+	"aaaa" // before blank
+
+	"b" // after blank
+)
+
+import (
+	// doc on x
+	x "xx"   // trailing x
+	y "yyyy" // trailing y
+)
+-- out/norelpos --
+package p
+import (
+	"fmt"              // formatting
+	js "encoding/json" // json codec
+	"path/filepath"    // file paths
+	"strings"
+)
+import (
+	"aaaa" // before blank
+	"b"    // after blank
+)
+import (
+	// doc on x
+	x "xx"   // trailing x
+	y "yyyy" // trailing y
+)

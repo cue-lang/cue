@@ -60,7 +60,7 @@ import (
 import (
 	time2 "time"
 
-	same "cuelang.org/go/foo" // comment 1
+	same "cuelang.org/go/foo"  // comment 1
 	same2 "cuelang.org/go/foo" // comment 2
 )
 

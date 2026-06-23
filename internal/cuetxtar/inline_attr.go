@@ -504,11 +504,16 @@ func directiveKey(pa parsedTestAttr) string {
 //   - Hidden field names with a $pkg qualifier, e.g. "_foo$pkg" →
 //     cue.Hid("_foo", ":pkg"), matching the syntax used inside @test(eq, ...)
 //     bodies.
+//   - Hidden field names with a parenthesized, module-qualified package, e.g.
+//     "_foo$(mod.test@v0:p)" → cue.Hid("_foo", "mod.test@v0:p"). The parentheses
+//     let the package path contain dots, which would otherwise be taken as path
+//     separators.
 //   - Integer segments as list-index selectors, e.g. "items.0" →
 //     [items, Index(0)].
 //
-// Dotted paths are split on "." and each segment is processed independently,
-// so "a._foo$pkg.0" works correctly.
+// Dotted paths are split on "." (except within a parenthesized package
+// qualifier) and each segment is processed independently, so "a._foo$pkg.0"
+// works correctly.
 func parseAtPath(at string) (cue.Path, error) {
 	// Fast path: no hidden fields and no integers — delegate directly.
 	if !strings.Contains(at, "_") && !strings.ContainsAny(at, "0123456789") {
@@ -516,12 +521,16 @@ func parseAtPath(at string) (cue.Path, error) {
 		return p, p.Err()
 	}
 	var sels []cue.Selector
-	for seg := range strings.SplitSeq(at, ".") {
+	for _, seg := range splitAtSegments(at) {
 		if internal.IsHidden(seg) {
 			name := seg
 			pkg := "_"
 			if i := strings.IndexByte(name, '$'); i >= 0 {
-				pkg = ":" + name[i+1:]
+				q, err := atPkgQualifier(name[i+1:])
+				if err != nil {
+					return cue.Path{}, err
+				}
+				pkg = q
 				name = name[:i]
 			}
 			sels = append(sels, cue.Hid(name, pkg))
@@ -536,6 +545,45 @@ func parseAtPath(at string) (cue.Path, error) {
 		}
 	}
 	return cue.MakePath(sels...), nil
+}
+
+// splitAtSegments splits an at= path on "." separators, except dots within a
+// parenthesized package qualifier such as _x$(mod.test@v0:p), which are kept so
+// that module-qualified hidden fields can be addressed.
+func splitAtSegments(at string) []string {
+	var segs []string
+	depth, start := 0, 0
+	for i := 0; i < len(at); i++ {
+		switch at[i] {
+		case '(':
+			depth++
+		case ')':
+			if depth > 0 {
+				depth--
+			}
+		case '.':
+			if depth == 0 {
+				segs = append(segs, at[start:i])
+				start = i + 1
+			}
+		}
+	}
+	return append(segs, at[start:])
+}
+
+// atPkgQualifier interprets the text after "$" in a hidden-field segment. A bare
+// name uses the empty-module form (":name"); a parenthesized value is taken
+// verbatim, allowing a full module-qualified package path like "(mod.test@v0:p)".
+// Mismatched parentheses are reported as an error.
+func atPkgQualifier(q string) (string, error) {
+	open, close := strings.HasPrefix(q, "("), strings.HasSuffix(q, ")")
+	if open != close {
+		return "", fmt.Errorf("mismatched parentheses in package qualifier %q", q)
+	}
+	if open {
+		return q[1 : len(q)-1], nil
+	}
+	return ":" + q, nil
 }
 
 // applyShareIDAt applies the at= field from a @test(shareID=...) attribute

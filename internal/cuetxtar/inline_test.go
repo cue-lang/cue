@@ -607,6 +607,40 @@ func TestAtDirective(t *testing.T) {
 			t.Error("expected isBareAt() false when path= is also set")
 		}
 	})
+
+	t.Run("splitAtSegments keeps dots inside parens", func(t *testing.T) {
+		got := splitAtSegments("a._name$(mod.test@v0:foo).c")
+		want := []string{"a", "_name$(mod.test@v0:foo)", "c"}
+		if !slices.Equal(got, want) {
+			t.Errorf("splitAtSegments = %q, want %q", got, want)
+		}
+	})
+
+	t.Run("atPkgQualifier", func(t *testing.T) {
+		cases := []struct {
+			in, want string
+			wantErr  bool
+		}{
+			{in: "p", want: ":p"},
+			{in: "(mod.test@v0:foo)", want: "mod.test@v0:foo"},
+			{in: "(foo", wantErr: true},
+			{in: "foo)", wantErr: true},
+		}
+		for _, tc := range cases {
+			got, err := atPkgQualifier(tc.in)
+			if tc.wantErr {
+				if err == nil {
+					t.Errorf("atPkgQualifier(%q): got nil error, want error", tc.in)
+				}
+				continue
+			}
+			if err != nil {
+				t.Errorf("atPkgQualifier(%q): unexpected error: %v", tc.in, err)
+			} else if got != tc.want {
+				t.Errorf("atPkgQualifier(%q) = %q, want %q", tc.in, got, tc.want)
+			}
+		}
+	})
 }
 
 // makeTestPos creates a token.Pos at the given 1-indexed line and column in

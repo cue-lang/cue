@@ -22,11 +22,11 @@ e: pkg.#D & #def & {
 
 	// This should not fail, as this is a different _val
 	_val: g: int
-}  @test(err, code=eval, at=_name$foo.c, contains="field not allowed", pos=[3:9])
+}  @test(err, code=eval, at="_name$(mod.test@v0:foo).c", contains="field not allowed", pos=[3:9])
 
 f: pkg.#D & {_val: f: 4} @test(debugCheck, """
 	(#struct){
-	  _val(:foo): (struct){
+	  _val(mod.test@v0:foo): (struct){
 	    f: (int){ 4 }
 	  }
 	  _val(mod.test/pkg): (#struct){

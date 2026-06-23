@@ -103,12 +103,12 @@ objects: hashed: b: data: foo:       "bar"
 -- out/compile --
 --- main.cue
 {
-  _export(:main): (〈import;"example.com/m/lib"〉.template & {
+  _export(example.com/m@v0:main): (〈import;"example.com/m/lib"〉.template & {
     OBJECTS: {}
     IMPORTS: [
       〈import;"example.com/m/sub"〉,
     ]
     GENERATORS: []
   })
-  result: 〈0;_export(:main)〉.objects
+  result: 〈0;_export(example.com/m@v0:main)〉.objects
 }

@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modpkgload"
+	"cuelang.org/go/mod/module"
 	pkgpath "cuelang.org/go/pkg/path"
 )
 
@@ -91,7 +92,21 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 
 	// TODO: ModImportFromFiles(files)
 	pkg.Dir = l.cfg.Dir
-	rewriteFiles(pkg, l.cfg.Dir, true, l.cfg.pathOS)
+	// Files named explicitly on the command line still belong to the enclosing
+	// module, so record its identity just as a directory load does. This lets
+	// capabilities like @embed know they are within a module. Root is the
+	// module root when in a module (matching a directory load), so it can be
+	// used to tell whether a named file lies within the module.
+	pkg.Module = l.cfg.Module
+	if l.cfg.Module != "" {
+		pkg.ModuleVersion, _ = module.NewVersion(l.cfg.Module, "")
+	}
+	pkg.ModuleFile = l.cfg.modFile
+	root := l.cfg.Dir
+	if l.cfg.ModuleRoot != "" {
+		root = l.cfg.ModuleRoot
+	}
+	rewriteFiles(pkg, root, true, l.cfg.pathOS)
 	setFSLoc(l.cfg, pkg)
 	for _, err := range errors.Errors(fp.finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError

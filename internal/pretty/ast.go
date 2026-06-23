@@ -3380,12 +3380,18 @@ func (c *converter) postfixAlias(a *ast.PostfixAlias) doc {
 }
 
 // importDecl converts an ImportDecl. Comments on each ImportSpec are
-// preserved via withComments. All separators (opener break, inter-spec,
-// closer break) are RelPos-driven: a parser-produced AST carries
-// Newline hints that lay the specs out one per line, while a
-// programmatic AST with no RelPos hints renders flat, the enclosing
-// [docGroup] picking compact `import ("a", "b")` when it fits and
-// breaking across lines otherwise.
+// preserved via [converter.importSpecRow]. All separators (opener
+// break, inter-spec, closer break) are RelPos-driven: a
+// parser-produced AST carries Newline hints that lay the specs out
+// one per line, while a programmatic AST with no RelPos hints renders
+// flat, the enclosing [docGroup] picking compact `import ("a", "b")`
+// when it fits and breaking across lines otherwise.
+//
+// The specs render as a [docTable] so that trailing comments on specs
+// in the same group column-align (cell 0 is the whole spec, cell 1
+// the comment). A blank line (NewSection) between two specs flushes
+// the table, matching how [converter.declSlice] segments struct
+// fields.
 func (c *converter) importDecl(x *ast.ImportDecl) doc {
 	if len(x.Specs) == 0 {
 		return nil
@@ -3400,27 +3406,88 @@ func (c *converter) importDecl(x *ast.ImportDecl) doc {
 		return c.withComments(s, body)
 	}
 
-	specs := make([]doc, len(x.Specs))
-	for i, s := range x.Specs {
-		spec := c.withComments(s, c.importSpec(s))
-		if i > 0 {
-			// Between specs: comma+space flat, hard newline when
-			// broken or when leadingRel demands it (a NewSection on a
-			// doc comment becomes BlankLine).
-			spec = cat(relBreakOr(LeadingRelPos(s), lineBreakOrComma), spec)
+	var bodyParts []doc
+	tableRows := make([]row, 0, len(x.Specs))
+	flushTable := func() {
+		if len(tableRows) == 0 {
+			return
 		}
-		specs[i] = spec
+		bodyParts = append(bodyParts, tableRows[0].sep, table(tableRows))
+		tableRows = tableRows[len(tableRows):]
 	}
+	for i, s := range x.Specs {
+		flat := lineBreakOrComma
+		if i == 0 {
+			flat = lineBreakOrEmpty
+		}
+		r := c.importSpecRow(s)
+		r.sep = relBreakOr(LeadingRelPos(s), flat)
+		// A blank line (NewSection) or a doc comment visually separates
+		// specs, so it starts a fresh alignment group - as in declSlice.
+		if len(tableRows) > 0 && (r.sep == blankLine || r.docComment != nil) {
+			flushTable()
+		}
+		tableRows = append(tableRows, r)
+	}
+	flushTable()
 
-	body := cats(specs...)
-	openBreak := relBreakOr(LeadingRelPos(x.Specs[0]), lineBreakOrEmpty)
 	closeBreak := relBreakOr(x.Rparen.RelPos(), lineBreakOrEmpty)
 	return group(cats(
 		stringLit("import ("),
-		nest(cat(openBreak, body)),
+		nest(cats(bodyParts...)),
 		closeBreak,
 		rParenLit,
 	))
+}
+
+// importSpecRow builds the table row for one ImportSpec. Cell 0 is the
+// spec text (`name "path"` or `"path"`); a same-line trailing comment
+// becomes cell 1, so trailing comments column-align across the group. A
+// doc comment renders on its own line above the spec via row.docComment.
+// Any other comment shape is unusual for an import spec, so we fall back
+// to the generic [converter.withComments] rendering as a non-aligned raw
+// row rather than risk dropping or misplacing it. The caller fills in
+// row.sep.
+func (c *converter) importSpecRow(s *ast.ImportSpec) row {
+	slots := classifyComments(s)
+	specDoc := c.importSpec(s)
+
+	// Trailing comments align in the comment column. The parser files a
+	// same-line comment at PosSuffix for an unnamed spec and at a
+	// trailing position for a named one, so we gather both. A comment
+	// counts as trailing when it sits on the spec's line (Line=true) or
+	// carries no own-line break (!IsNewline) - the latter covers a
+	// programmatic / RelPos-stripped AST, keeping trailing comments in
+	// the cell there too. A genuine own-line comment after the spec, or a
+	// prefix comment, is unusual; fall back below.
+	var trailing doc
+	unusual := len(slots.prefix) > 0
+	collect := func(cgs []*ast.CommentGroup) {
+		for _, cg := range cgs {
+			if cg.Line || !cg.Pos().IsNewline() {
+				trailing = joinLines(trailing, c.commentGroup(cg))
+			} else {
+				unusual = true
+			}
+		}
+	}
+	collect(slots.suffix)
+	collect(slots.trailing)
+	if unusual {
+		return row{raw: c.withComments(s, specDoc)}
+	}
+
+	cells := []doc{specDoc}
+	hasComment := false
+	if trailing != nil {
+		cells = append(cells, trailing)
+		hasComment = true
+	}
+	return row{
+		cells:      cells,
+		docComment: c.docCommentBlock(slots.doc, s.Pos().RelPos()),
+		hasComment: hasComment,
+	}
 }
 
 // importSpec converts an ImportSpec.

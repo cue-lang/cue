@@ -114,7 +114,12 @@ type compiler struct {
 
 	upCountOffset int32 // 1 for files; 0 for expressions
 
-	index adt.StringIndexer
+	index adt.Runtime
+
+	// externKinds holds the injection kinds declared by the file-level
+	// @extern attributes of the file currently being compiled, such as
+	// "embed" for @extern(embed). It is reset for each file.
+	externKinds map[string]bool
 
 	experiments cueexperiment.File
 
@@ -329,6 +334,7 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 
 	for _, file := range a {
 		c.experiments = file.Pos().Experiment()
+		c.externKinds = externFileKinds(file)
 
 		c.pushScope(nil, 0, file) // File scope
 		v := &adt.StructLit{Src: file}
@@ -338,6 +344,46 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	}
 
 	return res
+}
+
+// externFileKinds returns the injection kinds declared by the file-level
+// @extern attributes of f, which must appear before the package clause.
+func externFileKinds(f *ast.File) map[string]bool {
+	var kinds map[string]bool
+	for _, d := range f.Decls {
+		switch d := d.(type) {
+		case *ast.Package:
+			return kinds
+		case *ast.Attribute:
+			if d.Name() != "extern" {
+				continue
+			}
+			if k, err := internal.ParseAttr(d).String(0); err == nil && k != "" {
+				if kinds == nil {
+					kinds = map[string]bool{}
+				}
+				kinds[k] = true
+			}
+		}
+	}
+	return kinds
+}
+
+// checkInjectionAttr reports an error if attr names a registered injection
+// kind, such as @embed, but the file lacks the matching file-level @extern
+// declaration. Without the declaration such attributes would otherwise be
+// silently ignored.
+func (c *compiler) checkInjectionAttr(attr *ast.Attribute) {
+	// Injections only apply to files, which declare @extern; skip standalone
+	// expression compilation, which has no file-level scope.
+	if c.upCountOffset == 0 {
+		return
+	}
+	name := attr.Name()
+	if c.externKinds[name] || !c.index.IsInjectionKind(name) {
+		return
+	}
+	c.errf(attr, "@%[1]s attribute requires a file-level @extern(%[1]s) declaration", name)
 }
 
 func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
@@ -741,6 +787,10 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		return c.errf(d, "")
 
 	case *ast.Field:
+		for _, a := range x.Attrs {
+			c.checkInjectionAttr(a)
+		}
+
 		lab := x.Label
 		if a, ok := lab.(*ast.Alias); ok {
 			if lab, ok = a.Expr.(ast.Label); !ok {
@@ -849,7 +899,9 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		// Nothing to do for a free-floating comment group.
 
 	case *ast.Attribute:
-		// Nothing to do for now for an attribute declaration.
+		// Nothing to do for an attribute declaration, other than reporting
+		// an injection attribute such as @embed that lacks its @extern.
+		c.checkInjectionAttr(x)
 
 	case *ast.Ellipsis:
 		return &adt.Ellipsis{

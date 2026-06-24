@@ -95,9 +95,13 @@ duplicate @extern attribute for kind "testfn":
     ./double_extern_b.cue:3:1
 injection name must be non-empty:
     ./empty_extern.cue:1:1
+@testfn attribute requires a file-level @extern(testfn) declaration:
+    ./empty_extern.cue:5:8
 no injection defined for "\"testfn\" foo":
     ./invalid_file_attr.cue:1:1
 extern attribute must appear before package clause:
     ./late_extern.cue:3:1
+@testfn attribute requires a file-level @extern(testfn) declaration:
+    ./late_extern.cue:6:8
 no injection defined for "wazem":
     ./unknown_interpreter.cue:1:1

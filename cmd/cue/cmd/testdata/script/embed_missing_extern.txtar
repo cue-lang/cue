@@ -1,10 +1,7 @@
-# An @embed attribute without the file-level @extern(embed) declaration is
-# silently ignored, leaving the field incomplete and producing a confusing
+# An @embed attribute without the file-level @extern(embed) declaration used to
+# be silently ignored, leaving the field incomplete and producing a confusing
 # error from a downstream marshal-like operation (issue 4010). It should instead
 # report clearly that an @extern(embed) declaration is required.
-#
-# TODO(4010): the error below is the confusing status quo; once @embed without
-# @extern is reported directly, out/err should become that clearer message.
 
 # Without the @extern(embed) declaration, using @embed is an error.
 ! exec cue export ./withoutextern
@@ -39,8 +36,8 @@ obj: a: {
 -- withextern/b.txt --
 hello
 -- out/err --
-obj.a.txt: incomplete value string:
-    ./withoutextern/x.cue:3:14
+obj.a: @embed attribute requires a file-level @extern(embed) declaration:
+    ./withoutextern/x.cue:5:9
 -- out/withextern --
 {
     "obj": {

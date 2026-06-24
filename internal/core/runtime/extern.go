@@ -47,6 +47,12 @@ func (r *Runtime) AddInjection(i Injection) {
 	}
 }
 
+// IsInjectionKind reports whether name is a registered injection kind,
+// such as "embed" for the @embed attribute enabled by @extern(embed).
+func (r *Runtime) IsInjectionKind(name string) bool {
+	return r.injections[name] != nil
+}
+
 // Injection defines an entrypoint for creating per-instance injectors.
 type Injection interface {
 	// InjectorForInstance returns a new injector for the

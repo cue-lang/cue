@@ -1,5 +1,6 @@
-// TODO: We do not generate an error here as it allows files to be processed
-// faster. But maybe it is more user-friendly to report the error.
+// An injection attribute such as @testfn requires a matching file-level
+// @extern declaration; without it the attribute would be silently ignored,
+// so we report an error.
 -- cue.mod/modules.cue --
 -- in.cue --
 // Missing @extern("testfn")
@@ -12,4 +13,5 @@ Foo: _ @testfn(file.xx, abi=c, sig="func(int)int")
 
 -- extern/out --
 -- out/extern --
-{Foo: _}
+@testfn attribute requires a file-level @extern(testfn) declaration:
+    ./in.cue:7:8

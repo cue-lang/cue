@@ -60,6 +60,10 @@ type Runtime interface {
 	// ConfigureOpCtx configures the [*OpContext] with details such as
 	// evaluator version, debug options etc.
 	ConfigureOpCtx(ctx *OpContext)
+
+	// IsInjectionKind reports whether name is a registered injection kind,
+	// such as "embed" for the @embed attribute enabled by @extern(embed).
+	IsInjectionKind(name string) bool
 }
 
 type Config struct {

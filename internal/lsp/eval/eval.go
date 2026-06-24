@@ -2655,13 +2655,7 @@ func (n *frame) docComments() []*ast.CommentGroup {
 	if n.docsNode == nil {
 		return nil
 	}
-	var comments []*ast.CommentGroup
-	for _, group := range ast.Comments(n.docsNode) {
-		if group.Doc && len(group.List) > 0 && group.List[0].Pos().Compare(n.docsNode.Pos()) < 0 {
-			comments = append(comments, group)
-		}
-	}
-	return comments
+	return ast.DocComments(n.docsNode)
 }
 
 // fieldDeclExpr models all the different possible parts of a field

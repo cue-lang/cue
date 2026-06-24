@@ -1,0 +1,105 @@
+# End-to-end test for the html.Format function, intended for use as a tagged
+# string interpolation. It builds the result with Go's html/template package,
+# so each operand is escaped according to the HTML context in which its
+# interpolation appears: ordinary text, attribute values, URLs, JavaScript and
+# CSS are all escaped differently, and html/template additionally sanitizes
+# values it judges dangerous.
+
+# The happy path: the same hostile value escaped differently per context, plus
+# the various supported value kinds and some notable html/template behaviors.
+exec cue export quote.cue
+cmp stdout want-quote
+
+# A template that ends part-way through an HTML construct (here an unclosed,
+# unquoted-then-quoted attribute) cannot be escaped safely and is reported.
+# Note: the error message for this is not ideal and varies across Go versions
+# (see https://golang.org/issue/30635) so compare with a regexp rather than
+# the complete output.
+! exec cue export err_unclosed.cue
+stderr '^x: error in call to html.Format: html/template: ends in a non-text context: {stateURL .*}$'
+
+# html.Format can also be called directly, like any other builtin; the strings
+# and args lists need not come from a tagged literal.
+exec cue export direct.cue
+cmp stdout want-direct
+
+-- want-quote --
+{
+    "evil": "<b>x</b> 'q' \"d\" a&b",
+    "text": "<p>&lt;b&gt;x&lt;/b&gt; &#39;q&#39; &#34;d&#34; a&amp;b</p>",
+    "attrQuoted": "<img alt=\"&lt;b&gt;x&lt;/b&gt; &#39;q&#39; &#34;d&#34; a&amp;b\">",
+    "attrUnquoted": "<img alt=&lt;b&gt;x&lt;/b&gt;&#32;&#39;q&#39;&#32;&#34;d&#34;&#32;a&amp;b>",
+    "urlSafe": "<a href=\"/s?q=a%20b%26c%3dd\">go</a>",
+    "query": "a b&c=d",
+    "urlUnsafe": "<a href=\"#ZgotmplZ\">go</a>",
+    "scheme": "javascript:alert(1)",
+    "js": "<script>var x = \"\\u003cb\\u003ex\\u003c/b\\u003e 'q' \\\"d\\\" a\\u0026b\"</script>",
+    "jsNum": "<script>var n =  42 </script>",
+    "num": 42,
+    "css": "<style>p { color: ZgotmplZ }</style>",
+    "color": "red; background: url(/evil)",
+    "intText": "<p>42</p>",
+    "boolText": "<p>true</p>",
+    "flag": true,
+    "comment": "kept",
+    "multi": "<a href=\"/u/a%20b&amp;c=d\" title=\"a b&amp;c=d\">42</a>"
+}
+-- quote.cue --
+import "html"
+
+// A single hostile value reused across every context below.
+evil: "<b>x</b> 'q' \"d\" a&b"
+
+// HTML text content: the five HTML metacharacters are escaped.
+text: html.Format"<p>\(evil)</p>"
+
+// Quoted attribute value.
+attrQuoted: html.Format"<img alt=\"\(evil)\">"
+
+// Unquoted attribute value: escaped more aggressively.
+attrUnquoted: html.Format"<img alt=\(evil)>"
+
+// URL attribute with a safe value: query-escaped.
+urlSafe: html.Format"<a href=\"/s?q=\(query)\">go</a>"
+query: "a b&c=d"
+
+// URL attribute with a dangerous scheme: replaced with a harmless marker.
+urlUnsafe: html.Format"<a href=\"\(scheme)\">go</a>"
+scheme: "javascript:alert(1)"
+
+// JavaScript context: the value becomes a quoted, escaped JS string.
+js: html.Format"<script>var x = \(evil)</script>"
+
+// A number in JavaScript context is emitted as a numeric literal.
+jsNum: html.Format"<script>var n = \(num)</script>"
+num: 42
+
+// CSS context with an unsafe value: replaced with a harmless marker.
+css: html.Format"<style>p { color: \(color) }</style>"
+color: "red; background: url(/evil)"
+
+// Non-string scalars in text context.
+intText: html.Format"<p>\(num)</p>"
+boolText: html.Format"<p>\(flag)</p>"
+flag: true
+
+// html/template removes HTML comments entirely, including any interpolation
+// inside them; only the text after the comment survives.
+comment: html.Format"<!-- \(evil) -->kept"
+
+// Multiple interpolations, including the same value used twice.
+multi: html.Format"<a href=\"/u/\(query)\" title=\"\(query)\">\(num)</a>"
+-- err_unclosed.cue --
+import "html"
+
+x: html.Format"<a href=\"\(v)"
+v: "y"
+-- direct.cue --
+import "html"
+
+// Equivalent to html.Format"<p>\(arg)</p>" but spelled out as an ordinary call.
+x: html.Format(["<p>", "</p>"], ["a<b>c"])
+-- want-direct --
+{
+    "x": "<p>a&lt;b&gt;c</p>"
+}

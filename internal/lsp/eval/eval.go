@@ -2655,13 +2655,12 @@ func (n *frame) docComments() []*ast.CommentGroup {
 	if n.docsNode == nil {
 		return nil
 	}
-	var comments []*ast.CommentGroup
-	for _, group := range ast.Comments(n.docsNode) {
-		if group.Doc && len(group.List) > 0 && group.List[0].Pos().Compare(n.docsNode.Pos()) < 0 {
-			comments = append(comments, group)
-		}
-	}
-	return comments
+	// ast.DocComments resolves the field-chain convention, so a doc
+	// comment written above a chain head (e.g. "// c" in `// c\n a: b: x`)
+	// is reported for the leaf field it documents (b), matching cue's
+	// Value.Doc and cue def. The LSP parses with parser.ParseComments, so
+	// the tree has already been resolved by the parser.
+	return ast.DocComments(n.docsNode)
 }
 
 // fieldDeclExpr models all the different possible parts of a field

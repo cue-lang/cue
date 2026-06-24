@@ -363,7 +363,10 @@ command: help: {
 	y: 2
 }
 -- stdout-fieldchain.cue --
-command: help: {
-	x: 1
-	y: 2
+command: {
+	// doc on command
+	help: {
+		x: 1
+		y: 2
+	}
 }

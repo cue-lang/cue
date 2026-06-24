@@ -17,7 +17,6 @@ package style
 import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/pretty"
 )
 
 // inlineStructValue strips the Lbrace/Rbrace of f's value StructLit
@@ -61,9 +60,14 @@ func inlineStructValue(f *ast.Field) bool {
 // chain form, returning that StructLit or nil. The value must be a
 // 1-element StructLit whose single element is a Field, and none of the
 // outer Field, the inner Field, or the StructLit may carry side data
-// that the chain shape would displace or lose. As a special case, we
-// refuse an authored Lbrace combined with a doc comment on the outer
-// Field, so as to preserve the user's explicit braces.
+// that the chain shape would displace or lose.
+//
+// We also refuse when f owns a doc comment ([ast.DocComments]
+// non-empty): f's value is a braced struct, so f is currently the
+// leaf of its field-chain and thus the semantic owner of any doc on
+// the chain.  Unbracing it would extend the chain past f and move
+// that ownership to the inner field, silently re-targeting the
+// comment.
 func canInlineFieldValue(f *ast.Field) *ast.StructLit {
 	if len(f.Attrs) > 0 {
 		return nil
@@ -79,7 +83,7 @@ func canInlineFieldValue(f *ast.Field) *ast.StructLit {
 	if len(inner.Attrs) > 0 || len(ast.Comments(inner)) > 0 {
 		return nil
 	}
-	if sl.Lbrace.IsValid() && pretty.HasDocComment(f) {
+	if len(ast.DocComments(f)) > 0 {
 		return nil
 	}
 	return sl

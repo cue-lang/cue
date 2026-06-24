@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9adf2476_5c610b3e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T09:11:47Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "c6934352_d6e70006",
+      "revId": "f055bb39bb548450b7675964b8339b02ee79aa41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83fde47a_c5f3d19c",
@@ -35,6 +53,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09901522_2e66c682",
+        "filename": "internal/cuetxtar/inline_attr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T09:11:47Z",
+      "side": 1,
+      "message": "this fix is rather surgical and just touches what I need for this stack, so I\u0027d prefer to keep that separate, also so that we can get Marcel\u0027s eyes on it without blocking.",
+      "parentUuid": "83fde47a_c5f3d19c",
+      "revId": "f055bb39bb548450b7675964b8339b02ee79aa41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0d05954_30072338",
+        "filename": "internal/cuetxtar/inline_attr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T09:11:47Z",
+      "side": 1,
+      "message": "Agreed, that would be helpful. I\u0027ll leave it for a separate change rather than expanding the scope of this one, also because I wanted to keep this change surgical to just what I need for the fix later.",
+      "parentUuid": "83fde47a_c5f3d19c",
+      "revId": "f055bb39bb548450b7675964b8339b02ee79aa41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3138a05_2d6d4501",
@@ -48,6 +102,24 @@
       "writtenOn": "2026-06-24T07:48:56Z",
       "side": 1,
       "message": "I wonder if this should return an error if it gets mismatched parens.",
+      "revId": "f055bb39bb548450b7675964b8339b02ee79aa41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "810652e4_e286b410",
+        "filename": "internal/cuetxtar/inline_attr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T09:11:47Z",
+      "side": 1,
+      "message": "Done. atPkgQualifier now returns an error on mismatched parentheses, with unit-test coverage.",
+      "parentUuid": "c3138a05_2d6d4501",
       "revId": "f055bb39bb548450b7675964b8339b02ee79aa41",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

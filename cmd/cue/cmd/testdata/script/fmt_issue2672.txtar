@@ -1,0 +1,33 @@
+# Issue 2672: 
+
+exec cue fmt -s in.cue
+cmp in.cue in.cue.golden
+
+# NB: the golden output is WRONG - the comment has changed is semantic location.
+
+-- in.cue.golden --
+package foo
+
+import (
+	"tool/exec"
+)
+
+// displays help for available commands
+command: help: show: exec.Run & {cmd: ["sh", "-c", "cue help cmd | grep -A2 'Available Commands:'"]}
+-- cue.mod/module.cue --
+module: "cue.example/foo"
+language: {
+	version: "v0.9.0"
+}
+-- in.cue --
+package foo
+
+import (
+	"tool/exec"
+)
+
+// displays help for available commands
+command: help: {
+	show: exec.Run & {cmd: [ "sh", "-c", "cue help cmd | grep -A2 'Available Commands:'"]}
+}
+

@@ -1,0 +1,46 @@
+-- tagged-interpolation.input --
+@experiment(stringtag)
+package p
+
+// A plain-string tag.
+plain: foo "hello"
+
+// A tag applied to an interpolation.
+interp: foo "hi \(x)"
+
+// A selector as the tag.
+sel: pkg.foo "hi \(x)"
+
+// A multi-line tagged string.
+multi: t """
+	line1
+	line2 \(x)
+	"""
+
+// Comments on a tagged literal are preserved.
+withComment: foo "keep me" // trailing
+
+x: "there"
+-- out/format/tagged-interpolation.golden --
+@experiment(stringtag)
+package p
+
+// A plain-string tag.
+plain: foo "hello"
+
+// A tag applied to an interpolation.
+interp: foo "hi \(x)"
+
+// A selector as the tag.
+sel: pkg.foo "hi \(x)"
+
+// A multi-line tagged string.
+multi: t """
+	line1
+	line2 \(x)
+	"""
+
+// Comments on a tagged literal are preserved.
+withComment: foo "keep me" // trailing
+
+x: "there"

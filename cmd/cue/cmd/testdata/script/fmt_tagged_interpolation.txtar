@@ -1,0 +1,47 @@
+# Tagged string interpolations must round-trip through cue fmt. Before the
+# formatters learned about *ast.TaggedInterpolation, formatv2 rewrote the
+# field value to "/* unknown expr */" and the pre-v2 formatter panicked,
+# silently destroying the syntax. Check that both formatters preserve it.
+
+# Default: formatv2 is on.
+cp in.cue default.cue
+exec cue fmt default.cue
+cmp default.cue golden
+
+# Explicitly enabling formatv2 matches the default.
+env CUE_EXPERIMENT=formatv2=1
+cp in.cue on.cue
+exec cue fmt on.cue
+cmp on.cue golden
+
+# The pre-v2 formatter preserves it too.
+env CUE_EXPERIMENT=formatv2=0
+cp in.cue off.cue
+exec cue fmt off.cue
+cmp off.cue golden
+
+-- cue.mod/module.cue --
+module: "mod.com"
+language: version: "v0.18.0"
+-- in.cue --
+@experiment(stringtag)
+package m
+
+a: foo "hi \(x)"
+b: bar "plain"
+c: pkg.baz """
+	line1
+	line2 \(x)
+	"""
+x: "there"
+-- golden --
+@experiment(stringtag)
+package m
+
+a: foo "hi \(x)"
+b: bar "plain"
+c: pkg.baz """
+	line1
+	line2 \(x)
+	"""
+x: "there"

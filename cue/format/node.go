@@ -750,6 +750,11 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		}
 		f.after(nil)
 
+	case *ast.TaggedInterpolation:
+		f.expr1(x.Tag, token.HighestPrec, depth)
+		f.print(blank, nooverride)
+		f.expr0(x.Str, depth)
+
 	case *ast.ParenExpr:
 		if _, hasParens := x.X.(*ast.ParenExpr); hasParens {
 			// don't print parentheses around an already parenthesized expression

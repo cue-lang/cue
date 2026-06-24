@@ -91,6 +91,14 @@ Available per-file experiments:
     is evaluated conditionally") and is consistent with all mainstream
     languages.
 
+  stringtag (preview: v0.18.0)
+    stringtag enables tagged string interpolations: a string literal
+    prefixed with a reference (for example sh.Format"""...""") is passed
+    to that function along with the literal fragments and the
+    interpolation operands, allowing the function to control how each
+    operand is quoted and combined into the resulting string.
+    Proposal: https://cuelang.org/discussion/4295
+
 
 ## Global Experiments
 

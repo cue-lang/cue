@@ -819,6 +819,9 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				Value:   value,
 			}
 		}
+		// Note: a *ast.TaggedInterpolation cannot appear here: it is not
+		// an ast.Label, so the parser turns `tag "s"` in declaration
+		// position into an embedding, which is compiled via c.expr.
 
 	case *ast.LetClause:
 		m := c.stack[len(c.stack)-1].aliases
@@ -1206,12 +1209,19 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 	case *ast.BasicLit:
 		return c.parse(n)
 
-	case *ast.Interpolation:
-		if len(n.Elts) == 1 {
-			return c.expr(n.Elts[0])
+	case *ast.Interpolation, *ast.TaggedInterpolation:
+		var n1 *ast.Interpolation
+		tagged, ok := n.(*ast.TaggedInterpolation)
+		if ok {
+			n1 = tagged.Str
+		} else {
+			n1 = n.(*ast.Interpolation)
 		}
-		first, last := n.Quotes()
-		lit := &adt.Interpolation{Src: n}
+		if len(n1.Elts) == 1 && tagged == nil {
+			return c.expr(n1.Elts[0])
+		}
+		first, last := n1.Quotes()
+		lit := &adt.Interpolation{Src: n1}
 		info, prefixLen, _, err := literal.ParseQuotes(first.Value, last.Value)
 		if err != nil {
 			return c.errf(n, "invalid interpolation: %v", err)
@@ -1222,8 +1232,8 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			lit.K = adt.BytesKind
 		}
 		prefix := ""
-		for i := 0; i < len(n.Elts); i += 2 {
-			l, ok := n.Elts[i].(*ast.BasicLit)
+		for i := 0; i < len(n1.Elts); i += 2 {
+			l, ok := n1.Elts[i].(*ast.BasicLit)
 			if !ok {
 				return c.errf(n, "invalid interpolation")
 			}
@@ -1234,11 +1244,18 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			s = l.Value[prefixLen:]
 			x := parseString(c, l, info, s)
 			lit.Parts = append(lit.Parts, x)
-			if i+1 < len(n.Elts) {
-				lit.Parts = append(lit.Parts, c.expr(n.Elts[i+1]))
+			if i+1 < len(n1.Elts) {
+				lit.Parts = append(lit.Parts, c.expr(n1.Elts[i+1]))
 			}
 			prefix = ")"
 			prefixLen = 1
+		}
+		if tagged != nil {
+			return &adt.TaggedInterpolation{
+				Src:           tagged,
+				Tag:           c.expr(tagged.Tag),
+				Interpolation: lit,
+			}
 		}
 		return lit
 

@@ -17,6 +17,7 @@ package cue_test
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -154,4 +155,92 @@ func TestNewPureValidatorFuncExportError(t *testing.T) {
 	}, cue.Name("myValidator")))
 	got := v.LookupPath(cue.ParsePath("#v"))
 	qt.Assert(t, qt.Matches(fmt.Sprint(got), `.*cannot convert validator "myValidator" to CUE.*`))
+}
+
+// joinTag is a tag function for a tagged string interpolation that
+// reassembles the literal fragments and string operands, wrapping each
+// operand in angle brackets so the split between fragments and operands
+// is observable.
+var joinTag = cue.NewPureFunc2(func(strs, vals []string) (string, error) {
+	var sb strings.Builder
+	for i, s := range strs {
+		sb.WriteString(s)
+		if i < len(vals) {
+			sb.WriteString("<" + vals[i] + ">")
+		}
+	}
+	return sb.String(), nil
+})
+
+func TestTaggedInterpolation(t *testing.T) {
+	testCases := []struct {
+		name    string
+		src     string
+		tag     cue.Value
+		want    string
+		wantErr string
+	}{{
+		name: "string operands",
+		src:  `#tag: _, x: #tag "a\("one")b\("two")c"`,
+		tag:  joinTag,
+		want: `"a<one>b<two>c"`,
+	}, {
+		name: "single operand",
+		src:  `#tag: _, x: #tag "hello \("world")"`,
+		tag:  joinTag,
+		want: `"hello <world>"`,
+	}, {
+		// Operands keep their original CUE type rather than being
+		// coerced to string, so the tag function receives them as ints.
+		name: "int operands",
+		src:  `#tag: _, x: #tag "a\(1)b\(2)c"`,
+		tag: cue.NewPureFunc2(func(strs []string, vals []int) (string, error) {
+			var sb strings.Builder
+			for i, s := range strs {
+				sb.WriteString(s)
+				if i < len(vals) {
+					sb.WriteString(fmt.Sprintf("<%d>", vals[i]))
+				}
+			}
+			return sb.String(), nil
+		}),
+		want: `"a<1>b<2>c"`,
+	}, {
+		// A tagged literal with no interpolations still invokes the tag,
+		// which receives a single fragment and no operands.
+		name: "no interpolations",
+		src:  `#tag: _, x: #tag "plain"`,
+		tag: cue.NewPureFunc2(func(strs, vals []string) (string, error) {
+			return fmt.Sprintf("%d fragment(s) %d operand(s): %q", len(strs), len(vals), strs), nil
+		}),
+		want: `"1 fragment(s) 0 operand(s): [\"plain\"]"`,
+	}, {
+		name: "error from tag",
+		src:  `#tag: _, x: #tag "a\("b")c"`,
+		tag: cue.NewPureFunc2(func(strs, vals []string) (string, error) {
+			return "", errors.New("tag failed")
+		}),
+		wantErr: `.*tag failed.*`,
+	}, {
+		// An abstract operand cannot be passed to the tag function.
+		name:    "abstract operand",
+		src:     `#tag: _, y: string, x: #tag "a\(y)b"`,
+		tag:     joinTag,
+		wantErr: `.*cannot convert non-concrete value string.*`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := cuecontext.New()
+			v := ctx.CompileString("@experiment(stringtag)\n" + tc.src)
+			v = v.FillPath(cue.ParsePath("#tag"), tc.tag)
+			got := v.LookupPath(cue.ParsePath("x"))
+			if tc.wantErr != "" {
+				qt.Assert(t, qt.IsNotNil(got.Err()))
+				qt.Assert(t, qt.ErrorMatches(got.Err(), tc.wantErr))
+				return
+			}
+			qt.Assert(t, qt.IsNil(got.Err()))
+			qt.Assert(t, qt.Equals(fmt.Sprint(got), tc.want))
+		})
+	}
 }

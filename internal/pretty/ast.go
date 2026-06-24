@@ -1036,6 +1036,9 @@ func (c *converter) exprCore(x ast.Expr) doc {
 	case *ast.Interpolation:
 		return c.interpolation(x)
 
+	case *ast.TaggedInterpolation:
+		return c.taggedInterpolation(x)
+
 	case *ast.Func:
 		return c.funcExpr(x)
 
@@ -2615,6 +2618,16 @@ func (c *converter) interpolation(x *ast.Interpolation) doc {
 	}
 
 	return c.multiLineInterpolation(x)
+}
+
+// taggedInterpolation converts a TaggedInterpolation (`tag "str"`),
+// rendering the tag and the string literal separated by a single
+// space. The tag passes through [wrapForPrecedence] with
+// [token.HighestPrec] so a lower-precedence tag expression is
+// parenthesised, preserving its grouping.
+func (c *converter) taggedInterpolation(x *ast.TaggedInterpolation) doc {
+	tag := wrapForPrecedence(c.expr(x.Tag), x.Tag, token.HighestPrec)
+	return cats(tag, spaceLit, c.expr(x.Str))
 }
 
 // multiLineInterpolation handles the multi-line case of

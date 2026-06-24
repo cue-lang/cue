@@ -41,6 +41,9 @@ package x
 // docs9
 
 // docs10
+
+// docs11
+z: y: x: _
 -- _registry/example.com_foo_v0.0.1/x/z.cue --
 // docs for package2
 package x
@@ -77,6 +80,9 @@ import "example.com/foo/x"
 
 data: x.#Schema
 data: name: "bob"
+
+f: x.z
+g: f.y.x
 `
 
 	WithOptions(
@@ -128,6 +134,12 @@ name docs3
 name docs4
 ([z.cue line 9](%v/example.com/foo@v0.0.1/x/z.cue#L9))`[1:],
 				cacheURI, cacheURI),
+
+			fln("a/a.cue", 8, 1, "z"): fmt.Sprintf(`
+docs11
+([y.cue line 25](%v/example.com/foo@v0.0.1/x/y.cue#L25))`[1:],
+				cacheURI),
+			fln("a/a.cue", 9, 1, "x"): "",
 		}
 
 		ranges := rangeset.NewFilenameRangeSet()
@@ -146,7 +158,11 @@ name docs4
 					URI:   p.mapper.URI,
 					Range: protocol.Range{Start: pos},
 				})
-				qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v(+%d)", p, i))
+				if got == nil {
+					qt.Assert(t, qt.Equals("", expectation), qt.Commentf("%v(+%d)", p, i))
+				} else {
+					qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v(+%d)", p, i))
+				}
 			}
 		}
 

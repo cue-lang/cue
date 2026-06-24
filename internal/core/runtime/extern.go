@@ -120,8 +120,9 @@ func (d *externDecorator) addFile(f *ast.File) (errs errors.Error) {
 	if err != nil {
 		return err
 	}
+	errs = checkMissingExtern(f, kinds, d.runtime.injections)
 	if len(kinds) == 0 {
-		return nil
+		return errs
 	}
 
 	if d.fileKinds == nil {
@@ -134,6 +135,29 @@ func (d *externDecorator) addFile(f *ast.File) (errs errors.Error) {
 			errs = errors.Append(errs, err)
 		}
 	}
+	return errs
+}
+
+// checkMissingExtern reports each attribute in f naming a registered injection
+// kind, such as @embed, that lacks its file-level @extern declaration in kinds.
+// Such attributes would otherwise be silently ignored.
+func checkMissingExtern(f *ast.File, kinds map[string]*internal.Attr, injections map[string]Injection) (errs errors.Error) {
+	ast.Walk(f, func(n ast.Node) bool {
+		switch n := n.(type) {
+		case *ast.CommentGroup:
+			return false
+		case *ast.Attribute:
+			if name := n.Name(); injections[name] != nil && kinds[name] == nil {
+				// @extern is only allowed in files with a package clause.
+				format := "@%[1]s attribute requires a file-level @extern(%[1]s) declaration"
+				if pkg, _ := internal.Package(f); pkg == nil {
+					format = "@%[1]s attribute requires a package clause and a file-level @extern(%[1]s) declaration"
+				}
+				errs = errors.Append(errs, errors.Newf(n.Pos(), format, name))
+			}
+		}
+		return true
+	}, nil)
 	return errs
 }
 

@@ -33,7 +33,7 @@ func TestAttributes(t *testing.T) {
 		b: 1 @bar(a,b,c,d=1) @foo(a,,d=1)
 	}
 	b: {
-		@embed(foo)
+		@embedding(foo)
 		3
 	} @field(foo)
 
@@ -64,7 +64,7 @@ func TestAttributes(t *testing.T) {
 	}, {
 		flags: cue.DeclAttr,
 		path:  "b",
-		out:   "[@embed(foo)]",
+		out:   "[@embedding(foo)]",
 	}, {
 		flags: cue.FieldAttr,
 		path:  "b",
@@ -72,7 +72,7 @@ func TestAttributes(t *testing.T) {
 	}, {
 		flags: cue.ValueAttr,
 		path:  "b",
-		out:   "[@field(foo) @embed(foo)]",
+		out:   "[@field(foo) @embedding(foo)]",
 	}, {
 		flags: cue.ValueAttr,
 		path:  "c1",

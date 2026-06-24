@@ -1,11 +1,6 @@
-# An @embed attribute without the file-level @extern(embed) declaration is
-# silently ignored, leaving the field incomplete and producing a confusing
-# error from a downstream marshal-like operation. It should instead report
-# clearly that an @extern(embed) declaration is required.
+# An @embed attribute requires the file-level @extern(embed) declaration,
+# and a missing declaration is reported at the attribute.
 # See https://cuelang.org/issue/4010.
-#
-# TODO(4010): the error below is the confusing status quo; once @embed without
-# @extern is reported directly, out/err should become that clearer message.
 
 # Without the @extern(embed) declaration, using @embed is an error.
 ! exec cue export ./withoutextern
@@ -40,9 +35,8 @@ obj: a: {
 -- withextern/b.txt --
 hello
 -- out/err --
-obj.a.txt: incomplete value string:
-    ./withoutextern/x.cue:3:14
-    ./withoutextern/x.cue:5:7
+@embed attribute requires a file-level @extern(embed) declaration:
+    ./withoutextern/x.cue:5:9
 -- out/withextern --
 {
     "obj": {

@@ -1,0 +1,9 @@
+// An injection attribute in a file without a package clause cannot be enabled
+// by adding @extern alone, as @extern requires a package clause too.
+-- cue.mod/modules.cue --
+-- no_package.cue --
+Foo: _ @testfn(file.xx, abi=c, sig="func(int)int")
+
+-- out/extern --
+@testfn attribute requires a package clause and a file-level @extern(testfn) declaration:
+    ./no_package.cue:1:8

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6934352_d6e70006",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-24T07:48:56Z",
+      "side": 1,
+      "message": "nit: lines too long",
+      "revId": "f055bb39bb548450b7675964b8339b02ee79aa41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83fde47a_c5f3d19c",
+        "filename": "internal/cuetxtar/inline_attr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-24T07:48:56Z",
+      "side": 1,
+      "message": "It seems a bit wrong to me that the only docs for this behaviour are buried in an internal function deep in the cuetxtar package.\n\nCould we actually document the test syntax in the cuetxtar package doc comment? I for one would find that super helpful: I have no idea how to interpret `at\u003d...` and `shareID\u003d...` flags in `@test` attributes currently.\n\nFeel free to do that in another CL or I could do it if you like.",
+      "revId": "f055bb39bb548450b7675964b8339b02ee79aa41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3138a05_2d6d4501",
+        "filename": "internal/cuetxtar/inline_attr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-24T07:48:56Z",
+      "side": 1,
+      "message": "I wonder if this should return an error if it gets mismatched parens.",
+      "revId": "f055bb39bb548450b7675964b8339b02ee79aa41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

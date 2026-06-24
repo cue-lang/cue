@@ -1,0 +1,221 @@
+# End-to-end test for the encoding/go package, which provides a Format
+# function intended for use as a tagged string interpolation. Format quotes
+# its operands so that the original CUE values are preserved when the result
+# is interpreted as Go source, choosing the representation appropriate to the
+# surrounding context (a Go expression, an interpreted string literal or a
+# raw string literal). The result is run through go/format.
+
+# The happy path: interpolation in expression context for each supported
+# value kind, plus interpolation inside interpreted and raw string literals.
+exec cue export quote.cue
+cmp stdout want-quote
+
+# An interpolation in expression context cannot be followed by further text
+# within the same identifier.
+! exec cue export err_suffix.cue
+cmp stderr err_suffix.stderr
+
+# In expression context, only scalar kinds can be turned into Go syntax.
+! exec cue export err_expr_list.cue
+cmp stderr err_expr_list.stderr
+
+# In string context, non-scalar operands cannot be turned into a string.
+! exec cue export err_str_struct.cue
+cmp stderr err_str_struct.stderr
+
+# An interpolation in a position the formatter does not recognise (here, a
+# comment) is rejected rather than dropped.
+! exec cue export err_comment.cue
+cmp stderr err_comment.stderr
+
+# An interpolation where the grammar requires an identifier rather than an
+# expression (here, a declaration name) is rejected with the same error
+# rather than crashing while substituting.
+! exec cue export err_lvalue.cue
+cmp stderr err_lvalue.stderr
+
+# Source that does not parse as Go is reported, not formatted blindly.
+! exec cue export err_parse.cue
+cmp stderr err_parse.stderr
+
+# Format can also be called directly, like any other builtin; the strings
+# and args lists need not come from a tagged literal.
+exec cue export direct.cue
+cmp stdout want-direct
+
+-- want-quote --
+{
+    "exprStr": "package main\n\nvar x = \"he said \\\"hi\\\"\\n\\tand left\"\n",
+    "s": "he said \"hi\"\n\tand left",
+    "exprInt": "package main\n\nvar x = 42\n",
+    "i": 42,
+    "exprBool": "package main\n\nvar x = true\n",
+    "b": true,
+    "exprFloat": "package main\n\nvar x = 3.14\n",
+    "fl": 3.14,
+    "inStr": "package main\n\nvar x = \"prefix he said \\\"hi\\\"\\n\\tand left suffix\"\n",
+    "inRaw": "package main\n\nvar x = `prefix quotes \" and \\ stay literal suffix`\n",
+    "plain": "quotes \" and \\ stay literal",
+    "inRawTick": "package main\n\nvar x = \"prefix a `backquote` here suffix\"\n",
+    "ticky": "a `backquote` here",
+    "inRawTickMulti": "package main\n\nvar x = `line one\nline two ` + \"a `backquote` here\" + `\nline three`\n"
+}
+-- quote.cue --
+@experiment(stringtag)
+
+import "encoding/go"
+
+// Expression context: a string operand becomes a quoted Go string literal.
+exprStr: go.Format#"""
+	package main
+
+	var x = \#(s)
+	"""#
+s: "he said \"hi\"\n\tand left"
+
+// Expression context: other scalar kinds use their natural Go syntax.
+exprInt: go.Format#"""
+	package main
+
+	var x = \#(i)
+	"""#
+i: 42
+
+exprBool: go.Format#"""
+	package main
+
+	var x = \#(b)
+	"""#
+b: true
+
+exprFloat: go.Format#"""
+	package main
+
+	var x = \#(fl)
+	"""#
+fl: 3.14
+
+// Interpreted string context: the operand is escaped to survive inside the
+// surrounding double quotes.
+inStr: go.Format#"""
+	package main
+
+	var x = "prefix \#(s) suffix"
+	"""#
+
+// Raw string context: an operand without backquotes is inserted verbatim.
+inRaw: go.Format#"""
+	package main
+
+	var x = `prefix \#(plain) suffix`
+	"""#
+plain: "quotes \" and \\ stay literal"
+
+// Raw string context: because a Go raw string literal cannot contain a
+// backquote, an operand that has one forces a single-line literal to be
+// re-emitted as a regular string.
+inRawTick: go.Format#"""
+	package main
+
+	var x = `prefix \#(ticky) suffix`
+	"""#
+ticky: "a `backquote` here"
+
+// Raw string context: when the literal spans multiple lines, the newline-bearing
+// raw fragments are kept raw and the offending operand is broken out into an
+// interpreted segment joined with +, preserving the layout.
+inRawTickMulti: go.Format#"""
+	package main
+
+	var x = `line one
+	line two \#(ticky)
+	line three`
+	"""#
+-- err_suffix.cue --
+@experiment(stringtag)
+
+import "encoding/go"
+
+x: go.Format#"""
+	package main
+
+	var y = \#(v)Suffix
+	"""#
+v: "hello"
+-- err_suffix.stderr --
+x: error in call to encoding/go.Format: additional text following interpolation in expression context
+-- err_expr_list.cue --
+@experiment(stringtag)
+
+import "encoding/go"
+
+x: go.Format#"""
+	package main
+
+	var y = \#(v)
+	"""#
+v: [1, 2]
+-- err_expr_list.stderr --
+x: error in call to encoding/go.Format: cannot convert interpolation expression 0 to Go expression: cannot form Go syntax for [1, 2]
+-- err_str_struct.cue --
+@experiment(stringtag)
+
+import "encoding/go"
+
+x: go.Format#"""
+	package main
+
+	var y = "\#(v)"
+	"""#
+v: {a: 1}
+-- err_str_struct.stderr --
+x: error in call to encoding/go.Format: cannot convert interpolation expression 0 to string: unsupported value kind struct
+-- err_comment.cue --
+@experiment(stringtag)
+
+import "encoding/go"
+
+x: go.Format#"""
+	package main
+
+	// comment \#(v)
+	var y = 1
+	"""#
+v: "hello"
+-- err_comment.stderr --
+x: error in call to encoding/go.Format: interpolation 0 in unexpected place: cannot replace
+-- err_lvalue.cue --
+@experiment(stringtag)
+
+import "encoding/go"
+
+x: go.Format#"""
+	package main
+
+	var \#(v) = 1
+	"""#
+v: "name"
+-- err_lvalue.stderr --
+x: error in call to encoding/go.Format: interpolation 0 in unexpected place: cannot replace
+-- err_parse.cue --
+@experiment(stringtag)
+
+import "encoding/go"
+
+x: go.Format#"""
+	package main
+
+	this is not go
+	"""#
+-- err_parse.stderr --
+x: error in call to encoding/go.Format: cannot parse file "package main\n\nthis is not go" as Go: 3:1: expected declaration, found this
+-- direct.cue --
+import "encoding/go"
+
+// Equivalent to go.Format#"...var y = \#(arg)..."# but spelled out as an
+// ordinary call.
+x: go.Format(["package main\n\nvar y = ", ""], ["hello"])
+-- want-direct --
+{
+    "x": "package main\n\nvar y = \"hello\"\n"
+}

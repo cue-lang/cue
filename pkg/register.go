@@ -11,6 +11,7 @@ import (
 	_ "cuelang.org/go/pkg/crypto/sha512"
 	_ "cuelang.org/go/pkg/encoding/base64"
 	_ "cuelang.org/go/pkg/encoding/csv"
+	_ "cuelang.org/go/pkg/encoding/go"
 	_ "cuelang.org/go/pkg/encoding/hex"
 	_ "cuelang.org/go/pkg/encoding/json"
 	_ "cuelang.org/go/pkg/encoding/openapi"

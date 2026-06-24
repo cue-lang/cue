@@ -35,9 +35,6 @@ func ExtractDoc(v *adt.Vertex) (docs []*ast.CommentGroup) {
 }
 
 func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
-	fields := []*ast.Field{}
-
-	// Collect docs directly related to this Vertex.
 	for x := range v.LeafConjuncts() {
 		// TODO: Is this still being used?
 		if v, ok := x.Elem().(*adt.Vertex); ok {
@@ -46,11 +43,13 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 
 		switch f := x.Field().Source().(type) {
 		case *ast.Field:
-			if hasShorthandValue(f) {
-				continue
-			}
-			fields = append(fields, f)
-			for _, cg := range leadingDocComments(ast.Comments(f)) {
+			// ast.DocComments resolves the field-chain convention from
+			// the (parse-resolved) source AST, so a doc syntactically
+			// attached to a field-chain head is reported on the leaf
+			// field it documents. This works regardless of whether v has
+			// a parent, which is why it is also correct for the
+			// synthetic vertices built in the expr export path.
+			for _, cg := range ast.DocComments(f) {
 				if !containsDoc(docs, cg) {
 					docs = append(docs, cg)
 				}
@@ -61,65 +60,7 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 			docs = append(docs, fdocs...)
 		}
 	}
-
-	// Collect docs from parent scopes in collapsed fields.
-	for p := v.Parent; p != nil; p = p.Parent {
-
-		newFields := []*ast.Field{}
-
-		for x := range p.LeafConjuncts() {
-			f, ok := x.Source().(*ast.Field)
-			if !ok || !hasShorthandValue(f) {
-				continue
-			}
-
-			nested := nestedField(f)
-			for _, child := range fields {
-				if nested == child {
-					newFields = append(newFields, f)
-					for _, cg := range leadingDocComments(ast.Comments(f)) {
-						if !containsDoc(docs, cg) {
-							docs = append(docs, cg)
-						}
-					}
-				}
-			}
-		}
-
-		fields = newFields
-	}
 	return docs
-}
-
-// hasShorthandValue reports whether this field has a struct value that will
-// be rendered as a shorthand, for instance:
-//
-//	f: g: 2
-func hasShorthandValue(f *ast.Field) bool {
-	if f = nestedField(f); f == nil {
-		return false
-	}
-
-	// Not a regular field, but shorthand field.
-	// TODO: Should we return here? For now mimic old implementation.
-	if _, _, err := ast.LabelName(f.Label); err != nil {
-		return false
-	}
-
-	return true
-}
-
-// nestedField returns the child field of a field shorthand.
-func nestedField(f *ast.Field) *ast.Field {
-	s, _ := f.Value.(*ast.StructLit)
-	if s == nil || len(s.Elts) != 1 ||
-		s.Lbrace.IsValid() ||
-		s.Rbrace.IsValid() {
-		return nil
-	}
-
-	f, _ = s.Elts[0].(*ast.Field)
-	return f
 }
 
 // leadingDocComments returns the doc-position comment groups in cgs,

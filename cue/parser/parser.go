@@ -1647,6 +1647,7 @@ func (p *parser) checkExpr(x ast.Expr) ast.Expr {
 	case *ast.Ident:
 	case *ast.BasicLit:
 	case *ast.Interpolation:
+	case *ast.TaggedInterpolation:
 	case *ast.Func:
 	case *ast.StructLit:
 	case *ast.ListLit:
@@ -1691,6 +1692,37 @@ func (p *parser) parsePrimaryExprTail(operand ast.Expr) ast.Expr {
 L:
 	for {
 		switch p.tok {
+		case token.STRING:
+			if p.experiments == nil || !p.experiments.StringTag {
+				pos := p.pos
+				p.next()
+				p.errf(pos, "tagged string literal requires @experiment(stringtag)")
+				x = &ast.BadExpr{From: pos, To: p.pos}
+				continue
+			}
+			x = &ast.TaggedInterpolation{
+				Tag: x,
+				Str: &ast.Interpolation{
+					Elts: []ast.Expr{&ast.BasicLit{
+						ValuePos: p.pos,
+						Kind:     token.STRING,
+						Value:    p.lit,
+					}},
+				},
+			}
+			p.next()
+		case token.INTERPOLATION:
+			if p.experiments == nil || !p.experiments.StringTag {
+				pos := p.pos
+				p.parseInterpolation()
+				p.errf(pos, "tagged string literal requires @experiment(stringtag)")
+				x = &ast.BadExpr{From: pos, To: p.pos}
+				continue
+			}
+			x = &ast.TaggedInterpolation{
+				Tag: x,
+				Str: p.parseInterpolation(),
+			}
 		case token.PERIOD:
 			period := p.pos
 			c := p.openComments()
@@ -1834,7 +1866,7 @@ func (p *parser) parseBinaryExprTail(prec1 int, x ast.Expr) ast.Expr {
 	}
 }
 
-func (p *parser) parseInterpolation() (expr ast.Expr) {
+func (p *parser) parseInterpolation() (expr *ast.Interpolation) {
 	c := p.openComments()
 	defer func() { c.closeNode(p, expr) }()
 

@@ -231,6 +231,13 @@ shadowField: {
 		b: 0
 		d: b: 1
 	}
+
+	// TODO: could be simplified to:
+	// 		A=b: 0
+	//  	c:   A
+	// or even
+	// 		b: 0
+	//  	c: b
 	t6: x: {
 		{
 			A=b: 0

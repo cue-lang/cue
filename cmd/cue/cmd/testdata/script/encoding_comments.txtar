@@ -124,6 +124,7 @@ foo: "bar"
 
 // top-level comment before a struct
 struct: {
+
 	// comment in a struct field
 	field1: "message1"
 	field2: "message2"
@@ -213,6 +214,7 @@ disjunction: "some default"
 
 // top-level comment before a struct
 struct: {
+
 	// comment in a struct field
 	field1: "message1"
 	field2: "message2"

@@ -205,6 +205,8 @@ Foo: {
 // foos are instances of Foo.
 foos: {
 	{[string]: Foo}
+
+	// My first little foo.
 	MyFoo: {
 		// local field comment.
 		field1: 0

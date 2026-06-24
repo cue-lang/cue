@@ -135,11 +135,11 @@ name docs4
 ([z.cue line 9](%v/example.com/foo@v0.0.1/x/z.cue#L9))`[1:],
 				cacheURI, cacheURI),
 
-			fln("a/a.cue", 8, 1, "z"): fmt.Sprintf(`
+			fln("a/a.cue", 8, 1, "z"): "",
+			fln("a/a.cue", 9, 1, "x"): fmt.Sprintf(`
 docs11
 ([y.cue line 25](%v/example.com/foo@v0.0.1/x/y.cue#L25))`[1:],
 				cacheURI),
-			fln("a/a.cue", 9, 1, "x"): "",
 		}
 
 		ranges := rangeset.NewFilenameRangeSet()

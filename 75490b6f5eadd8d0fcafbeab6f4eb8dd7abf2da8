@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a07f1eb0_4061ff3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T12:08:52Z",
+      "side": 1,
+      "message": "PS1 is an AST-based check, which is more flexible (it can be moved to `cue vet`) but it requires an extra walk pass. PS2 extends the existing ADT walk instead.",
+      "revId": "75490b6f5eadd8d0fcafbeab6f4eb8dd7abf2da8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

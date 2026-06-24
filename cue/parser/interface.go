@@ -215,6 +215,9 @@ func ParseFile(filename string, src any, mode ...Option) (f *ast.File, err error
 	}
 	f.Filename = filename
 	astutil.Resolve(f, pp.errf)
+	if pp.cfg.Mode&ParseComments != 0 {
+		ast.ResolveComments(f)
+	}
 
 	return f, pp.errors
 }
@@ -266,6 +269,9 @@ func ParseExpr(filename string, src any, mode ...Option) (_ ast.Expr, err error)
 		return nil, p.errors
 	}
 	astutil.ResolveExpr(e, p.errf)
+	if p.cfg.Mode&ParseComments != 0 {
+		ast.ResolveComments(e)
+	}
 
 	return e, p.errors
 }

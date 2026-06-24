@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e49e444a_2abadda3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-24T07:38:22Z",
+      "side": 1,
+      "message": "LGTM modulo a few suggestions.",
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ea982fd_f3d19895",
+        "filename": "cmd/cue/cmd/testdata/script/load_module_context.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-24T07:38:22Z",
+      "side": 1,
+      "message": "I\u0027m actually a bit surprised this works, for a different reason: I thought we\u0027d need to do `cue export ./ver/ver.cue` otherwise it would be interpreted as an absolute path. As `cue help inputs` says:\n\n\u003e An import path\n\u003e that begins with a \".\" or \"..\" element is a relative import path,\n\u003e is interpreted as a file system path, and denotes the\n\u003e package instance in that directory.\n\nBut that\u0027s another issue and behaviour that we possibly can\u0027t change now anyway.",
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "343477ae_8c0adc0c",
+        "filename": "cmd/cue/cmd/testdata/script/load_module_context.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-24T07:38:22Z",
+      "side": 1,
+      "message": "That\u0027s not quite right, as I understand it. Isn\u0027t it loaded with the module found from the current directory (or none if none is found from there) ? This sentence makes it sound like the file is loaded without any module at all.",
+      "range": {
+        "startLine": 42,
+        "startChar": 24,
+        "endLine": 42,
+        "endChar": 74
+      },
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7649c1b9_def3263e",
+        "filename": "cmd/cue/cmd/testdata/script/load_module_context.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-24T07:38:22Z",
+      "side": 1,
+      "message": "It only works in one of the examples below. Maybe move the TODO closer to the actual examples that exhibit non-desired behaviour (the error should probably be \"cue.mod directory not found in current directory or any parent directory\" or similar, mirroring Go\u0027s approach)",
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3783001_c635bc5a",
+        "filename": "cmd/cue/cmd/testdata/script/load_module_context.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-24T07:38:22Z",
+      "side": 1,
+      "message": "It might also be good to have a test for what happens when we\u0027re in one module and mention a standalone file that\u0027s in another module. AIUI the cwd\u0027s module should be used and the module holding the standalone file should be ignored.",
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

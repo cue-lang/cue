@@ -138,7 +138,28 @@ func (clause) clauseNode() {}
 // Comments
 
 type comments struct {
-	groups *[]*CommentGroup
+	// syntacticGroups holds the comment groups syntactically attached
+	// to this node, as produced by the parser. This is used when
+	// rendering an AST, and is what [Comments] returns.
+	syntacticGroups *[]*CommentGroup
+
+	// inheritedDocComments holds doc comments that semantically
+	// document this node but are physically attached to an ancestor
+	// field of a field-chain. For
+	//
+	//	// c
+	//	a: b: {x: 1}
+	//
+	// the group "// c" lives in a.syntacticGroups (it renders above the
+	// chain) and in b.inheritedDocComments (b is what it documents).
+	//
+	// This list is sparse: it holds only inherited groups, never a
+	// node's own physically-attached docs, so it is disjoint from
+	// syntacticGroups.  It is therefore not the complete set of docs
+	// that document this node; for that, use [DocComments], which
+	// unions this with the node's own syntactic docs when the node is
+	// a chain leaf. Populated by [ResolveComments].
+	inheritedDocComments *[]*CommentGroup
 }
 
 func (c *comments) commentInfo() *comments { return c }
@@ -150,10 +171,10 @@ func (c *comments) commentInfo() *comments { return c }
 
 // Deprecated: use [Comments].
 func (c *comments) Comments() []*CommentGroup {
-	if c.groups == nil {
+	if c.syntacticGroups == nil {
 		return []*CommentGroup{}
 	}
-	return *c.groups
+	return *c.syntacticGroups
 }
 
 // Deprecated: use [AddComment].
@@ -161,14 +182,14 @@ func (c *comments) AddComment(cg *CommentGroup) {
 	if cg == nil {
 		return
 	}
-	if c.groups == nil {
+	if c.syntacticGroups == nil {
 		a := []*CommentGroup{cg}
-		c.groups = &a
+		c.syntacticGroups = &a
 		return
 	}
 
-	*c.groups = append(*c.groups, cg)
-	a := *c.groups
+	*c.syntacticGroups = append(*c.syntacticGroups, cg)
+	a := *c.syntacticGroups
 	for i := len(a) - 2; i >= 0 && a[i].Position > cg.Position; i-- {
 		a[i], a[i+1] = a[i+1], a[i]
 	}
@@ -176,7 +197,7 @@ func (c *comments) AddComment(cg *CommentGroup) {
 
 // Deprecated: use [SetComments].
 func (c *comments) SetComments(cgs []*CommentGroup) {
-	if c.groups == nil {
+	if c.syntacticGroups == nil {
 		if cgs == nil {
 			// Replacing no comments with a nil slice is a no-op.
 			// Avoid allocating below.
@@ -185,10 +206,10 @@ func (c *comments) SetComments(cgs []*CommentGroup) {
 			return
 		}
 		a := cgs
-		c.groups = &a
+		c.syntacticGroups = &a
 		return
 	}
-	*c.groups = cgs
+	*c.syntacticGroups = cgs
 }
 
 // A Comment node represents a single //-style comment.

@@ -25,6 +25,9 @@ cmp stdout stdout-2_4.cue
 exec cue def 2.cue 4.cue -p t
 cmp stdout stdout-2_4-pkg.cue
 
+exec cue def fieldchain.cue
+cmp stdout stdout-fieldchain.cue
+
 # title and top description are lost
 exec cue def -l '#top:' jsonschema: schema1.json
 cmp stdout stdout1-def
@@ -353,3 +356,14 @@ package t
 d:   1
 di:  1
 dii: 1
+-- fieldchain.cue --
+// doc on command
+command: help: {
+	x: 1
+	y: 2
+}
+-- stdout-fieldchain.cue --
+command: help: {
+	x: 1
+	y: 2
+}

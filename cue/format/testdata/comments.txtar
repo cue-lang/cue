@@ -44,7 +44,7 @@ a: b: {
     c: 2
 }
 
-// rewrite okay
+// don't simplify: collapsing would move this comment from c to d
 a: b: c: {
     d: 2
 }
@@ -216,10 +216,14 @@ a: {
 a: b: [1]
 
 // don't simplify
-a: b: c: 2
+a: b: {
+	c: 2
+}
 
-// rewrite okay
-a: b: c: d: 2
+// don't simplify: collapsing would move this comment from c to d
+a: b: c: {
+	d: 2
+}
 
 m: {}
 m: {

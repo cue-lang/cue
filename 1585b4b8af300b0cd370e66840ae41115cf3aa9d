@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81e35051_2299178b",
+        "filename": "cmd/cue/cmd/testdata/script/load_module_context.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T09:11:47Z",
+      "side": 1,
+      "message": "Remember that filetypes understands that any argument ending in `.cue` is a file, and NOT an import path, so the \"starts with a dot\" rule does not apply.\n\nOtherwise `cue export foo.cue` would never work, and you\u0027d have to do `cue export ./foo.cue`, which is a bit silly. We have the same behavior as Go in this respect, which I think is reasonable and user-friendly.\n\nSo IMO nothing to fix here, other than a clarification in the `cue help inputs` wording if you want to send a patch.",
+      "parentUuid": "9ea982fd_f3d19895",
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "343477ae_8c0adc0c",
@@ -48,6 +66,30 @@
       "writtenOn": "2026-06-24T07:38:22Z",
       "side": 1,
       "message": "That\u0027s not quite right, as I understand it. Isn\u0027t it loaded with the module found from the current directory (or none if none is found from there) ? This sentence makes it sound like the file is loaded without any module at all.",
+      "range": {
+        "startLine": 42,
+        "startChar": 24,
+        "endLine": 42,
+        "endChar": 74
+      },
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb05f253_f140c5bc",
+        "filename": "cmd/cue/cmd/testdata/script/load_module_context.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T09:11:47Z",
+      "side": 1,
+      "message": "yes, this is claude mistakenly assuming that the module is found starting from the file path, not the current directory :) I fixed a lot of those assumptions but clearly not this one. done.",
+      "parentUuid": "343477ae_8c0adc0c",
       "range": {
         "startLine": 42,
         "startChar": 24,
@@ -75,6 +117,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2183983_aed6def2",
+        "filename": "cmd/cue/cmd/testdata/script/load_module_context.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T09:11:47Z",
+      "side": 1,
+      "message": "\"work\" in this context means \"tries to load a package even though we\u0027re not in its module\"; the ones that fail are because we\u0027re not loading the module, not because we refuse to load the package. I\u0027ll move the TODO to the version one, as it\u0027s less ambiguous, but the point stands for all three cases.",
+      "parentUuid": "7649c1b9_def3263e",
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3783001_c635bc5a",
@@ -88,6 +148,24 @@
       "writtenOn": "2026-06-24T07:38:22Z",
       "side": 1,
       "message": "It might also be good to have a test for what happens when we\u0027re in one module and mention a standalone file that\u0027s in another module. AIUI the cwd\u0027s module should be used and the module holding the standalone file should be ignored.",
+      "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd070175_94636a80",
+        "filename": "cmd/cue/cmd/testdata/script/load_module_context.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-24T09:11:47Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "b3783001_c635bc5a",
       "revId": "1585b4b8af300b0cd370e66840ae41115cf3aa9d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

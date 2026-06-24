@@ -3,8 +3,11 @@
 exec cue fmt -s in.cue
 cmp in.cue in.cue.golden
 
+<<<<<<< HEAD
 # NB: the golden output is WRONG - the comment has changed its semantic location.
 
+=======
+>>>>>>> 1cefd7b31 (cue/ast: resolve doc-comment ownership for field shorthands)
 -- in.cue.golden --
 package foo
 
@@ -13,7 +16,9 @@ import (
 )
 
 // displays help for available commands
-command: help: show: exec.Run & {cmd: ["sh", "-c", "cue help cmd | grep -A2 'Available Commands:'"]}
+command: help: {
+	show: exec.Run & {cmd: ["sh", "-c", "cue help cmd | grep -A2 'Available Commands:'"]}
+}
 -- cue.mod/module.cue --
 module: "cue.example/foo"
 language: {

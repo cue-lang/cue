@@ -1,0 +1,127 @@
+# End-to-end test for the encoding/sh package, which provides a Format
+# function intended for use as a tagged string interpolation. Format quotes
+# its operands so that the original CUE values survive being interpreted as
+# a shell script, choosing the quoting appropriate to the surrounding
+# context (unquoted, single-quoted or double-quoted).
+
+# The happy path: quoting in all three contexts plus the various supported
+# value kinds and edge cases.
+exec cue export quote.cue
+cmp stdout want-quote
+
+# Values used outside any of the contexts we know how to quote into are
+# rejected rather than silently producing a broken script.
+! exec cue export err_comment.cue
+stderr 'interpolation 0 in unexpected place: cannot replace'
+
+# Non-scalar operands cannot be turned into a shell word.
+! exec cue export err_list.cue
+stderr 'cannot convert index 0 to string: unsupported value kind list'
+
+! exec cue export err_struct.cue
+stderr 'cannot convert index 0 to string: unsupported value kind struct'
+
+# A shell fragment that does not parse is reported, not quoted blindly.
+! exec cue export err_parse.cue
+stderr 'cannot parse shell syntax: .*reached EOF without closing quote'
+
+# Format can also be called directly, like any other builtin. The strings
+# and args lists need not come from a tagged literal.
+exec cue export direct.cue
+cmp stdout want-direct
+
+-- quote.cue --
+import "encoding/sh"
+
+// Unquoted context: the value is quoted into a single shell-safe word.
+// Because this value contains a single quote, the chosen form is a
+// double-quoted word rather than a single-quoted one.
+unquoted: sh.Format"ls -l \(special)"
+
+// Single-quoted context: only the single quote itself needs escaping.
+single: sh.Format"echo '\(special)'"
+
+// Double-quoted context: ", \, ` and $ are backslash-escaped.
+double: sh.Format"echo \"\(special)\""
+
+special: "a b'c\"d`e$f"
+
+// An empty string must still produce an explicit empty word.
+empty:   sh.Format"ls \(es)"
+es: ""
+
+// Glob metacharacters must be quoted so the shell does not expand them.
+glob:    sh.Format"ls \(g)"
+g: "a*b?c[d]"
+
+// Newlines and other control characters get $'...' quoting.
+newline: sh.Format"echo \(n)"
+n: "line1\nline2"
+
+// Non-string scalars are formatted via their natural representation.
+intval:   sh.Format"echo \(i)"
+i: 42
+boolval:  sh.Format"echo \(b)"
+b: true
+floatval: sh.Format"echo \(fl)"
+fl: 3.14
+
+// Interpolation embedded within a larger word.
+concat: sh.Format"ls /prefix/\(special)/suffix"
+
+// Interpolation inside a command substitution is reached and quoted too.
+cmdsub: sh.Format"echo $(ls \(special))"
+
+// Multiple interpolations of differing context in a single fragment.
+multi: sh.Format"cp \(special) \"dest/\(special)\""
+-- want-quote --
+{
+    "unquoted": "ls -l \"a b'c\\\"d\\`e\\$f\"",
+    "single": "echo 'a b'\"'\"'c\"d`e$f'",
+    "double": "echo \"a b'c\\\"d\\`e\\$f\"",
+    "special": "a b'c\"d`e$f",
+    "empty": "ls ''",
+    "es": "",
+    "glob": "ls 'a*b?c[d]'",
+    "g": "a*b?c[d]",
+    "newline": "echo $'line1\\nline2'",
+    "n": "line1\nline2",
+    "intval": "echo 42",
+    "i": 42,
+    "boolval": "echo true",
+    "b": true,
+    "floatval": "echo 3.14",
+    "fl": 3.14,
+    "concat": "ls /prefix/\"a b'c\\\"d\\`e\\$f\"/suffix",
+    "cmdsub": "echo $(ls \"a b'c\\\"d\\`e\\$f\")",
+    "multi": "cp \"a b'c\\\"d\\`e\\$f\" \"dest/a b'c\\\"d\\`e\\$f\""
+}
+-- err_comment.cue --
+import "encoding/sh"
+
+x: sh.Format"ls # comment \(v)"
+v: "hello"
+-- err_list.cue --
+import "encoding/sh"
+
+x: sh.Format"ls \(v)"
+v: [1, 2]
+-- err_struct.cue --
+import "encoding/sh"
+
+x: sh.Format"ls \(v)"
+v: {a: 1}
+-- err_parse.cue --
+import "encoding/sh"
+
+x: sh.Format"ls 'unterminated \(v)"
+v: "x"
+-- direct.cue --
+import "encoding/sh"
+
+// Equivalent to sh.Format"ls \(arg)" but spelled out as an ordinary call.
+x: sh.Format(["ls ", ""], ["a b"])
+-- want-direct --
+{
+    "x": "ls 'a b'"
+}

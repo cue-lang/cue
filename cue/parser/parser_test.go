@@ -1046,6 +1046,26 @@ expected ')' for string interpolation, found ','`,
 expected ')' for string interpolation, found ','`,
 		},
 		{
+			desc: "tagged interpolation basic string",
+			in:   "@experiment(stringtag)\na: foo \"something\"",
+			out:  `@experiment(stringtag), a: foo "something"`,
+		},
+		{
+			desc: "tagged interpolation",
+			in:   "@experiment(stringtag)\na: something \"foo \\(ident)\"",
+			out:  `@experiment(stringtag), a: something "foo \(ident)"`,
+		},
+		{
+			desc: "tagged interpolation basic string requires experiment",
+			in:   `a: foo "something"`,
+			out:  "a: <*ast.BadExpr>\ntagged string literal requires @experiment(stringtag)",
+		},
+		{
+			desc: "tagged interpolation requires experiment",
+			in:   `a: something "foo \(ident)"`,
+			out:  "a: <*ast.BadExpr>\ntagged string literal requires @experiment(stringtag)",
+		},
+		{
 			desc: "file comments",
 			in: `// foo
 

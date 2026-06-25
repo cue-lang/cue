@@ -20,6 +20,98 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "42fe9878_5bce7405",
+        "filename": "doc/Creating-test-or-performance-reproducers.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-25T14:03:44Z",
+      "side": 1,
+      "message": "I\u0027d encourage a shorter name for nicer links, like `testscript.md`, `testscript-reproducers.md`, or `issue-testscripts.md`.",
+      "parentUuid": "b6b2b638_d2f84bd2",
+      "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f5b401d_9d02098d",
+        "filename": "doc/Creating-test-or-performance-reproducers.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-25T14:03:44Z",
+      "side": 1,
+      "message": "I\u0027m personally not a fan of this intro. It mentions `cmd/testscript` before we say what that is and link to the tool, meaning a new reader is rather confused until they reach the next section. I\u0027d drop it or merge into the next section.",
+      "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f155ce4c_cd70c066",
+        "filename": "doc/Creating-test-or-performance-reproducers.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-25T14:03:44Z",
+      "side": 1,
+      "message": "this is confusing. when describing a bug, you cannot have the testscript describe the expected behavior AND pass currently. so I would drop the \"passes\" mention.",
+      "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16d56e22_7449e82a",
+        "filename": "doc/Creating-test-or-performance-reproducers.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-25T14:03:44Z",
+      "side": 1,
+      "message": "I\u0027d avoid using language like \"wrong\", and instead focus on the clarity of what is the intended behavior.",
+      "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "001c85a9_6ec44e70",
+        "filename": "doc/Creating-test-or-performance-reproducers.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-25T14:03:44Z",
+      "side": 1,
+      "message": "similar to \"wrong\" above, this feels unnecessary. just write in one sentence that describing the current behavior means that the testscript must be rewritten once the issue is being resolved.",
+      "range": {
+        "startLine": 61,
+        "startChar": 43,
+        "endLine": 61,
+        "endChar": 48
+      },
+      "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dcfd6c39_a9cdd45b",
         "filename": "doc/Creating-test-or-performance-reproducers.md",
         "patchSetId": 1
@@ -31,6 +123,23 @@
       "writtenOn": "2026-06-17T12:47:24Z",
       "side": 1,
       "message": "This example is way too big.",
+      "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "236381cf_f888ab67",
+        "filename": "doc/Creating-test-or-performance-reproducers.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-25T14:03:44Z",
+      "side": 1,
+      "message": "I\u0027d overall reduce the verbosity of this doc. this can be just one or two sentences to say: rather than adding comments to the testscript itself, put your analysis or any other information you want to share in the issue content.",
       "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

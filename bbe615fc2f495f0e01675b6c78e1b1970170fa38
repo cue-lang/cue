@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1e736b25_cb0a34a1",
+        "filename": "doc/Creating-test-or-performance-reproducers.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-06-25T14:06:55Z",
+      "side": 1,
+      "message": "Let\u0027s go with `testscript-reproducers.md`",
+      "parentUuid": "42fe9878_5bce7405",
+      "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2f5b401d_9d02098d",
         "filename": "doc/Creating-test-or-performance-reproducers.md",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "writtenOn": "2026-06-25T14:03:44Z",
       "side": 1,
       "message": "this is confusing. when describing a bug, you cannot have the testscript describe the expected behavior AND pass currently. so I would drop the \"passes\" mention.",
+      "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4e7cb80_5d5d8a3a",
+        "filename": "doc/Creating-test-or-performance-reproducers.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-06-25T14:06:55Z",
+      "side": 1,
+      "message": "Good catch. I missed this in my review.",
+      "parentUuid": "f155ce4c_cd70c066",
       "revId": "bbe615fc2f495f0e01675b6c78e1b1970170fa38",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

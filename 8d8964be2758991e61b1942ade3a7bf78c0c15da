@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cb2ed96_f0683fde",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-25T14:48:51Z",
+      "side": 1,
+      "message": "I\u0027m still pretty 50-50 on this, some of these removals can be considered improvements, but I tend to agree that we should lean towards obeying what the user wants to do. And we have the concept of a \"new section\" with relative positions, which implies that the formatter should not break it.",
+      "revId": "8d8964be2758991e61b1942ade3a7bf78c0c15da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

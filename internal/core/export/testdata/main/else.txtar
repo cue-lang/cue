@@ -260,6 +260,7 @@ diff old new
 -- out/value-v3 --
 == Simplified
 {
+
 	// if-else
 	ifElse: b: 2
 
@@ -271,6 +272,7 @@ diff old new
 }
 == Raw
 {
+
 	// if-else
 	ifElse: b: 2
 

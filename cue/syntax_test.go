@@ -54,6 +54,7 @@ func TestSyntax(t *testing.T) {
 		options: o(cue.Docs(true)),
 		out: `
 {
+
 	// Aloha
 	hello: "world"
 	// Aloha2

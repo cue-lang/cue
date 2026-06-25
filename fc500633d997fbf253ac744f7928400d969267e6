@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a9eba80_2991e110",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-25T12:41:31Z",
+      "side": 1,
+      "message": "LGTM modulo a potential simplification suggestion.",
+      "revId": "fc500633d997fbf253ac744f7928400d969267e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d88bdf40_8a1ff28a",
+        "filename": "cue/ast/comments.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-25T12:41:31Z",
+      "side": 1,
+      "message": "This logic is a bit tricky to follow: first we determine that it\u0027s a field with a node that needs populating with the inherited comments, then we rely on Walk to take us to the node that needs populating.\n\nAnd we never actually use the return value of fieldChainChild AFAICS.\n\nI _think_ that this logic can apply to exactly one parent-descendent pair of nodes.\nOnce we\u0027ve determined the field chain child that we need to populate, couldn\u0027t we just add the comments directly and return false, with no need to maintain that `inherited` variable and its associated complexity.\n\nBut I\u0027m probably missing something!",
+      "revId": "fc500633d997fbf253ac744f7928400d969267e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

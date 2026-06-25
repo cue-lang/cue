@@ -59,6 +59,7 @@ type Root struct {
 package x
 
 #Root: {
+
 	// reflect types and values in Go are opaque and do not encode as useful JSON.
 	// TODO: given that these don't encode to JSON, don't generate CUE fields for them.
 	ReflectType: _ @go(,reflect.Type)

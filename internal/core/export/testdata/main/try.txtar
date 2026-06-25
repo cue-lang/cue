@@ -150,6 +150,7 @@ diff old new
 -- out/value-v3 --
 == Simplified
 {
+
 	// Basic try with successful reference
 	tryBasic: {
 		x: 1
@@ -176,6 +177,7 @@ diff old new
 }
 == Raw
 {
+
 	// Basic try with successful reference
 	tryBasic: {
 		x: 1
@@ -287,10 +289,22 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -13,20 +13,16 @@
- 	}
- 
- 	// Try with else - optional field missing (uses else)
+@@ -1,35 +1,33 @@
+ == Simplified
+ {
+-	// Basic try with successful reference
+-	tryBasic: {
+-		x: 1
+-		y: 1
+-	}
+-
+-	// Try with else - reference exists
+-	tryWithElseExists: {
+-		x: 1
+-		y: 1
+-	}
+-
+-	// Try with else - optional field missing (uses else)
 -	tryWithElseMissing: {
 -		z: 0
 -	}
@@ -305,6 +319,20 @@ diff old new
 -	tryAssignElse: {
 -		z: 0
 -	}
++
++	// Basic try with successful reference
++	tryBasic: {
++		x: 1
++		y: 1
++	}
++
++	// Try with else - reference exists
++	tryWithElseExists: {
++		x: 1
++		y: 1
++	}
++
++	// Try with else - optional field missing (uses else)
 +	tryWithElseMissing: z: 0
 +
 +	// Try assignment form
@@ -318,7 +346,11 @@ diff old new
  }
  == Raw
  {
-@@ -70,19 +66,18 @@
++
+ 	// Basic try with successful reference
+ 	tryBasic: {
+ 		x: 1
+@@ -70,19 +68,18 @@
  		x: 1
  		y: 1
  	}
@@ -347,7 +379,7 @@ diff old new
  	// Basic try with successful reference
  	tryBasic: {
  		x: 1
-@@ -115,22 +110,26 @@
+@@ -115,22 +112,26 @@
  }
  == Eval
  {

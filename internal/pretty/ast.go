@@ -1516,7 +1516,7 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 		hugLast:           hugLast,
 		shareIndent:       shareIndent,
 		wantTrailingComma: wantTrailingComma,
-		openBreak:         openBreakDoc(b.lineHeader, b.hasInterior || forceOpen, leadRel),
+		openBreak:         openBreakDoc(b.lineHeader, b.hasInterior, forceOpen, leadRel),
 		closeBreak:        closeBreakDoc(b.closerRel, forceClose),
 	}
 }
@@ -3920,16 +3920,20 @@ func hasLineLeadingComment(slots commentSlots, first ast.Node) bool {
 // openBreakDoc returns the separator between the opening bracket and
 // the inner content. lineHeader keeps a `{ // c\n...` comment on the
 // opener line; hasInterior forces a HardLine so a `//` swallowing the
-// closer is impossible; otherwise leadRel (the first element's
-// leading RelPos, or the opener's own when the body is empty) drives
-// - a soft break for an inline body, a HardLine/BlankLine when the
-// first element starts on its own line.
-func openBreakDoc(lineHeader, hasInterior bool, leadRel token.RelPos) doc {
+// closer is impossible; forceOpen forces a break too but honours a
+// NewSection leadRel, so a blank line the author wrote after the
+// opener survives; otherwise leadRel (the first element's leading
+// RelPos, or the opener's own when the body is empty) drives - a soft
+// break for an inline body, a HardLine/BlankLine when the first
+// element starts on its own line.
+func openBreakDoc(lineHeader, hasInterior, forceOpen bool, leadRel token.RelPos) doc {
 	switch {
 	case lineHeader:
 		return spaceLit
 	case hasInterior:
 		return lineBreakHard
+	case forceOpen:
+		return relBreakOr(leadRel, lineBreakHard)
 	default:
 		return relBreak(leadRel)
 	}

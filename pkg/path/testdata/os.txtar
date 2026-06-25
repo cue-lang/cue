@@ -248,21 +248,25 @@ Match: {
 Slash: {
 	unix: {
 		"": {
+
 			// should roundtrip
 			to:   ""
 			from: ""
 		}
 		"/": {
+
 			// should roundtrip
 			to:   "/"
 			from: "/"
 		}
 		"/a/b": {
+
 			// should roundtrip
 			to:   "/a/b"
 			from: "/a/b"
 		}
 		"/a//b": {
+
 			// should roundtrip
 			to:   "/a//b"
 			from: "/a//b"
@@ -270,21 +274,25 @@ Slash: {
 	}
 	plan9: {
 		"": {
+
 			// should roundtrip
 			to:   ""
 			from: ""
 		}
 		"/": {
+
 			// should roundtrip
 			to:   "/"
 			from: "/"
 		}
 		"/a/b": {
+
 			// should roundtrip
 			to:   "/a/b"
 			from: "/a/b"
 		}
 		"/a//b": {
+
 			// should roundtrip
 			to:   "/a//b"
 			from: "/a//b"
@@ -292,21 +300,25 @@ Slash: {
 	}
 	windows: {
 		"": {
+
 			// should roundtrip
 			to:   ""
 			from: ""
 		}
 		"/": {
+
 			// should roundtrip
 			to:   "/"
 			from: "\\"
 		}
 		"/a/b": {
+
 			// should roundtrip
 			to:   "/a/b"
 			from: "\\a\\b"
 		}
 		"/a//b": {
+
 			// should roundtrip
 			to:   "/a//b"
 			from: "\\a\\\\b"

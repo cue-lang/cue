@@ -220,9 +220,11 @@ name: third`,
 		want: []string{
 			`{name: "first"}`,
 			`{
+
 	name: "second"
 }`,
 			`{
+
 	name: "third"
 }`,
 		},
@@ -252,6 +254,7 @@ a: value`,
 		want: []string{
 			`null`,
 			`{
+
 	a: "value"
 }`,
 		},

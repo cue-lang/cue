@@ -387,6 +387,7 @@ _|_ // e3: index out of range [2] with length 2
 	e7:  true
 	e8?: true
 	m1: {
+
 		// foo is an optional field
 		foo?: 3
 

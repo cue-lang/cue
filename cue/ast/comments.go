@@ -71,10 +71,8 @@ func DocComments(n Node) []*CommentGroup {
 		docs = append(docs, *c.inheritedDocComments...)
 	}
 
-	// An field-chain-leaf does not own its own syntactic doc comments;
-	// they semantically belong to the field-chain leaf. For any other
-	// node, their syntactic doc comments are also their semantic doc
-	// comments.
+	// Syntactic doc comments belong semantically to the field-chain
+	// leaf only.
 	if f, ok := n.(*Field); !ok || isFieldChainLeaf(f) {
 		for _, cg := range c.Comments() {
 			if isDocComment(cg) {

@@ -35,19 +35,18 @@ import (
 )
 
 // Package parameters
-githubRepositoryPath: *(URLPath & {#url: githubRepositoryURL, _}) | string
-githubRepositoryURL:          *("https://github.com/" + githubRepositoryPath) | string
-gerritHubHostname:            *"cue.gerrithub.io" | string
-gerritHubRepositoryURL:       *("https://\(gerritHubHostname)/a/" + githubRepositoryPath) | string
-gerritHubRepositoryNoAuthURL: *("https://\(gerritHubHostname)/" + githubRepositoryPath) | string
-trybotRepositoryPath:         *(githubRepositoryPath + "-" + trybot.key) | string
-trybotRepositoryURL:          *("https://github.com/" + trybotRepositoryPath) | string
+githubRepositoryPath:   *(URLPath & {#url: githubRepositoryURL, _}) | string
+githubRepositoryURL:    *("https://github.com/" + githubRepositoryPath) | string
+gerritHubHostname:      *"cue.gerrithub.io" | string
+gerritHubRepositoryURL: *("https://\(gerritHubHostname)/a/" + githubRepositoryPath) | string
+trybotRepositoryPath:   *(githubRepositoryPath + "-" + trybot.key) | string
+trybotRepositoryURL:    *("https://github.com/" + trybotRepositoryPath) | string
 
-defaultBranch:     *"master" | string
-testDefaultBranch: *"ci/test" | _
+defaultBranch:           *"master" | string
+testDefaultBranch:       *"ci/test" | _
 protectedBranchPatterns: *[defaultBranch] | [...string]
-releaseTagPrefix:  *"v" | string
-releaseTagPattern: *(releaseTagPrefix + "*") | string
+releaseTagPrefix:        *"v" | string
+releaseTagPattern:       *(releaseTagPrefix + "*") | string
 
 botGitHubUser:                      string
 botGitHubUserTokenSecretsKey:       *(strings.ToUpper(botGitHubUser) + "_GITHUB_PAT") | string

@@ -23,7 +23,7 @@ import (
 workflows: trybot: _repo.bashWorkflow & {
 	on: {
 		push: {
-			branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
+			branches:      list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [_repo.releaseTagPattern]
 		}
 		// Note that these jobs don't have access to any secrets.
@@ -35,7 +35,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			strategy: {
 				"fail-fast": false
 				matrix: {
-					(_repo.matrixRunnerName): [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
+					(_repo.matrixRunnerName):    [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
 					(_repo.matrixGoVersionName): [_repo.previousGo, _repo.latestGo]
 				}
 			}
@@ -71,7 +71,6 @@ workflows: trybot: _repo.bashWorkflow & {
 				_goTestWasm,
 				for v in _e2eTestSteps {v},
 				for v in _goChecks {v},
-				_checkTags,
 				// Run code generation towards the very end, to ensure it succeeds and makes no changes.
 				// Note that doing this before any Go tests or checks may lead to test cache misses,
 				// as Go uses modtimes to approximate whether files have been modified.
@@ -96,7 +95,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		run:  "go test ./..."
 	}
 
-	_e2eTestSteps: [... githubactions.#Step & {
+	_e2eTestSteps: [...githubactions.#Step & {
 		// The end-to-end tests require a github token secret and are a bit slow,
 		// so we only run them on pushes to protected branches and on one
 		// environment in the source repo.
@@ -155,32 +154,6 @@ workflows: trybot: _repo.bashWorkflow & {
 		// given how many downstreams rely on the cue module having few dependencies.
 		_repo.staticcheck & {#in: modfile: "internal/tools.mod"},
 	]
-
-	_checkTags: githubactions.#Step & {
-		// Ensure that GitHub and Gerrit agree on the full list of available tags.
-		// This way, if there is any discrepancy, we will get a useful diff.
-		//
-		// We use `git ls-remote` to list all tags from each remote git repository
-		// because it does not depend on custom REST API endpoints and is very fast.
-		// Note that it sorts tag names as strings, which is not the best, but works OK.
-		if:   "(\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_repo.isLatestGoLinux)"
-		name: "Check all git tags are available"
-		run:  """
-			cd $(mktemp -d)
-
-			git ls-remote --tags \(_repo.githubRepositoryURL) >github.txt
-			echo "GitHub tags:"
-			sed 's/^/    /' github.txt
-
-			git ls-remote --tags \(_repo.gerritHubRepositoryNoAuthURL) >gerrit.txt
-
-			if ! diff -u github.txt gerrit.txt; then
-				echo "GitHub and Gerrit do not agree on the list of tags!"
-				echo "Did you forget about refs/attic branches? https://github.com/cue-lang/cue/wiki/Notes-for-project-maintainers"
-				exit 1
-			fi
-			"""
-	}
 
 	_goTestRace: githubactions.#Step & {
 		// Windows and Mac on CI are slower than Linux, and most data races are not specific

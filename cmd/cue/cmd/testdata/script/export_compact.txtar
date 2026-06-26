@@ -1,0 +1,85 @@
+# The compact bool tag controls whether json and cue output is rendered
+# in a more compact form. It defaults to false, preserving the default
+# pretty-printed layout. For cue, compact also drops comments by default
+# (the comments tag), which can be re-enabled explicitly.
+
+# JSON: compact removes all indentation and inter-token whitespace.
+# Comments are not part of JSON, so the comments tag does not apply.
+exec cue export --out json in.cue
+cmp stdout expect-json
+exec cue export --out json+compact in.cue
+cmp stdout expect-json-compact
+
+# CUE: compact lets the formatter inline small structs and lists while
+# breaking longer ones, rather than placing every field on its own line.
+# It also drops comments by default.
+exec cue def --out cue in.cue
+cmp stdout expect-cue
+exec cue def --out cue+compact in.cue
+cmp stdout expect-cue-compact
+
+# Comments can be kept under compact by enabling the comments tag.
+exec cue def --out cue+compact+comments in.cue
+cmp stdout expect-cue-compact-comments
+
+# compact=false is the default and matches the non-compact output.
+exec cue export --out json+compact=false in.cue
+cmp stdout expect-json
+
+# compact is not valid for encodings other than json and cue.
+! exec cue export --out yaml+compact in.cue
+stderr 'field "compact" not allowed'
+
+# comments is only valid for cue, not json.
+! exec cue export --out json+comments in.cue
+stderr 'field "comments" not allowed'
+
+-- in.cue --
+// the a field
+a: 1
+b: {x: 1, y: 2, z: 3}
+list: [1, 2, 3]
+big: {field1: "a fairly long string value here", field2: "another fairly long string value here", field3: "yet another fairly long string value here"}
+-- expect-json --
+{
+    "a": 1,
+    "b": {
+        "x": 1,
+        "y": 2,
+        "z": 3
+    },
+    "list": [
+        1,
+        2,
+        3
+    ],
+    "big": {
+        "field1": "a fairly long string value here",
+        "field2": "another fairly long string value here",
+        "field3": "yet another fairly long string value here"
+    }
+}
+-- expect-json-compact --
+{"a":1,"b":{"x":1,"y":2,"z":3},"list":[1,2,3],"big":{"field1":"a fairly long string value here","field2":"another fairly long string value here","field3":"yet another fairly long string value here"}}
+-- expect-cue --
+// the a field
+a: 1
+b: {
+	x: 1
+	y: 2
+	z: 3
+}
+list: [1, 2, 3]
+big: {
+	field1: "a fairly long string value here"
+	field2: "another fairly long string value here"
+	field3: "yet another fairly long string value here"
+}
+-- expect-cue-compact --
+a: 1, b: {x: 1, y: 2, z: 3}, list: [1, 2, 3], big: {field1: "a fairly long string value here", field2: "another fairly long string value here", field3: "yet another fairly long string value here"}
+-- expect-cue-compact-comments --
+// the a field
+a:    1
+b:    {x: 1, y: 2, z: 3}
+list: [1, 2, 3]
+big:  {field1: "a fairly long string value here", field2: "another fairly long string value here", field3: "yet another fairly long string value here"}

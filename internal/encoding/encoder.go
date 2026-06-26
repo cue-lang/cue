@@ -37,6 +37,8 @@ import (
 	"cuelang.org/go/internal"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/pretty"
+	"cuelang.org/go/internal/pretty/style"
 )
 
 // An Encoder converts CUE to various file formats, including CUE itself.
@@ -129,6 +131,12 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 
 		opts := []format.Option{}
 		opts = append(opts, cfg.Format...)
+		compact := f.BoolTags["compact"]
+		// The comments tag is only present when the cue file type was
+		// selected explicitly (e.g. "cue:" or a .cue extension); when it
+		// is absent we keep comments. It defaults to false under compact.
+		comments, hasComments := f.BoolTags["comments"]
+		clearComments := hasComments && !comments
 
 		useSep := false
 		format := func(name string, n ast.Node) error {
@@ -158,7 +166,16 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 				ast.SetComments(f, rest)
 				f.Decls = append([]ast.Decl{pkg}, f.Decls...)
 			}
-			b, err := format.Node(f, opts...)
+			var b []byte
+			var err error
+			if compact {
+				b, err = formatCompactCUE(f, e.autoSimplify, clearComments)
+			} else {
+				if clearComments {
+					style.Config{ClearComments: true}.Annotate(f)
+				}
+				b, err = format.Node(f, opts...)
+			}
 			if err != nil {
 				return err
 			}
@@ -173,7 +190,9 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	case build.JSON, build.JSONL:
 		e.concrete = true
 		d := json.NewEncoder(w)
-		d.SetIndent("", "    ")
+		if !f.BoolTags["compact"] {
+			d.SetIndent("", "    ")
+		}
 		d.SetEscapeHTML(cfg.EscapeHTML)
 		e.encValue = func(v cue.Value) error {
 			err := d.Encode(v)
@@ -254,6 +273,24 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	}
 
 	return e, nil
+}
+
+// formatCompactCUE formats f as compact CUE: it discards the authored
+// line layout so the formatter lays the file out with its width-driven
+// heuristics, keeping small structs and lists on a single line and
+// breaking only longer ones. It uses the v2 pretty-printer directly
+// rather than the public cue/format API, as the relevant style options
+// are not exposed there.
+func formatCompactCUE(f *ast.File, simplify, clearComments bool) ([]byte, error) {
+	style.Config{
+		ClearPositions: true,
+		ClearComments:  clearComments,
+		InlineStructs:  simplify,
+		Labels:         simplify,
+		Ellipsis:       simplify,
+	}.Annotate(f)
+	cfg := &pretty.Config{Indent: "\t"}
+	return cfg.Node(f)
 }
 
 func (e *Encoder) EncodeFile(f *ast.File) error {

@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"io/fs"
 	"math"
-	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -107,9 +106,12 @@ func TestTxtar(t *testing.T) {
 		checkCommentsPreserved(tc.T, "with RelPos", input, gotRelPos)
 		checkIdempotent(tc.T, gotRelPos, cfg)
 
-		// Without RelPos.
-		stripRelPos(syntax)
-		styleCfg.Annotate(syntax)
+		// Without RelPos: clear the parser's layout via the style
+		// option, then (for houseStyle tests) apply the house style on
+		// the clean tree in the same pass.
+		clearCfg := styleCfg
+		clearCfg.ClearPositions = true
+		clearCfg.Annotate(syntax)
 		gotNoRelPos := trimTrailingNewline(string(mustFormat(tc, cfg, syntax)))
 		fmt.Fprintln(tc.Writer("norelpos"), gotNoRelPos)
 		checkCommentsPreserved(tc.T, "without RelPos", input, gotNoRelPos)
@@ -175,41 +177,6 @@ func checkCommentsPreserved(t *testing.T, label, input, output string) {
 		t.Errorf("%s: %d comment(s) lost in output:\n  %s\noutput was:\n%s",
 			label, len(missing), strings.Join(missing, "\n  "), output)
 	}
-}
-
-// stripRelPos strips all parser-derived layout intent from the AST, so
-// that we simulate a programmatically-built tree: we reset every
-// token.Pos's RelPos to NoRelPos with its comma and "scanned" bits
-// cleared, and reset every CommentGroup's Line flag to false. We clear
-// cg.Line because it is a redundant projection of Slash.RelPos = Blank;
-// we clear the comma/scanned bits to keep [listOmitsCommas]'s
-// source-preserving comma style faithful (i.e. lists keep their commas).
-// Position and Doc are structural/semantic, so we leave them intact.
-func stripRelPos(n ast.Node) {
-	posType := reflect.TypeFor[token.Pos]()
-	ast.Walk(n, func(node ast.Node) bool {
-		if cg, ok := node.(*ast.CommentGroup); ok {
-			cg.Line = false
-		}
-		v := reflect.ValueOf(node)
-		if v.Kind() == reflect.Pointer {
-			v = v.Elem()
-		}
-		if v.Kind() != reflect.Struct {
-			return true
-		}
-		for i := range v.NumField() {
-			f := v.Field(i)
-			if f.Type() == posType && f.CanSet() {
-				pos := f.Interface().(token.Pos)
-				newPos := pos.WithRel(token.NoRelPos).WithComma(false).WithScanned(false)
-				if newPos != pos {
-					f.Set(reflect.ValueOf(newPos))
-				}
-			}
-		}
-		return true
-	}, nil)
 }
 
 // TestProgrammaticAST exercises behaviours we cannot reach through parsed

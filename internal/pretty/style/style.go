@@ -39,6 +39,11 @@
 // patterns within each struct body, so multiple equivalent "open"
 // markers collapse to a single trailing `...`.
 //
+// [Config.ClearPositions] and [Config.ClearComments] wipe, respectively,
+// every relative-position layout hint and every comment from the tree.
+// They run first, before the rewrites above, so the remaining passes see
+// a clean slate.
+//
 // # RelPos heuristics
 //
 // The RelPos pass visits every body of declarations - the
@@ -81,18 +86,23 @@
 // the rewrites in this order:
 //
 //  1. Labels: BasicLit labels become Idents where safe.
-//  2. Ellipsis: open-marker patterns collapse to a trailing `...`.
-//  3. InlineStructs: synthesised braces are stripped from single-Field
+//  2. ClearPositions / ClearComments: a single pass wipes layout hints
+//     and/or comments from the whole tree.
+//  3. Ellipsis: open-marker patterns collapse to a trailing `...`.
+//  4. InlineStructs: synthesised braces are stripped from single-Field
 //     StructLit values.
-//  4. RelPos: layout RelPos hints are set on inter-decl positions.
+//  5. RelPos: layout RelPos hints are set on inter-decl positions.
 //
 // The order matters: each later pass would otherwise see a stale view
-// of the body. E.g. RelPos's pair-iteration depends on the final decl
-// list after Ellipsis has merged and InlineStructs has potentially
-// exposed new chain shapes.
+// of the body. The clearing pass runs before RelPos in particular so
+// that RelPos can add the house style afresh on a wiped tree (and so its
+// hints are not themselves wiped); and RelPos's pair-iteration depends
+// on the final decl list after Ellipsis has merged and InlineStructs has
+// potentially exposed new chain shapes.
 package style
 
 import (
+	"reflect"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -140,6 +150,22 @@ type Config struct {
 	// patterns and append a single fresh [*ast.Ellipsis] at the end of
 	// the body, carrying the comments of the last removed marker.
 	Ellipsis bool
+
+	// ClearPositions discards every relative-position layout hint in the
+	// tree (the [token.RelPos] of each node and of its structural tokens
+	// such as braces and commas). With the hints gone the formatter
+	// treats the node as programmatic and lays it out using its
+	// width-driven heuristics rather than reproducing an authored layout.
+	//
+	// It runs before the other passes, so it composes with RelPos: enable
+	// both to wipe any authored layout and then apply the house style
+	// afresh.
+	ClearPositions bool
+
+	// ClearComments removes every comment in the tree. This is useful
+	// alongside ClearPositions, where line comments would otherwise force
+	// line breaks that defeat the compact layout.
+	ClearComments bool
 }
 
 // Annotate applies the transformations selected by cfg to n in place.
@@ -155,6 +181,23 @@ func (cfg Config) Annotate(n ast.Node) bool {
 		if simplifyLabels(n) {
 			changed = true
 		}
+	}
+
+	// Wipe authored layout and/or comments first, in a full pass, so the
+	// house-style passes below start from a clean slate: a RelPos pass
+	// then adds only its own layout hints rather than mixing with (or
+	// being undone by) the authored ones.
+	if cfg.ClearPositions || cfg.ClearComments {
+		ast.Walk(n, func(node ast.Node) bool {
+			if cfg.ClearPositions && clearPositions(node) {
+				changed = true
+			}
+			if cfg.ClearComments && len(ast.Comments(node)) > 0 {
+				ast.SetComments(node, nil)
+				changed = true
+			}
+			return true
+		}, nil)
 	}
 
 	if !cfg.RelPos && !cfg.InlineStructs && !cfg.Ellipsis {
@@ -246,6 +289,38 @@ func (w *walker) visit(n ast.Node) bool {
 	}
 	return true
 }
+
+// clearPositions discards the relative-position layout hints on n itself
+// and on every [token.Pos] it embeds (struct braces, list brackets,
+// commas, and so on). It reports whether it changed anything.
+func clearPositions(n ast.Node) (changed bool) {
+	if cg, ok := n.(*ast.CommentGroup); ok && cg.Line {
+		cg.Line = false
+		changed = true
+	}
+	v := reflect.ValueOf(n)
+	if v.Kind() == reflect.Pointer {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return changed
+	}
+	for i := range v.NumField() {
+		f := v.Field(i)
+		if f.Type() != posType || !f.CanSet() {
+			continue
+		}
+		pos := f.Interface().(token.Pos)
+		newPos := pos.WithRel(token.NoRelPos).WithComma(false).WithScanned(false)
+		if newPos != pos {
+			f.Set(reflect.ValueOf(newPos))
+			changed = true
+		}
+	}
+	return changed
+}
+
+var posType = reflect.TypeFor[token.Pos]()
 
 // annotateInterpolation applies the house style to a string
 // interpolation, treating it as multi-line when a literal fragment (the

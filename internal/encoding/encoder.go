@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"math"
 	"os"
 	"path/filepath"
 
@@ -37,6 +38,8 @@ import (
 	"cuelang.org/go/internal"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/pretty"
+	"cuelang.org/go/internal/pretty/style"
 )
 
 // An Encoder converts CUE to various file formats, including CUE itself.
@@ -129,6 +132,7 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 
 		opts := []format.Option{}
 		opts = append(opts, cfg.Format...)
+		compact := f.BoolTags["compact"]
 
 		useSep := false
 		format := func(name string, n ast.Node) error {
@@ -158,7 +162,13 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 				ast.SetComments(f, rest)
 				f.Decls = append([]ast.Decl{pkg}, f.Decls...)
 			}
-			b, err := format.Node(f, opts...)
+			var b []byte
+			var err error
+			if compact {
+				b, err = formatCompactCUE(f, e.autoSimplify)
+			} else {
+				b, err = format.Node(f, opts...)
+			}
 			if err != nil {
 				return err
 			}
@@ -173,7 +183,9 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	case build.JSON, build.JSONL:
 		e.concrete = true
 		d := json.NewEncoder(w)
-		d.SetIndent("", "    ")
+		if !f.BoolTags["compact"] {
+			d.SetIndent("", "    ")
+		}
 		d.SetEscapeHTML(cfg.EscapeHTML)
 		e.encValue = func(v cue.Value) error {
 			err := d.Encode(v)
@@ -254,6 +266,26 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	}
 
 	return e, nil
+}
+
+// formatCompactCUE formats f as compact CUE: it discards the authored
+// line layout and all comments so the formatter lays the file out with
+// its width-driven heuristics. It uses the v2 pretty-printer directly
+// rather than the public cue/format API, as the relevant style options
+// are not exposed there.
+func formatCompactCUE(f *ast.File, simplify bool) ([]byte, error) {
+	style.Config{
+		ClearPositions: true,
+		ClearComments:  true,
+		InlineStructs:  simplify,
+		Labels:         simplify,
+		Ellipsis:       simplify,
+	}.Annotate(f)
+	// Use an effectively unbounded width so the layout never wraps purely
+	// to fit a line-width budget; only hard breaks such as multi-line
+	// strings introduce newlines.
+	cfg := &pretty.Config{Indent: "\t", Width: math.MaxInt}
+	return cfg.Node(f)
 }
 
 func (e *Encoder) EncodeFile(f *ast.File) error {

@@ -882,3 +882,64 @@ func TestAnnotateLabels(t *testing.T) {
 		}
 	})
 }
+
+func TestAnnotateClearPositions(t *testing.T) {
+	const src = `a: 1
+b: {
+	x: 1
+	y: 2
+}
+list: [
+	1,
+	2,
+]
+`
+	f, err := parser.ParseFile("test.cue", src, parser.ParseComments)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !(style.Config{ClearPositions: true}).Annotate(f) {
+		t.Fatal("expected Annotate to report a change")
+	}
+	// Every position in the tree must now carry NoRelPos (and no
+	// leftover comma/scanned flags).
+	ast.Walk(f, func(n ast.Node) bool {
+		if rel := n.Pos().RelPos(); rel != token.NoRelPos {
+			t.Errorf("node %T retained RelPos %v", n, rel)
+		}
+		return true
+	}, nil)
+
+	// Re-running is now a no-op: there is nothing left to clear.
+	if (style.Config{ClearPositions: true}).Annotate(f) {
+		t.Error("second ClearPositions pass reported a change")
+	}
+}
+
+func TestAnnotateClearComments(t *testing.T) {
+	const src = `// doc for a
+a: 1 // trailing
+
+// doc for b
+b: {
+	x: 1 // inner trailing
+}
+`
+	f, err := parser.ParseFile("test.cue", src, parser.ParseComments)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !(style.Config{ClearComments: true}).Annotate(f) {
+		t.Fatal("expected Annotate to report a change")
+	}
+	ast.Walk(f, func(n ast.Node) bool {
+		if cs := ast.Comments(n); len(cs) > 0 {
+			t.Errorf("node %T retained %d comment group(s)", n, len(cs))
+		}
+		return true
+	}, nil)
+
+	if (style.Config{ClearComments: true}).Annotate(f) {
+		t.Error("second ClearComments pass reported a change")
+	}
+}

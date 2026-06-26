@@ -93,6 +93,7 @@
 package style
 
 import (
+	"reflect"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -140,6 +141,21 @@ type Config struct {
 	// patterns and append a single fresh [*ast.Ellipsis] at the end of
 	// the body, carrying the comments of the last removed marker.
 	Ellipsis bool
+
+	// ClearPositions discards every relative-position layout hint in the
+	// tree (the [token.RelPos] of each node and of its structural tokens
+	// such as braces and commas). With the hints gone the formatter
+	// treats the node as programmatic and lays it out using its
+	// width-driven heuristics rather than reproducing an authored layout.
+	//
+	// It is the opposite of RelPos, which adds house-style hints, and the
+	// two should not be combined.
+	ClearPositions bool
+
+	// ClearComments removes every comment in the tree. This is useful
+	// alongside ClearPositions, where line comments would otherwise force
+	// line breaks that defeat the compact layout.
+	ClearComments bool
 }
 
 // Annotate applies the transformations selected by cfg to n in place.
@@ -157,7 +173,7 @@ func (cfg Config) Annotate(n ast.Node) bool {
 		}
 	}
 
-	if !cfg.RelPos && !cfg.InlineStructs && !cfg.Ellipsis {
+	if !cfg.RelPos && !cfg.InlineStructs && !cfg.Ellipsis && !cfg.ClearPositions && !cfg.ClearComments {
 		return changed
 	}
 
@@ -176,11 +192,18 @@ type walker struct {
 }
 
 func (w *walker) visit(n ast.Node) bool {
-	if mergeDocComments(n) {
-		w.changed = true
-	}
-	if sectionSeparateDocComments(n) {
-		w.changed = true
+	if w.cfg.ClearComments {
+		if len(ast.Comments(n)) > 0 {
+			ast.SetComments(n, nil)
+			w.changed = true
+		}
+	} else {
+		if mergeDocComments(n) {
+			w.changed = true
+		}
+		if sectionSeparateDocComments(n) {
+			w.changed = true
+		}
 	}
 	switch n := n.(type) {
 	case *ast.File:
@@ -244,8 +267,48 @@ func (w *walker) visit(n ast.Node) bool {
 			w.annotateInterpolation(n)
 		}
 	}
+	// Clear positions last, so that any structure synthesised by the
+	// InlineStructs or Ellipsis passes above is cleared too (and any
+	// nodes they create are cleared as the walk descends into them).
+	if w.cfg.ClearPositions {
+		if clearPositions(n) {
+			w.changed = true
+		}
+	}
 	return true
 }
+
+// clearPositions discards the relative-position layout hints on n itself
+// and on every [token.Pos] it embeds (struct braces, list brackets,
+// commas, and so on). It reports whether it changed anything.
+func clearPositions(n ast.Node) (changed bool) {
+	if cg, ok := n.(*ast.CommentGroup); ok && cg.Line {
+		cg.Line = false
+		changed = true
+	}
+	v := reflect.ValueOf(n)
+	if v.Kind() == reflect.Pointer {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return changed
+	}
+	for i := range v.NumField() {
+		f := v.Field(i)
+		if f.Type() != posType || !f.CanSet() {
+			continue
+		}
+		pos := f.Interface().(token.Pos)
+		newPos := pos.WithRel(token.NoRelPos).WithComma(false).WithScanned(false)
+		if newPos != pos {
+			f.Set(reflect.ValueOf(newPos))
+			changed = true
+		}
+	}
+	return changed
+}
+
+var posType = reflect.TypeFor[token.Pos]()
 
 // annotateInterpolation applies the house style to a string
 // interpolation, treating it as multi-line when a literal fragment (the

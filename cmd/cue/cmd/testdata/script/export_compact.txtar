@@ -1,0 +1,69 @@
+# The compact bool tag controls whether json output and cue output is rendered
+# in a more compact form. It defaults to false, preserving the default
+# pretty-printed layout. For cue, compact also discards comments, since
+# they would otherwise force line breaks that defeat the compact layout.
+
+# JSON: compact removes all indentation and inter-token whitespace.
+exec cue export --out json in.cue
+cmp stdout expect-json
+exec cue export --out json+compact in.cue
+cmp stdout expect-json-compact
+
+# CUE: compact lays out the output with no line length
+# restriction and drops comments.
+exec cue def --out cue in.cue
+cmp stdout expect-cue
+exec cue def --out cue+compact in.cue
+cmp stdout expect-cue-compact
+
+# compact=false is the default and matches the non-compact output.
+exec cue export --out json+compact=false in.cue
+cmp stdout expect-json
+
+# compact is not valid for encodings other than json and cue.
+! exec cue export --out yaml+compact in.cue
+stderr 'field "compact" not allowed'
+
+-- in.cue --
+// the a field
+a: 1
+b: {x: 1, y: 2, zw: 3}
+list: [1, 2, 3]
+big: {field1: "a fairly long string value here", field2: "another fairly long string value here", field3: "yet another fairly long string value here"}
+-- expect-json --
+{
+    "a": 1,
+    "b": {
+        "x": 1,
+        "y": 2,
+        "zw": 3
+    },
+    "list": [
+        1,
+        2,
+        3
+    ],
+    "big": {
+        "field1": "a fairly long string value here",
+        "field2": "another fairly long string value here",
+        "field3": "yet another fairly long string value here"
+    }
+}
+-- expect-json-compact --
+{"a":1,"b":{"x":1,"y":2,"zw":3},"list":[1,2,3],"big":{"field1":"a fairly long string value here","field2":"another fairly long string value here","field3":"yet another fairly long string value here"}}
+-- expect-cue --
+// the a field
+a: 1
+b: {
+	x:  1
+	y:  2
+	zw: 3
+}
+list: [1, 2, 3]
+big: {
+	field1: "a fairly long string value here"
+	field2: "another fairly long string value here"
+	field3: "yet another fairly long string value here"
+}
+-- expect-cue-compact --
+a: 1, b: {x: 1, y: 2, zw: 3}, list: [1, 2, 3], big: {field1: "a fairly long string value here", field2: "another fairly long string value here", field3: "yet another fairly long string value here"}

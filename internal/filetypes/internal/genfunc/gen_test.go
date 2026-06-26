@@ -138,6 +138,53 @@ var generateGoFuncForCUEStructTests = []struct {
 			"c": true,
 		}),
 	}},
+}, {
+	testName:   "NegatedDependency",
+	funcName:   "unify",
+	structName: "boolTags",
+	keys: []string{
+		"a",
+		"b",
+	},
+	typeName: "bool",
+	cue: `
+{
+	_#def
+	_#def: {
+		{
+			[string]: bool
+		}
+		a: *false | bool
+		b: *(!a) | bool
+	}
+}`,
+	subtests: []subtest{{
+		testName: "Default",
+		data:     map[string]bool{},
+		want: subtestData(map[string]bool{
+			"a": false,
+			"b": true,
+		}),
+	}, {
+		testName: "NegatedFollowsDependency",
+		data: map[string]bool{
+			"a": true,
+		},
+		want: subtestData(map[string]bool{
+			"a": true,
+			"b": false,
+		}),
+	}, {
+		testName: "Override",
+		data: map[string]bool{
+			"a": true,
+			"b": true,
+		},
+		want: subtestData(map[string]bool{
+			"a": true,
+			"b": true,
+		}),
+	}},
 }}
 
 // Note: duplicated in testharness.go.tmpl

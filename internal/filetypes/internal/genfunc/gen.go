@@ -155,6 +155,8 @@ func (g *funcGenerator) generateField(fieldName string) {
 
 func (g *funcGenerator) exprFor(e ast.Expr) string {
 	var binExpr *ast.BinaryExpr
+	var unaryExpr *ast.UnaryExpr
+	var parenExpr *ast.ParenExpr
 	var ident *ast.Ident
 	switch {
 	case match(e, &ident) && g.scope[ident.Name] != nil:
@@ -164,6 +166,11 @@ func (g *funcGenerator) exprFor(e ast.Expr) string {
 		return fmt.Sprintf("r.%s", ident.Name)
 	case isLiteral(e):
 		return fmt.Sprintf("opt.Some(%s)", dump(e))
+	case match(e, &parenExpr):
+		return g.exprFor(parenExpr.X)
+	case match(e, &unaryExpr) && unaryExpr.Op == token.NOT:
+		// !foo
+		return fmt.Sprintf("opt.Some(!(%s).Value())", g.exprFor(unaryExpr.X))
 	case match(e, &binExpr) && binExpr.Op == token.AND:
 		switch {
 		case g.isTypeName(binExpr.Y):

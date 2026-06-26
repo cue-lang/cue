@@ -46,6 +46,8 @@ func init() {
 		"auto":                 TagTopLevel,
 		"binary":               TagTopLevel,
 		"code":                 TagTopLevel,
+		"comments":             TagSubsidiaryBool,
+		"compact":              TagSubsidiaryBool,
 		"cue":                  TagTopLevel,
 		"dag":                  TagTopLevel,
 		"data":                 TagTopLevel,
@@ -274,6 +276,12 @@ var subsidiaryBoolTagFuncs = []func(subsidiaryBoolTags) (subsidiaryBoolTags, err
 	unifySubsidiaryBoolTags_5,
 	unifySubsidiaryBoolTags_6,
 	unifySubsidiaryBoolTags_7,
+	unifySubsidiaryBoolTags_8,
+	unifySubsidiaryBoolTags_9,
+	unifySubsidiaryBoolTags_10,
+	unifySubsidiaryBoolTags_11,
+	unifySubsidiaryBoolTags_12,
+	unifySubsidiaryBoolTags_13,
 }
 
 var subsidiaryTagFuncs = []func(subsidiaryTags) (subsidiaryTags, error){
@@ -301,6 +309,8 @@ func (t subsidiaryTags) marshalToMap() map[string]string {
 }
 
 type subsidiaryBoolTags struct {
+	comments             opt.Opt[bool]
+	compact              opt.Opt[bool]
 	indentSeq            opt.Opt[bool]
 	koala                opt.Opt[bool]
 	openOnlyWhenExplicit opt.Opt[bool]
@@ -310,6 +320,12 @@ type subsidiaryBoolTags struct {
 }
 
 func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
+	if x, ok := m["comments"]; ok {
+		t.comments = opt.Some(x)
+	}
+	if x, ok := m["compact"]; ok {
+		t.compact = opt.Some(x)
+	}
 	if x, ok := m["indentSeq"]; ok {
 		t.indentSeq = opt.Some(x)
 	}
@@ -332,6 +348,12 @@ func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
 }
 func (t subsidiaryBoolTags) marshalToMap() map[string]bool {
 	m := make(map[string]bool)
+	if t.comments.IsPresent() {
+		m["comments"] = t.comments.Value()
+	}
+	if t.compact.IsPresent() {
+		m["compact"] = t.compact.Value()
+	}
 	if t.indentSeq.IsPresent() {
 		m["indentSeq"] = t.indentSeq.Value()
 	}
@@ -398,7 +420,257 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 	return r, nil
 }
 
+// unifySubsidiaryBoolTags_4 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		compact:              *false | bool
+//		strict:               *false | bool
+//		strictKeywords:       *strict | bool
+//		strictFeatures:       *strict | bool
+//		comments:             *!compact | bool
+//		openOnlyWhenExplicit: *false | bool
+//	}
+func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	r.compact = opt.Some(false)
+	if t.compact.IsPresent() {
+		r.compact = t.compact
+	}
+	r.comments = opt.Some(!(r.compact).Value())
+	if t.comments.IsPresent() {
+		r.comments = t.comments
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	r.openOnlyWhenExplicit = opt.Some(false)
+	if t.openOnlyWhenExplicit.IsPresent() {
+		r.openOnlyWhenExplicit = t.openOnlyWhenExplicit
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_8 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		compact:              *false | bool
+//		strict:               *false | bool
+//		strictKeywords:       *strict | bool
+//		strictFeatures:       *strict | bool
+//		openOnlyWhenExplicit: *false | bool
+//	}
+func unifySubsidiaryBoolTags_8(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	r.compact = opt.Some(false)
+	if t.compact.IsPresent() {
+		r.compact = t.compact
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	r.openOnlyWhenExplicit = opt.Some(false)
+	if t.openOnlyWhenExplicit.IsPresent() {
+		r.openOnlyWhenExplicit = t.openOnlyWhenExplicit
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
 // unifySubsidiaryBoolTags_5 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		compact:        *false | bool
+//		strict:         *false | bool
+//		strictKeywords: *strict | bool
+//		comments:       *!compact | bool
+//		strictFeatures: *strict | bool
+//	}
+func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	r.compact = opt.Some(false)
+	if t.compact.IsPresent() {
+		r.compact = t.compact
+	}
+	r.comments = opt.Some(!(r.compact).Value())
+	if t.comments.IsPresent() {
+		r.comments = t.comments
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_9 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		compact:        *false | bool
+//		strict:         *false | bool
+//		strictKeywords: *strict | bool
+//		strictFeatures: *strict | bool
+//	}
+func unifySubsidiaryBoolTags_9(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	r.compact = opt.Some(false)
+	if t.compact.IsPresent() {
+		r.compact = t.compact
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_3 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		compact:  *false | bool
+//		comments: *!compact | bool
+//	}
+func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	r.compact = opt.Some(false)
+	if t.compact.IsPresent() {
+		r.compact = t.compact
+	}
+	r.comments = opt.Some(!(r.compact).Value())
+	if t.comments.IsPresent() {
+		r.comments = t.comments
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
+	if t.strict.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strict")
+	}
+	if t.strictFeatures.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictFeatures")
+	}
+	if t.strictKeywords.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictKeywords")
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_0 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		compact: *false | bool
+//	}
+func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	r.compact = opt.Some(false)
+	if t.compact.IsPresent() {
+		r.compact = t.compact
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
+	if t.strict.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strict")
+	}
+	if t.strictFeatures.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictFeatures")
+	}
+	if t.strictKeywords.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictKeywords")
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_11 unifies subsidiaryBoolTags values according to the following CUE logic:
 //
 //	{
 //		{[string]: bool}
@@ -408,11 +680,259 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 //		strictFeatures:       *strict | bool
 //		openOnlyWhenExplicit: *false | bool
 //	}
-func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+func unifySubsidiaryBoolTags_11(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	if t.compact.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
+	}
 	r.indentSeq = opt.Some(true)
 	if t.indentSeq.IsPresent() {
 		r.indentSeq = t.indentSeq
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	r.openOnlyWhenExplicit = opt.Some(false)
+	if t.openOnlyWhenExplicit.IsPresent() {
+		r.openOnlyWhenExplicit = t.openOnlyWhenExplicit
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_13 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		indentSeq:      *true | bool
+//		strict:         *false | bool
+//		strictKeywords: *strict | bool
+//		strictFeatures: *strict | bool
+//	}
+func unifySubsidiaryBoolTags_13(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	if t.compact.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
+	}
+	r.indentSeq = opt.Some(true)
+	if t.indentSeq.IsPresent() {
+		r.indentSeq = t.indentSeq
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_1 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		indentSeq: *true | bool
+//	}
+func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	if t.compact.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
+	}
+	r.indentSeq = opt.Some(true)
+	if t.indentSeq.IsPresent() {
+		r.indentSeq = t.indentSeq
+	}
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
+	if t.strict.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strict")
+	}
+	if t.strictFeatures.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictFeatures")
+	}
+	if t.strictKeywords.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictKeywords")
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_10 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		koala:                *false | bool
+//		strict:               *false | bool
+//		strictKeywords:       *strict | bool
+//		strictFeatures:       *strict | bool
+//		openOnlyWhenExplicit: *false | bool
+//	}
+func unifySubsidiaryBoolTags_10(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	if t.compact.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	r.koala = opt.Some(false)
+	if t.koala.IsPresent() {
+		r.koala = t.koala
+	}
+	r.openOnlyWhenExplicit = opt.Some(false)
+	if t.openOnlyWhenExplicit.IsPresent() {
+		r.openOnlyWhenExplicit = t.openOnlyWhenExplicit
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_12 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		koala:          *false | bool
+//		strict:         *false | bool
+//		strictKeywords: *strict | bool
+//		strictFeatures: *strict | bool
+//	}
+func unifySubsidiaryBoolTags_12(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	if t.compact.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	r.koala = opt.Some(false)
+	if t.koala.IsPresent() {
+		r.koala = t.koala
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_2 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		koala: *false | bool
+//	}
+func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	if t.compact.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	}
+	r.koala = opt.Some(false)
+	if t.koala.IsPresent() {
+		r.koala = t.koala
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
+	if t.strict.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strict")
+	}
+	if t.strictFeatures.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictFeatures")
+	}
+	if t.strictKeywords.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictKeywords")
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_6 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{[string]: bool}
+//		strict:               *false | bool
+//		strictKeywords:       *strict | bool
+//		strictFeatures:       *strict | bool
+//		openOnlyWhenExplicit: *false | bool
+//	}
+func unifySubsidiaryBoolTags_6(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
+	}
+	if t.compact.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
+	}
+	if t.indentSeq.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
 	}
 	if t.koala.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
@@ -440,218 +960,18 @@ func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //
 //	{
 //		{[string]: bool}
-//		indentSeq:      *true | bool
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
 //		strictFeatures: *strict | bool
 //	}
 func unifySubsidiaryBoolTags_7(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	r.indentSeq = opt.Some(true)
-	if t.indentSeq.IsPresent() {
-		r.indentSeq = t.indentSeq
+	if t.comments.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "comments")
 	}
-	if t.koala.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	if t.compact.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}
-	if t.openOnlyWhenExplicit.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
-	}
-	r.strict = opt.Some(false)
-	if t.strict.IsPresent() {
-		r.strict = t.strict
-	}
-	r.strictFeatures = r.strict
-	if t.strictFeatures.IsPresent() {
-		r.strictFeatures = t.strictFeatures
-	}
-	r.strictKeywords = r.strict
-	if t.strictKeywords.IsPresent() {
-		r.strictKeywords = t.strictKeywords
-	}
-	return r, nil
-}
-
-// unifySubsidiaryBoolTags_0 unifies subsidiaryBoolTags values according to the following CUE logic:
-//
-//	{
-//		{[string]: bool}
-//		indentSeq: *true | bool
-//	}
-func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
-	var r subsidiaryBoolTags
-	r.indentSeq = opt.Some(true)
-	if t.indentSeq.IsPresent() {
-		r.indentSeq = t.indentSeq
-	}
-	if t.koala.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
-	}
-	if t.openOnlyWhenExplicit.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
-	}
-	if t.strict.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strict")
-	}
-	if t.strictFeatures.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictFeatures")
-	}
-	if t.strictKeywords.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictKeywords")
-	}
-	return r, nil
-}
-
-// unifySubsidiaryBoolTags_4 unifies subsidiaryBoolTags values according to the following CUE logic:
-//
-//	{
-//		{[string]: bool}
-//		koala:                *false | bool
-//		strict:               *false | bool
-//		strictKeywords:       *strict | bool
-//		strictFeatures:       *strict | bool
-//		openOnlyWhenExplicit: *false | bool
-//	}
-func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
-	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
-	}
-	r.koala = opt.Some(false)
-	if t.koala.IsPresent() {
-		r.koala = t.koala
-	}
-	r.openOnlyWhenExplicit = opt.Some(false)
-	if t.openOnlyWhenExplicit.IsPresent() {
-		r.openOnlyWhenExplicit = t.openOnlyWhenExplicit
-	}
-	r.strict = opt.Some(false)
-	if t.strict.IsPresent() {
-		r.strict = t.strict
-	}
-	r.strictFeatures = r.strict
-	if t.strictFeatures.IsPresent() {
-		r.strictFeatures = t.strictFeatures
-	}
-	r.strictKeywords = r.strict
-	if t.strictKeywords.IsPresent() {
-		r.strictKeywords = t.strictKeywords
-	}
-	return r, nil
-}
-
-// unifySubsidiaryBoolTags_6 unifies subsidiaryBoolTags values according to the following CUE logic:
-//
-//	{
-//		{[string]: bool}
-//		koala:          *false | bool
-//		strict:         *false | bool
-//		strictKeywords: *strict | bool
-//		strictFeatures: *strict | bool
-//	}
-func unifySubsidiaryBoolTags_6(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
-	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
-	}
-	r.koala = opt.Some(false)
-	if t.koala.IsPresent() {
-		r.koala = t.koala
-	}
-	if t.openOnlyWhenExplicit.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
-	}
-	r.strict = opt.Some(false)
-	if t.strict.IsPresent() {
-		r.strict = t.strict
-	}
-	r.strictFeatures = r.strict
-	if t.strictFeatures.IsPresent() {
-		r.strictFeatures = t.strictFeatures
-	}
-	r.strictKeywords = r.strict
-	if t.strictKeywords.IsPresent() {
-		r.strictKeywords = t.strictKeywords
-	}
-	return r, nil
-}
-
-// unifySubsidiaryBoolTags_1 unifies subsidiaryBoolTags values according to the following CUE logic:
-//
-//	{
-//		{[string]: bool}
-//		koala: *false | bool
-//	}
-func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
-	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
-	}
-	r.koala = opt.Some(false)
-	if t.koala.IsPresent() {
-		r.koala = t.koala
-	}
-	if t.openOnlyWhenExplicit.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
-	}
-	if t.strict.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strict")
-	}
-	if t.strictFeatures.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictFeatures")
-	}
-	if t.strictKeywords.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictKeywords")
-	}
-	return r, nil
-}
-
-// unifySubsidiaryBoolTags_2 unifies subsidiaryBoolTags values according to the following CUE logic:
-//
-//	{
-//		{[string]: bool}
-//		strict:               *false | bool
-//		strictKeywords:       *strict | bool
-//		strictFeatures:       *strict | bool
-//		openOnlyWhenExplicit: *false | bool
-//	}
-func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
-	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
-	}
-	if t.koala.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
-	}
-	r.openOnlyWhenExplicit = opt.Some(false)
-	if t.openOnlyWhenExplicit.IsPresent() {
-		r.openOnlyWhenExplicit = t.openOnlyWhenExplicit
-	}
-	r.strict = opt.Some(false)
-	if t.strict.IsPresent() {
-		r.strict = t.strict
-	}
-	r.strictFeatures = r.strict
-	if t.strictFeatures.IsPresent() {
-		r.strictFeatures = t.strictFeatures
-	}
-	r.strictKeywords = r.strict
-	if t.strictKeywords.IsPresent() {
-		r.strictKeywords = t.strictKeywords
-	}
-	return r, nil
-}
-
-// unifySubsidiaryBoolTags_3 unifies subsidiaryBoolTags values according to the following CUE logic:
-//
-//	{
-//		{[string]: bool}
-//		strict:         *false | bool
-//		strictKeywords: *strict | bool
-//		strictFeatures: *strict | bool
-//	}
-func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
-	var r subsidiaryBoolTags
 	if t.indentSeq.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
 	}

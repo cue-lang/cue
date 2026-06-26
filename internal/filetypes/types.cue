@@ -352,8 +352,29 @@ tagInfo: {
 	dag: form:    "dag"
 	data: form:   "data"
 
-	cue: encoding:   "cue"
-	json: encoding:  "json"
+	cue: {
+		encoding: "cue"
+		boolTags: {
+			// compact controls whether the output is rendered in a
+			// more compact form. The exact meaning is
+			// encoding-specific.
+			compact: *false | bool
+			// comments controls whether comments are included in the
+			// output. It defaults to true, except when compact is
+			// enabled, where comments are dropped by default but can
+			// still be re-enabled explicitly.
+			comments: *(!compact) | bool
+		}
+	}
+	json: {
+		encoding: "json"
+		boolTags: {
+			// compact controls whether the output is rendered in a
+			// more compact form. The exact meaning is
+			// encoding-specific.
+			compact: *false | bool
+		}
+	}
 	jsonl: encoding: "jsonl"
 	yaml: {
 		encoding: "yaml"

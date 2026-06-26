@@ -352,8 +352,24 @@ tagInfo: {
 	dag: form:    "dag"
 	data: form:   "data"
 
-	cue: encoding:   "cue"
-	json: encoding:  "json"
+	cue: {
+		encoding: "cue"
+		boolTags: {
+			// compact controls whether the output is rendered in a
+			// more compact form. The exact meaning is
+			// encoding-specific.
+			compact: *false | bool
+		}
+	}
+	json: {
+		encoding: "json"
+		boolTags: {
+			// compact controls whether the output is rendered in a
+			// more compact form. The exact meaning is
+			// encoding-specific.
+			compact: *false | bool
+		}
+	}
 	jsonl: encoding: "jsonl"
 	yaml: {
 		encoding: "yaml"

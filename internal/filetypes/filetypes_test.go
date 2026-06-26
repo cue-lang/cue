@@ -304,6 +304,7 @@ func TestParseFile(t *testing.T) {
 			Filename:       "file.json",
 			Encoding:       build.JSON,
 			Interpretation: build.Auto,
+			BoolTags:       map[string]bool{"compact": false},
 		},
 	}, {
 		in:   ".json",
@@ -324,6 +325,7 @@ func TestParseFile(t *testing.T) {
 		out: &build.File{
 			Filename: "file.json",
 			Encoding: build.JSON,
+			BoolTags: map[string]bool{"compact": false},
 		},
 	}, {
 		in: "schema:file.json",
@@ -332,6 +334,7 @@ func TestParseFile(t *testing.T) {
 			Encoding:       build.JSON,
 			Interpretation: build.Auto,
 			Form:           build.Schema,
+			BoolTags:       map[string]bool{"compact": false},
 		},
 	}, {
 		in: "openapi:-",
@@ -351,6 +354,7 @@ func TestParseFile(t *testing.T) {
 		out: &build.File{
 			Filename: "file.json",
 			Encoding: build.CUE,
+			BoolTags: map[string]bool{"compact": false},
 		},
 	}, {
 		in: "cue+schema:-",
@@ -358,7 +362,26 @@ func TestParseFile(t *testing.T) {
 			Filename: "-",
 			Encoding: build.CUE,
 			Form:     build.Schema,
+			BoolTags: map[string]bool{"compact": false},
 		},
+	}, {
+		in: "json+compact:-",
+		out: &build.File{
+			Filename: "-",
+			Encoding: build.JSON,
+			BoolTags: map[string]bool{"compact": true},
+		},
+	}, {
+		in: "cue+compact:-",
+		out: &build.File{
+			Filename: "-",
+			Encoding: build.CUE,
+			BoolTags: map[string]bool{"compact": true},
+		},
+	}, {
+		// compact is not (yet) valid for encodings other than json and cue.
+		in:  "yaml+compact:-",
+		out: `field "compact" not allowed`,
 	}, {
 		in: "code+lang=js:foo.x",
 		out: &build.File{
@@ -381,12 +404,14 @@ func TestParseFile(t *testing.T) {
 			Filename:       `D:\foo.json`,
 			Encoding:       build.JSON,
 			Interpretation: build.Auto,
+			BoolTags:       map[string]bool{"compact": false},
 		},
 	}, {
 		in: `json:D:\foo.json`,
 		out: &build.File{
 			Filename: `D:\foo.json`,
 			Encoding: build.JSON,
+			BoolTags: map[string]bool{"compact": false},
 		},
 	}, {
 		in: `D:\foo:colons.json`,
@@ -394,6 +419,7 @@ func TestParseFile(t *testing.T) {
 			Filename:       `D:\foo:colons.json`,
 			Encoding:       build.JSON,
 			Interpretation: build.Auto,
+			BoolTags:       map[string]bool{"compact": false},
 		},
 	}, {
 		in: `/foo:colons.json`,
@@ -401,6 +427,7 @@ func TestParseFile(t *testing.T) {
 			Filename:       `/foo:colons.json`,
 			Encoding:       build.JSON,
 			Interpretation: build.Auto,
+			BoolTags:       map[string]bool{"compact": false},
 		},
 	}, {
 		in:  "json:",
@@ -442,6 +469,7 @@ func TestParseArgs(t *testing.T) {
 				Filename:       "foo.json",
 				Encoding:       build.JSON,
 				Interpretation: build.Auto,
+				BoolTags:       map[string]bool{"compact": false},
 			},
 			{
 				Filename:       "baz.yaml",
@@ -453,13 +481,13 @@ func TestParseArgs(t *testing.T) {
 	}, {
 		in: "data: foo.cue",
 		out: []*build.File{
-			{Filename: "foo.cue", Encoding: build.CUE, Form: build.Data},
+			{Filename: "foo.cue", Encoding: build.CUE, Form: build.Data, BoolTags: map[string]bool{"compact": false}},
 		},
 	}, {
 		in: "json: foo.json bar.data jsonschema: bar.schema",
 		out: []*build.File{
-			{Filename: "foo.json", Encoding: build.JSON}, // no auto!
-			{Filename: "bar.data", Encoding: build.JSON},
+			{Filename: "foo.json", Encoding: build.JSON, BoolTags: map[string]bool{"compact": false}}, // no auto!
+			{Filename: "bar.data", Encoding: build.JSON, BoolTags: map[string]bool{"compact": false}},
 			{
 				Filename:       "bar.schema",
 				Encoding:       build.JSON,
@@ -571,23 +599,23 @@ func TestParseArgs(t *testing.T) {
 	}, {
 		in: `json: c:\foo.json c:\path\to\file.dat`,
 		out: []*build.File{
-			{Filename: `c:\foo.json`, Encoding: build.JSON},
-			{Filename: `c:\path\to\file.dat`, Encoding: build.JSON},
+			{Filename: `c:\foo.json`, Encoding: build.JSON, BoolTags: map[string]bool{"compact": false}},
+			{Filename: `c:\path\to\file.dat`, Encoding: build.JSON, BoolTags: map[string]bool{"compact": false}},
 		},
 	}, {
 		in: `D:\foo.json`,
 		out: []*build.File{
-			{Filename: `D:\foo.json`, Encoding: build.JSON, Interpretation: build.Auto},
+			{Filename: `D:\foo.json`, Encoding: build.JSON, Interpretation: build.Auto, BoolTags: map[string]bool{"compact": false}},
 		},
 	}, {
 		in: `D:\foo:colons.json`,
 		out: []*build.File{
-			{Filename: `D:\foo:colons.json`, Encoding: build.JSON, Interpretation: build.Auto},
+			{Filename: `D:\foo:colons.json`, Encoding: build.JSON, Interpretation: build.Auto, BoolTags: map[string]bool{"compact": false}},
 		},
 	}, {
 		in: `/foo:colons.json`,
 		out: []*build.File{
-			{Filename: `/foo:colons.json`, Encoding: build.JSON, Interpretation: build.Auto},
+			{Filename: `/foo:colons.json`, Encoding: build.JSON, Interpretation: build.Auto, BoolTags: map[string]bool{"compact": false}},
 		},
 	}, {
 		in:  `json:D:\foo.json`,

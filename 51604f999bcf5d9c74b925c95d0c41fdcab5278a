@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d47a6b82_e0c544cf",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-26T15:11:54Z",
+      "side": 1,
+      "message": "you\u0027re copy pasting this comment; I would either put it in a \"let\" or hidden field elsewhere, and embed into these two here, or put the main comment in `cue` and let the others reference back to it briefly.",
+      "revId": "51604f999bcf5d9c74b925c95d0c41fdcab5278a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

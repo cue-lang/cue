@@ -16,6 +16,24 @@
       "message": "We\u0027ve just discussed this on a call; I find this very non-obvious code and I just wonder whether there\u0027s a way to reorder things here to make it all more obvious.",
       "revId": "7ffad15682384d447331f7f35aa8ef515fec2fbd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1577442b_21becbeb",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-26T14:40:16Z",
+      "side": 1,
+      "message": "Reordered so the schema is resolved first: it\u0027s the single loaded package if one is present, the orphan instance b if none is, and an error if more than one. The decoded schema files are then added directly to that schema, so the package and schema files together form the schema. This drops the separate schemaDest variable and the duplicated len(p.insts) branching.",
+      "parentUuid": "0aa79f31_3b799801",
+      "revId": "7ffad15682384d447331f7f35aa8ef515fec2fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

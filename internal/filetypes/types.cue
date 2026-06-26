@@ -352,8 +352,21 @@ tagInfo: {
 	dag: form:    "dag"
 	data: form:   "data"
 
-	cue: encoding:   "cue"
-	json: encoding:  "json"
+	cue: {
+		encoding: "cue"
+		boolTags: {
+			// compact causes CUE to be printed more compactly,
+			// avoiding newlines and eliding comments.
+			compact: *false | bool
+		}
+	}
+	json: {
+		encoding: "json"
+		boolTags: {
+			// compact causes the JSON to be emitted without whitespace.
+			compact: *false | bool
+		}
+	}
 	jsonl: encoding: "jsonl"
 	yaml: {
 		encoding: "yaml"

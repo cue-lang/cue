@@ -892,6 +892,16 @@ func (b *builder) number(v cue.Value) {
 	// Type may be number of float.
 
 	switch op, a := v.Expr(); op {
+	case cue.AndOp:
+		// Compounds like "int & >=1 & <=10" usually arrive pre-split by
+		// appendSplit in value(). Behind a default (e.g. "int & >=1 | *1"),
+		// appendSplit strips the default but stops short of splitting the
+		// remaining "&", so the value arrives intact. Emit each operand
+		// into the same schema node. See issue cue-lang/cue#4305.
+		for _, operand := range a {
+			b.number(operand)
+		}
+
 	case cue.LessThanOp:
 		if b.ctx.exclusiveBool {
 			b.setFilter("Schema", "exclusiveMaximum", ast.NewBool(true))

@@ -23,7 +23,7 @@ jobs:
     if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -58,7 +58,7 @@ jobs:
           echo "github.event.head_commit.message contains Dispatch-Trailer but we are on a protected branch"
           false
       - name: Install Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
           cache: false
           go-version: 1.26.4
@@ -76,17 +76,17 @@ jobs:
           # Dump env for good measure
           go env
       - name: Setup qemu
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
       - name: Docker Login
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           registry: docker.io
           username: cueckoo
           password: ${{ secrets.CUECKOO_DOCKER_PAT }}
       - name: Login to CUE registry
-        uses: cue-labs/registry-login-action@v1
+        uses: cue-labs/registry-login-action@66d40052b0206031343e17173425fa10508968d0 # v1
       - name: Install GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
         with:
           install-only: true
           version: v2.16.0

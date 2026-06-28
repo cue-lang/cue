@@ -38,7 +38,7 @@ jobs:
       Dispatch-Trailer: {"type":"'))
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -73,7 +73,7 @@ jobs:
           echo "github.event.head_commit.message contains Dispatch-Trailer but we are on a protected branch"
           false
       - name: Install Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
           cache: false
           go-version: ${{ matrix.go-version }}
@@ -91,7 +91,7 @@ jobs:
           # Dump env for good measure
           go env
       - if: github.event_name != 'schedule' && matrix.runner != 'ns-windows-amd64'
-        uses: namespacelabs/nscloud-cache-action@v1
+        uses: namespacelabs/nscloud-cache-action@15799a6b54e5765f85b2aac25b3f0df43ed571c0 # v1
         with:
           cache: go
       - if: |-
@@ -99,7 +99,7 @@ jobs:
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
         run: go env -w GOFLAGS=-count=1
       - name: Login to CUE registry
-        uses: cue-labs/registry-login-action@v1
+        uses: cue-labs/registry-login-action@66d40052b0206031343e17173425fa10508968d0 # v1
       - if: (matrix.go-version == '1.26.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Early git and code sanity checks
         run: go run ./internal/ci/checks
@@ -125,14 +125,14 @@ jobs:
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.26.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: gcloud auth for end-to-end tests
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.26.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: gcloud setup for end-to-end tests
-        uses: google-github-actions/setup-gcloud@v3
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.26.x' && matrix.runner == 'namespace-profile-linux-amd64-large')

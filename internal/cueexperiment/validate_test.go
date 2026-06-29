@@ -23,9 +23,10 @@ import (
 	"cuelang.org/go/internal/mod/semver"
 )
 
-// TestExperimentVersionOrdering validates that all experiment lifecycle versions
-// follow logical ordering constraints: preview <= default <= stable,
-// preview <= withdrawn, default <= withdrawn
+// TestExperimentVersionOrdering validates that all experiments declare a
+// preview version and that their lifecycle versions follow logical ordering
+// constraints: preview <= default <= stable, preview <= withdrawn,
+// default <= withdrawn
 func TestExperimentVersionOrdering(t *testing.T) {
 	// Test both global experiments (Config) and file experiments (File)
 	testTypes := []struct {
@@ -65,13 +66,20 @@ func TestExperimentVersionOrdering(t *testing.T) {
 	}
 }
 
-// validateExperimentVersionOrdering checks that experiment lifecycle versions follow logical ordering:
+// validateExperimentVersionOrdering checks that an experiment declares a preview
+// version and that its lifecycle versions follow logical ordering:
 // preview <= default <= stable, preview <= withdrawn, default <= withdrawn
 func validateExperimentVersionOrdering(fieldName string, versions map[string]string) error {
 	preview := versions["preview"]
 	defaultVer := versions["default"]
 	stable := versions["stable"]
 	withdrawn := versions["withdrawn"]
+
+	// A preview version is required: it is the version in which the experiment
+	// was introduced, and the rest of the codebase relies on it being set.
+	if preview == "" {
+		return fmt.Errorf("missing required preview version")
+	}
 
 	// Helper function to compare versions with proper error handling
 	compareVersions := func(v1, v2, v1Name, v2Name string) error {

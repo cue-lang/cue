@@ -19,7 +19,7 @@ type Config struct {
 
 	// FormatV2 selects the Wadler-Lindig pretty-printer as the
 	// implementation behind "cue fmt" and "cue/format".
-	FormatV2 bool `experiment:"default:v0.18.0"`
+	FormatV2 bool `experiment:"preview:v0.18.0,default:v0.18.0"`
 
 	// The flags in this second section describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.

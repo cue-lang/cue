@@ -120,7 +120,7 @@ Available global experiments:
     evalv3 enables the new CUE evaluator, addressing performance issues
     and bringing better algorithms for disjunctions, closedness, and cycles.
 
-  formatv2
+  formatv2 (preview: v0.18.0, default: v0.18.0)
     formatv2 selects the Wadler-Lindig pretty-printer as the
     implementation behind "cue fmt" and "cue/format".
 

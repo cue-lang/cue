@@ -34,6 +34,9 @@ import (
 //	preview:     the version from when the experiment was introduced.
 //	stable:      the version from when it is permanently set to true.
 //	withdrawn:   results in an error if the user attempts to use the flag.
+//
+// Every experiment must declare a preview version, as it is the version in
+// which the experiment was introduced; the other stages are optional.
 type File struct {
 	// version is the module version of the file that was compiled.
 	version string
@@ -140,7 +143,7 @@ func isPreview(experiment, version string, t any) bool {
 
 func (e *experimentInfo) isValidForVersion(version string) bool {
 	// Check if experiment is available for this version
-	if version != "" && e.Preview != "" {
+	if version != "" {
 		if semver.Compare(version, e.Preview) < 0 {
 			return false
 		}
@@ -187,8 +190,7 @@ func canApplyExperimentFix(experiment, version, target string, t any) error {
 
 	// Check if experiment is valid for this version
 	if !expInfo.isValidForVersion(target) {
-		if version != "" && expInfo.Preview != "" &&
-			semver.Compare(target, expInfo.Preview) < 0 {
+		if version != "" && semver.Compare(target, expInfo.Preview) < 0 {
 			const msg = "experiment %q requires language version %s or later, have %s"
 			return fmt.Errorf(msg, experiment, expInfo.Preview, version)
 		}
@@ -230,7 +232,7 @@ func getActiveExperiments(origVersion, targetVersion string, t any) []string {
 		expInfo := parseExperimentTag(tagStr)
 
 		// Skip if not yet available for this version
-		if targetVersion != "" && expInfo.Preview != "" && semver.Compare(targetVersion, expInfo.Preview) < 0 {
+		if targetVersion != "" && semver.Compare(targetVersion, expInfo.Preview) < 0 {
 			continue
 		}
 

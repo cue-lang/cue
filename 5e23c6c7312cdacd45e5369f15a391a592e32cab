@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cf6be89_d0ce664d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-29T08:31:49Z",
+      "side": 1,
+      "message": "To me \"heuristics\" isn\u0027t quite the right word. I\u0027d replace with \"Wadler-Lindig based algorithm, rather than...\"",
+      "range": {
+        "startLine": 11,
+        "startChar": 60,
+        "endLine": 11,
+        "endChar": 70
+      },
+      "revId": "5e23c6c7312cdacd45e5369f15a391a592e32cab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

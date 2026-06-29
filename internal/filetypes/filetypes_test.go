@@ -316,7 +316,7 @@ func TestParseFile(t *testing.T) {
 			Filename:       ".json.yaml",
 			Encoding:       build.YAML,
 			Interpretation: build.Auto,
-			BoolTags:       map[string]bool{"indentSeq": true},
+			BoolTags:       map[string]bool{"indentSequences": true},
 		},
 	}, {
 		in:   "file.json",
@@ -447,7 +447,7 @@ func TestParseArgs(t *testing.T) {
 				Filename:       "baz.yaml",
 				Encoding:       build.YAML,
 				Interpretation: build.Auto,
-				BoolTags:       map[string]bool{"indentSeq": true},
+				BoolTags:       map[string]bool{"indentSequences": true},
 			},
 		},
 	}, {

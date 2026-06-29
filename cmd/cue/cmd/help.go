@@ -622,7 +622,8 @@ valid with is mentioned in parentheses at the end.
                     require a schema to be explicitly opened before a
                     ... will be added to a struct (jsonschema)
 
-    indentSeq       indent sequence elements relative to their
+    indentSequences
+                    indent sequence elements relative to their
                     enclosing mapping key; true by default (yaml)
 
 Many commands also support the --out and --outfile/-o flags.

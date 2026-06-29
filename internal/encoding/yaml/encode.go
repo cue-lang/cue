@@ -79,9 +79,9 @@ type encodeConfig struct {
 	indentSequence bool
 }
 
-// IndentSequence controls whether sequence (list) elements are indented
+// IndentSequences controls whether sequence (list) elements are indented
 // relative to their enclosing mapping key. It defaults to true.
-func IndentSequence(indent bool) EncodeOption {
+func IndentSequences(indent bool) EncodeOption {
 	return func(c *encodeConfig) { c.indentSequence = indent }
 }
 

@@ -1,14 +1,14 @@
-# The yaml encoding's indentSeq bool tag controls whether sequence
+# The yaml encoding's indentSequences bool tag controls whether sequence
 # elements are indented relative to their enclosing mapping key.
 # It defaults to true, matching the long-standing behavior.
 
 exec cue export --out yaml in.cue
 cmp stdout expect-indentseq
 
-exec cue export --out yaml+indentSeq in.cue
+exec cue export --out yaml+indentSequences in.cue
 cmp stdout expect-indentseq
 
-exec cue export --out yaml+indentSeq=false in.cue
+exec cue export --out yaml+indentSequences=false in.cue
 cmp stdout expect-noindentseq
 
 -- in.cue --

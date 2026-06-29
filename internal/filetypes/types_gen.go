@@ -51,7 +51,7 @@ func init() {
 		"data":                 TagTopLevel,
 		"go":                   TagTopLevel,
 		"graph":                TagTopLevel,
-		"indentSeq":            TagSubsidiaryBool,
+		"indentSequences":      TagSubsidiaryBool,
 		"ini":                  TagTopLevel,
 		"json":                 TagTopLevel,
 		"jsonl":                TagTopLevel,
@@ -301,7 +301,7 @@ func (t subsidiaryTags) marshalToMap() map[string]string {
 }
 
 type subsidiaryBoolTags struct {
-	indentSeq            opt.Opt[bool]
+	indentSequences      opt.Opt[bool]
 	koala                opt.Opt[bool]
 	openOnlyWhenExplicit opt.Opt[bool]
 	strict               opt.Opt[bool]
@@ -310,8 +310,8 @@ type subsidiaryBoolTags struct {
 }
 
 func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
-	if x, ok := m["indentSeq"]; ok {
-		t.indentSeq = opt.Some(x)
+	if x, ok := m["indentSequences"]; ok {
+		t.indentSequences = opt.Some(x)
 	}
 	if x, ok := m["koala"]; ok {
 		t.koala = opt.Some(x)
@@ -332,8 +332,8 @@ func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
 }
 func (t subsidiaryBoolTags) marshalToMap() map[string]bool {
 	m := make(map[string]bool)
-	if t.indentSeq.IsPresent() {
-		m["indentSeq"] = t.indentSeq.Value()
+	if t.indentSequences.IsPresent() {
+		m["indentSequences"] = t.indentSequences.Value()
 	}
 	if t.koala.IsPresent() {
 		m["koala"] = t.koala.Value()
@@ -402,7 +402,7 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 //
 //	{
 //		{[string]: bool}
-//		indentSeq:            *true | bool
+//		indentSequences:      *true | bool
 //		strict:               *false | bool
 //		strictKeywords:       *strict | bool
 //		strictFeatures:       *strict | bool
@@ -410,9 +410,9 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 //	}
 func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	r.indentSeq = opt.Some(true)
-	if t.indentSeq.IsPresent() {
-		r.indentSeq = t.indentSeq
+	r.indentSequences = opt.Some(true)
+	if t.indentSequences.IsPresent() {
+		r.indentSequences = t.indentSequences
 	}
 	if t.koala.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
@@ -440,16 +440,16 @@ func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //
 //	{
 //		{[string]: bool}
-//		indentSeq:      *true | bool
-//		strict:         *false | bool
-//		strictKeywords: *strict | bool
-//		strictFeatures: *strict | bool
+//		indentSequences: *true | bool
+//		strict:          *false | bool
+//		strictKeywords:  *strict | bool
+//		strictFeatures:  *strict | bool
 //	}
 func unifySubsidiaryBoolTags_7(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	r.indentSeq = opt.Some(true)
-	if t.indentSeq.IsPresent() {
-		r.indentSeq = t.indentSeq
+	r.indentSequences = opt.Some(true)
+	if t.indentSequences.IsPresent() {
+		r.indentSequences = t.indentSequences
 	}
 	if t.koala.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
@@ -476,13 +476,13 @@ func unifySubsidiaryBoolTags_7(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //
 //	{
 //		{[string]: bool}
-//		indentSeq: *true | bool
+//		indentSequences: *true | bool
 //	}
 func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	r.indentSeq = opt.Some(true)
-	if t.indentSeq.IsPresent() {
-		r.indentSeq = t.indentSeq
+	r.indentSequences = opt.Some(true)
+	if t.indentSequences.IsPresent() {
+		r.indentSequences = t.indentSequences
 	}
 	if t.koala.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
@@ -514,8 +514,8 @@ func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	if t.indentSequences.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
 	r.koala = opt.Some(false)
 	if t.koala.IsPresent() {
@@ -551,8 +551,8 @@ func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_6(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	if t.indentSequences.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
 	r.koala = opt.Some(false)
 	if t.koala.IsPresent() {
@@ -584,8 +584,8 @@ func unifySubsidiaryBoolTags_6(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	if t.indentSequences.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
 	r.koala = opt.Some(false)
 	if t.koala.IsPresent() {
@@ -617,8 +617,8 @@ func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	if t.indentSequences.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
 	if t.koala.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
@@ -652,8 +652,8 @@ func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
-	if t.indentSeq.IsPresent() {
-		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSeq")
+	if t.indentSequences.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
 	if t.koala.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")

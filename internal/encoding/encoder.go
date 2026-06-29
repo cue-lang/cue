@@ -186,7 +186,7 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	case build.YAML:
 		e.concrete = true
 		streamed := false
-		indentSeq := f.BoolTags["indentSeq"]
+		indentSeq := f.BoolTags["indentSequences"]
 		// TODO(mvdan): use a NewEncoder API like in TOML below.
 		e.encValue = func(v cue.Value) error {
 			if streamed {
@@ -196,7 +196,7 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 
 			// Note that we use [cue.Concrete] here, which expands all references.
 			n := v.Syntax(cue.Concrete(true))
-			b, err := cueyaml.Encode(n, cueyaml.IndentSequence(indentSeq))
+			b, err := cueyaml.Encode(n, cueyaml.IndentSequences(indentSeq))
 			if err != nil {
 				return err
 			}

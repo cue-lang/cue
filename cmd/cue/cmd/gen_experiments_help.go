@@ -30,7 +30,7 @@ import (
 	"os"
 	"reflect"
 	"regexp"
-	"sort"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/internal/cueexperiment"
@@ -48,6 +48,15 @@ type Experiment struct {
 	IsGlobal  bool // true for CUE_EXPERIMENT, false for @experiment
 }
 
+// compare orders experiments by preview version, i.e. the version in which
+// they were introduced, then by name.
+func (exp Experiment) compare(other Experiment) int {
+	if c := semver.Compare(exp.Preview, other.Preview); c != 0 {
+		return c
+	}
+	return strings.Compare(exp.Name, other.Name)
+}
+
 func main() {
 	experiments, err := extractExperiments()
 	if err != nil {
@@ -63,24 +72,16 @@ func main() {
 			globalExperiments = append(globalExperiments, exp)
 		} else {
 			// Filter file experiments from v0.14.0 onwards to skip testing fields
-			if exp.Preview != "" && semver.Compare(exp.Preview, "v0.14.0") >= 0 {
+			if semver.Compare(exp.Preview, "v0.14.0") >= 0 {
 				fileExperiments = append(fileExperiments, exp)
 			}
 		}
 	}
 
-	// Sort file experiments by preview version, then by name
-	sort.Slice(fileExperiments, func(i, j int) bool {
-		if fileExperiments[i].Preview != fileExperiments[j].Preview {
-			return semver.Compare(fileExperiments[i].Preview, fileExperiments[j].Preview) < 0
-		}
-		return fileExperiments[i].Name < fileExperiments[j].Name
-	})
-
-	// Sort global experiments by name
-	sort.Slice(globalExperiments, func(i, j int) bool {
-		return globalExperiments[i].Name < globalExperiments[j].Name
-	})
+	// Sort both kinds of experiments chronologically by the version in which
+	// they were introduced, then by name.
+	slices.SortFunc(fileExperiments, Experiment.compare)
+	slices.SortFunc(globalExperiments, Experiment.compare)
 
 	// Validate URLs in comments for all experiments
 	allExperiments := append(fileExperiments, globalExperiments...)
@@ -373,23 +374,17 @@ Available global experiments:
 `)
 
 		for _, exp := range globalExperiments {
-			fmt.Fprintf(&sb, "  %s", exp.Name)
-			if exp.Preview != "" {
-				fmt.Fprintf(&sb, " (preview: %s", exp.Preview)
-				if exp.Default != "" {
-					fmt.Fprintf(&sb, ", default: %s", exp.Default)
-				}
-				if exp.Stable != "" {
-					fmt.Fprintf(&sb, ", stable: %s", exp.Stable)
-				}
-				if exp.Withdrawn != "" {
-					fmt.Fprintf(&sb, ", withdrawn: %s", exp.Withdrawn)
-				}
-				sb.WriteString(")")
-			} else if exp.Withdrawn != "" {
-				sb.WriteString(" (withdrawn)")
+			fmt.Fprintf(&sb, "  %s (preview: %s", exp.Name, exp.Preview)
+			if exp.Default != "" {
+				fmt.Fprintf(&sb, ", default: %s", exp.Default)
 			}
-			sb.WriteString("\n")
+			if exp.Stable != "" {
+				fmt.Fprintf(&sb, ", stable: %s", exp.Stable)
+			}
+			if exp.Withdrawn != "" {
+				fmt.Fprintf(&sb, ", withdrawn: %s", exp.Withdrawn)
+			}
+			sb.WriteString(")\n")
 
 			// Add full comment if available
 			if exp.Comment != "" {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90e704bb_7a99d5fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-29T08:20:45Z",
+      "side": 1,
+      "message": "Just checking: indentSeq never made it to 0.17? I.e. this isn\u0027t a breaking change?",
+      "revId": "236b8c32f995756f78f0b0d72bcaa232cc8f1651",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

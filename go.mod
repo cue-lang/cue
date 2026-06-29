@@ -3,16 +3,16 @@ module cuelang.org/go
 go 1.25.0
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20260601085548-328ff8e2c943
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20260618065901-6befdbcb3cf6
 	github.com/cockroachdb/apd/v3 v3.2.3
-	github.com/coder/websocket v1.8.14
+	github.com/coder/websocket v1.8.15
 	github.com/emicklei/proto v1.14.3
 	github.com/go-quicktest/qt v1.102.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
-	github.com/pelletier/go-toml/v2 v2.3.1
+	github.com/pelletier/go-toml/v2 v2.4.2
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20260420112717-c39628bde8b5
 	github.com/rogpeppe/go-internal v1.15.0
 	github.com/spf13/cobra v1.10.2
@@ -25,7 +25,7 @@ require (
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.21.0
 	golang.org/x/text v0.38.0
-	golang.org/x/tools v0.45.0
+	golang.org/x/tools v0.47.0
 )
 
 require (

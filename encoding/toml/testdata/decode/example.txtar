@@ -65,6 +65,11 @@ color = "gray"
 						Label: *ast.Ident{
 							NamePos: token.Pos("example.toml:8:1", newline)
 						}
+						Value: *ast.BinaryExpr{
+							X: *ast.BasicLit{
+								ValuePos: token.Pos("example.toml:8:7")
+							}
+						}
 					}
 				}
 				Rbrace: token.Pos("-", newline)
@@ -80,6 +85,9 @@ color = "gray"
 					*ast.Field{
 						Label: *ast.Ident{
 							NamePos: token.Pos("example.toml:11:1", newline)
+						}
+						Value: *ast.BasicLit{
+							ValuePos: token.Pos("example.toml:11:11")
 						}
 					}
 					*ast.Field{

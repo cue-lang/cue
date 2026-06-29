@@ -64,7 +64,7 @@ func TestDecoder(t *testing.T) {
 			= "no key name"
 			`,
 		wantErr: `
-			invalid character at start of key: =:
+			invalid character at start of key: U+003D '=':
 			    test.toml:2:1
 			`,
 	}, {

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64db647b_c30dba60",
+        "filename": "cmd/cue/cmd/testdata/script/export_compact.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-29T16:39:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce2f91e3_854e1d97",
+      "range": {
+        "startLine": 1,
+        "startChar": 40,
+        "endLine": 1,
+        "endChar": 59
+      },
+      "revId": "9a1bfe4cc9eb98e1443d3b330367b88cbadbabaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e9a327e_f4f58a56",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f87892a_025316c7",
+        "filename": "cmd/cue/cmd/testdata/script/export_compact.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-29T16:39:36Z",
+      "side": 1,
+      "message": "Agreed. Resolved a bit differently.",
+      "parentUuid": "1e9a327e_f4f58a56",
+      "range": {
+        "startLine": 12,
+        "startChar": 15,
+        "endLine": 12,
+        "endChar": 34
+      },
+      "revId": "9a1bfe4cc9eb98e1443d3b330367b88cbadbabaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97f4a0b6_4af3772c",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-06-29T08:50:25Z",
       "side": 1,
       "message": "It might be good if some of these field names were different lengths, as that would show up whether we\u0027re expecting field value alignment in the non-compact case with json (I suspect we are (I also suspect we do have other tests that demonstrate this, so this is almost certainly nit)).",
+      "range": {
+        "startLine": 30,
+        "startChar": 17,
+        "endLine": 30,
+        "endChar": 18
+      },
+      "revId": "9a1bfe4cc9eb98e1443d3b330367b88cbadbabaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9eb4298c_4c958d9d",
+        "filename": "cmd/cue/cmd/testdata/script/export_compact.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-29T16:39:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97f4a0b6_4af3772c",
       "range": {
         "startLine": 30,
         "startChar": 17,

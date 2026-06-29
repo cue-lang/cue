@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29256495_d0dca8e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-06-29T16:26:12Z",
+      "side": 1,
+      "message": "assuming we\u0027ve been adding CAPS LOCK WARNINGS to unstable package godocs, do the same here? even if we haven\u0027t I\u0027d start now, because we have similar EXPERIMENTAL notices on experimental packages.",
+      "revId": "a87d53a261af5218fa3a459b14b6054ca6bacdc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

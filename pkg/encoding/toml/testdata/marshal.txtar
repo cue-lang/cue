@@ -68,9 +68,9 @@ unmarshal: {
 	}
 }
 
--- out/toml --
+-- out/toml-v3 --
 Errors:
-unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: =:
+unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: U+003D '=':
     ./in.cue:66:19
     1:1
 unmarshal.output.failDuplicate: error in call to encoding/toml.Unmarshal: duplicate key: foo:
@@ -136,6 +136,6 @@ unmarshal: output: {
 	complexKeys: "123-456": " foo bar ": "value"
 	defaultEmpty:   {}
 	failIncomplete: toml.Unmarshal(value)
-	failBadSyntax:  _|_ // unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: =
+	failBadSyntax:  _|_ // unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: U+003D '='
 	failDuplicate:  _|_ // unmarshal.output.failDuplicate: error in call to encoding/toml.Unmarshal: duplicate key: foo
 }

@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce2f91e3_854e1d97",
+        "filename": "cmd/cue/cmd/testdata/script/export_compact.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-29T08:50:25Z",
+      "side": 1,
+      "message": "very much nit: I think \"json output and cue output are rendered...\". Otherwise, to me, it slightly reads like json-and-cue is one output type.",
+      "range": {
+        "startLine": 1,
+        "startChar": 40,
+        "endLine": 1,
+        "endChar": 59
+      },
+      "revId": "9a1bfe4cc9eb98e1443d3b330367b88cbadbabaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e9a327e_f4f58a56",
+        "filename": "cmd/cue/cmd/testdata/script/export_compact.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-29T08:50:25Z",
+      "side": 1,
+      "message": "also very nit: \"lays out the output\"? Or \"lays out the input\"? \"formats the input\". What even is input and output here? Output is the output of the formmater?\n\nAgain, I don\u0027t think heuristics is the right word... Also, given you state in the commit comment that line length is unbounded, you\u0027re not using width-driven Wadler-Lindig?",
+      "range": {
+        "startLine": 12,
+        "startChar": 15,
+        "endLine": 12,
+        "endChar": 34
+      },
+      "revId": "9a1bfe4cc9eb98e1443d3b330367b88cbadbabaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97f4a0b6_4af3772c",
+        "filename": "cmd/cue/cmd/testdata/script/export_compact.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-06-29T08:50:25Z",
+      "side": 1,
+      "message": "It might be good if some of these field names were different lengths, as that would show up whether we\u0027re expecting field value alignment in the non-compact case with json (I suspect we are (I also suspect we do have other tests that demonstrate this, so this is almost certainly nit)).",
+      "range": {
+        "startLine": 30,
+        "startChar": 17,
+        "endLine": 30,
+        "endChar": 18
+      },
+      "revId": "9a1bfe4cc9eb98e1443d3b330367b88cbadbabaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

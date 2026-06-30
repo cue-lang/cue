@@ -1,0 +1,27 @@
+# Multiple -d/--schema flags must all be honored when validating non-CUE
+# files, regardless of the order in which they are given. Previously only
+# the last -d schema took effect, making validation order dependent.
+
+# TODO(3726): the second invocation wrongly succeeds; only the last -d
+# schema is honored, so X: 4200 passes #B (>100).
+! exec cue vet .:A b_only.yaml -d '#B' -d '#C'
+cmp stderr err
+exec cue vet .:A b_only.yaml -d '#C' -d '#B'
+
+# Data satisfying all schemas passes regardless of -d order.
+exec cue vet .:A both.yaml -d '#B' -d '#C'
+exec cue vet .:A both.yaml -d '#C' -d '#B'
+
+-- a.cue --
+package A
+
+#C: X: number & <1000
+#B: X: number & >100
+-- b_only.yaml --
+X: 4200
+-- both.yaml --
+X: 500
+-- err --
+X: invalid value 4200 (out of bound <1000):
+    ./a.cue:3:17
+    ./b_only.yaml:1:4

@@ -12,8 +12,9 @@ var Flags Config
 
 // Config holds the set of known CUE_DEBUG flags.
 //
-// When adding, deleting, or modifying entries below,
-// update cmd/cue/cmd/help.go as well for `cue help environment`.
+// The field doc comments below are the source of truth for the CUE_DEBUG
+// section of `cue help environment`; run
+// "go generate cuelang.org/go/cmd/cue/cmd" after changing them.
 type Config struct {
 	// HTTP enables JSON logging per HTTP request and response made
 	// when interacting with module registries.

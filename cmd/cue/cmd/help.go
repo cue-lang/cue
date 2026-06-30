@@ -15,6 +15,7 @@
 package cmd
 
 //go:generate go run gen_experiments_help.go
+//go:generate go run gen_environment_help.go
 
 import (
 	"bufio"
@@ -315,25 +316,13 @@ If an environment variable is unset or empty, sensible default setting is used.
 	CUE_DEBUG
 		Comma-separated list of debug flags to enable or disable, such as:
 
-		http
-			Log a JSON message per HTTP request and response made
-			when interacting with module registries.
-		sortfields
-			Force fields in stucts to be sorted lexicographically.
-		toolsflow
-			Print task dependency mermaid graphs in 'cue cmd'.
-		parsertrace
-			Print a trace of parsed CUE productions.
-
+`[1:] + cueDebugHelp + `
 CUE_EXPERIMENT and CUE_DEBUG are comma-separated lists of key-value strings,
 where the value is a boolean "true" or "1" if omitted. For example:
 
 	CUE_EXPERIMENT=toenable,todisable=0
-`[1:],
+`,
 }
-
-// Please keep the CUE_EXPERIMENT and CUE_DEBUG lists above in sync with
-// the cueexperiment and cuedebug packages.
 
 var modulesHelp = &cobra.Command{
 	Use:   "modules",

@@ -94,7 +94,7 @@ type buildPlan struct {
 	imported []*ast.File
 
 	expressions []ast.Expr // only evaluate these expressions within results
-	schema      ast.Expr   // selects schema in instance for orphaned values
+	schemaExprs []ast.Expr // select schemas in instance for orphaned values
 
 	// orphan placement flags.
 	perFile    bool
@@ -544,7 +544,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			values, schemas = schemas, values
 		}
 
-		if len(p.insts) > 1 && p.schema != nil {
+		if len(p.insts) > 1 && len(p.schemaExprs) > 0 {
 			return nil, errors.Newf(token.NoPos,
 				"cannot use --schema/-d with flag more than one schema")
 		}
@@ -598,8 +598,11 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			}
 			p.instance = inst
 			p.encConfig.Schema = inst.Value()
-			if p.schema != nil {
-				v := cmd.ctx.BuildExpr(p.schema,
+			// Each -d/--schema expression selects a schema within the
+			// instance; data must validate against all of them, so unify
+			// them into a single schema value.
+			for i, expr := range p.schemaExprs {
+				v := cmd.ctx.BuildExpr(expr,
 					cue.InferBuiltins(true),
 					cue.Scope(inst.Value()),
 					// Use the schema package's import path so that references
@@ -611,14 +614,18 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 				if err := v.Validate(); err != nil {
 					return nil, err
 				}
-				p.encConfig.Schema = v
+				if i == 0 {
+					p.encConfig.Schema = v
+				} else {
+					p.encConfig.Schema = p.encConfig.Schema.Unify(v)
+				}
 			}
-		} else if p.schema != nil {
+		} else if len(p.schemaExprs) > 0 {
 			return nil, errors.Newf(token.NoPos,
 				"-d/--schema flag specified without a schema")
 		}
 
-		if p.schema != nil && len(values) == 0 {
+		if len(p.schemaExprs) > 0 && len(values) == 0 {
 			return nil, errors.Newf(token.NoPos,
 				"-d/--schema flag requires non-CUE input files")
 		}
@@ -627,7 +634,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		default:
 			fallthrough
 
-		case p.schema != nil:
+		case len(p.schemaExprs) > 0:
 			p.orphaned = values
 
 		case p.mergeData, p.usePlacement(), p.importing:
@@ -690,11 +697,12 @@ func (b *buildPlan) parseFlags() (err error) {
 		b.encConfig.Force = flagForce.Bool(b.cmd)
 	}
 
-	if s := flagSchema.String(b.cmd); s != "" {
-		b.schema, err = parser.ParseExpr("--schema", s)
+	for _, s := range flagSchema.StringArray(b.cmd) {
+		expr, err := parser.ParseExpr("--schema", s)
 		if err != nil {
 			return err
 		}
+		b.schemaExprs = append(b.schemaExprs, expr)
 	}
 	if s := flagGlob.String(b.cmd); s != "" {
 		// Set a default file filter to only include json and yaml files

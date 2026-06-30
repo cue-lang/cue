@@ -388,8 +388,13 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 		fail(v.Position, err)
 	}
 
-	pkgNamespace := strings.Split(imp.protoPkg, ".")
-	curNamespace := strings.Split(p.protoPkg, ".")
+	var pkgNamespace, curNamespace []string
+	if imp.protoPkg != "" {
+		pkgNamespace = strings.Split(imp.protoPkg, ".")
+	}
+	if p.protoPkg != "" {
+		curNamespace = strings.Split(p.protoPkg, ".")
+	}
 	for {
 		for k := range imp.symbols {
 			ref := k

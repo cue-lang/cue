@@ -38,6 +38,7 @@ func TestExtractDefinitions(t *testing.T) {
 		"mixer/v1/config/client/client_config.proto",
 		"other/trailcomment.proto",
 		"other/full_references.proto",
+		"other/package_less_import.proto",
 	}
 	for _, file := range testCases {
 		t.Run(file, func(t *testing.T) {

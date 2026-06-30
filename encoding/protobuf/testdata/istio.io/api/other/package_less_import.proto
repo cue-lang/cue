@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package istio.io.api.other.package_less_import;
+
+import "other/global_scope.proto";
+
+// PackageLessImport references GlobalMessage unqualified. GlobalMessage is
+// declared in a package-less file, so it lives in the global proto scope and
+// is reachable without qualification, exactly as protoc resolves it.
+message PackageLessImport {
+  GlobalMessage global = 1;
+}

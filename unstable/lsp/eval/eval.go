@@ -376,6 +376,10 @@ type Evaluator struct {
 	// passed to [New]. This is not the same as the
 	// [pkgFrame.navigable] (which is the entire package scope).
 	pkgDecls *navigable
+	// fileFramesNav is the navigable shared by all of the package's
+	// file frames. It aggregates the package's top-level bindings,
+	// and is the root of the graph exposed by [Evaluator.Root].
+	fileFramesNav *navigable
 	// byFilename maps file names to [FileEvaluator]
 	byFilename map[string]*FileEvaluator
 }
@@ -451,6 +455,7 @@ func New(config Config, files ...*ast.File) *Evaluator {
 		evaluator: evaluator,
 		parent:    pkgFrame.navigable,
 	}
+	evaluator.fileFramesNav = fileFramesNavigable
 
 	for _, file := range files {
 		fe := &FileEvaluator{
@@ -459,6 +464,7 @@ func New(config Config, files ...*ast.File) *Evaluator {
 		}
 		evaluator.byFilename[file.Filename] = fe
 		fileFr := fe.newFrame(pkgFrame, file, fileFramesNavigable)
+		fileFr.kind = DeclFile
 		pkgFrame.childFrames = append(pkgFrame.childFrames, fileFr)
 		// The AST doesn't include blank space after the last token. But
 		// the user's cursor can be in that space and we need to be able
@@ -508,11 +514,13 @@ func (e *Evaluator) Reset() {
 		evaluator: e,
 		parent:    pkgFrame.navigable,
 	}
+	e.fileFramesNav = fileFramesNavigable
 
 	for _, fe := range e.byFilename {
 		clear(fe.likelyUseOffsets)
 		clear(fe.importSpecNavigables)
 		fileFr := fe.newFrame(pkgFrame, fe.File, fileFramesNavigable)
+		fileFr.kind = DeclFile
 		pkgFrame.childFrames = append(pkgFrame.childFrames, fileFr)
 		tokFile := fe.File.Pos().File()
 		if tokFile == nil {
@@ -1653,6 +1661,11 @@ type frame struct {
 	// embeddings - it is also set for things the LSP treats like
 	// embeddings, such as disjunctions and comprehensions.
 	embedded bool
+	// kind classifies the syntactic construct that this frame
+	// models. It is surfaced by the graph API via [Decl.Kind]. The
+	// zero value is [DeclExpression]: a frame that does not
+	// correspond to any source-level declaration.
+	kind DeclKind
 	// parent is the parent frame.
 	parent *frame
 	// childFrames contains every frame that is a child of this
@@ -1816,6 +1829,7 @@ func (f *frame) eval() {
 			// imports of this package, in some other package.
 
 			childFr := f.newFrame(nil, f.fileEvaluator.evaluator.pkgDecls, false)
+			childFr.kind = DeclPackage
 			if fscache.IsPhantomPackage(node) {
 				// For packages with invented names, be careful to avoid
 				// returning file coordinates that use the length of the
@@ -1877,6 +1891,7 @@ func (f *frame) eval() {
 				}
 				nav, found := importSpecNavigables[*ip]
 				childFr := f.newFrame(node, nav, false)
+				childFr.kind = DeclImport
 				if !found {
 					importSpecNavigables[*ip] = childFr.navigable
 				}
@@ -1978,7 +1993,8 @@ func (f *frame) eval() {
 			}
 
 		case *ast.EmbedDecl:
-			f.newFrame(node.Expr, f.navigable, true)
+			childFr := f.newFrame(node.Expr, f.navigable, true)
+			childFr.kind = DeclEmbedding
 
 		case *ast.PostfixExpr:
 			switch node.Op {
@@ -1997,7 +2013,9 @@ func (f *frame) eval() {
 
 		case *ast.UnaryExpr:
 			if node.Op == token.MUL {
-				f.newFrame(node.X, f.navigable, true).addRange(node)
+				childFr := f.newFrame(node.X, f.navigable, true)
+				childFr.kind = DeclDefault
+				childFr.addRange(node)
 			} else {
 				f.newFrame(node.X, nil, false)
 			}
@@ -2005,8 +2023,15 @@ func (f *frame) eval() {
 		case *ast.BinaryExpr:
 			switch node.Op {
 			case token.AND, token.OR:
-				f.newFrame(node.X, f.navigable, true).addRange(node)
-				f.newFrame(node.Y, f.navigable, true).addRange(node)
+				kind := DeclConjunct
+				if node.Op == token.OR {
+					kind = DeclDisjunct
+				}
+				for _, operand := range []ast.Expr{node.X, node.Y} {
+					childFr := f.newFrame(operand, f.navigable, true)
+					childFr.kind = kind
+					childFr.addRange(node)
+				}
 			default:
 				f.newFrame(node.X, nil, false)
 				f.newFrame(node.Y, nil, false)
@@ -2015,6 +2040,7 @@ func (f *frame) eval() {
 		case *ast.Alias:
 			// X=e (the old deprecated alias syntax)
 			childFr := f.newBinding(node.Ident, nil)
+			childFr.kind = DeclAlias
 			childFr.navigable.ensureResolvesTo([]*navigable{f.navigable})
 			unprocessed = append(unprocessed, node.Expr)
 
@@ -2033,6 +2059,7 @@ func (f *frame) eval() {
 			//
 			// b and c are not unified.
 			childFr.navigable.name = "__..."
+			childFr.kind = DeclEllipsis
 			f.ellipses = append(f.ellipses, childFr.navigable)
 
 		case *ast.CallExpr:
@@ -2072,7 +2099,8 @@ func (f *frame) eval() {
 			clause := node.Clauses[0]
 			unprocessed = append(unprocessed, clause)
 			if fallback := node.Fallback; fallback != nil {
-				f.newFrame(fallback.Body, f.navigable, true)
+				fallbackFr := f.newFrame(fallback.Body, f.navigable, true)
+				fallbackFr.kind = DeclComprehension
 			}
 			// We don't know how many child frames we'll need to
 			// process clause. So we stash whatever remains of this
@@ -2102,7 +2130,8 @@ func (f *frame) eval() {
 			f.newFrame(node.Condition, nil, false)
 
 			comprehensionTail := comprehensionsStash[node]
-			f.newFrame(comprehensionTail, f.navigable, true)
+			tailFr := f.newFrame(comprehensionTail, f.navigable, true)
+			tailFr.kind = DeclComprehension
 
 		case *ast.ForClause:
 			f.newFrame(node.Source, nil, false)
@@ -2110,14 +2139,19 @@ func (f *frame) eval() {
 			stack := frameStack{f.newFrame(nil, nil, false)}
 
 			if key := node.Key; key != nil {
-				stack.push(key, stack.peek().newBinding(key, nil))
+				keyFr := stack.peek().newBinding(key, nil)
+				keyFr.kind = DeclAlias
+				stack.push(key, keyFr)
 			}
 			if val := node.Value; val != nil {
-				stack.push(val, stack.peek().newBinding(val, nil))
+				valFr := stack.peek().newBinding(val, nil)
+				valFr.kind = DeclAlias
+				stack.push(val, valFr)
 			}
 
 			comprehensionTail := comprehensionsStash[node]
 			tailFr := stack.peek().newFrame(comprehensionTail, f.navigable, true)
+			tailFr.kind = DeclComprehension
 			stack.push(comprehensionTail, tailFr)
 
 		case *ast.LetClause:
@@ -2128,15 +2162,19 @@ func (f *frame) eval() {
 				f.newFrame(node.Expr, nil, false)
 
 				stack := frameStack{f.newFrame(nil, nil, false)}
-				stack.push(ident, stack.peek().newBinding(ident, nil))
+				identFr := stack.peek().newBinding(ident, nil)
+				identFr.kind = DeclAlias
+				stack.push(ident, identFr)
 				tailFr := stack.peek().newFrame(comprehensionTail, f.navigable, true)
+				tailFr.kind = DeclComprehension
 				stack.push(comprehensionTail, tailFr)
 
 			} else {
 				// We're not within a wider comprehension: the binding
 				// must be added to the current frame f because we need to
 				// be able to find it from the first element of a path.
-				f.newBinding(ident, node.Expr)
+				letFr := f.newBinding(ident, node.Expr)
+				letFr.kind = DeclAlias
 			}
 
 		case *ast.TryClause:
@@ -2146,12 +2184,16 @@ func (f *frame) eval() {
 				f.newFrame(node.Expr, nil, false)
 
 				stack := frameStack{f.newFrame(nil, nil, false)}
-				stack.push(ident, stack.peek().newBinding(ident, nil))
+				identFr := stack.peek().newBinding(ident, nil)
+				identFr.kind = DeclAlias
+				stack.push(ident, identFr)
 				tailFr := stack.peek().newFrame(comprehensionTail, f.navigable, true)
+				tailFr.kind = DeclComprehension
 				stack.push(comprehensionTail, tailFr)
 			} else {
 				// Struct form: try { ... }
-				f.newFrame(comprehensionTail, f.navigable, true)
+				tailFr := f.newFrame(comprehensionTail, f.navigable, true)
+				tailFr.kind = DeclComprehension
 			}
 
 		case *ast.Field:
@@ -2174,6 +2216,7 @@ func (f *frame) eval() {
 			}
 
 			childFr := parentFr.newFrame(node.Value, childNav, false)
+			childFr.kind = DeclField
 			if valueAlias != nil {
 				childFr.key = valueAlias
 				childFr.parent.appendBinding(valueAlias.Name, childFr)
@@ -2183,7 +2226,8 @@ func (f *frame) eval() {
 			fieldDecl.valueFrame = childFr
 
 			if keyAlias != nil {
-				parentFr.newBinding(keyAlias, fieldDecl.keyExpr)
+				keyAliasFr := parentFr.newBinding(keyAlias, fieldDecl.keyExpr)
+				keyAliasFr.kind = DeclAlias
 			}
 			if fieldDecl.key != nil {
 				childFr.key = fieldDecl.key
@@ -2257,6 +2301,7 @@ func (f *frame) eval() {
 					fieldName := strings.TrimPrefix(remoteFilename, dir)
 					fieldNameIdent := ast.NewIdent(fieldName)
 					grandChildFr := f.newFrame(fieldNameIdent, f.navigable.ensureNavigable(fieldName), false)
+					grandChildFr.kind = DeclField
 					grandChildFr.addRange(attr)
 					f.appendBinding(fieldName, grandChildFr)
 					frs = append(frs, grandChildFr)

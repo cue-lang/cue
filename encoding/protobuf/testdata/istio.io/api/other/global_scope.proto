@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+// This file intentionally declares no `package`: its messages live in the
+// global proto namespace. It mirrors well-known-type style files that are
+// imported and referenced unqualified from other, named packages.
+option go_package = "istio.io/api/other/global_scope;global_scope";
+
+message GlobalMessage {
+  int64 value = 1;
+}

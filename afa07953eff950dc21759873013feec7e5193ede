@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7d1081f_9955bdbc",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-30T12:25:57Z",
+      "side": 1,
+      "message": "This feels a bit ambiguous to me. It\u0027s not immediately clear whether a child of the node is part of those contributions or not. (I _think_ that we\u0027re talking only about the top level of a node, not any children, but it would be good to be explicit)",
+      "revId": "afa07953eff950dc21759873013feec7e5193ede",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e47fb11_e0a45203",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-30T12:25:57Z",
+      "side": 1,
+      "message": "Might be good to mention pattern constraints: could they be included too?\nWhat about embedded declarations? I\u0027d expect those to \"contribute\" to a Node, but I\u0027m not sure if they are considered to by this code.",
+      "revId": "afa07953eff950dc21759873013feec7e5193ede",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a88c2ca_dc9b2d77",
+        "filename": "unstable/lsp/eval/graph_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-30T12:25:57Z",
+      "side": 1,
+      "message": "I\u0027d like to see some more interesting test cases here: pattern constraints, dynamic fields, hidden fields, definitions etc.",
+      "revId": "afa07953eff950dc21759873013feec7e5193ede",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

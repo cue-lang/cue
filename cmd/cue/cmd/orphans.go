@@ -69,7 +69,7 @@ func (b *buildPlan) parsePlacementFlags() error {
 				flagWithContext, flagPath, flagList, flagFiles,
 			)
 		}
-	} else if b.schema != nil {
+	} else if len(b.schemaExprs) > 0 {
 		return fmt.Errorf(
 			"cannot combine --%s flag with flag %q, %q, or %q",
 			flagSchema, flagPath, flagList, flagFiles,

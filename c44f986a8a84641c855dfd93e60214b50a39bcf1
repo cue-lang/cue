@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddce6c04_e98607be",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-30T14:52:13Z",
+      "side": 1,
+      "message": "Maybe mention that this can be repeated? I had to go looking quite hard for the mention that it could.",
+      "revId": "c44f986a8a84641c855dfd93e60214b50a39bcf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

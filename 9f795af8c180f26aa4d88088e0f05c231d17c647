@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cd47523_aa4c7ca4",
+        "filename": "cmd/cue/cmd/gen_environment_help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-30T15:03:01Z",
+      "side": 1,
+      "message": "nit: I\u0027d put high level functions before the code they call.",
+      "revId": "9f795af8c180f26aa4d88088e0f05c231d17c647",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04206741_3491d35e",
+        "filename": "cmd/cue/cmd/gen_environment_help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-30T15:03:01Z",
+      "side": 1,
+      "message": "This is now the third (at least) occurrence of the copyright string in generation code. How about putting it into an internal package, e.g.\n\n```\npackage copyright\n\n// String returns the CUE copyright message\n// with the given year.\nString(year string) string\n```",
+      "revId": "9f795af8c180f26aa4d88088e0f05c231d17c647",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3a93e08_82fd8b03",
+        "filename": "internal/cuedebug/cuedebug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-06-30T15:03:01Z",
+      "side": 1,
+      "message": "That path won\u0027t work from this directory.\nHow about `go generate cuelang.org/go/cmd/cue/cmd` instead?",
+      "revId": "9f795af8c180f26aa4d88088e0f05c231d17c647",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

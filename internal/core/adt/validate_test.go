@@ -229,6 +229,22 @@ func TestValidate(t *testing.T) {
 				Person.name: field is required but not present:
 				    test:3:5`,
 	}, {
+		// Issue #3992: a required field defined inside a comprehension must
+		// still report the position of its declaration in the error message.
+		name: "required field in comprehension reports position",
+		cfg:  &adt.ValidateConfig{Final: true},
+		in: `
+			x: {
+				if true {
+					foo!: int
+				}
+			}
+			`,
+		out: `incomplete
+				x.foo: field is required but not present:
+				    test:3:5
+				    test:4:6`,
+	}, {
 		name: "allow required fields in definitions",
 		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `

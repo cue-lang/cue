@@ -1,0 +1,53 @@
+# Companion to v2_all_schemas: with AllSchemas off, an unreferenced top-level
+# schema (#Unused) does not appear under components.schemas.
+#v2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+
+#Unused: {a: int}
+#Used: {b: string}
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #Used
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/x": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/Used"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "Used": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "b": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "b"
+            ]
+         }
+      }
+   }
+}

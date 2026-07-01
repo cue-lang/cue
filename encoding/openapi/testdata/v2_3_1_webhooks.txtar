@@ -1,0 +1,51 @@
+# Tests that a schema position inside a 3.1-only location (webhooks) is
+# recognized: webhooks is modeled by #Document_3_1 but not #Document_3_0, so
+# this exercises the version-specific meta-schema selection.
+#v2
+#Version: 3.1
+-- in.cue --
+openapi: "3.1.0"
+info: {title: "t", version: "1"}
+
+#Event: {kind: string}
+
+webhooks: newThing: post: requestBody: content: "application/json": schema: #: #Event
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.1.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "webhooks": {
+      "newThing": {
+         "post": {
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/Event"
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "Event": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "kind": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "kind"
+            ]
+         }
+      }
+   }
+}

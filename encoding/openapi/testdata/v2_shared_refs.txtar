@@ -1,0 +1,70 @@
+# Tests that a schema referenced from more than one position is emitted once
+# under components.schemas and referenced with a $ref from each position.
+#v2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+
+#Item: {name: string}
+
+paths: {
+	"/a": get: responses: "200": content: "application/json": schema: #: #Item
+	"/b": get: responses: "200": content: "application/json": schema: #: #Item
+}
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/a": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/Item"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/b": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/Item"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "Item": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "name": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "name"
+            ]
+         }
+      }
+   }
+}

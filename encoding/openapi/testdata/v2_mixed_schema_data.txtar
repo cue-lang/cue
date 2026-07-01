@@ -1,0 +1,15 @@
+# Tests that combining a "#" definition with sibling data fields at the same
+# Schema Object position is rejected, rather than silently dropping the data.
+#v2
+#Version: 3.0
+#ExpectError: has both a # definition and a data field
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+
+#Whatever: {name: string}
+
+paths: "/x": get: responses: "200": content: "application/json": schema: {
+	#:   #Whatever
+	foo: "bar"
+}

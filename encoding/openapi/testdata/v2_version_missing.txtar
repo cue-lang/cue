@@ -1,0 +1,8 @@
+# Tests that when GenerateConfig.Version is left unset and the document has
+# no "openapi" field, version auto-detection fails with an error.
+#v2
+#ExpectError: openapi field is required but not found
+-- in.cue --
+info: {title: "t", version: "1"}
+
+paths: {}

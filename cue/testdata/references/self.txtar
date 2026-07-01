@@ -127,6 +127,40 @@ cyclicErr: {
 	err3: 4
 }
 
+-- comprehension.cue --
+@experiment(aliasv2)
+
+// self inside a comprehension body resolves to the enclosing struct or list,
+// not to the comprehension's own scope. A comprehension's for/let/try clauses
+// and body are transparent to self. Issue #4422.
+forComp: {
+	n: 2
+	for i in [1, 2] {"k\(i)": self.n}
+}  @test(eq, {n: 2, k1: 2, k2: 2})
+
+// self inside a list comprehension refers to the enclosing list.
+listComp: [10, 20, for _ in [1] {self[0]}]  @test(eq, [10, 20, 10])
+
+// self inside an if comprehension.
+ifComp: {
+	n: 3
+	if true {m: self.n}
+}  @test(eq, {n: 3, m: 3})
+
+// self in a nested struct resolves to that struct, not the outer one.
+nestComp: {
+	outer: {
+		v: 5
+		for i in [1] {"c\(i)": self.v}
+	}
+}  @test(eq, {outer: {v: 5, c1: 5}})
+
+// self across two nested for comprehensions.
+doubleComp: {
+	n: 7
+	for i in [1] for j in [1] {"d\(i)\(j)": self.n}
+}  @test(eq, {n: 7, d11: 7})
+
 -- out/evalalpha --
 Errors:
 listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):

@@ -1,0 +1,14 @@
+#noverify
+
+Regression test for a nil pointer dereference in constraintRequired when the
+"required" array contains a non-string element. See https://cuelang.org/issue/4418.
+
+-- schema.json --
+{
+	"type": "object",
+	"required": [123]
+}
+-- out/decode/extract --
+ERROR:
+invalid string:
+    schema.json:3:15

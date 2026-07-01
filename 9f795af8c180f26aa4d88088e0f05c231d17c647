@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f5751ad_eea591f4",
+        "filename": "cmd/cue/cmd/gen_environment_help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-01T10:51:49Z",
+      "side": 1,
+      "message": "Done. Reordered so the functions called directly by main (extractFlags, generate) come first, with the extractComment helper last.",
+      "parentUuid": "2cd47523_aa4c7ca4",
+      "revId": "9f795af8c180f26aa4d88088e0f05c231d17c647",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "04206741_3491d35e",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f6c7447_d997de89",
+        "filename": "cmd/cue/cmd/gen_environment_help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-01T10:51:49Z",
+      "side": 1,
+      "message": "Done. Added internal/copyright with String(year string) string, and used it in both this generator and gen_experiments_help.go. Regenerating produces byte-identical output.",
+      "parentUuid": "04206741_3491d35e",
+      "revId": "9f795af8c180f26aa4d88088e0f05c231d17c647",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3a93e08_82fd8b03",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-30T15:03:01Z",
       "side": 1,
       "message": "That path won\u0027t work from this directory.\nHow about `go generate cuelang.org/go/cmd/cue/cmd` instead?",
+      "revId": "9f795af8c180f26aa4d88088e0f05c231d17c647",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc8c2603_0fcae777",
+        "filename": "internal/cuedebug/cuedebug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-01T10:51:49Z",
+      "side": 1,
+      "message": "Done. Changed to \"go generate cuelang.org/go/cmd/cue/cmd\".",
+      "parentUuid": "f3a93e08_82fd8b03",
       "revId": "9f795af8c180f26aa4d88088e0f05c231d17c647",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

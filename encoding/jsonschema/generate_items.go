@@ -1034,6 +1034,10 @@ func isolateRef(g *generator, expr ast.Expr) ast.Expr {
 	if !ok || !structHasField(st, "$ref") {
 		return expr
 	}
+	// A $ref with no sibling keywords needs no isolation.
+	if len(st.Elts) == 1 {
+		return expr
+	}
 	for i, d := range st.Elts {
 		if fieldLabel(d) == "$ref" {
 			st.Elts[i] = makeField("allOf", ast.NewList(makeSchemaStructLit(d)))

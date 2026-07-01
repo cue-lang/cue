@@ -68,8 +68,9 @@ func predeclared(n *ast.Ident) adt.Expr {
 		return remBuiltin
 
 	case "self", "__self":
-		// UpCount of 1 gets resolved to relNode(1)
-		return &adt.ValueReference{Src: n, UpCount: 1}
+		// The reference depth is set during resolution by selfUpCount, once the
+		// enclosing scopes are known.
+		return &adt.ValueReference{Src: n}
 
 	case "__no_sharing":
 		return adt.NoShareSentinel

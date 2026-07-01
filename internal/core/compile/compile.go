@@ -262,6 +262,59 @@ func (c *compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 	return entry
 }
 
+// selfUpCount computes the reference depth for a "self" predeclared identifier.
+//
+// self resolves to the struct that lexically contains the outermost
+// comprehension enclosing the reference; comprehension clauses (for/let/try),
+// the struct/list values they inject into, and their body structs are all
+// transparent to self. When the reference is not inside any comprehension,
+// self resolves to the immediately enclosing struct (depth 1), matching a
+// direct reference to that struct from a plain field, embedding or nested
+// struct.
+func (c *compiler) selfUpCount() int32 {
+	// self anchors to the struct enclosing the outermost (lowest on the stack)
+	// comprehension clause; when there is none it anchors to the innermost
+	// struct. Default the anchor to the top of the stack so the sum below is
+	// empty and the depth is 1.
+	anchor := len(c.stack) - 1
+	for k := range c.stack {
+		if isComprehensionScope(c.stack[k]) {
+			anchor = k - 1
+			for anchor >= 0 && !isStructScope(c.stack[anchor]) {
+				anchor--
+			}
+			break
+		}
+	}
+	// Sum the depths of every scope above the anchor, so self skips the
+	// comprehension clauses and the lists and structs they build.
+	up := int32(1)
+	for _, f := range c.stack[anchor+1:] {
+		up += f.upCount
+	}
+	return up
+}
+
+// isComprehensionScope reports whether f is a comprehension clause scope
+// (for/let/try inside a comprehension). Such frames carry the clause AST node
+// as their scope. A top-level let declaration also uses a letScope label but
+// carries the enclosing struct as its scope, so it is not matched here.
+func isComprehensionScope(f frame) bool {
+	switch f.scope.(type) {
+	case *ast.ForClause, *ast.LetClause, *ast.TryClause:
+		return true
+	}
+	return false
+}
+
+func isStructScope(f frame) bool {
+	switch f.scope.(type) {
+	case *ast.StructLit, *ast.File:
+		return true
+	}
+	return false
+}
+
 func (c *compiler) pushScope(n labeler, upCount int32, id ast.Node) *frame {
 	c.stack = append(c.stack, frame{
 		label:   n,
@@ -395,6 +448,9 @@ func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
 			return c.errf(src, "%s %q requires @experiment(aliasv2)", kind, name)
 		}
 		x.Label = adt.MakeStringLabel(c.index, name)
+		// self resolves to the enclosing struct; its reference depth depends on
+		// the scopes it is nested in, so it cannot be a constant.
+		x.UpCount = c.selfUpCount()
 		return n
 	}
 

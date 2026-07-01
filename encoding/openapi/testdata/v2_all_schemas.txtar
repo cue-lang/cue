@@ -1,0 +1,66 @@
+# Tests that AllSchemas emits a components.schemas entry for every top-level
+# schema, including #Unused which is never referenced from the document.
+#v2
+#Version: 3.0
+#AllSchemas
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+
+#Unused: {a: int}
+#Used: {b: string}
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #Used
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/x": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/Used"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "Unused": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "a": {
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "a"
+            ]
+         },
+         "Used": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "b": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "b"
+            ]
+         }
+      }
+   }
+}

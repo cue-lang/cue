@@ -1,0 +1,53 @@
+# Tests that NamesFunc controls the names of the shared schemas and the $ref
+# fragments that point at them.
+#v2
+#Version: 3.0
+#NamesFunc: toUpper
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+
+#Item: {name: string}
+
+paths: "/a": get: responses: "200": content: "application/json": schema: #: #Item
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/a": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ITEM"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "ITEM": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "name": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "name"
+            ]
+         }
+      }
+   }
+}

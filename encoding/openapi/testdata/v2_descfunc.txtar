@@ -1,0 +1,59 @@
+# Tests that DescriptionFunc supplies descriptions for the generated schemas.
+#v2
+#Version: 3.0
+#DescriptionFunc: randomish
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+
+#Item: {name: string}
+
+paths: "/a": get: responses: "200": content: "application/json": schema: #: #Item
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/a": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "description": "Randomly picked description from a set of size one.",
+                           "allOf": [
+                              {
+                                 "$ref": "#/components/schemas/Item"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "Item": {
+            "type": "object",
+            "description": "Randomly picked description from a set of size one.",
+            "additionalProperties": false,
+            "properties": {
+               "name": {
+                  "type": "string",
+                  "description": "Randomly picked description from a set of size one."
+               }
+            },
+            "required": [
+               "name"
+            ]
+         }
+      }
+   }
+}

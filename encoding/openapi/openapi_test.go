@@ -72,6 +72,10 @@ func TestGenerateOpenAPI(t *testing.T) {
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		t.Parallel()
+		if t.HasTag("v2") {
+			generateV2Test(t)
+			return
+		}
 		a := t.Instance()
 		ctx := t.CueContext()
 		v := ctx.BuildInstance(a)

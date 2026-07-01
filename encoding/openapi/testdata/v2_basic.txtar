@@ -1,0 +1,87 @@
+# Tests whole-document generation: non-schema content (including the x-vendor
+# extension and the operation summary) is preserved verbatim, the # at a
+# response position becomes a $ref, and the referenced schema together with its
+# transitive dependency is emitted under components.schemas.
+#v2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:      "Users API"
+	version:    "1.0.0"
+	"x-vendor": "keep"
+}
+
+#User: {id: int, name: string, address?: #Address}
+#Address: {street: string, city: string}
+
+paths: "/users/{id}": get: {
+	summary: "get a user"
+	responses: "200": content: "application/json": schema: #: #User
+}
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "Users API",
+      "version": "1.0.0",
+      "x-vendor": "keep"
+   },
+   "paths": {
+      "/users/{id}": {
+         "get": {
+            "summary": "get a user",
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/User"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "Address": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "city": {
+                  "type": "string"
+               },
+               "street": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "city",
+               "street"
+            ]
+         },
+         "User": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "address": {
+                  "$ref": "#/components/schemas/Address"
+               },
+               "id": {
+                  "type": "integer"
+               },
+               "name": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "id",
+               "name"
+            ]
+         }
+      }
+   }
+}

@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/internal/anyhash"
 )
 
@@ -64,6 +65,13 @@ type GenerateConfig struct {
 	// If this is nil and [GenerateConfig.NameFunc] is also nil,
 	// [DefaultNamesFunc] will be used.
 	NamesFunc func(refs []*CUERef)
+
+	// DescriptionFunc, if non-nil, returns the description to use for the
+	// schema generated from the given value. It is passed the value and its
+	// path (as reported by [cue.Value.Path]). When it returns the empty string
+	// no description is emitted. When nil, descriptions are derived from the
+	// value's doc comments.
+	DescriptionFunc func(v cue.Value, path cue.Path) string
 
 	// ExplicitOpen, when true, will never close a schema with `additionalProperties: false`
 	// (but _will_ explicitly open a schema with `additionalProperties: true`
@@ -178,11 +186,133 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if err := v.Validate(); err != nil {
 		return nil, err
 	}
+	g, err := newGenerator(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Phase 1: build the item tree, collecting all references.
+	rootItem := g.buildRoot(v)
+
+	// Phase 2: assign names to all collected references before
+	// generating any AST, because CUERef.generate uses the Name.
+	defKeys, err := g.assignNames()
+	if err != nil {
+		return nil, err
+	}
+
+	// Phase 3: optimize and generate the AST.
+	st, err := g.renderRoot(rootItem, v)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add schema version metadata and definitions.
+	var fields []ast.Decl
+	if g.dialect.emitSchemaKeyword {
+		fields = append(fields, makeField("$schema", ast.NewString(g.cfg.Version.String())))
+	}
+	if len(defKeys) > 0 {
+		defFields := make([]ast.Decl, 0, len(defKeys))
+		for _, k := range defKeys {
+			defFields = append(defFields, makeField(k.Name, g.renderDef(k)))
+		}
+		fields = append(fields, makeNestedField(g.dialect.refPrefix, &ast.StructLit{Elts: defFields}))
+	}
+	fields = append(fields, st.Elts...)
+
+	if g.err != nil {
+		return nil, g.err
+	}
+	// When the root schema is itself a $ref, keep it out of the same
+	// schema object as $schema and the definitions for dialects that
+	// would otherwise ignore those keywords.
+	return isolateRef(g, makeSchemaStructLit(fields...)), nil
+}
+
+// GenerateMulti is like [Generate] but generates several schemas at once,
+// sharing a single pool of definitions between them.
+//
+// Instead of nesting a definitions block (such as $defs) inside each
+// generated schema, references are emitted rooted at sharedSchemaRoot (a JSON
+// Pointer such as "#/components/schemas") and the referred-to schemas are
+// returned in the map, keyed by the reference name assigned by
+// [GenerateConfig.NamesFunc]. Identical definitions referenced from more than
+// one of the values are deduplicated into a single map entry.
+//
+// The returned expressions correspond one-to-one with values. They do not
+// carry a $schema keyword; placing the returned schemas and shared
+// definitions into a containing document is the caller's responsibility.
+//
+// Note: this functionality is currently experimental. The form of the
+// generated schema may, and probably will, change from release to release.
+func GenerateMulti(values []cue.Value, sharedSchemaRoot string, cfg *GenerateConfig) ([]ast.Expr, map[string]ast.Expr, error) {
+	for _, v := range values {
+		if err := v.Validate(); err != nil {
+			return nil, nil, err
+		}
+	}
+	g, err := newGenerator(cfg)
+	if err != nil {
+		return nil, nil, err
+	}
+	refPrefix, err := refPrefixFromRoot(sharedSchemaRoot)
+	if err != nil {
+		return nil, nil, err
+	}
+	g.dialect.refPrefix = refPrefix
+
+	// Phase 1: build every item tree, collecting all references into the
+	// single shared g.defs pool.
+	rootItems := make([]internItem, len(values))
+	for i, v := range values {
+		rootItems[i] = g.buildRoot(v)
+	}
+
+	// Phase 2: assign names across the whole shared pool.
+	defKeys, err := g.assignNames()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Phase 3: render each root and the shared definitions.
+	exprs := make([]ast.Expr, len(values))
+	for i := range values {
+		st, err := g.renderRoot(rootItems[i], values[i])
+		if err != nil {
+			return nil, nil, err
+		}
+		exprs[i] = isolateRef(g, makeSchemaStructLit(st.Elts...))
+	}
+	shared := make(map[string]ast.Expr, len(defKeys))
+	for _, k := range defKeys {
+		shared[k.Name] = g.renderDef(k)
+	}
+
+	if g.err != nil {
+		return nil, nil, g.err
+	}
+	return exprs, shared, nil
+}
+
+// refPrefixFromRoot converts a shared-schema-root JSON Pointer such as
+// "#/components/schemas" into the sequence of tokens used as the
+// [generateDialect.refPrefix].
+func refPrefixFromRoot(root string) ([]string, error) {
+	s := strings.TrimPrefix(root, "#")
+	if s != "" && !strings.HasPrefix(s, "/") {
+		return nil, fmt.Errorf("invalid shared schema root %q: must be a JSON Pointer", root)
+	}
+	return slices.Collect(json.Pointer(s).Tokens()), nil
+}
+
+// newGenerator returns a generator with a normalized copy of cfg.
+func newGenerator(cfg *GenerateConfig) (*generator, error) {
 	if cfg == nil {
 		cfg = &GenerateConfig{}
 	} else {
 		// Prevent mutation of the argument.
-		cfg = *ref(cfg)
+		cfg = ref(*cfg)
 	}
 	if cfg.NamesFunc == nil {
 		if cfg.NameFunc != nil {
@@ -203,13 +333,18 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	g := &generator{
+	return &generator{
 		cfg:     cfg,
 		dialect: d,
 		defs:    anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
 		unique:  newUniqueItems(),
-	}
+	}, nil
+}
+
+// buildRoot builds the item tree for a single root value, collecting any
+// references into g.defs. It is phase 1 of generation and may be called more
+// than once (by [GenerateMulti]) to share a single definitions pool.
+func (g *generator) buildRoot(v cue.Value) internItem {
 	mode := open
 	switch {
 	case v.IsClosedRecursively():
@@ -217,35 +352,40 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	case v.IsClosed():
 		mode = closed
 	}
+	return g.makeItem(v, mode)
+}
 
-	// Phase 1: build the item tree, collecting all references.
-	rootItem := g.makeItem(v, mode)
-
-	// Phase 2: assign names to all collected references before
-	// generating any AST, because CUERef.generate uses the Name.
-	var defKeys []*CUERef
-	if n := g.defs.Len(); n != 0 {
-		defKeys = slices.Collect(g.defs.Keys())
-		slices.SortFunc(defKeys, func(k1, k2 *CUERef) int {
-			return k1.Path.Compare(k2.Path)
-		})
-		g.cfg.NamesFunc(defKeys)
-		slices.SortFunc(defKeys, func(k1, k2 *CUERef) int {
-			return cmp.Compare(k1.Name, k2.Name)
-		})
-		if defKeys[0].Name == "" {
-			return nil, fmt.Errorf("NamesFunc did not set Name field in all *CUERef values")
-		}
-		prev := ""
-		for _, k := range defKeys {
-			if k.Name == prev {
-				return nil, fmt.Errorf("NamesFunc returned non-unique name %q", k.Name)
-			}
-			prev = k.Name
-		}
+// assignNames names every reference collected in g.defs, returning the
+// definition keys sorted by name. It must be called once after all roots have
+// been built (phase 2). It returns a nil slice when there are no references.
+func (g *generator) assignNames() ([]*CUERef, error) {
+	if g.defs.Len() == 0 {
+		return nil, nil
 	}
+	defKeys := slices.Collect(g.defs.Keys())
+	slices.SortFunc(defKeys, func(k1, k2 *CUERef) int {
+		return k1.Path.Compare(k2.Path)
+	})
+	g.cfg.NamesFunc(defKeys)
+	slices.SortFunc(defKeys, func(k1, k2 *CUERef) int {
+		return cmp.Compare(k1.Name, k2.Name)
+	})
+	if defKeys[0].Name == "" {
+		return nil, fmt.Errorf("NamesFunc did not set Name field in all *CUERef values")
+	}
+	prev := ""
+	for _, k := range defKeys {
+		if k.Name == prev {
+			return nil, fmt.Errorf("NamesFunc returned non-unique name %q", k.Name)
+		}
+		prev = k.Name
+	}
+	return defKeys, nil
+}
 
-	// Phase 3: optimize and generate the AST.
+// renderRoot optimizes and renders a single root item into a struct literal
+// (phase 3). The value v is used only for error reporting.
+func (g *generator) renderRoot(rootItem internItem, v cue.Value) (*ast.StructLit, error) {
 	rootItem = optimize(rootItem, g.unique)
 	expr := rootItem.Value().generate(g)
 
@@ -264,29 +404,13 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if !ok {
 		return nil, fmt.Errorf("expected struct literal from generate, got %T", expr)
 	}
+	return st, nil
+}
 
-	// Add schema version metadata and definitions.
-	var fields []ast.Decl
-	if g.dialect.emitSchemaKeyword {
-		fields = append(fields, makeField("$schema", ast.NewString(cfg.Version.String())))
-	}
-	if len(defKeys) > 0 {
-		defFields := make([]ast.Decl, 0, len(defKeys))
-		for _, k := range defKeys {
-			def := optimize(g.defs.At(k), g.unique)
-			defFields = append(defFields, makeField(k.Name, def.Value().generate(g)))
-		}
-		fields = append(fields, makeNestedField(g.dialect.refPrefix, &ast.StructLit{Elts: defFields}))
-	}
-	fields = append(fields, st.Elts...)
-
-	if g.err != nil {
-		return nil, g.err
-	}
-	// When the root schema is itself a $ref, keep it out of the same
-	// schema object as $schema and the definitions for dialects that
-	// would otherwise ignore those keywords.
-	return isolateRef(g, makeSchemaStructLit(fields...)), nil
+// renderDef optimizes and renders a single shared definition.
+func (g *generator) renderDef(k *CUERef) ast.Expr {
+	def := optimize(g.defs.At(k), g.unique)
+	return def.Value().generate(g)
 }
 
 func optimize(it internItem, u *uniqueItems) internItem {
@@ -449,7 +573,11 @@ func (g *generator) addErrorf(pos cue.Value, f string, a ...any) {
 // for v in naive form.
 func (g *generator) makeItem(v cue.Value, mode closedMode) internItem {
 	it := g.unique.intern(g.makeItem0(v, mode))
-	if desc := docString(v); desc != "" {
+	desc := docString(v)
+	if g.cfg.DescriptionFunc != nil {
+		desc = g.cfg.DescriptionFunc(v, v.Path())
+	}
+	if desc != "" {
 		it = g.unique.intern(&itemDescription{description: desc, elem: it})
 	}
 	return it

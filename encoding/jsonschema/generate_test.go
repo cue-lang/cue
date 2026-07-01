@@ -19,9 +19,12 @@ import (
 	"io/fs"
 	"maps"
 	"slices"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/jsonschema"
@@ -144,6 +147,52 @@ func TestGenerate(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestGenerateMulti(t *testing.T) {
+	ctx := cuecontext.New()
+	const src = `
+#Address: {street: string, city: string}
+#Person: {name: string, home: #Address, work: #Address}
+#Company: {name: string, address: #Address}
+`
+	root := ctx.CompileString(src)
+	qt.Assert(t, qt.IsNil(root.Err()))
+
+	person := root.LookupPath(cue.ParsePath("#Person"))
+	company := root.LookupPath(cue.ParsePath("#Company"))
+
+	exprs, shared, err := jsonschema.GenerateMulti(
+		[]cue.Value{person, company},
+		"#/components/schemas",
+		&jsonschema.GenerateConfig{Version: jsonschema.VersionOpenAPI},
+	)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.HasLen(exprs, 2))
+
+	// The single shared definition (#Address, referenced by both roots)
+	// is deduplicated into one map entry.
+	qt.Assert(t, qt.DeepEquals(slices.Sorted(maps.Keys(shared)), []string{"Address"}))
+
+	// Both roots reference the shared definition rather than inlining it,
+	// and the reference is rooted at the requested sharedSchemaRoot.
+	for i, e := range exprs {
+		s := formatNode(t, e)
+		qt.Assert(t, qt.IsTrue(strings.Contains(s, "#/components/schemas/Address")),
+			qt.Commentf("expr %d = %s", i, s))
+	}
+
+	// The returned schemas carry no $schema keyword and no nested
+	// definitions block: the shared definitions are returned separately.
+	personSchema := formatNode(t, exprs[0])
+	qt.Assert(t, qt.IsFalse(strings.Contains(personSchema, "$schema")))
+	qt.Assert(t, qt.IsFalse(strings.Contains(personSchema, "$defs")))
+}
+
+func formatNode(t *testing.T, n ast.Node) string {
+	data, err := format.Node(n)
+	qt.Assert(t, qt.IsNil(err))
+	return string(data)
 }
 
 type generateDataTest struct {

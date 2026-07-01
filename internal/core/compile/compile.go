@@ -262,6 +262,39 @@ func (c *compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 	return entry
 }
 
+// selfUpCount computes the reference depth for a "self" predeclared identifier.
+//
+// self resolves to the innermost enclosing struct or list. A comprehension
+// does not introduce one: the implicit blocks of its for/let/try clauses and
+// the body it injects as an embedding are transparent and are skipped, so self
+// reaches the struct or list the comprehension is declared in. Outside any
+// comprehension the depth is 1, matching a direct reference to the enclosing
+// struct from a plain field, embedding or nested struct.
+func (c *compiler) selfUpCount() int32 {
+	up := int32(1)
+	for k := len(c.stack) - 1; k >= 0; k-- {
+		clause := isComprehensionScope(c.stack[k])
+		body := k > 0 && isComprehensionScope(c.stack[k-1])
+		if !clause && !body {
+			break
+		}
+		up += c.stack[k].upCount
+	}
+	return up
+}
+
+// isComprehensionScope reports whether f is a comprehension clause scope
+// (for/let/try inside a comprehension). Such frames carry the clause AST node
+// as their scope. A top-level let declaration also uses a letScope label but
+// carries the enclosing struct as its scope, so it is not matched here.
+func isComprehensionScope(f frame) bool {
+	switch f.scope.(type) {
+	case *ast.ForClause, *ast.LetClause, *ast.TryClause:
+		return true
+	}
+	return false
+}
+
 func (c *compiler) pushScope(n labeler, upCount int32, id ast.Node) *frame {
 	c.stack = append(c.stack, frame{
 		label:   n,
@@ -395,6 +428,9 @@ func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
 			return c.errf(src, "%s %q requires @experiment(aliasv2)", kind, name)
 		}
 		x.Label = adt.MakeStringLabel(c.index, name)
+		// self resolves to the enclosing struct; its reference depth depends on
+		// the scopes it is nested in, so it cannot be a constant.
+		x.UpCount = c.selfUpCount()
 		return n
 	}
 

@@ -1,0 +1,69 @@
+# Tests that AllSchemas composes with a custom NamesFunc: a referenced
+# top-level schema must appear once, under the name assigned by NamesFunc,
+# not duplicated under a default-derived name; unreferenced top-level
+# schemas are named by the same NamesFunc.
+#v2
+#Version: 3.0
+#AllSchemas
+#NamesFunc: toUpper
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+
+#Unused: {a: int}
+#Used: {b: string}
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #Used
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/x": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/USED"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "UNUSED": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "a": {
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "a"
+            ]
+         },
+         "USED": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "b": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "b"
+            ]
+         }
+      }
+   }
+}

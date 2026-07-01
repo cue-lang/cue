@@ -1,0 +1,36 @@
+# Tests that a schema position holding a raw JSON Schema value (no #
+# definition) is passed through verbatim, with the meta-schema marker dropped.
+#v2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+
+paths: "/x": get: responses: "400": content: "application/json": schema: {
+	type: "string"
+}
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/x": {
+         "get": {
+            "responses": {
+               "400": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "type": "string"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}

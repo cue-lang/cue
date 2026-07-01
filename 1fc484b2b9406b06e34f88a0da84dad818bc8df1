@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "048de82a_41cadef3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2026-07-01T07:17:56Z",
+      "side": 1,
+      "message": "re-applying mvdan\u0027s +2",
+      "revId": "1fc484b2b9406b06e34f88a0da84dad818bc8df1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

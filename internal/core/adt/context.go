@@ -980,7 +980,7 @@ func (c *OpContext) typeError(v Value, k Kind) {
 	if isError(v) {
 		return
 	}
-	if !IsConcrete(v) && v.Kind()&k != 0 {
+	if (!IsConcrete(v) && v.Kind()&k != 0) || hasUnresolvedAncestorCycle(v) {
 		c.addErrf(IncompleteError, Pos(v), "incomplete %s: %s", k, v)
 	} else {
 		c.AddErrf("cannot use %s (type %s) as type %s", v, v.Kind(), k)
@@ -995,12 +995,24 @@ func (c *OpContext) typeErrorAs(v Value, k Kind, as interface{}) {
 	if isError(v) {
 		return
 	}
-	if !IsConcrete(v) && v.Kind()&k != 0 {
+	if (!IsConcrete(v) && v.Kind()&k != 0) || hasUnresolvedAncestorCycle(v) {
 		c.addErrf(IncompleteError, Pos(v),
 			"incomplete %s in %v: %s", k, as, v)
 	} else {
 		c.AddErrf("cannot use %s (type %s) as type %s in %v", v, v.Kind(), k, as)
 	}
+}
+
+// hasUnresolvedAncestorCycle reports whether v is a Vertex that only appears
+// concrete because it is an under-resolved copy of an ancestor reached through
+// a structural cycle (for instance the vertex bound by `let X = self`). Such a
+// value is not genuinely concrete: the same field resolves normally on the
+// non-cyclic original, so converting it to a scalar must yield an incomplete
+// error (which cyclic copies tolerate) rather than a permanent type error.
+// See https://cuelang.org/issue/4420.
+func hasUnresolvedAncestorCycle(v Value) bool {
+	x, ok := v.(*Vertex)
+	return ok && x.state != nil && x.state.hasAncestorCycle
 }
 
 var emptyNode = &Vertex{status: finalized}

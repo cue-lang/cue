@@ -33,16 +33,8 @@ e: {
 	}
 }
 -- out/evalalpha --
-Errors:
-e.self.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
-    ./in.cue:9:6
-    ./in.cue:9:9
-
-Result:
-(_|_){
-  // [eval]
-  e: (_|_){
-    // [eval]
+(struct){
+  e: (struct){
     let self#1 = (_|_){
       // [structural_cycle] e.self: structural cycle
     }
@@ -59,11 +51,7 @@ Result:
       // [structural_cycle] e.self: structural cycle
     }
     s: (bool){ true }
-    x: (_|_){
-      // [eval] e.self.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
-      //     ./in.cue:9:6
-      //     ./in.cue:9:9
-    }
+    x: (int){ 1 }
   }
 }
 -- out/eval/stats --

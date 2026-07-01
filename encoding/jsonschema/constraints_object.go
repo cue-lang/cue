@@ -456,8 +456,11 @@ func constraintRequired(key string, n cue.Value, s *state) {
 
 	for _, n := range s.listItems("required", n, true) {
 		str, ok := s.strValue(n)
+		if !ok {
+			continue // strValue already reported the error
+		}
 		f := fields[str]
-		if f == nil && ok {
+		if f == nil {
 			f := &ast.Field{
 				Label:      ast.NewString(str),
 				Value:      top(),

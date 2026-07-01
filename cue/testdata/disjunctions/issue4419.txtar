@@ -1,0 +1,21 @@
+# Deduping two disjuncts with a finalized (reclaimed) matching arc must not
+# panic when merging their close-info.
+-- in.cue --
+import "struct"
+
+b: {[string]: string} | *{} @test(eq, {test: "test"})
+a: struct.MaxFields(8) & {[string]: string} @test(eq, {test: "test"})
+b: "test": "test"
+a: b
+-- out/eval/stats --
+Leaks:  3
+Freed:  10
+Reused: 4
+Allocs: 9
+Retain: 0
+
+Unifications: 5
+Conjuncts:    17
+Disjuncts:    4
+
+NumCloseIDs: 1

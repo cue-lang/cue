@@ -913,6 +913,14 @@ type reqSet struct {
 // TODO: consider whether we can do without. We usually aim to not check
 // such nodes, but sometimes we do.
 func mergeCloseInfo(nv, nw *nodeContext) {
+	// A nil arc state (reached via the recursion below) only occurs for a
+	// finalized or never-started arc, whose reclaimed nodeContext we may meet
+	// after disjunct reclaim. A finalized arc already has computedCloseInfo
+	// set, so getReqSets returns its cached reqSets and any merge here would
+	// have no effect; skipping drops no information.
+	if nv == nil || nw == nil {
+		return
+	}
 	v := nv.node
 	w := nw.node
 	if w == nil {

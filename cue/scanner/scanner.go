@@ -520,7 +520,7 @@ func (s *Scanner) scanString(offs int, quote quoteInfo, continuation bool) (toke
 	if tok == token.STRING && quote.minLineWS != nil {
 		closingWS := s.src[lineStart : s.offset-int(quote.numChar)-quote.numHash]
 		if !bytes.HasPrefix(quote.minLineWS, closingWS) {
-			s.errf(quote.startOffset, "non-matching whitespace for multiline strings")
+			s.errf(quote.startOffset, "non-matching whitespace for multiline string (expected %q, got %q)", closingWS, quote.minLineWS)
 		}
 	}
 	return tok, string(lit)

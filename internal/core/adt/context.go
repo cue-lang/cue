@@ -980,7 +980,7 @@ func (c *OpContext) typeError(v Value, k Kind) {
 	if isError(v) {
 		return
 	}
-	if !IsConcrete(v) && v.Kind()&k != 0 {
+	if (!IsConcrete(v) && v.Kind()&k != 0) || c.hasUnresolvedAncestorCycle(v) {
 		c.addErrf(IncompleteError, Pos(v), "incomplete %s: %s", k, v)
 	} else {
 		c.AddErrf("cannot use %s (type %s) as type %s", v, v.Kind(), k)
@@ -995,12 +995,27 @@ func (c *OpContext) typeErrorAs(v Value, k Kind, as interface{}) {
 	if isError(v) {
 		return
 	}
-	if !IsConcrete(v) && v.Kind()&k != 0 {
+	if (!IsConcrete(v) && v.Kind()&k != 0) || c.hasUnresolvedAncestorCycle(v) {
 		c.addErrf(IncompleteError, Pos(v),
 			"incomplete %s in %v: %s", k, as, v)
 	} else {
 		c.AddErrf("cannot use %s (type %s) as type %s in %v", v, v.Kind(), k, as)
 	}
+}
+
+// hasUnresolvedAncestorCycle reports whether v is a Vertex that only appears
+// concrete because it is an under-resolved copy of an ancestor reached
+// through a structural cycle, such as the vertex bound by `let X = self`;
+// scalar conversion must then report an incomplete error, not a permanent
+// one. See https://cuelang.org/issue/4420.
+//
+// TODO(cycle): this compensates for conjuncts parked by the CallExpr
+// deferment in [nodeContext.scheduleConjunct]; better would be to not
+// propagate the cyclic marking onto fresh inline vertices at all.
+func (c *OpContext) hasUnresolvedAncestorCycle(v Value) bool {
+	x, ok := v.(*Vertex)
+	return ok && x.state != nil && x.state.ctx.opID == c.opID &&
+		x.state.hasOnlyCyclicConjuncts()
 }
 
 var emptyNode = &Vertex{status: finalized}

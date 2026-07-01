@@ -117,7 +117,7 @@ withLetDynamicField: {
 	for k, _ in g {
 		G: k
 	}
-	@test(eq:todo, {
+	@test(eq, {
 		h: a: c: 1
 		g: "1": true
 		G: "1"
@@ -147,7 +147,7 @@ withLetDynamicFieldRef: {
 	for k, _ in g {
 		G: k
 	}
-	@test(eq:todo, {
+	@test(eq, {
 		h: a: c: 1
 		g: "1": true
 		G: "1"
@@ -386,12 +386,6 @@ a: {
     ./validator.cue:19:12
     ./validator.cue:18:12
     ./validator.cue:19:19
-[eval] withLetDynamicField.Y.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
-    ./withlet.cue:52:6
-    ./withlet.cue:52:9
-[eval] withLetDynamicFieldRef.Y.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
-    ./withlet.cue:82:6
-    ./withlet.cue:82:9
 -- out/eval/stats --
 Leaks:  39
 Freed:  125

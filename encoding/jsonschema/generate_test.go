@@ -15,13 +15,17 @@
 package jsonschema_test
 
 import (
+	"fmt"
 	"io"
 	"io/fs"
 	"maps"
 	"slices"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/jsonschema"
@@ -144,6 +148,68 @@ func TestGenerate(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestGenerateMulti(t *testing.T) {
+	ctx := cuecontext.New()
+	const src = `
+#Address: {street: string, city: string}
+#Person: {name: string, home: #Address, work: #Address}
+#Company: {name: string, address: #Address}
+`
+	root := ctx.CompileString(src)
+	qt.Assert(t, qt.IsNil(root.Err()))
+
+	person := root.LookupPath(cue.ParsePath("#Person"))
+	company := root.LookupPath(cue.ParsePath("#Company"))
+
+	exprs, shared, err := jsonschema.GenerateMulti(
+		[]cue.Value{person, company},
+		"#/components/schemas",
+		&jsonschema.GenerateConfig{Version: jsonschema.VersionOpenAPI},
+	)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.HasLen(exprs, 2))
+
+	// The single shared definition (#Address, referenced by both roots)
+	// is deduplicated into one map entry.
+	qt.Assert(t, qt.DeepEquals(slices.Sorted(maps.Keys(shared)), []string{"Address"}))
+
+	// Both roots reference the shared definition rather than inlining it,
+	// and the reference is rooted at the requested sharedSchemaRoot.
+	var buf strings.Builder
+	for i, e := range exprs {
+		fmt.Fprintf(&buf, "\n-- expr-%d --\n", i)
+		fmt.Fprintf(&buf, "%s", formatNode(t, e))
+	}
+	qt.Assert(t, qt.Equals(buf.String(), `
+-- expr-0 --
+{
+	type:                 "object"
+	additionalProperties: false
+	properties: {
+		home: $ref: "#/components/schemas/Address"
+		name: type: "string"
+		work: $ref: "#/components/schemas/Address"
+	}
+	required: ["home", "name", "work"]
+}
+-- expr-1 --
+{
+	type:                 "object"
+	additionalProperties: false
+	properties: {
+		address: $ref: "#/components/schemas/Address"
+		name: type:    "string"
+	}
+	required: ["address", "name"]
+}`))
+}
+
+func formatNode(t *testing.T, n ast.Node) string {
+	data, err := format.Node(n)
+	qt.Assert(t, qt.IsNil(err))
+	return string(data)
 }
 
 type generateDataTest struct {

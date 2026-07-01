@@ -1,0 +1,52 @@
+# Tests that when GenerateConfig.Version is left unset, the version is
+# auto-detected from the document's "openapi" field. The document declares
+# 3.1.0 and holds a schema inside webhooks, a 3.1-only location: with the
+# 3.0 meta-schema the position would go unmarked and the schema would be
+# silently dropped.
+#v2
+-- in.cue --
+openapi: "3.1.0"
+info: {title: "t", version: "1"}
+
+#Event: {kind: string}
+
+webhooks: newThing: post: requestBody: content: "application/json": schema: #: #Event
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.1.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "webhooks": {
+      "newThing": {
+         "post": {
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/Event"
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "Event": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "kind": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "kind"
+            ]
+         }
+      }
+   }
+}

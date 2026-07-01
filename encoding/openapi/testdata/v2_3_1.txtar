@@ -1,0 +1,60 @@
+# Tests OpenAPI 3.1 generation, which uses the JSON Schema 2020-12 dialect:
+# nullability is expressed with a "null" type (here via anyOf) rather than the
+# 3.0-only "nullable" keyword.
+#v2
+#Version: 3.1
+-- in.cue --
+openapi: "3.1.0"
+info: {title: "t", version: "1"}
+
+#N: {v: string | null}
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #N
+-- out/TestGenerateOpenAPI/out.json --
+{
+   "openapi": "3.1.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/x": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/N"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "N": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "v": {
+                  "anyOf": [
+                     {
+                        "type": "string"
+                     },
+                     {
+                        "type": "null"
+                     }
+                  ]
+               }
+            },
+            "required": [
+               "v"
+            ]
+         }
+      }
+   }
+}

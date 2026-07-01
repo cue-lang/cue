@@ -1,0 +1,80 @@
+#inlinetest:exclude the whole-package result is a spurious eval error before
+# the fix, which is clearest as a golden tree rather than per-field @test.
+#
+# Tests that firing an inherited comprehension on a `let self = self` copy does
+# not surface a spurious "invalid interpolation" error. On the cyclic copy the
+# for-clause re-enters the ancestor, so a pattern-constrained field such as
+# `x.c` is only under-resolved there (an empty struct) rather than a concrete
+# value. Converting such an under-resolved cyclic value to a scalar must yield
+# an incomplete error, which the copy tolerates, rather than a permanent type
+# error that poisons unrelated lookups like `self.s`.
+# https://cuelang.org/issue/4420
+-- in.cue --
+@experiment(aliasv2)
+
+e: {
+	let self = self
+	h: [string]~K: c: len(K)
+	h: a: _
+	g: _
+	for x in self.h {
+		g: "\({if true {x.c}})": true
+	}
+	for k, _ in g {
+		G: k
+	}
+}
+e: {
+	let self = self
+	s: true
+	x: {
+		if self.s {1}
+		if !self.s {2}
+	}
+}
+-- out/evalalpha --
+Errors:
+e.self.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
+    ./in.cue:9:6
+    ./in.cue:9:9
+
+Result:
+(_|_){
+  // [eval]
+  e: (_|_){
+    // [eval]
+    let self#1 = (_|_){
+      // [structural_cycle] e.self: structural cycle
+    }
+    h: (struct){
+      a: (struct){
+        c: (int){ 1 }
+      }
+    }
+    g: (struct){
+      "1": (bool){ true }
+    }
+    G: (string){ "1" }
+    let self#2 = (_|_){
+      // [structural_cycle] e.self: structural cycle
+    }
+    s: (bool){ true }
+    x: (_|_){
+      // [eval] e.self.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
+      //     ./in.cue:9:6
+      //     ./in.cue:9:9
+    }
+  }
+}
+-- out/eval/stats --
+Leaks:  11
+Freed:  13
+Reused: 6
+Allocs: 18
+Retain: 0
+
+Unifications: 20
+Conjuncts:    39
+Disjuncts:    0
+
+NumCloseIDs: 19

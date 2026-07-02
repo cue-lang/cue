@@ -111,6 +111,9 @@ forComp: {
 	for i in [1, 2] {"k\(i)": self.n}
 }
 
+// self inside a list comprehension refers to the enclosing list.
+listComp: [10, 20, for _ in [1] {self[0]}]
+
 // self inside an if comprehension.
 ifComp: {
 	n: 3
@@ -148,9 +151,18 @@ a: {
       1,
       2,
     ] {
-      "k\(〈1;i〉)": 〈1〉.n
+      "k\(〈1;i〉)": 〈3〉.n
     }
   }
+  listComp: [
+    10,
+    20,
+    for _, _ in [
+      1,
+    ] {
+      〈3〉[0]
+    },
+  ]
   ifComp: {
     n: 3
     if true {
@@ -163,7 +175,7 @@ a: {
       for _, i in [
         1,
       ] {
-        "c\(〈1;i〉)": 〈1〉.v
+        "c\(〈1;i〉)": 〈3〉.v
       }
     }
   }
@@ -174,7 +186,7 @@ a: {
     ] for _, j in [
       1,
     ] {
-      "d\(〈2;i〉)\(〈1;j〉)": 〈1〉.n
+      "d\(〈2;i〉)\(〈1;j〉)": 〈4〉.n
     }
   }
 }

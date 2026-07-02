@@ -883,14 +883,27 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	// TODO(mem): add counter for let cache usage.
 	key := cacheKey{expr, arc}
 	v, ok := e.cache[key]
+	recompute := false
 	if ok {
 		// A cached cycle placeholder is provisional: it was computed before a
 		// dependency had settled. Recompute it in case the dependency now has a
 		// concrete value, but only while the let arc has not finalized: once it
 		// has, the value is settled and recomputing would loop on the same
 		// placeholder forever.
-		if cv := v.(*Vertex); isCyclePlaceholder(cv.BaseValue) && arc.status != finalized {
+		//
+		// Recompute at most once per arc status, though. A recompute that
+		// reproduces the same placeholder makes no progress, so repeating it at
+		// an unchanged status loops forever when nothing drives the arc forward
+		// (e.g. a let referenced from a try body whose arc stays at evaluating).
+		// The status is a monotonic progress signal: once it advances, a
+		// dependency may have become concrete, so another recompute can help.
+		// letCycleStatus records the status at the last recompute, or a
+		// negative sentinel if the entry has never been recomputed.
+		if cv := v.(*Vertex); isCyclePlaceholder(cv.BaseValue) &&
+			arc.status != finalized &&
+			(cv.letCycleStatus < 0 || arc.status != cv.letCycleStatus) {
 			ok = false
+			recompute = true
 		}
 	}
 	if !ok {
@@ -908,11 +921,20 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 			c [1]Conjunct
 		}
 		alloc.c[0] = c
+		// letCycleStatus records the arc status at which this entry was
+		// recomputed, so the recompute above fires at most once per status. A
+		// fresh entry (not a recompute) starts at the negative sentinel so its
+		// first recompute is always allowed.
+		letCycleStatus := vertexStatus(-1)
+		if recompute {
+			letCycleStatus = arc.status
+		}
 		alloc.v = Vertex{
-			Parent:    arc.Parent,
-			Label:     x.Label,
-			IsDynamic: b != nil && b.Code == StructuralCycleError,
-			Conjuncts: alloc.c[:],
+			Parent:         arc.Parent,
+			Label:          x.Label,
+			IsDynamic:      b != nil && b.Code == StructuralCycleError,
+			Conjuncts:      alloc.c[:],
+			letCycleStatus: letCycleStatus,
 		}
 		n := &alloc.v
 		v = n

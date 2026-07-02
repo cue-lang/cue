@@ -172,6 +172,13 @@ type Vertex struct {
 	// status indicates the evaluation progress of this vertex.
 	status vertexStatus
 
+	// letCycleStatus records, for a let-cache vertex holding a cycle
+	// placeholder, the status of the backing let arc when the placeholder was
+	// cached. LetReference.resolve uses it to recompute the placeholder only
+	// when the arc's status has since advanced, avoiding an unbounded recompute
+	// loop while the arc stays at the same status. See LetReference.resolve.
+	letCycleStatus vertexStatus
+
 	// isData indicates that this Vertex is to be interpreted as data: pattern
 	// and additional constraints, as well as optional fields, should be
 	// ignored.

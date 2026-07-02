@@ -100,6 +100,40 @@ cyclicErr: {
 	err3: 4
 }
 
+-- comprehension.cue --
+@experiment(aliasv2)
+
+// self inside a comprehension body resolves to the enclosing struct, not to
+// the comprehension's own scope. A comprehension's for/let/try clauses and
+// body are transparent to self. Issue #4422.
+forComp: {
+	n: 2
+	for i in [1, 2] {"k\(i)": self.n}
+}
+
+// self inside a list comprehension refers to the enclosing list.
+listComp: [10, 20, for _ in [1] {self[0]}]
+
+// self inside an if comprehension.
+ifComp: {
+	n: 3
+	if true {m: self.n}
+}
+
+// self in a nested struct resolves to that struct, not the outer one.
+nestComp: {
+	outer: {
+		v: 5
+		for i in [1] {"c\(i)": self.v}
+	}
+}
+
+// self across two nested for comprehensions.
+doubleComp: {
+	n: 7
+	for i in [1] for j in [1] {"d\(i)\(j)": self.n}
+}
+
 -- experiment_test.cue --
 // Test self usage without experiment enabled (should fail)
 
@@ -109,6 +143,53 @@ a: {
 }
 
 -- out/compile --
+--- comprehension.cue
+{
+  forComp: {
+    n: 2
+    for _, i in [
+      1,
+      2,
+    ] {
+      "k\(〈1;i〉)": 〈1〉.n
+    }
+  }
+  listComp: [
+    10,
+    20,
+    for _, _ in [
+      1,
+    ] {
+      〈1〉[0]
+    },
+  ]
+  ifComp: {
+    n: 3
+    if true {
+      m: 〈1〉.n
+    }
+  }
+  nestComp: {
+    outer: {
+      v: 5
+      for _, i in [
+        1,
+      ] {
+        "c\(〈1;i〉)": 〈1〉.v
+      }
+    }
+  }
+  doubleComp: {
+    n: 7
+    for _, i in [
+      1,
+    ] for _, j in [
+      1,
+    ] {
+      "d\(〈2;i〉)\(〈1;j〉)": 〈1〉.n
+    }
+  }
+}
 --- in.cue
 {
   a: 〈1〉.b

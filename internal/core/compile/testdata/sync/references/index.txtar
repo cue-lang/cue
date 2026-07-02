@@ -29,6 +29,15 @@ varNegativeIndex: {
 	n: -1
 	a: [1, 2, 3][n]
 }
+
+// TODO: "index out of range [0] with length 0" is misleading for a struct,
+// which can never have integer indices no matter its length.
+intIndexToStruct: {foo: "bar"}[0]
+intIndexToOpenStruct: {foo: "bar", ...}[0]
+intIndexToStructRef: {
+	s: {a: 1}
+	i: s[0]
+}
 -- out/compile --
 --- in.cue
 {
@@ -84,5 +93,18 @@ varNegativeIndex: {
       2,
       3,
     ][〈0;n〉]
+  }
+  intIndexToStruct: {
+    foo: "bar"
+  }[0]
+  intIndexToOpenStruct: {
+    foo: "bar"
+    ...
+  }[0]
+  intIndexToStructRef: {
+    s: {
+      a: 1
+    }
+    i: 〈0;s〉[0]
   }
 }

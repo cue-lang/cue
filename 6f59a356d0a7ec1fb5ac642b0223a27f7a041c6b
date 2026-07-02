@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c712c65_8e276406",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T15:34:05Z",
+      "side": 1,
+      "message": "Two garbled sentences: \"referenced with a . AllSchemas\" is missing \"$ref\", and \"where there is no other content, including specification extensions, is passed through verbatim\" looks like a clause dropped after \"If there is no # definition…\".",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff6d4799_3e4ffa83",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T15:34:05Z",
+      "side": 1,
+      "message": "same as the last commit, I\u0027d make this just take `v`",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3a5c8d6_2334098a",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T15:34:05Z",
+      "side": 1,
+      "message": "same as before; please make this the full EXPERIMENTAL notice",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b812feb8_6d15fecd",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T15:34:05Z",
+      "side": 1,
+      "message": "can we come up with a better name than GenerateV2? perhaps something to hint at the fact that this takes the full openapi structure as a value, whereas the old Generate just expects a value with a flat structure of schemas?",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc392131_1dca807c",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T15:34:05Z",
+      "side": 1,
+      "message": "This couples the fold to the default naming: `allNames` is derived from the trimmed selector, but referenced schemas land in `shared` under the name `NamesFunc` assigned. With a custom `NamesFunc` (e.g. upper-casing), a referenced top-level schema is keyed as e.g. \"USED\" in `shared`, so the lookup for \"Used\" misses and the same schema is re-added as a full inline copy — `components.schemas` ends up with both \"USED\" (the $ref target) and \"Used\" (dead duplicate).\n\nRepro: one position referencing `#Used`, `AllSchemas: true`, upper-casing `NamesFunc`. Default `NamesFunc` happens to match the trimmed selector, so the existing tests don\u0027t catch it. Consider routing top-level schemas through the same reference/naming path (or matching by CUERef identity) instead of reconstructing the name.",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b58c9196_e6f9e772",
+        "filename": "encoding/openapi/testdata/v2_no_all_schemas.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T15:34:05Z",
+      "side": 1,
+      "message": "I wonder to myself; the `#` is mainly useful for inline schemas, but for a reference to an existing schema, writing `schema: #: #Used` feels weird. one would naturally write the CUE like `schema: #Used`.",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

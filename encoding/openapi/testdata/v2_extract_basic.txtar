@@ -1,0 +1,84 @@
+# Tests whole-document extraction: components.schemas entries become top-level #
+# definitions, a $ref at a schema position becomes a reference under #, and
+# non-schema content (the x-vendor extension and the operation summary) is
+# preserved verbatim. This is the inverse of v2_basic.txtar.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:      "Users API"
+	version:    "1.0.0"
+	"x-vendor": "keep"
+}
+paths: "/users/{id}": get: {
+	summary: "get a user"
+	responses: "200": content: "application/json": schema: "$ref": "#/components/schemas/User"
+}
+components: schemas: {
+	User: {
+		type:                 "object"
+		additionalProperties: false
+		properties: {
+			address: "$ref": "#/components/schemas/Address"
+			id: type:   "integer"
+			name: type: "string"
+		}
+		required: ["id", "name"]
+	}
+	Address: {
+		type:                 "object"
+		additionalProperties: false
+		properties: {
+			city: type:   "string"
+			street: type: "string"
+		}
+		required: ["city", "street"]
+	}
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:      "Users API"
+	version:    "1.0.0"
+	"x-vendor": "keep"
+}
+
+#Address: close({
+	city!:   string
+	street!: string
+})
+
+#User: close({
+	address?: #Address
+	id!:      int
+	name!:    string
+})
+
+paths: "/users/{id}": get: {
+	summary: "get a user"
+	responses: "200": content: "application/json": schema: #: #User
+}
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:      "Users API"
+	version:    "1.0.0"
+	"x-vendor": "keep"
+}
+
+#Address: close({
+	city!:   string
+	street!: string
+})
+
+#User: close({
+	address?: #Address
+	id!:      int
+	name!:    string
+})
+
+paths: "/users/{id}": get: {
+	summary: "get a user"
+	responses: "200": content: "application/json": schema: #: #User
+}

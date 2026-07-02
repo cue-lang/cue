@@ -1,0 +1,66 @@
+# Tests that schemas living underneath an array are handled: an operation's
+# parameters are a list, so a parameter schema sits at parameters[0].schema,
+# whose JSON Pointer contains a numeric array index.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: "$ref": "#/components/schemas/ID"
+	}, {
+		name: "verbose"
+		in:   "query"
+		schema: type: "boolean"
+	}]
+	responses: "200": description: "ok"
+}
+components: schemas: ID: type: "string"
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#ID: string
+
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: #ID
+	}, {
+		name: "verbose"
+		in:   "query"
+		schema: #: bool
+	}]
+	responses: "200": description: "ok"
+}
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#ID: string
+
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: #ID
+	}, {
+		name: "verbose"
+		in:   "query"
+		schema: #: bool
+	}]
+	responses: "200": description: "ok"
+}

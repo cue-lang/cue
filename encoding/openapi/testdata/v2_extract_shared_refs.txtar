@@ -1,0 +1,47 @@
+# Tests that a schema referenced from more than one position is extracted once
+# as a top-level definition and referenced from each position. This is the
+# inverse of v2_shared_refs.txtar.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: {
+	"/a": get: responses: "200": content: "application/json": schema: "$ref": "#/components/schemas/Item"
+	"/b": get: responses: "200": content: "application/json": schema: "$ref": "#/components/schemas/Item"
+}
+components: schemas: Item: {
+	type:                 "object"
+	additionalProperties: false
+	properties: name: type: "string"
+	required: ["name"]
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#Item: close({name!: string})
+
+paths: {
+	"/a": get: responses: "200": content: "application/json": schema: #: #Item
+	"/b": get: responses: "200": content: "application/json": schema: #: #Item
+}
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#Item: close({name!: string})
+
+paths: {
+	"/a": get: responses: "200": content: "application/json": schema: #: #Item
+	"/b": get: responses: "200": content: "application/json": schema: #: #Item
+}

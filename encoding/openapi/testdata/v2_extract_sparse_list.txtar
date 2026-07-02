@@ -1,0 +1,81 @@
+# Tests schema extraction from a list in which not every element holds a
+# schema: the first parameter is a Reference Object (not a schema position),
+# so the extraction skeleton needs a placeholder for it, while the second
+# parameter's inline schema is referenced from another schema by its document
+# position.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: {
+	parameters: [{
+		"$ref": "#/components/parameters/Page"
+	}, {
+		name: "verbose"
+		in:   "query"
+		schema: type: "boolean"
+	}]
+	responses: "200": content: "application/json": schema: {
+		type: "object"
+		properties: flag: "$ref": "#/paths/~1x/get/parameters/1/schema"
+	}
+}
+components: parameters: Page: {
+	name: "page"
+	in:   "query"
+	schema: type: "integer"
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths: "/x": get: {
+	parameters: [{
+		$ref: "#/components/parameters/Page"
+	}, {
+		name: "verbose"
+		in:   "query"
+		schema: #: bool
+	}]
+	responses: "200": content: "application/json": schema: #: {
+		flag?: paths."/x".get.parameters[1].schema.#
+		...
+	}
+}
+components: parameters: Page: {
+	name: "page"
+	in:   "query"
+	schema: #: int
+}
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths: "/x": get: {
+	parameters: [{
+		$ref: "#/components/parameters/Page"
+	}, {
+		name: "verbose"
+		in:   "query"
+		schema: #: bool
+	}]
+	responses: "200": content: "application/json": schema: #: {
+		flag?: paths."/x".get.parameters[1].schema.#
+		...
+	}
+}
+components: parameters: Page: {
+	name: "page"
+	in:   "query"
+	schema: #: int
+}

@@ -139,7 +139,7 @@ forComp: {
 }  @test(eq, {n: 2, k1: 2, k2: 2})
 
 // self inside a list comprehension refers to the enclosing list.
-listComp: [10, 20, for _ in [1] {self[0]}]  @test(eq, [10, 20, _|_])
+listComp: [10, 20, for _ in [1] {self[0]}]  @test(eq, [10, 20, 10])
 
 // self inside an if comprehension.
 ifComp: {
@@ -297,8 +297,6 @@ a: {
 }
 
 -- out/errors.txt --
-[incomplete] listComp.2: index out of range [0] with length 0:
-    ./comprehension.cue:12:39
 [eval] listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
     ./list.cue:4:14
     ./list.cue:4:15

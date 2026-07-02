@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb95812a_2ac812e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T14:56:39Z",
+      "side": 1,
+      "message": "Marcel points out that the old interpretation of \"self\" was correct.",
+      "revId": "55bd293755dea792dacef8d6ae872fe433411da4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

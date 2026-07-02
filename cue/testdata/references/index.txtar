@@ -29,6 +29,15 @@ varNegativeIndex: {
 	n: -1
 	a: [1, 2, 3][n] @test(err, code=eval, contains="index n out of range [-1]", pos=[0:5, -1:5, 0:15])
 }
+
+// TODO: "index out of range [0] with length 0" is misleading for a struct,
+// which can never have integer indices no matter its length.
+intIndexToStruct: {foo: "bar"}[0] @test(err, code=eval, contains="index out of range [0] with length 0", pos=[0:32])
+intIndexToOpenStruct: {foo: "bar", ...}[0] @test(err, code=eval, contains="index out of range [0] with length 0", pos=[0:41])
+intIndexToStructRef: {
+	s: {a: 1}
+	i: s[0] @test(err, code=eval, contains="index out of range [0] with length 0", pos=[0:7])
+}
 -- out/errors.txt --
 [eval] outOfBoundsDisjunction: index out of range [1] with length 0:
     ./in.cue:7:36
@@ -54,6 +63,12 @@ varNegativeIndex: {
     ./in.cue:29:5
     ./in.cue:28:5
     ./in.cue:29:15
+[eval] intIndexToStruct: index out of range [0] with length 0:
+    ./in.cue:34:32
+[eval] intIndexToOpenStruct: index out of range [0] with length 0:
+    ./in.cue:35:41
+[eval] intIndexToStructRef.i: index out of range [0] with length 0:
+    ./in.cue:38:7
 -- out/todo.txt --
 Error messages slightly different between v2 and v3:
 - outOfBoundsDisjunction: v2 says "invalid list index 1 (out of bounds)", v3 says "index out of range [1] with length 0"

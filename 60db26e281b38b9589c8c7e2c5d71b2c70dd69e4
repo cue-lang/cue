@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1b3b762_cb0f8da5",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T14:59:57Z",
+      "side": 1,
+      "message": "use the typical EXPERIMENTAL all-caps notice we\u0027ve used in other packages and apis in the past; it stands out much more, and it\u0027s clearer.",
+      "revId": "60db26e281b38b9589c8c7e2c5d71b2c70dd69e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0400e74a_2708bf33",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T14:59:57Z",
+      "side": 1,
+      "message": "how about GenerateMany? that reads a little better as an API to me, like \"generate many values\" or \"generate many schemas\".",
+      "revId": "60db26e281b38b9589c8c7e2c5d71b2c70dd69e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "764dfce8_3b6f6bd2",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-02T14:59:57Z",
+      "side": 1,
+      "message": "why does DescriptionFunc need both v and v.Path? if we give it just v, it can call v.Path itself, no?",
+      "revId": "60db26e281b38b9589c8c7e2c5d71b2c70dd69e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

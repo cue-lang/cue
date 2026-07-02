@@ -60,6 +60,31 @@ func parseRootRef(str string) (cue.Path, error) {
 	return cue.MakePath(selectors...), nil
 }
 
+// lookupRoot returns the value at the location identified by the JSON reference
+// str within v, for use by [Config.Roots]. Unlike [parseRootRef] it resolves
+// the pointer with kind-aware lookup, so a numeric token (e.g. an HTTP status
+// code like "200") is treated as a struct field rather than a list index. It
+// returns a non-existent value if the location does not exist.
+func lookupRoot(v cue.Value, str string) (cue.Value, error) {
+	u, err := url.Parse(str)
+	if err != nil {
+		return cue.Value{}, fmt.Errorf("invalid JSON reference: %v", err)
+	}
+	if u.Host != "" || u.Path != "" || u.Opaque != "" {
+		return cue.Value{}, fmt.Errorf("external references (%s) not supported in Roots", str)
+	}
+	// As for parseRootRef, trim a final slash for backward compatibility.
+	frag := strings.TrimSuffix(u.Fragment, "/")
+	n, err := lookupJSONPointer(v, frag)
+	if err != nil {
+		if err == errRefNotFound {
+			return cue.Value{}, nil
+		}
+		return cue.Value{}, err
+	}
+	return n, nil
+}
+
 var errRefNotFound = errors.New("JSON Pointer reference not found")
 
 func lookupJSONPointer(v cue.Value, p string) (cue.Value, error) {

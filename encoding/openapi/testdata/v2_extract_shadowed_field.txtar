@@ -1,0 +1,64 @@
+# Tests a $ref to an inline schema position from within a schema that has a
+# property named "paths": an identifier label for the property field would
+# capture the reference to the top-level paths field, so the property label
+# must remain a quoted string, which does not bind the name.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: type: "string"
+	}]
+	responses: "200": content: "application/json": schema: {
+		type: "object"
+		properties: {
+			paths: type: "string"
+			link: "$ref": "#/paths/~1x/get/parameters/0/schema"
+		}
+	}
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: string
+	}]
+	responses: "200": content: "application/json": schema: #: {
+		"paths"?: string
+		link?:    paths."/x".get.parameters[0].schema.#
+		...
+	}
+}
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: string
+	}]
+	responses: "200": content: "application/json": schema: #: {
+		"paths"?: string
+		link?:    paths."/x".get.parameters[0].schema.#
+		...
+	}
+}

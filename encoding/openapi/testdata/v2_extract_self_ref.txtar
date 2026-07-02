@@ -1,0 +1,37 @@
+# Tests an inline schema that references its own document position via $ref,
+# yielding a recursive schema expressed through a reference to the # field at
+# that position.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: responses: "200": content: "application/json": schema: {
+	type: "object"
+	properties: next: "$ref": "#/paths/~1x/get/responses/200/content/application~1json/schema"
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: {
+	next?: paths."/x".get.responses."200".content."application/json".schema.#
+	...
+}
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: {
+	next?: paths."/x".get.responses."200".content."application/json".schema.#
+	...
+}

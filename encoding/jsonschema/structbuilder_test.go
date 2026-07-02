@@ -10,6 +10,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
@@ -96,6 +97,160 @@ func TestStructBuilderNonPresentNodeOmittedFromSyntax(t *testing.T) {
 	ok := b.put(cue.ParsePath(`a.b`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `a: b: "hello"`)
+}
+
+func TestStructBuilderListIndex(t *testing.T) {
+	var b structBuilder
+	ok := b.put(cue.ParsePath(`a.b[1].c`), ast.NewString("hello"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	assertStructBuilderSyntax(t, &b, `a: b: [_, {c: "hello"}]`)
+}
+
+func TestStructBuilderListIndexMultipleElements(t *testing.T) {
+	var b structBuilder
+	ok := b.put(cue.ParsePath(`a[2]`), ast.NewString("two"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	ok = b.put(cue.ParsePath(`a[0].x`), ast.NewString("zero"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	assertStructBuilderSyntax(t, &b, `a: [{x: "zero"}, _, "two"]`)
+}
+
+func TestStructBuilderListIndexNested(t *testing.T) {
+	var b structBuilder
+	ok := b.put(cue.ParsePath(`a[1][0]`), ast.NewString("hello"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	assertStructBuilderSyntax(t, &b, `a: [_, ["hello"]]`)
+}
+
+func TestStructBuilderListIndexRef(t *testing.T) {
+	var b structBuilder
+	ref, err := b.getRef(cue.ParsePath(`a.b[1].c`))
+	qt.Assert(t, qt.IsNil(err))
+	ok := b.put(cue.ParsePath(`a.b[1].c`), ast.NewString("hello"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	ok = b.put(cue.ParsePath(`#x.y`), ref, nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	assertStructBuilderSyntax(t, &b, `a: b: [_, {c: "hello"}]
+
+#x: y: a.b[1].c
+`)
+}
+
+func TestStructBuilderListIndexMixedWithField(t *testing.T) {
+	var b structBuilder
+	ok := b.put(cue.ParsePath(`a[0]`), ast.NewString("zero"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	ok = b.put(cue.ParsePath(`a.b`), ast.NewString("bee"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	_, err := b.syntax()
+	qt.Assert(t, qt.ErrorMatches(err, `at path a: cannot mix list-index and field entries`))
+}
+
+func TestStructBuilderListIndexUnderValue(t *testing.T) {
+	var b structBuilder
+	ok := b.put(cue.ParsePath(`a`), ast.NewString("hello"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	ok = b.put(cue.ParsePath(`a[0]`), ast.NewString("zero"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	_, err := b.syntax()
+	qt.Assert(t, qt.ErrorMatches(err, `cannot combine value and list elements at path a`))
+}
+
+func TestStructBuilderBase(t *testing.T) {
+	var b structBuilder
+	addStructBuilderBase(t, &b, `
+zed: "z"
+alpha: {
+	beta: 1
+	gamma: [{delta: true, epsilon: _}, "x"]
+}
+empty: {}
+`)
+	ok := b.put(cue.ParsePath(`alpha.gamma[0].epsilon.#`), ast.NewString("filled"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	assertStructBuilderSyntax(t, &b, `
+zed: "z"
+
+alpha: {
+	beta: 1
+	gamma: [
+		{
+			delta: true
+			epsilon: #: "filled"
+		},
+		"x"
+	]
+}
+
+empty: {}
+`)
+}
+
+func TestStructBuilderBaseOrderPrecedesUnseeded(t *testing.T) {
+	var b structBuilder
+	addStructBuilderBase(t, &b, `
+zebra:    1
+aardvark: 2
+`)
+	ok := b.put(cue.ParsePath(`#def`), ast.NewString("v"), nil)
+	qt.Assert(t, qt.IsTrue(ok))
+	assertStructBuilderSyntax(t, &b, `
+zebra: 1
+
+aardvark: 2
+
+#def: "v"
+`)
+}
+
+func TestStructBuilderBaseUnfilledPlaceholder(t *testing.T) {
+	var b structBuilder
+	addStructBuilderBase(t, &b, `a: b: _`)
+	assertStructBuilderSyntax(t, &b, `a: b: _`)
+}
+
+func TestStructBuilderBaseErrors(t *testing.T) {
+	for _, test := range []struct {
+		testName string
+		base     string
+		wantErr  string
+	}{{
+		testName: "Embedding",
+		base:     `"just a value"`,
+		wantErr:  `unsupported declaration type \*ast\.EmbedDecl in base data`,
+	}, {
+		testName: "OptionalField",
+		base:     `a?: 5`,
+		wantErr:  `unsupported field constraint "\?" in base data`,
+	}, {
+		testName: "DefinitionLabel",
+		base:     `#a: 5`,
+		wantErr:  `unsupported label "#a" in base data`,
+	}, {
+		testName: "AliasLabel",
+		base:     `X=a: 5`,
+		wantErr:  `unsupported label type \*ast\.Alias in base data`,
+	}, {
+		testName: "DuplicateValue",
+		base: `
+a: b: 5
+a: b: 6
+`,
+		wantErr: `duplicate value in base data at a\.b`,
+	}} {
+		t.Run(test.testName, func(t *testing.T) {
+			f, err := parser.ParseFile("base.cue", test.base)
+			qt.Assert(t, qt.IsNil(err))
+			var b structBuilder
+			qt.Assert(t, qt.ErrorMatches(b.addBase(f), test.wantErr))
+		})
+	}
+}
+
+func addStructBuilderBase(t *testing.T, b *structBuilder, src string) {
+	f, err := parser.ParseFile("base.cue", src)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsNil(b.addBase(f)))
 }
 
 func assertStructBuilderSyntax(t *testing.T, b *structBuilder, want string) {

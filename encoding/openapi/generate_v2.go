@@ -310,7 +310,7 @@ func (g *genV2) collect(v cue.Value) error {
 		// Do not descend into a schema.
 		return nil
 	}
-	switch v.IncompleteKind() {
+	switch v.Kind() {
 	case cue.StructKind:
 		it, err := v.Fields()
 		if err != nil {
@@ -343,7 +343,7 @@ func (g *genV2) build(v cue.Value) (ast.Expr, error) {
 	if e, ok := g.generated[v.Path().String()]; ok {
 		return e, nil
 	}
-	switch v.IncompleteKind() {
+	switch v.Kind() {
 	case cue.StructKind:
 		it, err := v.Fields()
 		if err != nil {

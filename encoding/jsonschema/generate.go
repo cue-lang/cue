@@ -1672,8 +1672,11 @@ func DefaultNamesFunc(refs []*CUERef) {
 		}
 		allUnique := true
 		changed := false
-		for _, indices := range groups {
-			if len(indices) <= 1 {
+		for name, indices := range groups {
+			// A unique, non-empty name is done. An empty name (which happens
+			// when a reference path ends in the anonymous # definition) must be
+			// deepened even when it is unique, so that it becomes non-empty.
+			if name != "" && len(indices) <= 1 {
 				continue
 			}
 			allUnique = false
@@ -1704,18 +1707,25 @@ func DefaultNamesFunc(refs []*CUERef) {
 }
 
 // defName builds a definition name from the last depth selectors of sels.
-// When raw is false, '#' is stripped from definition selectors.
+// When raw is false, '#' is stripped from definition selectors; a selector that
+// strips to nothing (the anonymous # definition) is skipped, so the result
+// never contains an empty component. When every selector in the window strips
+// away (a reference to the bare anonymous # definition), the result is empty and
+// the caller deepens or falls back to raw.
 func defName(sels []cue.Selector, depth int, raw bool) string {
 	start := max(len(sels)-depth, 0)
 	var b strings.Builder
-	for i, sel := range sels[start:] {
-		if i > 0 {
-			b.WriteByte('.')
-		}
+	for _, sel := range sels[start:] {
 		s := sel.String()
 		if !raw && (sel.LabelType() == cue.DefinitionLabel || sel.LabelType() == cue.HiddenDefinitionLabel) {
 			s = strings.TrimPrefix(s, "_")
 			s = strings.TrimPrefix(s, "#")
+		}
+		if s == "" {
+			continue
+		}
+		if b.Len() > 0 {
+			b.WriteByte('.')
 		}
 		b.WriteString(s)
 	}

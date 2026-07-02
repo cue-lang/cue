@@ -124,6 +124,18 @@ func TestDecode(t *testing.T) {
 		if root, ok := t.Value("root"); ok {
 			cfg.Root = root
 		}
+		if roots, ok := t.Value("roots"); ok {
+			cfg.Roots = strings.Fields(roots)
+			// Map each schema to a top-level definition named by the last
+			// element of its path.
+			cfg.MapRef = func(loc jsonschema.SchemaLoc) (string, cue.Path, error) {
+				if !loc.IsLocal {
+					return "", cue.Path{}, fmt.Errorf("external reference %v not supported", loc.ID)
+				}
+				sels := loc.Path.Selectors()
+				return "", cue.MakePath(cue.Def(sels[len(sels)-1].Unquoted())), nil
+			}
+		}
 		cfg.Strict = t.HasTag("strict")
 		cfg.StrictFeatures = t.HasTag("strictFeatures")
 		cfg.StrictKeywords = cfg.StrictKeywords || t.HasTag("strictKeywords")

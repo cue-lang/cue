@@ -1,0 +1,52 @@
+# Tests a $ref that points at an inline schema position (here another
+# parameter's schema, inside an array) rather than a components.schemas entry.
+# The reference is rewritten to the document location where that inline schema
+# is placed, using an index expression for the array element.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: "$ref": "#/components/schemas/ID"
+	}, {
+		name: "verbose"
+		in:   "query"
+		schema: {
+			type: "object"
+			properties: foo: "$ref": "#/paths/~1x/get/parameters/0/schema"
+		}
+	}]
+	responses: "200": description: "ok"
+}
+components: schemas: ID: type: "string"
+-- out/TestExtractV2/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#ID: string
+
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: #ID
+	}, {
+		name: "verbose"
+		in:   "query"
+		schema: #: {
+			foo?: paths."/x".get.parameters[0].schema.#
+			...
+		}
+	}]
+	responses: "200": description: "ok"
+}

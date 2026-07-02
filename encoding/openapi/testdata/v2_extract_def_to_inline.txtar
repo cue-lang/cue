@@ -1,0 +1,58 @@
+# Tests a components.schemas entry that references an inline schema position
+# via $ref: the reference within the top-level definition points back into the
+# document at the position where the inline schema is placed.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: type: "string"
+	}]
+	responses: "200": content: "application/json": schema: "$ref": "#/components/schemas/Result"
+}
+components: schemas: Result: {
+	type:                 "object"
+	additionalProperties: false
+	properties: id: "$ref": "#/paths/~1x/get/parameters/0/schema"
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#Result: close({id?: paths."/x".get.parameters[0].schema.#})
+
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: string
+	}]
+	responses: "200": content: "application/json": schema: #: #Result
+}
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#Result: close({id?: paths."/x".get.parameters[0].schema.#})
+
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: string
+	}]
+	responses: "200": content: "application/json": schema: #: #Result
+}

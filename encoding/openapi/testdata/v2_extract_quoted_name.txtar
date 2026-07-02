@@ -1,0 +1,39 @@
+# Tests that a components.schemas entry whose name is not a valid identifier is
+# extracted under the anonymous # definition as a quoted field (#."some-name"),
+# and that a $ref to it resolves to the same place. Because a reference to the
+# anonymous definition would be shadowed by the #: schema marker field at the
+# reference site, sanitization gives the definition an alias and refers to that.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: responses: "200": content: "application/json": schema: "$ref": "#/components/schemas/some-name"
+components: schemas: "some-name": {
+	type:                 "object"
+	additionalProperties: false
+	properties: id: type: "integer"
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#_9=#: "some-name": close({id?: int})
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #_9."some-name"
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#_9=#: "some-name": close({id?: int})
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #_9."some-name"

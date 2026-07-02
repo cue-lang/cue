@@ -1,0 +1,55 @@
+#roots: #/components/schemas/Widget #/paths/~1x/get/responses/200/content/application~1json/schema #/components/schemas/Missing
+#allowNonExistentRoot
+
+-- schema.json --
+{
+	"components": {
+		"schemas": {
+			"Widget": {
+				"type": "object",
+				"properties": {"name": {"type": "string"}}
+			}
+		}
+	},
+	"paths": {
+		"/x": {
+			"get": {
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"item": {"$ref": "#/components/schemas/Widget"}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+-- out/decode-v3/extract --
+#Widget: {
+	name?: string
+	...
+}
+
+#schema: {
+	item?: #Widget
+	...
+}
+-- out/decode-v3-noshare/extract --
+#Widget: {
+	name?: string
+	...
+}
+
+#schema: {
+	item?: #Widget
+	...
+}
+-- out/decode/extract --

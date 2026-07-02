@@ -72,6 +72,10 @@ func TestGenerateOpenAPI(t *testing.T) {
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		t.Parallel()
+		if t.HasTag("extractv2") {
+			// Handled by TestExtractV2.
+			return
+		}
 		if t.HasTag("v2") {
 			generateV2Test(t)
 			return

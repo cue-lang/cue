@@ -1,0 +1,62 @@
+# Tests a $ref into the paths section from a schema inside a webhook that is
+# itself named "paths": the webhook's field label shadows the top-level paths
+# field at the reference site, so sanitization adds an alias to the document's
+# paths field and the reference uses that alias.
+#extractv2
+#Version: 3.1
+-- in.cue --
+openapi: "3.1.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: type: "string"
+	}]
+	responses: "200": description: "ok"
+}
+webhooks: paths: post: requestBody: content: "application/json": schema: {
+	type: "object"
+	properties: item: "$ref": "#/paths/~1x/get/parameters/0/schema"
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.1.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths_9=paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: string
+	}]
+	responses: "200": description: "ok"
+}
+webhooks: paths: post: requestBody: content: "application/json": schema: #: {
+	item?: paths_9."/x".get.parameters[0].schema.#
+	...
+}
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.1.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths_9=paths: "/x": get: {
+	parameters: [{
+		name: "id"
+		in:   "query"
+		schema: #: string
+	}]
+	responses: "200": description: "ok"
+}
+webhooks: paths: post: requestBody: content: "application/json": schema: #: {
+	item?: paths_9."/x".get.parameters[0].schema.#
+	...
+}

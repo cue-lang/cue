@@ -120,13 +120,43 @@ func (d *decoder) addImport(n cue.Value, pkg string) *ast.Ident {
 	return ident
 }
 
+// seedBase adds [Config.Base], if any, to the builder. It is invoked whenever
+// the builder starts from empty: before the first decoding pass and after any
+// reset for a subsequent pass.
+func (d *decoder) seedBase() error {
+	if d.cfg.Base == nil {
+		return nil
+	}
+	return d.builder.addBase(d.cfg.Base)
+}
+
 func (d *decoder) decode(v cue.Value) *ast.File {
 	var defsRoot cue.Value
+	// rootValues holds the schemas to decode when [Config.Roots] is used.
+	var rootValues []cue.Value
+	useRoots := d.cfg.Roots != nil
 	// docRoot represents the root of the actual data, by contrast
 	// with the "root" value as specified in [Config.Root] which
 	// represents the root of the schemas to be decoded.
 	docRoot := v
-	if d.cfg.Root != "" {
+	switch {
+	case useRoots:
+		for _, r := range d.cfg.Roots {
+			n, err := lookupRoot(v, r)
+			if err != nil {
+				d.errf(cue.Value{}, "invalid Config.Roots value %q: %v", r, err)
+				return nil
+			}
+			if !n.Exists() {
+				if d.cfg.AllowNonExistentRoot {
+					continue
+				}
+				d.errf(v, "root value at path %v does not exist", r)
+				return nil
+			}
+			rootValues = append(rootValues, n)
+		}
+	case d.cfg.Root != "":
 		rootPath, err := parseRootRef(d.cfg.Root)
 		if err != nil {
 			d.errf(cue.Value{}, "invalid Config.Root value %q: %v", d.cfg.Root, err)
@@ -160,6 +190,10 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 	// not part of the regular traversal are found.
 	basePass := 0
 
+	if err := d.seedBase(); err != nil {
+		d.errf(cue.Value{}, "invalid Config.Base value: %v", err)
+		return nil
+	}
 	for pass := 0; ; pass++ {
 		if pass > 10 {
 			// Should never happen: the most we should ever see in practice
@@ -177,7 +211,15 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 			pos:    docRoot,
 		}
 
-		if defsRoot.Exists() {
+		if useRoots {
+			// Each entry in [Config.Roots] points to a single schema;
+			// ensure each is defined so that [Config.MapRef] places it and
+			// references between them resolve.
+			for _, n := range rootValues {
+				root.ensureDefinition(n)
+				root.schema(n)
+			}
+		} else if defsRoot.Exists() {
 			// When d.cfg.Root is non-empty, it points to a struct
 			// containing a field for each definition.
 			constraintAddDefinitions("schemas", defsRoot, root)
@@ -226,6 +268,11 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 		}
 
 		d.builder = structBuilder{}
+		if err := d.seedBase(); err != nil {
+			// Should never happen: the base was accepted before the first pass.
+			d.errf(cue.Value{}, "invalid Config.Base value: %v", err)
+			return nil
+		}
 		for _, def := range d.defs {
 			def.schema = nil
 		}

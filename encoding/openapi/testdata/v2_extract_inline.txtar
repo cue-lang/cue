@@ -1,0 +1,38 @@
+# Tests that an inline schema at a schema position (not a $ref) is extracted
+# into CUE and placed under a # field, so that it round-trips through GenerateV2.
+#extractv2
+#Version: 3.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: responses: "400": content: "application/json": schema: {
+	type:      "string"
+	minLength: 1
+}
+-- out/TestExtractV2-v3/out.cue --
+import "strings"
+
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths: "/x": get: responses: "400": content: "application/json": schema: #: strings.MinRunes(
+	1
+)
+-- out/TestExtractV2-v3-noshare/out.cue --
+import "strings"
+
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+paths: "/x": get: responses: "400": content: "application/json": schema: #: strings.MinRunes(
+	1
+)

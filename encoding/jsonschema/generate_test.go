@@ -206,6 +206,32 @@ func TestGenerateMany(t *testing.T) {
 }`))
 }
 
+// TestGenerateManyAnonymousRef checks that a reference whose path ends in the
+// anonymous # definition is named after the enclosing field rather than
+// producing an empty name (which previously errored in DefaultNamesFunc).
+func TestGenerateManyAnonymousRef(t *testing.T) {
+	ctx := cuecontext.New()
+	root := ctx.CompileString(`
+a: #: {x: int}
+b: #: {y: a.#}
+`)
+	qt.Assert(t, qt.IsNil(root.Err()))
+
+	exprs, shared, err := jsonschema.GenerateMany(
+		[]cue.Value{root.LookupPath(cue.ParsePath("b.#"))},
+		"#/components/schemas",
+		&jsonschema.GenerateConfig{Version: jsonschema.VersionOpenAPI},
+	)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(slices.Sorted(maps.Keys(shared)), []string{"a"}))
+	qt.Assert(t, qt.Equals(formatNode(t, exprs[0]), `{
+	type:                 "object"
+	additionalProperties: false
+	properties: y: $ref: "#/components/schemas/a"
+	required: ["y"]
+}`))
+}
+
 func formatNode(t *testing.T, n ast.Node) string {
 	data, err := format.Node(n)
 	qt.Assert(t, qt.IsNil(err))

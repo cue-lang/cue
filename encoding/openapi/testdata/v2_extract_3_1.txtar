@@ -1,0 +1,41 @@
+# Tests 3.1 extraction: the webhooks document position is walked (only present
+# in #Document_3_1) and the JSON Schema 2020-12 dialect is used for schemas.
+#extractv2
+#Version: 3.1
+-- in.cue --
+openapi: "3.1.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+webhooks: newThing: post: requestBody: content: "application/json": schema: "$ref": "#/components/schemas/Event"
+components: schemas: Event: {
+	type: "object"
+	properties: v: anyOf: [{type: "string"}, {type: "null"}]
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.1.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#Event: {
+	v?: matchN(>=1, [string, null])
+	...
+}
+
+webhooks: newThing: post: requestBody: content: "application/json": schema: #: #Event
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.1.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#Event: {
+	v?: matchN(>=1, [string, null])
+	...
+}
+
+webhooks: newThing: post: requestBody: content: "application/json": schema: #: #Event

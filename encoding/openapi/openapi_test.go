@@ -161,6 +161,21 @@ func TestIssue1234(t *testing.T) {
 	}
 }
 
+func TestIssue2530(t *testing.T) {
+	val := cuecontext.New().CompileString(`
+#List: [int]
+#A: #List[0]
+	`)
+	if err := val.Err(); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err := openapi.Gen(val, &openapi.Config{})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 // This is for debugging purposes. Do not remove.
 func TestX(t *testing.T) {
 	t.Skip()

@@ -181,12 +181,7 @@ func (c *buildContext) isInternal(sel cue.Selector) bool {
 }
 
 func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
-	panic(&openapiError{
-		errors.NewMessagef(format, args...),
-		v.Err(),
-		cue.MakePath(b.ctx.path...),
-		v.Pos(),
-	})
+	b.ctx.failf(v, format, args...)
 }
 
 func (b *builder) unsupported(v cue.Value) {
@@ -721,7 +716,10 @@ func (b *builder) object(v cue.Value) {
 		if b.ctx.isInternal(sel) {
 			continue
 		}
-		label := selectorLabel(sel)
+		label, ok := selectorLabel(sel)
+		if !ok {
+			b.failf(i.Value(), "cannot create OpenAPI property name for %v", sel)
+		}
 		var core *builder
 		if b.core != nil {
 			core = b.core.properties[label]
@@ -1232,6 +1230,15 @@ func (b *builder) addRef(v cue.Value, inst cue.Value, ref cue.Path) {
 	}
 }
 
+func (b *buildContext) failf(v cue.Value, format string, args ...interface{}) {
+	panic(&openapiError{
+		errors.NewMessagef(format, args...),
+		v.Err(),
+		cue.MakePath(b.path...),
+		v.Pos(),
+	})
+}
+
 func (b *buildContext) makeRef(inst cue.Value, ref cue.Path) string {
 	if b.nameFunc != nil {
 		return b.nameFunc(inst, ref)
@@ -1242,7 +1249,11 @@ func (b *buildContext) makeRef(inst cue.Value, ref cue.Path) string {
 			buf.WriteByte('.')
 		}
 		// TODO what should this do when it's not a valid identifier?
-		buf.WriteString(selectorLabel(sel))
+		label, ok := selectorLabel(sel)
+		if !ok {
+			b.failf(inst, "cannot create OpenAPI reference for %v: unsupported path element %v", ref, sel)
+		}
+		buf.WriteString(label)
 	}
 	return buf.String()
 }
@@ -1281,18 +1292,18 @@ func (b *builder) big(v cue.Value) ast.Expr {
 	return v.Syntax(cue.Final()).(ast.Expr)
 }
 
-func selectorLabel(sel cue.Selector) string {
+// selectorLabel returns the OpenAPI reference name component for sel and
+// reports whether sel can be represented at all: only non-hidden fields,
+// definitions, and pattern constraints are supported.
+func selectorLabel(sel cue.Selector) (label string, ok bool) {
 	if sel.Type().ConstraintType() == cue.PatternConstraint {
-		return "*"
+		return "*", true
 	}
 	switch sel.LabelType() {
 	case cue.StringLabel:
-		return sel.Unquoted()
+		return sel.Unquoted(), true
 	case cue.DefinitionLabel:
-		return sel.String()[1:]
+		return sel.String()[1:], true
 	}
-	// We shouldn't get anything other than non-hidden
-	// fields and definitions because we've not asked the
-	// Fields iterator for those or created them explicitly.
-	panic(fmt.Sprintf("unreachable %v", sel.Type()))
+	return "", false
 }

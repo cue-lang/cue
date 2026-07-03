@@ -500,15 +500,15 @@ chain.t2.p2 produces an incomplete error in v2 (cycle error referencing X)
 but succeeds in v3. issue2052.reduced.t1 and t2 show structure sharing
 (funcs."0" shared with A) in v3 where v2 expanded the struct.
 -- out/eval/stats --
-Leaks:  152
-Freed:  2927
-Reused: 2873
-Allocs: 206
+Leaks:  154
+Freed:  2899
+Reused: 2845
+Allocs: 208
 Retain: 0
 
-Unifications: 876
-Conjuncts:    4968
-Disjuncts:    1615
+Unifications: 890
+Conjuncts:    4928
+Disjuncts:    1579
 Notifications: 15
 
-NumCloseIDs: 1501
+NumCloseIDs: 1517

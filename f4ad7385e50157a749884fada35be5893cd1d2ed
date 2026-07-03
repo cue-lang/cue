@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f2df150_aeba8b35",
+        "filename": "cue/testdata/references/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-07-03T10:58:12Z",
+      "side": 1,
+      "message": "It is correct that this is an error although I think the error message is a bit misleading. We might want to not include the error message in the test directive so as to not to enforce this error message.\n\nArguably, this should also be a fatal error and not an incomplete error, as you can not have an integer index into a struct. So maybe add an error to do that. This should be an eval error.",
+      "revId": "f4ad7385e50157a749884fada35be5893cd1d2ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

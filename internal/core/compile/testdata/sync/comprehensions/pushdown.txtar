@@ -1117,6 +1117,34 @@ letCycleSelfKeyword2: {
 	}
 
 }
+-- issue4422.cue --
+@experiment(aliasv2)
+
+// A dynamic field whose key refers to a vertex that is still being evaluated
+// (here a list element that looks up a field on itself through an embedding)
+// must report an incomplete error. The pushed-down comprehension used to
+// insert the arc keyed on the partial value, after which lookups during the
+// expansion of the disjunction re-expanded it without bound, hanging
+// evaluation. https://cuelang.org/issue/4422
+issue4422: {
+	settings: domain: {
+		let _zero = 0
+		x: _zero
+	}
+	components: {
+		[_]: clusters: [for _ in [1, 2] {self.settings.missing}]
+		comp1: {}
+		comp2: {}
+	}
+
+	for _, cv in components
+	for host in cv.clusters {
+		hosts: (host): *settings.domain | 123
+	}
+
+	for host, _ in self.hosts {}
+
+}
 -- out/compile --
 --- in.cue
 {
@@ -2350,6 +2378,37 @@ letCycleSelfKeyword2: {
     }
   }
 }
+--- issue4422.cue
+{
+  issue4422: {
+    settings: {
+      domain: {
+        let _zero#2 = 0
+        x: 〈0;let _zero#2〉
+      }
+    }
+    components: {
+      [_]: {
+        clusters: [
+          for _, _ in [
+            1,
+            2,
+          ] {
+            〈1〉.settings.missing
+          },
+        ]
+      }
+      comp1: {}
+      comp2: {}
+    }
+    for _, cv in 〈0;components〉 for _, host in 〈0;cv〉.clusters {
+      hosts: {
+        〈2;host〉: (*〈4;settings〉.domain|123)
+      }
+    }
+    for host, _ in 〈1〉.hosts {}
+  }
+}
 --- pending.cue
 {
   arcTypeAcrossTwo: {
@@ -2456,9 +2515,9 @@ letCycleSelfKeyword2: {
   regression1: {
     #Primary: {
       _Y: _
-      let _X#2 = 〈0;_Y〉
-      if (len(〈0;let _X#2〉.spec.command) > 0) {
-        command: 〈1;let _X#2〉.spec.command
+      let _X#3 = 〈0;_Y〉
+      if (len(〈0;let _X#3〉.spec.command) > 0) {
+        command: 〈1;let _X#3〉.spec.command
       }
     }
     #Rollout: {
@@ -2506,16 +2565,16 @@ letCycleSelfKeyword2: {
   }
   letCycleSelf: {
     #X: {
-      let this#3 = 〈1〉
+      let this#4 = 〈1〉
       hosts: {
         [string]: _
       }
-      for h, _ in 〈0;let this#3〉.hosts {
+      for h, _ in 〈0;let this#4〉.hosts {
         out: {
           〈2;h〉: 1
         }
       }
-      for h, _ in 〈0;let this#3〉.hosts {
+      for h, _ in 〈0;let this#4〉.hosts {
         out: {
           〈2;h〉: 2
         }
@@ -2533,9 +2592,9 @@ letCycleSelfKeyword2: {
 {
   letCycleSelfKeyword: {
     #E: {
-      let s#4 = 〈1〉
+      let s#5 = 〈1〉
       hosts: _
-      for _, hv in 〈0;let s#4〉.hosts {
+      for _, hv in 〈0;let s#5〉.hosts {
         out: {
           〈2;hv〉.x: "a"
         }
@@ -2551,11 +2610,11 @@ letCycleSelfKeyword2: {
   }
   letCycleSelfKeyword2: {
     #E: {
-      let s#5 = 〈1〉
+      let s#6 = 〈1〉
       ...
-      for _, hv in 〈0;let s#5〉.hosts {
-        let n#6 = 〈2;let s#5〉.networks
-        a: 〈0;let n#6〉
+      for _, hv in 〈0;let s#6〉.hosts {
+        let n#7 = 〈2;let s#6〉.networks
+        a: 〈0;let n#7〉
       }
     }
     env: (〈0;#E〉 & {

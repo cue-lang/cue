@@ -110,7 +110,7 @@ type Environment struct {
 
 	// TODO: This can probably move into the nodeContext, making it a map from
 	// conjunct to Value.
-	cache map[cacheKey]Value
+	cache map[cacheKey]letCacheEntry
 }
 
 // Equal reports whether e and f refer to the same node.
@@ -121,6 +121,14 @@ func (e *Environment) Equal(ctx *OpContext, f *Environment) bool {
 type cacheKey struct {
 	Expr Expr
 	Arc  *Vertex
+}
+
+// letCacheEntry is a cached LetReference result. fromRecompute records that
+// this computation replaced an earlier cached cycle placeholder; such an
+// entry is not itself discarded again. See LetReference.resolve.
+type letCacheEntry struct {
+	v             *Vertex
+	fromRecompute bool
 }
 
 // DerefVertex returns the dereferenced vertex for this environment.

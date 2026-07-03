@@ -104,6 +104,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca561d1e_8709a14e",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-03T12:51:49Z",
+      "side": 1,
+      "message": "Done. Good catch, thanks. The top-level schemas are now named through the same NamesFunc invocation as the references collected by the generator: a referenced top-level schema is recognized by its root and path (CUERef identity), and a synthetic CUERef is added for each unreferenced one, so the fold no longer reconstructs names and NamesFunc guarantees uniqueness across the whole set. Added v2_all_schemas_namesfunc.txtar covering your repro (AllSchemas + upper-casing NamesFunc with a referenced #Used); it fails without the fix.",
+      "parentUuid": "dc392131_1dca807c",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b58c9196_e6f9e772",

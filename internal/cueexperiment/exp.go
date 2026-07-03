@@ -62,6 +62,11 @@ type Config struct {
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
 	// Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
 	CmdReferencePkg bool `experiment:"preview:v0.13.0,default:v0.14.0,stable:v0.16.0"`
+
+	// OpenAPIV2 selects the new whole-document OpenAPI implementation behind
+	// the openapi encoding used by "cue import" and "cue export", extracting
+	// and generating a complete OpenAPI document rather than only its schemas.
+	OpenAPIV2 bool `experiment:"preview:v0.18.0"`
 }
 
 // initExperimentFlags initializes the experiment flags by processing both

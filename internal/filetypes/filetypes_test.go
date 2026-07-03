@@ -341,6 +341,7 @@ func TestParseFile(t *testing.T) {
 			Interpretation: build.OpenAPI,
 			Form:           build.Schema,
 			BoolTags: map[string]bool{
+				"allSchemas":     false,
 				"strict":         false,
 				"strictFeatures": false,
 				"strictKeywords": false,

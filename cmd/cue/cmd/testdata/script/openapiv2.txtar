@@ -13,6 +13,11 @@ exec cue import -p test -f -o extracted.cue openapi: openapi.json
 exec cue export --out openapi extracted.cue
 cmp stdout expect-generate
 
+# The allSchemas bool tag emits every top-level schema under
+# components.schemas, even when it is unreferenced.
+exec cue export --out openapi+allSchemas extracted.cue
+cmp stdout expect-generate-allschemas
+
 # Without the experiment, extraction only yields the component schemas.
 env CUE_EXPERIMENT=
 exec cue import -p test -o - openapi: openapi.json
@@ -56,6 +61,31 @@ paths: {}
         "version": "1.0"
     },
     "paths": {}
+}
+-- expect-generate-allschemas --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "test",
+        "version": "1.0"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Foo": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            }
+        }
+    }
 }
 -- expect-extract-v1 --
 // test

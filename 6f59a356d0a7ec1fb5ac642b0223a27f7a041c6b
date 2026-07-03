@@ -191,6 +191,24 @@
       "parentUuid": "3c55d43e_592dab0c",
       "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c116d785_4951cafd",
+        "filename": "encoding/openapi/testdata/v2_no_all_schemas.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T13:45:51Z",
+      "side": 1,
+      "message": "err, meant to leave this unresolved",
+      "parentUuid": "d7abe6ef_ad0c87dd",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

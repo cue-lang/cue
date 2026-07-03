@@ -1,0 +1,128 @@
+# With the openapiv2 experiment enabled, the openapi encoding extracts and
+# generates the whole OpenAPI document (via ExtractV2/GenerateV2) rather than
+# only its component schemas.
+
+env CUE_EXPERIMENT=openapiv2
+
+# Extraction preserves the whole document, not just the schemas.
+exec cue import -p test -o - openapi: openapi.json
+cmp stdout expect-extract
+
+# Generation reproduces an OpenAPI document from the extracted CUE.
+exec cue import -p test -f -o extracted.cue openapi: openapi.json
+exec cue export --out openapi extracted.cue
+cmp stdout expect-generate
+
+# A 3.1 document: the version is auto-detected from the document's openapi
+# field, so a schema in a 3.1-only position (webhooks) survives a round trip.
+exec cue import openapi-3.1.yaml -o openapi31.cue
+exec cue export --out yaml+openapi openapi31.cue
+cmp stdout expect-generate-3.1
+
+# Without the experiment, extraction only yields the component schemas.
+env CUE_EXPERIMENT=
+exec cue import -p test -o - openapi: openapi.json
+cmp stdout expect-extract-v1
+
+-- openapi.json --
+{
+  "openapi": "3.0.0",
+  "info": {"title": "test", "version": "1.0"},
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Foo": {
+        "type": "object",
+        "properties": {"name": {"type": "string"}},
+        "required": ["name"]
+      }
+    }
+  }
+}
+-- expect-extract --
+package test
+
+openapi: "3.0.0"
+info: {
+	title:   "test"
+	version: "1.0"
+}
+
+#Foo: {
+	name!: string
+	...
+}
+
+paths: {}
+-- expect-generate --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "test",
+        "version": "1.0"
+    },
+    "paths": {}
+}
+-- openapi-3.1.yaml --
+openapi: 3.1.0
+info:
+  title: test
+  version: "1.0"
+paths: {}
+webhooks:
+  newThing:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item:
+                  $ref: '#/components/schemas/Foo'
+components:
+  schemas:
+    Foo:
+      type: object
+      properties:
+        name:
+          type: string
+-- expect-generate-3.1 --
+openapi: 3.1.0
+info:
+  title: test
+  version: "1.0"
+paths: {}
+webhooks:
+  newThing:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                item:
+                  $ref: '#/components/schemas/Foo'
+components:
+  schemas:
+    Foo:
+      type: object
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+-- expect-extract-v1 --
+// test
+package test
+
+info: {
+	title:   *"test" | string
+	version: *"1.0" | string
+}
+
+#Foo: {
+	name!: string
+	...
+}

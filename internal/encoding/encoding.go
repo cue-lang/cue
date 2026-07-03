@@ -40,6 +40,7 @@ import (
 	"cuelang.org/go/encoding/toml"
 	"cuelang.org/go/encoding/xml/koala"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/source"
@@ -354,15 +355,27 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 func openAPIFunc(c *Config, f *build.File) interpretFunc {
 	return func(v cue.Value) (file *ast.File, err error) {
 		tags := boolTagsForFile(f, build.JSONSchema)
-		file, err = openapi.Extract(v, &openapi.Config{
-			PkgName: c.PkgName,
+		if cueexperiment.Flags.OpenAPIV2 {
+			file, err = openapi.ExtractV2(v, &openapi.ExtractConfig{
+				PkgName: c.PkgName,
 
-			// Note: don't populate Strict (see more detailed
-			// comment in jsonSchemaFunc)
+				// Note: don't populate Strict (see more detailed
+				// comment in jsonSchemaFunc)
 
-			StrictKeywords: tags["strictKeywords"],
-			StrictFeatures: tags["strictFeatures"],
-		})
+				StrictKeywords: tags["strictKeywords"],
+				StrictFeatures: tags["strictFeatures"],
+			})
+		} else {
+			file, err = openapi.Extract(v, &openapi.Config{
+				PkgName: c.PkgName,
+
+				// Note: don't populate Strict (see more detailed
+				// comment in jsonSchemaFunc)
+
+				StrictKeywords: tags["strictKeywords"],
+				StrictFeatures: tags["strictFeatures"],
+			})
+		}
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)
 		return file, err

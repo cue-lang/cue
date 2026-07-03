@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1f40e50_6d12ca96",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-03T12:59:30Z",
+      "side": 1,
+      "message": "Done. Fixed both sentences: the schemas paragraph now reads \"... emitted once and referenced with a $ref.\" and the schema-position paragraph now reads \"... generates the schema from that; if there is no # definition it uses whatever it finds there verbatim. All other content, including specification extensions, is passed through verbatim.\"",
+      "parentUuid": "1c712c65_8e276406",
+      "revId": "27a1b68068d6a04582a5203c3f5b6fc576bd1f13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1d8a728_a8434748",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-03T12:59:30Z",
+      "side": 1,
+      "message": "Done; DescriptionFunc now takes just v (matching the change in the previous commit).",
+      "parentUuid": "ff6d4799_3e4ffa83",
+      "revId": "27a1b68068d6a04582a5203c3f5b6fc576bd1f13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af0766e3_a839e995",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-03T12:59:30Z",
+      "side": 1,
+      "message": "Done; now uses \"THIS IS EXPERIMENTAL. API MIGHT CHANGE.\" to match GenerateMany.",
+      "parentUuid": "e3a5c8d6_2334098a",
+      "revId": "27a1b68068d6a04582a5203c3f5b6fc576bd1f13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

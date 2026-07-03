@@ -207,6 +207,8 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 }
 
 // exprHasResolver checks if an expression contains a Resolver (reference).
+// Deferred calls may be rescued by [isSafeToFlushCyclic]; keep the two in
+// sync.
 func exprHasResolver(x Expr) bool {
 	switch v := x.(type) {
 	case Resolver:

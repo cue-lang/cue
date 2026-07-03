@@ -492,10 +492,10 @@ selfCycle.t1.c.d.d: invalid value {d:{}} (does not satisfy matchN): structural c
     ./yamlcycle.cue:60:8
     ./yamlcycle.cue:61:8
 -- out/eval/stats --
-Leaks:  59
-Freed:  468
-Reused: 440
-Allocs: 87
+Leaks:  60
+Freed:  467
+Reused: 439
+Allocs: 88
 Retain: 0
 
 Unifications: 428

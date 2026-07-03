@@ -121,6 +121,11 @@ func (c *OpContext) reclaimTempBuffers(v *Vertex) {
 		if n == nil || n.refCount > 0 {
 			continue
 		}
+		if n.isDisjunct {
+			// As with the root above, defer to freeDisjunct: mergeCloseInfo
+			// may still need the closedness information.
+			continue
+		}
 
 		if w := arc.DerefDisjunct(); arc != w {
 			// Reclaim the fields that were already added before starting the

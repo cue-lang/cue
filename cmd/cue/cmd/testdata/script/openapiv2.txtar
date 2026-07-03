@@ -13,6 +13,11 @@ exec cue import -p test -f -o extracted.cue openapi: openapi.json
 exec cue export --out openapi extracted.cue
 cmp stdout expect-generate
 
+# The allSchemas bool tag emits every top-level schema under
+# components.schemas, even when it is unreferenced.
+exec cue export --out openapi+allSchemas extracted.cue
+cmp stdout expect-generate-allschemas
+
 # A 3.1 document: the version is auto-detected from the document's openapi
 # field, so a schema in a 3.1-only position (webhooks) survives a round trip.
 exec cue def openapi-3.1.yaml -o openapi31.cue
@@ -62,6 +67,31 @@ paths: {}
         "version": "1.0"
     },
     "paths": {}
+}
+-- expect-generate-allschemas --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "test",
+        "version": "1.0"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Foo": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            }
+        }
+    }
 }
 -- openapi-3.1.yaml --
 openapi: 3.1.0

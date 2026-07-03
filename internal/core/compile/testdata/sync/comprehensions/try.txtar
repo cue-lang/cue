@@ -647,6 +647,23 @@ listElems: {
 	withElse: [try { c? } else { -1 }]
 }
 
+// =============================================================================
+// Let referenced from a try body over a still-evaluating struct
+// =============================================================================
+
+// A let referenced from a try body resolves to a cycle placeholder while the
+// enclosing struct is still evaluating. Looking up a field on the unified
+// result used to recompute that placeholder without bound, hanging evaluation;
+// it must terminate with an incomplete error for the unprotected reference to
+// the absent optional field. https://cuelang.org/issue/4421
+letTryCycle: {
+	_d: {
+		let _x = {inner?: bool}
+		try { c: "\(_x.inner)" }
+	}
+	out: (_d & {}).c
+}
+
 -- out/compile --
 --- in.cue
 {
@@ -1423,5 +1440,16 @@ listElems: {
         -1
       },
     ]
+  }
+  letTryCycle: {
+    _d: {
+      let _x#1 = {
+        inner?: bool
+      }
+      try {
+        c: "\(〈1;let _x#1〉.inner)"
+      }
+    }
+    out: (〈0;_d〉 & {}).c
   }
 }

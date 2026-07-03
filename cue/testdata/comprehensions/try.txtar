@@ -734,6 +734,23 @@ listElems: {
 	withElse: [try { c? } else { -1 }] @test(eq, [-1])
 }
 
+// =============================================================================
+// Let referenced from a try body over a still-evaluating struct
+// =============================================================================
+
+// A let referenced from a try body resolves to a cycle placeholder while the
+// enclosing struct is still evaluating. Looking up a field on the unified
+// result used to recompute that placeholder without bound, hanging evaluation;
+// it must terminate with an incomplete error for the unprotected reference to
+// the absent optional field. https://cuelang.org/issue/4421
+letTryCycle: {
+	_d: {
+		let _x = {inner?: bool}
+		try { c: "\(_x.inner)" }
+	}
+	out: (_d & {}).c @test(err, code=incomplete, contains="cannot reference optional field: inner")
+}
+
 -- out/errors.txt --
 [incomplete] requiredUnfilled.x: required field missing: a:
     ./in.cue:83:11
@@ -775,19 +792,25 @@ listElems: {
     ./in.cue:492:16
 [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
     ./in.cue:518:11
+[incomplete] letTryCycle._d.c: invalid interpolation: cannot reference optional field: inner:
+    ./in.cue:748:12
+    ./in.cue:748:18
+[incomplete] letTryCycle.out: invalid interpolation: cannot reference optional field: inner:
+    ./in.cue:748:12
+    ./in.cue:748:18
 -- out/todo.txt --
 In v2, the try mechanism does not exist and many operations that succeed in v3
 produce errors in v2 (type errors, index out of range on open lists, etc.).
 v3 adds the @experiment(try) feature that catches optional reference failures.
 -- out/eval/stats --
-Leaks:  70
-Freed:  499
-Reused: 456
-Allocs: 113
+Leaks:  76
+Freed:  513
+Reused: 471
+Allocs: 118
 Retain: 0
 
-Unifications: 534
-Conjuncts:    673
+Unifications: 553
+Conjuncts:    697
 Disjuncts:    12
 
-NumCloseIDs: 263
+NumCloseIDs: 269

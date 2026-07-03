@@ -1,0 +1,50 @@
+# Tests that a comprehension guard that reads a sibling field does not cause
+# conjuncts from sibling declarations that have not yet been evaluated to be
+# dropped. Issue: the comprehension pushdown runs comprehension guards before
+# sibling resolver tasks. In closedDef, the guard resolves the default of
+# d.type and finalizes the field before #D's conjuncts arrive, so closedness
+# rejects type with a spurious "field not allowed". In selfInsert, resolving
+# the reference to local within the comprehension body freezes local's field
+# set, so the body can no longer add sos_region ("field set was already
+# referenced").
+# https://cuelang.org/issue/4423
+
+-- in.cue --
+closedDef: {
+	#D: {
+		type?:  string
+		fired?: bool
+	}
+	d: {
+		type: *"x" | "y"
+		if type == "x" {
+			fired: true
+		}
+	}
+	d: #D @test(err, code=eval, path=type, contains="field not allowed", pos=[-5:3]) @test(eq:todo, {type: *"x" | "y", fired: true})
+}
+
+selfInsert: {
+	local: {zone: "zrh1"} @test(err, code=eval, contains="adding field %v not allowed as field set was already referenced", args=[sos_region], pos=[2:10]) @test(eq:todo, {zone: "zrh1", sos_region: "ch-dk-2"})
+	if local.zone == "zrh1" {
+		local: _zones[local.zone]
+	}
+	_zones: zrh1: sos_region: "ch-dk-2"
+}
+-- out/errors.txt --
+[eval] closedDef.d.type: field not allowed:
+    ./in.cue:7:3
+[eval] selfInsert.local: adding field sos_region not allowed as field set was already referenced:
+    ./in.cue:18:10
+-- out/eval/stats --
+Leaks:  3
+Freed:  14
+Reused: 7
+Allocs: 10
+Retain: 0
+
+Unifications: 15
+Conjuncts:    24
+Disjuncts:    2
+
+NumCloseIDs: 6

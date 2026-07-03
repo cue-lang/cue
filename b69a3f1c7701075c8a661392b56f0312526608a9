@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2131fe27_24c388d6",
+        "filename": "cue/testdata/references/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-07-03T16:18:05Z",
+      "side": 1,
+      "message": "Maybe as a comment or to-do in the future, we shouldn\u0027t allow even the possibility that a dynamic field might not get a value. That means we would have to use an else in this case.",
+      "revId": "b69a3f1c7701075c8a661392b56f0312526608a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

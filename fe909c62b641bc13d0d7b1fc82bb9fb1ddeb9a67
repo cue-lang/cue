@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1943d194_d9f9aa79",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T14:18:24Z",
+      "side": 1,
+      "message": "fair enough. you can tell my english is not very precise :)",
+      "parentUuid": "d73853c0_15ef1ff4",
+      "revId": "fe909c62b641bc13d0d7b1fc82bb9fb1ddeb9a67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44492d4d_57710d0b",

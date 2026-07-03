@@ -882,14 +882,22 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 
 	// TODO(mem): add counter for let cache usage.
 	key := cacheKey{expr, arc}
-	v, ok := e.cache[key]
+	entry, ok := e.cache[key]
 	if ok {
 		// A cached cycle placeholder is provisional: it was computed before a
 		// dependency had settled. Recompute it in case the dependency now has a
 		// concrete value, but only while the let arc has not finalized: once it
 		// has, the value is settled and recomputing would loop on the same
 		// placeholder forever.
-		if cv := v.(*Vertex); isCyclePlaceholder(cv.BaseValue) && arc.status != finalized {
+		//
+		// Only the original computation may be discarded this way. A recompute
+		// that again results in a placeholder gained nothing, and evaluating
+		// the recomputed entry can itself re-run resolve for the same key (for
+		// example when a try body referencing the let is dry-run as part of
+		// the evaluation), so discarding recomputed entries as well spawns
+		// fresh computations without bound.
+		if isCyclePlaceholder(entry.v.BaseValue) && arc.status != finalized &&
+			!entry.fromRecompute {
 			ok = false
 		}
 	}
@@ -900,7 +908,7 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		c.x = expr
 
 		if e.cache == nil {
-			e.cache = map[cacheKey]Value{}
+			e.cache = map[cacheKey]letCacheEntry{}
 		}
 		// Allocate a vertex with space for one conjunct.
 		var alloc struct {
@@ -915,8 +923,10 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 			Conjuncts: alloc.c[:],
 		}
 		n := &alloc.v
-		v = n
-		e.cache[key] = n
+		// A non-nil entry.v means this computation replaces a discarded
+		// placeholder.
+		entry = letCacheEntry{v: n, fromRecompute: entry.v != nil}
+		e.cache[key] = entry
 		// TODO(mem): enable again once we implement memory management.
 		// nc := n.getState(ctx)
 		// TODO: unlike with the old evaluator, we do not allow the first
@@ -940,7 +950,7 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		// location where this is triggered.
 		n.setParentDone()
 	}
-	return v.(*Vertex)
+	return entry.v
 }
 
 // A SelectorExpr looks up a fixed field in an expression.

@@ -135,6 +135,11 @@ Available global experiments:
     modules enables support for the modules and package management proposal
     as described in https://cuelang.org/discussion/2939.
 
+  openapiv2 (preview: v0.18.0)
+    openapiv2 selects the new whole-document OpenAPI implementation behind
+    the openapi encoding used by "cue import" and "cue export", extracting
+    and generating a complete OpenAPI document rather than only its schemas.
+
   toposort (preview: v0.11.0, default: v0.12.0, stable: v0.14.0)
     toposort enables topological sorting of struct fields.
     Provide feedback via https://cuelang.org/issue/3558.

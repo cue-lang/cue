@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10ad468d_1464c205",
+        "filename": "encoding/openapi/testdata/v2_no_all_schemas.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-03T14:00:19Z",
+      "side": 1,
+      "message": "Done. I\u0027ve expanded the package godoc (doc.go) with a \"Schema positions and the # convention\" section that explains how schema positions work, shows how to reference an existing schema (schema: #: #Used) and inline a schema, and spells out why the # marker is required rather than treating whatever is at a schema position as a schema (data/schema distinction, positions not always named \"schema\", and keeping the document a well-formed OpenAPI encoding that still exports as JSON).",
+      "parentUuid": "c116d785_4951cafd",
+      "revId": "476609723d2d4838e8347cc4fe124b4ae4862cb5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

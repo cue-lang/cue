@@ -83,10 +83,6 @@ issue3828: full: {
 // A dynamic field whose key has a concrete value of a kind that cannot be a
 // label reports an "invalid index" error. The field can never exist, so its
 // value must not be evaluated.
-//
-// TODO: the "division by zero" error is spurious: it comes from evaluating
-// the value of the unusable field, which is inserted as an arc under
-// InvalidLabel.
 invalidKeyValue: {
 	x: (k): 1 / 0
 	k: true

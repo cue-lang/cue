@@ -193,6 +193,10 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 	}
 
 	f := ctx.Label(field.Key, v)
+	if f == InvalidLabel {
+		// ctx.Label has reported an error; do not insert an arc for it.
+		return
+	}
 	// TODO: remove this restriction.
 	if f.IsInt() {
 		n.addErr(ctx.NewPosf(Pos(field.Key), "integer fields not supported"))

@@ -114,17 +114,10 @@ issue3828: full: {
 // A dynamic field whose key has a concrete value of a kind that cannot be a
 // label reports an "invalid index" error. The field can never exist, so its
 // value must not be evaluated.
-//
-// TODO: the "division by zero" error is spurious: it comes from evaluating
-// the value of the unusable field, which is inserted as an arc under
-// InvalidLabel.
 invalidKeyValue: {
 	x: (k): 1 / 0
 	k: true
-	@test(err, code=eval,
-		suberr=(code=eval, contains="invalid index k (invalid type bool)", pos=[1:10, 1:6]),
-		suberr=(code=eval, contains="failed arithmetic: division by zero", pos=[1:10]),
-	)
+	@test(err, code=eval, contains="invalid index k (invalid type bool)", pos=[1:10, 1:6])
 }
 -- out/errors.txt --
 [eval] invalid interpolation: conflicting values 2 and 1:
@@ -142,11 +135,9 @@ noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found
 [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
     ./in.cue:46:8
     ./in.cue:46:11
-[eval] invalidKeyValue.x: failed arithmetic: division by zero:
-    ./invalidkey.cue:9:10
-invalidKeyValue.x: invalid index k (invalid type bool):
-    ./invalidkey.cue:9:10
-    ./invalidkey.cue:9:6
+[eval] invalidKeyValue.x: invalid index k (invalid type bool):
+    ./invalidkey.cue:5:10
+    ./invalidkey.cue:5:6
 -- out/eval/stats --
 Leaks:  4
 Freed:  74

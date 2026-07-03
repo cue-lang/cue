@@ -4,8 +4,8 @@
 # sibling resolver tasks. In closedDef, the guard resolved the default of
 # d.type and finalized the field before #D's conjuncts arrived, so closedness
 # rejected type with a spurious "field not allowed". In selfInsert, resolving
-# the reference to local within the comprehension body freezes local's field
-# set, so the body can no longer add sos_region ("field set was already
+# the reference to local within the comprehension body froze local's field
+# set, so the body could no longer add sos_region ("field set was already
 # referenced").
 # https://cuelang.org/issue/4423
 
@@ -25,18 +25,15 @@ closedDef: {
 }
 
 selfInsert: {
-	local: {zone: "zrh1"} @test(err, code=eval, contains="adding field %v not allowed as field set was already referenced", args=[sos_region], pos=[2:10]) @test(eq:todo, {zone: "zrh1", sos_region: "ch-dk-2"})
+	local: {zone: "zrh1"} @test(eq, {zone: "zrh1", sos_region: "ch-dk-2"})
 	if local.zone == "zrh1" {
 		local: _zones[local.zone]
 	}
 	_zones: zrh1: sos_region: "ch-dk-2"
 }
--- out/errors.txt --
-[eval] selfInsert.local: adding field sos_region not allowed as field set was already referenced:
-    ./in.cue:18:10
 -- out/eval/stats --
-Leaks:  3
-Freed:  14
+Leaks:  2
+Freed:  15
 Reused: 7
 Allocs: 10
 Retain: 0

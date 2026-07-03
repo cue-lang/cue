@@ -87,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20f7d04a_8e936ed1",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T13:45:07Z",
+      "side": 1,
+      "message": "Fair enough. I guess it\u0027s fine to use \"V2\" names when we don\u0027t feel like an entirely new v2 package is necessary. I don\u0027t have a particularly better name in mind.",
+      "parentUuid": "df944c9b_7a021918",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dc392131_1dca807c",
@@ -153,6 +171,24 @@
       "side": 1,
       "message": "Yeah, I wondered about this. I decided to do things this way because it makes the distinction between data and schema clear - we can still `cue export` the resulting CUE OpenAPI document as JSON, although the schema parts will be omitted. And not all schemas are inside a `schema` field. Also, it means that the entire document still conforms to the OpenAPI specification, which it would not if the schemas were in place (because the spec specifies a JSON Schema in that position, but the translated schema validates the eventual data, not the schema itself).\n\nFor these reasons, I think it\u0027s probably OK to go ahead as is, at least for the time being. This is all still experimental, so we can change it up if we feel like it.",
       "parentUuid": "b58c9196_e6f9e772",
+      "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7abe6ef_ad0c87dd",
+        "filename": "encoding/openapi/testdata/v2_no_all_schemas.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T13:45:07Z",
+      "side": 1,
+      "message": "Fair enough, I buy that argument. I\u0027d just then document it a bit better, even if it\u0027s just in the package godoc, because a user or future maintainer might have the same questions in their head.",
+      "parentUuid": "3c55d43e_592dab0c",
       "revId": "6f59a356d0a7ec1fb5ac642b0223a27f7a041c6b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

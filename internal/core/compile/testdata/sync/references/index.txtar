@@ -30,8 +30,8 @@ varNegativeIndex: {
 	a: [1, 2, 3][n]
 }
 
-// TODO: "index out of range [0] with length 0" is misleading for a struct,
-// which can never have integer indices no matter its length.
+// An integer index into a value that can never be a list reports a fatal
+// invalid-index error rather than a misleading out-of-range one.
 intIndexToStruct: {foo: "bar"}[0]
 intIndexToOpenStruct: {foo: "bar", ...}[0]
 intIndexToStructRef: {

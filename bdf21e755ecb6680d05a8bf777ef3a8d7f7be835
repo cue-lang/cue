@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8f6c7fc_a9edbc61",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 24
+      },
+      "lineNbr": 2088,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T10:36:44Z",
+      "side": 1,
+      "message": "Since self can also refer to a comprehension body (which is syntactically a struct), consider wording that covers it, e.g. \"refer to the innermost struct, list, or comprehension body, or the top level if none exist\". As written, \"innermost struct or list\" invites reading self inside `[for x in l {...}]` as referring to the enclosing list, when it actually refers to the yielded element.",
+      "revId": "bdf21e755ecb6680d05a8bf777ef3a8d7f7be835",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23a653d4_e5d75192",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 24
+      },
+      "lineNbr": 2101,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T10:36:44Z",
+      "side": 1,
+      "message": "Worth adding comprehension examples here. The comprehension body is a struct, so self can refer to it:\n\n```\n// comprehension bodies\nj: [ for x in [1, 2] { v: x, w: self.v } ] // refers to each yielded element\nk: {\n    n: 1\n    for _ in [1] { m: self.n } // body embeds into k, so refers to value of k (1)\n}\n```\n\nIn the list case the body is the yielded element, so self does not reach the enclosing list; in the field case the body embeds into the enclosing struct, so self observably refers to that struct.",
+      "revId": "bdf21e755ecb6680d05a8bf777ef3a8d7f7be835",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

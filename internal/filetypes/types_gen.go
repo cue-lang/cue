@@ -43,6 +43,7 @@ var fromFileDataBytes []byte
 
 func init() {
 	tagTypes = map[string]TagType{
+		"allSchemas":           TagSubsidiaryBool,
 		"auto":                 TagTopLevel,
 		"binary":               TagTopLevel,
 		"code":                 TagTopLevel,
@@ -301,6 +302,7 @@ func (t subsidiaryTags) marshalToMap() map[string]string {
 }
 
 type subsidiaryBoolTags struct {
+	allSchemas           opt.Opt[bool]
 	indentSequences      opt.Opt[bool]
 	koala                opt.Opt[bool]
 	openOnlyWhenExplicit opt.Opt[bool]
@@ -310,6 +312,9 @@ type subsidiaryBoolTags struct {
 }
 
 func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
+	if x, ok := m["allSchemas"]; ok {
+		t.allSchemas = opt.Some(x)
+	}
 	if x, ok := m["indentSequences"]; ok {
 		t.indentSequences = opt.Some(x)
 	}
@@ -332,6 +337,9 @@ func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
 }
 func (t subsidiaryBoolTags) marshalToMap() map[string]bool {
 	m := make(map[string]bool)
+	if t.allSchemas.IsPresent() {
+		m["allSchemas"] = t.allSchemas.Value()
+	}
 	if t.indentSequences.IsPresent() {
 		m["indentSequences"] = t.indentSequences.Value()
 	}
@@ -410,6 +418,9 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 //	}
 func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	r.indentSequences = opt.Some(true)
 	if t.indentSequences.IsPresent() {
 		r.indentSequences = t.indentSequences
@@ -444,9 +455,14 @@ func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		strict:          *false | bool
 //		strictKeywords:  *strict | bool
 //		strictFeatures:  *strict | bool
+//		allSchemas:      *false | bool
 //	}
 func unifySubsidiaryBoolTags_7(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	r.allSchemas = opt.Some(false)
+	if t.allSchemas.IsPresent() {
+		r.allSchemas = t.allSchemas
+	}
 	r.indentSequences = opt.Some(true)
 	if t.indentSequences.IsPresent() {
 		r.indentSequences = t.indentSequences
@@ -480,6 +496,9 @@ func unifySubsidiaryBoolTags_7(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	r.indentSequences = opt.Some(true)
 	if t.indentSequences.IsPresent() {
 		r.indentSequences = t.indentSequences
@@ -514,6 +533,9 @@ func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	if t.indentSequences.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
@@ -548,9 +570,14 @@ func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
 //		strictFeatures: *strict | bool
+//		allSchemas:     *false | bool
 //	}
 func unifySubsidiaryBoolTags_6(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	r.allSchemas = opt.Some(false)
+	if t.allSchemas.IsPresent() {
+		r.allSchemas = t.allSchemas
+	}
 	if t.indentSequences.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
@@ -584,6 +611,9 @@ func unifySubsidiaryBoolTags_6(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	if t.indentSequences.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
@@ -617,6 +647,9 @@ func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	if t.indentSequences.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}
@@ -649,9 +682,14 @@ func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
 //		strictFeatures: *strict | bool
+//		allSchemas:     *false | bool
 //	}
 func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	r.allSchemas = opt.Some(false)
+	if t.allSchemas.IsPresent() {
+		r.allSchemas = t.allSchemas
+	}
 	if t.indentSequences.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "indentSequences")
 	}

@@ -622,6 +622,9 @@ valid with is mentioned in parentheses at the end.
                     require a schema to be explicitly opened before a
                     ... will be added to a struct (jsonschema)
 
+    allSchemas      emit an entry under components.schemas for every
+                    top-level schema, even when unreferenced (openapi)
+
     indentSequences
                     indent sequence elements relative to their
                     enclosing mapping key; true by default (yaml)

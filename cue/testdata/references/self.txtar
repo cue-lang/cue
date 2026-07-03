@@ -101,6 +101,71 @@ withLetComprehension: {
 	seeFor:    "c"
 	seeTry:    "d"
 })
+
+// A comprehension inherited by a `let X = self` copy must fully evaluate
+// a dynamic field whose key interpolation contains a call with a
+// reference argument, such as len(K) below.
+// See https://cuelang.org/issue/4420.
+withLetDynamicField: {
+	let X = self
+	h: [string]~K: c: len(K)
+	h: a: _
+	g: _
+	for x in X.h {
+		// TODO: the language may not always allow a dynamic field key that
+		// can lack a value; an if inside its interpolation would then
+		// require an else branch.
+		g: "\({if true {x.c}})": true
+	}
+	for k, _ in g {
+		G: k
+	}
+	@test(eq:todo, {
+		h: a: c: 1
+		g: "1": true
+		G: "1"
+		s: true
+		x: 1
+	})
+}
+withLetDynamicField: {
+	let Y = self
+	s: true
+	x: {
+		if Y.s {1}
+		if !Y.s {2}
+	}
+}
+
+// Variant of the above where the call argument is a regular reference
+// rather than a pattern alias.
+withLetDynamicFieldRef: {
+	let X = self
+	h: [string]: c: len(h.a)
+	h: a: _
+	g: _
+	for x in X.h {
+		g: "\({if true {x.c}})": true
+	}
+	for k, _ in g {
+		G: k
+	}
+	@test(eq:todo, {
+		h: a: c: 1
+		g: "1": true
+		G: "1"
+		s: true
+		x: 1
+	})
+}
+withLetDynamicFieldRef: {
+	let Y = self
+	s: true
+	x: {
+		if Y.s {1}
+		if !Y.s {2}
+	}
+}
 -- validator.cue --
 @experiment(structcmp)
 @experiment(aliasv2)
@@ -287,15 +352,21 @@ a: {
     ./validator.cue:19:12
     ./validator.cue:18:12
     ./validator.cue:19:19
+[eval] withLetDynamicField.Y.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
+    ./withlet.cue:55:6
+    ./withlet.cue:55:9
+[eval] withLetDynamicFieldRef.Y.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
+    ./withlet.cue:85:6
+    ./withlet.cue:85:9
 -- out/eval/stats --
-Leaks:  16
-Freed:  72
-Reused: 45
-Allocs: 43
+Leaks:  39
+Freed:  125
+Reused: 98
+Allocs: 66
 Retain: 0
 
-Unifications: 76
-Conjuncts:    132
+Unifications: 144
+Conjuncts:    244
 Disjuncts:    0
 
-NumCloseIDs: 42
+NumCloseIDs: 90

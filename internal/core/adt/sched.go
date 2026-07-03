@@ -708,9 +708,11 @@ func (s *scheduler) freeze(c condition) {
 // freezing is the deliberate cycle-breaker. A waiting task does not defer
 // either, regardless of kind.
 //
-// The current task is excluded: it may freeze fieldSetKnown for the very node
-// it is the parent task of (e.g. a comprehension iterating over its own source
-// node) without deferring on itself.
+// The current task is excluded from the parent-task check only: it may
+// freeze fieldSetKnown for the very node it is the parent task of (e.g. a
+// comprehension iterating over its own source node). A running resolver
+// among this scheduler's own tasks still defers the freeze, as its result
+// may yet add fields to this node.
 func (s *scheduler) deferFieldSetKnown(c condition) condition {
 	if c&fieldSetKnown == 0 {
 		return c
@@ -726,7 +728,7 @@ func (s *scheduler) deferFieldSetKnown(c condition) condition {
 		}
 	}
 	for _, t := range s.tasks {
-		if t == cur || t.run.completes&fieldConjunctsKnown == 0 {
+		if t.run.completes&fieldConjunctsKnown == 0 {
 			continue
 		}
 		switch t.state {

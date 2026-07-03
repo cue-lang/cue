@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88d7ab81_faa3b9a5",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-03T12:59:08Z",
+      "side": 1,
+      "message": "Done. Changed to \"THIS IS EXPERIMENTAL. API MIGHT CHANGE.\", matching the notice used on cue/load Config.Registry.",
+      "parentUuid": "f1b3b762_cb0f8da5",
+      "revId": "60db26e281b38b9589c8c7e2c5d71b2c70dd69e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0400e74a_2708bf33",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd9bbb62_b60706b5",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-03T12:59:08Z",
+      "side": 1,
+      "message": "Done. Renamed to GenerateMany.",
+      "parentUuid": "0400e74a_2708bf33",
+      "revId": "60db26e281b38b9589c8c7e2c5d71b2c70dd69e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "764dfce8_3b6f6bd2",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-07-02T14:59:57Z",
       "side": 1,
       "message": "why does DescriptionFunc need both v and v.Path? if we give it just v, it can call v.Path itself, no?",
+      "revId": "60db26e281b38b9589c8c7e2c5d71b2c70dd69e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe0252a8_39b89f90",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-03T12:59:08Z",
+      "side": 1,
+      "message": "Done. Dropped the path argument; DescriptionFunc is now func(v cue.Value) string, which also matches encoding/openapi\u0027s DescriptionFunc.",
+      "parentUuid": "764dfce8_3b6f6bd2",
       "revId": "60db26e281b38b9589c8c7e2c5d71b2c70dd69e4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

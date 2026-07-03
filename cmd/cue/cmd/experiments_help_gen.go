@@ -143,6 +143,11 @@ Available global experiments:
     formatv2 selects the Wadler-Lindig pretty-printer as the
     implementation behind "cue fmt" and "cue/format".
 
+  openapiv2 (preview: v0.18.0)
+    openapiv2 selects the new whole-document OpenAPI implementation behind
+    the openapi encoding used by "cue import" and "cue export", extracting
+    and generating a complete OpenAPI document rather than only its schemas.
+
 Each experiment's lifecycle tracks language versions as follows:
 - preview:   experimental feature that can be enabled
 - default:   experiment enabled by default, can still be disabled

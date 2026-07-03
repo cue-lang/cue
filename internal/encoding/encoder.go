@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/encoding/toml"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cueexperiment"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/pretty"
@@ -84,9 +85,20 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	case "":
 	case build.OpenAPI:
 		// TODO: get encoding options
-		cfg := &openapi.Config{}
-		e.interpret = func(v cue.Value) (*ast.File, error) {
-			return openapi.Generate(v, cfg)
+		if cueexperiment.Flags.OpenAPIV2 {
+			cfg := &openapi.GenerateConfig{}
+			e.interpret = func(v cue.Value) (*ast.File, error) {
+				expr, err := openapi.GenerateV2(v, cfg)
+				if err != nil {
+					return nil, err
+				}
+				return internal.ToFile(expr, false), nil
+			}
+		} else {
+			cfg := &openapi.Config{}
+			e.interpret = func(v cue.Value) (*ast.File, error) {
+				return openapi.Generate(v, cfg)
+			}
 		}
 	case build.JSONSchema:
 		// TODO: get encoding options

@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9be18c22_f926fa27",
+        "filename": "cue/testdata/references/self.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T11:47:23Z",
+      "side": 1,
+      "message": "Done, in two parts. This directive no longer asserts the error message, only code\u003dincomplete. And this CL now also adds intIndexToStruct cases to references/index.txtar capturing the current behavior, which a follow-up commit (I3fd2084261448e9db18c7dadfb2eca447f438f40) changes to a dedicated \"invalid index 0 (invalid type struct)\" error. One correction to my earlier claim: for settled structs the error was already fatal (via the closedness check), so the substance of the change is the clearer message, plus no longer depending on closedness for the error code.\n\nThis listComp case stays incomplete, though: when the index is evaluated, self\u0027s kind is not yet settled — its BaseValue is still a cycle placeholder, and the embedding under evaluation could in principle still turn the element into a list — so a fatal error here would judge the kind prematurely, the same trap that caused the dynamic-field hang fixed earlier in this stack. Making the fully cyclic case fatal as well would need to involve the structural-cycle machinery, which I would rather leave for a follow-up.",
+      "parentUuid": "6f2df150_aeba8b35",
+      "revId": "5c7d2c49fd048dbfce97d991a354f95f2c425272",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

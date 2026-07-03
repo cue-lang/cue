@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e82e0b50_cf4b5011",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T14:04:59Z",
+      "side": 1,
+      "message": "end the last sentence here by saying that the text below concerns GenerateV2 only.",
+      "revId": "fe909c62b641bc13d0d7b1fc82bb9fb1ddeb9a67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2189cfd2_2e8102bd",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T14:04:59Z",
+      "side": 1,
+      "message": "nit: I\u0027d say \"can also be written the same way\" as it\u0027s the user\u0027s choice whether or not to inline",
+      "revId": "fe909c62b641bc13d0d7b1fc82bb9fb1ddeb9a67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44492d4d_57710d0b",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T14:04:59Z",
+      "side": 1,
+      "message": "use a whole \"paths: ...\" example as above, for clarity?",
+      "revId": "fe909c62b641bc13d0d7b1fc82bb9fb1ddeb9a67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdd1796f_c7afeec5",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T14:04:59Z",
+      "side": 1,
+      "message": "use backquotes to clarify inline code, like: `` `schema: #Person` ``",
+      "revId": "fe909c62b641bc13d0d7b1fc82bb9fb1ddeb9a67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "537e14c5_254d43d1",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T14:04:59Z",
+      "side": 1,
+      "message": "do we have tests for this?\n\nand what about tests for mixing of the two, which should presumably fail:\n\n```\nschema: {\n  #: #Whatever\n  foo: \"bar\"\n}\n```",
+      "revId": "fe909c62b641bc13d0d7b1fc82bb9fb1ddeb9a67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4381acff_80f16260",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T14:04:59Z",
+      "side": 1,
+      "message": "I would drop this notice. we already document GenerateV2 itself as experimental, and we\u0027re not documenting the whole package as experimental.",
+      "revId": "fe909c62b641bc13d0d7b1fc82bb9fb1ddeb9a67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -43,6 +43,7 @@ var fromFileDataBytes []byte
 
 func init() {
 	tagTypes = map[string]TagType{
+		"allSchemas":           TagSubsidiaryBool,
 		"auto":                 TagTopLevel,
 		"binary":               TagTopLevel,
 		"code":                 TagTopLevel,
@@ -305,6 +306,7 @@ func (t subsidiaryTags) marshalToMap() map[string]string {
 }
 
 type subsidiaryBoolTags struct {
+	allSchemas           opt.Opt[bool]
 	compact              opt.Opt[bool]
 	indentSequences      opt.Opt[bool]
 	koala                opt.Opt[bool]
@@ -315,6 +317,9 @@ type subsidiaryBoolTags struct {
 }
 
 func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
+	if x, ok := m["allSchemas"]; ok {
+		t.allSchemas = opt.Some(x)
+	}
 	if x, ok := m["compact"]; ok {
 		t.compact = opt.Some(x)
 	}
@@ -340,6 +345,9 @@ func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
 }
 func (t subsidiaryBoolTags) marshalToMap() map[string]bool {
 	m := make(map[string]bool)
+	if t.allSchemas.IsPresent() {
+		m["allSchemas"] = t.allSchemas.Value()
+	}
 	if t.compact.IsPresent() {
 		m["compact"] = t.compact.Value()
 	}
@@ -421,6 +429,9 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 //	}
 func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	r.compact = opt.Some(false)
 	if t.compact.IsPresent() {
 		r.compact = t.compact
@@ -458,9 +469,14 @@ func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
 //		strictFeatures: *strict | bool
+//		allSchemas:     *false | bool
 //	}
 func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	r.allSchemas = opt.Some(false)
+	if t.allSchemas.IsPresent() {
+		r.allSchemas = t.allSchemas
+	}
 	r.compact = opt.Some(false)
 	if t.compact.IsPresent() {
 		r.compact = t.compact
@@ -497,6 +513,9 @@ func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	r.compact = opt.Some(false)
 	if t.compact.IsPresent() {
 		r.compact = t.compact
@@ -534,6 +553,9 @@ func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_8(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	if t.compact.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}
@@ -571,9 +593,14 @@ func unifySubsidiaryBoolTags_8(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		strict:          *false | bool
 //		strictKeywords:  *strict | bool
 //		strictFeatures:  *strict | bool
+//		allSchemas:      *false | bool
 //	}
 func unifySubsidiaryBoolTags_10(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	r.allSchemas = opt.Some(false)
+	if t.allSchemas.IsPresent() {
+		r.allSchemas = t.allSchemas
+	}
 	if t.compact.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}
@@ -610,6 +637,9 @@ func unifySubsidiaryBoolTags_10(t subsidiaryBoolTags) (subsidiaryBoolTags, error
 //	}
 func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	if t.compact.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}
@@ -647,6 +677,9 @@ func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_7(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	if t.compact.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}
@@ -684,9 +717,14 @@ func unifySubsidiaryBoolTags_7(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
 //		strictFeatures: *strict | bool
+//		allSchemas:     *false | bool
 //	}
 func unifySubsidiaryBoolTags_9(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	r.allSchemas = opt.Some(false)
+	if t.allSchemas.IsPresent() {
+		r.allSchemas = t.allSchemas
+	}
 	if t.compact.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}
@@ -723,6 +761,9 @@ func unifySubsidiaryBoolTags_9(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	if t.compact.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}
@@ -759,6 +800,9 @@ func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //	}
 func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	if t.allSchemas.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "allSchemas")
+	}
 	if t.compact.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}
@@ -794,9 +838,14 @@ func unifySubsidiaryBoolTags_5(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		strict:         *false | bool
 //		strictKeywords: *strict | bool
 //		strictFeatures: *strict | bool
+//		allSchemas:     *false | bool
 //	}
 func unifySubsidiaryBoolTags_6(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
+	r.allSchemas = opt.Some(false)
+	if t.allSchemas.IsPresent() {
+		r.allSchemas = t.allSchemas
+	}
 	if t.compact.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "compact")
 	}

@@ -86,11 +86,9 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	case build.OpenAPI:
 		// TODO: get encoding options
 		if cueexperiment.Flags.OpenAPIV2 {
-			// Note: leave AllSchemas as false, which will include
-			// in components.schemas only the schemas that are
-			// actually used by the OpenAPI spec. We could revisit
-			// that decision if it seems less than useful.
-			cfg := &openapi.GenerateConfig{}
+			cfg := &openapi.GenerateConfig{
+				AllSchemas: f.BoolTags["allSchemas"],
+			}
 			e.interpret = func(v cue.Value) (*ast.File, error) {
 				expr, err := openapi.GenerateV2(v, cfg)
 				if err != nil {

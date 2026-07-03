@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5894ac59_ed99ef8b",
+        "filename": "internal/core/adt/tasks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-07-03T11:01:33Z",
+      "side": 1,
+      "message": "Arguably this is generally true. You may want to consider if this check could be put one level up in the generic task handling. If not, no big deal.",
+      "revId": "6f678deac1f08e0362978c5f90ceaed2d867705b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

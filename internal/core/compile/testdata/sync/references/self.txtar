@@ -94,6 +94,9 @@ withLetDynamicField: {
 	h: a: _
 	g: _
 	for x in X.h {
+		// TODO: the language may not always allow a dynamic field key that
+		// can lack a value; an if inside its interpolation would then
+		// require an else branch.
 		g: "\({if true {x.c}})": true
 	}
 	for k, _ in g {

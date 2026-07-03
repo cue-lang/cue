@@ -101,6 +101,38 @@ withLetComprehension: {
 	seeFor:    "c"
 	seeTry:    "d"
 })
+
+// A comprehension inherited by a `let X = self` copy must fully evaluate
+// a dynamic field whose key interpolation contains a call taking a
+// pattern alias, such as len(K) below.
+// See https://cuelang.org/issue/4420.
+withLetDynamicField: {
+	let X = self
+	h: [string]~K: c: len(K)
+	h: a: _
+	g: _
+	for x in X.h {
+		g: "\({if true {x.c}})": true
+	}
+	for k, _ in g {
+		G: k
+	}
+	@test(eq:todo, {
+		h: a: c: 1
+		g: "1": true
+		G: "1"
+		s: true
+		x: 1
+	})
+}
+withLetDynamicField: {
+	let Y = self
+	s: true
+	x: {
+		if Y.s {1}
+		if !Y.s {2}
+	}
+}
 -- validator.cue --
 @experiment(structcmp)
 @experiment(aliasv2)
@@ -324,6 +356,9 @@ a: {
     ./validator.cue:19:12
     ./validator.cue:18:12
     ./validator.cue:19:19
+[eval] withLetDynamicField.Y.g: invalid interpolation: cannot use {} (type struct) as type (bool|string|bytes|number):
+    ./withlet.cue:52:6
+    ./withlet.cue:52:9
 -- out/eval/stats --
 Leaks:  16
 Freed:  72

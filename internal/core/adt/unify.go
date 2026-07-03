@@ -949,6 +949,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 				if state != nil {
 					for _, pt := range state.parentTasks {
 						if pt.state < taskSUCCESS {
+							c.lookupPendingParent = true
 							return arcReturn
 						}
 					}
@@ -962,6 +963,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 				// may still produce this field.
 				for _, pt := range arcState.parentTasks {
 					if pt.state < taskSUCCESS {
+						c.lookupPendingParent = true
 						return arcReturn
 					}
 				}

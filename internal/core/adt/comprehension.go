@@ -223,6 +223,14 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	// It seems so, but it causes some hangs.
 	// id.setOptional(nil)
 
+	// Mark the current task as inserting so that resolver tasks on this
+	// node are deferred until the insertion is complete; see the
+	// hasInsertingComp case in process.
+	if t := ctx.current(); t != nil && t.run == handleComprehension {
+		t.inserting = true
+		defer func() { t.inserting = false }()
+	}
+
 	if len(d.envs) == 0 && d.comp.Fallback != nil {
 		n.scheduleConjunct(Conjunct{d.env, d.comp.Fallback, id}, id)
 		return nil

@@ -478,6 +478,10 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 	// later comprehension iterates over fields that an earlier (currently
 	// running) comprehension has not yet populated.
 	hasRunningComp := false
+	// hasInsertingComp is like hasRunningComp, but only considers
+	// comprehensions that are past clause evaluation and are inserting the
+	// conjuncts their clauses yielded.
+	hasInsertingComp := false
 	// Check if a disjunction is still pending (READY) on this scheduler.
 	// If so, defer pushed-down comprehension tasks until disjunction
 	// expansion has cloned the parent into disjuncts. Pushdown turns the
@@ -491,6 +495,9 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 	for _, t := range s.tasks {
 		if t.state == taskRUNNING && t.run == handleComprehension {
 			hasRunningComp = true
+			if t.inserting {
+				hasInsertingComp = true
+			}
 		}
 		if t.state == taskREADY && t.run == handleDisjunctions {
 			hasPendingDisjunction = true
@@ -521,11 +528,16 @@ processNextTask:
 			// on the same node. The running comprehension may add fields
 			// that this one depends on.
 			continue
-		case hasRunningComp && t.run == handleResolver:
-			// Do not start a resolver while a comprehension is running
-			// on the same node. The resolver (e.g. an embedding like
-			// funcs["0"]) may depend on fields that the running
-			// comprehension has not yet added.
+		case hasInsertingComp && t.run == handleResolver:
+			// Do not start a resolver while a comprehension is inserting
+			// results on the same node. The resolver (e.g. an embedding
+			// like funcs["0"]) may depend on fields that the running
+			// comprehension has not yet added. Note that a comprehension
+			// that is still evaluating its clauses does not defer
+			// resolvers: its guards may depend on conjuncts the resolver
+			// adds, and deferring would allow the guard evaluation to
+			// resolve and freeze sibling fields before all their conjuncts
+			// are known. See https://cuelang.org/issue/4423.
 			continue
 		case hasPendingDisjunction && t.run == handleComprehension &&
 			t.completes == allTasksCompleted:
@@ -797,6 +809,15 @@ type task struct {
 	env *Environment
 	id  CloseInfo
 	x   Node // The conjunct Expression or Value.
+
+	// inserting indicates that this (comprehension) task is in the phase of
+	// inserting the conjuncts its clauses yielded, as opposed to still
+	// evaluating its clauses. See the hasInsertingComp case in process.
+	inserting bool
+
+	// retry indicates that this task ran without effect, but may succeed
+	// when run again later. It is reset to READY instead of completing.
+	retry bool
 }
 
 func (s *scheduler) insertTask(t *task) {
@@ -957,6 +978,17 @@ func runTask(t *task, mode runMode) {
 		if b, ok := d.node.BaseValue.(*Bottom); ok {
 			t.node.addBottom(b)
 		}
+	}
+
+	if t.retry && t.state == taskRUNNING {
+		// The task ran without effect, for instance a resolver that could
+		// not resolve in attemptOnly mode because a comprehension may still
+		// produce the referenced field. Requeue it so that a later pass
+		// reruns it, instead of completing it and silently dropping its
+		// conjuncts.
+		t.retry = false
+		t.state = taskREADY
+		return
 	}
 
 	if t.state != taskWAITING {

@@ -1,9 +1,9 @@
 # Tests that a comprehension guard that reads a sibling field does not cause
 # conjuncts from sibling declarations that have not yet been evaluated to be
-# dropped. Issue: the comprehension pushdown runs comprehension guards before
-# sibling resolver tasks. In closedDef, the guard resolves the default of
-# d.type and finalizes the field before #D's conjuncts arrive, so closedness
-# rejects type with a spurious "field not allowed". In selfInsert, resolving
+# dropped. Issue: the comprehension pushdown ran comprehension guards before
+# sibling resolver tasks. In closedDef, the guard resolved the default of
+# d.type and finalized the field before #D's conjuncts arrived, so closedness
+# rejected type with a spurious "field not allowed". In selfInsert, resolving
 # the reference to local within the comprehension body freezes local's field
 # set, so the body can no longer add sos_region ("field set was already
 # referenced").
@@ -21,7 +21,7 @@ closedDef: {
 			fired: true
 		}
 	}
-	d: #D @test(err, code=eval, path=type, contains="field not allowed", pos=[-5:3]) @test(eq:todo, {type: *"x" | "y", fired: true})
+	d: #D @test(eq, {type: *"x" | "y", fired: true})
 }
 
 selfInsert: {
@@ -32,8 +32,6 @@ selfInsert: {
 	_zones: zrh1: sos_region: "ch-dk-2"
 }
 -- out/errors.txt --
-[eval] closedDef.d.type: field not allowed:
-    ./in.cue:7:3
 [eval] selfInsert.local: adding field sos_region not allowed as field set was already referenced:
     ./in.cue:18:10
 -- out/eval/stats --
@@ -44,7 +42,7 @@ Allocs: 10
 Retain: 0
 
 Unifications: 15
-Conjuncts:    24
+Conjuncts:    25
 Disjuncts:    2
 
 NumCloseIDs: 6

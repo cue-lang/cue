@@ -83,6 +83,54 @@ withLetComprehension: {
 	seeFor:    X.viaFor
 	seeTry:    X.viaTry
 }
+
+// A comprehension inherited by a `let X = self` copy must fully evaluate
+// a dynamic field whose key interpolation contains a call with a
+// reference argument, such as len(K) below.
+// See https://cuelang.org/issue/4420.
+withLetDynamicField: {
+	let X = self
+	h: [string]~K: c: len(K)
+	h: a: _
+	g: _
+	for x in X.h {
+		g: "\({if true {x.c}})": true
+	}
+	for k, _ in g {
+		G: k
+	}
+}
+withLetDynamicField: {
+	let Y = self
+	s: true
+	x: {
+		if Y.s {1}
+		if !Y.s {2}
+	}
+}
+
+// Variant of the above where the call argument is a regular reference
+// rather than a pattern alias.
+withLetDynamicFieldRef: {
+	let X = self
+	h: [string]: c: len(h.a)
+	h: a: _
+	g: _
+	for x in X.h {
+		g: "\({if true {x.c}})": true
+	}
+	for k, _ in g {
+		G: k
+	}
+}
+withLetDynamicFieldRef: {
+	let Y = self
+	s: true
+	x: {
+		if Y.s {1}
+		if !Y.s {2}
+	}
+}
 -- validator.cue --
 @experiment(structcmp)
 @experiment(aliasv2)
@@ -308,5 +356,77 @@ a: {
     seeIf: 〈0;let X#2〉.viaIf
     seeFor: 〈0;let X#2〉.viaFor
     seeTry: 〈0;let X#2〉.viaTry
+  }
+  withLetDynamicField: {
+    let X#3 = 〈1〉
+    h: {
+      [string]: {
+        c: len(〈1;(〈0;-〉)〉)
+      }
+    }
+    h: {
+      a: _
+    }
+    g: _
+    for _, x in 〈0;let X#3〉.h {
+      g: {
+        "\({
+          if true {
+            〈4;x〉.c
+          }
+        })": true
+      }
+    }
+    for k, _ in 〈0;g〉 {
+      G: 〈1;k〉
+    }
+  }
+  withLetDynamicField: {
+    let Y#4 = 〈1〉
+    s: true
+    x: {
+      if 〈1;let Y#4〉.s {
+        1
+      }
+      if !〈1;let Y#4〉.s {
+        2
+      }
+    }
+  }
+  withLetDynamicFieldRef: {
+    let X#5 = 〈1〉
+    h: {
+      [string]: {
+        c: len(〈2;h〉.a)
+      }
+    }
+    h: {
+      a: _
+    }
+    g: _
+    for _, x in 〈0;let X#5〉.h {
+      g: {
+        "\({
+          if true {
+            〈4;x〉.c
+          }
+        })": true
+      }
+    }
+    for k, _ in 〈0;g〉 {
+      G: 〈1;k〉
+    }
+  }
+  withLetDynamicFieldRef: {
+    let Y#6 = 〈1〉
+    s: true
+    x: {
+      if 〈1;let Y#6〉.s {
+        1
+      }
+      if !〈1;let Y#6〉.s {
+        2
+      }
+    }
   }
 }

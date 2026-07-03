@@ -335,6 +335,9 @@ interpretations: openapi: {
 		strict:         *false | bool
 		strictKeywords: *strict | bool
 		strictFeatures: *strict | bool
+		// allSchemas causes an entry to be generated in components.schemas
+		// for every top-level schema (definition), even when unreferenced.
+		allSchemas: *false | bool
 	}
 }
 

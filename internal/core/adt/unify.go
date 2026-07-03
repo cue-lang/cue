@@ -947,10 +947,9 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 				// of truly absent fields produce an incomplete error rather
 				// than returning _.
 				if state != nil {
-					for _, pt := range state.parentTasks {
-						if pt.state < taskSUCCESS {
-							return arcReturn
-						}
+					if state.hasActiveParentTask() {
+						c.lookupPendingParent = true
+						return arcReturn
 					}
 					if state.provided&allTasksCompleted != 0 &&
 						state.counters[allTasksCompletedIdx] > 0 {
@@ -960,10 +959,9 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 				// Check the arc's own parent tasks (e.g.,
 				// comprehensions pushed down by pushDownDeps) — they
 				// may still produce this field.
-				for _, pt := range arcState.parentTasks {
-					if pt.state < taskSUCCESS {
-						return arcReturn
-					}
+				if arcState.hasActiveParentTask() {
+					c.lookupPendingParent = true
+					return arcReturn
 				}
 				arc.ArcType = ArcNotPresent
 			}
@@ -1033,14 +1031,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 				// Only mark arc as not present if no parent task is still
 				// running. If a parent task (e.g. a comprehension) is still
 				// in progress, it may yet add this arc.
-				hasActiveParent := false
-				for _, pt := range arcState.parentTasks {
-					if pt.state < taskSUCCESS {
-						hasActiveParent = true
-						break
-					}
-				}
-				if !hasActiveParent {
+				if !arcState.hasActiveParentTask() {
 					// updateArcType is the normal path, but for an arc
 					// currently at ArcPending it returns early without
 					// assigning because ArcNotPresent is "more restrictive"

@@ -103,6 +103,7 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	// be conclusive, we could avoid triggering evaluating disjunctions. This
 	// would be a pretty significant rework, though.
 
+	ctx.lookupPendingParent = false
 	arc := r.resolve(ctx, Flags{
 		condition: fieldSetKnown,
 		mode:      mode,
@@ -110,6 +111,13 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	// TODO: ensure that resolve always returns one of these two.
 	if arc == nil || arc == emptyNode {
 		// TODO: yield instead?
+		if arc == nil && mode == attemptOnly && !ctx.HasErr() &&
+			ctx.lookupPendingParent {
+			// A parent task, such as a comprehension this task ran ahead
+			// of, may still produce the field. Retry later rather than
+			// silently dropping this conjunct.
+			t.retry = true
+		}
 		return
 	}
 	ci := ctx.ci

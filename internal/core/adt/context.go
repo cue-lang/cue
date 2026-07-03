@@ -171,6 +171,11 @@ type OpContext struct {
 	// structural cycle errors.
 	vertex *Vertex
 
+	// lookupPendingParent is set by [Vertex.lookup] in attemptOnly mode when
+	// a field was not found but a parent task may still produce it.
+	// [processResolver] clears it before resolving and uses it to requeue.
+	lookupPendingParent bool
+
 	// list of vertices that need to be finalized.
 	// TODO: remove this again once we have a proper way of detecting references
 	// across optional boundaries in hasAncestorV3. We can probably do this

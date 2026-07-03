@@ -16,6 +16,24 @@
       "message": "Arguably this is generally true. You may want to consider if this check could be put one level up in the generic task handling. If not, no big deal.",
       "revId": "6f678deac1f08e0362978c5f90ceaed2d867705b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d97546c_7434f77e",
+        "filename": "internal/core/adt/tasks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-03T11:21:54Z",
+      "side": 1,
+      "message": "I tried hoisting this into ctx.value, which all task runners share: report an incomplete error whenever the result is a still-evaluating vertex. That breaks legitimate uses — most ctx.value callers tolerate a partial value or report their own, better-contextualized incomplete errors. For example, builtin arguments regress (text/template.Execute on a not-yet-settled struct fails with \"value not yet known\" instead of evaluating), and incomplete-tolerant cases like builtins/all okIncompleteChild turn into errors; 79 eval sub-tests fail in total. Gating the generic check on the requested condition does not help either: only two callers request scalarValue, and the other one (processPatternConstraint) goes through evalState rather than ctx.value, so the gate would de facto select this one caller anyway.\n\nSo I kept the check here, where a permanent decision is made based on the value\u0027s kind, and extended the comment to record that reasoning.",
+      "parentUuid": "5894ac59_ed99ef8b",
+      "revId": "6f678deac1f08e0362978c5f90ceaed2d867705b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

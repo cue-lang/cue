@@ -113,7 +113,7 @@ func (p *taskContext) popTask() {
 }
 
 // taskChunkSize is the number of tasks allocated at once when the pool is empty.
-// sizeof(task) is 128 bytes, so 32 tasks is 4KiB per chunk.
+// sizeof(task) is 120 bytes, so 32 tasks is just under 4KiB per chunk.
 const taskChunkSize = 32
 
 func (p *taskContext) newTask() *task {
@@ -478,6 +478,9 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 	// later comprehension iterates over fields that an earlier (currently
 	// running) comprehension has not yet populated.
 	hasRunningComp := false
+	// hasInsertingComp only considers comprehensions that are inserting
+	// the conjuncts their clauses yielded.
+	hasInsertingComp := false
 	// Check if a disjunction is still pending (READY) on this scheduler.
 	// If so, defer pushed-down comprehension tasks until disjunction
 	// expansion has cloned the parent into disjuncts. Pushdown turns the
@@ -491,6 +494,9 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 	for _, t := range s.tasks {
 		if t.state == taskRUNNING && t.run == handleComprehension {
 			hasRunningComp = true
+			if t.inserting {
+				hasInsertingComp = true
+			}
 		}
 		if t.state == taskREADY && t.run == handleDisjunctions {
 			hasPendingDisjunction = true
@@ -521,11 +527,12 @@ processNextTask:
 			// on the same node. The running comprehension may add fields
 			// that this one depends on.
 			continue
-		case hasRunningComp && t.run == handleResolver:
-			// Do not start a resolver while a comprehension is running
-			// on the same node. The resolver (e.g. an embedding like
-			// funcs["0"]) may depend on fields that the running
-			// comprehension has not yet added.
+		case hasInsertingComp && t.run == handleResolver:
+			// Do not start a resolver while a comprehension is inserting
+			// results on the same node: the resolver (e.g. an embedding
+			// like funcs["0"]) may depend on fields it has not yet added.
+			// A comprehension still evaluating its clauses does not defer
+			// resolvers: its guards may depend on the resolver's conjuncts.
 			continue
 		case hasPendingDisjunction && t.run == handleComprehension &&
 			t.completes == allTasksCompleted:
@@ -722,6 +729,17 @@ func (s *scheduler) deferFieldSetKnown(c condition) condition {
 	return c
 }
 
+// hasActiveParentTask reports whether a parent task, such as a pushed-down
+// comprehension, has not yet completed and may still add to this node.
+func (s *scheduler) hasActiveParentTask() bool {
+	for _, pt := range s.parentTasks {
+		if pt.state < taskSUCCESS {
+			return true
+		}
+	}
+	return false
+}
+
 // signalDoneAdding signals that no more tasks will be added to this scheduler.
 // This allows unblocking tasks that depend on states for which there are no
 // tasks in this scheduler.
@@ -757,6 +775,13 @@ type task struct {
 
 	// unblocked indicates this task was unblocked by force.
 	unblocked bool
+
+	// inserting indicates that this comprehension task is inserting the
+	// conjuncts its clauses yielded; see hasInsertingComp in process.
+	inserting bool
+
+	// retry requeues this task as READY instead of completing it.
+	retry bool
 
 	// The following fields indicate what this task is blocked on, including
 	// the scheduler, which conditions it is blocking on, and the stack of
@@ -940,6 +965,15 @@ func runTask(t *task, mode runMode) {
 		if b, ok := d.node.BaseValue.(*Bottom); ok {
 			t.node.addBottom(b)
 		}
+	}
+
+	if t.retry {
+		// The task ran without effect but may succeed later; requeue it
+		// rather than completing it and dropping its conjuncts.
+		// TODO: consider using the waitFor blocking machinery instead.
+		t.retry = false
+		t.state = taskREADY
+		return
 	}
 
 	if t.state != taskWAITING {

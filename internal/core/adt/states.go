@@ -339,14 +339,7 @@ func stateCompletions(s *scheduler) condition {
 		// Do not prematurely convert a pending arc to ArcNotPresent if a
 		// parent task (e.g. a comprehension) is still running that might
 		// yet add this arc.
-		hasActiveParent := false
-		for _, pt := range s.parentTasks {
-			if pt.state < taskSUCCESS {
-				hasActiveParent = true
-				break
-			}
-		}
-		if !hasActiveParent {
+		if !s.hasActiveParentTask() {
 			v.ArcType = ArcNotPresent
 		}
 	}

@@ -7,7 +7,7 @@ f:      {a: 1}.b                  @test(err, code=incomplete, pos=[0:16])
 g:      {a: 1}["b"]               @test(err, code=incomplete, pos=[0:16])
 h:      [3].b                     @test(err, code=eval, pos=[0:13])
 -- out/errors.txt --
-[eval] e: index out of range [4] with length 0:
+[eval] e: invalid index 4 (found struct, want list):
     ./in.cue:4:16
 [incomplete] f: undefined field: b:
     ./in.cue:5:16

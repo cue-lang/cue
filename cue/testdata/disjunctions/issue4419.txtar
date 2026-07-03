@@ -1,0 +1,22 @@
+# Merging an equal disjunct into its recorded counterpart used to panic in
+# mergeCloseInfo when arc states had been reclaimed too early.
+# See: https://cuelang.org/issue/4419
+-- in.cue --
+import "struct"
+
+b: {[string]: string} | *{}
+a: struct.MaxFields(8) & {[string]: string}
+b: "test": "test"
+a: b @test(eq, {test: "test"})
+-- out/eval/stats --
+Leaks:  3
+Freed:  10
+Reused: 4
+Allocs: 9
+Retain: 0
+
+Unifications: 5
+Conjuncts:    17
+Disjuncts:    4
+
+NumCloseIDs: 1

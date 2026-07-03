@@ -258,6 +258,16 @@ func newRequiredFieldInComprehensionError(ctx *OpContext, x *ForClause, v *Verte
 }
 
 func (v *Vertex) reportFieldIndexError(c *OpContext, pos token.Pos, f Feature) {
+	// An integer index into a value that can never be a list is a permanent
+	// error. BottomKind falls through so reportFieldError adopts its code.
+	if k := v.Kind(); f.IsInt() && k != BottomKind && k&ListKind == 0 {
+		c.AddBottom(&Bottom{
+			Code: EvalError,
+			Err:  c.NewPosf(pos, "invalid index %d (found %v, want list)", f.Index(), k),
+			Node: v,
+		})
+		return
+	}
 	v.reportFieldError(c, pos, f,
 		"index out of range [%d] with length %d",
 		"undefined field: %s")

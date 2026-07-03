@@ -165,6 +165,19 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 		return
 	}
 
+	// A key that resolves to a vertex that is still being evaluated has no
+	// settled value yet: an embedded scalar may still change its kind.
+	// Report an incomplete error rather than failing on the partial value.
+	if vx, ok := v.(*Vertex); ok && vx.Status() == evaluating {
+		n.addBottom(&Bottom{
+			Code: IncompleteError,
+			Node: n.node,
+			Err: ctx.NewPosf(Pos(field.Key),
+				"key value of dynamic field not yet known"),
+		})
+		return
+	}
+
 	if v.Concreteness() != Concrete {
 		n.addBottom(&Bottom{
 			Code: IncompleteError,

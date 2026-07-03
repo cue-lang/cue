@@ -1433,6 +1433,36 @@ letCycleSelfKeyword2: {
 		}
 	})
 }
+-- issue4422.cue --
+@experiment(aliasv2)
+
+// A dynamic field whose key refers to a vertex that is still being evaluated
+// (here a list element that looks up a field on itself through an embedding)
+// must report an incomplete error. The pushed-down comprehension used to
+// insert the arc keyed on the partial value, after which lookups during the
+// expansion of the disjunction re-expanded it without bound, hanging
+// evaluation. https://cuelang.org/issue/4422
+issue4422: {
+	settings: domain: {
+		let _zero = 0
+		x: _zero
+	}
+	components: {
+		[_]: clusters: [for _ in [1, 2] {self.settings.missing}]
+		comp1: {}
+		comp2: {}
+	}
+
+	for _, cv in components
+	for host in cv.clusters {
+		hosts: (host): *settings.domain | 123
+	}
+
+	for host, _ in self.hosts {}
+
+	@test(err, code=incomplete,
+		contains="key value of dynamic field not yet known", pos=[13:11])
+}
 -- out/errors.txt --
 [cycle] fail.a: cyclic reference to field b:
     ./in.cue:45:8
@@ -1519,6 +1549,8 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./issue3935.cue:47:27
 [incomplete] issue3935.full.#SchemaSelected._specConfig: required field missing: spec:
     ./issue3935.cue:50:16
+[incomplete] issue4422.hosts: key value of dynamic field not yet known:
+    ./issue4422.cue:22:11
 [incomplete] regression1.#Primary: undefined field: spec:
     ./rework.cue:5:13
 [incomplete] regression1.#Rollout.out: undefined field: spec:
@@ -1543,14 +1575,14 @@ issue3729.withoutDisjunction: error in v3 has fewer position annotations than v2
 issue3729.withoutDisjunctionWithEmbed, withEmbed.incomplete: v3 leaks the embedded _ from the comprehension body into the null optional constraint, causing null to appear as an embedded value in root.
 embed.fail1/fail4: errors have different position annotations in v3 vs v2.
 -- out/eval/stats --
-Leaks:  139
-Freed:  672
-Reused: 622
-Allocs: 189
+Leaks:  143
+Freed:  693
+Reused: 642
+Allocs: 194
 Retain: 0
 
-Unifications: 687
-Conjuncts:    1096
+Unifications: 712
+Conjuncts:    1132
 Disjuncts:    44
 
-NumCloseIDs: 338
+NumCloseIDs: 346

@@ -1,0 +1,21 @@
+# A self-feeding structural cycle where each level of recursion also
+# receives fresh struct conjuncts, e.g. `b: a, a: b: b: a` with `a`
+# embedded at the top level, used to hang the evaluator: the "new depth
+# implies no cycle" escape in detectCycle fired at every level, so the
+# cycle was never marked and unify kept descending forever.
+# https://cuelang.org/issue/4231
+-- in.cue --
+b: a
+a: b: b: a
+a
+-- out/compile --
+--- in.cue
+{
+  b: 〈0;a〉
+  a: {
+    b: {
+      b: 〈2;a〉
+    }
+  }
+  〈0;a〉
+}

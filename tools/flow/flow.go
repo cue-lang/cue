@@ -175,6 +175,11 @@ type Controller struct {
 	inst        cue.Value
 	valueSeqNum int64
 
+	// instPath is the path of inst within its instance. It is non-empty only
+	// if New was given a value that is not at the root of its instance. Task
+	// paths and labels are stored relative to it.
+	instPath []adt.Feature
+
 	env *adt.Environment
 
 	conjuncts   []adt.Conjunct
@@ -399,8 +404,8 @@ func (t *Task) Context() context.Context {
 	return t.c.context
 }
 
-// Path reports the path of Task within the Instance in which it is defined.
-// The Path is always valid.
+// Path reports the path of Task relative to the value from which the
+// Controller was created. The Path is always valid.
 func (t *Task) Path() cue.Path {
 	return t.path
 }

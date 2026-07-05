@@ -2,8 +2,6 @@
 # field does not stack overflow in the self-contained export of the resulting
 # incomplete value.
 # Issue #2944.
-#
-# TODO: the golden output is missing the let binding for the TEST references.
 
 exec cue eval -e result in.cue
 cmp stdout stdout.golden
@@ -52,6 +50,14 @@ tests: [{
     name:  "Smoke Tests / Inner"
     tests: []
 }]
+
+//cue:path: #Test
+let TEST = {
+    #x: {
+        name:  string
+        tests: [...#x]
+    }
+}
 
 //cue:path: test.name
 let NAME = {#x: "Smoke Tests"}

@@ -466,7 +466,9 @@ func (p *pivotter) refExpr(r adt.Resolver) ast.Expr {
 	}
 
 	if r := p.makeAlternativeReference(ref, r); r != nil {
-		dst.needTopLevel = true
+		// The reference is rooted at the top-level parent dep, so that is the
+		// dep that must be emitted as a let binding.
+		getParent(dst).needTopLevel = true
 		return r
 	}
 

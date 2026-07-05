@@ -18,6 +18,8 @@ package flow
 // and annotating the dependencies between them.
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
@@ -32,6 +34,8 @@ import (
 func (c *Controller) initTasks(addStats bool) {
 	// Clear previous cache.
 	c.nodes = map[*adt.Vertex]*Task{}
+
+	c.instPath = c.inst.Path()
 
 	v := c.inst.LookupPath(c.cfg.Root)
 	if err := v.Err(); err != nil {
@@ -148,7 +152,21 @@ func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 	}
 
 	// Look up cached task from previous evaluation.
+	//
+	// Task paths and labels are stored relative to the value passed to New,
+	// as updateTaskValue and updateTaskResults resolve against that value,
+	// which may not be at the root of its instance
+	// (https://cuelang.org/issue/2185). Inferred tasks outside that value
+	// keep their absolute path; they can never resolve and are skipped at
+	// runtime.
 	p := v.Path()
+	var labels []adt.Feature
+	if n := len(c.instPath.Selectors()); n > 0 {
+		if rel, ok := c.relPath(p); ok {
+			p = rel
+			labels = w.Path()[n:]
+		}
+	}
 	key := p.String()
 
 	t := c.keys[key]
@@ -168,13 +186,16 @@ func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 		}
 
 		if r != nil {
+			if labels == nil {
+				labels = w.Path()
+			}
 			index := len(c.tasks)
 			t = &Task{
 				v:        v,
 				c:        c,
 				r:        r,
 				path:     p,
-				labels:   w.Path(),
+				labels:   labels,
 				key:      key,
 				index:    index,
 				err:      errs,
@@ -314,8 +335,23 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 	})
 }
 
+// relPath returns p relative to the value passed to New. It reports false,
+// leaving p untouched, if p does not descend from that value.
+func (c *Controller) relPath(p cue.Path) (cue.Path, bool) {
+	inst := c.instPath.Selectors()
+	sels := p.Selectors()
+	if len(sels) < len(inst) || !slices.Equal(sels[:len(inst)], inst) {
+		return p, false
+	}
+	return cue.MakePath(sels[len(inst):]...), true
+}
+
 func (c *Controller) inRoot(n *adt.Vertex) bool {
-	path := value.Make(c.opCtx, n).Path().Selectors()
+	p, ok := c.relPath(value.Make(c.opCtx, n).Path())
+	if !ok {
+		return false
+	}
+	path := p.Selectors()
 	root := c.cfg.Root.Selectors()
 	if len(path) < len(root) {
 		return false

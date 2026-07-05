@@ -157,14 +157,11 @@ func TestFlowNonRootValue(t *testing.T) {
 	if err := c.Run(context.Background()); err != nil {
 		t.Fatal(errors.Details(err, nil))
 	}
-	// TODO(https://cuelang.org/issue/2185): the runner should run exactly once
-	// and fill done: true; the task is currently skipped as its path is
-	// resolved against the wrong root.
-	if runs != 0 {
-		t.Errorf("runner ran %d times, want 0", runs)
+	if runs != 1 {
+		t.Errorf("runner ran %d times, want 1", runs)
 	}
-	if v := c.Value().LookupPath(cue.MakePath(cue.Str("done"))); v.Exists() {
-		t.Errorf("done: got %v, want non-existent", v)
+	if done, err := c.Value().LookupPath(cue.MakePath(cue.Str("done"))).Bool(); err != nil || !done {
+		t.Errorf("done: got (%v, %v), want (true, nil)", done, err)
 	}
 }
 

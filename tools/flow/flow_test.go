@@ -123,6 +123,51 @@ controller totals:
 task totals - controller totals:
 %v`
 
+// TestFlowNonRootValue tests that when the value passed to New is not at the
+// root of its instance, a task at the top of that value is run with the
+// correct value and its results are filled in at the right place.
+// Issue: https://cuelang.org/issue/2185
+func TestFlowNonRootValue(t *testing.T) {
+	ctx := cuecontext.New()
+	inst := ctx.CompileString(`
+#task: {
+	task: true
+}
+`)
+	root := inst.LookupPath(cue.MakePath(cue.Def("#task")))
+	if err := root.Err(); err != nil {
+		t.Fatal(err)
+	}
+	isTask := func(v cue.Value) bool {
+		return v.LookupPath(cue.MakePath(cue.Str("task"))).Exists()
+	}
+	var runs int
+	c := flow.New(nil, root, func(v cue.Value) (flow.Runner, error) {
+		if !isTask(v) {
+			return nil, nil
+		}
+		return flow.RunnerFunc(func(t *flow.Task) error {
+			runs++
+			if v := t.Value(); !isTask(v) {
+				return fmt.Errorf("runner called with wrong value:\n%v", v)
+			}
+			return t.Fill(map[string]bool{"done": true})
+		}), nil
+	})
+	if err := c.Run(context.Background()); err != nil {
+		t.Fatal(errors.Details(err, nil))
+	}
+	// TODO(https://cuelang.org/issue/2185): the runner should run exactly once
+	// and fill done: true; the task is currently skipped as its path is
+	// resolved against the wrong root.
+	if runs != 0 {
+		t.Errorf("runner ran %d times, want 0", runs)
+	}
+	if v := c.Value().LookupPath(cue.MakePath(cue.Str("done"))); v.Exists() {
+		t.Errorf("done: got %v, want non-existent", v)
+	}
+}
+
 func TestFlowValuePanic(t *testing.T) {
 	f := `
     root: {

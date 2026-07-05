@@ -1,0 +1,41 @@
+#path: result
+
+#Issue: 2944
+-- in.cue --
+#Test: {
+	name: string
+	tests: [...#Test]
+}
+
+#Resolver: {
+	parent?:   #Test
+	self=test: #Test
+
+	resolved: {
+		if parent == _|_ {
+			name: test.name
+		}
+		if parent != _|_ {
+			name: "\(parent.name) / \(test.name)"
+		}
+
+		tests: [
+			for t in test.tests {
+				(#Resolver & {
+					parent: self
+					test:   t
+				}).resolved
+			},
+		]
+	}
+}
+
+let root = #Test & {
+	name: "Smoke Tests"
+	tests: [{name: "Inner"}]
+}
+
+result: (#Resolver & {
+	parent: _
+	test: root
+}).resolved

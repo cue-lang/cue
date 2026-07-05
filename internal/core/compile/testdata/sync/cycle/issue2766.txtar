@@ -1,0 +1,40 @@
+# A let binding a struct literal that embeds a self reference, whose
+# fields are then selected and embedded back into the referenced struct,
+# used to hang the evaluator: each lookup of the let vertex counted as
+# evidence of non-cyclicity even for cyclic conjuncts, so the cycle was
+# never terminated and nested let vertices kept expanding forever.
+# The lets should instead resolve to incomplete values, yielding x: _.
+# https://cuelang.org/issue/2766
+-- in.cue --
+t1: p: {
+	let P = {p}
+	x: _
+	P.x
+}
+t2: S=p: {
+	let P = {S}
+	x: _
+	P.x
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    p: {
+      let P#1 = {
+        〈2;p〉
+      }
+      x: _
+      〈0;let P#1〉.x
+    }
+  }
+  t2: {
+    p: {
+      let P#2 = {
+        〈2;p〉
+      }
+      x: _
+      〈0;let P#2〉.x
+    }
+  }
+}

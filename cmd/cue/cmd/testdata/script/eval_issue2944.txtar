@@ -1,0 +1,57 @@
+# Verify that eval of a recursive definition instantiated with a non-concrete
+# field does not stack overflow in the self-contained export of the resulting
+# incomplete value.
+# Issue #2944.
+#
+# TODO: the golden output is missing the let binding for the TEST references.
+
+exec cue eval -e result in.cue
+cmp stdout stdout.golden
+
+-- in.cue --
+#Test: {
+	name: string
+	tests: [...#Test]
+}
+
+#Resolver: {
+	parent?:   #Test
+	self=test: #Test
+
+	resolved: {
+		if parent == _|_ {
+			name: test.name
+		}
+		if parent != _|_ {
+			name: "\(parent.name) / \(test.name)"
+		}
+
+		tests: [
+			for t in test.tests {
+				(#Resolver & {
+					parent: self
+					test:   t
+				}).resolved
+			},
+		]
+	}
+}
+
+let root = #Test & {
+	name: "Smoke Tests"
+	tests: [{name: "Inner"}]
+}
+
+result: (#Resolver & {
+	parent: _
+	test: root
+}).resolved
+-- stdout.golden --
+name: "\(TEST.#x.name) / \(NAME.#x)"
+tests: [{
+    name:  "Smoke Tests / Inner"
+    tests: []
+}]
+
+//cue:path: test.name
+let NAME = {#x: "Smoke Tests"}

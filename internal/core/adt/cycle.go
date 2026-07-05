@@ -505,15 +505,6 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 				return ci, false
 			}
 
-			// A differing tree depth only signals new structure for rooted
-			// vertices. NonRooted inline-expansion vertices (e.g. the fresh
-			// vertex per `t & {}` in `t: _ | {b: (t & {}).b}`) stay at the
-			// same depth, so the difference is not progress and must not
-			// break the cycle.
-			if n.hasNonCycle && n.hasNonCyclic && r.Depth != n.depth && n.node.Rooted() {
-				return ci, false
-			}
-
 			// Skip a reoccurring arc that is structure sharing rather than
 			// a cycle: a different reference (r.Ref != x) reaching a node
 			// that still has non-cyclic conjuncts is a definition body

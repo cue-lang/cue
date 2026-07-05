@@ -22,12 +22,14 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
@@ -122,6 +124,69 @@ controller totals:
 
 task totals - controller totals:
 %v`
+
+// TestFlowConcurrentContextUse tests that a task runner can use the shared
+// cue.Context while the controller concurrently recomputes the configuration.
+// Compiling a value under the import path used by the configuration used to
+// re-register that path and race with the controller resolving the import;
+// run with -race to exercise this. Issue: https://cuelang.org/issue/2184
+func TestFlowConcurrentContextUse(t *testing.T) {
+	fsys := fstest.MapFS{
+		"cue.mod/module.cue": &fstest.MapFile{Data: []byte(`
+module: "example.com/tasks"
+language: version: "v0.9.0"
+`)},
+		"demo.cue": &fstest.MapFile{Data: []byte(`
+package demo
+
+import "example.com/tasks:task"
+
+a: task.#task & {
+	task: "one"
+}
+b: task.#task & {
+	task: "two"
+}
+`)},
+		"task.cue": &fstest.MapFile{Data: []byte(`
+package task
+
+#task: task: string
+`)},
+	}
+	insts := load.Instances([]string{".:demo"}, &load.Config{FS: fsys})
+	if err := insts[0].Err; err != nil {
+		t.Fatal(err)
+	}
+	// The iteration counts are arbitrary: enough runs of the flow, each with
+	// enough compiles overlapping the controller's recomputation, for the
+	// race detector to fire reliably on the unfixed code.
+	for range 20 {
+		ctx := cuecontext.New()
+		v := ctx.BuildInstance(insts[0])
+		if err := v.Err(); err != nil {
+			t.Fatal(err)
+		}
+		top := ctx.CompileString("_")
+		c := flow.New(nil, v, func(v cue.Value) (flow.Runner, error) {
+			taskName, err := v.LookupPath(cue.MakePath(cue.Str("task"))).String()
+			if err != nil {
+				return nil, nil
+			}
+			return flow.RunnerFunc(func(t *flow.Task) error {
+				if taskName == "two" {
+					for range 100 {
+						ctx.CompileString(`{foo: 1}`, cue.ImportPath("example.com/tasks:task"))
+					}
+				}
+				return t.Fill(top)
+			}), nil
+		})
+		if err := c.Run(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
 
 // TestFlowNonRootValue tests that when the value passed to New is not at the
 // root of its instance, a task at the top of that value is run with the

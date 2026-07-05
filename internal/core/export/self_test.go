@@ -49,6 +49,11 @@ func TestSelfContained(t *testing.T) {
 			"self/selfcontained/cyclic":            `reference not properly substituted`,
 			"self-v3/selfcontained/cyclic":         `reference not properly substituted`,
 			"self-v3-noshare/selfcontained/cyclic": `reference not properly substituted`,
+
+			// A reference into a comprehension scope is left dangling in a
+			// hoisted let binding.
+			"self-v3/selfcontained/issue2944":         `let[].#x: reference "test" not found`,
+			"self-v3-noshare/selfcontained/issue2944": `let[].#x: reference "test" not found`,
 		},
 	}
 

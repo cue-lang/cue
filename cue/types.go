@@ -1830,21 +1830,45 @@ func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 	return nil
 }
 
-// Unify reports the greatest lower bound of v and w.
-func (v Value) Unify(w Value) Value {
-	if v.v == nil {
-		return w
+// Unify reports the greatest lower bound of v and the given values.
+//
+// Unifying multiple values in a single call is more efficient than
+// unifying them one call at a time, as intermediate results do not
+// need to be computed.
+func (v Value) Unify(w ...Value) Value {
+	// Skip missing values, as well as values identical to the first one:
+	// unification is idempotent, and this retains the fast paths of the
+	// binary form. We do not dedupe the incoming values between each other,
+	// as that would be quadratic.
+	all := make([]adt.Value, 0, 1+len(w))
+	first := v
+	add := func(x Value) {
+		switch {
+		case x.v == nil:
+		case len(all) == 0:
+			first = x
+			all = append(all, x.v)
+		case x.v != first.v:
+			all = append(all, x.v)
+		}
 	}
-	if w.v == nil || w.v == v.v {
+	add(v)
+	for _, x := range w {
+		add(x)
+	}
+	switch len(all) {
+	case 0:
 		return v
+	case 1:
+		return first
 	}
 
-	ctx := v.ctx()
-	defer ctx.PopArc(ctx.PushArc(v.v))
+	ctx := first.ctx()
+	defer ctx.PopArc(ctx.PushArc(first.v))
 
-	n := adt.Unify(ctx, v.v, w.v)
+	n := adt.Unify(ctx, all...)
 
-	return makeValue(v.idx, n, v.parent_)
+	return makeValue(first.idx, n, first.parent_)
 }
 
 // UnifyAccept is like [Value.Unify], but enforces the closedness rules of

@@ -43,6 +43,24 @@ ok2: data: {
 	}
 }
 -- out/generate-v3/schema --
-{$schema: "https://json-schema.org/draft/2020-12/schema"}
+{
+	$schema:              "https://json-schema.org/draft/2020-12/schema"
+	type:                 "object"
+	additionalProperties: false
+	properties: {
+		external: type: "boolean"
+		name: type:     "string"
+		nested: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				x: type: "boolean"
+				z: type: "string"
+			}
+			required: ["x", "z"]
+		}
+	}
+	required: ["external", "nested"]
+}
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --

@@ -2566,16 +2566,16 @@ p: d.c
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "d"): {ln(1, 1, "d")},
 				ln(3, 1, "e"): {ln(2, 1, "e")},
-				ln(3, 1, "a"): {}, // This is WRONG
-				ln(3, 1, "b"): {}, // This is WRONG
+				ln(3, 1, "a"): {ln(1, 1, "a"), ln(1, 2, "a")},
+				ln(3, 1, "b"): {ln(1, 1, "b"), ln(1, 2, "b")},
 				ln(4, 1, "d"): {ln(1, 1, "d")},
 				ln(4, 1, "c"): {ln(1, 1, "c")},
 
 				ln(1, 1, "d"): {self},
-				ln(1, 1, "a"): {self}, // This is WRONG
-				ln(1, 1, "b"): {self}, // This is WRONG
-				ln(1, 2, "a"): {self}, // This is WRONG
-				ln(1, 2, "b"): {self}, // This is WRONG
+				ln(1, 1, "a"): {self, ln(1, 2, "a")},
+				ln(1, 1, "b"): {self, ln(1, 2, "b")},
+				ln(1, 2, "a"): {self, ln(1, 1, "a")},
+				ln(1, 2, "b"): {self, ln(1, 1, "b")},
 				ln(1, 1, "c"): {self},
 
 				ln(2, 1, "e"): {self},
@@ -2585,9 +2585,8 @@ p: d.c
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
 				or(0, 2):   {f: []string{"d", "e", "o", "p"}},
-				or(2, 4):   {f: []string{"a", "c"}, e: []string{"d", "e", "o", "p"}},
-				or1(4):     {f: []string{"a"}, e: []string{"d", "e", "o", "p"}},
-				or(5, 7):   {f: []string{"a"}},
+				or(2, 5):   {f: []string{"a", "c"}, e: []string{"d", "e", "o", "p"}},
+				or(5, 7):   {f: []string{"a", "c"}},
 				or1(7):     {f: []string{"b"}, e: []string{"a", "d", "e", "o", "p"}},
 				or(8, 10):  {f: []string{"b"}},
 				or1(10):    {e: []string{"a", "b", "d", "e", "o", "p"}},
@@ -2603,16 +2602,16 @@ p: d.c
 				or1(30):    {e: []string{"a", "c", "d", "e", "o", "p"}},
 				or1(31):    {e: []string{"d", "e", "o", "p"}},
 				or(32, 34): {f: []string{"d", "e", "o", "p"}},
-				or(34, 36): {f: []string{"f"}, e: []string{"d", "e", "o", "p"}},
-				or(36, 38): {f: []string{"a", "c"}, e: []string{"d", "e", "o", "p"}},
+				or(34, 38): {f: []string{"a", "c", "f"}, e: []string{"d", "e", "o", "p"}},
 				or(38, 40): {e: []string{"d", "e", "o", "p"}},
-				or(40, 43): {f: []string{"f"}, e: []string{"d", "e", "o", "p"}},
+				or(40, 43): {f: []string{"a", "c", "f"}, e: []string{"d", "e", "o", "p"}},
 				or1(43):    {e: []string{"d", "e", "f", "o", "p"}},
 				or1(45):    {e: []string{"d", "e", "f", "o", "p"}},
 				or1(46):    {e: []string{"d", "e", "o", "p"}},
 				or(47, 49): {f: []string{"d", "e", "o", "p"}},
 				or(49, 52): {e: []string{"d", "e", "o", "p"}},
-				or(52, 54): {e: []string{"f"}},
+				or(52, 54): {e: []string{"a", "c", "f"}},
+				or(54, 56): {e: []string{"b"}},
 				or(56, 58): {f: []string{"d", "e", "o", "p"}},
 				or(58, 61): {e: []string{"d", "e", "o", "p"}},
 				or(61, 63): {e: []string{"a", "c"}},

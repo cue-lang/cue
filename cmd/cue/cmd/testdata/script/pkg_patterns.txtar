@@ -30,33 +30,29 @@ cmp stderr dots-prefix.stderr
 exec cue eval ./alpha1/leaf
 stdout -count=1 '^self: "mod.com/alpha1/leaf"$'
 
-# A wildcard in the middle of a pattern should match only those packages
-# whose path matches the pattern in full, not every package under the
-# directory prefix before the wildcard. Following Go's package patterns,
-# the wildcard and its neighboring slash should match at least one path
-# element, so the top-level "leaf" directory should not be included.
-# TODO: every package under "." is matched; see issue 3212.
+# A wildcard in the middle of a pattern matches only those packages whose
+# path matches the pattern in full, not every package under the directory
+# prefix before the wildcard. Following Go's package patterns, the wildcard
+# and its neighboring slash must match at least one path element,
+# so the top-level "leaf" directory is not included.
 exec cue eval ./.../leaf
 cmp stdout dots-middle.stdout
 
 # The directory prefix before the wildcard restricts the matches;
-# as above, "beta1/leaf" itself should not be matched by "beta1/.../leaf".
-# TODO: every package under "./beta1" is matched; see issue 3212.
+# as above, "beta1/leaf" itself is not matched by "beta1/.../leaf".
 exec cue eval ./beta1/.../leaf
 cmp stdout beta1-dots-middle.stdout
 
-# A pattern which matches no packages should be an error.
-# TODO: every package under "." is matched; see issue 3212.
-exec cue eval ./.../nonexistent
-cmp stdout dots-middle.stdout
+# A pattern which matches no packages is an error.
+! exec cue eval ./.../nonexistent
+cmp stderr dots-middle-nomatch.stderr
 
-# Directories excluded by the pattern should not affect the result,
+# Directories excluded by the pattern must not affect the result,
 # even when loading them would fail; here, "multi" contains
 # two packages, which is an error for a wildcard match.
-# TODO: the non-matching "multi" directory is an error; see issue 3212.
 cd multimod
-! exec cue eval ./.../leaf
-cmp stderr ../multimod-dots-middle.stderr
+exec cue eval ./.../leaf
+cmp stdout ../multimod-dots-middle.stdout
 cd ..
 
 # TODO: Unlike other cases, this still returns a "matched no packages" error.
@@ -84,21 +80,17 @@ pattern not allowed in external package path "..."
 -- dots-prefix.stderr --
 pattern not allowed in external package path ".../leaf"
 -- dots-middle.stdout --
-"example.com/foo"
-// ---
 self: "mod.com/alpha1/leaf"
 // ---
 self: "mod.com/beta1/beta2/leaf"
 // ---
 self: "mod.com/beta1/leaf"
-// ---
-self: "mod.com/leaf"
 -- beta1-dots-middle.stdout --
 self: "mod.com/beta1/beta2/leaf"
-// ---
-self: "mod.com/beta1/leaf"
--- multimod-dots-middle.stderr --
-found packages "a" (a.cue) and "b" (b.cue) in "multi"
+-- dots-middle-nomatch.stderr --
+cue: "./.../nonexistent" matched no packages
+-- multimod-dots-middle.stdout --
+self: "multi.example/sub/leaf"
 -- current-dots-middle.stderr --
 cue: "mod.com/.../leaf" matched no packages
 -- external-dots-middle.stderr --

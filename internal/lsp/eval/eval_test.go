@@ -2556,6 +2556,70 @@ p: d.c
 		},
 
 		{
+			name: "Disjunction_Default",
+			archive: `-- a.cue --
+d: *{a: b: 3} | {a: b: 4, c: 5}
+e: *d | {f: 6}
+o: e.a.b
+p: d.c
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "d"): {ln(1, 1, "d")},
+				ln(3, 1, "e"): {ln(2, 1, "e")},
+				ln(3, 1, "a"): {}, // This is WRONG
+				ln(3, 1, "b"): {}, // This is WRONG
+				ln(4, 1, "d"): {ln(1, 1, "d")},
+				ln(4, 1, "c"): {ln(1, 1, "c")},
+
+				ln(1, 1, "d"): {self},
+				ln(1, 1, "a"): {self}, // This is WRONG
+				ln(1, 1, "b"): {self}, // This is WRONG
+				ln(1, 2, "a"): {self}, // This is WRONG
+				ln(1, 2, "b"): {self}, // This is WRONG
+				ln(1, 1, "c"): {self},
+
+				ln(2, 1, "e"): {self},
+				ln(2, 1, "f"): {self},
+				ln(3, 1, "o"): {self},
+				ln(4, 1, "p"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"d", "e", "o", "p"}},
+				or(2, 4):   {f: []string{"a", "c"}, e: []string{"d", "e", "o", "p"}},
+				or1(4):     {f: []string{"a"}, e: []string{"d", "e", "o", "p"}},
+				or(5, 7):   {f: []string{"a"}},
+				or1(7):     {f: []string{"b"}, e: []string{"a", "d", "e", "o", "p"}},
+				or(8, 10):  {f: []string{"b"}},
+				or1(10):    {e: []string{"a", "b", "d", "e", "o", "p"}},
+				or1(12):    {e: []string{"a", "b", "d", "e", "o", "p"}},
+				or(14, 16): {e: []string{"d", "e", "o", "p"}},
+				or(16, 19): {f: []string{"a", "c"}, e: []string{"d", "e", "o", "p"}},
+				or1(19):    {f: []string{"b"}, e: []string{"a", "c", "d", "e", "o", "p"}},
+				or(20, 22): {f: []string{"b"}, e: []string{"d", "e", "o", "p"}},
+				or1(22):    {e: []string{"a", "b", "c", "d", "e", "o", "p"}},
+				or1(24):    {e: []string{"a", "b", "c", "d", "e", "o", "p"}},
+				or(25, 28): {f: []string{"a", "c"}, e: []string{"d", "e", "o", "p"}},
+				or1(28):    {e: []string{"a", "c", "d", "e", "o", "p"}},
+				or1(30):    {e: []string{"a", "c", "d", "e", "o", "p"}},
+				or1(31):    {e: []string{"d", "e", "o", "p"}},
+				or(32, 34): {f: []string{"d", "e", "o", "p"}},
+				or(34, 36): {f: []string{"f"}, e: []string{"d", "e", "o", "p"}},
+				or(36, 38): {f: []string{"a", "c"}, e: []string{"d", "e", "o", "p"}},
+				or(38, 40): {e: []string{"d", "e", "o", "p"}},
+				or(40, 43): {f: []string{"f"}, e: []string{"d", "e", "o", "p"}},
+				or1(43):    {e: []string{"d", "e", "f", "o", "p"}},
+				or1(45):    {e: []string{"d", "e", "f", "o", "p"}},
+				or1(46):    {e: []string{"d", "e", "o", "p"}},
+				or(47, 49): {f: []string{"d", "e", "o", "p"}},
+				or(49, 52): {e: []string{"d", "e", "o", "p"}},
+				or(52, 54): {e: []string{"f"}},
+				or(56, 58): {f: []string{"d", "e", "o", "p"}},
+				or(58, 61): {e: []string{"d", "e", "o", "p"}},
+				or(61, 63): {e: []string{"a", "c"}},
+			},
+		},
+
+		{
 			name: "Disjunction_Inline",
 			archive: `-- a.cue --
 d: ({a: b: 3} | {a: b: 4}) & {c: 5}

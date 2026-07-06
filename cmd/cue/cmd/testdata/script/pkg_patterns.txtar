@@ -30,68 +30,59 @@ cmp stderr dots-prefix.stderr
 exec cue eval ./alpha1/leaf
 stdout -count=1 '^self: "mod.com/alpha1/leaf"$'
 
-# A wildcard in the middle of a pattern should match only those packages
-# whose path matches the pattern in full, not every package under the
-# directory prefix before the wildcard. Following Go's package patterns,
-# the wildcard and its neighboring slash should match at least one path
-# element, so the top-level "leaf" directory should not be included.
-# TODO: every package under "." is matched; see issue 3212.
+# A wildcard in the middle of a pattern matches only those packages whose
+# path matches the pattern in full, not every package under the directory
+# prefix before the wildcard. Following Go's package patterns, the wildcard
+# and its neighboring slash must match at least one path element,
+# so the top-level "leaf" directory is not included.
 exec cue eval ./.../leaf
 cmp stdout dots-middle.stdout
 
 # The directory prefix before the wildcard restricts the matches;
-# as above, "beta1/leaf" itself should not be matched by "beta1/.../leaf".
-# TODO: every package under "./beta1" is matched; see issue 3212.
+# as above, "beta1/leaf" itself is not matched by "beta1/.../leaf".
 exec cue eval ./beta1/.../leaf
 cmp stdout beta1-dots-middle.stdout
 
-# A pattern may contain multiple wildcards. All pattern elements should be
+# A pattern may contain multiple wildcards. All pattern elements must be
 # matched: "alpha1/mid/other" lacks a "leaf" element, so only
-# "alpha1/leaf/mid/other" should be included.
-# TODO: every package under "." is matched; see issue 3212.
+# "alpha1/leaf/mid/other" is included.
 exec cue eval ./.../leaf/.../other
-cmp stdout dots-middle.stdout
+cmp stdout two-wildcards.stdout
 
 # A pattern with both a middle and a trailing wildcard; the trailing
-# "/..." should also match "blah/foo" itself.
-# TODO: every package under "." is matched; see issue 3212.
+# "/..." also matches "blah/foo" itself.
 exec cue eval ./.../foo/...
-cmp stdout dots-middle.stdout
+cmp stdout mid-trailing-wildcards.stdout
 
-# A pattern element should not consume the text matching a later element:
-# the two "foo" pattern elements should match the first and last "foo"
+# A pattern element must not consume the text matching a later element:
+# the two "foo" pattern elements match the first and last "foo"
 # elements in "blah/foo/x/foo".
-# TODO: every package under "." is matched; see issue 3212.
 exec cue eval ./.../foo/.../foo
-cmp stdout dots-middle.stdout
+cmp stdout repeated-element.stdout
 
-# Wildcards should not be restricted to whole path elements; they should
-# be able to match part of an element, or span across multiple elements.
-# TODO: every package under "." is matched; see issue 3212.
+# Wildcards are not restricted to whole path elements; they can match
+# part of an element, or span across multiple elements.
 exec cue eval ./...1/leaf
-cmp stdout dots-middle.stdout
+cmp stdout partial-element.stdout
 exec cue eval ./b...2/leaf
-cmp stdout dots-middle.stdout
+cmp stdout spanning-elements.stdout
 
 # Text between two wildcards need not span a whole element either:
-# "./...foo..." should match any package path containing "foo",
+# "./...foo..." matches any package path containing "foo",
 # including inside an element such as "AfooB".
-# TODO: every package under "." is matched; see issue 3212.
 exec cue eval ./...foo...
-cmp stdout dots-middle.stdout
+cmp stdout embedded-element.stdout
 
-# A pattern which matches no packages should be an error.
-# TODO: every package under "." is matched; see issue 3212.
-exec cue eval ./.../nonexistent
-cmp stdout dots-middle.stdout
+# A pattern which matches no packages is an error.
+! exec cue eval ./.../nonexistent
+cmp stderr dots-middle-nomatch.stderr
 
-# Directories excluded by the pattern should not affect the result,
+# Directories excluded by the pattern must not affect the result,
 # even when loading them would fail; here, "multi" contains
 # two packages, which is an error for a wildcard match.
-# TODO: the non-matching "multi" directory is an error; see issue 3212.
 cd multimod
-! exec cue eval ./.../leaf
-cmp stderr ../multimod-dots-middle.stderr
+exec cue eval ./.../leaf
+cmp stdout ../multimod-dots-middle.stdout
 cd ..
 
 # TODO: Unlike other cases, this still returns a "matched no packages" error.
@@ -119,31 +110,37 @@ pattern not allowed in external package path "..."
 -- dots-prefix.stderr --
 pattern not allowed in external package path ".../leaf"
 -- dots-middle.stdout --
-"example.com/foo"
-// ---
 self: "mod.com/alpha1/leaf"
-// ---
-self: "mod.com/alpha1/leaf/mid/other"
-// ---
-self: "mod.com/alpha1/mid/other"
 // ---
 self: "mod.com/beta1/beta2/leaf"
 // ---
 self: "mod.com/beta1/leaf"
+-- beta1-dots-middle.stdout --
+self: "mod.com/beta1/beta2/leaf"
+-- two-wildcards.stdout --
+self: "mod.com/alpha1/leaf/mid/other"
+-- mid-trailing-wildcards.stdout --
+self: "mod.com/blah/foo"
 // ---
+self: "mod.com/blah/foo/x/foo"
+-- repeated-element.stdout --
+self: "mod.com/blah/foo/x/foo"
+-- partial-element.stdout --
+self: "mod.com/alpha1/leaf"
+// ---
+self: "mod.com/beta1/leaf"
+-- spanning-elements.stdout --
+self: "mod.com/beta1/beta2/leaf"
+-- embedded-element.stdout --
 self: "mod.com/blah/foo"
 // ---
 self: "mod.com/blah/foo/x/foo"
 // ---
-self: "mod.com/leaf"
-// ---
 self: "mod.com/y/AfooB/z"
--- beta1-dots-middle.stdout --
-self: "mod.com/beta1/beta2/leaf"
-// ---
-self: "mod.com/beta1/leaf"
--- multimod-dots-middle.stderr --
-found packages "a" (a.cue) and "b" (b.cue) in "multi"
+-- dots-middle-nomatch.stderr --
+cue: "./.../nonexistent" matched no packages
+-- multimod-dots-middle.stdout --
+self: "multi.example/sub/leaf"
 -- current-dots-middle.stderr --
 cue: "mod.com/.../leaf" matched no packages
 -- external-dots-middle.stderr --

@@ -404,6 +404,12 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 
 	case *adt.SelectorExpr:
 		c.markExpr(env, x.X)
+
+	case *adt.LetReference:
+		// The let did not resolve to a vertex, so markInternalResolvers
+		// never reached its value. Descend into it, matching the
+		// LetReference.X that the self-contained exporter renders inline.
+		c.markExpr(env, x.X)
 	}
 }
 

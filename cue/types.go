@@ -885,6 +885,10 @@ func (v Value) appendJSON(ctx *adt.OpContext, b []byte) ([]byte, error) {
 
 // Syntax converts the possibly partially evaluated value into syntax. This
 // can use used to print the value with package format.
+//
+// It honors the [All], [Attributes], [Concrete], [Definitions], [Docs],
+// [ErrorsAsValues], [Final], [Hidden], [InlineImports], [Optional], and [Raw]
+// options.
 func (v Value) Syntax(opts ...Option) ast.Node {
 	// TODO: the default should ideally be simplified representation that
 	// exactly represents the value. The latter can currently only be
@@ -1495,6 +1499,9 @@ func (s *hiddenStruct) Fields(opts ...Option) *Iterator {
 
 // Fields creates an iterator over v's fields if v is a struct or an error
 // otherwise.
+//
+// It honors the [All], [Concrete], [Definitions], [Final], [Hidden],
+// [Optional], and [Patterns] options.
 func (v Value) Fields(opts ...Option) (*Iterator, error) {
 	o := options{
 		omitDefinitions: true,
@@ -1794,6 +1801,8 @@ func (v hiddenValue) Template() func(label string) Value {
 //
 // Use the [Raw] option to do a low-level subsumption, taking defaults into
 // account.
+//
+// It honors the [Final], [Raw], and [Schema] options.
 func (v Value) Subsume(w Value, opts ...Option) error {
 	o := getOptions(opts)
 	p := subsume.CUE
@@ -2054,12 +2063,20 @@ type options struct {
 }
 
 // An Option defines modes of evaluation.
+//
+// Not every option is honored by every method that accepts options. Each
+// option below documents the methods it applies to; passing an option to a
+// method it does not apply to has no effect. The methods that accept options
+// are [Value.Syntax], [Value.Fields], [Value.Subsume], and [Value.Validate].
 type Option option
 
 type option func(p *options)
 
 // Final indicates a value is final. It implicitly closes all structs and lists
 // in a value and selects defaults.
+//
+// It applies to [Value.Syntax], [Value.Fields], [Value.Subsume], and
+// [Value.Validate].
 func Final() Option {
 	return func(o *options) {
 		o.final = true
@@ -2069,7 +2086,9 @@ func Final() Option {
 	}
 }
 
-// Schema specifies the input is a Schema. Used only by [Value.Subsume].
+// Schema specifies the input is a Schema.
+//
+// It applies only to [Value.Subsume].
 func Schema() Option {
 	return func(o *options) {
 		o.ignoreClosedness = true
@@ -2080,6 +2099,8 @@ func Schema() Option {
 //
 // For [Value.Validate] this means it returns an error if this is not the case.
 // In other cases a non-concrete value will be replaced with an error.
+//
+// It applies to [Value.Syntax], [Value.Fields], and [Value.Validate].
 func Concrete(concrete bool) Option {
 	return func(p *options) {
 		if concrete {
@@ -2095,12 +2116,16 @@ func Concrete(concrete bool) Option {
 
 // InlineImports causes references to values within imported packages to be
 // inlined. References to builtin packages are not inlined.
+//
+// It applies only to [Value.Syntax].
 func InlineImports(expand bool) Option {
 	return func(p *options) { p.inlineImports = expand }
 }
 
 // DisallowCycles forces validation in the presence of cycles, even if
 // non-concrete values are allowed. This is implied by [Concrete].
+//
+// It applies only to [Value.Validate].
 func DisallowCycles(disallow bool) Option {
 	return func(p *options) { p.disallowCycles = disallow }
 }
@@ -2108,7 +2133,8 @@ func DisallowCycles(disallow bool) Option {
 // ErrorsAsValues treats errors as a regular value, including them at the
 // location in the tree where they occur, instead of interpreting them as a
 // configuration-wide failure that is returned instead of root value.
-// Used by [Value.Syntax].
+//
+// It applies only to [Value.Syntax].
 func ErrorsAsValues(show bool) Option {
 	return func(p *options) { p.showErrors = show }
 }
@@ -2120,12 +2146,17 @@ func ErrorsAsValues(show bool) Option {
 //
 // The option InlineImports overrides this option with respect to ensuring the
 // output is self contained.
+//
+// It applies to [Value.Syntax] and [Value.Subsume].
 func Raw() Option {
 	return func(p *options) { p.raw = true }
 }
 
 // All indicates that all fields and values should be included in processing
 // even if they can be elided or omitted.
+//
+// It applies to [Value.Syntax] and [Value.Fields], although [Value.Fields]
+// never includes attributes.
 func All() Option {
 	return func(p *options) {
 		p.omitAttrs = false
@@ -2136,6 +2167,8 @@ func All() Option {
 }
 
 // Docs indicates whether docs should be included.
+//
+// It applies only to [Value.Syntax].
 func Docs(include bool) Option {
 	return func(p *options) { p.docs = true }
 }
@@ -2144,6 +2177,8 @@ func Docs(include bool) Option {
 //
 // Definitions may still be included for certain functions if they are referred
 // to by other values.
+//
+// It applies to [Value.Syntax] and [Value.Fields].
 func Definitions(include bool) Option {
 	return func(p *options) {
 		p.hasHidden = true
@@ -2156,6 +2191,8 @@ func Definitions(include bool) Option {
 // constraints such as `[_]: int` or `[=~"^a"]: string` but
 // not the ellipsis pattern as selected by [AnyString]: that
 // can be found with [Value.LookupPath](cue.MakePath(cue.AnyString)).
+//
+// It applies only to [Value.Fields].
 func Patterns(include bool) Option {
 	// TODO we can include patterns, but there's no way
 	// of iterating over patterns _only_ which might be
@@ -2167,6 +2204,8 @@ func Patterns(include bool) Option {
 }
 
 // Hidden indicates that definitions and hidden fields should be included.
+//
+// It applies to [Value.Syntax] and [Value.Fields].
 func Hidden(include bool) Option {
 	return func(p *options) {
 		p.hasHidden = true
@@ -2176,11 +2215,16 @@ func Hidden(include bool) Option {
 }
 
 // Optional indicates that optional fields should be included.
+//
+// It applies to [Value.Syntax] and [Value.Fields].
 func Optional(include bool) Option {
 	return func(p *options) { p.omitOptional = !include }
 }
 
 // Attributes indicates that attributes should be included.
+//
+// It applies only to [Value.Syntax]. In particular, it has no effect on
+// [Value.Fields], which never includes attributes.
 func Attributes(include bool) Option {
 	return func(p *options) { p.omitAttrs = !include }
 }
@@ -2203,6 +2247,8 @@ func (o *options) updateOptions(opts []Option) {
 // Note that by default not all errors are reported, unless options like
 // [Concrete] are used. The [Final] option can be used to check for missing
 // required fields.
+//
+// It honors the [Concrete], [DisallowCycles], and [Final] options.
 func (v Value) Validate(opts ...Option) error {
 	o := options{}
 	o.updateOptions(opts)

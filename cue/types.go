@@ -1830,21 +1830,44 @@ func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 	return nil
 }
 
+// Unify reports the greatest lower bound of the given values, like a
+// chain of [Value.Unify] calls. Unifying the values in a single call is
+// more efficient, as intermediate results do not need to be computed.
+func Unify(vals ...Value) Value {
+	// Skip missing values, as well as values identical to the first one:
+	// unification is idempotent, and this retains the fast paths of
+	// [Value.Unify]. We do not dedupe the incoming values between each
+	// other, as that would be quadratic.
+	all := make([]adt.Value, 0, len(vals))
+	var first Value
+	for _, x := range vals {
+		switch {
+		case x.v == nil:
+		case len(all) == 0:
+			first = x
+			all = append(all, x.v)
+		case x.v != first.v:
+			all = append(all, x.v)
+		}
+	}
+	if len(all) <= 1 {
+		// Note that first is the zero Value if all values are missing.
+		return first
+	}
+
+	ctx := first.ctx()
+	defer ctx.PopArc(ctx.PushArc(first.v))
+
+	n := adt.Unify(ctx, all...)
+
+	return makeValue(first.idx, n, first.parent_)
+}
+
 // Unify reports the greatest lower bound of v and w.
+//
+// To unify any number of values in a single call, see [Unify].
 func (v Value) Unify(w Value) Value {
-	if v.v == nil {
-		return w
-	}
-	if w.v == nil || w.v == v.v {
-		return v
-	}
-
-	ctx := v.ctx()
-	defer ctx.PopArc(ctx.PushArc(v.v))
-
-	n := adt.Unify(ctx, v.v, w.v)
-
-	return makeValue(v.idx, n, v.parent_)
+	return Unify(v, w)
 }
 
 // UnifyAccept is like [Value.Unify], but enforces the closedness rules of

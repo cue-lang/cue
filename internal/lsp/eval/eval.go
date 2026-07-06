@@ -1983,7 +1983,11 @@ func (f *frame) eval() {
 			unprocessed = append(unprocessed, node.X)
 
 		case *ast.UnaryExpr:
-			f.newFrame(node.X, nil, false)
+			if node.Op == token.MUL {
+				f.newFrame(node.X, f.navigable, true).addRange(node)
+			} else {
+				f.newFrame(node.X, nil, false)
+			}
 
 		case *ast.BinaryExpr:
 			switch node.Op {

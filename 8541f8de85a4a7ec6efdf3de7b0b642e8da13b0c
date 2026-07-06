@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cdb80c0_0fe42c14",
+        "filename": "cmd/cue/cmd/testdata/script/openapiv2.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-06T06:59:00Z",
+      "side": 1,
+      "message": "any particular reason why this test mixes `import` and `def` for the same purpose? we should consistently use whatever the docs recommend. my instinct is that we either use `def` for both encoding and decoding, or we use the pair of `import` and `export` commands.",
+      "revId": "8541f8de85a4a7ec6efdf3de7b0b642e8da13b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e23f65db_4e7e334d",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-06T06:59:00Z",
+      "side": 1,
+      "message": "GenerateConfig{} leaves AllSchemas false, so generation only emits components.schemas entries that are referenced from a schema position in the document. The openapiv2.txtar test shows the consequence: extracting openapi.json yields #Foo, but `cue export --out openapi` of that CUE drops Foo entirely (expect-generate has no components), because paths is empty and nothing references it.\n\nFor a `cue import openapi:` -\u003e `cue export --out openapi` round trip that\u0027s a silent fidelity loss of component schemas. Given the commit message frames this as round-tripping a complete document, is dropping unreferenced schemas intended here? Setting AllSchemas: true would preserve every top-level definition as a components.schemas entry, which seems closer to a faithful round trip. If the current behavior is deliberate, a one-line comment noting why would help.",
+      "revId": "8541f8de85a4a7ec6efdf3de7b0b642e8da13b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c20276a7_c3c5eb5f",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-06T06:59:00Z",
+      "side": 1,
+      "message": "should we copy this TODO into the v2 branch? I worry that if we later remove the v1 branches entirely, it will be too easy to lose it.",
+      "revId": "8541f8de85a4a7ec6efdf3de7b0b642e8da13b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

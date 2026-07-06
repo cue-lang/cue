@@ -112,8 +112,8 @@ func Benchmark(b *testing.B) {
 	}
 }
 
-// BenchmarkUnify measures how unifying a value with many others scales
-// with the number of values being unified.
+// BenchmarkUnify measures how a single Unify call scales with the number
+// of values being unified.
 func BenchmarkUnify(b *testing.B) {
 	for _, n := range []int{1, 10, 100} {
 		b.Run(fmt.Sprintf("len=%d", n), func(b *testing.B) {
@@ -139,10 +139,7 @@ func BenchmarkUnify(b *testing.B) {
 
 			b.ReportAllocs()
 			for b.Loop() {
-				v := base
-				for _, w := range vals {
-					v = v.Unify(w)
-				}
+				v := base.Unify(vals...)
 				if err := v.Validate(); err != nil {
 					b.Fatal(err)
 				}

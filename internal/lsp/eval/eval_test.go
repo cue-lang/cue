@@ -736,6 +736,43 @@ a: b: 5
 		},
 
 		{
+			name: "Interpolation_Value",
+			archive: `-- a.cue --
+a: {foo: 1}
+d: "\(a)-\(a.foo)"
+o: d.foo
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "a"):   {ln(1, 1, "a")},
+				ln(2, 2, "a"):   {ln(1, 1, "a")},
+				ln(2, 1, "foo"): {ln(1, 1, "foo")},
+				ln(3, 1, "d"):   {ln(2, 1, "d")},
+				ln(3, 1, "foo"): {ln(1, 1, "foo")}, // This is WRONG!
+
+				ln(1, 1, "a"):   {self},
+				ln(1, 1, "foo"): {self},
+				ln(2, 1, "d"):   {self},
+				ln(3, 1, "o"):   {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "d", "o"}},
+				or(2, 4):   {f: []string{"foo"}, e: []string{"a", "d", "o"}},
+				or(4, 8):   {f: []string{"foo"}},
+				or1(8):     {e: []string{"a", "d", "foo", "o"}},
+				or1(10):    {e: []string{"a", "d", "foo", "o"}},
+				or(12, 14): {f: []string{"a", "d", "o"}},
+				or1(14):    {f: []string{"foo"}, e: []string{"a", "d", "o"}},
+				or(18, 20): {f: []string{"foo"}, e: []string{"a", "d", "o"}},
+				or(23, 25): {e: []string{"a", "d", "o"}},
+				or(25, 29): {e: []string{"foo"}},
+				or1(30):    {e: []string{"a", "d", "o"}},
+				or(31, 33): {f: []string{"a", "d", "o"}},
+				or(33, 36): {e: []string{"a", "d", "o"}},
+				or(36, 40): {e: []string{"foo"}},
+			},
+		},
+
+		{
 			name: "List_Index",
 			archive: `-- a.cue --
 x: [{a: 5}, {b: 6}]

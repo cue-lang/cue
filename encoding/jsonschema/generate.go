@@ -778,6 +778,14 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		}
 	}
 	kind := v.IncompleteKind()
+	if kind == cue.BottomKind && isIncompleteStruct(v) {
+		// A struct containing a comprehension whose condition cannot be
+		// resolved (for example `if someBool { ... }` where someBool is
+		// not concrete) reports a bottom kind even though it is
+		// structurally a struct. Treat it as a struct so that its known
+		// fields are still emitted rather than producing an empty schema.
+		kind = cue.StructKind
+	}
 	if kind == cue.TopKind {
 		return &itemTrue{}
 	}
@@ -1232,7 +1240,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 			// In a closed context, inline non-definition references so
 			// their properties become local to additionalProperties.
 			v = pkg.LookupPath(path)
-		} else if pkg.Exists() || v.Kind() != cue.StructKind {
+		} else if pkg.Exists() || (v.Kind() != cue.StructKind && !isIncompleteStruct(v)) {
 			// This conjunct is a reference or some other non-struct literal.
 			// Let's keep it as such.
 			allOf.elems = append(allOf.elems, g.makeItem(v, open))
@@ -1518,6 +1526,29 @@ func join(it1, it2 internItem, u *uniqueItems) internItem {
 	return u.intern(&itemAllOf{
 		elems: []internItem{it1, it2},
 	})
+}
+
+// isIncompleteStruct reports whether v is structurally a struct that carries
+// an incomplete error and therefore reports a bottom kind. This happens, for
+// example, when a struct contains a comprehension whose condition is not
+// concrete (`if someBool { ... }`): the whole struct becomes incomplete even
+// though its unconditional fields are known. Such values must still be treated
+// as structs so that those fields are emitted rather than an empty schema.
+//
+// It is a heuristic: v is deemed to be such a struct if it holds an incomplete
+// error and its field iterator yields at least one field. Requiring a field
+// distinguishes an incomplete struct from other incomplete values that also
+// report a bottom kind, such as an unresolved call (`strconv.Atoi(x)`) or a
+// genuine conflict; for those, [cue.Value.Fields] either errors or is empty.
+func isIncompleteStruct(v cue.Value) bool {
+	if !cue.IsIncomplete(v.Err()) {
+		return false
+	}
+	iter, err := v.Fields(cue.Optional(true))
+	if err != nil {
+		return false
+	}
+	return iter.Next()
 }
 
 // cueKindToJSONSchemaTypes converts a CUE kind to JSON Schema type strings

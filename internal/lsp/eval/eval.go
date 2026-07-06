@@ -1342,12 +1342,14 @@ func (fe *FileEvaluator) evalForOffset(offset int) []*frame {
 // (directed, acyclic) of navigables.
 type navigable struct {
 	evaluator *Evaluator
-	// evaluated tracks whether this navigable has been evaluated,
-	// ensuring it is only evaluated once. Note that it is possible for
-	// a navigable's frames to be evaluated without the navigable
-	// itself being evaluated. Therefore it is not sufficient to rely
-	// on finding unevaluated frames within a navigable.
-	evaluated bool
+	// Frames can be added to a navigable after it has been evaluated;
+	// frameEvalCursor tracks which frames have been evaluated so far,
+	// so a later call to [navigable.eval] discovers new frames. Note
+	// that it is possible for a navigable's frames to be evaluated
+	// without the navigable itself being evaluated. Therefore it is
+	// not sufficient to rely on finding unevaluated frames within a
+	// navigable.
+	frameEvalCursor int
 	// parent is the parent navigable. The graph of navigables can be
 	// different from the graph of frames, because two frames in a
 	// parent-child relationship can reuse the same navigable. A good
@@ -1416,21 +1418,42 @@ type navigable struct {
 // recursive: it does not evaluate children. Except in special cases
 // (e.g. pkgFrames), [frame.eval] should not be directly
 // called. Instead call this [navigable.eval].
+//
+// eval may be called any number of times: each call evaluates any
+// frames that have been added to this navigable since the previous
+// call. In particular, a re-entrant call made while this navigable is
+// mid-evaluation completes the evaluation of its remaining
+// frames. For example, in
+//
+//	p: p.x.s & {x: s: 3}
+//
+// resolving the first operand's path re-enters this eval (via
+// [expandNavigables]) whilst the second operand's frame is still
+// pending, and must evaluate it before the path can find x.
+//
+// This maintains the invariant that path resolution relies upon:
+// every [navigateByName] is immediately preceded by an
+// [expandNavigables] over the same navigables, so a navigable's
+// bindings are only ever read once all its (current) frames have been
+// evaluated. A navigable's bindings are mutated only by evals of its
+// own frames, and its frames are only added by evals of its own or
+// its parent's frames. So a path, having resolved, cannot be
+// invalidated by later evaluation.
 func (n *navigable) eval() {
-	if n.evaluated {
-		return
-	}
-	n.evaluated = true
-	// Calling fr.eval() can append new frames to
-	// fr.navigable.frames (for example, the evaluation of
-	// BinaryExpr or comprehension clauses, can append new frames to
-	// the current navigable). Thus we don't use range.
-	for i := 0; i < len(n.frames); i++ {
-		fr := n.frames[i]
+	// Calling fr.eval() can append new frames to fr.navigable.frames
+	// (for example, the evaluation of BinaryExpr or comprehension
+	// clauses, can append new frames to the current navigable), and
+	// re-entrant calls to this eval can consume frames from further
+	// along the list. Thus we must loop on the cursor in the navigable
+	// struct.
+	evaluateFrames := n.frameEvalCursor < len(n.frames)
+	for n.frameEvalCursor < len(n.frames) {
+		fr := n.frames[n.frameEvalCursor]
+		n.frameEvalCursor++
 		fr.eval()
 	}
 
-	if len(n.bindings) == 0 {
+	if !evaluateFrames || len(n.bindings) == 0 {
 		return
 	}
 	//	a: b: c: _

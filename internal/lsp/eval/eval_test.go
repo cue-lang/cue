@@ -1551,6 +1551,42 @@ a: b: c: a.b`,
 			},
 		},
 
+		// A path in one operand of an explicit unification refers to a
+		// field declared in a sibling operand. The operands share p's
+		// navigable, and the p.x.s operand's frame is evaluated first:
+		// resolving its path traverses p's navigable whilst that
+		// navigable is mid-evaluation; [navigable.eval] must therefore
+		// evaluate the pending {x: s: 3} frame before the path can find
+		// x (see navigable.frameEvalCursor).
+		{
+			name: "Cycle_Sibling_Operand",
+			archive: `-- a.cue --
+p: p.x.s & {x: s: 3}`,
+			expectDefinitions: map[position][]position{
+				ln(1, 2, "p"): {ln(1, 1, "p")},
+				ln(1, 1, "x"): {ln(1, 2, "x")},
+				ln(1, 1, "s"): {ln(1, 2, "s")},
+
+				ln(1, 1, "p"): {self},
+				ln(1, 2, "x"): {self},
+				ln(1, 2, "s"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"p"}},
+				or(2, 4):   {f: []string{"x"}, e: []string{"p"}},
+				or1(4):     {e: []string{"p"}},
+				or(5, 7):   {e: []string{"x"}},
+				or(7, 9):   {e: []string{"s"}},
+				or(9, 11):  {e: []string{"p"}},
+				or(11, 14): {f: []string{"x"}, e: []string{"p"}},
+				or1(14):    {f: []string{"s"}, e: []string{"p", "x"}},
+				or(15, 17): {f: []string{"s"}, e: []string{"p"}},
+				or1(17):    {e: []string{"p", "s", "x"}},
+				or1(19):    {e: []string{"p", "s", "x"}},
+				or1(20):    {e: []string{"p"}},
+			},
+		},
+
 		{
 			name: "Cycle_Sibling_Operand",
 			archive: `-- a.cue --

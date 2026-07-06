@@ -1983,7 +1983,14 @@ func (f *frame) eval() {
 			unprocessed = append(unprocessed, node.X)
 
 		case *ast.UnaryExpr:
-			f.newFrame(node.X, nil, false)
+			if node.Op == token.MUL {
+				// *x marks x as a default disjunct: x contributes its
+				// structure to this frame just as an unmarked disjunct
+				// does.
+				f.newFrame(node.X, f.navigable, true).addRange(node)
+			} else {
+				f.newFrame(node.X, nil, false)
+			}
 
 		case *ast.BinaryExpr:
 			switch node.Op {

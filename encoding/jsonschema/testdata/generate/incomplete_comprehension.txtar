@@ -1,0 +1,48 @@
+# A struct that contains a comprehension whose condition is not concrete is
+# itself incomplete and reports a bottom kind.
+# TODO The known (unconditional) fields
+# should still be emitted rather than producing an empty schema.
+# See https://github.com/cue-lang/cue/discussions/4426
+
+#path: #Schema
+-- test.cue --
+package test
+
+#Schema: {
+	external!: bool
+	if external {
+		role: "minimal"
+	}
+	name?: string
+	nested: {
+		x!: bool
+		if x {
+			y: int
+		}
+		z: string
+	}
+}
+
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: {
+	external: true
+	nested: {
+		x: false
+		z: "hello"
+	}
+}
+
+ok2: data: {
+	external: false
+	name:     "bob"
+	nested: {
+		x: true
+		z: "world"
+	}
+}
+-- out/generate-v3/schema --
+{$schema: "https://json-schema.org/draft/2020-12/schema"}
+-- out/generate-v3/ok1 --
+-- out/generate-v3/ok2 --

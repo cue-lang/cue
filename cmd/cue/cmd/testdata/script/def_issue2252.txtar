@@ -1,0 +1,40 @@
+# cue def --inline-imports should inline imports even when a non-CUE data
+# file is merged in (age.json placed at merged: via --path). Issue 2252:
+# merging builds the value via cue.Value.Unify, whose vertex conjuncts the
+# dependency analysis behind --inline-imports did not descend into.
+#
+# TODO: the golden below still retains the import; fixed in the next commit.
+
+exec cue def merge.cue age.json --path 'merged:' --inline-imports
+cmp stdout out
+
+-- cue.mod/module.cue --
+module: "example.com"
+language: version: "v0.10.0"
+
+-- color/color.cue --
+package color
+
+blue: rgb8:  0x0000FF
+green: rgb8: 0x00FF00
+red: rgb8:   0xFF0000
+
+-- merge.cue --
+package merged
+
+import (
+	"example.com/color"
+)
+
+merged: uint
+
+favorite: color.blue.rgb8
+
+-- age.json --
+18
+
+-- out --
+import "example.com/color"
+
+merged:   18
+favorite: color.blue.rgb8

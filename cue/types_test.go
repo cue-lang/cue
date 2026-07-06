@@ -2499,6 +2499,94 @@ func TestUnify2(t *testing.T) {
 
 }
 
+// TestUnifyVariadic tests Unify calls with more than one argument,
+// checking that they behave like a chain of single-argument calls.
+func TestUnifyVariadic(t *testing.T) {
+	type testCase struct {
+		vals []string
+		want string // JSON; unused if err is true
+		err  bool
+	}
+	testCases := []testCase{{
+		vals: []string{`a: int, b: string`, `a: 1`, `b: "foo"`, `c: true`},
+		want: `{"a":1,"b":"foo","c":true}`,
+	}, {
+		// Conflicts between later arguments are still detected.
+		vals: []string{`a: int`, `a: 1`, `a: 2`},
+		err:  true,
+	}, {
+		// Closedness of the receiver applies to all arguments.
+		vals: []string{`close({a: int, b: int})`, `a: 1`, `b: 2`},
+		want: `{"a":1,"b":2}`,
+	}, {
+		vals: []string{`close({a: int})`, `a: 1`, `b: 2`},
+		err:  true,
+	}, {
+		// Closedness of a later argument applies as well.
+		vals: []string{`a: 1`, `close({a: int})`, `b: 2`},
+		err:  true,
+	}, {
+		vals: []string{`#D, #D: d: f: int`, `d: f: 1`, `d: f: <10`},
+		want: `{"d":{"f":1}}`,
+	}, {
+		vals: []string{`#D, #D: d: f: int`, `d: f: 1`, `d: e: 1`},
+		err:  true,
+	}, {
+		// Defaults are retained.
+		vals: []string{`a: *1 | int`, `b: 2`, `c: 3`},
+		want: `{"a":1,"b":2,"c":3}`,
+	}}
+
+	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
+		ctx := t.M.CueContext()
+		vals := make([]cue.Value, len(tc.vals))
+		for i, src := range tc.vals {
+			vals[i] = ctx.CompileString(src)
+		}
+
+		batched := vals[0].Unify(vals[1:]...)
+		chained := vals[0]
+		for _, w := range vals[1:] {
+			chained = chained.Unify(w)
+		}
+
+		for i, v := range []cue.Value{batched, chained} {
+			name := [...]string{"batched", "chained"}[i]
+			err := v.Validate(cue.Concrete(true))
+			t.Equal(err != nil, tc.err, name+" hasError")
+			if err != nil {
+				t.Log(name, "error:", err)
+				continue
+			}
+			b, err := v.MarshalJSON()
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Equal(string(b), tc.want, name)
+		}
+	})
+}
+
+// TestUnifyMissingValues tests Unify calls involving zero and duplicate
+// values, which are skipped.
+func TestUnifyMissingValues(t *testing.T) {
+	ctx := cuecontext.New()
+	a := ctx.CompileString(`x: 1`)
+	b := ctx.CompileString(`y: 2`)
+	var zero cue.Value
+
+	qt.Assert(t, qt.Equals(a.Unify(), a))
+	qt.Assert(t, qt.Equals(a.Unify(zero), a))
+	qt.Assert(t, qt.Equals(zero.Unify(a), a))
+	qt.Assert(t, qt.Equals(zero.Unify(zero), zero))
+	qt.Assert(t, qt.Equals(a.Unify(a, a), a))
+
+	v := zero.Unify(a, b)
+	data, err := v.MarshalJSON()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(string(data), `{"x":1,"y":2}`))
+}
+
 func TestUnifyAccept(t *testing.T) {
 	type testCase struct {
 		value string

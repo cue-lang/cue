@@ -934,12 +934,14 @@ func (v *Vertex) Bottom() *Bottom {
 
 // func (v *Vertex) Evaluate()
 
-// Unify unifies two values and returns the result.
+// Unify unifies the given values and returns the result. Unifying the
+// values in a single call is more efficient than unifying them pairwise,
+// as intermediate results do not need to be computed.
 //
 // TODO: introduce: Open() wrapper that indicates closedness should be ignored.
 //
 // Change Value to Node to allow any kind of type to be passed.
-func Unify(c *OpContext, a, b Value) *Vertex {
+func Unify(c *OpContext, vals ...Value) *Vertex {
 	v := &Vertex{}
 
 	// We set the parent of the context to be able to detect structural cycles
@@ -949,8 +951,9 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 		v.Label = n.Label
 	}
 
-	addConjuncts(c, v, a)
-	addConjuncts(c, v, b)
+	for _, x := range vals {
+		addConjuncts(c, v, x)
+	}
 
 	s := v.getState(c)
 	// As this is a new node, we should drop all the requirements from

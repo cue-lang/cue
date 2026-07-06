@@ -1,0 +1,76 @@
+# cue def --inline-imports should inline an import referenced inside a let:
+# in ./p0 the reference is buried in a comprehension in an inlined struct
+# (issue 3484); in ./caller the let value is directly the import (issue 2697).
+#
+# TODO: the goldens below still retain the import; fixed in the next commit.
+
+exec cue def --inline-imports ./p0
+cmp stdout out-p0
+
+exec cue def --inline-imports ./caller
+cmp stdout out-caller
+
+-- cue.mod/module.cue --
+module: "example.test"
+language: version: "v0.10.0"
+
+-- p0/ecs.cue --
+package p0
+
+import (
+	"encoding/json"
+	"example.test/p1"
+)
+
+#T: {
+	a: _
+	policy: json.Marshal({
+			let arns = {
+				for _, container in a
+				for _, v in container.env
+				if (v & p1.#S) != _|_ {}
+			}
+			arns
+	})
+}
+
+-- caller/one.cue --
+package caller
+
+import "example.test/p1"
+
+let foo = p1.#S
+myFoo: foo
+
+-- p1/x.cue --
+package p1
+
+#S: {...}
+
+-- out-p0 --
+package p0
+
+import (
+	"encoding/json"
+	"example.test/p1"
+)
+
+#T: {
+	a: _
+	policy: json.Marshal({
+		let arns = {
+			for _, container in a
+			for _, v in container.env
+			if (v & p1.#S) != _|_ // explicit error (_|_ literal) in source
+			{}
+		}
+		arns
+	}) & {}
+}
+-- out-caller --
+package caller
+
+import "example.test/p1"
+
+let foo = p1.#S
+myFoo: foo

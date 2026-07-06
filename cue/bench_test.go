@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
@@ -108,6 +109,45 @@ func Benchmark(b *testing.B) {
 	})
 	if err != nil {
 		b.Fatal(err)
+	}
+}
+
+// BenchmarkUnify measures how unifying a value with many others scales
+// with the number of values being unified.
+func BenchmarkUnify(b *testing.B) {
+	for _, n := range []int{1, 10, 100} {
+		b.Run(fmt.Sprintf("len=%d", n), func(b *testing.B) {
+			ctx := cuecontext.New()
+
+			var buf bytes.Buffer
+			for i := range 100 {
+				fmt.Fprintf(&buf, "f%d: int & >=0 & <=1000\n", i)
+			}
+			base := ctx.CompileBytes(buf.Bytes())
+			if err := base.Err(); err != nil {
+				b.Fatal(err)
+			}
+
+			// Each value sets a distinct field to a concrete value.
+			vals := make([]cue.Value, n)
+			for i := range vals {
+				vals[i] = ctx.CompileString(fmt.Sprintf("f%d: %d", i, i))
+				if err := vals[i].Err(); err != nil {
+					b.Fatal(err)
+				}
+			}
+
+			b.ReportAllocs()
+			for b.Loop() {
+				v := base
+				for _, w := range vals {
+					v = v.Unify(w)
+				}
+				if err := v.Validate(); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
 	}
 }
 

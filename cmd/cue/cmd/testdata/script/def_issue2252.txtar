@@ -2,8 +2,6 @@
 # file is merged in (age.json placed at merged: via --path). Issue 2252:
 # merging builds the value via cue.Value.Unify, whose vertex conjuncts the
 # dependency analysis behind --inline-imports did not descend into.
-#
-# TODO: the golden below still retains the import; fixed in the next commit.
 
 exec cue def merge.cue age.json --path 'merged:' --inline-imports
 cmp stdout out
@@ -34,7 +32,5 @@ favorite: color.blue.rgb8
 18
 
 -- out --
-import "example.com/color"
-
 merged:   18
-favorite: color.blue.rgb8
+favorite: 0x0000FF

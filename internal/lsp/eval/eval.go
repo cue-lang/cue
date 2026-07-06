@@ -1961,8 +1961,17 @@ func (f *frame) eval() {
 			}
 
 		case *ast.Interpolation:
+			// The expressions used within an interpolation must be
+			// resolvable, but the interpolation itself is a string: it
+			// does not resolve to the values of those expressions. So,
+			// as with unary operators, each expression is evaluated in
+			// a child frame with a fresh navigable.
 			for _, elt := range node.Elts {
-				unprocessed = append(unprocessed, elt)
+				if _, ok := elt.(*ast.BasicLit); ok {
+					unprocessed = append(unprocessed, elt)
+				} else {
+					f.newFrame(elt, nil, false)
+				}
 			}
 
 		case *ast.EmbedDecl:

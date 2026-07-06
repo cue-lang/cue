@@ -300,6 +300,12 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 
 	switch x := expr.(type) {
 	case nil:
+	case *adt.Vertex:
+		// A vertex appears as a conjunct when the value being analyzed was
+		// composed through the API (e.g. cue.Value.Unify) rather than compiled
+		// from source.
+		c.markConjuncts(x)
+
 	case *adt.BinaryExpr:
 		c.markExpr(env, x.X)
 		c.markExpr(env, x.Y)

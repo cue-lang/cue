@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe5d65d6_1ff99f2d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-07T17:05:56Z",
+      "side": 1,
+      "message": "LGTM modulo some extra test cases.",
+      "revId": "82de38808edd187afbc379b4452601e1613b07d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7cf413e_176341fc",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-07T17:05:56Z",
+      "side": 1,
+      "message": "I\u0027d like to see some slightly more detailed tests here, for example multiple segments (e.g. `./.../leaf/.../other`), \"backtracking\" (e.g. `./.../foo/.../foo` matching against `./blah/foo/x/foo`), non-segment-based patterns (e.g. `./...foo...`).",
+      "revId": "82de38808edd187afbc379b4452601e1613b07d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

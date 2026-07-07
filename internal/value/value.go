@@ -44,6 +44,11 @@ func Context[Ctx *cue.Runtime | *cue.Context | cue.Value | *adt.OpContext](ctx C
 	panic("unreachable")
 }
 
+// Runtime returns the internal runtime underlying the given context.
+func Runtime(ctx *cue.Context) *runtime.Runtime {
+	return (*runtime.Runtime)(ctx)
+}
+
 // OpContext returns an OpContext with proper node formatting initialized.
 func OpContext[Ctx *cue.Runtime | *cue.Context | cue.Value](c Ctx) *adt.OpContext {
 	var r *runtime.Runtime

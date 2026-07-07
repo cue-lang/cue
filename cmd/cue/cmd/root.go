@@ -34,11 +34,11 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
-	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/httplog"
+	"cuelang.org/go/internal/value"
 )
 
 // TODO: commands
@@ -97,9 +97,9 @@ type procStats struct {
 	MaxRssBytes uint64
 }
 
-func fetchStats() Stats {
+func fetchStats(cueStats stats.Counts) Stats {
 	var stats Stats
-	stats.CUE = adt.TotalStats()
+	stats.CUE = cueStats
 
 	// Fill in the runtime and system stats, which are cumulative counters.
 	// Since in practice the numbers aren't deterministic,
@@ -185,9 +185,6 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 			opts = append(opts, cuecontext.WithInjection(wasmInterp))
 		}
 		c.ctx = cuecontext.New(opts...)
-		// Some init work, such as in internal/filetypes, evaluates CUE by design.
-		// We don't want that work to count towards $CUE_STATS.
-		adt.ResetStats()
 
 		if cpuprofile := flagCpuProfile.String(c); cpuprofile != "" {
 			f, err := os.Create(cpuprofile)
@@ -217,7 +214,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		}
 
 		if statsEnc != nil {
-			stats := fetchStats()
+			stats := fetchStats(value.Runtime(c.ctx).StatsRecorder().Counts())
 			statsEnc.Encode(c.ctx.Encode(stats))
 			statsEnc.Close()
 		}
@@ -395,17 +392,19 @@ func Main() int {
 		fmt.Printf("Benchmark%s\t", benchName)
 
 		// The standard Go benchmark numbers from `go test -bench -benchmem`.
+		// Only the Go runtime and OS process numbers are used here, so no
+		// CUE evaluator counts are supplied.
 		fmt.Printf("%d\t%d ns/op", 1, time.Since(start))
-		stats := fetchStats()
-		fmt.Printf("\t%d B/op", stats.Go.AllocBytes)
+		benchStats := fetchStats(stats.Counts{})
+		fmt.Printf("\t%d B/op", benchStats.Go.AllocBytes)
 
 		// Extra numbers which may be useful in some cases.
 		// Starting with allocs/op, which tends to be pretty stable,
 		// and max RSS, which tends to be very useful when reducing memory usage.
-		fmt.Printf("\t%d allocs/op", stats.Go.AllocObjects)
-		fmt.Printf("\t%d max-RSS-B/op", stats.Proc.MaxRssBytes)
-		fmt.Printf("\t%d user-ns/op", stats.Proc.UserNano)
-		fmt.Printf("\t%d sys-ns/op", stats.Proc.SysNano)
+		fmt.Printf("\t%d allocs/op", benchStats.Go.AllocObjects)
+		fmt.Printf("\t%d max-RSS-B/op", benchStats.Proc.MaxRssBytes)
+		fmt.Printf("\t%d user-ns/op", benchStats.Proc.UserNano)
+		fmt.Printf("\t%d sys-ns/op", benchStats.Proc.SysNano)
 		fmt.Printf("\n")
 	}
 	return exitCode

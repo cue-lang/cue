@@ -13,11 +13,10 @@ exec cue export package-p.cue -e foo
 cmp stdout gold
 
 # The package qualifier form must behave the same as the file forms.
-# BUG(#3371): this currently fails with the out-of-scope bar conflict.
-! exec cue export .:p -e foo
-stderr 'conflicting values true and false'
-! exec cue eval .:p -e foo
-stderr 'conflicting values true and false'
+exec cue export .:p -e foo
+cmp stdout gold
+exec cue eval .:p -e foo
+cmp stdout gold
 
 # Selecting the conflicting expression itself must still fail.
 ! exec cue export .:p -e bar

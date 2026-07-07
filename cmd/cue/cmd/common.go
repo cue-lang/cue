@@ -117,7 +117,9 @@ func (b *buildPlan) instances() iterator {
 	case len(b.orphaned) > 0:
 		i = newStreamingIterator(b)
 	case len(b.insts) > 0:
-		insts, err := buildInstances(b.cmd, b.insts, false)
+		// With -e, only the selected expressions need to evaluate; skip
+		// whole-instance validation so out-of-scope errors do not surface.
+		insts, err := buildInstances(b.cmd, b.insts, len(b.expressions) > 0)
 		i = &instanceIterator{
 			inst: b.instance,
 			a:    insts,

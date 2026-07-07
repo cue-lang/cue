@@ -353,6 +353,7 @@ func (v Value) getNum(k adt.Kind) (*adt.Num, errors.Error) {
 		return num, nil
 	}
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	if err := v.checkKind(ctx, k); err != nil {
 		return nil, v.toErr(err)
 	}
@@ -696,6 +697,7 @@ func Dereference(v Value) Value {
 	c = adt.MakeRootConjunct(env, expr)
 
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	n, b := ctx.Resolve(c, r)
 	if b != nil {
 		return newErrValue(v, b)
@@ -823,7 +825,9 @@ func (v Value) IncompleteKind() Kind {
 
 // MarshalJSON marshalls this value into valid JSON.
 func (v Value) MarshalJSON() (b []byte, err error) {
-	b, err = v.appendJSON(v.ctx(), nil)
+	ctx := v.ctx()
+	defer ctx.FlushStats()
+	b, err = v.appendJSON(ctx, nil)
 	if err != nil {
 		return nil, unwrapJSONError(err)
 	}
@@ -1017,7 +1021,9 @@ func (v Value) BuildInstance() *build.Instance {
 
 // Err returns the error represented by v or nil v is not an error.
 func (v Value) Err() error {
-	if err := v.checkKind(v.ctx(), adt.BottomKind); err != nil {
+	ctx := v.ctx()
+	defer ctx.FlushStats()
+	if err := v.checkKind(ctx, adt.BottomKind); err != nil {
 		return v.toErr(err)
 	}
 	return nil
@@ -1065,6 +1071,7 @@ func (v Value) Allows(sel Selector) bool {
 		return true
 	}
 	c := v.ctx()
+	defer c.FlushStats()
 	f := sel.sel.feature(c)
 	return v.v.Accept(c, f)
 }
@@ -1198,7 +1205,9 @@ func makeInt(v Value, x int64) Value {
 // number of fields, for bytes the number of bytes.
 func (v Value) Len() Value {
 	if v.v != nil {
-		switch x := v.eval(v.ctx()).(type) {
+		ctx := v.ctx()
+		defer ctx.FlushStats()
+		switch x := v.eval(ctx).(type) {
 		case *adt.Vertex:
 			if x.IsList() {
 				n := &adt.Num{K: adt.IntKind}
@@ -1244,6 +1253,7 @@ func (v hiddenValue) Elem() (Value, bool) {
 // v is not a list.
 func (v Value) List() (Iterator, error) {
 	v, _ = v.Default()
+	// TODO(stats): flush when the iteration/operation completes.
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, adt.ListKind); err != nil {
 		return Iterator{idx: v.idx, ctx: ctx}, v.toErr(err)
@@ -1264,7 +1274,9 @@ func (v Value) Null() error {
 		// In the happy path, avoid creating a new [OpContext], which is wasteful.
 		return nil
 	}
-	if err := v.checkKind(v.ctx(), adt.NullKind); err != nil {
+	ctx := v.ctx()
+	defer ctx.FlushStats()
+	if err := v.checkKind(ctx, adt.NullKind); err != nil {
 		return v.toErr(err)
 	}
 	return nil
@@ -1277,7 +1289,9 @@ func (v Value) IsNull() bool {
 		// In the happy path, avoid creating a new [OpContext], which is wasteful.
 		return true
 	}
-	return v.isKind(v.ctx(), adt.NullKind)
+	ctx := v.ctx()
+	defer ctx.FlushStats()
+	return v.isKind(ctx, adt.NullKind)
 }
 
 // Bool returns the bool value of v or false and an error if v is not a boolean.
@@ -1288,6 +1302,7 @@ func (v Value) Bool() (bool, error) {
 		return b.B, nil
 	}
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	if err := v.checkKind(ctx, adt.BoolKind); err != nil {
 		return false, v.toErr(err)
 	}
@@ -1303,6 +1318,7 @@ func (v Value) String() (string, error) {
 		return str.Str, nil
 	}
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	if err := v.checkKind(ctx, adt.StringKind); err != nil {
 		return "", v.toErr(err)
 	}
@@ -1321,6 +1337,7 @@ func (v Value) Bytes() ([]byte, error) {
 		return []byte(val.Str), nil
 	}
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	switch x := v.eval(ctx).(type) {
 	case *adt.Bytes:
 		return bytes.Clone(x.B), nil
@@ -1335,6 +1352,7 @@ func (v Value) Bytes() ([]byte, error) {
 func (v hiddenValue) Reader() (io.Reader, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	switch x := v.eval(ctx).(type) {
 	case *adt.Bytes:
 		return bytes.NewReader(x.B), nil
@@ -1428,6 +1446,7 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 //
 // Deprecated: use [Value.Fields].
 func (v hiddenValue) Struct() (*Struct, error) {
+	// TODO(stats): flush when the iteration/operation completes.
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, options{})
 	if err != nil {
@@ -1471,6 +1490,7 @@ func (s *hiddenStruct) Field(i int) FieldInfo {
 	opt := a.ArcType == adt.ArcOptional
 	selType := featureToSelType(a.Label, a.ArcType)
 	ctx := s.v.ctx()
+	defer ctx.FlushStats()
 
 	v := makeChildValue(s.v, a)
 	name := s.v.idx.LabelStr(a.Label)
@@ -1509,6 +1529,7 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 		omitOptional:    true,
 	}
 	o.updateOptions(opts)
+	// TODO(stats): flush when the iteration/operation completes.
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, o)
 	if err != nil {
@@ -1535,6 +1556,7 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 // be removed to be reused eventually for looking up a selector.
 func (v hiddenValue) Lookup(path ...string) Value {
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	for _, k := range path {
 		// TODO(eval) TODO(error): always search in full data and change error
 		// message if a field is found but is of the incorrect type.
@@ -1697,6 +1719,7 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 		return v
 	}
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	if err := p.Err(); err != nil {
 		return newErrValue(v, mkErr(nil, 0, "invalid path: %v", err))
 	}
@@ -1818,6 +1841,7 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 		p.Defaults = true
 	}
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	return p.Value(ctx, v.v, w.v)
 }
 
@@ -1865,6 +1889,7 @@ func Unify(vals ...Value) Value {
 	}
 
 	ctx := first.ctx()
+	defer ctx.FlushStats()
 	defer ctx.PopArc(ctx.PushArc(first.v))
 
 	n := adt.Unify(ctx, all...)
@@ -1905,6 +1930,7 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 
 	n := &adt.Vertex{}
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 
 	n.AddOpenConjunct(ctx, v.v)
 	n.AddOpenConjunct(ctx, w.v)
@@ -1929,7 +1955,9 @@ func (v Value) Equals(other Value) bool {
 	if v.v == nil || other.v == nil {
 		return false
 	}
-	return adt.Equal(v.ctx(), v.v, other.v, 0)
+	ctx := v.ctx()
+	defer ctx.FlushStats()
+	return adt.Equal(ctx, v.v, other.v, 0)
 }
 
 func (v Value) instance() *Instance {
@@ -1985,6 +2013,7 @@ func (v Value) ReferencePath() (root Value, p Path) {
 		return Value{}, Path{}
 	}
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 
 	env, expr := c.EnvExpr()
 
@@ -2283,7 +2312,9 @@ func (v Value) Validate(opts ...Option) error {
 		AllErrors:      true,
 	}
 
-	b := adt.Validate(v.ctx(), v.v, cfg)
+	ctx := v.ctx()
+	defer ctx.FlushStats()
+	b := adt.Validate(ctx, v.v, cfg)
 	if b != nil {
 		return v.toErr(b)
 	}
@@ -2296,6 +2327,7 @@ func (v Value) Validate(opts ...Option) error {
 // fields.
 func (v Value) Walk(before func(Value) bool, after func(Value)) {
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 	switch v.Kind() {
 	case StructKind:
 		if before != nil && !before(v) {
@@ -2382,6 +2414,7 @@ func (v Value) Expr() (Op, []Value) {
 	default:
 		a := []Value{}
 		ctx := v.ctx()
+		defer ctx.FlushStats()
 		for c := range v.v.LeafConjuncts() {
 			// Keep parent here. TODO: do we need remove the requirement
 			// from other conjuncts?
@@ -2489,6 +2522,7 @@ process:
 	case *adt.FieldReference:
 		// TODO: allow hard link
 		ctx := v.ctx()
+		defer ctx.FlushStats()
 		f := ctx.PushState(env, x.Src)
 		env := ctx.Env(x.UpCount)
 		a = append(a, remakeValue(v, nil, &adt.NodeLink{Node: env.Vertex}))
@@ -2582,6 +2616,7 @@ process:
 		}
 
 		ctx := v.ctx()
+		defer ctx.FlushStats()
 
 		n := v.v
 

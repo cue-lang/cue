@@ -167,6 +167,7 @@ func (inst *Instance) ID() string {
 // top-level values.
 func (inst *Instance) Value() Value {
 	ctx := newContext(inst.index)
+	defer ctx.FlushStats()
 	inst.root.Finalize(ctx)
 	// TODO: consider including these statistics as well. Right now, this only
 	// seems to be used in cue cmd for "auxiliary" evaluations, like filetypes.
@@ -182,6 +183,7 @@ func Merge(inst ...*Instance) *Instance {
 
 	i := inst[0]
 	ctx := newContext(i.index)
+	defer ctx.FlushStats()
 
 	// TODO: interesting test: use actual unification and then on K8s corpus.
 

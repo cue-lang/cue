@@ -48,7 +48,9 @@ func NewPureValidatorFunc[T any](f func(T) error, opts ...FuncOption) Value {
 		o(&cfg)
 	}
 	ctx := (*Context)(runtime.New())
-	return newValueRoot(ctx.runtime(), ctx.ctx(), &adt.FuncValidator{
+	opCtx := ctx.ctx()
+	defer opCtx.FlushStats()
+	return newValueRoot(ctx.runtime(), opCtx, &adt.FuncValidator{
 		Name: cfg.name,
 		Validate: func(opCtx *adt.OpContext, v adt.Value) *adt.Bottom {
 			var t T
@@ -70,8 +72,10 @@ func newPureFunc[Args, R any](f func(Args) (R, error), opts []FuncOption) Value 
 		o(&cfg)
 	}
 	ctx := (*Context)(runtime.New()) // Share the context between all values.
+	opCtx := ctx.ctx()
+	defer opCtx.FlushStats()
 	argT := reflect.TypeFor[Args]()
-	return newValueRoot(ctx.runtime(), ctx.ctx(), &adt.Func{
+	return newValueRoot(ctx.runtime(), opCtx, &adt.Func{
 		Name: cfg.name,
 		Func: func(opCtx *adt.OpContext, argValues []adt.Value) adt.Expr {
 			numArgs := argT.NumField()

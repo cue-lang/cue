@@ -119,6 +119,7 @@ func Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, errors.Error) {
 // It resolves references that point outside any of the vertices in v.
 func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (f *ast.File, err errors.Error) {
 	e := newExporter(p, r, pkgID, v)
+	defer e.ctx.FlushStats()
 	e.initPivot(v)
 
 	isDef := v.IsRecursivelyClosed()
@@ -184,6 +185,7 @@ func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 // It does not resolve references that point outside the given expression.
 func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 	e := newExporter(p, r, pkgID, nil)
+	defer e.ctx.FlushStats()
 
 	return e.expr(nil, n), nil
 }
@@ -290,6 +292,7 @@ func Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error
 // It resolves incomplete references that point outside the current context.
 func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (f *ast.File, err errors.Error) {
 	e := newExporter(p, r, pkgID, n)
+	defer e.ctx.FlushStats()
 	e.initPivot(n)
 
 	v := e.value(n, n.Conjuncts...)
@@ -309,6 +312,7 @@ func Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 // TODO: Should take context.
 func (p *Profile) Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 	e := newExporter(p, r, pkgID, n)
+	defer e.ctx.FlushStats()
 	v := e.value(n)
 	// finalize runs astutil.Sanitize, which edits v in place via the shared
 	// StructLit Elts.

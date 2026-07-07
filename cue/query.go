@@ -48,6 +48,7 @@ func (v Value) LookupPath(p Path) Value {
 	n := v.v
 	parent := v.parent_
 	ctx := v.ctx()
+	defer ctx.FlushStats()
 
 outer:
 	for _, sel := range p.path {

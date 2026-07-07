@@ -187,6 +187,7 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
 
 	ctx := c.ctx()
+	defer ctx.FlushStats()
 
 	// TODO: move to runtime?: it probably does not make sense to treat BuildExpr
 	// and the expression resulting from CompileString differently.
@@ -260,6 +261,7 @@ func (c *Context) make(v *adt.Vertex) Value {
 	// able to properly handle this.
 	x := newValueRoot(c.runtime(), opCtx, v)
 	adt.AddStats(opCtx)
+	opCtx.FlushStats()
 	return x
 }
 
@@ -378,12 +380,15 @@ func NilIsAny(isAny bool) EncodeOption {
 func (c *Context) Encode(x any, option ...EncodeOption) Value {
 	switch v := x.(type) {
 	case adt.Value:
-		return newValueRoot(c.runtime(), c.ctx(), v)
+		ctx := c.ctx()
+		defer ctx.FlushStats()
+		return newValueRoot(c.runtime(), ctx, v)
 	}
 	var options encodeOptions
 	options.process(option)
 
 	ctx := c.ctx()
+	defer ctx.FlushStats()
 	// TODO: is true the right default?
 	val := convert.FromGoValue(ctx, x, options.nilIsTop)
 	n := adt.ToVertex(val) // we know val is finalized
@@ -402,6 +407,7 @@ func (c *Context) EncodeType(x any, option ...EncodeOption) Value {
 	}
 
 	ctx := c.ctx()
+	defer ctx.FlushStats()
 	v, err := convert.FromGoType(ctx, x)
 	if err != nil {
 		return c.makeError(err)
@@ -417,7 +423,9 @@ func (c *Context) NewList(v ...Value) Value {
 	for i, x := range v {
 		a[i] = x.v
 	}
-	return c.make(c.ctx().NewList(a...))
+	ctx := c.ctx()
+	defer ctx.FlushStats()
+	return c.make(ctx.NewList(a...))
 }
 
 // TODO:

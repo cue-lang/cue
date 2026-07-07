@@ -59,6 +59,14 @@ const (
 	// _|_ token, which we intend to phase out.
 	LegacyUserError // user
 
+	// A CanceledError means the evaluation was interrupted because the Go
+	// context of the operation was canceled. It is a permanent error: the
+	// state of the values involved in the operation is unspecified beyond
+	// reporting this error. The authoritative signal for cancellation is
+	// [OpContext.Canceled]; Bottom values with this code may additionally
+	// appear in partially evaluated results.
+	CanceledError // canceled
+
 	// StructuralCycleError means a structural cycle was found. Structural
 	// cycles are permanent errors, but they are not passed up recursively,
 	// as a unification of a value with a structural cycle with one that

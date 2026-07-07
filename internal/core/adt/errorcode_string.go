@@ -11,14 +11,15 @@ func _() {
 	_ = x[EvalError-0]
 	_ = x[UserError-1]
 	_ = x[LegacyUserError-2]
-	_ = x[StructuralCycleError-3]
-	_ = x[IncompleteError-4]
-	_ = x[CycleError-5]
+	_ = x[CanceledError-3]
+	_ = x[StructuralCycleError-4]
+	_ = x[IncompleteError-5]
+	_ = x[CycleError-6]
 }
 
-const _ErrorCode_name = "evaluseruserstructural_cycleincompletecycle"
+const _ErrorCode_name = "evaluserusercanceledstructural_cycleincompletecycle"
 
-var _ErrorCode_index = [...]uint8{0, 4, 8, 12, 28, 38, 43}
+var _ErrorCode_index = [...]uint8{0, 4, 8, 12, 20, 36, 46, 51}
 
 func (i ErrorCode) String() string {
 	idx := int(i) - 0

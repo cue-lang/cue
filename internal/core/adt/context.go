@@ -15,6 +15,7 @@
 package adt
 
 import (
+	"context"
 	"fmt"
 	"iter"
 	"reflect"
@@ -65,6 +66,12 @@ type Runtime interface {
 type Config struct {
 	Runtime
 	Format func(Runtime, Node) string
+
+	// Context, if non-nil, is the Go context of the operation the
+	// OpContext is created for. It is polled periodically during
+	// evaluation so that long evaluations can be interrupted; see
+	// [OpContext.Canceled].
+	Context context.Context
 }
 
 var contextGeneration atomic.Uint64
@@ -79,6 +86,7 @@ func New(v *Vertex, cfg *Config) *OpContext {
 		opID:        contextGeneration.Add(1),
 		Runtime:     cfg.Runtime,
 		Format:      cfg.Format,
+		goContext:   cfg.Context,
 		vertex:      v,
 		taskContext: schedConfig,
 	}
@@ -95,6 +103,57 @@ func New(v *Vertex, cfg *Config) *OpContext {
 
 func (c *OpContext) isDevVersion() bool {
 	return c.Version == internal.DevVersion
+}
+
+// Context returns the Go context of the operation this OpContext was
+// created for, as configured with [Config.Context]. It returns
+// [context.Background] if none was configured.
+func (c *OpContext) Context() context.Context {
+	if c.goContext == nil {
+		return context.Background()
+	}
+	return c.goContext
+}
+
+// Canceled returns the error recorded when the operation's Go context
+// was found to be canceled, if any. It is the authoritative signal that
+// an evaluation was interrupted: the state of the values involved is
+// unspecified beyond this error.
+func (c *OpContext) Canceled() *Bottom {
+	return c.canceled
+}
+
+// cancelCheckInterval is the number of checkCanceled calls between
+// polls of the Go context's Err method. Polling involves an atomic
+// load, which is too costly to perform on every scheduled task.
+const cancelCheckInterval = 1024
+
+// checkCanceled reports whether the operation's Go context has been
+// canceled, polling it at most once every cancelCheckInterval calls.
+// Upon first detecting cancellation it records the error returned by
+// [OpContext.Canceled] and adds it to the context's error set.
+func (c *OpContext) checkCanceled() bool {
+	if c.canceled != nil {
+		return true
+	}
+	if c.goContext == nil {
+		return false
+	}
+	if c.cancelPoll++; c.cancelPoll < cancelCheckInterval {
+		return false
+	}
+	c.cancelPoll = 0
+	err := c.goContext.Err()
+	if err == nil {
+		return false
+	}
+	c.canceled = &Bottom{
+		Code: CanceledError,
+		Err:  errors.Promote(err, "evaluation canceled"),
+		Node: c.vertex,
+	}
+	c.AddBottom(c.canceled)
+	return true
 }
 
 // An OpContext holds context associated with an on-going CUE
@@ -161,6 +220,20 @@ type OpContext struct {
 
 	stats        stats.Counts
 	freeListNode *nodeContext
+
+	// goContext is the Go context of the operation this OpContext was
+	// created for, if any. It is polled periodically during evaluation
+	// (see checkCanceled) so that long evaluations can be interrupted.
+	// A nil goContext means the operation cannot be canceled.
+	goContext context.Context
+
+	// cancelPoll amortizes the cost of polling goContext.Err.
+	cancelPoll int
+
+	// canceled records the error created when goContext was found to be
+	// canceled. Once set, schedulers stop running tasks and the
+	// evaluation winds down.
+	canceled *Bottom
 
 	e  *Environment
 	ci CloseInfo

@@ -215,6 +215,18 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	mode := flags.mode
 	checkTypos := flags.checkTypos
 
+	if c.checkCanceled() {
+		// The operation was interrupted: mark the vertex with the
+		// cancellation error and report it as done, so that the whole
+		// evaluation winds down instead of retrying. The resulting
+		// value state is unspecified; the operation as a whole reports
+		// the error recorded by [OpContext.Canceled].
+		if v.status != finalized {
+			v.setValue(c, finalized, c.canceled)
+		}
+		return true
+	}
+
 	if c.LogEval > 0 {
 		defer c.Un(c.Indentf(v, "UNIFY(%x, %v)", needs, mode))
 	}

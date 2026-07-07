@@ -505,6 +505,13 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 
 processNextTask:
 	for taskPos < len(s.tasks) {
+		// Stop running tasks when the operation's Go context has been
+		// canceled: the evaluation winds down with the canceled error
+		// recorded on the OpContext.
+		if c.checkCanceled() {
+			break
+		}
+
 		t := s.tasks[taskPos]
 		taskPos++
 

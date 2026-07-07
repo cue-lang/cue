@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c84d552_92f552e7",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 35
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T07:20:52Z",
+      "side": 1,
+      "message": "This new AST node isn\u0027t handled by the formatter, so `cue fmt` silently destroys tagged interpolations. With a module at language version v0.18.0:\n\n    @experiment(stringtag)\n    package m\n    a: foo \"hi \\(x)\"\n    x: \"there\"\n\n`cue fmt` rewrites it to:\n\n    a: /* unknown expr */\n    x: \"there\"\n\nThis seems like a hard blocker; we shouldn\u0027t ship new syntax in the parser unless we support it in the formatter too. this should work for both CUE_EXPERIMENT\u003dformatv2 and CUE_EXPERIMENT\u003dformatv2\u003d0, i.e. both the old and new formatters.",
+      "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00763d7d_b69add73",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 35
+      },
+      "lineNbr": 1669,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T07:20:52Z",
+      "side": 1,
+      "message": "Unlike the INTERPOLATION branch below (which calls p.parseInterpolation, wrapping the node in openComments/closeNode), this STRING branch hand-builds the *ast.Interpolation and BasicLit without any comment handling. Comments attached to a plain-string tagged literal (e.g. a trailing line comment on the string) will be dropped. Minor, but worth aligning with parseInterpolation\u0027s comment attachment.",
+      "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2f0a52b_acce44de",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 35
+      },
+      "lineNbr": 1236,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T07:20:52Z",
+      "side": 1,
+      "message": "The strings list holds the even-indexed parts, i.e. ceil(len(parts)/2) \u003d (len(parts)+1)/2 items, but the capacity hint is len(parts)/2 (floor), so it\u0027s always one short and forces a reallocation (for parts\u003d3, cap 1 but 2 appended). Trivial, but the hint for `values` (odd indices, floor) is correct — the strings one should be (len(parts)+1)/2.",
+      "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae5708b2_83bf9e10",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 35
+      },
+      "lineNbr": 822,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T07:20:52Z",
+      "side": 1,
+      "message": "FYI: I verified that a tagged interpolation used as a struct embedding (declaration position) already evaluates correctly — `x: { #tag \"hello \\(\"world\")\" }` yields \"hello world\" — presumably because embeddings route through c.expr. So this TODO may be resolvable/removable, or it\u0027s tracking a different case (tagged interpolation as a label?). Worth clarifying what\u0027s actually left to do.",
+      "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -52,3 +52,16 @@ func TotalStats() stats.Counts {
 	countsMu.Unlock()
 	return s
 }
+
+// FlushStats adds the statistics accumulated by c to its configured
+// [OpContext.StatsRecorder], if any, and resets them. It is intended to
+// be called exactly once at the end of each operation that created c;
+// calling it again is harmless. Statistics accumulated by contexts
+// without a recorder are dropped.
+func (c *OpContext) FlushStats() {
+	if c.StatsRecorder == nil {
+		return
+	}
+	c.StatsRecorder.Add(c.stats)
+	c.stats = stats.Counts{EvalVersion: c.stats.EvalVersion}
+}

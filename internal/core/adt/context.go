@@ -134,6 +134,12 @@ type OpContext struct {
 	cuedebug.Config
 	Version internal.EvaluatorVersion // Copied from Runtime
 
+	// StatsRecorder, if non-nil, receives the statistics accumulated by
+	// this context when [OpContext.FlushStats] is called at the end of
+	// the operation the context was created for. It is typically set by
+	// [Runtime.ConfigureOpCtx] to the runtime's recorder.
+	StatsRecorder *stats.Recorder
+
 	taskContext
 
 	nest int

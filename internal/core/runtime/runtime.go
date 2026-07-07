@@ -16,6 +16,7 @@ package runtime
 
 import (
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cuedebug"
@@ -35,6 +36,17 @@ type Runtime struct {
 	version internal.EvaluatorVersion
 
 	flags cuedebug.Config
+
+	// stats accumulates the statistics of all operations evaluated
+	// against this runtime. It is handed to each OpContext by
+	// ConfigureOpCtx and receives its counts at operation end.
+	stats *stats.Recorder
+}
+
+// StatsRecorder returns the recorder accumulating the statistics of all
+// operations evaluated against r.
+func (r *Runtime) StatsRecorder() *stats.Recorder {
+	return r.stats
 }
 
 func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
@@ -44,6 +56,7 @@ func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
 func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
 	ctx.Version = r.version
 	ctx.Config = r.flags
+	ctx.StatsRecorder = r.stats
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {
@@ -119,6 +132,7 @@ func (r *Runtime) Init() {
 	r.index.builtins = stdBuiltins
 
 	r.loaded = map[*build.Instance]interface{}{}
+	r.stats = &stats.Recorder{}
 
 	r.SetVersion(internal.DefaultVersion)
 

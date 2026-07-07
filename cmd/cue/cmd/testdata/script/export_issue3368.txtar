@@ -1,15 +1,16 @@
 # A --path value must be a single expression or a colon-terminated label
 # sequence. A trailing component in value position (e.g. "baz" in
-# "foo:bar:baz") should be rejected; instead it is currently dropped.
+# "foo:bar:baz") is rejected rather than silently dropped.
 # Issue: https://cuelang.org/issue/3368
 
 # A single bare identifier is a CUE expression.
 ! exec cue export f.yml --path baz
 stderr 'reference "baz" not found'
 
-# TODO(3368): should be rejected; the trailing "baz" is dropped instead.
-exec cue export f.yml --path foo:bar:baz
-cmp stdout expect-dropped
+# A trailing component in value position is rejected.
+! exec cue export f.yml --path foo:bar:baz
+stderr 'must end with a colon'
+stderr 'full paths'
 
 # A colon-terminated path treats every component as a literal label.
 exec cue export f.yml --path foo:bar:baz:
@@ -17,14 +18,6 @@ cmp stdout expect-colon
 
 -- f.yml --
 data: true
--- expect-dropped --
-{
-    "foo": {
-        "bar": {
-            "data": true
-        }
-    }
-}
 -- expect-colon --
 {
     "foo": {

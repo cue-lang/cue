@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -387,6 +388,12 @@ objsLoop:
 }
 
 func parseFullPath(exprs string, version parser.Option) (p []ast.Label, err error) {
+	// A full path is a colon-terminated label sequence, e.g. "foo: bar:".
+	if !strings.HasSuffix(strings.TrimSpace(exprs), ":") {
+		return p, fmt.Errorf("path %q must end with a colon", exprs)
+	}
+	// The "_" filler makes the colon-terminated path parse; it is the
+	// deepest value, dropped below.
 	f, err := parser.ParseFile("--path", exprs+"_", version)
 	if err != nil {
 		return p, fmt.Errorf("parser error in path %q: %v", exprs, err)

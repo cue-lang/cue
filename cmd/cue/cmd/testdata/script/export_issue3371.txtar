@@ -1,0 +1,40 @@
+# Issue #3371: with -e, only the selected expressions need to evaluate, whether
+# the input is a CUE file or a package qualifier. YAML is excluded: its only
+# conflict source, duplicate keys, is rejected at decode time regardless of -e.
+
+# A CUE file without a package declaration: -e foo ignores the bar conflict.
+exec cue export no-package.cue -e foo
+cmp stdout gold
+exec cue eval no-package.cue -e foo
+cmp stdout gold
+
+# The same contents with a package declaration behaves identically.
+exec cue export package-p.cue -e foo
+cmp stdout gold
+
+# The package qualifier form must behave the same as the file forms.
+# BUG(#3371): this currently fails with the out-of-scope bar conflict.
+! exec cue export .:p -e foo
+stderr 'conflicting values true and false'
+! exec cue eval .:p -e foo
+stderr 'conflicting values true and false'
+
+# Selecting the conflicting expression itself must still fail.
+! exec cue export .:p -e bar
+stderr 'conflicting values true and false'
+
+-- cue.mod/module.cue --
+module: "mod.example"
+language: version: "v0.9.0"
+-- package-p.cue --
+package p
+
+foo: true
+bar: false
+bar: true
+-- no-package.cue --
+foo: true
+bar: false
+bar: true
+-- gold --
+true

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6e1c6a7_bc4d3eb9",
+        "filename": "cue/func.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T07:07:39Z",
+      "side": 1,
+      "message": "FYI, same as the Name observation on the parent CL: the validator name never appears in validation errors either — a validator named \"myValidator\" that returns an error still reports just \"x: bad value\". If Name is meant to aid error messages (per its doc), threading it into the \"%v\"/decode errors here would help; TestNewPureValidatorFuncName sets a name but only asserts on the error text, so the gap isn\u0027t exercised.",
+      "revId": "e3bd7995717f120d7f99e4e7bef6f258f6c629a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1076978b_4a6154a6",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 1919,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T07:07:39Z",
+      "side": 1,
+      "message": "Pos_ is never set or read (same as Func.Pos in the parent CL), and the trailing-underscore name is inconsistent with Func.Pos. Suggest either dropping it until it\u0027s used, or aligning the name with Func.Pos.",
+      "revId": "e3bd7995717f120d7f99e4e7bef6f258f6c629a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b78e57af_788f654e",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 1924,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T07:07:39Z",
+      "side": 1,
+      "message": "Kind() returns TopKind unconditionally, whereas BuiltinValidator returns the parameter kind it validates. A consequence: a type mismatch like `#v \u0026 42` (with a string validator) isn\u0027t caught as a kind conflict — the validator claims to accept all kinds, so it runs and the decode fails with \"decoding value for validator: cannot use value 42 (type int) as string\". The message is informative, but it\u0027s an opaque decode error rather than a clean type conflict, and the validate function is invoked for wrong-typed values. Since T is known at construction, common scalar Go types could be mapped to their CUE kind (string→StringKind, int→IntKind, …) to get a proper kind gate; structs/slices could fall back to TopKind. Not necessarily for this CL, but worth a comment on why TopKind is the chosen behavior.",
+      "revId": "e3bd7995717f120d7f99e4e7bef6f258f6c629a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

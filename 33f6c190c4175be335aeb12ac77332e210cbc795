@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e87a530_8d7829d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T06:45:03Z",
+      "side": 1,
+      "message": "No +2 as I understand this needs Marcel\u0027s signoff.",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2295b079_7757f703",
+        "filename": "cue/func.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T06:45:03Z",
+      "side": 1,
+      "message": "The doc says the name is used \"for error messages\", but as far as I can tell it only ever surfaces in the export error (internal/core/export/value.go). None of the call-time errors reference it: the closure\u0027s NewErrf calls below (\"expected %d argument(s)\", \"decoding argument %d\", \"%v\") don\u0027t include cfg.name, and adt.Func.rawCall\u0027s incomplete-argument error uses call.Fun. So e.g. a 2-arg func named \"adder\" called with one arg still reports just \"expected 2 argument(s), got 1\", with no mention of \"adder\".\n\nTestNewPureFunc1Name sets a name but only asserts on the error text, so this gap isn\u0027t exercised. Could we either thread f.Name into these messages (matching how Builtin errors read \"in call to X\"), or narrow the doc comment to say the name is only used when exporting?",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dabe39ee_df913a05",
+        "filename": "cue/func.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T06:45:03Z",
+      "side": 1,
+      "message": "This wraps each argument value using the func\u0027s own runtime (ctx.runtime(), created by the runtime.New() above), but opCtx belongs to the runtime that is actually evaluating the CUE — a different one. It works today because the label table in internal/core/runtime/index.go is a process-global, so cross-runtime label lookups during Decode happen to resolve; but any per-runtime state consulted during decoding would silently be wrong. Wrapping the arg with the calling opCtx\u0027s runtime would be more obviously correct.",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94894059_a83e1ea5",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 1921,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T06:45:03Z",
+      "side": 1,
+      "message": "Pos is never set (newPureFunc leaves it zero) or read anywhere. Dead for now — worth dropping until it\u0027s used, or wiring it up.",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9beb9a7_abc3951f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-07T06:45:03Z",
+      "side": 1,
+      "message": "Unlike Builtin.rawCall, which wraps a *Bottom result as \"error in call to \u003cname\u003e\" with the call position, this passes the result straight to evalStateCI. A user function returning an error therefore surfaces as a bare message (e.g. \"x: boom\") with no call-site framing. Probably fine for an initial cut, but noting the inconsistency with builtins.",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

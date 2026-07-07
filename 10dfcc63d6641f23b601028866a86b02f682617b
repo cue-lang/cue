@@ -1,0 +1,94 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e02d1a8_189ca052",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-07T11:33:28Z",
+      "side": 1,
+      "message": "Done. The sentence now ends with \"; the rest of this package documentation concerns [GenerateV2] only.\"",
+      "parentUuid": "e82e0b50_cf4b5011",
+      "revId": "10dfcc63d6641f23b601028866a86b02f682617b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46f88a7b_f5094915",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-07T11:33:28Z",
+      "side": 1,
+      "message": "Done. The inline example now uses the same full `paths: ...` path as the reference example above.",
+      "parentUuid": "44492d4d_57710d0b",
+      "revId": "10dfcc63d6641f23b601028866a86b02f682617b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6dd39be2_d49b5713",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-07T11:33:28Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "bdd1796f_c7afeec5",
+      "revId": "10dfcc63d6641f23b601028866a86b02f682617b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5356e741_2daee8e1",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-07T11:33:28Z",
+      "side": 1,
+      "message": "The verbatim (no-\"#\") fallback is covered by v2_raw_fallback.txtar.\n\nOn mixing: you\u0027re right, it should fail. Previously combining a \"#\" definition with sibling data fields at the same schema position silently converted the \"#\" and dropped the data. GenerateV2 now rejects that combination with an error (\"schema position X has both a # definition and a data field ...\"). Added a regression test in v2_mixed_schema_data.txtar and documented the rule in doc.go.",
+      "parentUuid": "537e14c5_254d43d1",
+      "revId": "10dfcc63d6641f23b601028866a86b02f682617b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4809882b_6ca3ca23",
+        "filename": "encoding/openapi/doc.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-07T11:33:28Z",
+      "side": 1,
+      "message": "Done. Dropped the package-level experimental notice; GenerateV2\u0027s own doc comment still carries \"THIS IS EXPERIMENTAL. API MIGHT CHANGE.\"",
+      "parentUuid": "4381acff_80f16260",
+      "revId": "10dfcc63d6641f23b601028866a86b02f682617b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

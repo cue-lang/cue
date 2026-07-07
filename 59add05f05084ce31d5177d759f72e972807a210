@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d5ff9a8_df365524",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-07T08:19:37Z",
+      "side": 1,
+      "message": "It\u0027s not immediately clear _how_ it tracks which frames have been evaluated so far. \nHow about:\n\n\u003e frameEvalCursor holds the index into frames of the next frame to be evaluated\n\n? (assuming that description is right :) )",
+      "revId": "59add05f05084ce31d5177d759f72e972807a210",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

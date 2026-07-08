@@ -950,6 +950,25 @@ func TestUnmarshalErrors(t *testing.T) {
 	}
 }
 
+// TestWideAliasFanout checks that aliases which fan out widely, expanding
+// into a huge syntax tree, are rejected once the total number of expanded
+// nodes is exceeded.
+func TestWideAliasFanout(t *testing.T) {
+	// Seven levels of ten-way fan-out expand to ~10^7 nodes.
+	const src = `
+a: &a [x,x,x,x,x,x,x,x,x,x]
+b: &b [*a,*a,*a,*a,*a,*a,*a,*a,*a,*a]
+c: &c [*b,*b,*b,*b,*b,*b,*b,*b,*b,*b]
+d: &d [*c,*c,*c,*c,*c,*c,*c,*c,*c,*c]
+e: &e [*d,*d,*d,*d,*d,*d,*d,*d,*d,*d]
+f: &f [*e,*e,*e,*e,*e,*e,*e,*e,*e,*e]
+g: &g [*f,*f,*f,*f,*f,*f,*f,*f,*f,*f]
+`
+	_, err := callUnmarshal(t, src)
+	qt.Assert(t, qt.IsNotNil(err))
+	qt.Assert(t, qt.StringContains(err.Error(), "aliases expand to more than"))
+}
+
 func TestDecoderErrors(t *testing.T) {
 	for i, item := range unmarshalErrorTests {
 		t.Run(fmt.Sprintf("test %d: %q", i, item.data), func(t *testing.T) {

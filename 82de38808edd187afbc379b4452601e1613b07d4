@@ -33,6 +33,24 @@
       "message": "I\u0027d like to see some slightly more detailed tests here, for example multiple segments (e.g. `./.../leaf/.../other`), \"backtracking\" (e.g. `./.../foo/.../foo` matching against `./blah/foo/x/foo`), non-segment-based patterns (e.g. `./...foo...`).",
       "revId": "82de38808edd187afbc379b4452601e1613b07d4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d3a5deb_b9097aaf",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-08T14:36:35Z",
+      "side": 1,
+      "message": "Done. Added tests for multiple wildcards (./.../leaf/.../other), a middle plus trailing wildcard (./.../foo/...), repeated pattern elements (./.../foo/.../foo matching blah/foo/x/foo), and wildcards matching part of an element or spanning across elements (./...1/leaf and ./b...2/leaf).",
+      "parentUuid": "f7cf413e_176341fc",
+      "revId": "82de38808edd187afbc379b4452601e1613b07d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1493,6 +1493,34 @@ func TestParseExpr(t *testing.T) {
 	}
 }
 
+// TestNestingDepthLimit checks that input nested far more deeply than any
+// realistic document is rejected with an error rather than recursing until
+// the Go runtime aborts the program.
+func TestNestingDepthLimit(t *testing.T) {
+	// Comfortably past maxNestLevel in each recursive syntactic form.
+	const depth = maxNestLevel + 1000
+	for _, tc := range []struct {
+		name        string
+		open, close string
+	}{
+		{"lists", "[", "]"},
+		{"structs", "{a:", "}"},
+		{"parens", "(", ")"},
+		{"unary", "!", ""},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			src := strings.Repeat(tc.open, depth) + "1" + strings.Repeat(tc.close, depth)
+			_, err := parseExprString(src)
+			if err == nil {
+				t.Fatal("got no error")
+			}
+			if !strings.Contains(err.Error(), "nesting depth") {
+				t.Fatalf("got %v, want a nesting depth error", err)
+			}
+		})
+	}
+}
+
 func TestImports(t *testing.T) {
 	var imports = map[string]bool{
 		`"a"`:        true,

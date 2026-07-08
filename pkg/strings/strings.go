@@ -147,14 +147,6 @@ func HasSuffix(s, suffix string) bool {
 	return strings.HasSuffix(s, suffix)
 }
 
-// Repeat returns a new string consisting of count copies of the string s.
-//
-// It panics if count is negative or if
-// the result of (len(s) * count) overflows.
-func Repeat(s string, count int) string {
-	return strings.Repeat(s, count)
-}
-
 // ToUpper returns s with all Unicode letters mapped to their upper case.
 func ToUpper(s string) string {
 	return strings.ToUpper(s)

@@ -141,6 +141,9 @@ func Repeat(x []cue.Value, count int) ([]cue.Value, error) {
 	if count < 0 {
 		return nil, fmt.Errorf("negative count")
 	}
+	if count > adt.MaxRepeatCount {
+		return nil, fmt.Errorf("count %d exceeds limit of %d", count, adt.MaxRepeatCount)
+	}
 	return slices.Repeat(x, count), nil
 }
 

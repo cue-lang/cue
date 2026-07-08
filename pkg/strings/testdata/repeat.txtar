@@ -1,0 +1,17 @@
+# Repeat rejects counts above a fixed limit rather than repeating without
+# bound; a count up to and including the limit is accepted.
+-- in.cue --
+import "strings"
+
+ok:      strings.Repeat("ab", 3)
+atLimit: len(strings.Repeat("a", 1000000))
+tooBig:  len(strings.Repeat("a", 200000000))
+-- out/strings-v3 --
+Errors:
+tooBig: error in call to strings.Repeat: count 200000000 exceeds limit of 1000000:
+    ./in.cue:5:14
+
+Result:
+ok:      "ababab"
+atLimit: 1000000
+tooBig:  _|_ // tooBig: error in call to strings.Repeat: count 200000000 exceeds limit of 1000000

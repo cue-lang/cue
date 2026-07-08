@@ -208,19 +208,19 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 
 		case leftKind == StringKind && rightKind == IntKind:
 			const as = "string multiplication"
-			return c.NewString(strings.Repeat(c.stringValue(left, as), int(c.uint64(right, as))))
+			return c.NewString(strings.Repeat(c.stringValue(left, as), c.repeatCount(right, as)))
 
 		case leftKind == IntKind && rightKind == StringKind:
 			const as = "string multiplication"
-			return c.NewString(strings.Repeat(c.stringValue(right, as), int(c.uint64(left, as))))
+			return c.NewString(strings.Repeat(c.stringValue(right, as), c.repeatCount(left, as)))
 
 		case leftKind == BytesKind && rightKind == IntKind:
 			const as = "bytes multiplication"
-			return c.newBytes(bytes.Repeat(c.bytesValue(left, as), int(c.uint64(right, as))))
+			return c.newBytes(bytes.Repeat(c.bytesValue(left, as), c.repeatCount(right, as)))
 
 		case leftKind == IntKind && rightKind == BytesKind:
 			const as = "bytes multiplication"
-			return c.newBytes(bytes.Repeat(c.bytesValue(right, as), int(c.uint64(left, as))))
+			return c.newBytes(bytes.Repeat(c.bytesValue(right, as), c.repeatCount(left, as)))
 
 		case leftKind == IntKind && rightKind == ListKind:
 			fallthrough
@@ -236,6 +236,25 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 
 	return c.NewErrf("invalid operands %s and %s to '%s' (type %s and %s)",
 		left, right, op, left.Kind(), right.Kind())
+}
+
+// MaxRepeatCount bounds the repeat count accepted by string and bytes
+// multiplication and by the strings.Repeat and list.Repeat builtins.
+// Realistic uses repeat only a small number of times, so the limit is
+// generous; it keeps the count well within a non-negative int, so
+// [strings.Repeat] and [bytes.Repeat] cannot be handed a count that would
+// make them panic, and it bounds the memory a single repetition allocates.
+const MaxRepeatCount = 1_000_000
+
+// repeatCount returns the count for string or bytes multiplication, reporting
+// an error and returning 0 if it exceeds [MaxRepeatCount].
+func (c *OpContext) repeatCount(v Value, as string) int {
+	n := c.uint64(v, as)
+	if n > MaxRepeatCount {
+		c.AddErrf("%s count %d exceeds limit of %d", as, n, MaxRepeatCount)
+		return 0
+	}
+	return int(n)
 }
 
 func cmpTonode(c *OpContext, op Op, r int) Value {

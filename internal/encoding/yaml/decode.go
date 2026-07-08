@@ -58,6 +58,13 @@ type decoder struct {
 	// extractingAliases ensures we don't loop forever when expanding YAML anchors.
 	extractingAliases map[*yaml.Node]bool
 
+	// aliasDepth is positive while we are expanding an alias, so that we
+	// only count the nodes it produces towards [decoder.aliasNodes].
+	aliasDepth int
+
+	// aliasNodes counts the nodes produced by alias expansion. See [maxAliasNodes].
+	aliasNodes int
+
 	// lastOffset is byte offset from the last yaml.Node position that
 	// we decoded, used for working out relative positions such as
 	// token.NewSection. This offset can only increase, moving forward
@@ -191,6 +198,14 @@ func Unmarshal(filename string, data []byte) (ast.Expr, error) {
 }
 
 func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {
+	// Reject documents whose aliases expand into too large a tree; nodes
+	// outside an alias map one-to-one to the input, so are not counted.
+	if d.aliasDepth > 0 {
+		d.aliasNodes++
+		if d.aliasNodes > maxAliasNodes {
+			return nil, d.posErrorf(yn, "aliases expand to more than %d nodes", maxAliasNodes)
+		}
+	}
 	d.addHeadCommentsToPending(yn)
 	var expr ast.Expr
 	var err error
@@ -870,6 +885,12 @@ func (d *decoder) makeNum(pos token.Pos, val string, kind token.Token) (expr ast
 	return expr
 }
 
+// maxAliasNodes bounds the nodes produced by alias expansion. Each alias
+// reference expands into a fresh subtree, so wide fan-out can produce a
+// tree far larger than the input. Realistic documents use little or no
+// aliasing, so this limit is generous.
+const maxAliasNodes = 50_000
+
 func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 	if d.extractingAliases[yn] {
 		// TODO this could actually be allowed in some circumstances.
@@ -891,7 +912,9 @@ func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 	d.lastOffset = -1 // no position yet, so pos() produces valid positions for the alias's children
 	d.forceNewline = false
 
+	d.aliasDepth++
 	node, err := d.extract(yn.Alias)
+	d.aliasDepth--
 
 	d.lastOffset = savedLastOffset
 	d.forceNewline = savedForceNewline

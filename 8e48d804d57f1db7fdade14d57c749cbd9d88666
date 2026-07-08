@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e780ceb9_0393b958",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-07-08T15:29:55Z",
+      "side": 1,
+      "message": "why not cue.Path? Seems like a nicer level of abstraction.",
+      "revId": "8e48d804d57f1db7fdade14d57c749cbd9d88666",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

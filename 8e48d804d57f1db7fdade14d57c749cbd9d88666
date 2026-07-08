@@ -16,6 +16,24 @@
       "message": "why not cue.Path? Seems like a nicer level of abstraction.",
       "revId": "8e48d804d57f1db7fdade14d57c749cbd9d88666",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11917940_9765eb54",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-08T16:00:08Z",
+      "side": 1,
+      "message": "Done. instPath is now a cue.Path, and relLabels became relPath operating on selectors; inRoot also got simpler since it already computed a cue.Path. The task labels are still stored as []adt.Feature, as updateTaskResults needs features, so getTask trims the feature path by the selector count.",
+      "parentUuid": "e780ceb9_0393b958",
+      "revId": "8e48d804d57f1db7fdade14d57c749cbd9d88666",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

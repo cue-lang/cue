@@ -1,0 +1,17 @@
+# Repeat rejects counts above a fixed limit rather than repeating without
+# bound; a count up to and including the limit is accepted.
+-- in.cue --
+import "list"
+
+ok:      list.Repeat([1, 2], 2)
+atLimit: len(list.Repeat([0], 1000000))
+tooBig:  len(list.Repeat([0], 200000000))
+-- out/list-v3 --
+Errors:
+tooBig: error in call to list.Repeat: count 200000000 exceeds limit of 1000000:
+    ./in.cue:5:14
+
+Result:
+ok:      [1, 2, 1, 2]
+atLimit: 1000000
+tooBig:  _|_ // tooBig: error in call to list.Repeat: count 200000000 exceeds limit of 1000000

@@ -10,6 +10,11 @@ b2: 'abc' * 2     @test(eq, 'abcabc')
 // TODO: consider the semantics of this and perhaps allow this.
 e0: "a" + ''  @test(err, code=eval)
 e1: 'b' + "c" @test(err, code=eval)
+
+// Absurdly large repeat counts are rejected rather than allocated; the
+// same limit bounds the strings.Repeat and list.Repeat builtins.
+e2: "a" * 200000000 @test(err, code=eval)
+e3: 'a' * 200000000 @test(err, code=eval)
 -- out/errors.txt --
 [eval] e0: invalid operands "a" and '' to '+' (type string and bytes):
     ./in.cue:10:5
@@ -17,6 +22,10 @@ e1: 'b' + "c" @test(err, code=eval)
 [eval] e1: invalid operands 'b' and "c" to '+' (type bytes and string):
     ./in.cue:11:5
     ./in.cue:11:11
+[eval] e2: string multiplication count 200000000 exceeds limit of 1000000:
+    ./in.cue:15:5
+[eval] e3: bytes multiplication count 200000000 exceeds limit of 1000000:
+    ./in.cue:16:5
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

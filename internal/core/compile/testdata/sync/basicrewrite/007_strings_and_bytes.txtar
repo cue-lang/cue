@@ -10,6 +10,11 @@ b2: 'abc' * 2
 // TODO: consider the semantics of this and perhaps allow this.
 e0: "a" + ''
 e1: 'b' + "c"
+
+// Absurdly large repeat counts are rejected rather than allocated; the
+// same limit bounds the strings.Repeat and list.Repeat builtins.
+e2: "a" * 200000000
+e3: 'a' * 200000000
 -- out/compile --
 --- in.cue
 {
@@ -21,4 +26,6 @@ e1: 'b' + "c"
   b2: ('abc' * 2)
   e0: ("a" + '')
   e1: ('b' + "c")
+  e2: ("a" * 200000000)
+  e3: ('a' * 200000000)
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdebfa17_dd30bc4a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-08T10:52:56Z",
+      "side": 1,
+      "message": "LGTM, but why doesn\u0027t IncompleteKind already return StructKind in this case? I know that in this scenario the value is incomplete, but we know that it can only be struct or bottom due to the presence of regular/required fields, so IMHO IncompleteKind should return Struct as that is the most useful result. The proper Kind method can return Bottom still.\n\nNot to fix in this issue of course, but I think we should raise an issue about this, unless I\u0027m missing something here.",
+      "revId": "8f9cf9e8dd5e28dacbc2c528bcb6a2da2ce19ab8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "Should CUE_UPDATE be treated this way too: internal/cuetest/cuetest.go shows it too is read within an `init()` so would currently be bypassed too? This is odd though because I don\u0027t feel like it\u0027s that flakey - I don\u0027t regularly have to run -count\u003d1 to get CUE_UPDATE to work.",
       "revId": "020ec53756b3a5e6bd2511fa1fcea0d16b7d4230",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8549df3_6d438d51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-08T10:46:03Z",
+      "side": 1,
+      "message": "I\u0027ll fix that separately, as mentioned in my original investigation, given that the fix will be a bit more involved.",
+      "parentUuid": "13b07829_a259701e",
+      "revId": "020ec53756b3a5e6bd2511fa1fcea0d16b7d4230",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

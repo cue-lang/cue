@@ -49,6 +49,14 @@ type Config struct {
 	// automatically resolve identifiers to imports.
 	Imports func(x *ast.Ident) string
 
+	// KnownImport reports whether the given import path is known to the
+	// caller even though it does not resolve to a [build.Instance] or a
+	// standard library package. Such imports compile to an
+	// ImportReference with a nil Instance, which the evaluator resolves
+	// through the runtime; see RegisterPackage in
+	// [cuelang.org/go/internal/core/runtime].
+	KnownImport func(importPath string) bool
+
 	// pkgPath is used to qualify the scope of hidden fields. The default
 	// scope is "_".
 	pkgPath string
@@ -427,8 +435,10 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		importPath := c.label(imp.Path)
 		importPathStr := importPath.StringValue(c.index)
 		inst := c.inst.LookupImport(importPathStr)
-		if inst == nil && !isStdlibPackage(importPathStr) {
-			// It's an external package, which should be mentioned in [build.Instance.Imports].
+		if inst == nil && !isStdlibPackage(importPathStr) &&
+			(c.Config.KnownImport == nil || !c.Config.KnownImport(importPathStr)) {
+			// It's an external package, which should be mentioned in
+			// [build.Instance.Imports] or be known to the caller.
 			c.errf(n, "import %q not found", importPathStr)
 		}
 		return &adt.ImportReference{

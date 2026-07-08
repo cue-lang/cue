@@ -84,6 +84,9 @@ type index struct {
 	lock           sync.RWMutex
 	imports        map[*adt.Vertex]*build.Instance
 	importsByBuild map[*build.Instance]*adt.Vertex
+	// extern maps import paths to package roots registered with
+	// [Runtime.RegisterPackage], outside the build.Instance mechanism.
+	extern map[string]*adt.Vertex
 
 	nextUniqueID uint64
 	typeCache    sync.Map // map[reflect.Type]evaluated
@@ -137,9 +140,35 @@ func (r *Runtime) getNodeFromInstance(key *build.Instance) *adt.Vertex {
 	return r.index.importsByBuild[key]
 }
 
-// LoadBuiltin loads the builtin package with the given import path.
+// RegisterPackage associates importPath with the given compiled package
+// root on this runtime, so that imports of that path resolve to v. It
+// lets package loaders provide packages without going through the
+// [build.Instance] mechanism; the compiler must be told the path is
+// known via the KnownImport hook in
+// [cuelang.org/go/internal/core/compile.Config].
+//
+// The vertex must be finalized: like a builtin package, it is shared
+// between evaluations without copying.
+func (r *Runtime) RegisterPackage(importPath string, v *adt.Vertex) {
+	x := r.index
+	x.lock.Lock()
+	defer x.lock.Unlock()
+	if x.extern == nil {
+		x.extern = make(map[string]*adt.Vertex)
+	}
+	x.extern[importPath] = v
+}
+
+// LoadBuiltin loads the builtin or registered (see
+// [Runtime.RegisterPackage]) package with the given import path.
 func (r *Runtime) LoadBuiltin(importPath string) *adt.Vertex {
 	x := r.index
+	x.lock.RLock()
+	v := x.extern[importPath]
+	x.lock.RUnlock()
+	if v != nil {
+		return v
+	}
 	inst := x.builtins.importPaths[importPath]
 	if inst == nil {
 		return nil

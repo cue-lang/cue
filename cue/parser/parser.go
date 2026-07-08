@@ -73,6 +73,10 @@ type parser struct {
 
 	// Non-syntactic parser control
 	exprLev int // < 0: in control clause, >= 0: in expression
+
+	// nestLevel tracks and limits the expression nesting depth during
+	// parsing. See [maxNestLevel].
+	nestLevel int
 }
 
 func (p *parser) init(filename string, src []byte, opts []Option) {
@@ -282,6 +286,28 @@ func trace(p *parser, msg string) *parser {
 func un(p *parser) {
 	p.indent--
 	p.printTrace(")")
+}
+
+// maxNestLevel is the deepest expression nesting the parser accepts. Input
+// nested more deeply is rejected rather than recursed into any further.
+const maxNestLevel = 10_000
+
+// incNestLevel increments the parser's nesting depth, bailing out with an
+// error once it grows past [maxNestLevel]. It pairs with [decNestLevel] in the
+// same way as [trace] and [un]: defer decNestLevel(incNestLevel(p)).
+func incNestLevel(p *parser) *parser {
+	p.nestLevel++
+	if p.nestLevel > maxNestLevel {
+		p.panicking = true
+		p.errf(p.pos, "expression exceeds maximum nesting depth of %d", maxNestLevel)
+		panic("expression too deeply nested")
+	}
+	return p
+}
+
+// decNestLevel decrements the parser's nesting depth. See [incNestLevel].
+func decNestLevel(p *parser) {
+	p.nestLevel--
 }
 
 // Advance to the next
@@ -1728,6 +1754,9 @@ func (p *parser) parseUnaryExpr() ast.Expr {
 	if p.trace {
 		defer un(trace(p, "UnaryExpr"))
 	}
+	// Every level of expression nesting reaches this point, so guarding
+	// here alone bounds the parser's recursion depth.
+	defer decNestLevel(incNestLevel(p))
 
 	switch p.tok {
 	case token.EQL:

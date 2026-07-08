@@ -30,6 +30,8 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"cuelang.org/go/internal/core/adt"
 )
 
 // ByteAt reports the ith byte of the underlying byte slice.
@@ -52,6 +54,17 @@ func ByteSlice(b []byte, start, end int) ([]byte, error) {
 // Runes returns the Unicode code points of the given string.
 func Runes(s string) []rune {
 	return []rune(s)
+}
+
+// Repeat returns a new string consisting of count copies of the string s.
+func Repeat(s string, count int) (string, error) {
+	if count < 0 {
+		return "", fmt.Errorf("negative count")
+	}
+	if count > adt.MaxRepeatCount {
+		return "", fmt.Errorf("count %d exceeds limit of %d", count, adt.MaxRepeatCount)
+	}
+	return strings.Repeat(s, count), nil
 }
 
 // MinRunes reports whether the number of runes (Unicode codepoints) in a string

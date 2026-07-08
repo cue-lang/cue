@@ -54,6 +54,19 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "Repeat",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *pkg.CallCtxt) {
+			s, count := c.String(0), c.Int(1)
+			if c.Do() {
+				c.Ret, c.Err = Repeat(s, count)
+			}
+		},
+	}, {
 		Name: "MinRunes",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},
@@ -311,19 +324,6 @@ var p = &pkg.Package{
 			s, suffix := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = HasSuffix(s, suffix)
-			}
-		},
-	}, {
-		Name: "Repeat",
-		Params: []pkg.Param{
-			{Kind: adt.StringKind},
-			{Kind: adt.IntKind},
-		},
-		Result: adt.StringKind,
-		Func: func(c *pkg.CallCtxt) {
-			s, count := c.String(0), c.Int(1)
-			if c.Do() {
-				c.Ret = Repeat(s, count)
 			}
 		},
 	}, {

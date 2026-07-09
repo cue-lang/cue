@@ -16,6 +16,24 @@
       "message": "I guess this answers the comment I made in the previous patch about roundtripping schemas.\n\nI wonder, though. Should we not emit all schemas by default? It seems to me like it\u0027s the safer default, and what most users would expect, unless you do think that trimming by default is the right approach or has some precedent in openapi tooling or the ecosystem.",
       "revId": "bcbc6a9befdefd79b1e7a9e1ff90da3f3a4d469d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a1f3053_cff71e60",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:56Z",
+      "side": 1,
+      "message": "As replied in the previous CL.\nI\u0027ve added a similar comment as before, but in filetypes this time because that\u0027s where the default lives.",
+      "parentUuid": "1303f0de_c6ad5d48",
+      "revId": "bcbc6a9befdefd79b1e7a9e1ff90da3f3a4d469d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

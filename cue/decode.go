@@ -32,23 +32,23 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-// Decode initializes the value pointed to by x with Value v.
+// Decode initializes the value pointed to by x with [Value] v.
 // An error is returned if x is nil or not a pointer.
 //
 // If x implements any of these interfaces, they will be used for decoding
 // in the following order of precedence:
-//  1. Unmarshaler
-//  2. json.Unmarshaler
-//  3. encoding.TextUnmarshaler
+//  1. [Unmarshaler]
+//  2. [json.Unmarshaler]
+//  3. [encoding.TextUnmarshaler]
 //
-// If x is a struct, this same applies to all of its fields (matching the behavior of json.Unmarshal)
+// If x is a struct, this same applies to all of its fields (matching the behavior of [json.Unmarshal])
 //
 // If x is a struct, Decode will validate the constraints specified in the field tags.
 //
 // If x contains a [Value], that part of x will be set to the value
 // at the corresponding part of v. This allows decoding values
 // that aren't entirely concrete into a Go type.
-func (v Value) Decode(x interface{}) error {
+func (v Value) Decode(x any) error {
 	var d decoder
 	w := reflect.ValueOf(x)
 	if w.Kind() != reflect.Pointer || w.IsNil() {
@@ -292,7 +292,7 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	}
 }
 
-func (d *decoder) interfaceValue(v Value) (x interface{}) {
+func (d *decoder) interfaceValue(v Value) (x any) {
 	var err error
 	v, _ = v.Default()
 	switch v.Kind() {
@@ -321,19 +321,19 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 		x, err = v.Bytes()
 
 	case ListKind:
-		var a []interface{}
+		var a []any
 		list, err := v.List()
 		d.addErr(err)
 		for list.Next() {
 			a = append(a, d.interfaceValue(list.Value()))
 		}
 		if a == nil {
-			a = []interface{}{}
+			a = []any{}
 		}
 		x = a
 
 	case StructKind:
-		m := map[string]interface{}{}
+		m := map[string]any{}
 		iter, err := v.Fields()
 		d.addErr(err)
 		for iter.Next() {
@@ -711,7 +711,7 @@ func dominantField(fields []goField) (goField, bool) {
 
 var fieldCache sync.Map // map[reflect.Type]structFields
 
-// cachedTypeFields is like typeFields but uses a cache to avoid repeated work.
+// cachedTypeFields is like [typeFields] but uses a cache to avoid repeated work.
 func cachedTypeFields(t reflect.Type) structFields {
 	if f, ok := fieldCache.Load(t); ok {
 		return f.(structFields)
@@ -723,10 +723,10 @@ func cachedTypeFields(t reflect.Type) structFields {
 // foldFunc returns one of four different case folding equivalence
 // functions, from most general (and slow) to fastest:
 //
-// 1) bytes.EqualFold, if the key s contains any non-ASCII UTF-8
-// 2) equalFoldRight, if s contains special folding ASCII ('k', 'K', 's', 'S')
-// 3) asciiEqualFold, no special, but includes non-letters (including _)
-// 4) simpleLetterEqualFold, no specials, no non-letters.
+// 1) [bytes.EqualFold], if the key s contains any non-ASCII UTF-8
+// 2) [equalFoldRight], if s contains special folding ASCII ('k', 'K', 's', 'S')
+// 3) [asciiEqualFold], no special, but includes non-letters (including _)
+// 4) [simpleLetterEqualFold], no specials, no non-letters.
 //
 // The letters S and K are special because they map to 3 runes, not just 2:
 //   - S maps to s and to U+017F 'ſ' Latin small letter long s
@@ -766,10 +766,10 @@ const (
 	smallLongEss = '\u017f'
 )
 
-// equalFoldRight is a specialization of bytes.EqualFold when s is
+// equalFoldRight is a specialization of [bytes.EqualFold] when s is
 // known to be all ASCII (including punctuation), but contains an 's',
 // 'S', 'k', or 'K', requiring a Unicode fold on the bytes in t.
-// See comments on foldFunc.
+// See comments on [foldFunc].
 func equalFoldRight(s, t []byte) bool {
 	for _, sb := range s {
 		if len(t) == 0 {
@@ -811,10 +811,10 @@ func equalFoldRight(s, t []byte) bool {
 	return len(t) == 0
 }
 
-// asciiEqualFold is a specialization of bytes.EqualFold for use when
+// asciiEqualFold is a specialization of [bytes.EqualFold] for use when
 // s is all ASCII (but may contain non-letters) and contains no
 // special-folding letters.
-// See comments on foldFunc.
+// See comments on [foldFunc].
 func asciiEqualFold(s, t []byte) bool {
 	if len(s) != len(t) {
 		return false
@@ -835,10 +835,10 @@ func asciiEqualFold(s, t []byte) bool {
 	return true
 }
 
-// simpleLetterEqualFold is a specialization of bytes.EqualFold for
+// simpleLetterEqualFold is a specialization of [bytes.EqualFold] for
 // use when s is all ASCII letters (no underscores, etc) and also
 // doesn't contain 'k', 'K', 's', or 'S'.
-// See comments on foldFunc.
+// See comments on [foldFunc].
 func simpleLetterEqualFold(s, t []byte) bool {
 	if len(s) != len(t) {
 		return false
@@ -853,7 +853,7 @@ func simpleLetterEqualFold(s, t []byte) bool {
 
 // indirect walks down v allocating pointers as needed,
 // until it gets to a non-pointer.
-// If it encounters an Unmarshaler, indirect stops and returns that.
+// If it encounters a [valueUnmarshaler], indirect stops and returns that.
 // If decodingNull is true, indirect stops at the first settable pointer so it
 // can be set to nil.
 func indirect(v reflect.Value, decodingNull bool) (valueUnmarshaler, reflect.Value) {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1316bdd0_468a8e97",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T11:20:33Z",
+      "side": 1,
+      "message": "LGTM modulo suggestion for anothertest in subsequent CL.",
+      "revId": "6de8b3419dfd306713ac5381847dd7588108d43e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bb365df_6467b2c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "I think we still want the old tests because the old code is still around and still needs regression tests. We can remove the old tests when the old code goes away.",
+      "parentUuid": "03db4ed0_6dcc0ffe",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bed8915a_3d92589e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-06T06:51:54Z",
       "side": 1,
       "message": "should we be deprecating Root and SingleRoot? if the answer is no then the resulting docs are kind of confusing. when should I use the other two fields versus this one?",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b5e85ff_2c473853",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "The answer is really that Roots is only useful in specialized circumstances like the OpenAPI case. I\u0027m not sure I\u0027d want to deprecate Root when it\u0027s harder to use Roots. I\u0027ve added a note to that effect.",
+      "parentUuid": "bed8915a_3d92589e",
       "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c117f76d_36de4d3d",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4bb0045b_5325419f",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3419d371_0ba1fdcd",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-07-06T06:51:54Z",
       "side": 1,
       "message": "why not reuse ast.DocComments?",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af66b970_71a86cfa",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "Done (except that currently we can only use one doc comment group; not sure what to do if we encounter more, but left a TODO)",
+      "parentUuid": "3419d371_0ba1fdcd",
       "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "47d47c49_e95421b9",
+        "filename": "encoding/openapi/extract_v2.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "I think it\u0027s better this way: there are plenty of fields in jsonschema.Config that are _not_ applicable to both and that openapi needs to set, and I think that documenting the particular subset that is allowed to be changed is likewise fragile.\nIf there\u0027s a new flag that applies to both, I think we should think about whether it _does_ apply to both before adding it here.",
+      "parentUuid": "38bdb17b_c42e3f36",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19bbfc17_7f3d3cfe",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-07-06T06:51:54Z",
       "side": 1,
       "message": "ditto EXPERIMENTAL all caps etc. please make a pass through all apis and ensure we\u0027re consistent",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b09369c5_aeed7df6",
+        "filename": "encoding/openapi/extract_v2.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19bbfc17_7f3d3cfe",
       "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29a6b083_9e3729c5",
+        "filename": "encoding/openapi/extract_v2.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "It\u0027s already between those two loops. Added a newline to make it hopefully clearer.",
+      "parentUuid": "f86f6b7e_bde0292e",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f47be573_15878f6a",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-07-06T06:51:54Z",
       "side": 1,
       "message": "Unlike the struct branch, this ignores the skip return and unconditionally appends ev. If a list element ever returned skip\u003dtrue, a nil expr would be appended and later panic during formatting. It\u0027s unreachable today (skip only fires at or under components.schemas, which a list element can never be), but that invariant is subtle. Consider asserting it (or a brief comment) to guard against future changes.",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88ebaa82_f7e6d1bd",
+        "filename": "encoding/openapi/extract_v2.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f47be573_15878f6a",
       "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +298,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14eae85d_2064e3ab",
+        "filename": "encoding/openapi/generate_v2.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbb1b945_5a89023b",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "748dc770_b7ecc51f",
@@ -167,6 +329,24 @@
       "writtenOn": "2026-07-06T06:51:54Z",
       "side": 1,
       "message": "why do we keep getting v3-noshare outputs when the CUE is the same as the regular v3? I thought the test framework deduplicated these? if it doesn\u0027t, we don\u0027t need to fix here, but I\u0027d record an issue so we can clean this up in a later commit.",
+      "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5ffa83d_b6537e18",
+        "filename": "encoding/openapi/testdata/v2_extract_xref.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:14Z",
+      "side": 1,
+      "message": "I believe it\u0027s because if there\u0027s no `out/TestExtractV2/out.cue` file, it doesn\u0027t have a base (because `v2` is the default), so creates an output for both variants. I manually created that file and now there\u0027s only one output. I wish we could sort this out, given that v2 doesn\u0027t exist any more.",
+      "parentUuid": "748dc770_b7ecc51f",
       "revId": "455fa55c6edc7a116417642cc3fe8f9e22a2b23d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,24 @@
       "message": "LGTM, but why doesn\u0027t IncompleteKind already return StructKind in this case? I know that in this scenario the value is incomplete, but we know that it can only be struct or bottom due to the presence of regular/required fields, so IMHO IncompleteKind should return Struct as that is the most useful result. The proper Kind method can return Bottom still.\n\nNot to fix in this issue of course, but I think we should raise an issue about this, unless I\u0027m missing something here.",
       "revId": "8f9cf9e8dd5e28dacbc2c528bcb6a2da2ce19ab8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a6135ff_02eaea15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T11:31:24Z",
+      "side": 1,
+      "message": "\u003e we know that it can only be struct or bottom due to the presence of regular/required fields\n\n\nthat\u0027s unfortunately not true unless the evaluator does significantly more work than it does (i.e. explore into comprehensions even if they\u0027re guarded by an unmatched condition), because the comprehension could introduce a scalar.\n\nFor example:\n\n```\n_x: {\n\t_y!: bool\n\tif _y {\n\t\t5\n\t}\n}\n```\nWhat we\u0027d really like `IncompleteKind` to return there would be number|struct but that would require the evaluator to explore all possibilities for the condition, and I think that could end up very tricky in some cases.\nBasically, when there\u0027s a comprehension, we can\u0027t know the full set of possible kinds, so it\u0027s perhaps reasonable for it to return bottom.\n\nI actually think this could use a language change: we could only allow an embedded value to change a struct into a scalar when it\u0027s unconditionally included in the struct. Then we could do a bit better.",
+      "parentUuid": "fdebfa17_dd30bc4a",
+      "revId": "8f9cf9e8dd5e28dacbc2c528bcb6a2da2ce19ab8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

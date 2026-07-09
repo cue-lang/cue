@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16944dfe_1dd303e7",
+        "filename": "cmd/cue/cmd/testdata/script/openapiv2.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cdb80c0_0fe42c14",
+      "revId": "8541f8de85a4a7ec6efdf3de7b0b642e8da13b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e23f65db_4e7e334d",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2ed7f46_16ae6d28",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:36Z",
+      "side": 1,
+      "message": "I think that\u0027s probably fine. AIUI only reason for components/schemas to exist, in the OpenAPI world, is as a place to share schemas that are used in other places in the document. If they\u0027re not referred to, then they\u0027re not useful. And this behaviour we\u0027ve got here means that we won\u0027t end up including schemas that are inadvertently defined at the top level but aren\u0027t actually part of the OpenAPI spec.\n\nWe can change this decision later if it seems that that\u0027s not the case.\n\nI added a comment.",
+      "parentUuid": "e23f65db_4e7e334d",
+      "revId": "8541f8de85a4a7ec6efdf3de7b0b642e8da13b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c20276a7_c3c5eb5f",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-07-06T06:59:00Z",
       "side": 1,
       "message": "should we copy this TODO into the v2 branch? I worry that if we later remove the v1 branches entirely, it will be too easy to lose it.",
+      "revId": "8541f8de85a4a7ec6efdf3de7b0b642e8da13b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0315691_c1252c8f",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T21:43:36Z",
+      "side": 1,
+      "message": "Done, without copying.",
+      "parentUuid": "c20276a7_c3c5eb5f",
       "revId": "8541f8de85a4a7ec6efdf3de7b0b642e8da13b0c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

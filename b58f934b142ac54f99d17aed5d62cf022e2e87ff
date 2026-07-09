@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbc21f08_25048a1f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-09T21:10:54Z",
+      "side": 1,
+      "message": "out of curiosity, did you consider writing the Go code generator in CUE rather than Go?\n\nI also wonder if the JSON Schema spec publishes any data in e.g. JSON that we can reuse in terms of mapping out this dependency graph, so we don\u0027t have to re-do it ourselves.",
+      "revId": "b58f934b142ac54f99d17aed5d62cf022e2e87ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

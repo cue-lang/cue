@@ -519,10 +519,9 @@ type goField struct {
 	nameBytes []byte                 // []byte(name)
 	equalFold func(s, t []byte) bool // bytes.EqualFold or equivalent
 
-	tag       bool
-	index     []int
-	typ       reflect.Type
-	omitEmpty bool
+	tag   bool
+	index []int
+	typ   reflect.Type
 }
 
 func compareFieldByIndex(a, b goField) int {
@@ -587,7 +586,7 @@ func typeFields(t reflect.Type) structFields {
 				if tag == "-" {
 					continue
 				}
-				name, opts, _ := strings.Cut(tag, ",")
+				name, _, _ := strings.Cut(tag, ",")
 				if !isValidTag(name) {
 					name = ""
 				}
@@ -608,11 +607,10 @@ func typeFields(t reflect.Type) structFields {
 						name = sf.Name
 					}
 					field := goField{
-						name:      name,
-						tag:       tagged,
-						index:     index,
-						typ:       ft,
-						omitEmpty: tagOptions(opts).Contains("omitempty"),
+						name:  name,
+						tag:   tagged,
+						index: index,
+						typ:   ft,
 					}
 					field.nameBytes = []byte(field.name)
 					field.equalFold = foldFunc(field.nameBytes)
@@ -720,29 +718,6 @@ func cachedTypeFields(t reflect.Type) structFields {
 	}
 	f, _ := fieldCache.LoadOrStore(t, typeFields(t))
 	return f.(structFields)
-}
-
-// tagOptions is the string following a comma in a struct field's "json"
-// tag, or the empty string. It does not include the leading comma.
-type tagOptions string
-
-// Contains reports whether a comma-separated list of options
-// contains a particular substr flag. substr must be surrounded by a
-// string boundary or commas.
-func (o tagOptions) Contains(optionName string) bool {
-	if len(o) == 0 {
-		return false
-	}
-	s := string(o)
-	for s != "" {
-		var next string
-		s, next, _ = strings.Cut(s, ",")
-		if s == optionName {
-			return true
-		}
-		s = next
-	}
-	return false
 }
 
 // foldFunc returns one of four different case folding equivalence

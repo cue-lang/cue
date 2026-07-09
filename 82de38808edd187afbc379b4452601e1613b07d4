@@ -51,6 +51,24 @@
       "parentUuid": "f7cf413e_176341fc",
       "revId": "82de38808edd187afbc379b4452601e1613b07d4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f09544c0_2c510f58",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-09T11:20:47Z",
+      "side": 1,
+      "message": "Still one of my suggestions not done (good to have because I\u0027m not entirely sure how it should function): `./...foo...`. Will this match `x/y/AfooB/z` or not?",
+      "parentUuid": "7d3a5deb_b9097aaf",
+      "revId": "82de38808edd187afbc379b4452601e1613b07d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

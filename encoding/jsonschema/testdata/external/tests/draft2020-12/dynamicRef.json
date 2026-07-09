@@ -16,7 +16,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -63,7 +63,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 3 more errors)",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -110,7 +110,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://test.json-schema.org/ref-dynamicAnchor-same-schema/root#items: anchors (items) not supported (and 3 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

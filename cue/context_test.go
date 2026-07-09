@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"time"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
@@ -167,6 +168,13 @@ func TestEncodeType(t *testing.T) {
 		}{},
 		out: `{a: int64, b?: string, C?: *null|[...bool]}`,
 	}, {
+		name: "StructOmitZero",
+		x: struct {
+			A int       `json:"a,omitzero"`
+			B time.Time `json:"b,omitzero"`
+		}{},
+		out: `{a?: int64, b?: _}`,
+	}, {
 		name: "CUEValue#1",
 		x: struct {
 			A cue.Value `json:"a"`
@@ -241,6 +249,20 @@ func TestEncodeSyntax(t *testing.T) {
 		baz
 
 		"""
+}`,
+	}, {
+		// The omitzero json option omits zero values, consulting the
+		// IsZero method when implemented; see #4429.
+		name: "OmitZero",
+		x: struct {
+			A int       `json:"a,omitzero"`
+			B time.Time `json:"b,omitzero"`
+			C time.Time `json:"c,omitzero"`
+			D string    `json:"d"`
+		}{C: time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC)},
+		out: `{
+	c: "2019-04-01T00:00:00Z"
+	d: ""
 }`,
 	}}
 	ctx := cuecontext.New()

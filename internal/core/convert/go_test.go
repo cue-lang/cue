@@ -90,6 +90,21 @@ func (e *ptrError) Error() string { return e.msg }
 
 var _ error = &ptrError{}
 
+// isZeroer reports zero when V is -1, disagreeing with the reflect zero
+// value, so tests can tell that omitzero consults the IsZero method.
+type isZeroer struct {
+	V int
+}
+
+func (z isZeroer) IsZero() bool { return z.V == -1 }
+
+// ptrIsZeroer is like isZeroer, but with a pointer receiver.
+type ptrIsZeroer struct {
+	V int
+}
+
+func (z *ptrIsZeroer) IsZero() bool { return z.V == -1 }
+
 func TestConvert(t *testing.T) {
 	type key struct {
 		a int
@@ -207,6 +222,38 @@ func TestConvert(t *testing.T) {
 		}{3, 4, 0},
 		`(struct){
   A: (int){ 3 }
+}`,
+	}, {
+		struct {
+			A int             `json:",omitzero"`
+			B string          `json:",omitzero"`
+			C struct{ X int } `json:",omitzero"`
+			D int             `json:",omitzero"`
+		}{D: 4},
+		`(struct){
+  D: (int){ 4 }
+}`,
+	}, {
+		struct {
+			T time.Time `json:",omitzero"`
+			U time.Time `json:",omitzero"`
+		}{U: time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC)},
+		`(struct){
+  U: (string){ "2019-04-01T00:00:00Z" }
+}`,
+	}, {
+		struct {
+			A isZeroer                   `json:",omitzero"` // IsZero true despite non-zero value
+			B isZeroer                   `json:",omitzero"` // IsZero false despite zero value
+			C ptrIsZeroer                `json:",omitzero"` // pointer receiver, non-addressable value
+			D *isZeroer                  `json:",omitzero"` // nil pointer
+			E *isZeroer                  `json:",omitzero"` // non-nil pointer, IsZero true
+			F interface{ IsZero() bool } `json:",omitzero"` // non-nil interface, IsZero true
+		}{A: isZeroer{-1}, C: ptrIsZeroer{-1}, E: &isZeroer{-1}, F: isZeroer{-1}},
+		`(struct){
+  B: (struct){
+    V: (int){ 0 }
+  }
 }`,
 	}, {
 		struct {
@@ -357,6 +404,17 @@ func TestConvertType(t *testing.T) {
     L?: ((null|bytes)){ |(*(null){ null }, (bytes){ bytes }) }
     T: (_){ _ }
   }) }`,
+	}, {
+		goTyp: struct {
+			A int `json:",omitempty"`
+			B int `json:",omitzero"`
+			C int `json:"c,omitzero"`
+		}{},
+		want: `(struct){
+  A?: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+  B?: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+  c?: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+}`,
 	}, {
 		goTyp: struct {
 			A int `cue:"<"` // invalid

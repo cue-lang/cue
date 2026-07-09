@@ -324,6 +324,14 @@ func NilIsAny(isAny bool) EncodeOption {
 // encoding if the field has an empty value, defined as false, 0, a nil pointer,
 // a nil interface value, and any empty array, slice, map, or string.
 //
+// The "omitzero" option specifies that the field should be omitted from the
+// encoding if the field has a zero value, according to these rules:
+//
+// 1) If the field type has an "IsZero() bool" method, that will be used to
+// determine whether the value is zero.
+//
+// 2) Otherwise, the value is zero if it is the zero value for its type.
+//
 // See the documentation for Go's json.Marshal for more details on the field
 // tags and their meaning.
 //

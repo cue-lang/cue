@@ -94,7 +94,7 @@ func (c *Context) Validate(x interface{}) error {
 // possible.
 //
 // A value is considered undefined if it is pointer type and is nil or if it
-// is a field with a zero value and a json tag with the omitempty tag.
+// is a field with a zero value and a json tag with the omitempty or omitzero tag.
 // Complete does a JSON round trip. This means that data not preserved in such a
 // round trip, such as the location name of a time.Time, is lost after a
 // successful update.

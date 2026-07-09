@@ -50,7 +50,7 @@
 // Package cuego can also be used to infer undefined values from a set of
 // CUE constraints, for instance to fill out fields in a struct. A value
 // is considered undefined if it is a nil pointer type or if it is a zero
-// value and there is a JSON field tag with the omitempty flag.
+// value and there is a JSON field tag with the omitempty or omitzero flag.
 // A Complete will implicitly validate a struct.
 package cuego
 

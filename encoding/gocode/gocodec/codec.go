@@ -141,7 +141,7 @@ func (c *Codec) Validate(v cue.Value, x interface{}) error {
 //
 // Only undefined values are modified. A value is considered undefined if it is
 // pointer type and is nil or if it is a field with a zero value that has a json
-// tag with the omitempty flag.
+// tag with the omitempty or omitzero flag.
 //
 // The given value must be created using the same Runtime with which c was
 // initialized.

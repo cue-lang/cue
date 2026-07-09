@@ -172,12 +172,21 @@ func isOptional(f *reflect.StructField) bool {
 			}
 		}
 	} else if tag, ok = f.Tag.Lookup("json"); ok {
-		isOptional = false
-		if slices.Contains(strings.Split(tag, ",")[1:], "omitempty") {
+		isOptional = hasJSONOption(tag, "omitempty") || hasJSONOption(tag, "omitzero")
+	}
+	return isOptional
+}
+
+// hasJSONOption reports whether a json struct tag contains the given option,
+// such as "omitempty" or "omitzero".
+func hasJSONOption(tag, option string) bool {
+	_, opts, _ := strings.Cut(tag, ",")
+	for s := range strings.SplitSeq(opts, ",") {
+		if s == option {
 			return true
 		}
 	}
-	return isOptional
+	return false
 }
 
 // isOmitEmpty means that the zero value is interpreted as undefined.
@@ -193,18 +202,52 @@ func isOmitEmpty(f reflect.StructField) bool {
 		// TODO: we can also infer omit empty if a type cannot be nil if there
 		// is a constraint that unconditionally disallows the zero value.
 	}
-	tag, ok := f.Tag.Lookup("json")
-	if ok {
-		isOmitEmpty = false
-		i := 0
-		for s := range strings.SplitSeq(tag, ",") {
-			if i > 0 && s == "omitempty" {
-				return true
-			}
-			i++
-		}
+	if tag, ok := f.Tag.Lookup("json"); ok {
+		isOmitEmpty = hasJSONOption(tag, "omitempty")
 	}
 	return isOmitEmpty
+}
+
+// isOmitZero reports whether a field has the json "omitzero" option, meaning
+// that a zero value, as reported by [isZero], is interpreted as undefined.
+func isOmitZero(f reflect.StructField) bool {
+	tag, ok := f.Tag.Lookup("json")
+	return ok && hasJSONOption(tag, "omitzero")
+}
+
+// isZeroer matches types with an IsZero method, as used by json's omitzero.
+type isZeroer interface{ IsZero() bool }
+
+var isZeroerType = reflect.TypeFor[isZeroer]()
+
+// isZero mirrors encoding/json's "omitzero" semantics: it reports whether val
+// is the zero value for its type, using the type's IsZero method when one is
+// implemented and falling back to [reflect.Value.IsZero] otherwise.
+func isZero(val reflect.Value) bool {
+	t := val.Type()
+	switch {
+	case t.Kind() == reflect.Interface && t.Implements(isZeroerType):
+		// Avoid panics calling IsZero on a nil interface or
+		// a non-nil interface with a nil pointer.
+		return val.IsNil() ||
+			(val.Elem().Kind() == reflect.Pointer && val.Elem().IsNil()) ||
+			val.Interface().(isZeroer).IsZero()
+	case t.Kind() == reflect.Pointer && t.Implements(isZeroerType):
+		// Avoid panics calling IsZero on a nil pointer.
+		return val.IsNil() || val.Interface().(isZeroer).IsZero()
+	case t.Implements(isZeroerType):
+		return val.Interface().(isZeroer).IsZero()
+	case reflect.PointerTo(t).Implements(isZeroerType):
+		if !val.CanAddr() {
+			// Temporarily box val so we can take its address.
+			v2 := reflect.New(t).Elem()
+			v2.Set(val)
+			val = v2
+		}
+		return val.Addr().Interface().(isZeroer).IsZero()
+	default:
+		return val.IsZero()
+	}
 }
 
 func isNil(x reflect.Value) bool {
@@ -389,6 +432,9 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 				continue
 			}
 			if isOmitEmpty(sf) && val.IsZero() {
+				continue
+			}
+			if isOmitZero(sf) && isZero(val) {
 				continue
 			}
 			sub := fromGoValue(ctx, nilIsTop, val)

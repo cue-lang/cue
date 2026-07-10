@@ -396,8 +396,7 @@ x: 42
 	mv := module.MustParseVersion("example.com/module@v1.0.2")
 	zipData := createZip(t, mv, testMod)
 	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
-	// TODO: this should succeed; existing blobs should not be re-pushed.
-	qt.Assert(t, qt.ErrorMatches(err, `cannot make scratch config: 400 Bad Request: blob upload invalid`))
+	qt.Assert(t, qt.IsNil(err))
 }
 
 // noBlobOverwriteRegistry rejects pushes of blobs that already exist.

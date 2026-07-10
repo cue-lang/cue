@@ -396,10 +396,10 @@ func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule, meta *M
 		Annotations: annotations,
 	}
 
-	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, manifest.Layers[0], io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
+	if err := pushBlob(ctx, loc, manifest.Layers[0], io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
 		return fmt.Errorf("cannot push module contents: %v", err)
 	}
-	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, manifest.Layers[1], bytes.NewReader(m.modFileContent)); err != nil {
+	if err := pushBlob(ctx, loc, manifest.Layers[1], bytes.NewReader(m.modFileContent)); err != nil {
 		return fmt.Errorf("cannot push cue.mod/module.cue contents: %v", err)
 	}
 	manifestData, err := json.Marshal(manifest)
@@ -605,17 +605,26 @@ func isJSON(mediaType string) bool {
 // two-byte configuration {}.
 // https://github.com/opencontainers/image-spec/blob/main/manifest.md#example-of-a-scratch-config-or-layer-descriptor
 func (c *Client) scratchConfig(ctx context.Context, loc RegistryLocation, mediaType string) (ocispec.Descriptor, error) {
-	// TODO check if it exists already to avoid push?
 	content := []byte("{}")
 	desc := ocispec.Descriptor{
 		Digest:    digest.FromBytes(content),
 		MediaType: mediaType,
 		Size:      int64(len(content)),
 	}
-	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, desc, bytes.NewReader(content)); err != nil {
+	if err := pushBlob(ctx, loc, desc, bytes.NewReader(content)); err != nil {
 		return ocispec.Descriptor{}, err
 	}
 	return desc, nil
+}
+
+// pushBlob pushes a blob unless it is already present,
+// as some registries reject uploads overwriting existing content.
+func pushBlob(ctx context.Context, loc RegistryLocation, desc ocispec.Descriptor, r io.Reader) error {
+	if _, err := loc.Registry.ResolveBlob(ctx, loc.Repository, desc.Digest); err == nil {
+		return nil
+	}
+	_, err := loc.Registry.PushBlob(ctx, loc.Repository, desc, r)
+	return err
 }
 
 // singleResolver implements Resolver by always returning R,

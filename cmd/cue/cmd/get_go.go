@@ -113,7 +113,9 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  accordingly, when possible.
 
 	- Maps translate to a CUE struct, where all elements are constrained to
-	  be of Go map element type. Like for JSON, maps may only have string keys.
+	  be of Go map element type. Like for JSON, map keys must be strings,
+	  integers, or types implementing MarshalText or UnmarshalText, and are
+	  all translated to string labels.
 
 	- Pointers translate to a sum type with the default value of null and
 	  the Go type as an alternative value.
@@ -1046,7 +1048,7 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 	case *types.Array:
 		return e.supportedType(stack, t.Elem())
 	case *types.Map:
-		if b, ok := t.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
+		if !supportedMapKey(t.Key()) {
 			return false
 		}
 		return e.supportedType(stack, t.Elem())
@@ -1062,6 +1064,23 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 		}
 	case *types.Interface:
 		return true
+	}
+	return false
+}
+
+// supportedMapKey reports whether a map key type is supported by
+// encoding/json: strings, integers, and types implementing
+// encoding.TextMarshaler or encoding.TextUnmarshaler.
+// All are encoded as string labels in CUE.
+func supportedMapKey(t types.Type) bool {
+	if b, ok := t.Underlying().(*types.Basic); ok && b.Info()&(types.IsString|types.IsInteger) != 0 {
+		return true
+	}
+	ptr := types.NewPointer(t)
+	for _, iface := range toString {
+		if types.Implements(t, iface) || types.Implements(ptr, iface) {
+			return true
+		}
 	}
 	return false
 }
@@ -1300,7 +1319,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		}
 
 	case *types.Map:
-		if b, ok := typ.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
+		if !supportedMapKey(typ.Key()) {
 			panic(fmt.Sprintf("unsupported map key type %v", typ.Key()))
 		}
 

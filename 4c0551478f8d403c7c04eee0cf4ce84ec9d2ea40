@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a34b113_df339dcb",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-10T06:53:41Z",
+      "side": 1,
+      "message": "Done. It does match: \"...\" matches any string including slashes, so \"./...foo...\" matches any package path containing \"foo\" literally anywhere, even inside an element. This mirrors Go\u0027s package pattern semantics, where the pattern becomes the regexp `.*foo.*`. Added a test with a package at y/AfooB/z which is matched by ./...foo... alongside blah/foo and blah/foo/x/foo.",
+      "parentUuid": "f09544c0_2c510f58",
+      "revId": "4c0551478f8d403c7c04eee0cf4ce84ec9d2ea40",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

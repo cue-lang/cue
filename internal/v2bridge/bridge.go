@@ -28,3 +28,11 @@ import (
 // cue/v2 package) for the given vertex, owned by the given runtime.
 // Callers assert the result to the cue/v2 Value type.
 var NewVertexValue func(rt *runtime.Runtime, v *adt.Vertex) any
+
+// VertexOf is set by cuelang.org/go/cue/v2 upon initialization. It is
+// the reverse of [NewVertexValue]: it reports the owning runtime and
+// the realized root vertex of the given cue/v2 Value (typed any here
+// to avoid referring to the cue/v2 package). cue/v2 values are lazy;
+// for a value that has not yet been realized the returned vertex is
+// nil. It returns (nil, nil) if v is not a cue/v2 Value.
+var VertexOf func(v any) (*runtime.Runtime, *adt.Vertex)

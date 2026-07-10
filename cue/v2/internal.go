@@ -27,4 +27,17 @@ func init() {
 	v2bridge.NewVertexValue = func(rt *runtime.Runtime, v *adt.Vertex) any {
 		return newVertexValue(rt, v)
 	}
+	v2bridge.VertexOf = func(x any) (*runtime.Runtime, *adt.Vertex) {
+		v, ok := x.(Value)
+		if !ok || v.op == nil {
+			return nil, nil
+		}
+		v.op.mu.Lock()
+		defer v.op.mu.Unlock()
+		if v.op.built == nil || v.op.memoRT != v.rt {
+			// The value has not been realized (for this runtime).
+			return v.rt, nil
+		}
+		return v.rt, v.op.built
+	}
 }

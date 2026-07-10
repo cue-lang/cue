@@ -1160,6 +1160,12 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		case pkg.Path() == "math/big" && obj.Name() == "Int":
 			return e.ident("int", false)
 
+		case pkg.Path() == "cuelang.org/go/cue" && obj.Name() == "Value":
+			// A cue.Value can hold any CUE value, so it is translated to
+			// top rather than generating CUE definitions for the
+			// cuelang.org/go/cue package itself.
+			return e.ident("_", false)
+
 		default:
 			// Any Go standard library type that hasn't been handled above is not supported;
 			// fall back to whatever alternative type we can, or just "top".

@@ -33,10 +33,10 @@ triplequote: |-
 	"multiline": "say \"hi\"\nsecond line"
 }
 -- out-yaml --
-cmd:      "printf \"%s\" $FOO"
-winpath:  "C:\\foo\\bar"
-hashterm: "x \"# y"
-escintro: "x \\# y"
+cmd:      #"printf "%s" $FOO"#
+winpath:  #"C:\foo\bar"#
+hashterm: ##"x "# y"##
+escintro: ##"x \# y"##
 plain:    "hello world"
 tabquote: "a \"b\"\tc"
 multiline: """
@@ -48,10 +48,10 @@ triplequote: #"""
 	second line
 	"""#
 -- out-json --
-cmd:      "printf \"%s\" $FOO"
-winpath:  "C:\\foo\\bar"
-hashterm: "x \"# y"
-escintro: "x \\# y"
+cmd:      #"printf "%s" $FOO"#
+winpath:  #"C:\foo\bar"#
+hashterm: ##"x "# y"##
+escintro: ##"x \# y"##
 plain:    "hello world"
 tabquote: "a \"b\"\tc"
 multiline: """

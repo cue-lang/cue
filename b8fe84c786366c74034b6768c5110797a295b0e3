@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c0827a1_58c98e98",
+        "filename": "internal/core/adt/tasks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-07-10T10:47:43Z",
+      "side": 1,
+      "message": "I wonder if this hypothetically should be stack based, in case it is recursively set. At least check that this is not possible or make a note.",
+      "revId": "b8fe84c786366c74034b6768c5110797a295b0e3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

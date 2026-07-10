@@ -22,7 +22,7 @@ foo: {
 		"one",
 		"two",
 	]
-	nocodec1: "\"str\""
+	nocodec1: #""str""#
 	nocodec2: "1234"
 	nocodec3: "null"
 	nocodec4: "true"

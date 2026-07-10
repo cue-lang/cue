@@ -15,6 +15,8 @@
 package json
 
 import (
+	"strings"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/literal"
@@ -112,13 +114,16 @@ func PatchExpr(n ast.Node, patchPos func(n ast.Node)) {
 			descent = false
 
 		case *ast.BasicLit:
-			if x.Kind == token.STRING && len(x.Value) > 10 {
+			// Requoting only helps strings long enough to become
+			// multiline or containing escapes.
+			if x.Kind == token.STRING &&
+				(len(x.Value) > 10 || strings.ContainsRune(x.Value, '\\')) {
 				s, err := literal.Unquote(x.Value)
 				if err != nil {
 					break // should not happen: implies invalid JSON
 				}
 
-				x.Value = literal.String.WithOptionalTabIndent(len(stack)).Quote(s)
+				x.Value = literal.String.WithOptionalTabIndent(len(stack)).WithOptionalHashes().Quote(s)
 			}
 		}
 

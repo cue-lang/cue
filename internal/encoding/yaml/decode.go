@@ -798,7 +798,7 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		return &ast.BasicLit{
 			ValuePos: pos,
 			Kind:     token.STRING,
-			Value:    literal.String.WithOptionalTabIndent(1).Quote(yn.Value),
+			Value:    literal.String.WithOptionalTabIndent(1).WithOptionalHashes().Quote(yn.Value),
 		}, nil
 
 	case binaryTag:

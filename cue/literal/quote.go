@@ -26,6 +26,7 @@ type Form struct {
 	quote       byte
 	multiline   bool
 	auto        bool
+	autoHash    bool
 	exact       bool
 	asciiOnly   bool
 	graphicOnly bool
@@ -58,6 +59,13 @@ func (f Form) WithTabIndent(n int) Form {
 func (f Form) WithOptionalTabIndent(tabs int) Form {
 	f.indent = strings.Repeat("\t", tabs)
 	f.auto = true
+	return f
+}
+
+// WithOptionalHashes returns a new Form that uses a hash-delimited
+// form like #"..."# for single-line strings when that avoids all escaping.
+func (f Form) WithOptionalHashes() Form {
+	f.autoHash = true
 	return f
 }
 
@@ -120,6 +128,8 @@ func (f Form) Append(buf []byte, s string) []byte {
 	}
 	if f.multiline {
 		f.hashCount = f.requiredHashCount(s)
+	} else if f.autoHash {
+		f.hashCount = f.singleLineHashCount(s)
 	}
 
 	// Often called with big strings, so preallocate. If there's quoting,
@@ -186,6 +196,10 @@ func (f Form) AppendEscaped(buf []byte, s string) []byte {
 }
 
 func (f Form) appendEscaped(buf []byte, s string) []byte {
+	if !f.multiline && f.hashCount > 0 {
+		// The hash count guarantees that no escaping is needed.
+		return append(buf, s...)
+	}
 	for width := 0; len(s) > 0; s = s[width:] {
 		r := rune(s[0])
 		width = 1
@@ -217,14 +231,8 @@ func (f *Form) appendEscapedRune(buf []byte, r rune) []byte {
 		buf = append(buf, byte(r))
 		return buf
 	}
-	if f.asciiOnly {
-		if r < utf8.RuneSelf && strconv.IsPrint(r) {
-			buf = append(buf, byte(r))
-			return buf
-		}
-	} else if strconv.IsPrint(r) || (f.graphicOnly && strconv.IsGraphic(r)) {
-		buf = utf8.AppendRune(buf, r)
-		return buf
+	if f.isPrint(r) {
+		return utf8.AppendRune(buf, r)
 	}
 	buf = f.appendEscape(buf)
 	switch r {
@@ -272,6 +280,47 @@ func (f *Form) appendEscape(buf []byte) []byte {
 		buf = append(buf, '#')
 	}
 	return buf
+}
+
+func (f *Form) isPrint(r rune) bool {
+	if f.asciiOnly {
+		return r < utf8.RuneSelf && strconv.IsPrint(r)
+	}
+	return strconv.IsPrint(r) || (f.graphicOnly && strconv.IsGraphic(r))
+}
+
+// singleLineHashCount returns the number of # characters needed to
+// quote s as a single-line hash-delimited string with no escapes, or
+// zero if regular quoting suffices or some character needs escaping.
+func (f *Form) singleLineHashCount(s string) int {
+	if !strings.ContainsAny(s, `\`+string(f.quote)) {
+		return 0
+	}
+	hashCount := 1
+	for i := 0; i < len(s); {
+		r := rune(s[i])
+		width := 1
+		if r >= utf8.RuneSelf {
+			r, width = utf8.DecodeRuneInString(s[i:])
+			if width == 1 {
+				return 0 // invalid UTF-8
+			}
+		}
+		if !f.isPrint(r) {
+			return 0
+		}
+		i += width
+		if r == rune(f.quote) || r == '\\' {
+			// Exceed any run of hashes following a quote or backslash
+			// so that s cannot contain a delimiter or escape.
+			run := 0
+			for i+run < len(s) && s[i+run] == '#' {
+				run++
+			}
+			hashCount = max(hashCount, run+1)
+		}
+	}
+	return hashCount
 }
 
 // requiredHashCount returns the number of # characters

@@ -77,6 +77,26 @@ func TestQuote(t *testing.T) {
 
 			"""`},
 
+		// Issue #124
+		{form: String.WithOptionalHashes(), in: `plain`, out: `"plain"`},
+		{form: String.WithOptionalHashes(), in: `printf "%s" $FOO`, out: `#"printf "%s" $FOO"#`},
+		{form: String.WithOptionalHashes(), in: `C:\foo\bar`, out: `#"C:\foo\bar"#`},
+		{form: String.WithOptionalHashes(), in: `"`, out: `#"""#`},
+		{form: String.WithOptionalHashes(), in: `\`, out: `#"\"#`},
+		{form: String.WithOptionalHashes(), in: `x "# y`, out: `##"x "# y"##`},
+		{form: String.WithOptionalHashes(), in: `x \# y`, out: `##"x \# y"##`},
+		{form: String.WithOptionalHashes(), in: `x \## y`, out: `###"x \## y"###`},
+		// Fall back to regular quoting when escapes are needed anyway.
+		{form: String.WithOptionalHashes(), in: "a \"b\"\tc", out: `"a \"b\"\tc"`},
+		{form: String.WithOptionalHashes(), in: "say \"hi\"\nbye", out: `"say \"hi\"\nbye"`},
+		{form: String.WithOptionalHashes(), in: "a\xff\"b", out: `"a�\"b"`, lossy: true},
+		{form: String.WithOptionalTabIndent(3).WithOptionalHashes(), in: "say \"hi\"\nbye", out: `"""
+			say "hi"
+			bye
+			"""`},
+		{form: Bytes.WithOptionalHashes(), in: `a'b`, out: `#'a'b'#`},
+		{form: Bytes.WithOptionalHashes(), in: "a\xff'b", out: `'a\xff\'b'`},
+
 		// Issue #541
 		{form: String.WithTabIndent(3), in: "foo\n\"bar\"", out: `"""
 			foo

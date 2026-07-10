@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abf464e6_9b9f7b01",
+        "filename": "cue/func.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T12:35:38Z",
+      "side": 1,
+      "message": "Threaded the name into the call-time errors. Func.rawCall now wraps a *Bottom result as \"error in call to \u003cname\u003e\" with the call position, mirroring Builtin.rawCall (see the reply on expr.go). This covers all the closure errors (arg count, decoding, user error), so a 2-arg func named \"adder\" called with one arg now reports \"error in call to adder: expected 2 argument(s), got 1\". When no name is set it falls back to \"function\". TestNewPureFunc1Name now asserts the name appears in the message, so the gap is exercised. The doc comment is now accurate.",
+      "parentUuid": "2295b079_7757f703",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dabe39ee_df913a05",
@@ -48,6 +66,60 @@
       "writtenOn": "2026-07-07T06:45:03Z",
       "side": 1,
       "message": "This wraps each argument value using the func\u0027s own runtime (ctx.runtime(), created by the runtime.New() above), but opCtx belongs to the runtime that is actually evaluating the CUE — a different one. It works today because the label table in internal/core/runtime/index.go is a process-global, so cross-runtime label lookups during Decode happen to resolve; but any per-runtime state consulted during decoding would silently be wrong. Wrapping the arg with the calling opCtx\u0027s runtime would be more obviously correct.",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c12be399_9a8cf917",
+        "filename": "cue/func.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T12:35:38Z",
+      "side": 1,
+      "message": "Done. The argument value is now wrapped with the calling opCtx\u0027s runtime (opCtx.Runtime.(*runtime.Runtime)) rather than the func\u0027s own runtime, with a comment explaining why.",
+      "parentUuid": "dabe39ee_df913a05",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3f4e555_f9288120",
+        "filename": "cue/func.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T12:35:38Z",
+      "side": 1,
+      "message": "We\u0027re moving away from a per-context label table: values from different contexts can be freely mixed and I don\u0027t believe that will change.\n\nAs it\u0027s not entirely obvious what the right way to get a `*runtime.Runtime` from `*adt.OpContext` and we plan to remove Runtime from `adt.OpContext` anyway, I think we can safely leave this as-is.",
+      "parentUuid": "dabe39ee_df913a05",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9cd0616_f577fd85",
+        "filename": "cue/func.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T12:35:38Z",
+      "side": 1,
+      "message": "Done. The argument value is now wrapped with the calling opCtx\u0027s runtime (opCtx.Runtime.(*runtime.Runtime)) rather than the func\u0027s own runtime, with a comment explaining why.",
+      "parentUuid": "dabe39ee_df913a05",
       "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +141,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28b4eef8_dbd8f765",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 1921,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T12:35:38Z",
+      "side": 1,
+      "message": "Done. Dropped the Pos field; it can be re-added when wired up.",
+      "parentUuid": "94894059_a83e1ea5",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9beb9a7_abc3951f",
@@ -82,6 +172,24 @@
       "writtenOn": "2026-07-07T06:45:03Z",
       "side": 1,
       "message": "Unlike Builtin.rawCall, which wraps a *Bottom result as \"error in call to \u003cname\u003e\" with the call position, this passes the result straight to evalStateCI. A user function returning an error therefore surfaces as a bare message (e.g. \"x: boom\") with no call-site framing. Probably fine for an initial cut, but noting the inconsistency with builtins.",
+      "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9eb10f19_e5d31b0e",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T12:35:38Z",
+      "side": 1,
+      "message": "Addressed. Func.rawCall now wraps a *Bottom result as \"error in call to \u003cname\u003e\" with the call position, matching Builtin.rawCall (falling back to \"function\" when the func is unnamed). This also resolves the doc-comment concern on func.go.",
+      "parentUuid": "f9beb9a7_abc3951f",
       "revId": "33f6c190c4175be335aeb12ac77332e210cbc795",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8da0f46_569b3adf",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 35
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T13:00:44Z",
+      "side": 1,
+      "message": "Done. Both formatters now handle *ast.TaggedInterpolation: cue/format/node.go (pre-v2) and internal/pretty/ast.go (formatv2) render `tag \"...\"` rather than destroying it. Added a cmd/cue testscript (fmt_tagged_interpolation.txtar) that round-trips through `cue fmt` under both CUE_EXPERIMENT\u003dformatv2\u003d1 and \u003d0, plus a cue/format golden (tagged-interpolation.txtar) covering plain, interpolated, selector-tag, multi-line, and commented cases.",
+      "parentUuid": "4c84d552_92f552e7",
+      "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00763d7d_b69add73",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-07T07:20:52Z",
       "side": 1,
       "message": "Unlike the INTERPOLATION branch below (which calls p.parseInterpolation, wrapping the node in openComments/closeNode), this STRING branch hand-builds the *ast.Interpolation and BasicLit without any comment handling. Comments attached to a plain-string tagged literal (e.g. a trailing line comment on the string) will be dropped. Minor, but worth aligning with parseInterpolation\u0027s comment attachment.",
+      "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c8fa0c0_3c07962a",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 35
+      },
+      "lineNbr": 1669,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T13:00:44Z",
+      "side": 1,
+      "message": "Done. Merged the STRING and INTERPOLATION branches so the plain-string case also goes through p.parseInterpolation(), which wraps the node in openComments/closeExpr. A plain string produces the same single-element Interpolation as before, now with comment attachment.",
+      "parentUuid": "00763d7d_b69add73",
       "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "deaeb8ba_a8fc5e37",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 35
+      },
+      "lineNbr": 1236,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T13:00:44Z",
+      "side": 1,
+      "message": "Done. Changed the strings capacity hint to (len(parts)+1)/2 (ceil) so it no longer forces a reallocation. Left the values hint as len(parts)/2, which is correct for the odd indices.",
+      "parentUuid": "b2f0a52b_acce44de",
+      "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae5708b2_83bf9e10",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-07-07T07:20:52Z",
       "side": 1,
       "message": "FYI: I verified that a tagged interpolation used as a struct embedding (declaration position) already evaluates correctly — `x: { #tag \"hello \\(\"world\")\" }` yields \"hello world\" — presumably because embeddings route through c.expr. So this TODO may be resolvable/removable, or it\u0027s tracking a different case (tagged interpolation as a label?). Worth clarifying what\u0027s actually left to do.",
+      "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50d5af25_2fe1ad74",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 35
+      },
+      "lineNbr": 822,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T13:00:44Z",
+      "side": 1,
+      "message": "You\u0027re right. A *ast.TaggedInterpolation cannot reach this switch: it does not embed ast.label, so it does not implement ast.Label and cannot be a Field.Label. In declaration position the parser therefore turns `tag \"s\"` into an *ast.EmbedDecl, compiled via c.expr (which is why your embedding example works). Replaced the TODO with a Note explaining this.",
+      "parentUuid": "ae5708b2_83bf9e10",
       "revId": "fb5fcb933393941316c1b5c8b7dc47d59ed548fb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

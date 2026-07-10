@@ -1,0 +1,63 @@
+# Test which quoting form is selected for imported strings.
+# Strings whose only escapes would be for quotes or backslashes
+# should use hash-delimited strings for readability.
+# See https://cuelang.org/issue/124.
+
+exec cue import -o - data.yaml
+cmp stdout out-yaml
+
+exec cue import -o - data.json
+cmp stdout out-json
+
+-- data.yaml --
+cmd: printf "%s" $FOO
+winpath: C:\foo\bar
+hashterm: 'x "# y'
+escintro: 'x \# y'
+plain: hello world
+tabquote: "a \"b\"\tc"
+multiline: |-
+  say "hi"
+  second line
+triplequote: |-
+  contains """ quotes
+  second line
+-- data.json --
+{
+	"cmd": "printf \"%s\" $FOO",
+	"winpath": "C:\\foo\\bar",
+	"hashterm": "x \"# y",
+	"escintro": "x \\# y",
+	"plain": "hello world",
+	"tabquote": "a \"b\"\tc",
+	"multiline": "say \"hi\"\nsecond line"
+}
+-- out-yaml --
+cmd:      "printf \"%s\" $FOO"
+winpath:  "C:\\foo\\bar"
+hashterm: "x \"# y"
+escintro: "x \\# y"
+plain:    "hello world"
+tabquote: "a \"b\"\tc"
+multiline: """
+	say "hi"
+	second line
+	"""
+triplequote: #"""
+	contains """ quotes
+	second line
+	"""#
+-- out-json --
+cmd:      "printf \"%s\" $FOO"
+winpath:  "C:\\foo\\bar"
+hashterm: "x \"# y"
+escintro: "x \\# y"
+plain:    "hello world"
+tabquote: "a \"b\"\tc"
+multiline: """
+	say "hi"
+	second line
+	"""
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"

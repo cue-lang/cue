@@ -175,7 +175,7 @@ fail.both."16_IntList".types.IntList.0: conflicting values "foo" and int (mismat
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:26:23
+    ./root/types.cue:28:23
 fail.both."16_IntList".types.IntList.1: conflicting values "bar" and int (mismatched types string and int):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:27:2
@@ -184,7 +184,7 @@ fail.both."16_IntList".types.IntList.1: conflicting values "bar" and int (mismat
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:26:23
+    ./root/types.cue:28:23
 fail.both."20_IntMap".types.IntMap.one: conflicting values "x" and int (mismatched types string and int):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:27:2
@@ -193,7 +193,7 @@ fail.both."20_IntMap".types.IntMap.one: conflicting values "x" and int (mismatch
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:28:29
+    ./root/types.cue:30:29
 fail.both."20_IntMap".types.IntMap.two: conflicting values "y" and int (mismatched types string and int):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:27:2
@@ -202,7 +202,7 @@ fail.both."20_IntMap".types.IntMap.two: conflicting values "y" and int (mismatch
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:28:29
+    ./root/types.cue:30:29
 fail.both."37_NonEmptyString".types.NonEmptyString: conflicting values string and 123 (mismatched types string and int):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:27:2
@@ -211,7 +211,7 @@ fail.both."37_NonEmptyString".types.NonEmptyString: conflicting values string an
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:38:23
+    ./root/types.cue:40:23
 fail.both."40_NonEmptyString".types.NonEmptyString: conflicting values string and [1,2,3] (mismatched types string and list):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:27:2
@@ -220,7 +220,7 @@ fail.both."40_NonEmptyString".types.NonEmptyString: conflicting values string an
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:38:23
+    ./root/types.cue:40:23
 fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {item?:_,next?:#linkedList} (mismatched types string and struct):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:27:2
@@ -229,9 +229,9 @@ fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {ite
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:40:23
-    ./root/types.cue:44:14
-    ./root/types.cue:46:9
+    ./root/types.cue:42:23
+    ./root/types.cue:46:14
+    ./root/types.cue:48:9
 fail.both."44_GraphNode".types.GraphNode.edges: conflicting values {} and [...#graphNode] (mismatched types struct and list):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:27:2
@@ -240,8 +240,8 @@ fail.both."44_GraphNode".types.GraphNode.edges: conflicting values {} and [...#g
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:41:23
-    ./root/types.cue:50:10
+    ./root/types.cue:43:23
+    ./root/types.cue:52:10
 fail.both.notList: conflicting values [1,2,3] and {doc?:_} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
     ./cuetest/fail_check.cue:7:17
@@ -263,7 +263,7 @@ fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and null
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:35:23
+    ./root/types.cue:37:23
 fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and {foo?:int} (mismatched types string and struct):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:24:2
@@ -272,7 +272,7 @@ fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and {foo
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:35:30
+    ./root/types.cue:37:30
 fail.cue."32_NullOrString".types.NullOrString: 2 errors in empty disjunction:
 fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and null (mismatched types int and null):
     ./cuetest/all.cue:20:1
@@ -282,7 +282,7 @@ fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and null (
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:36:23
+    ./root/types.cue:38:23
 fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and string (mismatched types int and string):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:24:2
@@ -291,10 +291,10 @@ fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and string
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
-    ./root/types.cue:36:30
+    ./root/types.cue:38:30
 fail.cue."39_UniqueStrings".types.UniqueStrings: invalid value ["foo","foo"] (does not satisfy list.UniqueItems): equal value ("foo") at position 0 and 1:
     ./cuetest/all.cue:25:55
-    ./root/types.cue:39:23
+    ./root/types.cue:41:23
 fail.cue."9_Uint".types.Uint: invalid value -34 (out of bound >=0):
     ./cuetest/all.cue:59:30
 fail.cue.discBoth.discriminatorField: 2 errors in empty disjunction:
@@ -311,13 +311,13 @@ fail.cue.isNotEqual.mustEqual2: conflicting values 8 and 99:
 fail.cue."18_IntListClosed2".types.IntListClosed2: incompatible list lengths (2 and 4):
     ./cuetest/all.cue:69:38
 fail.cue."34_NumericBounds".types.NumericBounds: invalid value 5555 (out of bound <100):
-    ./root/types.cue:37:28
+    ./root/types.cue:39:28
     ./cuetest/all.cue:86:43
 fail.cue."36_NonEmptyString".types.NonEmptyString: invalid value "" (out of bound !=""):
-    ./root/types.cue:38:32
+    ./root/types.cue:40:32
     ./cuetest/all.cue:25:55
     ./cuetest/all.cue:88:43
-    ./root/types.cue:38:23
+    ./root/types.cue:40:23
 -- go.mod --
 module "foo.test/bar"
 
@@ -667,10 +667,12 @@ import (
 	String?: string
 	Bytes?:  bytes
 
-	Number?: number
-	Uint?:   uint
-	Int8?:   int8
-	Rune?:   rune
+	Number?:  number
+	Uint?:    uint
+	Int8?:    int8
+	Int32?:   int32
+	Float64?: float64
+	Rune?:    rune
 
 	IntList?:        [...int]
 	IntListClosed2?: [int, int]
@@ -777,6 +779,10 @@ type Types struct {
 	Uint int64 `json:"Uint,omitempty"`
 
 	Int8 int64 `json:"Int8,omitempty"`
+
+	Int32 int64 `json:"Int32,omitempty"`
+
+	Float64 any/* CUE number; int64 or float64 */ `json:"Float64,omitempty"`
 
 	Rune int64 `json:"Rune,omitempty"`
 

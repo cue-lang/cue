@@ -111,10 +111,11 @@ type Foozer struct {
 	// that it is really only implemented by the embedded field.
 	Embed struct{ CustomJSON }
 
-	MapKeyNamedUnsupported map[MyInt]MyString
-	MapKeyUnsupported      map[int]string
-	NamedMapKeyUnsupported MyIntMap
-	MapKeyNamedString      map[MyString]MyString
+	MapKeyNamedInt    map[MyInt]MyString
+	MapKeyInt         map[int]string
+	NamedMapKeyInt    MyIntMap
+	MapKeyNamedString map[MyString]MyString
+	MapKeyUnsupported map[float64]string
 
 	OptionalOmitEmptyJSON string `json:"optionalOmitEmptyJSON,omitempty"`
 
@@ -376,6 +377,9 @@ import (
 	// Even though this struct as a type implements MarshalJSON, it is known
 	// that it is really only implemented by the embedded field.
 	Embed:                  {CustomJSON: #CustomJSON} @go(,struct{CustomJSON})
+	MapKeyNamedInt:         {[string]: #MyString}     @go(,map[MyInt]MyString)
+	MapKeyInt:              {[string]: string}        @go(,map[int]string)
+	NamedMapKeyInt:         #MyIntMap
 	MapKeyNamedString:      {[string]: #MyString}     @go(,map[MyString]MyString)
 	optionalOmitEmptyJSON?: string                    @go(OptionalOmitEmptyJSON)
 	optionalOmitZeroJSON?:  time.Time                 @go(OptionalOmitZeroJSON)
@@ -438,6 +442,8 @@ import (
 #MyInt: int
 
 #MyString: string
+
+#MyIntMap: [string]: #MyString
 
 #Identifier: string // #enumIdentifier
 

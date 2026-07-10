@@ -1,13 +1,12 @@
 # A @go attribute in a file's preamble, before the package clause or the imports,
-# does not apply to the package and should result in an error.
+# does not apply to the package and results in an error.
 # See https://cuelang.org/issue/3904.
 
-# TODO(https://cuelang.org/issue/3904): this should fail, as the attributes
-# are silently ignored and the CUE package name is used instead.
 cd preamble
-exec cue exp gengotypes .
-! stderr .
-grep '^package pre$' cue_types_pre_gen.go
+! exec cue exp gengotypes .
+stderr '@go attribute must follow the package clause and imports:\n    \./bar\.cue:1:1\n'
+stderr '\./foo\.cue:3:1'
+! exists cue_types_pre_gen.go
 cd ..
 
 cd body

@@ -35,6 +35,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 )
 
 // WriteFunc is a function that writes the generated Go source for an instance.
@@ -45,6 +46,10 @@ type WriteFunc func(inst *build.Instance, data []byte) error
 //
 // writeFile is called to write the formatted Go source for each instance.
 func Generate(ctx *cue.Context, writeFile WriteFunc, insts ...*build.Instance) error {
+	if err := preambleAttrsError(insts); err != nil {
+		return err
+	}
+
 	// record which package instances have already been generated
 	instDone := make(map[*build.Instance]bool)
 
@@ -187,6 +192,24 @@ func Generate(ctx *cue.Context, writeFile WriteFunc, insts ...*build.Instance) e
 		}
 	}
 	return nil
+}
+
+// preambleAttrsError reports any @go attributes in the file preambles of the
+// given instances. They are never read, as a package attribute only applies
+// after the package clause and imports, so they are likely misplaced.
+func preambleAttrsError(insts []*build.Instance) error {
+	var errs errors.Error
+	for _, inst := range insts {
+		for _, file := range inst.Files {
+			for _, decl := range file.Preamble() {
+				if attr, ok := decl.(*ast.Attribute); ok && attr.Name() == "go" {
+					errs = errors.Append(errs, errors.Newf(attr.Pos(),
+						"@go attribute must follow the package clause and imports"))
+				}
+			}
+		}
+	}
+	return errs
 }
 
 // generator holds the state for generating Go code for one CUE package instance.

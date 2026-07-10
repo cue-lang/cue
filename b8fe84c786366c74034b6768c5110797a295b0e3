@@ -16,6 +16,24 @@
       "message": "I wonder if this hypothetically should be stack based, in case it is recursively set. At least check that this is not possible or make a note.",
       "revId": "b8fe84c786366c74034b6768c5110797a295b0e3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da66c246_45f7d60e",
+        "filename": "internal/core/adt/tasks.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-10T11:01:14Z",
+      "side": 1,
+      "message": "Done. Recursion is possible here: resolving can unify other nodes, whose schedulers run their own resolver tasks, so a nested processResolver could clobber the flag — in particular clearing it after our own lookup had set it, silently dropping the conjunct again. Made it stack-based by saving and restoring the flag around r.resolve, and noted this in the field\u0027s doc comment.",
+      "parentUuid": "1c0827a1_58c98e98",
+      "revId": "b8fe84c786366c74034b6768c5110797a295b0e3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

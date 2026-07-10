@@ -1,0 +1,38 @@
+# A @go attribute in a file's preamble, before the package clause or the imports,
+# does not apply to the package and should result in an error.
+# See https://cuelang.org/issue/3904.
+
+# TODO(https://cuelang.org/issue/3904): this should fail, as the attributes
+# are silently ignored and the CUE package name is used instead.
+cd preamble
+exec cue exp gengotypes .
+! stderr .
+grep '^package pre$' cue_types_pre_gen.go
+cd ..
+
+cd body
+exec cue exp gengotypes .
+! stderr .
+grep '^package si$' cue_types_body_gen.go
+
+-- preamble/foo.cue --
+package pre
+
+@go("si")
+
+import "time"
+
+#Date: time.Format("2006-01-02")
+-- preamble/bar.cue --
+@go("si")
+package pre
+
+#Email: string
+-- body/foo.cue --
+package body
+
+import "time"
+
+@go("si")
+
+#Date: time.Format("2006-01-02")

@@ -27,10 +27,12 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -56,6 +58,16 @@ import (
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modregistrytest"
 )
+
+// hostGoModCache returns the host's GOMODCACHE, letting testscripts reuse
+// already downloaded modules; gotooltest gives each script an empty GOPATH.
+var hostGoModCache = sync.OnceValues(func() (string, error) {
+	out, err := exec.Command("go", "env", "GOMODCACHE").Output()
+	if err != nil {
+		return "", fmt.Errorf("go env GOMODCACHE: %v", err)
+	}
+	return strings.TrimSpace(string(out)), nil
+})
 
 // TestLatest checks that the examples match the latest language standard,
 // even if still valid in backwards compatibility mode.
@@ -361,11 +373,23 @@ func TestScript(t *testing.T) {
 				return err
 			}
 
+			// Let testscripts build Go code against this cuelang.org/go
+			// checkout via a replace directive without network access.
+			checkoutRoot, err := filepath.Abs(filepath.Join("..", "..", ".."))
+			if err != nil {
+				return err
+			}
+			goModCache, err := hostGoModCache()
+			if err != nil {
+				return err
+			}
 			e.Vars = append(e.Vars,
 				// The current language version which would be added by `cue mod init`, e.g. v0.10.0.
 				"CUE_LANGUAGE_VERSION="+cueversion.LanguageVersion(),
 				// A later language version which only increases the bugfix release, e.g. v0.10.99.
 				"CUE_LANGUAGE_VERSION_BUGFIX="+semver.MajorMinor(cueversion.LanguageVersion())+".99",
+				"CUE_CHECKOUT_ROOT="+checkoutRoot,
+				"HOST_GOMODCACHE="+goModCache,
 			)
 			entries, err := os.ReadDir(e.WorkDir)
 			if err != nil {

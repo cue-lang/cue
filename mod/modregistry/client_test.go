@@ -35,6 +35,7 @@ import (
 
 	"golang.org/x/tools/txtar"
 
+	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 
@@ -375,6 +376,40 @@ func TestCheckModule(t *testing.T) {
 			qt.Assert(t, qt.DeepEquals(m.mv, test.mv))
 		})
 	}
+}
+
+func TestPutModuleWithExistingBlobs(t *testing.T) {
+	// Some registries reject blob uploads that would overwrite existing
+	// content, so already-present blobs must not be pushed again.
+	// See https://cuelang.org/issue/3340.
+	const testMod = `
+-- cue.mod/module.cue --
+module: "example.com/module@v1"
+language: version: "v0.8.0"
+
+-- x.cue --
+x: 42
+`
+	c := NewClient(noBlobOverwriteRegistry{ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})})
+	putModule(t, c, module.MustParseVersion("example.com/module@v1.0.1"), testMod)
+
+	mv := module.MustParseVersion("example.com/module@v1.0.2")
+	zipData := createZip(t, mv, testMod)
+	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
+	// TODO: this should succeed; existing blobs should not be re-pushed.
+	qt.Assert(t, qt.ErrorMatches(err, `cannot make scratch config: 400 Bad Request: blob upload invalid`))
+}
+
+// noBlobOverwriteRegistry rejects pushes of blobs that already exist.
+type noBlobOverwriteRegistry struct {
+	ociregistry.Interface
+}
+
+func (r noBlobOverwriteRegistry) PushBlob(ctx context.Context, repo string, desc ociregistry.Descriptor, rd io.Reader) (ociregistry.Descriptor, error) {
+	if _, err := r.Interface.ResolveBlob(ctx, repo, desc.Digest); err == nil {
+		return ociregistry.Descriptor{}, fmt.Errorf("400 Bad Request: blob upload invalid")
+	}
+	return r.Interface.PushBlob(ctx, repo, desc, rd)
 }
 
 func TestModuleVersionsOnNonExistentModule(t *testing.T) {

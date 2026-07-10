@@ -16,6 +16,24 @@
       "message": "out of curiosity, did you consider writing the Go code generator in CUE rather than Go?\n\nI also wonder if the JSON Schema spec publishes any data in e.g. JSON that we can reuse in terms of mapping out this dependency graph, so we don\u0027t have to re-do it ourselves.",
       "revId": "b58f934b142ac54f99d17aed5d62cf022e2e87ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3792e38_85ef82fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-10T11:36:16Z",
+      "side": 1,
+      "message": "I think it would be hard (impossible?) to do that graph calculation in CUE. And the actual Go template is a pretty small part of that code, so probably not worthwhile.\n\nI\u0027m not aware of one.",
+      "parentUuid": "cbc21f08_25048a1f",
+      "revId": "b58f934b142ac54f99d17aed5d62cf022e2e87ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

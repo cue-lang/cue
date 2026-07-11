@@ -331,7 +331,7 @@ func (c *converter) file(f *ast.File) doc {
 	// (the first visible token after the file-level leading comments)
 	// is honoured - otherwise a blank line between a file-level comment
 	// and the next decl's doc comment is silently dropped.
-	var firstDeclSep doc = lineBreakHard
+	var firstDeclSep doc
 	if len(f.Decls) > 0 {
 		firstDeclSep = relBreakOr(LeadingRelPos(f.Decls[0]), lineBreakHard)
 	}

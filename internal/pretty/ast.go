@@ -326,13 +326,14 @@ func (c *converter) file(f *ast.File) doc {
 		}
 	}
 
-	// Separator between the last leading comment and the body. We use
-	// LeadingRelPos so a NewSection on the first decl's own doc comment
-	// (the first visible token after the file-level leading comments)
-	// is honoured - otherwise a blank line between a file-level comment
-	// and the next decl's doc comment is silently dropped.
-	var firstDeclSep doc = lineBreakHard
+	var firstDeclSep doc
 	if len(f.Decls) > 0 {
+		// Separator between the last leading comment and the body. We
+		// use LeadingRelPos so a NewSection on the first decl's own doc
+		// comment (the first visible token after the file-level leading
+		// comments) is honoured - otherwise a blank line between a
+		// file-level comment and the next decl's doc comment is
+		// silently dropped.
 		firstDeclSep = relBreakOr(LeadingRelPos(f.Decls[0]), lineBreakHard)
 	}
 

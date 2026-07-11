@@ -356,7 +356,6 @@ foo: [
 // Just one comment on its own.
 -- out/format/comment_alone.golden --
 // Just one comment on its own.
-
 -- comment_field.input --
 // Just one comment on a field.
 foo: string
@@ -369,7 +368,6 @@ foo: string
 -- out/format/comments_alone.golden --
 // Just a few comments
 // on their own.
-
 -- comments_field.input --
 // Just a few comments
 // on a field.
@@ -378,6 +376,12 @@ foo: string
 // Just a few comments
 // on a field.
 foo: string
+-- issue4404.input --
+// A file with a single comment block
+// and no empty line afterwards.
+-- out/format/issue4404.golden --
+// A file with a single comment block
+// and no empty line afterwards.
 -- issue1006.input --
 // issue #1006: comments should not be aligned across the opening
 // or closing token of a multi-line struct, list, or func call.

@@ -313,7 +313,12 @@ func (c *OpContext) Env(upCount int32) *Environment {
 }
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
-	e := c.e.up(c, upCount)
+	return c.derefNode(c.e.up(c, upCount))
+}
+
+// derefNode returns the dereferenced vertex of e, ensuring it is at least
+// partially evaluated.
+func (c *OpContext) derefNode(e *Environment) *Vertex {
 	v := e.DerefVertex(c)
 	c.unify(v, Flags{
 		status:    partial,

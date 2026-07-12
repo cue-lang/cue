@@ -241,7 +241,7 @@ letSelfInline: {
 		data: this.raw
 		chk:  this.data
 	}
-	res: (S & {raw: "alice"}).chk @test(err, code=incomplete, path=this.data, contains="undefined field: %s", args=[raw], pos=[-3:14]) @test(eq:todo, "alice")
+	res: (S & {raw: "alice"}).chk @test(eq, "alice")
 }
 
 // Variant with two unified conjuncts, each with its own let-self binding,
@@ -257,7 +257,7 @@ letSelfInlineConj: {
 		let this = self
 		chk: this.data
 	}
-	res: (#T & {raw: "alice"}).chk @test(err, code=incomplete, path=this.data, contains="undefined field: %s", args=[raw], pos=[-6:14]) @test(eq:todo, "alice")
+	res: (#T & {raw: "alice"}).chk @test(eq, "alice")
 }
 
 -- issue4440.cue --
@@ -265,9 +265,9 @@ letSelfInlineConj: {
 
 // A definition combining a dynamic field whose key, a comprehension whose
 // guard, and a re-export that all read through a let-self binding. Reading
-// the options through the re-export made the dynamic field key fail with
-// "undefined field: network": the let vertex mirrored the definition, and
-// the mirror's own nested let-self conjunct was parked as a structural
+// the options through the re-export used to make the dynamic field key fail
+// with "undefined field: network": the let vertex mirrored the definition,
+// and the mirror's own nested let-self conjunct was parked as a structural
 // cycle, leaving it without arcs. See https://cuelang.org/issue/4440.
 letSelfDynamic: {
 	#Client: {
@@ -281,7 +281,7 @@ letSelfDynamic: {
 		container: options: this.options
 	}
 	c: #Client & {network: "mainnet"}
-	out: c.container.options @test(err, code=incomplete, contains="undefined field: network", pos=[-7:13]) @test(eq:todo, {mainnet: "x"})
+	out: c.container.options @test(eq, {mainnet: "x"})
 }
 
 -- out/evalalpha --
@@ -428,18 +428,6 @@ a: {
 [incomplete] letSelfDynamic.#Client.options: key value of dynamic field must be concrete, found string:
     ./issue4440.cue:14:13
     ./issue4440.cue:12:12
-[incomplete] letSelfDynamic.c.this.options: key value of dynamic field must be concrete, found _|_(letSelfDynamic.c.this.options: undefined field: network):
-    ./issue4440.cue:14:13
-letSelfDynamic.c.this.options: undefined field: network:
-    ./issue4440.cue:14:18
-[incomplete] letSelfDynamic.c.this.options: key value of dynamic field must be concrete, found _|_(letSelfDynamic.c.this.options: undefined field: network):
-    ./issue4440.cue:14:13
-letSelfDynamic.c.this.options: undefined field: network:
-    ./issue4440.cue:14:18
-[incomplete] this.data: undefined field: raw:
-    ./letselfinline.cue:11:14
-[incomplete] this.data: undefined field: raw:
-    ./letselfinline.cue:24:14
 [eval] listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
     ./list.cue:4:14
     ./list.cue:4:15

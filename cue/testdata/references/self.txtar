@@ -241,7 +241,7 @@ letSelfInline: {
 		data: this.raw
 		chk:  this.data
 	}
-	res: (S & {raw: "alice"}).chk @test(err, code=incomplete, path=this.data, contains="undefined field: %s", args=[raw], pos=[-3:14]) @test(eq:todo, "alice")
+	res: (S & {raw: "alice"}).chk @test(eq, "alice")
 }
 
 // Variant with two unified conjuncts, each with its own let-self binding,
@@ -257,7 +257,7 @@ letSelfInlineConj: {
 		let this = self
 		chk: this.data
 	}
-	res: (#T & {raw: "alice"}).chk @test(err, code=incomplete, path=this.data, contains="undefined field: %s", args=[raw], pos=[-6:14]) @test(eq:todo, "alice")
+	res: (#T & {raw: "alice"}).chk @test(eq, "alice")
 }
 
 -- out/evalalpha --
@@ -398,10 +398,6 @@ a: {
 -- out/errors.txt --
 [incomplete] listComp.2: index out of range [0] with length 0:
     ./comprehension.cue:13:39
-[incomplete] this.data: undefined field: raw:
-    ./letselfinline.cue:11:14
-[incomplete] this.data: undefined field: raw:
-    ./letselfinline.cue:24:14
 [eval] listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
     ./list.cue:4:14
     ./list.cue:4:15

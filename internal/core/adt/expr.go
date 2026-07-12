@@ -828,6 +828,14 @@ func (x *LetReference) Source() ast.Node {
 func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	e := ctx.Env(x.UpCount)
 
+	// A let bound to a bare value reference, like `let X = self`, is
+	// transparent: resolve it directly in the let's environment. The
+	// synthetic vertex below would lazily mirror the referenced vertex and
+	// misresolve nested `self`.
+	if vr, ok := x.X.(*ValueReference); ok && vr.UpCount > 0 {
+		return ctx.derefNode(e.up(ctx, vr.UpCount-1))
+	}
+
 	// No need to Unify n, as Let references can only result from evaluating
 	// an expression within n, in which case evaluation must already have
 	// started.

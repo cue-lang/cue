@@ -34,7 +34,6 @@ package b
 }
 
 x: #Def
-x: _
 -- diff/-out/trim-v3<==>+out/trim --
 diff old new
 --- old
@@ -49,12 +48,11 @@ diff old new
  
  #Def: {
  	y: 5
-@@ -9,4 +8,4 @@
+@@ -9,4 +8,3 @@
  }
  
  x: #Def
 -x: {}
-+x: _
 -- out/trim-v3-noshare --
 == b.cue
 package b
@@ -66,7 +64,6 @@ package b
 }
 
 x: #Def
-x: _
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old
@@ -81,12 +78,11 @@ diff old new
  
  #Def: {
  	y: 5
-@@ -9,4 +8,4 @@
+@@ -9,4 +8,3 @@
  }
  
  x: #Def
 -x: {}
-+x: _
 -- out/trim --
 == b.cue
 package b

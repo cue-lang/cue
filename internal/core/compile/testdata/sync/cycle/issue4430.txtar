@@ -1,0 +1,41 @@
+# lib, unified at two nesting levels, re-evaluates `({} & IMPORT).objects`
+# with a different IMPORT binding at each level, on a finite chain. The cycle
+# detector conflates these re-instantiations with self-feeding expansion,
+# reporting a spurious structural cycle.
+# https://cuelang.org/issue/4430
+-- in.cue --
+lib: {
+	IMPORT: objects: _
+	objects: ({} & IMPORT).objects
+}
+
+c2: objects: {
+	name: len(data)
+	data: {}
+}
+
+c1: lib & {IMPORT: c2}
+
+c0: lib & {IMPORT: c1}
+-- out/compile --
+--- in.cue
+{
+  lib: {
+    IMPORT: {
+      objects: _
+    }
+    objects: ({} & 〈0;IMPORT〉).objects
+  }
+  c2: {
+    objects: {
+      name: len(〈0;data〉)
+      data: {}
+    }
+  }
+  c1: (〈0;lib〉 & {
+    IMPORT: 〈1;c2〉
+  })
+  c0: (〈0;lib〉 & {
+    IMPORT: 〈1;c1〉
+  })
+}

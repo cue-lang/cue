@@ -18,8 +18,10 @@ import (
 	"bytes"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/tools/trim"
@@ -80,10 +82,27 @@ func TestTrimFiles(t *testing.T) {
 			}
 			val := ctx.BuildInstance(a)
 			qt.Assert(t, qt.IsNil(val.Err()))
+
+			// Trimming the output again must not change it any
+			// further: the output of a single pass is a fixed point.
+			before := formatFiles(t, files)
+			err := trim.Files(files, val, &trim.Config{})
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(formatFiles(t, files), before))
 		}
 
 		for _, f := range files {
 			t.WriteFile(f)
 		}
 	})
+}
+
+func formatFiles(t *cuetxtar.Test, files []*ast.File) string {
+	var buf bytes.Buffer
+	for _, f := range files {
+		b, err := format.Node(f)
+		qt.Assert(t, qt.IsNil(err))
+		buf.Write(b)
+	}
+	return buf.String()
 }

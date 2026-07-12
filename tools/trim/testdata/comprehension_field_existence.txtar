@@ -1,0 +1,26 @@
+# A comprehension that iterates over a struct and writes back into it cannot
+# be relied on to keep the struct's fields in existence: what it produces
+# depends on the very fields being trimmed. The field x must survive, if
+# only as x: _; removing it entirely would leave the comprehension nothing
+# to iterate over, changing the result of evaluation.
+
+-- in.cue --
+s: x: {port: 8080}
+d: port: 8080
+for k, v in s {
+	s: "\(k)": d
+}
+-- out/trim-v3 --
+== in.cue
+s: x:    _
+d: port: 8080
+for k, v in s {
+	s: "\(k)": d
+}
+-- out/trim-v3-noshare --
+== in.cue
+s: x:    _
+d: port: 8080
+for k, v in s {
+	s: "\(k)": d
+}

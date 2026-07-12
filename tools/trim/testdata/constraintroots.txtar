@@ -97,7 +97,7 @@ keepPatternConstraintRootIndirect: {
 
 keepPatternConstraintRootDef: {
 	if true {
-		deployment: "name": _
+		deployment: _
 	}
 
 	#Deployment: spec: []
@@ -159,7 +159,7 @@ diff old new
  keepPatternConstraintRootDef: {
  	if true {
 -		deployment: "name": {spec: []}
-+		deployment: "name": _
++		deployment: _
  	}
  
  	#Deployment: spec: []
@@ -212,7 +212,7 @@ keepPatternConstraintRootIndirect: {
 
 keepPatternConstraintRootDef: {
 	if true {
-		deployment: "name": _
+		deployment: _
 	}
 
 	#Deployment: spec: []
@@ -274,7 +274,7 @@ diff old new
  keepPatternConstraintRootDef: {
  	if true {
 -		deployment: "name": {spec: []}
-+		deployment: "name": _
++		deployment: _
  	}
  
  	#Deployment: spec: []

@@ -252,7 +252,7 @@ package bar
 		VCSCommitTime: time.Date(2024, 4, 23, 15, 16, 17, 0, time.UTC),
 	}
 	err := c.PutModuleWithMetadata(ctx, mv, bytes.NewReader(zipData), int64(len(zipData)), meta)
-	qt.Assert(t, qt.ErrorMatches(err, `invalid metadata: empty metadata value for field "org.cuelang.vcs-type"`))
+	qt.Assert(t, qt.ErrorMatches(err, `cannot put module "foo.com/bar@v0.5.100": invalid metadata: empty metadata value for field "org.cuelang.vcs-type"`))
 }
 
 func TestGetModuleWithManifest(t *testing.T) {
@@ -315,7 +315,7 @@ x: 42
 	c := newTestClient(t)
 	zipData := createZip(t, mv, testMod)
 	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
-	qt.Assert(t, qt.ErrorMatches(err, `module.cue file check failed: invalid module file cue.mod/module.cue: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`))
+	qt.Assert(t, qt.ErrorMatches(err, `cannot put module "foo.com/bar@v0.5.100": module.cue file check failed: invalid module file cue.mod/module.cue: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`))
 }
 
 var checkModuleTests = []struct {

@@ -292,6 +292,7 @@ func (r modMirrorRegistryResolverShim) ResolveToRegistry(mpath, vers string) (mo
 			registry:  regLoc.Registry,
 			dryRun:    r.dryRun,
 		},
+		Host:       loc.Host,
 		Repository: loc.Repository,
 		Tag:        loc.Tag,
 	}, nil

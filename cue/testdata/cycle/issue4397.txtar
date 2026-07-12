@@ -19,14 +19,14 @@ result: {"cue": cue, "tags": tags} @test(eq, {
 	tags: {cue: {modules: ["login", "mod"]}}
 })
 -- out/eval/stats --
-Leaks:  1
-Freed:  26
-Reused: 4
-Allocs: 23
+Leaks:  2
+Freed:  28
+Reused: 9
+Allocs: 21
 Retain: 0
 
 Unifications: 18
-Conjuncts:    38
-Disjuncts:    2
+Conjuncts:    43
+Disjuncts:    4
 
-NumCloseIDs: 13
+NumCloseIDs: 17

@@ -135,6 +135,8 @@ func matchPattern(ctx *OpContext, pattern Value, f Feature) bool {
 // This is an optimization an intended to be faster than regular CUE evaluation
 // for the majority of cases where pattern constraints are used.
 func matchPatternValue(ctx *OpContext, pattern Value, f Feature) (result bool) {
+	// Normally completePatternValue has already evaluated the pattern at
+	// registration time; this finalize remains as a backstop.
 	if v, ok := pattern.(*Vertex); ok {
 		v.unify(ctx, Flags{condition: scalarKnown, mode: finalize, checkTypos: false})
 	}

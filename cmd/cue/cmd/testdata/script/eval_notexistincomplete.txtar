@@ -19,7 +19,8 @@ sortedx: list.Sort(x, cmp)
 cmp: _
 
 -- expect-stderr1 --
-cmp: incomplete value _
+cmp: incomplete value _:
+    ./x.cue:8:6
 sortedx: error in call to list.Sort: non-concrete argument 1:
     ./x.cue:6:10
 -- expect-stdout2 --

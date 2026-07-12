@@ -17,10 +17,13 @@ toto: value: *_|_ | (*"toto" | string)
 
 -- expect_stdout_cue --
 -- expect_stderr_cue --
-toto.value: incomplete value "toto" | string
+toto.value: incomplete value "toto" | string:
+    ./x.cue:1:14
 -- expect_stdout_json --
 -- expect_stderr_json --
-toto.value: incomplete value "toto" | string
+toto.value: incomplete value "toto" | string:
+    ./x.cue:1:14
 -- expect_stdout_yaml --
 -- expect_stderr_yaml --
-toto.value: incomplete value "toto" | string
+toto.value: incomplete value "toto" | string:
+    ./x.cue:1:14

@@ -1,5 +1,3 @@
-# TODO: line numbers for errors.
-
 #Issue 1153
 #Issue 1152
 
@@ -49,4 +47,5 @@ V2: ("x" | "y") | *#SomeBaseType.#AUTO
 V1: "z"
 V2: "x" | "y"
 -- out/stderr --
-V2: incomplete value "x" | "y"
+V2: incomplete value "x" | "y":
+    ./x.cue:9:5

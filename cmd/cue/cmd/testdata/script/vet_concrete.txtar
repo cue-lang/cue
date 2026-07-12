@@ -3,10 +3,14 @@ cmp stderr expect-stderr
 -- expect-stderr --
 b.str: incomplete value string:
     ./partial.cue:8:7
-dfl: incomplete value "b" | "a" | string
-sum: incomplete value 1 | 2
+dfl: incomplete value "b" | "a" | string:
+    ./partial.cue:19:6
+    ./partial.cue:20:6
+sum: incomplete value 1 | 2:
+    ./partial.cue:4:6
 two: incomplete value string:
     ./partial.cue:21:6
+    ./partial.cue:22:6
 b.idx: invalid non-ground value string (must be concrete string):
     ./partial.cue:8:7
 -- partial.cue --

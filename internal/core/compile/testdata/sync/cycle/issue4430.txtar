@@ -1,7 +1,7 @@
 # lib, unified at two nesting levels, re-evaluates `({} & IMPORT).objects`
 # with a different IMPORT binding at each level, on a finite chain. The cycle
-# detector conflates these re-instantiations with self-feeding expansion,
-# reporting a spurious structural cycle.
+# detector used to conflate these re-instantiations with self-feeding
+# expansion, reporting a spurious structural cycle.
 # https://cuelang.org/issue/4430
 -- in.cue --
 lib: {
@@ -17,7 +17,61 @@ c2: objects: {
 c1: lib & {IMPORT: c2}
 
 c0: lib & {IMPORT: c1}
+-- comprehension.cue --
+// As above, but through a comprehension, as in the original reproducer:
+// the conjunct is evaluated in the node's own environment.
+comp: {
+	lib: {
+		IMPORT: [...]
+		objects: [
+			for _, imp in IMPORT
+			for _, obj in ({} & imp).objects {obj},
+		]
+	}
+	c2: objects: [{
+		name: len(data)
+		data: {}
+	}]
+	c1: lib & {IMPORT: [c2]}
+	c0: lib & {IMPORT: [c1]}
+
+	OUT: c0.objects
+}
 -- out/compile --
+--- comprehension.cue
+{
+  comp: {
+    lib: {
+      IMPORT: [
+        ...,
+      ]
+      objects: [
+        for _, imp in 〈1;IMPORT〉 for _, obj in ({} & 〈0;imp〉).objects {
+          〈1;obj〉
+        },
+      ]
+    }
+    c2: {
+      objects: [
+        {
+          name: len(〈0;data〉)
+          data: {}
+        },
+      ]
+    }
+    c1: (〈0;lib〉 & {
+      IMPORT: [
+        〈2;c2〉,
+      ]
+    })
+    c0: (〈0;lib〉 & {
+      IMPORT: [
+        〈2;c1〉,
+      ]
+    })
+    OUT: 〈0;c0〉.objects
+  }
+}
 --- in.cue
 {
   lib: {

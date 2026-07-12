@@ -478,6 +478,10 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 		return ci, false
 	}
 
+	// Set when the latest same-node reoccurrence of x is a chain step; see
+	// below. Older occurrences would spuriously fail that check.
+	chainStep := false
+
 	for r := ci.Refs; r != nil; r = r.Next {
 		if equalDeref(r.Arc, arc) {
 			if equalDeref(r.Node, n.node) {
@@ -532,6 +536,24 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 		}
 		if r.Ref == x && arc.nonRooted {
 			if equalDeref(r.Node, n.node) {
+				if chainStep {
+					continue
+				}
+				// A same-node reoccurrence is not a cycle when the conjunct
+				// is evaluated in the environment of the node itself or of
+				// the inline vertex the previous occurrence resolved into:
+				// the expression is then stepping one level along a finite
+				// chain of distinct bindings (https://cuelang.org/issue/4430).
+				// Any other route back re-feeds the same instantiation.
+				var v *Vertex
+				if env != nil {
+					v = env.DerefVertex(n.ctx)
+				}
+				if v != nil && (equalDeref(v, n.node) ||
+					(r.Arc.Parent != nil && equalDeref(v, r.Arc.Parent))) {
+					chainStep = true
+					continue
+				}
 				return n.markCyclicPath(arc, env, x, ci)
 			}
 			// Also detect cycles through StructLit inline vertices

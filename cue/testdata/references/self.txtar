@@ -227,6 +227,39 @@ doubleComp: {
 	for i in [1] for j in [1] {"d\(i)\(j)": self.n}
 }  @test(eq, {n: 7, d11: 7})
 
+-- letselfinline.cue --
+@experiment(aliasv2)
+
+// A let bound to self is a transparent binding to the enclosing struct.
+// Chained references through it must also work when the struct is unified
+// into an inline (dynamic) vertex, where structure sharing is unavailable.
+// See https://cuelang.org/issue/4428.
+letSelfInline: {
+	S: {
+		let this = self
+		raw:  string
+		data: this.raw
+		chk:  this.data
+	}
+	res: (S & {raw: "alice"}).chk @test(err, code=incomplete, path=this.data, contains="undefined field: %s", args=[raw], pos=[-3:14]) @test(eq:todo, "alice")
+}
+
+// Variant with two unified conjuncts, each with its own let-self binding,
+// where one conjunct references a field contributed by the other. This is
+// the shape that cue fix --exp=aliasv2 produces for postfix value aliases.
+letSelfInlineConj: {
+	#T: {
+		let this = self
+		raw:  string
+		data: this.raw
+	}
+	#T: {
+		let this = self
+		chk: this.data
+	}
+	res: (#T & {raw: "alice"}).chk @test(err, code=incomplete, path=this.data, contains="undefined field: %s", args=[raw], pos=[-6:14]) @test(eq:todo, "alice")
+}
+
 -- out/evalalpha --
 Errors:
 listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
@@ -365,6 +398,10 @@ a: {
 -- out/errors.txt --
 [incomplete] listComp.2: index out of range [0] with length 0:
     ./comprehension.cue:13:39
+[incomplete] this.data: undefined field: raw:
+    ./letselfinline.cue:11:14
+[incomplete] this.data: undefined field: raw:
+    ./letselfinline.cue:24:14
 [eval] listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
     ./list.cue:4:14
     ./list.cue:4:15
@@ -390,14 +427,14 @@ a: {
     ./validator.cue:18:12
     ./validator.cue:19:19
 -- out/eval/stats --
-Leaks:  39
-Freed:  125
-Reused: 98
-Allocs: 66
+Leaks:  67
+Freed:  156
+Reused: 127
+Allocs: 96
 Retain: 0
 
-Unifications: 144
-Conjuncts:    244
+Unifications: 176
+Conjuncts:    290
 Disjuncts:    0
 
-NumCloseIDs: 90
+NumCloseIDs: 98

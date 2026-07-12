@@ -31,7 +31,7 @@ foo: bar: {
 	b:      "foo"
 	c:      45
 
-	sList: [{b: "foo"}, {}]
+	sList: [{b: "foo"}, _]
 }
 
 foo: baz: _

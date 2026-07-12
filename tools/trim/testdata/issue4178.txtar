@@ -1,14 +1,10 @@
 # Trimming data against a schema whose defaults sit in nested disjunctions
-# should remove all of the data in a single pass: the defaults imply every
-# concrete value. Instead, a single pass currently leaves fields behind
+# removes all of the data in a single pass: the defaults imply every
+# concrete value. Issue #4178: a single pass used to leave fields behind
 # (x: _ and y: _) which a second trim run would then remove, so the output
-# of one pass is not a fixed point. A schema split over several shorthand
-# declarations (#Schema) additionally trims less than the equivalent single
+# of one pass was not a fixed point, and a schema split over several
+# shorthand declarations (#Schema) trimmed less than the equivalent single
 # declaration form (#Schema2).
-#
-# TODO: both a and b should be trimmed away entirely, leaving only the
-# schema references. The golden output below documents the current broken
-# behavior. Issue #4178.
 
 -- in.cue --
 a: #Schema
@@ -71,20 +67,8 @@ b: {
 -- out/trim-v3 --
 == in.cue
 a: #Schema
-a: {
-	opts: {
-		x: _
-		y: _
-	}
-}
 
 b: #Schema2
-b: {
-	opts: {
-		x: _
-		y: _
-	}
-}
 
 #Schema: {
 	b: string | *"foo"
@@ -116,20 +100,8 @@ b: {
 -- out/trim-v3-noshare --
 == in.cue
 a: #Schema
-a: {
-	opts: {
-		x: _
-		y: _
-	}
-}
 
 b: #Schema2
-b: {
-	opts: {
-		x: _
-		y: _
-	}
-}
 
 #Schema: {
 	b: string | *"foo"

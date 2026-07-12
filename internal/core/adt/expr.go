@@ -829,6 +829,20 @@ func (x *LetReference) Source() ast.Node {
 func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	e := ctx.Env(x.UpCount)
 
+	// A let bound to a bare value reference, like `let X = self`, denotes
+	// the identity of an enclosing vertex, not a computed value. Resolve it
+	// as ValueReference.resolve would: a pure environment lookup, which can
+	// never be incomplete. Other let expressions need the synthetic vertex
+	// below as a caching and suspension point, but evaluating a self
+	// binding there would unify the enclosing vertex into its own child.
+	// For rooted vertices structure sharing masks this; for dynamic
+	// (inline) vertices sharing is disabled and the synthetic vertex
+	// becomes a lazily populated mirror of its own parent, rebinding self
+	// to the mirror and misresolving nested references through the let.
+	if vr, ok := x.X.(*ValueReference); ok && vr.UpCount > 0 {
+		return ctx.derefNode(e.up(ctx, vr.UpCount-1))
+	}
+
 	// No need to Unify n, as Let references can only result from evaluating
 	// an expression within n, in which case evaluation must already have
 	// started.

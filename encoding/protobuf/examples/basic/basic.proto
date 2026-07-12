@@ -3,7 +3,7 @@ syntax = "proto3";
 // Package basic is just that: basic.
 package cuelang.examples.basic;
 
-import "cue/cue.proto";
+import "cueproto/cue.proto";
 
 option go_package = "cuelang.org/encoding/protobuf/examples/basic";
 

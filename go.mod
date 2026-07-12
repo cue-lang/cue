@@ -26,6 +26,7 @@ require (
 	golang.org/x/sync v0.21.0
 	golang.org/x/text v0.38.0
 	golang.org/x/tools v0.47.0
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -34,7 +35,6 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	golang.org/x/sys v0.46.0 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
 

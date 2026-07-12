@@ -86,7 +86,7 @@ var (
 func (p *protoConverter) mapBuiltinPackage(file string) (found bool) {
 	// Map some builtin types to their JSON/CUE mappings.
 	switch file {
-	case "cue/cue.proto":
+	case "cue/cue.proto", "cueproto/cue.proto":
 		return true
 	case "google/protobuf/struct.proto":
 		p.setBuiltin("google.protobuf.Struct", func() ast.Expr {

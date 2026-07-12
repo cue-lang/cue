@@ -8,13 +8,10 @@ exec cue eval mod.com/x
 cmp stdout stdout.golden
 exec cue eval mod.com/x/
 cmp stdout stdout.golden
-# TODO: the following two commands fail unexpectedly although they should be
-# consistent with the above; note also that a trailing slash changes the error.
-# See issue #3707.
-! exec cue eval ./x
-stderr 'found packages "x" \(x.cue\) and "y" \(y.cue\) in "\./x"'
-! exec cue eval ./x/
-stderr 'found packages "x" \(x.cue\) and "y" \(y.cue\) in "x"'
+exec cue eval ./x
+cmp stdout stdout.golden
+exec cue eval ./x/
+cmp stdout stdout.golden
 
 -- stdout.golden --
 x: 5

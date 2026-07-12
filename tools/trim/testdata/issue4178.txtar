@@ -1,0 +1,160 @@
+# Trimming data against a schema whose defaults sit in nested disjunctions
+# should remove all of the data in a single pass: the defaults imply every
+# concrete value. Instead, a single pass currently leaves fields behind
+# (x: _ and y: _) which a second trim run would then remove, so the output
+# of one pass is not a fixed point. A schema split over several shorthand
+# declarations (#Schema) additionally trims less than the equivalent single
+# declaration form (#Schema2).
+#
+# TODO: both a and b should be trimmed away entirely, leaving only the
+# schema references. The golden output below documents the current broken
+# behavior. Issue #4178.
+
+-- in.cue --
+a: #Schema
+a: {
+	b: "foo"
+	opts: {
+		x: {
+			args: []
+			type: "list"
+			show: true
+		}
+		y: {
+			mode: "single"
+		}
+	}
+}
+
+b: #Schema2
+b: {
+	b: "foo"
+	opts: {
+		x: {
+			args: []
+			type: "list"
+			show: true
+		}
+		y: {
+			mode: "single"
+		}
+	}
+}
+
+#Schema: {
+	b: string | *"foo"
+	opts: x: {
+		args: [...string] | *[]
+		type: "table" | *"list"
+		show: bool | *true
+	}
+	opts: y: {
+		mode: *"single" | "multi"
+		foo?: int
+	}
+}
+
+#Schema2: {
+	b: string | *"foo"
+	opts: {
+		x: {
+			args: [...string] | *[]
+			type: "table" | *"list"
+			show: bool | *true
+		}
+		y: {
+			mode: *"single" | "multi"
+			foo?: int
+		}
+	}
+}
+-- out/trim-v3 --
+== in.cue
+a: #Schema
+a: {
+	opts: {
+		x: _
+		y: _
+	}
+}
+
+b: #Schema2
+b: {
+	opts: {
+		x: _
+		y: _
+	}
+}
+
+#Schema: {
+	b: string | *"foo"
+	opts: x: {
+		args: [...string] | *[]
+		type: "table" | *"list"
+		show: bool | *true
+	}
+	opts: y: {
+		mode: *"single" | "multi"
+		foo?: int
+	}
+}
+
+#Schema2: {
+	b: string | *"foo"
+	opts: {
+		x: {
+			args: [...string] | *[]
+			type: "table" | *"list"
+			show: bool | *true
+		}
+		y: {
+			mode: *"single" | "multi"
+			foo?: int
+		}
+	}
+}
+-- out/trim-v3-noshare --
+== in.cue
+a: #Schema
+a: {
+	opts: {
+		x: _
+		y: _
+	}
+}
+
+b: #Schema2
+b: {
+	opts: {
+		x: _
+		y: _
+	}
+}
+
+#Schema: {
+	b: string | *"foo"
+	opts: x: {
+		args: [...string] | *[]
+		type: "table" | *"list"
+		show: bool | *true
+	}
+	opts: y: {
+		mode: *"single" | "multi"
+		foo?: int
+	}
+}
+
+#Schema2: {
+	b: string | *"foo"
+	opts: {
+		x: {
+			args: [...string] | *[]
+			type: "table" | *"list"
+			show: bool | *true
+		}
+		y: {
+			mode: *"single" | "multi"
+			foo?: int
+		}
+	}
+}

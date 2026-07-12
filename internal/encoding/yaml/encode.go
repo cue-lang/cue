@@ -230,7 +230,7 @@ var legacyStrings = map[string]bool{
 	".Nan": true,
 }
 
-func setNum(n *yaml.Node, s string, x interface{}) error {
+func setNum(n *yaml.Node, s string, x any) error {
 	if yaml.Unmarshal([]byte(s), x) == nil {
 		n.Value = s
 		return nil

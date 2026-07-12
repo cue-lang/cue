@@ -198,7 +198,7 @@ func (g *generator) addErr(err error) {
 	}
 }
 
-func (g *generator) exec(t *template.Template, data interface{}) {
+func (g *generator) exec(t *template.Template, data any) {
 	g.addErr(t.Execute(&g.w, data))
 }
 
@@ -250,7 +250,7 @@ func (g *generator) decl(name string, v cue.Value) {
 		}
 	}
 
-	g.exec(stubCode, map[string]interface{}{
+	g.exec(stubCode, map[string]any{
 		"prefix":  cmp.Or(g.Prefix, defaultPrefix),
 		"cueName": name,   // the field name of the CUE type
 		"goType":  goType, // the receiver or argument type

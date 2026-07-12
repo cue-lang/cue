@@ -62,13 +62,13 @@ func (p *printer) init(cfg *config) {
 	p.pos = token.Position{Line: 1, Column: 1}
 }
 
-func (p *printer) errf(n ast.Node, format string, args ...interface{}) {
+func (p *printer) errf(n ast.Node, format string, args ...any) {
 	p.errs = errors.Append(p.errs, errors.Newf(n.Pos(), format, args...))
 }
 
 const debug = false
 
-func (p *printer) internalError(msg ...interface{}) {
+func (p *printer) internalError(msg ...any) {
 	if debug {
 		fmt.Print(p.pos.String() + ": ")
 		fmt.Println(msg...)
@@ -80,7 +80,7 @@ func (p *printer) lineFor(pos token.Pos) int {
 	return pos.Line()
 }
 
-func (p *printer) Print(v interface{}) {
+func (p *printer) Print(v any) {
 	var (
 		impliedComma = false
 		isLit        bool

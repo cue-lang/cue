@@ -41,7 +41,7 @@ func newHTTPCmd(v cue.Value) (task.Runner, error) {
 	return &httpCmd{}, nil
 }
 
-func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *httpCmd) Run(ctx *task.Context) (res any, err error) {
 	var header, trailer http.Header
 	var (
 		method = ctx.String("method")
@@ -155,8 +155,8 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	// parse response body and headers
-	return map[string]interface{}{
-		"response": map[string]interface{}{
+	return map[string]any{
+		"response": map[string]any{
 			"status":     resp.Status,
 			"statusCode": resp.StatusCode,
 			"body":       string(b),

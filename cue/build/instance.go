@@ -231,7 +231,7 @@ func (inst *Instance) Context() *Context {
 	return inst.ctxt
 }
 
-func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {
+func (inst *Instance) parse(name string, src any) (*ast.File, error) {
 	cfg := parser.NewConfig(parser.ParseComments)
 	if inst.ModuleFile != nil && inst.ModuleFile.Language != nil {
 		cfg = cfg.Apply(parser.Version(inst.ModuleFile.Language.Version))
@@ -279,7 +279,7 @@ func (inst *Instance) addImport(imp *Instance) {
 //
 // Deprecated: use [Instance.AddSyntax] or wait for this to be renamed using a new
 // signature.
-func (inst *Instance) AddFile(filename string, src interface{}) error {
+func (inst *Instance) AddFile(filename string, src any) error {
 	file, err := inst.parse(filename, src)
 	if err != nil {
 		// should always be an errors.List, but just in case.
@@ -294,7 +294,7 @@ func (inst *Instance) AddFile(filename string, src interface{}) error {
 // AddSyntax adds the given file to list of files for this instance. The package
 // name of the file must match the package name of the instance.
 func (inst *Instance) AddSyntax(file *ast.File) errors.Error {
-	astutil.Resolve(file, func(pos token.Pos, msg string, args ...interface{}) {
+	astutil.Resolve(file, func(pos token.Pos, msg string, args ...any) {
 		inst.Err = errors.Append(inst.Err, errors.Newf(pos, msg, args...))
 	})
 	pkg := file.PackageName()

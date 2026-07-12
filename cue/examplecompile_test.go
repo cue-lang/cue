@@ -54,6 +54,6 @@ func ExampleContext() {
 	// a * b: 6
 }
 
-func p(format string, args ...interface{}) {
+func p(format string, args ...any) {
 	fmt.Printf(format+"\n", args...)
 }

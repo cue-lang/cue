@@ -50,7 +50,7 @@ func TestRead(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := map[string]interface{}{"contents": []byte("This is a test.")}
+	want := map[string]any{"contents": []byte("This is a test.")}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v; want %v", got, want)
 	}
@@ -63,7 +63,7 @@ func TestRead(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want = map[string]interface{}{"contents": "This is a test."}
+	want = map[string]any{"contents": "This is a test."}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v; want %v", got, want)
 	}
@@ -242,10 +242,10 @@ func TestMkdirTemp(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, exists := r.(map[string]interface{})["path"]; !exists {
+	if _, exists := r.(map[string]any)["path"]; !exists {
 		t.Fatal("no directory path returned")
 	}
-	path := r.(map[string]interface{})["path"].(string)
+	path := r.(map[string]any)["path"].(string)
 	t.Cleanup(func() { os.RemoveAll(path) })
 	fi, err := os.Stat(path)
 	if err != nil {

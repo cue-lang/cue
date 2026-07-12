@@ -115,7 +115,7 @@ func ResolveAbsolutePackage(ctx context.Context, reg Registry, p string) (module
 	fail := func(err error) (module.Version, module.SourceLoc, error) {
 		return module.Version{}, module.SourceLoc{}, err
 	}
-	failf := func(format string, args ...interface{}) (module.Version, module.SourceLoc, error) {
+	failf := func(format string, args ...any) (module.Version, module.SourceLoc, error) {
 		return fail(fmt.Errorf(format, args...))
 	}
 	if filepath.IsAbs(p) || path.IsAbs(p) {

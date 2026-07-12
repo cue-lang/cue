@@ -180,7 +180,7 @@ func (c *buildContext) isInternal(sel cue.Selector) bool {
 		strings.HasSuffix(sel.String(), "_value")
 }
 
-func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
+func (b *builder) failf(v cue.Value, format string, args ...any) {
 	panic(&openapiError{
 		errors.NewMessagef(format, args...),
 		v.Err(),

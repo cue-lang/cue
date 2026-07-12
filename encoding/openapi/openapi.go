@@ -34,7 +34,7 @@ type Config struct {
 	// Info specifies the info section of the OpenAPI document. To be a valid
 	// OpenAPI document, it must include at least the title and version fields.
 	// Info may be a *ast.StructLit or any type that marshals to JSON.
-	Info interface{}
+	Info any
 
 	// NameFunc allows users to specify an alternative representation
 	// for references. It is called with the value passed to the top level
@@ -120,7 +120,7 @@ func Generate(inst cue.InstanceOrValue, c *Config) (*ast.File, error) {
 	return &ast.File{Decls: top.Elts}, nil
 }
 
-func toCUE(name string, x interface{}) (v ast.Expr, err error) {
+func toCUE(name string, x any) (v ast.Expr, err error) {
 	b, err := internaljson.Marshal(x)
 	if err == nil {
 		v, err = cuejson.Extract(name, b)

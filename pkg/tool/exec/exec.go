@@ -37,7 +37,7 @@ func newExecCmd(v cue.Value) (task.Runner, error) {
 	return &execCmd{}, nil
 }
 
-func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *execCmd) Run(ctx *task.Context) (res any, err error) {
 	cmd, doc, err := mkCommand(ctx)
 	if err != nil {
 		return cue.Value{}, err
@@ -72,7 +72,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		return nil, errors.Wrapf(err, v.Pos(), "invalid bool value")
 	}
 
-	update := map[string]interface{}{}
+	update := map[string]any{}
 	if captureOut {
 		var stdout []byte
 		stdout, err = cmd.Output()

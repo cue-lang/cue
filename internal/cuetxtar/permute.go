@@ -277,7 +277,7 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 			}
 			return
 		}
-		for i := 0; i < k; i++ {
+		for i := range k {
 			generate(k - 1)
 			if k%2 == 0 {
 				perm[i], perm[k-1] = perm[k-1], perm[i]
@@ -298,7 +298,7 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 // checks are intentionally order-sensitive and not meaningful here.
 func stripPosFailureLines(s string) string {
 	var keep []string
-	for _, line := range strings.Split(s, "\n") {
+	for line := range strings.SplitSeq(s, "\n") {
 		if strings.Contains(line, "pos=") || strings.Contains(line, "position") {
 			continue
 		}

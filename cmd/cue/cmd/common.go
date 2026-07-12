@@ -41,7 +41,7 @@ import (
 func defaultConfig() (*config, error) {
 	return &config{
 		loadCfg: &load.Config{
-			ParseFile: func(name string, src interface{}, cfg parser.Config) (*ast.File, error) {
+			ParseFile: func(name string, src any, cfg parser.Config) (*ast.File, error) {
 				cuedebug.Init()
 				if cuedebug.Flags.ParserTrace {
 					cfg = cfg.Apply(parser.Trace)

@@ -87,7 +87,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	return v, errs
 }
 
-func (r *Runtime) Compile(cfg *Config, source interface{}) (*adt.Vertex, *build.Instance) {
+func (r *Runtime) Compile(cfg *Config, source any) (*adt.Vertex, *build.Instance) {
 	ctx := build.NewContext()
 	var filename string
 	if cfg != nil && cfg.Filename != "" {

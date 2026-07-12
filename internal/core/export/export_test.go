@@ -211,7 +211,7 @@ func TestGenerated(t *testing.T) {
 		}, {
 			// Issue #1131
 			in: func(r *adt.OpContext) (adt.Expr, error) {
-				m := make(map[string]interface{})
+				m := make(map[string]any)
 				v := ctx.Encode(m)
 				_, x := value.ToInternal(v)
 				return x, nil

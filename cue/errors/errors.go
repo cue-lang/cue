@@ -61,7 +61,7 @@ func Is(err, target error) bool {
 //
 // The As method should set the target to its value and return true if err
 // matches the type to which target points.
-func As(err error, target interface{}) bool {
+func As(err error, target any) bool {
 	return errors.As(err, target)
 }
 
@@ -70,13 +70,13 @@ func As(err error, target interface{}) bool {
 // in a CUE message.
 type Message struct {
 	format string
-	args   []interface{}
+	args   []any
 }
 
 // NewMessagef creates an error message for human consumption. The arguments
 // are for later consumption, allowing the message to be localized at a later
 // time. The passed argument list should not be modified.
-func NewMessagef(format string, args ...interface{}) Message {
+func NewMessagef(format string, args ...any) Message {
 	if false {
 		// Let go vet know that we're expecting printf-like arguments.
 		_ = fmt.Sprintf(format, args...)
@@ -89,13 +89,13 @@ func NewMessagef(format string, args ...interface{}) Message {
 // Deprecated: Use [NewMessagef] instead.
 //
 //go:fix inline
-func NewMessage(format string, args []interface{}) Message {
+func NewMessage(format string, args []any) Message {
 	return NewMessagef(format, args...)
 }
 
 // Msg returns a printf-style format string and its arguments for human
 // consumption.
-func (m *Message) Msg() (format string, args []interface{}) {
+func (m *Message) Msg() (format string, args []any) {
 	return m.format, m.args
 }
 
@@ -123,7 +123,7 @@ type Error interface {
 
 	// Msg returns the unformatted error message and its arguments for human
 	// consumption.
-	Msg() (format string, args []interface{})
+	Msg() (format string, args []any)
 }
 
 // Positions returns the printable positions returned by an error,
@@ -178,7 +178,7 @@ func Path(err error) []string {
 }
 
 // Newf creates an Error with the associated position and message.
-func Newf(p token.Pos, format string, args ...interface{}) Error {
+func Newf(p token.Pos, format string, args ...any) Error {
 	return &posError{
 		pos:     p,
 		Message: NewMessagef(format, args...),
@@ -187,7 +187,7 @@ func Newf(p token.Pos, format string, args ...interface{}) Error {
 
 // Wrapf creates an Error with the associated position and message. The provided
 // error is added for inspection context.
-func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
+func Wrapf(err error, p token.Pos, format string, args ...any) Error {
 	pErr := &posError{
 		pos:     p,
 		Message: NewMessagef(format, args...),
@@ -234,11 +234,11 @@ func (e *wrapped) Is(target error) bool {
 	return Is(e.main, target)
 }
 
-func (e *wrapped) As(target interface{}) bool {
+func (e *wrapped) As(target any) bool {
 	return As(e.main, target)
 }
 
-func (e *wrapped) Msg() (format string, args []interface{}) {
+func (e *wrapped) Msg() (format string, args []any) {
 	return e.main.Msg()
 }
 
@@ -364,7 +364,7 @@ func (p list) Is(target error) bool {
 	return false
 }
 
-func (p list) As(target interface{}) bool {
+func (p list) As(target any) bool {
 	for _, e := range p {
 		if errors.As(e, target) {
 			return true
@@ -479,7 +479,7 @@ func (e pathlessError) Path() []string { return nil }
 func (e pathlessError) Unwrap() error  { return Unwrap(e.cueError) }
 
 // Msg reports the unformatted error message for the first error, if any.
-func (p list) Msg() (format string, args []interface{}) {
+func (p list) Msg() (format string, args []any) {
 	switch len(p) {
 	case 0:
 		return "no errors", nil
@@ -489,7 +489,7 @@ func (p list) Msg() (format string, args []interface{}) {
 	// Wrap p[0] to suppress its path. The list's own Path() already
 	// returns p[0].Path(), so including the path in the format arg
 	// would cause it to appear twice in the output.
-	return "%s (and %d more errors)", []interface{}{pathlessError{p[0]}, len(p) - 1}
+	return "%s (and %d more errors)", []any{pathlessError{p[0]}, len(p) - 1}
 }
 
 // Position reports the primary position for the first error, if any.
@@ -529,7 +529,7 @@ func (p list) Err() error {
 type Config struct {
 	// Format formats the given string and arguments and writes it to w.
 	// It is used for all printing.
-	Format func(w io.Writer, format string, args ...interface{})
+	Format func(w io.Writer, format string, args ...any)
 
 	// Cwd is the current working directory. Filename positions are taken
 	// relative to this path.
@@ -648,7 +648,7 @@ func writeErr(w io.Writer, err Error, cfg *Config) {
 	}
 }
 
-func defaultFprintf(w io.Writer, format string, args ...interface{}) {
+func defaultFprintf(w io.Writer, format string, args ...any) {
 	fmt.Fprintf(w, format, args...)
 }
 

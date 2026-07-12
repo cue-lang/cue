@@ -480,7 +480,7 @@ func printError(cmd *Command, err error) {
 
 	// Link x/text as our localizer.
 	p := message.NewPrinter(getLang())
-	format := func(w io.Writer, format string, args ...interface{}) {
+	format := func(w io.Writer, format string, args ...any) {
 		p.Fprintf(w, format, args...)
 	}
 	errors.Print(cmd.Stderr(), err, &errors.Config{

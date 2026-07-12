@@ -6,6 +6,7 @@ package anyhash_test
 
 import (
 	"hash/maphash"
+	"maps"
 	"slices"
 	"strings"
 	"testing"
@@ -106,10 +107,7 @@ func TestMap(t *testing.T) {
 		t.Errorf("Values(): got %v", values)
 	}
 
-	entries := make(map[string]int)
-	for k, v := range m.All() {
-		entries[k] = v
-	}
+	entries = maps.Collect(m.All())
 	if len(entries) != 2 || entries["Hello"] != 2 || entries["World"] != 3 {
 		t.Errorf("All(): got %v", entries)
 	}

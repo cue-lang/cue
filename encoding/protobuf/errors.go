@@ -48,6 +48,6 @@ func (e *protobufError) Path() []string {
 	return e.path
 }
 
-func (e *protobufError) Msg() (format string, args []interface{}) {
-	return "error parsing protobuf: %v", []interface{}{e.err}
+func (e *protobufError) Msg() (format string, args []any) {
+	return "error parsing protobuf: %v", []any{e.err}
 }

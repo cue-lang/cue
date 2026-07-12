@@ -76,7 +76,7 @@ func (e *NoFilesError) Path() []string              { return nil }
 
 // TODO(localize)
 
-func (e *NoFilesError) Msg() (string, []interface{}) {
+func (e *NoFilesError) Msg() (string, []any) {
 	// Count files beginning with _, which we will pretend don't exist at all.
 	dummy := 0
 	for _, f := range e.Package.IgnoredFiles {
@@ -130,8 +130,8 @@ func (e *MultiplePackageError) Position() token.Pos         { return token.NoPos
 func (e *MultiplePackageError) InputPositions() []token.Pos { return nil }
 func (e *MultiplePackageError) Path() []string              { return nil }
 
-func (e *MultiplePackageError) Msg() (string, []interface{}) {
-	return "found packages %q (%s) and %q (%s) in %q", []interface{}{
+func (e *MultiplePackageError) Msg() (string, []any) {
+	return "found packages %q (%s) and %q (%s) in %q", []any{
 		e.Packages[0],
 		e.Files[0],
 		e.Packages[1],

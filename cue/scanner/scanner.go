@@ -30,7 +30,7 @@ import (
 // An ErrorHandler is a generic error handler used throughout CUE packages.
 //
 // The position points to the beginning of the offending value.
-type ErrorHandler func(pos token.Pos, msg string, args []interface{})
+type ErrorHandler func(pos token.Pos, msg string, args []any)
 
 // A Scanner holds the Scanner's internal state while processing
 // a given text. It can be allocated as part of another data
@@ -149,7 +149,7 @@ func (s *Scanner) Init(file *token.File, src []byte, eh ErrorHandler, mode Mode)
 	}
 }
 
-func (s *Scanner) errf(offs int, msg string, args ...interface{}) {
+func (s *Scanner) errf(offs int, msg string, args ...any) {
 	if s.errh != nil {
 		s.errh(s.file.Pos(offs, 0), msg, args)
 	}

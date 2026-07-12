@@ -1178,8 +1178,8 @@ pkg: x, x: y: "hello"`)
 	})
 }
 
-func goValue(v cue.Value) interface{} {
-	var x interface{}
+func goValue(v cue.Value) any {
+	var x any
 	err := v.Decode(&x)
 	if err != nil {
 		return err
@@ -1200,7 +1200,7 @@ func TestFill(t *testing.T) {
 
 	testCases := []struct {
 		in   string
-		x    interface{}
+		x    any
 		path string // comma-separated path
 		out  string
 	}{{
@@ -1299,7 +1299,7 @@ func TestFillPath(t *testing.T) {
 
 		testCases := []struct {
 			in   string
-			x    interface{}
+			x    any
 			path cue.Path
 			out  string
 		}{{
@@ -1595,7 +1595,7 @@ func TestFillPathSyntax(t *testing.T) {
 func TestFillPathError(t *testing.T) {
 	testCases := []struct {
 		in   string
-		x    interface{}
+		x    any
 		path cue.Path
 		err  string
 	}{{
@@ -1873,7 +1873,7 @@ func TestFillFloat(t *testing.T) {
 
 	want := `{x: 3.14}`
 
-	filltest := func(x interface{}) {
+	filltest := func(x any) {
 		ctx := cuecontext.New()
 		val := mustCompile(t, ctx, `
 	x: number

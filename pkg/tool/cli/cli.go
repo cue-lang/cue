@@ -38,7 +38,7 @@ func newPrintCmd(v cue.Value) (task.Runner, error) {
 	return &printCmd{}, nil
 }
 
-func (c *printCmd) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *printCmd) Run(ctx *task.Context) (res any, err error) {
 	str := ctx.String("text")
 	if ctx.Err != nil {
 		return nil, ctx.Err
@@ -64,7 +64,7 @@ func (r *oneByteReader) Read(p []byte) (int, error) {
 	return r.r.Read(p[:1])
 }
 
-func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *askCmd) Run(ctx *task.Context) (res any, err error) {
 	str := ctx.String("prompt")
 	if ctx.Err != nil {
 		return nil, ctx.Err
@@ -90,7 +90,7 @@ func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		return nil, err
 	}
 
-	update := map[string]interface{}{"response": response}
+	update := map[string]any{"response": response}
 
 	switch v := ctx.Lookup("response"); v.IncompleteKind() {
 	case cue.BoolKind:

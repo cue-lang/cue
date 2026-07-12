@@ -27,7 +27,7 @@ import (
 
 // failf panics with a marked error that can be intercepted upon returning
 // from parsing.
-func failf(pos scanner.Position, format string, args ...interface{}) {
+func failf(pos scanner.Position, format string, args ...any) {
 	panic(protoError{pos, fmt.Errorf(format, args...)})
 }
 

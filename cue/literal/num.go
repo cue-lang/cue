@@ -131,7 +131,7 @@ func ParseNum(s string, n *NumInfo) error {
 	return nil
 }
 
-func (p *NumInfo) errorf(format string, args ...interface{}) error {
+func (p *NumInfo) errorf(format string, args ...any) error {
 	return errors.Newf(p.pos, format, args...)
 }
 

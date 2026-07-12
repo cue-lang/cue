@@ -54,7 +54,7 @@ type cmdMkdir struct{}
 type cmdMkdirTemp struct{}
 type cmdRemoveAll struct{}
 
-func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *cmdRead) Run(ctx *task.Context) (res any, err error) {
 	filename := ctx.String("filename")
 	if ctx.Err != nil {
 		return nil, ctx.Err
@@ -64,7 +64,7 @@ func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
 	if err != nil {
 		return nil, err
 	}
-	update := map[string]interface{}{"contents": b}
+	update := map[string]any{"contents": b}
 
 	switch v := ctx.Lookup("contents"); v.IncompleteKind() {
 	case cue.BytesKind:
@@ -75,7 +75,7 @@ func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
 	return update, nil
 }
 
-func (c *cmdAppend) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *cmdAppend) Run(ctx *task.Context) (res any, err error) {
 	var (
 		filename = filepath.FromSlash(ctx.String("filename"))
 		mode     = ctx.Int64("permissions")
@@ -97,7 +97,7 @@ func (c *cmdAppend) Run(ctx *task.Context) (res interface{}, err error) {
 	return nil, nil
 }
 
-func (c *cmdCreate) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *cmdCreate) Run(ctx *task.Context) (res any, err error) {
 	var (
 		filename = filepath.FromSlash(ctx.String("filename"))
 		mode     = ctx.Int64("permissions")
@@ -110,7 +110,7 @@ func (c *cmdCreate) Run(ctx *task.Context) (res interface{}, err error) {
 	return nil, os.WriteFile(filename, b, os.FileMode(mode))
 }
 
-func (c *cmdSymlink) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *cmdSymlink) Run(ctx *task.Context) (res any, err error) {
 	var (
 		filename = filepath.FromSlash(ctx.String("filename"))
 		target   = filepath.FromSlash(ctx.String("target"))
@@ -122,7 +122,7 @@ func (c *cmdSymlink) Run(ctx *task.Context) (res interface{}, err error) {
 	return nil, os.Symlink(target, filename)
 }
 
-func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *cmdGlob) Run(ctx *task.Context) (res any, err error) {
 	glob := ctx.String("glob")
 	if ctx.Err != nil {
 		return nil, ctx.Err
@@ -141,11 +141,11 @@ func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
 	for i, s := range m {
 		m[i] = filepath.ToSlash(s)
 	}
-	files := map[string]interface{}{"files": m}
+	files := map[string]any{"files": m}
 	return files, err
 }
 
-func (c *cmdMkdir) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *cmdMkdir) Run(ctx *task.Context) (res any, err error) {
 	path := ctx.String("path")
 	mode := ctx.Int64("permissions")
 	createParents, _ := ctx.Lookup("createParents").Bool()
@@ -171,7 +171,7 @@ func (c *cmdMkdir) Run(ctx *task.Context) (res interface{}, err error) {
 	return nil, nil
 }
 
-func (c *cmdMkdirTemp) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *cmdMkdirTemp) Run(ctx *task.Context) (res any, err error) {
 	dir := ctx.String("dir")
 	pattern := ctx.String("pattern")
 
@@ -184,10 +184,10 @@ func (c *cmdMkdirTemp) Run(ctx *task.Context) (res interface{}, err error) {
 		return nil, errors.Wrapf(err, ctx.Obj.Pos(), "failed to create temporary directory")
 	}
 
-	return map[string]interface{}{"path": path}, nil
+	return map[string]any{"path": path}, nil
 }
 
-func (c *cmdRemoveAll) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *cmdRemoveAll) Run(ctx *task.Context) (res any, err error) {
 	path := ctx.String("path")
 
 	if ctx.Err != nil {
@@ -195,12 +195,12 @@ func (c *cmdRemoveAll) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	if _, err := os.Stat(path); err != nil {
-		return map[string]interface{}{"success": false}, nil
+		return map[string]any{"success": false}, nil
 	}
 
 	if err := os.RemoveAll(path); err != nil {
 		return nil, errors.Wrapf(err, ctx.Obj.Pos(), "failed to remove path")
 	}
 
-	return map[string]interface{}{"success": true}, nil
+	return map[string]any{"success": true}, nil
 }

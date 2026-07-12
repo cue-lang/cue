@@ -26,7 +26,7 @@ import (
 type Runtime struct {
 	index *index
 
-	loaded map[*build.Instance]interface{}
+	loaded map[*build.Instance]any
 
 	// injections implement extern functionality. The map key corresponds to
 	// the kind in a file-level @extern(kind) attribute.
@@ -46,13 +46,13 @@ func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
 	ctx.Config = r.flags
 }
 
-func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {
+func (r *Runtime) SetBuildData(b *build.Instance, x any) {
 	r.index.lock.Lock()
 	defer r.index.lock.Unlock()
 	r.loaded[b] = x
 }
 
-func (r *Runtime) BuildData(b *build.Instance) (x interface{}, ok bool) {
+func (r *Runtime) BuildData(b *build.Instance) (x any, ok bool) {
 	r.index.lock.RLock()
 	defer r.index.lock.RUnlock()
 	x, ok = r.loaded[b]
@@ -118,7 +118,7 @@ func (r *Runtime) Init() {
 	r.index = newIndex()
 	r.index.builtins = stdBuiltins
 
-	r.loaded = map[*build.Instance]interface{}{}
+	r.loaded = map[*build.Instance]any{}
 
 	r.SetVersion(internal.DefaultVersion)
 

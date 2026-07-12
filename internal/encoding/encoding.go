@@ -158,7 +158,7 @@ type Config struct {
 	ProtoPath     []string
 	Format        []format.Option
 	ParserConfig  parser.Config
-	ParseFile     func(name string, src interface{}, cfg parser.Config) (*ast.File, error)
+	ParseFile     func(name string, src any, cfg parser.Config) (*ast.File, error)
 }
 
 // NewDecoder returns a stream of non-rooted data expressions. The encoding

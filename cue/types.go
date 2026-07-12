@@ -180,8 +180,8 @@ func toMarshalErr(v Value, b *adt.Bottom) error {
 	return &marshalError{v.toErr(b), b}
 }
 
-func marshalErrf(v Value, src adt.Node, code adt.ErrorCode, msg string, args ...interface{}) error {
-	arguments := append([]interface{}{code, msg}, args...)
+func marshalErrf(v Value, src adt.Node, code adt.ErrorCode, msg string, args ...any) error {
+	arguments := append([]any{code, msg}, args...)
 	b := mkErr(src, arguments...)
 	return toMarshalErr(v, b)
 }
@@ -190,10 +190,10 @@ func (e *marshalError) Error() string {
 	return fmt.Sprintf("cue: marshal error: %v", e.err)
 }
 
-func (e *marshalError) Bottom() *adt.Bottom          { return e.b }
-func (e *marshalError) Path() []string               { return e.err.Path() }
-func (e *marshalError) Msg() (string, []interface{}) { return e.err.Msg() }
-func (e *marshalError) Position() token.Pos          { return e.err.Position() }
+func (e *marshalError) Bottom() *adt.Bottom  { return e.b }
+func (e *marshalError) Path() []string       { return e.err.Path() }
+func (e *marshalError) Msg() (string, []any) { return e.err.Msg() }
+func (e *marshalError) Position() token.Pos  { return e.err.Position() }
 func (e *marshalError) InputPositions() []token.Pos {
 	return e.err.InputPositions()
 }
@@ -1668,7 +1668,7 @@ func (v hiddenValue) LookupField(name string) (FieldInfo, error) {
 // to x in the newly created value. The resulting value is not validated.
 //
 // Deprecated: use [Value.FillPath].
-func (v hiddenValue) Fill(x interface{}, path ...string) Value {
+func (v hiddenValue) Fill(x any, path ...string) Value {
 	if v.v == nil {
 		return v
 	}
@@ -1691,7 +1691,7 @@ func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 //
 // Any reference in v referring to the value at the given path will resolve to x
 // in the newly created value. The resulting value is not validated.
-func (v Value) FillPath(p Path, x interface{}) Value {
+func (v Value) FillPath(p Path, x any) Value {
 	if v.v == nil {
 		// TODO: panic here?
 		return v

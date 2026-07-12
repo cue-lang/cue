@@ -72,7 +72,7 @@ func (f *overlayFile) Mode() iofs.FileMode {
 }
 func (f *overlayFile) ModTime() time.Time { return f.modtime }
 func (f *overlayFile) IsDir() bool        { return f.isDir }
-func (f *overlayFile) Sys() interface{}   { return nil }
+func (f *overlayFile) Sys() any           { return nil }
 
 // overlayFileSystem implements [fileSystem] using the host OS filesystem
 // with an optional overlay of in-memory files.

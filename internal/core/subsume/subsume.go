@@ -100,7 +100,7 @@ type subsumer struct {
 	lt      adt.Value
 }
 
-func (s *subsumer) errf(msg string, args ...interface{}) {
+func (s *subsumer) errf(msg string, args ...any) {
 	b := s.ctx.NewErrf(msg, args...)
 	s.errs = errors.Append(s.errs, b.Err)
 }

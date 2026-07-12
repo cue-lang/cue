@@ -17,7 +17,7 @@ type DocumentChanges struct {
 }
 
 func (d *DocumentChanges) UnmarshalJSON(data []byte) error {
-	var m map[string]interface{}
+	var m map[string]any
 
 	if err := json.Unmarshal(data, &m); err != nil {
 		return err

@@ -68,7 +68,7 @@ func (e *valueError) InputPositions() []token.Pos {
 	return e.err.Err.InputPositions()
 }
 
-func (e *valueError) Msg() (string, []interface{}) {
+func (e *valueError) Msg() (string, []any) {
 	if e.err.Err == nil {
 		return "", nil
 	}
@@ -120,7 +120,7 @@ func IsIncomplete(err error) bool {
 	return false
 }
 
-func mkErr(src adt.Node, args ...interface{}) *adt.Bottom {
+func mkErr(src adt.Node, args ...any) *adt.Bottom {
 	var e *adt.Bottom
 	var code adt.ErrorCode = -1
 outer:

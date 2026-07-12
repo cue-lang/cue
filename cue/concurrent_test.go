@@ -1328,9 +1328,7 @@ func TestConcurrentMixedOperations(t *testing.T) {
 	var wg sync.WaitGroup
 	for range concurrentWorkers {
 		// Reader: lookups and string extraction
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				s, _ := v.LookupPath(namePath).String()
 				if s != "Alice" {
@@ -1338,12 +1336,10 @@ func TestConcurrentMixedOperations(t *testing.T) {
 					return
 				}
 			}
-		}()
+		})
 
 		// Reader: defaults
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				d, ok := v.LookupPath(rolePath).Default()
 				if ok {
@@ -1354,24 +1350,20 @@ func TestConcurrentMixedOperations(t *testing.T) {
 					}
 				}
 			}
-		}()
+		})
 
 		// Reader: validation
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				if err := v.LookupPath(valPath).Validate(cue.Concrete(true)); err != nil {
 					t.Error(err)
 					return
 				}
 			}
-		}()
+		})
 
 		// Reader: field iteration
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				iter, err := v.LookupPath(metaPath).Fields()
 				if err != nil {
@@ -1382,12 +1374,10 @@ func TestConcurrentMixedOperations(t *testing.T) {
 					_, _ = iter.Value().String()
 				}
 			}
-		}()
+		})
 
 		// Reader: list iteration
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				iter, err := v.LookupPath(tagsPath).List()
 				if err != nil {
@@ -1398,12 +1388,10 @@ func TestConcurrentMixedOperations(t *testing.T) {
 					_, _ = iter.Value().String()
 				}
 			}
-		}()
+		})
 
 		// Reader: JSON marshal
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				_, err := v.LookupPath(valPath).MarshalJSON()
 				if err != nil {
@@ -1411,51 +1399,43 @@ func TestConcurrentMixedOperations(t *testing.T) {
 					return
 				}
 			}
-		}()
+		})
 
 		// Reader: syntax
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				_ = v.LookupPath(valPath).Syntax()
 			}
-		}()
+		})
 
 		// Reader: subsumption
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				schema := v.LookupPath(schemaPath)
 				val := v.LookupPath(valPath)
 				_ = schema.Subsume(val)
 			}
-		}()
+		})
 
 		// Writer: FillPath (creates new values from shared base)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			schema := v.LookupPath(schemaPath)
 			for range concurrentIterations {
 				filled := schema.FillPath(cue.ParsePath("name"), "Bob")
 				filled = filled.FillPath(cue.ParsePath("age"), 25)
 				_ = filled.Err()
 			}
-		}()
+		})
 
 		// Writer: Unify (creates new values from shared base)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			schema := v.LookupPath(schemaPath)
 			data := ctx.CompileString(`{name: "Charlie", age: 35, tags: ["test"]}`)
 			for range concurrentIterations {
 				result := schema.Unify(data)
 				_ = result.Err()
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }
@@ -1767,13 +1747,11 @@ func runConcurrent(t *testing.T, fn func()) {
 	t.Helper()
 	var wg sync.WaitGroup
 	for range concurrentWorkers {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range concurrentIterations {
 				fn()
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }

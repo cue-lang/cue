@@ -39,7 +39,7 @@ func TestAPI(t *testing.T) {
 	}, {
 		name: "issue1131",
 		fun: func() cue.Value {
-			m := make(map[string]interface{})
+			m := make(map[string]any)
 			ctx := New()
 			cv := ctx.Encode(m)
 			return cv

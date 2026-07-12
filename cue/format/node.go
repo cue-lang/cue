@@ -25,7 +25,7 @@ import (
 	"cuelang.org/go/internal"
 )
 
-func printNode(node interface{}, f *printer) error {
+func printNode(node any, f *printer) error {
 	s := newFormatter(f)
 
 	ls := labelSimplifier{scope: map[string]bool{}}

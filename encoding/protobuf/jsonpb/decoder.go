@@ -106,9 +106,9 @@ func (r *rewriter) addErr(err errors.Error) {
 	r.errs = errors.Append(r.errs, err)
 }
 
-func (r *rewriter) addErrf(p token.Pos, schema cue.Value, format string, args ...interface{}) {
+func (r *rewriter) addErrf(p token.Pos, schema cue.Value, format string, args ...any) {
 	format = "%s: " + format
-	args = append([]interface{}{schema.Path()}, args...)
+	args = append([]any{schema.Path()}, args...)
 	r.addErr(errors.Newf(p, format, args...))
 }
 

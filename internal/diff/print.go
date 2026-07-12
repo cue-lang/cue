@@ -79,7 +79,7 @@ func (p *printer) println(s string) {
 	fmt.Fprintln(p, s)
 }
 
-func (p *printer) printf(format string, args ...interface{}) {
+func (p *printer) printf(format string, args ...any) {
 	fmt.Fprintf(p, format, args...)
 }
 

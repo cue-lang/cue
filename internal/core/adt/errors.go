@@ -395,7 +395,7 @@ func (c *OpContext) AddPosition(n Node) {
 	}
 }
 
-func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
+func (c *OpContext) Newf(format string, args ...any) *ValueError {
 	return c.NewPosf(c.pos(), format, args...)
 }
 
@@ -411,7 +411,7 @@ func appendNodePositions(a []token.Pos, n Node) []token.Pos {
 	return a
 }
 
-func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *ValueError {
+func (c *OpContext) NewPosf(p token.Pos, format string, args ...any) *ValueError {
 	err := &ValueError{
 		baseError: baseError{
 			r:       c.Runtime,
@@ -480,7 +480,7 @@ func (c *OpContext) makeAltPath() (a []string) {
 
 // Msg wraps any Node args with [Formatter] lazily, so the boxing allocation
 // only happens when the error is actually rendered (the minority case).
-func (e *ValueError) Msg() (format string, args []interface{}) {
+func (e *ValueError) Msg() (format string, args []any) {
 	format, args = e.Message.Msg()
 	for i, a := range args {
 		if x, ok := a.(Node); ok {
@@ -506,12 +506,12 @@ func (e *ConflictError) Error() string {
 	return errors.String(e)
 }
 
-func (e *ConflictError) Msg() (format string, args []interface{}) {
+func (e *ConflictError) Msg() (format string, args []any) {
 	v1Str := Formatter{X: e.v1, F: e.format, R: e.r}
 	v2Str := Formatter{X: e.v2, F: e.format, R: e.r}
 	if e.k1 == e.k2 {
-		return "conflicting values %s and %s", []interface{}{v1Str, v2Str}
+		return "conflicting values %s and %s", []any{v1Str, v2Str}
 	}
 	return "conflicting values %s and %s (mismatched types %s and %s)",
-		[]interface{}{v1Str, v2Str, e.k1, e.k2}
+		[]any{v1Str, v2Str, e.k1, e.k2}
 }

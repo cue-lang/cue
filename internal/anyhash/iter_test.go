@@ -63,7 +63,7 @@ func TestIterationMutation(t *testing.T) {
 	for k := range m.Keys() {
 		if k == 50 {
 			// Add 1000 new items to trigger potential reallocations.
-			for j := 0; j < 1000; j++ {
+			for j := range 1000 {
 				m.Set(n+j, j)
 			}
 			// Delete some existing items.

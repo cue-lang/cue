@@ -482,7 +482,7 @@ type receiver struct {
 // Logf substitutes args in format. Arguments of type Feature, Value, and Expr
 // are printed in human-friendly formats. The printed string is prefixed and
 // indented with the path associated with the current nodeContext.
-func (n *nodeContext) Logf(format string, args ...interface{}) {
+func (n *nodeContext) Logf(format string, args ...any) {
 	n.ctx.Logf(n.node, format, args...)
 }
 

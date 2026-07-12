@@ -87,7 +87,7 @@ func (p *parser) init(filename string, src []byte, opts []Option) {
 	if p.cfg.Mode&ParseComments != 0 {
 		m = scanner.ScanComments
 	}
-	eh := func(pos token.Pos, msg string, args []interface{}) {
+	eh := func(pos token.Pos, msg string, args []any) {
 		p.errors = errors.Append(p.errors, errors.Newf(pos, msg, args...))
 	}
 	p.scanner.Init(p.file, src, eh, m)
@@ -261,7 +261,7 @@ func (c *commentState) closeClause(p *parser, n ast.Clause) ast.Clause {
 // ----------------------------------------------------------------------------
 // Parsing support
 
-func (p *parser) printTrace(a ...interface{}) {
+func (p *parser) printTrace(a ...any) {
 	const dots = ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
 	const n = len(dots)
 	pos := p.file.Position(p.pos)
@@ -450,7 +450,7 @@ func (p *parser) next() {
 	}
 }
 
-func (p *parser) errf(pos token.Pos, msg string, args ...interface{}) {
+func (p *parser) errf(pos token.Pos, msg string, args ...any) {
 	// ePos := p.file.Position(pos)
 	ePos := pos
 

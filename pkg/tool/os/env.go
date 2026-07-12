@@ -45,13 +45,13 @@ func newGetenvCmd(v cue.Value) (task.Runner, error) {
 	return &getenvCmd{}, nil
 }
 
-func (c *getenvCmd) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *getenvCmd) Run(ctx *task.Context) (res any, err error) {
 	iter, err := ctx.Obj.Fields()
 	if err != nil {
 		return nil, err
 	}
 
-	update := map[string]interface{}{}
+	update := map[string]any{}
 
 	for iter.Next() {
 		name := iter.Selector().Unquoted()
@@ -89,13 +89,13 @@ func newEnvironCmd(v cue.Value) (task.Runner, error) {
 	return &environCmd{}, nil
 }
 
-func (c *environCmd) Run(ctx *task.Context) (res interface{}, err error) {
+func (c *environCmd) Run(ctx *task.Context) (res any, err error) {
 	iter, err := ctx.Obj.Fields()
 	if err != nil {
 		return nil, err
 	}
 
-	update := map[string]interface{}{}
+	update := map[string]any{}
 
 	for _, kv := range os.Environ() {
 		name, str, _ := strings.Cut(kv, "=")

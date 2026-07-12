@@ -25,7 +25,7 @@ import (
 )
 
 // An ErrFunc processes errors.
-type ErrFunc func(pos token.Pos, msg string, args ...interface{})
+type ErrFunc func(pos token.Pos, msg string, args ...any)
 
 // TODO: future development
 //
@@ -121,7 +121,7 @@ type scope struct {
 
 	identFn func(s *scope, n *ast.Ident) bool
 	nameFn  func(name string)
-	errFn   func(p token.Pos, msg string, args ...interface{})
+	errFn   func(p token.Pos, msg string, args ...any)
 
 	// scopeStack is used to reuse scope allocations.
 	// The pointer is shared between the root scope and all its children.

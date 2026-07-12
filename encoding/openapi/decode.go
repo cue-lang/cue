@@ -112,7 +112,7 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 	// }
 
 	if info := v.LookupPath(cue.MakePath(cue.Str("info"))); info.Exists() {
-		decls := []interface{}{}
+		decls := []any{}
 		if st, ok := info.Syntax().(*ast.StructLit); ok {
 			// Remove title.
 			for _, d := range st.Elts {

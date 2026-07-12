@@ -174,7 +174,7 @@ func (fi fakeFileInfo) Mode() os.FileMode {
 
 func (fi fakeFileInfo) ModTime() time.Time { return time.Time{} }
 func (fi fakeFileInfo) IsDir() bool        { return fi.f.isDir }
-func (fi fakeFileInfo) Sys() interface{}   { return nil }
+func (fi fakeFileInfo) Sys() any           { return nil }
 
 type zeroReader struct{}
 

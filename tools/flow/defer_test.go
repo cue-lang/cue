@@ -124,6 +124,6 @@ func (r *stubRunner) IsService() bool {
 }
 
 // Needed to implement task.Runner for registration (though strictly flow.Runner is interface)
-func (r *stubRunner) RunTask(ctx *task.Context) (results interface{}, err error) {
+func (r *stubRunner) RunTask(ctx *task.Context) (results any, err error) {
 	return nil, r.runFunc()
 }

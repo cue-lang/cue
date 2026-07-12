@@ -681,7 +681,7 @@ func astFromGoType(t reflect.Type, allowNullDefault bool, errs *[]errors.Error) 
 func (b *typeBuilder) finalize(topExpr ast.Expr, errs *[]errors.Error) ast.Expr {
 	if len(b.named) == 0 {
 		f := &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: topExpr}}}
-		astutil.Resolve(f, func(_ token.Pos, msg string, args ...interface{}) {
+		astutil.Resolve(f, func(_ token.Pos, msg string, args ...any) {
 			*errs = append(*errs, errors.Newf(token.NoPos, msg, args...))
 		})
 		return topExpr
@@ -707,7 +707,7 @@ func (b *typeBuilder) finalize(topExpr ast.Expr, errs *[]errors.Error) ast.Expr 
 	// Resolve using the struct as the top-level expression so that
 	// identifiers within it can reference the struct's own fields.
 	f := &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: s}}}
-	astutil.Resolve(f, func(_ token.Pos, msg string, args ...interface{}) {
+	astutil.Resolve(f, func(_ token.Pos, msg string, args ...any) {
 		*errs = append(*errs, errors.Newf(token.NoPos, msg, args...))
 	})
 	return s

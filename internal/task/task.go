@@ -84,7 +84,7 @@ func (c *Context) Bytes(field string) []byte {
 	return value
 }
 
-func (c *Context) addErr(v cue.Value, wrap error, format string, args ...interface{}) {
+func (c *Context) addErr(v cue.Value, wrap error, format string, args ...any) {
 
 	err := &taskError{
 		task:    c.Obj,
@@ -262,7 +262,7 @@ type Runner interface {
 
 	// Runner runs given the current value and returns a new value which is to
 	// be unified with the original result.
-	Run(ctx *Context) (results interface{}, err error)
+	Run(ctx *Context) (results any, err error)
 }
 
 // Background indicates whether the task is running in the background after

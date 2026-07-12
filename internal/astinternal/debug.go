@@ -348,14 +348,14 @@ func refIDToName(id int) string {
 	return fmt.Sprintf("ref%03d", id)
 }
 
-func DebugStr(x interface{}) (out string) {
+func DebugStr(x any) (out string) {
 	if n, ok := x.(ast.Node); ok {
-		comments := ""
+		var comments strings.Builder
 		for _, g := range ast.Comments(n) {
-			comments += DebugStr(g)
+			comments.WriteString(DebugStr(g))
 		}
-		if comments != "" {
-			defer func() { out = "<" + comments + out + ">" }()
+		if comments.String() != "" {
+			defer func() { out = "<" + comments.String() + out + ">" }()
 		}
 	}
 	switch v := x.(type) {
@@ -590,12 +590,12 @@ func DebugStr(x interface{}) (out string) {
 		if len(v) == 0 {
 			return ""
 		}
-		out := ""
+		var out strings.Builder
 		for _, d := range v {
-			out += DebugStr(d)
-			out += sep
+			out.WriteString(DebugStr(d))
+			out.WriteString(sep)
 		}
-		return out[:len(out)-len(sep)]
+		return out.String()[:len(out.String())-len(sep)]
 
 	case []ast.Clause:
 		if len(v) == 0 {
@@ -612,23 +612,23 @@ func DebugStr(x interface{}) (out string) {
 		if len(v) == 0 {
 			return ""
 		}
-		out := ""
+		var out strings.Builder
 		for _, d := range v {
-			out += DebugStr(d)
-			out += sep
+			out.WriteString(DebugStr(d))
+			out.WriteString(sep)
 		}
-		return out[:len(out)-len(sep)]
+		return out.String()[:len(out.String())-len(sep)]
 
 	case []*ast.ImportSpec:
 		if len(v) == 0 {
 			return ""
 		}
-		out := ""
+		var out strings.Builder
 		for _, d := range v {
-			out += DebugStr(d)
-			out += sep
+			out.WriteString(DebugStr(d))
+			out.WriteString(sep)
 		}
-		return out[:len(out)-len(sep)]
+		return out.String()[:len(out.String())-len(sep)]
 
 	default:
 		if v == nil {

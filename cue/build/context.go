@@ -33,7 +33,7 @@ import (
 // A Context keeps track of state of building instances and caches work.
 type Context struct {
 	loader    LoadFunc
-	parseFunc func(str string, src interface{}, cfg parser.Config) (*ast.File, error)
+	parseFunc func(str string, src any, cfg parser.Config) (*ast.File, error)
 
 	initialized bool
 
@@ -129,6 +129,6 @@ func Loader(f LoadFunc) Option {
 //
 // In general, the function should respect the parser configuration passed
 // in, and modify it incrementally rather than overwriting it entirely.
-func ParseFile(f func(filename string, src interface{}, cfg parser.Config) (*ast.File, error)) Option {
+func ParseFile(f func(filename string, src any, cfg parser.Config) (*ast.File, error)) Option {
 	return func(c *Context) { c.parseFunc = f }
 }

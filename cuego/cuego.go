@@ -29,7 +29,7 @@ import (
 var DefaultContext = &Context{}
 
 // MustConstrain is like [Constrain], but panics if there is an error.
-func MustConstrain(x interface{}, constraints string) {
+func MustConstrain(x any, constraints string) {
 	if err := Constrain(x, constraints); err != nil {
 		panic(err)
 	}
@@ -40,12 +40,12 @@ func MustConstrain(x interface{}, constraints string) {
 //
 // Constrain works across package boundaries and is typically called in the
 // package defining the type. Use a Context to apply constraints locally.
-func Constrain(x interface{}, constraints string) error {
+func Constrain(x any, constraints string) error {
 	return DefaultContext.Constrain(x, constraints)
 }
 
 // Validate is a wrapper for Validate called on the global context.
-func Validate(x interface{}) error {
+func Validate(x any) error {
 	return DefaultContext.Validate(x)
 }
 
@@ -57,7 +57,7 @@ func Validate(x interface{}) error {
 // Complete does a JSON round trip. This means that data not preserved in such a
 // round trip, such as the location name of a time.Time, is lost after a
 // successful update.
-func Complete(x interface{}) error {
+func Complete(x any) error {
 	return DefaultContext.Complete(x)
 }
 
@@ -74,7 +74,7 @@ type Context struct {
 //
 // Constraints for x can be defined as field tags or through the Register
 // function.
-func (c *Context) Validate(x interface{}) error {
+func (c *Context) Validate(x any) error {
 	a := c.load(x)
 	v, err := fromGoValue(x, false)
 	if err != nil {
@@ -98,7 +98,7 @@ func (c *Context) Validate(x interface{}) error {
 // Complete does a JSON round trip. This means that data not preserved in such a
 // round trip, such as the location name of a time.Time, is lost after a
 // successful update.
-func (c *Context) Complete(x interface{}) error {
+func (c *Context) Complete(x any) error {
 	a := c.load(x)
 	v, err := fromGoValue(x, true)
 	if err != nil {
@@ -111,7 +111,7 @@ func (c *Context) Complete(x interface{}) error {
 	return v.Decode(x)
 }
 
-func (c *Context) load(x interface{}) cue.Value {
+func (c *Context) load(x any) cue.Value {
 	t := reflect.TypeOf(x)
 	if value, ok := c.typeCache.Load(t); ok {
 		return value.(cue.Value)
@@ -129,7 +129,7 @@ func (c *Context) load(x interface{}) cue.Value {
 
 // Constrain associates the given CUE constraints with the type of x or reports
 // an error if the constraints are invalid or not compatible with x.
-func (c *Context) Constrain(x interface{}, constraints string) error {
+func (c *Context) Constrain(x any, constraints string) error {
 	c.load(x) // Ensure fromGoType is called outside of lock.
 
 	mutex.Lock()
@@ -163,7 +163,7 @@ var (
 )
 
 // fromGoValue converts a Go value to CUE
-func fromGoValue(x interface{}, nilIsNull bool) (v cue.Value, err error) {
+func fromGoValue(x any, nilIsNull bool) (v cue.Value, err error) {
 	// TODO: remove the need to have a lock here. We could use a new index (new
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
@@ -191,7 +191,7 @@ func fromGoValue(x interface{}, nilIsNull bool) (v cue.Value, err error) {
 
 }
 
-func fromGoType(x interface{}) cue.Value {
+func fromGoType(x any) cue.Value {
 	// TODO: remove the need to have a lock here. We could use a new index (new
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.

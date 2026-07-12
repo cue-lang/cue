@@ -115,7 +115,7 @@ func TestConvert(t *testing.T) {
 	n36 := mkBigInt(-36)
 	f37 := big.NewFloat(37.0000)
 	testCases := []struct {
-		goVal interface{}
+		goVal any
 		want  string
 	}{{
 		nil, "(_){ _ }",
@@ -179,11 +179,11 @@ func TestConvert(t *testing.T) {
 		}{3, nil},
 		"(struct){\n  A: (int){ 3 }\n}",
 	}, {
-		[]interface{}{}, "(#list){\n}",
+		[]any{}, "(#list){\n}",
 	}, {
-		[]interface{}{nil}, "(#list){\n  0: (_){ _ }\n}",
+		[]any{nil}, "(#list){\n  0: (_){ _ }\n}",
 	}, {
-		map[string]interface{}{"a": 1, "x": nil}, `(struct){
+		map[string]any{"a": 1, "x": nil}, `(struct){
   a: (int){ 1 }
   x: (_){ _ }
 }`,
@@ -291,7 +291,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC), `(string){ "2019-04-01T00:00:00Z" }`,
 	}, {
-		func() interface{} {
+		func() any {
 			type T struct {
 				B int
 			}
@@ -318,7 +318,7 @@ func TestConvert(t *testing.T) {
 			"(struct){\n  foo: (string){ \"bar\" }\n}"},
 		{make(chan int),
 			"(_|_){\n  // [eval] unsupported Go type (chan int)\n}"},
-		{[]interface{}{func() {}},
+		{[]any{func() {}},
 			"(_|_){\n  // [eval] unsupported Go type (func())\n}"},
 		{[]encoding.TextMarshaler{nil},
 			"(#list){\n  0: (_){ _ }\n}"},
@@ -365,7 +365,7 @@ func TestX(t *testing.T) {
 
 func TestConvertType(t *testing.T) {
 	testCases := []struct {
-		goTyp       interface{}
+		goTyp       any
 		want        string
 		expectError bool
 	}{{
@@ -630,16 +630,14 @@ func TestFromGoTypeConcurrent(t *testing.T) {
 	// outside the scope of this fix.
 	var wg sync.WaitGroup
 	for range 10 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			r := runtime.New()
 			ctx := adt.NewContext(r, &adt.Vertex{})
 			_, err := convert.FromGoType(ctx, recursiveA{})
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }

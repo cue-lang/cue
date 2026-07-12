@@ -94,14 +94,14 @@ func (e *cycleError) Error() string {
 
 func (e *cycleError) Path() []string { return nil }
 
-func (e *cycleError) Msg() (format string, args []interface{}) {
+func (e *cycleError) Msg() (format string, args []any) {
 	w := &strings.Builder{}
 	for _, p := range e.path {
 		fmt.Fprintf(w, "\n\ttask %s refers to", p)
 	}
 	fmt.Fprintf(w, "\n\ttask %s", e.path[0])
 
-	return "cyclic task dependency:%v", []interface{}{w.String()}
+	return "cyclic task dependency:%v", []any{w.String()}
 }
 
 func (e *cycleError) Position() token.Pos {

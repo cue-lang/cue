@@ -29,7 +29,7 @@ type runConfig struct {
 func defaultConfig() runConfig {
 	return runConfig{
 		editor: fake.EditorConfig{
-			Settings: map[string]interface{}{
+			Settings: map[string]any{
 				// Shorten the diagnostic delay to speed up test execution (else we'd add
 				// the default delay to each assertion about diagnostics)
 				"diagnosticsDelay": "10ms",
@@ -88,11 +88,11 @@ func CapabilitiesJSON(capabilities []byte) RunOption {
 //
 // As a special case, the env setting must not be provided via Settings: use
 // EnvVars instead.
-type Settings map[string]interface{}
+type Settings map[string]any
 
 func (s Settings) set(opts *runConfig) {
 	if opts.editor.Settings == nil {
-		opts.editor.Settings = make(map[string]interface{})
+		opts.editor.Settings = make(map[string]any)
 	}
 	maps.Copy(opts.editor.Settings, s)
 }

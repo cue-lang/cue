@@ -34,7 +34,7 @@ func (e *callError) Error() string {
 	return fmt.Sprint(e.b)
 }
 
-func (c *CallCtxt) errf(underlying error, format string, args ...interface{}) {
+func (c *CallCtxt) errf(underlying error, format string, args ...any) {
 	var errs errors.Error
 	var code adt.ErrorCode
 	switch x := underlying.(type) {
@@ -52,7 +52,7 @@ func (c *CallCtxt) errf(underlying error, format string, args ...interface{}) {
 	c.Err = &callError{&adt.Bottom{Code: code, Err: errors.Wrap(vErr, errs)}}
 }
 
-func (c *CallCtxt) errcf(code adt.ErrorCode, format string, args ...interface{}) {
+func (c *CallCtxt) errcf(code adt.ErrorCode, format string, args ...any) {
 	err := c.ctx.NewErrf(format, args...)
 	err.Code = code
 	c.Err = &callError{err}

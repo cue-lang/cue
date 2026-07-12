@@ -475,7 +475,7 @@ func (t *Task) addDep(path string, dep *Task) {
 // The changes take effect after the task completes.
 //
 // This method may currently only be called by the runner.
-func (t *Task) Fill(x interface{}) error {
+func (t *Task) Fill(x any) error {
 	expr := convert.FromGoValue(t.ctxt, x, true)
 	if t.update == nil {
 		t.update = expr

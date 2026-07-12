@@ -313,12 +313,12 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 	return f
 }
 
-func (d *decoder) errf(n cue.Value, format string, args ...interface{}) ast.Expr {
+func (d *decoder) errf(n cue.Value, format string, args ...any) ast.Expr {
 	d.warnf(n.Pos(), format, args...)
 	return &ast.BadExpr{From: n.Pos()}
 }
 
-func (d *decoder) warnf(p token.Pos, format string, args ...interface{}) {
+func (d *decoder) warnf(p token.Pos, format string, args ...any) {
 	d.addErr(errors.Newf(p, format, args...))
 }
 

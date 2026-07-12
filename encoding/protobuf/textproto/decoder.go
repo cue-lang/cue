@@ -118,7 +118,7 @@ func (d *decoder) addErr(err error) {
 	d.errs = errors.Append(d.errs, errors.Promote(err, "textproto"))
 }
 
-func (d *decoder) addErrf(pos pbast.Position, format string, args ...interface{}) {
+func (d *decoder) addErrf(pos pbast.Position, format string, args ...any) {
 	err := errors.Newf(d.protoPos(pos), "textproto: "+format, args...)
 	d.errs = errors.Append(d.errs, err)
 }

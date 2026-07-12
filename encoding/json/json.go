@@ -75,7 +75,7 @@ func extract(path string, b []byte) (ast.Expr, error) {
 		if pos := errors.Positions(err); len(pos) > 0 {
 			p = pos[0]
 		}
-		var x interface{}
+		var x any
 		err := json.Unmarshal(b, &x)
 
 		// If encoding/json has a position, prefer that, as it relates to json.Unmarshal's error message.

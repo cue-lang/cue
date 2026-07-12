@@ -41,7 +41,7 @@ func TestValidate(t *testing.T) {
 	fail := "some error"
 	testCases := []struct {
 		name        string
-		value       interface{}
+		value       any
 		constraints string
 		err         string
 	}{{
@@ -117,8 +117,8 @@ func TestComplete(t *testing.T) {
 	_ = one
 	testCases := []struct {
 		name        string
-		value       interface{}
-		result      interface{}
+		value       any
+		result      any
 		constraints string
 		err         string
 	}{{
@@ -193,8 +193,8 @@ func TestComplete(t *testing.T) {
 func TestEncode(t *testing.T) {
 	testCases := []struct {
 		in   string
-		dst  interface{}
-		want interface{}
+		dst  any
+		want any
 	}{{
 		in:   "4",
 		dst:  new(int),
@@ -225,13 +225,13 @@ func TestEncode(t *testing.T) {
 
 func TestDecode(t *testing.T) {
 	testCases := []struct {
-		in   interface{}
+		in   any
 		want string
 	}{{
 		in:   "str",
 		want: `"str"`,
 	}, {
-		in: func() interface{} {
+		in: func() any {
 			type T struct {
 				B int
 			}
@@ -246,7 +246,7 @@ func TestDecode(t *testing.T) {
 	B: 0
 }`,
 	}, {
-		in: func() interface{} {
+		in: func() any {
 			type T struct {
 				B int
 			}

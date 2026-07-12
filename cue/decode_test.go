@@ -38,7 +38,7 @@ func TestDecode(t *testing.T) {
 		A int `json:"A"`
 		B int `json:"B"`
 		C int `json:"C"`
-		M map[string]interface{}
+		M map[string]any
 		*Nested
 	}
 	one := 1
@@ -48,14 +48,14 @@ func TestDecode(t *testing.T) {
 	}
 	testCases := []struct {
 		value string
-		dst   interface{}
-		want  interface{}
+		dst   any
+		want  any
 		err   string
 	}{{
 		value: `1`,
 		err:   "cannot decode into unsettable value",
 	}, {
-		dst:   new(interface{}),
+		dst:   new(any),
 		value: `_|_`,
 		err:   "explicit error (_|_ literal) in source",
 	}, {
@@ -125,7 +125,7 @@ func TestDecode(t *testing.T) {
 		value: `{a:1,m:{a: 3}}`,
 		dst:   &fields{},
 		want: fields{A: 1,
-			M: map[string]interface{}{"a": int64(3)}},
+			M: map[string]any{"a": int64(3)}},
 	}, {
 		// indirect int
 		value: `{p: 1}`,
@@ -186,14 +186,14 @@ func TestDecode(t *testing.T) {
 		want:  map[uint]int{1: 1, 2: 2, 3: 3},
 	}, {
 		value: `{a: 1, b: 2, c: true, d: e: 2}`,
-		dst:   &map[string]interface{}{},
-		want: map[string]interface{}{
+		dst:   &map[string]any{},
+		want: map[string]any{
 			"a": int64(1), "b": int64(2), "c": true,
-			"d": map[string]interface{}{"e": int64(2)}},
+			"d": map[string]any{"e": int64(2)}},
 	}, {
 		value: `{a: b: *2 | int}`,
-		dst:   &map[string]interface{}{},
-		want:  map[string]interface{}{"a": map[string]interface{}{"b": int64(2)}},
+		dst:   &map[string]any{},
+		want:  map[string]any{"a": map[string]any{"b": int64(2)}},
 	}, {
 		value: `{a: 1, b: 2, c: true}`,
 		dst:   &map[string]int{},
@@ -209,10 +209,10 @@ func TestDecode(t *testing.T) {
 	}, {
 		// Issue #1401
 		value: `a: b: _ | *[0, ...]`,
-		dst:   &map[string]interface{}{},
-		want: map[string]interface{}{
-			"a": map[string]interface{}{
-				"b": []interface{}{int64(0)},
+		dst:   &map[string]any{},
+		want: map[string]any{
+			"a": map[string]any{
+				"b": []any{int64(0)},
 			},
 		},
 	}, {
@@ -244,27 +244,27 @@ func TestDecode(t *testing.T) {
 		err:   "intPtr: cannot convert non-concrete value int",
 	}, {
 		value: `[]`,
-		dst:   new(interface{}),
-		want:  []interface{}{},
+		dst:   new(any),
+		want:  []any{},
 	}, {
 		// large integer which doesn't fit into an int32 or int on 32-bit platforms
 		value: `8000000000`,
-		dst:   new(interface{}),
+		dst:   new(any),
 		want:  int64(8000000000),
 	}, {
 		// same as the above, but negative
 		value: `-8000000000`,
-		dst:   new(interface{}),
+		dst:   new(any),
 		want:  int64(-8000000000),
 	}, {
 		// even larger integer which doesn't fit into an int64
 		value: `9500000000000000000`,
-		dst:   new(interface{}),
+		dst:   new(any),
 		want:  bigInt("9500000000000000000"),
 	}, {
 		// same as the above, but negative
 		value: `-9500000000000000000`,
-		dst:   new(interface{}),
+		dst:   new(any),
 		want:  bigInt("-9500000000000000000"),
 	}, {
 		value: `9500000000000000000`,
@@ -287,15 +287,15 @@ func TestDecode(t *testing.T) {
 	}, {
 		// large float which doesn't fit into a float32
 		value: `1.797693134e+308`,
-		dst:   new(interface{}),
+		dst:   new(any),
 		want:  float64(1.797693134e+308),
 	}, {
 		value: `1.99769313499e+508`,
-		dst:   new(interface{}),
+		dst:   new(any),
 		want:  bigFloat(`1.99769313499e+508`),
 	}, {
 		value: `-1.99769313499e+508`,
-		dst:   new(interface{}),
+		dst:   new(any),
 		want:  bigFloat(`-1.99769313499e+508`),
 	}, {
 		value: `1.99769313499e+508`,

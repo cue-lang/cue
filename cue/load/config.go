@@ -281,7 +281,7 @@ type Config struct {
 	// An application may supply a custom implementation of ParseFile to change
 	// the effective file contents or the behavior of the parser, or to modify
 	// the syntax tree.
-	ParseFile func(name string, src interface{}, cfg parser.Config) (*ast.File, error)
+	ParseFile func(name string, src any, cfg parser.Config) (*ast.File, error)
 
 	// Overlay provides a mapping of absolute file paths to file contents,
 	// which are overlaid on top of the host operating system when loading files.

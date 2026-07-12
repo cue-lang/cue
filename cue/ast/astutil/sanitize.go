@@ -145,7 +145,7 @@ type sanitizer struct {
 	errs errors.Error
 }
 
-func (z *sanitizer) errf(p token.Pos, msg string, args ...interface{}) {
+func (z *sanitizer) errf(p token.Pos, msg string, args ...any) {
 	z.errs = errors.Append(z.errs, errors.Newf(p, msg, args...))
 }
 

@@ -48,9 +48,7 @@ func TestDefaultConcurrent(t *testing.T) {
 	// Without the fix, this would cause a data race on the Conjuncts slice.
 	var wg sync.WaitGroup
 	for range 100 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for range 100 {
 				d, ok := a.Default()
 				if !ok {
@@ -68,7 +66,7 @@ func TestDefaultConcurrent(t *testing.T) {
 					return
 				}
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }

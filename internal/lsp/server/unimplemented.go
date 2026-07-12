@@ -158,7 +158,7 @@ func (s *server) SemanticTokensFull(ctx context.Context, params *protocol.Semant
 	return nil, notImplemented("SemanticTokens")
 }
 
-func (s *server) SemanticTokensFullDelta(context.Context, *protocol.SemanticTokensDeltaParams) (interface{}, error) {
+func (s *server) SemanticTokensFullDelta(context.Context, *protocol.SemanticTokensDeltaParams) (any, error) {
 	return nil, notImplemented("SemanticTokensFullDelta")
 }
 

@@ -56,7 +56,7 @@ func TestGetenv(t *testing.T) {
 		CUEOSTESTNULL:  int | null
 	}`
 
-	want := map[string]interface{}{
+	want := map[string]any{
 		"CUEOSTESTMOOD": ast.NewString("yippie"),
 		"CUEOSTESTTRUE": ast.NewBool(true),
 		"CUEOSTESTFALSE": &ast.BinaryExpr{
@@ -97,7 +97,7 @@ func TestGetenv(t *testing.T) {
 			cmpopts.IgnoreFields(ast.BasicLit{}, "ValuePos"),
 			cmpopts.IgnoreUnexported(ast.BasicLit{}, ast.BinaryExpr{}),
 			// For ignoring addinonal entries from os.Environ:
-			cmpopts.IgnoreMapEntries(func(s string, x interface{}) bool {
+			cmpopts.IgnoreMapEntries(func(s string, x any) bool {
 				_, ok := want[s]
 				return !ok
 			}),

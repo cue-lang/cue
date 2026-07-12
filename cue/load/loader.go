@@ -66,7 +66,7 @@ func (l *loader) abs(filename string) string {
 	return pkgpath.Join([]string{l.cfg.Dir, filename}, l.cfg.pathOS)
 }
 
-func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
+func (l *loader) errPkgf(importPos []token.Pos, format string, args ...any) *PackageError {
 	err := &PackageError{
 		ImportStack: l.stk.Copy(),
 		Message:     errors.NewMessagef(format, args...),

@@ -43,7 +43,7 @@ type File struct {
 	BoolTags map[string]bool `json:"boolTags,omitempty"`
 
 	ExcludeReason errors.Error `json:"-"`
-	Source        interface{}  `json:"-"` // TODO: swap out with concrete type.
+	Source        any          `json:"-"` // TODO: swap out with concrete type.
 }
 
 // A Encoding indicates a file format for representing a program.

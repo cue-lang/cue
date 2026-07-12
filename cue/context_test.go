@@ -147,7 +147,7 @@ bar: [
 func TestEncodeType(t *testing.T) {
 	type testCase struct {
 		name    string
-		x       interface{}
+		x       any
 		wantErr string
 		out     string
 	}

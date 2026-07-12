@@ -28,8 +28,8 @@ type ClientCloser interface {
 type connSender interface {
 	io.Closer
 
-	Notify(ctx context.Context, method string, params interface{}) error
-	Call(ctx context.Context, method string, params, result interface{}) error
+	Notify(ctx context.Context, method string, params any) error
+	Call(ctx context.Context, method string, params, result any) error
 }
 
 type clientDispatcher struct {
@@ -54,11 +54,11 @@ func (c clientConn) Close() error {
 	return c.conn.Close()
 }
 
-func (c clientConn) Notify(ctx context.Context, method string, params interface{}) error {
+func (c clientConn) Notify(ctx context.Context, method string, params any) error {
 	return c.conn.Notify(ctx, method, params)
 }
 
-func (c clientConn) Call(ctx context.Context, method string, params interface{}, result interface{}) error {
+func (c clientConn) Call(ctx context.Context, method string, params any, result any) error {
 	id, err := c.conn.Call(ctx, method, params, result)
 	if ctx.Err() != nil {
 		cancelCall(ctx, c, id)
@@ -125,7 +125,7 @@ func CancelHandler(handler jsonrpc2.Handler) jsonrpc2.Handler {
 			// be careful about racing between the two paths.
 			// TODO(iancottrell): Add a test that watches the stream and verifies the response
 			// for the cancelled request flows.
-			replyWithDetachedContext := func(ctx context.Context, resp interface{}, err error) error {
+			replyWithDetachedContext := func(ctx context.Context, resp any, err error) error {
 				// https://microsoft.github.io/language-server-protocol/specifications/specification-current/#cancelRequest
 				if ctx.Err() != nil && err == nil {
 					err = RequestCancelledError
@@ -150,7 +150,7 @@ func CancelHandler(handler jsonrpc2.Handler) jsonrpc2.Handler {
 	}
 }
 
-func Call(ctx context.Context, conn jsonrpc2.Conn, method string, params interface{}, result interface{}) error {
+func Call(ctx context.Context, conn jsonrpc2.Conn, method string, params any, result any) error {
 	id, err := conn.Call(ctx, method, params, result)
 	if ctx.Err() != nil {
 		cancelCall(ctx, clientConn{conn}, id)

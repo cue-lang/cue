@@ -140,7 +140,7 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 			builtin:            b,
 		}
 		defer func() {
-			var errVal interface{} = c.Err
+			var errVal any = c.Err
 			if err := recover(); err != nil {
 				errVal = err
 			}
@@ -191,7 +191,7 @@ func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
 
 }
 
-func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
+func processErr(call *CallCtxt, errVal any, ret adt.Expr) adt.Expr {
 	switch err := errVal.(type) {
 	case nil:
 	case ValidationError:

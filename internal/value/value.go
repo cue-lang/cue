@@ -95,7 +95,7 @@ func UnifyBuiltin(v cue.Value, kind string) cue.Value {
 	return v.Unify(ctx.Encode(a))
 }
 
-func FromGoValue(r *cue.Context, x interface{}, nilIsTop bool) cue.Value {
+func FromGoValue(r *cue.Context, x any, nilIsTop bool) cue.Value {
 	rt := (*runtime.Runtime)(r)
 	rt.Init()
 	ctx := eval.NewContext(rt, nil)
@@ -104,7 +104,7 @@ func FromGoValue(r *cue.Context, x interface{}, nilIsTop bool) cue.Value {
 	return r.Encode(n)
 }
 
-func FromGoType(r *cue.Context, x interface{}) cue.Value {
+func FromGoType(r *cue.Context, x any) cue.Value {
 	rt := (*runtime.Runtime)(r)
 	rt.Init()
 	ctx := eval.NewContext(rt, nil)

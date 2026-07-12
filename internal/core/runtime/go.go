@@ -36,7 +36,7 @@ func (x *index) StoreType(t reflect.Type, v *adt.Vertex) {
 	x.typeCache.Store(t, v)
 }
 
-func (x *index) LoadType(t reflect.Type) (v interface{}, ok bool) {
+func (x *index) LoadType(t reflect.Type) (v any, ok bool) {
 	v, ok = x.typeCache.Load(t)
 	return v, ok
 }

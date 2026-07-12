@@ -203,7 +203,7 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 	return c.make(v)
 }
 
-func errFn(pos token.Pos, msg string, args ...interface{}) {}
+func errFn(pos token.Pos, msg string, args ...any) {}
 
 // resolveExpr binds unresolved expressions to values in the expression or v.
 func resolveExpr(ctx *adt.OpContext, v Value, x ast.Expr) adt.Value {

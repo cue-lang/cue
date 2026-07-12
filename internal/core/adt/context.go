@@ -351,7 +351,7 @@ func (c *OpContext) Err() *Bottom {
 	return b
 }
 
-func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...interface{}) {
+func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...any) {
 	err := c.NewPosf(pos, msg, args...)
 	c.addErr(code, err)
 }
@@ -382,7 +382,7 @@ func (c *OpContext) AddErr(err errors.Error) *Bottom {
 
 // NewErrf creates a *Bottom value and returns it. The returned uses the
 // current source as the point of origin of the error.
-func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
+func (c *OpContext) NewErrf(format string, args ...any) *Bottom {
 	// TODO: consider renaming ot NewBottomf: this is now confusing as we also
 	// have Newf.
 	err := c.Newf(format, args...)
@@ -395,7 +395,7 @@ func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
 }
 
 // AddErrf records an error in OpContext. It returns errors collected so far.
-func (c *OpContext) AddErrf(format string, args ...interface{}) *Bottom {
+func (c *OpContext) AddErrf(format string, args ...any) *Bottom {
 	return c.AddErr(c.Newf(format, args...))
 }
 
@@ -567,7 +567,7 @@ func (c *OpContext) Validate(check Conjunct, value Value) *Bottom {
 
 // concrete returns the concrete value of x after evaluating it.
 // msg is used to mention the context in which an error occurred, if any.
-func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {
+func (c *OpContext) concrete(env *Environment, x Expr, msg any) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
 	state := Flags{
@@ -990,7 +990,7 @@ func (c *OpContext) typeError(v Value, k Kind) {
 	}
 }
 
-func (c *OpContext) typeErrorAs(v Value, k Kind, as interface{}) {
+func (c *OpContext) typeErrorAs(v Value, k Kind, as any) {
 	if as == nil {
 		c.typeError(v, k)
 		return
@@ -1129,7 +1129,7 @@ func (c *OpContext) list(v Value) *Vertex {
 
 var zero = &Num{K: NumberKind}
 
-func (c *OpContext) Num(v Value, as interface{}) *Num {
+func (c *OpContext) Num(v Value, as any) *Num {
 	v = Unwrap(v)
 	if isError(v) {
 		return zero
@@ -1187,7 +1187,7 @@ func (c *OpContext) BoolValue(v Value) bool {
 	return c.boolValue(v, nil)
 }
 
-func (c *OpContext) boolValue(v Value, as interface{}) bool {
+func (c *OpContext) boolValue(v Value, as any) bool {
 	v = Unwrap(v)
 	if isError(v) {
 		return false
@@ -1218,11 +1218,11 @@ func (c *OpContext) ToString(v Value) string {
 
 }
 
-func (c *OpContext) stringValue(v Value, as interface{}) string {
+func (c *OpContext) stringValue(v Value, as any) string {
 	return c.toStringValue(v, StringKind, as)
 }
 
-func (c *OpContext) toStringValue(v Value, k Kind, as interface{}) string {
+func (c *OpContext) toStringValue(v Value, k Kind, as any) string {
 	v = Unwrap(v)
 	if isError(v) {
 		return ""
@@ -1262,7 +1262,7 @@ func bytesToString(b []byte) string {
 	return strings.ToValidUTF8(string(b), string(utf8.RuneError))
 }
 
-func (c *OpContext) bytesValue(v Value, as interface{}) []byte {
+func (c *OpContext) bytesValue(v Value, as any) []byte {
 	v = Unwrap(v)
 	if isError(v) {
 		return nil

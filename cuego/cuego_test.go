@@ -35,7 +35,7 @@ func TestValidate(t *testing.T) {
 	fail := "some error"
 	testCases := []struct {
 		name        string
-		value       interface{}
+		value       any
 		constraints string
 		err         string
 	}{{
@@ -97,8 +97,8 @@ func TestUpdate(t *testing.T) {
 	_ = one
 	testCases := []struct {
 		name        string
-		value       interface{}
-		result      interface{}
+		value       any
+		result      any
 		constraints string
 		err         string
 	}{{

@@ -92,6 +92,6 @@ func (c BuiltinCallContext) Expr(i int) Expr {
 	return x
 }
 
-func (c BuiltinCallContext) Errf(format string, args ...interface{}) *Bottom {
+func (c BuiltinCallContext) Errf(format string, args ...any) *Bottom {
 	return c.ctx.NewErrf(format, args...)
 }

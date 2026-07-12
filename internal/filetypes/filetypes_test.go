@@ -26,7 +26,7 @@ import (
 	"cuelang.org/go/cue/errors"
 )
 
-func check(t *testing.T, want, x interface{}, err error) {
+func check(t *testing.T, want, x any, err error) {
 	t.Helper()
 	if err != nil {
 		x = errors.String(err.(errors.Error))
@@ -41,7 +41,7 @@ func TestFromFile(t *testing.T) {
 		name string
 		in   build.File
 		mode Mode
-		out  interface{}
+		out  any
 	}{{
 		name: "must specify encoding",
 		in:   build.File{},
@@ -296,7 +296,7 @@ func TestParseFile(t *testing.T) {
 	testCases := []struct {
 		in   string
 		mode Mode
-		out  interface{}
+		out  any
 	}{{
 		in:   "file.json",
 		mode: Input,
@@ -462,7 +462,7 @@ func TestParseFile(t *testing.T) {
 func TestParseArgs(t *testing.T) {
 	testCases := []struct {
 		in  string
-		out interface{}
+		out any
 	}{{
 		in: "foo.json baz.yaml",
 		out: []*build.File{

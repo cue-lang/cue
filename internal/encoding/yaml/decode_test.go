@@ -783,7 +783,7 @@ a:
 	},
 }
 
-type M map[interface{}]interface{}
+type M map[any]any
 
 func cueStr(node ast.Node) string {
 	if node == nil {

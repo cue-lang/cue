@@ -65,7 +65,7 @@ func New[Ctx *cue.Runtime | *cue.Context](ctx Ctx, c *Config) *Codec {
 //	    B int `cue:"c-a" json:"b,omitempty"`
 //	    C int `cue:"a+b" json:"c,omitempty"`
 //	}
-func (c *Codec) ExtractType(x interface{}) (cue.Value, error) {
+func (c *Codec) ExtractType(x any) (cue.Value, error) {
 	// ExtractType cannot introduce new fields on repeated calls. We could
 	// consider optimizing the lock usage based on this property.
 	c.mutex.Lock()
@@ -79,7 +79,7 @@ func (c *Codec) ExtractType(x interface{}) (cue.Value, error) {
 // Decode converts x to a CUE value.
 //
 // If x is of type [reflect.Value] it will convert the value represented by x.
-func (c *Codec) Decode(x interface{}) (cue.Value, error) {
+func (c *Codec) Decode(x any) (cue.Value, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -88,7 +88,7 @@ func (c *Codec) Decode(x interface{}) (cue.Value, error) {
 }
 
 // Encode converts v to a Go value.
-func (c *Codec) Encode(v cue.Value, x interface{}) error {
+func (c *Codec) Encode(v cue.Value, x any) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
@@ -98,7 +98,7 @@ func (c *Codec) Encode(v cue.Value, x interface{}) error {
 var defaultCodec = New(cuecontext.New(), nil)
 
 // Validate calls Validate on a default Codec for the type of x.
-func Validate(x interface{}) error {
+func Validate(x any) error {
 	c := defaultCodec
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
@@ -123,7 +123,7 @@ func Validate(x interface{}) error {
 //
 // The given value must be created using the same Runtime with which c was
 // initialized.
-func (c *Codec) Validate(v cue.Value, x interface{}) error {
+func (c *Codec) Validate(v cue.Value, x any) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
@@ -149,7 +149,7 @@ func (c *Codec) Validate(v cue.Value, x interface{}) error {
 // Complete does a JSON round trip. This means that data not preserved in such a
 // round trip, such as the location name of a [time.Time], is lost after a
 // successful update.
-func (c *Codec) Complete(v cue.Value, x interface{}) error {
+func (c *Codec) Complete(v cue.Value, x any) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
@@ -166,7 +166,7 @@ func (c *Codec) Complete(v cue.Value, x interface{}) error {
 	return w.Decode(x)
 }
 
-func fromGoValue(r *cue.Context, x interface{}, allowDefault bool) (cue.Value, error) {
+func fromGoValue(r *cue.Context, x any, allowDefault bool) (cue.Value, error) {
 	v := value.FromGoValue(r, x, allowDefault)
 	if err := v.Err(); err != nil {
 		return v, err
@@ -174,7 +174,7 @@ func fromGoValue(r *cue.Context, x interface{}, allowDefault bool) (cue.Value, e
 	return v, nil
 }
 
-func fromGoType(r *cue.Context, x interface{}) (cue.Value, error) {
+func fromGoType(r *cue.Context, x any) (cue.Value, error) {
 	v := value.FromGoType(r, x)
 	if err := v.Err(); err != nil {
 		return v, err

@@ -227,7 +227,7 @@ func (b *Extractor) addErr(err error) {
 // AddFile assumes that the proto file compiles with protoc and may not report
 // an error if it does not. Imports are resolved using the paths defined in
 // Config.
-func (b *Extractor) AddFile(filename string, src interface{}) error {
+func (b *Extractor) AddFile(filename string, src any) error {
 	if b.done {
 		err := errors.Newf(token.NoPos,
 			"protobuf: cannot call AddFile: Instances was already called")

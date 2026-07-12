@@ -40,7 +40,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string, def
 	fail := func(err error) (module.Version, module.SourceLoc, []module.SourceLoc, error) {
 		return module.Version{}, module.SourceLoc{}, nil, err
 	}
-	failf := func(format string, args ...interface{}) (module.Version, module.SourceLoc, []module.SourceLoc, error) {
+	failf := func(format string, args ...any) (module.Version, module.SourceLoc, []module.SourceLoc, error) {
 		return fail(fmt.Errorf(format, args...))
 	}
 	// Note: we don't care about the package qualifier at this point

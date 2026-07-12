@@ -37,7 +37,7 @@ import (
 	"cuelang.org/go/internal/source"
 )
 
-func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, err error) {
+func (s *Extractor) parse(filename string, src any) (p *protoConverter, err error) {
 	if filename == "" {
 		return nil, errors.Newf(token.NoPos, "empty filename")
 	}

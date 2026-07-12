@@ -404,7 +404,6 @@ func (r *inlineRunner) runArchive() {
 	}
 
 	for _, root := range roots {
-		root := root
 		name := r.subTestName(root, allRecords)
 		r.t.Run(name, func(t *testing.T) {
 			r.runInline(r.sinkOrSub(t), root, val, allRecords)

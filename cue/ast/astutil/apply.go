@@ -103,13 +103,13 @@ type cursor struct {
 	file     *info
 	parent   Cursor
 	node     ast.Node
-	typ      interface{} // the type of the node
-	index    int         // position of any of the sub types.
+	typ      any // the type of the node
+	index    int // position of any of the sub types.
 	replaced bool
 	modified bool
 }
 
-func newCursor(parent Cursor, n ast.Node, typ interface{}) *cursor {
+func newCursor(parent Cursor, n ast.Node, typ any) *cursor {
 	return &cursor{
 		parent: parent,
 		typ:    typ,

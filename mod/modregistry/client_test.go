@@ -442,7 +442,7 @@ func (fi txtarFileInfo) Mode() os.FileMode {
 
 func (fi txtarFileInfo) ModTime() time.Time { return time.Time{} }
 func (fi txtarFileInfo) IsDir() bool        { return false }
-func (fi txtarFileInfo) Sys() interface{}   { return nil }
+func (fi txtarFileInfo) Sys() any           { return nil }
 
 func TestMirrorWithReferrers(t *testing.T) {
 	const testMod = `

@@ -1017,7 +1017,7 @@ func (e *Editor) CodeActions(ctx context.Context, loc protocol.Location, diagnos
 	return e.Server.CodeAction(ctx, params)
 }
 
-func (e *Editor) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCommandParams) (interface{}, error) {
+func (e *Editor) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCommandParams) (any, error) {
 	if e.Server == nil {
 		return nil, nil
 	}

@@ -27,7 +27,7 @@ func Execute(templ string, data cue.Value) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var x interface{}
+	var x any
 	if err := data.Decode(&x); err != nil {
 		return "", err
 	}

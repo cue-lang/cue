@@ -25,7 +25,7 @@ import (
 func Test_readSource(t *testing.T) {
 	type args struct {
 		filename string
-		src      interface{}
+		src      any
 	}
 	tests := []struct {
 		name    string
@@ -50,7 +50,7 @@ func Test_readSource(t *testing.T) {
 func TestParseFile(t *testing.T) {
 	type args struct {
 		filename string
-		src      interface{}
+		src      any
 		options  []Option
 	}
 	tests := []struct {
@@ -76,7 +76,7 @@ func TestParseFile(t *testing.T) {
 func TestParseExprFrom(t *testing.T) {
 	type args struct {
 		filename string
-		src      interface{}
+		src      any
 		mode     Option
 	}
 	tests := []struct {

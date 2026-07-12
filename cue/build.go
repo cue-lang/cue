@@ -54,7 +54,7 @@ func (r *Runtime) complete(p *build.Instance, v *adt.Vertex) (*Instance, error) 
 //
 // Deprecated: use [Context] with methods like [Context.CompileString] or [Context.CompileBytes].
 // The use of [Instance] is being phased out.
-func (r *hiddenRuntime) Compile(filename string, source interface{}) (*Instance, error) {
+func (r *hiddenRuntime) Compile(filename string, source any) (*Instance, error) {
 	cfg := &runtime.Config{Filename: filename}
 	v, p := r.runtime().Compile(cfg, source)
 	return r.complete(p, v)

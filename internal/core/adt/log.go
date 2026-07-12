@@ -34,14 +34,14 @@ import (
 //
 // It is advisable for each use of Assert to document how the error is expected
 // to be handled down the line.
-func Assertf(c *OpContext, b bool, format string, args ...interface{}) {
+func Assertf(c *OpContext, b bool, format string, args ...any) {
 	if c.Strict && !b {
 		panic(fmt.Sprintf("assertion failed: "+format, args...))
 	}
 }
 
 // Assertf either panics or reports an error to c if the condition is not met.
-func (c *OpContext) Assertf(pos token.Pos, b bool, format string, args ...interface{}) {
+func (c *OpContext) Assertf(pos token.Pos, b bool, format string, args ...any) {
 	if !b {
 		if c.Strict {
 			panic(fmt.Sprintf("assertion failed: "+format, args...))
@@ -90,7 +90,7 @@ func (c *OpContext) Indentf(v *Vertex, format string, args ...any) (s nestString
 	return nestString(name), c.logID
 }
 
-func (c *OpContext) RewriteArgs(args ...interface{}) {
+func (c *OpContext) RewriteArgs(args ...any) {
 	for i, a := range args {
 		switch x := a.(type) {
 		case Node:
@@ -101,7 +101,7 @@ func (c *OpContext) RewriteArgs(args ...interface{}) {
 	}
 }
 
-func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
+func (c *OpContext) Logf(v *Vertex, format string, args ...any) {
 	if c.LogEval == 0 {
 		// The Go compiler as of 1.24 is not very clever with no-op function calls;
 		// any arguments passed to ...args above escape to the heap and allocate.

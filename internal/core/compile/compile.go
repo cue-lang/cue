@@ -149,7 +149,7 @@ func (c *compiler) reset() {
 	c.errs = nil
 }
 
-func (c *compiler) errf(n ast.Node, format string, args ...interface{}) *adt.Bottom {
+func (c *compiler) errf(n ast.Node, format string, args ...any) *adt.Bottom {
 	err := &compilerError{
 		n:       n,
 		path:    c.path(),

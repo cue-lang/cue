@@ -1,0 +1,48 @@
+# Module operations against a registry that rejects unauthenticated
+# requests should produce errors mentioning the registry host, so that
+# the user can tell which registry was being used.
+# Issue: the errors made no mention of the registry, and the publish
+# error also omitted the module and mentioned the scratch config, an
+# implementation detail.
+
+memregistry -auth=foo:bar MEMREGISTRY
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+env DOCKER_CONFIG=$WORK/dockerconfig
+
+cd example
+
+# Publishing a module version.
+# TODO: the error should mention the module and the registry host,
+# and skip the pointless mention of the scratch config.
+! exec cue mod publish v0.0.1
+cmpenv stderr ../want-stderr-publish
+
+# Fetching a specific module version.
+# TODO: the error should mention the registry host.
+! exec cue mod get foo.example/bar@v0.1.0
+cmpenv stderr ../want-stderr-get-version
+
+# Fetching the latest version of a module, which lists the versions
+# available in the registry.
+# TODO: the error should mention the registry host.
+! exec cue mod get foo.example/bar@latest
+cmpenv stderr ../want-stderr-get-latest
+
+-- want-stderr-publish --
+cannot put module: cannot make scratch config: 401 Unauthorized: unauthorized: authentication required: no credentials
+-- want-stderr-get-version --
+cannot determine new module graph: foo.example/bar@v0.1.0: module foo.example/bar@v0.1.0: 401 Unauthorized: unauthorized: authentication required: no credentials
+-- want-stderr-get-latest --
+module foo.example/bar: 401 Unauthorized: unauthorized: authentication required: no credentials
+-- dockerconfig/config.json --
+{}
+-- example/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.9.0"
+
+source: kind: "self"
+
+-- example/top.cue --
+package main
+
+"example.com@v0": "v0.0.1"

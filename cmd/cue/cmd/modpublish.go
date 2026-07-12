@@ -259,7 +259,13 @@ func runModUpload(cmd *Command, args []string) error {
 
 	rclient := modregistry.NewClientWithResolver(resolver)
 	if err := rclient.PutModuleWithMetadata(ctx, mv, zf, info.Size(), meta); err != nil {
-		return fmt.Errorf("cannot put module: %v", err)
+		// Mention the registry host so that the user can tell where the
+		// module was being published, e.g. when authorization fails.
+		// Note that the host may be empty if resolving the module failed.
+		if resolver.registryName != "" {
+			return fmt.Errorf("cannot put module %q to registry %q: %v", mv, resolver.registryName, err)
+		}
+		return fmt.Errorf("cannot put module %q: %v", mv, err)
 	}
 	ref := ociref.Reference{
 		Host:       resolver.registryName,

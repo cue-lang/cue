@@ -373,9 +373,12 @@ func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule, meta *M
 	}
 	// Upload the actual module's content
 	// TODO should we use a custom media type for this?
+	// Note: we don't wrap this error, as mentioning the scratch config
+	// is almost entirely pointless to end users; what matters is the
+	// underlying error, such as failing to authenticate to the registry.
 	configDesc, err := c.scratchConfig(ctx, loc, moduleArtifactType)
 	if err != nil {
-		return fmt.Errorf("cannot make scratch config: %v", err)
+		return err
 	}
 	manifest := &ocispec.Manifest{
 		Versioned: specs.Versioned{

@@ -167,8 +167,10 @@ func (v *validator) validate(x *Vertex) {
 	} else if v.checkConcrete() {
 		x = x.Default()
 		if !IsConcrete(x) {
-			x := x.Value()
-			err := v.ctx.Newf("incomplete value %v", x)
+			err := v.ctx.Newf("incomplete value %v", x.Value())
+			for c := range x.LeafConjuncts() {
+				err.AddPosition(c.Elem())
+			}
 			v.addPositions(err)
 			v.add(&Bottom{
 				Code: IncompleteError,

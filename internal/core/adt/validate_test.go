@@ -214,7 +214,8 @@ func TestValidate(t *testing.T) {
 			}
 			`,
 		out: `incomplete
-				x.a: incomplete value 1 | 2`,
+				x.a: incomplete value 1 | 2:
+				    test:3:8`,
 	}, {
 		name: "required field not present",
 		cfg:  &adt.ValidateConfig{Final: true},

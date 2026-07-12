@@ -3,7 +3,10 @@ cmp stderr expect-stderr
 -- expect-stderr --
 b.str: incomplete value string:
     ./partial.cue:8:7
+dfl: incomplete value "b" | "a" | string
 sum: incomplete value 1 | 2
+two: incomplete value string:
+    ./partial.cue:21:6
 b.idx: invalid non-ground value string (must be concrete string):
     ./partial.cue:8:7
 -- partial.cue --
@@ -22,3 +25,10 @@ a: {
 	c: 4
 }
 c: b & {str: "b"}
+
+// Issue #2507: errors for non-concrete values should report the positions
+// of all contributing conjuncts, including for conflicting defaults.
+dfl: *"b" | string
+dfl: *"a" | string
+two: string
+two: string

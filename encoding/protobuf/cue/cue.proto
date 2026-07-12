@@ -2,17 +2,13 @@ syntax = "proto3";
 
 package cue;
 
-import "google/protobuf/descriptor.proto";
+// This file exists only for compatibility with proto definitions that
+// import "cue/cue.proto", the path at which the CUE options were
+// originally published. New definitions should import
+// "cueproto/cue.proto" instead.
+//
+// TODO(v0.19): remove this file and its generated Go package.
+import public "cueproto/cue.proto";
 
-option go_package = "cuelang.org/cueproto";
+option go_package = "cuelang.org/go/encoding/protobuf/cue";
 option java_package = "org.cuelang.cueproto";
-
-message FieldOptions {
-    bool required = 1;
-}
-
-extend google.protobuf.FieldOptions {
-    string val = 123456;
-    FieldOptions opt = 1069;
-}
-

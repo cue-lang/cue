@@ -1,8 +1,8 @@
-# A pattern label using or() over a cyclic reference collapses the inner or()
-# disjunction to the first field of cue when close() adds a field that is not
-# in tags.cue.modules: the pattern is registered as a Disjunction holding
-# unevaluated list elements, which are then force-finalized while cue is
-# mid-evaluation, computing the inner or() from a partial field set.
+# A pattern label using or() over a cyclic reference used to collapse the
+# inner or() disjunction to the first field of cue when close() added a field
+# that is not in tags.cue.modules: the pattern was registered as a Disjunction
+# holding unevaluated list elements, which were then force-finalized while cue
+# was mid-evaluation, computing the inner or() from a partial field set.
 -- in.cue --
 cue: {
 	[or(tags.cue.modules)]: y: {}

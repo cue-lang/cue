@@ -204,6 +204,7 @@ func (r *Resolver) ResolveToRegistry(mpath string, version string) (modregistry.
 	}
 	return modregistry.RegistryLocation{
 		Registry:   reg,
+		Host:       loc.Host,
 		Repository: loc.Repository,
 		Tag:        loc.Tag,
 	}, nil

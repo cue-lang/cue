@@ -79,6 +79,10 @@ var ErrRegistryNotFound = fmt.Errorf("no registry configured for module")
 type RegistryLocation struct {
 	// Registry holds the registry to use to access the module.
 	Registry ociregistry.Interface
+	// Host optionally holds the host name of the registry,
+	// to be mentioned in error messages so that the user can
+	// tell which registry was being used.
+	Host string
 	// Repository holds the repository where the module is located.
 	Repository string
 	// Tag holds the tag for the module version. If an empty version
@@ -249,7 +253,7 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 		if isNotExist(err) {
 			return nil, fmt.Errorf("module %v: %w", m, ErrNotFound)
 		}
-		return nil, fmt.Errorf("module %v: %w", m, err)
+		return nil, moduleError(m, loc, err)
 	}
 	defer rd.Close()
 	data, err := io.ReadAll(rd)
@@ -323,7 +327,7 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) (_req []string, _
 	for tag, err := range loc.Registry.Tags(ctx, loc.Repository, "") {
 		if err != nil {
 			if !isNotExist(err) {
-				return nil, fmt.Errorf("module %v: %w", m, err)
+				return nil, moduleError(m, loc, err)
 			}
 			continue
 		}
@@ -354,7 +358,7 @@ type checkedModule struct {
 
 // putCheckedModule is like [Client.PutModule] except that it allows the
 // caller to do some additional checks (see [CheckModule] for more info).
-func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule, meta *Metadata) error {
+func (c *Client) putCheckedModule(ctx context.Context, loc RegistryLocation, m *checkedModule, meta *Metadata) error {
 	var annotations map[string]string
 	if meta != nil {
 		annotations0, err := meta.annotations()
@@ -363,19 +367,18 @@ func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule, meta *M
 		}
 		annotations = annotations0
 	}
-	loc, err := c.resolve(m.mv)
-	if err != nil {
-		return err
-	}
 	selfDigest, err := digest.FromReader(io.NewSectionReader(m.blobr, 0, m.size))
 	if err != nil {
 		return fmt.Errorf("cannot read module zip file: %v", err)
 	}
 	// Upload the actual module's content
 	// TODO should we use a custom media type for this?
+	// Note: we don't wrap this error, as mentioning the scratch config
+	// is almost entirely pointless to end users; what matters is the
+	// underlying error, such as failing to authenticate to the registry.
 	configDesc, err := c.scratchConfig(ctx, loc, moduleArtifactType)
 	if err != nil {
-		return fmt.Errorf("cannot make scratch config: %v", err)
+		return err
 	}
 	manifest := &ocispec.Manifest{
 		Versioned: specs.Versioned{
@@ -426,9 +429,19 @@ func (c *Client) PutModule(ctx context.Context, m module.Version, r io.ReaderAt,
 func (c *Client) PutModuleWithMetadata(ctx context.Context, m module.Version, r io.ReaderAt, size int64, meta *Metadata) error {
 	cm, err := checkModule(m, r, size)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot put module %q: %w", m, err)
 	}
-	return c.putCheckedModule(ctx, cm, meta)
+	loc, err := c.resolve(m)
+	if err != nil {
+		return fmt.Errorf("cannot put module %q: %w", m, err)
+	}
+	if err := c.putCheckedModule(ctx, loc, cm, meta); err != nil {
+		if loc.Host != "" {
+			return fmt.Errorf("cannot put module %q to registry %q: %w", m, loc.Host, err)
+		}
+		return fmt.Errorf("cannot put module %q: %w", m, err)
+	}
+	return nil
 }
 
 // checkModule checks a module's zip file before uploading it.
@@ -533,6 +546,16 @@ func (m *Module) GetZip(ctx context.Context) (io.ReadCloser, error) {
 // the module.
 func (m *Module) ManifestDigest() ociregistry.Digest {
 	return m.manifestDigest
+}
+
+// moduleError returns an error for a failed registry operation on the
+// given module, mentioning the registry host when known so that the
+// user can tell which registry was being used.
+func moduleError(m any, loc RegistryLocation, err error) error {
+	if loc.Host != "" {
+		return fmt.Errorf("module %v in registry %q: %w", m, loc.Host, err)
+	}
+	return fmt.Errorf("module %v: %w", m, err)
 }
 
 func (c *Client) resolve(m module.Version) (RegistryLocation, error) {

@@ -259,7 +259,7 @@ func runModUpload(cmd *Command, args []string) error {
 
 	rclient := modregistry.NewClientWithResolver(resolver)
 	if err := rclient.PutModuleWithMetadata(ctx, mv, zf, info.Size(), meta); err != nil {
-		return fmt.Errorf("cannot put module: %v", err)
+		return err
 	}
 	ref := ociref.Reference{
 		Host:       resolver.registryName,
@@ -457,6 +457,7 @@ func (r *publishRegistryResolverShim) ResolveToRegistry(mpath, vers string) (mod
 			resolver: r,
 			registry: regLoc.Registry,
 		},
+		Host:       loc.Host,
 		Repository: loc.Repository,
 		Tag:        loc.Tag,
 	}, nil

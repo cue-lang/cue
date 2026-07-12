@@ -1,0 +1,46 @@
+# A pattern label using or() over a cyclic reference collapses the inner or()
+# disjunction to the first field of cue when close() adds a field that is not
+# in tags.cue.modules: the pattern is registered as a Disjunction holding
+# unevaluated list elements, which are then force-finalized while cue is
+# mid-evaluation, computing the inner or() from a partial field set.
+-- in.cue --
+cue: {
+	[or(tags.cue.modules)]: y: {}
+}
+
+tags: "cue": [_]: [...or([for command, _ in cue {command}])]
+tags: cue: modules: ["login", "mod"]
+
+cue: close({
+	other: {}
+	login: _
+	mod:   _
+})
+
+result: {"cue": cue, "tags": tags} @test(err, code=eval, contains="conflicting values \"other\" and \"login\"", pos=[-9:27, -9:49, -9:50, -8:22]) @test(eq:todo, {
+	cue: {other: {}, login: {y: {}}, mod: {y: {}}}
+	tags: {cue: {modules: ["login", "mod"]}}
+})
+-- out/errors.txt --
+[eval] tags.cue.modules.0: conflicting values "other" and "login":
+    ./in.cue:5:27
+    ./in.cue:5:49
+    ./in.cue:5:50
+    ./in.cue:6:22
+[eval] tags.cue.modules.1: conflicting values "other" and "mod":
+    ./in.cue:5:27
+    ./in.cue:5:49
+    ./in.cue:5:50
+    ./in.cue:6:31
+-- out/eval/stats --
+Leaks:  0
+Freed:  25
+Reused: 2
+Allocs: 23
+Retain: 0
+
+Unifications: 17
+Conjuncts:    30
+Disjuncts:    0
+
+NumCloseIDs: 9

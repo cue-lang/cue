@@ -1,0 +1,28 @@
+# Publishing to a registry that rejects unauthenticated requests should
+# produce an error mentioning the module and the registry host, so that
+# the user can tell which registry was being used.
+# Issue: the error only said "cannot put module: cannot make scratch
+# config: 401 Unauthorized", with no mention of module or registry.
+
+memregistry -auth=foo:bar MEMREGISTRY
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+env DOCKER_CONFIG=$WORK/dockerconfig
+
+cd example
+! exec cue mod publish v0.0.1
+# TODO: the error should mention the module and the registry host,
+# and skip the pointless mention of the scratch config.
+stderr '^cannot put module: cannot make scratch config: 401 Unauthorized: unauthorized: authentication required: no credentials$'
+
+-- dockerconfig/config.json --
+{}
+-- example/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.9.0-alpha.0"
+
+source: kind: "self"
+
+-- example/top.cue --
+package main
+
+"example.com@v0": "v0.0.1"

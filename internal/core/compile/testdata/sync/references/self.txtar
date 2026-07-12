@@ -186,6 +186,39 @@ doubleComp: {
 	for i in [1] for j in [1] {"d\(i)\(j)": self.n}
 }
 
+-- letselfinline.cue --
+@experiment(aliasv2)
+
+// A let bound to self is a transparent binding to the enclosing struct.
+// Chained references through it must also work when the struct is unified
+// into an inline (dynamic) vertex, where structure sharing is unavailable.
+// See https://cuelang.org/issue/4428.
+letSelfInline: {
+	S: {
+		let this = self
+		raw:  string
+		data: this.raw
+		chk:  this.data
+	}
+	res: (S & {raw: "alice"}).chk
+}
+
+// Variant with two unified conjuncts, each with its own let-self binding,
+// where one conjunct references a field contributed by the other. This is
+// the shape that cue fix --exp=aliasv2 produces for postfix value aliases.
+letSelfInlineConj: {
+	#T: {
+		let this = self
+		raw:  string
+		data: this.raw
+	}
+	#T: {
+		let this = self
+		chk: this.data
+	}
+	res: (#T & {raw: "alice"}).chk
+}
+
 -- experiment_test.cue --
 // Test self usage without experiment enabled (should fail)
 
@@ -278,6 +311,34 @@ a: {
   }
   cycle: 〈1〉.cycle
 }
+--- letselfinline.cue
+{
+  letSelfInline: {
+    S: {
+      let this#1 = 〈1〉
+      raw: string
+      data: 〈0;let this#1〉.raw
+      chk: 〈0;let this#1〉.data
+    }
+    res: (〈0;S〉 & {
+      raw: "alice"
+    }).chk
+  }
+  letSelfInlineConj: {
+    #T: {
+      let this#2 = 〈1〉
+      raw: string
+      data: 〈0;let this#2〉.raw
+    }
+    #T: {
+      let this#3 = 〈1〉
+      chk: 〈0;let this#3〉.data
+    }
+    res: (〈0;#T〉 & {
+      raw: "alice"
+    }).chk
+  }
+}
 --- list.cue
 {
   #IntStrings: {
@@ -335,14 +396,14 @@ a: {
 --- withlet.cue
 {
   withLet: {
-    let X#1 = 〈1〉
+    let X#4 = 〈1〉
     foo: 1
     bar: {
-      baz: 〈1;let X#1〉.foo
+      baz: 〈1;let X#4〉.foo
     }
   }
   withLetComprehension: {
-    let X#2 = 〈1〉
+    let X#5 = 〈1〉
     direct: "a"
     if true {
       viaIf: "b"
@@ -355,13 +416,13 @@ a: {
     try {
       viaTry: "d"
     }
-    seeDirect: 〈0;let X#2〉.direct
-    seeIf: 〈0;let X#2〉.viaIf
-    seeFor: 〈0;let X#2〉.viaFor
-    seeTry: 〈0;let X#2〉.viaTry
+    seeDirect: 〈0;let X#5〉.direct
+    seeIf: 〈0;let X#5〉.viaIf
+    seeFor: 〈0;let X#5〉.viaFor
+    seeTry: 〈0;let X#5〉.viaTry
   }
   withLetDynamicField: {
-    let X#3 = 〈1〉
+    let X#6 = 〈1〉
     h: {
       [string]: {
         c: len(〈1;(〈0;-〉)〉)
@@ -371,7 +432,7 @@ a: {
       a: _
     }
     g: _
-    for _, x in 〈0;let X#3〉.h {
+    for _, x in 〈0;let X#6〉.h {
       g: {
         "\({
           if true {
@@ -385,19 +446,19 @@ a: {
     }
   }
   withLetDynamicField: {
-    let Y#4 = 〈1〉
+    let Y#7 = 〈1〉
     s: true
     x: {
-      if 〈1;let Y#4〉.s {
+      if 〈1;let Y#7〉.s {
         1
       }
-      if !〈1;let Y#4〉.s {
+      if !〈1;let Y#7〉.s {
         2
       }
     }
   }
   withLetDynamicFieldRef: {
-    let X#5 = 〈1〉
+    let X#8 = 〈1〉
     h: {
       [string]: {
         c: len(〈2;h〉.a)
@@ -407,7 +468,7 @@ a: {
       a: _
     }
     g: _
-    for _, x in 〈0;let X#5〉.h {
+    for _, x in 〈0;let X#8〉.h {
       g: {
         "\({
           if true {
@@ -421,13 +482,13 @@ a: {
     }
   }
   withLetDynamicFieldRef: {
-    let Y#6 = 〈1〉
+    let Y#9 = 〈1〉
     s: true
     x: {
-      if 〈1;let Y#6〉.s {
+      if 〈1;let Y#9〉.s {
         1
       }
-      if !〈1;let Y#6〉.s {
+      if !〈1;let Y#9〉.s {
         2
       }
     }

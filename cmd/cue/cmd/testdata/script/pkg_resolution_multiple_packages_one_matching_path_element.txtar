@@ -1,14 +1,20 @@
 # Test that a relative package path functions the same as an absolute package path
 # when there are multiple packages in the directory where one has a name
-# that does matches the final element of the import path.
+# that matches the final element of the import path.
 
 exec cue eval root.cue
 cmp stdout stdout.golden
 exec cue eval mod.com/x
 cmp stdout stdout.golden
-# TODO: the following command fails unexpectedly although it should be consistent with the above.
+exec cue eval mod.com/x/
+cmp stdout stdout.golden
+# TODO: the following two commands fail unexpectedly although they should be
+# consistent with the above; note also that a trailing slash changes the error.
+# See issue #3707.
 ! exec cue eval ./x
 stderr 'found packages "x" \(x.cue\) and "y" \(y.cue\) in "\./x"'
+! exec cue eval ./x/
+stderr 'found packages "x" \(x.cue\) and "y" \(y.cue\) in "x"'
 
 -- stdout.golden --
 x: 5

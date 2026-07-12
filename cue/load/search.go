@@ -314,6 +314,19 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 
 		var p *build.Instance
 		if isLocalImport(a) {
+			if pkgName == "" && l.cfg.Package == "" {
+				// Neither an explicit qualifier nor Config.Package was
+				// given. Choose the package to load following the same
+				// rules as appendExpandedUnqualifiedPackagePath, so
+				// that ./foo loads package foo when the directory
+				// holds multiple packages. On any error, leave the
+				// package name empty so that loading below reports
+				// errors as before.
+				if resolved, err := appendExpandedPackageArg(l.cfg, nil, a, "", l.tagger); err == nil &&
+					len(resolved) == 1 && resolved[0].packageFound {
+					pkgName = ast.ParseImportPath(resolved[0].resolvedCanonical).Qualifier
+				}
+			}
 			p = l.newRelInstance(token.NoPos, a, pkgName)
 		} else {
 			p = l.newInstance(token.NoPos, importPath(orig))
@@ -330,6 +343,10 @@ type resolvedPackageArg struct {
 	// package pattern matching code, as it is necessary to populate Instance.DisplayPath.
 	original          string
 	resolvedCanonical string
+	// packageFound reports whether the package qualifier in
+	// resolvedCanonical was confirmed by an actual package file, as
+	// opposed to carried over from the argument.
+	packageFound bool
 }
 
 func expandPackageArgs(c *Config, pkgArgs []string, pkgQual string, tg *tagger) ([]resolvedPackageArg, error) {
@@ -362,6 +379,12 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 	if isRel && ip.Path != "." {
 		// Preserve leading "./".
 		ip.Path = "./" + ip.Path
+	}
+	if !ip.ExplicitQualifier {
+		// Cleaning may have changed the last path element (e.g. when
+		// the argument had a trailing slash), so re-derive the implied
+		// qualifier from the cleaned path.
+		ip.Qualifier = ast.ParseImportPath(ip.Path).Qualifier
 	}
 	isLocal := isLocalImport(ip.Path)
 	// Note that when c.Module is empty, c.ModuleRoot is sometimes,
@@ -401,7 +424,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 				Dir: ".",
 			}, c.Module, tg)
 		}
-		return append(pkgPaths, resolvedPackageArg{origp, ip.Canonical().String()}), nil
+		return append(pkgPaths, resolvedPackageArg{original: origp, resolvedCanonical: ip.Canonical().String()}), nil
 	}
 	// Strip the module prefix, leaving only the directory relative
 	// to the module root.
@@ -439,7 +462,7 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 	if err != nil {
 		// The package directory doesn't exist.
 		// Treat it like an empty directory and let later logic deal with it.
-		return append(pkgPaths, resolvedPackageArg{origp, ip.String()}), nil
+		return append(pkgPaths, resolvedPackageArg{original: origp, resolvedCanonical: ip.String()}), nil
 	}
 	if !info.IsDir() {
 		return nil, fmt.Errorf("%s is a file and not a package directory", origp)
@@ -465,7 +488,7 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 			ip := ip
 			ip.Qualifier = pkgName
 			p := ip.String()
-			pkgPaths = append(pkgPaths, resolvedPackageArg{p, p})
+			pkgPaths = append(pkgPaths, resolvedPackageArg{original: p, resolvedCanonical: p, packageFound: pkgName != ""})
 		}
 		return pkgPaths, nil
 	}
@@ -493,12 +516,12 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 	if foundQualifier {
 		// We found the actual package that was implied by the import path (or pkgQual == "_").
 		// This takes precedence over anything else.
-		return append(pkgPaths, resolvedPackageArg{origp, ip.String()}), nil
+		return append(pkgPaths, resolvedPackageArg{original: origp, resolvedCanonical: ip.String(), packageFound: true}), nil
 	}
 	if len(files) == 0 {
 		// 6. if there are no package files in the directory, it just appends the import path as is,
 		// leaving it to later logic to produce an error in this case.
-		return append(pkgPaths, resolvedPackageArg{origp, ip.String()}), nil
+		return append(pkgPaths, resolvedPackageArg{original: origp, resolvedCanonical: ip.String()}), nil
 	}
 	pkgName := files[0].Syntax.PackageName()
 	for _, f := range files[1:] {
@@ -516,7 +539,7 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 	}
 	// 4. if there's exactly one package in the directory it will choose that.
 	ip.Qualifier = pkgName
-	return append(pkgPaths, resolvedPackageArg{origp, ip.String()}), nil
+	return append(pkgPaths, resolvedPackageArg{original: origp, resolvedCanonical: ip.String(), packageFound: true}), nil
 }
 
 // appendExpandedWildcardPackagePath expands the given pattern into any packages that it matches
@@ -615,7 +638,7 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern as
 				}
 			}
 		}
-		pkgPaths = append(pkgPaths, resolvedPackageArg{ip.String(), ip.String()})
+		pkgPaths = append(pkgPaths, resolvedPackageArg{original: ip.String(), resolvedCanonical: ip.String(), packageFound: true})
 		prevFile, prevImportPath = f, ip
 	}
 	return pkgPaths, nil

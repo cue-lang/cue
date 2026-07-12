@@ -334,8 +334,38 @@ func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check
 	arc.insertConjunct(n.ctx, c, c.CloseInfo, mode, check, false)
 }
 
+// completePatternValue evaluates any vertices held by a pattern value before
+// it is registered as a pattern constraint. Values returned by builtins, such
+// as a Disjunction returned by or(), may hold vertices that have not been
+// evaluated yet. If their evaluation were left to matchPatternValue, it could
+// be forced at a point where a node they depend on is mid-evaluation, locking
+// in results computed from a partial field set. Evaluating them here, while
+// dependencies can still be run or block the calling task, avoids that.
+// See https://cuelang.org/issue/4399.
+//
+// The traversal mirrors the Value kinds that matchPatternValue fast-tracks;
+// values it does not descend into, such as the arguments of a
+// BuiltinValidator, are still finalized late by matchPatternValue.
+func completePatternValue(ctx *OpContext, v Value) {
+	var vals []Value
+	switch x := v.(type) {
+	case *Vertex:
+		x.unify(ctx, Flags{condition: scalarValue, mode: yield})
+		return
+	case *Disjunction:
+		vals = x.Values
+	case *Conjunction:
+		vals = x.Values
+	}
+	for _, a := range vals {
+		completePatternValue(ctx, a)
+	}
+}
+
 func (n *nodeContext) insertPattern(pattern Value, c Conjunct) {
 	n.assertInitialized()
+
+	completePatternValue(n.ctx, pattern)
 
 	// Collect patterns in root vertex. This allows comparing disjuncts for
 	// equality as well as inserting new arcs down the line as they are

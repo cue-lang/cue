@@ -149,6 +149,10 @@ outer:
 		CopyComments(spec, orig)
 	}
 	imports.Specs = append(imports.Specs, spec)
+	// TODO: remove once the old formatter (CUE_EXPERIMENT=formatv2=0) is
+	// gone. The new formatter lays out import specs itself, while the old
+	// one keeps the first spec's parsed position and would render
+	// `import ( "a"` on one line without this clear.
 	ast.SetRelPos(imports.Specs[0], token.NoRelPos)
 
 	return spec

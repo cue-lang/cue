@@ -2,6 +2,16 @@
 ! stdout .
 cmp stderr cmd_badfields.out
 
+# A file.Read task whose contents field fails to evaluate must surface
+# that error rather than filling in the contents regardless.
+# TODO: the error is silently ignored and the command succeeds.
+exec cue cmd badread
+
+# A cli.Ask task whose response field fails to evaluate must surface
+# that error rather than reading a response and discarding it.
+# TODO: the error is silently ignored and the command succeeds.
+exec cue cmd badask
+
 -- cmd_badfields.out --
 command.ref.task.display.contents: invalid bytes argument: non-concrete value (string|bytes):
     ./task_tool.cue:6:8
@@ -21,3 +31,33 @@ command: ref: {
         filename: filename
 	}
 }
+-- read_tool.cue --
+package home
+
+import (
+	"encoding/json"
+	"tool/file"
+)
+
+command: badread: {
+	read: file.Read & {
+		filename: "data.txt"
+		contents: json.Marshal({a!: int})
+	}
+}
+-- ask_tool.cue --
+package home
+
+import (
+	"encoding/json"
+	"tool/cli"
+)
+
+command: badask: {
+	ask: cli.Ask & {
+		prompt:   "What is your name?"
+		response: json.Marshal({a!: int})
+	}
+}
+-- data.txt --
+hello

@@ -4,6 +4,7 @@ go 1.25.0
 
 require (
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20260618065901-6befdbcb3cf6
+	github.com/bufbuild/protocompile v0.14.1
 	github.com/cockroachdb/apd/v3 v3.2.3
 	github.com/coder/websocket v1.8.15
 	github.com/emicklei/proto v1.14.3

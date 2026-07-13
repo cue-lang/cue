@@ -2087,7 +2087,7 @@ c: l.b`,
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
 				or(3, 5):   {e: []string{"l"}},
-				or1(7):     {f: []string{"b", "c", "d"}, e: []string{"l"}},
+				or(6, 8):   {f: []string{"b", "c", "d"}, e: []string{"l"}},
 				or(8, 10):  {f: []string{"b", "c", "d"}},
 				or1(10):    {e: []string{"b", "c", "d", "l"}},
 				or1(12):    {e: []string{"b", "c", "d", "l"}},
@@ -2184,6 +2184,105 @@ v=[k=string]: {a: _, b: v.a, c: k.a}
 				or1(28):    {f: []string{"a", "b", "c"}, e: []string{"k", "v"}},
 				or(29, 31): {f: []string{"a", "b", "c"}},
 				or(31, 34): {e: []string{"a", "b", "c", "k", "v"}},
+			},
+		},
+
+		{
+			name: "Pattern_Plain",
+			archive: `-- a.cue --
+foo: 3
+[string]: bar: foo
+`,
+			// The pattern contributes no fields (we never match names
+			// against patterns), but its value is traversable: the use
+			// of foo within it resolves as usual.
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "foo"): {ln(1, 1, "foo")},
+
+				ln(1, 1, "foo"): {self},
+				ln(2, 1, "bar"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 4):   {f: []string{"foo"}},
+				or1(4):     {e: []string{"foo"}},
+				or1(6):     {e: []string{"foo"}},
+				or1(7):     {f: []string{"foo"}},
+				or(8, 15):  {e: []string{"foo"}},
+				or1(16):    {f: []string{"bar"}, e: []string{"foo"}},
+				or(17, 21): {f: []string{"bar"}},
+				or(21, 26): {e: []string{"bar", "foo"}},
+			},
+		},
+
+		{
+			name: "Dynamic_Plain",
+			archive: `-- a.cue --
+foo: "x"
+(foo): bar: foo
+"a\(foo)b": baz: foo
+`,
+			// The dynamic fields contribute no fields (we never compute
+			// their names), but both their name expressions and their
+			// values are traversable: every use of foo resolves as
+			// usual.
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "foo"): {ln(1, 1, "foo")},
+				ln(2, 2, "foo"): {ln(1, 1, "foo")},
+				ln(3, 1, "foo"): {ln(1, 1, "foo")},
+				ln(3, 2, "foo"): {ln(1, 1, "foo")},
+
+				ln(1, 1, "foo"): {self},
+				ln(2, 1, "bar"): {self},
+				ln(3, 1, "baz"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 4):   {f: []string{"foo"}},
+				or1(4):     {e: []string{"foo"}},
+				or1(8):     {e: []string{"foo"}},
+				or1(9):     {f: []string{"foo"}},
+				or(10, 14): {e: []string{"foo"}},
+				or1(15):    {f: []string{"bar"}, e: []string{"foo"}},
+				or(16, 20): {f: []string{"bar"}},
+				or(20, 25): {e: []string{"bar", "foo"}},
+				or1(25):    {f: []string{"foo"}},
+				or(29, 33): {e: []string{"foo"}},
+				or1(36):    {f: []string{"baz"}, e: []string{"foo"}},
+				or(37, 41): {f: []string{"baz"}},
+				or(41, 46): {e: []string{"baz", "foo"}},
+			},
+		},
+
+		{
+			name: "Field_Optional_Required",
+			archive: `-- a.cue --
+opt?: x
+req!: x
+opt: 3
+x: 7
+`,
+			// Optionality does not affect evaluation: `opt?: x` declares
+			// `opt` exactly as `opt: 3` does, so the two declarations
+			// resolve to each other.
+			expectDefinitions: map[position][]position{
+				ln(1, 1, "x"): {ln(4, 1, "x")},
+				ln(2, 1, "x"): {ln(4, 1, "x")},
+
+				ln(1, 1, "opt"): {self, ln(3, 1, "opt")},
+				ln(2, 1, "req"): {self},
+				ln(3, 1, "opt"): {self, ln(1, 1, "opt")},
+				ln(4, 1, "x"):   {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 4):   {f: []string{"opt", "req", "x"}},
+				or(5, 8):   {e: []string{"opt", "req", "x"}},
+				or(8, 12):  {f: []string{"opt", "req", "x"}},
+				or(13, 16): {e: []string{"opt", "req", "x"}},
+				or(16, 20): {f: []string{"opt", "req", "x"}},
+				or1(20):    {e: []string{"opt", "req", "x"}},
+				or1(22):    {e: []string{"opt", "req", "x"}},
+				or(23, 25): {f: []string{"opt", "req", "x"}},
+				or1(25):    {e: []string{"opt", "req", "x"}},
+				or1(27):    {e: []string{"opt", "req", "x"}},
 			},
 		},
 

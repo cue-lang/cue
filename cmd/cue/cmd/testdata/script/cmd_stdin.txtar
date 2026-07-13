@@ -24,8 +24,8 @@ cmp stdout noreads-stdout
 
 # A task whose stdin field fails to evaluate must surface that error
 # rather than running the command with an empty stdin.
-# TODO: the error is silently ignored and the command succeeds.
-exec cue cmd badstdin
+! exec cue cmd badstdin
+stderr 'error in call to encoding/json.Marshal'
 
 -- echo-stdin --
 Hello World!

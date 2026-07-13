@@ -16,6 +16,7 @@ package eval_test
 
 import (
 	"fmt"
+	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
@@ -105,4 +106,84 @@ large: size: 100
 	// branch small has fields [size]
 	// branch large has fields [size]
 	// branch {manual: true} has fields [manual]
+}
+
+// ExampleNode_Patterns discovers the pattern constraints declared
+// within a node and processes each one: its label, its doc comment,
+// and the fields declared within its value - which remains fully
+// traversable, even though the evaluator never matches field names
+// against patterns.
+func ExampleNode_Patterns() {
+	const src = `
+package p
+
+config: {
+	name: string
+
+	// Feature flags may be set freely.
+	[=~"^flag_"]: bool
+
+	// Anything else must declare its kind.
+	rest=[string]: {kind: string}
+}
+`
+
+	file, err := parser.ParseFile("config.cue", src, parser.ParseComments)
+	if err != nil {
+		panic(err)
+	}
+	ev := eval.New(eval.Config{
+		IP: ast.ParseImportPath("example.test/p").Canonical(),
+	}, file)
+
+	config := ev.Root().Field("config")
+
+	// Patterns contribute no fields to their enclosing node: config
+	// has only its named field.
+	var fields []string
+	for name := range config.Fields() {
+		fields = append(fields, name)
+	}
+	fmt.Printf("fields of config: %v\n", fields)
+
+	// A NodeSet's member order is unspecified: impose an order
+	// before rendering. Source position is the natural one here.
+	patterns := config.Patterns()
+	pos := func(n *eval.Node) token.Pos {
+		pos := token.NoPos
+		for d := range n.Decls() {
+			v := d.Value()
+			if v == nil {
+				continue
+			}
+			if p := v.Pos(); p.HasAbsPos() && p.Compare(pos) < 0 {
+				pos = p
+			}
+		}
+		return pos
+	}
+	slices.SortFunc(patterns, func(a, b *eval.Node) int {
+		return pos(a).Compare(pos(b))
+	})
+
+	for _, pattern := range patterns {
+		// A pattern node has a single Decl, of kind DeclPattern. Its
+		// Label is the bracketed pattern whatever the aliasing,
+		// whereas its Key is the value alias ident when one is
+		// present.
+		for d := range pattern.Decls() {
+			label, _ := format.Node(d.Label())
+			key, _ := format.Node(d.Key())
+			fmt.Printf("pattern %s (key %s): %s", label, key, d.DocComments()[0].Text())
+			for name := range pattern.Fields() {
+				fmt.Printf("  declares %s\n", name)
+			}
+		}
+	}
+
+	// Output:
+	// fields of config: [name]
+	// pattern [=~"^flag_"] (key [=~"^flag_"]): Feature flags may be set freely.
+	// pattern [string] (key rest): Anything else must declare its kind.
+	//   declares kind
 }

@@ -4,13 +4,13 @@ cmp stderr cmd_badfields.out
 
 # A file.Read task whose contents field fails to evaluate must surface
 # that error rather than filling in the contents regardless.
-# TODO: the error is silently ignored and the command succeeds.
-exec cue cmd badread
+! exec cue cmd badread
+stderr 'error in call to encoding/json.Marshal'
 
 # A cli.Ask task whose response field fails to evaluate must surface
 # that error rather than reading a response and discarding it.
-# TODO: the error is silently ignored and the command succeeds.
-exec cue cmd badask
+! exec cue cmd badask
+stderr 'error in call to encoding/json.Marshal'
 
 -- cmd_badfields.out --
 command.ref.task.display.contents: invalid bytes argument: non-concrete value (string|bytes):

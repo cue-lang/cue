@@ -56,6 +56,7 @@ type cmdRemoveAll struct{}
 
 func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
 	filename := ctx.String("filename")
+	contents := ctx.Lookup("contents")
 	if ctx.Err != nil {
 		return nil, ctx.Err
 	}
@@ -66,7 +67,7 @@ func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 	update := map[string]interface{}{"contents": b}
 
-	switch v := ctx.Lookup("contents"); v.IncompleteKind() {
+	switch contents.IncompleteKind() {
 	case cue.BytesKind:
 		// already set above
 	case cue.StringKind:

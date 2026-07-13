@@ -155,6 +155,11 @@ jobs:
           STATICCHECK_CACHE: /cache/staticcheck
         run: go tool -modfile=internal/tools.mod staticcheck ./...
       - if: (matrix.go-version == '1.26.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+        name: Test with CUE_UPDATE=1
+        env:
+          CUE_UPDATE: "1"
+        run: go test ./...
+      - if: (matrix.go-version == '1.26.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Generate
         run: go generate ./...
       - if: always()

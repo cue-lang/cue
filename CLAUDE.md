@@ -48,6 +48,12 @@ CUE_UPDATE=1 go test ./...
 go test -race ./...
 ```
 
+CI enforces that `CUE_UPDATE=1 go test ./...` leaves no diffs. For every
+commit touching `cue/testdata` or the evaluator (`internal/core/...`),
+re-run the tests with `CUE_UPDATE=1` and include any resulting changes
+(e.g. updated stats sections) in that same commit, so outputs stay up to
+date on every commit.
+
 #### Code quality
 
 ```bash

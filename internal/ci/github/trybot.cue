@@ -76,10 +76,22 @@ workflows: trybot: _repo.bashWorkflow & {
 				// as Go uses modtimes to approximate whether files have been modified.
 				// Moveover, Go test failures on CI due to changed generated code are very confusing
 				// as the user might not notice that checkGitClean is also failing towards the end.
+				_goTestUpdate,
 				_goGenerate,
 				_repo.checkGitClean,
 			]
 		}
+	}
+
+	_goTestUpdate: githubactions.#Step & {
+		name: "Test with CUE_UPDATE=1"
+		// Ensure that all test outputs, such as txtar golden files, are up to date.
+		// Any stale files would show up as a diff in the final checkGitClean step.
+		// The results don't vary based on the Go version or OS,
+		// so we only need to run this on one of the matrix jobs.
+		if:  _repo.isLatestGoLinux
+		env: CUE_UPDATE: "1"
+		run: "go test ./..."
 	}
 
 	_goGenerate: githubactions.#Step & {

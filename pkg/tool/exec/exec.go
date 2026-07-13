@@ -155,7 +155,12 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc []string, err error) {
 
 	cmd := exec.CommandContext(ctx.Context, bin, args...)
 
-	cmd.Dir, _ = ctx.Obj.LookupPath(cue.ParsePath("dir")).String()
+	if v := ctx.Obj.LookupPath(cue.ParsePath("dir")); v.Exists() {
+		cmd.Dir, err = v.String()
+		if err != nil {
+			return nil, nil, err
+		}
+	}
 
 	env := ctx.Obj.LookupPath(cue.ParsePath("env"))
 

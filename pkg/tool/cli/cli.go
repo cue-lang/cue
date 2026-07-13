@@ -54,6 +54,7 @@ func newAskCmd(v cue.Value) (task.Runner, error) {
 
 func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	str := ctx.String("prompt")
+	responseValue := ctx.Lookup("response")
 	if ctx.Err != nil {
 		return nil, ctx.Err
 	}
@@ -81,7 +82,7 @@ func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 
 	update := map[string]interface{}{"response": response}
 
-	switch v := ctx.Lookup("response"); v.IncompleteKind() {
+	switch responseValue.IncompleteKind() {
 	case cue.BoolKind:
 		update["response"] = strings.ToLower(response) == "yes"
 	case cue.StringKind:

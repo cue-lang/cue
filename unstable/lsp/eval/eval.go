@@ -1666,6 +1666,14 @@ type frame struct {
 	// zero value is [DeclExpression]: a frame that does not
 	// correspond to any source-level declaration.
 	kind DeclKind
+	// constraint records the optionality marker of the field that
+	// this frame declares: [token.OPTION] for optional fields
+	// (x?: v), and [token.NOT] for required fields (x!: v). It is
+	// [token.ILLEGAL] for regular fields, and for frames that do not
+	// model a field declaration at all. Beyond recording it, the
+	// evaluator makes no use of optionality: x?: v declares x
+	// exactly as x: v does.
+	constraint token.Token
 	// parent is the parent frame.
 	parent *frame
 	// childFrames contains every frame that is a child of this
@@ -1704,6 +1712,19 @@ type frame struct {
 	bindings map[string][]*frame
 	// ellipses contains navigables for ellipsis values.
 	ellipses []*navigable
+	// patterns contains navigables for the values of pattern
+	// constraints (e.g. [string]: x: 3) declared within this
+	// frame. The evaluator never matches field names against
+	// patterns: these navigables are anonymous and take no part in
+	// navigation, but their frames remain traversable by offset.
+	patterns []*navigable
+	// dynamics contains navigables for the values of dynamic fields
+	// (e.g. (expr): x: 3, or "\(expr)": x: 3) declared within this
+	// frame. The evaluator never computes the names of dynamic
+	// fields, even when trivial: these navigables are anonymous and
+	// take no part in navigation, but their frames remain
+	// traversable by offset.
+	dynamics []*navigable
 	// navigable provides access to the "navigable bindings" that is
 	// shared between multiple frames that should be considered
 	// "merged together".
@@ -2216,10 +2237,29 @@ func (f *frame) eval() {
 			}
 
 			childFr := parentFr.newFrame(node.Value, childNav, false)
-			childFr.kind = DeclField
+			switch {
+			case fieldDecl.patternField:
+				childFr.kind = DeclPattern
+				f.patterns = append(f.patterns, childFr.navigable)
+			case fieldDecl.dynamicField:
+				childFr.kind = DeclDynamic
+				f.dynamics = append(f.dynamics, childFr.navigable)
+			default:
+				childFr.kind = DeclField
+			}
+			childFr.constraint = node.Constraint
 			if valueAlias != nil {
 				childFr.key = valueAlias
 				childFr.parent.appendBinding(valueAlias.Name, childFr)
+			} else if fieldDecl.patternField || fieldDecl.dynamicField {
+				// A pattern constraint or dynamic field has no name, so
+				// its label ([expr], (expr), or an interpolation) is
+				// the closest thing it has to a defining key. Nothing
+				// resolves to this frame's navigable unless the field
+				// has a value alias (in which case the alias is the
+				// key, as usual), so this key is only observable via
+				// the graph API.
+				childFr.key = node.Label
 			}
 
 			childFr.docsNode = node
@@ -2376,9 +2416,11 @@ func fieldNames(field *ast.Field) *fieldDeclExpr {
 		}
 
 	case *ast.Interpolation:
+		result.dynamicField = true
 		result.exprs = append(result.exprs, label)
 
 	case *ast.ParenExpr:
+		result.dynamicField = true
 		if alias, ok := label.X.(*ast.Alias); ok {
 			// (X=e): field
 			// Although the spec supports this, the parser doesn't seem to.
@@ -2765,6 +2807,10 @@ type fieldDeclExpr struct {
 	// a pattern. This limits visibility of all aliases to the field's
 	// value scope.
 	patternField bool
+	// dynamicField indicates that the field's name is computed by an
+	// expression ((expr): v) or an interpolation ("\(expr)": v). The
+	// name is never computed by this evaluator, even when trivial.
+	dynamicField bool
 	// keyExpr contains the expression associated with the
 	// key. For (x=e]: y and [x=e]: y aliases, the alias x should
 	// resolve to the expression e, and not the field value y.

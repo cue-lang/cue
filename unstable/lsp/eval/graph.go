@@ -92,6 +92,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 )
 
 // A Node is a single field (or the package root). A Node represents
@@ -327,15 +328,19 @@ func (n *Node) FieldPath() ([]string, bool) {
 // package documentation). Use [Node.Decls] and [Decl.Fields] to
 // recover the per-branch grouping.
 //
-// Several forms of field declaration are not modeled by this
-// evaluator at all, and never appear as fields of any node:
+// Several forms of field declaration never appear as fields of any
+// node:
 //
 //   - pattern constraints: [string]: a: 3
 //   - dynamic fields: (m): 3, "\(m)": 3
 //
-// Additionally, a field's optionality is not modeled: x?: 3 and
-// x!: 3 declare a field x exactly as x: 3 does, and nothing records
-// the ? or !.
+// The evaluator tracks their declarations (see [Node.Patterns] and
+// [Node.Dynamics]) but never matches field names against patterns,
+// nor computes the names of dynamic fields.
+//
+// Additionally, a field's optionality does not affect the model:
+// x?: 3 and x!: 3 declare a field x exactly as x: 3 does. The
+// optionality marker is reported by [Decl.Constraint].
 //
 // List elements are not yielded here: see [Node.Elements].
 func (n *Node) Fields() iter.Seq2[string, *Node] {
@@ -439,6 +444,63 @@ func (n *Node) Ellipses() NodeSet {
 	var result NodeSet
 	for _, fr := range (*navigable)(n).frames {
 		for _, nav := range fr.ellipses {
+			result = append(result, (*Node)(nav))
+		}
+	}
+	return dedupeNodes(result)
+}
+
+// Patterns returns the nodes for the pattern constraints declared
+// within this node's declarations, in declaration order. A pattern
+// constraint gets its own anonymous node, whose single [Decl] has
+// kind [DeclPattern]: that Decl's Key is the pattern's bracketed
+// label (or the value alias ident, if one is present), and its Value
+// is the pattern's value. For example, given:
+//
+//	x: {[string]: int}
+//	y: {[=~"^a"]: b: 3} | {c: 4}
+//
+// x and y each have one pattern node. The evaluator never matches
+// field names against patterns: a pattern contributes no fields to
+// its enclosing node, and takes no part in navigation. Its value
+// remains traversable, though: b is a field of y's pattern node.
+// Because this node's declarations include disjunction operands and
+// other embedding-like constructs, use [Decl.Patterns] to recover
+// which declaration a pattern belongs to, e.g. to determine which
+// branch of a disjunction declares it.
+func (n *Node) Patterns() NodeSet {
+	(*navigable)(n).eval()
+	var result NodeSet
+	for _, fr := range (*navigable)(n).frames {
+		for _, nav := range fr.patterns {
+			result = append(result, (*Node)(nav))
+		}
+	}
+	return dedupeNodes(result)
+}
+
+// Dynamics returns the nodes for the dynamic fields — fields whose
+// names are computed by an expression or an interpolation — declared
+// within this node's declarations, in declaration order. A dynamic
+// field gets its own anonymous node, whose single [Decl] has kind
+// [DeclDynamic]: that Decl's Key is the field's label (or the value
+// alias ident, if one is present), and its Value is the field's
+// value. For example, given:
+//
+//	k: "kk"
+//	x: {(k): 1, "\(k)-b": c: 2}
+//
+// x has two dynamic nodes. The evaluator never computes the names of
+// dynamic fields, even when it is trivial to do so: a dynamic field
+// contributes no fields to its enclosing node, and takes no part in
+// navigation. Its value remains traversable, though: c is a field of
+// x's second dynamic node. Use [Decl.Dynamics] to recover which
+// declaration a dynamic field belongs to.
+func (n *Node) Dynamics() NodeSet {
+	(*navigable)(n).eval()
+	var result NodeSet
+	for _, fr := range (*navigable)(n).frames {
+		for _, nav := range fr.dynamics {
 			result = append(result, (*Node)(nav))
 		}
 	}
@@ -711,8 +773,40 @@ const (
 	//	key: value
 	//
 	// This includes optional (key?: value) and required (key!: value)
-	// fields (optionality is not modeled) and list elements.
+	// fields (whose optionality is reported by [Decl.Constraint] but
+	// does not affect the model) and list elements.
 	DeclField
+
+	// DeclPattern is a pattern constraint:
+	//
+	//	[string]: {a: 1}
+	//
+	// The Decl's Value is the pattern's value; its Key is the
+	// bracketed label (an [ast.ListLit]), or the value alias ident
+	// when one is present (v=[string]: ...). The evaluator never
+	// matches field names against patterns: a pattern's node is
+	// anonymous, contributes no fields to its enclosing node, and
+	// takes no part in navigation. Its value remains traversable:
+	// paths within it resolve as usual. Pattern nodes are
+	// discovered via [Node.Patterns] and [Decl.Patterns].
+	DeclPattern
+
+	// DeclDynamic is a field whose name is computed by an
+	// expression or an interpolation:
+	//
+	//	(expr): {a: 1}
+	//	"\(expr)": {a: 1}
+	//
+	// The Decl's Value is the field's value; its Key is the label
+	// (an [ast.ParenExpr] or [ast.Interpolation]), or the value
+	// alias ident when one is present. The evaluator never computes
+	// the field's name, even when it is trivial to do so: a dynamic
+	// field's node is anonymous, contributes no fields to its
+	// enclosing node, and takes no part in navigation. Its value
+	// remains traversable: paths within it resolve as usual.
+	// Dynamic field nodes are discovered via [Node.Dynamics] and
+	// [Decl.Dynamics].
+	DeclDynamic
 
 	// DeclAlias is an alias-like lexical binding: a field alias
 	// (X=key: value), a let clause, or the identifiers bound by a for
@@ -809,6 +903,10 @@ func (k DeclKind) String() string {
 		return "import"
 	case DeclField:
 		return "field"
+	case DeclPattern:
+		return "pattern"
+	case DeclDynamic:
+		return "dynamic"
 	case DeclAlias:
 		return "alias"
 	case DeclEmbedding:
@@ -904,6 +1002,43 @@ type Decl interface {
 	// only the [DeclDisjunct] Decl for {a: 1, ...} has an ellipsis,
 	// identifying which branch of the disjunction is open.
 	Ellipses() NodeSet
+
+	// Patterns returns the nodes for the pattern constraints
+	// declared directly within this declaration, in declaration
+	// order. Whereas [Node.Patterns] merges the patterns of every
+	// declaration, this is the per-declaration view: in
+	//
+	//	x: {[string]: 1} | {b: 2}
+	//
+	// only the [DeclDisjunct] Decl for {[string]: 1} has a
+	// pattern, identifying which branch of the disjunction
+	// declares it.
+	Patterns() NodeSet
+
+	// Dynamics returns the nodes for the dynamic fields declared
+	// directly within this declaration, in declaration order.
+	// Whereas [Node.Dynamics] merges the dynamic fields of every
+	// declaration, this is the per-declaration view. See
+	// [Node.Dynamics].
+	Dynamics() NodeSet
+
+	// Constraint reports this declaration's optionality marker:
+	// [token.OPTION] for an optional field (key?: value),
+	// [token.NOT] for a required field (key!: value), and
+	// [token.ILLEGAL] for a regular field and for every other kind
+	// of declaration. Beyond reporting the marker, the evaluator
+	// makes no use of optionality: an optional or required field
+	// declares its node exactly as a regular field does.
+	// Optionality belongs to an individual declaration, so
+	// different Decls of the same node can report different
+	// markers:
+	//
+	//	x?: 1
+	//	x: 2
+	//
+	// x's node has two Decls, reporting [token.OPTION] and
+	// [token.ILLEGAL] respectively.
+	Constraint() token.Token
 
 	// Resolve resolves an expression element (which was found by
 	// walking this declaration's Key or Value) to the nodes to which
@@ -1031,6 +1166,33 @@ func (fr *frameDecl) Ellipses() NodeSet {
 		result = append(result, (*Node)(nav))
 	}
 	return dedupeNodes(result)
+}
+
+// Patterns implements [Decl].
+func (fr *frameDecl) Patterns() NodeSet {
+	f := (*frame)(fr)
+	f.navigable.eval()
+	var result NodeSet
+	for _, nav := range f.patterns {
+		result = append(result, (*Node)(nav))
+	}
+	return dedupeNodes(result)
+}
+
+// Dynamics implements [Decl].
+func (fr *frameDecl) Dynamics() NodeSet {
+	f := (*frame)(fr)
+	f.navigable.eval()
+	var result NodeSet
+	for _, nav := range f.dynamics {
+		result = append(result, (*Node)(nav))
+	}
+	return dedupeNodes(result)
+}
+
+// Constraint implements [Decl].
+func (fr *frameDecl) Constraint() token.Token {
+	return fr.constraint
 }
 
 // Resolve implements [Decl].

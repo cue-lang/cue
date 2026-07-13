@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/unstable/lsp/eval"
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
@@ -415,37 +416,114 @@ d: e: 4
 		},
 
 		{
-			name: "UnmodelledFieldForms",
+			name: "PatternsDynamicsOptionality",
 			archive: `-- a.cue --
 package p
 
 k: "kk"
-[string]: pat: 1
-("dy"+"n"): dyn: 1
+v=[string]: {pat: 1, r: v.pat}
+[int]: pat2: 2
+l=("dy"+"n"): dyn: 1
 "\(k)": interp: 1
+use: l.dyn
+disj: {[string]: 1} | {n: 2}
 opt?: 1
 req!: 2
 `,
 			check: func(t *graphTest) {
 				root := t.root()
+				fileDecl := t.soleDecl(root, eval.DeclFile)
+				file := fileDecl.Value().(*ast.File)
 
 				// Pattern constraints, dynamic fields and interpolated
 				// field names contribute no fields anywhere: not to
 				// Fields, and not via expansion either.
-				t.checkFields(root, "k", "opt", "req")
-				for _, name := range []string{"pat", "dyn", "interp"} {
+				t.checkFields(root, "disj", "k", "opt", "req", "use")
+				for _, name := range []string{"pat", "pat2", "dyn", "interp"} {
 					t.checkNodes(root.Expand().Field(name))
 				}
 
-				// Optionality is not modelled: opt?: 1 and req!: 2
-				// declare plain fields, indistinguishable from opt: 1
-				// and req: 2.
+				// Node.Patterns yields one anonymous node per pattern
+				// constraint, in declaration order, each with a single
+				// Decl of kind DeclPattern.
+				pats := root.Patterns()
+				qt.Assert(t, qt.HasLen(pats, 2))
+				patNode, pat2Node := pats[0], pats[1]
+				qt.Assert(t, qt.Equals(patNode.Name(), ""))
+				patDecl := t.soleDecl(patNode, eval.DeclPattern)
+				t.checkValue(patDecl, "{pat: 1, r: v.pat}")
+
+				// A pattern Decl's Key is its value alias when one is
+				// present, or else the bracketed label.
+				t.checkKey(patDecl, "v @ a.cue:4")
+				pat2Decl := t.soleDecl(pat2Node, eval.DeclPattern)
+				_, isListLit := pat2Decl.Key().(*ast.ListLit)
+				qt.Assert(t, qt.IsTrue(isListLit))
+				t.checkFields(pat2Node, "pat2")
+
+				// A pattern's value remains traversable: its fields
+				// are fields of the pattern's node, and paths within
+				// the value resolve as usual.
+				t.checkFields(patNode, "pat", "r")
+				sel := findNode(t, file, func(s *ast.SelectorExpr) bool {
+					x, ok := s.X.(*ast.Ident)
+					return ok && x.Name == "v"
+				})
+				t.checkResolve(fileDecl, sel, patNode.Field("pat"))
+				qt.Assert(t, qt.Equals(patNode.Field("pat").Parent(), patNode))
+
+				// Nodes are canonical: resolving the value alias v
+				// reaches the node reported by Node.Patterns.
+				vIdent := findNode(t, file, func(i *ast.Ident) bool { return i.Name == "v" })
+				t.checkResolve(fileDecl, vIdent, patNode)
+
+				// Node.Dynamics yields one anonymous node per dynamic
+				// field, whether parenthesized or interpolated, in
+				// declaration order.
+				dyns := root.Dynamics()
+				qt.Assert(t, qt.HasLen(dyns, 2))
+				dynNode, interpNode := dyns[0], dyns[1]
+				qt.Assert(t, qt.Equals(dynNode.Name(), ""))
+				dynDecl := t.soleDecl(dynNode, eval.DeclDynamic)
+				t.checkValue(dynDecl, "{dyn: 1}")
+				t.checkFields(dynNode, "dyn")
+				interpDecl := t.soleDecl(interpNode, eval.DeclDynamic)
+				_, isInterp := interpDecl.Key().(*ast.Interpolation)
+				qt.Assert(t, qt.IsTrue(isInterp))
+				t.checkFields(interpNode, "interp")
+
+				// The dynamic field's alias is visible throughout the
+				// file, so use: l.dyn resolves through it, to the same
+				// canonical node.
+				useDecl := t.soleDecl(t.field("use"), eval.DeclField)
+				useSel := useDecl.Value().(*ast.SelectorExpr)
+				t.checkResolve(useDecl, useSel.X, dynNode)
+				t.checkResolve(useDecl, useSel, dynNode.Field("dyn"))
+
+				// Decl.Patterns recovers which declaration a pattern
+				// belongs to: only the first disjunct of disj declares
+				// one.
+				disj := t.field("disj")
+				disjPats := disj.Patterns()
+				qt.Assert(t, qt.HasLen(disjPats, 1))
+				disjuncts := t.declsOfKind(disj, eval.DeclDisjunct)
+				qt.Assert(t, qt.HasLen(disjuncts, 2))
+				t.checkNodes(disjuncts[0].Patterns(), disjPats...)
+				t.checkNodes(disjuncts[1].Patterns())
+
+				// Optionality is reported per declaration by
+				// Decl.Constraint. It does not affect the model:
+				// opt?: 1 and req!: 2 declare plain fields.
 				optDecl := t.soleDecl(t.field("opt"), eval.DeclField)
 				qt.Assert(t, qt.IsFalse(optDecl.Kind().Embedded()))
-				t.checkKey(optDecl, "opt @ a.cue:7")
+				t.checkKey(optDecl, "opt @ a.cue:10")
+				qt.Assert(t, qt.Equals(optDecl.Constraint(), token.OPTION))
 				reqDecl := t.soleDecl(t.field("req"), eval.DeclField)
 				qt.Assert(t, qt.IsFalse(reqDecl.Kind().Embedded()))
-				t.checkKey(reqDecl, "req @ a.cue:8")
+				t.checkKey(reqDecl, "req @ a.cue:11")
+				qt.Assert(t, qt.Equals(reqDecl.Constraint(), token.NOT))
+				kDecl := t.soleDecl(t.field("k"), eval.DeclField)
+				qt.Assert(t, qt.Equals(kDecl.Constraint(), token.ILLEGAL))
 			},
 		},
 

@@ -441,37 +441,205 @@ d: e: 4
 		},
 
 		{
-			name: "UnmodelledFieldForms",
+			name: "PatternsDynamicsOptionality",
 			archive: `-- a.cue --
 package p
 
 k: "kk"
-[string]: pat: 1
-("dy"+"n"): dyn: 1
+v=[string]: {pat: 1, r: v.pat}
+[int]: pat2: 2
+l=("dy"+"n"): dyn: 1
 "\(k)": interp: 1
+use: l.dyn
+disj: {[string]: 1} | {n: 2}
 opt?: 1
 req!: 2
+ddyn: {("d"+"y"): dd: 3} | {n2: 4}
 `,
 			check: func(t *graphTest) {
 				root := t.root()
+				fileDecl := t.soleDecl(root, eval.DeclFile)
+				file := fileDecl.Value().(*ast.File)
 
-				// Pattern constraints, dynamic fields and interpolated
-				// field names contribute no fields anywhere: not to
-				// Fields, and not via expansion either.
-				t.checkFields(root, "k", "opt", "req")
-				for _, name := range []string{"pat", "dyn", "interp"} {
+				// Pattern constraints and dynamic fields (whether
+				// parenthesized or interpolated) contribute no fields
+				// to their enclosing node: their contents are not
+				// fields of the root, nor reachable via expansion, but
+				// live on the anonymous nodes reported by Node.Patterns
+				// and Node.Dynamics below.
+				t.checkFields(root, "ddyn", "disj", "k", "opt", "req", "use")
+				for _, name := range []string{"pat", "pat2", "dyn", "interp"} {
 					t.checkNodes(root.Expand().Field(name))
 				}
 
-				// Optionality is not modelled: opt?: 1 and req!: 2
-				// declare plain fields, indistinguishable from opt: 1
-				// and req: 2.
+				// Node.Patterns yields one anonymous node per pattern
+				// constraint, in declaration order, each with a single
+				// Decl of kind DeclPattern.
+				pats := root.Patterns()
+				qt.Assert(t, qt.HasLen(pats, 2))
+				patNode, pat2Node := pats[0], pats[1]
+				qt.Assert(t, qt.Equals(patNode.Name(), ""))
+				patDecl := t.soleDecl(patNode, eval.DeclPattern)
+				t.checkValue(patDecl, "{pat: 1, r: v.pat}")
+
+				// A pattern Decl's Key is its value alias when one is
+				// present, or else the bracketed label; its Label is
+				// the bracketed label regardless of aliasing, so the
+				// actual pattern remains accessible.
+				t.checkKey(patDecl, "v @ a.cue:4")
+				patLabel, isListLit := patDecl.Label().(*ast.ListLit)
+				qt.Assert(t, qt.IsTrue(isListLit))
+				qt.Assert(t, qt.Equals(renderValueNode(patLabel.Elts[0]), "string"))
+				pat2Decl := t.soleDecl(pat2Node, eval.DeclPattern)
+				_, isListLit = pat2Decl.Key().(*ast.ListLit)
+				qt.Assert(t, qt.IsTrue(isListLit))
+				qt.Assert(t, qt.IsTrue(pat2Decl.Key() == ast.Node(pat2Decl.Label())))
+				t.checkFields(pat2Node, "pat2")
+
+				// A pattern's value remains traversable: its fields
+				// are fields of the pattern's node, and paths within
+				// the value resolve as usual.
+				t.checkFields(patNode, "pat", "r")
+				sel := findNode(t, file, func(s *ast.SelectorExpr) bool {
+					x, ok := s.X.(*ast.Ident)
+					return ok && x.Name == "v"
+				})
+				t.checkResolve(fileDecl, sel, patNode.Field("pat"))
+				qt.Assert(t, qt.Equals(patNode.Field("pat").Parent(), patNode))
+
+				// Nodes are canonical: resolving the alias's own
+				// declaration ident (the v in v=[string], found first
+				// by the walk) reaches the very node reported by
+				// Node.Patterns.
+				vIdent := findNode(t, file, func(i *ast.Ident) bool { return i.Name == "v" })
+				t.checkResolve(fileDecl, vIdent, patNode)
+
+				// Node.Dynamics yields one anonymous node per dynamic
+				// field, whether parenthesized or interpolated, in
+				// declaration order.
+				dyns := root.Dynamics()
+				qt.Assert(t, qt.HasLen(dyns, 2))
+				dynNode, interpNode := dyns[0], dyns[1]
+				qt.Assert(t, qt.Equals(dynNode.Name(), ""))
+				dynDecl := t.soleDecl(dynNode, eval.DeclDynamic)
+				t.checkValue(dynDecl, "{dyn: 1}")
+				t.checkFields(dynNode, "dyn")
+				interpDecl := t.soleDecl(interpNode, eval.DeclDynamic)
+				_, isInterp := interpDecl.Key().(*ast.Interpolation)
+				qt.Assert(t, qt.IsTrue(isInterp))
+				t.checkFields(interpNode, "interp")
+
+				// As with patterns, an aliased dynamic field's Key is
+				// the alias ident, but its Label is still the field's
+				// label, keeping the key expression accessible.
+				t.checkKey(dynDecl, "l @ a.cue:6")
+				dynLabel, isParen := dynDecl.Label().(*ast.ParenExpr)
+				qt.Assert(t, qt.IsTrue(isParen))
+				qt.Assert(t, qt.Equals(renderValueNode(dynLabel.X), `"dy" + "n"`))
+				qt.Assert(t, qt.IsTrue(interpDecl.Key() == ast.Node(interpDecl.Label())))
+
+				// Label is nil for declarations that are not fields.
+				qt.Assert(t, qt.IsNil(fileDecl.Label()))
+
+				// The value alias l on the dynamic field is visible
+				// throughout the file, so the l.dyn in use's value
+				// resolves through it, to the same canonical nodes
+				// reported by Node.Dynamics.
+				useDecl := t.soleDecl(t.field("use"), eval.DeclField)
+				useSel := useDecl.Value().(*ast.SelectorExpr)
+				t.checkResolve(useDecl, useSel.X, dynNode)
+				t.checkResolve(useDecl, useSel, dynNode.Field("dyn"))
+
+				// Decl.Patterns recovers which declaration a pattern
+				// belongs to: only the first disjunct of disj declares
+				// one.
+				disj := t.field("disj")
+				disjPats := disj.Patterns()
+				qt.Assert(t, qt.HasLen(disjPats, 1))
+				disjuncts := t.declsOfKind(disj, eval.DeclDisjunct)
+				qt.Assert(t, qt.HasLen(disjuncts, 2))
+				t.checkNodes(disjuncts[0].Patterns(), disjPats...)
+				t.checkNodes(disjuncts[1].Patterns())
+
+				// Decl.Dynamics likewise recovers which declaration a
+				// dynamic field belongs to: only the first disjunct of
+				// ddyn declares one, and Node.Dynamics is the merged
+				// view of the same nodes.
+				ddyn := t.field("ddyn")
+				ddynDyns := ddyn.Dynamics()
+				qt.Assert(t, qt.HasLen(ddynDyns, 1))
+				t.checkFields(ddynDyns[0], "dd")
+				ddynDisjuncts := t.declsOfKind(ddyn, eval.DeclDisjunct)
+				qt.Assert(t, qt.HasLen(ddynDisjuncts, 2))
+				t.checkNodes(ddynDisjuncts[0].Dynamics(), ddynDyns...)
+				t.checkNodes(ddynDisjuncts[1].Dynamics())
+
+				// Optionality is reported per declaration by
+				// Decl.Constraint. It does not affect the model:
+				// opt?: 1 and req!: 2 declare plain fields.
 				optDecl := t.soleDecl(t.field("opt"), eval.DeclField)
 				qt.Assert(t, qt.IsFalse(optDecl.Kind().Embedded()))
-				t.checkKey(optDecl, "opt @ a.cue:7")
+				t.checkKey(optDecl, "opt @ a.cue:10")
+				qt.Assert(t, qt.Equals(optDecl.Constraint(), eval.ConstraintOptional))
 				reqDecl := t.soleDecl(t.field("req"), eval.DeclField)
 				qt.Assert(t, qt.IsFalse(reqDecl.Kind().Embedded()))
-				t.checkKey(reqDecl, "req @ a.cue:8")
+				t.checkKey(reqDecl, "req @ a.cue:11")
+				qt.Assert(t, qt.Equals(reqDecl.Constraint(), eval.ConstraintRequired))
+				kDecl := t.soleDecl(t.field("k"), eval.DeclField)
+				qt.Assert(t, qt.Equals(kDecl.Constraint(), eval.ConstraintRegular))
+			},
+		},
+
+		{
+			// Node.Constraint unifies the constraints of a node's own
+			// field declarations, and only those.
+			name: "NodeConstraint",
+			archive: `-- a.cue --
+package p
+
+k: 1
+opt?: 1
+req!: 1
+blend!: int
+blend?: 2
+mix?: int
+mix: 2
+ctrap?: {a: 1} & {b: 2}
+[string]: pat: 1
+x: _
+y?: x
+`,
+			check: func(t *graphTest) {
+				checkConstraint := func(n *eval.Node, want eval.Constraint, wantOK bool) {
+					t.Helper()
+					got, ok := n.Constraint()
+					qt.Assert(t, qt.Equals(ok, wantOK))
+					qt.Assert(t, qt.Equals(got, want))
+				}
+
+				// Single declarations report their own marker; several
+				// declarations unify (regular wins outright, otherwise
+				// required beats optional).
+				checkConstraint(t.field("k"), eval.ConstraintRegular, true)
+				checkConstraint(t.field("opt"), eval.ConstraintOptional, true)
+				checkConstraint(t.field("req"), eval.ConstraintRequired, true)
+				checkConstraint(t.field("blend"), eval.ConstraintRequired, true)
+				checkConstraint(t.field("mix"), eval.ConstraintRegular, true)
+
+				// Non-field decls take no part: ctrap's conjunction
+				// operands (whose Decl.Constraint is the zero value,
+				// ConstraintRegular) do not make it regular.
+				checkConstraint(t.field("ctrap"), eval.ConstraintOptional, true)
+
+				// Nodes without field declarations have no constraint.
+				pats := t.root().Patterns()
+				qt.Assert(t, qt.HasLen(pats, 1))
+				checkConstraint(pats[0], eval.ConstraintRegular, false)
+
+				// The constraint is a property of the node's own
+				// declarations: referencing the regular field x does
+				// not affect y's optionality.
+				checkConstraint(t.field("y"), eval.ConstraintOptional, true)
 			},
 		},
 
@@ -1202,4 +1370,54 @@ v: {w: 1}
 			},
 		},
 	}.run(t)
+}
+
+// TestUnifyConstraints exhaustively checks the unification of field
+// constraints: every ordered pair, and associativity over every
+// triple.
+func TestUnifyConstraints(t *testing.T) {
+	// In subsumption order, weakest first.
+	optional, required, regular := eval.ConstraintOptional, eval.ConstraintRequired, eval.ConstraintRegular
+
+	want := map[[2]eval.Constraint]eval.Constraint{
+		{optional, optional}: optional,
+		{optional, required}: required,
+		{optional, regular}:  regular,
+		{required, optional}: required,
+		{required, required}: required,
+		{required, regular}:  regular,
+		{regular, optional}:  regular,
+		{regular, required}:  regular,
+		{regular, regular}:   regular,
+	}
+
+	constraints := []eval.Constraint{optional, required, regular}
+	for _, a := range constraints {
+		for _, b := range constraints {
+			got := eval.UnifyConstraints(a, b)
+			qt.Assert(t, qt.Equals(got, want[[2]eval.Constraint{a, b}]),
+				qt.Commentf("UnifyConstraints(%v, %v)", a, b))
+		}
+	}
+
+	// Unification is associative, so folding a list of declarations'
+	// constraints is order-independent.
+	for _, a := range constraints {
+		for _, b := range constraints {
+			for _, c := range constraints {
+				left := eval.UnifyConstraints(eval.UnifyConstraints(a, b), c)
+				right := eval.UnifyConstraints(a, eval.UnifyConstraints(b, c))
+				qt.Assert(t, qt.Equals(left, right),
+					qt.Commentf("associativity: a=%v b=%v c=%v", a, b, c))
+			}
+		}
+	}
+}
+
+// TestConstraintToken checks the mapping from constraints back to
+// their source-level markers.
+func TestConstraintToken(t *testing.T) {
+	qt.Assert(t, qt.Equals(eval.ConstraintRegular.Token(), token.ILLEGAL))
+	qt.Assert(t, qt.Equals(eval.ConstraintRequired.Token(), token.NOT))
+	qt.Assert(t, qt.Equals(eval.ConstraintOptional.Token(), token.OPTION))
 }

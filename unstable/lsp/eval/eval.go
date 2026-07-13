@@ -1666,6 +1666,14 @@ type frame struct {
 	// zero value is [DeclExpression]: a frame that does not
 	// correspond to any source-level declaration.
 	kind DeclKind
+	// constraint records the optionality marker of the field that this
+	// frame declares: [ConstraintOptional] for optional fields (x?:
+	// v), and [ConstraintRequired] for required fields (x!: v). It is
+	// [ConstraintRegular] (the zero value) for regular fields, and for
+	// frames that do not model a field declaration at all. Beyond
+	// recording it, the evaluator makes no use of optionality: `x?: v`
+	// declares `x` exactly as `x: v` does.
+	constraint Constraint
 	// parent is the parent frame.
 	parent *frame
 	// childFrames contains every frame that is a child of this
@@ -1681,6 +1689,13 @@ type frame struct {
 	// expression. For example in the path {a: 3, b: a}.b, a frame with
 	// no key will be created, containing the structlit {a: 3, b: a}.
 	key ast.Node
+	// label is the complete label of the field declaration that this
+	// frame models, with any value alias unwrapped. Unlike key, it is
+	// unaffected by aliasing: for v=[string]: {...} the label is the
+	// bracketed pattern. It is nil for frames that do not model field
+	// declarations, and for fields synthesized by the evaluator
+	// (e.g. list elements). It is surfaced via [Decl.Label].
+	label ast.Label
 	// node is the initial node that this frame is solely responsible
 	// for evaluating.
 	node  ast.Node
@@ -1704,6 +1719,19 @@ type frame struct {
 	bindings map[string][]*frame
 	// ellipses contains navigables for ellipsis values.
 	ellipses []*navigable
+	// patterns contains navigables for the values of pattern
+	// constraints (e.g. [string]: x: 3) declared within this
+	// frame. The evaluator never matches field names against patterns:
+	// these navigables are anonymous and take no part in navigation,
+	// but their frames remain traversable by offset.
+	patterns []*navigable
+	// dynamics contains navigables for the values of dynamic fields
+	// (e.g. (expr): x: 3, or "\(expr)": x: 3) declared within this
+	// frame. The evaluator never computes the names of dynamic fields,
+	// even when trivial: these navigables are anonymous and take no
+	// part in navigation, but their frames remain traversable by
+	// offset.
+	dynamics []*navigable
 	// navigable provides access to the "navigable bindings" that is
 	// shared between multiple frames that should be considered
 	// "merged together".
@@ -2216,10 +2244,35 @@ func (f *frame) eval() {
 			}
 
 			childFr := parentFr.newFrame(node.Value, childNav, false)
-			childFr.kind = DeclField
+			switch {
+			case fieldDecl.patternField:
+				childFr.kind = DeclPattern
+				f.patterns = append(f.patterns, childFr.navigable)
+			case fieldDecl.dynamicField:
+				childFr.kind = DeclDynamic
+				f.dynamics = append(f.dynamics, childFr.navigable)
+			default:
+				childFr.kind = DeclField
+			}
+			childFr.constraint = constraintFromToken(node.Constraint)
+			// We rely on the invariant that if the key starts with __
+			// then we've created it (e.g. list elements), and so there
+			// is no source-level label.
+			if !strings.HasPrefix(keyName, "__") {
+				childFr.label = fieldDecl.label
+			}
 			if valueAlias != nil {
 				childFr.key = valueAlias
 				childFr.parent.appendBinding(valueAlias.Name, childFr)
+			} else if fieldDecl.patternField || fieldDecl.dynamicField {
+				// A pattern constraint or dynamic field has no name, so
+				// its label ([expr], (expr), or an interpolation) is
+				// the closest thing it has to a defining key. Nothing
+				// resolves to this frame's navigable unless the field
+				// has a value alias (in which case the alias is the
+				// key, as usual), so this key is only observable via
+				// the graph API.
+				childFr.key = node.Label
 			}
 
 			childFr.docsNode = node
@@ -2362,6 +2415,7 @@ func fieldNames(field *ast.Field) *fieldDeclExpr {
 			result.exprs = append(result.exprs, alias.Expr)
 		}
 	}
+	result.label = label
 
 	switch label := label.(type) {
 	case *ast.Ident:
@@ -2376,9 +2430,11 @@ func fieldNames(field *ast.Field) *fieldDeclExpr {
 		}
 
 	case *ast.Interpolation:
+		result.dynamicField = true
 		result.exprs = append(result.exprs, label)
 
 	case *ast.ParenExpr:
+		result.dynamicField = true
 		if alias, ok := label.X.(*ast.Alias); ok {
 			// (X=e): field
 			// Although the spec supports this, the parser doesn't seem to.
@@ -2757,6 +2813,9 @@ type fieldDeclExpr struct {
 	keyName string
 	// key is the main key of the field if it's an Ident or a BasicLit
 	key ast.Label
+	// label is the field's complete label with any value alias
+	// unwrapped: for v=[string]: {...} it is the bracketed pattern.
+	label ast.Label
 	// keyAliasIdent is the alias that refers to the field's key's name
 	keyAliasIdent *ast.Ident
 	// valueAliasIdent is the alias that refers to the field's value
@@ -2765,6 +2824,10 @@ type fieldDeclExpr struct {
 	// a pattern. This limits visibility of all aliases to the field's
 	// value scope.
 	patternField bool
+	// dynamicField indicates that the field's name is computed by an
+	// expression ((expr): v) or an interpolation ("\(expr)": v). The
+	// name is never computed by this evaluator, even when trivial.
+	dynamicField bool
 	// keyExpr contains the expression associated with the
 	// key. For (x=e]: y and [x=e]: y aliases, the alias x should
 	// resolve to the expression e, and not the field value y.

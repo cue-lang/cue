@@ -84,6 +84,11 @@
 // it is deprecated and will be removed in v0.19.
 package protobuf
 
+// TODO: replace github.com/emicklei/proto with
+// github.com/bufbuild/protocompile, which tracks the protobuf language
+// with protoc parity, notably editions, and whose linker could replace
+// our ad-hoc name resolution.
+
 // TODO mappings:
 //
 // Wrapper types	various types	2, "2", "foo", true, "true", null, 0, …	Wrappers use the same representation in JSON as the wrapped primitive type, except that null is allowed and preserved during data conversion and transfer.

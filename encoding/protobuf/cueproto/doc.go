@@ -19,9 +19,7 @@
 // extensions.
 package cueproto
 
-// The cue.pb.go files here and in the sibling cue package are regenerated
-// by hand rather than via a go:generate directive, as CI runs
-// "go generate ./..." without protoc installed. Use a protoc-gen-go
-// matching the google.golang.org/protobuf version in go.mod:
-//
-//	protoc --go_out=.. --go_opt=paths=source_relative -I .. cueproto/cue.proto cue/cue.proto
+// The cue.pb.go files here and in the sibling cue package are generated
+// without needing protoc; see [cuelang.org/go/internal/cmd/genproto].
+
+//go:generate go run cuelang.org/go/internal/cmd/genproto

@@ -16,6 +16,24 @@
       "message": "This seems a bit hacky, as this special-cases this case. So ideally we should be able to do without and have a more principled solution.\n\nBut if none can be found it is acceptable, perhaps with a comment.",
       "revId": "02db07d1bcc1c4481a38989508d075197e66138c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56baf605_ef90e997",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 835,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-13T23:04:21Z",
+      "side": 1,
+      "message": "I dug into whether a more principled fix is possible; I believe this is the principled place, and I\u0027ve expanded the comment to justify it.\n\nThe underlying problem is that the machinery below evaluates the let\u0027s expression in a synthetic vertex, i.e. it unifies whatever the expression yields into a fresh child node. For `let X \u003d self` the expression yields the enclosing vertex itself, so this unifies a parent into its own child, and the resulting expansion can never be a faithful copy: it re-instantiates the parent\u0027s StructLits with the synthetic vertex as `self`, so nested references through the let rebind to the copy. In the rooted case this is masked because the synthetic vertex structure-shares the parent; for inline vertices sharing is disabled (issue 3801), exposing the mirror path.\n\nI also prototyped fixing this in the sharing layer instead, by allowing dynamic/non-rooted arcs to be shared into let vertices. That fixes the single-conjunct test case but not the two-conjunct one: sharing can always fall back to expansion (unshare on a second conjunct arriving via notifications, and sharing of let-labeled referents is itself unsupported), and the expansion rebinds self as above. Since sharing must remain a semantically optional optimization, alias transparency cannot be guaranteed there.\n\nWhat makes ValueReference special rather than an arbitrary syntactic carve-out: it is the one expression class whose value is defined as a vertex identity and whose resolution is a total environment lookup (relNode) that can never suspend or be incomplete. Every other let expression genuinely needs the synthetic vertex as a caching and suspension point, and resolving those referents directly would change incomplete-error and structural-cycle behavior.",
+      "parentUuid": "b16d6338_3c3ea4d3",
+      "revId": "02db07d1bcc1c4481a38989508d075197e66138c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

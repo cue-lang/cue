@@ -22,6 +22,11 @@ cmp stdout intro-spaces-stdout
 exec cue_stdinpipe cmd noreads
 cmp stdout noreads-stdout
 
+# A task whose stdin field fails to evaluate must surface that error
+# rather than running the command with an empty stdin.
+# TODO: the error is silently ignored and the command succeeds.
+exec cue cmd badstdin
+
 -- echo-stdin --
 Hello World!
 -- echo-stdout --
@@ -46,6 +51,7 @@ not reading any stdin
 package hello
 
 import (
+	"encoding/json"
 	"tool/cli"
 	"tool/exec"
 )
@@ -82,6 +88,13 @@ command: intro: {
 command: noreads: {
 	first: exec.Run & {
 		cmd: ["echo", "not reading any stdin"]
+	}
+}
+
+command: badstdin: {
+	run: exec.Run & {
+		cmd:   "cat"
+		stdin: json.Marshal({a!: int})
 	}
 }
 -- cue.mod/module.cue --

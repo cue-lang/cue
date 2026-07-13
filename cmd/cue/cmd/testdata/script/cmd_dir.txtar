@@ -1,6 +1,11 @@
 exec cue cmd ls
 cmp stdout expect-stdout
 
+# A task whose dir field fails to evaluate must surface that error
+# rather than running the command in the current working directory.
+# TODO: the error is silently ignored and the command succeeds.
+exec cue cmd baddir
+
 -- expect-stdout --
 a.txt
 b.txt
@@ -14,6 +19,7 @@ package ls
 import (
     "tool/cli"
     "tool/exec"
+    "encoding/json"
 )
 
 command: ls: {
@@ -26,6 +32,11 @@ command: ls: {
 	task: display: cli.Print & {
 		text: ls.stdout
 	}
+}
+
+command: baddir: run: exec.Run & {
+	cmd: ["true"]
+	dir: json.Marshal({a!: int})
 }
 
 -- cue.mod/module.cue --

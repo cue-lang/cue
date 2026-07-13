@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1645c6a8_79f282ff",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-13T17:31:28Z",
+      "side": 1,
+      "message": "Agh, I\u0027ve mucked something up. This is done, but in https://cue.gerrithub.io/c/cue-lang/cue/+/1241860/",
+      "parentUuid": "e7d1081f_9955bdbc",
+      "revId": "afa07953eff950dc21759873013feec7e5193ede",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e47fb11_e0a45203",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d0b79b7_638b1857",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-13T17:31:28Z",
+      "side": 1,
+      "message": "Agh, I\u0027ve mucked something up. This is done, but in https://cue.gerrithub.io/c/cue-lang/cue/+/1241860/",
+      "parentUuid": "0e47fb11_e0a45203",
+      "revId": "afa07953eff950dc21759873013feec7e5193ede",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a88c2ca_dc9b2d77",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-30T12:25:57Z",
       "side": 1,
       "message": "I\u0027d like to see some more interesting test cases here: pattern constraints, dynamic fields, hidden fields, definitions etc.",
+      "revId": "afa07953eff950dc21759873013feec7e5193ede",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa463616_e3ef401d",
+        "filename": "unstable/lsp/eval/graph_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-13T17:31:28Z",
+      "side": 1,
+      "message": "Agh, I\u0027ve mucked something up. This is done, but in https://cue.gerrithub.io/c/cue-lang/cue/+/1241860/",
+      "parentUuid": "5a88c2ca_dc9b2d77",
       "revId": "afa07953eff950dc21759873013feec7e5193ede",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

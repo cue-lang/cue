@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b16d6338_3c3ea4d3",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 835,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-07-13T21:19:55Z",
+      "side": 1,
+      "message": "This seems a bit hacky, as this special-cases this case. So ideally we should be able to do without and have a more principled solution.\n\nBut if none can be found it is acceptable, perhaps with a comment.",
+      "revId": "02db07d1bcc1c4481a38989508d075197e66138c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

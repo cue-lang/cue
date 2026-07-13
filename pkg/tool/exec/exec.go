@@ -44,24 +44,37 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	// TODO: set environment variables, if defined.
-	stream := func(name string) (stream cue.Value, ok bool) {
+	stream := func(name string) (stream cue.Value, ok bool, err error) {
 		c := ctx.Obj.LookupPath(cue.ParsePath(name))
-		if c.Err() != nil || c.IsNull() {
-			return
+		// A field that is absent or null is simply not configured;
+		// an error, such as a failure to compute its value, must not be ignored.
+		if !c.Exists() || c.IsNull() {
+			return cue.Value{}, false, nil
 		}
-		return c, true
+		if err := c.Err(); err != nil {
+			return cue.Value{}, false, err
+		}
+		return c, true, nil
 	}
 
-	if v, ok := stream("stdin"); !ok {
+	if v, ok, err := stream("stdin"); err != nil {
+		return nil, err
+	} else if !ok {
 		cmd.Stdin = ctx.Stdin
 	} else if cmd.Stdin, err = v.Reader(); err != nil {
 		return nil, errors.Wrapf(err, v.Pos(), "invalid input")
 	}
-	_, captureOut := stream("stdout")
+	_, captureOut, err := stream("stdout")
+	if err != nil {
+		return nil, err
+	}
 	if !captureOut {
 		cmd.Stdout = ctx.Stdout
 	}
-	_, captureErr := stream("stderr")
+	_, captureErr, err := stream("stderr")
+	if err != nil {
+		return nil, err
+	}
 	if !captureErr {
 		cmd.Stderr = ctx.Stderr
 	}

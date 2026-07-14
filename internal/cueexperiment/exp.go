@@ -67,6 +67,11 @@ type Config struct {
 	// the openapi encoding used by "cue import" and "cue export", extracting
 	// and generating a complete OpenAPI document rather than only its schemas.
 	OpenAPIV2 bool `experiment:"preview:v0.18.0"`
+
+	// YAMLV4 selects the github.com/goccy/go-yaml based YAML decoder,
+	// which retains more precise position and comment information than
+	// the older go.yaml.in/yaml/v3 based decoder it replaces.
+	YAMLV4 bool `experiment:"preview:v0.18.0,default:v0.18.0"`
 }
 
 // initExperimentFlags initializes the experiment flags by processing both

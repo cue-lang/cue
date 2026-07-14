@@ -149,6 +149,7 @@ _foo: a?: int
 				x: true
 				y: true
 			}
+			maxProperties: 100
 		}
 	}
 }

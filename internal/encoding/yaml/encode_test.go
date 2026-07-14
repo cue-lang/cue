@@ -18,8 +18,8 @@ import (
 	"strings"
 	"testing"
 
+	gparser "github.com/goccy/go-yaml/parser"
 	"github.com/google/go-cmp/cmp"
-	"go.yaml.in/yaml/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
@@ -90,6 +90,63 @@ dat: !!binary gA==
 nil: null
 "yes": true
 non: false
+`,
+	}, {
+		// Strings use a literal block only when the block decodes back
+		// to the same value: no line may end in a space, and characters
+		// needing escapes require double quotes instead. Blank lines
+		// within a block stay truly empty. Multi-line CUE literals keep
+		// their block form even with single-line content.
+		name: "strings",
+		in: `
+blank: """
+	line1
+
+	line2
+	"""
+single: """
+	{"tmpl": {{value}}}
+	"""
+deep: nested: """
+	one line
+	"""
+list: ["""
+	elem
+	""", "plain"]
+trailsp:   "a \nb"
+spaceline: "a\n \nb"
+endsp:     "x\n "
+tab:       "x\ty"
+cr:        "a\rb"
+nel:       "x\u0085y"
+tabline: """
+	a\tb
+	c
+	"""
+`,
+		out: `
+blank: |-
+  line1
+
+  line2
+single: |-
+  {"tmpl": {{value}}}
+deep:
+  nested: |-
+    one line
+list:
+  - |-
+    elem
+  - plain
+trailsp: "a \nb"
+spaceline: "a\n \nb"
+endsp: "x\n "
+tab: "x\ty"
+cr: "a\rb"
+nel: "x\u0085y"
+tabline: |-
+  a	b
+  c
 `,
 	}, {
 		name: "comments",
@@ -328,6 +385,10 @@ field: value
 				got = err.Error()
 			} else {
 				got = strings.TrimSpace(string(b))
+				// Any successfully encoded output must be valid YAML.
+				if _, err := gparser.ParseBytes(b, 0); err != nil {
+					t.Errorf("output does not re-parse as YAML: %v", err)
+				}
 			}
 			want := strings.TrimSpace(tc.out)
 			if got != want {
@@ -381,11 +442,7 @@ true
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			n, err := encode(tc.in)
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, err := yaml.Marshal(n)
+			b, err := Encode(tc.in)
 			if err != nil {
 				t.Fatal(err)
 			}

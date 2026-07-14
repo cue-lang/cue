@@ -149,9 +149,10 @@ Available global experiments:
     and generating a complete OpenAPI document rather than only its schemas.
 
   yamlgoccy (preview: v0.18.0, default: v0.18.0)
-    yamlgoccy selects the github.com/goccy/go-yaml based YAML decoder,
-    which retains more precise position and comment information than
-    the older github.com/go-yaml/yaml based decoder it replaces.
+    yamlgoccy selects the github.com/goccy/go-yaml based YAML decoder
+    and encoder. The new decoder retains more precise position and
+    comment information than the older github.com/go-yaml/yaml based
+    implementation it replaces.
 
 Each experiment's lifecycle tracks language versions as follows:
 - preview:   experimental feature that can be enabled

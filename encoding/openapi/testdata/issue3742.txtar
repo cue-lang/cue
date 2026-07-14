@@ -1,14 +1,10 @@
 # Tests that a field bounded by another non-concrete field (e.g.
 # limits.cpu: number & >=requests.cpu) can be generated. The bound cannot be
-# expressed in JSON Schema, so it should be dropped rather than causing an
-# error. Issue: https://cuelang.org/issue/3742
-#
-# This test currently documents the buggy behavior: generation fails with
-# "bad argument to unary comparison". The fix removes the error.
+# expressed in JSON Schema, so it is dropped rather than causing an error.
+# Issue: https://cuelang.org/issue/3742
 #v2
 #Version: 3.0
 #AllSchemas
-#ExpectError: bad argument to unary comparison
 -- in.cue --
 openapi: "3.0.0"
 info: {title: "t", version: "1"}
@@ -19,4 +15,114 @@ paths: {}
 		cpu:    number & >=requests.cpu
 		memory: number & >=requests.memory
 	}
+}
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Resource": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "limits": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                     "cpu": {
+                        "type": "number"
+                     },
+                     "memory": {
+                        "type": "number"
+                     }
+                  },
+                  "required": [
+                     "cpu",
+                     "memory"
+                  ]
+               },
+               "requests": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                     "cpu": {
+                        "type": "number"
+                     },
+                     "memory": {
+                        "type": "number"
+                     }
+                  },
+                  "required": [
+                     "cpu",
+                     "memory"
+                  ]
+               }
+            },
+            "required": [
+               "limits",
+               "requests"
+            ]
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Resource": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "limits": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                     "cpu": {
+                        "type": "number"
+                     },
+                     "memory": {
+                        "type": "number"
+                     }
+                  },
+                  "required": [
+                     "cpu",
+                     "memory"
+                  ]
+               },
+               "requests": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                     "cpu": {
+                        "type": "number"
+                     },
+                     "memory": {
+                        "type": "number"
+                     }
+                  },
+                  "required": [
+                     "cpu",
+                     "memory"
+                  ]
+               }
+            },
+            "required": [
+               "limits",
+               "requests"
+            ]
+         }
+      }
+   }
 }

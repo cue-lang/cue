@@ -250,10 +250,13 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 	}
 	rd, err := loc.Registry.GetTag(ctx, loc.Repository, loc.Tag)
 	if err != nil {
+		// Note: callers already know which module version they asked
+		// for, and typically mention it when adding their own context,
+		// so don't repeat it here.
 		if isNotExist(err) {
-			return nil, fmt.Errorf("module %v: %w", m, ErrNotFound)
+			return nil, ErrNotFound
 		}
-		return nil, moduleError(m, loc, err)
+		return nil, registryError(loc, err)
 	}
 	defer rd.Close()
 	data, err := io.ReadAll(rd)
@@ -556,6 +559,15 @@ func moduleError(m any, loc RegistryLocation, err error) error {
 		return fmt.Errorf("module %v in registry %q: %w", m, loc.Host, err)
 	}
 	return fmt.Errorf("module %v: %w", m, err)
+}
+
+// registryError is like [moduleError] for callers which already have
+// module context of their own, so only the registry host is added.
+func registryError(loc RegistryLocation, err error) error {
+	if loc.Host != "" {
+		return fmt.Errorf("registry %q: %w", loc.Host, err)
+	}
+	return err
 }
 
 func (c *Client) resolve(m module.Version) (RegistryLocation, error) {

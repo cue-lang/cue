@@ -122,7 +122,7 @@ deps: "bar.com@v0": v: "v0.0.2"	// doesn't exist
 		"foo.com/bar/hello@v0.2.3",
 	), nil)
 	_, err := rs.Graph(ctx)
-	qt.Assert(t, qt.ErrorMatches(err, `bar.com@v0.0.2: module bar.com@v0.0.2: module not found`))
+	qt.Assert(t, qt.ErrorMatches(err, `bar.com@v0.0.2: module not found`))
 	qt.Assert(t, qt.ErrorAs(err, new(*mvs.BuildListError[module.Version])))
 }
 

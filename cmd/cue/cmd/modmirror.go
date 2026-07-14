@@ -215,11 +215,11 @@ func (mm *modMirror) mirrorWithDeps(ctx context.Context, mv module.Version) erro
 	mm.done[mv] = true
 	m, err := mm.srcReg.GetModule(ctx, mv)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot fetch %v: %w", mv, err)
 	}
 	modFileData, err := m.ModuleFile(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot fetch %v: %w", mv, err)
 	}
 	mf, err := modfile.Parse(modFileData, mv.String()+"/cue.mod/module.cue")
 	if err != nil {
@@ -246,7 +246,7 @@ func (mm *modMirror) mirrorWithDeps(ctx context.Context, mv module.Version) erro
 	}
 	fmt.Printf("mirroring %v\n", mv)
 	if err := mm.srcReg.Mirror(ctx, mm.dstReg, mv); err != nil {
-		return err
+		return fmt.Errorf("cannot mirror %v: %w", mv, err)
 	}
 	return nil
 }

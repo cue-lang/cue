@@ -538,6 +538,29 @@ func (i *itemBytes) apply(f func(internItem, *uniqueItems) internItem, u *unique
 	return i
 }
 
+// itemSizedNumber represents a sized numeric builtin type (int32, int64,
+// float32, float64) rendered as a type plus an OpenAPI format keyword.
+type itemSizedNumber struct {
+	typ    string
+	format string
+}
+
+func (it *itemSizedNumber) hash(h *maphash.Hash, u *uniqueItems) {
+	h.WriteString(it.typ)
+	h.WriteString(it.format)
+}
+
+func (i *itemSizedNumber) generate(g *generator) ast.Expr {
+	return makeSchemaStructLit(
+		makeField("type", ast.NewString(i.typ)),
+		makeField("format", ast.NewString(i.format)),
+	)
+}
+
+func (i *itemSizedNumber) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {
+	return i
+}
+
 // itemPattern represents a pattern constraint
 type itemPattern struct {
 	regexp string

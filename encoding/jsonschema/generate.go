@@ -177,6 +177,12 @@ type generateDialect struct {
 	// expressed with `contentEncoding: base64` (draft-07 and later) rather
 	// than the OpenAPI 3.0 `format: byte` keyword.
 	bytesViaContentEncoding bool
+
+	// numericFormats reports whether the sized numeric builtin types
+	// (int32, int64, float32, float64) are expressed with a format
+	// keyword rather than being expanded to their numeric bounds. This is
+	// the OpenAPI convention.
+	numericFormats bool
 }
 
 // Generate generates a JSON Schema for the given CUE value,
@@ -644,6 +650,9 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		}
 		return ref
 	case cue.AndOp:
+		if it := g.makeSizedNumberItem(v); it != nil {
+			return it
+		}
 		if v.Kind() == cue.StructKind {
 			// It's a conjunction of structs: we want to see all the
 			// top level fields in one coherent view because JSON
@@ -909,6 +918,52 @@ func (g *generator) constExpr(v cue.Value, mode closedMode) (ast.Expr, bool) {
 	}
 	expr, ok := v.Syntax().(ast.Expr)
 	return expr, ok
+}
+
+// sizedNumber describes the JSON Schema type and format used to represent a
+// sized numeric builtin type in the OpenAPI dialect.
+type sizedNumber struct {
+	typ    string
+	format string
+}
+
+// sizedNumberFormats maps the CUE sized numeric builtin types to their
+// OpenAPI type and format. uint32/uint64 have no OpenAPI format and so are
+// left to be expressed via their bounds.
+var sizedNumberFormats = map[string]sizedNumber{
+	"int32":   {"integer", "int32"},
+	"int64":   {"integer", "int64"},
+	"float32": {"number", "float"},
+	"float64": {"number", "double"},
+}
+
+// makeSizedNumberItem returns an item representing a value that is exactly one
+// of the sized numeric builtin types (int32, int64, float32, float64) when the
+// dialect expresses these with a format keyword. It returns nil otherwise, so
+// the value is rendered via its numeric bounds instead.
+//
+// The type is recognized via v.Syntax(cue.Final()), which reports the builtin
+// name for a value whose bounds match one of the sized types exactly. A value
+// with tighter bounds (for example int32 & <=100) is not an identifier and so
+// is not matched.
+func (g *generator) makeSizedNumberItem(v cue.Value) item {
+	if !g.dialect.numericFormats {
+		return nil
+	}
+	switch v.IncompleteKind() {
+	case cue.IntKind, cue.FloatKind, cue.NumberKind:
+	default:
+		return nil
+	}
+	id, ok := v.Syntax(cue.Final()).(*ast.Ident)
+	if !ok {
+		return nil
+	}
+	f, ok := sizedNumberFormats[id.Name]
+	if !ok {
+		return nil
+	}
+	return &itemSizedNumber{typ: f.typ, format: f.format}
 }
 
 func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode) item {
@@ -1549,6 +1604,7 @@ func newGenerateDialect(v Version) (generateDialect, error) {
 			supportsPatternProperties: false,
 			supportsIfThenElse:        false,
 			refComposesWithSiblings:   false,
+			numericFormats:            true,
 		}, nil
 	}
 	return generateDialect{}, fmt.Errorf("version %v is not supported for generating JSON Schema", v)

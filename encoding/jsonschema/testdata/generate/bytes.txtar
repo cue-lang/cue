@@ -1,0 +1,13 @@
+# Generation of a CUE bytes value. On the JSON wire bytes are base64
+# encoded, so in JSON Schema (draft-07 and later) this is expressed with a
+# string plus contentEncoding: base64. See https://cuelang.org/issue/1785
+-- test.cue --
+package test
+
+data?: bytes
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: data: true
+}

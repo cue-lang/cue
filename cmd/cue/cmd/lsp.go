@@ -26,9 +26,8 @@ import (
 
 func newLSPCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Hidden: true,
-		Use:    "lsp",
-		Short:  "start or interact with a CUE Language Server instance",
+		Use:   "lsp",
+		Short: "start or interact with a CUE Language Server instance",
 		Run: func(cmd *cobra.Command, args []string) {
 			c.Command = cmd
 			runLSP(c, args)

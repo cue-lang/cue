@@ -75,6 +75,7 @@ Available Commands:
   get         add non-CUE dependencies to the current module
   import      convert other formats to CUE files
   login       log into a CUE registry
+  lsp         start or interact with a CUE Language Server instance
   mod         module maintenance
   trim        remove superfluous fields
   version     print the CUE version and build information

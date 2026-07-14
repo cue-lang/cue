@@ -516,6 +516,28 @@ func (i *itemFormat) apply(f func(internItem, *uniqueItems) internItem, u *uniqu
 	return i
 }
 
+// itemBytes represents a CUE bytes value. Bytes are base64-encoded on the
+// JSON wire, so it generates a string constrained by the dialect's encoding
+// keyword: format: byte for OpenAPI 3.0, contentEncoding: base64 otherwise.
+type itemBytes struct{}
+
+func (it *itemBytes) hash(h *maphash.Hash, u *uniqueItems) {
+}
+
+func (i *itemBytes) generate(g *generator) ast.Expr {
+	fields := []ast.Decl{makeField("type", ast.NewString("string"))}
+	if g.dialect.bytesViaContentEncoding {
+		fields = append(fields, makeField("contentEncoding", ast.NewString("base64")))
+	} else {
+		fields = append(fields, makeField("format", ast.NewString("byte")))
+	}
+	return makeSchemaStructLit(fields...)
+}
+
+func (i *itemBytes) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {
+	return i
+}
+
 // itemPattern represents a pattern constraint
 type itemPattern struct {
 	regexp string

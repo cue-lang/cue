@@ -732,6 +732,12 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 			// Binary operations can't be expressed in JSON Schema.
 			break
 		}
+		if !args[0].IsConcrete() {
+			// The bound refers to a non-concrete value (for example a
+			// bound on another field), so it can't be expressed in JSON
+			// Schema; accept anything.
+			return &itemTrue{}
+		}
 		switch kind := args[0].Kind(); kind {
 		case cue.FloatKind, cue.IntKind:
 			n, err := args[0].Float64()

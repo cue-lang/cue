@@ -148,12 +148,19 @@ func NewResolver(cfg *Config) (*Resolver, error) {
 	return &Resolver{
 		resolver: resolver,
 		newRegistry: func(host string, insecure bool) (ociregistry.Interface, error) {
+			transport := &cueLoginsTransport{
+				getenv: getenv,
+				cfg:    cfg,
+			}
+			// Initialize the transport eagerly so that a broken auth
+			// configuration surfaces as a direct error rather than
+			// wrapped in the HTTP request that would first use it.
+			if err := transport.init(); err != nil {
+				return nil, err
+			}
 			return ociclient.New(host, &ociclient.Options{
-				Insecure: insecure,
-				Transport: &cueLoginsTransport{
-					getenv: getenv,
-					cfg:    cfg,
-				},
+				Insecure:  insecure,
+				Transport: transport,
 			})
 		},
 		registries: make(map[string]ociregistry.Interface),
@@ -197,7 +204,7 @@ func (r *Resolver) ResolveToRegistry(mpath string, version string) (modregistry.
 	if reg == nil {
 		reg1, err := r.newRegistry(loc.Host, loc.Insecure)
 		if err != nil {
-			return modregistry.RegistryLocation{}, fmt.Errorf("cannot make client: %v", err)
+			return modregistry.RegistryLocation{}, err
 		}
 		r.registries[loc.Host] = reg1
 		reg = reg1

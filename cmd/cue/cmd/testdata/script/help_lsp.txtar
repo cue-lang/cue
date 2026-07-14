@@ -1,0 +1,66 @@
+# Verify the help output for the lsp command. The lsp command uses
+# the same cobra command handling as every other cue command, so its
+# own flags appear in the help output and in shell completion
+# suggestions, alongside the inherited root flags.
+
+exec cue help lsp
+cmp stdout expect-stdout
+
+exec cue __complete lsp -
+cmp stdout expect-complete-stdout
+
+-- expect-stdout --
+lsp runs a CUE language server.
+
+The server communicates using the Language Server Protocol (LSP), with
+JSONRPC2 over stdin and stdout, and is intended to be run as a child
+process of an editor. Running "cue lsp" with no subcommand is
+equivalent to running "cue lsp serve".
+
+By default, the server serves a single editor session over stdin and
+stdout. It can instead run as a shared daemon serving several editors:
+start the daemon with --listen, and configure each editor to run
+"cue lsp --remote" to connect to it. With --remote=auto, an editor's
+"cue lsp" starts the daemon automatically if it is not already
+running.
+
+Usage:
+  cue lsp [flags]
+  cue lsp [command]
+
+Available Commands:
+  serve       run a CUE language server
+
+Flags:
+      --extconfig string                 path to config file for external validators
+      --extprofile string                profile name for external validators
+      --listen string                    run as a daemon, listening on this address. If prefixed by 'unix;', the subsequent address is assumed to be a unix domain socket. Otherwise, TCP is used.
+      --listen-timeout duration          when used with --listen, shut down the server when there are no connected clients for this duration
+      --remote string                    forward the connection to a remote server at this address. With no special prefix, this is assumed to be a TCP address. If prefixed by 'unix;', the subsequent address is assumed to be a unix domain socket. If 'auto', or prefixed by 'auto;', the remote address is automatically resolved based on the executing environment.
+      --remote-listen-timeout duration   when used with --remote=auto, the --listen-timeout value used to start the daemon (default 1m0s)
+
+Global Flags:
+  -E, --all-errors     print all available errors
+  -C, --chdir string   change working directory before running command (must be the first flag)
+  -i, --ignore         proceed in the presence of errors
+  -s, --simplify       simplify output
+
+Use "cue lsp [command] --help" for more information about a command.
+-- expect-complete-stdout --
+--all-errors	print all available errors
+-E	print all available errors
+--chdir	change working directory before running command (must be the first flag)
+-C	change working directory before running command (must be the first flag)
+--ignore	proceed in the presence of errors
+-i	proceed in the presence of errors
+--simplify	simplify output
+-s	simplify output
+--extconfig	path to config file for external validators
+--extprofile	profile name for external validators
+--help	help for lsp
+-h	help for lsp
+--listen	run as a daemon, listening on this address. If prefixed by 'unix;', the subsequent address is assumed to be a unix domain socket. Otherwise, TCP is used.
+--listen-timeout	when used with --listen, shut down the server when there are no connected clients for this duration
+--remote	forward the connection to a remote server at this address. With no special prefix, this is assumed to be a TCP address. If prefixed by 'unix;', the subsequent address is assumed to be a unix domain socket. If 'auto', or prefixed by 'auto;', the remote address is automatically resolved based on the executing environment.
+--remote-listen-timeout	when used with --remote=auto, the --listen-timeout value used to start the daemon
+:4

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68306d45_5be33878",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T13:19:12Z",
+      "side": 1,
+      "message": "This makes me wonder if this we\u0027re returning the right thing here.\nI wonder if it might be better to define a new `Constraint` type, with values\nNone, Regular, Optional and Required, and a method to return the corresponding token.Token.",
+      "revId": "d142964199ebed6c84b17d44dcc307837cac2c79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23132a81_bed30bb0",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T13:19:12Z",
+      "side": 1,
+      "message": "Should we perhaps use the new alias syntax throughout, given that we\u0027re moving in that direction?",
+      "revId": "d142964199ebed6c84b17d44dcc307837cac2c79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4851583_62ff62ff",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1166,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T13:19:12Z",
+      "side": 1,
+      "message": "Given that we\u0027re not sorting here, and dedupeNodes doesn\u0027t sort, therefore the elements of the node set must already be in the correct deterministic order, couldn\u0027t we just use a considerably less expensive `slices.Compact` here?",
+      "revId": "d142964199ebed6c84b17d44dcc307837cac2c79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

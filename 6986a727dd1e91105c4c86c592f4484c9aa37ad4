@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ec84393_9b34f50d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-14T16:03:14Z",
+      "side": 1,
+      "message": "nit: a module doesn\u0027t resolve to a registry does it? I thought we always just used CUE_REGISTRY (or the default)? Is there really a mechanism for different modules to indicate they belong in different registries?",
+      "range": {
+        "startLine": 17,
+        "startChar": 16,
+        "endLine": 17,
+        "endChar": 34
+      },
+      "revId": "6986a727dd1e91105c4c86c592f4484c9aa37ad4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -12,14 +12,11 @@ cmp stdout expect-stdout
 cp OTHER/main.cue main.cue
 cp OTHER/cue.mod/module.cue cue.mod/module.cue
 ! exec cue export .
-stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot fetch example.com/e@v0.0.1: module example.com/e@v0.0.1 in registry "[^"]+": cannot do HTTP request: Get ".*": cannot load OCI auth configuration: invalid config file at \$DOCKER_CONFIG: decode failed: .*'
+stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot fetch example.com/e@v0.0.1: cannot load OCI auth configuration: invalid config file at \$DOCKER_CONFIG: decode failed: .*'
 
 # The same failure via `cue mod tidy`, which resolves dependencies.
-# TODO(https://cuelang.org/issue/2952): both messages are overly long: they
-# repeat the module path and registry host several times, and mention an
-# HTTP request that was never made, burying the actual configuration error.
 ! exec cue mod tidy
-stderr '^failed to resolve "example.com/e": cannot fetch example.com/e@v0.0.1: module example.com/e@v0.0.1 in registry "[^"]+": cannot do HTTP request: Get ".*": cannot load OCI auth configuration: invalid config file at \$DOCKER_CONFIG: decode failed: .*'
+stderr '^failed to resolve "example.com/e": cannot fetch example.com/e@v0.0.1: cannot load OCI auth configuration: invalid config file at \$DOCKER_CONFIG: decode failed: .*'
 -- dockerconfig/config.json --
 should be JSON but isn't
 -- expect-stdout --

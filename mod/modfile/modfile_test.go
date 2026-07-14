@@ -566,7 +566,7 @@ language: version: "v0.8.0"
 				Version: "v0.4.3",
 			},
 		},
-		wantError: `cannot parse result: cannot find schema suitable for reading module file with language version "v0.4.3"`,
+		wantError: `cannot find schema suitable for reading module file with language version "v0.4.3"`,
 	}, {
 		name: "WithInvalidModuleVersion",
 		file: &File{
@@ -575,7 +575,7 @@ language: version: "v0.8.0"
 				Version: "badversion--",
 			},
 		},
-		wantError: `cannot parse result: language version "badversion--" in module.cue is not valid semantic version`,
+		wantError: `language version "badversion--" in module.cue is not valid semantic version`,
 	}, {
 		name: "WithNonNilEmptyDeps",
 		file: &File{

@@ -28,10 +28,7 @@
 					"bar": 2,
 					"baz": 3
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ignores arrays",
@@ -75,10 +72,7 @@
 					"bar": 2,
 					"baz": 3
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -99,10 +93,7 @@
 				"data": {
 					"foo": 1
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

@@ -110,8 +110,8 @@ type Runner struct {
 	OptionsHook              func(*settings.Options) // if set, use these options when creating gopls sessions
 
 	// Immutable state shared across test invocations
-	goplsPath string // path to the gopls executable (for SeparateProcess mode)
-	tempDir   string // shared parent temp directory
+	cuePath string // path to the cue executable (for SeparateProcess mode)
+	tempDir string // shared parent temp directory
 
 	// Lazily allocated resources
 	tsOnce sync.Once
@@ -352,10 +352,10 @@ func newCache(config runConfig) (*cache.Cache, error) {
 	}
 }
 
-// runTestAsGoplsEnvvar triggers TestMain to run gopls instead of running
-// tests. It's a trick to allow tests to find a binary to use to start a gopls
-// subprocess.
-const runTestAsGoplsEnvvar = "_GOPLS_TEST_BINARY_RUN_AS_GOPLS"
+// runTestAsCueLspEnvvar triggers TestMain to run cue lsp instead of
+// running tests. It's a trick to allow tests to find a binary to use
+// to start a cue lsp subprocess.
+const runTestAsCueLspEnvvar = "_CUELSP_TEST_BINARY_RUN_AS_CUELSP"
 
 // separateProcessServer handles the SeparateProcess execution mode.
 func (r *Runner) separateProcessServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
@@ -376,17 +376,17 @@ func (r *Runner) separateProcessServer(config runConfig, optsHook func(*settings
 
 		// The server should be killed by when the test runner exits, but to be
 		// conservative also set a listen timeout.
-		args := []string{"serve", "-listen", "unix;" + r.remoteSocket, "-listen.timeout", "1m"}
+		args := []string{"lsp", "serve", "--listen", "unix;" + r.remoteSocket, "--listen-timeout", "1m"}
 
 		ctx, cancel := context.WithCancel(context.Background())
-		cmd := exec.CommandContext(ctx, r.goplsPath, args...)
-		cmd.Env = append(os.Environ(), runTestAsGoplsEnvvar+"=true")
+		cmd := exec.CommandContext(ctx, r.cuePath, args...)
+		cmd.Env = append(os.Environ(), runTestAsCueLspEnvvar+"=true")
 
-		// Start the external gopls process. This is still somewhat racy, as we
-		// don't know when gopls binds to the socket, but the gopls forwarder
-		// client has built-in retry behavior that should mostly mitigate this
-		// problem (and if it doesn't, we probably want to improve the retry
-		// behavior).
+		// Start the external cue process. This is still somewhat racy,
+		// as we don't know when cue binds to the socket, but the cue
+		// forwarder client has built-in retry behavior that should
+		// mostly mitigate this problem (and if it doesn't, we probably
+		// want to improve the retry behavior).
 		if err := cmd.Start(); err != nil {
 			cancel()
 			r.remoteSocket = ""

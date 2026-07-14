@@ -15,7 +15,12 @@ atLeast?: {[string]: string} & struct.MinFields(1)
 		atLeast: {
 			type: "object"
 			additionalProperties: type: "string"
+			minProperties: 1
 		}
-		bounded: true
+		bounded: {
+			type:          "object"
+			maxProperties: 3
+			minProperties: 1
+		}
 	}
 }

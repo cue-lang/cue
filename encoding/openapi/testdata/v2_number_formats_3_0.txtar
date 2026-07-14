@@ -1,0 +1,135 @@
+# The sized numeric builtin types generate an OpenAPI format keyword, and
+# int32 | null keeps the format on the non-null arm rather than falling back
+# to numeric bounds. See https://cuelang.org/issue/2529
+#v2
+#Version: 3.0
+#AllSchemas
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: {}
+#N32:     int32
+#N64:     int64
+#F32:     float32
+#F64:     float64
+#N32Null: int32 | null
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "F32": {
+            "type": "number",
+            "maximum": 3.4028234663852886E+38,
+            "minimum": -3.4028234663852886E+38
+         },
+         "F64": {
+            "type": "number",
+            "maximum": 1.7976931348623157E+308,
+            "minimum": -1.7976931348623157E+308
+         },
+         "N32": {
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 2147483647,
+                  "minimum": -2147483648
+               }
+            ]
+         },
+         "N32Null": {
+            "nullable": true,
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 2147483647,
+                  "minimum": -2147483648
+               }
+            ]
+         },
+         "N64": {
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 9.223372036854776E+18,
+                  "minimum": -9.223372036854776E+18
+               }
+            ]
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "F32": {
+            "type": "number",
+            "maximum": 3.4028234663852886E+38,
+            "minimum": -3.4028234663852886E+38
+         },
+         "F64": {
+            "type": "number",
+            "maximum": 1.7976931348623157E+308,
+            "minimum": -1.7976931348623157E+308
+         },
+         "N32": {
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 2147483647,
+                  "minimum": -2147483648
+               }
+            ]
+         },
+         "N32Null": {
+            "nullable": true,
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 2147483647,
+                  "minimum": -2147483648
+               }
+            ]
+         },
+         "N64": {
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 9.223372036854776E+18,
+                  "minimum": -9.223372036854776E+18
+               }
+            ]
+         }
+      }
+   }
+}

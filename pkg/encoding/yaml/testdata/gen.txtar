@@ -47,7 +47,7 @@ t4: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of boun
     yaml.ValidatePartial:3:4
 unmarshalTrailingInput.valid: error in call to encoding/yaml.Unmarshal: 3:1: expected a single YAML document:
     ./in.cue:27:11
-unmarshalTrailingInput.invalid: error in call to encoding/yaml.Unmarshal: expected a single YAML document: :2: did not find expected node content:
+unmarshalTrailingInput.invalid: error in call to encoding/yaml.Unmarshal: 3:1: expected a single YAML document:
     ./in.cue:28:11
 
 Result:
@@ -82,5 +82,5 @@ unmarshalStream: {
 }
 unmarshalTrailingInput: {
 	valid:   _|_ // unmarshalTrailingInput.valid: error in call to encoding/yaml.Unmarshal: 3:1: expected a single YAML document
-	invalid: _|_ // unmarshalTrailingInput.invalid: error in call to encoding/yaml.Unmarshal: expected a single YAML document: :2: did not find expected node content
+	invalid: _|_ // unmarshalTrailingInput.invalid: error in call to encoding/yaml.Unmarshal: 3:1: expected a single YAML document
 }

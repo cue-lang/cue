@@ -1,0 +1,52 @@
+# struct.MinFields generates minProperties in the OpenAPI document.
+# See https://cuelang.org/issue/3605
+#v2
+#Version: 3.0
+#AllSchemas
+-- in.cue --
+import "struct"
+
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: {}
+#foo: {
+	[string]: string
+} & struct.MinFields(1)
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "foo": {
+            "type": "object",
+            "additionalProperties": {
+               "type": "string"
+            }
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "foo": {
+            "type": "object",
+            "additionalProperties": {
+               "type": "string"
+            }
+         }
+      }
+   }
+}

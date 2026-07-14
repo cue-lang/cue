@@ -30,6 +30,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetest"
@@ -80,6 +81,9 @@ var unmarshalTests = []struct {
 	}, {
 		"v: -.Inf",
 		"v: -Inf",
+	}, {
+		"v: .NaN",
+		"v: NaN",
 	}, {
 		"v: -10",
 		"v: -10",
@@ -418,6 +422,34 @@ null:   1
 	{
 		"float64_maxuint64+1: 18446744073709551616",
 		`"float64_maxuint64+1": number & 18446744073709551616`,
+	},
+	{
+		"v: -9223372036854775809",
+		"v: number & -9223372036854775809",
+	},
+
+	// Scalars that are valid CUE numbers but not YAML numbers must stay
+	// strings, such as Kubernetes resource quantities with multiplier
+	// suffixes or hexadecimals beyond 64 bits.
+	{
+		"memory: 1Gi",
+		`memory: "1Gi"`,
+	},
+	{
+		"memory: 1.5Gi",
+		`memory: "1.5Gi"`,
+	},
+	{
+		"cpu: 100m",
+		`cpu: "100m"`,
+	},
+	{
+		"disk: 2T",
+		`disk: "2T"`,
+	},
+	{
+		"v: 0xFFFFFFFFFFFFFFFFF",
+		`v: "0xFFFFFFFFFFFFFFFFF"`,
 	},
 
 	// Overflow cases.
@@ -805,7 +837,20 @@ func callUnmarshal(t *testing.T, data string) (ast.Expr, error) {
 	return yaml.Unmarshal("test.yaml", []byte(data))
 }
 
+// knownInvalidCompile records unmarshalTests inputs whose decoded CUE
+// currently fails to compile, keyed by the input with the expected error
+// as the value. YAML infinities and NaN decode to `+Inf`, `-Inf`, and
+// `NaN`, which format as intended but are not valid CUE; see the TODO
+// in decode.go about the decoder always producing valid CUE.
+var knownInvalidCompile = map[string]string{
+	"v: .Inf":       `illegal number start "+Inf"`,
+	"v: -.Inf":      `illegal number start "Inf"`,
+	"v: .NaN":       `illegal number start "NaN"`,
+	"neginf: -.inf": `illegal number start "Inf"`,
+}
+
 func TestUnmarshal(t *testing.T) {
+	ctx := cuecontext.New()
 	for i, item := range unmarshalTests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Logf("test %d: %q", i, item.data)
@@ -815,6 +860,17 @@ func TestUnmarshal(t *testing.T) {
 			}
 			if got := cueStr(expr); got != item.want {
 				t.Errorf("\n    got:\n%v\n    want:\n%v", got, item.want)
+			}
+			// The decoder must produce valid CUE that can be compiled and
+			// evaluated directly, without formatting and re-parsing it first,
+			// which is how commands like `cue export` consume it.
+			err = ctx.BuildExpr(expr).Validate()
+			if wantErr := knownInvalidCompile[item.data]; wantErr != "" {
+				if err == nil || !strings.Contains(err.Error(), wantErr) {
+					t.Errorf("expected compile error containing %q, got: %v", wantErr, err)
+				}
+			} else if err != nil {
+				t.Errorf("decoded CUE does not compile: %v", err)
 			}
 		})
 	}
@@ -920,19 +976,19 @@ var unmarshalErrorTests = []struct {
 	{"\nv: !!float 'error'", `test.yaml:2: cannot decode "error" as !!float: illegal number start "error"`},
 	{"\nv: !!int 'error'", `test.yaml:2: cannot decode "error" as !!int: illegal number start "error"`},
 	{"\nv: !!int 123.456", `test.yaml:2: cannot decode "123.456" as !!int: not a literal number`},
-	{"v: [A,", "test.yaml:1: did not find expected node content"},
-	{"v:\n- [A,", "test.yaml:2: did not find expected node content"},
-	{"a:\n- b: *,", "test.yaml:2: did not find expected alphabetic or numeric character"},
-	{"a: *b\n", "test.yaml: unknown anchor 'b' referenced"},
+	{"v: [A,", "test.yaml:1: sequence end token ']' not found"},
+	{"v:\n- [A,", "test.yaml:2: sequence end token ']' not found"},
+	{"a:\n- b: *,", "test.yaml:2: unknown anchor ',' referenced"},
+	{"a: *b\n", "test.yaml:1: unknown anchor 'b' referenced"},
 	{"a: &a\n  b: *a\n", `test.yaml:2: anchor "a" value contains itself`},
 	{"a: &a { b: c }\n*a : foo", "test.yaml:2: invalid map key: !!map"},
 	{"a: &a [b]\n*a : foo", "test.yaml:2: invalid map key: !!seq"},
-	{"value: -", "test.yaml: block sequence entries are not allowed in this context"},
+	{"value: -", "test.yaml:1: block sequence entries are not allowed in this context"},
 	{"a: !!binary ==", "test.yaml:1: !!binary value contains invalid base64 data"},
-	{"{[.]}", `test.yaml:1: invalid map key: !!seq`},
-	{"{{.}}", `test.yaml:1: invalid map key: !!map`},
-	{"b: *a\na: &a {c: 1}", `test.yaml: unknown anchor 'a' referenced`},
-	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", "test.yaml: did not find expected whitespace"},
+	{"{[.]}", `test.yaml:1: could not find flow map content`},
+	{"{{.}}", `test.yaml:1: could not find flow map content`},
+	{"b: *a\na: &a {c: 1}", `test.yaml:1: unknown anchor 'a' referenced`},
+	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", `test.yaml:1: invalid tag directive handle "!%79!"`},
 }
 
 func TestUnmarshalErrors(t *testing.T) {

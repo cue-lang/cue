@@ -1,0 +1,37 @@
+# YAML plain scalars must resolve numbers per YAML's rules, not CUE's:
+# Kubernetes-style quantities such as 1Gi are valid CUE numbers but are
+# strings in YAML. Conversely, numbers which YAML resolves but which are
+# not lexed as numbers by the YAML parser, such as integers beyond 64 bits,
+# keep their numeric interpretation. Note that `cue export` evaluates the
+# decoded syntax tree directly, without formatting and re-parsing it, so
+# the `number & 123` forms below must be valid CUE expressions.
+
+exec cue export ./in.yaml
+cmp stdout expect-export
+
+exec cue import -o - -f ./in.yaml
+cmp stdout expect-import
+
+-- in.yaml --
+memory: 1Gi
+cpu: 100m
+frac: 1.5Gi
+huge: 18446744073709551616
+exp: 123456e1
+float: !!float 123
+-- expect-export --
+{
+    "memory": "1Gi",
+    "cpu": "100m",
+    "frac": "1.5Gi",
+    "huge": 18446744073709551616,
+    "exp": 1.23456E+6,
+    "float": 123
+}
+-- expect-import --
+memory: "1Gi"
+cpu:    "100m"
+frac:   "1.5Gi"
+huge:   number & 18446744073709551616
+exp:    123456e1
+float:  number & 123

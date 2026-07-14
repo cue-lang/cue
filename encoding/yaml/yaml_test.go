@@ -362,6 +362,16 @@ func TestYAMLValues(t *testing.T) {
 		{`"-.Inf"`, `"-.Inf"`},
 		{`"2002"`, `"2002"`},
 		{`"685_230.15"`, `"685_230.15"`},
+		{`"1e2"`, `"1e2"`},
+		{`"18446744073709551616"`, `"18446744073709551616"`},
+		// A bad YAML 1.1 octal: some decoders such as yaml.v3 resolve it
+		// as a float, so it must stay quoted.
+		{`"0778"`, `"0778"`},
+		// Strings that are valid CUE numbers but not YAML numbers, such as
+		// Kubernetes resource quantities, do not need quoting.
+		{`"1Gi"`, `1Gi`},
+		{`"1.5Gi"`, `1.5Gi`},
+		{`"100m"`, `100m`},
 		// Note that go-yaml doesn't quote strings which look like hexadecimal numbers,
 		// but we do in our fork. See: https://github.com/go-yaml/yaml/issues/847
 		{`"0x123456789012345678901234567890"`, `"0x123456789012345678901234567890"`},

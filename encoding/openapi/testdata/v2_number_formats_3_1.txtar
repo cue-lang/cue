@@ -1,0 +1,61 @@
+# In OpenAPI 3.1 (JSON Schema 2020-12) the sized numeric formats are not a
+# standard part of the dialect, so int32 is kept as its numeric bounds rather
+# than a format keyword. See https://cuelang.org/issue/2529
+#v2
+#Version: 3.1
+#AllSchemas
+-- in.cue --
+openapi: "3.1.0"
+info: {title: "t", version: "1"}
+paths: {}
+#N32: int32
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.1.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "N32": {
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 2147483647,
+                  "minimum": -2147483648
+               }
+            ]
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.1.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "N32": {
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 2147483647,
+                  "minimum": -2147483648
+               }
+            ]
+         }
+      }
+   }
+}

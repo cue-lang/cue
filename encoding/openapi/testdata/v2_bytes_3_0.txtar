@@ -22,7 +22,10 @@ paths: {}
             "type": "object",
             "additionalProperties": false,
             "properties": {
-               "data": true
+               "data": {
+                  "type": "string",
+                  "format": "byte"
+               }
             },
             "required": [
                "data"
@@ -45,7 +48,10 @@ paths: {}
             "type": "object",
             "additionalProperties": false,
             "properties": {
-               "data": true
+               "data": {
+                  "type": "string",
+                  "format": "byte"
+               }
             },
             "required": [
                "data"

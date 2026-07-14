@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "768cce2e_f9393f39",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "I\u0027m a bit confused as to exactly what \"field\" implies here. Would a scalar value be a field? What about an embedded value? To me \"field\" implies something with a label, but the package root definitely doesn\u0027t have a label. But maybe the package root is just a special case?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd2facf8_e2673520",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "I\u0027m not sure exactly \"in the same scope\" means here. An AST node is present in many different scopes (package, lexical, nested), and I don\u0027t know which is meant here.",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "362944a6_f8c62813",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "How are field names represented in the strings here? How would this distinguish between `{\"#foo\": 1}` and `{#foo: 1}`, for example.\nWhat about hidden fields? Do we get an indication of which package they belong to?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f89da4f6_14de5932",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "A field has elements too... maybe `ListElements` to make it really clear?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f8af817_1e01180f",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "hmm, this double-underscore logic makes me wonder... What would a struct `{\"__1\": true}` yield?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02a5e795_18eddebc",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "To me \"transitively\" naively implies that all the nodes in the returned node set are themselves fully expanded, but I suspect that\u0027s not the case, otherwise `NodeSet.Expand` probably wouldn\u0027t be needed?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9de0d046_3d29f608",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "This makes it sound like both x and z resolve to exactly the same thing, which i don\u0027t think is what\u0027s intended?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3b4f3c7_3960e960",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "Might be nice to mention comprehensions too.\n\nFor example, would the fields of this include `y`?\n\n```\n{if something {y?: bool}}\n```\n\nAlso to include an example that mentions disjunctions.",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bcea0f9_308f3c7f",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "I\u0027m left wondering about disjunctions: do they contribute to the node too? Presumably they\u0027d also be returned as items in the sequence?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e4d77d6_f1245d0b",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "personally i think i\u0027d just use cmp.Compare for all three comparisons.",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0abe8031_2dc00890",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "Are these type conversions needed?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b85d3ffd_992bc7ec",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1041,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-14T12:45:24Z",
+      "side": 1,
+      "message": "What if the node just doesn\u0027t have a position? (For example because `eval.New` was invoked with programmatically-constructed ast.File values)",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

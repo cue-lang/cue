@@ -31,6 +31,8 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
+	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/encoding/yaml/goccy"
 )
 
 // Encode converts a CUE AST to YAML.
@@ -47,10 +49,17 @@ import (
 //	CommentGroup
 //
 // TODO: support anchors through Ident.
+//
+// The yamlgoccy experiment, enabled by default, selects the new
+// github.com/goccy/go-yaml based encoder in [goccy]; disabling it
+// selects the older go.yaml.in/yaml/v3 based encoder in this package.
 func Encode(n ast.Node, opts ...EncodeOption) (b []byte, err error) {
 	cfg := encodeConfig{indentSequence: true}
 	for _, o := range opts {
 		o(&cfg)
+	}
+	if cueexperiment.Flags.YAMLGoccy {
+		return goccy.Encode(n, goccy.IndentSequences(cfg.indentSequence))
 	}
 
 	y, err := encode(n)

@@ -13,6 +13,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modrequirements"
+	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
 )
 
@@ -209,7 +210,7 @@ func FindPackageLocations(
 		}
 		mloc, isLocal, err := fetch(ctx, v)
 		if err != nil {
-			return nil, fmt.Errorf("cannot fetch %v: %w", v, err)
+			return nil, modregistry.WrapModuleError("cannot fetch", v, err)
 		}
 		if mloc.FS == nil {
 			// Not found but not an error.

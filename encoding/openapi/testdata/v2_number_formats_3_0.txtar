@@ -25,50 +25,24 @@ paths: {}
       "schemas": {
          "F32": {
             "type": "number",
-            "maximum": 3.4028234663852886E+38,
-            "minimum": -3.4028234663852886E+38
+            "format": "float"
          },
          "F64": {
             "type": "number",
-            "maximum": 1.7976931348623157E+308,
-            "minimum": -1.7976931348623157E+308
+            "format": "double"
          },
          "N32": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 2147483647,
-                  "minimum": -2147483648
-               }
-            ]
+            "type": "integer",
+            "format": "int32"
          },
          "N32Null": {
             "nullable": true,
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 2147483647,
-                  "minimum": -2147483648
-               }
-            ]
+            "type": "integer",
+            "format": "int32"
          },
          "N64": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 9.223372036854776E+18,
-                  "minimum": -9.223372036854776E+18
-               }
-            ]
+            "type": "integer",
+            "format": "int64"
          }
       }
    }
@@ -85,50 +59,24 @@ paths: {}
       "schemas": {
          "F32": {
             "type": "number",
-            "maximum": 3.4028234663852886E+38,
-            "minimum": -3.4028234663852886E+38
+            "format": "float"
          },
          "F64": {
             "type": "number",
-            "maximum": 1.7976931348623157E+308,
-            "minimum": -1.7976931348623157E+308
+            "format": "double"
          },
          "N32": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 2147483647,
-                  "minimum": -2147483648
-               }
-            ]
+            "type": "integer",
+            "format": "int32"
          },
          "N32Null": {
             "nullable": true,
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 2147483647,
-                  "minimum": -2147483648
-               }
-            ]
+            "type": "integer",
+            "format": "int32"
          },
          "N64": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 9.223372036854776E+18,
-                  "minimum": -9.223372036854776E+18
-               }
-            ]
+            "type": "integer",
+            "format": "int64"
          }
       }
    }

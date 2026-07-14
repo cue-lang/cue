@@ -22,6 +22,24 @@
       },
       "revId": "275b2fa347f9217c1d8f8181b9a3c54b57fa02d6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c752b91_6e93fd50",
+        "filename": "tools/trim/trimv3.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-14T12:26:24Z",
+      "side": 1,
+      "message": "Done, keeping the \"if\": \"But if we removed ...\".",
+      "parentUuid": "3a708c97_b4a87823",
+      "revId": "275b2fa347f9217c1d8f8181b9a3c54b57fa02d6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

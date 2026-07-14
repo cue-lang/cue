@@ -119,6 +119,11 @@ func (r *Runtime) AddInst(key *adt.Vertex, p *build.Instance) {
 }
 
 func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
+	// A per-evaluation instance of an imported package is not registered
+	// itself; resolve it to the shared package root that is.
+	if t := key.ImportTemplate(); t != nil {
+		key = t
+	}
 	r.index.lock.RLock()
 	defer r.index.lock.RUnlock()
 

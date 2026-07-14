@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"testing/fstest"
 
 	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
@@ -32,6 +33,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	cueload "cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -3636,6 +3638,58 @@ func TestZeroValueBuildInstance(t *testing.T) {
 	inst := cue.Value{}.BuildInstance()
 	if inst != nil {
 		t.Error("unexpected non-nil instance")
+	}
+}
+
+// TestReferencePathEmbeddedImport is a regression test for
+// https://cuelang.org/issue/4436: a reference reached through an embedded
+// cross-package definition resolves to a per-evaluation instance of the
+// imported package, whose root must still map to its build instance.
+func TestReferencePathEmbeddedImport(t *testing.T) {
+	fsys := fstest.MapFS{
+		"cue.mod/module.cue": &fstest.MapFile{Data: []byte(`module: "example.com"
+language: version: "v0.17.0"
+`)},
+		"lib/lib.cue": &fstest.MapFile{Data: []byte(`package lib
+
+#Inner: X: int
+#Outer: Inner: #Inner
+`)},
+		"leaf/leaf.cue": &fstest.MapFile{Data: []byte(`package leaf
+
+import "example.com/lib"
+
+#MyLeaf: {
+	lib.#Outer
+	Extra: string
+}
+`)},
+	}
+	insts := cueload.Instances([]string{"./leaf"}, &cueload.Config{FS: fsys})
+	if err := insts[0].Err; err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := cuecontext.New()
+	val := ctx.BuildInstance(insts[0])
+	if err := val.Err(); err != nil {
+		t.Fatal(err)
+	}
+	inner := val.LookupPath(cue.ParsePath("#MyLeaf.Inner"))
+
+	root, path := inner.ReferencePath()
+	if !root.Exists() {
+		t.Fatal("no root found for reference path")
+	}
+	if got, want := path.String(), "#Inner"; got != want {
+		t.Errorf("unexpected path; got %q want %q", got, want)
+	}
+	inst := root.BuildInstance()
+	if inst == nil {
+		t.Fatal("no build instance found for reference path root")
+	}
+	if got, want := inst.ImportPath, "example.com/lib"; got != want {
+		t.Errorf("unexpected import path; got %q want %q", got, want)
 	}
 }
 

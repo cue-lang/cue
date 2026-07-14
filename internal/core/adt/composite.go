@@ -172,6 +172,11 @@ type Vertex struct {
 	// TODO: move to nodeContext.
 	overlay *Vertex
 
+	// importTemplate, for a per-evaluation instance of an imported package
+	// created by [OpContext.importInstance], links back to the shared package
+	// root that the runtime registers. It is nil for all other vertices.
+	importTemplate *Vertex
+
 	// Label is the feature leading to this vertex.
 	Label Feature
 
@@ -291,6 +296,14 @@ func deref(v *Vertex) *Vertex {
 
 func equalDeref(a, b *Vertex) bool {
 	return deref(a) == deref(b)
+}
+
+// ImportTemplate returns the shared package root that v was instantiated from
+// by [OpContext.importInstance], or nil if v is not a per-evaluation instance
+// of an imported package. The runtime registers only the shared root, so use
+// this to map an instance back to its [build.Instance].
+func (v *Vertex) ImportTemplate() *Vertex {
+	return v.importTemplate
 }
 
 // newInlineVertex creates a Vertex that is needed for computation, but for

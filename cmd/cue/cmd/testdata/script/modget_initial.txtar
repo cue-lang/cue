@@ -44,9 +44,8 @@ cmp stdout want-stdout-1
 stderr 'other requirements prevent changing module baz.org@v0 to version v0.5.0 \(actual selected version: v0.10.1\)'
 
 # Fetching a module version which does not exist in the registry.
-# TODO(https://cuelang.org/issue/2952): the message repeats the module version.
 ! exec cue mod get not.exist/x@v0.1.2
-stderr '^cannot determine new module graph: not.exist/x@v0.1.2: module not.exist/x@v0.1.2: module not found$'
+stderr '^cannot determine new module graph: module not.exist/x@v0.1.2 not found$'
 
 -- want-module-1 --
 module: "main.org@v0"

@@ -24,7 +24,7 @@ cmpenv stderr ../want-stderr-get-latest
 -- want-stderr-publish --
 cannot put module "example.com@v0.0.1" to registry "$MEMREGISTRY": 401 Unauthorized: unauthorized: authentication required: no credentials
 -- want-stderr-get-version --
-cannot determine new module graph: foo.example/bar@v0.1.0: module foo.example/bar@v0.1.0 in registry "$MEMREGISTRY": 401 Unauthorized: unauthorized: authentication required: no credentials
+cannot determine new module graph: module foo.example/bar@v0.1.0 in registry "$MEMREGISTRY": 401 Unauthorized: unauthorized: authentication required: no credentials
 -- want-stderr-get-latest --
 module foo.example/bar in registry "$MEMREGISTRY": 401 Unauthorized: unauthorized: authentication required: no credentials
 -- dockerconfig/config.json --

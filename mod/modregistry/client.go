@@ -244,16 +244,16 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 	loc, err := c.resolve(m)
 	if err != nil {
 		if errors.Is(err, ErrRegistryNotFound) {
-			return nil, ErrNotFound
+			return nil, &ModuleError{Module: m.String(), Err: ErrNotFound}
 		}
 		return nil, err
 	}
 	rd, err := loc.Registry.GetTag(ctx, loc.Repository, loc.Tag)
 	if err != nil {
 		if isNotExist(err) {
-			return nil, fmt.Errorf("module %v: %w", m, ErrNotFound)
+			return nil, &ModuleError{Module: m.String(), Err: ErrNotFound}
 		}
-		return nil, moduleError(m, loc, err)
+		return nil, &ModuleError{Module: m.String(), Host: loc.Host, Err: err}
 	}
 	defer rd.Close()
 	data, err := io.ReadAll(rd)
@@ -327,7 +327,7 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) (_req []string, _
 	for tag, err := range loc.Registry.Tags(ctx, loc.Repository, "") {
 		if err != nil {
 			if !isNotExist(err) {
-				return nil, moduleError(m, loc, err)
+				return nil, &ModuleError{Module: m, Host: loc.Host, Err: err}
 			}
 			continue
 		}
@@ -548,15 +548,36 @@ func (m *Module) ManifestDigest() ociregistry.Digest {
 	return m.manifestDigest
 }
 
-// moduleError returns an error for a failed registry operation on the
-// given module, mentioning the registry host when known so that the
-// user can tell which registry was being used.
-func moduleError(m any, loc RegistryLocation, err error) error {
-	if loc.Host != "" {
-		return fmt.Errorf("module %v in registry %q: %w", m, loc.Host, err)
-	}
-	return fmt.Errorf("module %v: %w", m, err)
+// ModuleError is an error relating to a specific module, which its
+// message identifies along with the registry host when known.
+// Code adding further context to a ModuleError should avoid repeating
+// the module that the error already names.
+type ModuleError struct {
+	// Module holds the module path, including its version when known.
+	Module string
+	// Host optionally holds the host name of the registry being used.
+	Host string
+	// Err holds the underlying error; it is never nil.
+	Err error
 }
+
+func (e *ModuleError) Error() string {
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "module %v", e.Module)
+	if e.Host != "" {
+		fmt.Fprintf(&sb, " in registry %q", e.Host)
+	}
+	if e.Err == ErrNotFound {
+		// The sentinel's own text would repeat the word "module";
+		// read as a single sentence instead.
+		sb.WriteString(" not found")
+	} else {
+		fmt.Fprintf(&sb, ": %v", e.Err)
+	}
+	return sb.String()
+}
+
+func (e *ModuleError) Unwrap() error { return e.Err }
 
 func (c *Client) resolve(m module.Version) (RegistryLocation, error) {
 	loc, err := c.resolver.ResolveToRegistry(m.BasePath(), m.Version())

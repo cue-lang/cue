@@ -15,38 +15,25 @@ i32opt?: int32 | null
 	type: "object"
 	properties: {
 		f32: {
-			type:    "number"
-			maximum: 3.4028234663852886e+38
-			minimum: -3.4028234663852886e+38
+			type:   "number"
+			format: "float"
 		}
 		f64: {
-			type:    "number"
-			maximum: 1.7976931348623157e+308
-			minimum: -1.7976931348623157e+308
+			type:   "number"
+			format: "double"
 		}
-		i32: allOf: [{
-			type: "number"
-		}, {
-			type:    "integer"
-			maximum: 2.147483647e+09
-			minimum: -2.147483648e+09
-		}]
+		i32: {
+			type:   "integer"
+			format: "int32"
+		}
 		i32opt: {
 			nullable: true
-			allOf: [{
-				type: "number"
-			}, {
-				type:    "integer"
-				maximum: 2.147483647e+09
-				minimum: -2.147483648e+09
-			}]
+			type:     "integer"
+			format:   "int32"
 		}
-		i64: allOf: [{
-			type: "number"
-		}, {
-			type:    "integer"
-			maximum: 9.223372036854776e+18
-			minimum: -9.223372036854776e+18
-		}]
+		i64: {
+			type:   "integer"
+			format: "int64"
+		}
 	}
 }

@@ -1,0 +1,83 @@
+# The sized numeric builtin types generate an OpenAPI format keyword, and
+# int32 | null keeps the format on the non-null arm rather than falling back
+# to numeric bounds. See https://cuelang.org/issue/2529
+#v2
+#Version: 3.0
+#AllSchemas
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: {}
+#N32:     int32
+#N64:     int64
+#F32:     float32
+#F64:     float64
+#N32Null: int32 | null
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "F32": {
+            "type": "number",
+            "format": "float"
+         },
+         "F64": {
+            "type": "number",
+            "format": "double"
+         },
+         "N32": {
+            "type": "integer",
+            "format": "int32"
+         },
+         "N32Null": {
+            "nullable": true,
+            "type": "integer",
+            "format": "int32"
+         },
+         "N64": {
+            "type": "integer",
+            "format": "int64"
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "F32": {
+            "type": "number",
+            "format": "float"
+         },
+         "F64": {
+            "type": "number",
+            "format": "double"
+         },
+         "N32": {
+            "type": "integer",
+            "format": "int32"
+         },
+         "N32Null": {
+            "nullable": true,
+            "type": "integer",
+            "format": "int32"
+         },
+         "N64": {
+            "type": "integer",
+            "format": "int64"
+         }
+      }
+   }
+}

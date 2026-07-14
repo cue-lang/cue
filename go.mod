@@ -8,6 +8,7 @@ require (
 	github.com/coder/websocket v1.8.15
 	github.com/emicklei/proto v1.14.3
 	github.com/go-quicktest/qt v1.102.0
+	github.com/goccy/go-yaml v1.19.2
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/opencontainers/go-digest v1.0.0

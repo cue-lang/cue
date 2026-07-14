@@ -2,6 +2,7 @@ package modrequirements
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime"
 	"slices"
@@ -13,6 +14,7 @@ import (
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/par"
 	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
 )
 
@@ -213,7 +215,7 @@ func (rs *Requirements) DefaultMajorVersion(mpath string) (string, MajorVersionD
 	}
 }
 
-// rootModules returns the set of root modules of the graph, sorted and capped to
+// RootModules returns the set of root modules of the graph, sorted and capped to
 // length. It may contain duplicates, and may contain multiple versions for a
 // given module path.
 func (rs *Requirements) RootModules() []module.Version {
@@ -325,7 +327,7 @@ func (rs *Requirements) readModGraph(ctx context.Context) (*ModuleGraph, error) 
 		mu       sync.Mutex // guards mg.g and hasError during loading
 		hasError bool
 		mg       = &ModuleGraph{
-			g: mvs.NewGraph[module.Version](module.Versions{}, cmpVersion, []module.Version{rs.mainModuleVersion}),
+			g: mvs.NewGraph(module.Versions{}, cmpVersion, []module.Version{rs.mainModuleVersion}),
 		}
 	)
 
@@ -424,15 +426,13 @@ func (mg *ModuleGraph) findError(loadCache *par.ErrCache[module.Version, *modFil
 		return err != nil && err != par.ErrCacheEntryNotFound
 	})
 	if len(errStack) > 0 {
-		// TODO it seems that this stack can never be more than one
-		// element long, becasuse readModGraph never goes more
-		// than one depth level below the root requirements.
-		// Given that the top of the stack will always be the main
-		// module and that BuildListError elides the first element
-		// in this case, is it really worth using FindPath?
 		_, err := loadCache.Get(errStack[len(errStack)-1])
+		// Drop the final stack element when the error already names the module.
+		if len(errStack) > 1 && errors.As(err, new(*modregistry.ModuleError)) {
+			errStack = errStack[:len(errStack)-1]
+		}
 		var noUpgrade func(from, to module.Version) bool
-		return mvs.NewBuildListError[module.Version](err, errStack, module.Versions{}, noUpgrade)
+		return mvs.NewBuildListError(err, errStack, module.Versions{}, noUpgrade)
 	}
 
 	return nil

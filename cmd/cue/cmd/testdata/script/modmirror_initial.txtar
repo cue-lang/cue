@@ -4,7 +4,7 @@ env oldRegistry=$CUE_REGISTRY
 
 # Mirroring a module version which does not exist in the source registry.
 ! exec cue mod mirror --to $MEMREGISTRY not.exist/x@v0.1.2
-stderr '^module not.exist/x@v0.1.2: module not found$'
+stderr '^module not.exist/x@v0.1.2 not found$'
 
 # smoke-test the dry-run output.
 exec cue mod mirror --dry-run --to $MEMREGISTRY example.com

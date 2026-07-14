@@ -1,0 +1,21 @@
+# struct.MinFields and struct.MaxFields should generate the minProperties
+# and maxProperties keywords. See https://cuelang.org/issue/3605
+-- test.cue --
+package test
+
+import "struct"
+
+bounded?: struct.MinFields(1) & struct.MaxFields(3)
+atLeast?: {[string]: string} & struct.MinFields(1)
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		atLeast: {
+			type: "object"
+			additionalProperties: type: "string"
+		}
+		bounded: true
+	}
+}

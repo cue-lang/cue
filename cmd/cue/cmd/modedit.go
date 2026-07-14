@@ -106,7 +106,7 @@ func (c *modEditCmd) run(cmd *Command, args []string) error {
 	}
 	newData, err := modfile.Format(mf)
 	if err != nil {
-		return fmt.Errorf("invalid resulting module.cue file after edits: %v", err)
+		return err
 	}
 	if err := writeFileIfChanged(modPath, data, newData, 0o666); err != nil {
 		return err
@@ -153,7 +153,7 @@ func (c *modEditCmd) runLocalEdits(modRoot string, base *modfile.File) error {
 	}
 	newData, err := modfile.FormatLocal(local, base)
 	if err != nil {
-		return fmt.Errorf("invalid resulting local-module.cue file after edits: %v", err)
+		return err
 	}
 	return writeFileIfChanged(localPath, oldData, newData, 0o666)
 }

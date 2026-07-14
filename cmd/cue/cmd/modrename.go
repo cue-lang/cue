@@ -82,7 +82,7 @@ func runModRename(cmd *Command, args []string) error {
 	// perhaps we should detect that and give an error.
 	newModFileData, err := modfile.Format(mf)
 	if err != nil {
-		return fmt.Errorf("invalid resulting module.cue file after edits: %v", err)
+		return err
 	}
 	if err := os.WriteFile(modFilePath, newModFileData, 0o666); err != nil {
 		return err

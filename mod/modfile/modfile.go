@@ -98,7 +98,7 @@ func Format(f *File) ([]byte, error) {
 		err = rt.InitNonStrict()
 	}
 	if err != nil {
-		return nil, fmt.Errorf("cannot parse result: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
+		return nil, err
 	}
 	if f.Language != nil && actualSchemaVersion == "v0.0.0" {
 		// It's not a legacy module file (because the language field is present)
@@ -168,7 +168,7 @@ func FormatLocal(f, base *File) ([]byte, error) {
 	}
 	// Sanity check that the result parses against base's identity.
 	if _, err := ParseLocal(data, "-", base); err != nil {
-		return nil, fmt.Errorf("cannot parse result: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
+		return nil, err
 	}
 	return data, nil
 }

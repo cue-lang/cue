@@ -21,6 +21,16 @@ type Config struct {
 	// implementation behind "cue fmt" and "cue/format".
 	FormatV2 bool `experiment:"preview:v0.18.0,default:v0.18.0"`
 
+	// OpenAPIV2 selects the new whole-document OpenAPI implementation behind
+	// the openapi encoding used by "cue import" and "cue export", extracting
+	// and generating a complete OpenAPI document rather than only its schemas.
+	OpenAPIV2 bool `experiment:"preview:v0.18.0"`
+
+	// YAMLV4 selects the github.com/goccy/go-yaml based YAML decoder,
+	// which retains more precise position and comment information than
+	// the older go.yaml.in/yaml/v3 based decoder it replaces.
+	YAMLV4 bool `experiment:"preview:v0.18.0,default:v0.18.0"`
+
 	// The flags in this second section describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.
 	// Breaking users who set such a flag seems unnecessary,
@@ -62,11 +72,6 @@ type Config struct {
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
 	// Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
 	CmdReferencePkg bool `experiment:"preview:v0.13.0,default:v0.14.0,stable:v0.16.0"`
-
-	// OpenAPIV2 selects the new whole-document OpenAPI implementation behind
-	// the openapi encoding used by "cue import" and "cue export", extracting
-	// and generating a complete OpenAPI document rather than only its schemas.
-	OpenAPIV2 bool `experiment:"preview:v0.18.0"`
 }
 
 // initExperimentFlags initializes the experiment flags by processing both

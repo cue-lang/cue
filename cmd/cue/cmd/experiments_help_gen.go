@@ -148,6 +148,11 @@ Available global experiments:
     the openapi encoding used by "cue import" and "cue export", extracting
     and generating a complete OpenAPI document rather than only its schemas.
 
+  yamlv4 (preview: v0.18.0, default: v0.18.0)
+    yamlv4 selects the github.com/goccy/go-yaml based YAML decoder,
+    which retains more precise position and comment information than
+    the older go.yaml.in/yaml/v3 based decoder it replaces.
+
 Each experiment's lifecycle tracks language versions as follows:
 - preview:   experimental feature that can be enabled
 - default:   experiment enabled by default, can still be disabled

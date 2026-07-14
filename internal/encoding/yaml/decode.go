@@ -18,6 +18,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/encoding/yaml/goccy"
 )
 
 // TODO(mvdan): we should sanity check that the decoder always produces valid CUE,
@@ -99,7 +101,19 @@ type decoder struct {
 //
 // The filename is used for position information in CUE syntax tree nodes
 // as well as any errors encountered while decoding YAML.
-func NewDecoder(filename string, b []byte) *decoder {
+//
+// The yamlv4 experiment, enabled by default, selects the new
+// github.com/goccy/go-yaml based decoder in [goccy]; disabling it
+// selects the older go.yaml.in/yaml/v3 based decoder in this package.
+func NewDecoder(filename string, b []byte) Decoder {
+	if cueexperiment.Flags.YAMLV4 {
+		return goccy.NewDecoder(filename, b)
+	}
+	return newDecoder(filename, b)
+}
+
+// newDecoder creates a decoder for YAML values to extract CUE syntax tree nodes.
+func newDecoder(filename string, b []byte) *decoder {
 	// Note that yaml.v3 can insert a null node just past the end of the input
 	// in some edge cases, so we pretend that there's an extra newline
 	// so that we don't panic when handling such a position.

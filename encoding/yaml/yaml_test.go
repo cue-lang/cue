@@ -376,6 +376,26 @@ func TestYAMLValues(t *testing.T) {
 		// but we do in our fork. See: https://github.com/go-yaml/yaml/issues/847
 		{`"0x123456789012345678901234567890"`, `"0x123456789012345678901234567890"`},
 
+		// Strings whose lines end in a space do not survive a round-trip
+		// through a literal block, and characters such as tabs or carriage
+		// returns cannot stay in a plain scalar; all are double quoted.
+		{`"a \nb"`, `"a \nb"`},
+		{`"a\n \nb"`, `"a\n \nb"`},
+		{`"x\n "`, `"x\n "`},
+		{`"x\ty"`, `"x\ty"`},
+		{`"a\rb"`, `"a\rb"`},
+
+		// Blank lines within a literal block stay truly empty, with no
+		// trailing whitespace padding.
+		{`"""
+	a
+
+	b
+	"""`, `|-
+  a
+
+  b`},
+
 		// Legacy values.format.
 		{`"no"`, `"no"`},
 		{`"on"`, `"on"`},

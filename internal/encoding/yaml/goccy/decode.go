@@ -1,4 +1,4 @@
-// Package goccy converts YAML to CUE syntax trees using
+// Package goccy converts YAML to and from CUE syntax trees using
 // github.com/goccy/go-yaml. It is the implementation selected by the
 // yamlv4 experiment; [cuelang.org/go/internal/encoding/yaml] steers
 // between this package and its own older go.yaml.in/yaml/v3 based

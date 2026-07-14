@@ -8,7 +8,7 @@ stderr 'unknown filetype date'
 
 # Trying to parse as the wrong filetype.
 ! exec cue export json: somefile.cue
-stderr 'invalid JSON for file'
+stderr 'invalid JSON'
 
 # Trying to parse as the explicitly right filetype.
 exec cue export cue: somefile.cue
@@ -36,7 +36,7 @@ cmp stdout export.golden
 cp somefile.cue somefile
 
 ! exec cue export json: somefile
-stderr 'invalid JSON for file'
+stderr 'invalid JSON'
 
 exec cue export cue: somefile
 cmp stdout export.golden

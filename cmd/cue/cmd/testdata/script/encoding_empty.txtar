@@ -5,14 +5,10 @@
 
 # TODO(mvdan): cover more encodings: jsonschema, openapi, textproto, proto.
 
-# TODO(mvdan): json decoder errors seem to use absolute file paths,
-# which show the random directory names for each test run,
-# meaning that we can't cmp with a txtar file below.
-
 exec cue export cue: empty
 cmp stdout as-cue.stdout
 ! exec cue export json: empty
-stderr 'unexpected end of JSON input'
+cmp stderr empty-as-json.stderr
 exec cue export jsonl: empty
 cmp stdout as-jsonl.stdout
 exec cue export yaml: empty
@@ -25,7 +21,7 @@ cmp stdout as-toml.stdout
 exec cue export cue: newlines
 cmp stdout as-cue.stdout
 ! exec cue export json: newlines
-stderr 'unexpected end of JSON input'
+cmp stderr newlines-as-json.stderr
 exec cue export jsonl: newlines
 cmp stdout as-jsonl.stdout
 exec cue export yaml: newlines
@@ -39,9 +35,9 @@ cmp stdout as-toml.stdout
 exec cue export cue: slash-comments
 cmp stdout as-cue.stdout
 ! exec cue export json: slash-comments
-stderr 'invalid character ./. looking for beginning of value'
+cmp stderr slash-comments-as-json.stderr
 ! exec cue export jsonl: slash-comments
-stderr 'invalid character ./. looking for beginning of value'
+cmp stderr slash-comments-as-jsonl.stderr
 exec cue export yaml: hash-comments
 cmp stdout as-yaml.stdout
 exec cue export toml: hash-comments
@@ -49,6 +45,18 @@ cmp stdout as-toml.stdout
 
 -- as-cue.stdout --
 {}
+-- empty-as-json.stderr --
+invalid JSON: unexpected end of JSON input:
+    ./empty:1:1
+-- newlines-as-json.stderr --
+invalid JSON: unexpected end of JSON input:
+    ./newlines:3:1
+-- slash-comments-as-json.stderr --
+invalid JSON: invalid character '/' looking for beginning of value:
+    ./slash-comments:1:1
+-- slash-comments-as-jsonl.stderr --
+invalid JSON: invalid character '/' looking for beginning of value:
+    ./slash-comments:1:1
 -- as-jsonl.stdout --
 -- as-yaml.stdout --
 null

@@ -85,7 +85,7 @@ func extract(path string, b []byte) (ast.Expr, error) {
 			p = tokFile.Pos(int(synErr.Offset-1), token.NoRelPos)
 		}
 
-		return nil, errors.Wrapf(err, p, "invalid JSON for file %q", path)
+		return nil, errors.Wrapf(err, p, "invalid JSON")
 	}
 	return expr, nil
 }
@@ -141,12 +141,13 @@ func (d *Decoder) extract() (ast.Expr, error) {
 		return nil, err
 	}
 	if err != nil {
-		pos := token.NoPos
-		// When decoding into a RawMessage, encoding/json should only error due to syntax errors.
+		// Syntax errors carry an exact offset; otherwise, such as for an
+		// unexpected EOF, point at where the decoder stopped.
+		pos := d.tokFile.Pos(int(d.dec.InputOffset()), token.NoRelPos)
 		if synErr, ok := err.(*json.SyntaxError); ok {
 			pos = d.tokFile.Pos(int(synErr.Offset-1), token.NoRelPos)
 		}
-		return nil, errors.Wrapf(err, pos, "invalid JSON for file %q", d.path)
+		return nil, errors.Wrapf(err, pos, "invalid JSON")
 	}
 	expr, err := parser.ParseExpr(d.path, []byte(raw))
 	if err != nil {

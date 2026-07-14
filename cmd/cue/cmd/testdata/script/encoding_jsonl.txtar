@@ -20,9 +20,9 @@ stderr 'unknown filetype ldjson'
 # Multiple JSON values are rejected on a regular JSON file.
 
 ! exec cue export input-many.json
-stderr 'invalid JSON .* after top-level value'
+stderr 'invalid JSON: invalid character .* after top-level value'
 ! exec cue export json: input-none.none
-stderr 'invalid JSON .* after top-level value'
+stderr 'invalid JSON: invalid character .* after top-level value'
 exec cue export input-one.json
 cmp stdout export-one.stdout
 
@@ -30,7 +30,7 @@ cmp stdout export-one.stdout
 # both by default and when loading JSON only.
 
 ! exec cue import --list --dry-run .
-stderr 'invalid JSON .*input-many.json.* after top-level value'
+stderr 'invalid JSON: invalid character .* after top-level value:\n\s+\./input-many\.json'
 rm input-many.json
 
 exec cue import --list --dry-run .

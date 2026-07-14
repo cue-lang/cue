@@ -1,5 +1,3 @@
-//go:build ignore
-
 // Copyright 2020 CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package yaml
+package goccy
 
 import (
 	"strings"
 	"testing"
 
+	yparser "github.com/goccy/go-yaml/parser"
 	"github.com/google/go-cmp/cmp"
-	"go.yaml.in/yaml/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
@@ -96,8 +94,9 @@ non: false
 	}, {
 		// Scalars inside single-line flow collections need quoting for
 		// characters which are special in flow context, such as commas,
-		// braces, and colons. Scalars beginning with the "?" indicator
-		// and keys containing newlines need quoting in any context.
+		// braces, and colons. Scalars beginning with the "?" indicator,
+		// merge keys spelled "<<", and keys containing newlines need
+		// quoting in any context.
 		name: "quoting",
 		in: `
 		v: {a: "x,y", b: 2}
@@ -109,6 +108,8 @@ non: false
 		q: "?"
 		r: "? q"
 		s: "?x"
+		m1: "<<"
+		m2: {"<<": 1}
 		`,
 		out: `
 v: {a: 'x,y', b: 2}
@@ -116,13 +117,69 @@ w: ['x,y', z]
 u: {a: 'x}y'}
 fk: {'x,y': 1}
 c: {a: 'a:b', u: 'http://x/y'}
-? |-
-  k
-  l
-: 3
+"k\nl": 3
 q: '?'
 r: '? q'
 s: ?x
+m1: '<<'
+m2: {'<<': 1}
+`,
+	}, {
+		// Strings use a literal block only when the block decodes back
+		// to the same value: no line may end in a space, and characters
+		// needing escapes require double quotes instead. Blank lines
+		// within a block stay truly empty. Multi-line CUE literals keep
+		// their block form even with single-line content.
+		name: "strings",
+		in: `
+blank: """
+	line1
+
+	line2
+	"""
+single: """
+	{"tmpl": {{value}}}
+	"""
+deep: nested: """
+	one line
+	"""
+list: ["""
+	elem
+	""", "plain"]
+trailsp:   "a \nb"
+spaceline: "a\n \nb"
+endsp:     "x\n "
+tab:       "x\ty"
+cr:        "a\rb"
+nel:       "x\u0085y"
+tabline: """
+	a\tb
+	c
+	"""
+`,
+		out: `
+blank: |-
+  line1
+
+  line2
+single: |-
+  {"tmpl": {{value}}}
+deep:
+  nested: |-
+    one line
+list:
+  - |-
+    elem
+  - plain
+trailsp: "a \nb"
+spaceline: "a\n \nb"
+endsp: "x\n "
+tab: "x\ty"
+cr: "a\rb"
+nel: "x\u0085y"
+tabline: |-
+  a	b
+  c
 `,
 	}, {
 		name: "comments",
@@ -348,6 +405,25 @@ item: !%3Chttps://example.com/schema/v1%3E value
 		out: `
 field: value
 		`,
+	}, {
+		// A CUE bytes value renders as !!binary; an explicit @yaml tag
+		// replaces that tag rather than nesting a second one, which
+		// would be invalid YAML.
+		name: "yaml_tag_on_bytes",
+		in: `
+		item: '\xff\xfe' @yaml(,tag="!custom")
+		`,
+		out: `
+item: !custom //4=
+		`,
+	}, {
+		name: "yaml_binary_tag_on_bytes",
+		in: `
+		item: '\xff\xfe' @yaml(,tag="!!binary")
+		`,
+		out: `
+item: !!binary //4=
+		`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -355,12 +431,16 @@ field: value
 			if err != nil {
 				t.Fatal(err)
 			}
-			b, err := Encode(f)
+			b, err := Encode(f, EncodeOptions{})
 			var got string
 			if err != nil {
 				got = err.Error()
 			} else {
 				got = strings.TrimSpace(string(b))
+				// Any successfully encoded output must be valid YAML.
+				if _, err := yparser.ParseBytes(b, 0); err != nil {
+					t.Errorf("output does not re-parse as YAML: %v", err)
+				}
 			}
 			want := strings.TrimSpace(tc.out)
 			if got != want {
@@ -414,11 +494,7 @@ true
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			n, err := encode(tc.in)
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, err := yaml.Marshal(n)
+			b, err := Encode(tc.in, EncodeOptions{})
 			if err != nil {
 				t.Fatal(err)
 			}

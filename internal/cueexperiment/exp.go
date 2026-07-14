@@ -26,9 +26,10 @@ type Config struct {
 	// and generating a complete OpenAPI document rather than only its schemas.
 	OpenAPIV2 bool `experiment:"preview:v0.18.0"`
 
-	// YAMLGoccy selects the github.com/goccy/go-yaml based YAML decoder,
-	// which retains more precise position and comment information than
-	// the older github.com/go-yaml/yaml based decoder it replaces.
+	// YAMLGoccy selects the github.com/goccy/go-yaml based YAML decoder
+	// and encoder. The new decoder retains more precise position and
+	// comment information than the older github.com/go-yaml/yaml based
+	// implementation it replaces.
 	YAMLGoccy bool `experiment:"preview:v0.18.0,default:v0.18.0"`
 
 	// The flags in this second section describe completed experiments; they can still be set

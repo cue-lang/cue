@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71de7f78_0b42565b",
+        "filename": "cmd/cue/cmd/testdata/script/help_lsp.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-14T12:23:31Z",
+      "side": 1,
+      "message": "nit: this is pretty much just testing Cobra\u0027s own completion generation, so I would drop this second half of the test and the golden file.",
+      "revId": "29bb4770899c6424524a26d17e54b6e1ce020196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

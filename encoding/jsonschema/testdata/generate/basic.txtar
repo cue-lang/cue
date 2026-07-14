@@ -18,7 +18,8 @@ ok: data: {
 	t4: "foo"
 	t5: true
 	t6: "bar"
-	t7: 'something'
+	// t7 is bytes, which is a base64-encoded string on the wire.
+	t7: "c29tZXRoaW5n"
 }
 -- out/generate-v3/schema --
 {
@@ -31,7 +32,10 @@ ok: data: {
 		t4: type:  "string"
 		t5: type:  "boolean"
 		t6: anyOf: [{type: "string"}, {type: "integer"}]
-		t7: true
+		t7: {
+			type:            "string"
+			contentEncoding: "base64"
+		}
 		t8: type: "null"
 	}
 }

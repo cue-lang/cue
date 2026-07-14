@@ -18,8 +18,8 @@ import (
 	"strings"
 	"testing"
 
+	gparser "github.com/goccy/go-yaml/parser"
 	"github.com/google/go-cmp/cmp"
-	"go.yaml.in/yaml/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
@@ -328,6 +328,10 @@ field: value
 				got = err.Error()
 			} else {
 				got = strings.TrimSpace(string(b))
+				// Any successfully encoded output must be valid YAML.
+				if _, err := gparser.ParseBytes(b, 0); err != nil {
+					t.Errorf("output does not re-parse as YAML: %v", err)
+				}
 			}
 			want := strings.TrimSpace(tc.out)
 			if got != want {
@@ -381,11 +385,7 @@ true
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			n, err := encode(tc.in)
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, err := yaml.Marshal(n)
+			b, err := Encode(tc.in)
 			if err != nil {
 				t.Fatal(err)
 			}

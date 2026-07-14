@@ -1,0 +1,62 @@
+# A bytes field is base64-encoded on the wire; OpenAPI 3.0 expresses this
+# with type: string and format: byte. See https://cuelang.org/issue/1785
+#v2
+#Version: 3.0
+#AllSchemas
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: {}
+#Foo: {data: bytes}
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Foo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "data": {
+                  "type": "string",
+                  "format": "byte"
+               }
+            },
+            "required": [
+               "data"
+            ]
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Foo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "data": {
+                  "type": "string",
+                  "format": "byte"
+               }
+            },
+            "required": [
+               "data"
+            ]
+         }
+      }
+   }
+}

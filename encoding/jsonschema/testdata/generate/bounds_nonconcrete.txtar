@@ -1,0 +1,42 @@
+# A comparison bound that refers to a non-concrete value (here the sibling
+# field requests.cpu) cannot be expressed in JSON Schema, so it is dropped and
+# the field accepts any value of the base type. Previously this failed with
+# "bad argument to unary comparison". See https://cuelang.org/issue/3742
+-- test.cue --
+package test
+
+requests: cpu?: number
+limits: cpu?:   number & >=requests.cpu
+-- datatest/tests.cue --
+package datatest
+
+// The dropped bound means any number validates, including one that would
+// violate the original CUE bound.
+ok: data: {
+	requests: cpu: 4
+	limits: cpu:   2
+}
+
+errorNotNumber: {
+	data: limits: cpu: "x"
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		limits: {
+			type: "object"
+			properties: cpu: type: "number"
+		}
+		requests: {
+			type: "object"
+			properties: cpu: type: "number"
+		}
+	}
+}
+-- out/generate-v3/errorNotNumber --
+errorNotNumber.data.limits.cpu: conflicting values "x" and number (mismatched types string and number):
+    ./datatest/tests.cue:11:21
+-- out/generate-v3/ok --

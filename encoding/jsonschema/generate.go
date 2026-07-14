@@ -172,6 +172,11 @@ type generateDialect struct {
 	// a $ref causes all sibling keywords to be ignored, so they must be
 	// kept out of any schema object that contains a $ref.
 	refComposesWithSiblings bool
+
+	// bytesViaContentEncoding reports whether base64-encoded binary is
+	// expressed with `contentEncoding: base64` (draft-07 and later) rather
+	// than the OpenAPI 3.0 `format: byte` keyword.
+	bytesViaContentEncoding bool
 }
 
 // Generate generates a JSON Schema for the given CUE value,
@@ -801,6 +806,8 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		it = g.makeStructItem(v, mode)
 	case cue.ListKind:
 		it = g.makeListItem(v, mode)
+	case cue.BytesKind:
+		it = &itemBytes{}
 	}
 	var elems []internItem
 	if kinds := cueKindToJSONSchemaTypes(kind); len(kinds) > 0 {
@@ -1485,6 +1492,7 @@ func newGenerateDialect(v Version) (generateDialect, error) {
 			supportsPatternProperties: true,
 			supportsIfThenElse:        true,
 			refComposesWithSiblings:   true,
+			bytesViaContentEncoding:   true,
 		}, nil
 	case VersionDraft7:
 		return generateDialect{
@@ -1501,6 +1509,7 @@ func newGenerateDialect(v Version) (generateDialect, error) {
 			supportsPatternProperties: true,
 			supportsIfThenElse:        true,
 			refComposesWithSiblings:   false,
+			bytesViaContentEncoding:   true,
 		}, nil
 	case VersionOpenAPI:
 		return generateDialect{

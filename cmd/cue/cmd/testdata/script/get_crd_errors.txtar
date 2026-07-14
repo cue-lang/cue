@@ -10,7 +10,7 @@ stderr 'no such file or directory|cannot find the file specified'
 
 # Test invalid YAML
 ! exec cue get crd invalid.yaml
-stderr 'invalid.yaml: did not find expected node content'
+stderr 'invalid.yaml:1: sequence end token .\]. not found'
 
 # Test YAML with no CRDs.
 exec cue get crd non-crd.yaml
@@ -56,7 +56,7 @@ spec:
     kind: Foo
 
 -- invalid.yaml --
-}
+a: [
 -- non-crd.yaml --
 apiVersion: v1
 kind: ConfigMap

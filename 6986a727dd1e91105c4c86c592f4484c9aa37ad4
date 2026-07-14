@@ -22,6 +22,30 @@
       },
       "revId": "6986a727dd1e91105c4c86c592f4484c9aa37ad4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54e95982_f4e6a460",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-14T16:05:57Z",
+      "side": 1,
+      "message": "yes; CUE_REGISTRY in its simplest form is like GOPROXY, just a list of registries, but it also supports a key-value form where you can route different module prefixes to different modules. this is akin to Go\u0027s GOPRIVATE in a way, but much more powerful.\n\nSee `cue help registryconfig`, which has examples like:\n\n\u003e CUE_REGISTRY\u003d\u0027foo.example/bar\u003dlocalhost:5000,myregistry.example\u0027\n\nMost users won\u0027t need this, but this is very relevant for enterprise users where they want to use the central registry for OSS deps, but their on-premise registry for corporate code.",
+      "parentUuid": "6ec84393_9b34f50d",
+      "range": {
+        "startLine": 17,
+        "startChar": 16,
+        "endLine": 17,
+        "endChar": 34
+      },
+      "revId": "6986a727dd1e91105c4c86c592f4484c9aa37ad4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

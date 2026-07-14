@@ -104,7 +104,7 @@ func TestExtract(t *testing.T) {
 	}, {
 		name: "invalid JSON",
 		in:   `[3_]`,
-		out:  "invalid JSON for file \"invalid JSON\": invalid character '_' after array element",
+		out:  "invalid JSON: invalid character '_' after array element",
 	}, {
 		name: "numeric keys: Issue #219",
 		in:   `{"20": "a"}`,
@@ -146,11 +146,11 @@ func TestExtractNilAndEmpty(t *testing.T) {
 	}{{
 		name: "nil data",
 		data: nil,
-		out:  `invalid JSON for file "nil data": unexpected end of JSON input`,
+		out:  `invalid JSON: unexpected end of JSON input`,
 	}, {
 		name: "empty non-nil data",
 		data: make([]byte, 0),
-		out:  `invalid JSON for file "empty non-nil data": unexpected end of JSON input`,
+		out:  `invalid JSON: unexpected end of JSON input`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

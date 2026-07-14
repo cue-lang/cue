@@ -26,7 +26,8 @@ paths: {}
             "type": "object",
             "additionalProperties": {
                "type": "string"
-            }
+            },
+            "minProperties": 1
          }
       }
    }
@@ -45,7 +46,8 @@ paths: {}
             "type": "object",
             "additionalProperties": {
                "type": "string"
-            }
+            },
+            "minProperties": 1
          }
       }
    }

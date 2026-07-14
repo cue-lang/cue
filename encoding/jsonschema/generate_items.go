@@ -699,7 +699,7 @@ func (i *itemPropertyBounds) generate(g *generator) ast.Expr {
 	case cue.GreaterThanEqualOp:
 		keyword = "minProperties"
 	default:
-		panic("unexpected constraint in items bounds")
+		panic("unexpected constraint in property bounds")
 	}
 	return singleKeyword(keyword, ast.NewLit(token.INT, fmt.Sprint(i.n)))
 }

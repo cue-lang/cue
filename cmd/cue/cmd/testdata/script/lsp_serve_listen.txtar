@@ -1,0 +1,17 @@
+# Verify that the lsp command can run the language server as a
+# daemon, listening on an address, and that it shuts down cleanly
+# once the listen timeout expires with no connected clients.
+
+exec cue lsp serve --listen localhost:0 --listen-timeout 20ms
+stderr 'cuelsp daemon: listening on tcp network, address localhost:0'
+stderr 'cuelsp daemon: exiting'
+
+# "cue lsp" with no subcommand is equivalent to "cue lsp serve".
+exec cue lsp --listen localhost:0 --listen-timeout 20ms
+stderr 'cuelsp daemon: exiting'
+
+# Positional arguments are rejected.
+! exec cue lsp bogus
+stderr 'unknown command "bogus" for "cue lsp"'
+! exec cue lsp serve bogus
+stderr 'unknown command "bogus" for "cue lsp serve"'

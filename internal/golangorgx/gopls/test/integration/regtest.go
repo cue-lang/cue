@@ -13,29 +13,28 @@ import (
 	"testing"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cmd"
+	cuecmd "cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/tool"
 	"cuelang.org/go/internal/lsp/cache"
 )
 
 var (
-	runSubprocessTests       = flag.Bool("enable_gopls_subprocess_tests", false, "run integration tests against a gopls subprocess (default: in-process)")
-	goplsBinaryPath          = flag.String("gopls_test_binary", "", "path to the gopls binary for use as a remote, for use with the -enable_gopls_subprocess_tests flag")
-	timeout                  = flag.Duration("timeout", defaultTimeout(), "if nonzero, default timeout for each integration test; defaults to GOPLS_INTEGRATION_TEST_TIMEOUT")
+	runSubprocessTests       = flag.Bool("enable_cuelsp_subprocess_tests", false, "run integration tests against a cue lsp subprocess (default: in-process)")
+	cueBinaryPath            = flag.String("cue_test_binary", "", "path to the cue binary for use as a remote, for use with the -enable_cuelsp_subprocess_tests flag")
+	timeout                  = flag.Duration("timeout", defaultTimeout(), "if nonzero, default timeout for each integration test; defaults to CUELSP_INTEGRATION_TEST_TIMEOUT")
 	skipCleanup              = flag.Bool("skip_cleanup", false, "whether to skip cleaning up temp directories")
 	printGoroutinesOnFailure = flag.Bool("print_goroutines", false, "whether to print goroutines info on failure")
 	printLogs                = flag.Bool("print_logs", false, "whether to print LSP logs")
 )
 
 func defaultTimeout() time.Duration {
-	s := os.Getenv("GOPLS_INTEGRATION_TEST_TIMEOUT")
+	s := os.Getenv("CUELSP_INTEGRATION_TEST_TIMEOUT")
 	if s == "" {
 		return 0
 	}
 	d, err := time.ParseDuration(s)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "invalid GOPLS_INTEGRATION_TEST_TIMEOUT %q: %v\n", s, err)
+		fmt.Fprintf(os.Stderr, "invalid CUELSP_INTEGRATION_TEST_TIMEOUT %q: %v\n", s, err)
 		os.Exit(2)
 	}
 	return d
@@ -105,10 +104,21 @@ func DefaultModes() Mode {
 
 // Main sets up and tears down the shared integration test state.
 func Main(m *testing.M, hook func(*settings.Options)) {
-	// If this magic environment variable is set, run gopls instead of the test
-	// suite. See the documentation for runTestAsGoplsEnvvar for more details.
-	if os.Getenv(runTestAsGoplsEnvvar) == "true" {
-		tool.Main(context.Background(), cmd.New(hook), os.Args[1:])
+	// If this magic environment variable is set, run cue lsp instead of the test
+	// suite. See the documentation for runTestAsCueLspEnvvar for more details.
+	if os.Getenv(runTestAsCueLspEnvvar) == "true" {
+		// Run the real cue CLI: the arguments are of the form
+		// "lsp serve ..." (see Runner.separateProcessServer). Note
+		// that the hook parameter is not honored in this mode; it is
+		// a no-op for all current callers.
+		c, err := cuecmd.New(os.Args[1:])
+		if err == nil {
+			err = c.Run(context.Background())
+		}
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 
@@ -122,10 +132,10 @@ func Main(m *testing.M, hook func(*settings.Options)) {
 		OptionsHook:              hook,
 	}
 
-	runner.goplsPath = *goplsBinaryPath
-	if runner.goplsPath == "" {
+	runner.cuePath = *cueBinaryPath
+	if runner.cuePath == "" {
 		var err error
-		runner.goplsPath, err = os.Executable()
+		runner.cuePath, err = os.Executable()
 		if err != nil {
 			panic(fmt.Sprintf("finding test binary path: %v", err))
 		}

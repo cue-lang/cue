@@ -121,11 +121,11 @@ func (r *replacingRegistry) modFileFromDir(dir string) (*modfile.File, error) {
 	// underlying OS path in the error if available?
 	data, err := fs.ReadFile(loc.FS, path.Join(loc.Dir, "cue.mod/module.cue"))
 	if err != nil {
-		return nil, fmt.Errorf("cannot read module file in replacement directory: %v", err)
+		return nil, fmt.Errorf("replacement directory %q: %w", dir, err)
 	}
 	mf, err := modfile.ParseNonStrict(data, path.Join(dir, "cue.mod/module.cue"))
 	if err != nil {
-		return nil, fmt.Errorf("cannot parse module file in replacement directory: %v", err)
+		return nil, fmt.Errorf("replacement directory %q: %w", dir, err)
 	}
 	return mf, nil
 }

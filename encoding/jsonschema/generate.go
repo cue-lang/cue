@@ -1780,11 +1780,28 @@ func DefaultNamesFunc(refs []*CUERef) {
 		return
 	}
 	type refState struct {
-		sels  []cue.Selector
-		depth int
-		raw   bool
+		sels      []cue.Selector
+		depth     int
+		raw       bool
+		qualified bool
 	}
 	states := make([]refState, len(refs))
+	// nameOf computes the name for a reference given a candidate state. When
+	// qualified, the package name is prepended so that same-named definitions
+	// from different packages get distinct names.
+	nameOf := func(i, depth int, raw, qualified bool) string {
+		n := defName(states[i].sels, depth, raw)
+		if qualified {
+			if q := pkgQualifier(refs[i].Inst); q != "" {
+				if n == "" {
+					n = q
+				} else {
+					n = q + "." + n
+				}
+			}
+		}
+		return n
+	}
 	for i, ref := range refs {
 		sels := ref.Path.Selectors()
 		states[i] = refState{sels: sels, depth: 1}
@@ -1805,11 +1822,12 @@ func DefaultNamesFunc(refs []*CUERef) {
 				continue
 			}
 			allUnique = false
+			// Add another leading selector to any reference that has one.
 			anyDepthIncreased := false
 			for _, idx := range indices {
 				if s := &states[idx]; s.depth < len(s.sels) {
 					s.depth++
-					refs[idx].Name = defName(s.sels, s.depth, s.raw)
+					refs[idx].Name = nameOf(idx, s.depth, s.raw, s.qualified)
 					changed = true
 					anyDepthIncreased = true
 				}
@@ -1817,10 +1835,40 @@ func DefaultNamesFunc(refs []*CUERef) {
 			if anyDepthIncreased {
 				continue
 			}
+			// Keep the '#' prefix to distinguish a definition #Foo from a
+			// regular field Foo. This only helps when it actually splits the
+			// group (or makes an empty name non-empty); when every member would
+			// collapse to the same raw name (for example several same-named
+			// definitions from different packages) we fall through to
+			// qualifying by package instead.
+			rawSplit := make(map[string]bool)
 			for _, idx := range indices {
-				if s := &states[idx]; !s.raw {
-					s.raw = true
-					refs[idx].Name = defName(s.sels, s.depth, true)
+				rawSplit[nameOf(idx, states[idx].depth, true, states[idx].qualified)] = true
+			}
+			if name == "" || len(rawSplit) > 1 {
+				anyRaw := false
+				for _, idx := range indices {
+					if s := &states[idx]; !s.raw {
+						s.raw = true
+						refs[idx].Name = nameOf(idx, s.depth, true, s.qualified)
+						changed = true
+						anyRaw = true
+					}
+				}
+				if anyRaw {
+					continue
+				}
+			}
+			// The references share every selector but come from different
+			// packages (for example a definition re-exported under the same
+			// name); qualify them with the package name.
+			if len(indices) <= 1 {
+				continue
+			}
+			for _, idx := range indices {
+				if s := &states[idx]; !s.qualified && pkgQualifier(refs[idx].Inst) != "" {
+					s.qualified = true
+					refs[idx].Name = nameOf(idx, s.depth, s.raw, true)
 					changed = true
 				}
 			}
@@ -1829,6 +1877,18 @@ func DefaultNamesFunc(refs []*CUERef) {
 			break
 		}
 	}
+}
+
+// pkgQualifier returns the package qualifier (the final path element) for the
+// instance that a reference belongs to, or the empty string if the value is
+// not a package, as is the case for the top-level document passed to
+// [openapi.GenerateV2].
+func pkgQualifier(inst cue.Value) string {
+	bi := inst.BuildInstance()
+	if bi == nil {
+		return ""
+	}
+	return ast.ParseImportPath(bi.ImportPath).Qualifier
 }
 
 // defName builds a definition name from the last depth selectors of sels.

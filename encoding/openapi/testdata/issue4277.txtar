@@ -1,0 +1,34 @@
+# A definition re-exported through a chain of packages (repro.#Foo ->
+# sub.#Foo -> def.#Foo) must generate valid schemas. Each hop is a distinct
+# source definition that happens to share the selector #Foo; they must get
+# distinct names rather than colliding. Issue: https://cuelang.org/issue/4277
+#
+# The old generator emitted a self-referencing $ref; the new generator
+# currently fails with "NamesFunc returned non-unique name". The fix gives the
+# hops distinct, package-qualified names.
+#v2
+#Version: 3.0
+#AllSchemas
+#ExpectError: NamesFunc returned non-unique name
+-- cue.mod/module.cue --
+module: "openapi.test@v0"
+language: version: "v0.9.0"
+-- in.cue --
+package repro
+
+import "openapi.test/pkg/sub"
+
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: {}
+#Foo: sub.#Foo
+-- pkg/sub/re.cue --
+package sub
+
+import "openapi.test/pkg:def"
+
+#Foo: def.#Foo
+-- pkg/def.cue --
+package def
+
+#Foo: {name: string, type: "foo"}

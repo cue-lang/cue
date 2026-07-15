@@ -1,0 +1,32 @@
+# Companion to issue4277: two different packages that share both the package
+# name (util) and the definition name (#Foo) cannot be distinguished even by
+# qualifying with the package name; the full import path is needed.
+# Issue: https://cuelang.org/issue/4277
+#v2
+#Version: 3.0
+#ExpectError: NamesFunc returned non-unique name
+-- cue.mod/module.cue --
+module: "openapi.test@v0"
+language: version: "v0.9.0"
+-- in.cue --
+package repro
+
+import (
+	autil "openapi.test/a/util"
+	butil "openapi.test/b/util"
+)
+
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: "/x": get: responses: "200": content: "application/json": schema: #: {
+	a: autil.#Foo
+	b: butil.#Foo
+}
+-- a/util/util.cue --
+package util
+
+#Foo: {a: string}
+-- b/util/util.cue --
+package util
+
+#Foo: {b: string}

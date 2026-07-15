@@ -10,6 +10,7 @@
 			f1: int
 		})
 	}
+
 	x: _
 	// All tests here should pass and the result of the okcN tests should be
 	// identical to those of the okoN tests.

@@ -20,6 +20,7 @@ issue3801: nonRooted: reduced: {
 		}
 		out: #base & {val0: "foo"}
 	}
+
 	out: (#Output & {}).output // non-concrete
 }
 issue3801: let: full: {

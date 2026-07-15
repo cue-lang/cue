@@ -1,5 +1,6 @@
 -- in.cue --
 #schema: a!: bool
+
 _hidden & #schema // must fail here, but not elsewhere
 _hidden: {
 	"a":        true

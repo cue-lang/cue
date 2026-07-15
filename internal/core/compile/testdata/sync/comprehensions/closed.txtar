@@ -53,6 +53,7 @@ comprehensionIsEmbed: {
 // This comprehension is inside a definition and should still disallow b.
 noEraseDefinition: {
 	#Foo: [if true {a: int}]
+
 	a: {#Foo & [{b: 2}]} // Error
 }
 

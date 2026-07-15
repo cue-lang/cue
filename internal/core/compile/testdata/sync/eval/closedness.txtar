@@ -534,6 +534,7 @@ issue3924: two: {
 			allowed?: string
 		})
 	}
+
 	out: #Schema & {foo: disallowed: "bar"} // should fail
 }
 issue3924: three: t1: {
@@ -557,6 +558,7 @@ issue3924: three: t3: {
 issue3924: four: {
 	A: {{foo: #B}}
 	#B: allowed?: string
+
 	out: A & {foo: disallowed: "foo"} // should fail
 }
 -- reroot.cue --

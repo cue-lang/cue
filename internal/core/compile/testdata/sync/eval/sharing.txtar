@@ -196,6 +196,7 @@ issue3849: {
 		dep: metadata: name: app: "mysql"
 	}
 	#Deployment: metadata?: #ObjectMeta
+
 	#ObjectMeta: name?: [string]: string
 
 	// TODO(inline): investigate why these do not match. Optionals?

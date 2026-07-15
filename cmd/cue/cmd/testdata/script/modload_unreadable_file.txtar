@@ -8,17 +8,15 @@ exec cue export .
 cmp stdout want-export.txt
 
 # An unreadable file in a dependency package directory.
-# TODO(https://cuelang.org/issue/2952): the message repeats the file name.
 chmod 000 $CUE_CACHE_DIR/mod/extract/example.com/e@v0.0.1/top.cue
 ! exec cue export .
-stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot get imports: cannot read "top.cue": open top.cue: permission denied:$'
+stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot get imports: open top.cue: permission denied:$'
 chmod 644 $CUE_CACHE_DIR/mod/extract/example.com/e@v0.0.1/top.cue
 
 # An unreadable file in the main module.
-# TODO(https://cuelang.org/issue/2952): the message repeats the file name.
 chmod 000 sub/bad.cue
 ! exec cue mod tidy
-stderr '^cannot read "sub/bad.cue": open sub/bad.cue: permission denied$'
+stderr '^open sub/bad.cue: permission denied$'
 
 -- want-export.txt --
 {

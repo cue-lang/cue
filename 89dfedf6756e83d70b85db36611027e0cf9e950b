@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b90ece37_5417bd1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-15T10:00:25Z",
+      "side": 1,
+      "message": "Assuming that this is another case where openapi adds e.g. int64 on top of jsonschema, which doesn\u0027t have it.",
+      "revId": "89dfedf6756e83d70b85db36611027e0cf9e950b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cee7b66c_bc67b0bf",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-15T10:00:25Z",
+      "side": 1,
+      "message": "from https://spec.openapis.org/registry/format/ I see not only unsigned formats like uint64, but also smaller sizes like int8 and int16. am I missing something here?\n\nif that\u0027s because it\u0027s not a versioned openapi spec, then I\u0027m looking at https://spec.openapis.org/oas/latest.html#data-type-format, but that has int32 and int64 and no float32 nor float64, so then I\u0027m still confused.",
+      "revId": "89dfedf6756e83d70b85db36611027e0cf9e950b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

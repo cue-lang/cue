@@ -2,16 +2,14 @@
 # replacement should name the replacement directory.
 
 # A replacement directory with an invalid module.cue file.
-# TODO(https://cuelang.org/issue/2952): the message stacks several prefixes
-# and does not name the replacement directory.
 cp garbage.txt local_dep/cue.mod/module.cue
 ! exec cue export .
-stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot expand module graph: cannot parse module file in replacement directory: invalid module file syntax: expected label or '':'', found ''IDENT'' is:$'
+stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot expand module graph: replacement directory "./local_dep": invalid module file syntax: expected label or '':'', found ''IDENT'' is:$'
 
 # A replacement directory without a module.cue file.
 rm local_dep/cue.mod/module.cue
 ! exec cue export .
-stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot expand module graph: cannot read module file in replacement directory: open .*module.cue:'
+stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot expand module graph: replacement directory "./local_dep": open .*module.cue:'
 
 -- garbage.txt --
 this is not CUE {{{

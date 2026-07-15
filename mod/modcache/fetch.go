@@ -72,9 +72,9 @@ func (c *Cache) ModFile(ctx context.Context, mv module.Version) (*modfile.File, 
 		if err != nil {
 			return nil, err
 		}
-		mf, err := modfile.Parse(data, mv.String())
+		mf, err := modfile.Parse(data, "cue.mod/module.cue")
 		if err != nil {
-			return nil, fmt.Errorf("cannot parse module file from %v: %v", mv, err)
+			return nil, &modregistry.ModuleError{Module: mv.String(), Err: err}
 		}
 		return mf, nil
 	})

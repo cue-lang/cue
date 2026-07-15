@@ -16,6 +16,24 @@
       "message": "nit: use backquotes to clearly separate each of these snippets",
       "revId": "0af469844649ba9b79b77cf2798faeb61af558bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1433e2d_8ed1742f",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-15T12:00:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45a1740d_9ad0632f",
+      "revId": "0af469844649ba9b79b77cf2798faeb61af558bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

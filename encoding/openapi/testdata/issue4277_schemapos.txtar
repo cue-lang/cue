@@ -1,0 +1,27 @@
+# Companion to issue4277: the same re-export chain referenced from a schema
+# position (without AllSchemas) also collides on the shared #Foo selector.
+# Issue: https://cuelang.org/issue/4277
+#v2
+#Version: 3.0
+#ExpectError: NamesFunc returned non-unique name
+-- cue.mod/module.cue --
+module: "openapi.test@v0"
+language: version: "v0.9.0"
+-- in.cue --
+package repro
+
+import "openapi.test/pkg/sub"
+
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: "/x": get: responses: "200": content: "application/json": schema: #: sub.#Foo
+-- pkg/sub/re.cue --
+package sub
+
+import "openapi.test/pkg:def"
+
+#Foo: def.#Foo
+-- pkg/def.cue --
+package def
+
+#Foo: {name: string, type: "foo"}

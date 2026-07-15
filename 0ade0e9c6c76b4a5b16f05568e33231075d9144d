@@ -16,6 +16,24 @@
       "message": "ditto, backquotes to delimit each of these snippets",
       "revId": "0ade0e9c6c76b4a5b16f05568e33231075d9144d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e570d499_232344d6",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-15T11:55:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4689c51b_7b466e00",
+      "revId": "0ade0e9c6c76b4a5b16f05568e33231075d9144d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

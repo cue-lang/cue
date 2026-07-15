@@ -1776,59 +1776,229 @@ func DefaultNameFunc(inst cue.Value, ref cue.Path) string {
 // When stripping '#' would cause a clash (e.g. both #Foo and Foo
 // are referenced), the '#' is preserved for the definition.
 func DefaultNamesFunc(refs []*CUERef) {
-	if len(refs) == 0 {
-		return
-	}
-	type refState struct {
-		sels  []cue.Selector
-		depth int
-		raw   bool
-	}
-	states := make([]refState, len(refs))
+	states := make([]*nameState, len(refs))
 	for i, ref := range refs {
-		sels := ref.Path.Selectors()
-		states[i] = refState{sels: sels, depth: 1}
-		ref.Name = defName(sels, 1, false)
+		states[i] = &nameState{
+			ref:   ref,
+			sels:  ref.Path.Selectors(),
+			depth: 1,
+		}
+		ref.Name = states[i].name()
 	}
+	// Group the references by name and escalate each group of references
+	// that share a name (or whose name is empty, which happens when a
+	// reference path ends in the anonymous # definition) until all names
+	// are distinct and non-empty or no move can improve matters.
 	for {
-		groups := make(map[string][]int)
-		for i, ref := range refs {
-			groups[ref.Name] = append(groups[ref.Name], i)
+		groups := make(map[string][]*nameState)
+		for _, s := range states {
+			groups[s.ref.Name] = append(groups[s.ref.Name], s)
 		}
-		allUnique := true
 		changed := false
-		for name, indices := range groups {
-			// A unique, non-empty name is done. An empty name (which happens
-			// when a reference path ends in the anonymous # definition) must be
-			// deepened even when it is unique, so that it becomes non-empty.
-			if name != "" && len(indices) <= 1 {
+		for name, group := range groups {
+			if name != "" && len(group) <= 1 {
 				continue
 			}
-			allUnique = false
-			anyDepthIncreased := false
-			for _, idx := range indices {
-				if s := &states[idx]; s.depth < len(s.sels) {
-					s.depth++
-					refs[idx].Name = defName(s.sels, s.depth, s.raw)
-					changed = true
-					anyDepthIncreased = true
-				}
-			}
-			if anyDepthIncreased {
-				continue
-			}
-			for _, idx := range indices {
-				if s := &states[idx]; !s.raw {
-					s.raw = true
-					refs[idx].Name = defName(s.sels, s.depth, true)
-					changed = true
-				}
+			if escalate(group) {
+				changed = true
 			}
 		}
-		if allUnique || !changed {
+		if !changed {
 			break
 		}
 	}
+}
+
+// pkgLevel describes how much information about a reference's package is
+// included in its name.
+type pkgLevel int
+
+const (
+	pkgNone pkgLevel = iota // no package information
+	pkgName                 // the package name, e.g. "def"
+	pkgPath                 // the full package import path
+)
+
+// nameState holds the in-progress naming state for a single reference, as
+// used by [DefaultNamesFunc]. The zero escalation state derives the name
+// from the final selector of the reference's path alone; see [escalate]
+// for the moves that alter the state to make colliding names distinct.
+type nameState struct {
+	ref *CUERef
+
+	// sels holds the selectors of ref.Path.
+	sels []cue.Selector
+
+	// depth is the number of trailing selectors used for the name.
+	depth int
+
+	// raw causes the '#' prefix on definition selectors to be kept.
+	raw bool
+
+	// pkg is the amount of package information prefixed to the name.
+	pkg pkgLevel
+}
+
+// name returns the name implied by the current state.
+func (s *nameState) name() string {
+	name := defName(s.sels, s.depth, s.raw)
+	var prefix string
+	switch s.pkg {
+	case pkgName:
+		prefix = pkgQualifier(s.ref.Inst)
+	case pkgPath:
+		prefix = pkgImportPath(s.ref.Inst)
+	}
+	switch {
+	case prefix == "":
+		return name
+	case name == "":
+		return prefix
+	}
+	return prefix + "." + name
+}
+
+// escalate tries to distinguish the names of a group of references that
+// currently share the same name, applying the first applicable move of an
+// escalating sequence:
+//
+//   - derive the name from more of the path's trailing selectors
+//   - keep the '#' prefix that distinguishes a definition #Foo from a
+//     regular field Foo
+//   - prefix the package name, distinguishing definitions re-exported
+//     from another package under the same name
+//   - prefix the full package import path, in case the package names
+//     coincide too
+//
+// All moves except the first are applied only when they improve the
+// group's names (see [improves]), so, for example, the '#' prefix is not
+// kept when every reference in the group is a definition. Deepening can
+// help even when it does not immediately make any names distinct, because
+// further deepening might, so it is applied unconditionally.
+//
+// escalate reports whether any name changed. Colliding names that no move
+// can distinguish are left in place, to be diagnosed by the caller of the
+// NamesFunc.
+func escalate(group []*nameState) bool {
+	deepened := false
+	for _, s := range group {
+		if s.depth < len(s.sels) {
+			s.depth++
+			s.ref.Name = s.name()
+			deepened = true
+		}
+	}
+	if deepened {
+		return true
+	}
+	for _, move := range []func(s *nameState) bool{
+		func(s *nameState) bool {
+			if s.raw {
+				return false
+			}
+			s.raw = true
+			return true
+		},
+		func(s *nameState) bool {
+			if s.pkg >= pkgName || pkgQualifier(s.ref.Inst) == "" {
+				return false
+			}
+			s.pkg = pkgName
+			return true
+		},
+		func(s *nameState) bool {
+			if s.pkg >= pkgPath || pkgImportPath(s.ref.Inst) == "" {
+				return false
+			}
+			s.pkg = pkgPath
+			return true
+		},
+	} {
+		if tryMove(group, move) {
+			return true
+		}
+	}
+	return false
+}
+
+// tryMove applies move to a trial copy of each reference's state and, if
+// the resulting names are an improvement, commits the trial states and
+// renames the references. It reports whether the move was committed.
+func tryMove(group []*nameState, move func(*nameState) bool) bool {
+	trial := make([]*nameState, len(group))
+	applied := false
+	for i, s := range group {
+		s1 := *s
+		trial[i] = &s1
+		if move(&s1) {
+			applied = true
+		}
+	}
+	if !applied || !improves(group, trial) {
+		return false
+	}
+	for i, s := range group {
+		*s = *trial[i]
+		s.ref.Name = s.name()
+	}
+	return true
+}
+
+// improves reports whether the names implied by the trial states improve
+// on the current names of the given group: more distinct names, or as
+// many distinct names with fewer empty ones.
+func improves(group, trial []*nameState) bool {
+	distinct0, empty0 := nameStats(group)
+	distinct1, empty1 := nameStats(trial)
+	return distinct1 > distinct0 || (distinct1 == distinct0 && empty1 < empty0)
+}
+
+// nameStats returns the number of distinct non-empty names and the number
+// of empty names among the given states.
+func nameStats(states []*nameState) (distinct, empty int) {
+	seen := make(map[string]bool)
+	for _, s := range states {
+		if n := s.name(); n == "" {
+			empty++
+		} else {
+			seen[n] = true
+		}
+	}
+	return len(seen), empty
+}
+
+// pkgQualifier returns the package qualifier (the final path element) for
+// the instance that a reference belongs to, or the empty string if the
+// value is not a package, as is the case for the top-level document passed
+// to [openapi.GenerateV2].
+func pkgQualifier(inst cue.Value) string {
+	bi := inst.BuildInstance()
+	if bi == nil {
+		return ""
+	}
+	return ast.ParseImportPath(bi.ImportPath).Qualifier
+}
+
+// pkgImportPath returns the full import path of the package that a
+// reference belongs to, sanitized for use in a schema name by replacing
+// each character that is not alphanumeric or one of '.', '_', '-' (such
+// as the '/' separators) with '.'. It returns the empty string if the
+// value is not a package.
+func pkgImportPath(inst cue.Value) string {
+	bi := inst.BuildInstance()
+	if bi == nil {
+		return ""
+	}
+	return strings.Map(func(r rune) rune {
+		switch {
+		case r >= 'a' && r <= 'z',
+			r >= 'A' && r <= 'Z',
+			r >= '0' && r <= '9',
+			r == '.', r == '_', r == '-':
+			return r
+		}
+		return '.'
+	}, bi.ImportPath)
 }
 
 // defName builds a definition name from the last depth selectors of sels.

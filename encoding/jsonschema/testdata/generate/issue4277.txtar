@@ -1,0 +1,41 @@
+# A definition re-exported through a chain of packages (sub.#Foo ->
+# def.#Foo) produces several distinct references that share the selector
+# #Foo. They must get distinct, package-qualified names rather than
+# colliding. See https://cuelang.org/issue/4277
+-- cue.mod/module.cue --
+module: "test.example@v0"
+language: version: "v0.9.0"
+-- test.cue --
+package test
+
+import "test.example/pkg/sub"
+
+root?: sub.#Foo
+-- pkg/sub/re.cue --
+package sub
+
+import "test.example/pkg:def"
+
+#Foo: def.#Foo
+-- pkg/def.cue --
+package def
+
+#Foo: {name: string, type: "foo"}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		"def.Foo": {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				name: type:  "string"
+				type: const: "foo"
+			}
+			required: ["name"]
+		}
+		"sub.Foo": $ref: "#/$defs/def.Foo"
+	}
+	type: "object"
+	properties: root: $ref: "#/$defs/sub.Foo"
+}

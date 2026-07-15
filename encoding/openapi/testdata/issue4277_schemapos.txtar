@@ -3,7 +3,6 @@
 # Issue: https://cuelang.org/issue/4277
 #v2
 #Version: 3.0
-#ExpectError: NamesFunc returned non-unique name
 -- cue.mod/module.cue --
 module: "openapi.test@v0"
 language: version: "v0.9.0"
@@ -25,3 +24,101 @@ import "openapi.test/pkg:def"
 package def
 
 #Foo: {name: string, type: "foo"}
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/x": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/sub.Foo"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "def.Foo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "name": {
+                  "type": "string"
+               },
+               "type": {
+                  "enum": [
+                     "foo"
+                  ]
+               }
+            },
+            "required": [
+               "name"
+            ]
+         },
+         "sub.Foo": {
+            "$ref": "#/components/schemas/def.Foo"
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {
+      "/x": {
+         "get": {
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/sub.Foo"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components": {
+      "schemas": {
+         "def.Foo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "name": {
+                  "type": "string"
+               },
+               "type": {
+                  "enum": [
+                     "foo"
+                  ]
+               }
+            },
+            "required": [
+               "name"
+            ]
+         },
+         "sub.Foo": {
+            "$ref": "#/components/schemas/def.Foo"
+         }
+      }
+   }
+}

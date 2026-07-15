@@ -6,9 +6,8 @@ cmp stdout want-export.txt
 
 cp garbage.txt $CUE_CACHE_DIR/mod/download/example.com/e/@v/v0.0.1.mod
 
-# TODO(https://cuelang.org/issue/2952): the message repeats the module version.
 ! exec cue mod tidy
-stderr '^cannot tidy requirements: example.com/e@v0.0.1: cannot parse module file from example.com/e@v0.0.1: invalid module file syntax: expected label or '':'', found ''IDENT'' is$'
+stderr '^cannot tidy requirements: module example.com/e@v0.0.1: invalid module file syntax: expected label or '':'', found ''IDENT'' is$'
 
 -- garbage.txt --
 this is not CUE {{{

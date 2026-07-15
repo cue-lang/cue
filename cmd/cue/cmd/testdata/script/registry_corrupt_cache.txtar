@@ -1,0 +1,33 @@
+# A corrupted cue.mod/module.cue entry in the module cache should surface
+# a helpful parse error when the module graph is loaded.
+
+exec cue export .
+cmp stdout want-export.txt
+
+cp garbage.txt $CUE_CACHE_DIR/mod/download/example.com/e/@v/v0.0.1.mod
+
+# TODO(https://cuelang.org/issue/2952): the message repeats the module version.
+! exec cue mod tidy
+stderr '^cannot tidy requirements: example.com/e@v0.0.1: cannot parse module file from example.com/e@v0.0.1: invalid module file syntax: expected label or '':'', found ''IDENT'' is$'
+
+-- garbage.txt --
+this is not CUE {{{
+-- want-export.txt --
+{
+    "x": "bar"
+}
+-- cue.mod/module.cue --
+module: "test.org"
+language: version: "v0.9.0"
+deps: "example.com/e": v: "v0.0.1"
+-- main.cue --
+package main
+import "example.com/e"
+
+x: e.foo
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_e_v0.0.1/top.cue --
+package e
+foo: "bar"

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93ddc295_fe4794ec",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "```\nx: 3\nx: int\n```\n\nHere, there is one field with name `x` and it contains two decls (`3` and `int`).\n\nSo yes, package root is a special case but it\u0027s not the only special case. For example:\n\n```\nx: [3]\n```\n\nHere, the list element `3` is a node.\n\nIt is incorrect to say, as the docs did, that a node is a field. A field is represented by a node, but so are many other things. These docs have been rewritten.",
+      "parentUuid": "768cce2e_f9393f39",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd2facf8_e2673520",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-14T12:45:24Z",
       "side": 1,
       "message": "I\u0027m not sure exactly \"in the same scope\" means here. An AST node is present in many different scopes (package, lexical, nested), and I don\u0027t know which is meant here.",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5dc036f_4281fd98",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "Agreed. This wording is sloppy. Rewritten.",
+      "parentUuid": "fd2facf8_e2673520",
       "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e02271b7_3934c799",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "At the Node level, because it\u0027s a merge of field decls, the string here is *always* unquoted. So `x: y: _` and `x: \"y\": _` would both produce a plain string `y` for `name, node :\u003d range x.Fields()` (both individually and together in source).\n\nYou can always get back the original name via `node.Decls().Key()` (in the CL that follows I add `Decl.Label()` because `Key()` may contain only the ast.Node for the field\u0027s value-alias, whereas `Label()` returns the non-alias part",
+      "parentUuid": "362944a6_f8c62813",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f89da4f6_14de5932",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "238169f4_1c6e45d3",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f89da4f6_14de5932",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f8af817_1e01180f",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-07-14T12:45:24Z",
       "side": 1,
       "message": "hmm, this double-underscore logic makes me wonder... What would a struct `{\"__1\": true}` yield?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d04d601e_0907d3d3",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "Well spotted. It\u0027s currently a bug, but I think one that exists in the LSP eval in general and is a little orthogonal to this graph API. I\u0027ll tackle that later. Promise.",
+      "parentUuid": "6f8af817_1e01180f",
       "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +195,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "966516c8_494e98a5",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "It really is transitive, and as you can see by the implementation, it just constructs a singleton NodeSet and Expands that. It\u0027s just a convenience.\n\nBut a NodeSet can be returned by e.g. Decl.Resolve, and it\u0027s initially unexpanded - it\u0027s up to the caller whether they want to expand it.\n\nHappy to remove this method entirely, but for now I\u0027ve just added a note that this is a convenience wrapper. LMK.",
+      "parentUuid": "02a5e795_18eddebc",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9de0d046_3d29f608",
         "filename": "unstable/lsp/eval/graph.go",
         "patchSetId": 2
@@ -116,6 +224,24 @@
       "writtenOn": "2026-07-14T12:45:24Z",
       "side": 1,
       "message": "This makes it sound like both x and z resolve to exactly the same thing, which i don\u0027t think is what\u0027s intended?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a61dd63_96058861",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "Reworded.",
+      "parentUuid": "9de0d046_3d29f608",
       "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +263,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2646b077_eefb9ed2",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3b4f3c7_3960e960",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9bcea0f9_308f3c7f",
@@ -150,6 +294,24 @@
       "writtenOn": "2026-07-14T12:45:24Z",
       "side": 1,
       "message": "I\u0027m left wondering about disjunctions: do they contribute to the node too? Presumably they\u0027d also be returned as items in the sequence?",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f195316_8de86b7e",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "Yes, and yes. Docs improved.",
+      "parentUuid": "9bcea0f9_308f3c7f",
       "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +333,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4c29bbf_d9343b5c",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "Actually, I\u0027ve got rid of the sorting altogether.",
+      "parentUuid": "8e4d77d6_f1245d0b",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0abe8031_2dc00890",
@@ -188,6 +368,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "433e1dc2_7109c34b",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "No. They\u0027re not. I\u0027m surprised we don\u0027t have a static check for them (or that my editor doesn\u0027t spot they\u0027re unneeded. curious). Tidied up across the file.",
+      "parentUuid": "0abe8031_2dc00890",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b85d3ffd_992bc7ec",
@@ -201,6 +399,24 @@
       "writtenOn": "2026-07-14T12:45:24Z",
       "side": 1,
       "message": "What if the node just doesn\u0027t have a position? (For example because `eval.New` was invoked with programmatically-constructed ast.File values)",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee5b590f_dbccca29",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1041,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-15T15:15:56Z",
+      "side": 1,
+      "message": "You\u0027re in trouble. Given that pretty much the whole of the existing LSP eval API is methods FooForOffset(offset int), relying on positions being in the AST is a deep fundamental assumption. For a lot of spots we can move away from that, and indeed this graph API shows that we can trigger the necessary evaluation of navigables and frames as we walk through the graph without specifying offsets.\n\nBut, we currently have no index of ast.Node to path (or pathComponent; see eval.go). So we would currently need to iterate through every path in a frame, and every path component within the path, to find the match. There can be a lot of paths in a frame.\n\nI could add the map if you want? And then we can drop the requirements for Pos in the AST. But obviously it would have memory implications.",
+      "parentUuid": "b85d3ffd_992bc7ec",
       "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

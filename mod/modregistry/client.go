@@ -458,7 +458,8 @@ func checkModule(m module.Version, blobr io.ReaderAt, size int64) (*checkedModul
 	}
 	modFileContent, mf, err := checkModFile(m, modf)
 	if err != nil {
-		return nil, fmt.Errorf("module.cue file check failed: %v", err)
+		// checkModFile errors generally name cue.mod/module.cue already.
+		return nil, err
 	}
 	return &checkedModule{
 		mv:             m,

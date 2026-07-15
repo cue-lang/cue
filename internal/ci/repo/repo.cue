@@ -18,9 +18,9 @@ unityRepositoryURL:  "https://github.com/" + unityRepositoryPath
 
 cuelangRepositoryPath: "cue-lang/cuelang.org"
 
-defaultBranch:        _
-releaseBranchPrefix:  "release-branch."
-releaseBranchPattern: releaseBranchPrefix + "*"
+defaultBranch:           _
+releaseBranchPrefix:     "release-branch."
+releaseBranchPattern:    releaseBranchPrefix + "*"
 protectedBranchPatterns: [defaultBranch, releaseBranchPattern]
 
 botGitHubUser:      "cueckoo"
@@ -32,7 +32,7 @@ linuxMachine: base.linuxLargeMachine
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-pinnedReleaseGo: "1.26.4"
+pinnedReleaseGo: "1.26.5"
 
 goreleaserVersion: "v2.16.0"
 

@@ -1,0 +1,34 @@
+# Errors about the cue.mod/module.cue file of a directory-based module
+# replacement should name the replacement directory.
+
+# A replacement directory with an invalid module.cue file.
+# TODO(https://cuelang.org/issue/2952): the message stacks several prefixes
+# and does not name the replacement directory.
+cp garbage.txt local_dep/cue.mod/module.cue
+! exec cue export .
+stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot expand module graph: cannot parse module file in replacement directory: invalid module file syntax: expected label or '':'', found ''IDENT'' is:$'
+
+# A replacement directory without a module.cue file.
+rm local_dep/cue.mod/module.cue
+! exec cue export .
+stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot expand module graph: cannot read module file in replacement directory: open .*module.cue:'
+
+-- garbage.txt --
+this is not CUE {{{
+-- cue.mod/module.cue --
+module: "test.org"
+language: version: "v0.17.0"
+deps: "example.com/e": v: "v0.0.1"
+-- cue.mod/local-module.cue --
+deps: "example.com/e@v0": replaceWith: "./local_dep"
+-- main.cue --
+package main
+import "example.com/e"
+
+x: e.foo
+-- local_dep/cue.mod/module.cue --
+module: "example.com/e@v0"
+language: version: "v0.9.0"
+-- local_dep/top.cue --
+package e
+foo: "bar"

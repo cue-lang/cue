@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4689c51b_7b466e00",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-15T09:52:15Z",
+      "side": 1,
+      "message": "ditto, backquotes to delimit each of these snippets",
+      "revId": "0ade0e9c6c76b4a5b16f05568e33231075d9144d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,53 +1,53 @@
 -- in.cue --
 a1: """
-	before
-	\(4)
-	after
-	"""
+		before
+		\(4)
+		after
+		"""
 a2: """
-	before
-	\(4)
+		before
+		\(4)
 
-	"""
+		"""
 a3: """
 
-	\(4)
-	after
-	"""
+		\(4)
+		after
+		"""
 a4: """
 
-	\(4)
+		\(4)
 
-	"""
+		"""
 m1: """
-	before
-	\(
+		before
+		\(
 	4
 	)
-	after
-	"""
+		after
+		"""
 m2: """
-	before
-	\(
+		before
+		\(
 	4
 	)
 
-	"""
+		"""
 m3: """
 
-	\(
+		\(
 
 	4
 	)
-	after
-	"""
+		after
+		"""
 m4: """
 
-	\(
+		\(
 	4
 	)
 
-	"""
+		"""
 -- out/compile --
 --- in.cue
 {

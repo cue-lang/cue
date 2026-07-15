@@ -26,6 +26,7 @@ s: #T & {
 }
 #Deployment: {
 	#Containers: [Name=string]: #Container
+
 	containers: [for c in #Containers {c}] // Problem is here.
 }
 Something: {

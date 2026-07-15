@@ -49,6 +49,7 @@ embed: {
 			p: _
 		}
 	}
+
 	fail1: p: "foo" // this should fail, as p is not present.
 
 	success2: #C2
@@ -57,6 +58,7 @@ embed: {
 			p: _
 		}
 	}
+
 	success2: p: "foo" // this succeeds as p is present.
 
 	success3: #C3

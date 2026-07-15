@@ -10,10 +10,12 @@ embed: andInStruct: {
 }
 embed: embedDefWithEmbedding: {
 	#Foo: {{a: int}}
+
 	a: {#Foo & {err: 2}} // not allowed
 }
 embed: embedComprehension: {
 	#Foo: {if true {a: int}}
+
 	a: {#Foo & {err: 2}} // not allowed
 }
 embed: fieldWithAnd: {
@@ -85,6 +87,7 @@ embed: defAndHidden: full: {
 embed: withIndirect: {
 	A: #B
 	#B: b: int
+
 	A & {err: 2} // not allowed
 }
 -- validators.cue --
@@ -335,6 +338,7 @@ issue3839: full: {
 issue3920: {
 	out: {
 		#A
+
 		a: b: "out" // do not enforce #B
 	}
 	#A: a?: #B

@@ -31,10 +31,15 @@ issue3610: {
 	// completed.
 	#a
 	#a: <"a" | >"b" | string
+
 	#a: <"a" | >"b" | string // conjuncts 127  disjuncts 120
+
 	#a: <"a" | >"b" | string // conjuncts 219  disjuncts 210 (+92; +90)
+
 	#a: <"a" | >"b" | string // conjuncts 311  disjuncts 300 (+92; +90)
+
 	#a: <"a" | >"b" | string // conjuncts 403  disjuncts 390 (+92; +90)
+
 	#a: <"a" | >"b" | string // conjuncts 495  disjuncts 480 (+92; +90)
 }
 -- out/compile --

@@ -5,6 +5,7 @@
 -- in.cue --
 freezing: t1: ok: {
 	#a: x: "a"
+
 	len(#a) // 1
 }
 -- comprehension.cue --

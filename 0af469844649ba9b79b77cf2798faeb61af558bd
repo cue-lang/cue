@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45a1740d_9ad0632f",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-15T09:48:09Z",
+      "side": 1,
+      "message": "nit: use backquotes to clearly separate each of these snippets",
+      "revId": "0af469844649ba9b79b77cf2798faeb61af558bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2edd7b36_cdf2eb2f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-15T11:45:40Z",
+      "side": 1,
+      "message": "Yup, that\u0027s correct. JSON Schema only has string formats.",
+      "parentUuid": "b90ece37_5417bd1a",
+      "revId": "89dfedf6756e83d70b85db36611027e0cf9e950b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cee7b66c_bc67b0bf",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-15T10:00:25Z",
       "side": 1,
       "message": "from https://spec.openapis.org/registry/format/ I see not only unsigned formats like uint64, but also smaller sizes like int8 and int16. am I missing something here?\n\nif that\u0027s because it\u0027s not a versioned openapi spec, then I\u0027m looking at https://spec.openapis.org/oas/latest.html#data-type-format, but that has int32 and int64 and no float32 nor float64, so then I\u0027m still confused.",
+      "revId": "89dfedf6756e83d70b85db36611027e0cf9e950b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d1ef761_92cd27e8",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-15T11:45:40Z",
+      "side": 1,
+      "message": "version 3.0 only had int32 and int64. The new version has a bunch of optional others, including unsigned ints etc. I think we can leave them for now.",
+      "parentUuid": "cee7b66c_bc67b0bf",
       "revId": "89dfedf6756e83d70b85db36611027e0cf9e950b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

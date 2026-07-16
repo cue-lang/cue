@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47a5efdf_3a496765",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:46:02Z",
+      "side": 1,
+      "message": "LGTM with a few minor suggestions, but maybe add some pattern stuff to the example too?",
+      "revId": "2a8ea45d181b0166408c87ecc45ed827a705f179",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "131a02f7_fc899db6",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1292,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:46:02Z",
+      "side": 1,
+      "message": "case token.ILLEGAL and panic if it\u0027s none of the cases?",
+      "revId": "2a8ea45d181b0166408c87ecc45ed827a705f179",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64b89bad_7f98b810",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1314,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:46:02Z",
+      "side": 1,
+      "message": "or:\n\n```\nfunc (c Constraint) Unify(c1 Constraint) Constraint\n```\n\n?",
+      "revId": "2a8ea45d181b0166408c87ecc45ed827a705f179",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

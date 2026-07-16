@@ -16,6 +16,24 @@
       "message": "FWIW I\u0027m fairly sure that the behaviour documented at https://pkg.go.dev/bufio#SplitFunc could not be implemented if the scanner issued more reads than strictly necessary, because Read can block arbitrarily, so if we were using Scanner on a pipe, for example, and we read beyond a token, we could block even though there\u0027s a token available. Apart from anything else, that would be a badly breaking change.\n\nSo I think we are OK to rely on these semantics, but given that the code is no longer, I\u0027m OK with this change.",
       "revId": "4f46930d7519e53a811e0ac1ba0e06dd670dedf8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6182181_330f35c2",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-16T12:53:31Z",
+      "side": 0,
+      "message": "Acknowledged",
+      "parentUuid": "45333610_8750daa1",
+      "revId": "4f46930d7519e53a811e0ac1ba0e06dd670dedf8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

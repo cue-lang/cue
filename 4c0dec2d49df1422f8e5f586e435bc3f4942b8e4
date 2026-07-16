@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1cb9a33_02bcfa12",
+        "filename": "unstable/lsp/eval/example_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:41:07Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tfields :\u003d slice.Collect(d.Fields())\n```\n\n?",
+      "revId": "4c0dec2d49df1422f8e5f586e435bc3f4942b8e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c136a641_55b73e00",
+        "filename": "unstable/lsp/eval/example_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:41:07Z",
+      "side": 1,
+      "message": "```suggestion\n\tfields \u003d slices.AppendSeq(fields, d.Resolve(branch).Expand().Fields())\n```",
+      "revId": "4c0dec2d49df1422f8e5f586e435bc3f4942b8e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

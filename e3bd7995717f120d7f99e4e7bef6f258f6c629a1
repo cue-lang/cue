@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a018b2a4_d41d8437",
+        "filename": "cue/func.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:18:51Z",
+      "side": 1,
+      "message": "Threaded the name into validation errors, mirroring the fix on the parent CL. FuncValidator.validate now wraps a non-nil *Bottom result as \"error in call to \u003cname\u003e\" (falling back to \"validator\" when unnamed), which covers both the decode error and the user error. TestNewPureValidatorFuncName now asserts the name appears in the message, so the gap is exercised.",
+      "parentUuid": "e6e1c6a7_bc4d3eb9",
+      "revId": "e3bd7995717f120d7f99e4e7bef6f258f6c629a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1076978b_4a6154a6",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a3f19a5_9e5bdd4e",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 1919,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:18:51Z",
+      "side": 1,
+      "message": "Done. Dropped Pos_; it can be re-added (with a consistent name) when wired up, matching the Func.Pos removal on the parent CL.",
+      "parentUuid": "1076978b_4a6154a6",
+      "revId": "e3bd7995717f120d7f99e4e7bef6f258f6c629a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b78e57af_788f654e",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-07-07T07:07:39Z",
       "side": 1,
       "message": "Kind() returns TopKind unconditionally, whereas BuiltinValidator returns the parameter kind it validates. A consequence: a type mismatch like `#v \u0026 42` (with a string validator) isn\u0027t caught as a kind conflict — the validator claims to accept all kinds, so it runs and the decode fails with \"decoding value for validator: cannot use value 42 (type int) as string\". The message is informative, but it\u0027s an opaque decode error rather than a clean type conflict, and the validate function is invoked for wrong-typed values. Since T is known at construction, common scalar Go types could be mapped to their CUE kind (string→StringKind, int→IntKind, …) to get a proper kind gate; structs/slices could fall back to TopKind. Not necessarily for this CL, but worth a comment on why TopKind is the chosen behavior.",
+      "revId": "e3bd7995717f120d7f99e4e7bef6f258f6c629a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f8ed8bc_8d7086ba",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 1924,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:18:51Z",
+      "side": 1,
+      "message": "Added a doc comment on Kind explaining why TopKind is chosen and noting that mapping the Go type to a CUE kind (to reject wrong-typed values as a clean kind conflict rather than an opaque decode error) is not yet implemented. Left the kind mapping itself for a follow-up as suggested.",
+      "parentUuid": "b78e57af_788f654e",
       "revId": "e3bd7995717f120d7f99e4e7bef6f258f6c629a1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

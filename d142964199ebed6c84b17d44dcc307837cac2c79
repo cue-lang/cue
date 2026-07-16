@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b50d39ac_ceb8e0bc",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-16T10:43:54Z",
+      "side": 1,
+      "message": "Agreed. Done.",
+      "parentUuid": "68306d45_5be33878",
+      "revId": "d142964199ebed6c84b17d44dcc307837cac2c79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23132a81_bed30bb0",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c4d2c03_70344ba4",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-16T10:43:54Z",
+      "side": 1,
+      "message": "Well, Label() really needed to be added because in exactly this case the actual pattern `[string]` was not available from the Decl. This I imagine when aliasv2 becomes on by default we should make changes repo-wide changes to docs and examples. So ... yes, but not yet?",
+      "parentUuid": "23132a81_bed30bb0",
+      "revId": "d142964199ebed6c84b17d44dcc307837cac2c79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4851583_62ff62ff",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-07-14T13:19:12Z",
       "side": 1,
       "message": "Given that we\u0027re not sorting here, and dedupeNodes doesn\u0027t sort, therefore the elements of the node set must already be in the correct deterministic order, couldn\u0027t we just use a considerably less expensive `slices.Compact` here?",
+      "revId": "d142964199ebed6c84b17d44dcc307837cac2c79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "207b66d4_aa6a415c",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1166,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-16T10:43:54Z",
+      "side": 1,
+      "message": "Maybe I\u0027ve misunderstood you, but: AIUI `slices.Compact` only eliminates runs. So `[a,a,b,a]` would turn into `[a,b,a]`. `dedupeNodes` doesn\u0027t sort, but it uses a seen-map, so it would eliminate disjoint runs.\n\nHowever, there is no way that frame.patterns can contain duplicates. By construction. Idiot AI. Same holds for Dynamics and also Ellipsis (removed in parent CL)",
+      "parentUuid": "b4851583_62ff62ff",
       "revId": "d142964199ebed6c84b17d44dcc307837cac2c79",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,5 +1,5 @@
 ---
-name: release-notes
+name: draft-release-notes
 description: Draft CUE GitHub release notes from a commit range. Use when writing or assisting with the curated release-note prose for a CUE release — minor, pre-release (alpha/rc), or patch.
 ---
 
@@ -8,6 +8,15 @@ description: Draft CUE GitHub release notes from a commit range. Use when writin
 The release body is the GitHub release text. Write only the curated,
 hand-judged prose. The trailing `<details>` "Full list of changes since
 vX.Y.Z" block is tool-generated — ignore it entirely.
+
+First pin down which release is being drafted: the commit range (and
+hence the diff base tag) and the release type below. If the request is
+ambiguous — e.g. "the current branch" could mean master (next minor's
+alphas) or a release branch (a patch) — confirm with the user before
+drafting, as the two produce very different documents.
+
+Write the drafted body to `notes.md` at the repository root — a scratch
+file that stays untracked — and apply any follow-up edits there.
 
 ## Structure
 
@@ -40,7 +49,14 @@ Lead with the headline feature when one dominates, overriding the order
 
 - **One change per paragraph** (blank-line separated, not bullet lists);
   each a complete sentence or two. Closely related changes to one
-  flag/command/feature may share a paragraph.
+  flag/command/feature may share a paragraph, and patch releases
+  aggregate much harder still (see Release types below).
+- **State the fix, not the history.** Name the symptom just well enough
+  to be recognized and say what now happens; do not narrate the
+  mechanics of the old broken behavior. Likewise skip a fix's
+  side-effects for a secondary audience (e.g. the Go API symptom of a
+  bug whose headline is a CLI panic) — the issue link carries that
+  detail.
 - **Write for CUE users, not evaluator authors.** Describe the observable
   effect, not the implementation. Avoid internals ("arcs/vertices",
   "scope chain", "pushdown", "materializing fields"); name the symptom
@@ -123,5 +139,21 @@ CLI, the language, or the Go API.
 - **Pre-release** (`-alpha.N` / `-rc.N`): same structure as the minor it
   leads to; content accumulates into the final `.0`. RCs often document
   late design tweaks under a `:warning:` subsection.
-- **Patch** (`vX.Y.Z`, Z>0): short and fix-focused — usually no
-  `## Language` section, no warning legend; phrase entries as "Fix a …".
+- **Patch** (`vX.Y.Z`, Z>0): short and fix-focused — no preamble, no
+  warning legend, usually no `## Language` section; phrase entries as
+  "Fix a …". Aggregate hard: group fixes by symptom class rather than
+  one paragraph per issue — e.g. one paragraph for all the spurious
+  errors and panics regressed in the same version, another for all the
+  hangs — naming each symptom in a few words with its issue link as the
+  only per-fix detail:
+
+  > Fix several regressions introduced in `v0.17.0`: a panic when
+  > evaluating some disjunctions ([#4419](https://cuelang.org/issue/4419)),
+  > and spurious `invalid interpolation` ([#4420](https://cuelang.org/issue/4420))
+  > and `field not allowed` ([#4423](https://cuelang.org/issue/4423))
+  > errors in configurations involving comprehensions or `self`
+  > references. Thank you to all who reported these.
+
+  Do not restate each issue's scenario. Cut entries even more
+  ruthlessly than for a minor: a patch body is typically a handful of
+  paragraphs across two or three sections.

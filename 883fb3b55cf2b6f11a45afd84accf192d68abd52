@@ -211,6 +211,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca28081c_9cb8c823",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T12:06:34Z",
+      "side": 1,
+      "message": "No, seems reasonable to me.",
+      "parentUuid": "966516c8_494e98a5",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9de0d046_3d29f608",
@@ -417,6 +435,24 @@
       "side": 1,
       "message": "You\u0027re in trouble. Given that pretty much the whole of the existing LSP eval API is methods FooForOffset(offset int), relying on positions being in the AST is a deep fundamental assumption. For a lot of spots we can move away from that, and indeed this graph API shows that we can trigger the necessary evaluation of navigables and frames as we walk through the graph without specifying offsets.\n\nBut, we currently have no index of ast.Node to path (or pathComponent; see eval.go). So we would currently need to iterate through every path in a frame, and every path component within the path, to find the match. There can be a lot of paths in a frame.\n\nI could add the map if you want? And then we can drop the requirements for Pos in the AST. But obviously it would have memory implications.",
       "parentUuid": "b85d3ffd_992bc7ec",
+      "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3f740aa_99b72963",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1041,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T12:06:34Z",
+      "side": 1,
+      "message": "Or maybe document that the AST passed in must have valid position information and panic if !pos.IsValid ?",
+      "parentUuid": "ee5b590f_dbccca29",
       "revId": "883fb3b55cf2b6f11a45afd84accf192d68abd52",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

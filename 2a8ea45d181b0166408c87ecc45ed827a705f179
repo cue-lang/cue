@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2f1ea0b_041394cd",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1292,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-16T13:29:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "131a02f7_fc899db6",
+      "revId": "2a8ea45d181b0166408c87ecc45ed827a705f179",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64b89bad_7f98b810",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-07-16T11:46:02Z",
       "side": 1,
       "message": "or:\n\n```\nfunc (c Constraint) Unify(c1 Constraint) Constraint\n```\n\n?",
+      "revId": "2a8ea45d181b0166408c87ecc45ed827a705f179",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "677d48d6_beb12549",
+        "filename": "unstable/lsp/eval/graph.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1314,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-16T13:29:13Z",
+      "side": 1,
+      "message": "Done. I never know which is \"better\" here.",
+      "parentUuid": "64b89bad_7f98b810",
       "revId": "2a8ea45d181b0166408c87ecc45ed827a705f179",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

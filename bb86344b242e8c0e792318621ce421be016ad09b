@@ -16,6 +16,24 @@
       "message": "```suggestion\n\t\tfor i :\u003d range imports.Len() {\n```\n\nor add a comment saying why Len can vary during the loop?",
       "revId": "bb86344b242e8c0e792318621ce421be016ad09b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "044da828_42c38b88",
+        "filename": "internal/cmd/genproto/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-16T11:25:17Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "0314d167_b3c7af1c",
+      "revId": "bb86344b242e8c0e792318621ce421be016ad09b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abdc3bd9_f40e3e9a",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-16T10:27:56Z",
+      "side": 1,
+      "message": "Done. Added modregistry.WrapModuleError, which adds the \"cannot fetch/mirror \u003cmodule\u003e\" context only when the error isn\u0027t already a ModuleError, and used it at all three call sites here (including ModuleFile and Mirror) as well as in modpkgload.",
+      "parentUuid": "3db48bd1_edb791f4",
+      "revId": "dfe17691101f5eee102c2196bf8c0b87125de430",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af87ab85_85c622f8",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-07-16T08:52:23Z",
       "side": 1,
       "message": "I think we can lose this TODO now. Clearly the stack _can_ be more than one element long, otherwise `len(errStack) \u003e 1` would never be true (and it _is_ true sometimes - I verified that), so ISTM it still _is_ worth using FindPath and the TODO is misleading.",
+      "revId": "dfe17691101f5eee102c2196bf8c0b87125de430",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2afeb038_5986c286",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-16T10:27:56Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "af87ab85_85c622f8",
       "revId": "dfe17691101f5eee102c2196bf8c0b87125de430",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

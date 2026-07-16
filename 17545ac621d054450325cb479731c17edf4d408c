@@ -16,6 +16,24 @@
       "message": "I\u0027m not entirely sure this is right. Currently `cue mod resolve` is documented like this:\n\n\u003e It only consults local information - it works lexically\n\u003e with respect to the registry configuration (see \"cue help registryconfig\")\n\u003e and does not make any network calls to check whether\n\u003e the module exists.\n\nbut ISTM that this is somewhat breaking that contract (it might not be making network calls, but it\u0027s certainly not acting purely lexically).\n\nI wonder if it might be better to have an explicit method that can be invoked to check things can init OK.",
       "revId": "17545ac621d054450325cb479731c17edf4d408c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea154cf2_26788fc9",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-16T10:27:56Z",
+      "side": 1,
+      "message": "`cue mod resolve` isn\u0027t affected: it only calls Resolver.ResolveToLocation, which remains purely lexical. The eager init added here lives inside the newRegistry func, which is only reached via ResolveToRegistry when a registry client is actually created - i.e. exactly when network access is about to happen. I\u0027ve added a `cue mod resolve` case to registry_lazy_config.txtar with the broken DOCKER_CONFIG in place to lock that contract in. Given that, I don\u0027t think a separate init-check method is needed, but happy to add one if you still prefer it.",
+      "parentUuid": "4f1a9bcf_7e749064",
+      "revId": "17545ac621d054450325cb479731c17edf4d408c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

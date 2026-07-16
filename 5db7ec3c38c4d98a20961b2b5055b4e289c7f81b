@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b021d548_4a104f54",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-16T11:30:47Z",
+      "side": 1,
+      "message": "maybe define this outside the loop to avoid an allocation on each character?",
+      "revId": "5db7ec3c38c4d98a20961b2b5055b4e289c7f81b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

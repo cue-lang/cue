@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0e005b9_452e49d3",
+        "filename": "unstable/lsp/eval/example_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-16T13:29:13Z",
+      "side": 1,
+      "message": "I don\u0027t think you can, because `d.Fields()` is an `iter.Seq2` and `Collect` wants a `Seq`.",
+      "parentUuid": "d1cb9a33_02bcfa12",
+      "revId": "4c0dec2d49df1422f8e5f586e435bc3f4942b8e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c136a641_55b73e00",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-16T11:41:07Z",
       "side": 1,
       "message": "```suggestion\n\tfields \u003d slices.AppendSeq(fields, d.Resolve(branch).Expand().Fields())\n```",
+      "revId": "4c0dec2d49df1422f8e5f586e435bc3f4942b8e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d99b6a8d_7cc15d78",
+        "filename": "unstable/lsp/eval/example_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-16T13:29:13Z",
+      "side": 1,
+      "message": "Same with this one - `Fields()` returns a `Seq2`. There\u0027s no combinator I can find. Writing it is simple, but I think for the purpose of an example, it doesn\u0027t make things clearer and doesn\u0027t actually save any loc overall.",
+      "parentUuid": "c136a641_55b73e00",
       "revId": "4c0dec2d49df1422f8e5f586e435bc3f4942b8e4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

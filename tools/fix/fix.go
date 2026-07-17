@@ -319,22 +319,23 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 			return true
 		}
 
-		// Check if this field has an old-style alias in the label
+		// Check if this field has an old-style alias in the label.
+		// The parser only produces label aliases whose Expr is a Label;
+		// skip anything else rather than claim a change we cannot make,
+		// which would loop forever in [fixAliasV2].
 		if alias, ok := n.Label.(*ast.Alias); ok {
-			hasChanges = true
-
-			// Convert old-style alias (X=label) to new postfix alias (label~X).
-			// A blank alias binds nothing that can be referenced, so drop it.
-			if alias.Ident.Name != "_" {
-				n.Alias = &ast.PostfixAlias{
-					Field: alias.Ident,
-				}
-				ast.SetRelPos(alias.Ident, token.NoSpace)
-			}
-
-			// The alias.Expr should be a Label (e.g., Ident)
 			if label, ok := alias.Expr.(ast.Label); ok {
-				// Skip if the label is not a valid Label type
+				hasChanges = true
+
+				// Convert old-style alias (X=label) to new postfix alias (label~X).
+				// A blank alias binds nothing that can be referenced, so drop it.
+				if alias.Ident.Name != "_" {
+					n.Alias = &ast.PostfixAlias{
+						Field: alias.Ident,
+					}
+					ast.SetRelPos(alias.Ident, token.NoSpace)
+				}
+
 				n.Label = label
 				ast.SetRelPos(label, token.NoRelPos)
 			}

@@ -17,8 +17,10 @@ package fix
 import (
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 )
 
 func TestFile(t *testing.T) {
@@ -187,6 +189,30 @@ mixed: [string]~(X): {n: X.a}
 				}
 			}
 		})
+	}
+}
+
+// TestFixAliasV2InvalidLabelAlias checks that fixAliasV2 terminates on a
+// label alias whose Expr is not a valid label. The parser cannot produce
+// such an AST, but the public API accepts arbitrary ones; fixAliasV2 used
+// to loop forever since the alias was flagged as a change but never
+// rewritten.
+func TestFixAliasV2InvalidLabelAlias(t *testing.T) {
+	field := &ast.Field{
+		Label: &ast.Alias{
+			Ident: ast.NewIdent("X"),
+			Expr:  ast.NewBinExpr(token.ADD, ast.NewIdent("a"), ast.NewIdent("b")),
+		},
+		Value: ast.NewIdent("int"),
+	}
+	f := &ast.File{Decls: []ast.Decl{field}}
+
+	result, hasChanges := fixAliasV2(f)
+	if hasChanges {
+		t.Errorf("expected no changes for label alias with non-label Expr")
+	}
+	if _, ok := result.Decls[0].(*ast.Field).Label.(*ast.Alias); !ok {
+		t.Errorf("expected label alias to be left untouched")
 	}
 }
 

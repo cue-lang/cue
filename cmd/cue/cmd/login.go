@@ -81,6 +81,10 @@ The cue tool supports credentials configured via these tools:
 				}
 			}
 			registryHosts := locResolver.AllHosts()
+			if len(registryHosts) == 0 {
+				// This can happen when all registries are "none".
+				return fmt.Errorf("no CUE registry to log into")
+			}
 			if len(registryHosts) > 1 {
 				return fmt.Errorf("need a single CUE registry to log into")
 			}

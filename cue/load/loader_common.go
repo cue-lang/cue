@@ -55,9 +55,7 @@ type excludeError struct {
 
 func (e excludeError) Is(err error) bool { return err == errExclude }
 
-func rewriteFiles(p *build.Instance, root string, isLocal bool, os pkgpath.OS) {
-	p.Root = root
-
+func rewriteFiles(p *build.Instance, os pkgpath.OS) {
 	normalizeFiles(p.BuildFiles, os)
 	normalizeFiles(p.IgnoredFiles, os)
 	normalizeFiles(p.OrphanedFiles, os)
@@ -70,9 +68,7 @@ func rewriteFiles(p *build.Instance, root string, isLocal bool, os pkgpath.OS) {
 // maps Dir/Root to display paths.
 //
 // Dir/Root must hold loader-internal paths when this is called.
-// DirLoc is only set on the first call (Dir is set once and not
-// overwritten). RootLoc is always updated because rewriteFiles
-// may reset Root between calls.
+// setFSLoc is idempotent: locations already set are left untouched.
 func setFSLoc(c *Config, p *build.Instance) {
 	if c.FS != nil {
 		if p.DirLoc.IsZero() {
@@ -81,16 +77,18 @@ func setFSLoc(c *Config, p *build.Instance) {
 				p.Dir = c.FromFSPath(p.Dir)
 			}
 		}
-		p.RootLoc = makeFSLoc(c.FS, p.Root, c.FromFSPath)
-		if c.FromFSPath != nil {
-			p.Root = c.FromFSPath(p.Root)
+		if p.RootLoc.IsZero() {
+			p.RootLoc = makeFSLoc(c.FS, p.Root, c.FromFSPath)
+			if c.FromFSPath != nil {
+				p.Root = c.FromFSPath(p.Root)
+			}
 		}
 	} else {
 		ov, _ := c.fileSystem.(*overlayFileSystem)
 		if p.DirLoc.IsZero() && p.Dir != "" {
 			p.DirLoc = makeOSFSLoc(p.Dir, c.pathOS, ov)
 		}
-		if p.Root != "" {
+		if p.RootLoc.IsZero() && p.Root != "" {
 			p.RootLoc = makeOSFSLoc(p.Root, c.pathOS, ov)
 		}
 	}

@@ -210,7 +210,12 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 			continue
 		}
 		all = append(all, p)
-		rewriteFiles(p, cfg.ModuleRoot, false, cfg.pathOS)
+		// Instances for packages in dependency modules already have their
+		// own module root; the rest belong to the main module.
+		if p.Root == "" {
+			p.Root = cfg.ModuleRoot
+		}
+		rewriteFiles(p, cfg.pathOS)
 		setFSLoc(cfg, p)
 		if errs := fp.finalize(p); errs != nil {
 			p.ReportError(errs)

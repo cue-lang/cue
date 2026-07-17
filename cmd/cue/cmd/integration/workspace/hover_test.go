@@ -158,10 +158,14 @@ docs11
 					URI:   p.mapper.URI,
 					Range: protocol.Range{Start: pos},
 				})
+				// This test is only concerned with doc-comment hovers:
+				// hover appends an "Unified with:" section showing the
+				// unified value at the position, which [TestHoverValue]
+				// tests.
 				if got == nil {
 					qt.Assert(t, qt.Equals("", expectation), qt.Commentf("%v(+%d)", p, i))
 				} else {
-					qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v(+%d)", p, i))
+					qt.Assert(t, qt.Equals(stripUnification(got.Value), expectation), qt.Commentf("%v(+%d)", p, i))
 				}
 			}
 		}
@@ -186,7 +190,113 @@ docs11
 						Start: pos,
 					},
 				})
-				qt.Assert(t, qt.IsNil(got), qt.Commentf("%v:%v (0-based)", filename, pos))
+				if got != nil {
+					qt.Assert(t, qt.Equals(stripUnification(got.Value), ""), qt.Commentf("%v:%v (0-based)", filename, pos))
+				}
+			}
+		}
+	})
+}
+
+// stripUnification removes the "Unified with:" section that hover can
+// append, returning only the doc-comments part.
+func stripUnification(s string) string {
+	before, _, wasCut := strings.Cut(s, "Unified with:")
+	if !wasCut {
+		return s
+	}
+	return strings.TrimRight(before, "\n")
+}
+
+func TestHoverValue(t *testing.T) {
+	const files = `
+-- cue.mod/module.cue --
+module: "example.com/bar"
+language: version: "v0.11.0"
+-- a/a.cue --
+package a
+
+y: 5
+x: y
+z: int
+x: z
+w: len(x)
+v: len()
+u: {
+	alpha: "aaaaaaaaaa",
+	beta: "bbbbbbbbbb",
+	gamma: "cccccccccc",
+	delta: "dddddddddd",
+	epsilon: "eeeeeeeeee",
+	zeta: "ffffffffff"
+}
+t: u
+t: _
+`
+
+	WithOptions(
+		RootURIAsDefaultFolder(), Modes(DefaultModes()&^Forwarded),
+	).Run(t, files, func(t *testing.T, env *Env) {
+		rootURI := env.Sandbox.Workdir.RootURI()
+		env.Await(
+			LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+		)
+		env.OpenFile("a/a.cue")
+		env.Await(
+			env.DoneWithOpen(),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
+		)
+
+		mappers := make(map[string]*protocol.Mapper)
+		for _, file := range txtar.Parse([]byte(files)).Files {
+			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
+			mappers[file.Name] = mapper
+		}
+
+		cue := func(value string) string {
+			return fmt.Sprintf("Unified with: `%s`", value)
+		}
+		testCases := map[position]string{
+			// On x's key: the cursor declaration's value is a
+			// reference, so its expansion is shown, along with x's
+			// other declaration.
+			fln("a/a.cue", 4, 1, "x"): cue("5 & int"),
+			// On the reference y: a position within x's value, so
+			// the unified value of x, exactly as for x's key.
+			fln("a/a.cue", 4, 1, "y"): cue("5 & int"),
+			// On z's declaration: z has no other declarations, and
+			// its value contains nothing to expand (int is a
+			// builtin), so there is nothing to show.
+			fln("a/a.cue", 5, 1, "z: int"): "",
+			// On the reference x within a call argument: the value
+			// of x.
+			fln("a/a.cue", 7, 1, "x"): cue("5 & int"),
+			// On the callee: w has no other declarations, but the
+			// cursor declaration's call argument contains a
+			// reference, so the declaration is shown expanded.
+			fln("a/a.cue", 7, 1, "len"): cue("len(5 & int)"),
+			// In the interior of the call parens: no hover; a call's
+			// argument region is not unified with anything.
+			fln("a/a.cue", 8, 1, ")"): "",
+			// On u's key: u has no other declarations.
+			fln("a/a.cue", 9, 1, "u"): "",
+			// On the key of t's second declaration: t's first
+			// declaration remains, inlining u — too wide for one
+			// line, so it renders as a fenced block on the lines
+			// after the heading.
+			fln("a/a.cue", 18, 1, "t"): "Unified with:\n```cue\n{\n  alpha:   \"aaaaaaaaaa\"\n  beta:    \"bbbbbbbbbb\"\n  gamma:   \"cccccccccc\"\n  delta:   \"dddddddddd\"\n  epsilon: \"eeeeeeeeee\"\n  zeta:    \"ffffffffff\"\n}\n```",
+		}
+
+		for p, expectation := range testCases {
+			p.determinePos(mappers)
+			got, _ := env.Hover(protocol.Location{
+				URI:   p.mapper.URI,
+				Range: protocol.Range{Start: p.pos},
+			})
+			if got == nil {
+				qt.Assert(t, qt.Equals("", expectation), qt.Commentf("%v", p))
+			} else {
+				qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v", p))
 			}
 		}
 	})

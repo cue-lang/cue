@@ -4,6 +4,12 @@
 
 env CUE_CONFIG_DIR=$WORK/cueconfig
 
+# CUE_REGISTRY=none means there is no registry to log into.
+env CUE_REGISTRY=none
+! exec cue login
+cmp stderr stderr-none
+! exists cueconfig/logins.json
+
 # A registry returning 404 for the device code endpoint.
 oauthregistry device-code-not-found
 
@@ -18,6 +24,8 @@ oauthregistry device-code-method-not-allowed
 cmp stderr stderr-method-not-allowed
 ! exists cueconfig/logins.json
 
+-- stderr-none --
+no CUE registry to log into
 -- stderr-not-found --
 cannot start the OAuth2 device flow: 404 Not Found
 

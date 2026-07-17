@@ -317,13 +317,16 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 		if alias, ok := n.Label.(*ast.Alias); ok {
 			hasChanges = true
 
-			// Convert old-style alias (X=label) to new postfix alias (label~X)
-			// The alias.Expr should be a Label (e.g., Ident)
-			n.Alias = &ast.PostfixAlias{
-				Field: alias.Ident,
+			// Convert old-style alias (X=label) to new postfix alias (label~X).
+			// A blank alias binds nothing that can be referenced, so drop it.
+			if alias.Ident.Name != "_" {
+				n.Alias = &ast.PostfixAlias{
+					Field: alias.Ident,
+				}
+				ast.SetRelPos(alias.Ident, token.NoSpace)
 			}
-			ast.SetRelPos(alias.Ident, token.NoSpace)
 
+			// The alias.Expr should be a Label (e.g., Ident)
 			if label, ok := alias.Expr.(ast.Label); ok {
 				// Skip if the label is not a valid Label type
 				n.Label = label
@@ -334,14 +337,18 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 		if list, ok := n.Label.(*ast.ListLit); ok && len(list.Elts) == 1 {
 			if alias, ok := list.Elts[0].(*ast.Alias); ok {
 				hasChanges = true
-				if n.Alias == nil {
-					n.Alias = &ast.PostfixAlias{
-						Field: ast.NewIdent("_"),
+				// A blank alias, as in [_=string], binds nothing that can be
+				// referenced, so drop it rather than emit a blank postfix alias.
+				if alias.Ident.Name != "_" {
+					if n.Alias == nil {
+						n.Alias = &ast.PostfixAlias{
+							Field: ast.NewIdent("_"),
+						}
 					}
+					n.Alias.Label = alias.Ident
+					ast.SetRelPos(alias.Ident, token.NoSpace)
 				}
-				n.Alias.Label = alias.Ident
 				list.Elts[0] = alias.Expr
-				ast.SetRelPos(alias.Ident, token.NoSpace)
 				ast.SetRelPos(alias.Expr, token.NoRelPos)
 			}
 		}
@@ -350,6 +357,13 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 		// e.g., foo: X={x: X.a} should become foo: {let X = self; x: X.a}
 		if alias, ok := n.Value.(*ast.Alias); ok {
 			hasChanges = true
+
+			// A blank alias binds nothing that can be referenced, so drop it
+			// rather than emit an invalid "let _ = self".
+			if alias.Ident.Name == "_" {
+				n.Value = alias.Expr
+				return true
+			}
 
 			// The value alias binds the alias identifier to self
 			// Convert: foo: X={x: X.a, y: 1}

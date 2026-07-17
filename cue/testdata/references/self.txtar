@@ -260,6 +260,30 @@ letSelfInlineConj: {
 	res: (#T & {raw: "alice"}).chk @test(err, code=incomplete, path=this.data, contains="undefined field: %s", args=[raw], pos=[-6:14]) @test(eq:todo, "alice")
 }
 
+-- issue4440.cue --
+@experiment(aliasv2)
+
+// A definition combining a dynamic field whose key, a comprehension whose
+// guard, and a re-export that all read through a let-self binding. Reading
+// the options through the re-export made the dynamic field key fail with
+// "undefined field: network": the let vertex mirrored the definition, and
+// the mirror's own nested let-self conjunct was parked as a structural
+// cycle, leaving it without arcs. See https://cuelang.org/issue/4440.
+letSelfDynamic: {
+	#Client: {
+		let this = self
+		network: string
+		opt?:    string
+		options: (this.network): "x"
+		if this.opt != _|_ {
+			options: a: "y"
+		}
+		container: options: this.options
+	}
+	c: #Client & {network: "mainnet"}
+	out: c.container.options @test(err, code=incomplete, contains="undefined field: network", pos=[-7:13]) @test(eq:todo, {mainnet: "x"})
+}
+
 -- out/evalalpha --
 Errors:
 listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
@@ -398,6 +422,20 @@ a: {
 -- out/errors.txt --
 [incomplete] listComp.2: index out of range [0] with length 0:
     ./comprehension.cue:13:39
+[incomplete] letSelfDynamic.#Client.options: key value of dynamic field must be concrete, found string:
+    ./issue4440.cue:14:13
+    ./issue4440.cue:12:12
+[incomplete] letSelfDynamic.#Client.options: key value of dynamic field must be concrete, found string:
+    ./issue4440.cue:14:13
+    ./issue4440.cue:12:12
+[incomplete] letSelfDynamic.c.this.options: key value of dynamic field must be concrete, found _|_(letSelfDynamic.c.this.options: undefined field: network):
+    ./issue4440.cue:14:13
+letSelfDynamic.c.this.options: undefined field: network:
+    ./issue4440.cue:14:18
+[incomplete] letSelfDynamic.c.this.options: key value of dynamic field must be concrete, found _|_(letSelfDynamic.c.this.options: undefined field: network):
+    ./issue4440.cue:14:13
+letSelfDynamic.c.this.options: undefined field: network:
+    ./issue4440.cue:14:18
 [incomplete] this.data: undefined field: raw:
     ./letselfinline.cue:11:14
 [incomplete] this.data: undefined field: raw:
@@ -427,14 +465,14 @@ a: {
     ./validator.cue:18:12
     ./validator.cue:19:19
 -- out/eval/stats --
-Leaks:  67
-Freed:  156
-Reused: 127
-Allocs: 96
+Leaks:  82
+Freed:  174
+Reused: 144
+Allocs: 112
 Retain: 0
 
-Unifications: 176
-Conjuncts:    290
+Unifications: 208
+Conjuncts:    333
 Disjuncts:    0
 
-NumCloseIDs: 98
+NumCloseIDs: 110

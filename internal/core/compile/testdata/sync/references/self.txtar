@@ -219,6 +219,30 @@ letSelfInlineConj: {
 	res: (#T & {raw: "alice"}).chk
 }
 
+-- issue4440.cue --
+@experiment(aliasv2)
+
+// A definition combining a dynamic field whose key, a comprehension whose
+// guard, and a re-export that all read through a let-self binding. Reading
+// the options through the re-export made the dynamic field key fail with
+// "undefined field: network": the let vertex mirrored the definition, and
+// the mirror's own nested let-self conjunct was parked as a structural
+// cycle, leaving it without arcs. See https://cuelang.org/issue/4440.
+letSelfDynamic: {
+	#Client: {
+		let this = self
+		network: string
+		opt?:    string
+		options: (this.network): "x"
+		if this.opt != _|_ {
+			options: a: "y"
+		}
+		container: options: this.options
+	}
+	c: #Client & {network: "mainnet"}
+	out: c.container.options
+}
+
 -- experiment_test.cue --
 // Test self usage without experiment enabled (should fail)
 
@@ -311,14 +335,39 @@ a: {
   }
   cycle: 〈1〉.cycle
 }
+--- issue4440.cue
+{
+  letSelfDynamic: {
+    #Client: {
+      let this#1 = 〈1〉
+      network: string
+      opt?: string
+      options: {
+        〈1;let this#1〉.network: "x"
+      }
+      if (〈0;let this#1〉.opt != _|_(explicit error (_|_ literal) in source)) {
+        options: {
+          a: "y"
+        }
+      }
+      container: {
+        options: 〈1;let this#1〉.options
+      }
+    }
+    c: (〈0;#Client〉 & {
+      network: "mainnet"
+    })
+    out: 〈0;c〉.container.options
+  }
+}
 --- letselfinline.cue
 {
   letSelfInline: {
     S: {
-      let this#1 = 〈1〉
+      let this#2 = 〈1〉
       raw: string
-      data: 〈0;let this#1〉.raw
-      chk: 〈0;let this#1〉.data
+      data: 〈0;let this#2〉.raw
+      chk: 〈0;let this#2〉.data
     }
     res: (〈0;S〉 & {
       raw: "alice"
@@ -326,13 +375,13 @@ a: {
   }
   letSelfInlineConj: {
     #T: {
-      let this#2 = 〈1〉
+      let this#3 = 〈1〉
       raw: string
-      data: 〈0;let this#2〉.raw
+      data: 〈0;let this#3〉.raw
     }
     #T: {
-      let this#3 = 〈1〉
-      chk: 〈0;let this#3〉.data
+      let this#4 = 〈1〉
+      chk: 〈0;let this#4〉.data
     }
     res: (〈0;#T〉 & {
       raw: "alice"
@@ -396,14 +445,14 @@ a: {
 --- withlet.cue
 {
   withLet: {
-    let X#4 = 〈1〉
+    let X#5 = 〈1〉
     foo: 1
     bar: {
-      baz: 〈1;let X#4〉.foo
+      baz: 〈1;let X#5〉.foo
     }
   }
   withLetComprehension: {
-    let X#5 = 〈1〉
+    let X#6 = 〈1〉
     direct: "a"
     if true {
       viaIf: "b"
@@ -416,13 +465,13 @@ a: {
     try {
       viaTry: "d"
     }
-    seeDirect: 〈0;let X#5〉.direct
-    seeIf: 〈0;let X#5〉.viaIf
-    seeFor: 〈0;let X#5〉.viaFor
-    seeTry: 〈0;let X#5〉.viaTry
+    seeDirect: 〈0;let X#6〉.direct
+    seeIf: 〈0;let X#6〉.viaIf
+    seeFor: 〈0;let X#6〉.viaFor
+    seeTry: 〈0;let X#6〉.viaTry
   }
   withLetDynamicField: {
-    let X#6 = 〈1〉
+    let X#7 = 〈1〉
     h: {
       [string]: {
         c: len(〈1;(〈0;-〉)〉)
@@ -432,7 +481,7 @@ a: {
       a: _
     }
     g: _
-    for _, x in 〈0;let X#6〉.h {
+    for _, x in 〈0;let X#7〉.h {
       g: {
         "\({
           if true {
@@ -446,19 +495,19 @@ a: {
     }
   }
   withLetDynamicField: {
-    let Y#7 = 〈1〉
+    let Y#8 = 〈1〉
     s: true
     x: {
-      if 〈1;let Y#7〉.s {
+      if 〈1;let Y#8〉.s {
         1
       }
-      if !〈1;let Y#7〉.s {
+      if !〈1;let Y#8〉.s {
         2
       }
     }
   }
   withLetDynamicFieldRef: {
-    let X#8 = 〈1〉
+    let X#9 = 〈1〉
     h: {
       [string]: {
         c: len(〈2;h〉.a)
@@ -468,7 +517,7 @@ a: {
       a: _
     }
     g: _
-    for _, x in 〈0;let X#8〉.h {
+    for _, x in 〈0;let X#9〉.h {
       g: {
         "\({
           if true {
@@ -482,13 +531,13 @@ a: {
     }
   }
   withLetDynamicFieldRef: {
-    let Y#9 = 〈1〉
+    let Y#A = 〈1〉
     s: true
     x: {
-      if 〈1;let Y#9〉.s {
+      if 〈1;let Y#A〉.s {
         1
       }
-      if !〈1;let Y#9〉.s {
+      if !〈1;let Y#A〉.s {
         2
       }
     }

@@ -102,11 +102,11 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 		pkg.ModuleVersion, _ = module.NewVersion(l.cfg.Module, "")
 	}
 	pkg.ModuleFile = l.cfg.modFile
-	root := l.cfg.Dir
+	pkg.Root = l.cfg.Dir
 	if l.cfg.ModuleRoot != "" {
-		root = l.cfg.ModuleRoot
+		pkg.Root = l.cfg.ModuleRoot
 	}
-	rewriteFiles(pkg, root, true, l.cfg.pathOS)
+	rewriteFiles(pkg, l.cfg.pathOS)
 	setFSLoc(l.cfg, pkg)
 	for _, err := range errors.Errors(fp.finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError

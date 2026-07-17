@@ -540,6 +540,7 @@ func (fc *fileCache) getCUESyntax(bf *build.File, cfg parser.Config) (*ast.File,
 			// Repopulate bf.Source so subsequent cache hits still surface
 			// the file's raw bytes to callers, just like a cache miss does.
 			bf.Source = syntax.src
+			setSyntaxFSLoc(syntax.file, bf)
 			return syntax.file, syntax.err
 		}
 	}
@@ -553,7 +554,22 @@ func (fc *fileCache) getCUESyntax(bf *build.File, cfg parser.Config) (*ast.File,
 		src, _ := bf.Source.([]byte)
 		fc.entries[key] = fileCacheEntry{f, err, src}
 	}
+	setSyntaxFSLoc(f, bf)
 	return f, err
+}
+
+// setSyntaxFSLoc records bf's FS location on the token file underlying f so
+// that positions can be traced back to a file in an [fs.FS], as needed by
+// @embed. Each parser config produces a distinct token file for the same
+// build file, and a cache entry may have been created by a caller without
+// FilenameLoc set, so this must happen on every call, not just cache misses.
+func setSyntaxFSLoc(f *ast.File, bf *build.File) {
+	if f == nil || bf.FilenameLoc.IsZero() {
+		return
+	}
+	if tokFile := f.Pos().File(); tokFile != nil {
+		tokFile.SetFSLoc(bf.FilenameLoc)
+	}
 }
 
 type fileCacheKey struct {

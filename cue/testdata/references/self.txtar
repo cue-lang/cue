@@ -137,6 +137,17 @@ withLetDynamicField: {
 	}
 }
 
+// Iterating over a let bound to self sees the enclosing struct's full
+// field set, including the field defined by the comprehension itself.
+// This used to hang before the self experiment was folded into aliasv2.
+// See https://cuelang.org/issue/4099.
+letSelfIterate: {
+	let X = self
+	a: 3
+	d: [for k, _ in X {k}]
+	@test(eq, {a: 3, d: ["a", "d"]})
+}
+
 // Variant of the above where the call argument is a regular reference
 // rather than a pattern alias.
 withLetDynamicFieldRef: {

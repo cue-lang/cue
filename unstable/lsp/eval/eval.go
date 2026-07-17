@@ -743,6 +743,46 @@ func (fe *FileEvaluator) DocCommentsForOffset(offset int) map[ast.Node][]*ast.Co
 	return commentsMap
 }
 
+// DeclsForOffset returns the [Decl]s of the innermost declarations
+// that contain the given file offset (number of bytes from the start
+// of the file). It is the bridge from file offsets into the graph
+// API: explore onwards with the returned Decls' methods ([Decl.Node],
+// [Decl.Value], [Decl.Resolve] etc).
+//
+// An offset within a field's label is reported as that field's value
+// declaration. For example, given:
+//
+//	x: 5
+//
+// every offset within this declaration, whether within the label x or
+// within the value 5, yields the Decl whose Value is the 5. The same
+// applies to the ident of an alias or let: an offset within the y of
+// `let y = 5` yields the Decl of the bound value.
+func (fe *FileEvaluator) DeclsForOffset(offset int) []*Decl {
+	var decls []*Decl
+	seen := make(map[*frame]struct{})
+	for _, fr := range fe.evalForOffset(offset) {
+		if fieldDecl, ok := fr.node.(*fieldDeclExpr); ok {
+			// The frame models a field's label (or the ident of an
+			// alias or similar binding): its node is synthetic and
+			// carries no source-level syntax, so report the
+			// declaration of the corresponding value instead.
+			fr = fieldDecl.valueFrame
+		}
+		if fr.node == nil {
+			// Scaffolding frames (e.g. for comprehension clauses) have
+			// no syntax of their own.
+			continue
+		}
+		if _, found := seen[fr]; found {
+			continue
+		}
+		seen[fr] = struct{}{}
+		decls = append(decls, (*Decl)(fr))
+	}
+	return decls
+}
+
 type Completion struct {
 	// Start and End contain the range of the file that should be
 	// replaced by this Completion. They are byte offsets.

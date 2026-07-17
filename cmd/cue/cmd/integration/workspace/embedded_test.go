@@ -385,7 +385,11 @@ how many fields do we have?
 					Range: protocol.Range{Start: pos},
 				})
 				qt.Assert(t, qt.IsNotNil(got), qt.Commentf("%v(+%d)", p, i))
-				qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v(+%d)", p, i))
+				// This test is only concerned with doc-comment
+				// hovers: hover appends an "Unified with:" section
+				// showing the unified value at the position, which
+				// [TestHoverValue] tests.
+				qt.Assert(t, qt.Equals(stripValueSection(got.Value), expectation), qt.Commentf("%v(+%d)", p, i))
 			}
 		}
 
@@ -396,7 +400,9 @@ how many fields do we have?
 		)
 
 		// Test that all offsets not explicitly mentioned in
-		// expectations, have no hovers (for the open files only).
+		// expectations, have no doc-comment hovers (for the open
+		// files only). "Unified with:" value sections can occur
+		// anywhere; they are tested by [TestHoverValue].
 		for filename, mapper := range mappers {
 			if !env.Editor.HasBuffer(filename) {
 				continue
@@ -415,7 +421,9 @@ how many fields do we have?
 						Start: pos,
 					},
 				})
-				qt.Assert(t, qt.IsNil(got), qt.Commentf("%v:%v (0-based)", filename, pos))
+				if got != nil {
+					qt.Assert(t, qt.Equals(stripValueSection(got.Value), ""), qt.Commentf("%v:%v (0-based)", filename, pos))
+				}
 			}
 		}
 	})

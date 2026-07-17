@@ -26,6 +26,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/hover"
+	"cuelang.org/go/internal/pretty"
 	"cuelang.org/go/unstable/lsp/eval"
 )
 
@@ -131,7 +133,11 @@ func (w *Workspace) References(file *File, fe *eval.FileEvaluator, srcMapper *pr
 
 // Hover is very similar to Definition. It attempts to resolve the
 // given position, within the file definitions, to one or more ast
-// nodes, and returns the doc comments attached to those ast nodes.
+// nodes, and returns the doc comments attached to those ast nodes,
+// followed by an "Unified with:" section showing the unified value at
+// the position: a synthetic expression combining every declaration of
+// the value's field, with references inlined. Either part can be
+// absent; if both are, there is no hover.
 func (w *Workspace) Hover(file *File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.Hover {
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
@@ -139,9 +145,44 @@ func (w *Workspace) Hover(file *File, fe *eval.FileEvaluator, srcMapper *protoco
 		return nil
 	}
 
+	docs := w.hoverDocs(file, fe, offset)
+	value, tooBig := w.hoverUnifiedValue(fe, offset)
+	if docs == "" && value == "" && !tooBig {
+		return nil
+	}
+
+	var sb strings.Builder
+	sb.WriteString(docs)
+	if value != "" || tooBig {
+		if docs != "" {
+			sb.WriteString("\n\n")
+		}
+		switch {
+		case tooBig:
+			sb.WriteString("Unified with: (too big)")
+		case strings.Contains(value, "\n"):
+			// A multi-line value needs a fenced block, on the line
+			// after the heading.
+			fmt.Fprintf(&sb, "Unified with:\n```cue\n%s\n```", value)
+		default:
+			fmt.Fprintf(&sb, "Unified with: `%s`", value)
+		}
+	}
+
+	return &protocol.Hover{
+		Contents: protocol.MarkupContent{
+			Kind:  protocol.Markdown,
+			Value: sb.String(),
+		},
+	}
+}
+
+// hoverDocs returns the doc comments attached to the definitions that
+// the file offset resolves to, or "" if there are none.
+func (w *Workspace) hoverDocs(file *File, fe *eval.FileEvaluator, offset int) string {
 	comments := fe.DocCommentsForOffset(offset)
 	if len(comments) == 0 {
-		return nil
+		return ""
 	}
 
 	tokFile := file.tokFile
@@ -190,13 +231,29 @@ func (w *Workspace) Hover(file *File, fe *eval.FileEvaluator, srcMapper *protoco
 		}
 	}
 
-	docs := strings.TrimRight(sb.String(), "\n")
-	return &protocol.Hover{
-		Contents: protocol.MarkupContent{
-			Kind:  protocol.Markdown,
-			Value: docs,
-		},
+	return strings.TrimRight(sb.String(), "\n")
+}
+
+// hoverUnifiedValue renders the unified value at the given offset:
+// everything the value there is unified with, across all its
+// declarations, with references inlined. It returns "" if the offset
+// does not denote a value, and reports whether rendering was
+// abandoned because the value was too big to display usefully. See
+// [hover.ValueForOffset].
+func (w *Workspace) hoverUnifiedValue(fe *eval.FileEvaluator, offset int) (string, bool) {
+	expr, tooBig := hover.ValueForOffset(fe, offset)
+	if tooBig || expr == nil {
+		return "", tooBig
 	}
+	// The expression carries no position information, so the pretty
+	// printer lays it out purely width-driven at its default width.
+	b, err := (&pretty.Config{Indent: "  "}).Node(expr)
+	if err != nil {
+		// The returned bytes are a best-effort rendering even on
+		// error.
+		w.debugLog(err.Error())
+	}
+	return strings.TrimSpace(string(b)), false
 }
 
 // Completion attempts to resolve the given position, within the file

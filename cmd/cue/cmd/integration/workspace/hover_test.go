@@ -158,16 +158,22 @@ docs11
 					URI:   p.mapper.URI,
 					Range: protocol.Range{Start: pos},
 				})
+				// This test is only concerned with doc-comment
+				// hovers: hover appends an "Unified with:" section
+				// showing the unified value at the position, which
+				// [TestHoverValue] tests.
 				if got == nil {
 					qt.Assert(t, qt.Equals("", expectation), qt.Commentf("%v(+%d)", p, i))
 				} else {
-					qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v(+%d)", p, i))
+					qt.Assert(t, qt.Equals(stripValueSection(got.Value), expectation), qt.Commentf("%v(+%d)", p, i))
 				}
 			}
 		}
 
 		// Test that all offsets not explicitly mentioned in
-		// expectations, have no hovers (for the open files only).
+		// expectations, have no doc-comment hovers (for the open
+		// files only). "Unified with:" value sections can occur
+		// anywhere; they are tested by [TestHoverValue].
 		for filename, mapper := range mappers {
 			if !env.Editor.HasBuffer(filename) {
 				continue
@@ -186,7 +192,105 @@ docs11
 						Start: pos,
 					},
 				})
-				qt.Assert(t, qt.IsNil(got), qt.Commentf("%v:%v (0-based)", filename, pos))
+				if got != nil {
+					qt.Assert(t, qt.Equals(stripValueSection(got.Value), ""), qt.Commentf("%v:%v (0-based)", filename, pos))
+				}
+			}
+		}
+	})
+}
+
+// stripValueSection removes the "Unified with:" section that hover
+// appends when the position denotes a value, leaving only the
+// doc-comments part.
+func stripValueSection(s string) string {
+	i := strings.Index(s, "Unified with:")
+	if i < 0 {
+		return s
+	}
+	return strings.TrimRight(s[:i], "\n")
+}
+
+// TestHoverValue tests the fallback behaviour of hover when no doc
+// comments are found: it shows the "unified value" at the cursor —
+// one synthetic expression combining every declaration of the value's
+// field, with references inlined.
+func TestHoverValue(t *testing.T) {
+	const files = `
+-- cue.mod/module.cue --
+module: "example.com/bar"
+language: version: "v0.11.0"
+-- a/a.cue --
+package a
+
+y: 5
+x: y
+z: int
+x: z
+w: len(x)
+v: len()
+u: {alpha: "aaaaaaaaaa", beta: "bbbbbbbbbb", gamma: "cccccccccc", delta: "dddddddddd", epsilon: "eeeeeeeeee", zeta: "ffffffffff"}
+`
+
+	WithOptions(
+		RootURIAsDefaultFolder(), Modes(DefaultModes()&^Forwarded),
+	).Run(t, files, func(t *testing.T, env *Env) {
+		rootURI := env.Sandbox.Workdir.RootURI()
+		env.Await(
+			LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+		)
+		env.OpenFile("a/a.cue")
+		env.Await(
+			env.DoneWithOpen(),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
+		)
+
+		mappers := make(map[string]*protocol.Mapper)
+		for _, file := range txtar.Parse([]byte(files)).Files {
+			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
+			mappers[file.Name] = mapper
+		}
+
+		cue := func(value string) string {
+			return fmt.Sprintf("Unified with: `%s`", value)
+		}
+		testCases := map[position]string{
+			// On x's key: the unified value of x, references
+			// inlined; the declaration containing the cursor
+			// renders last.
+			fln("a/a.cue", 4, 1, "x"): cue("int & 5"),
+			// On the reference y: a position within x's value, so
+			// the unified value of x, exactly as for x's key.
+			fln("a/a.cue", 4, 1, "y"): cue("int & 5"),
+			// On z's declaration: both the key z and the value int
+			// resolve to z's sole declaration (int itself does not
+			// resolve: it is a builtin).
+			fln("a/a.cue", 5, 1, "z: int"): cue("int"),
+			// On the reference x within a call argument: the value
+			// of x.
+			fln("a/a.cue", 7, 1, "x"): cue("5 & int"),
+			// On the callee (which does not resolve — len is a
+			// builtin): the unified value of w, with the reference
+			// in the call argument inlined.
+			fln("a/a.cue", 7, 1, "len"): cue("len(5 & int)"),
+			// In the interior of the call parens: no hover; a call's
+			// argument region is not unified with anything.
+			fln("a/a.cue", 8, 1, ")"): "",
+			// A value too wide for one line renders as a fenced
+			// block on the lines after the heading.
+			fln("a/a.cue", 9, 1, "u"): "Unified with:\n```cue\n{\n  alpha:   \"aaaaaaaaaa\"\n  beta:    \"bbbbbbbbbb\"\n  gamma:   \"cccccccccc\"\n  delta:   \"dddddddddd\"\n  epsilon: \"eeeeeeeeee\"\n  zeta:    \"ffffffffff\"\n}\n```",
+		}
+
+		for p, expectation := range testCases {
+			p.determinePos(mappers)
+			got, _ := env.Hover(protocol.Location{
+				URI:   p.mapper.URI,
+				Range: protocol.Range{Start: p.pos},
+			})
+			if got == nil {
+				qt.Assert(t, qt.Equals("", expectation), qt.Commentf("%v", p))
+			} else {
+				qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v", p))
 			}
 		}
 	})

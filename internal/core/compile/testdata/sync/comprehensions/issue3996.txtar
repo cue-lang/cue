@@ -1,0 +1,70 @@
+# Nested top-level `if` comprehensions have no fixed fields, so they are not
+# pushed down; their condition reads a field that only becomes concrete once
+# a sibling comprehension guarded by a std function call is processed. evalv3
+# used to reject this with "non-concrete value bool in operand to ==" (evalv2
+# accepted it); the comprehension scheduling changes leading up to the
+# pushdown rework, starting with https://cuelang.org/cl/1236930, made it
+# converge.
+# https://cuelang.org/issue/3996
+-- in.cue --
+import "list"
+
+_justFoo: ["foo"]
+
+out: {
+	name:    "A"
+	enabled: bool
+	image:   string
+	if list.Contains(_justFoo, "foo") {
+		enabled: true
+	}
+}
+
+if out.enabled == true {
+	if out.name == "A" {
+		out: image: "svc-A:dev"
+	}
+}
+-- reduced.cue --
+// Reduced form: the empty `if` comprehension is blocked on a field that
+// only the second comprehension completes.
+_justFoo2: ["foo"]
+
+enabled2: bool
+if enabled2 {}
+if _justFoo2 == ["foo"] {enabled2: true}
+-- out/compile --
+--- in.cue
+{
+  _justFoo: [
+    "foo",
+  ]
+  out: {
+    name: "A"
+    enabled: bool
+    image: string
+    if 〈import;list〉.Contains(〈1;_justFoo〉, "foo") {
+      enabled: true
+    }
+  }
+  if (〈0;out〉.enabled == true) {
+    if (〈1;out〉.name == "A") {
+      out: {
+        image: "svc-A:dev"
+      }
+    }
+  }
+}
+--- reduced.cue
+{
+  _justFoo2: [
+    "foo",
+  ]
+  enabled2: bool
+  if 〈0;enabled2〉 {}
+  if (〈0;_justFoo2〉 == [
+    "foo",
+  ]) {
+    enabled2: true
+  }
+}

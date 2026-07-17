@@ -1475,6 +1475,13 @@ func TestParseExpr(t *testing.T) {
 		t.Errorf("ParseExpr(%q): got no error", src)
 	}
 
+	// an alias at the top level of an expression must not crash;
+	// see https://cuelang.org/issue/4442
+	src = "[A=0]"
+	if _, err := parseExprString(src); err != nil {
+		t.Errorf("ParseExpr(%q): %v", src, err)
+	}
+
 	// a comma is not permitted unless automatically inserted
 	src = "a + b\n"
 	if _, err := parseExprString(src); err != nil {

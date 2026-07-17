@@ -129,6 +129,30 @@ X: __closeAll({
 })
 `,
 		},
+
+		{
+			// Blank aliases bind nothing that can be referenced; they must be
+			// dropped rather than converted to blank postfix aliases, which
+			// Sanitize rejects, or to an invalid "let _ = self".
+			name: "aliasv2 blank aliases",
+			exps: []string{"aliasv2"},
+			in: `package foo
+
+obj: {[_=string]: int}
+val: _={a: 1}
+_=lbl: int
+mixed: X=[_=string]: {n: X.a}
+`,
+			out: `@experiment(aliasv2)
+
+package foo
+
+obj: {[string]: int}
+val: {a: 1}
+lbl: int
+mixed: [string]~(X): {n: X.a}
+`,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

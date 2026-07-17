@@ -123,7 +123,7 @@ type Package struct {
 	imports         []*Package         // packages imported by this one
 	inStd           bool
 	fromExternal    bool
-	resolvedImports map[string]string // raw import path → canonical versioned path
+	resolvedImports map[string]string // canonical rewrite input → canonical rewrite result
 
 	// Populated by postprocessing in [Packages.buildStacks]:
 	stack *Package // package importing this one in minimal import stack for this pkg
@@ -173,15 +173,18 @@ func (pkg *Package) Mod() module.Version {
 	return pkg.mod
 }
 
-// CanonicalImportPath returns the canonical versioned import path for the
-// given raw import path.
-// This is used for external module packages where the importing module's
-// default major versions differ from the main module's.
-func (pkg *Package) CanonicalImportPath(rawPath string) string {
-	if p, ok := pkg.resolvedImports[rawPath]; ok {
+// CanonicalImportPath returns the canonical resolved import path recorded for
+// sourcePath. The build layer supplies the spelling from the source file, but
+// resolvedImports is keyed by canonical paths produced during package scanning
+// and rewriting, so sourcePath is canonicalized for the lookup only.
+//
+// If no contextual rewrite was recorded, sourcePath is returned unchanged.
+func (pkg *Package) CanonicalImportPath(sourcePath string) string {
+	lookupPath := ast.ParseImportPath(sourcePath).Canonical().String()
+	if p, ok := pkg.resolvedImports[lookupPath]; ok {
 		return p
 	}
-	return rawPath
+	return sourcePath
 }
 
 func (pkg *Package) ModRoot() module.SourceLoc {

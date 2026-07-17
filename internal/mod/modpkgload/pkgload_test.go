@@ -105,6 +105,85 @@ func TestLoadPackages(t *testing.T) {
 	}
 }
 
+func TestPackageCanonicalImportPath(t *testing.T) {
+	pkg := &Package{
+		resolvedImports: map[string]string{
+			"example.com/default":        "example.com/default@v1",
+			"example.com/default:custom": "example.com/default@v1:custom",
+		},
+	}
+	tests := []struct {
+		name string
+		path string
+		want string
+	}{
+		{
+			name: "canonical",
+			path: "example.com/default",
+			want: "example.com/default@v1",
+		},
+		{
+			name: "redundant qualifier",
+			path: "example.com/default:default",
+			want: "example.com/default@v1",
+		},
+		{
+			name: "nonredundant qualifier",
+			path: "example.com/default:custom",
+			want: "example.com/default@v1:custom",
+		},
+		{
+			name: "unmapped spelling",
+			path: "example.com/unmapped:unmapped",
+			want: "example.com/unmapped:unmapped",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			qt.Assert(t, qt.Equals(pkg.CanonicalImportPath(test.path), test.want))
+		})
+	}
+}
+
+func TestReplacementCanonicalImportPath(t *testing.T) {
+	repls := &Replacements{
+		reverse: map[string]string{
+			"replacement.example/foo": "original.example/bar",
+		},
+	}
+	tests := []struct {
+		name string
+		path string
+		want string
+	}{
+		{
+			name: "qualifier becomes redundant",
+			path: "replacement.example/foo:bar",
+			want: "original.example/bar",
+		},
+		{
+			name: "implied qualifier becomes explicit",
+			path: "replacement.example/foo",
+			want: "original.example/bar:foo",
+		},
+		{
+			name: "nonredundant qualifier remains explicit",
+			path: "replacement.example/foo:custom",
+			want: "original.example/bar:custom",
+		},
+		{
+			name: "unmatched spelling",
+			path: "unmatched.example/foo:foo",
+			want: "unmatched.example/foo:foo",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			qt.Assert(t, qt.Equals(repls.CanonicalImportPath(test.path), test.want))
+		})
+	}
+}
+
 func TestFindPackageLocations(t *testing.T) {
 	versionForModule := func(ctx context.Context, prefixPath string) (module.Version, error) {
 		t.Logf("versionForModule %q", prefixPath)

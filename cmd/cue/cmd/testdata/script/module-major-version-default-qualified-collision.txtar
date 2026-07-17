@@ -1,0 +1,72 @@
+# A qualified import in an external module must use that module's default
+# major version even when the main module has already loaded the same
+# unversioned import under a different default.
+
+exec cue export .
+cmp stdout want-eval.txt
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+
+deps: {
+	"example.com/mod@v0": {
+		default: true
+		v: "v0.0.0"
+	}
+	"example.com/mod@v1": {
+		v: "v1.0.0"
+	}
+	"example.com/other": {
+		default: true
+		v: "v0.0.0"
+	}
+}
+-- main.cue --
+package main
+
+import (
+	"example.com/mod"
+	"example.com/other"
+)
+"mod": mod.value
+"other": other.value
+
+-- _registry/example.com_mod_v0.0.0/cue.mod/module.cue --
+module: "example.com/mod@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_mod_v0.0.0/mod.cue --
+package mod
+
+value: "v0"
+
+-- _registry/example.com_mod_v1.0.0/cue.mod/module.cue --
+module: "example.com/mod@v1"
+language: version: "v0.9.0"
+-- _registry/example.com_mod_v1.0.0/mod.cue --
+package mod
+
+value: "v1"
+
+-- _registry/example.com_other_v0.0.0/cue.mod/module.cue --
+module: "example.com/other@v0"
+language: version: "v0.9.0"
+
+deps: {
+	"example.com/mod@v1": {
+		default: true
+		v: "v1.0.0"
+	}
+}
+-- _registry/example.com_other_v0.0.0/other.cue --
+package other
+
+import "example.com/mod:mod"
+
+value: mod.value
+
+-- want-eval.txt --
+{
+    "mod": "v0",
+    "other": "v1"
+}

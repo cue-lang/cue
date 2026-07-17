@@ -1,12 +1,8 @@
 Value aliases on non-struct values are wrapped in a struct with an
 embedding to hold the inserted "let X = self". References to the
 enclosing field from elsewhere in the file must keep resolving to the
-field as-is.
-
-TODO: the wrapping currently breaks the node identity that references
-to the field were resolved against, so Sanitize preserves their binding
-through a spurious unique-name let indirection (dd_9, #pair_B below).
-The output should reference the fields directly.
+field as-is, rather than being preserved through a spurious
+unique-name let indirection such as "let dd_9 = dd".
 
 #exp:aliasv2
 #no-coverage
@@ -38,13 +34,9 @@ package foo
 
 // Value alias on a parenthesized disjunction.
 dd:    {let D = self, (*{a: 1, a2: D.a} | {b: 2})}
-ddref: dd_9.a @test(eq, 1)
+ddref: dd.a @test(eq, 1)
 
 // Value alias on a list, referenced from another field.
 #pair: {let P = self, [{x: int}, {y: P[0].x}]}
-pref:  #pair_B & [{x: 1}, _]
+pref:  #pair & [{x: 1}, _]
 pval:  pref[1].y @test(eq, 1)
-
-let dd_9 = dd
-
-let #pair_B = #pair

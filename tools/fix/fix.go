@@ -307,6 +307,12 @@ func fixAliasV2(f *ast.File) (result *ast.File, hasChanges bool) {
 }
 
 func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
+	// relink maps nodes that references resolved against (per the scope
+	// registration in [astutil.Resolve]) to their replacements. It is
+	// applied file-wide after the rewrite so that Sanitize does not see
+	// those references as rebound and preserve their binding through a
+	// unique-name let indirection.
+	relink := map[ast.Node]ast.Node{}
 	result = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n, ok := c.Node().(*ast.Field)
 		if !ok {
@@ -375,6 +381,9 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 				// This is possible V=[{a?: V}]. Replace with
 				// {let V = self, [{a?: V}]} in that case.
 				s = &ast.StructLit{Elts: []ast.Decl{alias.Expr}}
+				// References to the enclosing field resolved against the
+				// original value node; point them at the wrapper instead.
+				relink[alias.Expr] = s
 			}
 
 			// Create a let clause: let X = self
@@ -391,16 +400,22 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 
 			n.Value = s
 
-			// Relink referring nodes to prevent rewriting by Sanitize.
-			astutil.Apply(s, func(c astutil.Cursor) bool {
-				if id, ok := c.Node().(*ast.Ident); ok && id.Node == alias {
-					id.Node = letClause
-				}
-				return true
-			}, nil)
+			// References to the alias ident now resolve to the let clause.
+			relink[alias] = letClause
 		}
 		return true
 	}, nil).(*ast.File)
+
+	if len(relink) > 0 {
+		ast.Walk(result, func(n ast.Node) bool {
+			if id, ok := n.(*ast.Ident); ok {
+				if r, ok := relink[id.Node]; ok {
+					id.Node = r
+				}
+			}
+			return true
+		}, nil)
+	}
 
 	return result, hasChanges
 }

@@ -25,6 +25,27 @@ import (
 	"cuelang.org/go/pkg/internal"
 )
 
+func TestEmptyCmd(t *testing.T) {
+	for _, val := range []string{
+		`cmd: ""`,
+		`cmd: "   "`,
+		`cmd: []`,
+	} {
+		ctx := internal.NewContext()
+		v := ctx.CompileString(val)
+		if err := v.Err(); err != nil {
+			t.Fatal(err)
+		}
+		_, _, err := mkCommand(&task.Context{
+			Context: context.Background(),
+			Obj:     v,
+		})
+		if err == nil {
+			t.Errorf("mkCommand(%s) succeeded; want error", val)
+		}
+	}
+}
+
 func TestEnv(t *testing.T) {
 	testCases := []struct {
 		desc string

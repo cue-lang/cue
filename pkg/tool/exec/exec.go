@@ -128,8 +128,9 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc []string, err error) {
 	switch v.Kind() {
 	case cue.StringKind:
 		str, _ := v.String()
-		list := strings.Fields(str)
-		bin, args = list[0], list[1:]
+		if list := strings.Fields(str); len(list) > 0 {
+			bin, args = list[0], list[1:]
+		}
 
 	case cue.ListKind:
 		list, _ := v.List()

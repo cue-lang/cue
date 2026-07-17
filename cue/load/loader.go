@@ -20,6 +20,8 @@ package load
 //    - go/build
 
 import (
+	"cmp"
+
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
@@ -102,11 +104,8 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 		pkg.ModuleVersion, _ = module.NewVersion(l.cfg.Module, "")
 	}
 	pkg.ModuleFile = l.cfg.modFile
-	root := l.cfg.Dir
-	if l.cfg.ModuleRoot != "" {
-		root = l.cfg.ModuleRoot
-	}
-	rewriteFiles(pkg, root, true, l.cfg.pathOS)
+	pkg.Root = cmp.Or(l.cfg.ModuleRoot, l.cfg.Dir)
+	rewriteFiles(pkg, l.cfg.pathOS)
 	setFSLoc(l.cfg, pkg)
 	for _, err := range errors.Errors(fp.finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError

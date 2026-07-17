@@ -33,6 +33,24 @@
       "message": "This comment doesn\u0027t seem quite right: we can\u0027t possibly know at this point whether the error names the file or not because the error comes from an arbitrary iterator passed into AllImports.\n\nAnd I looked around and found at least one place where I don\u0027t believe that the error will contain the filename: the iterator can be modimports.PackageFiles which can end up returning an error from internal/decoder.Decoder which can return an error from cue.Context.BuildFile which I don\u0027t think will always contain the file name.\n\nThere\u0027s no really good answer here, but perhaps a better phrasing might be:\n\"The error usually names the file, so avoid repeating it here\".\n\nOnce upon a time I would add wrapping information here which would record the source location where the error is created without adding to the error message itself, but it seems there\u0027s no good idiom for that now. I found it incredibly helpful back in the day.",
       "revId": "c21fd1a7c11e931327147ac2dd5f8b2640430283",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1cef45e_a365519f",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-17T13:00:09Z",
+      "side": 1,
+      "message": "Done, used your suggested phrasing. Also softened the same claim in the commit message.",
+      "parentUuid": "91a9f2bc_c7f98aef",
+      "revId": "c21fd1a7c11e931327147ac2dd5f8b2640430283",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

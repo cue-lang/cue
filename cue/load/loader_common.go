@@ -344,11 +344,6 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 		badFile(errors.Promote(perr, "add failed"))
 		return false
 	}
-	if !file.FilenameLoc.IsZero() {
-		if tokFile := pf.Pos().File(); tokFile != nil {
-			tokFile.SetFSLoc(file.FilenameLoc)
-		}
-	}
 
 	pkg := pf.PackageName()
 	if pkg == "" {

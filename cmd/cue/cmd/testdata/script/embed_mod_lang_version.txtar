@@ -7,10 +7,8 @@
 # Issue: https://cuelang.org/issue/4439
 
 exec cue mod tidy
-
-# TODO: this should succeed and print the contents of out/eval.
-! exec cue eval ./acme/foo
-cmp stderr out/eval-stderr
+exec cue eval ./acme/foo
+cmp stdout out/eval
 
 -- cue.mod/module.cue --
 module: "main.org@v0"
@@ -35,9 +33,6 @@ package e
 a: _ @embed(file=foo.txt)
 -- _registry/example.com_e_v0.0.1/foo.txt --
 hello
--- out/eval-stderr --
-@embed: cannot embed files from a file outside of the current module:
-    .tmp/cache/mod/extract/example.com/e@v0.0.1/main.cue:5:6
 -- out/eval --
 c: """
     hello

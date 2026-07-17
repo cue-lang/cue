@@ -1,0 +1,45 @@
+# Embedding inside a dependency module must work even when the dependency
+# declares a language version that differs from the main module's: the
+# loader re-parses the dependency's files with its own language version
+# and must not lose track of their file system location, which @embed
+# needs. In v0.17 this resulted in a nil pointer panic or a spurious
+# "cannot embed files from a file outside of the current module" error.
+# Issue: https://cuelang.org/issue/4439
+
+exec cue mod tidy
+
+# TODO: this should succeed and print the contents of out/eval.
+! exec cue eval ./acme/foo
+cmp stderr out/eval-stderr
+
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+
+-- acme/foo/foo.cue --
+package foo
+
+import "example.com/e"
+
+c: e.a
+
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+language: version: "v0.9.0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+@extern(embed)
+
+package e
+
+a: _ @embed(file=foo.txt)
+-- _registry/example.com_e_v0.0.1/foo.txt --
+hello
+-- out/eval-stderr --
+@embed: cannot embed files from a file outside of the current module:
+    .tmp/cache/mod/extract/example.com/e@v0.0.1/main.cue:5:6
+-- out/eval --
+c: """
+    hello
+
+    """

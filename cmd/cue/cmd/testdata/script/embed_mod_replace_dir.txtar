@@ -1,0 +1,49 @@
+# A dependency module replaced with a local directory (replaceWith) may
+# use @embed; the embedded files resolve within the replacement
+# directory, which typically lies outside the main module root. In v0.17
+# this resulted in a nil pointer panic or a spurious "cannot embed files
+# from a file outside of the current module" error.
+# Issue: https://cuelang.org/issue/4439
+
+cd app
+
+# TODO: this should succeed and print the contents of $WORK/out/export.
+! exec cue export
+cmp stderr $WORK/out/export-stderr
+
+-- dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.12.0"
+
+-- dep/assets/assets.cue --
+@extern(embed)
+package assets
+
+scripts: _ @embed(glob=*.sh, type=text)
+
+-- dep/assets/hello.sh --
+echo hello
+
+-- app/cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.17.0"
+deps: "example.com/dep@v0": v: "v0.0.1"
+
+-- app/cue.mod/local-module.cue --
+deps: "example.com/dep@v0": replaceWith: "../dep"
+
+-- app/main.cue --
+package app
+
+import "example.com/dep/assets"
+
+out: assets.scripts
+-- out/export-stderr --
+@embed: cannot embed files from a file outside of the current module:
+    ../dep/assets/assets.cue:4:12
+-- out/export --
+{
+    "out": {
+        "hello.sh": "echo hello\n"
+    }
+}

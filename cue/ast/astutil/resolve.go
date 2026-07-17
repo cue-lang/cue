@@ -88,6 +88,7 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 func Resolve(f *ast.File, errFn ErrFunc) {
 	stack := make([]*scope, 0, 8)
 	visitor := &scope{
+		index:      make(map[string]entry),
 		errFn:      errFn,
 		identFn:    resolveIdent,
 		scopeStack: &stack,
@@ -102,6 +103,7 @@ func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 	stack := make([]*scope, 0, 8)
 	visitor := &scope{
 		file:       f,
+		index:      make(map[string]entry),
 		errFn:      errFn,
 		identFn:    resolveIdent,
 		scopeStack: &stack,

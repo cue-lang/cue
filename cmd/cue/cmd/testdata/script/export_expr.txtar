@@ -9,6 +9,13 @@ exec cue export -e 'obj2.name' input.cue
 cmp stdout stdout.golden
 cd ..
 
+# Issue 4442: an alias at the top level of an expression
+# panicked instead of reporting an error.
+cd simple
+! exec cue export data.cue -e '[A=0]'
+cmp stderr ../issue4442/expect-stderr
+cd ..
+
 -- simple/expect-stdout --
 4
 ---
@@ -37,3 +44,6 @@ obj2: obj
 }
 -- issue2542/stdout.golden --
 "enabled"
+-- issue4442/expect-stderr --
+alias values not allowed in this position:
+    --expression:1:2

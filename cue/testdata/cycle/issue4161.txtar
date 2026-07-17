@@ -1,0 +1,36 @@
+# Iterating over a file-level `let Self = self` used to report a spurious
+# "structural cycle" error at a sibling dynamic field whose label is computed
+# by a call whose argument list nests a let reference inside a literal list.
+# Fixed by https://cuelang.org/cl/1229416, which narrowed the deferral of
+# calls in cyclic contexts to calls with reference arguments; the nested
+# reference below counts as literal-only, unlike the pure-literal calls
+# covered by issue4230.txtar.
+# https://cuelang.org/issue/4161
+-- in.cue --
+@experiment(aliasv2)
+
+import "strings"
+
+let Self = self
+
+_all: [
+	for topLevelField in Self
+	for _ in topLevelField {}
+] @test(eq, [{}])
+
+let p = strings.ToUpper("")
+
+f: (strings.Join([p, "test"], "")): {}
+f: _ @test(eq, {test: {}})
+-- out/eval/stats --
+Leaks:  7
+Freed:  13
+Reused: 7
+Allocs: 13
+Retain: 0
+
+Unifications: 17
+Conjuncts:    22
+Disjuncts:    0
+
+NumCloseIDs: 3

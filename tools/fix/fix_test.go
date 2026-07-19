@@ -237,24 +237,18 @@ package foo
 		},
 
 		{
-			// Embeddings inside comprehension values contribute their
-			// embedFlags to the enclosing struct: Comprehension does not
-			// push a fresh closeInfo the way Field and BinaryExpr do, so
-			// the __closeAll, __reclose, and close() wrappers land on the
-			// enclosing struct rather than on the comprehension value.
-			// This turns the old conditional closedness (only when the
-			// guard fires) into unconditional closedness, and the wrapped
-			// forms below do not even evaluate (the guard reports
-			// incomplete bool).
-			//
-			// TODO: no wrapper must be added at all. The old conditional
-			// closing cannot be expressed: builtin wrappers evaluate
-			// their argument without the enclosing struct's fields,
-			// breaking self-referential guards like the ones below, and
-			// an unwrapped strict embedding denies the enclosing
-			// literal's own fields. The embeddings must simply be opened,
-			// with a TODO comment flagging the (permissive) semantic
-			// difference.
+			// Embeddings inside comprehension values must not add a
+			// wrapper to the enclosing struct: under the old semantics
+			// they close the comprehension result only when the guard
+			// fires, while a wrapper closes the enclosing struct
+			// unconditionally, and does not even evaluate when the guard
+			// references a field of the wrapped struct. The conditional
+			// closing cannot be expressed at all — builtin wrappers
+			// evaluate their argument without the enclosing struct's
+			// fields, and an unwrapped strict embedding denies the
+			// enclosing literal's own fields — so the embeddings are
+			// simply opened, with a TODO comment flagging the
+			// (permissive) semantic difference.
 			name: "embeddings inside comprehension values (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			in: `package foo
@@ -291,30 +285,30 @@ package foo
 #A:   {a: int}
 inst: #A
 
-x: __closeAll({
+x: {
 	c: bool
 	if c {
-		// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case.
 		#A...
 	}
-})
+}
 
-y: close({
+y: {
 	c: bool
 	if c {
-		// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case.
 		{a: 1}
 	}
-})
+}
 
-z: __reclose({
+z: {
 	c: bool
 	if c {
-		// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case.
 		inst...
 		extra: 1
 	}
-})
+}
 `,
 		},
 

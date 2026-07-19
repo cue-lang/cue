@@ -67,6 +67,18 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 	var info closeInfo
 	recloseStack := []closeInfo{}
+	// pushScope and popScope bracket the traversal of a node that starts
+	// a new reclose scope: fields, conjunctions and disjunctions, and
+	// comprehensions.
+	pushScope := func(next closeInfo) {
+		recloseStack = append(recloseStack, info)
+		info = next
+	}
+	popScope := func(c astutil.Cursor) {
+		info = recloseStack[len(recloseStack)-1]
+		recloseStack = recloseStack[:len(recloseStack)-1]
+		c.ClearEnclosingModified()
+	}
 	// comprehensionDepth tracks whether we are lexically inside a
 	// comprehension value. Unlike the closeInfo state, it is not reset
 	// at field or conjunction boundaries.
@@ -75,20 +87,28 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		n := c.Node()
 		switch n := n.(type) {
 		case *ast.Field:
-			recloseStack = append(recloseStack, info)
-			info = closeInfo{}
+			next := closeInfo{}
 			if internal.IsDefinition(n.Label) {
-				info.suspendReclose++
+				next.suspendReclose = 1
 			}
+			pushScope(next)
 
 		case *ast.BinaryExpr:
 			if n.Op == token.AND || n.Op == token.OR {
-				recloseStack = append(recloseStack, info)
-				info = closeInfo{}
+				pushScope(closeInfo{})
 			}
 
 		case *ast.Comprehension:
-			info.suspendReclose++
+			// Comprehensions are a scope boundary like conjunctions:
+			// embedFlags collected inside the comprehension value must
+			// not add a wrapper to the enclosing struct. No wrapper is
+			// added to the comprehension value either (suspendReclose):
+			// the old conditional closing cannot be expressed, as builtin
+			// wrappers evaluate their argument without the enclosing
+			// struct's fields, breaking self-referential guards. Opened
+			// embeddings inside comprehension values are instead flagged
+			// with a TODO comment.
+			pushScope(closeInfo{suspendReclose: 1})
 			comprehensionDepth++
 
 		case *ast.EmbedDecl:
@@ -98,9 +118,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 	}, func(c astutil.Cursor) bool {
 		switch n := c.Node().(type) {
 		case *ast.Field:
-			info = recloseStack[len(recloseStack)-1]
-			recloseStack = recloseStack[:len(recloseStack)-1]
-			c.ClearEnclosingModified()
+			popScope(c)
 
 			// See openCompFieldValue: comprehension conjuncts did not
 			// close their fields under the old semantics.
@@ -113,13 +131,11 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 		case *ast.BinaryExpr:
 			if n.Op == token.AND || n.Op == token.OR {
-				info = recloseStack[len(recloseStack)-1]
-				recloseStack = recloseStack[:len(recloseStack)-1]
-				c.ClearEnclosingModified()
+				popScope(c)
 			}
 
 		case *ast.Comprehension:
-			info.suspendReclose--
+			popScope(c)
 			comprehensionDepth--
 
 		case *ast.EmbedDecl:
@@ -134,7 +150,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			if exprChanged {
 				if comprehensionDepth > 0 {
 					ast.AddComment(newExpr, todoComment(
-						"... may not be intended inside a comprehension value; consider removing it."))
+						"the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case."))
 				}
 				if flags.def && len(recloseStack) == 0 {
 					ast.AddComment(newExpr, todoComment(

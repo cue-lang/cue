@@ -109,6 +109,33 @@ mutual: {
 	}
 }
 
+-- mutualisvalid.cue --
+@experiment(predicates)
+
+// mutual.mutualCycleFail as rewritten by cue fix --exp=predicates: the
+// isValid form reports the same cycle in either declaration order.
+mutualIsValid: {
+	mutualCycleFail: {
+		b: {
+			if !isValid(a.bar) {foo: ""}
+			@test(err, code=cycle)
+		}
+		a: {
+			if !isValid(b.foo) {bar: ""}
+			@test(err, code=cycle)
+		}
+	}
+	mutualCycleFailSwapped: {
+		a: {
+			if !isValid(b.foo) {bar: ""}
+			@test(err, code=cycle)
+		}
+		b: {
+			if !isValid(a.bar) {foo: ""}
+			@test(err, code=cycle)
+		}
+	}
+}
 -- mutualsamestruct.cue --
 sameStruct: {
 	chainSuccess: a: {
@@ -386,6 +413,16 @@ issue3838: {
 [cycle] mutual.mutualCycleFail.a: undefined field: foo:
     ./mutual.cue:14:9
     ./mutual.cue:9:3
+[cycle] mutualIsValid.mutualCycleFail.b: cyclic reference to field bar:
+    ./mutualisvalid.cue:8:18
+[cycle] mutualIsValid.mutualCycleFail.a: undefined field: foo:
+    ./mutualisvalid.cue:12:18
+    ./mutualisvalid.cue:7:3
+[cycle] mutualIsValid.mutualCycleFailSwapped.a: cyclic reference to field foo:
+    ./mutualisvalid.cue:18:18
+[cycle] mutualIsValid.mutualCycleFailSwapped.b: undefined field: bar:
+    ./mutualisvalid.cue:22:18
+    ./mutualisvalid.cue:17:3
 [cycle] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
     ./mutualsamestruct.cue:28:6
 [cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:

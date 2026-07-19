@@ -476,11 +476,12 @@ patternDistinct: {
 }
 
 -- issue2209full.cue --
+@experiment(predicates)
 // Evaluator 0.5 regression where disjunctions combined with comprehensions
 // produced incorrect results or spurious errors.
 // https://cuelang.org/issue/2209
 
-issue2209: simplified: t1: {
+issue2209: simplified: t1A: {
 	#SpecFoo: foo: min: 1
 	#SpecBar: bar: min: 1
 	spec: bar: {}
@@ -518,13 +519,90 @@ issue2209: simplified: t1: {
 		}
 	})
 }
+issue2209: simplified: t1B: {
+	#SpecFoo: foo: min: 1
+	#SpecBar: bar: min: 1
+	spec: bar: {}
+	spec:  #SpecFoo | #SpecBar
+	out: {
+		{nullFoo: null} | {nullBar: null}
+		{minFoo: int} | {minBar: int}
+		if exists(X.bar) {
+			minBar: X.bar.min
+		}
+		X: spec
+	}
+	@test(eq, {
+		#SpecFoo: {foo: {min: 1}}
+		#SpecBar: {bar: {min: 1}}
+		spec: {bar: {min: 1}}
+		out: {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullFoo: null
+			minFoo: int
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullFoo: null
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullBar: null,
+			minFoo: int
+		} | {
+			minBar: 1
+			X: {bar: {min: 1}}
+			nullBar: null
+		}
+	})
+}
 
-issue2209: simplified: t2: {
+issue2209: simplified: t2A: {
 	#SpecFoo: foo: {}
 	#SpecBar: bar: x: 1
 	spec: bar: {}
 	spec: *#SpecFoo | #SpecBar
 	if spec.bar != _|_ {
+		BAZ: spec.bar.x
+	}
+	{f1: int} | {b2: int}
+	{f2: int} | {b2: int}
+	@test(eq, {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		f1: int
+		f2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		f1: int
+		b2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		b2: int
+		f2: int
+	} | {
+		#SpecFoo: {foo: {}}
+		#SpecBar: {bar: {x: 1}}
+		spec: {bar: {x: 1}}
+		BAZ: 1
+		b2: int
+	})
+}
+issue2209: simplified: t2B: {
+	#SpecFoo: foo: {}
+	#SpecBar: bar: x: 1
+	spec: bar: {}
+	spec: *#SpecFoo | #SpecBar
+	if exists(spec.bar) {
 		BAZ: spec.bar.x
 	}
 	{f1: int} | {b2: int}
@@ -1307,17 +1385,17 @@ issue2685: {
 [incomplete] patternDistinct.nestedDefaultSel: unresolved disjunction {a:1} | {a:*1 | 2} (type struct):
     ./in.cue:461:20
 -- out/eval/stats --
-Leaks:  246
-Freed:  2742
-Reused: 2699
-Allocs: 289
+Leaks:  255
+Freed:  2862
+Reused: 2819
+Allocs: 298
 Retain: 0
 
-Unifications: 843
-Conjuncts:    3011
-Disjuncts:    1333
-Notifications: 8
+Unifications: 880
+Conjuncts:    3096
+Disjuncts:    1351
+Notifications: 12
 
-NumCloseIDs: 214
+NumCloseIDs: 222
 -- out/todo.txt --
 issue2685: only evaluated by v3 evaluator.

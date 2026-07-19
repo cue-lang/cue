@@ -1,0 +1,67 @@
+# The ? marker in an exists argument has its try meaning within a try
+# clause: there is no ? path marker specific to exists. See
+# exists_compile_errors.txtar for ? outside a try clause.
+
+-- in.cue --
+@experiment(predicates)
+@experiment(try)
+
+// The clause yields nothing, as a.b does not exist.
+tryAbsent: {
+	a: b?: c: 1
+	try {
+		check: exists(a.b?.c)
+	}
+}
+
+// The clause yields the result of exists, as a.b exists.
+tryPresent: {
+	a: b: c: 1
+	try {
+		check: exists(a.b?.c)
+	}
+}
+
+// The name bound by the assignment form is a binding, not a field: asking
+// for its presence is an error, as for a let. The reference it is bound to
+// is a regular question.
+tryBinding: {
+	a: b: 1
+	try x = a.b? {
+		bare: exists(x)
+		ref:  exists(a.b)
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  tryAbsent: {
+    a: {
+      b?: {
+        c: 1
+      }
+    }
+    try {
+      check: exists(〈1;a〉.b?.c)
+    }
+  }
+  tryPresent: {
+    a: {
+      b: {
+        c: 1
+      }
+    }
+    try {
+      check: exists(〈1;a〉.b?.c)
+    }
+  }
+  tryBinding: {
+    a: {
+      b: 1
+    }
+    try x = 〈0;a〉.b? {
+      bare: exists(〈1;x〉)
+      ref: exists(〈2;a〉.b)
+    }
+  }
+}

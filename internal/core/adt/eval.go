@@ -779,6 +779,12 @@ type envCheck struct {
 	ci          CloseInfo
 	expr        Expr
 	expectError bool
+
+	// verify, if set, replaces the expectError bottom-ness comparison: it is
+	// run when the node finalizes and must report whether the answer a
+	// reflection builtin committed for expr is still supported. Reporting
+	// false adds a cycle error: the result changed after evaluation.
+	verify func(c *OpContext, env *Environment) bool
 }
 
 func (n *nodeContext) addBottom(b *Bottom) {

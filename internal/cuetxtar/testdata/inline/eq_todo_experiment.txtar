@@ -1,0 +1,18 @@
+# Tests that an @test(eq:todo, EXPR) expected expression, like a plain
+# @test(eq, EXPR) one, is compiled with the file's @experiment(...) prefix, so
+# it may reference experiment-gated builtins. Here the todo matches, so
+# CUE_UPDATE promotes it to @test(eq, ...).
+#
+# Without the prefix, countN would not resolve, the todo would keep failing
+# silently, and the update would leave it unpromoted.
+-- in/test.cue --
+@experiment(predicates)
+
+v: countN(>=1, [true, true]) @test(eq:todo, countN(>=1, [true, true]))
+-- out/status.txt --
+update: output passes run
+force:  identical to update
+-- out/update/test.cue --
+@experiment(predicates)
+
+v: countN(>=1, [true, true]) @test(eq, countN(>=1, [true, true]))

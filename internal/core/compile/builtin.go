@@ -27,6 +27,7 @@ import (
 const supportedByLen = adt.StructKind | adt.BytesKind | adt.StringKind | adt.ListKind
 
 var (
+	valueParam  = adt.Param{Value: &adt.Top{}}
 	stringParam = adt.Param{Value: &adt.BasicType{K: adt.StringKind}}
 	listParam   = adt.Param{Value: &adt.BasicType{K: adt.ListKind}}
 	intParam    = adt.Param{Value: &adt.BasicType{K: adt.IntKind}}

@@ -69,8 +69,7 @@ var matchNBuiltin = &adt.Builtin{
 		bound := call.Value(1)
 		// TODO: consider a mode to require "all" to pass, for instance by
 		// supporting the value null or "all".
-
-		b := checkNum(c, bound, count, count+possibleCount)
+		b := checkNum(c, "", bound, count, count+possibleCount)
 		if b != nil {
 			// Only show errors related to incomplete schema if there is still
 			// a possibility that we can resolve it.
@@ -170,12 +169,17 @@ func unifyScalar(c *adt.OpContext, self, check adt.Value) *adt.Vertex {
 	return v
 }
 
-func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.Bottom {
+func checkNum(ctx *adt.OpContext, fn string, bound adt.Value, count, maxCount int64) *adt.Bottom {
 	cnt := ctx.NewInt64(count)
 	n := unifyScalar(ctx, bound, cnt)
 	b, _ := n.BaseValue.(*adt.Bottom)
 	if b != nil {
-		b := ctx.NewErrf("%d matched, expected %v", count, bound)
+		var b *adt.Bottom
+		if fn == "" {
+			b = ctx.NewErrf("%d matched, expected %v", count, bound)
+		} else {
+			b = ctx.NewErrf("%s: %d matched, expected %v", fn, count, bound)
+		}
 
 		// By default we should mark the error as incomplete, but check if we
 		// know for sure it will fail.
@@ -186,18 +190,14 @@ func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.B
 			}
 
 		case *adt.BoundValue:
-			v := &adt.Vertex{}
-			v.AddConjunct(ctx.MakeConjunct(bound))
-			v.AddConjunct(ctx.MakeConjunct(&adt.BoundValue{
-				Op:    adt.GreaterEqualOp,
-				Value: cnt,
-			}))
-			v.AddConjunct(ctx.MakeConjunct(&adt.BoundValue{
-				Op:    adt.LessEqualOp,
-				Value: ctx.NewInt64(maxCount),
-			}))
-			v.Finalize(ctx)
-			if _, ok := v.BaseValue.(*adt.Bottom); !ok {
+			if boundAdmits(ctx, bound, cnt, maxCount) {
+				b.Code = adt.IncompleteError
+			}
+
+		case *adt.Conjunction, *adt.Disjunction:
+			// A compound bound, such as >=1 & <=2 or 1 | 2. matchN, which
+			// passes no name, keeps reporting these as incomplete.
+			if fn == "" || boundAdmits(ctx, bound, cnt, maxCount) {
 				b.Code = adt.IncompleteError
 			}
 
@@ -208,6 +208,25 @@ func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.B
 		return b
 	}
 	return nil
+}
+
+// boundAdmits reports whether bound admits some count from cnt up to and
+// including maxCount: whether a count that fails bound now may still come to
+// satisfy it.
+func boundAdmits(ctx *adt.OpContext, bound adt.Value, cnt adt.Value, maxCount int64) bool {
+	v := &adt.Vertex{}
+	v.AddConjunct(ctx.MakeConjunct(bound))
+	v.AddConjunct(ctx.MakeConjunct(&adt.BoundValue{
+		Op:    adt.GreaterEqualOp,
+		Value: cnt,
+	}))
+	v.AddConjunct(ctx.MakeConjunct(&adt.BoundValue{
+		Op:    adt.LessEqualOp,
+		Value: ctx.NewInt64(maxCount),
+	}))
+	v.Finalize(ctx)
+	_, isErr := v.BaseValue.(*adt.Bottom)
+	return !isErr
 }
 
 func bottom(c *adt.OpContext, v adt.Value) *adt.Bottom {

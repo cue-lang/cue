@@ -4,7 +4,9 @@
 # if comprehensions inside #Leaf reference optional fields without triggering
 # spurious closedness errors.
 -- in.cue --
-object: #Leaf & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
+@experiment(predicates)
+objectA: #LeafA & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
+objectB: #LeafB & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
 
 #Base: {
 	extra?: {...}
@@ -18,7 +20,7 @@ object: #Leaf & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
 	@test(closed)
 }
 
-#Leaf: {
+#LeafA: {
 	// #Mid is spread, as more is not one of its fields.
 	#Mid...
 	extra?:  {...}
@@ -31,6 +33,25 @@ object: #Leaf & {} @test(eq, {extra?: {}, more?: int}) @test(closed)
 	@test(eq, {extra?: {}, more?: int})
 	@test(closed)
 }
+
+#LeafB: {
+	// #Mid is spread, as more is not one of its fields.
+	#Mid...
+	extra?:  {...}
+	more?: int
+	if exists(extra.foo) {
+		if exists(more) {
+			foo: "bar"
+		}
+	}
+	@test(eq, {extra?: {}, more?: int})
+	@test(closed)
+}
+-- out/errors.txt --
+[incomplete] objectB: cannot reference optional field: extra:
+    ./in.cue:36:12
+[incomplete] #LeafB: cannot reference optional field: extra:
+    ./in.cue:36:12
 -- out/eval/stats --
 Leaks:  2
 Freed:  11

@@ -136,7 +136,7 @@ type compiler struct {
 
 	// inTryContext tracks the nesting depth of try clauses. The ? marker on
 	// references is only valid when inTryContext > 0. In the future, this may
-	// also be set by other contexts like exists() builtins or query contexts.
+	// also be set by other comprehension-like constructs.
 	inTryContext int
 
 	fileScope map[adt.Feature]bool
@@ -456,6 +456,9 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 	// Predeclared name references created via [ast.NewPredeclared].
 	if n.IsPredeclared() {
 		p := predeclared(n)
+		if p == nil {
+			p = c.experimentPredeclared(n)
+		}
 		if p == nil {
 			return c.errf(n, "predeclared name %q not found", n.Name)
 		}

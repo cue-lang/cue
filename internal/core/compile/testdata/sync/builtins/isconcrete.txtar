@@ -1,0 +1,450 @@
+# Tests for the isConcrete function.
+#
+# isConcrete reports whether a value is a single, fully ground datum, aligned
+# with what export needs: anything clean but unfinished — an abstract type, an
+# undefaulted disjunction, an incomplete value (whether the whole argument or
+# its interior), or an unset required field — is false. Constraints that need
+# not bind an instance (optional fields, pattern constraints, open list tails)
+# never block groundedness. A permanent error propagates: isConcrete is not an
+# error catcher.
+
+-- in.cue --
+@experiment(predicates)
+
+// isConcrete with concrete scalar values.
+concreteScalars: {
+	a:      42
+	b:      "hello"
+	c:      true
+	d:      3.14
+	checkA: isConcrete(a)
+	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+	checkD: isConcrete(d)
+}
+
+// A reference to an absent optional field is incomplete at the fixpoint:
+// definitively not a ground datum, so false is committed rather than the
+// incomplete error being propagated. A struct whose member references an
+// absent optional field is likewise not concrete.
+concreteOptional: {
+	c?:     int
+	checkC: isConcrete(c)
+
+	d:      {e: f, f?: int}
+	checkD: isConcrete(d)
+}
+
+// An undeclared field on an open parent could still be added: false. On a
+// closed parent it can never exist: the permanent error propagates.
+concreteAbsent: {
+	open: {}
+	checkOpen: isConcrete(open.u)
+
+	closed: close({x: 1})
+	checkClosed: isConcrete(closed.u)
+}
+
+// isConcrete with types (not concrete).
+concreteTypes: {
+	a:      int
+	b:      string
+	c:      bool
+	checkA: isConcrete(a)
+	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+}
+
+// isConcrete with constraints (not concrete).
+concreteConstraints: {
+	a:      >10
+	b:      =~"pattern"
+	c:      int & >0
+	checkA: isConcrete(a)
+	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+}
+
+// isConcrete with disjunctions: concrete only when finalization selects a
+// single default.
+concreteDisjunctions: {
+	a:      1 | 2        // no default: not concrete
+	b:      *1 | 2       // single default: concrete (finalization selects it)
+	c:      1 | *2       // single default (last): concrete
+	d:      string | int // no default: not concrete
+	checkA: isConcrete(a)
+	checkB: isConcrete(b)
+	checkC: isConcrete(c)
+	checkD: isConcrete(d)
+}
+
+// isConcrete with structs and lists. Optional and pattern constraints, hidden
+// fields, and definitions do not affect concreteness; an unset required field
+// does, matching what export needs.
+concreteStructs: {
+	full:      {x: 1, y: "hello"}
+	checkFull: isConcrete(full)
+
+	partial:      {x: 1, y: string}
+	checkPartial: isConcrete(partial)
+
+	withOptional:  {a: 1, b?: int}
+	checkOptional: isConcrete(withOptional)
+
+	// An unsatisfiable optional constraint binds no instance: still concrete.
+	withBrokenOpt:  {a: 1, b?: 1 & 2}
+	checkBrokenOpt: isConcrete(withBrokenOpt)
+
+	withRequired:  {a: 1, b!: int}
+	checkRequired: isConcrete(withRequired)
+
+	withPattern:  {[string]: int, a: 1}
+	checkPattern: isConcrete(withPattern)
+
+	withHidden:  {_a: int, #a: int}
+	checkHidden: isConcrete(withHidden)
+
+	list:      [1, 2, 3]
+	checkList: isConcrete(list)
+
+	openList:      [1, 2, ...int]
+	checkOpenList: isConcrete(openList)
+
+	// open struct: concrete with respect to its concrete fields
+	open:      {x: 1, ...}
+	checkOpen: isConcrete(open)
+
+	deep: {
+		a: x: y: a: 1
+		b: x: y: b: *1 | 2
+		c: x: y: c: int
+	}
+	checkDeep1: isConcrete(deep)
+	checkDeep2: isConcrete(deep.a)
+	checkDeep3: isConcrete(deep.b)
+	checkDeep4: isConcrete(deep.c)
+	checkDeep5: isConcrete({deep.a, deep.b})
+	checkDeep6: isConcrete({deep.b, deep.c})
+	checkDeep7: isConcrete({deep.a, deep.c})
+}
+
+// isConcrete propagates errors: a permanent (eval) error is reported as the
+// error itself, not as "not concrete".
+concreteError: {
+	a:      1 & "x"
+	checkA: isConcrete(a)
+
+	// An unset required field does not mask a permanent error elsewhere in
+	// the value: the error still propagates.
+	checkRequired: isConcrete({a!: int, b: 1 & 2})
+	checkAbstract: isConcrete({a: int, b: 1 & 2})
+}
+
+// Cardinality over concreteness composes with countN (formerly concreteN).
+countNConcrete: {
+	a: 1
+	b: int
+	c: "hello"
+	countN(2, [isConcrete(a), isConcrete(b), isConcrete(c)])
+}
+
+countNConcreteBounds: {
+	a: 1
+	b: int
+	c: "hello"
+	countN(>=1, [isConcrete(a), isConcrete(b), isConcrete(c)])
+	countN(<=2, [isConcrete(a), isConcrete(b), isConcrete(c)])
+}
+
+// A determined violation is a permanent error: all conditions are settled
+// booleans when the count is checked.
+countNConcreteFail: {
+	a: 1
+	b: int
+	c: "hello"
+	countN(4, [isConcrete(a), isConcrete(b), isConcrete(c)])
+}
+
+// Exactly one concrete (protobuf-style oneof over concreteness).
+countNConcreteOneOf: {
+	a?: int
+	b?: string
+	a:  42
+	countN(1, [isConcrete(a), isConcrete(b)])
+}
+
+// A member holding a disjunction with a default counts as that default, as
+// the value as a whole does: an unset required field of the default blocks
+// groundedness wherever the disjunction sits.
+nestedDefault: {
+	a: isConcrete({a: *{b!: int} | {c: 1}})
+	b: isConcrete([*{b!: int} | {c: 1}])
+	c: isConcrete({a: *{c: 1} | {b!: int}})
+}
+
+// A false committed for an incomplete argument is verified against the
+// finalized configuration (CP-C4). The argument is re-derived for that: read
+// again, it would return the error it was finalized with. A guard that makes
+// its own argument ground is reported as a cycle; one that leaves it
+// abstract is consistent.
+staleAnswer: {
+	outer?: int
+	v: {e: outer}
+	c: isConcrete(v.e)
+	if !isConcrete(v.e) {outer: 5}
+}
+staleAnswerAbstract: {
+	outer?: int
+	v: {e: outer}
+	c: isConcrete(v.e)
+	if !isConcrete(v.e) {outer: int}
+}
+-- out/compile --
+--- in.cue
+{
+  concreteScalars: {
+    a: 42
+    b: "hello"
+    c: true
+    d: 3.14
+    checkA: isConcrete(〈0;a〉)
+    checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+    checkD: isConcrete(〈0;d〉)
+  }
+  concreteOptional: {
+    c?: int
+    checkC: isConcrete(〈0;c〉)
+    d: {
+      e: 〈0;f〉
+      f?: int
+    }
+    checkD: isConcrete(〈0;d〉)
+  }
+  concreteAbsent: {
+    open: {}
+    checkOpen: isConcrete(〈0;open〉.u)
+    closed: close({
+      x: 1
+    })
+    checkClosed: isConcrete(〈0;closed〉.u)
+  }
+  concreteTypes: {
+    a: int
+    b: string
+    c: bool
+    checkA: isConcrete(〈0;a〉)
+    checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+  }
+  concreteConstraints: {
+    a: >10
+    b: =~"pattern"
+    c: (int & >0)
+    checkA: isConcrete(〈0;a〉)
+    checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+  }
+  concreteDisjunctions: {
+    a: (1|2)
+    b: (*1|2)
+    c: (1|*2)
+    d: (string|int)
+    checkA: isConcrete(〈0;a〉)
+    checkB: isConcrete(〈0;b〉)
+    checkC: isConcrete(〈0;c〉)
+    checkD: isConcrete(〈0;d〉)
+  }
+  concreteStructs: {
+    full: {
+      x: 1
+      y: "hello"
+    }
+    checkFull: isConcrete(〈0;full〉)
+    partial: {
+      x: 1
+      y: string
+    }
+    checkPartial: isConcrete(〈0;partial〉)
+    withOptional: {
+      a: 1
+      b?: int
+    }
+    checkOptional: isConcrete(〈0;withOptional〉)
+    withBrokenOpt: {
+      a: 1
+      b?: (1 & 2)
+    }
+    checkBrokenOpt: isConcrete(〈0;withBrokenOpt〉)
+    withRequired: {
+      a: 1
+      b!: int
+    }
+    checkRequired: isConcrete(〈0;withRequired〉)
+    withPattern: {
+      [string]: int
+      a: 1
+    }
+    checkPattern: isConcrete(〈0;withPattern〉)
+    withHidden: {
+      _a: int
+      #a: int
+    }
+    checkHidden: isConcrete(〈0;withHidden〉)
+    list: [
+      1,
+      2,
+      3,
+    ]
+    checkList: isConcrete(〈0;list〉)
+    openList: [
+      1,
+      2,
+      ...int,
+    ]
+    checkOpenList: isConcrete(〈0;openList〉)
+    open: {
+      x: 1
+      ...
+    }
+    checkOpen: isConcrete(〈0;open〉)
+    deep: {
+      a: {
+        x: {
+          y: {
+            a: 1
+          }
+        }
+      }
+      b: {
+        x: {
+          y: {
+            b: (*1|2)
+          }
+        }
+      }
+      c: {
+        x: {
+          y: {
+            c: int
+          }
+        }
+      }
+    }
+    checkDeep1: isConcrete(〈0;deep〉)
+    checkDeep2: isConcrete(〈0;deep〉.a)
+    checkDeep3: isConcrete(〈0;deep〉.b)
+    checkDeep4: isConcrete(〈0;deep〉.c)
+    checkDeep5: isConcrete({
+      〈1;deep〉.a
+      〈1;deep〉.b
+    })
+    checkDeep6: isConcrete({
+      〈1;deep〉.b
+      〈1;deep〉.c
+    })
+    checkDeep7: isConcrete({
+      〈1;deep〉.a
+      〈1;deep〉.c
+    })
+  }
+  concreteError: {
+    a: (1 & "x")
+    checkA: isConcrete(〈0;a〉)
+    checkRequired: isConcrete({
+      a!: int
+      b: (1 & 2)
+    })
+    checkAbstract: isConcrete({
+      a: int
+      b: (1 & 2)
+    })
+  }
+  countNConcrete: {
+    a: 1
+    b: int
+    c: "hello"
+    countN(2, [
+      isConcrete(〈1;a〉),
+      isConcrete(〈1;b〉),
+      isConcrete(〈1;c〉),
+    ])
+  }
+  countNConcreteBounds: {
+    a: 1
+    b: int
+    c: "hello"
+    countN(>=1, [
+      isConcrete(〈1;a〉),
+      isConcrete(〈1;b〉),
+      isConcrete(〈1;c〉),
+    ])
+    countN(<=2, [
+      isConcrete(〈1;a〉),
+      isConcrete(〈1;b〉),
+      isConcrete(〈1;c〉),
+    ])
+  }
+  countNConcreteFail: {
+    a: 1
+    b: int
+    c: "hello"
+    countN(4, [
+      isConcrete(〈1;a〉),
+      isConcrete(〈1;b〉),
+      isConcrete(〈1;c〉),
+    ])
+  }
+  countNConcreteOneOf: {
+    a?: int
+    b?: string
+    a: 42
+    countN(1, [
+      isConcrete(〈1;a〉),
+      isConcrete(〈1;b〉),
+    ])
+  }
+  nestedDefault: {
+    a: isConcrete({
+      a: (*{
+        b!: int
+      }|{
+        c: 1
+      })
+    })
+    b: isConcrete([
+      (*{
+        b!: int
+      }|{
+        c: 1
+      }),
+    ])
+    c: isConcrete({
+      a: (*{
+        c: 1
+      }|{
+        b!: int
+      })
+    })
+  }
+  staleAnswer: {
+    outer?: int
+    v: {
+      e: 〈1;outer〉
+    }
+    c: isConcrete(〈0;v〉.e)
+    if !isConcrete(〈0;v〉.e) {
+      outer: 5
+    }
+  }
+  staleAnswerAbstract: {
+    outer?: int
+    v: {
+      e: 〈1;outer〉
+    }
+    c: isConcrete(〈0;v〉.e)
+    if !isConcrete(〈0;v〉.e) {
+      outer: int
+    }
+  }
+}

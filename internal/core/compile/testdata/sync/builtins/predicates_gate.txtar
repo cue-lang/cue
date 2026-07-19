@@ -1,0 +1,40 @@
+#inlinetest:exclude CUE source contains compile-time errors (predicate builtins referenced without @experiment(predicates))
+
+# Without @experiment(predicates), the predicate names resolve as they did
+# before the experiment existed (PRED-009): a reference that no declaration
+# shadows is not found, and the __-prefixed forms are not predeclared either.
+
+-- in.cue --
+a: 1
+
+e: exists(a)
+n: existsN(1, a)
+v: isValid(a)
+c: isConcrete(a)
+k: countN(1, [true])
+u: __exists(a)
+-- out/compile --
+e: reference "exists" not found:
+    ./in.cue:3:4
+n: reference "existsN" not found:
+    ./in.cue:4:4
+v: reference "isValid" not found:
+    ./in.cue:5:4
+c: reference "isConcrete" not found:
+    ./in.cue:6:4
+k: reference "countN" not found:
+    ./in.cue:7:4
+u: reference "__exists" not found:
+    ./in.cue:8:4
+--- in.cue
+{
+  a: 1
+  e: _|_(reference "exists" not found)(〈0;a〉)
+  n: _|_(reference "existsN" not found)(1, 〈0;a〉)
+  v: _|_(reference "isValid" not found)(〈0;a〉)
+  c: _|_(reference "isConcrete" not found)(〈0;a〉)
+  k: _|_(reference "countN" not found)(1, [
+    true,
+  ])
+  u: _|_(reference "__exists" not found)(〈0;a〉)
+}

@@ -95,6 +95,29 @@ mutual: {
 	}
 }
 
+-- mutualisvalid.cue --
+@experiment(predicates)
+
+// mutual.mutualCycleFail as rewritten by cue fix --exp=predicates: the
+// isValid form reports the same cycle in either declaration order.
+mutualIsValid: {
+	mutualCycleFail: {
+		b: {
+			if !isValid(a.bar) {foo: ""}
+		}
+		a: {
+			if !isValid(b.foo) {bar: ""}
+		}
+	}
+	mutualCycleFailSwapped: {
+		a: {
+			if !isValid(b.foo) {bar: ""}
+		}
+		b: {
+			if !isValid(a.bar) {foo: ""}
+		}
+	}
+}
 -- mutualsamestruct.cue --
 sameStruct: {
 	chainSuccess: a: {
@@ -537,6 +560,35 @@ issue3838: {
       b: {
         if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
           new: ""
+        }
+      }
+    }
+  }
+}
+--- mutualisvalid.cue
+{
+  mutualIsValid: {
+    mutualCycleFail: {
+      b: {
+        if !isValid(〈1;a〉.bar) {
+          foo: ""
+        }
+      }
+      a: {
+        if !isValid(〈1;b〉.foo) {
+          bar: ""
+        }
+      }
+    }
+    mutualCycleFailSwapped: {
+      a: {
+        if !isValid(〈1;b〉.foo) {
+          bar: ""
+        }
+      }
+      b: {
+        if !isValid(〈1;a〉.bar) {
+          foo: ""
         }
       }
     }

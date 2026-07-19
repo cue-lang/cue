@@ -301,6 +301,9 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 
 	case *BuiltinValidator:
 		if y, ok := w.(*BuiltinValidator); ok {
+			if x.Builtin.ValidatorNoSelf {
+				return x.Builtin == y.Builtin && equalCallSrc(ctx, x.Src, y.Src)
+			}
 			if x.Builtin != y.Builtin || len(x.Args) != len(y.Args) {
 				return false
 			}
@@ -332,4 +335,18 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 	}
 
 	return false
+}
+
+// equalCallSrc reports whether two calls of a self-less validator are the
+// same call. Such a validator keeps its arguments as unevaluated expressions
+// in its source call, so the calls are compared structurally: the printed
+// form spells out each argument, including the scope depth of references.
+func equalCallSrc(ctx *OpContext, x, y *CallExpr) bool {
+	if x == y {
+		return true
+	}
+	if x == nil || y == nil || ctx == nil {
+		return false
+	}
+	return ctx.String(x) == ctx.String(y)
 }

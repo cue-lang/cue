@@ -1,0 +1,511 @@
+# Tests for the isValid builtin, including cardinality-over-validity
+# compositions with countN (which replaces the former validN).
+
+-- in.cue --
+@experiment(predicates)
+
+// isValid with concrete values
+validConcrete: {
+	a:      1
+	checkA: isValid(a)
+}
+
+// isValid with non-concrete values (types, constraints)
+validNonConcrete: {
+	a:      int
+	checkA: isValid(a)
+	b:      >0
+	checkB: isValid(b)
+}
+
+// isValid with errors (conflicting unification)
+validErrors: {
+	a:      1 & 2
+	checkA: isValid(a)
+
+	b: int & string
+	checkB: isValid(b)
+
+	c: {a: 1} & {a: 2}
+	checkC: isValid(c)
+
+	d: {a: b: c: d: int} & {a: b: c: d: string}
+	checkD: isValid(d)
+}
+
+// Cardinality over validity composes with countN (formerly validN).
+countNValid: {
+	a: 1
+	b: 2
+	c: 1 & 2
+	countN(2, [isValid(a), isValid(b), isValid(c)])
+}
+
+// isValid with literal
+validLiteral: {
+	checkInt:    isValid(42)
+	checkString: isValid("hello")
+}
+
+// isValid with computation
+validComputation: {
+	checkAdd: isValid(1 + 2)
+}
+
+// countN with bound constraints over validity. A validator used as a field
+// value remains a validator value; isValid converts a passing or failing
+// countN into a boolean (the validator-to-boolean adapter).
+countNValidBounds: {
+	a: 1
+	b: 2
+	c: 1 & 2
+	t1: isValid(countN(>=1, [isValid(a), isValid(b), isValid(c)]))
+	t2: isValid(countN(<=2, [isValid(a), isValid(b), isValid(c)]))
+	t3: isValid(countN(3, [isValid(a), isValid(b), isValid(c)]))
+}
+
+// countN failure - requires all 3 valid but only 2 are. countN cannot tell
+// whether a false condition may still turn true, so a shortfall is
+// incomplete; isValid reports it as false.
+countNValidFailure: {
+	a: 1
+	b: 2
+	c: 1 & 2
+	t1: {
+		countN(3, [isValid(a), isValid(b), isValid(c)])
+		z: 1
+	}
+	t2: isValid(countN(3, [isValid(a), isValid(b), isValid(c)]))
+}
+
+countNValidEmbedFail: {
+	a: 1
+	b: 2
+	c: 1 & 2
+	t1: {
+		countN(>=3, [isValid(a), isValid(b), isValid(c)])
+		z: 1
+	}
+	t2: isValid(countN(>=3, [isValid(a), isValid(b), isValid(c)]))
+}
+
+// countN applied as a validator to a scalar, with conditions referencing the
+// validated value.
+countNValidSelfRef: {
+	y:  42
+	ok: y & countN(1, [isValid(string & y), isValid(int & y), isValid(bool & y)])
+}
+
+// The satisfiability semantics: an unsatisfiable optional constraint binds no
+// instance (true), an unset required field can still be satisfied (true), and
+// an unsatisfiable required constraint dooms every instance (false).
+isValidSatisfiability: {
+	checkOpt:       isValid({a?: 1 & 2})
+	checkReq:       isValid({a!: int})
+	checkReqBroken: isValid({a!: 1 & 2})
+}
+
+// The locus boundary: an incomplete interior is tolerated (the struct is a
+// fine partial value), while the same hole as the argument's own denotation
+// is false.
+isValidLocus: {
+	s: {x: y + 1, y: string}
+	checkStruct: isValid(s)
+	checkField:  isValid(s.x)
+}
+
+// isValid on non-existent reference returns false (not error)
+// Missing field is an evaluation error, and isValid returns false for any error
+isValidMissingRef: {
+	a:     b?: c: {}
+	check: isValid(a.b.c)
+}
+
+// isValid on a missing field unified with a type/value also returns false: the
+// missing reference leaves the whole value an (incomplete) error, which cannot
+// be made valid. Unifying with a type previously masked the error, wrongly
+// yielding true, because the incomplete bottom surfaced wrapped in a vertex
+// rather than as a bare bottom.
+isValidMissingUnified: {
+	a:      {x: 1}
+	check0: isValid(a.nonexist)
+	check1: isValid(a.nonexist & string)
+	check2: isValid(a.nonexist & "hi")
+}
+
+// isValid on existing but invalid reference should return false
+isValidExistingInvalid: {
+	a:     x: 1 & "foo"
+	check: isValid(a.x)
+}
+
+-- existing.cue --
+@experiment(predicates)
+
+import "list"
+
+isValidIncomplete: {
+	xc: close({})
+	xo: {}
+	okc2: {
+		if isValid({} & {s: [for y in xc.undefined {}]}) {a: 1}
+	}
+	oko2: {
+		if isValid({} & {s: [for y in xo.undefined {}]}) {a: 1}
+	}
+	okc3: {
+		if isValid({s: [for y in xc.undefined {}]}) {a: 1}
+	}
+
+	oko3: {
+		if isValid({s: [for y in xo.undefined {}]}) {a: 1}
+	}
+
+	// Pass final error back from list argument, though comprehension, and
+	// pass up.
+	// https://cuelang.org/issue/1969
+	viaLet: okc: {
+		let X = xc.undefined
+		let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
+
+		if isValid(Y) {Y}
+	}
+
+}
+-- cycle.cue --
+@experiment(predicates)
+
+// A mutual dependency through isValid is a cycle in either declaration
+// order, as with the `== _|_` form it replaces. isValid does not catch the
+// cycle error: answering false would make the result depend on which side
+// the evaluator happened to break the cycle at.
+isValidMutualCycle: {
+	ab: {
+		b: {
+			if !isValid(a.bar) {foo: ""}
+		}
+		a: {
+			if !isValid(b.foo) {bar: ""}
+		}
+	}
+	ba: {
+		a: {
+			if !isValid(b.foo) {bar: ""}
+		}
+		b: {
+			if !isValid(a.bar) {foo: ""}
+		}
+	}
+	permuted: {
+		b: {
+			if !isValid(a.bar) {foo: ""}
+		}
+		a: {
+			if !isValid(b.foo) {bar: ""}
+		}
+	}
+}
+
+// The answer feeds back into the value it reads: v.e is read while outer is
+// still absent, which makes isValid(v.e) false and thereby adds outer. The
+// committed false is order-dependent, so the post-check reports a cycle
+// instead of accepting outer: 5 with c2: false.
+nonMonotonic: {
+	predicate: {
+		outer?: int
+		v: {e: outer}
+		c2: isValid(v.e)
+		if !isValid(v.e) {outer: 5}
+	}
+	comparison: {
+		outer?: int
+		v: {e: outer}
+		c2: v.e != _|_
+		if v.e == _|_ {outer: 5}
+	}
+}
+-- out/compile --
+--- cycle.cue
+{
+  isValidMutualCycle: {
+    ab: {
+      b: {
+        if !isValid(〈1;a〉.bar) {
+          foo: ""
+        }
+      }
+      a: {
+        if !isValid(〈1;b〉.foo) {
+          bar: ""
+        }
+      }
+    }
+    ba: {
+      a: {
+        if !isValid(〈1;b〉.foo) {
+          bar: ""
+        }
+      }
+      b: {
+        if !isValid(〈1;a〉.bar) {
+          foo: ""
+        }
+      }
+    }
+    permuted: {
+      b: {
+        if !isValid(〈1;a〉.bar) {
+          foo: ""
+        }
+      }
+      a: {
+        if !isValid(〈1;b〉.foo) {
+          bar: ""
+        }
+      }
+    }
+  }
+  nonMonotonic: {
+    predicate: {
+      outer?: int
+      v: {
+        e: 〈1;outer〉
+      }
+      c2: isValid(〈0;v〉.e)
+      if !isValid(〈0;v〉.e) {
+        outer: 5
+      }
+    }
+    comparison: {
+      outer?: int
+      v: {
+        e: 〈1;outer〉
+      }
+      c2: (〈0;v〉.e != _|_(explicit error (_|_ literal) in source))
+      if (〈0;v〉.e == _|_(explicit error (_|_ literal) in source)) {
+        outer: 5
+      }
+    }
+  }
+}
+--- existing.cue
+{
+  isValidIncomplete: {
+    xc: close({})
+    xo: {}
+    okc2: {
+      if isValid(({} & {
+        s: [
+          for _, y in 〈3;xc〉.undefined {},
+        ]
+      })) {
+        a: 1
+      }
+    }
+    oko2: {
+      if isValid(({} & {
+        s: [
+          for _, y in 〈3;xo〉.undefined {},
+        ]
+      })) {
+        a: 1
+      }
+    }
+    okc3: {
+      if isValid({
+        s: [
+          for _, y in 〈3;xc〉.undefined {},
+        ]
+      }) {
+        a: 1
+      }
+    }
+    oko3: {
+      if isValid({
+        s: [
+          for _, y in 〈3;xo〉.undefined {},
+        ]
+      }) {
+        a: 1
+      }
+    }
+    viaLet: {
+      okc: {
+        let X#1 = 〈2;xc〉.undefined
+        let Y#2 = ({} & {
+          s: [
+            for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+          ]
+        })
+        if isValid(〈0;let Y#2〉) {
+          〈1;let Y#2〉
+        }
+      }
+    }
+  }
+}
+--- in.cue
+{
+  validConcrete: {
+    a: 1
+    checkA: isValid(〈0;a〉)
+  }
+  validNonConcrete: {
+    a: int
+    checkA: isValid(〈0;a〉)
+    b: >0
+    checkB: isValid(〈0;b〉)
+  }
+  validErrors: {
+    a: (1 & 2)
+    checkA: isValid(〈0;a〉)
+    b: (int & string)
+    checkB: isValid(〈0;b〉)
+    c: ({
+      a: 1
+    } & {
+      a: 2
+    })
+    checkC: isValid(〈0;c〉)
+    d: ({
+      a: {
+        b: {
+          c: {
+            d: int
+          }
+        }
+      }
+    } & {
+      a: {
+        b: {
+          c: {
+            d: string
+          }
+        }
+      }
+    })
+    checkD: isValid(〈0;d〉)
+  }
+  countNValid: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    countN(2, [
+      isValid(〈1;a〉),
+      isValid(〈1;b〉),
+      isValid(〈1;c〉),
+    ])
+  }
+  validLiteral: {
+    checkInt: isValid(42)
+    checkString: isValid("hello")
+  }
+  validComputation: {
+    checkAdd: isValid((1 + 2))
+  }
+  countNValidBounds: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: isValid(countN(>=1, [
+      isValid(〈1;a〉),
+      isValid(〈1;b〉),
+      isValid(〈1;c〉),
+    ]))
+    t2: isValid(countN(<=2, [
+      isValid(〈1;a〉),
+      isValid(〈1;b〉),
+      isValid(〈1;c〉),
+    ]))
+    t3: isValid(countN(3, [
+      isValid(〈1;a〉),
+      isValid(〈1;b〉),
+      isValid(〈1;c〉),
+    ]))
+  }
+  countNValidFailure: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: {
+      countN(3, [
+        isValid(〈2;a〉),
+        isValid(〈2;b〉),
+        isValid(〈2;c〉),
+      ])
+      z: 1
+    }
+    t2: isValid(countN(3, [
+      isValid(〈1;a〉),
+      isValid(〈1;b〉),
+      isValid(〈1;c〉),
+    ]))
+  }
+  countNValidEmbedFail: {
+    a: 1
+    b: 2
+    c: (1 & 2)
+    t1: {
+      countN(>=3, [
+        isValid(〈2;a〉),
+        isValid(〈2;b〉),
+        isValid(〈2;c〉),
+      ])
+      z: 1
+    }
+    t2: isValid(countN(>=3, [
+      isValid(〈1;a〉),
+      isValid(〈1;b〉),
+      isValid(〈1;c〉),
+    ]))
+  }
+  countNValidSelfRef: {
+    y: 42
+    ok: (〈0;y〉 & countN(1, [
+      isValid((string & 〈1;y〉)),
+      isValid((int & 〈1;y〉)),
+      isValid((bool & 〈1;y〉)),
+    ]))
+  }
+  isValidSatisfiability: {
+    checkOpt: isValid({
+      a?: (1 & 2)
+    })
+    checkReq: isValid({
+      a!: int
+    })
+    checkReqBroken: isValid({
+      a!: (1 & 2)
+    })
+  }
+  isValidLocus: {
+    s: {
+      x: (〈0;y〉 + 1)
+      y: string
+    }
+    checkStruct: isValid(〈0;s〉)
+    checkField: isValid(〈0;s〉.x)
+  }
+  isValidMissingRef: {
+    a: {
+      b?: {
+        c: {}
+      }
+    }
+    check: isValid(〈0;a〉.b.c)
+  }
+  isValidMissingUnified: {
+    a: {
+      x: 1
+    }
+    check0: isValid(〈0;a〉.nonexist)
+    check1: isValid((〈0;a〉.nonexist & string))
+    check2: isValid((〈0;a〉.nonexist & "hi"))
+  }
+  isValidExistingInvalid: {
+    a: {
+      x: (1 & "foo")
+    }
+    check: isValid(〈0;a〉.x)
+  }
+}

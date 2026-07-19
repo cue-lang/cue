@@ -1352,6 +1352,11 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 	//
 	//     #a: b     // this node is currently not shared, but could be.
 	//     b: {c: 1}
+	//
+	// One exception: a close() result holds its non-recursive closedness on a
+	// wrapper vertex (see closeBuiltin); capture it before dereferencing,
+	// which would otherwise discard it.
+	closed := v.ClosedNonRecursive
 	v = v.DerefValue()
 	// While v still has unexpanded disjunctions, its final field set is not
 	// yet known: allow f if any pending disjunct may declare it, mirroring
@@ -1396,7 +1401,7 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		}
 	}
 
-	if v.IsOpenStruct() || v.Lookup(f) != nil {
+	if (!closed && v.IsOpenStruct()) || v.Lookup(f) != nil {
 		return true
 	}
 

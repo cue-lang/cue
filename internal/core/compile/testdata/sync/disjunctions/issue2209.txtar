@@ -3,6 +3,7 @@
 # involving nested definitions with spec disjunctions and if-guard comprehensions.
 # https://cuelang.org/issue/2209
 -- input.cue --
+@experiment(predicates)
 full: {
 	Foo: #Abstract & {spec: foo: {}}
 	Bar: #Abstract & {spec: bar: {}}
@@ -79,7 +80,7 @@ full: {
 	}
 }
 
-reduced: {
+reducedA: {
 	Foo: #Obj & {spec: foo: {}}
 	Bar: #Obj & {spec: bar: {}}
 
@@ -93,6 +94,37 @@ reduced: {
 				minFoo: _Xspec.foo.min
 			}
 			if _Xspec.bar != _|_ {
+				minBar: _Xspec.bar.min
+			}
+		}
+	}
+
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	#Out: {
+		{minFoo: int} | {minBar: int}
+
+		*{nullFoo: null} | {nullBar: null}
+	}
+}
+reducedB: {
+	Foo: #Obj & {spec: foo: {}}
+	Bar: #Obj & {spec: bar: {}}
+
+	#Obj: {
+		let X = self
+		spec: *#SpecFoo | #SpecBar
+
+		out: #Out & {
+			_Xspec: X.spec
+			// _Xspec is a closed definition selected from a disjunction:
+			// probing a field the selected branch does not declare is an
+			// error under strict exists, so use the tolerant fallback form.
+			if *exists(_Xspec.foo) | false {
+				minFoo: _Xspec.foo.min
+			}
+			if *exists(_Xspec.bar) | false {
 				minBar: _Xspec.bar.min
 			}
 		}
@@ -185,7 +217,7 @@ reduced: {
       }
     }
   }
-  reduced: {
+  reducedA: {
     Foo: (〈0;#Obj〉 & {
       spec: {
         foo: {}
@@ -205,6 +237,53 @@ reduced: {
           minFoo: 〈1;_Xspec〉.foo.min
         }
         if (〈0;_Xspec〉.bar != _|_(explicit error (_|_ literal) in source)) {
+          minBar: 〈1;_Xspec〉.bar.min
+        }
+      })
+    }
+    #SpecFoo: {
+      foo: {
+        min: (int|*10)
+      }
+    }
+    #SpecBar: {
+      bar: {
+        min: (int|*20)
+      }
+    }
+    #Out: {
+      ({
+        minFoo: int
+      }|{
+        minBar: int
+      })
+      (*{
+        nullFoo: null
+      }|{
+        nullBar: null
+      })
+    }
+  }
+  reducedB: {
+    Foo: (〈0;#Obj〉 & {
+      spec: {
+        foo: {}
+      }
+    })
+    Bar: (〈0;#Obj〉 & {
+      spec: {
+        bar: {}
+      }
+    })
+    #Obj: {
+      let X#3 = 〈1〉
+      spec: (*〈1;#SpecFoo〉|〈1;#SpecBar〉)
+      out: (〈1;#Out〉 & {
+        _Xspec: 〈1;let X#3〉.spec
+        if (*exists(〈0;_Xspec〉.foo)|false) {
+          minFoo: 〈1;_Xspec〉.foo.min
+        }
+        if (*exists(〈0;_Xspec〉.bar)|false) {
           minBar: 〈1;_Xspec〉.bar.min
         }
       })

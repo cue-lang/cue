@@ -54,6 +54,14 @@ func (c BuiltinCallContext) AddPositions(err *ValueError) {
 	}
 }
 
+// NumArgs returns the number of arguments passed to this function call.
+// Unlike NumParams which returns the count of evaluated args, NumArgs returns
+// the count directly from the call expression, which is needed for VarArgs
+// builtins where the number of args may exceed the declared params.
+func (c BuiltinCallContext) NumArgs() int {
+	return len(c.call.Args)
+}
+
 // Arg returns the nth argument expression. The value is evaluated and any
 // cycle information is accumulated in the context. This allows cycles in
 // arguments to be detected.

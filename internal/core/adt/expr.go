@@ -2588,24 +2588,16 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 		case IncompleteError:
 			// The referenced node is actively being computed and still has
 			// value-producing tasks pending; yield until valueKnown is met.
-			// Requiring a running scheduler avoids deadlocking on a task that
-			// nobody else will trigger — a genuine cycle. The same yield
-			// serves both ArcPending (load-bearing: the comp body will fire
-			// and materialize the arc) and ArcOptional (usually a no-op, but
-			// the arc may still be upgraded to a member by sibling decls
-			// before valueKnown).
-			if v.Node != nil {
-				ns := v.Node.state
-				if ns != nil && ns.running &&
-					!ns.meets(valueKnown) &&
-					ns.provided&valueKnown != 0 {
-					if t := c.current(); t != nil {
-						c.PopState(s)
-						sched := &ns.scheduler
-						t.waitFor(sched, valueKnown)
-						sched.yield()
-						panic("unreachable")
-					}
+			// The same yield serves both ArcPending (load-bearing: the comp
+			// body will fire and materialize the arc) and ArcOptional
+			// (usually a no-op, but the arc may still be upgraded to a
+			// member by sibling decls before valueKnown).
+			if sched := pendingValueScheduler(v.Node); sched != nil {
+				if t := c.current(); t != nil {
+					c.PopState(s)
+					t.waitFor(sched, valueKnown)
+					sched.yield()
+					panic("unreachable")
 				}
 			}
 
@@ -2698,6 +2690,26 @@ func (c *OpContext) verifyNonMonotonicResult(env *Environment, x Expr, expectErr
 	}
 }
 
+// RegisterPostCheck arranges for verify to run once the node owning the
+// current environment finalizes. It is used by reflection builtins that
+// commit a definite answer for x while evaluation is still in progress:
+// verify must re-derive the answer against the finalized configuration and
+// report whether it still holds. If it reports false, a cycle error is
+// added, as the committed result was order-dependent.
+//
+// verify must not register further post-checks: checks added while the
+// post-checks for a node run are not executed.
+func (c *OpContext) RegisterPostCheck(x Expr, verify func(c *OpContext, env *Environment) bool) {
+	env := c.Env(0)
+	if n := env.DerefVertex(c).state; n != nil {
+		n.postChecks = append(n.postChecks, envCheck{
+			env:    env,
+			expr:   x,
+			verify: verify,
+		})
+	}
+}
+
 // A CallExpr represents a call to a builtin.
 //
 //	len(x)
@@ -2753,6 +2765,24 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 		if x.Partial {
 			c.AddErrf("partial application of builtin %s is not supported", x.Fun)
 			return nil
+		}
+		// For validators that don't take "self", return a BuiltinValidator
+		// so the result is used for validation rather than being embedded.
+		if f.RawFunc != nil && f.ValidatorNoSelf {
+			if !f.checkArgs(c, Pos(x), len(x.Args)) {
+				return nil
+			}
+			// Eagerly evaluate to detect permanent (non-incomplete) errors.
+			// If the validator can never succeed, return the error immediately.
+			callCtx := BuiltinCallContext{ctx: c, call: x, builtin: f}
+			if result := f.RawFunc(callCtx); result != nil {
+				if b, ok := result.(*Bottom); ok && !b.IsIncomplete() {
+					return b
+				}
+			}
+			// The arguments stay unevaluated in Src: they are references whose
+			// presence is the question, so they cannot be held as values.
+			return &BuiltinValidator{Src: x, Builtin: f, Env: c.Env(0)}
 		}
 		if x.hasArgLabels() {
 			// The legacy validator-constructor form leaves raw slot zero for
@@ -3198,6 +3228,12 @@ type Builtin struct {
 	// incomplete, for the same reason; see [OpContext.closedArg].
 	Closes Closing
 
+	// ValidatorNoSelf indicates that this is a validator that does not take
+	// "self" as an argument. When embedded in a struct, these validators
+	// constrain the struct without using the struct value itself.
+	// This is used for builtins like existsN that validate field presence.
+	ValidatorNoSelf bool
+
 	Func func(call BuiltinCallContext) Expr
 
 	// RawFunc gives low-level control to CUE's internals for builtins.
@@ -3209,6 +3245,8 @@ type Builtin struct {
 	//
 	// TODO: consider merging Func and RawFunc into a single field again.
 	RawFunc func(call BuiltinCallContext) Value
+
+	VarArgs bool // allows an unlimited number of arguments
 
 	// Added indicates as of which language version this builtin can be used.
 	Added string
@@ -3296,7 +3334,7 @@ func bottom(v Value) *Bottom {
 }
 
 func (x *Builtin) checkArgs(c *OpContext, p token.Pos, numArgs int) bool {
-	if numArgs > len(x.Params) {
+	if numArgs > len(x.Params) && !x.VarArgs {
 		c.addErrf(0, p,
 			"too many arguments in call to %v (have %d, want %d)",
 			x, numArgs, len(x.Params))
@@ -3369,9 +3407,15 @@ func (x *Builtin) signatureDefault(c *OpContext, pos int, flags Flags) (Value, b
 }
 
 // call calls the builtin with call.args, which must hold one argument per
-// parameter.
+// parameter, except for a ValidatorNoSelf builtin using RawFunc.
 func (x *Builtin) call(call BuiltinCallContext) Expr {
 	c := call.ctx
+
+	// A ValidatorNoSelf builtin using RawFunc had its arguments evaluated
+	// and checked in CallExpr.evaluate, and call.args is nil.
+	if x.ValidatorNoSelf && x.RawFunc != nil {
+		return x.RawFunc(call)
+	}
 
 	for i, a := range call.args {
 		if x.Closes != NoClosing && isIncompleteVertex(a) {
@@ -3462,21 +3506,42 @@ func (x *BuiltinValidator) Source() ast.Node {
 }
 
 func (x *BuiltinValidator) Kind() Kind {
+	// For validators that don't take "self", return TopKind to allow
+	// unification with any struct they're embedded in.
+	if x.Builtin.ValidatorNoSelf {
+		return TopKind
+	}
 	return x.Builtin.Params[0].Kind()
 }
 
 func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
-	args := make([]Value, len(x.Args)+1)
-	args[0] = v
-	copy(args[1:], x.Args)
+	var call BuiltinCallContext
 
-	return validateWithBuiltin(BuiltinCallContext{
-		ctx:         c,
-		call:        x.Src,
-		builtin:     x.Builtin,
-		args:        args,
-		isValidator: true,
-	})
+	if x.Builtin.ValidatorNoSelf {
+		// For validators that don't take "self", we don't prepend v to args.
+		// The RawFunc will access expressions directly via call.Src.
+		call = BuiltinCallContext{
+			ctx:         c,
+			call:        x.Src,
+			builtin:     x.Builtin,
+			args:        nil, // RawFunc accesses expressions directly
+			isValidator: false,
+		}
+	} else {
+		args := make([]Value, len(x.Args)+1)
+		args[0] = v
+		copy(args[1:], x.Args)
+
+		call = BuiltinCallContext{
+			ctx:         c,
+			call:        x.Src,
+			builtin:     x.Builtin,
+			args:        args,
+			isValidator: true,
+		}
+	}
+
+	return validateWithBuiltin(call)
 }
 
 func validateWithBuiltin(call BuiltinCallContext) *Bottom {
@@ -3486,7 +3551,12 @@ func validateWithBuiltin(call BuiltinCallContext) *Bottom {
 	c := call.ctx
 	b := call.builtin
 	src := call.Pos()
-	arg0 := call.Value(0)
+
+	// For ValidatorNoSelf, there's no "self" argument
+	var arg0 Value
+	if !b.ValidatorNoSelf {
+		arg0 = call.Value(0)
+	}
 
 	res := call.builtin.call(call)
 	switch v := res.(type) {
@@ -3496,6 +3566,11 @@ func validateWithBuiltin(call BuiltinCallContext) *Bottom {
 	case *Bottom:
 		if v == nil {
 			return nil // caught elsewhere, but be defensive.
+		}
+		if b.ValidatorNoSelf {
+			// There is no validated value to describe, and the builtin's own
+			// error already names it: wrapping would repeat the name.
+			return v
 		}
 		severeness = v.Code
 		err = v.Err
@@ -3510,9 +3585,11 @@ func validateWithBuiltin(call BuiltinCallContext) *Bottom {
 	}
 
 	// If the validator returns an error and we already had an error, just
-	// return the original error.
-	if b, ok := Unwrap(call.Value(0)).(*Bottom); ok {
-		return b
+	// return the original error. Skip this for ValidatorNoSelf since there's no arg0.
+	if !b.ValidatorNoSelf {
+		if b, ok := Unwrap(call.Value(0)).(*Bottom); ok {
+			return b
+		}
 	}
 	// failed:
 	// TODO(mvdan): building this buffer should be part of the error format and arguments,
@@ -3534,7 +3611,12 @@ func validateWithBuiltin(call BuiltinCallContext) *Bottom {
 		buf.WriteString(")")
 	}
 
-	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", arg0, buf.String())
+	var vErr *ValueError
+	if b.ValidatorNoSelf {
+		vErr = c.NewPosf(src, "%s", buf.String())
+	} else {
+		vErr = c.NewPosf(src, "invalid value %s (does not satisfy %s)", arg0, buf.String())
+	}
 
 	call.AddPositions(vErr)
 

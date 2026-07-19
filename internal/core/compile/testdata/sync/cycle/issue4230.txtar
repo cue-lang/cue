@@ -5,7 +5,8 @@
 # deferred when evaluated from within a cyclic context, resulting in empty output.
 # https://cuelang.org/issue/4230
 -- in.cue --
-#transform: {
+@experiment(predicates)
+#transformA: {
 	_input: {...}
 	_output: [
 		if _input.app != _|_ {
@@ -14,15 +15,30 @@
 	]
 }
 
-x: {
+#transformB: {
+	_input: {...}
+	_output: [
+		if exists(_input.app) {
+			_input.app.region
+		},
+	]
+}
+
+xa: {
 	let X = self
-	regions: (#transform & {_input: X})._output
+	regions: (#transformA & {_input: X})._output
+	app: region: or(["west", "east"]) & "west"
+}
+
+xb: {
+	let X = self
+	regions: (#transformB & {_input: X})._output
 	app: region: or(["west", "east"]) & "west"
 }
 -- out/compile --
 --- in.cue
 {
-  #transform: {
+  #transformA: {
     _input: {
       ...
     }
@@ -32,10 +48,32 @@ x: {
       },
     ]
   }
-  x: {
+  #transformB: {
+    _input: {
+      ...
+    }
+    _output: [
+      if exists(〈1;_input〉.app) {
+        〈2;_input〉.app.region
+      },
+    ]
+  }
+  xa: {
     let X#1 = 〈1〉
-    regions: (〈1;#transform〉 & {
+    regions: (〈1;#transformA〉 & {
       _input: 〈1;let X#1〉
+    })._output
+    app: {
+      region: (or([
+        "west",
+        "east",
+      ]) & "west")
+    }
+  }
+  xb: {
+    let X#2 = 〈1〉
+    regions: (〈1;#transformB〉 & {
+      _input: 〈1;let X#2〉
     })._output
     app: {
       region: (or([

@@ -1,4 +1,5 @@
 -- in.cue --
+@experiment(predicates)
 // All these cases whose name end with cycle should fail with a structural
 // error. These are all uncommon code paths, triggered when container types
 // are evalated within a nested expression such as as an argument to a
@@ -38,13 +39,19 @@ letCycleFail: t1: {
 
 // Cycles should also be detected in evaluation paths that descend into
 // recursion at non-field boundaries.
-letCycleFail: t2: {
+letCycleFail: t2A: {
 	a: {
 		let X = a
 		if X == _|_ { }
 		x: y: ""
 	}
-	// TODO(eval): not sure if it really should fail here, so this may be okay.
+}
+letCycleFail: t2B: {
+	a: {
+		let X = a
+		if !isValid(X) { }
+		x: y: ""
+	}
 }
 
 listCycleOK: {
@@ -117,10 +124,17 @@ printCycle: {
 	}
 }
 -- self.cue --
-issue3978: {
+@experiment(predicates)
+issue3978A: {
 	a: {
 		let this = self
 		if this.missing != _|_ {}
+	}
+}
+issue3978B: {
+	a: {
+		let this = self
+		if exists(this.missing) {}
 	}
 }
 -- out/compile --
@@ -152,10 +166,21 @@ issue3978: {
     }
   }
   letCycleFail: {
-    t2: {
+    t2A: {
       a: {
         let X#4 = 〈1;a〉
         if (〈0;let X#4〉 == _|_(explicit error (_|_ literal) in source)) {}
+        x: {
+          y: ""
+        }
+      }
+    }
+  }
+  letCycleFail: {
+    t2B: {
+      a: {
+        let X#5 = 〈1;a〉
+        if !isValid(〈0;let X#5〉) {}
         x: {
           y: ""
         }
@@ -262,10 +287,16 @@ issue3978: {
 }
 --- self.cue
 {
-  issue3978: {
+  issue3978A: {
     a: {
-      let this#5 = 〈1〉
-      if (〈0;let this#5〉.missing != _|_(explicit error (_|_ literal) in source)) {}
+      let this#6 = 〈1〉
+      if (〈0;let this#6〉.missing != _|_(explicit error (_|_ literal) in source)) {}
+    }
+  }
+  issue3978B: {
+    a: {
+      let this#7 = 〈1〉
+      if exists(〈0;let this#7〉.missing) {}
     }
   }
 }

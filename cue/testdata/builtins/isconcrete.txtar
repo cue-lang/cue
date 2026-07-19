@@ -1,0 +1,248 @@
+# Tests for the isConcrete function.
+#
+# isConcrete reports whether a value is a single, fully ground datum, aligned
+# with what export needs: anything clean but unfinished — an abstract type, an
+# undefaulted disjunction, an incomplete value (whether the whole argument or
+# its interior), or an unset required field — is false. Constraints that need
+# not bind an instance (optional fields, pattern constraints, open list tails)
+# never block groundedness. A permanent error propagates: isConcrete is not an
+# error catcher.
+
+-- in.cue --
+@experiment(predicates)
+
+// isConcrete with concrete scalar values.
+concreteScalars: {
+	a:      42
+	b:      "hello"
+	c:      true
+	d:      3.14
+	checkA: isConcrete(a) @test(eq, true)
+	checkB: isConcrete(b) @test(eq, true)
+	checkC: isConcrete(c) @test(eq, true)
+	checkD: isConcrete(d) @test(eq, true)
+}
+
+// A reference to an absent optional field is incomplete at the fixpoint:
+// definitively not a ground datum, so false is committed rather than the
+// incomplete error being propagated. A struct whose member references an
+// absent optional field is likewise not concrete.
+concreteOptional: {
+	c?:     int
+	checkC: isConcrete(c) @test(eq, false)
+
+	d:      {e: f, f?: int}
+	checkD: isConcrete(d) @test(eq, false)
+}
+
+// An undeclared field on an open parent could still be added: false. On a
+// closed parent it can never exist: the permanent error propagates.
+concreteAbsent: {
+	open: {}
+	checkOpen: isConcrete(open.u) @test(eq, false)
+
+	closed: close({x: 1})
+	checkClosed: isConcrete(closed.u) @test(err, code=eval, contains="undefined field: %s", args=[u], pos=[0:33, -1:2])
+}
+
+// isConcrete with types (not concrete).
+concreteTypes: {
+	a:      int
+	b:      string
+	c:      bool
+	checkA: isConcrete(a) @test(eq, false)
+	checkB: isConcrete(b) @test(eq, false)
+	checkC: isConcrete(c) @test(eq, false)
+}
+
+// isConcrete with constraints (not concrete).
+concreteConstraints: {
+	a:      >10
+	b:      =~"pattern"
+	c:      int & >0
+	checkA: isConcrete(a) @test(eq, false)
+	checkB: isConcrete(b) @test(eq, false)
+	checkC: isConcrete(c) @test(eq, false)
+}
+
+// isConcrete with disjunctions: concrete only when finalization selects a
+// single default.
+concreteDisjunctions: {
+	a:      1 | 2        // no default: not concrete
+	b:      *1 | 2       // single default: concrete (finalization selects it)
+	c:      1 | *2       // single default (last): concrete
+	d:      string | int // no default: not concrete
+	checkA: isConcrete(a) @test(eq, false)
+	checkB: isConcrete(b) @test(eq, true)
+	checkC: isConcrete(c) @test(eq, true)
+	checkD: isConcrete(d) @test(eq, false)
+}
+
+// isConcrete with structs and lists. Optional and pattern constraints, hidden
+// fields, and definitions do not affect concreteness; an unset required field
+// does, matching what export needs.
+concreteStructs: {
+	full:      {x: 1, y: "hello"}
+	checkFull: isConcrete(full) @test(eq, true)
+
+	partial:      {x: 1, y: string}
+	checkPartial: isConcrete(partial) @test(eq, false)
+
+	withOptional:  {a: 1, b?: int}
+	checkOptional: isConcrete(withOptional) @test(eq, true)
+
+	// An unsatisfiable optional constraint binds no instance: still concrete.
+	withBrokenOpt:  {a: 1, b?: 1 & 2}
+	checkBrokenOpt: isConcrete(withBrokenOpt) @test(eq, true)
+
+	withRequired:  {a: 1, b!: int}
+	checkRequired: isConcrete(withRequired) @test(eq, false)
+
+	withPattern:  {[string]: int, a: 1}
+	checkPattern: isConcrete(withPattern) @test(eq, true)
+
+	withHidden:  {_a: int, #a: int}
+	checkHidden: isConcrete(withHidden) @test(eq, true)
+
+	list:      [1, 2, 3]
+	checkList: isConcrete(list) @test(eq, true)
+
+	openList:      [1, 2, ...int]
+	checkOpenList: isConcrete(openList) @test(eq, true)
+
+	// open struct: concrete with respect to its concrete fields
+	open:      {x: 1, ...}
+	checkOpen: isConcrete(open) @test(eq, true)
+
+	deep: {
+		a: x: y: a: 1
+		b: x: y: b: *1 | 2
+		c: x: y: c: int
+	}
+	checkDeep1: isConcrete(deep)             @test(eq, false)
+	checkDeep2: isConcrete(deep.a)           @test(eq, true)
+	checkDeep3: isConcrete(deep.b)           @test(eq, true)
+	checkDeep4: isConcrete(deep.c)           @test(eq, false)
+	checkDeep5: isConcrete({deep.a, deep.b}) @test(eq, true)
+	checkDeep6: isConcrete({deep.b, deep.c}) @test(eq, false)
+	checkDeep7: isConcrete({deep.a, deep.c}) @test(eq, false)
+}
+
+// isConcrete propagates errors: a permanent (eval) error is reported as the
+// error itself, not as "not concrete".
+concreteError: {
+	a:      1 & "x"       @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[1, "x", int, string], pos=[0:10, 0:14])
+	checkA: isConcrete(a) @test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[1, "x", int, string], pos=[-1:10, -1:14])
+
+	// An unset required field does not mask a permanent error elsewhere in
+	// the value: the error still propagates.
+	checkRequired: isConcrete({a!: int, b: 1 & 2}) @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:41, 0:45])
+	checkAbstract: isConcrete({a: int, b: 1 & 2})  @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:40, 0:44])
+}
+
+// Cardinality over concreteness composes with countN (formerly concreteN).
+countNConcrete: {
+	a: 1
+	b: int
+	c: "hello"
+	countN(2, [isConcrete(a), isConcrete(b), isConcrete(c)])
+	@test(eq, {a: 1, b: int, c: "hello"})
+}
+
+countNConcreteBounds: {
+	a: 1
+	b: int
+	c: "hello"
+	countN(>=1, [isConcrete(a), isConcrete(b), isConcrete(c)])
+	countN(<=2, [isConcrete(a), isConcrete(b), isConcrete(c)])
+	@test(eq, {a: 1, b: int, c: "hello"})
+}
+
+// A determined violation is a permanent error: all conditions are settled
+// booleans when the count is checked.
+countNConcreteFail: {
+	a: 1
+	b: int
+	c: "hello"
+	countN(4, [isConcrete(a), isConcrete(b), isConcrete(c)])
+	@test(err, code=eval, contains="%s: %d matched, expected %v", args=[countN, 2, 4])
+}
+
+// Exactly one concrete (protobuf-style oneof over concreteness).
+countNConcreteOneOf: {
+	a?: int
+	b?: string
+	a:  42
+	countN(1, [isConcrete(a), isConcrete(b)])
+	@test(eq, {a: 42, b?: string})
+}
+
+// A member holding a disjunction with a default counts as that default, as
+// the value as a whole does: an unset required field of the default blocks
+// groundedness wherever the disjunction sits.
+nestedDefault: {
+	a: isConcrete({a: *{b!: int} | {c: 1}})   @test(eq, false)
+	b: isConcrete([*{b!: int} | {c: 1}])      @test(eq, false)
+	c: isConcrete({a: *{c: 1} | {b!: int}})   @test(eq, true)
+}
+
+// A false committed for an incomplete argument is verified against the
+// finalized configuration (CP-C4). The argument is re-derived for that: read
+// again, it would return the error it was finalized with. A guard that makes
+// its own argument ground is reported as a cycle; one that leaves it
+// abstract is consistent.
+staleAnswer: {
+	outer?: int
+	v: {e: outer}
+	c: isConcrete(v.e)
+	if !isConcrete(v.e) {outer: 5}
+	@test(err, code=cycle, contains="changed after evaluation")
+}
+staleAnswerAbstract: {
+	outer?: int
+	v: {e: outer}
+	c: isConcrete(v.e)   @test(eq, false)
+	if !isConcrete(v.e) {outer: int}
+}
+-- out/errors.txt --
+[incomplete] concreteOptional.d.e: cannot reference optional field: f:
+    ./in.cue:23:14
+[eval] concreteAbsent.checkClosed: undefined field: u:
+    ./in.cue:34:33
+    ./in.cue:33:2
+[eval] concreteStructs.withBrokenOpt.b: conflicting values 2 and 1:
+    ./in.cue:84:29
+    ./in.cue:84:33
+[eval] concreteError.a: conflicting values 1 and "x" (mismatched types int and string):
+    ./in.cue:123:10
+    ./in.cue:123:14
+[eval] concreteError.a: conflicting values 1 and "x" (mismatched types int and string):
+    ./in.cue:123:10
+    ./in.cue:123:14
+[eval] b: conflicting values 2 and 1:
+    ./in.cue:128:41
+    ./in.cue:128:45
+[eval] b: conflicting values 2 and 1:
+    ./in.cue:129:40
+    ./in.cue:129:44
+[eval] countNConcreteFail: countN: 2 matched, expected 4:
+    ./in.cue:156:2
+    ./in.cue:156:9
+[cycle] staleAnswer: circular dependency in evaluation of conditionals: v.e changed after evaluation:
+    ./in.cue:186:16
+staleAnswer: circular dependency in evaluation of conditionals: v.e changed after evaluation:
+    ./in.cue:187:17
+[incomplete] staleAnswerAbstract.v.e: cannot reference optional field: outer:
+    ./in.cue:192:9
+-- out/eval/stats --
+Leaks:  19
+Freed:  258
+Reused: 225
+Allocs: 52
+Retain: 0
+
+Unifications: 247
+Conjuncts:    337
+Disjuncts:    30
+
+NumCloseIDs: 13

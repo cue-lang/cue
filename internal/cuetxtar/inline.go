@@ -928,7 +928,11 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 			t.Logf("path %s: @test(eq:todo, ...): cannot parse expected expression: %v", path, err)
 			return
 		}
-		cmpErr := (&cmpCtx{baseLine: pa.baseLine}).astCmp(cue.Path{}, expr, val)
+		ctx := &cmpCtx{
+			baseLine:    pa.baseLine,
+			experiments: pa.experimentPrefix(),
+		}
+		cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 		if cmpErr == nil {
 			t.Logf("WARNING: path %s: TODO eq:todo now passes — consider upgrading to @test(eq, %s)", path, exprStr)
 			if cuetest.UpdateOrDiffGoldenFiles() {
@@ -974,6 +978,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		posWriteback: func(innerAttrText string, positions []token.Pos) {
 			r.enqueueNestedPosWrite(pa, innerAttrText, positions)
 		},
+		experiments: pa.experimentPrefix(),
 	}
 	cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {
@@ -1200,4 +1205,39 @@ func (r *inlineRunner) enqueueTodoPromote(pa parsedTestAttr, path cue.Path) {
 		newAttrText: promoteTodoAttr(pa),
 		gatePath:    path,
 	})
+}
+
+// fileExperimentPrefix returns a source prefix that gives a synthetic file the
+// language version and explicitly enabled experiments of the file containing
+// pos, e.g. "@version(v0.19.0)\n@experiment(predicates)\n". It returns "" if
+// that file enables no experiments.
+//
+// The prefix lets @test(eq, ...) expected expressions reference builtins gated
+// by the file's experiments (see cmpCtx). It is built from the experiments the
+// parser recorded for the file, so it covers every @experiment attribute the
+// parser honors, wherever it sits among the file attributes, and the language
+// version the file was loaded with, including one set by its module.
+func fileExperimentPrefix(pos token.Pos) string {
+	exp := pos.Experiment()
+	names := exp.Experiments()
+	if len(names) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	if v := exp.LanguageVersion(); v != "" {
+		fmt.Fprintf(&b, "@version(%s)\n", v)
+	}
+	for _, name := range names {
+		fmt.Fprintf(&b, "@experiment(%s)\n", name)
+	}
+	return b.String()
+}
+
+// experimentPrefix returns the [fileExperimentPrefix] of the file containing
+// pa, or "" if pa has no source attribute.
+func (pa parsedTestAttr) experimentPrefix() string {
+	if pa.srcAttr == nil {
+		return ""
+	}
+	return fileExperimentPrefix(pa.srcAttr.Pos())
 }

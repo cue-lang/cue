@@ -1,0 +1,45 @@
+#inlinetest:exclude CUE source contains compile-time errors (? marker outside a try clause)
+
+# The ? marker has no meaning specific to exists: there is no ? path marker,
+# and ? stays the marker of try (deliberations CP-E3). In an exists, existsN,
+# or countN argument it is therefore subject to the rules of try alone: a
+# compile error without the try experiment or outside a try clause. Within a
+# try clause it has the usual try semantics; see exists_try.txtar.
+
+-- in.cue --
+@experiment(predicates)
+
+// Without the try experiment, ? is rejected as everywhere else.
+existsOptionalMarker: {
+	a: b?: c: 1
+	check: exists(a.b?.c)
+}
+
+existsNOptionalMarker: {
+	a: b?: c: 1
+	existsN(1, a.b?.c)
+}
+
+countNOptionalMarker: {
+	a: b?: c: 1
+	countN(1, [exists(a.b?.c)])
+}
+-- try.cue --
+@experiment(predicates)
+@experiment(try)
+
+// With the try experiment but outside a try clause, ? is rejected as
+// everywhere else.
+tryOutsideClause: {
+	a: b?: c: 1
+	check: exists(a.b?.c)
+}
+-- out/evalalpha --
+existsOptionalMarker.check: optional marker (?) requires the try experiment (language version v0.16.0 or later):
+    ./in.cue:6:16
+existsNOptionalMarker: optional marker (?) requires the try experiment (language version v0.16.0 or later):
+    ./in.cue:11:13
+countNOptionalMarker: optional marker (?) requires the try experiment (language version v0.16.0 or later):
+    ./in.cue:16:20
+tryOutsideClause.check: optional marker (?) is only valid within a try clause:
+    ./try.cue:8:16

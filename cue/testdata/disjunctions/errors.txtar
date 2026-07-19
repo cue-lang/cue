@@ -127,6 +127,7 @@ issue3581: reduced: {
 	@test(eq, {list: _|_, c: _})
 }
 -- issue3576.cue --
+@experiment(predicates)
 // evalv3: disjunct of definitions with identical optional fields results in
 // incomplete evaluation; the resolved disjunct should be fully evaluated.
 // https://cuelang.org/issue/3576
@@ -145,7 +146,7 @@ issue3576: reduced: {
 		foo: {a: "1"}
 	})
 }
-issue3576: full: {
+issue3576: fullA: {
 	#Run: {
 		run!: string
 		options?: #Option | [#Option, ...]
@@ -161,9 +162,35 @@ issue3576: full: {
 			optionsValue: options
 		}
 	}
-	
 	#Option: {}
-	
+
+	foo: #Run | #Copy
+	foo: run: "make"
+	@test(eq, {
+		#Run: {run!: string, options?: {} | [{}]}
+		#Copy: {copy!: string, options?: {} | [{}]}
+		#Option: {}
+		foo: {run: "make", options?: {} | [{}]}
+	})
+}
+issue3576: fullB: {
+	#Run: {
+		run!: string
+		options?: #Option | [#Option, ...]
+		if exists(options) {
+			optionsValue: options
+		}
+	}
+
+	#Copy: {
+		copy!: string
+		options?: #Option | [#Option, ...]
+		if exists(options) {
+			optionsValue: options
+		}
+	}
+	#Option: {}
+
 	foo: #Run | #Copy
 	foo: run: "make"
 	@test(eq, {
@@ -371,17 +398,17 @@ issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
 [user] explicit error (_|_ literal) in source:
     ./optionalerror.cue:30:16
 -- out/eval/stats --
-Leaks:  31
-Freed:  265
-Reused: 240
-Allocs: 56
+Leaks:  41
+Freed:  288
+Reused: 263
+Allocs: 66
 Retain: 0
 
-Unifications: 150
-Conjuncts:    345
-Disjuncts:    86
+Unifications: 171
+Conjuncts:    381
+Disjuncts:    96
 Notifications: 2
 
-NumCloseIDs: 30
+NumCloseIDs: 36
 -- out/todo.txt --
 issue4022: only evaluated by v3 evaluator.

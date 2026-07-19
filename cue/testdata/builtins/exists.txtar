@@ -1,0 +1,913 @@
+# Tests for the exists builtin and the existsN and countN validators.
+#
+# exists distinguishes "absent but possible" (false) from "can never exist"
+# (a permanent error): declared optional/required fields, pattern-admitted
+# labels, open parents, and open-list indices yield false, while undeclared
+# labels on closed parents, out-of-range indices of closed lists, and members
+# of values whose kind admits none are errors. Presence is independent of a
+# member's value: a present member with a broken value is still true.
+
+-- in.cue --
+@experiment(predicates)
+
+// Field references
+fieldRef: {
+	a:       1
+	existsA: exists(a)   @test(eq, true)
+	b?:      string
+	existsB: exists(b)   @test(eq, false)
+}
+
+// Selector: all intermediates exist
+selector: {
+	x: y: z: 1
+	x: y: v?: 1
+	existsXYZ: exists(x.y.z)   @test(eq, true)
+	existsXYV: exists(x.y.v)   @test(eq, false)
+	existsXYW: exists(x.y.w)   @test(eq, false)
+
+	#Def: {a: 1, opt?: 2, req!: 3}
+	existsDefA:   exists(#Def.a)     @test(eq, true)
+	existsDefOpt: exists(#Def.opt)   @test(eq, false)
+	existsDefReq: exists(#Def.req)   @test(eq, false)
+	// An undeclared label on a closed definition can never exist.
+	existsDefNE:  exists(#Def.ne)    @test(err, code=eval, contains="exists: field ne not allowed by closed struct", pos=[0:16])
+
+	Ref: #Def
+	existsRefA:   exists(Ref.a)     @test(eq, true)
+	existsRefOpt: exists(Ref.opt)   @test(eq, false)
+	existsRefReq: exists(Ref.req)   @test(eq, false)
+	existsRefNE:  exists(Ref.ne)    @test(err, code=eval, contains="exists: field ne not allowed by closed struct", pos=[0:16])
+
+	D: #Def & { opt: 2, req: 3 }
+	existsDOpt: exists(D.opt)   @test(eq, true)
+	existsDReq: exists(D.req)   @test(eq, true)
+
+	R: Ref & { opt: _, req: _ }
+	existsROpt: exists(R.opt)   @test(eq, true)
+	existsRReq: exists(R.req)   @test(eq, true)
+}
+
+// Presence is independent of the member's value: a present member whose value
+// is broken still exists. The configuration's own error at the broken field
+// surfaces independently; exists neither propagates nor masks it.
+presenceOnly: {
+	s: c: {x: 1 & 2}   @test(err, at=x, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:12, 0:16])
+	existsC: exists(s.c)   @test(eq, true)
+}
+
+// Selector: optional intermediate not ? marked → error
+selectorRequiredIntermediate: {
+	x:         y?: z: 1
+	existsXYZ: exists(x.y.z)   @test(err, code=incomplete, contains="cannot reference optional field: %s", args=[y], pos=[0:22])
+}
+
+// A value whose kind can never have members is an error as an intermediate,
+// whether concrete or abstract. A kind that still admits members yields
+// false.
+wrongKindIntermediate: {
+	s: {x: 1}
+	e1: exists(s.x.y)   @test(err, code=eval, contains="%s: value of type %s can never have members", args=[exists, int], pos=[0:6])
+	t: {x: int}
+	e2: exists(t.x.y)   @test(err, code=eval, contains="%s: value of type %s can never have members", args=[exists, int], pos=[0:6])
+	u: {x: _}
+	e3: exists(u.x.y)   @test(eq, false)
+	w: {x: {...}}
+	e4: exists(w.x.y)   @test(eq, false)
+}
+
+// Hidden fields and definitions answer for the member class the reference
+// addresses; closedness never excludes them, so absence is always false.
+memberClasses: {
+	h: {_p: 1}
+	existsHidden: exists(h._p)    @test(eq, true)
+	d: {#D: 1}
+	existsDef:    exists(d.#D)    @test(eq, true)
+}
+
+// Index expressions - list
+indexList: {
+	list:    [1, 2, 3]
+	c: exists0: exists(list[0])   @test(eq, true)
+	c: exists2: exists(list[2])   @test(eq, true)
+	// An out-of-range index of a closed list can never exist.
+	c: ne1: exists(list[3])       @test(err, code=eval, contains="%s: index %d out of range", args=[exists, 3], pos=[0:10])
+
+	open: [1, 2, 3, ...]
+	o: exists0: exists(open[0])   @test(eq, true)
+	o: exists2: exists(open[2])   @test(eq, true)
+	// An open list may still grow: absent but possible.
+	o: ne1: exists(open[3])       @test(eq, false)
+}
+
+// Index expressions - struct with string key
+indexStruct: {
+	data:      foo: "bar"
+	existsFoo: exists(data["foo"])   @test(eq, true)
+	existsBaz: exists(data["baz"])   @test(eq, false)
+
+	// Parent is an unresolved disjunction with a default: index lookup
+	// follows the default, parallel to selector behavior on disjunctions.
+	d: *{a: 1} | {b: 2}
+	existsA: exists(d["a"])   @test(eq, true)
+	existsB: exists(d["b"])   @test(eq, false)
+
+	// The same shape with definitions as the disjuncts. Navigating the
+	// default lands on a closed struct, so a label it does not declare can
+	// never appear: a permanent error, where the open-struct case above
+	// answers false. The two cells side by side are the rule (CP-E2, CP-E8).
+	#DA: {a: 1}
+	#DB: {b: 2}
+	e: *#DA | #DB
+	existsClosedA: exists(e["a"])   @test(eq, true)
+	existsClosedB: exists(e["b"])   @test(err, code=eval, contains="exists: field b not allowed by closed struct", pos=[0:17])
+	// The selector form behaves the same way.
+	existsSelA: exists(e.a)   @test(eq, true)
+	existsSelB: exists(e.b)   @test(err, code=eval, contains="exists: field b not allowed by closed struct", pos=[0:14])
+}
+
+invalidValues: {
+	b: 1
+	existsFoo: exists(1)             @test(err, code=eval, contains="%s: argument must be a field reference, selector, or index expression", args=[exists], pos=[0:13])
+	existsBaz: exists(1 + b)         @test(err)
+	existsBaz: exists("string")      @test(err)
+	existsBaz: exists("string"[0])   @test(err, code=eval,
+		suberr=(code=eval, contains="%s: argument must be a field reference, selector, or index expression", args=[exists], pos=[-2:13]),
+		suberr=(code=eval, contains="%s: argument must be a field reference, selector, or index expression", args=[exists], pos=[-1:13]),
+		suberr=(code=eval, contains="%s: cannot index non-struct/list value", args=[exists], pos=[0:13]))
+}
+
+// countN - exact count (a and b exist, c does not)
+countNTest: {
+	a: 1
+	b: 2
+	c?: string
+	countN(2, [exists(a), exists(b), exists(c)])
+	@test(eq, {a: 1, b: 2, c?: string})
+}
+
+// countN with bound constraints (only a exists)
+countNBounds: {
+	a:  1
+	b?: int
+	c?: int
+	countN(>=1, [exists(a), exists(b), exists(c)])
+	countN(<=2, [exists(a), exists(b), exists(c)])
+	@test(eq, {a: 1, b?: int, c?: int})
+}
+
+// exists in conditionals
+conditionalExists: {
+	x?:      int   @test(err, code=incomplete, path=conditionalExists, contains="field not found: %v", args=[x], pos=[])
+	y:       1
+	existsY: exists(y)   @test(eq, true)
+	result: {
+		if exists(y) {
+			hasY: true
+		}
+		@test(eq, {hasY: true})
+	}
+}
+
+// countN with all conditions true
+countNAll: {
+	a: 1
+	b: 2
+	c: 3
+	countN(3, [exists(a), exists(b), exists(c)])
+	@test(eq, {a: 1, b: 2, c: 3})
+}
+
+// countN with none existing (all optional, none set)
+countNNone: {
+	a?: int
+	b?: int
+	countN(0, [exists(a), exists(b)])
+	@test(skip, why="struct has an embedded countN() that cannot be expressed in @test(eq, ...) format")
+}
+
+// List index out of bounds: an open list may still grow (false); a closed
+// list may not (error, tested under indexList above).
+indexOutOfBounds: {
+	open:      [1, 2, 3, ...]
+	open10:    exists(open[10])   @test(eq, false)
+}
+
+// Final component missing → false (no ? needed on final)
+missingNested: {
+	a:         b: {}
+	existsABC: exists(a.b.c)   @test(eq, false)
+}
+
+// Intermediate missing + not ? marked → error
+missingIntermediateRequired: {
+	a:         {}
+	existsABC: exists(a.b.c)   @test(err, code=incomplete, contains="undefined field: %s", args=[b], pos=[0:22, -1:2])
+}
+
+// At most one of the optional fields can be present (protobuf oneOf)
+oneOfPattern: {
+	a?: int
+	b?: string
+	c?: bool
+	countN(<=1, [exists(a), exists(b), exists(c)])
+	@test(skip, why="struct has an embedded countN() that cannot be expressed in @test(eq, ...) format")
+}
+
+// oneOf with one field present - should pass
+oneOfWithValue: {
+	a?: int
+	b?: string
+	c?: bool
+	a: 42
+	countN(<=1, [exists(a), exists(b), exists(c)])
+	@test(eq, {a: 42, b?: string, c?: bool})
+}
+
+// oneOf with two fields present - should fail
+oneOfViolation: {
+	a?: int
+	b?: string
+	c?: bool
+	a: 42
+	b: "hello"
+	countN(<=1, [exists(a), exists(b), exists(c)])
+	@test(err, code=eval, contains="%s: %d matched, expected %v", args=[countN, 2, <=1])
+}
+
+// countN failure - requires at least 2 but only 1 condition holds. More
+// fields could still appear, so, as for existsN, the failure is incomplete.
+countNTooFew: {
+	a: 1
+	b?: int
+	c?: int
+	countN(>=2, [exists(a), exists(b), exists(c)])
+	@test(err, code=incomplete, contains="%s: %d matched, expected %v", args=[countN, 1, >=2])
+}
+
+// countN failure - exact count mismatch, again one that more presence fixes.
+countNExactFail: {
+	a: 1
+	b?: int
+	countN(2, [exists(a), exists(b)])
+	@test(err, code=incomplete, contains="%s: %d matched, expected %v", args=[countN, 1, 2])
+}
+
+// The cardinality examples of the spec, in both forms. existsN(n, a, b, c)
+// is countN(n, [exists(a), exists(b), exists(c)]), so each pair agrees. A
+// schema whose optional fields are unset is not broken: the shortfall is
+// incomplete, so #OneOf itself passes, and so it is for an instance that
+// still lacks fields. Too many present fields is permanent.
+specExamples: {
+	existsNForm: {
+		#OneOf: {existsN(1, a, b, c), a?: int, b?: string, c?: bool}
+		foo: #OneOf & {a: 1} @test(eq, {a: 1, b?: string, c?: bool})
+
+		#AtMostOne: {existsN(<=1, x, y), x?: int, y?: int}
+		bar: #AtMostOne & {x: 1, y: 2} @test(err, code=eval, contains="%s: %d matched, expected %v", args=[existsN, 2, <=1])
+
+		#AtLeastTwo: {existsN(>=2, a, b, c), a?: int, b?: int, c?: int}
+		baz: #AtLeastTwo & {a: 1, c: 1} @test(eq, {a: 1, b?: int, c: 1})
+		qux: #AtLeastTwo & {a: 1} @test(err, code=incomplete, contains="%s: %d matched, expected %v", args=[existsN, 1, >=2])
+	}
+	countNForm: {
+		#OneOf: {countN(1, [exists(a), exists(b), exists(c)]), a?: int, b?: string, c?: bool}
+		foo: #OneOf & {a: 1} @test(eq, {a: 1, b?: string, c?: bool})
+
+		#AtMostOne: {countN(<=1, [exists(x), exists(y)]), x?: int, y?: int}
+		bar: #AtMostOne & {x: 1, y: 2} @test(err, code=eval, contains="%s: %d matched, expected %v", args=[countN, 2, <=1])
+
+		#AtLeastTwo: {countN(>=2, [exists(a), exists(b), exists(c)]), a?: int, b?: int, c?: int}
+		baz: #AtLeastTwo & {a: 1, c: 1} @test(eq, {a: 1, b?: int, c: 1})
+		qux: #AtLeastTwo & {a: 1} @test(err, code=incomplete, contains="%s: %d matched, expected %v", args=[countN, 1, >=2])
+	}
+}
+
+// existsN is the presence-specialized shorthand for countN over exists
+// conditions: existsN(n, a, b, c) == countN(n, [exists(a), exists(b),
+// exists(c)]).
+existsNTest: {
+	a: 1
+	b: 2
+	c?: string
+	existsN(2, a, b, c)
+	@test(eq, {a: 1, b: 2, c?: string})
+}
+
+// existsN with bound constraints (only a exists)
+existsNBounds: {
+	a:  1
+	b?: int
+	c?: int
+	existsN(>=1, a, b, c)
+	existsN(<=2, a, b, c)
+	@test(eq, {a: 1, b?: int, c?: int})
+}
+
+// oneOf via existsN with one field present - should pass
+oneOfExistsN: {
+	a?: int
+	b?: string
+	c?: bool
+	a: 42
+	existsN(<=1, a, b, c)
+	@test(eq, {a: 42, b?: string, c?: bool})
+}
+
+// oneOf via existsN with two fields present - should fail
+oneOfExistsNViolation: {
+	a?: int
+	b?: string
+	c?: bool
+	a: 42
+	b: "hello"
+	existsN(<=1, a, b, c)
+	@test(err, code=eval, contains="%s: %d matched, expected %v", args=[existsN, 2, <=1])
+}
+
+// existsN failure - requires at least 2 but only 1 exists; more fields could
+// still appear, so the failure is incomplete until finalization.
+existsNTooFew: {
+	a: 1
+	b?: int
+	c?: int
+	existsN(>=2, a, b, c)
+	@test(err, code=incomplete, contains="%s: %d matched, expected %v", args=[existsN, 1, >=2], pos=[4:2, 4:10])
+}
+
+// Two existsN validators with different references are distinct: neither
+// may be dropped as a duplicate of the other, in either order.
+existsNDistinct: {
+	ab: {
+		existsN(>=1, b)
+		existsN(>=1, a)
+		a?: int
+		b:  1
+		@test(err, code=incomplete, contains="%s: %d matched, expected %v", args=[existsN, 0, >=1])
+	}
+	ba: {
+		existsN(>=1, a)
+		existsN(>=1, b)
+		a?: int
+		b:  1
+		@test(err, code=incomplete, contains="%s: %d matched, expected %v", args=[existsN, 0, >=1])
+	}
+}
+
+// A bound given by reference is checked like a literal one: a violation that
+// no more presence can fix is permanent. A bound that is not a number is a
+// type error.
+boundReference: {
+	n: 2
+	a: 1
+	existsNRef: {
+		existsN(n, a)
+		z: 1
+		@test(err, code=eval, contains="%s: %d matched, expected %v", args=[existsN, 1, 2])
+	}
+	countNRef: {
+		countN(n, [true])
+		z: 1
+		@test(err, code=eval, contains="%s: %d matched, expected %v", args=[countN, 1, 2])
+	}
+	countNString: countN("x", [true]) @test(err, code=eval, contains="cannot use %s (type %s) as int in argument 1 to %s", args=["x", string, countN])
+	existsNString: {
+		existsN("x", a)
+		@test(err, code=eval, contains="cannot use %s (type %s) as int in argument 1 to %s", args=["x", string, existsN])
+	}
+}
+
+// A defaulted condition counts as its default. A condition that is a boolean
+// but not yet concrete, as in a schema, is incomplete rather than a type
+// error, so the schema itself is not broken and its instances are checked.
+countNElements: {
+	b: *true | false
+	defaultRef: isValid(countN(1, [b]))                 @test(eq, true)
+	defaultLit: isValid(countN(1, [*true | false]))     @test(eq, true)
+	defaultEmbed: {
+		countN(1, [b])
+		z: 1
+		@test(eq, {z: 1})
+	}
+	#D: {
+		x: bool
+		countN(1, [x])
+		@test(err, code=incomplete, contains="countN: element %d is not a concrete boolean", args=[0])
+	}
+	dTrue: #D & {x: true} @test(eq, {x: true})
+	notBool: {
+		countN(1, [1])
+		@test(err, code=eval, contains="countN: element must be a boolean, found %s", args=[int])
+	}
+}
+
+// Each reference has exists semantics, including strictness: a reference to
+// a member that can never exist is an error, not a silently uncounted
+// condition.
+existsNStrict: {
+	s: close({a?: int})
+	t: existsN(1, s.a, s.typo) @test(err, code=eval, contains="existsN: field typo not allowed by closed struct", pos=[0:5])
+}
+
+// isValid converts a determined countN violation into a boolean (the
+// validator-to-boolean adapter).
+countNAdapter: {
+	ok1: isValid(countN(1, [true, false]))   @test(eq, true)
+	ok2: isValid(countN(1, [true, true]))    @test(eq, false)
+}
+
+-- review.cue --
+@experiment(predicates)
+
+// A field reference is a selection on the scope that declares the field. It
+// registers the same stability post-check as the selector form, so a guard
+// that adds the field it tests for is reported as a cycle.
+fieldRefPostCheck: {
+	b?: int
+	if !exists(b) {b: 1}
+	@test(err, code=cycle, contains="changed after evaluation")
+}
+selectorPostCheck: {
+	s: b?: int
+	if !exists(s.b) {s: b: 1}
+	@test(err, code=cycle, contains="changed after evaluation")
+}
+
+// A present member is true regardless of its value, also through a field
+// reference: the structural cycle in b does not make it absent.
+fieldRefBrokenValue: {
+	b: {c: b}   @test(err, code=structural_cycle)
+	x: exists(b)   @test(eq, true)
+}
+selectorBrokenValue: {
+	s: b: {c: s.b}   @test(err, code=structural_cycle)
+	x: exists(s.b)   @test(eq, true)
+}
+
+// A field reference to a member of an enclosing scope.
+fieldRefOuter: {
+	@test(permute, count=6)
+	b?: int
+	c:  1
+	s: {x: exists(b), y: exists(c)}
+	@test(eq, {b?: int, c: 1, s: {x: false, y: true}})
+}
+
+// An undefaulted disjunction leaves the subject's field set undetermined: the
+// question is unformed (CP-E8), for selectors and indexes alike, and even for
+// a label that no disjunct admits.
+undefaultedDisjunction: {
+	s: {a: 1} | {b: 1}
+	x: exists(s.a)      @test(err, code=incomplete, contains="exists: unresolved disjunction")
+	y: exists(s["a"])   @test(err, code=incomplete, contains="exists: unresolved disjunction")
+
+	#A: {a: int}
+	#B: {b: int}
+	t: #A | #B
+	z: exists(t.zz)     @test(err, code=incomplete, contains="exists: unresolved disjunction")
+}
+
+// A disjunction that resolves to a single disjunct is navigated through it.
+resolvedDisjunction: {
+	@test(permute, count=6)
+	x: exists(s.a)
+	s: close({a: 1}) | close({b: 1})
+	s: {a: 1}
+	@test(eq, {x: true, s: {a: 1}})
+}
+
+// A non-monotonic guard that ran in the peer does not keep a later presence
+// question about the peer incomplete: absent members commit false.
+guardedPeer: {
+	@test(permute, count=6)
+	s: {a?: int, c: 1, if isValid(c) {d: 1}}
+	x: exists(s.zz)
+	y: exists(s.a)
+	@test(eq, {s: {a?: int, c: 1, d: 1}, x: false, y: false})
+}
+legacyGuardedPeer: {
+	@test(permute, count=6)
+	s: {a?: int, c: 1, if c != _|_ {d: 1}}
+	x: exists(s.zz)
+	y: exists(s.a)
+	@test(eq, {s: {a?: int, c: 1, d: 1}, x: false, y: false})
+}
+
+// A self-less validator is not given the struct it is embedded in, so it
+// decides nothing about the fields allowed there: a definition or a closed
+// struct that embeds one stays closed.
+validatorKeepsClosed: {
+	#OneOf: {existsN(1, a, b), a?: int, b?: int}
+	x: #OneOf & {a: 1, zz: 2}   @test(err, at=zz, code=eval, contains="field not allowed")
+	#Count: {countN(1, [exists(a), exists(b)]), a?: int, b?: int}
+	y: #Count & {a: 1, zz: 2}   @test(err, at=zz, code=eval, contains="field not allowed")
+	z: close({existsN(1, a), a?: int}) & {a: 1, zz: 2}   @test(err, at=zz, code=eval, contains="field not allowed")
+
+	// A validator on its own constrains no fields.
+	#Bare: existsN(0, q)
+	q?:    int
+	w: #Bare & {zz: 1}   @test(eq, {zz: 1})
+}
+
+// The answer does not depend on whether the subject is declared before or
+// after the call. A subject declared after it is still in progress when the
+// call is evaluated: its closedness, its kind, and an error of its own are
+// then not recorded on it yet.
+subjectOrder: {
+	closedDef: {
+		@test(permute, count=6)
+		a: exists(#D.a)    @test(eq, true)
+		b: exists(#D.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+		#D: {a: 1}
+	}
+	unifiedDef: {
+		@test(permute, count=24)
+		b: exists(d.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+		d: {a: 1}
+		d: #D
+		#D: {a: int}
+	}
+	nestedDef: {
+		@test(permute, count=6)
+		b: exists(e.x.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+		e: #F
+		#F: {x: {a: 1}}
+	}
+	closeCall: {
+		@test(permute, count=2)
+		b: exists(c.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+		c: close({a: 1})
+	}
+	patterns: {
+		@test(permute, count=24)
+		#G: {a?: int, [=~"^p"]: int}
+		p: exists(#G.a)    @test(eq, false)
+		q: exists(#G.px)   @test(eq, false)
+		r: exists(#G.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+	}
+	wrongKind: {
+		@test(permute, count=24)
+		x: exists(n.a)     @test(err, code=eval, contains="%s: value of type %s can never have members", args=[exists, null])
+		y: exists(s.x.y)   @test(err, code=eval, contains="%s: value of type %s can never have members", args=[exists, int])
+		n: null
+		s: {x: int}
+	}
+	// A subject that is itself broken is not a value to ask about.
+	brokenSubject: {
+		@test(permute, count=2)
+		x: exists(bt.a)   @test(err, code=eval, contains="conflicting values")
+		bt: {a: 1} & 5    @test(err, code=eval, contains="conflicting values")
+	}
+	// A broken member does not make its closed parent read as open.
+	brokenMember: {
+		@test(permute, count=6)
+		c: close({a: 1, b: 1 & 2})   @test(err, at=b, code=eval, contains="conflicting values")
+		x: exists(c.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+		y: exists(c.b)    @test(eq, true)
+	}
+}
+
+// The closedness of an inline close() applies to its members.
+inlineClose: {
+	o: {}
+	x: exists(close({}).typo)   @test(err, code=eval, contains="exists: field typo not allowed by closed struct")
+	y: exists(close(o).typo)    @test(err, code=eval, contains="exists: field typo not allowed by closed struct")
+	z: exists(close({a: 1}).a)  @test(eq, true)
+	p: exists(close({[=~"^p"]: int}).px)   @test(eq, false)
+}
+
+// A defaulted index is its default, as for an index expression outside a
+// call.
+defaultedIndex: {
+	s: {a: 1}
+	k: *"a" | "b"
+	x: exists(s[k])              @test(eq, true)
+	y: exists(s[*"b" | "c"])     @test(eq, false)
+}
+
+// A defaulted list of conditions is its default. A disjunction of lists
+// without a default is an unformed list, not a wrong argument.
+countNDefaultedList: {
+	xs: *[true] | [false]
+	x: {
+		countN(1, xs)
+		z: 1
+		@test(eq, {z: 1})
+	}
+	ys: [true] | [false]
+	y: {
+		countN(1, ys)
+		z: 1
+		@test(err, code=incomplete, contains="countN: second argument is not a resolved list")
+	}
+}
+
+// An open list may still gain conditions, so a shortfall in one is incomplete:
+// a schema declaring such a list is not broken. A bound that the conditions
+// so far meet passes, as it does for existsN over fields that may still be
+// added. Exceeding the bound is permanent.
+countNOpenList: {
+	#AtLeastOne: {
+		xs: [...bool]
+		countN(>=1, xs)
+		@test(err, code=incomplete, contains="%s: %d matched, expected %v", args=[countN, 0, >=1])
+	}
+	met: #AtLeastOne & {xs: [true]} @test(eq, {xs: [true]})
+
+	#AtMostOne: {
+		name: string
+		xs: [...bool]
+		countN(<=1, xs)
+	}
+	unset: #AtMostOne & {name: "unset"}                    @test(eq, {name: "unset", xs: []})
+	one:   #AtMostOne & {name: "one", xs: [true, false]}   @test(eq, {name: "one", xs: [true, false]})
+	two:   #AtMostOne & {name: "two", xs: [true, true]}    @test(err, code=eval, contains="%s: %d matched, expected %v", args=[countN, 2, <=1])
+
+	zero: {
+		countN(0, [...bool])
+		z: 1
+		@test(eq, {z: 1})
+	}
+	over: {
+		countN(<=1, [true, true, ...])
+		z: 1
+		@test(err, code=eval, contains="%s: %d matched, expected %v", args=[countN, 2, <=1])
+	}
+}
+
+// A permanent error in a condition takes precedence over a condition that
+// is not settled yet, wherever each sits in the list.
+countNElementOrder: {
+	a: {
+		countN(1, [bool, 1 & 2])
+		z: 1
+		@test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1])
+	}
+	b: {
+		countN(1, [1 & 2, bool])
+		z: 1
+		@test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1])
+	}
+	c: {
+		countN(1, [bool, 1])
+		z: 1
+		@test(err, code=eval, contains="countN: element must be a boolean, found %s", args=[int])
+	}
+}
+
+// A compound bound is checked like a simple one: a count that no more
+// presence can bring within the bound is a permanent violation.
+compoundBound: {
+	a:  1
+	b:  2
+	c?: int
+	d?: int
+	ok: {
+		existsN(>=1 & <=2, a, b)
+		z: 1
+		@test(eq, {z: 1})
+	}
+	tooFew: {
+		existsN(>=3 & <=4, a, b, c, d)
+		z: 1
+		@test(err, code=incomplete, contains="%s: %d matched, expected %v")
+	}
+	never: {
+		existsN(>=5 & <=6, a, b, c, d)
+		z: 1
+		@test(err, code=eval, contains="%s: %d matched, expected %v")
+	}
+	tooMany: {
+		countN(1 | 2, [true, true, true])
+		z: 1
+		@test(err, code=eval, contains="%s: %d matched, expected %v")
+	}
+}
+
+// A name bound by a let or by a comprehension clause is not a field: it
+// names a value, not a member that may or may not be present. Asking for
+// the presence of the bare name is an error. Selecting from it is a regular
+// question.
+clauseVariables: {
+	s: {a: {p: 1}, b: {}}
+	key:    [for k, v in s {exists(k)}]      @test(err, at=0, code=eval, contains="%s: argument must be a field reference, selector, or index expression", args=[exists])
+	value:  [for k, v in s {exists(v)}]      @test(err, at=0, code=eval, contains="%s: argument must be a field reference, selector, or index expression", args=[exists])
+	count:  [for k, v in s {existsN(1, v)}]  @test(err, at=0, code=eval, contains="%s: argument must be a field reference, selector, or index expression", args=[existsN])
+	member: [for k, v in s {exists(v.p)}]    @test(eq, [true, false])
+	index:  [for k, v in s if exists(s[k]) {k}]   @test(eq, ["a", "b"])
+	letVar: {
+		let L = s
+		x: exists(L)     @test(err, code=eval, contains="%s: argument must be a field reference, selector, or index expression", args=[exists])
+		y: exists(L.a)   @test(eq, true)
+	}
+}
+
+-- cycle.cue --
+@experiment(predicates)
+
+minimal: {
+	a: {
+		if !exists(b.port) {
+			port: ""
+		}
+		@test(err, code=incomplete|cycle)
+	}
+
+	b: {
+		if !exists(a.port) {
+			port: ""
+		}
+		@test(err, code=incomplete|cycle)
+	}
+}
+
+-- out/errors.txt --
+[cycle] minimal.a: cyclic reference to field port:
+    ./cycle.cue:5:16
+[cycle] minimal.b: undefined field: port:
+    ./cycle.cue:12:16
+    ./cycle.cue:4:2
+[eval] selector.existsDefNE: exists: field ne not allowed by closed struct:
+    ./in.cue:24:16
+[eval] selector.existsRefNE: exists: field ne not allowed by closed struct:
+    ./in.cue:30:16
+[eval] presenceOnly.s.c.x: conflicting values 2 and 1:
+    ./in.cue:45:12
+    ./in.cue:45:16
+[incomplete] selectorRequiredIntermediate.existsXYZ: cannot reference optional field: y:
+    ./in.cue:52:22
+[eval] wrongKindIntermediate.e1: exists: value of type int can never have members:
+    ./in.cue:60:6
+[eval] wrongKindIntermediate.e2: exists: value of type int can never have members:
+    ./in.cue:62:6
+[eval] indexList.c.ne1: exists: index 3 out of range:
+    ./in.cue:84:10
+[eval] indexStruct.existsClosedB: exists: field b not allowed by closed struct:
+    ./in.cue:113:17
+[eval] indexStruct.existsSelB: exists: field b not allowed by closed struct:
+    ./in.cue:116:14
+[eval] invalidValues.existsFoo: exists: argument must be a field reference, selector, or index expression:
+    ./in.cue:121:13
+[eval] invalidValues.existsBaz: exists: argument must be a field reference, selector, or index expression:
+    ./in.cue:122:13
+invalidValues.existsBaz: exists: argument must be a field reference, selector, or index expression:
+    ./in.cue:123:13
+invalidValues.existsBaz: exists: cannot index non-struct/list value:
+    ./in.cue:124:13
+[incomplete] missingIntermediateRequired.existsABC: undefined field: b:
+    ./in.cue:195:22
+    ./in.cue:194:2
+[eval] oneOfViolation: countN: 2 matched, expected <=1:
+    ./in.cue:224:2
+    ./in.cue:224:9
+[incomplete] countNTooFew: countN: 1 matched, expected >=2:
+    ./in.cue:234:2
+    ./in.cue:234:9
+[incomplete] countNExactFail: countN: 1 matched, expected 2:
+    ./in.cue:242:2
+    ./in.cue:242:9
+[eval] specExamples.existsNForm.bar: existsN: 2 matched, expected <=1:
+    ./in.cue:256:16
+    ./in.cue:256:24
+[incomplete] specExamples.existsNForm.qux: existsN: 1 matched, expected >=2:
+    ./in.cue:259:17
+    ./in.cue:259:25
+[eval] specExamples.countNForm.bar: countN: 2 matched, expected <=1:
+    ./in.cue:267:16
+    ./in.cue:267:23
+[incomplete] specExamples.countNForm.qux: countN: 1 matched, expected >=2:
+    ./in.cue:270:17
+    ./in.cue:270:24
+[eval] oneOfExistsNViolation: existsN: 2 matched, expected <=1:
+    ./in.cue:314:2
+    ./in.cue:314:10
+[incomplete] existsNTooFew: existsN: 1 matched, expected >=2:
+    ./in.cue:324:2
+    ./in.cue:324:10
+[incomplete] existsNDistinct.ab: existsN: 0 matched, expected >=1:
+    ./in.cue:333:3
+    ./in.cue:333:11
+[incomplete] existsNDistinct.ba: existsN: 0 matched, expected >=1:
+    ./in.cue:339:3
+    ./in.cue:339:11
+[eval] boundReference.existsNRef: existsN: 1 matched, expected 2:
+    ./in.cue:354:3
+    ./in.cue:351:5
+[eval] boundReference.countNRef: countN: 1 matched, expected 2:
+    ./in.cue:359:3
+    ./in.cue:351:5
+[eval] boundReference.countNString: cannot use "x" (type string) as int in argument 1 to countN:
+    ./in.cue:363:16
+    ./in.cue:363:23
+[eval] boundReference.existsNString: cannot use "x" (type string) as int in argument 1 to existsN:
+    ./in.cue:365:3
+    ./in.cue:365:11
+[incomplete] countNElements.#D: countN: element 0 is not a concrete boolean:
+    ./in.cue:384:3
+[eval] countNElements.notBool: countN: element must be a boolean, found int:
+    ./in.cue:389:3
+[eval] existsNStrict.t: existsN: field typo not allowed by closed struct:
+    ./in.cue:399:5
+[cycle] fieldRefPostCheck: circular dependency in evaluation of conditionals: b changed after evaluation:
+    ./review.cue:8:13
+[cycle] selectorPostCheck: circular dependency in evaluation of conditionals: s.b changed after evaluation:
+    ./review.cue:13:13
+[structural_cycle] fieldRefBrokenValue.b.c: structural cycle
+[structural_cycle] selectorBrokenValue.s.b.c: structural cycle
+[incomplete] undefaultedDisjunction.x: exists: unresolved disjunction:
+    ./review.cue:42:14
+[incomplete] undefaultedDisjunction.y: exists: unresolved disjunction:
+    ./review.cue:43:14
+[incomplete] undefaultedDisjunction.z: exists: unresolved disjunction:
+    ./review.cue:48:14
+[eval] validatorKeepsClosed.x.zz: field not allowed:
+    ./review.cue:82:21
+[eval] validatorKeepsClosed.y.zz: field not allowed:
+    ./review.cue:84:21
+[eval] validatorKeepsClosed.z.zz: field not allowed:
+    ./review.cue:85:46
+[eval] subjectOrder.closedDef.b: exists: field zz not allowed by closed struct:
+    ./review.cue:101:6
+[eval] subjectOrder.unifiedDef.b: exists: field zz not allowed by closed struct:
+    ./review.cue:106:6
+[eval] subjectOrder.nestedDef.b: exists: field zz not allowed by closed struct:
+    ./review.cue:113:6
+[eval] subjectOrder.closeCall.b: exists: field zz not allowed by closed struct:
+    ./review.cue:119:6
+[eval] subjectOrder.patterns.r: exists: field zz not allowed by closed struct:
+    ./review.cue:127:6
+[eval] subjectOrder.wrongKind.x: exists: value of type null can never have members:
+    ./review.cue:131:6
+[eval] subjectOrder.wrongKind.y: exists: value of type int can never have members:
+    ./review.cue:132:6
+[eval] subjectOrder.brokenSubject.bt: conflicting values {a:1} and 5 (mismatched types struct and int):
+    ./review.cue:140:7
+    ./review.cue:140:16
+[eval] subjectOrder.brokenSubject.bt: conflicting values {a:1} and 5 (mismatched types struct and int):
+    ./review.cue:140:7
+    ./review.cue:140:16
+[eval] subjectOrder.brokenMember.c.b: conflicting values 2 and 1:
+    ./review.cue:145:12
+    ./review.cue:145:22
+    ./review.cue:145:26
+[eval] subjectOrder.brokenMember.x: exists: field zz not allowed by closed struct:
+    ./review.cue:146:6
+[eval] inlineClose.x: exists: field typo not allowed by closed struct:
+    ./review.cue:154:5
+[eval] inlineClose.y: exists: field typo not allowed by closed struct:
+    ./review.cue:155:5
+[incomplete] countNDefaultedList.y: countN: second argument is not a resolved list:
+    ./review.cue:180:3
+[incomplete] countNOpenList.#AtLeastOne: countN: 0 matched, expected >=1:
+    ./review.cue:193:3
+    ./review.cue:193:10
+[eval] countNOpenList.two: countN: 2 matched, expected <=1:
+    ./review.cue:201:3
+    ./review.cue:201:10
+[eval] countNOpenList.over: countN: 2 matched, expected <=1:
+    ./review.cue:213:3
+    ./review.cue:213:10
+[eval] 1: conflicting values 2 and 1:
+    ./review.cue:223:20
+    ./review.cue:223:24
+[eval] 0: conflicting values 2 and 1:
+    ./review.cue:228:14
+    ./review.cue:228:18
+[eval] countNElementOrder.c: countN: element must be a boolean, found int:
+    ./review.cue:233:3
+[incomplete] compoundBound.tooFew: existsN: 2 matched, expected >=3 & <=4:
+    ./review.cue:252:3
+    ./review.cue:252:11
+    ./review.cue:252:17
+[eval] compoundBound.never: existsN: 2 matched, expected >=5 & <=6:
+    ./review.cue:257:3
+    ./review.cue:257:11
+    ./review.cue:257:17
+[eval] compoundBound.tooMany: countN: 3 matched, expected 1 | 2:
+    ./review.cue:262:3
+[eval] clauseVariables.key.0: exists: argument must be a field reference, selector, or index expression:
+    ./review.cue:274:26
+[eval] clauseVariables.key.1: exists: argument must be a field reference, selector, or index expression:
+    ./review.cue:274:26
+[eval] clauseVariables.value.0: exists: argument must be a field reference, selector, or index expression:
+    ./review.cue:275:26
+[eval] clauseVariables.value.1: exists: argument must be a field reference, selector, or index expression:
+    ./review.cue:275:26
+[eval] clauseVariables.count.0: existsN: argument must be a field reference, selector, or index expression:
+    ./review.cue:276:26
+[eval] clauseVariables.count.1: existsN: argument must be a field reference, selector, or index expression:
+    ./review.cue:276:26
+[eval] clauseVariables.letVar.x: exists: argument must be a field reference, selector, or index expression:
+    ./review.cue:281:6
+-- out/eval/stats --
+Leaks:  75
+Freed:  740
+Reused: 673
+Allocs: 142
+Retain: 0
+
+Unifications: 773
+Conjuncts:    1104
+Disjuncts:    36
+
+NumCloseIDs: 26

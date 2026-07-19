@@ -47,6 +47,15 @@ type cmpCtx struct {
 	// innerAttrText is the raw text of the inner @test(err,...) attribute
 	// (used to locate it within the outer @test(eq,...) source text).
 	posWriteback func(innerAttrText string, positions []token.Pos)
+	// experiments, when non-empty, is a source prefix of file attributes (e.g.
+	// "@version(v0.19.0)\n@experiment(predicates)\n") that carries the
+	// language version and experiments of the file under test; see
+	// [fileExperimentPrefix]. Expected expressions in @test(eq, ...) that are
+	// builtin calls or selectors are compiled with this prefix so they may
+	// reference experiment-gated builtins (such as countN). Empty means the
+	// expression is compiled with a bare BuildExpr at the default language
+	// version (the common case).
+	experiments string
 }
 
 // CompareExpr compares a parsed CUE AST expression against an evaluated
@@ -120,7 +129,7 @@ func (c *cmpCtx) astCmp(path cue.Path, expr ast.Expr, val cue.Value) error {
 		}
 		return nil
 	case *ast.CallExpr, *ast.SelectorExpr:
-		return cmpBuiltinExpr(path, expr, val)
+		return c.cmpBuiltinExpr(path, expr, val)
 	}
 	return pathErr(path, "unsupported AST node type %T", expr)
 }
@@ -1087,9 +1096,21 @@ func toStr(expr ast.Expr) string {
 // cmpBuiltinExpr compiles expr using InferBuiltins so that unresolved
 // package-qualified references (e.g. struct.MaxFields(2), math.Pi) resolve to
 // CUE builtin packages, then compares the resulting value against val.
-func cmpBuiltinExpr(path cue.Path, expr ast.Expr, val cue.Value) error {
+//
+// When the file under test enables per-file experiments (c.experiments), expr
+// is compiled as the file-level embedding of a synthetic file whose attributes
+// carry the file's language version and experiments, so it may reference
+// experiment-gated builtins (e.g. countN). The synthetic file is compiled in
+// val's context so the resulting value is comparable to val.
+func (c *cmpCtx) cmpBuiltinExpr(path cue.Path, expr ast.Expr, val cue.Value) error {
 	ctx := value.Context(val)
-	expected := ctx.BuildExpr(expr, cue.InferBuiltins(true))
+	var expected cue.Value
+	if c.experiments != "" {
+		src := c.experiments + toStr(expr) + "\n"
+		expected = ctx.CompileString(src, cue.InferBuiltins(true))
+	} else {
+		expected = ctx.BuildExpr(expr, cue.InferBuiltins(true))
+	}
 	if err := expected.Err(); err != nil {
 		return pathErr(path, "cannot compile expression %s: %v", toStr(expr), err)
 	}

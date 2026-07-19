@@ -3,6 +3,7 @@
 # involving nested definitions with spec disjunctions and if-guard comprehensions.
 # https://cuelang.org/issue/2209
 -- input.cue --
+@experiment(predicates)
 full: {
 	Foo: #Abstract & {spec: foo: {}}
 	Bar: #Abstract & {spec: bar: {}}
@@ -128,7 +129,7 @@ full: {
 	})
 }
 
-reduced: {
+reducedA: {
 	Foo: #Obj & {spec: foo: {}}
 	Bar: #Obj & {spec: bar: {}}
 
@@ -173,18 +174,66 @@ reduced: {
 		#Out: *{minFoo: int, nullFoo: null} | *{minBar: int, nullFoo: null} | {minFoo: int, nullBar: null} | {minBar: int, nullBar: null}
 	})
 }
+reducedB: {
+	Foo: #Obj & {spec: foo: {}}
+	Bar: #Obj & {spec: bar: {}}
+
+	#Obj: {
+		let X = self
+		spec: *#SpecFoo | #SpecBar
+
+		out: #Out & {
+			_Xspec: X.spec
+			// _Xspec is a closed definition selected from a disjunction:
+			// probing a field the selected branch does not declare is an
+			// error under strict exists, so use the tolerant fallback form.
+			if *exists(_Xspec.foo) | false {
+				minFoo: _Xspec.foo.min
+			}
+			if *exists(_Xspec.bar) | false {
+				minBar: _Xspec.bar.min
+			}
+		}
+	}
+
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	#Out: {
+		{minFoo: int} | {minBar: int}
+
+		*{nullFoo: null} | {nullBar: null}
+	}
+	@test(eq, {
+		Foo: {
+			spec: {foo: {min: *10 | int}}
+			out: *{_Xspec: {foo: {min: *10 | int}}, minFoo: *10 | int, nullFoo: null} | {_Xspec: {foo: {min: *10 | int}}, minFoo: *10 | int, nullBar: null}
+		}
+		Bar: {
+			spec: {bar: {min: *20 | int}}
+			out: *{_Xspec: {bar: {min: *20 | int}}, minBar: *20 | int, nullFoo: null} | {_Xspec: {bar: {min: *20 | int}}, minBar: *20 | int, nullBar: null}
+		}
+		#Obj: {
+			spec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}
+			out: *{_Xspec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}, minFoo: *10 | int, nullFoo: null} | {_Xspec: *{foo: {min: *10 | int}} | {bar: {min: *20 | int}}, minFoo: *10 | int, nullBar: null}
+		}
+		#SpecFoo: {foo: {min: *10 | int}}
+		#SpecBar: {bar: {min: *20 | int}}
+		#Out: *{minFoo: int, nullFoo: null} | *{minBar: int, nullFoo: null} | {minFoo: int, nullBar: null} | {minBar: int, nullBar: null}
+	})
+}
 -- out/todo.txt --
 full: evalv2 produced errors ("empty disjunction") for full.Bar.resource.spec
 and reduced.Bar.out.minBar; evalv3 evaluates both correctly without errors.
 -- out/eval/stats --
-Leaks:  92
-Freed:  916
-Reused: 847
-Allocs: 161
+Leaks:  114
+Freed:  1100
+Reused: 1052
+Allocs: 162
 Retain: 0
 
-Unifications: 152
-Conjuncts:    967
-Disjuncts:    610
+Unifications: 214
+Conjuncts:    1157
+Disjuncts:    692
 
-NumCloseIDs: 96
+NumCloseIDs: 134

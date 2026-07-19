@@ -1,0 +1,25 @@
+# Tests that an @test(eq, EXPR) expected expression in a file with per-file
+# experiments is compiled at the file's language version, here v0.17.0 as set
+# by the module, rather than at the default version.
+#
+# The predeclared self requires language version v0.18.0, so at v0.17.0 the
+# expectation fails to compile, while at the default version it would compile
+# and match.
+-- in/cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.17.0"
+-- in/test.cue --
+@experiment(try)
+
+v: 1 @test(eq, len([self]))
+-- out/status.txt --
+update: identical to input
+-- out/run/errors.txt --
+path v: cannot compile expression len([self]): predeclared identifier "self" requires language version v0.18.0 or @experiment(aliasv2)
+-- out/force/cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.17.0"
+-- out/force/test.cue --
+@experiment(try)
+
+v: 1 @test(eq, 1)

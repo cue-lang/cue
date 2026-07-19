@@ -354,6 +354,11 @@ func (w *printer) compactNode(n adt.Node) {
 		w.string(x.Name)
 
 	case *adt.BuiltinValidator:
+		if x.Builtin.ValidatorNoSelf && x.Src != nil {
+			// The arguments are unevaluated expressions kept in the call.
+			w.node(x.Src)
+			break
+		}
 		w.node(x.Builtin)
 		w.string("(")
 		for i, a := range x.Args {

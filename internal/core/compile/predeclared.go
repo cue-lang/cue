@@ -33,6 +33,20 @@ func (c *compiler) experimentPredeclared(n *ast.Ident) adt.Expr {
 			return validatorBuiltin
 		}
 	}
+	if c.experiments.Predicates {
+		switch n.Name {
+		case "exists", "__exists":
+			return exists
+		case "existsN", "__existsN":
+			return existsN
+		case "isValid", "__isValid":
+			return isValid
+		case "isConcrete", "__isConcrete":
+			return isConcrete
+		case "countN", "__countN":
+			return countN
+		}
+	}
 	return nil
 }
 

@@ -882,8 +882,12 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		// value is present that would erase top (cc.hasNonTop): if a field is
 		// only associated with a validator, we leave it to the validator to
 		// decide what fields are allowed.
+		//
+		// A self-less validator, such as existsN, is not given the value it
+		// is embedded in, so it decides nothing about the fields allowed
+		// there: it must not open a struct that is otherwise closed.
 		if kind&(ListKind|StructKind) != 0 {
-			if b, ok := x.(*BuiltinValidator); ok && b.Builtin.NonConcrete {
+			if b, ok := x.(*BuiltinValidator); ok && b.Builtin.NonConcrete && !b.Builtin.ValidatorNoSelf {
 				n.updateConjunctInfo(TopKind, id, cHasOpenValidator|cHasTop)
 			} else {
 				n.updateConjunctInfo(TopKind, id, cHasTop)

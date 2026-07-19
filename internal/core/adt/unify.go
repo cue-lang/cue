@@ -572,12 +572,18 @@ func (n *nodeContext) validateScalar() {
 // they are not run again when the value is used in a validator. The errors go
 // to c, which may be a context other than the node's own when that context
 // finalizes the node, as a builtin marshaling its argument does.
+//
+// A validator may suspend the current task: existsN resolves its references
+// cooperatively and yields while a referenced peer is still being computed.
+// The yield unwinds through this loop when the node is finalized from a task
+// of another node. The validator that yielded and those not yet run are then
+// put back, so that they run when the node is processed again.
 func (n *nodeContext) runChecks(c *OpContext) {
 	if len(n.checks) == 0 {
 		return
 	}
 	checks := n.checks
-	n.checks = n.checks[:0]
+	n.checks = nil
 	// Validators do not run on an erroneous value. Adding the error of a
 	// validator given one would replace a child error with a copy that no
 	// longer leads to the other child errors. A node with conflicting kinds
@@ -585,11 +591,18 @@ func (n *nodeContext) runChecks(c *OpContext) {
 	if n.kind == BottomKind || n.node.IsErr() {
 		return
 	}
-	for _, check := range checks {
+	i := 0
+	defer func() {
+		if i < len(checks) {
+			// Unwound by a yield: restore the checks that did not complete.
+			n.checks = append(checks[i:len(checks):len(checks)], n.checks...)
+		}
+	}()
+	for ; i < len(checks); i++ {
 		// TODO(errors): make Validate return bottom and generate
 		// optimized conflict message. Also track and inject IDs
 		// to determine origin location.s
-		if b := c.Validate(check, n.node); b != nil {
+		if b := c.Validate(checks[i], n.node); b != nil {
 			n.addBottom(b)
 		}
 	}
@@ -697,17 +710,24 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		// as cyclic and re-expands without bound.
 		f := ctx.pushConjunct(MakeConjunct(c.env, c.expr, c.ci))
 
-		v := ctx.evalState(c.expr, Flags{
-			status:    finalized,
-			condition: allKnown,
-			mode:      ignore,
-		})
-		v, _ = ctx.getDefault(v)
-		v = Unwrap(v)
+		ok := true
+		if c.verify != nil {
+			// A reflection builtin committed an answer for c.expr; re-derive
+			// it against the finalized state and require that it still holds.
+			ok = c.verify(ctx, c.env)
+		} else {
+			v := ctx.evalState(c.expr, Flags{
+				status:    finalized,
+				condition: allKnown,
+				mode:      ignore,
+			})
+			v, _ = ctx.getDefault(v)
+			v = Unwrap(v)
 
-		switch _, isError := v.(*Bottom); {
-		case isError == c.expectError:
-		default:
+			_, isError := v.(*Bottom)
+			ok = isError == c.expectError
+		}
+		if !ok {
 			n.node.AddErr(&Bottom{
 				Src:  c.expr.Source(),
 				Code: CycleError,

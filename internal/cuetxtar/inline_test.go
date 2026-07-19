@@ -14,6 +14,7 @@
 package cuetxtar
 
 import (
+	"cmp"
 	"fmt"
 	"slices"
 	"strings"
@@ -969,5 +970,89 @@ func TestTodoQualifierOnClosedAndAllows(t *testing.T) {
 		if cap.failed != tc.fails {
 			t.Errorf("%s: failed=%v, want %v\n%s", tc.src, cap.failed, tc.fails, cap.msgs.String())
 		}
+	}
+}
+
+// TestFileExperimentPrefix verifies that fileExperimentPrefix reproduces the
+// language version and explicitly enabled experiments the parser recorded for
+// a file. The prefix is used to compile @test(eq, ...) expected expressions
+// with the same experiments as the file under test.
+func TestFileExperimentPrefix(t *testing.T) {
+	testCases := []struct {
+		name    string
+		data    string
+		version string // language version the file is parsed with; v0.19.0 if empty
+		want    string
+	}{{
+		name: "none",
+		data: "a: 1\n",
+		want: "",
+	}, {
+		name: "version without experiments",
+		data: "a: 1\n",
+		// Without experiments the expression is built at the default version.
+		version: "v0.17.0",
+		want:    "",
+	}, {
+		name: "single",
+		data: "@experiment(predicates)\n\na: 1\n",
+		want: "@version(v0.19.0)\n@experiment(predicates)\n",
+	}, {
+		name:    "configured version",
+		data:    "@experiment(try)\n\na: 1\n",
+		version: "v0.17.0",
+		want:    "@version(v0.17.0)\n@experiment(try)\n",
+	}, {
+		// The file's own @version takes precedence over the configured one.
+		name: "file version",
+		data: "@version(v0.18.0)\n@experiment(try)\n\na: 1\n",
+		want: "@version(v0.18.0)\n@experiment(try)\n",
+	}, {
+		name: "after comment",
+		data: "// header comment\n@experiment(predicates)\n\na: 1\n",
+		want: "@version(v0.19.0)\n@experiment(predicates)\n",
+	}, {
+		name: "multiple",
+		data: "@experiment(try)\n@experiment(predicates)\n\na: 1\n",
+		want: "@version(v0.19.0)\n@experiment(predicates)\n@experiment(try)\n",
+	}, {
+		name: "list",
+		data: "@experiment(try,predicates)\n\na: 1\n",
+		want: "@version(v0.19.0)\n@experiment(predicates)\n@experiment(try)\n",
+	}, {
+		name: "after other file attribute",
+		data: "@if(x)\n@experiment(predicates)\n\na: 1\n",
+		want: "@version(v0.19.0)\n@experiment(predicates)\n",
+	}, {
+		name: "between other file attributes",
+		data: "@experiment(predicates)\n@if(x)\n@experiment(try)\n\na: 1\n",
+		want: "@version(v0.19.0)\n@experiment(predicates)\n@experiment(try)\n",
+	}, {
+		name: "after package clause before import",
+		data: "package p\n\n@experiment(predicates)\n\nimport \"strings\"\n\na: strings.ToUpper(\"a\")\n",
+		want: "@version(v0.19.0)\n@experiment(predicates)\n",
+	}, {
+		// An attribute after the first declaration is not a file attribute.
+		name: "not after first declaration",
+		data: "@experiment(predicates)\nb: 1\n@experiment(try)\n",
+		want: "@version(v0.19.0)\n@experiment(predicates)\n",
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			version := cmp.Or(tc.version, "v0.19.0")
+			f, err := parser.ParseFile("in.cue", tc.data, parser.Version(version))
+			if err != nil {
+				t.Fatal(err)
+			}
+			pos := f.Decls[len(f.Decls)-1].Pos()
+			if got := fileExperimentPrefix(pos); got != tc.want {
+				t.Errorf("fileExperimentPrefix() = %q, want %q", got, tc.want)
+			}
+		})
+	}
+
+	// A position without a file yields no prefix rather than panicking.
+	if got := fileExperimentPrefix(token.NoPos); got != "" {
+		t.Errorf("fileExperimentPrefix(NoPos) = %q, want empty", got)
 	}
 }

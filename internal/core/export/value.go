@@ -555,6 +555,10 @@ func reparseFunc(src *ast.Func) ast.Expr {
 }
 
 func (e *exporter) builtinValidator(n *adt.BuiltinValidator) ast.Expr {
+	if n.Builtin.ValidatorNoSelf && n.Src != nil {
+		// The arguments are unevaluated expressions kept in the call.
+		return e.adt(n.Env, n.Src)
+	}
 	call := ast.NewCall(e.builtin(n.Builtin))
 	for _, a := range n.Args {
 		call.Args = append(call.Args, e.value(a))

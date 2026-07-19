@@ -103,6 +103,13 @@ Available per-file experiments:
     the experiment. An index on a definition named # is written (#)[i].
     Proposal: https://cuelang.org/issue/1999
 
+  predicates (preview: v0.19.0)
+    predicates enables the predeclared predicate builtins: exists, isValid,
+    isConcrete, and the cardinality validators existsN and countN. They
+    inspect field presence, validity, and concreteness, replacing the
+    historical ` + "`" + `!= _|_` + "`" + ` pattern.
+    Proposal: https://cuelang.org/discussion/4386
+
 
 ## Global Experiments
 

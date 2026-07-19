@@ -1,0 +1,38 @@
+# Tests that @test(eq, EXPR) expected expressions may reference builtins gated
+# behind a per-file @experiment(...) attribute. The expected expression is a
+# builtin call, so it is routed through cmpBuiltinExpr. That compiles it as the
+# embedding of a synthetic file whose attributes carry the file's
+# @experiment(predicates) and language version, so a predicate validator such
+# as countN compiles and compares against the value.
+#
+# Without this, the expected expression would be compiled in a bare context and
+# the run would fail with:
+#   cannot compile expression countN(...): reference "countN" not found
+#
+# The comparison must also see the arguments: countN keeps them as
+# unevaluated expressions, so a call with a different bound or condition
+# list is a different validator, and w must fail.
+-- in/test.cue --
+@experiment(predicates)
+
+// The validator equals the same builtin call written with literal
+// arguments. The expected expression compiles only because the file
+// enables @experiment(predicates).
+v: countN(>=1, [true, true]) @test(eq, countN(>=1, [true, true]))
+
+// A different bound is a different validator.
+w: countN(>=1, [true, true]) @test(eq, countN(2, [true, true]))
+-- out/status.txt --
+update: identical to input
+-- out/run/errors.txt --
+path w: expected countN(2, [true, true]), got countN(>=1, [true, true])
+-- out/force/test.cue --
+@experiment(predicates)
+
+// The validator equals the same builtin call written with literal
+// arguments. The expected expression compiles only because the file
+// enables @experiment(predicates).
+v: countN(>=1, [true, true]) @test(eq, countN(>=1, [true, true]))
+
+// A different bound is a different validator.
+w: countN(>=1, [true, true]) @test(eq, countN(>=1, [true, true]))

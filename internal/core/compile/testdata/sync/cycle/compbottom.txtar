@@ -23,13 +23,18 @@
 //     X: "message: hello"
 //
 // for the simple example.
+//
+// Each test exists in two forms:
+//   - <name>A uses the legacy `X != _|_` / `X == _|_` comparison.
+//   - <name>B uses the new exists() builtin.
 -- in.cue --
+@experiment(predicates)
 import "regexp"
 
 simple: {
 	#message: #"^(message: (?P<message>.*))?$"#
 
-	p1: {
+	p1a: {
 
 		X: "message: hello"
 		#aux: {
@@ -44,9 +49,24 @@ simple: {
 		Y: regexp.FindNamedSubmatch(#message, X)
 		X: #aux.message
 	}
+	p1b: {
+
+		X: "message: hello"
+		#aux: {
+			if !exists(Y.message) {
+				message: ""
+			}
+			if exists(Y.message) {
+				message: "message: " + Y.message
+			}
+		}
+
+		Y: regexp.FindNamedSubmatch(#message, X)
+		X: #aux.message
+	}
 }
 
-medium: {
+mediumA: {
 	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"#
 
 	p1: {
@@ -56,13 +76,9 @@ medium: {
 			host:     "mod.test"
 		}
 
-		// X: "user@example.com"
 		X: #X.userinfo + #X.host
 
 		#X: {
-			// userinfo: "user@"
-			// host:     "mod.test"
-
 			if Y.userinfo == _|_ {
 				userinfo: ""
 			}
@@ -74,10 +90,41 @@ medium: {
 		}
 
 		Y: {
-			// userinfo: "user"
-			// host:     "mod.test"
-
 			if #Y.userinfo != _|_ {
+				userinfo: #Y.userinfo
+			}
+
+			host: #Y.host
+		}
+
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
+	}
+}
+mediumB: {
+	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"#
+
+	p1: {
+
+		Y: {
+			userinfo: "user"
+			host:     "mod.test"
+		}
+
+		X: #X.userinfo + #X.host
+
+		#X: {
+			if !exists(Y.userinfo) {
+				userinfo: ""
+			}
+			if exists(Y.userinfo) {
+				userinfo: Y.userinfo + "@"
+			}
+
+			host: Y.host
+		}
+
+		Y: {
+			if exists(#Y.userinfo) {
 				userinfo: #Y.userinfo
 			}
 
@@ -92,7 +139,7 @@ medium: {
 {
   simple: {
     #message: "^(message: (?P<message>.*))?$"
-    p1: {
+    p1a: {
       X: "message: hello"
       #aux: {
         if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
@@ -105,8 +152,21 @@ medium: {
       Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
       X: 〈0;#aux〉.message
     }
+    p1b: {
+      X: "message: hello"
+      #aux: {
+        if !exists(〈1;Y〉.message) {
+          message: ""
+        }
+        if exists(〈1;Y〉.message) {
+          message: ("message: " + 〈2;Y〉.message)
+        }
+      }
+      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
+      X: 〈0;#aux〉.message
+    }
   }
-  medium: {
+  mediumA: {
     #userHostPort: "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"
     p1: {
       Y: {
@@ -125,6 +185,32 @@ medium: {
       }
       Y: {
         if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+  }
+  mediumB: {
+    #userHostPort: "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"
+    p1: {
+      Y: {
+        userinfo: "user"
+        host: "mod.test"
+      }
+      X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
+      #X: {
+        if !exists(〈1;Y〉.userinfo) {
+          userinfo: ""
+        }
+        if exists(〈1;Y〉.userinfo) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+      }
+      Y: {
+        if exists(〈1;#Y〉.userinfo) {
           userinfo: 〈2;#Y〉.userinfo
         }
         host: 〈1;#Y〉.host

@@ -117,6 +117,14 @@ type File struct {
 	//
 	// Proposal: https://cuelang.org/issue/1999
 	OpenLists bool `experiment:"preview:v0.18.0"`
+
+	// Predicates enables the predeclared predicate builtins: exists, isValid,
+	// isConcrete, and the cardinality validators existsN and countN. They
+	// inspect field presence, validity, and concreteness, replacing the
+	// historical `!= _|_` pattern.
+	//
+	// Proposal: https://cuelang.org/discussion/4386
+	Predicates bool `experiment:"preview:v0.19.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

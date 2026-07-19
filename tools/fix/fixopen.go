@@ -209,7 +209,7 @@ func openCompFieldValue(expr ast.Expr) (ast.Expr, bool) {
 	switch expr.(type) {
 	case *ast.SelectorExpr, *ast.IndexExpr:
 		return addEllipsis(expr), true
-	case *ast.Ident, *ast.BinaryExpr, *ast.ParenExpr:
+	case *ast.Ident, *ast.BinaryExpr, *ast.ParenExpr, *ast.CallExpr:
 		if _, _, f := collectEmbedFlags(expr); f.mayBeClosed() {
 			return addEllipsis(expr), true
 		}

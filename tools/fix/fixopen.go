@@ -174,7 +174,14 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			if c.Modified() && info.shouldReclose() {
 				hasChanges = true
 
-				if isSingleEmbed(n) {
+				// A hoisted close() carries its closing only in the close
+				// flag, so the single-embed shortcuts below would drop it.
+				// They still apply when the embedded expression guarantees
+				// the closing by itself (a definition, with no operand
+				// that needs a runtime check).
+				closeSubsumed := info.def && !info.other && !info.forceReclose
+
+				if isSingleEmbed(n) && (!info.close || closeSubsumed) {
 					// Single embedding: { expr } ≡ expr, so use the
 					// expression directly without wrapping. Strip the
 					// ... since it is not needed outside a wrapper.
@@ -195,13 +202,17 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 					break
 				}
 
-				// Single close()-hoisted embed (bare embedding, no ...):
-				// under old semantics, embedding close() opened up, so
-				// a single close() embed produces an open struct — no
-				// wrapping needed.
+				// Single close()-hoisted embed (bare embedding, no ...).
 				if isSingleBareEmbed(n) {
-					c.ClearEnclosingModified()
-					break
+					if !info.close {
+						c.ClearEnclosingModified()
+						break
+					}
+					// {close(X)} for a struct literal X: unwrap {X} to X
+					// so that the wrapper below restores close(X).
+					if s, ok := n.Elts[0].(*ast.EmbedDecl).Expr.(*ast.StructLit); ok {
+						n = s
+					}
 				}
 
 				ast.SetRelPos(n, token.NoSpace)
@@ -349,9 +360,9 @@ func openEmbedExpr(expr ast.Expr) (result ast.Expr, changed bool, flags embedFla
 		if id, ok := x.Fun.(*ast.Ident); ok {
 			switch id.Name {
 			case "close":
-				// In the old semantics, embedding close() opened up
-				// the embedding — the outer struct stayed open. Under
-				// explicitopen, close() no longer opens up when embedded.
+				// Under the old semantics, embedding close(X) closed the
+				// enclosing struct while still allowing its literal
+				// fields; a strict embedding of close(X) would deny them.
 				// Hoist close() to wrapper level: return the processed
 				// argument as the new embedding, and set the close flag
 				// so the containing struct gets close() wrapping.

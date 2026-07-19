@@ -210,8 +210,6 @@ package foo
 			// Selectors may resolve to closed values just like plain
 			// references, so a conjunction with a selector operand needs
 			// a runtime __reclose check on the enclosing struct.
-			// TODO: the enclosing struct is left unwrapped; it should be
-			// wrapped in __reclose to preserve the old behavior.
 			name: "reclose embeddings of selector conjunctions (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			in: `package foo
@@ -231,10 +229,10 @@ package foo
 #A: a:    int
 h: inner: #A
 
-v: {
+v: __reclose({
 	(h.inner & {a: 1})...
 	extra: 2
-}
+})
 `,
 		},
 
@@ -242,9 +240,6 @@ v: {
 			// Comprehension field values that may resolve to closed
 			// structs via a selector conjunction or an and() call must
 			// be opened like plain references.
-			// TODO: the field values are left untouched; they should
-			// become "(lib.v & {hc: port: 1})..." and "and([lib.v])..."
-			// to preserve the old behavior.
 			name: "open selector and call field values in comprehensions (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			in: `package foo
@@ -263,7 +258,9 @@ lib: v: #HC
 	}
 }
 `,
-			out: `package foo
+			out: `@experiment(explicitopen)
+
+package foo
 
 #HC: hc: {port: 1}
 lib: v:  #HC
@@ -272,10 +269,10 @@ lib: v:  #HC
 	enable: bool
 	egress?: [string]: {...}
 	if enable {
-		egress: lib.v & {hc: port: 1}
+		egress: (lib.v & {hc: port: 1})...
 	}
 	if enable {
-		egress2: and([lib.v])
+		egress2: and([lib.v])...
 	}
 }
 `,
@@ -286,9 +283,6 @@ lib: v:  #HC
 			// with a defaulted definition operand needs a runtime __reclose
 			// check when embedded, and must be opened as a comprehension
 			// field value.
-			// TODO: the enclosing struct is left unwrapped and the field
-			// value untouched; they should get __reclose and "..." to
-			// preserve the old behavior.
 			name: "default marker embedding flags (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			in: `package foo
@@ -314,16 +308,16 @@ package foo
 
 #A: {a: int}
 
-v: {
+v: __reclose({
 	(*#A | {})...
 	extra: 1
-}
+})
 
 #S: {
 	enable: bool
 	x?:     {...}
 	if enable {
-		x: *#A | {}
+		x: (*#A | {})...
 	}
 }
 `,

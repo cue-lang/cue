@@ -64,6 +64,10 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 	var info closeInfo
 	recloseStack := []closeInfo{}
+	// comprehensionDepth tracks whether we are lexically inside a
+	// comprehension value, across field boundaries (unlike
+	// info.inComprehension, which is reset per field).
+	comprehensionDepth := 0
 	result = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n := n.(type) {
@@ -83,6 +87,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		case *ast.Comprehension:
 			info.suspendReclose++
 			info.inComprehension++
+			comprehensionDepth++
 
 		case *ast.EmbedDecl:
 			info.suspendReclose++
@@ -95,6 +100,17 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			recloseStack = recloseStack[:len(recloseStack)-1]
 			c.ClearEnclosingModified()
 
+			// Conjuncts inserted through a comprehension did not close
+			// their fields under the old semantics, like embeddings.
+			// Open field values that may resolve to closed structs so
+			// that the old behavior is preserved.
+			if comprehensionDepth > 0 {
+				if newValue, changed := openCompFieldValue(n.Value); changed {
+					n.Value = newValue
+					hasChanges = true
+				}
+			}
+
 		case *ast.BinaryExpr:
 			if n.Op == token.AND || n.Op == token.OR {
 				info = recloseStack[len(recloseStack)-1]
@@ -105,6 +121,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		case *ast.Comprehension:
 			info.suspendReclose--
 			info.inComprehension--
+			comprehensionDepth--
 
 		case *ast.EmbedDecl:
 			info.suspendReclose--
@@ -183,6 +200,35 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 	}).(*ast.File)
 
 	return result, hasChanges
+}
+
+// openCompFieldValue adds a postfix ellipsis to a field value inside a
+// comprehension when the value may resolve to a closed struct. Under the
+// old semantics, conjuncts inserted through comprehensions were treated
+// like embeddings and did not close their fields.
+func openCompFieldValue(expr ast.Expr) (ast.Expr, bool) {
+	switch x := expr.(type) {
+	case *ast.Ident:
+		if x.Name == "_" {
+			return expr, false
+		}
+		return addEllipsis(expr), true
+	case *ast.SelectorExpr, *ast.IndexExpr:
+		return addEllipsis(expr), true
+	case *ast.BinaryExpr:
+		if x.Op == token.AND || x.Op == token.OR {
+			_, _, f := collectEmbedFlags(x)
+			if f.def || f.other || f.close {
+				return addEllipsis(expr), true
+			}
+		}
+	case *ast.ParenExpr:
+		_, _, f := collectEmbedFlags(x.X)
+		if f.def || f.other || f.close {
+			return addEllipsis(expr), true
+		}
+	}
+	return expr, false
 }
 
 // collectEmbedFlags recurses into an expression to collect embedding flags

@@ -56,6 +56,11 @@ type closeInfo struct {
 	// for comprehensions, nested structs, etc.
 	suspendReclose int
 
+	// The scope is the value of a comprehension, not a field nested
+	// inside one. Only embeddings declared directly in a comprehension
+	// value lose the old conditional closing and get a TODO comment.
+	compValue bool
+
 	embedFlags
 }
 
@@ -88,7 +93,12 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		switch n := n.(type) {
 		case *ast.Field:
 			next := closeInfo{}
-			if internal.IsDefinition(n.Label) {
+			// Fields with definition labels reclose on their own. Fields
+			// inside comprehensions never wrap: conjuncts inserted through
+			// comprehensions did not close under the old semantics (see
+			// openCompFieldValue), so a wrapper would deny fields that the
+			// old semantics allowed.
+			if internal.IsDefinition(n.Label) || comprehensionDepth > 0 {
 				next.suspendReclose = 1
 			}
 			pushScope(next)
@@ -108,7 +118,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			// struct's fields, breaking self-referential guards. Opened
 			// embeddings inside comprehension values are instead flagged
 			// with a TODO comment.
-			pushScope(closeInfo{suspendReclose: 1})
+			pushScope(closeInfo{suspendReclose: 1, compValue: true})
 			comprehensionDepth++
 
 		case *ast.EmbedDecl:
@@ -148,7 +158,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			newExpr, exprChanged, flags := openEmbedExpr(n.Expr)
 			info.embedFlags = info.embedFlags.or(flags)
 			if exprChanged {
-				if comprehensionDepth > 0 {
+				if info.compValue {
 					ast.AddComment(newExpr, todoComment(
 						"the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case."))
 				}

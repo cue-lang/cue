@@ -112,30 +112,30 @@ embeddedSel: {
 }
 
 // Definition in comprehension → TODO.
-compDef: __closeAll({
+compDef: {
 	for v in _repo {
-		// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case.
 		#D...
 	}
-})
+}
 
 // Non-def reference in comprehension → TODO.
-compRef: __reclose({
+compRef: {
 	for v in _repo {
-		// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case.
 		v...
 	}
-})
+}
 
 // Comprehension inside a list.
 inList: {
 	steps: [
 		for v in _repo.checkoutCode {
-			// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+			// TODO(cue-fix): the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case.
 			v...
 		},
 		for v in _repo.installGo {
-			// TODO(cue-fix): ... may not be intended inside a comprehension value; consider removing it.
+			// TODO(cue-fix): the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case.
 			v...
 		},
 		{

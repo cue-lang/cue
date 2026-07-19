@@ -176,34 +176,48 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			if c.Modified() && info.shouldReclose() {
 				hasChanges = true
 
-				if isSingleEmbed(n) {
-					// Single embedding: { expr } ≡ expr, so use the
-					// expression directly without wrapping. Strip the
-					// ... since it is not needed outside a wrapper.
-					//
-					// This is done in post-processing (after ... was
-					// added) because at the EmbedDecl pre-visit level
-					// we don't yet know the parent struct's element
-					// count.
-					//
-					// TODO: this incorrectly fires for single-embed
-					// structs inside close() at field-value level,
-					// e.g. a: close({_repo}). Fix by tracking whether
-					// we are inside a close() argument.
-					embed := n.Elts[0].(*ast.EmbedDecl)
-					pf := embed.Expr.(*ast.PostfixExpr)
-					embed.Expr = pf.X
-					c.ClearEnclosingModified()
-					break
-				}
+				// A hoisted close() carries its closing only in the close
+				// flag, so the single-embed shortcuts below would drop it.
+				// They still apply when the embedded expression guarantees
+				// the closing by itself (a definition, with no operand
+				// that needs a runtime check).
+				closeSubsumed := info.def && !info.other && !info.forceReclose
 
-				// Single close()-hoisted embed (bare embedding, no ...):
-				// under old semantics, embedding close() opened up, so
-				// a single close() embed produces an open struct — no
-				// wrapping needed.
-				if isSingleBareEmbed(n) {
-					c.ClearEnclosingModified()
-					break
+				// Single embedding: { expr } ≡ expr, so the wrapper can
+				// often be omitted. This is decided in post-processing
+				// (after ... was added) because at the EmbedDecl
+				// pre-visit level we don't yet know the parent struct's
+				// element count.
+				if embed, ok := singleEmbed(n); ok {
+					if pf, ok := embed.Expr.(*ast.PostfixExpr); ok && pf.Op == token.ELLIPSIS {
+						if !info.close || closeSubsumed {
+							// Use the expression directly without
+							// wrapping; strip the ... since it is not
+							// needed outside a wrapper.
+							//
+							// TODO: this incorrectly fires for
+							// single-embed structs inside close() at
+							// field-value level, e.g. a: close({_repo}).
+							// Fix by tracking whether we are inside a
+							// close() argument.
+							embed.Expr = pf.X
+							c.ClearEnclosingModified()
+							break
+						}
+					} else {
+						// A bare embedding: the struct argument of a
+						// hoisted close() call.
+						if !info.close {
+							c.ClearEnclosingModified()
+							break
+						}
+						// {close(X)} for a struct literal X: unwrap {X}
+						// to X so that the wrapper below restores
+						// close(X).
+						if s, ok := embed.Expr.(*ast.StructLit); ok {
+							n = s
+						}
+					}
 				}
 
 				ast.SetRelPos(n, token.NoSpace)
@@ -334,9 +348,9 @@ func openEmbedExpr(expr ast.Expr) (result ast.Expr, changed bool, flags embedFla
 
 	case *ast.CallExpr:
 		if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "close" {
-			// In the old semantics, embedding close() opened up
-			// the embedding — the outer struct stayed open. Under
-			// explicitopen, close() no longer opens up when embedded.
+			// Under the old semantics, embedding close(X) closed the
+			// enclosing struct while still allowing its literal
+			// fields; a strict embedding of close(X) would deny them.
 			// Hoist close() to wrapper level: return the processed
 			// argument as the new embedding, and set the close flag
 			// so the containing struct gets close() wrapping.
@@ -392,32 +406,14 @@ func openCloseArg(expr ast.Expr) (ast.Expr, bool, embedFlags) {
 	return &newStruct, true, f
 }
 
-// isSingleEmbed reports whether s contains exactly one declaration
-// which is an embedding with postfix ellipsis (...).
-func isSingleEmbed(s *ast.StructLit) bool {
+// singleEmbed returns the sole element of s if it is a single embedded
+// declaration.
+func singleEmbed(s *ast.StructLit) (*ast.EmbedDecl, bool) {
 	if len(s.Elts) != 1 {
-		return false
+		return nil, false
 	}
-	embed, ok := s.Elts[0].(*ast.EmbedDecl)
-	if !ok {
-		return false
-	}
-	pf, ok := embed.Expr.(*ast.PostfixExpr)
-	if !ok || pf.Op != token.ELLIPSIS {
-		return false
-	}
-	return true
-}
-
-// isSingleBareEmbed reports whether s contains exactly one declaration
-// which is an embedding without postfix ellipsis. This occurs when a
-// close() call was hoisted and its struct argument became a bare embedding.
-func isSingleBareEmbed(s *ast.StructLit) bool {
-	if len(s.Elts) != 1 {
-		return false
-	}
-	_, ok := s.Elts[0].(*ast.EmbedDecl)
-	return ok
+	e, ok := s.Elts[0].(*ast.EmbedDecl)
+	return e, ok
 }
 
 func addEllipsis(expr ast.Expr) *ast.PostfixExpr {

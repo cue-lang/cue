@@ -405,6 +405,7 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 				n.reqDefIDs[i].ignore = false
 				n.reqDefIDs[i].parent = id.outerID
 				n.reqDefIDs[i].embed = id.enclosingEmbed
+				n.reqDefIDs[i].conjunctOpened = id.ConjunctOpened
 			}
 			break
 		}

@@ -143,7 +143,7 @@ derivedDef: {
 		})
 	}
 
-	ctx: n & {globals: #B} @test(err, code=eval, contains="field not allowed", pos=[-4:4]) @test(eq:todo, {globals: {f: "ns"}, s: {f: "ns", extra: "x"}})
+	ctx: n & {globals: #B} @test(eq, {globals: {f: "ns"}, s: {f: "ns", extra: "x"}})
 }
 
 -- old.cue --
@@ -175,8 +175,6 @@ retro: {
     ./in.cue:116:8
     ./in.cue:125:11
     ./in.cue:125:15
-[eval] derivedDef.ctx.s.extra: field not allowed:
-    ./in.cue:141:4
 [eval] retro.t1.err: error in call to __reclose: __reclose may only be used when explicitopen is enabled:
     ./old.cue:3:11
 -- out/eval/stats --

@@ -1,0 +1,83 @@
+// Dependencies through the explicitopen spread operator (...), as
+// emitted by cue fix --exp=explicitopen for task values inside
+// comprehensions.
+//
+// TODO: the reference to producer inside the spread is not tracked:
+// the graph lacks a t1-->t0 edge and consumer runs before producer.
+
+-- in.cue --
+@experiment(explicitopen)
+
+root: [string]: $id: "valToOut"
+
+_template: {}
+
+root: {
+	producer: {
+		x: 3
+	}
+
+	// The task value is a spread conjunction; its reference to
+	// producer must still be tracked as a task dependency.
+	consumer: (_template & {
+		x: producer.x
+	})...
+}
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.producer [Ready]")
+  t1("root.consumer [Ready]")
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.producer [Running]")
+  t1("root.consumer [Terminated]")
+
+-- out/run-v3/t1/value --
+{
+	$id: "valToOut"
+	x:   3
+}
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   1
+-- out/run-v3/t2 --
+graph TD
+  t0("root.producer [Terminated]")
+  t1("root.consumer [Terminated]")
+
+-- out/run-v3/t2/value --
+{
+	$id: "valToOut"
+	x:   3
+}
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   1

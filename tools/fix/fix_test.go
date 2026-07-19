@@ -207,6 +207,81 @@ package foo
 		},
 
 		{
+			// Selectors may resolve to closed values just like plain
+			// references, so a conjunction with a selector operand needs
+			// a runtime __reclose check on the enclosing struct.
+			// TODO: the enclosing struct is left unwrapped; it should be
+			// wrapped in __reclose to preserve the old behavior.
+			name: "reclose embeddings of selector conjunctions (fixExplicitOpen)",
+			exps: []string{"explicitopen"},
+			in: `package foo
+
+#A: a: int
+h: inner: #A
+
+v: {
+	h.inner & {a: 1}
+	extra: 2
+}
+`,
+			out: `@experiment(explicitopen)
+
+package foo
+
+#A: a:    int
+h: inner: #A
+
+v: {
+	(h.inner & {a: 1})...
+	extra: 2
+}
+`,
+		},
+
+		{
+			// Comprehension field values that may resolve to closed
+			// structs via a selector conjunction or an and() call must
+			// be opened like plain references.
+			// TODO: the field values are left untouched; they should
+			// become "(lib.v & {hc: port: 1})..." and "and([lib.v])..."
+			// to preserve the old behavior.
+			name: "open selector and call field values in comprehensions (fixExplicitOpen)",
+			exps: []string{"explicitopen"},
+			in: `package foo
+
+#HC: hc: {port: 1}
+lib: v: #HC
+
+#Service: {
+	enable: bool
+	egress?: [string]: {...}
+	if enable {
+		egress: lib.v & {hc: port: 1}
+	}
+	if enable {
+		egress2: and([lib.v])
+	}
+}
+`,
+			out: `package foo
+
+#HC: hc: {port: 1}
+lib: v:  #HC
+
+#Service: {
+	enable: bool
+	egress?: [string]: {...}
+	if enable {
+		egress: lib.v & {hc: port: 1}
+	}
+	if enable {
+		egress2: and([lib.v])
+	}
+}
+`,
+		},
+
+		{
 			// The old comprehension opening also overrides an explicit
 			// close() in a field value: sibling entries added elsewhere
 			// remain allowed.

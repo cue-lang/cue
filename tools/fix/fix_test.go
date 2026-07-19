@@ -176,8 +176,6 @@ v: __closeAll({
 			// comprehensions are treated like embeddings and do not close
 			// their fields. Field values that may resolve to closed
 			// structs must be opened to preserve that behavior.
-			// TODO: the egress value is left untouched; it should become
-			// "#HC..." so that sibling entries of egress remain allowed.
 			name: "open field values in comprehensions (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			in: `package foo
@@ -192,7 +190,9 @@ v: __closeAll({
 	}
 }
 `,
-			out: `package foo
+			out: `@experiment(explicitopen)
+
+package foo
 
 #HC: hc: {port: 1}
 
@@ -200,7 +200,7 @@ v: __closeAll({
 	enable: bool
 	egress?: [string]: {...}
 	if enable {
-		egress: #HC
+		egress: #HC...
 	}
 }
 `,

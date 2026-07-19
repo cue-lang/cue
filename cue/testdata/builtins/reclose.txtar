@@ -128,6 +128,24 @@ nonStructDefinitions: {
 		args=[{b:1}, 1, struct, int], pos=[-9:8, 0:11, 0:15])
 }
 
+// The vertex spread into a __reclose'd struct may elsewhere be unified
+// with a definition that expands to a conjunction (#B: #A & {...}).
+// Fields declared in the __reclose literal must remain allowed.
+derivedDef: {
+	#A: {f: string}
+	#B: #A & {f: "ns"}
+
+	n: {
+		globals: #A
+		s: __reclose({
+			globals...
+			extra: "x"
+		})
+	}
+
+	ctx: n & {globals: #B} @test(err, code=eval, contains="field not allowed", pos=[-4:4]) @test(eq:todo, {globals: {f: "ns"}, s: {f: "ns", extra: "x"}})
+}
+
 -- old.cue --
 retro: {
 	// May not be used if explicitopen is not set.
@@ -157,17 +175,19 @@ retro: {
     ./in.cue:116:8
     ./in.cue:125:11
     ./in.cue:125:15
+[eval] derivedDef.ctx.s.extra: field not allowed:
+    ./in.cue:141:4
 [eval] retro.t1.err: error in call to __reclose: __reclose may only be used when explicitopen is enabled:
     ./old.cue:3:11
 -- out/eval/stats --
 Leaks:  0
-Freed:  281
-Reused: 250
-Allocs: 31
+Freed:  303
+Reused: 271
+Allocs: 32
 Retain: 0
 
-Unifications: 206
-Conjuncts:    445
+Unifications: 224
+Conjuncts:    496
 Disjuncts:    0
 
-NumCloseIDs: 102
+NumCloseIDs: 120

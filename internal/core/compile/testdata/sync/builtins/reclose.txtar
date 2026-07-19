@@ -121,6 +121,24 @@ nonStructDefinitions: {
 	t2: err: a & {b: 1}
 }
 
+// The vertex spread into a __reclose'd struct may elsewhere be unified
+// with a definition that expands to a conjunction (#B: #A & {...}).
+// Fields declared in the __reclose literal must remain allowed.
+derivedDef: {
+	#A: {f: string}
+	#B: #A & {f: "ns"}
+
+	n: {
+		globals: #A
+		s: __reclose({
+			globals...
+			extra: "x"
+		})
+	}
+
+	ctx: n & {globals: #B}
+}
+
 -- old.cue --
 retro: {
 	// May not be used if explicitopen is not set.
@@ -310,6 +328,24 @@ retro: {
         b: 1
       })
     }
+  }
+  derivedDef: {
+    #A: {
+      f: string
+    }
+    #B: (〈0;#A〉 & {
+      f: "ns"
+    })
+    n: {
+      globals: 〈1;#A〉
+      s: __reclose({
+        〈1;globals〉...
+        extra: "x"
+      })
+    }
+    ctx: (〈0;n〉 & {
+      globals: 〈1;#B〉
+    })
   }
 }
 --- old.cue

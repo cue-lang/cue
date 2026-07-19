@@ -25,6 +25,7 @@ type BuiltinCallContext struct {
 	call        *CallExpr
 	builtin     *Builtin
 	args        []Value
+	rawArgs     []Value
 	isValidator bool
 }
 
@@ -41,6 +42,29 @@ func (c BuiltinCallContext) Pos() token.Pos {
 
 func (c BuiltinCallContext) Value(i int) Value {
 	return c.args[i]
+}
+
+// RawValue returns the ith argument like Value, except that if the argument
+// as evaluated was a wrapper vertex of that same final argument, such as the
+// one close() produces to record closedness, it returns the wrapper instead.
+//
+// In all other cases it returns exactly Value(i). In particular, this holds
+// for an argument that was rewritten after evaluation, for instance by a
+// parameter constraint of an attached function type, a per-disjunct call, or
+// a filled-in default, so that RawValue never exposes a stale argument.
+func (c BuiltinCallContext) RawValue(i int) Value {
+	arg := c.args[i]
+	if i >= len(c.rawArgs) {
+		return arg
+	}
+	raw, ok := c.rawArgs[i].(*Vertex)
+	if !ok || raw == arg {
+		return arg
+	}
+	if v, ok := arg.(*Vertex); !ok || Unwrap(raw) != Value(v) {
+		return arg
+	}
+	return raw
 }
 
 // NumParams returns the total number of parameters to this function.

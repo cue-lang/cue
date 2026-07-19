@@ -1,0 +1,163 @@
+# Tests for reflect.Allows: reports whether a given selector is allowed on an
+# object. An ordinary function: closedness must survive the argument path,
+# including for inline close(...) arguments.
+
+-- in.cue --
+@experiment(predicates)
+
+import "reflect"
+
+// Open struct: any string label allowed.
+openStruct: {
+	s: {a: 1, b: 2}
+	yesA:  reflect.Allows(s, "a")    @test(eq, true)
+	yesNo: reflect.Allows(s, "nope") @test(eq, true)
+}
+
+// Closed struct: only declared labels allowed.
+closedStruct: {
+	#Def: {a: int, b?: int}
+	yesA: reflect.Allows(#Def, "a") @test(eq, true)
+	yesB: reflect.Allows(#Def, "b") @test(eq, true)
+	noC:  reflect.Allows(#Def, "c") @test(eq, false)
+
+	d: close({a: 1})
+	noD: reflect.Allows(d, "b") @test(eq, false) // closed, "b" not allowed
+}
+
+// Open list: indices below length are valid, beyond are still allowed.
+openList: {
+	xs: [1, 2, 3, ...]
+	in0: reflect.Allows(xs, 0) @test(eq, true)
+	in2: reflect.Allows(xs, 2) @test(eq, true)
+	in5: reflect.Allows(xs, 5) @test(eq, true)
+}
+
+// Closed list: indices below length valid, beyond rejected.
+closedList: {
+	xs: [1, 2, 3]
+	in0:  reflect.Allows(xs, 0) @test(eq, true)
+	in2:  reflect.Allows(xs, 2) @test(eq, true)
+	oob3: reflect.Allows(xs, 3) @test(eq, false)
+}
+
+// An index that no list can have is never allowed, even on an open list:
+// a negative index, one beyond what an index can represent, and one beyond
+// int64. These are false, not errors.
+impossibleIndex: {
+	open:  [1, 2, ...]
+	neg:   reflect.Allows([1, 2], -1)                       @test(eq, false)
+	negO:  reflect.Allows(open, -1)                         @test(eq, false)
+	huge:  reflect.Allows([1], 1099511627776)               @test(eq, false)
+	hugeO: reflect.Allows(open, 1099511627776)              @test(eq, false)
+	big:   reflect.Allows([1], 100000000000000000000000)    @test(eq, false)
+	bigO:  reflect.Allows(open, 100000000000000000000000)   @test(eq, false)
+}
+
+// Allows is an ordinary function: a disjunction argument resolves to its
+// default first, and one without a default leaves the call incomplete.
+disjunction: {
+	#A: a: int
+	#B: b: int
+	defaulted: reflect.Allows(*#A | #B, "b") @test(eq, false)
+	noDefault: reflect.Allows(#A | #B, "b") @test(err, code=incomplete, contains="unresolved disjunction")
+}
+
+// Closing a struct inline as a builtin argument retains its closedness, just
+// as the field-bound form (closedStruct.noD above) does. Existing fields and
+// labels admitted by a pattern constraint are still allowed.
+inlineClose: {
+	noB:     reflect.Allows(close({a: 1}), "b")                @test(eq, false)
+	yesA:    reflect.Allows(close({a: 1}), "a")                @test(eq, true)
+	pattern: reflect.Allows(close({a: 1, [string]: int}), "b") @test(eq, true)
+}
+
+// Kind-mismatched labels can never appear: false, not an error.
+kindMismatch: {
+	s: {a: 1}
+	intOnStruct: reflect.Allows(s, 3)          @test(eq, false)
+	strOnList:   reflect.Allows([1, 2], "a")   @test(eq, false)
+}
+
+// The strictness escape hatch, worked through. Selecting a variant from a
+// defaulted disjunction of definitions and probing it with a bare exists is
+// an error: the default is closed, so a label it does not declare can never
+// appear. Allows is the query view of the same lattice fact and answers
+// false instead, so guarding the probe with it makes the idiom total.
+// && short-circuits, and chained if clauses compose the same way.
+escapeHatch: {
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	spec: *#SpecFoo | #SpecBar
+
+	// Guarded with chained if clauses, which short-circuit on their own:
+	// the probe is only reached for a label the variant admits. The &&
+	// spelling of the same guard is in shortcircuit.cue.
+	picked: {
+		if reflect.Allows(spec, "foo") if exists(spec.foo) {
+			minFoo: spec.foo.min
+		}
+		if reflect.Allows(spec, "bar") if exists(spec.bar) {
+			minBar: spec.bar.min
+		}
+		@test(eq, {minFoo: *10 | int})
+	}
+
+	// The guard itself, per label: the default admits foo, never bar.
+	allowsFoo: reflect.Allows(spec, "foo") @test(eq, true)
+	allowsBar: reflect.Allows(spec, "bar") @test(eq, false)
+}
+
+// The closedness of an inline close() is observed for the default of a
+// disjunction too.
+inlineCloseDefault: {
+	a: reflect.Allows(close(*{a: 1} | {b: 2}), "a")   @test(eq, true)
+	b: reflect.Allows(close(*{a: 1} | {b: 2}), "b")   @test(eq, false)
+}
+-- shortcircuit.cue --
+// The && spelling of the escape hatch, which is how the composition reads
+// in practice. It needs the shortcircuit experiment beside predicates: with
+// predicates alone both operands are evaluated, so the exists probe raises
+// the closedness error the guard exists to avoid.
+@experiment(predicates,shortcircuit)
+
+import "reflect"
+
+sc: {
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	spec: *#SpecFoo | #SpecBar
+
+	// The guard settles the answer, so the probe is never evaluated for a
+	// label the variant does not admit: false, not an error.
+	andFoo: reflect.Allows(spec, "foo") && exists(spec.foo) @test(eq, true)
+	andBar: reflect.Allows(spec, "bar") && exists(spec.bar) @test(eq, false)
+
+	picked: {
+		if reflect.Allows(spec, "foo") && exists(spec.foo) {
+			minFoo: spec.foo.min
+		}
+		if reflect.Allows(spec, "bar") && exists(spec.bar) {
+			minBar: spec.bar.min
+		}
+		@test(eq, {minFoo: *10 | int})
+	}
+}
+
+-- out/errors.txt --
+[incomplete] disjunction.noDefault: unresolved disjunction {a:int} | {b:int} (type struct):
+    ./in.cue:58:13
+-- out/eval/stats --
+Leaks:  3
+Freed:  159
+Reused: 131
+Allocs: 31
+Retain: 0
+
+Unifications: 134
+Conjuncts:    168
+Disjuncts:    28
+
+NumCloseIDs: 9

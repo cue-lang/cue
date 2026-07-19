@@ -1,0 +1,64 @@
+# Composition of reflect.Field with the predicate builtins: Field makes the
+# constraint of an absent field observable, so predicates can ask about the
+# constraint rather than the member.
+
+-- in.cue --
+@experiment(predicates)
+
+import "reflect"
+
+x: {a?: 123}
+y: {a?: int}
+z: {f?: int}
+
+// The member is absent: isConcrete on the reference is false. The
+// constraint, accessed via Field, is concrete.
+m1: isConcrete(x.a)
+c1: isConcrete(reflect.Field(x, "a"))
+
+// An abstract constraint is not concrete either way.
+m2: isConcrete(y.a)
+c2: isConcrete(reflect.Field(y, "a"))
+
+// "Could f hold a string?" — test the constraint of an absent field
+// against a type without adding the field.
+u1: isValid(reflect.Field(z, "f") & 5)
+u2: isValid(reflect.Field(z, "f") & "s")
+
+// An undeclared field on an open struct is unconstrained.
+u3: isValid(reflect.Field(z, "other") & "s")
+
+// The closedness of an inline close() is observed for the default of a
+// disjunction too: a field its default cannot have is an error.
+d1: reflect.Field(close(*{a: 1} | {b: 2}), "a")
+d2: reflect.Field(close(*{a: 1} | {b: 2}), "b")
+-- out/compile --
+--- in.cue
+{
+  x: {
+    a?: 123
+  }
+  y: {
+    a?: int
+  }
+  z: {
+    f?: int
+  }
+  m1: isConcrete(〈0;x〉.a)
+  c1: isConcrete(〈import;reflect〉.Field(〈0;x〉, "a"))
+  m2: isConcrete(〈0;y〉.a)
+  c2: isConcrete(〈import;reflect〉.Field(〈0;y〉, "a"))
+  u1: isValid((〈import;reflect〉.Field(〈0;z〉, "f") & 5))
+  u2: isValid((〈import;reflect〉.Field(〈0;z〉, "f") & "s"))
+  u3: isValid((〈import;reflect〉.Field(〈0;z〉, "other") & "s"))
+  d1: 〈import;reflect〉.Field(close((*{
+    a: 1
+  }|{
+    b: 2
+  })), "a")
+  d2: 〈import;reflect〉.Field(close((*{
+    a: 1
+  }|{
+    b: 2
+  })), "b")
+}

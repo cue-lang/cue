@@ -17,6 +17,7 @@
 @experiment(functions)
 
 import (
+	"encoding/json"
 	"list"
 	"path"
 	"strings"
@@ -307,6 +308,21 @@ typeDefaults: {
 	unixX:  unix(["a", "b"])
 	unixOS: unix(["a", "b"], "windows")
 }
+
+// A builtin that takes its argument as a whole value, such as json.Marshal,
+// sees the argument after the type's parameter constraint is applied, and a
+// default declared by the type fills an omitted argument for it too.
+valueArgs: {
+	_f: json.Marshal & func(v: {a: *1 | int, ...}) -> string
+	x:  _f({})
+	y:  _f({b: 2})
+
+	_g: json.Marshal & func(v: _ = {a: 1}) -> string
+	z:  _g()
+
+	// A close() wrapper of the argument is passed through as is.
+	closed: json.Marshal(close({a: 1}))
+}
 -- out/compile --
 --- in.cue
 {
@@ -538,5 +554,22 @@ typeDefaults: {
       "a",
       "b",
     ], "windows")
+  }
+  valueArgs: {
+    _f: (〈import;"encoding/json"〉.Marshal & func(v: {
+      a: (*1|int)
+      ...
+    }) -> string)
+    x: 〈0;_f〉({})
+    y: 〈0;_f〉({
+      b: 2
+    })
+    _g: (〈import;"encoding/json"〉.Marshal & func(v: _ = {
+      a: 1
+    }) -> string)
+    z: 〈0;_g〉()
+    closed: 〈import;"encoding/json"〉.Marshal(close({
+      a: 1
+    }))
   }
 }

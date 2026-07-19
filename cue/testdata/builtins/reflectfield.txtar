@@ -1,0 +1,49 @@
+# Composition of reflect.Field with the predicate builtins: Field makes the
+# constraint of an absent field observable, so predicates can ask about the
+# constraint rather than the member.
+
+-- in.cue --
+@experiment(predicates)
+
+import "reflect"
+
+x: {a?: 123}
+y: {a?: int}
+z: {f?: int}
+
+// The member is absent: isConcrete on the reference is false. The
+// constraint, accessed via Field, is concrete.
+m1: isConcrete(x.a)                    @test(eq, false)
+c1: isConcrete(reflect.Field(x, "a"))  @test(eq, true)
+
+// An abstract constraint is not concrete either way.
+m2: isConcrete(y.a)                    @test(eq, false)
+c2: isConcrete(reflect.Field(y, "a"))  @test(eq, false)
+
+// "Could f hold a string?" — test the constraint of an absent field
+// against a type without adding the field.
+u1: isValid(reflect.Field(z, "f") & 5)      @test(eq, true)
+u2: isValid(reflect.Field(z, "f") & "s")    @test(eq, false)
+
+// An undeclared field on an open struct is unconstrained.
+u3: isValid(reflect.Field(z, "other") & "s") @test(eq, true)
+
+// The closedness of an inline close() is observed for the default of a
+// disjunction too: a field its default cannot have is an error.
+d1: reflect.Field(close(*{a: 1} | {b: 2}), "a")   @test(eq, 1)
+d2: reflect.Field(close(*{a: 1} | {b: 2}), "b")   @test(err, code=eval, contains="field not allowed")
+-- out/errors.txt --
+[eval] d2: error in call to reflect.Field: field not allowed:
+    ./in.cue:29:5
+-- out/eval/stats --
+Leaks:  1
+Freed:  35
+Reused: 18
+Allocs: 18
+Retain: 0
+
+Unifications: 32
+Conjuncts:    51
+Disjuncts:    4
+
+NumCloseIDs: 8

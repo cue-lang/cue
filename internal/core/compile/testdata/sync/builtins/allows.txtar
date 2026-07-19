@@ -1,0 +1,305 @@
+# Tests for reflect.Allows: reports whether a given selector is allowed on an
+# object. An ordinary function: closedness must survive the argument path,
+# including for inline close(...) arguments.
+
+-- in.cue --
+@experiment(predicates)
+
+import "reflect"
+
+// Open struct: any string label allowed.
+openStruct: {
+	s: {a: 1, b: 2}
+	yesA:  reflect.Allows(s, "a")
+	yesNo: reflect.Allows(s, "nope")
+}
+
+// Closed struct: only declared labels allowed.
+closedStruct: {
+	#Def: {a: int, b?: int}
+	yesA: reflect.Allows(#Def, "a")
+	yesB: reflect.Allows(#Def, "b")
+	noC:  reflect.Allows(#Def, "c")
+
+	d: close({a: 1})
+	noD: reflect.Allows(d, "b") // closed, "b" not allowed
+}
+
+// Open list: indices below length are valid, beyond are still allowed.
+openList: {
+	xs: [1, 2, 3, ...]
+	in0: reflect.Allows(xs, 0)
+	in2: reflect.Allows(xs, 2)
+	in5: reflect.Allows(xs, 5)
+}
+
+// Closed list: indices below length valid, beyond rejected.
+closedList: {
+	xs: [1, 2, 3]
+	in0:  reflect.Allows(xs, 0)
+	in2:  reflect.Allows(xs, 2)
+	oob3: reflect.Allows(xs, 3)
+}
+
+// An index that no list can have is never allowed, even on an open list:
+// a negative index, one beyond what an index can represent, and one beyond
+// int64. These are false, not errors.
+impossibleIndex: {
+	open:  [1, 2, ...]
+	neg:   reflect.Allows([1, 2], -1)
+	negO:  reflect.Allows(open, -1)
+	huge:  reflect.Allows([1], 1099511627776)
+	hugeO: reflect.Allows(open, 1099511627776)
+	big:   reflect.Allows([1], 100000000000000000000000)
+	bigO:  reflect.Allows(open, 100000000000000000000000)
+}
+
+// Allows is an ordinary function: a disjunction argument resolves to its
+// default first, and one without a default leaves the call incomplete.
+disjunction: {
+	#A: a: int
+	#B: b: int
+	defaulted: reflect.Allows(*#A | #B, "b")
+	noDefault: reflect.Allows(#A | #B, "b")
+}
+
+// Closing a struct inline as a builtin argument retains its closedness, just
+// as the field-bound form (closedStruct.noD above) does. Existing fields and
+// labels admitted by a pattern constraint are still allowed.
+inlineClose: {
+	noB:     reflect.Allows(close({a: 1}), "b")
+	yesA:    reflect.Allows(close({a: 1}), "a")
+	pattern: reflect.Allows(close({a: 1, [string]: int}), "b")
+}
+
+// Kind-mismatched labels can never appear: false, not an error.
+kindMismatch: {
+	s: {a: 1}
+	intOnStruct: reflect.Allows(s, 3)
+	strOnList:   reflect.Allows([1, 2], "a")
+}
+
+// The strictness escape hatch, worked through. Selecting a variant from a
+// defaulted disjunction of definitions and probing it with a bare exists is
+// an error: the default is closed, so a label it does not declare can never
+// appear. Allows is the query view of the same lattice fact and answers
+// false instead, so guarding the probe with it makes the idiom total.
+// && short-circuits, and chained if clauses compose the same way.
+escapeHatch: {
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	spec: *#SpecFoo | #SpecBar
+
+	// Guarded with chained if clauses, which short-circuit on their own:
+	// the probe is only reached for a label the variant admits. The &&
+	// spelling of the same guard is in shortcircuit.cue.
+	picked: {
+		if reflect.Allows(spec, "foo") if exists(spec.foo) {
+			minFoo: spec.foo.min
+		}
+		if reflect.Allows(spec, "bar") if exists(spec.bar) {
+			minBar: spec.bar.min
+		}
+	}
+
+	// The guard itself, per label: the default admits foo, never bar.
+	allowsFoo: reflect.Allows(spec, "foo")
+	allowsBar: reflect.Allows(spec, "bar")
+}
+
+// The closedness of an inline close() is observed for the default of a
+// disjunction too.
+inlineCloseDefault: {
+	a: reflect.Allows(close(*{a: 1} | {b: 2}), "a")
+	b: reflect.Allows(close(*{a: 1} | {b: 2}), "b")
+}
+-- shortcircuit.cue --
+// The && spelling of the escape hatch, which is how the composition reads
+// in practice. It needs the shortcircuit experiment beside predicates: with
+// predicates alone both operands are evaluated, so the exists probe raises
+// the closedness error the guard exists to avoid.
+@experiment(predicates,shortcircuit)
+
+import "reflect"
+
+sc: {
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	spec: *#SpecFoo | #SpecBar
+
+	// The guard settles the answer, so the probe is never evaluated for a
+	// label the variant does not admit: false, not an error.
+	andFoo: reflect.Allows(spec, "foo") && exists(spec.foo)
+	andBar: reflect.Allows(spec, "bar") && exists(spec.bar)
+
+	picked: {
+		if reflect.Allows(spec, "foo") && exists(spec.foo) {
+			minFoo: spec.foo.min
+		}
+		if reflect.Allows(spec, "bar") && exists(spec.bar) {
+			minBar: spec.bar.min
+		}
+	}
+}
+
+-- out/compile --
+--- in.cue
+{
+  openStruct: {
+    s: {
+      a: 1
+      b: 2
+    }
+    yesA: 〈import;reflect〉.Allows(〈0;s〉, "a")
+    yesNo: 〈import;reflect〉.Allows(〈0;s〉, "nope")
+  }
+  closedStruct: {
+    #Def: {
+      a: int
+      b?: int
+    }
+    yesA: 〈import;reflect〉.Allows(〈0;#Def〉, "a")
+    yesB: 〈import;reflect〉.Allows(〈0;#Def〉, "b")
+    noC: 〈import;reflect〉.Allows(〈0;#Def〉, "c")
+    d: close({
+      a: 1
+    })
+    noD: 〈import;reflect〉.Allows(〈0;d〉, "b")
+  }
+  openList: {
+    xs: [
+      1,
+      2,
+      3,
+      ...,
+    ]
+    in0: 〈import;reflect〉.Allows(〈0;xs〉, 0)
+    in2: 〈import;reflect〉.Allows(〈0;xs〉, 2)
+    in5: 〈import;reflect〉.Allows(〈0;xs〉, 5)
+  }
+  closedList: {
+    xs: [
+      1,
+      2,
+      3,
+    ]
+    in0: 〈import;reflect〉.Allows(〈0;xs〉, 0)
+    in2: 〈import;reflect〉.Allows(〈0;xs〉, 2)
+    oob3: 〈import;reflect〉.Allows(〈0;xs〉, 3)
+  }
+  impossibleIndex: {
+    open: [
+      1,
+      2,
+      ...,
+    ]
+    neg: 〈import;reflect〉.Allows([
+      1,
+      2,
+    ], -1)
+    negO: 〈import;reflect〉.Allows(〈0;open〉, -1)
+    huge: 〈import;reflect〉.Allows([
+      1,
+    ], 1099511627776)
+    hugeO: 〈import;reflect〉.Allows(〈0;open〉, 1099511627776)
+    big: 〈import;reflect〉.Allows([
+      1,
+    ], 100000000000000000000000)
+    bigO: 〈import;reflect〉.Allows(〈0;open〉, 100000000000000000000000)
+  }
+  disjunction: {
+    #A: {
+      a: int
+    }
+    #B: {
+      b: int
+    }
+    defaulted: 〈import;reflect〉.Allows((*〈0;#A〉|〈0;#B〉), "b")
+    noDefault: 〈import;reflect〉.Allows((〈0;#A〉|〈0;#B〉), "b")
+  }
+  inlineClose: {
+    noB: 〈import;reflect〉.Allows(close({
+      a: 1
+    }), "b")
+    yesA: 〈import;reflect〉.Allows(close({
+      a: 1
+    }), "a")
+    pattern: 〈import;reflect〉.Allows(close({
+      a: 1
+      [string]: int
+    }), "b")
+  }
+  kindMismatch: {
+    s: {
+      a: 1
+    }
+    intOnStruct: 〈import;reflect〉.Allows(〈0;s〉, 3)
+    strOnList: 〈import;reflect〉.Allows([
+      1,
+      2,
+    ], "a")
+  }
+  escapeHatch: {
+    #SpecFoo: {
+      foo: {
+        min: (int|*10)
+      }
+    }
+    #SpecBar: {
+      bar: {
+        min: (int|*20)
+      }
+    }
+    spec: (*〈0;#SpecFoo〉|〈0;#SpecBar〉)
+    picked: {
+      if 〈import;reflect〉.Allows(〈1;spec〉, "foo") if exists(〈1;spec〉.foo) {
+        minFoo: 〈2;spec〉.foo.min
+      }
+      if 〈import;reflect〉.Allows(〈1;spec〉, "bar") if exists(〈1;spec〉.bar) {
+        minBar: 〈2;spec〉.bar.min
+      }
+    }
+    allowsFoo: 〈import;reflect〉.Allows(〈0;spec〉, "foo")
+    allowsBar: 〈import;reflect〉.Allows(〈0;spec〉, "bar")
+  }
+  inlineCloseDefault: {
+    a: 〈import;reflect〉.Allows(close((*{
+      a: 1
+    }|{
+      b: 2
+    })), "a")
+    b: 〈import;reflect〉.Allows(close((*{
+      a: 1
+    }|{
+      b: 2
+    })), "b")
+  }
+}
+--- shortcircuit.cue
+{
+  sc: {
+    #SpecFoo: {
+      foo: {
+        min: (int|*10)
+      }
+    }
+    #SpecBar: {
+      bar: {
+        min: (int|*20)
+      }
+    }
+    spec: (*〈0;#SpecFoo〉|〈0;#SpecBar〉)
+    andFoo: (〈import;reflect〉.Allows(〈0;spec〉, "foo") && exists(〈0;spec〉.foo))
+    andBar: (〈import;reflect〉.Allows(〈0;spec〉, "bar") && exists(〈0;spec〉.bar))
+    picked: {
+      if (〈import;reflect〉.Allows(〈1;spec〉, "foo") && exists(〈1;spec〉.foo)) {
+        minFoo: 〈2;spec〉.foo.min
+      }
+      if (〈import;reflect〉.Allows(〈1;spec〉, "bar") && exists(〈1;spec〉.bar)) {
+        minBar: 〈2;spec〉.bar.min
+      }
+    }
+  }
+}

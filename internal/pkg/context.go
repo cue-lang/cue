@@ -50,9 +50,11 @@ func (c *CallCtxt) Schema(i int) Schema {
 	return value.Make(c.ctx, v)
 }
 
-// Value returns a finalized cue.Value for the ith argument.
+// Value returns a finalized cue.Value for the ith argument. It uses the
+// non-unwrapped argument so that closedness recorded by a close() wrapper
+// remains observable.
 func (c *CallCtxt) Value(i int) cue.Value {
-	v := value.Make(c.ctx, c.BuiltinCallContext.Value(i))
+	v := value.Make(c.ctx, c.BuiltinCallContext.RawValue(i))
 	if c.builtin.NonConcrete {
 		// In case NonConcrete is false, the concreteness is already checked
 		// at call time. We may want to use finalize semantics in both cases,

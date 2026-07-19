@@ -17,6 +17,7 @@
 @experiment(functions)
 
 import (
+	"encoding/json"
 	"list"
 	"path"
 	"strings"
@@ -307,114 +308,129 @@ typeDefaults: {
 	unixX:  unix(["a", "b"]) @test(eq, "a/b")
 	unixOS: unix(["a", "b"], "windows") @test(eq, "a\\b")
 }
+
+// A builtin that takes its argument as a whole value, such as json.Marshal,
+// sees the argument after the type's parameter constraint is applied, and a
+// default declared by the type fills an omitted argument for it too.
+valueArgs: {
+	_f: json.Marshal & func(v: {a: *1 | int, ...}) -> string
+	x:  _f({}) @test(eq, "{\"a\":1}")
+	y:  _f({b: 2}) @test(eq, "{\"a\":1,\"b\":2}")
+
+	_g: json.Marshal & func(v: _ = {a: 1}) -> string
+	z:  _g() @test(eq, "{\"a\":1}")
+
+	// A close() wrapper of the argument is passed through as is.
+	closed: json.Marshal(close({a: 1})) @test(eq, "{\"a\":1}")
+}
 -- out/errors.txt --
 [eval] static.tooMany: function type has more positional parameters than builtin strings.ToUpper:
-    ./in.cue:34:51
-    ./in.cue:34:12
-[eval] static.tooFew: builtin strings.ToUpper has more parameters than closed function type:
-    ./in.cue:35:32
+    ./in.cue:35:51
     ./in.cue:35:12
+[eval] static.tooFew: builtin strings.ToUpper has more parameters than closed function type:
+    ./in.cue:36:32
+    ./in.cue:36:12
 [eval] static.badParam: parameter 1 of function type has kind int, conflicting with kind string of builtin strings.ToUpper:
-    ./in.cue:39:42
-    ./in.cue:39:14
-[eval] static.badResult: result of function type has kind int, conflicting with result kind string of builtin strings.ToUpper:
     ./in.cue:40:42
     ./in.cue:40:14
+[eval] static.badResult: result of function type has kind int, conflicting with result kind string of builtin strings.ToUpper:
+    ./in.cue:41:42
+    ./in.cue:41:14
 [eval] static.conflict: conflicting values func(a: string) -> string: ... and strings.ToUpper:
-    ./in.cue:43:15
     ./in.cue:44:15
-    ./in.cue:44:19
-[eval] static.conflictRev: conflicting values func(a: string) -> string: ... and strings.ToUpper:
-    ./in.cue:43:15
     ./in.cue:45:15
-    ./in.cue:45:33
+    ./in.cue:45:19
+[eval] static.conflictRev: conflicting values func(a: string) -> string: ... and strings.ToUpper:
+    ./in.cue:44:15
+    ./in.cue:46:15
+    ./in.cue:46:33
 [eval] dynamic.oob: invalid value "zz" (out of bound <="m"):
-    ./in.cue:52:11
-    ./in.cue:56:10
+    ./in.cue:53:11
+    ./in.cue:57:10
 [eval] dynamic.up2: builtin strings.ToUpper returns string, but its signature requires "HI":
-    ./in.cue:61:7
+    ./in.cue:62:7
 [eval] dynamic.hi: invalid value "zz" (out of bound <="m"):
-    ./in.cue:66:12
-    ./in.cue:70:11
+    ./in.cue:67:12
+    ./in.cue:71:11
 [eval] optionalExtra.bad: parameter sep of function type not allowed by builtin strings.ToUpper: no parameter of the builtin has this label:
-    ./in.cue:88:48
-    ./in.cue:88:8
+    ./in.cue:89:48
+    ./in.cue:89:8
 [eval] labelMatch.optBad: invalid value 5 (out of bound <3):
-    ./in.cue:94:56
-    ./in.cue:96:20
+    ./in.cue:95:56
+    ./in.cue:97:20
 [eval] labelMatch.unknown: parameter times of function type not allowed by builtin strings.Repeat: no parameter of the builtin has this label:
-    ./in.cue:100:29
+    ./in.cue:101:29
 [eval] merge.conflict: conflicting parameter labels q and p for positional parameter 1 in function type and function type:
-    ./in.cue:137:14
+    ./in.cue:138:14
 [eval] merge.ambiguous: ambiguous parameter label p refers to multiple positions:
-    ./in.cue:139:14
+    ./in.cue:140:14
 [eval] unify.distinct: conflicting values strings.ToLower and strings.ToUpper:
-    ./in.cue:148:15
-    ./in.cue:148:33
-[eval] unify.distinctRev: conflicting values strings.ToUpper and strings.ToLower:
     ./in.cue:149:15
     ./in.cue:149:33
-[eval] unify.num: conflicting values 1 and strings.ToUpper (mismatched types int and func):
+[eval] unify.distinctRev: conflicting values strings.ToUpper and strings.ToLower:
     ./in.cue:150:15
     ./in.cue:150:33
-[eval] unify.numRev: conflicting values 1 and strings.ToUpper (mismatched types int and func):
+[eval] unify.num: conflicting values 1 and strings.ToUpper (mismatched types int and func):
     ./in.cue:151:15
-    ./in.cue:151:19
+    ./in.cue:151:33
+[eval] unify.numRev: conflicting values 1 and strings.ToUpper (mismatched types int and func):
+    ./in.cue:152:15
+    ./in.cue:152:19
 [eval] partial.contains: partial application of builtin strings.Contains is not supported:
-    ./in.cue:158:12
-[eval] partial.length: partial application of builtin len is not supported:
     ./in.cue:159:12
+[eval] partial.length: partial application of builtin len is not supported:
+    ./in.cue:160:12
 [eval] polymorphic.any: parameter 1 of builtin len accepts (string|bytes|list|struct), but its signature requires _:
-    ./in.cue:171:9
+    ./in.cue:172:9
 [eval] polymorphic.sBad: conflicting values string and [1,2] (mismatched types string and list):
-    ./in.cue:175:13
-    ./in.cue:178:11
+    ./in.cue:176:13
+    ./in.cue:179:11
 [eval] polymorphic.bad: result of function type has kind string, conflicting with result kind int of builtin len:
-    ./in.cue:181:8
+    ./in.cue:182:8
 [eval] aliases.sp3: builtin strings.Split returns list, but its signature requires {...}:
-    ./in.cue:196:8
+    ./in.cue:197:8
 [eval] labelOrder.ab: parameter x of builtin len accepts (string|bytes|list|struct), but its signature requires (string|int):
-    ./in.cue:206:6
     ./in.cue:207:6
+    ./in.cue:208:6
 [eval] labelOrder.ba: parameter x of builtin len accepts (string|bytes|list|struct), but its signature requires (string|int):
-    ./in.cue:206:6
+    ./in.cue:207:6
 [eval] labeled.errors.unknown: unknown argument lst in call to list.Drop:
-    ./in.cue:225:12
+    ./in.cue:226:12
 [eval] labeled.errors.dup: argument s provided by position and label in call to strings.Repeat:
-    ./in.cue:228:8
+    ./in.cue:229:8
 [eval] labeled.errors.hole: missing argument 2 in call to list.Slice:
-    ./in.cue:231:9
+    ./in.cue:232:9
 [eval] labeled.user.f: builtin strings.SplitN has more parameters than closed function type:
-    ./in.cue:237:6
+    ./in.cue:238:6
 [eval] labeled.user.badName: conflicting parameter labels text and s for positional parameter 1 in function type and function type:
-    ./in.cue:245:50
-    ./in.cue:245:13
+    ./in.cue:246:50
+    ./in.cue:246:13
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:261:43
-    ./in.cue:253:40
-    ./in.cue:262:20
+    ./in.cue:262:43
+    ./in.cue:254:40
+    ./in.cue:263:20
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:261:43
-    ./in.cue:253:40
-    ./in.cue:263:37
+    ./in.cue:262:43
+    ./in.cue:254:40
+    ./in.cue:264:37
 [eval] conflicting defaults for parameter count: conflicting values 3 and 2:
-    ./in.cue:253:40
-    ./in.cue:261:43
-    ./in.cue:264:38
+    ./in.cue:254:40
+    ./in.cue:262:43
+    ./in.cue:265:38
 [eval] conflicting defaults for parameter os: conflicting values "unix" and "windows":
-    ./in.cue:269:60
-    ./in.cue:270:11
-[eval] typeDefaults.joinAny: parameter os of builtin path.Join accepts *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos", but its signature requires string:
+    ./in.cue:270:60
     ./in.cue:271:11
+[eval] typeDefaults.joinAny: parameter os of builtin path.Join accepts *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos", but its signature requires string:
+    ./in.cue:272:11
 -- out/eval/stats --
-Leaks:  16
-Freed:  447
-Reused: 404
-Allocs: 59
+Leaks:  19
+Freed:  477
+Reused: 436
+Allocs: 60
 Retain: 0
 
-Unifications: 265
-Conjuncts:    745
-Disjuncts:    182
+Unifications: 290
+Conjuncts:    785
+Disjuncts:    188
 
-NumCloseIDs: 139
+NumCloseIDs: 143

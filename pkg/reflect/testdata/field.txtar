@@ -1,0 +1,99 @@
+-- in.cue --
+import "reflect"
+
+s: {
+	present:  42
+	broken?:  1 & 2
+	opt?:     123
+	abs?:     int
+	req!:     string
+	[=~"^x"]: int
+	xa?:      >5
+}
+
+// A present regular field: its value.
+t1: reflect.Field(s, "present")
+
+// A declared optional field: its constraint.
+t2: reflect.Field(s, "opt")
+t3: reflect.Field(s, "abs")
+
+// A declared required field: its constraint.
+t4: reflect.Field(s, "req")
+
+// Pattern constraints are unified in, for declared and undeclared names.
+t5: reflect.Field(s, "xa")
+t6: reflect.Field(s, "xz")
+
+// An undeclared field on an open struct with no applicable pattern: top.
+t7: reflect.Field(s, "other")
+
+// A field that can never exist is an error, for a field-bound closed struct
+// and for an inline close() argument alike.
+c: close({a: 1})
+t8: reflect.Field(c, "typo")
+t8b: reflect.Field(close({a: 1}), "typo")
+
+#D: {a: 1}
+t9: reflect.Field(#D, "typo")
+
+// A broken constraint is the field's (error) value: it propagates.
+t10: reflect.Field(s, "broken")
+
+// A non-struct subject is an error.
+t11: reflect.Field("no", "a")
+-- out/reflect-v3 --
+Errors:
+t8: error in call to reflect.Field: field not allowed:
+    ./in.cue:33:5
+t8b: error in call to reflect.Field: field not allowed:
+    ./in.cue:34:6
+t9: error in call to reflect.Field: field not allowed:
+    ./in.cue:37:5
+t10: error in call to reflect.Field: conflicting values 2 and 1:
+    ./in.cue:40:6
+    ./in.cue:5:12
+    ./in.cue:5:16
+t11: error in call to reflect.Field: first argument must be a struct, found string:
+    ./in.cue:43:6
+
+Result:
+s: {
+	present: 42
+	broken?: 1 & 2
+	opt?:    123
+	abs?:    int
+	req!:    string
+	xa?:     int & >5
+}
+
+// A present regular field: its value.
+t1: 42
+
+// A declared optional field: its constraint.
+t2: 123
+t3: int
+
+// A declared required field: its constraint.
+t4: string
+
+// Pattern constraints are unified in, for declared and undeclared names.
+t5: int & >5
+t6: int
+
+// An undeclared field on an open struct with no applicable pattern: top.
+t7: _
+
+// A field that can never exist is an error, for a field-bound closed struct
+// and for an inline close() argument alike.
+c: a: 1
+t8:  _|_ // t8: error in call to reflect.Field: c.typo: field not allowed
+t8b: _|_ // t8b: error in call to reflect.Field: typo: field not allowed
+#D: a: 1
+t9: _|_ // t9: error in call to reflect.Field: #D.typo: field not allowed
+
+// A broken constraint is the field's (error) value: it propagates.
+t10: _|_ // t10: error in call to reflect.Field: s.broken: conflicting values 2 and 1
+
+// A non-struct subject is an error.
+t11: _|_ // t11: error in call to reflect.Field: first argument must be a struct, found string

@@ -2710,6 +2710,28 @@ func (c *OpContext) RegisterPostCheck(x Expr, verify func(c *OpContext, env *Env
 	}
 }
 
+// wrappedDefault returns the single default of v if v is a disjunction that
+// has one, following defaults through nested disjunctions as
+// [resolveDefault] does. Unlike resolveDefault and [DefaultDisjunct], it
+// does not look through a vertex that is not a disjunction, so that the
+// default is returned along with a wrapper it may have, such as the one
+// close() produces.
+func wrappedDefault(v Value) Value {
+	for {
+		var d *Disjunction
+		switch x := v.(type) {
+		case *Vertex:
+			d, _ = x.BaseValue.(*Disjunction)
+		case *Disjunction:
+			d = x
+		}
+		if d == nil || d.NumDefaults != 1 {
+			return v
+		}
+		v = d.Values[0]
+	}
+}
+
 // A CallExpr represents a call to a builtin.
 //
 //	len(x)
@@ -2888,31 +2910,50 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 	}()
 
 	args := make([]Value, 0, len(call.Args))
+	rawArgs := make([]Value, 0, len(call.Args))
 	for i, a := range call.Args {
 		saved := c.errs
 		c.errs = nil
 		// XXX: XXX: clear id.closeContext per argument and remove from runTask?
 
-		var expr Value
+		var expr, raw Value
 		if builtin.NonConcrete {
 			expr = c.evalState(a, Flags{
 				status:    state.status,
 				condition: state.condition,
 				mode:      state.mode,
 			})
+			raw = expr
 		} else {
-			flags := Flags{
+			// As [OpContext.value], but retaining the non-unwrapped form:
+			// unwrapping dereferences through a close() wrapper and would
+			// discard the closedness it records (see [BuiltinCallContext.RawValue]).
+			f := Flags{
 				status:    state.status,
 				condition: state.condition | fieldSetKnown | concreteKnown | disjunctionTask,
 				mode:      state.mode,
 			}
 			switch {
 			case builtin.Closes != NoClosing:
-				expr = c.closedArg(a, flags)
+				// A closing builtin takes a reference as the vertex it
+				// resolves to, even when incomplete; see [OpContext.closedArg].
+				expr = c.closedArg(a, f)
+				raw = expr
 			case builtin.PerDisjunct:
-				expr = c.valueOrDisjunction(a, flags)
+				// A per-disjunct builtin wants the disjunction itself,
+				// defaults and all, so no default is taken here.
+				expr = c.valueOrDisjunction(a, f)
+				raw = expr
 			default:
-				expr = c.value(a, flags)
+				// expr is exactly what [OpContext.value] computes. raw keeps
+				// the evaluated form before taking the default and
+				// unwrapping, which [BuiltinCallContext.RawValue] exposes only
+				// when it is a wrapper of expr itself.
+				f.concrete = true
+				raw = c.evalState(a, f)
+				expr, _ = c.getDefault(raw)
+				expr = Unwrap(expr)
+				raw = wrappedDefault(raw)
 			}
 		}
 
@@ -2948,6 +2989,7 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 
 		default:
 			args = append(args, expr)
+			rawArgs = append(rawArgs, raw)
 		}
 		c.errs = CombineErrors(a.Source(), saved, c.errs)
 	}
@@ -2975,6 +3017,7 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 		return nil
 	}
 
+	callCtx.rawArgs = rawArgs
 	if builtin.PerDisjunct {
 		if d := disjunctionOf(args[0]); d != nil {
 			return builtin.callPerDisjunct(c, callCtx, args, d, state)

@@ -143,6 +143,32 @@ disjunctDefs: {
 	#A | #D
 }
 
+// Disjunction with a defaulted definition operand → __reclose wraps,
+// and the comprehension field value is opened.
+defaultDisjunct: {
+	#A: {a: int}
+	v: {
+		*#A | {}
+		b: int
+	}
+
+	t1: {w: v & {a: 1}} @test(eq, {w: {a: 1, b: int} @test(final)})
+
+	// TODO: the new semantics is more permissive here; under the old
+	// semantics the defaulted branch is closed, so unifying v with
+	// {c: 1} eliminates it and resolves to the empty branch.
+
+	#S: {
+		enable: bool
+		x?: {...}
+		if enable {
+			x: *#A | {}
+		}
+	}
+	t3: #S & {enable: true, x: {extra: 1}} @test(eq,
+		{enable: true, x: {a: int, extra: 1} @test(final)})
+}
+
 // and() with extra field → not simplified, __reclose wraps.
 andField: {
 	#A: {a: int, b?: int}
@@ -163,6 +189,41 @@ andField: {
 orField: {
 	or([#A, #D])
 	b: int
+}
+
+// Conjunction with a selector operand → __reclose wraps.
+selConjField: {
+	#A: a: int
+	h: inner: #A
+	v: {
+		h.inner & {a: 1}
+		b: int
+	}
+
+	t1: v & {b: 1} @test(eq, {a: 1, b: 1})
+	t2: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// Comprehension field values with a selector conjunction or an and()
+// call do not close their field against a sibling pattern constraint;
+// entries added elsewhere remain allowed.
+compCallField: {
+	#HC: hc: {port: 1}
+	lib: v: #HC
+	#S: {
+		enable: bool
+		egress?: [string]: {...}
+		egress2?: [string]: {...}
+		if enable {
+			egress: lib.v & {hc: port: 1}
+		}
+		if enable {
+			egress2: and([lib.v])
+		}
+	}
+
+	t1: #S & {enable: true, egress: {extra: {}}, egress2: {extra: {}}} @test(eq,
+		{enable: true, egress: {hc: {port: 1}, extra: {}}, egress2: {hc: {port: 1}, extra: {}}})
 }
 
 -- out/errors.txt --
@@ -236,12 +297,18 @@ orField: {
     ./in.cue:64:8
 [eval] embeddedCloseField.t3.c: field not allowed:
     ./in.cue:112:11
+[incomplete] defaultDisjunct.#S: incomplete bool: bool:
+    ./in.cue:148:11
 [eval] andField.v.c: field not allowed:
-    ./in.cue:135:15
+    ./in.cue:161:15
 [eval] andField.t1.c: field not allowed:
-    ./in.cue:135:15
+    ./in.cue:161:15
 [eval] andField.t2.c: field not allowed:
-    ./in.cue:135:15
+    ./in.cue:161:15
+[eval] selConjField.t2.c: field not allowed:
+    ./in.cue:190:11
+[incomplete] compCallField.#S: incomplete bool: bool:
+    ./in.cue:200:11
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -374,6 +441,32 @@ disjunctDefs: {
 	#A | #D
 }
 
+// Disjunction with a defaulted definition operand → __reclose wraps,
+// and the comprehension field value is opened.
+defaultDisjunct: {
+	#A: {a: int}
+	v: __reclose({
+		(*#A | {})...
+		b: int
+	})
+
+	t1: {w: v & {a: 1}} @test(eq, {w: {a: 1, b: int} @test(final)})
+
+	// TODO: the new semantics is more permissive here; under the old
+	// semantics the defaulted branch is closed, so unifying v with
+	// {c: 1} eliminates it and resolves to the empty branch.
+
+	#S: {
+		enable: bool
+		x?:     {...}
+		if enable {
+			x: (*#A | {})...
+		}
+	}
+	t3: #S & {enable: true, x: {extra: 1}} @test(eq,
+		{enable: true, x: {a: int, extra: 1} @test(final)})
+}
+
 // and() with extra field → not simplified, __reclose wraps.
 andField: {
 	#A: {a: int, b?: int}
@@ -395,3 +488,38 @@ orField: __reclose({
 	or([#A, #D])...
 	b: int
 })
+
+// Conjunction with a selector operand → __reclose wraps.
+selConjField: {
+	#A: a:    int
+	h: inner: #A
+	v: __reclose({
+		(h.inner & {a: 1})...
+		b: int
+	})
+
+	t1: v & {b: 1} @test(eq, {a: 1, b: 1})
+	t2: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// Comprehension field values with a selector conjunction or an and()
+// call do not close their field against a sibling pattern constraint;
+// entries added elsewhere remain allowed.
+compCallField: {
+	#HC: hc: {port: 1}
+	lib: v:  #HC
+	#S: {
+		enable: bool
+		egress?: [string]:  {...}
+		egress2?: [string]: {...}
+		if enable {
+			egress: (lib.v & {hc: port: 1})...
+		}
+		if enable {
+			egress2: and([lib.v])...
+		}
+	}
+
+	t1: #S & {enable: true, egress: {extra: {}}, egress2: {extra: {}}} @test(eq,
+		{enable: true, egress: {hc: {port: 1}, extra: {}}, egress2: {hc: {port: 1}, extra: {}}})
+}

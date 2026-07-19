@@ -79,6 +79,9 @@ func (m marked) markExpr(x adt.Expr) {
 			m.markExpr(x.Y)
 		}
 
+	case *adt.OpenExpr:
+		m.markExpr(x.X)
+
 	case *adt.StructLit:
 		for _, e := range x.Decls {
 			switch x := e.(type) {

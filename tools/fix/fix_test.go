@@ -172,6 +172,41 @@ v: __closeAll({
 		},
 
 		{
+			// Under the old semantics, conjuncts inserted through
+			// comprehensions are treated like embeddings and do not close
+			// their fields. Field values that may resolve to closed
+			// structs must be opened to preserve that behavior.
+			// TODO: the egress value is left untouched; it should become
+			// "#HC..." so that sibling entries of egress remain allowed.
+			name: "open field values in comprehensions (fixExplicitOpen)",
+			exps: []string{"explicitopen"},
+			in: `package foo
+
+#HC: hc: {port: 1}
+
+#Service: {
+	enable: bool
+	egress?: [string]: {...}
+	if enable {
+		egress: #HC
+	}
+}
+`,
+			out: `package foo
+
+#HC: hc: {port: 1}
+
+#Service: {
+	enable: bool
+	egress?: [string]: {...}
+	if enable {
+		egress: #HC
+	}
+}
+`,
+		},
+
+		{
 			// Blank aliases bind nothing that can be referenced; they must be
 			// dropped rather than converted to blank postfix aliases, which
 			// Sanitize rejects, or to an invalid "let _ = self".

@@ -222,10 +222,10 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 // old semantics, conjuncts inserted through comprehensions were treated
 // like embeddings and did not close their fields.
 func openCompFieldValue(expr ast.Expr) (ast.Expr, bool) {
+	// PostfixExpr is excluded: the value already has an ellipsis.
 	switch expr.(type) {
-	case *ast.SelectorExpr, *ast.IndexExpr:
-		return addEllipsis(expr), true
-	case *ast.Ident, *ast.BinaryExpr, *ast.ParenExpr, *ast.CallExpr:
+	case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr,
+		*ast.BinaryExpr, *ast.ParenExpr, *ast.CallExpr:
 		if _, _, f := collectEmbedFlags(expr); f.mayBeClosed() {
 			return addEllipsis(expr), true
 		}
@@ -235,7 +235,8 @@ func openCompFieldValue(expr ast.Expr) (ast.Expr, bool) {
 
 // collectEmbedFlags recurses into an expression to collect embedding flags
 // without modifying the expression. Used for & and | where we add ... to the
-// whole expression rather than individual operands.
+// whole expression rather than individual operands. It must classify every
+// expression kind exactly like [openEmbedExpr] does.
 func collectEmbedFlags(expr ast.Expr) (ast.Expr, bool, embedFlags) {
 	switch x := expr.(type) {
 	case *ast.PostfixExpr:
@@ -255,6 +256,8 @@ func collectEmbedFlags(expr ast.Expr) (ast.Expr, bool, embedFlags) {
 			}
 			return expr, false, f
 		}
+		// Other binary ops (e.g. +, *) cannot resolve to closed structs.
+		return expr, false, embedFlags{}
 	case *ast.ParenExpr:
 		return collectEmbedFlags(x.X)
 	case *ast.Ident:
@@ -269,12 +272,26 @@ func collectEmbedFlags(expr ast.Expr) (ast.Expr, bool, embedFlags) {
 		if id, ok := x.Fun.(*ast.Ident); ok {
 			switch id.Name {
 			case "close":
-				_, _, f := openCloseArg(x.Args[0])
-				return expr, false, f.or(embedFlags{close: true})
+				if len(x.Args) == 1 {
+					_, _, f := openCloseArg(x.Args[0])
+					return expr, false, f.or(embedFlags{close: true})
+				}
+				return expr, false, embedFlags{close: true}
+			case "and", "or":
+				return expr, false, embedFlags{other: true}
 			}
 		}
+		return expr, false, embedFlags{}
+	case *ast.ListLit,
+		*ast.StructLit,
+		*ast.BasicLit,
+		*ast.Interpolation,
+		*ast.UnaryExpr:
+		return expr, false, embedFlags{}
 	}
-	return expr, false, embedFlags{}
+
+	// Default: may resolve to a closed struct (SelectorExpr, IndexExpr, etc.)
+	return expr, false, embedFlags{other: true}
 }
 
 // openEmbedExpr adds postfix ellipsis to embedded expressions. For & and |

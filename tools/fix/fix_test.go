@@ -207,6 +207,36 @@ package foo
 		},
 
 		{
+			// The old comprehension opening also overrides an explicit
+			// close() in a field value: sibling entries added elsewhere
+			// remain allowed.
+			// TODO: the close() value is left untouched; it should become
+			// "close({...})..." to preserve the old behavior.
+			name: "open close() field values in comprehensions (fixExplicitOpen)",
+			exps: []string{"explicitopen"},
+			in: `package foo
+
+#S: {
+	enable: bool
+	egress?: [string]: {...}
+	if enable {
+		egress: close({hc: {p: 1}})
+	}
+}
+`,
+			out: `package foo
+
+#S: {
+	enable: bool
+	egress?: [string]: {...}
+	if enable {
+		egress: close({hc: {p: 1}})
+	}
+}
+`,
+		},
+
+		{
 			// Blank aliases bind nothing that can be referenced; they must be
 			// dropped rather than converted to blank postfix aliases, which
 			// Sanitize rejects, or to an invalid "let _ = self".

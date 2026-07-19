@@ -18,7 +18,7 @@ package foo
 #D: x: int
 _repo: {}
 
-// close()-oAnd indeed, the post-fix is incorrect. nly embedding → no change needed.
+// close()-only embedding → close() hoisted to wrapper level.
 closeOnly: {
 	v: {
 		close({a: int})
@@ -26,6 +26,25 @@ closeOnly: {
 	}
 	t1: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
 	t2: v & {b: 1}   @test(eq, {b: 1, a: int})
+}
+
+// close()-only single embed → {close(X)} ≡ close(X).
+singleClose: {
+	v: {
+		close({a: int})
+	}
+	t1: v & {a: 1} @test(eq, {a: 1})
+	t2: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// close() of an open reference, single embed.
+singleCloseRef: {
+	o: b: int
+	v: {
+		close(o)
+	}
+	t1: v & {b: 1} @test(eq, {b: 1})
+	t2: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
 }
 
 
@@ -245,72 +264,76 @@ compLiteralField: {
 -- out/errors.txt --
 [eval] closeOnly.t1.c: field not allowed:
     ./in.cue:13:11
+[eval] singleClose.t2.c: field not allowed:
+    ./in.cue:23:11
+[eval] singleCloseRef.t2.c: field not allowed:
+    ./in.cue:33:11
 [eval] closeAndRef.t1.c: field not allowed:
-    ./in.cue:26:11
+    ./in.cue:45:11
 [eval] mixedDefClose.t1.c: field not allowed:
-    ./in.cue:40:11
-[eval] mixedDefClose.t2.b.d: field not allowed:
-    ./in.cue:41:14
-[eval] mixedDefClose.t3.b.c.d: field not allowed:
-    ./in.cue:42:17
-[eval] conjunct.t2.b: field not allowed:
     ./in.cue:59:11
+[eval] mixedDefClose.t2.b.d: field not allowed:
+    ./in.cue:60:14
+[eval] mixedDefClose.t3.b.c.d: field not allowed:
+    ./in.cue:61:17
+[eval] conjunct.t2.b: field not allowed:
+    ./in.cue:78:11
 [eval] conjunctComplex.v.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.v.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.t1.a: field not allowed:
-    ./in.cue:63:8
-    ./in.cue:69:11
+    ./in.cue:82:8
+    ./in.cue:88:11
 [eval] conjunctComplex.t1.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.t2.b: field not allowed:
-    ./in.cue:64:8
-    ./in.cue:70:11
+    ./in.cue:83:8
+    ./in.cue:89:11
 [eval] conjunctComplex.t2.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.t3.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.t3.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.t4.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.t4.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.t5.e: field not allowed:
-    ./in.cue:73:11
+    ./in.cue:92:11
 [eval] conjunctComplex.t5.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.t5.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.#C.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.#C.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.vb.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.vb.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.tb1.a: field not allowed:
-    ./in.cue:63:8
-    ./in.cue:80:13
+    ./in.cue:82:8
+    ./in.cue:99:13
 [eval] conjunctComplex.tb1.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.tb2.b: field not allowed:
-    ./in.cue:64:8
-    ./in.cue:81:13
+    ./in.cue:83:8
+    ./in.cue:100:13
 [eval] conjunctComplex.tb2.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.tb3.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.tb3.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] conjunctComplex.tb5.e: field not allowed:
-    ./in.cue:83:13
+    ./in.cue:102:13
 [eval] conjunctComplex.tb5.a: field not allowed:
-    ./in.cue:63:8
+    ./in.cue:82:8
 [eval] conjunctComplex.tb5.b: field not allowed:
-    ./in.cue:64:8
+    ./in.cue:83:8
 [eval] embeddedCloseField.t3.c: field not allowed:
     ./in.cue:112:11
 [incomplete] defaultDisjunct.#S: incomplete bool: bool:
@@ -324,9 +347,9 @@ compLiteralField: {
 [eval] selConjField.t2.c: field not allowed:
     ./in.cue:190:11
 [incomplete] compCallField.#S: incomplete bool: bool:
-    ./in.cue:174:11
+    ./in.cue:193:11
 [incomplete] compLiteralField.#S: incomplete bool: bool:
-    ./in.cue:194:11
+    ./in.cue:213:11
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -340,7 +363,7 @@ package foo
 #D: x: int
 _repo: {}
 
-// close()-oAnd indeed, the post-fix is incorrect. nly embedding → no change needed.
+// close()-only embedding → close() hoisted to wrapper level.
 closeOnly: {
 	v: close({
 		{a: int}
@@ -348,6 +371,23 @@ closeOnly: {
 	})
 	t1: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
 	t2: v & {b: 1}   @test(eq, {b: 1, a: int})
+}
+
+// close()-only single embed → {close(X)} ≡ close(X).
+singleClose: {
+	v:  close({a: int})
+	t1: v & {a: 1}   @test(eq, {a: 1})
+	t2: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// close() of an open reference, single embed.
+singleCloseRef: {
+	o: b: int
+	v: close(__reclose({
+		o...
+	}))
+	t1: v & {b: 1}   @test(eq, {b: 1})
+	t2: v & {c: int} @test(err, code=eval, path=c, contains="field not allowed")
 }
 
 // close() + non-def reference → __reclose wraps struct, close() left as-is.

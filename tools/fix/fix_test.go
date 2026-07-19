@@ -469,9 +469,6 @@ package foo
 			// A hoisted close() must keep closing the struct when it is
 			// the only element: under the old semantics {close(X)} is
 			// equivalent to close(X).
-			// TODO: the close() is dropped entirely, leaving open structs;
-			// the rewrites should be "close({c: 3})" and
-			// "close(__reclose({o...}))".
 			name: "keep closing of single close() embeds (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			in: `package foo
@@ -487,8 +484,8 @@ package foo
 
 o: {b: int}
 
-s1: {{c: 3}}
-s2: {o}
+s1: close({c: 3})
+s2: close(__reclose({o...}))
 `,
 		},
 

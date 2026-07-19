@@ -109,6 +109,29 @@ g: (list.Repeat([9], 5)) + (list.Repeat([10], 6))
 		},
 
 		{
+			name: "rewrite bottom comparisons (fixPredicates)",
+			exps: []string{"predicates"},
+			in: `a: {x: 1}
+p: a.x != _|_
+q: a.y == _|_
+r: _|_ != a.x
+s: _|_ == a.y
+t: (a.x != _|_) && (a.y == _|_)
+u: _|_ == _|_
+`,
+			out: `@experiment(predicates)
+
+a: {x: 1}
+p: isValid(a.x)
+q: !isValid(a.y)
+r: isValid(a.x)
+s: !isValid(a.y)
+t: (isValid(a.x)) && (!isValid(a.y))
+u: _|_ == _|_
+`,
+		},
+
+		{
 			name: "add ellipsis to embeddings (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			// The fix only has work to do below v0.18.0, where explicitopen

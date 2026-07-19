@@ -184,6 +184,9 @@ func file(f *ast.File, version string, outsideModule bool, o ...Option) (*ast.Fi
 	if wantExps.OpenLists && !existingExps.OpenLists {
 		fix(fixOpenLists, "openlists")
 	}
+	if wantExps.Predicates && !existingExps.Predicates {
+		fix(fixPredicates, "predicates")
+	}
 	// Experiments can change while in preview, so a file outside any module,
 	// where nothing else records it, notes the version at which an
 	// experiment was applied to it.

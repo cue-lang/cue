@@ -51,6 +51,11 @@ cd ..
 exec cue fix --exp=openlists o.cue
 cmp o.cue expect/o
 
+# The predicate rewrite is applied through the same path, so a loose file
+# records the version for it too.
+exec cue fix --exp=predicates p.cue
+cmp p.cue expect/p
+
 # An experiment that is not yet available at the chosen version is refused.
 cp in.cue z.cue
 ! exec cue fix --language-version v0.16.0 --exp=shortcircuit z.cue
@@ -94,6 +99,15 @@ a: #L & [1, 2]
 
 #L: #[int, int]
 a:  #L & #[1, 2]
+-- p.cue --
+d: {x: 1}
+y: d.x != _|_
+-- expect/p --
+@version(v0.19.0)
+@experiment(predicates)
+
+d: {x: 1}
+y: isValid(d.x)
 -- expect/loose-explicitopen --
 @version(v0.17.0)
 @experiment(explicitopen)

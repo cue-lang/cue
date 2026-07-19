@@ -1,0 +1,186 @@
+#exp:predicates
+
+-- cue.mod/module.cue --
+module: "test.example"
+
+language: version: "v0.19.0"
+
+-- a.cue --
+package foo
+
+d: {x: 1}
+
+// A present field: true under both the idiom and isValid.
+p1: d.x != _|_ @test(eq, true)
+
+// An absent field on an open struct: false under both.
+p2: d.y != _|_ @test(eq, false)
+
+// The negated form.
+p3: d.y == _|_ @test(eq, true)
+
+// The idiom as a comprehension guard.
+out: {
+	if d.x != _|_ {
+		v: 1
+	}
+	@test(eq, {v: 1})
+}
+
+-- b.cue --
+package foo
+
+// A permanent error: false under both.
+broken: 1 & 2 @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:9, 0:13])
+p4: broken != _|_ @test(eq, false)
+p5: broken == _|_ @test(eq, true)
+-- c.cue --
+package foo
+
+e: {x: 1}
+
+// A parenthesized bottom operand is matched too, and the redundant
+// parentheses around the argument are dropped.
+q1: e.x != (_|_) @test(eq, true)
+q2: (e.x) != _|_ @test(eq, true)
+
+-- d.cue --
+package foo
+
+g: {x: 1}
+
+// A comment within the parentheses around bottom is kept, by leaving the
+// comparison as is.
+c1: g.x != (
+	// in bottom paren
+	_|_) @test(eq, true)
+
+// A trailing comment is kept.
+c2: g.x != _|_ @test(eq, true) // trailing comment
+
+// Line breaks before a rewritten comparison are kept, for either operand
+// order.
+l1: [
+	g.x != _|_,
+	g.y == _|_,
+] @test(eq, [true, true])
+l2: [
+	_|_ != g.x,
+	_|_ == g.y,
+] @test(eq, [true, true])
+a1: g.x != _|_ &&
+	g.y == _|_ @test(eq, true)
+a2: _|_ != g.x &&
+	_|_ == g.y @test(eq, true)
+
+-- shadow/shadow.cue --
+// A package of its own: a field named isValid shadows the builtin for every
+// file of the package it is declared in, so keeping it here leaves the plain
+// isValid output above intact.
+package shadow
+
+// Sanitize rewrites the emitted identifier to the __isValid form so the call
+// still reaches the builtin rather than this declaration.
+isValid: {ok: true} @test(eq, {ok: true})
+
+f: {x: 1}
+r1: f.x != _|_ @test(eq, true)
+
+-- out/errors.txt --
+[eval] broken: conflicting values 2 and 1:
+    ./b.cue:4:9
+    ./b.cue:4:13
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "test.example"
+language: version: "v0.19.0"
+--- a.cue
+@experiment(predicates)
+
+package foo
+
+d: {x: 1}
+
+// A present field: true under both the idiom and isValid.
+p1: isValid(d.x) @test(eq, true)
+
+// An absent field on an open struct: false under both.
+p2: isValid(d.y) @test(eq, false)
+
+// The negated form.
+p3: !isValid(d.y) @test(eq, true)
+
+// The idiom as a comprehension guard.
+out: {
+	if isValid(d.x) {
+		v: 1
+	}
+	@test(eq, {v: 1})
+}
+--- b.cue
+@experiment(predicates)
+
+package foo
+
+// A permanent error: false under both.
+broken: 1 & 2            @test(err, code=eval, contains="conflicting values %s and %s", args=[2, 1], pos=[0:9, 0:13])
+p4:     isValid(broken)  @test(eq, false)
+p5:     !isValid(broken) @test(eq, true)
+--- c.cue
+@experiment(predicates)
+
+package foo
+
+e: {x: 1}
+
+// A parenthesized bottom operand is matched too, and the redundant
+// parentheses around the argument are dropped.
+q1: isValid(e.x) @test(eq, true)
+q2: isValid(e.x) @test(eq, true)
+--- d.cue
+@experiment(predicates)
+
+package foo
+
+g: {x: 1}
+
+// A comment within the parentheses around bottom is kept, by leaving the
+// comparison as is.
+c1: g.x != (
+	// in bottom paren
+	_|_) @test(eq, true)
+
+// A trailing comment is kept.
+c2: isValid(g.x) @test(eq, true) // trailing comment
+
+// Line breaks before a rewritten comparison are kept, for either operand
+// order.
+l1: [
+	isValid(g.x),
+	!isValid(g.y),
+] @test(eq, [true, true])
+l2: [
+	isValid(g.x),
+	!isValid(g.y),
+] @test(eq, [true, true])
+a1: isValid(g.x) &&
+	!isValid(g.y) @test(eq, true)
+a2: isValid(g.x) &&
+	!isValid(g.y) @test(eq, true)
+--- cue.mod/module.cue
+module: "test.example"
+language: version: "v0.19.0"
+--- shadow/shadow.cue
+@experiment(predicates)
+
+// A package of its own: a field named isValid shadows the builtin for every
+// file of the package it is declared in, so keeping it here leaves the plain
+// isValid output above intact.
+package shadow
+
+// Sanitize rewrites the emitted identifier to the __isValid form so the call
+// still reaches the builtin rather than this declaration.
+isValid: {ok: true} @test(eq, {ok: true})
+
+f:  {x: 1}
+r1: __isValid(f.x) @test(eq, true)

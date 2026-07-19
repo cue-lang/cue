@@ -135,8 +135,6 @@ X: __closeAll({
 		{
 			// Embeddings nested inside a rewritten embedding, such as in
 			// the struct operand of a conjunction, must be rewritten too.
-			// TODO: the inner ref embedding is left untouched; it should
-			// become "ref..." with a __reclose wrapper on its struct.
 			name: "nested embeddings inside conjunction operands (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			in: `package foo
@@ -163,10 +161,10 @@ ref: {a: int}
 
 v: __closeAll({
 	(#X & {
-		ctx: {
-			ref
+		ctx: __reclose({
+			ref...
 			extra: 1
-		}
+		})
 	})...
 	more: 2
 })

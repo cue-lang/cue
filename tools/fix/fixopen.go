@@ -45,13 +45,16 @@ func (a embedFlags) or(b embedFlags) embedFlags {
 	}
 }
 
+// mayBeClosed reports whether the expression the flags were collected
+// from may resolve to a closed value.
+func (f embedFlags) mayBeClosed() bool {
+	return f.def || f.other || f.close
+}
+
 type closeInfo struct {
 	// Do not close enclosing structs if non-zero. This may be the case
 	// for comprehensions, nested structs, etc.
 	suspendReclose int
-
-	// inComprehension tracks whether we are inside a comprehension value.
-	inComprehension int
 
 	embedFlags
 }
@@ -64,6 +67,10 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 	var info closeInfo
 	recloseStack := []closeInfo{}
+	// comprehensionDepth tracks whether we are lexically inside a
+	// comprehension value. Unlike the closeInfo state, it is not reset
+	// at field or conjunction boundaries.
+	comprehensionDepth := 0
 	result = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n := n.(type) {
@@ -82,7 +89,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 		case *ast.Comprehension:
 			info.suspendReclose++
-			info.inComprehension++
+			comprehensionDepth++
 
 		case *ast.EmbedDecl:
 			info.suspendReclose++
@@ -95,6 +102,15 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			recloseStack = recloseStack[:len(recloseStack)-1]
 			c.ClearEnclosingModified()
 
+			// See openCompFieldValue: comprehension conjuncts did not
+			// close their fields under the old semantics.
+			if comprehensionDepth > 0 {
+				if newValue, changed := openCompFieldValue(n.Value); changed {
+					n.Value = newValue
+					hasChanges = true
+				}
+			}
+
 		case *ast.BinaryExpr:
 			if n.Op == token.AND || n.Op == token.OR {
 				info = recloseStack[len(recloseStack)-1]
@@ -104,7 +120,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 		case *ast.Comprehension:
 			info.suspendReclose--
-			info.inComprehension--
+			comprehensionDepth--
 
 		case *ast.EmbedDecl:
 			info.suspendReclose--
@@ -116,7 +132,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			newExpr, exprChanged, flags := openEmbedExpr(n.Expr)
 			info.embedFlags = info.embedFlags.or(flags)
 			if exprChanged {
-				if info.inComprehension > 0 {
+				if comprehensionDepth > 0 {
 					ast.AddComment(newExpr, todoComment(
 						"... may not be intended inside a comprehension value; consider removing it."))
 				}
@@ -183,6 +199,22 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 	}).(*ast.File)
 
 	return result, hasChanges
+}
+
+// openCompFieldValue adds a postfix ellipsis to a field value inside a
+// comprehension when the value may resolve to a closed struct. Under the
+// old semantics, conjuncts inserted through comprehensions were treated
+// like embeddings and did not close their fields.
+func openCompFieldValue(expr ast.Expr) (ast.Expr, bool) {
+	switch expr.(type) {
+	case *ast.SelectorExpr, *ast.IndexExpr:
+		return addEllipsis(expr), true
+	case *ast.Ident, *ast.BinaryExpr, *ast.ParenExpr:
+		if _, _, f := collectEmbedFlags(expr); f.mayBeClosed() {
+			return addEllipsis(expr), true
+		}
+	}
+	return expr, false
 }
 
 // collectEmbedFlags recurses into an expression to collect embedding flags
@@ -316,7 +348,7 @@ func openCloseArg(expr ast.Expr) (ast.Expr, bool, embedFlags) {
 		// Non-struct argument: process like a regular embedding so that
 		// e.g. close(#A) → #A... when hoisted.
 		newExpr, _, f := openEmbedExpr(expr)
-		return newExpr, f.def || f.other || f.close, f
+		return newExpr, f.mayBeClosed(), f
 	}
 	var f embedFlags
 	var changed bool

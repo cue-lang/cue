@@ -435,8 +435,6 @@ z: {
 			// not close under the old semantics, so a wrapper would deny
 			// fields that the old semantics allowed. The embeddings inside
 			// the literal are still opened.
-			// TODO: the literal is wrapped in __closeAll with a misleading
-			// TODO comment; it should stay unwrapped and uncommented.
 			name: "no wrappers on struct literal field values in comprehensions (fixExplicitOpen)",
 			exps: []string{"explicitopen"},
 			in: `package foo
@@ -461,11 +459,7 @@ package foo
 	enable:  bool
 	egress?: {...}
 	if enable {
-		egress: __closeAll({
-			// TODO(cue-fix): the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case.
-			#A...
-			extra: 1
-		})
+		egress: {#A..., extra: 1}
 	}
 }
 `,

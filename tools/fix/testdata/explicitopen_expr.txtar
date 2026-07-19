@@ -226,6 +226,22 @@ compCallField: {
 		{enable: true, egress: {hc: {port: 1}, extra: {}}, egress2: {hc: {port: 1}, extra: {}}})
 }
 
+// Struct literal field values inside comprehensions get no wrapper;
+// entries added elsewhere remain allowed.
+compLiteralField: {
+	#A: a: int
+	#S: {
+		enable: bool
+		egress?: {...}
+		if enable {
+			egress: {#A, extra: 1}
+		}
+	}
+
+	t1: #S & {enable: true, egress: {a: 1, extra2: 2}} @test(eq,
+		{enable: true, egress: {a: 1, extra: 1, extra2: 2}})
+}
+
 -- out/errors.txt --
 [eval] closeOnly.t1.c: field not allowed:
     ./in.cue:13:11
@@ -308,7 +324,9 @@ compCallField: {
 [eval] selConjField.t2.c: field not allowed:
     ./in.cue:190:11
 [incomplete] compCallField.#S: incomplete bool: bool:
-    ./in.cue:200:11
+    ./in.cue:174:11
+[incomplete] compLiteralField.#S: incomplete bool: bool:
+    ./in.cue:194:11
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -522,4 +540,20 @@ compCallField: {
 
 	t1: #S & {enable: true, egress: {extra: {}}, egress2: {extra: {}}} @test(eq,
 		{enable: true, egress: {hc: {port: 1}, extra: {}}, egress2: {hc: {port: 1}, extra: {}}})
+}
+
+// Struct literal field values inside comprehensions get no wrapper;
+// entries added elsewhere remain allowed.
+compLiteralField: {
+	#A: a: int
+	#S: {
+		enable:  bool
+		egress?: {...}
+		if enable {
+			egress: {#A..., extra: 1}
+		}
+	}
+
+	t1: #S & {enable: true, egress: {a: 1, extra2: 2}} @test(eq,
+		{enable: true, egress: {a: 1, extra: 1, extra2: 2}})
 }

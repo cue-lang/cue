@@ -56,6 +56,15 @@ type closeInfo struct {
 	// for comprehensions, nested structs, etc.
 	suspendReclose int
 
+	// The scope is lexically inside a comprehension value. Unlike the
+	// rest of closeInfo, it is inherited by nested scopes (see pushScope).
+	inComprehension bool
+
+	// The scope is the value of a comprehension, not a field nested
+	// inside one. Only embeddings declared directly in a comprehension
+	// value lose the old conditional closing and get a TODO comment.
+	compValue bool
+
 	embedFlags
 }
 
@@ -71,6 +80,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 	// a new reclose scope: fields, conjunctions and disjunctions, and
 	// comprehensions.
 	pushScope := func(next closeInfo) {
+		next.inComprehension = next.inComprehension || info.inComprehension
 		recloseStack = append(recloseStack, info)
 		info = next
 	}
@@ -79,16 +89,16 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		recloseStack = recloseStack[:len(recloseStack)-1]
 		c.ClearEnclosingModified()
 	}
-	// comprehensionDepth tracks whether we are lexically inside a
-	// comprehension value. Unlike the closeInfo state, it is not reset
-	// at field or conjunction boundaries.
-	comprehensionDepth := 0
 	result = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n := n.(type) {
 		case *ast.Field:
 			next := closeInfo{}
-			if internal.IsDefinition(n.Label) {
+			// Fields with definition labels reclose on their own. Fields
+			// inside comprehensions never wrap: a wrapper would deny
+			// fields that the old semantics allowed (see
+			// openCompFieldValue).
+			if internal.IsDefinition(n.Label) || info.inComprehension {
 				next.suspendReclose = 1
 			}
 			pushScope(next)
@@ -108,8 +118,11 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			// struct's fields, breaking self-referential guards. Opened
 			// embeddings inside comprehension values are instead flagged
 			// with a TODO comment.
-			pushScope(closeInfo{suspendReclose: 1})
-			comprehensionDepth++
+			pushScope(closeInfo{
+				suspendReclose:  1,
+				inComprehension: true,
+				compValue:       true,
+			})
 
 		case *ast.EmbedDecl:
 			info.suspendReclose++
@@ -122,7 +135,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 			// See openCompFieldValue: comprehension conjuncts did not
 			// close their fields under the old semantics.
-			if comprehensionDepth > 0 {
+			if info.inComprehension {
 				if newValue, changed := openCompFieldValue(n.Value); changed {
 					n.Value = newValue
 					hasChanges = true
@@ -136,7 +149,6 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 		case *ast.Comprehension:
 			popScope(c)
-			comprehensionDepth--
 
 		case *ast.EmbedDecl:
 			info.suspendReclose--
@@ -148,7 +160,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			newExpr, exprChanged, flags := openEmbedExpr(n.Expr)
 			info.embedFlags = info.embedFlags.or(flags)
 			if exprChanged {
-				if comprehensionDepth > 0 {
+				if info.compValue {
 					ast.AddComment(newExpr, todoComment(
 						"the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case."))
 				}

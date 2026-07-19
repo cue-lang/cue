@@ -23,6 +23,7 @@ package cuetxtar
 import (
 	"slices"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/cuetest"
 )
 
@@ -39,6 +40,27 @@ type inlineFillWrite struct {
 	attrOffset  int    // byte offset of the @ in the original file data
 	attrLen     int    // byte length of the original @test(...) text
 	newAttrText string // replacement text
+
+	// gatePath, when non-empty, names the @test(eq:todo) being promoted:
+	// dropGatedTodoPromotes removes this write if that todo failed under some
+	// @test(permute) ordering, so an order-dependent todo keeps its :todo.
+	gatePath cue.Path
+}
+
+// dropGatedTodoPromotes removes pending @test(eq:todo) promotions whose todo
+// failed under some @test(permute) ordering. Such a todo is order-dependent — it
+// matches in source order but not in others — so promoting it would turn the
+// silent per-ordering todo failures into hard @test(eq) failures, breaking the
+// permute on re-run.
+func (r *inlineRunner) dropGatedTodoPromotes() {
+	if len(r.todoFailedUnderPermute) == 0 {
+		return
+	}
+	r.pendingInlineFillWrites = slices.DeleteFunc(r.pendingInlineFillWrites,
+		func(ifw inlineFillWrite) bool {
+			return len(ifw.gatePath.Selectors()) > 0 &&
+				r.todoFailedUnderPermute[ifw.gatePath.String()]
+		})
 }
 
 // applyInlineFillWritebacks applies all pending byte-level @test attribute
@@ -50,6 +72,9 @@ type inlineFillWrite struct {
 // Under CUE_UPDATE=diff the archive is left alone and each file that would
 // be rewritten is reported as a failure instead.
 func (r *inlineRunner) applyInlineFillWritebacks() {
+	// Drop eq:todo promotions for structs whose @test(permute) failed.
+	r.dropGatedTodoPromotes()
+
 	// Flush nestedPosFills into pendingPosWrites: each accumulated entry
 	// represents an outer @test(eq, {...}) attribute whose text was updated
 	// in-place to fill nested pos=[] placeholders.

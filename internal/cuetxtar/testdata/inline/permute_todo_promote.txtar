@@ -1,0 +1,16 @@
+# Tests that CUE_UPDATE keeps an @test(eq:todo) that matches in source order
+# but fails under a non-source @test(permute) ordering. The expectation
+# checks field order, so it holds for a-then-b but not for b-then-a.
+#
+# Without the gate, the update would promote the todo to @test(eq, ...) on
+# the strength of the source ordering alone, and the re-run would fail
+# under the permutation (the update would not be idempotent).
+-- in/test.cue --
+s: {
+	@test(permute, count=2)
+	a: 1
+	b: 2
+} @test(eq:todo, {@test(checkOrder), a: 1, b: 2})
+-- out/status.txt --
+update: identical to input
+force:  identical to update

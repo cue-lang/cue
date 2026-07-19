@@ -86,24 +86,6 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 		case *ast.EmbedDecl:
 			info.suspendReclose++
-
-			newExpr, exprChanged, flags := openEmbedExpr(n.Expr)
-			info.embedFlags = info.embedFlags.or(flags)
-			if exprChanged {
-				if info.inComprehension > 0 {
-					ast.AddComment(newExpr, todoComment(
-						"... may not be intended inside a comprehension value; consider removing it."))
-				}
-				if flags.def && len(recloseStack) == 0 {
-					ast.AddComment(newExpr, todoComment(
-						"top-level definition embedding opened; if this is intended as a schema, remove the '...'."))
-				}
-				newEmbed := &ast.EmbedDecl{Expr: newExpr}
-				// After is not called after a Replace: match nesting count.
-				info.suspendReclose--
-				c.Replace(newEmbed)
-				hasChanges = true
-			}
 		}
 		return true
 	}, func(c astutil.Cursor) bool {
@@ -126,6 +108,25 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 		case *ast.EmbedDecl:
 			info.suspendReclose--
+
+			// Rewrite the embedding in the post-visit so that nested
+			// embeddings (e.g. inside struct operands of a conjunction)
+			// have already been processed; a Replace in the pre-visit
+			// would prevent the children from being traversed at all.
+			newExpr, exprChanged, flags := openEmbedExpr(n.Expr)
+			info.embedFlags = info.embedFlags.or(flags)
+			if exprChanged {
+				if info.inComprehension > 0 {
+					ast.AddComment(newExpr, todoComment(
+						"... may not be intended inside a comprehension value; consider removing it."))
+				}
+				if flags.def && len(recloseStack) == 0 {
+					ast.AddComment(newExpr, todoComment(
+						"top-level definition embedding opened; if this is intended as a schema, remove the '...'."))
+				}
+				c.Replace(&ast.EmbedDecl{Expr: newExpr})
+				hasChanges = true
+			}
 
 		case *ast.StructLit:
 			if c.Modified() && info.shouldReclose() {
@@ -189,6 +190,13 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 // whole expression rather than individual operands.
 func collectEmbedFlags(expr ast.Expr) (ast.Expr, bool, embedFlags) {
 	switch x := expr.(type) {
+	case *ast.PostfixExpr:
+		// Already has ellipsis (e.g. rewritten by a nested pass);
+		// still collect flags from the underlying expression.
+		if x.Op == token.ELLIPSIS {
+			_, _, f := collectEmbedFlags(x.X)
+			return expr, false, f
+		}
 	case *ast.BinaryExpr:
 		if x.Op == token.AND || x.Op == token.OR {
 			_, _, xf := collectEmbedFlags(x.X)
@@ -227,8 +235,11 @@ func collectEmbedFlags(expr ast.Expr) (ast.Expr, bool, embedFlags) {
 func openEmbedExpr(expr ast.Expr) (result ast.Expr, changed bool, flags embedFlags) {
 	switch x := expr.(type) {
 	case *ast.PostfixExpr:
-		// Already has ellipsis
-		return expr, false, embedFlags{}
+		// Already has ellipsis; still collect flags from the underlying
+		// expression, as they influence the wrapping of the enclosing
+		// struct.
+		_, _, f := collectEmbedFlags(x)
+		return expr, false, f
 
 	case *ast.BinaryExpr:
 		if x.Op == token.AND || x.Op == token.OR {

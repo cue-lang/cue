@@ -222,11 +222,11 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 // old semantics, conjuncts inserted through comprehensions were treated
 // like embeddings and did not close their fields.
 func openCompFieldValue(expr ast.Expr) (ast.Expr, bool) {
+	// PostfixExpr is excluded: the value already has an ellipsis.
 	switch expr.(type) {
-	case *ast.SelectorExpr, *ast.IndexExpr:
-		return addEllipsis(expr), true
-	case *ast.Ident, *ast.BinaryExpr, *ast.ParenExpr, *ast.CallExpr:
-		if _, _, f := collectEmbedFlags(expr); f.mayBeClosed() {
+	case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr,
+		*ast.BinaryExpr, *ast.ParenExpr, *ast.CallExpr:
+		if collectEmbedFlags(expr).mayBeClosed() {
 			return addEllipsis(expr), true
 		}
 	}
@@ -234,124 +234,114 @@ func openCompFieldValue(expr ast.Expr) (ast.Expr, bool) {
 }
 
 // collectEmbedFlags recurses into an expression to collect embedding flags
-// without modifying the expression. Used for & and | where we add ... to the
-// whole expression rather than individual operands.
-func collectEmbedFlags(expr ast.Expr) (ast.Expr, bool, embedFlags) {
+// without modifying the expression. It is the single classifier of what an
+// embedded expression may resolve to; [openEmbedExpr] derives its rewrites
+// from the flags it returns.
+func collectEmbedFlags(expr ast.Expr) embedFlags {
 	switch x := expr.(type) {
 	case *ast.PostfixExpr:
 		// Already has ellipsis (e.g. rewritten by a nested pass);
 		// still collect flags from the underlying expression.
 		if x.Op == token.ELLIPSIS {
-			_, _, f := collectEmbedFlags(x.X)
-			return expr, false, f
+			return collectEmbedFlags(x.X)
 		}
 	case *ast.BinaryExpr:
 		if x.Op == token.AND || x.Op == token.OR {
-			_, _, xf := collectEmbedFlags(x.X)
-			_, _, yf := collectEmbedFlags(x.Y)
+			xf := collectEmbedFlags(x.X)
+			yf := collectEmbedFlags(x.Y)
 			f := xf.or(yf)
 			if x.Op == token.OR && (xf.other || yf.other) {
 				f.forceReclose = true
 			}
-			return expr, false, f
+			return f
 		}
+		// Other binary ops (e.g. +, *) cannot resolve to closed structs.
+		return embedFlags{}
 	case *ast.ParenExpr:
 		return collectEmbedFlags(x.X)
 	case *ast.Ident:
 		if x.Name == "_" {
-			return expr, false, embedFlags{}
+			return embedFlags{}
 		}
 		if internal.IsDefinition(x) {
-			return expr, false, embedFlags{def: true}
+			return embedFlags{def: true}
 		}
-		return expr, false, embedFlags{other: true}
+		return embedFlags{other: true}
 	case *ast.CallExpr:
 		if id, ok := x.Fun.(*ast.Ident); ok {
 			switch id.Name {
 			case "close":
-				_, _, f := openCloseArg(x.Args[0])
-				return expr, false, f.or(embedFlags{close: true})
+				f := embedFlags{close: true}
+				if len(x.Args) == 1 {
+					_, _, af := openCloseArg(x.Args[0])
+					f = f.or(af)
+				}
+				return f
+			case "and", "or":
+				return embedFlags{other: true}
 			}
 		}
+		return embedFlags{}
+	case *ast.ListLit, // Lists cannot be opened anyway (atm).
+		*ast.StructLit, // Structs are open by default.
+		*ast.BasicLit,
+		*ast.Interpolation,
+		*ast.UnaryExpr:
+		return embedFlags{}
 	}
-	return expr, false, embedFlags{}
+
+	// Default: may resolve to a closed struct (SelectorExpr, IndexExpr, etc.)
+	return embedFlags{other: true}
 }
 
-// openEmbedExpr adds postfix ellipsis to embedded expressions. For & and |
-// expressions, it adds ... to the whole expression. For other expressions, it
-// adds ellipsis if needed based on the expression type.
+// openEmbedExpr adds postfix ellipsis to embedded expressions, classifying
+// them via [collectEmbedFlags]. Conjunctions, disjunctions, and parenthesized
+// expressions always get ... on the whole expression; embedded close() calls
+// are hoisted; any other expression gets ... exactly when its flags indicate
+// it may resolve to a closed value.
 func openEmbedExpr(expr ast.Expr) (result ast.Expr, changed bool, flags embedFlags) {
 	switch x := expr.(type) {
 	case *ast.PostfixExpr:
 		// Already has ellipsis; still collect flags from the underlying
 		// expression, as they influence the wrapping of the enclosing
 		// struct.
-		return collectEmbedFlags(x)
+		return expr, false, collectEmbedFlags(x)
 
 	case *ast.BinaryExpr:
-		if x.Op == token.AND || x.Op == token.OR {
-			// Collect flags from operands, then add ... to the
-			// entire expression rather than each operand.
-			_, _, xFlags := collectEmbedFlags(x.X)
-			_, _, yFlags := collectEmbedFlags(x.Y)
-			f := xFlags.or(yFlags)
-			if x.Op == token.OR && (xFlags.other || yFlags.other) {
-				f.forceReclose = true
-			}
-			return addEllipsis(expr), true, f
-		}
-		// Other binary ops (e.g. +, *) don't need ellipsis.
-		return expr, false, embedFlags{}
-
-	case *ast.ParenExpr:
-		// Recurse through parens to collect flags, then add ...
-		// to the whole parenthesized expression.
-		_, _, f := collectEmbedFlags(x.X)
-		return addEllipsis(expr), true, f
-
-	case *ast.Ident:
-		if x.Name == "_" {
+		if x.Op != token.AND && x.Op != token.OR {
+			// Other binary ops (e.g. +, *) don't need ellipsis.
 			return expr, false, embedFlags{}
 		}
-		if internal.IsDefinition(x) {
-			return addEllipsis(expr), true, embedFlags{def: true}
-		}
-		return addEllipsis(expr), true, embedFlags{other: true}
+		// Add ... to the entire expression rather than each operand,
+		// even when no operand may resolve to a closed value.
+		return addEllipsis(expr), true, collectEmbedFlags(x)
+
+	case *ast.ParenExpr:
+		// Add ... to the whole parenthesized expression.
+		return addEllipsis(expr), true, collectEmbedFlags(x)
 
 	case *ast.CallExpr:
-		if id, ok := x.Fun.(*ast.Ident); ok {
-			switch id.Name {
-			case "close":
-				// In the old semantics, embedding close() opened up
-				// the embedding — the outer struct stayed open. Under
-				// explicitopen, close() no longer opens up when embedded.
-				// Hoist close() to wrapper level: return the processed
-				// argument as the new embedding, and set the close flag
-				// so the containing struct gets close() wrapping.
-				if len(x.Args) == 1 {
-					newArg, _, f := openCloseArg(x.Args[0])
-					f.close = true
-					astutil.CopyMeta(newArg, x)
-					return newArg, true, f
-				}
-				return expr, true, embedFlags{close: true}
-			case "and", "or":
-				return addEllipsis(expr), true, embedFlags{other: true}
+		if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "close" {
+			// In the old semantics, embedding close() opened up
+			// the embedding — the outer struct stayed open. Under
+			// explicitopen, close() no longer opens up when embedded.
+			// Hoist close() to wrapper level: return the processed
+			// argument as the new embedding, and set the close flag
+			// so the containing struct gets close() wrapping.
+			if len(x.Args) == 1 {
+				newArg, _, f := openCloseArg(x.Args[0])
+				f.close = true
+				astutil.CopyMeta(newArg, x)
+				return newArg, true, f
 			}
+			return expr, true, embedFlags{close: true}
 		}
-		return expr, false, embedFlags{}
-
-	case *ast.ListLit, // Lists cannot be opened anyway (atm).
-		*ast.StructLit, // Structs are open by default
-		*ast.BasicLit,
-		*ast.Interpolation,
-		*ast.UnaryExpr:
-
-		return expr, false, embedFlags{}
 	}
 
-	// Default: needs ellipsis (SelectorExpr, IndexExpr, etc.)
-	return addEllipsis(expr), true, embedFlags{other: true}
+	if f := collectEmbedFlags(expr); f.mayBeClosed() {
+		return addEllipsis(expr), true, f
+	}
+	return expr, false, embedFlags{}
 }
 
 // openCloseArg processes the argument of an embedded close() call,

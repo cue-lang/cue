@@ -165,6 +165,41 @@ orField: {
 	b: int
 }
 
+// Conjunction with a selector operand → __reclose wraps.
+selConjField: {
+	#A: a: int
+	h: inner: #A
+	v: {
+		h.inner & {a: 1}
+		b: int
+	}
+
+	t1: v & {b: 1} @test(eq, {a: 1, b: 1})
+	t2: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// Comprehension field values with a selector conjunction or an and()
+// call do not close their field against a sibling pattern constraint;
+// entries added elsewhere remain allowed.
+compCallField: {
+	#HC: hc: {port: 1}
+	lib: v: #HC
+	#S: {
+		enable: bool
+		egress?: [string]: {...}
+		egress2?: [string]: {...}
+		if enable {
+			egress: lib.v & {hc: port: 1}
+		}
+		if enable {
+			egress2: and([lib.v])
+		}
+	}
+
+	t1: #S & {enable: true, egress: {extra: {}}, egress2: {extra: {}}} @test(eq,
+		{enable: true, egress: {hc: {port: 1}, extra: {}}, egress2: {hc: {port: 1}, extra: {}}})
+}
+
 -- out/errors.txt --
 [eval] closeOnly.t1.c: field not allowed:
     ./in.cue:13:11
@@ -242,6 +277,10 @@ orField: {
     ./in.cue:135:15
 [eval] andField.t2.c: field not allowed:
     ./in.cue:135:15
+[eval] selConjField.t2.c: field not allowed:
+    ./in.cue:164:11
+[incomplete] compCallField.#S: incomplete bool: bool:
+    ./in.cue:174:11
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -395,3 +434,38 @@ orField: __reclose({
 	or([#A, #D])...
 	b: int
 })
+
+// Conjunction with a selector operand → __reclose wraps.
+selConjField: {
+	#A: a:    int
+	h: inner: #A
+	v: __reclose({
+		(h.inner & {a: 1})...
+		b: int
+	})
+
+	t1: v & {b: 1} @test(eq, {a: 1, b: 1})
+	t2: v & {c: 1} @test(err, code=eval, path=c, contains="field not allowed")
+}
+
+// Comprehension field values with a selector conjunction or an and()
+// call do not close their field against a sibling pattern constraint;
+// entries added elsewhere remain allowed.
+compCallField: {
+	#HC: hc: {port: 1}
+	lib: v:  #HC
+	#S: {
+		enable: bool
+		egress?: [string]:  {...}
+		egress2?: [string]: {...}
+		if enable {
+			egress: (lib.v & {hc: port: 1})...
+		}
+		if enable {
+			egress2: and([lib.v])...
+		}
+	}
+
+	t1: #S & {enable: true, egress: {extra: {}}, egress2: {extra: {}}} @test(eq,
+		{enable: true, egress: {hc: {port: 1}, extra: {}}, egress2: {hc: {port: 1}, extra: {}}})
+}

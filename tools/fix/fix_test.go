@@ -133,6 +133,47 @@ X: __closeAll({
 		},
 
 		{
+			// Embeddings nested inside a rewritten embedding, such as in
+			// the struct operand of a conjunction, must be rewritten too.
+			// TODO: the inner ref embedding is left untouched; it should
+			// become "ref..." with a __reclose wrapper on its struct.
+			name: "nested embeddings inside conjunction operands (fixExplicitOpen)",
+			exps: []string{"explicitopen"},
+			in: `package foo
+
+#X: ctx: {...}
+ref: {a: int}
+
+v: {
+	#X & {
+		ctx: {
+			ref
+			extra: 1
+		}
+	}
+	more: 2
+}
+`,
+			out: `@experiment(explicitopen)
+
+package foo
+
+#X: ctx: {...}
+ref: {a: int}
+
+v: __closeAll({
+	(#X & {
+		ctx: {
+			ref
+			extra: 1
+		}
+	})...
+	more: 2
+})
+`,
+		},
+
+		{
 			// Blank aliases bind nothing that can be referenced; they must be
 			// dropped rather than converted to blank postfix aliases, which
 			// Sanitize rejects, or to an invalid "let _ = self".

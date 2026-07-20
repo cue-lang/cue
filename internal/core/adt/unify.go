@@ -812,6 +812,41 @@ func root(v *Vertex) *Vertex {
 	return v
 }
 
+// arcSettledForLookup reports whether the arc for f is already a member
+// whose conjunct set can no longer be affected by any task that a
+// lookup-driven process call could run, so that the lookup may return it
+// without driving this node's scheduler.
+//
+// This preserves the fine-grained dependency tracking of comprehension
+// pushdown: a pushed-down comprehension task — one completing only
+// allTasksCompleted, which [pushDownDeps] assigns exactly when the body
+// consists of literal fields only — contributes conjuncts solely to the
+// arcs it pre-created at scheduling time, registering itself in those
+// arcs' parentTasks. Any other pending task, or a task registered on the
+// requested arc itself, may still contribute to f and defeats the fast
+// path.
+func (n *nodeContext) arcSettledForLookup(f Feature) bool {
+	// A READY task other than a pushed-down comprehension may add
+	// conjuncts to arbitrary fields of this node, including f.
+	for _, t := range n.tasks {
+		if t.state == taskREADY &&
+			(t.run != handleComprehension || t.completes != allTasksCompleted) {
+			return false
+		}
+	}
+	// An ancestor comprehension may still add conjuncts to this node.
+	if n.hasActiveParentTask() {
+		return false
+	}
+	arc := n.node.LookupRaw(f)
+	if arc == nil || arc.ArcType != ArcMember {
+		return false
+	}
+	// Pushed-down comprehensions that may contribute to f, whether from
+	// this node or an ancestor, are registered on the arc itself.
+	return arc.state == nil || !arc.state.hasActiveParentTask()
+}
+
 func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Vertex {
 	needs := flags.condition
 	runMode := flags.mode
@@ -851,8 +886,12 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 
 		// Drive the lookup target forward when its scheduler has not yet
 		// started everything; the !allTasksStarted guard keeps us out of
-		// nodes that are already mid-execution.
-		if !allTasksStarted(state) {
+		// nodes that are already mid-execution. Skip this when the
+		// requested arc is already settled: driving the scheduler may
+		// force unrelated comprehension guards and disjunctions whose
+		// evaluation can re-enter the vertex that initiated this lookup,
+		// force-freezing values that are still being computed there.
+		if !allTasksStarted(state) && !state.arcSettledForLookup(f) {
 			state.process(valueKnown|fieldConjunctsKnown|allTasksCompleted, attemptOnly)
 			state.updateScalar()
 		}

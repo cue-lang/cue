@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fa0b733_3be590b0",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1839,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-20T15:12:30Z",
+      "side": 1,
+      "message": "I\u0027m surprised that we need to record this; could we not always qualify with the full package path when it exists, and if not falling back to just the package name, or otherwise nothing? i.e. I imagine this could be dynamic rather than static.",
+      "revId": "447f37ff75c7211b6350efdffec71476a160c9dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdbbc210_21478a02",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1843,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-20T15:12:30Z",
+      "side": 1,
+      "message": "perhaps call this \"qualifiedName\" or \"fullName\" for clarity?",
+      "revId": "447f37ff75c7211b6350efdffec71476a160c9dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
